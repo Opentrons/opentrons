@@ -31,7 +31,7 @@ run-parts /data/boot.d
 # - sleep in between the update server and api server starting. Sorry.
 
 echo "[ $0 ] Starting Opentrons update server"
-OT_UPDATE_SERVER=true python -m otupdate --debug --port 34000 &
+OT_UPDATE_SERVER=true ENABLE_VIRTUAL_SMOOTHIE=true python -m otupdate --debug --port 34000 &
 sleep 15
 
 echo "[ $0 ] Starting Jupyter Notebook server"

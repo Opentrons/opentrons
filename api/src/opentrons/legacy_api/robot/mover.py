@@ -1,4 +1,8 @@
 from opentrons.trackers.pose_tracker import Point, change_base, update, ROOT
+import logging
+
+
+log = logging.getLogger(__name__)
 
 
 class Mover:
@@ -68,6 +72,8 @@ class Mover:
         return update(pose_tree, self, Point(*defaults(dst_x, dst_y, dst_z)))
 
     def home(self, pose_tree):
+        log.info(f'Pose tree in home transform {pose_tree}')
+        log.info(f'Axis mapping {self._axis_mapping.values()}')
         self._driver.home(axis=''.join(self._axis_mapping.values()))
         return self.update_pose_from_driver(pose_tree)
 
@@ -160,5 +166,5 @@ class Mover:
             y=self._driver.position.get(self._axis_mapping.get('y', ''), 0.0),
             z=self._driver.position.get(self._axis_mapping.get('z', ''), 0.0)
         )
-
+        log.info(f'Point in update pose from driver {point}')
         return update(pose_tree, self, point)

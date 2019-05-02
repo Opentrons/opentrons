@@ -280,7 +280,9 @@ class Robot(CommandPublisher):
                 # TODO(LC25-4-2019): Modify configs to update to as
                 # testing informs better values
                 self._driver.update_pipette_config(mount_axis, {'home': 172.15})
+                self._driver.dist_from_eeprom[mount_axis] = 47.8
             elif model_value:
+                self._driver.dist_from_eeprom[mount_axis] = 0.0
                 self._driver.update_steps_per_mm(
                     {plunger_axis: DEFAULT_STEPS_PER_MM[plunger_axis]})
 

@@ -34,6 +34,15 @@ HOMED_POSITION = {
     'C': 19
 }
 
+EEPROM_DEFAULT = {
+    'X': 0.0,
+    'Y': 0.0,
+    'Z': 0.0,
+    'A': 0.0,
+    'B': 0.0,
+    'C': 0.0
+}
+
 PLUNGER_BACKLASH_MM = 0.3
 LOW_CURRENT_Z_SPEED = 30
 CURRENT_CHANGE_DELAY = 0.005
@@ -255,6 +264,7 @@ class SmoothieDriver_3_0_0:
     def __init__(self, config):
         self.run_flag = Event()
         self.run_flag.set()
+        self.dist_from_eeprom = EEPROM_DEFAULT.copy()
 
         self._position = HOMED_POSITION.copy()
         self.log = []
@@ -1288,6 +1298,7 @@ class SmoothieDriver_3_0_0:
             ax: self.homed_position.get(ax)
             for ax in ''.join(home_sequence)
         }
+        log.info(f'Home before update pos {homed}')
         self.update_position(default=homed)
         for axis in ''.join(home_sequence):
             self.engaged_axes[axis] = True
@@ -1300,6 +1311,7 @@ class SmoothieDriver_3_0_0:
             if ax in axis
         }
         self._homed_position.update(new)
+        log.info(f'Homed position after {new}')
 
         return self.position
 
@@ -1560,7 +1572,10 @@ class SmoothieDriver_3_0_0:
         rd: bytes = await proc.stdout.read()  # type: ignore
         res = rd.decode().strip()
         await proc.communicate()
-
+        try:
+            self._connection.close()
+        except Exception:
+            log.exception('Failed to close smoothie connection.')
         # re-open the port
         self._connection.open()
         # reset smoothieware
