@@ -303,6 +303,7 @@
   left: 0;
   right: 0;
   width: 100%;
+  min-height: calc(100vh - var(--size-mobile-nav));
   padding: 0;
   background-color: var(--c-white);
   z-index: 900;
@@ -404,6 +405,7 @@
 
   .mobile_nav {
     top: var(--size-main-nav);
+    min-height: auto;
   }
 
   .mobile_nav_item {
