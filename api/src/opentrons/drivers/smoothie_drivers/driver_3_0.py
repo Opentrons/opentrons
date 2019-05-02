@@ -1523,7 +1523,7 @@ class SmoothieDriver_3_0_0:
             gpio.set_high(gpio.OUTPUT_PINS['HALT'])
             sleep(0.25)
 
-    async def update_firmware(self,
+    async def update_firmware(self,  # noqa(C901)
                               filename: str,
                               loop: asyncio.AbstractEventLoop = None,
                               explicit_modeset: bool = True) -> str:
