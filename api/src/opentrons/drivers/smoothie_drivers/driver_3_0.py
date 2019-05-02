@@ -34,6 +34,15 @@ HOMED_POSITION = {
     'C': 19
 }
 
+EEPROM_DEFAULT = {
+    'X': 0.0,
+    'Y': 0.0,
+    'Z': 0.0,
+    'A': 0.0,
+    'B': 0.0,
+    'C': 0.0
+}
+
 PLUNGER_BACKLASH_MM = 0.3
 LOW_CURRENT_Z_SPEED = 30
 CURRENT_CHANGE_DELAY = 0.005
@@ -79,6 +88,7 @@ GCODES = {'HOME': 'G28.2',
           'PUSH_SPEED': 'M120',
           'POP_SPEED': 'M121',
           'SET_SPEED': 'G0F',
+          'STEPS_PER_MM': 'M92',
           'READ_INSTRUMENT_ID': 'M369',
           'WRITE_INSTRUMENT_ID': 'M370',
           'READ_INSTRUMENT_MODEL': 'M371',
@@ -254,6 +264,7 @@ class SmoothieDriver_3_0_0:
     def __init__(self, config):
         self.run_flag = Event()
         self.run_flag.set()
+        self.dist_from_eeprom = EEPROM_DEFAULT.copy()
 
         self._position = HOMED_POSITION.copy()
         self.log = []
@@ -302,7 +313,7 @@ class SmoothieDriver_3_0_0:
         self._saved_max_speed_settings = self._max_speed_settings.copy()
         self._combined_speed = float(DEFAULT_AXES_SPEED)
         self._saved_axes_speed = float(self._combined_speed)
-
+        self._steps_per_mm = {}
         self._acceleration = config.acceleration.copy()
         self._saved_acceleration = config.acceleration.copy()
 
@@ -431,6 +442,44 @@ class SmoothieDriver_3_0_0:
         '''
         self._write_to_pipette(
             GCODES['WRITE_INSTRUMENT_MODEL'], mount, data_string)
+
+    def update_pipette_config(self, axis, data):
+        '''
+        Updates the following configs for a given pipette mount based on
+        the detected pipette type:
+        - homing positions M365.0
+        - Max Travel M365.1
+        - endstop debounce M365.2 (NOT for zprobe debounce)
+        - retract from endstop distance M365.3
+        '''
+        if self.simulating:
+            return {axis: data}
+
+        gcodes = {
+            'retract': 'M365.3',
+            'debounce': 'M365.2',
+            'max_travel': 'M365.1',
+            'home': 'M365.0'}
+
+        res_msg = {axis: {}}
+
+        for key, value in data.items():
+            if key == 'debounce':
+                # debounce variable for all axes, so do not specify an axis
+                cmd = f' O{value}'
+            else:
+                cmd = f' {axis}{value}'
+            res = self._send_command(gcodes[key] + cmd)
+            if res is None:
+                raise ValueError(
+                    f'{key} was not updated to {value} on {axis} axis')
+            # ensure smoothie received code and changed value through
+            # return message. Format of return message:
+            # <Axis> (or E for endstop) updated <Value>
+            arr_result = res.strip().split(' ')
+            res_msg[axis][str(arr_result[0])] = float(arr_result[2])
+
+        return res_msg
 
     # FIXME (JG 9/28/17): Should have a more thought out
     # way of simulating vs really running
@@ -565,6 +614,10 @@ class SmoothieDriver_3_0_0:
     @property
     def speed(self):
         pass
+
+    @property
+    def steps_per_mm(self):
+        return self._steps_per_mm
 
     def set_speed(self, value):
         ''' set total axes movement speed in mm/second'''
@@ -995,7 +1048,7 @@ class SmoothieDriver_3_0_0:
         log.debug("wait for ack done")
         self._reset_from_error()
         log.debug("_reset")
-        self._send_command(self._config.steps_per_mm)
+        self.update_steps_per_mm(self._config.steps_per_mm)
         log.debug("sent steps")
         self._send_command(GCODES['ABSOLUTE_COORDS'])
         log.debug("sent abs")
@@ -1006,6 +1059,24 @@ class SmoothieDriver_3_0_0:
         self.pop_speed()
         self.pop_acceleration()
         log.debug("setup done")
+
+    def update_steps_per_mm(self, data):
+        # Using M92, update steps per mm for a given axis
+        if self.simulating:
+            self.steps_per_mm.update(data)
+            return
+
+        if isinstance(data, str):
+            # Unfortunately update server calls driver._setup() before the
+            # update can correctly load the robot_config change on disk.
+            # Need to account for old command format to avoid this issue.
+            self._send_command(data)
+        else:
+            cmd = ''
+            for axis, value in data.items():
+                cmd = f'{cmd} {axis}{value}'
+                self.steps_per_mm[axis] = value
+            self._send_command(GCODES['STEPS_PER_MM'] + cmd)
 
     def _read_from_pipette(self, gcode, mount) -> Optional[str]:
         '''
@@ -1227,6 +1298,7 @@ class SmoothieDriver_3_0_0:
             ax: self.homed_position.get(ax)
             for ax in ''.join(home_sequence)
         }
+        log.info(f'Home before update pos {homed}')
         self.update_position(default=homed)
         for axis in ''.join(home_sequence):
             self.engaged_axes[axis] = True
@@ -1239,6 +1311,7 @@ class SmoothieDriver_3_0_0:
             if ax in axis
         }
         self._homed_position.update(new)
+        log.info(f'Homed position after {new}')
 
         return self.position
 
@@ -1450,7 +1523,7 @@ class SmoothieDriver_3_0_0:
             gpio.set_high(gpio.OUTPUT_PINS['HALT'])
             sleep(0.25)
 
-    async def update_firmware(self,
+    async def update_firmware(self,  # noqa(C901)
                               filename: str,
                               loop: asyncio.AbstractEventLoop = None,
                               explicit_modeset: bool = True) -> str:
@@ -1499,7 +1572,10 @@ class SmoothieDriver_3_0_0:
         rd: bytes = await proc.stdout.read()  # type: ignore
         res = rd.decode().strip()
         await proc.communicate()
-
+        try:
+            self._connection.close()
+        except Exception:
+            log.exception('Failed to close smoothie connection.')
         # re-open the port
         self._connection.open()
         # reset smoothieware

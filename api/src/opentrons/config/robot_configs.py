@@ -110,7 +110,14 @@ DEFAULT_ACCELERATION: Dict[str, float] = {
     'C': C_ACCELERATION
 }
 
-DEFAULT_STEPS_PER_MM = 'M92 X80.00 Y80.00 Z400 A400 B768 C768'
+DEFAULT_STEPS_PER_MM: Dict[str, float] = {
+    'X': 80.00,
+    'Y': 80.00,
+    'Z': 400,
+    'A': 400,
+    'B': 768,
+    'C': 768
+}
 # This probe height is ~73 from deck to the top surface of the switch body
 # per CAD; 74.3mm is the nominal for engagement from the switch drawing.
 # Note that this has a piece-to-piece tolerance stackup of +-1.5mm
@@ -242,9 +249,10 @@ def _build_tip_probe(tip_probe_settings: dict) -> tip_probe_config:
     )
 
 
-def _build_acceleration(from_conf: Union[Dict, str, None]) -> Dict[str, float]:
+def _build_conf_dict(
+        from_conf: Union[Dict, str, None], default) -> Dict[str, float]:
     if not from_conf or isinstance(from_conf, str):
-        return DEFAULT_ACCELERATION
+        return default
     else:
         return from_conf
 
@@ -254,8 +262,10 @@ def _build_config(deck_cal: List[List[float]],
     cfg = robot_config(
         name=robot_settings.get('name', 'Ada Lovelace'),
         version=int(robot_settings.get('version', ROBOT_CONFIG_VERSION)),
-        steps_per_mm=robot_settings.get('steps_per_mm', DEFAULT_STEPS_PER_MM),
-        acceleration=_build_acceleration(robot_settings.get('acceleration')),
+        steps_per_mm=_build_conf_dict(
+            robot_settings.get('steps_per_mm'), DEFAULT_STEPS_PER_MM),
+        acceleration=_build_conf_dict(
+            robot_settings.get('acceleration'), DEFAULT_ACCELERATION),
         gantry_calibration=deck_cal or DEFAULT_DECK_CALIBRATION,
         instrument_offset=build_fallback_instrument_offset(robot_settings),
         tip_length=robot_settings.get('tip_length', DEFAULT_TIP_LENGTH_DICT),

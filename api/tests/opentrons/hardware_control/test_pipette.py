@@ -80,3 +80,8 @@ def test_config_update():
         sample_plunger_pos = {'top': 19.5}
         pip.update_config_item('top', sample_plunger_pos.get('top'))
         assert pip.config.top == sample_plunger_pos.get('top')
+
+
+def test_smoothie_config_update(monkeypatch):
+    for config in pipette_config.config_models:
+        assert config == config

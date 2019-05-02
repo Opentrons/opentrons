@@ -142,9 +142,9 @@ export const getConnectedRobot: GetConnectedRobot = createSelector(
 )
 
 export const getRobotApiVersion = (robot: AnyRobot): ?string =>
-  (robot.serverHealth && semver.valid(robot.serverHealth.apiServerVersion)) ||
-  (robot.health && semver.valid(robot.health.api_version))
+  (robot.health && semver.valid(robot.health.api_version)) ||
+  (robot.serverHealth && semver.valid(robot.serverHealth.apiServerVersion))
 
 export const getRobotFirmwareVersion = (robot: AnyRobot): ?string =>
-  (robot.serverHealth && robot.serverHealth.smoothieVersion) ||
-  (robot.health && robot.health.fw_version)
+  (robot.health && robot.health.fw_version) ||
+  (robot.serverHealth && robot.serverHealth.smoothieVersion)

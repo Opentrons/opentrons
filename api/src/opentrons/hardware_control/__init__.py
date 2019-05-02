@@ -20,6 +20,7 @@ from opentrons import types as top_types
 from opentrons.util import linal
 from .simulator import Simulator
 from opentrons.config import robot_configs
+from opentrons.config.robot_configs import DEFAULT_STEPS_PER_MM
 from .pipette import Pipette
 try:
     from .controller import Controller
@@ -267,6 +268,28 @@ class API(HardwareAPILike):
                             self._config.instrument_offset[mount.name.lower()],
                             instrument_data['id'])
                 self._attached_instruments[mount] = p
+                mount_axis = Axis.by_mount(mount)
+                plunger_axis = Axis.of_plunger(mount)
+                if 'v2' in model:
+                    # Check if new model of pipettes, load smoothie configs
+                    # for this particular model
+                    self._backend._smoothie_driver.update_steps_per_mm(
+                        {plunger_axis.name: 2133.33})
+                    # TODO(LC25-4-2019): Modify configs to update to as
+                    # testing informs better values
+                    self._backend._smoothie_driver.update_pipette_config(
+                        mount_axis.name, {'home': 172.15})
+                    self._backend._smoothie_driver.update_pipette_config(
+                        plunger_axis.name, {'max_travel': 60})
+                else:
+                    self._backend._smoothie_driver.update_steps_per_mm(
+                        {plunger_axis.name: DEFAULT_STEPS_PER_MM[
+                            plunger_axis.name]})
+
+                    self._backend._smoothie_driver.update_pipette_config(
+                        mount_axis.name, {'home': 220})
+                    self._backend._smoothie_driver.update_pipette_config(
+                        plunger_axis.name, {'max_travel': 30})
             else:
                 self._attached_instruments[mount] = None
         mod_log.info("Instruments found: {}".format(

@@ -6,6 +6,7 @@ from typing import Dict, Optional, List, Tuple
 from contextlib import contextmanager
 from opentrons import types
 from opentrons.config.pipette_config import config_models
+from opentrons.drivers.smoothie_drivers import SimulatingDriver
 from . import modules
 
 
@@ -81,6 +82,9 @@ class Simulator:
         self._position = copy.copy(_HOME_POSITION)
         # Engaged axes start all true in smoothie for some reason so we
         # imitate that here
+        # TODO(LC2642019) Create a simulating driver for smoothie instead of
+        # using a flag
+        self._smoothie_driver = SimulatingDriver()
         self._engaged_axes = {ax: True for ax in _HOME_POSITION}
         self._lights = {'button': False, 'rails': False}
         self._run_flag = Event()
