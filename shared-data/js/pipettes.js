@@ -22,6 +22,7 @@ export type PipetteModelSpecs = {
 
 export type PipetteModel =
   | 'p10_single'
+  | 'p20_single'
   | 'p50_single'
   | 'p300_single'
   | 'p1000_single'

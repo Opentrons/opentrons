@@ -415,6 +415,7 @@ class Pipette:
 
         mm_position = self._aspirate_plunger_position(
             self.current_volume + volume)
+        print('mm_position', mm_position)
         speed = self.speeds['aspirate'] * rate
         self.instrument_actuator.push_speed()
         self.instrument_actuator.set_speed(speed)
@@ -498,14 +499,17 @@ class Pipette:
         volume = min(self.current_volume, volume)
 
         # if volume is specified as 0uL, then do nothing
-        if volume == 0:
-            return self
+        
         self._position_for_dispense(location)
         #print('position for dispense: ', self._position_for_dispense(location))
-        print('Dispensing volume: ', volume)
+        #print('Dispensing volume: ', volume)
         mm_position = self._dispense_plunger_position(
             self.current_volume - volume)
+
+        if (self.current_volume - volume)  == 0:
+            mm_position = self._dispense_plunger_position(0.01)
         print('current volume after dispense: ', self.current_volume - volume)
+        print('Current motor position:', mm_position)
         speed = self.speeds['dispense'] * rate
 
         self.instrument_actuator.push_speed()
@@ -515,7 +519,7 @@ class Pipette:
             self.robot.poses,
             x=mm_position
         )
-        print('current position: ', mm_position)
+        print('Target position: ', mm_position)
         self.instrument_actuator.pop_speed()
         self.current_volume -= volume  # update after actual dispense
         return self
@@ -1407,6 +1411,7 @@ class Pipette:
         millimeters = ul / self._ul_per_mm(ul, 'aspirate')
         destination_mm = self._get_plunger_position('bottom') + millimeters
         return round(destination_mm, 6)
+        
 
     def _dispense_plunger_position(self, ul):
         """Calculate axis position for a given liquid volume.
@@ -1417,8 +1422,9 @@ class Pipette:
         Calibration of the pipette motor's ul-to-mm conversion is required
         """
         millimeters = ul / self._ul_per_mm(ul, 'dispense')
-        destination_mm = self._get_plunger_position('bottom') + millimeters
-        print('destination mm: ', destination_mm)
+        destination_mm =  self._get_plunger_position('bottom') + millimeters
+        #print ('uL_per_mm', self._uL_per_mm(uL,'dispense'))
+        #print('Dipense position: ', destination_mm)
         return round(destination_mm, 6)
 
     def _ul_per_mm(self, ul: float, func: str) -> float:
@@ -1428,7 +1434,7 @@ class Pipette:
         :return: microliters/mm as a float
         """
         sequence = self.ul_per_mm[func]
-        print('api ul/mm: ', sequence)
+        #print('api ul/mm: ', sequence)
         return pipette_config.piecewise_volume_conversion(ul, sequence)
 
     def _volume_percentage(self, volume):

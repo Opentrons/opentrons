@@ -14,7 +14,7 @@ UPDATE_SERVER_DIR := update-server
 # this may be set as an environment variable to select the version of
 # python to run if pyenv is not available. it should always be set to
 # point to a python3.6.
-OT_PYTHON ?= python
+OT_PYTHON ?= python3
 
 # watch, coverage, and update snapshot variables for tests
 watch ?= false

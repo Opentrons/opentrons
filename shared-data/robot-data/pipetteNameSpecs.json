@@ -14,6 +14,16 @@
     "defaultAspirateFlowRate": 5,
     "defaultDispenseFlowRate": 10,
     "channels": 8
+
+  },
+  "p20_single": {
+    "displayName": "P20 Single-Channel",
+    "minVolume": 1,
+    "maxVolume": 20,
+    "channels": 1,
+    "defaultAspirateFlowRate": 5,
+    "defaultDispenseFlowRate": 10,
+    
   },
   "p50_single": {
     "displayName": "P50 Single-Channel",
