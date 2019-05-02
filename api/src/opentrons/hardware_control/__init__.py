@@ -279,6 +279,8 @@ class API(HardwareAPILike):
                     # testing informs better values
                     self._backend._smoothie_driver.update_pipette_config(
                         mount_axis.name, {'home': 172.15})
+                    self._backend._smoothie_driver.update_pipette_config(
+                        plunger_axis.name, {'max_travel': 60})
                 else:
                     self._backend._smoothie_driver.update_steps_per_mm(
                         {plunger_axis.name: DEFAULT_STEPS_PER_MM[
@@ -286,6 +288,8 @@ class API(HardwareAPILike):
 
                     self._backend._smoothie_driver.update_pipette_config(
                         mount_axis.name, {'home': 220})
+                    self._backend._smoothie_driver.update_pipette_config(
+                        plunger_axis.name, {'max_travel': 30})
             else:
                 self._attached_instruments[mount] = None
         mod_log.info("Instruments found: {}".format(

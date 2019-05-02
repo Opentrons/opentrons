@@ -143,19 +143,17 @@ class Mover:
         assert axis in 'xyz', "axis value should be x, y or z"
         assert axis in self._axis_mapping, "mapping is not set for " + axis
 
-        # change_base is computationally expensive
-        # so only run if max pos is not known
-        if self._axis_maximum[axis] is None:
-            d_axis_max = self._driver.homed_position[self._axis_mapping[axis]]
-            d_point = {'x': 0, 'y': 0, 'z': 0}
-            d_point[axis] = d_axis_max
-            x, y, z = change_base(
-                pose_tree,
-                src=self._dst,
-                dst=self._src,
-                point=Point(**d_point))
-            point = {'x': x, 'y': y, 'z': z}
-            self._axis_maximum[axis] = point[axis]
+        d_axis_max = self._driver.homed_position[self._axis_mapping[axis]]
+        log.info(f"Axis max from driver: {d_axis_max}")
+        d_point = {'x': 0, 'y': 0, 'z': 0}
+        d_point[axis] = d_axis_max
+        x, y, z = change_base(
+            pose_tree,
+            src=self._dst,
+            dst=self._src,
+            point=Point(**d_point))
+        point = {'x': x, 'y': y, 'z': z}
+        self._axis_maximum[axis] = point[axis]
         return self._axis_maximum[axis]
 
     def update_pose_from_driver(self, pose_tree):
