@@ -19,14 +19,12 @@ exports[`SecondaryNav component renders 1`] = `
   <li
     key="1"
   >
-    <a
+    <Link
       className="subdomain_link"
-      href="./"
-      rel="noopener noreferrer"
-      target="_blank"
+      to="/"
     >
       Labware Library
-    </a>
+    </Link>
   </li>
   <li
     key="2"
