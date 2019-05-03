@@ -21,7 +21,7 @@ type Props = {
 }
 
 // TODO(mc, 2018-03-30): volume and channels should come from the API
-const RE_CHANNELS = /p\d+_(single|multi)/
+const RE_CHANNELS = /p(\d+|\+\d+)_(single|multi)/
 
 const LABEL_BY_MOUNT = {
   left: 'Left pipette',
