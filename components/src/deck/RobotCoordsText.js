@@ -11,12 +11,7 @@ type TextProps = {
 export default function RobotCoordsText(props: TextProps) {
   const { x, y, children, ...additionalProps } = props
   return (
-    <text
-      {...additionalProps}
-      x={x}
-      y={-1 * y}
-      style={{ transform: 'scale(1, -1)' }}
-    >
+    <text {...additionalProps} x={x} y={-1 * y} transform="scale(1, -1)">
       {children}
     </text>
   )

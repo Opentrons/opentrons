@@ -11,18 +11,22 @@ export type FilledWellsProps = {|
 
 function FilledWells(props: FilledWellsProps) {
   const { definition, fillByWell } = props
-  return map<*, *, React.Node>(
-    fillByWell,
-    (color: $Values<typeof fillByWell>, wellName) => {
-      return (
-        <Well
-          key={wellName}
-          wellName={wellName}
-          fill={color}
-          definition={definition}
-        />
-      )
-    }
+  return (
+    <>
+      {map<*, *, React.Node>(
+        fillByWell,
+        (color: $Values<typeof fillByWell>, wellName) => {
+          return (
+            <Well
+              key={wellName}
+              wellName={wellName}
+              fill={color}
+              definition={definition}
+            />
+          )
+        }
+      )}
+    </>
   )
 }
 
