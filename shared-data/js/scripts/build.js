@@ -1,7 +1,6 @@
 // This build script is run by `make install`
 
-// Merge all JSON files into a single JSON labware file, build/labware.json,
-// and a single JSON decks file, build/decks.json
+// Merge all JSON files into a single JSON file, build/labware.json,
 // with each filename as a key in the final JSON file.
 const fs = require('fs')
 const path = require('path')
@@ -15,23 +14,17 @@ if (!buildDir) {
   )
 }
 
-const globifySourceFiles = sourcePath => {
-  let output = {}
+let output = {}
 
-  const files = glob.sync(path.join(__dirname, sourcePath))
+const files = glob.sync(path.join(__dirname, '../../definitions/*.json'))
 
-  files.forEach(filename => {
-    const contents = require(filename)
-    const labwareName = path.parse(filename).name
+files.forEach(filename => {
+  const contents = require(filename)
+  const labwareName = path.parse(filename).name
 
-    output[labwareName] = contents
-  })
+  output[labwareName] = contents
+})
 
-  return JSON.stringify(output)
-}
+const jsonOutput = JSON.stringify(output)
 
-const labwareSourcePath = '../../definitions/*.json'
-const decksSourcePath = '../../robot-data/decks/*.json'
-
-fs.writeFileSync(path.join(buildDir, 'labware.json'), globifySourceFiles(labwareSourcePath))
-fs.writeFileSync(path.join(buildDir, 'decks.json'), globifySourceFiles(decksSourcePath))
+fs.writeFileSync(path.join(buildDir, 'labware.json'), jsonOutput)

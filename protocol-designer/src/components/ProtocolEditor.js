@@ -15,8 +15,6 @@ import { PortalRoot as TopPortalRoot } from './portals/TopPortal'
 import { SCROLL_ON_SELECT_STEP_CLASSNAME } from '../steplist/actions'
 import styles from './ProtocolEditor.css'
 
-import { WorkingSpace } from '@opentrons/components'
-
 const showGateModal =
   process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
 
@@ -42,10 +40,7 @@ function ProtocolEditor() {
             {/* TODO: Ian 2018-06-28 All main page modals will go here */}
             <MainPageModalPortalRoot />
 
-            {/* <ConnectedMainPanel /> */}
-            <div style={{ height: '500px', width: '500px' }}>
-              <WorkingSpace />
-            </div>
+            <ConnectedMainPanel />
           </div>
         </div>
       </div>

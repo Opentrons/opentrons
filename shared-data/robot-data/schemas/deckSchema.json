@@ -13,6 +13,16 @@
       "minItems": 3,
       "maxItems": 3
     },
+    "unitVector": {
+      "type": "array",
+      "description": "Array of 3 unit directions, [x, y, z]",
+      "items": {
+        "type": "number",
+        "enum": [1, -1]
+      },
+      "minItems": 3,
+      "maxItems": 3
+    },
     "boundingBox": {
       "type": "object",
       "description": "The active area (both pipettes can reach) of a fixture on the deck",
@@ -32,7 +42,7 @@
       "description": "A physical feature of the deck",
       "required": ["footprint"],
       "properties": {
-        "footprint": {"$ref": "#/definitions/pathDValue"}
+        "footprint": { "$ref": "#/definitions/pathDValue" }
       }
     }
   },
@@ -40,7 +50,16 @@
   "description": "Deck specifications, where x,y,z (0,0,0) is at front the bottom left corner.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["otId", "loadName", "cornerOffsetFromOrigin", "dimensions", "metadata", "robot", "locations", "layers"],
+  "required": [
+    "otId",
+    "loadName",
+    "cornerOffsetFromOrigin",
+    "dimensions",
+    "metadata",
+    "robot",
+    "locations",
+    "layers"
+  ],
   "properties": {
     "otId": {
       "description": "Unique internal ID generated using UUID",
@@ -48,39 +67,19 @@
     },
 
     "loadName": {
-      "description": "Generated unique name of Deck",
+      "description": "Unique name of Deck",
       "type": "string",
       "pattern": "^[a-z0-9._]+$"
     },
 
     "cornerOffsetFromOrigin": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "Distance from left-front-bottom corner of entire deck to robot coordinate system origin",
-      "required": ["x", "y", "z"],
-      "properties": {
-        "x": { "type": "number" },
-        "y": { "type": "number" },
-        "z": { "type": "number" }
-      }
+      "$ref": "#/definitions/xyzArray",
+      "description": "Distance from left-front-bottom corner of entire deck to robot coordinate system origin"
     },
 
     "dimensions": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "Outer dimensions of a labware",
-      "required": ["xDimension", "yDimension", "zDimension"],
-      "properties": {
-        "xDimension": {
-          "$ref": "#/definitions/positiveNumber"
-        },
-        "yDimension": {
-          "$ref": "#/definitions/positiveNumber"
-        },
-        "zDimension": {
-          "$ref": "#/definitions/positiveNumber"
-        }
-      }
+      "$ref": "#/definitions/xyzArray",
+      "description": "Outer dimensions of a deck bounding box"
     },
 
     "metadata": {
@@ -131,6 +130,10 @@
                 "type": "string"
               },
               "position": { "$ref": "#/definitions/xyzArray" },
+              "matingSurfaceUnitVector": {
+                "$ref": "#/definitions/unitVector",
+                "description": "An optional diagonal direction of force, defined by spring location, which governs the mating surface of objects placed in slot."
+              },
               "boundingBox": { "$ref": "#/definitions/boundingBox" },
               "displayName": {
                 "description": "An optional human-readable nickname for this slot Eg \"Slot 1\" or \"Fixed Trash\"",
@@ -218,7 +221,7 @@
       "additionalProperties": {
         "type": "array",
         "description": "Individual features within a layer",
-        "items": {"$ref": "#/definitions/feature"}
+        "items": { "$ref": "#/definitions/feature" }
       }
     }
   }

@@ -1,4 +1,4 @@
-import { getDeckLayers } from "./helpers";
+import { getDeckLayers } from './helpers'
 
 // @flow
 export type WellDefinition = {
@@ -143,9 +143,13 @@ export type DeckRobot = {|
 |}
 
 export type CoordinateTuple = [number, number, number]
+
+export type UnitDirection = 1 | -1
+export type UnitVectorTuple = [UnitDirection, UnitDirection, UnitDirection]
 export type DeckSlot = {|
   id: string,
   position: CoordinateTuple,
+  matingSurfaceUnitVector?: UnitVectorTuple,
   boundingBox: Dimensions,
   displayName: string,
 |}
@@ -170,7 +174,6 @@ export type DeckLayer = {|
 
 export type DeckDefinition = {|
   otId: string,
-  loadName: string,
   cornerOffsetFromOrigin: DeckOffset,
   dimensions: Dimensions,
   robot: DeckRobot,

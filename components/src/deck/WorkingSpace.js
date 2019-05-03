@@ -1,57 +1,59 @@
 // @flow
 import * as React from 'react'
-import { getDeckLayers, type DeckDimensions } from '@opentrons/shared-data'
+import {
+  getDeckLayers,
+  type DeckDefinition,
+  type DeckSlot,
+} from '@opentrons/shared-data'
+import { getDeckDefinitions } from '../utils'
 import styles from './Deck.css'
 
-// TODO: IMMEDIATELY put in deck definition, and get from there
-const originX = -115.65
-const originY = -68.03
-const xDimension = 624.3
-const yDimension = 565.2
-
 type dValue = string
-type Props = { deckLoadName: string }
-
-const WorkingSpace = (props: Props) => {
-  const {deckLoadName = 'ot2_standard'} = props
-
-  const {
-    xCornerOffsetFromOrigin,
-    yCornerOffsetFromOrigin,
-    boundingBoxXDimension,
-    boundingBoxYDimension,
-  }: DeckDimensions = getDeckDimensions(deckLoadName)
-
-  return (
-    <svg className={styles.working_space} viewBox={`${originX} ${originY} ${xDimension} ${yDimension}`}>
-      <Deck deckLoadName={deckLoadName} />
-
-      <text
-        x={240}
-        y={-160}
-        onClick={(e) => console.log(e.target.x)}
-        style={{ transform: 'scale(1, -1)' }}>
-        HEY HELLO THERE
-      </text>
-      <foreignObject x={128} y={80} height='20px' width='100px'>
-        <div
-          style={{ transform: 'scale(1, -1)' }}
-          xmlns="http://www.w3.org/1999/xhtml">
-          <input placeholder='Name Here'></input>
-        </div>
-      </foreignObject>
-    </svg>
-  )
-
+type Props = {
+  deckName: string,
+  children: DeckSlot => React.Node,
 }
 
-type DeckProps = {deckLoadName: string}
+class WorkingSpace extends React.Component<Props> {
+  deckDef: DeckDefinition
+  static defaultProps = { deckName: 'ot2_standard' }
+
+  constructor(props: Props) {
+    super(props)
+    const allDecks = getDeckDefinitions()
+    this.deckDef = allDecks[this.props.deckName]
+  }
+
+  render() {
+    if (!this.deckDef) return null
+    const { deckName } = this.props
+
+    const [viewBoxOriginX, viewBoxOriginY] = this.deckDef.cornerOffsetFromOrigin
+    const [deckXDimension, deckYDimension] = this.deckDef.dimensions
+
+    const slots = this.deckDef.locations.orderedSlots.reduce(
+      (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
+      {}
+    )
+    return (
+      <svg
+        className={styles.working_space}
+        viewBox={`${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`}
+      >
+        <Deck deckName={deckName} />
+        {this.props.children({ slots })}
+      </svg>
+    )
+  }
+}
+
+type DeckProps = { deckName: string }
 class Deck extends React.PureComponent<DeckProps> {
   render() {
     const layers: Array<{
       name: string,
       footprints: Array<dValue>,
-    }> = getDeckLayers(this.props.deckLoadName)
+    }> = getDeckLayers(this.props.deckName)
 
     return (
       <g>
@@ -66,5 +68,27 @@ class Deck extends React.PureComponent<DeckProps> {
     )
   }
 }
+
+// NOTE: In order for arbitrary UI text and foreigObjects
+// to render properly in the robot coordinate system, use these
+// components which will perform the necessary transformation
+type TextProps = any // $FlowFixMe(bc, 2019-05-03) React.ElementProps<'text'>
+export const Text = (props: TextProps) => (
+  <text {...props} y={-props.y} style={{ transform: 'scale(1, -1)' }}>
+    {props.children}
+  </text>
+)
+
+type ForeignObjectProps = any // $FlowFixMe(bc, 2019-05-03) React.ElementProps<'foreignObject'>
+export const ForeignObject = (props: ForeignObjectProps) => (
+  <foreignObject {...props}>
+    <div
+      style={{ transform: 'scale(1, -1)' }}
+      xmlns="http://www.w3.org/1999/xhtml"
+    >
+      {props.children}
+    </div>
+  </foreignObject>
+)
 
 export default WorkingSpace

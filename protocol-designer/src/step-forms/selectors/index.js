@@ -120,6 +120,23 @@ export const _getPipetteEntitiesRootState: RootState => PipetteEntities = create
 export const getInitialDeckSetupStepForm = (state: BaseState) =>
   rootSelector(state).savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
 
+export const getLabwareLocationsForStep = (
+  state: BaseState,
+  stepId: StepIdType = INITIAL_DECK_SETUP_STEP_ID
+) => {
+  const { orderedStepIds, savedStepForms } = rootSelector(state)
+  const allOrderedStepIds = [INITIAL_DECK_SETUP_STEP_ID, ...orderedStepIds]
+  const relevantStepIds = allOrderedStepIds.slice(
+    0,
+    allOrderedStepIds.indexOf(stepId) + 1
+  )
+  return relevantStepIds.reduce((acc, stepId) => {
+    const { labwareLocationUpdate } = savedStepForms[stepId]
+    if (labwareLocationUpdate) return { ...acc, ...labwareLocationUpdate }
+    return acc
+  }, {})
+}
+
 export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
   getInitialDeckSetupStepForm,
   getLabwareEntities,

@@ -1,5 +1,7 @@
 {
-  "otId": "a4446480-1a8c-11e9-a2de-d3e23d313b0f",
+  "otId": "ot2_short_trash",
+  "cornerOffsetFromOrigin": [-115.65, -68.03, 0],
+  "dimensions": [624.3, 565.2, 0],
   "metadata": {
     "displayName": "OT-2 Short-Trash Deck",
     "tags": ["ot2", "12 slots", "short trash"]
@@ -12,6 +14,7 @@
       {
         "id": "1",
         "position": [0.0, 0.0, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
@@ -22,6 +25,7 @@
       {
         "id": "2",
         "position": [132.5, 0.0, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
@@ -32,6 +36,7 @@
       {
         "id": "3",
         "position": [265.0, 0.0, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
@@ -42,6 +47,7 @@
       {
         "id": "4",
         "position": [0.0, 90.5, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
@@ -52,6 +58,7 @@
       {
         "id": "5",
         "position": [132.5, 90.5, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
@@ -62,6 +69,7 @@
       {
         "id": "6",
         "position": [265.0, 90.5, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
@@ -72,6 +80,7 @@
       {
         "id": "7",
         "position": [0.0, 181.0, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
@@ -82,6 +91,7 @@
       {
         "id": "8",
         "position": [132.5, 181.0, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
@@ -92,6 +102,7 @@
       {
         "id": "9",
         "position": [265.0, 181.0, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
@@ -102,6 +113,7 @@
       {
         "id": "10",
         "position": [0.0, 271.5, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
@@ -112,6 +124,7 @@
       {
         "id": "11",
         "position": [132.5, 271.5, 0.0],
+        "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
