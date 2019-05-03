@@ -40,7 +40,7 @@ export default function ProtocolMenu(props: Props) {
             target="_blank"
             rel="noopener noreferrer"
           >
-            {bottomLink.name} &nbsp; &gt;
+            {bottomLink.name} ›
           </a>
         </div>
       )}

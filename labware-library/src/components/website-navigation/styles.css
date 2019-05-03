@@ -90,15 +90,10 @@
 
 .nav_link {
   @apply --link-text;
-  @apply --transition-color;
 
   position: relative;
   padding: 2rem var(--spacing-nav);
   color: var(--c-nav-gray);
-
-  &:hover {
-    color: var(--c-black);
-  }
 
   &:last-child {
     padding-right: 0;
@@ -186,7 +181,7 @@
   @apply --font-body-2-dark;
 
   line-height: 1.25rem;
-  flex-basis: 8rem;
+  flex: 0 0 6rem;
   padding: 0 var(--spacing-5);
   text-transform: uppercase;
 }
@@ -224,6 +219,8 @@
 .link_title {
   @apply --link-text;
 
+  display: block;
+  width: 100%;
   text-align: left;
   color: var(--c-black);
 
@@ -233,7 +230,7 @@
 
   /* Only add caret to base NavLinks on Mobile */
   &::after {
-    content: '\00a0 \3E';
+    content: ' ›';
   }
 }
 
@@ -286,14 +283,8 @@
 }
 
 .menu_button {
-  @apply --transition-color;
-
   flex: 0 0 3rem;
   color: var(--c-font-dark);
-
-  &:hover {
-    color: var(--c-black);
-  }
 }
 
 /* Mobile List */
@@ -303,6 +294,7 @@
   left: 0;
   right: 0;
   width: 100%;
+  min-height: calc(100vh - var(--size-mobile-nav));
   padding: 0;
   background-color: var(--c-white);
   z-index: 900;
@@ -402,8 +394,13 @@
     padding-left: 0;
   }
 
+  .link_title {
+    text-align: center;
+  }
+
   .mobile_nav {
     top: var(--size-main-nav);
+    min-height: auto;
   }
 
   .mobile_nav_item {
@@ -459,6 +456,7 @@
 
   .link_title {
     display: block;
+    width: 100%;
     padding: 0;
     text-align: left;
 
@@ -468,7 +466,7 @@
   }
 
   .link_cta::after {
-    content: '\00a0 \3E';
+    content: ' ›';
   }
 
   .submenu_title {
