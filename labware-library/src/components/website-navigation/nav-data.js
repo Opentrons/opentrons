@@ -126,7 +126,7 @@ export const supportLinkProps: SupportLinks = {
   },
   support: {
     name: 'Contact Support',
-    url: 'http://opentrons.com/contact',
+    url: 'https://opentrons.com/contact-support',
     cta: true,
   },
 }

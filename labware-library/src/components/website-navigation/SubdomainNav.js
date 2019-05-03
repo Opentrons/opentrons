@@ -2,11 +2,12 @@
 // top subdomain nav bar component
 import * as React from 'react'
 import { Link } from 'react-router-dom'
+import { getPublicPath } from '../../public-path'
 import styles from './styles.css'
 
 export const SUBDOMAIN_NAV_LINKS = [
   { name: 'Python API', url: 'https://docs.opentrons.com/' },
-  { name: 'Labware Library', to: '/' },
+  { name: 'Labware Library', to: getPublicPath() },
   { name: 'Protocol Library', url: 'https://protocols.opentrons.com/' },
   { name: 'Protocol Designer', url: 'https://designer.opentrons.com/' },
 ]

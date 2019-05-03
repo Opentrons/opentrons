@@ -6,5 +6,9 @@ import logoSrc from './images/ot-logo-full.png'
 import styles from './styles.css'
 
 export default function Logo() {
-  return <img className={styles.logo} src={logoSrc} />
+  return (
+    <a href="https://opentrons.com/" target="_blank" rel="noopener noreferrer">
+      <img className={styles.logo} src={logoSrc} />
+    </a>
+  )
 }
