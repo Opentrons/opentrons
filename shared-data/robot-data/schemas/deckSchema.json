@@ -22,6 +22,18 @@
         "yDimension": { "$ref": "#/definitions/positiveNumber" },
         "zDimension": { "$ref": "#/definitions/positiveNumber" }
       }
+    },
+    "pathDValue": {
+      "type": "string",
+      "description": "A valid d-attribute value for an svg path. Note: uses physical coordinate system which has origin at the bottom, front, left of the robot's workspace."
+    },
+    "feature": {
+      "type": "object",
+      "description": "A physical feature of the deck",
+      "required": ["footprint"],
+      "properties": {
+        "footprint": {"$ref": "#/definitions/pathDValue"}
+      }
     }
   },
 
@@ -162,6 +174,15 @@
             ]
           }
         }
+      }
+    },
+    "layers": {
+      "type": "object",
+      "description": "Layered feature groups of the deck.",
+      "additionalProperties": {
+        "type": "array",
+        "description": "Individual features within a layer",
+        "items": {"$ref": "#/definitions/feature"}
       }
     }
   }
