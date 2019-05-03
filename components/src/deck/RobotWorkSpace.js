@@ -5,9 +5,12 @@ import { getDeckDefinitions } from '../utils'
 import { DeckFromData } from './Deck'
 import styles from './RobotWorkSpace.css'
 
+type RenderProps = {
+  slots: { [string]: DeckSlot },
+}
 type Props = {
   deckName: string,
-  children: DeckSlot => React.Node,
+  children?: RenderProps => React.Node,
   deckLayerBlacklist: Array<string>,
 }
 
@@ -46,7 +49,7 @@ class RobotWorkSpace extends React.Component<Props> {
         viewBox={`${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`}
       >
         <DeckFromData def={this.deckDef} visibleLayers={visibleDeckLayers} />
-        {this.props.children({ slots })}
+        {this.props.children && this.props.children({ slots })}
       </svg>
     )
   }

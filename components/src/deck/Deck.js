@@ -7,6 +7,7 @@ import pick from 'lodash/pick'
 import type { DeckSlot } from '../robot-types'
 import {
   type DeckDefinition,
+  type DeckLayer,
   SLOT_RENDER_WIDTH,
   SLOT_RENDER_HEIGHT,
 } from '@opentrons/shared-data'
@@ -31,7 +32,7 @@ export class DeckFromData extends React.PureComponent<DeckProps> {
       <g>
         {map(
           pick(this.props.def.layers, this.props.visibleLayers),
-          (layer, layerId) => (
+          (layer: DeckLayer, layerId: string) => (
             <g id={layerId} key={layerId} className={styles.deck_outline}>
               {layer.map((feature: { footprint: string }, index: number) => (
                 <path d={feature.footprint} key={`${layerId}${index}`} />

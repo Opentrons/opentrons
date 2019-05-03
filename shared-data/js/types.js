@@ -1,5 +1,3 @@
-import { getDeckLayers } from './helpers'
-
 // @flow
 export type WellDefinition = {
   diameter?: number, // NOTE: presence of diameter indicates a circular well
@@ -168,9 +166,11 @@ export type DeckMetadata = {|
   tags: Array<string>,
 |}
 
-export type DeckLayer = {|
+export type DeckLayerFeature = {|
   footprint: string,
 |}
+
+export type DeckLayer = Array<DeckLayerFeature>
 
 export type DeckDefinition = {|
   otId: string,

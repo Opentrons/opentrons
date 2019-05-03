@@ -2,7 +2,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { Deck, ClickOutside, RobotWorkSpace } from '@opentrons/components'
+import { Deck, ClickOutside } from '@opentrons/components'
 import styles from './Deck.css'
 import i18n from '../localization'
 
@@ -20,7 +20,6 @@ import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors
 import * as labwareIngredActions from '../labware-ingred/actions'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../steplist'
 import { selectors as stepsSelectors } from '../ui/steps'
-import { selectors as stepFormSelectors } from '../step-forms'
 
 import type { BaseState, ThunkDispatch } from '../types'
 
@@ -28,7 +27,6 @@ type SP = {|
   selectedTerminalItemId: ?TerminalItemId,
   ingredSelectionMode: boolean,
   drilledDown: boolean,
-  labwareLocations: { [StepIdType]: Slot },
 |}
 
 type DP = {| drillUpFromLabware: () => mixed |}
@@ -40,7 +38,6 @@ const mapStateToProps = (state: BaseState): SP => ({
   ingredSelectionMode:
     labwareIngredSelectors.getSelectedLabwareId(state) != null,
   drilledDown: labwareIngredSelectors.getDrillDownLabwareId(state) != null,
-  labwareLocations: stepFormSelectors.getLabwareLocationsForStep(state),
 })
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
@@ -51,7 +48,6 @@ const mergeProps = (stateProps: SP, dispatchProps: DP): Props => ({
   selectedTerminalItemId: stateProps.selectedTerminalItemId,
   ingredSelectionMode: stateProps.ingredSelectionMode,
   drilledDown: stateProps.drilledDown,
-  labwareLocations: stateProps.labwareLocations,
   handleClickOutside: () => {
     if (stateProps.drilledDown) dispatchProps.drillUpFromLabware()
   },
@@ -79,12 +75,9 @@ class DeckSetup extends React.Component<Props> {
           <ClickOutside onClickOutside={this.props.handleClickOutside}>
             {({ ref }) => (
               <div ref={ref} className={styles.deck_wrapper}>
-                {/* <Deck
+                <Deck
                   DragPreviewLayer={DragPreviewLayer}
                   LabwareComponent={LabwareContainer}
-                /> */}
-                <RobotWorkSpace
-                  labwareLocations={this.props.labwareLocations}
                 />
               </div>
             )}
