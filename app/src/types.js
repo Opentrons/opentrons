@@ -6,7 +6,7 @@ import type { RouterAction } from 'react-router-redux'
 import type { Observable } from 'rxjs'
 
 import typeof reducer from './reducer'
-import type { ApiAction } from './robot-api'
+import type { RobotApiAction } from './robot-api'
 import type { HttpApiAction } from './http-api-client'
 import type { Action as RobotAction } from './robot'
 import type { ShellAction } from './shell'
@@ -17,7 +17,7 @@ import type { ProtocolAction } from './protocol'
 export type Action =
   | RobotAction
   | HttpApiAction
-  | ApiAction
+  | RobotApiAction
   | ShellAction
   | ConfigAction
   | RouterAction

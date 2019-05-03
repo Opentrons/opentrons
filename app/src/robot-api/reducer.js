@@ -2,37 +2,46 @@
 // api state reducer
 // tracks resource and networking state per robot
 import {
-  passApiAction,
-  passRequestAction,
-  passResponseAction,
-  passErrorAction,
+  passRobotApiAction,
+  passRobotApiRequestAction,
+  passRobotApiResponseAction,
+  passRobotApiErrorAction,
 } from './utils'
 import { resourcesReducer } from './resources'
 
 import type { Action } from '../types'
-import type { ApiActionLike, ApiState, NetworkingInstanceState } from './types'
+import type {
+  RobotApiState,
+  RobotInstanceNetworkingState,
+  RobotApiActionLike,
+} from './types'
 
 const INITIAL_INSTANCE_STATE = { networking: {}, resources: {} }
 
 function networkingReducer(
-  state: NetworkingInstanceState = INITIAL_INSTANCE_STATE.networking,
-  action: ApiActionLike
-): NetworkingInstanceState {
-  const request = passRequestAction(action)
-  const response = passResponseAction(action) || passErrorAction(action)
+  state: RobotInstanceNetworkingState = INITIAL_INSTANCE_STATE.networking,
+  action: RobotApiActionLike
+): RobotInstanceNetworkingState {
+  const reqAction = passRobotApiRequestAction(action)
+  const resAction =
+    passRobotApiResponseAction(action) || passRobotApiErrorAction(action)
+
   let nextState = state
 
-  if (request) {
-    nextState = { ...state, [request.payload.path]: { inProgress: true } }
-  } else if (response) {
-    nextState = { ...state, [response.payload.path]: { inProgress: false } }
+  if (reqAction) {
+    nextState = { ...state, [reqAction.payload.path]: { inProgress: true } }
+  } else if (resAction) {
+    nextState = { ...state, [resAction.payload.path]: { inProgress: false } }
   }
 
   return nextState
 }
 
-function robotApiReducer(state: ApiState = {}, action: Action): ApiState {
-  const apiAction = passApiAction(action)
+function robotApiReducer(
+  state: RobotApiState = {},
+  action: Action
+): RobotApiState {
+  const apiAction = passRobotApiAction(action)
 
   if (apiAction) {
     const { name } = apiAction.payload.host

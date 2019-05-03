@@ -5,12 +5,12 @@ import { combineEpics } from 'redux-observable'
 import { healthReducer, healthEpic } from './health'
 import { modulesReducer, modulesEpic } from './modules'
 
-import type { ApiActionLike } from '../types'
+import type { RobotApiActionLike } from '../types'
 
 export * from './health'
 export * from './modules'
 
-export const resourcesReducer = combineReducers<_, ApiActionLike>({
+export const resourcesReducer = combineReducers<_, RobotApiActionLike>({
   health: healthReducer,
   modules: modulesReducer,
 })

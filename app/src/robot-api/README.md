@@ -37,7 +37,7 @@ Before adding client state for an endpoint, either identify or create a file in 
    export const fetchMyThingEpic = createBaseRequestEpic(FETCH_MY_THING)
    ```
 
-   - See `setTargetTempEpic` in `app/src/robot-api/resources/modules.js` for an example of an epic that needs more than the base functionality and layers that logic on top of the base
+   - If you need more functionality than the base epic, document your solution here
 
 2. Add the epic to the exported combined epic (or create the combined epic if it doesn't exist)
 

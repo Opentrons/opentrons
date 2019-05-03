@@ -9,14 +9,14 @@ export type RobotHost = {
   port: number,
 }
 
-export type ApiRequest = {|
+export type RobotApiRequest = {|
   host: RobotHost,
   method: Method,
   path: string,
   body?: mixed,
 |}
 
-export type ApiResponse = {|
+export type RobotApiResponse = {|
   host: RobotHost,
   path: string,
   method: Method,
@@ -27,25 +27,29 @@ export type ApiResponse = {|
 
 // action types
 
-export type ApiAction =
-  | {| type: 'robotHttp:FETCH_HEALTH', payload: ApiRequest |}
-  | {| type: 'robotHttp:FETCH_MODULES', payload: ApiRequest |}
-  | {| type: 'robotHttp:FETCH_MODULE_DATA', payload: ApiRequest |}
-  | {| type: 'robotHttp:SET_MODULE_TARGET_TEMP', payload: ApiRequest |}
+export type RobotApiAction =
+  | {| type: 'robotApi:FETCH_HEALTH', payload: RobotApiRequest |}
+  | {| type: 'robotApi:FETCH_MODULES', payload: RobotApiRequest |}
+  | {| type: 'robotApi:FETCH_MODULE_DATA', payload: RobotApiRequest |}
+  | {| type: 'robotApi:SET_MODULE_TARGET_TEMP', payload: RobotApiRequest |}
 
-export type ApiActionType = $PropertyType<ApiAction, 'type'>
+export type RobotApiActionType = $PropertyType<RobotApiAction, 'type'>
 
 // internal, request lifecycle types
 // only for use inside observables
-export type ApiRequestAction = {| type: string, payload: ApiRequest |}
-
-export type ApiResponseAction = {| type: string, payload: ApiResponse |}
-
-export type ApiErrorAction = {| type: string, payload: ApiResponse |}
-
-export type ApiActionLike = {|
+export type RobotApiRequestAction = {|
   type: string,
-  payload: ApiRequest | ApiResponse,
+  payload: RobotApiRequest,
+|}
+
+export type RobotApiResponseAction = {|
+  type: string,
+  payload: RobotApiResponse,
+|}
+
+export type RobotApiActionLike = {|
+  type: string,
+  payload: RobotApiRequest | RobotApiResponse,
 |}
 
 // resource types
@@ -99,22 +103,22 @@ export type ModulesState = Array<Module>
 
 // instance state shapes
 
-export type NetworkingInstanceState = {
+export type RobotInstanceNetworkingState = {
   [path: string]: {| inProgress: true |},
 }
 
-export type ApiInstanceState = {|
+export type RobotInstanceResourcesState = {|
   health: HealthState,
   modules: ModulesState,
 |}
 
-export type RobotApiState = {|
-  networking: NetworkingInstanceState,
-  resources: ApiInstanceState,
+export type RobotInstanceApiState = {|
+  networking: RobotInstanceNetworkingState,
+  resources: RobotInstanceResourcesState,
 |}
 
 // overall API state
 
-export type ApiState = {
-  [robotName: string]: ?RobotApiState,
+export type RobotApiState = {
+  [robotName: string]: ?RobotInstanceApiState,
 }

@@ -1,85 +1,95 @@
 // @flow
-import { of as observableOf, concat as observableConcat } from 'rxjs'
+import { of, concat } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 
-import fetch from './fetch'
+import { robotApiFetch } from './http'
 
+import type { Observable } from 'rxjs'
 import type { State, Epic, Action, ActionLike } from '../types'
 import type {
   Method,
-  ApiRequest,
-  ApiResponse,
-  ApiAction,
-  ApiActionLike,
-  ApiRequestAction,
-  ApiResponseAction,
-  ApiErrorAction,
-  ApiActionType,
-  RobotApiState,
+  RobotApiRequest,
+  RobotApiResponse,
+  RobotApiAction,
+  RobotApiActionLike,
+  RobotApiRequestAction,
+  RobotApiResponseAction,
+  RobotApiActionType,
+  RobotInstanceApiState,
 } from './types'
 
 export const GET: Method = 'GET'
 export const POST: Method = 'POST'
 
-export const API_ACTION_PREFIX = 'robotHttp'
-export const API_REQUEST_PREFIX = `${API_ACTION_PREFIX}:REQUEST`
-export const API_RESPONSE_PREFIX = `${API_ACTION_PREFIX}:RESPONSE`
-export const API_ERROR_PREFIX = `${API_ACTION_PREFIX}:ERROR`
+export const ROBOT_API_ACTION_PREFIX = 'robotApi'
+export const ROBOT_API_REQUEST_PREFIX = `${ROBOT_API_ACTION_PREFIX}:REQUEST`
+export const ROBOT_API_RESPONSE_PREFIX = `${ROBOT_API_ACTION_PREFIX}:RESPONSE`
+export const ROBOT_API_ERROR_PREFIX = `${ROBOT_API_ACTION_PREFIX}:ERROR`
 
-const apiRequest = (payload: ApiRequest): ApiRequestAction => ({
-  type: `${API_REQUEST_PREFIX}__${payload.method}__${payload.path}`,
+const robotApiRequest = (payload: RobotApiRequest): RobotApiRequestAction => ({
+  type: `${ROBOT_API_REQUEST_PREFIX}__${payload.method}__${payload.path}`,
   payload,
 })
 
-const apiResponse = (payload: ApiResponse): ApiResponseAction => ({
-  type: `${API_RESPONSE_PREFIX}__${payload.method}__${payload.path}`,
+const robotApiResponse = (
+  payload: RobotApiResponse
+): RobotApiResponseAction => ({
+  type: `${ROBOT_API_RESPONSE_PREFIX}__${payload.method}__${payload.path}`,
   payload,
 })
 
-const apiError = (payload: ApiResponse): ApiErrorAction => ({
-  type: `${API_ERROR_PREFIX}__${payload.method}__${payload.path}`,
+export const robotApiError = (
+  payload: RobotApiResponse
+): RobotApiResponseAction => ({
+  type: `${ROBOT_API_ERROR_PREFIX}__${payload.method}__${payload.path}`,
   payload,
 })
 
-export const passApiAction = (
+export const passRobotApiAction = (
   action: Action | ActionLike
-): ApiActionLike | null =>
-  action.type.startsWith(API_ACTION_PREFIX) ? (action: any) : null
+): RobotApiActionLike | null =>
+  action.type.startsWith(ROBOT_API_ACTION_PREFIX) ? (action: any) : null
 
-export const passRequestAction = (
+export const passRobotApiRequestAction = (
   action: ActionLike
-): ApiRequestAction | null =>
-  action.type.startsWith(API_REQUEST_PREFIX) ? (action: any) : null
+): RobotApiActionLike | null =>
+  action.type.startsWith(ROBOT_API_REQUEST_PREFIX) ? (action: any) : null
 
-export const passResponseAction = (
+export const passRobotApiResponseAction = (
   action: ActionLike
-): ApiResponseAction | null =>
-  action.type.startsWith(API_RESPONSE_PREFIX) ? (action: any) : null
+): RobotApiResponseAction | null =>
+  action.type.startsWith(ROBOT_API_RESPONSE_PREFIX) ? (action: any) : null
 
-export const passErrorAction = (action: ActionLike): ApiErrorAction | null =>
-  action.type.startsWith(API_ERROR_PREFIX) ? (action: any) : null
+export const passRobotApiErrorAction = (
+  action: ActionLike
+): RobotApiResponseAction | null =>
+  action.type.startsWith(ROBOT_API_ERROR_PREFIX) ? (action: any) : null
 
-export const createBaseRequestEpic = (type: ApiActionType): Epic => {
-  return action$ =>
-    action$.pipe(
-      ofType(type),
-      switchMap<ApiAction, _, _>(a => {
-        const requestAction = observableOf(apiRequest(a.payload))
-        const responseAction = fetch(a.payload).pipe(
-          switchMap<ApiResponse, _, ApiActionLike>(resp =>
-            observableOf(resp.ok ? apiResponse(resp) : apiError(resp))
-          )
-        )
-
-        return observableConcat(requestAction, responseAction)
-      })
+export const makeRobotApiRequest = (
+  request: RobotApiRequest
+): Observable<RobotApiRequestAction | RobotApiResponseAction> => {
+  const reqAction = of(robotApiRequest(request))
+  const resAction = robotApiFetch(request).pipe(
+    switchMap<RobotApiResponse, _, RobotApiResponseAction>(res =>
+      of(res.ok ? robotApiResponse(res) : robotApiError(res))
     )
+  )
+
+  return concat(reqAction, resAction)
 }
 
-export function getRobotApiState(
+export const createBaseRobotApiEpic = (
+  type: RobotApiActionType
+): Epic => action$ =>
+  action$.pipe(
+    ofType(type),
+    switchMap<RobotApiAction, _, RobotApiActionLike>(a =>
+      makeRobotApiRequest(a.payload)
+    )
+  )
+
+export const getRobotApiState = (
   state: State,
   robotName: string
-): RobotApiState | null {
-  return state.robotApi[robotName] || null
-}
+): RobotInstanceApiState | null => state.robotApi[robotName] || null
