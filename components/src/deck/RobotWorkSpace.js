@@ -1,22 +1,22 @@
 // @flow
 import * as React from 'react'
-import {
-  getDeckLayers,
-  type DeckDefinition,
-  type DeckSlot,
-} from '@opentrons/shared-data'
+import { type DeckDefinition, type DeckSlot } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '../utils'
-import styles from './Deck.css'
+import { DeckFromData } from './Deck'
+import styles from './RobotWorkSpace.css'
 
-type dValue = string
 type Props = {
   deckName: string,
   children: DeckSlot => React.Node,
+  deckLayerBlacklist: Array<string>,
 }
 
-class WorkingSpace extends React.Component<Props> {
+class RobotWorkSpace extends React.Component<Props> {
   deckDef: DeckDefinition
-  static defaultProps = { deckName: 'ot2_standard' }
+  static defaultProps = {
+    deckName: 'ot2_standard',
+    deckLayerBlacklist: [],
+  }
 
   constructor(props: Props) {
     super(props)
@@ -26,7 +26,7 @@ class WorkingSpace extends React.Component<Props> {
 
   render() {
     if (!this.deckDef) return null
-    const { deckName } = this.props
+    const { deckLayerBlacklist } = this.props
 
     const [viewBoxOriginX, viewBoxOriginY] = this.deckDef.cornerOffsetFromOrigin
     const [deckXDimension, deckYDimension] = this.deckDef.dimensions
@@ -35,36 +35,19 @@ class WorkingSpace extends React.Component<Props> {
       (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
       {}
     )
+
+    const visibleDeckLayers: Array<string> = Object.keys(
+      this.deckDef.layers
+    ).filter(l => !deckLayerBlacklist.includes(l))
+
     return (
       <svg
         className={styles.working_space}
         viewBox={`${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`}
       >
-        <Deck deckName={deckName} />
+        <DeckFromData def={this.deckDef} visibleLayers={visibleDeckLayers} />
         {this.props.children({ slots })}
       </svg>
-    )
-  }
-}
-
-type DeckProps = { deckName: string }
-class Deck extends React.PureComponent<DeckProps> {
-  render() {
-    const layers: Array<{
-      name: string,
-      footprints: Array<dValue>,
-    }> = getDeckLayers(this.props.deckName)
-
-    return (
-      <g>
-        {layers.map(layer => (
-          <g id={layer.name} key={layer.name} className={styles.deck_outline}>
-            {layer.footprints.map((footprint: string, index: number) => (
-              <path d={footprint} key={`${layer.name}${index}`} />
-            ))}
-          </g>
-        ))}
-      </g>
     )
   }
 }
@@ -91,4 +74,4 @@ export const ForeignObject = (props: ForeignObjectProps) => (
   </foreignObject>
 )
 
-export default WorkingSpace
+export default RobotWorkSpace

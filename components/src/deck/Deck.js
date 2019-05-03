@@ -2,8 +2,14 @@
 import * as React from 'react'
 import cx from 'classnames'
 import flatMap from 'lodash/flatMap'
+import map from 'lodash/map'
+import pick from 'lodash/pick'
 import type { DeckSlot } from '../robot-types'
-import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
+import {
+  type DeckDefinition,
+  SLOT_RENDER_WIDTH,
+  SLOT_RENDER_HEIGHT,
+} from '@opentrons/shared-data'
 import {
   SLOTNAME_MATRIX,
   SLOT_SPACING_MM,
@@ -14,6 +20,32 @@ import DeckOutline from './DeckOutline'
 import { EmptyDeckSlot } from './EmptyDeckSlot'
 
 import styles from './Deck.css'
+
+type DeckProps = {
+  def: DeckDefinition,
+  visibleLayers: Array<string>,
+}
+export class DeckFromData extends React.PureComponent<DeckProps> {
+  render() {
+    return (
+      <g>
+        {map(
+          pick(this.props.def.layers, this.props.visibleLayers),
+          (layer, layerId) => (
+            <g id={layerId} key={layerId} className={styles.deck_outline}>
+              {layer.map((feature: { footprint: string }, index: number) => (
+                <path d={feature.footprint} key={`${layerId}${index}`} />
+              ))}
+            </g>
+          )
+        )}
+      </g>
+    )
+  }
+}
+
+// TODO:  BC 2019-05-03 we should migrate to only using the above DeckFromData
+// component once Deck is remove, we should probably rename it Deck
 
 export type LabwareComponentProps = {|
   slot: DeckSlot,

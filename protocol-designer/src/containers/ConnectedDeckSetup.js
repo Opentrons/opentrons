@@ -2,7 +2,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { Deck, ClickOutside, WorkingSpace } from '@opentrons/components'
+import { Deck, ClickOutside, RobotWorkSpace } from '@opentrons/components'
 import styles from './Deck.css'
 import i18n from '../localization'
 
@@ -83,7 +83,9 @@ class DeckSetup extends React.Component<Props> {
                   DragPreviewLayer={DragPreviewLayer}
                   LabwareComponent={LabwareContainer}
                 /> */}
-                <WorkingSpace labwareLocations={this.props.labwareLocations} />
+                <RobotWorkSpace
+                  labwareLocations={this.props.labwareLocations}
+                />
               </div>
             )}
           </ClickOutside>

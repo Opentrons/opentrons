@@ -9,7 +9,7 @@ import Tip from './Tip'
 import type { SingleWell } from './Well'
 import Module from './Module'
 import ModuleNameOverlay from './ModuleNameOverlay'
-import WorkingSpace from './WorkingSpace'
+import RobotWorkSpace from './RobotWorkSpace'
 
 import { ContainerNameOverlay } from './ContainerNameOverlay'
 import { EmptyDeckSlot } from './EmptyDeckSlot'
@@ -30,7 +30,7 @@ export {
   ModuleNameOverlay,
   SlotOverlay,
   Well,
-  WorkingSpace,
+  RobotWorkSpace,
   Tip,
 }
 
