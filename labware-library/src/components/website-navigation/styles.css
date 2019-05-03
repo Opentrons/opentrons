@@ -230,7 +230,7 @@
 
   /* Only add caret to base NavLinks on Mobile */
   &::after {
-    content: '\00a0 ›';
+    content: ' ›';
   }
 }
 
@@ -466,7 +466,7 @@
   }
 
   .link_cta::after {
-    content: '\00a0 ›';
+    content: ' ›';
   }
 
   .submenu_title {

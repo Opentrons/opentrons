@@ -36,7 +36,7 @@ export function NavButton(props: Link) {
       target="_blank"
       rel="noopener noreferrer"
     >
-      {props.name} &nbsp; ›
+      {props.name} ›
     </a>
   )
 }
