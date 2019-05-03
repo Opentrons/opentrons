@@ -25,8 +25,13 @@ export type LabwareRenderProps = {|
 |}
 
 export default function LabwareRender(props: LabwareRenderProps) {
+  const cornerOffsetFromSlot = props.definition.cornerOffsetFromSlot
   return (
-    <g>
+    <g
+      transform={`translate(${cornerOffsetFromSlot.x}, ${
+        cornerOffsetFromSlot.y
+      })`}
+    >
       <StaticLabware
         definition={props.definition}
         onMouseOverWell={props.onMouseOverWell}
@@ -40,7 +45,6 @@ export default function LabwareRender(props: LabwareRenderProps) {
       )}
       {props.highlightedWells && (
         <StyledWells
-          noInnerTipCircle
           className={styles.highlighted_well}
           definition={props.definition}
           wells={props.highlightedWells}
@@ -48,7 +52,6 @@ export default function LabwareRender(props: LabwareRenderProps) {
       )}
       {props.missingTips && (
         <StyledWells
-          noInnerTipCircle
           className={styles.missing_tip}
           definition={props.definition}
           wells={props.missingTips}

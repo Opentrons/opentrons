@@ -6,21 +6,19 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 export type StyledWellProps = {|
   className: string,
   definition: LabwareDefinition2,
-  noInnerTipCircle?: boolean,
   wells: Set<string>,
 |}
 
 function StyledWell(props: StyledWellProps) {
-  const { className, definition, noInnerTipCircle } = props
+  const { className, definition } = props
   const wells = [...props.wells]
   return wells.map<*, *, React.Node>(wellName => {
     return (
       <Well
         key={wellName}
         wellName={wellName}
-        definition={definition}
+        well={definition.wells[wellName]}
         className={className}
-        noInnerTipCircle={noInnerTipCircle}
       />
     )
   })

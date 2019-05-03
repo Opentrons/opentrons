@@ -20,8 +20,8 @@ function FilledWells(props: FilledWellsProps) {
             <Well
               key={wellName}
               wellName={wellName}
+              well={definition.wells[wellName]}
               fill={color}
-              definition={definition}
             />
           )
         }

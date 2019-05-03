@@ -10,3 +10,9 @@
   fill: var(--c-plate-bg);
   stroke: var(--c-charcoal);
 }
+
+.tip {
+  fill: var(--c-white);
+  stroke: var(--c-near-black);
+  stroke-width: 0.6;
+}
