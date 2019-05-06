@@ -2,8 +2,8 @@
 import * as React from 'react'
 
 import { CenteredTextSvg } from '../CenteredTextSvg'
-import LabwareContainer from './LabwareContainer'
-import styles from './LabwareContainer.css'
+import LabwareWrapper from './LabwareWrapper'
+import styles from './LabwareWrapper.css'
 
 import type { DeckSlotProps } from '../../interfaces/DeckSlot'
 
@@ -12,11 +12,11 @@ export function EmptyDeckSlot(props: DeckSlotProps) {
   const { slot } = props
 
   return (
-    <LabwareContainer {...props}>
+    <LabwareWrapper {...props}>
       <g className={styles.empty_slot}>
         <rect width="100%" height="100%" />
         <CenteredTextSvg text={slot} />
       </g>
-    </LabwareContainer>
+    </LabwareWrapper>
   )
 }

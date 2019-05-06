@@ -1,10 +1,10 @@
 @import '@opentrons/components';
 
-/* TODO Ian 2018-02-16: this is copied from LabwareContainer.css in complib -- should it be imported in index.css? */
+/* TODO Ian 2018-02-16: this is copied from LabwareWrapper.css in complib -- should it be imported in index.css? */
 :root {
   --round-slot: {
     clip-path: url(#roundSlotClipPath);
-  };
+  }
 }
 
 .slot_overlay {

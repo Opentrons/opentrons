@@ -5,7 +5,7 @@ import cx from 'classnames'
 import { getModuleDisplayName, type ModuleType } from '@opentrons/shared-data'
 
 import { Icon } from '../icons'
-import LabwareContainer from './LabwareContainer'
+import LabwareWrapper from './LabwareWrapper'
 import { CenteredTextSvg } from '../CenteredTextSvg'
 import styles from './Module.css'
 
@@ -25,7 +25,7 @@ const DIMENSIONS = {
 
 export default function Module(props: Props) {
   return (
-    <LabwareContainer {...DIMENSIONS}>
+    <LabwareWrapper {...DIMENSIONS}>
       <rect
         className={styles.module}
         rx="6"
@@ -35,7 +35,7 @@ export default function Module(props: Props) {
         fill="#000"
       />
       <ModuleItemContents {...props} />
-    </LabwareContainer>
+    </LabwareWrapper>
   )
 }
 
