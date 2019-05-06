@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { type DeckDefinition, type DeckSlot } from '@opentrons/shared-data'
-import { getDeckDefinitions } from '../utils'
+import { getDeckDefinitions } from '../getDeckDefinitions'
 import { DeckFromData } from './Deck'
 import styles from './RobotWorkSpace.css'
 
