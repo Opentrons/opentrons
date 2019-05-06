@@ -10,10 +10,13 @@ type RenderProps = {
 }
 type Props = {
   deckName: string,
+  viewBox: string,
   children?: RenderProps => React.Node,
   deckLayerBlacklist: Array<string>,
 }
 
+// NOTE: this component assumes, for performance reasons,
+// that the deckName prop is not dynamic for a mounted component
 class RobotWorkSpace extends React.Component<Props> {
   deckDef: DeckDefinition
   static defaultProps = {
@@ -28,27 +31,36 @@ class RobotWorkSpace extends React.Component<Props> {
   }
 
   render() {
-    if (!this.deckDef) return null
-    const { deckLayerBlacklist } = this.props
+    if (!this.deckDef && !this.props.viewBox) return null
+    const { deckLayerBlacklist, viewBox } = this.props
 
-    const [viewBoxOriginX, viewBoxOriginY] = this.deckDef.cornerOffsetFromOrigin
-    const [deckXDimension, deckYDimension] = this.deckDef.dimensions
+    let wholeDeckViewBox = null
+    let slots = {}
+    if (this.deckDef) {
+      const [
+        viewBoxOriginX,
+        viewBoxOriginY,
+      ] = this.deckDef.cornerOffsetFromOrigin
+      const [deckXDimension, deckYDimension] = this.deckDef.dimensions
 
-    const slots = this.deckDef.locations.orderedSlots.reduce(
-      (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
-      {}
-    )
-
-    const visibleDeckLayers: Array<string> = Object.keys(
-      this.deckDef.layers
-    ).filter(l => !deckLayerBlacklist.includes(l))
+      slots = this.deckDef.locations.orderedSlots.reduce(
+        (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
+        {}
+      )
+      wholeDeckViewBox = `${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`
+    }
 
     return (
       <svg
         className={styles.working_space}
-        viewBox={`${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`}
+        viewBox={viewBox || wholeDeckViewBox}
       >
-        <DeckFromData def={this.deckDef} visibleLayers={visibleDeckLayers} />
+        {this.deckDef && (
+          <DeckFromData
+            def={this.deckDef}
+            layerBlacklist={deckLayerBlacklist}
+          />
+        )}
         {this.props.children && this.props.children({ slots })}
       </svg>
     )

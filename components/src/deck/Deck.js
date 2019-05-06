@@ -3,7 +3,6 @@ import * as React from 'react'
 import cx from 'classnames'
 import flatMap from 'lodash/flatMap'
 import map from 'lodash/map'
-import pick from 'lodash/pick'
 import type { DeckSlot } from '../robot-types'
 import {
   type DeckDefinition,
@@ -24,22 +23,22 @@ import styles from './Deck.css'
 
 type DeckProps = {
   def: DeckDefinition,
-  visibleLayers: Array<string>,
+  layerBlacklist: Array<string>,
 }
 export class DeckFromData extends React.PureComponent<DeckProps> {
   render() {
     return (
       <g>
-        {map(
-          pick(this.props.def.layers, this.props.visibleLayers),
-          (layer: DeckLayer, layerId: string) => (
+        {map(this.props.def.layers, (layer: DeckLayer, layerId: string) => {
+          if (this.props.layerBlacklist.includes(layerId)) return null
+          return (
             <g id={layerId} key={layerId} className={styles.deck_outline}>
               {layer.map((feature: { footprint: string }, index: number) => (
                 <path d={feature.footprint} key={`${layerId}${index}`} />
               ))}
             </g>
           )
-        )}
+        })}
       </g>
     )
   }
