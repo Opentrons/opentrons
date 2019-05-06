@@ -142,7 +142,7 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
                   volume: Math.max(subTransferVol),
                   times: 1,
                   aspirateOffsetFromBottomMm,
-                  dispenseOffsetFromBottomMm,
+                  dispenseOffsetFromBottomMm: aspirateOffsetFromBottomMm,
                   aspirateFlowRateUlSec,
                   dispenseFlowRateUlSec,
                 })
@@ -156,7 +156,7 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
                 volume: args.mixBeforeAspirate.volume,
                 times: args.mixBeforeAspirate.times,
                 aspirateOffsetFromBottomMm,
-                dispenseOffsetFromBottomMm,
+                dispenseOffsetFromBottomMm: aspirateOffsetFromBottomMm,
                 aspirateFlowRateUlSec,
                 dispenseFlowRateUlSec,
               })
@@ -193,7 +193,7 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
                 well: destWell,
                 volume: args.mixInDestination.volume,
                 times: args.mixInDestination.times,
-                aspirateOffsetFromBottomMm,
+                aspirateOffsetFromBottomMm: dispenseOffsetFromBottomMm,
                 dispenseOffsetFromBottomMm,
                 aspirateFlowRateUlSec,
                 dispenseFlowRateUlSec,

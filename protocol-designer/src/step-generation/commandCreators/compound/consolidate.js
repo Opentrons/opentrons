@@ -128,7 +128,7 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
             volume: args.mixFirstAspirate.volume,
             times: args.mixFirstAspirate.times,
             aspirateOffsetFromBottomMm,
-            dispenseOffsetFromBottomMm,
+            dispenseOffsetFromBottomMm: aspirateOffsetFromBottomMm,
             aspirateFlowRateUlSec,
             dispenseFlowRateUlSec,
           })
@@ -143,7 +143,7 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
             volume: args.volume,
             times: 1,
             aspirateOffsetFromBottomMm,
-            dispenseOffsetFromBottomMm,
+            dispenseOffsetFromBottomMm: aspirateOffsetFromBottomMm,
             aspirateFlowRateUlSec,
             dispenseFlowRateUlSec,
           })
@@ -156,7 +156,7 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
             well: args.destWell,
             volume: args.mixInDestination.volume,
             times: args.mixInDestination.times,
-            aspirateOffsetFromBottomMm,
+            aspirateOffsetFromBottomMm: dispenseOffsetFromBottomMm,
             dispenseOffsetFromBottomMm,
             aspirateFlowRateUlSec,
             dispenseFlowRateUlSec,

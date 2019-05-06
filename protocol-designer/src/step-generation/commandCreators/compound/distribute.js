@@ -173,7 +173,7 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (
             volume: args.mixBeforeAspirate.volume,
             times: args.mixBeforeAspirate.times,
             aspirateOffsetFromBottomMm,
-            dispenseOffsetFromBottomMm,
+            dispenseOffsetFromBottomMm: aspirateOffsetFromBottomMm,
             aspirateFlowRateUlSec,
             dispenseFlowRateUlSec,
           })
