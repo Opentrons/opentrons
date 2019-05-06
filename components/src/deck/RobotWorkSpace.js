@@ -52,7 +52,7 @@ class RobotWorkSpace extends React.Component<Props> {
 
     return (
       <svg
-        className={styles.working_space}
+        className={styles.robot_work_space}
         viewBox={viewBox || wholeDeckViewBox}
       >
         {this.deckDef && (
