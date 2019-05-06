@@ -53,7 +53,7 @@ export const passRobotApiAction = (
 
 export const passRobotApiRequestAction = (
   action: ActionLike
-): RobotApiActionLike | null =>
+): RobotApiRequestAction | null =>
   action.type.startsWith(ROBOT_API_REQUEST_PREFIX) ? (action: any) : null
 
 export const passRobotApiResponseAction = (
