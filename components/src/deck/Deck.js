@@ -21,32 +21,6 @@ import { EmptyDeckSlot } from './EmptyDeckSlot'
 
 import styles from './Deck.css'
 
-type DeckProps = {
-  def: DeckDefinition,
-  layerBlacklist: Array<string>,
-}
-export class DeckFromData extends React.PureComponent<DeckProps> {
-  render() {
-    return (
-      <g>
-        {map(this.props.def.layers, (layer: DeckLayer, layerId: string) => {
-          if (this.props.layerBlacklist.includes(layerId)) return null
-          return (
-            <g id={layerId} key={layerId} className={styles.deck_outline}>
-              {layer.map((feature: { footprint: string }, index: number) => (
-                <path d={feature.footprint} key={`${layerId}${index}`} />
-              ))}
-            </g>
-          )
-        })}
-      </g>
-    )
-  }
-}
-
-// TODO:  BC 2019-05-03 we should migrate to only using the above DeckFromData
-// component once Deck is remove, we should probably rename it Deck
-
 export type LabwareComponentProps = {|
   slot: DeckSlot,
   width: number,
@@ -144,3 +118,29 @@ function renderLabware(
     }
   )
 }
+
+type DeckProps = {
+  def: DeckDefinition,
+  layerBlacklist: Array<string>,
+}
+export class DeckFromData extends React.PureComponent<DeckProps> {
+  render() {
+    return (
+      <g>
+        {map(this.props.def.layers, (layer: DeckLayer, layerId: string) => {
+          if (this.props.layerBlacklist.includes(layerId)) return null
+          return (
+            <g id={layerId} key={layerId} className={styles.deck_outline}>
+              {layer.map((feature: { footprint: string }, index: number) => (
+                <path d={feature.footprint} key={`${layerId}${index}`} />
+              ))}
+            </g>
+          )
+        })}
+      </g>
+    )
+  }
+}
+
+// TODO:  BC 2019-05-03 we should migrate to only using the above DeckFromData
+// component once Deck is remove, we should probably rename it Deck

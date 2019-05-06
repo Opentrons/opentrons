@@ -5,6 +5,27 @@ import { getDeckDefinitions } from './getDeckDefinitions'
 import { DeckFromData } from './Deck'
 import styles from './RobotWorkSpace.css'
 
+// NOTE: In order for arbitrary UI text and foreigObjects
+// to render properly in the robot coordinate system, use these
+// components which will perform the necessary transformation
+type TextProps = any // $FlowFixMe(bc, 2019-05-03) React.ElementProps<'text'>
+const Text = (props: TextProps) => (
+  <text {...props} y={-props.y} style={{ transform: 'scale(1, -1)' }}>
+    {props.children}
+  </text>
+)
+
+type ForeignObjectProps = any // $FlowFixMe(bc, 2019-05-03) React.ElementProps<'foreignObject'>
+const ForeignObject = (props: ForeignObjectProps) => (
+  <foreignObject {...props}>
+    <div
+      style={{ transform: 'scale(1, -1)' }}
+      xmlns="http://www.w3.org/1999/xhtml"
+    >
+      {props.children}
+    </div>
+  </foreignObject>
+)
 type RenderProps = {
   slots: { [string]: DeckSlot },
 }
@@ -67,26 +88,5 @@ class RobotWorkSpace extends React.Component<Props> {
   }
 }
 
-// NOTE: In order for arbitrary UI text and foreigObjects
-// to render properly in the robot coordinate system, use these
-// components which will perform the necessary transformation
-type TextProps = any // $FlowFixMe(bc, 2019-05-03) React.ElementProps<'text'>
-export const Text = (props: TextProps) => (
-  <text {...props} y={-props.y} style={{ transform: 'scale(1, -1)' }}>
-    {props.children}
-  </text>
-)
-
-type ForeignObjectProps = any // $FlowFixMe(bc, 2019-05-03) React.ElementProps<'foreignObject'>
-export const ForeignObject = (props: ForeignObjectProps) => (
-  <foreignObject {...props}>
-    <div
-      style={{ transform: 'scale(1, -1)' }}
-      xmlns="http://www.w3.org/1999/xhtml"
-    >
-      {props.children}
-    </div>
-  </foreignObject>
-)
-
 export default RobotWorkSpace
+export { Text, ForeignObject }
