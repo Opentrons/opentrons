@@ -14,7 +14,7 @@ export default function supportMobileContent(props: Props) {
   return (
     <div className={styles.support_mobile_content}>
       <div className={styles.sales_group}>
-        <h3 className={styles.submenu_title}>Support</h3>
+        <h3 className={styles.submenu_title}>Sales</h3>
         <ul>
           {salesLinks.map(link => (
             <li key={link.name}>
@@ -24,7 +24,7 @@ export default function supportMobileContent(props: Props) {
         </ul>
       </div>
       <div className={styles.support_group}>
-        <h3 className={styles.submenu_title}>Sales</h3>
+        <h3 className={styles.submenu_title}>Support</h3>
         <ul>
           {supportLinks.map(link => (
             <li key={link.name}>

@@ -208,11 +208,12 @@
   line-height: 1.25rem;
   text-align: left;
   padding-bottom: var(--spacing-link);
-  padding-left: 4rem;
+  padding-left: 5rem;
 
   &.support_nav_link {
     padding-bottom: var(--spacing-5);
     text-align: left;
+    padding-left: 0;
   }
 }
 
@@ -349,7 +350,7 @@
 /* Top Mobile Menu text */
 .mobile_menu_title {
   width: 100%;
-  padding-left: 5rem;
+  padding-left: 6rem;
   text-align: left;
   font-size: var(--fs-default);
   font-weight: var(--fw-semibold);
