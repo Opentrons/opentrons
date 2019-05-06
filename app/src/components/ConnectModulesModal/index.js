@@ -3,7 +3,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import countBy from 'lodash/countBy'
 
-import { makeGetRobotModules, fetchModules } from '../../http-api-client'
+import { getModulesState, fetchModules } from '../../robot-api'
 import {
   selectors as robotSelectors,
   actions as robotActions,
@@ -17,7 +17,7 @@ import ReviewModuleItem from './ReviewModuleItem'
 
 import type { State, Dispatch } from '../../types'
 import type { RobotService, SessionModule } from '../../robot'
-import type { Module } from '../../http-api-client'
+import type { Module } from '../../robot-api'
 
 type OP = {| robot: RobotService |}
 
@@ -28,7 +28,7 @@ type DP = {| setReviewed: () => mixed, fetchModules: () => mixed |}
 type Props = { ...OP, ...SP, ...DP }
 
 export default connect<Props, OP, SP, DP, State, Dispatch>(
-  makeMapStateToProps,
+  mapStateToProps,
   mapDispatchToProps
 )(ConnectModulesModal)
 
@@ -48,19 +48,13 @@ function ConnectModulesModal(props: Props) {
   )
 }
 
-function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
-  const getRobotModules = makeGetRobotModules()
+function mapStateToProps(state: State, ownProps: OP): SP {
+  const sessionModules = robotSelectors.getModules(state)
+  const actualModules = getModulesState(state, ownProps.robot.name)
 
-  return (state, ownProps) => {
-    const sessionModules = robotSelectors.getModules(state)
-    const actualModulesCall = getRobotModules(state, ownProps.robot)
-    const actualModules =
-      actualModulesCall.response && actualModulesCall.response.modules
-
-    return {
-      modulesRequired: sessionModules.length !== 0,
-      modulesMissing: checkModulesMissing(sessionModules, actualModules),
-    }
+  return {
+    modulesRequired: sessionModules.length !== 0,
+    modulesMissing: checkModulesMissing(sessionModules, actualModules),
   }
 }
 

@@ -3,11 +3,14 @@
 import { combineReducers } from 'redux'
 import { routerReducer } from 'react-router-redux'
 
-// robot state
+// oldest robot api state
 import { reducer as robotReducer } from './robot'
 
+// old api state
+import { reducer as apiReducer } from './http-api-client'
+
 // api state
-import { reducer as httpApiReducer } from './http-api-client'
+import { robotApiReducer } from './robot-api'
 
 // app shell state
 import { shellReducer } from './shell'
@@ -25,7 +28,8 @@ import type { Action } from './types'
 
 export default combineReducers<_, Action>({
   robot: robotReducer,
-  api: httpApiReducer,
+  api: apiReducer,
+  robotApi: robotApiReducer,
   config: configReducer,
   discovery: discoveryReducer,
   protocol: protocolReducer,

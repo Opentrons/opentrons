@@ -3,10 +3,12 @@
 // application types
 import type { Store as ReduxStore, Dispatch as ReduxDispatch } from 'redux'
 import type { RouterAction } from 'react-router-redux'
+import type { Observable } from 'rxjs'
 
 import typeof reducer from './reducer'
-import type { Action as RobotAction } from './robot'
+import type { RobotApiAction } from './robot-api'
 import type { HttpApiAction } from './http-api-client'
+import type { Action as RobotAction } from './robot'
 import type { ShellAction } from './shell'
 import type { ConfigAction } from './config'
 import type { DiscoveryAction } from './discovery'
@@ -15,11 +17,14 @@ import type { ProtocolAction } from './protocol'
 export type Action =
   | RobotAction
   | HttpApiAction
+  | RobotApiAction
   | ShellAction
   | ConfigAction
   | RouterAction
   | DiscoveryAction
   | ProtocolAction
+
+export type ActionLike = {| type: string, payload: any |}
 
 export type State = $Call<reducer, {}, Action>
 
@@ -47,5 +52,7 @@ type PlainDispatch = ReduxDispatch<Action>
 type ThunkDispatch = (thunk: ThunkAction) => ?Action
 
 type ThunkPromiseDispatch = (thunk: ThunkPromiseAction) => Promise<?Action>
+
+export type Epic = (action$: Observable<Action>) => Observable<ActionLike>
 
 export type Error = { name: string, message: string }

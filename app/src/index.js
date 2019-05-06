@@ -7,6 +7,7 @@ import { createStore, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 import createHistory from 'history/createHashHistory'
 import { ConnectedRouter, routerMiddleware } from 'react-router-redux'
+import { createEpicMiddleware } from 'redux-observable'
 
 import createLogger from './logger'
 import { checkShellUpdate, shellMiddleware } from './shell'
@@ -16,7 +17,8 @@ import { initializeAnalytics, analyticsMiddleware } from './analytics'
 import { initializeSupport, supportMiddleware } from './support'
 import { startDiscovery, discoveryMiddleware } from './discovery'
 
-import reducer from './reducer'
+import rootReducer from './reducer'
+import rootEpic from './epic'
 
 // components
 import App from './components/App'
@@ -24,9 +26,11 @@ import App from './components/App'
 const log = createLogger(__filename)
 
 const history = createHistory()
+const epicMiddlware = createEpicMiddleware()
 
 const middleware = applyMiddleware(
   thunk,
+  epicMiddlware,
   robotApiMiddleware(),
   shellMiddleware,
   analyticsMiddleware,
@@ -40,7 +44,9 @@ const composeEnhancers =
     window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({ maxAge: 200 })) ||
   compose
 
-const store = createStore(reducer, composeEnhancers(middleware))
+const store = createStore(rootReducer, composeEnhancers(middleware))
+
+epicMiddlware.run(rootEpic)
 
 const renderApp = () =>
   ReactDom.render(
