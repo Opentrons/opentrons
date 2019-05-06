@@ -7,7 +7,7 @@ import glob from 'glob'
 
 const LABWARE_FIXTURE_PATTERN = path.join(
   __dirname,
-  '../../../../shared-data/js/__tests__/fixtures/*.json'
+  '../../../../shared-data/js/__tests__/fixtures/labware/*.json'
 )
 
 const allLabware = glob
