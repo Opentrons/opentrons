@@ -1,7 +1,9 @@
 from threading import Thread
+from unittest.mock import Mock
 import pytest
 
 from tests.opentrons.conftest import fuzzy_assert
+from opentrons.config.robot_configs import DEFAULT_STEPS_PER_MM
 
 
 def position(x, y, z, a, b, c):
@@ -146,11 +148,16 @@ def test_dwell_and_activate_axes(smoothie, monkeypatch):
     smoothie.dwell_axes('BCY')
     smoothie._set_saved_current()
     expected = [
-        ['M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
-        ['M907 A0.1 B0.5 C0.5 X1.25 Y1.25 Z0.1 G4P0.005 M400'],
-        ['M907 A0.1 B0.5 C0.05 X0.3 Y1.25 Z0.1 G4P0.005 M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400']
+        ['M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005'],
+        ['M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
+        ['M400'],
+        ['M907 A0.1 B0.5 C0.5 X1.25 Y1.25 Z0.1 G4P0.005'],
+        ['M400'],
+        ['M907 A0.1 B0.5 C0.05 X0.3 Y1.25 Z0.1 G4P0.005'],
+        ['M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
+        ['M400'],
     ]
     # from pprint import pprint
     # pprint(command_log)
@@ -179,9 +186,12 @@ def test_disable_motor(smoothie, monkeypatch):
     smoothie.disengage_axis('XYZ')
     smoothie.disengage_axis('ABCD')
     expected = [
-        ['M18X M400'],
-        ['M18[XYZ]+ M400'],
-        ['M18[ABC]+ M400']
+        ['M18X'],
+        ['M400'],
+        ['M18[XYZ]+'],
+        ['M400'],
+        ['M18[ABC]+'],
+        ['M400'],
     ]
     # from pprint import pprint
     # pprint(command_log)
@@ -210,23 +220,40 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.home()
     expected = [
-        ['M907 A0.8 B0.5 C0.5 X0.3 Y0.3 Z0.8 G4P0.005 G28.2.+[ABCZ].+ M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
-        ['M203.1 Y50 M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.8 Z0.1 G4P0.005 G91 G0Y-28 G0Y10 G90 M400'],  # NOQA
-        ['M203.1 X80 M400'],
-        ['M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G28.2X M400'],
-        ['M203.1 A125 B40 C40 X600 Y400 Z125 M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
-        ['M203.1 Y80 M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y1.25 Z0.1 G4P0.005 G28.2Y M400'],
-        ['M203.1 Y8 M400'],
-        ['G91 G0Y-3 G90 M400'],
-        ['G28.2Y M400'],
-        ['G91 G0Y-3 G90 M400'],
-        ['M203.1 A125 B40 C40 X600 Y400 Z125 M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'],
-        ['M114.2 M400']
+        ['M907 A0.8 B0.5 C0.5 X0.3 Y0.3 Z0.8 G4P0.005 G28.2.+[ABCZ].+'],
+        ['M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
+        ['M400'],
+        ['M203.1 Y50'],
+        ['M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.8 Z0.1 G4P0.005 G91 G0Y-28 G0Y10 G90'],
+        ['M400'],
+        ['M203.1 X80'],
+        ['M400'],
+        ['M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G28.2X'],
+        ['M400'],
+        ['M203.1 A125 B40 C40 X600 Y400 Z125'],
+        ['M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
+        ['M400'],
+        ['M203.1 Y80'],
+        ['M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y1.25 Z0.1 G4P0.005 G28.2Y'],
+        ['M400'],
+        ['M203.1 Y8'],
+        ['M400'],
+        ['G91 G0Y-3 G90'],
+        ['M400'],
+        ['G28.2Y'],
+        ['M400'],
+        ['G91 G0Y-3 G90'],
+        ['M400'],
+        ['M203.1 A125 B40 C40 X600 Y400 Z125'],
+        ['M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
+        ['M400'],
+        ['M114.2'],
+        ['M400'],
     ]
     # from pprint import pprint
     # pprint(command_log)
@@ -235,7 +262,8 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.move({'X': 0, 'Y': 1.123456, 'Z': 2, 'A': 3})
     expected = [
-        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 G0.+ M400']
+        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 G0.+'],
+        ['M400'],
     ]
     # from pprint import pprint
     # pprint(command_log)
@@ -244,8 +272,10 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.move({'B': 2})
     expected = [
-        ['M907 A0.1 B0.5 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0B2 M400'],
-        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400']
+        ['M907 A0.1 B0.5 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0B2'],
+        ['M400'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
+        ['M400'],
     ]
     # from pprint import pprint
     # pprint(command_log)
@@ -261,9 +291,11 @@ def test_plunger_commands(smoothie, monkeypatch):
         'C': 5})
     expected = [
         # Set active axes high
-        ['M907 A0.8 B0.5 C0.5 X1.25 Y1.25 Z0.8 G4P0.005 G0.+[BC].+ M400'],
+        ['M907 A0.8 B0.5 C0.5 X1.25 Y1.25 Z0.8 G4P0.005 G0.+[BC].+'],
+        ['M400'],
         # Set plunger current low
-        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 M400'],
+        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005'],
+        ['M400'],
     ]
     # from pprint import pprint
     # pprint(command_log)
@@ -300,17 +332,44 @@ def test_set_active_current(smoothie, monkeypatch):
     smoothie.set_active_current({'B': 0.42, 'C': 0.42})
     smoothie.home('BC')
     expected = [
-        ['M907 A2 B2 C2 X2 Y2 Z2 G4P0.005 G0A0B0C0X0Y0Z0 M400'],  # move all
-        ['M907 A2 B0 C0 X2 Y2 Z2 G4P0.005 M400'],  # disable BC axes
-        ['M907 A0 B2 C2 X0 Y0 Z0 G4P0.005 G0B1.3C1.3 G0B1C1 M400'],  # move BC
-        ['M907 A0 B0 C0 X0 Y0 Z0 G4P0.005 M400'],  # disable BC axes
-        ['M907 A0 B0.42 C0.42 X0 Y0 Z0 G4P0.005 G28.2BC M400'],  # home BC
-        ['M907 A0 B0 C0 X0 Y0 Z0 G4P0.005 M400'],  # dwell all axes after home
-        ['M114.2 M400']  # update the position
+        ['M907 A2 B2 C2 X2 Y2 Z2 G4P0.005 G0A0B0C0X0Y0Z0'],  # move all
+        ['M400'],
+        ['M907 A2 B0 C0 X2 Y2 Z2 G4P0.005'],  # disable BC axes
+        ['M400'],
+        ['M907 A0 B2 C2 X0 Y0 Z0 G4P0.005 G0B1.3C1.3 G0B1C1'],  # move BC
+        ['M400'],
+        ['M907 A0 B0 C0 X0 Y0 Z0 G4P0.005'],  # disable BC axes
+        ['M400'],
+        ['M907 A0 B0.42 C0.42 X0 Y0 Z0 G4P0.005 G28.2BC'],  # home BC
+        ['M400'],
+        ['M907 A0 B0 C0 X0 Y0 Z0 G4P0.005'],  # dwell all axes after home
+        ['M400'],
+        ['M114.2'],  # update the position
+        ['M400'],
     ]
     # from pprint import pprint
     # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
+
+
+def test_steps_per_mm(smoothie, monkeypatch):
+    # Check that steps_per_mm dict gets loaded with defaults on start
+    assert smoothie.steps_per_mm == {}
+    smoothie._setup()
+    assert smoothie.steps_per_mm == DEFAULT_STEPS_PER_MM
+    smoothie.update_steps_per_mm({'Z': 450})
+    expected = DEFAULT_STEPS_PER_MM
+    expected['Z'] = 450
+    assert smoothie.steps_per_mm == expected
+
+
+def test_pipette_configs(smoothie, monkeypatch):
+    axis_value = 'home updated 175'
+    smoothie._send_command = Mock(return_value=axis_value)
+
+    res = smoothie.update_pipette_config('Z', {'home': 175})
+    expected_return = {'Z': {'home': 175}}
+    assert res == expected_return
 
 
 def test_set_acceleration(smoothie, monkeypatch):
@@ -342,10 +401,14 @@ def test_set_acceleration(smoothie, monkeypatch):
     smoothie.pop_acceleration()
 
     expected = [
-        ['M204 S10000 A4 B5 C6 X1 Y2 Z3 M400'],
-        ['M204 S10000 A4 B5 C6 X1 Y2 Z3 M400'],
-        ['M204 S10000 A40 B50 C60 X10 Y20 Z30 M400'],
-        ['M204 S10000 A4 B5 C6 X1 Y2 Z3 M400']
+        ['M204 S10000 A4 B5 C6 X1 Y2 Z3'],
+        ['M400'],
+        ['M204 S10000 A4 B5 C6 X1 Y2 Z3'],
+        ['M400'],
+        ['M204 S10000 A40 B50 C60 X10 Y20 Z30'],
+        ['M400'],
+        ['M204 S10000 A4 B5 C6 X1 Y2 Z3'],
+        ['M400'],
     ]
     # from pprint import pprint
     # pprint(command_log)
@@ -676,16 +739,21 @@ def test_clear_limit_switch(smoothie, monkeypatch):
 
     assert [c.strip() for c in cmd_list] == [
         # attempt to move and fail
-        'M907 A0.1 B0.05 C0.5 X0.3 Y0.3 Z0.1 G4P0.005 G0C100.3 G0C100 M400',
+        'M907 A0.1 B0.05 C0.5 X0.3 Y0.3 Z0.1 G4P0.005 G0C100.3 G0C100',
         # recover from failure
-        'M999 M400',
+        'M999',
+        'M400',
         # set current for homing the failed axis (C)
-        'M907 A0.1 B0.05 C0.5 X0.3 Y0.3 Z0.1 G4P0.005 G28.2C M400',
+        'M907 A0.1 B0.05 C0.5 X0.3 Y0.3 Z0.1 G4P0.005 G28.2C',
+        'M400',
         # set current back to idling after home
-        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400',
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',
+        'M400',
         # update position
-        'M114.2 M400',
-        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 M400'
+        'M114.2',
+        'M400',
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',
+        'M400',
     ]
 
 
@@ -760,10 +828,10 @@ def test_speed_change(model, monkeypatch):
     pipette.aspirate(10)
     pipette.dispense(10)
     expected = [
-        ['G0F1200 M400'],  # pipette's default aspirate speed in mm/min
-        ['G0F24000 M400'],
-        ['G0F2400 M400'],  # pipette's default dispense speed in mm/min
-        ['G0F24000 M400']
+        ['G0F1200'],  # pipette's default aspirate speed in mm/min
+        ['G0F24000'],
+        ['G0F2400'],  # pipette's default dispense speed in mm/min
+        ['G0F24000'],
     ]
     # from pprint import pprint
     # pprint(command_log)
@@ -795,12 +863,12 @@ def test_max_speed_change(model, monkeypatch):
     robot._driver.set_speed(321)
     robot._driver.pop_speed()
     expected = [
-        ['G0F{} M400'.format(555 * 60)],
-        ['M203.1 A4 B5 C6 X1 Y2 Z3 M400'],
-        ['M203.1 X7 M400'],
-        ['G0F{} M400'.format(123 * 60)],
-        ['G0F{} M400'.format(321 * 60)],
-        ['G0F{} M400'.format(123 * 60)]
+        ['G0F{}'.format(555 * 60)],
+        ['M203.1 A4 B5 C6 X1 Y2 Z3'],
+        ['M203.1 X7'],
+        ['G0F{}'.format(123 * 60)],
+        ['G0F{}'.format(321 * 60)],
+        ['G0F{}'.format(123 * 60)],
     ]
     # from pprint import pprint
     # pprint(command_log)

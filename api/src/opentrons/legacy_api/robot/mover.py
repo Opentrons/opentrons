@@ -1,4 +1,8 @@
 from opentrons.trackers.pose_tracker import Point, change_base, update, ROOT
+import logging
+
+
+log = logging.getLogger(__name__)
 
 
 class Mover:
@@ -68,6 +72,8 @@ class Mover:
         return update(pose_tree, self, Point(*defaults(dst_x, dst_y, dst_z)))
 
     def home(self, pose_tree):
+        log.info(f'Pose tree in home transform {pose_tree}')
+        log.info(f'Axis mapping {self._axis_mapping.values()}')
         self._driver.home(axis=''.join(self._axis_mapping.values()))
         return self.update_pose_from_driver(pose_tree)
 
@@ -137,19 +143,17 @@ class Mover:
         assert axis in 'xyz', "axis value should be x, y or z"
         assert axis in self._axis_mapping, "mapping is not set for " + axis
 
-        # change_base is computationally expensive
-        # so only run if max pos is not known
-        if self._axis_maximum[axis] is None:
-            d_axis_max = self._driver.homed_position[self._axis_mapping[axis]]
-            d_point = {'x': 0, 'y': 0, 'z': 0}
-            d_point[axis] = d_axis_max
-            x, y, z = change_base(
-                pose_tree,
-                src=self._dst,
-                dst=self._src,
-                point=Point(**d_point))
-            point = {'x': x, 'y': y, 'z': z}
-            self._axis_maximum[axis] = point[axis]
+        d_axis_max = self._driver.homed_position[self._axis_mapping[axis]]
+        log.info(f"Axis max from driver: {d_axis_max}")
+        d_point = {'x': 0, 'y': 0, 'z': 0}
+        d_point[axis] = d_axis_max
+        x, y, z = change_base(
+            pose_tree,
+            src=self._dst,
+            dst=self._src,
+            point=Point(**d_point))
+        point = {'x': x, 'y': y, 'z': z}
+        self._axis_maximum[axis] = point[axis]
         return self._axis_maximum[axis]
 
     def update_pose_from_driver(self, pose_tree):
@@ -160,5 +164,5 @@ class Mover:
             y=self._driver.position.get(self._axis_mapping.get('y', ''), 0.0),
             z=self._driver.position.get(self._axis_mapping.get('z', ''), 0.0)
         )
-
+        log.info(f'Point in update pose from driver {point}')
         return update(pose_tree, self, point)

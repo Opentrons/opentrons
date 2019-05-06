@@ -1,9 +1,14 @@
 // @flow
-import type { DeckSlot, Mount } from '@opentrons/components'
 import type {
   CommandV1 as Command,
   PipetteLabwareFieldsV1 as PipetteLabwareFields,
 } from '@opentrons/shared-data'
+import type {
+  LabwareTemporalProperties,
+  PipetteTemporalProperties,
+  LabwareEntities,
+  PipetteEntities,
+} from '../step-forms'
 
 // ===== MIX-IN TYPES =====
 
@@ -155,21 +160,6 @@ export type CommandCreatorArgs =
   | DelayArgs
   | TransferArgs
 
-// TODO: Ian 2019-01-07 with multiple deck setup steps, we might want to
-// separate 'entities' from 'locations' for pipettes/labware, and remove
-// 'entities' (pipette name / labware type) from the timeline to protect it
-// from being different btw frames
-export type PipetteData = {|
-  name: string,
-  mount: Mount,
-  tiprackModel: string, // NOTE: this will go away when tiprack choice-per-step and/or tiprack sharing is implemented
-|}
-
-export type LabwareData = {|
-  type: string, // TODO Ian 2018-04-17 keys from JSON. Also, rename 'type' to 'model' (or something??)
-  slot: DeckSlot,
-|}
-
 /** tips are numbered 0-7. 0 is the furthest to the back of the robot.
  * For an 8-channel, on a 96-flat, Tip 0 is in row A, Tip 7 is in row H.
  */
@@ -188,13 +178,19 @@ export type SourceAndDest = {|
   dest: LocationLiquidState,
 |}
 
+// Data that never changes across time
+export type InvariantContext = {|
+  labwareEntities: LabwareEntities,
+  pipetteEntities: PipetteEntities,
+|}
+
 // TODO Ian 2018-02-09 Rename this so it's less ambigious with what we call "robot state": `TimelineFrame`?
 export type RobotState = {|
   pipettes: {
-    [instrumentId: string]: PipetteData,
+    [pipetteId: string]: PipetteTemporalProperties,
   },
   labware: {
-    [labwareId: string]: LabwareData,
+    [labwareId: string]: LabwareTemporalProperties,
   },
   tipState: {
     tipracks: {
@@ -260,9 +256,11 @@ export type CommandCreatorErrorResponse = {
 }
 
 export type CommandCreator = (
+  invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => CommandsAndRobotState | CommandCreatorErrorResponse
 export type CompoundCommandCreator = (
+  invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => Array<CommandCreator>
 

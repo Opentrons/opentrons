@@ -6,6 +6,6 @@ exports[`MainNav component renders 1`] = `
 >
   <Logo />
   <NavList />
-  <MenuButton />
+  <MobileNav />
 </div>
 `;

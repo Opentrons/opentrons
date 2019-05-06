@@ -24,6 +24,10 @@ pipenv_opts += $(and $(CI),--keep-outdated --clear)
 wheel_file = dist/opentrons-$(shell $(python) ../scripts/python_build_utils.py api normalize_version)-py2.py3-none-any.whl
 wheel_pattern := dist/opentrons-%-py2.py3-none-any.whl
 
+# These variables are for simulating python protocols
+sim_log_level ?= info
+simfile ?=
+
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
 # make test tests=tests/opentrons/tools/test_qc_scripts.py would run only the
@@ -129,6 +133,10 @@ local-install: wheel
 local-shell: local-install
 	pipenv shell
 
+.PHONY: simulate
+simulate: local-install
+	-$(python) -m opentrons.simulate -l $(sim_log_level) $(simfile)
+
 .PHONY: deploy-staging
 deploy-staging: wheel
 	-$(python) -m twine upload --repository-url "https://test.pypi.org/legacy/"\
@@ -151,7 +159,7 @@ push: wheel
 push-buildroot: wheel
 	scp -i $(br_ssh_key) $(br_ssh_opts) $(wheel_file) root@$(host):/data/
 	ssh -i $(br_ssh_key) $(br_ssh_opts) root@$(host) \
-"function cleanup () { rm -f /data/$(wheel_file) && mount -o remount,ro / && systemctl start opentrons-api-server; } ;\
+"function cleanup () { rm -f /data/opentrons*.whl && mount -o remount,ro / && systemctl start opentrons-api-server; } ;\
 systemctl stop opentrons-api-server &&\
 mount -o remount,rw / &&\
 cd /usr/lib/python3.7/site-packages &&\

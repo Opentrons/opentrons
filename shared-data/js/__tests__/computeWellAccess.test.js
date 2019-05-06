@@ -1,14 +1,15 @@
+// @flow
+import {
+  fixtureTrash,
+  fixture96Plate,
+  fixture384Plate,
+  fixture12Trough,
+  fixture24TubeRack,
+} from '@opentrons/shared-data/fixtures'
 import {
   computeWellAccess,
   computeWellAccessDeprecated,
 } from '../helpers/computeWellAccess'
-
-// TODO Ian 2019-04-12: create representative fixtures, don't use real defs
-const fixtureFixedTrash = require('../../definitions2/opentrons_1_trash_1.1_l.json')
-const fixture96Plate = require('../../definitions2/generic_96_wellplate_380_ul.json')
-const fixture384Plate = require('../../definitions2/corning_384_wellplate_112_ul.json')
-const fixture12Trough = require('../../definitions2/usa_scientific_12_trough_22_ml.json')
-const fixtureTubeRack = require('../../definitions2/opentrons_24_tuberack_2_ml_screwcap.json')
 
 describe('96 plate', () => {
   const labware = fixture96Plate
@@ -92,7 +93,7 @@ describe('384 plate', () => {
 })
 
 describe('Fixed trash', () => {
-  const labware = fixtureFixedTrash
+  const labware = fixtureTrash
 
   test('A1 => all tips in A1', () => {
     expect(computeWellAccess(labware, 'A1')).toEqual([
@@ -113,7 +114,7 @@ describe('Fixed trash', () => {
 })
 
 describe('tube rack 2mL', () => {
-  const labware = fixtureTubeRack
+  const labware = fixture24TubeRack
   test('tube rack 2mL not accessible by 8-channel (return null)', () => {
     ;['A1', 'A2', 'B1', 'B2'].forEach(well => {
       expect(computeWellAccess(labware, 'A1')).toEqual(null)

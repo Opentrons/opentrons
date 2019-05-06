@@ -1,8 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Logo component renders 1`] = `
-<img
-  className="logo"
-  src="ot-logo-full.png"
-/>
+<a
+  href="https://opentrons.com/"
+  rel="noopener noreferrer"
+  target="_blank"
+>
+  <img
+    className="logo"
+    src="ot-logo-full.png"
+  />
+</a>
 `;

@@ -79,6 +79,20 @@ class InstrumentsWrapper(object):
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
 
+    def P20_Plus_Single(
+            self,
+            mount,
+            trash_container='',
+            tip_racks=[],
+            aspirate_flow_rate=None,
+            dispense_flow_rate=None,
+            min_volume=None,
+            max_volume=None):
+        return self.pipette_by_name(mount, 'p+20_single',
+                                    trash_container, tip_racks,
+                                    aspirate_flow_rate, dispense_flow_rate,
+                                    min_volume, max_volume)
+
     def P50_Single(
             self,
             mount,
@@ -121,6 +135,20 @@ class InstrumentsWrapper(object):
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
 
+    def P300_Plus_Single(
+            self,
+            mount,
+            trash_container='',
+            tip_racks=[],
+            aspirate_flow_rate=None,
+            dispense_flow_rate=None,
+            min_volume=None,
+            max_volume=None):
+        return self.pipette_by_name(mount, 'p+300_single',
+                                    trash_container, tip_racks,
+                                    aspirate_flow_rate, dispense_flow_rate,
+                                    min_volume, max_volume)
+
     def P300_Multi(
             self,
             mount,
@@ -145,6 +173,20 @@ class InstrumentsWrapper(object):
             min_volume=None,
             max_volume=None):
         return self.pipette_by_name(mount, 'p1000_single',
+                                    trash_container, tip_racks,
+                                    aspirate_flow_rate, dispense_flow_rate,
+                                    min_volume, max_volume)
+
+    def P1000_Plus_Single(
+            self,
+            mount,
+            trash_container='',
+            tip_racks=[],
+            aspirate_flow_rate=None,
+            dispense_flow_rate=None,
+            min_volume=None,
+            max_volume=None):
+        return self.pipette_by_name(mount, 'p+1000_single',
                                     trash_container, tip_racks,
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
@@ -238,7 +280,12 @@ class InstrumentsWrapper(object):
             # pass a default pipette model-version for when robot is simulating
             # this allows any pipette to be simulated, regardless of what is
             # actually attached/cached on the robot's mounts
-            return expected_model_substring + '_v1'  # default to v1
+            #
+            # from all available config models that match the expected string,
+            # pick the first one for simulation
+            return list(filter(
+                lambda m: expected_model_substring in m,
+                pipette_config.config_models))[0]
 
 
 instruments = InstrumentsWrapper(robot)

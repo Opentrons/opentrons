@@ -13,7 +13,8 @@ dummy_cal = [
 dummy_settings = {
     'name': 'Andy',
     'version': 42,
-    'steps_per_mm': 'steps_rulz',
+    'steps_per_mm': {
+        'X': 80.00, 'Y': 80.00, 'Z': 400, 'A': 400, 'B': 768, 'C': 768},
     'acceleration': {'X': 3, 'Y': 2, 'Z': 15, 'A': 15, 'B': 2, 'C': 2},
     'instrument_offset': {
         'left': {

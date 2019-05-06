@@ -34,6 +34,15 @@ HOMED_POSITION = {
     'C': 19
 }
 
+EEPROM_DEFAULT = {
+    'X': 0.0,
+    'Y': 0.0,
+    'Z': 0.0,
+    'A': 0.0,
+    'B': 0.0,
+    'C': 0.0
+}
+
 PLUNGER_BACKLASH_MM = 0.3
 LOW_CURRENT_Z_SPEED = 30
 CURRENT_CHANGE_DELAY = 0.005
@@ -79,6 +88,7 @@ GCODES = {'HOME': 'G28.2',
           'PUSH_SPEED': 'M120',
           'POP_SPEED': 'M121',
           'SET_SPEED': 'G0F',
+          'STEPS_PER_MM': 'M92',
           'READ_INSTRUMENT_ID': 'M369',
           'WRITE_INSTRUMENT_ID': 'M370',
           'READ_INSTRUMENT_MODEL': 'M371',
@@ -87,13 +97,14 @@ GCODES = {'HOME': 'G28.2',
           'SET_CURRENT': 'M907',
           'DISENGAGE_MOTOR': 'M18',
           'HOMING_STATUS': 'G28.6',
-          'ACCELERATION': 'M204 S10000'}
+          'ACCELERATION': 'M204 S10000',
+          'WAIT': 'M400'}
 
 # Number of digits after the decimal point for coordinates being sent
 # to Smoothie
 GCODE_ROUNDING_PRECISION = 3
 
-SMOOTHIE_COMMAND_TERMINATOR = 'M400\r\n\r\n'
+SMOOTHIE_COMMAND_TERMINATOR = '\r\n\r\n'
 SMOOTHIE_ACK = 'ok\r\nok\r\n'
 
 
@@ -253,6 +264,7 @@ class SmoothieDriver_3_0_0:
     def __init__(self, config):
         self.run_flag = Event()
         self.run_flag.set()
+        self.dist_from_eeprom = EEPROM_DEFAULT.copy()
 
         self._position = HOMED_POSITION.copy()
         self.log = []
@@ -301,7 +313,7 @@ class SmoothieDriver_3_0_0:
         self._saved_max_speed_settings = self._max_speed_settings.copy()
         self._combined_speed = float(DEFAULT_AXES_SPEED)
         self._saved_axes_speed = float(self._combined_speed)
-
+        self._steps_per_mm = {}
         self._acceleration = config.acceleration.copy()
         self._saved_acceleration = config.acceleration.copy()
 
@@ -430,6 +442,44 @@ class SmoothieDriver_3_0_0:
         '''
         self._write_to_pipette(
             GCODES['WRITE_INSTRUMENT_MODEL'], mount, data_string)
+
+    def update_pipette_config(self, axis, data):
+        '''
+        Updates the following configs for a given pipette mount based on
+        the detected pipette type:
+        - homing positions M365.0
+        - Max Travel M365.1
+        - endstop debounce M365.2 (NOT for zprobe debounce)
+        - retract from endstop distance M365.3
+        '''
+        if self.simulating:
+            return {axis: data}
+
+        gcodes = {
+            'retract': 'M365.3',
+            'debounce': 'M365.2',
+            'max_travel': 'M365.1',
+            'home': 'M365.0'}
+
+        res_msg = {axis: {}}
+
+        for key, value in data.items():
+            if key == 'debounce':
+                # debounce variable for all axes, so do not specify an axis
+                cmd = f' O{value}'
+            else:
+                cmd = f' {axis}{value}'
+            res = self._send_command(gcodes[key] + cmd)
+            if res is None:
+                raise ValueError(
+                    f'{key} was not updated to {value} on {axis} axis')
+            # ensure smoothie received code and changed value through
+            # return message. Format of return message:
+            # <Axis> (or E for endstop) updated <Value>
+            arr_result = res.strip().split(' ')
+            res_msg[axis][str(arr_result[0])] = float(arr_result[2])
+
+        return res_msg
 
     # FIXME (JG 9/28/17): Should have a more thought out
     # way of simulating vs really running
@@ -564,6 +614,10 @@ class SmoothieDriver_3_0_0:
     @property
     def speed(self):
         pass
+
+    @property
+    def steps_per_mm(self):
+        return self._steps_per_mm
 
     def set_speed(self, value):
         ''' set total axes movement speed in mm/second'''
@@ -840,23 +894,29 @@ class SmoothieDriver_3_0_0:
         """
         if self.simulating:
             return
+        cmd_ret = self._write_with_retries(
+            command + SMOOTHIE_COMMAND_TERMINATOR,
+            5.0, DEFAULT_COMMAND_RETRIES)
+        cmd_ret = self._remove_unwanted_characters(command, cmd_ret)
+        self._handle_return(cmd_ret, GCODES['HOME'] in command)
+        wait_ret = serial_communication.write_and_return(
+            GCODES['WAIT'] + SMOOTHIE_COMMAND_TERMINATOR,
+            SMOOTHIE_ACK, self._connection, timeout=12000)
+        wait_ret = self._remove_unwanted_characters(
+            GCODES['WAIT'], wait_ret)
+        self._handle_return(wait_ret, GCODES['HOME'] in command)
+        return cmd_ret.strip()
 
-        command_line = command + ' ' + SMOOTHIE_COMMAND_TERMINATOR
-        ret_code = self._recursive_write_and_return(
-            command_line, timeout, DEFAULT_COMMAND_RETRIES)
-
-        ret_code = self._remove_unwanted_characters(command_line, ret_code)
-
+    def _handle_return(self, ret_code: str, was_home: bool):
         # Smoothieware returns error state if a switch was hit while moving
         if (ERROR_KEYWORD in ret_code.lower()) or \
                 (ALARM_KEYWORD in ret_code.lower()):
             self._reset_from_error()
             error_axis = ret_code.strip()[-1]
-            if GCODES['HOME'] not in command and error_axis in 'XYZABC':
+            if not was_home and error_axis in 'XYZABC':
+                log.warning(f"alarm/error in {ret_code}, homing {error_axis}")
                 self.home(error_axis)
             raise SmoothieError(ret_code)
-
-        return ret_code.strip()
 
     def _remove_unwanted_characters(self, command, response):
         # smoothieware can enter a weird state, where it repeats back
@@ -881,24 +941,25 @@ class SmoothieDriver_3_0_0:
 
         return modified_response
 
-    def _recursive_write_and_return(self, cmd, timeout, retries):
-        try:
-            return serial_communication.write_and_return(
-                cmd,
-                SMOOTHIE_ACK,
-                self._connection,
-                timeout=timeout)
-        except serial_communication.SerialNoResponse as e:
-            retries -= 1
-            if retries <= 0:
-                raise e
-            if not self.simulating:
-                sleep(DEFAULT_STABILIZE_DELAY)
-            if self._connection:
-                self._connection.close()
-                self._connection.open()
-            return self._recursive_write_and_return(
-                cmd, timeout, retries)
+    def _write_with_retries(self, cmd: str, timeout: float, retries: int):
+        for attempt in range(retries):
+            try:
+                ret = serial_communication.write_and_return(
+                    cmd,
+                    SMOOTHIE_ACK,
+                    self._connection,
+                    timeout=timeout)
+                if attempt != 0:
+                    log.warning(
+                        f"required {attempt} retries for {cmd.strip()}")
+                return ret
+            except serial_communication.SerialNoResponse:
+                if not self.simulating:
+                    sleep(DEFAULT_STABILIZE_DELAY)
+                if self._connection:
+                    self._connection.close()
+                    self._connection.open()
+        raise serial_communication.SerialNoResponse()
 
     def _home_x(self):
         log.debug("_home_x")
@@ -982,15 +1043,40 @@ class SmoothieDriver_3_0_0:
         except serial_communication.SerialNoResponse:
             # incase motor-driver is stuck in bootloader and unresponsive,
             # use gpio to reset into a known state
+            log.debug("wait for ack failed, resetting")
             self._smoothie_reset()
+        log.debug("wait for ack done")
         self._reset_from_error()
-        self._send_command(self._config.steps_per_mm)
+        log.debug("_reset")
+        self.update_steps_per_mm(self._config.steps_per_mm)
+        log.debug("sent steps")
         self._send_command(GCODES['ABSOLUTE_COORDS'])
+        log.debug("sent abs")
         self._save_current(self.current, axes_active=False)
+        log.debug("sent current")
         self.update_position(default=self.homed_position)
         self.pop_axis_max_speed()
         self.pop_speed()
         self.pop_acceleration()
+        log.debug("setup done")
+
+    def update_steps_per_mm(self, data):
+        # Using M92, update steps per mm for a given axis
+        if self.simulating:
+            self.steps_per_mm.update(data)
+            return
+
+        if isinstance(data, str):
+            # Unfortunately update server calls driver._setup() before the
+            # update can correctly load the robot_config change on disk.
+            # Need to account for old command format to avoid this issue.
+            self._send_command(data)
+        else:
+            cmd = ''
+            for axis, value in data.items():
+                cmd = f'{cmd} {axis}{value}'
+                self.steps_per_mm[axis] = value
+            self._send_command(GCODES['STEPS_PER_MM'] + cmd)
 
     def _read_from_pipette(self, gcode, mount) -> Optional[str]:
         '''
@@ -1212,6 +1298,7 @@ class SmoothieDriver_3_0_0:
             ax: self.homed_position.get(ax)
             for ax in ''.join(home_sequence)
         }
+        log.info(f'Home before update pos {homed}')
         self.update_position(default=homed)
         for axis in ''.join(home_sequence):
             self.engaged_axes[axis] = True
@@ -1224,6 +1311,7 @@ class SmoothieDriver_3_0_0:
             if ax in axis
         }
         self._homed_position.update(new)
+        log.info(f'Homed position after {new}')
 
         return self.position
 
@@ -1435,7 +1523,7 @@ class SmoothieDriver_3_0_0:
             gpio.set_high(gpio.OUTPUT_PINS['HALT'])
             sleep(0.25)
 
-    async def update_firmware(self,
+    async def update_firmware(self,  # noqa(C901)
                               filename: str,
                               loop: asyncio.AbstractEventLoop = None,
                               explicit_modeset: bool = True) -> str:
@@ -1452,7 +1540,14 @@ class SmoothieDriver_3_0_0:
         if self.simulating:
             return 'Did nothing (simulating)'
 
-        smoothie_update._ensure_programmer_executable()
+        try:
+            smoothie_update._ensure_programmer_executable()
+        except OSError as ose:
+            if ose.errno == 30:
+                # This is "read only filesystem" and happens on buildroot
+                pass
+            else:
+                raise
 
         if not self.is_connected():
             self._connect_to_port()
@@ -1477,7 +1572,10 @@ class SmoothieDriver_3_0_0:
         rd: bytes = await proc.stdout.read()  # type: ignore
         res = rd.decode().strip()
         await proc.communicate()
-
+        try:
+            self._connection.close()
+        except Exception:
+            log.exception('Failed to close smoothie connection.')
         # re-open the port
         self._connection.open()
         # reset smoothieware

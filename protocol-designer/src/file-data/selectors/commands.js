@@ -1,26 +1,27 @@
 // @flow
-import assert from 'assert'
 import { createSelector } from 'reselect'
 import last from 'lodash/last'
 import mapValues from 'lodash/mapValues'
-import reduce from 'lodash/reduce'
 import takeWhile from 'lodash/takeWhile'
 import uniqBy from 'lodash/uniqBy'
-import { getIsTiprack, getPipetteNameSpecs } from '@opentrons/shared-data'
 import { getAllWellsForLabware } from '../../constants'
 import * as StepGeneration from '../../step-generation'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { BaseState, Selector } from '../../types'
 import type { StepIdType } from '../../form-types'
-import type { LabwareOnDeck, PipetteOnDeck } from '../../step-forms'
+import type {
+  LabwareOnDeck,
+  PipetteOnDeck,
+  LabwareTemporalProperties,
+  PipetteTemporalProperties,
+} from '../../step-forms'
 
-function _makeTipState(
-  labwareDef: LabwareDefinition2
-): { [well: string]: true } {
-  return mapValues(labwareDef.wells, well => true)
-}
+const getInvariantContext: Selector<StepGeneration.InvariantContext> = createSelector(
+  stepFormSelectors.getLabwareEntities,
+  stepFormSelectors.getPipetteEntities,
+  (labwareEntities, pipetteEntities) => ({ labwareEntities, pipetteEntities })
+)
 
 // NOTE this just adds missing well keys to the labware-ingred 'deck setup' liquid state
 export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> = createSelector(
@@ -55,117 +56,36 @@ export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> 
   }
 )
 
-type TipState = $PropertyType<StepGeneration.RobotState, 'tipState'>
-type TiprackTipState = $PropertyType<TipState, 'tipracks'>
 export const getInitialRobotState: BaseState => StepGeneration.RobotState = createSelector(
   stepFormSelectors.getInitialDeckSetup,
-  stepFormSelectors.getLabwareEntities,
+  stepFormSelectors.getInvariantContext,
   getLabwareLiquidState,
-  (initialDeckSetup, labwareEntities, labwareLiquidState) => {
-    const labware = mapValues(
+  (initialDeckSetup, invariantContext, labwareLiquidState) => {
+    const labware: {
+      [labwareId: string]: LabwareTemporalProperties,
+    } = mapValues(
       initialDeckSetup.labware,
-      (l: LabwareOnDeck, id: string): StepGeneration.LabwareData => ({
-        type: l.type,
+      (l: LabwareOnDeck): LabwareTemporalProperties => ({
         slot: l.slot,
       })
     )
 
-    const pipettes = mapValues(
+    const pipettes: {
+      [pipetteId: string]: PipetteTemporalProperties,
+    } = mapValues(
       initialDeckSetup.pipettes,
-      (p: PipetteOnDeck, id: string): StepGeneration.PipetteData => {
-        const pipetteSpecs = getPipetteNameSpecs(p.name)
-        if (!pipetteSpecs) {
-          // this should never happen this far along
-          throw new Error(`no pipette spec for ${p && p.name}`)
-        }
-        return {
-          mount: p.mount,
-          name: p.name,
-          tiprackModel: p.tiprackModel,
-        }
-      }
+      (p: PipetteOnDeck): PipetteTemporalProperties => ({
+        mount: p.mount,
+      })
     )
 
-    const tipracks: TiprackTipState = reduce(
-      labware,
-      (
-        acc: TiprackTipState,
-        labwareData: StepGeneration.LabwareData,
-        labwareId: string
-      ) => {
-        const labwareDef = labwareEntities[labwareId].def
-        if (getIsTiprack(labwareDef)) {
-          return {
-            ...acc,
-            [labwareId]: _makeTipState(labwareDef),
-          }
-        }
-        return acc
-      },
-      {}
-    )
-
-    type PipetteTipState = { [pipetteId: string]: boolean }
-    const pipetteTipState: PipetteTipState = reduce(
-      pipettes,
-      (
-        acc: PipetteTipState,
-        pipetteData: StepGeneration.PipetteData,
-        pipetteId: string
-      ) => ({
-        ...acc,
-        [pipetteId]: false, // start with no tips
-      }),
-      {}
-    )
-
-    const pipetteLiquidState = reduce(
-      pipettes,
-      (acc, pipetteData: StepGeneration.PipetteData, pipetteId: string) => {
-        const pipetteSpec = getPipetteNameSpecs(pipetteData.name)
-        assert(
-          pipetteSpec,
-          `expected pipette spec for ${pipetteId} ${
-            pipetteData.name
-          }, could not make pipetteLiquidState for initial frame correctly`
-        )
-        const channels = pipetteSpec ? pipetteSpec.channels : 1
-        assert(
-          channels === 1 || channels === 8,
-          'expected pipette with 1 or 8 channels'
-        )
-        return {
-          ...acc,
-          [pipetteId]:
-            channels > 1
-              ? {
-                  '0': {},
-                  '1': {},
-                  '2': {},
-                  '3': {},
-                  '4': {},
-                  '5': {},
-                  '6': {},
-                  '7': {},
-                }
-              : { '0': {} },
-        }
-      },
-      {}
-    )
-
-    return {
-      pipettes,
-      labware,
-      tipState: {
-        tipracks,
-        pipettes: pipetteTipState,
-      },
-      liquidState: {
-        pipettes: pipetteLiquidState,
-        labware: labwareLiquidState,
-      },
-    }
+    const robotState = StepGeneration.makeInitialRobotState({
+      invariantContext,
+      labwareLocations: labware,
+      pipetteLocations: pipettes,
+    })
+    robotState.liquidState.labware = labwareLiquidState
+    return robotState
   }
 )
 
@@ -181,8 +101,10 @@ function compoundCommandCreatorFromStepArgs(
       // TODO(mc, 2019-04-09): these typedefs should probably be exact objects
       // (like redux actions) to have this switch block behave
       return prevRobotState => [
-        // $FlowFixMe: TODOs above ^^^
-        prevRobotState => StepGeneration.delay(stepArgs)(prevRobotState),
+        // TODO: Ian 2019-04-18 this is a HACK the make delay work here, until compound vs non-compound cc types are merged
+        (invariantContext, prevRobotState) =>
+          // $FlowFixMe: TODOs above ^^^
+          StepGeneration.delay(stepArgs)(invariantContext, prevRobotState),
       ]
     }
     case 'distribute':
@@ -203,7 +125,13 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
   stepFormSelectors.getArgsAndErrorsByStepId,
   stepFormSelectors.getOrderedStepIds,
   getInitialRobotState,
-  (allStepArgsAndErrors, orderedStepIds, initialRobotState) => {
+  getInvariantContext,
+  (
+    allStepArgsAndErrors,
+    orderedStepIds,
+    initialRobotState,
+    invariantContext
+  ) => {
     const allStepArgs: Array<StepGeneration.CommandCreatorArgs | null> = orderedStepIds.map(
       stepId => {
         return (
@@ -231,7 +159,7 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
         reducedCommandCreator =
           compoundCommandCreator &&
           StepGeneration.reduceCommandCreators(
-            compoundCommandCreator(initialRobotState)
+            compoundCommandCreator(invariantContext, initialRobotState)
           )
 
         if (!reducedCommandCreator) {
@@ -272,6 +200,7 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
     )
 
     const timeline = StepGeneration.commandCreatorsTimeline(commandCreators)(
+      invariantContext,
       initialRobotState
     )
 

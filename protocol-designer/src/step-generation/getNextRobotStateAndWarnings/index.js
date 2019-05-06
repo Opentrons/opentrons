@@ -2,10 +2,15 @@
 import assert from 'assert'
 import forAspirateDispense from './forAspirateDispense'
 import type { CommandV1 as Command } from '@opentrons/shared-data'
-import type { RobotState, RobotStateAndWarnings } from '../types'
+import type {
+  InvariantContext,
+  RobotState,
+  RobotStateAndWarnings,
+} from '../types'
 
 export default function getNextRobotStateAndWarnings(
   command: Command,
+  invariantContext: InvariantContext,
   prevRobotState: RobotState
 ): RobotStateAndWarnings {
   assert(command, 'undefined command passed to getNextRobotStateAndWarning')
@@ -13,7 +18,11 @@ export default function getNextRobotStateAndWarnings(
     case 'dispense':
     case 'aspirate':
       // TODO: BC 2018-11-29 handle dispense
-      return forAspirateDispense(command.params, prevRobotState)
+      return forAspirateDispense(
+        command.params,
+        invariantContext,
+        prevRobotState
+      )
     case 'blowout':
     case 'drop-tip':
     case 'pick-up-tip':

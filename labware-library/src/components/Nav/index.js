@@ -8,17 +8,19 @@ export { default as Breadcrumbs } from './Breadcrumbs'
 
 export default function Nav() {
   return (
-    <nav className={styles.nav}>
-      <div className={styles.subdomain_nav_wrapper}>
-        <div className={styles.nav_container}>
-          <SubdomainNav />
+    <>
+      <nav className={styles.nav}>
+        <div className={styles.subdomain_nav_wrapper}>
+          <div className={styles.nav_container}>
+            <SubdomainNav />
+          </div>
         </div>
-      </div>
-      <div className={styles.main_nav_wrapper}>
-        <div className={styles.nav_container}>
-          <MainNav />
+        <div className={styles.main_nav_wrapper}>
+          <div className={styles.nav_container}>
+            <MainNav />
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </>
   )
 }

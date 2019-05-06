@@ -1,0 +1,114 @@
+{
+  "p10_single": {
+    "displayName": "P10 Single-Channel",
+    "minVolume": 1,
+    "maxVolume": 10,
+    "channels": 1,
+    "defaultAspirateFlowRate": {
+      "value": 5,
+      "min": 0.001,
+      "max": 50
+    },
+    "defaultDispenseFlowRate": {
+      "value": 10,
+      "min": 0.001,
+      "max": 50
+    }
+  },
+  "p10_multi": {
+    "displayName": "P10 8-Channel",
+    "minVolume": 1,
+    "maxVolume": 10,
+    "defaultAspirateFlowRate": {
+      "value": 5,
+      "min": 0.001,
+      "max": 50
+    },
+    "defaultDispenseFlowRate": {
+      "value": 10,
+      "min": 0.001,
+      "max": 50
+    },
+    "channels": 8
+  },
+  "p50_single": {
+    "displayName": "P50 Single-Channel",
+    "defaultAspirateFlowRate": {
+      "value": 25,
+      "min": 0.001,
+      "max": 100
+    },
+    "defaultDispenseFlowRate": {
+      "value": 50,
+      "min": 0.001,
+      "max": 100
+    },
+    "channels": 1,
+    "minVolume": 5,
+    "maxVolume": 50
+  },
+  "p50_multi": {
+    "displayName": "P50 8-Channel",
+    "defaultAspirateFlowRate": {
+      "value": 25,
+      "min": 0.001,
+      "max": 100
+    },
+    "defaultDispenseFlowRate": {
+      "value": 50,
+      "min": 0.001,
+      "max": 100
+    },
+    "channels": 8,
+    "minVolume": 5,
+    "maxVolume": 50
+  },
+  "p300_single": {
+    "displayName": "P300 Single-Channel",
+    "defaultAspirateFlowRate": {
+      "value": 150,
+      "min": 0.001,
+      "max": 600
+    },
+    "defaultDispenseFlowRate": {
+      "value": 300,
+      "min": 0.001,
+      "max": 600
+    },
+    "channels": 1,
+    "minVolume": 30,
+    "maxVolume": 300
+  },
+  "p300_multi": {
+    "displayName": "P300 8-Channel",
+    "defaultAspirateFlowRate": {
+      "value": 150,
+      "min": 0.001,
+      "max": 600
+    },
+    "defaultDispenseFlowRate": {
+      "value": 300,
+      "min": 0.001,
+      "max": 600
+    },
+    "channels": 8,
+    "minVolume": 30,
+    "maxVolume": 300
+  },
+  "p1000_single": {
+    "displayName": "P1000 Single-Channel",
+    "defaultAspirateFlowRate": {
+      "value": 500,
+      "min": 50,
+      "max": 2000
+    },
+    "defaultDispenseFlowRate": {
+      "value": 1000,
+      "min": 50,
+      "max": 2000
+    },
+    "channels": 1,
+    "minVolume": 100,
+    "maxVolume": 1000
+  }
+}

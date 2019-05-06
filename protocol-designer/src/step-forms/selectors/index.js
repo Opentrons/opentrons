@@ -35,7 +35,6 @@ import type {
   StepArgsAndErrors,
   StepFormAndFieldErrors,
   StepItemData,
-  StepFormContextualState,
 } from '../../steplist/types'
 import type { CommandCreatorArgs } from '../../step-generation/types'
 import type {
@@ -50,6 +49,7 @@ import type {
   FormPipettesByMount,
 } from '../types'
 import type { RootState } from '../reducers'
+import type { InvariantContext } from '../../step-generation'
 
 // TODO: Ian 2019-04-10 SHIM REMOVAL #3335
 const FALLBACK_DEF = '54d2f430-d602-11e8-80b1-6965467d172c'
@@ -299,10 +299,10 @@ const getOrderedSavedForms: Selector<Array<FormData>> = createSelector(
 // TODO: Ian 2019-01-25 type with hydrated form type
 function _getHydratedForm(
   rawForm: FormData,
-  contextualState: StepFormContextualState
+  invariantContext: InvariantContext
 ) {
   const hydratedForm = mapValues(rawForm, (value, name) =>
-    hydrateField(contextualState, name, value)
+    hydrateField(invariantContext, name, value)
   )
   return hydratedForm
 }
@@ -333,7 +333,7 @@ const _getFormAndFieldErrorsFromHydratedForm = (
   return errors
 }
 
-export const getHydrationContext: Selector<StepFormContextualState> = createSelector(
+export const getInvariantContext: Selector<InvariantContext> = createSelector(
   getLabwareEntities,
   getPipetteEntities,
   (labwareEntities, pipetteEntities) => ({ labwareEntities, pipetteEntities })
@@ -341,7 +341,7 @@ export const getHydrationContext: Selector<StepFormContextualState> = createSele
 
 export const getUnsavedFormErrors: Selector<?StepFormAndFieldErrors> = createSelector(
   getUnsavedForm,
-  getHydrationContext,
+  getInvariantContext,
   (unsavedForm, contextualState) => {
     if (!unsavedForm) return null
     const hydratedForm = _getHydratedForm(unsavedForm, contextualState)
@@ -371,7 +371,7 @@ export const makeGetArgsAndErrorsWithId = () => {
     _
   >(
     getStepFormWithId,
-    getHydrationContext,
+    getInvariantContext,
     (stepForm, contextualState) => {
       const hydratedForm = _getHydratedForm(stepForm, contextualState)
       const errors = _getFormAndFieldErrorsFromHydratedForm(hydratedForm)
@@ -406,7 +406,7 @@ export const getArgsAndErrorsByStepId: Selector<{
   [StepIdType]: StepArgsAndErrors,
 }> = createSelector(
   getOrderedSavedForms,
-  getHydrationContext,
+  getInvariantContext,
   (stepForms, contextualState) => {
     return reduce(
       stepForms,
@@ -440,7 +440,7 @@ export const getFormLevelWarningsForUnsavedForm: Selector<
   Array<FormWarning>
 > = createSelector(
   getUnsavedForm,
-  getHydrationContext,
+  getInvariantContext,
   (unsavedForm, contextualState) => {
     if (!unsavedForm) return []
     const hydratedForm = _getHydratedForm(unsavedForm, contextualState)
@@ -452,7 +452,7 @@ export const getFormLevelWarningsPerStep: Selector<{
   [stepId: string]: Array<FormWarning>,
 }> = createSelector(
   getSavedStepForms,
-  getHydrationContext,
+  getInvariantContext,
   (forms, contextualState) =>
     mapValues(forms, (form, stepId) => {
       if (!form) return []

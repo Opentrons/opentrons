@@ -2,6 +2,7 @@
 import * as errorCreators from '../../errorCreators'
 import type { PipetteLabwareFieldsV1 as PipetteLabwareFields } from '@opentrons/shared-data'
 import type {
+  InvariantContext,
   RobotState,
   CommandCreator,
   CommandCreatorError,
@@ -10,6 +11,7 @@ import type {
 import updateLiquidState from '../../dispenseUpdateLiquidState'
 
 const blowout = (args: PipetteLabwareFields): CommandCreator => (
+  invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => {
   /** Blowout with given args. Requires tip. */
@@ -58,10 +60,9 @@ const blowout = (args: PipetteLabwareFields): CommandCreator => (
       ...prevRobotState,
       liquidState: updateLiquidState(
         {
+          invariantContext,
           pipetteId: pipette,
-          pipetteData,
           labwareId: labware,
-          labwareType: prevRobotState.labware[labware].type,
           useFullVolume: true,
           well,
         },

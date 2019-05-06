@@ -1,8 +1,8 @@
-// flow
+// @flow
 import * as React from 'react'
 import Logo from './Logo'
 import { NavList } from './NavList'
-import MenuButton from './MenuButton'
+import MobileNav from './MobileNav'
 import styles from './styles.css'
 
 export function MainNav() {
@@ -10,7 +10,7 @@ export function MainNav() {
     <div className={styles.main_nav_contents}>
       <Logo />
       <NavList />
-      <MenuButton />
+      <MobileNav />
     </div>
   )
 }

@@ -399,19 +399,22 @@ describe('discovery selectors', () => {
       expected: makeFullyUp('bar', '10.0.0.2', 'connectable', true, 'bar'),
     },
     {
-      name: 'getRobotApiVersion returns serverHealth.apiServerVersion',
+      name: 'getRobotApiVersion returns health.apiServerVersion',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
       state: {
         serverHealth: { apiServerVersion: '1.2.3' },
         health: { api_version: '4.5.6' },
       },
       selector: discovery.getRobotApiVersion,
-      expected: '1.2.3',
+      expected: '4.5.6',
     },
     {
-      name: 'getRobotApiVersion returns health.api_version if no serverHealth',
+      name: 'getRobotApiVersion returns serverHealth.api_version if no health',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
-      state: { serverHealth: null, health: { api_version: '4.5.6' } },
+      state: {
+        serverHealth: { apiServerVersion: '4.5.6' },
+        health: null,
+      },
       selector: discovery.getRobotApiVersion,
       expected: '4.5.6',
     },
@@ -423,11 +426,11 @@ describe('discovery selectors', () => {
       expected: null,
     },
     {
-      name: 'getRobotApiVersion returns API health if serverHealth invalid',
+      name: 'getRobotApiVersion returns serverHleath if API health invalid',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
       state: {
-        serverHealth: { apiServerVersion: 'not available' },
-        health: { api_version: '4.5.6' },
+        serverHealth: { apiServerVersion: '4.5.6' },
+        health: { api_version: 'not available' },
       },
       selector: discovery.getRobotApiVersion,
       expected: '4.5.6',
@@ -443,20 +446,20 @@ describe('discovery selectors', () => {
       expected: null,
     },
     {
-      name: 'getRobotFirmwareVersion returns serverHealth.smoothieVersion',
+      name: 'getRobotFirmwareVersion returns health.smoothieVersion',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
       state: {
         serverHealth: { smoothieVersion: '1.2.3' },
         health: { fw_version: '4.5.6' },
       },
       selector: discovery.getRobotFirmwareVersion,
-      expected: '1.2.3',
+      expected: '4.5.6',
     },
     {
       name:
-        'getRobotFirmwareVersion returns health.fw_version if no serverHealth',
+        'getRobotFirmwareVersion returns serverHealth.smoothieVersion if no halth',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
-      state: { serverHealth: null, health: { fw_version: '4.5.6' } },
+      state: { serverHealth: { smoothieVersion: '4.5.6' }, health: null },
       selector: discovery.getRobotFirmwareVersion,
       expected: '4.5.6',
     },

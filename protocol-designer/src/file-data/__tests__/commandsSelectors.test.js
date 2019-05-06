@@ -1,3 +1,8 @@
+import {
+  fixture12Trough,
+  fixture96Plate,
+  fixtureTrash,
+} from '@opentrons/shared-data/fixtures'
 import { getLabwareLiquidState } from '../selectors'
 jest.mock('../../labware-defs/utils')
 
@@ -5,16 +10,15 @@ let labwareEntities
 let ingredLocs
 
 beforeEach(() => {
-  // TODO Ian 2019-04-12: create representative fixtures, don't use real defs
   labwareEntities = {
     FIXED_TRASH_ID: {
-      def: require('@opentrons/shared-data/definitions2/opentrons_1_trash_1.1_l.json'),
+      def: fixtureTrash,
     },
     wellPlateId: {
-      def: require('@opentrons/shared-data/definitions2/generic_96_wellplate_380_ul.json'),
+      def: fixture96Plate,
     },
     troughId: {
-      def: require('@opentrons/shared-data/definitions2/usa_scientific_12_trough_22_ml.json'),
+      def: fixture12Trough,
     },
   }
 

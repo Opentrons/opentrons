@@ -1,4 +1,4 @@
-from os import system
+import os
 from sys import platform
 from typing import Tuple
 """
@@ -81,7 +81,7 @@ def _write_value(value, path):
         command = "{0} > NUL".format(base_command)
     else:
         command = "exec 2> /dev/null; {0}".format(base_command)
-    system(command.format(value, path))
+    os.system(command.format(value, path))
 
 
 def _read_value(path):
@@ -90,7 +90,8 @@ def _read_value(path):
     :param path: A valid system path
     """
     read_value = 0
-    if platform == 'win32':
+    if not os.path.exists(path):
+        # Path will generally only exist on a Raspberry Pi
         pass
     else:
         with open(path) as f:

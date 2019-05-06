@@ -59,6 +59,31 @@ Opentrons Labware
 
 Tipracks
 ========
+opentrons-tiprack-10ul
+----------------------
+Tiprack for a 10ul pipette (single or 8-channel) *does not require an adapter*
+
+.. code-block:: python
+
+  labware.load('opentrons-tiprack-10ul', slot)
+
+**Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
+
+.. image::  img/labware_lib/opentrons_10ul_tips.png
+
+
+tiprack-10ul
+------------
+Tiprack for a 10ul pipette (single or 8-channel) *requires an adapter*
+
+.. code-block:: python
+
+  labware.load('tiprack-10ul', slot)
+
+**Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
+
+.. image:: img/labware_lib/geb_10ul_tips.png
+
 
 opentrons-tiprack-300ul
 -----------------------
@@ -210,20 +235,6 @@ You can access the point position as ``my_labware.wells('A1')`` or ``my_labware.
 
 Tipracks
 ==========
-
-tiprack-10ul
--------------
-
-Tip rack for a 10 uL pipette (single or 8-channel)
-
-.. code-block:: python
-
-    labware.load('tiprack-10ul', slot)
-
-**Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
-
-.. image:: img/labware_lib/Tiprack-10ul.png
-
 
 tiprack-200ul
 -------------

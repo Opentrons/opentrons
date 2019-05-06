@@ -14,7 +14,7 @@ from opentrons.data_storage import database, old_container_loading,\
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as fflags
-from opentrons.config.robot_configs import load
+from opentrons.config.robot_configs import load, DEFAULT_STEPS_PER_MM
 from opentrons.legacy_api import containers, modules
 from opentrons.legacy_api.containers import Container, load_new_labware,\
     save_new_offsets
@@ -130,10 +130,6 @@ class Robot(CommandPublisher):
         self.model_by_mount = {'left': {'model': None, 'id': None},
                                'right': {'model': None, 'id': None}}
 
-        # TODO (artyom, 09182017): once protocol development experience
-        # in the light of Session concept is fully fleshed out, we need
-        # to properly communicate deprecation of commands. For now we'll
-        # leave it as is for compatibility with documentation.
         self._commands = []
         self._unsubscribe_commands = None
         self.reset()
@@ -275,6 +271,28 @@ class Robot(CommandPublisher):
         log.debug("Updating instrument model cache")
         for mount in self.model_by_mount.keys():
             model_value = self._driver.read_pipette_model(mount)
+            plunger_axis = 'B' if mount == 'left' else 'C'
+            mount_axis = 'Z' if mount == 'left' else 'A'
+            if model_value and 'v2' in model_value:
+                # Check if new model of pipettes, load smoothie configs
+                # for this particular model
+                self._driver.update_steps_per_mm({plunger_axis: 2133.33})
+                # TODO(LC25-4-2019): Modify configs to update to as
+                # testing informs better values
+                self._driver.update_pipette_config(
+                    mount_axis, {'home': 172.15})
+                self._driver.update_pipette_config(
+                    plunger_axis, {'max_travel': 60})
+                self._driver.dist_from_eeprom[mount_axis] = 47.8
+            elif model_value:
+                self._driver.dist_from_eeprom[mount_axis] = 0.0
+                self._driver.update_steps_per_mm(
+                    {plunger_axis: DEFAULT_STEPS_PER_MM[plunger_axis]})
+
+                self._driver.update_pipette_config(mount_axis, {'home': 220})
+                self._driver.update_pipette_config(
+                    plunger_axis, {'max_travel': 30})
+
             if model_value:
                 id_response = self._driver.read_pipette_id(mount)
             else:

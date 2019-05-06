@@ -5,6 +5,7 @@ from functools import reduce
 import json
 import logging
 from time import time
+from uuid import uuid4
 
 from opentrons.broker import Broker
 from opentrons.legacy_api.containers import get_container, location_to_list
@@ -34,6 +35,9 @@ class SessionManager(object):
         self.session = None
         self._session_lock = False
         self._hardware = hardware
+        self._command_logger = logging.getLogger(
+            'opentrons.server.command_logger')
+        self._broker.set_logger(self._command_logger)
 
     def __del__(self):
         if isinstance(getattr(self, '_hardware', None),
@@ -47,6 +51,9 @@ class SessionManager(object):
 
         self._session_lock = True
         try:
+            session_short_id = hex(uuid4().fields[0])
+            session_logger = self._command_logger.getChild(session_short_id)
+            self._broker.set_logger(session_logger)
             self.session = Session.build_and_prep(
                 name=name,
                 text=text,
@@ -66,6 +73,7 @@ class SessionManager(object):
         if self.session:
             self._hardware.reset()
         self.session = None
+        self._broker.set_logger(self._command_logger)
 
     def get_session(self):
         return self.session
@@ -82,6 +90,9 @@ class Session(object):
 
     def __init__(self, name, text, hardware, loop, broker):
         self._broker = broker
+        self._default_logger = self._broker.logger
+        self._sim_logger = self._broker.logger.getChild('sim')
+        self._run_logger = self._broker.logger.getChild('run')
         self._loop = loop
         self.name = name
         self.protocol_text = text
@@ -211,8 +222,6 @@ class Session(object):
                                  context=self._simulating_ctx)
                 sim.join()
             else:
-                # TODO (artyom, 20171005): this will go away
-                # once robot / driver simulation flow is fixed
                 self._hardware.broker = self._broker
                 self._hardware.cache_instrument_models()
                 self._hardware.disconnect()
@@ -257,7 +266,15 @@ class Session(object):
             parsed = ast.parse(self.protocol_text, filename=self.name)
             self.metadata = extract_metadata(parsed)
             self._protocol = compile(parsed, filename=self.name, mode='exec')
-        commands = self._simulate()
+
+        try:
+            self._broker.set_logger(self._sim_logger)
+            commands = self._simulate()
+        except Exception:
+            raise
+        finally:
+            self._broker.set_logger(self._default_logger)
+
         self.commands = tree.from_list(commands)
 
         self.containers = self.get_containers()
@@ -282,7 +299,7 @@ class Session(object):
         self.set_state('running')
         return self
 
-    def run(self):  # noqa(C901)
+    def _run(self):  # noqa(C901)
         def on_command(message):
             if message['$'] == 'before':
                 self.log_append()
@@ -327,6 +344,14 @@ class Session(object):
         finally:
             _unsubscribe()
 
+    def run(self):
+        try:
+            self._broker.set_logger(self._run_logger)
+            self._run()
+        except Exception:
+            raise
+        finally:
+            self._broker.set_logger(self._default_logger)
         return self
 
     def identify(self):
