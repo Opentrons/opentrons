@@ -3,6 +3,8 @@
 
 const mockElectron = require('./electron')
 
+// TODO: BC 2019-05-06 relocate this appropriately
+
 global.APP_SHELL = {
   __mockElectron: mockElectron,
   ipcRenderer: mockElectron.ipcRenderer,

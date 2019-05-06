@@ -4,6 +4,7 @@ module.exports = {
   setupFiles: [
     '<rootDir>/__mocks__/setup-mock-globals.js',
     '<rootDir>/scripts/setup-enzyme.js',
+    '<rootDir>/scripts/setup-global-mocks.js',
   ],
   moduleNameMapper: {
     '\\.(css)$': 'identity-obj-proxy',
