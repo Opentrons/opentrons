@@ -1,6 +1,6 @@
 {
   "otId": "ot2_short_trash",
-  "schemaVersion": "1",
+  "schemaVersion": 1,
   "cornerOffsetFromOrigin": [-115.65, -68.03, 0],
   "dimensions": [624.3, 565.2, 0],
   "metadata": {

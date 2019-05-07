@@ -53,7 +53,6 @@
   "required": [
     "otId",
     "schemaVersion",
-    "loadName",
     "cornerOffsetFromOrigin",
     "dimensions",
     "metadata",
@@ -70,12 +69,6 @@
     "schemaVersion": {
       "description": "Schema version of a deck is a single integer",
       "enum": [1]
-    },
-
-    "loadName": {
-      "description": "Unique name of Deck",
-      "type": "string",
-      "pattern": "^[a-z0-9._]+$"
     },
 
     "cornerOffsetFromOrigin": {
