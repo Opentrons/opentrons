@@ -10,6 +10,8 @@ type SlotViewProps = {|
   /** optional className, overrides default class. */
   className?: ?string,
 |}
+
+// TODO: Ian 2019-05-07 remove this component, use RobotWorkSpace instead
 export default function SlotView(props: SlotViewProps) {
   // SVG coordinate system is flipped in Y from our robot coordinate system.
   // Note that this reflection via scaling happens via CSS on the SVG element,

@@ -8,6 +8,7 @@ type TextProps = {
 }
 
 /** SVG text reflected to use take robot coordinates as props */
+// TODO: Ian 2019-05-07 reconcile this with Brian's version
 export default function RobotCoordsText(props: TextProps) {
   const { x, y, children, ...additionalProps } = props
   return (
