@@ -53,7 +53,7 @@ header#nav .docs-navbar {
 
 @media only screen and (min-width: 1024px) {
   header#nav .docs-navbar {
-    height: 30px;
+    height: 2rem;
     display: flex;
     align-items: center;
     justify-content: flex-end;
