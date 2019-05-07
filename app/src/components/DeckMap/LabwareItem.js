@@ -9,7 +9,7 @@ import type { LabwareComponentProps } from '@opentrons/components'
 import {
   ContainerNameOverlay,
   ModuleNameOverlay,
-  LabwareContainer,
+  LabwareWrapper,
   Labware as LabwareComponent,
   humanizeLabwareType,
 } from '@opentrons/components'
@@ -46,7 +46,7 @@ export default function LabwareItem(props: LabwareItemProps) {
   const labwareClass = cx({ [styles.disabled]: disabled })
 
   const item = (
-    <LabwareContainer width={width} height={height} highlighted={highlighted}>
+    <LabwareWrapper width={width} height={height} highlighted={highlighted}>
       <g className={labwareClass}>
         <LabwareComponent labwareType={type} />
 
@@ -61,7 +61,7 @@ export default function LabwareItem(props: LabwareItemProps) {
 
         {showSpinner && <LabwareSpinner />}
       </g>
-    </LabwareContainer>
+    </LabwareWrapper>
   )
 
   if (!showSpinner && !disabled && url) {

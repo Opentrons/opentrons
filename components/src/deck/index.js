@@ -1,7 +1,7 @@
 // @flow
 import Deck from './Deck'
 import Labware from './Labware'
-import LabwareContainer from './LabwareContainer'
+import LabwareWrapper from './LabwareWrapper'
 import LabwareOutline from './LabwareOutline'
 import LabwareLabels from './LabwareLabels'
 import Well from './Well'
@@ -23,7 +23,7 @@ export {
   ContainerNameOverlay,
   EmptyDeckSlot,
   Labware,
-  LabwareContainer,
+  LabwareWrapper,
   LabwareOutline,
   LabwareLabels,
   Module,

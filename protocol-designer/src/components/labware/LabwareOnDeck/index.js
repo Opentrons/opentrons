@@ -2,9 +2,9 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { getLabware, getIsTiprackDeprecated } from '@opentrons/shared-data'
-import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
-import { selectors as uiLabwareSelectors } from '../ui/labware'
-import { selectors as stepFormSelectors } from '../step-forms'
+import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
+import { selectors as uiLabwareSelectors } from '../../../ui/labware'
+import { selectors as stepFormSelectors } from '../../../step-forms'
 import {
   openIngredientSelector,
   deleteContainer,
@@ -14,14 +14,16 @@ import {
   drillUpFromLabware,
   duplicateLabware,
   swapSlotContents,
-} from '../labware-ingred/actions'
-import { START_TERMINAL_ITEM_ID } from '../steplist'
-import { selectors as stepsSelectors } from '../ui/steps'
+} from '../../../labware-ingred/actions'
+import { START_TERMINAL_ITEM_ID } from '../../../steplist'
+import { selectors as stepsSelectors } from '../../../ui/steps'
 
-import { LabwareOnDeck } from '../components/labware'
-import type { StepIdType } from '../form-types'
-import type { BaseState, ThunkDispatch } from '../types'
+import LabwareOnDeck from './LabwareOnDeck'
+
 import type { DeckSlot } from '@opentrons/components'
+import type { StepIdType } from '../../../form-types'
+import type { BaseState, ThunkDispatch } from '../../../types'
+export { default as DragPreviewLayer } from './DragPreviewLayer'
 
 type OP = {
   slot: DeckSlot,

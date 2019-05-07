@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { SLOT_RENDER_HEIGHT, SLOT_RENDER_WIDTH } from '@opentrons/shared-data'
-import styles from './LabwareContainer.css'
+import styles from './LabwareWrapper.css'
 
 const defs = { roundSlotClipPath: 'roundSlotClipPath' } // TODO: import these defs instead of hard-coding in applications? Or should they be passed to children?
 
@@ -14,7 +14,7 @@ type Props = {
   children?: React.Node,
 }
 
-export default function LabwareContainer(props: Props) {
+export default function LabwareWrapper(props: Props) {
   const { x, y, highlighted, children } = props
   const height = props.height || SLOT_RENDER_HEIGHT
   const width = props.width || SLOT_RENDER_WIDTH
