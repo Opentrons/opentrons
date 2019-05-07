@@ -123,3 +123,61 @@ export type LabwareDefinition2 = {|
   ordering: Array<Array<string>>,
   wells: LabwareWellMap,
 |}
+
+export type DeckOffset = {|
+  x: number,
+  y: number,
+  z: number,
+|}
+
+export type Dimensions = {|
+  xDimension: number,
+  yDimension: number,
+  zDimension: number,
+|}
+
+export type DeckRobot = {|
+  model: string,
+|}
+
+export type CoordinateTuple = [number, number, number]
+
+export type UnitDirection = 1 | -1
+export type UnitVectorTuple = [UnitDirection, UnitDirection, UnitDirection]
+export type DeckSlot = {|
+  id: string,
+  position: CoordinateTuple,
+  matingSurfaceUnitVector?: UnitVectorTuple,
+  boundingBox: Dimensions,
+  displayName: string,
+|}
+export type DeckCalibrationPoint = {|
+  id: string,
+  position: CoordinateTuple,
+  displayName: string,
+|}
+export type DeckLocations = {|
+  orderedSlots: Array<DeckSlot>,
+  calibrationPoints: Array<DeckCalibrationPoint>,
+|}
+
+export type DeckMetadata = {|
+  displayName: string,
+  tags: Array<string>,
+|}
+
+export type DeckLayerFeature = {|
+  footprint: string,
+|}
+
+export type DeckLayer = Array<DeckLayerFeature>
+
+export type DeckDefinition = {|
+  otId: string,
+  cornerOffsetFromOrigin: DeckOffset,
+  dimensions: Dimensions,
+  robot: DeckRobot,
+  locations: DeckLocations,
+  metadata: DeckMetadata,
+  layers: { [string]: DeckLayer },
+|}

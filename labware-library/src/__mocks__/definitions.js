@@ -7,7 +7,7 @@ import type { LabwareList } from '../types'
 
 const LABWARE_FIXTURE_PATTERN = path.join(
   __dirname,
-  '../../../shared-data/js/__tests__/fixtures/*.json'
+  '../../../shared-data/js/__tests__/fixtures/labware2/*.json'
 )
 
 const allLabware = glob

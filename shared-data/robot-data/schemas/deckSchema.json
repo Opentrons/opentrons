@@ -13,6 +13,16 @@
       "minItems": 3,
       "maxItems": 3
     },
+    "unitVector": {
+      "type": "array",
+      "description": "Array of 3 unit directions, [x, y, z]",
+      "items": {
+        "type": "number",
+        "enum": [1, -1]
+      },
+      "minItems": 3,
+      "maxItems": 3
+    },
     "boundingBox": {
       "type": "object",
       "description": "The active area (both pipettes can reach) of a fixture on the deck",
@@ -32,7 +42,7 @@
       "description": "A physical feature of the deck",
       "required": ["footprint"],
       "properties": {
-        "footprint": {"$ref": "#/definitions/pathDValue"}
+        "footprint": { "$ref": "#/definitions/pathDValue" }
       }
     }
   },
@@ -40,11 +50,35 @@
   "description": "Deck specifications, where x,y,z (0,0,0) is at front the bottom left corner.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["otId", "metadata", "robot", "locations"],
+  "required": [
+    "otId",
+    "schemaVersion",
+    "cornerOffsetFromOrigin",
+    "dimensions",
+    "metadata",
+    "robot",
+    "locations",
+    "layers"
+  ],
   "properties": {
     "otId": {
       "description": "Unique internal ID generated using UUID",
       "type": "string"
+    },
+
+    "schemaVersion": {
+      "description": "Schema version of a deck is a single integer",
+      "enum": [1]
+    },
+
+    "cornerOffsetFromOrigin": {
+      "$ref": "#/definitions/xyzArray",
+      "description": "Position of left-front-bottom corner of entire deck to robot coordinate system origin"
+    },
+
+    "dimensions": {
+      "$ref": "#/definitions/xyzArray",
+      "description": "Outer dimensions of a deck bounding box"
     },
 
     "metadata": {
@@ -95,6 +129,10 @@
                 "type": "string"
               },
               "position": { "$ref": "#/definitions/xyzArray" },
+              "matingSurfaceUnitVector": {
+                "$ref": "#/definitions/unitVector",
+                "description": "An optional diagonal direction of force, defined by spring location, which governs the mating surface of objects placed in slot."
+              },
               "boundingBox": { "$ref": "#/definitions/boundingBox" },
               "displayName": {
                 "description": "An optional human-readable nickname for this slot Eg \"Slot 1\" or \"Fixed Trash\"",
@@ -182,7 +220,7 @@
       "additionalProperties": {
         "type": "array",
         "description": "Individual features within a layer",
-        "items": {"$ref": "#/definitions/feature"}
+        "items": { "$ref": "#/definitions/feature" }
       }
     }
   }

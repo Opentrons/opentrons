@@ -39,6 +39,7 @@ module.exports = {
         '**/test-with-flow/**.js',
         '**/__tests__/**.js',
         '**/__mocks__/**.js',
+        'scripts/*.js',
       ],
       env: {
         jest: true,
