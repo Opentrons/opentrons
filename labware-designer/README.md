@@ -349,10 +349,10 @@ const dimensions = {
 
 Fields:
 
-| field         | type   | required | description                  |
-| ------------- | ------ | -------- | ---------------------------- |
+| field      | type   | required | description                  |
+| ---------- | ------ | -------- | ---------------------------- |
 | xDimension | number | yes      | X-axis measurement in **mm** |
-| yDimension  | number | yes      | Y-axis measurement in **mm** |
+| yDimension | number | yes      | Y-axis measurement in **mm** |
 | zDimension | number | yes      | Z-axis measurement in **mm** |
 
 - `xDimension` is the outer dimension of the labware in the X-axis
