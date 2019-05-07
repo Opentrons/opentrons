@@ -16,7 +16,7 @@ export type WellLabelsProps = {|
 const Labels = (props: {
   definition: LabwareDefinition2,
   wells: Array<string>,
-  isLetterColumn: boolean,
+  isLetterColumn?: boolean,
 }) => (
   <>
     {props.wells.map(wellName => {
