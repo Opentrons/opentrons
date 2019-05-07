@@ -399,6 +399,10 @@
     text-align: center;
   }
 
+  .support_nav_link .link_title {
+    text-align: left;
+  }
+
   .mobile_nav {
     top: var(--size-main-nav);
     min-height: auto;
