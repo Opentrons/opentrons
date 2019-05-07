@@ -13,30 +13,34 @@ export type WellLabelsProps = {|
   definition: LabwareDefinition2,
 |}
 
-const makeLabels = (args: {
+const Labels = (props: {
   definition: LabwareDefinition2,
   wells: Array<string>,
   isLetterColumn: boolean,
-}) =>
-  args.wells.map(wellName => {
-    const well = args.definition.wells[wellName]
-    return (
-      <RobotCoordsText
-        key={wellName}
-        x={args.isLetterColumn ? LETTER_COLUMN_X : well.x}
-        y={
-          args.isLetterColumn
-            ? well.y
-            : args.definition.dimensions.overallWidth - NUMBER_COLUMN_Y_FROM_TOP
-        }
-        className={cx(styles.label_text, {
-          [styles.letter_column]: args.isLetterColumn,
-        })}
-      >
-        {(args.isLetterColumn ? /[A-Z]+/g : /\d+/g).exec(wellName)}
-      </RobotCoordsText>
-    )
-  })
+}) => (
+  <>
+    {props.wells.map(wellName => {
+      const well = props.definition.wells[wellName]
+      return (
+        <RobotCoordsText
+          key={wellName}
+          x={props.isLetterColumn ? LETTER_COLUMN_X : well.x}
+          y={
+            props.isLetterColumn
+              ? well.y
+              : props.definition.dimensions.overallWidth -
+                NUMBER_COLUMN_Y_FROM_TOP
+          }
+          className={cx(styles.label_text, {
+            [styles.letter_column]: props.isLetterColumn,
+          })}
+        >
+          {(props.isLetterColumn ? /[A-Z]+/g : /\d+/g).exec(wellName)}
+        </RobotCoordsText>
+      )
+    })}
+  </>
+)
 
 function WellLabels(props: WellLabelsProps) {
   const { definition } = props
@@ -45,16 +49,8 @@ function WellLabels(props: WellLabelsProps) {
 
   return (
     <g>
-      {makeLabels({
-        definition,
-        wells: letterColumn,
-        isLetterColumn: true,
-      })}
-      {makeLabels({
-        definition,
-        wells: numberRow,
-        isLetterColumn: false,
-      })}
+      <Labels definition={definition} wells={letterColumn} isLetterColumn />
+      <Labels definition={definition} wells={numberRow} />
     </g>
   )
 }
