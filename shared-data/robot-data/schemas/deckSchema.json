@@ -68,8 +68,8 @@
     },
 
     "schemaVersion": {
-      "description": "Schema version of a protocol is a single integer",
-      "enum": [3]
+      "description": "Schema version of a deck is a single integer",
+      "enum": [1]
     },
 
     "loadName": {

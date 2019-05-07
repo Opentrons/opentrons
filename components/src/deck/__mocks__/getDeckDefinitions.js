@@ -1,6 +1,3 @@
-// File transformer for Jest
-// Makes asset filenames appear in snapshots
-// see https://facebook.github.io/jest/docs/en/webpack.html
 import path from 'path'
 // replace webpack-specific require.context with Node-based glob in tests
 import glob from 'glob'
