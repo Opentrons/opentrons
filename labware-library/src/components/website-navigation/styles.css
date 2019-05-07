@@ -426,6 +426,10 @@
     flex-direction: row;
   }
 
+  .submenu_title {
+    flex: 0 0 8rem;
+  }
+
   .support_group {
     flex-basis: 60%;
     display: flex;
