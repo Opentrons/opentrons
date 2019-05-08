@@ -65,9 +65,6 @@ class Mover:
         if 'z' in self._axis_mapping:
             assert z is not None, "Value must be set for each axis mapped"
             driver_target[self._axis_mapping['z']] = dst_z
-        log.debug(
-            f'Mover for {self._axis_mapping}: ({x}, {y}, {z}) -> '
-            f'({dst_x}, {dst_y}, {dst_z}) via {pose_tree}')
         self._driver.move(driver_target, home_flagged_axes=home_flagged_axes)
 
         # Update pose with the new value. Since stepper motors are open loop
