@@ -52,3 +52,22 @@
   clip-path: inset(0 0 0 360px);
   z-index: 5000;
 }
+
+.labware_preview_wrapper {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  left: -20rem;
+  z-index: 1;
+}
+
+.labware_preview {
+  width: 15rem;
+  height: 5rem;
+  background-color: var(--c-white);
+  box-shadow: var(--shadow-lvl-2);
+  padding: 1rem 2rem;
+}
