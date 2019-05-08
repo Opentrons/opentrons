@@ -12,13 +12,12 @@ import {
 } from '../utils'
 
 import type { State as AppState, ActionLike } from '../../types'
+import type { RobotHost, RobotApiAction } from '../types'
 import type {
-  RobotHost,
-  RobotApiAction,
   Module,
   SetTemperatureRequest,
   ModulesState as State,
-} from '../types'
+} from './types'
 
 const INITIAL_STATE: State = []
 

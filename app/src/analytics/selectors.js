@@ -16,11 +16,8 @@ import {
   getRobotFirmwareVersion,
 } from '../discovery'
 
-import {
-  getRobotApiState,
-  getSettingsRequest,
-  getPipettesRequest,
-} from '../http-api-client'
+import { getRobotApiState, getPipettesRequest } from '../http-api-client'
+import { getRobotSettingsState } from '../robot-api'
 
 import hash from './hash'
 
@@ -70,11 +67,8 @@ export function getRobotAnalyticsData(state: State): RobotAnalyticsData | null {
 
   if (robot) {
     const api = getRobotApiState(state, robot)
-    const settingsRequest = getSettingsRequest(api)
     const pipettesRequest = getPipettesRequest(api)
-    const settings = settingsRequest.response
-      ? settingsRequest.response.settings
-      : []
+    const settings = getRobotSettingsState(state, robot.name)
 
     const pipettes = pipettesRequest.response
       ? {

@@ -8,8 +8,8 @@ import reduce from 'lodash/reduce'
 import {
   fetchSettings,
   setSettings,
-  makeGetRobotSettings,
-} from '../../http-api-client'
+  getRobotSettingsState,
+} from '../../robot-api'
 
 import { CONNECTABLE } from '../../discovery'
 import { downloadLogs } from '../../shell'
@@ -19,7 +19,7 @@ import PipetteUpdateWarningModal from './PipetteUpdateWarningModal'
 
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery'
-import type { Setting } from '../../http-api-client'
+import type { RobotSettings } from '../../robot-api'
 import type { ToggleRef } from './PipetteUpdateWarningModal'
 
 type OP = {|
@@ -28,7 +28,7 @@ type OP = {|
 |}
 
 type SP = {|
-  settings: Array<Setting>,
+  settings: RobotSettings,
   showPipetteUpdateWarning: boolean,
 |}
 
@@ -143,30 +143,21 @@ class AdvancedSettingsCard extends React.Component<Props> {
   }
 }
 
-function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
-  const getRobotSettings = makeGetRobotSettings()
+function mapStateToProps(state: State, ownProps: OP): SP {
+  const { robot } = ownProps
+  const settings = getRobotSettingsState(state, robot.name)
+  const pipetteUpdateOptedOut = reduce(
+    settings,
+    (result, setting) => {
+      if (setting.id === PIPETTE_UPDATE_OPT_OUT_ID) return setting.value
+      return result
+    },
+    false
+  )
 
-  return (state, ownProps) => {
-    const { robot } = ownProps
-    const settingsRequest = getRobotSettings(state, robot)
-    const settings =
-      settingsRequest &&
-      settingsRequest.response &&
-      settingsRequest.response.settings
-
-    const pipetteUpdateOptedOut = reduce(
-      settings,
-      (result, setting) => {
-        if (setting.id === PIPETTE_UPDATE_OPT_OUT_ID) return setting.value
-        return result
-      },
-      false
-    )
-
-    return {
-      settings: settings || [],
-      showPipetteUpdateWarning: pipetteUpdateOptedOut === null,
-    }
+  return {
+    settings: settings,
+    showPipetteUpdateWarning: pipetteUpdateOptedOut === null,
   }
 }
 
@@ -181,6 +172,6 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
 }
 
 export default connect<Props, OP, SP, DP, State, Dispatch>(
-  makeMapStateToProps,
+  mapStateToProps,
   mapDispatchToProps
 )(AdvancedSettingsCard)

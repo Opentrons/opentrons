@@ -7,7 +7,7 @@ import { push } from 'react-router-redux'
 
 import { selectors as robotSelectors } from '../../robot'
 import { getConnectedRobot } from '../../discovery'
-import { makeGetRobotSettings } from '../../http-api-client'
+import { getRobotSettingsState } from '../../robot-api'
 
 import Page from '../../components/Page'
 import CalibrateLabware from '../../components/CalibrateLabware'
@@ -37,7 +37,7 @@ type Props = { ...OP, ...SP, ...DP }
 
 export default withRouter<{||}>(
   connect<Props, OP, SP, _, _, _>(
-    makeMapStateToProps,
+    mapStateToProps,
     mapDispatchToProps
   )(SetupDeckPage)
 )
@@ -83,40 +83,32 @@ function SetupDeckPage(props: Props) {
   )
 }
 
-function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
-  const getRobotSettings = makeGetRobotSettings()
+function mapStateToProps(state: State, ownProps: OP): SP {
+  const {
+    match: {
+      params: { slot },
+    },
+  } = ownProps
+  const labware = robotSelectors.getLabware(state)
+  const currentLabware = labware.find(lw => lw.slot === slot)
+  const robot = getConnectedRobot(state)
+  const settings = robot && getRobotSettingsState(state, robot.name)
 
-  return (state, ownProps) => {
-    const {
-      match: {
-        params: { slot },
-      },
-    } = ownProps
-    const labware = robotSelectors.getLabware(state)
-    const currentLabware = labware.find(lw => lw.slot === slot)
-    const robot = getConnectedRobot(state)
+  // TODO(mc, 2018-07-23): make diagram component a container
+  const calToBottomFlag =
+    settings && settings.find(s => s.id === 'calibrateToBottom')
+  const calibrateToBottom = !!calToBottomFlag && calToBottomFlag.value === true
 
-    // TODO(mc, 2018-07-19): API selector for getting the response directly
-    const settingsResp = robot && getRobotSettings(state, robot).response
-    const settings = settingsResp && settingsResp.settings
+  const modulesRequired = robotSelectors.getModules(state).length > 0
+  const modulesReviewed = robotSelectors.getModulesReviewed(state)
+  const reviewModules = modulesRequired && !modulesReviewed
 
-    // TODO(mc, 2018-07-23): make diagram component a container
-    const calToBottomFlag =
-      settings && settings.find(s => s.id === 'calibrateToBottom')
-    const calibrateToBottom =
-      !!calToBottomFlag && calToBottomFlag.value === true
-
-    const modulesRequired = robotSelectors.getModules(state).length > 0
-    const modulesReviewed = robotSelectors.getModulesReviewed(state)
-    const reviewModules = modulesRequired && !modulesReviewed
-
-    return {
-      calibrateToBottom,
-      reviewModules,
-      robot,
-      deckPopulated: !!robotSelectors.getDeckPopulated(state),
-      labware: currentLabware,
-    }
+  return {
+    calibrateToBottom,
+    reviewModules,
+    robot,
+    deckPopulated: !!robotSelectors.getDeckPopulated(state),
+    labware: currentLabware,
   }
 }
 
