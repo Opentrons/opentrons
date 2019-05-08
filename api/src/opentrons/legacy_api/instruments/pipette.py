@@ -1470,7 +1470,7 @@ class Pipette(CommandPublisher):
 
         Calibration of the pipette motor's ul-to-mm conversion is required
         """
-        millimeters = ul / self._ul_per_mm(ul, 'dispense')
+        millimeters = ul / self._ul_per_mm(ul, 'aspirate')
         destination_mm = self._get_plunger_position('bottom') + millimeters
         return round(destination_mm, 6)
 
