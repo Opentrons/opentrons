@@ -7,7 +7,6 @@ def test_migrates_empty_object():
     assert(version == 1)
     assert(settings == {
       'shortFixedTrash': None,
-      'splitLabwareDefinitions': None,
       'calibrateToBottom': None,
       'deckCalibrationDots': None,
       'disableHomeOnBoot': None,
@@ -19,7 +18,6 @@ def test_migrates_empty_object():
 def test_migrates_versionless_new_config():
     settings, version = _migrate({
       'shortFixedTrash': True,
-      'splitLabwareDefinitions': False,
       'calibrateToBottom': True,
       'deckCalibrationDots': False,
       'disableHomeOnBoot': True,
@@ -30,7 +28,6 @@ def test_migrates_versionless_new_config():
     assert(version == 1)
     assert(settings == {
       'shortFixedTrash': True,
-      'splitLabwareDefinitions': None,
       'calibrateToBottom': True,
       'deckCalibrationDots': None,
       'disableHomeOnBoot': True,
@@ -42,7 +39,6 @@ def test_migrates_versionless_new_config():
 def test_migrates_versionless_old_config():
     settings, version = _migrate({
       'short-fixed-trash': False,
-      'split-labware-def': True,
       'calibrate-to-bottom': False,
       'dots-deck-type': True,
       'disable-home-on-boot': False,
@@ -51,7 +47,6 @@ def test_migrates_versionless_old_config():
     assert(version == 1)
     assert(settings == {
       'shortFixedTrash': None,
-      'splitLabwareDefinitions': True,
       'calibrateToBottom': None,
       'deckCalibrationDots': True,
       'disableHomeOnBoot': None,
@@ -62,14 +57,13 @@ def test_migrates_versionless_old_config():
 
 def test_ignores_invalid_keys():
     settings, version = _migrate({
-      'foo-bar': True,
-      'bazQux': True
+      'split-labware-def': True,
+      'splitLabwareDefinitions': True
     })
 
     assert(version == 1)
     assert(settings == {
       'shortFixedTrash': None,
-      'splitLabwareDefinitions': None,
       'calibrateToBottom': None,
       'deckCalibrationDots': None,
       'disableHomeOnBoot': None,
