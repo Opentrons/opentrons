@@ -463,7 +463,7 @@ header#nav .navbar .main-menu .main-menu-li .navbar-ul {
   position: absolute;
   top: 50px;
   left: -20px;
-  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2);
   border: solid 1px #e7e7e7;
   background-color: #fff;
 }
@@ -823,7 +823,7 @@ header#nav .sub-menu {
   right: 0;
   margin: 0 -110% 0 0;
   transition: all 500ms linear;
-  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2);
 }
 header#nav .showmenu {
   margin: 0;
@@ -1145,7 +1145,7 @@ header#nav .mobile-menu {
   position: fixed;
   width: 100%;
   flex-direction: column;
-  box-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 @media only screen and (min-device-width: 768px) and (min-width: 768px) and (max-width: 1023px) {
