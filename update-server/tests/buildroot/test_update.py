@@ -77,6 +77,7 @@ async def test_future_chain(otupdate_config, downloaded_update_file,
         last_progress = session.state['progress']
         await asyncio.sleep(0.01)
     assert fut.done()
+    last_progress = 0.0
     while session.stage == Stages.WRITING:
         assert session.state['progress'] >= last_progress
         last_progress = session.state['progress']

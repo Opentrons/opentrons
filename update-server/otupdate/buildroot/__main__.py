@@ -15,6 +15,7 @@ LOG = logging.getLogger(__name__)
 try:
     # systemd journal is available, we can use its handler
     import systemd.journal  # noqa(F401)
+    import systemd.daemon
 
     def _handler_for(topic_name: str,
                      log_level: int):
@@ -22,6 +23,15 @@ try:
                 'formatter': 'message_only',
                 'level': log_level,
                 'SYSLOG_IDENTIFIER': topic_name}
+
+    # By using sd_notify
+    # (https://www.freedesktop.org/software/systemd/man/sd_notify.html)
+    # and type=notify in the unit file, we can prevent systemd from starting
+    # dependent services until we actually say we're ready. By calling this
+    # after we change the hostname, we make anything with an After= on us
+    # be guaranteed to see the correct hostname
+    def _notify_up():
+        systemd.daemon.notify("READY=1")
 
 except ImportError:
     # systemd journal isn't available, probably running tests
@@ -33,6 +43,9 @@ except ImportError:
             'formatter': 'basic',
             'level': log_level,
         }
+
+    def _notify_up():
+        LOG.info("systemd couldn't be imported (host? test?), not notifying")
 
 
 def configure_logging(level: int):
@@ -55,6 +68,11 @@ def configure_logging(level: int):
                 'level': level,
                 'propagate': False
             },
+            '__main__': {
+                'handlers': ['journald'],
+                'level': level,
+                'propagate': False,
+            }
         },
         'root': {
             'handlers': ['journald'],
@@ -96,6 +114,9 @@ def main():
     name = app[constants.DEVICE_NAME_VARNAME]
     LOG.info(f"Setting advertised name to {name}")
     loop.run_until_complete(name_management.set_name(name))
+
+    LOG.info('Notifying systemd')
+    _notify_up()
 
     LOG.info(
         f'Starting buildroot update server on http://{args.host}:{args.port}')

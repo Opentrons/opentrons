@@ -18,7 +18,9 @@ The robot has two names associated with it:
 
 import asyncio
 import logging
+import os
 from typing import Optional
+import urllib.parse
 
 from aiohttp import web
 
@@ -95,12 +97,36 @@ except ImportError:
 _BUS_LOCK = asyncio.Lock()
 
 
+def _get_hostname() -> str:
+    """ Get a good value for the system hostname.
+
+    The hostname is loaded from, in order of preference,
+
+    - url-encoding the contents of /var/serial-number, if it is present,
+      not empty, and not the default
+    - the systemd-generated machine-id, which changes at every boot.
+    """
+    if os.path.exists('/var/serial'):
+        serial = open('/var/serial').read().strip()
+        if serial:
+            LOG.info("Using serial for hostname")
+            hn = ''.join([c for c in urllib.parse.quote(serial, safe='')
+                          if c != '%'])
+            if hn != serial:
+                LOG.warning(f"Reencoded serial to {hn}")
+            return hn
+
+        else:
+            LOG.info("Using machine-id for hostname: empty /var/serial")
+    else:
+        LOG.info("Using machine-id for hostname: no /var/serial")
+
+    return open('/etc/machine-id').read().strip()[:6]
+
+
 async def setup_hostname() -> str:
     """
     Intended to be run when the server starts. Sets the machine hostname.
-
-    The machine hostname is set from the systemd-generated machine-id, which
-    changes at every boot.
 
     Once the hostname is set, we restart avahi.
 
@@ -110,8 +136,7 @@ async def setup_hostname() -> str:
 
     :returns: the hostname
     """
-    machine_id = open('/etc/machine-id').read().strip()
-    hostname = machine_id[:6]
+    hostname = _get_hostname()
     with open('/etc/hostname', 'w') as ehn:
         ehn.write(f'{hostname}\n')
 
