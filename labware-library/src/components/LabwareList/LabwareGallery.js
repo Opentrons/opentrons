@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 
-import LabwareRender from '../LabwareRender'
+import { LabwareRender } from '@opentrons/components'
 import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'

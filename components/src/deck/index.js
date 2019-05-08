@@ -4,6 +4,7 @@ import Labware from './Labware'
 import LabwareWrapper from './LabwareWrapper'
 import LabwareOutline from './LabwareOutline'
 import LabwareLabels from './LabwareLabels'
+import LabwareRender from './LabwareRender'
 import Well from './Well'
 import Tip from './Tip'
 import type { SingleWell } from './Well'
@@ -26,6 +27,7 @@ export {
   LabwareWrapper,
   LabwareOutline,
   LabwareLabels,
+  LabwareRender,
   Module,
   ModuleNameOverlay,
   SlotOverlay,
