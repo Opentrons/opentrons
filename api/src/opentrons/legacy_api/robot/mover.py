@@ -65,6 +65,9 @@ class Mover:
         if 'z' in self._axis_mapping:
             assert z is not None, "Value must be set for each axis mapped"
             driver_target[self._axis_mapping['z']] = dst_z
+        log.debug(
+            f'Mover for {self._axis_mapping}: ({x}, {y}, {z}) -> '
+            f'({dst_x}, {dst_y}, {dst_z}) via {pose_tree}')
         self._driver.move(driver_target, home_flagged_axes=home_flagged_axes)
 
         # Update pose with the new value. Since stepper motors are open loop
@@ -72,8 +75,6 @@ class Mover:
         return update(pose_tree, self, Point(*defaults(dst_x, dst_y, dst_z)))
 
     def home(self, pose_tree):
-        log.info(f'Pose tree in home transform {pose_tree}')
-        log.info(f'Axis mapping {self._axis_mapping.values()}')
         self._driver.home(axis=''.join(self._axis_mapping.values()))
         return self.update_pose_from_driver(pose_tree)
 
@@ -144,7 +145,6 @@ class Mover:
         assert axis in self._axis_mapping, "mapping is not set for " + axis
 
         d_axis_max = self._driver.homed_position[self._axis_mapping[axis]]
-        log.info(f"Axis max from driver: {d_axis_max}")
         d_point = {'x': 0, 'y': 0, 'z': 0}
         d_point[axis] = d_axis_max
         x, y, z = change_base(
@@ -164,5 +164,5 @@ class Mover:
             y=self._driver.position.get(self._axis_mapping.get('y', ''), 0.0),
             z=self._driver.position.get(self._axis_mapping.get('z', ''), 0.0)
         )
-        log.info(f'Point in update pose from driver {point}')
+        log.debug(f'Point in update pose from driver {point}')
         return update(pose_tree, self, point)
