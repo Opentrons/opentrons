@@ -28,7 +28,7 @@ const Labels = (props: {
           y={
             props.isLetterColumn
               ? well.y
-              : props.definition.dimensions.overallWidth -
+              : props.definition.dimensions.yDimension -
                 NUMBER_COLUMN_Y_FROM_TOP
           }
           className={cx(styles.label_text, {
