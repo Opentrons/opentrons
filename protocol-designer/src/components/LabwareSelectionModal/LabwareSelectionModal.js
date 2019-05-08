@@ -1,13 +1,16 @@
 // @flow
-import * as React from 'react'
-import { getLabwareDiagramURL } from '../../images'
+import React, { useState } from 'react'
 import {
   ClickOutside,
   OutlineButton,
   type DeckSlot,
 } from '@opentrons/components'
+import map from 'lodash/map'
+import filter from 'lodash/filter'
+import startCase from 'lodash/startCase'
+import { getLabwareDiagramURL } from '../../images'
+import { getAllDefinitions } from '../../labware-defs/utils'
 import { PDTitledList } from '../lists'
-import SelectedWrapper from './SelectedWrapper'
 import LabwareItem from './LabwareItem'
 import styles from './styles.css'
 
@@ -16,9 +19,83 @@ type Props = {
   selectLabware: (containerType: string) => mixed,
   slot: ?DeckSlot,
   permittedTipracks: Array<string>,
-  select: (?string) => mixed,
-  selectedSection: ?string,
 }
+
+const categoryOrder: Array<string> = [
+  'tipRack',
+  'tubeRack',
+  'wellPlate',
+  'trough',
+  'trash',
+]
+
+const LabwareDropdown = (props: Props) => {
+  const [selectedCategory, selectCategory] = useState('')
+
+  const labwareItemMapper = (dataRow, key) => {
+    const { selectLabware } = props
+    const [labwareType, displayName, imgFileName] = dataRow
+    return (
+      <LabwareItem
+        key={key}
+        containerType={labwareType}
+        displayName={displayName}
+        selectLabware={selectLabware}
+        // TODO: Ian 2018-02-22 If these images stay, factor out this magic URL more obvious (or import them with webpack)
+        labwareImgUrl={getLabwareDiagramURL(imgFileName)}
+      />
+    )
+  }
+
+  const generateSections = () => {
+    const { permittedTipracks } = props
+    const allDefs = getAllDefinitions()
+    console.log(map(getAllDefinitions(), def => def.metadata.displayCategory))
+    const sections = categoryOrder.map(category => {
+      let labwareInCategory = filter(allDefs, def => {
+        const isPermitted =
+          category === 'tiprack' &&
+          permittedTipracks.includes(def.metadata.name)
+
+        return isPermitted && def.metadata.displayCategory === category
+      })
+
+      const toggleCategory = () => selectCategory(category)
+      return (
+        <PDTitledList
+          key={category}
+          title={startCase(category)}
+          collapsed={selectedCategory !== category}
+          onCollapseToggle={toggleCategory}
+          onClick={toggleCategory}
+          className={styles.labware_selection_modal}
+        >
+          {labwareInCategory.map(labwareItemMapper)}
+        </PDTitledList>
+      )
+    })
+
+    return sections
+  }
+
+  const { onClose, slot } = props
+  // do not render without a slot
+  if (!slot) return null
+
+  return (
+    <ClickOutside onClickOutside={onClose}>
+      {({ ref }) => (
+        <div ref={ref} className={styles.labware_dropdown}>
+          <div className={styles.title}>Slot {slot} Labware</div>
+          <ul>{generateSections()}</ul>
+          <OutlineButton onClick={onClose}>CLOSE</OutlineButton>
+        </div>
+      )}
+    </ClickOutside>
+  )
+}
+
+export default LabwareDropdown
 
 // TODO: Ian 2017-07-26 use shared-data labware, need displayName
 // [labware type, display name, and optional image url]
@@ -84,91 +161,4 @@ const hardcodedLabware = {
   Trash: [
     ['trash-box', 'Trash Box'], // no container img
   ],
-}
-
-const labwareSectionOrder: Array<$Keys<typeof hardcodedLabware>> = [
-  'Tip Rack',
-  'Aluminum Block',
-  'Tube Rack',
-  'Well Plate',
-  'Trough',
-  'Trash',
-]
-
-class LabwareDropdown extends React.Component<Props> {
-  labwareItemMapper = (dataRow, key) => {
-    const { selectLabware } = this.props
-    const [labwareType, displayName, imgFileName] = dataRow
-    return (
-      <LabwareItem
-        key={key}
-        containerType={labwareType}
-        displayName={displayName}
-        selectLabware={selectLabware}
-        // TODO: Ian 2018-02-22 If these images stay, factor out this magic URL more obvious (or import them with webpack)
-        labwareImgUrl={getLabwareDiagramURL(imgFileName)}
-      />
-    )
-  }
-
-  generateSections = () => {
-    const { permittedTipracks, selectedSection, select } = this.props
-
-    const sections = labwareSectionOrder.map(section => {
-      const selectSection = () => select(section)
-      let labwareInSection = hardcodedLabware[section]
-
-      if (section === 'Tip Rack') {
-        // filter out tip rack labware that doesn't match pipettes
-        labwareInSection = labwareInSection.filter(labwareModelNameImage =>
-          permittedTipracks.includes(labwareModelNameImage[0])
-        )
-      }
-
-      return (
-        <PDTitledList
-          key={section}
-          title={section}
-          collapsed={selectedSection !== section}
-          onCollapseToggle={selectSection}
-          onClick={selectSection}
-          className={styles.labware_selection_modal}
-        >
-          {labwareInSection.map(this.labwareItemMapper)}
-        </PDTitledList>
-      )
-    })
-
-    return sections
-  }
-
-  render() {
-    const { onClose, slot } = this.props
-    // do not render without a slot
-    if (!slot) return null
-
-    return (
-      <ClickOutside onClickOutside={onClose}>
-        {({ ref }) => (
-          <div ref={ref} className={styles.labware_dropdown}>
-            <div className={styles.title}>Slot {slot} Labware</div>
-            <ul>{this.generateSections()}</ul>
-            <OutlineButton onClick={onClose}>CLOSE</OutlineButton>
-          </div>
-        )}
-      </ClickOutside>
-    )
-  }
-}
-
-type FinalProps = $Diff<Props, { selectedSection: *, select: * }>
-
-export default function WrappedLabwareDropdown(props: FinalProps) {
-  return (
-    <SelectedWrapper
-      render={({ selected, select }) => (
-        <LabwareDropdown {...{ ...props, selectedSection: selected, select }} />
-      )}
-    />
-  )
 }
