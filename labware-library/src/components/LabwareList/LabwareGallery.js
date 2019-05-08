@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 
-import { LabwareRender } from '@opentrons/components'
+import { LabwareRender, SlotView } from '@opentrons/components'
 import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
@@ -32,7 +32,9 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
     // TODO(mc, 2019-03-27): use actual images
     const images = [
       <img key="left" src={`https://placekitten.com/480/480`} />,
-      <LabwareRender key="center" definition={definition} />,
+      <SlotView key="center">
+        <LabwareRender definition={definition} />
+      </SlotView>,
       <img key="right" src={`https://placekitten.com/512/512`} />,
     ]
 

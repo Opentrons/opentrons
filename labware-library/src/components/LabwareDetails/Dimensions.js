@@ -19,11 +19,11 @@ export type DimensionsProps = {
 
 export default function Dimensions(props: DimensionsProps) {
   const { definition } = props
-  const { overallLength, overallWidth, overallHeight } = definition.dimensions
+  const { xDimension, yDimension, zDimension } = definition.dimensions
   const dimensions = [
-    { label: X_DIM, value: toFixed(overallLength) },
-    { label: Y_DIM, value: toFixed(overallWidth) },
-    { label: Z_DIM, value: toFixed(overallHeight) },
+    { label: X_DIM, value: toFixed(xDimension) },
+    { label: Y_DIM, value: toFixed(yDimension) },
+    { label: Z_DIM, value: toFixed(zDimension) },
   ]
 
   return (

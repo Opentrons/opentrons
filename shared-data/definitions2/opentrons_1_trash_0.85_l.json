@@ -14,9 +14,9 @@
     "z": 0
   },
   "dimensions": {
-    "overallLength": 172.86,
-    "overallWidth": 165.86,
-    "overallHeight": 58
+    "xDimension": 172.86,
+    "yDimension": 165.86,
+    "zDimension": 58
   },
   "parameters": {
     "format": "trash",
@@ -28,8 +28,8 @@
   "wells": {
     "A1": {
       "shape": "rectangular",
-      "length": 165.67,
-      "width": 107.11,
+      "yDimension": 165.67,
+      "xDimension": 107.11,
       "totalLiquidVolume": 850000,
       "depth": 53,
       "x": 82.84,

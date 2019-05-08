@@ -26,9 +26,9 @@
     "z": 0
   },
   "dimensions": {
-    "overallLength": 127.76,
-    "overallWidth": 85.8,
-    "overallHeight": 44.45
+    "xDimension": 127.76,
+    "yDimension": 85.8,
+    "zDimension": 44.45
   },
   "parameters": {
     "format": "trough",
@@ -41,8 +41,8 @@
     "A1": {
       "shape": "rectangular",
       "depth": 42.16,
-      "length": 8.33,
-      "width": 71.88,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
       "totalLiquidVolume": 22000,
       "x": 13.94,
       "y": 42.9,
@@ -51,8 +51,8 @@
     "A2": {
       "shape": "rectangular",
       "depth": 42.16,
-      "length": 8.33,
-      "width": 71.88,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
       "totalLiquidVolume": 22000,
       "x": 23.03,
       "y": 42.9,
@@ -61,8 +61,8 @@
     "A3": {
       "shape": "rectangular",
       "depth": 42.16,
-      "length": 8.33,
-      "width": 71.88,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
       "totalLiquidVolume": 22000,
       "x": 32.12,
       "y": 42.9,
@@ -71,8 +71,8 @@
     "A4": {
       "shape": "rectangular",
       "depth": 42.16,
-      "length": 8.33,
-      "width": 71.88,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
       "totalLiquidVolume": 22000,
       "x": 41.21,
       "y": 42.9,
@@ -81,8 +81,8 @@
     "A5": {
       "shape": "rectangular",
       "depth": 42.16,
-      "length": 8.33,
-      "width": 71.88,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
       "totalLiquidVolume": 22000,
       "x": 50.3,
       "y": 42.9,
@@ -91,8 +91,8 @@
     "A6": {
       "shape": "rectangular",
       "depth": 42.16,
-      "length": 8.33,
-      "width": 71.88,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
       "totalLiquidVolume": 22000,
       "x": 59.39,
       "y": 42.9,
@@ -101,8 +101,8 @@
     "A7": {
       "shape": "rectangular",
       "depth": 42.16,
-      "length": 8.33,
-      "width": 71.88,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
       "totalLiquidVolume": 22000,
       "x": 68.48,
       "y": 42.9,
@@ -111,8 +111,8 @@
     "A8": {
       "shape": "rectangular",
       "depth": 42.16,
-      "length": 8.33,
-      "width": 71.88,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
       "totalLiquidVolume": 22000,
       "x": 77.57,
       "y": 42.9,
@@ -121,8 +121,8 @@
     "A9": {
       "shape": "rectangular",
       "depth": 42.16,
-      "length": 8.33,
-      "width": 71.88,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
       "totalLiquidVolume": 22000,
       "x": 86.66,
       "y": 42.9,
@@ -131,8 +131,8 @@
     "A10": {
       "shape": "rectangular",
       "depth": 42.16,
-      "length": 8.33,
-      "width": 71.88,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
       "totalLiquidVolume": 22000,
       "x": 95.75,
       "y": 42.9,
@@ -141,8 +141,8 @@
     "A11": {
       "shape": "rectangular",
       "depth": 42.16,
-      "length": 8.33,
-      "width": 71.88,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
       "totalLiquidVolume": 22000,
       "x": 104.84,
       "y": 42.9,
@@ -151,8 +151,8 @@
     "A12": {
       "shape": "rectangular",
       "depth": 42.16,
-      "length": 8.33,
-      "width": 71.88,
+      "xDimension": 8.33,
+      "yDimension": 71.88,
       "totalLiquidVolume": 22000,
       "x": 113.93,
       "y": 42.9,

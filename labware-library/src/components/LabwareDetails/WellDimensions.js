@@ -61,8 +61,12 @@ export default function WellDimensions(props: WellDimensionsProps) {
           w.diameter != null
             ? { label: DIAMETER, value: toFixed(w.diameter) }
             : null,
-          w.length != null ? { label: X_DIM, value: toFixed(w.length) } : null,
-          w.width != null ? { label: Y_DIM, value: toFixed(w.width) } : null,
+          w.xDimension != null
+            ? { label: X_DIM, value: toFixed(w.xDimension) }
+            : null,
+          w.yDimension != null
+            ? { label: Y_DIM, value: toFixed(w.yDimension) }
+            : null,
           // TODO(mc, 2019-04-15): change label to icon
           { label: SHAPE, value: w.shape },
         ].filter(Boolean)

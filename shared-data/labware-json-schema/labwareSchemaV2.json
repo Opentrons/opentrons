@@ -158,15 +158,15 @@
       "type": "object",
       "additionalProperties": false,
       "description": "Outer dimensions of a labware",
-      "required": ["overallWidth", "overallHeight", "overallLength"],
+      "required": ["xDimension", "yDimension", "zDimension"],
       "properties": {
-        "overallWidth": {
+        "yDimension": {
           "$ref": "#/definitions/positiveNumber"
         },
-        "overallHeight": {
+        "zDimension": {
           "$ref": "#/definitions/positiveNumber"
         },
-        "overallLength": {
+        "xDimension": {
           "$ref": "#/definitions/positiveNumber"
         }
       }
@@ -180,13 +180,13 @@
           "additionalProperties": false,
           "required": ["depth", "shape", "totalLiquidVolume", "x", "y", "z"],
           "oneOf": [
-            { "required": ["width", "length"] },
+            { "required": ["xDimension", "yDimension"] },
             { "required": ["diameter"] }
           ],
           "not": {
             "anyOf": [
-              { "required": ["diameter", "width"] },
-              { "required": ["diameter", "length"] }
+              { "required": ["diameter", "xDimension"] },
+              { "required": ["diameter", "yDimension"] }
             ]
           },
           "properties": {
@@ -207,11 +207,20 @@
               "description": "Total well, tube, or tip volume in microliters",
               "$ref": "#/definitions/positiveNumber"
             },
-            "width": { "$ref": "#/definitions/positiveNumber" },
-            "length": { "$ref": "#/definitions/positiveNumber" },
-            "diameter": { "$ref": "#/definitions/positiveNumber" },
+            "xDimension": {
+              "description": "x dimension of rectangular wells",
+              "$ref": "#/definitions/positiveNumber"
+            },
+            "yDimension": {
+              "description": "y dimension of rectangular wells",
+              "$ref": "#/definitions/positiveNumber"
+            },
+            "diameter": {
+              "description": "diameter of circular wells",
+              "$ref": "#/definitions/positiveNumber"
+            },
             "shape": {
-              "description": "If rectangular, use length and width; otherwise use diameter",
+              "description": "If 'rectangular', use xDimension and yDimension; if 'circular' use diameter",
               "type": "string",
               "enum": ["rectangular", "circular"]
             }

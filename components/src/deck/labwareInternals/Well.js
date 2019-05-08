@@ -50,14 +50,14 @@ function Well(props: WellProps) {
   }
 
   if (well.shape === 'rectangular') {
-    const { length, width } = well
+    const { xDimension, yDimension } = well
     return (
       <rect
         {...commonProps}
-        x={x - length / 2}
-        y={y - width / 2}
-        width={length}
-        height={width}
+        x={x - xDimension / 2}
+        y={y - yDimension / 2}
+        width={xDimension}
+        height={yDimension}
       />
     )
   }

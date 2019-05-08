@@ -17,9 +17,9 @@ exports[`LabwareList component renders 1`] = `
         },
         "deprecated": false,
         "dimensions": Object {
-          "overallHeight": 64.48,
-          "overallLength": 127.76,
-          "overallWidth": 85.48,
+          "xDimension": 127.76,
+          "yDimension": 85.48,
+          "zDimension": 64.48,
         },
         "metadata": Object {
           "displayCategory": "tubeRack",
@@ -631,9 +631,9 @@ exports[`LabwareList component renders 1`] = `
         },
         "deprecated": false,
         "dimensions": Object {
-          "overallHeight": 50,
-          "overallLength": 127.76,
-          "overallWidth": 85.48,
+          "xDimension": 127.76,
+          "yDimension": 85.48,
+          "zDimension": 50,
         },
         "metadata": Object {
           "displayCategory": "wellPlate",
@@ -692,9 +692,9 @@ exports[`LabwareList component renders 1`] = `
         },
         "deprecated": false,
         "dimensions": Object {
-          "overallHeight": 50,
-          "overallLength": 50,
-          "overallWidth": 50,
+          "xDimension": 50,
+          "yDimension": 50,
+          "zDimension": 50,
         },
         "metadata": Object {
           "displayCategory": "wellPlate",

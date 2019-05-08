@@ -28,9 +28,9 @@
     "z": 0
   },
   "dimensions": {
-    "overallLength": 127.76,
-    "overallWidth": 85.48,
-    "overallHeight": 64.48
+    "xDimension": 127.76,
+    "yDimension": 85.48,
+    "zDimension": 64.48
   },
   "parameters": {
     "format": "irregular",

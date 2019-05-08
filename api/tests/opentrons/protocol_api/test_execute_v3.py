@@ -3,8 +3,8 @@ import json
 from opentrons.types import Point
 from opentrons.protocol_api import execute_v3, ProtocolContext
 
-with open(os.path.join(os.path.dirname(__file__), 'data',
-          'custom_trough_def.json'), 'r') as f:
+with open(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..',
+          'shared-data', 'fixtures', 'fixture12Trough.json'), 'r') as f:
     custom_trough_def = json.load(f)
 
 
@@ -35,7 +35,8 @@ def test_load_labware_v2(loop):
     assert 'Source (Buffer)' in str(loaded_labware['sourcePlateId'])
     assert loaded_labware['destPlateId'] == ctx.loaded_labwares[11]
     # use the metadata.displayName from embedded def
-    assert 'CUSTOM 12 Channel Trough' in str(loaded_labware['destPlateId'])
+    assert (custom_trough_def['metadata']['displayName'] in
+            str(loaded_labware['destPlateId']))
 
 
 class MockPipette(object):
