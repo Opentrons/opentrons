@@ -11,7 +11,8 @@ import type { SingleWell } from './Well'
 import Module from './Module'
 import ModuleNameOverlay from './ModuleNameOverlay'
 import RobotWorkSpace from './RobotWorkSpace'
-import SlotView from './SlotView'
+import RobotCoordsForeignDiv from './RobotCoordsForeignDiv'
+import RobotCoordsText from './RobotCoordsText'
 
 import { ContainerNameOverlay } from './ContainerNameOverlay'
 import { EmptyDeckSlot } from './EmptyDeckSlot'
@@ -32,9 +33,10 @@ export {
   Module,
   ModuleNameOverlay,
   SlotOverlay,
-  SlotView,
   Well,
   RobotWorkSpace,
+  RobotCoordsForeignDiv,
+  RobotCoordsText,
   Tip,
 }
 
