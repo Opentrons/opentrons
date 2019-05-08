@@ -12,7 +12,9 @@ const fixtureTipRack300Ul = require('@opentrons/shared-data/fixtures/fixtureTipR
 let definition = fixture96Plate
 
 ;<RobotWorkSpace
-  viewBox={`0 0  ${definition.xDimension} ${definition.yDimension}`}
+  viewBox={`0 0  ${definition.dimensions.xDimension} ${
+    definition.dimensions.yDimension
+  }`}
 >
   {() => (
     <LabwareRender
@@ -33,7 +35,9 @@ const fixtureTipRack300Ul = require('@opentrons/shared-data/fixtures/fixtureTipR
 let definition = fixtureTipRack300Ul
 
 ;<RobotWorkSpace
-  viewBox={`0 0  ${definition.xDimension} ${definition.yDimension}`}
+  viewBox={`0 0  ${definition.dimensions.xDimension} ${
+    definition.dimensions.yDimension
+  }`}
 >
   {() => (
     <LabwareRender
