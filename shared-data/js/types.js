@@ -140,10 +140,18 @@ export type DeckRobot = {|
   model: string,
 |}
 
+export type DeckFixture = {|
+  id: string,
+  slot: string,
+  labware: string,
+  displayName: string,
+|}
+
 export type CoordinateTuple = [number, number, number]
 
 export type UnitDirection = 1 | -1
 export type UnitVectorTuple = [UnitDirection, UnitDirection, UnitDirection]
+
 export type DeckSlot = {|
   id: string,
   position: CoordinateTuple,
@@ -159,6 +167,7 @@ export type DeckCalibrationPoint = {|
 export type DeckLocations = {|
   orderedSlots: Array<DeckSlot>,
   calibrationPoints: Array<DeckCalibrationPoint>,
+  fixtures: Array<DeckFixture>,
 |}
 
 export type DeckMetadata = {|
@@ -174,8 +183,8 @@ export type DeckLayer = Array<DeckLayerFeature>
 
 export type DeckDefinition = {|
   otId: string,
-  cornerOffsetFromOrigin: DeckOffset,
-  dimensions: Dimensions,
+  cornerOffsetFromOrigin: CoordinateTuple,
+  dimensions: CoordinateTuple,
   robot: DeckRobot,
   locations: DeckLocations,
   metadata: DeckMetadata,
