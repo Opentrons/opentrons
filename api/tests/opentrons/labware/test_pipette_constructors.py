@@ -1,6 +1,7 @@
 # TODO: Modify all calls to get a Well to use the `wells` method
 import pytest
 from opentrons import robot, instruments
+from opentrons.config import pipette_config
 from opentrons.legacy_api.instruments import Pipette
 
 factories = [
@@ -14,6 +15,12 @@ factories = [
     ('p300_multi', instruments.P300_Multi),
     ('p1000_single', instruments.P1000_Single),
     ('p+1000_single', instruments.P1000_Plus_Single),
+]
+
+backcompat_pips = [
+    ('p+20_single', 'p10_single', instruments.P10_Single),
+    ('p+300_single', 'p300_single', instruments.P300_Single),
+    ('p+1000_single', 'p1000_single', instruments.P1000_Single),
 ]
 
 
@@ -53,3 +60,22 @@ def test_pipette_contructors(factory, monkeypatch):
     assert dispense_flow_rate == 42
     assert pipette.min_volume == 7
     assert pipette.max_volume == 8
+
+
+@pytest.mark.parametrize('backcompat', backcompat_pips)
+def test_backwards_compatibility(backcompat, monkeypatch):
+    expected_name, old_name, old_constructor = backcompat
+
+    robot.reset()
+
+    fake_pip = {'left': {'model': None, 'id': None},
+                'right': {'model': expected_name + '_v2.0', 'id': 'FakePip'}}
+    monkeypatch.setattr(robot, 'model_by_mount', fake_pip)
+
+    old_config = pipette_config.name_config()[old_name]
+    pipette = old_constructor(mount='right')
+
+    assert pipette.name.startswith(expected_name) is True
+    assert pipette.mount == 'right'
+    assert pipette.min_volume == old_config['minVolume']
+    assert pipette.max_volume == old_config['maxVolume']
