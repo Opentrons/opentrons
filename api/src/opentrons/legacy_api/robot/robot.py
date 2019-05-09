@@ -1052,6 +1052,7 @@ class Robot(CommandPublisher):
         msg = await self._driver.update_firmware(
             filename, checked_loop, explicit_modeset)
         self.fw_version = self._driver.get_fw_version()
+        self.connect()
         return msg
 
     @property

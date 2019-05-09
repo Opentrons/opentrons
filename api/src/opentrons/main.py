@@ -54,14 +54,26 @@ def initialize_robot(loop):
     if fw_version != packed_smoothie_fw_ver:
         log.info("Executing smoothie update: current vers {}, packed vers {}"
                  .format(fw_version, packed_smoothie_fw_ver))
-        loop.run_until_complete(
-            hardware.update_firmware(packed_smoothie_fw_file,
-                                     explicit_modeset=explicit_modeset))
-        if hardware.is_connected():
-            log.info("FW Update complete!")
+        for attempts in range(3):
+            try:
+                loop.run_until_complete(
+                    hardware.update_firmware(
+                        packed_smoothie_fw_file,
+                        explicit_modeset=explicit_modeset))
+            except RuntimeError:
+                explicit_modeset = True
+                continue
+
+            if hardware.is_connected():
+                log.info(f"Smoothie fw update complete in {attempts} tries")
+                break
+            else:
+                log.error(
+                    "Failed to update smoothie: did not connect after update")
         else:
-            raise RuntimeError(
-                "Could not connect to motor driver after fw update")
+            log.error("Could not update smoothie, forcing virtual")
+            os.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
+            hardware.connect()
     else:
         log.info("FW version OK: {}".format(packed_smoothie_fw_ver))
     log.info(f"Name: {name()}")
