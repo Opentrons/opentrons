@@ -1,3 +1,4 @@
+import logging
 from . import (robot as _robot_module,
                instruments as inst,
                containers as cnt,
@@ -7,6 +8,8 @@ from opentrons.config import pipette_config
 # Ignore the type here because well, this is exactly why this is the legacy_api
 robot = _robot_module.Robot()  # type: ignore
 modules.provide_singleton(robot)
+
+LOG = logging.getLogger(__name__)
 
 
 def reset():
@@ -24,8 +27,13 @@ class ContainersWrapper(object):
     def list(self, *args, **kwargs):
         return cnt.list(*args, **kwargs)
 
-    def load(self, *args, **kwargs):
-        return cnt.load(self.robot, *args, **kwargs)
+    def load(self, container_name, slot, label=None, share=False):
+        try:
+            return cnt.load(self.robot, container_name, slot, label, share)
+        except FileNotFoundError:
+            LOG.exception(f"Exception opening labware {container_name}")
+            raise RuntimeError(
+                f"Could not load labware {container_name}")
 
 
 class InstrumentsWrapper(object):
