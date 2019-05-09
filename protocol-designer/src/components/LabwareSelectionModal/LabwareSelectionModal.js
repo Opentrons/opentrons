@@ -8,6 +8,7 @@ import {
 import startCase from 'lodash/startCase'
 import reduce from 'lodash/reduce'
 import { getAllDefinitions } from '../../labware-defs/utils'
+import { Portal } from '../portals/TopPortal'
 import { PDTitledList } from '../lists'
 import LabwareItem from './LabwareItem'
 import LabwarePreview from './LabwarePreview'
@@ -67,7 +68,9 @@ const LabwareDropdown = (props: Props) => {
     <ClickOutside onClickOutside={onClose}>
       {({ ref }) => (
         <>
-          <LabwarePreview labwareDef={previewedLabware} />
+          <Portal>
+            <LabwarePreview labwareDef={previewedLabware} />
+          </Portal>
           <div ref={ref} className={styles.labware_dropdown}>
             <div className={styles.title}>Slot {slot} Labware</div>
             <ul>

@@ -22,10 +22,21 @@ const LabwarePreview = (props: Props) => {
     (acc, well) => acc.add(well.totalLiquidVolume),
     new Set()
   )
+  const formattedVolumes = Array.from(maxVolumes)
+    .map(vol => `${vol}${i18n.t('application.units.microliter')}`)
+    .join(', ')
+
+  // NOTE: this is a temporary magic value that positions the preview component
+  // in a fixed place relative to the labware dropdown, while still letting
+  // it overflow the sidebar nav if necessary
+  const leftValue = (global.innerWidth - 365) / 2 - 216
+
   return (
-    <div className={styles.labware_preview_wrapper}>
+    <div style={{ left: leftValue }} className={styles.labware_preview_wrapper}>
       <div className={styles.labware_preview}>
-        <h3>{props.labwareDef.metadata.displayName}</h3>
+        <h3 className={styles.labware_preview_header}>
+          {props.labwareDef.metadata.displayName}
+        </h3>
         <div className={styles.labware_detail_row}>
           <div className={styles.labware_render_wrapper}>
             <RobotWorkSpace
@@ -36,19 +47,19 @@ const LabwarePreview = (props: Props) => {
               {() => <LabwareRender definition={labwareDef} />}
             </RobotWorkSpace>
           </div>
-          <div>
+          <div className={styles.labware_detail_column}>
             <LabeledValue
               label={i18n.t('modal.labware_selection.measurements')}
               value={i18n.t('modal.labware_selection.see_details')}
             />
-            <div>
+            <div className={styles.labware_values_row}>
               <LabeledValue
                 label={i18n.t('modal.labware_selection.well_count')}
                 value={Object.keys(labwareDef.wells).length}
               />
               <LabeledValue
                 label={i18n.t('modal.labware_selection.max_vol')}
-                value={Array.from(maxVolumes).join(', ')}
+                value={formattedVolumes}
               />
             </div>
           </div>

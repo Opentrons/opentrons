@@ -59,20 +59,44 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  width: 100%;
-  left: -20rem;
+  z-index: 1;
 }
 
 .labware_preview {
-  width: 25rem;
-  height: 13rem;
+  width: 25.25rem;
+  height: 12.8125rem;
   background-color: var(--c-white);
   box-shadow: var(--shadow-lvl-2);
-  padding: 1rem 2rem;
-  z-index: 1;
+  padding: 1rem;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+}
+
+.labware_preview_header {
+  @apply --font-header-dark;
 }
 
 .labware_render_wrapper {
   height: 7.125rem;
   width: 10.75rem;
+}
+
+.labware_detail_row {
+  display: flex;
+  justify-content: space-around;
+  flex-direction: row;
+}
+
+.labware_values_row {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+.labware_detail_column {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
 }
