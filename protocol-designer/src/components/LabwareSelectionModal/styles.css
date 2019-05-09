@@ -61,13 +61,18 @@
   height: 100%;
   width: 100%;
   left: -20rem;
-  z-index: 1;
 }
 
 .labware_preview {
-  width: 15rem;
-  height: 5rem;
+  width: 25rem;
+  height: 13rem;
   background-color: var(--c-white);
   box-shadow: var(--shadow-lvl-2);
   padding: 1rem 2rem;
+  z-index: 1;
+}
+
+.labware_render_wrapper {
+  height: 7.125rem;
+  width: 10.75rem;
 }

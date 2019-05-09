@@ -27,13 +27,15 @@ const LabwarePreview = (props: Props) => {
       <div className={styles.labware_preview}>
         <h3>{props.labwareDef.metadata.displayName}</h3>
         <div className={styles.labware_detail_row}>
-          <RobotWorkSpace
-            viewBox={`0 0 ${labwareDef.dimensions.overallLength} ${
-              labwareDef.dimensions.overallWidth
-            }`}
-          >
-            {() => <LabwareRender definition={labwareDef} />}
-          </RobotWorkSpace>
+          <div className={styles.labware_render_wrapper}>
+            <RobotWorkSpace
+              viewBox={`0 0 ${labwareDef.dimensions.overallLength} ${
+                labwareDef.dimensions.overallWidth
+              }`}
+            >
+              {() => <LabwareRender definition={labwareDef} />}
+            </RobotWorkSpace>
+          </div>
           <div>
             <LabeledValue
               label={i18n.t('modal.labware_selection.measurements')}

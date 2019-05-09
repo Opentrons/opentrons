@@ -34,8 +34,8 @@ const LabwareDropdown = (props: Props) => {
   // do not render without a slot
   if (!slot) return null
 
-  const [selectedCategory, selectCategory] = useState('')
-  const [previewedLabware, previewLabware] = useState()
+  const [selectedCategory, selectCategory] = useState(null)
+  const [previewedLabware, previewLabware] = useState(null)
 
   const labwareByCategory = useMemo(() => {
     const allDefs = getAllDefinitions()
@@ -59,6 +59,10 @@ const LabwareDropdown = (props: Props) => {
     )
   }, [permittedTipracks])
 
+  const makeToggleCategory = (category: string) => () => {
+    selectCategory(selectedCategory === category ? null : category)
+  }
+
   return (
     <ClickOutside onClickOutside={onClose}>
       {({ ref }) => (
@@ -72,8 +76,8 @@ const LabwareDropdown = (props: Props) => {
                   key={category}
                   title={startCase(category)}
                   collapsed={selectedCategory !== category}
-                  onCollapseToggle={() => selectCategory(category)}
-                  onClick={() => selectCategory(category)}
+                  onCollapseToggle={makeToggleCategory(category)}
+                  onClick={makeToggleCategory(category)}
                   className={styles.labware_selection_modal}
                 >
                   {labwareByCategory[category] &&
@@ -83,7 +87,8 @@ const LabwareDropdown = (props: Props) => {
                         containerType={labwareDef.parameters.loadName}
                         displayName={labwareDef.metadata.displayName}
                         selectLabware={selectLabware}
-                        onMouseOver={() => previewLabware(labwareDef)}
+                        onMouseEnter={() => previewLabware(labwareDef)}
+                        // onMouseLeave={() => previewLabware()}
                       />
                     ))}
                 </PDTitledList>

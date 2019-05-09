@@ -7,18 +7,26 @@ type Props = {
   selectLabware: (containerType: string) => mixed,
   containerType: string,
   displayName: string,
-  onMouseOver: () => any,
+  onMouseEnter: () => any,
+  onMouseLeave: () => any,
 }
 
 export default function LabwareItem(props: Props) {
-  const { selectLabware, onMouseOver, containerType, displayName } = props
+  const {
+    selectLabware,
+    onMouseLeave,
+    onMouseEnter,
+    containerType,
+    displayName,
+  } = props
   return (
     <PDListItem
       border
       hoverable
       className={styles.labware_list_item}
       onClick={() => selectLabware(containerType)}
-      onMouseOver={onMouseOver}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
     >
       {displayName}
     </PDListItem>
