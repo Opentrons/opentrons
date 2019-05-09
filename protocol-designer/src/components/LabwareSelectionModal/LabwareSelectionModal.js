@@ -91,7 +91,7 @@ const LabwareDropdown = (props: Props) => {
                         displayName={labwareDef.metadata.displayName}
                         selectLabware={selectLabware}
                         onMouseEnter={() => previewLabware(labwareDef)}
-                        // onMouseLeave={() => previewLabware()}
+                        onMouseLeave={() => previewLabware()}
                       />
                     ))}
                 </PDTitledList>

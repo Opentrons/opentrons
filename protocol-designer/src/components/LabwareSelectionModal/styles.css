@@ -85,12 +85,6 @@
 
 .labware_detail_row {
   display: flex;
-  justify-content: space-around;
-  flex-direction: row;
-}
-
-.labware_values_row {
-  display: flex;
   justify-content: space-between;
   flex-direction: row;
 }
@@ -99,4 +93,6 @@
   display: flex;
   justify-content: space-between;
   flex-direction: column;
+  flex: 1;
+  padding: 0.25rem 1rem;
 }

@@ -11,7 +11,7 @@ import i18n from '../../localization'
 import styles from './styles.css'
 
 type Props = {
-  labwareDef: LabwareDefinition2,
+  labwareDef: ?LabwareDefinition2,
 }
 
 const LabwarePreview = (props: Props) => {
@@ -35,7 +35,7 @@ const LabwarePreview = (props: Props) => {
     <div style={{ left: leftValue }} className={styles.labware_preview_wrapper}>
       <div className={styles.labware_preview}>
         <h3 className={styles.labware_preview_header}>
-          {props.labwareDef.metadata.displayName}
+          {props.labwareDef?.metadata?.displayName}
         </h3>
         <div className={styles.labware_detail_row}>
           <div className={styles.labware_render_wrapper}>
@@ -52,7 +52,7 @@ const LabwarePreview = (props: Props) => {
               label={i18n.t('modal.labware_selection.measurements')}
               value={i18n.t('modal.labware_selection.see_details')}
             />
-            <div className={styles.labware_values_row}>
+            <div className={styles.labware_detail_row}>
               <LabeledValue
                 label={i18n.t('modal.labware_selection.well_count')}
                 value={Object.keys(labwareDef.wells).length}
