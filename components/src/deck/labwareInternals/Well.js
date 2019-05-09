@@ -5,6 +5,7 @@ import cx from 'classnames'
 import styles from './Well.css'
 
 import type { LabwareWell } from '@opentrons/shared-data'
+import type { WellMouseEvent } from './types'
 
 export type WellProps = {|
   /** if included, overrides the default classname */
@@ -17,13 +18,14 @@ export type WellProps = {|
   well: LabwareWell,
   /** special class used for drag-to-select functionality. Should not be used for styling */
   selectableWellClass?: string,
-  /** Optional callback, called with well name onMouseOver */
-  onMouseOverWell?: (wellName: string) => mixed,
+  /** Optional callback, called with WellMouseEvent args onMouseOver */
+  onMouseEnterWell?: WellMouseEvent => mixed,
+  onMouseLeaveWell?: WellMouseEvent => mixed,
 |}
 
 function Well(props: WellProps) {
-  const { well, wellName, fill, onMouseOverWell } = props
-  assert(well, `expected well prop for ${wellName}`)
+  const { well, wellName, fill, onMouseEnterWell, onMouseLeaveWell } = props
+  assert(well, `expected well prop for well "${wellName}"`)
   if (!well) return null
   const { x, y } = well
 
@@ -33,15 +35,23 @@ function Well(props: WellProps) {
   const _mouseInteractionProps = {
     className,
     style: { fill },
-    'data-well-name': wellName,
-    onMouseOver: onMouseOverWell ? () => onMouseOverWell(wellName) : null,
+    'data-wellname': wellName,
+    onMouseEnter: onMouseEnterWell
+      ? event => onMouseEnterWell({ wellName, event })
+      : null,
+    onMouseLeave: onMouseLeaveWell
+      ? event => onMouseLeaveWell({ wellName, event })
+      : null,
   }
   const _noMouseProps = {
     className: baseClassName,
     style: { fill, pointerEvents: 'none' },
   }
-  // exclude all mouse interactivity props if no onMouseOverWell provided
-  const commonProps = onMouseOverWell ? _mouseInteractionProps : _noMouseProps
+  // exclude all mouse interactivity props if no event handler props provided
+  const commonProps =
+    onMouseEnterWell || onMouseLeaveWell
+      ? _mouseInteractionProps
+      : _noMouseProps
 
   if (well.shape === 'circular') {
     const { diameter } = well

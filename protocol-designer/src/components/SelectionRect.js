@@ -34,7 +34,6 @@ class SelectionRect extends React.Component<Props, State> {
     const width = Math.abs(xDynamic - xStart)
     const height = Math.abs(yDynamic - yStart)
     const { originXOffset = 0, originYOffset = 0 } = this.props
-
     if (this.props.svg) {
       // calculate ratio btw clientRect bounding box vs svg parent viewBox
       // WARNING: May not work right if you're nesting SVGs!
@@ -70,7 +69,7 @@ class SelectionRect extends React.Component<Props, State> {
     return (
       <div
         className={styles.selection_rect}
-        styles={{
+        style={{
           left: left + 'px',
           top: top + 'px',
           width: width + 'px',

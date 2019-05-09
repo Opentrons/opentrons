@@ -17,5 +17,5 @@ div.selection_rect {
   position: fixed;
   z-index: 1000;
   border-radius: 0;
-  border: 1px var(--c-highlight);
+  border: 1px solid var(--c-highlight);
 }

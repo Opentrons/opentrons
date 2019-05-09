@@ -2,6 +2,11 @@
 
 .highlighted_well {
   stroke: var(--c-highlight);
+  fill: color(var(--c-highlight) alpha(20%));
+}
+
+.selected_well {
+  stroke: var(--c-highlight);
   fill: transparent;
 }
 

@@ -1,7 +1,7 @@
 // @flow
 import uuidv1 from 'uuid/v1'
 import type { BoundingRect, GenericRect } from '../collision-types'
-import type { Wells } from '../labware-ingred/types'
+import type { WellSet } from '../labware-ingred/types'
 
 export const registerSelectors =
   process.env.NODE_ENV === 'development'
@@ -30,9 +30,8 @@ export function clientRectToBoundingRect(rect: ClientRect): BoundingRect {
 export const getCollidingWells = (
   rectPositions: GenericRect,
   selectableClassname: string
-): Wells => {
-  // Returns obj of selected wells under a collision rect
-  // Result: {'0,1': [0, 1], '0,2': [0, 2]}] where numbers are well positions: (column, row).
+): WellSet => {
+  // Returns set of selected wells under a collision rect
   const { x0, y0, x1, y1 } = rectPositions
   const selectionBoundingRect = {
     x: Math.min(x0, x1),
@@ -53,13 +52,13 @@ export const getCollidingWells = (
     )
   )
 
-  const collidedWellData = collidedElems.reduce((acc: Wells, elem) => {
+  const collidedWellData = collidedElems.reduce((acc: WellSet, elem) => {
     if ('wellname' in elem.dataset) {
       const wellName = elem.dataset['wellname']
-      return { ...acc, [wellName]: wellName }
+      return new Set([...acc, wellName])
     }
     return acc
-  }, {})
+  }, new Set())
 
   return collidedWellData
 }

@@ -7,21 +7,25 @@ import { connect } from 'react-redux'
 
 import { Modal, OutlineButton, LabeledValue } from '@opentrons/components'
 import { sortWells } from '@opentrons/shared-data'
-import type { PipetteNameSpecs } from '@opentrons/shared-data'
-import type { BaseState, ThunkDispatch } from '../../../../types'
+
+import { changeFormInput } from '../../../../steplist/actions'
+import SingleLabware from '../../../SingleLabware'
+import WellSelectionInstructions from '../../../WellSelectionInstructions'
+// import { SelectableLabware } from '../../../labware' // TODO IMMEDIATELY
 
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
 import { selectors } from '../../../../labware-ingred/selectors'
-import type { Wells, ContentsByWell } from '../../../../labware-ingred/types'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { selectors as stepsSelectors } from '../../../../ui/steps'
-import type { WellIngredientNames } from '../../../../steplist/types'
-import { changeFormInput } from '../../../../steplist/actions'
-import type { StepFieldName } from '../../../../form-types'
 
-import { SelectableLabware } from '../../../labware'
-import SingleLabwareWrapper from '../../../SingleLabware'
-import WellSelectionInstructions from '../../../WellSelectionInstructions'
+import type { BaseState, ThunkDispatch } from '../../../../types'
+import type {
+  LabwareDefinition2,
+  PipetteNameSpecs,
+} from '@opentrons/shared-data'
+import type { Wells, ContentsByWell } from '../../../../labware-ingred/types'
+import type { WellIngredientNames } from '../../../../steplist/types'
+import type { StepFieldName } from '../../../../form-types'
 
 import styles from './WellSelectionModal.css'
 import modalStyles from '../../../modals/modal.css'
@@ -38,7 +42,7 @@ type SP = {|
   pipetteSpec: ?PipetteNameSpecs,
   initialSelectedWells: Array<string>,
   wellContents: ContentsByWell,
-  containerType: string,
+  labwareDef: ?LabwareDefinition2,
   ingredNames: WellIngredientNames,
 |}
 
@@ -84,7 +88,7 @@ class WellSelectionModal extends React.Component<Props, State> {
 
   render() {
     if (!this.props.isOpen) return null
-    const { pipetteSpec } = this.props
+    const { labwareDef, pipetteSpec } = this.props
 
     return (
       <Modal
@@ -106,19 +110,24 @@ class WellSelectionModal extends React.Component<Props, State> {
           </OutlineButton>
         </div>
 
-        <SingleLabwareWrapper showLabels>
-          <SelectableLabware
-            highlightedWells={this.state.highlightedWells}
-            selectedWells={this.state.selectedWells}
-            selectWells={this.selectWells}
-            deselectWells={this.deselectWells}
-            updateHighlightedWells={this.updateHighlightedWells}
-            wellContents={this.props.wellContents}
-            containerType={this.props.containerType}
-            pipetteChannels={pipetteSpec ? pipetteSpec.channels : null}
-            ingredNames={this.props.ingredNames}
+        {labwareDef && (
+          <SingleLabware
+            showLabels
+            definition={labwareDef}
+            // TODO IMMEDIATELY: no Wells type in state
+            highlightedWells={new Set(Object.keys(this.state.highlightedWells))}
+
+            // selectedWells={this.state.selectedWells}
+            // selectWells={this.selectWells}
+            // deselectWells={this.deselectWells}
+            // updateHighlightedWells={this.updateHighlightedWells}
+            // pipetteChannels={pipetteSpec ? pipetteSpec.channels : null}
+            // ingredNames={this.props.ingredNames}
+
+            // TODO IMMEDIATELY: wellContents to wellFill
+            // wellContents={this.props.wellContents}
           />
-        </SingleLabwareWrapper>
+        )}
 
         <WellSelectionInstructions />
       </Modal>
@@ -129,9 +138,10 @@ class WellSelectionModal extends React.Component<Props, State> {
 function mapStateToProps(state: BaseState, ownProps: OP): SP {
   const { pipetteId, labwareId } = ownProps
 
-  const labwareType = labwareId
-    ? stepFormSelectors.getLabwareTypesById(state)[labwareId]
-    : null
+  const labwareDef =
+    (labwareId &&
+      stepFormSelectors.getLabwareEntities(state)[labwareId]?.def) ||
+    null
   const allWellContentsForSteps = wellContentsSelectors.getAllWellContentsForSteps(
     state
   )
@@ -155,7 +165,7 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
       labwareId && allWellContentsForStep
         ? allWellContentsForStep[labwareId]
         : {},
-    containerType: labwareType || 'missing labware',
+    labwareDef,
     ingredNames,
   }
 }

@@ -1,18 +1,11 @@
 // @flow
+import assert from 'assert'
 import * as React from 'react'
 import cx from 'classnames'
-import map from 'lodash/map'
+import reduce from 'lodash/reduce'
 import { connect } from 'react-redux'
 
-import { getWellDefsForSVG } from '@opentrons/shared-data'
-
-import {
-  Modal,
-  Well,
-  LabwareOutline,
-  LabwareLabels,
-  ingredIdsToColor,
-} from '@opentrons/components'
+import { Modal, ingredIdsToColor } from '@opentrons/components'
 import type { BaseState, ThunkDispatch } from '../../types'
 import i18n from '../../localization'
 
@@ -20,18 +13,19 @@ import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import { selectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import * as labwareIngredsActions from '../../labware-ingred/actions'
-import type { ContentsByWell } from '../../labware-ingred/types'
+import type { ContentsByWell, WellContents } from '../../labware-ingred/types'
 import type { WellIngredientNames } from '../../steplist/types'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-import SingleLabwareWrapper from '../SingleLabware'
+import SingleLabware from '../SingleLabware'
 
 import modalStyles from '../modals/modal.css'
 import styles from './labware.css'
 import WellTooltip from './WellTooltip'
 
 type SP = {|
+  definition: ?LabwareDefinition2,
   wellContents: ContentsByWell,
-  labwareType: string,
   ingredNames: WellIngredientNames,
 |}
 
@@ -47,7 +41,21 @@ class BrowseLabwareModal extends React.Component<Props> {
   }
 
   render() {
-    const allWellDefsByName = getWellDefsForSVG(this.props.labwareType)
+    const { definition } = this.props
+    if (!definition) {
+      assert(definition, 'BrowseLabwareModal expected definition')
+      return null
+    }
+
+    const wellFill = reduce(
+      // TODO IMMEDIATELY
+      this.props.wellContents,
+      (acc, wellContents: WellContents, wellName) => ({
+        ...acc,
+        [wellName]: ingredIdsToColor(wellContents.groupIds),
+      }),
+      {}
+    )
 
     return (
       <Modal
@@ -60,42 +68,32 @@ class BrowseLabwareModal extends React.Component<Props> {
       >
         <WellTooltip ingredNames={this.props.ingredNames}>
           {({
-            makeHandleMouseOverWell,
+            makeHandleMouseEnterWell,
             handleMouseLeaveWell,
             tooltipWellName,
           }) => (
-            <SingleLabwareWrapper showLabels>
-              <g>
-                <LabwareOutline />
-                {map(this.props.wellContents, (well, wellName) => {
-                  const color = ingredIdsToColor(well.groupIds)
-                  const mouseHandlers = color
-                    ? {
-                        onMouseOver: makeHandleMouseOverWell(
-                          wellName,
-                          well.ingreds
-                        ),
-                        onMouseLeave: handleMouseLeaveWell,
-                      }
-                    : {}
-                  return (
-                    <Well
-                      {...mouseHandlers}
-                      key={wellName}
-                      wellName={wellName}
-                      highlighted={tooltipWellName === wellName}
-                      fillColor={color}
-                      svgOffset={{ x: 1, y: -3 }}
-                      wellDef={allWellDefsByName[wellName]}
-                    />
+            <SingleLabware
+              definition={definition}
+              showLabels
+              wellFill={wellFill}
+              highlightedWells={
+                new Set(
+                  reduce(
+                    this.props.wellContents,
+                    (acc, wellContents, wellName): Array<string> =>
+                      tooltipWellName === wellName ? [...acc, wellName] : acc,
+                    []
                   )
-                })}
-              </g>
-              <LabwareLabels
-                labwareType={this.props.labwareType}
-                inner={false}
-              />
-            </SingleLabwareWrapper>
+                )
+              }
+              onMouseEnterWell={({ event, wellName }) =>
+                makeHandleMouseEnterWell(
+                  wellName,
+                  this.props.wellContents[wellName].ingreds
+                )(event)
+              }
+              onMouseLeaveWell={handleMouseLeaveWell}
+            />
           )}
         </WellTooltip>
         <div className={styles.modal_instructions}>
@@ -108,9 +106,9 @@ class BrowseLabwareModal extends React.Component<Props> {
 
 function mapStateToProps(state: BaseState): SP {
   const labwareId = selectors.getDrillDownLabwareId(state)
-  const labwareType =
-    (labwareId && stepFormSelectors.getLabwareTypesById(state)[labwareId]) ||
-    'missing labware'
+  const definition = labwareId
+    ? stepFormSelectors.getLabwareEntities(state)[labwareId]?.def
+    : null
   const allWellContents = wellContentsSelectors.getLastValidWellContents(state)
   const wellContents =
     labwareId && allWellContents ? allWellContents[labwareId] : {}
@@ -118,7 +116,7 @@ function mapStateToProps(state: BaseState): SP {
   return {
     wellContents,
     ingredNames,
-    labwareType,
+    definition,
   }
 }
 
