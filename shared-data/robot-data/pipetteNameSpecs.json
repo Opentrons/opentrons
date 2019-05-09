@@ -22,7 +22,7 @@
     "maxVolume": 20,
     "channels": 1,
     "defaultAspirateFlowRate": 5,
-    "defaultDispenseFlowRate": 10,
+    "defaultDispenseFlowRate": 10
     
   },
   "p50_single": {

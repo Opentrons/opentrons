@@ -51,6 +51,7 @@ Y_OFFSET_MULTI = MULTI_LENGTH / 2
 Z_OFFSET_MULTI = -25.8
 
 Z_OFFSET_P10 = -13  # longest single-channel pipette
+Z_OFFSET_P20 = 6.05
 Z_OFFSET_P50 = 0
 Z_OFFSET_P300 = 0
 Z_OFFSET_P1000 = 20  # shortest single-channel pipette
@@ -119,9 +120,12 @@ def load(pipette_model: str) -> pipette_config:
     elif 'p300' in pipette_model:
         assert res.model_offset[1] == 0.0
         assert res.model_offset[2] == Z_OFFSET_P300
+    elif 'p20' in pipette_model:
+        assert res.model_offset[1] == 0.0
+        assert res.model_offset[2] == Z_OFFSET_P20
     else:
         assert res.model_offset[1] == 0.0
-        assert res.model_offset[2] == Z_OFFSET_P50
+        assert res.model_offset[2] == Z_OFFSET_P20
 
     return res
 

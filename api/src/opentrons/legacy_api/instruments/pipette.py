@@ -503,11 +503,14 @@ class Pipette:
         self._position_for_dispense(location)
         #print('position for dispense: ', self._position_for_dispense(location))
         #print('Dispensing volume: ', volume)
-        mm_position = self._dispense_plunger_position(
-            self.current_volume - volume)
+        
 
         if (self.current_volume - volume)  == 0:
             mm_position = self._dispense_plunger_position(0.01)
+        else:
+            mm_position = self._dispense_plunger_position(
+            self.current_volume - volume)
+            
         print('current volume after dispense: ', self.current_volume - volume)
         print('Current motor position:', mm_position)
         speed = self.speeds['dispense'] * rate
