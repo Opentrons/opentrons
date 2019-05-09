@@ -1,6 +1,7 @@
 import asyncio
 import collections
 import datetime
+import json
 import logging
 import syslog
 from typing import Any, Deque, Dict, List, Mapping
@@ -147,3 +148,64 @@ async def get_logs_by_id(request: web.Request) -> web.Response:
     opts = _get_options(request.query, 15000)
     return await _get_log_response(
         ident, opts['records'], opts['format'])
+
+
+async def set_syslog_level(request: web.Request) -> web.Response:
+    """
+    Set the minimum level for which logs will be sent upstream via syslog-ng
+
+    POST /settings/log_level/upstream {"log_level": str level, null} -> 200 OK
+
+    Similar to :py:meth:`opentrons.server.endpoints.settings.set_log_level`,
+    the level should be a python log level like "debug", "info", "warning", or
+    "error". If it is null, sets the minimum log level to emergency which we
+    do not log at since there's not really a matching level in python logging,
+    which effectively disables log upstreaming.
+    """
+    try:
+        body = await request.json()
+    except json.JSONDecodeError:
+        return web.json_respose(status=400,
+                                data={"message": "request must be json"})
+    if 'log_level' not in body:
+        return web.json_response(
+            status=400,
+            data={"message": "body must have log_level key"})
+    log_level = body['log_level']
+    ok_syslogs = {
+        'error': 'err',
+        'warning': 'warning',
+        'info': 'info',
+        'debug': 'debug'
+    }
+    if log_level is None:
+        syslog_level = 'emerg'
+    else:
+        try:
+            syslog_level = ok_syslogs[log_level.lower()]
+        except (KeyError, AttributeError):
+            return web.json_response(
+                status=400,
+                data={"message": f"invalid log level {log_level}"})
+    with open('/var/lib/syslog-ng/min-level', 'w') as ml:
+        ml.write(syslog_level)
+    proc = await asyncio.create_subprocess_exec(
+        'syslog-ng-ctl', 'reload',
+        stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+    stdout, stderr = await proc.communicate()
+    code = proc.returncode
+    if code != 0:
+        msg = f'Could not reload config: {stdout} {stderr}'
+        LOG.error(msg)
+        return web.json_response(status=500, message={'message': msg})
+    else:
+
+        if log_level:
+            result = f'Upstreaming log level changed to {log_level}'
+            getattr(LOG, log_level.lower())(
+                result)
+        else:
+            result = "Upstreaming logs disabled"
+            LOG.info(result)
+        return web.json_response(status=200,
+                                 data={"message": result})
