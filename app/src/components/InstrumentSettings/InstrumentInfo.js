@@ -5,6 +5,7 @@ import cx from 'classnames'
 
 import type { Mount } from '../../robot'
 
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
   LabeledValue,
   OutlineButton,
@@ -20,9 +21,6 @@ type Props = {
   showSettings: boolean,
 }
 
-// TODO(mc, 2018-03-30): volume and channels should come from the API
-const RE_CHANNELS = /p(\d+|\+\d+)_(single|multi)/
-
 const LABEL_BY_MOUNT = {
   left: 'Left pipette',
   right: 'Right pipette',
@@ -31,8 +29,8 @@ const LABEL_BY_MOUNT = {
 export default function PipetteInfo(props: Props) {
   const { mount, model, name, onChangeClick, showSettings } = props
   const label = LABEL_BY_MOUNT[mount]
-  const channelsMatch = model && model.match(RE_CHANNELS)
-  const channels = channelsMatch && channelsMatch[1]
+  const pipette = model ? getPipetteModelSpecs(model) : null
+  const channels = pipette?.channels
   const direction = model ? 'change' : 'attach'
 
   const changeUrl = `/robots/${name}/instruments/pipettes/change/${mount}`
@@ -62,7 +60,7 @@ export default function PipetteInfo(props: Props) {
       <div className={styles.image}>
         {channels && (
           <InstrumentDiagram
-            channels={channels === 'multi' ? 8 : 1}
+            channels={channels}
             className={styles.pipette_diagram}
           />
         )}
