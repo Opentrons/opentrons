@@ -132,7 +132,6 @@ class SelectableLabware extends React.Component<Props> {
           )
         : selectedPrimaryWells
 
-    console.log({ labwareProps, allSelectedWells })
     return (
       <SelectionRect
         onSelectionMove={this.handleSelectionMove}
