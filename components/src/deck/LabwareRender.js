@@ -9,16 +9,20 @@ import {
 import styles from './labwareRender.css'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { WellMouseEvent } from './labwareInternals/types'
+import type {
+  WellMouseEvent,
+  WellFill,
+  WellArray,
+} from './labwareInternals/types'
 
 export type LabwareRenderProps = {|
   definition: LabwareDefinition2,
   showLabels?: boolean,
-  missingTips?: Set<string>,
-  highlightedWells?: Set<string>,
-  selectedWells?: Set<string>,
+  missingTips?: WellArray,
+  highlightedWells?: WellArray,
+  selectedWells?: WellArray,
   /** CSS color to fill specified wells */
-  wellFill?: { [wellName: string]: string },
+  wellFill?: WellFill,
   /** Optional callback, called with WellMouseEvent args onMouseEnter */
   onMouseEnterWell?: WellMouseEvent => mixed,
   /** Optional callback, called with WellMouseEvent args onMouseLeave */

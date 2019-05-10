@@ -3,9 +3,9 @@ import assert from 'assert'
 import * as React from 'react'
 import reduce from 'lodash/reduce'
 
-import { ingredIdsToColor } from '@opentrons/components'
 import SingleLabware from './SingleLabware'
-import type { ContentsByWell, WellContents } from '../../labware-ingred/types'
+import { wellFillFromWellContents } from './utils'
+import type { ContentsByWell } from '../../labware-ingred/types'
 import type { WellIngredientNames } from '../../steplist/types'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
@@ -24,16 +24,6 @@ export default function BrowsableLabware(props: Props) {
     return null
   }
 
-  const wellFill = reduce(
-    // TODO IMMEDIATELY
-    wellContents,
-    (acc, wellContents: WellContents, wellName) => ({
-      ...acc,
-      [wellName]: ingredIdsToColor(wellContents.groupIds),
-    }),
-    {}
-  )
-
   return (
     <WellTooltip ingredNames={ingredNames}>
       {({
@@ -44,17 +34,13 @@ export default function BrowsableLabware(props: Props) {
         <SingleLabware
           definition={definition}
           showLabels
-          wellFill={wellFill}
-          highlightedWells={
-            new Set(
-              reduce(
-                wellContents,
-                (acc, wellContents, wellName): Array<string> =>
-                  tooltipWellName === wellName ? [...acc, wellName] : acc,
-                []
-              )
-            )
-          }
+          wellFill={wellFillFromWellContents(wellContents)}
+          highlightedWells={reduce(
+            wellContents,
+            (acc, wellContents, wellName): Array<string> =>
+              tooltipWellName === wellName ? [...acc, wellName] : acc,
+            []
+          )}
           onMouseEnterWell={({ event, wellName }) =>
             makeHandleMouseEnterWell(wellName, wellContents[wellName].ingreds)(
               event

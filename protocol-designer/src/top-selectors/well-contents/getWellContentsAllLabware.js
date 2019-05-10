@@ -7,10 +7,10 @@ import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import wellSelectionSelectors from '../../well-selection/selectors'
 
+import type { WellArray } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { Selector } from '../../types'
 import type {
-  Wells,
   ContentsByWell,
   WellContentsByLabware,
 } from '../../labware-ingred/types'
@@ -19,8 +19,8 @@ import type { SingleLabwareLiquidState } from '../../step-generation'
 const _getWellContents = (
   labwareDef: LabwareDefinition2,
   __ingredientsForContainer: SingleLabwareLiquidState,
-  selectedWells: ?Wells,
-  highlightedWells: ?Wells
+  selectedWells: ?WellArray,
+  highlightedWells: ?WellArray
 ): ContentsByWell | null => {
   // selectedWells and highlightedWells args may both be null,
   // they're only relevant to the selected container.

@@ -13,12 +13,10 @@ export type LabwareTypeById = { [labwareId: string]: ?string }
 
 // ==== WELLS ==========
 
-// TODO: Ian 2019-07-08 remove this in favor of WellSet
+// TODO: Ian 2019-07-08 remove this in favor of WellArray
 export type Wells = {
   [wellName: string]: string, // eg A1: 'A1'.
 }
-
-export type WellSet = Set<string>
 
 export type WellContents = {|
   // non-ingredient well state, for SelectableLabware

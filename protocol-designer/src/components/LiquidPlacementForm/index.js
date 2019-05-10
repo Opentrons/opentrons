@@ -32,9 +32,7 @@ type SP = $Rest<
 >
 
 function mapStateToProps(state: BaseState): SP {
-  const selectedWells = Object.keys(
-    wellSelectionSelectors.getSelectedWells(state)
-  )
+  const selectedWells = wellSelectionSelectors.getSelectedWells(state)
 
   const _labwareId = labwareIngredSelectors.getSelectedLabwareId(state)
   const liquidLocations = labwareIngredSelectors.getLiquidsByLabwareId(state)

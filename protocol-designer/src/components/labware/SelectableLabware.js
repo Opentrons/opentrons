@@ -3,26 +3,31 @@ import * as React from 'react'
 import reduce from 'lodash/reduce'
 
 import { getCollidingWells } from '../../utils'
-import { SELECTABLE_WELL_CLASS, WELL_LABEL_OFFSET } from '../../constants'
+import { SELECTABLE_WELL_CLASS } from '../../constants'
 import { getWellSetForMultichannel } from '../../well-selection/utils'
 import SingleLabware from './SingleLabware'
 import SelectionRect from '../SelectionRect'
 import WellTooltip from './WellTooltip'
 
-import type { Channels, WellMouseEvent } from '@opentrons/components'
-import type { ContentsByWell, WellSet } from '../../labware-ingred/types'
+import type { Channels, WellMouseEvent, WellArray } from '@opentrons/components'
+import type { ContentsByWell } from '../../labware-ingred/types'
 import type { WellIngredientNames } from '../../steplist/types'
 import type { GenericRect } from '../../collision-types'
 
-export type Props = {
-  labwareProps: React.ElementProps<typeof SingleLabware>,
-  selectWells: WellSet => mixed,
-  deselectWells: WellSet => mixed,
-  updateHighlightedWells: WellSet => mixed,
+export type Props = {|
+  labwareProps: $Diff<
+    React.ElementProps<typeof SingleLabware>,
+    { selectedWells: * }
+  >,
+  /** array of primary wells. Overrides labwareProps.selectedWells */
+  selectedPrimaryWells: WellArray,
+  selectWells: WellArray => mixed,
+  deselectWells: WellArray => mixed,
+  updateHighlightedWells: WellArray => mixed,
   pipetteChannels?: ?Channels,
   ingredNames: WellIngredientNames,
   wellContents: ContentsByWell,
-}
+|}
 
 class SelectableLabware extends React.Component<Props> {
   _getWellsFromRect = (rect: GenericRect): * => {
@@ -30,19 +35,19 @@ class SelectableLabware extends React.Component<Props> {
     return this._wellsFromSelected(selectedWells)
   }
 
-  _wellsFromSelected = (selectedWells: WellSet): WellSet => {
+  _wellsFromSelected = (selectedWells: WellArray): WellArray => {
     const labwareDef = this.props.labwareProps.definition
     // Returns PRIMARY WELLS from the selection.
     if (this.props.pipetteChannels === 8) {
       // for the wells that have been highlighted,
       // get all 8-well well sets and merge them
-      const primaryWells: WellSet = [...selectedWells].reduce(
-        (acc: WellSet, wellName: string): WellSet => {
+      const primaryWells: WellArray = selectedWells.reduce(
+        (acc: WellArray, wellName: string): WellArray => {
           const wellSet = getWellSetForMultichannel(labwareDef, wellName)
           if (!wellSet) return acc
-          return new Set([...acc, wellSet[0]])
+          return [...acc, wellSet[0]]
         },
-        new Set()
+        []
       )
       return primaryWells
     }
@@ -55,19 +60,18 @@ class SelectableLabware extends React.Component<Props> {
     const labwareDef = this.props.labwareProps.definition
     if (!e.shiftKey) {
       if (this.props.pipetteChannels === 8) {
-        const selectedWells: WellSet = this._getWellsFromRect(rect)
-        const allWellsForMulti: WellSet = [...selectedWells].reduce(
-          (acc: WellSet, wellName: string): WellSet => {
+        const selectedWells: WellArray = this._getWellsFromRect(rect)
+        const allWellsForMulti: WellArray = selectedWells.reduce(
+          (acc: WellArray, wellName: string): WellArray => {
             const wellSetForMulti =
               getWellSetForMultichannel(labwareDef, wellName) || []
-            const channelWells: WellSet = wellSetForMulti.reduce(
-              (acc, channelWellName: string) =>
-                new Set([...acc, channelWellName]),
-              new Set()
+            const channelWells: WellArray = wellSetForMulti.reduce(
+              (acc, channelWellName: string) => [...acc, channelWellName],
+              []
             )
-            return new Set([...acc, ...channelWells])
+            return [...acc, ...channelWells]
           },
-          new Set()
+          []
         )
         this.props.updateHighlightedWells(allWellsForMulti)
       } else {
@@ -90,18 +94,18 @@ class SelectableLabware extends React.Component<Props> {
       const wellSet = getWellSetForMultichannel(labwareDef, args.wellName)
       const nextHighlightedWells = reduce(
         wellSet,
-        (acc, wellName) => new Set([...acc, wellName]),
-        new Set()
+        (acc, wellName) => [...acc, wellName],
+        []
       )
       nextHighlightedWells &&
         this.props.updateHighlightedWells(nextHighlightedWells)
     } else {
-      this.props.updateHighlightedWells(new Set([args.wellName]))
+      this.props.updateHighlightedWells([args.wellName])
     }
   }
 
   handleMouseLeaveWell = (args: WellMouseEvent) => {
-    this.props.updateHighlightedWells(new Set())
+    this.props.updateHighlightedWells([])
   }
 
   render() {
@@ -110,31 +114,27 @@ class SelectableLabware extends React.Component<Props> {
       ingredNames,
       wellContents,
       pipetteChannels,
+      selectedPrimaryWells,
     } = this.props
-
-    // TODO IMMEDIATELY should this distinction be made upstream?
-    const selectedPrimaryWells = labwareProps.selectedWells || new Set()
 
     // For rendering, show all wells not just primary wells
     const allSelectedWells =
       pipetteChannels === 8
-        ? new Set(
-            [...selectedPrimaryWells].reduce((acc, wellName) => {
-              const wellSet = getWellSetForMultichannel(
-                this.props.labwareProps.definition,
-                wellName
-              )
-              if (!wellSet) return acc
-              return [...acc, ...wellSet]
-            }, [])
-          )
+        ? selectedPrimaryWells.reduce((acc, wellName) => {
+            const wellSet = getWellSetForMultichannel(
+              this.props.labwareProps.definition,
+              wellName
+            )
+            if (!wellSet) return acc
+            return [...acc, ...wellSet]
+          }, [])
         : selectedPrimaryWells
 
-    // FIXME: SelectionRect is somehow off by one in the x axis, hence the magic number
     return (
       <SelectionRect
-        originXOffset={WELL_LABEL_OFFSET - 1}
-        originYOffset={WELL_LABEL_OFFSET}
+        // TODO IMMEDIATELY
+        originXOffset={0}
+        originYOffset={0}
         onSelectionMove={this.handleSelectionMove}
         onSelectionDone={this.handleSelectionDone}
       >

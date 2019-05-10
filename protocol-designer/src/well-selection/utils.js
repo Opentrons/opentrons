@@ -2,8 +2,7 @@
 import { computeWellAccess } from '@opentrons/shared-data'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-// TODO IMMEDIATELY clearer name for this 2D array
-type WellSetByWell = Array<Array<string>>
+type WellSetByPrimaryWell = Array<Array<string>>
 
 /** Compute all well sets for a labware type.
  * A well set is array of 8 wells that an 8 channel pipettes can fit into,
@@ -11,32 +10,35 @@ type WellSetByWell = Array<Array<string>>
  **/
 function _getAllWellSetsForLabware(
   labwareDef: LabwareDefinition2
-): WellSetByWell {
+): WellSetByPrimaryWell {
   const allWells: Array<string> = Object.keys(labwareDef.wells)
-  return allWells.reduce((acc: WellSetByWell, well: string): WellSetByWell => {
-    const wellSet = computeWellAccess(labwareDef, well)
-    return wellSet === null ? acc : [...acc, wellSet]
-  }, [])
+  return allWells.reduce(
+    (acc: WellSetByPrimaryWell, well: string): WellSetByPrimaryWell => {
+      const wellSet = computeWellAccess(labwareDef, well)
+      return wellSet === null ? acc : [...acc, wellSet]
+    },
+    []
+  )
 }
 
 let cache: {
   [otId: string]: ?{
     labwareDef: LabwareDefinition2,
-    wellSetByWell: WellSetByWell,
+    WellSetByPrimaryWell: WellSetByPrimaryWell,
   },
 } = {}
 const _getAllWellSetsForLabwareMemoized = (
   labwareDef: LabwareDefinition2
-): WellSetByWell => {
+): WellSetByPrimaryWell => {
   const c = cache[labwareDef.otId]
   // use cached version only if labwareDef is shallowly equal, in case
   // custom labware defs are changed without giving them a new otId
   if (c && c.labwareDef === labwareDef) {
-    return c.wellSetByWell
+    return c.WellSetByPrimaryWell
   }
-  const wellSetByWell = _getAllWellSetsForLabware(labwareDef)
-  cache[labwareDef.otId] = { labwareDef, wellSetByWell }
-  return wellSetByWell
+  const WellSetByPrimaryWell = _getAllWellSetsForLabware(labwareDef)
+  cache[labwareDef.otId] = { labwareDef, WellSetByPrimaryWell }
+  return WellSetByPrimaryWell
 }
 
 export function getWellSetForMultichannel(

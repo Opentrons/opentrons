@@ -14,7 +14,7 @@ import type { Selector } from '../types'
 import type { SubstepItemData } from '../steplist/types'
 import type { PipetteEntity, LabwareEntity } from '../step-forms'
 
-type AllWellHighlights = { [wellName: string]: true } // NOTE: all keys are true. There's a TODO in HighlightableLabware.js about making this a Set of well strings
+export type AllWellHighlights = { [wellName: string]: true } // NOTE: all keys are true. There's a TODO in HighlightableLabware.js about making this a Set of well strings
 type AllWellHighlightsAllLabware = { [labwareId: string]: AllWellHighlights }
 
 function _wellsForPipette(

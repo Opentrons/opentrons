@@ -128,7 +128,6 @@ export const getSelectedWellsMaxVolume: Selector<number> = createSelector(
   labwareIngredSelectors.getSelectedLabwareId,
   stepFormSelectors.getLabwareEntities,
   (selectedWells, selectedLabwareId, labwareEntities) => {
-    const selectedWellNames = Object.keys(selectedWells)
     const def = selectedLabwareId && labwareEntities[selectedLabwareId].def
     if (!def) {
       console.warn('No container type selected, cannot get max volume')
@@ -136,9 +135,9 @@ export const getSelectedWellsMaxVolume: Selector<number> = createSelector(
     }
     const maxVolumesByWell = getMaxVolumes(def)
     const maxVolumesList =
-      selectedWellNames.length > 0
+      selectedWells.length > 0
         ? // when wells are selected, only look at vols of selected wells
-          Object.values(pick(maxVolumesByWell, selectedWellNames))
+          Object.values(pick(maxVolumesByWell, selectedWells))
         : // when no wells selected (eg editing ingred group), look at all volumes.
           // TODO LATER: look at filled wells, not all wells.
           Object.values(maxVolumesByWell)
@@ -153,10 +152,9 @@ export const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSe
   wellSelectionSelectors.getSelectedWells,
   labwareIngredSelectors.getSelectedLabwareId,
   labwareIngredSelectors.getLiquidsByLabwareId,
-  (selectedWellsObj, labwareId, allIngreds) => {
+  (selectedWells, labwareId, allIngreds) => {
     if (!labwareId) return { ingredientId: null, volume: null }
     const ingredsInLabware = allIngreds[labwareId]
-    const selectedWells: Array<string> = Object.keys(selectedWellsObj)
     if (!ingredsInLabware || selectedWells.length < 1)
       return { ingredientId: null, volume: null }
 

@@ -6,6 +6,7 @@ import { handleActions } from 'redux-actions'
 import type { Action } from '../types'
 import type { Wells } from '../labware-ingred/types'
 
+// TODO: Ian 2019-05-10 remove Wells type, use WellArray.
 type WellSelectionAction = {
   payload: Wells, // NOTE: primary wells.
 }
