@@ -1,52 +1,11 @@
 // @flow
 import range from 'lodash/range'
-import { getLabware } from '../getLabware'
 import { getLabwareHasQuirk } from '.'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 // TODO Ian 2018-03-13 pull pipette offsets/positions from some pipette definitions data
 const OFFSET_8_CHANNEL = 9 // offset in mm between tips
 const MULTICHANNEL_TIP_SPAN = OFFSET_8_CHANNEL * (8 - 1) // length in mm from first to last tip of multichannel
-
-// TODO: Ian 2019-04-11 DEPRECATED REMOVE
-/** Find first well at given (x, y) coordinates. Assumes ONLY ONE well at each (x, y) */
-function _findWellAtDeprecated(
-  labwareName: string,
-  x: number,
-  y: number
-): ?string {
-  const labware = getLabware(labwareName)
-  if (!labware) {
-    console.warn('Labware ' + labwareName + ' not found.')
-    return null
-  }
-  return Object.keys(labware.wells).find((wellName: string) => {
-    const well = labware.wells[wellName]
-    const { diameter } = well
-
-    if (typeof diameter === 'number') {
-      // circular well
-      return (
-        Math.sqrt(Math.pow(x - well.x, 2) + Math.pow(y - well.y, 2)) <= diameter
-      )
-    }
-
-    // Not circular, must be a rectangular well
-    // For rectangular wells, (x, y) is at the center.
-    // Here we calculate 'wellOriginX/Y', at the bottom left point (lowest x y values)
-
-    // TODO: Ian 2018-09-17 un-comment the below when definitions update to center
-    // (right now defs are bottom-left bounding box)
-
-    const wellOriginX = well.x // - (well.width / 2)
-    const wellOriginY = well.y // - (well.length / 2)
-
-    return (
-      Math.abs(x - wellOriginX) <= well.width &&
-      Math.abs(y - wellOriginY) <= well.length
-    )
-  })
-}
 
 function _findWellAt(
   labwareDef: LabwareDefinition2,
