@@ -2,6 +2,9 @@
 
 exports[`Logo component renders 1`] = `
 <a
+  data-gtm-action="click"
+  data-gtm-category="l-header"
+  data-gtm-label="logo"
   href="https://opentrons.com/"
   rel="noopener noreferrer"
   target="_blank"
