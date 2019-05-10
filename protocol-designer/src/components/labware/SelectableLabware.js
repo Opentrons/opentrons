@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import reduce from 'lodash/reduce'
+import uniq from 'lodash/uniq'
 
 import { getCollidingWells } from '../../utils'
 import { SELECTABLE_WELL_CLASS } from '../../constants'
@@ -73,7 +74,7 @@ class SelectableLabware extends React.Component<Props> {
           },
           []
         )
-        this.props.updateHighlightedWells(allWellsForMulti)
+        this.props.updateHighlightedWells(uniq(allWellsForMulti))
       } else {
         this.props.updateHighlightedWells(this._getWellsFromRect(rect))
       }

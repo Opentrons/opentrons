@@ -72,49 +72,8 @@ function _findWellAt(
   })
 }
 
-// TODO: Ian 2019-04-11 DEPRECATED REMOVE
-// "topWell" means well at the "top" of the column we're accessing: usually A row, or B row for 384-format
-export function computeWellAccessDeprecated(
-  labwareName: string,
-  topWellName: string
-): Array<string> | null {
-  const labware = getLabware(labwareName)
-  if (!labware) {
-    return null
-  }
-
-  const topWell = labware.wells[topWellName]
-  if (!topWell) {
-    // well does not exist in labware
-    return null
-  }
-
-  const tipPositions = [0, 1, 2, 3, 4, 5, 6, 7].map(
-    tipNo => (7 - tipNo) * OFFSET_8_CHANNEL
-  )
-
-  const x = topWell.x
-  const offsetTipPositions = tipPositions.map(
-    origPos => topWell.y - tipPositions[0] + origPos
-  )
-
-  // Return null for containers with any undefined wells
-  const wellsAccessed = offsetTipPositions.reduce(
-    (acc: Array<string> | null, tipPos) => {
-      const wellForTip = _findWellAtDeprecated(labwareName, x, tipPos)
-      if (acc === null || !wellForTip) {
-        return null
-      }
-      return acc.concat(wellForTip)
-    },
-    []
-  )
-
-  return wellsAccessed
-}
-
 // "topWellName" means well at the "top" of the column we're accessing: usually A row, or B row for 384-format
-export function computeWellAccess(
+export function getWellNamePerMultiTip(
   labwareDef: LabwareDefinition2,
   topWellName: string
 ): Array<string> | null {
@@ -123,7 +82,7 @@ export function computeWellAccess(
     console.warn(
       `well "${topWellName}" does not exist in labware "${
         labwareDef.otId
-      }", cannot computeWellAccess`
+      }", cannot getWellNamePerMultiTip`
     )
     return null
   }

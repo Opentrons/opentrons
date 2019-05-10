@@ -1,6 +1,6 @@
 // @flow
 import { createSelector } from 'reselect'
-import { computeWellAccess } from '@opentrons/shared-data'
+import { getWellNamePerMultiTip } from '@opentrons/shared-data'
 
 import mapValues from 'lodash/mapValues'
 
@@ -25,7 +25,7 @@ function _wellsForPipette(
   // `wells` is all the wells that pipette's channel 1 interacts with.
   if (pipetteEntity.spec.channels === 8) {
     return wells.reduce((acc, well) => {
-      const setOfWellsForMulti = computeWellAccess(labwareEntity.def, well)
+      const setOfWellsForMulti = getWellNamePerMultiTip(labwareEntity.def, well)
 
       return setOfWellsForMulti ? [...acc, ...setOfWellsForMulti] : acc // setOfWellsForMulti is null
     }, [])

@@ -1,5 +1,5 @@
 // @flow
-import { computeWellAccess } from '@opentrons/shared-data'
+import { getWellNamePerMultiTip } from '@opentrons/shared-data'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 type WellSetByPrimaryWell = Array<Array<string>>
@@ -14,7 +14,7 @@ function _getAllWellSetsForLabware(
   const allWells: Array<string> = Object.keys(labwareDef.wells)
   return allWells.reduce(
     (acc: WellSetByPrimaryWell, well: string): WellSetByPrimaryWell => {
-      const wellSet = computeWellAccess(labwareDef, well)
+      const wellSet = getWellNamePerMultiTip(labwareDef, well)
       return wellSet === null ? acc : [...acc, wellSet]
     },
     []
@@ -24,7 +24,7 @@ function _getAllWellSetsForLabware(
 let cache: {
   [otId: string]: ?{
     labwareDef: LabwareDefinition2,
-    WellSetByPrimaryWell: WellSetByPrimaryWell,
+    wellSetByPrimaryWell: WellSetByPrimaryWell,
   },
 } = {}
 const _getAllWellSetsForLabwareMemoized = (
@@ -34,11 +34,11 @@ const _getAllWellSetsForLabwareMemoized = (
   // use cached version only if labwareDef is shallowly equal, in case
   // custom labware defs are changed without giving them a new otId
   if (c && c.labwareDef === labwareDef) {
-    return c.WellSetByPrimaryWell
+    return c.wellSetByPrimaryWell
   }
-  const WellSetByPrimaryWell = _getAllWellSetsForLabware(labwareDef)
-  cache[labwareDef.otId] = { labwareDef, WellSetByPrimaryWell }
-  return WellSetByPrimaryWell
+  const wellSetByPrimaryWell = _getAllWellSetsForLabware(labwareDef)
+  cache[labwareDef.otId] = { labwareDef, wellSetByPrimaryWell }
+  return wellSetByPrimaryWell
 }
 
 export function getWellSetForMultichannel(
@@ -48,6 +48,7 @@ export function getWellSetForMultichannel(
   /** Given a well for a labware, returns the well set it belongs to (or null)
    * for 8-channel access.
    * Ie: C2 for 96-flat => ['A2', 'B2', 'C2', ... 'H2']
+   * Or A1 for trough => ['A1', 'A1', 'A1', ...]
    **/
   const allWellSets = _getAllWellSetsForLabwareMemoized(labwareDef)
   return allWellSets.find((wellSet: Array<string>) => wellSet.includes(well))
