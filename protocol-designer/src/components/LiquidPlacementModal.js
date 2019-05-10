@@ -79,20 +79,23 @@ class LiquidPlacementModal extends React.Component<Props, State> {
         <LiquidPlacementForm />
 
         {labwareDef && (
-          <SelectableLabware
-            labwareProps={{
-              showLabels: true,
-              definition: labwareDef,
-              // TODO IMMEDIATELY
-              highlightedWells: this.state.highlightedWells,
-              selectedWells: new Set(Object.keys(selectedWells)), // TODO IMMEDIATELY
-              wellFill,
-            }}
-            selectWells={this.props.selectWells}
-            deselectWells={this.props.deselectWells}
-            updateHighlightedWells={this.updateHighlightedWells}
-            ingredNames={this.props.liquidNamesById}
-          />
+          <div className={styles.labware}>
+            <SelectableLabware
+              labwareProps={{
+                showLabels: true,
+                definition: labwareDef,
+                // TODO IMMEDIATELY
+                highlightedWells: this.state.highlightedWells,
+                selectedWells: new Set(Object.keys(selectedWells)), // TODO IMMEDIATELY
+                wellFill,
+              }}
+              selectWells={this.props.selectWells}
+              deselectWells={this.props.deselectWells}
+              updateHighlightedWells={this.updateHighlightedWells}
+              ingredNames={this.props.liquidNamesById}
+              wellContents={this.props.wellContents}
+            />
+          </div>
         )}
 
         <WellSelectionInstructions />

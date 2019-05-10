@@ -33,7 +33,7 @@ const _getWellContents = (
       well: $PropertyType<LabwareDefinition2, 'wells'>,
       wellName: string
     ): ContentsByWell => {
-      const groupIds =
+      const groupIds: Array<string> =
         __ingredientsForContainer && __ingredientsForContainer[wellName]
           ? Object.keys(__ingredientsForContainer[wellName])
           : []
@@ -45,8 +45,7 @@ const _getWellContents = (
           selected: selectedWells ? wellName in selectedWells : false,
           maxVolume: well.totalLiquidVolume,
           groupIds,
-          ingreds:
-            __ingredientsForContainer && __ingredientsForContainer[wellName],
+          ingreds: __ingredientsForContainer?.[wellName] || {},
         },
       }
     },
@@ -71,7 +70,10 @@ const getWellContentsAllLabware: Selector<WellContentsByLabware> = createSelecto
     const allLabwareIds: Array<string> = Object.keys(labwareEntities)
 
     return allLabwareIds.reduce(
-      (acc: WellContentsByLabware, labwareId: string) => {
+      (
+        acc: WellContentsByLabware,
+        labwareId: string
+      ): WellContentsByLabware => {
         const liquidsForLabware = liquidsByLabware[labwareId]
         const isSelectedLabware = selectedLabwareId === labwareId
 

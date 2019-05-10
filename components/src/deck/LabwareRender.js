@@ -9,7 +9,7 @@ import {
 import styles from './labwareRender.css'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { WellMouseEvent } from './types'
+import type { WellMouseEvent } from './labwareInternals/types'
 
 export type LabwareRenderProps = {|
   definition: LabwareDefinition2,

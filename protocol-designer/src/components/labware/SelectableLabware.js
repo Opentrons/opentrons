@@ -7,10 +7,11 @@ import { SELECTABLE_WELL_CLASS, WELL_LABEL_OFFSET } from '../../constants'
 import { getWellSetForMultichannel } from '../../well-selection/utils'
 import SingleLabware from '../SingleLabware'
 import SelectionRect from '../SelectionRect'
-// import WellTooltip from './WellTooltip' // TODO IMMEDIATELY
+import WellTooltip from './WellTooltip'
 
 import type { Channels, WellMouseEvent } from '@opentrons/components'
-import type { WellSet } from '../../labware-ingred/types'
+import type { ContentsByWell, WellSet } from '../../labware-ingred/types'
+import type { WellIngredientNames } from '../../steplist/types'
 import type { GenericRect } from '../../collision-types'
 
 export type Props = {
@@ -19,6 +20,8 @@ export type Props = {
   deselectWells: WellSet => mixed,
   updateHighlightedWells: WellSet => mixed,
   pipetteChannels?: ?Channels,
+  ingredNames: WellIngredientNames,
+  wellContents: ContentsByWell,
 }
 
 class SelectableLabware extends React.Component<Props> {
@@ -103,8 +106,14 @@ class SelectableLabware extends React.Component<Props> {
   }
 
   render() {
-    const { labwareProps, pipetteChannels, updateHighlightedWells } = this.props
-    const { definition, highlightedWells } = labwareProps
+    const {
+      labwareProps,
+      // pipetteChannels, // TODO IMMEDIATELY ???
+      ingredNames,
+      wellContents,
+      // updateHighlightedWells, // TODO IMMEDIATELY ???
+    } = this.props
+    // const { definition, highlightedWells } = labwareProps // TODO IMMEDIATELY ???
 
     // TODO IMMEDIATELY: should this be done in state???
     // const selectedWellSets =
@@ -148,13 +157,29 @@ class SelectableLabware extends React.Component<Props> {
         onSelectionMove={this.handleSelectionMove}
         onSelectionDone={this.handleSelectionDone}
       >
-        {/* TODO IMMEDIATELY: make WellTooltip somehow less boilerplate-y and use here */}
-        <SingleLabware
-          {...labwareProps}
-          onMouseEnterWell={this.handleMouseEnterWell}
-          onMouseLeaveWell={this.handleMouseLeaveWell}
-          selectableWellClass={SELECTABLE_WELL_CLASS}
-        />
+        <WellTooltip ingredNames={ingredNames}>
+          {({
+            makeHandleMouseEnterWell,
+            handleMouseLeaveWell,
+            tooltipWellName,
+          }) => (
+            <SingleLabware
+              {...labwareProps}
+              onMouseLeaveWell={mouseEventArgs => {
+                this.handleMouseLeaveWell(mouseEventArgs)
+                handleMouseLeaveWell(mouseEventArgs.event)
+              }}
+              selectableWellClass={SELECTABLE_WELL_CLASS}
+              onMouseEnterWell={({ wellName, event }) => {
+                this.handleMouseEnterWell({ wellName, event })
+                makeHandleMouseEnterWell(
+                  wellName,
+                  wellContents[wellName].ingreds
+                )(event)
+              }}
+            />
+          )}
+        </WellTooltip>
       </SelectionRect>
     )
   }
