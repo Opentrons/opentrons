@@ -36,7 +36,7 @@ class SelectableLabware extends React.Component<Props> {
     if (this.props.pipetteChannels === 8) {
       // for the wells that have been highlighted,
       // get all 8-well well sets and merge them
-      const primaryWells: WellSet = Object.keys(selectedWells).reduce(
+      const primaryWells: WellSet = [...selectedWells].reduce(
         (acc: WellSet, wellName: string): WellSet => {
           const wellSet = getWellSetForMultichannel(labwareDef, wellName)
           if (!wellSet) return acc
@@ -44,7 +44,6 @@ class SelectableLabware extends React.Component<Props> {
         },
         new Set()
       )
-
       return primaryWells
     }
 
@@ -108,46 +107,28 @@ class SelectableLabware extends React.Component<Props> {
   render() {
     const {
       labwareProps,
-      // pipetteChannels, // TODO IMMEDIATELY ???
       ingredNames,
       wellContents,
-      // updateHighlightedWells, // TODO IMMEDIATELY ???
+      pipetteChannels,
     } = this.props
-    // const { definition, highlightedWells } = labwareProps // TODO IMMEDIATELY ???
 
-    // TODO IMMEDIATELY: should this be done in state???
-    // const selectedWellSets =
-    //   pipetteChannels === 8
-    //     ? [...selectedWells].reduce((acc, wellName) => {
-    //         const wellSet = getWellSetForMultichannel(definition, wellName)
-    //         if (!wellSet) return acc
-    //         return [...acc, ...wellSet]
-    //       }, [])
-    //     : selectedWells
+    // TODO IMMEDIATELY should this distinction be made upstream?
+    const selectedPrimaryWells = labwareProps.selectedWells || new Set()
 
-    // map(wellContents, (well, wellName) => (
-    //   <Well
-    //     selectable
-    //     key={wellName}
-    //     wellName={wellName}
-    //     onMouseOver={this.makeHandleMouseEnterWell(
-    //       wellName,
-    //       well.ingreds
-    //         ? makeHandleMouseEnterWell(wellName, well.ingreds)
-    //         : () => {}
-    //     )}
-    //     onMouseLeave={this.makeHandleMouseExitWell(
-    //       handleMouseLeaveWell
-    //     )}
-    //     highlighted={Object.keys(highlightedWells).includes(
-    //       wellName
-    //     )}
-    //     selected={selectedWellSets.includes(wellName)}
-    //     fillColor={ingredIdsToColor(well.groupIds)}
-    //     svgOffset={{ x: 1, y: -3 }}
-    //     wellDef={allWellDefsByName[wellName]}
-    //   />
-    // ))
+    // For rendering, show all wells not just primary wells
+    const allSelectedWells =
+      pipetteChannels === 8
+        ? new Set(
+            [...selectedPrimaryWells].reduce((acc, wellName) => {
+              const wellSet = getWellSetForMultichannel(
+                this.props.labwareProps.definition,
+                wellName
+              )
+              if (!wellSet) return acc
+              return [...acc, ...wellSet]
+            }, [])
+          )
+        : selectedPrimaryWells
 
     // FIXME: SelectionRect is somehow off by one in the x axis, hence the magic number
     return (
@@ -165,6 +146,7 @@ class SelectableLabware extends React.Component<Props> {
           }) => (
             <SingleLabware
               {...labwareProps}
+              selectedWells={allSelectedWells}
               onMouseLeaveWell={mouseEventArgs => {
                 this.handleMouseLeaveWell(mouseEventArgs)
                 handleMouseLeaveWell(mouseEventArgs.event)

@@ -1,17 +1,20 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
 import { connect } from 'react-redux'
 
-import { Modal, OutlineButton, LabeledValue } from '@opentrons/components'
+import {
+  Modal,
+  OutlineButton,
+  LabeledValue,
+  ingredIdsToColor,
+} from '@opentrons/components'
 import { sortWells } from '@opentrons/shared-data'
 
 import { changeFormInput } from '../../../../steplist/actions'
-import SingleLabware from '../../../SingleLabware'
 import WellSelectionInstructions from '../../../WellSelectionInstructions'
-// import { SelectableLabware } from '../../../labware' // TODO IMMEDIATELY
+import { SelectableLabware } from '../../../labware'
 
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
 import { selectors } from '../../../../labware-ingred/selectors'
@@ -23,7 +26,11 @@ import type {
   LabwareDefinition2,
   PipetteNameSpecs,
 } from '@opentrons/shared-data'
-import type { Wells, ContentsByWell } from '../../../../labware-ingred/types'
+import type {
+  WellSet,
+  ContentsByWell,
+  WellContents,
+} from '../../../../labware-ingred/types'
 import type { WellIngredientNames } from '../../../../steplist/types'
 import type { StepFieldName } from '../../../../form-types'
 
@@ -40,44 +47,44 @@ type OP = {|
 
 type SP = {|
   pipetteSpec: ?PipetteNameSpecs,
-  initialSelectedWells: Array<string>,
+  initialSelectedWells: WellSet,
   wellContents: ContentsByWell,
   labwareDef: ?LabwareDefinition2,
   ingredNames: WellIngredientNames,
 |}
 
-type DP = {| saveWellSelection: Wells => mixed |}
+type DP = {| saveWellSelection: WellSet => mixed |}
 
 type Props = {| ...OP, ...SP, ...DP |}
-type State = { selectedWells: Wells, highlightedWells: Wells }
+type State = { selectedWells: WellSet, highlightedWells: WellSet }
 
 class WellSelectionModal extends React.Component<Props, State> {
-  state = { selectedWells: {}, highlightedWells: {} }
+  state = { selectedWells: new Set(), highlightedWells: new Set() }
   constructor(props: Props) {
     super(props)
-    const initialSelectedWells = reduce(
-      this.props.initialSelectedWells,
-      (acc, well) => ({ ...acc, [well]: well }),
-      {}
-    )
-    this.state = { selectedWells: initialSelectedWells, highlightedWells: {} }
+    this.state = {
+      selectedWells: props.initialSelectedWells,
+      highlightedWells: new Set(),
+    }
   }
 
-  updateHighlightedWells = (wells: Wells) => {
+  updateHighlightedWells = (wells: WellSet) => {
     this.setState({ highlightedWells: wells })
   }
 
-  selectWells = (wells: Wells) => {
+  selectWells = (wells: WellSet) => {
     this.setState({
-      selectedWells: { ...this.state.selectedWells, ...wells },
-      highlightedWells: {},
+      selectedWells: new Set([...this.state.selectedWells, ...wells]),
+      highlightedWells: new Set(),
     })
   }
 
-  deselectWells = (wells: Wells) => {
+  deselectWells = (wells: WellSet) => {
     this.setState({
-      selectedWells: omit(this.state.selectedWells, Object.keys(wells)),
-      highlightedWells: {},
+      selectedWells: new Set(
+        [...this.state.selectedWells].filter(w => !wells.has(w))
+      ),
+      highlightedWells: new Set(),
     })
   }
 
@@ -89,6 +96,16 @@ class WellSelectionModal extends React.Component<Props, State> {
   render() {
     if (!this.props.isOpen) return null
     const { labwareDef, pipetteSpec } = this.props
+
+    const wellFill = reduce(
+      // TODO IMMEDIATELY
+      this.props.wellContents,
+      (acc, wellContents: WellContents, wellName) => ({
+        ...acc,
+        [wellName]: ingredIdsToColor(wellContents.groupIds),
+      }),
+      {}
+    )
 
     return (
       <Modal
@@ -111,21 +128,21 @@ class WellSelectionModal extends React.Component<Props, State> {
         </div>
 
         {labwareDef && (
-          <SingleLabware
-            showLabels
-            definition={labwareDef}
-            // TODO IMMEDIATELY: no Wells type in state
-            highlightedWells={new Set(Object.keys(this.state.highlightedWells))}
-
-            // selectedWells={this.state.selectedWells}
-            // selectWells={this.selectWells}
-            // deselectWells={this.deselectWells}
-            // updateHighlightedWells={this.updateHighlightedWells}
-            // pipetteChannels={pipetteSpec ? pipetteSpec.channels : null}
-            // ingredNames={this.props.ingredNames}
-
+          <SelectableLabware
+            labwareProps={{
+              showLabels: true,
+              definition: labwareDef,
+              highlightedWells: this.state.highlightedWells,
+              selectedWells: this.state.selectedWells,
+              wellFill,
+            }}
+            selectWells={this.selectWells}
+            deselectWells={this.deselectWells}
+            updateHighlightedWells={this.updateHighlightedWells}
+            pipetteChannels={pipetteSpec ? pipetteSpec.channels : null}
+            ingredNames={this.props.ingredNames}
             // TODO IMMEDIATELY: wellContents to wellFill
-            // wellContents={this.props.wellContents}
+            wellContents={this.props.wellContents}
           />
         )}
 
@@ -159,7 +176,9 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
       : null
 
   return {
-    initialSelectedWells: formData ? formData[ownProps.name] : [],
+    initialSelectedWells: formData
+      ? new Set(formData[ownProps.name])
+      : new Set(),
     pipetteSpec: pipette && pipette.spec,
     wellContents:
       labwareId && allWellContentsForStep
@@ -175,7 +194,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>, ownProps: OP): DP {
     saveWellSelection: wells =>
       dispatch(
         changeFormInput({
-          update: { [ownProps.name]: Object.keys(wells).sort(sortWells) },
+          update: { [ownProps.name]: [...wells].sort(sortWells) },
         })
       ),
   }
