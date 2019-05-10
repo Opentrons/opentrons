@@ -5,7 +5,7 @@ import reduce from 'lodash/reduce'
 import { getCollidingWells } from '../../utils'
 import { SELECTABLE_WELL_CLASS, WELL_LABEL_OFFSET } from '../../constants'
 import { getWellSetForMultichannel } from '../../well-selection/utils'
-import SingleLabware from '../SingleLabware'
+import SingleLabware from './SingleLabware'
 import SelectionRect from '../SelectionRect'
 import WellTooltip from './WellTooltip'
 

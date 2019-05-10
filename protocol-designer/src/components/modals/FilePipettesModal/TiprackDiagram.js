@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import SingleLabware from '../../SingleLabware'
+import SingleLabware from '../../labware/SingleLabware'
 import styles from './FilePipettesModal.css'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 

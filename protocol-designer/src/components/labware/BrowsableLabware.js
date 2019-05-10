@@ -4,7 +4,7 @@ import * as React from 'react'
 import reduce from 'lodash/reduce'
 
 import { ingredIdsToColor } from '@opentrons/components'
-import SingleLabware from '../SingleLabware' // TODO IMMEDIATELY move into labware/???
+import SingleLabware from './SingleLabware'
 import type { ContentsByWell, WellContents } from '../../labware-ingred/types'
 import type { WellIngredientNames } from '../../steplist/types'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'

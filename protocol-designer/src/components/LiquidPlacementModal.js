@@ -136,7 +136,7 @@ const mapStateToProps = (state: BaseState): SP => {
   }
 }
 
-// TODO IMMEDIATELY
+// TODO IMMEDIATELY remove this, it's just back-compat for Wells {A1: 'A1'} type
 const wellSetToDeprecatedWells = (wellSet: WellSet): Wells =>
   [...wellSet].reduce((acc, wellName) => ({ ...acc, [wellName]: wellName }), {})
 
