@@ -12,10 +12,10 @@ export type StyledWellProps = {|
 
 function StyledWell(props: StyledWellProps) {
   const { className, definition, wells } = props
-  return Object.keys(wells).map<*, *, React.Node>((wellName, key) => {
+  return Object.keys(wells).map<*, *, React.Node>((wellName: string) => {
     return (
       <Well
-        key={key}
+        key={wellName}
         wellName={wellName}
         well={definition.wells[wellName]}
         className={className}
