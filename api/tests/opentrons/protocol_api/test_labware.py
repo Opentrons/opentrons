@@ -20,8 +20,8 @@ test_data = {
         'shape': 'rectangular',
         'depth': 20,
         'totalLiquidVolume': 200,
-        'length': 120,
-        'width': 50,
+        'xDimension': 120,
+        'yDimension': 50,
         'x': 45,
         'y': 10,
         'z': 22
@@ -41,8 +41,8 @@ def test_well_init():
     well2_name = 'rectangular_well_json'
     well2 = labware.Well(test_data[well2_name], slot, well2_name, has_tip)
     assert well2._diameter is None
-    assert well2._length == test_data[well2_name]['length']
-    assert well2._width == test_data[well2_name]['width']
+    assert well2._length == test_data[well2_name]['xDimension']
+    assert well2._width == test_data[well2_name]['yDimension']
 
 
 def test_top():
@@ -320,7 +320,7 @@ def test_module_load_labware():
         assert mod.labware == lw
         assert mod.highest_z ==\
             (mod.location.point.z
-             + labware_def['dimensions']['overallHeight']
+             + labware_def['dimensions']['zDimension']
              + mod._over_labware)
         with pytest.raises(AssertionError):
             mod.add_labware(lw)

@@ -207,8 +207,8 @@ function calculateCoordinates(
 
 export function _calculateCornerOffset(dimensions: Dimensions): Offset {
   return {
-    x: round(SLOT_LENGTH_MM - dimensions.overallLength, 2),
-    y: round(SLOT_WIDTH_MM - dimensions.overallWidth, 2),
+    x: round(SLOT_LENGTH_MM - dimensions.xDimension, 2),
+    y: round(SLOT_WIDTH_MM - dimensions.yDimension, 2),
     z: 0,
   }
 }

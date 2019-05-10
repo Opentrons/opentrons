@@ -37,13 +37,6 @@ settings = [
         description='Trash box is 55mm tall (rather than the 77mm default)'
     ),
     Setting(
-        _id='splitLabwareDefinitions',
-        old_id='split-labware-def',
-        title='New JSON labware definitions',
-        description='JSON labware definitions with a separate def file and'
-                    ' offset file for each labware'
-    ),
-    Setting(
         _id='calibrateToBottom',
         old_id='calibrate-to-bottom',
         title='Calibrate to bottom',
@@ -103,7 +96,7 @@ def get_all_adv_settings() -> Dict[str, Dict[str, Union[str, bool, None]]]:
     return {
         key: {**settings_by_id[key].__dict__,
               'value': value}
-        for key, value in values.items()
+        for key, value in values.items() if key in settings_by_id
     }
 
 

@@ -18,9 +18,9 @@
     "tags": ["SBS", "microplate", "3.4", "mL", "24 wells"]
   },
   "dimensions": {
-    "overallLength": 127.76,
-    "overallWidth": 85.47,
-    "overallHeight": 20.27
+    "xDimension": 127.76,
+    "yDimension": 85.47,
+    "zDimension": 20.27
   },
   "otId": "4373e820-54c9-11e9-9364-556fc2c8a783",
   "deprecated": false,

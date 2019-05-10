@@ -1,4 +1,4 @@
-Note that `LabwareRender` is in robot coordinates, we transform it to view it using `SlotView`.
+Note that `LabwareRender` is in robot coordinates, we transform it to view it using `RobotWorkSpace`.
 
 **Normal Labware**
 
@@ -11,14 +11,20 @@ const fixtureTipRack300Ul = require('@opentrons/shared-data/fixtures/fixtureTipR
 // Change this to view different labware fixtures
 let definition = fixture96Plate
 
-;<SlotView>
-  <LabwareRender
-    showLabels
-    definition={definition}
-    highlightedWells={new Set(['A1', 'B2'])}
-    wellFill={{ A1: 'maroon', C3: 'lavender' }}
-  />
-</SlotView>
+;<RobotWorkSpace
+  viewBox={`0 0  ${definition.dimensions.xDimension} ${
+    definition.dimensions.yDimension
+  }`}
+>
+  {() => (
+    <LabwareRender
+      showLabels
+      definition={definition}
+      highlightedWells={new Set(['A1', 'B2'])}
+      wellFill={{ A1: 'maroon', C3: 'lavender' }}
+    />
+  )}
+</RobotWorkSpace>
 ```
 
 **Tiprack**
@@ -28,11 +34,17 @@ const fixtureTipRack300Ul = require('@opentrons/shared-data/fixtures/fixtureTipR
 
 let definition = fixtureTipRack300Ul
 
-;<SlotView>
-  <LabwareRender
-    definition={definition}
-    highlightedWells={new Set(['A1', 'B2'])}
-    missingTips={new Set(['C3', 'D4'])}
-  />
-</SlotView>
+;<RobotWorkSpace
+  viewBox={`0 0  ${definition.dimensions.xDimension} ${
+    definition.dimensions.yDimension
+  }`}
+>
+  {() => (
+    <LabwareRender
+      definition={definition}
+      highlightedWells={new Set(['A1', 'B2'])}
+      missingTips={new Set(['C3', 'D4'])}
+    />
+  )}
+</RobotWorkSpace>
 ```

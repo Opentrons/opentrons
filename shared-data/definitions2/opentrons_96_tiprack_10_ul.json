@@ -24,9 +24,9 @@
     "tags": ["Opentrons", "tiprack", "10uL"]
   },
   "dimensions": {
-    "overallLength": 127.76,
-    "overallWidth": 85.48,
-    "overallHeight": 64.89
+    "xDimension": 127.76,
+    "yDimension": 85.48,
+    "zDimension": 64.89
   },
   "otId": "55127330-6ab8-11e9-8a70-35657d4f3dc7",
   "deprecated": false,

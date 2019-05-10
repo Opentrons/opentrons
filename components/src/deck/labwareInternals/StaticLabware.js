@@ -47,9 +47,8 @@ function StaticLabware(props: StaticLabwareProps) {
           (row: Array<string>, i: number, c: Array<Array<string>>) => {
             return row.map(wellName => {
               return (
-                <>
+                <React.Fragment key={wellName}>
                   <Well
-                    key={`well:${wellName}`}
                     className={isTiprack ? styles.tip : null}
                     wellName={wellName}
                     well={props.definition.wells[wellName]}
@@ -62,7 +61,7 @@ function StaticLabware(props: StaticLabwareProps) {
                   {isTiprack && (
                     <TipDecoration well={props.definition.wells[wellName]} />
                   )}
-                </>
+                </React.Fragment>
               )
             })
           }

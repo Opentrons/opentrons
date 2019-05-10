@@ -1,4 +1,7 @@
 .robot_work_space {
+  width: 100%;
+  height: 100%;
+
   /* reflect horizontally about the center of the DOM elem */
   transform: scale(1, -1);
 }

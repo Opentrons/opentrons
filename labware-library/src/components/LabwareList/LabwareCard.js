@@ -98,14 +98,14 @@ function Title(props: LabwareCardProps) {
 function Dimensions(props: LabwareCardProps) {
   const { definition } = props
   const { displayCategory } = definition.metadata
-  const { overallLength, overallWidth, overallHeight } = definition.dimensions
+  const { xDimension, yDimension, zDimension } = definition.dimensions
   const dimsLabel =
     LABWARE_DIMS_BY_CATEGORY[displayCategory] || LABWARE_DIMS_BY_CATEGORY.other
 
   const dimensions = [
-    { label: SHORT_X_DIM, value: toFixed(overallLength) },
-    { label: SHORT_Y_DIM, value: toFixed(overallWidth) },
-    { label: SHORT_Z_DIM, value: toFixed(overallHeight) },
+    { label: SHORT_X_DIM, value: toFixed(xDimension) },
+    { label: SHORT_Y_DIM, value: toFixed(yDimension) },
+    { label: SHORT_Z_DIM, value: toFixed(zDimension) },
   ]
 
   return (
@@ -152,8 +152,12 @@ function WellProperties(props: LabwareCardProps) {
           w.diameter != null
             ? { label: DIAMETER, value: toFixed(w.diameter) }
             : null,
-          w.length != null ? { label: X_DIM, value: toFixed(w.length) } : null,
-          w.width != null ? { label: Y_DIM, value: toFixed(w.width) } : null,
+          w.xDimension != null
+            ? { label: X_DIM, value: toFixed(w.xDimension) }
+            : null,
+          w.yDimension != null
+            ? { label: Y_DIM, value: toFixed(w.yDimension) }
+            : null,
         ].filter(Boolean)
 
         return (
