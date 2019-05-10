@@ -197,7 +197,7 @@ async def set_syslog_level(request: web.Request) -> web.Response:
     if code != 0:
         msg = f'Could not reload config: {stdout} {stderr}'
         LOG.error(msg)
-        return web.json_response(status=500, message={'message': msg})
+        return web.json_response(status=500, data={'message': msg})
     else:
 
         if log_level:
