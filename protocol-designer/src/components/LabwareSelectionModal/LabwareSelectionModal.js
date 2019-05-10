@@ -21,6 +21,8 @@ type Props = {
   permittedTipracks: Array<string>,
 }
 
+// TODO: BC 2019-05-10 ideally this should be pulled from the definitions
+// and it's usage should be memoized by the useMemo below
 const orderedCategories: Array<string> = [
   'tipRack',
   'tubeRack',
@@ -31,9 +33,6 @@ const orderedCategories: Array<string> = [
 
 const LabwareDropdown = (props: Props) => {
   const { permittedTipracks, onClose, slot, selectLabware } = props
-
-  // do not render without a slot
-  if (!slot) return null
 
   const [selectedCategory, selectCategory] = useState(null)
   const [previewedLabware, previewLabware] = useState(null)
@@ -59,6 +58,9 @@ const LabwareDropdown = (props: Props) => {
       {}
     )
   }, [permittedTipracks])
+
+  // do not render without a slot
+  if (!slot) return null
 
   const makeToggleCategory = (category: string) => () => {
     selectCategory(selectedCategory === category ? null : category)
