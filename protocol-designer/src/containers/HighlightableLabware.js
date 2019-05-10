@@ -15,7 +15,7 @@ import * as wellContentsSelectors from '../top-selectors/well-contents'
 import * as tipContentsSelectors from '../top-selectors/tip-contents'
 import wellSelectionSelectors from '../well-selection/selectors'
 
-import type { AllWellHighlights } from '../top-selectors/substep-highlight'
+import type { WellGroup } from '@opentrons/components'
 import type { WellContents, ContentsByWell } from '../labware-ingred/types'
 import type { BaseState } from '../types'
 
@@ -73,11 +73,9 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
       : null
 
     // shows liquids the current step in timeline
-    const selectedWells = wellSelectionSelectors
-      .getSelectedWells(state)
-      .reduce((acc, w) => ({ ...acc, [w]: w }), {})
+    const selectedWells = wellSelectionSelectors.getSelectedWells(state)
     let wellContentsWithoutHighlight = null
-    let highlightedWells: ?AllWellHighlights = null
+    let highlightedWells: ?WellGroup = null
 
     if (timelineIdx != null) {
       wellContentsWithoutHighlight = allWellContentsForSteps[timelineIdx]
@@ -89,9 +87,7 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
 
     if (wellSelectionModeForLabware) {
       // we're in the well selection modal, highlight hovered/selected wells
-      highlightedWells = wellSelectionSelectors
-        .getHighlightedWells(state)
-        .reduce((acc, well) => ({ [well]: true }), {})
+      highlightedWells = wellSelectionSelectors.getHighlightedWells(state)
     } else {
       // wells are highlighted for steps / substep hover
 

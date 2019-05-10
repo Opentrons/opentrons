@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import assert from 'assert'
+import isEmpty from 'lodash/isEmpty'
 import {
   removeWellsContents,
   setWellContents,
@@ -39,7 +40,7 @@ function mapStateToProps(state: BaseState): SP {
   const _selectionHasLiquids = Boolean(
     _labwareId &&
       liquidLocations[_labwareId] &&
-      selectedWells.some(well => liquidLocations[_labwareId][well])
+      Object.keys(selectedWells).some(well => liquidLocations[_labwareId][well])
   )
 
   return {
@@ -52,13 +53,13 @@ function mapStateToProps(state: BaseState): SP {
     liquidSelectionOptions: labwareIngredSelectors.getLiquidSelectionOptions(
       state
     ),
-    showForm: selectedWells.length > 0,
+    showForm: !isEmpty(selectedWells),
     selectedWellsMaxVolume: wellContentsSelectors.getSelectedWellsMaxVolume(
       state
     ),
 
     _labwareId,
-    _selectedWells: selectedWells,
+    _selectedWells: Object.keys(selectedWells),
     _selectionHasLiquids,
   }
 }

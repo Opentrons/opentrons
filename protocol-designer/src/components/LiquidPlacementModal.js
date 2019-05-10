@@ -21,36 +21,36 @@ import { selectWells, deselectWells } from '../well-selection/actions'
 import styles from './LiquidPlacementModal.css'
 
 import type { Dispatch } from 'redux'
-import type { WellArray } from '@opentrons/components'
+import type { WellGroup } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { BaseState } from '../types'
-import type { Wells, ContentsByWell } from '../labware-ingred/types'
+import type { ContentsByWell } from '../labware-ingred/types'
 import type { WellIngredientNames } from '../steplist'
 
 type SP = {|
-  selectedWells: WellArray,
+  selectedWells: WellGroup,
   wellContents: ContentsByWell,
   labwareDef: ?LabwareDefinition2,
   liquidNamesById: WellIngredientNames,
 |}
 
 type DP = {|
-  selectWells: WellArray => mixed,
-  deselectWells: WellArray => mixed,
+  selectWells: WellGroup => mixed,
+  deselectWells: WellGroup => mixed,
 |}
 
 type Props = { ...SP, ...DP }
 
-type State = { highlightedWells: WellArray }
+type State = { highlightedWells: WellGroup }
 
 class LiquidPlacementModal extends React.Component<Props, State> {
-  state = { highlightedWells: [] }
+  state = { highlightedWells: {} }
   constructor(props: Props) {
     super(props)
-    this.state = { highlightedWells: [] }
+    this.state = { highlightedWells: {} }
   }
 
-  updateHighlightedWells = (wells: WellArray) => {
+  updateHighlightedWells = (wells: WellGroup) => {
     this.setState({ highlightedWells: wells })
   }
 
@@ -99,7 +99,7 @@ const mapStateToProps = (state: BaseState): SP => {
       'LiquidPlacementModal: No labware is selected, and no labwareId was given to LiquidPlacementModal'
     )
     return {
-      selectedWells: [],
+      selectedWells: {},
       wellContents: {},
       labwareDef: null,
       liquidNamesById: {},
@@ -122,14 +122,9 @@ const mapStateToProps = (state: BaseState): SP => {
   }
 }
 
-// TODO: Ian 2019-05-10 remove this, it's just back-compat for Wells {A1: 'A1'} type
-const wellSetToDeprecatedWells = (wells: WellArray): Wells =>
-  wells.reduce((acc, wellName) => ({ ...acc, [wellName]: wellName }), {})
-
 const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
-  deselectWells: wells =>
-    dispatch(deselectWells(wellSetToDeprecatedWells(wells))),
-  selectWells: wells => dispatch(selectWells(wellSetToDeprecatedWells(wells))),
+  deselectWells: wells => dispatch(deselectWells(wells)),
+  selectWells: wells => dispatch(selectWells(wells)),
 })
 
 export default connect<Props, {||}, _, _, _, _>(

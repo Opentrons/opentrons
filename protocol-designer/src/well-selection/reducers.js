@@ -4,19 +4,21 @@ import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 
 import type { Action } from '../types'
-import type { Wells } from '../labware-ingred/types'
+import type { WellGroup } from '@opentrons/components'
 
-// TODO: Ian 2019-05-10 remove Wells type, use WellArray.
 type WellSelectionAction = {
-  payload: Wells, // NOTE: primary wells.
+  payload: WellGroup, // NOTE: primary wells.
 }
 
 type SelectedWellsState = {
-  highlighted: Wells,
-  selected: Wells,
+  highlighted: WellGroup,
+  selected: WellGroup,
 }
 
-function deleteWells(initialWells: Wells, wellsToRemove: Wells): Wells {
+function deleteWells(
+  initialWells: WellGroup,
+  wellsToRemove: WellGroup
+): WellGroup {
   // remove given wells from a set of wells
   return omit(initialWells, Object.keys(wellsToRemove))
 }

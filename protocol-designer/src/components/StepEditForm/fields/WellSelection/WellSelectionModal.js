@@ -2,10 +2,11 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { connect } from 'react-redux'
-
+import omit from 'lodash/omit'
 import { Modal, OutlineButton, LabeledValue } from '@opentrons/components'
 import { sortWells } from '@opentrons/shared-data'
 
+import { arrayToWellGroup } from '../../../../utils'
 import { changeFormInput } from '../../../../steplist/actions'
 import WellSelectionInstructions from '../../../WellSelectionInstructions'
 import { SelectableLabware, wellFillFromWellContents } from '../../../labware'
@@ -16,7 +17,7 @@ import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { selectors as stepsSelectors } from '../../../../ui/steps'
 
 import type { BaseState, ThunkDispatch } from '../../../../types'
-import type { WellArray } from '@opentrons/components'
+import type { WellGroup } from '@opentrons/components'
 import type {
   LabwareDefinition2,
   PipetteNameSpecs,
@@ -38,42 +39,45 @@ type OP = {|
 
 type SP = {|
   pipetteSpec: ?PipetteNameSpecs,
-  initialSelectedWells: WellArray,
+  initialSelectedPrimaryWells: WellGroup,
   wellContents: ContentsByWell,
   labwareDef: ?LabwareDefinition2,
   ingredNames: WellIngredientNames,
 |}
 
-type DP = {| saveWellSelection: WellArray => mixed |}
+type DP = {| saveWellSelection: WellGroup => mixed |}
 
 type Props = {| ...OP, ...SP, ...DP |}
-type State = { selectedWells: WellArray, highlightedWells: WellArray }
+type State = { selectedWells: WellGroup, highlightedWells: WellGroup }
 
 class WellSelectionModal extends React.Component<Props, State> {
-  state = { selectedWells: [], highlightedWells: [] }
+  state = { selectedWells: {}, highlightedWells: {} }
   constructor(props: Props) {
     super(props)
     this.state = {
-      selectedWells: props.initialSelectedWells,
-      highlightedWells: [],
+      selectedWells: props.initialSelectedPrimaryWells,
+      highlightedWells: {},
     }
   }
 
-  updateHighlightedWells = (wells: WellArray) => {
+  updateHighlightedWells = (wells: WellGroup) => {
     this.setState({ highlightedWells: wells })
   }
 
-  selectWells = (wells: WellArray) => {
+  selectWells = (wells: WellGroup) => {
     this.setState({
-      selectedWells: [...this.state.selectedWells, ...wells],
-      highlightedWells: [],
+      selectedWells: { ...this.state.selectedWells, ...wells },
+      highlightedWells: {},
     })
   }
 
-  deselectWells = (wells: WellArray) => {
+  deselectWells = (deselectedWells: WellGroup) => {
     this.setState({
-      selectedWells: this.state.selectedWells.filter(w => !wells.includes(w)),
-      highlightedWells: [],
+      selectedWells: omit(
+        this.state.selectedWells,
+        Object.keys(deselectedWells)
+      ),
+      highlightedWells: {},
     })
   }
 
@@ -154,7 +158,9 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
       : null
 
   return {
-    initialSelectedWells: formData ? formData[ownProps.name] : [],
+    initialSelectedPrimaryWells: formData
+      ? arrayToWellGroup(formData[ownProps.name])
+      : {},
     pipetteSpec: pipette && pipette.spec,
     wellContents:
       labwareId && allWellContentsForStep
@@ -170,7 +176,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>, ownProps: OP): DP {
     saveWellSelection: wells =>
       dispatch(
         changeFormInput({
-          update: { [ownProps.name]: wells.sort(sortWells) },
+          update: { [ownProps.name]: Object.keys(wells).sort(sortWells) },
         })
       ),
   }

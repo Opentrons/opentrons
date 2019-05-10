@@ -7,6 +7,7 @@ import SingleLabware from './SingleLabware'
 import { wellFillFromWellContents } from './utils'
 import type { ContentsByWell } from '../../labware-ingred/types'
 import type { WellIngredientNames } from '../../steplist/types'
+import type { WellGroup } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 import WellTooltip from './WellTooltip'
@@ -37,9 +38,9 @@ export default function BrowsableLabware(props: Props) {
           wellFill={wellFillFromWellContents(wellContents)}
           highlightedWells={reduce(
             wellContents,
-            (acc, wellContents, wellName): Array<string> =>
-              tooltipWellName === wellName ? [...acc, wellName] : acc,
-            []
+            (acc, _, wellName): WellGroup =>
+              tooltipWellName === wellName ? { ...acc, [wellName]: null } : acc,
+            {}
           )}
           onMouseEnterWell={({ event, wellName }) =>
             makeHandleMouseEnterWell(wellName, wellContents[wellName].ingreds)(

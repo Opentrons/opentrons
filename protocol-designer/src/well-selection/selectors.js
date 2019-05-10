@@ -1,19 +1,19 @@
 // @flow
 import { createSelector } from 'reselect'
 import { sortWells } from '@opentrons/shared-data'
-import type { WellArray } from '@opentrons/components'
+import type { WellGroup } from '@opentrons/components'
 import type { BaseState, Selector } from '../types'
 
 const rootSelector = (state: BaseState) => state.wellSelection
 
-const getSelectedWells: Selector<WellArray> = createSelector(
+const getSelectedWells: Selector<WellGroup> = createSelector(
   rootSelector,
-  state => Object.keys(state.selectedWells.selected)
+  state => state.selectedWells.selected
 )
 
-const getHighlightedWells: Selector<WellArray> = createSelector(
+const getHighlightedWells: Selector<WellGroup> = createSelector(
   rootSelector,
-  state => Object.keys(state.selectedWells.highlighted)
+  state => state.selectedWells.highlighted
 )
 
 const getSelectedWellNames: Selector<Array<string>> = createSelector(

@@ -25,7 +25,7 @@ export type WellProps = {|
 
 function Well(props: WellProps) {
   const { well, wellName, fill, onMouseEnterWell, onMouseLeaveWell } = props
-  assert(well, `expected well prop for well "${wellName}"`)
+  assert(well, `expected 'well' prop for well "${wellName}"`)
   if (!well) return null
   const { x, y } = well
 

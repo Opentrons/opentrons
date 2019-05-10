@@ -12,15 +12,15 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   WellMouseEvent,
   WellFill,
-  WellArray,
+  WellGroup,
 } from './labwareInternals/types'
 
 export type LabwareRenderProps = {|
   definition: LabwareDefinition2,
   showLabels?: boolean,
-  missingTips?: WellArray,
-  highlightedWells?: WellArray,
-  selectedWells?: WellArray,
+  missingTips?: WellGroup,
+  highlightedWells?: WellGroup,
+  selectedWells?: WellGroup,
   /** CSS color to fill specified wells */
   wellFill?: WellFill,
   /** Optional callback, called with WellMouseEvent args onMouseEnter */
@@ -33,6 +33,7 @@ export type LabwareRenderProps = {|
 |}
 
 export default function LabwareRender(props: LabwareRenderProps) {
+  console.log({ props })
   const cornerOffsetFromSlot = props.definition.cornerOffsetFromSlot
   return (
     <g

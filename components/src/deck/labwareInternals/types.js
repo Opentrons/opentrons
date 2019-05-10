@@ -7,5 +7,5 @@ export type WellMouseEvent = {|
 // wellName to CSS color, eg {'A1': '#123456'}
 export type WellFill = { [wellName: string]: string }
 
-// an array of well names. No concept of primary vs non-primary. Order should not matter. Should be unique.
-export type WellArray = Array<string>
+// Use this like a Set!
+export type WellGroup = { [wellName: string]: null }
