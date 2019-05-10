@@ -40,8 +40,8 @@ const LabwarePreview = (props: Props) => {
         <div className={styles.labware_detail_row}>
           <div className={styles.labware_render_wrapper}>
             <RobotWorkSpace
-              viewBox={`0 0 ${labwareDef.dimensions.overallLength} ${
-                labwareDef.dimensions.overallWidth
+              viewBox={`0 0 ${labwareDef.dimensions.xDimension} ${
+                labwareDef.dimensions.yDimension
               }`}
             >
               {() => <LabwareRender definition={labwareDef} />}
