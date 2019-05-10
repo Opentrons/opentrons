@@ -11,6 +11,9 @@ type Props = {|
 |}
 
 export default function NavLink(props: Props) {
+  const {
+    gtm: { category, label, action },
+  } = props
   return (
     <div className={cx(styles.link_group, props.className)}>
       <a
@@ -18,6 +21,9 @@ export default function NavLink(props: Props) {
         className={cx(styles.link_title, { [styles.link_cta]: props.cta })}
         target="_blank"
         rel="noopener noreferrer"
+        data-gtm-category={category}
+        data-gtm-label={label}
+        data-gtm-action={action}
       >
         {props.name}
       </a>

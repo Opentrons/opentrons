@@ -6,20 +6,45 @@ import { getPublicPath } from '../../public-path'
 import styles from './styles.css'
 
 export const SUBDOMAIN_NAV_LINKS = [
-  { name: 'Python API', url: 'https://docs.opentrons.com/' },
-  { name: 'Labware Library', to: getPublicPath() },
-  { name: 'Protocol Library', url: 'https://protocols.opentrons.com/' },
-  { name: 'Protocol Designer', url: 'https://designer.opentrons.com/' },
+  {
+    name: 'Python API',
+    url: 'https://docs.opentrons.com/',
+    gtm: { action: 'click', category: 'l-toolbar', label: 'opentrons-api' },
+  },
+  {
+    name: 'Labware Library',
+    to: getPublicPath(),
+    gtm: { action: 'click', category: 'l-toolbar', label: 'labware-library' },
+  },
+  {
+    name: 'Protocol Library',
+    url: 'https://protocols.opentrons.com/',
+    gtm: { action: 'click', category: 'l-toolbar', label: 'protocol-library' },
+  },
+  {
+    name: 'Protocol Designer',
+    url: 'https://designer.opentrons.com/',
+    gtm: { action: 'click', category: 'l-toolbar', label: 'protocol-designer' },
+  },
 ]
 
 export function SubdomainNav() {
   return (
     <ul className={styles.subdomain_nav_contents}>
       {SUBDOMAIN_NAV_LINKS.map((link, index) => {
+        const {
+          gtm: { category, label, action },
+        } = link
         if (link.to) {
           return (
             <li key={index}>
-              <Link to={link.to} className={styles.subdomain_link}>
+              <Link
+                to={link.to}
+                className={styles.subdomain_link}
+                data-gtm-category={category}
+                data-gtm-label={label}
+                data-gtm-action={action}
+              >
                 {link.name}
               </Link>
             </li>
@@ -32,6 +57,9 @@ export function SubdomainNav() {
               className={styles.subdomain_link}
               target="_blank"
               rel="noopener noreferrer"
+              data-gtm-category={category}
+              data-gtm-label={label}
+              data-gtm-action={action}
             >
               {link.name}
             </a>

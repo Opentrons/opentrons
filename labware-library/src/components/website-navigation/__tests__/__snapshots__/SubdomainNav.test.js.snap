@@ -9,6 +9,9 @@ exports[`SecondaryNav component renders 1`] = `
   >
     <a
       className="subdomain_link"
+      data-gtm-action="click"
+      data-gtm-category="l-toolbar"
+      data-gtm-label="opentrons-api"
       href="https://docs.opentrons.com/"
       rel="noopener noreferrer"
       target="_blank"
@@ -21,6 +24,9 @@ exports[`SecondaryNav component renders 1`] = `
   >
     <Link
       className="subdomain_link"
+      data-gtm-action="click"
+      data-gtm-category="l-toolbar"
+      data-gtm-label="labware-library"
       to="/"
     >
       Labware Library
@@ -31,6 +37,9 @@ exports[`SecondaryNav component renders 1`] = `
   >
     <a
       className="subdomain_link"
+      data-gtm-action="click"
+      data-gtm-category="l-toolbar"
+      data-gtm-label="protocol-library"
       href="https://protocols.opentrons.com/"
       rel="noopener noreferrer"
       target="_blank"
@@ -43,6 +52,9 @@ exports[`SecondaryNav component renders 1`] = `
   >
     <a
       className="subdomain_link"
+      data-gtm-action="click"
+      data-gtm-category="l-toolbar"
+      data-gtm-label="protocol-designer"
       href="https://designer.opentrons.com/"
       rel="noopener noreferrer"
       target="_blank"
