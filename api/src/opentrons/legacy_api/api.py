@@ -293,8 +293,9 @@ class InstrumentsWrapper(object):
 
         if attached_model and expected_model_substring in attached_model:
             return attached_model
-        elif attached_model and expected_model_substring.split('p')[1]\
-                in attached_model.split('+'):
+        elif attached_model and '+' in attached_model and\
+                expected_model_substring.split('p')[1] in\
+                attached_model.split('+')[1]:
             # Allow for backwards compatibility in old pipette constructors
             return attached_model
         else:
