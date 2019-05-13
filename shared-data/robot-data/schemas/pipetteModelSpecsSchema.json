@@ -74,7 +74,6 @@
             "dropTipCurrent",
             "dropTipSpeed",
             "ulPerMm",
-            "quirks",
             "tipLength"
           ],
           "additionalProperties": false,
@@ -102,7 +101,13 @@
             },
             "quirks": {
               "type": "array",
-              "items": { "type": "string" }
+              "items":
+                {
+                     "type": "string",
+                     "enum": [
+                         "needs-pickup-shake", "needs-droptip-shake", "double-droptip"
+                     ]
+                }
             },
             "tipLength": {
               "type": "object",
@@ -116,6 +121,11 @@
       "type": "array",
       "description": "Array of mutable configs for a given pipette",
       "items": { "type": "string" }
-    }
+  },
+  "validQuirks": {
+      "type": "array",
+      "description": "Array of valid quirks for a given pipette",
+      "items": { "type": "string"}
+  }
   }
 }

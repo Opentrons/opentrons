@@ -99,7 +99,6 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -285,7 +284,6 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -471,7 +469,6 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -657,7 +654,6 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -812,7 +808,6 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -1003,7 +998,6 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -1194,7 +1188,6 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -1385,7 +1378,6 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -1540,7 +1532,6 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -1716,7 +1707,6 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -1892,7 +1882,6 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -2068,7 +2057,6 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -2223,7 +2211,6 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -2399,7 +2386,6 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -2575,7 +2561,6 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -2751,7 +2736,6 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -2891,7 +2875,6 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -3031,7 +3014,6 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -3171,7 +3153,6 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -3311,7 +3292,6 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -3507,7 +3487,6 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -3703,7 +3682,6 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -3899,7 +3877,6 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
   "tipLength": Object {
     "max": 100,
     "min": 0,

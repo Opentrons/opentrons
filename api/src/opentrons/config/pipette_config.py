@@ -83,7 +83,8 @@ def name_config() -> Dict[str, Any]:
 config_models = list(model_config()['config'].keys())
 configs = model_config()['config']
 #: A list of pipette model names for which we have config entries
-mutable_configs = model_config()['mutableConfigs']
+MUTABLE_CONFIGS = model_config()['mutableConfigs']
+VALID_QUIRKS = model_config()['validQuirks']
 #: A list of mutable configs for pipettes
 
 
@@ -149,34 +150,34 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
 
     res = pipette_config(
         top=ensure_value(
-            cfg, 'top', mutable_configs),
+            cfg, 'top', MUTABLE_CONFIGS),
         bottom=ensure_value(
-            cfg, 'bottom', mutable_configs),
+            cfg, 'bottom', MUTABLE_CONFIGS),
         blow_out=ensure_value(
-            cfg, 'blowout', mutable_configs),
+            cfg, 'blowout', MUTABLE_CONFIGS),
         drop_tip=ensure_value(
-            cfg, 'dropTip', mutable_configs),
-        pick_up_current=ensure_value(cfg, 'pickUpCurrent', mutable_configs),
-        pick_up_distance=ensure_value(cfg, 'pickUpDistance', mutable_configs),
+            cfg, 'dropTip', MUTABLE_CONFIGS),
+        pick_up_current=ensure_value(cfg, 'pickUpCurrent', MUTABLE_CONFIGS),
+        pick_up_distance=ensure_value(cfg, 'pickUpDistance', MUTABLE_CONFIGS),
         pick_up_increment=ensure_value(
-            cfg, 'pickUpIncrement', mutable_configs),
-        pick_up_presses=ensure_value(cfg, 'pickUpPresses', mutable_configs),
-        pick_up_speed=ensure_value(cfg, 'pickUpSpeed', mutable_configs),
+            cfg, 'pickUpIncrement', MUTABLE_CONFIGS),
+        pick_up_presses=ensure_value(cfg, 'pickUpPresses', MUTABLE_CONFIGS),
+        pick_up_speed=ensure_value(cfg, 'pickUpSpeed', MUTABLE_CONFIGS),
         aspirate_flow_rate=ensure_value(
-            cfg, 'defaultAspirateFlowRate', mutable_configs),
+            cfg, 'defaultAspirateFlowRate', MUTABLE_CONFIGS),
         dispense_flow_rate=ensure_value(
-            cfg, 'defaultDispenseFlowRate', mutable_configs),
-        channels=ensure_value(cfg, 'channels', mutable_configs),
-        model_offset=ensure_value(cfg, 'modelOffset', mutable_configs),
-        plunger_current=ensure_value(cfg, 'plungerCurrent', mutable_configs),
-        drop_tip_current=ensure_value(cfg, 'dropTipCurrent', mutable_configs),
-        drop_tip_speed=ensure_value(cfg, 'dropTipSpeed', mutable_configs),
-        min_volume=ensure_value(cfg, 'minVolume', mutable_configs),
-        max_volume=ensure_value(cfg, 'maxVolume', mutable_configs),
+            cfg, 'defaultDispenseFlowRate', MUTABLE_CONFIGS),
+        channels=ensure_value(cfg, 'channels', MUTABLE_CONFIGS),
+        model_offset=ensure_value(cfg, 'modelOffset', MUTABLE_CONFIGS),
+        plunger_current=ensure_value(cfg, 'plungerCurrent', MUTABLE_CONFIGS),
+        drop_tip_current=ensure_value(cfg, 'dropTipCurrent', MUTABLE_CONFIGS),
+        drop_tip_speed=ensure_value(cfg, 'dropTipSpeed', MUTABLE_CONFIGS),
+        min_volume=ensure_value(cfg, 'minVolume', MUTABLE_CONFIGS),
+        max_volume=ensure_value(cfg, 'maxVolume', MUTABLE_CONFIGS),
         ul_per_mm=ul_per_mm,
-        quirks=ensure_value(cfg, 'quirks', mutable_configs),
-        tip_length=ensure_value(cfg, 'tipLength', mutable_configs),
-        display_name=ensure_value(cfg, 'displayName', mutable_configs)
+        quirks=ensure_value(cfg, 'quirks', MUTABLE_CONFIGS),
+        tip_length=ensure_value(cfg, 'tipLength', MUTABLE_CONFIGS),
+        display_name=ensure_value(cfg, 'displayName', MUTABLE_CONFIGS)
     )
 
     return res
@@ -295,7 +296,7 @@ def load_config_dict(pipette_id: str) -> Dict:
     return config
 
 
-def list_mutable_configs(pipette_id: str) -> Dict[str, Any]:
+def list_MUTABLE_CONFIGS(pipette_id: str) -> Dict[str, Any]:
     """
     Returns dict of mutable configs only.
     """
@@ -308,6 +309,6 @@ def list_mutable_configs(pipette_id: str) -> Dict[str, Any]:
         return cfg
 
     for key in config:
-        if key in mutable_configs:
+        if key in MUTABLE_CONFIGS:
             cfg[key] = config[key]
     return cfg

@@ -1098,7 +1098,8 @@ class Pipette(CommandPublisher):
                 x=pos_drop_tip
             )
             self.instrument_actuator.pop_speed()
-            self._shake_off_tips(location)
+            if "needs-droptip-shake" in self.quirks:
+                self._shake_off_tips(location)
             if home_after:
                 self._home_after_drop_tip()
 
