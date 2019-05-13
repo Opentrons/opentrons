@@ -10,9 +10,14 @@ export type MenuName =
 export type Link = {|
   name: string,
   url?: string,
-  to?: string, // TODO: (ka 2019-4-18): refactor component to take ?Links
+  to?: string,
   description?: string,
   cta?: boolean,
+  gtm: {
+    action: string,
+    category: string,
+    label: string,
+  },
 |}
 
 export type Submenu = {|
