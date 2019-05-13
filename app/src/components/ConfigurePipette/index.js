@@ -10,7 +10,6 @@ import {
   setPipetteSettings,
   getSetPipetteSettingsRequestState,
 } from '../../robot-api'
-import { chainActions } from '../../util'
 import { getConfig } from '../../config'
 
 import { ScrollableAlertModal } from '../modals'
@@ -64,25 +63,23 @@ function ConfigurePipette(props: Props) {
     configRequest,
   } = props
   const [error, setError] = React.useState<string | null>(null)
-  const prevRequest = React.useRef<RobotApiRequestState | null>(null)
+  const prevRequestState = React.useRef<RobotApiRequestState | null>(null)
 
+  // when an in-progress request completes, check if the response was ok
+  // if ok, close the modal, else save the error message for display
   React.useEffect(() => {
-    if (
-      prevRequest.current &&
-      !prevRequest.current.response &&
-      configRequest &&
-      configRequest.response
-    ) {
-      if (configRequest.response.ok) {
+    const prevResponse = prevRequestState.current?.response
+    const nextResponse = configRequest?.response
+
+    if (prevRequestState.current && !prevResponse && nextResponse) {
+      if (nextResponse.ok) {
         closeModal()
       } else {
-        setError(
-          configRequest.response.body.message || 'An unknown error occurred'
-        )
+        setError(nextResponse.body.message || 'An unknown error occurred')
       }
     }
 
-    prevRequest.current = configRequest
+    prevRequestState.current = configRequest
   }, [configRequest])
 
   // TODO (ka 2019-2-12): This logic is used to get display name in slightly
