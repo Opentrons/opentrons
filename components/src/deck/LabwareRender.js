@@ -33,7 +33,6 @@ export type LabwareRenderProps = {|
 |}
 
 export default function LabwareRender(props: LabwareRenderProps) {
-  console.log({ props })
   const cornerOffsetFromSlot = props.definition.cornerOffsetFromSlot
   return (
     <g
