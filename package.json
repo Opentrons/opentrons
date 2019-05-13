@@ -105,5 +105,8 @@
     "webpack-merge": "^4.1.4",
     "worker-loader": "^2.0.0",
     "ws": "3.1.0"
+  },
+  "dependencies": {
+    "eslint-plugin-react-hooks": "^1.6.0"
   }
 }
