@@ -7,6 +7,7 @@ import {
   getPipetteNameSpecs,
   getPipetteModelSpecs,
 } from '@opentrons/shared-data'
+import { getConfig } from '../../config'
 
 import type {
   PipetteNameSpecs,
@@ -65,6 +66,7 @@ type SP = {|
   direction: Direction,
   success: boolean,
   attachedWrong: boolean,
+  __pipettePlusEnabled: boolean,
 |}
 
 type DP = {|
@@ -145,6 +147,9 @@ function makeMapStateToProps(): (State, OP) => SP {
       displayName,
       moveRequest: getRobotMove(state, ownProps.robot),
       homeRequest: getRobotHome(state, ownProps.robot),
+      __pipettePlusEnabled: Boolean(
+        getConfig(state).devInternal?.enablePipettePlus
+      ),
     }
   }
 }
