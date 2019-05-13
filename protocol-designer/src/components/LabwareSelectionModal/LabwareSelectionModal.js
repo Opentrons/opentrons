@@ -1,7 +1,7 @@
 // @flow
 import React, { useState, useMemo } from 'react'
 import {
-  ClickOutside,
+  useOnClickOutside,
   OutlineButton,
   type DeckSlot,
 } from '@opentrons/components'
@@ -23,12 +23,13 @@ type Props = {
 
 // TODO: BC 2019-05-10 ideally this should be pulled from the definitions
 // and it's usage should be memoized by the useMemo below
+// TODO: BC 2019-05-10 this should include displayCategory 'trash',
+// but there are no current trash box definitions
 const orderedCategories: Array<string> = [
   'tipRack',
   'tubeRack',
   'wellPlate',
   'trough',
-  'trash',
 ]
 
 const LabwareDropdown = (props: Props) => {
@@ -58,6 +59,7 @@ const LabwareDropdown = (props: Props) => {
       {}
     )
   }, [permittedTipracks])
+  const wrapperRef = useOnClickOutside({ onClickOutside: onClose })
 
   // do not render without a slot
   if (!slot) return null
@@ -67,43 +69,39 @@ const LabwareDropdown = (props: Props) => {
   }
 
   return (
-    <ClickOutside onClickOutside={onClose}>
-      {({ ref }) => (
-        <>
-          <Portal>
-            <LabwarePreview labwareDef={previewedLabware} />
-          </Portal>
-          <div ref={ref} className={styles.labware_dropdown}>
-            <div className={styles.title}>Slot {slot} Labware</div>
-            <ul>
-              {orderedCategories.map(category => (
-                <PDTitledList
-                  key={category}
-                  title={startCase(category)}
-                  collapsed={selectedCategory !== category}
-                  onCollapseToggle={makeToggleCategory(category)}
-                  onClick={makeToggleCategory(category)}
-                  className={styles.labware_selection_modal}
-                >
-                  {labwareByCategory[category] &&
-                    labwareByCategory[category].map((labwareDef, index) => (
-                      <LabwareItem
-                        key={index}
-                        containerType={labwareDef.parameters.loadName}
-                        displayName={labwareDef.metadata.displayName}
-                        selectLabware={selectLabware}
-                        onMouseEnter={() => previewLabware(labwareDef)}
-                        onMouseLeave={() => previewLabware()}
-                      />
-                    ))}
-                </PDTitledList>
-              ))}
-            </ul>
-            <OutlineButton onClick={onClose}>CLOSE</OutlineButton>
-          </div>
-        </>
-      )}
-    </ClickOutside>
+    <>
+      <Portal>
+        <LabwarePreview labwareDef={previewedLabware} />
+      </Portal>
+      <div ref={wrapperRef} className={styles.labware_dropdown}>
+        <div className={styles.title}>Slot {slot} Labware</div>
+        <ul>
+          {orderedCategories.map(category => (
+            <PDTitledList
+              key={category}
+              title={startCase(category)}
+              collapsed={selectedCategory !== category}
+              onCollapseToggle={makeToggleCategory(category)}
+              onClick={makeToggleCategory(category)}
+              className={styles.labware_selection_modal}
+            >
+              {labwareByCategory[category] &&
+                labwareByCategory[category].map((labwareDef, index) => (
+                  <LabwareItem
+                    key={index}
+                    containerType={labwareDef.parameters.loadName}
+                    displayName={labwareDef.metadata.displayName}
+                    selectLabware={selectLabware}
+                    onMouseEnter={() => previewLabware(labwareDef)}
+                    onMouseLeave={() => previewLabware()}
+                  />
+                ))}
+            </PDTitledList>
+          ))}
+        </ul>
+        <OutlineButton onClick={onClose}>CLOSE</OutlineButton>
+      </div>
+    </>
   )
 }
 

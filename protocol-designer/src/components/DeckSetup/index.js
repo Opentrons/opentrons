@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import { selectors as stepsSelectors } from '../../ui/steps'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import DeckSetup from './DeckSetup'
 
 import type { TerminalItemId } from '../../steplist'
@@ -25,6 +26,7 @@ const mapStateToProps = (state: BaseState): SP => ({
   ingredSelectionMode:
     labwareIngredSelectors.getSelectedLabwareId(state) != null,
   drilledDown: labwareIngredSelectors.getDrillDownLabwareId(state) != null,
+  initialDeckSetup: stepFormSelectors.getInitialDeckSetup(state),
 })
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
@@ -35,6 +37,7 @@ const mergeProps = (stateProps: SP, dispatchProps: DP): Props => ({
   selectedTerminalItemId: stateProps.selectedTerminalItemId,
   ingredSelectionMode: stateProps.ingredSelectionMode,
   drilledDown: stateProps.drilledDown,
+  initialDeckSetup: stateProps.initialDeckSetup,
   handleClickOutside: () => {
     if (stateProps.drilledDown) dispatchProps.drillUpFromLabware()
   },

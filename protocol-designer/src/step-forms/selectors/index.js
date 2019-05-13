@@ -52,7 +52,7 @@ import type { RootState } from '../reducers'
 import type { InvariantContext } from '../../step-generation'
 
 // TODO: Ian 2019-04-10 SHIM REMOVAL #3335
-const FALLBACK_DEF = '54d2f430-d602-11e8-80b1-6965467d172c'
+const FALLBACK_DEF = 'opentrons_1_trash_1.1_l'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 
@@ -144,6 +144,7 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
   getLabwareEntities,
   getPipetteEntities,
   (initialSetupStep, labwareEntities, pipetteEntities) => {
+    console.table({ labwareEntities })
     assert(
       initialSetupStep && initialSetupStep.stepType === 'manualIntervention',
       'expected initial deck setup step to be "manualIntervention" step'

@@ -8,6 +8,7 @@ type Props = {
   y?: string | number,
   children?: React.Node,
   className?: string,
+  innerDivProps?: string,
 }
 
 const RobotCoordsForeignDiv = (props: Props) => {
@@ -18,12 +19,14 @@ const RobotCoordsForeignDiv = (props: Props) => {
     height = '100%',
     width = '100%',
     className,
+    innerDivProps,
   } = props
   return (
     <foreignObject {...{ x, y, height, width, className }}>
       <div
         style={{ transform: 'scale(1, -1)' }}
         xmlns="http://www.w3.org/1999/xhtml"
+        {...innerDivProps}
       >
         {children}
       </div>

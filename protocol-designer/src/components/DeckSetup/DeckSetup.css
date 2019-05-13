@@ -16,3 +16,32 @@
 .deck_row {
   @apply --center-children;
 }
+
+.slot_overlay {
+  background-color: var(--c-black);
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  cursor: pointer;
+}
+
+.overlay_icon {
+  height: 15px;
+  width: 15px;
+}
+
+.appear_on_mouseover {
+  opacity: 0;
+
+  &:hover {
+    opacity: 0.75;
+  }
+}
+
+.overlay_panel {
+  opacity: 0.9;
+}
