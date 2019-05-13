@@ -84,11 +84,7 @@ function SetupDeckPage(props: Props) {
 }
 
 function mapStateToProps(state: State, ownProps: OP): SP {
-  const {
-    match: {
-      params: { slot },
-    },
-  } = ownProps
+  const { slot } = ownProps.match.params
   const labware = robotSelectors.getLabware(state)
   const currentLabware = labware.find(lw => lw.slot === slot)
   const robot = getConnectedRobot(state)

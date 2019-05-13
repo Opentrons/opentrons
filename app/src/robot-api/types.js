@@ -40,8 +40,16 @@ export type RobotApiResponse = {|
 export type RobotApiAction =
   | {| type: 'robotApi:FETCH_HEALTH', payload: RobotApiRequest |}
   | {| type: 'robotApi:FETCH_MODULES', payload: RobotApiRequest |}
-  | {| type: 'robotApi:FETCH_MODULE_DATA', payload: RobotApiRequest |}
-  | {| type: 'robotApi:SET_MODULE_TARGET_TEMP', payload: RobotApiRequest |}
+  | {|
+      type: 'robotApi:FETCH_MODULE_DATA',
+      payload: RobotApiRequest,
+      meta: {| id: string |},
+    |}
+  | {|
+      type: 'robotApi:SET_MODULE_TARGET_TEMP',
+      payload: RobotApiRequest,
+      meta: {| id: string |},
+    |}
   | {| type: 'robotApi:FETCH_SETTINGS', payload: RobotApiRequest |}
   | {| type: 'robotApi:FETCH_PIPETTE_SETTINGS', payload: RobotApiRequest |}
   | {| type: 'robotApi:SET_SETTINGS', payload: RobotApiRequest |}
