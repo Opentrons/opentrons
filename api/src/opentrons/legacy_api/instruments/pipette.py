@@ -109,13 +109,14 @@ class Pipette(CommandPublisher):
     ...     tip_racks=[tip_rack_300ul]) # doctest: +SKIP
     """
 
-    def __init__(
+    def __init__(  # noqa(C901)
             self,
             robot,
             model_offset=(0, 0, 0),
             mount=None,
             axis=None,
             mount_obj=None,
+            model=None,
             name=None,
             ul_per_mm=None,
             channels=1,
@@ -166,6 +167,9 @@ class Pipette(CommandPublisher):
         if not name:
             name = self.__class__.__name__
         self.name = name
+        if not model:
+            model = self.__class__.__name__
+        self.model = model
 
         if trash_container == '':
             trash_container = self.robot.fixed_trash
@@ -223,8 +227,8 @@ class Pipette(CommandPublisher):
             aspirate=aspirate_flow_rate, dispense=dispense_flow_rate)
 
         # TODO (andy): remove from pipette, move to tip-rack
-        self.robot.config.tip_length[self.name] = \
-            self.robot.config.tip_length.get(self.name, fallback_tip_length)
+        self.robot.config.tip_length[self.model] = \
+            self.robot.config.tip_length.get(self.model, fallback_tip_length)
 
         self.quirks = quirks if isinstance(quirks, list) else []
 
@@ -1678,7 +1682,7 @@ class Pipette(CommandPublisher):
     def _tip_length(self):
         # TODO (andy): tip length should be retrieved from tip-rack's labware
         # definition, unblocking ability to use multiple types of tips
-        return self.robot.config.tip_length[self.name]
+        return self.robot.config.tip_length[self.model]
 
     def set_speed(self, aspirate=None, dispense=None):
         """

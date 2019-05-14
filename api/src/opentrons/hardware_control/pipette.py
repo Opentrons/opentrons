@@ -22,7 +22,8 @@ class Pipette:
                  inst_offset_config: Dict[str, Tuple[float, float, float]],
                  pipette_id: str = None) -> None:
         self._config = pipette_config.load(model, pipette_id)
-        self._name = model
+        self._name = pipette_config.name_for_model(model)
+        self._model = model
         self._current_volume = 0.0
         self._current_tip_length = 0.0
         self._has_tip = False
@@ -49,6 +50,10 @@ class Pipette:
     @property
     def name(self) -> str:
         return self._name
+
+    @property
+    def model(self) -> str:
+        return self._model
 
     @property
     def pipette_id(self) -> Optional[str]:
@@ -179,6 +184,7 @@ class Pipette:
         config_dict = self.config._asdict()
         config_dict.update({'current_volume': self.current_volume,
                             'name': self.name,
+                            'model': self.model,
                             'pipette_id': self.pipette_id,
                             'has_tip': self.has_tip})
         return config_dict

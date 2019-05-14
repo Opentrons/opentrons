@@ -14,11 +14,13 @@ def dummy_instruments():
     dummy_instruments_attached = {
         types.Mount.LEFT: {
             'model': LEFT_PIPETTE_MODEL,
-            'id': LEFT_PIPETTE_ID
+            'id': LEFT_PIPETTE_ID,
+            'name': LEFT_PIPETTE_PREFIX,
         },
         types.Mount.RIGHT: {
             'model': None,
-            'id': None
+            'id': None,
+            'name': None,
         }
     }
     return dummy_instruments_attached
@@ -27,7 +29,7 @@ def dummy_instruments():
 instrument_keys = sorted([
     'name', 'min_volume', 'max_volume', 'aspirate_flow_rate', 'channels',
     'dispense_flow_rate', 'pipette_id', 'current_volume', 'display_name',
-    'tip_length', 'has_tip'])
+    'tip_length', 'has_tip', 'model'])
 
 
 async def test_cache_instruments(dummy_instruments, loop):
@@ -87,12 +89,16 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
     # When we expect instruments, we should get what we expect since nothing
     # was specified at init time
     await sim.cache_instruments({types.Mount.LEFT: 'p10_single_v1.3'})
-    assert sim.attached_instruments[types.Mount.LEFT]['name']\
+    assert sim.attached_instruments[types.Mount.LEFT]['model']\
         == 'p10_single_v1.3'
+    assert sim.attached_instruments[types.Mount.LEFT]['name']\
+        == 'p10_single'
     # If we use prefixes, that should work too
     await sim.cache_instruments({types.Mount.RIGHT: 'p300_single'})
-    assert sim.attached_instruments[types.Mount.RIGHT]['name']\
+    assert sim.attached_instruments[types.Mount.RIGHT]['model']\
         == 'p300_single_v1'
+    assert sim.attached_instruments[types.Mount.RIGHT]['name']\
+        == 'p300_single'
     # If we specify instruments at init time, we should get them without
     # passing an expectation
     sim = hc.API.build_hardware_simulator(

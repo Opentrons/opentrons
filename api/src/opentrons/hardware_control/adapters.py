@@ -206,12 +206,13 @@ class SingletonAdapter(HardwareAPILike):
         instrs = {}
         for mount, data in api.attached_instruments.items():
             instrs[mount.name.lower()] = {
-                'model': data.get('name', None),
+                'model': data.get('model', None),
+                'name': data.get('name', None),
                 'id': data.get('pipette_id', None),
                 'mount_axis': Axis.by_mount(mount),
                 'plunger_axis': Axis.of_plunger(mount)
             }
-            if data.get('name'):
+            if data.get('model'):
                 instrs[mount.name.lower()]['tip_length'] \
                     = data.get('tip_length', None)
 

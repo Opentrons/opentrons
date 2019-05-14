@@ -194,11 +194,11 @@ def _get_model_name(pipette, hardware):
     id = None
     if pipette:
         if not feature_flags.use_protocol_api_v2():
-            model = pipette.name
+            model = pipette.model
             pip_info = hardware.get_attached_pipettes()[pipette.mount]
             id = pip_info['id']
         else:
-            model = pipette.get('name')
+            model = pipette.get('model')
             mount = Mount.LEFT if pipette['mount'] == 'left' else Mount.RIGHT
             pip_info = hardware.attached_instruments[mount]
             id = pip_info['pipette_id']

@@ -127,8 +127,10 @@ class Robot(CommandPublisher):
 
         self.INSTRUMENT_DRIVERS_CACHE = {}
         self._instruments = {}
-        self.model_by_mount = {'left': {'model': None, 'id': None},
-                               'right': {'model': None, 'id': None}}
+        self.model_by_mount = {
+            'left': {'model': None, 'id': None, 'name': None},
+            'right': {'model': None, 'id': None, 'name': None}
+        }
 
         self._commands = []
         self._unsubscribe_commands = None
@@ -271,6 +273,7 @@ class Robot(CommandPublisher):
         log.debug("Updating instrument model cache")
         for mount in self.model_by_mount.keys():
             model_value = self._driver.read_pipette_model(mount)
+            name_value = pipette_config.name_for_model(model_value)
             plunger_axis = 'B' if mount == 'left' else 'C'
             mount_axis = 'Z' if mount == 'left' else 'A'
             if model_value and 'v2' in model_value:
@@ -299,7 +302,8 @@ class Robot(CommandPublisher):
                 id_response = None
             self.model_by_mount[mount] = {
                 'model': model_value,
-                'id': id_response
+                'id': id_response,
+                'name': name_value
             }
             log.debug("{}: {} [{}]".format(
                 mount,
@@ -880,6 +884,7 @@ class Robot(CommandPublisher):
                 'mount_axis': 'z',
                 'plunger_axis': 'b',
                 'model': self.model_by_mount['left']['model'],
+                'name': self.model_by_mount['left']['name'],
                 'id': self.model_by_mount['left']['id']
             }
         left_model = left_data.get('model')
@@ -893,6 +898,7 @@ class Robot(CommandPublisher):
                 'mount_axis': 'a',
                 'plunger_axis': 'c',
                 'model': self.model_by_mount['right']['model'],
+                'name': self.model_by_mount['right']['name'],
                 'id': self.model_by_mount['right']['id']
             }
         right_model = right_data.get('model')

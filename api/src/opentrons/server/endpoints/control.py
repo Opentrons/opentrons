@@ -36,6 +36,7 @@ async def get_attached_pipettes(request):
     {
       'left': {
         'model': 'p300_single_v1',
+        'name': 'p300_single',
         'tip_length': 51.7,
         'mount_axis': 'z',
         'plunger_axis': 'b',
@@ -43,6 +44,7 @@ async def get_attached_pipettes(request):
       },
       'right': {
         'model': 'p10_multi_v1',
+        'name': 'p10_multi',
         'tip_length': 40,
         'mount_axis': 'a',
         'plunger_axis': 'c',
@@ -65,6 +67,7 @@ async def get_attached_pipettes(request):
     for mount, data in hw.get_attached_pipettes().items():
         response[mount] = {
             'model': data['model'],
+            'name': data['name'],
             'mount_axis': str(data['mount_axis']).lower(),
             'plunger_axis': str(data['plunger_axis']).lower(),
             'id': data['id']

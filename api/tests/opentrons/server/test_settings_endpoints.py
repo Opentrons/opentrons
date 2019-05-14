@@ -12,6 +12,49 @@ from opentrons.config import pipette_config
 from opentrons import config, types
 
 
+@pytest.fixture
+async def attached_pipettes(async_server, request):
+    """ Fixture the robot to have attached pipettes
+
+    Mark the node with
+    'attach_left_model': model_name for left (default: p300_single_v1)
+    'attach_right_model': model_name for right (default: p50_multi_v1)
+    'attach_left_id': id for left (default: 'abc123')
+    'attach_right_id': id for right (default: 'acbcd123')
+
+    Returns the model by mount style dict of
+    {'left': {'name': str, 'model': str, 'id': str}, 'right'...}
+    """
+    def marker_with_default(marker: str, default: str) -> str:
+        return request.node.get_marker(marker) or default
+    left_mod = marker_with_default('attach_left_model', 'p300_multi_v1')
+    left_name = left_mod.split('_v')[0]
+    right_mod = marker_with_default('attach_right_model', 'p50_multi_v1')
+    right_name = right_mod.split('_v')[0]
+    left_id = marker_with_default('attach_left_id', 'abc123')
+    right_id = marker_with_default('attach_right_id', 'abcd123')
+    hw = async_server['com.opentrons.hardware']
+    if async_server['api_version'] == 1:
+        hw.model_by_mount = {
+            'left': {'model': left_mod, 'id': left_id, 'name': left_name},
+            'right': {'model': right_mod, 'id': right_id, 'name': right_name}
+        }
+        hw.get_attached_pipettes()
+        return hw.model_by_mount
+    else:
+        hw._backend._attached_instruments = {
+            types.Mount.RIGHT: {
+                'model': right_mod, 'id': right_id, 'name': right_name
+            },
+            types.Mount.LEFT: {
+                'model': left_mod, 'id': left_id, 'name': left_name
+            }
+        }
+        await hw.cache_instruments()
+        return {k.name.lower(): v
+                for k, v in hw._backend._attached_instruments.items()}
+
+
 def validate_response_body(body):
     settings_list = body.get('settings')
     assert type(settings_list) == list
@@ -167,25 +210,9 @@ async def test_reset_v2(virtual_smoothie_env, loop, async_client):
 
 
 async def test_receive_pipette_settings(
-        async_server, loop, async_client):
+        async_server, loop, async_client, attached_pipettes):
 
-    test_model = 'p300_multi_v1'
-    test_id = 'abc123'
-    test_id2 = 'abcd123'
-    hw = async_server['com.opentrons.hardware']
-
-    if async_server['api_version'] == 1:
-        hw.model_by_mount = {'left': {'model': test_model, 'id': test_id},
-                             'right': {'model': test_model, 'id': test_id2}}
-        hw.get_attached_pipettes()
-    else:
-        hw._backend._attached_instruments = {
-            types.Mount.RIGHT: {'model': test_model, 'id': test_id},
-            types.Mount.LEFT: {'model': test_model, 'id': test_id2}
-        }
-
-        await hw.cache_instruments()
-
+    test_id = attached_pipettes['left']['id']
     resp = await async_client.get('/settings/pipettes')
     body = await resp.json()
     assert test_id in body
@@ -194,23 +221,10 @@ async def test_receive_pipette_settings(
 
 
 async def test_receive_pipette_settings_one_pipette(
-        async_server, loop, async_client):
+        async_server, loop, async_client, attached_pipettes):
     # This will check that sending a known pipette id works,
     # and sending an unknown one does not
-    test_model = 'p300_multi_v1'
-    test_id = 'abc123'
-    test_id2 = 'abcd123'
-
-    hw = async_server['com.opentrons.hardware']
-    if async_server['api_version'] == 1:
-        hw.model_by_mount = {'left': {'model': test_model, 'id': test_id},
-                             'right': {'model': test_model, 'id': test_id2}}
-        hw.get_attached_pipettes()
-    else:
-        hw._backend._attached_instruments = {
-            types.Mount.RIGHT: {'model': test_model, 'id': test_id},
-            types.Mount.LEFT: {'model': test_model, 'id': test_id2}}
-        await hw.cache_instruments()
+    test_id = attached_pipettes['left']['id']
     resp = await async_client.get('/settings/pipettes/{}'.format(test_id))
     body = await resp.json()
     assert body['fields'] == pipette_config.list_mutable_configs(
@@ -222,14 +236,10 @@ async def test_receive_pipette_settings_one_pipette(
     assert resp.status == 404
 
 
-async def test_modify_pipette_settings(async_server, loop, async_client):
+async def test_modify_pipette_settings(
+        async_server, loop, async_client, attached_pipettes):
     # This test will check that setting modified pipette configs
     # works as expected
-
-    test_model = 'p300_multi_v1'
-    test_id = 'abc123'
-    test_id2 = 'abcd123'
-
     changes = {
         'fields': {
             'pickUpCurrent': {'value': 1}
@@ -242,17 +252,7 @@ async def test_modify_pipette_settings(async_server, loop, async_client):
             }
         }
 
-    hw = async_server['com.opentrons.hardware']
-    if async_server['api_version'] == 1:
-        hw.model_by_mount = {'left': {'model': test_model, 'id': test_id},
-                             'right': {'model': test_model, 'id': test_id2}}
-        hw.get_attached_pipettes()
-    else:
-        hw._backend._attached_instruments = {
-            types.Mount.RIGHT: {'model': test_model, 'id': test_id},
-            types.Mount.LEFT: {'model': test_model, 'id': test_id2}}
-        await hw.cache_instruments()
-
+    test_id = attached_pipettes['left']['id']
     # Check data has not been changed yet
     resp = await async_client.get('/settings/pipettes/{}'.format(test_id))
     body = await resp.json()
@@ -297,31 +297,15 @@ async def test_modify_pipette_settings(async_server, loop, async_client):
 
 
 async def test_incorrect_modify_pipette_settings(
-        async_server, loop, async_client):
-
-    test_model = 'p300_multi_v1'
-    test_id = 'abc123'
-    test_id2 = 'abcd123'
-
+        async_server, loop, async_client, attached_pipettes):
     out_of_range = {
             'fields': {
                 'pickUpCurrent': {'value': 1000}
                 }
             }
-    hw = async_server['com.opentrons.hardware']
-    if async_server['api_version'] == 1:
-        hw.model_by_mount = {'left': {'model': test_model, 'id': test_id},
-                             'right': {'model': test_model, 'id': test_id2}}
-        hw.get_attached_pipettes()
-    else:
-        hw._backend._attached_instruments = {
-            types.Mount.RIGHT: {'model': test_model, 'id': test_id},
-            types.Mount.LEFT: {'model': test_model, 'id': test_id2}}
-        await hw.cache_instruments()
-
     # check over max fails
     resp = await async_client.patch(
-        '/settings/pipettes/{}'.format(test_id),
+        '/settings/pipettes/{}'.format(attached_pipettes['left']['id']),
         json=out_of_range)
     assert resp.status == 412
 
