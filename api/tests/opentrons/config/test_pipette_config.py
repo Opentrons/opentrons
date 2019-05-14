@@ -122,7 +122,7 @@ def test_mutable_configs_only(monkeypatch):
     # Test that only set mutable configs are populated in this dictionary
 
     monkeypatch.setattr(
-        pipette_config, 'mutable_configs', ['tipLength', 'plungerCurrent'])
+        pipette_config, 'MUTABLE_CONFIGS', ['tipLength', 'plungerCurrent'])
 
     new_id = 'aoa2109j09cj2a'
     model = 'p300_multi_v1'
@@ -133,6 +133,6 @@ def test_mutable_configs_only(monkeypatch):
     # instead of dealing with unordered lists, convert to set and check whether
     # these lists have a difference between them
     difference = set(list(config.keys())) - \
-        set(pipette_config.mutable_configs)
+        set(pipette_config.MUTABLE_CONFIGS)
     # ensure empty
     assert bool(difference) is False

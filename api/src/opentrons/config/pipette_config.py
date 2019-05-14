@@ -176,7 +176,7 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
         min_volume=ensure_value(cfg, 'minVolume', MUTABLE_CONFIGS),
         max_volume=ensure_value(cfg, 'maxVolume', MUTABLE_CONFIGS),
         ul_per_mm=ul_per_mm,
-        quirks=ensure_value(cfg, 'quirks', MUTABLE_CONFIGS),
+        quirks=validate_quirks(ensure_value(cfg, 'quirks', MUTABLE_CONFIGS)),
         tip_length=ensure_value(cfg, 'tipLength', MUTABLE_CONFIGS),
         display_name=ensure_value(cfg, 'displayName', MUTABLE_CONFIGS)
     )
@@ -208,12 +208,18 @@ def piecewise_volume_conversion(
 def save_overrides(
         pipette_id: str, overrides: Dict[str, Any], model: Optional[str]):
     override_dir = CONFIG['pipette_config_overrides_dir']
+    model_configs = configs[model]
     try:
         existing = load_overrides(pipette_id)
+        for key in model_configs['quirks']:
+            if key not in existing:
+                existing.update({key: True})
     except FileNotFoundError:
-        existing = {}
+        existing = {
+            key: True
+            for key in model_configs['quirks']
+            }
 
-    model_configs = configs[model]
     for key, value in overrides.items():
         # If an existing override is saved as null from endpoint, remove from
         # overrides file
@@ -241,6 +247,16 @@ def load_overrides(pipette_id: str) -> Dict[str, Any]:
         raise FileNotFoundError(str(overrides/f'{pipette_id}.json'))
 
 
+def validate_quirks(quirks: List[str]):
+    valid_quirks = []
+    for quirk in quirks:
+        if quirk in VALID_QUIRKS:
+            valid_quirks.append(quirk)
+        else:
+            log.warning(f'{quirk} is not a valid quirk')
+    return valid_quirks
+
+
 def ensure_value(
         config: dict,
         name: Union[str, Tuple[str, ...]],
@@ -258,7 +274,7 @@ def ensure_value(
         config = config[element]
 
     value = config[path[-1]]
-    if path[-1] in mutable_config_list:
+    if path[-1] != 'quirks' and path[-1] in mutable_config_list:
         value = value['value']
     return value
 
@@ -289,15 +305,19 @@ def load_config_dict(pipette_id: str) -> Dict:
     config = copy.deepcopy(model_config()['config'][model])
     config.update(copy.deepcopy(name_config()[config['name']]))
 
+    if 'quirks' not in override.keys():
+        override['quirks'] = {key: True for key in config['quirks']}
+
     for top_level_key in config.keys():
-        add_default(config[top_level_key])
+        if top_level_key != 'quirks':
+            add_default(config[top_level_key])
 
     config.update(override)
 
     return config
 
 
-def list_MUTABLE_CONFIGS(pipette_id: str) -> Dict[str, Any]:
+def list_mutable_configs(pipette_id: str) -> Dict[str, Any]:
     """
     Returns dict of mutable configs only.
     """
