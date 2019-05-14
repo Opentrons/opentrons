@@ -273,7 +273,10 @@ class Robot(CommandPublisher):
         log.debug("Updating instrument model cache")
         for mount in self.model_by_mount.keys():
             model_value = self._driver.read_pipette_model(mount)
-            name_value = pipette_config.name_for_model(model_value)
+            if model_value:
+                name_value = pipette_config.name_for_model(model_value)
+            else:
+                name_value = None
             plunger_axis = 'B' if mount == 'left' else 'C'
             mount_axis = 'Z' if mount == 'left' else 'A'
             if model_value and 'v2' in model_value:
