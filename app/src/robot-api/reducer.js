@@ -26,15 +26,18 @@ function networkingReducer(
   const resAction =
     passRobotApiResponseAction(action) || passRobotApiErrorAction(action)
 
-  let nextState = state
-
   if (reqAction) {
-    nextState = { ...state, [reqAction.payload.path]: { inProgress: true } }
-  } else if (resAction) {
-    nextState = { ...state, [resAction.payload.path]: { inProgress: false } }
+    return { ...state, [reqAction.payload.path]: { response: null } }
   }
 
-  return nextState
+  if (resAction) {
+    return {
+      ...state,
+      [resAction.payload.path]: { response: resAction.payload },
+    }
+  }
+
+  return state
 }
 
 function robotApiReducer(

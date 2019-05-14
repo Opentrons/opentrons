@@ -24,7 +24,7 @@ export type Action =
   | DiscoveryAction
   | ProtocolAction
 
-export type ActionLike = {| type: string, payload: any |}
+export type ActionLike = {| type: string, payload: any, meta: any |}
 
 export type State = $Call<reducer, {}, Action>
 

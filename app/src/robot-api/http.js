@@ -1,8 +1,7 @@
 // @flow
 // simple fetch wrapper to format URL for robot and parse JSON response
-import { of } from 'rxjs'
-import { fromFetch } from 'rxjs/fetch'
-import { timeout, switchMap, catchError } from 'rxjs/operators'
+import { of, from } from 'rxjs'
+import { switchMap, catchError } from 'rxjs/operators'
 
 import type { Observable } from 'rxjs'
 import type { RobotApiRequest, RobotApiResponse } from './types'
@@ -26,8 +25,7 @@ export function robotApiFetch(
     if (typeof reqBody === 'object') options.body = JSON.stringify(reqBody)
   }
 
-  return fromFetch(url, options).pipe(
-    timeout(timeoutMs),
+  return from(fetch(url, options)).pipe(
     switchMap(response =>
       response.json().then(body => ({
         host,
