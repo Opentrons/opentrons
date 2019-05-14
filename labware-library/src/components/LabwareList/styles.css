@@ -43,28 +43,15 @@
   height: 1.5rem;
 }
 
-.gallery_container,
-.stats,
-.well_dimensions,
-.well_volume {
-  display: inline-block;
-  vertical-align: top;
-}
-
-.gallery_container {
-  width: var(--size-40p);
-  padding-top: var(--spacing-1);
-  padding-left: var(--spacing-5);
-  padding-right: var(--spacing-6);
-}
-
-.gallery {
+.card_contents {
   width: 100%;
+  padding: 0 var(--spacing-5) var(--spacing-5);
 }
 
+.gallery_container,
+.gallery,
 .stats {
-  width: var(--size-60p);
-  padding-right: var(--spacing-4);
+  width: 100%;
 }
 
 .gallery_main {
@@ -73,10 +60,7 @@
 
 .image_container {
   @apply --aspect-item;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @apply --center-children;
 }
 
 .thumbnail_row {
@@ -101,41 +85,29 @@
   @apply --aspect-1-1;
 }
 
-.dimensions {
-  padding-bottom: var(--spacing-4);
-  border-bottom: var(--bd-light);
+.well_count,
+.well_properties {
+  margin-top: var(--spacing-5);
 }
 
-.wells {
-  margin-top: var(--spacing-4);
+.well_count {
+  @apply --flex-between;
 }
 
-.well_group {
-  margin-top: var(--spacing-4);
-}
-
-.well_dimensions {
-  width: var(--size-two-thirds);
-  padding-right: var(--spacing-6);
-}
-
-.well_volume {
-  width: var(--size-third);
-}
-
-.units {
-  text-transform: none;
+.well_group_properties {
+  margin-top: var(--spacing-5);
+  padding: var(--spacing-5);
+  border: var(--bd-light);
 }
 
 .tags_container {
-  margin-top: var(--spacing-6);
   background-color: var(--c-bg-light);
 }
 
 .tags {
   display: flex;
   align-items: center;
-  padding: var(--spacing-3) var(--spacing-5);
+  padding: var(--spacing-2) var(--spacing-5);
 
   & .value {
     font-size: var(--fs-body-1);
@@ -171,7 +143,7 @@ button.load_name_button {
   flex: none;
   width: var(--size-2);
   padding-left: var(--spacing-5);
-  padding-right: var(--spacing-4);
+  padding-right: calc(var(--spacing-5) - 0.25rem);
   border-radius: 0;
   background-color: var(--c-dark-gray);
 
@@ -188,18 +160,29 @@ button.load_name_button {
 .no_results {
   @apply --font-header-dark;
 
-  margin-top: var(--spacing-8);
+  margin-top: var(--spacing-7);
   text-align: center;
 }
 
 @media (--medium) {
   .list {
     margin: 0 auto;
-    max-width: var(--size-6);
   }
 
   .card {
     margin-top: 0;
+  }
+
+  .gallery_container {
+    display: inline-block;
+    width: var(--size-40p);
+  }
+
+  .stats {
+    display: inline-block;
+    width: var(--size-60p);
+    padding-left: var(--spacing-5);
+    vertical-align: top;
   }
 
   .no_results {
@@ -209,16 +192,12 @@ button.load_name_button {
 }
 
 @media (--large) {
-  .list {
-    max-width: 100%;
-  }
-
   .card {
     display: inline-block;
     vertical-align: top;
-    width: calc(50% - 0.5 * var(--spacing-8));
-    margin-right: var(--spacing-8);
-    margin-bottom: var(--spacing-8);
+    width: calc(50% - 0.5 * var(--spacing-7));
+    margin-right: var(--spacing-7);
+    margin-bottom: var(--spacing-7);
 
     &:nth-child(even) {
       margin-right: 0;

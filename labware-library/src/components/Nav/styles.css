@@ -85,7 +85,7 @@ are project specific  */
   }
 }
 
-@media (--desktop) {
+@media (--large) {
   .subdomain_nav_wrapper {
     display: block;
     width: 100%;
@@ -101,9 +101,7 @@ are project specific  */
   .breadcrumbs {
     top: var(--size-total-nav);
   }
-}
 
-@media (--large) {
   .nav_container,
   .breadcrumbs_contents {
     margin: auto;
