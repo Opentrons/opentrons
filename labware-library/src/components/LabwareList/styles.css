@@ -142,10 +142,15 @@
 button.load_name_button {
   flex: none;
   width: var(--size-2);
-  padding-left: var(--spacing-5);
-  padding-right: calc(var(--spacing-5) - 0.25rem);
   border-radius: 0;
   background-color: var(--c-dark-gray);
+
+  /*
+   * perceived center of the copy icon is a few pixels off center, so
+   * adjust padding accordingly
+   */
+  padding-left: var(--spacing-5);
+  padding-right: calc(var(--spacing-5) - 0.25rem);
 
   & svg {
     stroke: none;
