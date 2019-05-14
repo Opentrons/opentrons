@@ -84,8 +84,9 @@ config_models = list(model_config()['config'].keys())
 configs = model_config()['config']
 #: A list of pipette model names for which we have config entries
 MUTABLE_CONFIGS = model_config()['mutableConfigs']
-VALID_QUIRKS = model_config()['validQuirks']
 #: A list of mutable configs for pipettes
+VALID_QUIRKS = model_config()['validQuirks']
+#: A list of valid quirks for pipettes
 
 
 def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
