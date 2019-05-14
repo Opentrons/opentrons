@@ -45,12 +45,14 @@ function ProtocolPipettes(props: Props) {
 
   const pipetteInfo = pipettes.map(p => {
     const pipetteConfig = getPipetteModelSpecs(p.name)
+    const actualPipetteConfig = getPipetteModelSpecs(
+      actualPipettes?.[p.mount].model || ''
+    )
     const displayName = !pipetteConfig ? 'N/A' : pipetteConfig.displayName
 
-    const actualModel = actualPipettes && actualPipettes[p.mount].model
     let pipettesMatch = true
 
-    if (pipetteConfig && actualModel !== p.name) {
+    if (pipetteConfig && pipetteConfig.name !== actualPipetteConfig?.name) {
       pipettesMatch = false
     }
 
