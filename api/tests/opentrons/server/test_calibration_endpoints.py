@@ -372,7 +372,6 @@ async def test_forcing_new_session(
     overridden.
     """
     test_model = 'p300_multi_v1'
-    test_name = 'p300_multi'
     if async_server['api_version'] == 1:
 
         def dummy_read_model(mount):
