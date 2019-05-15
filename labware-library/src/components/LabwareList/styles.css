@@ -169,25 +169,35 @@ button.load_name_button {
   text-align: center;
 }
 
+@media (--small) {
+  .gallery_container {
+    display: inline-block;
+    width: var(--size-50p);
+  }
+
+  .stats {
+    display: inline-block;
+    width: var(--size-50p);
+    padding-left: var(--spacing-5);
+    vertical-align: top;
+  }
+}
+
 @media (--medium) {
+  /* .gallery_container {
+    width: var(--size-40p);
+  }
+
+  .stats {
+    width: var(--size-60p);
+  } */
+
   .list {
     margin: 0 auto;
   }
 
   .card {
     margin-top: 0;
-  }
-
-  .gallery_container {
-    display: inline-block;
-    width: var(--size-40p);
-  }
-
-  .stats {
-    display: inline-block;
-    width: var(--size-60p);
-    padding-left: var(--spacing-5);
-    vertical-align: top;
   }
 
   .no_results {

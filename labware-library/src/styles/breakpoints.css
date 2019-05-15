@@ -1,6 +1,7 @@
 /* mobile-first custom media queries */
 
 :root {
+  --screen-width-small: 480px;
   --screen-width-medium: 768px;
   --screen-width-desktop: 1024px;
   --screen-width-large: 1024px;
@@ -8,6 +9,7 @@
 }
 
 /* keep these values aligned; cannot use vars in custom-media defintions */
+@custom-media --small (width >= 480px);
 @custom-media --medium (width >= 768px);
 @custom-media --desktop (width >= 1024px);
 @custom-media --large (width >= 1024px);
