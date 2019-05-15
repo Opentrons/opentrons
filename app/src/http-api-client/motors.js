@@ -1,13 +1,14 @@
 // @flow
 // http api client module for /motors/** endpoints
-import type { ThunkPromiseAction } from '../types'
-import type { ApiCall } from './types'
-import type { Mount, RobotService } from '../robot'
-
-import type { PipettesResponse } from './pipettes'
-import client from './client'
+import { getPipettesState } from '../robot-api'
 import { apiRequest, apiSuccess, apiFailure } from './actions'
+import client from './client'
+
+import type { ThunkPromiseAction } from '../types'
+import type { Mount, RobotService } from '../robot'
 import type { ApiAction } from './actions'
+import type { ApiCall } from './types'
+
 export type MotorAxis = 'a' | 'b' | 'c' | 'x' | 'y' | 'z'
 
 // not the actual request body because we combine multiple api calls
@@ -38,31 +39,17 @@ export function disengagePipetteMotors(
   ...mounts: Array<Mount>
 ): ThunkPromiseAction {
   return (dispatch, getState) => {
-    const pipettesState = getState().api.api[robot.name].pipettes
+    const pipettes = getPipettesState(getState(), robot.name)
+    const axes = mounts.reduce((result, mount) => {
+      const pip = pipettes[mount]
+      return pip ? result.concat(pip.mount_axis, pip.plunger_axis) : result
+    }, [])
 
     // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
     dispatch(apiRequest(robot, DISENGAGE, { mounts }))
 
-    // pull motor axes from state if available, otherwise hit GET /pipettes
-    const getPipettes =
-      pipettesState && pipettesState.response
-        ? Promise.resolve(pipettesState.response)
-        : client(robot, 'GET', 'pipettes')
-
     return (
-      getPipettes
-        .then((pipettes: PipettesResponse) => {
-          const axes = mounts.reduce(
-            (result, mount) =>
-              result.concat(
-                pipettes[mount].mount_axis,
-                pipettes[mount].plunger_axis
-              ),
-            []
-          )
-
-          return client(robot, 'POST', 'motors/disengage', { axes })
-        })
+      client(robot, 'POST', 'motors/disengage', { axes })
         .then(
           response => apiSuccess(robot, DISENGAGE, response),
           error => apiFailure(robot, DISENGAGE, error)

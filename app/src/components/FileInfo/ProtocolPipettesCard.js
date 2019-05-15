@@ -4,7 +4,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 
 import { selectors as robotSelectors } from '../../robot'
-import { makeGetRobotPipettes, fetchPipettes } from '../../http-api-client'
+import { fetchPipettes, getPipettesState } from '../../robot-api'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import InstrumentItem from './InstrumentItem'
 import { RefreshWrapper } from '../Page'
@@ -14,27 +14,25 @@ import InstrumentWarning from './InstrumentWarning'
 
 import type { State, Dispatch } from '../../types'
 import type { Pipette } from '../../robot'
-import type { PipettesResponse } from '../../http-api-client'
+import type { PipettesState } from '../../robot-api'
 import type { Robot } from '../../discovery'
 
 type OP = {| robot: Robot |}
 
 type SP = {|
   pipettes: Array<Pipette>,
-  actualPipettes: ?PipettesResponse,
-|}
-
-type DP = {|
-  fetchPipettes: () => mixed,
+  actualPipettes: PipettesState,
   changePipetteUrl: string,
 |}
+
+type DP = {| fetchPipettes: () => mixed |}
 
 type Props = { ...OP, ...SP, ...DP }
 
 const TITLE = 'Required Pipettes'
 
 export default connect<Props, OP, SP, DP, State, Dispatch>(
-  makeMapStateToProps,
+  mapStateToProps,
   mapDispatchToProps
 )(ProtocolPipettes)
 
@@ -46,7 +44,7 @@ function ProtocolPipettes(props: Props) {
   const pipetteInfo = pipettes.map(p => {
     const pipetteConfig = getPipetteModelSpecs(p.name)
     const actualPipetteConfig = getPipetteModelSpecs(
-      actualPipettes?.[p.mount].model || ''
+      actualPipettes[p.mount]?.model || ''
     )
     const displayName = !pipetteConfig ? 'N/A' : pipetteConfig.displayName
 
@@ -87,26 +85,17 @@ function ProtocolPipettes(props: Props) {
   )
 }
 
-function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
-  const getAttachedPipettes = makeGetRobotPipettes()
-
-  return (state, ownProps) => {
-    const pipettesCall = getAttachedPipettes(state, ownProps.robot)
-
-    return {
-      pipettes: robotSelectors.getPipettes(state),
-      actualPipettes: pipettesCall && pipettesCall.response,
-    }
+function mapStateToProps(state: State, ownProps: OP): SP {
+  return {
+    pipettes: robotSelectors.getPipettes(state),
+    actualPipettes: getPipettesState(state, ownProps.robot.name),
+    // TODO(mc, 2018-10-10): pass this prop down from page
+    changePipetteUrl: `/robots/${ownProps.robot.name}/instruments`,
   }
 }
 
 function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
-  const { robot } = ownProps
-  // TODO(mc, 2018-10-10): pass this prop down from page
-  const changePipetteUrl = `/robots/${robot.name}/instruments`
-
   return {
-    changePipetteUrl,
-    fetchPipettes: () => dispatch(fetchPipettes(robot)),
+    fetchPipettes: () => dispatch(fetchPipettes(ownProps.robot)),
   }
 }
