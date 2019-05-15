@@ -43,6 +43,8 @@ export type LabwareDisplayCategory =
 
 export type LabwareVolumeUnits = 'µL' | 'mL' | 'L'
 
+export type WellBottomShape = 'flat' | 'u' | 'v' | 'other'
+
 export type LabwareMetadata = {|
   displayName: string,
   displayCategory: LabwareDisplayCategory,
@@ -75,8 +77,9 @@ export type LabwareParameters = {|
 |}
 
 export type LabwareBrand = {|
-  brandId?: Array<string>,
   brand: string,
+  brandId: Array<string>,
+  links: Array<string>,
 |}
 
 type LabwareWellShapeProperties =
@@ -110,6 +113,18 @@ export type LabwareWellMap = {
   [wellName: string]: LabwareWell,
 }
 
+export type LabwareWellGroupMetadata = {|
+  displayName?: string,
+  displayCategory?: LabwareDisplayCategory,
+  wellBottomShape?: WellBottomShape,
+|}
+
+export type LabwareWellGroup = {|
+  wells: Array<string>,
+  metadata: LabwareWellGroupMetadata,
+  brand?: LabwareBrand,
+|}
+
 // NOTE: must be synced with shared-data/labware-json-schema/labwareSchemaV2.json
 export type LabwareDefinition2 = {|
   otId: string,
@@ -123,6 +138,7 @@ export type LabwareDefinition2 = {|
   brand: LabwareBrand,
   ordering: Array<Array<string>>,
   wells: LabwareWellMap,
+  groups: Array<LabwareWellGroup>,
 |}
 
 export type DeckOffset = {|

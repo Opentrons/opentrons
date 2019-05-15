@@ -41,5 +41,13 @@
   },
   "brand": {
     "brand": "Opentrons"
-  }
+  },
+  "grids": [
+    {
+      "wells": ["A1"],
+      "metadata": {
+        "wellBottomShape": ""
+      }
+    }
+  ]
 }

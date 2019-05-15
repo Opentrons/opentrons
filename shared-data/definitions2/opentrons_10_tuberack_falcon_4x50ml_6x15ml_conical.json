@@ -129,5 +129,37 @@
     "links": [
       "https://shop.opentrons.com/collections/opentrons-tips/products/tube-rack-set-1"
     ]
-  }
+  },
+  "groups": [
+    {
+      "wells": ["A3", "B3", "A4", "B4"],
+      "metadata": {
+        "displayName": "Falcon 4x50 mL Conical",
+        "displayCategory": "tubeRack",
+        "wellBottomShape": "v"
+      },
+      "brand": {
+        "brand": "Falcon",
+        "brandId": ["352070", "352098"],
+        "links": [
+          "https://ecatalog.corning.com/life-sciences/b2c/US/en/Liquid-Handling/Tubes,-Liquid-Handling/Centrifuge-Tubes/Falcon%C2%AE-Conical-Centrifuge-Tubes/p/falconConicalTubes"
+        ]
+      }
+    },
+    {
+      "wells": ["A1", "B1", "C1", "A2", "B2", "C2"],
+      "metadata": {
+        "displayName": "Falcon 6x15 mL Conical",
+        "displayCategory": "tubeRack",
+        "wellBottomShape": "v"
+      },
+      "brand": {
+        "brand": "Falcon",
+        "brandId": ["352095", "352096", "352097", "352099", "352196"],
+        "links": [
+          "https://ecatalog.corning.com/life-sciences/b2c/US/en/Liquid-Handling/Tubes,-Liquid-Handling/Centrifuge-Tubes/Falcon%C2%AE-Conical-Centrifuge-Tubes/p/falconConicalTubes"
+        ]
+      }
+    }
+  ]
 }
