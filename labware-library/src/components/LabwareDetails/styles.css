@@ -17,11 +17,18 @@
   padding: 0 var(--spacing-5);
 }
 
+.category_container {
+  display: flex;
+  align-items: baseline;
+  padding: var(--spacing-2) 0 var(--spacing-2);
+}
+
 .title {
   font-size: var(--fs-default);
   font-weight: var(--fw-semibold);
   line-height: var(--lh-title);
-  color: var(--c-blue);
+  color: var(--c-black);
+  margin-bottom: var(--spacing-5);
 }
 
 .lighter {
@@ -110,5 +117,11 @@
       margin-top: 0;
       padding-top: 0;
     }
+  }
+}
+
+@media (--xlarge) {
+  .category_container {
+    padding: var(--spacing-5) 0 var(--spacing-2);
   }
 }

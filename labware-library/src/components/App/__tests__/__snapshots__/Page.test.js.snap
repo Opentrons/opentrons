@@ -49,3 +49,28 @@ exports[`Page component renders with sidebarLargeOnly CSS 1`] = `
   </div>
 </div>
 `;
+
+exports[`Page component renders with sidebarXLOnly CSS 1`] = `
+<div
+  className="page"
+>
+  <div
+    className="content_scroller"
+  >
+    <div
+      className="content_width_limiter"
+    >
+      <div
+        className="sidebar_container sidebar_xl_only"
+      >
+        foo
+      </div>
+      <section
+        className="content_container sidebar_xl_only"
+      >
+        bar
+      </section>
+    </div>
+  </div>
+</div>
+`;

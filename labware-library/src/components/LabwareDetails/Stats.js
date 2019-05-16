@@ -4,9 +4,7 @@ import * as React from 'react'
 
 import {
   MANUFACTURER,
-  CATEGORY,
   NUM_WELLS_BY_CATEGORY,
-  CATEGORY_LABELS_BY_CATEGORY,
   MANUFACTURER_LABELS_BY_MANUFACTURER,
 } from '../../localization'
 
@@ -28,12 +26,6 @@ export default function Stats(props: StatsProps) {
     {
       label: MANUFACTURER,
       value: MANUFACTURER_LABELS_BY_MANUFACTURER[brand] || brand,
-    },
-    {
-      label: CATEGORY,
-      value:
-        CATEGORY_LABELS_BY_CATEGORY[displayCategory] ||
-        CATEGORY_LABELS_BY_CATEGORY.other,
     },
     {
       label:

@@ -65,7 +65,7 @@
   }
 
   .content_container {
-    padding-top: var(--spacing-7);
+    padding-top: var(--spacing-2);
     padding-right: var(--spacing-7);
 
     /* spacing + sidebar width */
@@ -116,6 +116,8 @@
 
 @media (--xlarge) {
   .content_container.sidebar_xl_only {
+    padding-top: var(--spacing-7);
+
     /* spacing + sidebar width */
     padding-left: calc(var(--size-4) + var(--spacing-5));
   }
