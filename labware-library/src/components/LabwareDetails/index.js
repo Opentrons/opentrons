@@ -3,11 +3,11 @@
 import * as React from 'react'
 
 import { LabwareGallery, Tags, LoadName } from '../LabwareList'
-
 import LabwareTitle from './LabwareTitle'
 import Stats from './Stats'
 import Dimensions from './Dimensions'
 import WellDimensions from './WellDimensions'
+import ManufacturerStats from './ManufacturerStats'
 import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
@@ -19,7 +19,6 @@ export type LabwareDetailsProps = {
 export default function LabwareDetails(props: LabwareDetailsProps) {
   const { definition } = props
   const { parameters } = definition
-
   return (
     <>
       <LabwareTitle definition={definition} />
@@ -34,6 +33,7 @@ export default function LabwareDetails(props: LabwareDetailsProps) {
         <Stats definition={definition} />
         <Dimensions definition={definition} />
         <WellDimensions definition={definition} />
+        <ManufacturerStats definition={definition} />
       </div>
     </>
   )

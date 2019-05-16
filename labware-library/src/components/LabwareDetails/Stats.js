@@ -2,11 +2,7 @@
 // top-level labware stats
 import * as React from 'react'
 
-import {
-  MANUFACTURER,
-  NUM_WELLS_BY_CATEGORY,
-  MANUFACTURER_LABELS_BY_MANUFACTURER,
-} from '../../localization'
+import { NUM_WELLS_BY_CATEGORY } from '../../localization'
 
 import { TableEntry, LabelText, Value, LABEL_LEFT } from '../ui'
 
@@ -20,13 +16,8 @@ export type StatsProps = {
 
 export default function Stats(props: StatsProps) {
   const { definition } = props
-  const { brand } = definition.brand
   const { displayCategory } = definition.metadata
   const stats = [
-    {
-      label: MANUFACTURER,
-      value: MANUFACTURER_LABELS_BY_MANUFACTURER[brand] || brand,
-    },
     {
       label:
         NUM_WELLS_BY_CATEGORY[displayCategory] || NUM_WELLS_BY_CATEGORY.other,

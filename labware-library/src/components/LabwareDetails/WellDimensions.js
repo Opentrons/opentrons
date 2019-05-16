@@ -79,7 +79,7 @@ export default function WellDimensions(props: WellDimensionsProps) {
         ]
 
         return (
-          <div key={i} className={styles.well_dimensions_row}>
+          <>
             <LabeledValueTable
               className={styles.well_dimensions}
               label={
@@ -107,7 +107,7 @@ export default function WellDimensions(props: WellDimensionsProps) {
               }
               values={spacing}
             />
-          </div>
+          </>
         )
       })}
     </div>
