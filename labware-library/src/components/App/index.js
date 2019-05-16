@@ -26,7 +26,6 @@ export class App extends React.Component<DefinitionRouteRenderProps> {
     const { definition, location } = this.props
     const filters = getFilters(location, definition)
     const breadcrumbsVisibile = Boolean(definition)
-    console.log(Boolean(definition))
 
     return (
       <div

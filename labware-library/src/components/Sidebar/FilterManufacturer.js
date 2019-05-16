@@ -29,7 +29,6 @@ export function FilterManufacturer(props: FilterManufacturerProps) {
     label: MANUFACTURER_LABELS_BY_MANUFACTURER[value] || value,
   }))
 
-  console.log(isLabwareDetail)
   const className = isLabwareDetail
     ? cx(styles.filter_manufacturer, styles.xl_filter_manufacturer)
     : styles.filter_manufacturer

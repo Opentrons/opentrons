@@ -15,7 +15,6 @@ export type SidebarProps = {
 
 export default function Sidebar(props: SidebarProps) {
   const { filters, isLabwareDetail } = props
-  console.log('sidebar: ', isLabwareDetail)
   return (
     <nav className={styles.sidebar}>
       {!isLabwareDetail && <LabwareGuide />}
