@@ -48,7 +48,7 @@
 
 .filter_manufacturer_label {
   text-transform: uppercase;
-  padding: 0 0 var(--spacing-3) var(--spacing-3);
+  padding: 0 0 var(--spacing-3) 0;
   font-size: var(--fs-caption);
   font-weight: var(--fw-semibold);
   color: var(--c-dark-gray);
@@ -102,5 +102,11 @@
   .filter_category_item {
     display: block;
     width: 100%;
+  }
+}
+
+@media (--xlarge) {
+  .filter_manufacturer.xl_filter_manufacturer {
+    margin: var(--spacing-5) 0 var(--spacing-7) 0;
   }
 }

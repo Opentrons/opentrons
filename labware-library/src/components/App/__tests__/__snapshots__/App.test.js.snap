@@ -40,9 +40,11 @@ exports[`App component renders with definition 1`] = `
             "manufacturer": "generic",
           }
         }
+        isLabwareDetail={true}
       />
     }
     sidebarLargeOnly={true}
+    sidebarXlOnly={true}
   />
 </div>
 `;
@@ -71,9 +73,11 @@ exports[`App component renders without definition 1`] = `
             "manufacturer": "all",
           }
         }
+        isLabwareDetail={false}
       />
     }
     sidebarLargeOnly={false}
+    sidebarXlOnly={false}
   />
 </div>
 `;

@@ -22,7 +22,8 @@
 .sidebar_container {
   padding: var(--spacing-7) var(--spacing-3);
 
-  &.sidebar_large_only {
+  &.sidebar_large_only,
+  &.sidebar_xl_only {
     display: none;
   }
 }
@@ -70,7 +71,8 @@
     /* spacing + sidebar width */
     padding-left: calc(var(--size-3) + var(--spacing-5));
 
-    &.sidebar_large_only {
+    &.sidebar_large_only,
+    &.sidebar_xl_only {
       padding-left: var(--spacing-7);
     }
   }
@@ -94,11 +96,37 @@
     &.sidebar_large_only {
       display: block;
     }
+
+    &.sidebar_xl_only {
+      display: none;
+    }
   }
 
   .content_container,
   .content_container.sidebar_large_only {
     /* spacing + sidebar width */
     padding-left: calc(var(--size-4) + var(--spacing-5));
+  }
+
+  .content_container.sidebar_xl_only {
+    /* no sidebar for labware details until xl */
+    padding-left: var(--spacing-7);
+  }
+}
+
+@media (--xlarge) {
+  .content_container.sidebar_xl_only {
+    /* spacing + sidebar width */
+    padding-left: calc(var(--size-4) + var(--spacing-5));
+  }
+
+  .sidebar_container {
+    width: var(--size-4);
+    padding-left: var(--spacing-7);
+
+    &.sidebar_xl_only {
+      display: block;
+      padding-top: 0;
+    }
   }
 }

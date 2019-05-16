@@ -26,6 +26,7 @@ export class App extends React.Component<DefinitionRouteRenderProps> {
     const { definition, location } = this.props
     const filters = getFilters(location, definition)
     const breadcrumbsVisibile = Boolean(definition)
+    console.log(Boolean(definition))
 
     return (
       <div
@@ -37,7 +38,10 @@ export class App extends React.Component<DefinitionRouteRenderProps> {
         {breadcrumbsVisibile && <Breadcrumbs definition={definition} />}
         <Page
           sidebarLargeOnly={breadcrumbsVisibile}
-          sidebar={<Sidebar filters={filters} />}
+          sidebarXlOnly={!!definition}
+          sidebar={
+            <Sidebar filters={filters} isLabwareDetail={breadcrumbsVisibile} />
+          }
           content={
             definition ? (
               <LabwareDetails definition={definition} />

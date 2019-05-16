@@ -1,7 +1,6 @@
 // @flow
 // main application sidebar
 import * as React from 'react'
-
 import LabwareGuide from './LabwareGuide'
 import FilterManufacturer from './FilterManufacturer'
 import FilterCategory from './FilterCategory'
@@ -11,15 +10,16 @@ import type { FilterParams } from '../../types'
 
 export type SidebarProps = {
   filters: FilterParams,
+  isLabwareDetail: boolean,
 }
 
 export default function Sidebar(props: SidebarProps) {
-  const { filters } = props
-
+  const { filters, isLabwareDetail } = props
+  console.log('sidebar: ', isLabwareDetail)
   return (
     <nav className={styles.sidebar}>
-      <LabwareGuide />
-      <FilterManufacturer filters={filters} />
+      {!isLabwareDetail && <LabwareGuide />}
+      <FilterManufacturer filters={filters} isLabwareDetail={isLabwareDetail} />
       <FilterCategory filters={filters} />
     </nav>
   )
