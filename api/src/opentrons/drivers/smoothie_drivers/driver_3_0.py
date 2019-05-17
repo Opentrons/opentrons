@@ -1550,12 +1550,14 @@ class SmoothieDriver_3_0_0:
                 raise
 
         if not self.is_connected():
+            log.info("Getting port to connect")
             self._connect_to_port()
 
         # get port name
         port = self._connection.port
 
         if explicit_modeset:
+            log.info("Setting programming mode")
             # set smoothieware into programming mode
             self._smoothie_programming_mode()
             # close the port so other application can access it
@@ -1564,14 +1566,22 @@ class SmoothieDriver_3_0_0:
         # run lpc21isp, THIS WILL TAKE AROUND 1 MINUTE TO COMPLETE
         update_cmd = 'lpc21isp -wipe -donotstart {0} {1} {2} 12000'.format(
             filename, port, self._config.serial_speed)
-        kwargs: Dict[str, Any] = {'stdout': asyncio.subprocess.PIPE}
+        kwargs: Dict[str, Any] = {
+            'stdout': asyncio.subprocess.PIPE,
+            'stderr': asyncio.subprocess.PIPE}
         if loop:
             kwargs['loop'] = loop
+        log.info(update_cmd)
         proc = await asyncio.create_subprocess_shell(
             update_cmd, **kwargs)
-        rd: bytes = await proc.stdout.read()  # type: ignore
-        res = rd.decode().strip()
-        await proc.communicate()
+        out_b, err_b = await proc.communicate()
+        if proc.returncode != 0:
+            log.error(
+                f"Smoothie update failed: {proc.returncode} {out_b} {err_b}")
+            raise RuntimeError(
+                f"Failed to program smoothie: {proc.returncode}: {err_b}")
+        else:
+            log.info("Smoothie update complete")
         try:
             self._connection.close()
         except Exception:
@@ -1583,6 +1593,6 @@ class SmoothieDriver_3_0_0:
         # run setup gcodes
         self._setup()
 
-        return res
+        return out_b.decode().strip()
 
     # ----------- END Public interface ------------ #
