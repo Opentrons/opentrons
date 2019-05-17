@@ -87,6 +87,10 @@ mutable_configs = model_config()['mutableConfigs']
 #: A list of mutable configs for pipettes
 
 
+def name_for_model(pipette_model: str) -> str:
+    return configs[pipette_model]['name']
+
+
 def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
     """
     Load pipette config data

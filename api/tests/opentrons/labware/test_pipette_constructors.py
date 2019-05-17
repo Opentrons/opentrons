@@ -68,8 +68,11 @@ def test_backwards_compatibility(backcompat, monkeypatch):
 
     robot.reset()
 
-    fake_pip = {'left': {'model': None, 'id': None},
-                'right': {'model': expected_name + '_v2.0', 'id': 'FakePip'}}
+    fake_pip = {'left': {'model': None, 'id': None, 'name': None},
+                'right': {
+                    'model': expected_name + '_v2.0',
+                    'id': 'FakePip',
+                    'name': expected_name}}
     monkeypatch.setattr(robot, 'model_by_mount', fake_pip)
 
     old_config = pipette_config.name_config()[old_name]

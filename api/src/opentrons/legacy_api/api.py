@@ -258,10 +258,17 @@ class InstrumentsWrapper(object):
             'bottom': config.bottom,
             'blow_out': config.blow_out,
             'drop_tip': config.drop_tip}
+        if '_v' in name:
+            model = name
+            name = name.split('_v')[0]
+        else:
+            model = name
+            name = name
         p = self.Pipette(
             model_offset=config.model_offset,
             mount=mount,
             name=name,
+            model=model,
             trash_container=trash_container,
             tip_racks=tip_racks,
             channels=config.channels,

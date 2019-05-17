@@ -184,26 +184,26 @@ def set_current_mount(hardware, session):
         pipette = left_pipette
         session.cp = CriticalPoint.FRONT_NOZZLE
 
-    model, id = _get_model_name(pipette, hardware)
-    session.pipette_id = id
+    model, pip_id = _get_model_name(pipette, hardware)
+    session.pipette_id = pip_id
     return {'pipette': pipette, 'model': model}
 
 
 def _get_model_name(pipette, hardware):
     model = None
-    id = None
+    pip_id = None
     if pipette:
         if not feature_flags.use_protocol_api_v2():
-            model = pipette.name
+            model = pipette.model
             pip_info = hardware.get_attached_pipettes()[pipette.mount]
-            id = pip_info['id']
+            pip_id = pip_info['id']
         else:
-            model = pipette.get('name')
+            model = pipette.get('model')
             mount = Mount.LEFT if pipette['mount'] == 'left' else Mount.RIGHT
             pip_info = hardware.attached_instruments[mount]
-            id = pip_info['pipette_id']
+            pip_id = pip_info['pipette_id']
 
-    return model, id
+    return model, pip_id
 
 
 async def attach_tip(data):

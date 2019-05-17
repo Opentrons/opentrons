@@ -20,12 +20,14 @@ async def test_get_pipettes_uncommissioned(
             "mount_axis": "z",
             "plunger_axis": "b",
             "model": None,
+            "name": None,
             "id": None
         },
         "right": {
             "mount_axis": "a",
             "plunger_axis": "c",
             "model": None,
+            "name": None,
             "id": None
         }
     }
@@ -52,6 +54,7 @@ async def test_get_pipettes_uncommissioned(
 
 async def test_get_pipettes(async_server, async_client, monkeypatch):
     test_model = 'p300_multi_v1'
+    test_name = 'p300_multi'
     test_id = '123abc'
 
     hw = async_server['com.opentrons.hardware']
@@ -76,6 +79,7 @@ async def test_get_pipettes(async_server, async_client, monkeypatch):
     expected = {
         'left': {
             'model': test_model,
+            'name': test_name,
             'tip_length': model.tip_length,
             'mount_axis': 'z',
             'plunger_axis': 'b',
@@ -83,6 +87,7 @@ async def test_get_pipettes(async_server, async_client, monkeypatch):
         },
         'right': {
             'model': test_model,
+            'name': test_name,
             'tip_length': model.tip_length,
             'mount_axis': 'a',
             'plunger_axis': 'c',
@@ -193,6 +198,7 @@ async def test_execute_module_command_v1(
 
 async def test_get_cached_pipettes(async_server, async_client, monkeypatch):
     test_model = 'p300_multi_v1'
+    test_name = 'p300_multi'
     test_id = '123abc'
 
     hw = async_server['com.opentrons.hardware']
@@ -222,6 +228,7 @@ async def test_get_cached_pipettes(async_server, async_client, monkeypatch):
     expected = {
         'left': {
             'model': test_model,
+            'name': test_name,
             'tip_length': model.tip_length,
             'mount_axis': 'z',
             'plunger_axis': 'b',
@@ -229,6 +236,7 @@ async def test_get_cached_pipettes(async_server, async_client, monkeypatch):
         },
         'right': {
             'model': test_model,
+            'name': test_name,
             'tip_length': model.tip_length,
             'mount_axis': 'a',
             'plunger_axis': 'c',
@@ -241,12 +249,12 @@ async def test_get_cached_pipettes(async_server, async_client, monkeypatch):
     assert resp.status == 200
     assert json.loads(text) == expected
 
-    name1 = 'p10_single_v1.3'
-    model1 = pipette_config.load(name1)
+    model1 = 'p10_single_v1.3'
+    config1 = pipette_config.load(model1)
     id1 = 'fgh876'
     if async_server['api_version'] == 1:
         def dummy_read_model(mount):
-            return name1
+            return model1
 
         def dummy_read_id(mount):
             return id1
@@ -257,8 +265,8 @@ async def test_get_cached_pipettes(async_server, async_client, monkeypatch):
             hw._driver, 'read_pipette_id', dummy_read_id)
     else:
         hw._backend._attached_instruments = {
-            types.Mount.RIGHT: {'model': name1, 'id': id1},
-            types.Mount.LEFT: {'model': name1, 'id': id1}
+            types.Mount.RIGHT: {'model': model1, 'id': id1},
+            types.Mount.LEFT: {'model': model1, 'id': id1}
         }
 
     resp1 = await async_client.get('/pipettes')
@@ -268,15 +276,17 @@ async def test_get_cached_pipettes(async_server, async_client, monkeypatch):
 
     expected2 = {
         'left': {
-            'model': name1,
-            'tip_length': model1.tip_length,
+            'model': model1,
+            'name': pipette_config.name_for_model(model1),
+            'tip_length': config1.tip_length,
             'mount_axis': 'z',
             'plunger_axis': 'b',
             'id': id1
         },
         'right': {
-            'model': name1,
-            'tip_length': model1.tip_length,
+            'model': model1,
+            'name': pipette_config.name_for_model(model1),
+            'tip_length': config1.tip_length,
             'mount_axis': 'a',
             'plunger_axis': 'c',
             'id': id1
@@ -395,7 +405,6 @@ async def test_instrument_reuse(async_server, async_client, monkeypatch):
     res = await async_client.get('/pipettes',
                                  params=[('refresh', 'true')])
     data = await res.json()
-
     assert data['left']['model'] == test_model
 
     res = await async_client.post('/robot/home', json=test_data)
@@ -403,6 +412,7 @@ async def test_instrument_reuse(async_server, async_client, monkeypatch):
 
     res = await async_client.get('/pipettes')
     data = await res.json()
+
     assert data['left']['model'] == test_model
 
 
