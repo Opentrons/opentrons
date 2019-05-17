@@ -117,7 +117,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p10_single_v1.3": {
       "name": "p10_single",
@@ -237,7 +237,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p10_single_v1.4": {
       "name": "p10_single",
@@ -356,7 +356,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p10_single_v1.5": {
       "name": "p10_single",
@@ -465,7 +465,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]    },
+    "quirks": ["dropTipShake"]    },
     "p10_multi_v1": {
       "name": "p10_multi",
       "top": {
@@ -582,7 +582,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p10_multi_v1.3": {
       "name": "p10_multi",
@@ -700,7 +700,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p10_multi_v1.4": {
       "name": "p10_multi",
@@ -818,7 +818,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p10_multi_v1.5": {
       "name": "p10_multi",
@@ -927,7 +927,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p+20_single_v2.0": {
       "name": "p+20_single",
@@ -1036,7 +1036,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p50_single_v1": {
       "name": "p50_single",
@@ -1152,7 +1152,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p50_single_v1.3": {
       "name": "p50_single",
@@ -1268,7 +1268,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p50_single_v1.4": {
       "name": "p50_single",
@@ -1384,7 +1384,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p50_multi_v1": {
       "name": "p50_multi",
@@ -1500,7 +1500,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p50_multi_v1.3": {
       "name": "p50_multi",
@@ -1616,7 +1616,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p50_multi_v1.4": {
       "name": "p50_multi",
@@ -1732,7 +1732,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p50_multi_v1.5": {
       "name": "p50_multi",
@@ -1841,7 +1841,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p300_single_v1": {
       "name": "p300_single",
@@ -1961,7 +1961,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p300_single_v1.3": {
       "name": "p300_single",
@@ -2081,7 +2081,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p300_single_v1.4": {
       "name": "p300_single",
@@ -2201,7 +2201,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p300_single_v1.5": {
       "name": "p300_single",
@@ -2311,7 +2311,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p+300_single_v2.0": {
       "name": "p+300_single",
@@ -2418,7 +2418,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p300_multi_v1": {
       "name": "p300_multi",
@@ -2524,7 +2524,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p300_multi_v1.3": {
       "name": "p300_multi",
@@ -2630,7 +2630,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p300_multi_v1.4": {
       "name": "p300_multi",
@@ -2736,7 +2736,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     },
     "p300_multi_v1.5": {
       "name": "p300_multi",
@@ -2842,7 +2842,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
 
     },
     "p1000_single_v1": {
@@ -2945,7 +2945,7 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": ["needs-pickup-shake", "needs-droptip-shake"],
+      "quirks": ["pickupTipShake", "dropTipShake"],
       "tipLength": {
         "value": 76.7,
         "units": "mm",
@@ -3054,7 +3054,7 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": ["needs-pickup-shake", "needs-droptip-shake"],
+      "quirks": ["pickupTipShake", "dropTipShake"],
       "tipLength": {
         "value": 76.7,
         "units": "mm",
@@ -3163,7 +3163,7 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": ["needs-pickup-shake", "needs-droptip-shake"],
+      "quirks": ["pickupTipShake", "dropTipShake"],
       "tipLength": {
         "value": 76.7,
         "units": "mm",
@@ -3272,7 +3272,7 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": ["needs-pickup-shake", "needs-droptip-shake"],
+      "quirks": ["pickupTipShake", "dropTipShake"],
       "tipLength": {
         "value": 76.7,
         "units": "mm",
@@ -3382,7 +3382,7 @@
         "min": 0,
         "max": 100
     },
-    "quirks": ["needs-droptip-shake"]
+    "quirks": ["dropTipShake"]
     }
   },
   "mutableConfigs": [
@@ -3404,8 +3404,8 @@
     "quirks"
 ],
 "validQuirks": [
-    "needs-pickup-shake",
-    "needs-droptip-shake",
-    "double-droptip"
+    "pickupTipShake",
+    "dropTipShake",
+    "doubleDropTip"
 ]
 }

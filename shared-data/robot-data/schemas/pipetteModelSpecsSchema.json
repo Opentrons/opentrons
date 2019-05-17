@@ -105,7 +105,7 @@
                 {
                      "type": "string",
                      "enum": [
-                         "needs-pickup-shake", "needs-droptip-shake", "double-droptip"
+                         "pickupTipShake", "dropTipShake", "doubleDropTip"
                      ]
                 }
             },

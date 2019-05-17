@@ -1006,9 +1006,8 @@ class Pipette(CommandPublisher):
             # neighboring tips tend to get stuck in the space between
             # the volume chamber and the drop-tip sleeve on p1000.
             # This extra shake ensures those tips are removed
-            if 'needs-pickup-shake' in self.quirks:
-                self._shake_off_tips(location)
-                self._shake_off_tips(location)
+            self._check_quirks(location, 'pickupTipShake', times=2)
+
             self.previous_placeable = None  # no longer inside a placeable
             self.robot.poses = self.instrument_mover.fast_home(
                 self.robot.poses, self._pick_up_distance)
@@ -1098,8 +1097,9 @@ class Pipette(CommandPublisher):
                 x=pos_drop_tip
             )
             self.instrument_actuator.pop_speed()
-            if "needs-droptip-shake" in self.quirks:
-                self._shake_off_tips(location)
+
+            self._check_quirks(location, 'dropTipShake')
+
             if home_after:
                 self._home_after_drop_tip()
 
@@ -1115,6 +1115,11 @@ class Pipette(CommandPublisher):
         do_publish(self.broker, commands.drop_tip, self.drop_tip,
                    'after', self, None, self, location)
         return self
+
+    def _check_quirks(self, location, quirk, times=1):
+        if quirk in self.quirks:
+            for _ in range(times):
+                self._shake_off_tips(location)
 
     def _shake_off_tips(self, location):
         # tips don't always fall off, especially if resting against

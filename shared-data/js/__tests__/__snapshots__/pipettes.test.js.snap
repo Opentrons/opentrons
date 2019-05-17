@@ -100,7 +100,7 @@ Object {
     "value": 0.5,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -288,7 +288,7 @@ Object {
     "value": 0.5,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -476,7 +476,7 @@ Object {
     "value": 0.5,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -664,7 +664,7 @@ Object {
     "value": 0.5,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -821,7 +821,7 @@ Object {
     "value": 0.3,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -1014,7 +1014,7 @@ Object {
     "value": 0.3,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -1207,7 +1207,7 @@ Object {
     "value": 0.3,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -1400,7 +1400,7 @@ Object {
     "value": 0.3,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -1557,7 +1557,7 @@ Object {
     "value": 0.5,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -1735,7 +1735,7 @@ Object {
     "value": 0.5,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -1913,7 +1913,7 @@ Object {
     "value": 0.5,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -2091,7 +2091,7 @@ Object {
     "value": 0.5,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -2248,7 +2248,7 @@ Object {
     "value": 0.3,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -2426,7 +2426,7 @@ Object {
     "value": 0.3,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -2604,7 +2604,7 @@ Object {
     "value": 0.3,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -2782,7 +2782,7 @@ Object {
     "value": 0.5,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -2924,7 +2924,7 @@ Object {
     "value": 0.5,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -3066,7 +3066,7 @@ Object {
     "value": 0.5,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -3208,7 +3208,7 @@ Object {
     "value": 0.5,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -3350,7 +3350,7 @@ Object {
     "value": 0.3,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -3548,7 +3548,7 @@ Object {
     "value": 0.3,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -3746,7 +3746,7 @@ Object {
     "value": 0.3,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -3944,7 +3944,7 @@ Object {
     "value": 0.3,
   },
   "quirks": Array [
-    "needs-droptip-shake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -4106,8 +4106,8 @@ Object {
     "value": 0.5,
   },
   "quirks": Array [
-    "needs-pickup-shake",
-    "needs-droptip-shake",
+    "pickupTipShake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -4269,8 +4269,8 @@ Object {
     "value": 0.5,
   },
   "quirks": Array [
-    "needs-pickup-shake",
-    "needs-droptip-shake",
+    "pickupTipShake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -4432,8 +4432,8 @@ Object {
     "value": 0.5,
   },
   "quirks": Array [
-    "needs-pickup-shake",
-    "needs-droptip-shake",
+    "pickupTipShake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -4595,8 +4595,8 @@ Object {
     "value": 0.5,
   },
   "quirks": Array [
-    "needs-pickup-shake",
-    "needs-droptip-shake",
+    "pickupTipShake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,

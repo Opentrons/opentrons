@@ -127,6 +127,10 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
     if pipette_id:
         try:
             override = load_overrides(pipette_id)
+            if 'quirks' in override.keys():
+                override['quirks'] = [
+                    quirk for quirk in override['quirks'].keys()
+                    if override['quirks'][quirk]]
         except FileNotFoundError:
             save_overrides(pipette_id, {}, pipette_model)
             log.info(
@@ -211,14 +215,11 @@ def save_overrides(
     model_configs = configs[model]
     try:
         existing = load_overrides(pipette_id)
-        for key in model_configs['quirks']:
-            if key not in existing:
-                existing.update({key: True})
+        # Add quirks setting for pipettes already with a pipette id file
+        if 'quirks' not in existing.keys():
+            existing['quirks'] = {key: True for key in model_configs['quirks']}
     except FileNotFoundError:
-        existing = {
-            key: True
-            for key in model_configs['quirks']
-            }
+        existing = {key: True for key in model_configs['quirks']}
 
     for key, value in overrides.items():
         # If an existing override is saved as null from endpoint, remove from
@@ -226,6 +227,9 @@ def save_overrides(
         if value is None:
             if existing.get(key):
                 del existing[key]
+        elif key == 'quirks':
+            existing, model_configs = change_quirks(
+                value, existing, model_configs)
         else:
             if not model_configs[key].get('default'):
                 model_configs[key]['default'] = model_configs[key]['value']
@@ -234,6 +238,20 @@ def save_overrides(
     assert model in config_models
     existing['model'] = model
     json.dump(existing, (override_dir/f'{pipette_id}.json').open('w'))
+
+
+def change_quirks(override_quirks, existing, model_configs):
+    if not existing.get('quirks'):
+        # ensure quirk key exists
+        existing['quirks'] = override_quirks
+    for quirk, setting in override_quirks.items():
+        # setting values again if above case true, but
+        # meant for use-cases where we may only be given an update
+        # for one setting
+        existing['quirks'][quirk] = setting
+        if setting not in model_configs['quirks']:
+            model_configs['quirks'].append(setting)
+    return existing, model_configs
 
 
 def load_overrides(pipette_id: str) -> Dict[str, Any]:
