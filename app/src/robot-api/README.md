@@ -34,7 +34,7 @@ Before adding client state for an endpoint, either identify or create a file in 
    export const FETCH_MY_THING: 'robotHttp:FETCH_MY_THING' =
      'robotHttp:FETCH_MY_THING'
 
-   export const fetchMyThingEpic = createBaseRequestEpic(FETCH_MY_THING)
+   export const fetchMyThingEpic = createBaseRobotApiEpic(FETCH_MY_THING)
    ```
 
    - If you need more functionality than the base epic, document your solution here
@@ -56,9 +56,13 @@ Before adding client state for an endpoint, either identify or create a file in 
    // app/src/robot-api/types.js
 
    // ...
-   export type ApiAction =
+   export type RobotApiAction =
      | {| type: 'robotApi:FETCH_HEALTH', payload: ApiRequest |}
-     | {| type: 'robotApi:FETCH_MY_THING', payload: ApiRequest |}
+     | {|
+         type: 'robotApi:FETCH_MY_THING',
+         payload: ApiRequest,
+         meta: {| id: string |},
+       |}
    ```
 
    ```js
@@ -70,6 +74,7 @@ Before adding client state for an endpoint, either identify or create a file in 
    export const fetchMyThing = (host: RobotHost, id: string): ApiAction => ({
      type: FETCH_MY_THING,
      payload: { host, method: GET, path: `/my-thing/${id}` },
+     meta: { id },
    })
    ```
 
@@ -77,9 +82,9 @@ Before adding client state for an endpoint, either identify or create a file in 
 
    ```js
    import pathToRegexp from 'path-to-regexp'
-   import { passResponseAction } from '../utils'
+   import { passRobotApiResponseAction } from '../utils'
    // NOTE: be sure to define any necessary model types in types.js
-   import type { ApiActionLike, ThingState as State } from '../types'
+   import type { RobotApiActionLike, ThingState as State } from '../types'
 
    // ...
    const INITIAL_STATE: State = {}
@@ -88,17 +93,21 @@ Before adding client state for an endpoint, either identify or create a file in 
 
    export function myThingReducer(
      state: State = INITIAL_STATE,
-     action: ApiActionLike
+     action: RobotApiActionLike
    ): State {
-     const response = passResponseAction(action)
+     const resAction = passRobotApiResponseAction(action)
 
-     if (response) {
-       const { path, body } = action.payload
+     if (resAction) {
+       const { payload, meta } = resAction
+       const { method, path, body } = payload
        const thingIdMatch = path.match(RE_THING_PATH)
 
-       if (thingIdMatch) {
-         const id = thingIdMatch[1]
-         return { ...state, [id]: body }
+       if (
+         method === GET &&
+         RE_THING_PATH.test(path) &&
+         typeof meta.id === 'string'
+       ) {
+         return { ...state, [meta.id]: body }
        }
 
        // ...
@@ -115,7 +124,7 @@ Before adding client state for an endpoint, either identify or create a file in 
 
    import {myThingReducer, myThingEpic} from './resources'
 
-   export const resourcesReducer = combineReducers<_, ApiActionLike>({
+   export const resourcesReducer = combineReducers<_, RobotApiActionLike>({
      // ...
      myThing: myThingReducer,
      // ...

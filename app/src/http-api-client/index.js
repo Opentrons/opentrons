@@ -9,7 +9,6 @@ import type { MotorsAction } from './motors'
 import type { ResetAction } from './reset'
 import { robotReducer, type RobotAction } from './robot'
 import { serverReducer, type ServerAction } from './server'
-import type { SettingsAction } from './settings'
 import type { NetworkingAction } from './networking'
 import type { Action } from '../types'
 
@@ -52,7 +51,6 @@ export type HttpApiAction =
   | ResetAction
   | RobotAction
   | ServerAction
-  | SettingsAction
 
 export { getRobotApiState } from './reducer'
 
@@ -67,8 +65,6 @@ export {
 export * from './health'
 
 export * from './reset'
-
-export * from './settings'
 
 export * from './pipettes'
 

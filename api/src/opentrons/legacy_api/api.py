@@ -5,6 +5,7 @@ from . import (robot as _robot_module,
                modules)
 from opentrons.config import pipette_config
 
+log = logging.getLogger(__name__)
 # Ignore the type here because well, this is exactly why this is the legacy_api
 robot = _robot_module.Robot()  # type: ignore
 modules.provide_singleton(robot)
@@ -213,6 +214,13 @@ class InstrumentsWrapper(object):
             mount, name_or_model)
         config = pipette_config.load(pipette_model_version, pip_id)
 
+        if pip_id and name_or_model not in pipette_model_version:
+            log.warning(
+                f"Using a deprecated constructor for {pipette_model_version}")
+            constructor_config = pipette_config.name_config()[name_or_model]
+            config = config._replace(
+                min_volume=constructor_config['minVolume'],
+                max_volume=constructor_config['maxVolume'])
         return self._create_pipette_from_config(
             config=config,
             mount=mount,
@@ -282,7 +290,20 @@ class InstrumentsWrapper(object):
 
         attached_model = robot.get_attached_pipettes()[mount]['model']
 
+        if attached_model and\
+                'p+20' in attached_model and 'p10' in expected_model_substring:
+            # Special use-case where volume does not match, but we still
+            # want a valid model name to be passed
+            if attached_model.split('_')[1] ==\
+                    expected_model_substring.split('_')[1]:
+                return attached_model
+
         if attached_model and expected_model_substring in attached_model:
+            return attached_model
+        elif attached_model and '+' in attached_model and\
+                expected_model_substring.split('p')[1] in\
+                attached_model.split('+')[1]:
+            # Allow for backwards compatibility in old pipette constructors
             return attached_model
         else:
             # pass a default pipette model-version for when robot is simulating

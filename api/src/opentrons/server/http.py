@@ -85,7 +85,10 @@ class HTTPServer(object):
         self.app.router.add_post(
             '/settings', settings.set_advanced_setting)
         self.app.router.add_post(
-            '/settings/log_level', settings.set_log_level)
+            '/settings/log_level/local', settings.set_log_level)
+        if config.ARCHITECTURE == config.SystemArchitecture.BUILDROOT:
+            self.app.router.add_post(
+                '/settings/log_level/upstream', logs.set_syslog_level)
         self.app.router.add_post(
             '/settings/reset', settings.reset)
         self.app.router.add_get(

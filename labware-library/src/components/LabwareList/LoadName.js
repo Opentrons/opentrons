@@ -17,79 +17,61 @@ export type LoadNameProps = {
   loadName: string,
 }
 
-export type LoadNameState = {
-  success: boolean,
-}
+export default function LoadName(props: LoadNameProps) {
+  const { loadName } = props
+  const [success, setSuccess] = React.useState(false)
+  const inputRef = React.useRef<HTMLInputElement | null>(null)
+  const successTimeout = React.useRef<TimeoutID | null>(null)
 
-class LoadName extends React.Component<LoadNameProps, LoadNameState> {
-  inputRef: { current: HTMLInputElement | null }
-  successTimeout: TimeoutID | null
-
-  constructor(props: LoadNameProps) {
-    super(props)
-    this.inputRef = React.createRef()
-    this.successTimeout = null
-    this.state = { success: false }
+  const cleanupSuccessTimeout = () => {
+    if (successTimeout.current) clearTimeout(successTimeout.current)
   }
+
+  React.useEffect(() => cleanupSuccessTimeout, [])
 
   // note: we could choose to always copy the entire loadName string here,
   // regardless of what the user selects, but the benefit of catching missed
   // characters doesn't seem to outweigh the annoyance of removing user control
-  handleCopy = () => {
-    this.setState({ success: true })
-    this.cleanupSuccessTimeout()
-    this.successTimeout = setTimeout(
-      () => this.setState({ success: false }),
+  const handleCopy = () => {
+    setSuccess(true)
+    cleanupSuccessTimeout()
+    successTimeout.current = setTimeout(
+      () => setSuccess(false),
       SUCCESS_TIMEOUT_MS
     )
   }
 
-  handleCopyButtonClick = () => {
-    if (this.inputRef.current) {
-      this.inputRef.current.select()
+  const handleCopyButtonClick = () => {
+    if (inputRef.current) {
+      inputRef.current.select()
       document.execCommand('copy')
     }
   }
 
-  cleanupSuccessTimeout() {
-    if (this.successTimeout) clearTimeout(this.successTimeout)
-  }
-
-  componentWillUnmount() {
-    this.cleanupSuccessTimeout()
-  }
-
-  render() {
-    const { loadName } = this.props
-    const { success } = this.state
-
-    return (
-      <div className={styles.load_name}>
-        <label className={styles.load_name_label} onCopy={this.handleCopy}>
-          <LabelText position={LABEL_TOP}>{EN_API_NAME}</LabelText>
-          <input
-            ref={this.inputRef}
-            className={styles.load_name_input}
-            type="text"
-            value={loadName}
-            onFocus={e => e.currentTarget.select()}
-            readOnly
+  return (
+    <div className={styles.load_name}>
+      <label className={styles.load_name_label} onCopy={handleCopy}>
+        <LabelText position={LABEL_TOP}>{EN_API_NAME}</LabelText>
+        <input
+          ref={inputRef}
+          className={styles.load_name_input}
+          type="text"
+          value={loadName}
+          onFocus={e => e.currentTarget.select()}
+          readOnly
+        />
+      </label>
+      <Tooltip open={success} tooltipComponent={EN_COPY_SUCCESS_MESSAGE}>
+        {tooltipProps => (
+          <IconButton
+            onClick={handleCopyButtonClick}
+            hoverTooltipHandlers={tooltipProps}
+            className={styles.load_name_button}
+            name={COPY_ICON}
+            inverted
           />
-        </label>
-        <Tooltip open={success} tooltipComponent={EN_COPY_SUCCESS_MESSAGE}>
-          {tooltipProps => (
-            <IconButton
-              onClick={this.handleCopyButtonClick}
-              hoverTooltipHandlers={tooltipProps}
-              className={styles.load_name_button}
-              name={COPY_ICON}
-              inverted
-            />
-          )}
-        </Tooltip>
-      </div>
-    )
-  }
+        )}
+      </Tooltip>
+    </div>
+  )
 }
-
-export default LoadName

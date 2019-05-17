@@ -33,7 +33,7 @@ const pages = [{ location: '', title: pkg.productName }]
 
 // TODO(mc, 2019-03-13): we won't need to replace entry to avoid including
 //   react-hot-loader/patch once monorepo is updated to react-hot-loader@4
-module.exports = merge.strategy({ entry: 'replace' })(baseConfig, {
+module.exports = merge(baseConfig, {
   entry: JS_ENTRY,
 
   output: {

@@ -11,7 +11,6 @@ import type { HealthState } from './health'
 import type { PipettesState } from './pipettes'
 import type { MotorsState } from './motors'
 import type { ResetState } from './reset'
-import type { SettingsState } from './settings'
 import type { NetworkingState } from './networking'
 
 export type RobotApiState = {|
@@ -19,7 +18,6 @@ export type RobotApiState = {|
   ...PipettesState,
   ...MotorsState,
   ...ResetState,
-  ...SettingsState,
   ...NetworkingState,
 |}
 
