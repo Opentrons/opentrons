@@ -72,7 +72,7 @@ def initialize_robot(loop):
                     "Failed to update smoothie: did not connect after update")
         else:
             log.error("Could not update smoothie, forcing virtual")
-            os.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
+            os.environ['ENABLE_VIRTUAL_SMOOTHIE'] = 'true'
             hardware.connect()
     else:
         log.info("FW version OK: {}".format(packed_smoothie_fw_ver))
