@@ -1,3 +1,5 @@
+from typing import List, Tuple
+
 from opentrons.config import feature_flags as ff
 from opentrons import types
 
@@ -14,7 +16,7 @@ crosses = 'crosses'
 z_pos = (170.5, 129.0, 5.0)
 
 
-def dots_set():
+def dots_set() -> List[Tuple[float, float]]:
     """
 
     :param dot_flag: a boolean represented whether the feature flag is set

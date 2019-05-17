@@ -234,6 +234,14 @@ class Labware:
         return self._definition['parameters']['loadName']
 
     @property
+    def ot_id(self) -> str:
+        """
+        The ID number in the labware which can be used to identify a definition
+        uniquely
+        """
+        return self._id
+
+    @property
     def parameters(self) -> dict:
         """Internal properties of a labware including type and quirks"""
         return self._parameters

@@ -2,8 +2,9 @@ import logging
 from . import endpoints as endp
 from opentrons import config
 from .endpoints import (networking, control, settings, update)
-from opentrons.deck_calibration import endpoints as dc_endp
-
+from opentrons.deck_calibration import (endpoints as dc_endp,
+                                        v2 as dcv2)
+from opentrons.config import feature_flags as ff
 
 from .endpoints import serverlib_fallback as endpoints
 log = logging.getLogger(__name__)
@@ -64,6 +65,10 @@ class HTTPServer(object):
             '/calibration/deck/start', dc_endp.start)
         self.app.router.add_post(
             '/calibration/deck', dc_endp.dispatch)
+
+        if ff.use_protocol_api_v2():
+            dcv2.install(self.app, '/calibration/v2/')
+
         self.app.router.add_get(
             '/pipettes', control.get_attached_pipettes)
         self.app.router.add_get(
