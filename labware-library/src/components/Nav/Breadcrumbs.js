@@ -2,13 +2,11 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 
+import { BACK_TO_LABWARE_LIBRARY } from '../../localization'
 import { getPublicPath } from '../../public-path'
 import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
-
-// TODO(mc, 2019-04-07): i18n
-const EN_LABWARE_LIBRARY = 'Back to Labware Library'
 
 export type BreadcrumbsProps = {
   definition: LabwareDefinition | null,
@@ -23,7 +21,7 @@ export default function Breadcrumbs(props: BreadcrumbsProps) {
       <div className={styles.breadcrumbs_contents}>
         <span className={styles.breadcrumbs_separator}>{' < '}</span>
         <Link to={getPublicPath()} className={styles.breadcrumbs_link}>
-          {EN_LABWARE_LIBRARY}
+          {BACK_TO_LABWARE_LIBRARY}
         </Link>
       </div>
     </div>

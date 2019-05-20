@@ -5,13 +5,15 @@ import round from 'lodash/round'
 
 import {
   WELL_TYPE_BY_CATEGORY,
+  SPACING,
   MM,
-  X_DIM,
-  Y_DIM,
-  DEPTH,
-  DIAMETER,
-  MEASUREMENTS,
+  X_OFFSET,
+  Y_OFFSET,
+  X_SPACING,
+  Y_SPACING,
 } from '../../localization'
+
+import styles from './styles.css'
 
 import { LabeledValueTable, LowercaseText } from '../ui'
 
@@ -23,39 +25,36 @@ import type {
 // safe toFixed
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 
-export type WellDimensionsProps = {
+const spacingValue = (spacing: number) =>
+  spacing ? toFixed(spacing) : <span className={styles.lighter}>N/A</span>
+
+export type WellSpacingProps = {
   wellProperties: LabwareWellGroupProperties,
   displayCategory: LabwareDisplayCategory,
   className?: string,
 }
 
-export default function WellDimensions(props: WellDimensionsProps) {
+export default function WellSpacing(props: WellSpacingProps) {
   const { wellProperties, displayCategory, className } = props
   const wellType =
     WELL_TYPE_BY_CATEGORY[displayCategory] || WELL_TYPE_BY_CATEGORY.other
 
-  const dimensions = [
-    { label: DEPTH, value: toFixed(wellProperties.depth) },
-    wellProperties.diameter != null
-      ? { label: DIAMETER, value: toFixed(wellProperties.diameter) }
-      : null,
-    wellProperties.xDimension != null
-      ? { label: X_DIM, value: toFixed(wellProperties.xDimension) }
-      : null,
-    wellProperties.yDimension != null
-      ? { label: Y_DIM, value: toFixed(wellProperties.yDimension) }
-      : null,
-  ].filter(Boolean)
+  const spacing = [
+    { label: X_OFFSET, value: toFixed(wellProperties.xOffset) },
+    { label: Y_OFFSET, value: toFixed(wellProperties.yOffset) },
+    { label: X_SPACING, value: spacingValue(wellProperties.xSpacing) },
+    { label: Y_SPACING, value: spacingValue(wellProperties.ySpacing) },
+  ]
 
   return (
     <LabeledValueTable
       className={className}
       label={
         <>
-          {wellType} {MEASUREMENTS} <LowercaseText>({MM})</LowercaseText>
+          {wellType} {SPACING} <LowercaseText>({MM})</LowercaseText>
         </>
       }
-      values={dimensions}
+      values={spacing}
     />
   )
 }

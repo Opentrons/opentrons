@@ -5,30 +5,28 @@ import cx from 'classnames'
 import styles from './styles.css'
 
 export type PageProps = {
-  sidebarLargeOnly: boolean,
-  sidebarXlOnly: boolean,
+  detailPage: boolean,
   sidebar: React.Node,
   content: React.Node,
 }
 
 export default function Page(props: PageProps) {
-  const { sidebarLargeOnly, sidebarXlOnly, sidebar, content } = props
+  const { detailPage, sidebar, content } = props
+
   return (
     <div className={styles.page}>
       <div className={styles.content_scroller}>
         <div className={styles.content_width_limiter}>
           <div
             className={cx(styles.sidebar_container, {
-              [styles.sidebar_large_only]: sidebarLargeOnly && !sidebarXlOnly,
-              [styles.sidebar_xl_only]: sidebarXlOnly,
+              [styles.is_detail_page]: detailPage,
             })}
           >
             {sidebar}
           </div>
           <section
             className={cx(styles.content_container, {
-              [styles.sidebar_large_only]: sidebarLargeOnly && !sidebarXlOnly,
-              [styles.sidebar_xl_only]: sidebarXlOnly,
+              [styles.is_detail_page]: detailPage,
             })}
           >
             {content}

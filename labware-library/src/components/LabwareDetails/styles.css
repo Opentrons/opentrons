@@ -3,31 +3,22 @@
 @import '../../styles/spacing.css';
 
 .gallery_container {
-  width: var(--size-two-thirds);
-  max-width: var(--size-4);
-  margin: auto;
+  width: 100%;
+  margin-bottom: var(--spacing-5);
 }
 
 .tags_container {
   margin-top: var(--spacing-3);
 }
 
-.details_container {
-  position: relative;
-  margin: var(--spacing-7) auto;
-  padding: 0 var(--spacing-5);
-  border: var(--bd-light);
-}
-
 .category_container {
   display: flex;
   align-items: baseline;
-  padding: var(--spacing-2) 0 var(--spacing-2);
+  margin-bottom: var(--spacing-2);
 }
 
-.manufacturer_container {
-  padding: var(--spacing-5);
-  background-color: var(--c-light-gray);
+.title_container {
+  margin-bottom: var(--spacing-5);
 }
 
 .title {
@@ -35,106 +26,47 @@
   font-weight: var(--fw-semibold);
   line-height: var(--lh-title);
   color: var(--c-black);
-  margin-bottom: var(--spacing-5);
 }
 
 .lighter {
   opacity: 0.5;
 }
 
-.stats,
-.dimensions,
-.well_dimensions {
-  width: 100%;
+.details_table {
+  margin-top: var(--spacing-7);
 }
 
-.stats {
-  margin-bottom: var(--spacing-5);
-}
-
-.well_dimensions {
-  display: inline-block;
-  vertical-align: top;
-
-  &:nth-child(even) {
-    margin-right: 0;
+@media (--small) {
+  .gallery_container,
+  .details_box_container {
+    display: inline-block;
+    vertical-align: top;
   }
-}
 
-.well_dimensions_row {
-  padding-top: var(--spacing-4);
-  margin-top: var(--spacing-5);
-  border-top: var(--bd-light);
-
-  &:first-child {
-    border: none;
+  .gallery_container {
+    width: var(--size-50p);
   }
-}
 
-.well_volume {
-  padding: 0 var(--spacing-2);
+  .details_box_container {
+    width: calc(var(--size-50p) - var(--spacing-5));
+    margin-left: var(--spacing-5);
+  }
 }
 
 @media (--medium) {
   .gallery_container {
-    display: inline-block;
-    vertical-align: top;
     width: var(--size-third);
-    max-width: var(--size-5);
   }
 
-  .details_container {
-    display: inline-block;
-    vertical-align: top;
-    width: var(--size-third);
-    margin: 0;
-    padding-top: var(--spacing-2);
+  .details_box_container {
+    width: calc(var(--size-two-thirds) - var(--spacing-7));
     margin-left: var(--spacing-7);
-    padding-right: 0;
-  }
-
-  .manufacturer_container {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: var(--size-25p);
-    height: 100%;
-  }
-
-  .stats,
-  .well_dimensions_container {
-    width: 50%;
   }
 }
 
 @media (--large) {
-  .gallery_container {
-    width: var(--size-25p);
-  }
-
   .details_container {
-    width: calc(var(--size-75p) - var(--spacing-7));
-  }
-
-  .stats,
-  .dimensions {
-    width: var(--size-third);
-  }
-
-  .well_dimensions_container {
-    width: var(--size-third);
-  }
-
-  .well_dimensions_row {
-    &:first-child {
-      margin-top: 0;
-      padding-top: 0;
-    }
-  }
-}
-
-@media (--xlarge) {
-  .category_container {
-    padding: var(--spacing-5) 0 var(--spacing-2);
+    max-width: var(--size-5);
+    margin-right: auto;
   }
 }

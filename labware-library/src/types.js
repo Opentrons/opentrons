@@ -11,6 +11,8 @@ export type {
   LabwareWell,
   LabwareWellProperties,
   LabwareWellMap,
+  LabwareVolumeUnits,
+  LabwareDisplayCategory,
 } from '@opentrons/shared-data'
 
 export type LabwareWellGroupProperties = {|

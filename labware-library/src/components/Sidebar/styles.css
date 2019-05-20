@@ -104,9 +104,3 @@
     width: 100%;
   }
 }
-
-@media (--xlarge) {
-  .filter_manufacturer.xl_filter_manufacturer {
-    margin: var(--spacing-5) 0 var(--spacing-7) 0;
-  }
-}

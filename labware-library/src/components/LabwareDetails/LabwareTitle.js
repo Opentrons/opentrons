@@ -12,26 +12,24 @@ import type { LabwareDefinition } from '../../types'
 
 export type LabwareTitleProps = {
   definition: LabwareDefinition,
+  className?: string,
 }
 
 export default function LabwareTitle(props: LabwareTitleProps) {
-  const { definition } = props
+  const { definition, className } = props
   const { metadata } = definition
   const { displayCategory } = definition.metadata
-  const categoryProps = {
-    label: CATEGORY,
-    value:
-      CATEGORY_LABELS_BY_CATEGORY[displayCategory] ||
-      CATEGORY_LABELS_BY_CATEGORY.other,
-  }
+  const category =
+    CATEGORY_LABELS_BY_CATEGORY[displayCategory] ||
+    CATEGORY_LABELS_BY_CATEGORY.other
 
   return (
-    <>
+    <div className={className}>
       <div className={styles.category_container}>
-        <LabelText position={LABEL_LEFT}>{categoryProps.label}</LabelText>
-        <Value>{categoryProps.value}</Value>
+        <LabelText position={LABEL_LEFT}>{CATEGORY}</LabelText>
+        <Value>{category}</Value>
       </div>
       <h2 className={styles.title}>{metadata.displayName}</h2>
-    </>
+    </div>
   )
 }

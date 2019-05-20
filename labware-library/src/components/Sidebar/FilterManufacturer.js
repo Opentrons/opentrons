@@ -18,23 +18,18 @@ import type { FilterParams } from '../../types'
 export type FilterManufacturerProps = {
   ...ContextRouter,
   filters: FilterParams,
-  isLabwareDetail: boolean,
 }
 
 export function FilterManufacturer(props: FilterManufacturerProps) {
-  const { history, filters, isLabwareDetail } = props
+  const { history, filters } = props
   const manufacturers = getAllManufacturers()
   const options = manufacturers.map(value => ({
     value,
     label: MANUFACTURER_LABELS_BY_MANUFACTURER[value] || value,
   }))
 
-  const className = isLabwareDetail
-    ? cx(styles.filter_manufacturer, styles.xl_filter_manufacturer)
-    : styles.filter_manufacturer
-
   return (
-    <label className={className}>
+    <label className={styles.filter_manufacturer}>
       <p className={styles.filter_manufacturer_label}>{MANUFACTURER}</p>
       <SelectField
         className={styles.filter_manufacturer_select}

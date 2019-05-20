@@ -10,15 +10,14 @@ import type { FilterParams } from '../../types'
 
 export type SidebarProps = {
   filters: FilterParams,
-  isLabwareDetail: boolean,
 }
 
 export default function Sidebar(props: SidebarProps) {
-  const { filters, isLabwareDetail } = props
+  const { filters } = props
   return (
     <nav className={styles.sidebar}>
-      {!isLabwareDetail && <LabwareGuide />}
-      <FilterManufacturer filters={filters} isLabwareDetail={isLabwareDetail} />
+      <LabwareGuide />
+      <FilterManufacturer filters={filters} />
       <FilterCategory filters={filters} />
     </nav>
   )

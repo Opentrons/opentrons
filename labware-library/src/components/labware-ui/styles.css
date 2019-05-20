@@ -1,0 +1,12 @@
+@import '@opentrons/components';
+@import '../../styles/spacing.css';
+
+.well_count_data {
+  @apply --flex-between;
+}
+
+.well_properties {
+  margin-top: var(--spacing-5);
+  padding: var(--spacing-5);
+  border: var(--bd-light);
+}

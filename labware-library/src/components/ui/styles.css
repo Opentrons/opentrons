@@ -1,5 +1,20 @@
 @import '@opentrons/components';
+@import '../../styles/breakpoints.css';
 @import '../../styles/spacing.css';
+
+.details_box {
+  border: var(--bd-light);
+  margin-bottom: var(--spacing-5);
+}
+
+.details_box_contents {
+  padding: var(--spacing-5);
+}
+
+.details_box_aside {
+  padding: var(--spacing-5);
+  background-color: var(--c-light-gray);
+}
 
 .label_text {
   flex: none;
@@ -48,5 +63,28 @@
     & > .table_entry {
       width: auto;
     }
+  }
+}
+
+@media (--medium) {
+  .details_box {
+    display: flex;
+    margin-bottom: var(--spacing-7);
+  }
+
+  .details_box_contents {
+    width: var(--size-two-thirds);
+  }
+
+  .details_box_aside {
+    width: var(--size-third);
+    align-self: stretch;
+  }
+}
+
+@media (--large) {
+  .details_box_contents,
+  .details_box_aside {
+    padding: var(--spacing-5) var(--spacing-7);
   }
 }

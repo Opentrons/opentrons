@@ -9,9 +9,9 @@
   /* nav height */
   padding-top: var(--size-mobile-nav);
 
-  &.breadcrumbs_visible {
+  &.is_detail_page {
     /* nav + breadcrumbs height */
-    padding-top: calc(var(--size-main-nav) + var(--size-2));
+    padding-top: calc(var(--size-mobile-nav) + var(--size-2));
   }
 }
 
@@ -20,10 +20,9 @@
 }
 
 .sidebar_container {
-  padding: var(--spacing-7) var(--spacing-3);
+  padding: var(--spacing-7) var(--spacing-3) 0;
 
-  &.sidebar_large_only,
-  &.sidebar_xl_only {
+  &.is_detail_page {
     display: none;
   }
 }
@@ -42,6 +41,11 @@
 @media (--medium) {
   .app {
     padding-top: var(--size-main-nav);
+
+    &.is_detail_page {
+      /* nav + breadcrumbs height */
+      padding-top: calc(var(--size-main-nav) + var(--size-2));
+    }
   }
 
   .page {
@@ -56,6 +60,7 @@
     width: var(--size-3);
     padding-left: var(--spacing-7);
     padding-right: var(--spacing-5);
+    padding-bottom: var(--spacing-3);
     overflow-y: auto;
   }
 
@@ -65,14 +70,14 @@
   }
 
   .content_container {
-    padding-top: var(--spacing-2);
+    padding-top: var(--spacing-7);
     padding-right: var(--spacing-7);
 
     /* spacing + sidebar width */
     padding-left: calc(var(--size-3) + var(--spacing-5));
 
-    &.sidebar_large_only,
-    &.sidebar_xl_only {
+    /* keep padding at spacing-7 on detail page because no sidebar */
+    &.is_detail_page {
       padding-left: var(--spacing-7);
     }
   }
@@ -83,7 +88,7 @@
     /* total nav height */
     padding-top: var(--size-total-nav);
 
-    &.breadcrumbs_visible {
+    &.is_detail_page {
       /* total nav + breadcrumbs height */
       padding-top: calc(var(--size-total-nav) + var(--size-2));
     }
@@ -91,31 +96,16 @@
 
   .sidebar_container {
     width: var(--size-4);
-    padding-left: var(--spacing-7);
-
-    &.sidebar_large_only {
-      display: block;
-    }
-
-    &.sidebar_xl_only {
-      display: none;
-    }
   }
 
-  .content_container,
-  .content_container.sidebar_large_only {
+  .content_container {
     /* spacing + sidebar width */
     padding-left: calc(var(--size-4) + var(--spacing-5));
-  }
-
-  .content_container.sidebar_xl_only {
-    /* no sidebar for labware details until xl */
-    padding-left: var(--spacing-7);
   }
 }
 
 @media (--xlarge) {
-  .content_container.sidebar_xl_only {
+  .content_container.is_detail_page {
     padding-top: var(--spacing-7);
 
     /* spacing + sidebar width */
@@ -126,9 +116,8 @@
     width: var(--size-4);
     padding-left: var(--spacing-7);
 
-    &.sidebar_xl_only {
+    &.is_detail_page {
       display: block;
-      padding-top: 0;
     }
   }
 }
