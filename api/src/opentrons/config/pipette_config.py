@@ -129,8 +129,8 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
             override = load_overrides(pipette_id)
             if 'quirks' in override.keys():
                 override['quirks'] = [
-                    quirk for quirk in override['quirks'].keys()
-                    if override['quirks'][quirk]]
+                    qname for qname, qval in override['quirks'].items()
+                    if qval]
         except FileNotFoundError:
             save_overrides(pipette_id, {}, pipette_model)
             log.info(

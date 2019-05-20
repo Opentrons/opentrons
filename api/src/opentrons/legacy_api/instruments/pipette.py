@@ -1006,8 +1006,8 @@ class Pipette(CommandPublisher):
             # neighboring tips tend to get stuck in the space between
             # the volume chamber and the drop-tip sleeve on p1000.
             # This extra shake ensures those tips are removed
-            self._check_quirks(location, 'pickupTipShake', times=2)
-
+            self._shake_off_tips(location, 'pickupTipShake')
+            self._shake_off_tips(location, 'pickupTipShake')
             self.previous_placeable = None  # no longer inside a placeable
             self.robot.poses = self.instrument_mover.fast_home(
                 self.robot.poses, self._pick_up_distance)
@@ -1098,7 +1098,7 @@ class Pipette(CommandPublisher):
             )
             self.instrument_actuator.pop_speed()
 
-            self._check_quirks(location, 'dropTipShake')
+            self._shake_off_tips(location, 'dropTipShake')
 
             if home_after:
                 self._home_after_drop_tip()
@@ -1116,24 +1116,21 @@ class Pipette(CommandPublisher):
                    'after', self, None, self, location)
         return self
 
-    def _check_quirks(self, location, quirk, times=1):
-        if quirk in self.quirks:
-            for _ in range(times):
-                self._shake_off_tips(location)
-
-    def _shake_off_tips(self, location):
+    def _shake_off_tips(self, location, quirk):
         # tips don't always fall off, especially if resting against
         # tiprack or other tips below it. To ensure the tip has fallen
         # first, shake the pipette to dislodge partially-sealed tips,
         # then second, raise the pipette so loosened tips have room to fall
 
         # shake the pipette left/right a few millimeters
+        if quirk not in self.quirks:
+            return
         shake_off_distance = SHAKE_OFF_TIPS_DISTANCE
         if location:
             placeable, _ = unpack_location(location)
             # ensure the distance is not >25% the diameter of placeable
-            shake_off_distance = min(
-                shake_off_distance, placeable.x_size() / 4)
+            shake_off_distance = max(min(
+                shake_off_distance, placeable.x_size() / 4), 1.0)
         self.robot.gantry.push_speed()
         self.robot.gantry.set_speed(SHAKE_OFF_TIPS_SPEED)
         self.robot.poses = self._jog(
