@@ -1,7 +1,7 @@
 from numpy import add
 import time
 import datetime
-from opentrons import instruments, labware, robot
+from opentrons import instruments, robot
 
 
 def _sleep(seconds):
@@ -23,30 +23,35 @@ def load_pipettes(protocol_data):
 
 
 def load_labware(protocol_data):
-    data = protocol_data.get('labware', {})
+    data = protocol_data['labware']
+    defs = protocol_data['labwareDefinitions']
     loaded_labware = {}
     for labware_id, props in data.items():
-        slot = props.get('slot')
-        model = props.get('model')
+        slot = props['slot']
+        definition_id = props['definitionId']
+        definition = defs[definition_id]
+        if not definition:
+            raise RuntimeError(
+                'No definition under def id {}'.format(definition_id))
         display_name = props.get('displayName')
 
         if slot == '12':
-            if model == 'fixed-trash':
+            if 'fixedTrash' in definition['parameters'].get('quirks', []):
                 # pass in the pre-existing fixed-trash
                 loaded_labware[labware_id] = robot.fixed_trash
             else:
                 # share the slot with the fixed-trash
-                loaded_labware[labware_id] = labware.load(
-                    model,
+                loaded_labware[labware_id] = robot.add_container_by_definition(
+                    definition,
                     slot,
-                    display_name,
+                    label=display_name,
                     share=True
                 )
         else:
-            loaded_labware[labware_id] = labware.load(
-                model,
+            loaded_labware[labware_id] = robot.add_container_by_definition(
+                definition,
                 slot,
-                display_name
+                label=display_name
             )
 
     return loaded_labware
@@ -58,8 +63,8 @@ def _get_location(loaded_labware, command_type, params, default_values):
         # not all commands use labware param
         return None
     well = params.get('well')
-    labware = loaded_labware.get(labwareId)
-    if not labware:
+    lw = loaded_labware.get(labwareId)
+    if not lw:
         raise ValueError(
             'Command tried to use labware "{}", but that ID does not exist ' +
             'in protocol\'s "labware" section'.format(labwareId))
@@ -78,12 +83,12 @@ def _get_location(loaded_labware, command_type, params, default_values):
         # touch-tip uses offset from top, not bottom, as default
         # when offsetFromBottomMm command-specific value is unset
         if command_type == 'touchTip':
-            return labware.wells(well).top(
+            return lw.wells(well).top(
                 z=default_values['touchTipMmFromTop'])
 
-        return labware.wells(well)
+        return lw.wells(well)
 
-    return labware.wells(well).bottom(offset_from_bottom)
+    return lw.wells(well).bottom(offset_from_bottom)
 
 
 def _get_pipette(command_params, loaded_pipettes):

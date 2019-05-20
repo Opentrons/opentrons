@@ -1,6 +1,12 @@
+import os
+import json
 from opentrons import robot, labware, instruments
 from opentrons.protocols import execute_v3
 # TODO: Modify all calls to get a Well to use the `wells` method
+
+with open(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..',
+          'shared-data', 'fixtures', 'fixture96Plate.json'), 'r') as f:
+    fixture_96_plate = json.load(f)
 
 
 def test_load_pipettes():
@@ -66,15 +72,18 @@ def test_get_location():
 def test_load_labware():
     robot.reset()
     data = {
+        "labwareDefinitions": {
+            "someDefId": fixture_96_plate
+        },
         "labware": {
             "sourcePlateId": {
               "slot": "10",
-              "model": "trough-12row",
+              "definitionId": "someDefId",
               "displayName": "Source (Buffer)"
             },
             "destPlateId": {
               "slot": "11",
-              "model": "96-flat",
+              "definitionId": "someDefId",
               "displayName": "Destination Plate"
             },
         }
@@ -89,10 +98,17 @@ def test_load_labware():
 def test_load_labware_trash():
     robot.reset()
     data = {
+        "labwareDefinitions": {
+            "someTrashLabwareId": {
+                "parameters": {
+                    "quirks": ["fixedTrash"]
+                }
+            }
+        },
         "labware": {
             "someTrashId": {
                 "slot": "12",
-                "model": "fixed-trash"
+                "definitionId": "someTrashLabwareId"
             }
         }
     }

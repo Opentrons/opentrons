@@ -68,8 +68,8 @@ def _get_location(loaded_labware, command_type, params, default_values):
         # not all commands use labware param
         return None
     well = params.get('well')
-    labware = loaded_labware.get(labwareId)
-    if not labware:
+    lw = loaded_labware.get(labwareId)
+    if not lw:
         raise ValueError(
             'Command tried to use labware "{}", but that ID does not exist ' +
             'in protocol\'s "labware" section'.format(labwareId))
@@ -90,12 +90,12 @@ def _get_location(loaded_labware, command_type, params, default_values):
         if command_type == 'touch-tip':
             # TODO: Ian 2018-10-29 remove this `-1` when
             # touch-tip-mm-from-top is a required field
-            return labware.wells(well).top(
+            return lw.wells(well).top(
                 z=default_values.get('touch-tip-mm-from-top', -1))
 
-        return labware.wells(well)
+        return lw.wells(well)
 
-    return labware.wells(well).bottom(offset_from_bottom)
+    return lw.wells(well).bottom(offset_from_bottom)
 
 
 def _get_pipette(command_params, loaded_pipettes):
