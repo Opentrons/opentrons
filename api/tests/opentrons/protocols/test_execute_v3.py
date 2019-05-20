@@ -1,41 +1,28 @@
-from opentrons import robot, protocols, labware, instruments
+from opentrons import robot, labware, instruments
+from opentrons.protocols import execute_v3
 # TODO: Modify all calls to get a Well to use the `wells` method
 
 
 def test_load_pipettes():
-    # TODO Ian 2018-11-07 when `model` is dropped, delete its test case
-    test_cases = [
-        # deprecated case
-        {
-            "pipettes": {
-                "leftPipetteHere": {
-                    "mount": "left",
-                    "model": "p10_single_v1.3"
-                }
-            }
-        },
-        # future case
-        {
-            "pipettes": {
-                "leftPipetteHere": {
-                    "mount": "left",
-                    "name": "p10_single"
-                }
+    data = {
+        "pipettes": {
+            "leftPipetteHere": {
+                "mount": "left",
+                "name": "p10_single"
             }
         }
-    ]
+    }
 
-    for data in test_cases:
-        robot.reset()
+    robot.reset()
 
-        loaded_pipettes = protocols.load_pipettes(data)
-        robot_instruments = robot.get_instruments()
+    loaded_pipettes = execute_v3.load_pipettes(data)
+    robot_instruments = robot.get_instruments()
 
-        assert len(robot_instruments) == 1
-        mount, pipette = robot_instruments[0]
-        assert mount == 'left'
-        # loaded pipette in result dict should match that in robot_instruments
-        assert pipette == loaded_pipettes['leftPipetteHere']
+    assert len(robot_instruments) == 1
+    mount, pipette = robot_instruments[0]
+    assert mount == 'left'
+    # loaded pipette in result dict should match that in robot_instruments
+    assert pipette == loaded_pipettes['leftPipetteHere']
 
 
 def test_get_location():
@@ -46,7 +33,7 @@ def test_get_location():
     well = "B2"
 
     default_values = {
-        'aspirate-mm-from-bottom': 2
+        'aspirateMmFromBottom': 2
     }
 
     loaded_labware = {
@@ -60,7 +47,7 @@ def test_get_location():
             "well": well,
             "offsetFromBottomMm": offset
         }
-        result = protocols._get_location(
+        result = execute_v3._get_location(
             loaded_labware, command_type, command_params, default_values)
         assert result == plate.well(well).bottom(offset)
 
@@ -70,10 +57,10 @@ def test_get_location():
     }
 
     # no command-specific offset, use default
-    result = protocols._get_location(
+    result = execute_v3._get_location(
         loaded_labware, command_type, command_params, default_values)
     assert result == plate.well(well).bottom(
-        default_values['aspirate-mm-from-bottom'])
+        default_values['aspirateMmFromBottom'])
 
 
 def test_load_labware():
@@ -83,16 +70,16 @@ def test_load_labware():
             "sourcePlateId": {
               "slot": "10",
               "model": "trough-12row",
-              "display-name": "Source (Buffer)"
+              "displayName": "Source (Buffer)"
             },
             "destPlateId": {
               "slot": "11",
               "model": "96-flat",
-              "display-name": "Destination Plate"
+              "displayName": "Destination Plate"
             },
         }
     }
-    loaded_labware = protocols.load_labware(data)
+    loaded_labware = execute_v3.load_labware(data)
 
     # objects in loaded_labware should be same objs as labware objs in the deck
     assert loaded_labware['sourcePlateId'] in robot.deck['10']
@@ -109,17 +96,9 @@ def test_load_labware_trash():
             }
         }
     }
-    result = protocols.load_labware(data)
+    result = execute_v3.load_labware(data)
 
     assert result['someTrashId'] == robot.fixed_trash
-
-
-def test_blank_protocol():
-    result = protocols.execute_protocol({})
-    assert result == {
-        'pipettes': {},
-        'labware': {}
-    }
 
 
 def test_dispatch_commands(monkeypatch):
@@ -156,57 +135,53 @@ def test_dispatch_commands(monkeypatch):
     monkeypatch.setattr(pipette, 'aspirate', mock_aspirate)
     monkeypatch.setattr(pipette, 'dispense', mock_dispense)
     monkeypatch.setattr(pipette, 'set_flow_rate', mock_set_flow_rate)
-    monkeypatch.setattr(protocols, '_sleep', mock_sleep)
+    monkeypatch.setattr(execute_v3, '_sleep', mock_sleep)
 
     protocol_data = {
-        "default-values": {
-            "aspirate-flow-rate": {
-                "p300_single_v1": 101
+        "defaultValues": {
+            "aspirateFlowRate": {
+                "p300_single": 101
             },
-            "dispense-flow-rate": {
-                "p300_single_v1": 102
+            "dispenseFlowRate": {
+                "p300_single": 102
             }
         },
         "pipettes": {
             "pipetteId": {
                 "mount": "left",
-                "model": "p300_single_v1"
+                "name": "p300_single"
             }
         },
-        "procedure": [
+        "commands": [
             {
-                "subprocedure": [
-                    {
-                        "command": "aspirate",
-                        "params": {
-                            "pipette": "pipetteId",
-                            "labware": "sourcePlateId",
-                            "well": "A1",
-                            "volume": 5,
-                            "flow-rate": 123
-                        }
-                    },
-                    {
-                        "command": "delay",
-                        "params": {
-                            "wait": 42
-                        }
-                    },
-                    {
-                        "command": "dispense",
-                        "params": {
-                            "pipette": "pipetteId",
-                            "labware": "destPlateId",
-                            "well": "B1",
-                            "volume": 4.5
-                        }
-                    },
-                ]
-            }
+                "command": "aspirate",
+                "params": {
+                    "pipette": "pipetteId",
+                    "labware": "sourcePlateId",
+                    "well": "A1",
+                    "volume": 5,
+                    "flowRate": 123
+                }
+            },
+            {
+                "command": "delay",
+                "params": {
+                    "wait": 42
+                }
+            },
+            {
+                "command": "dispense",
+                "params": {
+                    "pipette": "pipetteId",
+                    "labware": "destPlateId",
+                    "well": "B1",
+                    "volume": 4.5
+                }
+            },
         ]
     }
 
-    protocols.dispatch_commands(
+    execute_v3.dispatch_commands(
         protocol_data, loaded_pipettes, loaded_labware)
 
     assert cmd == [
