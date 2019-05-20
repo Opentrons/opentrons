@@ -2,6 +2,12 @@
   "browse_labware": {
     "instructions": "Hover on a well to see contents"
   },
+  "labware_selection": {
+    "measurements": "Labware Measurements",
+    "well_count": "# of wells",
+    "max_vol": "Max Volume",
+    "see_details": "See detail page"
+  },
   "tip_position": {
     "title": "Tip Positioning",
     "body": {

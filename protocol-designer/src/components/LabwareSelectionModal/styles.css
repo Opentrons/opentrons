@@ -52,3 +52,47 @@
   clip-path: inset(0 0 0 360px);
   z-index: 5000;
 }
+
+.labware_preview_wrapper {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  z-index: 1;
+}
+
+.labware_preview {
+  width: 25.25rem;
+  height: 12.8125rem;
+  background-color: var(--c-white);
+  box-shadow: var(--shadow-lvl-2);
+  padding: 1rem;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+}
+
+.labware_preview_header {
+  @apply --font-header-dark;
+}
+
+.labware_render_wrapper {
+  height: 7.125rem;
+  width: 10.75rem;
+}
+
+.labware_detail_row {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+.labware_detail_column {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  flex: 1;
+  padding: 0.25rem 1rem;
+}
