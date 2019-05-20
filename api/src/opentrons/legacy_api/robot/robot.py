@@ -17,7 +17,8 @@ from opentrons.config import feature_flags as fflags
 from opentrons.config.robot_configs import load, DEFAULT_STEPS_PER_MM
 from opentrons.legacy_api import containers, modules
 from opentrons.legacy_api.containers import Container, load_new_labware,\
-    save_new_offsets
+    save_new_offsets, load_new_labware_def
+from opentrons.util.vector import Vector
 
 from .mover import Mover
 from opentrons.config import pipette_config
@@ -44,11 +45,14 @@ def _load_weird_container(container_name):
     return container
 
 
-def _setup_container(container_name):
-    """ Try and find a container in a variety of methods """
-    for meth in (database.load_container,
-                 load_new_labware,
-                 _load_weird_container):
+def _load_container_by_name(container_name):
+    """ Try and find a container in a variety of methods.
+
+    Returns the container or raises a KeyError if it could not be found
+    """
+    for meth in (database.load_container,  # From the labware database
+                 load_new_labware,         # Fallback to built in v2 labware
+                 _load_weird_container):   # honestly don't know
         log.debug(
             f"Trying to load container {container_name} via {meth.__name__}")
         try:
@@ -61,20 +65,23 @@ def _setup_container(container_name):
             log.info(f"{container_name} not in {meth.__name__}")
     else:
         raise KeyError(f"Unknown labware {container_name}")
+    return container
 
-    container_x, container_y, container_z = container._coordinates
+
+def _setup_container(container_obj):
+    """ Fix up a loaded container's coordinates. Returns the container  """
+    container_x, container_y, container_z = container_obj._coordinates
 
     # infer z from height
-    if container_z == 0 and 'height' in container[0].properties:
-        container_z = container[0].properties['height']
+    if container_z == 0 and 'height' in container_obj[0].properties:
+        container_z = container_obj[0].properties['height']
 
-    from opentrons.util.vector import Vector
-    container._coordinates = Vector(
+    container_obj._coordinates = Vector(
         container_x,
         container_y,
         container_z)
 
-    return container
+    return container_obj
 
 
 class Robot(CommandPublisher):
@@ -812,14 +819,30 @@ class Robot(CommandPublisher):
         """
         return self._deck.containers()
 
+    def add_container_by_definition(
+            self, definition, slot, label=None, share=False):
+        container = load_new_labware_def(definition)
+        container_patched = _setup_container(container)
+        return self._add_container_obj(
+            container_patched, container_patched.properties['type'],
+            slot, label, share)
+
     def add_container(self, name, slot, label=None, share=False):
-        container = _setup_container(name)
-        if container is not None:
-            location = self._get_placement_location(slot)
-            if self._is_available_slot(location, share, slot, name):
-                location.add(container, label or name)
-            self.add_container_to_pose_tracker(location, container)
-            self.max_deck_height.cache_clear()
+        container = _load_container_by_name(name)
+        container_patched = _setup_container(container)
+        if not container_patched:
+            return None
+        else:
+            return self._add_container_obj(
+                container_patched, name, slot, label, share)
+
+    def _add_container_obj(
+            self, container, name, slot, label=None, share=False):
+        location = self._get_placement_location(slot)
+        if self._is_available_slot(location, share, slot, name):
+            location.add(container, label or name)
+        self.add_container_to_pose_tracker(location, container)
+        self.max_deck_height.cache_clear()
         return container
 
     def add_container_to_pose_tracker(self, location, container: Container):
