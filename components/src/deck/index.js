@@ -20,7 +20,7 @@ import { SlotOverlay } from './SlotOverlay'
 
 export * from './constants'
 export * from './Deck'
-
+export * from './labwareInternals/types'
 export {
   Deck,
   ContainerNameOverlay,

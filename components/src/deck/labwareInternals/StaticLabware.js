@@ -10,11 +10,13 @@ import Well from './Well'
 import styles from './staticLabware.css'
 
 import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
+import type { WellMouseEvent } from './types'
 
 export type StaticLabwareProps = {|
   definition: LabwareDefinition2,
   selectableWellClass?: string,
-  onMouseOverWell?: (wellName: string) => mixed,
+  onMouseEnterWell?: WellMouseEvent => mixed,
+  onMouseLeaveWell?: WellMouseEvent => mixed,
 |}
 
 const TipDecoration = React.memo(function TipDecoration(props: {
@@ -52,7 +54,8 @@ function StaticLabware(props: StaticLabwareProps) {
                     className={isTiprack ? styles.tip : null}
                     wellName={wellName}
                     well={props.definition.wells[wellName]}
-                    onMouseOverWell={props.onMouseOverWell}
+                    onMouseEnterWell={props.onMouseEnterWell}
+                    onMouseLeaveWell={props.onMouseLeaveWell}
                     selectableWellClass={props.selectableWellClass}
                   />
 

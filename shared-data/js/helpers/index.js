@@ -2,10 +2,7 @@
 import assert from 'assert'
 import type { LabwareDefinition2 } from '../types'
 export { canPipetteUseLabware } from './canPipetteUseLabware'
-export {
-  computeWellAccessDeprecated,
-  computeWellAccess,
-} from './computeWellAccess'
+export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { default as getWellTotalVolume } from './getWellTotalVolume'
 export { default as wellIsRect } from './wellIsRect'
 export * from './volume'

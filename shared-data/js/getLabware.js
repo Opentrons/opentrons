@@ -41,6 +41,7 @@ const _getSvgYValueForWell = (labwareName: string, wellDef: WellDefinition) => {
   return renderHeight - wellDef.y
 }
 
+// TODO IMMEDIATELY: DEPRECATED, remove
 /** For display. Flips Y axis to match SVG, applies offset to wells */
 export function getWellDefsForSVG(labwareName: string) {
   const labware = getLabware(labwareName)

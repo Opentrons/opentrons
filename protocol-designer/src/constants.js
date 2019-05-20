@@ -41,5 +41,3 @@ export const DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP = -1
 
 export const DEFAULT_WELL_ORDER_FIRST_OPTION: 't2b' = 't2b'
 export const DEFAULT_WELL_ORDER_SECOND_OPTION: 'l2r' = 'l2r'
-
-export const WELL_LABEL_OFFSET: number = 8

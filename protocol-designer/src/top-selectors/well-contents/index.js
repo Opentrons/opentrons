@@ -1,6 +1,7 @@
 // @flow
 import { createSelector } from 'reselect'
 
+import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import min from 'lodash/min'
 import pick from 'lodash/pick'
@@ -128,20 +129,18 @@ export const getSelectedWellsMaxVolume: Selector<number> = createSelector(
   labwareIngredSelectors.getSelectedLabwareId,
   stepFormSelectors.getLabwareEntities,
   (selectedWells, selectedLabwareId, labwareEntities) => {
-    const selectedWellNames = Object.keys(selectedWells)
     const def = selectedLabwareId && labwareEntities[selectedLabwareId].def
     if (!def) {
       console.warn('No container type selected, cannot get max volume')
       return Infinity
     }
     const maxVolumesByWell = getMaxVolumes(def)
-    const maxVolumesList =
-      selectedWellNames.length > 0
-        ? // when wells are selected, only look at vols of selected wells
-          Object.values(pick(maxVolumesByWell, selectedWellNames))
-        : // when no wells selected (eg editing ingred group), look at all volumes.
-          // TODO LATER: look at filled wells, not all wells.
-          Object.values(maxVolumesByWell)
+    const maxVolumesList = !isEmpty(selectedWells)
+      ? // when wells are selected, only look at vols of selected wells
+        Object.values(pick(maxVolumesByWell, Object.keys(selectedWells)))
+      : // when no wells selected (eg editing ingred group), look at all volumes.
+        // TODO LATER: look at filled wells, not all wells.
+        Object.values(maxVolumesByWell)
     return min(maxVolumesList.map(n => parseInt(n)))
   }
 )
@@ -153,19 +152,18 @@ export const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSe
   wellSelectionSelectors.getSelectedWells,
   labwareIngredSelectors.getSelectedLabwareId,
   labwareIngredSelectors.getLiquidsByLabwareId,
-  (selectedWellsObj, labwareId, allIngreds) => {
+  (selectedWells, labwareId, allIngreds) => {
     if (!labwareId) return { ingredientId: null, volume: null }
     const ingredsInLabware = allIngreds[labwareId]
-    const selectedWells: Array<string> = Object.keys(selectedWellsObj)
-    if (!ingredsInLabware || selectedWells.length < 1)
+    if (!ingredsInLabware || isEmpty(selectedWells))
       return { ingredientId: null, volume: null }
 
     const initialWellContents: ?StepGeneration.LocationLiquidState =
-      ingredsInLabware[selectedWells[0]]
+      ingredsInLabware[Object.keys(selectedWells)[0]] // TODO IMMEDIATELY why arbitrary 0th???
     const initialIngredId: ?string =
       initialWellContents && Object.keys(initialWellContents)[0]
 
-    const hasCommonIngred = selectedWells.every(well => {
+    const hasCommonIngred = Object.keys(selectedWells).every((well: string) => {
       if (!ingredsInLabware[well]) return null
       const ingreds = Object.keys(ingredsInLabware[well])
       return ingreds.length === 1 && ingreds[0] === initialIngredId
@@ -175,10 +173,14 @@ export const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSe
       return { ingredientId: null, volume: null }
     } else {
       const initialVolume: ?number = initialWellContents[initialIngredId].volume
-      const hasCommonVolume = selectedWells.every(well => {
-        if (!ingredsInLabware[well] || !initialIngredId) return null
-        return ingredsInLabware[well][initialIngredId].volume === initialVolume
-      })
+      const hasCommonVolume = Object.keys(selectedWells).every(
+        (well: string) => {
+          if (!ingredsInLabware[well] || !initialIngredId) return null
+          return (
+            ingredsInLabware[well][initialIngredId].volume === initialVolume
+          )
+        }
+      )
       return {
         ingredientId: initialIngredId,
         volume: hasCommonVolume ? initialVolume : null,

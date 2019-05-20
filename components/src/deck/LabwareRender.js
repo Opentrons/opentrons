@@ -9,16 +9,24 @@ import {
 import styles from './labwareRender.css'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  WellMouseEvent,
+  WellFill,
+  WellGroup,
+} from './labwareInternals/types'
 
 export type LabwareRenderProps = {|
   definition: LabwareDefinition2,
   showLabels?: boolean,
-  missingTips?: Set<string>,
-  highlightedWells?: Set<string>,
+  missingTips?: WellGroup,
+  highlightedWells?: WellGroup,
+  selectedWells?: WellGroup,
   /** CSS color to fill specified wells */
-  wellFill?: { [wellName: string]: string },
-  /** Optional callback, called with well name onMouseOver */
-  onMouseOverWell?: (wellName: string) => mixed,
+  wellFill?: WellFill,
+  /** Optional callback, called with WellMouseEvent args onMouseEnter */
+  onMouseEnterWell?: WellMouseEvent => mixed,
+  /** Optional callback, called with WellMouseEvent args onMouseLeave */
+  onMouseLeaveWell?: WellMouseEvent => mixed,
   /** Special class which, together with 'data-wellname' on the well elements,
     allows drag-to-select behavior */
   selectableWellClass?: string,
@@ -34,7 +42,8 @@ export default function LabwareRender(props: LabwareRenderProps) {
     >
       <StaticLabware
         definition={props.definition}
-        onMouseOverWell={props.onMouseOverWell}
+        onMouseEnterWell={props.onMouseEnterWell}
+        onMouseLeaveWell={props.onMouseLeaveWell}
         selectableWellClass={props.selectableWellClass}
       />
       {props.wellFill && (
@@ -48,6 +57,13 @@ export default function LabwareRender(props: LabwareRenderProps) {
           className={styles.highlighted_well}
           definition={props.definition}
           wells={props.highlightedWells}
+        />
+      )}
+      {props.selectedWells && (
+        <StyledWells
+          className={styles.selected_well}
+          definition={props.definition}
+          wells={props.selectedWells}
         />
       )}
       {props.missingTips && (

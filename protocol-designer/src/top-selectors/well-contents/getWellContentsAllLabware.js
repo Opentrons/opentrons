@@ -7,10 +7,10 @@ import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import wellSelectionSelectors from '../../well-selection/selectors'
 
+import type { WellGroup } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { Selector } from '../../types'
 import type {
-  Wells,
   ContentsByWell,
   WellContentsByLabware,
 } from '../../labware-ingred/types'
@@ -19,8 +19,8 @@ import type { SingleLabwareLiquidState } from '../../step-generation'
 const _getWellContents = (
   labwareDef: LabwareDefinition2,
   __ingredientsForContainer: SingleLabwareLiquidState,
-  selectedWells: ?Wells,
-  highlightedWells: ?Wells
+  selectedWells: ?WellGroup,
+  highlightedWells: ?WellGroup
 ): ContentsByWell | null => {
   // selectedWells and highlightedWells args may both be null,
   // they're only relevant to the selected container.
@@ -33,7 +33,7 @@ const _getWellContents = (
       well: $PropertyType<LabwareDefinition2, 'wells'>,
       wellName: string
     ): ContentsByWell => {
-      const groupIds =
+      const groupIds: Array<string> =
         __ingredientsForContainer && __ingredientsForContainer[wellName]
           ? Object.keys(__ingredientsForContainer[wellName])
           : []
@@ -45,8 +45,7 @@ const _getWellContents = (
           selected: selectedWells ? wellName in selectedWells : false,
           maxVolume: well.totalLiquidVolume,
           groupIds,
-          ingreds:
-            __ingredientsForContainer && __ingredientsForContainer[wellName],
+          ingreds: __ingredientsForContainer?.[wellName] || {},
         },
       }
     },
@@ -71,7 +70,10 @@ const getWellContentsAllLabware: Selector<WellContentsByLabware> = createSelecto
     const allLabwareIds: Array<string> = Object.keys(labwareEntities)
 
     return allLabwareIds.reduce(
-      (acc: WellContentsByLabware, labwareId: string) => {
+      (
+        acc: WellContentsByLabware,
+        labwareId: string
+      ): WellContentsByLabware => {
         const liquidsForLabware = liquidsByLabware[labwareId]
         const isSelectedLabware = selectedLabwareId === labwareId
 

@@ -15,6 +15,7 @@ import * as wellContentsSelectors from '../top-selectors/well-contents'
 import * as tipContentsSelectors from '../top-selectors/tip-contents'
 import wellSelectionSelectors from '../well-selection/selectors'
 
+import type { WellGroup } from '@opentrons/components'
 import type { WellContents, ContentsByWell } from '../labware-ingred/types'
 import type { BaseState } from '../types'
 
@@ -74,7 +75,7 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
     // shows liquids the current step in timeline
     const selectedWells = wellSelectionSelectors.getSelectedWells(state)
     let wellContentsWithoutHighlight = null
-    let highlightedWells
+    let highlightedWells: ?WellGroup = null
 
     if (timelineIdx != null) {
       wellContentsWithoutHighlight = allWellContentsForSteps[timelineIdx]
@@ -96,18 +97,16 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
       const highlightedWellsByLabware = highlightSelectors.wellHighlightsByLabwareId(
         state
       )
-      highlightedWells = highlightedWellsByLabware[containerId] || {}
+      highlightedWells = highlightedWellsByLabware[containerId] || null
     }
 
-    // TODO: Ian 2018-07-31 some sets of wells are {[wellName]: true},
-    // others {[wellName]: wellName}. Use Set instead!
     // TODO: Ian 2018-08-16 pass getWellProps instead of wellContents,
     // and make getWellProps a plain old selector (move that logic out of this STP)
     wellContents = (mapValues(
       wellContentsWithoutHighlight,
       (wellContentsForWell: WellContents, well: string): WellContents => ({
         ...wellContentsForWell,
-        highlighted: Boolean(highlightedWells[well]),
+        highlighted: Boolean(highlightedWells && highlightedWells[well]),
         selected: Boolean(selectedWells[well]),
       })
     ): ContentsByWell)
