@@ -152,7 +152,7 @@ def save_custom_container(data):
         "labware, please use opentrons.containers.create()")
 
 
-def _load_new_well(well_data, saved_offset, format):
+def _load_new_well(well_data, saved_offset, lw_format):
     props = {
         'depth': well_data['depth'],
         'total-liquid-volume': well_data['totalLiquidVolume'],
@@ -166,7 +166,7 @@ def _load_new_well(well_data, saved_offset, format):
             f"Bad definition for well shape: {well_data['shape']}")
     well = Well(properties=props)
 
-    if format == 'trough':
+    if lw_format == 'trough':
         well_tuple = (
             well_data['x'] - well_data['xDimension']/2 + saved_offset.x,
             well_data['y'] + well_data['yDimension']/2 + saved_offset.y,
@@ -220,11 +220,11 @@ def load_new_labware_def(definition):
     log.info(f"Container name {container_name}")
     container.properties['type'] = container_name
     container.properties['otId'] = labware_id
-    format = definition['parameters']['format']
+    lw_format = definition['parameters']['format']
 
     container._coordinates = Vector(definition['cornerOffsetFromSlot'])
     for well_name in itertools.chain(*definition['ordering']):
         well_obj, well_pos = _load_new_well(
-            definition['wells'][well_name], saved_offset, format)
+            definition['wells'][well_name], saved_offset, lw_format)
         container.add(well_obj, well_name, well_pos)
     return container
