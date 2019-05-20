@@ -202,22 +202,29 @@ def save_new_offsets(otId, delta):
 
 
 def load_new_labware(container_name):
-    """ Load a labware in the new schema into a placeable.
+    """ Load a labware in the new schema into a placeable, by name
 
     :raises KeyError: If the labware name is not found
     """
     defn = new_labware.load_definition_by_name(container_name)
-    labware_id = defn['otId']
+    return load_new_labware_def(defn)
+
+
+def load_new_labware_def(definition):
+    """ Load a labware definition in the new schema into a placeable
+    """
+    labware_id = definition['otId']
     saved_offset = _look_up_offsets(labware_id)
     container = Container()
+    container_name = definition['parameters']['loadName']
     log.info(f"Container name {container_name}")
     container.properties['type'] = container_name
     container.properties['otId'] = labware_id
-    format = defn['parameters']['format']
+    format = definition['parameters']['format']
 
-    container._coordinates = Vector(defn['cornerOffsetFromSlot'])
-    for well_name in itertools.chain(*defn['ordering']):
+    container._coordinates = Vector(definition['cornerOffsetFromSlot'])
+    for well_name in itertools.chain(*definition['ordering']):
         well_obj, well_pos = _load_new_well(
-            defn['wells'][well_name], saved_offset, format)
+            definition['wells'][well_name], saved_offset, format)
         container.add(well_obj, well_name, well_pos)
     return container
