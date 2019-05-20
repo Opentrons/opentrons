@@ -21,12 +21,12 @@ export const NUM_WELLS_BY_CATEGORY = {
 }
 
 export const WELL_TYPE_BY_CATEGORY = {
-  tubeRack: 'tubes',
-  tipRack: 'tips',
-  wellPlate: 'wells',
-  trough: 'wells',
-  trash: 'wells',
-  other: 'wells',
+  tubeRack: 'tube',
+  tipRack: 'tip',
+  wellPlate: 'well',
+  trough: 'well',
+  trash: 'well',
+  other: 'well',
 }
 
 export const LABWARE_DIMS_BY_CATEGORY = {
@@ -54,7 +54,7 @@ export const MANUFACTURER_LABELS_BY_MANUFACTURER = {
 
 export const MANUFACTURER = 'manufacturer'
 export const CATEGORY = 'category'
-export const LABWARE = 'labware'
+export const LABWARE = 'footprint'
 export const MEASUREMENTS = 'measurements'
 export const SPACING = 'spacing'
 export const MM = 'mm'

@@ -23,7 +23,7 @@ export default function LabwareDetails(props: LabwareDetailsProps) {
   const { parameters, metadata } = definition
   const { displayCategory, displayVolumeUnits } = metadata
   const wellGroups = getUniqueWellProperties(definition)
-
+  console.log(definition)
   // TODO(mc, 2019-05-20): clarify this logic with UX. If this logic is
   // correct, this will require additional checks for aluminum blocks once
   // that's a thing and data is in place

@@ -13,6 +13,7 @@ describe('Page', () => {
       <Page
         sidebar="foo"
         content="bar"
+        detailPage={false}
         sidebarLargeOnly={false}
         sidebarXlOnly={false}
       />
@@ -26,6 +27,7 @@ describe('Page', () => {
       <Page
         sidebar="foo"
         content="bar"
+        detailPage={false}
         sidebarLargeOnly
         sidebarXlOnly={false}
       />
@@ -39,6 +41,7 @@ describe('Page', () => {
       <Page
         sidebar="foo"
         content="bar"
+        detailPage={true}
         sidebarLargeOnly={false}
         sidebarXlOnly
       />

@@ -12,7 +12,6 @@ exports[`Sidebar component renders 1`] = `
         "manufacturer": "all",
       }
     }
-    isLabwareDetail={false}
   />
   <FilterCategory
     filters={

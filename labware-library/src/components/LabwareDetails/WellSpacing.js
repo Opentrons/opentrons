@@ -4,7 +4,6 @@ import * as React from 'react'
 import round from 'lodash/round'
 
 import {
-  WELL_TYPE_BY_CATEGORY,
   SPACING,
   MM,
   X_OFFSET,
@@ -35,9 +34,10 @@ export type WellSpacingProps = {
 }
 
 export default function WellSpacing(props: WellSpacingProps) {
-  const { wellProperties, displayCategory, className } = props
-  const wellType =
-    WELL_TYPE_BY_CATEGORY[displayCategory] || WELL_TYPE_BY_CATEGORY.other
+  const { wellProperties, className } = props
+  // TODO (ka 2019-5-20): Revist this after grids definition is merged
+  // const wellType =
+  //   WELL_TYPE_BY_CATEGORY[displayCategory] || WELL_TYPE_BY_CATEGORY.other
 
   const spacing = [
     { label: X_OFFSET, value: toFixed(wellProperties.xOffset) },
@@ -51,7 +51,7 @@ export default function WellSpacing(props: WellSpacingProps) {
       className={className}
       label={
         <>
-          {wellType} {SPACING} <LowercaseText>({MM})</LowercaseText>
+          {SPACING} <LowercaseText>({MM})</LowercaseText>
         </>
       }
       values={spacing}

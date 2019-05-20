@@ -2,6 +2,27 @@
 @import '../../styles/breakpoints.css';
 @import '../../styles/spacing.css';
 
+.clickable_icon {
+  cursor: pointer;
+
+  &:active,
+  &:focus {
+    outline: none;
+  }
+}
+
+.info_button {
+  width: 1.25rem;
+  color: var(--c-med-gray);
+}
+
+.table_title {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: var(--spacing-1);
+  border-bottom: var(--bd-light);
+}
+
 .details_box {
   border: var(--bd-light);
   margin-bottom: var(--spacing-5);
@@ -40,6 +61,7 @@
 .value {
   @apply --font-body-2-dark;
 
+  font-weight: var(--fw-semibold);
   line-height: var(--lh-title);
 }
 
@@ -48,6 +70,7 @@
   justify-content: space-between;
   align-items: baseline;
   padding: var(--spacing-2) 0;
+  padding-left: var(--spacing-5);
   width: 100%;
 }
 

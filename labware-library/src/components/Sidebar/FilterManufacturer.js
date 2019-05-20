@@ -2,7 +2,6 @@
 // filter labware by manufacturer
 import * as React from 'react'
 import { withRouter } from 'react-router-dom'
-import cx from 'classnames'
 import { SelectField } from '@opentrons/components'
 import { getAllManufacturers, buildFiltersUrl } from '../../filters'
 import styles from './styles.css'

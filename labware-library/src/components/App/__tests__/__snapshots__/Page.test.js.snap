@@ -36,12 +36,12 @@ exports[`Page component renders with sidebarLargeOnly CSS 1`] = `
       className="content_width_limiter"
     >
       <div
-        className="sidebar_container sidebar_large_only"
+        className="sidebar_container"
       >
         foo
       </div>
       <section
-        className="content_container sidebar_large_only"
+        className="content_container"
       >
         bar
       </section>
@@ -61,12 +61,12 @@ exports[`Page component renders with sidebarXLOnly CSS 1`] = `
       className="content_width_limiter"
     >
       <div
-        className="sidebar_container sidebar_xl_only"
+        className="sidebar_container is_detail_page"
       >
         foo
       </div>
       <section
-        className="content_container sidebar_xl_only"
+        className="content_container is_detail_page"
       >
         bar
       </section>
