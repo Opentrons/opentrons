@@ -101,13 +101,10 @@
             },
             "quirks": {
               "type": "array",
-              "items":
-                {
-                     "type": "string",
-                     "enum": [
-                         "pickupTipShake", "dropTipShake", "doubleDropTip"
-                     ]
-                }
+              "items": {
+                "type": "string",
+                "enum": ["pickupTipShake", "dropTipShake", "doubleDropTip"]
+              }
             },
             "tipLength": {
               "type": "object",
@@ -121,11 +118,11 @@
       "type": "array",
       "description": "Array of mutable configs for a given pipette",
       "items": { "type": "string" }
-  },
-  "validQuirks": {
+    },
+    "validQuirks": {
       "type": "array",
       "description": "Array of valid quirks for a given pipette",
-      "items": { "type": "string"}
-  }
+      "items": { "type": "string" }
+    }
   }
 }
