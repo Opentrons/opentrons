@@ -109,14 +109,15 @@
           "dispense": [[12.5135, 0, 0.7945]]
         }
       ],
-      "quirks": [],
+
       "tipLength": {
         "value": 33,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p10_single_v1.3": {
       "name": "p10_single",
@@ -228,14 +229,14 @@
         "type": "float"
       },
 
-      "quirks": [],
       "tipLength": {
         "value": 33,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p10_single_v1.4": {
       "name": "p10_single",
@@ -346,14 +347,15 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 33,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p10_single_v1.5": {
       "name": "p10_single",
@@ -454,14 +456,15 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 33,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p10_multi_v1": {
       "name": "p10_multi",
@@ -571,14 +574,15 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 33,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p10_multi_v1.3": {
       "name": "p10_multi",
@@ -688,14 +692,15 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 33,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p10_multi_v1.4": {
       "name": "p10_multi",
@@ -805,14 +810,15 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 33,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p10_multi_v1.5": {
       "name": "p10_multi",
@@ -913,14 +919,15 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 33,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p+20_single_v2.0": {
       "name": "p+20_single",
@@ -1021,14 +1028,15 @@
           "dispense": [[26, 0, 0.8]]
         }
       ],
-      "quirks": [],
+
       "tipLength": {
         "value": 31.15,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p50_single_v1": {
       "name": "p50_single",
@@ -1136,14 +1144,15 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 51.7,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p50_single_v1.3": {
       "name": "p50_single",
@@ -1251,14 +1260,15 @@
           "dispense": [[50, 0, 2.931601299]]
         }
       ],
-      "quirks": [],
+
       "tipLength": {
         "value": 51.7,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p50_single_v1.4": {
       "name": "p50_single",
@@ -1366,14 +1376,15 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 51.7,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p50_multi_v1": {
       "name": "p50_multi",
@@ -1481,14 +1492,15 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 51.7,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p50_multi_v1.3": {
       "name": "p50_multi",
@@ -1596,14 +1608,15 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 51.7,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p50_multi_v1.4": {
       "name": "p50_multi",
@@ -1711,14 +1724,15 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 51.7,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p50_multi_v1.5": {
       "name": "p50_multi",
@@ -1819,14 +1833,15 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 51.7,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p300_single_v1": {
       "name": "p300_single",
@@ -1938,14 +1953,15 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 51.7,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p300_single_v1.3": {
       "name": "p300_single",
@@ -2057,14 +2073,15 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 51.7,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p300_single_v1.4": {
       "name": "p300_single",
@@ -2176,14 +2193,15 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 51.7,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p300_single_v1.5": {
       "name": "p300_single",
@@ -2285,14 +2303,15 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 51.7,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p+300_single_v2.0": {
       "name": "p+300_single",
@@ -2391,14 +2410,15 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 52.1,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p300_multi_v1": {
       "name": "p300_multi",
@@ -2496,14 +2516,15 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 51.7,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p300_multi_v1.3": {
       "name": "p300_multi",
@@ -2601,14 +2622,15 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 51.7,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p300_multi_v1.4": {
       "name": "p300_multi",
@@ -2706,14 +2728,15 @@
         "units": "mm",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 51.7,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p300_multi_v1.5": {
       "name": "p300_multi",
@@ -2811,14 +2834,15 @@
         "units": "mm",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 51.7,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     },
     "p1000_single_v1": {
       "name": "p1000_single",
@@ -2920,7 +2944,7 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": ["needs-pickup-shake"],
+      "quirks": ["pickupTipShake", "dropTipShake"],
       "tipLength": {
         "value": 76.7,
         "units": "mm",
@@ -3029,7 +3053,7 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": ["needs-pickup-shake"],
+      "quirks": ["pickupTipShake", "dropTipShake"],
       "tipLength": {
         "value": 76.7,
         "units": "mm",
@@ -3138,7 +3162,7 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": ["needs-pickup-shake"],
+      "quirks": ["pickupTipShake", "dropTipShake"],
       "tipLength": {
         "value": 76.7,
         "units": "mm",
@@ -3247,7 +3271,7 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": ["needs-pickup-shake"],
+      "quirks": ["pickupTipShake", "dropTipShake"],
       "tipLength": {
         "value": 76.7,
         "units": "mm",
@@ -3349,14 +3373,15 @@
         "units": "mm/sec",
         "type": "float"
       },
-      "quirks": [],
+
       "tipLength": {
         "value": 79.5,
         "units": "mm",
         "type": "float",
         "min": 0,
         "max": 100
-      }
+      },
+      "quirks": ["dropTipShake"]
     }
   },
   "mutableConfigs": [
@@ -3374,6 +3399,8 @@
     "dropTipSpeed",
     "tipLength",
     "defaultAspirateFlowRate",
-    "defaultDispenseFlowRate"
-  ]
+    "defaultDispenseFlowRate",
+    "quirks"
+  ],
+  "validQuirks": ["pickupTipShake", "dropTipShake", "doubleDropTip"]
 }

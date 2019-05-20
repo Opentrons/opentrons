@@ -99,7 +99,9 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -285,7 +287,9 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -471,7 +475,9 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -657,7 +663,9 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -812,7 +820,9 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -1003,7 +1013,9 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -1194,7 +1206,9 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -1385,7 +1399,9 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -1540,7 +1556,9 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -1716,7 +1734,9 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -1892,7 +1912,9 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -2068,7 +2090,9 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -2223,7 +2247,9 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -2399,7 +2425,9 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -2575,7 +2603,9 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -2751,7 +2781,9 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -2891,7 +2923,9 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -3031,7 +3065,9 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -3171,7 +3207,9 @@ Object {
     "units": "amps",
     "value": 0.5,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -3311,7 +3349,9 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -3507,7 +3547,9 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -3703,7 +3745,9 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -3899,7 +3943,9 @@ Object {
     "units": "amps",
     "value": 0.3,
   },
-  "quirks": Array [],
+  "quirks": Array [
+    "dropTipShake",
+  ],
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -4060,7 +4106,8 @@ Object {
     "value": 0.5,
   },
   "quirks": Array [
-    "needs-pickup-shake",
+    "pickupTipShake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -4222,7 +4269,8 @@ Object {
     "value": 0.5,
   },
   "quirks": Array [
-    "needs-pickup-shake",
+    "pickupTipShake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -4384,7 +4432,8 @@ Object {
     "value": 0.5,
   },
   "quirks": Array [
-    "needs-pickup-shake",
+    "pickupTipShake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,
@@ -4546,7 +4595,8 @@ Object {
     "value": 0.5,
   },
   "quirks": Array [
-    "needs-pickup-shake",
+    "pickupTipShake",
+    "dropTipShake",
   ],
   "tipLength": Object {
     "max": 100,

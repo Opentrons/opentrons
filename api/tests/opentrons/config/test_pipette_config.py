@@ -70,8 +70,9 @@ def test_override_load():
     cdir = CONFIG['pipette_config_overrides_dir']
 
     existing_overrides = {
-        'pickUpCurrent': {"value": 1231.213},
-        'dropTipSpeed': {"value": 121}
+        'pickUpCurrent': {'value': 1231.213},
+        'dropTipSpeed': {'value': 121},
+        'quirks': {'dropTipShake': True}
     }
 
     existing_id = 'ohoahflaseh08102qa'
@@ -83,6 +84,7 @@ def test_override_load():
     assert pconf.pick_up_current == \
         existing_overrides['pickUpCurrent']['value']
     assert pconf.drop_tip_speed == existing_overrides['dropTipSpeed']['value']
+    assert pconf.quirks == ['dropTipShake']
 
     new_id = '0djaisoa921jas'
     new_pconf = pipette_config.load('p300_multi_v1.4', new_id)
@@ -98,9 +100,10 @@ def test_override_save():
 
     overrides = {
         'pickUpCurrent': {
-            "value": 1231.213},
+            'value': 1231.213},
         'dropTipSpeed': {
-            "value": 121}
+            'value': 121},
+        'quirks': {'dropTipShake': False}
     }
 
     new_id = 'aoa2109j09cj2a'
@@ -117,12 +120,15 @@ def test_override_save():
     assert loaded['dropTipSpeed']['value'] == \
         overrides['dropTipSpeed']['value']
 
+    new_pconf = pipette_config.load('p300_multi_v1.4', new_id)
+    assert new_pconf.quirks == []
+
 
 def test_mutable_configs_only(monkeypatch):
     # Test that only set mutable configs are populated in this dictionary
 
     monkeypatch.setattr(
-        pipette_config, 'mutable_configs', ['tipLength', 'plungerCurrent'])
+        pipette_config, 'MUTABLE_CONFIGS', ['tipLength', 'plungerCurrent'])
 
     new_id = 'aoa2109j09cj2a'
     model = 'p300_multi_v1'
@@ -133,6 +139,6 @@ def test_mutable_configs_only(monkeypatch):
     # instead of dealing with unordered lists, convert to set and check whether
     # these lists have a difference between them
     difference = set(list(config.keys())) - \
-        set(pipette_config.mutable_configs)
+        set(pipette_config.MUTABLE_CONFIGS)
     # ensure empty
     assert bool(difference) is False

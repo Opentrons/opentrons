@@ -995,7 +995,7 @@ class API(HardwareAPILike):
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
         # This extra shake ensures those tips are removed
-        if 'needs-pickup-shake' in instr.config.quirks:
+        if 'pickupTipShake' in instr.config.quirks:
             await self._shake_off_tips(mount)
             await self._shake_off_tips(mount)
 
