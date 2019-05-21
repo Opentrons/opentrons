@@ -16,7 +16,7 @@ import i18n from '../../localization'
 import BrowseLabwareModal from '../labware/BrowseLabwareModal'
 // import LabwareOnDeck, { DragPreviewLayer } from '../labware/LabwareOnDeck'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../steplist'
-import type { InitialDeckSetup } from '../../step-forms'
+import type { InitialDeckSetup, LabwareEntity } from '../../step-forms'
 
 import { LabwareName, AddLabware, EditLabware } from './LabwareOverlays'
 import styles from './DeckSetup.css'
@@ -34,7 +34,9 @@ const isFixed = (labwareEntity: LabwareEntity) =>
 
 const DeckSetup = (props: Props) => {
   const deckDef = useMemo(() => getDeckDefinitions()['ot2_standard'], [])
-  const wrapperRef = useOnClickOutside(props.handleClickOutside)
+  const wrapperRef = useOnClickOutside({
+    onClickOutside: props.handleClickOutside,
+  })
   const headerMessage = props.selectedTerminalItemId
     ? i18n.t(
         `deck.header.${

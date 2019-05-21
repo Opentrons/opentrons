@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { LabwareNameOverlay, humanizeLabwareType } from '@opentrons/components'
 import type { BaseState, ThunkDispatch } from '../../../types'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
-
+import type { LabwareEntity } from '../../../step-forms'
 type OP = {|
   labwareEntity: LabwareEntity,
 |}

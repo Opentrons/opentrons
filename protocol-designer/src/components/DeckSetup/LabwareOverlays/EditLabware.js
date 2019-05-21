@@ -4,9 +4,14 @@ import { connect } from 'react-redux'
 import cx from 'classnames'
 import { Icon } from '@opentrons/components'
 import type { BaseState, ThunkDispatch } from '../../../types'
-import { openIngredientSelector } from '../../../labware-ingred/actions'
+import {
+  openIngredientSelector,
+  deleteContainer,
+  duplicateLabware,
+} from '../../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import i18n from '../../../localization'
+import type { LabwareEntity } from '../../../step-forms'
 import NameThisLabware from './NameThisLabware'
 import styles from './LabwareOverlays.css'
 
@@ -18,21 +23,22 @@ type SP = {|
 |}
 type DP = {|
   editLiquids: () => mixed,
+  duplicateLabware: () => mixed,
+  deleteLabware: () => mixed,
 |}
 
 type Props = { ...OP, ...SP, ...DP }
 
 const EditLabware = (props: Props) => {
-  const { labwareEntity, isYetUnnamed, editLiquids } = props
+  const {
+    labwareEntity,
+    isYetUnnamed,
+    editLiquids,
+    deleteLabware,
+    duplicateLabware,
+  } = props
 
   if (labwareEntity.def.parameters.isTiprack) return null
-
-  const duplicateLabware = () => {
-    console.log('dup labware')
-  }
-  const deleteLabware = () => {
-    console.log('delete labware')
-  }
 
   if (isYetUnnamed) {
     return (
@@ -76,6 +82,14 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   editLiquids: () =>
     dispatch(openIngredientSelector(ownProps.labwareEntity.id)),
+  duplicateLabware: () => dispatch(duplicateLabware(ownProps.labwareEntity.id)),
+  deleteLabware: () => {
+    window.confirm(
+      `Are you sure you want to permanently delete this ${
+        ownProps.labwareEntity.def.metadata.displayName
+      }?`
+    ) && dispatch(deleteContainer({ labwareId: ownProps.labwareEntity.id }))
+  },
 })
 
 export default connect<Props, OP, SP, DP, BaseState, ThunkDispatch<*>>(

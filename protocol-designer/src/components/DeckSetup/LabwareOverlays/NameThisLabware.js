@@ -1,10 +1,12 @@
 // @flow
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
+import cx from 'classnames'
 import { Icon, useOnClickOutside } from '@opentrons/components'
 import { renameLabware } from '../../../labware-ingred/actions'
 import type { BaseState, ThunkDispatch } from '../../../types'
 import i18n from '../../../localization'
+import type { LabwareEntity } from '../../../step-forms'
 import styles from './LabwareOverlays.css'
 
 type OP = {|
@@ -23,7 +25,6 @@ const NameThisLabware = (props: Props) => {
   const [inputValue, setInputValue] = useState('')
 
   const saveNickname = () => {
-    console.log('TRIED TO SAVE')
     props.setLabwareName(inputValue || null)
   }
 
@@ -44,7 +45,7 @@ const NameThisLabware = (props: Props) => {
   }
 
   return (
-    <div className={styles.slot_overlay} ref={wrapperRef}>
+    <div className={cx(styles.slot_overlay, styles.with_form)} ref={wrapperRef}>
       <input
         className={styles.name_input}
         onChange={handleChange}
