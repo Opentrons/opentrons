@@ -106,18 +106,11 @@
 
 @media (--xlarge) {
   .content_container.is_detail_page {
-    padding-top: var(--spacing-7);
-
     /* spacing + sidebar width */
     padding-left: calc(var(--size-4) + var(--spacing-5));
   }
 
-  .sidebar_container {
-    width: var(--size-4);
-    padding-left: var(--spacing-7);
-
-    &.is_detail_page {
-      display: block;
-    }
+  .sidebar_container.is_detail_page {
+    display: block;
   }
 }

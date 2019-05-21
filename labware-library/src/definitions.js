@@ -59,6 +59,7 @@ export function getUniqueWellProperties(
         yOffsetFromTop: dimensions.yDimension - y,
         xSpacing: 0,
         ySpacing: 0,
+        wellCount: 0,
       }
       let group: ?LabwareWellGroupProperties = find(groups, props)
 
@@ -72,6 +73,8 @@ export function getUniqueWellProperties(
       }
 
       if (group) {
+        group.wellCount += 1
+
         if (!group.xSpacing && y === group.yStart) {
           // we've hit the first well in ordering that matches the group's
           // starting well's y position, so use its x position to set spacing

@@ -18,9 +18,6 @@ export type LabwareListProps = {|
 |}
 
 export { default as NoResults } from './NoResults'
-export { default as LabwareGallery } from './LabwareGallery'
-export { default as LoadName } from './LoadName'
-export { default as Tags } from './Tags'
 
 export default function LabwareList(props: LabwareListProps) {
   const { category, manufacturer } = props.filters

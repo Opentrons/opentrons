@@ -48,43 +48,6 @@
   padding: 0 var(--spacing-5) var(--spacing-5);
 }
 
-.gallery_container,
-.gallery,
-.stats {
-  width: 100%;
-}
-
-.gallery_main {
-  @apply --aspect-4-3;
-}
-
-.image_container {
-  @apply --aspect-item;
-  @apply --center-children;
-}
-
-.thumbnail_row {
-  display: flex;
-  justify-content: space-around;
-  width: 100%;
-  margin-top: var(--spacing-5);
-}
-
-.thumbnail_container {
-  @apply --clickable;
-
-  width: calc(var(--size-third) - var(--spacing-5) * 2 / 3);
-  margin-right: var(--spacing-5);
-}
-
-.thumbnail_container:last-of-type {
-  margin-right: 0;
-}
-
-.thumbnail {
-  @apply --aspect-1-1;
-}
-
 .well_count,
 .well_properties {
   margin-top: var(--spacing-5);
@@ -98,68 +61,6 @@
   margin-top: var(--spacing-5);
   padding: var(--spacing-5);
   border: var(--bd-light);
-}
-
-.tags_container {
-  background-color: var(--c-bg-light);
-}
-
-.tags {
-  display: flex;
-  align-items: center;
-  padding: var(--spacing-2) var(--spacing-5);
-
-  & .value {
-    font-size: var(--fs-body-1);
-  }
-}
-
-.load_name {
-  display: flex;
-}
-
-.load_name_label {
-  display: block;
-  width: 100%;
-  padding: var(--spacing-2) var(--spacing-5);
-  background-color: var(--c-lightest-gray);
-}
-
-.load_name_input {
-  font-size: var(--fs-body-1);
-  line-height: var(--lh-title);
-  width: calc(100% + 2 * var(--spacing-2));
-  margin-left: -var(--spacing-2);
-  padding: var(--spacing-1) var(--spacing-2);
-  border: var(--bd-light);
-  color: var(--c-font-dark);
-}
-
-/*
- * TODO(mc, 2019-04-02): production bundle breaks CSS order, so for now make
- * this rule more specific
- */
-button.load_name_button {
-  flex: none;
-  width: var(--size-2);
-  border-radius: 0;
-  background-color: var(--c-dark-gray);
-
-  /*
-   * perceived center of the copy icon is a few pixels off center, so
-   * adjust padding accordingly
-   */
-  padding-left: var(--spacing-5);
-  padding-right: calc(var(--spacing-5) - 0.25rem);
-
-  & svg {
-    stroke: none;
-  }
-}
-
-.copy_tooltip {
-  display: block;
-  text-align: center;
 }
 
 .no_results {
@@ -184,14 +85,6 @@ button.load_name_button {
 }
 
 @media (--medium) {
-  /* .gallery_container {
-    width: var(--size-40p);
-  }
-
-  .stats {
-    width: var(--size-60p);
-  } */
-
   .list {
     margin: 0 auto;
   }

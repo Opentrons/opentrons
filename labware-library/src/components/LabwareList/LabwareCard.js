@@ -7,13 +7,16 @@ import { Link } from 'react-router-dom'
 
 import { getPublicPath } from '../../public-path'
 import { Icon } from '@opentrons/components'
-import Gallery from './LabwareGallery'
-import LoadName from './LoadName'
-import Tags from './Tags'
-import styles from './styles.css'
+import {
+  Gallery,
+  LoadName,
+  Tags,
+  WellCount,
+  AllWellProperties,
+} from '../labware-ui'
 
-import { WellCount, AllWellProperties } from '../labware-ui'
 import { CATEGORY_LABELS_BY_CATEGORY } from '../../localization'
+import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
 
@@ -21,26 +24,27 @@ export type LabwareCardProps = {| definition: LabwareDefinition |}
 
 export default function LabwareCard(props: LabwareCardProps) {
   const { definition } = props
+  const { displayCategory } = definition.metadata
 
   return (
     <li className={styles.card}>
       <TopBar {...props} />
       <Title {...props} />
       <div className={styles.card_contents}>
-        <div className={styles.gallery_container}>
-          <Gallery {...props} />
-        </div>
+        <Gallery definition={definition} className={styles.gallery_container} />
         <div className={styles.stats}>
-          <WellCount definition={definition} className={styles.well_count} />
+          <WellCount
+            count={Object.keys(definition.wells).length}
+            displayCategory={displayCategory}
+            className={styles.well_count}
+          />
           <AllWellProperties
             definition={definition}
             className={styles.well_properties}
           />
         </div>
       </div>
-      <div className={styles.tags_container}>
-        <Tags {...props} />
-      </div>
+      <Tags definition={definition} />
       <LoadName loadName={definition.parameters.loadName} />
     </li>
   )

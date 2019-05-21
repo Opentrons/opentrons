@@ -9,17 +9,18 @@ import {
   MANUFACTURER_LABELS_BY_MANUFACTURER,
 } from '../../localization'
 
-import type { LabwareDefinition } from '../../types'
+import type { LabwareBrand } from '../../types'
 
 export type ManufacturerStatsProps = {|
-  definition: LabwareDefinition,
+  brand: LabwareBrand,
   className?: string,
 |}
 
 export function ManufacturerStats(props: ManufacturerStatsProps) {
-  const { definition, className } = props
-  const { brand } = definition.brand
-  const manfacturerValue = MANUFACTURER_LABELS_BY_MANUFACTURER[brand] || brand
+  const { brand, className } = props
+  const { brand: brandName } = brand
+  const manfacturerValue =
+    MANUFACTURER_LABELS_BY_MANUFACTURER[brandName] || brandName
 
   return (
     <div className={className}>

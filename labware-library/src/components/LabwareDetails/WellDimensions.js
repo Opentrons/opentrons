@@ -3,36 +3,23 @@
 import * as React from 'react'
 import round from 'lodash/round'
 
-import {
-  WELL_TYPE_BY_CATEGORY,
-  MM,
-  X_DIM,
-  Y_DIM,
-  DEPTH,
-  DIAMETER,
-  MEASUREMENTS,
-} from '../../localization'
+import { MM, X_DIM, Y_DIM, DEPTH, DIAMETER } from '../../localization'
 
 import { LabeledValueTable, LowercaseText } from '../ui'
 
-import type {
-  LabwareDisplayCategory,
-  LabwareWellGroupProperties,
-} from '../../types'
+import type { LabwareWellGroupProperties } from '../../types'
 
 // safe toFixed
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 
 export type WellDimensionsProps = {|
+  title: string,
   wellProperties: LabwareWellGroupProperties,
-  displayCategory: LabwareDisplayCategory,
   className?: string,
 |}
 
 export default function WellDimensions(props: WellDimensionsProps) {
-  const { wellProperties, displayCategory, className } = props
-  const wellType =
-    WELL_TYPE_BY_CATEGORY[displayCategory] || WELL_TYPE_BY_CATEGORY.other
+  const { title, wellProperties, className } = props
 
   const dimensions = [
     { label: DEPTH, value: toFixed(wellProperties.depth) },
@@ -52,7 +39,7 @@ export default function WellDimensions(props: WellDimensionsProps) {
       className={className}
       label={
         <>
-          {wellType} {MEASUREMENTS} <LowercaseText>({MM})</LowercaseText>
+          {title} <LowercaseText>({MM})</LowercaseText>
         </>
       }
       values={dimensions}
