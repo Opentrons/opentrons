@@ -15,7 +15,6 @@ import styles from '../labware.css'
 import type { StepIdType } from '../../../form-types'
 import HighlightableLabware from '../../../containers/HighlightableLabware'
 import ClickableText from '../ClickableText'
-import NameThisLabwareOverlay from '../../DeckSetup/NameThisLabwareOverlay'
 import OverlayPanel from '../OverlayPanel'
 import DisabledSelectSlotOverlay from '../DisabledSelectSlotOverlay'
 import BrowseLabwareOverlay from '../BrowseLabwareOverlay'
@@ -253,12 +252,11 @@ const LabwareOnDeck = (props: LabwareOnDeckProps) => {
   if (selectedTerminalItem === START_TERMINAL_ITEM_ID && !addLabwareMode) {
     isManualInterventionStep = true
     if (showNameOverlay) {
-      overlay = (
-        <NameThisLabwareOverlay
-          {...{ setLabwareName, editLiquids }}
-          onClickOutside={setDefaultLabwareName}
-        />
-      )
+      overlay = null
+      // <NameThisLabwareOverlay
+      //   {...{ setLabwareName, editLiquids }}
+      //   onClickOutside={setDefaultLabwareName}
+      // />
     } else {
       overlay = slotHasLabware ? (
         <LabwareDeckSlotOverlay

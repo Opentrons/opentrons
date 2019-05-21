@@ -3,13 +3,12 @@ import React from 'react'
 import { connect } from 'react-redux'
 import cx from 'classnames'
 import { Icon } from '@opentrons/components'
-import type { BaseState, ThunkDispatch } from '../../types'
-import { openIngredientSelector } from '../../labware-ingred/actions'
-import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-// import { openAddLabwareModal } from '../../labware-ingred/actions'
-import i18n from '../../localization'
-import styles from './DeckSetup.css'
-import NameThisLabwareOverlay from './NameThisLabwareOverlay'
+import type { BaseState, ThunkDispatch } from '../../../types'
+import { openIngredientSelector } from '../../../labware-ingred/actions'
+import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
+import i18n from '../../../localization'
+import NameThisLabware from './NameThisLabware'
+import styles from './LabwareOverlays.css'
 
 type OP = {|
   labwareEntity: LabwareEntity,
@@ -23,7 +22,7 @@ type DP = {|
 
 type Props = { ...OP, ...SP, ...DP }
 
-const EditLabwareOverlay = (props: Props) => {
+const EditLabware = (props: Props) => {
   const { labwareEntity, isYetUnnamed, editLiquids } = props
 
   if (labwareEntity.def.parameters.isTiprack) return null
@@ -37,7 +36,7 @@ const EditLabwareOverlay = (props: Props) => {
 
   if (isYetUnnamed) {
     return (
-      <NameThisLabwareOverlay
+      <NameThisLabware
         labwareEntity={labwareEntity}
         editLiquids={editLiquids}
       />
@@ -82,4 +81,4 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
 export default connect<Props, OP, SP, DP, BaseState, ThunkDispatch<*>>(
   mapStateToProps,
   mapDispatchToProps
-)(EditLabwareOverlay)
+)(EditLabware)
