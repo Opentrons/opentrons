@@ -14,7 +14,9 @@
     ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
   ],
   "otId": "d88a5b70-f4c9-11e8-83b8-c3ba5d2a3baa",
-  "deprecated": false,
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "opentrons",
   "metadata": {
     "displayName": "Aluminum Bio-Rad PCR plate 200uL",
     "displayVolumeUnits": "µL",

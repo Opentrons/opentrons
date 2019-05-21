@@ -28,6 +28,7 @@ describe('createLabware', () => {
       spacing: { row: 10, column: 10 },
       well: well1,
       brand: exampleLabware1.brand,
+      namespace: 'fixture',
     })
 
     labware2 = createRegularLabware({
@@ -38,6 +39,7 @@ describe('createLabware', () => {
       grid: { row: 3, column: 2 },
       spacing: { row: 9, column: 9 },
       well: well2,
+      namespace: 'fixture',
     })
   })
 
