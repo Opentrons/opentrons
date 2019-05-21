@@ -17,7 +17,6 @@
   "schemaVersion": 2,
   "version": 1,
   "namespace": "opentrons",
-
   "metadata": {
     "displayName": "Aluminum Bio-Rad PCR plate 200uL",
     "displayVolumeUnits": "µL",

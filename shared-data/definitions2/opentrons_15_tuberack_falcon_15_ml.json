@@ -25,7 +25,6 @@
   "schemaVersion": 2,
   "version": 1,
   "namespace": "opentrons",
-
   "cornerOffsetFromSlot": {
     "x": 0,
     "y": 0,
