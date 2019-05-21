@@ -52,6 +52,7 @@ type OP = {|
   mount: Mount,
   robot: Robot,
   wantedPipette: ?PipetteNameSpecs,
+  setWantedName: (name: string) => mixed,
   baseUrl: string,
   confirmUrl: string,
   exitUrl: string,
@@ -155,7 +156,7 @@ function makeMapStateToProps(): (State, OP) => SP {
 }
 
 function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
-  const { confirmUrl, parentUrl, baseUrl, robot, mount } = ownProps
+  const { confirmUrl, parentUrl, robot, mount } = ownProps
   const disengage = () => dispatch(disengagePipetteMotors(robot, mount))
   const checkPipette = () =>
     disengage().then(() => dispatch(fetchPipettes(robot, true)))
@@ -165,7 +166,7 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
     exit: () =>
       dispatch(home(robot, mount)).then(() => dispatch(push(parentUrl))),
     back: () => dispatch(goBack()),
-    onPipetteSelect: evt => dispatch(push(`${baseUrl}/${evt.target.value}`)),
+    onPipetteSelect: evt => ownProps.setWantedName(evt.target.value),
     moveToFront: () =>
       dispatch(
         moveRobotTo(robot, {
@@ -178,6 +179,7 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
 }
 
 export default function ChangePipette(props: Props) {
+  const [wantedName, setWantedName] = React.useState<string | null>(null)
   const {
     robot,
     parentUrl,
@@ -186,13 +188,13 @@ export default function ChangePipette(props: Props) {
 
   return (
     <Route
-      path={`${path}/:mount${RE_MOUNT}/:name?`}
+      path={`${path}/:mount${RE_MOUNT}`}
       render={propsWithMount => {
         const { params, url: baseUrl } = propsWithMount.match
         const mount: Mount = (params.mount: any)
 
-        const wantedPipette = params.name
-          ? getPipetteNameSpecs(params.name)
+        const wantedPipette = wantedName
+          ? getPipetteNameSpecs(wantedName)
           : null
 
         return (
@@ -202,6 +204,7 @@ export default function ChangePipette(props: Props) {
             subtitle={`${mount} mount`}
             mount={mount}
             wantedPipette={wantedPipette}
+            setWantedName={setWantedName}
             parentUrl={parentUrl}
             baseUrl={baseUrl}
             confirmUrl={`${baseUrl}/confirm`}
