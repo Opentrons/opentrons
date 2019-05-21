@@ -12,7 +12,13 @@ const useOnClickOutside = ({ onClickOutside }) => {
       'expected clicked element to be Node - something went wrong in onClickOutside hook'
     )
 
-    if (onClickOutside && node && !node.current.contains(clickedElem)) {
+    if (
+      onClickOutside &&
+      node &&
+      node.current &&
+      node.current.contains &&
+      !node.current.contains(clickedElem)
+    ) {
       onClickOutside(event)
     }
   }

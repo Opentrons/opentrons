@@ -8,7 +8,7 @@ type Props = {
   y?: string | number,
   children?: React.Node,
   className?: string,
-  innerDivProps?: string,
+  innerDivProps?: React.ElementProps<'div'>,
 }
 
 const RobotCoordsForeignDiv = (props: Props) => {

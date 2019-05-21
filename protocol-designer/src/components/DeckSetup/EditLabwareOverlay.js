@@ -1,87 +1,85 @@
 // @flow
 import React from 'react'
-import type { DeckSlot } from '@opentrons/shared-data'
-import { RobotCoordsForeignDiv, Icon } from '@opentrons/components'
+import { connect } from 'react-redux'
 import cx from 'classnames'
-// import { connect } from 'react-redux'
+import { Icon } from '@opentrons/components'
+import type { BaseState, ThunkDispatch } from '../../types'
+import { openIngredientSelector } from '../../labware-ingred/actions'
+import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 // import { openAddLabwareModal } from '../../labware-ingred/actions'
 import i18n from '../../localization'
 import styles from './DeckSetup.css'
+import NameThisLabwareOverlay from './NameThisLabwareOverlay'
 
-type OP = {| slot: DeckSlot |}
-type DP = {|
-  addLabware: (e: SyntheticEvent<*>) => mixed,
+type OP = {|
+  labwareEntity: LabwareEntity,
 |}
-type Props = {| ...OP, ...DP |}
+type SP = {|
+  isYetUnnamed: boolean,
+|}
+type DP = {|
+  editLiquids: () => mixed,
+|}
 
-const EditLabwareOverlay = ({ slot, labwareEntity, addLabware }: Props) => {
+type Props = { ...OP, ...SP, ...DP }
+
+const EditLabwareOverlay = (props: Props) => {
+  const { labwareEntity, isYetUnnamed, editLiquids } = props
+
   if (labwareEntity.def.parameters.isTiprack) return null
 
-  const addLiquids = () => {
-    console.log('add liquids')
-  }
-  const leaveEmpty = () => {
-    console.log('leave empty')
-  }
-  const editLiquids = () => {
-    console.log('edit liquids')
-  }
   const duplicateLabware = () => {
     console.log('dup labware')
   }
   const deleteLabware = () => {
     console.log('delete labware')
   }
-  return (
-    <RobotCoordsForeignDiv
-      x={slot.position[0]}
-      y={slot.position[1]}
-      width={slot.boundingBox.xDimension}
-      height={slot.boundingBox.yDimension}
-      innerDivProps={{
-        className: cx(styles.slot_overlay, styles.appear_on_mouseover),
-      }}
-    >
-      <input
-        className={styles.name_input}
-        // onChange={this.handleChange}
-        // onKeyUp={this.handleKeyUp}
-        placeholder={i18n.t('deck.overlay.name_labware.nickname_placeholder')}
-        // value={this.state.inputValue}
+
+  if (isYetUnnamed) {
+    return (
+      <NameThisLabwareOverlay
+        labwareEntity={labwareEntity}
+        editLiquids={editLiquids}
       />
-
-      <p onClick={addLiquids}>
-        <Icon className={styles.overlay_icon} name="water" />
-        {i18n.t('deck.overlay.name_labware.add_liquids')}
-      </p>
-      <p onClick={leaveEmpty}>
-        <Icon className={styles.overlay_icon} name="ot-water-outline" />
-        {i18n.t('deck.overlay.name_labware.leave_empty')}
-      </p>
-
-      {/*  can add ingreds */}
-      {false && (
-        <>
-          <div onClick={editLiquids}>
-            <Icon name="pencil" />
-            <p>Name & Liquids</p>
-          </div>
-          <div onClick={duplicateLabware}>
-            <Icon name="content-copy" />
-            <p>Duplicate</p>
-          </div>
-          <div onClick={deleteLabware}>
-            <Icon name="close" />
-            <p>Delete</p>
-          </div>
-        </>
-      )}
-    </RobotCoordsForeignDiv>
-  )
+    )
+  } else {
+    return (
+      <div
+        className={cx(styles.slot_overlay, {
+          [styles.appear_on_mouseover]: !isYetUnnamed,
+        })}
+      >
+        <a className={styles.overlay_button} onClick={editLiquids}>
+          <Icon className={styles.overlay_icon} name="pencil" />
+          Name & Liquids
+        </a>
+        <a className={styles.overlay_button} onClick={duplicateLabware}>
+          <Icon className={styles.overlay_icon} name="content-copy" />
+          Duplicate
+        </a>
+        <a className={styles.overlay_button} onClick={deleteLabware}>
+          <Icon className={styles.overlay_icon} name="close" />
+          Delete
+        </a>
+      </div>
+    )
+  }
 }
 
-// const mapDispatchToProps = (dispatch: Dispatch, ownProps: OP): DP => ({
-//   addLabware: () => dispatch(openAddLabwareModal({ slot: ownProps.slot.id })),
-// })
+const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
+  const { id } = ownProps.labwareEntity
+  const hasName = labwareIngredSelectors.getSavedLabware(state)[id]
+  return {
+    isYetUnnamed: !ownProps.labwareEntity.def.parameters.isTiprack && !hasName,
+  }
+}
 
-export default EditLabwareOverlay
+const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
+  editLiquids: () =>
+    dispatch(openIngredientSelector(ownProps.labwareEntity.id)),
+})
+
+export default connect<Props, OP, SP, DP, BaseState, ThunkDispatch<*>>(
+  mapStateToProps,
+  mapDispatchToProps
+)(EditLabwareOverlay)

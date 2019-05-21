@@ -1,7 +1,7 @@
 // @flow
 import React from 'react'
 import type { DeckSlot } from '@opentrons/shared-data'
-import { RobotCoordsForeignDiv } from '@opentrons/components'
+import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
 import cx from 'classnames'
 import { connect } from 'react-redux'
 import { openAddLabwareModal } from '../../labware-ingred/actions'
@@ -25,7 +25,10 @@ const AddLabwareOverlay = ({ slot, addLabware }: Props) => (
       onClick: addLabware,
     }}
   >
-    <p>+ Add Labware</p>
+    <a className={styles.overlay_button} onClick={addLabware}>
+      <Icon className={styles.overlay_icon} name="plus" />
+      Add Labware
+    </a>
   </RobotCoordsForeignDiv>
 )
 

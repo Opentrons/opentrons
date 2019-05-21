@@ -17,21 +17,54 @@
   @apply --center-children;
 }
 
-.slot_overlay {
-  background-color: var(--c-black);
+.slot_ui {
   height: 100%;
   width: 100%;
+}
+
+.slot_overlay {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 0.5rem;
+  opacity: 0.75;
+  background-color: var(--c-black);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  justify-content: space-around;
+  align-items: flex-start;
   color: white;
+  font-size: 0.75rem;
+  vertical-align: middle;
+}
+
+.name_input {
+  width: 7rem;
+}
+
+.multi_row {
+  align-items: flex-start;
+}
+
+.overlay_button {
+  text-decoration: none;
+  color: white;
+  display: flex;
+  align-items: center;
   cursor: pointer;
 }
 
+.overlay_button:active {
+  opacity: 0.5;
+}
+
 .overlay_icon {
-  height: 15px;
-  width: 15px;
+  height: 1rem;
+  width: 1rem;
+  margin-right: 0.25rem;
 }
 
 .appear_on_mouseover {
