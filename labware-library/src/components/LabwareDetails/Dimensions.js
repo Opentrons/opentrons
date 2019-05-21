@@ -3,7 +3,7 @@
 import * as React from 'react'
 import round from 'lodash/round'
 
-import { LABWARE, MM, X_DIM, Y_DIM, Z_DIM } from '../../localization'
+import { FOOTPRINT, MM, X_DIM, Y_DIM, Z_DIM } from '../../localization'
 import { LabeledValueTable, LowercaseText } from '../ui'
 
 import type { LabwareDefinition } from '../../types'
@@ -30,7 +30,7 @@ export default function Dimensions(props: DimensionsProps) {
       className={className}
       label={
         <>
-          {LABWARE} <LowercaseText>({MM})</LowercaseText>
+          {FOOTPRINT} <LowercaseText>({MM})</LowercaseText>
         </>
       }
       values={dimensions}

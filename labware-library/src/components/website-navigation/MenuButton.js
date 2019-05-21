@@ -16,15 +16,3 @@ export default function MenuButton(props: MobileNavProps) {
     />
   )
 }
-
-// ONEOFF: Needed for overriding button styles, possible candidate for ui/
-// type Props = { ...React.ElementProps<'button'>, ...$Exact<IconProps> }
-//
-// export function ClickableIcon(props: Props) {
-//   const className = cx(styles.clickable_icon, props.className)
-//   return (
-//     <button type="button" {...props} className={className}>
-//       <Icon name={props.name} />
-//     </button>
-//   )
-// }

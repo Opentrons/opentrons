@@ -54,7 +54,7 @@ export const MANUFACTURER_LABELS_BY_MANUFACTURER = {
 
 export const MANUFACTURER = 'manufacturer'
 export const CATEGORY = 'category'
-export const LABWARE = 'footprint'
+export const FOOTPRINT = 'footprint'
 export const MEASUREMENTS = 'measurements'
 export const SPACING = 'spacing'
 export const MM = 'mm'
