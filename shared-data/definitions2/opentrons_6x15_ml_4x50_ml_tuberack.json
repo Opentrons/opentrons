@@ -9,7 +9,7 @@
   "schemaVersion": 2,
   "version": 1,
   "namespace": "opentrons",
-  "deprecated": false,
+
   "metadata": {
     "displayName": "Opentrons 6x15mL 4x50mL tube rack",
     "displayCategory": "tubeRack",

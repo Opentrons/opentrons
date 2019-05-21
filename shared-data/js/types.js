@@ -116,7 +116,6 @@ export type LabwareDefinition2 = {|
   version: number,
   schemaVersion: 2,
   namespace: string,
-  deprecated: boolean,
   metadata: LabwareMetadata,
   dimensions: LabwareDimensions,
   cornerOffsetFromSlot: LabwareOffset,

@@ -17,7 +17,7 @@
   "schemaVersion": 2,
   "version": 1,
   "namespace": "opentrons",
-  "deprecated": false,
+
   "metadata": {
     "displayName": "Opentrons GEB 1000uL Tiprack",
     "displayVolumeUnits": "µL",

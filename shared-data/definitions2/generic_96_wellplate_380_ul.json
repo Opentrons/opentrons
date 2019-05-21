@@ -17,7 +17,7 @@
   "schemaVersion": 2,
   "version": 1,
   "namespace": "opentrons",
-  "deprecated": false,
+
   "metadata": {
     "displayName": "ANSI 96 Standard Microplate",
     "displayCategory": "wellPlate",

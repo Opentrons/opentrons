@@ -13,7 +13,7 @@
   "schemaVersion": 2,
   "version": 1,
   "namespace": "opentrons",
-  "deprecated": false,
+
   "metadata": {
     "displayName": "Corning 48 Well Plate",
     "displayVolumeUnits": "mL",

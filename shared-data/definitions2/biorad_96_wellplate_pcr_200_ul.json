@@ -17,7 +17,6 @@
   "schemaVersion": 2,
   "version": 1,
   "namespace": "opentrons",
-  "deprecated": false,
   "metadata": {
     "displayName": "Bio-Rad HardShell 96-Well PCR Plate",
     "displayCategory": "wellPlate",

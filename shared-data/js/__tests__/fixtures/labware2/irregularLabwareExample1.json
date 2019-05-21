@@ -15,7 +15,6 @@
   "schemaVersion": 2,
   "version": 1,
   "namespace": "fixture",
-  "deprecated": false,
   "metadata": {
     "displayName": "Fake Irregular Container",
     "displayCategory": "tubeRack",

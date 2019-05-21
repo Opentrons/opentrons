@@ -14,7 +14,6 @@
     "schemaVersion",
     "version",
     "namespace",
-    "deprecated",
     "metadata",
     "brand",
     "parameters",
@@ -40,10 +39,6 @@
     },
     "namespace": {
       "description": "The namespace that the definition lives under. Note: 'opentrons' is a controlled namespace for official Opentrons definitions."
-    },
-    "deprecated": {
-      "description": "Flag specifying whether a labware is deprecated or not",
-      "type": "boolean"
     },
     "metadata": {
       "type": "object",

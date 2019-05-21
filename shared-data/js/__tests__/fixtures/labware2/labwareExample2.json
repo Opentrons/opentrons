@@ -1,6 +1,5 @@
 {
   "otId": "mock-id",
-  "deprecated": false,
   "metadata": {
     "displayName": "fake labware 2",
     "displayCategory": "wellPlate",

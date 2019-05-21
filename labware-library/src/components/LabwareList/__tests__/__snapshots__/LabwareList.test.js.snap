@@ -15,7 +15,6 @@ exports[`LabwareList component renders 1`] = `
           "y": 0,
           "z": 0,
         },
-        "deprecated": false,
         "dimensions": Object {
           "xDimension": 127.76,
           "yDimension": 85.48,
@@ -632,7 +631,6 @@ exports[`LabwareList component renders 1`] = `
           "y": 0,
           "z": 0,
         },
-        "deprecated": false,
         "dimensions": Object {
           "xDimension": 127.76,
           "yDimension": 85.48,
@@ -696,7 +694,6 @@ exports[`LabwareList component renders 1`] = `
           "y": 35.48,
           "z": 0,
         },
-        "deprecated": false,
         "dimensions": Object {
           "xDimension": 50,
           "yDimension": 50,

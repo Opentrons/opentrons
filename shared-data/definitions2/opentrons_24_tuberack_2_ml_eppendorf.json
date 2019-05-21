@@ -11,7 +11,7 @@
   "schemaVersion": 2,
   "version": 1,
   "namespace": "opentrons",
-  "deprecated": false,
+
   "metadata": {
     "displayVolumeUnits": "mL",
     "displayCategory": "tubeRack",

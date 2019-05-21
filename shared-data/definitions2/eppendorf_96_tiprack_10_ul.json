@@ -17,7 +17,7 @@
   "schemaVersion": 2,
   "version": 1,
   "namespace": "opentrons",
-  "deprecated": false,
+
   "metadata": {
     "displayName": "epT.I.P.S. 0.1-10 uL tiprack",
     "displayVolumeUnits": "µL",

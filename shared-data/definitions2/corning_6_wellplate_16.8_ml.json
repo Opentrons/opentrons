@@ -1,7 +1,7 @@
 {
   "ordering": [["A1", "B1"], ["A2", "B2"], ["A3", "B3"]],
   "otId": "bd10e8d0-f4da-11e8-bb2a-e7b1dd90654d",
-  "deprecated": false,
+
   "metadata": {
     "displayName": "Corning 6 Well Plate",
     "displayVolumeUnits": "mL",
