@@ -872,6 +872,15 @@ class InstrumentContext(CommandPublisher):
         bot = loc.bottom()
         bot = bot._replace(point=bot.point._replace(z=bot.point.z + 10))
         self.drop_tip(bot)
+        try:
+            loc.parent.return_tips(loc, self.channels)
+        except AssertionError:
+            # The failure mode here is "can't return the tip", and might
+            # happen because another pipette took a tip from the tiprack
+            # since this pipette did. In this case just don't return the
+            # tip to the tip tracker
+            self._log.exception('Could not return tip to tip tracker')
+
         return self
 
     @cmds.publish.both(command=cmds.pick_up_tip)  # noqa(C901)
@@ -1034,6 +1043,17 @@ class InstrumentContext(CommandPublisher):
                 " However, it is a {}".format(location))
         self.move_to(target)
         self._hw_manager.hardware.drop_tip(self._mount)
+        if target.labware.parent.is_tiprack:
+            # If this is a tiprack we can try and add the tip back to the
+            # tracker
+            try:
+                target.labware.parent.return_tips(
+                    target.labware, self.channels)
+            except AssertionError:
+                # Similarly to :py:meth:`return_tips`, the failure case here
+                # just means the tip can't be reused, so don't actually stop
+                # the protocol
+                self._log.exception(f'Could not return tip to {target}')
         self._last_tip_picked_up_from = None
         return self
 

@@ -284,6 +284,51 @@ def test_select_next_tip():
     assert next_eight == well_list[16]
 
 
+def test_previous_tip():
+    labware_name = 'opentrons_96_tiprack_300_ul'
+    labware_def = labware.load_definition_by_name(labware_name)
+    tiprack = labware.Labware(labware_def,
+                              Location(Point(0, 0, 0), 'Test Slot'))
+    # If all wells are used, we can't get a previous tip
+    assert tiprack.previous_tip() is None
+    # If one well is empty, wherever it is, we can get a slot
+    tiprack.wells()[5].has_tip = False
+    assert tiprack.previous_tip() is tiprack.wells()[5]
+    # But not if we ask for more slots than are available
+    assert tiprack.previous_tip(2) is None
+    tiprack.wells()[7].has_tip = False
+    # And those available wells have to be contiguous
+    assert tiprack.previous_tip(2) is None
+    # But if they are, we're good
+    tiprack.wells()[6].has_tip = False
+    assert tiprack.previous_tip(3) is tiprack.wells()[5]
+
+
+def test_return_tips():
+    labware_name = 'opentrons_96_tiprack_300_ul'
+    labware_def = labware.load_definition_by_name(labware_name)
+    tiprack = labware.Labware(labware_def,
+                              Location(Point(0, 0, 0), 'Test Slot'))
+    # If all wells are used, we get an error if we try to return
+    with pytest.raises(AssertionError):
+        tiprack.return_tips(tiprack.wells()[0])
+    # If we have space where we specify, everything is OK
+    tiprack.wells()[0].has_tip = False
+    tiprack.return_tips(tiprack.wells()[0])
+    assert tiprack.wells()[0].has_tip
+    # We have to have enough space
+    tiprack.wells()[0].has_tip = False
+    with pytest.raises(AssertionError):
+        tiprack.return_tips(tiprack.wells()[0], 2)
+    # But we can drop stuff off the end of a column
+    tiprack.wells()[7].has_tip = False
+    tiprack.wells()[8].has_tip = False
+    tiprack.return_tips(tiprack.wells()[7], 2)
+    assert tiprack.wells()[7].has_tip
+    # But we won't wrap around
+    assert not tiprack.wells()[8].has_tip
+
+
 def test_module_load():
     module_names = ['tempdeck', 'magdeck']
     module_defs = json.loads(
