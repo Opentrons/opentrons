@@ -278,6 +278,22 @@ Tip rack for a 1000 uL pipette (single or 8-channel)
 
 .. image:: img/labware_lib/Tiprack-1000.png
 
+opentrons-tiprack-1000ul
+---------------
+
+This is a custom-made 1000ul tiprack for the OT 2 model (single or 8-channel)
+
+.. code-block:: python
+
+    labware.load('opentrons-tiprack-1000ul', slot)
+
+
+**Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
+
+`Check out our available tipracks here`__
+
+__ https://shop.opentrons.com/collections/opentrons-tips
+
 tiprack-1000ul-chem
 -------------------
 
