@@ -13,9 +13,9 @@ import type { FilterParams } from '../../types'
 const filterMatches = (filter: ?string, value: string): boolean =>
   !filter || filter === FILTER_OFF || filter === value
 
-export type LabwareListProps = {
+export type LabwareListProps = {|
   filters: FilterParams,
-}
+|}
 
 export { default as NoResults } from './NoResults'
 export { default as LabwareGallery } from './LabwareGallery'

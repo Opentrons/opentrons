@@ -11,10 +11,10 @@ import {
 
 import type { LabwareDefinition } from '../../types'
 
-export type ManufacturerStatsProps = {
+export type ManufacturerStatsProps = {|
   definition: LabwareDefinition,
   className?: string,
-}
+|}
 
 export function ManufacturerStats(props: ManufacturerStatsProps) {
   const { definition, className } = props

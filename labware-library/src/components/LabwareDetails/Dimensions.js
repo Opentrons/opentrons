@@ -11,10 +11,10 @@ import type { LabwareDefinition } from '../../types'
 // safe toFixed
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 
-export type DimensionsProps = {
+export type DimensionsProps = {|
   definition: LabwareDefinition,
   className?: string,
-}
+|}
 
 export default function Dimensions(props: DimensionsProps) {
   const { definition, className } = props

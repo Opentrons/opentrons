@@ -13,9 +13,9 @@ const EN_COPY_SUCCESS_MESSAGE = 'Copied to clipboard!'
 const COPY_ICON = 'ot-copy-text'
 const SUCCESS_TIMEOUT_MS = 1500
 
-export type LoadNameProps = {
+export type LoadNameProps = {|
   loadName: string,
-}
+|}
 
 export default function LoadName(props: LoadNameProps) {
   const { loadName } = props

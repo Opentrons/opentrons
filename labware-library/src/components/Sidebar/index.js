@@ -8,9 +8,9 @@ import styles from './styles.css'
 
 import type { FilterParams } from '../../types'
 
-export type SidebarProps = {
+export type SidebarProps = {|
   filters: FilterParams,
-}
+|}
 
 export default function Sidebar(props: SidebarProps) {
   const { filters } = props

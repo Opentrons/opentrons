@@ -8,9 +8,9 @@ import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
 
-export type BreadcrumbsProps = {
+export type BreadcrumbsProps = {|
   definition: LabwareDefinition | null,
-}
+|}
 
 export default function Breadcrumbs(props: BreadcrumbsProps) {
   const { definition } = props

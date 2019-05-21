@@ -3,10 +3,10 @@ import * as React from 'react'
 
 import styles from './styles.css'
 
-export type ValueProps = {
+export type ValueProps = {|
   /** contents of the value */
   children: React.Node,
-}
+|}
 
 /**
  * Value - display a value, sometimes in a <Table> and usually labeled by a

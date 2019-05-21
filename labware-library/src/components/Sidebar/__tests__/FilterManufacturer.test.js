@@ -28,7 +28,6 @@ describe('FilterManufacturer', () => {
         history={({}: any)}
         match={({}: any)}
         filters={filters}
-        isLabwareDetail={false}
       />
     )
 

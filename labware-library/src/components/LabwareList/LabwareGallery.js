@@ -6,18 +6,18 @@ import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
 
-export type GalleryProps = {
+export type GalleryProps = {|
   definition: LabwareDefinition,
-}
+|}
 
-export type GalleryState = {
+export type GalleryState = {|
   currentImage: number,
-}
+|}
 
-type ThumbnailProps = {
+type ThumbnailProps = {|
   onClick: () => mixed,
   children: React.Node,
-}
+|}
 
 class Gallery extends React.Component<GalleryProps, GalleryState> {
   constructor(props: GalleryProps) {
@@ -52,7 +52,6 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
           {images.map((img, index) => (
             <Thumbnail
               key={index}
-              imageId={index}
               onClick={() => this.setState({ currentImage: index })}
             >
               {img}

@@ -10,12 +10,12 @@ export type TableDirection = 'row' | 'column'
 export const TABLE_COLUMN: TableDirection = 'column'
 export const TABLE_ROW: TableDirection = 'row'
 
-export type TableProps = {
+export type TableProps = {|
   /** direction of table; defaults to "column" */
   direction?: TableDirection,
   /** contents of the "table" */
   children: React.Node,
-}
+|}
 
 /**
  * Table - rows or columns of data, usually <TableEntry>
@@ -31,10 +31,10 @@ export function Table(props: TableProps) {
   return <div className={classes}>{children}</div>
 }
 
-export type TableEntryProps = {
+export type TableEntryProps = {|
   /** contents of the "table" row or column */
   children: React.Node,
-}
+|}
 
 /**
  * TableEntry - A row or column in a <Table>, with children that are usually

@@ -14,9 +14,9 @@ import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
 
-export type LabwareDetailsProps = {
+export type LabwareDetailsProps = {|
   definition: LabwareDefinition,
-}
+|}
 
 export default function LabwareDetails(props: LabwareDetailsProps) {
   const { definition } = props

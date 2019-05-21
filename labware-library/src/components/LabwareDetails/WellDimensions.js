@@ -23,11 +23,11 @@ import type {
 // safe toFixed
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 
-export type WellDimensionsProps = {
+export type WellDimensionsProps = {|
   wellProperties: LabwareWellGroupProperties,
   displayCategory: LabwareDisplayCategory,
   className?: string,
-}
+|}
 
 export default function WellDimensions(props: WellDimensionsProps) {
   const { wellProperties, displayCategory, className } = props

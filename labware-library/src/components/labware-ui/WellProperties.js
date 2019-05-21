@@ -14,15 +14,15 @@ import type {
   LabwareVolumeUnits,
 } from '../../types'
 
-export type AllWellPropertiesProps = {
+export type AllWellPropertiesProps = {|
   definition: LabwareDefinition,
   className?: string,
-}
+|}
 
-export type WellPropertiesProps = {
+export type WellPropertiesProps = {|
   wellProperties: LabwareWellGroupProperties,
   displayVolumeUnits: LabwareVolumeUnits,
-}
+|}
 
 export function AllWellProperties(props: AllWellPropertiesProps) {
   const { definition, className } = props
@@ -34,7 +34,6 @@ export function AllWellProperties(props: AllWellPropertiesProps) {
       {uniqueWellProps.map((wellProperties, i) => (
         <WellProperties
           key={i}
-          className={styles.well_properties}
           wellProperties={wellProperties}
           displayVolumeUnits={displayVolumeUnits}
         />

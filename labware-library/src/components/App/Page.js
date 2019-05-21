@@ -4,11 +4,11 @@ import cx from 'classnames'
 
 import styles from './styles.css'
 
-export type PageProps = {
+export type PageProps = {|
   detailPage: boolean,
   sidebar: React.Node,
   content: React.Node,
-}
+|}
 
 export default function Page(props: PageProps) {
   const { detailPage, sidebar, content } = props

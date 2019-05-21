@@ -14,10 +14,10 @@ import {
 import type { ContextRouter } from 'react-router-dom'
 import type { FilterParams } from '../../types'
 
-export type FilterManufacturerProps = {
+export type FilterManufacturerProps = {|
   ...ContextRouter,
   filters: FilterParams,
-}
+|}
 
 export function FilterManufacturer(props: FilterManufacturerProps) {
   const { history, filters } = props

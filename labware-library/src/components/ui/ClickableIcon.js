@@ -4,18 +4,21 @@ import cx from 'classnames'
 
 import { Icon } from '@opentrons/components'
 import styles from './styles.css'
-import type { IconProps } from '@opentrons/components'
+import type { IconName } from '@opentrons/components'
 
 export type ClickableIconProps = {
-  ...React.ElementProps<'button'>,
-  ...$Exact<IconProps>,
+  ...$Exact<React.ElementProps<'button'>>,
+  name: IconName,
+  className?: string,
 }
 
 export function ClickableIcon(props: ClickableIconProps) {
-  const className = cx(styles.clickable_icon, props.className)
+  const { name, className, ...buttonProps } = props
+  const buttonCx = cx(styles.clickable_icon, className)
+
   return (
-    <button type="button" {...props} className={className}>
-      <Icon name={props.name} />
+    <button type="button" className={buttonCx} {...buttonProps}>
+      <Icon name={name} />
     </button>
   )
 }

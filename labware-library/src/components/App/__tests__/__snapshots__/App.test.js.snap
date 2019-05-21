@@ -41,7 +41,6 @@ exports[`App component renders with definition 1`] = `
             "manufacturer": "generic",
           }
         }
-        isLabwareDetail={true}
       />
     }
   />
@@ -73,7 +72,6 @@ exports[`App component renders without definition 1`] = `
             "manufacturer": "all",
           }
         }
-        isLabwareDetail={false}
       />
     }
   />

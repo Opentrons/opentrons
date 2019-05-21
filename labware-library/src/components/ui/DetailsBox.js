@@ -2,10 +2,10 @@
 import * as React from 'react'
 import styles from './styles.css'
 
-export type DetailsBoxProps = {
+export type DetailsBoxProps = {|
   children: React.Node,
   aside: React.Node,
-}
+|}
 
 export function DetailsBox(props: DetailsBoxProps) {
   const { children, aside } = props

@@ -11,9 +11,9 @@ import { CATEGORY_LABELS_BY_CATEGORY } from '../../localization'
 
 import type { FilterParams } from '../../types'
 
-export type FilterCategoryProps = {
+export type FilterCategoryProps = {|
   filters: FilterParams,
-}
+|}
 
 export default function FilterCategory(props: FilterCategoryProps) {
   const { filters } = props

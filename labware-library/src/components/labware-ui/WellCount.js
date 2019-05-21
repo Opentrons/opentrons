@@ -7,10 +7,10 @@ import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
 
-export type WellCountProps = {
+export type WellCountProps = {|
   definition: LabwareDefinition,
   className?: string,
-}
+|}
 
 export function WellCount(props: WellCountProps) {
   const { wells, metadata } = props.definition

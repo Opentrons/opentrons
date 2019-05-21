@@ -10,9 +10,9 @@ import type { LabwareDefinition } from '../../types'
 // TODO(mc, 2019-04-08): i18n
 const EN_TAGS = 'tags'
 
-export type TagsProps = {
+export type TagsProps = {|
   definition: LabwareDefinition,
-}
+|}
 
 export default function Tags(props: TagsProps) {
   const tags = props.definition.metadata.tags || []

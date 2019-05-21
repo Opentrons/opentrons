@@ -37,7 +37,7 @@ export class App extends React.Component<DefinitionRouteRenderProps> {
         {detailPage && <Breadcrumbs definition={definition} />}
         <Page
           detailPage={detailPage}
-          sidebar={<Sidebar filters={filters} isLabwareDetail={detailPage} />}
+          sidebar={<Sidebar filters={filters} />}
           content={
             definition ? (
               <LabwareDetails definition={definition} />
