@@ -53,15 +53,15 @@ function AttachedPipettesCard(props: Props) {
         <CardContentFlex>
           <InstrumentInfo
             mount="left"
-            name={props.robot.name}
-            {...props.left}
+            robotName={props.robot.name}
+            model={props.left?.model}
             onChangeClick={props.clearMove}
             showSettings={props.showLeftSettings}
           />
           <InstrumentInfo
             mount="right"
-            name={props.robot.name}
-            {...props.right}
+            robotName={props.robot.name}
+            model={props.right?.model}
             onChangeClick={props.clearMove}
             showSettings={props.showRightSettings}
           />
