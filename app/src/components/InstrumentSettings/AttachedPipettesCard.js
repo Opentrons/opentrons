@@ -54,14 +54,14 @@ function AttachedPipettesCard(props: Props) {
           <InstrumentInfo
             mount="left"
             robotName={props.robot.name}
-            {...props.left}
+            model={props.left?.model}
             onChangeClick={props.clearMove}
             showSettings={props.showLeftSettings}
           />
           <InstrumentInfo
             mount="right"
             robotName={props.robot.name}
-            {...props.right}
+            model={props.right?.model}
             onChangeClick={props.clearMove}
             showSettings={props.showRightSettings}
           />
