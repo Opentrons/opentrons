@@ -17,8 +17,10 @@ export type {
 
 export type LabwareWellGroupProperties = {|
   ...LabwareWellProperties,
-  xOffset: number,
-  yOffset: number,
+  xStart: number,
+  yStart: number,
+  xOffsetFromLeft: number,
+  yOffsetFromTop: number,
   xSpacing: number,
   ySpacing: number,
 |}

@@ -40,8 +40,8 @@ export default function WellSpacing(props: WellSpacingProps) {
   //   WELL_TYPE_BY_CATEGORY[displayCategory] || WELL_TYPE_BY_CATEGORY.other
 
   const spacing = [
-    { label: X_OFFSET, value: toFixed(wellProperties.xOffset) },
-    { label: Y_OFFSET, value: toFixed(wellProperties.yOffset) },
+    { label: X_OFFSET, value: toFixed(wellProperties.xOffsetFromLeft) },
+    { label: Y_OFFSET, value: toFixed(wellProperties.yOffsetFromTop) },
     { label: X_SPACING, value: spacingValue(wellProperties.xSpacing) },
     { label: Y_SPACING, value: spacingValue(wellProperties.ySpacing) },
   ]

@@ -47,12 +47,19 @@ export function getDefinition(loadName: ?string): LabwareDefinition | null {
 export function getUniqueWellProperties(
   definition: LabwareDefinition
 ): Array<LabwareWellGroupProperties> {
-  const { ordering, wells } = definition
+  const { ordering, wells, dimensions } = definition
 
   return flatten(ordering).reduce(
     (groups: Array<LabwareWellGroupProperties>, k: string) => {
       const { x, y, z, ...props } = wells[k]
-      const groupBase = { xOffset: x, yOffset: y, xSpacing: 0, ySpacing: 0 }
+      const groupBase = {
+        xStart: x,
+        yStart: y,
+        xOffsetFromLeft: x,
+        yOffsetFromTop: dimensions.yDimension - y,
+        xSpacing: 0,
+        ySpacing: 0,
+      }
       let group: ?LabwareWellGroupProperties = find(groups, props)
 
       // these ifs are overly specific and duplicated to make flow happy
@@ -65,13 +72,13 @@ export function getUniqueWellProperties(
       }
 
       if (group) {
-        if (!group.xSpacing && y === group.yOffset) {
+        if (!group.xSpacing && y === group.yStart) {
           // we've hit the first well in ordering that matches the group's
           // starting well's y position, so use its x position to set spacing
-          group.xSpacing = round(x - group.xOffset, 2)
-        } else if (!group.ySpacing && x === group.xOffset) {
+          group.xSpacing = round(x - group.xStart, 2)
+        } else if (!group.ySpacing && x === group.xStart) {
           // same as above, but for the y spacing
-          group.ySpacing = round(group.yOffset - y, 2)
+          group.ySpacing = round(group.yStart - y, 2)
         }
       }
 
