@@ -16,6 +16,9 @@
     "isTiprack": false,
     "isMagneticModuleCompatible": false
   },
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "fixture",
   "cornerOffsetFromSlot": {
     "x": 0,
     "y": 0,

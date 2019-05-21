@@ -1,4 +1,7 @@
 {
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "opentrons",
   "ordering": [
     [
       "A1",

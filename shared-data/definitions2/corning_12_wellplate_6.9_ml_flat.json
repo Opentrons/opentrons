@@ -9,6 +9,9 @@
     "brand": "Corning",
     "brandId": ["3336", "3512", "3513"]
   },
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "opentrons",
   "metadata": {
     "displayName": "Corning 12 Well Plate 6.9 ml Flat",
     "displayVolumeUnits": "mL",

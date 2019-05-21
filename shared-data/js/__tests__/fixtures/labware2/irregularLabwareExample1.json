@@ -12,6 +12,9 @@
     ["A10", "C10", "E10", "G10", "I10"]
   ],
   "otId": "mock-id",
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "fixture",
   "deprecated": false,
   "metadata": {
     "displayName": "Fake Irregular Container",

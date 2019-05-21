@@ -14,6 +14,9 @@
     ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
   ],
   "otId": "54d2f430-d602-11e8-80b1-6965467d172c",
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "opentrons",
   "deprecated": false,
   "metadata": {
     "displayName": "ANSI 96 Standard Microplate",

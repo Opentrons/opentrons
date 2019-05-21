@@ -13,6 +13,9 @@
     "y": 0,
     "z": 0
   },
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "opentrons",
   "dimensions": {
     "xDimension": 172.86,
     "yDimension": 165.86,

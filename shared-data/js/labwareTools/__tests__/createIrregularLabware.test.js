@@ -103,6 +103,7 @@ describe('test createIrregularLabware function', () => {
 
   beforeEach(() => {
     labware1 = createIrregularLabware({
+      namespace: 'fixture',
       metadata: {
         displayName: 'Fake Irregular Container',
         displayCategory: 'tubeRack',

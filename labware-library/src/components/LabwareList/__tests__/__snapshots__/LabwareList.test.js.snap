@@ -30,6 +30,7 @@ exports[`LabwareList component renders 1`] = `
             "opentrons",
           ],
         },
+        "namespace": "fixture",
         "ordering": Array [
           Array [
             "A1",
@@ -114,6 +115,8 @@ exports[`LabwareList component renders 1`] = `
           "isTiprack": false,
           "loadName": "generic_50x3_ml_5x10_ml_tuberack",
         },
+        "schemaVersion": 2,
+        "version": 1,
         "wells": Object {
           "A1": Object {
             "depth": 10.54,
@@ -640,6 +643,7 @@ exports[`LabwareList component renders 1`] = `
           "displayName": "fake labware",
           "displayVolumeUnits": "µL",
         },
+        "namespace": "fixture",
         "ordering": Array [
           Array [
             "A1",
@@ -655,6 +659,8 @@ exports[`LabwareList component renders 1`] = `
           "isTiprack": false,
           "loadName": "opentrons_2_wellplate_100_ul",
         },
+        "schemaVersion": 2,
+        "version": 1,
         "wells": Object {
           "A1": Object {
             "depth": 40,
@@ -701,6 +707,7 @@ exports[`LabwareList component renders 1`] = `
           "displayName": "fake labware 2",
           "displayVolumeUnits": "mL",
         },
+        "namespace": "fixture",
         "ordering": Array [
           Array [
             "A1",
@@ -720,6 +727,8 @@ exports[`LabwareList component renders 1`] = `
           "isTiprack": false,
           "loadName": "generic_6_wellplate_1_ml",
         },
+        "schemaVersion": 2,
+        "version": 1,
         "wells": Object {
           "A1": Object {
             "depth": 40,

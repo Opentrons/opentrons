@@ -29,6 +29,10 @@ import type {
   LabwareVolumeUnits as VolumeUnits,
 } from '../types'
 
+// NOTE: leaving this 'beta' to reduce conflicts with future labware cloud namespaces
+const DEFAULT_CUSTOM_NAMESPACE = 'custom_beta'
+const SCHEMA_VERSION = 2
+
 type Cell = {
   row: number,
   column: number,
@@ -55,6 +59,8 @@ export type RegularLabwareProps = {
   spacing: Cell,
   well: InputWell,
   brand?: Brand,
+  version?: number,
+  namespace?: string,
 }
 
 export type IrregularLabwareProps = {
@@ -67,6 +73,8 @@ export type IrregularLabwareProps = {
   well: Array<InputWell>,
   gridStart: Array<GridStart>,
   brand?: Brand,
+  version?: number,
+  namespace?: string,
 }
 
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
@@ -76,8 +84,10 @@ function validateDefinition(definition: Definition): Definition {
   const valid = validate(definition)
 
   if (!valid) {
-    console.error(validate.errors)
-    throw new Error('Produced invalid labware definition; check inputs')
+    throw new Error(
+      'Labware failed to validate against the schema:\n\n' +
+        JSON.stringify(validate.errors, null, 4)
+    )
   }
 
   return definition
@@ -234,6 +244,8 @@ function createName(
 // or the labware definition schema in labware-json-schema
 export function createRegularLabware(args: RegularLabwareProps): Definition {
   const { offset, dimensions, grid, spacing, well } = args
+  const version = args.version || 1
+  const namespace = args.namespace || DEFAULT_CUSTOM_NAMESPACE
   const ordering = determineOrdering(grid)
   const numWells = grid.row * grid.column
   const brand = ensureBrand(args.brand)
@@ -260,6 +272,9 @@ export function createRegularLabware(args: RegularLabwareProps): Definition {
     cornerOffsetFromSlot: _calculateCornerOffset(dimensions),
     wells: calculateCoordinates(well, ordering, spacing, offset),
     parameters: { ...args.parameters, loadName },
+    namespace,
+    version,
+    schemaVersion: SCHEMA_VERSION,
   })
 }
 
@@ -269,6 +284,8 @@ export function createIrregularLabware(
   args: IrregularLabwareProps
 ): Definition {
   const { offset, dimensions, grid, spacing, well, gridStart } = args
+  const namespace = args.namespace || DEFAULT_CUSTOM_NAMESPACE
+  const version = args.version || 1
   const wells = determineIrregularLayout(grid, spacing, offset, gridStart, well)
   const brand = ensureBrand(args.brand)
   const metadata = {
@@ -294,5 +311,8 @@ export function createIrregularLabware(
     cornerOffsetFromSlot: _calculateCornerOffset(dimensions),
     parameters: { ...args.parameters, loadName, format: 'irregular' },
     ordering: determineIrregularOrdering(Object.keys(wells)),
+    namespace,
+    version,
+    schemaVersion: SCHEMA_VERSION,
   })
 }

@@ -15,6 +15,9 @@
     "loadName": "generic_6_wellplate_1_ml",
     "isMagneticModuleCompatible": false
   },
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "fixture",
   "cornerOffsetFromSlot": {
     "x": 77.76,
     "y": 35.48,
