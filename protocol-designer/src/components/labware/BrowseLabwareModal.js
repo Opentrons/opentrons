@@ -1,37 +1,29 @@
 // @flow
+import assert from 'assert'
+import i18n from '../../localization'
 import * as React from 'react'
 import cx from 'classnames'
-import map from 'lodash/map'
 import { connect } from 'react-redux'
 
-import { getWellDefsForSVG } from '@opentrons/shared-data'
-
-import {
-  Modal,
-  Well,
-  LabwareOutline,
-  LabwareLabels,
-  ingredIdsToColor,
-} from '@opentrons/components'
-import type { BaseState, ThunkDispatch } from '../../types'
-import i18n from '../../localization'
+import { Modal } from '@opentrons/components'
+import BrowsableLabware from './BrowsableLabware'
 
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import { selectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import * as labwareIngredsActions from '../../labware-ingred/actions'
+
+import type { BaseState, ThunkDispatch } from '../../types'
 import type { ContentsByWell } from '../../labware-ingred/types'
 import type { WellIngredientNames } from '../../steplist/types'
-
-import SingleLabwareWrapper from '../SingleLabware'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 import modalStyles from '../modals/modal.css'
 import styles from './labware.css'
-import WellTooltip from './WellTooltip'
 
 type SP = {|
+  definition: ?LabwareDefinition2,
   wellContents: ContentsByWell,
-  labwareType: string,
   ingredNames: WellIngredientNames,
 |}
 
@@ -41,76 +33,39 @@ type DP = {|
 
 type Props = {| ...SP, ...DP |}
 
-class BrowseLabwareModal extends React.Component<Props> {
-  handleClose = () => {
-    this.props.drillUp()
+const BrowseLabwareModal = (props: Props) => {
+  const { drillUp, definition, ingredNames, wellContents } = props
+  if (!definition) {
+    assert(definition, 'BrowseLabwareModal expected definition')
+    return null
   }
 
-  render() {
-    const allWellDefsByName = getWellDefsForSVG(this.props.labwareType)
-
-    return (
-      <Modal
-        className={modalStyles.modal}
-        contentsClassName={cx(
-          modalStyles.modal_contents,
-          modalStyles.transparent_content
-        )}
-        onCloseClick={this.handleClose}
-      >
-        <WellTooltip ingredNames={this.props.ingredNames}>
-          {({
-            makeHandleMouseOverWell,
-            handleMouseLeaveWell,
-            tooltipWellName,
-          }) => (
-            <SingleLabwareWrapper showLabels>
-              <g>
-                <LabwareOutline />
-                {map(this.props.wellContents, (well, wellName) => {
-                  const color = ingredIdsToColor(well.groupIds)
-                  const mouseHandlers = color
-                    ? {
-                        onMouseOver: makeHandleMouseOverWell(
-                          wellName,
-                          well.ingreds
-                        ),
-                        onMouseLeave: handleMouseLeaveWell,
-                      }
-                    : {}
-                  return (
-                    <Well
-                      {...mouseHandlers}
-                      key={wellName}
-                      wellName={wellName}
-                      highlighted={tooltipWellName === wellName}
-                      fillColor={color}
-                      svgOffset={{ x: 1, y: -3 }}
-                      wellDef={allWellDefsByName[wellName]}
-                    />
-                  )
-                })}
-              </g>
-              <LabwareLabels
-                labwareType={this.props.labwareType}
-                inner={false}
-              />
-            </SingleLabwareWrapper>
-          )}
-        </WellTooltip>
-        <div className={styles.modal_instructions}>
-          {i18n.t('modal.browse_labware.instructions')}
-        </div>
-      </Modal>
-    )
-  }
+  return (
+    <Modal
+      className={modalStyles.modal}
+      contentsClassName={cx(
+        modalStyles.modal_contents,
+        modalStyles.transparent_content
+      )}
+      onCloseClick={drillUp}
+    >
+      <BrowsableLabware
+        definition={definition}
+        ingredNames={ingredNames}
+        wellContents={wellContents}
+      />
+      <div className={styles.modal_instructions}>
+        {i18n.t('modal.browse_labware.instructions')}
+      </div>
+    </Modal>
+  )
 }
 
 function mapStateToProps(state: BaseState): SP {
   const labwareId = selectors.getDrillDownLabwareId(state)
-  const labwareType =
-    (labwareId && stepFormSelectors.getLabwareTypesById(state)[labwareId]) ||
-    'missing labware'
+  const definition = labwareId
+    ? stepFormSelectors.getLabwareEntities(state)[labwareId]?.def
+    : null
   const allWellContents = wellContentsSelectors.getLastValidWellContents(state)
   const wellContents =
     labwareId && allWellContents ? allWellContents[labwareId] : {}
@@ -118,7 +73,7 @@ function mapStateToProps(state: BaseState): SP {
   return {
     wellContents,
     ingredNames,
-    labwareType,
+    definition,
   }
 }
 

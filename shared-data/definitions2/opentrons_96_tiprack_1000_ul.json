@@ -124,6 +124,10 @@
   "brand": {
     "brand": "opentrons"
   },
+  "otId": "d4e462c0-ffde-11e8-abfa-95044b186e81",
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "opentrons",
   "metadata": {
     "displayName": "Opentrons Tiprack 1000uL",
     "displayCategory": "tipRack",

@@ -128,19 +128,18 @@ async def test_update_happypath(test_cli, update_session,
         last_progress = body['progress']
         assert loop.time() - then <= 300
 
-    assert body['stage'] == 'writing'
-
-    # Wait through write
-    then = loop.time()
-    last_progress = 0.0
-    while body['stage'] == 'writing':
-        assert body['progress'] >= last_progress
-        resp = await test_cli.get(session_endpoint(update_session,
-                                                   'status'))
-        assert resp.status == 200
-        body = await resp.json()
-        last_progress = body['progress']
-        assert loop.time() - then <= 300
+    if body['stage'] == 'writing':
+        # Wait through write
+        then = loop.time()
+        last_progress = 0.0
+        while body['stage'] == 'writing':
+            assert body['progress'] >= last_progress
+            resp = await test_cli.get(session_endpoint(update_session,
+                                                       'status'))
+            assert resp.status == 200
+            body = await resp.json()
+            last_progress = body['progress']
+            assert loop.time() - then <= 300
 
     assert body['stage'] == 'done'
 

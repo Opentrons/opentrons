@@ -14,7 +14,9 @@
     ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
   ],
   "otId": "60344120-ffde-11e8-abfa-95044b186e81",
-  "deprecated": false,
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "opentrons",
   "metadata": {
     "displayName": "epT.I.P.S. 50-1000 uL tiprack",
     "displayVolumeUnits": "µL",

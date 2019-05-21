@@ -1,6 +1,6 @@
 // @flow
 import { createSelector } from 'reselect'
-import { computeWellAccess } from '@opentrons/shared-data'
+import { getWellNamePerMultiTip } from '@opentrons/shared-data'
 
 import mapValues from 'lodash/mapValues'
 
@@ -10,12 +10,13 @@ import { selectors as stepFormSelectors } from '../step-forms'
 import { selectors as fileDataSelectors } from '../file-data'
 import { selectors as stepsSelectors } from '../ui/steps'
 
+import type { WellGroup } from '@opentrons/components'
 import type { Selector } from '../types'
 import type { SubstepItemData } from '../steplist/types'
 import type { PipetteEntity, LabwareEntity } from '../step-forms'
 
-type AllWellHighlights = { [wellName: string]: true } // NOTE: all keys are true. There's a TODO in HighlightableLabware.js about making this a Set of well strings
-type AllWellHighlightsAllLabware = { [labwareId: string]: AllWellHighlights }
+// TODO IMMEDIATELY use WellGroup here
+export type AllWellHighlights = { [wellName: string]: true } // NOTE: all keys are true. There's a TODO in HighlightableLabware.js about making this a Set of well strings
 
 function _wellsForPipette(
   pipetteEntity: PipetteEntity,
@@ -25,7 +26,7 @@ function _wellsForPipette(
   // `wells` is all the wells that pipette's channel 1 interacts with.
   if (pipetteEntity.spec.channels === 8) {
     return wells.reduce((acc, well) => {
-      const setOfWellsForMulti = computeWellAccess(labwareEntity.def, well)
+      const setOfWellsForMulti = getWellNamePerMultiTip(labwareEntity.def, well)
 
       return setOfWellsForMulti ? [...acc, ...setOfWellsForMulti] : acc // setOfWellsForMulti is null
     }, [])
@@ -145,7 +146,9 @@ function _getSelectedWellsForSubstep(
   return wells
 }
 
-export const wellHighlightsByLabwareId: Selector<AllWellHighlightsAllLabware> = createSelector(
+export const wellHighlightsByLabwareId: Selector<{
+  [labwareId: string]: WellGroup,
+}> = createSelector(
   fileDataSelectors.getRobotStateTimeline,
   stepFormSelectors.getInvariantContext,
   stepFormSelectors.getArgsAndErrorsByStepId,

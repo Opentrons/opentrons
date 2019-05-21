@@ -555,7 +555,6 @@ Object {
           "y": 0,
           "z": 0,
         },
-        "deprecated": false,
         "dimensions": Object {
           "xDimension": 127.76,
           "yDimension": 85.48,
@@ -573,6 +572,7 @@ Object {
             "generic",
           ],
         },
+        "namespace": "fixture",
         "ordering": Array [
           Array [
             "A1",
@@ -702,6 +702,8 @@ Object {
           "isTiprack": false,
           "loadName": "generic_96_wellplate_380_ul",
         },
+        "schemaVersion": 2,
+        "version": 1,
         "wells": Object {
           "A1": Object {
             "depth": 10.54,
@@ -1582,7 +1584,6 @@ Object {
           "y": 0,
           "z": 0,
         },
-        "deprecated": false,
         "dimensions": Object {
           "xDimension": 127.76,
           "yDimension": 85.48,
@@ -1600,6 +1601,7 @@ Object {
             "generic",
           ],
         },
+        "namespace": "fixture",
         "ordering": Array [
           Array [
             "A1",
@@ -1729,6 +1731,8 @@ Object {
           "isTiprack": false,
           "loadName": "generic_96_wellplate_380_ul",
         },
+        "schemaVersion": 2,
+        "version": 1,
         "wells": Object {
           "A1": Object {
             "depth": 10.54,
@@ -2609,7 +2613,6 @@ Object {
           "y": 0,
           "z": 0,
         },
-        "deprecated": false,
         "dimensions": Object {
           "xDimension": 127.76,
           "yDimension": 85.48,
@@ -2628,6 +2631,7 @@ Object {
             "p50",
           ],
         },
+        "namespace": "fixture",
         "ordering": Array [
           Array [
             "A1",
@@ -2759,6 +2763,8 @@ Object {
           "tipLength": 59.17,
           "tipOverlap": 7.47,
         },
+        "schemaVersion": 2,
+        "version": 1,
         "wells": Object {
           "A1": Object {
             "depth": 54,
@@ -3639,7 +3645,6 @@ Object {
           "y": 0,
           "z": 0,
         },
-        "deprecated": false,
         "dimensions": Object {
           "xDimension": 127.76,
           "yDimension": 85.48,
@@ -3658,6 +3663,7 @@ Object {
             "p50",
           ],
         },
+        "namespace": "fixture",
         "ordering": Array [
           Array [
             "A1",
@@ -3789,6 +3795,8 @@ Object {
           "tipLength": 59.17,
           "tipOverlap": 7.47,
         },
+        "schemaVersion": 2,
+        "version": 1,
         "wells": Object {
           "A1": Object {
             "depth": 54,
@@ -4669,7 +4677,6 @@ Object {
           "y": 0,
           "z": 0,
         },
-        "deprecated": false,
         "dimensions": Object {
           "xDimension": 127.76,
           "yDimension": 85.48,
@@ -4688,6 +4695,7 @@ Object {
             "p50",
           ],
         },
+        "namespace": "fixture",
         "ordering": Array [
           Array [
             "A1",
@@ -4819,6 +4827,8 @@ Object {
           "tipLength": 59.17,
           "tipOverlap": 7.47,
         },
+        "schemaVersion": 2,
+        "version": 1,
         "wells": Object {
           "A1": Object {
             "depth": 54,
@@ -5699,7 +5709,6 @@ Object {
           "y": 0,
           "z": 0,
         },
-        "deprecated": false,
         "dimensions": Object {
           "xDimension": 172.86,
           "yDimension": 165.86,
@@ -5715,6 +5724,7 @@ Object {
             "tall",
           ],
         },
+        "namespace": "fixture",
         "ordering": Array [
           Array [
             "A1",
@@ -5731,6 +5741,8 @@ Object {
             "centerMultichannelOnWells",
           ],
         },
+        "schemaVersion": 2,
+        "version": 1,
         "wells": Object {
           "A1": Object {
             "depth": 77,
@@ -5760,7 +5772,6 @@ Object {
           "y": 0.32,
           "z": 0,
         },
-        "deprecated": false,
         "dimensions": Object {
           "xDimension": 127.76,
           "yDimension": 85.8,
@@ -5771,6 +5782,7 @@ Object {
           "displayName": "12 Channel Trough",
           "displayVolumeUnits": "mL",
         },
+        "namespace": "fixture",
         "ordering": Array [
           Array [
             "A1",
@@ -5819,6 +5831,8 @@ Object {
             "centerMultichannelOnWells",
           ],
         },
+        "schemaVersion": 2,
+        "version": 1,
         "wells": Object {
           "A1": Object {
             "depth": 42.16,
@@ -5975,7 +5989,6 @@ Object {
           "y": -0.02,
           "z": 0,
         },
-        "deprecated": false,
         "dimensions": Object {
           "xDimension": 127.75,
           "yDimension": 85.5,
@@ -5992,6 +6005,7 @@ Object {
             "Opentrons",
           ],
         },
+        "namespace": "fixture",
         "ordering": Array [
           Array [
             "A1",
@@ -6123,6 +6137,8 @@ Object {
           "tipLength": 39.2,
           "tipOverlap": 6.2,
         },
+        "schemaVersion": 2,
+        "version": 1,
         "wells": Object {
           "A1": Object {
             "depth": 34,
@@ -7020,7 +7036,6 @@ Object {
           "y": -0.02,
           "z": 0,
         },
-        "deprecated": false,
         "dimensions": Object {
           "xDimension": 127.75,
           "yDimension": 85.5,
@@ -7037,6 +7052,7 @@ Object {
             "Opentrons",
           ],
         },
+        "namespace": "fixture",
         "ordering": Array [
           Array [
             "A1",
@@ -7168,6 +7184,8 @@ Object {
           "tipLength": 39.2,
           "tipOverlap": 6.2,
         },
+        "schemaVersion": 2,
+        "version": 1,
         "wells": Object {
           "A1": Object {
             "depth": 34,
@@ -8065,7 +8083,6 @@ Object {
           "y": 0,
           "z": 0,
         },
-        "deprecated": false,
         "dimensions": Object {
           "xDimension": 127.76,
           "yDimension": 85.48,
@@ -8084,6 +8101,7 @@ Object {
             "p50",
           ],
         },
+        "namespace": "fixture",
         "ordering": Array [
           Array [
             "A1",
@@ -8215,6 +8233,8 @@ Object {
           "tipLength": 59.17,
           "tipOverlap": 7.47,
         },
+        "schemaVersion": 2,
+        "version": 1,
         "wells": Object {
           "A1": Object {
             "depth": 54,
@@ -9112,7 +9132,6 @@ Object {
           "y": 0,
           "z": 0,
         },
-        "deprecated": false,
         "dimensions": Object {
           "xDimension": 127.76,
           "yDimension": 85.48,
@@ -9131,6 +9150,7 @@ Object {
             "p50",
           ],
         },
+        "namespace": "fixture",
         "ordering": Array [
           Array [
             "A1",
@@ -9262,6 +9282,8 @@ Object {
           "tipLength": 59.17,
           "tipOverlap": 7.47,
         },
+        "schemaVersion": 2,
+        "version": 1,
         "wells": Object {
           "A1": Object {
             "depth": 54,

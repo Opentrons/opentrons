@@ -1,4 +1,6 @@
 // @flow
+
+// TODO: BC: 2019-05-08 remove these labware images
 const _fileMap = {
   '96-Deep-Well': require('./96-Deep-Well.png'),
   '96-PCR-Flatt': require('./96-PCR-Flatt.png'),

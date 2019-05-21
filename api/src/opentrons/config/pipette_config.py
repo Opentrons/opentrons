@@ -83,8 +83,10 @@ def name_config() -> Dict[str, Any]:
 config_models = list(model_config()['config'].keys())
 configs = model_config()['config']
 #: A list of pipette model names for which we have config entries
-mutable_configs = model_config()['mutableConfigs']
+MUTABLE_CONFIGS = model_config()['mutableConfigs']
 #: A list of mutable configs for pipettes
+VALID_QUIRKS = model_config()['validQuirks']
+#: A list of valid quirks for pipettes
 
 
 def name_for_model(pipette_model: str) -> str:
@@ -129,6 +131,10 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
     if pipette_id:
         try:
             override = load_overrides(pipette_id)
+            if 'quirks' in override.keys():
+                override['quirks'] = [
+                    qname for qname, qval in override['quirks'].items()
+                    if qval]
         except FileNotFoundError:
             save_overrides(pipette_id, {}, pipette_model)
             log.info(
@@ -153,34 +159,34 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
 
     res = pipette_config(
         top=ensure_value(
-            cfg, 'top', mutable_configs),
+            cfg, 'top', MUTABLE_CONFIGS),
         bottom=ensure_value(
-            cfg, 'bottom', mutable_configs),
+            cfg, 'bottom', MUTABLE_CONFIGS),
         blow_out=ensure_value(
-            cfg, 'blowout', mutable_configs),
+            cfg, 'blowout', MUTABLE_CONFIGS),
         drop_tip=ensure_value(
-            cfg, 'dropTip', mutable_configs),
-        pick_up_current=ensure_value(cfg, 'pickUpCurrent', mutable_configs),
-        pick_up_distance=ensure_value(cfg, 'pickUpDistance', mutable_configs),
+            cfg, 'dropTip', MUTABLE_CONFIGS),
+        pick_up_current=ensure_value(cfg, 'pickUpCurrent', MUTABLE_CONFIGS),
+        pick_up_distance=ensure_value(cfg, 'pickUpDistance', MUTABLE_CONFIGS),
         pick_up_increment=ensure_value(
-            cfg, 'pickUpIncrement', mutable_configs),
-        pick_up_presses=ensure_value(cfg, 'pickUpPresses', mutable_configs),
-        pick_up_speed=ensure_value(cfg, 'pickUpSpeed', mutable_configs),
+            cfg, 'pickUpIncrement', MUTABLE_CONFIGS),
+        pick_up_presses=ensure_value(cfg, 'pickUpPresses', MUTABLE_CONFIGS),
+        pick_up_speed=ensure_value(cfg, 'pickUpSpeed', MUTABLE_CONFIGS),
         aspirate_flow_rate=ensure_value(
-            cfg, 'defaultAspirateFlowRate', mutable_configs),
+            cfg, 'defaultAspirateFlowRate', MUTABLE_CONFIGS),
         dispense_flow_rate=ensure_value(
-            cfg, 'defaultDispenseFlowRate', mutable_configs),
-        channels=ensure_value(cfg, 'channels', mutable_configs),
-        model_offset=ensure_value(cfg, 'modelOffset', mutable_configs),
-        plunger_current=ensure_value(cfg, 'plungerCurrent', mutable_configs),
-        drop_tip_current=ensure_value(cfg, 'dropTipCurrent', mutable_configs),
-        drop_tip_speed=ensure_value(cfg, 'dropTipSpeed', mutable_configs),
-        min_volume=ensure_value(cfg, 'minVolume', mutable_configs),
-        max_volume=ensure_value(cfg, 'maxVolume', mutable_configs),
+            cfg, 'defaultDispenseFlowRate', MUTABLE_CONFIGS),
+        channels=ensure_value(cfg, 'channels', MUTABLE_CONFIGS),
+        model_offset=ensure_value(cfg, 'modelOffset', MUTABLE_CONFIGS),
+        plunger_current=ensure_value(cfg, 'plungerCurrent', MUTABLE_CONFIGS),
+        drop_tip_current=ensure_value(cfg, 'dropTipCurrent', MUTABLE_CONFIGS),
+        drop_tip_speed=ensure_value(cfg, 'dropTipSpeed', MUTABLE_CONFIGS),
+        min_volume=ensure_value(cfg, 'minVolume', MUTABLE_CONFIGS),
+        max_volume=ensure_value(cfg, 'maxVolume', MUTABLE_CONFIGS),
         ul_per_mm=ul_per_mm,
-        quirks=ensure_value(cfg, 'quirks', mutable_configs),
-        tip_length=ensure_value(cfg, 'tipLength', mutable_configs),
-        display_name=ensure_value(cfg, 'displayName', mutable_configs)
+        quirks=validate_quirks(ensure_value(cfg, 'quirks', MUTABLE_CONFIGS)),
+        tip_length=ensure_value(cfg, 'tipLength', MUTABLE_CONFIGS),
+        display_name=ensure_value(cfg, 'displayName', MUTABLE_CONFIGS)
     )
 
     return res
@@ -210,18 +216,24 @@ def piecewise_volume_conversion(
 def save_overrides(
         pipette_id: str, overrides: Dict[str, Any], model: Optional[str]):
     override_dir = CONFIG['pipette_config_overrides_dir']
+    model_configs = configs[model]
     try:
         existing = load_overrides(pipette_id)
+        # Add quirks setting for pipettes already with a pipette id file
+        if 'quirks' not in existing.keys():
+            existing['quirks'] = {key: True for key in model_configs['quirks']}
     except FileNotFoundError:
-        existing = {}
+        existing = {key: True for key in model_configs['quirks']}
 
-    model_configs = configs[model]
     for key, value in overrides.items():
         # If an existing override is saved as null from endpoint, remove from
         # overrides file
         if value is None:
             if existing.get(key):
                 del existing[key]
+        elif key == 'quirks':
+            existing, model_configs = change_quirks(
+                value, existing, model_configs)
         else:
             if not model_configs[key].get('default'):
                 model_configs[key]['default'] = model_configs[key]['value']
@@ -230,6 +242,20 @@ def save_overrides(
     assert model in config_models
     existing['model'] = model
     json.dump(existing, (override_dir/f'{pipette_id}.json').open('w'))
+
+
+def change_quirks(override_quirks, existing, model_configs):
+    if not existing.get('quirks'):
+        # ensure quirk key exists
+        existing['quirks'] = override_quirks
+    for quirk, setting in override_quirks.items():
+        # setting values again if above case true, but
+        # meant for use-cases where we may only be given an update
+        # for one setting
+        existing['quirks'][quirk] = setting
+        if setting not in model_configs['quirks']:
+            model_configs['quirks'].append(setting)
+    return existing, model_configs
 
 
 def load_overrides(pipette_id: str) -> Dict[str, Any]:
@@ -241,6 +267,16 @@ def load_overrides(pipette_id: str) -> Dict[str, Any]:
         log.warning(f'pipette override for {pipette_id} is corrupt: {e}')
         (overrides/f'{pipette_id}.json').unlink()
         raise FileNotFoundError(str(overrides/f'{pipette_id}.json'))
+
+
+def validate_quirks(quirks: List[str]):
+    valid_quirks = []
+    for quirk in quirks:
+        if quirk in VALID_QUIRKS:
+            valid_quirks.append(quirk)
+        else:
+            log.warning(f'{quirk} is not a valid quirk')
+    return valid_quirks
 
 
 def ensure_value(
@@ -260,7 +296,7 @@ def ensure_value(
         config = config[element]
 
     value = config[path[-1]]
-    if path[-1] in mutable_config_list:
+    if path[-1] != 'quirks' and path[-1] in mutable_config_list:
         value = value['value']
     return value
 
@@ -291,8 +327,12 @@ def load_config_dict(pipette_id: str) -> Dict:
     config = copy.deepcopy(model_config()['config'][model])
     config.update(copy.deepcopy(name_config()[config['name']]))
 
+    if 'quirks' not in override.keys():
+        override['quirks'] = {key: True for key in config['quirks']}
+
     for top_level_key in config.keys():
-        add_default(config[top_level_key])
+        if top_level_key != 'quirks':
+            add_default(config[top_level_key])
 
     config.update(override)
 
@@ -312,6 +352,6 @@ def list_mutable_configs(pipette_id: str) -> Dict[str, Any]:
         return cfg
 
     for key in config:
-        if key in mutable_configs:
+        if key in MUTABLE_CONFIGS:
             cfg[key] = config[key]
     return cfg

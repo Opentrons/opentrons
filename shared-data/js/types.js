@@ -110,11 +110,12 @@ export type LabwareWellMap = {
   [wellName: string]: LabwareWell,
 }
 
-// TODO(mc, 2019-03-18): this should eventually replace LabwareDefinition
-// NOTE: must be synced with shared-data/labware-json-schema/labware-schema.json
+// NOTE: must be synced with shared-data/labware-json-schema/labwareSchemaV2.json
 export type LabwareDefinition2 = {|
   otId: string,
-  deprecated: boolean,
+  version: number,
+  schemaVersion: 2,
+  namespace: string,
   metadata: LabwareMetadata,
   dimensions: LabwareDimensions,
   cornerOffsetFromSlot: LabwareOffset,

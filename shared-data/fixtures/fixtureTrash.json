@@ -1,7 +1,9 @@
 {
   "ordering": [["A1"]],
   "otId": "fixtureTrash",
-  "deprecated": false,
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "fixture",
   "metadata": {
     "displayCategory": "trash",
     "displayVolumeUnits": "L",

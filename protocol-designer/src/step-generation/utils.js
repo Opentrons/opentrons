@@ -5,7 +5,7 @@ import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
 import last from 'lodash/last'
-import { computeWellAccess, getIsTiprack } from '@opentrons/shared-data'
+import { getWellNamePerMultiTip, getIsTiprack } from '@opentrons/shared-data'
 
 import type {
   PipetteLabwareFieldsV1 as PipetteLabwareFields,
@@ -223,7 +223,7 @@ export function getWellsForTips(
 |} {
   // Array of wells corresponding to the tip at each position.
   const wellsForTips =
-    channels === 1 ? [well] : computeWellAccess(labwareDef, well)
+    channels === 1 ? [well] : getWellNamePerMultiTip(labwareDef, well)
 
   if (!wellsForTips) {
     console.warn(

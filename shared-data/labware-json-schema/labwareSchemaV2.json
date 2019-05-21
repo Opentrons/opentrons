@@ -11,7 +11,9 @@
   "additionalProperties": false,
   "required": [
     "otId",
-    "deprecated",
+    "schemaVersion",
+    "version",
+    "namespace",
     "metadata",
     "brand",
     "parameters",
@@ -25,9 +27,18 @@
       "description": "Unique internal ID generated using UUID",
       "type": "string"
     },
-    "deprecated": {
-      "description": "Flag specifying whether a labware is deprecated or not",
-      "type": "boolean"
+    "schemaVersion": {
+      "description": "Which schema version a labware is using",
+      "type": "number",
+      "enum": [2]
+    },
+    "version": {
+      "description": "Version of the labware definition itself (eg myPlate v1/v2/v3). An incrementing integer",
+      "type": "integer",
+      "minimum": 1
+    },
+    "namespace": {
+      "description": "The namespace that the definition lives under. Note: 'opentrons' is a controlled namespace for official Opentrons definitions."
     },
     "metadata": {
       "type": "object",

@@ -14,11 +14,11 @@ const DEFAULT_TOOLTIP_OFFSET = 22
 const WELL_BORDER_WIDTH = 4
 
 type WellTooltipParams = {
-  makeHandleMouseOverWell: (
+  makeHandleMouseEnterWell: (
     wellName: string,
     wellIngreds: LocationLiquidState
   ) => (e: SyntheticMouseEvent<*>) => void,
-  handleMouseLeaveWell: (e: SyntheticMouseEvent<*>) => void,
+  handleMouseLeaveWell: mixed => void,
   tooltipWellName: ?string,
 }
 
@@ -45,7 +45,7 @@ const initialState: State = {
 class WellTooltip extends React.Component<Props, State> {
   state: State = initialState
 
-  makeHandleMouseOverWell = (
+  makeHandleMouseEnterWell = (
     wellName: string,
     wellIngreds: LocationLiquidState
   ) => (e: SyntheticMouseEvent<*>) => {
@@ -65,7 +65,7 @@ class WellTooltip extends React.Component<Props, State> {
     }
   }
 
-  handleMouseLeaveWell = (e: SyntheticMouseEvent<*>) => {
+  handleMouseLeaveWell = () => {
     this.setState(initialState)
   }
 
@@ -87,7 +87,7 @@ class WellTooltip extends React.Component<Props, State> {
             )}
           </Reference>
           {this.props.children({
-            makeHandleMouseOverWell: this.makeHandleMouseOverWell,
+            makeHandleMouseEnterWell: this.makeHandleMouseEnterWell,
             handleMouseLeaveWell: this.handleMouseLeaveWell,
             tooltipWellName: this.state.tooltipWellName,
           })}

@@ -434,7 +434,9 @@
     ]
   ],
   "otId": "fixture384Plate",
-  "deprecated": false,
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "fixture",
   "metadata": {
     "displayName": "Corning 384 Well Plate",
     "displayVolumeUnits": "µL",

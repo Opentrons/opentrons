@@ -2,16 +2,14 @@
 import assert from 'assert'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import type { Dispatch } from 'redux'
 import cx from 'classnames'
 import isEmpty from 'lodash/isEmpty'
 
-import styles from './LiquidPlacementModal.css'
-
-import type { Wells, ContentsByWell } from '../labware-ingred/types'
-import { SelectableLabware } from '../components/labware'
+import {
+  wellFillFromWellContents,
+  SelectableLabware,
+} from '../components/labware'
 import LiquidPlacementForm from '../components/LiquidPlacementForm'
-import SingleLabwareWrapper from '../components/SingleLabware'
 import WellSelectionInstructions from './WellSelectionInstructions'
 
 import { selectors } from '../labware-ingred/selectors'
@@ -20,24 +18,30 @@ import * as wellContentsSelectors from '../top-selectors/well-contents'
 import wellSelectionSelectors from '../well-selection/selectors'
 import { selectWells, deselectWells } from '../well-selection/actions'
 
+import styles from './LiquidPlacementModal.css'
+
+import type { Dispatch } from 'redux'
+import type { WellGroup } from '@opentrons/components'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { BaseState } from '../types'
+import type { ContentsByWell } from '../labware-ingred/types'
 import type { WellIngredientNames } from '../steplist'
 
 type SP = {|
-  selectedWells: Wells,
+  selectedWells: WellGroup,
   wellContents: ContentsByWell,
-  containerType: string,
+  labwareDef: ?LabwareDefinition2,
   liquidNamesById: WellIngredientNames,
 |}
 
 type DP = {|
-  selectWells: Wells => mixed,
-  deselectWells: Wells => mixed,
+  selectWells: WellGroup => mixed,
+  deselectWells: WellGroup => mixed,
 |}
 
 type Props = { ...SP, ...DP }
 
-type State = { highlightedWells: Wells }
+type State = { highlightedWells: WellGroup }
 
 class LiquidPlacementModal extends React.Component<Props, State> {
   state = { highlightedWells: {} }
@@ -46,31 +50,39 @@ class LiquidPlacementModal extends React.Component<Props, State> {
     this.state = { highlightedWells: {} }
   }
 
-  updateHighlightedWells = (wells: Wells) => {
+  updateHighlightedWells = (wells: WellGroup) => {
     this.setState({ highlightedWells: wells })
   }
 
   render() {
+    const { labwareDef, selectedWells } = this.props
+
     return (
       <div
         className={cx(styles.liquid_placement_modal, {
-          [styles.expanded]: !isEmpty(this.props.selectedWells),
+          [styles.expanded]: !isEmpty(selectedWells),
         })}
       >
         <LiquidPlacementForm />
 
-        <SingleLabwareWrapper showLabels>
-          <SelectableLabware
-            wellContents={this.props.wellContents}
-            containerType={this.props.containerType}
-            selectedWells={this.props.selectedWells}
-            highlightedWells={this.state.highlightedWells}
-            selectWells={this.props.selectWells}
-            deselectWells={this.props.deselectWells}
-            updateHighlightedWells={this.updateHighlightedWells}
-            ingredNames={this.props.liquidNamesById}
-          />
-        </SingleLabwareWrapper>
+        {labwareDef && (
+          <div className={styles.labware}>
+            <SelectableLabware
+              labwareProps={{
+                showLabels: true,
+                definition: labwareDef,
+                highlightedWells: this.state.highlightedWells,
+                wellFill: wellFillFromWellContents(this.props.wellContents),
+              }}
+              selectedPrimaryWells={selectedWells}
+              selectWells={this.props.selectWells}
+              deselectWells={this.props.deselectWells}
+              updateHighlightedWells={this.updateHighlightedWells}
+              ingredNames={this.props.liquidNamesById}
+              wellContents={this.props.wellContents}
+            />
+          </div>
+        )}
 
         <WellSelectionInstructions />
       </div>
@@ -89,12 +101,12 @@ const mapStateToProps = (state: BaseState): SP => {
     return {
       selectedWells: {},
       wellContents: {},
-      containerType: '',
+      labwareDef: null,
       liquidNamesById: {},
     }
   }
 
-  const labwareType = stepFormSelectors.getLabwareTypesById(state)[labwareId]
+  const labwareDef = stepFormSelectors.getLabwareEntities(state)[labwareId]?.def
   let wellContents: ContentsByWell = {}
 
   // selection for deck setup: shows initial state of liquids
@@ -105,7 +117,7 @@ const mapStateToProps = (state: BaseState): SP => {
   return {
     selectedWells,
     wellContents,
-    containerType: labwareType || 'missing labware',
+    labwareDef,
     liquidNamesById: selectors.getLiquidNamesById(state),
   }
 }
