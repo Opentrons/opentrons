@@ -388,7 +388,9 @@
     "zDimension": 49.22
   },
   "otId": "c8023050-7b44-11e9-b6b2-e3753d0e72ec",
-  "deprecated": false,
+  "namespace": "opentrons",
+  "schemaVersion": 2,
+  "version": 1,
   "cornerOffsetFromSlot": {
     "x": 0.01,
     "y": -0.02,
