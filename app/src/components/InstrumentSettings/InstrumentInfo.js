@@ -16,7 +16,7 @@ import styles from './styles.css'
 type Props = {
   mount: Mount,
   model: ?string,
-  name: string,
+  robotName: string,
   onChangeClick: () => mixed,
   showSettings: boolean,
 }
@@ -27,14 +27,14 @@ const LABEL_BY_MOUNT = {
 }
 
 export default function PipetteInfo(props: Props) {
-  const { mount, model, name, onChangeClick, showSettings } = props
+  const { mount, model, robotName, onChangeClick, showSettings } = props
   const label = LABEL_BY_MOUNT[mount]
   const pipette = model ? getPipetteModelSpecs(model) : null
   const channels = pipette?.channels
   const direction = model ? 'change' : 'attach'
 
-  const changeUrl = `/robots/${name}/instruments/pipettes/change/${mount}`
-  const configUrl = `/robots/${name}/instruments/pipettes/config/${mount}`
+  const changeUrl = `/robots/${robotName}/instruments/pipettes/change/${mount}`
+  const configUrl = `/robots/${robotName}/instruments/pipettes/config/${mount}`
 
   const className = cx(styles.pipette_card, {
     [styles.right]: mount === 'right',
