@@ -17,7 +17,8 @@
   @apply --center-children;
 }
 
-.slot_ui {
-  height: 100%;
-  width: 100%;
+.deck_instructions {
+  font-size: var(--fs-body-1);
+  font-weight: var(--fw-semibold);
+  color: var(--c-font-dark);
 }

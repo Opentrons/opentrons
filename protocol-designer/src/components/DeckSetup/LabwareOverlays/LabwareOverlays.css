@@ -1,5 +1,10 @@
 @import '@opentrons/components';
 
+.slot_ui {
+  height: 100%;
+  width: 100%;
+}
+
 .slot_overlay {
   position: absolute;
   z-index: 1;
