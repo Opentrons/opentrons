@@ -1043,7 +1043,8 @@ class InstrumentContext(CommandPublisher):
                 " However, it is a {}".format(location))
         self.move_to(target)
         self._hw_manager.hardware.drop_tip(self._mount)
-        if target.labware.parent.is_tiprack:
+        if isinstance(target.labware, Well)\
+           and target.labware.parent.is_tiprack:
             # If this is a tiprack we can try and add the tip back to the
             # tracker
             try:
