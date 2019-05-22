@@ -34,6 +34,7 @@ const SlotControls = ({ slot, addLabware, selectedTerminalItemId }: Props) => {
     >
       <a className={styles.overlay_button} onClick={addLabware}>
         <Icon className={styles.overlay_icon} name="plus" />
+        {i18n.t('deck.overlay.slot.add_labware')}
         Add Labware
       </a>
     </RobotCoordsForeignDiv>

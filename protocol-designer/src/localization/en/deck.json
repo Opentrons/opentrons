@@ -8,6 +8,14 @@
       "nickname_placeholder": "Add a nickname?",
       "add_liquids": "Add Liquids",
       "leave_empty": "Leave Empty"
+    },
+    "edit": {
+      "name_and_liquids": "Name & Liquids",
+      "duplicate": "Duplicate",
+      "delete": "Delete"
+    },
+    "slot": {
+      "add_labware": "Add Labware"
     }
   }
 }

@@ -25,6 +25,9 @@ import {
 } from '../../../steplist'
 import { DND_TYPES } from './constants'
 
+// TODO: BC 2019-05-22 this component is no longer used and should be remove once
+// its functionality reaches parity with the new components in /DeckSetup/*
+
 type DragDropLabwareProps = React.ElementProps<typeof LabwareWrapper> & {
   connectDragSource: mixed => React.Element<any>,
   connectDropTarget: mixed => React.Element<any>,
@@ -242,8 +245,8 @@ const LabwareOnDeck = (props: LabwareOnDeckProps) => {
     editLiquids,
     swapSlotContents,
 
-    setDefaultLabwareName,
-    setLabwareName,
+    // setDefaultLabwareName,
+    // setLabwareName,
   } = props
 
   // determine what overlay to show

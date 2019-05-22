@@ -56,15 +56,15 @@ const EditLabware = (props: Props) => {
       >
         <a className={styles.overlay_button} onClick={editLiquids}>
           <Icon className={styles.overlay_icon} name="pencil" />
-          Name & Liquids
+          {i18n.t('deck.overlay.edit.name_and_liquids')}
         </a>
         <a className={styles.overlay_button} onClick={duplicateLabware}>
           <Icon className={styles.overlay_icon} name="content-copy" />
-          Duplicate
+          {i18n.t('deck.overlay.edit.duplicate')}
         </a>
         <a className={styles.overlay_button} onClick={deleteLabware}>
           <Icon className={styles.overlay_icon} name="close" />
-          Delete
+          {i18n.t('deck.overlay.edit.delete')}
         </a>
       </div>
     )
