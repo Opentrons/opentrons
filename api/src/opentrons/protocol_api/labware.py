@@ -4,6 +4,9 @@ import os
 import re
 import time
 import pkgutil
+import shutil
+import sys
+from pathlib import Path
 from collections import defaultdict
 from enum import Enum, auto
 from itertools import takewhile, dropwhile
@@ -12,6 +15,10 @@ from typing import List, Dict, Optional, Union
 from opentrons.types import Location
 from opentrons.types import Point
 from opentrons.config import CONFIG
+
+# TODO IMMEDIATELY where to store this constant?
+OPENTRONS_NAMESPACE = 'opentrons'
+CUSTOM_NAMESPACE = 'custom_beta'
 
 
 class WellShape(Enum):
@@ -796,37 +803,169 @@ def _read_file(filepath: str) -> dict:
     return calibration_data
 
 
-def load_definition_by_name(name: str) -> dict:
-    """
-    Look up and return a definition by name (name is expected to correspond to
-    the filename of the definition, with the .json extension) and return it or
-    raise an exception
+def _get_path_to_labware(load_name: str, namespace: str, version: int) -> Path:
+    if namespace == OPENTRONS_NAMESPACE:
+        # labware in OPENTRONS_NAMESPACE is bundled in wheel
 
-    :param name: A string to use for looking up a labware defintion previously
-        saved to disc. The definition file must have been saved in a known
-        location with the filename '${name}.json'
+        # TODO IMMEDIATELY: need to restructure shared data dir...
+        rel_def_path = f'shared_data/definitions2/{load_name}/{version}/' + \
+            f'{namespace}__{load_name}__{version}.json'
+
+        return os.path.join(
+            os.path.dirname(sys.modules['opentrons'].__file__),
+            rel_def_path)
+
+    # TODO IMMEDIATELY: make sure Path() doesn't do weird stuff
+    #     if there is / or \ in loadName
+    base_path = CONFIG['labware_user_definitions_dir_v4']
+    def_path = base_path / Path(namespace) / Path(load_name) / \
+        Path(f'{namespace}__{load_name}__{version}.json')
+    return def_path
+
+
+def _get_latest_labware(load_name: str, namespace: str) -> dict:
+    # Get highest-versioned labware within a given namespace
+    if namespace == OPENTRONS_NAMESPACE:
+        # TODO IMMEDIATELY
+        raise NotImplementedError
+
+    base_path = CONFIG['labware_user_definitions_dir_v4']
+    loadname_dir = base_path / Path(namespace) / Path(load_name)
+    if not os.path.isdir(loadname_dir):
+        raise FileNotFoundError(f'no labware exist in namespace {namespace}')
+
+    result = None
+    for fileName in os.listdir(loadname_dir):
+        file_path = os.path.join(loadname_dir, fileName)
+        if os.path.isfile(file_path) and file_path.endswith('.json'):
+            with open(file_path, 'r') as f:
+                defn = json.load(f)
+            if result is None or result['version'] < defn['version']:
+                result = defn
+    if result is None:
+        raise FileNotFoundError(f'No labware "{load_name}" exists ' +
+                                f'in namespace "{namespace}"')
+
+    return result
+
+
+def save_definition(
+    labware_def: dict,
+    force: bool = False
+) -> None:
     """
-    def_path = 'shared_data/definitions2/{}.json'.format(name.lower())
-    labware_def = json.loads(pkgutil.get_data('opentrons', def_path))  # type: ignore # NOQA
+    Save a labware definition
+
+    :param labware_def: A deserialized JSON labware definition
+    :param bool force: If true, overwrite an existing definition if found.
+        Cannot overwrite Opentrons definitions.
+    """
+    namespace = labware_def['namespace']
+    load_name = labware_def['parameters']['loadName']
+    version = labware_def['version']
+
+    if not namespace or not load_name or not version:
+        raise RuntimeError(
+            'Could not save definition, labware def is missing a field: ' +
+            f'{namespace}, {load_name}, {version}')
+
+    if namespace == OPENTRONS_NAMESPACE:
+        raise RuntimeError(
+            f'Saving definitions to the "{OPENTRONS_NAMESPACE}" namespace ' +
+            'is not permitted')
+
+    def_path = _get_path_to_labware(load_name, namespace, version)
+
+    if not force and os.path.isfile(def_path):
+        raise RuntimeError(
+            f'The given definition ({namespace}/{load_name} v{version}) ' +
+            'already exists. Cannot save definition without force=True')
+
+    Path(def_path).parent.mkdir(parents=True, exist_ok=True)
+    with open(def_path, 'w') as f:
+        json.dump(labware_def, f)
+
+
+def delete_all_custom_labware() -> None:
+    custom_def_dir = CONFIG['labware_user_definitions_dir_v4']
+    if os.path.exists(custom_def_dir):
+        shutil.rmtree(custom_def_dir)
+
+
+def load_definition(
+    load_name: str,
+    namespace: str = None,
+    version: int = None
+) -> dict:
+    """
+    Look up and return a definition by load_name + namespace + version and
+        return it or raise an exception
+
+    :param str load_name: corresponds to 'loadName' key in definition
+    :param str namespace: The namespace the labware definition belongs to. If
+        unspecified, will search in this order: 'opentrons', 'custom_beta',
+        then all other namespaces together.
+    :param int version: The version of the labware definition. If unspecified,
+        will use the latest version.
+    """
+    if namespace is None:
+        for fallback_namespace in [OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE]:
+            try:
+                return load_definition(load_name, fallback_namespace, version)
+            except (FileNotFoundError):
+                pass
+        raise RuntimeError(
+            f'{load_name} not found with version {version}. If you are ' +
+            f'using a namespace besides {OPENTRONS_NAMESPACE} or ' +
+            f'{CUSTOM_NAMESPACE}, please specify it')
+
+    if version:
+        def_path = _get_path_to_labware(load_name, namespace, version)
+    else:
+        # use 'latest' version
+        if namespace == OPENTRONS_NAMESPACE:
+            # TODO: Ian 2019-05-22 support version=None -> "latest" lookup
+            # for 'opentrons' namespace. Also do lookup by load_name,
+            # do not assume filename matches load_name :/
+            def_path = _get_path_to_labware(load_name, namespace, version)
+            # labware_def = json.loads(pkgutil.get_data('opentrons', def_path))  # type: ignore # NOQA
+            # return labware_def
+        else:
+            return _get_latest_labware(load_name, namespace)
+
+    with open(def_path, 'r') as f:
+        labware_def = json.load(f)
+
     return labware_def
 
 
-def load(name: str, parent: Location, label: str = None) -> Labware:
+def load(
+    load_name: str,
+    parent: Location,
+    namespace: str = None,
+    version: str = None,
+    label: str = None
+) -> Labware:
     """
     Return a labware object constructed from a labware definition dict looked
     up by name (definition must have been previously stored locally on the
     robot)
 
-    :param name: A string to use for looking up a labware definition previously
-        saved to disc. The definition file must have been saved in a known
-        location with the filename '${name}.json'
+    :param load_name: A string to use for looking up a labware definition
+        previously saved to disc. The definition file must have been saved in a
+        known location with the filename '${name}.json'
     :param parent: A :py:class:`.Location` representing the location where
                    the front and left most point of the outside of labware is
                    (often the front-left corner of a slot on the deck).
+    :param str namespace: The namespace the labware definition belongs to. If
+        unspecified, will search in this order: 'opentrons', 'custom_beta',
+        then all other namespaces together.
+    :param int version: The version of the labware definition. If unspecified,
+        will use the latest version.
     :param str label: An optional label that will override the labware's
                       display name from its definition
     """
-    definition = load_definition_by_name(name)
+    definition = load_definition(load_name, namespace, version)
     return load_from_definition(definition, parent, label)
 
 

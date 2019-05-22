@@ -30,6 +30,11 @@ if ff.use_protocol_api_v2():
             'id': 'bootScripts',
             'name': 'Boot Scripts',
             'description': 'Clear custom boot scripts'
+        },
+        {
+            'id': 'customLabware',
+            'name': 'Custom Labware',
+            'description': 'Clear custom labware definitions'
         }
     ]
 else:
@@ -120,6 +125,9 @@ async def reset(request: web.Request) -> web.Response:
             labware.clear_calibrations()
         else:
             db.reset()
+
+    if data.get('customLabware'):
+        labware.delete_all_custom_labware()
 
     if data.get('bootScripts'):
         if IS_ROBOT:

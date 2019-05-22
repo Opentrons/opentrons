@@ -206,7 +206,7 @@ def load_new_labware(container_name):
 
     :raises KeyError: If the labware name is not found
     """
-    defn = new_labware.load_definition_by_name(container_name)
+    defn = new_labware.load_definition(load_name=container_name)
     return load_new_labware_def(defn)
 
 
