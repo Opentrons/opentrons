@@ -25,11 +25,6 @@ def execute_protocol(protocol_json):
             protocol_json)
         execute_v1.dispatch_commands(protocol_json, ins, lw)
 
-    # loaded_pipettes = execute_v1.load_pipettes(protocol)
-    # loaded_labware = execute_v1.load_labware(protocol)
-    #
-    # execute_v1.dispatch_commands(protocol, loaded_pipettes, loaded_labware)
-
     return {
         'pipettes': ins,
         'labware': lw
