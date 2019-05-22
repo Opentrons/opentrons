@@ -96,21 +96,15 @@
 
   .sidebar_container {
     width: var(--size-4);
+
+    &.is_detail_page {
+      display: block;
+    }
   }
 
-  .content_container {
-    /* spacing + sidebar width */
-    padding-left: calc(var(--size-4) + var(--spacing-5));
-  }
-}
-
-@media (--xlarge) {
+  .content_container,
   .content_container.is_detail_page {
     /* spacing + sidebar width */
     padding-left: calc(var(--size-4) + var(--spacing-5));
-  }
-
-  .sidebar_container.is_detail_page {
-    display: block;
   }
 }
