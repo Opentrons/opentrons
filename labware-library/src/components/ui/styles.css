@@ -44,6 +44,11 @@
   border-bottom: var(--bd-light);
 }
 
+.table_title_text {
+  display: flex;
+  justify-content: space-between;
+}
+
 .details_box {
   border: var(--bd-light);
   margin-bottom: var(--spacing-5);

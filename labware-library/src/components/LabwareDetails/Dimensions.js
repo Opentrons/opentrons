@@ -24,6 +24,8 @@ export type DimensionsProps = {|
 
 export default function Dimensions(props: DimensionsProps) {
   const { definition, className } = props
+
+  const { displayCategory } = definition.metadata
   const { xDimension, yDimension, zDimension } = definition.dimensions
   const dimensions = [
     { label: LABWARE_X_DIM, value: toFixed(xDimension) },
@@ -39,6 +41,8 @@ export default function Dimensions(props: DimensionsProps) {
           {FOOTPRINT} <LowercaseText>({MM})</LowercaseText>
         </>
       }
+      category={displayCategory}
+      guideType={FOOTPRINT}
       values={dimensions}
     />
   )

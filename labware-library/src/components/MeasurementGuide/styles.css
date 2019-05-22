@@ -1,0 +1,15 @@
+@import '@opentrons/components';
+@import '../../styles/breakpoints.css';
+@import '../../styles/spacing.css';
+
+.measurement_guide {
+  height: auto;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 1s;
+
+  &.open {
+    /* Need to specify a max height for the transition to work */
+    max-height: 800px;
+  }
+}
