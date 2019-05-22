@@ -20,13 +20,13 @@ import { selectors as stepsSelectors } from '../../../ui/steps'
 
 import LabwareOnDeck from './LabwareOnDeck'
 
-import type { DeckSlot } from '@opentrons/components'
+import type { DeckSlotId } from '@opentrons/shared-data'
 import type { StepIdType } from '../../../form-types'
 import type { BaseState, ThunkDispatch } from '../../../types'
 export { default as DragPreviewLayer } from './DragPreviewLayer'
 
 type OP = {
-  slot: DeckSlot,
+  slot: DeckSlotId,
 }
 
 type Props = React.ElementProps<typeof LabwareOnDeck>
@@ -36,7 +36,7 @@ type DP = {|
   editLiquids: () => mixed,
   deleteLabware: () => mixed,
   duplicateLabware: StepIdType => mixed,
-  swapSlotContents: (DeckSlot, DeckSlot) => mixed,
+  swapSlotContents: (DeckSlotId, DeckSlotId) => mixed,
   setLabwareName: (name: ?string) => mixed,
   setDefaultLabwareName: () => mixed,
 |}

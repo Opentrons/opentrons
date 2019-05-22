@@ -6,11 +6,11 @@ import { Icon, useOnClickOutside } from '@opentrons/components'
 import { renameLabware } from '../../../labware-ingred/actions'
 import type { BaseState, ThunkDispatch } from '../../../types'
 import i18n from '../../../localization'
-import type { LabwareEntity } from '../../../step-forms'
+import type { LabwareOnDeck } from '../../../step-forms'
 import styles from './LabwareOverlays.css'
 
 type OP = {|
-  labwareEntity: LabwareEntity,
+  labwareOnDeck: LabwareOnDeck,
   editLiquids: () => mixed,
 |}
 
@@ -67,7 +67,7 @@ const NameThisLabware = (props: Props) => {
 }
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => {
-  const { id } = ownProps.labwareEntity
+  const { id } = ownProps.labwareOnDeck
   return {
     setLabwareName: (name: ?string) =>
       dispatch(renameLabware({ labwareId: id, name })),

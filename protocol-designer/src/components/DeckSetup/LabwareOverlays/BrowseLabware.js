@@ -4,12 +4,12 @@ import cx from 'classnames'
 import { connect } from 'react-redux'
 import { Icon } from '@opentrons/components'
 import type { ThunkDispatch } from '../../../types'
-import type { LabwareEntity } from '../../../step-forms'
+import type { LabwareOnDeck } from '../../../step-forms'
 import { drillDownOnLabware } from '../../../labware-ingred/actions'
 import styles from './LabwareOverlays.css'
 
 type OP = {|
-  labwareEntity: LabwareEntity,
+  labwareOnDeck: LabwareOnDeck,
 |}
 
 type DP = {|
@@ -19,7 +19,7 @@ type DP = {|
 type Props = { ...OP, ...DP }
 
 function BrowseLabwareOverlay(props: Props) {
-  if (props.labwareEntity.def.parameters.isTiprack) return null
+  if (props.labwareOnDeck.def.parameters.isTiprack) return null
   return (
     <div className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
       <a className={styles.overlay_button} onClick={props.drillDown}>
@@ -31,7 +31,7 @@ function BrowseLabwareOverlay(props: Props) {
 }
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
-  drillDown: () => dispatch(drillDownOnLabware(ownProps.labwareEntity.id)),
+  drillDown: () => dispatch(drillDownOnLabware(ownProps.labwareOnDeck.id)),
 })
 
 export default connect<Props, OP, _, DP, _, _>(

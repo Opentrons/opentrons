@@ -4,23 +4,23 @@ import { RobotCoordsForeignDiv } from '@opentrons/components'
 import type { DeckSlot } from '@opentrons/shared-data'
 
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../../steplist'
-import type { LabwareEntity } from '../../../step-forms'
+import type { LabwareOnDeck } from '../../../step-forms'
 import styles from './LabwareOverlays.css'
 import LabwareName from './LabwareName'
 import EditLabware from './EditLabware'
 import BrowseLabware from './BrowseLabware'
 
 type Props = {
-  labwareEntity: LabwareEntity,
+  labwareOnDeck: LabwareOnDeck,
   selectedTerminalItemId: ?TerminalItemId,
   slot: DeckSlot,
 }
 
 const LabwareControls = (props: Props) => {
-  const { labwareEntity, slot, selectedTerminalItemId } = props
+  const { labwareOnDeck, slot, selectedTerminalItemId } = props
   if (
-    labwareEntity.def.parameters.quirks &&
-    labwareEntity.def.parameters.quirks.includes('fixedTrash')
+    labwareOnDeck.def.parameters.quirks &&
+    labwareOnDeck.def.parameters.quirks.includes('fixedTrash')
   )
     return null
   const canEdit = selectedTerminalItemId === START_TERMINAL_ITEM_ID
@@ -34,11 +34,11 @@ const LabwareControls = (props: Props) => {
       innerDivProps={{ className: styles.slot_ui }}
     >
       {canEdit ? (
-        <EditLabware labwareEntity={labwareEntity} />
+        <EditLabware labwareOnDeck={labwareOnDeck} />
       ) : (
-        <BrowseLabware labwareEntity={labwareEntity} />
+        <BrowseLabware labwareOnDeck={labwareOnDeck} />
       )}
-      <LabwareName labwareEntity={labwareEntity} />
+      <LabwareName labwareOnDeck={labwareOnDeck} />
     </RobotCoordsForeignDiv>
   )
 }

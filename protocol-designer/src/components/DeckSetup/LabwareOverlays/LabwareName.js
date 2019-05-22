@@ -4,9 +4,9 @@ import { connect } from 'react-redux'
 import { LabwareNameOverlay, humanizeLabwareType } from '@opentrons/components'
 import type { BaseState, ThunkDispatch } from '../../../types'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
-import type { LabwareEntity } from '../../../step-forms'
+import type { LabwareOnDeck } from '../../../step-forms'
 type OP = {|
-  labwareEntity: LabwareEntity,
+  labwareOnDeck: LabwareOnDeck,
 |}
 
 type SP = {|
@@ -16,17 +16,17 @@ type SP = {|
 type Props = { ...OP, ...SP }
 
 const NameOverlay = (props: Props) => {
-  const { labwareEntity, nickname } = props
+  const { labwareOnDeck, nickname } = props
   const title =
     nickname ||
-    labwareEntity.def.metadata.displayName ||
-    humanizeLabwareType(labwareEntity.type)
+    labwareOnDeck.def.metadata.displayName ||
+    humanizeLabwareType(labwareOnDeck.type)
 
   return <LabwareNameOverlay title={title} />
 }
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
-  const { id } = ownProps.labwareEntity
+  const { id } = ownProps.labwareOnDeck
   return {
     nickname: uiLabwareSelectors.getLabwareNicknamesById(state)[id],
   }

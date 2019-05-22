@@ -1,10 +1,7 @@
 // @flow
 import React, { useState, useMemo } from 'react'
-import {
-  useOnClickOutside,
-  OutlineButton,
-  type DeckSlot,
-} from '@opentrons/components'
+import { useOnClickOutside, OutlineButton } from '@opentrons/components'
+import { type DeckSlotId } from '@opentrons/shared-data'
 import startCase from 'lodash/startCase'
 import reduce from 'lodash/reduce'
 import { getAllDefinitions } from '../../labware-defs/utils'
@@ -17,7 +14,7 @@ import styles from './styles.css'
 type Props = {
   onClose: (e?: *) => mixed,
   selectLabware: (containerType: string) => mixed,
-  slot: ?DeckSlot,
+  slot: ?DeckSlotId,
   permittedTipracks: Array<string>,
 }
 

@@ -1,7 +1,7 @@
 // @flow
 import React, { useMemo } from 'react'
 import map from 'lodash/map'
-import pickBy from 'lodash/pickBy'
+import filter from 'lodash/filter'
 import some from 'lodash/some'
 import {
   LabwareRender,
@@ -13,7 +13,7 @@ import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefini
 import i18n from '../../localization'
 import BrowseLabwareModal from '../labware/BrowseLabwareModal'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../steplist'
-import type { InitialDeckSetup } from '../../step-forms'
+import type { InitialDeckSetup, LabwareOnDeck } from '../../step-forms'
 
 import { SlotControls, LabwareControls } from './LabwareOverlays'
 import styles from './DeckSetup.css'
@@ -23,6 +23,7 @@ type Props = {|
   handleClickOutside?: () => mixed,
   drilledDown: boolean,
   initialDeckSetup: InitialDeckSetup,
+  ingredSelectionMode: boolean, // TODO: BC 2019-05-22 is this needed anymore?
 |}
 
 const DeckSetup = (props: Props) => {
@@ -68,7 +69,7 @@ const DeckSetup = (props: Props) => {
                 {map(slots, (slot, slotId) => {
                   if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render labware or overlays
 
-                  const containedLabware = pickBy(
+                  const containedLabware: Array<LabwareOnDeck> = filter(
                     props.initialDeckSetup.labware,
                     labware =>
                       labware.slot === slotId &&
@@ -87,25 +88,24 @@ const DeckSetup = (props: Props) => {
 
                   if (some(containedLabware)) {
                     // NOTE: only controlling first contained labware for now!
-                    const labwareEntity = Object.values(containedLabware)[0]
                     controls = (
                       <LabwareControls
                         slot={slot}
-                        labwareEntity={labwareEntity}
+                        labwareOnDeck={containedLabware[0]}
                         selectedTerminalItemId={props.selectedTerminalItemId}
                       />
                     )
                   }
                   return (
                     <>
-                      {map(containedLabware, labwareEntity => (
+                      {map(containedLabware, labwareOnDeck => (
                         <g
-                          key={labwareEntity.id}
+                          key={labwareOnDeck.id}
                           transform={`translate(${
-                            slots[labwareEntity.slot].position[0]
-                          }, ${slots[labwareEntity.slot].position[1]})`}
+                            slots[labwareOnDeck.slot].position[0]
+                          }, ${slots[labwareOnDeck.slot].position[1]})`}
                         >
-                          <LabwareRender definition={labwareEntity.def} />
+                          <LabwareRender definition={labwareOnDeck.def} />
                         </g>
                       ))}
                       {controls}

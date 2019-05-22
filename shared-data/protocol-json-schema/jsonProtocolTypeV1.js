@@ -1,5 +1,6 @@
 // @flow
-import type { DeckSlot, Mount } from '@opentrons/components'
+import type { Mount } from '@opentrons/components'
+import type { DeckSlotId } from '@opentrons/shared-data'
 
 // COMMANDS
 
@@ -64,7 +65,7 @@ export type FilePipetteV1 = {
 }
 
 export type FileLabwareV1 = {
-  slot: DeckSlot,
+  slot: DeckSlotId,
   model: string,
   'display-name'?: string,
 }

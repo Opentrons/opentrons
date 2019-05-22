@@ -11,12 +11,12 @@ import {
 } from '../../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import i18n from '../../../localization'
-import type { LabwareEntity } from '../../../step-forms'
+import type { LabwareOnDeck } from '../../../step-forms'
 import NameThisLabware from './NameThisLabware'
 import styles from './LabwareOverlays.css'
 
 type OP = {|
-  labwareEntity: LabwareEntity,
+  labwareOnDeck: LabwareOnDeck,
 |}
 type SP = {|
   isYetUnnamed: boolean,
@@ -31,19 +31,19 @@ type Props = { ...OP, ...SP, ...DP }
 
 const EditLabware = (props: Props) => {
   const {
-    labwareEntity,
+    labwareOnDeck,
     isYetUnnamed,
     editLiquids,
     deleteLabware,
     duplicateLabware,
   } = props
 
-  if (labwareEntity.def.parameters.isTiprack) return null
+  if (labwareOnDeck.def.parameters.isTiprack) return null
 
   if (isYetUnnamed) {
     return (
       <NameThisLabware
-        labwareEntity={labwareEntity}
+        labwareOnDeck={labwareOnDeck}
         editLiquids={editLiquids}
       />
     )
@@ -72,23 +72,23 @@ const EditLabware = (props: Props) => {
 }
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
-  const { id } = ownProps.labwareEntity
+  const { id } = ownProps.labwareOnDeck
   const hasName = labwareIngredSelectors.getSavedLabware(state)[id]
   return {
-    isYetUnnamed: !ownProps.labwareEntity.def.parameters.isTiprack && !hasName,
+    isYetUnnamed: !ownProps.labwareOnDeck.def.parameters.isTiprack && !hasName,
   }
 }
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   editLiquids: () =>
-    dispatch(openIngredientSelector(ownProps.labwareEntity.id)),
-  duplicateLabware: () => dispatch(duplicateLabware(ownProps.labwareEntity.id)),
+    dispatch(openIngredientSelector(ownProps.labwareOnDeck.id)),
+  duplicateLabware: () => dispatch(duplicateLabware(ownProps.labwareOnDeck.id)),
   deleteLabware: () => {
     window.confirm(
       `Are you sure you want to permanently delete this ${
-        ownProps.labwareEntity.def.metadata.displayName
+        ownProps.labwareOnDeck.def.metadata.displayName
       }?`
-    ) && dispatch(deleteContainer({ labwareId: ownProps.labwareEntity.id }))
+    ) && dispatch(deleteContainer({ labwareId: ownProps.labwareOnDeck.id }))
   },
 })
 

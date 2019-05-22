@@ -6,6 +6,7 @@ import { selectors as labwareIngredSelectors } from '../../labware-ingred/select
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import { selectors as stepsSelectors } from '../../ui/steps'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import type { InitialDeckSetup } from '../../step-forms'
 import DeckSetup from './DeckSetup'
 
 import type { TerminalItemId } from '../../steplist'
@@ -17,6 +18,7 @@ type SP = {|
   selectedTerminalItemId: ?TerminalItemId,
   ingredSelectionMode: boolean,
   drilledDown: boolean,
+  initialDeckSetup: InitialDeckSetup,
 |}
 
 type DP = {| drillUpFromLabware: () => mixed |}

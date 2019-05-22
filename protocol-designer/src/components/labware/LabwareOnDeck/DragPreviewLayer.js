@@ -1,7 +1,8 @@
 // @flow
 import * as React from 'react'
 import { DragLayer } from 'react-dnd'
-import { LabwareWrapper, type DeckSlot } from '@opentrons/components'
+import type { DeckSlotId } from '@opentrons/shared-data'
+import { LabwareWrapper } from '@opentrons/components'
 import HighlightableLabware from '../../../containers/HighlightableLabware'
 import { DND_TYPES } from './constants'
 
@@ -9,7 +10,7 @@ type DragPreviewProps = {
   getXY: (rawX: number, rawY: number) => { scaledX?: number, scaledY?: number },
   isDragging: boolean,
   currentOffset?: { x: number, y: number },
-  item: { slot: DeckSlot, labwareOrSlot: React.Node, containerId: string },
+  item: { slot: DeckSlotId, labwareOrSlot: React.Node, containerId: string },
   itemType: string,
   containerType: string,
   children: React.Node,

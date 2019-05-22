@@ -1,8 +1,7 @@
 // @flow
 import assert from 'assert'
 import reduce from 'lodash/reduce'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import type { DeckSlot } from '@opentrons/components'
+import { getPipetteNameSpecs, type DeckSlotId } from '@opentrons/shared-data'
 import type { LabwareDefByDefId } from '../labware-defs'
 import type {
   NormalizedPipette,
@@ -40,8 +39,8 @@ export function getIdsInRange<T: string | number>(
 }
 
 export function getLabwareIdInSlot(
-  labwareIdToSlot: { [labwareId: string]: DeckSlot },
-  slot: DeckSlot
+  labwareIdToSlot: { [labwareId: string]: DeckSlotId },
+  slot: DeckSlotId
 ): ?string {
   const labwareIdsForSourceSlot = Object.entries(labwareIdToSlot)
     .filter(([id, labwareSlot]) => labwareSlot === slot)

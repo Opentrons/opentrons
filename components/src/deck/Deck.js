@@ -3,10 +3,10 @@ import * as React from 'react'
 import cx from 'classnames'
 import flatMap from 'lodash/flatMap'
 import map from 'lodash/map'
-import type { DeckSlot } from '../robot-types'
 import {
   type DeckDefinition,
   type DeckLayer,
+  type DeckSlotId,
   SLOT_RENDER_WIDTH,
   SLOT_RENDER_HEIGHT,
 } from '@opentrons/shared-data'
@@ -22,7 +22,7 @@ import { EmptyDeckSlot } from './EmptyDeckSlot'
 import styles from './Deck.css'
 
 export type LabwareComponentProps = {|
-  slot: DeckSlot,
+  slot: DeckSlotId,
   width: number,
   height: number,
 |}
@@ -91,9 +91,9 @@ function renderLabware(
 ): Array<React.Node> {
   return flatMap(
     SLOTNAME_MATRIX,
-    (columns: Array<DeckSlot>, row: number): Array<React.Node> => {
+    (columns: Array<DeckSlotId>, row: number): Array<React.Node> => {
       return columns.map(
-        (slot: DeckSlot, col: number): React.Node => {
+        (slot: DeckSlotId, col: number): React.Node => {
           if (slot === TRASH_SLOTNAME) return null
 
           const props = {

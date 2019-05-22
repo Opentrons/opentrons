@@ -7,9 +7,12 @@ import {
   ContainerNameOverlay,
   EmptyDeckSlot,
   humanizeLabwareType,
-  type DeckSlot,
 } from '@opentrons/components'
-import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
+import {
+  type DeckSlotId,
+  SLOT_RENDER_WIDTH,
+  SLOT_RENDER_HEIGHT,
+} from '@opentrons/shared-data'
 import styles from '../labware.css'
 
 import type { StepIdType } from '../../../form-types'
@@ -31,12 +34,12 @@ import { DND_TYPES } from './constants'
 type DragDropLabwareProps = React.ElementProps<typeof LabwareWrapper> & {
   connectDragSource: mixed => React.Element<any>,
   connectDropTarget: mixed => React.Element<any>,
-  draggedItem?: { slot: DeckSlot },
+  draggedItem?: { slot: DeckSlotId },
   isOver: boolean,
-  swapSlotContents: (DeckSlot, DeckSlot) => void,
+  swapSlotContents: (DeckSlotId, DeckSlotId) => void,
   render: (args: {
     isOver: boolean,
-    draggedItem?: { slot: DeckSlot },
+    draggedItem?: { slot: DeckSlotId },
   }) => React.Node,
 }
 const DragSourceLabware = (props: DragDropLabwareProps) => {
@@ -193,7 +196,7 @@ function EmptyDeckSlotOverlay(props: EmptyDeckSlotOverlayProps) {
 }
 
 type LabwareOnDeckProps = {
-  slot: DeckSlot,
+  slot: DeckSlotId,
   containerId: string,
   containerName: ?string,
   containerType: string,
@@ -214,7 +217,7 @@ type LabwareOnDeckProps = {
   deleteLabware: () => mixed,
   duplicateLabware: StepIdType => mixed,
   editLiquids: () => mixed,
-  swapSlotContents: (DeckSlot, DeckSlot) => mixed,
+  swapSlotContents: (DeckSlotId, DeckSlotId) => mixed,
 
   setLabwareName: (name: ?string) => mixed,
   setDefaultLabwareName: () => mixed,
