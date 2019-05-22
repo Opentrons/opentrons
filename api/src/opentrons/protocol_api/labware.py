@@ -951,6 +951,11 @@ def load(
     :param parent: A :py:class:`.Location` representing the location where
                    the front and left most point of the outside of labware is
                    (often the front-left corner of a slot on the deck).
+    :param str namespace: The namespace the labware definition belongs to. If
+        unspecified, will search in this order: 'opentrons', 'custom_beta',
+        then all other namespaces together.
+    :param int version: The version of the labware definition. If unspecified,
+        will use the latest version.
     :param str label: An optional label that will override the labware's
                       display name from its definition
     :param str namespace: The namespace the labware definition belongs to.
