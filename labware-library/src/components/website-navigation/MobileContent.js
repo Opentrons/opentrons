@@ -15,7 +15,7 @@ export default function MobileContent(props: Props) {
     <ul className={styles.mobile_content}>
       {links.map((link, index) => (
         <li key={index}>
-          <NavLink url={link.url} name={link.name} />
+          <NavLink url={link.url} name={link.name} gtm={link.gtm} />
         </li>
       ))}
 
@@ -25,6 +25,7 @@ export default function MobileContent(props: Props) {
             url={props.bottomLink.url}
             name={props.bottomLink.name}
             cta
+            gtm={props.bottomLink.gtm}
           />
         </li>
       )}

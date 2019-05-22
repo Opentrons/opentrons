@@ -1,7 +1,12 @@
 @import '@opentrons/components';
 
+.labware {
+  margin: 2rem auto;
+  max-width: 50rem;
+}
+
 .liquid_placement_modal {
-  @apply(--absolute-fill);
+  @apply (--absolute-fill);
 
   background-color: rgba(100, 100, 100, 0.8);
 

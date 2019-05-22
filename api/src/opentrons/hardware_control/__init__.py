@@ -264,9 +264,10 @@ class API(HardwareAPILike):
         for mount, instrument_data in found.items():
             model = instrument_data.get('model')
             if model is not None:
-                p = Pipette(model,
-                            self._config.instrument_offset[mount.name.lower()],
-                            instrument_data['id'])
+                p = Pipette(
+                    model,
+                    self._config.instrument_offset[mount.name.lower()],
+                    instrument_data['id'])
                 self._attached_instruments[mount] = p
                 mount_axis = Axis.by_mount(mount)
                 plunger_axis = Axis.of_plunger(mount)
@@ -300,7 +301,7 @@ class API(HardwareAPILike):
         configs = ['name', 'min_volume', 'max_volume', 'channels',
                    'aspirate_flow_rate', 'dispense_flow_rate',
                    'pipette_id', 'current_volume', 'display_name',
-                   'tip_length']
+                   'tip_length', 'model']
         instruments = {top_types.Mount.LEFT: {},
                        top_types.Mount.RIGHT: {}}
         for mount in top_types.Mount:
@@ -994,7 +995,7 @@ class API(HardwareAPILike):
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
         # This extra shake ensures those tips are removed
-        if 'needs-pickup-shake' in instr.config.quirks:
+        if 'pickupTipShake' in instr.config.quirks:
             await self._shake_off_tips(mount)
             await self._shake_off_tips(mount)
 
@@ -1214,7 +1215,7 @@ class API(HardwareAPILike):
                                     for ax, vals in new_pos.items()})
         self._log.info("Tip probe complete with {} {} on {}. "
                        "New position: {} (default {}), averaged from {}"
-                       .format(pip.name, pip.pipette_id, mount.name,
+                       .format(pip.model, pip.pipette_id, mount.name,
                                to_ret, self._config.tip_probe.center,
                                new_pos))
         return to_ret

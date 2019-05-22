@@ -14,7 +14,9 @@
     ["A12"]
   ],
   "otId": "fixture12Trough",
-  "deprecated": false,
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "fixture",
   "metadata": {
     "displayName": "12 Channel Trough",
     "displayVolumeUnits": "mL",

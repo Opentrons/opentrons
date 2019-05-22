@@ -109,13 +109,14 @@ class Pipette(CommandPublisher):
     ...     tip_racks=[tip_rack_300ul]) # doctest: +SKIP
     """
 
-    def __init__(
+    def __init__(  # noqa(C901)
             self,
             robot,
             model_offset=(0, 0, 0),
             mount=None,
             axis=None,
             mount_obj=None,
+            model=None,
             name=None,
             ul_per_mm=None,
             channels=1,
@@ -166,6 +167,9 @@ class Pipette(CommandPublisher):
         if not name:
             name = self.__class__.__name__
         self.name = name
+        if not model:
+            model = self.__class__.__name__
+        self.model = model
 
         if trash_container == '':
             trash_container = self.robot.fixed_trash
@@ -223,8 +227,8 @@ class Pipette(CommandPublisher):
             aspirate=aspirate_flow_rate, dispense=dispense_flow_rate)
 
         # TODO (andy): remove from pipette, move to tip-rack
-        self.robot.config.tip_length[self.name] = \
-            self.robot.config.tip_length.get(self.name, fallback_tip_length)
+        self.robot.config.tip_length[self.model] = \
+            self.robot.config.tip_length.get(self.model, fallback_tip_length)
 
         self.quirks = quirks if isinstance(quirks, list) else []
 
@@ -1006,9 +1010,8 @@ class Pipette(CommandPublisher):
             # neighboring tips tend to get stuck in the space between
             # the volume chamber and the drop-tip sleeve on p1000.
             # This extra shake ensures those tips are removed
-            if 'needs-pickup-shake' in self.quirks:
-                self._shake_off_tips(location)
-                self._shake_off_tips(location)
+            self._shake_off_tips(location, 'pickupTipShake')
+            self._shake_off_tips(location, 'pickupTipShake')
             self.previous_placeable = None  # no longer inside a placeable
             self.robot.poses = self.instrument_mover.fast_home(
                 self.robot.poses, self._pick_up_distance)
@@ -1098,7 +1101,9 @@ class Pipette(CommandPublisher):
                 x=pos_drop_tip
             )
             self.instrument_actuator.pop_speed()
-            self._shake_off_tips(location)
+
+            self._shake_off_tips(location, 'dropTipShake')
+
             if home_after:
                 self._home_after_drop_tip()
 
@@ -1115,19 +1120,21 @@ class Pipette(CommandPublisher):
                    'after', self, None, self, location)
         return self
 
-    def _shake_off_tips(self, location):
+    def _shake_off_tips(self, location, quirk):
         # tips don't always fall off, especially if resting against
         # tiprack or other tips below it. To ensure the tip has fallen
         # first, shake the pipette to dislodge partially-sealed tips,
         # then second, raise the pipette so loosened tips have room to fall
 
         # shake the pipette left/right a few millimeters
+        if quirk not in self.quirks:
+            return
         shake_off_distance = SHAKE_OFF_TIPS_DISTANCE
         if location:
             placeable, _ = unpack_location(location)
             # ensure the distance is not >25% the diameter of placeable
-            shake_off_distance = min(
-                shake_off_distance, placeable.x_size() / 4)
+            shake_off_distance = max(min(
+                shake_off_distance, placeable.x_size() / 4), 1.0)
         self.robot.gantry.push_speed()
         self.robot.gantry.set_speed(SHAKE_OFF_TIPS_SPEED)
         self.robot.poses = self._jog(
@@ -1678,7 +1685,7 @@ class Pipette(CommandPublisher):
     def _tip_length(self):
         # TODO (andy): tip length should be retrieved from tip-rack's labware
         # definition, unblocking ability to use multiple types of tips
-        return self.robot.config.tip_length[self.name]
+        return self.robot.config.tip_length[self.model]
 
     def set_speed(self, aspirate=None, dispense=None):
         """

@@ -6,7 +6,9 @@
     ["A4", "B4"]
   ],
   "otId": "f65f2960-0f76-11e9-8659-e18ed15996f5",
-  "deprecated": false,
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "opentrons",
   "metadata": {
     "displayName": "Opentrons 6x15mL 4x50mL tube rack",
     "displayCategory": "tubeRack",

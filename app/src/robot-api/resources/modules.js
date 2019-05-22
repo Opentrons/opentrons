@@ -12,13 +12,12 @@ import {
 } from '../utils'
 
 import type { State as AppState, ActionLike } from '../../types'
+import type { RobotHost, RobotApiAction } from '../types'
 import type {
-  RobotHost,
-  RobotApiAction,
   Module,
   SetTemperatureRequest,
   ModulesState as State,
-} from '../types'
+} from './types'
 
 const INITIAL_STATE: State = []
 
@@ -44,19 +43,21 @@ export const fetchModules = (host: RobotHost): RobotApiAction => ({
 
 export const fetchModuleData = (
   host: RobotHost,
-  serial: string
+  id: string
 ): RobotApiAction => ({
   type: FETCH_MODULE_DATA,
-  payload: { host, method: GET, path: `/modules/${serial}/data` },
+  payload: { host, method: GET, path: `/modules/${id}/data` },
+  meta: { id },
 })
 
 export const setTargetTemp = (
   host: RobotHost,
-  serial: string,
+  id: string,
   body: SetTemperatureRequest
 ): RobotApiAction => ({
   type: SET_MODULE_TARGET_TEMP,
-  payload: { host, body, method: POST, path: `/modules/${serial}` },
+  payload: { host, body, method: POST, path: `/modules/${id}` },
+  meta: { id },
 })
 
 const fetchModulesEpic = createBaseRobotApiEpic(FETCH_MODULES)
@@ -76,20 +77,21 @@ export function modulesReducer(
   const resAction = passRobotApiResponseAction(action)
 
   if (resAction) {
-    const { path, body } = resAction.payload
+    const { payload, meta } = resAction
+    const { method, path, body } = payload
 
     if (path === MODULES_PATH) {
       return (body.modules: Array<Module>)
     }
 
-    const dataPathMatch = path.match(RE_MODULE_DATA_PATH)
-
-    if (dataPathMatch) {
-      const serial = dataPathMatch[1]
+    if (
+      method === GET &&
+      RE_MODULE_DATA_PATH.test(path) &&
+      typeof meta.id === 'string'
+    ) {
       const { status, data } = body
-
       return state.map(m =>
-        m.serial === serial ? ({ ...m, status, data }: any) : m
+        m.serial === meta.id ? ({ ...m, status, data }: any) : m
       )
     }
   }

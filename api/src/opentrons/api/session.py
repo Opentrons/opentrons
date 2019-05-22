@@ -200,7 +200,7 @@ class Session(object):
                 instrs = {}
                 for mount, pip in self._hardware.attached_instruments.items():
                     if pip:
-                        instrs[mount] = {'model': pip['name'],
+                        instrs[mount] = {'model': pip['model'],
                                          'id': pip.get('pipette_id', '')}
                 sim = adapters.SynchronousAdapter.build(
                     API.build_hardware_simulator,

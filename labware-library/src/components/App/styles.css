@@ -34,7 +34,7 @@
 
 .content_container {
   width: 100%;
-  padding: var(--spacing-3);
+  padding: var(--spacing-5);
   margin: 0;
 }
 
@@ -76,7 +76,7 @@
   }
 }
 
-@media (--desktop) {
+@media (--large) {
   .app {
     /* total nav height */
     padding-top: var(--size-total-nav);
@@ -86,9 +86,7 @@
       padding-top: calc(var(--size-total-nav) + var(--size-2));
     }
   }
-}
 
-@media (--large) {
   .sidebar_container {
     width: var(--size-4);
     padding-left: var(--spacing-7);
@@ -101,6 +99,6 @@
   .content_container,
   .content_container.sidebar_large_only {
     /* spacing + sidebar width */
-    padding-left: calc(var(--size-4) + var(--spacing-7));
+    padding-left: calc(var(--size-4) + var(--spacing-5));
   }
 }

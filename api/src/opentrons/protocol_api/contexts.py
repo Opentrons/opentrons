@@ -345,7 +345,7 @@ class ProtocolContext(CommandPublisher):
             raise RuntimeError("Instrument already present in {} mount: {}"
                                .format(checked_mount.name.lower(),
                                        instr.name))
-        attached = {att_mount: instr.get('name', None)
+        attached = {att_mount: instr.get('model', None)
                     for att_mount, instr
                     in self._hw_manager.hardware.attached_instruments.items()}
         attached[checked_mount] = instrument_name
@@ -1379,7 +1379,7 @@ class InstrumentContext(CommandPublisher):
         elif 'multi' in model:
             return 'multi'
         else:
-            raise RuntimeError("Bad pipette model name: {}".format(model))
+            raise RuntimeError("Bad pipette name: {}".format(model))
 
     @property
     def tip_racks(self) -> List[Labware]:
@@ -1412,9 +1412,16 @@ class InstrumentContext(CommandPublisher):
     @property
     def name(self) -> str:
         """
-        The model string for the pipette.
+        The name string for the pipette (e.g. 'p300_single')
         """
         return self.hw_pipette['name']
+
+    @property
+    def model(self) -> str:
+        """
+        The model string for the pipette (e.g. 'p300_single_v1.3')
+        """
+        return self.hw_pipette['model']
 
     @property
     def min_volume(self) -> float:
@@ -1469,7 +1476,7 @@ class InstrumentContext(CommandPublisher):
 
     def __repr__(self):
         return '<{}: {} in {}>'.format(self.__class__.__name__,
-                                       self.hw_pipette['name'],
+                                       self.hw_pipette['model'],
                                        self._mount.name)
 
     def __str__(self):

@@ -28,28 +28,33 @@ export default function Pipettes(props: Props) {
 
   const infoByMount = PIPETTE_MOUNTS.reduce((result, mount) => {
     const pipette = pipettes.find(p => p.mount === mount)
-    // TODO(mc, 2018-04-25)
+
     const pipetteConfig = pipette ? getPipetteModelSpecs(pipette.name) : null
+    const actualPipetteConfig = getPipetteModelSpecs(
+      actualPipettes?.[mount].model || ''
+    )
 
     const isDisabled = !pipette || mount !== currentMount
     const details = !pipetteConfig
       ? { description: 'N/A', tipType: 'N/A' }
       : {
           description: pipetteConfig.displayName,
-          tipType: `${pipetteConfig.maxVolume} ul`,
+          tipType: `${pipetteConfig.maxVolume} µL`,
           channels: pipetteConfig.channels,
         }
 
-    const actualModel = actualPipettes && actualPipettes[mount].model
     let showAlert = false
     let alertType = ''
 
     // only show alert if a pipette is on this mount in the protocol
     if (pipetteConfig) {
-      if (actualModel == null) {
+      if (!actualPipetteConfig) {
         showAlert = true
         alertType = 'attach'
-      } else if (pipette && pipette.name !== actualModel) {
+      } else if (
+        actualPipetteConfig &&
+        actualPipetteConfig.name !== pipetteConfig.name
+      ) {
         showAlert = true
         alertType = 'change'
       }

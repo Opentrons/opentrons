@@ -5,7 +5,7 @@ import * as React from 'react'
 import {
   MANUFACTURER,
   CATEGORY,
-  NUM_WELLS_LONG_BY_CATEGORY,
+  NUM_WELLS_BY_CATEGORY,
   CATEGORY_LABELS_BY_CATEGORY,
   MANUFACTURER_LABELS_BY_MANUFACTURER,
 } from '../../localization'
@@ -37,8 +37,7 @@ export default function Stats(props: StatsProps) {
     },
     {
       label:
-        NUM_WELLS_LONG_BY_CATEGORY[displayCategory] ||
-        NUM_WELLS_LONG_BY_CATEGORY.other,
+        NUM_WELLS_BY_CATEGORY[displayCategory] || NUM_WELLS_BY_CATEGORY.other,
       value: Object.keys(definition.wells).length,
     },
   ]

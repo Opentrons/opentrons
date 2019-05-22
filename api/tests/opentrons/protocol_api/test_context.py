@@ -29,7 +29,7 @@ def test_load_instrument(loop):
     ctx = papi.ProtocolContext(loop=loop)
     for config in config_models:
         loaded = ctx.load_instrument(config, Mount.LEFT, replace=True)
-        assert loaded.name == config
+        assert loaded.model == config
         prefix = config.split('_v')[0]
         loaded = ctx.load_instrument(prefix, Mount.RIGHT, replace=True)
         assert loaded.name.startswith(prefix)
@@ -115,10 +115,14 @@ def test_pipette_info(loop):
     left = ctx.load_instrument('p1000_single', Mount.LEFT)
     assert right.type == 'multi'
     name = ctx._hw_manager.hardware.attached_instruments[Mount.RIGHT]['name']
+    model = ctx._hw_manager.hardware.attached_instruments[Mount.RIGHT]['model']
     assert right.name == name
+    assert right.model == model
     assert left.type == 'single'
     name = ctx._hw_manager.hardware.attached_instruments[Mount.LEFT]['name']
+    model = ctx._hw_manager.hardware.attached_instruments[Mount.LEFT]['model']
     assert left.name == name
+    assert left.model == model
 
 
 def test_pick_up_and_drop_tip(loop, load_my_labware):

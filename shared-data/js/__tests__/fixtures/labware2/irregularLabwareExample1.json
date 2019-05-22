@@ -12,7 +12,9 @@
     ["A10", "C10", "E10", "G10", "I10"]
   ],
   "otId": "mock-id",
-  "deprecated": false,
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "fixture",
   "metadata": {
     "displayName": "Fake Irregular Container",
     "displayCategory": "tubeRack",

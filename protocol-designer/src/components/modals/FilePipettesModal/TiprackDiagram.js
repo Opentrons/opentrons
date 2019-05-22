@@ -1,20 +1,21 @@
 // @flow
 import * as React from 'react'
-import { Labware } from '@opentrons/components'
-import SingleLabware from '../../SingleLabware'
+import SingleLabware from '../../labware/SingleLabware'
 import styles from './FilePipettesModal.css'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-type Props = { containerType: ?string }
+type Props = { definition?: ?LabwareDefinition2 }
 
+// TODO: Ian 2019-05-08 actually pass a definition down where TiprackDiagram is used! #3334
 export default function TiprackDiagram(props: Props) {
-  const { containerType } = props
-  if (!containerType) {
+  const { definition } = props
+  if (!definition) {
     return <div className={styles.tiprack_labware} />
   }
 
   return (
-    <SingleLabware className={styles.tiprack_labware}>
-      <Labware labwareType={containerType} />
-    </SingleLabware>
+    <div className={styles.tiprack_labware}>
+      <SingleLabware definition={definition} />
+    </div>
   )
 }

@@ -1,37 +1,33 @@
 // @flow
 import * as React from 'react'
 import reduce from 'lodash/reduce'
-import map from 'lodash/map'
-import {
-  LabwareLabels,
-  type Channels,
-  LabwareOutline,
-  Well,
-  ingredIdsToColor,
-} from '@opentrons/components'
 
-import { getWellDefsForSVG } from '@opentrons/shared-data'
-
-import { getCollidingWells } from '../../utils'
-import { SELECTABLE_WELL_CLASS, WELL_LABEL_OFFSET } from '../../constants'
-import { getWellSetForMultichannelDeprecated as getWellSetForMultichannel } from '../../well-selection/utils'
-import SelectionRect from '../SelectionRect.js'
-import type { ContentsByWell, Wells } from '../../labware-ingred/types'
-import type { WellIngredientNames } from '../../steplist/types'
-import type { GenericRect } from '../../collision-types'
+import { getCollidingWells, arrayToWellGroup } from '../../utils'
+import { SELECTABLE_WELL_CLASS } from '../../constants'
+import { getWellSetForMultichannel } from '../../well-selection/utils'
+import SingleLabware from './SingleLabware'
+import SelectionRect from '../SelectionRect'
 import WellTooltip from './WellTooltip'
 
-export type Props = {
-  wellContents: ContentsByWell,
-  containerType: string,
-  selectedWells: Wells,
-  highlightedWells: Wells,
-  selectWells: Wells => mixed,
-  deselectWells: Wells => mixed,
-  updateHighlightedWells: Wells => mixed,
+import type { Channels, WellMouseEvent, WellGroup } from '@opentrons/components'
+import type { ContentsByWell } from '../../labware-ingred/types'
+import type { WellIngredientNames } from '../../steplist/types'
+import type { GenericRect } from '../../collision-types'
+
+export type Props = {|
+  labwareProps: $Diff<
+    React.ElementProps<typeof SingleLabware>,
+    { selectedWells: * }
+  >,
+  /** array of primary wells. Overrides labwareProps.selectedWells */
+  selectedPrimaryWells: WellGroup,
+  selectWells: WellGroup => mixed,
+  deselectWells: WellGroup => mixed,
+  updateHighlightedWells: WellGroup => mixed,
   pipetteChannels?: ?Channels,
   ingredNames: WellIngredientNames,
-}
+  wellContents: ContentsByWell,
+|}
 
 class SelectableLabware extends React.Component<Props> {
   _getWellsFromRect = (rect: GenericRect): * => {
@@ -39,24 +35,21 @@ class SelectableLabware extends React.Component<Props> {
     return this._wellsFromSelected(selectedWells)
   }
 
-  _wellsFromSelected = (selectedWells: Wells): Wells => {
+  _wellsFromSelected = (selectedWells: WellGroup): WellGroup => {
+    const labwareDef = this.props.labwareProps.definition
     // Returns PRIMARY WELLS from the selection.
     if (this.props.pipetteChannels === 8) {
       // for the wells that have been highlighted,
       // get all 8-well well sets and merge them
-      const primaryWells: Wells = Object.keys(selectedWells).reduce(
-        (acc: Wells, wellName: string): Wells => {
-          const wellSet = getWellSetForMultichannel(
-            this.props.containerType,
-            wellName
-          )
+      const primaryWells: WellGroup = reduce(
+        selectedWells,
+        (acc: WellGroup, _, wellName: string): WellGroup => {
+          const wellSet = getWellSetForMultichannel(labwareDef, wellName)
           if (!wellSet) return acc
-
-          return { ...acc, [wellSet[0]]: wellSet[0] }
+          return { ...acc, [wellSet[0]]: null }
         },
         {}
       )
-
       return primaryWells
     }
 
@@ -65,24 +58,24 @@ class SelectableLabware extends React.Component<Props> {
   }
 
   handleSelectionMove = (e: MouseEvent, rect: GenericRect) => {
+    const labwareDef = this.props.labwareProps.definition
     if (!e.shiftKey) {
       if (this.props.pipetteChannels === 8) {
-        const selectedWells: Wells = this._getWellsFromRect(rect)
-        const allWells: Wells = Object.keys(selectedWells).reduce(
-          (acc: Wells, wellName: string): Wells => {
-            const channelWells: ?Wells = reduce(
-              getWellSetForMultichannel(this.props.containerType, wellName),
-              (acc, channelWellName) => ({
-                ...acc,
-                [channelWellName]: channelWellName,
-              }),
-              {}
-            )
-            return { ...acc, ...channelWells }
+        const selectedWells = this._getWellsFromRect(rect)
+        const allWellsForMulti: WellGroup = reduce(
+          selectedWells,
+          (acc: WellGroup, _, wellName: string): WellGroup => {
+            const wellSetForMulti =
+              getWellSetForMultichannel(labwareDef, wellName) || []
+            const channelWells = arrayToWellGroup(wellSetForMulti)
+            return {
+              ...acc,
+              ...channelWells,
+            }
           },
           {}
         )
-        this.props.updateHighlightedWells(allWells)
+        this.props.updateHighlightedWells(allWellsForMulti)
       } else {
         this.props.updateHighlightedWells(this._getWellsFromRect(rect))
       }
@@ -97,103 +90,75 @@ class SelectableLabware extends React.Component<Props> {
     }
   }
 
-  makeHandleMouseOverWell = (
-    wellName: string,
-    callback: (e: SyntheticMouseEvent<*>) => void
-  ) => (e: SyntheticMouseEvent<*>) => {
-    callback(e)
+  handleMouseEnterWell = (args: WellMouseEvent) => {
     if (this.props.pipetteChannels === 8) {
-      const wellSet = getWellSetForMultichannel(
-        this.props.containerType,
-        wellName
-      )
-      const nextHighlightedWells = reduce(
-        wellSet,
-        (acc, well) => ({ ...acc, [well]: well }),
-        {}
-      )
+      const labwareDef = this.props.labwareProps.definition
+      const wellSet = getWellSetForMultichannel(labwareDef, args.wellName)
+      const nextHighlightedWells = arrayToWellGroup(wellSet || [])
       nextHighlightedWells &&
         this.props.updateHighlightedWells(nextHighlightedWells)
     } else {
-      this.props.updateHighlightedWells({ [wellName]: wellName })
+      this.props.updateHighlightedWells({ [args.wellName]: null })
     }
   }
 
-  makeHandleMouseExitWell = (callback: (e: SyntheticMouseEvent<*>) => void) => (
-    e: SyntheticMouseEvent<*>
-  ) => {
-    callback(e)
+  handleMouseLeaveWell = (args: WellMouseEvent) => {
     this.props.updateHighlightedWells({})
   }
 
   render() {
     const {
-      wellContents,
-      containerType,
-      highlightedWells,
-      selectedWells,
-      pipetteChannels,
+      labwareProps,
       ingredNames,
+      wellContents,
+      pipetteChannels,
+      selectedPrimaryWells,
     } = this.props
 
-    const allWellDefsByName = getWellDefsForSVG(containerType)
-
-    const selectedWellSets =
+    // For rendering, show all wells not just primary wells
+    const allSelectedWells =
       pipetteChannels === 8
         ? reduce(
-            selectedWells,
-            (acc, wellName) => {
+            selectedPrimaryWells,
+            (acc, _, wellName): WellGroup => {
               const wellSet = getWellSetForMultichannel(
-                this.props.containerType,
+                this.props.labwareProps.definition,
                 wellName
               )
               if (!wellSet) return acc
-              return [...acc, ...wellSet]
+              return { ...acc, ...arrayToWellGroup(wellSet) }
             },
-            []
+            {}
           )
-        : Object.keys(selectedWells)
+        : selectedPrimaryWells
 
-    // FIXME: SelectionRect is somehow off by one in the x axis, hence the magic number
     return (
       <SelectionRect
-        svg
-        originXOffset={WELL_LABEL_OFFSET - 1}
-        originYOffset={WELL_LABEL_OFFSET}
         onSelectionMove={this.handleSelectionMove}
         onSelectionDone={this.handleSelectionDone}
       >
         <WellTooltip ingredNames={ingredNames}>
-          {({ makeHandleMouseOverWell, handleMouseLeaveWell }) => (
-            <React.Fragment>
-              <g>
-                <LabwareOutline />
-                {map(wellContents, (well, wellName) => (
-                  <Well
-                    selectable
-                    key={wellName}
-                    wellName={wellName}
-                    onMouseOver={this.makeHandleMouseOverWell(
-                      wellName,
-                      well.ingreds
-                        ? makeHandleMouseOverWell(wellName, well.ingreds)
-                        : () => {}
-                    )}
-                    onMouseLeave={this.makeHandleMouseExitWell(
-                      handleMouseLeaveWell
-                    )}
-                    highlighted={Object.keys(highlightedWells).includes(
-                      wellName
-                    )}
-                    selected={selectedWellSets.includes(wellName)}
-                    fillColor={ingredIdsToColor(well.groupIds)}
-                    svgOffset={{ x: 1, y: -3 }}
-                    wellDef={allWellDefsByName[wellName]}
-                  />
-                ))}
-              </g>
-              <LabwareLabels labwareType={containerType} />
-            </React.Fragment>
+          {({
+            makeHandleMouseEnterWell,
+            handleMouseLeaveWell,
+            tooltipWellName,
+          }) => (
+            <SingleLabware
+              {...labwareProps}
+              selectedWells={allSelectedWells}
+              onMouseLeaveWell={mouseEventArgs => {
+                this.handleMouseLeaveWell(mouseEventArgs)
+                handleMouseLeaveWell(mouseEventArgs.event)
+              }}
+              selectableWellClass={SELECTABLE_WELL_CLASS}
+              onMouseEnterWell={({ wellName, event }) => {
+                this.handleMouseEnterWell({ wellName, event })
+                makeHandleMouseEnterWell(
+                  wellName,
+                  wellContents[wellName].ingreds
+                )(event)
+              }}
+            />
           )}
         </WellTooltip>
       </SelectionRect>

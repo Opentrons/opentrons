@@ -23,13 +23,12 @@ type Props = {
 
 // TODO: BC 2019-05-10 ideally this should be pulled from the definitions
 // and it's usage should be memoized by the useMemo below
-// TODO: BC 2019-05-10 this should include displayCategory 'trash',
-// but there are no current trash box definitions
 const orderedCategories: Array<string> = [
   'tipRack',
   'tubeRack',
   'wellPlate',
   'trough',
+  'trash',
 ]
 
 const LabwareDropdown = (props: Props) => {

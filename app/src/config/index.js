@@ -71,6 +71,7 @@ export type Config = {
     allPipetteConfig?: boolean,
     tempdeckControls?: boolean,
     enableThermocycler?: boolean,
+    enablePipettePlus?: boolean,
   },
 }
 

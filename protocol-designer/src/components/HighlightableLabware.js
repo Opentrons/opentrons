@@ -32,6 +32,8 @@ export type Props = {
 // TODO: BC 2018-10-08 we are only using this component in LabwareOnDeck,
 // with no hover or select capabilities, pull out implicit highlighting
 // labware into it's own component probably near to View Results' BrowsableLabware
+
+// TODO: Ian 2019-05-10 this labware should be removed! Required of #3334
 export default function HighlightableLabware(props: Props) {
   const { wellContents, getTipProps, containerType } = props
 

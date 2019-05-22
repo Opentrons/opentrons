@@ -38,7 +38,10 @@ class Instrument:
         self._context = context
 
         self.id = id(instrument)
-        self.name = instrument.name
+        # The name element here is actually the pipette model for historical
+        # reasons
+        self.name = instrument.model
+        self.model_name = instrument.name
         self.channels = instrument.channels
         self.mount = instrument.mount
         self.containers = [

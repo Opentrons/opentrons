@@ -2,17 +2,17 @@
 import * as React from 'react'
 import Well from './Well'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { WellGroup } from './types'
 
 export type StyledWellProps = {|
   className: string,
   definition: LabwareDefinition2,
-  wells: Set<string>,
+  wells: WellGroup,
 |}
 
 function StyledWell(props: StyledWellProps) {
-  const { className, definition } = props
-  const wells = [...props.wells]
-  return wells.map<*, *, React.Node>(wellName => {
+  const { className, definition, wells } = props
+  return Object.keys(wells).map<*, *, React.Node>((wellName: string) => {
     return (
       <Well
         key={wellName}

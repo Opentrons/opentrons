@@ -14,7 +14,7 @@ def probe_instrument(instrument, robot, tip_length=None) -> Point:
     robot.home()
     tp = robot.config.tip_probe
     if tip_length is None:
-        tip_length = robot.config.tip_length[instrument.name]
+        tip_length = robot.config.tip_length[instrument.model]
     instrument._add_tip(tip_length)
 
     # probe_center is the point at the center of the switch pcb
@@ -107,7 +107,7 @@ def update_instrument_config(
     instrument_offset[instrument.mount][instrument.type] = \
         (old_x - dx, old_y - dy, 0.0)
     tip_length = deepcopy(config.tip_length)
-    tip_length[instrument.name] = tip_length[instrument.name] + dz
+    tip_length[instrument.model] = tip_length[instrument.model] + dz
 
     config = config \
         ._replace(instrument_offset=instrument_offset) \

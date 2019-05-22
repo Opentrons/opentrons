@@ -1,6 +1,5 @@
 {
   "otId": "mock-id",
-  "deprecated": false,
   "metadata": {
     "displayName": "fake labware 2",
     "displayCategory": "wellPlate",
@@ -15,6 +14,9 @@
     "loadName": "generic_6_wellplate_1_ml",
     "isMagneticModuleCompatible": false
   },
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "fixture",
   "cornerOffsetFromSlot": {
     "x": 77.76,
     "y": 35.48,

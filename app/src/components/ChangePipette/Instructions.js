@@ -33,7 +33,10 @@ export default function Instructions(props: ChangePipetteProps) {
       contentsClassName={styles.modal_contents}
     >
       {!actualPipette && !wantedPipette && (
-        <PipetteSelection onChange={props.onPipetteSelect} />
+        <PipetteSelection
+          onChange={props.onPipetteSelect}
+          __pipettePlusEnabled={props.__pipettePlusEnabled}
+        />
       )}
 
       {(actualPipette || wantedPipette) && (

@@ -15,28 +15,28 @@ import isEmpty from 'lodash/isEmpty'
 import FormButtonBar from './FormButtonBar'
 import ConfigFormGroup, { FormColumn } from './ConfigFormGroup'
 
+import type { Pipette } from '../../http-api-client'
 import type {
-  Pipette,
+  PipetteSettings,
   PipetteSettingsField,
-  PipetteConfigResponse,
-  PipetteConfigFields,
-  PipetteConfigRequest,
-} from '../../http-api-client'
-
+  PipetteSettingsFieldsMap,
+  PipetteSettingsUpdate,
+} from '../../robot-api'
 import type { FormValues } from './ConfigFormGroup'
 
-export type DisplayFieldProps = PipetteSettingsField & {
+export type DisplayFieldProps = {|
+  ...PipetteSettingsField,
   name: string,
   displayName: string,
-}
+|}
 
-type Props = {
+type Props = {|
   parentUrl: string,
   pipette: Pipette,
-  pipetteConfig: PipetteConfigResponse,
-  updateConfig: (id: string, PipetteConfigRequest) => mixed,
-  showHiddenFields: boolean,
-}
+  pipetteConfig: PipetteSettings,
+  updateConfig: (id: string, body: PipetteSettingsUpdate) => mixed,
+  __showHiddenFields: boolean,
+|}
 
 const PLUNGER_KEYS = ['top', 'bottom', 'blowout', 'dropTip']
 const POWER_KEYS = ['plungerCurrent', 'pickUpCurrent', 'dropTipCurrent']
@@ -45,7 +45,7 @@ const TIP_KEYS = ['dropTipSpeed', 'pickUpDistance']
 export default class ConfigForm extends React.Component<Props> {
   getFieldsByKey(
     keys: Array<string>,
-    fields: PipetteConfigFields
+    fields: PipetteSettingsFieldsMap
   ): Array<DisplayFieldProps> {
     return keys.map(k => {
       const field = fields[k]
@@ -59,8 +59,8 @@ export default class ConfigForm extends React.Component<Props> {
     })
   }
 
-  getVisibleFields = (): PipetteConfigFields => {
-    if (this.props.showHiddenFields) return this.props.pipetteConfig.fields
+  getVisibleFields = (): PipetteSettingsFieldsMap => {
+    if (this.props.__showHiddenFields) return this.props.pipetteConfig.fields
 
     return pick(this.props.pipetteConfig.fields, [
       ...PLUNGER_KEYS,
@@ -174,7 +174,7 @@ export default class ConfigForm extends React.Component<Props> {
                   groupLabel="Tip Pickup / Drop"
                   formFields={tipFields}
                 />
-                {this.props.showHiddenFields && (
+                {this.props.__showHiddenFields && (
                   <ConfigFormGroup
                     groupLabel="For Dev Use Only"
                     formFields={devFields}

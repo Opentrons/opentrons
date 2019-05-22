@@ -401,8 +401,13 @@ async def test_forcing_new_session(
         '/calibration/deck/start', json={'force': 'true'})
     text2 = await resp2.json()
     assert resp2.status == 201
-    expected2 = {'token': dummy_token,
-                 'pipette': {'mount': 'right', 'model': test_model}}
+    expected2 = {
+        'token': dummy_token,
+        'pipette': {
+            'mount': 'right',
+            'model': test_model
+        }
+    }
     assert text2 == expected2
 
 

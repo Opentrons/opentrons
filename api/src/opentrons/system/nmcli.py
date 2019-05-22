@@ -597,7 +597,7 @@ async def _call(cmd: List[str], suppress_err: bool = False) -> Tuple[str, str]:
     sanitized = sanitize_args(to_exec)
     log.debug('{}: stdout={}'.format(' '.join(sanitized), out_str))
     if err_str and not suppress_err:
-        log.info('{}: stderr={}'.format(' '.join(sanitized), err_str))
+        log.warning('{}: stderr={}'.format(' '.join(sanitized), err_str))
     return out_str, err_str
 
 

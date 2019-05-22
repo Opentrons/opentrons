@@ -21,7 +21,7 @@ export default function NavMenu(props: Props) {
             <ul>
               {links.map((link, index) => (
                 <li key={index}>
-                  <NavLink url={link.url} name={link.name} />
+                  <NavLink {...link} />
                 </li>
               ))}
             </ul>

@@ -10,7 +10,9 @@
     ["A8", "B8", "C8", "D8", "E8", "F8"]
   ],
   "otId": "3d53c440-f50d-11e8-bb2a-e7b1dd90654d",
-  "deprecated": false,
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "opentrons",
   "metadata": {
     "displayName": "Corning 48 Well Plate",
     "displayVolumeUnits": "mL",

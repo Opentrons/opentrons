@@ -13,10 +13,12 @@ module.exports = {
     'prettier/standard',
   ],
 
-  plugins: ['flowtype', 'react', 'json', 'prettier'],
+  plugins: ['flowtype', 'react', 'react-hooks', 'json', 'prettier'],
 
   rules: {
     camelcase: 'off',
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
   },
 
   globals: {},

@@ -451,7 +451,7 @@
   }
 }
 
-@media (--desktop) {
+@media (--large) {
   .menu_button,
   .mobile_nav {
     display: none;

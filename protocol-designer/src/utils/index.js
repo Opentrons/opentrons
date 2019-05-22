@@ -1,7 +1,7 @@
 // @flow
 import uuidv1 from 'uuid/v1'
+import type { WellGroup } from '@opentrons/components'
 import type { BoundingRect, GenericRect } from '../collision-types'
-import type { Wells } from '../labware-ingred/types'
 
 export const registerSelectors =
   process.env.NODE_ENV === 'development'
@@ -30,9 +30,8 @@ export function clientRectToBoundingRect(rect: ClientRect): BoundingRect {
 export const getCollidingWells = (
   rectPositions: GenericRect,
   selectableClassname: string
-): Wells => {
-  // Returns obj of selected wells under a collision rect
-  // Result: {'0,1': [0, 1], '0,2': [0, 2]}] where numbers are well positions: (column, row).
+): WellGroup => {
+  // Returns set of selected wells under a collision rect
   const { x0, y0, x1, y1 } = rectPositions
   const selectionBoundingRect = {
     x: Math.min(x0, x1),
@@ -42,7 +41,7 @@ export const getCollidingWells = (
   }
 
   // NOTE: querySelectorAll returns a NodeList, so you need to unpack it as an Array to do .filter
-  const selectableElems = [
+  const selectableElems: Array<HTMLElement> = [
     ...document.querySelectorAll('.' + selectableClassname),
   ]
 
@@ -53,13 +52,21 @@ export const getCollidingWells = (
     )
   )
 
-  const collidedWellData = collidedElems.reduce((acc: Wells, elem) => {
-    if ('wellname' in elem.dataset) {
-      const wellName = elem.dataset['wellname']
-      return { ...acc, [wellName]: wellName }
-    }
-    return acc
-  }, {})
+  const collidedWellData = collidedElems.reduce(
+    (acc: WellGroup, elem): WellGroup => {
+      // TODO IMMEDIATELY no magic string 'wellname'
+      if ('wellname' in elem.dataset) {
+        const wellName = elem.dataset['wellname']
+        return { ...acc, [wellName]: null }
+      }
+      return acc
+    },
+    {}
+  )
 
   return collidedWellData
 }
+
+// TODO IMMEDIATELY use where appropriate
+export const arrayToWellGroup = (w: Array<string>): WellGroup =>
+  w.reduce((acc, wellName) => ({ ...acc, [wellName]: null }), {})

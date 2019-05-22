@@ -11,22 +11,13 @@ export const CATEGORY_LABELS_BY_CATEGORY = {
   other: 'Other',
 }
 
-export const NUM_WELLS_LONG_BY_CATEGORY = {
-  tubeRack: 'number of tubes',
-  tipRack: 'number of tips',
-  wellPlate: 'number of wells',
-  trough: 'number of wells',
-  trash: 'number of wells',
-  other: 'number of wells',
-}
-
-export const NUM_WELLS_SHORT_BY_CATEGORY = {
-  tubeRack: 'no. of tubes',
-  tipRack: 'no. of tips',
-  wellPlate: 'no. of wells',
-  trough: 'no. of wells',
-  trash: 'no. of wells',
-  other: 'no. of wells',
+export const NUM_WELLS_BY_CATEGORY = {
+  tubeRack: 'tube count',
+  tipRack: 'tip count',
+  wellPlate: 'well count',
+  trough: 'well count',
+  trash: 'well count',
+  other: 'well count',
 }
 
 export const WELL_TYPE_BY_CATEGORY = {
