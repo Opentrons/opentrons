@@ -1,0 +1,130 @@
+{
+  "wells": {
+    "A1": {
+      "totalLiquidVolume": 15000,
+      "diameter": 14.5,
+      "shape": "circular",
+      "depth": 117.98,
+      "x": 18.64,
+      "y": 57.45,
+      "z": 5.78
+    },
+    "B1": {
+      "totalLiquidVolume": 15000,
+      "diameter": 14.5,
+      "shape": "circular",
+      "depth": 117.98,
+      "x": 18.64,
+      "y": 34.45,
+      "z": 5.78
+    },
+    "C1": {
+      "totalLiquidVolume": 15000,
+      "diameter": 14.5,
+      "shape": "circular",
+      "depth": 117.98,
+      "x": 18.64,
+      "y": 11.45,
+      "z": 5.78
+    },
+    "A2": {
+      "totalLiquidVolume": 15000,
+      "diameter": 14.5,
+      "shape": "circular",
+      "depth": 117.98,
+      "x": 50.14,
+      "y": 57.45,
+      "z": 5.78
+    },
+    "B2": {
+      "totalLiquidVolume": 15000,
+      "diameter": 14.5,
+      "shape": "circular",
+      "depth": 117.98,
+      "x": 50.14,
+      "y": 34.45,
+      "z": 5.78
+    },
+    "C2": {
+      "totalLiquidVolume": 15000,
+      "diameter": 14.5,
+      "shape": "circular",
+      "depth": 117.98,
+      "x": 50.14,
+      "y": 11.45,
+      "z": 5.78
+    },
+    "A3": {
+      "totalLiquidVolume": 50000,
+      "diameter": 26.45,
+      "shape": "circular",
+      "depth": 113.85,
+      "x": 70.22,
+      "y": 59.18,
+      "z": 5.95
+    },
+    "B3": {
+      "totalLiquidVolume": 50000,
+      "diameter": 26.45,
+      "shape": "circular",
+      "depth": 113.85,
+      "x": 70.22,
+      "y": 23.34,
+      "z": 5.95
+    },
+    "A4": {
+      "totalLiquidVolume": 50000,
+      "diameter": 26.45,
+      "shape": "circular",
+      "depth": 113.85,
+      "x": 115.45,
+      "y": 59.18,
+      "z": 5.95
+    },
+    "B4": {
+      "totalLiquidVolume": 50000,
+      "diameter": 26.45,
+      "shape": "circular",
+      "depth": 113.85,
+      "x": 115.45,
+      "y": 23.34,
+      "z": 5.95
+    }
+  },
+  "brand": {
+    "brand": "generic",
+    "brandId": ["352096", "352070"]
+  },
+  "metadata": {
+    "displayName": "Acrylic 6x15mL 4x50mL Tube Rack",
+    "displayCategory": "tubeRack",
+    "displayVolumeUnits": "mL",
+    "tags": ["tuberack", "15", "mL", "50", "mL"]
+  },
+  "dimensions": {
+    "xDimension": 127.75,
+    "yDimension": 85.5,
+    "zDimension": 123.76
+  },
+  "otId": "25bf03a0-7c1a-11e9-90bf-55e3fefb5079",
+  "cornerOffsetFromSlot": {
+    "x": 0.01,
+    "y": -0.02,
+    "z": 0
+  },
+  "parameters": {
+    "format": "irregular",
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "generic_6x15_ml_4x50_ml_tuberack"
+  },
+  "ordering": [
+    ["A1", "B1", "C1"],
+    ["A2", "B2", "C2"],
+    ["A3", "B3"],
+    ["A4", "B4"]
+  ],
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2
+}
