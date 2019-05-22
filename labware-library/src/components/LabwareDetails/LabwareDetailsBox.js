@@ -67,13 +67,13 @@ export default function LabwareDetailsBox(props: LabwareDetailsBoxProps) {
               )}
               {!hasInserts && (
                 <WellDimensions
-                  title={`${MEASUREMENTS} - Group ${i}`}
+                  title={`${MEASUREMENTS}${irregular ? ` - Group ${i}` : ''}`}
                   wellProperties={wellProps}
                   className={styles.details_table}
                 />
               )}
               <WellSpacing
-                title={`${SPACING} - Group ${i}`}
+                title={`${SPACING}${irregular ? ` - Group ${i}` : ''}`}
                 wellProperties={wellProps}
                 className={styles.details_table}
               />
