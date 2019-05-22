@@ -461,7 +461,7 @@ class Labware:
         :type num_tips: int
         :return: the :py:class:`.Well` meeting the target criteria, or None
         """
-        assert num_tips > 0
+        assert num_tips > 0, 'Bad call to next_tip: num_tips <= 0'
 
         columns: List[List[Well]] = self.columns()
         drop_leading_empties = [
@@ -501,7 +501,7 @@ class Labware:
         :param num_channels: The number of channels for the current pipette
         :type num_channels: int
         """
-        assert num_channels > 0, 'Bad call to use_tips: num_channels==0'
+        assert num_channels > 0, 'Bad call to use_tips: num_channels<=0'
         # Select the column of the labware that contains the target well
         target_column: List[Well] = [
             col for col in self.columns() if start_well in col][0]
@@ -523,6 +523,68 @@ class Labware:
 
     def __repr__(self):
         return self._display_name
+
+    def previous_tip(self, num_tips: int = 1) -> Optional[Well]:
+        """
+        Find the best well to drop a tip in.
+
+        This is the well from which the last tip was picked up, if there's
+        room. It can be used to return tips to the tip tracker.
+
+        :param num_tips: target number of tips to return, sequential in a
+                         column
+        :type num_tips: int
+        :return: The :py:class:`.Well` meeting the target criteria, or ``None``
+        """
+        # This logic is the inverse of :py:meth:`next_tip`
+        assert num_tips > 0, 'Bad call to previous_tip: num_tips <= 0'
+
+        columns = self.columns()
+        drop_leading_filled = [
+            list(dropwhile(lambda x: x.has_tip, column))
+            for column in columns]
+        drop_at_first_gap = [
+            list(takewhile(lambda x: not x.has_tip, column))
+            for column in drop_leading_filled]
+        long_enough = [
+            column for column in drop_at_first_gap if len(column) >= num_tips]
+        try:
+            return long_enough[0][0]
+        except IndexError:
+            return None
+
+    def return_tips(self, start_well: Well, num_channels: int = 1):
+        """
+        Re-adds tips to the tip tracker
+
+        This method should be called when a tip is dropped in a tiprack. It
+        should be called with `num_channels=1` or `num_channels=8` for single-
+        and multi-channel respectively. If returning more than one channel,
+        this method will automatically determine which tips are returned based
+        on the start well, the number of channels, and the tiprack geometry.
+
+        Note that unlike :py:meth:`use_tips`, calling this method in a way
+        that would drop tips into wells with tips in them will raise an
+        exception; this should only be called on a valid return of
+        :py:meth:`previous_tip`.
+
+        :param start_well: The :py:class:`.Well` into which to return a tip.
+        :type start_well: :py:class:`.Well`
+        :param num_channels: The number of channels for the current pipette
+        :type num_channels: int
+        """
+        # This logic is the inverse of :py:meth:`use_tips`
+        assert num_channels > 0, 'Bad call to return_tips: num_channels <= 0'
+        # Select the column that contains the target_well
+        target_column = [col for col in self.columns() if start_well in col][0]
+        well_idx = target_column.index(start_well)
+        end_idx = min(well_idx + num_channels, len(target_column))
+        drop_targets = target_column[well_idx:end_idx]
+        for well in drop_targets:
+            if well.has_tip:
+                raise AssertionError(f'Well {repr(well)} has a tip')
+        for well in drop_targets:
+            well.has_tip = True
 
 
 class ModuleGeometry:
