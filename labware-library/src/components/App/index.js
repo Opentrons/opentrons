@@ -25,18 +25,18 @@ export class App extends React.Component<DefinitionRouteRenderProps> {
   render() {
     const { definition, location } = this.props
     const filters = getFilters(location, definition)
-    const breadcrumbsVisibile = Boolean(definition)
+    const detailPage = Boolean(definition)
 
     return (
       <div
         className={cx(styles.app, {
-          [styles.breadcrumbs_visible]: breadcrumbsVisibile,
+          [styles.is_detail_page]: detailPage,
         })}
       >
         <Nav />
-        {breadcrumbsVisibile && <Breadcrumbs definition={definition} />}
+        {detailPage && <Breadcrumbs definition={definition} />}
         <Page
-          sidebarLargeOnly={breadcrumbsVisibile}
+          detailPage={detailPage}
           sidebar={<Sidebar filters={filters} />}
           content={
             definition ? (

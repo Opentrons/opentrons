@@ -2,7 +2,7 @@
 
 exports[`App component renders with definition 1`] = `
 <div
-  className="app breadcrumbs_visible"
+  className="app is_detail_page"
 >
   <Nav />
   <Breadcrumbs
@@ -32,6 +32,7 @@ exports[`App component renders with definition 1`] = `
         }
       />
     }
+    detailPage={true}
     sidebar={
       <Sidebar
         filters={
@@ -42,7 +43,6 @@ exports[`App component renders with definition 1`] = `
         }
       />
     }
-    sidebarLargeOnly={true}
   />
 </div>
 `;
@@ -63,6 +63,7 @@ exports[`App component renders without definition 1`] = `
         }
       />
     }
+    detailPage={false}
     sidebar={
       <Sidebar
         filters={
@@ -73,7 +74,6 @@ exports[`App component renders without definition 1`] = `
         }
       />
     }
-    sidebarLargeOnly={false}
   />
 </div>
 `;

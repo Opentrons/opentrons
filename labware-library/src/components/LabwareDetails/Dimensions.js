@@ -3,9 +3,7 @@
 import * as React from 'react'
 import round from 'lodash/round'
 
-import { LABWARE, MM, X_DIM, Y_DIM, Z_DIM } from '../../localization'
-import styles from './styles.css'
-
+import { FOOTPRINT, MM, X_DIM, Y_DIM, Z_DIM } from '../../localization'
 import { LabeledValueTable, LowercaseText } from '../ui'
 
 import type { LabwareDefinition } from '../../types'
@@ -13,12 +11,13 @@ import type { LabwareDefinition } from '../../types'
 // safe toFixed
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 
-export type DimensionsProps = {
+export type DimensionsProps = {|
   definition: LabwareDefinition,
-}
+  className?: string,
+|}
 
 export default function Dimensions(props: DimensionsProps) {
-  const { definition } = props
+  const { definition, className } = props
   const { xDimension, yDimension, zDimension } = definition.dimensions
   const dimensions = [
     { label: X_DIM, value: toFixed(xDimension) },
@@ -28,10 +27,10 @@ export default function Dimensions(props: DimensionsProps) {
 
   return (
     <LabeledValueTable
-      className={styles.dimensions}
+      className={className}
       label={
         <>
-          {LABWARE} <LowercaseText>({MM})</LowercaseText>
+          {FOOTPRINT} <LowercaseText>({MM})</LowercaseText>
         </>
       }
       values={dimensions}

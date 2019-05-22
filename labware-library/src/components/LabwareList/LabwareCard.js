@@ -5,46 +5,46 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 
-import { getDisplayVolume } from '@opentrons/shared-data'
 import { getPublicPath } from '../../public-path'
-import { getUniqueWellProperties } from '../../definitions'
 import { Icon } from '@opentrons/components'
-import Gallery from './LabwareGallery'
-import LoadName from './LoadName'
-import Tags from './Tags'
-import styles from './styles.css'
-
-import { LabelText, Value, LABEL_TOP, LABEL_LEFT } from '../ui'
-
 import {
-  CATEGORY_LABELS_BY_CATEGORY,
-  NUM_WELLS_BY_CATEGORY,
-  MAX_VOLUME,
-} from '../../localization'
+  Gallery,
+  LoadName,
+  Tags,
+  WellCount,
+  AllWellProperties,
+} from '../labware-ui'
+
+import { CATEGORY_LABELS_BY_CATEGORY } from '../../localization'
+import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
 
-export type LabwareCardProps = { definition: LabwareDefinition }
+export type LabwareCardProps = {| definition: LabwareDefinition |}
 
 export default function LabwareCard(props: LabwareCardProps) {
   const { definition } = props
+  const { displayCategory } = definition.metadata
 
   return (
     <li className={styles.card}>
       <TopBar {...props} />
       <Title {...props} />
       <div className={styles.card_contents}>
-        <div className={styles.gallery_container}>
-          <Gallery {...props} />
-        </div>
+        <Gallery definition={definition} className={styles.gallery_container} />
         <div className={styles.stats}>
-          <WellCount {...props} />
-          <WellProperties {...props} />
+          <WellCount
+            count={Object.keys(definition.wells).length}
+            displayCategory={displayCategory}
+            className={styles.well_count}
+          />
+          <AllWellProperties
+            definition={definition}
+            className={styles.well_properties}
+          />
         </div>
       </div>
-      <div className={styles.tags_container}>
-        <Tags {...props} />
-      </div>
+      <Tags definition={definition} />
       <LoadName loadName={definition.parameters.loadName} />
     </li>
   )
@@ -73,42 +73,5 @@ function Title(props: LabwareCardProps) {
         <Icon className={styles.title_icon} name="chevron-right" />
       </h2>
     </Link>
-  )
-}
-
-function WellCount(props: LabwareCardProps) {
-  const { wells, metadata } = props.definition
-  const { displayCategory } = metadata
-  const numWellsLabel =
-    NUM_WELLS_BY_CATEGORY[displayCategory] || NUM_WELLS_BY_CATEGORY.other
-
-  return (
-    <div className={styles.well_count}>
-      <LabelText position={LABEL_LEFT}>{numWellsLabel}</LabelText>
-      <Value>{Object.keys(wells).length}</Value>
-    </div>
-  )
-}
-
-function WellProperties(props: LabwareCardProps) {
-  const { definition } = props
-  const { displayVolumeUnits } = definition.metadata
-  const wellProps = getUniqueWellProperties(definition)
-
-  return (
-    <div className={styles.well_properties}>
-      {wellProps.map((w, i) => {
-        const vol = getDisplayVolume(w.totalLiquidVolume, displayVolumeUnits, 2)
-
-        return (
-          <div key={i} className={styles.well_group_properties}>
-            <LabelText position={LABEL_TOP}>{MAX_VOLUME}</LabelText>
-            <Value>
-              {vol} {displayVolumeUnits}
-            </Value>
-          </div>
-        )
-      })}
-    </div>
   )
 }

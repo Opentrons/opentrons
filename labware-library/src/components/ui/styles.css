@@ -1,5 +1,41 @@
 @import '@opentrons/components';
+@import '../../styles/breakpoints.css';
 @import '../../styles/spacing.css';
+
+.clickable_icon {
+  cursor: pointer;
+
+  &:active,
+  &:focus {
+    outline: none;
+  }
+}
+
+.info_button {
+  width: 1.25rem;
+  color: var(--c-med-gray);
+}
+
+.table_title {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: var(--spacing-1);
+  border-bottom: var(--bd-light);
+}
+
+.details_box {
+  border: var(--bd-light);
+  margin-bottom: var(--spacing-5);
+}
+
+.details_box_contents {
+  padding: var(--spacing-5);
+}
+
+.details_box_aside {
+  padding: var(--spacing-5);
+  background-color: var(--c-light-gray);
+}
 
 .label_text {
   flex: none;
@@ -25,6 +61,7 @@
 .value {
   @apply --font-body-2-dark;
 
+  font-weight: var(--fw-semibold);
   line-height: var(--lh-title);
 }
 
@@ -33,13 +70,12 @@
   justify-content: space-between;
   align-items: baseline;
   padding: var(--spacing-2) 0;
+  padding-left: var(--spacing-5);
   width: 100%;
 }
 
 .table {
   width: 100%;
-  padding: 0 var(--spacing-2);
-  background-color: var(--c-lightest-gray);
 
   &.row {
     display: flex;
@@ -50,5 +86,28 @@
     & > .table_entry {
       width: auto;
     }
+  }
+}
+
+@media (--medium) {
+  .details_box {
+    display: flex;
+    margin-bottom: var(--spacing-7);
+  }
+
+  .details_box_contents {
+    width: var(--size-two-thirds);
+  }
+
+  .details_box_aside {
+    width: var(--size-third);
+    align-self: stretch;
+  }
+}
+
+@media (--large) {
+  .details_box_contents,
+  .details_box_aside {
+    padding: var(--spacing-5) var(--spacing-7);
   }
 }

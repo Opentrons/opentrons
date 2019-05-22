@@ -2,37 +2,36 @@
 // full-width labware details
 import * as React from 'react'
 
-import { LabwareGallery, Tags, LoadName } from '../LabwareList'
-import Stats from './Stats'
-import Dimensions from './Dimensions'
-import WellDimensions from './WellDimensions'
+import { Gallery, Tags, LoadName } from '../labware-ui'
+import LabwareTitle from './LabwareTitle'
+import LabwareDetailsBox from './LabwareDetailsBox'
 import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
 
-export type LabwareDetailsProps = {
+export type LabwareDetailsProps = {|
   definition: LabwareDefinition,
-}
+|}
 
 export default function LabwareDetails(props: LabwareDetailsProps) {
   const { definition } = props
-  const { parameters, metadata } = definition
+  const { loadName } = definition.parameters
 
   return (
     <>
+      <LabwareTitle
+        definition={definition}
+        className={styles.title_container}
+      />
       <div className={styles.gallery_container}>
-        <LabwareGallery definition={definition} />
-        <div className={styles.tags_container}>
-          <Tags definition={definition} />
-        </div>
-        <LoadName loadName={parameters.loadName} />
+        <Gallery definition={definition} />
+        <Tags definition={definition} className={styles.tags_container} />
+        <LoadName loadName={loadName} />
       </div>
-      <div className={styles.details_container}>
-        <h2 className={styles.title}>{metadata.displayName}</h2>
-        <Stats definition={definition} />
-        <Dimensions definition={definition} />
-        <WellDimensions definition={definition} />
-      </div>
+      <LabwareDetailsBox
+        definition={definition}
+        className={styles.details_box_container}
+      />
     </>
   )
 }

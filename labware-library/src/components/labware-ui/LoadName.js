@@ -4,25 +4,22 @@ import * as React from 'react'
 
 import { IconButton, Tooltip } from '@opentrons/components'
 import { LabelText, LABEL_TOP } from '../ui'
-import styles from './styles.css'
 
-// TODO(mc, 2019-03-29): i18n
-const EN_API_NAME = 'api name'
-const EN_COPY_SUCCESS_MESSAGE = 'Copied to clipboard!'
+import { API_NAME, COPIED_TO_CLIPBOARD } from '../../localization'
+import styles from './styles.css'
 
 const COPY_ICON = 'ot-copy-text'
 const SUCCESS_TIMEOUT_MS = 1500
 
-export type LoadNameProps = {
+export type LoadNameProps = {|
   loadName: string,
-}
+|}
 
-export default function LoadName(props: LoadNameProps) {
+export function LoadName(props: LoadNameProps) {
   const { loadName } = props
   const [success, setSuccess] = React.useState(false)
   const inputRef = React.useRef<HTMLInputElement | null>(null)
   const successTimeout = React.useRef<TimeoutID | null>(null)
-
   const cleanupSuccessTimeout = () => {
     if (successTimeout.current) clearTimeout(successTimeout.current)
   }
@@ -51,7 +48,7 @@ export default function LoadName(props: LoadNameProps) {
   return (
     <div className={styles.load_name}>
       <label className={styles.load_name_label} onCopy={handleCopy}>
-        <LabelText position={LABEL_TOP}>{EN_API_NAME}</LabelText>
+        <LabelText position={LABEL_TOP}>{API_NAME}</LabelText>
         <input
           ref={inputRef}
           className={styles.load_name_input}
@@ -61,7 +58,7 @@ export default function LoadName(props: LoadNameProps) {
           readOnly
         />
       </label>
-      <Tooltip open={success} tooltipComponent={EN_COPY_SUCCESS_MESSAGE}>
+      <Tooltip open={success} tooltipComponent={COPIED_TO_CLIPBOARD}>
         {tooltipProps => (
           <IconButton
             onClick={handleCopyButtonClick}

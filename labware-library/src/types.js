@@ -11,14 +11,20 @@ export type {
   LabwareWell,
   LabwareWellProperties,
   LabwareWellMap,
+  LabwareVolumeUnits,
+  LabwareDisplayCategory,
+  LabwareBrand,
 } from '@opentrons/shared-data'
 
 export type LabwareWellGroupProperties = {|
   ...LabwareWellProperties,
-  xOffset: number,
-  yOffset: number,
+  xStart: number,
+  yStart: number,
+  xOffsetFromLeft: number,
+  yOffsetFromTop: number,
   xSpacing: number,
   ySpacing: number,
+  wellCount: number,
 |}
 
 export type LabwareList = Array<LabwareDefinition>

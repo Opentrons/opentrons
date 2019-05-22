@@ -2,7 +2,6 @@
 // filter labware by manufacturer
 import * as React from 'react'
 import { withRouter } from 'react-router-dom'
-
 import { SelectField } from '@opentrons/components'
 import { getAllManufacturers, buildFiltersUrl } from '../../filters'
 import styles from './styles.css'
@@ -15,10 +14,10 @@ import {
 import type { ContextRouter } from 'react-router-dom'
 import type { FilterParams } from '../../types'
 
-export type FilterManufacturerProps = {
+export type FilterManufacturerProps = {|
   ...ContextRouter,
   filters: FilterParams,
-}
+|}
 
 export function FilterManufacturer(props: FilterManufacturerProps) {
   const { history, filters } = props

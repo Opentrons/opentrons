@@ -4,14 +4,14 @@ import cx from 'classnames'
 
 import styles from './styles.css'
 
-export type PageProps = {
-  sidebarLargeOnly: boolean,
+export type PageProps = {|
+  detailPage: boolean,
   sidebar: React.Node,
   content: React.Node,
-}
+|}
 
 export default function Page(props: PageProps) {
-  const { sidebarLargeOnly, sidebar, content } = props
+  const { detailPage, sidebar, content } = props
 
   return (
     <div className={styles.page}>
@@ -19,14 +19,14 @@ export default function Page(props: PageProps) {
         <div className={styles.content_width_limiter}>
           <div
             className={cx(styles.sidebar_container, {
-              [styles.sidebar_large_only]: sidebarLargeOnly,
+              [styles.is_detail_page]: detailPage,
             })}
           >
             {sidebar}
           </div>
           <section
             className={cx(styles.content_container, {
-              [styles.sidebar_large_only]: sidebarLargeOnly,
+              [styles.is_detail_page]: detailPage,
             })}
           >
             {content}

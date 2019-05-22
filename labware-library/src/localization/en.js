@@ -21,12 +21,12 @@ export const NUM_WELLS_BY_CATEGORY = {
 }
 
 export const WELL_TYPE_BY_CATEGORY = {
-  tubeRack: 'tubes',
-  tipRack: 'tips',
-  wellPlate: 'wells',
-  trough: 'wells',
-  trash: 'wells',
-  other: 'wells',
+  tubeRack: 'tube',
+  tipRack: 'tip',
+  wellPlate: 'well',
+  trough: 'well',
+  trash: 'well',
+  other: 'well',
 }
 
 export const LABWARE_DIMS_BY_CATEGORY = {
@@ -54,7 +54,8 @@ export const MANUFACTURER_LABELS_BY_MANUFACTURER = {
 
 export const MANUFACTURER = 'manufacturer'
 export const CATEGORY = 'category'
-export const LABWARE = 'labware'
+export const FOOTPRINT = 'footprint'
+export const MEASUREMENTS = 'measurements'
 export const SPACING = 'spacing'
 export const MM = 'mm'
 export const SHORT_X_DIM = 'l'
@@ -71,3 +72,7 @@ export const DIAMETER = 'diameter'
 export const DEPTH = 'depth'
 export const MAX_VOLUME = 'max volume'
 export const SHAPE = 'shape'
+export const BACK_TO_LABWARE_LIBRARY = 'Back to Labware Library'
+export const TAGS = 'tags'
+export const API_NAME = 'api name'
+export const COPIED_TO_CLIPBOARD = 'Copied to clipboard!'
