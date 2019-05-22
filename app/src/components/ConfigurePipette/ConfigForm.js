@@ -13,7 +13,10 @@ import set from 'lodash/set'
 import isEmpty from 'lodash/isEmpty'
 
 import FormButtonBar from './FormButtonBar'
-import ConfigFormGroup, { FormColumn } from './ConfigFormGroup'
+import ConfigFormGroup, {
+  FormColumn,
+  ConfigQuirkGroup,
+} from './ConfigFormGroup'
 
 import type { Pipette } from '../../http-api-client'
 import type {
@@ -26,6 +29,12 @@ import type { FormValues } from './ConfigFormGroup'
 
 export type DisplayFieldProps = {|
   ...PipetteSettingsField,
+  name: string,
+  displayName: string,
+|}
+
+export type DisplayQuirkFieldProps = {|
+  [quirkId: string]: boolean,
   name: string,
   displayName: string,
 |}
@@ -53,6 +62,22 @@ export default class ConfigForm extends React.Component<Props> {
       const name = k
       return {
         ...field,
+        name,
+        displayName,
+      }
+    })
+  }
+
+  getKnownQuirks = (): Array<DisplayQuirkFieldProps> => {
+    const quirks = this.props.pipetteConfig.fields.quirks
+    if (!quirks) return []
+    const quirkKeys = Object.keys(quirks)
+    return quirkKeys.map(key => {
+      const value = quirks[key]
+      const name = key
+      const displayName = startCase(key)
+      return {
+        [key]: value,
         name,
         displayName,
       }
@@ -143,6 +168,8 @@ export default class ConfigForm extends React.Component<Props> {
     const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
     const powerFields = this.getFieldsByKey(POWER_KEYS, fields)
     const tipFields = this.getFieldsByKey(TIP_KEYS, fields)
+    const quirkFields = this.getKnownQuirks()
+    const quirksPresent = !!quirkFields[0]
     const devFields = this.getFieldsByKey(UNKNOWN_KEYS, fields)
 
     return (
@@ -174,6 +201,12 @@ export default class ConfigForm extends React.Component<Props> {
                   groupLabel="Tip Pickup / Drop"
                   formFields={tipFields}
                 />
+                {quirksPresent && (
+                  <ConfigQuirkGroup
+                    groupLabel="Pipette Quirks"
+                    quirks={quirkFields}
+                  />
+                )}
                 {this.props.__showHiddenFields && (
                   <ConfigFormGroup
                     groupLabel="For Dev Use Only"
