@@ -1165,11 +1165,10 @@ class InstrumentContext(CommandPublisher):
                 - 'once': (default) a single tip will be used for all commands.
                 - 'always': use a new tip for each transfer.
 
-            * *trash* (``boolean``) --
+            * *return_tip* (``boolean``) --
               If `False` (default behavior), tips will be
-              returned to their tip rack. If `True` and a trash
-              container has been attached to this `Pipette`,
-              then the tip will be sent to the trash container.
+              returned to the trash container attached this `Pipette`.
+              If `True` tips will be returned to tiprack.
 
             * *touch_tip* (``boolean``) --
               If `True`, a :py:meth:`touch_tip` will occur following each
@@ -1240,10 +1239,10 @@ class InstrumentContext(CommandPublisher):
         else:
             mix_strategy = transfers.MixStrategy.NEVER
 
-        if kwargs.get('trash'):
-            drop_tip = transfers.DropTipStrategy.TRASH
-        else:
+        if kwargs.get('return_tip'):
             drop_tip = transfers.DropTipStrategy.RETURN
+        else:
+            drop_tip = transfers.DropTipStrategy.TRASH
 
         new_tip = kwargs.get('new_tip')
         if isinstance(new_tip, str):

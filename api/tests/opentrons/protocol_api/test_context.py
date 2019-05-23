@@ -469,7 +469,7 @@ def test_transfer_options(loop, monkeypatch):
             gradient_function=None,
             disposal_volume=0,
             mix_strategy=tf.MixStrategy.BEFORE,
-            drop_tip_strategy=tf.DropTipStrategy.RETURN,
+            drop_tip_strategy=tf.DropTipStrategy.TRASH,
             blow_out_strategy=tf.BlowOutStrategy.TRASH,
             touch_tip_strategy=tf.TouchTipStrategy.NEVER
         ),
@@ -489,7 +489,7 @@ def test_transfer_options(loop, monkeypatch):
 
     instr.pick_up_tip()
     instr.distribute(50, lw1.rows()[0][0], lw2.columns()[0],
-                     new_tip='never', touch_tip=True, trash=True,
+                     new_tip='never', touch_tip=True, return_tip=True,
                      disposal_vol=10, mix_after=(3, 20))
     instr.drop_tip()
     expected_xfer_options2 = tf.TransferOptions(
@@ -500,7 +500,7 @@ def test_transfer_options(loop, monkeypatch):
             gradient_function=None,
             disposal_volume=10,
             mix_strategy=tf.MixStrategy.AFTER,
-            drop_tip_strategy=tf.DropTipStrategy.TRASH,
+            drop_tip_strategy=tf.DropTipStrategy.RETURN,
             blow_out_strategy=tf.BlowOutStrategy.NONE,
             touch_tip_strategy=tf.TouchTipStrategy.ALWAYS
         ),
