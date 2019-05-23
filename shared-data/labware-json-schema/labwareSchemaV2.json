@@ -34,6 +34,11 @@
     "displayCategory": {
       "type": "string",
       "enum": ["tipRack", "tubeRack", "trough", "trash", "wellPlate", "other"]
+    },
+    "safeString": {
+      "description": "a string safe to use for loadName / namespace",
+      "type": "string",
+      "pattern": "^[a-z0-9._]+$"
     }
   },
   "type": "object",
@@ -68,7 +73,7 @@
       "minimum": 1
     },
     "namespace": {
-      "description": "The namespace that the definition lives under. Note: 'opentrons' is a controlled namespace for official Opentrons definitions."
+      "$ref": "#/definitions/safeString"
     },
     "metadata": {
       "type": "object",
@@ -138,9 +143,8 @@
           "$ref": "#/definitions/positiveNumber"
         },
         "loadName": {
-          "description": "Generated unique name of container",
-          "type": "string",
-          "pattern": "^[a-z0-9._]+$"
+          "description": "Name used to reference a labware definition",
+          "$ref": "#/definitions/safeString"
         },
         "isMagneticModuleCompatible": {
           "description": "Flag marking whether a labware is compatible by default with the Magnetic Module",

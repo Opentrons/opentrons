@@ -16,9 +16,12 @@ from opentrons.types import Location
 from opentrons.types import Point
 from opentrons.config import CONFIG
 
-# TODO IMMEDIATELY where to store this constant?
+# TODO: Ian 2019-05-23 where to store these constants?
 OPENTRONS_NAMESPACE = 'opentrons'
 CUSTOM_NAMESPACE = 'custom_beta'
+STANDARD_DEFS_PATH = Path(os.path.join(
+    os.path.dirname(sys.modules['opentrons'].__file__),
+    'shared_data/labware/definitions/2'))
 
 
 class WellShape(Enum):
@@ -806,16 +809,10 @@ def _read_file(filepath: str) -> dict:
 def _get_path_to_labware(load_name: str, namespace: str, version: int) -> Path:
     if namespace == OPENTRONS_NAMESPACE:
         # all labware in OPENTRONS_NAMESPACE is bundled in wheel
-        rel_def_path = f'shared_data/labware/definitions/2/' + \
-            f'{load_name}/{version}/' + \
-            f'{namespace}__{load_name}__{version}.json'
+        return STANDARD_DEFS_PATH / Path(
+            f'{load_name}/{version}/' +
+            f'{namespace}__{load_name}__{version}.json')
 
-        return os.path.join(
-            os.path.dirname(sys.modules['opentrons'].__file__),
-            rel_def_path)
-
-    # TODO IMMEDIATELY: make sure Path() doesn't do weird stuff
-    #     if there is / or \ in loadName
     base_path = CONFIG['labware_user_definitions_dir_v4']
     def_path = base_path / Path(namespace) / Path(load_name) / \
         Path(str(version)) / Path(f'{namespace}__{load_name}__{version}.json')
@@ -824,17 +821,12 @@ def _get_path_to_labware(load_name: str, namespace: str, version: int) -> Path:
 
 def _get_latest_labware(load_name: str, namespace: str) -> dict:
     # Get highest-versioned labware within a given namespace
-    # TODO IMMEDIATELY - DRY
     if namespace == OPENTRONS_NAMESPACE:
-        base_path = Path(os.path.join(
-            os.path.dirname(sys.modules['opentrons'].__file__),
-            'shared_data/labware/definitions/2'))
-        print('bassss', base_path)
+        base_path = STANDARD_DEFS_PATH
     else:
         base_path = CONFIG['labware_user_definitions_dir_v4'] / Path(namespace)
 
     loadname_dir = base_path / Path(load_name)
-    print('xsdf', loadname_dir)
     if not os.path.isdir(loadname_dir):
         raise FileNotFoundError(f'no labware exist in namespace {namespace}')
 
@@ -843,7 +835,6 @@ def _get_latest_labware(load_name: str, namespace: str) -> dict:
         version_dir = os.path.join(loadname_dir, fileName)
         version_dir_files = [fpath for fpath in os.listdir(version_dir)
                              if fpath.endswith('.json')]
-        print(version_dir, version_dir_files)
         if len(version_dir_files) != 1:
             raise RuntimeError(
                 f'Found multiple JSON files in version space {version_dir}, ' +
