@@ -13,14 +13,15 @@
     ["A11"],
     ["A12"]
   ],
-  "otId": "fixture12Trough",
+  "otId": "a41d9ef0-f4b6-11e8-90c2-7106f0eae5a7",
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "fixture",
+  "namespace": "opentrons",
   "metadata": {
-    "displayName": "12 Channel Trough",
+    "displayName": "USA Scientific 12 Well Reservoir 22 mL",
     "displayVolumeUnits": "mL",
-    "displayCategory": "trough"
+    "displayCategory": "trough",
+    "tags": []
   },
   "cornerOffsetFromSlot": {
     "x": 0,
@@ -163,6 +164,9 @@
   },
   "brand": {
     "brand": "USA Scientific",
-    "brandId": ["1061-8150"]
+    "brandId": ["1061-8150"],
+    "links": [
+      "https://www.usascientific.com/12-channel-automation-reservoir.aspx"
+    ]
   }
 }

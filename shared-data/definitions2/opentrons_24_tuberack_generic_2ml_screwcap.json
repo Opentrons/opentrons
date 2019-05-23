@@ -7,15 +7,15 @@
     ["A5", "B5", "C5", "D5"],
     ["A6", "B6", "C6", "D6"]
   ],
-  "otId": "fixture24TubeRack",
+  "otId": "e8c55910-e8f1-11e8-b93b-5f6727dde048",
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "fixture",
+  "namespace": "opentrons",
   "metadata": {
     "displayVolumeUnits": "mL",
     "displayCategory": "tubeRack",
-    "displayName": "Opentrons screwcap 2mL tuberack",
-    "tags": ["2", "mL", "screwcap", "tuberack", "Opentrons", "E&K Scientific"]
+    "displayName": "Opentrons 24 Tube Rack with Generic 2 mL Screwcap",
+    "tags": []
   },
   "cornerOffsetFromSlot": {
     "x": 0.01,
@@ -253,6 +253,9 @@
   },
   "brand": {
     "brand": "Opentrons",
-    "brandId": ["649020"]
+    "brandId": [],
+    "links": [
+      "https://shop.opentrons.com/collections/opentrons-tips/products/tube-rack-set-1"
+    ]
   }
 }

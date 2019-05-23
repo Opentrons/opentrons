@@ -1,29 +1,29 @@
 {
   "ordering": [["A1"]],
-  "otId": "fixtureTrash",
-  "schemaVersion": 2,
-  "version": 1,
-  "namespace": "fixture",
+  "otId": "d8ad09a0-ecfd-11e8-b073-3da0bb8daec9",
   "metadata": {
     "displayCategory": "trash",
-    "displayVolumeUnits": "L",
-    "displayName": "Tall Fixed Trash",
-    "tags": ["trash", "opentrons", "tall"]
+    "displayVolumeUnits": "mL",
+    "displayName": "Opentrons Short Fixed Trash",
+    "tags": []
   },
   "cornerOffsetFromSlot": {
     "x": 0,
     "y": 0,
     "z": 0
   },
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "opentrons",
   "dimensions": {
     "xDimension": 172.86,
     "yDimension": 165.86,
-    "zDimension": 82
+    "zDimension": 58
   },
   "parameters": {
     "format": "trash",
     "isTiprack": false,
-    "loadName": "opentrons_1_trash_1100ml_fixed",
+    "loadName": "opentrons_1_trash_850ml_fixed",
     "isMagneticModuleCompatible": false,
     "quirks": ["fixedTrash", "centerMultichannelOnWells"]
   },
@@ -32,8 +32,8 @@
       "shape": "rectangular",
       "yDimension": 165.67,
       "xDimension": 107.11,
-      "totalLiquidVolume": 1100000,
-      "depth": 77,
+      "totalLiquidVolume": 850000,
+      "depth": 53,
       "x": 82.84,
       "y": 53.56,
       "z": 5

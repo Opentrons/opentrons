@@ -1,20 +1,20 @@
 {
   "ordering": [["A1"]],
-  "otId": "fixtureTrash",
-  "schemaVersion": 2,
-  "version": 1,
-  "namespace": "fixture",
+  "otId": "629d3b80-ecfe-11e8-b073-3da0bb8daec9",
   "metadata": {
     "displayCategory": "trash",
-    "displayVolumeUnits": "L",
-    "displayName": "Tall Fixed Trash",
-    "tags": ["trash", "opentrons", "tall"]
+    "displayVolumeUnits": "mL",
+    "displayName": "Opentrons Fixed Trash",
+    "tags": []
   },
   "cornerOffsetFromSlot": {
     "x": 0,
     "y": 0,
     "z": 0
   },
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "opentrons",
   "dimensions": {
     "xDimension": 172.86,
     "yDimension": 165.86,

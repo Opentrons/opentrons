@@ -13,15 +13,15 @@
     ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
     ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
   ],
-  "otId": "fixture96Plate",
+  "otId": "54d2f430-d602-11e8-80b1-6965467d172c",
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "fixture",
+  "namespace": "opentrons",
   "metadata": {
-    "displayName": "ANSI 96 Standard Microplate",
+    "displayName": "Generic 96 Well Plate 360 µL Flat",
     "displayCategory": "wellPlate",
     "displayVolumeUnits": "µL",
-    "tags": ["flat", "microplate", "SBS", "ANSI", "generic"]
+    "tags": []
   },
   "cornerOffsetFromSlot": {
     "x": 0,
@@ -906,6 +906,7 @@
     }
   },
   "brand": {
-    "brand": "generic"
+    "brand": "generic",
+    "links": ["https://www.slas.org/resources/information/industry-standards/"]
   }
 }

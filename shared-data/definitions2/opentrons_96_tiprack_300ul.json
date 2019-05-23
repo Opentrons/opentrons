@@ -13,15 +13,15 @@
     ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
     ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
   ],
-  "otId": "fixtureTipRack300Ul",
+  "otId": "3d278f00-ffe0-11e8-abfa-95044b186e81",
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "fixture",
+  "namespace": "opentrons",
   "metadata": {
-    "displayName": "Opentrons GEB 300uL Tiprack",
+    "displayName": "Opentrons 96 Tip Rack 300 µL",
     "displayVolumeUnits": "µL",
     "displayCategory": "tipRack",
-    "tags": ["GEB", "tiprack", "300uL", "Opentrons", "p300", "p50"]
+    "tags": []
   },
   "cornerOffsetFromSlot": {
     "x": 0,
@@ -908,6 +908,10 @@
     }
   },
   "brand": {
-    "brand": "Opentrons"
+    "brand": "Opentrons",
+    "brandId": [],
+    "links": [
+      "https://shop.opentrons.com/collections/opentrons-tips/products/opentrons-300ul-tips"
+    ]
   }
 }

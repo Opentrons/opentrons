@@ -13,15 +13,15 @@
     ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
     ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
   ],
-  "otId": "fixtureTipRack1000Ul",
+  "otId": "d4e462c0-ffde-11e8-abfa-95044b186e81",
+  "namespace": "opentrons",
   "schemaVersion": 2,
   "version": 1,
-  "namespace": "fixture",
   "metadata": {
-    "displayName": "Opentrons GEB 1000uL Tiprack",
+    "displayName": "GEB 96 Tip Rack 1000 µL",
     "displayVolumeUnits": "µL",
     "displayCategory": "tipRack",
-    "tags": ["GEB", "tiprack", "1000uL", "Opentrons"]
+    "tags": []
   },
   "cornerOffsetFromSlot": {
     "x": 0.01,
@@ -39,7 +39,7 @@
     "isMagneticModuleCompatible": false,
     "tipLength": 87.9,
     "tipOverlap": 11.2,
-    "loadName": "opentrons_96_tiprack_1000ul"
+    "loadName": "geb_96_tiprack_1000ul"
   },
   "wells": {
     "H1": {
@@ -908,6 +908,8 @@
     }
   },
   "brand": {
-    "brand": "Opentrons"
+    "brand": "GEB",
+    "brandId": ["PT1000-1-B"],
+    "links": ["http://www.ge-bio.com/product/showproduct.php?lang=en&id=188"]
   }
 }

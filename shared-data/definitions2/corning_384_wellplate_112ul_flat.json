@@ -1,4 +1,7 @@
 {
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "opentrons",
   "ordering": [
     [
       "A1",
@@ -433,15 +436,12 @@
       "P24"
     ]
   ],
-  "otId": "fixture384Plate",
-  "schemaVersion": 2,
-  "version": 1,
-  "namespace": "fixture",
+  "otId": "cf69e110-f50e-11e8-bb2a-e7b1dd90654d",
   "metadata": {
-    "displayName": "Corning 384 Well Plate",
+    "displayName": "Corning 384 Well Plate 112 µL Flat",
     "displayVolumeUnits": "µL",
     "displayCategory": "wellPlate",
-    "tags": ["SBS", "microplate", "112", "uL", "384 wells"]
+    "tags": []
   },
   "cornerOffsetFromSlot": {
     "x": 0,
@@ -3919,6 +3919,9 @@
   },
   "brand": {
     "brand": "Corning",
-    "brandId": ["3640", "3662", "3680", "3700", "3701", "3702"]
+    "brandId": ["3640", "3662", "3680", "3700", "3701", "3702"],
+    "links": [
+      "https://ecatalog.corning.com/life-sciences/b2c/US/en/Microplates/Assay-Microplates/384-Well-Microplates/Corning%C2%AE-384-well-Clear-Polystyrene-Microplates/p/corning384WellClearPolystyreneMicroplates"
+    ]
   }
 }
