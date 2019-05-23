@@ -15,7 +15,8 @@
       "delete": "Delete"
     },
     "slot": {
-      "add_labware": "Add Labware"
+      "add_labware": "Add Labware",
+      "place_here": "Place Here"
     }
   }
 }

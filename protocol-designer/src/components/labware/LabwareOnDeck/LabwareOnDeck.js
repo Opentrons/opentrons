@@ -83,7 +83,7 @@ const collectLabwareTarget = (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
 })
-const DragDropLabware = DropTarget(
+export const DragDropLabware = DropTarget(
   DND_TYPES.LABWARE,
   labwareTarget,
   collectLabwareTarget
@@ -227,25 +227,25 @@ const LabwareOnDeck = (props: LabwareOnDeckProps) => {
   const {
     slot,
     containerId,
-    containerName,
-    containerType,
+    // containerName,
+    // containerType,
 
-    showNameOverlay,
-    slotHasLabware,
+    // showNameOverlay,
+    // slotHasLabware,
     highlighted,
 
-    addLabwareMode,
-    canAddIngreds,
-    isTiprack,
-    selectedTerminalItem,
+    // addLabwareMode,
+    // canAddIngreds,
+    // isTiprack,
+    // selectedTerminalItem,
 
-    drillDown,
-    drillUp,
+    // drillDown,
+    // drillUp,
 
-    addLabware,
-    deleteLabware,
-    duplicateLabware,
-    editLiquids,
+    // addLabware,
+    // deleteLabware,
+    // duplicateLabware,
+    // editLiquids,
     swapSlotContents,
 
     // setDefaultLabwareName,
@@ -255,41 +255,41 @@ const LabwareOnDeck = (props: LabwareOnDeckProps) => {
   // determine what overlay to show
   let overlay = null
   let isManualInterventionStep = false
-  if (selectedTerminalItem === START_TERMINAL_ITEM_ID && !addLabwareMode) {
-    isManualInterventionStep = true
-    if (showNameOverlay) {
-      overlay = null
-      // <NameThisLabwareOverlay
-      //   {...{ setLabwareName, editLiquids }}
-      //   onClickOutside={setDefaultLabwareName}
-      // />
-    } else {
-      overlay = slotHasLabware ? (
-        <LabwareDeckSlotOverlay
-          duplicateLabware={() => duplicateLabware(containerId)}
-          {...{ canAddIngreds, deleteLabware, editLiquids }}
-        />
-      ) : (
-        <EmptyDeckSlotOverlay {...{ addLabware }} />
-      )
-    }
-  } else if (
-    selectedTerminalItem === END_TERMINAL_ITEM_ID &&
-    slotHasLabware &&
-    !isTiprack
-  ) {
-    overlay = <BrowseLabwareOverlay drillDown={drillDown} drillUp={drillUp} />
-  }
+  // if (selectedTerminalItem === START_TERMINAL_ITEM_ID && !addLabwareMode) {
+  //   isManualInterventionStep = true
+  //   if (showNameOverlay) {
+  //     overlay = null
+  //     // <NameThisLabwareOverlay
+  //     //   {...{ setLabwareName, editLiquids }}
+  //     //   onClickOutside={setDefaultLabwareName}
+  //     // />
+  //   } else {
+  //     overlay = slotHasLabware ? (
+  //       <LabwareDeckSlotOverlay
+  //         duplicateLabware={() => duplicateLabware(containerId)}
+  //         {...{ canAddIngreds, deleteLabware, editLiquids }}
+  //       />
+  //     ) : (
+  //       <EmptyDeckSlotOverlay {...{ addLabware }} />
+  //     )
+  //   }
+  // } else if (
+  //   selectedTerminalItem === END_TERMINAL_ITEM_ID &&
+  //   slotHasLabware &&
+  //   !isTiprack
+  // ) {
+  //   overlay = <BrowseLabwareOverlay drillDown={drillDown} drillUp={drillUp} />
+  // }
 
-  const labwareOrSlot = slotHasLabware ? (
-    <SlotWithLabware
-      key={`${containerType}`}
-      {...{ containerType, containerId }}
-      displayName={containerName || containerType}
-    />
-  ) : (
-    <EmptyDeckSlot slot={slot} />
-  )
+  // const labwareOrSlot = slotHasLabware ? (
+  //   <SlotWithLabware
+  //     key={`${containerType}`}
+  //     {...{ containerType, containerId }}
+  //     displayName={containerName || containerType}
+  //   />
+  // ) : (
+  //   <EmptyDeckSlot slot={slot} />
+  // )
 
   return (
     <DragDropLabware
@@ -307,7 +307,7 @@ const LabwareOnDeck = (props: LabwareOnDeckProps) => {
         return (
           <g>
             <LabwareWrapper {...{ highlighted }}>
-              {labwareOrSlot}
+              {/* {labwareOrSlot} */}
               {finalOverlay}
             </LabwareWrapper>
           </g>

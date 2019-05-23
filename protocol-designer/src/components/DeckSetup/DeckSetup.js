@@ -7,7 +7,7 @@ import {
   LabwareRender,
   useOnClickOutside,
   RobotWorkSpace,
-  RobotCoordsText,
+  RobotCoordsForeignDiv,
 } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import i18n from '../../localization'
@@ -15,7 +15,13 @@ import BrowseLabwareModal from '../labware/BrowseLabwareModal'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../steplist'
 import type { InitialDeckSetup, LabwareOnDeck } from '../../step-forms'
 
-import { SlotControls, LabwareControls } from './LabwareOverlays'
+import { DragDropLabware } from '../labware/LabwareOnDeck/LabwareOnDeck'
+import {
+  SlotControls,
+  LabwareControls,
+  EmptyDestinationSlot,
+  DisabledSelectSlot,
+} from './LabwareOverlays'
 import styles from './DeckSetup.css'
 
 type Props = {|
@@ -47,25 +53,47 @@ const DeckSetup = (props: Props) => {
         <div ref={wrapperRef} className={styles.deck_wrapper}>
           <RobotWorkSpace
             deckLayerBlacklist={[
+              // 'slotRidges',
+              // 'slotNumbers',
+              // 'fixedTrash',
+              'calibrationMarkings',
               'fixedBase',
               'removableDeckOutline',
               'doorStops',
               'metalFrame',
-              'removalHandles',
+              'removalHandle',
               'screwHoles',
             ]}
             deckDef={deckDef}
-            viewBox={`-10 -10 ${410} ${390}`}
+            viewBox={`-10 -10 ${410} ${390}`} // viewbox for small
+            // viewBox={`-10 -10 ${460} ${452}`} // viewbox for mid
           >
             {({ slots }) => (
               <>
-                <RobotCoordsText
+                <RobotCoordsForeignDiv
                   x={0}
-                  y={370}
-                  className={styles.deck_instructions}
+                  y={364}
+                  height={30}
+                  width={380}
+                  innerDivProps={{
+                    className: styles.deck_instructions,
+                  }}
                 >
                   {headerMessage}
-                </RobotCoordsText>
+                </RobotCoordsForeignDiv>
+                {/** TEXT for large */}
+                {/* <RobotCoordsForeignDiv
+                  x={0}
+                  y={464}
+                  height={30}
+                  width={380}
+                  innerDivProps={{
+                    className: styles.deck_instructions,
+                  }}
+                >
+                  {headerMessage}
+                </RobotCoordsForeignDiv> */}
+
                 {map(slots, (slot, slotId) => {
                   if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render labware or overlays
 
@@ -78,38 +106,120 @@ const DeckSetup = (props: Props) => {
                         labware.def.parameters.quirks.includes('fixedTrash')
                       )
                   )
-                  let controls = (
-                    <SlotControls
-                      key={slot.id}
-                      slot={slot}
-                      selectedTerminalItemId={props.selectedTerminalItemId}
-                    />
-                  )
 
                   if (some(containedLabware)) {
                     // NOTE: only controlling first contained labware for now!
-                    controls = (
-                      <LabwareControls
-                        slot={slot}
-                        labwareOnDeck={containedLabware[0]}
-                        selectedTerminalItemId={props.selectedTerminalItemId}
-                      />
+                    return (
+                      <>
+                        {map(containedLabware, labwareOnDeck => (
+                          <g
+                            key={labwareOnDeck.id}
+                            transform={`translate(${
+                              slots[labwareOnDeck.slot].position[0]
+                            }, ${slots[labwareOnDeck.slot].position[1]})`}
+                          >
+                            <LabwareRender definition={labwareOnDeck.def} />
+                          </g>
+                        ))}
+
+                        <DragDropLabware
+                          {...{
+                            isManualInterventionStep: true,
+                            containerId: containedLabware[0].id,
+                            swapSlotContents: () => {
+                              console.log('swap called')
+                            },
+                            slot: slot.id,
+                          }}
+                          render={({ draggedItem, isOver }) => {
+                            if (draggedItem) {
+                              let dragOverlay = null
+                              if (draggedItem.slot === slot.id) {
+                                // this labware is being dragged, disable it
+                                dragOverlay = <DisabledSelectSlot slot={slot} />
+                              } else if (isOver) {
+                                dragOverlay = (
+                                  <EmptyDestinationSlot slot={slot} />
+                                )
+                              }
+                              return (
+                                <g
+                                  transform={`translate(${slot.position[0]}, ${
+                                    slot.position[1]
+                                  })`}
+                                >
+                                  {dragOverlay}
+                                </g>
+                              )
+                            } else {
+                              return (
+                                <g>
+                                  <LabwareControls
+                                    slot={slot}
+                                    labwareOnDeck={containedLabware[0]}
+                                    selectedTerminalItemId={
+                                      props.selectedTerminalItemId
+                                    }
+                                  />
+                                </g>
+                              )
+                            }
+                          }}
+                        />
+                      </>
                     )
                   }
+
                   return (
-                    <>
-                      {map(containedLabware, labwareOnDeck => (
-                        <g
-                          key={labwareOnDeck.id}
-                          transform={`translate(${
-                            slots[labwareOnDeck.slot].position[0]
-                          }, ${slots[labwareOnDeck.slot].position[1]})`}
-                        >
-                          <LabwareRender definition={labwareOnDeck.def} />
-                        </g>
-                      ))}
-                      {controls}
-                    </>
+                    <SlotControls
+                      key={slot.id}
+                      slot={slot}
+                      render={({ isOver }) => {
+                        if (isOver) {
+                          return (
+                            <g>
+                              <EmptyDestinationSlot slot={slot} />
+                            </g>
+                          )
+                        }
+                        return (
+                          <g>
+                            <RobotCoordsForeignDiv
+                              x={slot.position[0]}
+                              y={slot.position[1]}
+                              width={slot.boundingBox.xDimension}
+                              height={slot.boundingBox.yDimension}
+                              innerDivProps={
+                                {
+                                  // className: cx(
+                                  // styles.slot_overlay,
+                                  // styles.appear_on_mouseover
+                                  // ),
+                                  // onClick: addLabware,
+                                }
+                              }
+                            >
+                              <a
+                                className={styles.overlay_button}
+                                // onClick={addLabware}
+                              >
+                                {/* <Icon
+                                  className={styles.overlay_icon}
+                                  name="plus"
+                                /> */}
+                                {i18n.t('deck.overlay.slot.add_labware')}
+                              </a>
+                            </RobotCoordsForeignDiv>
+                          </g>
+                        )
+                      }}
+                      isManualInterventionStep={true}
+                      containerId={undefined}
+                      swapSlotContents={() => {
+                        console.log('swap called')
+                      }}
+                      selectedTerminalItemId={props.selectedTerminalItemId}
+                    />
                   )
                 })}
               </>
