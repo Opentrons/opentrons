@@ -1019,14 +1019,19 @@ class API(HardwareAPILike):
         plunger_ax = Axis.of_plunger(mount)
         droptip = instr.config.drop_tip
         bottom = instr.config.bottom
-        self._backend.set_active_current(plunger_ax,
-                                         instr.config.plunger_current)
-        await self._move_plunger(mount, bottom)
-        self._backend.set_active_current(plunger_ax,
-                                         instr.config.drop_tip_current)
-        await self._move_plunger(
-            mount, droptip, speed=instr.config.drop_tip_speed)
-        await self._shake_off_tips(mount)
+        async def _drop_tip():
+            self._backend.set_active_current(plunger_ax,
+                                             instr.config.plunger_current)
+            await self._move_plunger(mount, bottom)
+            self._backend.set_active_current(plunger_ax,
+                                             instr.config.drop_tip_current)
+            await self._move_plunger(
+                mount, droptip, speed=instr.config.drop_tip_speed)
+        if 'doubleDropTip' in instr.config.quirks:
+            await _drop_tip()
+        await _drop_tip()
+        if 'dropTipShake' in instr.config.quirks:
+            await self._shake_off_tips(mount)
         self._backend.set_active_current(plunger_ax,
                                          instr.config.plunger_current)
         instr.set_current_volume(0)

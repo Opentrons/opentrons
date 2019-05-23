@@ -231,9 +231,9 @@ def save_overrides(
         if value is None:
             if existing.get(key):
                 del existing[key]
-        elif key == 'quirks':
+        elif isinstance(value['value'], bool):
             existing, model_configs = change_quirks(
-                value, existing, model_configs)
+                {key: value['value']}, existing, model_configs)
         else:
             if not model_configs[key].get('default'):
                 model_configs[key]['default'] = model_configs[key]['value']
@@ -255,6 +255,8 @@ def change_quirks(override_quirks, existing, model_configs):
         existing['quirks'][quirk] = setting
         if setting not in model_configs['quirks']:
             model_configs['quirks'].append(setting)
+        elif not value:
+            model_configs['quirks'].remove(setting)
     return existing, model_configs
 
 

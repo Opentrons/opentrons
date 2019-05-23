@@ -103,7 +103,7 @@ def test_override_save():
             'value': 1231.213},
         'dropTipSpeed': {
             'value': 121},
-        'quirks': {'dropTipShake': False}
+        'dropTipShake': {'value': False}
     }
 
     new_id = 'aoa2109j09cj2a'

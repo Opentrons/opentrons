@@ -911,8 +911,6 @@ class Pipette(CommandPublisher):
             self.robot.add_warning(
                 'Pipette has no tip to return, dropping in place')
 
-        if 'doubleDropTip' in self.quirks:
-            self.drop_tip(self.current_tip())
         self.drop_tip(self.current_tip(), home_after=home_after)
         return self
 
@@ -1117,6 +1115,8 @@ class Pipette(CommandPublisher):
 
         do_publish(self.broker, commands.drop_tip, self.drop_tip,
                    'before', None, None, self, location)
+        if 'doubleDropTip' in self.quirks:
+            _drop_tip(location)
         _drop_tip(location)
         do_publish(self.broker, commands.drop_tip, self.drop_tip,
                    'after', self, None, self, location)
