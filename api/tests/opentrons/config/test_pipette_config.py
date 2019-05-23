@@ -109,6 +109,10 @@ def test_override_save():
     new_id = 'aoa2109j09cj2a'
     model = 'p300_multi_v1'
 
+    old_pconf = pipette_config.load('p300_multi_v1.4', new_id)
+
+    assert old_pconf.quirks == ['dropTipShake']
+
     pipette_config.save_overrides(new_id, overrides, model)
 
     assert (cdir/f'{new_id}.json').is_file()

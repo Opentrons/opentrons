@@ -1019,6 +1019,7 @@ class API(HardwareAPILike):
         plunger_ax = Axis.of_plunger(mount)
         droptip = instr.config.drop_tip
         bottom = instr.config.bottom
+
         async def _drop_tip():
             self._backend.set_active_current(plunger_ax,
                                              instr.config.plunger_current)

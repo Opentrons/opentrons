@@ -254,9 +254,9 @@ def change_quirks(override_quirks, existing, model_configs):
         # for one setting
         existing['quirks'][quirk] = setting
         if setting not in model_configs['quirks']:
-            model_configs['quirks'].append(setting)
-        elif not value:
-            model_configs['quirks'].remove(setting)
+            model_configs['quirks'].append(quirk)
+        elif not setting:
+            model_configs['quirks'].remove(quirk)
     return existing, model_configs
 
 
