@@ -805,10 +805,9 @@ def _read_file(filepath: str) -> dict:
 
 def _get_path_to_labware(load_name: str, namespace: str, version: int) -> Path:
     if namespace == OPENTRONS_NAMESPACE:
-        # labware in OPENTRONS_NAMESPACE is bundled in wheel
-
-        # TODO IMMEDIATELY: need to restructure shared data dir...
-        rel_def_path = f'shared_data/definitions2/{load_name}/{version}/' + \
+        # all labware in OPENTRONS_NAMESPACE is bundled in wheel
+        rel_def_path = f'shared_data/labware/definitions/2/' + \
+            f'{load_name}/{version}/' + \
             f'{namespace}__{load_name}__{version}.json'
 
         return os.path.join(
@@ -819,29 +818,41 @@ def _get_path_to_labware(load_name: str, namespace: str, version: int) -> Path:
     #     if there is / or \ in loadName
     base_path = CONFIG['labware_user_definitions_dir_v4']
     def_path = base_path / Path(namespace) / Path(load_name) / \
-        Path(f'{namespace}__{load_name}__{version}.json')
+        Path(str(version)) / Path(f'{namespace}__{load_name}__{version}.json')
     return def_path
 
 
 def _get_latest_labware(load_name: str, namespace: str) -> dict:
     # Get highest-versioned labware within a given namespace
+    # TODO IMMEDIATELY - DRY
     if namespace == OPENTRONS_NAMESPACE:
-        # TODO IMMEDIATELY
-        raise NotImplementedError
+        base_path = Path(os.path.join(
+            os.path.dirname(sys.modules['opentrons'].__file__),
+            'shared_data/labware/definitions/2'))
+        print('bassss', base_path)
+    else:
+        base_path = CONFIG['labware_user_definitions_dir_v4'] / Path(namespace)
 
-    base_path = CONFIG['labware_user_definitions_dir_v4']
-    loadname_dir = base_path / Path(namespace) / Path(load_name)
+    loadname_dir = base_path / Path(load_name)
+    print('xsdf', loadname_dir)
     if not os.path.isdir(loadname_dir):
         raise FileNotFoundError(f'no labware exist in namespace {namespace}')
 
     result = None
     for fileName in os.listdir(loadname_dir):
-        file_path = os.path.join(loadname_dir, fileName)
-        if os.path.isfile(file_path) and file_path.endswith('.json'):
-            with open(file_path, 'r') as f:
-                defn = json.load(f)
-            if result is None or result['version'] < defn['version']:
-                result = defn
+        version_dir = os.path.join(loadname_dir, fileName)
+        version_dir_files = [fpath for fpath in os.listdir(version_dir)
+                             if fpath.endswith('.json')]
+        print(version_dir, version_dir_files)
+        if len(version_dir_files) != 1:
+            raise RuntimeError(
+                f'Found multiple JSON files in version space {version_dir}, ' +
+                'expected only one')
+        file_path = version_dir_files[0]
+        with open(os.path.join(version_dir, file_path), 'r') as f:
+            defn = json.load(f)
+        if result is None or result['version'] < defn['version']:
+            result = defn
     if result is None:
         raise FileNotFoundError(f'No labware "{load_name}" exists ' +
                                 f'in namespace "{namespace}"')
@@ -922,16 +933,7 @@ def load_definition(
     if version:
         def_path = _get_path_to_labware(load_name, namespace, version)
     else:
-        # use 'latest' version
-        if namespace == OPENTRONS_NAMESPACE:
-            # TODO: Ian 2019-05-22 support version=None -> "latest" lookup
-            # for 'opentrons' namespace. Also do lookup by load_name,
-            # do not assume filename matches load_name :/
-            def_path = _get_path_to_labware(load_name, namespace, version)
-            # labware_def = json.loads(pkgutil.get_data('opentrons', def_path))  # type: ignore # NOQA
-            # return labware_def
-        else:
-            return _get_latest_labware(load_name, namespace)
+        return _get_latest_labware(load_name, namespace)
 
     with open(def_path, 'r') as f:
         labware_def = json.load(f)
