@@ -117,7 +117,7 @@ def test_force_direct():
 
 
 def test_no_labware_loc():
-    labware_def = labware.load_definition_by_name(labware_name)
+    labware_def = labware.load_definition(labware_name)
 
     deck = Deck()
     lw1 = labware.load(labware_name, deck.position_for(1))

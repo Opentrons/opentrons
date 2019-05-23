@@ -36,7 +36,7 @@
       "enum": ["tipRack", "tubeRack", "trough", "trash", "wellPlate", "other"]
     },
     "safeString": {
-      "description": "a string safe to use for loadName / namespace",
+      "description": "a string safe to use for loadName / namespace. Lowercase-only.",
       "type": "string",
       "pattern": "^[a-z0-9._]+$"
     }

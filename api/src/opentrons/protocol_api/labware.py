@@ -866,6 +866,8 @@ def save_definition(
     load_name = labware_def['parameters']['loadName']
     version = labware_def['version']
 
+    # TODO: Ian 2019-05-23 validate labware def schema before saving
+
     if not namespace or not load_name or not version:
         raise RuntimeError(
             'Could not save definition, labware def is missing a field: ' +
@@ -910,17 +912,19 @@ def load_definition(
     :param int version: The version of the labware definition. If unspecified,
         will use the latest version.
     """
+    load_name = load_name.lower()
     if namespace is None:
         for fallback_namespace in [OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE]:
             try:
                 return load_definition(load_name, fallback_namespace, version)
             except (FileNotFoundError):
                 pass
-        raise RuntimeError(
+        raise FileNotFoundError(
             f'{load_name} not found with version {version}. If you are ' +
             f'using a namespace besides {OPENTRONS_NAMESPACE} or ' +
             f'{CUSTOM_NAMESPACE}, please specify it')
 
+    namespace = namespace.lower()
     if version:
         def_path = _get_path_to_labware(load_name, namespace, version)
     else:
@@ -935,9 +939,9 @@ def load_definition(
 def load(
     load_name: str,
     parent: Location,
+    label: str = None,
     namespace: str = None,
-    version: str = None,
-    label: str = None
+    version: str = None
 ) -> Labware:
     """
     Return a labware object constructed from a labware definition dict looked
@@ -950,13 +954,13 @@ def load(
     :param parent: A :py:class:`.Location` representing the location where
                    the front and left most point of the outside of labware is
                    (often the front-left corner of a slot on the deck).
+    :param str label: An optional label that will override the labware's
+                      display name from its definition
     :param str namespace: The namespace the labware definition belongs to. If
         unspecified, will search in this order: 'opentrons', 'custom_beta',
         then all other namespaces together.
     :param int version: The version of the labware definition. If unspecified,
         will use the latest version.
-    :param str label: An optional label that will override the labware's
-                      display name from its definition
     """
     definition = load_definition(load_name, namespace, version)
     return load_from_definition(definition, parent, label)
