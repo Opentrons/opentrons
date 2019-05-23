@@ -941,7 +941,7 @@ def load(
     parent: Location,
     label: str = None,
     namespace: str = None,
-    version: str = None
+    version: int = None
 ) -> Labware:
     """
     Return a labware object constructed from a labware definition dict looked

@@ -101,7 +101,7 @@ def _check_reset(reset_req: Dict[str, str]) -> Tuple[bool, str]:
     return (True, '')
 
 
-async def reset(request: web.Request) -> web.Response:
+async def reset(request: web.Request) -> web.Response:  # noqa(C901)
     """ Execute a reset of the requested parts of the user configuration.
     """
     data = await request.json()
