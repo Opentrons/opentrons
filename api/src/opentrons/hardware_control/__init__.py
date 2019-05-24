@@ -1028,6 +1028,15 @@ class API(HardwareAPILike):
                                              instr.config.drop_tip_current)
             await self._move_plunger(
                 mount, droptip, speed=instr.config.drop_tip_speed)
+            if home_after:
+                safety_margin = abs(bottom-droptip)
+                async with self._motion_lock:
+                    smoothie_pos = self._backend.fast_home(
+                        plunger_ax.name.upper(), safety_margin)
+                    self._current_position = self._deck_from_smoothie(
+                        smoothie_pos)
+                await self._move_plunger(mount, safety_margin)
+
         if 'doubleDropTip' in instr.config.quirks:
             await _drop_tip()
         await _drop_tip()
@@ -1037,13 +1046,6 @@ class API(HardwareAPILike):
                                          instr.config.plunger_current)
         instr.set_current_volume(0)
         instr.remove_tip()
-        if home_after:
-            safety_margin = abs(bottom-droptip)
-            async with self._motion_lock:
-                smoothie_pos = self._backend.fast_home(
-                    plunger_ax.name.upper(), safety_margin)
-                self._current_position = self._deck_from_smoothie(smoothie_pos)
-            await self._move_plunger(mount, safety_margin)
 
     async def _shake_off_tips(self, mount):
         # tips don't always fall off, especially if resting against
