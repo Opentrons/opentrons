@@ -56,7 +56,7 @@ def test_location_cache(loop, monkeypatch, load_my_labware):
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)
     right = ctx.load_instrument('p10_single', Mount.RIGHT)
-    lw = ctx.load_labware_by_name('generic_96_wellplate_360ul_flat', 1)
+    lw = ctx.load_labware_by_name('generic_96_wellplate_340ul_flat', 1)
     ctx.home()
 
     test_args = None
@@ -93,7 +93,7 @@ def test_move_uses_arc(loop, monkeypatch, load_my_labware):
     ctx.connect(hardware)
     ctx.home()
     right = ctx.load_instrument('p10_single', Mount.RIGHT)
-    lw = ctx.load_labware_by_name('generic_96_wellplate_360ul_flat', 1)
+    lw = ctx.load_labware_by_name('generic_96_wellplate_340ul_flat', 1)
     ctx.home()
 
     targets = []
@@ -238,7 +238,7 @@ def test_instrument_trash(loop, load_my_labware):
 def test_aspirate(loop, load_my_labware, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
-    lw = ctx.load_labware_by_name('generic_96_wellplate_360ul_flat', 1)
+    lw = ctx.load_labware_by_name('generic_96_wellplate_340ul_flat', 1)
     instr = ctx.load_instrument('p10_single', Mount.RIGHT)
 
     asp_called_with = None
@@ -279,7 +279,7 @@ def test_aspirate(loop, load_my_labware, monkeypatch):
 def test_dispense(loop, load_my_labware, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
-    lw = ctx.load_labware_by_name('generic_96_wellplate_360ul_flat', 1)
+    lw = ctx.load_labware_by_name('generic_96_wellplate_340ul_flat', 1)
     instr = ctx.load_instrument('p10_single', Mount.RIGHT)
 
     disp_called_with = None
@@ -449,7 +449,7 @@ def test_blow_out(loop, monkeypatch):
 def test_transfer_options(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     lw1 = ctx.load_labware_by_name('biorad_96_wellplate_200ul_pcr', 1)
-    lw2 = ctx.load_labware_by_name('generic_96_wellplate_360ul_flat', 2)
+    lw2 = ctx.load_labware_by_name('generic_96_wellplate_340ul_flat', 2)
     tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300ul', 3)
     instr = ctx.load_instrument('p300_single', Mount.RIGHT,
                                 tip_racks=[tiprack])

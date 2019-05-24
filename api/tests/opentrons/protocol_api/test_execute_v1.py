@@ -43,7 +43,7 @@ async def test_load_pipettes(loop, protocol_data):
 @pytest.mark.parametrize('command_type', ['aspirate', 'dispense'])
 def test_get_location_with_offset(loop, command_type):
     ctx = ProtocolContext(loop=loop)
-    plate = ctx.load_labware_by_name("generic_96_wellplate_360ul_flat", 1)
+    plate = ctx.load_labware_by_name("generic_96_wellplate_340ul_flat", 1)
     well = "B2"
 
     default_values = {
@@ -97,7 +97,7 @@ def test_load_labware(loop):
             },
             "destPlateId": {
                 "slot": "11",
-                "model": "generic_96_wellplate_360ul_flat",
+                "model": "generic_96_wellplate_340ul_flat",
                 "display-name": "Destination Plate"
             },
             "oldPlateId": {
@@ -115,7 +115,7 @@ def test_load_labware(loop):
     assert loaded_labware['destPlateId'] == ctx.loaded_labwares[11]
     assert 'Destination Plate' in str(loaded_labware['destPlateId'])
     assert loaded_labware['oldPlateId'].name == \
-        'generic_96_wellplate_360ul_flat'
+        'generic_96_wellplate_340ul_flat'
     assert 'Test Plate' in str(loaded_labware['oldPlateId'])
 
 
@@ -157,9 +157,9 @@ def test_dispatch_commands(monkeypatch, loop):
     insts = execute_v1.load_pipettes_from_json(ctx, protocol_data)
 
     source_plate = ctx.load_labware_by_name(
-        'generic_96_wellplate_360ul_flat', '1')
+        'generic_96_wellplate_340ul_flat', '1')
     dest_plate = ctx.load_labware_by_name(
-        'generic_96_wellplate_360ul_flat', '2')
+        'generic_96_wellplate_340ul_flat', '2')
 
     loaded_labware = {
         'sourcePlateId': source_plate,

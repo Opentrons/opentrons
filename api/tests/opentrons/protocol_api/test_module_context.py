@@ -165,7 +165,7 @@ def test_semithermocycler_labware_accessor(loop):
 
 def test_module_load_labware(loop):
     ctx = papi.ProtocolContext(loop)
-    labware_name = 'generic_96_wellplate_360ul_flat'
+    labware_name = 'generic_96_wellplate_340ul_flat'
     labware_def = json.loads(
         pkgutil.get_data('opentrons',
                          'shared_data/definitions2/{}.json'.format(
@@ -208,7 +208,7 @@ def test_magdeck_labware_props(loop):
     mod.engage(height=3)
     assert mod._module._driver.plate_height == 3
     mod._geometry.reset_labware()
-    labware_name = 'generic_96_wellplate_360ul_flat'
+    labware_name = 'generic_96_wellplate_340ul_flat'
     mod.load_labware_by_name(labware_name)
     with pytest.raises(ValueError):
         mod.engage()

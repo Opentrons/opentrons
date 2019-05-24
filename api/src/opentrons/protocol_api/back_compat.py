@@ -217,7 +217,7 @@ class BCLabware:
         '48-well-plate': 'corning_48_wellplate_1.6_ml',
         '6-well-plate': 'corning_6_wellplate_16.8ml_flat',
         '96-PCR-flat': 'biorad_96_wellplate_200ul_pcr',
-        '96-flat': 'generic_96_wellplate_360ul_flat',
+        '96-flat': 'generic_96_wellplate_340ul_flat',
         'biorad-hardshell-96-PCR': 'biorad_96_wellplate_200ul_pcr',
         'opentrons-aluminum-block-2ml-eppendorf': 'opentrons_24_aluminumblock_generic_2ml_screwcap',       # noqa(E501)
         'opentrons-aluminum-block-2ml-screwcap': 'opentrons_24_aluminumblock_generic_2ml_screwcap',        # noqa(E501)

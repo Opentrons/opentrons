@@ -57,7 +57,7 @@ If we were to rewrite this with the Opentrons API, it would look like the follow
     def run(protocol_context):
 
         # labware
-        plate = protocol_context.load_labware_by_name('generic_96_wellplate_360ul_flat', '2')
+        plate = protocol_context.load_labware_by_name('generic_96_wellplate_340ul_flat', '2')
         tiprack = protocol_context.load_labware_by_name('opentrons_96_tiprack_300ul', '1')
 
         # pipettes
@@ -106,13 +106,13 @@ Labware
 
 The labware section informs the protocol context what labware is present on the robot’s deck. In this section, you define the tip racks, well plates, troughs, tubes, or anything else you’ve put on the deck.
 
-Each labware is given a name (ex: ``'generic_96_wellplate_360ul_flat'``), and the slot on the robot it will be placed (ex: ``'2'``). A list of valid labware can be found in :ref:`protocol-api-valid-labware`. In this example, we’ll use ``'generic_96_wellplate_360ul_flat'`` (an ANSI standard 96-well plate) and ``'opentrons_96_tiprack_300ul'``, the Opentrons standard 300 uL tiprack.
+Each labware is given a name (ex: ``'generic_96_wellplate_340ul_flat'``), and the slot on the robot it will be placed (ex: ``'2'``). A list of valid labware can be found in :ref:`protocol-api-valid-labware`. In this example, we’ll use ``'generic_96_wellplate_340ul_flat'`` (an ANSI standard 96-well plate) and ``'opentrons_96_tiprack_300ul'``, the Opentrons standard 300 uL tiprack.
 
 From the example above, the "labware" section looked like:
 
 .. code-block:: python
 
-    plate = protocol_context.load_labware_by_name('generic_96_wellplate_360ul_flat', '2')
+    plate = protocol_context.load_labware_by_name('generic_96_wellplate_340ul_flat', '2')
     tiprack = protocol_context.load_labware_by_name('opentrons_96_tiprack_300ul', '1')
 
 
@@ -143,7 +143,7 @@ This table lists the names of valid labwares that can be loaded with :py:meth:`.
 +-------------------------------------------+----------------------------------------+
 | eppendorf_96_tiprack_10ul                | --                                     |
 +-------------------------------------------+----------------------------------------+
-| generic_96_wellplate_360ul_flat               | 96-flat                                |
+| generic_96_wellplate_340ul_flat               | 96-flat                                |
 +-------------------------------------------+----------------------------------------+
 | opentrons_15_tuberack_15_ml_falcon        | opentrons-tuberack-15ml                |
 +-------------------------------------------+----------------------------------------+

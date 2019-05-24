@@ -91,7 +91,7 @@ class ContainerTestCase(unittest.TestCase):
 
     def test_new_slot_names(self):
         trough = 'usascientific_12_reservoir_22ml'
-        plate = 'generic_96_wellplate_360ul_flat'
+        plate = 'generic_96_wellplate_340ul_flat'
         tuberack = 'opentrons_6_tuberack_falcon_50ml_conical'
 
         cont = new_load(trough)
