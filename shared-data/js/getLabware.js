@@ -32,7 +32,7 @@ export function getIsTiprack(labwareDef: LabwareDefinition2): boolean {
 // achieve going forward.
 
 // TODO: BC 2019-02-28 The height constants used here should be replaced with the heights
-// in the dimensions field of the corresponding labware in definitions2
+// in the dimensions field of the corresponding labware in definitions
 const _getSvgYValueForWell = (labwareName: string, wellDef: WellDefinition) => {
   const renderHeight =
     labwareName === 'fixed-trash'

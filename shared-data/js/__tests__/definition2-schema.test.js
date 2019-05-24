@@ -5,7 +5,10 @@ import schema from '../../labware-json-schema/labwareSchemaV2.json'
 import exampleLabware1 from './fixtures/labware2/labwareExample.json'
 import exampleLabware2 from './fixtures/labware2/labwareExample2.json'
 
-const definitionsGlobPath = path.join(__dirname, '../../definitions2/*.json')
+const definitionsGlobPath = path.join(
+  __dirname,
+  '../../labware/definitions/2/**/*.json'
+)
 
 // JSON Schema defintion & setup
 

@@ -168,8 +168,8 @@ def test_module_load_labware(loop):
     labware_name = 'generic_96_wellplate_340ul_flat'
     labware_def = json.loads(
         pkgutil.get_data('opentrons',
-                         'shared_data/definitions2/{}.json'.format(
-                             labware_name)))
+                         f'shared_data/labware/definitions/2/{labware_name}' +
+                         f'/1/{labware_name}.json'))
     ctx._hw_manager.hardware._backend._attached_modules = [
         ('mod0', 'tempdeck')]
     mod = ctx.load_module('Temperature Module', 1)
@@ -192,8 +192,8 @@ def test_magdeck_labware_props(loop):
     labware_name = 'biorad_96_wellplate_200ul_pcr'
     labware_def = json.loads(
         pkgutil.get_data('opentrons',
-                         'shared_data/definitions2/{}.json'.format(
-                             labware_name)))
+                         f'shared_data/labware/definitions/2/{labware_name}' +
+                         f'/1/{labware_name}.json'))
     ctx._hw_manager.hardware._backend._attached_modules = [('mod0', 'magdeck')]
     mod = ctx.load_module('magdeck', 1)
     assert mod.labware is None

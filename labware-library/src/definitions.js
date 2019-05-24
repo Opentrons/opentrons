@@ -19,10 +19,10 @@ import type {
   LabwareDefinition,
 } from './types'
 
-// require all definitions in the definitions2 directory
+// require all definitions in the labware/definitions/2 directory
 // require.context is webpack-specific method
 const definitionsContext = (require: any).context(
-  '@opentrons/shared-data/definitions2',
+  '@opentrons/shared-data/labware/definitions/2',
   true, // traverse subdirectories
   /\.json$/, // import filter
   'sync' // load every definition into one synchronous chunk

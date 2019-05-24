@@ -23,7 +23,6 @@ SHARED_DATA_PATH = os.path.join('..', 'shared-data')
 SHARED_DATA_SUBDIRS = ['labware-json-schema',
                        'protocol-json-schema',
                        'definitions',
-                       'definitions2',
                        'labware',
                        'robot-data']
 # Where, relative to the package root, we put the files we copy

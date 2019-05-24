@@ -4,10 +4,10 @@ import type { LabwareDefByDefId } from './types'
 // TODO: Ian 2019-04-11 getAllDefinitions also exists (differently) in labware-library,
 // should reconcile differences & make a general util fn imported from shared-data
 
-// require all definitions in the definitions2 directory
+// require all definitions in the labware/definitions/2 directory
 // $FlowFixMe: require.context is webpack-specific method
 const definitionsContext = require.context(
-  '@opentrons/shared-data/definitions2',
+  '@opentrons/shared-data/labware/definitions/2',
   true, // traverse subdirectories
   /\.json$/, // import filter
   'sync' // load every definition into one synchronous chunk
