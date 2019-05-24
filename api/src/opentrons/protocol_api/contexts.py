@@ -1128,7 +1128,7 @@ class InstrumentContext(CommandPublisher):
                  volume: Union[float, Sequence[float]],
                  source,
                  dest,
-                 trash = True,
+                 trash=True,
                  **kwargs) -> 'InstrumentContext':
         # source: Union[Well, List[Well], List[List[Well]]],
         # dest: Union[Well, List[Well], List[List[Well]]],
