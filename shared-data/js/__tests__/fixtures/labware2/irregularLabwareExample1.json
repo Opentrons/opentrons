@@ -38,7 +38,7 @@
     "format": "irregular",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "generic_50x3_ml_5x10_ml_tuberack"
+    "loadName": "generic_55_tuberack_50x3ml_5x10ml"
   },
   "wells": {
     "A1": {
