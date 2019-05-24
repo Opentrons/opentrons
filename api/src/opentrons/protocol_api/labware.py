@@ -1,6 +1,5 @@
 """This module will replace Placeable"""
 import json
-import os
 import re
 import time
 import pkgutil
@@ -19,9 +18,8 @@ from opentrons.config import CONFIG
 # TODO: Ian 2019-05-23 where to store these constants?
 OPENTRONS_NAMESPACE = 'opentrons'
 CUSTOM_NAMESPACE = 'custom_beta'
-STANDARD_DEFS_PATH = Path(os.path.join(
-    os.path.dirname(sys.modules['opentrons'].__file__),
-    'shared_data/labware/definitions/2'))
+STANDARD_DEFS_PATH = Path(sys.modules['opentrons'].__file__).parent /\
+    'shared_data' / 'labware' / 'definitions' / '2'
 
 
 class WellShape(Enum):
@@ -771,7 +769,7 @@ def load_calibration(labware: Labware):
 
 
 def _helper_offset_data_format(filepath: str, delta: Point) -> dict:
-    if not os.path.exists(filepath):
+    if not Path(filepath).is_file():
         calibration_data = {
             "default": {
                 "offset": [delta.x, delta.y, delta.z],
@@ -819,35 +817,36 @@ def _get_path_to_labware(load_name: str, namespace: str, version: int) -> Path:
     return def_path
 
 
-def _get_latest_labware(load_name: str, namespace: str) -> dict:
-    # Get highest-versioned labware within a given namespace
+def _get_path_to_latest_labware(load_name: str, namespace: str) -> Path:
+    # Get path to highest-versioned labware within a given namespace
     if namespace == OPENTRONS_NAMESPACE:
         base_path = STANDARD_DEFS_PATH
     else:
-        base_path = CONFIG['labware_user_definitions_dir_v4'] / Path(namespace)
+        base_path = CONFIG['labware_user_definitions_dir_v4'] / namespace
 
-    loadname_dir = base_path / Path(load_name)
-    if not os.path.isdir(loadname_dir):
-        raise FileNotFoundError(f'no labware exist in namespace {namespace}')
+    loadname_dir = base_path / load_name
+    if not loadname_dir.is_dir():
+        raise FileNotFoundError(f'labware {load_name} not found in namespace' +
+                                f' {namespace}')
 
     result = None
-    for fileName in os.listdir(loadname_dir):
-        version_dir = os.path.join(loadname_dir, fileName)
-        version_dir_files = [fpath for fpath in os.listdir(version_dir)
-                             if fpath.endswith('.json')]
-        if len(version_dir_files) != 1:
-            raise RuntimeError(
-                f'Found multiple JSON files in version space {version_dir}, ' +
-                'expected only one')
-        file_path = version_dir_files[0]
-        with open(os.path.join(version_dir, file_path), 'r') as f:
-            defn = json.load(f)
-        if result is None or result['version'] < defn['version']:
-            result = defn
+    sorted_version_dirs = sorted(
+        [d for d in loadname_dir.iterdir() if d.is_dir()],
+        key=lambda dirpath: int(dirpath.name))
+    highest_version_dir = sorted_version_dirs[-1]
+    version_dir_files = [f for f in highest_version_dir.iterdir()
+                         if f.is_file() and f.name.endswith('.json')]
+    if len(version_dir_files) != 1:
+        raise RuntimeError(
+            f'Found {len(version_dir_files)} JSON files for labware ' +
+            f'{load_name} in namespace {namespace} for version ' +
+            f'{highest_version_dir}, expected exactly one file in the ' +
+            'version directory')
+    result = version_dir_files[0]
+
     if result is None:
         raise FileNotFoundError(f'No labware "{load_name}" exists ' +
                                 f'in namespace "{namespace}"')
-
     return result
 
 
@@ -880,7 +879,7 @@ def save_definition(
 
     def_path = _get_path_to_labware(load_name, namespace, version)
 
-    if not force and os.path.isfile(def_path):
+    if not force and def_path.is_file():
         raise RuntimeError(
             f'The given definition ({namespace}/{load_name} v{version}) ' +
             'already exists. Cannot save definition without force=True')
@@ -892,7 +891,7 @@ def save_definition(
 
 def delete_all_custom_labware() -> None:
     custom_def_dir = CONFIG['labware_user_definitions_dir_v4']
-    if os.path.exists(custom_def_dir):
+    if custom_def_dir.is_dir():
         shutil.rmtree(custom_def_dir)
 
 
@@ -928,7 +927,7 @@ def load_definition(
     if version:
         def_path = _get_path_to_labware(load_name, namespace, version)
     else:
-        return _get_latest_labware(load_name, namespace)
+        def_path = _get_path_to_latest_labware(load_name, namespace)
 
     with open(def_path, 'r') as f:
         labware_def = json.load(f)
