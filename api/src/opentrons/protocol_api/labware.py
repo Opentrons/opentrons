@@ -9,7 +9,7 @@ from pathlib import Path
 from collections import defaultdict
 from enum import Enum, auto
 from itertools import takewhile, dropwhile
-from typing import List, Dict, Optional, Union
+from typing import Any, List, Dict, Optional, Union
 
 from opentrons.types import Location
 from opentrons.types import Point
@@ -807,13 +807,13 @@ def _read_file(filepath: str) -> dict:
 def _get_path_to_labware(load_name: str, namespace: str, version: int) -> Path:
     if namespace == OPENTRONS_NAMESPACE:
         # all labware in OPENTRONS_NAMESPACE is bundled in wheel
-        return STANDARD_DEFS_PATH / Path(
+        return STANDARD_DEFS_PATH / (
             f'{load_name}/{version}/' +
             f'{namespace}__{load_name}__{version}.json')
 
     base_path = CONFIG['labware_user_definitions_dir_v4']
-    def_path = base_path / Path(namespace) / Path(load_name) / \
-        Path(str(version)) / Path(f'{namespace}__{load_name}__{version}.json')
+    def_path = base_path / namespace / load_name / \
+        str(version) / f'{namespace}__{load_name}__{version}.json'
     return def_path
 
 
@@ -851,7 +851,7 @@ def _get_path_to_latest_labware(load_name: str, namespace: str) -> Path:
 
 
 def save_definition(
-    labware_def: dict,
+    labware_def: Dict[str, Any],
     force: bool = False
 ) -> None:
     """
