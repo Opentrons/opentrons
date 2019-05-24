@@ -90,9 +90,9 @@ class ContainerTestCase(unittest.TestCase):
         warnings.filterwarnings('default')
 
     def test_new_slot_names(self):
-        trough = 'usa_scientific_12_trough_22_ml'
-        plate = 'generic_96_wellplate_380_ul'
-        tuberack = 'opentrons_6_tuberack_falcon_50_ml'
+        trough = 'usascientific_12_reservoir_22ml'
+        plate = 'generic_96_wellplate_360ul_flat'
+        tuberack = 'opentrons_6_tuberack_falcon_50ml_conical'
 
         cont = new_load(trough)
         self.assertTrue(isinstance(cont, Container))
@@ -102,7 +102,7 @@ class ContainerTestCase(unittest.TestCase):
         self.assertTrue(isinstance(cont, Container))
 
     def test_load_new_trough(self):
-        trough = 'usa_scientific_12_trough_22_ml'
+        trough = 'usascientific_12_reservoir_22ml'
         cont = new_load(trough)
         self.assertEqual(cont.size(), (0, 0, 0))
         self.assertEqual(

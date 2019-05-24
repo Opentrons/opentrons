@@ -61,7 +61,7 @@ To build a _regular_ labware, the `options` object should have the following sha
 | `version`    | [Version](#Version)       | no       | Version of the definition, should be incremented if non-metadata info is altered (defaults to `1`) |
 | `namespace`  | [Namepace](#Namespace)    | no       | Defaults to "custom_beta"                                                                          |
 
-This example generates [generic_96_wellplate_380_ul.json][]:
+This example generates [generic_96_wellplate_360ul_flat.json][]:
 
 ```js
 const options = {
@@ -96,7 +96,7 @@ const options = {
 const labware = sharedData.createRegularLabware(options)
 ```
 
-[generic_96_wellplate_380_ul.json]: ../shared-data/definitions2/generic_96_wellplate_380_ul.json
+[generic_96_wellplate_360ul_flat.json]: ../shared-data/definitions2/generic_96_wellplate_360ul_flat.json
 
 ### createIrregularLabware(options: IrregularLabwareProps): LabwareDefinition2
 
@@ -116,7 +116,7 @@ To build an _irregular_ labware, the `options` object should have the following 
 | `version`    | [Version](#Version)            | no       | Version of the definition, should be incremented if non-metadata info is altered (defaults to `1`) |
 | `namespace`  | [Namepace](#Namespace)         | no       | Defaults to "custom_beta"                                                                          |
 
-This example generates [opentrons_6x15_ml_4x50_ml_tuberack.json][]
+This example generates [opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical.json][]
 
 ```js
 const options = {
@@ -163,7 +163,7 @@ const options = {
 const labware = sharedData.createIrregularLabware(options)
 ```
 
-[opentrons_6x15_ml_4x50_ml_tuberack.json]: ../shared-data/definitions2/opentrons_6x15_ml_4x50_ml_tuberack.json
+[opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical.json]: ../shared-data/definitions2/opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical.json
 
 ### Types
 

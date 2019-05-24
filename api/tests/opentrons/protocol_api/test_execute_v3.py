@@ -4,7 +4,8 @@ from opentrons.types import Point
 from opentrons.protocol_api import execute_v3, ProtocolContext
 
 with open(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..',
-          'shared-data', 'fixtures', 'fixture12Trough.json'), 'r') as f:
+                       'shared-data', 'fixtures', 'fixture12Trough.json'),
+          'r') as f:
     custom_trough_def = json.load(f)
 
 
@@ -17,13 +18,13 @@ def test_load_labware_v2(loop):
         },
         "labware": {
             "sourcePlateId": {
-              "slot": "10",
-              "definitionId": "someTroughDef",
-              "displayName": "Source (Buffer)"
+                "slot": "10",
+                "definitionId": "someTroughDef",
+                "displayName": "Source (Buffer)"
             },
             "destPlateId": {
-              "slot": "11",
-              "definitionId": "someTroughDef"
+                "slot": "11",
+                "definitionId": "someTroughDef"
             },
         }
     }
@@ -66,7 +67,7 @@ class MockPipette(object):
 
 def test_dispatch_commands(monkeypatch, loop):
     with open(os.path.join(os.path.dirname(__file__), 'data',
-              'v3_json_dispatch.json'), 'r') as f:
+                           'v3_json_dispatch.json'), 'r') as f:
         protocol_data = json.load(f)
 
     command_log = []
@@ -80,9 +81,11 @@ def test_dispatch_commands(monkeypatch, loop):
 
     monkeypatch.setattr(ctx, 'delay', mock_delay)
 
-    source_plate = ctx.load_labware_by_name('generic_96_wellplate_380_ul', '1')
-    dest_plate = ctx.load_labware_by_name('generic_96_wellplate_380_ul', '2')
-    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_10_ul', '3')
+    source_plate = ctx.load_labware_by_name(
+        'generic_96_wellplate_360ul_flat', '1')
+    dest_plate = ctx.load_labware_by_name(
+        'generic_96_wellplate_360ul_flat', '2')
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_10ul', '3')
 
     loaded_labware = {
         'sourcePlateId': source_plate,

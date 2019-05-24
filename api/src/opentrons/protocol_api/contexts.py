@@ -111,9 +111,9 @@ class ProtocolContext(CommandPublisher):
         self.clear_commands()
 
         if fflags.short_fixed_trash():
-            trash_name = 'opentrons_1_trash_0.85_l'
+            trash_name = 'opentrons_1_trash_850ml_fixed'
         else:
-            trash_name = 'opentrons_1_trash_1.1_l'
+            trash_name = 'opentrons_1_trash_1100ml_fixed'
 
         self.load_labware_by_name(
             trash_name, '12')
@@ -1570,7 +1570,7 @@ class TemperatureModuleContext(ModuleContext):
             slot_number = 10
             temp_mod = ctx.load_module('Temperature Module', slot_number)
             temp_plate = temp_mod.load_labware(
-                'biorad_96_wellplate_pcr_200_ul')
+                'biorad_96_wellplate_200ul_pcr')
 
             temp_mod.set_temperature(45.5)
             temp_mod.wait_for_temp()
