@@ -50,6 +50,7 @@ type Props = {|
 const PLUNGER_KEYS = ['top', 'bottom', 'blowout', 'dropTip']
 const POWER_KEYS = ['plungerCurrent', 'pickUpCurrent', 'dropTipCurrent']
 const TIP_KEYS = ['dropTipSpeed', 'pickUpDistance']
+const QUIRK_KEY = 'quirks'
 
 export default class ConfigForm extends React.Component<Props> {
   getFieldsByKey(
@@ -69,7 +70,7 @@ export default class ConfigForm extends React.Component<Props> {
   }
 
   getKnownQuirks = (): Array<DisplayQuirkFieldProps> => {
-    const quirks = this.props.pipetteConfig.fields.quirks
+    const quirks = this.props.pipetteConfig.fields[QUIRK_KEY]
     if (!quirks) return []
     const quirkKeys = Object.keys(quirks)
     return quirkKeys.map(key => {
@@ -86,7 +87,6 @@ export default class ConfigForm extends React.Component<Props> {
 
   getVisibleFields = (): PipetteSettingsFieldsMap => {
     if (this.props.__showHiddenFields) return this.props.pipetteConfig.fields
-
     return pick(this.props.pipetteConfig.fields, [
       ...PLUNGER_KEYS,
       ...POWER_KEYS,
@@ -100,12 +100,16 @@ export default class ConfigForm extends React.Component<Props> {
         ...PLUNGER_KEYS,
         ...POWER_KEYS,
         ...TIP_KEYS,
+        QUIRK_KEY,
       ])
     )
   }
 
   handleSubmit = (values: FormValues) => {
     const params = mapValues(values, v => {
+      if (v === true || v === false) {
+        return { value: Boolean(v) }
+      }
       return v === '' ? null : { value: Number(v) }
     })
     this.props.updateConfig(this.props.pipette.id, { fields: { ...params } })
@@ -158,19 +162,33 @@ export default class ConfigForm extends React.Component<Props> {
     return errors
   }
 
+  getInitialValues = () => {
+    const fields = this.getVisibleFields()
+    const initialFieldValues = mapValues(fields, f => {
+      if (f.value === true || f.value === false) return f.value
+      return f.value !== f.default ? f.value.toString() : ''
+    })
+    const initialQuirkValues = this.props.pipetteConfig.fields[QUIRK_KEY]
+    const initialValues = Object.assign(
+      {},
+      initialFieldValues,
+      initialQuirkValues
+    )
+
+    return initialValues
+  }
+
   render() {
     const { parentUrl } = this.props
     const fields = this.getVisibleFields()
     const UNKNOWN_KEYS = this.getUnknownKeys()
-    const initialValues = mapValues(fields, f => {
-      return f.value !== f.default ? f.value.toString() : ''
-    })
     const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
     const powerFields = this.getFieldsByKey(POWER_KEYS, fields)
     const tipFields = this.getFieldsByKey(TIP_KEYS, fields)
     const quirkFields = this.getKnownQuirks()
     const quirksPresent = !!quirkFields[0]
     const devFields = this.getFieldsByKey(UNKNOWN_KEYS, fields)
+    const initialValues = this.getInitialValues()
 
     return (
       <Formik
