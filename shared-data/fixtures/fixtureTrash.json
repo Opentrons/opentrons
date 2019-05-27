@@ -42,12 +42,10 @@
   "brand": {
     "brand": "Opentrons"
   },
-  "grids": [
+  "groups": [
     {
       "wells": ["A1"],
-      "metadata": {
-        "wellBottomShape": ""
-      }
+      "metadata": {}
     }
   ]
 }

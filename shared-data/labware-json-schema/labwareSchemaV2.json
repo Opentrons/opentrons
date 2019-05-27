@@ -9,7 +9,7 @@
     "brandData": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["brand", "brandId", "links"],
+      "required": ["brand"],
       "properties": {
         "brand": {
           "type": "string",

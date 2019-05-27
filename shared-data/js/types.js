@@ -78,8 +78,8 @@ export type LabwareParameters = {|
 
 export type LabwareBrand = {|
   brand: string,
-  brandId: Array<string>,
-  links: Array<string>,
+  brandId?: Array<string>,
+  links?: Array<string>,
 |}
 
 type LabwareWellShapeProperties =

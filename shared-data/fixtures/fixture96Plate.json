@@ -908,7 +908,7 @@
   "brand": {
     "brand": "generic"
   },
-  "grids": [
+  "groups": [
     {
       "wells": [
         "A1",

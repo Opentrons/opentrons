@@ -255,7 +255,7 @@
     "brand": "Opentrons",
     "brandId": ["649020"]
   },
-  "grids": [
+  "groups": [
     {
       "wells": [
         "A1",
@@ -283,9 +283,7 @@
         "C6",
         "D6"
       ],
-      "metadata": {
-        "wellBottomShape": ""
-      }
+      "metadata": {}
     }
   ]
 }
