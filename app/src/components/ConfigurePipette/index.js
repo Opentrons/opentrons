@@ -80,7 +80,7 @@ function ConfigurePipette(props: Props) {
     }
 
     prevRequestState.current = configRequest
-  }, [configRequest])
+  }, [configRequest, closeModal])
 
   // TODO (ka 2019-2-12): This logic is used to get display name in slightly
   // different ways in several different files.

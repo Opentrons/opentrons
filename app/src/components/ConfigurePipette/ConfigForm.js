@@ -73,12 +73,11 @@ export default class ConfigForm extends React.Component<Props> {
     const quirks = this.props.pipetteConfig.fields[QUIRK_KEY]
     if (!quirks) return []
     const quirkKeys = Object.keys(quirks)
-    return quirkKeys.map(key => {
-      const value = quirks[key]
-      const name = key
-      const displayName = startCase(key)
+    return quirkKeys.map(name => {
+      const value = quirks[name]
+      const displayName = startCase(name)
       return {
-        [key]: value,
+        [name]: value,
         name,
         displayName,
       }
@@ -108,7 +107,7 @@ export default class ConfigForm extends React.Component<Props> {
   handleSubmit = (values: FormValues) => {
     const params = mapValues(values, v => {
       if (v === true || v === false) {
-        return { value: Boolean(v) }
+        return { value: v }
       }
       return v === '' ? null : { value: Number(v) }
     })
@@ -186,7 +185,7 @@ export default class ConfigForm extends React.Component<Props> {
     const powerFields = this.getFieldsByKey(POWER_KEYS, fields)
     const tipFields = this.getFieldsByKey(TIP_KEYS, fields)
     const quirkFields = this.getKnownQuirks()
-    const quirksPresent = !!quirkFields[0]
+    const quirksPresent = quirkFields.length > 0
     const devFields = this.getFieldsByKey(UNKNOWN_KEYS, fields)
     const initialValues = this.getInitialValues()
 
