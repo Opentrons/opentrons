@@ -1,0 +1,133 @@
+{
+  "ordering": [
+    ["A1", "B1", "C1"],
+    ["A2", "B2", "C2"],
+    ["A3", "B3"],
+    ["A4", "B4"]
+  ],
+  "otId": "f65f2960-0f76-11e9-8659-e18ed15996f5",
+  "schemaVersion": 2,
+  "version": 1,
+  "namespace": "opentrons",
+  "metadata": {
+    "displayName": "Opentrons 10 Tube Rack with Falcon 4x50 mL, 6x15 mL Conical",
+    "displayCategory": "tubeRack",
+    "displayVolumeUnits": "mL",
+    "tags": []
+  },
+  "cornerOffsetFromSlot": {
+    "x": 0.01,
+    "y": -0.02,
+    "z": 0
+  },
+  "dimensions": {
+    "xDimension": 127.75,
+    "yDimension": 85.5,
+    "zDimension": 123.76
+  },
+  "parameters": {
+    "format": "irregular",
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical"
+  },
+  "wells": {
+    "A1": {
+      "totalLiquidVolume": 15000,
+      "diameter": 14.5,
+      "shape": "circular",
+      "depth": 117.98,
+      "x": 13.88,
+      "y": 67.75,
+      "z": 5.78
+    },
+    "B1": {
+      "totalLiquidVolume": 15000,
+      "diameter": 14.5,
+      "shape": "circular",
+      "depth": 117.98,
+      "x": 13.88,
+      "y": 42.75,
+      "z": 5.78
+    },
+    "C1": {
+      "totalLiquidVolume": 15000,
+      "diameter": 14.5,
+      "shape": "circular",
+      "depth": 117.98,
+      "x": 13.88,
+      "y": 17.75,
+      "z": 5.78
+    },
+    "A2": {
+      "totalLiquidVolume": 15000,
+      "diameter": 14.5,
+      "shape": "circular",
+      "depth": 117.98,
+      "x": 38.88,
+      "y": 67.75,
+      "z": 5.78
+    },
+    "B2": {
+      "totalLiquidVolume": 15000,
+      "diameter": 14.5,
+      "shape": "circular",
+      "depth": 117.98,
+      "x": 38.88,
+      "y": 42.75,
+      "z": 5.78
+    },
+    "C2": {
+      "totalLiquidVolume": 15000,
+      "diameter": 14.5,
+      "shape": "circular",
+      "depth": 117.98,
+      "x": 38.88,
+      "y": 17.75,
+      "z": 5.78
+    },
+    "A3": {
+      "totalLiquidVolume": 50000,
+      "diameter": 26.45,
+      "shape": "circular",
+      "depth": 113.85,
+      "x": 71.38,
+      "y": 60.25,
+      "z": 5.95
+    },
+    "B3": {
+      "totalLiquidVolume": 50000,
+      "diameter": 26.45,
+      "shape": "circular",
+      "depth": 113.85,
+      "x": 71.38,
+      "y": 25.25,
+      "z": 5.95
+    },
+    "A4": {
+      "totalLiquidVolume": 50000,
+      "diameter": 26.45,
+      "shape": "circular",
+      "depth": 113.85,
+      "x": 106.38,
+      "y": 60.25,
+      "z": 5.95
+    },
+    "B4": {
+      "totalLiquidVolume": 50000,
+      "diameter": 26.45,
+      "shape": "circular",
+      "depth": 113.85,
+      "x": 106.38,
+      "y": 25.25,
+      "z": 5.95
+    }
+  },
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": [],
+    "links": [
+      "https://shop.opentrons.com/collections/opentrons-tips/products/tube-rack-set-1"
+    ]
+  }
+}

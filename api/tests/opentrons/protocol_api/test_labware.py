@@ -286,7 +286,7 @@ def test_select_next_tip():
 
 def test_previous_tip():
     labware_name = 'opentrons_96_tiprack_300ul'
-    labware_def = labware.load_definition_by_name(labware_name)
+    labware_def = labware.load_definition(labware_name)
     tiprack = labware.Labware(labware_def,
                               Location(Point(0, 0, 0), 'Test Slot'))
     # If all wells are used, we can't get a previous tip
@@ -306,7 +306,7 @@ def test_previous_tip():
 
 def test_return_tips():
     labware_name = 'opentrons_96_tiprack_300ul'
-    labware_def = labware.load_definition_by_name(labware_name)
+    labware_def = labware.load_definition(labware_name)
     tiprack = labware.Labware(labware_def,
                               Location(Point(0, 0, 0), 'Test Slot'))
     # If all wells are used, we get an error if we try to return
