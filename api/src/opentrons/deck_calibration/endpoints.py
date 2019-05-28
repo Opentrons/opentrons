@@ -355,6 +355,15 @@ async def move(data):
                 y = point[1] + pipette_config.Y_OFFSET_MULTI * 2
                 z = point[2]
                 point = (x, y, z)
+            # hack: z=150mm is not a safe point for a gen2 pipette with a tip
+            # attached, since their home location is z=+172mm and both 300ul
+            # and 1000ul tips are more than 22mm long. This isn't an issue for
+            # apiv2 because it can select the NOZZLE critical point.
+            if pipette.tip_attached and point_name == 'attachTip':
+                point = (point[0],
+                         point[1],
+                         point[2]-pipette._tip_length)
+
             pipette.move_to((session.adapter.deck, point), strategy='arc')
         else:
             if not point_name == 'attachTip':
