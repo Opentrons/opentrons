@@ -187,6 +187,16 @@ CONFIG_ELEMENTS = (
 #: normal search path.
 
 
+def escape_windows_path(p: Path) -> Path:
+    """On Windows, prefix a Path with "\\\\?\\DRIVE:\\" to avoid the system's
+    260-character path limit. If not run on Windows, passes through unchanged.
+    """
+    if os.name == 'nt':
+        return Path(f'\\\\?\\{p.drive}\\') / p
+    else:
+        return p
+
+
 def infer_config_base_dir() -> Path:
     """ Return the directory to store data in.
 
@@ -247,13 +257,14 @@ def _load_with_overrides(base) -> Dict[str, str]:
 
     for key in CONFIG_ELEMENTS:
         if key.name not in index:
+            default = escape_windows_path(key.default)
             sys.stderr.write(
-                f"New config index key {key.name}={key.default}"
+                f"New config index key {key.name}={default}"
                 "\nRewriting...\n")
             if key.kind in (ConfigElementType.DIR, ConfigElementType.FILE):
-                index[key.name] = base/key.default
+                index[key.name] = base/default
             else:
-                index[key.name] = key.default
+                index[key.name] = default
             should_write = True
 
     if should_write:
@@ -430,7 +441,7 @@ def generate_config_index(defaults: Dict[str, str],
     def parse_or_default(
             ce: ConfigElement, val: Optional[str]) -> Path:
         if not val:
-            return base / Path(ce.default)
+            return escape_windows_path(base) / ce.default
         else:
             return Path(val)
 

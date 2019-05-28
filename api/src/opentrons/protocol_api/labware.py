@@ -2,7 +2,6 @@
 import json
 import re
 import time
-import os
 import pkgutil
 import shutil
 import sys
@@ -19,16 +18,8 @@ from opentrons.config import CONFIG
 # TODO: Ian 2019-05-23 where to store these constants?
 OPENTRONS_NAMESPACE = 'opentrons'
 CUSTOM_NAMESPACE = 'custom_beta'
-
-
-def get_standard_defs_path() -> Path:
-    base_path = Path(sys.modules['opentrons'].__file__).parent /\
-        'shared_data' / 'labware' / 'definitions' / '2'
-    # Windows plain paths have max limit of 260 chars. Use UNC paths instead
-    if os.name == 'nt':
-        base_path = Path(f'\\\\?\\{base_path.drive}\\') / base_path
-
-    return base_path
+STANDARD_DEFS_BASE_PATH = Path(sys.modules['opentrons'].__file__).parent /\
+    'shared_data' / 'labware' / 'definitions' / '2'
 
 
 class WellShape(Enum):
@@ -816,7 +807,7 @@ def _read_file(filepath: str) -> dict:
 def _get_path_to_labware(load_name: str, namespace: str, version: int) -> Path:
     if namespace == OPENTRONS_NAMESPACE:
         # all labware in OPENTRONS_NAMESPACE is bundled in wheel
-        return get_standard_defs_path() / \
+        return STANDARD_DEFS_BASE_PATH / \
             load_name / f'{version}' / \
             f'{namespace}__{load_name}__{version}.json'
 
@@ -829,7 +820,7 @@ def _get_path_to_labware(load_name: str, namespace: str, version: int) -> Path:
 def _get_path_to_latest_labware(load_name: str, namespace: str) -> Path:
     # Get path to highest-versioned labware within a given namespace
     if namespace == OPENTRONS_NAMESPACE:
-        base_path = get_standard_defs_path()
+        base_path = STANDARD_DEFS_BASE_PATH
     else:
         base_path = CONFIG['labware_user_definitions_dir_v4'] / namespace
 
