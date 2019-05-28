@@ -191,7 +191,7 @@ async def modify_pipette_settings(request: web.Request) -> web.Response:
         return web.json_response(config_match, status=200)
 
     for key, value in data['fields'].items():
-        if value:
+        if value and not isinstance(value['value'], bool):
             config = value['value']
             default = config_match[key]
             if config < default['min'] or config > default['max']:

@@ -927,7 +927,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["dropTipShake"]
+      "quirks": ["dropTipShake", "doubleDropTip"]
     },
     "p+20_single_v2.0": {
       "name": "p+20_single",
@@ -1841,7 +1841,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["dropTipShake"]
+      "quirks": ["dropTipShake", "doubleDropTip"]
     },
     "p300_single_v1": {
       "name": "p300_single",
@@ -2842,7 +2842,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["dropTipShake"]
+      "quirks": ["dropTipShake", "doubleDropTip"]
     },
     "p1000_single_v1": {
       "name": "p1000_single",

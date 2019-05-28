@@ -665,6 +665,7 @@ Object {
   },
   "quirks": Array [
     "dropTipShake",
+    "doubleDropTip",
   ],
   "tipLength": Object {
     "max": 100,
@@ -2092,6 +2093,7 @@ Object {
   },
   "quirks": Array [
     "dropTipShake",
+    "doubleDropTip",
   ],
   "tipLength": Object {
     "max": 100,
@@ -3209,6 +3211,7 @@ Object {
   },
   "quirks": Array [
     "dropTipShake",
+    "doubleDropTip",
   ],
   "tipLength": Object {
     "max": 100,
