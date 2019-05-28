@@ -33,6 +33,11 @@ exports[`App component renders with definition 1`] = `
       />
     }
     detailPage={true}
+    scrollRef={
+      Object {
+        "current": null,
+      }
+    }
     sidebar={
       <Sidebar
         filters={
@@ -64,6 +69,11 @@ exports[`App component renders without definition 1`] = `
       />
     }
     detailPage={false}
+    scrollRef={
+      Object {
+        "current": null,
+      }
+    }
     sidebar={
       <Sidebar
         filters={
