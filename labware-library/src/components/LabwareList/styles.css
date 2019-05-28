@@ -30,8 +30,6 @@
   color: var(--c-blue);
   background-color: var(--c-white);
 
-  /* maximum two lines */
-  
   &:hover {
     background-color: var(--c-light-gray);
   }
