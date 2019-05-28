@@ -5,13 +5,13 @@ import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
 import cx from 'classnames'
 import { connect } from 'react-redux'
 import { DropTarget } from 'react-dnd'
+import noop from 'lodash/noop'
 import { openAddLabwareModal } from '../../../labware-ingred/actions'
 import i18n from '../../../localization'
 import type { ThunkDispatch } from '../../../types'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../../steplist'
 
 import { DND_TYPES } from '../../labware/LabwareOnDeck/constants'
-import { EmptyDestinationSlot } from './EmptyDestinationSlot'
 import styles from './LabwareOverlays.css'
 
 type OP = {|
@@ -30,8 +30,6 @@ const SlotControls = ({
   ...restProps
 }: Props) => {
   if (selectedTerminalItemId !== START_TERMINAL_ITEM_ID) return null
-  // if (restProps.isOver) {
-  console.log('rest props', restProps)
   const { isOver } = restProps
   return restProps.connectDropTarget(
     <g>
@@ -42,14 +40,12 @@ const SlotControls = ({
         height={slot.boundingBox.yDimension}
         innerDivProps={{
           className: cx(styles.slot_overlay, styles.appear_on_mouseover),
-          onClick: addLabware,
+          onClick: isOver ? noop : addLabware,
         }}
       >
         <a className={styles.overlay_button} onClick={addLabware}>
-          <Icon className={styles.overlay_icon} name="plus" />
-          {isOver
-            ? i18n.t('deck.overlay.slot.place_here')
-            : i18n.t('deck.overlay.slot.add_labware')}
+          {!isOver && <Icon className={styles.overlay_icon} name="plus" />}
+          {i18n.t(`deck.overlay.slot.${isOver ? 'place_here' : 'add_labware'}`)}
         </a>
       </RobotCoordsForeignDiv>
     </g>
