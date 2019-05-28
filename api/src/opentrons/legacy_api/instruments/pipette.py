@@ -1293,10 +1293,10 @@ class Pipette(CommandPublisher):
             will be used for each transfer. Default is 'once'.
 
         trash : boolean
-            If `False` (default behavior) tips will be returned to their
-            tip rack. If `True` and a trash container has been attached
+            If `True` (default behavior) and trash container has been attached
             to this `Pipette`, then the tip will be sent to the trash
             container.
+            If `False`, then tips will be returned to their associated tiprack.
 
         touch_tip : boolean
             If `True`, a :any:`touch_tip` will occur following each

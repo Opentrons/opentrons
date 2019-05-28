@@ -1128,6 +1128,7 @@ class InstrumentContext(CommandPublisher):
                  volume: Union[float, Sequence[float]],
                  source,
                  dest,
+                 trash=True,
                  **kwargs) -> 'InstrumentContext':
         # source: Union[Well, List[Well], List[List[Well]]],
         # dest: Union[Well, List[Well], List[List[Well]]],
@@ -1166,10 +1167,9 @@ class InstrumentContext(CommandPublisher):
                 - 'always': use a new tip for each transfer.
 
             * *trash* (``boolean``) --
-              If `False` (default behavior), tips will be
-              returned to their tip rack. If `True` and a trash
-              container has been attached to this `Pipette`,
-              then the tip will be sent to the trash container.
+              If `True` (default behavior), tips will be
+              dropped in the trash container attached this `Pipette`.
+              If `False` tips will be returned to tiprack.
 
             * *touch_tip* (``boolean``) --
               If `True`, a :py:meth:`touch_tip` will occur following each
@@ -1240,7 +1240,7 @@ class InstrumentContext(CommandPublisher):
         else:
             mix_strategy = transfers.MixStrategy.NEVER
 
-        if kwargs.get('trash'):
+        if trash:
             drop_tip = transfers.DropTipStrategy.TRASH
         else:
             drop_tip = transfers.DropTipStrategy.RETURN
