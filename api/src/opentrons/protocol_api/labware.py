@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 from collections import defaultdict
 from enum import Enum, auto
+from hashlib import sha256
 from itertools import takewhile, dropwhile
 from typing import Any, List, Dict, Optional, Union
 
@@ -716,6 +717,14 @@ class ThermocyclerGeometry(ModuleGeometry):
         return self._labware
 
 
+def _hash_labware_def(labware: Dict[str, Any]) -> str:
+    # remove keys that do not affect run
+    blacklist = ['metadata', 'brand']
+    def_no_metadata = {k: labware[k] for k in labware if k not in blacklist}
+    sorted_def_str = json.dumps(def_no_metadata, sort_keys=True)
+    return sha256(sorted_def_str.encode('utf-8')).hexdigest()
+
+
 def save_calibration(labware: Labware, delta: Point):
     """
     Function to be used whenever an updated delta is found for the first well
@@ -726,7 +735,8 @@ def save_calibration(labware: Labware, delta: Point):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
     if not calibration_path.exists():
         calibration_path.mkdir(parents=True, exist_ok=True)
-    labware_offset_path = calibration_path/'{}.json'.format(labware._id)
+    labware_hash = _hash_labware_def(labware._definition)
+    labware_offset_path = calibration_path/'{}.json'.format(labware_hash)
     calibration_data = _helper_offset_data_format(
         str(labware_offset_path), delta)
     with labware_offset_path.open('w') as f:
@@ -744,7 +754,8 @@ def save_tip_length(labware: Labware, length: float):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
     if not calibration_path.exists():
         calibration_path.mkdir(parents=True, exist_ok=True)
-    labware_offset_path = calibration_path/'{}.json'.format(labware._id)
+    labware_hash = _hash_labware_def(labware._definition)
+    labware_offset_path = calibration_path/'{}.json'.format(labware_hash)
     calibration_data = _helper_tip_length_data_format(
         str(labware_offset_path), length)
     with labware_offset_path.open('w') as f:
@@ -757,7 +768,8 @@ def load_calibration(labware: Labware):
     Look up a calibration if it exists and apply it to the given labware.
     """
     calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
-    labware_offset_path = calibration_path/'{}.json'.format(labware._id)
+    labware_hash = _hash_labware_def(labware._definition)
+    labware_offset_path = calibration_path/'{}.json'.format(labware_hash)
     if labware_offset_path.exists():
         calibration_data = _read_file(str(labware_offset_path))
         offset_array = calibration_data['default']['offset']
