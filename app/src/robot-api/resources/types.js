@@ -78,6 +78,7 @@ export type RobotSettingsFieldUpdate = {|
 
 export type PipetteSettingsFieldsMap = {|
   [fieldId: string]: PipetteSettingsField,
+  quirks?: PipetteQuirksField,
 |}
 
 export type PipetteSettingsField = {|
@@ -88,6 +89,10 @@ export type PipetteSettingsField = {|
   units?: string,
   type?: string,
 |}
+
+export type PipetteQuirksField = {
+  [quirkId: string]: boolean,
+}
 
 export type PipetteSettingsUpdate = {|
   fields: {|
