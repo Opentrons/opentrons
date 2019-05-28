@@ -122,7 +122,10 @@ button.load_name_button {
 }
 
 .well_bottom_icon {
+  align-self: flex-end;
   width: var(--spacing-6);
   margin-left: var(--spacing-3);
+  padding-bottom: calc(var(--spacing-1));
   overflow: visible;
+  color: var(--c-font-icon);
 }
