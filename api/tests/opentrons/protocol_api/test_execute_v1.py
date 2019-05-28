@@ -43,7 +43,7 @@ async def test_load_pipettes(loop, protocol_data):
 @pytest.mark.parametrize('command_type', ['aspirate', 'dispense'])
 def test_get_location_with_offset(loop, command_type):
     ctx = ProtocolContext(loop=loop)
-    plate = ctx.load_labware_by_name("generic_96_wellplate_380_ul", 1)
+    plate = ctx.load_labware_by_name("generic_96_wellplate_340ul_flat", 1)
     well = "B2"
 
     default_values = {
@@ -91,19 +91,19 @@ def test_load_labware(loop):
     data = {
         "labware": {
             "sourcePlateId": {
-              "slot": "10",
-              "model": "usa_scientific_12_trough_22_ml",
-              "display-name": "Source (Buffer)"
+                "slot": "10",
+                "model": "usascientific_12_reservoir_22ml",
+                "display-name": "Source (Buffer)"
             },
             "destPlateId": {
-              "slot": "11",
-              "model": "generic_96_wellplate_380_ul",
-              "display-name": "Destination Plate"
+                "slot": "11",
+                "model": "generic_96_wellplate_340ul_flat",
+                "display-name": "Destination Plate"
             },
             "oldPlateId": {
-              "slot": "9",
-              "model": "96-flat",
-              "display-name": "Test Plate"
+                "slot": "9",
+                "model": "96-flat",
+                "display-name": "Test Plate"
             },
         }
     }
@@ -114,7 +114,8 @@ def test_load_labware(loop):
     assert 'Source (Buffer)' in str(loaded_labware['sourcePlateId'])
     assert loaded_labware['destPlateId'] == ctx.loaded_labwares[11]
     assert 'Destination Plate' in str(loaded_labware['destPlateId'])
-    assert loaded_labware['oldPlateId'].name == 'generic_96_wellplate_380_ul'
+    assert loaded_labware['oldPlateId'].name == \
+        'generic_96_wellplate_340ul_flat'
     assert 'Test Plate' in str(loaded_labware['oldPlateId'])
 
 
@@ -135,7 +136,7 @@ def test_load_labware_trash(loop):
 
 def test_dispatch_commands(monkeypatch, loop):
     with open(os.path.join(os.path.dirname(__file__), 'data',
-              'v1_json_dispatch.json'), 'r') as f:
+                           'v1_json_dispatch.json'), 'r') as f:
         protocol_data = json.load(f)
     ctx = ProtocolContext(loop=loop)
     cmd = []
@@ -155,8 +156,10 @@ def test_dispatch_commands(monkeypatch, loop):
 
     insts = execute_v1.load_pipettes_from_json(ctx, protocol_data)
 
-    source_plate = ctx.load_labware_by_name('generic_96_wellplate_380_ul', '1')
-    dest_plate = ctx.load_labware_by_name('generic_96_wellplate_380_ul', '2')
+    source_plate = ctx.load_labware_by_name(
+        'generic_96_wellplate_340ul_flat', '1')
+    dest_plate = ctx.load_labware_by_name(
+        'generic_96_wellplate_340ul_flat', '2')
 
     loaded_labware = {
         'sourcePlateId': source_plate,

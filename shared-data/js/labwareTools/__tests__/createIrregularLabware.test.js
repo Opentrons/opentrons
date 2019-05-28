@@ -169,23 +169,25 @@ describe('test createIrregularLabware function', () => {
           totalLiquidVolume: 2000,
         },
       ],
+      totalWellCount: 10,
       units: 'µL',
       displayCategory: 'wellPlate',
       brand: 'some brand',
     })
 
-    expect(loadName).toEqual('somebrand_6x400_ul_4x2000_ul_wellplate')
+    expect(loadName).toEqual('somebrand_10_wellplate_6x400ul_4x2000ul')
   })
 
   test('labware loadName generated correctly for multi-grid labware in other units', () => {
     const loadName = _generateIrregularLoadName({
       grid: [{ row: 3, column: 2 }],
       well: [{ depth: 20, shape: 'circular', totalLiquidVolume: 4000 }],
+      totalWellCount: 6,
       units: 'mL',
       displayCategory: 'wellPlate',
       brand: 'some brand',
     })
 
-    expect(loadName).toEqual('somebrand_6x4_ml_wellplate')
+    expect(loadName).toEqual('somebrand_6_wellplate_6x4ml')
   })
 })

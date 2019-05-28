@@ -154,20 +154,21 @@ function determineIrregularLayout(
 export function _generateIrregularLoadName(args: {
   grid: Array<Cell>,
   well: Array<InputWell>,
+  totalWellCount: number,
   units: VolumeUnits,
   brand: string,
   displayCategory: string,
 }): string {
-  const { grid, well, units, brand, displayCategory } = args
+  const { grid, well, totalWellCount, units, brand, displayCategory } = args
   const loadNameUnits = getAsciiVolumeUnits(units)
   const wellComboArray = grid.map((gridObj, gridIdx) => {
     const numWells = gridObj.row * gridObj.column
     const wellVolume = getDisplayVolume(well[gridIdx].totalLiquidVolume, units)
 
-    return `${numWells}x${wellVolume}_${loadNameUnits}`
+    return `${numWells}x${wellVolume}${loadNameUnits}`
   })
 
-  return createName([brand, wellComboArray, displayCategory])
+  return createName([brand, totalWellCount, displayCategory, wellComboArray])
 }
 
 // Decide order of wells for single grid containers
@@ -258,8 +259,10 @@ export function createRegularLabware(args: RegularLabwareProps): Definition {
     brand.brand,
     numWells,
     metadata.displayCategory,
-    getDisplayVolume(well.totalLiquidVolume, metadata.displayVolumeUnits),
-    getAsciiVolumeUnits(metadata.displayVolumeUnits),
+    `${getDisplayVolume(
+      well.totalLiquidVolume,
+      metadata.displayVolumeUnits
+    )}${getAsciiVolumeUnits(metadata.displayVolumeUnits)}`,
   ])
 
   return validateDefinition({
@@ -295,6 +298,7 @@ export function createIrregularLabware(
   const loadName = _generateIrregularLoadName({
     grid,
     well,
+    totalWellCount: Object.keys(wells).length,
     units: metadata.displayVolumeUnits,
     displayCategory: metadata.displayCategory,
     brand: brand.brand,

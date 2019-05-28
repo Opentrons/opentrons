@@ -11,7 +11,7 @@
   "parameters": {
     "format": "irregular",
     "isTiprack": false,
-    "loadName": "generic_6_wellplate_1_ml",
+    "loadName": "generic_6_wellplate_1ml",
     "isMagneticModuleCompatible": false
   },
   "schemaVersion": 2,

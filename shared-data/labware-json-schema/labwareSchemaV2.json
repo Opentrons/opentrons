@@ -51,7 +51,7 @@
           "type": "string"
         },
         "displayCategory": {
-          "description": "Label used in UI to categorize labware",
+          "description": "Label(s) used in UI to categorize labware",
           "type": "string",
           "enum": [
             "tipRack",
@@ -82,6 +82,10 @@
       "additionalProperties": false,
       "required": ["brand"],
       "properties": {
+        "brand": {
+          "type": "string",
+          "description": "Brand/manufacturer name"
+        },
         "brandId": {
           "type": "array",
           "description": "An array of manufacture numbers pertaining to a given labware",
@@ -89,8 +93,12 @@
             "type": "string"
           }
         },
-        "brand": {
-          "type": "string"
+        "links": {
+          "type": "array",
+          "description": "URLs for manufacturer page(s)",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

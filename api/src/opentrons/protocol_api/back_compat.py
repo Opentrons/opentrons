@@ -34,6 +34,7 @@ class BCRobot:
 
     For more information see :py:class:`.ProtocolContext`.
     """
+
     def __init__(self,
                  hardware: hc.adapters.SingletonAdapter,
                  protocol_ctx: ProtocolContext) -> None:
@@ -79,6 +80,7 @@ class AddInstrumentCtors(type):
         This is a separate function so that the `proper_name` is correctly
         caught in the closure that it returns.
         """
+
         def initializer(
                 self,
                 mount: str,
@@ -172,6 +174,7 @@ class BCInstruments(metaclass=AddInstrumentCtors):
     of :py:class:`.ProtocolContext`. For information on how to replace calls to
     methods of this class, see the method documentation.
     """
+
     def __init__(self, ctx: ProtocolContext) -> None:
         self._ctx = ctx
 
@@ -187,6 +190,7 @@ class BCLabware:
     :py:class:`.ProtocolContext`. For information on how to replace calls to
     methods of this class, see the method documentation.
     """
+
     def __init__(self, ctx: ProtocolContext) -> None:
         self._ctx = ctx
 
@@ -209,25 +213,25 @@ class BCLabware:
     LW_TRANSLATION = {
         '12-well-plate': 'corning_12_wellplate_6.9_ml',
         '24-well-plate': 'corning_24_wellplate_3.4_ml',
-        '384-plate': 'corning_384_wellplate_112_ul',
+        '384-plate': 'corning_384_wellplate_112ul_flat',
         '48-well-plate': 'corning_48_wellplate_1.6_ml',
-        '6-well-plate': 'corning_6_wellplate_16.8_ml',
-        '96-PCR-flat': 'biorad_96_wellplate_pcr_200_ul',
-        '96-flat': 'generic_96_wellplate_380_ul',
-        'biorad-hardshell-96-PCR': 'biorad_96_wellplate_pcr_200_ul',
-        'opentrons-aluminum-block-2ml-eppendorf': 'opentrons_24_aluminum_tuberack_2_ml',       # noqa(E501)
-        'opentrons-aluminum-block-2ml-screwcap': 'opentrons_24_aluminum_tuberack_2_ml',        # noqa(E501)
+        '6-well-plate': 'corning_6_wellplate_16.8ml_flat',
+        '96-PCR-flat': 'biorad_96_wellplate_200ul_pcr',
+        '96-flat': 'generic_96_wellplate_340ul_flat',
+        'biorad-hardshell-96-PCR': 'biorad_96_wellplate_200ul_pcr',
+        'opentrons-aluminum-block-2ml-eppendorf': 'opentrons_24_aluminumblock_generic_2ml_screwcap',       # noqa(E501)
+        'opentrons-aluminum-block-2ml-screwcap': 'opentrons_24_aluminumblock_generic_2ml_screwcap',        # noqa(E501)
         'opentrons-aluminum-block-96-PCR-plate': 'opentrons_96_aluminum_biorad_plate_200_ul',  # noqa(E501)
-        'opentrons-tiprack-300ul': 'opentrons_96_tiprack_300_ul',
-        'opentrons-tuberack-1.5ml-eppendorf': 'opentrons_24_tuberack_1.5_ml_eppendorf',        # noqa(E501)
-        'opentrons-tuberack-15_50ml': 'opentrons_6x15_ml_4x50_ml_tuberack',
+        'opentrons-tiprack-300ul': 'opentrons_96_tiprack_300ul',
+        'opentrons-tuberack-1.5ml-eppendorf': 'opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap',        # noqa(E501)
+        'opentrons-tuberack-15_50ml': 'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical',        # noqa(E501)
         'opentrons-tuberack-15ml': 'opentrons_15_tuberack_15_ml_falcon',
-        'opentrons-tuberack-2ml-eppendorf': 'opentrons_24_tuberack_2_ml_eppendorf',            # noqa(E501)
-        'opentrons-tuberack-2ml-screwcap': 'opentrons_24_tuberack_2_ml_screwcap',              # noqa(E501)
-        'opentrons-tuberack-50ml': 'opentrons_6_tuberack_falcon_50_ml',
-        'tiprack-1000ul': 'opentrons_96_tiprack_1000_ul',
-        'tiprack-10ul': 'opentrons_96_tiprack_10_ul',
-        'trough-12row': 'usa_scientific_12_trough_22_ml'
+        'opentrons-tuberack-2ml-eppendorf': 'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap',            # noqa(E501)
+        'opentrons-tuberack-2ml-screwcap': 'opentrons_24_tuberack_generic_2ml_screwcap',              # noqa(E501)
+        'opentrons-tuberack-50ml': 'opentrons_6_tuberack_falcon_50ml_conical',
+        'tiprack-1000ul': 'opentrons_96_tiprack_1000ul',
+        'tiprack-10ul': 'opentrons_96_tiprack_10ul',
+        'trough-12row': 'usascientific_12_reservoir_22ml'
     }
     """ A table mapping old labware names to new labware names"""
 
@@ -258,7 +262,7 @@ class BCLabware:
 
         return self._ctx.load_labware_by_name(name, slot, label)
 
-    def create(self,  *args, **kwargs):
+    def create(self, *args, **kwargs):
         raise NotImplementedError
 
     def list(self, *args, **kwargs):

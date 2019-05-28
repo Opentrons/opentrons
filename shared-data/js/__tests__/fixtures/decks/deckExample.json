@@ -209,7 +209,7 @@
       {
         "id": "fixedTrash",
         "slot": "12",
-        "labware": "opentrons_1_trash_1.1_l",
+        "labware": "opentrons_1_trash_1100ml_fixed",
         "displayName": "Fixed Trash"
       }
     ]

@@ -36,7 +36,7 @@
     "format": "trough",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "usa_scientific_12_trough_22_ml",
+    "loadName": "usascientific_12_reservoir_22ml",
     "quirks": ["centerMultichannelOnWells"]
   },
   "wells": {
