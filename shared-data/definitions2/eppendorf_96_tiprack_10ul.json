@@ -18,7 +18,7 @@
   "version": 1,
   "namespace": "opentrons",
   "metadata": {
-    "displayName": "Eppendorf 96 Tip Rack 10 µL",
+    "displayName": "Eppendorf epT.I.P.S. 96 Tip Rack 10 µL",
     "displayVolumeUnits": "µL",
     "displayCategory": "tipRack",
     "tags": []
@@ -39,7 +39,7 @@
     "isMagneticModuleCompatible": false,
     "tipLength": 34,
     "tipOverlap": 1,
-    "loadName": "eppendorf_96_tiprack_10ul"
+    "loadName": "eppendorf_96_tiprack_10ul_eptips"
   },
   "wells": {
     "H1": {
