@@ -20,7 +20,7 @@
   "metadata": {
     "displayName": "USA Scientific 12 Well Reservoir 22 mL",
     "displayVolumeUnits": "mL",
-    "displayCategory": "trough",
+    "displayCategory": "reservoir",
     "tags": []
   },
   "cornerOffsetFromSlot": {
@@ -162,6 +162,27 @@
       "z": 2.29
     }
   },
+  "groups": [
+    {
+      "wells": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "A6",
+        "A7",
+        "A8",
+        "A9",
+        "A10",
+        "A11",
+        "A12"
+      ],
+      "metadata": {
+        "wellBottomShape": "v"
+      }
+    }
+  ],
   "brand": {
     "brand": "USA Scientific",
     "brandId": ["1061-8150"],
