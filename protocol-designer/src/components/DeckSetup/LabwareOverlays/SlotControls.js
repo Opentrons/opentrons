@@ -33,24 +33,26 @@ const SlotControls = ({
   // if (restProps.isOver) {
   console.log('rest props', restProps)
   const { isOver } = restProps
-  return restProps.connectDropTarget(restProps.render({ isOver }))
-  // }
-  // return (
-  //   <RobotCoordsForeignDiv
-  //     x={slot.position[0]}
-  //     y={slot.position[1]}
-  //     width={slot.boundingBox.xDimension}
-  //     height={slot.boundingBox.yDimension}
-  //     innerDivProps={{
-  //       className: cx(styles.slot_overlay, styles.appear_on_mouseover),
-  //       onClick: addLabware,
-  //     }}
-  //   >
-  //     <a className={styles.overlay_button} onClick={addLabware}>
-  //       <Icon className={styles.overlay_icon} name="plus" />
-  //       {i18n.t('deck.overlay.slot.add_labware')}
-  //     </a>
-  //   </RobotCoordsForeignDiv>
+  return restProps.connectDropTarget(
+    <g>
+      <RobotCoordsForeignDiv
+        x={slot.position[0]}
+        y={slot.position[1]}
+        width={slot.boundingBox.xDimension}
+        height={slot.boundingBox.yDimension}
+        innerDivProps={{
+          className: cx(styles.slot_overlay, styles.appear_on_mouseover),
+          onClick: addLabware,
+        }}
+      >
+        <a className={styles.overlay_button} onClick={addLabware}>
+          <Icon className={styles.overlay_icon} name="plus" />
+          {isOver
+            ? i18n.t('deck.overlay.slot.place_here')
+            : i18n.t('deck.overlay.slot.add_labware')}
+        </a>
+      </RobotCoordsForeignDiv>
+    </g>
   )
 }
 
