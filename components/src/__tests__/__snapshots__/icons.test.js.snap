@@ -616,6 +616,21 @@ exports[`icons ot-file renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons ot-flat-bottom renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 24 24"
+>
+  <path
+    d="M23 0h1v24H0V0h1v23h22z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons ot-logo renders correctly 1`] = `
 <svg
   aria-hidden="true"
@@ -716,6 +731,36 @@ exports[`icons ot-transfer renders correctly 1`] = `
 >
   <path
     d="M0 10.8h15.5V8l8.5 5-8.5 4.9v-2.8H0z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons ot-u-bottom renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 24 24"
+>
+  <path
+    d="M0 0h1v12c0 6.075 4.925 11 11 11s11-4.925 11-11V0h1v12c0 6.627-5.373 12-12 12S0 18.627 0 12V0z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons ot-v-bottom renders correctly 1`] = `
+<svg
+  aria-hidden="true"
+  className="foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 24 24"
+>
+  <path
+    d="M23 0h1v12a.5.5 0 0 1-.146.354l-11.5 11.5a.5.5 0 0 1-.708 0l-11.5-11.5A.5.5 0 0 1 0 12V0h1v11.793l11 11 11-11V0z"
     fillRule="evenodd"
   />
 </svg>
