@@ -1,6 +1,5 @@
 # Inspired by:
 # https://hynek.me/articles/sharing-your-labor-of-love-pypi-quick-and-dirty/
-import fcntl
 import sys
 import codecs
 import os
@@ -11,8 +10,10 @@ from setuptools.command import build_py, sdist
 import json
 
 # make stdout non-blocking for Travis
-flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL)
-fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags & ~os.O_NONBLOCK)
+if os.name == 'posix':
+    import fcntl
+    flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL)
+    fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags & ~os.O_NONBLOCK)
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
