@@ -26,7 +26,7 @@ def get_standard_defs_path() -> Path:
         'shared_data' / 'labware' / 'definitions' / '2'
     # Windows plain paths have max limit of 260 chars. Use UNC paths instead
     if os.name == 'nt':
-        base_path = Path(f'\\\\{base_path.drive}') / base_path
+        base_path = Path(f'\\\\?') / base_path
 
     return base_path
 
