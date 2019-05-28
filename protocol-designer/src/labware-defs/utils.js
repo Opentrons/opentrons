@@ -16,6 +16,9 @@ const definitionsContext = require.context(
 let definitions = null
 
 // TODO: BC: 2019-05-10 change to def.loadName once it gets moved up
+// TODO: BC&IL: 2019-05-28 this won't work once there are multiple versions
+// of labware in shared-data/labware/definitions/2 - but it's appropriate for now,
+//  we'll have to refactor this soon anyway
 export function getAllDefinitions(): LabwareDefByDefId {
   // NOTE: unlike labware-library, no filtering out trashes here (we need 'em)
   // also, more convenient & performant to make a map {otId: def} not an array

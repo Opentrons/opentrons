@@ -145,7 +145,6 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
   getLabwareEntities,
   getPipetteEntities,
   (initialSetupStep, labwareEntities, pipetteEntities) => {
-    console.table({ labwareEntities })
     assert(
       initialSetupStep && initialSetupStep.stepType === 'manualIntervention',
       'expected initial deck setup step to be "manualIntervention" step'
