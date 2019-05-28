@@ -40,13 +40,8 @@ def load_labware(protocol_data):
                 # pass in the pre-existing fixed-trash
                 loaded_labware[labware_id] = robot.fixed_trash
             else:
-                # share the slot with the fixed-trash
-                loaded_labware[labware_id] = robot.add_container_by_definition(
-                    definition,
-                    slot,
-                    label=display_name,
-                    share=True
-                )
+                raise RuntimeError(
+                    'Only fixed trash labware can be placed in slot 12')
         else:
             loaded_labware[labware_id] = robot.add_container_by_definition(
                 definition,
