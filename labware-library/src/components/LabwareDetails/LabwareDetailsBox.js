@@ -25,11 +25,7 @@ export default function LabwareDetailsBox(props: LabwareDetailsBoxProps) {
   const { metadata, brand, wells } = definition
   const { displayCategory, displayVolumeUnits } = metadata
   const wellGroups = getUniqueWellProperties(definition)
-
-  // TODO(mc, 2019-05-20): clarify this logic with UX. If this logic is
-  // correct, this will require additional checks for aluminum blocks once
-  // that's a thing and data is in place
-  const hasInserts = displayCategory === 'tubeRack'
+  const hasInserts = wellGroups.some(g => g.metadata.displayCategory)
   const irregular = wellGroups.length > 1
 
   return (
@@ -44,41 +40,50 @@ export default function LabwareDetailsBox(props: LabwareDetailsBoxProps) {
             <WellProperties
               wellProperties={wellGroups[0]}
               displayVolumeUnits={displayVolumeUnits}
+              hideTitle
             />
           )}
           <Dimensions
             definition={definition}
             className={styles.details_table}
           />
-          {wellGroups.map((wellProps, i) => (
-            <React.Fragment key={i}>
-              {!hasInserts && irregular && (
-                <>
-                  <WellCount
-                    className={styles.irregular_well_count}
-                    displayCategory={displayCategory}
-                    count={wellProps.wellCount}
-                  />
-                  <WellProperties
+          {wellGroups.map((wellProps, i) => {
+            const { metadata: groupMetadata } = wellProps
+            const groupDisplaySuffix = groupMetadata.displayName
+              ? ` - ${groupMetadata.displayName}`
+              : ''
+
+            return (
+              <React.Fragment key={i}>
+                {!groupMetadata.displayCategory && irregular && (
+                  <>
+                    <WellCount
+                      className={styles.irregular_well_count}
+                      displayCategory={displayCategory}
+                      count={wellProps.wellCount}
+                    />
+                    <WellProperties
+                      wellProperties={wellProps}
+                      displayVolumeUnits={displayVolumeUnits}
+                      hideTitle
+                    />
+                  </>
+                )}
+                {!groupMetadata.displayCategory && (
+                  <WellDimensions
+                    title={`${MEASUREMENTS}${groupDisplaySuffix}`}
                     wellProperties={wellProps}
-                    displayVolumeUnits={displayVolumeUnits}
+                    className={styles.details_table}
                   />
-                </>
-              )}
-              {!hasInserts && (
-                <WellDimensions
-                  title={`${MEASUREMENTS}${irregular ? ` - Group ${i}` : ''}`}
+                )}
+                <WellSpacing
+                  title={`${SPACING}${groupDisplaySuffix}`}
                   wellProperties={wellProps}
                   className={styles.details_table}
                 />
-              )}
-              <WellSpacing
-                title={`${SPACING}${irregular ? ` - Group ${i}` : ''}`}
-                wellProperties={wellProps}
-                className={styles.details_table}
-              />
-            </React.Fragment>
-          ))}
+              </React.Fragment>
+            )
+          })}
         </div>
       </DetailsBox>
       {hasInserts && <InsertDetails definition={definition} />}

@@ -69,7 +69,7 @@ function Title(props: LabwareCardProps) {
   return (
     <Link to={`${getPublicPath()}${loadName}`}>
       <h2 className={styles.title}>
-        {displayName}
+        <span className={styles.title_text}>{displayName}</span>
         <Icon className={styles.title_icon} name="chevron-right" />
       </h2>
     </Link>

@@ -3,14 +3,18 @@
 // TODO(mc, 2019-03-18): move to shared-data?
 import * as React from 'react'
 import { Route } from 'react-router-dom'
-import find from 'lodash/find'
-import flatten from 'lodash/flatten'
+import isEqual from 'lodash/isEqual'
+import uniqBy from 'lodash/uniqBy'
+import uniqWith from 'lodash/uniqWith'
 import round from 'lodash/round'
+import orderBy from 'lodash/orderBy'
 import { getPublicPath } from './public-path'
 
 import type { ContextRouter } from 'react-router-dom'
 import type {
   LabwareList,
+  LabwareWell,
+  LabwareWellShapeProperties,
   LabwareWellGroupProperties,
   LabwareDefinition,
 } from './types'
@@ -43,51 +47,66 @@ export function getDefinition(loadName: ?string): LabwareDefinition | null {
   return def || null
 }
 
-// TODO(mc, 2019-03-21): move to shared data
 export function getUniqueWellProperties(
   definition: LabwareDefinition
 ): Array<LabwareWellGroupProperties> {
-  const { ordering, wells, dimensions } = definition
+  const { groups, wells, dimensions } = definition
 
-  return flatten(ordering).reduce(
-    (groups: Array<LabwareWellGroupProperties>, k: string) => {
-      const { x, y, z, ...props } = wells[k]
-      const groupBase = {
-        xStart: x,
-        yStart: y,
-        xOffsetFromLeft: x,
-        yOffsetFromTop: dimensions.yDimension - y,
-        xSpacing: 0,
-        ySpacing: 0,
-        wellCount: 0,
+  return groups.map(group => {
+    const wellProps = orderBy(
+      group.wells.map(n => wells[n]),
+      ['x', 'y'],
+      ['asc', 'desc']
+    )
+    const wellDepths = wellProps.map<number>(w => w.depth)
+    const wellVolumes = wellProps.map<number>(w => w.totalLiquidVolume)
+    const wellShapes = wellProps.map<LabwareWellShapeProperties>(
+      (well: LabwareWell) =>
+        well.shape === 'circular'
+          ? { shape: well.shape, diameter: well.diameter }
+          : {
+              shape: well.shape,
+              xDimension: well.xDimension,
+              yDimension: well.yDimension,
+            }
+    )
+
+    const xStart = wellProps[0].x
+    const yStart = wellProps[0].y
+
+    return {
+      metadata: group.metadata,
+      brand: group.brand || null,
+      xSpacing: getSpacing(wellProps, 'x'),
+      ySpacing: getSpacing(wellProps, 'y'),
+      xOffsetFromLeft: xStart,
+      yOffsetFromTop: dimensions.yDimension - yStart,
+      wellCount: wellProps.length,
+      depth: getIfConsistent(wellDepths),
+      totalLiquidVolume: getIfConsistent(wellVolumes),
+      shape: getIfConsistent(wellShapes),
+    }
+  })
+}
+
+function getIfConsistent<T>(items: Array<T>): T | null {
+  return uniqWith(items, isEqual).length === 1 ? items[0] : null
+}
+
+function getSpacing(wells: Array<LabwareWell>, axis: 'x' | 'y'): number | null {
+  return uniqBy<LabwareWell>(wells, axis).reduce<number | null>(
+    (spacing, well, index, uniqueWells) => {
+      if (index > 0) {
+        const prev = uniqueWells[index - 1]
+        const currentSpacing = Math.abs(round(well[axis] - prev[axis], 2))
+
+        return spacing === 0 || spacing === currentSpacing
+          ? currentSpacing
+          : null
       }
-      let group: ?LabwareWellGroupProperties = find(groups, props)
-
-      // these ifs are overly specific and duplicated to make flow happy
-      if (!group && props.shape === 'circular') {
-        group = { ...props, ...groupBase }
-        groups.push(group)
-      } else if (!group && props.shape === 'rectangular') {
-        group = { ...props, ...groupBase }
-        groups.push(group)
-      }
-
-      if (group) {
-        group.wellCount += 1
-
-        if (!group.xSpacing && y === group.yStart) {
-          // we've hit the first well in ordering that matches the group's
-          // starting well's y position, so use its x position to set spacing
-          group.xSpacing = round(x - group.xStart, 2)
-        } else if (!group.ySpacing && x === group.xStart) {
-          // same as above, but for the y spacing
-          group.ySpacing = round(group.yStart - y, 2)
-        }
-      }
-
-      return groups
+      return spacing
     },
-    []
+    0
   )
 }
 

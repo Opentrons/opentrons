@@ -279,7 +279,7 @@
               "wellBottomShape": {
                 "type": "string",
                 "description": "Bottom shape of the well for UI purposes",
-                "enum": ["flat", "u", "v", "other"]
+                "enum": ["flat", "u", "v"]
               }
             }
           },

@@ -1,7 +1,9 @@
 // @flow
 import type {
   LabwareDefinition2 as LabwareDefinition,
-  LabwareWellProperties,
+  LabwareWellShapeProperties,
+  LabwareWellGroupMetadata,
+  LabwareBrand,
 } from '@opentrons/shared-data'
 
 export type {
@@ -9,22 +11,26 @@ export type {
   LabwareParameters,
   LabwareOffset,
   LabwareWell,
+  LabwareWellShapeProperties,
   LabwareWellProperties,
   LabwareWellMap,
+  LabwareWellGroupMetadata,
   LabwareVolumeUnits,
   LabwareDisplayCategory,
   LabwareBrand,
 } from '@opentrons/shared-data'
 
 export type LabwareWellGroupProperties = {|
-  ...LabwareWellProperties,
-  xStart: number,
-  yStart: number,
   xOffsetFromLeft: number,
   yOffsetFromTop: number,
-  xSpacing: number,
-  ySpacing: number,
+  xSpacing: number | null,
+  ySpacing: number | null,
   wellCount: number,
+  shape: LabwareWellShapeProperties | null,
+  depth: number | null,
+  totalLiquidVolume: number | null,
+  metadata: LabwareWellGroupMetadata,
+  brand: LabwareBrand | null,
 |}
 
 export type LabwareList = Array<LabwareDefinition>

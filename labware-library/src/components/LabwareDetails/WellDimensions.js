@@ -20,19 +20,19 @@ export type WellDimensionsProps = {|
 
 export default function WellDimensions(props: WellDimensionsProps) {
   const { title, wellProperties, className } = props
+  const { shape } = wellProperties
+  const dimensions = [{ label: DEPTH, value: wellProperties.depth }]
 
-  const dimensions = [
-    { label: DEPTH, value: toFixed(wellProperties.depth) },
-    wellProperties.diameter != null
-      ? { label: DIAMETER, value: toFixed(wellProperties.diameter) }
-      : null,
-    wellProperties.xDimension != null
-      ? { label: X_DIM, value: toFixed(wellProperties.xDimension) }
-      : null,
-    wellProperties.yDimension != null
-      ? { label: Y_DIM, value: toFixed(wellProperties.yDimension) }
-      : null,
-  ].filter(Boolean)
+  if (shape) {
+    if (shape.shape === 'circular') {
+      dimensions.push({ label: DIAMETER, value: toFixed(shape.diameter) })
+    } else if (shape.shape === 'rectangular') {
+      dimensions.push(
+        { label: X_DIM, value: toFixed(shape.xDimension) },
+        { label: Y_DIM, value: toFixed(shape.yDimension) }
+      )
+    }
+  }
 
   return (
     <LabeledValueTable
