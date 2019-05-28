@@ -28,15 +28,21 @@
 }
 
 .slot_overlay.disabled {
-  fill: color(var(--c-light-gray) alpha(0.9));
+  background-color: color(var(--c-light-gray) alpha(0.9));
   color: var(--c-font-dark);
 }
 
+.name_input_wrapper {
+  flex: 1;
+}
+
 .name_input {
+  padding: 0 0 0 0.25rem;
   width: 7rem;
 }
 
 .overlay_button {
+  flex: 1;
   text-decoration: none;
   color: white;
   display: flex;
@@ -46,6 +52,10 @@
 
 .overlay_button:active {
   opacity: 0.5;
+}
+
+.button_spacer {
+  flex: 1;
 }
 
 .overlay_icon {

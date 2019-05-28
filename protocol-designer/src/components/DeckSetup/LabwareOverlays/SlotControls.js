@@ -6,7 +6,10 @@ import cx from 'classnames'
 import { connect } from 'react-redux'
 import { DropTarget } from 'react-dnd'
 import noop from 'lodash/noop'
-import { openAddLabwareModal } from '../../../labware-ingred/actions'
+import {
+  openAddLabwareModal,
+  swapSlotContents,
+} from '../../../labware-ingred/actions'
 import i18n from '../../../localization'
 import type { ThunkDispatch } from '../../../types'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../../steplist'
@@ -14,24 +17,29 @@ import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../../steplist'
 import { DND_TYPES } from '../../labware/LabwareOnDeck/constants'
 import styles from './LabwareOverlays.css'
 
+type DNDP = {|
+  isOver: boolean,
+  connectDropTarget: React.Node => mixed,
+|}
 type OP = {|
   slot: DeckSlot,
   selectedTerminalItemId: ?TerminalItemId,
 |}
 type DP = {|
   addLabware: (e: SyntheticEvent<*>) => mixed,
+  swapSlotContents: (DeckSlotId, DeckSlotId) => void,
 |}
-type Props = {| ...OP, ...DP |}
+type Props = {| ...OP, ...DP, ...DNDP |}
 
 const SlotControls = ({
   slot,
   addLabware,
   selectedTerminalItemId,
-  ...restProps
+  isOver,
+  connectDropTarget,
 }: Props) => {
   if (selectedTerminalItemId !== START_TERMINAL_ITEM_ID) return null
-  const { isOver } = restProps
-  return restProps.connectDropTarget(
+  return connectDropTarget(
     <g>
       <RobotCoordsForeignDiv
         x={slot.position[0]}
@@ -54,13 +62,11 @@ const SlotControls = ({
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   addLabware: () => dispatch(openAddLabwareModal({ slot: ownProps.slot.id })),
+  swapSlotContents: (sourceSlot, destSlot) =>
+    dispatch(swapSlotContents(sourceSlot, destSlot)),
 })
 
-const labwareTarget = {
-  canDrop: (props, monitor) => {
-    const draggedItem = monitor.getItem()
-    return draggedItem && draggedItem.slot !== props.slot.id
-  },
+const slotTarget = {
   drop: (props, monitor) => {
     const draggedItem = monitor.getItem()
     if (draggedItem) {
@@ -68,18 +74,12 @@ const labwareTarget = {
     }
   },
 }
-const collectLabwareTarget = (connect, monitor) => ({
+const collectSlotTarget = (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
 })
 
-export default DropTarget(
-  DND_TYPES.LABWARE,
-  labwareTarget,
-  collectLabwareTarget
-)(
-  connect<Props, OP, _, DP, _, _>(
-    null,
-    mapDispatchToProps
-  )(SlotControls)
-)
+export default connect<Props, OP, _, DP, _, _>(
+  null,
+  mapDispatchToProps
+)(DropTarget(DND_TYPES.LABWARE, slotTarget, collectSlotTarget)(SlotControls))
