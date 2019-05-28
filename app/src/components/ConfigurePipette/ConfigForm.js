@@ -200,7 +200,14 @@ export default class ConfigForm extends React.Component<Props> {
           const { errors, values } = formProps
           const disableSubmit = !isEmpty(errors)
           const handleReset = () =>
-            formProps.resetForm(mapValues(values, () => ''))
+            formProps.resetForm(
+              mapValues(values, v => {
+                if (typeof v === 'boolean') {
+                  return true
+                }
+                return ''
+              })
+            )
           return (
             <Form>
               <FormColumn>
