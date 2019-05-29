@@ -3,8 +3,8 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-<a name="3.9.0-alpha.0"></a>
-# [3.9.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.8.3...v3.9.0-alpha.0) (2019-05-28)
+<a name="3.9.0"></a>
+# [3.9.0](https://github.com/Opentrons/opentrons/compare/v3.8.3...v3.9.0) (2019-05-29)
 
 
 ### Features
@@ -14,9 +14,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **protocol-designer:** v2 labware selection from definitions ([#3439](https://github.com/Opentrons/opentrons/issues/3439)) ([0ae7129](https://github.com/Opentrons/opentrons/commit/0ae7129)), closes [#3335](https://github.com/Opentrons/opentrons/issues/3335) [#3291](https://github.com/Opentrons/opentrons/issues/3291) [#3290](https://github.com/Opentrons/opentrons/issues/3290)
 * **repo:** change v2 labware len/width fields ([#3410](https://github.com/Opentrons/opentrons/issues/3410)) ([0ef0bd5](https://github.com/Opentrons/opentrons/commit/0ef0bd5))
 * **shared-data:** deck component from physical data ([#3415](https://github.com/Opentrons/opentrons/issues/3415)) ([ddf9e78](https://github.com/Opentrons/opentrons/commit/ddf9e78)), closes [#3326](https://github.com/Opentrons/opentrons/issues/3326)
-
-
-
 
 
 <a name="3.8.3"></a>

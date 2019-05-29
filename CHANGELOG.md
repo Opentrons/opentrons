@@ -3,12 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-<a name="3.9.0-alpha.0"></a>
-# [3.9.0-alpha.0](https://github.com/opentrons/opentrons/compare/v3.8.3...v3.9.0-alpha.0) (2019-05-28)
+<a name="3.9.0"></a>
+# [3.9.0](https://github.com/opentrons/opentrons/compare/v3.8.3...v3.9.0) (2019-05-29)
 
 
 ### Bug Fixes
 
+* **api:** Add separate key for new steps per mm shape ([#3499](https://github.com/opentrons/opentrons/issues/3499)) ([50bb2a9](https://github.com/opentrons/opentrons/commit/50bb2a9))
 * **api:** Don't talk about apiv2 if you can't find a labware ([#3435](https://github.com/opentrons/opentrons/issues/3435)) ([d31f1a5](https://github.com/opentrons/opentrons/commit/d31f1a5))
 * **api:** Fix default transfer tip behavior ([#3486](https://github.com/opentrons/opentrons/issues/3486)) ([4534e6f](https://github.com/opentrons/opentrons/commit/4534e6f))
 * **api:** Handle smoothie update better ([#3437](https://github.com/opentrons/opentrons/issues/3437)) ([d2569d8](https://github.com/opentrons/opentrons/commit/d2569d8))
@@ -42,9 +43,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **shared-data:** add version, schemaVersion, and namespace keys to v2 labware ([#3469](https://github.com/opentrons/opentrons/issues/3469)) ([da03025](https://github.com/opentrons/opentrons/commit/da03025)), closes [#3454](https://github.com/opentrons/opentrons/issues/3454)
 * **shared-data:** deck component from physical data ([#3415](https://github.com/opentrons/opentrons/issues/3415)) ([ddf9e78](https://github.com/opentrons/opentrons/commit/ddf9e78)), closes [#3326](https://github.com/opentrons/opentrons/issues/3326)
 * **update-server:** buildroot: use sd-notify and better hostname ([#3416](https://github.com/opentrons/opentrons/issues/3416)) ([e38944c](https://github.com/opentrons/opentrons/commit/e38944c))
-
-
-
 
 
 <a name="3.8.3"></a>

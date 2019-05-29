@@ -3,12 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-<a name="3.9.0-alpha.0"></a>
-# [3.9.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.8.3...v3.9.0-alpha.0) (2019-05-28)
+<a name="3.9.0"></a>
+# [3.9.0](https://github.com/Opentrons/opentrons/compare/v3.8.3...v3.9.0) (2019-05-29)
 
 
 ### Bug Fixes
 
+* **api:** Add separate key for new steps per mm shape ([#3499](https://github.com/Opentrons/opentrons/issues/3499)) ([50bb2a9](https://github.com/Opentrons/opentrons/commit/50bb2a9))
 * **api:** Don't talk about apiv2 if you can't find a labware ([#3435](https://github.com/Opentrons/opentrons/issues/3435)) ([d31f1a5](https://github.com/Opentrons/opentrons/commit/d31f1a5))
 * **api:** Fix default transfer tip behavior ([#3486](https://github.com/Opentrons/opentrons/issues/3486)) ([4534e6f](https://github.com/Opentrons/opentrons/commit/4534e6f))
 * **api:** Handle smoothie update better ([#3437](https://github.com/Opentrons/opentrons/issues/3437)) ([d2569d8](https://github.com/Opentrons/opentrons/commit/d2569d8))
@@ -28,9 +29,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **api:** Make pipette quirks configurable ([#3463](https://github.com/Opentrons/opentrons/issues/3463)) ([3513794](https://github.com/Opentrons/opentrons/commit/3513794))
 * **api:** support running v3 protocols in APIv1 ([#3468](https://github.com/Opentrons/opentrons/issues/3468)) ([0ff1ab6](https://github.com/Opentrons/opentrons/commit/0ff1ab6)), closes [#3449](https://github.com/Opentrons/opentrons/issues/3449)
 * **repo:** change v2 labware len/width fields ([#3410](https://github.com/Opentrons/opentrons/issues/3410)) ([0ef0bd5](https://github.com/Opentrons/opentrons/commit/0ef0bd5))
-
-
-
 
 
 <a name="3.8.3"></a>
