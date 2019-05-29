@@ -20,8 +20,8 @@ def get_labware_def(monkeypatch):
         # TODO: Ian 2019-05-30 use fixtures not real defs
         labware_def = json.loads(
             pkgutil.get_data('opentrons',
-                             'shared_data/labware/definitions/2/' +
-                             f'{load_name}/1/{load_name}.json'))
+                             'shared_data/definitions2/{}.json'.format(
+                                 labware_name)))
         return labware_def
     monkeypatch.setattr(papi.labware, 'get_labware_definition', dummy_load)
 
