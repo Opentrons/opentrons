@@ -20,7 +20,7 @@
   "metadata": {
     "displayName": "Opentrons 96 Well Aluminum Block with Generic PCR Strip 200 µL",
     "displayVolumeUnits": "µL",
-    "displayCategory": "tubeRack",
+    "displayCategory": "aluminumBlock",
     "tags": []
   },
   "cornerOffsetFromSlot": {

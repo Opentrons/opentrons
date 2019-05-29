@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom'
 import { getPublicPath } from '../../public-path'
 import { Icon } from '@opentrons/components'
 import {
+  getWellLabel,
   Gallery,
   LoadName,
   Tags,
@@ -24,7 +25,7 @@ export type LabwareCardProps = {| definition: LabwareDefinition |}
 
 export default function LabwareCard(props: LabwareCardProps) {
   const { definition } = props
-  const { displayCategory } = definition.metadata
+  const wellLabel = getWellLabel(definition)
 
   return (
     <li className={styles.card}>
@@ -34,8 +35,8 @@ export default function LabwareCard(props: LabwareCardProps) {
         <Gallery definition={definition} className={styles.gallery_container} />
         <div className={styles.stats}>
           <WellCount
+            wellLabel={wellLabel}
             count={Object.keys(definition.wells).length}
-            displayCategory={displayCategory}
             className={styles.well_count}
           />
           <AllWellProperties

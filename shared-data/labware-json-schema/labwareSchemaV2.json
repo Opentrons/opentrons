@@ -33,7 +33,15 @@
     },
     "displayCategory": {
       "type": "string",
-      "enum": ["tipRack", "tubeRack", "trough", "trash", "wellPlate", "other"]
+      "enum": [
+        "tipRack",
+        "tubeRack",
+        "reservoir",
+        "trash",
+        "wellPlate",
+        "aluminumBlock",
+        "other"
+      ]
     },
     "safeString": {
       "description": "a string safe to use for loadName / namespace. Lowercase-only.",

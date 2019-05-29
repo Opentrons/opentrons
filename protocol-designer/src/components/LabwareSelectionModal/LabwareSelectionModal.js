@@ -27,7 +27,8 @@ const orderedCategories: Array<string> = [
   'tipRack',
   'tubeRack',
   'wellPlate',
-  'trough',
+  'reservoir',
+  'aluminumBlock',
   'trash',
 ]
 

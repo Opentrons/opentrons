@@ -6326,7 +6326,7 @@ Object {
           },
         ],
         "metadata": Object {
-          "displayCategory": "trough",
+          "displayCategory": "reservoir",
           "displayName": "12 Channel Trough",
           "displayVolumeUnits": "mL",
         },

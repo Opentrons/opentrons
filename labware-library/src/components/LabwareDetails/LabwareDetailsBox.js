@@ -3,14 +3,18 @@
 import * as React from 'react'
 
 import { getUniqueWellProperties } from '../../definitions'
-import { WellCount, WellProperties, ManufacturerStats } from '../labware-ui'
+import {
+  getWellLabel,
+  WellCount,
+  WellProperties,
+  ManufacturerStats,
+} from '../labware-ui'
 import { DetailsBox } from '../ui'
 import InsertDetails from './InsertDetails'
 import Dimensions from './Dimensions'
 import WellDimensions from './WellDimensions'
 import WellSpacing from './WellSpacing'
 
-import { SPACING, MEASUREMENTS } from '../../localization'
 import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
@@ -23,8 +27,9 @@ export type LabwareDetailsBoxProps = {|
 export default function LabwareDetailsBox(props: LabwareDetailsBoxProps) {
   const { definition, className } = props
   const { metadata, brand, wells } = definition
-  const { displayCategory, displayVolumeUnits } = metadata
+  const { displayVolumeUnits } = metadata
   const wellGroups = getUniqueWellProperties(definition)
+  const wellLabel = getWellLabel(definition)
   const hasInserts = wellGroups.some(g => g.metadata.displayCategory)
   const irregular = wellGroups.length > 1
 
@@ -32,13 +37,11 @@ export default function LabwareDetailsBox(props: LabwareDetailsBoxProps) {
     <div className={className}>
       <DetailsBox aside={<ManufacturerStats brand={brand} />}>
         <div className={styles.details_container}>
-          <WellCount
-            displayCategory={displayCategory}
-            count={Object.keys(wells).length}
-          />
+          <WellCount wellLabel={wellLabel} count={Object.keys(wells).length} />
           {!hasInserts && !irregular && (
             <WellProperties
               wellProperties={wellGroups[0]}
+              wellLabel={wellLabel}
               displayVolumeUnits={displayVolumeUnits}
               hideTitle
             />
@@ -49,6 +52,7 @@ export default function LabwareDetailsBox(props: LabwareDetailsBoxProps) {
           />
           {wellGroups.map((wellProps, i) => {
             const { metadata: groupMetadata } = wellProps
+            const wellLabel = getWellLabel(wellProps, definition)
             const groupDisplaySuffix = groupMetadata.displayName
               ? ` - ${groupMetadata.displayName}`
               : ''
@@ -58,12 +62,13 @@ export default function LabwareDetailsBox(props: LabwareDetailsBoxProps) {
                 {!groupMetadata.displayCategory && irregular && (
                   <>
                     <WellCount
-                      className={styles.irregular_well_count}
-                      displayCategory={displayCategory}
                       count={wellProps.wellCount}
+                      wellLabel={wellLabel}
+                      className={styles.irregular_well_count}
                     />
                     <WellProperties
                       wellProperties={wellProps}
+                      wellLabel={wellLabel}
                       displayVolumeUnits={displayVolumeUnits}
                       hideTitle
                     />
@@ -71,14 +76,15 @@ export default function LabwareDetailsBox(props: LabwareDetailsBoxProps) {
                 )}
                 {!groupMetadata.displayCategory && (
                   <WellDimensions
-                    title={`${MEASUREMENTS}${groupDisplaySuffix}`}
                     wellProperties={wellProps}
+                    wellLabel={wellLabel}
+                    labelSuffix={groupDisplaySuffix}
                     className={styles.details_table}
                   />
                 )}
                 <WellSpacing
-                  title={`${SPACING}${groupDisplaySuffix}`}
                   wellProperties={wellProps}
+                  labelSuffix={groupDisplaySuffix}
                   className={styles.details_table}
                 />
               </React.Fragment>

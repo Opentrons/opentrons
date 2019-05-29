@@ -7,7 +7,7 @@ import cx from 'classnames'
 import { getAllCategories, buildFiltersUrl } from '../../filters'
 import styles from './styles.css'
 
-import { CATEGORY_LABELS_BY_CATEGORY } from '../../localization'
+import { PLURAL_CATEGORY_LABELS_BY_CATEGORY } from '../../localization'
 
 import type { FilterParams } from '../../types'
 
@@ -29,7 +29,7 @@ export default function FilterCategory(props: FilterCategoryProps) {
               [styles.selected]: c === filters.category,
             })}
           >
-            {CATEGORY_LABELS_BY_CATEGORY[c]}
+            {PLURAL_CATEGORY_LABELS_BY_CATEGORY[c]}
           </Link>
         </li>
       ))}

@@ -32,17 +32,23 @@ export type LabwareDefinition = {
 export type AllLabwareDefinitions = {
   [name: string]: LabwareDefinition,
 }
-
+// TODO(mc, 2019-05-29): Remove this enum in favor of string + exported
+// constants + unit tests to catch typos in our definitions. Make changes
+// here and in shared-data/labware-json-schema/labwareSchemaV2.json
 export type LabwareDisplayCategory =
+  | 'wellPlate'
   | 'tipRack'
   | 'tubeRack'
-  | 'trough'
+  | 'reservoir'
+  | 'aluminumBlock'
   | 'trash'
-  | 'wellPlate'
   | 'other'
 
 export type LabwareVolumeUnits = 'µL' | 'mL' | 'L'
 
+// TODO(mc, 2019-05-29): Remove this enum in favor of string + exported
+// constants + unit tests to catch typos in our definitions. Make changes
+// here and in shared-data/labware-json-schema/labwareSchemaV2.json
 export type WellBottomShape = 'flat' | 'u' | 'v'
 
 export type LabwareMetadata = {|

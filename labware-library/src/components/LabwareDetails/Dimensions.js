@@ -3,7 +3,13 @@
 import * as React from 'react'
 import round from 'lodash/round'
 
-import { FOOTPRINT, MM, X_DIM, Y_DIM, Z_DIM } from '../../localization'
+import {
+  FOOTPRINT,
+  MM,
+  LABWARE_X_DIM,
+  LABWARE_Y_DIM,
+  LABWARE_Z_DIM,
+} from '../../localization'
 import { LabeledValueTable, LowercaseText } from '../ui'
 
 import type { LabwareDefinition } from '../../types'
@@ -20,9 +26,9 @@ export default function Dimensions(props: DimensionsProps) {
   const { definition, className } = props
   const { xDimension, yDimension, zDimension } = definition.dimensions
   const dimensions = [
-    { label: X_DIM, value: toFixed(xDimension) },
-    { label: Y_DIM, value: toFixed(yDimension) },
-    { label: Z_DIM, value: toFixed(zDimension) },
+    { label: LABWARE_X_DIM, value: toFixed(xDimension) },
+    { label: LABWARE_Y_DIM, value: toFixed(yDimension) },
+    { label: LABWARE_Z_DIM, value: toFixed(zDimension) },
   ]
 
   return (
