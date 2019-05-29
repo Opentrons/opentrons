@@ -807,10 +807,10 @@ def _read_file(filepath: str) -> dict:
 def _get_path_to_labware(load_name: str, namespace: str, version: int) -> Path:
     if namespace == OPENTRONS_NAMESPACE:
         # all labware in OPENTRONS_NAMESPACE is bundled in wheel
-        return STANDARD_DEFS_PATH / load_name / f'{str(version)}.json'
+        return STANDARD_DEFS_PATH / load_name / f'{version}.json'
 
     base_path = CONFIG['labware_user_definitions_dir_v4']
-    def_path = base_path / namespace / load_name / f'{str(version)}.json'
+    def_path = base_path / namespace / load_name / f'{version}.json'
     return def_path
 
 
@@ -911,8 +911,8 @@ def load_definition(
             except (FileNotFoundError):
                 pass
         raise FileNotFoundError(
-            f'{load_name} not found with version {version}. If you are ' +
-            f'using a namespace besides {OPENTRONS_NAMESPACE} or ' +
+            f'Labware "{load_name}" not found with version {version}. If ' +
+            f'your are using a namespace besides {OPENTRONS_NAMESPACE} or ' +
             f'{CUSTOM_NAMESPACE}, please specify it')
 
     namespace = namespace.lower()
@@ -921,8 +921,14 @@ def load_definition(
     else:
         def_path = _get_path_to_latest_labware(load_name, namespace)
 
-    with open(def_path, 'r') as f:
-        labware_def = json.load(f)
+    try:
+        with open(def_path, 'r') as f:
+            labware_def = json.load(f)
+    except FileNotFoundError:
+        raise FileNotFoundError(
+            f'Labware "{load_name}" not found with version {version} ' +
+            f'in namespace "{namespace}".'
+        )
 
     return labware_def
 
@@ -947,9 +953,8 @@ def load(
                    (often the front-left corner of a slot on the deck).
     :param str label: An optional label that will override the labware's
                       display name from its definition
-    :param str namespace: The namespace the labware definition belongs to. If
-        unspecified, will search in this order: 'opentrons', 'custom_beta',
-        then all other namespaces together.
+    :param str namespace: The namespace the labware definition belongs to.
+        If unspecified, will search 'opentrons' then 'custom_beta'
     :param int version: The version of the labware definition. If unspecified,
         will use the latest version.
     """

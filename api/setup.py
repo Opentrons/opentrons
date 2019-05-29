@@ -9,7 +9,7 @@ from setuptools.command import build_py, sdist
 
 import json
 
-# make stdout non-blocking for Travis
+# make stdout blocking since Travis sets it to nonblocking
 if os.name == 'posix':
     import fcntl
     flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL)

@@ -200,8 +200,13 @@ class ProtocolContext(CommandPublisher):
         return labware_obj
 
     def load_labware_by_name(
-            self, labware_name: str,
-            location: types.DeckLocation, label: str = None) -> Labware:
+            self,
+            load_name: str,
+            location: types.DeckLocation,
+            label: str = None,
+            namespace: str = None,
+            version: int = None
+    ) -> Labware:
         """ A convenience function to specify a piece of labware by name.
 
         For labware already defined by Opentrons, this is a convient way
@@ -211,7 +216,7 @@ class ProtocolContext(CommandPublisher):
         This function returns the created and initialized labware for use
         later in the protocol.
 
-        :param str labware_name: The name of the labware to load
+        :param load_name: A string to use for looking up a labware definition
         :param location: The slot into which to load the labware such as
                          1 or '1'
         :type location: int or str
@@ -219,10 +224,14 @@ class ProtocolContext(CommandPublisher):
                           specified, this is the name the labware will appear
                           as in the run log and the calibration view in the
                           Opentrons app.
+        :param str namespace: The namespace the labware definition belongs to.
+            If unspecified, will search 'opentrons' then 'custom_beta'
+        :param int version: The version of the labware definition. If
+            unspecified, will use the latest version.
         """
-        labware = load(labware_name,
+        labware = load(load_name,
                        self._deck_layout.position_for(location),
-                       label)
+                       label, namespace, version)
         return self.load_labware(labware, location)
 
     def load_module(
