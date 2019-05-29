@@ -114,9 +114,7 @@ DEFAULT_GANTRY_STEPS_PER_MM: Dict[str, float] = {
     'X': 80.00,
     'Y': 80.00,
     'Z': 400,
-    'A': 400,
-    'B': 768,
-    'C': 768
+    'A': 400
 }
 
 DEFAULT_STEPS_PER_MM = 'M92 X80.00 Y80.00 Z400 A400 B768 C768'

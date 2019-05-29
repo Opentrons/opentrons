@@ -300,7 +300,7 @@ class Robot(CommandPublisher):
             elif model_value:
                 self._driver.dist_from_eeprom[mount_axis] = 0.0
                 self._driver.update_steps_per_mm(
-                    {plunger_axis: DEFAULT_GANTRY_STEPS_PER_MM[plunger_axis]})
+                    {plunger_axis: 768})
 
                 self._driver.update_pipette_config(mount_axis, {'home': 220})
                 self._driver.update_pipette_config(

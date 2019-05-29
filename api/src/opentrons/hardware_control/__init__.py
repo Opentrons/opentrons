@@ -284,8 +284,7 @@ class API(HardwareAPILike):
                         plunger_axis.name, {'max_travel': 60})
                 else:
                     self._backend._smoothie_driver.update_steps_per_mm(
-                        {plunger_axis.name: DEFAULT_GANTRY_STEPS_PER_MM[
-                            plunger_axis.name]})
+                        {plunger_axis.name: 768})
 
                     self._backend._smoothie_driver.update_pipette_config(
                         mount_axis.name, {'home': 220})
