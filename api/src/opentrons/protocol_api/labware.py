@@ -912,7 +912,7 @@ def load_definition(
                 pass
         raise FileNotFoundError(
             f'Labware "{load_name}" not found with version {version}. If ' +
-            f'your are using a namespace besides {OPENTRONS_NAMESPACE} or ' +
+            f'you are using a namespace besides {OPENTRONS_NAMESPACE} or ' +
             f'{CUSTOM_NAMESPACE}, please specify it')
 
     namespace = namespace.lower()
