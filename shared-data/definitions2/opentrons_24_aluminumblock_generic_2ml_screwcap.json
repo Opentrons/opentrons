@@ -14,7 +14,7 @@
   "metadata": {
     "displayName": "Opentrons 24 Well Aluminum Block with Generic 2 mL Screwcap",
     "displayVolumeUnits": "mL",
-    "displayCategory": "tubeRack",
+    "displayCategory": "aluminumBlock",
     "tags": []
   },
   "cornerOffsetFromSlot": {

@@ -20,7 +20,7 @@
   "metadata": {
     "displayName": "12 Channel Trough",
     "displayVolumeUnits": "mL",
-    "displayCategory": "trough"
+    "displayCategory": "reservoir"
   },
   "cornerOffsetFromSlot": {
     "x": 0,

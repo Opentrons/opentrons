@@ -3,48 +3,30 @@
 
 export const CATEGORY_LABELS_BY_CATEGORY = {
   all: 'All',
+  tubeRack: 'Tube Rack',
+  tipRack: 'Tip Rack',
+  wellPlate: 'Well Plate',
+  reservoir: 'Reservoir',
+  aluminumBlock: 'Aluminum Block',
+  trash: 'Trash',
+  other: 'Other',
+}
+
+export const PLURAL_CATEGORY_LABELS_BY_CATEGORY = {
+  all: 'All',
   tubeRack: 'Tube Racks',
   tipRack: 'Tip Racks',
   wellPlate: 'Well Plates',
-  trough: 'Troughs',
+  reservoir: 'Reservoirs',
+  aluminumBlock: 'Aluminum Blocks',
   trash: 'Trashes',
   other: 'Other',
 }
 
-export const NUM_WELLS_BY_CATEGORY = {
-  tubeRack: 'tube count',
-  tipRack: 'tip count',
-  wellPlate: 'well count',
-  trough: 'well count',
-  trash: 'well count',
-  other: 'well count',
-}
-
-export const WELL_TYPE_BY_CATEGORY = {
+export const WELL_TYPE_BY_CATEGORY: { [string]: string } = {
   tubeRack: 'tube',
   tipRack: 'tip',
-  wellPlate: 'well',
-  trough: 'well',
-  trash: 'well',
   other: 'well',
-}
-
-export const LABWARE_DIMS_BY_CATEGORY = {
-  tubeRack: 'rack dimensions',
-  tipRack: 'rack dimensions',
-  wellPlate: 'plate dimensions',
-  trough: 'trough dimensions',
-  trash: 'trash dimensions',
-  other: 'labware dimensions',
-}
-
-export const WELL_DIMS_BY_CATEGORY = {
-  tubeRack: 'tube dimensions',
-  tipRack: 'tip dimensions',
-  wellPlate: 'well dimensions',
-  trough: 'well dimensions',
-  trash: 'well dimensions',
-  other: 'well dimensions',
 }
 
 export const MANUFACTURER_LABELS_BY_MANUFACTURER = {
@@ -63,13 +45,13 @@ export const CATEGORY = 'category'
 export const FOOTPRINT = 'footprint'
 export const MEASUREMENTS = 'measurements'
 export const SPACING = 'spacing'
+export const COUNT = 'count'
 export const MM = 'mm'
-export const SHORT_X_DIM = 'l'
-export const SHORT_Y_DIM = 'w'
-export const SHORT_Z_DIM = 'h'
-export const X_DIM = 'length'
-export const Y_DIM = 'width'
-export const Z_DIM = 'height'
+export const LABWARE_X_DIM = 'length'
+export const LABWARE_Y_DIM = 'width'
+export const LABWARE_Z_DIM = 'height'
+export const WELL_X_DIM = 'x-size'
+export const WELL_Y_DIM = 'y-size'
 export const X_OFFSET = 'x-offset'
 export const Y_OFFSET = 'y-offset'
 export const X_SPACING = 'x-spacing'

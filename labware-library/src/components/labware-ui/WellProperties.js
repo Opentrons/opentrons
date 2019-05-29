@@ -7,10 +7,11 @@ import { getUniqueWellProperties } from '../../definitions'
 import {
   MAX_VOLUME,
   SHAPE,
-  WELL_TYPE_BY_CATEGORY,
   WELL_BOTTOM_VALUES,
   VARIOUS,
 } from '../../localization'
+
+import { getWellLabel } from './labels'
 import { LabelText, Value, LABEL_TOP } from '../ui'
 
 import styles from './styles.css'
@@ -28,6 +29,7 @@ export type AllWellPropertiesProps = {|
 
 export type WellPropertiesProps = {|
   wellProperties: LabwareWellGroupProperties,
+  wellLabel: string,
   displayVolumeUnits: LabwareVolumeUnits,
   hideTitle?: boolean,
 |}
@@ -42,6 +44,7 @@ export function AllWellProperties(props: AllWellPropertiesProps) {
       {uniqueWellProps.map((wellProperties, i) => (
         <WellProperties
           key={i}
+          wellLabel={getWellLabel(wellProperties, definition)}
           wellProperties={wellProperties}
           displayVolumeUnits={displayVolumeUnits}
         />
@@ -57,14 +60,15 @@ const BOTTOM_SHAPE_TO_ICON = {
 }
 
 export function WellProperties(props: WellPropertiesProps) {
-  const { hideTitle, wellProperties, displayVolumeUnits: units } = props
+  const {
+    hideTitle,
+    wellProperties,
+    wellLabel,
+    displayVolumeUnits: units,
+  } = props
+
   const { totalLiquidVolume: vol, metadata } = wellProperties
-  const { displayName, displayCategory, wellBottomShape } = metadata
-
-  const wellType = displayCategory
-    ? WELL_TYPE_BY_CATEGORY[displayCategory]
-    : WELL_TYPE_BY_CATEGORY.other
-
+  const { displayName, wellBottomShape } = metadata
   const wellBottomValue = wellBottomShape
     ? WELL_BOTTOM_VALUES[wellBottomShape]
     : null
@@ -86,7 +90,7 @@ export function WellProperties(props: WellPropertiesProps) {
         <div className={styles.well_properties_column}>
           <div>
             <LabelText position={LABEL_TOP}>
-              {wellType} {SHAPE}
+              {wellLabel} {SHAPE}
             </LabelText>
             <Value>{wellBottomValue}</Value>
           </div>

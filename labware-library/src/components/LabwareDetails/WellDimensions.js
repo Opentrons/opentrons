@@ -3,8 +3,14 @@
 import * as React from 'react'
 import round from 'lodash/round'
 
-import { MM, X_DIM, Y_DIM, DEPTH, DIAMETER } from '../../localization'
-
+import {
+  MEASUREMENTS,
+  WELL_X_DIM,
+  WELL_Y_DIM,
+  DEPTH,
+  DIAMETER,
+  MM,
+} from '../../localization'
 import { LabeledValueTable, LowercaseText } from '../ui'
 
 import type { LabwareWellGroupProperties } from '../../types'
@@ -13,14 +19,16 @@ import type { LabwareWellGroupProperties } from '../../types'
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 
 export type WellDimensionsProps = {|
-  title: string,
   wellProperties: LabwareWellGroupProperties,
+  wellLabel: string,
+  labelSuffix?: string,
   className?: string,
 |}
 
 export default function WellDimensions(props: WellDimensionsProps) {
-  const { title, wellProperties, className } = props
+  const { wellProperties, wellLabel, labelSuffix, className } = props
   const { shape } = wellProperties
+  const title = `${wellLabel} ${MEASUREMENTS}${labelSuffix || ''}`
   const dimensions = [{ label: DEPTH, value: wellProperties.depth }]
 
   if (shape) {
@@ -28,8 +36,8 @@ export default function WellDimensions(props: WellDimensionsProps) {
       dimensions.push({ label: DIAMETER, value: toFixed(shape.diameter) })
     } else if (shape.shape === 'rectangular') {
       dimensions.push(
-        { label: X_DIM, value: toFixed(shape.xDimension) },
-        { label: Y_DIM, value: toFixed(shape.yDimension) }
+        { label: WELL_X_DIM, value: toFixed(shape.xDimension) },
+        { label: WELL_Y_DIM, value: toFixed(shape.yDimension) }
       )
     }
   }

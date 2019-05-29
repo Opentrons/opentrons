@@ -367,7 +367,7 @@
   },
   "metadata": {
     "displayName": "Opentrons 40 Well Aluminum Block with Eppendorf 24x2 mL Safe-Lock Snapcap, Generic 16x0.2 mL PCR Strip",
-    "displayCategory": "tubeRack",
+    "displayCategory": "aluminumBlock",
     "displayVolumeUnits": "mL",
     "tags": []
   },

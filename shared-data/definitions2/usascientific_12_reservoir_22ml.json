@@ -20,7 +20,7 @@
   "metadata": {
     "displayName": "USA Scientific 12 Well Reservoir 22 mL",
     "displayVolumeUnits": "mL",
-    "displayCategory": "trough",
+    "displayCategory": "reservoir",
     "tags": []
   },
   "cornerOffsetFromSlot": {

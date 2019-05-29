@@ -20,7 +20,7 @@
   "metadata": {
     "displayName": "Opentrons 96 Well Aluminum Block with Bio-Rad Well Plate 200 µL",
     "displayVolumeUnits": "µL",
-    "displayCategory": "wellPlate",
+    "displayCategory": "aluminumBlock",
     "tags": []
   },
   "cornerOffsetFromSlot": {

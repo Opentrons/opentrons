@@ -34,11 +34,12 @@ export type AllLabwareDefinitions = {
 }
 
 export type LabwareDisplayCategory =
+  | 'wellPlate'
   | 'tipRack'
   | 'tubeRack'
-  | 'trough'
+  | 'reservoir'
+  | 'aluminumBlock'
   | 'trash'
-  | 'wellPlate'
   | 'other'
 
 export type LabwareVolumeUnits = 'µL' | 'mL' | 'L'
