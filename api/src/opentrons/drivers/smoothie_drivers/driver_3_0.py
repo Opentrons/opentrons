@@ -1048,7 +1048,7 @@ class SmoothieDriver_3_0_0:
         log.debug("wait for ack done")
         self._reset_from_error()
         log.debug("_reset")
-        self.update_steps_per_mm(self._config.steps_per_mm)
+        self.update_steps_per_mm(self._config.gantry_steps_per_mm)
         log.debug("sent steps")
         self._send_command(GCODES['ABSOLUTE_COORDS'])
         log.debug("sent abs")
