@@ -16,13 +16,13 @@ import pytest
 
 @pytest.fixture
 def load_my_labware(monkeypatch):
-    def dummy_load(labware_name):
+    def dummy_load(labware_name, namespace=None, version=None):
         labware_def = json.loads(
             pkgutil.get_data('opentrons',
                              'shared_data/definitions2/{}.json'.format(
                                  labware_name)))
         return labware_def
-    monkeypatch.setattr(papi.labware, 'load_definition_by_name', dummy_load)
+    monkeypatch.setattr(papi.labware, 'load_definition', dummy_load)
 
 
 def test_load_instrument(loop):

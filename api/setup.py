@@ -1,5 +1,6 @@
 # Inspired by:
 # https://hynek.me/articles/sharing-your-labor-of-love-pypi-quick-and-dirty/
+import sys
 import codecs
 import os
 import os.path
@@ -7,6 +8,12 @@ from setuptools import setup, find_packages
 from setuptools.command import build_py, sdist
 
 import json
+
+# make stdout blocking since Travis sets it to nonblocking
+if os.name == 'posix':
+    import fcntl
+    flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL)
+    fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags & ~os.O_NONBLOCK)
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
@@ -17,6 +24,7 @@ SHARED_DATA_SUBDIRS = ['labware-json-schema',
                        'protocol-json-schema',
                        'definitions',
                        'definitions2',
+                       'labware',
                        'robot-data']
 # Where, relative to the package root, we put the files we copy
 DEST_BASE_PATH = 'shared_data'

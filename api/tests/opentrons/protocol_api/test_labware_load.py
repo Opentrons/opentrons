@@ -21,11 +21,11 @@ def test_loaded(loop):
 
 def test_load_incorrect_definition_by_name():
     with pytest.raises(FileNotFoundError):
-        papi.labware.load_definition_by_name('fake_labware')
+        papi.labware.load_definition('fake_labware')
 
 
 def test_load_mixed_case():
-    dfn = papi.labware.load_definition_by_name(
+    dfn = papi.labware.load_definition(
         'GeNeRiC_96_wElLpLaTe_340Ul_FlAt')
     assert dfn['parameters']['loadName'] == labware_name
 
