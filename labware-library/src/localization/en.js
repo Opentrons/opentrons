@@ -52,6 +52,12 @@ export const MANUFACTURER_LABELS_BY_MANUFACTURER = {
   generic: 'Generic',
 }
 
+export const WELL_BOTTOM_VALUES = {
+  u: 'U-bottom',
+  v: 'V-bottom',
+  flat: 'Flat-bottom',
+}
+
 export const MANUFACTURER = 'manufacturer'
 export const CATEGORY = 'category'
 export const FOOTPRINT = 'footprint'
@@ -76,3 +82,5 @@ export const BACK_TO_LABWARE_LIBRARY = 'Back to Labware Library'
 export const TAGS = 'tags'
 export const API_NAME = 'api name'
 export const COPIED_TO_CLIPBOARD = 'Copied to clipboard!'
+export const VARIOUS = 'Various'
+export const NA = 'N/A'

@@ -9,6 +9,8 @@ import {
   Y_OFFSET,
   X_SPACING,
   Y_SPACING,
+  NA,
+  VARIOUS,
 } from '../../localization'
 
 import styles from './styles.css'
@@ -20,8 +22,15 @@ import type { LabwareWellGroupProperties } from '../../types'
 // safe toFixed
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 
-const spacingValue = (spacing: number) =>
-  spacing ? toFixed(spacing) : <span className={styles.lighter}>N/A</span>
+const spacingValue = (spacing: number | null) => {
+  if (!spacing) {
+    return (
+      <span className={styles.lighter}>{spacing === null ? VARIOUS : NA}</span>
+    )
+  }
+
+  return toFixed(spacing)
+}
 
 export type WellSpacingProps = {|
   title: string,

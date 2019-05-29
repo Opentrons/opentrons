@@ -27,13 +27,22 @@ export default function InsertDetails(props: InsertDetailsProps) {
       {wellGroups.map((wellProps, i) => (
         <DetailsBox
           key={i}
-          aside={<ManufacturerStats brand={{ brand: `Brand ${i}` }} />}
+          aside={
+            wellProps.brand ? (
+              <ManufacturerStats brand={wellProps.brand} />
+            ) : null
+          }
         >
           <div className={styles.details_container}>
-            <h3 className={styles.well_group_title}>Group {i}</h3>
+            {wellProps.metadata.displayName && (
+              <h3 className={styles.well_group_title}>
+                {wellProps.metadata.displayName}
+              </h3>
+            )}
             <WellProperties
               wellProperties={wellProps}
               displayVolumeUnits={displayVolumeUnits}
+              hideTitle
             />
             <WellDimensions
               title={MEASUREMENTS}

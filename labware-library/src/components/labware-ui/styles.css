@@ -92,6 +92,40 @@ button.load_name_button {
 
 .well_properties {
   margin-top: var(--spacing-5);
-  padding: var(--spacing-5);
+  padding: var(--spacing-5) var(--spacing-5) 0;
   border: var(--bd-light);
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.well_properties_title {
+  @apply --font-body-2-dark;
+
+  width: 100%;
+  margin-bottom: var(--spacing-5);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-title);
+}
+
+.well_properties_column {
+  display: flex;
+  width: 50%;
+  min-width: 8rem;
+  align-items: center;
+  margin-bottom: var(--spacing-5);
+}
+
+.well_bottom_shape {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--spacing-5);
+}
+
+.well_bottom_icon {
+  align-self: flex-end;
+  width: var(--spacing-6);
+  margin-left: var(--spacing-3);
+  padding-bottom: calc(var(--spacing-1));
+  overflow: visible;
+  color: var(--c-font-icon);
 }

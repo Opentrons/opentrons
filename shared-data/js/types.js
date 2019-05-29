@@ -43,7 +43,7 @@ export type LabwareDisplayCategory =
 
 export type LabwareVolumeUnits = 'µL' | 'mL' | 'L'
 
-export type WellBottomShape = 'flat' | 'u' | 'v' | 'other'
+export type WellBottomShape = 'flat' | 'u' | 'v'
 
 export type LabwareMetadata = {|
   displayName: string,
@@ -82,7 +82,7 @@ export type LabwareBrand = {|
   links?: Array<string>,
 |}
 
-type LabwareWellShapeProperties =
+export type LabwareWellShapeProperties =
   | {|
       shape: 'circular',
       diameter: number,

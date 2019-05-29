@@ -5,17 +5,18 @@ import cx from 'classnames'
 import styles from './styles.css'
 
 export type PageProps = {|
+  scrollRef: { current: HTMLDivElement | null },
   detailPage: boolean,
   sidebar: React.Node,
   content: React.Node,
 |}
 
 export default function Page(props: PageProps) {
-  const { detailPage, sidebar, content } = props
+  const { scrollRef, detailPage, sidebar, content } = props
 
   return (
     <div className={styles.page}>
-      <div className={styles.content_scroller}>
+      <div className={styles.content_scroller} ref={scrollRef}>
         <div className={styles.content_width_limiter}>
           <div
             className={cx(styles.sidebar_container, {

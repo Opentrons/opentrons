@@ -309,6 +309,20 @@ const ICON_DATA_BY_NAME = {
     viewBox: '0 0 24 24',
     path: 'M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z',
   },
+  'ot-flat-bottom': {
+    viewBox: '0 0 24 24',
+    path: 'M23 0h1v24H0V0h1v23h22z',
+  },
+  'ot-u-bottom': {
+    viewBox: '0 0 24 24',
+    path:
+      'M0 0h1v12c0 6.075 4.925 11 11 11s11-4.925 11-11V0h1v12c0 6.627-5.373 12-12 12S0 18.627 0 12V0z',
+  },
+  'ot-v-bottom': {
+    viewBox: '0 0 24 24',
+    path:
+      'M23 0h1v12a.5.5 0 0 1-.146.354l-11.5 11.5a.5.5 0 0 1-.708 0l-11.5-11.5A.5.5 0 0 1 0 12V0h1v11.793l11 11 11-11V0z',
+  },
 }
 
 export type IconName = $Keys<typeof ICON_DATA_BY_NAME>
