@@ -4,6 +4,7 @@
 //   many of which will be common to LabwareCard and LabwarePage
 import * as React from 'react'
 import { Link } from 'react-router-dom'
+import uniq from 'lodash/uniq'
 
 import { getPublicPath } from '../../public-path'
 import { Icon } from '@opentrons/components'
@@ -16,7 +17,10 @@ import {
   AllWellProperties,
 } from '../labware-ui'
 
-import { CATEGORY_LABELS_BY_CATEGORY } from '../../localization'
+import {
+  CATEGORY_LABELS_BY_CATEGORY,
+  MANUFACTURER_VALUES,
+} from '../../localization'
 import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
@@ -52,11 +56,18 @@ export default function LabwareCard(props: LabwareCardProps) {
 }
 
 function TopBar(props: LabwareCardProps) {
-  const { metadata, brand } = props.definition
+  const { metadata, brand, groups } = props.definition
+  const groupBrands: Array<string> = groups
+    .map(group => group.brand?.brand)
+    .filter(Boolean)
+
+  const brands = uniq([brand.brand, ...groupBrands])
+    .map(b => MANUFACTURER_VALUES[b] || b)
+    .join(', ')
 
   return (
     <p className={styles.top_bar}>
-      <span>{brand.brand}</span>
+      <span>{brands}</span>
       {' | '}
       <span>{CATEGORY_LABELS_BY_CATEGORY[metadata.displayCategory]}</span>
     </p>

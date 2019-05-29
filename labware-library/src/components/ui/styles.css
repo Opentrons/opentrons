@@ -11,6 +11,26 @@
   }
 }
 
+.external_link {
+  @apply --flex-start;
+  @apply --transition-color;
+
+  margin-top: var(--spacing-3);
+  font-size: var(--fs-body-2);
+  font-weight: var(--fw-semibold);
+  color: var(--c-blue);
+
+  &:hover,
+  &:active {
+    color: color(var(--c-blue) alpha(0.6));
+  }
+
+  & .icon {
+    padding-left: var(--spacing-1);
+    width: var(--size-1);
+  }
+}
+
 .info_button {
   width: 1.25rem;
   color: var(--c-med-gray);

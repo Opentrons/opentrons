@@ -2,16 +2,12 @@
 // main LabwareList component
 import * as React from 'react'
 
-import { getAllDefinitions } from '../../definitions'
-import { FILTER_OFF } from '../../filters'
+import { getFilteredDefinitions } from '../../filters'
 import LabwareCard from './LabwareCard'
 import NoResults from './NoResults'
 import styles from './styles.css'
 
 import type { FilterParams } from '../../types'
-
-const filterMatches = (filter: ?string, value: string): boolean =>
-  !filter || filter === FILTER_OFF || filter === value
 
 export type LabwareListProps = {|
   filters: FilterParams,
@@ -20,12 +16,7 @@ export type LabwareListProps = {|
 export { default as NoResults } from './NoResults'
 
 export default function LabwareList(props: LabwareListProps) {
-  const { category, manufacturer } = props.filters
-  const definitions = getAllDefinitions().filter(
-    d =>
-      filterMatches(category, d.metadata.displayCategory) &&
-      filterMatches(manufacturer, d.brand.brand)
-  )
+  const definitions = getFilteredDefinitions(props.filters)
 
   return definitions.length === 0 ? (
     <NoResults />

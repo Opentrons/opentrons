@@ -4,6 +4,7 @@
 
 export * from './ClickableIcon'
 export * from './DetailsBox'
+export * from './ExternalLink'
 export * from './LabeledValueTable'
 export * from './Table'
 export * from './LabelText'
