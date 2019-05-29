@@ -5,7 +5,7 @@ for filepath in $(ls ${1}/definitions2/*.json)
 do
   filebasename=$(basename "${filepath}" .json)
   # assumes only version is 1
-  dirpath="${1}/labware/definitions/2/${filebasename}/1"
+  dirpath="${1}/labware/definitions/2/${filebasename}"
   mkdir -p "${dirpath}"
-  cp "${filepath}" "${dirpath}/${filebasename}.json"
+  cp "${filepath}" "${dirpath}/1.json"
 done

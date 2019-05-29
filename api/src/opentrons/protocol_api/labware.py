@@ -18,7 +18,7 @@ from opentrons.config import CONFIG
 # TODO: Ian 2019-05-23 where to store these constants?
 OPENTRONS_NAMESPACE = 'opentrons'
 CUSTOM_NAMESPACE = 'custom_beta'
-STANDARD_DEFS_BASE_PATH = Path(sys.modules['opentrons'].__file__).parent /\
+STANDARD_DEFS_PATH = Path(sys.modules['opentrons'].__file__).parent /\
     'shared_data' / 'labware' / 'definitions' / '2'
 
 
@@ -807,20 +807,17 @@ def _read_file(filepath: str) -> dict:
 def _get_path_to_labware(load_name: str, namespace: str, version: int) -> Path:
     if namespace == OPENTRONS_NAMESPACE:
         # all labware in OPENTRONS_NAMESPACE is bundled in wheel
-        return STANDARD_DEFS_BASE_PATH / \
-            load_name / f'{version}' / \
-            f'{namespace}__{load_name}__{version}.json'
+        return STANDARD_DEFS_PATH / load_name / f'{str(version)}.json'
 
     base_path = CONFIG['labware_user_definitions_dir_v4']
-    def_path = base_path / namespace / load_name / \
-        str(version) / f'{namespace}__{load_name}__{version}.json'
+    def_path = base_path / namespace / load_name / f'{str(version)}.json'
     return def_path
 
 
 def _get_path_to_latest_labware(load_name: str, namespace: str) -> Path:
     # Get path to highest-versioned labware within a given namespace
     if namespace == OPENTRONS_NAMESPACE:
-        base_path = STANDARD_DEFS_BASE_PATH
+        base_path = STANDARD_DEFS_PATH
     else:
         base_path = CONFIG['labware_user_definitions_dir_v4'] / namespace
 
@@ -830,19 +827,14 @@ def _get_path_to_latest_labware(load_name: str, namespace: str) -> Path:
                                 f' {namespace}')
 
     result = None
-    sorted_version_dirs = sorted(
-        [d for d in loadname_dir.iterdir() if d.is_dir()],
-        key=lambda dirpath: int(dirpath.name))
-    highest_version_dir = sorted_version_dirs[-1]
-    version_dir_files = [f for f in highest_version_dir.iterdir()
-                         if f.is_file() and f.name.endswith('.json')]
-    if len(version_dir_files) != 1:
+    files_by_version = sorted(
+        [d for d in loadname_dir.iterdir()
+            if d.is_file() and d.name.endswith('.json')],
+        key=lambda dirpath: int(dirpath.stem))
+    if len(files_by_version) == 0:
         raise RuntimeError(
-            f'Found {len(version_dir_files)} JSON files for labware ' +
-            f'{load_name} in namespace {namespace} for version ' +
-            f'{highest_version_dir}, expected exactly one file in the ' +
-            'version directory')
-    result = version_dir_files[0]
+            f'No json files found in {loadname_dir}, expected at least one')
+    result = files_by_version[-1]
 
     if result is None:
         raise FileNotFoundError(f'No labware "{load_name}" exists ' +
