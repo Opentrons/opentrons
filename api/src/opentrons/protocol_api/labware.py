@@ -941,7 +941,7 @@ def load(
 
     :param load_name: A string to use for looking up a labware definition
         previously saved to disc. The definition file must have been saved in a
-        known location with the filename '${name}.json'
+        known location
     :param parent: A :py:class:`.Location` representing the location where
                    the front and left most point of the outside of labware is
                    (often the front-left corner of a slot on the deck).
