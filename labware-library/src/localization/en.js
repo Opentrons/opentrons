@@ -29,7 +29,7 @@ export const WELL_TYPE_BY_CATEGORY: { [string]: string } = {
   other: 'well',
 }
 
-export const MANUFACTURER_LABELS_BY_MANUFACTURER = {
+export const MANUFACTURER_VALUES = {
   all: 'All',
   generic: 'Generic',
 }
@@ -41,6 +41,7 @@ export const WELL_BOTTOM_VALUES = {
 }
 
 export const MANUFACTURER = 'manufacturer'
+export const MANUFACTURER_NO = 'manufacturer / catalog #'
 export const CATEGORY = 'category'
 export const FOOTPRINT = 'footprint'
 export const MEASUREMENTS = 'measurements'

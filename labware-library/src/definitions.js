@@ -28,7 +28,7 @@ const definitionsContext = (require: any).context(
   'sync' // load every definition into one synchronous chunk
 )
 
-let definitions = null
+let definitions: LabwareList | null = null
 
 export function getAllDefinitions(): LabwareList {
   // TODO(mc, 2019-03-28): revisit decision to hide trash labware

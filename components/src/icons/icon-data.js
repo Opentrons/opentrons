@@ -323,6 +323,11 @@ const ICON_DATA_BY_NAME = {
     path:
       'M23 0h1v12a.5.5 0 0 1-.146.354l-11.5 11.5a.5.5 0 0 1-.708 0l-11.5-11.5A.5.5 0 0 1 0 12V0h1v11.793l11 11 11-11V0z',
   },
+  'open-in-new': {
+    viewBox: '0 0 24 24',
+    path:
+      'M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z',
+  },
 }
 
 export type IconName = $Keys<typeof ICON_DATA_BY_NAME>

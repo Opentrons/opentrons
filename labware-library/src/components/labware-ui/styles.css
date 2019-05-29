@@ -75,6 +75,14 @@ button.load_name_button {
   }
 }
 
+.manufacturer_stats:not(:last-child) {
+  margin-bottom: var(--spacing-7);
+}
+
+.manufacturer_brand_id {
+  line-height: var(--lh-copy);
+}
+
 .tags_data {
   display: flex;
   align-items: center;

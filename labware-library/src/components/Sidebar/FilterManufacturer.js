@@ -6,10 +6,7 @@ import { SelectField } from '@opentrons/components'
 import { getAllManufacturers, buildFiltersUrl } from '../../filters'
 import styles from './styles.css'
 
-import {
-  MANUFACTURER,
-  MANUFACTURER_LABELS_BY_MANUFACTURER,
-} from '../../localization'
+import { MANUFACTURER, MANUFACTURER_VALUES } from '../../localization'
 
 import type { ContextRouter } from 'react-router-dom'
 import type { FilterParams } from '../../types'
@@ -24,7 +21,7 @@ export function FilterManufacturer(props: FilterManufacturerProps) {
   const manufacturers = getAllManufacturers()
   const options = manufacturers.map(value => ({
     value,
-    label: MANUFACTURER_LABELS_BY_MANUFACTURER[value] || value,
+    label: MANUFACTURER_VALUES[value] || value,
   }))
 
   return (

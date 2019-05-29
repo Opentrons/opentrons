@@ -33,7 +33,7 @@ export type LabwareWellGroupProperties = {|
   brand: LabwareBrand | null,
 |}
 
-export type LabwareList = Array<LabwareDefinition>
+export type LabwareList = $ReadOnlyArray<LabwareDefinition>
 
 export type FilterParams = {
   category: string,
