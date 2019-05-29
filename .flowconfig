@@ -9,7 +9,7 @@ audio/.*
 compute/.*
 update-server/.*
 shared-data/definitions/.*
-shared-data/definitions2/.*
+shared-data/labware/definitions/.*
 
 [include]
 
