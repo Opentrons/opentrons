@@ -20,7 +20,6 @@ from opentrons import types as top_types
 from opentrons.util import linal
 from .simulator import Simulator
 from opentrons.config import robot_configs
-from opentrons.config.robot_configs import DEFAULT_GANTRY_STEPS_PER_MM
 from .pipette import Pipette
 try:
     from .controller import Controller

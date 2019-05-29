@@ -14,7 +14,7 @@ from opentrons.data_storage import database, old_container_loading,\
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as fflags
-from opentrons.config.robot_configs import load, DEFAULT_GANTRY_STEPS_PER_MM
+from opentrons.config.robot_configs import load
 from opentrons.legacy_api import containers, modules
 from opentrons.legacy_api.containers import Container, load_new_labware,\
     save_new_offsets, load_new_labware_def
