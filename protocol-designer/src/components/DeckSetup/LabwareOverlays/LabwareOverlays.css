@@ -71,3 +71,7 @@
     opacity: 1;
   }
 }
+
+.drag_preview {
+  position: absolute;
+}

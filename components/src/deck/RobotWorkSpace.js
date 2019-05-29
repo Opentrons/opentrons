@@ -1,5 +1,5 @@
 // @flow
-import * as React from 'react'
+import React, { useRef } from 'react'
 import { DeckFromData } from './Deck'
 import type { DeckDefinition, DeckSlot } from '@opentrons/shared-data'
 import styles from './RobotWorkSpace.css'
@@ -16,6 +16,19 @@ type Props = {
 
 function RobotWorkSpace(props: Props) {
   const { children, deckDef, deckLayerBlacklist = [], viewBox } = props
+  const wrapperRef: ElementRef<'svg'> = useRef()
+  const getRobotCoordsFromDOM = useRef((left: number, top: number) => {
+    const cursorPoint = wrapperRef && wrapperRef.createSVGPoint()
+
+    cursorPoint.x = left
+    cursorPoint.y = top
+
+    const cursor = cursorPoint.matrixTransform(
+      wrapperRef.getScreenCTM().inverse()
+    )
+
+    return cursor
+  })
   if (!deckDef && !viewBox) return null
 
   let wholeDeckViewBox = null
@@ -35,11 +48,12 @@ function RobotWorkSpace(props: Props) {
     <svg
       className={styles.robot_work_space}
       viewBox={viewBox || wholeDeckViewBox}
+      ref={wrapperRef}
     >
       {deckDef && (
         <DeckFromData def={deckDef} layerBlacklist={deckLayerBlacklist} />
       )}
-      {children && children({ slots })}
+      {children && children({ slots, getRobotCoordsFromDOM })}
     </svg>
   )
 }

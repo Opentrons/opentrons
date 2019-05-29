@@ -15,11 +15,7 @@ import BrowseLabwareModal from '../labware/BrowseLabwareModal'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../steplist'
 import type { InitialDeckSetup, LabwareOnDeck } from '../../step-forms'
 
-import {
-  SlotControls,
-  LabwareControls,
-  EmptyDestinationSlot,
-} from './LabwareOverlays'
+import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
 import styles from './DeckSetup.css'
 
 type Props = {|
@@ -66,8 +62,9 @@ const DeckSetup = (props: Props) => {
             viewBox={`-10 -10 ${410} ${390}`} // viewbox for small
             // viewBox={`-10 -10 ${460} ${452}`} // viewbox for mid
           >
-            {({ slots }) => (
+            {({ slots, getRobotCoordsFromDOM }) => (
               <>
+                <DragPreview getRobotCoordsFromDOM={getRobotCoordsFromDOM} />
                 <RobotCoordsForeignDiv
                   x={0}
                   y={364}

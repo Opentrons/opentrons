@@ -111,7 +111,7 @@ const labwareSource = {
   beginDrag: props => {
     return {
       slot: props.labwareOnDeck.slot,
-      labwareId: props.labwareOnDeck.id,
+      def: props.labwareOnDeck.def,
     }
   },
 }
