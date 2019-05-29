@@ -33,7 +33,7 @@ For more details, please see the full [technical change log][changelog]
 
 ### New Features
 
-- There is a more accurate definition for white-labeled Opentrons 1000ul tips. You can load it via `opentrons-tiprack-1000ul`
+- There is a more accurate definition for Opentrons 1000ul tips. You can load it via `opentrons-tiprack-1000ul`
 - Remove hard-coded smoothie timeouts to prevent issues with extremely long aspirations and dispenses.
 - Added support for more upcoming pipette hardware revisions
 - Enable pipette behavior settings to be configurable in the App
