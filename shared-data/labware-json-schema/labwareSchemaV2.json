@@ -249,7 +249,7 @@
     },
     "groups": {
       "type": "array",
-      "description": "Generated array that keeps track of how wells should grouped in a labware",
+      "description": "Logical well groupings for metadata/display purposes; changes in groups do not affect protocol execution",
       "items": {
         "type": "object",
         "required": ["wells", "metadata"],
