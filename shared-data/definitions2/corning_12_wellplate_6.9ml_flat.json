@@ -147,5 +147,26 @@
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "corning_12_wellplate_6.9ml_flat"
-  }
+  },
+  "groups": [
+    {
+      "wells": [
+        "A1",
+        "B1",
+        "C1",
+        "A2",
+        "B2",
+        "C2",
+        "A3",
+        "B3",
+        "C3",
+        "A4",
+        "B4",
+        "C4"
+      ],
+      "metadata": {
+        "wellBottomShape": "flat"
+      }
+    }
+  ]
 }

@@ -88,5 +88,22 @@
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "opentrons_6_tuberack_falcon_50ml_conical"
-  }
+  },
+  "groups": [
+    {
+      "wells": ["A1", "B1", "A2", "B2", "A3", "B3"],
+      "metadata": {
+        "displayName": "Falcon 6x50 mL Conical",
+        "displayCategory": "tubeRack",
+        "wellBottomShape": "v"
+      },
+      "brand": {
+        "brand": "Falcon",
+        "brandId": ["352070", "352098"],
+        "links": [
+          "https://ecatalog.corning.com/life-sciences/b2c/US/en/Liquid-Handling/Tubes,-Liquid-Handling/Centrifuge-Tubes/Falcon%C2%AE-Conical-Centrifuge-Tubes/p/falconConicalTubes"
+        ]
+      }
+    }
+  ]
 }
