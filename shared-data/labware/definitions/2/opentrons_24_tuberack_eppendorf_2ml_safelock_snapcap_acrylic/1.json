@@ -304,7 +304,7 @@
       }
     }
   ],
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2
 }
