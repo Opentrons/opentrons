@@ -40,7 +40,7 @@
   &.active {
     background-color: var(--c-lightest-gray);
     color: var(--c-dark-gray);
-    border-radius: 2px;
+    border-radius: var(--bd-radius-default);
   }
 }
 
