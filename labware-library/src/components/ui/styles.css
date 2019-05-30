@@ -37,7 +37,8 @@
   color: var(--c-med-gray);
   padding: var(--spacing-1);
 
-  &.active {
+  &.active,
+  &:hover {
     background-color: var(--c-lightest-gray);
     color: var(--c-dark-gray);
     border-radius: var(--bd-radius-default);
