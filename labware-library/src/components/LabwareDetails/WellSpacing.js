@@ -41,7 +41,6 @@ export type WellSpacingProps = {|
 
 export default function WellSpacing(props: WellSpacingProps) {
   const { labelSuffix, wellProperties, className } = props
-  const title = `${SPACING}${labelSuffix || ''}`
   const spacing = [
     { label: X_OFFSET, value: toFixed(wellProperties.xOffsetFromLeft) },
     { label: Y_OFFSET, value: toFixed(wellProperties.yOffsetFromTop) },
@@ -54,7 +53,7 @@ export default function WellSpacing(props: WellSpacingProps) {
       className={className}
       label={
         <>
-          {title} <LowercaseText>({MM})</LowercaseText>
+          {SPACING} <LowercaseText>({MM})</LowercaseText> {labelSuffix || ''}
         </>
       }
       values={spacing}

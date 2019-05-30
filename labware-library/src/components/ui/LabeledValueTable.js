@@ -2,7 +2,7 @@
 import * as React from 'react'
 
 import { Table, TableEntry, TABLE_COLUMN } from './Table'
-import { LabelText, LABEL_TOP, LABEL_LEFT } from './LabelText'
+import { LabelText, LABEL_LEFT } from './LabelText'
 import { Value } from './Value'
 import { ClickableIcon } from './ClickableIcon'
 
@@ -52,7 +52,7 @@ export function TableTitle(props: TableTitleProps) {
 
   return (
     <div className={styles.table_title}>
-      <LabelText position={LABEL_TOP}>{label}</LabelText>
+      <LabelText position={LABEL_LEFT}>{label}</LabelText>
       <ClickableIcon
         title="info"
         name="information"

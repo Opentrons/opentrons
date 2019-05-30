@@ -29,6 +29,11 @@ export const WELL_TYPE_BY_CATEGORY: { [string]: string } = {
   other: 'well',
 }
 
+export const WELL_DEPTH_BY_CATEGORY: { [string]: string } = {
+  tipRack: 'total length',
+  other: 'depth',
+}
+
 export const MANUFACTURER_VALUES = {
   all: 'All',
   generic: 'Generic',
@@ -58,7 +63,6 @@ export const Y_OFFSET = 'y-offset'
 export const X_SPACING = 'x-spacing'
 export const Y_SPACING = 'y-spacing'
 export const DIAMETER = 'diameter'
-export const DEPTH = 'depth'
 export const MAX_VOLUME = 'max volume'
 export const SHAPE = 'shape'
 export const BACK_TO_LABWARE_LIBRARY = 'Back to Labware Library'

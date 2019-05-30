@@ -1,13 +1,11 @@
 // @flow
 // labware display card
-// TODO(mc, 2019-03-21): split this file out into multiple component files,
-//   many of which will be common to LabwareCard and LabwarePage
 import * as React from 'react'
-import { Link } from 'react-router-dom'
 import uniq from 'lodash/uniq'
 
 import { getPublicPath } from '../../public-path'
 import { Icon } from '@opentrons/components'
+import { Link } from '../ui'
 import {
   getWellLabel,
   Gallery,

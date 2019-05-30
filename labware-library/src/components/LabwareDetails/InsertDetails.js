@@ -3,7 +3,12 @@
 import * as React from 'react'
 
 import { getUniqueWellProperties } from '../../definitions'
-import { getWellLabel, WellProperties, ManufacturerStats } from '../labware-ui'
+import {
+  getWellLabel,
+  getWellDepthLabel,
+  WellProperties,
+  ManufacturerStats,
+} from '../labware-ui'
 import { DetailsBox } from '../ui'
 import WellDimensions from './WellDimensions'
 
@@ -25,6 +30,7 @@ export default function InsertDetails(props: InsertDetailsProps) {
     <>
       {wellGroups.map((wellProps, i) => {
         const wellLabel = getWellLabel(wellProps, definition)
+        const depthLabel = getWellDepthLabel(wellProps, definition)
 
         return (
           <DetailsBox
@@ -50,6 +56,7 @@ export default function InsertDetails(props: InsertDetailsProps) {
               <WellDimensions
                 wellProperties={wellProps}
                 wellLabel={wellLabel}
+                depthLabel={depthLabel}
                 className={styles.details_table}
               />
             </div>

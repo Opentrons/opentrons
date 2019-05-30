@@ -5,6 +5,7 @@ import * as React from 'react'
 import { getUniqueWellProperties } from '../../definitions'
 import {
   getWellLabel,
+  getWellDepthLabel,
   WellCount,
   WellProperties,
   ManufacturerStats,
@@ -53,6 +54,7 @@ export default function LabwareDetailsBox(props: LabwareDetailsBoxProps) {
           {wellGroups.map((wellProps, i) => {
             const { metadata: groupMetadata } = wellProps
             const wellLabel = getWellLabel(wellProps, definition)
+            const depthLabel = getWellDepthLabel(wellProps, definition)
             const groupDisplaySuffix = groupMetadata.displayName
               ? ` - ${groupMetadata.displayName}`
               : ''
@@ -78,6 +80,7 @@ export default function LabwareDetailsBox(props: LabwareDetailsBoxProps) {
                   <WellDimensions
                     wellProperties={wellProps}
                     wellLabel={wellLabel}
+                    depthLabel={depthLabel}
                     labelSuffix={groupDisplaySuffix}
                     className={styles.details_table}
                   />

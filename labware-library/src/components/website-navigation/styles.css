@@ -283,7 +283,7 @@
 
 /* Mobile Button / Toggle */
 .menu_button {
-  flex: 0 0 3rem;
+  width: 3rem;
   color: var(--c-font-dark);
 }
 
@@ -426,7 +426,8 @@
   }
 
   .submenu_title {
-    flex: 0 0 8rem;
+    flex: none;
+    width: 8rem;
   }
 
   .support_group {
@@ -478,7 +479,7 @@
   }
 
   .submenu_title {
-    flex: 0 0 100%;
+    width: 100%;
     padding: 0;
     margin-bottom: var(--spacing-2);
   }

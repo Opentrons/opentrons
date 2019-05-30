@@ -1,13 +1,25 @@
 // @flow
 import uniqBy from 'lodash/uniqBy'
 
-import { WELL_TYPE_BY_CATEGORY } from '../../localization'
+import {
+  WELL_TYPE_BY_CATEGORY,
+  WELL_DEPTH_BY_CATEGORY,
+} from '../../localization'
 
 import type { LabwareWellGroupProperties, LabwareDefinition } from '../../types'
 
-export function getWellLabel(
-  spec: LabwareDefinition | LabwareWellGroupProperties,
-  fallback?: LabwareDefinition | LabwareWellGroupProperties
+export type LabelSpec = LabwareDefinition | LabwareWellGroupProperties
+
+export const getWellLabel = (spec: LabelSpec, fallback?: LabelSpec) =>
+  getLabel(WELL_TYPE_BY_CATEGORY, spec, fallback)
+
+export const getWellDepthLabel = (spec: LabelSpec, fallback?: LabelSpec) =>
+  getLabel(WELL_DEPTH_BY_CATEGORY, spec, fallback)
+
+function getLabel(
+  labelMap: { [string]: string },
+  spec: LabelSpec,
+  fallback?: LabelSpec
 ): string {
   let { displayCategory } = spec.metadata
 
@@ -20,13 +32,13 @@ export function getWellLabel(
     }
   }
 
-  if (displayCategory && WELL_TYPE_BY_CATEGORY[displayCategory]) {
-    return WELL_TYPE_BY_CATEGORY[displayCategory]
+  if (displayCategory && labelMap[displayCategory]) {
+    return labelMap[displayCategory]
   }
 
   if (fallback) {
-    return getWellLabel(fallback)
+    return getLabel(labelMap, fallback)
   }
 
-  return WELL_TYPE_BY_CATEGORY.other
+  return labelMap.other
 }

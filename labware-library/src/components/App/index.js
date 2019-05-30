@@ -18,7 +18,7 @@ import type { DefinitionRouteRenderProps } from '../../definitions'
 export function App(props: DefinitionRouteRenderProps) {
   const { definition, location } = props
   const scrollRef = React.useRef<HTMLDivElement | null>(null)
-  const filters = getFilters(location, definition)
+  const filters = getFilters(location)
   const detailPage = Boolean(definition)
 
   React.useEffect(() => {
