@@ -38,7 +38,7 @@
     "format": "irregular",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "generic_50x3_ml_5x10_ml_tuberack"
+    "loadName": "generic_55_tuberack_50x3ml_5x10ml"
   },
   "wells": {
     "A1": {
@@ -536,5 +536,66 @@
       "y": 15,
       "z": 48.94
     }
-  }
+  },
+  "groups": [
+    {
+      "wells": [
+        "A1",
+        "C1",
+        "E1",
+        "G1",
+        "I1",
+        "A2",
+        "C2",
+        "E2",
+        "G2",
+        "I2",
+        "A3",
+        "C3",
+        "E3",
+        "G3",
+        "I3",
+        "A4",
+        "C4",
+        "E4",
+        "G4",
+        "I4",
+        "A5",
+        "C5",
+        "E5",
+        "G5",
+        "I5",
+        "A6",
+        "C6",
+        "E6",
+        "G6",
+        "I6",
+        "A7",
+        "C7",
+        "E7",
+        "G7",
+        "I7",
+        "A8",
+        "C8",
+        "E8",
+        "G8",
+        "I8",
+        "A9",
+        "C9",
+        "E9",
+        "G9",
+        "I9",
+        "A10",
+        "C10",
+        "E10",
+        "G10",
+        "I10"
+      ],
+      "metadata": {}
+    },
+    {
+      "wells": ["B1", "B2", "B3", "B4", "B5"],
+      "metadata": {}
+    }
+  ]
 }

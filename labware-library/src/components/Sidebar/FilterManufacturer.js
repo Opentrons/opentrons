@@ -2,30 +2,26 @@
 // filter labware by manufacturer
 import * as React from 'react'
 import { withRouter } from 'react-router-dom'
-
 import { SelectField } from '@opentrons/components'
 import { getAllManufacturers, buildFiltersUrl } from '../../filters'
 import styles from './styles.css'
 
-import {
-  MANUFACTURER,
-  MANUFACTURER_LABELS_BY_MANUFACTURER,
-} from '../../localization'
+import { MANUFACTURER, MANUFACTURER_VALUES } from '../../localization'
 
 import type { ContextRouter } from 'react-router-dom'
 import type { FilterParams } from '../../types'
 
-export type FilterManufacturerProps = {
+export type FilterManufacturerProps = {|
   ...ContextRouter,
   filters: FilterParams,
-}
+|}
 
 export function FilterManufacturer(props: FilterManufacturerProps) {
   const { history, filters } = props
   const manufacturers = getAllManufacturers()
   const options = manufacturers.map(value => ({
     value,
-    label: MANUFACTURER_LABELS_BY_MANUFACTURER[value] || value,
+    label: MANUFACTURER_VALUES[value] || value,
   }))
 
   return (

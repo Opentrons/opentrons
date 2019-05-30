@@ -31,6 +31,9 @@ import { DND_TYPES } from '../../DeckSetup/LabwareOverlays/constants'
 // TODO: BC 2019-05-22 this component is no longer used and should be remove once
 // its functionality reaches parity with the new components in /DeckSetup/*
 
+// TODO: BC 2019-05-22 this component is no longer used and should be remove once
+// its functionality reaches parity with the new components in /DeckSetup/*
+
 type DragDropLabwareProps = React.ElementProps<typeof LabwareWrapper> & {
   connectDragSource: mixed => React.Element<any>,
   connectDropTarget: mixed => React.Element<any>,

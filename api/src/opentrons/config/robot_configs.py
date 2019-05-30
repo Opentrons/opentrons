@@ -110,14 +110,14 @@ DEFAULT_ACCELERATION: Dict[str, float] = {
     'C': C_ACCELERATION
 }
 
-DEFAULT_STEPS_PER_MM: Dict[str, float] = {
+DEFAULT_GANTRY_STEPS_PER_MM: Dict[str, float] = {
     'X': 80.00,
     'Y': 80.00,
     'Z': 400,
-    'A': 400,
-    'B': 768,
-    'C': 768
+    'A': 400
 }
+
+DEFAULT_STEPS_PER_MM = 'M92 X80.00 Y80.00 Z400 A400 B768 C768'
 # This probe height is ~73 from deck to the top surface of the switch body
 # per CAD; 74.3mm is the nominal for engagement from the switch drawing.
 # Note that this has a piece-to-piece tolerance stackup of +-1.5mm
@@ -158,6 +158,7 @@ robot_config = namedtuple(
         'name',
         'version',
         'steps_per_mm',
+        'gantry_steps_per_mm',
         'acceleration',
         'gantry_calibration',
         'instrument_offset',
@@ -264,6 +265,8 @@ def _build_config(deck_cal: List[List[float]],
         version=int(robot_settings.get('version', ROBOT_CONFIG_VERSION)),
         steps_per_mm=_build_conf_dict(
             robot_settings.get('steps_per_mm'), DEFAULT_STEPS_PER_MM),
+        gantry_steps_per_mm=_build_conf_dict(
+            robot_settings.get('steps_per_mm'), DEFAULT_GANTRY_STEPS_PER_MM),
         acceleration=_build_conf_dict(
             robot_settings.get('acceleration'), DEFAULT_ACCELERATION),
         gantry_calibration=deck_cal or DEFAULT_DECK_CALIBRATION,

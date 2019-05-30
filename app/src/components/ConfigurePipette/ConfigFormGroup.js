@@ -1,11 +1,11 @@
 // @flow
 import * as React from 'react'
 import { Field } from 'formik'
-import { FormGroup, InputField } from '@opentrons/components'
+import { FormGroup, InputField, CheckboxField } from '@opentrons/components'
 
 import styles from './styles.css'
 
-import type { DisplayFieldProps } from './ConfigForm'
+import type { DisplayFieldProps, DisplayQuirkFieldProps } from './ConfigForm'
 
 type FormColProps = {
   children: React.Node,
@@ -94,5 +94,46 @@ export function ConfigInput(props: ConfigInputProps) {
         )}
       </Field>
     </ConfigFormRow>
+  )
+}
+
+type ConfigBooleanProps = {
+  field: DisplayQuirkFieldProps,
+  className?: string,
+}
+
+export function ConfigCheckbox(props: ConfigBooleanProps) {
+  const { field, className } = props
+  const { name, displayName } = field
+  const id = makeId(name)
+  return (
+    <ConfigFormRow label={displayName} labelFor={id}>
+      <Field name={name}>
+        {fieldProps => (
+          <CheckboxField
+            {...{
+              ...fieldProps.field,
+              className,
+            }}
+          />
+        )}
+      </Field>
+    </ConfigFormRow>
+  )
+}
+
+type QuirkGroupProps = {
+  groupLabel: string,
+  quirks: Array<DisplayQuirkFieldProps>,
+}
+
+export function ConfigQuirkGroup(props: QuirkGroupProps) {
+  const { groupLabel, quirks } = props
+  return (
+    <FormGroup label={groupLabel} className={styles.form_group}>
+      {quirks.map((field, index) => {
+        return <ConfigCheckbox field={field} key={index} />
+      })}
+    </FormGroup>
   )
 }

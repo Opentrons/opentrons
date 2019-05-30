@@ -110,15 +110,15 @@ CONFIG_ELEMENTS = (
                   'The SQLite database where labware definitions and offsets'
                   ' are stored'),
     ConfigElement('labware_calibration_offsets_dir_v4',
-                  'API V4 Custom Labware Directory',
+                  'API V4 Calibration Offsets Directory',
                   Path('labware')/'v4'/'offsets',
                   ConfigElementType.DIR,
                   'The location where APIV4 labware calibration is stored'),
     ConfigElement('labware_user_definitions_dir_v4',
                   'API V4 Custom Labware Directory',
-                  Path('labware')/'v4'/'offsets',
+                  Path('labware')/'v4'/'custom_definitions',
                   ConfigElementType.DIR,
-                  'The location where APIV4 labware calibration is stored'),
+                  'The location where APIV4 labware definitions are stored'),
     ConfigElement('feature_flags_file',
                   'Feature Flags',
                   Path('feature_flags.json'),
@@ -430,7 +430,7 @@ def generate_config_index(defaults: Dict[str, str],
     def parse_or_default(
             ce: ConfigElement, val: Optional[str]) -> Path:
         if not val:
-            return base / Path(ce.default)
+            return base / ce.default
         else:
             return Path(val)
 

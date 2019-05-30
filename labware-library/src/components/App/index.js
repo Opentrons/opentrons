@@ -15,40 +15,38 @@ import styles from './styles.css'
 
 import type { DefinitionRouteRenderProps } from '../../definitions'
 
-export class App extends React.Component<DefinitionRouteRenderProps> {
-  componentDidUpdate(prevProps: DefinitionRouteRenderProps): void {
-    if (this.props.location.pathname !== prevProps.location.pathname) {
-      window.scrollTo(0, 0)
-    }
-  }
+export function App(props: DefinitionRouteRenderProps) {
+  const { definition, location } = props
+  const scrollRef = React.useRef<HTMLDivElement | null>(null)
+  const filters = getFilters(location, definition)
+  const detailPage = Boolean(definition)
 
-  render() {
-    const { definition, location } = this.props
-    const filters = getFilters(location, definition)
-    const breadcrumbsVisibile = Boolean(definition)
+  React.useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = 0
+  }, [location.pathname])
 
-    return (
-      <div
-        className={cx(styles.app, {
-          [styles.breadcrumbs_visible]: breadcrumbsVisibile,
-        })}
-      >
-        <Nav />
-        {breadcrumbsVisibile && <Breadcrumbs definition={definition} />}
-        <Page
-          sidebarLargeOnly={breadcrumbsVisibile}
-          sidebar={<Sidebar filters={filters} />}
-          content={
-            definition ? (
-              <LabwareDetails definition={definition} />
-            ) : (
-              <LabwareList filters={filters} />
-            )
-          }
-        />
-      </div>
-    )
-  }
+  return (
+    <div
+      className={cx(styles.app, {
+        [styles.is_detail_page]: detailPage,
+      })}
+    >
+      <Nav />
+      {detailPage && <Breadcrumbs definition={definition} />}
+      <Page
+        scrollRef={scrollRef}
+        detailPage={detailPage}
+        sidebar={<Sidebar filters={filters} />}
+        content={
+          definition ? (
+            <LabwareDetails definition={definition} />
+          ) : (
+            <LabwareList filters={filters} />
+          )
+        }
+      />
+    </div>
+  )
 }
 
 export function AppWithRoute() {

@@ -8,9 +8,9 @@ from opentrons.protocol_api import transfers as tx
 @pytest.fixture
 def _instr_labware(loop):
     ctx = papi.ProtocolContext(loop)
-    lw1 = ctx.load_labware_by_name('biorad_96_wellplate_pcr_200_ul', 1)
-    lw2 = ctx.load_labware_by_name('generic_96_wellplate_380_ul', 2)
-    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_ul', 3)
+    lw1 = ctx.load_labware_by_name('biorad_96_wellplate_200ul_pcr', 1)
+    lw2 = ctx.load_labware_by_name('generic_96_wellplate_340ul_flat', 2)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300ul', 3)
     instr = ctx.load_instrument('p300_single', Mount.RIGHT,
                                 tip_racks=[tiprack])
 
@@ -170,7 +170,7 @@ def test_new_tip_always(_instr_labware, monkeypatch):
     options = options._replace(
         transfer=options.transfer._replace(
             new_tip=TransferTipPolicy.ALWAYS,
-            drop_tip_strategy=tx.DropTipStrategy.RETURN))
+            drop_tip_strategy=tx.DropTipStrategy.TRASH))
 
     xfer_plan = tx.TransferPlan(100,
                                 lw1.columns()[0][1:5], lw2.columns()[0][1:5],
@@ -183,25 +183,25 @@ def test_new_tip_always(_instr_labware, monkeypatch):
              'kwargs': {}},
             {'method': 'dispense', 'args': [100, lw2.columns()[0][1], 1.0],
              'kwargs': {}},
-            {'method': 'return_tip', 'args': [], 'kwargs': {}},
+            {'method': 'drop_tip', 'args': [], 'kwargs': {}},
             {'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
             {'method': 'aspirate', 'args': [100, lw1.columns()[0][2], 1.0],
              'kwargs': {}},
             {'method': 'dispense', 'args': [100, lw2.columns()[0][2], 1.0],
              'kwargs': {}},
-            {'method': 'return_tip', 'args': [], 'kwargs': {}},
+            {'method': 'drop_tip', 'args': [], 'kwargs': {}},
             {'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
             {'method': 'aspirate', 'args': [100, lw1.columns()[0][3], 1.0],
              'kwargs': {}},
             {'method': 'dispense', 'args': [100, lw2.columns()[0][3], 1.0],
              'kwargs': {}},
-            {'method': 'return_tip', 'args': [], 'kwargs': {}},
+            {'method': 'drop_tip', 'args': [], 'kwargs': {}},
             {'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
             {'method': 'aspirate', 'args': [100, lw1.columns()[0][4], 1.0],
              'kwargs': {}},
             {'method': 'dispense', 'args': [100, lw2.columns()[0][4], 1.0],
              'kwargs': {}},
-            {'method': 'return_tip', 'args': [], 'kwargs': {}}]
+            {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
     assert xfer_plan_list == exp1
     for cmd in xfer_plan_list:
         getattr(i_ctx, cmd['method'])(*cmd['args'], **cmd['kwargs'])

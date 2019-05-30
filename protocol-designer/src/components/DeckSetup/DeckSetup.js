@@ -9,6 +9,7 @@ import {
   RobotWorkSpace,
   RobotCoordsForeignDiv,
 } from '@opentrons/components'
+import { getLabwareHasQuirk } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import i18n from '../../localization'
 import BrowseLabwareModal from '../labware/BrowseLabwareModal'
@@ -87,10 +88,7 @@ const DeckSetup = (props: Props) => {
                     props.initialDeckSetup.labware,
                     labware =>
                       labware.slot === slotId &&
-                      !(
-                        labware.def.parameters.quirks &&
-                        labware.def.parameters.quirks.includes('fixedTrash')
-                      )
+                      !getLabwareHasQuirk(labware.def, 'fixedTrash')
                   )
 
                   if (some(containedLabware)) {

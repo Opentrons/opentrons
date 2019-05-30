@@ -30,6 +30,11 @@ if ff.use_protocol_api_v2():
             'id': 'bootScripts',
             'name': 'Boot Scripts',
             'description': 'Clear custom boot scripts'
+        },
+        {
+            'id': 'customLabware',
+            'name': 'Custom Labware',
+            'description': 'Clear custom labware definitions'
         }
     ]
 else:
@@ -96,7 +101,7 @@ def _check_reset(reset_req: Dict[str, str]) -> Tuple[bool, str]:
     return (True, '')
 
 
-async def reset(request: web.Request) -> web.Response:
+async def reset(request: web.Request) -> web.Response:  # noqa(C901)
     """ Execute a reset of the requested parts of the user configuration.
     """
     data = await request.json()
@@ -120,6 +125,9 @@ async def reset(request: web.Request) -> web.Response:
             labware.clear_calibrations()
         else:
             db.reset()
+
+    if data.get('customLabware'):
+        labware.delete_all_custom_labware()
 
     if data.get('bootScripts'):
         if IS_ROBOT:
@@ -191,7 +199,7 @@ async def modify_pipette_settings(request: web.Request) -> web.Response:
         return web.json_response(config_match, status=200)
 
     for key, value in data['fields'].items():
-        if value:
+        if value and not isinstance(value['value'], bool):
             config = value['value']
             default = config_match[key]
             if config < default['min'] or config > default['max']:

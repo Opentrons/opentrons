@@ -25,6 +25,7 @@ import type {
   LabwareWell as Well,
   LabwareWellProperties as InputWell,
   LabwareWellMap as WellMap,
+  LabwareWellGroup as WellGroup,
   LabwareOffset as Offset,
   LabwareVolumeUnits as VolumeUnits,
 } from '../types'
@@ -130,44 +131,54 @@ function determineIrregularLayout(
   offset: Array<Offset>,
   gridStart: Array<GridStart>,
   wells: Array<InputWell>
-): WellMap {
-  return grids.reduce((wellMap, gridObj, gridIdx) => {
-    const reverseRowIdx = range(gridObj.row - 1, -1)
+): { wells: WellMap, groups: Array<WellGroup> } {
+  return grids.reduce(
+    (result, gridObj, gridIdx) => {
+      const reverseRowIdx = range(gridObj.row - 1, -1)
+      const currentGroup = { wells: [], metadata: {} }
 
-    range(gridObj.column).forEach(colIdx => {
-      range(gridObj.row).forEach(rowIdx => {
-        const wellName = _irregularWellName(rowIdx, colIdx, gridStart[gridIdx])
-        wellMap[wellName] = _calculateWellCoord(
-          reverseRowIdx[rowIdx],
-          colIdx,
-          spacing[gridIdx],
-          offset[gridIdx],
-          wells[gridIdx]
-        )
+      range(gridObj.column).forEach(colIdx => {
+        range(gridObj.row).forEach(rowIdx => {
+          const wellName = _irregularWellName(
+            rowIdx,
+            colIdx,
+            gridStart[gridIdx]
+          )
+          currentGroup.wells.push(wellName)
+          result.wells[wellName] = _calculateWellCoord(
+            reverseRowIdx[rowIdx],
+            colIdx,
+            spacing[gridIdx],
+            offset[gridIdx],
+            wells[gridIdx]
+          )
+        })
       })
-    })
 
-    return wellMap
-  }, {})
+      return { wells: result.wells, groups: [...result.groups, currentGroup] }
+    },
+    { wells: {}, groups: [] }
+  )
 }
 
 export function _generateIrregularLoadName(args: {
   grid: Array<Cell>,
   well: Array<InputWell>,
+  totalWellCount: number,
   units: VolumeUnits,
   brand: string,
   displayCategory: string,
 }): string {
-  const { grid, well, units, brand, displayCategory } = args
+  const { grid, well, totalWellCount, units, brand, displayCategory } = args
   const loadNameUnits = getAsciiVolumeUnits(units)
   const wellComboArray = grid.map((gridObj, gridIdx) => {
     const numWells = gridObj.row * gridObj.column
     const wellVolume = getDisplayVolume(well[gridIdx].totalLiquidVolume, units)
 
-    return `${numWells}x${wellVolume}_${loadNameUnits}`
+    return `${numWells}x${wellVolume}${loadNameUnits}`
   })
 
-  return createName([brand, wellComboArray, displayCategory])
+  return createName([brand, totalWellCount, displayCategory, wellComboArray])
 }
 
 // Decide order of wells for single grid containers
@@ -258,8 +269,10 @@ export function createRegularLabware(args: RegularLabwareProps): Definition {
     brand.brand,
     numWells,
     metadata.displayCategory,
-    getDisplayVolume(well.totalLiquidVolume, metadata.displayVolumeUnits),
-    getAsciiVolumeUnits(metadata.displayVolumeUnits),
+    `${getDisplayVolume(
+      well.totalLiquidVolume,
+      metadata.displayVolumeUnits
+    )}${getAsciiVolumeUnits(metadata.displayVolumeUnits)}`,
   ])
 
   return validateDefinition({
@@ -270,6 +283,7 @@ export function createRegularLabware(args: RegularLabwareProps): Definition {
     otId: assignId(),
     cornerOffsetFromSlot: _calculateCornerOffset(dimensions),
     wells: calculateCoordinates(well, ordering, spacing, offset),
+    groups: [{ wells: flatten(ordering), metadata: {} }],
     parameters: { ...args.parameters, loadName },
     namespace,
     version,
@@ -285,7 +299,13 @@ export function createIrregularLabware(
   const { offset, dimensions, grid, spacing, well, gridStart } = args
   const namespace = args.namespace || DEFAULT_CUSTOM_NAMESPACE
   const version = args.version || 1
-  const wells = determineIrregularLayout(grid, spacing, offset, gridStart, well)
+  const { wells, groups } = determineIrregularLayout(
+    grid,
+    spacing,
+    offset,
+    gridStart,
+    well
+  )
   const brand = ensureBrand(args.brand)
   const metadata = {
     ...args.metadata,
@@ -295,6 +315,7 @@ export function createIrregularLabware(
   const loadName = _generateIrregularLoadName({
     grid,
     well,
+    totalWellCount: Object.keys(wells).length,
     units: metadata.displayVolumeUnits,
     displayCategory: metadata.displayCategory,
     brand: brand.brand,
@@ -302,6 +323,7 @@ export function createIrregularLabware(
 
   return validateDefinition({
     wells,
+    groups,
     brand,
     metadata,
     dimensions,

@@ -111,9 +111,9 @@ class ProtocolContext(CommandPublisher):
         self.clear_commands()
 
         if fflags.short_fixed_trash():
-            trash_name = 'opentrons_1_trash_0.85_l'
+            trash_name = 'opentrons_1_trash_850ml_fixed'
         else:
-            trash_name = 'opentrons_1_trash_1.1_l'
+            trash_name = 'opentrons_1_trash_1100ml_fixed'
 
         self.load_labware_by_name(
             trash_name, '12')
@@ -200,8 +200,13 @@ class ProtocolContext(CommandPublisher):
         return labware_obj
 
     def load_labware_by_name(
-            self, labware_name: str,
-            location: types.DeckLocation, label: str = None) -> Labware:
+            self,
+            load_name: str,
+            location: types.DeckLocation,
+            label: str = None,
+            namespace: str = None,
+            version: int = None
+    ) -> Labware:
         """ A convenience function to specify a piece of labware by name.
 
         For labware already defined by Opentrons, this is a convient way
@@ -211,7 +216,7 @@ class ProtocolContext(CommandPublisher):
         This function returns the created and initialized labware for use
         later in the protocol.
 
-        :param str labware_name: The name of the labware to load
+        :param load_name: A string to use for looking up a labware definition
         :param location: The slot into which to load the labware such as
                          1 or '1'
         :type location: int or str
@@ -219,10 +224,14 @@ class ProtocolContext(CommandPublisher):
                           specified, this is the name the labware will appear
                           as in the run log and the calibration view in the
                           Opentrons app.
+        :param str namespace: The namespace the labware definition belongs to.
+            If unspecified, will search 'opentrons' then 'custom_beta'
+        :param int version: The version of the labware definition. If
+            unspecified, will use the latest version.
         """
-        labware = load(labware_name,
+        labware = load(load_name,
                        self._deck_layout.position_for(location),
-                       label)
+                       label, namespace, version)
         return self.load_labware(labware, location)
 
     def load_module(
@@ -872,6 +881,15 @@ class InstrumentContext(CommandPublisher):
         bot = loc.bottom()
         bot = bot._replace(point=bot.point._replace(z=bot.point.z + 10))
         self.drop_tip(bot)
+        try:
+            loc.parent.return_tips(loc, self.channels)
+        except AssertionError:
+            # The failure mode here is "can't return the tip", and might
+            # happen because another pipette took a tip from the tiprack
+            # since this pipette did. In this case just don't return the
+            # tip to the tip tracker
+            self._log.exception('Could not return tip to tip tracker')
+
         return self
 
     @cmds.publish.both(command=cmds.pick_up_tip)  # noqa(C901)
@@ -1034,6 +1052,18 @@ class InstrumentContext(CommandPublisher):
                 " However, it is a {}".format(location))
         self.move_to(target)
         self._hw_manager.hardware.drop_tip(self._mount)
+        if isinstance(target.labware, Well)\
+           and target.labware.parent.is_tiprack:
+            # If this is a tiprack we can try and add the tip back to the
+            # tracker
+            try:
+                target.labware.parent.return_tips(
+                    target.labware, self.channels)
+            except AssertionError:
+                # Similarly to :py:meth:`return_tips`, the failure case here
+                # just means the tip can't be reused, so don't actually stop
+                # the protocol
+                self._log.exception(f'Could not return tip to {target}')
         self._last_tip_picked_up_from = None
         return self
 
@@ -1107,6 +1137,7 @@ class InstrumentContext(CommandPublisher):
                  volume: Union[float, Sequence[float]],
                  source,
                  dest,
+                 trash=True,
                  **kwargs) -> 'InstrumentContext':
         # source: Union[Well, List[Well], List[List[Well]]],
         # dest: Union[Well, List[Well], List[List[Well]]],
@@ -1145,10 +1176,9 @@ class InstrumentContext(CommandPublisher):
                 - 'always': use a new tip for each transfer.
 
             * *trash* (``boolean``) --
-              If `False` (default behavior), tips will be
-              returned to their tip rack. If `True` and a trash
-              container has been attached to this `Pipette`,
-              then the tip will be sent to the trash container.
+              If `True` (default behavior), tips will be
+              dropped in the trash container attached this `Pipette`.
+              If `False` tips will be returned to tiprack.
 
             * *touch_tip* (``boolean``) --
               If `True`, a :py:meth:`touch_tip` will occur following each
@@ -1219,7 +1249,7 @@ class InstrumentContext(CommandPublisher):
         else:
             mix_strategy = transfers.MixStrategy.NEVER
 
-        if kwargs.get('trash'):
+        if trash:
             drop_tip = transfers.DropTipStrategy.TRASH
         else:
             drop_tip = transfers.DropTipStrategy.RETURN
@@ -1549,7 +1579,7 @@ class TemperatureModuleContext(ModuleContext):
             slot_number = 10
             temp_mod = ctx.load_module('Temperature Module', slot_number)
             temp_plate = temp_mod.load_labware(
-                'biorad_96_wellplate_pcr_200_ul')
+                'biorad_96_wellplate_200ul_pcr')
 
             temp_mod.set_temperature(45.5)
             temp_mod.wait_for_temp()

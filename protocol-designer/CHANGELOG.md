@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.9.0"></a>
+# [3.9.0](https://github.com/Opentrons/opentrons/compare/v3.8.3...v3.9.0) (2019-05-29)
+
+
+### Bug Fixes
+
+* **protocol-designer:** cast offsetFromBottomMm values to number ([#3387](https://github.com/Opentrons/opentrons/issues/3387)) ([893f83a](https://github.com/Opentrons/opentrons/commit/893f83a))
+* **protocol-designer:** update document title to reflect project status ([#3390](https://github.com/Opentrons/opentrons/issues/3390)) ([9ea495d](https://github.com/Opentrons/opentrons/commit/9ea495d))
+
+
+### Features
+
+* **protocol-designer:** make "labware views" use new v2 labware components ([#3448](https://github.com/Opentrons/opentrons/issues/3448)) ([ec6598b](https://github.com/Opentrons/opentrons/commit/ec6598b))
+* **protocol-designer:** v2 labware selection from definitions ([#3439](https://github.com/Opentrons/opentrons/issues/3439)) ([0ae7129](https://github.com/Opentrons/opentrons/commit/0ae7129)), closes [#3335](https://github.com/Opentrons/opentrons/issues/3335) [#3291](https://github.com/Opentrons/opentrons/issues/3291) [#3290](https://github.com/Opentrons/opentrons/issues/3290)
+* **repo:** change v2 labware len/width fields ([#3410](https://github.com/Opentrons/opentrons/issues/3410)) ([0ef0bd5](https://github.com/Opentrons/opentrons/commit/0ef0bd5))
+* **shared-data:** add version, schemaVersion, and namespace keys to v2 labware ([#3469](https://github.com/Opentrons/opentrons/issues/3469)) ([da03025](https://github.com/Opentrons/opentrons/commit/da03025)), closes [#3454](https://github.com/Opentrons/opentrons/issues/3454)
+* **shared-data:** deck component from physical data ([#3415](https://github.com/Opentrons/opentrons/issues/3415)) ([ddf9e78](https://github.com/Opentrons/opentrons/commit/ddf9e78)), closes [#3326](https://github.com/Opentrons/opentrons/issues/3326)
+
+
 <a name="3.8.3"></a>
 ## [3.8.3](https://github.com/Opentrons/opentrons/compare/v3.8.2...v3.8.3) (2019-04-30)
 

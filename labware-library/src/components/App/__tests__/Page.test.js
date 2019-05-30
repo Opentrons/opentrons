@@ -10,14 +10,26 @@ jest.mock('../../../definitions')
 describe('Page', () => {
   test('component renders sidebar and content', () => {
     const tree = shallow(
-      <Page sidebar="foo" content="bar" sidebarLargeOnly={false} />
+      <Page
+        scrollRef={{ current: null }}
+        sidebar="foo"
+        content="bar"
+        detailPage={false}
+      />
     )
 
     expect(tree).toMatchSnapshot()
   })
 
-  test('component renders with sidebarLargeOnly CSS', () => {
-    const tree = shallow(<Page sidebar="foo" content="bar" sidebarLargeOnly />)
+  test('component renders with detailPage CSS', () => {
+    const tree = shallow(
+      <Page
+        scrollRef={{ current: null }}
+        sidebar="foo"
+        content="bar"
+        detailPage={true}
+      />
+    )
 
     expect(tree).toMatchSnapshot()
   })

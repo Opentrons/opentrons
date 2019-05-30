@@ -115,8 +115,8 @@ def test_from_center_cartesian():
 
 
 def test_backcompat():
-    labware_name = 'generic_96_wellplate_380_ul'
-    labware_def = labware.load_definition_by_name(labware_name)
+    labware_name = 'generic_96_wellplate_340ul_flat'
+    labware_def = labware.load_definition(labware_name)
     lw = labware.Labware(labware_def, Location(Point(0, 0, 0), 'Test Slot'))
 
     # Note that this test uses the display name of wells to test for equality,
@@ -160,8 +160,8 @@ def test_backcompat():
 
 
 def test_well_parent():
-    labware_name = 'generic_96_wellplate_380_ul'
-    labware_def = labware.load_definition_by_name(labware_name)
+    labware_name = 'generic_96_wellplate_340ul_flat'
+    labware_def = labware.load_definition(labware_name)
     lw = labware.Labware(labware_def, Location(Point(0, 0, 0), 'Test Slot'))
     parent = Location(Point(7, 8, 9), lw)
     well_name = 'circular_well_json'
@@ -180,16 +180,16 @@ def test_well_parent():
 
 
 def test_tip_tracking_init():
-    labware_name = 'opentrons_96_tiprack_300_ul'
-    labware_def = labware.load_definition_by_name(labware_name)
+    labware_name = 'opentrons_96_tiprack_300ul'
+    labware_def = labware.load_definition(labware_name)
     tiprack = labware.Labware(labware_def,
                               Location(Point(0, 0, 0), 'Test Slot'))
     assert tiprack.is_tiprack
     for well in tiprack.wells():
         assert well.has_tip
 
-    labware_name = 'generic_96_wellplate_380_ul'
-    labware_def = labware.load_definition_by_name(labware_name)
+    labware_name = 'generic_96_wellplate_340ul_flat'
+    labware_def = labware.load_definition(labware_name)
     lw = labware.Labware(labware_def, Location(Point(0, 0, 0), 'Test Slot'))
     assert not lw.is_tiprack
     for well in lw.wells():
@@ -197,8 +197,8 @@ def test_tip_tracking_init():
 
 
 def test_use_tips():
-    labware_name = 'opentrons_96_tiprack_300_ul'
-    labware_def = labware.load_definition_by_name(labware_name)
+    labware_name = 'opentrons_96_tiprack_300ul'
+    labware_def = labware.load_definition(labware_name)
     tiprack = labware.Labware(labware_def,
                               Location(Point(0, 0, 0), 'Test Slot'))
     well_list = tiprack.wells()
@@ -236,8 +236,8 @@ def test_use_tips():
 
 
 def test_select_next_tip():
-    labware_name = 'opentrons_96_tiprack_300_ul'
-    labware_def = labware.load_definition_by_name(labware_name)
+    labware_name = 'opentrons_96_tiprack_300ul'
+    labware_def = labware.load_definition(labware_name)
     tiprack = labware.Labware(labware_def,
                               Location(Point(0, 0, 0), 'Test Slot'))
     well_list = tiprack.wells()
@@ -284,6 +284,51 @@ def test_select_next_tip():
     assert next_eight == well_list[16]
 
 
+def test_previous_tip():
+    labware_name = 'opentrons_96_tiprack_300ul'
+    labware_def = labware.load_definition(labware_name)
+    tiprack = labware.Labware(labware_def,
+                              Location(Point(0, 0, 0), 'Test Slot'))
+    # If all wells are used, we can't get a previous tip
+    assert tiprack.previous_tip() is None
+    # If one well is empty, wherever it is, we can get a slot
+    tiprack.wells()[5].has_tip = False
+    assert tiprack.previous_tip() is tiprack.wells()[5]
+    # But not if we ask for more slots than are available
+    assert tiprack.previous_tip(2) is None
+    tiprack.wells()[7].has_tip = False
+    # And those available wells have to be contiguous
+    assert tiprack.previous_tip(2) is None
+    # But if they are, we're good
+    tiprack.wells()[6].has_tip = False
+    assert tiprack.previous_tip(3) is tiprack.wells()[5]
+
+
+def test_return_tips():
+    labware_name = 'opentrons_96_tiprack_300ul'
+    labware_def = labware.load_definition(labware_name)
+    tiprack = labware.Labware(labware_def,
+                              Location(Point(0, 0, 0), 'Test Slot'))
+    # If all wells are used, we get an error if we try to return
+    with pytest.raises(AssertionError):
+        tiprack.return_tips(tiprack.wells()[0])
+    # If we have space where we specify, everything is OK
+    tiprack.wells()[0].has_tip = False
+    tiprack.return_tips(tiprack.wells()[0])
+    assert tiprack.wells()[0].has_tip
+    # We have to have enough space
+    tiprack.wells()[0].has_tip = False
+    with pytest.raises(AssertionError):
+        tiprack.return_tips(tiprack.wells()[0], 2)
+    # But we can drop stuff off the end of a column
+    tiprack.wells()[7].has_tip = False
+    tiprack.wells()[8].has_tip = False
+    tiprack.return_tips(tiprack.wells()[7], 2)
+    assert tiprack.wells()[7].has_tip
+    # But we won't wrap around
+    assert not tiprack.wells()[8].has_tip
+
+
 def test_module_load():
     module_names = ['tempdeck', 'magdeck']
     module_defs = json.loads(
@@ -310,8 +355,8 @@ def test_module_load():
 
 def test_module_load_labware():
     module_names = ['tempdeck', 'magdeck']
-    labware_name = 'generic_96_wellplate_380_ul'
-    labware_def = labware.load_definition_by_name(labware_name)
+    labware_name = 'generic_96_wellplate_340ul_flat'
+    labware_def = labware.load_definition(labware_name)
     for name in module_names:
         mod = labware.load_module(name, Location(Point(0, 0, 0), 'test'))
         old_z = mod.highest_z

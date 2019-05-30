@@ -1101,23 +1101,25 @@ class Pipette(CommandPublisher):
                 x=pos_drop_tip
             )
             self.instrument_actuator.pop_speed()
-
-            self._shake_off_tips(location, 'dropTipShake')
-
-            if home_after:
-                self._home_after_drop_tip()
-
-            self.current_volume = 0
-            self.current_tip(None)
-            self._remove_tip(
-                length=self._tip_length
-            )
+            self._home_after_drop_tip(home_after)
 
         do_publish(self.broker, commands.drop_tip, self.drop_tip,
                    'before', None, None, self, location)
+        if 'doubleDropTip' in self.quirks:
+            _drop_tip(location)
+
         _drop_tip(location)
         do_publish(self.broker, commands.drop_tip, self.drop_tip,
                    'after', self, None, self, location)
+
+        self._shake_off_tips(location, 'dropTipShake')
+
+        self.current_volume = 0
+        self.current_tip(None)
+        self._remove_tip(
+            length=self._tip_length
+        )
+
         return self
 
     def _shake_off_tips(self, location, quirk):
@@ -1149,9 +1151,11 @@ class Pipette(CommandPublisher):
         self.robot.poses = self._jog(
             self.robot.poses, 'z', DROP_TIP_RELEASE_DISTANCE)
 
-    def _home_after_drop_tip(self):
+    def _home_after_drop_tip(self, home_after):
         # incase plunger motor stalled while dropping a tip, add a
         # safety margin of the distance between `bottom` and `drop_tip`
+        if not home_after:
+            return
         b = self._get_plunger_position('bottom')
         d = self._get_plunger_position('drop_tip')
         safety_margin = abs(b - d)
@@ -1293,10 +1297,10 @@ class Pipette(CommandPublisher):
             will be used for each transfer. Default is 'once'.
 
         trash : boolean
-            If `False` (default behavior) tips will be returned to their
-            tip rack. If `True` and a trash container has been attached
+            If `True` (default behavior) and trash container has been attached
             to this `Pipette`, then the tip will be sent to the trash
             container.
+            If `False`, then tips will be returned to their associated tiprack.
 
         touch_tip : boolean
             If `True`, a :any:`touch_tip` will occur following each

@@ -36,7 +36,7 @@ are project specific  */
 
 .breadcrumbs {
   position: fixed;
-  top: var(--size-main-nav);
+  top: var(--size-mobile-nav);
   left: 0;
   right: 0;
   z-index: 888;
@@ -63,7 +63,8 @@ are project specific  */
   overflow: hidden;
   text-overflow: ellipsis;
 
-  &:hover {
+  &:hover,
+  &:active {
     color: color(var(--c-blue) alpha(0.6));
   }
 }
@@ -74,6 +75,10 @@ are project specific  */
 }
 
 @media (--medium) {
+  .breadcrumbs {
+    top: var(--size-main-nav);
+  }
+
   .main_nav_wrapper {
     height: var(--size-main-nav);
   }

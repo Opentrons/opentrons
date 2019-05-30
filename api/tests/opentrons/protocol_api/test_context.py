@@ -16,13 +16,13 @@ import pytest
 
 @pytest.fixture
 def load_my_labware(monkeypatch):
-    def dummy_load(labware_name):
+    def dummy_load(labware_name, namespace=None, version=None):
         labware_def = json.loads(
             pkgutil.get_data('opentrons',
                              'shared_data/definitions2/{}.json'.format(
                                  labware_name)))
         return labware_def
-    monkeypatch.setattr(papi.labware, 'load_definition_by_name', dummy_load)
+    monkeypatch.setattr(papi.labware, 'load_definition', dummy_load)
 
 
 def test_load_instrument(loop):
@@ -56,7 +56,7 @@ def test_location_cache(loop, monkeypatch, load_my_labware):
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)
     right = ctx.load_instrument('p10_single', Mount.RIGHT)
-    lw = ctx.load_labware_by_name('generic_96_wellplate_380_ul', 1)
+    lw = ctx.load_labware_by_name('generic_96_wellplate_340ul_flat', 1)
     ctx.home()
 
     test_args = None
@@ -93,7 +93,7 @@ def test_move_uses_arc(loop, monkeypatch, load_my_labware):
     ctx.connect(hardware)
     ctx.home()
     right = ctx.load_instrument('p10_single', Mount.RIGHT)
-    lw = ctx.load_labware_by_name('generic_96_wellplate_380_ul', 1)
+    lw = ctx.load_labware_by_name('generic_96_wellplate_340ul_flat', 1)
     ctx.home()
 
     targets = []
@@ -128,7 +128,7 @@ def test_pipette_info(loop):
 def test_pick_up_and_drop_tip(loop, load_my_labware):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
-    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_ul', 1)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300ul', 1)
     tip_length = tiprack.tip_length
     mount = Mount.LEFT
 
@@ -140,19 +140,20 @@ def test_pick_up_and_drop_tip(loop, load_my_labware):
     target_location = tiprack.wells_by_index()['A1'].top()
 
     instr.pick_up_tip(target_location)
-
+    assert not tiprack.wells()[0].has_tip
     new_offset = model_offset - Point(0, 0,
                                       tip_length)
     assert pipette.critical_point() == new_offset
 
     instr.drop_tip(target_location)
+    assert tiprack.wells()[0].has_tip
     assert pipette.critical_point() == model_offset
 
 
 def test_return_tip(loop, load_my_labware):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
-    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_ul', 1)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300ul', 1)
     mount = Mount.LEFT
 
     instr = ctx.load_instrument('p300_single', mount, tip_racks=[tiprack])
@@ -165,21 +166,22 @@ def test_return_tip(loop, load_my_labware):
 
     target_location = tiprack.wells_by_index()['A1'].top()
     instr.pick_up_tip(target_location)
-
+    assert not tiprack.wells()[0].has_tip
     assert pipette.has_tip
 
     instr.return_tip()
     assert not pipette.has_tip
+    assert tiprack.wells()[0].has_tip
 
 
 def test_pick_up_tip_no_location(loop, load_my_labware):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
 
-    tiprack1 = ctx.load_labware_by_name('opentrons_96_tiprack_300_ul', 1)
+    tiprack1 = ctx.load_labware_by_name('opentrons_96_tiprack_300ul', 1)
     tip_length1 = tiprack1.tip_length
 
-    tiprack2 = ctx.load_labware_by_name('opentrons_96_tiprack_300_ul', 2)
+    tiprack2 = ctx.load_labware_by_name('opentrons_96_tiprack_300ul', 2)
     tip_length2 = tip_length1 + 1.0
     tiprack2.tip_length = tip_length2
 
@@ -196,6 +198,7 @@ def test_pick_up_tip_no_location(loop, load_my_labware):
 
     assert 'picking up tip' in ','.join([cmd.lower()
                                          for cmd in ctx.commands()])
+    assert not tiprack1.wells()[0].has_tip
 
     new_offset = model_offset - Point(0, 0,
                                       tip_length1)
@@ -203,6 +206,7 @@ def test_pick_up_tip_no_location(loop, load_my_labware):
 
     # TODO: remove argument and verify once trash container is added
     instr.drop_tip(tiprack1.wells()[0].top())
+    assert tiprack1.wells()[0].has_tip
     assert pipette.critical_point() == model_offset
 
     for well in tiprack1.wells():
@@ -223,18 +227,18 @@ def test_instrument_trash(loop, load_my_labware):
     mount = Mount.LEFT
     instr = ctx.load_instrument('p300_single', mount)
 
-    assert instr.trash_container.name == 'opentrons_1_trash_1.1_l'
+    assert instr.trash_container.name == 'opentrons_1_trash_1100ml_fixed'
 
-    new_trash = ctx.load_labware_by_name('usa_scientific_12_trough_22_ml', 2)
+    new_trash = ctx.load_labware_by_name('usascientific_12_reservoir_22ml', 2)
     instr.trash_container = new_trash
 
-    assert instr.trash_container.name == 'usa_scientific_12_trough_22_ml'
+    assert instr.trash_container.name == 'usascientific_12_reservoir_22ml'
 
 
 def test_aspirate(loop, load_my_labware, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
-    lw = ctx.load_labware_by_name('generic_96_wellplate_380_ul', 1)
+    lw = ctx.load_labware_by_name('generic_96_wellplate_340ul_flat', 1)
     instr = ctx.load_instrument('p10_single', Mount.RIGHT)
 
     asp_called_with = None
@@ -275,7 +279,7 @@ def test_aspirate(loop, load_my_labware, monkeypatch):
 def test_dispense(loop, load_my_labware, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
-    lw = ctx.load_labware_by_name('generic_96_wellplate_380_ul', 1)
+    lw = ctx.load_labware_by_name('generic_96_wellplate_340ul_flat', 1)
     instr = ctx.load_instrument('p10_single', Mount.RIGHT)
 
     disp_called_with = None
@@ -351,8 +355,9 @@ def test_hw_manager(loop):
 def test_mix(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
-    lw = ctx.load_labware_by_name('opentrons_24_tuberack_1.5_ml_eppendorf', 1)
-    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_ul', 3)
+    lw = ctx.load_labware_by_name(
+        'opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 1)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300ul', 3)
     instr = ctx.load_instrument('p300_single', Mount.RIGHT,
                                 tip_racks=[tiprack])
 
@@ -392,8 +397,9 @@ def test_mix(loop, monkeypatch):
 def test_touch_tip_default_args(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
-    lw = ctx.load_labware_by_name('opentrons_24_tuberack_1.5_ml_eppendorf', 1)
-    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_ul', 3)
+    lw = ctx.load_labware_by_name(
+        'opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 1)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300ul', 3)
     instr = ctx.load_instrument('p300_single', Mount.RIGHT,
                                 tip_racks=[tiprack])
 
@@ -415,14 +421,15 @@ def test_touch_tip_default_args(loop, monkeypatch):
              lw.wells()[0]._from_center_cartesian(0, 1, 1) - z_offset,
              lw.wells()[0]._from_center_cartesian(0, -1, 1) - z_offset]
     for i in range(1, 5):
-        assert total_hw_moves[i] == (edges[i-1], speed)
+        assert total_hw_moves[i] == (edges[i - 1], speed)
 
 
 def test_blow_out(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
-    lw = ctx.load_labware_by_name('opentrons_24_tuberack_1.5_ml_eppendorf', 1)
-    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_ul', 3)
+    lw = ctx.load_labware_by_name(
+        'opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 1)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300ul', 3)
     instr = ctx.load_instrument('p300_single', Mount.RIGHT,
                                 tip_racks=[tiprack])
 
@@ -441,9 +448,9 @@ def test_blow_out(loop, monkeypatch):
 
 def test_transfer_options(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
-    lw1 = ctx.load_labware_by_name('biorad_96_wellplate_pcr_200_ul', 1)
-    lw2 = ctx.load_labware_by_name('generic_96_wellplate_380_ul', 2)
-    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300_ul', 3)
+    lw1 = ctx.load_labware_by_name('biorad_96_wellplate_200ul_pcr', 1)
+    lw2 = ctx.load_labware_by_name('generic_96_wellplate_340ul_flat', 2)
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300ul', 3)
     instr = ctx.load_instrument('p300_single', Mount.RIGHT,
                                 tip_racks=[tiprack])
 
@@ -465,7 +472,7 @@ def test_transfer_options(loop, monkeypatch):
             gradient_function=None,
             disposal_volume=0,
             mix_strategy=tf.MixStrategy.BEFORE,
-            drop_tip_strategy=tf.DropTipStrategy.RETURN,
+            drop_tip_strategy=tf.DropTipStrategy.TRASH,
             blow_out_strategy=tf.BlowOutStrategy.TRASH,
             touch_tip_strategy=tf.TouchTipStrategy.NEVER
         ),
@@ -485,7 +492,7 @@ def test_transfer_options(loop, monkeypatch):
 
     instr.pick_up_tip()
     instr.distribute(50, lw1.rows()[0][0], lw2.columns()[0],
-                     new_tip='never', touch_tip=True, trash=True,
+                     new_tip='never', touch_tip=True, trash=False,
                      disposal_vol=10, mix_after=(3, 20))
     instr.drop_tip()
     expected_xfer_options2 = tf.TransferOptions(
@@ -496,7 +503,7 @@ def test_transfer_options(loop, monkeypatch):
             gradient_function=None,
             disposal_volume=10,
             mix_strategy=tf.MixStrategy.AFTER,
-            drop_tip_strategy=tf.DropTipStrategy.TRASH,
+            drop_tip_strategy=tf.DropTipStrategy.RETURN,
             blow_out_strategy=tf.BlowOutStrategy.NONE,
             touch_tip_strategy=tf.TouchTipStrategy.ALWAYS
         ),

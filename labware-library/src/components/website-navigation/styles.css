@@ -282,15 +282,6 @@
 }
 
 /* Mobile Button / Toggle */
-.clickable_icon {
-  cursor: pointer;
-
-  &:active,
-  &:focus {
-    outline: none;
-  }
-}
-
 .menu_button {
   flex: 0 0 3rem;
   color: var(--c-font-dark);

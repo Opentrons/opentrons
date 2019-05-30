@@ -11,7 +11,7 @@
   "parameters": {
     "format": "irregular",
     "isTiprack": false,
-    "loadName": "generic_6_wellplate_1_ml",
+    "loadName": "generic_6_wellplate_1ml",
     "isMagneticModuleCompatible": false
   },
   "schemaVersion": 2,
@@ -83,5 +83,11 @@
       "z": 10,
       "shape": "circular"
     }
-  }
+  },
+  "groups": [
+    {
+      "wells": ["A1", "B1", "C1", "A2", "B2", "C2"],
+      "metadata": {}
+    }
+  ]
 }

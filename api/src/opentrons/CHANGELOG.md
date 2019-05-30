@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.9.0"></a>
+# [3.9.0](https://github.com/Opentrons/opentrons/compare/v3.8.3...v3.9.0) (2019-05-29)
+
+
+### Bug Fixes
+
+* **api:** Add separate key for new steps per mm shape ([#3499](https://github.com/Opentrons/opentrons/issues/3499)) ([50bb2a9](https://github.com/Opentrons/opentrons/commit/50bb2a9))
+* **api:** Don't talk about apiv2 if you can't find a labware ([#3435](https://github.com/Opentrons/opentrons/issues/3435)) ([d31f1a5](https://github.com/Opentrons/opentrons/commit/d31f1a5))
+* **api:** Fix default transfer tip behavior ([#3486](https://github.com/Opentrons/opentrons/issues/3486)) ([4534e6f](https://github.com/Opentrons/opentrons/commit/4534e6f))
+* **api:** Handle smoothie update better ([#3437](https://github.com/Opentrons/opentrons/issues/3437)) ([d2569d8](https://github.com/Opentrons/opentrons/commit/d2569d8))
+
+
+### Features
+
+* **api:** Add backwards compatibility to old pipette constructors ([#3438](https://github.com/Opentrons/opentrons/issues/3438)) ([25cf5fe](https://github.com/Opentrons/opentrons/commit/25cf5fe))
+* **api:** Add G Code for pipette config in driver ([#3388](https://github.com/Opentrons/opentrons/issues/3388)) ([77fffa6](https://github.com/Opentrons/opentrons/commit/77fffa6))
+* **api:** add pipette plus constructors ([#3407](https://github.com/Opentrons/opentrons/issues/3407)) ([f4feee9](https://github.com/Opentrons/opentrons/commit/f4feee9))
+* **api:** Add pipette+ to write_pipette_memory ([#3405](https://github.com/Opentrons/opentrons/issues/3405)) ([1b35ed1](https://github.com/Opentrons/opentrons/commit/1b35ed1))
+* **api:** Allow loading labware v2 definitions directly into apiv1 ([#3466](https://github.com/Opentrons/opentrons/issues/3466)) ([a3201fb](https://github.com/Opentrons/opentrons/commit/a3201fb))
+* **api:** apiv2: allow returning tips to the tip tracker ([#3470](https://github.com/Opentrons/opentrons/issues/3470)) ([0c73aa1](https://github.com/Opentrons/opentrons/commit/0c73aa1))
+* **api:** buildroot: allow separate setting of upstream log level ([#3436](https://github.com/Opentrons/opentrons/issues/3436)) ([ebc41a4](https://github.com/Opentrons/opentrons/commit/ebc41a4)), closes [#3422](https://github.com/Opentrons/opentrons/issues/3422)
+* **api:** Detect and change behavior for buildroot system ([#3367](https://github.com/Opentrons/opentrons/issues/3367)) ([a439f5b](https://github.com/Opentrons/opentrons/commit/a439f5b))
+* **api:** Enable Double Drop Quirk ([#3485](https://github.com/Opentrons/opentrons/issues/3485)) ([e864150](https://github.com/Opentrons/opentrons/commit/e864150))
+* **api:** Make pipette quirks configurable ([#3463](https://github.com/Opentrons/opentrons/issues/3463)) ([3513794](https://github.com/Opentrons/opentrons/commit/3513794))
+* **api:** support running v3 protocols in APIv1 ([#3468](https://github.com/Opentrons/opentrons/issues/3468)) ([0ff1ab6](https://github.com/Opentrons/opentrons/commit/0ff1ab6)), closes [#3449](https://github.com/Opentrons/opentrons/issues/3449)
+* **repo:** change v2 labware len/width fields ([#3410](https://github.com/Opentrons/opentrons/issues/3410)) ([0ef0bd5](https://github.com/Opentrons/opentrons/commit/0ef0bd5))
+
+
 <a name="3.8.3"></a>
 ## [3.8.3](https://github.com/Opentrons/opentrons/compare/v3.8.2...v3.8.3) (2019-04-30)
 

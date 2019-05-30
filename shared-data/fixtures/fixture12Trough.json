@@ -20,7 +20,7 @@
   "metadata": {
     "displayName": "12 Channel Trough",
     "displayVolumeUnits": "mL",
-    "displayCategory": "trough"
+    "displayCategory": "reservoir"
   },
   "cornerOffsetFromSlot": {
     "x": 0,
@@ -36,7 +36,7 @@
     "format": "trough",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "usa_scientific_12_trough_22_ml",
+    "loadName": "usascientific_12_reservoir_22ml",
     "quirks": ["centerMultichannelOnWells"]
   },
   "wells": {
@@ -164,5 +164,26 @@
   "brand": {
     "brand": "USA Scientific",
     "brandId": ["1061-8150"]
-  }
+  },
+  "groups": [
+    {
+      "wells": [
+        "A1",
+        "A2",
+        "A3",
+        "A4",
+        "A5",
+        "A6",
+        "A7",
+        "A8",
+        "A9",
+        "A10",
+        "A11",
+        "A12"
+      ],
+      "metadata": {
+        "wellBottomShape": "v"
+      }
+    }
+  ]
 }

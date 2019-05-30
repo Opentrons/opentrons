@@ -20,7 +20,6 @@ from opentrons import types as top_types
 from opentrons.util import linal
 from .simulator import Simulator
 from opentrons.config import robot_configs
-from opentrons.config.robot_configs import DEFAULT_STEPS_PER_MM
 from .pipette import Pipette
 try:
     from .controller import Controller
@@ -284,8 +283,7 @@ class API(HardwareAPILike):
                         plunger_axis.name, {'max_travel': 60})
                 else:
                     self._backend._smoothie_driver.update_steps_per_mm(
-                        {plunger_axis.name: DEFAULT_STEPS_PER_MM[
-                            plunger_axis.name]})
+                        {plunger_axis.name: 768})
 
                     self._backend._smoothie_driver.update_pipette_config(
                         mount_axis.name, {'home': 220})
@@ -1019,25 +1017,33 @@ class API(HardwareAPILike):
         plunger_ax = Axis.of_plunger(mount)
         droptip = instr.config.drop_tip
         bottom = instr.config.bottom
-        self._backend.set_active_current(plunger_ax,
-                                         instr.config.plunger_current)
-        await self._move_plunger(mount, bottom)
-        self._backend.set_active_current(plunger_ax,
-                                         instr.config.drop_tip_current)
-        await self._move_plunger(
-            mount, droptip, speed=instr.config.drop_tip_speed)
-        await self._shake_off_tips(mount)
+
+        async def _drop_tip():
+            self._backend.set_active_current(plunger_ax,
+                                             instr.config.plunger_current)
+            await self._move_plunger(mount, bottom)
+            self._backend.set_active_current(plunger_ax,
+                                             instr.config.drop_tip_current)
+            await self._move_plunger(
+                mount, droptip, speed=instr.config.drop_tip_speed)
+            if home_after:
+                safety_margin = abs(bottom-droptip)
+                async with self._motion_lock:
+                    smoothie_pos = self._backend.fast_home(
+                        plunger_ax.name.upper(), safety_margin)
+                    self._current_position = self._deck_from_smoothie(
+                        smoothie_pos)
+                await self._move_plunger(mount, safety_margin)
+
+        if 'doubleDropTip' in instr.config.quirks:
+            await _drop_tip()
+        await _drop_tip()
+        if 'dropTipShake' in instr.config.quirks:
+            await self._shake_off_tips(mount)
         self._backend.set_active_current(plunger_ax,
                                          instr.config.plunger_current)
         instr.set_current_volume(0)
         instr.remove_tip()
-        if home_after:
-            safety_margin = abs(bottom-droptip)
-            async with self._motion_lock:
-                smoothie_pos = self._backend.fast_home(
-                    plunger_ax.name.upper(), safety_margin)
-                self._current_position = self._deck_from_smoothie(smoothie_pos)
-            await self._move_plunger(mount, safety_margin)
 
     async def _shake_off_tips(self, mount):
         # tips don't always fall off, especially if resting against

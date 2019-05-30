@@ -10,13 +10,12 @@ import LabwareName from './LabwareName'
 import EditLabware from './EditLabware'
 import BrowseLabware from './BrowseLabware'
 
-type OP = {|
+type Props = {|
   labwareOnDeck: LabwareOnDeck,
   selectedTerminalItemId: ?TerminalItemId,
   slot: DeckSlot,
 |}
 
-type Props = {| ...DNDProps, ...OP |}
 const LabwareControls = (props: Props) => {
   const { labwareOnDeck, slot, selectedTerminalItemId } = props
   if (

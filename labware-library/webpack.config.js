@@ -55,5 +55,6 @@ function makeHtmlPlugin(page) {
     description: pkg.description,
     author: pkg.author.name,
     filename: path.join(location, 'index.html'),
+    gtmId: process.env.GTM_ID,
   })
 }

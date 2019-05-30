@@ -44,7 +44,7 @@ async def test_tip_probe_v2(main_router, model, monkeypatch):
     monkeypatch.setattr(main_router.calibration_manager,
                         'move_to_front', fake_move)
 
-    tr = labware.load('opentrons_96_tiprack_300_ul', Location(Point(), 'test'))
+    tr = labware.load('opentrons_96_tiprack_300ul', Location(Point(), 'test'))
     tr.tip_length = 2
 
     model.instrument.tip_racks = [

@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 
 from tests.opentrons.conftest import fuzzy_assert
-from opentrons.config.robot_configs import DEFAULT_STEPS_PER_MM
+from opentrons.config.robot_configs import DEFAULT_GANTRY_STEPS_PER_MM
 
 
 def position(x, y, z, a, b, c):
@@ -356,9 +356,9 @@ def test_steps_per_mm(smoothie, monkeypatch):
     # Check that steps_per_mm dict gets loaded with defaults on start
     assert smoothie.steps_per_mm == {}
     smoothie._setup()
-    assert smoothie.steps_per_mm == DEFAULT_STEPS_PER_MM
+    assert smoothie.steps_per_mm == DEFAULT_GANTRY_STEPS_PER_MM
     smoothie.update_steps_per_mm({'Z': 450})
-    expected = DEFAULT_STEPS_PER_MM
+    expected = DEFAULT_GANTRY_STEPS_PER_MM
     expected['Z'] = 450
     assert smoothie.steps_per_mm == expected
 

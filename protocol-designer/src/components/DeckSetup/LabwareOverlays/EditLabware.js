@@ -16,7 +16,6 @@ import { selectors as labwareIngredSelectors } from '../../../labware-ingred/sel
 import i18n from '../../../localization'
 import type { LabwareOnDeck } from '../../../step-forms'
 import NameThisLabware from './NameThisLabware'
-// import DisabledSelectSlot from './DisabledSelectSlot'
 import styles from './LabwareOverlays.css'
 
 type OP = {|

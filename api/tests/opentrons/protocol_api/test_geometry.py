@@ -5,8 +5,8 @@ from opentrons.protocol_api.geometry import Deck, plan_moves
 from opentrons.protocol_api import labware
 from opentrons.hardware_control.types import CriticalPoint
 
-labware_name = 'generic_96_wellplate_380_ul'
-trough_name = 'usa_scientific_12_trough_22_ml'
+labware_name = 'generic_96_wellplate_340ul_flat'
+trough_name = 'usascientific_12_reservoir_22ml'
 
 
 def test_slot_names():
@@ -117,7 +117,7 @@ def test_force_direct():
 
 
 def test_no_labware_loc():
-    labware_def = labware.load_definition_by_name(labware_name)
+    labware_def = labware.load_definition(labware_name)
 
     deck = Deck()
     lw1 = labware.load(labware_name, deck.position_for(1))

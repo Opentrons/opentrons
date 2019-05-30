@@ -32,16 +32,24 @@ export type LabwareDefinition = {
 export type AllLabwareDefinitions = {
   [name: string]: LabwareDefinition,
 }
-
+// TODO(mc, 2019-05-29): Remove this enum in favor of string + exported
+// constants + unit tests to catch typos in our definitions. Make changes
+// here and in shared-data/labware-json-schema/labwareSchemaV2.json
 export type LabwareDisplayCategory =
+  | 'wellPlate'
   | 'tipRack'
   | 'tubeRack'
-  | 'trough'
+  | 'reservoir'
+  | 'aluminumBlock'
   | 'trash'
-  | 'wellPlate'
   | 'other'
 
 export type LabwareVolumeUnits = 'µL' | 'mL' | 'L'
+
+// TODO(mc, 2019-05-29): Remove this enum in favor of string + exported
+// constants + unit tests to catch typos in our definitions. Make changes
+// here and in shared-data/labware-json-schema/labwareSchemaV2.json
+export type WellBottomShape = 'flat' | 'u' | 'v'
 
 export type LabwareMetadata = {|
   displayName: string,
@@ -75,11 +83,12 @@ export type LabwareParameters = {|
 |}
 
 export type LabwareBrand = {|
-  brandId?: Array<string>,
   brand: string,
+  brandId?: Array<string>,
+  links?: Array<string>,
 |}
 
-type LabwareWellShapeProperties =
+export type LabwareWellShapeProperties =
   | {|
       shape: 'circular',
       diameter: number,
@@ -110,6 +119,18 @@ export type LabwareWellMap = {
   [wellName: string]: LabwareWell,
 }
 
+export type LabwareWellGroupMetadata = {|
+  displayName?: string,
+  displayCategory?: LabwareDisplayCategory,
+  wellBottomShape?: WellBottomShape,
+|}
+
+export type LabwareWellGroup = {|
+  wells: Array<string>,
+  metadata: LabwareWellGroupMetadata,
+  brand?: LabwareBrand,
+|}
+
 // NOTE: must be synced with shared-data/labware-json-schema/labwareSchemaV2.json
 export type LabwareDefinition2 = {|
   otId: string,
@@ -123,6 +144,7 @@ export type LabwareDefinition2 = {|
   brand: LabwareBrand,
   ordering: Array<Array<string>>,
   wells: LabwareWellMap,
+  groups: Array<LabwareWellGroup>,
 |}
 
 export type DeckOffset = {|

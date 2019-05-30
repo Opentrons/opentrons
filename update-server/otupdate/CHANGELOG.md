@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.9.0"></a>
+# [3.9.0](https://github.com/Opentrons/opentrons/compare/v3.8.3...v3.9.0) (2019-05-29)
+
+
+### Features
+
+* **api:** Detect and change behavior for buildroot system ([#3367](https://github.com/Opentrons/opentrons/issues/3367)) ([a439f5b](https://github.com/Opentrons/opentrons/commit/a439f5b))
+* **update-server:** buildroot: use sd-notify and better hostname ([#3416](https://github.com/Opentrons/opentrons/issues/3416)) ([e38944c](https://github.com/Opentrons/opentrons/commit/e38944c))
+
+
 <a name="3.8.3"></a>
 ## [3.8.3](https://github.com/Opentrons/opentrons/compare/v3.8.2...v3.8.3) (2019-04-30)
 
