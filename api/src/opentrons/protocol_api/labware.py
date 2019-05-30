@@ -720,7 +720,7 @@ class ThermocyclerGeometry(ModuleGeometry):
 def _hash_labware_def(labware: Dict[str, Any]) -> str:
     # remove keys that do not affect run
     blacklist = ['metadata', 'brand', 'groups']
-    def_no_metadata = {k: labware[k] for k in labware if k not in blacklist}
+    def_no_metadata = {k: v for k, v in labware.items() if k not in blacklist}
     sorted_def_str = json.dumps(
         def_no_metadata, sort_keys=True, separators=(',', ':'))
     return sha256(sorted_def_str.encode('utf-8')).hexdigest()
