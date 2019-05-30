@@ -12,7 +12,7 @@
 
 .gallery_thumbnail_row {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   width: 100%;
   margin-top: var(--spacing-5);
 }
@@ -99,11 +99,12 @@ button.load_name_button {
 }
 
 .well_properties {
+  @apply --flex-between;
+
+  flex-wrap: wrap;
   margin-top: var(--spacing-5);
   padding: var(--spacing-5) var(--spacing-5) 0;
   border: var(--bd-light);
-  display: flex;
-  flex-wrap: wrap;
 }
 
 .well_properties_title {
@@ -116,11 +117,15 @@ button.load_name_button {
 }
 
 .well_properties_column {
+  flex: none;
   display: flex;
-  width: 50%;
-  min-width: 8rem;
   align-items: center;
   margin-bottom: var(--spacing-5);
+
+  &:first-child {
+    margin-right: auto;
+    padding-right: var(--spacing-5);
+  }
 }
 
 .well_bottom_shape {
@@ -132,7 +137,7 @@ button.load_name_button {
 .well_bottom_icon {
   align-self: flex-end;
   width: var(--spacing-6);
-  margin-left: var(--spacing-3);
+  margin-left: var(--spacing-5);
   padding-bottom: calc(var(--spacing-1));
   overflow: visible;
   color: var(--c-font-icon);
