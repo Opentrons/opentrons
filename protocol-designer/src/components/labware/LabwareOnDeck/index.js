@@ -43,6 +43,7 @@ const LabwareOnDeck = (props: Props) => (
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const { labwareOnDeck } = ownProps
+
   return {
     wellContents: wellContentsSelectors.getAllWellContentsForActiveItem(state)[
       labwareOnDeck.id

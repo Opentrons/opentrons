@@ -42,10 +42,6 @@ function _wellContentsForWell(
   )
 
   return {
-    highlighted: false,
-    selected: false,
-    error: false,
-    maxVolume: Infinity, // TODO Ian 2018-03-23 refactor so all these fields aren't needed
     wellName: well,
     groupIds: ingredGroupIdsWithContent, // TODO: BC 2018-09-21 remove in favor of volumeByGroupId
     ingreds: omitBy(
@@ -57,7 +53,6 @@ function _wellContentsForWell(
 
 export function _wellContentsForLabware(
   labwareLiquids: StepGeneration.SingleLabwareLiquidState,
-  labwareId: string,
   labwareDef: LabwareDefinition2
 ): ContentsByWell {
   const allWellsForContainer = getAllWellsForLabware(labwareDef)
@@ -99,7 +94,6 @@ export const getAllWellContentsForSteps: Selector<
         ) =>
           _wellContentsForLabware(
             labwareLiquids,
-            labwareId,
             labwareEntities[labwareId].def
           )
       )
@@ -119,7 +113,6 @@ export const getLastValidWellContents: Selector<WellContentsByLabware> = createS
       ) => {
         return _wellContentsForLabware(
           robotState.liquidState.labware[labwareId],
-          labwareId,
           labwareEntities[labwareId].def
         )
       }
@@ -131,39 +124,49 @@ export const getAllWellContentsForActiveItem: Selector<
   Array<WellContentsByLabware>
 > = createSelector(
   stepsSelectors.getActiveItem,
-  getWellContentsAllLabware,
-  getLastValidWellContents,
-  getAllWellContentsForSteps,
+  fileDataSelectors.getInitialRobotState,
+  fileDataSelectors.getRobotStateTimeline,
+  fileDataSelectors.lastValidRobotState,
+  stepFormSelectors.getLabwareEntities,
   stepFormSelectors.getOrderedStepIds,
   (
     activeItem,
-    wellContentsAllLabware,
-    lastValidWellContents,
-    allWellContentsForSteps,
+    initialRobotState,
+    robotStateTimeline,
+    lastValidRobotState,
+    labwareEntities,
     orderedStepIds
   ) => {
-    if (activeItem.isStep) {
-      // TODO: Ian 2018-07-31 replace with util function, "findIndexOrNull"?
+    const timeline = [
+      { robotState: initialRobotState },
+      ...robotStateTimeline.timeline,
+      { robotState: lastValidRobotState },
+    ]
+    let timelineIdx = timeline.length - 1 // default to last valid robot state
 
-      const timelineIdx = orderedStepIds.findIndex(id => id === activeItem.id)
-      assert(
-        timelineIdx !== -1,
-        `getAllWellContentsForActiveItem got unhandled terminal id: "${
-          activeItem.id
-        }"`
-      )
-      return allWellContentsForSteps[timelineIdx] || lastValidWellContents
+    if (activeItem.isStep) {
+      timelineIdx = orderedStepIds.findIndex(id => id === activeItem.id)
     } else if (!activeItem.isStep && activeItem.id === START_TERMINAL_ITEM_ID) {
-      return wellContentsAllLabware
-    } else if (!activeItem.isStep && activeItem.id === END_TERMINAL_ITEM_ID) {
-      return lastValidWellContents
-    } else {
-      console.warn(
-        activeItem.isStep,
-        `getAllWellContentsForActiveItem got unhandled id: "${activeItem.id}"`
-      )
-      return {}
+      timelineIdx = 0
     }
+
+    assert(
+      timelineIdx !== -1,
+      `getAllWellContentsForActiveItem got unhandled terminal id: "${
+        activeItem.id
+      }"`
+    )
+
+    const liquidState = timeline[timelineIdx].robotState.liquidState.labware
+    const wellContentsByLabwareId = mapValues(
+      liquidState,
+      (
+        labwareLiquids: StepGeneration.SingleLabwareLiquidState,
+        labwareId: string
+      ) =>
+        _wellContentsForLabware(labwareLiquids, labwareEntities[labwareId].def)
+    )
+    return wellContentsByLabwareId
   }
 )
 
