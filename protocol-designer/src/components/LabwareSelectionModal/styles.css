@@ -21,6 +21,7 @@
   margin: auto;
   padding: 1rem 2rem;
   user-select: none;
+  z-index: 1;
 
   & button {
     margin-top: 2rem;
@@ -59,7 +60,7 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  z-index: 1;
+  z-index: 10;
 }
 
 .labware_preview {

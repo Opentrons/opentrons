@@ -1,6 +1,7 @@
 // @flow
 import type { ElementProps } from 'react'
-import type { DeckSlot, DropdownOption, Mount } from '@opentrons/components'
+import type { DeckSlotId } from '@opentrons/shared-data'
+import type { DropdownOption, Mount } from '@opentrons/components'
 import { typeof InstrumentGroup as InstrumentGroupProps } from '@opentrons/components'
 import assert from 'assert'
 import forEach from 'lodash/forEach'
@@ -52,7 +53,7 @@ import type { RootState } from '../reducers'
 import type { InvariantContext } from '../../step-generation'
 
 // TODO: Ian 2019-04-10 SHIM REMOVAL #3335
-const FALLBACK_DEF = '54d2f430-d602-11e8-80b1-6965467d172c'
+const FALLBACK_DEF = 'opentrons_1_trash_1.1_l'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 
@@ -155,7 +156,7 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
     return {
       labware: mapValues(
         labwareLocations,
-        (slot: DeckSlot, labwareId: string): LabwareOnDeck => {
+        (slot: DeckSlotId, labwareId: string): LabwareOnDeck => {
           return { slot, ...labwareEntities[labwareId] }
         }
       ),

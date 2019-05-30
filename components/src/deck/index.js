@@ -3,6 +3,7 @@ import Deck from './Deck'
 import Labware from './Labware'
 import LabwareWrapper from './LabwareWrapper'
 import LabwareOutline from './LabwareOutline'
+import LabwareNameOverlay from './LabwareNameOverlay'
 import LabwareLabels from './LabwareLabels'
 import LabwareRender from './LabwareRender'
 import Well from './Well'
@@ -27,6 +28,7 @@ export {
   EmptyDeckSlot,
   Labware,
   LabwareWrapper,
+  LabwareNameOverlay,
   LabwareOutline,
   LabwareLabels,
   LabwareRender,

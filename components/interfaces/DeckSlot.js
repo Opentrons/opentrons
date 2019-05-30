@@ -5,7 +5,5 @@ export type DeckSlotProps = {
   slot: string,
   highlighted?: boolean,
   containerType?: string,
-  children?: React.Node
+  children?: React.Node,
 }
-
-export type DeckSlot = React.ComponentType<DeckSlotProps>

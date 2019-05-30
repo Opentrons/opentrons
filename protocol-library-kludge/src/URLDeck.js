@@ -9,19 +9,19 @@ import {
   Labware,
   Module,
 } from '@opentrons/components'
-import type { DeckSlot, LabwareComponentProps } from '@opentrons/components'
-import type { ModuleType } from '@opentrons/shared-data'
+import type { LabwareComponentProps } from '@opentrons/components'
+import type { ModuleType, DeckSlotId } from '@opentrons/shared-data'
 
 // URI-encoded JSON expected as URL param "data" (eg `?data=...`)
 type UrlData = {
   labware: {
-    [DeckSlot]: {
+    [DeckSlotId]: {
       labwareType: string,
       name: ?string,
     },
   },
   modules: {
-    [DeckSlot]: ModuleType,
+    [DeckSlotId]: ModuleType,
   },
 }
 

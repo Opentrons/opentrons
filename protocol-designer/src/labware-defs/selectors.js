@@ -1,5 +1,6 @@
 // @flow
 import mapValues from 'lodash/mapValues'
+import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
 import { _getSharedLabware, getAllDefinitions } from './utils'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -55,10 +56,19 @@ export const V1_NAME_TO_V2_OTID = {
   'trough-12row': 'a41d9ef0-f4b6-11e8-90c2-7106f0eae5a7',
 }
 
+const otIdToLoadName = reduce(
+  getAllDefinitions(),
+  (acc, def, otID) => ({
+    ...acc,
+    [def.otId]: def.parameters.loadName,
+  }),
+  {}
+)
+
 // TODO: Ian 2019-04-10 SHIM REMOVAL #3335
 const V1_FALLBACKS = mapValues(
   V1_NAME_TO_V2_OTID,
-  v1Type => getAllDefinitions()[v1Type]
+  v1Type => getAllDefinitions()[otIdToLoadName[v1Type]]
 )
 
 const _makeLabwareDefsObj = (customDefs: LabwareDefByDefId) => {

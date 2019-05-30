@@ -3,7 +3,7 @@ import { createAction } from 'redux-actions'
 import type { Dispatch } from 'redux'
 
 import { selectors } from '../selectors'
-import type { DeckSlot } from '@opentrons/components'
+import type { DeckSlotId } from '@opentrons/shared-data'
 import type { GetState } from '../../types'
 import type { IngredInputs } from '../types'
 
@@ -13,7 +13,7 @@ type IngredInputsExact = $Exact<IngredInputs>
 
 export const openAddLabwareModal = createAction<
   'OPEN_ADD_LABWARE_MODAL',
-  { slot: DeckSlot }
+  { slot: DeckSlotId }
 >('OPEN_ADD_LABWARE_MODAL')
 
 export const closeLabwareSelector = createAction<
@@ -46,7 +46,7 @@ export const drillUpFromLabware = createAction<'DRILL_UP_FROM_LABWARE', void>(
 // ==== Create/delete/modify labware =====
 
 export type CreateContainerArgs = {|
-  slot?: DeckSlot, // NOTE: if slot is omitted, next available slot will be used.
+  slot?: DeckSlotId, // NOTE: if slot is omitted, next available slot will be used.
   containerType: string,
 |}
 
@@ -91,16 +91,16 @@ export const renameLabware = (
 export type SwapSlotContentsAction = {
   type: 'SWAP_SLOT_CONTENTS',
   payload: {
-    sourceSlot: DeckSlot,
-    destSlot: DeckSlot,
+    sourceSlot: DeckSlotId,
+    destSlot: DeckSlotId,
   },
 }
 
 // TODO: Ian 2019-01-24 later, this should work on stepId or a range of steps.
 // We could follow the pattern of SubstituteStepFormPipettesAction.
 export const swapSlotContents = (
-  sourceSlot: DeckSlot,
-  destSlot: DeckSlot
+  sourceSlot: DeckSlotId,
+  destSlot: DeckSlotId
 ): SwapSlotContentsAction => ({
   type: 'SWAP_SLOT_CONTENTS',
   payload: { sourceSlot, destSlot },
@@ -112,7 +112,7 @@ export type DuplicateLabwareAction = {
     templateLabwareId: string,
     duplicateLabwareId: string,
     duplicateDisambiguationNumber: number,
-    slot: DeckSlot,
+    slot: DeckSlotId,
   },
 }
 

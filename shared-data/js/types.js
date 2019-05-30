@@ -175,8 +175,10 @@ export type CoordinateTuple = [number, number, number]
 export type UnitDirection = 1 | -1
 export type UnitVectorTuple = [UnitDirection, UnitDirection, UnitDirection]
 
+export type DeckSlotId = string
+
 export type DeckSlot = {|
-  id: string,
+  id: DeckSlotId,
   position: CoordinateTuple,
   matingSurfaceUnitVector?: UnitVectorTuple,
   boundingBox: Dimensions,

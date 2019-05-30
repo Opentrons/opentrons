@@ -7,15 +7,17 @@ import {
   ContainerNameOverlay,
   EmptyDeckSlot,
   humanizeLabwareType,
-  type DeckSlot,
 } from '@opentrons/components'
-import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
+import {
+  type DeckSlotId,
+  SLOT_RENDER_WIDTH,
+  SLOT_RENDER_HEIGHT,
+} from '@opentrons/shared-data'
 import styles from '../labware.css'
 
 import type { StepIdType } from '../../../form-types'
 import HighlightableLabware from '../../../containers/HighlightableLabware'
 import ClickableText from '../ClickableText'
-import NameThisLabwareOverlay from '../NameThisLabwareOverlay'
 import OverlayPanel from '../OverlayPanel'
 import DisabledSelectSlotOverlay from '../DisabledSelectSlotOverlay'
 import BrowseLabwareOverlay from '../BrowseLabwareOverlay'
@@ -26,15 +28,18 @@ import {
 } from '../../../steplist'
 import { DND_TYPES } from './constants'
 
+// TODO: BC 2019-05-22 this component is no longer used and should be remove once
+// its functionality reaches parity with the new components in /DeckSetup/*
+
 type DragDropLabwareProps = React.ElementProps<typeof LabwareWrapper> & {
   connectDragSource: mixed => React.Element<any>,
   connectDropTarget: mixed => React.Element<any>,
-  draggedItem?: { slot: DeckSlot },
+  draggedItem?: { slot: DeckSlotId },
   isOver: boolean,
-  swapSlotContents: (DeckSlot, DeckSlot) => void,
+  swapSlotContents: (DeckSlotId, DeckSlotId) => void,
   render: (args: {
     isOver: boolean,
-    draggedItem?: { slot: DeckSlot },
+    draggedItem?: { slot: DeckSlotId },
   }) => React.Node,
 }
 const DragSourceLabware = (props: DragDropLabwareProps) => {
@@ -191,7 +196,7 @@ function EmptyDeckSlotOverlay(props: EmptyDeckSlotOverlayProps) {
 }
 
 type LabwareOnDeckProps = {
-  slot: DeckSlot,
+  slot: DeckSlotId,
   containerId: string,
   containerName: ?string,
   containerType: string,
@@ -212,7 +217,7 @@ type LabwareOnDeckProps = {
   deleteLabware: () => mixed,
   duplicateLabware: StepIdType => mixed,
   editLiquids: () => mixed,
-  swapSlotContents: (DeckSlot, DeckSlot) => mixed,
+  swapSlotContents: (DeckSlotId, DeckSlotId) => mixed,
 
   setLabwareName: (name: ?string) => mixed,
   setDefaultLabwareName: () => mixed,
@@ -243,8 +248,8 @@ const LabwareOnDeck = (props: LabwareOnDeckProps) => {
     editLiquids,
     swapSlotContents,
 
-    setDefaultLabwareName,
-    setLabwareName,
+    // setDefaultLabwareName,
+    // setLabwareName,
   } = props
 
   // determine what overlay to show
@@ -253,12 +258,11 @@ const LabwareOnDeck = (props: LabwareOnDeckProps) => {
   if (selectedTerminalItem === START_TERMINAL_ITEM_ID && !addLabwareMode) {
     isManualInterventionStep = true
     if (showNameOverlay) {
-      overlay = (
-        <NameThisLabwareOverlay
-          {...{ setLabwareName, editLiquids }}
-          onClickOutside={setDefaultLabwareName}
-        />
-      )
+      overlay = null
+      // <NameThisLabwareOverlay
+      //   {...{ setLabwareName, editLiquids }}
+      //   onClickOutside={setDefaultLabwareName}
+      // />
     } else {
       overlay = slotHasLabware ? (
         <LabwareDeckSlotOverlay

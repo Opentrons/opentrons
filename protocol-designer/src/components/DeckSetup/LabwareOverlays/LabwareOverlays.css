@@ -1,0 +1,58 @@
+@import '@opentrons/components';
+
+.slot_ui {
+  height: 100%;
+  width: 100%;
+}
+
+.slot_overlay {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 0.5rem;
+  background-color: color(var(--c-black) alpha(0.75));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: flex-start;
+  color: white;
+  font-size: 0.75rem;
+  vertical-align: middle;
+}
+
+.slot_overlay.with_form {
+  background-color: color(var(--c-black) alpha(1));
+}
+
+.name_input {
+  width: 7rem;
+}
+
+.overlay_button {
+  text-decoration: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.overlay_button:active {
+  opacity: 0.5;
+}
+
+.overlay_icon {
+  height: 1rem;
+  width: 1rem;
+  margin-right: 0.25rem;
+}
+
+.appear_on_mouseover {
+  opacity: 0;
+
+  &:hover {
+    opacity: 1;
+  }
+}

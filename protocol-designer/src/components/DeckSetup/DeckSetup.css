@@ -16,3 +16,9 @@
 .deck_row {
   @apply --center-children;
 }
+
+.deck_instructions {
+  font-size: var(--fs-body-1);
+  font-weight: var(--fw-semibold);
+  color: var(--c-font-dark);
+}
