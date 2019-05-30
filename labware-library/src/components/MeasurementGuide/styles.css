@@ -6,10 +6,10 @@
   height: auto;
   max-height: 0;
   overflow: hidden;
-  transition: max-height 1s;
+  transition: max-height 0.5s linear;
 
   &.open {
-    /* Need to specify a max height for the transition to work */
+    /* TODO: investigate react handling dynamic max height */
     max-height: 800px;
   }
 }

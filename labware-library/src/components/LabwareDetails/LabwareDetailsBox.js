@@ -50,7 +50,7 @@ export default function LabwareDetailsBox(props: LabwareDetailsBoxProps) {
           <Dimensions
             definition={definition}
             className={styles.details_table}
-            isIrregular={irregular}
+            irregular={irregular}
           />
           {wellGroups.map((wellProps, i) => {
             const { metadata: groupMetadata } = wellProps

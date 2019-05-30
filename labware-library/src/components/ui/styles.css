@@ -45,15 +45,14 @@
 }
 
 .table_title {
-  @apply --flex-between;
-
   padding-bottom: var(--spacing-1);
   border-bottom: var(--bd-light);
 }
 
 .table_title_text {
-  display: flex;
-  justify-content: space-between;
+  @apply --flex-between;
+
+  align-items: center;
 }
 
 .details_box {

@@ -41,7 +41,7 @@ export function LabeledValueTable(props: LabledValueTableProps) {
     insertCategory,
     shape,
     wellBottomShape,
-    isIrregular,
+    irregular,
   } = props
   return (
     <div className={className}>
@@ -54,7 +54,7 @@ export function LabeledValueTable(props: LabledValueTableProps) {
         insertCategory={insertCategory}
         shape={shape}
         wellBottomShape={wellBottomShape}
-        isIrregular={isIrregular}
+        irregular={irregular}
       />
       <Table direction={direction || TABLE_COLUMN}>
         {values.map((v, i) => (
@@ -85,7 +85,7 @@ export function TableTitle(props: TableTitleProps) {
     insertCategory,
     shape,
     wellBottomShape,
-    isIrregular,
+    irregular,
   } = props
 
   const className = cx(styles.info_button, { [styles.active]: guideVisible })
@@ -108,7 +108,7 @@ export function TableTitle(props: TableTitleProps) {
         insertCategory={insertCategory}
         shape={shape}
         wellBottomShape={wellBottomShape}
-        isIrregular={isIrregular}
+        irregular={irregular}
       />
     </div>
   )

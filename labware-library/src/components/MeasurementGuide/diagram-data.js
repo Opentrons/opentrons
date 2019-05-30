@@ -7,7 +7,7 @@ export type DiagramProps = {|
   shape?: string,
   wellBottomShape?: string,
   guideVisible?: boolean,
-  isIrregular?: boolean,
+  irregular?: boolean,
 |}
 
 const FOOTPRINT_DIAGRAMS: { [category: string]: Array<?string> } = {
@@ -142,15 +142,14 @@ export function getDiagramSrc(props: DiagramProps) {
     shape,
     wellBottomShape,
     insertCategory,
-    isIrregular,
+    irregular,
   } = props
 
   switch (guideType) {
     case 'footprint':
-      console.log()
       if (category === 'aluminumBlock') {
         return insertCategory && ALUM_BLOCK_FOOTPRINTS[insertCategory]
-      } else if (category === 'tubeRack' && isIrregular) {
+      } else if (category === 'tubeRack' && irregular) {
         return FOOTPRINT_DIAGRAMS['irregular']
       }
       return category && FOOTPRINT_DIAGRAMS[category]
@@ -163,7 +162,6 @@ export function getDiagramSrc(props: DiagramProps) {
     case 'measurements':
       if (category === 'tipRack') return TIPRACK_MEASUREMENT_DIAGRAMS
       else if (category === 'wellPlate') {
-        console.log(wellBottomShape, shape)
         return (
           wellBottomShape &&
           shape &&
