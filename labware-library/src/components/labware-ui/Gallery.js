@@ -2,6 +2,7 @@
 import * as React from 'react'
 
 import { LabwareRender, RobotWorkSpace } from '@opentrons/components'
+import labwareImages from './labware-images'
 import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
@@ -13,21 +14,22 @@ export type GalleryProps = {|
 
 export function Gallery(props: GalleryProps) {
   const { definition, className } = props
-  const [currentImage, setCurrentImage] = React.useState(1)
-
-  // TODO(mc, 2019-03-27): use actual images
-  const images = [
-    <img key="left" src={`https://placekitten.com/480/480`} />,
+  const { parameters: params, dimensions: dims } = definition
+  const [currentImage, setCurrentImage] = React.useState(0)
+  const render = (
     <RobotWorkSpace
       key="center"
-      viewBox={`0 0 ${definition.dimensions.xDimension} ${
-        definition.dimensions.yDimension
-      }`}
+      viewBox={`0 0 ${dims.xDimension} ${dims.yDimension}`}
     >
       {() => <LabwareRender definition={definition} />}
-    </RobotWorkSpace>,
-    <img key="right" src={`https://placekitten.com/512/512`} />,
-  ]
+    </RobotWorkSpace>
+  )
+
+  const staticImages = (labwareImages[params.loadName] || []).map(
+    (src, key) => <img key={key} src={src} />
+  )
+
+  const images = [render, ...staticImages]
 
   return (
     <div className={className}>
@@ -36,13 +38,15 @@ export function Gallery(props: GalleryProps) {
           {images[currentImage]}
         </div>
       </div>
-      <div className={styles.gallery_thumbnail_row}>
-        {images.map((img, index) => (
-          <Thumbnail key={index} onClick={() => setCurrentImage(index)}>
-            {img}
-          </Thumbnail>
-        ))}
-      </div>
+      {images.length > 1 && (
+        <div className={styles.gallery_thumbnail_row}>
+          {images.map((img, index) => (
+            <Thumbnail key={index} onClick={() => setCurrentImage(index)}>
+              {img}
+            </Thumbnail>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

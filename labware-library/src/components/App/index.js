@@ -23,6 +23,7 @@ export function App(props: DefinitionRouteRenderProps) {
 
   React.useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = 0
+    window.scrollTo(0, 0)
   }, [location.pathname])
 
   return (
