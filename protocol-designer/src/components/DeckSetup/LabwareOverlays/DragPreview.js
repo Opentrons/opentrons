@@ -22,7 +22,7 @@ type DragPreviewProps = {
   >,
 }
 
-const DragPreview = (props: DragPreviewProps) => {
+const LabwareDragPreview = (props: DragPreviewProps) => {
   const {
     item,
     itemType,
@@ -46,11 +46,11 @@ const DragPreview = (props: DragPreviewProps) => {
   )
 }
 
-const DragPreviewLayer = DragLayer(monitor => ({
+const DragPreview = DragLayer(monitor => ({
   currentOffset: monitor.getSourceClientOffset(),
   isDragging: monitor.isDragging(),
   itemType: monitor.getItemType(),
   item: monitor.getItem(),
-}))(DragPreview)
+}))(LabwareDragPreview)
 
-export default DragPreviewLayer
+export default DragPreview

@@ -4,7 +4,6 @@ import map from 'lodash/map'
 import filter from 'lodash/filter'
 import some from 'lodash/some'
 import {
-  LabwareRender,
   useOnClickOutside,
   RobotWorkSpace,
   RobotCoordsForeignDiv,
@@ -12,11 +11,10 @@ import {
 import { getLabwareHasQuirk } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import i18n from '../../localization'
-import BrowseLabwareModal from '../labware/BrowseLabwareModal'
-import LabwareOnDeck from '../labware/LabwareOnDeck'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../steplist'
 import type { InitialDeckSetup, LabwareOnDeckType } from '../../step-forms'
 
+import { LabwareOnDeck, BrowseLabwareModal } from '../labware'
 import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
 import styles from './DeckSetup.css'
 
@@ -94,7 +92,7 @@ const DeckSetup = (props: Props) => {
                   if (some(containedLabware)) {
                     // NOTE: only controlling first contained labware for now!
                     return (
-                      <>
+                      <g key={slot}>
                         {map(containedLabware, labwareOnDeck => (
                           <LabwareOnDeck
                             key={labwareOnDeck.id}
@@ -112,7 +110,7 @@ const DeckSetup = (props: Props) => {
                             }
                           />
                         </g>
-                      </>
+                      </g>
                     )
                   }
 

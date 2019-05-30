@@ -3,17 +3,17 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { LabwareRender } from '@opentrons/components'
 
-import * as wellContentsSelectors from '../../../top-selectors/well-contents'
-import * as highlightSelectors from '../../../top-selectors/substep-highlight'
-import * as tipContentsSelectors from '../../../top-selectors/tip-contents'
-import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
-import { selectors as stepsSelectors } from '../../../ui/steps'
-import { type LabwareOnDeck as LabwareOnDeckType } from '../../../step-forms'
+import * as wellContentsSelectors from '../../top-selectors/well-contents'
+import * as highlightSelectors from '../../top-selectors/substep-highlight'
+import * as tipContentsSelectors from '../../top-selectors/tip-contents'
+import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
+import { selectors as stepsSelectors } from '../../ui/steps'
+import { type LabwareOnDeck as LabwareOnDeckType } from '../../step-forms'
 
-import type { ContentsByWell } from '../../../labware-ingred/types'
-import type { WellIngredientNames } from '../../../steplist/types'
-import type { BaseState } from '../../../types'
-import { wellFillFromWellContents } from '../utils'
+import type { ContentsByWell } from '../../labware-ingred/types'
+import type { WellIngredientNames } from '../../steplist/types'
+import type { BaseState } from '../../types'
+import { wellFillFromWellContents } from './utils'
 
 type OP = {|
   labwareOnDeck: LabwareOnDeckType,
