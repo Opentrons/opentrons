@@ -14,7 +14,8 @@ import i18n from '../../localization'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../steplist'
 import type { InitialDeckSetup, LabwareOnDeckType } from '../../step-forms'
 
-import { LabwareOnDeck, BrowseLabwareModal } from '../labware'
+import { BrowseLabwareModal } from '../labware'
+import LabwareOnDeck from './LabwareOnDeck'
 import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
 import styles from './DeckSetup.css'
 
@@ -92,7 +93,7 @@ const DeckSetup = (props: Props) => {
                   if (some(containedLabware)) {
                     // NOTE: only controlling first contained labware for now!
                     return (
-                      <g key={slot}>
+                      <g key={slot.id}>
                         {map(containedLabware, labwareOnDeck => (
                           <LabwareOnDeck
                             key={labwareOnDeck.id}

@@ -71,3 +71,9 @@
 .drag_preview {
   position: absolute;
 }
+
+.highlighted_border {
+  stroke: var(--c-highlight);
+  stroke-width: 2;
+  fill: transparent;
+}

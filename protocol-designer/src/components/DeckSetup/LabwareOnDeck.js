@@ -6,14 +6,12 @@ import { LabwareRender } from '@opentrons/components'
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import * as highlightSelectors from '../../top-selectors/substep-highlight'
 import * as tipContentsSelectors from '../../top-selectors/tip-contents'
-import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepsSelectors } from '../../ui/steps'
 import { type LabwareOnDeck as LabwareOnDeckType } from '../../step-forms'
-
 import type { ContentsByWell } from '../../labware-ingred/types'
-import type { WellIngredientNames } from '../../steplist/types'
 import type { BaseState } from '../../types'
-import { wellFillFromWellContents } from './utils'
+import { HighlightedBorder } from './LabwareOverlays'
+import { wellFillFromWellContents } from '../labware/utils'
 
 type OP = {|
   labwareOnDeck: LabwareOnDeckType,
@@ -23,7 +21,6 @@ type OP = {|
 
 type SP = {|
   wellContents: ContentsByWell,
-  ingredNames: WellIngredientNames,
   highlighted: boolean,
   highlightedWells: { [string]: null },
 |}
@@ -32,6 +29,9 @@ type Props = {| ...OP, ...SP |}
 
 const LabwareOnDeck = (props: Props) => (
   <g transform={`translate(${props.x}, ${props.y})`}>
+    {props.highlighted && (
+      <HighlightedBorder definition={props.labwareOnDeck.def} />
+    )}
     <LabwareRender
       definition={props.labwareOnDeck.def}
       wellFill={wellFillFromWellContents(props.wellContents)}
@@ -54,7 +54,6 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
     missingTips: tipContentsSelectors.getMissingTipsByLabwareId(state)[
       labwareOnDeck.id
     ],
-    ingredNames: labwareIngredSelectors.getLiquidNamesById(state),
     highlighted: stepsSelectors
       .getHoveredStepLabware(state)
       .includes(labwareOnDeck.id),
