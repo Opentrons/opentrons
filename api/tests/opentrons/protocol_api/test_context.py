@@ -15,14 +15,15 @@ import pytest
 
 
 @pytest.fixture
-def load_my_labware(monkeypatch):
+def get_labware_def(monkeypatch):
     def dummy_load(labware_name, namespace=None, version=None):
+        # TODO: Ian 2019-05-30 use fixtures not real defs
         labware_def = json.loads(
             pkgutil.get_data('opentrons',
                              'shared_data/definitions2/{}.json'.format(
                                  labware_name)))
         return labware_def
-    monkeypatch.setattr(papi.labware, 'load_definition', dummy_load)
+    monkeypatch.setattr(papi.labware, 'get_labware_definition', dummy_load)
 
 
 def test_load_instrument(loop):
@@ -51,7 +52,7 @@ async def test_motion(loop):
     assert await hardware.current_position(instr._mount) == old_pos
 
 
-def test_location_cache(loop, monkeypatch, load_my_labware):
+def test_location_cache(loop, monkeypatch, get_labware_def):
     hardware = API.build_hardware_simulator(loop=loop)
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)
@@ -87,7 +88,7 @@ def test_location_cache(loop, monkeypatch, load_my_labware):
     assert test_args[0].labware == lw.wells()[0]
 
 
-def test_move_uses_arc(loop, monkeypatch, load_my_labware):
+def test_move_uses_arc(loop, monkeypatch, get_labware_def):
     hardware = API.build_hardware_simulator(loop=loop)
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)
@@ -125,7 +126,7 @@ def test_pipette_info(loop):
     assert left.model == model
 
 
-def test_pick_up_and_drop_tip(loop, load_my_labware):
+def test_pick_up_and_drop_tip(loop, get_labware_def):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
     tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300ul', 1)
@@ -150,7 +151,7 @@ def test_pick_up_and_drop_tip(loop, load_my_labware):
     assert pipette.critical_point() == model_offset
 
 
-def test_return_tip(loop, load_my_labware):
+def test_return_tip(loop, get_labware_def):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
     tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300ul', 1)
@@ -174,7 +175,7 @@ def test_return_tip(loop, load_my_labware):
     assert tiprack.wells()[0].has_tip
 
 
-def test_pick_up_tip_no_location(loop, load_my_labware):
+def test_pick_up_tip_no_location(loop, get_labware_def):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
 
@@ -220,7 +221,7 @@ def test_pick_up_tip_no_location(loop, load_my_labware):
     assert not tiprack2.wells()[0].has_tip
 
 
-def test_instrument_trash(loop, load_my_labware):
+def test_instrument_trash(loop, get_labware_def):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
 
@@ -235,7 +236,7 @@ def test_instrument_trash(loop, load_my_labware):
     assert instr.trash_container.name == 'usascientific_12_reservoir_22ml'
 
 
-def test_aspirate(loop, load_my_labware, monkeypatch):
+def test_aspirate(loop, get_labware_def, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
     lw = ctx.load_labware_by_name('generic_96_wellplate_340ul_flat', 1)
@@ -276,7 +277,7 @@ def test_aspirate(loop, load_my_labware, monkeypatch):
     assert move_called_with is None
 
 
-def test_dispense(loop, load_my_labware, monkeypatch):
+def test_dispense(loop, get_labware_def, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
     lw = ctx.load_labware_by_name('generic_96_wellplate_340ul_flat', 1)

@@ -900,11 +900,11 @@ def delete_all_custom_labware() -> None:
         shutil.rmtree(custom_def_dir)
 
 
-def load_definition(
+def get_labware_definition(
     load_name: str,
     namespace: str = None,
     version: int = None
-) -> dict:
+) -> Dict[str, Any]:
     """
     Look up and return a definition by load_name + namespace + version and
         return it or raise an exception
@@ -920,7 +920,8 @@ def load_definition(
     if namespace is None:
         for fallback_namespace in [OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE]:
             try:
-                return load_definition(load_name, fallback_namespace, version)
+                return get_labware_definition(
+                    load_name, fallback_namespace, version)
             except (FileNotFoundError):
                 pass
         raise FileNotFoundError(
@@ -976,7 +977,7 @@ def load(
     :param int version: The version of the labware definition. If unspecified,
         will use the latest version.
     """
-    definition = load_definition(load_name, namespace, version)
+    definition = get_labware_definition(load_name, namespace, version)
     return load_from_definition(definition, parent, label)
 
 
