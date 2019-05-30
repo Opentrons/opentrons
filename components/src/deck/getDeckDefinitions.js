@@ -6,10 +6,9 @@ import type { DeckDefinition } from '@opentrons/shared-data'
 // fn imported from shared-data, but this relies on a webpack-specific method,
 // and SD is not webpacked
 
-// require all definitions in the deck definitions directory
 // $FlowFixMe: require.context is webpack-specific method
 const deckDefinitionsContext = require.context(
-  '@opentrons/shared-data/robot-data/decks',
+  '@opentrons/shared-data/deck/definitions/1',
   true, // traverse subdirectories
   /\.json$/, // import filter
   'sync' // load every definition into one synchronous chunk
