@@ -39,6 +39,7 @@ function _wellsForPipette(
 function _getSelectedWellsForStep(
   stepArgs: StepGeneration.CommandCreatorArgs,
   labwareId: string,
+  frame: StepGeneration.CommandsAndRobotState,
   invariantContext: StepGeneration.InvariantContext
 ): Array<string> {
   if (stepArgs.commandCreatorFnName === 'delay') {
@@ -86,6 +87,30 @@ function _getSelectedWellsForStep(
       wells.push(...getWells(stepArgs.destWells))
     }
   }
+
+  frame.commands.forEach((c: Command) => {
+    if (c.command === 'pick-up-tip' && c.params.labware === labwareId) {
+      const commandWellName = c.params.well
+      const pipetteId = c.params.pipette
+      const pipetteSpec =
+        invariantContext.pipetteEntities[pipetteId]?.spec || {}
+
+      if (pipetteSpec.channels === 1) {
+        wells.push(commandWellName)
+      } else if (pipetteSpec.channels === 8) {
+        const wellSet = getWellSetForMultichannel(
+          invariantContext.labwareEntities[labwareId].def,
+          commandWellName
+        )
+        wells.push(...wellSet)
+      } else {
+        console.error(
+          `Unexpected number of channels: ${pipetteSpec.channels ||
+            '?'}. Could not get tip highlight state`
+        )
+      }
+    }
+  })
 
   return wells
 }
@@ -145,23 +170,24 @@ function _getSelectedWellsForSubstep(
     wells.push(...getWells('dest'))
   }
 
-  let tipWellSet = []
   if (substeps && substeps.commandCreatorFnName !== 'delay') {
+    let tipWellSet = []
     if (substeps.multichannel) {
-      const hoveredSubstepData = substeps.multiRows[substepIndex][0] // just use first multi row
+      const { activeTips } = substeps.multiRows[substepIndex][0] // just use first multi row
 
-      tipWellSet = hoveredSubstepData.activeTips
-        ? getWellSetForMultichannel(
-            invariantContext.labwareEntities[labwareId].def,
-            hoveredSubstepData.activeTips.well
-          )
-        : []
+      if (activeTips && activeTips.labware === labwareId) {
+        tipWellSet = getWellSetForMultichannel(
+          invariantContext.labwareEntities[labwareId].def,
+          activeTips.well
+        )
+      }
     } else {
       // single-channel
-      tipWellSet = [substeps.rows[substepIndex].activeTips.well]
+      const { activeTips } = substeps.rows[substepIndex]
+      if (activeTips.labware === labwareId) tipWellSet = [activeTips.well]
     }
+    wells.push(...tipWellSet)
   }
-  wells.push(...tipWellSet)
 
   return wells
 }
@@ -222,6 +248,7 @@ export const wellHighlightsByLabwareId: Selector<{
           selectedWells = _getSelectedWellsForStep(
             stepArgs,
             labwareId,
+            frame,
             invariantContext
           )
         }
