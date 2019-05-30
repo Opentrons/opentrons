@@ -16,7 +16,7 @@ type DP = {|
   drillDown: () => mixed,
 |}
 
-type Props = { ...OP, ...DP }
+type Props = {| ...OP, ...DP |}
 
 function BrowseLabwareOverlay(props: Props) {
   if (props.labwareOnDeck.def.parameters.isTiprack) return null
