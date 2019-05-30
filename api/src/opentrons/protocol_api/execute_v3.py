@@ -58,12 +58,10 @@ def load_labware_from_json_defs(
     for labware_id, props in protocol_labware.items():
         slot = props['slot']
         definition = definitions[props['definitionId']]
+        labware_instance = labware.load_from_definition(
+            definition=definition, parent=slot)
         loaded_labware[labware_id] = ctx.load_labware(
-            labware.Labware(
-                definition,
-                ctx.deck.position_for(slot),
-                props.get('displayName')
-            ),
+            labware_instance,
             slot)
 
     return loaded_labware
