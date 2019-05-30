@@ -1,6 +1,8 @@
 // @flow
 import { createSelector } from 'reselect'
 import noop from 'lodash/noop'
+import reduce from 'lodash/reduce'
+import mapValues from 'lodash/mapValues'
 import * as StepGeneration from '../../step-generation'
 import { allSubsteps as getAllSubsteps } from '../substeps'
 import { START_TERMINAL_ITEM_ID, END_TERMINAL_ITEM_ID } from '../../steplist'
@@ -92,6 +94,62 @@ const getLastValidTips: GetTipSelector = createSelector(
   })
 )
 
+export const getMissingTipsByLabwareId: GetTipSelector = createSelector(
+  stepFormSelectors.getOrderedStepIds,
+  fileDataSelectors.getRobotStateTimeline,
+  stepsSelectors.getActiveItem,
+  fileDataSelectors.getInitialRobotState,
+  fileDataSelectors.lastValidRobotState,
+  (
+    orderedStepIds,
+    robotStateTimeline,
+    activeItem,
+    initialRobotState,
+    lastValidRobotState
+  ) => {
+    let robotState = null
+
+    if (!activeItem.isStep) {
+      const terminalId = activeItem.id
+      if (terminalId === START_TERMINAL_ITEM_ID) {
+        robotState = initialRobotState
+      } else if (terminalId === END_TERMINAL_ITEM_ID) {
+        robotState = lastValidRobotState
+      } else {
+        console.error(
+          `Invalid terminalId ${terminalId}, could not getMissingTipsByLabwareId`
+        )
+      }
+    } else {
+      const stepId = activeItem.id
+      const timeline = robotStateTimeline.timeline
+      const timelineIdx = orderedStepIds.includes(stepId)
+        ? orderedStepIds.findIndex(id => id === stepId)
+        : null
+
+      if (timelineIdx == null) {
+        console.error(`Expected non-null timelineIdx for step ${stepId}`)
+        return noop
+      }
+
+      const prevFrame = timeline[timelineIdx - 1]
+      if (prevFrame) robotState = prevFrame.robotState
+    }
+
+    const missingTips =
+      robotState &&
+      mapValues(robotState.tipState.tipracks, tipMap =>
+        reduce(
+          tipMap,
+          (acc, hasTip, wellName): WellGroup =>
+            hasTip ? acc : { ...acc, [wellName]: null },
+          {}
+        )
+      )
+    return missingTips || {}
+  }
+)
+
 export const getTipsForCurrentStep: GetTipSelector = createSelector(
   stepFormSelectors.getOrderedStepIds,
   stepFormSelectors.getInvariantContext,
@@ -131,7 +189,6 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
     }
 
     const stepId = activeItem.id
-    const hovered = stepId === hoveredStepId
     const timeline = robotStateTimeline.timeline
     const timelineIdx = orderedStepIds.includes(stepId)
       ? orderedStepIds.findIndex(id => id === stepId)
@@ -143,8 +200,15 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
     }
 
     const prevFrame = timeline[timelineIdx - 1]
-    const currentFrame = timeline[timelineIdx]
+    const missingTips = reduce(
+      prevFrame.robotState.tipState.tipracks[labwareId],
+      (acc, hasTip, wellName): WellGroup =>
+        hasTip ? { ...acc, [wellName]: null } : acc,
+      {}
+    )
 
+    const hovered = stepId === hoveredStepId
+    const currentFrame = timeline[timelineIdx]
     return (wellName: string) => {
       // show empty/present tip state at end of previous frame
       const empty = prevFrame

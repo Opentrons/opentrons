@@ -14,7 +14,7 @@ import i18n from '../../../localization'
 import type { ThunkDispatch } from '../../../types'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../../steplist'
 
-import { DND_TYPES } from '../../labware/LabwareOnDeck/constants'
+import { DND_TYPES } from './constants'
 import styles from './LabwareOverlays.css'
 
 type DNDP = {|

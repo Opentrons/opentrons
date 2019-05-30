@@ -26,7 +26,7 @@ import {
   START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
 } from '../../../steplist'
-import { DND_TYPES } from './constants'
+import { DND_TYPES } from '../../DeckSetup/LabwareOverlays/constants'
 
 // TODO: BC 2019-05-22 this component is no longer used and should be remove once
 // its functionality reaches parity with the new components in /DeckSetup/*
@@ -48,24 +48,6 @@ const DragSourceLabware = (props: DragDropLabwareProps) => {
     props.connectDropTarget(props.render({ draggedItem, isOver }))
   )
 }
-
-const labwareSource = {
-  beginDrag: props => ({
-    slot: props.slot,
-    containerId: props.containerId,
-  }),
-  canDrag: props => !!props.containerId && props.isManualInterventionStep,
-}
-const collectLabwareSource = (connect, monitor) => ({
-  connectDragSource: connect.dragSource(),
-  isDragging: monitor.isDragging(),
-  draggedItem: monitor.getItem(),
-})
-const DraggableLabware = DragSource(
-  DND_TYPES.LABWARE,
-  labwareSource,
-  collectLabwareSource
-)(DragSourceLabware)
 
 const labwareTarget = {
   canDrop: (props, monitor) => {

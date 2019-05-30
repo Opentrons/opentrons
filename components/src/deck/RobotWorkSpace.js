@@ -1,34 +1,34 @@
 // @flow
 import React, { useRef } from 'react'
 import { DeckFromData } from './Deck'
-import type { DeckDefinition, DeckSlot } from '@opentrons/shared-data'
+import type { DeckDefinition } from '@opentrons/shared-data'
 import styles from './RobotWorkSpace.css'
+import type { RobotWorkSpaceRenderProps } from './types'
 
-type RenderProps = {
-  slots: { [string]: DeckSlot },
-}
 type Props = {
   deckDef?: DeckDefinition,
   viewBox?: string,
-  children?: RenderProps => React.Node,
+  children?: RobotWorkSpaceRenderProps => React.Node,
   deckLayerBlacklist?: Array<string>,
 }
 
 function RobotWorkSpace(props: Props) {
   const { children, deckDef, deckLayerBlacklist = [], viewBox } = props
   const wrapperRef: ElementRef<'svg'> = useRef()
-  const getRobotCoordsFromDOM = useRef((left: number, top: number) => {
-    const cursorPoint = wrapperRef && wrapperRef.createSVGPoint()
 
-    cursorPoint.x = left
-    cursorPoint.y = top
+  const getRobotCoordsFromDOMCoords = (
+    x: number,
+    y: number
+  ): { x: number, y: number } => {
+    const cursorPoint = wrapperRef.current.createSVGPoint()
 
-    const cursor = cursorPoint.matrixTransform(
-      wrapperRef.getScreenCTM().inverse()
+    cursorPoint.x = x
+    cursorPoint.y = y
+
+    return cursorPoint.matrixTransform(
+      wrapperRef.current.getScreenCTM().inverse()
     )
-
-    return cursor
-  })
+  }
   if (!deckDef && !viewBox) return null
 
   let wholeDeckViewBox = null
@@ -53,7 +53,7 @@ function RobotWorkSpace(props: Props) {
       {deckDef && (
         <DeckFromData def={deckDef} layerBlacklist={deckLayerBlacklist} />
       )}
-      {children && children({ slots, getRobotCoordsFromDOM })}
+      {children && children({ slots, getRobotCoordsFromDOMCoords })}
     </svg>
   )
 }

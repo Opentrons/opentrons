@@ -3,9 +3,8 @@ import React from 'react'
 import { connect } from 'react-redux'
 import cx from 'classnames'
 import { Icon } from '@opentrons/components'
-import noop from 'lodash/noop'
 import { DragSource, DropTarget } from 'react-dnd'
-import { DND_TYPES } from '../../labware/LabwareOnDeck/constants'
+import { DND_TYPES } from './constants'
 import type { BaseState, ThunkDispatch } from '../../../types'
 import {
   openIngredientSelector,

@@ -2,9 +2,11 @@
 import * as React from 'react'
 import { DragLayer } from 'react-dnd'
 import type { DeckSlotId } from '@opentrons/shared-data'
-import { LabwareRender } from '@opentrons/components'
-import { DND_TYPES } from '../../labware/LabwareOnDeck/constants'
-import styles from './LabwareOverlays.css'
+import {
+  LabwareRender,
+  type RobotWorkSpaceRenderProps,
+} from '@opentrons/components'
+import { DND_TYPES } from './constants'
 
 type DragPreviewProps = {
   getXY: (rawX: number, rawY: number) => { scaledX?: number, scaledY?: number },
@@ -14,6 +16,10 @@ type DragPreviewProps = {
   itemType: string,
   containerType: string,
   children: React.Node,
+  getRobotCoordsFromDOMCoords: $PropertyType<
+    RobotWorkSpaceRenderProps,
+    'getRobotCoordsFromDOMCoords'
+  >,
 }
 
 const DragPreview = (props: DragPreviewProps) => {
@@ -22,16 +28,19 @@ const DragPreview = (props: DragPreviewProps) => {
     itemType,
     isDragging,
     currentOffset,
-    getRobotCoordsFromDOM,
+    getRobotCoordsFromDOMCoords,
   } = props
   if (itemType !== DND_TYPES.LABWARE || !isDragging || !currentOffset)
     return null
   const { x, y } = currentOffset
 
-  const cursor = getRobotCoordsFromDOM(x, y)
+  const cursor = getRobotCoordsFromDOMCoords(x, y)
 
   return (
-    <g transform={`translate(${cursor.x}, ${cursor.y})`}>
+    <g
+      transform={`translate(${cursor.x}, ${cursor.y -
+        item.def.dimensions.yDimension})`}
+    >
       <LabwareRender definition={item && item.def} />
     </g>
   )

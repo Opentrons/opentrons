@@ -4,7 +4,7 @@ import { DragLayer } from 'react-dnd'
 import type { DeckSlotId } from '@opentrons/shared-data'
 import { LabwareWrapper } from '@opentrons/components'
 import HighlightableLabware from '../../../containers/HighlightableLabware'
-import { DND_TYPES } from './constants'
+import { DND_TYPES } from '../../DeckSetup/LabwareOverlays/constants'
 
 type DragPreviewProps = {
   getXY: (rawX: number, rawY: number) => { scaledX?: number, scaledY?: number },

@@ -7,15 +7,18 @@ import min from 'lodash/min'
 import pick from 'lodash/pick'
 import reduce from 'lodash/reduce'
 import omitBy from 'lodash/omitBy'
+import assert from 'assert'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import * as StepGeneration from '../../step-generation'
 import { selectors as fileDataSelectors } from '../../file-data'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import { selectors as stepsSelectors } from '../../ui/steps'
 import wellSelectionSelectors from '../../well-selection/selectors'
+import { START_TERMINAL_ITEM_ID, END_TERMINAL_ITEM_ID } from '../../steplist'
 import { getAllWellsForLabware, getMaxVolumes } from '../../constants'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { Selector } from '../../types'
 import type {
   WellContents,
@@ -121,6 +124,46 @@ export const getLastValidWellContents: Selector<WellContentsByLabware> = createS
         )
       }
     )
+  }
+)
+
+export const getAllWellContentsForActiveItem: Selector<
+  Array<WellContentsByLabware>
+> = createSelector(
+  stepsSelectors.getActiveItem,
+  getWellContentsAllLabware,
+  getLastValidWellContents,
+  getAllWellContentsForSteps,
+  stepFormSelectors.getOrderedStepIds,
+  (
+    activeItem,
+    wellContentsAllLabware,
+    lastValidWellContents,
+    allWellContentsForSteps,
+    orderedStepIds
+  ) => {
+    if (activeItem.isStep) {
+      // TODO: Ian 2018-07-31 replace with util function, "findIndexOrNull"?
+
+      const timelineIdx = orderedStepIds.findIndex(id => id === activeItem.id)
+      assert(
+        timelineIdx !== -1,
+        `getAllWellContentsForActiveItem got unhandled terminal id: "${
+          activeItem.id
+        }"`
+      )
+      return allWellContentsForSteps[timelineIdx] || lastValidWellContents
+    } else if (!activeItem.isStep && activeItem.id === START_TERMINAL_ITEM_ID) {
+      return wellContentsAllLabware
+    } else if (!activeItem.isStep && activeItem.id === END_TERMINAL_ITEM_ID) {
+      return lastValidWellContents
+    } else {
+      console.warn(
+        activeItem.isStep,
+        `getAllWellContentsForActiveItem got unhandled id: "${activeItem.id}"`
+      )
+      return {}
+    }
   }
 )
 

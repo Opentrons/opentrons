@@ -205,9 +205,9 @@ export const wellHighlightsByLabwareId: Selector<{
           )
         }
 
-        // return selected wells eg {A1: true, B4: true}
+        // return selected wells eg {A1: null, B4: null}
         return selectedWells.reduce(
-          (acc: AllWellHighlights, well) => ({ ...acc, [well]: true }),
+          (acc: AllWellHighlights, well) => ({ ...acc, [well]: null }),
           {}
         )
       }

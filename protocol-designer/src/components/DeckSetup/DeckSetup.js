@@ -12,8 +12,9 @@ import {
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import i18n from '../../localization'
 import BrowseLabwareModal from '../labware/BrowseLabwareModal'
+import LabwareOnDeck from '../labware/LabwareOnDeck'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../steplist'
-import type { InitialDeckSetup, LabwareOnDeck } from '../../step-forms'
+import type { InitialDeckSetup, LabwareOnDeckType } from '../../step-forms'
 
 import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
 import styles from './DeckSetup.css'
@@ -62,9 +63,11 @@ const DeckSetup = (props: Props) => {
             viewBox={`-10 -10 ${410} ${390}`} // viewbox for small
             // viewBox={`-10 -10 ${460} ${452}`} // viewbox for mid
           >
-            {({ slots, getRobotCoordsFromDOM }) => (
+            {({ slots, getRobotCoordsFromDOMCoords }) => (
               <>
-                <DragPreview getRobotCoordsFromDOM={getRobotCoordsFromDOM} />
+                <DragPreview
+                  getRobotCoordsFromDOMCoords={getRobotCoordsFromDOMCoords}
+                />
                 <RobotCoordsForeignDiv
                   x={0}
                   y={364}
@@ -80,7 +83,7 @@ const DeckSetup = (props: Props) => {
                 {map(slots, (slot, slotId) => {
                   if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render labware or overlays
 
-                  const containedLabware: Array<LabwareOnDeck> = filter(
+                  const containedLabware: Array<LabwareOnDeckType> = filter(
                     props.initialDeckSetup.labware,
                     labware =>
                       labware.slot === slotId &&
@@ -95,14 +98,12 @@ const DeckSetup = (props: Props) => {
                     return (
                       <>
                         {map(containedLabware, labwareOnDeck => (
-                          <g
+                          <LabwareOnDeck
                             key={labwareOnDeck.id}
-                            transform={`translate(${
-                              slots[labwareOnDeck.slot].position[0]
-                            }, ${slots[labwareOnDeck.slot].position[1]})`}
-                          >
-                            <LabwareRender definition={labwareOnDeck.def} />
-                          </g>
+                            x={slots[labwareOnDeck.slot].position[0]}
+                            y={slots[labwareOnDeck.slot].position[1]}
+                            labwareOnDeck={labwareOnDeck}
+                          />
                         ))}
                         <g>
                           <LabwareControls
