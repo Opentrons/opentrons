@@ -19,13 +19,13 @@ def test_loaded(loop):
     assert ctx.loaded_labwares[1] == labware
 
 
-def test_load_incorrect_definition_by_name():
+def test_get_incorrect_definition_by_name():
     with pytest.raises(FileNotFoundError):
-        papi.labware.load_definition('fake_labware')
+        papi.labware.get_labware_definition('fake_labware')
 
 
-def test_load_mixed_case():
-    dfn = papi.labware.load_definition(
+def test_get_mixed_case_labware_def():
+    dfn = papi.labware.get_labware_definition(
         'GeNeRiC_96_wElLpLaTe_340Ul_FlAt')
     assert dfn['parameters']['loadName'] == labware_name
 

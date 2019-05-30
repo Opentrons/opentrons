@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 from collections import defaultdict
 from enum import Enum, auto
+from hashlib import sha256
 from itertools import takewhile, dropwhile
 from typing import Any, List, Dict, Optional, Union
 
@@ -716,6 +717,15 @@ class ThermocyclerGeometry(ModuleGeometry):
         return self._labware
 
 
+def _hash_labware_def(labware: Dict[str, Any]) -> str:
+    # remove keys that do not affect run
+    blacklist = ['metadata', 'brand', 'groups']
+    def_no_metadata = {k: v for k, v in labware.items() if k not in blacklist}
+    sorted_def_str = json.dumps(
+        def_no_metadata, sort_keys=True, separators=(',', ':'))
+    return sha256(sorted_def_str.encode('utf-8')).hexdigest()
+
+
 def save_calibration(labware: Labware, delta: Point):
     """
     Function to be used whenever an updated delta is found for the first well
@@ -726,7 +736,8 @@ def save_calibration(labware: Labware, delta: Point):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
     if not calibration_path.exists():
         calibration_path.mkdir(parents=True, exist_ok=True)
-    labware_offset_path = calibration_path/'{}.json'.format(labware._id)
+    labware_hash = _hash_labware_def(labware._definition)
+    labware_offset_path = calibration_path/'{}.json'.format(labware_hash)
     calibration_data = _helper_offset_data_format(
         str(labware_offset_path), delta)
     with labware_offset_path.open('w') as f:
@@ -744,7 +755,8 @@ def save_tip_length(labware: Labware, length: float):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
     if not calibration_path.exists():
         calibration_path.mkdir(parents=True, exist_ok=True)
-    labware_offset_path = calibration_path/'{}.json'.format(labware._id)
+    labware_hash = _hash_labware_def(labware._definition)
+    labware_offset_path = calibration_path/'{}.json'.format(labware_hash)
     calibration_data = _helper_tip_length_data_format(
         str(labware_offset_path), length)
     with labware_offset_path.open('w') as f:
@@ -757,7 +769,8 @@ def load_calibration(labware: Labware):
     Look up a calibration if it exists and apply it to the given labware.
     """
     calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
-    labware_offset_path = calibration_path/'{}.json'.format(labware._id)
+    labware_hash = _hash_labware_def(labware._definition)
+    labware_offset_path = calibration_path/'{}.json'.format(labware_hash)
     if labware_offset_path.exists():
         calibration_data = _read_file(str(labware_offset_path))
         offset_array = calibration_data['default']['offset']
@@ -887,11 +900,11 @@ def delete_all_custom_labware() -> None:
         shutil.rmtree(custom_def_dir)
 
 
-def load_definition(
+def get_labware_definition(
     load_name: str,
     namespace: str = None,
     version: int = None
-) -> dict:
+) -> Dict[str, Any]:
     """
     Look up and return a definition by load_name + namespace + version and
         return it or raise an exception
@@ -907,7 +920,8 @@ def load_definition(
     if namespace is None:
         for fallback_namespace in [OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE]:
             try:
-                return load_definition(load_name, fallback_namespace, version)
+                return get_labware_definition(
+                    load_name, fallback_namespace, version)
             except (FileNotFoundError):
                 pass
         raise FileNotFoundError(
@@ -951,6 +965,11 @@ def load(
     :param parent: A :py:class:`.Location` representing the location where
                    the front and left most point of the outside of labware is
                    (often the front-left corner of a slot on the deck).
+    :param str namespace: The namespace the labware definition belongs to. If
+        unspecified, will search in this order: 'opentrons', 'custom_beta',
+        then all other namespaces together.
+    :param int version: The version of the labware definition. If unspecified,
+        will use the latest version.
     :param str label: An optional label that will override the labware's
                       display name from its definition
     :param str namespace: The namespace the labware definition belongs to.
@@ -958,7 +977,7 @@ def load(
     :param int version: The version of the labware definition. If unspecified,
         will use the latest version.
     """
-    definition = load_definition(load_name, namespace, version)
+    definition = get_labware_definition(load_name, namespace, version)
     return load_from_definition(definition, parent, label)
 
 

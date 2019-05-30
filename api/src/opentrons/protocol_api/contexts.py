@@ -1,8 +1,10 @@
 import asyncio
 import contextlib
 import logging
-from .labware import (Well, Labware, load, load_module, ModuleGeometry,
-                      quirks_from_any_parent, ThermocyclerGeometry)
+from .labware import (Well, Labware, load, get_labware_definition,
+                      load_from_definition, load_module,
+                      ModuleGeometry, quirks_from_any_parent,
+                      ThermocyclerGeometry)
 from typing import Any, Dict, List, Optional, Union, Tuple, Sequence
 from opentrons import types, hardware_control as hc, commands as cmds
 from opentrons.commands import CommandPublisher
@@ -182,20 +184,24 @@ class ProtocolContext(CommandPublisher):
         """
         self._hw_manager.reset_hw()
 
-    def load_labware(
-            self, labware_obj: Labware,
-            location: types.DeckLocation) -> Labware:
+    def load_labware_from_definition(
+            self,
+            labware_def: Dict[str, Any],
+            location: types.DeckLocation,
+            label: str = None
+    ) -> Labware:
         """ Specify the presence of a piece of labware on the OT2 deck.
 
-        This function loads the labware specified by `labware`
-        (previously loaded from a configuration file) to the location
-        specified by `location`.
+        This function loads the labware definition specified by `labware_def`
+        to the location specified by `location`.
 
-        :param Labware labware: The labware object to load
+        :param labware_def: The labware definition to load
         :param location: The slot into which to load the labware such as
                          1 or '1'
         :type location: int or str
         """
+        parent = self.deck.position_for(location)
+        labware_obj = load_from_definition(labware_def, parent, label)
         self._deck_layout[location] = labware_obj
         return labware_obj
 
@@ -229,10 +235,8 @@ class ProtocolContext(CommandPublisher):
         :param int version: The version of the labware definition. If
             unspecified, will use the latest version.
         """
-        labware = load(load_name,
-                       self._deck_layout.position_for(location),
-                       label, namespace, version)
-        return self.load_labware(labware, location)
+        labware_def = get_labware_definition(load_name, namespace, version)
+        return self.load_labware_from_definition(labware_def, location, label)
 
     def load_module(
             self, module_name: str,

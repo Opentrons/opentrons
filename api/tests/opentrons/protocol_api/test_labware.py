@@ -116,7 +116,7 @@ def test_from_center_cartesian():
 
 def test_backcompat():
     labware_name = 'generic_96_wellplate_340ul_flat'
-    labware_def = labware.load_definition(labware_name)
+    labware_def = labware.get_labware_definition(labware_name)
     lw = labware.Labware(labware_def, Location(Point(0, 0, 0), 'Test Slot'))
 
     # Note that this test uses the display name of wells to test for equality,
@@ -161,7 +161,7 @@ def test_backcompat():
 
 def test_well_parent():
     labware_name = 'generic_96_wellplate_340ul_flat'
-    labware_def = labware.load_definition(labware_name)
+    labware_def = labware.get_labware_definition(labware_name)
     lw = labware.Labware(labware_def, Location(Point(0, 0, 0), 'Test Slot'))
     parent = Location(Point(7, 8, 9), lw)
     well_name = 'circular_well_json'
@@ -181,7 +181,7 @@ def test_well_parent():
 
 def test_tip_tracking_init():
     labware_name = 'opentrons_96_tiprack_300ul'
-    labware_def = labware.load_definition(labware_name)
+    labware_def = labware.get_labware_definition(labware_name)
     tiprack = labware.Labware(labware_def,
                               Location(Point(0, 0, 0), 'Test Slot'))
     assert tiprack.is_tiprack
@@ -189,7 +189,7 @@ def test_tip_tracking_init():
         assert well.has_tip
 
     labware_name = 'generic_96_wellplate_340ul_flat'
-    labware_def = labware.load_definition(labware_name)
+    labware_def = labware.get_labware_definition(labware_name)
     lw = labware.Labware(labware_def, Location(Point(0, 0, 0), 'Test Slot'))
     assert not lw.is_tiprack
     for well in lw.wells():
@@ -198,7 +198,7 @@ def test_tip_tracking_init():
 
 def test_use_tips():
     labware_name = 'opentrons_96_tiprack_300ul'
-    labware_def = labware.load_definition(labware_name)
+    labware_def = labware.get_labware_definition(labware_name)
     tiprack = labware.Labware(labware_def,
                               Location(Point(0, 0, 0), 'Test Slot'))
     well_list = tiprack.wells()
@@ -237,7 +237,7 @@ def test_use_tips():
 
 def test_select_next_tip():
     labware_name = 'opentrons_96_tiprack_300ul'
-    labware_def = labware.load_definition(labware_name)
+    labware_def = labware.get_labware_definition(labware_name)
     tiprack = labware.Labware(labware_def,
                               Location(Point(0, 0, 0), 'Test Slot'))
     well_list = tiprack.wells()
@@ -286,7 +286,7 @@ def test_select_next_tip():
 
 def test_previous_tip():
     labware_name = 'opentrons_96_tiprack_300ul'
-    labware_def = labware.load_definition(labware_name)
+    labware_def = labware.get_labware_definition(labware_name)
     tiprack = labware.Labware(labware_def,
                               Location(Point(0, 0, 0), 'Test Slot'))
     # If all wells are used, we can't get a previous tip
@@ -306,7 +306,7 @@ def test_previous_tip():
 
 def test_return_tips():
     labware_name = 'opentrons_96_tiprack_300ul'
-    labware_def = labware.load_definition(labware_name)
+    labware_def = labware.get_labware_definition(labware_name)
     tiprack = labware.Labware(labware_def,
                               Location(Point(0, 0, 0), 'Test Slot'))
     # If all wells are used, we get an error if we try to return
@@ -356,7 +356,7 @@ def test_module_load():
 def test_module_load_labware():
     module_names = ['tempdeck', 'magdeck']
     labware_name = 'generic_96_wellplate_340ul_flat'
-    labware_def = labware.load_definition(labware_name)
+    labware_def = labware.get_labware_definition(labware_name)
     for name in module_names:
         mod = labware.load_module(name, Location(Point(0, 0, 0), 'test'))
         old_z = mod.highest_z

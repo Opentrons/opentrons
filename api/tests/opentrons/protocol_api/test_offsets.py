@@ -4,11 +4,11 @@ import os
 import time
 
 import pytest
-
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Location
 from opentrons import config
 
+MOCK_HASH = 'mock_hash'
 
 minimalLabwareDef = {
     "metadata": {
@@ -54,27 +54,31 @@ minimalLabwareDef = {
 }
 
 
-def path():
+def path(calibration_name):
     return config.CONFIG['labware_calibration_offsets_dir_v4']\
-        / '{}.json'.format(minimalLabwareDef['otId'])
+        / '{}.json'.format(calibration_name)
+
+
+def mock_hash_labware(labware_def):
+    return MOCK_HASH
 
 
 @pytest.fixture
 def clear_calibration(monkeypatch):
     try:
-        os.remove(path())
+        os.remove(path(MOCK_HASH))
     except FileNotFoundError:
         pass
     yield
     try:
-        os.remove(path())
+        os.remove(path(MOCK_HASH))
     except FileNotFoundError:
         pass
 
 
 def test_save_calibration(monkeypatch, clear_calibration):
     # Test the save calibration file
-    assert not os.path.exists(path())
+    assert not os.path.exists(path(MOCK_HASH))
     calibration_point = None
 
     def mock_set_calibration(self, delta):
@@ -85,23 +89,33 @@ def test_save_calibration(monkeypatch, clear_calibration):
         labware.Labware,
         'set_calibration', mock_set_calibration)
 
+    monkeypatch.setattr(
+        labware,
+        '_hash_labware_def', mock_hash_labware
+    )
+
     test_labware = labware.Labware(minimalLabwareDef,
                                    Location(Point(0, 0, 0), 'deck'))
 
     labware.save_calibration(test_labware, Point(1, 1, 1))
-    assert os.path.exists(path())
+    assert os.path.exists(path(MOCK_HASH))
     assert calibration_point == Point(1, 1, 1)
 
 
 def test_save_tip_length(monkeypatch, clear_calibration):
-    assert not os.path.exists(path())
+    assert not os.path.exists(path(MOCK_HASH))
+
+    monkeypatch.setattr(
+        labware,
+        '_hash_labware_def', mock_hash_labware
+    )
 
     test_labware = labware.Labware(minimalLabwareDef,
                                    Location(Point(0, 0, 0), 'deck'))
     calibrated_length = 22.0
     labware.save_tip_length(test_labware, calibrated_length)
-    assert os.path.exists(path())
-    with open(path()) as calibration_file:
+    assert os.path.exists(path(MOCK_HASH))
+    with open(path(MOCK_HASH)) as calibration_file:
         data = json.load(calibration_file)
         assert data['tipLength']['length'] == calibrated_length
 
@@ -114,9 +128,14 @@ def test_schema_shape(monkeypatch, clear_calibration):
     test_labware = labware.Labware(minimalLabwareDef,
                                    Location(Point(0, 0, 0), 'deck'))
 
+    monkeypatch.setattr(
+       labware,
+       '_hash_labware_def', mock_hash_labware
+    )
+
     labware.save_calibration(test_labware, Point(1, 1, 1))
     expected = {"default": {"offset": [1, 1, 1], "lastModified": 1}}
-    with open(path()) as f:
+    with open(path(MOCK_HASH)) as f:
         result = json.load(f)
     assert result == expected
 
@@ -132,6 +151,11 @@ def test_load_calibration(monkeypatch, clear_calibration):
     monkeypatch.setattr(
         labware.Labware,
         'set_calibration', mock_set_calibration)
+
+    monkeypatch.setattr(
+        labware,
+        '_hash_labware_def', mock_hash_labware
+    )
 
     test_labware = labware.Labware(minimalLabwareDef,
                                    Location(Point(0, 0, 0), 'deck'))
@@ -180,3 +204,22 @@ def test_clear_calibrations():
     assert len(os.listdir(calpath)) > 0
     labware.clear_calibrations()
     assert len(os.listdir(calpath)) == 0
+
+
+def test_hash_labware_def():
+    def1a = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.00003, 1/3]}
+    def1aa = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.00003, 1/3]}
+    def1b = {"metadata": {"a": "blah"}, "importantStuff": [1.1, 0.00003, 1/3]}
+    def2 = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.000033, 1/3]}
+
+    # identity preserved across json serialization+deserialization
+    assert labware._hash_labware_def(def1a) == \
+        labware._hash_labware_def(
+            json.loads(json.dumps(def1a, separators=(',', ':'))))
+    # 2 instances of same def should match
+    assert labware._hash_labware_def(def1a) == \
+        labware._hash_labware_def(def1aa)
+    # metadata ignored
+    assert labware._hash_labware_def(def1a) == labware._hash_labware_def(def1b)
+    # different data should not match
+    assert labware._hash_labware_def(def1a) != labware._hash_labware_def(def2)
