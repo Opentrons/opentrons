@@ -34,22 +34,26 @@ const spacingValue = (spacing: number | null) => {
 }
 
 export type WellSpacingProps = {|
+  category?: string,
   wellProperties: LabwareWellGroupProperties,
   labelSuffix?: string,
   className?: string,
 |}
 
 export default function WellSpacing(props: WellSpacingProps) {
-  const { labelSuffix, wellProperties, className } = props
+  const { labelSuffix, wellProperties, className, category } = props
   const spacing = [
     { label: X_OFFSET, value: toFixed(wellProperties.xOffsetFromLeft) },
     { label: Y_OFFSET, value: toFixed(wellProperties.yOffsetFromTop) },
     { label: X_SPACING, value: spacingValue(wellProperties.xSpacing) },
     { label: Y_SPACING, value: spacingValue(wellProperties.ySpacing) },
   ]
-
+  const shape = wellProperties.shape?.shape
   return (
     <LabeledValueTable
+      category={category}
+      guideType="spacing"
+      shape={shape}
       className={className}
       label={
         <>

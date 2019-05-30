@@ -23,9 +23,8 @@ export type InsertDetailsProps = {|
 export default function InsertDetails(props: InsertDetailsProps) {
   const { definition } = props
   const { metadata } = definition
-  const { displayVolumeUnits } = metadata
+  const { displayVolumeUnits, displayCategory } = metadata
   const wellGroups = getUniqueWellProperties(definition)
-
   return (
     <>
       {wellGroups.map((wellProps, i) => {
@@ -54,6 +53,7 @@ export default function InsertDetails(props: InsertDetailsProps) {
                 hideTitle
               />
               <WellDimensions
+                category={displayCategory}
                 wellProperties={wellProps}
                 wellLabel={wellLabel}
                 depthLabel={depthLabel}

@@ -2,7 +2,7 @@
 // labware dimensions for details page
 import * as React from 'react'
 import round from 'lodash/round'
-
+import { getUniqueWellProperties } from '../../definitions'
 import {
   FOOTPRINT,
   MM,
@@ -24,7 +24,6 @@ export type DimensionsProps = {|
 
 export default function Dimensions(props: DimensionsProps) {
   const { definition, className } = props
-
   const { displayCategory } = definition.metadata
   const { xDimension, yDimension, zDimension } = definition.dimensions
   const dimensions = [
@@ -32,6 +31,9 @@ export default function Dimensions(props: DimensionsProps) {
     { label: LABWARE_Y_DIM, value: toFixed(yDimension) },
     { label: LABWARE_Z_DIM, value: toFixed(zDimension) },
   ]
+  const wellGroups = getUniqueWellProperties(definition)
+  const insert = wellGroups.find(g => g.metadata.displayCategory)
+  const insertCategory = insert?.metadata.displayCategory
 
   return (
     <LabeledValueTable
@@ -43,6 +45,7 @@ export default function Dimensions(props: DimensionsProps) {
       }
       category={displayCategory}
       guideType={FOOTPRINT}
+      insertCategory={insertCategory}
       values={dimensions}
     />
   )

@@ -78,6 +78,7 @@ export default function LabwareDetailsBox(props: LabwareDetailsBoxProps) {
                 )}
                 {!groupMetadata.displayCategory && (
                   <WellDimensions
+                    category={definition.metadata.displayCategory}
                     wellProperties={wellProps}
                     wellLabel={wellLabel}
                     depthLabel={depthLabel}
@@ -86,6 +87,7 @@ export default function LabwareDetailsBox(props: LabwareDetailsBoxProps) {
                   />
                 )}
                 <WellSpacing
+                  category={definition.metadata.displayCategory}
                   wellProperties={wellProps}
                   labelSuffix={groupDisplaySuffix}
                   className={styles.details_table}

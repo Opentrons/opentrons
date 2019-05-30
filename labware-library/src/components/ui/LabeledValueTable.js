@@ -2,7 +2,7 @@
 import * as React from 'react'
 
 import { Table, TableEntry, TABLE_COLUMN } from './Table'
-import { LabelText, LABEL_TOP } from './LabelText'
+import { LabelText, LABEL_LEFT } from './LabelText'
 import { Value } from './Value'
 import { ClickableIcon } from './ClickableIcon'
 import { MeasurementGuide } from '../MeasurementGuide'
@@ -10,7 +10,7 @@ import { MeasurementGuide } from '../MeasurementGuide'
 import styles from './styles.css'
 
 import type { TableDirection } from './Table'
-import type { GuideProps } from '../MeasurementGuide'
+import type { DiagramProps } from '../MeasurementGuide'
 
 export type ValueEntry = {
   label: React.Node,
@@ -18,13 +18,12 @@ export type ValueEntry = {
 }
 
 export type LabledValueTableProps = {
+  ...DiagramProps,
   label: React.Node,
   values: Array<ValueEntry>,
   direction?: TableDirection,
   className?: string,
   children?: React.Node,
-  category?: string,
-  guideType?: string,
 }
 
 export function LabeledValueTable(props: LabledValueTableProps) {
@@ -38,6 +37,9 @@ export function LabeledValueTable(props: LabledValueTableProps) {
     children,
     category,
     guideType,
+    insertCategory,
+    shape,
+    wellBottomShape,
   } = props
   return (
     <div className={className}>
@@ -47,6 +49,9 @@ export function LabeledValueTable(props: LabledValueTableProps) {
         guideVisible={guideVisible}
         category={category}
         guideType={guideType}
+        insertCategory={insertCategory}
+        shape={shape}
+        wellBottomShape={wellBottomShape}
       />
       <Table direction={direction || TABLE_COLUMN}>
         {values.map((v, i) => (
@@ -62,18 +67,27 @@ export function LabeledValueTable(props: LabledValueTableProps) {
 }
 
 type TableTitleProps = {|
-  ...GuideProps,
+  ...DiagramProps,
   label: React.Node,
   setGuideVisible: (visible: Boolean) => mixed,
 |}
 
 export function TableTitle(props: TableTitleProps) {
-  const { label, setGuideVisible, guideVisible, category, guideType } = props
+  const {
+    label,
+    setGuideVisible,
+    guideVisible,
+    category,
+    guideType,
+    insertCategory,
+    shape,
+    wellBottomShape,
+  } = props
 
   return (
     <div className={styles.table_title}>
       <div className={styles.table_title_text}>
-        <LabelText position={LABEL_TOP}>{label}</LabelText>
+        <LabelText position={LABEL_LEFT}>{label}</LabelText>
         <ClickableIcon
           title="info"
           name="information"
@@ -85,6 +99,9 @@ export function TableTitle(props: TableTitleProps) {
         category={category}
         guideType={guideType}
         guideVisible={guideVisible}
+        insertCategory={insertCategory}
+        shape={shape}
+        wellBottomShape={wellBottomShape}
       />
     </div>
   )
