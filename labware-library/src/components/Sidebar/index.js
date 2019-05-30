@@ -14,6 +14,7 @@ export type SidebarProps = {|
 
 export default function Sidebar(props: SidebarProps) {
   const { filters } = props
+
   return (
     <nav className={styles.sidebar}>
       <LabwareGuide />

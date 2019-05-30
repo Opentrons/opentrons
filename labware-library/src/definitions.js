@@ -28,15 +28,24 @@ const definitionsContext = (require: any).context(
   'sync' // load every definition into one synchronous chunk
 )
 
+const DO_NOT_LIST = [
+  'opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip',
+  'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap_acrylic',
+  'opentrons_24_tuberack_generic_0.75ml_snapcap_acrylic',
+  'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic',
+  'tipone_96_tiprack_200ul',
+  'opentrons_1_trash_850ml_fixed',
+  'opentrons_1_trash_1100ml_fixed',
+]
+
 let definitions: LabwareList | null = null
 
 export function getAllDefinitions(): LabwareList {
-  // TODO(mc, 2019-03-28): revisit decision to hide trash labware
   if (!definitions) {
     definitions = definitionsContext
       .keys()
       .map(name => definitionsContext(name))
-      .filter(d => d.metadata.displayCategory !== 'trash')
+      .filter(d => DO_NOT_LIST.indexOf(d.parameters.loadName) === -1)
   }
 
   return definitions

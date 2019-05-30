@@ -31,17 +31,7 @@ export function getAllManufacturers(): Array<string> {
   return uniq([FILTER_OFF, ...brands, ...wellGroupBrands])
 }
 
-export function getFilters(
-  location: Location,
-  definition: LabwareDefinition | null
-): FilterParams {
-  if (definition) {
-    return {
-      category: definition.metadata.displayCategory,
-      manufacturer: definition.brand.brand,
-    }
-  }
-
+export function getFilters(location: Location): FilterParams {
   const queryParams = queryString.parse(location.search)
   const category = queryParams.category || FILTER_OFF
   const manufacturer = queryParams.manufacturer || FILTER_OFF

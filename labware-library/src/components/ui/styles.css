@@ -3,6 +3,7 @@
 @import '../../styles/spacing.css';
 
 .clickable_icon {
+  flex: none;
   cursor: pointer;
 
   &:active,
@@ -37,8 +38,8 @@
 }
 
 .table_title {
-  display: flex;
-  justify-content: space-between;
+  @apply --flex-between;
+
   padding-bottom: var(--spacing-1);
   border-bottom: var(--bd-light);
 }
@@ -58,7 +59,9 @@
 }
 
 .label_text {
-  flex: none;
+  @apply --truncate;
+
+  /* flex: none; */
   font-size: var(--fs-caption);
   font-weight: var(--fw-semibold);
   line-height: var(--lh-title);

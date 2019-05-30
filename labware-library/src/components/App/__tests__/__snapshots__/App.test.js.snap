@@ -42,8 +42,8 @@ exports[`App component renders with definition 1`] = `
       <Sidebar
         filters={
           Object {
-            "category": "wellPlate",
-            "manufacturer": "generic",
+            "category": "all",
+            "manufacturer": "all",
           }
         }
       />

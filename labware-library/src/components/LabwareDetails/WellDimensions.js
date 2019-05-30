@@ -7,7 +7,6 @@ import {
   MEASUREMENTS,
   WELL_X_DIM,
   WELL_Y_DIM,
-  DEPTH,
   DIAMETER,
   MM,
 } from '../../localization'
@@ -21,15 +20,21 @@ const toFixed = (n: number): string => round(n, 2).toFixed(2)
 export type WellDimensionsProps = {|
   wellProperties: LabwareWellGroupProperties,
   wellLabel: string,
+  depthLabel: string,
   labelSuffix?: string,
   className?: string,
 |}
 
 export default function WellDimensions(props: WellDimensionsProps) {
-  const { wellProperties, wellLabel, labelSuffix, className } = props
+  const {
+    wellProperties,
+    depthLabel,
+    wellLabel,
+    labelSuffix,
+    className,
+  } = props
   const { shape } = wellProperties
-  const title = `${wellLabel} ${MEASUREMENTS}${labelSuffix || ''}`
-  const dimensions = [{ label: DEPTH, value: wellProperties.depth }]
+  const dimensions = [{ label: depthLabel, value: wellProperties.depth }]
 
   if (shape) {
     if (shape.shape === 'circular') {
@@ -47,7 +52,8 @@ export default function WellDimensions(props: WellDimensionsProps) {
       className={className}
       label={
         <>
-          {title} <LowercaseText>({MM})</LowercaseText>
+          {wellLabel} {MEASUREMENTS} <LowercaseText>({MM})</LowercaseText>{' '}
+          {labelSuffix || ''}
         </>
       }
       values={dimensions}

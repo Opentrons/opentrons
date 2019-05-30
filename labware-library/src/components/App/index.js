@@ -18,13 +18,13 @@ import type { DefinitionRouteRenderProps } from '../../definitions'
 export function App(props: DefinitionRouteRenderProps) {
   const { definition, location } = props
   const scrollRef = React.useRef<HTMLDivElement | null>(null)
-  const filters = getFilters(location, definition)
+  const filters = getFilters(location)
   const detailPage = Boolean(definition)
 
   React.useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = 0
     window.scrollTo(0, 0)
-  }, [location.pathname])
+  }, [location.pathname, location.search])
 
   return (
     <div

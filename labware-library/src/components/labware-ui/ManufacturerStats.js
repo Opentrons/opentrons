@@ -38,7 +38,9 @@ export function ManufacturerStats(props: ManufacturerStatsProps) {
         <div className={styles.manufacturer_stats}>
           <LabelText position={LABEL_TOP}>{MANUFACTURER_NO}</LabelText>
           <Value>
-            <p className={styles.manufacturer_brand_id}>{brandId.join(', ')}</p>
+            <span className={styles.manufacturer_brand_id}>
+              {brandId.join(', ')}
+            </span>
           </Value>
         </div>
       )}

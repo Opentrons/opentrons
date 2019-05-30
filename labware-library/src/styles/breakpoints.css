@@ -5,7 +5,7 @@
   --screen-width-medium: 768px;
   --screen-width-desktop: 1024px;
   --screen-width-large: 1024px;
-  --screen-width-xlarge: 1600px;
+  --screen-width-xlarge: 1440px;
 }
 
 /* keep these values aligned; cannot use vars in custom-media defintions */

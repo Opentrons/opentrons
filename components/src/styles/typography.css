@@ -97,4 +97,11 @@
     font-weight: var(--fw-semibold);
     color: var(--c-med-gray);
   };
+
+  --truncate: {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  };
 }

@@ -1,9 +1,10 @@
 // @flow
 import * as React from 'react'
-import { Link } from 'react-router-dom'
 
 import { BACK_TO_LABWARE_LIBRARY } from '../../localization'
 import { getPublicPath } from '../../public-path'
+import { Link } from '../ui'
+
 import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
