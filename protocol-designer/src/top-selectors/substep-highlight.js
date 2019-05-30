@@ -9,6 +9,7 @@ import * as StepGeneration from '../step-generation'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { selectors as fileDataSelectors } from '../file-data'
 import { selectors as stepsSelectors } from '../ui/steps'
+import { getWellSetForMultichannel } from '../well-selection/utils'
 
 import type { WellGroup } from '@opentrons/components'
 import type { Selector } from '../types'
@@ -94,7 +95,8 @@ function _getSelectedWellsForSubstep(
   stepArgs: StepGeneration.CommandCreatorArgs,
   labwareId: string,
   substeps: ?SubstepItemData,
-  substepIndex: number
+  substepIndex: number,
+  invariantContext: StepGeneration.InvariantContext
 ): Array<string> {
   if (substeps === null) {
     return []
@@ -142,6 +144,24 @@ function _getSelectedWellsForSubstep(
   if (stepArgs.destLabware && stepArgs.destLabware === labwareId) {
     wells.push(...getWells('dest'))
   }
+
+  let tipWellSet = []
+  if (substeps && substeps.commandCreatorFnName !== 'delay') {
+    if (substeps.multichannel) {
+      const hoveredSubstepData = substeps.multiRows[substepIndex][0] // just use first multi row
+
+      tipWellSet = hoveredSubstepData.activeTips
+        ? getWellSetForMultichannel(
+            invariantContext.labwareEntities[labwareId].def,
+            hoveredSubstepData.activeTips.well
+          )
+        : []
+    } else {
+      // single-channel
+      tipWellSet = [substeps.rows[substepIndex].activeTips.well]
+    }
+  }
+  wells.push(...tipWellSet)
 
   return wells
 }
@@ -194,7 +214,8 @@ export const wellHighlightsByLabwareId: Selector<{
             stepArgs,
             labwareId,
             allSubsteps[stepId],
-            hoveredSubstep.substepIndex
+            hoveredSubstep.substepIndex,
+            invariantContext
           )
         } else {
           // wells for step overall
