@@ -7,6 +7,7 @@ export type DiagramProps = {|
   shape?: string,
   wellBottomShape?: string,
   guideVisible?: boolean,
+  isIrregular?: boolean,
 |}
 
 const FOOTPRINT_DIAGRAMS: { [category: string]: Array<?string> } = {
@@ -25,6 +26,10 @@ const FOOTPRINT_DIAGRAMS: { [category: string]: Array<?string> } = {
   reservoir: [
     require('./images/dimensions/footprint@3x.png'),
     require('./images/dimensions/height-plate-and-reservoir@3x.png'),
+  ],
+  irregular: [
+    require('./images/dimensions/footprint@3x.png'),
+    require('./images/dimensions/height-tube-rack-irregular@3x.png'),
   ],
 }
 
@@ -131,13 +136,24 @@ const MEASUREMENT_DIAGRAMS: {
 }
 
 export function getDiagramSrc(props: DiagramProps) {
-  const { guideType, category, shape, wellBottomShape, insertCategory } = props
+  const {
+    guideType,
+    category,
+    shape,
+    wellBottomShape,
+    insertCategory,
+    isIrregular,
+  } = props
 
   switch (guideType) {
     case 'footprint':
-      return category === 'aluminumBlock'
-        ? insertCategory && ALUM_BLOCK_FOOTPRINTS[insertCategory]
-        : category && FOOTPRINT_DIAGRAMS[category]
+      console.log()
+      if (category === 'aluminumBlock') {
+        return insertCategory && ALUM_BLOCK_FOOTPRINTS[insertCategory]
+      } else if (category === 'tubeRack' && isIrregular) {
+        return FOOTPRINT_DIAGRAMS['irregular']
+      }
+      return category && FOOTPRINT_DIAGRAMS[category]
 
     case 'spacing':
       return category === 'reservoir'

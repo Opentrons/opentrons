@@ -33,8 +33,15 @@
 }
 
 .info_button {
-  width: 1.25rem;
+  width: 2rem;
   color: var(--c-med-gray);
+  padding: var(--spacing-1);
+
+  &.active {
+    background-color: var(--c-lightest-gray);
+    color: var(--c-dark-gray);
+    border-radius: 2px;
+  }
 }
 
 .table_title {

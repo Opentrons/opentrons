@@ -20,10 +20,11 @@ const toFixed = (n: number): string => round(n, 2).toFixed(2)
 export type DimensionsProps = {|
   definition: LabwareDefinition,
   className?: string,
+  isIrregular?: boolean,
 |}
 
 export default function Dimensions(props: DimensionsProps) {
-  const { definition, className } = props
+  const { definition, className, isIrregular } = props
   const { displayCategory } = definition.metadata
   const { xDimension, yDimension, zDimension } = definition.dimensions
   const dimensions = [
@@ -47,6 +48,7 @@ export default function Dimensions(props: DimensionsProps) {
       guideType={FOOTPRINT}
       insertCategory={insertCategory}
       values={dimensions}
+      isIrregular={isIrregular}
     />
   )
 }

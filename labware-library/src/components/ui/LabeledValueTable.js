@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import cx from 'classnames'
 
 import { Table, TableEntry, TABLE_COLUMN } from './Table'
 import { LabelText, LABEL_LEFT } from './LabelText'
@@ -40,6 +41,7 @@ export function LabeledValueTable(props: LabledValueTableProps) {
     insertCategory,
     shape,
     wellBottomShape,
+    isIrregular,
   } = props
   return (
     <div className={className}>
@@ -52,6 +54,7 @@ export function LabeledValueTable(props: LabledValueTableProps) {
         insertCategory={insertCategory}
         shape={shape}
         wellBottomShape={wellBottomShape}
+        isIrregular={isIrregular}
       />
       <Table direction={direction || TABLE_COLUMN}>
         {values.map((v, i) => (
@@ -82,7 +85,10 @@ export function TableTitle(props: TableTitleProps) {
     insertCategory,
     shape,
     wellBottomShape,
+    isIrregular,
   } = props
+
+  const className = cx(styles.info_button, { [styles.active]: guideVisible })
 
   return (
     <div className={styles.table_title}>
@@ -91,7 +97,7 @@ export function TableTitle(props: TableTitleProps) {
         <ClickableIcon
           title="info"
           name="information"
-          className={styles.info_button}
+          className={className}
           onClick={setGuideVisible}
         />
       </div>
@@ -102,6 +108,7 @@ export function TableTitle(props: TableTitleProps) {
         insertCategory={insertCategory}
         shape={shape}
         wellBottomShape={wellBottomShape}
+        isIrregular={isIrregular}
       />
     </div>
   )
