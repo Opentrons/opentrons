@@ -48,8 +48,14 @@ const ALUM_BLOCK_FOOTPRINTS: { [category: string]: Array<?string> } = {
 const RESERVOIR_SPACING_DIAGRAMS: {
   [rows: string]: Array<?string>,
 } = {
-  singleRow: [require('./images/spacing/spacing-reservoir@3x.png')],
-  multiRow: [require('./images/spacing/spacing-reservoir-multi-row@3x.png')],
+  singleRow: [
+    require('./images/offset/offset-reservoir@3x.png'),
+    require('./images/spacing/spacing-reservoir@3x.png'),
+  ],
+  multiRow: [
+    require('./images/offset/offset-reservoir@3x.png'),
+    require('./images/spacing/spacing-reservoir-multi-row@3x.png'),
+  ],
 }
 
 const SPACING_DIAGRAMS: {
