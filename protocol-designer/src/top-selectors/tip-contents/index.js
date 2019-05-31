@@ -18,7 +18,7 @@ import type {
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import type { OutputSelector } from 'reselect'
-import type { BaseState } from '../../types'
+import type { BaseState, Selector } from '../../types'
 import type { ElementProps } from 'react'
 
 type GetTipProps = $PropertyType<ElementProps<Labware>, 'getTipProps'>
@@ -95,9 +95,9 @@ const getLastValidTips: GetTipSelector = createSelector(
   })
 )
 
-export const getMissingTipsByLabwareId: {
-  [string]: WellGroup,
-} = createSelector(
+export const getMissingTipsByLabwareId: Selector<{
+  [labwareId: string]: WellGroup,
+}> = createSelector(
   stepFormSelectors.getOrderedStepIds,
   fileDataSelectors.getRobotStateTimeline,
   stepsSelectors.getActiveItem,
@@ -142,6 +142,7 @@ export const getMissingTipsByLabwareId: {
     const missingTips =
       robotState &&
       robotState.tipState &&
+      // $FlowFixMe(bc, 2019-05-31): flow choking on mapValues
       mapValues(robotState.tipState.tipracks, tipMap =>
         reduce(
           tipMap,

@@ -14,12 +14,14 @@ type Props = {
 
 function RobotWorkSpace(props: Props) {
   const { children, deckDef, deckLayerBlacklist = [], viewBox } = props
-  const wrapperRef: ElementRef<Node> = useRef<Node | null>(null)
+  const wrapperRef: ElementRef<*> = useRef(null)
 
+  // $FlowFixMe(bc, 2019-05-31): flow type svg ref
   const getRobotCoordsFromDOMCoords = (
     x: number,
     y: number
   ): { x: number, y: number } => {
+    if (!wrapperRef.current) return { x: 0, y: 0 }
     const cursorPoint = wrapperRef.current.createSVGPoint()
 
     cursorPoint.x = x
@@ -48,7 +50,7 @@ function RobotWorkSpace(props: Props) {
     <svg
       className={styles.robot_work_space}
       viewBox={viewBox || wholeDeckViewBox}
-      ref={wrapperRef}
+      ref={el => (wrapperRef.current = el)}
     >
       {deckDef && (
         <DeckFromData def={deckDef} layerBlacklist={deckLayerBlacklist} />

@@ -101,10 +101,11 @@ function _getSelectedWellsForStep(
       if (pipetteSpec.channels === 1) {
         wells.push(commandWellName)
       } else if (pipetteSpec.channels === 8) {
-        const wellSet = getWellSetForMultichannel(
-          invariantContext.labwareEntities[labwareId].def,
-          commandWellName
-        )
+        const wellSet =
+          getWellSetForMultichannel(
+            invariantContext.labwareEntities[labwareId].def,
+            commandWellName
+          ) || []
         wells.push(...wellSet)
       } else {
         console.error(

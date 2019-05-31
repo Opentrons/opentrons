@@ -1,6 +1,6 @@
 // @flow
-import React from 'react'
-import type { DeckSlot } from '@opentrons/shared-data'
+import React, { type Node } from 'react'
+import type { DeckSlotId, DeckSlot } from '@opentrons/shared-data'
 import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
 import cx from 'classnames'
 import { connect } from 'react-redux'
@@ -19,7 +19,7 @@ import styles from './LabwareOverlays.css'
 
 type DNDP = {|
   isOver: boolean,
-  connectDropTarget: React.Node => mixed,
+  connectDropTarget: Node => mixed,
 |}
 type OP = {|
   slot: DeckSlot,

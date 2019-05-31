@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
 import type { DeckSlot } from '@opentrons/shared-data'
 
+import type { BaseState } from '../../../types'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../../steplist'
 import type { LabwareOnDeck } from '../../../step-forms'
 import { selectors as stepsSelectors } from '../../../ui/steps'
@@ -23,7 +24,7 @@ type SP = {|
   highlighted: boolean,
 |}
 
-type Props = {| ...OP, ...SP |}
+type Props = { ...OP, ...SP }
 
 const LabwareControls = (props: Props) => {
   const { labwareOnDeck, slot, selectedTerminalItemId, highlighted } = props
@@ -58,4 +59,6 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => ({
     .includes(ownProps.labwareOnDeck.id),
 })
 
-export default connect<Props, OP, SP, _, _, _>(mapStateToProps)(LabwareControls)
+export default connect<Props, OP, SP, {||}, _, _>(mapStateToProps)(
+  LabwareControls
+)

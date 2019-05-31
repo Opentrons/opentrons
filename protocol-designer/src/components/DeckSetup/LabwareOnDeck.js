@@ -7,7 +7,7 @@ import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import * as highlightSelectors from '../../top-selectors/substep-highlight'
 import * as tipContentsSelectors from '../../top-selectors/tip-contents'
 import { type LabwareOnDeck as LabwareOnDeckType } from '../../step-forms'
-import type { WellContentsByLabware } from '../../labware-ingred/types'
+import type { ContentsByWell } from '../../labware-ingred/types'
 import type { BaseState } from '../../types'
 import { wellFillFromWellContents } from '../labware/utils'
 
@@ -18,12 +18,12 @@ type OP = {|
 |}
 
 type SP = {|
-  wellContents: WellContentsByLabware,
+  wellContents: ContentsByWell,
   missingTips: WellGroup,
   highlightedWells: WellGroup,
 |}
 
-type Props = {| ...OP, ...SP |}
+type Props = { ...OP, ...SP }
 
 const LabwareOnDeck = (props: Props) => (
   <g transform={`translate(${props.x}, ${props.y})`}>
@@ -52,4 +52,6 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-export default connect<Props, OP, SP, _, _, _>(mapStateToProps)(LabwareOnDeck)
+export default connect<Props, OP, SP, {||}, _, _>(mapStateToProps)(
+  LabwareOnDeck
+)
