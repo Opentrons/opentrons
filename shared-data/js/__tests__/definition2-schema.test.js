@@ -5,7 +5,10 @@ import schema from '../../labware-json-schema/labwareSchemaV2.json'
 import exampleLabware1 from './fixtures/labware2/labwareExample.json'
 import exampleLabware2 from './fixtures/labware2/labwareExample2.json'
 
-const definitionsGlobPath = path.join(__dirname, '../../definitions2/*.json')
+const definitionsGlobPath = path.join(
+  __dirname,
+  '../../labware/definitions/2/**/*.json'
+)
 
 // JSON Schema defintion & setup
 
@@ -46,7 +49,7 @@ describe('test the schema against a minimalist fixture', () => {
   })
 })
 
-describe('test schemas of all definitions', () => {
+describe('test schemas of all opentrons definitions', () => {
   const labwarePaths = glob.sync(definitionsGlobPath)
   beforeAll(() => {
     // Make sure definitions path didn't break, which would give you false positives
@@ -54,7 +57,7 @@ describe('test schemas of all definitions', () => {
   })
 
   labwarePaths.forEach(labwarePath => {
-    const filename = path.parse(labwarePath).name
+    const filename = path.parse(labwarePath).base
     const labwareDef = require(labwarePath)
     test(filename, () => {
       const valid = validate(labwareDef)
@@ -63,8 +66,11 @@ describe('test schemas of all definitions', () => {
       expect(validationErrors).toBe(null)
       expect(valid).toBe(true)
     })
-    test(`file name matches loadName: ${filename}`, () => {
-      expect(labwareDef.parameters.loadName).toEqual(filename)
+    test(`file name matches version: ${labwarePath}`, () => {
+      expect(`${labwareDef.version}.json`).toEqual(filename)
+    })
+    test(`namespace is "opentrons": ${labwarePath}`, () => {
+      expect(labwareDef.namespace).toEqual('opentrons')
     })
   })
 })

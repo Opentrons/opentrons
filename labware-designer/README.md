@@ -96,7 +96,7 @@ const options = {
 const labware = sharedData.createRegularLabware(options)
 ```
 
-[generic_96_wellplate_340ul_flat.json]: ../shared-data/definitions2/generic_96_wellplate_340ul_flat.json
+[generic_96_wellplate_340ul_flat.json]: ../shared-data/labware/definitions/2/generic_96_wellplate_340ul_flat/1.json
 
 ### createIrregularLabware(options: IrregularLabwareProps): LabwareDefinition2
 
@@ -163,7 +163,7 @@ const options = {
 const labware = sharedData.createIrregularLabware(options)
 ```
 
-[opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical.json]: ../shared-data/definitions2/opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical.json
+[opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical.json]: ../shared-data/labware/definitions/2/opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical/1.json
 
 ### Types
 
