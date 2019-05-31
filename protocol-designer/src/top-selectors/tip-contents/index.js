@@ -3,6 +3,7 @@ import { createSelector } from 'reselect'
 import noop from 'lodash/noop'
 import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
+import type { WellGroup } from '@opentrons/components'
 import * as StepGeneration from '../../step-generation'
 import { allSubsteps as getAllSubsteps } from '../substeps'
 import { START_TERMINAL_ITEM_ID, END_TERMINAL_ITEM_ID } from '../../steplist'
@@ -94,7 +95,9 @@ const getLastValidTips: GetTipSelector = createSelector(
   })
 )
 
-export const getMissingTipsByLabwareId: GetTipSelector = createSelector(
+export const getMissingTipsByLabwareId: {
+  [string]: WellGroup,
+} = createSelector(
   stepFormSelectors.getOrderedStepIds,
   fileDataSelectors.getRobotStateTimeline,
   stepsSelectors.getActiveItem,
@@ -138,6 +141,7 @@ export const getMissingTipsByLabwareId: GetTipSelector = createSelector(
 
     const missingTips =
       robotState &&
+      robotState.tipState &&
       mapValues(robotState.tipState.tipracks, tipMap =>
         reduce(
           tipMap,

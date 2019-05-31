@@ -7,7 +7,7 @@ import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import * as highlightSelectors from '../../top-selectors/substep-highlight'
 import * as tipContentsSelectors from '../../top-selectors/tip-contents'
 import { type LabwareOnDeck as LabwareOnDeckType } from '../../step-forms'
-import type { ContentsByWell } from '../../labware-ingred/types'
+import type { WellContentsByLabware } from '../../labware-ingred/types'
 import type { BaseState } from '../../types'
 import { wellFillFromWellContents } from '../labware/utils'
 
@@ -18,7 +18,7 @@ type OP = {|
 |}
 
 type SP = {|
-  wellContents: ContentsByWell,
+  wellContents: WellContentsByLabware,
   missingTips: WellGroup,
   highlightedWells: WellGroup,
 |}

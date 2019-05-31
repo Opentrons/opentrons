@@ -16,7 +16,7 @@ import { selectors as labwareIngredSelectors } from '../../labware-ingred/select
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as stepsSelectors } from '../../ui/steps'
 import wellSelectionSelectors from '../../well-selection/selectors'
-import { START_TERMINAL_ITEM_ID, END_TERMINAL_ITEM_ID } from '../../steplist'
+import { START_TERMINAL_ITEM_ID } from '../../steplist'
 import { getAllWellsForLabware, getMaxVolumes } from '../../constants'
 
 import type { Selector } from '../../types'
@@ -120,9 +120,7 @@ export const getLastValidWellContents: Selector<WellContentsByLabware> = createS
   }
 )
 
-export const getAllWellContentsForActiveItem: Selector<
-  Array<WellContentsByLabware>
-> = createSelector(
+export const getAllWellContentsForActiveItem: Selector<WellContentsByLabware> = createSelector(
   stepsSelectors.getActiveItem,
   fileDataSelectors.getInitialRobotState,
   fileDataSelectors.getRobotStateTimeline,

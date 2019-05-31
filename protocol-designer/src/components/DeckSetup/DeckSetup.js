@@ -12,7 +12,10 @@ import { getLabwareHasQuirk } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import i18n from '../../localization'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../steplist'
-import type { InitialDeckSetup, LabwareOnDeckType } from '../../step-forms'
+import type {
+  InitialDeckSetup,
+  LabwareOnDeck as LabwareOnDeckType,
+} from '../../step-forms'
 
 import { BrowseLabwareModal } from '../labware'
 import LabwareOnDeck from './LabwareOnDeck'

@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import React, { type Node } from 'react'
 import { connect } from 'react-redux'
 import cx from 'classnames'
 import { Icon } from '@opentrons/components'
@@ -32,8 +32,8 @@ type DP = {|
 
 type DNDP = {|
   draggedItem: any,
-  connectDragSource: React.Node => React.Node,
-  connectDropTarget: React.Node => React.Node,
+  connectDragSource: Node => Node,
+  connectDropTarget: Node => Node,
 |}
 
 type Props = {| ...OP, ...SP, ...DP, ...DNDP |}
@@ -168,7 +168,14 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
     dispatch(swapSlotContents(sourceSlot, destSlot)),
 })
 
-export default connect<Props, OP, SP, DP, BaseState, ThunkDispatch<*>>(
+export default connect<
+  {| ...OP, ...SP, ...DP |},
+  OP,
+  SP,
+  DP,
+  BaseState,
+  ThunkDispatch<*>
+>(
   mapStateToProps,
   mapDispatchToProps
 )(DragDropEditLabware)

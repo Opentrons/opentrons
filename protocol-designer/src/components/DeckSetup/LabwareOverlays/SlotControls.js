@@ -27,7 +27,7 @@ type OP = {|
 |}
 type DP = {|
   addLabware: (e: SyntheticEvent<*>) => mixed,
-  swapSlotContents: (DeckSlotId, DeckSlotId) => void,
+  swapSlotContents: (DeckSlotId, DeckSlotId) => mixed,
 |}
 type Props = {| ...OP, ...DP, ...DNDP |}
 
@@ -79,7 +79,7 @@ const collectSlotTarget = (connect, monitor) => ({
   isOver: monitor.isOver(),
 })
 
-export default connect<Props, OP, _, DP, _, _>(
+export default connect<{| ...OP, ...DP |}, OP, _, DP, _, _>(
   null,
   mapDispatchToProps
 )(DropTarget(DND_TYPES.LABWARE, slotTarget, collectSlotTarget)(SlotControls))

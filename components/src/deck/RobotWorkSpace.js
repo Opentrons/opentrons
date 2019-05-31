@@ -1,5 +1,5 @@
 // @flow
-import React, { useRef } from 'react'
+import React, { useRef, type Node, type ElementRef } from 'react'
 import { DeckFromData } from './Deck'
 import type { DeckDefinition } from '@opentrons/shared-data'
 import styles from './RobotWorkSpace.css'
@@ -8,13 +8,13 @@ import type { RobotWorkSpaceRenderProps } from './types'
 type Props = {
   deckDef?: DeckDefinition,
   viewBox?: string,
-  children?: RobotWorkSpaceRenderProps => React.Node,
+  children?: RobotWorkSpaceRenderProps => Node,
   deckLayerBlacklist?: Array<string>,
 }
 
 function RobotWorkSpace(props: Props) {
   const { children, deckDef, deckLayerBlacklist = [], viewBox } = props
-  const wrapperRef: ElementRef<'svg'> = useRef()
+  const wrapperRef: ElementRef<Node> = useRef<Node | null>(null)
 
   const getRobotCoordsFromDOMCoords = (
     x: number,

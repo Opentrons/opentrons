@@ -1,6 +1,9 @@
 // @flow
 import { createSelector } from 'reselect'
-import { getWellNamePerMultiTip } from '@opentrons/shared-data'
+import {
+  getWellNamePerMultiTip,
+  type CommandV1 as Command,
+} from '@opentrons/shared-data'
 
 import mapValues from 'lodash/mapValues'
 
@@ -176,15 +179,17 @@ function _getSelectedWellsForSubstep(
       const { activeTips } = substeps.multiRows[substepIndex][0] // just use first multi row
 
       if (activeTips && activeTips.labware === labwareId) {
-        tipWellSet = getWellSetForMultichannel(
+        const multiTipWellSet = getWellSetForMultichannel(
           invariantContext.labwareEntities[labwareId].def,
           activeTips.well
         )
+        if (multiTipWellSet) tipWellSet = multiTipWellSet
       }
     } else {
       // single-channel
       const { activeTips } = substeps.rows[substepIndex]
-      if (activeTips.labware === labwareId) tipWellSet = [activeTips.well]
+      if (activeTips && activeTips.labware === labwareId && activeTips.well)
+        tipWellSet = [activeTips.well]
     }
     wells.push(...tipWellSet)
   }
