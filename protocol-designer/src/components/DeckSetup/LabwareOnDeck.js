@@ -1,16 +1,14 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { LabwareRender } from '@opentrons/components'
+import { LabwareRender, type WellGroup } from '@opentrons/components'
 
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import * as highlightSelectors from '../../top-selectors/substep-highlight'
 import * as tipContentsSelectors from '../../top-selectors/tip-contents'
-import { selectors as stepsSelectors } from '../../ui/steps'
 import { type LabwareOnDeck as LabwareOnDeckType } from '../../step-forms'
 import type { ContentsByWell } from '../../labware-ingred/types'
 import type { BaseState } from '../../types'
-import { HighlightedBorder } from './LabwareOverlays'
 import { wellFillFromWellContents } from '../labware/utils'
 
 type OP = {|
@@ -21,17 +19,14 @@ type OP = {|
 
 type SP = {|
   wellContents: ContentsByWell,
-  highlighted: boolean,
-  highlightedWells: { [string]: null },
+  missingTips: WellGroup,
+  highlightedWells: WellGroup,
 |}
 
 type Props = {| ...OP, ...SP |}
 
 const LabwareOnDeck = (props: Props) => (
   <g transform={`translate(${props.x}, ${props.y})`}>
-    {props.highlighted && (
-      <HighlightedBorder definition={props.labwareOnDeck.def} />
-    )}
     <LabwareRender
       definition={props.labwareOnDeck.def}
       wellFill={wellFillFromWellContents(props.wellContents)}
@@ -54,9 +49,6 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
     missingTips: tipContentsSelectors.getMissingTipsByLabwareId(state)[
       labwareOnDeck.id
     ],
-    highlighted: stepsSelectors
-      .getHoveredStepLabware(state)
-      .includes(labwareOnDeck.id),
   }
 }
 

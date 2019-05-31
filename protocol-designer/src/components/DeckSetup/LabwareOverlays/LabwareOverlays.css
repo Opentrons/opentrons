@@ -72,8 +72,8 @@
   position: absolute;
 }
 
-.highlighted_border {
-  stroke: var(--c-highlight);
-  stroke-width: 2;
-  fill: transparent;
+.highlighted_border_div {
+  border-color: var(--c-highlight);
+  border-width: 3px;
+  border-style: solid;
 }

@@ -93,7 +93,7 @@ const DeckSetup = (props: Props) => {
                   if (some(containedLabware)) {
                     // NOTE: only controlling first contained labware for now!
                     return (
-                      <g key={slot.id}>
+                      <React.Fragment key={slot.id}>
                         {map(containedLabware, labwareOnDeck => (
                           <LabwareOnDeck
                             key={labwareOnDeck.id}
@@ -111,7 +111,7 @@ const DeckSetup = (props: Props) => {
                             }
                           />
                         </g>
-                      </g>
+                      </React.Fragment>
                     )
                   }
 
