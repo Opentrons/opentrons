@@ -30,7 +30,7 @@ let definition = fixture96Plate
 **Tiprack**
 
 ```js
-const fixtureTipRack300Ul = require('@opentrons/shared-data/fixtures/fixtureTipRack300Ul')
+const fixtureTipRack300Ul = require('@opentrons/shared-data/labware/fixtures/2/fixtureTipRack300Ul')
 
 let definition = fixtureTipRack300Ul
 
