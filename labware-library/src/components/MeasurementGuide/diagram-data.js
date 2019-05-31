@@ -8,6 +8,7 @@ export type DiagramProps = {|
   wellBottomShape?: string,
   guideVisible?: boolean,
   irregular?: boolean,
+  isMultiRow?: boolean,
 |}
 
 const FOOTPRINT_DIAGRAMS: { [category: string]: Array<?string> } = {
