@@ -11,7 +11,7 @@ import {
   MM,
 } from '../../localization'
 import { LabeledValueTable, LowercaseText } from '../ui'
-import { getMeasurementDiagram } from '../MeasurementGuide'
+import { getMeasurementDiagram } from '../measurement-guide'
 
 import type { LabwareWellGroupProperties } from '../../types'
 

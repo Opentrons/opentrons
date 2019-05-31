@@ -17,7 +17,7 @@ import {
 import styles from './styles.css'
 
 import { LabeledValueTable, LowercaseText } from '../ui'
-import { getSpacingDiagram } from '../MeasurementGuide'
+import { getSpacingDiagram } from '../measurement-guide'
 
 import type { LabwareWellGroupProperties } from '../../types'
 

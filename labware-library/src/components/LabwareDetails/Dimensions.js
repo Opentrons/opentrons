@@ -10,7 +10,7 @@ import {
   LABWARE_Z_DIM,
 } from '../../localization'
 import { LabeledValueTable, LowercaseText } from '../ui'
-import { getFootprintDiagram } from '../MeasurementGuide'
+import { getFootprintDiagram } from '../measurement-guide'
 
 import type { LabwareDefinition } from '../../types'
 
