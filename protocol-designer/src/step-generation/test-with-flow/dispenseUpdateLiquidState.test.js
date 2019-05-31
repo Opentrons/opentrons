@@ -1,9 +1,8 @@
 // @flow
-import {
-  fixture12Trough,
-  fixture96Plate,
-  fixture384Plate,
-} from '@opentrons/shared-data/fixtures'
+import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture96Plate.json'
+import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture12Trough.json'
+import fixture384Plate from '@opentrons/shared-data/labware/fixtures/2/fixture384Plate.json'
+
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import { createEmptyLiquidState, createTipLiquidState } from '../utils'

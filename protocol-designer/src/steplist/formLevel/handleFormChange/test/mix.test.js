@@ -1,5 +1,6 @@
 // @flow
-import { fixture96Plate, fixtureTrash } from '@opentrons/shared-data/fixtures'
+import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture96Plate.json'
+import fixtureTrash from '@opentrons/shared-data/labware/fixtures/2/fixtureTrash.json'
 import dependentFieldsUpdateMix from '../dependentFieldsUpdateMix'
 import { DEFAULT_MM_FROM_BOTTOM_DISPENSE } from '../../../../constants'
 

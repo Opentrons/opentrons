@@ -1,11 +1,10 @@
-import os
+from pathlib import Path
 import json
 from opentrons.types import Point
 from opentrons.protocol_api import execute_v3, ProtocolContext
 
-with open(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..',
-                       'shared-data', 'fixtures', 'fixture12Trough.json'),
-          'r') as f:
+with open((Path(__file__).parent/'..'/'..'/'..'/'..'/'shared-data'/'labware' /
+          'fixtures'/'2'/'fixture12Trough.json'), 'r') as f:
     custom_trough_def = json.load(f)
 
 
@@ -66,8 +65,8 @@ class MockPipette(object):
 
 
 def test_dispatch_commands(monkeypatch, loop):
-    with open(os.path.join(os.path.dirname(__file__), 'data',
-                           'v3_json_dispatch.json'), 'r') as f:
+    with open(Path(Path(__file__).parent/'data'/'v3_json_dispatch.json'),
+              'r') as f:
         protocol_data = json.load(f)
 
     command_log = []

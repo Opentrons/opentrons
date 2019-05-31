@@ -1,11 +1,11 @@
-import os
+from pathlib import Path
 import json
 from opentrons import robot, labware, instruments
 from opentrons.protocols import execute_v3
 # TODO: Modify all calls to get a Well to use the `wells` method
 
-with open(os.path.join(os.path.dirname(__file__), '..', '..', '..', '..',
-          'shared-data', 'fixtures', 'fixture96Plate.json'), 'r') as f:
+with open((Path(__file__).parent/'..'/'..'/'..'/'..'/'shared-data'/'labware' /
+          'fixtures'/'2'/'fixture96Plate.json'), 'r') as f:
     fixture_96_plate = json.load(f)
 
 

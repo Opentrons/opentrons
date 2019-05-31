@@ -1,5 +1,6 @@
 // @flow
-import { fixtureTipRack300Ul } from '@opentrons/shared-data/fixtures'
+import fixtureTipRack300Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack300Ul.json'
+
 import {
   makeContext,
   makeState,

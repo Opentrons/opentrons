@@ -1,10 +1,8 @@
 // @flow
 import { expectTimelineError } from './testMatchers'
 import _aspirate from '../commandCreators/atomic/aspirate'
-import {
-  fixtureTipRack10Ul,
-  fixtureTipRack1000Ul,
-} from '@opentrons/shared-data/fixtures'
+import fixtureTipRack10Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack10Ul.json'
+import fixtureTipRack1000Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack1000Ul.json'
 import {
   getInitialRobotStateStandard,
   getRobotStateWithTipStandard,

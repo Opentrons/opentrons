@@ -1,13 +1,20 @@
+// @flows
+import assert from 'assert'
 import path from 'path'
 // replace webpack-specific require.context with Node-based glob in tests
 import glob from 'glob'
 
 const DECK_FIXTURE_PATTERN = path.join(
   __dirname,
-  '../../../shared-data/js/__tests__/fixtures/decks/*.json'
+  '../../../shared-data/deck/fixtures/2/*.json'
 )
 
 const allDecks = glob.sync(DECK_FIXTURE_PATTERN).map(require)
+
+assert(
+  allDecks.length > 0,
+  `no deck fixtures found, is the path correct? ${DECK_FIXTURE_PATTERN}`
+)
 
 export const getDeckDefinitions = jest.fn(() =>
   allDecks.reduce(deck => ({ [deck.otId]: deck }), {})
