@@ -2,7 +2,6 @@
 // labware dimensions for details page
 import * as React from 'react'
 import round from 'lodash/round'
-import { getUniqueWellProperties } from '../../definitions'
 import {
   FOOTPRINT,
   MM,
@@ -11,6 +10,7 @@ import {
   LABWARE_Z_DIM,
 } from '../../localization'
 import { LabeledValueTable, LowercaseText } from '../ui'
+import { MeasurementGuide } from '../MeasurementGuide'
 
 import type { LabwareDefinition } from '../../types'
 
@@ -21,10 +21,11 @@ export type DimensionsProps = {|
   definition: LabwareDefinition,
   className?: string,
   irregular?: boolean,
+  insertCategory?: string,
 |}
 
 export default function Dimensions(props: DimensionsProps) {
-  const { definition, className, irregular } = props
+  const { definition, className, irregular, insertCategory } = props
   const { displayCategory } = definition.metadata
   const { xDimension, yDimension, zDimension } = definition.dimensions
   const dimensions = [
@@ -32,9 +33,6 @@ export default function Dimensions(props: DimensionsProps) {
     { label: LABWARE_Y_DIM, value: toFixed(yDimension) },
     { label: LABWARE_Z_DIM, value: toFixed(zDimension) },
   ]
-  const wellGroups = getUniqueWellProperties(definition)
-  const insert = wellGroups.find(g => g.metadata.displayCategory)
-  const insertCategory = insert?.metadata.displayCategory
 
   return (
     <LabeledValueTable
@@ -44,11 +42,15 @@ export default function Dimensions(props: DimensionsProps) {
           {FOOTPRINT} <LowercaseText>({MM})</LowercaseText>
         </>
       }
-      category={displayCategory}
-      guideType={FOOTPRINT}
-      insertCategory={insertCategory}
       values={dimensions}
-      irregular={irregular}
+      diagram={
+        <MeasurementGuide
+          category={displayCategory}
+          guideType={FOOTPRINT}
+          insertCategory={insertCategory}
+          irregular={irregular}
+        />
+      }
     />
   )
 }

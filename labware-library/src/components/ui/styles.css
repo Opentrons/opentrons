@@ -56,6 +56,18 @@
   align-items: center;
 }
 
+.expandable_content {
+  height: auto;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s linear;
+
+  &.open {
+    /* TODO: investigate react handling dynamic max height */
+    max-height: 800px;
+  }
+}
+
 .details_box {
   border: var(--bd-light);
   margin-bottom: var(--spacing-5);

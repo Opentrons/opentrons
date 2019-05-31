@@ -11,6 +11,7 @@ import {
   MM,
 } from '../../localization'
 import { LabeledValueTable, LowercaseText } from '../ui'
+import { MeasurementGuide } from '../MeasurementGuide'
 
 import type { LabwareWellGroupProperties } from '../../types'
 
@@ -20,11 +21,8 @@ const toFixed = (n: number): string => round(n, 2).toFixed(2)
 export type WellDimensionsProps = {|
   wellProperties: LabwareWellGroupProperties,
   wellLabel: string,
-
   depthLabel: string,
-
   category: string,
-
   labelSuffix?: string,
   className?: string,
 |}
@@ -57,10 +55,6 @@ export default function WellDimensions(props: WellDimensionsProps) {
 
   return (
     <LabeledValueTable
-      guideType="measurements"
-      category={category}
-      shape={shape?.shape}
-      wellBottomShape={wellBottomShape}
       className={className}
       label={
         <>
@@ -69,6 +63,14 @@ export default function WellDimensions(props: WellDimensionsProps) {
         </>
       }
       values={dimensions}
+      diagram={
+        <MeasurementGuide
+          guideType="measurements"
+          category={category}
+          shape={shape?.shape}
+          wellBottomShape={wellBottomShape}
+        />
+      }
     />
   )
 }

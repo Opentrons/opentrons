@@ -6,12 +6,10 @@ import { Table, TableEntry, TABLE_COLUMN } from './Table'
 import { LabelText, LABEL_LEFT } from './LabelText'
 import { Value } from './Value'
 import { ClickableIcon } from './ClickableIcon'
-import { MeasurementGuide } from '../MeasurementGuide'
 
 import styles from './styles.css'
 
 import type { TableDirection } from './Table'
-import type { DiagramProps } from '../MeasurementGuide'
 
 export type ValueEntry = {
   label: React.Node,
@@ -19,43 +17,19 @@ export type ValueEntry = {
 }
 
 export type LabledValueTableProps = {
-  ...DiagramProps,
   label: React.Node,
   values: Array<ValueEntry>,
   direction?: TableDirection,
   className?: string,
   children?: React.Node,
+  diagram?: React.Node,
 }
 
 export function LabeledValueTable(props: LabledValueTableProps) {
-  const [guideVisible, setGuideVisible] = React.useState<boolean>(false)
-  const toggleGuide = () => setGuideVisible(!guideVisible)
-  const {
-    label,
-    values,
-    direction,
-    className,
-    children,
-    category,
-    guideType,
-    insertCategory,
-    shape,
-    wellBottomShape,
-    irregular,
-  } = props
+  const { label, values, direction, className, children, diagram } = props
   return (
     <div className={className}>
-      <TableTitle
-        label={label}
-        setGuideVisible={toggleGuide}
-        guideVisible={guideVisible}
-        category={category}
-        guideType={guideType}
-        insertCategory={insertCategory}
-        shape={shape}
-        wellBottomShape={wellBottomShape}
-        irregular={irregular}
-      />
+      <TableTitle label={label} diagram={diagram} />
       <Table direction={direction || TABLE_COLUMN}>
         {values.map((v, i) => (
           <TableEntry key={i}>
@@ -70,25 +44,22 @@ export function LabeledValueTable(props: LabledValueTableProps) {
 }
 
 type TableTitleProps = {|
-  ...DiagramProps,
   label: React.Node,
-  setGuideVisible: (visible: Boolean) => mixed,
+  diagram?: React.Node,
 |}
 
 export function TableTitle(props: TableTitleProps) {
-  const {
-    label,
-    setGuideVisible,
-    guideVisible,
-    category,
-    guideType,
-    insertCategory,
-    shape,
-    wellBottomShape,
-    irregular,
-  } = props
+  const [guideVisible, setGuideVisible] = React.useState<boolean>(false)
+  const toggleGuide = () => setGuideVisible(!guideVisible)
+  const { label, diagram } = props
 
-  const className = cx(styles.info_button, { [styles.active]: guideVisible })
+  const iconClassName = cx(styles.info_button, {
+    [styles.active]: guideVisible,
+  })
+
+  const contentClassName = cx(styles.expandable_content, {
+    [styles.open]: guideVisible,
+  })
 
   return (
     <div className={styles.table_title}>
@@ -97,19 +68,11 @@ export function TableTitle(props: TableTitleProps) {
         <ClickableIcon
           title="info"
           name="information"
-          className={className}
-          onClick={setGuideVisible}
+          className={iconClassName}
+          onClick={toggleGuide}
         />
       </div>
-      <MeasurementGuide
-        category={category}
-        guideType={guideType}
-        guideVisible={guideVisible}
-        insertCategory={insertCategory}
-        shape={shape}
-        wellBottomShape={wellBottomShape}
-        irregular={irregular}
-      />
+      <div className={contentClassName}>{diagram}</div>
     </div>
   )
 }

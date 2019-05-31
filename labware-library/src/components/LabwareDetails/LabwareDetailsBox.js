@@ -32,6 +32,8 @@ export default function LabwareDetailsBox(props: LabwareDetailsBoxProps) {
   const wellGroups = getUniqueWellProperties(definition)
   const wellLabel = getWellLabel(definition)
   const hasInserts = wellGroups.some(g => g.metadata.displayCategory)
+  const insert = wellGroups.find(g => g.metadata.displayCategory)
+  const insertCategory = insert?.metadata.displayCategory
   const irregular = wellGroups.length > 1
 
   return (
@@ -51,6 +53,7 @@ export default function LabwareDetailsBox(props: LabwareDetailsBoxProps) {
             definition={definition}
             className={styles.details_table}
             irregular={irregular}
+            insertCategory={insertCategory}
           />
           {wellGroups.map((wellProps, i) => {
             const { metadata: groupMetadata } = wellProps
