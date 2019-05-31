@@ -4,8 +4,6 @@ import type { DeckSlotId } from '@opentrons/shared-data'
 
 // COMMANDS
 
-// TODO IMMEDIATELY what to do with this file???
-
 export type PipetteLabwareFieldsV1 = {|
   pipette: string,
   labware: string,

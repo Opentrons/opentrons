@@ -12,4 +12,4 @@ export * from './pipettes'
 export * from './types'
 export * from './labwareTools'
 export * from './modules'
-export * from '../protocol/schemas/jsonProtocolTypeV1' // TODO IMMEDIATELY
+export * from '../protocol/flowTypes/schemaV1'
