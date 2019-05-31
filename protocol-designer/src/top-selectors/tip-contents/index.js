@@ -205,12 +205,6 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
     }
 
     const prevFrame = timeline[timelineIdx - 1]
-    const missingTips = reduce(
-      prevFrame.robotState.tipState.tipracks[labwareId],
-      (acc, hasTip, wellName): WellGroup =>
-        hasTip ? { ...acc, [wellName]: null } : acc,
-      {}
-    )
 
     const hovered = stepId === hoveredStepId
     const currentFrame = timeline[timelineIdx]

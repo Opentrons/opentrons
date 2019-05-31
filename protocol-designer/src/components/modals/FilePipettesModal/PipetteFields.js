@@ -40,7 +40,7 @@ export default function ChangePipetteFields(props: Props) {
       },
       []
     )
-  })
+  }, [])
 
   const initialTabIndex = props.initialTabIndex || 1
   return (
