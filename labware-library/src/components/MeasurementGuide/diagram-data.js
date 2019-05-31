@@ -145,47 +145,38 @@ const MEASUREMENT_DIAGRAMS: {
   },
 }
 
-export function getDiagramSrc(props: DiagramProps) {
-  const {
-    guideType,
-    category,
-    shape,
-    wellBottomShape,
-    insertCategory,
-    irregular,
-    isMultiRow,
-  } = props
+export function getFootprintDiagram(props: DiagramProps) {
+  const { category, insertCategory, irregular } = props
+  if (category === 'aluminumBlock') {
+    return insertCategory && ALUM_BLOCK_FOOTPRINTS[insertCategory]
+  } else if (category === 'tubeRack' && irregular) {
+    return FOOTPRINT_DIAGRAMS['irregular']
+  }
+  return category && FOOTPRINT_DIAGRAMS[category]
+}
 
-  if (guideType === 'footprint') {
-    if (category === 'aluminumBlock') {
-      return insertCategory && ALUM_BLOCK_FOOTPRINTS[insertCategory]
-    } else if (category === 'tubeRack' && irregular) {
-      return FOOTPRINT_DIAGRAMS['irregular']
-    }
-    return category && FOOTPRINT_DIAGRAMS[category]
+export function getSpacingDiagram(props: DiagramProps) {
+  const { category, isMultiRow, shape } = props
+  if (category === 'reservoir') {
+    return isMultiRow
+      ? RESERVOIR_SPACING_DIAGRAMS['multiRow']
+      : RESERVOIR_SPACING_DIAGRAMS['singleRow']
   }
 
-  if (guideType === 'spacing') {
-    if (category === 'reservoir') {
-      return isMultiRow
-        ? RESERVOIR_SPACING_DIAGRAMS['multiRow']
-        : RESERVOIR_SPACING_DIAGRAMS['singleRow']
-    }
+  return shape && SPACING_DIAGRAMS[shape]
+}
 
-    return shape && SPACING_DIAGRAMS[shape]
-  }
-
-  if (guideType === 'measurements') {
-    if (category === 'tipRack') return TIPRACK_MEASUREMENT_DIAGRAMS
-    else if (category === 'wellPlate') {
-      return (
-        wellBottomShape &&
-        shape &&
-        PLATE_MEASUREMENT_DIAGRAMS[wellBottomShape][shape]
-      )
-    }
+export function getMeasurementDiagram(props: DiagramProps) {
+  const { category, wellBottomShape, shape } = props
+  if (category === 'tipRack') return TIPRACK_MEASUREMENT_DIAGRAMS
+  else if (category === 'wellPlate') {
     return (
-      wellBottomShape && shape && MEASUREMENT_DIAGRAMS[wellBottomShape][shape]
+      wellBottomShape &&
+      shape &&
+      PLATE_MEASUREMENT_DIAGRAMS[wellBottomShape][shape]
     )
   }
+  return (
+    wellBottomShape && shape && MEASUREMENT_DIAGRAMS[wellBottomShape][shape]
+  )
 }
