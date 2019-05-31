@@ -27,7 +27,7 @@ export type LabwareDetailsBoxProps = {|
 
 export default function LabwareDetailsBox(props: LabwareDetailsBoxProps) {
   const { definition, className } = props
-  const { metadata, brand, wells } = definition
+  const { metadata, brand, wells, ordering } = definition
   const { displayVolumeUnits } = metadata
   const wellGroups = getUniqueWellProperties(definition)
   const wellLabel = getWellLabel(definition)
@@ -35,6 +35,7 @@ export default function LabwareDetailsBox(props: LabwareDetailsBoxProps) {
   const insert = wellGroups.find(g => g.metadata.displayCategory)
   const insertCategory = insert?.metadata.displayCategory
   const irregular = wellGroups.length > 1
+  const isMultiRow = ordering.some(row => row.length > 1)
 
   return (
     <div className={className}>
@@ -93,6 +94,7 @@ export default function LabwareDetailsBox(props: LabwareDetailsBoxProps) {
                 <WellSpacing
                   category={definition.metadata.displayCategory}
                   wellProperties={wellProps}
+                  isMultiRow={isMultiRow}
                   labelSuffix={groupDisplaySuffix}
                   className={styles.details_table}
                 />

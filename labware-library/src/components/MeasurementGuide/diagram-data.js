@@ -44,9 +44,12 @@ const ALUM_BLOCK_FOOTPRINTS: { [category: string]: Array<?string> } = {
   ],
 }
 
-const RESERVOIR_SPACING_DIAGRAMS: Array<?string> = [
-  require('./images/spacing/spacing-reservoir@3x.png'),
-]
+const RESERVOIR_SPACING_DIAGRAMS: {
+  [rows: string]: Array<?string>,
+} = {
+  singleRow: [require('./images/spacing/spacing-reservoir@3x.png')],
+  multiRow: [require('./images/spacing/spacing-reservoir-multi-row@3x.png')],
+}
 
 const SPACING_DIAGRAMS: {
   [shape: string]: Array<?string>,
@@ -143,6 +146,7 @@ export function getDiagramSrc(props: DiagramProps) {
     wellBottomShape,
     insertCategory,
     irregular,
+    isMultiRow,
   } = props
 
   if (guideType === 'footprint') {
@@ -156,8 +160,9 @@ export function getDiagramSrc(props: DiagramProps) {
 
   if (guideType === 'spacing') {
     if (category === 'reservoir') {
-      // TODO (ka 2019-5-31): Add in reservoir grid case
-      return RESERVOIR_SPACING_DIAGRAMS
+      return isMultiRow
+        ? RESERVOIR_SPACING_DIAGRAMS['multiRow']
+        : RESERVOIR_SPACING_DIAGRAMS['singleRow']
     }
 
     return shape && SPACING_DIAGRAMS[shape]

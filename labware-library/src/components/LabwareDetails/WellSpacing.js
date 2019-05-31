@@ -36,13 +36,14 @@ const spacingValue = (spacing: number | null) => {
 
 export type WellSpacingProps = {|
   category?: string,
+  isMultiRow?: boolean,
   wellProperties: LabwareWellGroupProperties,
   labelSuffix?: string,
   className?: string,
 |}
 
 export default function WellSpacing(props: WellSpacingProps) {
-  const { labelSuffix, wellProperties, className, category } = props
+  const { labelSuffix, wellProperties, className, category, isMultiRow } = props
   const spacing = [
     { label: X_OFFSET, value: toFixed(wellProperties.xOffsetFromLeft) },
     { label: Y_OFFSET, value: toFixed(wellProperties.yOffsetFromTop) },
@@ -65,6 +66,7 @@ export default function WellSpacing(props: WellSpacingProps) {
           category={category}
           guideType="spacing"
           shape={shape}
+          isMultiRow={isMultiRow}
         />
       }
     />
