@@ -11,7 +11,7 @@ import {
   MM,
 } from '../../localization'
 import { LabeledValueTable, LowercaseText } from '../ui'
-import { MeasurementGuide } from '../MeasurementGuide'
+import { getMeasurementDiagram } from '../MeasurementGuide'
 
 import type { LabwareWellGroupProperties } from '../../types'
 
@@ -53,6 +53,13 @@ export default function WellDimensions(props: WellDimensionsProps) {
     }
   }
 
+  const diagram = getMeasurementDiagram({
+    category: category,
+    guideType: 'measurements',
+    shape: shape?.shape,
+    wellBottomShape: wellBottomShape,
+  }).map((src, index) => <img src={src} key={index} />)
+
   return (
     <LabeledValueTable
       className={className}
@@ -63,14 +70,7 @@ export default function WellDimensions(props: WellDimensionsProps) {
         </>
       }
       values={dimensions}
-      diagram={
-        <MeasurementGuide
-          guideType="measurements"
-          category={category}
-          shape={shape?.shape}
-          wellBottomShape={wellBottomShape}
-        />
-      }
+      diagram={diagram}
     />
   )
 }

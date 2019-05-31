@@ -17,7 +17,7 @@ import {
 import styles from './styles.css'
 
 import { LabeledValueTable, LowercaseText } from '../ui'
-import { MeasurementGuide } from '../MeasurementGuide'
+import { getSpacingDiagram } from '../MeasurementGuide'
 
 import type { LabwareWellGroupProperties } from '../../types'
 
@@ -52,6 +52,13 @@ export default function WellSpacing(props: WellSpacingProps) {
   ]
   const shape = wellProperties.shape?.shape
 
+  const diagram = getSpacingDiagram({
+    category: category,
+    guideType: 'spacing',
+    shape: shape,
+    isMultiRow: isMultiRow,
+  }).map((src, index) => <img src={src} key={index} />)
+
   return (
     <LabeledValueTable
       className={className}
@@ -61,14 +68,7 @@ export default function WellSpacing(props: WellSpacingProps) {
         </>
       }
       values={spacing}
-      diagram={
-        <MeasurementGuide
-          category={category}
-          guideType="spacing"
-          shape={shape}
-          isMultiRow={isMultiRow}
-        />
-      }
+      diagram={diagram}
     />
   )
 }

@@ -10,7 +10,7 @@ import {
   LABWARE_Z_DIM,
 } from '../../localization'
 import { LabeledValueTable, LowercaseText } from '../ui'
-import { MeasurementGuide } from '../MeasurementGuide'
+import { getFootprintDiagram } from '../MeasurementGuide'
 
 import type { LabwareDefinition } from '../../types'
 
@@ -34,6 +34,13 @@ export default function Dimensions(props: DimensionsProps) {
     { label: LABWARE_Z_DIM, value: toFixed(zDimension) },
   ]
 
+  const diagram = getFootprintDiagram({
+    category: displayCategory,
+    guideType: FOOTPRINT,
+    insertCategory: insertCategory,
+    irregular: irregular,
+  }).map((src, index) => <img src={src} key={index} />)
+
   return (
     <LabeledValueTable
       className={className}
@@ -43,14 +50,7 @@ export default function Dimensions(props: DimensionsProps) {
         </>
       }
       values={dimensions}
-      diagram={
-        <MeasurementGuide
-          category={displayCategory}
-          guideType={FOOTPRINT}
-          insertCategory={insertCategory}
-          irregular={irregular}
-        />
-      }
+      diagram={diagram}
     />
   )
 }
