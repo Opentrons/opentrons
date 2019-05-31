@@ -214,7 +214,6 @@ class Labware:
         self._wells: List[Well] = []
         # Directly from definition
         self._well_definition = definition['wells']
-        self._id = definition['otId']
         self._parameters = definition['parameters']
         offset = definition['cornerOffsetFromSlot']
         self._dimensions = definition['dimensions']

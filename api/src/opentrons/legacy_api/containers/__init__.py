@@ -179,9 +179,9 @@ def _load_new_well(well_data, saved_offset, lw_format):
     return (well, well_tuple)
 
 
-def _look_up_offsets(otId):
+def _look_up_offsets(labware_hash):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
-    labware_offset_path = calibration_path/'{}.json'.format(otId)
+    labware_offset_path = calibration_path/'{}.json'.format(labware_hash)
     if labware_offset_path.exists():
         calibration_data = new_labware._read_file(str(labware_offset_path))
         offset_array = calibration_data['default']['offset']
@@ -190,11 +190,11 @@ def _look_up_offsets(otId):
         return Point(x=0, y=0, z=0)
 
 
-def save_new_offsets(otId, delta):
+def save_new_offsets(labware_hash, delta):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
     if not calibration_path.exists():
         calibration_path.mkdir(parents=True, exist_ok=True)
-    labware_offset_path = calibration_path/'{}.json'.format(otId)
+    labware_offset_path = calibration_path/'{}.json'.format(labware_hash)
     calibration_data = new_labware._helper_offset_data_format(
         str(labware_offset_path), delta)
     with labware_offset_path.open('w') as f:
@@ -213,13 +213,13 @@ def load_new_labware(container_name):
 def load_new_labware_def(definition):
     """ Load a labware definition in the new schema into a placeable
     """
-    labware_id = definition['otId']
-    saved_offset = _look_up_offsets(labware_id)
+    labware_hash = new_labware._hash_labware_def(definition)
+    saved_offset = _look_up_offsets(labware_hash)
     container = Container()
     container_name = definition['parameters']['loadName']
     log.info(f"Container name {container_name}")
+    container.properties['labware_hash'] = labware_hash
     container.properties['type'] = container_name
-    container.properties['otId'] = labware_id
     lw_format = definition['parameters']['format']
 
     container._coordinates = Vector(definition['cornerOffsetFromSlot'])
