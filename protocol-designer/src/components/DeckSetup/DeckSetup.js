@@ -53,17 +53,17 @@ const DeckSetup = (props: Props) => {
               // 'slotRidges',
               // 'slotNumbers',
               // 'fixedTrash',
+              // 'removableDeckOutline',
               'calibrationMarkings',
               'fixedBase',
-              'removableDeckOutline',
               'doorStops',
               'metalFrame',
               'removalHandle',
               'screwHoles',
             ]}
             deckDef={deckDef}
-            viewBox={`-10 -10 ${410} ${390}`} // viewbox for small
-            // viewBox={`-10 -10 ${460} ${452}`} // viewbox for mid
+            // viewBox={`-10 -10 ${410} ${390}`} // viewbox for small
+            viewBox={`-46 -68 ${488} ${510}`} // viewbox for mid
           >
             {({ slots, getRobotCoordsFromDOMCoords }) => (
               <>
@@ -71,8 +71,8 @@ const DeckSetup = (props: Props) => {
                   getRobotCoordsFromDOMCoords={getRobotCoordsFromDOMCoords}
                 />
                 <RobotCoordsForeignDiv
-                  x={0}
-                  y={364}
+                  x={30}
+                  y={-44}
                   height={30}
                   width={380}
                   innerDivProps={{
