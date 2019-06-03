@@ -1537,8 +1537,8 @@ class SmoothieDriver_3_0_0:
         programming mode.
         """
         # ensure there is a reference to the port
-        if self.simulating:
-            return 'Did nothing (simulating)'
+        # if self.simulating:
+        #    return 'Did nothing (simulating)'
 
         try:
             smoothie_update._ensure_programmer_executable()
