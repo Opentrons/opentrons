@@ -4,19 +4,22 @@ import map from 'lodash/map'
 import filter from 'lodash/filter'
 import some from 'lodash/some'
 import {
-  LabwareRender,
   useOnClickOutside,
   RobotWorkSpace,
-  RobotCoordsText,
+  RobotCoordsForeignDiv,
 } from '@opentrons/components'
 import { getLabwareHasQuirk } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import i18n from '../../localization'
-import BrowseLabwareModal from '../labware/BrowseLabwareModal'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../steplist'
-import type { InitialDeckSetup, LabwareOnDeck } from '../../step-forms'
+import type {
+  InitialDeckSetup,
+  LabwareOnDeck as LabwareOnDeckType,
+} from '../../step-forms'
 
-import { SlotControls, LabwareControls } from './LabwareOverlays'
+import { BrowseLabwareModal } from '../labware'
+import LabwareOnDeck from './LabwareOnDeck'
+import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
 import styles from './DeckSetup.css'
 
 type Props = {|
@@ -24,7 +27,6 @@ type Props = {|
   handleClickOutside?: () => mixed,
   drilledDown: boolean,
   initialDeckSetup: InitialDeckSetup,
-  ingredSelectionMode: boolean, // TODO: BC 2019-05-22 is this needed anymore?
 |}
 
 const DeckSetup = (props: Props) => {
@@ -48,66 +50,79 @@ const DeckSetup = (props: Props) => {
         <div ref={wrapperRef} className={styles.deck_wrapper}>
           <RobotWorkSpace
             deckLayerBlacklist={[
+              // 'slotRidges',
+              // 'slotNumbers',
+              // 'fixedTrash',
+              'calibrationMarkings',
               'fixedBase',
               'removableDeckOutline',
               'doorStops',
               'metalFrame',
-              'removalHandles',
+              'removalHandle',
               'screwHoles',
             ]}
             deckDef={deckDef}
-            viewBox={`-10 -10 ${410} ${390}`}
+            viewBox={`-10 -10 ${410} ${390}`} // viewbox for small
+            // viewBox={`-10 -10 ${460} ${452}`} // viewbox for mid
           >
-            {({ slots }) => (
+            {({ slots, getRobotCoordsFromDOMCoords }) => (
               <>
-                <RobotCoordsText
+                <DragPreview
+                  getRobotCoordsFromDOMCoords={getRobotCoordsFromDOMCoords}
+                />
+                <RobotCoordsForeignDiv
                   x={0}
-                  y={370}
-                  className={styles.deck_instructions}
+                  y={364}
+                  height={30}
+                  width={380}
+                  innerDivProps={{
+                    className: styles.deck_instructions,
+                  }}
                 >
                   {headerMessage}
-                </RobotCoordsText>
-                {map(slots, (slot, slotId) => {
+                </RobotCoordsForeignDiv>
+
+                {map(slots, (slot: $Values<typeof slots>, slotId) => {
                   if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render labware or overlays
 
-                  const containedLabware: Array<LabwareOnDeck> = filter(
+                  const containedLabware: Array<LabwareOnDeckType> = filter(
                     props.initialDeckSetup.labware,
                     labware =>
                       labware.slot === slotId &&
                       !getLabwareHasQuirk(labware.def, 'fixedTrash')
                   )
-                  let controls = (
+
+                  if (some(containedLabware)) {
+                    // NOTE: only controlling first contained labware for now!
+                    return (
+                      <React.Fragment key={slot.id}>
+                        {map(containedLabware, labwareOnDeck => (
+                          <LabwareOnDeck
+                            key={labwareOnDeck.id}
+                            x={slots[labwareOnDeck.slot].position[0]}
+                            y={slots[labwareOnDeck.slot].position[1]}
+                            labwareOnDeck={labwareOnDeck}
+                          />
+                        ))}
+                        <g>
+                          <LabwareControls
+                            slot={slot}
+                            labwareOnDeck={containedLabware[0]}
+                            selectedTerminalItemId={
+                              props.selectedTerminalItemId
+                            }
+                          />
+                        </g>
+                      </React.Fragment>
+                    )
+                  }
+
+                  return (
                     <SlotControls
                       key={slot.id}
                       slot={slot}
                       selectedTerminalItemId={props.selectedTerminalItemId}
                     />
-                  )
-
-                  if (some(containedLabware)) {
-                    // NOTE: only controlling first contained labware for now!
-                    controls = (
-                      <LabwareControls
-                        slot={slot}
-                        labwareOnDeck={containedLabware[0]}
-                        selectedTerminalItemId={props.selectedTerminalItemId}
-                      />
-                    )
-                  }
-                  return (
-                    <>
-                      {map(containedLabware, labwareOnDeck => (
-                        <g
-                          key={labwareOnDeck.id}
-                          transform={`translate(${
-                            slots[labwareOnDeck.slot].position[0]
-                          }, ${slots[labwareOnDeck.slot].position[1]})`}
-                        >
-                          <LabwareRender definition={labwareOnDeck.def} />
-                        </g>
-                      ))}
-                      {controls}
-                    </>
                   )
                 })}
               </>

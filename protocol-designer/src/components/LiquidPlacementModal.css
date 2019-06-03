@@ -9,6 +9,7 @@
   @apply (--absolute-fill);
 
   background-color: rgba(100, 100, 100, 0.8);
+  z-index: 1;
 
   /* make up lost space for overlay */
   height: 103%;

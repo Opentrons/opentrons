@@ -31,7 +31,7 @@ const useOnClickOutside = (params: Params) => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  })
+  }, [onClickOutside])
 
   return node
 }
