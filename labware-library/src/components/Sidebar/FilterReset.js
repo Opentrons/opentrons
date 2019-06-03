@@ -11,11 +11,11 @@ import { CLEAR_FILTERS } from '../../localization'
 
 import type { FilterParams } from '../../types'
 
-export type FilterCategoryProps = {|
+export type FilterResetProps = {|
   filters: FilterParams,
 |}
 
-export default function FilterCategory(props: FilterCategoryProps) {
+export default function FilterReset(props: FilterResetProps) {
   const { filters } = props
   // TODO (ka 2019-3-09):Should this be moved to Sidebar?
   const { manufacturer, category } = filters
