@@ -27,7 +27,6 @@ type Props = {|
   handleClickOutside?: () => mixed,
   drilledDown: boolean,
   initialDeckSetup: InitialDeckSetup,
-  ingredSelectionMode: boolean, // TODO: BC 2019-05-22 is this needed anymore?
 |}
 
 const DeckSetup = (props: Props) => {
@@ -83,7 +82,7 @@ const DeckSetup = (props: Props) => {
                   {headerMessage}
                 </RobotCoordsForeignDiv>
 
-                {map(slots, (slot, slotId) => {
+                {map(slots, (slot: $Values<typeof slots>, slotId) => {
                   if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render labware or overlays
 
                   const containedLabware: Array<LabwareOnDeckType> = filter(

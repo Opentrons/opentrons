@@ -16,6 +16,10 @@ function RobotWorkSpace(props: Props) {
   const { children, deckDef, deckLayerBlacklist = [], viewBox } = props
   const wrapperRef: ElementRef<*> = useRef(null)
 
+  // NOTE: getScreenCTM in Chrome a DOMMatrix type,
+  // in Firefox the same fn returns a deprecated SVGMatrix.
+  // Until Firefox fixes this and conforms to SVG2 draft,
+  // it will suffer from inverted y behavior (ignores css transform)
   // $FlowFixMe(bc, 2019-05-31): flow type svg ref
   const getRobotCoordsFromDOMCoords = (
     x: number,
@@ -50,7 +54,7 @@ function RobotWorkSpace(props: Props) {
     <svg
       className={styles.robot_work_space}
       viewBox={viewBox || wholeDeckViewBox}
-      ref={el => (wrapperRef.current = el)}
+      ref={wrapperRef}
     >
       {deckDef && (
         <DeckFromData def={deckDef} layerBlacklist={deckLayerBlacklist} />

@@ -3,6 +3,7 @@ import React from 'react'
 import cx from 'classnames'
 import { connect } from 'react-redux'
 import { Icon } from '@opentrons/components'
+import i18n from '../../../localization'
 import type { ThunkDispatch } from '../../../types'
 import type { LabwareOnDeck } from '../../../step-forms'
 import { drillDownOnLabware } from '../../../labware-ingred/actions'
@@ -24,7 +25,7 @@ function BrowseLabwareOverlay(props: Props) {
     <div className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
       <a className={styles.overlay_button} onClick={props.drillDown}>
         <Icon className={styles.overlay_icon} name="water" />
-        View Liquids
+        {i18n.t('deck.overlay.browse.view_liquid')}
       </a>
     </div>
   )

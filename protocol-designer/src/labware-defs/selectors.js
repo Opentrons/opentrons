@@ -81,7 +81,6 @@ const _makeLabwareDefsObj = (customDefs: LabwareDefByDefId) => {
     {}
   )
 
-  console.log({ ...V1_FALLBACKS, ...getAllDefinitions(), ...customDefsById })
   return { ...V1_FALLBACKS, ...getAllDefinitions(), ...customDefsById }
 }
 
