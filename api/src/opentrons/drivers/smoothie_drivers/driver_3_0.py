@@ -1536,10 +1536,6 @@ class SmoothieDriver_3_0_0:
         If explicit_modeset is False, assume the smoothie is already in
         programming mode.
         """
-        # ensure there is a reference to the port
-        # if self.simulating:
-        #    return 'Did nothing (simulating)'
-
         try:
             smoothie_update._ensure_programmer_executable()
         except OSError as ose:
