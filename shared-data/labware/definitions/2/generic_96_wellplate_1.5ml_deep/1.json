@@ -14,10 +14,7 @@
     ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
   ],
   "brand": {
-    "brand": "generic",
-    "links": [
-      "https://ecatalog.corning.com/life-sciences/b2c/US/en/Genomics-&-Molecular-Biology/Automation-Consumables/Deep-Well-Plate/Axygen%C2%AE-Deep-Well-and-Assay-Plates/p/P-DW-20-C-S"
-    ]
+    "brand": "generic"
   },
   "metadata": {
     "displayName": "Generic 96 Well Plate 1.5 mL",
