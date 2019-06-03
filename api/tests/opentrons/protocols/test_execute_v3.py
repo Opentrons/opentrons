@@ -1,12 +1,6 @@
-from pathlib import Path
-import json
 from opentrons import robot, labware, instruments
 from opentrons.protocols import execute_v3
 # TODO: Modify all calls to get a Well to use the `wells` method
-
-with open((Path(__file__).parent/'..'/'..'/'..'/'..'/'shared-data'/'labware' /
-          'fixtures'/'2'/'fixture96Plate.json'), 'r') as f:
-    fixture_96_plate = json.load(f)
 
 
 def test_load_pipettes():
@@ -69,8 +63,9 @@ def test_get_location():
         default_values['aspirateMmFromBottom'])
 
 
-def test_load_labware():
+def test_load_labware(get_labware_fixture):
     robot.reset()
+    fixture_96_plate = get_labware_fixture('fixture96Plate')
     data = {
         "labwareDefinitions": {
             "someDefId": fixture_96_plate

@@ -5,6 +5,7 @@
 import asyncio
 import contextlib
 import os
+import json
 import pathlib
 import re
 import shutil
@@ -456,3 +457,14 @@ def cntrlr_mock_connect(monkeypatch):
 def hardware_api(loop):
     hw_api = hc.API.build_hardware_simulator(loop=loop)
     return hw_api
+
+
+@pytest.fixture
+def get_labware_fixture():
+    def _get_labware_fixture(fixture_name):
+        with open((pathlib.Path(__file__).parent/'..'/'..'/'..'/'shared-data' /
+                   'labware' / 'fixtures'/'2'/f'{fixture_name}.json'), 'r'
+                  ) as f:
+            return json.load(f)
+
+    return _get_labware_fixture
