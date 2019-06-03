@@ -217,7 +217,7 @@ def load_new_labware_def(definition):
     saved_offset = _look_up_offsets(labware_hash)
     container = Container()
     container_name = definition['parameters']['loadName']
-    log.info(f"Container name {container_name}")
+    log.info(f"Container name {container_name}, hash {labware_hash}")
     container.properties['labware_hash'] = labware_hash
     container.properties['type'] = container_name
     lw_format = definition['parameters']['format']
