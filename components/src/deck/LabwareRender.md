@@ -20,7 +20,7 @@ let definition = fixture96Plate
     <LabwareRender
       showLabels
       definition={definition}
-      highlightedWells={new Set(['A1', 'B2'])}
+      highlightedWells={{ A1: null, B2: null }}
       wellFill={{ A1: 'maroon', C3: 'lavender' }}
     />
   )}
@@ -42,8 +42,8 @@ let definition = fixtureTipRack300Ul
   {() => (
     <LabwareRender
       definition={definition}
-      highlightedWells={new Set(['A1', 'B2'])}
-      missingTips={new Set(['C3', 'D4'])}
+      highlightedWells={{ A1: null, B2: null }}
+      missingTips={{ C3: null, D4: null }}
     />
   )}
 </RobotWorkSpace>
