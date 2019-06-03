@@ -2,7 +2,6 @@
 // reset all filters button
 import * as React from 'react'
 import { Link } from 'react-router-dom'
-import cx from 'classnames'
 
 import { buildFiltersUrl } from '../../filters'
 import { Icon } from '@opentrons/components'

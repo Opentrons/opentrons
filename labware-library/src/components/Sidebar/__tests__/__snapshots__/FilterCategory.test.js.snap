@@ -1,13 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`FilterCategory component renders 1`] = `
-<ul
-  className="filter_category"
->
-  <li
-    className="filter_category_item"
-    key="all"
+<Fragment>
+  <p
+    className="filter_label"
   >
+<<<<<<< HEAD
     <Link
       className="filter_category_link selected"
       to="/?"
@@ -29,22 +27,40 @@ exports[`FilterCategory component renders 1`] = `
   <li
     className="filter_category_item"
     key="tubeRack"
+=======
+    category
+  </p>
+  <ul
+    className="filter_category"
+>>>>>>> fix: Update snapshots
   >
-    <Link
-      className="filter_category_link"
-      to="/?category=tubeRack"
+    <li
+      className="filter_category_item"
+      key="all"
     >
-      Tube Racks
-    </Link>
-  </li>
-  <li
-    className="filter_category_item"
-    key="wellPlate"
-  >
-    <Link
-      className="filter_category_link"
-      to="/?category=wellPlate"
+      <Link
+        className="filter_category_link selected"
+        to="/?"
+      >
+        All
+      </Link>
+    </li>
+    <li
+      className="filter_category_item"
+      key="tubeRack"
     >
+      <Link
+        className="filter_category_link"
+        to="/?category=tubeRack"
+      >
+        Tube Racks
+      </Link>
+    </li>
+    <li
+      className="filter_category_item"
+      key="wellPlate"
+    >
+<<<<<<< HEAD
       Well Plates
     </Link>
   </li>
@@ -60,4 +76,15 @@ exports[`FilterCategory component renders 1`] = `
     </Link>
   </li>
 </ul>
+=======
+      <Link
+        className="filter_category_link"
+        to="/?category=wellPlate"
+      >
+        Well Plates
+      </Link>
+    </li>
+  </ul>
+</Fragment>
+>>>>>>> fix: Update snapshots
 `;
