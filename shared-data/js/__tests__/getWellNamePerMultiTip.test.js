@@ -1,11 +1,9 @@
 // @flow
-import {
-  fixtureTrash,
-  fixture96Plate,
-  fixture384Plate,
-  fixture12Trough,
-  fixture24TubeRack,
-} from '@opentrons/shared-data/fixtures'
+import fixtureTrash from '@opentrons/shared-data/labware/fixtures/2/fixtureTrash.json'
+import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture96Plate.json'
+import fixture384Plate from '@opentrons/shared-data/labware/fixtures/2/fixture384Plate.json'
+import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture12Trough.json'
+import fixture24TubeRack from '@opentrons/shared-data/labware/fixtures/2/fixture24TubeRack.json'
 import { getWellNamePerMultiTip } from '../helpers/getWellNamePerMultiTip'
 
 describe('96 plate', () => {

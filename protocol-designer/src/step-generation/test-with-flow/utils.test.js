@@ -1,12 +1,14 @@
 // @flow
 import {
-  fixture96Plate,
-  fixtureTipRack10Ul,
-  fixtureTipRack300Ul,
-  fixtureTrash,
   fixtureP10Single,
   fixtureP300Multi,
 } from '@opentrons/shared-data/fixtures'
+
+import fixtureTrash from '@opentrons/shared-data/labware/fixtures/2/fixtureTrash.json'
+import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture96Plate.json'
+import fixtureTipRack10Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack10Ul.json'
+import fixtureTipRack300Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack300Ul.json'
+
 import {
   reduceCommandCreators,
   commandCreatorsTimeline,

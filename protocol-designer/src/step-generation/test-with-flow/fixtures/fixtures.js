@@ -1,16 +1,17 @@
 // @flow
 import mapValues from 'lodash/mapValues'
 import {
-  fixtureTrash,
-  fixture96Plate,
-  fixture12Trough,
-  fixtureTipRack10Ul,
-  fixtureTipRack300Ul,
   fixtureP10Single,
   fixtureP10Multi,
   fixtureP300Single,
   fixtureP300Multi,
 } from '@opentrons/shared-data/fixtures'
+import fixtureTrash from '@opentrons/shared-data/labware/fixtures/2/fixtureTrash.json'
+import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture96Plate.json'
+import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture12Trough.json'
+import fixtureTipRack10Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack10Ul.json'
+import fixtureTipRack300Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack300Ul.json'
+
 import { makeInitialRobotState, reduceCommandCreators } from '../../utils'
 import { tiprackWellNamesFlat } from './data'
 import type { InvariantContext, RobotState } from '../../'

@@ -17,6 +17,17 @@ exports[`FilterCategory component renders 1`] = `
   </li>
   <li
     className="filter_category_item"
+    key="reservoir"
+  >
+    <Link
+      className="filter_category_link"
+      to="/?category=reservoir"
+    >
+      Reservoirs
+    </Link>
+  </li>
+  <li
+    className="filter_category_item"
     key="tubeRack"
   >
     <Link
@@ -35,6 +46,17 @@ exports[`FilterCategory component renders 1`] = `
       to="/?category=wellPlate"
     >
       Well Plates
+    </Link>
+  </li>
+  <li
+    className="filter_category_item"
+    key="tipRack"
+  >
+    <Link
+      className="filter_category_link"
+      to="/?category=tipRack"
+    >
+      Tip Racks
     </Link>
   </li>
 </ul>
