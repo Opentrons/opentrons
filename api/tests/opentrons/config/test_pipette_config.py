@@ -63,7 +63,7 @@ def test_ul_per_mm_continuous(pipette_model):
 
         diff_mm = abs(ul_per_mm_top - ul_per_mm_bottom) / volume
 
-        assert diff_mm < 2e-2
+        assert diff_mm < 0.05
 
 
 def test_override_load():

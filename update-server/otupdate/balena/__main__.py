@@ -14,8 +14,6 @@ def main():
     parser.add_argument('--host', dest='host', type=str, default='127.0.0.1')
     parser.add_argument('--test', action='store_true')
     parser.add_argument('--debug', action='store_true')
-    parser.add_argument('--with-migration',
-                        dest='with_migration', action='store_true')
     args = parser.parse_args()
 
     if sys.platform == 'win32':
@@ -59,5 +57,5 @@ def main():
         update_package=update_package,
         smoothie_version=smoothie_version,
         test=args.test,
-        with_migration=args.with_migration)
+        with_migration=True)
     web.run_app(app, host=args.host, port=args.port)

@@ -11,6 +11,7 @@ import {
   MM,
 } from '../../localization'
 import { LabeledValueTable, LowercaseText } from '../ui'
+import { getMeasurementDiagram } from '../measurement-guide'
 
 import type { LabwareWellGroupProperties } from '../../types'
 
@@ -21,6 +22,7 @@ export type WellDimensionsProps = {|
   wellProperties: LabwareWellGroupProperties,
   wellLabel: string,
   depthLabel: string,
+  category: string,
   labelSuffix?: string,
   className?: string,
 |}
@@ -32,8 +34,12 @@ export default function WellDimensions(props: WellDimensionsProps) {
     wellLabel,
     labelSuffix,
     className,
+    category,
   } = props
-  const { shape } = wellProperties
+  const {
+    shape,
+    metadata: { wellBottomShape },
+  } = wellProperties
   const dimensions = [{ label: depthLabel, value: wellProperties.depth }]
 
   if (shape) {
@@ -47,6 +53,13 @@ export default function WellDimensions(props: WellDimensionsProps) {
     }
   }
 
+  const diagram = getMeasurementDiagram({
+    category: category,
+    guideType: 'measurements',
+    shape: shape?.shape,
+    wellBottomShape: wellBottomShape,
+  }).map((src, index) => <img src={src} key={index} />)
+
   return (
     <LabeledValueTable
       className={className}
@@ -57,6 +70,7 @@ export default function WellDimensions(props: WellDimensionsProps) {
         </>
       }
       values={dimensions}
+      diagram={diagram}
     />
   )
 }

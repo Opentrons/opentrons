@@ -33,15 +33,39 @@
 }
 
 .info_button {
-  width: 1.25rem;
+  width: 2rem;
   color: var(--c-med-gray);
+  padding: var(--spacing-1);
+
+  &.active,
+  &:hover {
+    background-color: var(--c-lightest-gray);
+    color: var(--c-dark-gray);
+    border-radius: var(--bd-radius-default);
+  }
 }
 
 .table_title {
-  @apply --flex-between;
-
   padding-bottom: var(--spacing-1);
   border-bottom: var(--bd-light);
+}
+
+.table_title_text {
+  @apply --flex-between;
+
+  align-items: center;
+}
+
+.expandable_content {
+  height: auto;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s linear;
+
+  &.open {
+    /* TODO: investigate react handling dynamic max height */
+    max-height: 800px;
+  }
 }
 
 .details_box {
