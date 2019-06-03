@@ -20,7 +20,7 @@ from opentrons.util.calibration_functions import probe_instrument
 from opentrons.util.linal import solve, add_z, apply_transform
 from . import (
     left, right, SAFE_HEIGHT, cli_dots_set,
-    position, jog, apply_mount_offset)
+    position, jog, apply_mount_offset, identity_transform)
 
 # TODO: add tests for methods, split out current point behavior per comment
 # TODO:   below, and total result on robot against prior version of this app
@@ -92,6 +92,7 @@ class CLITool:
             event_loop=loop
         )
         self._config = self.hardware.config
+        self.identity_transform = identity_transform
         self.calibration_matrix = self._config.gantry_calibration
         # Other state
         self._tip_length = tip_length

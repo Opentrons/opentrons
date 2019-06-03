@@ -9,7 +9,7 @@ from opentrons.config import pipette_config, robot_configs, feature_flags
 from opentrons import instruments, hardware_control
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.types import CriticalPoint
-from . import jog, position, dots_set, z_pos
+from . import jog, position, dots_set, z_pos, identity_transform
 from opentrons.util.linal import add_z, solve
 
 session = None
@@ -74,6 +74,7 @@ class SessionManager:
     def __init__(self, hardware):
         self.id = _get_uuid()
         self.pipettes = {}
+        self.identity_transform = identity_transform
         self.current_mount = None
         self.current_model = None
         self.tip_length = None

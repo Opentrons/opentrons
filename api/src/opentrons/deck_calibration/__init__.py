@@ -1,3 +1,5 @@
+import numpy as np
+
 from opentrons.config import feature_flags as ff
 from opentrons import types
 
@@ -13,6 +15,7 @@ crosses = 'crosses'
 
 z_pos = (170.5, 129.0, 5.0)
 
+identity_transform = np.identity(3)
 
 def dots_set():
     """
