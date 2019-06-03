@@ -54,6 +54,7 @@ export const V1_NAME_TO_V2_OTID = {
   'tiprack-300ul': '88154cc0-ffde-11e8-abfa-95044b186e81', // NOT REAL DEF, shim using 10uL tiprack
   'tiprack-1000ul': 'd4e462c0-ffde-11e8-abfa-95044b186e81',
   'trough-12row': 'a41d9ef0-f4b6-11e8-90c2-7106f0eae5a7',
+  'fixed-trash': '629d3b80-ecfe-11e8-b073-3da0bb8daec9',
 }
 
 const otIdToLoadName = reduce(
