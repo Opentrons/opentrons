@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 
-import { buildFiltersUrl } from '../../filters'
+import { buildFiltersUrl, FILTER_OFF } from '../../filters'
 import { Icon } from '@opentrons/components'
 import styles from './styles.css'
 
@@ -17,6 +17,10 @@ export type FilterCategoryProps = {|
 
 export default function FilterCategory(props: FilterCategoryProps) {
   const { filters } = props
+  // TODO (ka 2019-3-09):Should this be moved to Sidebar?
+  const { manufacturer, category } = filters
+  const filtersCleared = manufacturer === FILTER_OFF && category === FILTER_OFF
+  if (filtersCleared) return null
 
   return (
     <Link
