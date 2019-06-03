@@ -10,7 +10,6 @@ minimalLabwareDef = {
         "y": 10,
         "z": 5
     },
-    "otId": "minimalLabwareDef",
     "parameters": {
         "isTiprack": False,
     },
@@ -51,7 +50,6 @@ minimalLabwareDef2 = {
             "y": 10,
             "z": 5
     },
-    "otId": "minimalLabwareDef2",
     "parameters": {
         "isTiprack": False,
     },

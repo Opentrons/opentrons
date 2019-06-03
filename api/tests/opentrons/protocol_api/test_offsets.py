@@ -19,7 +19,6 @@ minimalLabwareDef = {
         "y": 10,
         "z": 5
     },
-    "otId": "minimalLabwareDef",
     "parameters": {
         "isTiprack": True,
         "tipLength": 55.3,
