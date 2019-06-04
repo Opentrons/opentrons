@@ -57,7 +57,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    width: var(--size-3);
+    width: var(--size-4);
     padding-left: var(--spacing-7);
     padding-right: var(--spacing-5);
     padding-bottom: var(--spacing-3);
@@ -74,7 +74,7 @@
     padding-right: var(--spacing-7);
 
     /* spacing + sidebar width */
-    padding-left: calc(var(--size-3) + var(--spacing-5));
+    padding-left: calc(var(--size-4) + var(--spacing-5));
 
     /* keep padding at spacing-7 on detail page because no sidebar */
     &.is_detail_page {
@@ -95,11 +95,23 @@
   }
 
   .sidebar_container {
-    width: var(--size-4);
+    width: var(--size-3);
 
     &.is_detail_page {
       display: block;
     }
+  }
+
+  .content_container,
+  .content_container.is_detail_page {
+    /* spacing + sidebar width */
+    padding-left: calc(var(--size-3) + var(--spacing-5));
+  }
+}
+
+@media (--xlarge) {
+  .sidebar_container {
+    width: var(--size-4);
   }
 
   .content_container,
