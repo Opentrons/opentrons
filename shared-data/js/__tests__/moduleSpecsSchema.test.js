@@ -1,6 +1,6 @@
 import Ajv from 'ajv'
-import moduleSpecsSchema from '../../robot-data/schemas/moduleSpecsSchema.json'
-import moduleSpecs from '../../robot-data/moduleSpecs.json'
+import moduleSpecsSchema from '../../module/schemas/1.json'
+import moduleSpecs from '../../module/definitions/1.json'
 
 const ajv = new Ajv({
   allErrors: true,

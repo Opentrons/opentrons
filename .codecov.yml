@@ -8,7 +8,6 @@ ignore:
   - 'protocol-library-kludge'
   - 'shared-data/definitions'
   - 'shared-data/definitions2'
-  - 'shared-data/robot-data'
-  - 'shared-data/protocol-json-schema'
+  - 'shared-data/module'
   - 'shared-data/labware-json-schema'
   - 'webpack-config'

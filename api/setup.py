@@ -26,7 +26,7 @@ SHARED_DATA_SUBDIRS = ['labware-json-schema',
                        'pipette',
                        'protocol',
                        'labware',
-                       'robot-data']
+                       'module']
 # Where, relative to the package root, we put the files we copy
 DEST_BASE_PATH = 'shared_data'
 
@@ -65,9 +65,8 @@ class BuildWithSharedData(build_py.build_py):
     def _get_data_files(self):
         """
         Override of build_py.get_data_files that includes out of tree configs.
-        These are currently hardcoded to include everything in
-         ../shared-data/robot-data, which will move to
-        opentrons/config/shared-data
+        These are currently hardcoded to include selected folders in
+         ../shared-data/, which will move to opentrons/config/shared-data
         """
         files = super()._get_data_files()
         # We don’t really want to duplicate logic used in the original

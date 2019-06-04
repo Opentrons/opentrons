@@ -9,7 +9,9 @@ audio/.*
 compute/.*
 update-server/.*
 shared-data/definitions/.*
+shared-data/deck/definitions/.*
 shared-data/labware/definitions/.*
+shared-data/pipette/definitions/.*
 
 [include]
 
