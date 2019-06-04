@@ -13,14 +13,12 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  overflow-y: scroll;
-
-  & > :first-child {
-    flex: 0 0 auto;
-  }
 }
 
 .main_page_content {
-  flex: 1 1;
-  position: relative;
+  position: absolute;
+  top: 3rem;
+  bottom: 0;
+  width: calc(100% - 22.8125rem);
+  overflow-y: scroll;
 }
