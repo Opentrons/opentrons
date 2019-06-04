@@ -63,9 +63,6 @@ const DeckSetup = (props: Props) => {
           >
             {({ slots, getRobotCoordsFromDOMCoords }) => (
               <>
-                <DragPreview
-                  getRobotCoordsFromDOMCoords={getRobotCoordsFromDOMCoords}
-                />
                 <RobotCoordsForeignDiv
                   x={30}
                   y={-44}
@@ -121,6 +118,9 @@ const DeckSetup = (props: Props) => {
                     />
                   )
                 })}
+                <DragPreview
+                  getRobotCoordsFromDOMCoords={getRobotCoordsFromDOMCoords}
+                />
               </>
             )}
           </RobotWorkSpace>

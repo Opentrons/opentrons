@@ -47,7 +47,9 @@ const SlotControls = ({
         width={slot.boundingBox.xDimension}
         height={slot.boundingBox.yDimension}
         innerDivProps={{
-          className: cx(styles.slot_overlay, styles.appear_on_mouseover),
+          className: cx(styles.slot_overlay, styles.appear_on_mouseover, {
+            [styles.appear]: isOver,
+          }),
           onClick: isOver ? noop : addLabware,
         }}
       >

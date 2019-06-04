@@ -32,6 +32,7 @@
   fill: white;
 }
 
+.ot2_short_trash,
 .ot2_standard {
   &.fixed_trash {
     fill: var(--c-lightest-gray);
