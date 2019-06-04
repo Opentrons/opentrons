@@ -36,6 +36,7 @@ const LabwareDropdown = (props: Props) => {
   const [previewedLabware, previewLabware] = useState(null)
 
   const labwareByCategory = useMemo(() => {
+    // TODO: Ian 2019-06-04 only show latest versions of labware here (#3525)
     const allDefs = getAllDefinitions()
     return reduce(
       allDefs,

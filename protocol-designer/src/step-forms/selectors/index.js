@@ -222,7 +222,7 @@ export const getPipettesForInstrumentGroup: Selector<PipettesForInstrumentGroup>
           description: _getPipetteDisplayName(pipetteOnDeck.name),
           isDisabled: false,
           tiprackModel: getLabwareDisplayName(tiprackDef),
-          tiprack: { model: pipetteOnDeck.tiprackDefURI }, // TODO IMMEDIATELY no 'model' reference to a labware def
+          tiprack: { model: pipetteOnDeck.tiprackDefURI },
         }
 
         return {

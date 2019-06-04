@@ -29,6 +29,7 @@ export default function ChangePipetteFields(props: Props) {
   const { values, handleChange } = props
 
   const tiprackOptions = useMemo(() => {
+    // TODO: Ian 2019-06-04 only show latest versions of labware here (#3525)
     const allDefs = getAllDefinitions()
     return reduce(
       allDefs,
