@@ -1,4 +1,5 @@
 // @flow
+// TODO Ian 2019-06-04 split this out into eg ../labware/flowTypes/labwareV1.js
 export type WellDefinition = {
   diameter?: number, // NOTE: presence of diameter indicates a circular well
   depth?: number, // TODO Ian 2018-03-12: depth should be required, but is missing in MALDI-plate
@@ -34,7 +35,7 @@ export type AllLabwareDefinitions = {
 }
 // TODO(mc, 2019-05-29): Remove this enum in favor of string + exported
 // constants + unit tests to catch typos in our definitions. Make changes
-// here and in shared-data/labware-json-schema/labwareSchemaV2.json
+// here and in shared-data/labware/schemas/2.json
 export type LabwareDisplayCategory =
   | 'wellPlate'
   | 'tipRack'
@@ -48,7 +49,7 @@ export type LabwareVolumeUnits = 'µL' | 'mL' | 'L'
 
 // TODO(mc, 2019-05-29): Remove this enum in favor of string + exported
 // constants + unit tests to catch typos in our definitions. Make changes
-// here and in shared-data/labware-json-schema/labwareSchemaV2.json
+// here and in shared-data/labware/schemas/2.json
 export type WellBottomShape = 'flat' | 'u' | 'v'
 
 export type LabwareMetadata = {|
@@ -131,7 +132,7 @@ export type LabwareWellGroup = {|
   brand?: LabwareBrand,
 |}
 
-// NOTE: must be synced with shared-data/labware-json-schema/labwareSchemaV2.json
+// NOTE: must be synced with shared-data/labware/schemas/2.json
 export type LabwareDefinition2 = {|
   otId: string,
   version: number,

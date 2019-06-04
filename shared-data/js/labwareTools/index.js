@@ -4,7 +4,7 @@ import flatten from 'lodash/flatten'
 import range from 'lodash/range'
 import round from 'lodash/round'
 
-import labwareSchema from '../../labware-json-schema/labwareSchemaV2.json'
+import labwareSchema from '../../labware/schemas/2.json'
 import { SLOT_WIDTH_MM, SLOT_LENGTH_MM } from '../constants'
 import assignId from './assignId'
 import {
@@ -252,7 +252,7 @@ function createName(
 // Generator function for labware definitions within a regular grid format
 // e.g. well plates, regular tuberacks (NOT 15_50ml) etc.
 // For further info on these parameters look at labware examples in __tests__
-// or the labware definition schema in labware-json-schema
+// or the labware definition schema in labware/schemas/
 export function createRegularLabware(args: RegularLabwareProps): Definition {
   const { offset, dimensions, grid, spacing, well } = args
   const version = args.version || 1

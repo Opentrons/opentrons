@@ -20,13 +20,11 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 # Where we get our files from
 SHARED_DATA_PATH = os.path.join('..', 'shared-data')
 # The subdirectories of SHARED_DATA_PATH to scan for files
-SHARED_DATA_SUBDIRS = ['labware-json-schema',
-                       'definitions',
-                       'deck',
-                       'pipette',
-                       'protocol',
+SHARED_DATA_SUBDIRS = ['deck',
                        'labware',
-                       'module']
+                       'module',
+                       'pipette',
+                       'protocol']
 # Where, relative to the package root, we put the files we copy
 DEST_BASE_PATH = 'shared_data'
 
