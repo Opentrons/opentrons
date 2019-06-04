@@ -35,6 +35,7 @@
     "react-dom": "^16.8.6",
     "react-hot-loader": "^3.0.0-beta.7",
     "react-redux": "^5.0.6",
+    "react-remove-scroll": "^1.0.8",
     "redux": "^3.7.2",
     "redux-actions": "^2.2.1",
     "redux-thunk": "^2.2.0",

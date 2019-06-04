@@ -3,6 +3,8 @@ import * as React from 'react'
 import cx from 'classnames'
 import { connect } from 'react-redux'
 import omit from 'lodash/omit'
+import { RemoveScroll } from 'react-remove-scroll'
+
 import { Modal, OutlineButton, LabeledValue } from '@opentrons/components'
 import { sortWells } from '@opentrons/shared-data'
 
@@ -91,45 +93,47 @@ class WellSelectionModal extends React.Component<Props, State> {
     const { labwareDef, pipetteSpec } = this.props
 
     return (
-      <Modal
-        className={modalStyles.modal}
-        contentsClassName={cx(
-          modalStyles.modal_contents,
-          modalStyles.transparent_content
-        )}
-        onCloseClick={this.props.onCloseClick}
-      >
-        <div className={styles.top_row}>
-          <LabeledValue
-            label="Pipette"
-            value={pipetteSpec ? pipetteSpec.displayName : ''}
-            className={styles.inverted_text}
-          />
-          <OutlineButton onClick={this.handleSave} inverted>
-            SAVE SELECTION
-          </OutlineButton>
-        </div>
+      <RemoveScroll>
+        <Modal
+          className={modalStyles.modal}
+          contentsClassName={cx(
+            modalStyles.modal_contents,
+            modalStyles.transparent_content
+          )}
+          onCloseClick={this.props.onCloseClick}
+        >
+          <div className={styles.top_row}>
+            <LabeledValue
+              label="Pipette"
+              value={pipetteSpec ? pipetteSpec.displayName : ''}
+              className={styles.inverted_text}
+            />
+            <OutlineButton onClick={this.handleSave} inverted>
+              SAVE SELECTION
+            </OutlineButton>
+          </div>
 
-        {labwareDef && (
-          <SelectableLabware
-            labwareProps={{
-              showLabels: true,
-              definition: labwareDef,
-              highlightedWells: this.state.highlightedWells,
-              wellFill: wellFillFromWellContents(this.props.wellContents),
-            }}
-            selectedPrimaryWells={this.state.selectedWells}
-            selectWells={this.selectWells}
-            deselectWells={this.deselectWells}
-            updateHighlightedWells={this.updateHighlightedWells}
-            pipetteChannels={pipetteSpec ? pipetteSpec.channels : null}
-            ingredNames={this.props.ingredNames}
-            wellContents={this.props.wellContents}
-          />
-        )}
+          {labwareDef && (
+            <SelectableLabware
+              labwareProps={{
+                showLabels: true,
+                definition: labwareDef,
+                highlightedWells: this.state.highlightedWells,
+                wellFill: wellFillFromWellContents(this.props.wellContents),
+              }}
+              selectedPrimaryWells={this.state.selectedWells}
+              selectWells={this.selectWells}
+              deselectWells={this.deselectWells}
+              updateHighlightedWells={this.updateHighlightedWells}
+              pipetteChannels={pipetteSpec ? pipetteSpec.channels : null}
+              ingredNames={this.props.ingredNames}
+              wellContents={this.props.wellContents}
+            />
+          )}
 
-        <WellSelectionInstructions />
-      </Modal>
+          <WellSelectionInstructions />
+        </Modal>
+      </RemoveScroll>
     )
   }
 }
