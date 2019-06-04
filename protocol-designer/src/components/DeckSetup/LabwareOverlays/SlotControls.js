@@ -72,7 +72,7 @@ const slotTarget = {
   drop: (props, monitor) => {
     const draggedItem = monitor.getItem()
     if (draggedItem) {
-      props.swapSlotContents(draggedItem.slot, props.slot.id)
+      props.swapSlotContents(draggedItem.labwareOnDeck.slot, props.slot.id)
     }
   },
 }

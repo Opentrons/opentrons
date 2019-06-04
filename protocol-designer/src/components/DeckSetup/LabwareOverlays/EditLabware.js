@@ -64,7 +64,7 @@ const EditLabware = (props: Props) => {
     )
   } else {
     const isBeingDragged =
-      draggedItem && draggedItem.slot === labwareOnDeck.slot
+      draggedItem && draggedItem.labwareOnDeck.slot === labwareOnDeck.slot
 
     const contents = draggedItem ? (
       <div className={styles.overlay_button}>
@@ -111,12 +111,7 @@ const EditLabware = (props: Props) => {
 }
 
 const labwareSource = {
-  beginDrag: props => {
-    return {
-      slot: props.labwareOnDeck.slot,
-      def: props.labwareOnDeck.def,
-    }
-  },
+  beginDrag: props => ({ labwareOnDeck: props.labwareOnDeck }),
 }
 const collectLabwareSource = (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
@@ -132,12 +127,17 @@ const DragEditLabware = DragSource(
 const labwareTarget = {
   canDrop: (props, monitor) => {
     const draggedItem = monitor.getItem()
-    return draggedItem && draggedItem.slot !== props.labwareOnDeck.slot
+    return (
+      draggedItem && draggedItem.labwareOnDeck.slot !== props.labwareOnDeck.slot
+    )
   },
   drop: (props, monitor) => {
     const draggedItem = monitor.getItem()
     if (draggedItem) {
-      props.swapSlotContents(draggedItem.slot, props.labwareOnDeck.slot)
+      props.swapSlotContents(
+        draggedItem.labwareOnDeck.slot,
+        props.labwareOnDeck.slot
+      )
     }
   },
 }

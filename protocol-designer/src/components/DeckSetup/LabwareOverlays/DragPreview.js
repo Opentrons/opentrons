@@ -1,17 +1,16 @@
 // @flow
 import * as React from 'react'
 import { DragLayer } from 'react-dnd'
-import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
-import {
-  LabwareRender,
-  type RobotWorkSpaceRenderProps,
-} from '@opentrons/components'
+import { type RobotWorkSpaceRenderProps } from '@opentrons/components'
+import type { LabwareOnDeck as LabwareOnDeckType } from '../../../step-forms'
+import LabwareOnDeck from '../LabwareOnDeck'
+
 import { DND_TYPES } from './constants'
 
 type DragPreviewProps = {
   isDragging: boolean,
   currentOffset?: { x: number, y: number },
-  item: { slot: DeckSlotId, def: LabwareDefinition2 },
+  item: { labwareOnDeck: LabwareOnDeckType },
   itemType: string,
   getRobotCoordsFromDOMCoords: $PropertyType<
     RobotWorkSpaceRenderProps,
@@ -34,12 +33,11 @@ const LabwareDragPreview = (props: DragPreviewProps) => {
   const cursor = getRobotCoordsFromDOMCoords(x, y)
 
   return (
-    <g
-      transform={`translate(${cursor.x}, ${cursor.y -
-        item.def.dimensions.yDimension})`}
-    >
-      <LabwareRender definition={item && item.def} />
-    </g>
+    <LabwareOnDeck
+      x={cursor.x}
+      y={cursor.y - item.labwareOnDeck.def.dimensions.yDimension}
+      labwareOnDeck={item.labwareOnDeck}
+    />
   )
 }
 
