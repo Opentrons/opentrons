@@ -72,7 +72,7 @@ export function denormalizePipetteEntities(
       const pipetteEntity: PipetteEntity = {
         ...pipette,
         spec,
-        tiprackLabwareDef: labwareDefs[pipette.tiprackModel],
+        tiprackLabwareDef: labwareDefs[pipette.tiprackDefURI],
       }
       return { ...acc, [pipetteId]: pipetteEntity }
     },

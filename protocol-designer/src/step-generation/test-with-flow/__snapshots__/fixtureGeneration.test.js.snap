@@ -1677,7 +1677,7 @@ Object {
         },
       },
       "id": "destPlateId",
-      "type": "fixture/generic_96_wellplate_340ul_flat/1",
+      "labwareDefURI": "fixture/generic_96_wellplate_340ul_flat/1",
     },
     "sourcePlateId": Object {
       "def": Object {
@@ -2811,7 +2811,7 @@ Object {
         },
       },
       "id": "sourcePlateId",
-      "type": "fixture/generic_96_wellplate_340ul_flat/1",
+      "labwareDefURI": "fixture/generic_96_wellplate_340ul_flat/1",
     },
     "tiprack1Id": Object {
       "def": Object {
@@ -3946,7 +3946,7 @@ Object {
         },
       },
       "id": "tiprack1Id",
-      "type": "fixture/opentrons_96_tiprack_300ul/1",
+      "labwareDefURI": "fixture/opentrons_96_tiprack_300ul/1",
     },
     "tiprack2Id": Object {
       "def": Object {
@@ -5081,7 +5081,7 @@ Object {
         },
       },
       "id": "tiprack2Id",
-      "type": "fixture/opentrons_96_tiprack_300ul/1",
+      "labwareDefURI": "fixture/opentrons_96_tiprack_300ul/1",
     },
     "tiprack3Id": Object {
       "def": Object {
@@ -6216,7 +6216,7 @@ Object {
         },
       },
       "id": "tiprack3Id",
-      "type": "fixture/opentrons_96_tiprack_300ul/1",
+      "labwareDefURI": "fixture/opentrons_96_tiprack_300ul/1",
     },
     "trashId": Object {
       "def": Object {
@@ -6284,7 +6284,7 @@ Object {
         },
       },
       "id": "trashId",
-      "type": "fixture/opentrons_1_trash_1100ml_fixed/1",
+      "labwareDefURI": "fixture/opentrons_1_trash_1100ml_fixed/1",
     },
     "troughId": Object {
       "def": Object {
@@ -6505,7 +6505,7 @@ Object {
         },
       },
       "id": "troughId",
-      "type": "fixture/usascientific_12_reservoir_22ml/1",
+      "labwareDefURI": "fixture/usascientific_12_reservoir_22ml/1",
     },
   },
   "pipetteEntities": Object {
@@ -6528,6 +6528,7 @@ Object {
         "maxVolume": 10,
         "minVolume": 1,
       },
+      "tiprackDefURI": "fixture/opentrons_96_tiprack_10ul/1",
       "tiprackLabwareDef": Object {
         "brand": Object {
           "brand": "Opentrons",
@@ -7657,7 +7658,6 @@ Object {
           },
         },
       },
-      "tiprackModel": "fixture/opentrons_96_tiprack_10ul/1",
     },
     "p10SingleId": Object {
       "id": "p10SingleId",
@@ -7678,6 +7678,7 @@ Object {
         "maxVolume": 10,
         "minVolume": 1,
       },
+      "tiprackDefURI": "fixture/opentrons_96_tiprack_10ul/1",
       "tiprackLabwareDef": Object {
         "brand": Object {
           "brand": "Opentrons",
@@ -8807,7 +8808,6 @@ Object {
           },
         },
       },
-      "tiprackModel": "fixture/opentrons_96_tiprack_10ul/1",
     },
     "p300MultiId": Object {
       "id": "p300MultiId",
@@ -8828,6 +8828,7 @@ Object {
         "maxVolume": 300,
         "minVolume": 30,
       },
+      "tiprackDefURI": "fixture/opentrons_96_tiprack_300ul/1",
       "tiprackLabwareDef": Object {
         "brand": Object {
           "brand": "Opentrons",
@@ -9959,7 +9960,6 @@ Object {
           },
         },
       },
-      "tiprackModel": "fixture/opentrons_96_tiprack_300ul/1",
     },
     "p300SingleId": Object {
       "id": "p300SingleId",
@@ -9980,6 +9980,7 @@ Object {
         "maxVolume": 300,
         "minVolume": 30,
       },
+      "tiprackDefURI": "fixture/opentrons_96_tiprack_300ul/1",
       "tiprackLabwareDef": Object {
         "brand": Object {
           "brand": "Opentrons",
@@ -11111,7 +11112,6 @@ Object {
           },
         },
       },
-      "tiprackModel": "fixture/opentrons_96_tiprack_300ul/1",
     },
   },
 }

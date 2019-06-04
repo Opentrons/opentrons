@@ -392,7 +392,9 @@ export const savedStepForms = (
 }
 
 const initialLabwareState: NormalizedLabwareById = {
-  [FIXED_TRASH_ID]: { type: 'opentrons/opentrons_1_trash_1100ml_fixed/1' },
+  [FIXED_TRASH_ID]: {
+    labwareDefURI: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
+  },
 }
 
 // MIGRATION NOTE: copied from `containers` reducer. Slot + UI stuff stripped out.
@@ -407,7 +409,7 @@ export const labwareInvariantProperties = handleActions<
     ) => {
       return {
         ...state,
-        [action.payload.id]: { type: action.payload.labwareDefURI },
+        [action.payload.id]: { labwareDefURI: action.payload.labwareDefURI },
       }
     },
     DUPLICATE_LABWARE: (
@@ -417,7 +419,7 @@ export const labwareInvariantProperties = handleActions<
       return {
         ...state,
         [action.payload.duplicateLabwareId]: {
-          type: state[action.payload.templateLabwareId].type,
+          labwareDefURI: state[action.payload.templateLabwareId].labwareDefURI,
         },
       }
     },
@@ -462,15 +464,15 @@ export const pipetteInvariantProperties = handleActions<
           filePipette: FilePipette,
           pipetteId: string
         ): $Values<NormalizedPipetteById> => {
-          const tiprackModel = metadata.pipetteTiprackAssignments[pipetteId]
+          const tiprackDefURI = metadata.pipetteTiprackAssignments[pipetteId]
           assert(
-            tiprackModel,
-            `expected tiprackModel in file metadata for pipette ${pipetteId}`
+            tiprackDefURI,
+            `expected tiprackDefURI in file metadata for pipette ${pipetteId}`
           )
           return {
             id: pipetteId,
             name: filePipette.name || pipetteModelToName(filePipette.model),
-            tiprackModel,
+            tiprackDefURI,
           }
         }
       )

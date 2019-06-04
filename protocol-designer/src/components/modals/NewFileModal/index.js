@@ -85,8 +85,8 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
       )
 
       // auto-generate tipracks for pipettes
-      const newTiprackModels = uniq(
-        pipettes.map(pipette => pipette.tiprackModel) // TODO IMMEDIATELY tiprackModel -> tiprackDefURI
+      const newTiprackModels: Array<string> = uniq(
+        pipettes.map(pipette => pipette.tiprackDefURI)
       )
 
       newTiprackModels.forEach(tiprackDefURI => {

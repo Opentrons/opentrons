@@ -50,8 +50,8 @@ const initialState = {
   fields: { name: '' },
   showEditPipetteConfirmation: false,
   pipettesByMount: {
-    left: { pipetteName: '', tiprackModel: null },
-    right: { pipetteName: '', tiprackModel: null },
+    left: { pipetteName: '', tiprackDefURI: null },
+    right: { pipetteName: '', tiprackDefURI: null },
   },
 }
 
@@ -111,14 +111,14 @@ export default class FilePipettesModal extends React.Component<Props, State> {
         assert(mount === 'left' || mount === 'right', `invalid mount: ${mount}`) // this is mostly for flow
         return formPipette &&
           formPipette.pipetteName &&
-          formPipette.tiprackModel &&
+          formPipette.tiprackDefURI &&
           (mount === 'left' || mount === 'right')
           ? [
               ...acc,
               {
                 mount,
                 name: formPipette.pipetteName,
-                tiprackModel: formPipette.tiprackModel,
+                tiprackDefURI: formPipette.tiprackDefURI,
               },
             ]
           : acc
@@ -149,8 +149,8 @@ export default class FilePipettesModal extends React.Component<Props, State> {
 
     // if pipette selected, corresponding tiprack type also selected
     const tiprackSelectionIsValid =
-      (left.pipetteName ? Boolean(left.tiprackModel) : true) &&
-      (right.pipetteName ? Boolean(right.tiprackModel) : true)
+      (left.pipetteName ? Boolean(left.tiprackDefURI) : true) &&
+      (right.pipetteName ? Boolean(right.tiprackDefURI) : true)
 
     const canSubmit = pipetteSelectionIsValid && tiprackSelectionIsValid
 

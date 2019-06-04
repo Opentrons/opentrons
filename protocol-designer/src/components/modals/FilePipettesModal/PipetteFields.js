@@ -74,8 +74,8 @@ export default function ChangePipetteFields(props: Props) {
               tabIndex={initialTabIndex + 2}
               disabled={isEmpty(values.left.pipetteName)}
               options={tiprackOptions}
-              value={values.left.tiprackModel}
-              name="left.tiprackModel"
+              value={values.left.tiprackDefURI}
+              name="left.tiprackDefURI"
               onChange={handleChange}
             />
           </FormGroup>
@@ -104,8 +104,8 @@ export default function ChangePipetteFields(props: Props) {
               tabIndex={initialTabIndex + 4}
               disabled={isEmpty(values.right.pipetteName)}
               options={tiprackOptions}
-              value={values.right.tiprackModel}
-              name="right.tiprackModel"
+              value={values.right.tiprackDefURI}
+              name="right.tiprackDefURI"
               onChange={handleChange}
             />
           </FormGroup>
@@ -113,12 +113,12 @@ export default function ChangePipetteFields(props: Props) {
       </div>
 
       <div className={styles.diagrams}>
-        <TiprackDiagram containerType={values.left.tiprackModel} />
+        <TiprackDiagram containerType={values.left.tiprackDefURI} />
         <PipetteDiagram
           leftPipette={values.left.pipetteName}
           rightPipette={values.right.pipetteName}
         />
-        <TiprackDiagram containerType={values.right.tiprackModel} />
+        <TiprackDiagram containerType={values.right.tiprackDefURI} />
       </div>
     </React.Fragment>
   )

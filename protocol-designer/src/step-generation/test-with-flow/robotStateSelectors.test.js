@@ -56,7 +56,7 @@ describe('_getNextTip', () => {
     let _invariantContext = makeContext()
     _invariantContext.labwareEntities[tiprackId] = {
       id: tiprackId,
-      type: getLabwareDefURI(fixtureTipRack300Ul),
+      labwareDefURI: getLabwareDefURI(fixtureTipRack300Ul),
       def: fixtureTipRack300Ul,
     }
     let robotState = makeState({

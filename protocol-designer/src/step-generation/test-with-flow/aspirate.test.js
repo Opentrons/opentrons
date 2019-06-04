@@ -97,7 +97,7 @@ describe('aspirate', () => {
   test('aspirate with volume > tip max volume should throw error', () => {
     invariantContext.pipetteEntities[
       'p300SingleId'
-    ].tiprackModel = getLabwareDefURI(fixtureTipRack10Ul)
+    ].tiprackDefURI = getLabwareDefURI(fixtureTipRack10Ul)
 
     invariantContext.pipetteEntities[
       'p300SingleId'
@@ -120,7 +120,7 @@ describe('aspirate', () => {
     // NOTE: assigning p300 to a 1000uL tiprack is nonsense, just for this test
     invariantContext.pipetteEntities[
       'p300SingleId'
-    ].tiprackModel = getLabwareDefURI(fixtureTipRack1000Ul)
+    ].tiprackDefURI = getLabwareDefURI(fixtureTipRack1000Ul)
 
     invariantContext.pipetteEntities[
       'p300SingleId'

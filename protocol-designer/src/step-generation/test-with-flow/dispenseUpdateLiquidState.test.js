@@ -330,12 +330,12 @@ describe('...8-channel pipette', () => {
     ]
 
     tests.forEach(({ labwareType, def, expectedLabwareMatch }) =>
-      // make sourcePlateId a different labware type/def each time
+      // make sourcePlateId a different labware def each time
       test(labwareType, () => {
         let customInvariantContext = makeContext()
         customInvariantContext.labwareEntities.sourcePlateId = {
           id: 'sourcePlateId',
-          type: labwareType,
+          labwareDefURI: labwareType,
           def,
         }
         const blankLiquidState = createEmptyLiquidState(customInvariantContext)

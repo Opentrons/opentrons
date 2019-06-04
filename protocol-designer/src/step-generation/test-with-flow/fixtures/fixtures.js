@@ -107,37 +107,37 @@ export function makeContext(): InvariantContext {
   const labwareEntities = {
     trashId: {
       id: 'trashId',
-      type: getLabwareDefURI(fixtureTrash),
+      labwareDefURI: getLabwareDefURI(fixtureTrash),
       def: fixtureTrash,
     },
     sourcePlateId: {
       id: 'sourcePlateId',
-      type: getLabwareDefURI(fixture96Plate),
+      labwareDefURI: getLabwareDefURI(fixture96Plate),
       def: fixture96Plate,
     },
     destPlateId: {
       id: 'destPlateId',
-      type: getLabwareDefURI(fixture96Plate),
+      labwareDefURI: getLabwareDefURI(fixture96Plate),
       def: fixture96Plate,
     },
     troughId: {
       id: 'troughId',
-      type: getLabwareDefURI(fixture12Trough),
+      labwareDefURI: getLabwareDefURI(fixture12Trough),
       def: fixture12Trough,
     },
     tiprack1Id: {
       id: 'tiprack1Id',
-      type: getLabwareDefURI(fixtureTipRack300Ul),
+      labwareDefURI: getLabwareDefURI(fixtureTipRack300Ul),
       def: fixtureTipRack300Ul,
     },
     tiprack2Id: {
       id: 'tiprack2Id',
-      type: getLabwareDefURI(fixtureTipRack300Ul),
+      labwareDefURI: getLabwareDefURI(fixtureTipRack300Ul),
       def: fixtureTipRack300Ul,
     },
     tiprack3Id: {
       id: 'tiprack3Id',
-      type: getLabwareDefURI(fixtureTipRack300Ul),
+      labwareDefURI: getLabwareDefURI(fixtureTipRack300Ul),
       def: fixtureTipRack300Ul,
     },
   }
@@ -146,28 +146,28 @@ export function makeContext(): InvariantContext {
     p10SingleId: {
       name: 'p10_single',
       id: 'p10SingleId',
-      tiprackModel: getLabwareDefURI(fixtureTipRack10Ul),
+      tiprackDefURI: getLabwareDefURI(fixtureTipRack10Ul),
       tiprackLabwareDef: fixtureTipRack10Ul,
       spec: fixtureP10Single,
     },
     p10MultiId: {
       name: 'p10_multi',
       id: 'p10MultiId',
-      tiprackModel: getLabwareDefURI(fixtureTipRack10Ul),
+      tiprackDefURI: getLabwareDefURI(fixtureTipRack10Ul),
       tiprackLabwareDef: fixtureTipRack10Ul,
       spec: fixtureP10Multi,
     },
     p300SingleId: {
       name: 'p300_single',
       id: 'p300SingleId',
-      tiprackModel: getLabwareDefURI(fixtureTipRack300Ul),
+      tiprackDefURI: getLabwareDefURI(fixtureTipRack300Ul),
       tiprackLabwareDef: fixtureTipRack300Ul,
       spec: fixtureP300Single,
     },
     p300MultiId: {
       name: 'p300_multi',
       id: 'p300MultiId',
-      tiprackModel: getLabwareDefURI(fixtureTipRack300Ul),
+      tiprackDefURI: getLabwareDefURI(fixtureTipRack300Ul),
       tiprackLabwareDef: fixtureTipRack300Ul,
       spec: fixtureP300Multi,
     },

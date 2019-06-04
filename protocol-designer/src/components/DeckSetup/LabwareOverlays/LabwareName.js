@@ -20,7 +20,7 @@ const NameOverlay = (props: Props) => {
   const title =
     nickname ||
     labwareOnDeck.def.metadata.displayName ||
-    humanizeLabwareType(labwareOnDeck.type)
+    humanizeLabwareType(labwareOnDeck.labwareDefURI)
 
   return <LabwareNameOverlay title={title} />
 }

@@ -12,6 +12,7 @@ import { createSelector } from 'reselect'
 import {
   getPipetteNameSpecs,
   getLabwareDisplayName,
+  getLabwareDefURI,
 } from '@opentrons/shared-data'
 import i18n from '../../localization'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
@@ -31,7 +32,6 @@ import {
 import type { FormWarning } from '../../steplist/formLevel'
 import type { BaseState, Selector } from '../../types'
 import type { FormData, StepIdType, StepType } from '../../form-types'
-import type { LabwareTypeById } from '../../labware-ingred/types'
 import type {
   StepArgsAndErrors,
   StepFormAndFieldErrors,
@@ -66,23 +66,15 @@ const _getNormalizedLabwareById: Selector<NormalizedLabwareById> = createSelecto
   state => state.labwareInvariantProperties
 )
 
-// TODO: Ian 2019-04-15 remove this selector completely. DEPRECATED.
-// Removal blocked by: BrowseLabwareModal/HighlightableLabware/LiquidPlacementModal/WellSelectionModal (all use SelectableLabware)
-export const getLabwareTypesById: Selector<LabwareTypeById> = createSelector(
-  _getNormalizedLabwareById,
-  normalizedLabwareById =>
-    mapValues(normalizedLabwareById, (l: NormalizedLabware) => l.type)
-)
-
 function _hydrateLabwareEntity(
   l: NormalizedLabware,
   labwareId: string,
-  defs: LabwareDefByDefURI
+  defsByURI: LabwareDefByDefURI
 ): LabwareEntity {
   return {
     ...l,
     id: labwareId,
-    def: defs[l.type] || defs[FALLBACK_DEF],
+    def: defsByURI[l.labwareDefURI] || defsByURI[FALLBACK_DEF],
   }
 }
 
@@ -176,7 +168,7 @@ export const getPermittedTipracks: Selector<Array<string>> = createSelector(
     reduce(
       initialDeckSetup.pipettes,
       (acc: Array<string>, pipette: PipetteOnDeck) => {
-        return pipette.tiprackModel ? [...acc, pipette.tiprackModel] : acc
+        return pipette.tiprackDefURI ? [...acc, pipette.tiprackDefURI] : acc
       },
       []
     )
@@ -230,7 +222,7 @@ export const getPipettesForInstrumentGroup: Selector<PipettesForInstrumentGroup>
           description: _getPipetteDisplayName(pipetteOnDeck.name),
           isDisabled: false,
           tiprackModel: getLabwareDisplayName(tiprackDef),
-          tiprack: { model: pipetteOnDeck.tiprackModel },
+          tiprack: { model: pipetteOnDeck.tiprackDefURI }, // TODO IMMEDIATELY no 'model' reference to a labware def
         }
 
         return {
@@ -259,7 +251,7 @@ export const getPipettesForEditPipetteForm: Selector<FormPipettesByMount> = crea
 
         const pipetteForInstrumentGroup = {
           pipetteName: pipetteOnDeck.name,
-          tiprackModel: getLabwareDisplayName(tiprackDef),
+          tiprackDefURI: getLabwareDefURI(tiprackDef),
         }
 
         return {
@@ -268,8 +260,8 @@ export const getPipettesForEditPipetteForm: Selector<FormPipettesByMount> = crea
         }
       },
       {
-        left: { pipetteName: null, tiprackModel: null },
-        right: { pipetteName: null, tiprackModel: null },
+        left: { pipetteName: null, tiprackDefURI: null },
+        right: { pipetteName: null, tiprackDefURI: null },
       }
     )
 )
