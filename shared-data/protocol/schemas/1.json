@@ -3,7 +3,7 @@
 
   "definitions": {
     "pipetteName": {
-      "description": "Name of a pipette. Does not contain info about specific model/version. Should match keys in pipetteNameSpecs.json",
+      "description": "Name of a pipette. Does not contain info about specific model/version. Should match keys in pipette 'name' json file",
       "type": "string",
       "enum": [
         "p10_single",

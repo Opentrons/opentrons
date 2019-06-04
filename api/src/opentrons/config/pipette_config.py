@@ -68,7 +68,7 @@ def model_config() -> Dict[str, Any]:
     """ Load the per-pipette-model config file from within the wheel """
     return json.loads(
         pkgutil.get_data(
-            'opentrons', 'shared_data/robot-data/pipetteModelSpecs.json')
+            'opentrons', 'shared_data/pipette/definitions/model/1.json')
         or '{}')
 
 
@@ -76,7 +76,7 @@ def name_config() -> Dict[str, Any]:
     """ Load the per-pipette-name config file from within the wheel """
     return json.loads(
         pkgutil.get_data(
-            'opentrons', 'shared_data/robot-data/pipetteNameSpecs.json')
+            'opentrons', 'shared_data/pipette/definitions/name/1.json')
         or '{}')
 
 
@@ -100,8 +100,8 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
 
     This function loads from a combination of
 
-    - the pipetteModelSpecs.json file in the wheel (should never be edited)
-    - the pipetteNameSpecs.json file in the wheel(should never be edited)
+    - the pipette 'model' json file in the wheel (should never be edited)
+    - the pipette 'name' json file in the wheel(should never be edited)
     - any config overrides found in
       ``opentrons.config.CONFIG['pipette_config_overrides_dir']``
 
@@ -118,7 +118,7 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
                        new overrides file for it.
     :type pipette_id: str or None
     :raises KeyError: if ``pipette_model`` is not in the top-level keys of
-                      pipetteModeLSpecs.json (and therefore not in
+                      the pipette 'model' json file (and therefore not in
                       :py:attr:`configs`)
 
     :returns pipette_config: The configuration, loaded and checked
@@ -143,7 +143,7 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
         else:
             cfg.update(override)
 
-    # the ulPerMm functions are structured in pipetteModelSpecs.json as
+    # the ulPerMm functions are structured in pipette 'model' json file as
     # a list sorted from oldest to newest. That means the latest functions
     # are always the last element and, as of right now, the older ones are
     # the first element (for models that only have one function, the first

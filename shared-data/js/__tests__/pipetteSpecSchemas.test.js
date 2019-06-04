@@ -1,8 +1,8 @@
 import Ajv from 'ajv'
-import nameSpecsSchema from '../../robot-data/schemas/pipetteNameSpecsSchema.json'
-import modelSpecsSchema from '../../robot-data/schemas/pipetteModelSpecsSchema.json'
-import pipetteNameSpecs from '../../robot-data/pipetteNameSpecs.json'
-import pipetteModelSpecs from '../../robot-data/pipetteModelSpecs.json'
+import nameSpecsSchema from '../../pipette/schemas/name/1.json'
+import modelSpecsSchema from '../../pipette/schemas/model/1.json'
+import pipetteNameSpecs from '../../pipette/definitions/name/1.json'
+import pipetteModelSpecs from '../../pipette/definitions/model/1.json'
 
 const ajv = new Ajv({
   allErrors: true,
