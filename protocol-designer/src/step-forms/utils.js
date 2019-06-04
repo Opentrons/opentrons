@@ -2,7 +2,7 @@
 import assert from 'assert'
 import reduce from 'lodash/reduce'
 import { getPipetteNameSpecs, type DeckSlotId } from '@opentrons/shared-data'
-import type { LabwareDefByDefId } from '../labware-defs'
+import type { LabwareDefByDefURI } from '../labware-defs'
 import type {
   NormalizedPipette,
   NormalizedPipetteById,
@@ -54,7 +54,7 @@ export function getLabwareIdInSlot(
 
 export function denormalizePipetteEntities(
   pipetteInvariantProperties: NormalizedPipetteById,
-  labwareDefs: LabwareDefByDefId
+  labwareDefs: LabwareDefByDefURI
 ): PipetteEntities {
   return reduce(
     pipetteInvariantProperties,

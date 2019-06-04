@@ -1,4 +1,5 @@
 // @flow
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import {
   fixtureP10Single,
   fixtureP300Multi,
@@ -411,36 +412,36 @@ describe('makeInitialRobotState', () => {
             id: 'p10SingleId',
             name: 'p10_single',
             spec: fixtureP10Single,
-            tiprackModel: fixtureTipRack10Ul.otId,
+            tiprackModel: getLabwareDefURI(fixtureTipRack10Ul),
             tiprackLabwareDef: fixtureTipRack10Ul,
           },
           p300MultiId: {
             id: 'p300MultiId',
             name: 'p300_multi',
             spec: fixtureP300Multi,
-            tiprackModel: fixtureTipRack300Ul.otId,
+            tiprackModel: getLabwareDefURI(fixtureTipRack300Ul),
             tiprackLabwareDef: fixtureTipRack300Ul,
           },
         },
         labwareEntities: {
           somePlateId: {
             id: 'somePlateId',
-            type: fixture96Plate.otId,
+            type: getLabwareDefURI(fixture96Plate),
             def: fixture96Plate,
           },
           tiprack10Id: {
             id: 'tiprack10Id',
-            type: fixtureTipRack10Ul.otId,
+            type: getLabwareDefURI(fixtureTipRack10Ul),
             def: fixtureTipRack10Ul,
           },
           tiprack300Id: {
             id: 'tiprack300Id',
-            type: fixtureTipRack300Ul.otId,
+            type: getLabwareDefURI(fixtureTipRack300Ul),
             def: fixtureTipRack300Ul,
           },
           trashId: {
             id: 'trashId',
-            type: fixtureTrash.otId,
+            type: getLabwareDefURI(fixtureTrash),
             def: fixtureTrash,
           },
         },

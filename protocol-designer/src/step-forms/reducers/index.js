@@ -392,7 +392,7 @@ export const savedStepForms = (
 }
 
 const initialLabwareState: NormalizedLabwareById = {
-  [FIXED_TRASH_ID]: { type: 'opentrons_1_trash_1100ml_fixed' },
+  [FIXED_TRASH_ID]: { type: 'opentrons/opentrons_1_trash_1100ml_fixed/1' },
 }
 
 // MIGRATION NOTE: copied from `containers` reducer. Slot + UI stuff stripped out.
@@ -407,7 +407,7 @@ export const labwareInvariantProperties = handleActions<
     ) => {
       return {
         ...state,
-        [action.payload.id]: { type: action.payload.containerType },
+        [action.payload.id]: { type: action.payload.labwareDefURI },
       }
     },
     DUPLICATE_LABWARE: (

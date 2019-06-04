@@ -1,7 +1,7 @@
 // @flow
 import React, { useState, useMemo } from 'react'
 import { useOnClickOutside, OutlineButton } from '@opentrons/components'
-import { type DeckSlotId } from '@opentrons/shared-data'
+import { getLabwareDefURI, type DeckSlotId } from '@opentrons/shared-data'
 import startCase from 'lodash/startCase'
 import reduce from 'lodash/reduce'
 import { getAllDefinitions } from '../../labware-defs/utils'
@@ -43,7 +43,7 @@ const LabwareDropdown = (props: Props) => {
         const category = def.metadata.displayCategory
         if (
           category === 'tipRack' &&
-          !permittedTipracks.includes(def.parameters.loadName)
+          !permittedTipracks.includes(getLabwareDefURI(def))
         ) {
           return acc
         }
@@ -86,7 +86,7 @@ const LabwareDropdown = (props: Props) => {
                 labwareByCategory[category].map((labwareDef, index) => (
                   <LabwareItem
                     key={index}
-                    containerType={labwareDef.parameters.loadName}
+                    containerType={getLabwareDefURI(labwareDef)}
                     displayName={labwareDef.metadata.displayName}
                     selectLabware={selectLabware}
                     onMouseEnter={() => previewLabware(labwareDef)}

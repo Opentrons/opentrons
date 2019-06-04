@@ -25,7 +25,7 @@ import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
 import { denormalizePipetteEntities } from '../utils'
 import {
   selectors as labwareDefSelectors,
-  type LabwareDefByDefId,
+  type LabwareDefByDefURI,
 } from '../../labware-defs'
 
 import type { FormWarning } from '../../steplist/formLevel'
@@ -77,7 +77,7 @@ export const getLabwareTypesById: Selector<LabwareTypeById> = createSelector(
 function _hydrateLabwareEntity(
   l: NormalizedLabware,
   labwareId: string,
-  defs: LabwareDefByDefId
+  defs: LabwareDefByDefURI
 ): LabwareEntity {
   return {
     ...l,

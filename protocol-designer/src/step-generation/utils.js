@@ -5,7 +5,11 @@ import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
 import last from 'lodash/last'
-import { getWellNamePerMultiTip, getIsTiprack } from '@opentrons/shared-data'
+import {
+  getWellNamePerMultiTip,
+  getIsTiprack,
+  getLabwareDefURI,
+} from '@opentrons/shared-data'
 
 import type {
   PipetteLabwareFieldsV1 as PipetteLabwareFields,
@@ -229,9 +233,9 @@ export function getWellsForTips(
     console.warn(
       channels === 1
         ? `Invalid well: ${well}`
-        : `For labware def (ID ${
-            labwareDef.otId
-          }), with primary well ${well}, no wells are accessible by 8-channel's 1st tip`
+        : `For labware def (URI ${getLabwareDefURI(
+            labwareDef
+          )}), with primary well ${well}, no wells are accessible by 8-channel's 1st tip`
     )
     // TODO: Ian 2019-04-11 figure out a clearer way to handle failure case
     return { wellsForTips: [], allWellsShared: false }

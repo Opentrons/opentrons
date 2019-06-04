@@ -39,7 +39,7 @@ export const createContainer = (args: CreateContainerArgs) => (
   const state = getState()
   const disambiguationNumber = getNextDisambiguationNumber(
     state,
-    args.containerType
+    args.labwareDefURI
   )
   const initialSetupStep = stepFormSelectors.getSavedStepForms(state)[
     INITIAL_DECK_SETUP_STEP_ID
@@ -53,7 +53,7 @@ export const createContainer = (args: CreateContainerArgs) => (
       type: 'CREATE_CONTAINER',
       payload: {
         ...args,
-        id: `${uuid()}:${args.containerType}`,
+        id: `${uuid()}:${args.labwareDefURI}`,
         disambiguationNumber,
         slot,
       },

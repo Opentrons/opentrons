@@ -1,6 +1,10 @@
 // @flow
 import React, { useMemo } from 'react'
 import { DropdownField, FormGroup, type Mount } from '@opentrons/components'
+import {
+  getLabwareDefURI,
+  type LabwareDefinition2,
+} from '@opentrons/shared-data'
 import isEmpty from 'lodash/isEmpty'
 import reduce from 'lodash/reduce'
 import i18n from '../../../localization'
@@ -28,13 +32,13 @@ export default function ChangePipetteFields(props: Props) {
     const allDefs = getAllDefinitions()
     return reduce(
       allDefs,
-      (acc, def) => {
+      (acc, def: LabwareDefinition2) => {
         if (def.metadata.displayCategory !== 'tipRack') return acc
         return [
           ...acc,
           {
             name: def.metadata.displayName,
-            value: def.parameters.loadName,
+            value: getLabwareDefURI(def),
           },
         ]
       },

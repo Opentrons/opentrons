@@ -1,4 +1,5 @@
 // @flow
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import moveLiquidFormToArgs, {
   getMixData,
   type HydratedMoveLiquidFormData,
@@ -12,10 +13,18 @@ jest.mock('../../../utils')
 
 describe('move liquid step form -> command creator args', () => {
   let hydratedForm: ?HydratedMoveLiquidFormData = null
-  const sourceLabwareType = '96-flat'
-  const sourceLabwareDef = { otId: 'sourceLabwareMock' }
-  const destLabwareType = '96-deep-well'
-  const destLabwareDef = { otId: 'destLabwareMock' }
+  const sourceLabwareDef = {
+    version: 123,
+    namespace: 'foo',
+    parameters: { loadName: 'sourceLabwareMock' },
+  }
+  const sourceLabwareType = getLabwareDefURI(sourceLabwareDef)
+  const destLabwareDef = {
+    version: 123,
+    namespace: 'foo',
+    parameters: { loadName: 'destLabwareMock' },
+  }
+  const destLabwareType = getLabwareDefURI(destLabwareDef)
   beforeEach(() => {
     // $FlowFixMe: mock methods
     getOrderedWells.mockClear()
