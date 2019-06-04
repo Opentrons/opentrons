@@ -1,6 +1,6 @@
 // This build script is run by `make install`
 
-// Merge all JSON files into a single JSON file, build/labware.json,
+// Merge all v1 labware files into a single JSON file, build/labware.json,
 // with each filename as a key in the final JSON file.
 const fs = require('fs')
 const path = require('path')
@@ -16,7 +16,9 @@ if (!buildDir) {
 
 let output = {}
 
-const files = glob.sync(path.join(__dirname, '../../definitions/*.json'))
+const files = glob.sync(
+  path.join(__dirname, '../../labware/definitions/1/*.json')
+)
 
 files.forEach(filename => {
   const contents = require(filename)
