@@ -5,34 +5,10 @@ exports[`FilterCategory component renders 1`] = `
   <p
     className="filter_label"
   >
-<<<<<<< HEAD
-    <Link
-      className="filter_category_link selected"
-      to="/?"
-    >
-      All
-    </Link>
-  </li>
-  <li
-    className="filter_category_item"
-    key="reservoir"
-  >
-    <Link
-      className="filter_category_link"
-      to="/?category=reservoir"
-    >
-      Reservoirs
-    </Link>
-  </li>
-  <li
-    className="filter_category_item"
-    key="tubeRack"
-=======
     category
   </p>
   <ul
     className="filter_category"
->>>>>>> fix: Update snapshots
   >
     <li
       className="filter_category_item"
@@ -43,6 +19,17 @@ exports[`FilterCategory component renders 1`] = `
         to="/?"
       >
         All
+      </Link>
+    </li>
+    <li
+      className="filter_category_item"
+      key="reservoir"
+    >
+      <Link
+        className="filter_category_link"
+        to="/?category=reservoir"
+      >
+        Reservoirs
       </Link>
     </li>
     <li
@@ -60,23 +47,6 @@ exports[`FilterCategory component renders 1`] = `
       className="filter_category_item"
       key="wellPlate"
     >
-<<<<<<< HEAD
-      Well Plates
-    </Link>
-  </li>
-  <li
-    className="filter_category_item"
-    key="tipRack"
-  >
-    <Link
-      className="filter_category_link"
-      to="/?category=tipRack"
-    >
-      Tip Racks
-    </Link>
-  </li>
-</ul>
-=======
       <Link
         className="filter_category_link"
         to="/?category=wellPlate"
@@ -84,7 +54,17 @@ exports[`FilterCategory component renders 1`] = `
         Well Plates
       </Link>
     </li>
+    <li
+      className="filter_category_item"
+      key="tipRack"
+    >
+      <Link
+        className="filter_category_link"
+        to="/?category=tipRack"
+      >
+        Tip Racks
+      </Link>
+    </li>
   </ul>
 </Fragment>
->>>>>>> fix: Update snapshots
 `;

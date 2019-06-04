@@ -21,7 +21,7 @@ exports[`Sidebar component renders 1`] = `
       }
     }
   />
-  <FilterCategory
+  <FilterReset
     filters={
       Object {
         "category": "all",
