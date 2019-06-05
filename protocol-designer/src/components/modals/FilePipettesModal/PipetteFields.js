@@ -28,7 +28,7 @@ export default function ChangePipetteFields(props: Props) {
     const allDefs = getAllDefinitions()
     return reduce(
       allDefs,
-      (acc, def) => {
+      (acc, def: $Values<typeof allDefs>) => {
         if (def.metadata.displayCategory !== 'tipRack') return acc
         return [
           ...acc,

@@ -31,3 +31,28 @@
   text-anchor: middle;
   fill: white;
 }
+
+.ot2_short_trash,
+.ot2_standard {
+  &.fixed_trash {
+    fill: var(--c-lightest-gray);
+    fill-rule: evenodd;
+    stroke: none;
+  }
+
+  &.slot_numbers {
+    fill: var(--c-plate-bg);
+    fill-rule: evenodd;
+    stroke: none;
+  }
+
+  &.slot_ridges {
+    fill: var(--c-plate-bg);
+    fill-rule: evenodd;
+    stroke: none;
+  }
+
+  &.removable_deck_outline {
+    stroke: var(--c-lightest-gray);
+  }
+}

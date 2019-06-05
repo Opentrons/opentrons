@@ -22,6 +22,14 @@ import LabwareOnDeck from './LabwareOnDeck'
 import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
 import styles from './DeckSetup.css'
 
+const deckSetupLayerBlacklist = [
+  'calibrationMarkings',
+  'fixedBase',
+  'doorStops',
+  'metalFrame',
+  'removalHandle',
+  'screwHoles',
+]
 type Props = {|
   selectedTerminalItemId: ?TerminalItemId,
   handleClickOutside?: () => mixed,
@@ -49,30 +57,15 @@ const DeckSetup = (props: Props) => {
         {props.drilledDown && <BrowseLabwareModal />}
         <div ref={wrapperRef} className={styles.deck_wrapper}>
           <RobotWorkSpace
-            deckLayerBlacklist={[
-              // 'slotRidges',
-              // 'slotNumbers',
-              // 'fixedTrash',
-              'calibrationMarkings',
-              'fixedBase',
-              'removableDeckOutline',
-              'doorStops',
-              'metalFrame',
-              'removalHandle',
-              'screwHoles',
-            ]}
+            deckLayerBlacklist={deckSetupLayerBlacklist}
             deckDef={deckDef}
-            viewBox={`-10 -10 ${410} ${390}`} // viewbox for small
-            // viewBox={`-10 -10 ${460} ${452}`} // viewbox for mid
+            viewBox={`-46 -70 ${488} ${514}`} // TODO: put these in variables
           >
             {({ slots, getRobotCoordsFromDOMCoords }) => (
               <>
-                <DragPreview
-                  getRobotCoordsFromDOMCoords={getRobotCoordsFromDOMCoords}
-                />
                 <RobotCoordsForeignDiv
-                  x={0}
-                  y={364}
+                  x={30}
+                  y={-44}
                   height={30}
                   width={380}
                   innerDivProps={{
@@ -125,6 +118,9 @@ const DeckSetup = (props: Props) => {
                     />
                   )
                 })}
+                <DragPreview
+                  getRobotCoordsFromDOMCoords={getRobotCoordsFromDOMCoords}
+                />
               </>
             )}
           </RobotWorkSpace>

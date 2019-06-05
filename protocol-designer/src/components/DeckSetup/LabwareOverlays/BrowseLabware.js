@@ -25,7 +25,7 @@ function BrowseLabwareOverlay(props: Props) {
     <div className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
       <a className={styles.overlay_button} onClick={props.drillDown}>
         <Icon className={styles.overlay_icon} name="water" />
-        {i18n.t('deck.overlay.browse.view_liquid')}
+        {i18n.t('deck.overlay.browse.view_liquids')}
       </a>
     </div>
   )

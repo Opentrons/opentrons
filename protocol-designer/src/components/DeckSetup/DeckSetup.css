@@ -1,9 +1,7 @@
 @import '@opentrons/components';
 
 .deck_wrapper {
-  padding: 1rem;
-  max-width: 100%;
-  width: 100vh;
+  flex: 1;
 }
 
 .deck_header {
@@ -14,7 +12,11 @@
 }
 
 .deck_row {
-  @apply --center-children;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  max-height: calc(100vh - 3rem);
+  overflow-y: hidden;
 }
 
 .deck_instructions {
