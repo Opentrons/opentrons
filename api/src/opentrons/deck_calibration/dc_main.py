@@ -158,14 +158,14 @@ class CLITool:
     @hardware.setter
     def hardware(self, hardware):
         self._hardware = hardware
-
-    @property
-    def calibration_matrix(self):
-        return self._calibration_matrix
-
-    @calibration_matrix.setter
-    def calibration_matrix(self, calibration):
-        self._calibration_matrix = calibration
+    #
+    # @property
+    # def calibration_matrix(self):
+    #     return self._calibration_matrix
+    #
+    # @calibration_matrix.setter
+    # def calibration_matrix(self, calibration):
+    #     self._calibration_matrix = calibration
 
     @property
     def actual_points(self):
@@ -244,9 +244,7 @@ class CLITool:
         to the axis of a pipette currently used
         """
 
-        res = position(self._current_mount, self.hardware)
-
-        return res
+        return position(self._current_mount, self.hardware)
 
     def _jog(self, axis, direction, step):
         """

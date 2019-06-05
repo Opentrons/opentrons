@@ -74,7 +74,6 @@ class SessionManager:
     def __init__(self, hardware):
         self.id = _get_uuid()
         self.pipettes = {}
-        self.identity_transform = identity_transform
         self.current_mount = None
         self.current_model = None
         self.tip_length = None
@@ -83,13 +82,14 @@ class SessionManager:
         self.cp = None
         self.pipette_id = None
         self.adapter = hardware
+        self.identity_transform = identity_transform
 
         if feature_flags.use_protocol_api_v2():
             self.adapter = hardware_control.adapters.SynchronousAdapter(
                 hardware)
 
         # default = robot_configs._build_config({}, {}).gantry_calibration
-        self.adapter.update_config(gantry_calibration=identity_transform)
+        self.adapter.update_config(gantry_calibration=self.identity_transform)
         # log.debug("Current deck calibration {}".format(self.adapter.config))
 
 
@@ -473,8 +473,9 @@ async def save_z(data):
             session.z_value = position(
                 session.current_mount, session.adapter, session.cp)[-1]
 
-            session.identity_transform[2][3] = session.z_value
-            calibration_matrix = add_z(flat_matrix, session.z_value)
+        session.identity_transform[2][3] = session.z_value
+        session.adapter.update_config(gantry_calibration=list(
+                map(lambda i: list(i), session.identity_transform)))
 
         message = "Saved z: {}".format(session.z_value)
         status = 200
@@ -505,11 +506,13 @@ async def save_transform(data):
 
         # Generate a 2 dimensional transform matrix from the two matricies
         flat_matrix = solve(expected, actual)
-        # # Add the z component to form the 3 dimensional transform
-        # calibration_matrix = add_z(flat_matrix, session.z_value)
+
+        # replace relevant X and Y components
+        session.identity_transform[0][3] = flat_matrix[0][2]
+        session.identity_transform[1][3] = flat_matrix[1][2]
 
         session.adapter.update_config(gantry_calibration=list(
-                map(lambda i: list(i), calibration_matrix)))
+                map(lambda i: list(i), session.identity_transform)))
 
         robot_configs.save_deck_calibration(session.adapter.config)
         robot_configs.backup_configuration(session.adapter.config)
