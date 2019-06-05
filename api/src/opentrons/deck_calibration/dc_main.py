@@ -93,7 +93,7 @@ class CLITool:
         )
         self._config = self.hardware.config
         self.identity_transform = identity_transform
-        self.calibration_matrix = self._config.gantry_calibration
+        # self.calibration_matrix = self._config.gantry_calibration
         # Other state
         self._tip_length = tip_length
         if feature_flags.use_protocol_api_v2():
@@ -228,14 +228,14 @@ class CLITool:
         # TODO (ben 20180201): create a function in linal module so we don't
         # TODO                 have to do dot product & etc here
         point = array(list(point) + [1])
-        x, y, z, _ = dot(self.calibration_matrix, point)
+        x, y, z, _ = dot(self.identity_transform, point)
         return (x, y, z)
 
     def _driver_to_deck_coords(self, point):
         # TODO (ben 20180201): create a function in linal module so we don't
         # TODO                 have to do dot product & etc here
         point = array(list(point) + [1])
-        x, y, z, _ = dot(inv(self.calibration_matrix), point)
+        x, y, z, _ = dot(inv(self.identity_transform), point)
         return (x, y, z)
 
     def _position(self):
@@ -321,12 +321,12 @@ class CLITool:
         # Generate a 2 dimensional transform matrix from the two matricies
         flat_matrix = solve(expected, actual)
         log.debug("save_transform flat_matrix: {}".format(flat_matrix))
-        current_z = self.calibration_matrix[2][3]
+        current_z = self.identity_transform[2][3]
         # Add the z component to form the 3 dimensional transform
-        self.calibration_matrix = add_z(flat_matrix, current_z)
+        self.identity_transform = add_z(flat_matrix, current_z)
 
         gantry_calibration = list(
-                map(lambda i: list(i), self.calibration_matrix))
+                map(lambda i: list(i), self.identity_transform))
         log.debug("save_transform calibration_matrix: {}".format(
             gantry_calibration))
 
@@ -337,10 +337,10 @@ class CLITool:
 
     def save_z_value(self) -> str:
         actual_z = self._position()[-1]
-        expected_z = self.calibration_matrix[2][3] + self._tip_length
-        new_z = self.calibration_matrix[2][3] + actual_z - expected_z
+        expected_z = self.identity_transform[2][3] + self._tip_length
+        new_z = self.identity_transform[2][3] + actual_z - expected_z
         log.debug("Saving z value: {}".format(new_z))
-        self.calibration_matrix[2][3] = new_z
+        self.identity_transform[2][3] = new_z
         return 'saved Z-Offset: {}'.format(new_z)
 
     def _left_mount_offset(self):
@@ -432,7 +432,7 @@ class CLITool:
         text = '\n'.join([
             points,
             'World: {}'.format(apply_transform(
-                inv(self.calibration_matrix), self.current_position)),
+                inv(self.identity_transform), self.current_position)),
             'Step: {}'.format(self.current_step()),
             'Message: {}'.format(msg)
         ])

@@ -88,9 +88,9 @@ class SessionManager:
             self.adapter = hardware_control.adapters.SynchronousAdapter(
                 hardware)
 
-        default = robot_configs._build_config({}, {}).gantry_calibration
-        self.adapter.update_config(gantry_calibration=default)
-        log.debug("Current deck calibration {}".format(self.adapter.config))
+        # default = robot_configs._build_config({}, {}).gantry_calibration
+        self.adapter.update_config(gantry_calibration=identity_transform)
+        # log.debug("Current deck calibration {}".format(self.adapter.config))
 
 
 # -------------- Route Fns -----------------------------------------------
@@ -468,9 +468,13 @@ async def save_z(data):
             length_offset = pipette_config.load(
                 session.current_model, session.pipette_id).model_offset[-1]
             session.z_value = actual_z - session.tip_length + length_offset
+
         else:
             session.z_value = position(
                 session.current_mount, session.adapter, session.cp)[-1]
+
+            session.identity_transform[2][3] = session.z_value
+            calibration_matrix = add_z(flat_matrix, session.z_value)
 
         message = "Saved z: {}".format(session.z_value)
         status = 200
@@ -501,8 +505,8 @@ async def save_transform(data):
 
         # Generate a 2 dimensional transform matrix from the two matricies
         flat_matrix = solve(expected, actual)
-        # Add the z component to form the 3 dimensional transform
-        calibration_matrix = add_z(flat_matrix, session.z_value)
+        # # Add the z component to form the 3 dimensional transform
+        # calibration_matrix = add_z(flat_matrix, session.z_value)
 
         session.adapter.update_config(gantry_calibration=list(
                 map(lambda i: list(i), calibration_matrix)))
