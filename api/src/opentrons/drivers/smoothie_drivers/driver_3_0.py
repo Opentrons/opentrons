@@ -2,7 +2,7 @@ import asyncio
 from os import environ
 import logging
 from time import sleep
-from threading import Event
+from threading import Event, RLock
 from typing import Any, Dict, Optional
 
 from serial.serialutil import SerialException
@@ -109,7 +109,16 @@ SMOOTHIE_ACK = 'ok\r\nok\r\n'
 
 
 class SmoothieError(Exception):
-    pass
+    def __init__(self, ret_code: str = None, command: str = None) -> None:
+        self.ret_code = ret_code
+        self.command = command
+        super().__init__()
+
+    def __repr__(self):
+        return f'<SmoothieError: {self.ret_code} from {self.command}>'
+
+    def __str__(self):
+        return f'SmoothieError: {self.command} returned {self.ret_code}'
 
 
 class ParseError(Exception):
@@ -261,7 +270,7 @@ def _parse_homing_status_values(raw_homing_status_values):
 
 
 class SmoothieDriver_3_0_0:
-    def __init__(self, config):
+    def __init__(self, config, handle_locks=True):
         self.run_flag = Event()
         self.run_flag.set()
         self.dist_from_eeprom = EEPROM_DEFAULT.copy()
@@ -328,6 +337,18 @@ class SmoothieDriver_3_0_0:
             'B': False,
             'C': False
         })
+
+        if handle_locks:
+            self._serial_lock = RLock()
+        else:
+            class DummyLock:
+                def __enter__(self):
+                    pass
+
+                def __exit__(self, *args, **kwargs):
+                    pass
+
+            self._serial_lock = DummyLock()
 
     @property
     def homed_position(self):
@@ -894,6 +915,26 @@ class SmoothieDriver_3_0_0:
         """
         if self.simulating:
             return
+        try:
+            with self._serial_lock:
+                return self._send_command_unsynchronized(command, timeout)
+        except SmoothieError as se:
+            # XXX: This is a reentrancy error because another command could
+            # swoop in here. We're already resetting though and errors (should
+            # be) rare so it's probably fine, but the actual solution to this
+            # is locking at a higher level like in APIv2.
+            self._reset_from_error()
+            log.exception(f"Smoothie error from command {command}")
+            error_axis = se.ret_code.strip()[-1]
+            if GCODES['HOME'] not in command and error_axis in 'XYZABC':
+                log.warning(
+                    f"alarm/error in {se.ret_code}, homing {error_axis}")
+                self.home(error_axis)
+                raise SmoothieError(se.ret_code, command)
+
+    def _send_command_unsynchronized(self,
+                                     command,
+                                     timeout=DEFAULT_SMOOTHIE_TIMEOUT):
         cmd_ret = self._write_with_retries(
             command + SMOOTHIE_COMMAND_TERMINATOR,
             5.0, DEFAULT_COMMAND_RETRIES)
@@ -911,11 +952,6 @@ class SmoothieDriver_3_0_0:
         # Smoothieware returns error state if a switch was hit while moving
         if (ERROR_KEYWORD in ret_code.lower()) or \
                 (ALARM_KEYWORD in ret_code.lower()):
-            self._reset_from_error()
-            error_axis = ret_code.strip()[-1]
-            if not was_home and error_axis in 'XYZABC':
-                log.warning(f"alarm/error in {ret_code}, homing {error_axis}")
-                self.home(error_axis)
             raise SmoothieError(ret_code)
 
     def _remove_unwanted_characters(self, command, response):
