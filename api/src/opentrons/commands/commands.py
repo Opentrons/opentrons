@@ -11,6 +11,7 @@ from opentrons.legacy_api.containers import (Well as OldWell,
                                              location_to_list)
 from opentrons.protocol_api.labware import Well, Labware, ModuleGeometry
 from opentrons.types import Location
+from opentrons.drivers import utils
 
 
 def is_new_loc(location: Union[Location, Well, None,
@@ -346,12 +347,17 @@ def magdeck_calibrate():
     )
 
 
-def tempdeck_set_temp():
+def tempdeck_set_temp(celsius):
     text = "Setting temperature deck module temperature " \
-           "(rounded off to nearest integer)"
+           "to {temp} deg. celsius (rounded off to nearest integer)".format(
+            temp=round(float(celsius),
+                       utils.TEMPDECK_GCODE_ROUNDING_PRECISION))
     return make_command(
         name=command_types.TEMPDECK_SET_TEMP,
-        payload={'text': text}
+        payload={
+            'celsius': celsius,
+            'text': text
+        }
     )
 
 
@@ -371,11 +377,59 @@ def thermocycler_open():
     )
 
 
-def thermocycler_set_temp():
-    text = "Setting thermocycler temperature"
+def thermocycler_set_temp(temp, hold_time):
+    text = "Setting thermocycler temperature to {temp} deg. celsius ".format(
+            temp=temp)
+    if hold_time is not None:
+        text += " with a hold time of {} seconds".format(hold_time)
     return make_command(
         name=command_types.THERMOCYCLER_SET_TEMP,
-        payload={'text': text})
+        payload={
+            'temp': temp,
+            'hold_time': hold_time,
+            'text': text
+        }
+    )
+
+
+def thermocycler_wait_for_hold():
+    text = "Waiting for hold time duration"
+    return make_command(
+        name=command_types.THERMOCYCLER_WAIT_FOR_HOLD,
+        payload={'text': text}
+    )
+
+
+def thermocycler_wait_for_temp():
+    text = "Waiting for thermocycler to reach target"
+    return make_command(
+        name=command_types.THERMOCYCLER_WAIT_FOR_TEMP,
+        payload={'text': text}
+    )
+
+
+def thermocycler_heat_lid():
+    text = "Heating thermocycler lid"
+    return make_command(
+        name=command_types.THERMOCYCLER_HEAT_LID,
+        payload={'text': text}
+    )
+
+
+def thermocycler_stop_lid_heating():
+    text = "Deactivating lid heating"
+    return make_command(
+        name=command_types.THERMOCYCLER_STOP_LID_HEATING,
+        payload={'text': text}
+    )
+
+
+def thermocycler_wait_for_lid_temp():
+    text = "Waiting for lid to reach target temperature"
+    return make_command(
+        name=command_types.THERMOCYCLER_WAIT_FOR_LID_TEMP,
+        payload={'text': text}
+    )
 
 
 def thermocycler_close():

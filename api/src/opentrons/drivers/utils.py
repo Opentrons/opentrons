@@ -6,7 +6,8 @@ log = logging.getLogger(__name__)
 
 # Number of digits after the decimal point for temperatures being sent
 # to/from Temp-Deck
-GCODE_ROUNDING_PRECISION = 2
+TEMPDECK_GCODE_ROUNDING_PRECISION = 0
+TC_GCODE_ROUNDING_PRECISION = 2
 
 
 class ParseError(Exception):
@@ -28,7 +29,7 @@ def parse_string_value_from_substring(substring) -> str:
                 substring))
 
 
-def parse_number_from_substring(substring) -> Optional[float]:
+def parse_number_from_substring(substring, rounding_val) -> Optional[float]:
     '''
     Returns the number in the expected string "N:12.3", where "N" is the
     key, and "12.3" is a floating point value
@@ -40,7 +41,7 @@ def parse_number_from_substring(substring) -> Optional[float]:
         value = substring.split(':')[1]
         if value.strip().lower() == 'none':
             return None
-        return round(float(value), GCODE_ROUNDING_PRECISION)
+        return round(float(value), rounding_val)
     except (ValueError, IndexError, TypeError, AttributeError):
         log.exception('Unexpected argument to parse_number_from_substring:')
         raise ParseError(
@@ -63,7 +64,8 @@ def parse_key_from_substring(substring) -> str:
 
 
 def parse_temperature_response(
-        temperature_string: str) -> Mapping[str, Optional[float]]:
+        temperature_string: str, rounding_val: int
+        ) -> Mapping[str, Optional[float]]:
     '''
     Example input: "T:none C:25"
     '''
@@ -78,7 +80,8 @@ def parse_temperature_response(
         raise ParseError(err_msg)
 
     data = {
-        parse_key_from_substring(s): parse_number_from_substring(s)
+        parse_key_from_substring(s): parse_number_from_substring(s,
+                                                                 rounding_val)
         for s in parsed_values[:2]
     }
     if 'C' not in data or 'T' not in data:

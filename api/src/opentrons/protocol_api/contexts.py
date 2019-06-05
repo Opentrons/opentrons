@@ -1757,6 +1757,7 @@ class ThermocyclerContext(ModuleContext):
         """ Update lid target temperature"""
         self._protocol_lid_target = temp
 
+    @cmds.publish.both(command=cmds.thermocycler_heat_lid)
     def heat_lid(self):
         """ Start heating thermocycler Lid to ``_protocol_lid_target``
             degree celsius. If ``_protocol_lid_target`` is None, the lid
@@ -1764,18 +1765,22 @@ class ThermocyclerContext(ModuleContext):
         """
         self._module.set_lid_temperature(self._protocol_lid_target)
 
+    @cmds.publish.both(command=cmds.thermocycler_stop_lid_heating)
     def stop_lid_heating(self):
         """ Turn off the lid heatpad """
         self._module.stop_lid_heating()
 
+    @cmds.publish.both(command=cmds.thermocycler_wait_for_lid_temp)
     def wait_for_lid_temp(self):
         """ Block until the lid heatpad reaches its target temperature"""
         self._module.wait_for_lid_temp()
 
+    @cmds.publish.both(command=cmds.thermocycler_wait_for_temp)
     def wait_for_temp(self):
         """ Block until the module reaches its setpoint"""
         self._module.wait_for_temp()
 
+    @cmds.publish.both(command=cmds.thermocycler_wait_for_hold)
     def wait_for_hold(self):
         """ Block until hold time has elapsed"""
         self._module.wait_for_hold()

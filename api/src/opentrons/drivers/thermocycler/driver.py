@@ -317,7 +317,8 @@ class Thermocycler:
 
         for substr in data_substrs:
             key = utils.parse_key_from_substring(substr)
-            value = utils.parse_number_from_substring(substr)
+            value = utils.parse_number_from_substring(
+                    substr, utils.TC_GCODE_ROUNDING_PRECISION)
             val_dict[key] = value
 
         self._current_temp = val_dict['C']
@@ -332,7 +333,8 @@ class Thermocycler:
 
         for substr in data_substrs:
             key = utils.parse_key_from_substring(substr)
-            value = utils.parse_number_from_substring(substr)
+            value = utils.parse_number_from_substring(
+                    substr, utils.TC_GCODE_ROUNDING_PRECISION)
             val_dict[key] = value
         self._lid_temp = val_dict['C']
         self._lid_target = val_dict['T']
