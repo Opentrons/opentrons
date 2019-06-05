@@ -15,8 +15,8 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../constants'
 import type {
-  FilePipetteV1 as FilePipette,
-  FileLabwareV1 as FileLabware,
+  FilePipetteV3 as FilePipette,
+  FileLabwareV3 as FileLabware,
 } from '@opentrons/shared-data'
 import type { BaseState } from '../../types'
 import type { PDProtocolFile } from '../../file-types'
@@ -99,7 +99,7 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
       ): FileLabware => ({
         slot: l.slot,
         'display-name': labwareNamesById[labwareId],
-        model: labwareEntities[labwareId].type,
+        labwareDefURI: labwareEntities[labwareId].labwareDefURI,
       })
     )
 
@@ -136,7 +136,7 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
         data: {
           pipetteTiprackAssignments: mapValues(
             pipetteEntities,
-            (p: $Values<typeof pipetteEntities>): ?string => p.tiprackModel
+            (p: $Values<typeof pipetteEntities>): ?string => p.tiprackDefURI
           ),
           dismissedWarnings,
           ingredients,

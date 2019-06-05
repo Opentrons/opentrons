@@ -1,6 +1,7 @@
 // @flow
 import React, { useMemo } from 'react'
 import { DropdownField, FormGroup, type Mount } from '@opentrons/components'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import isEmpty from 'lodash/isEmpty'
 import reduce from 'lodash/reduce'
 import i18n from '../../../localization'
@@ -25,6 +26,7 @@ export default function ChangePipetteFields(props: Props) {
   const { values, handleChange } = props
 
   const tiprackOptions = useMemo(() => {
+    // TODO: Ian 2019-06-04 only show latest versions of labware here (#3525)
     const allDefs = getAllDefinitions()
     return reduce(
       allDefs,
@@ -34,7 +36,7 @@ export default function ChangePipetteFields(props: Props) {
           ...acc,
           {
             name: def.metadata.displayName,
-            value: def.parameters.loadName,
+            value: getLabwareDefURI(def),
           },
         ]
       },
@@ -70,8 +72,8 @@ export default function ChangePipetteFields(props: Props) {
               tabIndex={initialTabIndex + 2}
               disabled={isEmpty(values.left.pipetteName)}
               options={tiprackOptions}
-              value={values.left.tiprackModel}
-              name="left.tiprackModel"
+              value={values.left.tiprackDefURI}
+              name="left.tiprackDefURI"
               onChange={handleChange}
             />
           </FormGroup>
@@ -100,8 +102,8 @@ export default function ChangePipetteFields(props: Props) {
               tabIndex={initialTabIndex + 4}
               disabled={isEmpty(values.right.pipetteName)}
               options={tiprackOptions}
-              value={values.right.tiprackModel}
-              name="right.tiprackModel"
+              value={values.right.tiprackDefURI}
+              name="right.tiprackDefURI"
               onChange={handleChange}
             />
           </FormGroup>
@@ -109,12 +111,12 @@ export default function ChangePipetteFields(props: Props) {
       </div>
 
       <div className={styles.diagrams}>
-        <TiprackDiagram containerType={values.left.tiprackModel} />
+        <TiprackDiagram definitionURI={values.left.tiprackDefURI} />
         <PipetteDiagram
           leftPipette={values.left.pipetteName}
           rightPipette={values.right.pipetteName}
         />
-        <TiprackDiagram containerType={values.right.tiprackModel} />
+        <TiprackDiagram definitionURI={values.right.tiprackDefURI} />
       </div>
     </React.Fragment>
   )
