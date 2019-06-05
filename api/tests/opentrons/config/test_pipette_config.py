@@ -8,7 +8,7 @@ from opentrons.config import pipette_config, feature_flags as ff, CONFIG
 
 defs = json.loads(
     pkgutil.get_data(
-        'opentrons', 'shared_data/pipette/definitions/model/1.json'))
+        'opentrons', 'shared_data/pipette/definitions/pipetteModelSpecs.json'))
 
 
 @pytest.mark.parametrize('pipette_model',

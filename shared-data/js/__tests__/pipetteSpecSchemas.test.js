@@ -1,8 +1,8 @@
 import Ajv from 'ajv'
-import nameSpecsSchema from '../../pipette/schemas/name/1.json'
-import modelSpecsSchema from '../../pipette/schemas/model/1.json'
-import pipetteNameSpecs from '../../pipette/definitions/name/1.json'
-import pipetteModelSpecs from '../../pipette/definitions/model/1.json'
+import nameSpecsSchema from '../../pipette/schemas/pipetteNameSpecsSchema.json'
+import modelSpecsSchema from '../../pipette/schemas/pipetteModelSpecsSchema.json'
+import pipetteNameSpecs from '../../pipette/definitions/pipetteNameSpecs.json'
+import pipetteModelSpecs from '../../pipette/definitions/pipetteModelSpecs.json'
 
 const ajv = new Ajv({
   allErrors: true,
