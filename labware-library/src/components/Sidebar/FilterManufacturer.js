@@ -26,7 +26,7 @@ export function FilterManufacturer(props: FilterManufacturerProps) {
 
   return (
     <label className={styles.filter_manufacturer}>
-      <p className={styles.filter_manufacturer_label}>{MANUFACTURER}</p>
+      <p className={styles.filter_label}>{MANUFACTURER}</p>
       <SelectField
         className={styles.filter_manufacturer_select}
         name="manufacturer"

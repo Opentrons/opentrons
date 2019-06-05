@@ -34,6 +34,7 @@ type DP = {|
 
 type DNDP = {|
   draggedItem: any,
+  isOver: boolean,
   connectDragSource: Node => Node,
   connectDropTarget: Node => Node,
 |}
@@ -48,6 +49,7 @@ const EditLabware = (props: Props) => {
     deleteLabware,
     duplicateLabware,
     draggedItem,
+    isOver,
     connectDragSource,
     connectDropTarget,
   } = props
@@ -62,7 +64,7 @@ const EditLabware = (props: Props) => {
     )
   } else {
     const isBeingDragged =
-      draggedItem && draggedItem.slot === labwareOnDeck.slot
+      draggedItem && draggedItem.labwareOnDeck.slot === labwareOnDeck.slot
 
     const contents = draggedItem ? (
       <div className={styles.overlay_button}>
@@ -97,6 +99,7 @@ const EditLabware = (props: Props) => {
         <div
           className={cx(styles.slot_overlay, {
             [styles.appear_on_mouseover]: !isBeingDragged && !isYetUnnamed,
+            [styles.appear]: isOver,
             [styles.disabled]: isBeingDragged,
           })}
         >
@@ -108,12 +111,7 @@ const EditLabware = (props: Props) => {
 }
 
 const labwareSource = {
-  beginDrag: props => {
-    return {
-      slot: props.labwareOnDeck.slot,
-      def: props.labwareOnDeck.def,
-    }
-  },
+  beginDrag: props => ({ labwareOnDeck: props.labwareOnDeck }),
 }
 const collectLabwareSource = (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
@@ -129,17 +127,23 @@ const DragEditLabware = DragSource(
 const labwareTarget = {
   canDrop: (props, monitor) => {
     const draggedItem = monitor.getItem()
-    return draggedItem && draggedItem.slot !== props.labwareOnDeck.slot
+    return (
+      draggedItem && draggedItem.labwareOnDeck.slot !== props.labwareOnDeck.slot
+    )
   },
   drop: (props, monitor) => {
     const draggedItem = monitor.getItem()
     if (draggedItem) {
-      props.swapSlotContents(draggedItem.slot, props.labwareOnDeck.slot)
+      props.swapSlotContents(
+        draggedItem.labwareOnDeck.slot,
+        props.labwareOnDeck.slot
+      )
     }
   },
 }
 const collectLabwareTarget = (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
+  isOver: monitor.isOver(),
 })
 export const DragDropEditLabware = DropTarget(
   DND_TYPES.LABWARE,

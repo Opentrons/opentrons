@@ -38,7 +38,8 @@ const LabwareControls = (props: Props) => {
       width={slot.boundingBox.xDimension}
       height={slot.boundingBox.yDimension}
       innerDivProps={{
-        className: cx(styles.slot_ui, {
+        className: cx(styles.labware_controls, {
+          [styles.can_edit]: canEdit,
           [styles.highlighted_border_div]: highlighted,
         }),
       }}

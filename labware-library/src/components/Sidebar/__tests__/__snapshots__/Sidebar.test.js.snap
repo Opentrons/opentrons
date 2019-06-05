@@ -21,5 +21,13 @@ exports[`Sidebar component renders 1`] = `
       }
     }
   />
+  <FilterReset
+    filters={
+      Object {
+        "category": "all",
+        "manufacturer": "all",
+      }
+    }
+  />
 </nav>
 `;

@@ -46,7 +46,7 @@ type Props = {
   }) => mixed,
 }
 
-const initialState = {
+const initialState: State = {
   fields: { name: '' },
   showEditPipetteConfirmation: false,
   pipettesByMount: {

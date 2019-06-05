@@ -3,6 +3,7 @@
 const path = require('path')
 const merge = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
 // const glob = require('glob')
 
 const { baseConfig } = require('@opentrons/webpack-config')
@@ -38,7 +39,25 @@ module.exports = merge(baseConfig, {
     path: OUT_PATH,
   },
 
-  plugins: pages.map(makeHtmlPlugin),
+  plugins: [
+    ...pages.map(makeHtmlPlugin),
+    new FaviconsWebpackPlugin({
+      logo: './src/images/favicon-logo.png',
+      prefix: 'icons-[hash]/',
+      inject: true,
+      background: '#fff',
+      icons: {
+        android: false,
+        appleIcon: false,
+        appleStartup: false,
+        coast: false,
+        favicons: true,
+        firefox: false,
+        windows: false,
+        yandex: false,
+      },
+    }),
+  ],
 })
 
 function makeHtmlPlugin(page) {

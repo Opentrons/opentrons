@@ -48,6 +48,7 @@ export const WELL_BOTTOM_VALUES = {
 export const MANUFACTURER = 'manufacturer'
 export const MANUFACTURER_NO = 'manufacturer / catalog #'
 export const CATEGORY = 'category'
+export const CLEAR_FILTERS = 'clear filters'
 export const FOOTPRINT = 'footprint'
 export const MEASUREMENTS = 'measurements'
 export const SPACING = 'spacing'

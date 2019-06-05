@@ -3,6 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import flatMap from 'lodash/flatMap'
 import map from 'lodash/map'
+import snakeCase from 'lodash/snakeCase'
 import {
   type DeckDefinition,
   type DeckLayer,
@@ -125,15 +126,21 @@ type DeckProps = {
 }
 export class DeckFromData extends React.PureComponent<DeckProps> {
   render() {
+    const { def, layerBlacklist } = this.props
     return (
       <g>
-        {map(this.props.def.layers, (layer: DeckLayer, layerId: string) => {
-          if (this.props.layerBlacklist.includes(layerId)) return null
+        {map(def.layers, (layer: DeckLayer, layerId: string) => {
+          if (layerBlacklist.includes(layerId)) return null
           return (
-            <g id={layerId} key={layerId} className={styles.deck_outline}>
-              {layer.map((feature: { footprint: string }, index: number) => (
-                <path d={feature.footprint} key={`${layerId}${index}`} />
-              ))}
+            <g id={layerId} key={layerId}>
+              <path
+                className={cx(
+                  styles.deck_outline,
+                  styles[def.otId],
+                  styles[snakeCase(layerId)]
+                )}
+                d={layer.map(l => l.footprint).join(' ')}
+              />
             </g>
           )
         })}

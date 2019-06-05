@@ -1,10 +1,7 @@
 // @flow
 import React, { useMemo } from 'react'
 import { DropdownField, FormGroup, type Mount } from '@opentrons/components'
-import {
-  getLabwareDefURI,
-  type LabwareDefinition2,
-} from '@opentrons/shared-data'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import isEmpty from 'lodash/isEmpty'
 import reduce from 'lodash/reduce'
 import i18n from '../../../localization'
@@ -33,7 +30,7 @@ export default function ChangePipetteFields(props: Props) {
     const allDefs = getAllDefinitions()
     return reduce(
       allDefs,
-      (acc, def: LabwareDefinition2) => {
+      (acc, def: $Values<typeof allDefs>) => {
         if (def.metadata.displayCategory !== 'tipRack') return acc
         return [
           ...acc,
@@ -114,12 +111,12 @@ export default function ChangePipetteFields(props: Props) {
       </div>
 
       <div className={styles.diagrams}>
-        <TiprackDiagram containerType={values.left.tiprackDefURI} />
+        <TiprackDiagram definitionURI={values.left.tiprackDefURI} />
         <PipetteDiagram
           leftPipette={values.left.pipetteName}
           rightPipette={values.right.pipetteName}
         />
-        <TiprackDiagram containerType={values.right.tiprackDefURI} />
+        <TiprackDiagram definitionURI={values.right.tiprackDefURI} />
       </div>
     </React.Fragment>
   )

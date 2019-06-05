@@ -1,8 +1,12 @@
 @import '@opentrons/components';
 
-.slot_ui {
+.labware_controls {
   height: 100%;
   width: 100%;
+}
+
+.labware_controls.can_edit {
+  cursor: grab;
 }
 
 .slot_overlay {
@@ -68,8 +72,13 @@
   }
 }
 
+.appear {
+  opacity: 1;
+}
+
 .drag_preview {
   position: absolute;
+  cursor: grabbing;
 }
 
 .highlighted_border_div {
