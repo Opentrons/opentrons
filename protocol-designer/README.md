@@ -28,7 +28,7 @@ It uses [shared-data](../shared-data) for data about labware and pipettes and fo
 
 ## Some important directories
 
-- `shared-data/protocol-json-schema/` - contains the [JSON schema][json-schema] definitions for all versions of Opentrons JSON Protocols
+- `shared-data/protocol/schemas/{schemaVersionNumber}.json` - contains the [JSON schema][json-schema] definitions for all versions of Opentrons JSON Protocols
 - `protocol-designer/src/step-generation/` - a set of functions for creating commands for Opentrons JSON Protocols. Designed to be agnostic of the specifics of Protocol Designer so that it can eventually be split out as its own library
 - `protocol-designer/src/steplist` - contains Redux actions, reducers, and selectors that make up the bulk of the logic for the behavior of Step Forms and the protocol Timeline.
 - `protocol-designer/src/ui` - Redux actions, reducers, and selectors that are purely concerned with UI and not with the "domain layer" of the protocol itself
