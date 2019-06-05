@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { LabwareNameOverlay, humanizeLabwareType } from '@opentrons/components'
+import { LabwareNameOverlay } from '@opentrons/components'
 import type { BaseState, ThunkDispatch } from '../../../types'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import type { LabwareOnDeck } from '../../../step-forms'
@@ -17,10 +17,7 @@ type Props = { ...OP, ...SP }
 
 const NameOverlay = (props: Props) => {
   const { labwareOnDeck, nickname } = props
-  const title =
-    nickname ||
-    labwareOnDeck.def.metadata.displayName ||
-    humanizeLabwareType(labwareOnDeck.type)
+  const title = nickname || labwareOnDeck.def.metadata.displayName
 
   return <LabwareNameOverlay title={title} />
 }

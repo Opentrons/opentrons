@@ -16,7 +16,6 @@ type Props = React.ElementProps<typeof DeckSetup>
 
 type SP = {|
   selectedTerminalItemId: ?TerminalItemId,
-  ingredSelectionMode: boolean,
   drilledDown: boolean,
   initialDeckSetup: InitialDeckSetup,
 |}
@@ -25,8 +24,6 @@ type DP = {| drillUpFromLabware: () => mixed |}
 
 const mapStateToProps = (state: BaseState): SP => ({
   selectedTerminalItemId: stepsSelectors.getSelectedTerminalItemId(state),
-  ingredSelectionMode:
-    labwareIngredSelectors.getSelectedLabwareId(state) != null,
   drilledDown: labwareIngredSelectors.getDrillDownLabwareId(state) != null,
   initialDeckSetup: stepFormSelectors.getInitialDeckSetup(state),
 })
@@ -37,7 +34,6 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
 
 const mergeProps = (stateProps: SP, dispatchProps: DP): Props => ({
   selectedTerminalItemId: stateProps.selectedTerminalItemId,
-  ingredSelectionMode: stateProps.ingredSelectionMode,
   drilledDown: stateProps.drilledDown,
   initialDeckSetup: stateProps.initialDeckSetup,
   handleClickOutside: () => {

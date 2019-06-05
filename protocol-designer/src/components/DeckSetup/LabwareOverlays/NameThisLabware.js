@@ -46,14 +46,15 @@ const NameThisLabware = (props: Props) => {
 
   return (
     <div className={cx(styles.slot_overlay, styles.with_form)} ref={wrapperRef}>
-      <input
-        className={styles.name_input}
-        onChange={handleChange}
-        onKeyUp={handleKeyUp}
-        placeholder={i18n.t('deck.overlay.name_labware.nickname_placeholder')}
-        value={inputValue}
-      />
-
+      <div className={styles.name_input_wrapper}>
+        <input
+          className={styles.name_input}
+          onChange={handleChange}
+          onKeyUp={handleKeyUp}
+          placeholder={i18n.t('deck.overlay.name_labware.nickname_placeholder')}
+          value={inputValue}
+        />
+      </div>
       <a className={styles.overlay_button} onClick={addLiquids}>
         <Icon className={styles.overlay_icon} name="water" />
         {i18n.t('deck.overlay.name_labware.add_liquids')}

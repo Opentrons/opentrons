@@ -35,9 +35,9 @@ function mergeProps(
     onClose: () => {
       dispatch(closeLabwareSelector())
     },
-    selectLabware: containerType => {
+    selectLabware: labwareDefURI => {
       if (stateProps.slot) {
-        dispatch(createContainer({ slot: stateProps.slot, containerType }))
+        dispatch(createContainer({ slot: stateProps.slot, labwareDefURI }))
       }
     },
   }

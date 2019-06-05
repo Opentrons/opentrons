@@ -4,6 +4,7 @@ import * as React from 'react'
 import LabwareGuide from './LabwareGuide'
 import FilterManufacturer from './FilterManufacturer'
 import FilterCategory from './FilterCategory'
+import FilterReset from './FilterReset'
 import styles from './styles.css'
 
 import type { FilterParams } from '../../types'
@@ -20,6 +21,7 @@ export default function Sidebar(props: SidebarProps) {
       <LabwareGuide />
       <FilterManufacturer filters={filters} />
       <FilterCategory filters={filters} />
+      <FilterReset filters={filters} />
     </nav>
   )
 }

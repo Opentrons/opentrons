@@ -39,7 +39,7 @@ export const createContainer = (args: CreateContainerArgs) => (
   const state = getState()
   const disambiguationNumber = getNextDisambiguationNumber(
     state,
-    args.containerType
+    args.labwareDefURI
   )
   const initialSetupStep = stepFormSelectors.getSavedStepForms(state)[
     INITIAL_DECK_SETUP_STEP_ID
@@ -53,7 +53,7 @@ export const createContainer = (args: CreateContainerArgs) => (
       type: 'CREATE_CONTAINER',
       payload: {
         ...args,
-        id: `${uuid()}:${args.containerType}`,
+        id: `${uuid()}:${args.labwareDefURI}`,
         disambiguationNumber,
         slot,
       },
@@ -68,12 +68,12 @@ export const duplicateLabware = (templateLabwareId: string) => (
   getState: GetState
 ) => {
   const state = getState()
-  const templateLabwareType = stepFormSelectors.getLabwareEntities(state)[
+  const templateLabwareDefURI = stepFormSelectors.getLabwareEntities(state)[
     templateLabwareId
-  ].type
+  ].labwareDefURI
   assert(
-    templateLabwareType,
-    `no type for labware ${templateLabwareId}, cannot run duplicateLabware thunk`
+    templateLabwareDefURI,
+    `no labwareDefURI for labware ${templateLabwareId}, cannot run duplicateLabware thunk`
   )
 
   const initialSetupStep = stepFormSelectors.getSavedStepForms(state)[
@@ -86,13 +86,13 @@ export const duplicateLabware = (templateLabwareId: string) => (
   if (!duplicateSlot)
     console.warn('no slots available, cannot duplicate labware')
 
-  if (templateLabwareType && duplicateSlot) {
+  if (templateLabwareDefURI && duplicateSlot) {
     dispatch({
       type: 'DUPLICATE_LABWARE',
       payload: {
         duplicateDisambiguationNumber: getNextDisambiguationNumber(
           state,
-          templateLabwareType
+          templateLabwareDefURI
         ),
         templateLabwareId,
         duplicateLabwareId: uuid(),

@@ -6,7 +6,7 @@ import type {
   DeckSlotId,
 } from '@opentrons/shared-data'
 
-export type FormPipette = { pipetteName: ?string, tiprackModel: ?string }
+export type FormPipette = { pipetteName: ?string, tiprackDefURI: ?string }
 export type FormPipettesByMount = {
   left: FormPipette,
   right: FormPipette,
@@ -20,7 +20,7 @@ export type NormalizedPipetteById = {
   [pipetteId: string]: {|
     name: string,
     id: string,
-    tiprackModel: string, // TODO: Ian 2019-04-12 change to `tiprackOtId`
+    tiprackDefURI: string,
   |},
 }
 export type NormalizedPipette = $Values<NormalizedPipetteById>
@@ -39,7 +39,7 @@ export type PipetteEntities = {
 
 export type NormalizedLabwareById = {
   [labwareId: string]: {|
-    type: string, // TODO: Ian 2019-04-12 change to `definitionOtId`
+    labwareDefURI: string,
   |},
 }
 
@@ -47,7 +47,7 @@ export type NormalizedLabware = $Values<NormalizedLabwareById>
 
 export type LabwareEntity = {|
   id: string,
-  type: string, // TODO: Ian 2019-04-12 change to `definitionOtId`
+  labwareDefURI: string,
   def: LabwareDefinition2,
 |}
 export type LabwareEntities = {

@@ -7,15 +7,18 @@ import min from 'lodash/min'
 import pick from 'lodash/pick'
 import reduce from 'lodash/reduce'
 import omitBy from 'lodash/omitBy'
+import assert from 'assert'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import * as StepGeneration from '../../step-generation'
 import { selectors as fileDataSelectors } from '../../file-data'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import { selectors as stepsSelectors } from '../../ui/steps'
 import wellSelectionSelectors from '../../well-selection/selectors'
+import { START_TERMINAL_ITEM_ID } from '../../steplist'
 import { getAllWellsForLabware, getMaxVolumes } from '../../constants'
 
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { Selector } from '../../types'
 import type {
   WellContents,
@@ -39,10 +42,6 @@ function _wellContentsForWell(
   )
 
   return {
-    highlighted: false,
-    selected: false,
-    error: false,
-    maxVolume: Infinity, // TODO Ian 2018-03-23 refactor so all these fields aren't needed
     wellName: well,
     groupIds: ingredGroupIdsWithContent, // TODO: BC 2018-09-21 remove in favor of volumeByGroupId
     ingreds: omitBy(
@@ -54,7 +53,6 @@ function _wellContentsForWell(
 
 export function _wellContentsForLabware(
   labwareLiquids: StepGeneration.SingleLabwareLiquidState,
-  labwareId: string,
   labwareDef: LabwareDefinition2
 ): ContentsByWell {
   const allWellsForContainer = getAllWellsForLabware(labwareDef)
@@ -96,7 +94,6 @@ export const getAllWellContentsForSteps: Selector<
         ) =>
           _wellContentsForLabware(
             labwareLiquids,
-            labwareId,
             labwareEntities[labwareId].def
           )
       )
@@ -116,11 +113,58 @@ export const getLastValidWellContents: Selector<WellContentsByLabware> = createS
       ) => {
         return _wellContentsForLabware(
           robotState.liquidState.labware[labwareId],
-          labwareId,
           labwareEntities[labwareId].def
         )
       }
     )
+  }
+)
+
+export const getAllWellContentsForActiveItem: Selector<WellContentsByLabware> = createSelector(
+  stepsSelectors.getActiveItem,
+  fileDataSelectors.getInitialRobotState,
+  fileDataSelectors.getRobotStateTimeline,
+  fileDataSelectors.lastValidRobotState,
+  stepFormSelectors.getLabwareEntities,
+  stepFormSelectors.getOrderedStepIds,
+  (
+    activeItem,
+    initialRobotState,
+    robotStateTimeline,
+    lastValidRobotState,
+    labwareEntities,
+    orderedStepIds
+  ) => {
+    const timeline = [
+      { robotState: initialRobotState },
+      ...robotStateTimeline.timeline,
+      { robotState: lastValidRobotState },
+    ]
+    let timelineIdx = timeline.length - 1 // default to last valid robot state
+
+    if (activeItem.isStep) {
+      timelineIdx = orderedStepIds.findIndex(id => id === activeItem.id)
+    } else if (!activeItem.isStep && activeItem.id === START_TERMINAL_ITEM_ID) {
+      timelineIdx = 0
+    }
+
+    assert(
+      timelineIdx !== -1,
+      `getAllWellContentsForActiveItem got unhandled terminal id: "${
+        activeItem.id
+      }"`
+    )
+
+    const liquidState = timeline[timelineIdx].robotState.liquidState.labware
+    const wellContentsByLabwareId = mapValues(
+      liquidState,
+      (
+        labwareLiquids: StepGeneration.SingleLabwareLiquidState,
+        labwareId: string
+      ) =>
+        _wellContentsForLabware(labwareLiquids, labwareEntities[labwareId].def)
+    )
+    return wellContentsByLabwareId
   }
 )
 

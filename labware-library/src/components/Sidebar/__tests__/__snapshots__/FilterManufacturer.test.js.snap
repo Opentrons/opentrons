@@ -5,7 +5,7 @@ exports[`FilterManufacturer component renders 1`] = `
   className="filter_manufacturer"
 >
   <p
-    className="filter_manufacturer_label"
+    className="filter_label"
   >
     manufacturer
   </p>

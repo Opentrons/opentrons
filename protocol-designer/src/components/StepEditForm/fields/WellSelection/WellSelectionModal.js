@@ -3,6 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import { connect } from 'react-redux'
 import omit from 'lodash/omit'
+
 import { Modal, OutlineButton, LabeledValue } from '@opentrons/components'
 import { sortWells } from '@opentrons/shared-data'
 

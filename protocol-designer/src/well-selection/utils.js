@@ -1,5 +1,8 @@
 // @flow
-import { getWellNamePerMultiTip } from '@opentrons/shared-data'
+import {
+  getWellNamePerMultiTip,
+  getLabwareDefURI,
+} from '@opentrons/shared-data'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 type WellSetByPrimaryWell = Array<Array<string>>
@@ -22,7 +25,7 @@ function _getAllWellSetsForLabware(
 }
 
 let cache: {
-  [otId: string]: ?{
+  [labwareDefURI: string]: ?{
     labwareDef: LabwareDefinition2,
     wellSetByPrimaryWell: WellSetByPrimaryWell,
   },
@@ -30,14 +33,15 @@ let cache: {
 const _getAllWellSetsForLabwareMemoized = (
   labwareDef: LabwareDefinition2
 ): WellSetByPrimaryWell => {
-  const c = cache[labwareDef.otId]
+  const labwareDefURI = getLabwareDefURI(labwareDef)
+  const c = cache[labwareDefURI]
   // use cached version only if labwareDef is shallowly equal, in case
-  // custom labware defs are changed without giving them a new otId
+  // custom labware defs are changed without giving them a new URI
   if (c && c.labwareDef === labwareDef) {
     return c.wellSetByPrimaryWell
   }
   const wellSetByPrimaryWell = _getAllWellSetsForLabware(labwareDef)
-  cache[labwareDef.otId] = { labwareDef, wellSetByPrimaryWell }
+  cache[labwareDefURI] = { labwareDef, wellSetByPrimaryWell }
   return wellSetByPrimaryWell
 }
 

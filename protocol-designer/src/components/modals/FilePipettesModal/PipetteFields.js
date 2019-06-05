@@ -1,26 +1,19 @@
 // @flow
-import * as React from 'react'
+import React, { useMemo } from 'react'
 import { DropdownField, FormGroup, type Mount } from '@opentrons/components'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import isEmpty from 'lodash/isEmpty'
+import reduce from 'lodash/reduce'
 import i18n from '../../../localization'
 import { pipetteOptions } from '../../../pipettes/pipetteData'
 import PipetteDiagram from './PipetteDiagram'
 import TiprackDiagram from './TiprackDiagram'
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
+import { getAllDefinitions } from '../../../labware-defs/utils'
 import type { FormPipette } from '../../../step-forms'
 
 const pipetteOptionsWithNone = [{ name: 'None', value: '' }, ...pipetteOptions]
-
-// TODO: Ian 2018-06-22 get this programatically from shared-data labware defs
-// and exclude options that are incompatible with pipette
-// and also auto-select tiprack if there's only one compatible tiprack for a pipette
-const tiprackOptions = [
-  { name: '10 μL', value: 'tiprack-10ul' },
-  { name: '200 μL', value: 'tiprack-200ul' },
-  { name: '300 μL', value: 'opentrons-tiprack-300ul' },
-  { name: '1000 μL', value: 'tiprack-1000ul' },
-]
 
 type Props = {
   initialTabIndex?: number,
@@ -31,6 +24,26 @@ type Props = {
 
 export default function ChangePipetteFields(props: Props) {
   const { values, handleChange } = props
+
+  const tiprackOptions = useMemo(() => {
+    // TODO: Ian 2019-06-04 only show latest versions of labware here (#3525)
+    const allDefs = getAllDefinitions()
+    return reduce(
+      allDefs,
+      (acc, def: $Values<typeof allDefs>) => {
+        if (def.metadata.displayCategory !== 'tipRack') return acc
+        return [
+          ...acc,
+          {
+            name: def.metadata.displayName,
+            value: getLabwareDefURI(def),
+          },
+        ]
+      },
+      []
+    )
+  }, [])
+
   const initialTabIndex = props.initialTabIndex || 1
   return (
     <React.Fragment>
@@ -59,8 +72,8 @@ export default function ChangePipetteFields(props: Props) {
               tabIndex={initialTabIndex + 2}
               disabled={isEmpty(values.left.pipetteName)}
               options={tiprackOptions}
-              value={values.left.tiprackModel}
-              name="left.tiprackModel"
+              value={values.left.tiprackDefURI}
+              name="left.tiprackDefURI"
               onChange={handleChange}
             />
           </FormGroup>
@@ -89,8 +102,8 @@ export default function ChangePipetteFields(props: Props) {
               tabIndex={initialTabIndex + 4}
               disabled={isEmpty(values.right.pipetteName)}
               options={tiprackOptions}
-              value={values.right.tiprackModel}
-              name="right.tiprackModel"
+              value={values.right.tiprackDefURI}
+              name="right.tiprackDefURI"
               onChange={handleChange}
             />
           </FormGroup>
@@ -98,12 +111,12 @@ export default function ChangePipetteFields(props: Props) {
       </div>
 
       <div className={styles.diagrams}>
-        <TiprackDiagram containerType={values.left.tiprackModel} />
+        <TiprackDiagram definitionURI={values.left.tiprackDefURI} />
         <PipetteDiagram
           leftPipette={values.left.pipetteName}
           rightPipette={values.right.pipetteName}
         />
-        <TiprackDiagram containerType={values.right.tiprackModel} />
+        <TiprackDiagram definitionURI={values.right.tiprackDefURI} />
       </div>
     </React.Fragment>
   )
