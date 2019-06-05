@@ -3,6 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import Overlay from './Overlay'
 import styles from './modals.css'
+import { RemoveScroll } from 'react-remove-scroll'
 
 type ModalProps = {
   /** handler to close the modal (attached to `Overlay` onClick) */
@@ -33,19 +34,21 @@ export default function Modal(props: ModalProps) {
     innerRef,
   } = props
   return (
-    <div
-      className={cx(styles.modal, props.className, {
-        [styles.alert_modal]: alertOverlay,
-      })}
-    >
-      <Overlay onClick={onCloseClick} alertOverlay={alertOverlay} />
+    <RemoveScroll>
       <div
-        ref={innerRef}
-        className={cx(styles.modal_contents, contentsClassName)}
+        className={cx(styles.modal, props.className, {
+          [styles.alert_modal]: alertOverlay,
+        })}
       >
-        {heading && <h3 className={styles.modal_heading}>{heading}</h3>}
-        {props.children}
+        <Overlay onClick={onCloseClick} alertOverlay={alertOverlay} />
+        <div
+          ref={innerRef}
+          className={cx(styles.modal_contents, contentsClassName)}
+        >
+          {heading && <h3 className={styles.modal_heading}>{heading}</h3>}
+          {props.children}
+        </div>
       </div>
-    </div>
+    </RemoveScroll>
   )
 }
