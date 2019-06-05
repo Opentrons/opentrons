@@ -30,6 +30,8 @@ class Container:
             Instrument(instrument)
             for instrument in instruments]
 
+        self.is_legacy = not container.properties.get('labware_hash')
+
 
 class Instrument:
     def __init__(self, instrument, containers=None, context=None):

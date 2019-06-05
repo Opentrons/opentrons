@@ -44,7 +44,7 @@ export default function LabwareItem(props: LabwareItemProps) {
   } = labware
 
   const labwareClass = cx({ [styles.disabled]: disabled })
-
+  // const v2LabwareDef = getLabwareDefinition(loadName, namespace, version)
   const item = (
     <LabwareWrapper width={width} height={height} highlighted={highlighted}>
       <g className={labwareClass}>
