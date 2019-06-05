@@ -6,7 +6,7 @@ log = logging.getLogger(__name__)
 
 # Number of digits after the decimal point for temperatures being sent
 # to/from Temp-Deck
-GCODE_ROUNDING_PRECISION = 0
+GCODE_ROUNDING_PRECISION = 2
 
 
 class ParseError(Exception):

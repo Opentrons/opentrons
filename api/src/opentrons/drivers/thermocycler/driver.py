@@ -41,7 +41,7 @@ def _build_temp_code(temp, hold_time=None):
     cmd = '{} S{}'.format(GCODES['SET_PLATE_TEMP'], temp)
     if hold_time:
         cmd += ' H{}'.format(hold_time)
-    return cmd
+    return cmd, temp
 
 
 TC_BAUDRATE = 115200
@@ -52,7 +52,7 @@ SERIAL_ACK = '\r\n'
 TC_COMMAND_TERMINATOR = SERIAL_ACK
 TC_ACK = 'ok' + SERIAL_ACK + 'ok' + SERIAL_ACK
 ERROR_KEYWORD = 'error'
-DEFAULT_TC_TIMEOUT = 5
+DEFAULT_TC_TIMEOUT = 10
 DEFAULT_COMMAND_RETRIES = 3
 DEFAULT_STABILIZE_DELAY = 0.1
 POLLING_FREQUENCY_MS = 1000
@@ -275,9 +275,14 @@ class Thermocycler:
         if ramp_rate:
             ramp_cmd = '{} S{}'.format(GCODES['SET_RAMP_RATE'], ramp_rate)
             await self._write_and_wait(ramp_cmd)
-        temp_cmd = _build_temp_code(temp, hold_time)
+        temp_cmd, temp = _build_temp_code(temp, hold_time)
         await self._write_and_wait(temp_cmd)
-        await asyncio.sleep(1.1)    # Wait for the poller to update
+        tries = 0
+        while (self._target_temp != temp) or (self._hold_time != hold_time):
+            await asyncio.sleep(0.1)    # Wait for the poller to update
+            tries += 1
+            if tries > 15:
+                break
 
     async def set_lid_temperature(self, temp: Optional[float]) -> None:
         if temp is None:
