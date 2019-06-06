@@ -2,13 +2,11 @@ import itertools
 
 import pytest
 
-from opentrons.api import Session
 from opentrons.api.session import (
     _accumulate, _get_labware, _dedupe, extract_metadata)
 from tests.opentrons.conftest import state
 from opentrons.legacy_api.robot.robot import Robot
 from functools import partial
-from opentrons.broker import Broker
 
 state = partial(state, 'session')
 

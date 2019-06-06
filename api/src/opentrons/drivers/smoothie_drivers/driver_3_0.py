@@ -924,7 +924,6 @@ class SmoothieDriver_3_0_0:
             # be) rare so it's probably fine, but the actual solution to this
             # is locking at a higher level like in APIv2.
             self._reset_from_error()
-            log.exception(f"Smoothie error from command {command}")
             error_axis = se.ret_code.strip()[-1]
             if GCODES['HOME'] not in command and error_axis in 'XYZABC':
                 log.warning(

@@ -3,6 +3,7 @@
 import asyncio
 import logging
 import threading
+import time
 import traceback
 
 from typing import TYPE_CHECKING
@@ -60,10 +61,18 @@ class ThreadedAsyncLock:
         self._thread_lock = threading.RLock()
 
     async def __aenter__(self):
+        pref = f"[ThreadedAsyncLock tid {threading.get_ident()} "\
+            f"task {asyncio.Task.current_task()}] "
+        log.debug(pref + 'will acquire')
+        then = time.clock()
         while not self._thread_lock.acquire(blocking=False):
             await asyncio.sleep(0.1)
+        now = time.clock()
+        log.debug(pref + f'acquired in {now-then}s')
 
     async def __aexit__(self, exc_type, exc, tb):
+        log.debug(f"[ThreadedAsyncLock tid {threading.get_ident()} "
+                  f"task {asyncio.Task.current_task()}] will release")
         self._thread_lock.release()
 
     def __enter__(self):

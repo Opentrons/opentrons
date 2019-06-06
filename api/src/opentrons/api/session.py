@@ -317,8 +317,8 @@ class Session(object):
         self.set_state('running')
         return self
 
-    @_motion_lock
-    def _run(self):  # noqa(C901)
+    @_motion_lock  # noqa(C901)
+    def _run(self):
         def on_command(message):
             if message['$'] == 'before':
                 self.log_append()
