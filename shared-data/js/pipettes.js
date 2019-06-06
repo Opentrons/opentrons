@@ -1,7 +1,7 @@
 // @flow
 import reduce from 'lodash/reduce'
-import pipetteNameSpecs from '../robot-data/pipetteNameSpecs.json'
-import pipetteModelSpecs from '../robot-data/pipetteModelSpecs.json'
+import pipetteNameSpecs from '../pipette/definitions/pipetteNameSpecs.json'
+import pipetteModelSpecs from '../pipette/definitions/pipetteModelSpecs.json'
 
 export type PipetteChannels = 1 | 8
 

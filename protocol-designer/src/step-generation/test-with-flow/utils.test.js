@@ -3,7 +3,7 @@ import { getLabwareDefURI } from '@opentrons/shared-data'
 import {
   fixtureP10Single,
   fixtureP300Multi,
-} from '@opentrons/shared-data/fixtures'
+} from '@opentrons/shared-data/pipette/fixtures/name'
 
 import fixtureTrash from '@opentrons/shared-data/labware/fixtures/2/fixtureTrash.json'
 import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture96Plate.json'

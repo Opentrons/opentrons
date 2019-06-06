@@ -1,13 +1,11 @@
 import path from 'path'
 import glob from 'glob'
 import Ajv from 'ajv'
-import schema from '../../labware-json-schema/labwareSchemaV2.json'
-import exampleLabware1 from '../../labware/fixtures/2/labwareExample1.json'
-import exampleLabware2 from '../../labware/fixtures/2/labwareExample2.json'
+import schema from '../schema'
 
 const definitionsGlobPath = path.join(
   __dirname,
-  '../../labware/definitions/2/**/*.json'
+  '../../labware/definitions/1/*.json'
 )
 
 // JSON Schema defintion & setup
@@ -20,15 +18,31 @@ const ajv = new Ajv({
 const validate = ajv.compile(schema)
 
 describe('test the schema against a minimalist fixture', () => {
-  test('validate example definitions with schema', () => {
-    const valid1 = validate(exampleLabware1)
-    const validationErrors1 = validate.errors
-    expect(validationErrors1).toBe(null)
-    expect(valid1).toBe(true)
-    const valid2 = validate(exampleLabware2)
-    const validationErrors2 = validate.errors
-    expect(validationErrors2).toBe(null)
-    expect(valid2).toBe(true)
+  test('...', () => {
+    const minimalLabwareDef = {
+      metadata: {
+        name: 'test-labware',
+        format: 'trough',
+      },
+      ordering: [['A1']],
+      wells: {
+        A1: {
+          depth: 40,
+          height: 40,
+          length: 70,
+          'total-liquid-volume': 22000,
+          width: 7,
+          x: 10.84,
+          y: 7.75,
+          z: 0,
+        },
+      },
+    }
+    const valid = validate(minimalLabwareDef)
+    const validationErrors = validate.errors
+
+    expect(validationErrors).toBe(null)
+    expect(valid).toBe(true)
   })
 
   test('fail on bad labware', () => {
@@ -49,15 +63,16 @@ describe('test the schema against a minimalist fixture', () => {
   })
 })
 
-describe('test schemas of all opentrons definitions', () => {
+describe('test schemas of all definitions', () => {
   const labwarePaths = glob.sync(definitionsGlobPath)
-  beforeAll(() => {
+
+  test('got at least 1 labware definition file', () => {
     // Make sure definitions path didn't break, which would give you false positives
     expect(labwarePaths.length).toBeGreaterThan(0)
   })
 
   labwarePaths.forEach(labwarePath => {
-    const filename = path.parse(labwarePath).base
+    const filename = path.parse(labwarePath).name
     const labwareDef = require(labwarePath)
     test(filename, () => {
       const valid = validate(labwareDef)
@@ -66,11 +81,8 @@ describe('test schemas of all opentrons definitions', () => {
       expect(validationErrors).toBe(null)
       expect(valid).toBe(true)
     })
-    test(`file name matches version: ${labwarePath}`, () => {
-      expect(`${labwareDef.version}.json`).toEqual(filename)
-    })
-    test(`namespace is "opentrons": ${labwarePath}`, () => {
-      expect(labwareDef.namespace).toEqual('opentrons')
+    test(`file name matches metadata.name: ${filename}`, () => {
+      expect(labwareDef.metadata.name).toEqual(filename)
     })
   })
 })

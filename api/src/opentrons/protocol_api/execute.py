@@ -169,7 +169,7 @@ def validate_protocol(protocol_json: Dict[Any, Any]):
     labware_schema_v2 = json.loads(  # type: ignore
         pkgutil.get_data(
             'opentrons',
-            'shared_data/labware-json-schema/labwareSchemaV2.json'))
+            'shared_data/labware/schemas/2.json'))
 
     resolver = jsonschema.RefResolver(
         protocol_schema.get('$id', ''),
