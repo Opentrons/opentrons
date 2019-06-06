@@ -35,7 +35,7 @@ dev:
 
 .PHONY: clean
 clean:
-	shx rm -rf \
+	$(SHX) rm -rf \
 		build \
 		dist \
 		.coverage \
@@ -60,8 +60,8 @@ lint:
 .PHONY: wheel
 wheel: clean
 	$(python) setup.py bdist_wheel
-	shx rm -rf build
-	shx ls dist
+	$(SHX) rm -rf build
+	$(SHX) ls dist
 
 .PHONY: bootstrap
 bootstrap: wheel
