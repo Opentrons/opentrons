@@ -14,6 +14,7 @@ from numpy import dot, array
 import opentrons
 from opentrons import robot, instruments, types
 from opentrons.hardware_control import adapters
+from opentrons.hardware_control.types import CriticalPoint
 from opentrons.config import (robot_configs, feature_flags,
                               SystemArchitecture, ARCHITECTURE)
 from opentrons.util.calibration_functions import probe_instrument
@@ -120,7 +121,8 @@ class CLITool:
             '-': lambda: self.decrease_step(),
             '=': lambda: self.increase_step(),
             'z': lambda: self.save_z_value(),
-            'p': lambda: probe(self._tip_length, self.hardware),
+            'p': lambda: probe(
+                self._tip_length, self.hardware, self._current_mount),
             'enter': lambda: self.save_point(),
             '\\': lambda: self.home(),
             ' ': lambda: self.save_transform(),
@@ -243,8 +245,12 @@ class CLITool:
         Read position from driver into a tuple and map 3-rd value
         to the axis of a pipette currently used
         """
-
-        return position(self._current_mount, self.hardware)
+        if not feature_flags.use_protocol_api_v2():
+            res = position(self._current_mount, self.hardware)
+        else:
+            res = position(
+                self._current_mount, self.hardware, CriticalPoint.TIP)
+        return res
 
     def _jog(self, axis, direction, step):
         """
@@ -290,11 +296,16 @@ class CLITool:
         log.debug("save_mount_offset position: {}".format(pos))
         cx, cy, cz = self._driver_to_deck_coords(pos)
         log.debug("save_mount_offset cxyz: {}".format((cx, cy, cz)))
-        ex, ey, ez = apply_mount_offset(
-            self._expected_points[1], self.hardware)
-        log.debug("save_mount_offset exyz: {}".format((ex, ey, ez)))
-        dx, dy, dz = (cx - ex, cy - ey, cz - ez)
+
+        if not feature_flags.use_protocol_api_v2():
+            ex, ey, ez = apply_mount_offset(
+                self._expected_points[1], self.hardware)
+            log.debug("save_mount_offset exyz: {}".format((ex, ey, ez)))
+            dx, dy, dz = (cx - ex, cy - ey, cz - ez)
+        else:
+            dx, dy, dz = (cx, cy, cz)
         log.debug("save_mount_offset dxyz: {}".format((dx, dy, dz)))
+
         mx, my, mz = self.hardware.config.mount_offset
         log.debug("save_mount_offset mxyz: {}".format((mx, my, mz)))
         offset = (mx - dx, my - dy, mz - dz)
@@ -335,8 +346,11 @@ class CLITool:
 
     def save_z_value(self) -> str:
         actual_z = self._position()[-1]
-        expected_z = self.identity_transform[2][3] + self._tip_length
-        new_z = self.identity_transform[2][3] + actual_z - expected_z
+        if not feature_flags.use_protocol_api_v2():
+            expected_z = self.identity_transform[2][3] + self._tip_length
+            new_z = self.identity_transform[2][3] + actual_z - expected_z
+        else:
+            new_z = actual_z
         log.debug("Saving z value: {}".format(new_z))
         self.identity_transform[2][3] = new_z
         return 'saved Z-Offset: {}'.format(new_z)
@@ -390,8 +404,10 @@ class CLITool:
             self.hardware._driver.move({'X': tx, 'Y': ty})
             self.hardware._driver.move({self._current_mount: tz})
         else:
-            pt = types.Point(x=tx, y=ty, z=tz)
-            self.hardware.move_to(self._current_mount, pt)
+            pt1 = types.Point(x=tx, y=ty, z=SAFE_HEIGHT)
+            pt2 = types.Point(x=tx, y=ty, z=tz)
+            self.hardware.move_to(self._current_mount, pt1)
+            self.hardware.move_to(self._current_mount, pt2)
         return 'moved to point {}'.format(point)
 
     def move_to_safe_height(self):
@@ -439,7 +455,7 @@ class CLITool:
 
 
 # Functions for backing key-press
-def probe(tip_length: float, hardware) -> str:
+def probe(tip_length: float, hardware, mount) -> str:
     if not feature_flags.use_protocol_api_v2():
         hardware.reset()
         pipette = instruments.P300_Single(mount='right')   # type: ignore
@@ -447,7 +463,7 @@ def probe(tip_length: float, hardware) -> str:
             pipette, robot, tip_length=tip_length))
         log.debug("Setting probe center to {}".format(probe_center))
     else:
-        probe_center = hardware.locate_tip_probe_center(tip_length)
+        probe_center = hardware.locate_tip_probe_center(mount, tip_length)
     hardware.update_config(
         tip_probe=hardware.config.tip_probe._replace(center=probe_center))
     return 'Tip probe'

@@ -1,6 +1,7 @@
 import asyncio
 import os
 import logging
+import pdb
 from functools import lru_cache
 from typing import Dict, Any
 
@@ -1070,6 +1071,7 @@ class Robot(CommandPublisher):
         of the configuration.
         """
         self.config = self.config._replace(**kwargs)
+        pdb.set_trace()
 
     async def update_firmware(self,
                               filename,

@@ -6,6 +6,7 @@ from opentrons import deck_calibration as dc
 from opentrons.deck_calibration import endpoints
 from opentrons.trackers.pose_tracker import absolute
 from opentrons.config.pipette_config import Y_OFFSET_MULTI
+from opentrons.config.robot_configs import robot_config
 from opentrons.hardware_control.types import CriticalPoint
 
 # Note that several values in this file have target/expected values that do not
@@ -183,8 +184,8 @@ async def test_transform_from_moves(async_server, async_client, monkeypatch):
     # This transform represents a 5 degree rotation, with a shift in x, y, & z.
     # Values for the points and expected transform come from a hand-crafted
     # transformation matrix and the points that would generate that matrix.
-    cos_5deg_p = 0.99619469809
-    sin_5deg_p = 0.08715574274
+    cos_5deg_p = 0.9962
+    sin_5deg_p = 0.0872
     sin_5deg_n = -sin_5deg_p
     const_zero = 0.0
     const_one_ = 1.0
@@ -354,8 +355,8 @@ async def test_transform_from_moves_v2(
     # This transform represents a 5 degree rotation, with a shift in x, y, & z.
     # Values for the points and expected transform come from a hand-crafted
     # transformation matrix and the points that would generate that matrix.
-    cos_5deg_p = 0.99619469809
-    sin_5deg_p = 0.08715574274
+    cos_5deg_p = 0.9962
+    sin_5deg_p = 0.0872
     sin_5deg_n = -sin_5deg_p
     const_zero = 0.0
     const_one_ = 1.0
@@ -369,5 +370,4 @@ async def test_transform_from_moves_v2(
         [const_zero, const_zero, const_zero, const_one_]]
 
     actual_transform = hardware.config.gantry_calibration
-
     assert np.allclose(actual_transform, expected_transform)

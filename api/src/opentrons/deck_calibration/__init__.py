@@ -17,6 +17,7 @@ z_pos = (170.5, 129.0, 5.0)
 
 identity_transform = np.identity(4)
 
+
 def dots_set():
     """
 

@@ -5,6 +5,7 @@ import numpy as np
 from opentrons.config import (CONFIG,
                               robot_configs,
                               advanced_settings as advs)
+from opentrons.types import Mount
 from opentrons.deck_calibration import dc_main
 from opentrons.deck_calibration.dc_main import get_calibration_points
 from opentrons.deck_calibration.endpoints import expected_points
@@ -108,8 +109,13 @@ def test_move_output(mock_config, loop, async_server, monkeypatch):
 def test_tip_probe(mock_config, async_server):
     # Test that tip probe returns successfully
     hardware = async_server['com.opentrons.hardware']
+    version = async_server['api_version']
     tip_length = 51.7  # p300/p50 tip length
-    output = dc_main.probe(tip_length, hardware)
+    if version == 2:
+        mount = Mount.RIGHT
+    else:
+        mount = 'right'
+    output = dc_main.probe(tip_length, hardware, mount)
     assert output == 'Tip probe'
 
 
@@ -176,6 +182,6 @@ def test_gantry_matrix_output(mock_config, loop, async_server, monkeypatch):
     assert tool.actual_points == actual_points
 
     tool.save_transform()
-    assert np.allclose(expected, tool.calibration_matrix)
+    assert np.allclose(expected, tool.identity_transform)
 
     hardware.reset()

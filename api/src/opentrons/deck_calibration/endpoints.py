@@ -468,12 +468,12 @@ async def save_z(data):
             length_offset = pipette_config.load(
                 session.current_model, session.pipette_id).model_offset[-1]
             session.z_value = actual_z - session.tip_length + length_offset
-
         else:
             session.z_value = position(
                 session.current_mount, session.adapter, session.cp)[-1]
 
         session.identity_transform[2][3] = session.z_value
+
         session.adapter.update_config(gantry_calibration=list(
                 map(lambda i: list(i), session.identity_transform)))
 
@@ -505,11 +505,14 @@ async def save_transform(data):
         actual = [session.points[p] for p in sorted(session.points.keys())]
 
         # Generate a 2 dimensional transform matrix from the two matricies
-        flat_matrix = solve(expected, actual)
+        flat_matrix = solve(expected, actual).round(4)
 
-        # replace relevant X and Y components
-        session.identity_transform[0][3] = flat_matrix[0][2]
-        session.identity_transform[1][3] = flat_matrix[1][2]
+        # replace relevant X, Y and angular components
+        # [[cos_x, sin_y, const_zero, delta_x___],
+        # [-sin_x, cos_y, const_zero, delta_y___],
+        # [const_zero, const_zero, const_one_, delta_z___],
+        # [const_zero, const_zero, const_zero, const_one_]]
+        session.identity_transform = add_z(flat_matrix, session.z_value)
 
         session.adapter.update_config(gantry_calibration=list(
                 map(lambda i: list(i), session.identity_transform)))

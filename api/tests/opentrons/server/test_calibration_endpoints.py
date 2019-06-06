@@ -219,8 +219,8 @@ async def test_transform_calculation(dc_session):
     # Values for the points and expected transform come from a hand-crafted
     # transformation matrix and the points that would generate that matrix.
     hardware = dc_session.adapter
-    cos_5deg_p = 0.99619469809
-    sin_5deg_p = 0.08715574274
+    cos_5deg_p = 0.9962
+    sin_5deg_p = 0.0872
     sin_5deg_n = -sin_5deg_p
     const_zero = 0.0
     const_one_ = 1.0
