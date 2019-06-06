@@ -2,7 +2,11 @@
 import * as React from 'react'
 import cx from 'classnames'
 import uniq from 'lodash/uniq'
-import { getWellDefsForSVG, wellIsRect } from '@opentrons/shared-data'
+import {
+  getLabwareV1Def,
+  getWellPropsForSVGLabwareV1,
+  wellIsRect,
+} from '@opentrons/shared-data'
 import { wellNameSplit } from '../utils'
 import styles from './LabwareLabels.css'
 
@@ -12,12 +16,12 @@ const COLUMN_OFFSET = -4
 
 export default function LabwareLabels(props: Props) {
   const { labwareType } = props
-  const allWells = getWellDefsForSVG(labwareType)
-
-  if (!allWells) {
+  const labwareDef = getLabwareV1Def(labwareType)
+  if (!labwareDef) {
     console.warn(`Could not get wells for labware type ${labwareType}`)
     return null
   }
+  const allWells = getWellPropsForSVGLabwareV1(labwareDef)
   const allWellNames = Object.keys(allWells)
   const allWellsSplit = allWellNames.map(wellNameSplit)
 

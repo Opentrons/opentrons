@@ -1,9 +1,10 @@
 // @flow
 import * as React from 'react'
 import {
-  getLabware,
-  getWellDefsForSVG,
-  getIsTiprackDeprecated,
+  getLabwareV1Def,
+  getWellPropsForSVGLabwareV1,
+  getIsV1LabwareTiprack,
+  type LabwareDefinition1,
 } from '@opentrons/shared-data'
 
 import LabwareOutline from './LabwareOutline'
@@ -32,18 +33,8 @@ export type Props = {
 }
 
 // TODO: Ian 2018-06-27 this fn is called a zillion times, optimize it later
-function getLabwareMetadata(labwareType: string) {
-  const labwareDefinition = getLabware(labwareType)
-
-  if (!labwareDefinition) {
-    console.warn(
-      `No labware type "${labwareType}" in labware definitions, cannot render labware`
-    )
-    return {}
-  }
-
-  const tipVolume =
-    labwareDefinition.metadata && labwareDefinition.metadata.tipVolume
+function getLabwareV1Metadata(def: LabwareDefinition1) {
+  const tipVolume = def?.metadata?.tipVolume || null
   return { tipVolume }
 }
 
@@ -53,9 +44,17 @@ function createWell(
   getTipProps?: $PropertyType<Props, 'getTipProps'>,
   getWellProps?: $PropertyType<Props, 'getWellProps'>
 ): React.Node {
-  const { tipVolume } = getLabwareMetadata(labwareType)
-  const isTiprack = getIsTiprackDeprecated(labwareType)
-  const allWells = getWellDefsForSVG(labwareType)
+  const labwareDefinition = getLabwareV1Def(labwareType)
+  if (!labwareDefinition) {
+    console.warn(
+      `No labware type "${labwareType}" in labware definitions, cannot render labware`
+    )
+    return null
+  }
+
+  const { tipVolume } = getLabwareV1Metadata(labwareDefinition)
+  const isTiprack = getIsV1LabwareTiprack(labwareDefinition)
+  const allWells = getWellPropsForSVGLabwareV1(labwareDefinition)
   const wellDef = allWells && allWells[wellName]
 
   if (!wellDef) {
@@ -102,13 +101,13 @@ function createWell(
 class Labware extends React.Component<Props> {
   render() {
     const { labwareType, getTipProps, getWellProps } = this.props
-
-    if (!getLabware(labwareType)) {
+    const labwareDef = getLabwareV1Def(labwareType)
+    if (!labwareDef) {
       return <FallbackLabware />
     }
 
-    const allWellNames = Object.keys(getWellDefsForSVG(labwareType))
-    const isTiprack = getIsTiprackDeprecated(labwareType)
+    const allWellNames = Object.keys(getWellPropsForSVGLabwareV1(labwareDef))
+    const isTiprack = getIsV1LabwareTiprack(labwareDef)
     const wells = allWellNames.map(wellName =>
       createWell(wellName, labwareType, getTipProps, getWellProps)
     )
