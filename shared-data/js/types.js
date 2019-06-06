@@ -30,10 +30,6 @@ export type LabwareDefinition1 = {
   },
 }
 
-export type AllLabwareDefinitions = {
-  // TODO IMMEDIATELY: rename with "v1"
-  [name: string]: LabwareDefinition1,
-}
 // TODO(mc, 2019-05-29): Remove this enum in favor of string + exported
 // constants + unit tests to catch typos in our definitions. Make changes
 // here and in shared-data/labware/schemas/2.json
