@@ -6,8 +6,6 @@ import { createRegularLabware } from '../index.js'
 import exampleLabware1 from '../../../labware/fixtures/2/labwareExample1.json'
 import exampleLabware2 from '../../../labware/fixtures/2/labwareExample2.json'
 
-jest.mock('../assignId', () => jest.fn(() => 'mock-id'))
-
 describe('createLabware', () => {
   let labware1
   let labware2
@@ -50,11 +48,6 @@ describe('createLabware', () => {
   test('snapshot tests', () => {
     expect(labware1).toEqual(exampleLabware1)
     expect(labware2).toEqual(exampleLabware2)
-  })
-
-  test('id is from assignId', () => {
-    expect(labware1.otId).toBe('mock-id')
-    expect(labware2.otId).toBe('mock-id')
   })
 
   test('ordering generates as expected', () => {

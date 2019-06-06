@@ -1,5 +1,6 @@
 // @flow
 import assert from 'assert'
+import { getLabwareDefURI } from '../getLabware'
 import type { LabwareDefinition2 } from '../types'
 export { canPipetteUseLabware } from './canPipetteUseLabware'
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
@@ -16,9 +17,9 @@ export const getLabwareFormat = (labwareDef: LabwareDefinition2) =>
 export const getTiprackVolume = (labwareDef: LabwareDefinition2): number => {
   assert(
     labwareDef.parameters.isTiprack,
-    `getTiprackVolume expected a tiprack labware ${
-      labwareDef.otId
-    }, but 'isTiprack' isn't true`
+    `getTiprackVolume expected a tiprack labware ${getLabwareDefURI(
+      labwareDef
+    )}, but 'isTiprack' isn't true`
   )
   // NOTE: Ian 2019-04-16 assuming all tips are the same volume across the rack
   const volume = labwareDef.wells['A1'].totalLiquidVolume

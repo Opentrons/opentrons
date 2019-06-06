@@ -800,7 +800,6 @@ Object {
             "H12",
           ],
         ],
-        "otId": "fixture96Plate",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -1934,7 +1933,6 @@ Object {
             "H12",
           ],
         ],
-        "otId": "fixture96Plate",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -3067,7 +3065,6 @@ Object {
             "H12",
           ],
         ],
-        "otId": "fixtureTipRack300Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -4202,7 +4199,6 @@ Object {
             "H12",
           ],
         ],
-        "otId": "fixtureTipRack300Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -5337,7 +5333,6 @@ Object {
             "H12",
           ],
         ],
-        "otId": "fixtureTipRack300Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -6257,7 +6252,6 @@ Object {
             "A1",
           ],
         ],
-        "otId": "fixtureTrash",
         "parameters": Object {
           "format": "trash",
           "isMagneticModuleCompatible": false,
@@ -6369,7 +6363,6 @@ Object {
             "A12",
           ],
         ],
-        "otId": "fixture12Trough",
         "parameters": Object {
           "format": "trough",
           "isMagneticModuleCompatible": false,
@@ -6780,7 +6773,6 @@ Object {
             "H12",
           ],
         ],
-        "otId": "fixtureTipRack10Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -7930,7 +7922,6 @@ Object {
             "H12",
           ],
         ],
-        "otId": "fixtureTipRack10Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -9082,7 +9073,6 @@ Object {
             "H12",
           ],
         ],
-        "otId": "fixtureTipRack300Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -10234,7 +10224,6 @@ Object {
             "H12",
           ],
         ],
-        "otId": "fixtureTipRack300Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,

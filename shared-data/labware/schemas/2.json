@@ -52,7 +52,6 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "otId",
     "schemaVersion",
     "version",
     "namespace",
@@ -66,10 +65,6 @@
     "groups"
   ],
   "properties": {
-    "otId": {
-      "description": "Unique internal ID generated using UUID",
-      "type": "string"
-    },
     "schemaVersion": {
       "description": "Which schema version a labware is using",
       "type": "number",

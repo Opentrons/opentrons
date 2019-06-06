@@ -12,8 +12,6 @@ import { splitWellsOnColumn, sortWells } from '../../helpers/index.js'
 
 import exampleLabware1 from '../../../labware/fixtures/2/irregularLabwareExample1.json'
 
-jest.mock('../assignId', () => jest.fn(() => 'mock-id'))
-
 describe('test helper functions', () => {
   test('cornerOffsetFromSlot outputs correctly', () => {
     // If smaller than slot, positive values

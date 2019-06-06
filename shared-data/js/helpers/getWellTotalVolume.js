@@ -8,8 +8,9 @@ const getWellTotalVolume = (
   const well = labwareDef.wells[wellName]
   if (!well) {
     console.warn(
-      `No well "${wellName}" found for labware "${labwareDef &&
-        labwareDef.otId}"`
+      `No well "${wellName}" found for labware ${labwareDef?.namespace}/${
+        labwareDef?.parameters?.loadName
+      }/${labwareDef?.version}"`
     )
     return null
   }
