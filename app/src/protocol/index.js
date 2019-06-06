@@ -108,6 +108,7 @@ type CreatorAppSelector = OutputSelector<
 >
 
 const getName: StringGetter = getter('metadata.protocol-name')
+const getV3Name: StringGetter = getter('metadata.protocolName')
 const getAuthor: StringGetter = getter('metadata.author')
 const getDesc: StringGetter = getter('metadata.description')
 const getCreated: NumberGetter = getter('metadata.created')
@@ -136,7 +137,8 @@ export const getProtocolLastModified: NumberSelector = createSelector(
 export const getProtocolName: StringSelector = createSelector(
   getProtocolFilename,
   getProtocolData,
-  (name, data) => getName(data) || (name && stripDirAndExtension(name))
+  (name, data) =>
+    getName(data) || getV3Name(data) || (name && stripDirAndExtension(name))
 )
 
 export const getProtocolAuthor: StringSelector = createSelector(
