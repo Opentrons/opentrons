@@ -1,8 +1,12 @@
 // @flow
 import React, { useMemo } from 'react'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router'
+import some from 'lodash/some'
+import map from 'lodash/map'
+import { type DeckSlotId } from '@opentrons/shared-data'
 
-import { RobotWorkSpace, LabwareOnDeck } from '@opentrons/components'
+import { RobotWorkSpace, LabwareRender } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import {
   selectors as robotSelectors,
@@ -13,11 +17,17 @@ import {
 import LabwareItem from './LabwareItem'
 
 // import styles from './styles.css'
+type DeckSlotSessionItem =
+  | $PropertyType<LabwareItemProps, 'labware'>
+  | SessionModule
+
+type OP = {| ...ContextRouter |}
 
 type SP = {|
-  _calibrator: Mount | null,
-  _labware: $PropertyType<LabwareItemProps, 'labware'> | null,
-  module: SessionModule | null,
+  calibrator: Mount | null,
+  itemsBySlot: { [DeckSlotId]: Array<DeckSlotSessionItem> },
+  selectedSlot: DeckSlotId,
+  areTipracksConfirmed: boolean,
 |}
 
 type DP = {| dispatch: Dispatch |}
@@ -37,7 +47,7 @@ const deckSetupLayerBlacklist = [
   'screwHoles',
 ]
 
-function DeckMap() {
+function DeckMap(props: Props) {
   const deckDef = useMemo(() => getDeckDefinitions()['ot2_standard'], [])
   //  <Deck LabwareComponent={ConnectedSlotItem} className={styles.deck} />
   return (
@@ -46,18 +56,25 @@ function DeckMap() {
       deckDef={deckDef}
       viewBox={`-46 -70 ${488} ${514}`} // TODO: put these in variables
     >
-      {({ slots, getRobotCoordsFromDOMCoords }) => (
-        <>
-          {map(containedLabware, labwareOnDeck => (
-            <LabwareOnDeck
-              key={labwareOnDeck.id}
-              x={slots[labwareOnDeck.slot].position[0]}
-              y={slots[labwareOnDeck.slot].position[1]}
-              labwareOnDeck={labwareOnDeck}
-            />
-          ))}
-        </>
-      )}
+      {({ slots }) =>
+        map(slots, (slot: $Values<typeof slots>, slotId) => {
+          if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render labware or overlays
+          const itemsInSlot = props.itemsBySlot[slot]
+          if (some()) {
+            return (
+              <React.Fragment key={slot.id}>
+                {map(itemsInSlot, slotItem => (
+                  <DeckSlotItem
+                    item={slotItem}
+                    x={slots[labwareOnDeck.slot].position[0]}
+                    y={slots[labwareOnDeck.slot].position[1]}
+                  />
+                ))}
+              </React.Fragment>
+            )
+          }
+        })
+      }
     </RobotWorkSpace>
   )
 }
@@ -67,62 +84,45 @@ export type { LabwareItemProps } from './LabwareItem'
 
 function mapStateToProps(state: State, ownProps: OP): SP {
   const {
-    slot,
     match: {
       params: { slot: selectedSlot },
     },
   } = ownProps
   const allLabware = robotSelectors.getLabware(state)
-  const tipracksConfirmed = robotSelectors.getTipracksConfirmed(state)
-  const labware = allLabware.find(lw => lw.slot === slot)
-  const highlighted = slot === selectedSlot
-  const module = robotSelectors.getModulesBySlot(state)[slot]
+  const areTipracksConfirmed = robotSelectors.getTipracksConfirmed(state)
 
-  const stateProps: SP = { _calibrator: null, _labware: null, module: null }
+  const modulesBySlot = robotSelectors.getModulesBySlot(state)
 
-  if (labware) {
-    const { isTiprack, confirmed, calibratorMount } = labware
+  const itemsBySlot = allLabware.reduce((acc, labware) => {
+    let itemsInSlot = [...acc[labware.slot], labware]
+    const moduleInSlot = modulesBySlot[labware.slot]
+    if (moduleInSlot) itemsInSlot = [moduleInSlot, ...itemsInSlot]
 
-    stateProps._calibrator =
-      calibratorMount || robotSelectors.getCalibratorMount(state)
-
-    stateProps._labware = {
-      ...labware,
-      highlighted,
-      disabled: (isTiprack && confirmed) || (!isTiprack && !tipracksConfirmed),
-      showName: highlighted || confirmed,
-      showUnconfirmed: true,
-      showSpinner: highlighted && labware.calibration === 'moving-to-slot',
-      url: `/calibrate/labware/${slot}`,
+    return {
+      ...acc,
+      [labware.slot]: itemsInSlot,
     }
+  }, {})
+
+  return {
+    _calibrator: robotSelectors.getCalibratorMount(state),
+    itemsBySlot,
+    selectedSlot,
+    areTipracksConfirmed,
   }
-
-  if (module) stateProps.module = module
-
-  return stateProps
 }
 
-function mergeProps(stateProps: SP, dispatchProps: DP): Props {
-  const { _labware, _calibrator } = stateProps
-  const { dispatch } = dispatchProps
-  const allProps: Props = stateProps
-
-  if (_labware) {
-    allProps.labware = {
-      ..._labware,
-      onClick: () => {
-        if (_calibrator && (!_labware.isTiprack || !_labware.confirmed)) {
-          dispatch(robotActions.moveTo(_calibrator, _labware.slot))
-        }
-      },
-    }
+function mapDispatchToProps(dispatch: Dispatch): DP {
+  // if (_calibrator && (!_labware.isTiprack || !_labware.confirmed)) {
+  return {
+    moveToSlot: (calibrator, slot) =>
+      dispatch(robotActions.moveTo(calibrator, slot)),
   }
-
-  return allProps
 }
 
-export default connect<Props, _, SP, {||}, State, Dispatch>(
-  mapStateToProps,
-  null,
-  mergeProps
-)(DeckMap)
+export default withRouter<WithRouterOP>(
+  connect<Props, OP, SP, {||}, State, Dispatch>(
+    mapStateToProps,
+    mapDispatchToProps
+  )(DeckMap)
+)
