@@ -118,6 +118,9 @@ const getAppName: StringGetter = getter('designer-application.application-name')
 const getAppVersion: StringGetter = getter(
   'designer-application.application-version'
 )
+
+const getV3AppName: StringGetter = getter('designerApplication.name')
+const getV3AppVersion: StringGetter = getter('designerApplication.version')
 const stripDirAndExtension = f => path.basename(f, path.extname(f))
 
 export const getProtocolFile = (state: State) => state.protocol.file
@@ -170,7 +173,11 @@ export const getProtocolType: ProtocolTypeSelector = createSelector(
 
 export const getProtocolCreatorApp: CreatorAppSelector = createSelector(
   getProtocolData,
-  data => ({ name: getAppName(data), version: getAppVersion(data) })
+  data => {
+    const appName = getAppName(data) || getV3AppName(data)
+    const appVersion = getAppVersion(data) || getV3AppVersion(data)
+    return { name: appName, version: appVersion }
+  }
 )
 
 const METHOD_OT_API = 'Opentrons API'
