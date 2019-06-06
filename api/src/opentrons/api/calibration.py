@@ -1,3 +1,4 @@
+import functools
 import logging
 from copy import copy
 
@@ -25,6 +26,20 @@ def _well0(cont):
         return cont.wells(0)
 
 
+def _require_lock(func):
+    """ Decorator to make a function require a lock. Only works for instance
+    methods of CalibrationManager """
+    @functools.wraps(func)
+    def decorated(*args, **kwargs):
+        self = args[0]
+        if self._lock:
+            with self._lock:
+                return func(*args, **kwargs)
+        else:
+            return func(*args, **kwargs)
+    return decorated
+
+
 class CalibrationManager:
     """
     Serves endpoints that are primarily used in
@@ -32,11 +47,12 @@ class CalibrationManager:
     """
     TOPIC = 'calibration'
 
-    def __init__(self, hardware, loop=None, broker=None):
+    def __init__(self, hardware, loop=None, broker=None, lock=None):
         self._broker = broker or Broker()
         self._hardware = hardware
         self._loop = loop
         self.state = None
+        self._lock = lock
 
     def _set_state(self, state):
         if state not in VALID_STATES:
@@ -45,6 +61,7 @@ class CalibrationManager:
         self.state = state
         self._on_state_changed()
 
+    @_require_lock
     def tip_probe(self, instrument):
         inst = instrument._instrument
         log.info('Probing tip with {}'.format(instrument.name))
@@ -82,6 +99,7 @@ class CalibrationManager:
         self.move_to_front(instrument)
         self._set_state('ready')
 
+    @_require_lock
     def pick_up_tip(self, instrument, container):
         if not isinstance(container, Container):
             raise ValueError(
@@ -100,6 +118,7 @@ class CalibrationManager:
             inst.pick_up_tip(_well0(container._container))
         self._set_state('ready')
 
+    @_require_lock
     def drop_tip(self, instrument, container):
         if not isinstance(container, Container):
             raise ValueError(
@@ -118,6 +137,7 @@ class CalibrationManager:
             inst.drop_tip(_well0(container._container))
         self._set_state('ready')
 
+    @_require_lock
     def return_tip(self, instrument):
         inst = instrument._instrument
         log.info('Returning tip from {}'.format(instrument.name))
@@ -130,6 +150,7 @@ class CalibrationManager:
             inst.return_tip()
         self._set_state('ready')
 
+    @_require_lock
     def move_to_front(self, instrument):
         inst = instrument._instrument
         log.info('Moving {}'.format(instrument.name))
@@ -153,6 +174,7 @@ class CalibrationManager:
                 inst, inst.robot)
         self._set_state('ready')
 
+    @_require_lock
     def move_to(self, instrument, container):
         if not isinstance(container, Container):
             raise ValueError(
@@ -176,6 +198,7 @@ class CalibrationManager:
 
         self._set_state('ready')
 
+    @_require_lock
     def jog(self, instrument, distance, axis):
         inst = instrument._instrument
         log.info('Jogging {} by {} in {}'.format(
@@ -192,6 +215,7 @@ class CalibrationManager:
                 robot=inst.robot)
         self._set_state('ready')
 
+    @_require_lock
     def home(self, instrument):
         inst = instrument._instrument
         log.info('Homing {}'.format(instrument.name))
@@ -204,6 +228,7 @@ class CalibrationManager:
             inst.home()
         self._set_state('ready')
 
+    @_require_lock
     def update_container_offset(self, container, instrument):
         inst = instrument._instrument
         log.info('Updating {} in {}'.format(container.name, container.slot))

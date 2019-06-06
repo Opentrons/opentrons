@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
+import asyncio
 import logging
+import threading
 import traceback
+
 from typing import TYPE_CHECKING
 from aiohttp import web
 
@@ -38,6 +41,38 @@ async def error_middleware(request, handler):
     return response
 
 
+class ThreadedAsyncLock:
+    """ A thread-safe async lock
+
+    This is required to properly lock access to motion calls, which are
+    a) done in async contexts (rpc methods and http methods) and should
+       block as little as possible
+    b) done from several different threads (rpc workers and main thread)
+
+    This is a code wart that needs to be removed. It can be removed by
+    - making smoothie async so we don't need worker threads anymore
+    - removing said threads
+
+    This object can be used as either an asynchronous context manager using
+    ``async with`` or a synchronous context manager using ``with``.
+    """
+    def __init__(self):
+        self._thread_lock = threading.RLock()
+
+    async def __aenter__(self):
+        while not self._thread_lock.acquire(blocking=False):
+            await asyncio.sleep(0.1)
+
+    async def __aexit__(self, exc_type, exc, tb):
+        self._thread_lock.release()
+
+    def __enter__(self):
+        self._thread_lock.acquire()
+
+    def __exit__(self, exc_type, exc, tb):
+        self._thread_lock.release()
+
+
 # Support for running using aiohttp CLI.
 # See: https://docs.aiohttp.org/en/stable/web.html#command-line-interface-cli
 def init(loop=None, hardware: 'HardwareAPILike' = None):
@@ -57,7 +92,10 @@ def init(loop=None, hardware: 'HardwareAPILike' = None):
     else:
         checked_hardware = opentrons.hardware
     app['com.opentrons.hardware'] = checked_hardware
-    app['com.opentrons.rpc'] = RPCServer(app, MainRouter(checked_hardware))
+    app['com.opentrons.motion_lock'] = ThreadedAsyncLock()
+    app['com.opentrons.rpc'] = RPCServer(
+        app, MainRouter(
+            checked_hardware, lock=app['com.opentrons.motion_lock']))
     app['com.opentrons.http'] = HTTPServer(app, CONFIG['log_dir'])
 
     return app

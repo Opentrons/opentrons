@@ -223,17 +223,15 @@ def test_error_append(run_session):
 @pytest.mark.api1_only
 async def test_get_instruments_and_containers(labware_setup,
                                               virtual_smoothie_env,
-                                              hardware, loop):
+                                              loop,
+                                              session_manager):
     instruments, tip_racks, plates, commands = labware_setup
     p50, p1000 = instruments
 
     instruments, containers, modules, interactions = \
         _accumulate([_get_labware(command) for command in commands])
 
-    session = Session.build_and_prep(name='', text='',
-                                     hardware=hardware,
-                                     loop=loop,
-                                     broker=Broker())
+    session = session_manager.create(name='', text='')
     # We are calling dedupe directly for testing purposes.
     # Normally it is called from within a session
     session._instruments.extend(_dedupe(instruments))
