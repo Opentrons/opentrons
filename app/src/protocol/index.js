@@ -107,25 +107,42 @@ type CreatorAppSelector = OutputSelector<
   { name: ?string, version: ?string }
 >
 
-const getName: StringGetter = getter('metadata.protocol-name')
-const getV3Name: StringGetter = getter('metadata.protocolName')
+const protocolV1V2GetterPaths = {
+  name: 'metadata.protocol-name',
+  appName: 'designer-application.application-name',
+  appVersion: 'designer-application.application-version',
+}
+
+const PROTOCOL_GETTER_PATHS_BY_SCHEMA = {
+  '1': protocolV1V2GetterPaths,
+  '2': protocolV1V2GetterPaths,
+  '3': {
+    name: 'metadata.protocolName',
+    appName: 'designerApplication.name',
+    appVersion: 'designerApplication.version',
+  },
+}
+
 const getAuthor: StringGetter = getter('metadata.author')
 const getDesc: StringGetter = getter('metadata.description')
 const getCreated: NumberGetter = getter('metadata.created')
 const getLastModified: NumberGetter = getter('metadata.last-modified')
 const getSource: StringGetter = getter('metadata.source')
-const getAppName: StringGetter = getter('designer-application.application-name')
-const getAppVersion: StringGetter = getter(
-  'designer-application.application-version'
-)
 
-const getV3AppName: StringGetter = getter('designerApplication.name')
-const getV3AppVersion: StringGetter = getter('designerApplication.version')
 const stripDirAndExtension = f => path.basename(f, path.extname(f))
 
 export const getProtocolFile = (state: State) => state.protocol.file
 export const getProtocolContents = (state: State) => state.protocol.contents
 export const getProtocolData = (state: State) => state.protocol.data
+
+const getProtocolSchemaVersion: NumberSelector = createSelector(
+  getProtocolData,
+  data => {
+    return data && data['protocol-schema']
+      ? Number(data['protocol-schema'].charAt(0))
+      : data && data['schemaVersion']
+  }
+)
 
 export const getProtocolFilename: StringSelector = createSelector(
   getProtocolFile,
@@ -138,10 +155,15 @@ export const getProtocolLastModified: NumberSelector = createSelector(
 )
 
 export const getProtocolName: StringSelector = createSelector(
+  getProtocolSchemaVersion,
   getProtocolFilename,
   getProtocolData,
-  (name, data) =>
-    getName(data) || getV3Name(data) || (name && stripDirAndExtension(name))
+  (pathsForProtocol, name, data) => {
+    const getName =
+      pathsForProtocol &&
+      getter(PROTOCOL_GETTER_PATHS_BY_SCHEMA[pathsForProtocol]['name'])
+    return (data && getName(data)) || (name && stripDirAndExtension(name))
+  }
 )
 
 export const getProtocolAuthor: StringSelector = createSelector(
@@ -172,10 +194,17 @@ export const getProtocolType: ProtocolTypeSelector = createSelector(
 )
 
 export const getProtocolCreatorApp: CreatorAppSelector = createSelector(
+  getProtocolSchemaVersion,
   getProtocolData,
-  data => {
-    const appName = getAppName(data) || getV3AppName(data)
-    const appVersion = getAppVersion(data) || getV3AppVersion(data)
+  (pathsForProtocol, data) => {
+    const getAppName =
+      pathsForProtocol &&
+      getter(PROTOCOL_GETTER_PATHS_BY_SCHEMA[pathsForProtocol]['appName'])
+    const getAppVersion =
+      pathsForProtocol &&
+      getter(PROTOCOL_GETTER_PATHS_BY_SCHEMA[pathsForProtocol]['appVersion'])
+    const appName = pathsForProtocol && getAppName(data)
+    const appVersion = pathsForProtocol && getAppVersion(data)
     return { name: appName, version: appVersion }
   }
 )
@@ -187,11 +216,11 @@ export const getProtocolMethod: StringSelector = createSelector(
   getProtocolFile,
   getProtocolContents,
   getProtocolData,
-  (file, contents, data) => {
+  getProtocolCreatorApp,
+  (file, contents, data, app) => {
     const isJson = file && fileIsJson(file)
-    const appName = getAppName(data)
-    const appVersion = getAppVersion(data)
-    const readableName = appName && startCase(appName)
+    const appVersion = app && app.version
+    const readableName = app && startCase(app.name)
 
     if (!file || !contents) return null
     if (isJson === true && !readableName) return METHOD_UNKNOWN
