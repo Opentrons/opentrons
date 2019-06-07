@@ -14,11 +14,8 @@ from opentrons.deck_calibration.endpoints import expected_points
 
 @pytest.fixture
 def mock_config():
-    test_config = robot_configs.load()
-    new_config = test_config._replace(name='new-value1')
-    robot_configs.save_robot_settings(new_config)
-    yield new_config
-    robot_configs.save_robot_settings(test_config)
+    yield robot_configs.load()
+    robot_configs.clear()
 
 
 @pytest.mark.api1_only
@@ -39,6 +36,7 @@ def test_save_and_clear_config(mock_config, async_server):
     import os
 
     hardware = async_server['com.opentrons.hardware']
+
     hardware.config.gantry_calibration[0][3] = 10
 
     old_gantry = copy.copy(hardware.config.gantry_calibration)
@@ -58,6 +56,9 @@ def test_save_and_clear_config(mock_config, async_server):
     # Check that we properly saved the old deck calibration
     saved_config = robot_configs.load(filename)
     assert saved_config.gantry_calibration == old_gantry
+    # XXX This shouldn't be necessary but the config isn't properly cleared
+    # otherwise
+    hardware.config.gantry_calibration[0][3] = 0
 
 
 async def test_new_deck_points():
@@ -189,6 +190,6 @@ def test_gantry_matrix_output(mock_config, loop, async_server, monkeypatch):
     assert tool.actual_points == actual_points
 
     tool.save_transform()
-    assert np.allclose(expected, tool.identity_transform)
+    assert np.allclose(expected, tool.current_transform)
 
     hardware.reset()

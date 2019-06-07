@@ -208,8 +208,7 @@ class Thermocycler(mod_abc.AbstractModule):
     def loop(self):
         return self._loop
 
-    @loop.setter
-    def loop(self, newLoop):
+    def set_loop(self, newLoop):
         self._loop = newLoop
 
     async def _connect(self):
