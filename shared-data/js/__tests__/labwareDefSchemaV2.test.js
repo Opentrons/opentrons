@@ -67,7 +67,12 @@ describe('test schemas of all opentrons definitions', () => {
       expect(valid).toBe(true)
     })
     test(`file name matches version: ${labwarePath}`, () => {
-      expect(`${labwareDef.version}.json`).toEqual(filename)
+      expect(`${labwareDef.version}`).toEqual(path.basename(filename, '.json'))
+    })
+    test(`parent dir matches loadName: ${labwarePath}`, () => {
+      expect(labwareDef.parameters.loadName).toEqual(
+        path.basename(path.dirname(labwarePath))
+      )
     })
     test(`namespace is "opentrons": ${labwarePath}`, () => {
       expect(labwareDef.namespace).toEqual('opentrons')
