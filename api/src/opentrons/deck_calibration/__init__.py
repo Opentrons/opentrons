@@ -1,5 +1,3 @@
-import numpy as np
-
 from opentrons.config import feature_flags as ff
 from opentrons import types
 
@@ -15,12 +13,9 @@ crosses = 'crosses'
 
 z_pos = (170.5, 129.0, 5.0)
 
-identity_transform = np.identity(4)
-
 
 def dots_set():
     """
-
     :param dot_flag: a boolean represented whether the feature flag is set
     or not (if dots_deck_type is set to True
     then it will utilize old calibration points)

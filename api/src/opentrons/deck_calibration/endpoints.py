@@ -9,8 +9,8 @@ from opentrons.config import pipette_config, robot_configs, feature_flags
 from opentrons import instruments, hardware_control
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.types import CriticalPoint
-from . import jog, position, dots_set, z_pos, identity_transform
-from opentrons.util.linal import add_z, solve
+from . import jog, position, dots_set, z_pos
+from opentrons.util.linal import add_z, solve, identity_deck_transform
 
 session = None
 mount_by_name = {'left': Mount.LEFT, 'right': Mount.RIGHT}
@@ -82,14 +82,14 @@ class SessionManager:
         self.cp = None
         self.pipette_id = None
         self.adapter = hardware
-        self.identity_transform = identity_transform
+        self.current_transform = identity_deck_transform()
 
         if feature_flags.use_protocol_api_v2():
             self.adapter = hardware_control.adapters.SynchronousAdapter(
                 hardware)
 
         # Start from fresh identity matrix every calibration session
-        self.adapter.update_config(gantry_calibration=self.identity_transform)
+        self.adapter.update_config(gantry_calibration=self.current_transform)
 
 
 # -------------- Route Fns -----------------------------------------------
@@ -470,12 +470,11 @@ async def save_z(data):
         else:
             session.z_value = position(
                 session.current_mount, session.adapter, session.cp)[-1]
-        print(">>>>>>>>>>>>>>>>>")
-        print(f"Current Z value {session.z_value}")
-        session.identity_transform[2][3] = session.z_value
+
+        session.current_transform[2][3] = session.z_value
 
         session.adapter.update_config(gantry_calibration=list(
-                map(lambda i: list(i), session.identity_transform)))
+                map(lambda i: list(i), session.current_transform)))
 
         message = "Saved z: {}".format(session.z_value)
         status = 200
@@ -512,10 +511,10 @@ async def save_transform(data):
         # [-sin_x, cos_y, const_zero, delta_y___],
         # [const_zero, const_zero, const_one_, delta_z___],
         # [const_zero, const_zero, const_zero, const_one_]]
-        session.identity_transform = add_z(flat_matrix, session.z_value)
+        session.current_transform = add_z(flat_matrix, session.z_value)
 
         session.adapter.update_config(gantry_calibration=list(
-                map(lambda i: list(i), session.identity_transform)))
+                map(lambda i: list(i), session.current_transform)))
 
         robot_configs.save_deck_calibration(session.adapter.config)
         robot_configs.backup_configuration(session.adapter.config)
