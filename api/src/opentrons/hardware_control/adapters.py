@@ -58,7 +58,7 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
                      for the worker thread.
         """
         checked_loop = loop or asyncio.new_event_loop()
-        api.loop = checked_loop
+        api.set_loop(checked_loop)
         self._loop = checked_loop
         self._api = api
         self._call_lock = threading.Lock()

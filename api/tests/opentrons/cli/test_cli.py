@@ -1,3 +1,4 @@
+import copy
 import pytest
 import sys
 import numpy as np
@@ -33,24 +34,30 @@ def test_clear_config(mock_config, async_server):
 
 def test_save_and_clear_config(mock_config, async_server):
     # Clear should happen automatically after the following import, resetting
-    # the robot config to the default value from robot_configs
+    # the deck cal to the default value
     from opentrons.deck_calibration import dc_main
     import os
 
     hardware = async_server['com.opentrons.hardware']
-    hardware.update_config(name='Ada Lovelace')
-    old_config = hardware.config
+    hardware.config.gantry_calibration[0][3] = 10
+
+    old_gantry = copy.copy(hardware.config.gantry_calibration)
     base_filename = CONFIG['deck_calibration_file']
 
     tag = "testing"
     root, ext = os.path.splitext(base_filename)
     filename = "{}-{}{}".format(root, tag, ext)
+
     dc_main.backup_configuration_and_reload(hardware, tag=tag)
+    # After reset gantry calibration should be I(4,4)
+    assert hardware.config.gantry_calibration\
+        == robot_configs.DEFAULT_DECK_CALIBRATION
+    # Mount calibration should be defaulted
+    assert hardware.config.mount_offset == robot_configs.DEFAULT_MOUNT_OFFSET
 
-    assert hardware.config == robot_configs._build_config({}, {})
-
+    # Check that we properly saved the old deck calibration
     saved_config = robot_configs.load(filename)
-    assert saved_config == old_config
+    assert saved_config.gantry_calibration == old_gantry
 
 
 async def test_new_deck_points():

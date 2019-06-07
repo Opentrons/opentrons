@@ -1071,6 +1071,10 @@ class Robot(CommandPublisher):
         """
         self.config = self.config._replace(**kwargs)
 
+    def set_config(self, config):
+        """ Replace the entire configuration. """
+        self.config = config
+
     async def update_firmware(self,
                               filename,
                               loop=None,

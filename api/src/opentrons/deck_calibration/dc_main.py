@@ -481,7 +481,8 @@ def save_config(config) -> str:
 
 def clear_configuration_and_reload(hardware):
     robot_configs.clear()
-    hardware.config = robot_configs.load()
+    new_config = robot_configs.load()
+    hardware.set_config(new_config)
     if not feature_flags.use_protocol_api_v2():
         hardware.reset()
 
