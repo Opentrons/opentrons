@@ -88,9 +88,8 @@ class SessionManager:
             self.adapter = hardware_control.adapters.SynchronousAdapter(
                 hardware)
 
-        # default = robot_configs._build_config({}, {}).gantry_calibration
+        # Start from fresh identity matrix every calibration session
         self.adapter.update_config(gantry_calibration=self.identity_transform)
-        # log.debug("Current deck calibration {}".format(self.adapter.config))
 
 
 # -------------- Route Fns -----------------------------------------------
@@ -471,7 +470,8 @@ async def save_z(data):
         else:
             session.z_value = position(
                 session.current_mount, session.adapter, session.cp)[-1]
-
+        print(">>>>>>>>>>>>>>>>>")
+        print(f"Current Z value {session.z_value}")
         session.identity_transform[2][3] = session.z_value
 
         session.adapter.update_config(gantry_calibration=list(
