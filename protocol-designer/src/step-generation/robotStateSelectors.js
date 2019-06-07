@@ -70,14 +70,14 @@ export function getNextTiprack(
   const sortedTipracksIds = sortLabwareBySlot(robotState.labware).filter(
     labwareId => {
       assert(
-        invariantContext.labwareEntities[labwareId]?.type,
+        invariantContext.labwareEntities[labwareId]?.labwareDefURI,
         `cannot getNextTiprack, no labware entity for "${labwareId}"`
       )
       const isOnDeck = robotState.labware[labwareId].slot != null
       return (
         isOnDeck &&
-        pipetteEntity.tiprackModel ===
-          invariantContext.labwareEntities[labwareId]?.type
+        pipetteEntity.tiprackDefURI ===
+          invariantContext.labwareEntities[labwareId]?.labwareDefURI
       )
     }
   )

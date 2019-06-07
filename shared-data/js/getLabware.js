@@ -1,5 +1,7 @@
 // @flow
+import assert from 'assert'
 import mapValues from 'lodash/mapValues'
+// TODO: Ian 2019-06-04 remove the shared-data build process for labware v1
 import definitions from '../build/labware.json'
 import { SLOT_RENDER_HEIGHT, FIXED_TRASH_RENDER_HEIGHT } from './constants'
 import type {
@@ -7,6 +9,11 @@ import type {
   LabwareDefinition2,
   WellDefinition,
 } from './types'
+
+assert(
+  definitions && Object.keys(definitions).length > 0,
+  'Expected v1 labware defs. Something went wrong with shared-data/build/labware.json'
+)
 
 export function getLabware(labwareName: string): ?LabwareDefinition {
   const labware: ?LabwareDefinition = definitions[labwareName]
@@ -64,3 +71,6 @@ export function getWellDefsForSVG(labwareName: string) {
     y: _getSvgYValueForWell(labwareName, wellDef) + yCorrection,
   }))
 }
+
+export const getLabwareDefURI = (def: LabwareDefinition2): string =>
+  `${def.namespace}/${def.parameters.loadName}/${def.version}`

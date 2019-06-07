@@ -1033,8 +1033,8 @@ class Robot(CommandPublisher):
         pose_tree = pose_tracker.update(pose_tree, container, new_coordinates)
         container._coordinates = container._coordinates + delta
 
-        if save and container.properties.get('otId'):
-            save_new_offsets(container.properties['otId'], delta)
+        if save and container.properties.get('labware_hash'):
+            save_new_offsets(container.properties['labware_hash'], delta)
         elif save and new_container_name:
             database.save_new_container(container, new_container_name)
         elif save:

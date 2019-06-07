@@ -3,10 +3,10 @@ Note that `LabwareRender` is in robot coordinates, we transform it to view it us
 **Normal Labware**
 
 ```js
-const fixture96Plate = require('@opentrons/shared-data/fixtures/fixture96Plate')
-const fixture24TubeRack = require('@opentrons/shared-data/fixtures/fixture24TubeRack')
-const fixture12Trough = require('@opentrons/shared-data/fixtures/fixture12Trough')
-const fixtureTipRack300Ul = require('@opentrons/shared-data/fixtures/fixtureTipRack300Ul')
+const fixture96Plate = require('@opentrons/shared-data/labware/fixtures/2/fixture96Plate')
+const fixture24TubeRack = require('@opentrons/shared-data/labware/fixtures/2/fixture24TubeRack')
+const fixture12Trough = require('@opentrons/shared-data/labware/fixtures/2/fixture12Trough')
+const fixtureTipRack300Ul = require('@opentrons/shared-data/labware/fixtures/2/fixtureTipRack300Ul')
 
 // Change this to view different labware fixtures
 let definition = fixture96Plate
@@ -20,7 +20,7 @@ let definition = fixture96Plate
     <LabwareRender
       showLabels
       definition={definition}
-      highlightedWells={new Set(['A1', 'B2'])}
+      highlightedWells={{ A1: null, B2: null }}
       wellFill={{ A1: 'maroon', C3: 'lavender' }}
     />
   )}
@@ -30,7 +30,7 @@ let definition = fixture96Plate
 **Tiprack**
 
 ```js
-const fixtureTipRack300Ul = require('@opentrons/shared-data/fixtures/fixtureTipRack300Ul')
+const fixtureTipRack300Ul = require('@opentrons/shared-data/labware/fixtures/2/fixtureTipRack300Ul')
 
 let definition = fixtureTipRack300Ul
 
@@ -42,8 +42,8 @@ let definition = fixtureTipRack300Ul
   {() => (
     <LabwareRender
       definition={definition}
-      highlightedWells={new Set(['A1', 'B2'])}
-      missingTips={new Set(['C3', 'D4'])}
+      highlightedWells={{ A1: null, B2: null }}
+      missingTips={{ C3: null, D4: null }}
     />
   )}
 </RobotWorkSpace>

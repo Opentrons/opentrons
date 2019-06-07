@@ -1,6 +1,0 @@
-@import '@opentrons/components';
-
-.tiprack_plate_outline {
-  fill: var(--c-plate-bg);
-  stroke: var(--c-charcoal);
-}

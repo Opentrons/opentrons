@@ -214,7 +214,6 @@ class Labware:
         self._wells: List[Well] = []
         # Directly from definition
         self._well_definition = definition['wells']
-        self._id = definition['otId']
         self._parameters = definition['parameters']
         offset = definition['cornerOffsetFromSlot']
         self._dimensions = definition['dimensions']
@@ -1046,12 +1045,13 @@ def load_module(name: str, parent: Location) -> ModuleGeometry:
     by name.
 
     :param name: A string to use for looking up the definition. The string
-                 must be present as a top-level key in moduleSpecs.json.
+                 must be present as a top-level key in
+                 module/definitions/{moduleDefinitionVersion}.json.
     :param parent: A :py:class:`.Location` representing the location where
                    the front and left most point of the outside of the module
                    is (often the front-left corner of a slot on the deck).
     """
-    def_path = 'shared_data/robot-data/moduleSpecs.json'
+    def_path = 'shared_data/module/definitions/1.json'
     module_def = json.loads(  # type: ignore
         pkgutil.get_data('opentrons', def_path))
     return load_module_from_definition(module_def[name], parent)

@@ -20,10 +20,6 @@ export type Wells = {
 
 export type WellContents = {|
   // non-ingredient well state, for SelectableLabware
-  highlighted: boolean,
-  selected: boolean,
-  error: boolean,
-  maxVolume: number,
   wellName: string, // eg 'A1', 'A2' etc
   groupIds: Array<string>,
   ingreds: LocationLiquidState,

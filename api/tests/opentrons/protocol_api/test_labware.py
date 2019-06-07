@@ -333,7 +333,7 @@ def test_module_load():
     module_names = ['tempdeck', 'magdeck']
     module_defs = json.loads(
         pkgutil.get_data('opentrons',
-                         'shared_data/robot-data/moduleSpecs.json'))
+                         'shared_data/module/definitions/1.json'))
     for name in module_names:
         mod = labware.load_module(name, Location(Point(0, 0, 0), 'test'))
         mod_def = module_defs[name]

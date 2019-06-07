@@ -3,8 +3,8 @@ import range from 'lodash/range'
 
 import { createRegularLabware } from '../index.js'
 
-import exampleLabware1 from '../../__tests__/fixtures/labware2/labwareExample.json'
-import exampleLabware2 from '../../__tests__/fixtures/labware2/labwareExample2.json'
+import exampleLabware1 from '../../../labware/fixtures/2/labwareExample1.json'
+import exampleLabware2 from '../../../labware/fixtures/2/labwareExample2.json'
 
 jest.mock('../assignId', () => jest.fn(() => 'mock-id'))
 

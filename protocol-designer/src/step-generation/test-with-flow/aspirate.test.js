@@ -1,10 +1,9 @@
 // @flow
 import { expectTimelineError } from './testMatchers'
 import _aspirate from '../commandCreators/atomic/aspirate'
-import {
-  fixtureTipRack10Ul,
-  fixtureTipRack1000Ul,
-} from '@opentrons/shared-data/fixtures'
+import { getLabwareDefURI } from '@opentrons/shared-data'
+import fixtureTipRack10Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack10Ul.json'
+import fixtureTipRack1000Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack1000Ul.json'
 import {
   getInitialRobotStateStandard,
   getRobotStateWithTipStandard,
@@ -96,11 +95,14 @@ describe('aspirate', () => {
   })
 
   test('aspirate with volume > tip max volume should throw error', () => {
-    invariantContext.pipetteEntities['p300SingleId'].tiprackModel =
-      fixtureTipRack10Ul.otId
+    invariantContext.pipetteEntities[
+      'p300SingleId'
+    ].tiprackDefURI = getLabwareDefURI(fixtureTipRack10Ul)
+
     invariantContext.pipetteEntities[
       'p300SingleId'
     ].tiprackLabwareDef = fixtureTipRack10Ul
+
     const result = aspirateWithErrors({
       pipette: 'p300SingleId',
       volume: 201,
@@ -116,11 +118,14 @@ describe('aspirate', () => {
 
   test('aspirate with volume > pipette max volume should throw error', () => {
     // NOTE: assigning p300 to a 1000uL tiprack is nonsense, just for this test
-    invariantContext.pipetteEntities['p300SingleId'].tiprackModel =
-      fixtureTipRack1000Ul.otId
+    invariantContext.pipetteEntities[
+      'p300SingleId'
+    ].tiprackDefURI = getLabwareDefURI(fixtureTipRack1000Ul)
+
     invariantContext.pipetteEntities[
       'p300SingleId'
     ].tiprackLabwareDef = fixtureTipRack1000Ul
+
     const result = aspirateWithErrors({
       pipette: 'p300SingleId',
       volume: 301,

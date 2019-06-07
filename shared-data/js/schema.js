@@ -10,8 +10,7 @@ const PositiveNumber = {
 
 const LabwareFormats = ['96-standard', '384-standard', 'trough', 'irregular']
 
-// TODO (9/21/2018): This will be deprecated and
-// replaced with labware-json-schema
+// TODO IMMEDIATELY move to labware/flowTypes/
 const schema = {
   type: 'object',
   required: ['metadata', 'ordering', 'wells'],

@@ -1,16 +1,18 @@
 // @flow
 import mapValues from 'lodash/mapValues'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import {
-  fixtureTrash,
-  fixture96Plate,
-  fixture12Trough,
-  fixtureTipRack10Ul,
-  fixtureTipRack300Ul,
   fixtureP10Single,
   fixtureP10Multi,
   fixtureP300Single,
   fixtureP300Multi,
-} from '@opentrons/shared-data/fixtures'
+} from '@opentrons/shared-data/pipette/fixtures/name'
+import fixtureTrash from '@opentrons/shared-data/labware/fixtures/2/fixtureTrash.json'
+import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture96Plate.json'
+import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture12Trough.json'
+import fixtureTipRack10Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack10Ul.json'
+import fixtureTipRack300Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack300Ul.json'
+
 import { makeInitialRobotState, reduceCommandCreators } from '../../utils'
 import { tiprackWellNamesFlat } from './data'
 import type { InvariantContext, RobotState } from '../../'
@@ -105,37 +107,37 @@ export function makeContext(): InvariantContext {
   const labwareEntities = {
     trashId: {
       id: 'trashId',
-      type: fixtureTrash.otId,
+      labwareDefURI: getLabwareDefURI(fixtureTrash),
       def: fixtureTrash,
     },
     sourcePlateId: {
       id: 'sourcePlateId',
-      type: fixture96Plate.otId,
+      labwareDefURI: getLabwareDefURI(fixture96Plate),
       def: fixture96Plate,
     },
     destPlateId: {
       id: 'destPlateId',
-      type: fixture96Plate.otId,
+      labwareDefURI: getLabwareDefURI(fixture96Plate),
       def: fixture96Plate,
     },
     troughId: {
       id: 'troughId',
-      type: fixture12Trough.otId,
+      labwareDefURI: getLabwareDefURI(fixture12Trough),
       def: fixture12Trough,
     },
     tiprack1Id: {
       id: 'tiprack1Id',
-      type: fixtureTipRack300Ul.otId,
+      labwareDefURI: getLabwareDefURI(fixtureTipRack300Ul),
       def: fixtureTipRack300Ul,
     },
     tiprack2Id: {
       id: 'tiprack2Id',
-      type: fixtureTipRack300Ul.otId,
+      labwareDefURI: getLabwareDefURI(fixtureTipRack300Ul),
       def: fixtureTipRack300Ul,
     },
     tiprack3Id: {
       id: 'tiprack3Id',
-      type: fixtureTipRack300Ul.otId,
+      labwareDefURI: getLabwareDefURI(fixtureTipRack300Ul),
       def: fixtureTipRack300Ul,
     },
   }
@@ -144,28 +146,28 @@ export function makeContext(): InvariantContext {
     p10SingleId: {
       name: 'p10_single',
       id: 'p10SingleId',
-      tiprackModel: fixtureTipRack10Ul.otId,
+      tiprackDefURI: getLabwareDefURI(fixtureTipRack10Ul),
       tiprackLabwareDef: fixtureTipRack10Ul,
       spec: fixtureP10Single,
     },
     p10MultiId: {
       name: 'p10_multi',
       id: 'p10MultiId',
-      tiprackModel: fixtureTipRack10Ul.otId,
+      tiprackDefURI: getLabwareDefURI(fixtureTipRack10Ul),
       tiprackLabwareDef: fixtureTipRack10Ul,
       spec: fixtureP10Multi,
     },
     p300SingleId: {
       name: 'p300_single',
       id: 'p300SingleId',
-      tiprackModel: fixtureTipRack300Ul.otId,
+      tiprackDefURI: getLabwareDefURI(fixtureTipRack300Ul),
       tiprackLabwareDef: fixtureTipRack300Ul,
       spec: fixtureP300Single,
     },
     p300MultiId: {
       name: 'p300_multi',
       id: 'p300MultiId',
-      tiprackModel: fixtureTipRack300Ul.otId,
+      tiprackDefURI: getLabwareDefURI(fixtureTipRack300Ul),
       tiprackLabwareDef: fixtureTipRack300Ul,
       spec: fixtureP300Multi,
     },

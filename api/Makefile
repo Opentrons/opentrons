@@ -60,7 +60,7 @@ ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources) $(modul
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
-clean_cmd = shx rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc'
+clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc'
 
 .PHONY: all
 all: clean wheel
@@ -80,9 +80,9 @@ uninstall:
 $(wheel_pattern): setup.py $(ot_sources)
 	$(clean_cmd)
 	$(python) setup.py bdist_wheel
-	shx rm -rf build
+	$(SHX) rm -rf build
 	$(python)	-m twine check $@
-	shx ls dist
+	$(SHX) ls dist
 
 wheel: $(wheel_file)
 
@@ -98,23 +98,23 @@ lint: $(ot_py_sources)
 .PHONY: docs docs-html docs-doctest docs-pdf
 
 docs-html: local-install
-	shx rm -rf docs/build/html
+	$(SHX) rm -rf docs/build/html
 	pipenv run sphinx-build -b html -d docs/build/doctrees docs/source docs/build/html
 
 docs-doctest: local-install
-	shx rm -rf docs/build/doctest
+	$(SHX) rm -rf docs/build/doctest
 	pipenv run sphinx-build -b doctest -d docs/build/doctrees docs/source docs/build/doctest
 
 docs-pdf: local-install
-	-shx rm -rf docs/build/pdf
+	-$(SHX) rm -rf docs/build/pdf
 	-pipenv run sphinx-build -b latex -d docs/build/doctrees docs/source docs/build/pdf
 	-$(MAKE) -C docs/build/pdf all-pdf
 
 .PHONY: docs
 docs: docs-pdf docs-html
-	shx mkdir -p docs/dist
-	shx cp -R docs/build/html/. docs/public/. docs/dist
-	-shx cp docs/build/pdf/OpentronsAPI.pdf docs/dist/_static
+	$(SHX) mkdir -p docs/dist
+	$(SHX) cp -R docs/build/html/. docs/public/. docs/dist
+	-$(SHX) cp docs/build/pdf/OpentronsAPI.pdf docs/dist/_static
 
 .PHONY: publish
 publish:

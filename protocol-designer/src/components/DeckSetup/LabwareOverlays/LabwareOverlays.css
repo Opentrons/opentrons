@@ -1,17 +1,18 @@
 @import '@opentrons/components';
 
-.slot_ui {
+.labware_controls {
   height: 100%;
   width: 100%;
 }
 
+.labware_controls.can_edit {
+  cursor: grab;
+}
+
 .slot_overlay {
-  position: absolute;
+  @apply --absolute-fill;
+
   z-index: 1;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
   padding: 0.5rem;
   background-color: color(var(--c-black) alpha(0.75));
   display: flex;
@@ -19,19 +20,29 @@
   justify-content: space-around;
   align-items: flex-start;
   color: white;
-  font-size: 0.75rem;
-  vertical-align: middle;
+  font-size: var(--fs-body-1);
 }
 
 .slot_overlay.with_form {
   background-color: color(var(--c-black) alpha(1));
 }
 
+.slot_overlay.disabled {
+  background-color: color(var(--c-light-gray) alpha(0.9));
+  color: var(--c-font-dark);
+}
+
+.name_input_wrapper {
+  flex: 1;
+}
+
 .name_input {
+  padding: 0 0 0 0.25rem;
   width: 7rem;
 }
 
 .overlay_button {
+  flex: 1;
   text-decoration: none;
   color: white;
   display: flex;
@@ -41,6 +52,10 @@
 
 .overlay_button:active {
   opacity: 0.5;
+}
+
+.button_spacer {
+  flex: 1;
 }
 
 .overlay_icon {
@@ -55,4 +70,19 @@
   &:hover {
     opacity: 1;
   }
+}
+
+.appear {
+  opacity: 1;
+}
+
+.drag_preview {
+  position: absolute;
+  cursor: grabbing;
+}
+
+.highlighted_border_div {
+  border-color: var(--c-highlight);
+  border-width: 3px;
+  border-style: solid;
 }

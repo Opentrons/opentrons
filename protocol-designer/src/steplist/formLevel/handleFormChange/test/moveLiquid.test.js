@@ -1,5 +1,5 @@
 // @flow
-import { fixtureP10Single } from '@opentrons/shared-data/fixtures'
+import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import dependentFieldsUpdateMoveLiquid, {
   updatePatchBlowoutFields,
 } from '../dependentFieldsUpdateMoveLiquid'

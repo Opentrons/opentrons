@@ -148,8 +148,7 @@ def get_schema_for_protocol(protocol_json: Dict[Any, Any]) -> Dict[Any, Any]:
     try:
         schema = pkgutil.get_data(
             'opentrons',
-            'shared_data/protocol-json-schema/protocolSchemaV{}.json'
-            .format(version_num))
+            f'shared_data/protocol/schemas/{version_num}.json')
     except FileNotFoundError:
         schema = None
     if not schema:
@@ -170,7 +169,7 @@ def validate_protocol(protocol_json: Dict[Any, Any]):
     labware_schema_v2 = json.loads(  # type: ignore
         pkgutil.get_data(
             'opentrons',
-            'shared_data/labware-json-schema/labwareSchemaV2.json'))
+            'shared_data/labware/schemas/2.json'))
 
     resolver = jsonschema.RefResolver(
         protocol_schema.get('$id', ''),

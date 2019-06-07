@@ -1,8 +1,7 @@
-import {
-  fixture96Plate,
-  fixtureTrash,
-  fixture24TubeRack,
-} from '@opentrons/shared-data/fixtures'
+import fixture24TubeRack from '@opentrons/shared-data/labware/fixtures/2/fixture24TubeRack'
+import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture96Plate'
+import fixtureTrash from '@opentrons/shared-data/labware/fixtures/2/fixtureTrash'
+
 import getWellContentsAllLabware from '../getWellContentsAllLabware'
 
 jest.mock('../../../labware-defs/utils')

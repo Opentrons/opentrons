@@ -1,6 +1,9 @@
 // @flow
 import { createSelector } from 'reselect'
-import { getWellNamePerMultiTip } from '@opentrons/shared-data'
+import {
+  getWellNamePerMultiTip,
+  type CommandV1 as Command,
+} from '@opentrons/shared-data'
 
 import mapValues from 'lodash/mapValues'
 
@@ -9,6 +12,7 @@ import * as StepGeneration from '../step-generation'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { selectors as fileDataSelectors } from '../file-data'
 import { selectors as stepsSelectors } from '../ui/steps'
+import { getWellSetForMultichannel } from '../well-selection/utils'
 
 import type { WellGroup } from '@opentrons/components'
 import type { Selector } from '../types'
@@ -38,6 +42,7 @@ function _wellsForPipette(
 function _getSelectedWellsForStep(
   stepArgs: StepGeneration.CommandCreatorArgs,
   labwareId: string,
+  frame: StepGeneration.CommandsAndRobotState,
   invariantContext: StepGeneration.InvariantContext
 ): Array<string> {
   if (stepArgs.commandCreatorFnName === 'delay') {
@@ -86,6 +91,31 @@ function _getSelectedWellsForStep(
     }
   }
 
+  frame.commands.forEach((c: Command) => {
+    if (c.command === 'pick-up-tip' && c.params.labware === labwareId) {
+      const commandWellName = c.params.well
+      const pipetteId = c.params.pipette
+      const pipetteSpec =
+        invariantContext.pipetteEntities[pipetteId]?.spec || {}
+
+      if (pipetteSpec.channels === 1) {
+        wells.push(commandWellName)
+      } else if (pipetteSpec.channels === 8) {
+        const wellSet =
+          getWellSetForMultichannel(
+            invariantContext.labwareEntities[labwareId].def,
+            commandWellName
+          ) || []
+        wells.push(...wellSet)
+      } else {
+        console.error(
+          `Unexpected number of channels: ${pipetteSpec.channels ||
+            '?'}. Could not get tip highlight state`
+        )
+      }
+    }
+  })
+
   return wells
 }
 
@@ -94,7 +124,8 @@ function _getSelectedWellsForSubstep(
   stepArgs: StepGeneration.CommandCreatorArgs,
   labwareId: string,
   substeps: ?SubstepItemData,
-  substepIndex: number
+  substepIndex: number,
+  invariantContext: StepGeneration.InvariantContext
 ): Array<string> {
   if (substeps === null) {
     return []
@@ -141,6 +172,27 @@ function _getSelectedWellsForSubstep(
   // $FlowFixMe: property `destLabware` is missing in `MixArgs`
   if (stepArgs.destLabware && stepArgs.destLabware === labwareId) {
     wells.push(...getWells('dest'))
+  }
+
+  if (substeps && substeps.commandCreatorFnName !== 'delay') {
+    let tipWellSet = []
+    if (substeps.multichannel) {
+      const { activeTips } = substeps.multiRows[substepIndex][0] // just use first multi row
+
+      if (activeTips && activeTips.labware === labwareId) {
+        const multiTipWellSet = getWellSetForMultichannel(
+          invariantContext.labwareEntities[labwareId].def,
+          activeTips.well
+        )
+        if (multiTipWellSet) tipWellSet = multiTipWellSet
+      }
+    } else {
+      // single-channel
+      const { activeTips } = substeps.rows[substepIndex]
+      if (activeTips && activeTips.labware === labwareId && activeTips.well)
+        tipWellSet = [activeTips.well]
+    }
+    wells.push(...tipWellSet)
   }
 
   return wells
@@ -194,20 +246,22 @@ export const wellHighlightsByLabwareId: Selector<{
             stepArgs,
             labwareId,
             allSubsteps[stepId],
-            hoveredSubstep.substepIndex
+            hoveredSubstep.substepIndex,
+            invariantContext
           )
         } else {
           // wells for step overall
           selectedWells = _getSelectedWellsForStep(
             stepArgs,
             labwareId,
+            frame,
             invariantContext
           )
         }
 
-        // return selected wells eg {A1: true, B4: true}
+        // return selected wells eg {A1: null, B4: null}
         return selectedWells.reduce(
-          (acc: AllWellHighlights, well) => ({ ...acc, [well]: true }),
+          (acc: AllWellHighlights, well) => ({ ...acc, [well]: null }),
           {}
         )
       }

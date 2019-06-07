@@ -1,9 +1,8 @@
 // @flow
-import {
-  fixture12Trough,
-  fixture96Plate,
-  fixture384Plate,
-} from '@opentrons/shared-data/fixtures'
+import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture96Plate.json'
+import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture12Trough.json'
+import fixture384Plate from '@opentrons/shared-data/labware/fixtures/2/fixture384Plate.json'
+
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import { createEmptyLiquidState, createTipLiquidState } from '../utils'
@@ -331,12 +330,12 @@ describe('...8-channel pipette', () => {
     ]
 
     tests.forEach(({ labwareType, def, expectedLabwareMatch }) =>
-      // make sourcePlateId a different labware type/def each time
+      // make sourcePlateId a different labware def each time
       test(labwareType, () => {
         let customInvariantContext = makeContext()
         customInvariantContext.labwareEntities.sourcePlateId = {
           id: 'sourcePlateId',
-          type: labwareType,
+          labwareDefURI: labwareType,
           def,
         }
         const blankLiquidState = createEmptyLiquidState(customInvariantContext)

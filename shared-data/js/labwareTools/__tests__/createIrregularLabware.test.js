@@ -10,7 +10,7 @@ import {
 } from '../index.js'
 import { splitWellsOnColumn, sortWells } from '../../helpers/index.js'
 
-import exampleLabware1 from '../../__tests__/fixtures/labware2/irregularLabwareExample1.json'
+import exampleLabware1 from '../../../labware/fixtures/2/irregularLabwareExample1.json'
 
 jest.mock('../assignId', () => jest.fn(() => 'mock-id'))
 

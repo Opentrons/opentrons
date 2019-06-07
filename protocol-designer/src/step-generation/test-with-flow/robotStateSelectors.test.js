@@ -1,5 +1,7 @@
 // @flow
-import { fixtureTipRack300Ul } from '@opentrons/shared-data/fixtures'
+import { getLabwareDefURI } from '@opentrons/shared-data'
+import fixtureTipRack300Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack300Ul.json'
+
 import {
   makeContext,
   makeState,
@@ -54,7 +56,7 @@ describe('_getNextTip', () => {
     let _invariantContext = makeContext()
     _invariantContext.labwareEntities[tiprackId] = {
       id: tiprackId,
-      type: fixtureTipRack300Ul.otId,
+      labwareDefURI: getLabwareDefURI(fixtureTipRack300Ul),
       def: fixtureTipRack300Ul,
     }
     let robotState = makeState({
