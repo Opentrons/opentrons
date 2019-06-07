@@ -3,15 +3,22 @@ import * as React from 'react'
 import cx from 'classnames'
 import { Link } from 'react-router-dom'
 
-import type { Labware, SessionModule } from '../../robot'
-import type { LabwareComponentProps } from '@opentrons/components'
+import {
+  selectors as robotSelectors,
+  actions as robotActions,
+  type Labware,
+  type SessionModule,
+} from '../../robot'
+import { getLatestLabwareDef } from '../../util'
 
 import {
-  ContainerNameOverlay,
-  ModuleNameOverlay,
+  LabwareNameOverlay,
+  // ModuleNameOverlay,
   LabwareWrapper,
+  LabwareRender,
   Labware as LabwareComponent,
   humanizeLabwareType,
+  type LabwareComponentProps,
 } from '@opentrons/components'
 
 import LabwareSpinner from './LabwareSpinner'
@@ -31,46 +38,68 @@ export type LabwareItemProps = {
 }
 
 export default function LabwareItem(props: LabwareItemProps) {
-  const { width, height, labware, module } = props
+  const { labware, highlighted, areTipracksConfirmed, handleClick } = props
 
-  const {
-    name,
-    type,
-    highlighted,
-    disabled,
-    showSpinner,
-    onClick,
-    url,
-  } = labware
+  const { isTiprack, confirmed, name, type, slot } = labware
+
+  const showSpinner = highlighted && labware.calibration === 'moving-to-slot'
+  const disabled =
+    (isTiprack && confirmed) || (!isTiprack && !areTipracksConfirmed)
 
   const labwareClass = cx({ [styles.disabled]: disabled })
+  const title = humanizeLabwareType(type)
+
+  let item
+
+  if (labware.isLegacy) {
+    item = (
+      <LabwareWrapper highlighted={highlighted}>
+        <g className={labwareClass}>
+          <LabwareComponent labwareType={type} />
+
+          {showSpinner ? (
+            <LabwareSpinner />
+          ) : (
+            <LabwareNameOverlay title={title} subtitle={name} />
+          )
+          // module && <ModuleNameOverlay name={module.name} />
+          }
+        </g>
+      </LabwareWrapper>
+    )
+  } else {
+    item = <LabwareRender definition={getLatestLabwareDef(type)} />
+  }
   // const v2LabwareDef = getLabwareDefinition(loadName, namespace, version)
-  const item = (
-    <LabwareWrapper width={width} height={height} highlighted={highlighted}>
-      <g className={labwareClass}>
-        <LabwareComponent labwareType={type} />
-
-        {!showSpinner && (
-          <ContainerNameOverlay
-            title={humanizeLabwareType(type)}
-            subtitle={name}
-          />
-        )}
-
-        {!showSpinner && module && <ModuleNameOverlay name={module.name} />}
-
-        {showSpinner && <LabwareSpinner />}
-      </g>
-    </LabwareWrapper>
-  )
-
-  if (!showSpinner && !disabled && url) {
+  if (!showSpinner && !disabled) {
     return (
-      <Link to={url} onClick={onClick}>
+      <Link to={`/calibrate/labware/${slot}`} onClick={handleClick}>
         {item}
       </Link>
     )
   }
 
   return item
+}
+
+function mapStateToProps(state: State, ownProps: OP): SP {
+  return {
+    _calibrator:
+      ownProps.labware.calibratorMount ||
+      robotSelectors.getCalibratorMount(state),
+  }
+}
+
+function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
+  const { labware } = ownProps
+  const { dispatch } = dispatchProps
+  const { _calibrator } = stateProps
+  return {
+    ...ownProps,
+    handleClick: () => {
+      if (_calibrator && (!labware.isTiprack || !labware.confirmed)) {
+        dispatch(robotActions.moveTo(_calibrator, labware.slot))
+      }
+    },
+  }
 }

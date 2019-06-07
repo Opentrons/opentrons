@@ -11,6 +11,7 @@ import {
   type Labware,
 } from '../../robot'
 
+import DeckMap from '../DeckMap'
 import { Modal } from '../modals'
 import Prompt from './Prompt'
 import ReviewDeck from './ReviewDeck'
@@ -35,7 +36,7 @@ function ReviewDeckModal(props: Props) {
   return (
     <Modal>
       {currentLabware && <Prompt {...currentLabware} onClick={onClick} />}
-      <ReviewDeck />
+      <DeckMap />
     </Modal>
   )
 }

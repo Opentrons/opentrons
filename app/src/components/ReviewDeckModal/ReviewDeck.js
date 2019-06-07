@@ -10,3 +10,4 @@ import styles from './styles.css'
 export default function CalibrateDeck() {
   return <Deck LabwareComponent={LabwareComponent} className={styles.deck} />
 }
+//  <Deck LabwareComponent={ConnectedSlotItem} className={styles.deck} />

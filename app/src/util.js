@@ -1,5 +1,6 @@
 // @flow
 // utility functions
+import groupBy from 'lodash/groupBy'
 import type { Action, ThunkAction, ThunkPromiseAction } from './types'
 import createLogger from './logger'
 
@@ -59,4 +60,48 @@ export function chainActions(...actions: Array<Chainable>): ThunkPromiseAction {
       return Promise.resolve(result)
     }
   }
+}
+
+// require all definitions in the labware/definitions/2 directory
+// require.context is webpack-specific method
+const definitionsContext = (require: any).context(
+  '@opentrons/shared-data/labware/definitions/2',
+  true, // traverse subdirectories
+  /\.json$/, // import filter
+  'sync' // load every definition into one synchronous chunk
+)
+
+let definitions: LabwareList | null = null
+
+export function getLatestDefinitions(): LabwareList {
+  // NOTE: unlike labware-library, no filtering out "do not list labware"
+  // also, more convenient & performant to make a map {loadName: def} not an array
+  if (!definitions) {
+    const allDefs = definitionsContext
+      .keys()
+      .map(name => definitionsContext(name))
+    // group by namespace + loadName
+    const labwareDefGroups: {
+      [groupKey: string]: Array<LabwareDefinition2>,
+    } = groupBy(allDefs, d => `${d.namespace}/${d.parameters.loadName}`)
+
+    definitions = Object.keys(labwareDefGroups).map((groupKey: string) => {
+      const group = labwareDefGroups[groupKey]
+      const allVersions = group.map(d => d.version)
+      const highestVersionNum = Math.max(...allVersions)
+      const resultIdx = group.findIndex(d => d.version === highestVersionNum)
+      return group[resultIdx]
+    })
+  }
+
+  return definitions
+}
+
+export function getLatestLabwareDef(
+  loadName: ?string
+): LabwareDefinition | null {
+  const def = getLatestDefinitions().find(
+    d => d.parameters.loadName === loadName
+  )
+  return def || null
 }

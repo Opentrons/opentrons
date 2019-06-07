@@ -21,7 +21,7 @@ let definitions = null
 //  we'll have to refactor this soon anyway
 export function getAllDefinitions(): LabwareDefByDefId {
   // NOTE: unlike labware-library, no filtering out trashes here (we need 'em)
-  // also, more convenient & performant to make a map {otId: def} not an array
+  // also, more convenient & performant to make a map {loadName: def} not an array
   if (!definitions) {
     definitions = definitionsContext.keys().reduce((acc, filename) => {
       const def = definitionsContext(filename)

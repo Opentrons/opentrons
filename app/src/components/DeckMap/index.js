@@ -6,37 +6,25 @@ import some from 'lodash/some'
 import map from 'lodash/map'
 import { type DeckSlotId } from '@opentrons/shared-data'
 
-import { RobotWorkSpace, LabwareRender } from '@opentrons/components'
+import { RobotWorkSpace, Module as ModuleItem } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
-import {
-  selectors as robotSelectors,
-  actions as robotActions,
-} from '../../robot'
+import { selectors as robotSelectors, type Labware } from '../../robot'
 
 // import ConnectedSlotItem from './ConnectedSlotItem'
 import LabwareItem from './LabwareItem'
 
 // import styles from './styles.css'
-type DeckSlotSessionItem =
-  | $PropertyType<LabwareItemProps, 'labware'>
-  | SessionModule
 
 type OP = {| ...ContextRouter |}
 
 type SP = {|
-  calibrator: Mount | null,
-  itemsBySlot: { [DeckSlotId]: Array<DeckSlotSessionItem> },
+  labwareBySlot: { [DeckSlotId]: Array<Labware> },
+  modulesBySlot: { [DeckSlotId]: SessionModule },
   selectedSlot: DeckSlotId,
   areTipracksConfirmed: boolean,
 |}
 
-type DP = {| dispatch: Dispatch |}
-
-type Props = {
-  ...SP,
-  labware?: $PropertyType<LabwareItemProps, 'labware'>,
-  module?: SessionModule,
-}
+type Props = {| ...OP, ...SP |}
 
 const deckSetupLayerBlacklist = [
   'calibrationMarkings',
@@ -49,7 +37,12 @@ const deckSetupLayerBlacklist = [
 
 function DeckMap(props: Props) {
   const deckDef = useMemo(() => getDeckDefinitions()['ot2_standard'], [])
-  //  <Deck LabwareComponent={ConnectedSlotItem} className={styles.deck} />
+  const {
+    modulesBySlot,
+    labwareBySlot,
+    selectedSlot,
+    areTipracksConfirmed,
+  } = props
   return (
     <RobotWorkSpace
       deckLayerBlacklist={deckSetupLayerBlacklist}
@@ -58,21 +51,27 @@ function DeckMap(props: Props) {
     >
       {({ slots }) =>
         map(slots, (slot: $Values<typeof slots>, slotId) => {
-          if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render labware or overlays
-          const itemsInSlot = props.itemsBySlot[slot]
-          if (some()) {
-            return (
-              <React.Fragment key={slot.id}>
-                {map(itemsInSlot, slotItem => (
-                  <DeckSlotItem
-                    item={slotItem}
-                    x={slots[labwareOnDeck.slot].position[0]}
-                    y={slots[labwareOnDeck.slot].position[1]}
+          if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
+          const moduleInSlot = modulesBySlot[slotId]
+          const labwareInSlot = labwareBySlot[slotId]
+
+          return (
+            <g
+              transform={`translate(${slot.position[0]}, ${slot.position[1]})`}
+            >
+              {moduleInSlot && (
+                <ModuleItem name={moduleInSlot.name} mode="default" />
+              )}
+              {some(labwareInSlot) &&
+                map(labwareInSlot, labware => (
+                  <LabwareItem
+                    labware={labware}
+                    areTipracksConfirmed={areTipracksConfirmed}
+                    highlighted={slotId === selectedSlot}
                   />
                 ))}
-              </React.Fragment>
-            )
-          }
+            </g>
+          )
         })
       }
     </RobotWorkSpace>
@@ -93,36 +92,22 @@ function mapStateToProps(state: State, ownProps: OP): SP {
 
   const modulesBySlot = robotSelectors.getModulesBySlot(state)
 
-  const itemsBySlot = allLabware.reduce((acc, labware) => {
-    let itemsInSlot = [...acc[labware.slot], labware]
-    const moduleInSlot = modulesBySlot[labware.slot]
-    if (moduleInSlot) itemsInSlot = [moduleInSlot, ...itemsInSlot]
-
-    return {
+  const labwareBySlot = allLabware.reduce(
+    (acc, labware) => ({
       ...acc,
-      [labware.slot]: itemsInSlot,
-    }
-  }, {})
+      [labware.slot]: [...(acc[labware.slot] || []), labware],
+    }),
+    {}
+  )
 
   return {
-    _calibrator: robotSelectors.getCalibratorMount(state),
-    itemsBySlot,
+    labwareBySlot,
+    modulesBySlot,
     selectedSlot,
     areTipracksConfirmed,
   }
 }
 
-function mapDispatchToProps(dispatch: Dispatch): DP {
-  // if (_calibrator && (!_labware.isTiprack || !_labware.confirmed)) {
-  return {
-    moveToSlot: (calibrator, slot) =>
-      dispatch(robotActions.moveTo(calibrator, slot)),
-  }
-}
-
 export default withRouter<WithRouterOP>(
-  connect<Props, OP, SP, {||}, State, Dispatch>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(DeckMap)
+  connect<Props, OP, SP, {||}, State, Dispatch>(mapStateToProps)(DeckMap)
 )
