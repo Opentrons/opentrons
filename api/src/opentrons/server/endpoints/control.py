@@ -1,4 +1,5 @@
 import asyncio
+import functools
 import os
 import json
 import logging
@@ -14,6 +15,14 @@ from opentrons.hardware_control.types import Axis, CriticalPoint
 
 
 log = logging.getLogger(__name__)
+
+
+def _motion_lock(func):
+    @functools.wraps(func)
+    async def decorated(request):
+        async with request.app['com.opentrons.motion_lock']:
+            return await func(request)
+    return decorated
 
 
 def hw_from_req(req):
@@ -309,6 +318,7 @@ def _validate_move_data(data):
     return target, point, mount, model, message, error
 
 
+@_motion_lock
 async def move(request):
     """
     Moves the robot to the specified position as provided by the `control.info`
@@ -419,6 +429,7 @@ def _move_mount(robot, mount, point):
     return "Move complete. New position: {}".format(new_position)
 
 
+@_motion_lock
 async def home(request):
     """
     This initializes a call to pipette.home() which, as a side effect will:
