@@ -34,6 +34,7 @@ export function parseProtocolData(
     }
   } else if (metadata) {
     // grab Python protocol metadata, if any
+    // $FlowFixMe: (ka, 2019-06-10): cant differentiate which file schema file is needed
     return { metadata }
   }
 

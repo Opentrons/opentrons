@@ -4,6 +4,7 @@ import path from 'path'
 import startCase from 'lodash/startCase'
 import { createSelector } from 'reselect'
 import { getter } from '@thi.ng/paths'
+import { getProtocolSchemaVersion } from '@opentrons/shared-data'
 import {
   fileToProtocolFile,
   parseProtocolData,
@@ -101,6 +102,11 @@ type NumberGetter = (?ProtocolData) => ?number
 type StringSelector = OutputSelector<State, void, ?string>
 type NumberSelector = OutputSelector<State, void, ?number>
 type ProtocolTypeSelector = OutputSelector<State, void, ProtocolType | null>
+type ProtocolInfoSelector = OutputSelector<
+  State,
+  void,
+  { protocolName: ?string, appName: ?string, appVersion: ?string }
+>
 type CreatorAppSelector = OutputSelector<
   State,
   void,
@@ -135,15 +141,6 @@ export const getProtocolFile = (state: State) => state.protocol.file
 export const getProtocolContents = (state: State) => state.protocol.contents
 export const getProtocolData = (state: State) => state.protocol.data
 
-const getProtocolSchemaVersion: NumberSelector = createSelector(
-  getProtocolData,
-  data => {
-    return data && data['protocol-schema']
-      ? Number(data['protocol-schema'].charAt(0))
-      : data && data['schemaVersion']
-  }
-)
-
 export const getProtocolFilename: StringSelector = createSelector(
   getProtocolFile,
   file => file && file.name
@@ -154,16 +151,28 @@ export const getProtocolLastModified: NumberSelector = createSelector(
   file => file && file.lastModified
 )
 
-export const getProtocolName: StringSelector = createSelector(
-  getProtocolSchemaVersion,
-  getProtocolFilename,
+export const getProtocolDisplayData: $Shape<ProtocolInfoSelector> = createSelector(
   getProtocolData,
-  (pathsForProtocol, name, data) => {
+  getProtocolFilename,
+  (data, name) => {
+    const version = (data && getProtocolSchemaVersion(data)) || 1
     const getName =
-      pathsForProtocol &&
-      getter(PROTOCOL_GETTER_PATHS_BY_SCHEMA[pathsForProtocol]['name'])
-    return (data && getName(data)) || (name && stripDirAndExtension(name))
+      version && getter(PROTOCOL_GETTER_PATHS_BY_SCHEMA[version]['name'])
+    const getAppName =
+      version && getter(PROTOCOL_GETTER_PATHS_BY_SCHEMA[version]['appName'])
+    const getAppVersion =
+      version && getter(PROTOCOL_GETTER_PATHS_BY_SCHEMA[version]['appVersion'])
+    const protocolName =
+      (data && getName(data)) || (name && stripDirAndExtension(name))
+    const appName = data && getAppName(data)
+    const appVersion = data && getAppVersion(data)
+    return { name: protocolName, appName: appName, appVersion: appVersion }
   }
+)
+
+export const getProtocolName: StringSelector = createSelector(
+  getProtocolDisplayData,
+  displayData => displayData.name
 )
 
 export const getProtocolAuthor: StringSelector = createSelector(
@@ -194,18 +203,12 @@ export const getProtocolType: ProtocolTypeSelector = createSelector(
 )
 
 export const getProtocolCreatorApp: CreatorAppSelector = createSelector(
-  getProtocolSchemaVersion,
-  getProtocolData,
-  (pathsForProtocol, data) => {
-    const getAppName =
-      pathsForProtocol &&
-      getter(PROTOCOL_GETTER_PATHS_BY_SCHEMA[pathsForProtocol]['appName'])
-    const getAppVersion =
-      pathsForProtocol &&
-      getter(PROTOCOL_GETTER_PATHS_BY_SCHEMA[pathsForProtocol]['appVersion'])
-    const appName = pathsForProtocol && getAppName(data)
-    const appVersion = pathsForProtocol && getAppVersion(data)
-    return { name: appName, version: appVersion }
+  getProtocolDisplayData,
+  displayData => {
+    return {
+      name: displayData.appName,
+      version: displayData.appVersion,
+    }
   }
 )
 
