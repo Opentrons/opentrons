@@ -1008,7 +1008,7 @@
     "format": "96Standard",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "usascientific_96_wellplate_2.4ml_deep"
+    "loadName": "generic_96_wellplate_1.5ml_deep"
   },
   "namespace": "opentrons",
   "version": 1,

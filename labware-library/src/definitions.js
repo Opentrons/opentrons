@@ -4,10 +4,15 @@
 import * as React from 'react'
 import { Route } from 'react-router-dom'
 import isEqual from 'lodash/isEqual'
+import groupBy from 'lodash/groupBy'
 import uniqBy from 'lodash/uniqBy'
 import uniqWith from 'lodash/uniqWith'
 import round from 'lodash/round'
 import orderBy from 'lodash/orderBy'
+import {
+  LABWAREV2_DO_NOT_LIST,
+  type LabwareDefinition2,
+} from '@opentrons/shared-data'
 import { getPublicPath } from './public-path'
 
 import type { ContextRouter } from 'react-router-dom'
@@ -28,24 +33,33 @@ const definitionsContext = (require: any).context(
   'sync' // load every definition into one synchronous chunk
 )
 
-const DO_NOT_LIST = [
-  'opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip',
-  'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap_acrylic',
-  'opentrons_24_tuberack_generic_0.75ml_snapcap_acrylic',
-  'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic',
-  'tipone_96_tiprack_200ul',
-  'opentrons_1_trash_850ml_fixed',
-  'opentrons_1_trash_1100ml_fixed',
-]
+const getOnlyLatestDefs = (labwareList: LabwareList): LabwareList => {
+  // group by namespace + loadName
+  const labwareDefGroups: {
+    [groupKey: string]: Array<LabwareDefinition2>,
+  } = groupBy(labwareList, d => `${d.namespace}/${d.parameters.loadName}`)
+
+  return Object.keys(labwareDefGroups).map((groupKey: string) => {
+    const group = labwareDefGroups[groupKey]
+    const allVersions = group.map(d => d.version)
+    const highestVersionNum = Math.max(...allVersions)
+    const resultIdx = group.findIndex(d => d.version === highestVersionNum)
+    return group[resultIdx]
+  })
+}
 
 let definitions: LabwareList | null = null
 
 export function getAllDefinitions(): LabwareList {
   if (!definitions) {
-    definitions = definitionsContext
+    const allDefs = definitionsContext
       .keys()
       .map(name => definitionsContext(name))
-      .filter(d => DO_NOT_LIST.indexOf(d.parameters.loadName) === -1)
+      .filter(
+        (d: LabwareDefinition2) =>
+          LABWAREV2_DO_NOT_LIST.indexOf(d.parameters.loadName) === -1
+      )
+    definitions = getOnlyLatestDefs(allDefs)
   }
 
   return definitions
