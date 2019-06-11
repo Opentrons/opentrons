@@ -105,7 +105,12 @@ type ProtocolTypeSelector = OutputSelector<State, void, ProtocolType | null>
 type ProtocolInfoSelector = OutputSelector<
   State,
   void,
-  { name: ?string, appName: ?string, appVersion: ?string }
+  {
+    protocolName: ?string,
+    lastModified: ?number,
+    appName: ?string,
+    appVersion: ?string,
+  }
 >
 type CreatorAppSelector = OutputSelector<
   State,
@@ -115,6 +120,7 @@ type CreatorAppSelector = OutputSelector<
 
 const protocolV1V2GetterPaths = {
   name: 'metadata.protocol-name',
+  lastModified: 'metadata.last-modified',
   appName: 'designer-application.application-name',
   appVersion: 'designer-application.application-version',
 }
@@ -124,6 +130,7 @@ const PROTOCOL_GETTER_PATHS_BY_SCHEMA = {
   '2': protocolV1V2GetterPaths,
   '3': {
     name: 'metadata.protocolName',
+    lastModified: 'metadata.lastModified',
     appName: 'designerApplication.name',
     appVersion: 'designerApplication.version',
   },
@@ -132,7 +139,6 @@ const PROTOCOL_GETTER_PATHS_BY_SCHEMA = {
 const getAuthor: StringGetter = getter('metadata.author')
 const getDesc: StringGetter = getter('metadata.description')
 const getCreated: NumberGetter = getter('metadata.created')
-const getLastModified: NumberGetter = getter('metadata.last-modified')
 const getSource: StringGetter = getter('metadata.source')
 
 const stripDirAndExtension = f => path.basename(f, path.extname(f))
@@ -146,18 +152,28 @@ export const getProtocolFilename: StringSelector = createSelector(
   file => file && file.name
 )
 
-export const getProtocolLastModified: NumberSelector = createSelector(
-  getProtocolFile,
-  file => file && file.lastModified
-)
+// TODO: (ka 2019-06-11): Investigate removing this unused? selector
+// export const getProtocolLastModified: NumberSelector = createSelector(
+//   getProtocolFile,
+//   file => file && file.lastModified
+// )
 
 export const getProtocolDisplayData: $Shape<ProtocolInfoSelector> = createSelector(
   getProtocolData,
   getProtocolFilename,
   (data, name) => {
-    if (!data) return { name: '', appName: '', appVersion: '' }
+    if (!data)
+      return {
+        protocolName: name && stripDirAndExtension(name),
+        lastModified: null,
+        appName: null,
+        appVersion: null,
+      }
     const version = (data && getProtocolSchemaVersion(data)) || 1
     const getName = getter(PROTOCOL_GETTER_PATHS_BY_SCHEMA[version]['name'])
+    const getLastModified = getter(
+      PROTOCOL_GETTER_PATHS_BY_SCHEMA[version]['lastModified']
+    )
     const getAppName = getter(
       PROTOCOL_GETTER_PATHS_BY_SCHEMA[version]['appName']
     )
@@ -165,15 +181,21 @@ export const getProtocolDisplayData: $Shape<ProtocolInfoSelector> = createSelect
       PROTOCOL_GETTER_PATHS_BY_SCHEMA[version]['appVersion']
     )
     const protocolName = getName(data) || (name && stripDirAndExtension(name))
+    const lastModified = getLastModified(data) || getCreated(data)
     const appName = getAppName(data)
     const appVersion = getAppVersion(data)
-    return { name: protocolName, appName: appName, appVersion: appVersion }
+    return {
+      protocolName: protocolName,
+      lastModified: lastModified,
+      appName: appName,
+      appVersion: appVersion,
+    }
   }
 )
 
 export const getProtocolName: StringSelector = createSelector(
   getProtocolDisplayData,
-  displayData => displayData.name
+  displayData => displayData.protocolName
 )
 
 export const getProtocolAuthor: StringSelector = createSelector(
@@ -193,9 +215,8 @@ export const getProtocolSource: StringSelector = createSelector(
 
 export const getProtocolLastUpdated: NumberSelector = createSelector(
   getProtocolFile,
-  getProtocolData,
-  (file, data) =>
-    getLastModified(data) || getCreated(data) || (file && file.lastModified)
+  getProtocolDisplayData,
+  (file, displayData) => displayData.lastModified || (file && file.lastModified)
 )
 
 export const getProtocolType: ProtocolTypeSelector = createSelector(
