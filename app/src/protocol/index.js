@@ -105,7 +105,7 @@ type ProtocolTypeSelector = OutputSelector<State, void, ProtocolType | null>
 type ProtocolInfoSelector = OutputSelector<
   State,
   void,
-  { protocolName: ?string, appName: ?string, appVersion: ?string }
+  { name: ?string, appName: ?string, appVersion: ?string }
 >
 type CreatorAppSelector = OutputSelector<
   State,
