@@ -155,17 +155,18 @@ export const getProtocolDisplayData: $Shape<ProtocolInfoSelector> = createSelect
   getProtocolData,
   getProtocolFilename,
   (data, name) => {
+    if (!data) return { name: '', appName: '', appVersion: '' }
     const version = (data && getProtocolSchemaVersion(data)) || 1
-    const getName =
-      version && getter(PROTOCOL_GETTER_PATHS_BY_SCHEMA[version]['name'])
-    const getAppName =
-      version && getter(PROTOCOL_GETTER_PATHS_BY_SCHEMA[version]['appName'])
-    const getAppVersion =
-      version && getter(PROTOCOL_GETTER_PATHS_BY_SCHEMA[version]['appVersion'])
-    const protocolName =
-      (data && getName(data)) || (name && stripDirAndExtension(name))
-    const appName = data && getAppName(data)
-    const appVersion = data && getAppVersion(data)
+    const getName = getter(PROTOCOL_GETTER_PATHS_BY_SCHEMA[version]['name'])
+    const getAppName = getter(
+      PROTOCOL_GETTER_PATHS_BY_SCHEMA[version]['appName']
+    )
+    const getAppVersion = getter(
+      PROTOCOL_GETTER_PATHS_BY_SCHEMA[version]['appVersion']
+    )
+    const protocolName = getName(data) || (name && stripDirAndExtension(name))
+    const appName = getAppName(data)
+    const appVersion = getAppVersion(data)
     return { name: protocolName, appName: appName, appVersion: appVersion }
   }
 )
