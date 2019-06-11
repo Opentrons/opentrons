@@ -1,10 +1,11 @@
 // @flow
 import assert from 'assert'
+import { getLabwareHeight } from '@opentrons/shared-data'
 import {
   DEFAULT_CHANGE_TIP_OPTION,
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
-  DEFAULT_MM_FROM_BOTTOM_BLOWOUT,
+  DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
 } from '../../../constants'
 import { getOrderedWells } from '../../utils'
 import type { FormData } from '../../../form-types'
@@ -43,7 +44,8 @@ const mixFormToArgs = (hydratedFormData: FormData): MixStepArgs => {
 
   // Blowout settings
   const blowoutFlowRateUlSec = dispenseFlowRateUlSec
-  const blowoutOffsetFromBottomMm = DEFAULT_MM_FROM_BOTTOM_BLOWOUT
+  const blowoutOffsetFromBottomMm =
+    getLabwareHeight(labware.def) + DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
 
   // It's radiobutton, so one should always be selected.
   // One changeTip option should always be selected.

@@ -1,5 +1,6 @@
 // @flow
 import assert from 'assert'
+import { getLabwareHeight } from '@opentrons/shared-data'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
@@ -7,8 +8,8 @@ import {
 import {
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
-  DEFAULT_MM_FROM_BOTTOM_BLOWOUT,
-  DEFAULT_MM_FROM_BOTTOM_TOUCHTIP,
+  DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
+  DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
 import { getOrderedWells } from '../../utils'
 
@@ -66,12 +67,17 @@ const moveLiquidFormToArgs = (
   } = fields
 
   const touchTipAfterAspirate = Boolean(fields.aspirate_touchTip_checkbox)
+
   const touchTipAfterAspirateOffsetMmFromBottom =
-    fields.aspirate_touchTip_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_TOUCHTIP
+    fields.aspirate_touchTip_mmFromBottom ||
+    getLabwareHeight(fields.aspirate_labware.def) +
+      DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
 
   const touchTipAfterDispense = Boolean(fields.dispense_touchTip_checkbox)
   const touchTipAfterDispenseOffsetMmFromBottom =
-    fields.dispense_touchTip_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_TOUCHTIP
+    fields.dispense_touchTip_mmFromBottom ||
+    getLabwareHeight(fields.dispense_labware.def) +
+      DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
 
   const mixBeforeAspirate = getMixData(
     fields,
@@ -107,7 +113,9 @@ const moveLiquidFormToArgs = (
       fields.dispense_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_DISPENSE,
     blowoutFlowRateUlSec:
       fields.dispense_flowRate || pipetteSpec.defaultDispenseFlowRate.value,
-    blowoutOffsetFromBottomMm: DEFAULT_MM_FROM_BOTTOM_BLOWOUT,
+    blowoutOffsetFromBottomMm:
+      getLabwareHeight(fields.dispense_labware.def) +
+      DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
 
     changeTip: fields.changeTip,
     preWetTip: Boolean(fields.preWetTip),

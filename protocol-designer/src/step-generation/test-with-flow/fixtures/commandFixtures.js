@@ -39,13 +39,12 @@ export const pickUpTip = (
 
 export const touchTip = (
   well: string,
-  params?: {| labware?: string |}
+  params: {| offsetFromBottomMm: number, labware?: string |}
 ): Command => ({
   command: 'touchTip',
   params: {
     labware: 'sourcePlateId',
     pipette: 'p300SingleId',
-    offsetFromBottomMm: 11,
     ...params,
     well,
   },
@@ -75,8 +74,6 @@ export const dispense = (
   params: {
     pipette: 'p300SingleId',
     labware: 'sourcePlateId',
-    offsetFromBottomMm: 1,
-    flowRate: 2,
     ...params,
     volume,
     well,
@@ -85,15 +82,18 @@ export const dispense = (
 
 export const blowout = (
   labware?: string,
-  params?: {| pipette?: string, well?: string |}
+  params?: {|
+    offsetFromBottomMm: number,
+    flowRate: number,
+    pipette?: string,
+    well?: string,
+  |}
 ): Command => ({
   command: 'blowout',
   params: {
     pipette: 'p300SingleId',
     well: 'A1',
     labware: labware || 'trashId',
-    offsetFromBottomMm: 1,
-    flowRate: 2,
     ...params,
   },
 })

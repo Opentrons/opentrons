@@ -86,3 +86,8 @@ export function getWellDefsForSVG(labwareName: string) {
 
 export const getLabwareDefURI = (def: LabwareDefinition2): string =>
   `${def.namespace}/${def.parameters.loadName}/${def.version}`
+
+// NOTE: this is used in PD for converting "mm from top" to "mm from bottom"
+// With v2 labware defs, wells only have differing depths. Wells within a labware have a uniform height.
+export const getLabwareHeight = (labwareDef: LabwareDefinition2): number =>
+  labwareDef.dimensions.zDimension + labwareDef.cornerOffsetFromSlot.z
