@@ -32,7 +32,7 @@ describe('touchTip', () => {
 
     expect(result.commands).toEqual([
       {
-        command: 'touch-tip',
+        command: 'touchTip',
         params: {
           pipette: 'p300SingleId',
           labware: 'sourcePlateId',
@@ -54,7 +54,7 @@ describe('touchTip', () => {
 
     expect(result.commands).toEqual([
       {
-        command: 'touch-tip',
+        command: 'touchTip',
         params: {
           pipette: 'p300SingleId',
           labware: 'sourcePlateId',

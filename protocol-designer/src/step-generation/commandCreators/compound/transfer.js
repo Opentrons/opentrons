@@ -71,6 +71,8 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
     dispenseFlowRateUlSec,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
+    blowoutFlowRateUlSec,
+    blowoutOffsetFromBottomMm,
   } = args
 
   const effectiveTransferVol = getPipetteWithTipMaxVol(
@@ -204,7 +206,9 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
             sourceWell,
             args.destLabware,
             destWell,
-            args.blowoutLocation
+            args.blowoutLocation,
+            blowoutFlowRateUlSec,
+            blowoutOffsetFromBottomMm
           )
 
           const nextCommands = [
@@ -216,7 +220,7 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
               volume: subTransferVol,
               labware: args.sourceLabware,
               well: sourceWell,
-              'flow-rate': aspirateFlowRateUlSec,
+              flowRate: aspirateFlowRateUlSec,
               offsetFromBottomMm: aspirateOffsetFromBottomMm,
             }),
             ...touchTipAfterAspirateCommands,
@@ -225,7 +229,7 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
               volume: subTransferVol,
               labware: args.destLabware,
               well: destWell,
-              'flow-rate': dispenseFlowRateUlSec,
+              flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
             }),
             ...touchTipAfterDispenseCommands,

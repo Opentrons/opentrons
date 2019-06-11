@@ -115,7 +115,7 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (
               volume: args.volume,
               labware: args.destLabware,
               well: destWell,
-              'flow-rate': dispenseFlowRateUlSec,
+              flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
             }),
             ...touchTipAfterDispenseCommand,
@@ -134,6 +134,7 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (
       }
 
       // TODO: BC 2018-11-29 instead of disposalLabware and disposalWell use blowoutLocation
+      // TODO IMMEDIATELY why not use blowout util???
       let blowoutCommands = []
       if (args.disposalVolume && args.disposalLabware && args.disposalWell) {
         blowoutCommands = [
@@ -141,6 +142,8 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (
             pipette: args.pipette,
             labware: args.disposalLabware,
             well: args.disposalWell,
+            flowRate: args.blowoutFlowRateUlSec,
+            offsetFromBottomMm: args.blowoutOffsetFromBottomMm,
           }),
         ]
       }
@@ -178,7 +181,7 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (
           volume: args.volume * destWellChunk.length + disposalVolume,
           labware: args.sourceLabware,
           well: args.sourceWell,
-          'flow-rate': aspirateFlowRateUlSec,
+          flowRate: aspirateFlowRateUlSec,
           offsetFromBottomMm: aspirateOffsetFromBottomMm,
         }),
         ...touchTipAfterAspirateCommand,

@@ -2,7 +2,7 @@
 import { createSelector } from 'reselect'
 import {
   getWellNamePerMultiTip,
-  type CommandV1 as Command,
+  type CommandV3 as Command,
 } from '@opentrons/shared-data'
 
 import mapValues from 'lodash/mapValues'
@@ -92,7 +92,7 @@ function _getSelectedWellsForStep(
   }
 
   frame.commands.forEach((c: Command) => {
-    if (c.command === 'pick-up-tip' && c.params.labware === labwareId) {
+    if (c.command === 'pickUpTip' && c.params.labware === labwareId) {
       const commandWellName = c.params.well
       const pipetteId = c.params.pipette
       const pipetteSpec =

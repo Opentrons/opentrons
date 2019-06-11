@@ -55,7 +55,7 @@ describe('dropTip', () => {
 
       expect(result.commands).toEqual([
         {
-          command: 'drop-tip',
+          command: 'dropTip',
           params: {
             pipette: 'p300SingleId',
             labware: 'trashId',
@@ -90,7 +90,7 @@ describe('dropTip', () => {
       )
       expect(result.commands).toEqual([
         {
-          command: 'drop-tip',
+          command: 'dropTip',
           params: {
             pipette: 'p300MultiId',
             labware: 'trashId',

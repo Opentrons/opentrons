@@ -105,7 +105,7 @@ export type MixForm = {|
   times?: string,
   volume?: string,
   wells?: Array<string>,
-  'touch-tip'?: boolean,
+  touchTip?: boolean,
 |}
 
 export type PauseForm = {|

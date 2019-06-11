@@ -466,7 +466,7 @@ describe('advanced options', () => {
       ])
     })
 
-    test('touch-tip after aspirate should touch-tip on each source well, for every aspirate', () => {
+    test('touchTip after aspirate should touchTip on each source well, for every aspirate', () => {
       transferArgs = {
         ...transferArgs,
         volume: 350,
@@ -485,7 +485,7 @@ describe('advanced options', () => {
       ])
     })
 
-    test('touch-tip after dispense should touch-tip on each dest well, for every dispense', () => {
+    test('touchTip after dispense should touchTip on each dest well, for every dispense', () => {
       transferArgs = {
         ...transferArgs,
         volume: 350,

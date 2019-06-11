@@ -1,6 +1,6 @@
 // @flow
 import * as errorCreators from '../../errorCreators'
-import type { PipetteLabwareFieldsV1 as PipetteLabwareFields } from '@opentrons/shared-data'
+import type { BlowoutArgsV3 } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   RobotState,
@@ -10,12 +10,12 @@ import type {
 
 import updateLiquidState from '../../dispenseUpdateLiquidState'
 
-const blowout = (args: PipetteLabwareFields): CommandCreator => (
+const blowout = (args: BlowoutArgsV3): CommandCreator => (
   invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => {
   /** Blowout with given args. Requires tip. */
-  const { pipette, labware, well } = args
+  const { pipette, labware, well, offsetFromBottomMm, flowRate } = args
 
   const actionName = 'blowout'
   let errors: Array<CommandCreatorError> = []
@@ -50,6 +50,8 @@ const blowout = (args: PipetteLabwareFields): CommandCreator => (
         pipette,
         labware,
         well,
+        flowRate,
+        offsetFromBottomMm,
       },
     },
   ]

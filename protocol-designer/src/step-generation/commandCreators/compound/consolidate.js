@@ -54,8 +54,10 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
   const {
     aspirateFlowRateUlSec,
     dispenseFlowRateUlSec,
+    blowoutFlowRateUlSec,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
+    blowoutOffsetFromBottomMm,
   } = args
 
   const maxWellsPerChunk = Math.floor(
@@ -90,7 +92,7 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
               volume: args.volume,
               labware: args.sourceLabware,
               well: sourceWell,
-              'flow-rate': aspirateFlowRateUlSec,
+              flowRate: aspirateFlowRateUlSec,
               offsetFromBottomMm: aspirateOffsetFromBottomMm,
             }),
             ...touchTipAfterAspirateCommand,
@@ -156,6 +158,8 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
             times: args.mixInDestination.times,
             aspirateOffsetFromBottomMm,
             dispenseOffsetFromBottomMm,
+            aspirateFlowRateUlSec,
+            dispenseFlowRateUlSec,
           })
         : []
 
@@ -165,7 +169,9 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
         sourceWellChunk[0],
         args.destLabware,
         args.destWell,
-        args.blowoutLocation
+        args.blowoutLocation,
+        blowoutFlowRateUlSec,
+        blowoutOffsetFromBottomMm
       )
 
       return [
@@ -178,7 +184,7 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
           volume: args.volume * sourceWellChunk.length,
           labware: args.destLabware,
           well: args.destWell,
-          'flow-rate': dispenseFlowRateUlSec,
+          flowRate: dispenseFlowRateUlSec,
           offsetFromBottomMm: dispenseOffsetFromBottomMm,
         }),
         ...touchTipAfterDispenseCommands,

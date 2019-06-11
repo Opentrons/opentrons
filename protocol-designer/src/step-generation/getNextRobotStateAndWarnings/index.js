@@ -1,7 +1,7 @@
 // @flow
 import assert from 'assert'
 import forAspirateDispense from './forAspirateDispense'
-import type { CommandV1 as Command } from '@opentrons/shared-data'
+import type { CommandV3 as Command } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   RobotState,
@@ -24,17 +24,17 @@ export default function getNextRobotStateAndWarnings(
         prevRobotState
       )
     case 'blowout':
-    case 'drop-tip':
-    case 'pick-up-tip':
+    case 'dropTip':
+    case 'pickUpTip':
       // TODO: BC 2018-11-29 handle PipetteLabwareArgs
       return { robotState: prevRobotState, warnings: [] }
-    case 'touch-tip':
-      // TODO: BC 2018-11-29 handle touch-tip
+    case 'touchTip':
+      // TODO: BC 2018-11-29 handle touchTip
       return { robotState: prevRobotState, warnings: [] }
     case 'delay':
       // TODO: BC 2018-11-29 handle delay
       return { robotState: prevRobotState, warnings: [] }
-    case 'air-gap':
+    case 'airGap':
       // TODO: BC 2018-11-29 handle air-gap
       return { robotState: prevRobotState, warnings: [] }
     default:

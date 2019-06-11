@@ -1,8 +1,9 @@
 // @flow
 import { tiprackWellNamesFlat } from './data'
 import type {
-  AspirateDispenseArgsV1 as AspirateDispenseArgs,
-  CommandV1 as Command,
+  AspirateArgsV3,
+  DispenseArgsV3,
+  CommandV3 as Command,
 } from '@opentrons/shared-data'
 
 export const replaceTipCommands = (tip: number | string): Array<Command> => [
@@ -14,7 +15,7 @@ export const dropTip = (
   well: string,
   params?: {| pipette?: string, labware?: string |}
 ): Command => ({
-  command: 'drop-tip',
+  command: 'dropTip',
   params: {
     pipette: 'p300SingleId',
     labware: 'trashId',
@@ -27,7 +28,7 @@ export const pickUpTip = (
   tip: number | string,
   params?: {| pipette?: string, labware?: string |}
 ): Command => ({
-  command: 'pick-up-tip',
+  command: 'pickUpTip',
   params: {
     pipette: 'p300SingleId',
     labware: 'tiprack1Id',
@@ -40,10 +41,11 @@ export const touchTip = (
   well: string,
   params?: {| labware?: string |}
 ): Command => ({
-  command: 'touch-tip',
+  command: 'touchTip',
   params: {
     labware: 'sourcePlateId',
     pipette: 'p300SingleId',
+    offsetFromBottomMm: 11,
     ...params,
     well,
   },
@@ -52,7 +54,7 @@ export const touchTip = (
 export const aspirate = (
   well: string,
   volume: number,
-  params?: $Shape<AspirateDispenseArgs>
+  params?: $Shape<AspirateArgsV3>
 ): Command => ({
   command: 'aspirate',
   params: {
@@ -67,12 +69,14 @@ export const aspirate = (
 export const dispense = (
   well: string,
   volume: number,
-  params?: $Shape<AspirateDispenseArgs>
+  params?: $Shape<DispenseArgsV3>
 ): Command => ({
   command: 'dispense',
   params: {
     pipette: 'p300SingleId',
     labware: 'sourcePlateId',
+    offsetFromBottomMm: 1,
+    flowRate: 2,
     ...params,
     volume,
     well,
@@ -88,6 +92,8 @@ export const blowout = (
     pipette: 'p300SingleId',
     well: 'A1',
     labware: labware || 'trashId',
+    offsetFromBottomMm: 1,
+    flowRate: 2,
     ...params,
   },
 })

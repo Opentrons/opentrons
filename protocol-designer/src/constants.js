@@ -35,6 +35,8 @@ export const INITIAL_DECK_SETUP_STEP_ID = '__INITIAL_DECK_SETUP_STEP__'
 export const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
 export const DEFAULT_MM_FROM_BOTTOM_ASPIRATE = 1
 export const DEFAULT_MM_FROM_BOTTOM_DISPENSE = 0.5
+export const DEFAULT_MM_FROM_BOTTOM_BLOWOUT = 1 // TODO IMMEDIATELY value???
+export const DEFAULT_MM_FROM_BOTTOM_TOUCHTIP = 5 // TODO IMMEDIATELY value???
 
 // NOTE: in the negative Z direction, to go down from top
 export const DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP = -1

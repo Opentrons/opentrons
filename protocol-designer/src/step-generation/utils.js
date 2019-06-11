@@ -11,10 +11,7 @@ import {
   getLabwareDefURI,
 } from '@opentrons/shared-data'
 
-import type {
-  PipetteLabwareFieldsV1 as PipetteLabwareFields,
-  LabwareDefinition2,
-} from '@opentrons/shared-data'
+import type { BlowoutArgsV3, LabwareDefinition2 } from '@opentrons/shared-data'
 import type { PipetteEntity, LabwareEntity } from '../step-forms'
 import type {
   CommandCreator,
@@ -259,12 +256,14 @@ export function totalVolume(location: LocationLiquidState): number {
 }
 
 export const blowoutUtil = (
-  pipette: $PropertyType<PipetteLabwareFields, 'pipette'>,
-  sourceLabware: $PropertyType<PipetteLabwareFields, 'labware'>,
-  sourceWell: $PropertyType<PipetteLabwareFields, 'well'>,
-  destLabware: $PropertyType<PipetteLabwareFields, 'labware'>,
-  destWell: $PropertyType<PipetteLabwareFields, 'well'>,
-  blowoutLocation: ?string
+  pipette: $PropertyType<BlowoutArgsV3, 'pipette'>,
+  sourceLabware: $PropertyType<BlowoutArgsV3, 'labware'>,
+  sourceWell: $PropertyType<BlowoutArgsV3, 'well'>,
+  destLabware: $PropertyType<BlowoutArgsV3, 'labware'>,
+  destWell: $PropertyType<BlowoutArgsV3, 'well'>,
+  blowoutLocation: ?string,
+  flowRate: number,
+  offsetFromBottomMm: number
 ): Array<CommandCreator> => {
   if (!blowoutLocation) return []
   let labware = blowoutLocation
@@ -278,7 +277,9 @@ export const blowoutUtil = (
     labware = destLabware
     well = destWell
   }
-  return [blowout({ pipette: pipette, labware, well })]
+  return [
+    blowout({ pipette: pipette, labware, well, flowRate, offsetFromBottomMm }),
+  ]
 }
 
 export function createEmptyLiquidState(invariantContext: InvariantContext) {

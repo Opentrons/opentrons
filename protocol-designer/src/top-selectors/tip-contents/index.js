@@ -13,7 +13,7 @@ import { selectors as fileDataSelectors } from '../../file-data'
 import { getWellSetForMultichannel } from '../../well-selection/utils'
 
 import type {
-  CommandV1 as Command,
+  CommandV3 as Command,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import type { OutputSelector } from 'reselect'
@@ -41,7 +41,7 @@ function getTipHighlighted(
 ): boolean {
   const { commands } = commandsAndRobotState
   const commandUsesTip = (c: Command) => {
-    if (c.command === 'pick-up-tip' && c.params.labware === labwareId) {
+    if (c.command === 'pickUpTip' && c.params.labware === labwareId) {
       const commandWellName = c.params.well
       const pipetteId = c.params.pipette
       const pipetteSpec =

@@ -9,10 +9,43 @@ import { getLabware, getPipetteNameSpecs } from '@opentrons/shared-data'
 import type {
   FileLabwareV1 as FileLabware,
   FilePipetteV1 as FilePipette,
+  SchemaV1ProtocolFile,
 } from '@opentrons/shared-data'
 import type { FormPatch } from '../../steplist/actions'
-import type { PDProtocolFile } from '../../file-types'
 import type { FormData } from '../../form-types'
+
+type PDV1Metadata = {
+  pipetteTiprackAssignments: { [pipetteId: string]: string },
+
+  dismissedWarnings: {
+    form: { [stepId: string]: ?Array<string> },
+    timeline: { [stepId: string]: ?Array<string> },
+  },
+
+  ingredients: {
+    [groupId: string]: {
+      name: ?string,
+      description: ?string,
+      serialize: boolean,
+    },
+  },
+  ingredLocations: {
+    [labwareId: string]: {
+      [well: string]: { [ingredGroup: string]: { volume: number } },
+    },
+  },
+
+  savedStepForms: {
+    [stepId: string]: {
+      stepType: 'moveLiquid' | 'mix' | 'pause' | 'manualIntervention',
+      id: string,
+      [string]: any,
+    },
+  },
+  orderedStepIds: Array<string>,
+}
+
+type PDProtocolFile = SchemaV1ProtocolFile<PDV1Metadata>
 
 type LegacyPipetteEntities = {
   [pipetteId: string]: {

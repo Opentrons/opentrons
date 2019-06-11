@@ -24,30 +24,59 @@ type VolumeParams = {| volume: number |}
 
 type OffsetParams = {| offsetFromBottomMm: number |}
 
+type _AspDispAirgapArgs = {|
+  ...FlowRateParams,
+  ...PipetteAccessParams,
+  ...VolumeParams,
+  ...OffsetParams,
+|}
+
+export type AspirateArgsV3 = _AspDispAirgapArgs
+export type DispenseArgsV3 = _AspDispAirgapArgs
+export type AirGapArgsV3 = _AspDispAirgapArgs
+
+export type BlowoutArgsV3 = {|
+  ...FlowRateParams,
+  ...PipetteAccessParams,
+  ...OffsetParams,
+|}
+
+export type TouchTipArgsV3 = {|
+  ...PipetteAccessParams,
+  ...OffsetParams,
+|}
+
+export type PickUpTipArgsV3 = PipetteAccessParams
+export type DropTipArgsV3 = PipetteAccessParams
+
+export type MoveToSlotArgsV3 = {|
+  pipette: string,
+  slot: string,
+  offset?: {|
+    x: number,
+    y: number,
+    z: number,
+  |},
+  minimumZHeight: number,
+|}
+
+export type DelayArgsV3 = {|
+  wait: number | true,
+  message?: string,
+|}
+
 export type CommandV3 =
   | {|
       command: 'aspirate' | 'dispense' | 'airGap',
-      params: {|
-        ...FlowRateParams,
-        ...PipetteAccessParams,
-        ...VolumeParams,
-        ...OffsetParams,
-      |},
+      params: _AspDispAirgapArgs,
     |}
   | {|
       command: 'blowout',
-      params: {|
-        ...FlowRateParams,
-        ...PipetteAccessParams,
-        ...OffsetParams,
-      |},
+      params: BlowoutArgsV3,
     |}
   | {|
       command: 'touchTip',
-      params: {|
-        ...PipetteAccessParams,
-        ...OffsetParams,
-      |},
+      params: TouchTipArgsV3,
     |}
   | {|
       command: 'pickUpTip' | 'dropTip',
@@ -55,23 +84,11 @@ export type CommandV3 =
     |}
   | {|
       command: 'moveToSlot',
-      params: {|
-        pipette: string,
-        slot: string,
-        offset?: {|
-          x: number,
-          y: number,
-          z: number,
-        |},
-        minimumZHeight: number,
-      |},
+      params: MoveToSlotArgsV3,
     |}
   | {|
       command: 'delay',
-      params: {|
-        wait: number | true,
-        message?: string,
-      |},
+      params: DelayArgsV3,
     |}
 
 // NOTE: must be kept in sync with '../schemas/3.json'

@@ -6,10 +6,10 @@ import type {
   RobotState,
   CommandCreator,
   CommandCreatorError,
-  TouchTipArgs,
 } from '../../types'
+import type { TouchTipArgsV3 } from '@opentrons/shared-data'
 
-const touchTip = (args: TouchTipArgs): CommandCreator => (
+const touchTip = (args: TouchTipArgsV3): CommandCreator => (
   invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => {
@@ -35,13 +35,12 @@ const touchTip = (args: TouchTipArgs): CommandCreator => (
 
   const commands = [
     {
-      command: 'touch-tip',
+      command: 'touchTip',
       params: {
         pipette,
         labware,
         well,
-        offsetFromBottomMm:
-          offsetFromBottomMm == null ? undefined : offsetFromBottomMm,
+        offsetFromBottomMm,
       },
     },
   ]

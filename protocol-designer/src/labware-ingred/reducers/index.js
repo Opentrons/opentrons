@@ -176,10 +176,11 @@ export const containers = handleActions<ContainersState, *>(
       return sortedLabwareIds.reduce(
         (acc: ContainersState, id): ContainersState => {
           const fileLabware = allFileLabware[id]
-          const nickname = fileLabware['display-name']
+          const nickname = fileLabware.displayName
           const disambiguationNumber =
             Object.keys(acc).filter(
-              filterId => allFileLabware[filterId]['display-name'] === nickname
+              (filterId: string) =>
+                allFileLabware[filterId].displayName === nickname
             ).length + 1
           return {
             ...acc,

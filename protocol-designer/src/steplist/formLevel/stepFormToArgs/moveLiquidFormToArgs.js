@@ -4,6 +4,12 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../../../step-generation/utils'
+import {
+  DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+  DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+  DEFAULT_MM_FROM_BOTTOM_BLOWOUT,
+  DEFAULT_MM_FROM_BOTTOM_TOUCHTIP,
+} from '../../../constants'
 import { getOrderedWells } from '../../utils'
 
 import type { HydratedMoveLiquidFormData } from '../../../form-types'
@@ -47,6 +53,7 @@ const moveLiquidFormToArgs = (
   )
 
   const fields = hydratedFormData.fields
+  const pipetteSpec = fields.pipette.spec
 
   const pipetteId = fields.pipette.id
   const {
@@ -59,14 +66,12 @@ const moveLiquidFormToArgs = (
   } = fields
 
   const touchTipAfterAspirate = Boolean(fields.aspirate_touchTip_checkbox)
-  const touchTipAfterAspirateOffsetMmFromBottom = touchTipAfterAspirate
-    ? fields.aspirate_touchTip_mmFromBottom
-    : null
+  const touchTipAfterAspirateOffsetMmFromBottom =
+    fields.aspirate_touchTip_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_TOUCHTIP
 
   const touchTipAfterDispense = Boolean(fields.dispense_touchTip_checkbox)
-  const touchTipAfterDispenseOffsetMmFromBottom = touchTipAfterDispense
-    ? fields.dispense_touchTip_mmFromBottom
-    : null
+  const touchTipAfterDispenseOffsetMmFromBottom =
+    fields.dispense_touchTip_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_TOUCHTIP
 
   const mixBeforeAspirate = getMixData(
     fields,
@@ -92,10 +97,17 @@ const moveLiquidFormToArgs = (
     sourceLabware: sourceLabware.id,
     destLabware: destLabware.id,
 
-    aspirateFlowRateUlSec: fields.aspirate_flowRate,
-    dispenseFlowRateUlSec: fields.dispense_flowRate,
-    aspirateOffsetFromBottomMm: fields.aspirate_mmFromBottom,
-    dispenseOffsetFromBottomMm: fields.dispense_mmFromBottom,
+    aspirateFlowRateUlSec:
+      fields.aspirate_flowRate || pipetteSpec.defaultAspirateFlowRate.value,
+    dispenseFlowRateUlSec:
+      fields.dispense_flowRate || pipetteSpec.defaultDispenseFlowRate.value,
+    aspirateOffsetFromBottomMm:
+      fields.aspirate_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+    dispenseOffsetFromBottomMm:
+      fields.dispense_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+    blowoutFlowRateUlSec:
+      fields.dispense_flowRate || pipetteSpec.defaultDispenseFlowRate.value,
+    blowoutOffsetFromBottomMm: DEFAULT_MM_FROM_BOTTOM_BLOWOUT,
 
     changeTip: fields.changeTip,
     preWetTip: Boolean(fields.preWetTip),

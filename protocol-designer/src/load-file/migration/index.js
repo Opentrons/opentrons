@@ -8,8 +8,7 @@ import migrateTo_1_1_0 from './1_1_0'
 export const OLDEST_MIGRATEABLE_VERSION = '1.0.0'
 
 type Version = string
-type Migration = PDProtocolFile => PDProtocolFile
-type MigrationsByVersion = { [Version]: Migration }
+type MigrationsByVersion = { [Version]: (Object) => Object }
 
 const allMigrationsByVersion: MigrationsByVersion = {
   '1.1.0': migrateTo_1_1_0,

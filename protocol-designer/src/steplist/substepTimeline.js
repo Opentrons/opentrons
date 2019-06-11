@@ -18,11 +18,11 @@ function _conditionallyUpdateActiveTips(
   nextFrame: CommandsAndRobotState
 ) {
   const lastNewTipCommand = last(
-    nextFrame.commands.filter(c => c.command === 'pick-up-tip')
+    nextFrame.commands.filter(c => c.command === 'pickUpTip')
   )
   const newTipParams =
     lastNewTipCommand &&
-    lastNewTipCommand.command === 'pick-up-tip' &&
+    lastNewTipCommand.command === 'pickUpTip' &&
     lastNewTipCommand.params
 
   if (newTipParams) {

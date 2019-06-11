@@ -399,7 +399,7 @@ describe('consolidate single-channel', () => {
     )
   })
 
-  test('touch-tip after aspirate should touch tip after every aspirate command', () => {
+  test('touchTip after aspirate should touch tip after every aspirate command', () => {
     const data = {
       ...baseData,
       volume: 150,
@@ -433,7 +433,7 @@ describe('consolidate single-channel', () => {
     )
   })
 
-  test('touch-tip after dispense should touch tip after dispense on destination well', () => {
+  test('touchTip after dispense should touch tip after dispense on destination well', () => {
     const data = {
       ...baseData,
       volume: 150,

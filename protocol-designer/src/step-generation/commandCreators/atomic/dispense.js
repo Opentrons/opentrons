@@ -1,7 +1,7 @@
 // @flow
 import * as errorCreators from '../../errorCreators'
 import updateLiquidState from '../../dispenseUpdateLiquidState'
-import type { AspirateDispenseArgsV1 as AspirateDispenseArgs } from '@opentrons/shared-data'
+import type { DispenseArgsV3 } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   RobotState,
@@ -10,12 +10,11 @@ import type {
 } from '../../types'
 
 /** Dispense with given args. Requires tip. */
-const dispense = (args: AspirateDispenseArgs): CommandCreator => (
+const dispense = (args: DispenseArgsV3): CommandCreator => (
   invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => {
-  const { pipette, volume, labware, well, offsetFromBottomMm } = args
-  const flowRateUlSec = args['flow-rate']
+  const { pipette, volume, labware, well, offsetFromBottomMm, flowRate } = args
 
   const actionName = 'dispense'
   let errors: Array<CommandCreatorError> = []
@@ -42,9 +41,8 @@ const dispense = (args: AspirateDispenseArgs): CommandCreator => (
         volume,
         labware,
         well,
-        offsetFromBottomMm:
-          offsetFromBottomMm == null ? undefined : offsetFromBottomMm,
-        'flow-rate': flowRateUlSec == null ? undefined : flowRateUlSec,
+        offsetFromBottomMm,
+        flowRate,
       },
     },
   ]
