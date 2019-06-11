@@ -3,15 +3,14 @@
 .*/test/.*
 .*/coverage/.*
 .*/docs/.*
-api/.*
-api-server-lib/.*
-audio/.*
-compute/.*
-update-server/.*
-shared-data/deck/definitions/.*
-shared-data/labware/definitions/.*
-shared-data/module/definitions/.*
-shared-data/pipette/definitions/.*
+<PROJECT_ROOT>/api/.*
+<PROJECT_ROOT>/api-server-lib/.*
+<PROJECT_ROOT>/audio/.*
+<PROJECT_ROOT>/compute/.*
+<PROJECT_ROOT>/update-server/.*
+<PROJECT_ROOT>/shared-data/deck/\(definitions\|fixtures\)/.*
+<PROJECT_ROOT>/shared-data/labware/definitions/.*
+<PROJECT_ROOT>/shared-data/module/\(definitions\|fixtures\)/.*
 
 [include]
 
