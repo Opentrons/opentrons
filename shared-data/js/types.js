@@ -134,7 +134,6 @@ export type LabwareWellGroup = {|
 
 // NOTE: must be synced with shared-data/labware/schemas/2.json
 export type LabwareDefinition2 = {|
-  otId: string,
   version: number,
   schemaVersion: 2,
   namespace: string,
