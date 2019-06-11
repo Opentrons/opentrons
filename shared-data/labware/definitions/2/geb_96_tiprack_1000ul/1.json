@@ -13,7 +13,6 @@
     ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
     ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
   ],
-  "otId": "d4e462c0-ffde-11e8-abfa-95044b186e81",
   "namespace": "opentrons",
   "schemaVersion": 2,
   "version": 1,

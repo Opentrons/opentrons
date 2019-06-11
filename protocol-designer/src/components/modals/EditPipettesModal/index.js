@@ -67,7 +67,7 @@ const makeUpdatePipettes = (
     [pipetteId: string]: {
       mount: string,
       name: string,
-      tiprackModel: string,
+      tiprackDefURI: string,
       id: string,
     },
   } = {}
@@ -75,7 +75,7 @@ const makeUpdatePipettes = (
   // from array of pipettes from Edit Pipette form (with no IDs),
   // assign IDs and populate nextPipettes
   newPipetteArray.forEach(newPipette => {
-    if (newPipette && newPipette.name && newPipette.tiprackModel) {
+    if (newPipette && newPipette.name && newPipette.tiprackDefURI) {
       const candidatePipetteIds = prevPipetteIds.filter(id => {
         const prevPipette = prevPipettes[id]
         const alreadyUsed = usedPrevPipettes.some(usedId => usedId === id)
@@ -100,7 +100,7 @@ const makeUpdatePipettes = (
         (p: $Values<typeof nextPipettes>): NormalizedPipette => ({
           id: p.id,
           name: p.name,
-          tiprackModel: p.tiprackModel,
+          tiprackDefURI: p.tiprackDefURI,
         })
       )
     )

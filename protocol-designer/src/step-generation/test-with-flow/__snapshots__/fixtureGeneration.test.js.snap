@@ -800,7 +800,6 @@ Object {
             "H12",
           ],
         ],
-        "otId": "fixture96Plate",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -1677,7 +1676,7 @@ Object {
         },
       },
       "id": "destPlateId",
-      "type": "fixture96Plate",
+      "labwareDefURI": "fixture/generic_96_wellplate_340ul_flat/1",
     },
     "sourcePlateId": Object {
       "def": Object {
@@ -1934,7 +1933,6 @@ Object {
             "H12",
           ],
         ],
-        "otId": "fixture96Plate",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -2811,7 +2809,7 @@ Object {
         },
       },
       "id": "sourcePlateId",
-      "type": "fixture96Plate",
+      "labwareDefURI": "fixture/generic_96_wellplate_340ul_flat/1",
     },
     "tiprack1Id": Object {
       "def": Object {
@@ -3067,7 +3065,6 @@ Object {
             "H12",
           ],
         ],
-        "otId": "fixtureTipRack300Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -3946,7 +3943,7 @@ Object {
         },
       },
       "id": "tiprack1Id",
-      "type": "fixtureTipRack300Ul",
+      "labwareDefURI": "fixture/opentrons_96_tiprack_300ul/1",
     },
     "tiprack2Id": Object {
       "def": Object {
@@ -4202,7 +4199,6 @@ Object {
             "H12",
           ],
         ],
-        "otId": "fixtureTipRack300Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -5081,7 +5077,7 @@ Object {
         },
       },
       "id": "tiprack2Id",
-      "type": "fixtureTipRack300Ul",
+      "labwareDefURI": "fixture/opentrons_96_tiprack_300ul/1",
     },
     "tiprack3Id": Object {
       "def": Object {
@@ -5337,7 +5333,6 @@ Object {
             "H12",
           ],
         ],
-        "otId": "fixtureTipRack300Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -6216,7 +6211,7 @@ Object {
         },
       },
       "id": "tiprack3Id",
-      "type": "fixtureTipRack300Ul",
+      "labwareDefURI": "fixture/opentrons_96_tiprack_300ul/1",
     },
     "trashId": Object {
       "def": Object {
@@ -6257,7 +6252,6 @@ Object {
             "A1",
           ],
         ],
-        "otId": "fixtureTrash",
         "parameters": Object {
           "format": "trash",
           "isMagneticModuleCompatible": false,
@@ -6284,7 +6278,7 @@ Object {
         },
       },
       "id": "trashId",
-      "type": "fixtureTrash",
+      "labwareDefURI": "fixture/opentrons_1_trash_1100ml_fixed/1",
     },
     "troughId": Object {
       "def": Object {
@@ -6369,7 +6363,6 @@ Object {
             "A12",
           ],
         ],
-        "otId": "fixture12Trough",
         "parameters": Object {
           "format": "trough",
           "isMagneticModuleCompatible": false,
@@ -6505,7 +6498,7 @@ Object {
         },
       },
       "id": "troughId",
-      "type": "fixture12Trough",
+      "labwareDefURI": "fixture/usascientific_12_reservoir_22ml/1",
     },
   },
   "pipetteEntities": Object {
@@ -6528,6 +6521,7 @@ Object {
         "maxVolume": 10,
         "minVolume": 1,
       },
+      "tiprackDefURI": "fixture/opentrons_96_tiprack_10ul/1",
       "tiprackLabwareDef": Object {
         "brand": Object {
           "brand": "Opentrons",
@@ -6779,7 +6773,6 @@ Object {
             "H12",
           ],
         ],
-        "otId": "fixtureTipRack10Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -7657,7 +7650,6 @@ Object {
           },
         },
       },
-      "tiprackModel": "fixtureTipRack10Ul",
     },
     "p10SingleId": Object {
       "id": "p10SingleId",
@@ -7678,6 +7670,7 @@ Object {
         "maxVolume": 10,
         "minVolume": 1,
       },
+      "tiprackDefURI": "fixture/opentrons_96_tiprack_10ul/1",
       "tiprackLabwareDef": Object {
         "brand": Object {
           "brand": "Opentrons",
@@ -7929,7 +7922,6 @@ Object {
             "H12",
           ],
         ],
-        "otId": "fixtureTipRack10Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -8807,7 +8799,6 @@ Object {
           },
         },
       },
-      "tiprackModel": "fixtureTipRack10Ul",
     },
     "p300MultiId": Object {
       "id": "p300MultiId",
@@ -8828,6 +8819,7 @@ Object {
         "maxVolume": 300,
         "minVolume": 30,
       },
+      "tiprackDefURI": "fixture/opentrons_96_tiprack_300ul/1",
       "tiprackLabwareDef": Object {
         "brand": Object {
           "brand": "Opentrons",
@@ -9081,7 +9073,6 @@ Object {
             "H12",
           ],
         ],
-        "otId": "fixtureTipRack300Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -9959,7 +9950,6 @@ Object {
           },
         },
       },
-      "tiprackModel": "fixtureTipRack300Ul",
     },
     "p300SingleId": Object {
       "id": "p300SingleId",
@@ -9980,6 +9970,7 @@ Object {
         "maxVolume": 300,
         "minVolume": 30,
       },
+      "tiprackDefURI": "fixture/opentrons_96_tiprack_300ul/1",
       "tiprackLabwareDef": Object {
         "brand": Object {
           "brand": "Opentrons",
@@ -10233,7 +10224,6 @@ Object {
             "H12",
           ],
         ],
-        "otId": "fixtureTipRack300Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -11111,7 +11101,6 @@ Object {
           },
         },
       },
-      "tiprackModel": "fixtureTipRack300Ul",
     },
   },
 }

@@ -6,7 +6,11 @@ import some from 'lodash/some'
 import map from 'lodash/map'
 import { type DeckSlotId } from '@opentrons/shared-data'
 
-import { RobotWorkSpace, Module as ModuleItem } from '@opentrons/components'
+import {
+  RobotWorkSpace,
+  Module as ModuleItem,
+  RobotCoordsForeignDiv,
+} from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import { selectors as robotSelectors, type Labware } from '../../robot'
 
@@ -56,21 +60,27 @@ function DeckMap(props: Props) {
           const labwareInSlot = labwareBySlot[slotId]
 
           return (
-            <g
-              transform={`translate(${slot.position[0]}, ${slot.position[1]})`}
-            >
+            <>
               {moduleInSlot && (
-                <ModuleItem name={moduleInSlot.name} mode="default" />
+                <g
+                  transform={`translate(${slot.position[0]}, ${
+                    slot.position[1]
+                  })`}
+                >
+                  <ModuleItem name={moduleInSlot.name} mode="default" />
+                </g>
               )}
               {some(labwareInSlot) &&
                 map(labwareInSlot, labware => (
                   <LabwareItem
+                    x={slot.position[0]}
+                    y={slot.position[1]}
                     labware={labware}
                     areTipracksConfirmed={areTipracksConfirmed}
                     highlighted={slotId === selectedSlot}
                   />
                 ))}
-            </g>
+            </>
           )
         })
       }

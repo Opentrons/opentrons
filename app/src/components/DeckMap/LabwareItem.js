@@ -10,11 +10,13 @@ import {
   type Labware,
   type SessionModule,
 } from '../../robot'
-import { getLatestLabwareDef } from '../../util'
+import { getLatestLabwareDef, getLegacyLabwareDef } from '../../util'
 
 import {
   LabwareNameOverlay,
   // ModuleNameOverlay,
+  RobotCoordsForeignDiv,
+  RobotCoordsText,
   LabwareRender,
   Labware as LabwareComponent,
   humanizeLabwareType,
@@ -38,7 +40,14 @@ export type LabwareItemProps = {
 }
 
 export default function LabwareItem(props: LabwareItemProps) {
-  const { labware, highlighted, areTipracksConfirmed, handleClick } = props
+  const {
+    labware,
+    x,
+    y,
+    highlighted,
+    areTipracksConfirmed,
+    handleClick,
+  } = props
 
   const { isTiprack, confirmed, name, type, slot } = labware
 
@@ -53,15 +62,16 @@ export default function LabwareItem(props: LabwareItemProps) {
   if (labware.isLegacy) {
     item = (
       <g className={cx({ [styles.disabled]: disabled })}>
-        <LabwareComponent labwareType={type} />
+        <LabwareComponent definition={getLegacyLabwareDef(type)} />
         {/*
         {showSpinner ? (
-          <LabwareSpinner />
-        ) : (
-          <LabwareNameOverlay title={title} subtitle={name} />
-        )
-        // module && <ModuleNameOverlay name={module.name} />
+            <LabwareSpinner />
+          ) : (
+            <LabwareNameOverlay title={title} subtitle={name} />
+          )
+          // module && <ModuleNameOverlay name={module.name} />
         }
+        */}
         {highlighted && (
           <rect
             className={styles.highlighted}
@@ -71,18 +81,52 @@ export default function LabwareItem(props: LabwareItemProps) {
             height={SLOT_RENDER_HEIGHT - 1}
             rx="6"
           />
-        )} */}
+        )}
       </g>
     )
   } else {
-    item = <LabwareRender definition={getLatestLabwareDef(type)} />
+    const def = getLatestLabwareDef(type)
+    item = (
+      <>
+        <g
+          className={cx({ [styles.disabled]: disabled })}
+          transform={`translate(${props.x}, ${props.y})`}
+        >
+          <LabwareRender definition={def} />
+          <RobotCoordsForeignDiv
+            width={def.dimensions.xDimension}
+            height={def.dimensions.yDimension}
+            x={0}
+            y={0 - def.dimensions.yDimension}
+            transformWithSVG
+            innerDivProps={
+              {
+                //className: cx(styles.labware_controls, {
+                //   [styles.highlighted_border_div]: highlighted,
+                // }),
+              }
+            }
+          >
+            <div
+              style={{
+                height: '100px',
+                width: '100px',
+                backgroundColor: 'red',
+              }}
+            >
+              NAME HERE
+            </div>
+          </RobotCoordsForeignDiv>
+        </g>
+      </>
+    )
   }
   // const v2LabwareDef = getLabwareDefinition(loadName, namespace, version)
   if (!showSpinner && !disabled) {
     return (
-      <Link to={`/calibrate/labware/${slot}`} onClick={handleClick}>
-        {item}
-      </Link>
+      // <Link to={`/calibrate/labware/${slot}`} onClick={handleClick}>
+      item
+      // </Link>
     )
   }
 

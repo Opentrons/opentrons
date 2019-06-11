@@ -25,3 +25,9 @@
   stroke: var(--c-highlight);
   stroke-width: 2.5;
 }
+
+.highlighted_border_div {
+  border-color: var(--c-highlight);
+  border-width: 3px;
+  border-style: solid;
+}

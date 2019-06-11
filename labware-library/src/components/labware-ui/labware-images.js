@@ -102,7 +102,7 @@ export default {
   usascientific_12_reservoir_22ml: [
     require('../../images/usascientific_12_reservoir_22ml_side_view.jpg'),
   ],
-  'usascientific_96_wellplate_2.4ml_deep': [
-    require('../../images/usascientific_96_wellplate_2.4ml_deep_side_view.jpg'),
+  'generic_96_wellplate_1.5ml_deep': [
+    require('../../images/generic_96_wellplate_1.5ml_deep_side_view.jpg'),
   ],
 }

@@ -45,7 +45,8 @@ RUN pip install --force-reinstall \
 
 COPY ./compute/container_setup.sh /usr/local/bin/container_setup.sh
 COPY ./audio/ /etc/audio
-COPY ./shared-data/robot-data /etc/robot-data
+COPY ./shared-data/module /etc/module
+COPY ./shared-data/pipette /etc/pipette
 COPY ./shared-data/definitions /etc/labware
 COPY ./api /tmp/api
 # Make our shared data available for the api setup.py

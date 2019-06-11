@@ -4,7 +4,7 @@
 
   "definitions": {
     "pipetteName": {
-      "description": "Name of a pipette. Does not contain info about specific model/version. Should match keys in pipetteNameSpecs.json",
+      "description": "Name of a pipette. Does not contain info about specific model/version. Should match keys in pipetteNameSpecs.json file",
       "type": "string",
       "enum": [
         "p10_single",
@@ -21,14 +21,6 @@
     "mmOffset": {
       "description": "Millimeters for pipette location offsets",
       "type": "number"
-    },
-
-    "flowRateForPipettes": {
-      "description": "Flow rate in mm/sec for each pipette used in the protocol, by pipette name",
-      "type": "object",
-      "propertyNames": { "$ref": "#/definitions/pipetteName" },
-      "patternProperties": { ".*": { "type": "number", "minimum": 0 } },
-      "additionalProperties": false
     },
 
     "offsetFromBottomMm": {

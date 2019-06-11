@@ -1,5 +1,5 @@
 // @flow
-import moduleSpecs from '../robot-data/moduleSpecs.json'
+import moduleSpecs from '../module/definitions/1.json'
 
 export type ModuleType = 'magdeck' | 'tempdeck'
 

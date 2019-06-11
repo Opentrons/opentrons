@@ -1,6 +1,5 @@
 // @flow
-// TODO: Ian 2019-05-31 remove this fixtures/ dir for #3331
-import pipetteNameSpecFixtures from './pipetteNameSpecFixtures'
+import pipetteNameSpecFixtures from './pipetteNameSpecFixtures.json'
 
 export const fixtureP10Single = pipetteNameSpecFixtures['p10_single']
 export const fixtureP10Multi = pipetteNameSpecFixtures['p10_multi']

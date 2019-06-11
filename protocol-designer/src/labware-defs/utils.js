@@ -1,6 +1,9 @@
 // @flow
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { LabwareDefByDefId } from './types'
+import {
+  getLabwareDefURI,
+  type LabwareDefinition2,
+} from '@opentrons/shared-data'
+import type { LabwareDefByDefURI } from './types'
 // TODO: Ian 2019-04-11 getAllDefinitions also exists (differently) in labware-library,
 // should reconcile differences & make a general util fn imported from shared-data
 
@@ -15,17 +18,14 @@ const definitionsContext = require.context(
 
 let definitions = null
 
-// TODO: BC: 2019-05-10 change to def.loadName once it gets moved up
-// TODO: BC&IL: 2019-05-28 this won't work once there are multiple versions
-// of labware in shared-data/labware/definitions/2 - but it's appropriate for now,
-//  we'll have to refactor this soon anyway
-export function getAllDefinitions(): LabwareDefByDefId {
+export function getAllDefinitions(): LabwareDefByDefURI {
   // NOTE: unlike labware-library, no filtering out trashes here (we need 'em)
-  // also, more convenient & performant to make a map {loadName: def} not an array
+  // also, more convenient & performant to make a map {labwareDefURI: def} not an array
   if (!definitions) {
     definitions = definitionsContext.keys().reduce((acc, filename) => {
       const def = definitionsContext(filename)
-      return { ...acc, [def.parameters.loadName]: def }
+      const labwareDefURI = getLabwareDefURI(def)
+      return { ...acc, [labwareDefURI]: def }
     }, {})
   }
 
@@ -33,7 +33,7 @@ export function getAllDefinitions(): LabwareDefByDefId {
 }
 
 // NOTE: this is different than labware library,
-// in PD we wanna get always by otId never by loadName
-export function _getSharedLabware(otId: string): ?LabwareDefinition2 {
-  return getAllDefinitions()[otId] || null
+// in PD we wanna get always by labware URI (namespace/loadName/version) never by loadName
+export function _getSharedLabware(labwareDefURI: string): ?LabwareDefinition2 {
+  return getAllDefinitions()[labwareDefURI] || null
 }

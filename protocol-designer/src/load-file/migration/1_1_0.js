@@ -41,9 +41,16 @@ function getPipetteCapacityLegacy(
   if (specs && tiprackDef && tiprackDef.metadata.tipVolume) {
     return Math.min(specs.maxVolume, tiprackDef.metadata.tipVolume)
   }
+  assert(specs, `Expected spec for pipette ${JSON.stringify(pipette)}`)
   assert(
-    false,
-    `Expected spec and tiprack def for pipette ${pipette ? pipette.id : '???'}`
+    tiprackDef,
+    `expected tiprack def for pipette ${JSON.stringify(pipette)}`
+  )
+  assert(
+    tiprackDef?.metadata?.tipVolume,
+    `expected tiprack volume for tiprack def ${JSON.stringify(
+      tiprackDef?.metadata || 'undefined'
+    )}`
   )
   return NaN
 }

@@ -1,11 +1,12 @@
 // @flow
 import * as React from 'react'
 import map from 'lodash/map'
+import mapValues from 'lodash/mapValues'
 import assert from 'assert'
 import {
   getLabware,
-  getWellDefsForSVG,
-  getIsTiprackDeprecated,
+  // getWellDefsForSVG,
+  // getIsTiprackDeprecated,
 } from '@opentrons/shared-data'
 
 import LabwareOutline from './LabwareOutline'
@@ -17,33 +18,31 @@ import styles from './Labware.css'
 export type Props = {
   /** labware type, to get definition from shared-data */
   labwareType: string,
+  definition: any, // TODO: definitions1 type
 }
 
 class Labware extends React.Component<Props> {
   render() {
-    const { labwareType } = this.props
+    const { labwareType, definition } = this.props
 
-    const labwareDefinition = getLabware(labwareType)
+    const labwareDefinition = definition || getLabware(labwareType)
 
-    if (!getLabware(labwareType)) {
+    if (!labwareDefinition) {
       return <FallbackLabware />
     }
 
     const tipVolume =
       labwareDefinition.metadata && labwareDefinition.metadata.tipVolume
 
-    const allWells = getWellDefsForSVG(labwareType)
-    const isTiprack = getIsTiprackDeprecated(labwareType)
+    const isTiprack =
+      labwareDefinition.metadata && labwareDefinition.metadata.isTiprack
 
-    // TODO: Ian 2018-06-27 remove scale & transform so this offset isn't needed
-    // Or... this is actually from the labware definitions?? But not tipracks?
-    const svgOffset = { x: 1, y: -3 }
     return (
       <g>
         <LabwareOutline
           className={isTiprack ? styles.tiprack_plate_outline : null}
         />
-        {map(allWells, (wellDef, wellName) => {
+        {map(labwareDefinition.wells, (wellDef, wellName) => {
           assert(
             wellDef,
             `No well definition for labware ${labwareType}, well ${wellName}`
@@ -54,7 +53,7 @@ class Labware extends React.Component<Props> {
             <Well
               key={wellName}
               wellName={wellName}
-              {...{ wellDef, svgOffset }}
+              wellDef={{ ...wellDef, x: wellDef.x + 1, y: wellDef.y + 3 }} // This is a HACK to make the offset less "off"
             />
           )
         })}

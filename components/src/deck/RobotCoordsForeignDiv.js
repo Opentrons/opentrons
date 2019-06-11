@@ -9,6 +9,7 @@ type Props = {
   children?: React.Node,
   className?: string,
   innerDivProps?: React.ElementProps<'div'>,
+  transformWithSVG: boolean,
 }
 
 const RobotCoordsForeignDiv = (props: Props) => {
@@ -20,11 +21,18 @@ const RobotCoordsForeignDiv = (props: Props) => {
     width = '100%',
     className,
     innerDivProps,
+    transformWithSVG = false,
   } = props
+
   return (
-    <foreignObject {...{ x, y, height, width, className }}>
+    <foreignObject
+      {...{ x, y, height, width, className }}
+      transform={transformWithSVG ? 'scale(1, -1)' : 'none'}
+    >
       <div
-        style={{ transform: 'scale(1, -1)' }}
+        style={{
+          transform: transformWithSVG ? 'none' : 'scale(1, -1)',
+        }}
         xmlns="http://www.w3.org/1999/xhtml"
         {...innerDivProps}
       >

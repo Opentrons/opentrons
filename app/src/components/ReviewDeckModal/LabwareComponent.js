@@ -4,7 +4,6 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 
 import { selectors as robotSelectors, type SessionModule } from '../../robot'
-import { Module as ModuleItem } from '@opentrons/components'
 import { LabwareItem } from '../DeckMap'
 
 import type { State } from '../../types'
@@ -29,7 +28,6 @@ function LabwareComponent(props: Props) {
 
   return (
     <React.Fragment>
-      {module && <ModuleItem name={module.name} mode="default" />}
       {labware && (
         <LabwareItem
           slot={props.slot}

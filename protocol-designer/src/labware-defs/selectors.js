@@ -1,11 +1,10 @@
 // @flow
 import mapValues from 'lodash/mapValues'
-import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
 import { _getSharedLabware, getAllDefinitions } from './utils'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { BaseState, Selector } from '../types'
-import type { LabwareDefByDefId } from './types'
+import type { LabwareDefByDefURI } from './types'
 import type { RootState } from './reducers'
 import type { RootState as StepFormRootState } from '../step-forms'
 
@@ -14,65 +13,59 @@ export const rootSelector = (state: BaseState): RootState =>
   state.stepForms.labwareDefs
 
 const _getLabwareDef = (
-  customDefs: LabwareDefByDefId,
-  otId: string
+  customDefs: LabwareDefByDefURI,
+  labwareDefURI: string
 ): LabwareDefinition2 => {
-  const customDef = customDefs[otId]
+  const customDef = customDefs[labwareDefURI]
   if (customDef) return customDef
-  const sharedDataDef = _getSharedLabware(otId)
+  const sharedDataDef = _getSharedLabware(labwareDefURI)
   if (sharedDataDef) return sharedDataDef
   throw Error(
-    `No labware definition in PD session's custom labware or builtin shared-data defs for otId "{otId}"`
+    `No labware definition in PD session's custom labware or builtin shared-data defs for labwareDefURI "{labwareDefURI}"`
   )
 }
 
 // NOTE: this mapping should be reviewed before using it in migration later
-export const V1_NAME_TO_V2_OTID = {
-  '12-well-plate': 'a4961650-54c9-11e9-989a-e90aec2c3723',
-  '24-well-plate': '4373e820-54c9-11e9-9364-556fc2c8a783',
-  '384-plate': 'cf69e110-f50e-11e8-bb2a-e7b1dd90654d',
-  '48-well-plate': '3d53c440-f50d-11e8-bb2a-e7b1dd90654d',
-  '6-well-plate': 'bd10e8d0-f4da-11e8-bb2a-e7b1dd90654d',
-  '96-PCR-flat': 'a07a3f50-ec38-11e8-a3cc-d7bd32b6c4b1',
-  '96-flat': '54d2f430-d602-11e8-80b1-6965467d172c',
-  'biorad-hardshell-96-PCR': 'a07a3f50-ec38-11e8-a3cc-d7bd32b6c4b1',
+// NOTE: Ian 2019-06-04 These are more up-to-date than map in api/src/opentrons/protocol_api/back_compat.py
+export const V1_NAME_TO_V2_LOADNAME = {
+  '12-well-plate': 'corning_12_wellplate_6.9ml_flat',
+  '24-well-plate': 'corning_24_wellplate_3.4ml_flat',
+  '384-plate': 'corning_384_wellplate_112ul_flat',
+  '48-well-plate': 'corning_48_wellplate_1.6ml_flat',
+  '6-well-plate': 'corning_6_wellplate_16.8ml_flat',
+  '96-PCR-flat': 'biorad_96_wellplate_200ul_pcr',
+  '96-flat': 'generic_96_wellplate_340ul_flat',
+  'biorad-hardshell-96-PCR': 'biorad_96_wellplate_200ul_pcr',
   'opentrons-aluminum-block-2ml-eppendorf':
-    'cf9cbb20-f401-11e8-a244-69cb0fde6293',
+    'opentrons_24_aluminumblock_generic_2ml_screwcap',
   'opentrons-aluminum-block-2ml-screwcap':
-    'cf9cbb20-f401-11e8-a244-69cb0fde6293',
+    'opentrons_24_aluminumblock_generic_2ml_screwcap',
   'opentrons-aluminum-block-96-PCR-plate':
-    'd88a5b70-f4c9-11e8-83b8-c3ba5d2a3baa',
-  'opentrons-tiprack-300ul': '3d278f00-ffe0-11e8-abfa-95044b186e81',
-  'opentrons-tuberack-1.5ml-eppendorf': '9467f4b0-fa3d-11e8-b76d-25864338afc4',
-  'opentrons-tuberack-15_50ml': 'f65f2960-0f76-11e9-8659-e18ed15996f5',
-  'opentrons-tuberack-15ml': 'e57a7130-54c8-11e9-a8d4-c1917c1bf74f',
-  'opentrons-tuberack-2ml-eppendorf': 'b28e5eb0-e8f0-11e8-b93b-5f6727dde048',
-  'opentrons-tuberack-2ml-screwcap': 'e8c55910-e8f1-11e8-b93b-5f6727dde048',
-  'opentrons-tuberack-50ml': '23784a80-5563-11e9-bf87-f7b718396190',
-  'tiprack-10ul': '88154cc0-ffde-11e8-abfa-95044b186e81',
-  'tiprack-200ul': '88154cc0-ffde-11e8-abfa-95044b186e81', // NOT REAL DEF, shim using 10uL tiprack
-  'tiprack-300ul': '88154cc0-ffde-11e8-abfa-95044b186e81', // NOT REAL DEF, shim using 10uL tiprack
-  'tiprack-1000ul': 'd4e462c0-ffde-11e8-abfa-95044b186e81',
-  'trough-12row': 'a41d9ef0-f4b6-11e8-90c2-7106f0eae5a7',
-  'fixed-trash': '629d3b80-ecfe-11e8-b073-3da0bb8daec9',
+    'opentrons_96_aluminumblock_biorad_wellplate_200ul',
+  'opentrons-tiprack-300ul': 'opentrons_96_tiprack_300ul',
+  'opentrons-tuberack-1.5ml-eppendorf':
+    'opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap',
+  'opentrons-tuberack-15_50ml':
+    'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical',
+  'opentrons-tuberack-15ml': 'opentrons_15_tuberack_falcon_15ml_conical',
+  'opentrons-tuberack-2ml-eppendorf':
+    'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap',
+  'opentrons-tuberack-2ml-screwcap':
+    'opentrons_24_tuberack_generic_2ml_screwcap',
+  'opentrons-tuberack-50ml': 'opentrons_6_tuberack_falcon_50ml_conical',
+  'tiprack-1000ul': 'opentrons_96_tiprack_1000ul',
+  'tiprack-10ul': 'opentrons_96_tiprack_10ul',
+  'trough-12row': 'usascientific_12_reservoir_22ml',
+  'fixed-trash': 'opentrons_1_trash_1100ml_fixed',
 }
-
-const otIdToLoadName = reduce(
-  getAllDefinitions(),
-  (acc, def, otID) => ({
-    ...acc,
-    [def.otId]: def.parameters.loadName,
-  }),
-  {}
-)
 
 // TODO: Ian 2019-04-10 SHIM REMOVAL #3335
 const V1_FALLBACKS = mapValues(
-  V1_NAME_TO_V2_OTID,
-  v1Type => getAllDefinitions()[otIdToLoadName[v1Type]]
+  V1_NAME_TO_V2_LOADNAME,
+  (v2LoadName, v1Type) => getAllDefinitions()[`opentrons/${v2LoadName}/1`]
 )
 
-const _makeLabwareDefsObj = (customDefs: LabwareDefByDefId) => {
+const _makeLabwareDefsObj = (customDefs: LabwareDefByDefURI) => {
   const allCustomIds = Object.keys(customDefs)
   const customDefsById = allCustomIds.reduce(
     (acc, id) => ({
@@ -85,12 +78,12 @@ const _makeLabwareDefsObj = (customDefs: LabwareDefByDefId) => {
   return { ...V1_FALLBACKS, ...getAllDefinitions(), ...customDefsById }
 }
 
-export const _getLabwareDefsByIdRootState: StepFormRootState => LabwareDefByDefId = createSelector(
+export const _getLabwareDefsByIdRootState: StepFormRootState => LabwareDefByDefURI = createSelector(
   (rootState: StepFormRootState) => rootState.labwareDefs.customDefs,
   _makeLabwareDefsObj
 )
 
-export const getLabwareDefsById: Selector<LabwareDefByDefId> = createSelector(
+export const getLabwareDefsById: Selector<LabwareDefByDefURI> = createSelector(
   state => rootSelector(state).customDefs,
   _makeLabwareDefsObj
 )

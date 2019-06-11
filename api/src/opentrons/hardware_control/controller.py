@@ -81,8 +81,9 @@ class Controller:
                 raise
 
         self.config = config or opentrons.config.robot_configs.load()
+        # We handle our own locks in the hardware controller thank you
         self._smoothie_driver = driver_3_0.SmoothieDriver_3_0_0(
-            config=self.config)
+            config=self.config, handle_locks=False)
         self._cached_fw_version: Optional[str] = None
 
     def move(self, target_position: Dict[str, float],

@@ -12,20 +12,20 @@ import { selectors as stepsSelectors } from '../../ui/steps'
 import { selectors as fileDataSelectors } from '../../file-data'
 import { getWellSetForMultichannel } from '../../well-selection/utils'
 
-import { typeof Labware } from '@opentrons/components'
 import type {
   CommandV1 as Command,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import type { OutputSelector } from 'reselect'
 import type { BaseState, Selector } from '../../types'
-import type { ElementProps } from 'react'
 
-type GetTipProps = $PropertyType<ElementProps<Labware>, 'getTipProps'>
+type GetTipCallback = (
+  wellName: string
+) => ?{ empty: boolean, highlighted: boolean }
 type GetTipSelector = OutputSelector<
   BaseState,
   { labwareId: string },
-  GetTipProps
+  GetTipCallback
 >
 
 function getLabwareIdProp(state, props: { labwareId: string }) {

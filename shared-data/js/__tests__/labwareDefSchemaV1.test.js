@@ -3,7 +3,10 @@ import glob from 'glob'
 import Ajv from 'ajv'
 import schema from '../schema'
 
-const definitionsGlobPath = path.join(__dirname, '../../definitions/*.json')
+const definitionsGlobPath = path.join(
+  __dirname,
+  '../../labware/definitions/1/*.json'
+)
 
 // JSON Schema defintion & setup
 
