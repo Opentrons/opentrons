@@ -23,14 +23,6 @@
       "type": "number"
     },
 
-    "flowRateForPipettes": {
-      "description": "Flow rate in mm/sec for each pipette used in the protocol, by pipette name",
-      "type": "object",
-      "propertyNames": { "$ref": "#/definitions/pipetteName" },
-      "patternProperties": { ".*": { "type": "number", "minimum": 0 } },
-      "additionalProperties": false
-    },
-
     "offsetFromBottomMm": {
       "description": "Offset from bottom of well in millimeters",
       "required": ["offsetFromBottomMm"],
