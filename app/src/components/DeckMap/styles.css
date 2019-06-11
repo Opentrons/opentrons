@@ -14,3 +14,14 @@
 .spinner {
   color: var(--c-font-light);
 }
+
+.labware_wrapper {
+  /* reflect horizontally about the center of the DOM elem */
+  transform: scale(1, -1);
+}
+
+.highlighted {
+  fill: none;
+  stroke: var(--c-highlight);
+  stroke-width: 2.5;
+}

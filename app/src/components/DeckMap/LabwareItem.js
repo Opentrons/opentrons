@@ -2,6 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { Link } from 'react-router-dom'
+import { SLOT_RENDER_HEIGHT, SLOT_RENDER_WIDTH } from '@opentrons/shared-data'
 
 import {
   selectors as robotSelectors,
@@ -14,7 +15,6 @@ import { getLatestLabwareDef } from '../../util'
 import {
   LabwareNameOverlay,
   // ModuleNameOverlay,
-  LabwareWrapper,
   LabwareRender,
   Labware as LabwareComponent,
   humanizeLabwareType,
@@ -46,26 +46,33 @@ export default function LabwareItem(props: LabwareItemProps) {
   const disabled =
     (isTiprack && confirmed) || (!isTiprack && !areTipracksConfirmed)
 
-  const labwareClass = cx({ [styles.disabled]: disabled })
   const title = humanizeLabwareType(type)
 
   let item
 
   if (labware.isLegacy) {
     item = (
-      <LabwareWrapper highlighted={highlighted}>
-        <g className={labwareClass}>
-          <LabwareComponent labwareType={type} />
-
-          {showSpinner ? (
-            <LabwareSpinner />
-          ) : (
-            <LabwareNameOverlay title={title} subtitle={name} />
-          )
-          // module && <ModuleNameOverlay name={module.name} />
-          }
-        </g>
-      </LabwareWrapper>
+      <g className={cx({ [styles.disabled]: disabled })}>
+        <LabwareComponent labwareType={type} />
+        {/*
+        {showSpinner ? (
+          <LabwareSpinner />
+        ) : (
+          <LabwareNameOverlay title={title} subtitle={name} />
+        )
+        // module && <ModuleNameOverlay name={module.name} />
+        }
+        {highlighted && (
+          <rect
+            className={styles.highlighted}
+            x="0.5"
+            y="0.5"
+            width={SLOT_RENDER_WIDTH - 1}
+            height={SLOT_RENDER_HEIGHT - 1}
+            rx="6"
+          />
+        )} */}
+      </g>
     )
   } else {
     item = <LabwareRender definition={getLatestLabwareDef(type)} />
