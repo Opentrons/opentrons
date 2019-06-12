@@ -29,7 +29,7 @@ def load_labware(protocol_data):
     for labware_id, props in data.items():
         slot = props['slot']
         definition_id = props['definitionId']
-        definition = defs[definition_id]
+        definition = defs.get(definition_id)
         if not definition:
             raise RuntimeError(
                 'No definition under def id {}'.format(definition_id))

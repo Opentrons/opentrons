@@ -12,8 +12,8 @@ export type FilePipetteV3 = {
 
 export type FileLabwareV3 = {
   slot: DeckSlotId,
-  labwareDefURI: string,
-  'display-name'?: string,
+  definitionId: string,
+  displayName?: string,
 }
 
 type FlowRateParams = {| flowRate: number |}

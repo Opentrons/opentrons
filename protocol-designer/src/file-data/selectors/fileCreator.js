@@ -3,9 +3,11 @@ import { createSelector } from 'reselect'
 import flatten from 'lodash/flatten'
 import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
+import pickBy from 'lodash/pickBy'
 import { getFileMetadata } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
 import { selectors as dismissSelectors } from '../../dismiss'
+import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
@@ -43,6 +45,7 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
   stepFormSelectors.getLabwareEntities,
   stepFormSelectors.getPipetteEntities,
   uiLabwareSelectors.getLabwareNicknamesById,
+  labwareDefSelectors.getLabwareDefsById,
   (
     fileMetadata,
     initialRobotState,
@@ -54,7 +57,8 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
     orderedStepIds,
     labwareEntities,
     pipetteEntities,
-    labwareNamesById
+    labwareNicknamesById,
+    labwareDefsById
   ) => {
     const { author, description, created } = fileMetadata
     const name = fileMetadata.protocolName || 'untitled'
@@ -67,10 +71,6 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
         pipetteId: string
       ): FilePipette => ({
         mount: pipette.mount,
-        // TODO: Ian 2018-11-06 'model' is for backwards compatibility with old API version
-        // (JSON executor used to expect versioned model).
-        // Drop this "model" when we do breaking change (see TODO in protocol-schema.json)
-        model: pipetteEntities[pipetteId].name + '_v1.3',
         name: pipetteEntities[pipetteId].name,
       })
     )
@@ -82,8 +82,8 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
         labwareId: string
       ): FileLabware => ({
         slot: l.slot,
-        'display-name': labwareNamesById[labwareId],
-        labwareDefURI: labwareEntities[labwareId].labwareDefURI,
+        displayName: labwareNicknamesById[labwareId],
+        definitionId: labwareEntities[labwareId].labwareDefURI,
       })
     )
 
@@ -92,6 +92,12 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
     // (We could just export the `steps` reducer, but we've sunset it)
     const savedOrderedStepIds = orderedStepIds.filter(
       stepId => savedStepForms[stepId]
+    )
+
+    // exclude definitions that aren't used by any labware in the protocol
+    // TODO IMMEDIATELY make this typesafe
+    const labwareDefinitions = pickBy(labwareDefsById, (def, defId) =>
+      Object.values(labware).some(l => l.definitionId === defId)
     )
 
     return {
@@ -136,7 +142,7 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
 
       pipettes,
       labware,
-      labwareDefinitions: {}, // TODO IMMEDIATELY
+      labwareDefinitions,
 
       commands: flatten<CommandV3, CommandV3>(
         robotStateTimeline.timeline.map(timelineFrame => timelineFrame.commands)
