@@ -682,7 +682,7 @@ class ThermocyclerGeometry(ModuleGeometry):
     def __init__(self, definition: dict, parent: Location) -> None:
         super().__init__(definition, parent)
         self._lid_height = definition["dimensions"]["lidHeight"]
-        self._lid_status = 'closed'
+        self._lid_status = 'open'   # Needs to reflect true status
 
     @property
     def highest_z(self) -> float:
