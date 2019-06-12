@@ -1,5 +1,8 @@
 // @flow
 import { getLabwareDefURI } from '@opentrons/shared-data'
+import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
+import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture12Trough.json'
+import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture96Plate.json'
 import moveLiquidFormToArgs, {
   getMixData,
   type HydratedMoveLiquidFormData,
@@ -13,17 +16,9 @@ jest.mock('../../../utils')
 
 describe('move liquid step form -> command creator args', () => {
   let hydratedForm: ?HydratedMoveLiquidFormData = null
-  const sourceLabwareDef = {
-    version: 123,
-    namespace: 'foo',
-    parameters: { loadName: 'sourceLabwareMock' },
-  }
+  const sourceLabwareDef = fixture12Trough
   const sourceLabwareType = getLabwareDefURI(sourceLabwareDef)
-  const destLabwareDef = {
-    version: 123,
-    namespace: 'foo',
-    parameters: { loadName: 'destLabwareMock' },
-  }
+  const destLabwareDef = fixture96Plate
   const destLabwareType = getLabwareDefURI(destLabwareDef)
   beforeEach(() => {
     // $FlowFixMe: mock methods
@@ -38,7 +33,10 @@ describe('move liquid step form -> command creator args', () => {
       description: null,
 
       fields: {
-        pipette: { id: 'pipetteId' },
+        pipette: {
+          id: 'pipetteId',
+          spec: fixtureP10Single,
+        },
         volume: 10,
         path: 'single',
         changeTip: 'always',
@@ -126,14 +124,14 @@ describe('move liquid step form -> command creator args', () => {
   const checkboxFieldCases = [
     {
       checkboxField: 'aspirate_touchTip_checkbox',
-      formFields: { aspirate_touchTip_mmFromBottom: 42 },
+      formFields: { aspirate_touchTip_mmFromBottom: 101 },
       expectedArgsUnchecked: {
         touchTipAfterAspirate: false,
-        touchTipAfterAspirateOffsetMmFromBottom: null,
+        touchTipAfterAspirateOffsetMmFromBottom: 101,
       },
       expectedArgsChecked: {
         touchTipAfterAspirate: true,
-        touchTipAfterAspirateOffsetMmFromBottom: 42,
+        touchTipAfterAspirateOffsetMmFromBottom: 101,
       },
     },
 
@@ -142,7 +140,7 @@ describe('move liquid step form -> command creator args', () => {
       formFields: { dispense_touchTip_mmFromBottom: 42 },
       expectedArgsUnchecked: {
         touchTipAfterDispense: false,
-        touchTipAfterDispenseOffsetMmFromBottom: null,
+        touchTipAfterDispenseOffsetMmFromBottom: 42,
       },
       expectedArgsChecked: {
         touchTipAfterDispense: true,

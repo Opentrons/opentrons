@@ -4,13 +4,19 @@ import _mix from '../commandCreators/compound/mix'
 import {
   getRobotStateWithTipStandard,
   makeContext,
-  compoundCommandCreatorNoErrors,
-  compoundCommandCreatorHasErrors,
+  getSuccessResult,
+  getErrorResult,
   commandFixtures as cmd,
 } from './fixtures'
+import { reduceCommandCreators } from '../utils'
 import type { MixArgs } from '../types'
-const mix = compoundCommandCreatorNoErrors(_mix)
-const mixWithErrors = compoundCommandCreatorHasErrors(_mix)
+
+// collapse this compound command creator into the signature of an atomic command creator
+const mix = (args: MixArgs) => (invariantContext, initialRobotState) =>
+  reduceCommandCreators(_mix(args)(invariantContext, initialRobotState))(
+    invariantContext,
+    initialRobotState
+  )
 
 let invariantContext
 let robotStateWithTip
@@ -81,8 +87,9 @@ describe('mix: change tip', () => {
   test('changeTip="always"', () => {
     const args = makeArgs('always')
     const result = mix(args)(invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
 
-    expect(result.commands).toEqual(
+    expect(res.commands).toEqual(
       flatMap(args.wells, (well: string, idx: number) => [
         ...cmd.replaceTipCommands(idx),
         aspirateHelper(well, volume),
@@ -97,8 +104,9 @@ describe('mix: change tip', () => {
   test('changeTip="once"', () => {
     const args = makeArgs('once')
     const result = mix(args)(invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
 
-    expect(result.commands).toEqual([
+    expect(res.commands).toEqual([
       ...cmd.replaceTipCommands(0),
       ...flatMap(args.wells, well => [
         aspirateHelper(well, volume),
@@ -112,8 +120,9 @@ describe('mix: change tip', () => {
   test('changeTip="never"', () => {
     const args = makeArgs('never')
     const result = mix(args)(invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
 
-    expect(result.commands).toEqual(
+    expect(res.commands).toEqual(
       flatMap(args.wells, well => [
         aspirateHelper(well, volume),
         dispenseHelper(well, volume),
@@ -160,7 +169,8 @@ describe('mix: advanced options', () => {
     }
 
     const result = mix(args)(invariantContext, robotStateWithTip)
-    expect(result.commands).toEqual([
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
       ...cmd.replaceTipCommands(0),
       { ...cmd.aspirate('A1', volume, aspirateParams) },
       { ...cmd.dispense('A1', volume, dispenseParams) },
@@ -181,8 +191,9 @@ describe('mix: advanced options', () => {
     }
 
     const result = mix(args)(invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
 
-    expect(result.commands).toEqual(
+    expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
         ...cmd.replaceTipCommands(idx),
         aspirateHelper(well, volume),
@@ -206,8 +217,9 @@ describe('mix: advanced options', () => {
     }
 
     const result = mix(args)(invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
 
-    expect(result.commands).toEqual(
+    expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
         ...cmd.replaceTipCommands(idx),
         aspirateHelper(well, volume),
@@ -232,8 +244,9 @@ describe('mix: advanced options', () => {
     }
 
     const result = mix(args)(invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
 
-    expect(result.commands).toEqual(
+    expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
         ...cmd.replaceTipCommands(idx),
         aspirateHelper(well, volume),
@@ -264,9 +277,10 @@ describe('mix: errors', () => {
       ...errorArgs,
       labware: 'invalidLabwareId',
     }
-    const result = mixWithErrors(args)(invariantContext, robotStateWithTip)
-    expect(result.errors).toHaveLength(1)
-    expect(result.errors[0]).toMatchObject({
+    const result = mix(args)(invariantContext, robotStateWithTip)
+    const res = getErrorResult(result)
+    expect(res.errors).toHaveLength(1)
+    expect(res.errors[0]).toMatchObject({
       type: 'LABWARE_DOES_NOT_EXIST',
     })
   })
@@ -276,9 +290,10 @@ describe('mix: errors', () => {
       ...errorArgs,
       pipette: 'invalidPipetteId',
     }
-    const result = mixWithErrors(args)(invariantContext, robotStateWithTip)
-    expect(result.errors).toHaveLength(1)
-    expect(result.errors[0]).toMatchObject({
+    const result = mix(args)(invariantContext, robotStateWithTip)
+    const res = getErrorResult(result)
+    expect(res.errors).toHaveLength(1)
+    expect(res.errors[0]).toMatchObject({
       type: 'PIPETTE_DOES_NOT_EXIST',
     })
   })

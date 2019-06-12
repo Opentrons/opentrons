@@ -13,7 +13,7 @@ import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture12
 import fixtureTipRack10Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack10Ul.json'
 import fixtureTipRack300Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack300Ul.json'
 
-import { makeInitialRobotState, reduceCommandCreators } from '../../utils'
+import { makeInitialRobotState } from '../../utils'
 import { tiprackWellNamesFlat } from './data'
 import type { InvariantContext, RobotState } from '../../'
 import type {
@@ -44,36 +44,6 @@ export function getErrorResult(
     throw new Error(
       `Expected command creator to return errors but got success result`
     )
-  }
-  return result
-}
-
-export const compoundCommandCreatorNoErrors = (command: *) => (
-  commandArgs: *
-) => (
-  invariantContext: InvariantContext,
-  robotState: RobotState
-): CommandsAndRobotState => {
-  const result = reduceCommandCreators(
-    command(commandArgs)(invariantContext, robotState)
-  )(invariantContext, robotState)
-  if (result.errors) {
-    throw new Error('expected no errors, got ' + JSON.stringify(result.errors))
-  }
-  return result
-}
-
-export const compoundCommandCreatorHasErrors = (command: *) => (
-  commandArgs: *
-) => (
-  invariantContext: InvariantContext,
-  robotState: RobotState
-): CommandCreatorErrorResponse => {
-  const result = reduceCommandCreators(
-    command(commandArgs)(invariantContext, robotState)
-  )(invariantContext, robotState)
-  if (!result.errors) {
-    throw new Error('expected errors')
   }
   return result
 }

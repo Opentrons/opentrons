@@ -3,21 +3,76 @@ import merge from 'lodash/merge'
 import {
   getRobotStateWithTipStandard,
   makeContext,
-  compoundCommandCreatorNoErrors,
-  compoundCommandCreatorHasErrors,
   commandFixtures as cmd,
+  getSuccessResult,
+  getErrorResult,
 } from './fixtures'
+import { reduceCommandCreators } from '../utils'
 import _transfer from '../commandCreators/compound/transfer'
+import type { TransferArgs } from '../types'
 
-const transfer = compoundCommandCreatorNoErrors(_transfer)
-const transferWithErrors = compoundCommandCreatorHasErrors(_transfer)
+// collapse this compound command creator into the signature of an atomic command creator
+const transfer = (args: TransferArgs) => (
+  invariantContext,
+  initialRobotState
+) =>
+  reduceCommandCreators(_transfer(args)(invariantContext, initialRobotState))(
+    invariantContext,
+    initialRobotState
+  )
 
-let transferArgs
+// TODO IMMEDIATELY: this is duplicated in consolidate and probably distribute
+// NOTE: make sure none of these numbers match!
+const ASPIRATE_FLOW_RATE = 2.1
+const DISPENSE_FLOW_RATE = 2.2
+const BLOWOUT_FLOW_RATE = 2.3
+
+const ASPIRATE_OFFSET_FROM_BOTTOM_MM = 3.1
+const DISPENSE_OFFSET_FROM_BOTTOM_MM = 3.2
+const BLOWOUT_OFFSET_FROM_BOTTOM_MM = 3.3
+const TOUCH_TIP_OFFSET_FROM_BOTTOM_MM = 3.4
+
+const aspirateHelper = (well: string, volume: number, params = null) =>
+  cmd.aspirate(well, volume, {
+    offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+    flowRate: ASPIRATE_FLOW_RATE,
+    ...params,
+  })
+
+const dispenseHelper = (well, volume, params = null) =>
+  cmd.dispense(well, volume, {
+    labware: 'sourcePlateId', // TODO IMMEDIATELY: THIS IS DIFFERENT THAN CONSOLIDATE
+    offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+    flowRate: DISPENSE_FLOW_RATE,
+    ...params,
+  })
+
+// TODO IMMEDIATELY: THIS IS NEW vs CONSOLIDATE
+const touchTipHelper = (well, params) =>
+  cmd.touchTip(well, {
+    offsetFromBottomMm: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
+    ...params,
+  })
+
 let invariantContext
 let robotStateWithTip
+let transferArgs
+let flowRatesAndOffsets
 
 beforeEach(() => {
+  flowRatesAndOffsets = {
+    aspirateFlowRateUlSec: ASPIRATE_FLOW_RATE,
+    dispenseFlowRateUlSec: DISPENSE_FLOW_RATE,
+    blowoutFlowRateUlSec: BLOWOUT_FLOW_RATE,
+    aspirateOffsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+    dispenseOffsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+    blowoutOffsetFromBottomMm: BLOWOUT_OFFSET_FROM_BOTTOM_MM,
+    touchTipAfterAspirateOffsetMmFromBottom: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
+    touchTipAfterDispenseOffsetMmFromBottom: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
+  }
+
   transferArgs = {
+    ...flowRatesAndOffsets,
     commandCreatorFnName: 'transfer',
     name: 'Transfer Test',
     description: 'test blah blah',
@@ -62,8 +117,9 @@ describe('pick up tip if no tip on pipette', () => {
       }
 
       const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
 
-      expect(result.commands[0]).toEqual(cmd.pickUpTip('A1'))
+      expect(res.commands[0]).toEqual(cmd.pickUpTip('A1'))
     })
   })
 
@@ -73,13 +129,11 @@ describe('pick up tip if no tip on pipette', () => {
       changeTip: 'never',
     }
 
-    const result = transferWithErrors(transferArgs)(
-      invariantContext,
-      robotStateWithTip
-    )
+    const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
+    const res = getErrorResult(result)
 
-    expect(result.errors).toHaveLength(1)
-    expect(result.errors[0]).toMatchObject({
+    expect(res.errors).toHaveLength(1)
+    expect(res.errors[0]).toMatchObject({
       type: 'NO_TIP_ON_PIPETTE',
     })
   })
@@ -99,12 +153,13 @@ test('single transfer: 1 source & 1 dest', () => {
   }
 
   const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-  expect(result.commands).toEqual([
-    cmd.aspirate('A1', 30),
-    cmd.dispense('B2', 30, { labware: 'destPlateId' }),
+  const res = getSuccessResult(result)
+  expect(res.commands).toEqual([
+    aspirateHelper('A1', 30),
+    dispenseHelper('B2', 30, { labware: 'destPlateId' }),
   ])
 
-  expect(result.robotState.liquidState).toEqual(
+  expect(res.robotState.liquidState).toEqual(
     merge({}, robotStateWithTip.liquidState, {
       labware: {
         sourcePlateId: { A1: { '0': { volume: 200 - 30 } } },
@@ -126,12 +181,13 @@ test('transfer with multiple sets of wells', () => {
     volume: 30,
   }
   const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-  expect(result.commands).toEqual([
-    cmd.aspirate('A1', 30),
-    cmd.dispense('B2', 30, { labware: 'destPlateId' }),
+  const res = getSuccessResult(result)
+  expect(res.commands).toEqual([
+    aspirateHelper('A1', 30),
+    dispenseHelper('B2', 30, { labware: 'destPlateId' }),
 
-    cmd.aspirate('A2', 30),
-    cmd.dispense('C2', 30, { labware: 'destPlateId' }),
+    aspirateHelper('A2', 30),
+    dispenseHelper('C2', 30, { labware: 'destPlateId' }),
   ])
 
   // TODO Ian 2018-04-02 robotState, liquidState checks
@@ -147,13 +203,11 @@ test('invalid pipette ID should throw error', () => {
     pipette: 'no-such-pipette-id-here',
   }
 
-  const result = transferWithErrors(transferArgs)(
-    invariantContext,
-    robotStateWithTip
-  )
+  const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
+  const res = getErrorResult(result)
 
-  expect(result.errors).toHaveLength(1)
-  expect(result.errors[0]).toMatchObject({
+  expect(res.errors).toHaveLength(1)
+  expect(res.errors[0]).toMatchObject({
     type: 'PIPETTE_DOES_NOT_EXIST',
   })
 })
@@ -168,13 +222,11 @@ test('invalid labware ID should throw error', () => {
     changeTip: 'always',
   }
 
-  const result = transferWithErrors(transferArgs)(
-    invariantContext,
-    robotStateWithTip
-  )
+  const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
+  const res = getErrorResult(result)
 
-  expect(result.errors).toHaveLength(1)
-  expect(result.errors[0]).toMatchObject({
+  expect(res.errors).toHaveLength(1)
+  expect(res.errors[0]).toMatchObject({
     type: 'LABWARE_DOES_NOT_EXIST',
   })
 })
@@ -229,19 +281,20 @@ describe('single transfer exceeding pipette max', () => {
     }
 
     const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-    expect(result.commands).toEqual([
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
       cmd.pickUpTip('A1'),
-      cmd.aspirate('A1', 300),
-      cmd.dispense('A3', 300, { labware: 'destPlateId' }),
-      cmd.aspirate('A1', 50),
-      cmd.dispense('A3', 50, { labware: 'destPlateId' }),
-      cmd.aspirate('B1', 300),
-      cmd.dispense('B3', 300, { labware: 'destPlateId' }),
-      cmd.aspirate('B1', 50),
-      cmd.dispense('B3', 50, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 300),
+      dispenseHelper('A3', 300, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 50),
+      dispenseHelper('A3', 50, { labware: 'destPlateId' }),
+      aspirateHelper('B1', 300),
+      dispenseHelper('B3', 300, { labware: 'destPlateId' }),
+      aspirateHelper('B1', 50),
+      dispenseHelper('B3', 50, { labware: 'destPlateId' }),
     ])
 
-    expect(result.robotState.liquidState).toEqual(
+    expect(res.robotState.liquidState).toEqual(
       merge({}, robotStateWithTip.liquidState, expectedFinalLiquidState)
     )
   })
@@ -253,32 +306,33 @@ describe('single transfer exceeding pipette max', () => {
     }
 
     const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-    expect(result.commands).toEqual([
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
       cmd.pickUpTip('A1'),
 
-      cmd.aspirate('A1', 300),
-      cmd.dispense('A3', 300, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 300),
+      dispenseHelper('A3', 300, { labware: 'destPlateId' }),
 
       // replace tip before next asp-disp chunk
       cmd.dropTip('A1'),
       cmd.pickUpTip('B1'),
 
-      cmd.aspirate('A1', 50),
-      cmd.dispense('A3', 50, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 50),
+      dispenseHelper('A3', 50, { labware: 'destPlateId' }),
 
       // replace tip before next source-dest well pair
       cmd.dropTip('A1'),
       cmd.pickUpTip('C1'),
 
-      cmd.aspirate('B1', 300),
-      cmd.dispense('B3', 300, { labware: 'destPlateId' }),
+      aspirateHelper('B1', 300),
+      dispenseHelper('B3', 300, { labware: 'destPlateId' }),
 
       // replace tip before next asp-disp chunk
       cmd.dropTip('A1'),
       cmd.pickUpTip('D1'),
 
-      cmd.aspirate('B1', 50),
-      cmd.dispense('B3', 50, { labware: 'destPlateId' }),
+      aspirateHelper('B1', 50),
+      dispenseHelper('B3', 50, { labware: 'destPlateId' }),
     ])
 
     // unlike the other test cases here, we have a new tip when aspirating from B1.
@@ -290,7 +344,7 @@ describe('single transfer exceeding pipette max', () => {
     // $FlowFixMe flow doesn't like assigning to these objects
     expectedFinalLiquidState.labware.destPlateId.B3 = { '1': { volume: 350 } }
 
-    expect(result.robotState.liquidState).toEqual(
+    expect(res.robotState.liquidState).toEqual(
       merge({}, robotStateWithTip.liquidState, expectedFinalLiquidState)
     )
   })
@@ -304,31 +358,32 @@ describe('single transfer exceeding pipette max', () => {
     }
 
     const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-    expect(result.commands).toEqual([
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
       cmd.pickUpTip('A1'),
 
-      cmd.aspirate('A1', 300),
-      cmd.dispense('B1', 300, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 300),
+      dispenseHelper('B1', 300, { labware: 'destPlateId' }),
 
-      cmd.aspirate('A1', 50),
-      cmd.dispense('B1', 50, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 50),
+      dispenseHelper('B1', 50, { labware: 'destPlateId' }),
 
       // same source, different dest: no change
-      cmd.aspirate('A1', 300),
-      cmd.dispense('B2', 300, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 300),
+      dispenseHelper('B2', 300, { labware: 'destPlateId' }),
 
-      cmd.aspirate('A1', 50),
-      cmd.dispense('B2', 50, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 50),
+      dispenseHelper('B2', 50, { labware: 'destPlateId' }),
 
       // new source, different dest: change tip
       cmd.dropTip('A1'),
       cmd.pickUpTip('B1'),
 
-      cmd.aspirate('A2', 300),
-      cmd.dispense('B2', 300, { labware: 'destPlateId' }),
+      aspirateHelper('A2', 300),
+      dispenseHelper('B2', 300, { labware: 'destPlateId' }),
 
-      cmd.aspirate('A2', 50),
-      cmd.dispense('B2', 50, { labware: 'destPlateId' }),
+      aspirateHelper('A2', 50),
+      dispenseHelper('B2', 50, { labware: 'destPlateId' }),
     ])
   })
 
@@ -342,32 +397,33 @@ describe('single transfer exceeding pipette max', () => {
     }
 
     const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-    expect(result.commands).toEqual([
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
       cmd.pickUpTip('A1'),
 
-      cmd.aspirate('A1', 300),
-      cmd.dispense('B1', 300, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 300),
+      dispenseHelper('B1', 300, { labware: 'destPlateId' }),
 
-      cmd.aspirate('A1', 50),
-      cmd.dispense('B1', 50, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 50),
+      dispenseHelper('B1', 50, { labware: 'destPlateId' }),
 
       // same source, different dest: change tip
       cmd.dropTip('A1'),
       cmd.pickUpTip('B1'),
 
-      cmd.aspirate('A1', 300),
-      cmd.dispense('B2', 300, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 300),
+      dispenseHelper('B2', 300, { labware: 'destPlateId' }),
 
-      cmd.aspirate('A1', 50),
-      cmd.dispense('B2', 50, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 50),
+      dispenseHelper('B2', 50, { labware: 'destPlateId' }),
 
       // different source, same dest: no change
 
-      cmd.aspirate('A2', 300),
-      cmd.dispense('B2', 300, { labware: 'destPlateId' }),
+      aspirateHelper('A2', 300),
+      dispenseHelper('B2', 300, { labware: 'destPlateId' }),
 
-      cmd.aspirate('A2', 50),
-      cmd.dispense('B2', 50, { labware: 'destPlateId' }),
+      aspirateHelper('A2', 50),
+      dispenseHelper('B2', 50, { labware: 'destPlateId' }),
     ])
   })
 
@@ -380,22 +436,23 @@ describe('single transfer exceeding pipette max', () => {
     robotStateWithTip.tipState.pipettes.p300SingleId = true
 
     const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-    expect(result.commands).toEqual([
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
       // no pick up tip
-      cmd.aspirate('A1', 300),
-      cmd.dispense('A3', 300, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 300),
+      dispenseHelper('A3', 300, { labware: 'destPlateId' }),
 
-      cmd.aspirate('A1', 50),
-      cmd.dispense('A3', 50, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 50),
+      dispenseHelper('A3', 50, { labware: 'destPlateId' }),
 
-      cmd.aspirate('B1', 300),
-      cmd.dispense('B3', 300, { labware: 'destPlateId' }),
+      aspirateHelper('B1', 300),
+      dispenseHelper('B3', 300, { labware: 'destPlateId' }),
 
-      cmd.aspirate('B1', 50),
-      cmd.dispense('B3', 50, { labware: 'destPlateId' }),
+      aspirateHelper('B1', 50),
+      dispenseHelper('B3', 50, { labware: 'destPlateId' }),
     ])
 
-    expect(result.robotState.liquidState).toEqual(
+    expect(res.robotState.liquidState).toEqual(
       merge({}, robotStateWithTip.liquidState, expectedFinalLiquidState)
     )
   })
@@ -414,22 +471,23 @@ describe('single transfer exceeding pipette max', () => {
     robotStateWithTip.tipState.pipettes.p300SingleId = true
 
     const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-    expect(result.commands).toEqual([
-      cmd.aspirate('A1', 300),
-      cmd.dispense('A3', 300, { labware: 'destPlateId' }),
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
+      aspirateHelper('A1', 300),
+      dispenseHelper('A3', 300, { labware: 'destPlateId' }),
       // last 2 chunks split evenly
-      cmd.aspirate('A1', 164.5),
-      cmd.dispense('A3', 164.5, { labware: 'destPlateId' }),
-      cmd.aspirate('A1', 164.5),
-      cmd.dispense('A3', 164.5, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 164.5),
+      dispenseHelper('A3', 164.5, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 164.5),
+      dispenseHelper('A3', 164.5, { labware: 'destPlateId' }),
 
-      cmd.aspirate('B1', 300),
-      cmd.dispense('B3', 300, { labware: 'destPlateId' }),
+      aspirateHelper('B1', 300),
+      dispenseHelper('B3', 300, { labware: 'destPlateId' }),
       // last 2 chunks split evenly
-      cmd.aspirate('B1', 164.5),
-      cmd.dispense('B3', 164.5, { labware: 'destPlateId' }),
-      cmd.aspirate('B1', 164.5),
-      cmd.dispense('B3', 164.5, { labware: 'destPlateId' }),
+      aspirateHelper('B1', 164.5),
+      dispenseHelper('B3', 164.5, { labware: 'destPlateId' }),
+      aspirateHelper('B1', 164.5),
+      dispenseHelper('B3', 164.5, { labware: 'destPlateId' }),
     ])
   })
 })
@@ -452,17 +510,18 @@ describe('advanced options', () => {
       }
 
       const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-      expect(result.commands).toEqual([
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
         // pre-wet aspirate/dispense
-        cmd.aspirate('A1', 300),
-        cmd.dispense('A1', 300),
+        aspirateHelper('A1', 300),
+        dispenseHelper('A1', 300),
 
         // "real" aspirate/dispenses
-        cmd.aspirate('A1', 300),
-        cmd.dispense('B1', 300, { labware: 'destPlateId' }),
+        aspirateHelper('A1', 300),
+        dispenseHelper('B1', 300, { labware: 'destPlateId' }),
 
-        cmd.aspirate('A1', 50),
-        cmd.dispense('B1', 50, { labware: 'destPlateId' }),
+        aspirateHelper('A1', 50),
+        dispenseHelper('B1', 50, { labware: 'destPlateId' }),
       ])
     })
 
@@ -474,14 +533,15 @@ describe('advanced options', () => {
       }
 
       const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-      expect(result.commands).toEqual([
-        cmd.aspirate('A1', 300),
-        cmd.touchTip('A1'),
-        cmd.dispense('B1', 300, { labware: 'destPlateId' }),
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 300),
+        touchTipHelper('A1'),
+        dispenseHelper('B1', 300, { labware: 'destPlateId' }),
 
-        cmd.aspirate('A1', 50),
-        cmd.touchTip('A1'),
-        cmd.dispense('B1', 50, { labware: 'destPlateId' }),
+        aspirateHelper('A1', 50),
+        touchTipHelper('A1'),
+        dispenseHelper('B1', 50, { labware: 'destPlateId' }),
       ])
     })
 
@@ -493,14 +553,15 @@ describe('advanced options', () => {
       }
 
       const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-      expect(result.commands).toEqual([
-        cmd.aspirate('A1', 300),
-        cmd.dispense('B1', 300, { labware: 'destPlateId' }),
-        cmd.touchTip('B1', { labware: 'destPlateId' }),
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 300),
+        dispenseHelper('B1', 300, { labware: 'destPlateId' }),
+        touchTipHelper('B1', { labware: 'destPlateId' }),
 
-        cmd.aspirate('A1', 50),
-        cmd.dispense('B1', 50, { labware: 'destPlateId' }),
-        cmd.touchTip('B1', { labware: 'destPlateId' }),
+        aspirateHelper('A1', 50),
+        dispenseHelper('B1', 50, { labware: 'destPlateId' }),
+        touchTipHelper('B1', { labware: 'destPlateId' }),
       ])
     })
 
@@ -517,22 +578,23 @@ describe('advanced options', () => {
       // written here for less verbose `commands` below
       const mixCommands = [
         // mix 1
-        cmd.aspirate('A1', 250),
-        cmd.dispense('A1', 250),
+        aspirateHelper('A1', 250),
+        dispenseHelper('A1', 250),
         // mix 2
-        cmd.aspirate('A1', 250),
-        cmd.dispense('A1', 250),
+        aspirateHelper('A1', 250),
+        dispenseHelper('A1', 250),
       ]
 
       const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-      expect(result.commands).toEqual([
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
         ...mixCommands,
-        cmd.aspirate('A1', 300),
-        cmd.dispense('B1', 300, { labware: 'destPlateId' }),
+        aspirateHelper('A1', 300),
+        dispenseHelper('B1', 300, { labware: 'destPlateId' }),
 
         ...mixCommands,
-        cmd.aspirate('A1', 50),
-        cmd.dispense('B1', 50, { labware: 'destPlateId' }),
+        aspirateHelper('A1', 50),
+        dispenseHelper('B1', 50, { labware: 'destPlateId' }),
       ])
     })
 
@@ -553,21 +615,22 @@ describe('advanced options', () => {
       // written here for less verbose `commands` below
       const mixCommands = [
         // mix 1
-        cmd.aspirate('B1', 250, { labware: 'destPlateId' }),
-        cmd.dispense('B1', 250, { labware: 'destPlateId' }),
+        aspirateHelper('B1', 250, { labware: 'destPlateId' }),
+        dispenseHelper('B1', 250, { labware: 'destPlateId' }),
         // mix 2
-        cmd.aspirate('B1', 250, { labware: 'destPlateId' }),
-        cmd.dispense('B1', 250, { labware: 'destPlateId' }),
+        aspirateHelper('B1', 250, { labware: 'destPlateId' }),
+        dispenseHelper('B1', 250, { labware: 'destPlateId' }),
       ]
 
       const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-      expect(result.commands).toEqual([
-        cmd.aspirate('A1', 300),
-        cmd.dispense('B1', 300, { labware: 'destPlateId' }),
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 300),
+        dispenseHelper('B1', 300, { labware: 'destPlateId' }),
         ...mixCommands,
 
-        cmd.aspirate('A1', 50),
-        cmd.dispense('B1', 50, { labware: 'destPlateId' }),
+        aspirateHelper('A1', 50),
+        dispenseHelper('B1', 50, { labware: 'destPlateId' }),
         ...mixCommands,
       ])
     })

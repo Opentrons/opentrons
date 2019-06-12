@@ -7,9 +7,15 @@ import * as warningCreators from '../warningCreators'
 
 let invariantContext
 let initialRobotState
+let flowRatesAndOffsets
+
 beforeEach(() => {
   invariantContext = makeContext()
   initialRobotState = getInitialRobotStateStandard(invariantContext)
+  flowRatesAndOffsets = {
+    flowRate: 1.23,
+    offsetFromBottomMm: 4.32,
+  }
 })
 
 describe('...single-channel pipette', () => {
@@ -19,6 +25,7 @@ describe('...single-channel pipette', () => {
   beforeEach(() => {
     // NOTE: aspirate from TROUGH not sourcePlate
     aspirateSingleCh50FromA1Args = {
+      ...flowRatesAndOffsets,
       labware: labwareId,
       pipette: 'p300SingleId',
       volume: 50,
@@ -204,6 +211,7 @@ describe('...8-channel pipette', () => {
 
   beforeEach(() => {
     aspirate8Ch50FromA1Args = {
+      ...flowRatesAndOffsets,
       labware: labwareId,
       pipette: 'p300MultiId',
       volume: 50,
@@ -346,6 +354,7 @@ describe('8-channel trough', () => {
         }
 
         const args = {
+          ...flowRatesAndOffsets,
           pipette: 'p300MultiId',
           well: 'A1',
           labware: labwareId,

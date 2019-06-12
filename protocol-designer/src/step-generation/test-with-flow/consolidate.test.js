@@ -25,6 +25,7 @@ const consolidate = (args: ConsolidateArgs) => (
     _consolidate(args)(invariantContext, initialRobotState)
   )(invariantContext, initialRobotState)
 
+// TODO IMMEDIATELY these are replicated eg in transfer.test.js and distribute.test.js
 // NOTE: make sure none of these numbers match!
 const ASPIRATE_FLOW_RATE = 2.1
 const DISPENSE_FLOW_RATE = 2.2
@@ -33,7 +34,9 @@ const BLOWOUT_FLOW_RATE = 2.3
 const ASPIRATE_OFFSET_FROM_BOTTOM_MM = 3.1
 const DISPENSE_OFFSET_FROM_BOTTOM_MM = 3.2
 const BLOWOUT_OFFSET_FROM_BOTTOM_MM = 3.3
+const TOUCH_TIP_OFFSET_FROM_BOTTOM_MM = 3.4
 
+// TODO IMMEDIATELY these are replicated eg in transfer.test.js
 const aspirateHelper = (well: string, volume: number, params = null) =>
   cmd.aspirate(well, volume, {
     offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
@@ -49,10 +52,11 @@ const dispenseHelper = (well, volume, params = null) =>
     ...params,
   })
 
-const blowoutHelper = () =>
-  cmd.blowout(undefined, {
+const blowoutHelper = (labware: string | typeof undefined, params) =>
+  cmd.blowout(labware, {
     offsetFromBottomMm: BLOWOUT_OFFSET_FROM_BOTTOM_MM,
     flowRate: BLOWOUT_FLOW_RATE,
+    ...params,
   })
 
 function tripleMix(well: string, volume: number, labware: string) {
@@ -106,6 +110,7 @@ beforeEach(() => {
     }
   )
 
+  // TODO IMMEDIATELY this is duplicated in transfer and distribute
   flowRatesAndOffsets = {
     aspirateFlowRateUlSec: ASPIRATE_FLOW_RATE,
     dispenseFlowRateUlSec: DISPENSE_FLOW_RATE,
@@ -113,13 +118,14 @@ beforeEach(() => {
     aspirateOffsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
     dispenseOffsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
     blowoutOffsetFromBottomMm: BLOWOUT_OFFSET_FROM_BOTTOM_MM,
-    touchTipAfterAspirateOffsetMmFromBottom: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-    touchTipAfterDispenseOffsetMmFromBottom: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+    touchTipAfterAspirateOffsetMmFromBottom: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
+    touchTipAfterDispenseOffsetMmFromBottom: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
   }
 
   baseArgs = {
     // `volume` and `changeTip` should be explicit in tests,
     // those fields intentionally omitted from here
+    ...flowRatesAndOffsets,
     stepType: 'consolidate',
     commandCreatorFnName: 'consolidate',
     name: 'Consolidate Test',
@@ -138,8 +144,6 @@ beforeEach(() => {
     touchTipAfterDispense: false,
     mixInDestination: null,
     blowoutLocation: null,
-
-    ...flowRatesAndOffsets,
   }
 })
 
@@ -315,11 +319,11 @@ describe('consolidate single-channel', () => {
       cmd.pickUpTip('A1'),
       // Start mix
       aspirateHelper('A1', 50),
-      cmd.dispense('A1', 50), // sourceLabwareId
+      dispenseHelper('A1', 50, { labware: 'sourcePlateId' }),
       aspirateHelper('A1', 50),
-      cmd.dispense('A1', 50), // sourceLabwareId
+      dispenseHelper('A1', 50, { labware: 'sourcePlateId' }),
       aspirateHelper('A1', 50),
-      cmd.dispense('A1', 50), // sourceLabwareId
+      dispenseHelper('A1', 50, { labware: 'sourcePlateId' }),
       // done mix
       aspirateHelper('A1', 125),
       aspirateHelper('A2', 125),
@@ -327,11 +331,11 @@ describe('consolidate single-channel', () => {
 
       // Start mix
       aspirateHelper('A3', 50),
-      cmd.dispense('A3', 50), // sourceLabwareId
+      dispenseHelper('A3', 50, { labware: 'sourcePlateId' }),
       aspirateHelper('A3', 50),
-      cmd.dispense('A3', 50), // sourceLabwareId
+      dispenseHelper('A3', 50, { labware: 'sourcePlateId' }),
       aspirateHelper('A3', 50),
-      cmd.dispense('A3', 50), // sourceLabwareId
+      dispenseHelper('A3', 50, { labware: 'sourcePlateId' }),
       // done mix
 
       aspirateHelper('A3', 125),
@@ -421,7 +425,7 @@ describe('consolidate single-channel', () => {
 
       // pre-wet tip
       aspirateHelper('A1', preWetVol),
-      cmd.dispense('A1', preWetVol),
+      dispenseHelper('A1', preWetVol, { labware: 'sourcePlateId' }),
       // done pre-wet
 
       aspirateHelper('A1', 150),
@@ -430,7 +434,7 @@ describe('consolidate single-channel', () => {
 
       // pre-wet tip, now with A3
       aspirateHelper('A3', preWetVol),
-      cmd.dispense('A3', preWetVol),
+      dispenseHelper('A3', preWetVol, { labware: 'sourcePlateId' }),
       // done pre-wet
 
       aspirateHelper('A3', 150),

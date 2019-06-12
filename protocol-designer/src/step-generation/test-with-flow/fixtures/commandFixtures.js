@@ -11,6 +11,8 @@ export const replaceTipCommands = (tip: number | string): Array<Command> => [
   pickUpTip(tip),
 ]
 
+// TODO IMMEDIATELY: make a factory that bakes args into these fns, don't bake them in here...???
+
 export const dropTip = (
   well: string,
   params?: {| pipette?: string, labware?: string |}
