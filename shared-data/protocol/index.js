@@ -8,10 +8,15 @@ type ProtocolData =
 
 // $FlowFixMe: (ka, 2019-06-10): cant differentiate which file schema file is needed
 export function getProtocolSchemaVersion(data: ProtocolData): ?number {
-  if (data.schemaVersion) {
-    return data.schemaVersion
-  } else if (data['protocol-schema']) {
-    return Number(data['protocol-schema'].charAt(0))
+  if (data.schemaVersion > 3) {
+    console.warn('this is protocol schema version is not yet supported')
+  }
+  if (data.schemaVersion === 3) {
+    return 3
+  } else if (data['protocol-schema'] === '2.0.0') {
+    return 2
+  } else if (data['protocol-schema'] === '1.0.0') {
+    return 1
   }
   return null
 }
