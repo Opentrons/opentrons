@@ -163,16 +163,16 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
           })
         : []
 
-      const blowoutCommand = blowoutUtil(
-        args.pipette,
-        args.sourceLabware,
-        sourceWellChunk[0],
-        args.destLabware,
-        args.destWell,
-        args.blowoutLocation,
-        blowoutFlowRateUlSec,
-        blowoutOffsetFromBottomMm
-      )
+      const blowoutCommand = blowoutUtil({
+        pipette: args.pipette,
+        sourceLabware: args.sourceLabware,
+        sourceWell: sourceWellChunk[0],
+        destLabware: args.destLabware,
+        destWell: args.destWell,
+        blowoutLocation: args.blowoutLocation,
+        flowRate: blowoutFlowRateUlSec,
+        offsetFromBottomMm: blowoutOffsetFromBottomMm,
+      })
 
       return [
         ...tipCommands,

@@ -200,16 +200,16 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
               })
             : []
 
-          const blowoutCommand = blowoutUtil(
-            args.pipette,
-            args.sourceLabware,
-            sourceWell,
-            args.destLabware,
-            destWell,
-            args.blowoutLocation,
-            blowoutFlowRateUlSec,
-            blowoutOffsetFromBottomMm
-          )
+          const blowoutCommand = blowoutUtil({
+            pipette: args.pipette,
+            sourceLabware: args.sourceLabware,
+            sourceWell: sourceWell,
+            destLabware: args.destLabware,
+            destWell: destWell,
+            blowoutLocation: args.blowoutLocation,
+            flowRate: blowoutFlowRateUlSec,
+            offsetFromBottomMm: blowoutOffsetFromBottomMm,
+          })
 
           const nextCommands = [
             ...tipCommands,

@@ -59,9 +59,9 @@ export const aspirate = (
   params: {
     pipette: 'p300SingleId',
     labware: 'sourcePlateId',
-    ...params,
     volume,
     well,
+    ...params,
   },
 })
 
@@ -74,9 +74,9 @@ export const dispense = (
   params: {
     pipette: 'p300SingleId',
     labware: 'sourcePlateId',
-    ...params,
     volume,
     well,
+    ...params,
   },
 })
 

@@ -8,19 +8,15 @@ import {
 
 jest.mock('../commandCreators/atomic/blowout')
 
-const pipetteId = 'p300SingleId'
-const sourceLabwareId = 'sourcePlateId'
-const sourceWell = 'A1'
-const destLabwareId = 'destPlateId'
-const destWell = 'A2'
-
-const blowoutArgs = [
-  pipetteId,
-  sourceLabwareId,
-  sourceWell,
-  destLabwareId,
-  destWell,
-]
+const blowoutArgs = {
+  pipette: 'p300SingleId',
+  sourceLabware: 'sourcePlateId',
+  sourceWell: 'A1',
+  destLabware: 'destPlateId',
+  destWell: 'A2',
+  flowRate: 1.23,
+  offsetFromBottomMm: 1.02,
+}
 
 describe('blowoutUtil', () => {
   beforeEach(() => {
@@ -31,31 +27,37 @@ describe('blowoutUtil', () => {
   })
 
   test('blowoutUtil calls blowout with source well params', () => {
-    blowoutUtil(
+    blowoutUtil({
       ...blowoutArgs,
-
-      SOURCE_WELL_BLOWOUT_DESTINATION
-    )
+      blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
+    })
 
     expect(_blowout).toHaveBeenCalledWith({
-      pipette: pipetteId,
-      labware: sourceLabwareId,
-      well: sourceWell,
+      pipette: blowoutArgs.pipette,
+      labware: blowoutArgs.sourceLabware,
+      well: blowoutArgs.sourceWell,
+      flowRate: blowoutArgs.flowRate,
+      offsetFromBottomMm: blowoutArgs.offsetFromBottomMm,
     })
   })
 
   test('blowoutUtil calls blowout with dest plate params', () => {
-    blowoutUtil(...blowoutArgs, DEST_WELL_BLOWOUT_DESTINATION)
+    blowoutUtil({
+      ...blowoutArgs,
+      blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
+    })
 
     expect(_blowout).toHaveBeenCalledWith({
-      pipette: pipetteId,
-      labware: destLabwareId,
-      well: destWell,
+      pipette: blowoutArgs.pipette,
+      labware: blowoutArgs.destLabware,
+      well: blowoutArgs.destWell,
+      flowRate: blowoutArgs.flowRate,
+      offsetFromBottomMm: blowoutArgs.offsetFromBottomMm,
     })
   })
 
   test('blowoutUtil returns an empty array if not given a blowoutLocation', () => {
-    const result = blowoutUtil(...blowoutArgs, null)
+    const result = blowoutUtil({ ...blowoutArgs, blowoutLocation: null })
     expect(_blowout).not.toHaveBeenCalled()
     expect(result).toEqual([])
   })

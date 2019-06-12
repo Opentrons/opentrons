@@ -1,8 +1,6 @@
 // @flow
-import _delay from '../commandCreators/atomic/delay'
-import { commandCreatorNoErrors } from './fixtures'
-
-const delay = commandCreatorNoErrors(_delay)
+import delay from '../commandCreators/atomic/delay'
+import { getSuccessResult } from './fixtures'
 
 const getRobotInitialState = (): any => {
   // This particular state shouldn't matter for delay
@@ -19,15 +17,15 @@ describe('delay indefinitely', () => {
 
     const result = delay({
       message,
-      description: 'description',
-      name: 'name',
       wait: true,
     })(invariantContext, robotInitialState)
 
-    expect(result.robotState).toEqual(getRobotInitialState())
-    expect(result.robotState).toBe(robotInitialState) // same object
+    const res = getSuccessResult(result)
 
-    expect(result.commands).toEqual([
+    expect(res.robotState).toEqual(getRobotInitialState())
+    expect(res.robotState).toBe(robotInitialState) // same object
+
+    expect(res.commands).toEqual([
       {
         command: 'delay',
         params: {
@@ -46,15 +44,15 @@ describe('delay for a given time', () => {
 
     const result = delay({
       message,
-      description: 'description',
-      name: 'name',
       wait: 95.5,
     })(invariantContext, robotInitialState)
 
-    expect(result.robotState).toEqual(getRobotInitialState())
-    expect(result.robotState).toBe(robotInitialState) // same object
+    const res = getSuccessResult(result)
 
-    expect(result.commands).toEqual([
+    expect(res.robotState).toEqual(getRobotInitialState())
+    expect(res.robotState).toBe(robotInitialState) // same object
+
+    expect(res.commands).toEqual([
       {
         command: 'delay',
         params: {

@@ -3,18 +3,15 @@ import {
   getInitialRobotStateStandard,
   getRobotStateWithTipStandard,
   makeContext,
-  commandCreatorNoErrors,
-  commandCreatorHasErrors,
+  getErrorResult,
+  getSuccessResult,
 } from './fixtures'
-import _dispense from '../commandCreators/atomic/dispense'
+import dispense from '../commandCreators/atomic/dispense'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
 
 jest.mock('../dispenseUpdateLiquidState')
 jest.mock('../../labware-defs/utils') // TODO IMMEDIATELY move to somewhere more general
-
-const dispense = commandCreatorNoErrors(_dispense)
-const dispenseWithErrors = commandCreatorHasErrors(_dispense)
 
 describe('dispense', () => {
   let initialRobotState
@@ -33,100 +30,47 @@ describe('dispense', () => {
   })
 
   describe('tip tracking & commands:', () => {
-    describe('dispense normally (with tip)', () => {
-      const optionalArgsCases = [
-        {
-          description: 'no optional args',
-          expectInParams: false,
-          args: {},
-        },
-        {
-          description: 'null optional args',
-          expectInParams: false,
-          args: {
-            offsetFromBottomMm: null,
-            'flow-rate': null,
-          },
-        },
-        {
-          description: 'all optional args',
-          expectInParams: true,
-          args: {
-            offsetFromBottomMm: 5,
-            'flow-rate': 6,
-          },
-        },
-      ]
-      optionalArgsCases.forEach(testCase => {
-        test(testCase.description, () => {
-          const result = dispense({
-            pipette: 'p300SingleId',
-            volume: 50,
-            labware: 'sourcePlateId',
-            well: 'A1',
-            ...testCase.args,
-          })(invariantContext, robotStateWithTip)
-
-          expect(result.commands).toEqual([
-            {
-              command: 'dispense',
-              params: {
-                pipette: 'p300SingleId',
-                volume: 50,
-                labware: 'sourcePlateId',
-                well: 'A1',
-                ...(testCase.expectInParams ? testCase.args : {}),
-              },
-            },
-          ])
-        })
-      })
-    })
-
-    test('dispense normally (with tip) and optional args', () => {
-      const args = {
+    let params
+    beforeEach(() => {
+      params = {
         pipette: 'p300SingleId',
         volume: 50,
         labware: 'sourcePlateId',
         well: 'A1',
         offsetFromBottomMm: 5,
-        'flow-rate': 6,
+        flowRate: 6,
       }
+    })
+    test('dispense normally (with tip)', () => {
+      const result = dispense(params)(invariantContext, robotStateWithTip)
 
-      const result = dispense(args)(invariantContext, robotStateWithTip)
-
-      expect(result.commands).toEqual([
+      expect(getSuccessResult(result).commands).toEqual([
         {
           command: 'dispense',
-          params: args,
+          params,
         },
       ])
     })
 
     test('dispensing without tip should throw error', () => {
-      const result = dispenseWithErrors({
-        pipette: 'p300SingleId',
-        volume: 50,
-        labware: 'sourcePlateId',
-        well: 'A1',
-      })(invariantContext, initialRobotState)
+      const result = dispense(params)(invariantContext, initialRobotState)
 
-      expect(result.errors).toHaveLength(1)
-      expect(result.errors[0]).toMatchObject({
+      const res = getErrorResult(result)
+      expect(res.errors).toHaveLength(1)
+      expect(res.errors[0]).toMatchObject({
         type: 'NO_TIP_ON_PIPETTE',
       })
     })
 
     test('dispense to nonexistent labware should throw error', () => {
-      const result = dispenseWithErrors({
-        pipette: 'p300SingleId',
-        volume: 50,
+      const result = dispense({
+        ...params,
         labware: 'someBadLabwareId',
-        well: 'A1',
       })(invariantContext, robotStateWithTip)
 
-      expect(result.errors).toHaveLength(1)
-      expect(result.errors[0]).toMatchObject({
+      const res = getErrorResult(result)
+      expect(res.errors).toHaveLength(1)
+      expect(res.errors[0]).toMatchObject({
         type: 'LABWARE_DOES_NOT_EXIST',
       })
     })
@@ -145,25 +89,30 @@ describe('dispense', () => {
     })
 
     test('dispense calls dispenseUpdateLiquidState with correct args and puts result into robotState.liquidState', () => {
-      const result = dispense({
+      const params = {
         pipette: 'p300SingleId',
         labware: 'sourcePlateId',
         well: 'A1',
         volume: 152,
-      })(invariantContext, robotStateWithTip)
+        flowRate: 12,
+        offsetFromBottomMm: 21,
+      }
+      const result = dispense(params)(invariantContext, robotStateWithTip)
 
       expect(updateLiquidState).toHaveBeenCalledWith(
         {
           invariantContext,
-          pipetteId: 'p300SingleId',
-          labwareId: 'sourcePlateId',
-          volume: 152,
-          well: 'A1',
+          pipetteId: params.pipette,
+          labwareId: params.labware,
+          volume: params.volume,
+          well: params.well,
         },
         robotStateWithTip.liquidState
       )
 
-      expect(result.robotState.liquidState).toBe(mockLiquidReturnValue)
+      expect(getSuccessResult(result).robotState.liquidState).toBe(
+        mockLiquidReturnValue
+      )
     })
   })
 })

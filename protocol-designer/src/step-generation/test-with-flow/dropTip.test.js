@@ -5,13 +5,11 @@ import {
   makeStateArgsStandard,
   makeContext,
   makeState,
-  commandCreatorNoErrors,
+  getSuccessResult,
 } from './fixtures'
-import _dropTip from '../commandCreators/atomic/dropTip'
+import dropTip from '../commandCreators/atomic/dropTip'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
-
-const dropTip = commandCreatorNoErrors(_dropTip)
 
 jest.mock('../dispenseUpdateLiquidState')
 
@@ -52,8 +50,8 @@ describe('dropTip', () => {
         invariantContext,
         makeRobotState({ singleHasTips: true, multiHasTips: true })
       )
-
-      expect(result.commands).toEqual([
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
         {
           command: 'dropTip',
           params: {
@@ -63,7 +61,7 @@ describe('dropTip', () => {
           },
         },
       ])
-      expect(result.robotState).toEqual(
+      expect(res.robotState).toEqual(
         makeRobotState({ singleHasTips: false, multiHasTips: true })
       )
     })
@@ -77,8 +75,9 @@ describe('dropTip', () => {
         invariantContext,
         initialRobotState
       )
-      expect(result.commands).toEqual([])
-      expect(result.robotState).toEqual(initialRobotState)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([])
+      expect(res.robotState).toEqual(initialRobotState)
     })
   })
 
@@ -88,7 +87,8 @@ describe('dropTip', () => {
         invariantContext,
         makeRobotState({ singleHasTips: true, multiHasTips: true })
       )
-      expect(result.commands).toEqual([
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
         {
           command: 'dropTip',
           params: {
@@ -98,7 +98,7 @@ describe('dropTip', () => {
           },
         },
       ])
-      expect(result.robotState).toEqual(
+      expect(res.robotState).toEqual(
         makeRobotState({ singleHasTips: true, multiHasTips: false })
       )
     })
@@ -109,8 +109,9 @@ describe('dropTip', () => {
         multiHasTips: false,
       })
       const result = dropTip('p300MultiId')(invariantContext, initialRobotState)
-      expect(result.commands).toEqual([])
-      expect(result.robotState).toEqual(initialRobotState)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([])
+      expect(res.robotState).toEqual(initialRobotState)
     })
   })
 
@@ -128,7 +129,7 @@ describe('dropTip', () => {
       })
 
       const result = dropTip('p300MultiId')(invariantContext, initialRobotState)
-
+      const res = getSuccessResult(result)
       expect(updateLiquidState).toHaveBeenCalledWith(
         {
           invariantContext,
@@ -140,7 +141,7 @@ describe('dropTip', () => {
         robotStateWithTip.liquidState
       )
 
-      expect(result.robotState.liquidState).toBe(mockLiquidReturnValue)
+      expect(res.robotState.liquidState).toBe(mockLiquidReturnValue)
     })
   })
 })

@@ -4,12 +4,10 @@ import forAspirateDispense from '../getNextRobotStateAndWarnings/forAspirateDisp
 import {
   makeContext,
   getRobotStateWithTipStandard,
-  commandCreatorNoErrors,
+  getSuccessResult,
 } from './fixtures'
 
-import _aspirate from '../commandCreators/atomic/aspirate'
-
-const aspirate = commandCreatorNoErrors(_aspirate)
+import aspirate from '../commandCreators/atomic/aspirate'
 
 jest.mock('../getNextRobotStateAndWarnings/forAspirateDispense')
 
@@ -27,9 +25,12 @@ describe('Aspirate Command', () => {
       labware: 'sourcePlateId',
       well: 'A1',
       volume: 152,
+      flowRate: 2.22,
+      offsetFromBottomMm: 1.11,
     }
-    const command = aspirate(args)(invariantContext, robotStateWithTip)
-      .commands[0]
+    const result = aspirate(args)(invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
+    const command = res.commands[0]
     getNextRobotStateAndWarnings(command, invariantContext, robotStateWithTip)
 
     expect(forAspirateDispense).toHaveBeenCalledWith(

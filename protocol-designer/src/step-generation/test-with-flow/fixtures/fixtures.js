@@ -24,24 +24,26 @@ import type {
 /** Used to wrap command creators in tests, effectively casting their results
  **  to normal response or error response
  **/
-export const commandCreatorNoErrors = (command: any) => (commandArgs: *) => (
-  invariantContext: InvariantContext,
-  robotState: RobotState
-): CommandsAndRobotState => {
-  const result = command(commandArgs)(invariantContext, robotState)
+export function getSuccessResult(
+  result: CommandsAndRobotState | CommandCreatorErrorResponse
+): CommandsAndRobotState {
   if (result.errors) {
-    throw new Error('expected no errors, got ' + JSON.stringify(result.errors))
+    throw new Error(
+      `Expected a successful command creator call but got errors: ${JSON.stringify(
+        result.errors
+      )}`
+    )
   }
   return result
 }
 
-export const commandCreatorHasErrors = (command: *) => (commandArgs: *) => (
-  invariantContext: InvariantContext,
-  robotState: RobotState
-): CommandCreatorErrorResponse => {
-  const result = command(commandArgs)(invariantContext, robotState)
+export function getErrorResult(
+  result: CommandsAndRobotState | CommandCreatorErrorResponse
+): CommandCreatorErrorResponse {
   if (!result.errors) {
-    throw new Error('expected errors')
+    throw new Error(
+      `Expected command creator to return errors but got success result`
+    )
   }
   return result
 }

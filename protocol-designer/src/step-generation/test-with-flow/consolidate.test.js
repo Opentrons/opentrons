@@ -8,28 +8,61 @@ import {
   makeContext,
   getTipColumn,
   getTiprackTipstate,
-  compoundCommandCreatorNoErrors,
-  compoundCommandCreatorHasErrors,
+  getSuccessResult,
+  getErrorResult,
   commandFixtures as cmd,
 } from './fixtures'
+import { reduceCommandCreators } from '../utils'
 import _consolidate from '../commandCreators/compound/consolidate'
+import type { ConsolidateArgs } from '../types'
 
-const consolidate = compoundCommandCreatorNoErrors(_consolidate)
-const consolidateWithErrors = compoundCommandCreatorHasErrors(_consolidate)
+// collapse this compound command creator into the signature of an atomic command creator
+const consolidate = (args: ConsolidateArgs) => (
+  invariantContext,
+  initialRobotState
+) =>
+  reduceCommandCreators(
+    _consolidate(args)(invariantContext, initialRobotState)
+  )(invariantContext, initialRobotState)
 
-// shorthand
-const dispense = (well, volume) =>
-  cmd.dispense(well, volume, { labware: 'destPlateId' })
+// NOTE: make sure none of these numbers match!
+const ASPIRATE_FLOW_RATE = 2.1
+const DISPENSE_FLOW_RATE = 2.2
+const BLOWOUT_FLOW_RATE = 2.3
+
+const ASPIRATE_OFFSET_FROM_BOTTOM_MM = 3.1
+const DISPENSE_OFFSET_FROM_BOTTOM_MM = 3.2
+const BLOWOUT_OFFSET_FROM_BOTTOM_MM = 3.3
+
+const aspirateHelper = (well: string, volume: number, params = null) =>
+  cmd.aspirate(well, volume, {
+    offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+    flowRate: ASPIRATE_FLOW_RATE,
+    ...params,
+  })
+
+const dispenseHelper = (well, volume, params = null) =>
+  cmd.dispense(well, volume, {
+    labware: 'destPlateId',
+    offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+    flowRate: DISPENSE_FLOW_RATE,
+    ...params,
+  })
+
+const blowoutHelper = () =>
+  cmd.blowout(undefined, {
+    offsetFromBottomMm: BLOWOUT_OFFSET_FROM_BOTTOM_MM,
+    flowRate: BLOWOUT_FLOW_RATE,
+  })
 
 function tripleMix(well: string, volume: number, labware: string) {
-  const params = { labware }
   return [
-    cmd.aspirate(well, volume, params),
-    cmd.dispense(well, volume, params),
-    cmd.aspirate(well, volume, params),
-    cmd.dispense(well, volume, params),
-    cmd.aspirate(well, volume, params),
-    cmd.dispense(well, volume, params),
+    aspirateHelper(well, volume, { labware }),
+    dispenseHelper(well, volume, { labware }),
+    aspirateHelper(well, volume, { labware }),
+    dispenseHelper(well, volume, { labware }),
+    aspirateHelper(well, volume, { labware }),
+    dispenseHelper(well, volume, { labware }),
   ]
 }
 
@@ -39,6 +72,8 @@ let robotInitialStateNoLiquidState
 let robotStatePickedUpOneTipNoLiquidState
 let robotStatePickedUpMultiTipsNoLiquidState
 let robotStatePickedUpOneTip
+let baseArgs
+let flowRatesAndOffsets
 
 beforeEach(() => {
   invariantContext = makeContext()
@@ -70,11 +105,23 @@ beforeEach(() => {
       },
     }
   )
-})
 
-describe('consolidate single-channel', () => {
-  const baseData = {
+  flowRatesAndOffsets = {
+    aspirateFlowRateUlSec: ASPIRATE_FLOW_RATE,
+    dispenseFlowRateUlSec: DISPENSE_FLOW_RATE,
+    blowoutFlowRateUlSec: BLOWOUT_FLOW_RATE,
+    aspirateOffsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+    dispenseOffsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+    blowoutOffsetFromBottomMm: BLOWOUT_OFFSET_FROM_BOTTOM_MM,
+    touchTipAfterAspirateOffsetMmFromBottom: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+    touchTipAfterDispenseOffsetMmFromBottom: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+  }
+
+  baseArgs = {
+    // `volume` and `changeTip` should be explicit in tests,
+    // those fields intentionally omitted from here
     stepType: 'consolidate',
+    commandCreatorFnName: 'consolidate',
     name: 'Consolidate Test',
     description: 'test blah blah',
     pipette: 'p300SingleId',
@@ -84,8 +131,6 @@ describe('consolidate single-channel', () => {
     sourceLabware: 'sourcePlateId',
     destLabware: 'destPlateId',
 
-    // volume and changeTip should be explicit in tests
-
     preWetTip: false,
     touchTipAfterAspirate: false,
     mixFirstAspirate: null,
@@ -93,11 +138,15 @@ describe('consolidate single-channel', () => {
     touchTipAfterDispense: false,
     mixInDestination: null,
     blowoutLocation: null,
-  }
 
+    ...flowRatesAndOffsets,
+  }
+})
+
+describe('consolidate single-channel', () => {
   test('Minimal single-channel: A1 A2 to B1, 50uL with p300', () => {
     const data = {
-      ...baseData,
+      ...baseArgs,
       sourceWells: ['A1', 'A2'],
       volume: 50,
       changeTip: 'once',
@@ -105,65 +154,64 @@ describe('consolidate single-channel', () => {
 
     const result = consolidate(data)(invariantContext, initialRobotState)
 
-    expect(result.robotState).toMatchObject(robotStatePickedUpOneTip)
+    const res = getSuccessResult(result)
+    expect(res.robotState).toMatchObject(robotStatePickedUpOneTip)
 
-    expect(result.commands).toEqual([
+    expect(res.commands).toEqual([
       cmd.pickUpTip('A1'),
-      cmd.aspirate('A1', 50),
-      cmd.aspirate('A2', 50),
-      dispense('B1', 100),
+      aspirateHelper('A1', 50),
+      aspirateHelper('A2', 50),
+      dispenseHelper('B1', 100),
     ])
   })
 
   test('Single-channel with exceeding pipette max: A1 A2 A3 A4 to B1, 150uL with p300', () => {
     // TODO Ian 2018-05-03 is this a duplicate of exceeding max with changeTip="once"???
     const data = {
-      ...baseData,
+      ...baseArgs,
       volume: 150,
       changeTip: 'once',
     }
 
     const result = consolidate(data)(invariantContext, initialRobotState)
-
-    expect(result.commands).toEqual([
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
       cmd.pickUpTip('A1'),
-      cmd.aspirate('A1', 150),
-      cmd.aspirate('A2', 150),
-      dispense('B1', 300),
+      aspirateHelper('A1', 150),
+      aspirateHelper('A2', 150),
+      dispenseHelper('B1', 300),
 
-      cmd.aspirate('A3', 150),
-      cmd.aspirate('A4', 150),
-      dispense('B1', 300),
+      aspirateHelper('A3', 150),
+      aspirateHelper('A4', 150),
+      dispenseHelper('B1', 300),
     ])
 
-    expect(result.robotState).toMatchObject(
-      robotStatePickedUpOneTipNoLiquidState
-    )
+    expect(res.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
   test('Single-channel with exceeding pipette max: with changeTip="always"', () => {
     const data = {
-      ...baseData,
+      ...baseArgs,
       volume: 150,
       changeTip: 'always',
     }
 
     const result = consolidate(data)(invariantContext, initialRobotState)
-
-    expect(result.commands).toEqual([
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
       cmd.pickUpTip('A1'),
-      cmd.aspirate('A1', 150),
-      cmd.aspirate('A2', 150),
-      dispense('B1', 300),
+      aspirateHelper('A1', 150),
+      aspirateHelper('A2', 150),
+      dispenseHelper('B1', 300),
       cmd.dropTip('A1'),
 
       cmd.pickUpTip('B1'),
-      cmd.aspirate('A3', 150),
-      cmd.aspirate('A4', 150),
-      dispense('B1', 300),
+      aspirateHelper('A3', 150),
+      aspirateHelper('A4', 150),
+      dispenseHelper('B1', 300),
     ])
 
-    expect(result.robotState).toMatchObject({
+    expect(res.robotState).toMatchObject({
       ...robotInitialStateNoLiquidState,
       tipState: {
         tipracks: {
@@ -180,157 +228,150 @@ describe('consolidate single-channel', () => {
 
   test('Single-channel with exceeding pipette max: with changeTip="once"', () => {
     const data = {
-      ...baseData,
+      ...baseArgs,
       volume: 150,
       changeTip: 'once',
     }
 
     const result = consolidate(data)(invariantContext, initialRobotState)
-
-    expect(result.commands).toEqual([
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
       cmd.pickUpTip('A1'),
-      cmd.aspirate('A1', 150),
-      cmd.aspirate('A2', 150),
-      dispense('B1', 300),
+      aspirateHelper('A1', 150),
+      aspirateHelper('A2', 150),
+      dispenseHelper('B1', 300),
 
-      cmd.aspirate('A3', 150),
-      cmd.aspirate('A4', 150),
-      dispense('B1', 300),
+      aspirateHelper('A3', 150),
+      aspirateHelper('A4', 150),
+      dispenseHelper('B1', 300),
     ])
 
-    expect(result.robotState).toMatchObject(
-      robotStatePickedUpOneTipNoLiquidState
-    )
+    expect(res.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
   test('Single-channel with exceeding pipette max: with changeTip="never"', () => {
     const data = {
-      ...baseData,
+      ...baseArgs,
       volume: 150,
       changeTip: 'never',
     }
 
     const result = consolidate(data)(invariantContext, robotStatePickedUpOneTip)
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
+      aspirateHelper('A1', 150),
+      aspirateHelper('A2', 150),
+      dispenseHelper('B1', 300),
 
-    expect(result.commands).toEqual([
-      cmd.aspirate('A1', 150),
-      cmd.aspirate('A2', 150),
-      dispense('B1', 300),
-
-      cmd.aspirate('A3', 150),
-      cmd.aspirate('A4', 150),
-      dispense('B1', 300),
+      aspirateHelper('A3', 150),
+      aspirateHelper('A4', 150),
+      dispenseHelper('B1', 300),
     ])
 
-    expect(result.robotState).toMatchObject(
-      robotStatePickedUpOneTipNoLiquidState
-    )
+    expect(res.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
   test('mix on aspirate should mix before aspirate in first well of chunk only', () => {
     const data = {
-      ...baseData,
+      ...baseArgs,
       volume: 100,
       changeTip: 'once',
       mixFirstAspirate: { times: 3, volume: 50 },
     }
 
     const result = consolidate(data)(invariantContext, initialRobotState)
+    const res = getSuccessResult(result)
 
-    expect(result.commands).toEqual([
+    expect(res.commands).toEqual([
       cmd.pickUpTip('A1'),
 
       ...tripleMix('A1', 50, 'sourcePlateId'),
 
-      cmd.aspirate('A1', 100),
-      cmd.aspirate('A2', 100),
-      cmd.aspirate('A3', 100),
-      dispense('B1', 300),
+      aspirateHelper('A1', 100),
+      aspirateHelper('A2', 100),
+      aspirateHelper('A3', 100),
+      dispenseHelper('B1', 300),
 
       ...tripleMix('A4', 50, 'sourcePlateId'),
 
-      cmd.aspirate('A4', 100),
-      dispense('B1', 100),
+      aspirateHelper('A4', 100),
+      dispenseHelper('B1', 100),
     ])
-    expect(result.robotState).toMatchObject(
-      robotStatePickedUpOneTipNoLiquidState
-    )
+    expect(res.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
   test('mix on aspirate', () => {
     const data = {
-      ...baseData,
+      ...baseArgs,
       volume: 125,
       changeTip: 'once',
       mixFirstAspirate: { times: 3, volume: 50 },
     }
 
     const result = consolidate(data)(invariantContext, initialRobotState)
+    const res = getSuccessResult(result)
 
-    expect(result.commands).toEqual([
+    expect(res.commands).toEqual([
       cmd.pickUpTip('A1'),
       // Start mix
-      cmd.aspirate('A1', 50),
+      aspirateHelper('A1', 50),
       cmd.dispense('A1', 50), // sourceLabwareId
-      cmd.aspirate('A1', 50),
+      aspirateHelper('A1', 50),
       cmd.dispense('A1', 50), // sourceLabwareId
-      cmd.aspirate('A1', 50),
+      aspirateHelper('A1', 50),
       cmd.dispense('A1', 50), // sourceLabwareId
       // done mix
-      cmd.aspirate('A1', 125),
-      cmd.aspirate('A2', 125),
-      dispense('B1', 250),
+      aspirateHelper('A1', 125),
+      aspirateHelper('A2', 125),
+      dispenseHelper('B1', 250),
 
       // Start mix
-      cmd.aspirate('A3', 50),
+      aspirateHelper('A3', 50),
       cmd.dispense('A3', 50), // sourceLabwareId
-      cmd.aspirate('A3', 50),
+      aspirateHelper('A3', 50),
       cmd.dispense('A3', 50), // sourceLabwareId
-      cmd.aspirate('A3', 50),
+      aspirateHelper('A3', 50),
       cmd.dispense('A3', 50), // sourceLabwareId
       // done mix
 
-      cmd.aspirate('A3', 125),
-      cmd.aspirate('A4', 125),
-      dispense('B1', 250),
+      aspirateHelper('A3', 125),
+      aspirateHelper('A4', 125),
+      dispenseHelper('B1', 250),
     ])
-    expect(result.robotState).toMatchObject(
-      robotStatePickedUpOneTipNoLiquidState
-    )
+    expect(res.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
   test('mix after dispense', () => {
     const data = {
-      ...baseData,
+      ...baseArgs,
       volume: 100,
       changeTip: 'once',
       mixInDestination: { times: 3, volume: 53 },
     }
 
     const result = consolidate(data)(invariantContext, initialRobotState)
+    const res = getSuccessResult(result)
 
-    expect(result.commands).toEqual([
+    expect(res.commands).toEqual([
       cmd.pickUpTip('A1'),
-      cmd.aspirate('A1', 100),
-      cmd.aspirate('A2', 100),
-      cmd.aspirate('A3', 100),
-      dispense('B1', 300),
+      aspirateHelper('A1', 100),
+      aspirateHelper('A2', 100),
+      aspirateHelper('A3', 100),
+      dispenseHelper('B1', 300),
 
       ...tripleMix('B1', 53, 'destPlateId'),
 
-      cmd.aspirate('A4', 100),
-      dispense('B1', 100),
+      aspirateHelper('A4', 100),
+      dispenseHelper('B1', 100),
 
       ...tripleMix('B1', 53, 'destPlateId'),
     ])
-    expect(result.robotState).toMatchObject(
-      robotStatePickedUpOneTipNoLiquidState
-    )
+    expect(res.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
   test('mix after dispense with blowout to trash: first mix, then blowout', () => {
     const data = {
-      ...baseData,
+      ...baseArgs,
       volume: 100,
       changeTip: 'once',
       mixInDestination: { times: 3, volume: 54 },
@@ -338,32 +379,32 @@ describe('consolidate single-channel', () => {
     }
 
     const result = consolidate(data)(invariantContext, initialRobotState)
-    expect(result.commands).toEqual([
+    const res = getSuccessResult(result)
+
+    expect(res.commands).toEqual([
       cmd.pickUpTip('A1'),
-      cmd.aspirate('A1', 100),
-      cmd.aspirate('A2', 100),
-      cmd.aspirate('A3', 100),
-      dispense('B1', 300),
+      aspirateHelper('A1', 100),
+      aspirateHelper('A2', 100),
+      aspirateHelper('A3', 100),
+      dispenseHelper('B1', 300),
 
       ...tripleMix('B1', 54, 'destPlateId'),
 
-      cmd.blowout(),
-      cmd.aspirate('A4', 100),
-      dispense('B1', 100),
+      blowoutHelper(),
+      aspirateHelper('A4', 100),
+      dispenseHelper('B1', 100),
 
       ...tripleMix('B1', 54, 'destPlateId'),
 
-      cmd.blowout(),
+      blowoutHelper(),
     ])
-    expect(result.robotState).toMatchObject(
-      robotStatePickedUpOneTipNoLiquidState
-    )
+    expect(res.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
   test('"pre-wet tip" should aspirate and dispense consolidate volume from first well of each chunk', () => {
     // TODO LATER Ian 2018-02-13 Should it be 2/3 max volume instead?
     const data = {
-      ...baseData,
+      ...baseArgs,
       volume: 150,
       changeTip: 'once',
       preWetTip: true,
@@ -373,112 +414,115 @@ describe('consolidate single-channel', () => {
     const preWetVol = data.volume // NOTE same as volume above... for now
 
     const result = consolidate(data)(invariantContext, initialRobotState)
-    expect(result.commands).toEqual([
+    const res = getSuccessResult(result)
+
+    expect(res.commands).toEqual([
       cmd.pickUpTip('A1'),
 
       // pre-wet tip
-      cmd.aspirate('A1', preWetVol),
+      aspirateHelper('A1', preWetVol),
       cmd.dispense('A1', preWetVol),
       // done pre-wet
 
-      cmd.aspirate('A1', 150),
-      cmd.aspirate('A2', 150),
-      dispense('B1', 300),
+      aspirateHelper('A1', 150),
+      aspirateHelper('A2', 150),
+      dispenseHelper('B1', 300),
 
       // pre-wet tip, now with A3
-      cmd.aspirate('A3', preWetVol),
+      aspirateHelper('A3', preWetVol),
       cmd.dispense('A3', preWetVol),
       // done pre-wet
 
-      cmd.aspirate('A3', 150),
-      cmd.aspirate('A4', 150),
-      dispense('B1', 300),
+      aspirateHelper('A3', 150),
+      aspirateHelper('A4', 150),
+      dispenseHelper('B1', 300),
     ])
-    expect(result.robotState).toMatchObject(
-      robotStatePickedUpOneTipNoLiquidState
-    )
+    expect(res.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
   test('touchTip after aspirate should touch tip after every aspirate command', () => {
     const data = {
-      ...baseData,
+      ...baseArgs,
       volume: 150,
       changeTip: 'once',
       touchTipAfterAspirate: true,
     }
 
     const result = consolidate(data)(invariantContext, initialRobotState)
+    const res = getSuccessResult(result)
 
-    expect(result.commands).toEqual([
+    const touchTipAfterAsp = {
+      offsetFromBottomMm: baseArgs.touchTipAfterAspirateOffsetMmFromBottom,
+    }
+    expect(res.commands).toEqual([
       cmd.pickUpTip('A1'),
 
-      cmd.aspirate('A1', 150),
-      cmd.touchTip('A1'),
+      aspirateHelper('A1', 150),
+      cmd.touchTip('A1', touchTipAfterAsp),
 
-      cmd.aspirate('A2', 150),
-      cmd.touchTip('A2'),
+      aspirateHelper('A2', 150),
+      cmd.touchTip('A2', touchTipAfterAsp),
 
-      dispense('B1', 300),
+      dispenseHelper('B1', 300),
 
-      cmd.aspirate('A3', 150),
-      cmd.touchTip('A3'),
+      aspirateHelper('A3', 150),
+      cmd.touchTip('A3', touchTipAfterAsp),
 
-      cmd.aspirate('A4', 150),
-      cmd.touchTip('A4'),
+      aspirateHelper('A4', 150),
+      cmd.touchTip('A4', touchTipAfterAsp),
 
-      dispense('B1', 300),
+      dispenseHelper('B1', 300),
     ])
-    expect(result.robotState).toMatchObject(
-      robotStatePickedUpOneTipNoLiquidState
-    )
+    expect(res.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
   test('touchTip after dispense should touch tip after dispense on destination well', () => {
     const data = {
-      ...baseData,
+      ...baseArgs,
       volume: 150,
       changeTip: 'once',
       touchTipAfterDispense: true,
     }
 
     const result = consolidate(data)(invariantContext, initialRobotState)
+    const res = getSuccessResult(result)
 
-    expect(result.commands).toEqual([
+    const touchTipAfterDisp = {
+      labware: 'destPlateId',
+      offsetFromBottomMm: baseArgs.touchTipAfterDispenseOffsetMmFromBottom,
+    }
+    expect(res.commands).toEqual([
       cmd.pickUpTip('A1'),
 
-      cmd.aspirate('A1', 150),
-      cmd.aspirate('A2', 150),
+      aspirateHelper('A1', 150),
+      aspirateHelper('A2', 150),
 
-      dispense('B1', 300),
-      cmd.touchTip('B1', { labware: 'destPlateId' }),
+      dispenseHelper('B1', 300),
+      cmd.touchTip('B1', touchTipAfterDisp),
 
-      cmd.aspirate('A3', 150),
-      cmd.aspirate('A4', 150),
+      aspirateHelper('A3', 150),
+      aspirateHelper('A4', 150),
 
-      dispense('B1', 300),
-      cmd.touchTip('B1', { labware: 'destPlateId' }),
+      dispenseHelper('B1', 300),
+      cmd.touchTip('B1', touchTipAfterDisp),
     ])
-    expect(result.robotState).toMatchObject(
-      robotStatePickedUpOneTipNoLiquidState
-    )
+    expect(res.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
   test('invalid pipette ID should return error', () => {
     const data = {
-      ...baseData,
+      ...baseArgs,
       sourceWells: ['A1', 'A2'],
       volume: 150,
       changeTip: 'once',
       pipette: 'no-such-pipette-id-here',
     }
 
-    const result = consolidateWithErrors(data)(
-      invariantContext,
-      initialRobotState
-    )
+    const result = consolidate(data)(invariantContext, initialRobotState)
+    const res = getErrorResult(result)
 
-    expect(result.errors).toHaveLength(1)
-    expect(result.errors[0].type).toEqual('PIPETTE_DOES_NOT_EXIST')
+    expect(res.errors).toHaveLength(1)
+    expect(res.errors[0].type).toEqual('PIPETTE_DOES_NOT_EXIST')
   })
 
   test.skip('air gap', () => {}) // TODO Ian 2018-04-05 determine air gap behavior
@@ -492,8 +536,9 @@ describe('consolidate multi-channel', () => {
       pipette: 'p300MultiId',
     })
 
-  const baseData = {
+  const args = {
     stepType: 'consolidate',
+    commandCreatorFnName: 'consolidate',
     name: 'Consolidate Test',
     description: 'test blah blah',
     pipette: 'p300MultiId',
@@ -512,17 +557,20 @@ describe('consolidate multi-channel', () => {
     touchTipAfterDispense: false,
     mixInDestination: null,
     blowoutLocation: null,
+
+    ...flowRatesAndOffsets,
   }
 
   test('simple multi-channel: cols A1 A2 A3 A4 to col A12', () => {
     const data = {
-      ...baseData,
+      ...args,
       volume: 140,
       changeTip: 'once',
     }
     const result = consolidate(data)(invariantContext, initialRobotState)
+    const res = getSuccessResult(result)
 
-    expect(result.commands).toEqual([
+    expect(res.commands).toEqual([
       cmd.pickUpTip('A1', multiParams),
       cmd.aspirate('A1', 140, multiParams),
       cmd.aspirate('A2', 140, multiParams),
@@ -532,7 +580,7 @@ describe('consolidate multi-channel', () => {
       cmd.aspirate('A4', 140, multiParams),
       multiDispense('A12', 280),
     ])
-    expect(result.robotState).toMatchObject(
+    expect(res.robotState).toMatchObject(
       robotStatePickedUpMultiTipsNoLiquidState
     )
   })

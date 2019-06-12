@@ -255,7 +255,9 @@ export function totalVolume(location: LocationLiquidState): number {
   }, 0)
 }
 
-export const blowoutUtil = (
+// Set blowout location using the SOURCE_WELL_BLOWOUT_DESTINATION / DEST_WELL_BLOWOUT_DESTINATION
+// special strings
+export const blowoutUtil = (args: {
   pipette: $PropertyType<BlowoutArgsV3, 'pipette'>,
   sourceLabware: $PropertyType<BlowoutArgsV3, 'labware'>,
   sourceWell: $PropertyType<BlowoutArgsV3, 'well'>,
@@ -263,8 +265,19 @@ export const blowoutUtil = (
   destWell: $PropertyType<BlowoutArgsV3, 'well'>,
   blowoutLocation: ?string,
   flowRate: number,
-  offsetFromBottomMm: number
-): Array<CommandCreator> => {
+  offsetFromBottomMm: number,
+}): Array<CommandCreator> => {
+  const {
+    pipette,
+    sourceLabware,
+    sourceWell,
+    destLabware,
+    destWell,
+    blowoutLocation,
+    flowRate,
+    offsetFromBottomMm,
+  } = args
+
   if (!blowoutLocation) return []
   let labware = blowoutLocation
   let well = 'A1'

@@ -130,16 +130,16 @@ const mix = (data: MixArgs): CompoundCommandCreator => (
           ]
         : []
 
-      const blowoutCommand = blowoutUtil(
-        data.pipette,
-        data.labware,
-        well,
-        data.labware,
-        well,
-        data.blowoutLocation,
-        blowoutFlowRateUlSec,
-        blowoutOffsetFromBottomMm
-      )
+      const blowoutCommand = blowoutUtil({
+        pipette: data.pipette,
+        sourceLabware: data.labware,
+        sourceWell: well,
+        destLabware: data.labware,
+        destWell: well,
+        blowoutLocation: data.blowoutLocation,
+        flowRate: blowoutFlowRateUlSec,
+        offsetFromBottomMm: blowoutOffsetFromBottomMm,
+      })
 
       const mixCommands = mixUtil({
         pipette,
