@@ -26,8 +26,30 @@
   stroke-width: 2.5;
 }
 
+.labware_ui_wrapper {
+  height: 100%;
+  width: 100%;
+}
+
 .highlighted_border_div {
   border-color: var(--c-highlight);
   border-width: 3px;
   border-style: solid;
+}
+
+.labware_spinner {
+  background-color: color(var(--c-black) alpha(0.5));
+}
+
+.name_overlay {
+  font-size: 0.5rem;
+  color: var(--c-font-light);
+  background-color: color(var(--c-black) alpha(0.75));
+  padding: 0.25rem;
+}
+
+.display_name {
+  font-weight: var(--fw-semibold);
+  color: var(--c-font-light);
+  text-transform: uppercase;
 }

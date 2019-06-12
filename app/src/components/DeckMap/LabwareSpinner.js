@@ -6,8 +6,7 @@ import styles from './styles.css'
 
 export default function LabwareSpinner() {
   return (
-    <React.Fragment>
-      <rect x="0" y="0" width="100%" height="100%" fill="rgba(0, 0, 0, 0.5)" />
+    <div className={styles.labware_spinner}>
       <Icon
         x="10%"
         y="10%"
@@ -17,6 +16,6 @@ export default function LabwareSpinner() {
         name="ot-spinner"
         spin
       />
-    </React.Fragment>
+    </div>
   )
 }

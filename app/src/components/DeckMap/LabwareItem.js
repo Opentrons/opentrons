@@ -40,14 +40,7 @@ export type LabwareItemProps = {
 }
 
 export default function LabwareItem(props: LabwareItemProps) {
-  const {
-    labware,
-    x,
-    y,
-    highlighted,
-    areTipracksConfirmed,
-    handleClick,
-  } = props
+  const { labware, highlighted, areTipracksConfirmed, handleClick } = props
 
   const { isTiprack, confirmed, name, type, slot } = labware
 
@@ -58,79 +51,85 @@ export default function LabwareItem(props: LabwareItemProps) {
   const title = humanizeLabwareType(type)
 
   let item
+  let width
+  let height
 
   if (labware.isLegacy) {
-    item = (
-      <g className={cx({ [styles.disabled]: disabled })}>
-        <LabwareComponent definition={getLegacyLabwareDef(type)} />
-        {/*
-        {showSpinner ? (
-            <LabwareSpinner />
-          ) : (
-            <LabwareNameOverlay title={title} subtitle={name} />
-          )
-          // module && <ModuleNameOverlay name={module.name} />
-        }
-        */}
-        {highlighted && (
-          <rect
-            className={styles.highlighted}
-            x="0.5"
-            y="0.5"
-            width={SLOT_RENDER_WIDTH - 1}
-            height={SLOT_RENDER_HEIGHT - 1}
-            rx="6"
-          />
-        )}
-      </g>
-    )
+    item = <LabwareComponent definition={getLegacyLabwareDef(type)} />
+    width = SLOT_RENDER_WIDTH
+    height = SLOT_RENDER_HEIGHT
+    // <g className={cx({ [styles.disabled]: disabled })}>
+    //   <LabwareComponent definition={getLegacyLabwareDef(type)} />
+    //   {/*
+    //   {showSpinner ? (
+    //       <LabwareSpinner />
+    //     ) : (
+    //       <LabwareNameOverlay title={title} subtitle={name} />
+    //     )
+    //     // module && <ModuleNameOverlay name={module.name} />
+    //   }
+    //   */}
+    //   {highlighted && (
+    //     <rect
+    //       className={styles.highlighted}
+    //       x="0.5"
+    //       y="0.5"
+    //       width={SLOT_RENDER_WIDTH - 1}
+    //       height={SLOT_RENDER_HEIGHT - 1}
+    //       rx="6"
+    //     />
+    //   )}
+    // </g>
+    // )
   } else {
     const def = getLatestLabwareDef(type)
-    item = (
-      <>
-        <g
-          className={cx({ [styles.disabled]: disabled })}
-          transform={`translate(${props.x}, ${props.y})`}
+    item = <LabwareRender definition={def} />
+    width = def.dimensions.xDimension
+    height = def.dimensions.yDimension
+  }
+  return (
+    <>
+      <g
+        className={cx({ [styles.disabled]: disabled })}
+        transform={`translate(${props.x}, ${props.y})`}
+      >
+        {item}
+        <RobotCoordsForeignDiv
+          width={width}
+          height={height}
+          x={0}
+          y={0 - height}
+          transformWithSVG
+          innerDivProps={{
+            className: cx(styles.labware_ui_wrapper, {
+              [styles.highlighted_border_div]: highlighted,
+            }),
+          }}
         >
-          <LabwareRender definition={def} />
-          <RobotCoordsForeignDiv
-            width={def.dimensions.xDimension}
-            height={def.dimensions.yDimension}
-            x={0}
-            y={0 - def.dimensions.yDimension}
-            transformWithSVG
-            innerDivProps={
-              {
-                //className: cx(styles.labware_controls, {
-                //   [styles.highlighted_border_div]: highlighted,
-                // }),
+          <>
+            <Link to={`/calibrate/labware/${slot}`} onClick={handleClick}>
+              {showSpinner ? (
+                <LabwareSpinner />
+              ) : (
+                <div className={styles.name_overlay}>
+                  <p className={styles.display_name}> {title} </p>
+                  {/* {subtitle && <p className={styles.display_name}>{name}</p>} */}
+                </div>
+              )
+              // module && <ModuleNameOverlay name={module.name} />
               }
-            }
-          >
-            <div
-              style={{
-                height: '100px',
-                width: '100px',
-                backgroundColor: 'red',
-              }}
-            >
-              NAME HERE
-            </div>
-          </RobotCoordsForeignDiv>
-        </g>
-      </>
-    )
-  }
-  // const v2LabwareDef = getLabwareDefinition(loadName, namespace, version)
-  if (!showSpinner && !disabled) {
-    return (
-      // <Link to={`/calibrate/labware/${slot}`} onClick={handleClick}>
-      item
-      // </Link>
-    )
-  }
+            </Link>
+          </>
+        </RobotCoordsForeignDiv>
+      </g>
+    </>
+  )
+  // // const v2LabwareDef = getLabwareDefinition(loadName, namespace, version)
+  // if (!showSpinner && !disabled) {
+  //   return item
+  // }
 
-  return item
+  // return item
 }
 
 function mapStateToProps(state: State, ownProps: OP): SP {
