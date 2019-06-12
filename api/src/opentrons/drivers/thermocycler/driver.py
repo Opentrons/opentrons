@@ -30,7 +30,10 @@ GCODES = {
     'DEACTIVATE': 'M18',
     'DEVICE_INFO': 'M115'
 }
-DEFAULT_LID_TARGET = 105    # Degree celsius
+LID_TARGET_DEFAULT = 105    # Degree celsius
+LID_TARGET_MIN = 20
+LID_TARGET_MAX = 105
+TEMP_UPDATE_RETRIES = 15
 
 
 def _build_temp_code(temp, hold_time=None):
@@ -277,21 +280,21 @@ class Thermocycler:
             await self._write_and_wait(ramp_cmd)
         temp_cmd, temp = _build_temp_code(temp, hold_time)
         await self._write_and_wait(temp_cmd)
-        tries = 0
+        retries = 0
         while (self._target_temp != temp) or (self._hold_time != hold_time):
             await asyncio.sleep(0.1)    # Wait for the poller to update
-            tries += 1
-            if tries > 15:
+            retries += 1
+            if retries > TEMP_UPDATE_RETRIES:
                 break
 
     async def set_lid_temperature(self, temp: Optional[float]) -> None:
         if temp is None:
-            self._lid_target = DEFAULT_LID_TARGET
+            self._lid_target = LID_TARGET_DEFAULT
         else:
-            if temp < 20:
-                self._lid_target = 20
-            elif temp > 105:
-                self._lid_target = 105
+            if temp < LID_TARGET_MIN:
+                self._lid_target = LID_TARGET_MIN
+            elif temp > LID_TARGET_MAX:
+                self._lid_target = LID_TARGET_MAX
             else:
                 self._lid_target = temp
 
