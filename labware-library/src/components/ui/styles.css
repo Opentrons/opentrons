@@ -48,9 +48,7 @@
 .table_title {
   padding-bottom: var(--spacing-1);
   border-bottom: var(--bd-light);
-}
 
-.table_title_text {
   @apply --flex-between;
 
   align-items: center;
