@@ -100,15 +100,18 @@ export default function LabwareItem(props: LabwareItemProps) {
           x={0}
           y={0 - height}
           transformWithSVG
-          innerDivProps={{
-            className: cx(styles.labware_ui_wrapper, {
-              [styles.highlighted_border_div]: highlighted,
-            }),
-          }}
         >
-          <>
-            <Link to={`/calibrate/labware/${slot}`} onClick={handleClick}>
-              {showSpinner ? (
+          <div
+            className={cx(styles.labware_ui_wrapper, {
+              [styles.highlighted_border_div]: highlighted,
+            })}
+          >
+            <Link
+              to={`/calibrate/labware/${slot}`}
+              onClick={handleClick}
+              className={styles.labware_ui_link}
+            >
+              {true || showSpinner ? (
                 <LabwareSpinner />
               ) : (
                 <div className={styles.name_overlay}>
@@ -119,7 +122,7 @@ export default function LabwareItem(props: LabwareItemProps) {
               // module && <ModuleNameOverlay name={module.name} />
               }
             </Link>
-          </>
+          </div>
         </RobotCoordsForeignDiv>
       </g>
     </>

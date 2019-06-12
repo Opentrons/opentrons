@@ -3,19 +3,23 @@
 .prompt {
   max-width: 32rem;
   margin: 0 0 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .prompt_text {
   @apply --font-header-light;
 
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   text-align: center;
 }
 
 .prompt_button {
   display: block;
   width: auto;
-  margin: 1rem auto;
+  margin: 0.5rem auto;
   padding-left: 3rem;
   padding-right: 3rem;
 }
@@ -23,11 +27,21 @@
 .prompt_details {
   @apply --font-body-2-light;
 
-  margin: 1rem 0 0;
+  margin: 0.5rem 0 0;
   text-align: center;
 }
 
 .deck {
   width: 100%;
   overflow: visible;
+}
+
+.page_content_dark {
+  display: flex;
+  padding: 1rem;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: color(var(--c-black) alpha(0.99));
+  min-height: 100%;
 }

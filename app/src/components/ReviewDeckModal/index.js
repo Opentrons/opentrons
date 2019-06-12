@@ -12,9 +12,9 @@ import {
 } from '../../robot'
 
 import DeckMap from '../DeckMap'
-import { Modal } from '../modals'
 import Prompt from './Prompt'
 import ReviewDeck from './ReviewDeck'
+import styles from './styles.css'
 
 type OP = {| slot: ?string |}
 
@@ -34,10 +34,10 @@ function ReviewDeckModal(props: Props) {
   const { currentLabware, onClick } = props
 
   return (
-    <Modal>
+    <div className={styles.page_content_dark}>
       {currentLabware && <Prompt {...currentLabware} onClick={onClick} />}
       <DeckMap />
-    </Modal>
+    </div>
   )
 }
 

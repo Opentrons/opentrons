@@ -11,10 +11,6 @@
   pointer-events: none;
 }
 
-.spinner {
-  color: var(--c-font-light);
-}
-
 .labware_wrapper {
   /* reflect horizontally about the center of the DOM elem */
   transform: scale(1, -1);
@@ -31,14 +27,30 @@
   width: 100%;
 }
 
+.labware_ui_link {
+  height: 100%;
+  width: 100%;
+}
+
 .highlighted_border_div {
   border-color: var(--c-highlight);
   border-width: 3px;
   border-style: solid;
 }
 
-.labware_spinner {
+.labware_spinner_wrapper {
   background-color: color(var(--c-black) alpha(0.5));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.spinner {
+  color: var(--c-font-light);
+  height: 80%;
+  width: 80%;
 }
 
 .name_overlay {

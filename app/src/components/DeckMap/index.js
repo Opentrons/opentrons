@@ -4,6 +4,8 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import some from 'lodash/some'
 import map from 'lodash/map'
+import mapValues from 'lodash/mapValues'
+import countBy from 'lodash/countBy'
 import { type DeckSlotId } from '@opentrons/shared-data'
 
 import {
@@ -13,6 +15,9 @@ import {
 } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import { selectors as robotSelectors, type Labware } from '../../robot'
+
+import { getModulesState } from '../../robot-api'
+import { getConnectedRobot } from '../../discovery'
 
 // import ConnectedSlotItem from './ConnectedSlotItem'
 import LabwareItem from './LabwareItem'
@@ -51,13 +56,13 @@ function DeckMap(props: Props) {
     <RobotWorkSpace
       deckLayerBlacklist={deckSetupLayerBlacklist}
       deckDef={deckDef}
-      viewBox={`-46 -70 ${488} ${514}`} // TODO: put these in variables
+      viewBox={`-46 -10 ${488} ${390}`} // TODO: put these in variables
     >
       {({ slots }) =>
         map(slots, (slot: $Values<typeof slots>, slotId) => {
           if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
-          const moduleInSlot = modulesBySlot[slotId]
-          const labwareInSlot = labwareBySlot[slotId]
+          const moduleInSlot = modulesBySlot && modulesBySlot[slotId]
+          const labwareInSlot = labwareBySlot && labwareBySlot[slotId]
 
           return (
             <>
@@ -67,7 +72,10 @@ function DeckMap(props: Props) {
                     slot.position[1]
                   })`}
                 >
-                  <ModuleItem name={moduleInSlot.name} mode="default" />
+                  <ModuleItem
+                    name={moduleInSlot.name}
+                    mode={moduleInSlot.displayMode}
+                  />
                 </g>
               )}
               {some(labwareInSlot) &&
@@ -88,6 +96,8 @@ function DeckMap(props: Props) {
   )
 }
 
+// TODO: IMMEDIATELY when you re in the review deck "modal" no labware is disable
+
 export { LabwareItem }
 export type { LabwareItemProps } from './LabwareItem'
 
@@ -100,7 +110,31 @@ function mapStateToProps(state: State, ownProps: OP): SP {
   const allLabware = robotSelectors.getLabware(state)
   const areTipracksConfirmed = robotSelectors.getTipracksConfirmed(state)
 
-  const modulesBySlot = robotSelectors.getModulesBySlot(state)
+  let modulesBySlot = robotSelectors.getModulesBySlot(state)
+
+  if (ownProps.modulesRequired) {
+    const robot = getConnectedRobot(state)
+    const sessionModules = robotSelectors.getModules(state)
+    const actualModules = robot ? getModulesState(state, robot.name) : []
+
+    const requiredNames = countBy(sessionModules, 'name')
+    const actualNames = countBy(actualModules, 'name')
+
+    modulesBySlot = mapValues(
+      robotSelectors.getModulesBySlot(state),
+      module => {
+        const present =
+          !module || requiredNames[module.name] === actualNames[module.name]
+        return {
+          ...module,
+          displayMode: present ? 'present' : 'missing',
+        }
+      }
+    )
+    return {
+      modulesBySlot,
+    }
+  }
 
   const labwareBySlot = allLabware.reduce(
     (acc, labware) => ({
@@ -117,6 +151,29 @@ function mapStateToProps(state: State, ownProps: OP): SP {
     areTipracksConfirmed,
   }
 }
+
+//   <ModuleItem
+//     name={props.module.name}
+//     mode={props.present ? 'present' : 'missing'}
+//   />
+// )
+// }
+
+// function mapStateToProps(state: State, ownProps: OP): SP {
+//   // TODO(mc, 2018-07-23): this logic is duplicated because can only get props
+//   // into Deck.props.LabwareComponent via redux
+//   const robot = getConnectedRobot(state)
+//   const module = robotSelectors.getModulesBySlot(state)[ownProps.slot]
+//   const sessionModules = robotSelectors.getModules(state)
+//   const actualModules = robot ? getModulesState(state, robot.name) : []
+
+//   const requiredNames = countBy(sessionModules, 'name')
+//   const actualNames = countBy(actualModules, 'name')
+//   const present =
+//     !module || requiredNames[module.name] === actualNames[module.name]
+
+//   return { present, module }
+// }
 
 export default withRouter<WithRouterOP>(
   connect<Props, OP, SP, {||}, State, Dispatch>(mapStateToProps)(DeckMap)

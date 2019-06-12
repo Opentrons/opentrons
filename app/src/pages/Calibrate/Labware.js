@@ -56,13 +56,18 @@ function SetupDeckPage(props: Props) {
     },
   } = props
 
+  const renderPage = () => {
+    if (reviewModules && robot) {
+      return <ConnectModulesModal robot={robot} />
+    } else if (!deckPopulated && !reviewModules) {
+      return <ReviewDeckModal slot={slot} />
+    } else {
+      return <CalibrateLabware labware={labware} />
+    }
+  }
   return (
     <React.Fragment>
-      <Page titleBarProps={{ title: <SessionHeader /> }}>
-        <CalibrateLabware labware={labware} />
-      </Page>
-      {robot && reviewModules && <ConnectModulesModal robot={robot} />}
-      {!deckPopulated && !reviewModules && <ReviewDeckModal slot={slot} />}
+      <Page titleBarProps={{ title: <SessionHeader /> }}>{renderPage()}</Page>
       <Route
         path={`${url}/confirm`}
         render={() => {
