@@ -3,7 +3,7 @@ import { createSelector } from 'reselect'
 import flatten from 'lodash/flatten'
 import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
-import pickBy from 'lodash/pickBy'
+import uniq from 'lodash/uniq'
 import { getFileMetadata } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
 import { selectors as dismissSelectors } from '../../dismiss'
@@ -45,7 +45,7 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
   stepFormSelectors.getLabwareEntities,
   stepFormSelectors.getPipetteEntities,
   uiLabwareSelectors.getLabwareNicknamesById,
-  labwareDefSelectors.getLabwareDefsById,
+  labwareDefSelectors.getLabwareDefsByURI,
   (
     fileMetadata,
     initialRobotState,
@@ -58,7 +58,7 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
     labwareEntities,
     pipetteEntities,
     labwareNicknamesById,
-    labwareDefsById
+    labwareDefsByURI
   ) => {
     const { author, description, created } = fileMetadata
     const name = fileMetadata.protocolName || 'untitled'
@@ -75,7 +75,7 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
       })
     )
 
-    const labware = mapValues(
+    const labware: { [labwareId: string]: FileLabware } = mapValues(
       initialRobotState.labware,
       (
         l: $Values<typeof initialRobotState.labware>,
@@ -95,9 +95,17 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
     )
 
     // exclude definitions that aren't used by any labware in the protocol
-    // TODO IMMEDIATELY make this typesafe
-    const labwareDefinitions = pickBy(labwareDefsById, (def, defId) =>
-      Object.values(labware).some(l => l.definitionId === defId)
+    const labwareDefsInUse = uniq(
+      Object.keys(labware).map(
+        (labwareId: string) => labware[labwareId].definitionId
+      )
+    )
+    const labwareDefinitions = labwareDefsInUse.reduce<typeof labwareDefsByURI>(
+      (acc, labwareDefURI: string) => ({
+        ...acc,
+        [labwareDefURI]: labwareDefsByURI[labwareDefURI],
+      }),
+      {}
     )
 
     return {

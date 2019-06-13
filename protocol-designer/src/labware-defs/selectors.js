@@ -83,7 +83,7 @@ export const _getLabwareDefsByIdRootState: StepFormRootState => LabwareDefByDefU
   _makeLabwareDefsObj
 )
 
-export const getLabwareDefsById: Selector<LabwareDefByDefURI> = createSelector(
+export const getLabwareDefsByURI: Selector<LabwareDefByDefURI> = createSelector(
   state => rootSelector(state).customDefs,
   _makeLabwareDefsObj
 )

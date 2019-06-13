@@ -80,7 +80,7 @@ function _hydrateLabwareEntity(
 
 export const getLabwareEntities: Selector<LabwareEntities> = createSelector(
   _getNormalizedLabwareById,
-  labwareDefSelectors.getLabwareDefsById,
+  labwareDefSelectors.getLabwareDefsByURI,
   (normalizedLabwareById, labwareDefs) =>
     mapValues(normalizedLabwareById, (l: NormalizedLabware, id: string) =>
       _hydrateLabwareEntity(l, id, labwareDefs)
@@ -99,7 +99,7 @@ export const _getLabwareEntitiesRootState: RootState => LabwareEntities = create
 
 export const getPipetteEntities: Selector<PipetteEntities> = createSelector(
   state => rootSelector(state).pipetteInvariantProperties,
-  labwareDefSelectors.getLabwareDefsById,
+  labwareDefSelectors.getLabwareDefsByURI,
   denormalizePipetteEntities
 )
 
