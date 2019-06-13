@@ -80,3 +80,8 @@
 .disabled {
   color: var(--c-font-disabled);
 }
+
+.file_input {
+  position: fixed;
+  clip: rect(1px 1px 1px 1px);
+}

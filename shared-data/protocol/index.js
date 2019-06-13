@@ -1,0 +1,25 @@
+// @flow
+import type { SchemaV1ProtocolFile } from './flowTypes/schemaV1'
+import type { SchemaV3ProtocolFile } from './flowTypes/schemaV3'
+
+type ProtocolData =
+  | $Shape<SchemaV1ProtocolFile<{}>>
+  | $Shape<SchemaV3ProtocolFile<{}>>
+
+// $FlowFixMe: (ka, 2019-06-10): cant differentiate which file schema file is needed
+export function getProtocolSchemaVersion(data: ProtocolData): ?number {
+  if (data.schemaVersion > 3) {
+    console.warn('this is protocol schema version is not yet supported')
+  }
+  if (data.schemaVersion === 3) {
+    return 3
+  } else if (data['protocol-schema'] === '2.0.0') {
+    return 2
+  } else if (data['protocol-schema'] === '1.0.0') {
+    return 1
+  }
+  return null
+}
+
+export * from './flowTypes/schemaV1'
+export * from './flowTypes/schemaV3'

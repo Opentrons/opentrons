@@ -72,6 +72,7 @@ export type Config = {
     tempdeckControls?: boolean,
     enableThermocycler?: boolean,
     enablePipettePlus?: boolean,
+    enableBuildRoot?: boolean,
   },
 }
 

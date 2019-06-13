@@ -94,7 +94,8 @@ class TempDeck:
 
     def set_temperature(self, celsius) -> str:
         self.run_flag.wait()
-        celsius = round(float(celsius), utils.GCODE_ROUNDING_PRECISION)
+        celsius = round(float(celsius),
+                        utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
         try:
             self._send_command(
                 '{0} S{1}'.format(GCODES['SET_TEMP'], celsius))
@@ -240,7 +241,8 @@ class TempDeck:
     def _recursive_update_temperature(self, retries):
         try:
             res = self._send_command(GCODES['GET_TEMP'])
-            res = utils.parse_temperature_response(res)
+            res = utils.parse_temperature_response(
+                  res, utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
             self._temperature.update(res)
             return None
         except utils.ParseError as e:
