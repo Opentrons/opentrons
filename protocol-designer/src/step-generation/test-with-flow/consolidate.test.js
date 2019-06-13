@@ -10,9 +10,6 @@ import {
   getTiprackTipstate,
   getSuccessResult,
   getErrorResult,
-} from './fixtures'
-import { reduceCommandCreators } from '../utils'
-import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
   DEST_LABWARE,
@@ -24,7 +21,8 @@ import {
   blowoutHelper,
   pickUpTipHelper,
   dropTipHelper,
-} from './fixtures/commandFixtures'
+} from './fixtures'
+import { reduceCommandCreators } from '../utils'
 import _consolidate from '../commandCreators/compound/consolidate'
 import type { ConsolidateArgs } from '../types'
 

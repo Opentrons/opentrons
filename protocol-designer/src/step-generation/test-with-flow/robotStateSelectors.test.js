@@ -7,8 +7,8 @@ import {
   makeState,
   getTipColumn,
   getTiprackTipstate,
+  DEFAULT_PIPETTE,
 } from './fixtures'
-import { DEFAULT_PIPETTE } from './fixtures/commandFixtures'
 import { sortLabwareBySlot, getNextTiprack, _getNextTip } from '../'
 
 let invariantContext

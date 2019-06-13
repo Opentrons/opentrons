@@ -5,8 +5,9 @@ import {
   makeContext,
   getErrorResult,
   getSuccessResult,
+  DEFAULT_PIPETTE,
+  SOURCE_LABWARE,
 } from './fixtures'
-import { DEFAULT_PIPETTE, SOURCE_LABWARE } from './fixtures/commandFixtures'
 import dispense from '../commandCreators/atomic/dispense'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'

@@ -6,12 +6,10 @@ import {
   getTiprackTipstate,
   getTipColumn,
   getSuccessResult,
-} from './fixtures'
-import {
   pickUpTipHelper,
   dropTipHelper,
   DEFAULT_PIPETTE,
-} from './fixtures/commandFixtures'
+} from './fixtures'
 import replaceTip from '../commandCreators/atomic/replaceTip'
 import updateLiquidState from '../dispenseUpdateLiquidState'
 

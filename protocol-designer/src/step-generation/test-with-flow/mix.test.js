@@ -6,9 +6,7 @@ import {
   makeContext,
   getSuccessResult,
   getErrorResult,
-  commandFixtures as cmd,
-} from './fixtures'
-import {
+  replaceTipCommands,
   getFlowRateAndOffsetParams,
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
@@ -17,7 +15,7 @@ import {
   makeDispenseHelper,
   blowoutHelper,
   makeTouchTipHelper,
-} from './fixtures/commandFixtures'
+} from './fixtures'
 import { reduceCommandCreators } from '../utils'
 import type { MixArgs } from '../types'
 
@@ -71,7 +69,7 @@ describe('mix: change tip', () => {
 
     expect(res.commands).toEqual(
       flatMap(args.wells, (well: string, idx: number) => [
-        ...cmd.replaceTipCommands(idx),
+        ...replaceTipCommands(idx),
         aspirateHelper(well, volume),
         dispenseHelper(well, volume),
 
@@ -87,7 +85,7 @@ describe('mix: change tip', () => {
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual([
-      ...cmd.replaceTipCommands(0),
+      ...replaceTipCommands(0),
       ...flatMap(args.wells, well => [
         aspirateHelper(well, volume),
         dispenseHelper(well, volume),
@@ -131,7 +129,7 @@ describe('mix: advanced options', () => {
     const result = mix(args)(invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
-      ...cmd.replaceTipCommands(0),
+      ...replaceTipCommands(0),
       aspirateHelper('A1', volume),
       dispenseHelper('A1', volume),
       aspirateHelper('A1', volume),
@@ -154,7 +152,7 @@ describe('mix: advanced options', () => {
 
     expect(res.commands).toEqual(
       flatMap(args.wells, (well: string, idx: number) => [
-        ...cmd.replaceTipCommands(idx),
+        ...replaceTipCommands(idx),
         aspirateHelper(well, volume),
         dispenseHelper(well, volume),
 
@@ -180,7 +178,7 @@ describe('mix: advanced options', () => {
 
     expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
-        ...cmd.replaceTipCommands(idx),
+        ...replaceTipCommands(idx),
         aspirateHelper(well, volume),
         dispenseHelper(well, volume),
 
@@ -207,7 +205,7 @@ describe('mix: advanced options', () => {
 
     expect(res.commands).toEqual(
       flatMap(args.wells, (well, idx) => [
-        ...cmd.replaceTipCommands(idx),
+        ...replaceTipCommands(idx),
         aspirateHelper(well, volume),
         dispenseHelper(well, volume),
 

@@ -19,7 +19,7 @@ import {
   repeatArray,
   makeInitialRobotState,
 } from '../utils'
-import { FIXED_TRASH_ID } from './fixtures/commandFixtures'
+import { FIXED_TRASH_ID } from './fixtures'
 import type { InvariantContext } from '../types'
 
 let invariantContext

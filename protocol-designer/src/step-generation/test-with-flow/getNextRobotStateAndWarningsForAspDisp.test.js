@@ -1,7 +1,11 @@
 // @flow
 import { AIR, createTipLiquidState } from '../utils'
-import { makeContext, getInitialRobotStateStandard } from './fixtures'
-import { DEFAULT_PIPETTE, SOURCE_LABWARE } from './fixtures/commandFixtures'
+import {
+  makeContext,
+  getInitialRobotStateStandard,
+  DEFAULT_PIPETTE,
+  SOURCE_LABWARE,
+} from './fixtures'
 
 import forAspirateDispense from '../getNextRobotStateAndWarnings/forAspirateDispense'
 import * as warningCreators from '../warningCreators'

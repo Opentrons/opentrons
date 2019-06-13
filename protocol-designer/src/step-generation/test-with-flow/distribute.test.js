@@ -5,10 +5,6 @@ import {
   makeContext,
   getSuccessResult,
   getErrorResult,
-} from './fixtures'
-import { reduceCommandCreators } from '../utils'
-import _distribute from '../commandCreators/compound/distribute'
-import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
   DEST_LABWARE,
@@ -20,7 +16,9 @@ import {
   makeTouchTipHelper,
   pickUpTipHelper,
   dropTipHelper,
-} from './fixtures/commandFixtures'
+} from './fixtures'
+import { reduceCommandCreators } from '../utils'
+import _distribute from '../commandCreators/compound/distribute'
 import type { DistributeArgs } from '../types'
 
 const aspirateHelper = makeAspirateHelper()

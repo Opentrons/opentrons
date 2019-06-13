@@ -4,8 +4,8 @@ import {
   makeContext,
   getInitialRobotStateStandard,
   getSuccessResult,
+  DEFAULT_PIPETTE,
 } from './fixtures'
-import { DEFAULT_PIPETTE } from './fixtures/commandFixtures'
 import dropAllTips from '../commandCreators/atomic/dropAllTips'
 
 const p300SingleId = DEFAULT_PIPETTE

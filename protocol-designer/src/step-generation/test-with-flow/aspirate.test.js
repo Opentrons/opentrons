@@ -10,8 +10,9 @@ import {
   makeContext,
   getSuccessResult,
   getErrorResult,
+  DEFAULT_PIPETTE,
+  SOURCE_LABWARE,
 } from './fixtures'
-import { DEFAULT_PIPETTE, SOURCE_LABWARE } from './fixtures/commandFixtures'
 import getNextRobotStateAndWarnings from '../getNextRobotStateAndWarnings'
 
 jest.mock('../getNextRobotStateAndWarnings')

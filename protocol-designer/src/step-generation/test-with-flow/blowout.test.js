@@ -7,8 +7,9 @@ import {
   getRobotStateWithTipStandard,
   getErrorResult,
   getSuccessResult,
+  DEFAULT_PIPETTE,
+  SOURCE_LABWARE,
 } from './fixtures'
-import { DEFAULT_PIPETTE, SOURCE_LABWARE } from './fixtures/commandFixtures'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
 

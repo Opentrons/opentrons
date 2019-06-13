@@ -5,11 +5,7 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '../utils'
-import {
-  DEFAULT_PIPETTE,
-  SOURCE_LABWARE,
-  DEST_LABWARE,
-} from './fixtures/commandFixtures'
+import { DEFAULT_PIPETTE, SOURCE_LABWARE, DEST_LABWARE } from './fixtures'
 jest.mock('../commandCreators/atomic/blowout')
 
 const blowoutArgs = {

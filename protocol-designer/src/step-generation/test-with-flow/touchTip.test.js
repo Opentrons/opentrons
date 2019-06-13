@@ -7,8 +7,9 @@ import {
   makeContext,
   getSuccessResult,
   getErrorResult,
+  DEFAULT_PIPETTE,
+  SOURCE_LABWARE,
 } from './fixtures'
-import { DEFAULT_PIPETTE, SOURCE_LABWARE } from './fixtures/commandFixtures'
 
 describe('touchTip', () => {
   let invariantContext

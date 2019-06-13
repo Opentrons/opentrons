@@ -5,8 +5,9 @@ import {
   makeContext,
   getRobotStateWithTipStandard,
   getSuccessResult,
+  DEFAULT_PIPETTE,
+  SOURCE_LABWARE,
 } from './fixtures'
-import { DEFAULT_PIPETTE, SOURCE_LABWARE } from './fixtures/commandFixtures'
 
 import aspirate from '../commandCreators/atomic/aspirate'
 

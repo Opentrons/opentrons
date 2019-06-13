@@ -5,9 +5,6 @@ import {
   makeContext,
   getSuccessResult,
   getErrorResult,
-} from './fixtures'
-import { reduceCommandCreators } from '../utils'
-import {
   getFlowRateAndOffsetParams,
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
@@ -17,7 +14,8 @@ import {
   makeTouchTipHelper,
   pickUpTipHelper,
   dropTipHelper,
-} from './fixtures/commandFixtures'
+} from './fixtures'
+import { reduceCommandCreators } from '../utils'
 import _transfer from '../commandCreators/compound/transfer'
 import type { TransferArgs } from '../types'
 

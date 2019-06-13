@@ -6,8 +6,9 @@ import {
   makeContext,
   makeState,
   getSuccessResult,
+  DEFAULT_PIPETTE,
+  FIXED_TRASH_ID,
 } from './fixtures'
-import { DEFAULT_PIPETTE, FIXED_TRASH_ID } from './fixtures/commandFixtures'
 import dropTip from '../commandCreators/atomic/dropTip'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
