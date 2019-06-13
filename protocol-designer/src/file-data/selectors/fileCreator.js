@@ -11,6 +11,12 @@ import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
+import {
+  DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+  DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+  DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
+  DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
+} from '../../constants'
 
 import type {
   FilePipetteV3 as FilePipette,
@@ -130,7 +136,13 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
         data: {
           _internalAppBuildDate,
           defaultValues: {
-            // TODO IMMEDIATELY
+            // TODO: Ian 2019-07-13 load these into redux and always get them from redux, not constants.js
+            // This `defaultValues` key is not yet read by anything, but is populated here for auditability
+            // and so that later we can do #3587 without a PD migration
+            aspirate_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
+            dispense_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_DISPENSE,
+            touchTip_mmFromTop: DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
+            blowout_mmFromTop: DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
           },
           pipetteTiprackAssignments: mapValues(
             pipetteEntities,
