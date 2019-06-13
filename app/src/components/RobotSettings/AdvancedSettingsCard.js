@@ -11,6 +11,7 @@ import {
   getRobotSettingsState,
 } from '../../robot-api'
 
+import { getConfig } from '../../config'
 import { CONNECTABLE } from '../../discovery'
 import { downloadLogs } from '../../shell'
 import { RefreshCard } from '@opentrons/components'
@@ -21,6 +22,7 @@ import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery'
 import type { RobotSettings } from '../../robot-api'
 import type { ToggleRef } from './PipetteUpdateWarningModal'
+import UploadRobotUpdate from './UploadRobotUpdate'
 
 type OP = {|
   robot: ViewableRobot,
@@ -30,6 +32,7 @@ type OP = {|
 type SP = {|
   settings: RobotSettings,
   showPipetteUpdateWarning: boolean,
+  __buildRootEnabled: boolean,
 |}
 
 type DP = {|
@@ -138,6 +141,7 @@ class AdvancedSettingsCard extends React.Component<Props> {
             }
           />
         ))}
+        {this.props.__buildRootEnabled && <UploadRobotUpdate />}
       </RefreshCard>
     )
   }
@@ -158,6 +162,7 @@ function mapStateToProps(state: State, ownProps: OP): SP {
   return {
     settings: settings,
     showPipetteUpdateWarning: pipetteUpdateOptedOut === null,
+    __buildRootEnabled: Boolean(getConfig(state).devInternal?.enableBuildRoot),
   }
 }
 
