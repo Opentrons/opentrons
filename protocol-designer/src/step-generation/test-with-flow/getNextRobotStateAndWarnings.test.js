@@ -6,6 +6,7 @@ import {
   getRobotStateWithTipStandard,
   getSuccessResult,
 } from './fixtures'
+import { DEFAULT_PIPETTE, SOURCE_LABWARE } from './fixtures/commandFixtures'
 
 import aspirate from '../commandCreators/atomic/aspirate'
 
@@ -21,8 +22,8 @@ beforeEach(() => {
 describe('Aspirate Command', () => {
   test('aspirate from single-ingredient well', () => {
     const args = {
-      pipette: 'p300SingleId',
-      labware: 'sourcePlateId',
+      pipette: DEFAULT_PIPETTE,
+      labware: SOURCE_LABWARE,
       well: 'A1',
       volume: 152,
       flowRate: 2.22,

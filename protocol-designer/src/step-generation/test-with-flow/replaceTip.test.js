@@ -7,15 +7,20 @@ import {
   getTipColumn,
   getSuccessResult,
 } from './fixtures'
-import { pickUpTipHelper, dropTipHelper } from './fixtures/commandFixtures'
+import {
+  pickUpTipHelper,
+  dropTipHelper,
+  DEFAULT_PIPETTE,
+} from './fixtures/commandFixtures'
 import replaceTip from '../commandCreators/atomic/replaceTip'
 import updateLiquidState from '../dispenseUpdateLiquidState'
 
 jest.mock('../dispenseUpdateLiquidState')
 
+// TODO: Ian 2019-07-13 move these strings into commandFixtures
 const tiprack1Id = 'tiprack1Id'
 const tiprack2Id = 'tiprack2Id'
-const p300SingleId = 'p300SingleId'
+const p300SingleId = DEFAULT_PIPETTE
 const p300MultiId = 'p300MultiId'
 
 describe('replaceTip', () => {

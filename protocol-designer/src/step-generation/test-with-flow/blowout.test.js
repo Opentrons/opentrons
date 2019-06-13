@@ -8,6 +8,7 @@ import {
   getErrorResult,
   getSuccessResult,
 } from './fixtures'
+import { DEFAULT_PIPETTE, SOURCE_LABWARE } from './fixtures/commandFixtures'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
 
@@ -30,8 +31,8 @@ describe('blowout', () => {
     updateLiquidState.mockReturnValue(initialRobotState.liquidState)
 
     params = {
-      pipette: 'p300SingleId',
-      labware: 'sourcePlateId',
+      pipette: DEFAULT_PIPETTE,
+      labware: SOURCE_LABWARE,
       well: 'A1',
       flowRate: 21.1,
       offsetFromBottomMm: 1.3,
@@ -97,8 +98,8 @@ describe('blowout', () => {
       expect(updateLiquidState).toHaveBeenCalledWith(
         {
           invariantContext,
-          pipetteId: 'p300SingleId',
-          labwareId: 'sourcePlateId',
+          pipetteId: DEFAULT_PIPETTE,
+          labwareId: SOURCE_LABWARE,
           useFullVolume: true,
           well: 'A1',
         },

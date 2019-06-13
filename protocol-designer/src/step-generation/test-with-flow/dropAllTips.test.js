@@ -5,9 +5,10 @@ import {
   getInitialRobotStateStandard,
   getSuccessResult,
 } from './fixtures'
+import { DEFAULT_PIPETTE } from './fixtures/commandFixtures'
 import dropAllTips from '../commandCreators/atomic/dropAllTips'
 
-const p300SingleId = 'p300SingleId'
+const p300SingleId = DEFAULT_PIPETTE
 const p300MultiId = 'p300MultiId'
 
 let initialRobotState

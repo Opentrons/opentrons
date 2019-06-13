@@ -1,6 +1,7 @@
 // @flow
 import { AIR, createTipLiquidState } from '../utils'
 import { makeContext, getInitialRobotStateStandard } from './fixtures'
+import { DEFAULT_PIPETTE, SOURCE_LABWARE } from './fixtures/commandFixtures'
 
 import forAspirateDispense from '../getNextRobotStateAndWarnings/forAspirateDispense'
 import * as warningCreators from '../warningCreators'
@@ -27,7 +28,7 @@ describe('...single-channel pipette', () => {
     aspirateSingleCh50FromA1Args = {
       ...flowRatesAndOffsets,
       labware: labwareId,
-      pipette: 'p300SingleId',
+      pipette: DEFAULT_PIPETTE,
       volume: 50,
       well: 'A1',
     }
@@ -207,7 +208,7 @@ describe('...single-channel pipette', () => {
 
 describe('...8-channel pipette', () => {
   let aspirate8Ch50FromA1Args
-  const labwareId = 'sourcePlateId'
+  const labwareId = SOURCE_LABWARE
 
   beforeEach(() => {
     aspirate8Ch50FromA1Args = {

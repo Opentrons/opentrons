@@ -13,6 +13,12 @@ import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture12
 import fixtureTipRack10Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack10Ul.json'
 import fixtureTipRack300Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack300Ul.json'
 
+import {
+  DEFAULT_PIPETTE,
+  SOURCE_LABWARE,
+  DEST_LABWARE,
+  FIXED_TRASH_ID,
+} from './commandFixtures'
 import { makeInitialRobotState } from '../../utils'
 import { tiprackWellNamesFlat } from './data'
 import type { InvariantContext, RobotState } from '../../'
@@ -78,17 +84,17 @@ export function getTipColumn<T>(
 export function makeContext(): InvariantContext {
   const labwareEntities = {
     trashId: {
-      id: 'trashId',
+      id: FIXED_TRASH_ID,
       labwareDefURI: getLabwareDefURI(fixtureTrash),
       def: fixtureTrash,
     },
     sourcePlateId: {
-      id: 'sourcePlateId',
+      id: SOURCE_LABWARE,
       labwareDefURI: getLabwareDefURI(fixture96Plate),
       def: fixture96Plate,
     },
     destPlateId: {
-      id: 'destPlateId',
+      id: DEST_LABWARE,
       labwareDefURI: getLabwareDefURI(fixture96Plate),
       def: fixture96Plate,
     },
@@ -131,7 +137,7 @@ export function makeContext(): InvariantContext {
     },
     p300SingleId: {
       name: 'p300_single',
-      id: 'p300SingleId',
+      id: DEFAULT_PIPETTE,
       tiprackDefURI: getLabwareDefURI(fixtureTipRack300Ul),
       tiprackLabwareDef: fixtureTipRack300Ul,
       spec: fixtureP300Single,

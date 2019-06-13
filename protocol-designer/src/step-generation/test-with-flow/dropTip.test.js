@@ -7,6 +7,7 @@ import {
   makeState,
   getSuccessResult,
 } from './fixtures'
+import { DEFAULT_PIPETTE, FIXED_TRASH_ID } from './fixtures/commandFixtures'
 import dropTip from '../commandCreators/atomic/dropTip'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
@@ -46,7 +47,7 @@ describe('dropTip', () => {
 
   describe('replaceTip: single channel', () => {
     test('drop tip if there is a tip', () => {
-      const result = dropTip('p300SingleId')(
+      const result = dropTip(DEFAULT_PIPETTE)(
         invariantContext,
         makeRobotState({ singleHasTips: true, multiHasTips: true })
       )
@@ -55,8 +56,8 @@ describe('dropTip', () => {
         {
           command: 'dropTip',
           params: {
-            pipette: 'p300SingleId',
-            labware: 'trashId',
+            pipette: DEFAULT_PIPETTE,
+            labware: FIXED_TRASH_ID,
             well: 'A1',
           },
         },
@@ -71,7 +72,7 @@ describe('dropTip', () => {
         singleHasTips: false,
         multiHasTips: true,
       })
-      const result = dropTip('p300SingleId')(
+      const result = dropTip(DEFAULT_PIPETTE)(
         invariantContext,
         initialRobotState
       )
@@ -93,7 +94,7 @@ describe('dropTip', () => {
           command: 'dropTip',
           params: {
             pipette: 'p300MultiId',
-            labware: 'trashId',
+            labware: FIXED_TRASH_ID,
             well: 'A1',
           },
         },
@@ -134,7 +135,7 @@ describe('dropTip', () => {
         {
           invariantContext,
           pipetteId: 'p300MultiId',
-          labwareId: 'trashId',
+          labwareId: FIXED_TRASH_ID,
           useFullVolume: true,
           well: 'A1',
         },

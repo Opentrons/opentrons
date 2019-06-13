@@ -134,7 +134,6 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (
       }
 
       // TODO: BC 2018-11-29 instead of disposalLabware and disposalWell use blowoutLocation
-      // TODO IMMEDIATELY why not use blowout util???
       let blowoutCommands = []
       if (args.disposalVolume && args.disposalLabware && args.disposalWell) {
         blowoutCommands = [

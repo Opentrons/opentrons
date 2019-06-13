@@ -5,14 +5,18 @@ import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '../utils'
-
+import {
+  DEFAULT_PIPETTE,
+  SOURCE_LABWARE,
+  DEST_LABWARE,
+} from './fixtures/commandFixtures'
 jest.mock('../commandCreators/atomic/blowout')
 
 const blowoutArgs = {
-  pipette: 'p300SingleId',
-  sourceLabware: 'sourcePlateId',
+  pipette: DEFAULT_PIPETTE,
+  sourceLabware: SOURCE_LABWARE,
   sourceWell: 'A1',
-  destLabware: 'destPlateId',
+  destLabware: DEST_LABWARE,
   destWell: 'A2',
   flowRate: 1.23,
   offsetFromBottomMm: 1.02,

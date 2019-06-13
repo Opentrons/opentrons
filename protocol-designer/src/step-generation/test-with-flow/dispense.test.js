@@ -6,6 +6,7 @@ import {
   getErrorResult,
   getSuccessResult,
 } from './fixtures'
+import { DEFAULT_PIPETTE, SOURCE_LABWARE } from './fixtures/commandFixtures'
 import dispense from '../commandCreators/atomic/dispense'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
@@ -33,9 +34,9 @@ describe('dispense', () => {
     let params
     beforeEach(() => {
       params = {
-        pipette: 'p300SingleId',
+        pipette: DEFAULT_PIPETTE,
         volume: 50,
-        labware: 'sourcePlateId',
+        labware: SOURCE_LABWARE,
         well: 'A1',
         offsetFromBottomMm: 5,
         flowRate: 6,
@@ -90,8 +91,8 @@ describe('dispense', () => {
 
     test('dispense calls dispenseUpdateLiquidState with correct args and puts result into robotState.liquidState', () => {
       const params = {
-        pipette: 'p300SingleId',
-        labware: 'sourcePlateId',
+        pipette: DEFAULT_PIPETTE,
+        labware: SOURCE_LABWARE,
         well: 'A1',
         volume: 152,
         flowRate: 12,

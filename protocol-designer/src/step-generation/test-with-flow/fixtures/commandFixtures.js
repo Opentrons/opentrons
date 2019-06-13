@@ -41,7 +41,6 @@ export const getFlowRateAndOffsetParams = () => ({
 
 // =================
 
-// TODO IMMEDIATELY replace all uses of these hard-coded strings in tests with these variables
 export const DEFAULT_PIPETTE = 'p300SingleId'
 export const SOURCE_LABWARE = 'sourcePlateId'
 export const DEST_LABWARE = 'destPlateId'

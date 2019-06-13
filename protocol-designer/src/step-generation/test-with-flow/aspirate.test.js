@@ -11,6 +11,7 @@ import {
   getSuccessResult,
   getErrorResult,
 } from './fixtures'
+import { DEFAULT_PIPETTE, SOURCE_LABWARE } from './fixtures/commandFixtures'
 import getNextRobotStateAndWarnings from '../getNextRobotStateAndWarnings'
 
 jest.mock('../getNextRobotStateAndWarnings')
@@ -48,9 +49,9 @@ describe('aspirate', () => {
   test('aspirate normally (with tip)', () => {
     const params = {
       ...flowRateAndOffsets,
-      pipette: 'p300SingleId',
+      pipette: DEFAULT_PIPETTE,
       volume: 50,
-      labware: 'sourcePlateId',
+      labware: SOURCE_LABWARE,
       well: 'A1',
     }
 
@@ -65,18 +66,18 @@ describe('aspirate', () => {
 
   test('aspirate with volume > tip max volume should throw error', () => {
     invariantContext.pipetteEntities[
-      'p300SingleId'
+      DEFAULT_PIPETTE
     ].tiprackDefURI = getLabwareDefURI(fixtureTipRack10Ul)
 
     invariantContext.pipetteEntities[
-      'p300SingleId'
+      DEFAULT_PIPETTE
     ].tiprackLabwareDef = fixtureTipRack10Ul
 
     const result = aspirate({
       ...flowRateAndOffsets,
-      pipette: 'p300SingleId',
+      pipette: DEFAULT_PIPETTE,
       volume: 201,
-      labware: 'sourcePlateId',
+      labware: SOURCE_LABWARE,
       well: 'A1',
     })(invariantContext, robotStateWithTip)
 
@@ -89,18 +90,18 @@ describe('aspirate', () => {
   test('aspirate with volume > pipette max volume should throw error', () => {
     // NOTE: assigning p300 to a 1000uL tiprack is nonsense, just for this test
     invariantContext.pipetteEntities[
-      'p300SingleId'
+      DEFAULT_PIPETTE
     ].tiprackDefURI = getLabwareDefURI(fixtureTipRack1000Ul)
 
     invariantContext.pipetteEntities[
-      'p300SingleId'
+      DEFAULT_PIPETTE
     ].tiprackLabwareDef = fixtureTipRack1000Ul
 
     const result = aspirate({
       ...flowRateAndOffsets,
-      pipette: 'p300SingleId',
+      pipette: DEFAULT_PIPETTE,
       volume: 301,
-      labware: 'sourcePlateId',
+      labware: SOURCE_LABWARE,
       well: 'A1',
     })(invariantContext, robotStateWithTip)
 
@@ -115,7 +116,7 @@ describe('aspirate', () => {
       ...flowRateAndOffsets,
       pipette: 'badPipette',
       volume: 50,
-      labware: 'sourcePlateId',
+      labware: SOURCE_LABWARE,
       well: 'A1',
     })(invariantContext, robotStateWithTip)
 
@@ -125,9 +126,9 @@ describe('aspirate', () => {
   test('aspirate with no tip should return error', () => {
     const result = aspirate({
       ...flowRateAndOffsets,
-      pipette: 'p300SingleId',
+      pipette: DEFAULT_PIPETTE,
       volume: 50,
-      labware: 'sourcePlateId',
+      labware: SOURCE_LABWARE,
       well: 'A1',
     })(invariantContext, initialRobotState)
 
@@ -140,7 +141,7 @@ describe('aspirate', () => {
   test('aspirate from nonexistent labware should return error', () => {
     const result = aspirate({
       ...flowRateAndOffsets,
-      pipette: 'p300SingleId',
+      pipette: DEFAULT_PIPETTE,
       volume: 50,
       labware: 'problematicLabwareId',
       well: 'A1',
@@ -156,8 +157,8 @@ describe('aspirate', () => {
     test('aspirate calls getNextRobotStateAndWarnings with correct args and puts result into robotState', () => {
       const args = {
         ...flowRateAndOffsets,
-        pipette: 'p300SingleId',
-        labware: 'sourcePlateId',
+        pipette: DEFAULT_PIPETTE,
+        labware: SOURCE_LABWARE,
         well: 'A1',
         volume: 152,
       }

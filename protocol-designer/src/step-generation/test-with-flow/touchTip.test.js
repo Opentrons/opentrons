@@ -8,6 +8,7 @@ import {
   getSuccessResult,
   getErrorResult,
 } from './fixtures'
+import { DEFAULT_PIPETTE, SOURCE_LABWARE } from './fixtures/commandFixtures'
 
 describe('touchTip', () => {
   let invariantContext
@@ -22,8 +23,8 @@ describe('touchTip', () => {
 
   test('touchTip with tip, specifying offsetFromBottomMm', () => {
     const result = touchTip({
-      pipette: 'p300SingleId',
-      labware: 'sourcePlateId',
+      pipette: DEFAULT_PIPETTE,
+      labware: SOURCE_LABWARE,
       well: 'A1',
       offsetFromBottomMm: 10,
     })(invariantContext, robotStateWithTip)
@@ -33,8 +34,8 @@ describe('touchTip', () => {
       {
         command: 'touchTip',
         params: {
-          pipette: 'p300SingleId',
-          labware: 'sourcePlateId',
+          pipette: DEFAULT_PIPETTE,
+          labware: SOURCE_LABWARE,
           well: 'A1',
           offsetFromBottomMm: 10,
         },
@@ -47,7 +48,7 @@ describe('touchTip', () => {
   test('touchTip with invalid pipette ID should throw error', () => {
     const result = touchTip({
       pipette: 'badPipette',
-      labware: 'sourcePlateId',
+      labware: SOURCE_LABWARE,
       well: 'A1',
       offsetFromBottomMm: 10,
     })(invariantContext, robotStateWithTip)
@@ -58,8 +59,8 @@ describe('touchTip', () => {
 
   test('touchTip with no tip should throw error', () => {
     const result = touchTip({
-      pipette: 'p300SingleId',
-      labware: 'sourcePlateId',
+      pipette: DEFAULT_PIPETTE,
+      labware: SOURCE_LABWARE,
       well: 'A1',
       offsetFromBottomMm: 10,
     })(invariantContext, initialRobotState)
