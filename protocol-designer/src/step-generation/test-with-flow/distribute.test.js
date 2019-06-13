@@ -269,71 +269,22 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
     const res = getSuccessResult(result)
 
     const preWetVolume = 42 // TODO what is pre-wet volume?
-    // TODO IMMEDIATELY use helper
+
     const preWetTipCommands = [
-      {
-        command: 'aspirate',
-        labware: SOURCE_LABWARE,
-        pipette: DEFAULT_PIPETTE,
-        volume: preWetVolume,
-        well: 'A1',
-      },
-      {
-        command: 'dispense',
-        labware: SOURCE_LABWARE,
-        pipette: DEFAULT_PIPETTE,
-        volume: preWetVolume,
-        well: 'A1',
-      },
+      aspirateHelper('A1', preWetVolume),
+      dispenseHelper('A1', preWetVolume, { labware: SOURCE_LABWARE }),
     ]
 
-    // TODO IMMEDIATELY use helper
     expect(res.commands).toEqual([
       ...preWetTipCommands,
-      {
-        command: 'aspirate',
-        labware: SOURCE_LABWARE,
-        pipette: DEFAULT_PIPETTE,
-        volume: 300,
-        well: 'A1',
-      },
-      {
-        command: 'dispense',
-        labware: DEST_LABWARE,
-        pipette: DEFAULT_PIPETTE,
-        volume: 150,
-        well: 'A2',
-      },
-      {
-        command: 'dispense',
-        labware: DEST_LABWARE,
-        pipette: DEFAULT_PIPETTE,
-        volume: 150,
-        well: 'A3',
-      },
+      aspirateHelper('A1', 300),
+      dispenseHelper('A2', 150),
+      dispenseHelper('A3', 150),
       blowoutSingleToTrash,
       ...preWetTipCommands,
-      {
-        command: 'aspirate',
-        labware: SOURCE_LABWARE,
-        pipette: DEFAULT_PIPETTE,
-        volume: 300,
-        well: 'A1',
-      },
-      {
-        command: 'dispense',
-        labware: DEST_LABWARE,
-        pipette: DEFAULT_PIPETTE,
-        volume: 150,
-        well: 'A4',
-      },
-      {
-        command: 'dispense',
-        labware: DEST_LABWARE,
-        pipette: DEFAULT_PIPETTE,
-        volume: 150,
-        well: 'A5',
-      },
+      aspirateHelper('A1', 300),
+      dispenseHelper('A4', 150),
+      dispenseHelper('A5', 150),
       blowoutSingleToTrash,
     ])
   })

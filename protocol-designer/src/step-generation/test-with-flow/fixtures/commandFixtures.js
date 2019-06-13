@@ -117,7 +117,7 @@ export const touchTipHelper = (
   command: 'touchTip',
   params: {
     pipette: DEFAULT_PIPETTE,
-    labware: 'sourcePlateId', // TODO IMMEDIATELY: don't hard-code here. Required arg???
+    labware: SOURCE_LABWARE, // TODO IMMEDIATELY: don't hard-code here. Required arg???
     offsetFromBottomMm: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
     well,
     ...params,
@@ -134,7 +134,7 @@ export const dropTip = (
 ): Command => ({
   command: 'dropTip',
   params: {
-    pipette: 'p300SingleId',
+    pipette: DEFAULT_PIPETTE,
     labware: FIXED_TRASH_ID,
     well: typeof well === 'string' ? well : tiprackWellNamesFlat[well],
     ...params,
@@ -147,7 +147,7 @@ export const pickUpTip = (
 ): Command => ({
   command: 'pickUpTip',
   params: {
-    pipette: 'p300SingleId',
+    pipette: DEFAULT_PIPETTE,
     labware: 'tiprack1Id',
     ...params,
     well: typeof tip === 'string' ? tip : tiprackWellNamesFlat[tip],
@@ -161,8 +161,8 @@ export const touchTip = (
 ): Command => ({
   command: 'touchTip',
   params: {
-    labware: 'sourcePlateId',
-    pipette: 'p300SingleId',
+    labware: SOURCE_LABWARE,
+    pipette: DEFAULT_PIPETTE,
     ...params,
     well,
   },
@@ -176,8 +176,8 @@ export const aspirate = (
 ): Command => ({
   command: 'aspirate',
   params: {
-    pipette: 'p300SingleId',
-    labware: 'sourcePlateId',
+    pipette: DEFAULT_PIPETTE,
+    labware: SOURCE_LABWARE,
     volume,
     well,
     ...params,
@@ -192,8 +192,8 @@ export const dispense = (
 ): Command => ({
   command: 'dispense',
   params: {
-    pipette: 'p300SingleId',
-    labware: 'sourcePlateId',
+    pipette: DEFAULT_PIPETTE,
+    labware: SOURCE_LABWARE,
     volume,
     well,
     ...params,
@@ -212,7 +212,7 @@ export const blowout = (
 ): Command => ({
   command: 'blowout',
   params: {
-    pipette: 'p300SingleId',
+    pipette: DEFAULT_PIPETTE,
     well: 'A1',
     labware: labware || FIXED_TRASH_ID,
     ...params,
