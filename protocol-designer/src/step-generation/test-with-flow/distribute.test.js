@@ -9,7 +9,21 @@ import {
 } from './fixtures'
 import { reduceCommandCreators } from '../utils'
 import _distribute from '../commandCreators/compound/distribute'
+import {
+  DEFAULT_PIPETTE,
+  SOURCE_LABWARE,
+  DEST_LABWARE,
+  FIXED_TRASH_ID,
+  getFlowRateAndOffsetParams,
+  makeAspirateHelper,
+  makeDispenseHelper,
+  blowoutHelper,
+  touchTipHelper,
+} from './fixtures/commandFixtures'
 import type { DistributeArgs } from '../types'
+
+const aspirateHelper = makeAspirateHelper()
+const dispenseHelper = makeDispenseHelper()
 
 // collapse this compound command creator into the signature of an atomic command creator
 const distribute = (args: DistributeArgs) => (
@@ -21,89 +35,39 @@ const distribute = (args: DistributeArgs) => (
     initialRobotState
   )
 
-// TODO IMMEDIATELY: this is duplicated in consolidate and probably distribute
-// NOTE: make sure none of these numbers match!
-const ASPIRATE_FLOW_RATE = 2.1
-const DISPENSE_FLOW_RATE = 2.2
-const BLOWOUT_FLOW_RATE = 2.3
-
-const ASPIRATE_OFFSET_FROM_BOTTOM_MM = 3.1
-const DISPENSE_OFFSET_FROM_BOTTOM_MM = 3.2
-const BLOWOUT_OFFSET_FROM_BOTTOM_MM = 3.3
-const TOUCH_TIP_OFFSET_FROM_BOTTOM_MM = 3.4
-
-const aspirateHelper = (well: string, volume: number, params = null) =>
-  cmd.aspirate(well, volume, {
-    offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-    flowRate: ASPIRATE_FLOW_RATE,
-    ...params,
-  })
-
-const dispenseHelper = (well, volume, params = null) =>
-  cmd.dispense(well, volume, {
-    labware: 'destPlateId', // TODO IMMEDIATELY: watch this value
-    offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
-    flowRate: DISPENSE_FLOW_RATE,
-    ...params,
-  })
-
-// TODO IMMEDIATELY: THIS IS NEW vs CONSOLIDATE
-const touchTipHelper = (well, params) =>
-  cmd.touchTip(well, {
-    offsetFromBottomMm: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
-    ...params,
-  })
-
-const blowoutHelper = (labware: string | typeof undefined, params) =>
-  cmd.blowout(labware, {
-    offsetFromBottomMm: BLOWOUT_OFFSET_FROM_BOTTOM_MM,
-    flowRate: BLOWOUT_FLOW_RATE,
-    ...params,
-  })
-
 let mixinArgs
 let invariantContext
 let robotStateWithTip
 let robotInitialStateNoTipsRemain
 let blowoutSingleToTrash
 let blowoutSingleToSourceA1
-let flowRatesAndOffsets
 
 beforeEach(() => {
-  flowRatesAndOffsets = {
-    aspirateFlowRateUlSec: ASPIRATE_FLOW_RATE,
-    dispenseFlowRateUlSec: DISPENSE_FLOW_RATE,
-    blowoutFlowRateUlSec: BLOWOUT_FLOW_RATE,
-    aspirateOffsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-    dispenseOffsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
-    blowoutOffsetFromBottomMm: BLOWOUT_OFFSET_FROM_BOTTOM_MM,
-    touchTipAfterAspirateOffsetMmFromBottom: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
-    touchTipAfterDispenseOffsetMmFromBottom: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
-  }
-
   // TODO IMMEDIATELY call this var the same thing in transfer/consolidate/distribute
   mixinArgs = {
-    ...flowRatesAndOffsets,
+    ...getFlowRateAndOffsetParams(),
     commandCreatorFnName: 'distribute',
     name: 'distribute test',
     description: 'test blah blah',
 
-    pipette: 'p300SingleId',
-    sourceLabware: 'sourcePlateId',
-    destLabware: 'destPlateId',
+    pipette: DEFAULT_PIPETTE,
+    sourceLabware: SOURCE_LABWARE,
+    destLabware: DEST_LABWARE,
 
     preWetTip: false,
     touchTipAfterAspirate: false,
     disposalVolume: 60,
-    disposalLabware: 'trashId',
+    disposalLabware: FIXED_TRASH_ID,
     disposalWell: 'A1',
     mixBeforeAspirate: null,
 
     touchTipAfterDispense: false,
   }
 
-  blowoutSingleToTrash = blowoutHelper('trashId')
-  blowoutSingleToSourceA1 = blowoutHelper('sourcePlateId', { well: 'A1' })
+  blowoutSingleToTrash = blowoutHelper(FIXED_TRASH_ID)
+  blowoutSingleToSourceA1 = blowoutHelper(SOURCE_LABWARE, {
+    well: 'A1',
+  })
 
   invariantContext = makeContext()
   robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
@@ -264,7 +228,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
 
       mixFirstAspirate: true,
       disposalVolume: 12,
-      disposalLabware: 'sourcePlateId',
+      disposalLabware: SOURCE_LABWARE,
       disposalWell: 'A1',
     }
     const result = distribute(distributeArgs)(
@@ -308,43 +272,45 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
     const res = getSuccessResult(result)
 
     const preWetVolume = 42 // TODO what is pre-wet volume?
+    // TODO IMMEDIATELY use helper
     const preWetTipCommands = [
       {
         command: 'aspirate',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
+        labware: SOURCE_LABWARE,
+        pipette: DEFAULT_PIPETTE,
         volume: preWetVolume,
         well: 'A1',
       },
       {
         command: 'dispense',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
+        labware: SOURCE_LABWARE,
+        pipette: DEFAULT_PIPETTE,
         volume: preWetVolume,
         well: 'A1',
       },
     ]
 
+    // TODO IMMEDIATELY use helper
     expect(res.commands).toEqual([
       ...preWetTipCommands,
       {
         command: 'aspirate',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
+        labware: SOURCE_LABWARE,
+        pipette: DEFAULT_PIPETTE,
         volume: 300,
         well: 'A1',
       },
       {
         command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
+        labware: DEST_LABWARE,
+        pipette: DEFAULT_PIPETTE,
         volume: 150,
         well: 'A2',
       },
       {
         command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
+        labware: DEST_LABWARE,
+        pipette: DEFAULT_PIPETTE,
         volume: 150,
         well: 'A3',
       },
@@ -352,22 +318,22 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
       ...preWetTipCommands,
       {
         command: 'aspirate',
-        labware: 'sourcePlateId',
-        pipette: 'p300SingleId',
+        labware: SOURCE_LABWARE,
+        pipette: DEFAULT_PIPETTE,
         volume: 300,
         well: 'A1',
       },
       {
         command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
+        labware: DEST_LABWARE,
+        pipette: DEFAULT_PIPETTE,
         volume: 150,
         well: 'A4',
       },
       {
         command: 'dispense',
-        labware: 'destPlateId',
-        pipette: 'p300SingleId',
+        labware: DEST_LABWARE,
+        pipette: DEFAULT_PIPETTE,
         volume: 150,
         well: 'A5',
       },
@@ -423,16 +389,16 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
     expect(res.commands).toEqual([
       aspirateHelper('A1', 240),
       dispenseHelper('A2', 90),
-      touchTipHelper('A2', { labware: 'destPlateId' }),
+      touchTipHelper('A2', { labware: DEST_LABWARE }),
       dispenseHelper('A3', 90),
-      touchTipHelper('A3', { labware: 'destPlateId' }),
+      touchTipHelper('A3', { labware: DEST_LABWARE }),
       blowoutSingleToTrash,
 
       aspirateHelper('A1', 240),
       dispenseHelper('A4', 90),
-      touchTipHelper('A4', { labware: 'destPlateId' }),
+      touchTipHelper('A4', { labware: DEST_LABWARE }),
       dispenseHelper('A5', 90),
-      touchTipHelper('A5', { labware: 'destPlateId' }),
+      touchTipHelper('A5', { labware: DEST_LABWARE }),
       blowoutSingleToTrash,
     ])
   })
@@ -440,7 +406,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
   test('mix before aspirate w/ disposal vol', () => {
     const volume = 130
     const disposalVolume = 20
-    const disposalLabware = 'sourcePlateId'
+    const disposalLabware = SOURCE_LABWARE
     const disposalWell = 'A1'
     const aspirateVol = volume * 2 + disposalVolume
     const distributeArgs: DistributeArgs = {
@@ -467,10 +433,10 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
     const mixCommands = [
       // mix 1
       aspirateHelper('A1', 250),
-      dispenseHelper('A1', 250, { labware: 'sourcePlateId' }),
+      dispenseHelper('A1', 250, { labware: SOURCE_LABWARE }),
       // mix 2
       aspirateHelper('A1', 250),
-      dispenseHelper('A1', 250, { labware: 'sourcePlateId' }),
+      dispenseHelper('A1', 250, { labware: SOURCE_LABWARE }),
     ]
 
     expect(res.commands).toEqual([
@@ -545,7 +511,7 @@ describe('distribute volume exceeds pipette max volume', () => {
       changeTip,
       volume: 250,
       disposalVolume: 100,
-      disposalLabware: 'trashId',
+      disposalLabware: FIXED_TRASH_ID,
       disposalWell: 'A1',
     }
     const result = distribute(distributeArgs)(

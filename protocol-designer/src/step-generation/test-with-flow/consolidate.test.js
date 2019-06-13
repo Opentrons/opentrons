@@ -13,8 +13,21 @@ import {
   commandFixtures as cmd,
 } from './fixtures'
 import { reduceCommandCreators } from '../utils'
+import {
+  DEFAULT_PIPETTE,
+  SOURCE_LABWARE,
+  DEST_LABWARE,
+  FIXED_TRASH_ID,
+  getFlowRateAndOffsetParams,
+  makeAspirateHelper,
+  makeDispenseHelper,
+  blowoutHelper,
+} from './fixtures/commandFixtures'
 import _consolidate from '../commandCreators/compound/consolidate'
 import type { ConsolidateArgs } from '../types'
+
+const aspirateHelper = makeAspirateHelper()
+const dispenseHelper = makeDispenseHelper()
 
 // collapse this compound command creator into the signature of an atomic command creator
 const consolidate = (args: ConsolidateArgs) => (
@@ -24,40 +37,6 @@ const consolidate = (args: ConsolidateArgs) => (
   reduceCommandCreators(
     _consolidate(args)(invariantContext, initialRobotState)
   )(invariantContext, initialRobotState)
-
-// TODO IMMEDIATELY these are replicated eg in transfer.test.js and distribute.test.js
-// NOTE: make sure none of these numbers match!
-const ASPIRATE_FLOW_RATE = 2.1
-const DISPENSE_FLOW_RATE = 2.2
-const BLOWOUT_FLOW_RATE = 2.3
-
-const ASPIRATE_OFFSET_FROM_BOTTOM_MM = 3.1
-const DISPENSE_OFFSET_FROM_BOTTOM_MM = 3.2
-const BLOWOUT_OFFSET_FROM_BOTTOM_MM = 3.3
-const TOUCH_TIP_OFFSET_FROM_BOTTOM_MM = 3.4
-
-// TODO IMMEDIATELY these are replicated eg in transfer.test.js
-const aspirateHelper = (well: string, volume: number, params = null) =>
-  cmd.aspirate(well, volume, {
-    offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-    flowRate: ASPIRATE_FLOW_RATE,
-    ...params,
-  })
-
-const dispenseHelper = (well, volume, params = null) =>
-  cmd.dispense(well, volume, {
-    labware: 'destPlateId',
-    offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
-    flowRate: DISPENSE_FLOW_RATE,
-    ...params,
-  })
-
-const blowoutHelper = (labware: string | typeof undefined, params) =>
-  cmd.blowout(labware, {
-    offsetFromBottomMm: BLOWOUT_OFFSET_FROM_BOTTOM_MM,
-    flowRate: BLOWOUT_FLOW_RATE,
-    ...params,
-  })
 
 function tripleMix(well: string, volume: number, labware: string) {
   return [
@@ -77,7 +56,6 @@ let robotStatePickedUpOneTipNoLiquidState
 let robotStatePickedUpMultiTipsNoLiquidState
 let robotStatePickedUpOneTip
 let baseArgs
-let flowRatesAndOffsets
 
 beforeEach(() => {
   invariantContext = makeContext()
@@ -110,32 +88,20 @@ beforeEach(() => {
     }
   )
 
-  // TODO IMMEDIATELY this is duplicated in transfer and distribute
-  flowRatesAndOffsets = {
-    aspirateFlowRateUlSec: ASPIRATE_FLOW_RATE,
-    dispenseFlowRateUlSec: DISPENSE_FLOW_RATE,
-    blowoutFlowRateUlSec: BLOWOUT_FLOW_RATE,
-    aspirateOffsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-    dispenseOffsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
-    blowoutOffsetFromBottomMm: BLOWOUT_OFFSET_FROM_BOTTOM_MM,
-    touchTipAfterAspirateOffsetMmFromBottom: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
-    touchTipAfterDispenseOffsetMmFromBottom: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
-  }
-
   baseArgs = {
     // `volume` and `changeTip` should be explicit in tests,
     // those fields intentionally omitted from here
-    ...flowRatesAndOffsets,
+    ...getFlowRateAndOffsetParams(),
     stepType: 'consolidate',
     commandCreatorFnName: 'consolidate',
     name: 'Consolidate Test',
     description: 'test blah blah',
-    pipette: 'p300SingleId',
+    pipette: DEFAULT_PIPETTE,
 
     sourceWells: ['A1', 'A2', 'A3', 'A4'],
     destWell: 'B1',
-    sourceLabware: 'sourcePlateId',
-    destLabware: 'destPlateId',
+    sourceLabware: SOURCE_LABWARE,
+    destLabware: DEST_LABWARE,
 
     preWetTip: false,
     touchTipAfterAspirate: false,
@@ -289,14 +255,14 @@ describe('consolidate single-channel', () => {
     expect(res.commands).toEqual([
       cmd.pickUpTip('A1'),
 
-      ...tripleMix('A1', 50, 'sourcePlateId'),
+      ...tripleMix('A1', 50, SOURCE_LABWARE),
 
       aspirateHelper('A1', 100),
       aspirateHelper('A2', 100),
       aspirateHelper('A3', 100),
       dispenseHelper('B1', 300),
 
-      ...tripleMix('A4', 50, 'sourcePlateId'),
+      ...tripleMix('A4', 50, SOURCE_LABWARE),
 
       aspirateHelper('A4', 100),
       dispenseHelper('B1', 100),
@@ -319,11 +285,11 @@ describe('consolidate single-channel', () => {
       cmd.pickUpTip('A1'),
       // Start mix
       aspirateHelper('A1', 50),
-      dispenseHelper('A1', 50, { labware: 'sourcePlateId' }),
+      dispenseHelper('A1', 50, { labware: SOURCE_LABWARE }),
       aspirateHelper('A1', 50),
-      dispenseHelper('A1', 50, { labware: 'sourcePlateId' }),
+      dispenseHelper('A1', 50, { labware: SOURCE_LABWARE }),
       aspirateHelper('A1', 50),
-      dispenseHelper('A1', 50, { labware: 'sourcePlateId' }),
+      dispenseHelper('A1', 50, { labware: SOURCE_LABWARE }),
       // done mix
       aspirateHelper('A1', 125),
       aspirateHelper('A2', 125),
@@ -331,11 +297,11 @@ describe('consolidate single-channel', () => {
 
       // Start mix
       aspirateHelper('A3', 50),
-      dispenseHelper('A3', 50, { labware: 'sourcePlateId' }),
+      dispenseHelper('A3', 50, { labware: SOURCE_LABWARE }),
       aspirateHelper('A3', 50),
-      dispenseHelper('A3', 50, { labware: 'sourcePlateId' }),
+      dispenseHelper('A3', 50, { labware: SOURCE_LABWARE }),
       aspirateHelper('A3', 50),
-      dispenseHelper('A3', 50, { labware: 'sourcePlateId' }),
+      dispenseHelper('A3', 50, { labware: SOURCE_LABWARE }),
       // done mix
 
       aspirateHelper('A3', 125),
@@ -363,12 +329,12 @@ describe('consolidate single-channel', () => {
       aspirateHelper('A3', 100),
       dispenseHelper('B1', 300),
 
-      ...tripleMix('B1', 53, 'destPlateId'),
+      ...tripleMix('B1', 53, DEST_LABWARE),
 
       aspirateHelper('A4', 100),
       dispenseHelper('B1', 100),
 
-      ...tripleMix('B1', 53, 'destPlateId'),
+      ...tripleMix('B1', 53, DEST_LABWARE),
     ])
     expect(res.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -379,7 +345,7 @@ describe('consolidate single-channel', () => {
       volume: 100,
       changeTip: 'once',
       mixInDestination: { times: 3, volume: 54 },
-      blowoutLocation: 'trashId',
+      blowoutLocation: FIXED_TRASH_ID,
     }
 
     const result = consolidate(data)(invariantContext, initialRobotState)
@@ -392,13 +358,13 @@ describe('consolidate single-channel', () => {
       aspirateHelper('A3', 100),
       dispenseHelper('B1', 300),
 
-      ...tripleMix('B1', 54, 'destPlateId'),
+      ...tripleMix('B1', 54, DEST_LABWARE),
 
       blowoutHelper(),
       aspirateHelper('A4', 100),
       dispenseHelper('B1', 100),
 
-      ...tripleMix('B1', 54, 'destPlateId'),
+      ...tripleMix('B1', 54, DEST_LABWARE),
 
       blowoutHelper(),
     ])
@@ -425,7 +391,7 @@ describe('consolidate single-channel', () => {
 
       // pre-wet tip
       aspirateHelper('A1', preWetVol),
-      dispenseHelper('A1', preWetVol, { labware: 'sourcePlateId' }),
+      dispenseHelper('A1', preWetVol, { labware: SOURCE_LABWARE }),
       // done pre-wet
 
       aspirateHelper('A1', 150),
@@ -434,7 +400,7 @@ describe('consolidate single-channel', () => {
 
       // pre-wet tip, now with A3
       aspirateHelper('A3', preWetVol),
-      dispenseHelper('A3', preWetVol, { labware: 'sourcePlateId' }),
+      dispenseHelper('A3', preWetVol, { labware: SOURCE_LABWARE }),
       // done pre-wet
 
       aspirateHelper('A3', 150),
@@ -492,7 +458,7 @@ describe('consolidate single-channel', () => {
     const res = getSuccessResult(result)
 
     const touchTipAfterDisp = {
-      labware: 'destPlateId',
+      labware: DEST_LABWARE,
       offsetFromBottomMm: baseArgs.touchTipAfterDispenseOffsetMmFromBottom,
     }
     expect(res.commands).toEqual([
@@ -535,8 +501,8 @@ describe('consolidate single-channel', () => {
 describe('consolidate multi-channel', () => {
   const multiParams = { pipette: 'p300MultiId' }
   const multiDispense = (well: string, volume: number) =>
-    cmd.dispense(well, volume, {
-      labware: 'destPlateId',
+    dispenseHelper(well, volume, {
+      labware: DEST_LABWARE,
       pipette: 'p300MultiId',
     })
 
@@ -549,8 +515,8 @@ describe('consolidate multi-channel', () => {
 
     sourceWells: ['A1', 'A2', 'A3', 'A4'],
     destWell: 'A12',
-    sourceLabware: 'sourcePlateId',
-    destLabware: 'destPlateId',
+    sourceLabware: SOURCE_LABWARE,
+    destLabware: DEST_LABWARE,
 
     // volume and changeTip should be explicit in tests
 
@@ -562,7 +528,7 @@ describe('consolidate multi-channel', () => {
     mixInDestination: null,
     blowoutLocation: null,
 
-    ...flowRatesAndOffsets,
+    ...getFlowRateAndOffsetParams(),
   }
 
   test('simple multi-channel: cols A1 A2 A3 A4 to col A12', () => {
@@ -576,12 +542,12 @@ describe('consolidate multi-channel', () => {
 
     expect(res.commands).toEqual([
       cmd.pickUpTip('A1', multiParams),
-      cmd.aspirate('A1', 140, multiParams),
-      cmd.aspirate('A2', 140, multiParams),
+      aspirateHelper('A1', 140, multiParams),
+      aspirateHelper('A2', 140, multiParams),
       multiDispense('A12', 280),
 
-      cmd.aspirate('A3', 140, multiParams),
-      cmd.aspirate('A4', 140, multiParams),
+      aspirateHelper('A3', 140, multiParams),
+      aspirateHelper('A4', 140, multiParams),
       multiDispense('A12', 280),
     ])
     expect(res.robotState).toMatchObject(

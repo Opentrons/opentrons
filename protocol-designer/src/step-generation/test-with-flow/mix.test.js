@@ -8,8 +8,21 @@ import {
   getErrorResult,
   commandFixtures as cmd,
 } from './fixtures'
+import {
+  getFlowRateAndOffsetParams,
+  DEFAULT_PIPETTE,
+  SOURCE_LABWARE,
+  DEST_LABWARE,
+  makeAspirateHelper,
+  makeDispenseHelper,
+  blowoutHelper,
+  touchTipHelper,
+} from './fixtures/commandFixtures'
 import { reduceCommandCreators } from '../utils'
 import type { MixArgs } from '../types'
+
+const aspirateHelper = makeAspirateHelper()
+const dispenseHelper = makeDispenseHelper({ labware: SOURCE_LABWARE })
 
 // collapse this compound command creator into the signature of an atomic command creator
 const mix = (args: MixArgs) => (invariantContext, initialRobotState) =>
@@ -21,10 +34,6 @@ const mix = (args: MixArgs) => (invariantContext, initialRobotState) =>
 let invariantContext
 let robotStateWithTip
 let mixinArgs
-let aspirateHelper
-let blowoutHelper
-let dispenseHelper
-let touchTipHelper
 
 beforeEach(() => {
   mixinArgs = {
@@ -32,43 +41,13 @@ beforeEach(() => {
     name: 'mix test',
     description: 'test blah blah',
 
-    pipette: 'p300SingleId',
-    labware: 'sourcePlateId',
+    pipette: DEFAULT_PIPETTE,
+    labware: SOURCE_LABWARE,
 
     blowoutLocation: null,
     touchTip: false,
-    touchTipMmFromBottom: 21,
-
-    aspirateFlowRateUlSec: 3,
-    blowoutFlowRateUlSec: 4.5,
-    dispenseFlowRateUlSec: 4,
-    aspirateOffsetFromBottomMm: 2,
-    blowoutOffsetFromBottomMm: 22,
-    dispenseOffsetFromBottomMm: 1,
+    ...getFlowRateAndOffsetParams(),
   }
-
-  aspirateHelper = (well: string, volume: number) =>
-    cmd.aspirate(well, volume, {
-      flowRate: mixinArgs.aspirateFlowRateUlSec,
-      offsetFromBottomMm: mixinArgs.aspirateOffsetFromBottomMm,
-    })
-
-  blowoutHelper = (labwareId: string) =>
-    cmd.blowout(labwareId, {
-      flowRate: mixinArgs.blowoutFlowRateUlSec,
-      offsetFromBottomMm: mixinArgs.blowoutOffsetFromBottomMm,
-    })
-
-  dispenseHelper = (well: string, volume: number) =>
-    cmd.dispense(well, volume, {
-      flowRate: mixinArgs.dispenseFlowRateUlSec,
-      offsetFromBottomMm: mixinArgs.dispenseOffsetFromBottomMm,
-    })
-
-  touchTipHelper = (well: string) =>
-    cmd.touchTip(well, {
-      offsetFromBottomMm: mixinArgs.touchTipMmFromBottom,
-    })
 
   invariantContext = makeContext()
   robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
@@ -136,7 +115,7 @@ describe('mix: change tip', () => {
 describe('mix: advanced options', () => {
   const volume = 8
   const times = 2
-  const blowoutLabwareId = 'destPlateId'
+  const blowoutLabwareId = DEST_LABWARE
 
   test('flow rate', () => {
     const ASPIRATE_OFFSET = 11
@@ -194,7 +173,7 @@ describe('mix: advanced options', () => {
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual(
-      flatMap(args.wells, (well, idx) => [
+      flatMap(args.wells, (well: string, idx: number) => [
         ...cmd.replaceTipCommands(idx),
         aspirateHelper(well, volume),
         dispenseHelper(well, volume),
