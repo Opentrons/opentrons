@@ -69,16 +69,3 @@ function comparePipettes(sortBy: Array<SortableProps>) {
     return 0
   }
 }
-
-export function getFlowRateDefaultsAllPipettes(
-  flowRateName: 'defaultAspirateFlowRate' | 'defaultDispenseFlowRate'
-): { [pipetteName: string]: number } {
-  return reduce(
-    pipetteNameSpecs,
-    (acc, spec: PipetteNameSpecs, pipetteName: string) => ({
-      ...acc,
-      [pipetteName]: spec[flowRateName].value,
-    }),
-    {}
-  )
-}
