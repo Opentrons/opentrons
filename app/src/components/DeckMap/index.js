@@ -24,7 +24,11 @@ import LabwareItem from './LabwareItem'
 
 // import styles from './styles.css'
 
-type OP = {| ...ContextRouter |}
+type OP = {|
+  ...ContextRouter,
+  modulesRequired: boolean,
+  enableLabwareSelection: boolean,
+|}
 
 type SP = {|
   labwareBySlot: { [DeckSlotId]: Array<Labware> },
@@ -81,6 +85,7 @@ function DeckMap(props: Props) {
               {some(labwareInSlot) &&
                 map(labwareInSlot, labware => (
                   <LabwareItem
+                    key={labware._id}
                     x={slot.position[0]}
                     y={slot.position[1]}
                     labware={labware}
@@ -102,16 +107,9 @@ export { LabwareItem }
 export type { LabwareItemProps } from './LabwareItem'
 
 function mapStateToProps(state: State, ownProps: OP): SP {
-  const {
-    match: {
-      params: { slot: selectedSlot },
-    },
-  } = ownProps
-  const allLabware = robotSelectors.getLabware(state)
-  const areTipracksConfirmed = robotSelectors.getTipracksConfirmed(state)
-
   let modulesBySlot = robotSelectors.getModulesBySlot(state)
 
+  // only show necessary modules if still need to connect some
   if (ownProps.modulesRequired) {
     const robot = getConnectedRobot(state)
     const sessionModules = robotSelectors.getModules(state)
@@ -134,21 +132,28 @@ function mapStateToProps(state: State, ownProps: OP): SP {
     return {
       modulesBySlot,
     }
-  }
-
-  const labwareBySlot = allLabware.reduce(
-    (acc, labware) => ({
-      ...acc,
-      [labware.slot]: [...(acc[labware.slot] || []), labware],
-    }),
-    {}
-  )
-
-  return {
-    labwareBySlot,
-    modulesBySlot,
-    selectedSlot,
-    areTipracksConfirmed,
+  } else {
+    const allLabware = robotSelectors.getLabware(state)
+    const labwareBySlot = allLabware.reduce(
+      (acc, labware) => ({
+        ...acc,
+        [labware.slot]: [...(acc[labware.slot] || []), labware],
+      }),
+      {}
+    )
+    if (!ownProps.enableLabwareSelection) {
+      return {
+        labwareBySlot,
+        modulesBySlot,
+      }
+    } else {
+      return {
+        labwareBySlot,
+        modulesBySlot,
+        selectedSlot: ownProps.match.params.slot,
+        areTipracksConfirmed: robotSelectors.getTipracksConfirmed(state),
+      }
+    }
   }
 }
 

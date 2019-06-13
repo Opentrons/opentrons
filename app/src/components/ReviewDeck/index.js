@@ -13,7 +13,6 @@ import {
 
 import DeckMap from '../DeckMap'
 import Prompt from './Prompt'
-import ReviewDeck from './ReviewDeck'
 import styles from './styles.css'
 
 type OP = {| slot: ?string |}
@@ -28,15 +27,15 @@ export default connect<Props, OP, SP, {||}, State, Dispatch>(
   mapStateToProps,
   null,
   mergeProps
-)(ReviewDeckModal)
+)(ReviewDeck)
 
-function ReviewDeckModal(props: Props) {
+function ReviewDeck(props: Props) {
   const { currentLabware, onClick } = props
 
   return (
     <div className={styles.page_content_dark}>
       {currentLabware && <Prompt {...currentLabware} onClick={onClick} />}
-      <DeckMap />
+      <DeckMap showAll />
     </div>
   )
 }

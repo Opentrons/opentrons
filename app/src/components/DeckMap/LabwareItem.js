@@ -46,7 +46,7 @@ export default function LabwareItem(props: LabwareItemProps) {
 
   const showSpinner = highlighted && labware.calibration === 'moving-to-slot'
   const disabled =
-    (isTiprack && confirmed) || (!isTiprack && !areTipracksConfirmed)
+    (isTiprack && confirmed) || (!isTiprack && areTipracksConfirmed === false)
 
   const title = humanizeLabwareType(type)
 
@@ -100,29 +100,27 @@ export default function LabwareItem(props: LabwareItemProps) {
           x={0}
           y={0 - height}
           transformWithSVG
-        >
-          <div
-            className={cx(styles.labware_ui_wrapper, {
+          innerDivProps={{
+            className: cx(styles.labware_ui_wrapper, {
               [styles.highlighted_border_div]: highlighted,
-            })}
+            }),
+          }}
+        >
+          <Link
+            to={`/calibrate/labware/${slot}`}
+            onClick={handleClick}
+            className={styles.labware_ui_link}
           >
-            <Link
-              to={`/calibrate/labware/${slot}`}
-              onClick={handleClick}
-              className={styles.labware_ui_link}
-            >
-              {true || showSpinner ? (
-                <LabwareSpinner />
-              ) : (
-                <div className={styles.name_overlay}>
-                  <p className={styles.display_name}> {title} </p>
-                  {/* {subtitle && <p className={styles.display_name}>{name}</p>} */}
-                </div>
-              )
-              // module && <ModuleNameOverlay name={module.name} />
-              }
-            </Link>
-          </div>
+            {showSpinner ? (
+              <LabwareSpinner />
+            ) : (
+              <div className={styles.name_overlay}>
+                <p className={styles.display_name}> {title} </p>
+              </div>
+            )
+            // module && <ModuleNameOverlay name={module.name} />
+            }
+          </Link>
         </RobotCoordsForeignDiv>
       </g>
     </>

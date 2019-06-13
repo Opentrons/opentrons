@@ -12,9 +12,9 @@ import { getRobotSettingsState } from '../../robot-api'
 import Page from '../../components/Page'
 import CalibrateLabware from '../../components/CalibrateLabware'
 import SessionHeader from '../../components/SessionHeader'
-import ReviewDeckModal from '../../components/ReviewDeckModal'
+import ReviewDeck from '../../components/ReviewDeck'
 import ConfirmModal from '../../components/CalibrateLabware/ConfirmModal'
-import ConnectModulesModal from '../../components/ConnectModulesModal'
+import ConnectModules from '../../components/ConnectModules'
 
 import type { ContextRouter } from 'react-router'
 import type { State, Dispatch } from '../../types'
@@ -58,9 +58,9 @@ function SetupDeckPage(props: Props) {
 
   const renderPage = () => {
     if (reviewModules && robot) {
-      return <ConnectModulesModal robot={robot} />
+      return <ConnectModules robot={robot} />
     } else if (!deckPopulated && !reviewModules) {
-      return <ReviewDeckModal slot={slot} />
+      return <ReviewDeck slot={slot} />
     } else {
       return <CalibrateLabware labware={labware} />
     }

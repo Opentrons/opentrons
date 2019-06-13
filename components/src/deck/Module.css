@@ -11,12 +11,10 @@
   align-items: center;
 }
 
-.module_icon {
-  color: var(--c-white);
-}
-
 .module_review_icon {
   color: var(--c-white);
+  height: 16px;
+  width: 16px;
 }
 
 .module_review_icon_missing {

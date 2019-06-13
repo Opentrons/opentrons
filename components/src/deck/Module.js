@@ -5,9 +5,7 @@ import cx from 'classnames'
 import { getModuleDisplayName, type ModuleType } from '@opentrons/shared-data'
 
 import { Icon } from '../icons'
-import LabwareWrapper from './LabwareWrapper'
 import RobotCoordsForeignDiv from './RobotCoordsForeignDiv'
-import { CenteredTextSvg } from '../CenteredTextSvg'
 import styles from './Module.css'
 
 export type Props = {
@@ -42,17 +40,6 @@ function ModuleItemContents(props: Props) {
   const { mode, name } = props
   const displayName = getModuleDisplayName(name)
 
-  if (!mode || mode === 'default') {
-    // generic/empty display - just show USB icon
-    return (
-      // x="8" y="20" width="16"
-      <>
-        <Icon className={styles.module_icon} name="usb" />
-        <div className={styles.module_text_wrapper} />
-      </>
-    )
-  }
-
   const message =
     mode === 'missing' ? (
       <>
@@ -72,6 +59,7 @@ function ModuleItemContents(props: Props) {
     missing: 'alert-circle',
     present: 'check-circle',
     info: 'usb',
+    default: 'usb',
   }
 
   return (
@@ -81,7 +69,7 @@ function ModuleItemContents(props: Props) {
         x="8"
         y="0"
         width="16"
-        name={iconNameByMode[mode]}
+        name={iconNameByMode[mode] || 'usb'}
       />
       <div className={styles.module_text_wrapper}>{message}</div>
     </React.Fragment>
