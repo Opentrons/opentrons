@@ -33,7 +33,7 @@ import type {
   SwapSlotContentsAction,
 } from '../../labware-ingred/actions'
 import type { FormData, StepIdType } from '../../form-types'
-// TODO: update labware & pipette state shape to not use v1 #3336
+// TODO: Ian 2019-07-12 update labware & pipette state shape to not use v1 #3336
 import type {
   FileLabwareV1 as FileLabware,
   FilePipetteV1 as FilePipette,
