@@ -1,6 +1,6 @@
 // @flow
 import assert from 'assert'
-import { getLabwareHeight } from '@opentrons/shared-data'
+import { getWellsDepth } from '@opentrons/shared-data'
 import {
   DEFAULT_CHANGE_TIP_OPTION,
   DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
@@ -19,10 +19,6 @@ const mixFormToArgs = (
 ): MixStepArgs => {
   console.log('mixFormToArgs', { hydratedFormData })
   const { labware, pipette } = hydratedFormData
-  const touchTip = Boolean(hydratedFormData['mix_touchTip_checkbox'])
-  const touchTipMmFromBottom =
-    hydratedFormData['mix_touchTip_mmFromBottom'] ||
-    getLabwareHeight(labware.def) + DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
 
   let unorderedWells = hydratedFormData.wells || []
   const orderFirst = hydratedFormData.mix_wellOrder_first
@@ -34,6 +30,12 @@ const mixFormToArgs = (
     orderFirst,
     orderSecond
   )
+
+  const touchTip = Boolean(hydratedFormData['mix_touchTip_checkbox'])
+  const touchTipMmFromBottom =
+    hydratedFormData['mix_touchTip_mmFromBottom'] ||
+    getWellsDepth(labware.def, orderedWells) +
+      DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
 
   const volume = hydratedFormData.volume || 0
   const times = hydratedFormData.times || 0
@@ -52,11 +54,6 @@ const mixFormToArgs = (
   const dispenseOffsetFromBottomMm =
     hydratedFormData['mix_mmFromBottom'] || DEFAULT_MM_FROM_BOTTOM_DISPENSE
 
-  // Blowout settings
-  const blowoutFlowRateUlSec = dispenseFlowRateUlSec
-  const blowoutOffsetFromBottomMm =
-    getLabwareHeight(labware.def) + DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
-
   // It's radiobutton, so one should always be selected.
   // One changeTip option should always be selected.
   assert(
@@ -68,6 +65,13 @@ const mixFormToArgs = (
   const blowoutLocation = hydratedFormData['blowout_checkbox']
     ? hydratedFormData['blowout_location']
     : null
+
+  // Blowout settings
+  const blowoutFlowRateUlSec = dispenseFlowRateUlSec
+  const blowoutOffsetFromBottomMm = blowoutLocation
+    ? getWellsDepth(labware.def, [blowoutLocation]) +
+      DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
+    : 0
 
   return {
     commandCreatorFnName: 'mix',
