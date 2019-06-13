@@ -17,7 +17,10 @@ export type PDMetadata = {
   orderedStepIds: $PropertyType<StepformRoot, 'orderedStepIds'>,
 
   defaultValues: {
-    // TODO IMMEDIATELY
+    aspirate_mmFromBottom: number,
+    dispense_mmFromBottom: number,
+    touchTip_mmFromTop: number,
+    blowout_mmFromTop: number,
   },
 }
 
