@@ -1,5 +1,4 @@
 // @flow
-import reduce from 'lodash/reduce'
 import pipetteNameSpecs from '../pipette/definitions/pipetteNameSpecs.json'
 import pipetteModelSpecs from '../pipette/definitions/pipetteModelSpecs.json'
 
