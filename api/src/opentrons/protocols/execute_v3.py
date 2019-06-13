@@ -52,7 +52,7 @@ def load_labware(protocol_data):
     return loaded_labware
 
 
-def _get_location(loaded_labware, command_type, params, default_values):
+def _get_location(loaded_labware, command_type, params):
     labwareId = params.get('labware')
     if not labwareId:
         # not all commands use labware param
@@ -64,23 +64,10 @@ def _get_location(loaded_labware, command_type, params, default_values):
             'Command tried to use labware "{}", but that ID does not exist ' +
             'in protocol\'s "labware" section'.format(labwareId))
 
-    # default offset from bottom for aspirate/dispense commands
-    offset_default = default_values.get(
-        '{}MmFromBottom'.format(command_type))
-
-    # optional command-specific value, fallback to default
-    offset_from_bottom = params.get(
-        'offsetFromBottomMm', offset_default)
+    offset_from_bottom = params['offsetFromBottomMm']
 
     if offset_from_bottom is None:
-        # not all commands use offsets
-
-        # touch-tip uses offset from top, not bottom, as default
-        # when offsetFromBottomMm command-specific value is unset
-        if command_type == 'touchTip':
-            return lw.wells(well).top(
-                z=default_values['touchTipMmFromTop'])
-
+        # not all commands use offsets (eg pick up tip / drop tip)
         return lw.wells(well)
 
     return lw.wells(well).bottom(offset_from_bottom)
@@ -94,41 +81,21 @@ def _get_pipette(command_params, loaded_pipettes):
 # TODO (Ian 2018-08-22) once Pipette has more sensible way of managing
 # flow rate value (eg as an argument in aspirate/dispense fns), remove this
 def _set_flow_rate(
-        pipette_name, pipette, command_type, params, default_values):
+        pipette_name, pipette, command_type, params):
     """
-    Set flow rate in uL/mm, to value obtained from command's params,
-    or if unspecified in command params, then from protocol's "defaultValues".
+    Set flow rate in uL/mm, to value obtained from command's params
     """
-    default_aspirate = default_values.get(
-        'aspirateFlowRate', {}).get(pipette_name)
-
-    default_dispense = default_values.get(
-        'dispenseFlowRate', {}).get(pipette_name)
-
     flow_rate_param = params.get('flowRate')
 
-    if flow_rate_param is not None:
-        if command_type == 'aspirate':
-            pipette.set_flow_rate(
-                aspirate=flow_rate_param,
-                dispense=default_dispense)
-            return
-        if command_type == 'dispense':
-            pipette.set_flow_rate(
-                aspirate=default_aspirate,
-                dispense=flow_rate_param)
-            return
-
     pipette.set_flow_rate(
-        aspirate=default_aspirate,
-        dispense=default_dispense
-    )
+        aspirate=flow_rate_param,
+        dispense=flow_rate_param)
+    return
 
 
 # C901 code complexity is due to long elif block, ok in this case (Ian+Ben)
 def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: C901 E501
     commands = protocol_data['commands']
-    default_values = protocol_data.get('defaultValues', {})
 
     for command_item in commands:
         command_type = command_item['command']
@@ -141,7 +108,7 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
         pipette_name = protocol_pipette_data.get('name')
 
         location = _get_location(
-            loaded_labware, command_type, params, default_values)
+            loaded_labware, command_type, params)
         volume = params.get('volume')
 
         if pipette:
@@ -150,7 +117,7 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
             # Flow rate is persisted inside the Pipette object
             # and is settable but not easily gettable
             _set_flow_rate(
-                pipette_name, pipette, command_type, params, default_values)
+                pipette_name, pipette, command_type, params)
 
         if command_type == 'delay':
             wait = params.get('wait')
@@ -188,8 +155,7 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
             (well_object, loc_tuple) = location
 
             # Use the offset baked into the well_object.
-            # Do not allow API to apply its v_offset kwarg default value,
-            # and do not apply the JSON protocol's default offset.
+            # Do not allow API to apply its v_offset kwarg default value
             z_from_bottom = loc_tuple[2]
             offset_from_top = (
                 well_object.properties['depth'] - z_from_bottom) * -1
