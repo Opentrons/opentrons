@@ -77,9 +77,7 @@ beforeEach(() => {
 
 describe('distribute: minimal example', () => {
   test('single channel; 60uL from A1 -> A2, A3; no tip pickup', () => {
-    // TODO Ian 2018-05-03 distributeArgs needs to be typed because the
-    // commandCreatorNoErrors wrapper casts the arg type to any :(
-    const distributeArgs: DistributeArgs = {
+    const distributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
       destWells: ['A2', 'A3'],

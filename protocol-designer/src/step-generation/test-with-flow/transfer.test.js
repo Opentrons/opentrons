@@ -425,14 +425,11 @@ describe('single transfer exceeding pipette max', () => {
   })
 
   test('split up volume without going below pipette min', () => {
-    // TODO: Ian 2019-01-04 for some reason, doing mixinArgs = {...mixinArgs, ...etc}
-    // works everywhere but here - here, it makes Jest fail with "Jest encountered an unexpected token"
-    const _mixinArgs = {
+    mixinArgs = {
       ...mixinArgs,
       volume: 629,
       changeTip: 'never', // don't test tip use here
     }
-    mixinArgs = _mixinArgs
 
     // begin with tip on pipette
     robotStateWithTip.tipState.pipettes.p300SingleId = true
