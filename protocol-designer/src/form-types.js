@@ -185,6 +185,32 @@ export type HydratedMoveLiquidFormData = {
   },
 }
 
+export type HydratedMixFormDataLegacy = {
+  id: string,
+  stepType: 'mix',
+  stepName: string,
+  stepDetails: ?string,
+
+  pipette: PipetteEntity,
+  volume: number,
+  changeTip: ChangeTipOptions,
+
+  labware: LabwareEntity,
+  wells: Array<string>,
+  mix_wellOrder_first: WellOrderOption,
+  mix_wellOrder_second: WellOrderOption,
+  aspirate_flowRate: ?number,
+  mix_mmFromBottom: ?number,
+  mix_touchTip_checkbox: ?boolean,
+  mix_touchTip_mmFromBottom: ?number,
+  times: ?number,
+
+  dispense_flowRate: ?number,
+
+  blowout_checkbox: ?boolean,
+  blowout_location: ?string, // labwareId or 'SOURCE_WELL' or 'DEST_WELL'
+}
+
 // TODO: Ian 2019-01-17 Moving away from this and towards nesting all form fields
 // inside `fields` key, but deprecating transfer/consolidate/distribute is a pre-req
 export type HydratedMoveLiquidFormDataLegacy = {
