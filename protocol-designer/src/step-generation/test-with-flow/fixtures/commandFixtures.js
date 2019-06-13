@@ -169,38 +169,6 @@ export const touchTip = (
 })
 
 // TODO IMMEDIATELY: remove
-export const aspirate = (
-  well: string,
-  volume: number,
-  params?: $Shape<AspirateArgsV3>
-): Command => ({
-  command: 'aspirate',
-  params: {
-    pipette: DEFAULT_PIPETTE,
-    labware: SOURCE_LABWARE,
-    volume,
-    well,
-    ...params,
-  },
-})
-
-// TODO IMMEDIATELY: remove
-export const dispense = (
-  well: string,
-  volume: number,
-  params?: $Shape<DispenseArgsV3>
-): Command => ({
-  command: 'dispense',
-  params: {
-    pipette: DEFAULT_PIPETTE,
-    labware: SOURCE_LABWARE,
-    volume,
-    well,
-    ...params,
-  },
-})
-
-// TODO IMMEDIATELY: remove
 export const blowout = (
   labware?: string,
   params?: {|

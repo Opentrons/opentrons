@@ -118,44 +118,23 @@ describe('mix: advanced options', () => {
   const blowoutLabwareId = DEST_LABWARE
 
   test('flow rate', () => {
-    const ASPIRATE_OFFSET = 11
-    const DISPENSE_OFFSET = 12
-    const BLOWOUT_OFFSET = 13
-    const ASPIRATE_FLOW_RATE = 3
-    const DISPENSE_FLOW_RATE = 6
-    const BLOWOUT_FLOW_RATE = 9
-    const args: MixArgs = {
+    const args = {
       ...mixinArgs,
       volume,
       times,
       wells: ['A1'],
       changeTip: 'once',
-      aspirateOffsetFromBottomMm: ASPIRATE_OFFSET,
-      blowoutOffsetFromBottomMm: BLOWOUT_OFFSET,
-      dispenseOffsetFromBottomMm: DISPENSE_OFFSET,
-      aspirateFlowRateUlSec: ASPIRATE_FLOW_RATE,
-      blowoutFlowRateUlSec: BLOWOUT_FLOW_RATE,
-      dispenseFlowRateUlSec: DISPENSE_FLOW_RATE,
-    }
-
-    const aspirateParams = {
-      flowRate: ASPIRATE_FLOW_RATE,
-      offsetFromBottomMm: ASPIRATE_OFFSET,
-    }
-    const dispenseParams = {
-      flowRate: DISPENSE_FLOW_RATE,
-      offsetFromBottomMm: DISPENSE_OFFSET,
+      ...getFlowRateAndOffsetParams(),
     }
 
     const result = mix(args)(invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       ...cmd.replaceTipCommands(0),
-      { ...cmd.aspirate('A1', volume, aspirateParams) },
-      { ...cmd.dispense('A1', volume, dispenseParams) },
-
-      { ...cmd.aspirate('A1', volume, aspirateParams) },
-      { ...cmd.dispense('A1', volume, dispenseParams) },
+      aspirateHelper('A1', volume),
+      dispenseHelper('A1', volume),
+      aspirateHelper('A1', volume),
+      dispenseHelper('A1', volume),
     ])
   })
 
