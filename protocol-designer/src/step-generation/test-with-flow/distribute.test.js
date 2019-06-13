@@ -5,7 +5,6 @@ import {
   makeContext,
   getSuccessResult,
   getErrorResult,
-  commandFixtures as cmd,
 } from './fixtures'
 import { reduceCommandCreators } from '../utils'
 import _distribute from '../commandCreators/compound/distribute'
@@ -18,12 +17,15 @@ import {
   makeAspirateHelper,
   makeDispenseHelper,
   blowoutHelper,
-  touchTipHelper,
+  makeTouchTipHelper,
+  pickUpTipHelper,
+  dropTipHelper,
 } from './fixtures/commandFixtures'
 import type { DistributeArgs } from '../types'
 
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()
+const touchTipHelper = makeTouchTipHelper()
 
 // collapse this compound command creator into the signature of an atomic command creator
 const distribute = (args: DistributeArgs) => (
@@ -115,8 +117,8 @@ describe('tip handling for multiple distribute chunks', () => {
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual([
-      cmd.dropTip('A1'),
-      cmd.pickUpTip('A1'),
+      dropTipHelper('A1'),
+      pickUpTipHelper('A1'),
       aspirateHelper('A1', 240),
       dispenseHelper('A2', 90),
       dispenseHelper('A3', 90),
@@ -146,16 +148,16 @@ describe('tip handling for multiple distribute chunks', () => {
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual([
-      cmd.dropTip('A1'),
-      cmd.pickUpTip('A1'),
+      dropTipHelper('A1'),
+      pickUpTipHelper('A1'),
       aspirateHelper('A1', 240),
       dispenseHelper('A2', 90),
       dispenseHelper('A3', 90),
       blowoutSingleToTrash,
 
       // next chunk, change tip
-      cmd.dropTip('A1'),
-      cmd.pickUpTip('B1'),
+      dropTipHelper('A1'),
+      pickUpTipHelper('B1'),
       aspirateHelper('A1', 240),
       dispenseHelper('A4', 90),
       dispenseHelper('A5', 90),

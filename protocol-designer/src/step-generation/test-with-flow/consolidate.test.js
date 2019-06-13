@@ -10,7 +10,6 @@ import {
   getTiprackTipstate,
   getSuccessResult,
   getErrorResult,
-  commandFixtures as cmd,
 } from './fixtures'
 import { reduceCommandCreators } from '../utils'
 import {
@@ -21,13 +20,17 @@ import {
   getFlowRateAndOffsetParams,
   makeAspirateHelper,
   makeDispenseHelper,
+  makeTouchTipHelper,
   blowoutHelper,
+  pickUpTipHelper,
+  dropTipHelper,
 } from './fixtures/commandFixtures'
 import _consolidate from '../commandCreators/compound/consolidate'
 import type { ConsolidateArgs } from '../types'
 
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()
+const touchTipHelper = makeTouchTipHelper()
 
 // collapse this compound command creator into the signature of an atomic command creator
 const consolidate = (args: ConsolidateArgs) => (
@@ -128,7 +131,7 @@ describe('consolidate single-channel', () => {
     expect(res.robotState).toMatchObject(robotStatePickedUpOneTip)
 
     expect(res.commands).toEqual([
-      cmd.pickUpTip('A1'),
+      pickUpTipHelper('A1'),
       aspirateHelper('A1', 50),
       aspirateHelper('A2', 50),
       dispenseHelper('B1', 100),
@@ -146,7 +149,7 @@ describe('consolidate single-channel', () => {
     const result = consolidate(data)(invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
-      cmd.pickUpTip('A1'),
+      pickUpTipHelper('A1'),
       aspirateHelper('A1', 150),
       aspirateHelper('A2', 150),
       dispenseHelper('B1', 300),
@@ -169,13 +172,13 @@ describe('consolidate single-channel', () => {
     const result = consolidate(data)(invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
-      cmd.pickUpTip('A1'),
+      pickUpTipHelper('A1'),
       aspirateHelper('A1', 150),
       aspirateHelper('A2', 150),
       dispenseHelper('B1', 300),
-      cmd.dropTip('A1'),
+      dropTipHelper('A1'),
 
-      cmd.pickUpTip('B1'),
+      pickUpTipHelper('B1'),
       aspirateHelper('A3', 150),
       aspirateHelper('A4', 150),
       dispenseHelper('B1', 300),
@@ -206,7 +209,7 @@ describe('consolidate single-channel', () => {
     const result = consolidate(data)(invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
-      cmd.pickUpTip('A1'),
+      pickUpTipHelper('A1'),
       aspirateHelper('A1', 150),
       aspirateHelper('A2', 150),
       dispenseHelper('B1', 300),
@@ -253,7 +256,7 @@ describe('consolidate single-channel', () => {
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual([
-      cmd.pickUpTip('A1'),
+      pickUpTipHelper('A1'),
 
       ...tripleMix('A1', 50, SOURCE_LABWARE),
 
@@ -282,7 +285,7 @@ describe('consolidate single-channel', () => {
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual([
-      cmd.pickUpTip('A1'),
+      pickUpTipHelper('A1'),
       // Start mix
       aspirateHelper('A1', 50),
       dispenseHelper('A1', 50, { labware: SOURCE_LABWARE }),
@@ -323,7 +326,7 @@ describe('consolidate single-channel', () => {
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual([
-      cmd.pickUpTip('A1'),
+      pickUpTipHelper('A1'),
       aspirateHelper('A1', 100),
       aspirateHelper('A2', 100),
       aspirateHelper('A3', 100),
@@ -352,7 +355,7 @@ describe('consolidate single-channel', () => {
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual([
-      cmd.pickUpTip('A1'),
+      pickUpTipHelper('A1'),
       aspirateHelper('A1', 100),
       aspirateHelper('A2', 100),
       aspirateHelper('A3', 100),
@@ -387,7 +390,7 @@ describe('consolidate single-channel', () => {
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual([
-      cmd.pickUpTip('A1'),
+      pickUpTipHelper('A1'),
 
       // pre-wet tip
       aspirateHelper('A1', preWetVol),
@@ -425,21 +428,21 @@ describe('consolidate single-channel', () => {
       offsetFromBottomMm: mixinArgs.touchTipAfterAspirateOffsetMmFromBottom,
     }
     expect(res.commands).toEqual([
-      cmd.pickUpTip('A1'),
+      pickUpTipHelper('A1'),
 
       aspirateHelper('A1', 150),
-      cmd.touchTip('A1', touchTipAfterAsp),
+      touchTipHelper('A1', touchTipAfterAsp),
 
       aspirateHelper('A2', 150),
-      cmd.touchTip('A2', touchTipAfterAsp),
+      touchTipHelper('A2', touchTipAfterAsp),
 
       dispenseHelper('B1', 300),
 
       aspirateHelper('A3', 150),
-      cmd.touchTip('A3', touchTipAfterAsp),
+      touchTipHelper('A3', touchTipAfterAsp),
 
       aspirateHelper('A4', 150),
-      cmd.touchTip('A4', touchTipAfterAsp),
+      touchTipHelper('A4', touchTipAfterAsp),
 
       dispenseHelper('B1', 300),
     ])
@@ -462,19 +465,19 @@ describe('consolidate single-channel', () => {
       offsetFromBottomMm: mixinArgs.touchTipAfterDispenseOffsetMmFromBottom,
     }
     expect(res.commands).toEqual([
-      cmd.pickUpTip('A1'),
+      pickUpTipHelper('A1'),
 
       aspirateHelper('A1', 150),
       aspirateHelper('A2', 150),
 
       dispenseHelper('B1', 300),
-      cmd.touchTip('B1', touchTipAfterDisp),
+      touchTipHelper('B1', touchTipAfterDisp),
 
       aspirateHelper('A3', 150),
       aspirateHelper('A4', 150),
 
       dispenseHelper('B1', 300),
-      cmd.touchTip('B1', touchTipAfterDisp),
+      touchTipHelper('B1', touchTipAfterDisp),
     ])
     expect(res.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -541,7 +544,7 @@ describe('consolidate multi-channel', () => {
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual([
-      cmd.pickUpTip('A1', multiParams),
+      pickUpTipHelper('A1', multiParams),
       aspirateHelper('A1', 140, multiParams),
       aspirateHelper('A2', 140, multiParams),
       multiDispense('A12', 280),

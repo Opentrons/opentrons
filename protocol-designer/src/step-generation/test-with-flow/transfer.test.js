@@ -3,7 +3,6 @@ import merge from 'lodash/merge'
 import {
   getRobotStateWithTipStandard,
   makeContext,
-  commandFixtures as cmd,
   getSuccessResult,
   getErrorResult,
 } from './fixtures'
@@ -15,13 +14,16 @@ import {
   DEST_LABWARE,
   makeAspirateHelper,
   makeDispenseHelper,
-  touchTipHelper,
+  makeTouchTipHelper,
+  pickUpTipHelper,
+  dropTipHelper,
 } from './fixtures/commandFixtures'
 import _transfer from '../commandCreators/compound/transfer'
 import type { TransferArgs } from '../types'
 
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()
+const touchTipHelper = makeTouchTipHelper()
 
 // collapse this compound command creator into the signature of an atomic command creator
 const transfer = (args: TransferArgs) => (
@@ -86,7 +88,7 @@ describe('pick up tip if no tip on pipette', () => {
       const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
 
-      expect(res.commands[0]).toEqual(cmd.pickUpTip('A1'))
+      expect(res.commands[0]).toEqual(pickUpTipHelper('A1'))
     })
   })
 
@@ -250,7 +252,7 @@ describe('single transfer exceeding pipette max', () => {
     const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
-      cmd.pickUpTip('A1'),
+      pickUpTipHelper('A1'),
       aspirateHelper('A1', 300),
       dispenseHelper('A3', 300),
       aspirateHelper('A1', 50),
@@ -275,28 +277,28 @@ describe('single transfer exceeding pipette max', () => {
     const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
-      cmd.pickUpTip('A1'),
+      pickUpTipHelper('A1'),
 
       aspirateHelper('A1', 300),
       dispenseHelper('A3', 300),
 
       // replace tip before next asp-disp chunk
-      cmd.dropTip('A1'),
-      cmd.pickUpTip('B1'),
+      dropTipHelper('A1'),
+      pickUpTipHelper('B1'),
 
       aspirateHelper('A1', 50),
       dispenseHelper('A3', 50),
 
       // replace tip before next source-dest well pair
-      cmd.dropTip('A1'),
-      cmd.pickUpTip('C1'),
+      dropTipHelper('A1'),
+      pickUpTipHelper('C1'),
 
       aspirateHelper('B1', 300),
       dispenseHelper('B3', 300),
 
       // replace tip before next asp-disp chunk
-      cmd.dropTip('A1'),
-      cmd.pickUpTip('D1'),
+      dropTipHelper('A1'),
+      pickUpTipHelper('D1'),
 
       aspirateHelper('B1', 50),
       dispenseHelper('B3', 50),
@@ -327,7 +329,7 @@ describe('single transfer exceeding pipette max', () => {
     const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
-      cmd.pickUpTip('A1'),
+      pickUpTipHelper('A1'),
 
       aspirateHelper('A1', 300),
       dispenseHelper('B1', 300),
@@ -343,8 +345,8 @@ describe('single transfer exceeding pipette max', () => {
       dispenseHelper('B2', 50),
 
       // new source, different dest: change tip
-      cmd.dropTip('A1'),
-      cmd.pickUpTip('B1'),
+      dropTipHelper('A1'),
+      pickUpTipHelper('B1'),
 
       aspirateHelper('A2', 300),
       dispenseHelper('B2', 300),
@@ -366,7 +368,7 @@ describe('single transfer exceeding pipette max', () => {
     const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
-      cmd.pickUpTip('A1'),
+      pickUpTipHelper('A1'),
 
       aspirateHelper('A1', 300),
       dispenseHelper('B1', 300),
@@ -375,8 +377,8 @@ describe('single transfer exceeding pipette max', () => {
       dispenseHelper('B1', 50),
 
       // same source, different dest: change tip
-      cmd.dropTip('A1'),
-      cmd.pickUpTip('B1'),
+      dropTipHelper('A1'),
+      pickUpTipHelper('B1'),
 
       aspirateHelper('A1', 300),
       dispenseHelper('B2', 300),

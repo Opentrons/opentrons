@@ -2,13 +2,15 @@
 import { tiprackWellNamesFlat } from './data'
 import type {
   AspirateArgsV3,
+  BlowoutArgsV3,
   DispenseArgsV3,
+  TouchTipArgsV3,
   CommandV3 as Command,
 } from '@opentrons/shared-data'
 
 export const replaceTipCommands = (tip: number | string): Array<Command> => [
-  dropTip('A1'),
-  pickUpTip(tip),
+  dropTipHelper('A1'),
+  pickUpTipHelper(tip),
 ]
 
 // NOTE: make sure none of these numbers match each other!
@@ -56,7 +58,7 @@ export const makeAspirateHelper = (bakedParams?: $Shape<AspirateArgsV3>) => (
   well: string,
   volume: number,
   params?: $Shape<AspirateArgsV3>
-) => ({
+): Command => ({
   command: 'aspirate',
   params: {
     ..._defaultAspirateParams,
@@ -71,13 +73,8 @@ export const makeAspirateHelper = (bakedParams?: $Shape<AspirateArgsV3>) => (
 
 export const blowoutHelper = (
   labware?: ?string,
-  params?: {|
-    offsetFromBottomMm?: number,
-    flowRate?: number,
-    pipette?: string,
-    well?: string, // TODO IMMEDIATELY use $Shape?
-  |}
-) => ({
+  params?: $Shape<BlowoutArgsV3>
+): Command => ({
   command: 'blowout',
   params: {
     pipette: DEFAULT_PIPETTE,
@@ -99,7 +96,7 @@ export const makeDispenseHelper = (bakedParams?: $Shape<DispenseArgsV3>) => (
   well: string,
   volume: number,
   params?: $Shape<DispenseArgsV3>
-) => ({
+): Command => ({
   command: 'dispense',
   params: {
     ..._defaultDispenseParams,
@@ -110,15 +107,19 @@ export const makeDispenseHelper = (bakedParams?: $Shape<DispenseArgsV3>) => (
   },
 })
 
-export const touchTipHelper = (
+const _defaultTouchTipParams = {
+  pipette: DEFAULT_PIPETTE,
+  labware: SOURCE_LABWARE,
+  offsetFromBottomMm: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
+}
+export const makeTouchTipHelper = (bakedParams?: $Shape<TouchTipArgsV3>) => (
   well: string,
-  params?: {| offsetFromBottomMm?: number, labware?: string |}
-) => ({
+  params?: $Shape<TouchTipArgsV3>
+): Command => ({
   command: 'touchTip',
   params: {
-    pipette: DEFAULT_PIPETTE,
-    labware: SOURCE_LABWARE, // TODO IMMEDIATELY: don't hard-code here. Required arg???
-    offsetFromBottomMm: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
+    ..._defaultTouchTipParams,
+    ...bakedParams,
     well,
     ...params,
   },
@@ -126,9 +127,7 @@ export const touchTipHelper = (
 
 // =================
 
-// TODO IMMEDIATELY: make a factory that bakes args into these fns, don't bake them in here...???
-
-export const dropTip = (
+export const dropTipHelper = (
   well: string,
   params?: {| pipette?: string, labware?: string |}
 ): Command => ({
@@ -141,7 +140,7 @@ export const dropTip = (
   },
 })
 
-export const pickUpTip = (
+export const pickUpTipHelper = (
   tip: number | string,
   params?: {| pipette?: string, labware?: string |}
 ): Command => ({
@@ -151,38 +150,5 @@ export const pickUpTip = (
     labware: 'tiprack1Id',
     ...params,
     well: typeof tip === 'string' ? tip : tiprackWellNamesFlat[tip],
-  },
-})
-
-// TODO IMMEDIATELY: remove
-export const touchTip = (
-  well: string,
-  params: {| offsetFromBottomMm: number, labware?: string |}
-): Command => ({
-  command: 'touchTip',
-  params: {
-    labware: SOURCE_LABWARE,
-    pipette: DEFAULT_PIPETTE,
-    ...params,
-    well,
-  },
-})
-
-// TODO IMMEDIATELY: remove
-export const blowout = (
-  labware?: string,
-  params?: {|
-    offsetFromBottomMm: number,
-    flowRate: number,
-    pipette?: string,
-    well?: string,
-  |}
-): Command => ({
-  command: 'blowout',
-  params: {
-    pipette: DEFAULT_PIPETTE,
-    well: 'A1',
-    labware: labware || FIXED_TRASH_ID,
-    ...params,
   },
 })
