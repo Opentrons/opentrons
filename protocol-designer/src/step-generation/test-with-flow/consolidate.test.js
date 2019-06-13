@@ -55,7 +55,7 @@ let robotInitialStateNoLiquidState
 let robotStatePickedUpOneTipNoLiquidState
 let robotStatePickedUpMultiTipsNoLiquidState
 let robotStatePickedUpOneTip
-let baseArgs
+let mixinArgs
 
 beforeEach(() => {
   invariantContext = makeContext()
@@ -88,7 +88,7 @@ beforeEach(() => {
     }
   )
 
-  baseArgs = {
+  mixinArgs = {
     // `volume` and `changeTip` should be explicit in tests,
     // those fields intentionally omitted from here
     ...getFlowRateAndOffsetParams(),
@@ -116,7 +116,7 @@ beforeEach(() => {
 describe('consolidate single-channel', () => {
   test('Minimal single-channel: A1 A2 to B1, 50uL with p300', () => {
     const data = {
-      ...baseArgs,
+      ...mixinArgs,
       sourceWells: ['A1', 'A2'],
       volume: 50,
       changeTip: 'once',
@@ -138,7 +138,7 @@ describe('consolidate single-channel', () => {
   test('Single-channel with exceeding pipette max: A1 A2 A3 A4 to B1, 150uL with p300', () => {
     // TODO Ian 2018-05-03 is this a duplicate of exceeding max with changeTip="once"???
     const data = {
-      ...baseArgs,
+      ...mixinArgs,
       volume: 150,
       changeTip: 'once',
     }
@@ -161,7 +161,7 @@ describe('consolidate single-channel', () => {
 
   test('Single-channel with exceeding pipette max: with changeTip="always"', () => {
     const data = {
-      ...baseArgs,
+      ...mixinArgs,
       volume: 150,
       changeTip: 'always',
     }
@@ -198,7 +198,7 @@ describe('consolidate single-channel', () => {
 
   test('Single-channel with exceeding pipette max: with changeTip="once"', () => {
     const data = {
-      ...baseArgs,
+      ...mixinArgs,
       volume: 150,
       changeTip: 'once',
     }
@@ -221,7 +221,7 @@ describe('consolidate single-channel', () => {
 
   test('Single-channel with exceeding pipette max: with changeTip="never"', () => {
     const data = {
-      ...baseArgs,
+      ...mixinArgs,
       volume: 150,
       changeTip: 'never',
     }
@@ -243,7 +243,7 @@ describe('consolidate single-channel', () => {
 
   test('mix on aspirate should mix before aspirate in first well of chunk only', () => {
     const data = {
-      ...baseArgs,
+      ...mixinArgs,
       volume: 100,
       changeTip: 'once',
       mixFirstAspirate: { times: 3, volume: 50 },
@@ -272,7 +272,7 @@ describe('consolidate single-channel', () => {
 
   test('mix on aspirate', () => {
     const data = {
-      ...baseArgs,
+      ...mixinArgs,
       volume: 125,
       changeTip: 'once',
       mixFirstAspirate: { times: 3, volume: 50 },
@@ -313,7 +313,7 @@ describe('consolidate single-channel', () => {
 
   test('mix after dispense', () => {
     const data = {
-      ...baseArgs,
+      ...mixinArgs,
       volume: 100,
       changeTip: 'once',
       mixInDestination: { times: 3, volume: 53 },
@@ -341,7 +341,7 @@ describe('consolidate single-channel', () => {
 
   test('mix after dispense with blowout to trash: first mix, then blowout', () => {
     const data = {
-      ...baseArgs,
+      ...mixinArgs,
       volume: 100,
       changeTip: 'once',
       mixInDestination: { times: 3, volume: 54 },
@@ -374,7 +374,7 @@ describe('consolidate single-channel', () => {
   test('"pre-wet tip" should aspirate and dispense consolidate volume from first well of each chunk', () => {
     // TODO LATER Ian 2018-02-13 Should it be 2/3 max volume instead?
     const data = {
-      ...baseArgs,
+      ...mixinArgs,
       volume: 150,
       changeTip: 'once',
       preWetTip: true,
@@ -412,7 +412,7 @@ describe('consolidate single-channel', () => {
 
   test('touchTip after aspirate should touch tip after every aspirate command', () => {
     const data = {
-      ...baseArgs,
+      ...mixinArgs,
       volume: 150,
       changeTip: 'once',
       touchTipAfterAspirate: true,
@@ -422,7 +422,7 @@ describe('consolidate single-channel', () => {
     const res = getSuccessResult(result)
 
     const touchTipAfterAsp = {
-      offsetFromBottomMm: baseArgs.touchTipAfterAspirateOffsetMmFromBottom,
+      offsetFromBottomMm: mixinArgs.touchTipAfterAspirateOffsetMmFromBottom,
     }
     expect(res.commands).toEqual([
       cmd.pickUpTip('A1'),
@@ -448,7 +448,7 @@ describe('consolidate single-channel', () => {
 
   test('touchTip after dispense should touch tip after dispense on destination well', () => {
     const data = {
-      ...baseArgs,
+      ...mixinArgs,
       volume: 150,
       changeTip: 'once',
       touchTipAfterDispense: true,
@@ -459,7 +459,7 @@ describe('consolidate single-channel', () => {
 
     const touchTipAfterDisp = {
       labware: DEST_LABWARE,
-      offsetFromBottomMm: baseArgs.touchTipAfterDispenseOffsetMmFromBottom,
+      offsetFromBottomMm: mixinArgs.touchTipAfterDispenseOffsetMmFromBottom,
     }
     expect(res.commands).toEqual([
       cmd.pickUpTip('A1'),
@@ -481,7 +481,7 @@ describe('consolidate single-channel', () => {
 
   test('invalid pipette ID should return error', () => {
     const data = {
-      ...baseArgs,
+      ...mixinArgs,
       sourceWells: ['A1', 'A2'],
       volume: 150,
       changeTip: 'once',

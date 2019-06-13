@@ -43,7 +43,6 @@ let blowoutSingleToTrash
 let blowoutSingleToSourceA1
 
 beforeEach(() => {
-  // TODO IMMEDIATELY call this var the same thing in transfer/consolidate/distribute
   mixinArgs = {
     ...getFlowRateAndOffsetParams(),
     commandCreatorFnName: 'distribute',
