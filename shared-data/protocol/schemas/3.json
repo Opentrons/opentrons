@@ -59,7 +59,7 @@
         "flowRate": {
           "description": "Flow rate in uL/sec. Must be greater than 0",
           "type": "number",
-          "exclusiveMinimum": 0
+          "minumum": 0
         }
       }
     },

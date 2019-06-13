@@ -64,7 +64,7 @@ def _get_location(loaded_labware, command_type, params):
             'Command tried to use labware "{}", but that ID does not exist ' +
             'in protocol\'s "labware" section'.format(labwareId))
 
-    offset_from_bottom = params['offsetFromBottomMm']
+    offset_from_bottom = params.get('offsetFromBottomMm')
 
     if offset_from_bottom is None:
         # not all commands use offsets (eg pick up tip / drop tip)
