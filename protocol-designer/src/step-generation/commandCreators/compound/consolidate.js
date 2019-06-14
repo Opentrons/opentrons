@@ -188,8 +188,8 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
           flowRate: dispenseFlowRateUlSec,
           offsetFromBottomMm: dispenseOffsetFromBottomMm,
         }),
-        ...touchTipAfterDispenseCommands,
         ...mixAfterCommands,
+        ...touchTipAfterDispenseCommands,
         ...blowoutCommand,
       ]
     }

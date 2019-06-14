@@ -233,8 +233,8 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
               flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
             }),
-            ...touchTipAfterDispenseCommands,
             ...mixInDestinationCommands,
+            ...touchTipAfterDispenseCommands,
             ...blowoutCommand,
           ]
 
