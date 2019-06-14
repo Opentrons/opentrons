@@ -88,8 +88,8 @@ export function getWellDefsForSVG(labwareName: string) {
 export const getLabwareDefURI = (def: LabwareDefinition2): string =>
   `${def.namespace}/${def.parameters.loadName}/${def.version}`
 
-// NOTE: this is used in PD for converting "mm from top" to "mm from bottom"
-// assumes wells have same offset because multi-offset not yet supported.
+// NOTE: this is used in PD for converting "offset from top" to "mm from bottom".
+// Assumes all wells have same offset because multi-offset not yet supported.
 // TODO: Ian 2019-07-13 return {[string: well]: offset} to support multi-offset
 export const getWellsDepth = (
   labwareDef: LabwareDefinition2,

@@ -34,7 +34,7 @@ const DECIMALS_ALLOWED = 1
 
 type OP = {|
   mmFromBottom: number,
-  wellHeightMM: number,
+  wellDepthMm: number,
   isOpen: boolean,
   closeModal: () => mixed,
   fieldName: TipOffsetFields,
@@ -57,7 +57,7 @@ class TipPositionModal extends React.Component<Props, State> {
     this.state = { value: initialValue }
   }
   componentDidUpdate(prevProps: Props) {
-    if (prevProps.wellHeightMM !== this.props.wellHeightMM) {
+    if (prevProps.wellDepthMm !== this.props.wellDepthMm) {
       this.setState({ value: roundValue(this.props.mmFromBottom) })
     }
   }
@@ -67,8 +67,8 @@ class TipPositionModal extends React.Component<Props, State> {
     this.props.closeModal()
   }
   getDefaultMmFromBottom = (): number => {
-    const { fieldName, wellHeightMM } = this.props
-    return utils.getDefaultMmFromBottom({ fieldName, wellHeightMM })
+    const { fieldName, wellDepthMm } = this.props
+    return utils.getDefaultMmFromBottom({ fieldName, wellDepthMm })
   }
   getMinMaxMmFromBottom = (): {
     maxMmFromBottom: number,
@@ -76,12 +76,12 @@ class TipPositionModal extends React.Component<Props, State> {
   } => {
     if (getIsTouchTipField(this.props.fieldName)) {
       return {
-        maxMmFromBottom: roundValue(this.props.wellHeightMM),
-        minMmFromBottom: roundValue(this.props.wellHeightMM / 2),
+        maxMmFromBottom: roundValue(this.props.wellDepthMm),
+        minMmFromBottom: roundValue(this.props.wellDepthMm / 2),
       }
     }
     return {
-      maxMmFromBottom: roundValue(this.props.wellHeightMM * 2),
+      maxMmFromBottom: roundValue(this.props.wellDepthMm * 2),
       minMmFromBottom: 0,
     }
   }
@@ -139,7 +139,7 @@ class TipPositionModal extends React.Component<Props, State> {
   render() {
     if (!this.props.isOpen) return null
     const { value } = this.state
-    const { fieldName, wellHeightMM } = this.props
+    const { fieldName, wellDepthMm } = this.props
     const { maxMmFromBottom, minMmFromBottom } = this.getMinMaxMmFromBottom()
 
     return (
@@ -209,7 +209,7 @@ class TipPositionModal extends React.Component<Props, State> {
                     mmFromBottom={
                       value != null ? value : this.getDefaultMmFromBottom()
                     }
-                    wellHeightMM={wellHeightMM}
+                    wellDepthMm={wellDepthMm}
                   />
                 </div>
               </div>
