@@ -67,14 +67,10 @@ const mixFormToArgs = (
     : null
 
   // Blowout settings
-  // TODO IMMEDIATELY this will NOT WORK, blowoutLocation is a special string not a well (and the labware might be the trash!)
-  // The blowout offset should be calculated inside mix fn, which has better access to blowout details.
-  // Write tests first
   const blowoutFlowRateUlSec = dispenseFlowRateUlSec
-  const blowoutOffsetFromBottomMm = blowoutLocation
-    ? getWellsDepth(labware.def, [blowoutLocation]) +
-      DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
-    : null
+  const blowoutOffsetFromTopMm = blowoutLocation
+    ? DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
+    : 0
 
   return {
     commandCreatorFnName: 'mix',
@@ -94,7 +90,7 @@ const mixFormToArgs = (
     blowoutFlowRateUlSec,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
-    blowoutOffsetFromBottomMm,
+    blowoutOffsetFromTopMm,
   }
 }
 

@@ -16,11 +16,11 @@ export const replaceTipCommands = (tip: number | string): Array<Command> => [
 // NOTE: make sure none of these numbers match each other!
 const ASPIRATE_FLOW_RATE = 2.1
 const DISPENSE_FLOW_RATE = 2.2
-const BLOWOUT_FLOW_RATE = 2.3
+export const BLOWOUT_FLOW_RATE = 2.3
 
 const ASPIRATE_OFFSET_FROM_BOTTOM_MM = 3.1
 const DISPENSE_OFFSET_FROM_BOTTOM_MM = 3.2
-const BLOWOUT_OFFSET_FROM_BOTTOM_MM = 3.3
+export const BLOWOUT_OFFSET_FROM_TOP_MM = 3.3
 const TOUCH_TIP_OFFSET_FROM_BOTTOM_MM = 3.4
 
 export const getFlowRateAndOffsetParams = () => ({
@@ -29,7 +29,7 @@ export const getFlowRateAndOffsetParams = () => ({
   blowoutFlowRateUlSec: BLOWOUT_FLOW_RATE,
   aspirateOffsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
   dispenseOffsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
-  blowoutOffsetFromBottomMm: BLOWOUT_OFFSET_FROM_BOTTOM_MM,
+  blowoutOffsetFromTopMm: BLOWOUT_OFFSET_FROM_TOP_MM,
 
   // for consolidate/distribute/transfer only
   touchTipAfterAspirateOffsetMmFromBottom: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
@@ -44,6 +44,7 @@ export const getFlowRateAndOffsetParams = () => ({
 export const DEFAULT_PIPETTE = 'p300SingleId'
 export const SOURCE_LABWARE = 'sourcePlateId'
 export const DEST_LABWARE = 'destPlateId'
+export const TROUGH_LABWARE = 'troughId'
 export const FIXED_TRASH_ID = 'trashId'
 export const DEFAULT_BLOWOUT_WELL = 'A1'
 
@@ -79,7 +80,7 @@ export const blowoutHelper = (
     pipette: DEFAULT_PIPETTE,
     labware: labware || FIXED_TRASH_ID,
     well: DEFAULT_BLOWOUT_WELL,
-    offsetFromBottomMm: BLOWOUT_OFFSET_FROM_BOTTOM_MM,
+    offsetFromBottomMm: BLOWOUT_OFFSET_FROM_TOP_MM, // TODO IMMEDIATELY
     flowRate: BLOWOUT_FLOW_RATE,
     ...params,
   },

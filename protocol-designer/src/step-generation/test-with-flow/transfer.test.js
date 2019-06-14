@@ -598,7 +598,5 @@ describe('advanced options', () => {
         ...mixCommands,
       ])
     })
-
-    test.skip('blowout should blowout in specified labware after each dispense', () => {}) // TODO
   })
 })

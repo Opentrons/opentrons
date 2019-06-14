@@ -29,6 +29,8 @@ import type { ConsolidateArgs } from '../types'
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()
 const touchTipHelper = makeTouchTipHelper()
+// TODO: Ian 2019-07-14 more elegant way to test the blowout offset calculation
+const BLOWOUT_OFFSET_ANY: any = expect.any(Number)
 
 // collapse this compound command creator into the signature of an atomic command creator
 const consolidate = (args: ConsolidateArgs) => (
@@ -361,13 +363,13 @@ describe('consolidate single-channel', () => {
 
       ...tripleMix('B1', 54, DEST_LABWARE),
 
-      blowoutHelper(),
+      blowoutHelper(null, { offsetFromBottomMm: BLOWOUT_OFFSET_ANY }),
       aspirateHelper('A4', 100),
       dispenseHelper('B1', 100),
 
       ...tripleMix('B1', 54, DEST_LABWARE),
 
-      blowoutHelper(),
+      blowoutHelper(null, { offsetFromBottomMm: BLOWOUT_OFFSET_ANY }),
     ])
     expect(res.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })

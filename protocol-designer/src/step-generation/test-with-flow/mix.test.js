@@ -22,6 +22,8 @@ import type { MixArgs } from '../types'
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper({ labware: SOURCE_LABWARE })
 const touchTipHelper = makeTouchTipHelper()
+// TODO: Ian 2019-07-14 more elegant way to test the blowout offset calculation
+const BLOWOUT_OFFSET_ANY: any = expect.any(Number)
 
 // collapse this compound command creator into the signature of an atomic command creator
 const mix = (args: MixArgs) => (invariantContext, initialRobotState) =>
@@ -184,7 +186,9 @@ describe('mix: advanced options', () => {
 
         aspirateHelper(well, volume),
         dispenseHelper(well, volume),
-        blowoutHelper(blowoutLabwareId),
+        blowoutHelper(blowoutLabwareId, {
+          offsetFromBottomMm: BLOWOUT_OFFSET_ANY,
+        }),
       ])
     )
   })
@@ -211,7 +215,9 @@ describe('mix: advanced options', () => {
 
         aspirateHelper(well, volume),
         dispenseHelper(well, volume),
-        blowoutHelper(blowoutLabwareId),
+        blowoutHelper(blowoutLabwareId, {
+          offsetFromBottomMm: BLOWOUT_OFFSET_ANY,
+        }),
         touchTipHelper(well),
       ])
     )

@@ -145,6 +145,8 @@ const moveLiquidFormToArgs = (
   const blowoutLocation =
     (fields.blowout_checkbox && fields.blowout_location) || null
 
+  const blowoutOffsetFromTopMm = DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
+
   const commonFields = {
     pipette: pipetteId,
     volume,
@@ -162,13 +164,7 @@ const moveLiquidFormToArgs = (
       fields.dispense_mmFromBottom || DEFAULT_MM_FROM_BOTTOM_DISPENSE,
     blowoutFlowRateUlSec:
       fields.dispense_flowRate || pipetteSpec.defaultDispenseFlowRate.value,
-    // TODO IMMEDIATELY this will NOT WORK, blowoutLocation is a special string not a well (and the labware might be the trash!)
-    // The blowout offset should be calculated inside the command creator fn, which has better access to blowout details.
-    // Write tests first
-    blowoutOffsetFromBottomMm: blowoutLocation
-      ? getWellsDepth(fields.dispense_labware.def, [blowoutLocation]) +
-        DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP
-      : null,
+    blowoutOffsetFromTopMm,
 
     changeTip: fields.changeTip,
     preWetTip: Boolean(fields.preWetTip),

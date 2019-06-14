@@ -1,6 +1,7 @@
 // @flow
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
+import { getWellsDepth } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import type {
@@ -142,7 +143,13 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (
             labware: args.disposalLabware,
             well: args.disposalWell,
             flowRate: args.blowoutFlowRateUlSec,
-            offsetFromBottomMm: args.blowoutOffsetFromBottomMm,
+            offsetFromBottomMm:
+              // NOTE: when we use blowoutLocation as mentioned above,
+              // we can delegate this top -> bottom transform to blowoutUtil
+              getWellsDepth(
+                invariantContext.labwareEntities[args.disposalLabware].def,
+                [args.disposalWell]
+              ) + args.blowoutOffsetFromTopMm,
           }),
         ]
       }

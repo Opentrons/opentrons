@@ -72,7 +72,7 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
     blowoutFlowRateUlSec,
-    blowoutOffsetFromBottomMm,
+    blowoutOffsetFromTopMm,
   } = args
 
   const effectiveTransferVol = getPipetteWithTipMaxVol(
@@ -202,13 +202,14 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
 
           const blowoutCommand = blowoutUtil({
             pipette: args.pipette,
-            sourceLabware: args.sourceLabware,
+            sourceLabwareId: args.sourceLabware,
             sourceWell: sourceWell,
-            destLabware: args.destLabware,
+            destLabwareId: args.destLabware,
             destWell: destWell,
             blowoutLocation: args.blowoutLocation,
             flowRate: blowoutFlowRateUlSec,
-            offsetFromBottomMm: blowoutOffsetFromBottomMm,
+            offsetFromTopMm: blowoutOffsetFromTopMm,
+            invariantContext,
           })
 
           const nextCommands = [

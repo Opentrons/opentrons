@@ -74,7 +74,7 @@ export type ConsolidateArgs = {
   /** If given, blow out in the specified destination after dispense at the end of each asp-asp-dispense cycle */
   blowoutLocation: ?string,
   blowoutFlowRateUlSec: number,
-  blowoutOffsetFromBottomMm: number,
+  blowoutOffsetFromTopMm: number,
 
   /** Mix in first well in chunk */
   mixFirstAspirate: ?InnerMixArgs,
@@ -91,7 +91,7 @@ export type TransferArgs = {
   /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
   blowoutLocation: ?string,
   blowoutFlowRateUlSec: number,
-  blowoutOffsetFromBottomMm: number,
+  blowoutOffsetFromTopMm: number,
 
   /** Mix in first well in chunk */
   mixBeforeAspirate: ?InnerMixArgs,
@@ -113,7 +113,7 @@ export type DistributeArgs = {
 
   /** pass to blowout **/
   blowoutFlowRateUlSec: number,
-  blowoutOffsetFromBottomMm: number,
+  blowoutOffsetFromTopMm: number,
 
   /** Mix in first well in chunk */
   mixBeforeAspirate: ?InnerMixArgs,
@@ -138,7 +138,7 @@ export type MixArgs = {
   /** If given, blow out in the specified destination after mixing each well */
   blowoutLocation: ?string,
   blowoutFlowRateUlSec: number,
-  blowoutOffsetFromBottomMm: number,
+  blowoutOffsetFromTopMm: number,
 
   /** offset from bottom of well in mm */
   aspirateOffsetFromBottomMm: number,

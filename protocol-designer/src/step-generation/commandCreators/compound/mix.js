@@ -85,7 +85,7 @@ const mix = (data: MixArgs): CompoundCommandCreator => (
     aspirateFlowRateUlSec,
     dispenseFlowRateUlSec,
     blowoutFlowRateUlSec,
-    blowoutOffsetFromBottomMm,
+    blowoutOffsetFromTopMm,
   } = data
 
   // Errors
@@ -132,13 +132,14 @@ const mix = (data: MixArgs): CompoundCommandCreator => (
 
       const blowoutCommand = blowoutUtil({
         pipette: data.pipette,
-        sourceLabware: data.labware,
+        sourceLabwareId: data.labware,
         sourceWell: well,
-        destLabware: data.labware,
+        destLabwareId: data.labware,
         destWell: well,
         blowoutLocation: data.blowoutLocation,
         flowRate: blowoutFlowRateUlSec,
-        offsetFromBottomMm: blowoutOffsetFromBottomMm,
+        offsetFromTopMm: blowoutOffsetFromTopMm,
+        invariantContext,
       })
 
       const mixCommands = mixUtil({

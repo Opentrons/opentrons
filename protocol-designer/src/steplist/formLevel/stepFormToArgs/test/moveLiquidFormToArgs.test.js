@@ -14,6 +14,9 @@ import {
 import { getOrderedWells } from '../../../utils'
 jest.mock('../../../utils')
 
+const ASPIRATE_WELL = 'A2' // default source is trough for these tests
+const DISPENSE_WELL = 'C3' // default dest in 96 flat for these tests
+
 describe('move liquid step form -> command creator args', () => {
   let hydratedForm: ?HydratedMoveLiquidFormData = null
   const sourceLabwareDef = fixture12Trough
@@ -45,7 +48,7 @@ describe('move liquid step form -> command creator args', () => {
           type: sourceLabwareType,
           def: sourceLabwareDef,
         },
-        aspirate_wells: ['B1'],
+        aspirate_wells: [ASPIRATE_WELL],
         aspirate_wellOrder_first: 'l2r',
         aspirate_wellOrder_second: 't2b',
         aspirate_flowRate: null,
@@ -61,7 +64,7 @@ describe('move liquid step form -> command creator args', () => {
           type: destLabwareType,
           def: destLabwareDef,
         },
-        dispense_wells: ['B2'],
+        dispense_wells: [DISPENSE_WELL],
         dispense_wellOrder_first: 'r2l',
         dispense_wellOrder_second: 'b2t',
         dispense_flowRate: null,
@@ -88,13 +91,13 @@ describe('move liquid step form -> command creator args', () => {
 
     expect(getOrderedWells).toHaveBeenCalledTimes(2)
     expect(getOrderedWells).toHaveBeenCalledWith(
-      ['B1'],
+      [ASPIRATE_WELL],
       sourceLabwareDef,
       'l2r',
       't2b'
     )
     expect(getOrderedWells).toHaveBeenCalledWith(
-      ['B2'],
+      [DISPENSE_WELL],
       destLabwareDef,
       'r2l',
       'b2t'
@@ -109,9 +112,9 @@ describe('move liquid step form -> command creator args', () => {
       volume: 10,
       changeTip: 'always',
       sourceLabware: 'sourceLabwareId',
-      sourceWells: ['B1'],
+      sourceWells: [ASPIRATE_WELL],
       destLabware: 'destLabwareId',
-      destWells: ['B2'],
+      destWells: [DISPENSE_WELL],
     })
 
     // no form-specific fields should be passed along
@@ -276,7 +279,7 @@ describe('move liquid step form -> command creator args', () => {
       expect(result).toMatchObject({
         disposalVolume: null,
         disposalLabware: 'sourceLabwareId',
-        disposalWell: 'B1',
+        disposalWell: ASPIRATE_WELL,
       })
     })
 
@@ -294,7 +297,7 @@ describe('move liquid step form -> command creator args', () => {
       expect(result).toMatchObject({
         disposalVolume: null,
         disposalLabware: 'destLabwareId',
-        disposalWell: 'B2',
+        disposalWell: DISPENSE_WELL,
       })
     })
   })

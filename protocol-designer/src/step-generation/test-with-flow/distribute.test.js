@@ -24,6 +24,8 @@ import type { DistributeArgs } from '../types'
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()
 const touchTipHelper = makeTouchTipHelper()
+// TODO: Ian 2019-07-14 more elegant way to test the blowout offset calculation
+const BLOWOUT_OFFSET_ANY: any = expect.any(Number)
 
 // collapse this compound command creator into the signature of an atomic command creator
 const distribute = (args: DistributeArgs) => (
@@ -63,9 +65,11 @@ beforeEach(() => {
     touchTipAfterDispense: false,
   }
 
-  blowoutSingleToTrash = blowoutHelper(FIXED_TRASH_ID)
+  blowoutSingleToTrash = blowoutHelper(FIXED_TRASH_ID, {
+    offsetFromBottomMm: BLOWOUT_OFFSET_ANY,
+  })
   blowoutSingleToSourceA1 = blowoutHelper(SOURCE_LABWARE, {
-    well: 'A1',
+    offsetFromBottomMm: BLOWOUT_OFFSET_ANY,
   })
 
   invariantContext = makeContext()

@@ -5,6 +5,7 @@ import {
   getInitialRobotStateStandard,
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
+  TROUGH_LABWARE,
 } from './fixtures'
 
 import forAspirateDispense from '../getNextRobotStateAndWarnings/forAspirateDispense'
@@ -25,7 +26,7 @@ beforeEach(() => {
 
 describe('...single-channel pipette', () => {
   let aspirateSingleCh50FromA1Args
-  const labwareId = 'troughId'
+  const labwareId = TROUGH_LABWARE
 
   beforeEach(() => {
     // NOTE: aspirate from TROUGH not sourcePlate
@@ -313,7 +314,7 @@ describe('...8-channel pipette', () => {
 })
 
 describe('8-channel trough', () => {
-  const labwareId = 'troughId'
+  const labwareId = TROUGH_LABWARE
   const troughCases = [
     {
       testName: '20uLx8 from 300uL trough well',

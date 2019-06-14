@@ -17,6 +17,7 @@ import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
   DEST_LABWARE,
+  TROUGH_LABWARE,
   FIXED_TRASH_ID,
 } from './commandFixtures'
 import { makeInitialRobotState } from '../../utils'
@@ -83,23 +84,23 @@ export function getTipColumn<T>(
 // standard context fixtures to use across tests
 export function makeContext(): InvariantContext {
   const labwareEntities = {
-    trashId: {
+    [FIXED_TRASH_ID]: {
       id: FIXED_TRASH_ID,
       labwareDefURI: getLabwareDefURI(fixtureTrash),
       def: fixtureTrash,
     },
-    sourcePlateId: {
+    [SOURCE_LABWARE]: {
       id: SOURCE_LABWARE,
       labwareDefURI: getLabwareDefURI(fixture96Plate),
       def: fixture96Plate,
     },
-    destPlateId: {
+    [DEST_LABWARE]: {
       id: DEST_LABWARE,
       labwareDefURI: getLabwareDefURI(fixture96Plate),
       def: fixture96Plate,
     },
-    troughId: {
-      id: 'troughId',
+    [TROUGH_LABWARE]: {
+      id: TROUGH_LABWARE,
       labwareDefURI: getLabwareDefURI(fixture12Trough),
       def: fixture12Trough,
     },
@@ -135,7 +136,7 @@ export function makeContext(): InvariantContext {
       tiprackLabwareDef: fixtureTipRack10Ul,
       spec: fixtureP10Multi,
     },
-    p300SingleId: {
+    [DEFAULT_PIPETTE]: {
       name: 'p300_single',
       id: DEFAULT_PIPETTE,
       tiprackDefURI: getLabwareDefURI(fixtureTipRack300Ul),

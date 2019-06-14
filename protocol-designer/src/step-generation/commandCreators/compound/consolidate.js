@@ -57,7 +57,7 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
     blowoutFlowRateUlSec,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
-    blowoutOffsetFromBottomMm,
+    blowoutOffsetFromTopMm,
   } = args
 
   const maxWellsPerChunk = Math.floor(
@@ -165,13 +165,14 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
 
       const blowoutCommand = blowoutUtil({
         pipette: args.pipette,
-        sourceLabware: args.sourceLabware,
+        sourceLabwareId: args.sourceLabware,
         sourceWell: sourceWellChunk[0],
-        destLabware: args.destLabware,
+        destLabwareId: args.destLabware,
         destWell: args.destWell,
         blowoutLocation: args.blowoutLocation,
         flowRate: blowoutFlowRateUlSec,
-        offsetFromBottomMm: blowoutOffsetFromBottomMm,
+        offsetFromTopMm: blowoutOffsetFromTopMm,
+        invariantContext,
       })
 
       return [

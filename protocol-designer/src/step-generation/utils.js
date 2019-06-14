@@ -1,4 +1,5 @@
 // @flow
+import assert from 'assert'
 import cloneDeep from 'lodash/cloneDeep'
 import flatMap from 'lodash/flatMap'
 import mapValues from 'lodash/mapValues'
@@ -6,9 +7,10 @@ import range from 'lodash/range'
 import reduce from 'lodash/reduce'
 import last from 'lodash/last'
 import {
-  getWellNamePerMultiTip,
   getIsTiprack,
   getLabwareDefURI,
+  getWellsDepth,
+  getWellNamePerMultiTip,
 } from '@opentrons/shared-data'
 
 import type { BlowoutArgsV3, LabwareDefinition2 } from '@opentrons/shared-data'
@@ -255,43 +257,64 @@ export function totalVolume(location: LocationLiquidState): number {
   }, 0)
 }
 
-// Set blowout location using the SOURCE_WELL_BLOWOUT_DESTINATION / DEST_WELL_BLOWOUT_DESTINATION
-// special strings
+// Set blowout location depending on the 'blowoutLocation' arg: set it to
+// the SOURCE_WELL_BLOWOUT_DESTINATION / DEST_WELL_BLOWOUT_DESTINATION
+// special strings, or to a labware ID.
 export const blowoutUtil = (args: {
   pipette: $PropertyType<BlowoutArgsV3, 'pipette'>,
-  sourceLabware: $PropertyType<BlowoutArgsV3, 'labware'>,
+  sourceLabwareId: string,
   sourceWell: $PropertyType<BlowoutArgsV3, 'well'>,
-  destLabware: $PropertyType<BlowoutArgsV3, 'labware'>,
+  destLabwareId: string,
   destWell: $PropertyType<BlowoutArgsV3, 'well'>,
   blowoutLocation: ?string,
   flowRate: number,
-  offsetFromBottomMm: number,
+  offsetFromTopMm: number,
+  invariantContext: InvariantContext,
 }): Array<CommandCreator> => {
   const {
     pipette,
-    sourceLabware,
+    sourceLabwareId,
     sourceWell,
-    destLabware,
+    destLabwareId,
     destWell,
     blowoutLocation,
     flowRate,
-    offsetFromBottomMm,
+    offsetFromTopMm,
+    invariantContext,
   } = args
 
   if (!blowoutLocation) return []
-  let labware = blowoutLocation
-  let well = 'A1'
+  let labware
+  let well
 
-  // TODO Ian 2018-05-04 more explicit test for non-trash blowout destination
   if (blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION) {
-    labware = sourceLabware
+    labware = invariantContext.labwareEntities[sourceLabwareId]
     well = sourceWell
   } else if (blowoutLocation === DEST_WELL_BLOWOUT_DESTINATION) {
-    labware = destLabware
+    labware = invariantContext.labwareEntities[destLabwareId]
     well = destWell
+  } else {
+    // if it's not one of the magic strings, it's a labware id
+    labware = invariantContext.labwareEntities?.[blowoutLocation]
+    well = 'A1'
+    if (!labware) {
+      assert(
+        false,
+        `expected a labwareId for blowoutUtil's "blowoutLocation", got ${blowoutLocation}`
+      )
+      return []
+    }
   }
+  const offsetFromBottomMm =
+    getWellsDepth(labware.def, [well]) + offsetFromTopMm
   return [
-    blowout({ pipette: pipette, labware, well, flowRate, offsetFromBottomMm }),
+    blowout({
+      pipette: pipette,
+      labware: labware.id,
+      well,
+      flowRate,
+      offsetFromBottomMm,
+    }),
   ]
 }
 
