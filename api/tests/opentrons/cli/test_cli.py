@@ -1,7 +1,6 @@
 import copy
 import pytest
 import sys
-import asyncio
 import numpy as np
 
 from opentrons.config import (CONFIG,
