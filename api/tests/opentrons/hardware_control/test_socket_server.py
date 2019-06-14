@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import tempfile
+from types import MethodType
 
 import pytest
 
@@ -42,7 +43,7 @@ async def test_multi_write_json(hc_stream_server, loop, monkeypatch):
         finally:
             called.set()
 
-    monkeypatch.setattr(sockserv, 'dispatch', fake_dispatch)
+    monkeypatch.setattr(server, '_dispatch', fake_dispatch)
 
     reader, writer = await asyncio.open_unix_connection(
         sock, limit=15)
@@ -63,7 +64,7 @@ async def test_task_cancel(hc_stream_server, loop, monkeypatch):
         while True:
             await asyncio.sleep(10)
 
-    monkeypatch.setattr(sockserv, 'dispatch', forever_dispatch)
+    monkeypatch.setattr(server, '_dispatch', forever_dispatch)
     reader, writer = await asyncio.open_unix_connection(
         sock, limit=15)
     writer.write(b'{"hi": "there"}')
@@ -89,7 +90,7 @@ async def test_dispatch_exception(hc_stream_server, loop, monkeypatch):
     async def error_dispatch(_ignored):
         raise Exception()
 
-    monkeypatch.setattr(sockserv, 'dispatch', error_dispatch)
+    monkeypatch.setattr(server, '_dispatch', error_dispatch)
     reader, writer = await asyncio.open_unix_connection(
         sock, limit=15)
     writer.write(b'{"hi": "there"}')
@@ -100,3 +101,77 @@ async def test_dispatch_exception(hc_stream_server, loop, monkeypatch):
     assert obj['error']['code'] == -32063
     assert obj['error']['message'] == 'uncaught exception in dispatch'
     assert 'data' in obj['error']
+
+
+async def test_errors_from_invoke(hc_stream_server, loop):
+    """ Test that various jsonrpc errors actually get back to us """
+
+    sock, server = hc_stream_server
+    reader, writer = await asyncio.open_unix_connection(
+        sock)
+    decoder = sockserv.JsonStreamDecoder(reader)
+    writer.write(b'aojsbdakbsdkabsdkh')
+    writer.write(json.dumps({'this is invalid': 'jsonrpc'}).encode())
+    resp = await decoder.read_object()
+    assert resp['jsonrpc'] == '2.0'
+    assert resp['error']['code'] == -32600
+    writer.write(
+        json.dumps({'jsonrpc': '2.0', 'method': 'aouhsoashdas',
+                    'params': [], 'id': 1}).encode())
+    resp = await decoder.read_object()
+    assert resp['error']['code'] == -32601
+
+
+async def test_basic_method(hc_stream_server, loop, monkeypatch):
+    """ Test methods with no non-serializable argument types """
+    sock, server = hc_stream_server
+    reader, writer = await asyncio.open_unix_connection(
+        sock)
+    # Check a non-async method and make sure it works
+    passed_message = None
+
+    def fake_pause_with_message(obj, message):
+        nonlocal passed_message
+        passed_message = message
+
+    bound = MethodType(fake_pause_with_message, server._api)
+    monkeypatch.setattr(
+        server._api, 'pause_with_message', bound)
+    server._methods = sockserv.build_jrpc_methods(server._api)
+    request = json.dumps({'jsonrpc': '2.0', 'method': 'pause_with_message',
+                          'params': {'message': 'why hello!'},
+                          'id': 1})
+    writer.write(request.encode())
+    decoder = sockserv.JsonStreamDecoder(reader)
+    resp = await decoder.read_object()
+    assert resp == {'jsonrpc': '2.0', 'result': None, 'id': 1}
+
+    passed_fw = None
+    passed_modeset = None
+
+    async def fake_update_firmware(obj,
+                                   firmware_file,
+                                   loop=None,
+                                   explicit_modeset=True):
+        nonlocal passed_fw
+        nonlocal passed_modeset
+        assert not loop
+        passed_fw = firmware_file
+        passed_modeset = explicit_modeset
+        await asyncio.sleep(0.1)
+        return 'i programmed the cool file'
+
+    bound = MethodType(fake_update_firmware, server._api)
+    monkeypatch.setattr(server._api, 'update_firmware', bound)
+    server._methods = sockserv.build_jrpc_methods(server._api)
+    request = json.dumps({'jsonrpc': '2.0', 'method': 'update_firmware',
+                          'params': {'firmware_file': "cool file.hex",
+                                     'explicit_modeset': False},
+                          'id': 2})
+    writer.write(request.encode())
+    resp = await decoder.read_object()
+    assert resp == {'jsonrpc': '2.0',
+                    'result': 'i programmed the cool file',
+                    'id': 2}
+    assert passed_fw == 'cool file.hex'
+    assert passed_modeset is False

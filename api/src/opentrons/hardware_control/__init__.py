@@ -200,6 +200,11 @@ class API(HardwareAPILike):
         The version is a string retrieved directly from the attached hardware
         (or possibly simulator).
         """
+        return self.get_fw_version()
+
+    def get_fw_version(self) -> str:
+        """ A method implementation of :py:attr:`fw_version`.
+        """
         from_backend = self._backend.fw_version
         if from_backend is None:
             return 'unknown'
@@ -302,6 +307,20 @@ class API(HardwareAPILike):
 
     @property
     def attached_instruments(self):
+        """ Get the status dicts of the cached attached instruments.
+
+        Also available as :py:meth:`get_attached_instruments`.
+
+        This returns a dictified version of the
+        :py:class:`hardware_control.pipette.Pipette` as a dict keyed by
+        the :py:class:`top_types.Mount` to which the pipette is attached.
+        If no pipette is attached on a given mount, the mount key will
+        still be present but will have the value ``None``.
+
+        Note that this is only a query of a cached value; to actively scan
+        for changes, use :py:meth:`cache_instruments`. This process deactivates
+        the motors and should be used sparingly.
+        """
         configs = ['name', 'min_volume', 'max_volume', 'channels',
                    'aspirate_flow_rate', 'dispense_flow_rate',
                    'pipette_id', 'current_volume', 'display_name',
@@ -317,6 +336,10 @@ class API(HardwareAPILike):
                 instruments[mount][key] = instr_dict[key]
             instruments[mount]['has_tip'] = instr.has_tip
         return instruments
+
+    def get_attached_instruments(self):
+        """ Function implementation of :py:attr:`attached_instruments` """
+        return self.attached_instruments
 
     @property
     def attached_modules(self):
