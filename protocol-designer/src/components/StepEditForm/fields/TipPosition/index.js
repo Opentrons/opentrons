@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { HoverTooltip, FormGroup, InputField } from '@opentrons/components'
+import { getWellsDepth } from '@opentrons/shared-data'
 import i18n from '../../../../localization'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { getDisabledFields } from '../../../../steplist/formLevel'
@@ -121,7 +122,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
 
     // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths
     const firstWell = labwareDef.wells['A1']
-    if (firstWell) wellHeightMM = firstWell.depth
+    if (firstWell) wellHeightMM = getWellsDepth(labwareDef, ['A1'])
   }
 
   return {
