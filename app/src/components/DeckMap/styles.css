@@ -39,6 +39,7 @@
   border-color: var(--c-highlight);
   border-width: 3px;
   border-style: solid;
+  border-radius: 6px;
 }
 
 .labware_spinner_wrapper {
@@ -60,6 +61,7 @@
   color: var(--c-font-light);
   background-color: color(var(--c-black) alpha(0.75));
   padding: 0.25rem;
+  border-radius: 0 0 3px 3px;
 }
 
 .display_name {
