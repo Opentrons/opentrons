@@ -9,20 +9,24 @@
 
 .prompt {
   padding-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .prompt_text {
   @apply --font-header-light;
 
   font-weight: normal;
-  margin-top: 1rem;
+  margin: 0.5rem 0;
   text-align: center;
 }
 
 .prompt_button {
   display: block;
   width: auto;
-  margin: 1.5rem auto;
+  margin: 0.5rem 0 1rem 0;
   padding-left: 3rem;
   padding-right: 3rem;
 }

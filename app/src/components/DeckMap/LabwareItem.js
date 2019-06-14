@@ -5,25 +5,17 @@ import { Link } from 'react-router-dom'
 import { SLOT_RENDER_HEIGHT, SLOT_RENDER_WIDTH } from '@opentrons/shared-data'
 
 import {
-  selectors as robotSelectors,
-  actions as robotActions,
-  type Labware,
-  type SessionModule,
-} from '../../robot'
-import { getLatestLabwareDef, getLegacyLabwareDef } from '../../util'
-
-import {
-  LabwareNameOverlay,
-  // ModuleNameOverlay,
   RobotCoordsForeignDiv,
-  RobotCoordsText,
   LabwareRender,
   Labware as LabwareComponent,
+  Icon,
   humanizeLabwareType,
   type LabwareComponentProps,
 } from '@opentrons/components'
 
-import LabwareSpinner from './LabwareSpinner'
+import { type Labware, type SessionModule } from '../../robot'
+import { getLatestLabwareDef, getLegacyLabwareDef } from '../../util'
+
 import styles from './styles.css'
 
 export type LabwareItemProps = {
@@ -58,29 +50,6 @@ export default function LabwareItem(props: LabwareItemProps) {
     item = <LabwareComponent definition={getLegacyLabwareDef(type)} />
     width = SLOT_RENDER_WIDTH
     height = SLOT_RENDER_HEIGHT
-    // <g className={cx({ [styles.disabled]: disabled })}>
-    //   <LabwareComponent definition={getLegacyLabwareDef(type)} />
-    //   {/*
-    //   {showSpinner ? (
-    //       <LabwareSpinner />
-    //     ) : (
-    //       <LabwareNameOverlay title={title} subtitle={name} />
-    //     )
-    //     // module && <ModuleNameOverlay name={module.name} />
-    //   }
-    //   */}
-    //   {highlighted && (
-    //     <rect
-    //       className={styles.highlighted}
-    //       x="0.5"
-    //       y="0.5"
-    //       width={SLOT_RENDER_WIDTH - 1}
-    //       height={SLOT_RENDER_HEIGHT - 1}
-    //       rx="6"
-    //     />
-    //   )}
-    // </g>
-    // )
   } else {
     const def = getLatestLabwareDef(type)
     item = <LabwareRender definition={def} />
@@ -112,7 +81,9 @@ export default function LabwareItem(props: LabwareItemProps) {
             className={styles.labware_ui_link}
           >
             {showSpinner ? (
-              <LabwareSpinner />
+              <div className={styles.labware_spinner_wrapper}>
+                <Icon className={styles.spinner} name="ot-spinner" spin />
+              </div>
             ) : (
               <div className={styles.name_overlay}>
                 <p className={styles.display_name} title={title}>
@@ -122,40 +93,10 @@ export default function LabwareItem(props: LabwareItemProps) {
                   {name}
                 </p>
               </div>
-            )
-            // module && <ModuleNameOverlay name={module.name} />
-            }
+            )}
           </Link>
         </RobotCoordsForeignDiv>
       </g>
     </>
   )
-  // // const v2LabwareDef = getLabwareDefinition(loadName, namespace, version)
-  // if (!showSpinner && !disabled) {
-  //   return item
-  // }
-
-  // return item
-}
-
-function mapStateToProps(state: State, ownProps: OP): SP {
-  return {
-    _calibrator:
-      ownProps.labware.calibratorMount ||
-      robotSelectors.getCalibratorMount(state),
-  }
-}
-
-function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
-  const { labware } = ownProps
-  const { dispatch } = dispatchProps
-  const { _calibrator } = stateProps
-  return {
-    ...ownProps,
-    handleClick: () => {
-      if (_calibrator && (!labware.isTiprack || !labware.confirmed)) {
-        dispatch(robotActions.moveTo(_calibrator, labware.slot))
-      }
-    },
-  }
 }

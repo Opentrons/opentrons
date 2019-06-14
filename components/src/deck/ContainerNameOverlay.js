@@ -8,6 +8,7 @@ type Props = {
   subtitle?: ?string,
 }
 
+// TODO: BC 2019-06-14 only used in protocol library kludge, remove when possible
 export function ContainerNameOverlay(props: Props) {
   const { title, subtitle } = props
 

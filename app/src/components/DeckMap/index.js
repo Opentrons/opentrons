@@ -8,21 +8,17 @@ import mapValues from 'lodash/mapValues'
 import countBy from 'lodash/countBy'
 import { type DeckSlotId } from '@opentrons/shared-data'
 
-import {
-  RobotWorkSpace,
-  Module as ModuleItem,
-  RobotCoordsForeignDiv,
-} from '@opentrons/components'
+import { RobotWorkSpace, Module as ModuleItem } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import { selectors as robotSelectors, type Labware } from '../../robot'
 
 import { getModulesState } from '../../robot-api'
 import { getConnectedRobot } from '../../discovery'
 
-// import ConnectedSlotItem from './ConnectedSlotItem'
 import LabwareItem from './LabwareItem'
 
-// import styles from './styles.css'
+export { LabwareItem }
+export type { LabwareItemProps } from './LabwareItem'
 
 type OP = {|
   ...ContextRouter,
@@ -101,11 +97,6 @@ function DeckMap(props: Props) {
   )
 }
 
-// TODO: IMMEDIATELY when you re in the review deck "modal" no labware is disable
-
-export { LabwareItem }
-export type { LabwareItemProps } from './LabwareItem'
-
 function mapStateToProps(state: State, ownProps: OP): SP {
   let modulesBySlot = robotSelectors.getModulesBySlot(state)
 
@@ -156,29 +147,6 @@ function mapStateToProps(state: State, ownProps: OP): SP {
     }
   }
 }
-
-//   <ModuleItem
-//     name={props.module.name}
-//     mode={props.present ? 'present' : 'missing'}
-//   />
-// )
-// }
-
-// function mapStateToProps(state: State, ownProps: OP): SP {
-//   // TODO(mc, 2018-07-23): this logic is duplicated because can only get props
-//   // into Deck.props.LabwareComponent via redux
-//   const robot = getConnectedRobot(state)
-//   const module = robotSelectors.getModulesBySlot(state)[ownProps.slot]
-//   const sessionModules = robotSelectors.getModules(state)
-//   const actualModules = robot ? getModulesState(state, robot.name) : []
-
-//   const requiredNames = countBy(sessionModules, 'name')
-//   const actualNames = countBy(actualModules, 'name')
-//   const present =
-//     !module || requiredNames[module.name] === actualNames[module.name]
-
-//   return { present, module }
-// }
 
 export default withRouter<WithRouterOP>(
   connect<Props, OP, SP, {||}, State, Dispatch>(mapStateToProps)(DeckMap)
