@@ -115,7 +115,8 @@ export default function LabwareItem(props: LabwareItemProps) {
               <LabwareSpinner />
             ) : (
               <div className={styles.name_overlay}>
-                <p className={styles.display_name}> {title} </p>
+                <p className={styles.display_name}>{title}</p>
+                <p className={styles.display_name}>{name}</p>
               </div>
             )
             // module && <ModuleNameOverlay name={module.name} />

@@ -14,7 +14,7 @@ function CalibrateLabware(props: Props) {
   return (
     <div>
       <InfoBox labware={props.labware} />
-      <DeckMap />
+      <DeckMap enableLabwareSelection />
     </div>
   )
 }
