@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import map from 'lodash/map'
-import mapValues from 'lodash/mapValues'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import assert from 'assert'
 import {
   getLabware,
@@ -16,9 +16,9 @@ import Well from './Well'
 import styles from './Labware.css'
 
 export type Props = {
-  /** labware type, to get definition from shared-data */
-  labwareType: string,
-  definition: any, // TODO: definitions1 type
+  /** labware type, to get legacy definition from shared-data */
+  labwareType?: string,
+  definition?: ?LabwareDefinition2,
 }
 
 class Labware extends React.Component<Props> {

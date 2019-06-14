@@ -10,25 +10,20 @@ import {
   Labware as LabwareComponent,
   Icon,
   humanizeLabwareType,
-  type LabwareComponentProps,
 } from '@opentrons/components'
 
-import { type Labware, type SessionModule } from '../../robot'
+import { type Labware } from '../../robot'
 import { getLatestLabwareDef, getLegacyLabwareDef } from '../../util'
 
 import styles from './styles.css'
 
 export type LabwareItemProps = {
-  ...$Exact<LabwareComponentProps>,
-  labware: {
-    ...$Exact<Labware>,
-    highlighted?: boolean,
-    disabled?: boolean,
-    showSpinner?: boolean,
-    onClick?: () => void,
-    url?: string,
-  },
-  module: ?SessionModule,
+  highlighted?: boolean,
+  areTipracksConfirmed?: boolean,
+  handleClick?: () => void,
+  labware: $Exact<Labware>,
+  x: number,
+  y: number,
 }
 
 export default function LabwareItem(props: LabwareItemProps) {
@@ -42,16 +37,12 @@ export default function LabwareItem(props: LabwareItemProps) {
 
   const title = humanizeLabwareType(type)
 
-  let item
-  let width
-  let height
+  let item = <LabwareComponent definition={getLegacyLabwareDef(type)} />
+  let width = SLOT_RENDER_WIDTH
+  let height = SLOT_RENDER_HEIGHT
 
-  if (labware.isLegacy) {
-    item = <LabwareComponent definition={getLegacyLabwareDef(type)} />
-    width = SLOT_RENDER_WIDTH
-    height = SLOT_RENDER_HEIGHT
-  } else {
-    const def = getLatestLabwareDef(type)
+  const def = getLatestLabwareDef(type)
+  if (!labware.isLegacy && def) {
     item = <LabwareRender definition={def} />
     width = def.dimensions.xDimension
     height = def.dimensions.yDimension

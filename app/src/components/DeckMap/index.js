@@ -1,5 +1,5 @@
 // @flow
-import React, { useMemo } from 'react'
+import React, { useMemo, type ElementProps } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import some from 'lodash/some'
@@ -7,10 +7,17 @@ import map from 'lodash/map'
 import mapValues from 'lodash/mapValues'
 import countBy from 'lodash/countBy'
 import { type DeckSlotId } from '@opentrons/shared-data'
+import type { ContextRouter } from 'react-router'
 
 import { RobotWorkSpace, Module as ModuleItem } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
-import { selectors as robotSelectors, type Labware } from '../../robot'
+
+import type { State } from '../../types'
+import {
+  selectors as robotSelectors,
+  type Labware,
+  type SessionModule,
+} from '../../robot'
 
 import { getModulesState } from '../../robot-api'
 import { getConnectedRobot } from '../../discovery'
@@ -26,11 +33,17 @@ type OP = {|
   enableLabwareSelection: boolean,
 |}
 
+type DisplayModule = {
+  ...$Exact<SessionModule>,
+  mode?: $PropertyType<ElementProps<typeof ModuleItem>, 'mode'>,
+}
 type SP = {|
-  labwareBySlot: { [DeckSlotId]: Array<Labware> },
-  modulesBySlot: { [DeckSlotId]: SessionModule },
-  selectedSlot: DeckSlotId,
-  areTipracksConfirmed: boolean,
+  labwareBySlot?: { [DeckSlotId]: Array<Labware> },
+  modulesBySlot?: {
+    [DeckSlotId]: ?DisplayModule,
+  },
+  selectedSlot?: DeckSlotId,
+  areTipracksConfirmed?: boolean,
 |}
 
 type Props = {| ...OP, ...SP |}
@@ -73,8 +86,8 @@ function DeckMap(props: Props) {
                   })`}
                 >
                   <ModuleItem
-                    name={moduleInSlot.name}
-                    mode={moduleInSlot.displayMode}
+                    name={moduleInSlot && moduleInSlot.name}
+                    mode={(moduleInSlot && moduleInSlot.mode) || 'default'}
                   />
                 </g>
               )}
@@ -116,7 +129,7 @@ function mapStateToProps(state: State, ownProps: OP): SP {
           !module || requiredNames[module.name] === actualNames[module.name]
         return {
           ...module,
-          displayMode: present ? 'present' : 'missing',
+          mode: present ? 'present' : 'missing',
         }
       }
     )

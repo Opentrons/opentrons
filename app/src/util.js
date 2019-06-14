@@ -1,6 +1,7 @@
 // @flow
 // utility functions
 import groupBy from 'lodash/groupBy'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { Action, ThunkAction, ThunkPromiseAction } from './types'
 import createLogger from './logger'
 
