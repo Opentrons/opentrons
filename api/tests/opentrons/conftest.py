@@ -151,6 +151,7 @@ def using_api2(loop):
         else:
             os.environ['OT_API_FF_useProtocolApi2'] = oldenv
         opentrons.reset_globals(loop=loop)
+        opentrons.hardware.set_config(config.robot_configs.load())
 
 
 @pytest.fixture
@@ -172,6 +173,7 @@ def using_api1(loop):
         if None is not oldenv:
             os.environ['OT_API_FF_useProtocolApi2'] = oldenv
         opentrons.reset_globals(loop=loop)
+        opentrons.robot.config = config.robot_configs.load()
 
 
 @pytest.fixture(params=[using_api1, using_api2])
