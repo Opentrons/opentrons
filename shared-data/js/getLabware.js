@@ -95,7 +95,9 @@ export const getWellsDepth = (
   labwareDef: LabwareDefinition2,
   wells: Array<string>
 ): number => {
-  const offsets = wells.map(well => labwareDef.wells[well].depth)
+  const offsets = wells.map(
+    well => labwareDef.wells[well].depth + labwareDef.wells[well].z
+  )
   if (uniq(offsets).length !== 1) {
     console.warn(
       `expected wells ${JSON.stringify(
