@@ -70,3 +70,11 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.subtitle {
+  color: var(--c-font-light);
+  text-transform: uppercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
