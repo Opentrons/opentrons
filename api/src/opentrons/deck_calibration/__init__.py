@@ -16,7 +16,6 @@ z_pos = (170.5, 129.0, 5.0)
 
 def dots_set():
     """
-
     :param dot_flag: a boolean represented whether the feature flag is set
     or not (if dots_deck_type is set to True
     then it will utilize old calibration points)

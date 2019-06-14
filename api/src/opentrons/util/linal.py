@@ -4,6 +4,11 @@ from numpy.linalg import inv
 from typing import List, Tuple, Union
 
 
+def identity_deck_transform():
+    """ The default deck transform """
+    return np.identity(4)
+
+
 def solve(expected: List[Tuple[float, float]],
           actual: List[Tuple[float, float]]) -> np.ndarray:
     """

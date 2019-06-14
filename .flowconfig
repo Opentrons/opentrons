@@ -8,6 +8,9 @@
 <PROJECT_ROOT>/audio/.*
 <PROJECT_ROOT>/compute/.*
 <PROJECT_ROOT>/update-server/.*
+
+[untyped]
+.*/node_modules/.*
 <PROJECT_ROOT>/shared-data/deck/\(definitions\|fixtures\)/.*
 <PROJECT_ROOT>/shared-data/labware/definitions/.*
 <PROJECT_ROOT>/shared-data/module/\(definitions\|fixtures\)/.*
@@ -22,5 +25,3 @@
 module.name_mapper.extension='css' -> '@opentrons/components/interfaces/CSSModule.js'
 merge_timeout=300
 esproposal.optional_chaining=enable
-
-[strict]
