@@ -1,7 +1,10 @@
 // @flow
 // utility functions
 import groupBy from 'lodash/groupBy'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  LabwareDefinition,
+} from '@opentrons/shared-data'
 import type { Action, ThunkAction, ThunkPromiseAction } from './types'
 import createLogger from './logger'
 
@@ -71,8 +74,8 @@ const labwareSchemaV1DefsContext = (require: any).context(
   /\.json$/, // import filter
   'sync' // load every definition into one synchronous chunk
 )
-let labwareSchemaV1Defs: LabwareList | null = null
-function getLegacyLabwareDefs(): LabwareList {
+let labwareSchemaV1Defs: $ReadOnlyArray<LabwareDefinition> | null = null
+function getLegacyLabwareDefs(): $ReadOnlyArray<LabwareDefinition> {
   if (!labwareSchemaV1Defs) {
     labwareSchemaV1Defs = labwareSchemaV1DefsContext
       .keys()
@@ -97,8 +100,9 @@ const labwareSchemaV2DefsContext = (require: any).context(
   /\.json$/, // import filter
   'sync' // load every definition into one synchronous chunk
 )
-let labwareSchemaV2Defs: LabwareList | null = null
-function getLatestLabwareDefs(): LabwareList {
+
+let labwareSchemaV2Defs: $ReadOnlyArray<LabwareDefinition2> | null = null
+function getLatestLabwareDefs(): $ReadOnlyArray<LabwareDefinition2> {
   // NOTE: unlike labware-library, no filtering out "do not list labware"
   // also, more convenient & performant to make a map {loadName: def} not an array
   if (!labwareSchemaV2Defs) {
@@ -126,7 +130,7 @@ function getLatestLabwareDefs(): LabwareList {
 
 export function getLatestLabwareDef(
   loadName: ?string
-): LabwareDefinition | null {
+): LabwareDefinition2 | null {
   const def = getLatestLabwareDefs().find(
     d => d.parameters.loadName === loadName
   )

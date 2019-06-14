@@ -12,7 +12,7 @@ import type { ContextRouter } from 'react-router'
 import { RobotWorkSpace, Module as ModuleItem } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
-import type { State } from '../../types'
+import type { State, Dispatch } from '../../types'
 import {
   selectors as robotSelectors,
   type Labware,
@@ -27,26 +27,31 @@ import LabwareItem from './LabwareItem'
 export { LabwareItem }
 export type { LabwareItemProps } from './LabwareItem'
 
-type OP = {|
-  ...ContextRouter,
-  modulesRequired: boolean,
-  enableLabwareSelection: boolean,
+type WithRouterOP = {|
+  modulesRequired?: boolean,
+  enableLabwareSelection?: boolean,
 |}
 
-type DisplayModule = {
+type OP = {|
+  ...ContextRouter,
+  ...WithRouterOP,
+|}
+
+type DP = {| dispatch: Dispatch |}
+type DisplayModule = {|
   ...$Exact<SessionModule>,
   mode?: $PropertyType<ElementProps<typeof ModuleItem>, 'mode'>,
-}
+|}
 type SP = {|
   labwareBySlot?: { [DeckSlotId]: Array<Labware> },
   modulesBySlot?: {
     [DeckSlotId]: ?DisplayModule,
   },
-  selectedSlot?: DeckSlotId,
+  selectedSlot?: ?DeckSlotId,
   areTipracksConfirmed?: boolean,
 |}
 
-type Props = {| ...OP, ...SP |}
+type Props = {| ...OP, ...SP, ...DP |}
 
 const deckSetupLayerBlacklist = [
   'calibrationMarkings',
@@ -111,7 +116,13 @@ function DeckMap(props: Props) {
 }
 
 function mapStateToProps(state: State, ownProps: OP): SP {
-  let modulesBySlot = robotSelectors.getModulesBySlot(state)
+  let modulesBySlot = mapValues(
+    robotSelectors.getModulesBySlot(state),
+    module => ({
+      ...module,
+      mode: 'default',
+    })
+  )
 
   // only show necessary modules if still need to connect some
   if (ownProps.modulesRequired) {
@@ -151,10 +162,11 @@ function mapStateToProps(state: State, ownProps: OP): SP {
         modulesBySlot,
       }
     } else {
+      const selectedSlot: ?DeckSlotId = ownProps.match.params.slot
       return {
         labwareBySlot,
         modulesBySlot,
-        selectedSlot: ownProps.match.params.slot,
+        selectedSlot,
         areTipracksConfirmed: robotSelectors.getTipracksConfirmed(state),
       }
     }
@@ -162,5 +174,5 @@ function mapStateToProps(state: State, ownProps: OP): SP {
 }
 
 export default withRouter<WithRouterOP>(
-  connect<Props, OP, SP, {||}, State, Dispatch>(mapStateToProps)(DeckMap)
+  connect<Props, OP, SP, DP, State, Dispatch>(mapStateToProps)(DeckMap)
 )

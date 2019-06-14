@@ -9,7 +9,7 @@ type Props = {
   children?: React.Node,
   className?: string,
   innerDivProps?: React.ElementProps<'div'>,
-  transformWithSVG: boolean,
+  transformWithSVG?: boolean,
 }
 
 const RobotCoordsForeignDiv = (props: Props) => {

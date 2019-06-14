@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import map from 'lodash/map'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import assert from 'assert'
 import {
   getLabware,
@@ -18,14 +18,15 @@ import styles from './Labware.css'
 export type Props = {
   /** labware type, to get legacy definition from shared-data */
   labwareType?: string,
-  definition?: ?LabwareDefinition2,
+  definition?: ?LabwareDefinition,
 }
 
 class Labware extends React.Component<Props> {
   render() {
     const { labwareType, definition } = this.props
 
-    const labwareDefinition = definition || getLabware(labwareType)
+    const labwareDefinition =
+      definition || (labwareType && getLabware(labwareType))
 
     if (!labwareDefinition) {
       return <FallbackLabware />
@@ -45,7 +46,8 @@ class Labware extends React.Component<Props> {
         {map(labwareDefinition.wells, (wellDef, wellName) => {
           assert(
             wellDef,
-            `No well definition for labware ${labwareType}, well ${wellName}`
+            `No well definition for labware ${labwareType ||
+              'unknown labware'}, well ${wellName}`
           )
           return isTiprack ? (
             <Tip key={wellName} wellDef={wellDef} tipVolume={tipVolume} />

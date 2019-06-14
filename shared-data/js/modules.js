@@ -1,5 +1,5 @@
 // @flow
-import moduleSpecs from '../module/definitions/1.json'
+import moduleSpecs from '../module/definitions/1'
 
 export type ModuleType = 'magdeck' | 'tempdeck'
 
