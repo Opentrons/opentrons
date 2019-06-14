@@ -1,6 +1,7 @@
 import copy
 import pytest
 import sys
+import asyncio
 import numpy as np
 
 from opentrons.config import (CONFIG,
@@ -114,16 +115,32 @@ def test_move_output(mock_config, loop, async_server, monkeypatch):
             tool._position(), expected_pts[point]).all()
 
 
-def test_tip_probe(mock_config, async_server):
+@pytest.mark.skipif(
+    sys.platform.startswith("win"), reason="Incompatible with Windows")
+@pytest.mark.api1_only
+def test_tip_probe(mock_config, loop, async_server, monkeypatch):
     # Test that tip probe returns successfully
     hardware = async_server['com.opentrons.hardware']
+
+    # TODO (maybe): Figure out how to prevent the pytest loop fixture
+    # from getting closed by the CLI tool on exit for API V2
+    monkeypatch.setattr(
+        dc_main.CLITool, 'hardware', hardware)
+    tip_length = 51.7
+    tool = dc_main.CLITool(
+        point_set=get_calibration_points(), tip_length=tip_length, loop=loop)
+
+    assert tool.hardware is hardware
+
     version = async_server['api_version']
+    point_after = (10, 10, 10)
     tip_length = 51.7  # p300/p50 tip length
     if version == 2:
+        # Keeping here for future use if TODO can be figured out.
         mount = Mount.RIGHT
     else:
         mount = 'right'
-    output = dc_main.probe(tip_length, hardware, mount)
+    output = tool.probe(tip_length, hardware, mount, point_after)
     assert output == 'Tip probe'
 
 

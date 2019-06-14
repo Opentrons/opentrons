@@ -126,12 +126,14 @@ class CLITool:
             'corner8': (190.65, 227.57, deck_height),
             'corner9': (330.14, 222.78, deck_height)}
 
+        slot5 = self._test_points['slot5']
+
         self.key_map = {
             '-': lambda: self.decrease_step(),
             '=': lambda: self.increase_step(),
             'z': lambda: self.save_z_value(),
-            'p': lambda: probe(
-                self._tip_length, self.hardware, self._current_mount),
+            'p': lambda: self.probe(
+                self._tip_length, self.hardware, self._current_mount, slot5),
             'enter': lambda: self.save_point(),
             '\\': lambda: self.home(),
             ' ': lambda: self.save_transform(),
@@ -463,20 +465,26 @@ class CLITool:
 
         self._status_text_box.set_text(text)
 
+    # Functions for backing key-press
+    def probe(self, tip_length: float, hardware, mount, move_after) -> str:
 
-# Functions for backing key-press
-def probe(tip_length: float, hardware, mount) -> str:
-    if not feature_flags.use_protocol_api_v2():
-        hardware.reset()
-        pipette = instruments.P300_Single(mount='right')   # type: ignore
-        probe_center = tuple(probe_instrument(
-            pipette, robot, tip_length=tip_length))
-        log.debug("Setting probe center to {}".format(probe_center))
-    else:
-        probe_center = hardware.locate_tip_probe_center(mount, tip_length)
-    hardware.update_config(
-        tip_probe=hardware.config.tip_probe._replace(center=probe_center))
-    return 'Tip probe'
+        if not feature_flags.use_protocol_api_v2():
+            hardware.reset()
+            pipette = instruments.P300_Single(mount='right')   # type: ignore
+            probe_center = tuple(probe_instrument(
+                pipette, robot, tip_length=tip_length))
+            log.debug("Setting probe center to {}".format(probe_center))
+        else:
+            probe_center = hardware.locate_tip_probe_center(mount, tip_length)
+            _, _, cz = position(mount, hardware, CriticalPoint.TIP)
+            # work around to prevent pipette tip crashing into tip box
+            # when moving from tip box -> other point on the deck
+            pt = types.Point(x=move_after[0], y=move_after[1], z=cz)
+            hardware.move_to(mount, pt)
+
+        hardware.update_config(
+            tip_probe=hardware.config.tip_probe._replace(center=probe_center))
+        return 'Tip probe'
 
 
 def save_config(config) -> str:
