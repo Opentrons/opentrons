@@ -9,6 +9,18 @@ export default function FallbackLabware() {
   return (
     <g>
       <LabwareOutline />
+      <RobotCoordsForeignDiv
+        width={SLOT_RENDER_WIDTH}
+        height={SLOT_RENDER_HEIGHT}
+        x={0}
+        y={-SLOT_RENDER_HEIGHT}
+        transformWithSVG
+        innerDivProps={{
+          className: styles.fallback_plate_text,
+        }}
+      >
+        Custom Labware
+      </RobotCoordsForeignDiv>
     </g>
   )
 }
