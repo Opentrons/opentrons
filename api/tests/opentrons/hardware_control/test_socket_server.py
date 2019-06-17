@@ -7,6 +7,7 @@ from types import MethodType
 
 import pytest
 
+from opentrons.types import Mount
 import opentrons.hardware_control as hc
 import opentrons.hardware_control.socket_server as sockserv
 
@@ -175,3 +176,36 @@ async def test_basic_method(hc_stream_server, loop, monkeypatch):
                     'id': 2}
     assert passed_fw == 'cool file.hex'
     assert passed_modeset is False
+
+
+async def test_complex_method(hc_stream_server, loop, monkeypatch):
+    """ Test methods with arguments and returns that need serialization """
+    sock, server = hc_stream_server
+    reader, writer = await asyncio.open_unix_connection(
+        sock)
+    decoder = sockserv.JsonStreamDecoder(reader)
+    request = json.dumps({
+        'jsonrpc': '2.0', 'method': 'cache_instruments',
+        'params': {
+            'require': {
+                'left': 'p300_single_v1.5',
+                'right': 'p1000_single_v1'
+            }
+        },
+        'id': 1
+    })
+    writer.write(request.encode())
+    resp = await decoder.read_object()
+    assert resp['id'] == 1
+    assert 'error' not in resp, resp
+    assert resp['result'] is None
+    gai = json.dumps({
+        'jsonrpc': '2.0', 'method': 'get_attached_instruments',
+        'params': {}, 'id': 2
+    })
+    writer.write(gai.encode())
+    gai_resp = await decoder.read_object()
+    assert gai_resp['id'] == 2
+    assert 'result' in gai_resp
+    assert gai_resp['result']['LEFT']\
+        == server._api.attached_instruments[Mount.LEFT]

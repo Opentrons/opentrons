@@ -8,13 +8,13 @@ import functools
 import inspect
 import json
 import logging
-from typing import Any, Awaitable, Callable, Optional, Set
+from typing import Any, Awaitable, Callable, Dict, Optional, Set
 
 import jsonrpcserver
 
 from opentrons import types as top_types
 
-from . import API, types
+from . import API, types, pipette
 
 LOG = logging.getLogger()
 
@@ -34,19 +34,74 @@ _SERDES = {
         deserializer=lambda name: types.CriticalPoint[name.upper()]),
     top_types.Point: SerDes(
         serializer=lambda point: list(point),
-        deserializer=lambda lst: top_types.Point(*lst))
+        deserializer=lambda lst: top_types.Point(*lst)),
+    Dict[top_types.Mount, str]: SerDes(
+        serializer=lambda require: {
+            mount.name(): val for mount, val in require.items()},
+        deserializer=lambda require: {
+            top_types.Mount[key.upper()]: val for key, val in require.items()}
+    ),
+    Dict[top_types.Mount, pipette.Pipette.DictType]: SerDes(
+        serializer=lambda pipette_dict: {
+            mount.name: pipette_info
+            for mount, pipette_info in pipette_dict.items()
+        },
+        deserializer=lambda json_dict: {
+            top_types.Mount[mount_name.upper()]: pipette_info
+            for mount_name, pipette_info in json_dict.items()
+        }
+    )
 }
 
 
-def _build_method(method_name, method):
+def _build_serializable_method(method_name, method):  # noqa(C901)
+    """ Build the method to actually server over jsonrpc.
+
+    To serve over jsonrpc, we need to have an interface that is fully
+    json-serializable. Since serving over jsonrpc is a secondary task of the
+    hardware controller, we don't want to make all the hc methods json
+    serializable because that would take away from the readability of rich
+    typing for the python-python interface. Instead, we'll build adapters here
+    that transform things to and from json.
+    """
+    # Complexity lint check disabled because most of the complexity is in the
+    # wrapper functions
+    signature = inspect.signature(method)
     if inspect.iscoroutinefunction(method):
-        @functools.wraps(method)
-        async def wrapper(*args, **kwargs):
-            return await method(*args, **kwargs)
+        async_wrapper = method
     else:
         @functools.wraps(method)
-        async def wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs):
             return method(*args, **kwargs)
+
+    transformers = {}
+    defaults = {}
+    for argname, param in signature.parameters.items():
+        if param.annotation in _SERDES:
+            transformers[argname] = _SERDES[param.annotation].deserializer
+        else:
+            transformers[argname] = lambda arg: arg
+        if param.default != param.empty:
+            defaults[argname] = param.default
+
+    if signature.return_annotation in _SERDES:
+        return_transformer = _SERDES[signature.return_annotation].serializer
+    else:
+        return_transformer = lambda ret: ret  # noqa(E371)
+
+    @functools.wraps(async_wrapper)
+    async def wrapper(**kwargs):
+        transformed = {}
+        for argname, val in kwargs.items():
+            if argname in defaults and defaults[argname] == val:
+                # This is an arg with its default value; let's ignore it and
+                # the actual function will fill in its default and we don't
+                # need to have our serdes handle defaults
+                continue
+            transformed[argname] = transformers[argname](val)
+        ret = await async_wrapper(**transformed)
+        return return_transformer(ret)
+
     return wrapper
 
 
@@ -56,7 +111,7 @@ def build_jrpc_methods(api: API) -> jsonrpcserver.methods.Methods:
     for mname, mobj in inspect.getmembers(
             api,
             lambda m: inspect.ismethod(m) and not m.__name__.startswith('_')):
-        wrapper = _build_method(mname, mobj)
+        wrapper = _build_serializable_method(mname, mobj)
         methods.add(**{mname: wrapper})
     return methods
 

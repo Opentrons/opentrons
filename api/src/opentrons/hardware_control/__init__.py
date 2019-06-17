@@ -306,7 +306,8 @@ class API(HardwareAPILike):
             self._attached_instruments))
 
     @property
-    def attached_instruments(self):
+    def attached_instruments(self) -> Dict[top_types.Mount,
+                                           Pipette.DictType]:
         """ Get the status dicts of the cached attached instruments.
 
         Also available as :py:meth:`get_attached_instruments`.
@@ -325,8 +326,10 @@ class API(HardwareAPILike):
                    'aspirate_flow_rate', 'dispense_flow_rate',
                    'pipette_id', 'current_volume', 'display_name',
                    'tip_length', 'model']
-        instruments = {top_types.Mount.LEFT: {},
-                       top_types.Mount.RIGHT: {}}
+        instruments: Dict[top_types.Mount, Pipette.DictType] = {
+            top_types.Mount.LEFT: {},
+            top_types.Mount.RIGHT: {}
+        }
         for mount in top_types.Mount:
             instr = self._attached_instruments[mount]
             if not instr:
@@ -337,7 +340,8 @@ class API(HardwareAPILike):
             instruments[mount]['has_tip'] = instr.has_tip
         return instruments
 
-    def get_attached_instruments(self):
+    def get_attached_instruments(self) -> Dict[top_types.Mount,
+                                               Pipette.DictType]:
         """ Function implementation of :py:attr:`attached_instruments` """
         return self.attached_instruments
 

@@ -17,6 +17,9 @@ class Pipette:
     control API. Its only purpose is to gather state.
     """
 
+    DictType = Dict[str, Union[str, float]]
+    #: The type of this data class as a dict
+
     def __init__(self,
                  model: str,
                  inst_offset_config: Dict[str, Tuple[float, float, float]],
@@ -180,7 +183,7 @@ class Pipette:
                                     self._config.display_name,
                                     id(self))
 
-    def as_dict(self) -> Dict[str, Union[str, float]]:
+    def as_dict(self) -> 'Pipette.DictType':
         config_dict = self.config._asdict()
         config_dict.update({'current_volume': self.current_volume,
                             'name': self.name,
