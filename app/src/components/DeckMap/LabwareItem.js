@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 
 import { type Labware } from '../../robot'
-import { getLatestLabwareDef, getLegacyLabwareDef } from '../../util'
+import { getLatestLabwareDef, getLegacyLabwareDef } from '../../getLabware'
 
 import styles from './styles.css'
 
