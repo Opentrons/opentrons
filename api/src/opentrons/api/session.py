@@ -1,7 +1,7 @@
 import ast
 import asyncio
 from copy import copy
-from functools import reduce
+from functools import reduce, wraps
 import json
 import logging
 from time import time
@@ -28,8 +28,22 @@ log = logging.getLogger(__name__)
 VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused', 'error'}
 
 
+def _motion_lock(func):
+    """ Decorator to make a function require a lock. Only works for instance
+    methods of Session (or SessionManager) """
+    @wraps(func)
+    def decorated(*args, **kwargs):
+        self = args[0]
+        if self._motion_lock:
+            with self._motion_lock:
+                return func(*args, **kwargs)
+        else:
+            return func(*args, **kwargs)
+    return decorated
+
+
 class SessionManager(object):
-    def __init__(self, hardware, loop=None, broker=None):
+    def __init__(self, hardware, loop=None, broker=None, lock=None):
         self._broker = broker or Broker()
         self._loop = loop or asyncio.get_event_loop()
         self.session = None
@@ -38,6 +52,7 @@ class SessionManager(object):
         self._command_logger = logging.getLogger(
             'opentrons.server.command_logger')
         self._broker.set_logger(self._command_logger)
+        self._motion_lock = lock
 
     def __del__(self):
         if isinstance(getattr(self, '_hardware', None),
@@ -59,7 +74,8 @@ class SessionManager(object):
                 text=text,
                 hardware=self._hardware,
                 loop=self._loop,
-                broker=self._broker)
+                broker=self._broker,
+                motion_lock=self._motion_lock)
         finally:
             self._session_lock = False
 
@@ -83,12 +99,12 @@ class Session(object):
     TOPIC = 'session'
 
     @classmethod
-    def build_and_prep(cls, name, text, hardware, loop, broker):
-        sess = cls(name, text, hardware, loop, broker)
+    def build_and_prep(cls, name, text, hardware, loop, broker, motion_lock):
+        sess = cls(name, text, hardware, loop, broker, motion_lock)
         sess.prepare()
         return sess
 
-    def __init__(self, name, text, hardware, loop, broker):
+    def __init__(self, name, text, hardware, loop, broker, motion_lock):
         self._broker = broker
         self._default_logger = self._broker.logger
         self._sim_logger = self._broker.logger.getChild('sim')
@@ -116,6 +132,7 @@ class Session(object):
         self.metadata = {}
 
         self.startTime = None
+        self._motion_lock = motion_lock
 
     def prepare(self):
         self._hardware.discover_modules()
@@ -159,6 +176,7 @@ class Session(object):
         self.command_log.clear()
         self.errors.clear()
 
+    @_motion_lock
     def _simulate(self):
         self._reset()
 
@@ -299,7 +317,8 @@ class Session(object):
         self.set_state('running')
         return self
 
-    def _run(self):  # noqa(C901)
+    @_motion_lock  # noqa(C901)
+    def _run(self):
         def on_command(message):
             if message['$'] == 'before':
                 self.log_append()

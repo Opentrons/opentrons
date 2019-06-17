@@ -2,6 +2,7 @@
 // main LabwareList component
 import * as React from 'react'
 
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import { getFilteredDefinitions } from '../../filters'
 import LabwareCard from './LabwareCard'
 import NoResults from './NoResults'
@@ -23,7 +24,7 @@ export default function LabwareList(props: LabwareListProps) {
   ) : (
     <ul className={styles.list}>
       {definitions.map(d => (
-        <LabwareCard key={d.otId} definition={d} />
+        <LabwareCard key={getLabwareDefURI(d)} definition={d} />
       ))}
     </ul>
   )

@@ -140,9 +140,15 @@ async def test_save_xy(async_server, dc_session):
     assert actual == expected
 
 
-async def test_save_z(async_server, dc_session):
+async def test_save_z(async_server, dc_session, monkeypatch):
     hardware = dc_session.adapter
     model = 'p10_single_v1'
+
+    # Z values were bleeding in from other tests, mock robot configs
+    # to encapsulate this test
+    fake_config = robot_configs.load()
+    monkeypatch.setattr(hardware, 'config', fake_config)
+
     if async_server['api_version'] == 1:
         mount = 'left'
         hardware.reset()
@@ -214,13 +220,14 @@ async def test_save_calibration_file(dc_session, monkeypatch):
     assert np.allclose(in_memory, expected)
 
 
-async def test_transform_calculation(dc_session):
+async def test_transform_calculation(dc_session, monkeypatch):
     # This transform represents a 5 degree rotation, with a shift in x, y, & z.
     # Values for the points and expected transform come from a hand-crafted
     # transformation matrix and the points that would generate that matrix.
     hardware = dc_session.adapter
-    cos_5deg_p = 0.99619469809
-    sin_5deg_p = 0.08715574274
+
+    cos_5deg_p = 0.9962
+    sin_5deg_p = 0.0872
     sin_5deg_n = -sin_5deg_p
     const_zero = 0.0
     const_one_ = 1.0

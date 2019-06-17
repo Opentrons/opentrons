@@ -2,6 +2,7 @@ import asyncio
 import os
 import logging
 from functools import lru_cache
+from threading import Lock
 from typing import Dict, Any
 
 from numpy import add, subtract
@@ -141,6 +142,7 @@ class Robot(CommandPublisher):
 
         self._commands = []
         self._unsubscribe_commands = None
+        self._smoothie_lock = Lock()
         self.reset()
 
     def __del__(self):
@@ -1070,6 +1072,10 @@ class Robot(CommandPublisher):
         of the configuration.
         """
         self.config = self.config._replace(**kwargs)
+
+    def set_config(self, config):
+        """ Replace the entire configuration. """
+        self.config = config
 
     async def update_firmware(self,
                               filename,

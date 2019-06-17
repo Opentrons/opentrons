@@ -1,3 +1,4 @@
+import copy
 import pytest
 import sys
 import numpy as np
@@ -5,6 +6,7 @@ import numpy as np
 from opentrons.config import (CONFIG,
                               robot_configs,
                               advanced_settings as advs)
+from opentrons.types import Mount
 from opentrons.deck_calibration import dc_main
 from opentrons.deck_calibration.dc_main import get_calibration_points
 from opentrons.deck_calibration.endpoints import expected_points
@@ -12,11 +14,8 @@ from opentrons.deck_calibration.endpoints import expected_points
 
 @pytest.fixture
 def mock_config():
-    test_config = robot_configs.load()
-    new_config = test_config._replace(name='new-value1')
-    robot_configs.save_robot_settings(new_config)
-    yield new_config
-    robot_configs.save_robot_settings(test_config)
+    yield robot_configs.load()
+    robot_configs.clear()
 
 
 @pytest.mark.api1_only
@@ -32,24 +31,34 @@ def test_clear_config(mock_config, async_server):
 
 def test_save_and_clear_config(mock_config, async_server):
     # Clear should happen automatically after the following import, resetting
-    # the robot config to the default value from robot_configs
+    # the deck cal to the default value
     from opentrons.deck_calibration import dc_main
     import os
 
     hardware = async_server['com.opentrons.hardware']
-    hardware.update_config(name='Ada Lovelace')
-    old_config = hardware.config
+
+    hardware.config.gantry_calibration[0][3] = 10
+
+    old_gantry = copy.copy(hardware.config.gantry_calibration)
     base_filename = CONFIG['deck_calibration_file']
 
     tag = "testing"
     root, ext = os.path.splitext(base_filename)
     filename = "{}-{}{}".format(root, tag, ext)
+
     dc_main.backup_configuration_and_reload(hardware, tag=tag)
+    # After reset gantry calibration should be I(4,4)
+    assert hardware.config.gantry_calibration\
+        == robot_configs.DEFAULT_DECK_CALIBRATION
+    # Mount calibration should be defaulted
+    assert hardware.config.mount_offset == robot_configs.DEFAULT_MOUNT_OFFSET
 
-    assert hardware.config == robot_configs._build_config({}, {})
-
+    # Check that we properly saved the old deck calibration
     saved_config = robot_configs.load(filename)
-    assert saved_config == old_config
+    assert saved_config.gantry_calibration == old_gantry
+    # XXX This shouldn't be necessary but the config isn't properly cleared
+    # otherwise
+    hardware.config.gantry_calibration[0][3] = 0
 
 
 async def test_new_deck_points():
@@ -105,11 +114,32 @@ def test_move_output(mock_config, loop, async_server, monkeypatch):
             tool._position(), expected_pts[point]).all()
 
 
-def test_tip_probe(mock_config, async_server):
+@pytest.mark.skipif(
+    sys.platform.startswith("win"), reason="Incompatible with Windows")
+@pytest.mark.api1_only
+def test_tip_probe(mock_config, loop, async_server, monkeypatch):
     # Test that tip probe returns successfully
     hardware = async_server['com.opentrons.hardware']
+
+    # TODO (maybe): Figure out how to prevent the pytest loop fixture
+    # from getting closed by the CLI tool on exit for API V2
+    monkeypatch.setattr(
+        dc_main.CLITool, 'hardware', hardware)
+    tip_length = 51.7
+    tool = dc_main.CLITool(
+        point_set=get_calibration_points(), tip_length=tip_length, loop=loop)
+
+    assert tool.hardware is hardware
+
+    version = async_server['api_version']
+    point_after = (10, 10, 10)
     tip_length = 51.7  # p300/p50 tip length
-    output = dc_main.probe(tip_length, hardware)
+    if version == 2:
+        # Keeping here for future use if TODO can be figured out.
+        mount = Mount.RIGHT
+    else:
+        mount = 'right'
+    output = tool.probe(tip_length, hardware, mount, point_after)
     assert output == 'Tip probe'
 
 
@@ -176,6 +206,6 @@ def test_gantry_matrix_output(mock_config, loop, async_server, monkeypatch):
     assert tool.actual_points == actual_points
 
     tool.save_transform()
-    assert np.allclose(expected, tool.calibration_matrix)
+    assert np.allclose(expected, tool.current_transform)
 
     hardware.reset()

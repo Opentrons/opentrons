@@ -88,7 +88,6 @@ exports[`LabwareList component renders 1`] = `
             "A12",
           ],
         ],
-        "otId": "fixture12Trough",
         "parameters": Object {
           "format": "trough",
           "isMagneticModuleCompatible": false,
@@ -224,7 +223,7 @@ exports[`LabwareList component renders 1`] = `
         },
       }
     }
-    key="fixture12Trough"
+    key="fixture/usascientific_12_reservoir_22ml/1"
   />
   <LabwareCard
     definition={
@@ -328,7 +327,6 @@ exports[`LabwareList component renders 1`] = `
             "D6",
           ],
         ],
-        "otId": "fixture24TubeRack",
         "parameters": Object {
           "format": "irregular",
           "isMagneticModuleCompatible": false,
@@ -557,7 +555,7 @@ exports[`LabwareList component renders 1`] = `
         },
       }
     }
-    key="fixture24TubeRack"
+    key="fixture/opentrons_24_tuberack_generic_2ml_screwcap/1"
   />
   <LabwareCard
     definition={
@@ -1423,7 +1421,6 @@ exports[`LabwareList component renders 1`] = `
             "P24",
           ],
         ],
-        "otId": "fixture384Plate",
         "parameters": Object {
           "format": "384Standard",
           "isMagneticModuleCompatible": false,
@@ -4892,7 +4889,7 @@ exports[`LabwareList component renders 1`] = `
         },
       }
     }
-    key="fixture384Plate"
+    key="fixture/corning_384_wellplate_112ul_flat/1"
   />
   <LabwareCard
     definition={
@@ -5150,7 +5147,6 @@ exports[`LabwareList component renders 1`] = `
             "H12",
           ],
         ],
-        "otId": "fixture96Plate",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -6027,7 +6023,7 @@ exports[`LabwareList component renders 1`] = `
         },
       }
     }
-    key="fixture96Plate"
+    key="fixture/generic_96_wellplate_340ul_flat/1"
   />
   <LabwareCard
     definition={
@@ -6282,7 +6278,6 @@ exports[`LabwareList component renders 1`] = `
             "H12",
           ],
         ],
-        "otId": "fixtureTipRack1000Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -7161,7 +7156,7 @@ exports[`LabwareList component renders 1`] = `
         },
       }
     }
-    key="fixtureTipRack1000Ul"
+    key="fixture/opentrons_96_tiprack_1000ul/1"
   />
   <LabwareCard
     definition={
@@ -7416,7 +7411,6 @@ exports[`LabwareList component renders 1`] = `
             "H12",
           ],
         ],
-        "otId": "fixtureTipRack10Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -8295,7 +8289,7 @@ exports[`LabwareList component renders 1`] = `
         },
       }
     }
-    key="fixtureTipRack10Ul"
+    key="fixture/opentrons_96_tiprack_10ul/1"
   />
   <LabwareCard
     definition={
@@ -8552,7 +8546,6 @@ exports[`LabwareList component renders 1`] = `
             "H12",
           ],
         ],
-        "otId": "fixtureTipRack300Ul",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -9431,7 +9424,7 @@ exports[`LabwareList component renders 1`] = `
         },
       }
     }
-    key="fixtureTipRack300Ul"
+    key="fixture/opentrons_96_tiprack_300ul/1"
   />
   <LabwareCard
     definition={
@@ -9603,7 +9596,6 @@ exports[`LabwareList component renders 1`] = `
             "I10",
           ],
         ],
-        "otId": "mock-id",
         "parameters": Object {
           "format": "irregular",
           "isMagneticModuleCompatible": false,
@@ -10111,7 +10103,7 @@ exports[`LabwareList component renders 1`] = `
         },
       }
     }
-    key="mock-id"
+    key="fixture/generic_55_tuberack_50x3ml_5x10ml/1"
   />
   <LabwareCard
     definition={
@@ -10155,7 +10147,6 @@ exports[`LabwareList component renders 1`] = `
             "A2",
           ],
         ],
-        "otId": "mock-id",
         "parameters": Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
@@ -10186,7 +10177,7 @@ exports[`LabwareList component renders 1`] = `
         },
       }
     }
-    key="mock-id"
+    key="fixture/opentrons_2_wellplate_100ul/1"
   />
   <LabwareCard
     definition={
@@ -10235,7 +10226,6 @@ exports[`LabwareList component renders 1`] = `
             "C2",
           ],
         ],
-        "otId": "mock-id",
         "parameters": Object {
           "format": "irregular",
           "isMagneticModuleCompatible": false,
@@ -10302,7 +10292,7 @@ exports[`LabwareList component renders 1`] = `
         },
       }
     }
-    key="mock-id"
+    key="fixture/generic_6_wellplate_1ml/1"
   />
 </ul>
 `;

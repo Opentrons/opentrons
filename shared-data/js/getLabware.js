@@ -15,6 +15,18 @@ assert(
   'Expected v1 labware defs. Something went wrong with shared-data/build/labware.json'
 )
 
+// labware definitions only used for back-compat with legacy v1 defs.
+// do not list in any "available labware" UI.
+export const LABWAREV2_DO_NOT_LIST = [
+  'opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip',
+  'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap_acrylic',
+  'opentrons_24_tuberack_generic_0.75ml_snapcap_acrylic',
+  'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic',
+  'tipone_96_tiprack_200ul',
+  'opentrons_1_trash_850ml_fixed',
+  'opentrons_1_trash_1100ml_fixed',
+]
+
 export function getLabwareV1Def(labwareName: string): ?LabwareDefinition1 {
   const labware: ?LabwareDefinition1 = definitions[labwareName]
   return labware

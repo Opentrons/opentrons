@@ -165,8 +165,7 @@ class API(HardwareAPILike):
         """ The event loop used by this instance. """
         return self._loop
 
-    @loop.setter
-    def loop(self, loop: asyncio.AbstractEventLoop):
+    def set_loop(self, loop: asyncio.AbstractEventLoop):
         self._loop = loop
         self._lock = asyncio.Lock(loop=loop)
 
@@ -792,8 +791,7 @@ class API(HardwareAPILike):
         """
         return self._config
 
-    @config.setter
-    def config(self, config):
+    def set_config(self, config: robot_configs.robot_config):
         self._config = config
 
     def update_config(self, **kwargs):
