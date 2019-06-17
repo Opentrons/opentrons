@@ -7,7 +7,7 @@ from opentrons.legacy_api.instruments import pipette
 
 @pytest.fixture
 def plate(robot):
-    load(robot, '96-flat', '4')
+    return load(robot, '96-flat', '4')
 
 
 def test_rows_cols(plate):
