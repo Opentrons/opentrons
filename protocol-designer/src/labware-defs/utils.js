@@ -1,4 +1,5 @@
 // @flow
+import groupBy from 'lodash/groupBy'
 import {
   getLabwareDefURI,
   type LabwareDefinition2,
@@ -30,6 +31,38 @@ export function getAllDefinitions(): LabwareDefByDefURI {
   }
 
   return definitions
+}
+
+// filter out all but the latest version of each labware
+// NOTE: this is similar to labware-library's getOnlyLatestDefs, but this one
+// has the {labwareDefURI: def} shape, instead of an array of labware defs
+let latestDefs = null
+export function getOnlyLatestDefs(): LabwareDefByDefURI {
+  if (!latestDefs) {
+    const allDefs = getAllDefinitions()
+    const allURIs = Object.keys(allDefs)
+    const labwareDefGroups: {
+      [groupKey: string]: Array<LabwareDefinition2>,
+    } = groupBy(
+      allURIs.map((uri: string) => allDefs[uri]),
+      d => `${d.namespace}/${d.parameters.loadName}`
+    )
+    latestDefs = Object.keys(labwareDefGroups).reduce(
+      (acc, groupKey: string) => {
+        const group = labwareDefGroups[groupKey]
+        const allVersions = group.map(d => d.version)
+        const highestVersionNum = Math.max(...allVersions)
+        const resultIdx = group.findIndex(d => d.version === highestVersionNum)
+        const latestDefInGroup = group[resultIdx]
+        return {
+          ...acc,
+          [getLabwareDefURI(latestDefInGroup)]: latestDefInGroup,
+        }
+      },
+      {}
+    )
+  }
+  return latestDefs
 }
 
 // NOTE: this is different than labware library,

@@ -4,7 +4,7 @@ import { useOnClickOutside, OutlineButton } from '@opentrons/components'
 import { getLabwareDefURI, type DeckSlotId } from '@opentrons/shared-data'
 import startCase from 'lodash/startCase'
 import reduce from 'lodash/reduce'
-import { getAllDefinitions } from '../../labware-defs/utils'
+import { getOnlyLatestDefs } from '../../labware-defs/utils'
 import { Portal } from '../portals/TopPortal'
 import { PDTitledList } from '../lists'
 import LabwareItem from './LabwareItem'
@@ -36,10 +36,9 @@ const LabwareDropdown = (props: Props) => {
   const [previewedLabware, previewLabware] = useState(null)
 
   const labwareByCategory = useMemo(() => {
-    // TODO: Ian 2019-06-04 only show latest versions of labware here (#3525)
-    const allDefs = getAllDefinitions()
+    const latestDefs = getOnlyLatestDefs()
     return reduce(
-      allDefs,
+      latestDefs,
       (acc, def) => {
         const category = def.metadata.displayCategory
         if (
