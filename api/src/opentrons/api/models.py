@@ -22,7 +22,7 @@ class Container:
             self.name = container.get_name()
             self.type = container.get_type()
             self.slot = _get_parent_slot(container).get_name()
-            self.is_legacy = not container.properties.get('labware_hash')
+            self.is_legacy = container.properties.get('labware_hash') is not None
         else:
             self.name = container.name
             self.type = container.name
