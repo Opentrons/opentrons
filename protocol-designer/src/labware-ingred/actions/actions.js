@@ -55,7 +55,6 @@ export type CreateContainerAction = {
   payload: {
     ...CreateContainerArgs,
     id: string,
-    disambiguationNumber: number,
   },
 }
 
@@ -70,21 +69,6 @@ export const deleteContainer = createAction<
   'DELETE_CONTAINER',
   $PropertyType<DeleteContainerAction, 'payload'>
 >('DELETE_CONTAINER')
-
-export type RenameLabwareAction = {
-  type: 'RENAME_LABWARE',
-  payload: {
-    labwareId: string,
-    name: ?string,
-  },
-}
-
-export const renameLabware = (
-  payload: $PropertyType<RenameLabwareAction, 'payload'>
-): RenameLabwareAction => ({
-  type: 'RENAME_LABWARE',
-  payload,
-})
 
 // ===========
 
@@ -111,7 +95,7 @@ export type DuplicateLabwareAction = {
   payload: {
     templateLabwareId: string,
     duplicateLabwareId: string,
-    duplicateDisambiguationNumber: number,
+    duplicateLabwareNickname: string,
     slot: DeckSlotId,
   },
 }

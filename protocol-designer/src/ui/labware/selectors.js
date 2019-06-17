@@ -2,11 +2,13 @@
 import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
-
-import { getIsTiprack, getLabwareFormat } from '@opentrons/shared-data'
+import {
+  getIsTiprack,
+  getLabwareDisplayName,
+  getLabwareFormat,
+} from '@opentrons/shared-data'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-import { labwareToDisplayName } from '../../labware-ingred/utils'
 
 import type { Options } from '@opentrons/components'
 import type { Selector } from '../../types'
@@ -18,8 +20,10 @@ export const getLabwareNicknamesById: Selector<{
   stepFormSelectors.getLabwareEntities,
   labwareIngredSelectors.getLabwareNameInfo,
   (labwareEntities, displayLabware): { [labwareId: string]: string } =>
-    mapValues(labwareEntities, (labwareEntity: LabwareEntity, id: string) =>
-      labwareToDisplayName(displayLabware[id], labwareEntity.def)
+    mapValues(
+      labwareEntities,
+      (labwareEntity: LabwareEntity, id: string): string =>
+        displayLabware[id]?.nickname || getLabwareDisplayName(labwareEntity.def)
     )
 )
 
