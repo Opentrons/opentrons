@@ -1,10 +1,15 @@
 // @flow
 import groupBy from 'lodash/groupBy'
+import reduce from 'lodash/reduce'
 import {
   getLabwareDefURI,
+  LABWAREV2_DO_NOT_LIST,
   type LabwareDefinition2,
 } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from './types'
+
+const OPENTRONS_NAMESPACE = 'opentrons'
+
 // TODO: Ian 2019-04-11 getAllDefinitions also exists (differently) in labware-library,
 // should reconcile differences & make a general util fn imported from shared-data
 
@@ -17,28 +22,27 @@ const definitionsContext = require.context(
   'sync' // load every definition into one synchronous chunk
 )
 
-let definitions = null
-
+let _definitions = null
 export function getAllDefinitions(): LabwareDefByDefURI {
   // NOTE: unlike labware-library, no filtering out trashes here (we need 'em)
   // also, more convenient & performant to make a map {labwareDefURI: def} not an array
-  if (!definitions) {
-    definitions = definitionsContext.keys().reduce((acc, filename) => {
+  if (!_definitions) {
+    _definitions = definitionsContext.keys().reduce((acc, filename) => {
       const def = definitionsContext(filename)
       const labwareDefURI = getLabwareDefURI(def)
       return { ...acc, [labwareDefURI]: def }
     }, {})
   }
 
-  return definitions
+  return _definitions
 }
 
 // filter out all but the latest version of each labware
 // NOTE: this is similar to labware-library's getOnlyLatestDefs, but this one
 // has the {labwareDefURI: def} shape, instead of an array of labware defs
-let latestDefs = null
+let _latestDefs = null
 export function getOnlyLatestDefs(): LabwareDefByDefURI {
-  if (!latestDefs) {
+  if (!_latestDefs) {
     const allDefs = getAllDefinitions()
     const allURIs = Object.keys(allDefs)
     const labwareDefGroups: {
@@ -47,7 +51,7 @@ export function getOnlyLatestDefs(): LabwareDefByDefURI {
       allURIs.map((uri: string) => allDefs[uri]),
       d => `${d.namespace}/${d.parameters.loadName}`
     )
-    latestDefs = Object.keys(labwareDefGroups).reduce(
+    _latestDefs = Object.keys(labwareDefGroups).reduce(
       (acc, groupKey: string) => {
         const group = labwareDefGroups[groupKey]
         const allVersions = group.map(d => d.version)
@@ -62,7 +66,25 @@ export function getOnlyLatestDefs(): LabwareDefByDefURI {
       {}
     )
   }
-  return latestDefs
+  return _latestDefs
+}
+
+// filter out "do not list" labware
+export function getAllAddableLabware(): LabwareDefByDefURI {
+  const latestDefs = getOnlyLatestDefs()
+  return reduce(
+    latestDefs,
+    (acc, def: $Values<typeof latestDefs>, uri) => {
+      if (
+        def.namespace === OPENTRONS_NAMESPACE &&
+        LABWAREV2_DO_NOT_LIST.includes(def.parameters.loadName)
+      ) {
+        return acc
+      }
+      return { ...acc, [uri]: def }
+    },
+    {}
+  )
 }
 
 // NOTE: this is different than labware library,

@@ -1,10 +1,14 @@
 // @flow
 import React, { useState, useMemo } from 'react'
 import { useOnClickOutside, OutlineButton } from '@opentrons/components'
-import { getLabwareDefURI, type DeckSlotId } from '@opentrons/shared-data'
+import {
+  getLabwareDefURI,
+  type DeckSlotId,
+  type LabwareDefinition2,
+} from '@opentrons/shared-data'
 import startCase from 'lodash/startCase'
 import reduce from 'lodash/reduce'
-import { getOnlyLatestDefs } from '../../labware-defs/utils'
+import { getAllAddableLabware } from '../../labware-defs/utils'
 import { Portal } from '../portals/TopPortal'
 import { PDTitledList } from '../lists'
 import LabwareItem from './LabwareItem'
@@ -32,15 +36,16 @@ const orderedCategories: Array<string> = [
 const LabwareDropdown = (props: Props) => {
   const { permittedTipracks, onClose, slot, selectLabware } = props
 
-  const [selectedCategory, selectCategory] = useState(null)
-  const [previewedLabware, previewLabware] = useState(null)
+  const [selectedCategory, selectCategory] = useState<?string>(null)
+  const [previewedLabware, previewLabware] = useState<?LabwareDefinition2>(null)
 
   const labwareByCategory = useMemo(() => {
-    const latestDefs = getOnlyLatestDefs()
+    const defs = getAllAddableLabware()
     return reduce(
-      latestDefs,
-      (acc, def) => {
+      defs,
+      (acc, def: $Values<typeof defs>) => {
         const category = def.metadata.displayCategory
+        // filter out non-permitted tipracks
         if (
           category === 'tipRack' &&
           !permittedTipracks.includes(getLabwareDefURI(def))
