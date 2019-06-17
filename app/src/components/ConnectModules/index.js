@@ -41,7 +41,9 @@ function ConnectModules(props: Props) {
     <RefreshWrapper refresh={fetchModules}>
       <div className={styles.page_content_dark}>
         <Prompt modulesMissing={modulesMissing} onClick={onPromptClick} />
-        <DeckMap modulesRequired />
+        <div className={styles.deck_map_wrapper}>
+          <DeckMap modulesRequired />
+        </div>
       </div>
     </RefreshWrapper>
   )

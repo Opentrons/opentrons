@@ -35,7 +35,9 @@ function ReviewDeck(props: Props) {
   return (
     <div className={styles.page_content_dark}>
       {currentLabware && <Prompt {...currentLabware} onClick={onClick} />}
-      <DeckMap />
+      <div className={styles.deck_map_wrapper}>
+        <DeckMap />
+      </div>
     </div>
   )
 }

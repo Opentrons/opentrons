@@ -59,6 +59,7 @@ const deckSetupLayerBlacklist = [
   'doorStops',
   'metalFrame',
   'removalHandle',
+  'removableDeckOutline',
   'screwHoles',
 ]
 

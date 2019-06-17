@@ -43,3 +43,9 @@
   background-color: color(var(--c-black) alpha(0.99));
   min-height: 100%;
 }
+
+.deck_map_wrapper {
+  width: 100%;
+  background-color: var(--c-bg-light);
+  border-radius: 6px;
+}
