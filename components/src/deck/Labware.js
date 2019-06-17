@@ -3,11 +3,7 @@ import * as React from 'react'
 import map from 'lodash/map'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 import assert from 'assert'
-import {
-  getLabware,
-  // getWellDefsForSVG,
-  // getIsTiprackDeprecated,
-} from '@opentrons/shared-data'
+import { getLabware } from '@opentrons/shared-data'
 
 import LabwareOutline from './LabwareOutline'
 import FallbackLabware from './FallbackLabware'
@@ -21,12 +17,15 @@ export type Props = {
   definition?: ?LabwareDefinition,
 }
 
+// NOTE: this is a legacy component that is only responsible
+// for visualizing a labware schema v1 definition by def or loadName
+
 class Labware extends React.Component<Props> {
   render() {
     const { labwareType, definition } = this.props
 
     const labwareDefinition =
-      definition || (labwareType && getLabware(labwareType))
+      definition || (labwareType ? getLabware(labwareType) : null)
 
     if (!labwareDefinition) {
       return <FallbackLabware />
@@ -49,13 +48,15 @@ class Labware extends React.Component<Props> {
             `No well definition for labware ${labwareType ||
               'unknown labware'}, well ${wellName}`
           )
+          // NOTE x + 1, y + 3 HACK offset from old getWellDefsForSVG has been purposefully
+          // left out here; it's intention was to make the well viz offset less "off"
           return isTiprack ? (
             <Tip key={wellName} wellDef={wellDef} tipVolume={tipVolume} />
           ) : (
             <Well
               key={wellName}
               wellName={wellName}
-              wellDef={{ ...wellDef, x: wellDef.x + 1, y: wellDef.y + 3 }} // This is a HACK to make the offset less "off"
+              wellDef={{ ...wellDef, x: wellDef.x, y: wellDef.y }}
             />
           )
         })}

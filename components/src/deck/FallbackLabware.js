@@ -19,7 +19,7 @@ export default function FallbackLabware() {
           className: styles.fallback_plate_text,
         }}
       >
-        Custom Labware
+        <p>Custom Labware</p>
       </RobotCoordsForeignDiv>
     </g>
   )

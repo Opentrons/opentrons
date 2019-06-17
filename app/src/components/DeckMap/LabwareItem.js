@@ -2,6 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { Link } from 'react-router-dom'
+import noop from 'lodash/noop'
 import { SLOT_RENDER_HEIGHT, SLOT_RENDER_WIDTH } from '@opentrons/shared-data'
 
 import {
@@ -33,7 +34,9 @@ export default function LabwareItem(props: LabwareItemProps) {
 
   const showSpinner = highlighted && labware.calibration === 'moving-to-slot'
   const disabled =
-    (isTiprack && confirmed) || (!isTiprack && areTipracksConfirmed === false)
+    areTipracksConfirmed === undefined ||
+    (isTiprack && confirmed) ||
+    (!isTiprack && areTipracksConfirmed === false)
 
   const title = humanizeLabwareType(type)
 
@@ -48,46 +51,44 @@ export default function LabwareItem(props: LabwareItemProps) {
     height = def.dimensions.yDimension
   }
   return (
-    <>
-      <g
-        className={cx({ [styles.disabled]: disabled })}
-        transform={`translate(${props.x}, ${props.y})`}
+    <g
+      className={cx({ [styles.disabled]: disabled })}
+      transform={`translate(${props.x}, ${props.y})`}
+    >
+      {item}
+      <RobotCoordsForeignDiv
+        width={width}
+        height={height}
+        x={0}
+        y={0 - height}
+        transformWithSVG
+        innerDivProps={{
+          className: cx(styles.labware_ui_wrapper, {
+            [styles.highlighted_border_div]: highlighted,
+          }),
+        }}
       >
-        {item}
-        <RobotCoordsForeignDiv
-          width={width}
-          height={height}
-          x={0}
-          y={0 - height}
-          transformWithSVG
-          innerDivProps={{
-            className: cx(styles.labware_ui_wrapper, {
-              [styles.highlighted_border_div]: highlighted,
-            }),
-          }}
+        <Link
+          to={`/calibrate/labware/${slot}`}
+          onClick={disabled ? noop : handleClick}
+          className={styles.labware_ui_link}
         >
-          <Link
-            to={`/calibrate/labware/${slot}`}
-            onClick={handleClick}
-            className={styles.labware_ui_link}
-          >
-            {showSpinner ? (
-              <div className={styles.labware_spinner_wrapper}>
-                <Icon className={styles.spinner} name="ot-spinner" spin />
-              </div>
-            ) : (
-              <div className={styles.name_overlay}>
-                <p className={styles.display_name} title={title}>
-                  {title}
-                </p>
-                <p className={styles.subtitle} title={name}>
-                  {name}
-                </p>
-              </div>
-            )}
-          </Link>
-        </RobotCoordsForeignDiv>
-      </g>
-    </>
+          {showSpinner ? (
+            <div className={styles.labware_spinner_wrapper}>
+              <Icon className={styles.spinner} name="ot-spinner" spin />
+            </div>
+          ) : (
+            <div className={styles.name_overlay}>
+              <p className={styles.display_name} title={title}>
+                {title}
+              </p>
+              <p className={styles.subtitle} title={name}>
+                {name}
+              </p>
+            </div>
+          )}
+        </Link>
+      </RobotCoordsForeignDiv>
+    </g>
   )
 }

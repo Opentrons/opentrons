@@ -1,15 +1,15 @@
 @import '@opentrons/components';
 
 .fallback_plate_text {
-  @apply --absolute-fill;
-
+  height: 100%;
+  width: 100%;
   font-size: var(--fs-body-1);
   font-style: italic;
   color: gray;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .plate_outline {

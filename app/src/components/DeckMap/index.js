@@ -83,7 +83,7 @@ function DeckMap(props: Props) {
           const labwareInSlot = labwareBySlot && labwareBySlot[slotId]
 
           return (
-            <>
+            <React.Fragment key={slotId}>
               {moduleInSlot && (
                 <g
                   transform={`translate(${slot.position[0]}, ${
@@ -91,8 +91,8 @@ function DeckMap(props: Props) {
                   })`}
                 >
                   <ModuleItem
-                    name={moduleInSlot && moduleInSlot.name}
-                    mode={(moduleInSlot && moduleInSlot.mode) || 'default'}
+                    name={moduleInSlot.name}
+                    mode={moduleInSlot.mode || 'default'}
                   />
                 </g>
               )}
@@ -107,7 +107,7 @@ function DeckMap(props: Props) {
                     highlighted={slotId === selectedSlot}
                   />
                 ))}
-            </>
+            </React.Fragment>
           )
         })
       }
