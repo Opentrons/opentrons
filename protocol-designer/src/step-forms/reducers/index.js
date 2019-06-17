@@ -35,8 +35,8 @@ import type {
 import type { FormData, StepIdType } from '../../form-types'
 // TODO: Ian 2019-07-12 update labware & pipette state shape to not use v1 #3336
 import type {
-  FileLabwareV1 as FileLabware,
-  FilePipetteV1 as FilePipette,
+  FileLabwareV3 as FileLabware,
+  FilePipetteV3 as FilePipette,
 } from '@opentrons/shared-data'
 
 import type {
@@ -57,7 +57,7 @@ import type {
   DeletePipettesAction,
   SubstituteStepFormPipettesAction,
 } from '../actions'
-import { getIdsInRange, getLabwareIdInSlot, pipetteModelToName } from '../utils'
+import { getIdsInRange, getLabwareIdInSlot } from '../utils'
 
 type FormState = FormData | null
 
@@ -438,7 +438,7 @@ export const labwareInvariantProperties = handleActions<
       return mapValues(
         file.labware,
         (fileLabware: FileLabware, id: string) => ({
-          type: fileLabware.model,
+          labwareDefURI: fileLabware.definitionId,
         })
       )
     },
@@ -472,7 +472,7 @@ export const pipetteInvariantProperties = handleActions<
           )
           return {
             id: pipetteId,
-            name: filePipette.name || pipetteModelToName(filePipette.model),
+            name: filePipette.name,
             tiprackDefURI,
           }
         }
