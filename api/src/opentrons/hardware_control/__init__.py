@@ -14,6 +14,7 @@ import asyncio
 from collections import OrderedDict
 import contextlib
 import functools
+import inspect
 import logging
 from typing import Any, Dict, Union, List, Optional, Tuple
 from opentrons import types as top_types
@@ -34,10 +35,16 @@ mod_log = logging.getLogger(__name__)
 
 
 def _log_call(func):
-    @functools.wraps(func)
-    def _log_call_inner(*args, **kwargs):
-        args[0]._log.debug(func.__name__)
-        return func(*args, **kwargs)
+    if inspect.iscoroutinefunction(func):
+        @functools.wraps(func)
+        async def _log_call_inner(*args, **kwargs):
+            args[0]._log.debug(func.__name__)
+            return await func(*args, **kwargs)
+    else:
+        @functools.wraps(func)
+        def _log_call_inner(*args, **kwargs):
+            args[0]._log.debug(func.__name__)
+            return func(*args, **kwargs)
     return _log_call_inner
 
 
