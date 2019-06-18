@@ -24,32 +24,32 @@ type VolumeParams = {| volume: number |}
 
 type OffsetParams = {| offsetFromBottomMm: number |}
 
-type _AspDispAirgapArgs = {|
+type _AspDispAirgapParams = {|
   ...FlowRateParams,
   ...PipetteAccessParams,
   ...VolumeParams,
   ...OffsetParams,
 |}
 
-export type AspirateArgsV3 = _AspDispAirgapArgs
-export type DispenseArgsV3 = _AspDispAirgapArgs
-export type AirGapArgsV3 = _AspDispAirgapArgs
+export type AspirateParamsV3 = _AspDispAirgapParams
+export type DispenseParamsV3 = _AspDispAirgapParams
+export type AirGapParamsV3 = _AspDispAirgapParams
 
-export type BlowoutArgsV3 = {|
+export type BlowoutParamsV3 = {|
   ...FlowRateParams,
   ...PipetteAccessParams,
   ...OffsetParams,
 |}
 
-export type TouchTipArgsV3 = {|
+export type TouchTipParamsV3 = {|
   ...PipetteAccessParams,
   ...OffsetParams,
 |}
 
-export type PickUpTipArgsV3 = PipetteAccessParams
-export type DropTipArgsV3 = PipetteAccessParams
+export type PickUpTipParamsV3 = PipetteAccessParams
+export type DropTipParamsV3 = PipetteAccessParams
 
-export type MoveToSlotArgsV3 = {|
+export type MoveToSlotParamsV3 = {|
   pipette: string,
   slot: string,
   offset?: {|
@@ -60,7 +60,7 @@ export type MoveToSlotArgsV3 = {|
   minimumZHeight: number,
 |}
 
-export type DelayArgsV3 = {|
+export type DelayParamsV3 = {|
   wait: number | true,
   message?: string,
 |}
@@ -68,15 +68,15 @@ export type DelayArgsV3 = {|
 export type CommandV3 =
   | {|
       command: 'aspirate' | 'dispense' | 'airGap',
-      params: _AspDispAirgapArgs,
+      params: _AspDispAirgapParams,
     |}
   | {|
       command: 'blowout',
-      params: BlowoutArgsV3,
+      params: BlowoutParamsV3,
     |}
   | {|
       command: 'touchTip',
-      params: TouchTipArgsV3,
+      params: TouchTipParamsV3,
     |}
   | {|
       command: 'pickUpTip' | 'dropTip',
@@ -84,11 +84,11 @@ export type CommandV3 =
     |}
   | {|
       command: 'moveToSlot',
-      params: MoveToSlotArgsV3,
+      params: MoveToSlotParamsV3,
     |}
   | {|
       command: 'delay',
-      params: DelayArgsV3,
+      params: DelayParamsV3,
     |}
 
 // NOTE: must be kept in sync with '../schemas/3.json'

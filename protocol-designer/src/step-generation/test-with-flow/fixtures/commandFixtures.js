@@ -1,10 +1,10 @@
 // @flow
 import { tiprackWellNamesFlat } from './data'
 import type {
-  AspirateArgsV3,
-  BlowoutArgsV3,
-  DispenseArgsV3,
-  TouchTipArgsV3,
+  AspirateParamsV3,
+  BlowoutParamsV3,
+  DispenseParamsV3,
+  TouchTipParamsV3,
   CommandV3 as Command,
 } from '@opentrons/shared-data'
 import type {
@@ -85,10 +85,10 @@ const _defaultAspirateParams = {
   pipette: DEFAULT_PIPETTE,
   labware: SOURCE_LABWARE,
 }
-export const makeAspirateHelper = (bakedParams?: $Shape<AspirateArgsV3>) => (
+export const makeAspirateHelper = (bakedParams?: $Shape<AspirateParamsV3>) => (
   well: string,
   volume: number,
-  params?: $Shape<AspirateArgsV3>
+  params?: $Shape<AspirateParamsV3>
 ): Command => ({
   command: 'aspirate',
   params: {
@@ -104,7 +104,7 @@ export const makeAspirateHelper = (bakedParams?: $Shape<AspirateArgsV3>) => (
 
 export const blowoutHelper = (
   labware?: ?string,
-  params?: $Shape<BlowoutArgsV3>
+  params?: $Shape<BlowoutParamsV3>
 ): Command => ({
   command: 'blowout',
   params: {
@@ -123,10 +123,10 @@ const _defaultDispenseParams = {
   offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
   flowRate: DISPENSE_FLOW_RATE,
 }
-export const makeDispenseHelper = (bakedParams?: $Shape<DispenseArgsV3>) => (
+export const makeDispenseHelper = (bakedParams?: $Shape<DispenseParamsV3>) => (
   well: string,
   volume: number,
-  params?: $Shape<DispenseArgsV3>
+  params?: $Shape<DispenseParamsV3>
 ): Command => ({
   command: 'dispense',
   params: {
@@ -143,9 +143,9 @@ const _defaultTouchTipParams = {
   labware: SOURCE_LABWARE,
   offsetFromBottomMm: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
 }
-export const makeTouchTipHelper = (bakedParams?: $Shape<TouchTipArgsV3>) => (
+export const makeTouchTipHelper = (bakedParams?: $Shape<TouchTipParamsV3>) => (
   well: string,
-  params?: $Shape<TouchTipArgsV3>
+  params?: $Shape<TouchTipParamsV3>
 ): Command => ({
   command: 'touchTip',
   params: {

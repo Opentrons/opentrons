@@ -2,7 +2,7 @@
 import getNextRobotStateAndWarnings from '../../getNextRobotStateAndWarnings'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import type { AspirateArgsV3 as AspirateDispenseArgs } from '@opentrons/shared-data'
+import type { AspirateParamsV3 as AspirateDispenseArgs } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   RobotState,
