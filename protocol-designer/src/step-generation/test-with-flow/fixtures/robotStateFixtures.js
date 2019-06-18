@@ -23,37 +23,6 @@ import {
 import { makeInitialRobotState } from '../../utils'
 import { tiprackWellNamesFlat } from './data'
 import type { InvariantContext, RobotState } from '../../'
-import type {
-  CommandsAndRobotState,
-  CommandCreatorErrorResponse,
-} from '../../types'
-
-/** Used to wrap command creators in tests, effectively casting their results
- **  to normal response or error response
- **/
-export function getSuccessResult(
-  result: CommandsAndRobotState | CommandCreatorErrorResponse
-): CommandsAndRobotState {
-  if (result.errors) {
-    throw new Error(
-      `Expected a successful command creator call but got errors: ${JSON.stringify(
-        result.errors
-      )}`
-    )
-  }
-  return result
-}
-
-export function getErrorResult(
-  result: CommandsAndRobotState | CommandCreatorErrorResponse
-): CommandCreatorErrorResponse {
-  if (!result.errors) {
-    throw new Error(
-      `Expected command creator to return errors but got success result`
-    )
-  }
-  return result
-}
 
 // Eg {A1: true, B1: true, ...}
 type WellTipState = { [wellName: string]: boolean }
