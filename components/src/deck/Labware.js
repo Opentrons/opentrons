@@ -98,7 +98,7 @@ function createWell(
   )
 }
 
-// TODO: BC 2018-10-10 this is a class component because it should probably have a sCU for performance reasons
+// TODO: BC 2019-06-18 this is deprecated it should not be used anywhere
 class Labware extends React.Component<Props> {
   render() {
     const { labwareType, getTipProps, getWellProps } = this.props

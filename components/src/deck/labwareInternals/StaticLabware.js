@@ -5,12 +5,12 @@ import * as React from 'react'
 import flatMap from 'lodash/flatMap'
 import cx from 'classnames'
 
-import { LabwareOutline } from '@opentrons/components'
 import Well from './Well'
 import styles from './staticLabware.css'
 
 import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
-import type { WellMouseEvent } from './types'
+import LabwareOutline from '../LabwareOutline'
+import { WellMouseEvent } from './types'
 
 export type StaticLabwareProps = {|
   definition: LabwareDefinition2,
@@ -39,8 +39,17 @@ function StaticLabware(props: StaticLabwareProps) {
   return (
     <g>
       <g className={styles.labware_detail_group}>
-        <LabwareOutline
-          className={cx({ [styles.tiprack_outline]: isTiprack })}
+        <LabwareOutline definition={props.definition} />
+        <rect
+          x={1}
+          y={1}
+          strokeWidth={1}
+          width={props.definition.dimensions.xDimension - 2}
+          height={props.definition.dimensions.yDimension - 2}
+          rx={6}
+          className={cx(styles.labware_outline, {
+            [styles.tiprack_outline]: isTiprack,
+          })}
         />
       </g>
       <g>

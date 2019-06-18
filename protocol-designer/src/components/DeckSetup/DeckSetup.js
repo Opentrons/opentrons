@@ -28,6 +28,7 @@ const deckSetupLayerBlacklist = [
   'doorStops',
   'metalFrame',
   'removalHandle',
+  'removableDeckOutline',
   'screwHoles',
 ]
 type Props = {|
@@ -59,15 +60,15 @@ const DeckSetup = (props: Props) => {
           <RobotWorkSpace
             deckLayerBlacklist={deckSetupLayerBlacklist}
             deckDef={deckDef}
-            viewBox={`-46 -70 ${488} ${514}`} // TODO: put these in variables
+            viewBox={`-46 -10 ${488} ${414}`} // TODO: put these in variables
           >
             {({ slots, getRobotCoordsFromDOMCoords }) => (
               <>
                 <RobotCoordsForeignDiv
-                  x={30}
-                  y={-44}
-                  height={30}
-                  width={380}
+                  x={0}
+                  y={364}
+                  height={36}
+                  width={200}
                   innerDivProps={{
                     className: styles.deck_instructions,
                   }}
