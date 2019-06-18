@@ -18,10 +18,10 @@ export function mixUtil(args: {
   well: string,
   volume: number,
   times: number,
-  aspirateOffsetFromBottomMm?: ?number,
-  dispenseOffsetFromBottomMm?: ?number,
-  aspirateFlowRateUlSec?: ?number,
-  dispenseFlowRateUlSec?: ?number,
+  aspirateOffsetFromBottomMm: number,
+  dispenseOffsetFromBottomMm: number,
+  aspirateFlowRateUlSec: number,
+  dispenseFlowRateUlSec: number,
 }): Array<CommandCreator> {
   const {
     pipette,
@@ -42,7 +42,7 @@ export function mixUtil(args: {
         labware,
         well,
         offsetFromBottomMm: aspirateOffsetFromBottomMm,
-        'flow-rate': aspirateFlowRateUlSec,
+        flowRate: aspirateFlowRateUlSec,
       }),
       dispense({
         pipette,
@@ -50,7 +50,7 @@ export function mixUtil(args: {
         labware,
         well,
         offsetFromBottomMm: dispenseOffsetFromBottomMm,
-        'flow-rate': dispenseFlowRateUlSec,
+        flowRate: dispenseFlowRateUlSec,
       }),
     ],
     times
@@ -84,6 +84,8 @@ const mix = (data: MixArgs): CompoundCommandCreator => (
     dispenseOffsetFromBottomMm,
     aspirateFlowRateUlSec,
     dispenseFlowRateUlSec,
+    blowoutFlowRateUlSec,
+    blowoutOffsetFromTopMm,
   } = data
 
   // Errors
@@ -128,14 +130,17 @@ const mix = (data: MixArgs): CompoundCommandCreator => (
           ]
         : []
 
-      const blowoutCommand = blowoutUtil(
-        data.pipette,
-        data.labware,
-        well,
-        data.labware,
-        well,
-        data.blowoutLocation
-      )
+      const blowoutCommand = blowoutUtil({
+        pipette: data.pipette,
+        sourceLabwareId: data.labware,
+        sourceWell: well,
+        destLabwareId: data.labware,
+        destWell: well,
+        blowoutLocation: data.blowoutLocation,
+        flowRate: blowoutFlowRateUlSec,
+        offsetFromTopMm: blowoutOffsetFromTopMm,
+        invariantContext,
+      })
 
       const mixCommands = mixUtil({
         pipette,

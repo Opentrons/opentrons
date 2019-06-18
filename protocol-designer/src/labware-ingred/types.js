@@ -13,7 +13,7 @@ export type LabwareTypeById = { [labwareId: string]: ?string }
 
 // ==== WELLS ==========
 
-// TODO: Ian 2019-07-08 remove this in favor of WellGroup
+// TODO: Ian 2019-06-08 remove this in favor of WellGroup
 export type Wells = {
   [wellName: string]: string, // eg A1: 'A1'.
 }

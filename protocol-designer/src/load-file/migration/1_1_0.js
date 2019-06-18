@@ -7,12 +7,45 @@ import omitBy from 'lodash/omitBy'
 import flow from 'lodash/flow'
 import { getLabware, getPipetteNameSpecs } from '@opentrons/shared-data'
 import type {
-  FileLabwareV1 as FileLabware,
-  FilePipetteV1 as FilePipette,
-} from '@opentrons/shared-data'
+  FileLabware,
+  FilePipette,
+  ProtocolFile,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV1'
 import type { FormPatch } from '../../steplist/actions'
-import type { PDProtocolFile } from '../../file-types'
 import type { FormData } from '../../form-types'
+
+type PDV1Metadata = {
+  pipetteTiprackAssignments: { [pipetteId: string]: string },
+
+  dismissedWarnings: {
+    form: { [stepId: string]: ?Array<string> },
+    timeline: { [stepId: string]: ?Array<string> },
+  },
+
+  ingredients: {
+    [groupId: string]: {
+      name: ?string,
+      description: ?string,
+      serialize: boolean,
+    },
+  },
+  ingredLocations: {
+    [labwareId: string]: {
+      [well: string]: { [ingredGroup: string]: { volume: number } },
+    },
+  },
+
+  savedStepForms: {
+    [stepId: string]: {
+      stepType: 'moveLiquid' | 'mix' | 'pause' | 'manualIntervention',
+      id: string,
+      [string]: any,
+    },
+  },
+  orderedStepIds: Array<string>,
+}
+
+type PDProtocolFile = ProtocolFile<PDV1Metadata>
 
 type LegacyPipetteEntities = {
   [pipetteId: string]: {

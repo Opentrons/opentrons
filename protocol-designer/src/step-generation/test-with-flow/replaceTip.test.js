@@ -5,20 +5,20 @@ import {
   makeContext,
   getTiprackTipstate,
   getTipColumn,
-  commandCreatorNoErrors,
-  commandFixtures as cmd,
+  getSuccessResult,
+  pickUpTipHelper,
+  dropTipHelper,
+  DEFAULT_PIPETTE,
 } from './fixtures'
-import _replaceTip from '../commandCreators/atomic/replaceTip'
-
+import replaceTip from '../commandCreators/atomic/replaceTip'
 import updateLiquidState from '../dispenseUpdateLiquidState'
-
-const replaceTip = commandCreatorNoErrors(_replaceTip)
 
 jest.mock('../dispenseUpdateLiquidState')
 
+// TODO: Ian 2019-06-13 move these strings into commandFixtures
 const tiprack1Id = 'tiprack1Id'
 const tiprack2Id = 'tiprack2Id'
-const p300SingleId = 'p300SingleId'
+const p300SingleId = DEFAULT_PIPETTE
 const p300MultiId = 'p300MultiId'
 
 describe('replaceTip', () => {
@@ -40,10 +40,11 @@ describe('replaceTip', () => {
         invariantContext,
         initialRobotState
       )
+      const res = getSuccessResult(result)
 
-      expect(result.commands).toEqual([cmd.pickUpTip(0)])
+      expect(res.commands).toEqual([pickUpTipHelper(0)])
 
-      expect(result.robotState).toMatchObject(
+      expect(res.robotState).toMatchObject(
         merge({}, initialRobotState, {
           tipState: {
             tipracks: {
@@ -75,10 +76,11 @@ describe('replaceTip', () => {
           },
         })
       )
+      const res = getSuccessResult(result)
 
-      expect(result.commands).toEqual([cmd.pickUpTip(1)])
+      expect(res.commands).toEqual([pickUpTipHelper(1)])
 
-      expect(result.robotState).toMatchObject(
+      expect(res.robotState).toMatchObject(
         merge({}, initialRobotState, {
           tipState: {
             tipracks: {
@@ -111,10 +113,11 @@ describe('replaceTip', () => {
         invariantContext,
         initialTestRobotState
       )
+      const res = getSuccessResult(result)
 
-      expect(result.commands).toEqual([cmd.pickUpTip('A2')])
+      expect(res.commands).toEqual([pickUpTipHelper('A2')])
 
-      expect(result.robotState).toMatchObject(
+      expect(res.robotState).toMatchObject(
         merge({}, initialTestRobotState, {
           tipState: {
             tipracks: {
@@ -148,10 +151,11 @@ describe('replaceTip', () => {
         invariantContext,
         initialTestRobotState
       )
+      const res = getSuccessResult(result)
 
-      expect(result.commands).toEqual([cmd.dropTip('A1'), cmd.pickUpTip('B1')])
+      expect(res.commands).toEqual([dropTipHelper('A1'), pickUpTipHelper('B1')])
 
-      expect(result.robotState).toMatchObject(
+      expect(res.robotState).toMatchObject(
         merge({}, initialTestRobotState, {
           tipState: {
             tipracks: {
@@ -180,12 +184,12 @@ describe('replaceTip', () => {
         invariantContext,
         initialTestRobotState
       )
-
-      expect(result.commands).toEqual([
-        cmd.pickUpTip('A1', { labware: tiprack2Id }),
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        pickUpTipHelper('A1', { labware: tiprack2Id }),
       ])
 
-      expect(result.robotState).toMatchObject(
+      expect(res.robotState).toMatchObject(
         merge({}, initialTestRobotState, {
           tipState: {
             tipracks: {
@@ -208,12 +212,12 @@ describe('replaceTip', () => {
         invariantContext,
         initialRobotState
       )
+      const res = getSuccessResult(result)
 
-      expect(result.commands).toEqual([
-        cmd.pickUpTip('A1', { pipette: p300MultiId }),
+      expect(res.commands).toEqual([
+        pickUpTipHelper('A1', { pipette: p300MultiId }),
       ])
-
-      expect(result.robotState).toMatchObject(
+      expect(res.robotState).toMatchObject(
         merge({}, initialRobotState, {
           tipState: {
             tipracks: {
@@ -243,12 +247,12 @@ describe('replaceTip', () => {
         invariantContext,
         robotStateWithTipA1Missing
       )
-
-      expect(result.commands).toEqual([
-        cmd.pickUpTip('A2', { pipette: p300MultiId }),
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        pickUpTipHelper('A2', { pipette: p300MultiId }),
       ])
 
-      expect(result.robotState).toMatchObject(
+      expect(res.robotState).toMatchObject(
         merge({}, robotStateWithTipA1Missing, {
           tipState: {
             tipracks: {
@@ -286,12 +290,13 @@ describe('replaceTip', () => {
         invariantContext,
         robotStateWithTipsOnMulti
       )
-      expect(result.commands).toEqual([
-        cmd.dropTip('A1', { pipette: p300MultiId }),
-        cmd.pickUpTip('A1', { pipette: p300MultiId }),
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        dropTipHelper('A1', { pipette: p300MultiId }),
+        pickUpTipHelper('A1', { pipette: p300MultiId }),
       ])
 
-      expect(result.robotState).toMatchObject(
+      expect(res.robotState).toMatchObject(
         merge({}, robotStateWithTipsOnMulti, {
           tipState: {
             tipracks: {

@@ -105,7 +105,7 @@ export type MixForm = {|
   times?: string,
   volume?: string,
   wells?: Array<string>,
-  'touch-tip'?: boolean,
+  touchTip?: boolean,
 |}
 
 export type PauseForm = {|
@@ -183,6 +183,32 @@ export type HydratedMoveLiquidFormData = {
     blowout_checkbox: ?boolean,
     blowout_location: ?string, // labwareId or 'SOURCE_WELL' or 'DEST_WELL'
   },
+}
+
+export type HydratedMixFormDataLegacy = {
+  id: string,
+  stepType: 'mix',
+  stepName: string,
+  stepDetails: ?string,
+
+  pipette: PipetteEntity,
+  volume: number,
+  changeTip: ChangeTipOptions,
+
+  labware: LabwareEntity,
+  wells: Array<string>,
+  mix_wellOrder_first: WellOrderOption,
+  mix_wellOrder_second: WellOrderOption,
+  aspirate_flowRate: ?number,
+  mix_mmFromBottom: ?number,
+  mix_touchTip_checkbox: ?boolean,
+  mix_touchTip_mmFromBottom: ?number,
+  times: ?number,
+
+  dispense_flowRate: ?number,
+
+  blowout_checkbox: ?boolean,
+  blowout_location: ?string, // labwareId or 'SOURCE_WELL' or 'DEST_WELL'
 }
 
 // TODO: Ian 2019-01-17 Moving away from this and towards nesting all form fields

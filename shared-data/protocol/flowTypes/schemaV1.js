@@ -4,32 +4,32 @@ import type { DeckSlotId } from '@opentrons/shared-data'
 
 // COMMANDS
 
-export type PipetteLabwareFieldsV1 = {|
+export type PipetteLabwareFields = {|
   pipette: string,
   labware: string,
   well: string,
 |}
 
-export type AspirateDispenseArgsV1 = {|
-  ...PipetteLabwareFieldsV1,
+export type AspirateDispenseArgs = {|
+  ...PipetteLabwareFields,
   volume: number,
   offsetFromBottomMm?: ?number,
   'flow-rate'?: ?number,
 |}
 
-export type CommandV1 =
+export type Command =
   | {|
       command: 'aspirate' | 'dispense',
-      params: AspirateDispenseArgsV1,
+      params: AspirateDispenseArgs,
     |}
   | {|
       command: 'pick-up-tip' | 'drop-tip' | 'blowout',
-      params: PipetteLabwareFieldsV1,
+      params: PipetteLabwareFields,
     |}
   | {|
       command: 'touch-tip',
       params: {|
-        ...PipetteLabwareFieldsV1,
+        ...PipetteLabwareFields,
         offsetFromBottomMm?: ?number,
       |},
     |}
@@ -58,13 +58,13 @@ type VersionString = string // eg '1.0.0'
 type PipetteModel = string
 type PipetteName = string
 
-export type FilePipetteV1 = {
+export type FilePipette = {
   mount: Mount,
   model: PipetteModel,
   name?: PipetteName,
 }
 
-export type FileLabwareV1 = {
+export type FileLabware = {
   slot: DeckSlotId,
   model: string,
   'display-name'?: string,
@@ -75,7 +75,7 @@ type FlowRateForPipettes = {
 }
 
 // A v1 JSON protocol file
-export type SchemaV1ProtocolFile<DesignerApplicationData> = {
+export type ProtocolFile<DesignerApplicationData> = {
   'protocol-schema': VersionString,
 
   metadata: {
@@ -109,11 +109,11 @@ export type SchemaV1ProtocolFile<DesignerApplicationData> = {
   },
 
   pipettes: {
-    [instrumentId: string]: FilePipetteV1,
+    [instrumentId: string]: FilePipette,
   },
 
   labware: {
-    [labwareId: string]: FileLabwareV1,
+    [labwareId: string]: FileLabware,
   },
 
   procedure: Array<{
@@ -121,6 +121,6 @@ export type SchemaV1ProtocolFile<DesignerApplicationData> = {
       name: string,
       description: string,
     },
-    subprocedure: Array<CommandV1>,
+    subprocedure: Array<Command>,
   }>,
 }

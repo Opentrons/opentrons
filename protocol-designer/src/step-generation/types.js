@@ -1,8 +1,5 @@
 // @flow
-import type {
-  CommandV1 as Command,
-  PipetteLabwareFieldsV1 as PipetteLabwareFields,
-} from '@opentrons/shared-data'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type {
   LabwareTemporalProperties,
   PipetteTemporalProperties,
@@ -49,23 +46,23 @@ export type SharedTransferLikeArgs = {
   /** Touch tip after every aspirate */
   touchTipAfterAspirate: boolean,
   /** Optional offset for touch tip after aspirate (if null, use PD default) */
-  touchTipAfterAspirateOffsetMmFromBottom?: ?number,
+  touchTipAfterAspirateOffsetMmFromBottom: number,
   /** changeTip is interpreted differently by different Step types */
   changeTip: ChangeTipOptions,
   /** Flow rate in uL/sec for all aspirates */
-  aspirateFlowRateUlSec?: ?number,
+  aspirateFlowRateUlSec: number,
   /** offset from bottom of well in mm */
-  aspirateOffsetFromBottomMm?: ?number,
+  aspirateOffsetFromBottomMm: number,
 
   // ===== DISPENSE SETTINGS =====
   /** Touch tip in destination well after dispense */
   touchTipAfterDispense: boolean,
   /** Optional offset for touch tip after dispense (if null, use PD default) */
-  touchTipAfterDispenseOffsetMmFromBottom?: ?number,
+  touchTipAfterDispenseOffsetMmFromBottom: number,
   /** Flow rate in uL/sec for all dispenses */
-  dispenseFlowRateUlSec?: ?number,
+  dispenseFlowRateUlSec: number,
   /** offset from bottom of well in mm */
-  dispenseOffsetFromBottomMm?: ?number,
+  dispenseOffsetFromBottomMm: number,
 }
 
 export type ConsolidateArgs = {
@@ -76,6 +73,8 @@ export type ConsolidateArgs = {
 
   /** If given, blow out in the specified destination after dispense at the end of each asp-asp-dispense cycle */
   blowoutLocation: ?string,
+  blowoutFlowRateUlSec: number,
+  blowoutOffsetFromTopMm: number,
 
   /** Mix in first well in chunk */
   mixFirstAspirate: ?InnerMixArgs,
@@ -91,6 +90,8 @@ export type TransferArgs = {
 
   /** If given, blow out in the specified destination after dispense at the end of each asp-dispense cycle */
   blowoutLocation: ?string,
+  blowoutFlowRateUlSec: number,
+  blowoutOffsetFromTopMm: number,
 
   /** Mix in first well in chunk */
   mixBeforeAspirate: ?InnerMixArgs,
@@ -110,6 +111,10 @@ export type DistributeArgs = {
   disposalLabware: ?string,
   disposalWell: ?string,
 
+  /** pass to blowout **/
+  blowoutFlowRateUlSec: number,
+  blowoutOffsetFromTopMm: number,
+
   /** Mix in first well in chunk */
   mixBeforeAspirate: ?InnerMixArgs,
 } & SharedTransferLikeArgs
@@ -126,22 +131,24 @@ export type MixArgs = {
   times: number,
   /** Touch tip after mixing */
   touchTip: boolean,
-  touchTipMmFromBottom?: ?number,
+  touchTipMmFromBottom: number,
   /** change tip: see comments in step-generation/mix.js */
   changeTip: ChangeTipOptions,
 
   /** If given, blow out in the specified destination after mixing each well */
   blowoutLocation: ?string,
+  blowoutFlowRateUlSec: number,
+  blowoutOffsetFromTopMm: number,
 
   /** offset from bottom of well in mm */
-  aspirateOffsetFromBottomMm?: ?number,
-  dispenseOffsetFromBottomMm?: ?number,
+  aspirateOffsetFromBottomMm: number,
+  dispenseOffsetFromBottomMm: number,
   /** flow rates in uL/sec */
-  aspirateFlowRateUlSec?: ?number,
-  dispenseFlowRateUlSec?: ?number,
+  aspirateFlowRateUlSec: number,
+  dispenseFlowRateUlSec: number,
 }
 
-export type DelayArgs = {
+export type PauseArgs = {
   ...$Exact<CommonArgs>,
   commandCreatorFnName: 'delay',
   message?: string,
@@ -157,7 +164,7 @@ export type CommandCreatorArgs =
   | ConsolidateArgs
   | DistributeArgs
   | MixArgs
-  | DelayArgs
+  | PauseArgs
   | TransferArgs
 
 /** tips are numbered 0-7. 0 is the furthest to the back of the robot.
@@ -214,11 +221,6 @@ export type RobotState = {|
       },
     },
   },
-|}
-
-export type TouchTipArgs = {|
-  ...PipetteLabwareFields,
-  offsetFromBottomMm?: ?number,
 |}
 
 export type ErrorType =

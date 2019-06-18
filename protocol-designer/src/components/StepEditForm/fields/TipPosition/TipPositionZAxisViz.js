@@ -11,15 +11,15 @@ const WELL_HEIGHT_PIXELS = 48
 const PIXEL_DECIMALS = 2
 type Props = {
   mmFromBottom: number,
-  wellHeightMM: number,
+  wellDepthMm: number,
 }
 
 const TipPositionZAxisViz = (props: Props) => {
-  const fractionOfWellHeight = props.mmFromBottom / props.wellHeightMM
+  const fractionOfWellHeight = props.mmFromBottom / props.wellDepthMm
   const pixelsFromBottom =
     Number(fractionOfWellHeight) * WELL_HEIGHT_PIXELS - WELL_HEIGHT_PIXELS
   const roundedPixelsFromBottom = round(pixelsFromBottom, PIXEL_DECIMALS)
-  const bottomPx = props.wellHeightMM
+  const bottomPx = props.wellDepthMm
     ? roundedPixelsFromBottom
     : props.mmFromBottom - WELL_HEIGHT_PIXELS
   return (
@@ -29,8 +29,8 @@ const TipPositionZAxisViz = (props: Props) => {
         className={styles.pipette_tip_image}
         style={{ bottom: `${bottomPx}px` }}
       />
-      {props.wellHeightMM !== null && (
-        <span className={styles.well_height_label}>{props.wellHeightMM}mm</span>
+      {props.wellDepthMm !== null && (
+        <span className={styles.well_height_label}>{props.wellDepthMm}mm</span>
       )}
       <img
         src={WELL_CROSS_SECTION_IMAGE}

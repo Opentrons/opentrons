@@ -3,28 +3,50 @@ import merge from 'lodash/merge'
 import {
   getRobotStateWithTipStandard,
   makeContext,
-  compoundCommandCreatorNoErrors,
-  compoundCommandCreatorHasErrors,
-  commandFixtures as cmd,
+  getSuccessResult,
+  getErrorResult,
+  getFlowRateAndOffsetParams,
+  DEFAULT_PIPETTE,
+  SOURCE_LABWARE,
+  DEST_LABWARE,
+  makeAspirateHelper,
+  makeDispenseHelper,
+  makeTouchTipHelper,
+  pickUpTipHelper,
+  dropTipHelper,
 } from './fixtures'
+import { reduceCommandCreators } from '../utils'
 import _transfer from '../commandCreators/compound/transfer'
+import type { TransferArgs } from '../types'
 
-const transfer = compoundCommandCreatorNoErrors(_transfer)
-const transferWithErrors = compoundCommandCreatorHasErrors(_transfer)
+const aspirateHelper = makeAspirateHelper()
+const dispenseHelper = makeDispenseHelper()
+const touchTipHelper = makeTouchTipHelper()
 
-let transferArgs
+// collapse this compound command creator into the signature of an atomic command creator
+const transfer = (args: TransferArgs) => (
+  invariantContext,
+  initialRobotState
+) =>
+  reduceCommandCreators(_transfer(args)(invariantContext, initialRobotState))(
+    invariantContext,
+    initialRobotState
+  )
+
 let invariantContext
 let robotStateWithTip
+let mixinArgs
 
 beforeEach(() => {
-  transferArgs = {
+  mixinArgs = {
+    ...getFlowRateAndOffsetParams(),
     commandCreatorFnName: 'transfer',
     name: 'Transfer Test',
     description: 'test blah blah',
-    pipette: 'p300SingleId',
+    pipette: DEFAULT_PIPETTE,
 
-    sourceLabware: 'sourcePlateId',
-    destLabware: 'destPlateId',
+    sourceLabware: SOURCE_LABWARE,
+    destLabware: DEST_LABWARE,
 
     preWetTip: false,
     touchTipAfterAspirate: false,
@@ -41,8 +63,8 @@ beforeEach(() => {
 
 describe('pick up tip if no tip on pipette', () => {
   beforeEach(() => {
-    transferArgs = {
-      ...transferArgs,
+    mixinArgs = {
+      ...mixinArgs,
       sourceWells: ['A1'],
       destWells: ['B2'],
       volume: 30,
@@ -56,38 +78,37 @@ describe('pick up tip if no tip on pipette', () => {
 
   changeTipOptions.forEach(changeTip => {
     test(`...${changeTip}`, () => {
-      transferArgs = {
-        ...transferArgs,
+      mixinArgs = {
+        ...mixinArgs,
         changeTip,
       }
 
-      const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
+      const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
 
-      expect(result.commands[0]).toEqual(cmd.pickUpTip('A1'))
+      expect(res.commands[0]).toEqual(pickUpTipHelper('A1'))
     })
   })
 
   test('...never (should not pick up tip, and fail)', () => {
-    transferArgs = {
-      ...transferArgs,
+    mixinArgs = {
+      ...mixinArgs,
       changeTip: 'never',
     }
 
-    const result = transferWithErrors(transferArgs)(
-      invariantContext,
-      robotStateWithTip
-    )
+    const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
+    const res = getErrorResult(result)
 
-    expect(result.errors).toHaveLength(1)
-    expect(result.errors[0]).toMatchObject({
+    expect(res.errors).toHaveLength(1)
+    expect(res.errors[0]).toMatchObject({
       type: 'NO_TIP_ON_PIPETTE',
     })
   })
 })
 
 test('single transfer: 1 source & 1 dest', () => {
-  transferArgs = {
-    ...transferArgs,
+  mixinArgs = {
+    ...mixinArgs,
     sourceWells: ['A1'],
     destWells: ['B2'],
     changeTip: 'never',
@@ -98,13 +119,14 @@ test('single transfer: 1 source & 1 dest', () => {
     '0': { volume: 200 },
   }
 
-  const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-  expect(result.commands).toEqual([
-    cmd.aspirate('A1', 30),
-    cmd.dispense('B2', 30, { labware: 'destPlateId' }),
+  const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
+  const res = getSuccessResult(result)
+  expect(res.commands).toEqual([
+    aspirateHelper('A1', 30),
+    dispenseHelper('B2', 30),
   ])
 
-  expect(result.robotState.liquidState).toEqual(
+  expect(res.robotState.liquidState).toEqual(
     merge({}, robotStateWithTip.liquidState, {
       labware: {
         sourcePlateId: { A1: { '0': { volume: 200 - 30 } } },
@@ -118,28 +140,29 @@ test('single transfer: 1 source & 1 dest', () => {
 })
 
 test('transfer with multiple sets of wells', () => {
-  transferArgs = {
-    ...transferArgs,
+  mixinArgs = {
+    ...mixinArgs,
     sourceWells: ['A1', 'A2'],
     destWells: ['B2', 'C2'],
     changeTip: 'never',
     volume: 30,
   }
-  const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-  expect(result.commands).toEqual([
-    cmd.aspirate('A1', 30),
-    cmd.dispense('B2', 30, { labware: 'destPlateId' }),
+  const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
+  const res = getSuccessResult(result)
+  expect(res.commands).toEqual([
+    aspirateHelper('A1', 30),
+    dispenseHelper('B2', 30),
 
-    cmd.aspirate('A2', 30),
-    cmd.dispense('C2', 30, { labware: 'destPlateId' }),
+    aspirateHelper('A2', 30),
+    dispenseHelper('C2', 30),
   ])
 
   // TODO Ian 2018-04-02 robotState, liquidState checks
 })
 
 test('invalid pipette ID should throw error', () => {
-  transferArgs = {
-    ...transferArgs,
+  mixinArgs = {
+    ...mixinArgs,
     sourceWells: ['A1'],
     destWells: ['B1'],
     volume: 10,
@@ -147,20 +170,18 @@ test('invalid pipette ID should throw error', () => {
     pipette: 'no-such-pipette-id-here',
   }
 
-  const result = transferWithErrors(transferArgs)(
-    invariantContext,
-    robotStateWithTip
-  )
+  const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
+  const res = getErrorResult(result)
 
-  expect(result.errors).toHaveLength(1)
-  expect(result.errors[0]).toMatchObject({
+  expect(res.errors).toHaveLength(1)
+  expect(res.errors[0]).toMatchObject({
     type: 'PIPETTE_DOES_NOT_EXIST',
   })
 })
 
 test('invalid labware ID should throw error', () => {
-  transferArgs = {
-    ...transferArgs,
+  mixinArgs = {
+    ...mixinArgs,
     sourceLabware: 'no-such-labware-id-here',
     sourceWells: ['A1'],
     destWells: ['B1'],
@@ -168,13 +189,11 @@ test('invalid labware ID should throw error', () => {
     changeTip: 'always',
   }
 
-  const result = transferWithErrors(transferArgs)(
-    invariantContext,
-    robotStateWithTip
-  )
+  const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
+  const res = getErrorResult(result)
 
-  expect(result.errors).toHaveLength(1)
-  expect(result.errors[0]).toMatchObject({
+  expect(res.errors).toHaveLength(1)
+  expect(res.errors[0]).toMatchObject({
     type: 'LABWARE_DOES_NOT_EXIST',
   })
 })
@@ -182,8 +201,8 @@ test('invalid labware ID should throw error', () => {
 describe('single transfer exceeding pipette max', () => {
   let expectedFinalLiquidState
   beforeEach(() => {
-    transferArgs = {
-      ...transferArgs,
+    mixinArgs = {
+      ...mixinArgs,
       sourceWells: ['A1', 'B1'],
       destWells: ['A3', 'B3'],
       volume: 350,
@@ -223,62 +242,64 @@ describe('single transfer exceeding pipette max', () => {
   })
 
   test('changeTip="once"', () => {
-    transferArgs = {
-      ...transferArgs,
+    mixinArgs = {
+      ...mixinArgs,
       changeTip: 'once',
     }
 
-    const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-    expect(result.commands).toEqual([
-      cmd.pickUpTip('A1'),
-      cmd.aspirate('A1', 300),
-      cmd.dispense('A3', 300, { labware: 'destPlateId' }),
-      cmd.aspirate('A1', 50),
-      cmd.dispense('A3', 50, { labware: 'destPlateId' }),
-      cmd.aspirate('B1', 300),
-      cmd.dispense('B3', 300, { labware: 'destPlateId' }),
-      cmd.aspirate('B1', 50),
-      cmd.dispense('B3', 50, { labware: 'destPlateId' }),
+    const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
+      pickUpTipHelper('A1'),
+      aspirateHelper('A1', 300),
+      dispenseHelper('A3', 300),
+      aspirateHelper('A1', 50),
+      dispenseHelper('A3', 50),
+      aspirateHelper('B1', 300),
+      dispenseHelper('B3', 300),
+      aspirateHelper('B1', 50),
+      dispenseHelper('B3', 50),
     ])
 
-    expect(result.robotState.liquidState).toEqual(
+    expect(res.robotState.liquidState).toEqual(
       merge({}, robotStateWithTip.liquidState, expectedFinalLiquidState)
     )
   })
 
   test('changeTip="always"', () => {
-    transferArgs = {
-      ...transferArgs,
+    mixinArgs = {
+      ...mixinArgs,
       changeTip: 'always',
     }
 
-    const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-    expect(result.commands).toEqual([
-      cmd.pickUpTip('A1'),
+    const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
+      pickUpTipHelper('A1'),
 
-      cmd.aspirate('A1', 300),
-      cmd.dispense('A3', 300, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 300),
+      dispenseHelper('A3', 300),
 
       // replace tip before next asp-disp chunk
-      cmd.dropTip('A1'),
-      cmd.pickUpTip('B1'),
+      dropTipHelper('A1'),
+      pickUpTipHelper('B1'),
 
-      cmd.aspirate('A1', 50),
-      cmd.dispense('A3', 50, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 50),
+      dispenseHelper('A3', 50),
 
       // replace tip before next source-dest well pair
-      cmd.dropTip('A1'),
-      cmd.pickUpTip('C1'),
+      dropTipHelper('A1'),
+      pickUpTipHelper('C1'),
 
-      cmd.aspirate('B1', 300),
-      cmd.dispense('B3', 300, { labware: 'destPlateId' }),
+      aspirateHelper('B1', 300),
+      dispenseHelper('B3', 300),
 
       // replace tip before next asp-disp chunk
-      cmd.dropTip('A1'),
-      cmd.pickUpTip('D1'),
+      dropTipHelper('A1'),
+      pickUpTipHelper('D1'),
 
-      cmd.aspirate('B1', 50),
-      cmd.dispense('B3', 50, { labware: 'destPlateId' }),
+      aspirateHelper('B1', 50),
+      dispenseHelper('B3', 50),
     ])
 
     // unlike the other test cases here, we have a new tip when aspirating from B1.
@@ -290,154 +311,155 @@ describe('single transfer exceeding pipette max', () => {
     // $FlowFixMe flow doesn't like assigning to these objects
     expectedFinalLiquidState.labware.destPlateId.B3 = { '1': { volume: 350 } }
 
-    expect(result.robotState.liquidState).toEqual(
+    expect(res.robotState.liquidState).toEqual(
       merge({}, robotStateWithTip.liquidState, expectedFinalLiquidState)
     )
   })
 
   test('changeTip="perSource"', () => {
-    transferArgs = {
-      ...transferArgs,
+    mixinArgs = {
+      ...mixinArgs,
       sourceWells: ['A1', 'A1', 'A2'],
       destWells: ['B1', 'B2', 'B2'],
       changeTip: 'perSource',
     }
 
-    const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-    expect(result.commands).toEqual([
-      cmd.pickUpTip('A1'),
+    const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
+      pickUpTipHelper('A1'),
 
-      cmd.aspirate('A1', 300),
-      cmd.dispense('B1', 300, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 300),
+      dispenseHelper('B1', 300),
 
-      cmd.aspirate('A1', 50),
-      cmd.dispense('B1', 50, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 50),
+      dispenseHelper('B1', 50),
 
       // same source, different dest: no change
-      cmd.aspirate('A1', 300),
-      cmd.dispense('B2', 300, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 300),
+      dispenseHelper('B2', 300),
 
-      cmd.aspirate('A1', 50),
-      cmd.dispense('B2', 50, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 50),
+      dispenseHelper('B2', 50),
 
       // new source, different dest: change tip
-      cmd.dropTip('A1'),
-      cmd.pickUpTip('B1'),
+      dropTipHelper('A1'),
+      pickUpTipHelper('B1'),
 
-      cmd.aspirate('A2', 300),
-      cmd.dispense('B2', 300, { labware: 'destPlateId' }),
+      aspirateHelper('A2', 300),
+      dispenseHelper('B2', 300),
 
-      cmd.aspirate('A2', 50),
-      cmd.dispense('B2', 50, { labware: 'destPlateId' }),
+      aspirateHelper('A2', 50),
+      dispenseHelper('B2', 50),
     ])
   })
 
   test('changeTip="perDest"', () => {
     // NOTE: same wells as perSource test
-    transferArgs = {
-      ...transferArgs,
+    mixinArgs = {
+      ...mixinArgs,
       sourceWells: ['A1', 'A1', 'A2'],
       destWells: ['B1', 'B2', 'B2'],
       changeTip: 'perDest',
     }
 
-    const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-    expect(result.commands).toEqual([
-      cmd.pickUpTip('A1'),
+    const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
+      pickUpTipHelper('A1'),
 
-      cmd.aspirate('A1', 300),
-      cmd.dispense('B1', 300, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 300),
+      dispenseHelper('B1', 300),
 
-      cmd.aspirate('A1', 50),
-      cmd.dispense('B1', 50, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 50),
+      dispenseHelper('B1', 50),
 
       // same source, different dest: change tip
-      cmd.dropTip('A1'),
-      cmd.pickUpTip('B1'),
+      dropTipHelper('A1'),
+      pickUpTipHelper('B1'),
 
-      cmd.aspirate('A1', 300),
-      cmd.dispense('B2', 300, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 300),
+      dispenseHelper('B2', 300),
 
-      cmd.aspirate('A1', 50),
-      cmd.dispense('B2', 50, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 50),
+      dispenseHelper('B2', 50),
 
       // different source, same dest: no change
 
-      cmd.aspirate('A2', 300),
-      cmd.dispense('B2', 300, { labware: 'destPlateId' }),
+      aspirateHelper('A2', 300),
+      dispenseHelper('B2', 300),
 
-      cmd.aspirate('A2', 50),
-      cmd.dispense('B2', 50, { labware: 'destPlateId' }),
+      aspirateHelper('A2', 50),
+      dispenseHelper('B2', 50),
     ])
   })
 
   test('changeTip="never"', () => {
-    transferArgs = {
-      ...transferArgs,
+    mixinArgs = {
+      ...mixinArgs,
       changeTip: 'never',
     }
     // begin with tip on pipette
     robotStateWithTip.tipState.pipettes.p300SingleId = true
 
-    const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-    expect(result.commands).toEqual([
+    const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
       // no pick up tip
-      cmd.aspirate('A1', 300),
-      cmd.dispense('A3', 300, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 300),
+      dispenseHelper('A3', 300),
 
-      cmd.aspirate('A1', 50),
-      cmd.dispense('A3', 50, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 50),
+      dispenseHelper('A3', 50),
 
-      cmd.aspirate('B1', 300),
-      cmd.dispense('B3', 300, { labware: 'destPlateId' }),
+      aspirateHelper('B1', 300),
+      dispenseHelper('B3', 300),
 
-      cmd.aspirate('B1', 50),
-      cmd.dispense('B3', 50, { labware: 'destPlateId' }),
+      aspirateHelper('B1', 50),
+      dispenseHelper('B3', 50),
     ])
 
-    expect(result.robotState.liquidState).toEqual(
+    expect(res.robotState.liquidState).toEqual(
       merge({}, robotStateWithTip.liquidState, expectedFinalLiquidState)
     )
   })
 
   test('split up volume without going below pipette min', () => {
-    // TODO: Ian 2019-01-04 for some reason, doing transferArgs = {...transferArgs, ...etc}
-    // works everywhere but here - here, it makes Jest fail with "Jest encountered an unexpected token"
-    const _transferArgs = {
-      ...transferArgs,
+    mixinArgs = {
+      ...mixinArgs,
       volume: 629,
       changeTip: 'never', // don't test tip use here
     }
-    transferArgs = _transferArgs
 
     // begin with tip on pipette
     robotStateWithTip.tipState.pipettes.p300SingleId = true
 
-    const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-    expect(result.commands).toEqual([
-      cmd.aspirate('A1', 300),
-      cmd.dispense('A3', 300, { labware: 'destPlateId' }),
+    const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
+      aspirateHelper('A1', 300),
+      dispenseHelper('A3', 300),
       // last 2 chunks split evenly
-      cmd.aspirate('A1', 164.5),
-      cmd.dispense('A3', 164.5, { labware: 'destPlateId' }),
-      cmd.aspirate('A1', 164.5),
-      cmd.dispense('A3', 164.5, { labware: 'destPlateId' }),
+      aspirateHelper('A1', 164.5),
+      dispenseHelper('A3', 164.5),
+      aspirateHelper('A1', 164.5),
+      dispenseHelper('A3', 164.5),
 
-      cmd.aspirate('B1', 300),
-      cmd.dispense('B3', 300, { labware: 'destPlateId' }),
+      aspirateHelper('B1', 300),
+      dispenseHelper('B3', 300),
       // last 2 chunks split evenly
-      cmd.aspirate('B1', 164.5),
-      cmd.dispense('B3', 164.5, { labware: 'destPlateId' }),
-      cmd.aspirate('B1', 164.5),
-      cmd.dispense('B3', 164.5, { labware: 'destPlateId' }),
+      aspirateHelper('B1', 164.5),
+      dispenseHelper('B3', 164.5),
+      aspirateHelper('B1', 164.5),
+      dispenseHelper('B3', 164.5),
     ])
   })
 })
 
 describe('advanced options', () => {
   beforeEach(() => {
-    transferArgs = {
-      ...transferArgs,
+    mixinArgs = {
+      ...mixinArgs,
       sourceWells: ['A1'],
       destWells: ['B1'],
       changeTip: 'never',
@@ -445,68 +467,71 @@ describe('advanced options', () => {
   })
   describe('...aspirate options', () => {
     test('pre-wet tip should aspirate and dispense transfer volume from source well of each subtransfer', () => {
-      transferArgs = {
-        ...transferArgs,
+      mixinArgs = {
+        ...mixinArgs,
         volume: 350,
         preWetTip: true,
       }
 
-      const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-      expect(result.commands).toEqual([
+      const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
         // pre-wet aspirate/dispense
-        cmd.aspirate('A1', 300),
-        cmd.dispense('A1', 300),
+        aspirateHelper('A1', 300),
+        dispenseHelper('A1', 300, { labware: SOURCE_LABWARE }),
 
         // "real" aspirate/dispenses
-        cmd.aspirate('A1', 300),
-        cmd.dispense('B1', 300, { labware: 'destPlateId' }),
+        aspirateHelper('A1', 300),
+        dispenseHelper('B1', 300),
 
-        cmd.aspirate('A1', 50),
-        cmd.dispense('B1', 50, { labware: 'destPlateId' }),
+        aspirateHelper('A1', 50),
+        dispenseHelper('B1', 50),
       ])
     })
 
-    test('touch-tip after aspirate should touch-tip on each source well, for every aspirate', () => {
-      transferArgs = {
-        ...transferArgs,
+    test('touchTip after aspirate should touchTip on each source well, for every aspirate', () => {
+      mixinArgs = {
+        ...mixinArgs,
         volume: 350,
         touchTipAfterAspirate: true,
       }
 
-      const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-      expect(result.commands).toEqual([
-        cmd.aspirate('A1', 300),
-        cmd.touchTip('A1'),
-        cmd.dispense('B1', 300, { labware: 'destPlateId' }),
+      const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 300),
+        touchTipHelper('A1'),
+        dispenseHelper('B1', 300),
 
-        cmd.aspirate('A1', 50),
-        cmd.touchTip('A1'),
-        cmd.dispense('B1', 50, { labware: 'destPlateId' }),
+        aspirateHelper('A1', 50),
+        touchTipHelper('A1'),
+        dispenseHelper('B1', 50),
       ])
     })
 
-    test('touch-tip after dispense should touch-tip on each dest well, for every dispense', () => {
-      transferArgs = {
-        ...transferArgs,
+    test('touchTip after dispense should touchTip on each dest well, for every dispense', () => {
+      mixinArgs = {
+        ...mixinArgs,
         volume: 350,
         touchTipAfterDispense: true,
       }
 
-      const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-      expect(result.commands).toEqual([
-        cmd.aspirate('A1', 300),
-        cmd.dispense('B1', 300, { labware: 'destPlateId' }),
-        cmd.touchTip('B1', { labware: 'destPlateId' }),
+      const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 300),
+        dispenseHelper('B1', 300),
+        touchTipHelper('B1', { labware: DEST_LABWARE }),
 
-        cmd.aspirate('A1', 50),
-        cmd.dispense('B1', 50, { labware: 'destPlateId' }),
-        cmd.touchTip('B1', { labware: 'destPlateId' }),
+        aspirateHelper('A1', 50),
+        dispenseHelper('B1', 50),
+        touchTipHelper('B1', { labware: DEST_LABWARE }),
       ])
     })
 
     test('mix before aspirate', () => {
-      transferArgs = {
-        ...transferArgs,
+      mixinArgs = {
+        ...mixinArgs,
         volume: 350,
         mixBeforeAspirate: {
           volume: 250,
@@ -517,22 +542,23 @@ describe('advanced options', () => {
       // written here for less verbose `commands` below
       const mixCommands = [
         // mix 1
-        cmd.aspirate('A1', 250),
-        cmd.dispense('A1', 250),
+        aspirateHelper('A1', 250),
+        dispenseHelper('A1', 250, { labware: SOURCE_LABWARE }),
         // mix 2
-        cmd.aspirate('A1', 250),
-        cmd.dispense('A1', 250),
+        aspirateHelper('A1', 250),
+        dispenseHelper('A1', 250, { labware: SOURCE_LABWARE }),
       ]
 
-      const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-      expect(result.commands).toEqual([
+      const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
         ...mixCommands,
-        cmd.aspirate('A1', 300),
-        cmd.dispense('B1', 300, { labware: 'destPlateId' }),
+        aspirateHelper('A1', 300),
+        dispenseHelper('B1', 300),
 
         ...mixCommands,
-        cmd.aspirate('A1', 50),
-        cmd.dispense('B1', 50, { labware: 'destPlateId' }),
+        aspirateHelper('A1', 50),
+        dispenseHelper('B1', 50),
       ])
     })
 
@@ -541,8 +567,8 @@ describe('advanced options', () => {
 
   describe('...dispense options', () => {
     test('mix after dispense', () => {
-      transferArgs = {
-        ...transferArgs,
+      mixinArgs = {
+        ...mixinArgs,
         volume: 350,
         mixInDestination: {
           volume: 250,
@@ -553,25 +579,24 @@ describe('advanced options', () => {
       // written here for less verbose `commands` below
       const mixCommands = [
         // mix 1
-        cmd.aspirate('B1', 250, { labware: 'destPlateId' }),
-        cmd.dispense('B1', 250, { labware: 'destPlateId' }),
+        aspirateHelper('B1', 250, { labware: DEST_LABWARE }),
+        dispenseHelper('B1', 250),
         // mix 2
-        cmd.aspirate('B1', 250, { labware: 'destPlateId' }),
-        cmd.dispense('B1', 250, { labware: 'destPlateId' }),
+        aspirateHelper('B1', 250, { labware: DEST_LABWARE }),
+        dispenseHelper('B1', 250),
       ]
 
-      const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-      expect(result.commands).toEqual([
-        cmd.aspirate('A1', 300),
-        cmd.dispense('B1', 300, { labware: 'destPlateId' }),
+      const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
+        aspirateHelper('A1', 300),
+        dispenseHelper('B1', 300),
         ...mixCommands,
 
-        cmd.aspirate('A1', 50),
-        cmd.dispense('B1', 50, { labware: 'destPlateId' }),
+        aspirateHelper('A1', 50),
+        dispenseHelper('B1', 50),
         ...mixCommands,
       ])
     })
-
-    test.skip('blowout should blowout in specified labware after each dispense', () => {}) // TODO
   })
 })

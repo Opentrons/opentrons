@@ -6,7 +6,7 @@ import fixture384Plate from '@opentrons/shared-data/labware/fixtures/2/fixture38
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import { createEmptyLiquidState, createTipLiquidState } from '../utils'
-import { makeContext } from './fixtures'
+import { makeContext, DEFAULT_PIPETTE, SOURCE_LABWARE } from './fixtures'
 
 import _updateLiquidState from '../dispenseUpdateLiquidState'
 
@@ -17,9 +17,9 @@ beforeEach(() => {
   invariantContext = makeContext()
   dispenseSingleCh150ToA1Args = {
     invariantContext,
-    pipetteId: 'p300SingleId',
+    pipetteId: DEFAULT_PIPETTE,
     volume: 150,
-    labwareId: 'sourcePlateId',
+    labwareId: SOURCE_LABWARE,
     well: 'A1',
   }
 })
@@ -334,7 +334,7 @@ describe('...8-channel pipette', () => {
       test(labwareType, () => {
         let customInvariantContext = makeContext()
         customInvariantContext.labwareEntities.sourcePlateId = {
-          id: 'sourcePlateId',
+          id: SOURCE_LABWARE,
           labwareDefURI: labwareType,
           def,
         }
@@ -365,7 +365,7 @@ describe('...8-channel pipette', () => {
             invariantContext: customInvariantContext,
             pipetteId: 'p300MultiId',
             volume: 150,
-            labwareId: 'sourcePlateId',
+            labwareId: SOURCE_LABWARE,
             well: 'A1',
           },
           initialLiquidState

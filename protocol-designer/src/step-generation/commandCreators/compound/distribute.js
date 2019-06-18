@@ -1,6 +1,7 @@
 // @flow
 import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
+import { getWellsDepth } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import type {
@@ -115,7 +116,7 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (
               volume: args.volume,
               labware: args.destLabware,
               well: destWell,
-              'flow-rate': dispenseFlowRateUlSec,
+              flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
             }),
             ...touchTipAfterDispenseCommand,
@@ -141,6 +142,14 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (
             pipette: args.pipette,
             labware: args.disposalLabware,
             well: args.disposalWell,
+            flowRate: args.blowoutFlowRateUlSec,
+            offsetFromBottomMm:
+              // NOTE: when we use blowoutLocation as mentioned above,
+              // we can delegate this top -> bottom transform to blowoutUtil
+              getWellsDepth(
+                invariantContext.labwareEntities[args.disposalLabware].def,
+                [args.disposalWell]
+              ) + args.blowoutOffsetFromTopMm,
           }),
         ]
       }
@@ -178,7 +187,7 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (
           volume: args.volume * destWellChunk.length + disposalVolume,
           labware: args.sourceLabware,
           well: args.sourceWell,
-          'flow-rate': aspirateFlowRateUlSec,
+          flowRate: aspirateFlowRateUlSec,
           offsetFromBottomMm: aspirateOffsetFromBottomMm,
         }),
         ...touchTipAfterAspirateCommand,

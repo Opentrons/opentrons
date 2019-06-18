@@ -5,13 +5,13 @@ import {
   makeStateArgsStandard,
   makeContext,
   makeState,
-  commandCreatorNoErrors,
+  getSuccessResult,
+  DEFAULT_PIPETTE,
+  FIXED_TRASH_ID,
 } from './fixtures'
-import _dropTip from '../commandCreators/atomic/dropTip'
+import dropTip from '../commandCreators/atomic/dropTip'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
-
-const dropTip = commandCreatorNoErrors(_dropTip)
 
 jest.mock('../dispenseUpdateLiquidState')
 
@@ -48,22 +48,22 @@ describe('dropTip', () => {
 
   describe('replaceTip: single channel', () => {
     test('drop tip if there is a tip', () => {
-      const result = dropTip('p300SingleId')(
+      const result = dropTip(DEFAULT_PIPETTE)(
         invariantContext,
         makeRobotState({ singleHasTips: true, multiHasTips: true })
       )
-
-      expect(result.commands).toEqual([
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
         {
-          command: 'drop-tip',
+          command: 'dropTip',
           params: {
-            pipette: 'p300SingleId',
-            labware: 'trashId',
+            pipette: DEFAULT_PIPETTE,
+            labware: FIXED_TRASH_ID,
             well: 'A1',
           },
         },
       ])
-      expect(result.robotState).toEqual(
+      expect(res.robotState).toEqual(
         makeRobotState({ singleHasTips: false, multiHasTips: true })
       )
     })
@@ -73,12 +73,13 @@ describe('dropTip', () => {
         singleHasTips: false,
         multiHasTips: true,
       })
-      const result = dropTip('p300SingleId')(
+      const result = dropTip(DEFAULT_PIPETTE)(
         invariantContext,
         initialRobotState
       )
-      expect(result.commands).toEqual([])
-      expect(result.robotState).toEqual(initialRobotState)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([])
+      expect(res.robotState).toEqual(initialRobotState)
     })
   })
 
@@ -88,17 +89,18 @@ describe('dropTip', () => {
         invariantContext,
         makeRobotState({ singleHasTips: true, multiHasTips: true })
       )
-      expect(result.commands).toEqual([
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([
         {
-          command: 'drop-tip',
+          command: 'dropTip',
           params: {
             pipette: 'p300MultiId',
-            labware: 'trashId',
+            labware: FIXED_TRASH_ID,
             well: 'A1',
           },
         },
       ])
-      expect(result.robotState).toEqual(
+      expect(res.robotState).toEqual(
         makeRobotState({ singleHasTips: true, multiHasTips: false })
       )
     })
@@ -109,8 +111,9 @@ describe('dropTip', () => {
         multiHasTips: false,
       })
       const result = dropTip('p300MultiId')(invariantContext, initialRobotState)
-      expect(result.commands).toEqual([])
-      expect(result.robotState).toEqual(initialRobotState)
+      const res = getSuccessResult(result)
+      expect(res.commands).toEqual([])
+      expect(res.robotState).toEqual(initialRobotState)
     })
   })
 
@@ -128,19 +131,19 @@ describe('dropTip', () => {
       })
 
       const result = dropTip('p300MultiId')(invariantContext, initialRobotState)
-
+      const res = getSuccessResult(result)
       expect(updateLiquidState).toHaveBeenCalledWith(
         {
           invariantContext,
           pipetteId: 'p300MultiId',
-          labwareId: 'trashId',
+          labwareId: FIXED_TRASH_ID,
           useFullVolume: true,
           well: 'A1',
         },
         robotStateWithTip.liquidState
       )
 
-      expect(result.robotState.liquidState).toBe(mockLiquidReturnValue)
+      expect(res.robotState.liquidState).toBe(mockLiquidReturnValue)
     })
   })
 })

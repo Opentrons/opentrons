@@ -2,7 +2,7 @@
 import getNextRobotStateAndWarnings from '../../getNextRobotStateAndWarnings'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import type { AspirateDispenseArgsV1 as AspirateDispenseArgs } from '@opentrons/shared-data'
+import type { AspirateParams as AspirateDispenseArgs } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type {
   InvariantContext,
   RobotState,
@@ -15,8 +15,7 @@ const aspirate = (args: AspirateDispenseArgs): CommandCreator => (
   invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => {
-  const { pipette, volume, labware, well, offsetFromBottomMm } = args
-  const flowRateUlSec = args['flow-rate']
+  const { pipette, volume, labware, well, offsetFromBottomMm, flowRate } = args
 
   const actionName = 'aspirate'
   let errors: Array<CommandCreatorError> = []
@@ -78,9 +77,8 @@ const aspirate = (args: AspirateDispenseArgs): CommandCreator => (
         volume,
         labware,
         well,
-        offsetFromBottomMm:
-          offsetFromBottomMm == null ? undefined : offsetFromBottomMm,
-        'flow-rate': flowRateUlSec == null ? undefined : flowRateUlSec,
+        offsetFromBottomMm,
+        flowRate,
       },
     },
   ]
