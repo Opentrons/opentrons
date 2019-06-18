@@ -99,11 +99,10 @@ export const renameLabware = (
   const defaultNickname = allNicknamesById[labwareId]
   const nextNickname = getNextNickname(
     Object.keys(allNicknamesById)
-      .filter(id => id !== labwareId)
+      .filter((id: string) => id !== labwareId)
       .map((id: string) => allNicknamesById[id]), // NOTE: flow won't do Object.values here >:(
     args.name || defaultNickname
   )
-  console.log({ allNicknamesById, defaultNickname, nextNickname })
 
   return dispatch({
     type: 'RENAME_LABWARE',

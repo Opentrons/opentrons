@@ -11,27 +11,39 @@ export function getNextAvailableSlot(labwareLocations: {
   )
 }
 
+const getMatchOrNull = (pattern: RegExp, s: string): ?string => {
+  const matchResult = pattern.exec(s)
+  return matchResult ? matchResult[1] : null
+}
+
 const nameOnlyPattern = /^(.*)\(\d+\)$/
 const numOnlyPattern = /^.*\((\d+)\)$/
 export function getNextNickname(
   allNicknames: Array<string>,
   _proposedNickname: string
 ): string {
-  const proposedNickname = _proposedNickname.trim()
-  const parsed = allNicknames.reduce((acc, nickname) => {
-    const nameOnly = (
-      (nameOnlyPattern.exec(nickname) || [])[1] || nickname
-    ).trim()
-    const numOnlyMatch = numOnlyPattern.exec(nickname)
-    // if no number, use zero
-    const num = numOnlyMatch ? Number(numOnlyMatch[1]) : 0
-    if (nameOnly === proposedNickname) {
-      return [...acc, { nameOnly, num }]
-    }
-    return acc
-  }, [])
+  const proposedNickname = (
+    getMatchOrNull(nameOnlyPattern, _proposedNickname) || _proposedNickname
+  ).trim()
+  const matchingDisambigNums = allNicknames.reduce<Array<number>>(
+    (acc, nickname) => {
+      const nameOnly = (
+        getMatchOrNull(nameOnlyPattern, nickname) || nickname
+      ).trim()
 
-  const topMatchNum = Math.max(...parsed.map(({ num }) => num))
+      const numOnlyMatch = getMatchOrNull(numOnlyPattern, nickname)
+      const num = numOnlyMatch ? Number(numOnlyMatch) : 0
+
+      // only include matching names
+      if (nameOnly === proposedNickname) {
+        return [...acc, num]
+      }
+      return acc
+    },
+    []
+  )
+
+  const topMatchNum = Math.max(...matchingDisambigNums)
   return Number.isFinite(topMatchNum)
     ? `${proposedNickname.trim()} (${topMatchNum + 1})`
     : proposedNickname

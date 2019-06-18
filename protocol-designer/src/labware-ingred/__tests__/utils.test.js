@@ -21,6 +21,12 @@ describe('getNextNickname', () => {
       expected: 'cool (1)',
     },
     {
+      desc: 'increments (1) suffix to (2) when duplicating',
+      allNicknames: ['cool', 'cool(1)'],
+      proposed: 'cool (1)',
+      expected: 'cool (2)',
+    },
+    {
       desc: 'adds (2) suffix on second match',
       allNicknames: ['cool', 'cool (1)'],
       proposed: 'cool',
