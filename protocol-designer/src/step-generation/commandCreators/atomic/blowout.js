@@ -1,6 +1,6 @@
 // @flow
 import * as errorCreators from '../../errorCreators'
-import type { BlowoutParamsV3 } from '@opentrons/shared-data'
+import type { BlowoutParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type {
   InvariantContext,
   RobotState,
@@ -10,7 +10,7 @@ import type {
 
 import updateLiquidState from '../../dispenseUpdateLiquidState'
 
-const blowout = (args: BlowoutParamsV3): CommandCreator => (
+const blowout = (args: BlowoutParams): CommandCreator => (
   invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => {

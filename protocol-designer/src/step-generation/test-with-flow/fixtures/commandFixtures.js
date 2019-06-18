@@ -1,12 +1,12 @@
 // @flow
 import { tiprackWellNamesFlat } from './data'
 import type {
-  AspirateParamsV3,
-  BlowoutParamsV3,
-  DispenseParamsV3,
-  TouchTipParamsV3,
-  CommandV3 as Command,
-} from '@opentrons/shared-data'
+  AspirateParams,
+  BlowoutParams,
+  DispenseParams,
+  TouchTipParams,
+  Command,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type {
   CommandsAndRobotState,
   CommandCreatorErrorResponse,
@@ -85,10 +85,10 @@ const _defaultAspirateParams = {
   pipette: DEFAULT_PIPETTE,
   labware: SOURCE_LABWARE,
 }
-export const makeAspirateHelper = (bakedParams?: $Shape<AspirateParamsV3>) => (
+export const makeAspirateHelper = (bakedParams?: $Shape<AspirateParams>) => (
   well: string,
   volume: number,
-  params?: $Shape<AspirateParamsV3>
+  params?: $Shape<AspirateParams>
 ): Command => ({
   command: 'aspirate',
   params: {
@@ -104,7 +104,7 @@ export const makeAspirateHelper = (bakedParams?: $Shape<AspirateParamsV3>) => (
 
 export const blowoutHelper = (
   labware?: ?string,
-  params?: $Shape<BlowoutParamsV3>
+  params?: $Shape<BlowoutParams>
 ): Command => ({
   command: 'blowout',
   params: {
@@ -123,10 +123,10 @@ const _defaultDispenseParams = {
   offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
   flowRate: DISPENSE_FLOW_RATE,
 }
-export const makeDispenseHelper = (bakedParams?: $Shape<DispenseParamsV3>) => (
+export const makeDispenseHelper = (bakedParams?: $Shape<DispenseParams>) => (
   well: string,
   volume: number,
-  params?: $Shape<DispenseParamsV3>
+  params?: $Shape<DispenseParams>
 ): Command => ({
   command: 'dispense',
   params: {
@@ -143,9 +143,9 @@ const _defaultTouchTipParams = {
   labware: SOURCE_LABWARE,
   offsetFromBottomMm: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
 }
-export const makeTouchTipHelper = (bakedParams?: $Shape<TouchTipParamsV3>) => (
+export const makeTouchTipHelper = (bakedParams?: $Shape<TouchTipParams>) => (
   well: string,
-  params?: $Shape<TouchTipParamsV3>
+  params?: $Shape<TouchTipParams>
 ): Command => ({
   command: 'touchTip',
   params: {

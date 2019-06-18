@@ -5,12 +5,12 @@ import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
 // NOTE: this is an enum type in the spec, but it's inconvenient to flow-type them.
 type PipetteName = string
 
-export type FilePipetteV3 = {
+export type FilePipette = {
   mount: Mount,
   name: PipetteName,
 }
 
-export type FileLabwareV3 = {
+export type FileLabware = {
   slot: DeckSlotId,
   definitionId: string,
   displayName?: string,
@@ -31,25 +31,25 @@ type _AspDispAirgapParams = {|
   ...OffsetParams,
 |}
 
-export type AspirateParamsV3 = _AspDispAirgapParams
-export type DispenseParamsV3 = _AspDispAirgapParams
-export type AirGapParamsV3 = _AspDispAirgapParams
+export type AspirateParams = _AspDispAirgapParams
+export type DispenseParams = _AspDispAirgapParams
+export type AirGapParams = _AspDispAirgapParams
 
-export type BlowoutParamsV3 = {|
+export type BlowoutParams = {|
   ...FlowRateParams,
   ...PipetteAccessParams,
   ...OffsetParams,
 |}
 
-export type TouchTipParamsV3 = {|
+export type TouchTipParams = {|
   ...PipetteAccessParams,
   ...OffsetParams,
 |}
 
-export type PickUpTipParamsV3 = PipetteAccessParams
-export type DropTipParamsV3 = PipetteAccessParams
+export type PickUpTipParams = PipetteAccessParams
+export type DropTipParams = PipetteAccessParams
 
-export type MoveToSlotParamsV3 = {|
+export type MoveToSlotParams = {|
   pipette: string,
   slot: string,
   offset?: {|
@@ -60,23 +60,23 @@ export type MoveToSlotParamsV3 = {|
   minimumZHeight: number,
 |}
 
-export type DelayParamsV3 = {|
+export type DelayParams = {|
   wait: number | true,
   message?: string,
 |}
 
-export type CommandV3 =
+export type Command =
   | {|
       command: 'aspirate' | 'dispense' | 'airGap',
       params: _AspDispAirgapParams,
     |}
   | {|
       command: 'blowout',
-      params: BlowoutParamsV3,
+      params: BlowoutParams,
     |}
   | {|
       command: 'touchTip',
-      params: TouchTipParamsV3,
+      params: TouchTipParams,
     |}
   | {|
       command: 'pickUpTip' | 'dropTip',
@@ -84,15 +84,15 @@ export type CommandV3 =
     |}
   | {|
       command: 'moveToSlot',
-      params: MoveToSlotParamsV3,
+      params: MoveToSlotParams,
     |}
   | {|
       command: 'delay',
-      params: DelayParamsV3,
+      params: DelayParams,
     |}
 
 // NOTE: must be kept in sync with '../schemas/3.json'
-export type SchemaV3ProtocolFile<DesignerApplicationData> = {|
+export type ProtocolFile<DesignerApplicationData> = {|
   schemaVersion: 3,
   metadata: {
     protocolName?: string,
@@ -113,7 +113,7 @@ export type SchemaV3ProtocolFile<DesignerApplicationData> = {|
     model: 'OT-2 Standard',
   },
   pipettes: {
-    [pipetteId: string]: FilePipetteV3,
+    [pipetteId: string]: FilePipette,
   },
   labwareDefinitions: {
     [labwareDefId: string]: LabwareDefinition2,
@@ -125,6 +125,6 @@ export type SchemaV3ProtocolFile<DesignerApplicationData> = {|
       displayName?: string,
     },
   },
-  commands: Array<CommandV3>,
+  commands: Array<Command>,
   commandAnnotations?: Object, // NOTE: intentionally underspecified b/c we haven't decided on this yet
 |}

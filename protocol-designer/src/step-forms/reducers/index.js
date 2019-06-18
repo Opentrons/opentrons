@@ -35,9 +35,9 @@ import type {
 import type { FormData, StepIdType } from '../../form-types'
 // TODO: Ian 2019-06-12 update labware & pipette state shape to not use v1 #3336
 import type {
-  FileLabwareV1 as FileLabware,
-  FilePipetteV1 as FilePipette,
-} from '@opentrons/shared-data'
+  FileLabware,
+  FilePipette,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV1'
 
 import type {
   AddStepAction,

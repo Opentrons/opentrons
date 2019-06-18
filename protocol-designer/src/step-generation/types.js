@@ -1,5 +1,5 @@
 // @flow
-import type { CommandV3 as Command } from '@opentrons/shared-data'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type {
   LabwareTemporalProperties,
   PipetteTemporalProperties,

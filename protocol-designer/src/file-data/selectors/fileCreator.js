@@ -19,10 +19,10 @@ import {
 } from '../../constants'
 
 import type {
-  FilePipetteV3 as FilePipette,
-  FileLabwareV3 as FileLabware,
-  CommandV3,
-} from '@opentrons/shared-data'
+  FilePipette,
+  FileLabware,
+  Command,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { BaseState } from '../../types'
 import type { PDProtocolFile } from '../../file-types'
 
@@ -164,7 +164,7 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
       labware,
       labwareDefinitions,
 
-      commands: flatten<CommandV3, CommandV3>(
+      commands: flatten<Command, Command>(
         robotStateTimeline.timeline.map(timelineFrame => timelineFrame.commands)
       ),
     }

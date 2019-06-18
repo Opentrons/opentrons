@@ -2,7 +2,7 @@
 import type { RootState as IngredRoot } from './labware-ingred/reducers'
 import type { RootState as StepformRoot } from './step-forms'
 import type { RootState as DismissRoot } from './dismiss'
-import type { SchemaV3ProtocolFile } from '@opentrons/shared-data'
+import type { ProtocolFile } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 
 export type PDMetadata = {
   // pipetteId to tiprackModel
@@ -24,7 +24,7 @@ export type PDMetadata = {
   },
 }
 
-export type PDProtocolFile = SchemaV3ProtocolFile<PDMetadata>
+export type PDProtocolFile = ProtocolFile<PDMetadata>
 
 export function getPDMetadata(file: PDProtocolFile): PDMetadata {
   const metadata = file.designerApplication?.data
