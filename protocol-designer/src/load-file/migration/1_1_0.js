@@ -7,14 +7,14 @@ import omitBy from 'lodash/omitBy'
 import flow from 'lodash/flow'
 import { getLabware, getPipetteNameSpecs } from '@opentrons/shared-data'
 import type {
-  FileLabwareV1 as FileLabware,
-  FilePipetteV1 as FilePipette,
-  SchemaV1ProtocolFile,
-} from '@opentrons/shared-data'
+  FileLabware,
+  FilePipette,
+  ProtocolFile,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV1'
 import type { FormPatch } from '../../steplist/actions'
 import type { FormData } from '../../form-types'
 
-type PDV1Metadata = {
+type PDMetadata = {
   pipetteTiprackAssignments: { [pipetteId: string]: string },
 
   dismissedWarnings: {
@@ -45,7 +45,7 @@ type PDV1Metadata = {
   orderedStepIds: Array<string>,
 }
 
-type PDProtocolFile = SchemaV1ProtocolFile<PDV1Metadata>
+type PDProtocolFile = ProtocolFile<PDMetadata>
 
 type LegacyPipetteEntities = {
   [pipetteId: string]: {

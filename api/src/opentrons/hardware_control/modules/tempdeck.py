@@ -180,9 +180,8 @@ class TempDeck(mod_abc.AbstractModule):
     def loop(self):
         return self._loop
 
-    @loop.setter
-    def loop(self, newLoop):
-        self._loop = newLoop
+    def set_loop(self, loop):
+        self._loop = loop
 
     async def _connect(self):
         """

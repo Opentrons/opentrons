@@ -1,5 +1,5 @@
 // @flow
-import type { DelayArgs, CommandCreatorArgs } from '../step-generation'
+import type { PauseArgs, CommandCreatorArgs } from '../step-generation'
 import type {
   FormData,
   StepIdType,
@@ -89,7 +89,7 @@ export type SourceDestSubstepItem =
   | SourceDestSubstepItemSingleChannel
   | SourceDestSubstepItemMultiChannel
 
-export type SubstepItemData = SourceDestSubstepItem | DelayArgs // Pause substep uses same data as delay args
+export type SubstepItemData = SourceDestSubstepItem | PauseArgs // Pause substep uses same data as processed form
 
 export type StepItemData = {
   id: StepIdType,

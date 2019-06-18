@@ -34,7 +34,7 @@ export const INITIAL_DECK_SETUP_STEP_ID = '__INITIAL_DECK_SETUP_STEP__'
 
 export const DEFAULT_CHANGE_TIP_OPTION: 'always' = 'always'
 
-// TODO: Ian 2019-07-13 don't keep these as hard-coded static values (see #3587)
+// TODO: Ian 2019-06-13 don't keep these as hard-coded static values (see #3587)
 export const DEFAULT_MM_FROM_BOTTOM_ASPIRATE = 1
 export const DEFAULT_MM_FROM_BOTTOM_DISPENSE = 0.5
 // NOTE: in the negative Z direction, to go down from top

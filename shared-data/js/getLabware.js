@@ -1,7 +1,6 @@
 // @flow
 import assert from 'assert'
 import mapValues from 'lodash/mapValues'
-import uniq from 'lodash/uniq'
 // TODO: Ian 2019-06-04 remove the shared-data build process for labware v1
 import definitions from '../build/labware.json'
 import { SLOT_RENDER_HEIGHT, FIXED_TRASH_RENDER_HEIGHT } from './constants'
@@ -83,28 +82,4 @@ export function getWellDefsForSVG(labwareName: string) {
     x: wellDef.x + xCorrection,
     y: _getSvgYValueForWell(labwareName, wellDef) + yCorrection,
   }))
-}
-
-export const getLabwareDefURI = (def: LabwareDefinition2): string =>
-  `${def.namespace}/${def.parameters.loadName}/${def.version}`
-
-// NOTE: this is used in PD for converting "offset from top" to "mm from bottom".
-// Assumes all wells have same offset because multi-offset not yet supported.
-// TODO: Ian 2019-07-13 return {[string: well]: offset} to support multi-offset
-export const getWellsDepth = (
-  labwareDef: LabwareDefinition2,
-  wells: Array<string>
-): number => {
-  const offsets = wells.map(well => labwareDef.wells[well].depth)
-  if (uniq(offsets).length !== 1) {
-    console.warn(
-      `expected wells ${JSON.stringify(
-        wells
-      )} to all have same offset, but they were different. Labware def is ${getLabwareDefURI(
-        labwareDef
-      )}`
-    )
-  }
-
-  return offsets[0]
 }

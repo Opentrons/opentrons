@@ -1,9 +1,7 @@
 // @flow
 import { createSelector } from 'reselect'
-import {
-  getWellNamePerMultiTip,
-  type CommandV3 as Command,
-} from '@opentrons/shared-data'
+import { getWellNamePerMultiTip } from '@opentrons/shared-data'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 
 import mapValues from 'lodash/mapValues'
 

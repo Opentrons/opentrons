@@ -1,10 +1,10 @@
 // @flow
 import * as React from 'react'
-import type { DelayArgs } from '../../step-generation'
+import type { PauseArgs } from '../../step-generation'
 import { PDListItem } from '../lists'
 
 type Props = {
-  pauseArgs: DelayArgs,
+  pauseArgs: PauseArgs,
 }
 
 export default function PauseStepItems(props: Props) {

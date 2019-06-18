@@ -10,7 +10,7 @@ from opentrons import instruments, hardware_control
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.types import CriticalPoint
 from . import jog, position, dots_set, z_pos
-from opentrons.util.linal import add_z, solve
+from opentrons.util.linal import add_z, solve, identity_deck_transform
 
 session = None
 mount_by_name = {'left': Mount.LEFT, 'right': Mount.RIGHT}
@@ -82,14 +82,14 @@ class SessionManager:
         self.cp = None
         self.pipette_id = None
         self.adapter = hardware
+        self.current_transform = identity_deck_transform()
 
         if feature_flags.use_protocol_api_v2():
             self.adapter = hardware_control.adapters.SynchronousAdapter(
                 hardware)
 
-        default = robot_configs._build_config({}, {}).gantry_calibration
-        self.adapter.update_config(gantry_calibration=default)
-        log.debug("Current deck calibration {}".format(self.adapter.config))
+        # Start from fresh identity matrix every calibration session
+        self.adapter.update_config(gantry_calibration=self.current_transform)
 
 
 # -------------- Route Fns -----------------------------------------------
@@ -471,6 +471,11 @@ async def save_z(data):
             session.z_value = position(
                 session.current_mount, session.adapter, session.cp)[-1]
 
+        session.current_transform[2][3] = session.z_value
+
+        session.adapter.update_config(gantry_calibration=list(
+                map(lambda i: list(i), session.current_transform)))
+
         message = "Saved z: {}".format(session.z_value)
         status = 200
     return web.json_response({'message': message}, status=status)
@@ -499,12 +504,17 @@ async def save_transform(data):
         actual = [session.points[p] for p in sorted(session.points.keys())]
 
         # Generate a 2 dimensional transform matrix from the two matricies
-        flat_matrix = solve(expected, actual)
-        # Add the z component to form the 3 dimensional transform
-        calibration_matrix = add_z(flat_matrix, session.z_value)
+        flat_matrix = solve(expected, actual).round(4)
+
+        # replace relevant X, Y and angular components
+        # [[cos_x, sin_y, const_zero, delta_x___],
+        # [-sin_x, cos_y, const_zero, delta_y___],
+        # [const_zero, const_zero, const_one_, delta_z___],
+        # [const_zero, const_zero, const_zero, const_one_]]
+        session.current_transform = add_z(flat_matrix, session.z_value)
 
         session.adapter.update_config(gantry_calibration=list(
-                map(lambda i: list(i), calibration_matrix)))
+                map(lambda i: list(i), session.current_transform)))
 
         robot_configs.save_deck_calibration(session.adapter.config)
         robot_configs.backup_configuration(session.adapter.config)

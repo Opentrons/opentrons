@@ -1,3 +1,3 @@
 // @flow
 export * from './commandFixtures.js'
-export * from './fixtures.js'
+export * from './robotStateFixtures.js'

@@ -7,9 +7,9 @@ import type {
   CommandCreator,
   CommandCreatorError,
 } from '../../types'
-import type { TouchTipArgsV3 } from '@opentrons/shared-data'
+import type { TouchTipParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 
-const touchTip = (args: TouchTipArgsV3): CommandCreator => (
+const touchTip = (args: TouchTipParams): CommandCreator => (
   invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => {

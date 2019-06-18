@@ -14,10 +14,12 @@ from numpy import dot, array
 import opentrons
 from opentrons import robot, instruments, types
 from opentrons.hardware_control import adapters
+from opentrons.hardware_control.types import CriticalPoint
 from opentrons.config import (robot_configs, feature_flags,
                               SystemArchitecture, ARCHITECTURE)
 from opentrons.util.calibration_functions import probe_instrument
-from opentrons.util.linal import solve, add_z, apply_transform
+from opentrons.util.linal import (solve, add_z, apply_transform,
+                                  identity_deck_transform)
 from . import (
     left, right, SAFE_HEIGHT, cli_dots_set,
     position, jog, apply_mount_offset)
@@ -92,34 +94,46 @@ class CLITool:
             event_loop=loop
         )
         self._config = self.hardware.config
-        self.calibration_matrix = self._config.gantry_calibration
+        self.current_transform = identity_deck_transform()
+
         # Other state
         self._tip_length = tip_length
         if feature_flags.use_protocol_api_v2():
-            self.hardware.add_tip(self._current_mount, self._tip_length)
+            self.hardware.add_tip(types.Mount.RIGHT, self._tip_length)
+            if self.hardware.attached_instruments[types.Mount.LEFT]:
+                self.hardware.add_tip(types.Mount.LEFT, self._tip_length)
         self.current_position = (0, 0, 0)
         self._steps = [0.1, 0.25, 0.5, 1, 5, 10, 20, 40, 80]
         self._steps_index = 2
         self._current_point = 1
 
+        if feature_flags.use_protocol_api_v2():
+            deck_height = 0
+        else:
+            deck_height = self._tip_length
+
         self._expected_points = {
-            key: (vX, vY, tip_length)
+            key: (vX, vY, deck_height)
             for key, (vX, vY) in point_set.items()}
         self.actual_points = {
             1: (0, 0),
             2: (0, 0),
             3: (0, 0)}
+
         self._test_points = {
-            'slot5': (132.50, 90.50, self._tip_length),
-            'corner3': (332.13, 47.41, self._tip_length),
-            'corner8': (190.65, 227.57, self._tip_length),
-            'corner9': (330.14, 222.78, self._tip_length)}
+            'slot5': (132.50, 90.50, deck_height),
+            'corner3': (332.13, 47.41, deck_height),
+            'corner8': (190.65, 227.57, deck_height),
+            'corner9': (330.14, 222.78, deck_height)}
+
+        slot5 = self._test_points['slot5']
 
         self.key_map = {
             '-': lambda: self.decrease_step(),
             '=': lambda: self.increase_step(),
             'z': lambda: self.save_z_value(),
-            'p': lambda: probe(self._tip_length, self.hardware),
+            'p': lambda: self.probe(
+                self._tip_length, self.hardware, self._current_mount, slot5),
             'enter': lambda: self.save_point(),
             '\\': lambda: self.home(),
             ' ': lambda: self.save_transform(),
@@ -147,7 +161,7 @@ class CLITool:
                 self._test_points['corner8'], 6, self._current_mount),
             '7': lambda: self.validate(
                 self._test_points['corner9'], 7, self._current_mount),
-            '?': lambda: self.print_instructions()
+            '?': lambda: self.print_instructions(),
         }
 
     @property
@@ -157,14 +171,14 @@ class CLITool:
     @hardware.setter
     def hardware(self, hardware):
         self._hardware = hardware
-
-    @property
-    def calibration_matrix(self):
-        return self._calibration_matrix
-
-    @calibration_matrix.setter
-    def calibration_matrix(self, calibration):
-        self._calibration_matrix = calibration
+    #
+    # @property
+    # def calibration_matrix(self):
+    #     return self._calibration_matrix
+    #
+    # @calibration_matrix.setter
+    # def calibration_matrix(self, calibration):
+    #     self._calibration_matrix = calibration
 
     @property
     def actual_points(self):
@@ -227,24 +241,28 @@ class CLITool:
         # TODO (ben 20180201): create a function in linal module so we don't
         # TODO                 have to do dot product & etc here
         point = array(list(point) + [1])
-        x, y, z, _ = dot(self.calibration_matrix, point)
+        x, y, z, _ = dot(self.current_transform, point)
         return (x, y, z)
 
     def _driver_to_deck_coords(self, point):
         # TODO (ben 20180201): create a function in linal module so we don't
         # TODO                 have to do dot product & etc here
         point = array(list(point) + [1])
-        x, y, z, _ = dot(inv(self.calibration_matrix), point)
+        x, y, z, _ = dot(inv(self.current_transform), point)
         return (x, y, z)
 
     def _position(self):
         """
         Read position from driver into a tuple and map 3-rd value
-        to the axis of a pipette currently used
+        to the axis of a pipette currently used. Always returns deck
+        coordinates
         """
-
-        res = position(self._current_mount, self.hardware)
-
+        if not feature_flags.use_protocol_api_v2():
+            res = self._driver_to_deck_coords(
+                position(self._current_mount, self.hardware))
+        else:
+            res = position(
+                self._current_mount, self.hardware, CriticalPoint.TIP)
         return res
 
     def _jog(self, axis, direction, step):
@@ -287,15 +305,19 @@ class CLITool:
         return msg
 
     def save_mount_offset(self) -> str:
-        pos = self._position()
-        log.debug("save_mount_offset position: {}".format(pos))
-        cx, cy, cz = self._driver_to_deck_coords(pos)
+        cx, cy, cz = self._position()
         log.debug("save_mount_offset cxyz: {}".format((cx, cy, cz)))
-        ex, ey, ez = apply_mount_offset(
-            self._expected_points[1], self.hardware)
-        log.debug("save_mount_offset exyz: {}".format((ex, ey, ez)))
-        dx, dy, dz = (cx - ex, cy - ey, cz - ez)
+
+        if not feature_flags.use_protocol_api_v2():
+            ex, ey, ez = apply_mount_offset(
+                self._expected_points[1], self.hardware)
+            log.debug("save_mount_offset exyz: {}".format((ex, ey, ez)))
+            dx, dy, dz = (cx - ex, cy - ey, cz - ez)
+        else:
+            ex, ey, ez = self._expected_points[1]
+            dx, dy, dz = (cx - ex, cy - ey, cz - ez)
         log.debug("save_mount_offset dxyz: {}".format((dx, dy, dz)))
+
         mx, my, mz = self.hardware.config.mount_offset
         log.debug("save_mount_offset mxyz: {}".format((mx, my, mz)))
         offset = (mx - dx, my - dy, mz - dz)
@@ -320,12 +342,12 @@ class CLITool:
         # Generate a 2 dimensional transform matrix from the two matricies
         flat_matrix = solve(expected, actual)
         log.debug("save_transform flat_matrix: {}".format(flat_matrix))
-        current_z = self.calibration_matrix[2][3]
+        current_z = self.current_transform[2][3]
         # Add the z component to form the 3 dimensional transform
-        self.calibration_matrix = add_z(flat_matrix, current_z)
+        self.current_transform = add_z(flat_matrix, current_z)
 
         gantry_calibration = list(
-                map(lambda i: list(i), self.calibration_matrix))
+                map(lambda i: list(i), self.current_transform))
         log.debug("save_transform calibration_matrix: {}".format(
             gantry_calibration))
 
@@ -336,10 +358,13 @@ class CLITool:
 
     def save_z_value(self) -> str:
         actual_z = self._position()[-1]
-        expected_z = self.calibration_matrix[2][3] + self._tip_length
-        new_z = self.calibration_matrix[2][3] + actual_z - expected_z
+        if not feature_flags.use_protocol_api_v2():
+            expected_z = self.current_transform[2][3] + self._tip_length
+            new_z = self.current_transform[2][3] + actual_z - expected_z
+        else:
+            new_z = self.current_transform[2][3] + actual_z
         log.debug("Saving z value: {}".format(new_z))
-        self.calibration_matrix[2][3] = new_z
+        self.current_transform[2][3] = new_z
         return 'saved Z-Offset: {}'.format(new_z)
 
     def _left_mount_offset(self):
@@ -353,15 +378,14 @@ class CLITool:
         if not feature_flags.use_protocol_api_v2():
             r_pipette = right
             l_pipette = left
+            targ = apply_mount_offset(self._expected_points[1], self.hardware)
         else:
             r_pipette = types.Mount.RIGHT
             l_pipette = types.Mount.LEFT
+            targ = self._expected_points[1]
         self.validate(self._expected_points[1], 1, r_pipette)
 
-        self.validate(
-            apply_mount_offset(self._expected_points[1], self.hardware),
-            0,
-            l_pipette)
+        self.validate(targ, 0, l_pipette)
 
     def validate(
             self,
@@ -375,33 +399,36 @@ class CLITool:
 
         :return:
         """
-        _, _, cz = self._driver_to_deck_coords(self._position())
-        if self._current_mount != pipette_mount and cz < SAFE_HEIGHT:
-            self.move_to_safe_height()
-
-        self._current_mount = pipette_mount
         self._current_point = point_num
-
-        _, _, cz = self._driver_to_deck_coords(self._position())
-        if cz < SAFE_HEIGHT:
-            self.move_to_safe_height()
-
-        tx, ty, tz = self._deck_to_driver_coords(point)
         if not feature_flags.use_protocol_api_v2():
+            _, _, cz = self._position()
+            if self._current_mount != pipette_mount and cz < SAFE_HEIGHT:
+                self.move_to_safe_height()
+
+            self._current_mount = pipette_mount
+
+            _, _, cz = self._position()
+            if cz < SAFE_HEIGHT:
+                self.move_to_safe_height()
+            tx, ty, tz = self._deck_to_driver_coords(point)
             self.hardware._driver.move({'X': tx, 'Y': ty})
             self.hardware._driver.move({self._current_mount: tz})
         else:
-            pt = types.Point(x=tx, y=ty, z=tz)
-            self.hardware.move_to(self._current_mount, pt)
+            self._current_mount = pipette_mount
+            self.move_to_safe_height()
+            pt1 = types.Point(x=point[0], y=point[1], z=SAFE_HEIGHT)
+            pt2 = types.Point(*point)
+            self.hardware.move_to(self._current_mount, pt1)
+            self.hardware.move_to(self._current_mount, pt2)
         return 'moved to point {}'.format(point)
 
     def move_to_safe_height(self):
-        cx, cy, _ = self._driver_to_deck_coords(self._position())
-        _, _, sz = self._deck_to_driver_coords((cx, cy, SAFE_HEIGHT))
+        cx, cy, _ = self._position()
         if not feature_flags.use_protocol_api_v2():
+            _, _, sz = self._deck_to_driver_coords((cx, cy, SAFE_HEIGHT))
             self.hardware._driver.move({self._current_mount: sz})
         else:
-            pt = types.Point(x=cx, y=cy, z=sz)
+            pt = types.Point(x=cx, y=cy, z=SAFE_HEIGHT)
             self.hardware.move_to(self._current_mount, pt)
 
     def exit(self):
@@ -431,27 +458,33 @@ class CLITool:
         text = '\n'.join([
             points,
             'World: {}'.format(apply_transform(
-                inv(self.calibration_matrix), self.current_position)),
+                inv(self.current_transform), self.current_position)),
             'Step: {}'.format(self.current_step()),
             'Message: {}'.format(msg)
         ])
 
         self._status_text_box.set_text(text)
 
+    # Functions for backing key-press
+    def probe(self, tip_length: float, hardware, mount, move_after) -> str:
 
-# Functions for backing key-press
-def probe(tip_length: float, hardware) -> str:
-    if not feature_flags.use_protocol_api_v2():
-        hardware.reset()
-        pipette = instruments.P300_Single(mount='right')   # type: ignore
-        probe_center = tuple(probe_instrument(
-            pipette, robot, tip_length=tip_length))
-        log.debug("Setting probe center to {}".format(probe_center))
-    else:
-        probe_center = hardware.locate_tip_probe_center(tip_length)
-    hardware.update_config(
-        tip_probe=hardware.config.tip_probe._replace(center=probe_center))
-    return 'Tip probe'
+        if not feature_flags.use_protocol_api_v2():
+            hardware.reset()
+            pipette = instruments.P300_Single(mount='right')   # type: ignore
+            probe_center = tuple(probe_instrument(
+                pipette, robot, tip_length=tip_length))
+            log.debug("Setting probe center to {}".format(probe_center))
+        else:
+            probe_center = hardware.locate_tip_probe_center(mount, tip_length)
+            _, _, cz = position(mount, hardware, CriticalPoint.TIP)
+            # work around to prevent pipette tip crashing into tip box
+            # when moving from tip box -> other point on the deck
+            pt = types.Point(x=move_after[0], y=move_after[1], z=cz)
+            hardware.move_to(mount, pt)
+
+        hardware.update_config(
+            tip_probe=hardware.config.tip_probe._replace(center=probe_center))
+        return 'Tip probe'
 
 
 def save_config(config) -> str:
@@ -466,7 +499,8 @@ def save_config(config) -> str:
 
 def clear_configuration_and_reload(hardware):
     robot_configs.clear()
-    hardware.config = robot_configs.load()
+    new_config = robot_configs.load()
+    hardware.set_config(new_config)
     if not feature_flags.use_protocol_api_v2():
         hardware.reset()
 

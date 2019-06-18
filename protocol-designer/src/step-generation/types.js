@@ -1,5 +1,5 @@
 // @flow
-import type { CommandV3 as Command } from '@opentrons/shared-data'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type {
   LabwareTemporalProperties,
   PipetteTemporalProperties,
@@ -148,7 +148,7 @@ export type MixArgs = {
   dispenseFlowRateUlSec: number,
 }
 
-export type DelayArgs = {
+export type PauseArgs = {
   ...$Exact<CommonArgs>,
   commandCreatorFnName: 'delay',
   message?: string,
@@ -164,7 +164,7 @@ export type CommandCreatorArgs =
   | ConsolidateArgs
   | DistributeArgs
   | MixArgs
-  | DelayArgs
+  | PauseArgs
   | TransferArgs
 
 /** tips are numbered 0-7. 0 is the furthest to the back of the robot.

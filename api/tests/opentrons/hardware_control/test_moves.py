@@ -1,12 +1,16 @@
 import pytest
 from opentrons import types
 from opentrons import hardware_control as hc
+from opentrons.config import robot_configs
 from opentrons.hardware_control.types import Axis, CriticalPoint
 
 
 async def test_controller_home(loop):
-    c = hc.API.build_hardware_simulator(loop=loop)
+    c = hc.API.build_hardware_simulator(
+        loop=loop,
+        config=robot_configs._build_config({}, {}))
     await c.home()
+
     assert c._current_position == {Axis.X: 418,
                                    Axis.Y: 353,
                                    Axis.Z: 218,

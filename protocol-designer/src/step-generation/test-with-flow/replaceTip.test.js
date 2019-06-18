@@ -15,7 +15,7 @@ import updateLiquidState from '../dispenseUpdateLiquidState'
 
 jest.mock('../dispenseUpdateLiquidState')
 
-// TODO: Ian 2019-07-13 move these strings into commandFixtures
+// TODO: Ian 2019-06-13 move these strings into commandFixtures
 const tiprack1Id = 'tiprack1Id'
 const tiprack2Id = 'tiprack2Id'
 const p300SingleId = DEFAULT_PIPETTE

@@ -33,11 +33,10 @@ import type {
   SwapSlotContentsAction,
 } from '../../labware-ingred/actions'
 import type { FormData, StepIdType } from '../../form-types'
-// TODO: Ian 2019-07-12 update labware & pipette state shape to not use v1 #3336
 import type {
-  FileLabwareV3 as FileLabware,
-  FilePipetteV3 as FilePipette,
-} from '@opentrons/shared-data'
+  FileLabware,
+  FilePipette,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 
 import type {
   AddStepAction,

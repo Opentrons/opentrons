@@ -2,7 +2,7 @@
 import getNextRobotStateAndWarnings from '../../getNextRobotStateAndWarnings'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import type { AspirateArgsV3 as AspirateDispenseArgs } from '@opentrons/shared-data'
+import type { AspirateParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type {
   InvariantContext,
   RobotState,
@@ -11,7 +11,7 @@ import type {
 } from '../../types'
 
 /** Aspirate with given args. Requires tip. */
-const aspirate = (args: AspirateDispenseArgs): CommandCreator => (
+const aspirate = (args: AspirateParams): CommandCreator => (
   invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => {

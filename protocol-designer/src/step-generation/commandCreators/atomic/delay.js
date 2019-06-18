@@ -1,8 +1,8 @@
 // @flow
-import type { DelayArgsV3 } from '@opentrons/shared-data'
+import type { DelayParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { InvariantContext, RobotState, CommandCreator } from '../../types'
 
-const delay = (args: DelayArgsV3): CommandCreator => (
+const delay = (args: DelayParams): CommandCreator => (
   invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => {

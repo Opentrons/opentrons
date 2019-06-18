@@ -13,7 +13,8 @@ import {
   getWellNamePerMultiTip,
 } from '@opentrons/shared-data'
 
-import type { BlowoutArgsV3, LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { BlowoutParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { PipetteEntity, LabwareEntity } from '../step-forms'
 import type {
   CommandCreator,
@@ -261,11 +262,11 @@ export function totalVolume(location: LocationLiquidState): number {
 // the SOURCE_WELL_BLOWOUT_DESTINATION / DEST_WELL_BLOWOUT_DESTINATION
 // special strings, or to a labware ID.
 export const blowoutUtil = (args: {
-  pipette: $PropertyType<BlowoutArgsV3, 'pipette'>,
+  pipette: $PropertyType<BlowoutParams, 'pipette'>,
   sourceLabwareId: string,
-  sourceWell: $PropertyType<BlowoutArgsV3, 'well'>,
+  sourceWell: $PropertyType<BlowoutParams, 'well'>,
   destLabwareId: string,
-  destWell: $PropertyType<BlowoutArgsV3, 'well'>,
+  destWell: $PropertyType<BlowoutParams, 'well'>,
   blowoutLocation: ?string,
   flowRate: number,
   offsetFromTopMm: number,
