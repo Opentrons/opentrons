@@ -136,7 +136,7 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
         data: {
           _internalAppBuildDate,
           defaultValues: {
-            // TODO: Ian 2019-07-13 load these into redux and always get them from redux, not constants.js
+            // TODO: Ian 2019-06-13 load these into redux and always get them from redux, not constants.js
             // This `defaultValues` key is not yet read by anything, but is populated here for auditability
             // and so that later we can do #3587 without a PD migration
             aspirate_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
