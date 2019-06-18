@@ -31,11 +31,12 @@ const masterMigration = (
   const designerApplication =
     file.designerApplication || file['designer-application']
 
-  // NOTE: default exists because any protocol that doesn't include the applicationVersion
+  // NOTE: default exists because any protocol that doesn't include the application version
   // key will be treated as the oldest migrateable version ('1.0.0')
-  const {
-    applicationVersion = OLDEST_MIGRATEABLE_VERSION,
-  } = designerApplication
+  const applicationVersion: string =
+    designerApplication.applicationVersion ||
+    designerApplication.version ||
+    OLDEST_MIGRATEABLE_VERSION
 
   const migrationVersionsToRun = getMigrationVersionsToRunFromVersion(
     allMigrationsByVersion,
