@@ -52,9 +52,6 @@ import type {
 import type { RootState } from '../reducers'
 import type { InvariantContext } from '../../step-generation'
 
-// TODO: Ian 2019-04-10 SHIM REMOVAL #3335
-const FALLBACK_DEF = 'opentrons_1_trash_1.1_l'
-
 const rootSelector = (state: BaseState): RootState => state.stepForms
 
 // NOTE Ian 2019-04-15: outside of this file, you probably only care about
@@ -71,10 +68,17 @@ function _hydrateLabwareEntity(
   labwareId: string,
   defsByURI: LabwareDefByDefURI
 ): LabwareEntity {
+  const def = defsByURI[l.labwareDefURI]
+  assert(
+    def,
+    `could not hydrate labware ${labwareId}, missing def for URI ${
+      l.labwareDefURI
+    }`
+  )
   return {
     ...l,
     id: labwareId,
-    def: defsByURI[l.labwareDefURI] || defsByURI[FALLBACK_DEF],
+    def,
   }
 }
 
