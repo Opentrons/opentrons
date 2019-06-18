@@ -13,10 +13,11 @@ from typing import Any, Awaitable, Callable, Dict, Optional, Set
 import jsonrpcserver
 
 from opentrons import types as top_types
+from opentrons.config import robot_configs
 
 from . import API, types, pipette
 
-LOG = logging.getLogger()
+LOG = logging.getLogger(__name__)
 
 
 SerDes = namedtuple('SerDes', ('serializer', 'deserializer'))
@@ -37,7 +38,7 @@ _SERDES = {
         deserializer=lambda lst: top_types.Point(*lst)),
     Dict[top_types.Mount, str]: SerDes(
         serializer=lambda require: {
-            mount.name(): val for mount, val in require.items()},
+            mount.name: val for mount, val in require.items()},
         deserializer=lambda require: {
             top_types.Mount[key.upper()]: val for key, val in require.items()}
     ),
@@ -50,11 +51,47 @@ _SERDES = {
             top_types.Mount[mount_name.upper()]: pipette_info
             for mount_name, pipette_info in json_dict.items()
         }
+    ),
+    Dict[types.Axis, bool]: SerDes(
+        serializer=lambda axisdict: {
+            ax.name: engaged for ax, engaged in axisdict.items()
+        },
+        deserializer=lambda namedict: {
+            types.Axis[ax.upper()]: engaged
+            for ax, engaged in namedict.items()
+        }
+    ),
+    robot_configs.robot_config: SerDes(
+        serializer=lambda config: list(robot_configs.config_to_save(config)),
+        deserializer=lambda clist: robot_configs.build_config(*clist)
     )
+
 }
 
 
-def _build_serializable_method(method_name, method):  # noqa(C901)
+def serializer_for(annotation: Any) -> Callable[[Any], Any]:
+    """
+    Extract a serializer for the annotation, providing an identity
+    if there isn't one registered
+    """
+    if annotation in _SERDES:
+        return _SERDES[annotation].serializer
+    else:
+        return lambda x: x
+
+
+def deserializer_for(annotation: Any) -> Callable[[Any], Any]:
+    """
+    Extract a deserialize for the annotation, providing an identity
+    if there isn't oen registerd
+    """
+    if annotation in _SERDES:
+        return _SERDES[annotation].deserializer
+    else:
+        return lambda x: x
+
+
+def _build_serializable_method(method_name, method):
     """ Build the method to actually server over jsonrpc.
 
     To serve over jsonrpc, we need to have an interface that is fully
@@ -64,8 +101,6 @@ def _build_serializable_method(method_name, method):  # noqa(C901)
     typing for the python-python interface. Instead, we'll build adapters here
     that transform things to and from json.
     """
-    # Complexity lint check disabled because most of the complexity is in the
-    # wrapper functions
     signature = inspect.signature(method)
     if inspect.iscoroutinefunction(method):
         async_wrapper = method
@@ -77,17 +112,11 @@ def _build_serializable_method(method_name, method):  # noqa(C901)
     transformers = {}
     defaults = {}
     for argname, param in signature.parameters.items():
-        if param.annotation in _SERDES:
-            transformers[argname] = _SERDES[param.annotation].deserializer
-        else:
-            transformers[argname] = lambda arg: arg
+        transformers[argname] = deserializer_for(param.annotation)
         if param.default != param.empty:
             defaults[argname] = param.default
 
-    if signature.return_annotation in _SERDES:
-        return_transformer = _SERDES[signature.return_annotation].serializer
-    else:
-        return_transformer = lambda ret: ret  # noqa(E371)
+    return_transformer = serializer_for(signature.return_annotation)
 
     @functools.wraps(async_wrapper)
     async def wrapper(**kwargs):
@@ -114,24 +143,6 @@ def build_jrpc_methods(api: API) -> jsonrpcserver.methods.Methods:
         wrapper = _build_serializable_method(mname, mobj)
         methods.add(**{mname: wrapper})
     return methods
-
-
-class JsonStreamDecoder:
-    def __init__(self, reader: asyncio.StreamReader):
-        self._reader = reader
-        self._buf = b''
-        self._decoder = json.JSONDecoder()
-
-    async def read_object(self) -> Any:
-        while True:
-            self._buf += await self._reader.read(1)
-            try:
-                decoded, offset = self._decoder.raw_decode(self._buf.decode())
-            except json.JSONDecodeError:
-                pass
-            else:
-                self._buf = self._buf[offset:]
-                return decoded
 
 
 class Server:
@@ -174,7 +185,8 @@ class Server:
 
 
 def _build_jrpc_error(message, exc) -> str:
-    return json.dumps({'jsonrpc': '2.0', 'id': None,
+    return json.dumps({'jsonrpc': '2.0',
+                       'id': None,
                        'error': {'code': -32063,  # jsonrpc internal error
                                  'message': message,
                                  'data': repr(exc)}})
@@ -217,7 +229,7 @@ class JsonRpcProtocol(asyncio.Protocol):
         self._buffer += data.decode()  # hope this isn't incomplete
         try:
             _, pos = self._decoder.raw_decode(self._buffer)
-        except json.JSONDecodeError as e:
+        except json.JSONDecodeError:
             # If someone sends us garbage that isn't valid json, we need to
             # not get stuck in a bad state. If we're always accumulating data
             # until we no longer get an error, then consider if the first thing

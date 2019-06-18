@@ -10,6 +10,24 @@ from . import API
 from .types import Axis, HardwareAPILike
 
 
+try:
+    from .socket_client import JsonRpcAdapter as jra
+
+    def _get_jra():
+        return jra
+except ImportError:
+    class _DummyJra:  # noqa(T484) type: ignore
+        def __init__(self, *args, **kwargs):
+            raise RuntimeError(
+                'JsonRpcAdapter is not available on this system')
+
+    def _get_jra():
+        return _DummyJra
+
+
+JsonRpcAdapter = _get_jra()
+
+
 class SynchronousAdapter(HardwareAPILike, threading.Thread):
     """ A wrapper to make every call into :py:class:`.hardware_control.API`
     synchronous.
