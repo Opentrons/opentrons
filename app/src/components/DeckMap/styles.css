@@ -8,7 +8,6 @@
 
 .disabled {
   opacity: 0.4;
-  pointer-events: none;
 }
 
 .labware_wrapper {
@@ -27,7 +26,7 @@
   width: 100%;
 }
 
-.labware_ui_link {
+.labware_ui_content {
   height: 100%;
   width: 100%;
   display: flex;
@@ -49,6 +48,7 @@
   align-items: center;
   min-height: 100%;
   width: 100%;
+  border-radius: 3px;
 }
 
 .spinner {

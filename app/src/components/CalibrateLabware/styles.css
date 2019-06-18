@@ -67,3 +67,9 @@
   margin: 35vh auto auto;
   color: var(--c-font-light);
 }
+
+.calibrate_labware_wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}

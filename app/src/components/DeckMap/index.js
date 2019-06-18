@@ -105,7 +105,7 @@ function DeckMap(props: Props) {
                     y={slot.position[1]}
                     labware={labware}
                     areTipracksConfirmed={areTipracksConfirmed}
-                    highlighted={slotId === selectedSlot}
+                    highlighted={selectedSlot ? slotId === selectedSlot : null}
                   />
                 ))}
             </React.Fragment>

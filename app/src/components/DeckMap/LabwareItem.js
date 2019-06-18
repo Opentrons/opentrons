@@ -2,7 +2,6 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { Link } from 'react-router-dom'
-import noop from 'lodash/noop'
 import { SLOT_RENDER_HEIGHT, SLOT_RENDER_WIDTH } from '@opentrons/shared-data'
 
 import {
@@ -19,7 +18,7 @@ import { getLatestLabwareDef, getLegacyLabwareDef } from '../../getLabware'
 import styles from './styles.css'
 
 export type LabwareItemProps = {
-  highlighted?: boolean,
+  highlighted?: ?boolean,
   areTipracksConfirmed?: boolean,
   handleClick?: () => void,
   labware: $Exact<Labware>,
@@ -33,10 +32,10 @@ export default function LabwareItem(props: LabwareItemProps) {
   const { isTiprack, confirmed, name, type, slot } = labware
 
   const showSpinner = highlighted && labware.calibration === 'moving-to-slot'
+  const clickable = highlighted !== undefined
   const disabled =
-    areTipracksConfirmed === undefined ||
-    (isTiprack && confirmed) ||
-    (!isTiprack && areTipracksConfirmed === false)
+    clickable &&
+    ((isTiprack && confirmed) || (!isTiprack && areTipracksConfirmed === false))
 
   const title = humanizeLabwareType(type)
 
@@ -49,6 +48,35 @@ export default function LabwareItem(props: LabwareItemProps) {
     item = <LabwareRender definition={def} />
     width = def.dimensions.xDimension
     height = def.dimensions.yDimension
+  }
+
+  const renderContents = () => {
+    const contents = showSpinner ? (
+      <div className={styles.labware_spinner_wrapper}>
+        <Icon className={styles.spinner} name="ot-spinner" spin />
+      </div>
+    ) : (
+      <div className={styles.name_overlay}>
+        <p className={styles.display_name} title={title}>
+          {title}
+        </p>
+        <p className={styles.subtitle} title={name}>
+          {name}
+        </p>
+      </div>
+    )
+    if (clickable && !disabled) {
+      return (
+        <Link
+          to={`/calibrate/labware/${slot}`}
+          onClick={handleClick}
+          className={styles.labware_ui_content}
+        >
+          {contents}
+        </Link>
+      )
+    }
+    return <div className={styles.labware_ui_content}>{contents}</div>
   }
   return (
     <g
@@ -68,26 +96,7 @@ export default function LabwareItem(props: LabwareItemProps) {
           }),
         }}
       >
-        <Link
-          to={`/calibrate/labware/${slot}`}
-          onClick={disabled ? noop : handleClick}
-          className={styles.labware_ui_link}
-        >
-          {showSpinner ? (
-            <div className={styles.labware_spinner_wrapper}>
-              <Icon className={styles.spinner} name="ot-spinner" spin />
-            </div>
-          ) : (
-            <div className={styles.name_overlay}>
-              <p className={styles.display_name} title={title}>
-                {title}
-              </p>
-              <p className={styles.subtitle} title={name}>
-                {name}
-              </p>
-            </div>
-          )}
-        </Link>
+        {renderContents()}
       </RobotCoordsForeignDiv>
     </g>
   )
