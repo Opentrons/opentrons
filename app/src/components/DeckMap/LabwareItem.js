@@ -18,7 +18,7 @@ import { getLatestLabwareDef, getLegacyLabwareDef } from '../../getLabware'
 import styles from './styles.css'
 
 export type LabwareItemProps = {
-  highlighted?: ?boolean,
+  highlighted?: boolean | null,
   areTipracksConfirmed?: boolean,
   handleClick?: () => void,
   labware: $Exact<Labware>,
@@ -32,7 +32,7 @@ export default function LabwareItem(props: LabwareItemProps) {
   const { isTiprack, confirmed, name, type, slot } = labware
 
   const showSpinner = highlighted && labware.calibration === 'moving-to-slot'
-  const clickable = highlighted !== undefined
+  const clickable = highlighted !== null
   const disabled =
     clickable &&
     ((isTiprack && confirmed) || (!isTiprack && areTipracksConfirmed === false))
