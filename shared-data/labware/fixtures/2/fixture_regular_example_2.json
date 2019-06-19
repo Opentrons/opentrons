@@ -10,7 +10,7 @@
   "parameters": {
     "format": "irregular",
     "isTiprack": false,
-    "loadName": "generic_6_wellplate_1ml",
+    "loadName": "fixture_regular_example_2",
     "isMagneticModuleCompatible": false
   },
   "schemaVersion": 2,

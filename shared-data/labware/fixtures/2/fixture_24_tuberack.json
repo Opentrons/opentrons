@@ -29,7 +29,7 @@
   "parameters": {
     "format": "irregular",
     "isTiprack": false,
-    "loadName": "opentrons_24_tuberack_generic_2ml_screwcap",
+    "loadName": "fixture_24_tuberack",
     "isMagneticModuleCompatible": false
   },
   "wells": {

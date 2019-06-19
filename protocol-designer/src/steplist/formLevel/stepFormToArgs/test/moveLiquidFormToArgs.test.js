@@ -1,8 +1,8 @@
 // @flow
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
-import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture12Trough.json'
-import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture96Plate.json'
+import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import moveLiquidFormToArgs, {
   getMixData,
   type HydratedMoveLiquidFormData,
@@ -19,9 +19,9 @@ const DISPENSE_WELL = 'C3' // default dest in 96 flat for these tests
 
 describe('move liquid step form -> command creator args', () => {
   let hydratedForm: ?HydratedMoveLiquidFormData = null
-  const sourceLabwareDef = fixture12Trough
+  const sourceLabwareDef = fixture_12_trough
   const sourceLabwareType = getLabwareDefURI(sourceLabwareDef)
-  const destLabwareDef = fixture96Plate
+  const destLabwareDef = fixture_96_plate
   const destLabwareType = getLabwareDefURI(destLabwareDef)
   beforeEach(() => {
     // $FlowFixMe: mock methods

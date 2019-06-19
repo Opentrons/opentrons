@@ -1,5 +1,7 @@
 import { getMigrationVersionsToRunFromVersion } from '../index.js'
 
+jest.mock('../../../labware-defs/utils')
+
 describe('runs appropriate migrations for version', () => {
   // purposefully out of order
   const stubbedMigrationByVersion = {

@@ -1,13 +1,13 @@
-import fixture24TubeRack from '@opentrons/shared-data/labware/fixtures/2/fixture24TubeRack'
-import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture96Plate'
-import fixtureTrash from '@opentrons/shared-data/labware/fixtures/2/fixtureTrash'
+import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
+import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash'
 
 import getWellContentsAllLabware from '../getWellContentsAllLabware'
 
 jest.mock('../../../labware-defs/utils')
 
 describe('getWellContentsAllLabware', () => {
-  const container1MaxVolume = fixture96Plate.wells.A1.totalLiquidVolume
+  const container1MaxVolume = fixture_96_plate.wells.A1.totalLiquidVolume
   let baseIngredFields
   let labwareEntities
   let ingredsByLabwareXXSingleIngred
@@ -23,10 +23,10 @@ describe('getWellContentsAllLabware', () => {
     }
 
     labwareEntities = {
-      FIXED_TRASH_ID: { def: fixtureTrash },
-      container1Id: { def: fixture96Plate },
-      container2Id: { def: fixture96Plate },
-      container3Id: { def: fixture24TubeRack },
+      FIXED_TRASH_ID: { def: fixture_trash },
+      container1Id: { def: fixture_96_plate },
+      container2Id: { def: fixture_96_plate },
+      container3Id: { def: fixture_24_tuberack },
     }
 
     ingredsByLabwareXXSingleIngred = {

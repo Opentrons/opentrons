@@ -5,10 +5,10 @@ import {
   fixtureP300Multi,
 } from '@opentrons/shared-data/pipette/fixtures/name'
 
-import fixtureTrash from '@opentrons/shared-data/labware/fixtures/2/fixtureTrash.json'
-import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture96Plate.json'
-import fixtureTipRack10Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack10Ul.json'
-import fixtureTipRack300Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack300Ul.json'
+import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 
 import {
   reduceCommandCreators,
@@ -413,37 +413,37 @@ describe('makeInitialRobotState', () => {
             id: 'p10SingleId',
             name: 'p10_single',
             spec: fixtureP10Single,
-            tiprackDefURI: getLabwareDefURI(fixtureTipRack10Ul),
-            tiprackLabwareDef: fixtureTipRack10Ul,
+            tiprackDefURI: getLabwareDefURI(fixture_tiprack_10_ul),
+            tiprackLabwareDef: fixture_tiprack_10_ul,
           },
           p300MultiId: {
             id: 'p300MultiId',
             name: 'p300_multi',
             spec: fixtureP300Multi,
-            tiprackDefURI: getLabwareDefURI(fixtureTipRack300Ul),
-            tiprackLabwareDef: fixtureTipRack300Ul,
+            tiprackDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
+            tiprackLabwareDef: fixture_tiprack_300_ul,
           },
         },
         labwareEntities: {
           somePlateId: {
             id: 'somePlateId',
-            labwareDefURI: getLabwareDefURI(fixture96Plate),
-            def: fixture96Plate,
+            labwareDefURI: getLabwareDefURI(fixture_96_plate),
+            def: fixture_96_plate,
           },
           tiprack10Id: {
             id: 'tiprack10Id',
-            labwareDefURI: getLabwareDefURI(fixtureTipRack10Ul),
-            def: fixtureTipRack10Ul,
+            labwareDefURI: getLabwareDefURI(fixture_tiprack_10_ul),
+            def: fixture_tiprack_10_ul,
           },
           tiprack300Id: {
             id: 'tiprack300Id',
-            labwareDefURI: getLabwareDefURI(fixtureTipRack300Ul),
-            def: fixtureTipRack300Ul,
+            labwareDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
+            def: fixture_tiprack_300_ul,
           },
           trashId: {
             id: FIXED_TRASH_ID,
-            labwareDefURI: getLabwareDefURI(fixtureTrash),
-            def: fixtureTrash,
+            labwareDefURI: getLabwareDefURI(fixture_trash),
+            def: fixture_trash,
           },
         },
       },

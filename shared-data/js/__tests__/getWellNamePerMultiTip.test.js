@@ -1,13 +1,13 @@
 // @flow
-import fixtureTrash from '@opentrons/shared-data/labware/fixtures/2/fixtureTrash.json'
-import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture96Plate.json'
-import fixture384Plate from '@opentrons/shared-data/labware/fixtures/2/fixture384Plate.json'
-import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture12Trough.json'
-import fixture24TubeRack from '@opentrons/shared-data/labware/fixtures/2/fixture24TubeRack.json'
+import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import fixture_384_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_384_plate.json'
+import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
 import { getWellNamePerMultiTip } from '../helpers/getWellNamePerMultiTip'
 
 describe('96 plate', () => {
-  const labware = fixture96Plate
+  const labware = fixture_96_plate
 
   test('A1 => column 1', () => {
     expect(getWellNamePerMultiTip(labware, 'A1')).toEqual([
@@ -41,7 +41,7 @@ describe('96 plate', () => {
 })
 
 describe('384 plate', () => {
-  const labware = fixture384Plate
+  const labware = fixture_384_plate
 
   test('A1 => column 1 ACEGIKMO', () => {
     expect(getWellNamePerMultiTip(labware, 'A1')).toEqual([
@@ -88,7 +88,7 @@ describe('384 plate', () => {
 })
 
 describe('Fixed trash', () => {
-  const labware = fixtureTrash
+  const labware = fixture_trash
 
   test('A1 => all tips in A1', () => {
     expect(getWellNamePerMultiTip(labware, 'A1')).toEqual([
@@ -109,7 +109,7 @@ describe('Fixed trash', () => {
 })
 
 describe('tube rack 2mL', () => {
-  const labware = fixture24TubeRack
+  const labware = fixture_24_tuberack
   test('tube rack 2mL not accessible by 8-channel (return null)', () => {
     ;['A1', 'A2', 'B1', 'B2'].forEach(well => {
       expect(getWellNamePerMultiTip(labware, 'A1')).toEqual(null)
@@ -118,7 +118,7 @@ describe('tube rack 2mL', () => {
 })
 
 describe('12 channel trough', () => {
-  const labware = fixture12Trough
+  const labware = fixture_12_trough
 
   test('A1 => all tips in A1', () => {
     expect(getWellNamePerMultiTip(labware, 'A1')).toEqual([

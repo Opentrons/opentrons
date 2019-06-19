@@ -3,13 +3,13 @@ Note that `LabwareRender` is in robot coordinates, we transform it to view it us
 **Normal Labware**
 
 ```js
-const fixture96Plate = require('@opentrons/shared-data/labware/fixtures/2/fixture96Plate')
-const fixture24TubeRack = require('@opentrons/shared-data/labware/fixtures/2/fixture24TubeRack')
-const fixture12Trough = require('@opentrons/shared-data/labware/fixtures/2/fixture12Trough')
-const fixtureTipRack300Ul = require('@opentrons/shared-data/labware/fixtures/2/fixtureTipRack300Ul')
+const fixture_96_plate = require('@opentrons/shared-data/labware/fixtures/2/fixture_96_plate')
+const fixture_24_tuberack = require('@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack')
+const fixture_12_trough = require('@opentrons/shared-data/labware/fixtures/2/fixture_12_trough')
+const fixture_tiprack_300_ul = require('@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul')
 
 // Change this to view different labware fixtures
-let definition = fixture96Plate
+let definition = fixture_96_plate
 
 ;<RobotWorkSpace
   viewBox={`0 0  ${definition.dimensions.xDimension} ${
@@ -30,9 +30,9 @@ let definition = fixture96Plate
 **Tiprack**
 
 ```js
-const fixtureTipRack300Ul = require('@opentrons/shared-data/labware/fixtures/2/fixtureTipRack300Ul')
+const fixture_tiprack_300_ul = require('@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul')
 
-let definition = fixtureTipRack300Ul
+let definition = fixture_tiprack_300_ul
 
 ;<RobotWorkSpace
   viewBox={`0 0  ${definition.dimensions.xDimension} ${
