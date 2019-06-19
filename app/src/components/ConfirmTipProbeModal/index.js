@@ -2,7 +2,7 @@
 // container to prompt the user to clear the deck before continuing tip probe
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { push } from 'react-router-redux'
+import { push } from 'connected-react-router'
 
 import { actions as robotActions, type Mount } from '../../robot'
 import { ContinueModal } from '@opentrons/components'
@@ -45,7 +45,7 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
       dispatch(robotActions.moveToFront(mount))
       dispatch(push(backUrl))
     },
-    // $FlowFixMe: react-router-redux action creators are not typed
+    // $FlowFixMe: connected-react-router action creators are not typed
     onCancelClick: () => dispatch(push(backUrl)),
   }
 }

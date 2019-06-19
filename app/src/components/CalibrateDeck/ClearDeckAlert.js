@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { push } from 'react-router-redux'
+import { push } from 'connected-react-router'
 import { deckCalibrationCommand as dcCommand } from '../../http-api-client'
 import ClearDeckAlertModal from '../ClearDeckAlertModal'
 

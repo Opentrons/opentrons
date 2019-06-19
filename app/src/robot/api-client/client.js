@@ -1,7 +1,7 @@
 // robot api client
 // takes a dispatch (send) function and returns a receive handler
 // TODO(mc, 2018-01-26): typecheck with flow
-import { push } from 'react-router-redux'
+import { push } from 'connected-react-router'
 import find from 'lodash/find'
 import kebabCase from 'lodash/kebabCase'
 import mapKeys from 'lodash/mapKeys'

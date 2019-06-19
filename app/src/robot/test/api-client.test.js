@@ -1,7 +1,7 @@
 // tests for the api client
 import functions from 'lodash/functions'
 import omit from 'lodash/omit'
-import { push } from 'react-router-redux'
+import { push } from 'connected-react-router'
 
 import {
   mockResolvedValue,

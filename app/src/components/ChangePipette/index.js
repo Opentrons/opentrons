@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { push, goBack } from 'react-router-redux'
+import { push, goBack } from 'connected-react-router'
 import { Switch, Route, withRouter, type Match } from 'react-router'
 import {
   getPipetteNameSpecs,
@@ -18,7 +18,6 @@ import type { Mount } from '../../robot'
 import type { Robot } from '../../discovery'
 import type { Direction, ChangePipetteProps } from './types'
 import type { RobotHome, RobotMove } from '../../http-api-client'
-import type { RobotApiRequestState } from '../../robot-api'
 import {
   home,
   moveRobotTo,
@@ -27,11 +26,7 @@ import {
   makeGetRobotHome,
 } from '../../http-api-client'
 
-import {
-  fetchPipettes,
-  getPipettesState,
-  getPipettesRequestState,
-} from '../../robot-api'
+import { fetchPipettes, getPipettesState } from '../../robot-api'
 
 import ClearDeckAlertModal from '../ClearDeckAlertModal'
 import ExitAlertModal from './ExitAlertModal'
@@ -67,7 +62,6 @@ type SP = {|
   moveRequest: RobotMove,
   homeRequest: RobotHome,
   actualPipette: ?PipetteModelSpecs,
-  checkRequest: RobotApiRequestState | null,
   displayName: string,
   direction: Direction,
   success: boolean,
@@ -149,7 +143,6 @@ function makeMapStateToProps(): (State, OP) => SP {
       success,
       attachedWrong,
       displayName,
-      checkRequest: getPipettesRequestState(state, robot.name),
       moveRequest: getRobotMove(state, robot),
       homeRequest: getRobotHome(state, robot),
       __pipettePlusEnabled: Boolean(

@@ -3,10 +3,10 @@ import type {
   PipetteNameSpecs,
   PipetteModelSpecs,
 } from '@opentrons/shared-data'
-import type { Mount } from '../../robot'
 
+import type { Mount } from '../../robot'
+import type { Robot } from '../../discovery'
 import type { RobotMove, RobotHome } from '../../http-api-client'
-import type { RobotApiRequestState } from '../../robot-api'
 import type { PipetteSelectionProps } from './PipetteSelection'
 
 export type Direction = 'attach' | 'detach'
@@ -27,7 +27,7 @@ export type ChangePipetteProps = {
   exitUrl: string,
   moveRequest: RobotMove,
   homeRequest: RobotHome,
-  checkRequest: RobotApiRequestState | null,
+  robot: Robot,
   back: () => mixed,
   exit: () => mixed,
   moveToFront: () => mixed,

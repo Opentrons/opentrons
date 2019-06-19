@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { push } from 'react-router-redux'
+import { push } from 'connected-react-router'
 import { AlertModal } from '@opentrons/components'
 
 import { actions as robotActions } from '../../robot'

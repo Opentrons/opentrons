@@ -1,7 +1,9 @@
 // @flow
+import createHistory from 'history/createHashHistory'
+import { connectRouter } from 'connected-react-router'
+
 // interface state
 import { combineReducers } from 'redux'
-import { routerReducer } from 'react-router-redux'
 
 // oldest robot api state
 import { reducer as robotReducer } from './robot'
@@ -26,6 +28,8 @@ import { protocolReducer } from './protocol'
 
 import type { Action } from './types'
 
+export const history = createHistory()
+
 export default combineReducers<_, Action>({
   robot: robotReducer,
   api: apiReducer,
@@ -34,5 +38,5 @@ export default combineReducers<_, Action>({
   discovery: discoveryReducer,
   protocol: protocolReducer,
   shell: shellReducer,
-  router: routerReducer,
+  router: connectRouter(history),
 })
