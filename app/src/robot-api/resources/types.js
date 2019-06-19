@@ -51,6 +51,22 @@ export type SetTemperatureRequest = {|
   args?: Array<number>,
 |}
 
+// pipettes
+export type PipettesState = {|
+  right: Pipette | null,
+  left: Pipette | null,
+|}
+
+export type Pipette = {|
+  id: ?string,
+  name: ?string,
+  model: ?string,
+  mount_axis: MotorAxis,
+  plunger_axis: MotorAxis,
+|}
+
+export type MotorAxis = 'a' | 'b' | 'c' | 'x' | 'y' | 'z'
+
 // settings
 export type SettingsState = {|
   robot: RobotSettings,

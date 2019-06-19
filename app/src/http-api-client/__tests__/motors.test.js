@@ -22,10 +22,19 @@ describe('/motors/**', () => {
 
     robot = { name: NAME, ip: '1.2.3.4', port: '1234' }
     state = {
+      robotApi: {
+        [NAME]: {
+          resources: {
+            pipettes: {
+              left: { mount_axis: 'z', plunger_axis: 'b' },
+              right: { mount_axis: 'a', plunger_axis: 'c' },
+            },
+          },
+        },
+      },
       api: {
         api: {
           [NAME]: {
-            pipettes: {},
             motors: {},
           },
         },
@@ -37,32 +46,11 @@ describe('/motors/**', () => {
 
   describe('disengagePipetteMotors action creator', () => {
     const path = 'motors/disengage'
-    const mockPipettesResponse = {
-      left: { mount_axis: 'z', plunger_axis: 'b' },
-      right: { mount_axis: 'a', plunger_axis: 'c' },
-    }
     const response = { message: 'we did it' }
 
-    test('calls GET /pipettes then POST /motors/disengage with axes', () => {
-      const expected = { axes: ['a', 'c'] }
-
-      client.__setMockResponse(mockPipettesResponse, response)
-
-      // use mock.calls to verify call order
-      return store
-        .dispatch(disengagePipetteMotors(robot, 'right'))
-        .then(() =>
-          expect(client.mock.calls).toEqual([
-            [robot, 'GET', 'pipettes'],
-            [robot, 'POST', 'motors/disengage', expected],
-          ])
-        )
-    })
-
-    test('skips GET /pipettes call if axes are in state', () => {
+    test('adds pipette axes to request body', () => {
       const expected = { axes: ['z', 'b'] }
 
-      state.api.api[NAME].pipettes = { response: mockPipettesResponse }
       client.__setMockResponse(response)
 
       // use mock.calls to verify call order
@@ -83,7 +71,7 @@ describe('/motors/**', () => {
         { type: 'api:SUCCESS', payload: { robot, response, path } },
       ]
 
-      client.__setMockResponse(mockPipettesResponse, response)
+      client.__setMockResponse(response)
 
       return store
         .dispatch(disengagePipetteMotors(robot, 'left', 'right'))

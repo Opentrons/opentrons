@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 import { Route, Redirect } from 'react-router'
 
 import { selectors as robotSelectors } from '../../robot'
-import { makeGetRobotPipettes, fetchPipettes } from '../../http-api-client'
+import { getPipettesState, fetchPipettes } from '../../robot-api'
 import { getConnectedRobot } from '../../discovery'
 
 import Page, { RefreshWrapper } from '../../components/Page'
@@ -17,7 +17,7 @@ import SessionHeader from '../../components/SessionHeader'
 import type { ContextRouter } from 'react-router'
 import type { State, Dispatch } from '../../types'
 import type { Pipette } from '../../robot'
-import type { PipettesResponse } from '../../http-api-client'
+import type { PipettesState } from '../../robot-api'
 import type { Robot } from '../../discovery'
 
 type OP = ContextRouter
@@ -25,21 +25,21 @@ type OP = ContextRouter
 type SP = {|
   pipettes: Array<Pipette>,
   currentPipette: ?Pipette,
-  actualPipettes: ?PipettesResponse,
+  actualPipettes: ?PipettesState,
   _robot: ?Robot,
 |}
 
 type DP = {| dispatch: Dispatch |}
 
-type Props = {
+type Props = {|
   ...OP,
   ...SP,
   fetchPipettes: () => mixed,
   changePipetteUrl: string,
-}
+|}
 
 export default connect<Props, OP, SP, {||}, State, Dispatch>(
-  makeMapStateToProps,
+  mapStateToProps,
   null,
   mergeProps
 )(CalibratePipettesPage)
@@ -47,6 +47,7 @@ export default connect<Props, OP, SP, {||}, State, Dispatch>(
 function CalibratePipettesPage(props: Props) {
   const {
     pipettes,
+    actualPipettes,
     currentPipette,
     fetchPipettes,
     match: { url, params },
@@ -63,7 +64,9 @@ function CalibratePipettesPage(props: Props) {
     <RefreshWrapper refresh={fetchPipettes}>
       <Page titleBarProps={{ title: <SessionHeader /> }}>
         <PipetteTabs {...{ pipettes, currentPipette }} />
-        <Pipettes {...props} changePipetteUrl={changePipetteUrl} />
+        <Pipettes
+          {...{ pipettes, currentPipette, actualPipettes, changePipetteUrl }}
+        />
         {!!currentPipette && (
           <TipProbe
             {...currentPipette}
@@ -86,20 +89,18 @@ function CalibratePipettesPage(props: Props) {
   )
 }
 
-function makeMapStateToProps(): (State, OP) => SP {
-  const getCurrentPipette = robotSelectors.makeGetCurrentPipette()
-  const getAttachedPipettes = makeGetRobotPipettes()
+function mapStateToProps(state: State, ownProps: OP): SP {
+  const { mount } = ownProps.match.params
+  const _robot = getConnectedRobot(state)
+  const pipettes = robotSelectors.getPipettes(state)
+  const currentPipette = pipettes.find(p => p.mount === mount)
+  const actualPipettes = _robot && getPipettesState(state, _robot.name)
 
-  return (state, props) => {
-    const _robot = getConnectedRobot(state)
-    const pipettesCall = _robot && getAttachedPipettes(state, _robot)
-
-    return {
-      _robot,
-      pipettes: robotSelectors.getPipettes(state),
-      currentPipette: getCurrentPipette(state, props),
-      actualPipettes: pipettesCall && pipettesCall.response,
-    }
+  return {
+    _robot,
+    pipettes,
+    actualPipettes,
+    currentPipette,
   }
 }
 

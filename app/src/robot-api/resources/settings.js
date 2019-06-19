@@ -1,6 +1,8 @@
 // @flow
 // settings endpoints and client state
-import { combineEpics } from 'redux-observable'
+import { of } from 'rxjs'
+import { switchMap } from 'rxjs/operators'
+import { combineEpics, ofType } from 'redux-observable'
 
 import {
   getRobotApiState,
@@ -12,7 +14,9 @@ import {
   PATCH,
 } from '../utils'
 
-import type { State as AppState, Action, ActionLike } from '../../types'
+import { fetchPipettes } from './pipettes'
+
+import type { State as AppState, Action, ActionLike, Epic } from '../../types'
 import type { RobotHost, RobotApiAction, RobotApiRequestState } from '../types'
 import type {
   SettingsState as State,
@@ -68,20 +72,27 @@ export const setPipetteSettings = (
   meta: { id },
 })
 
-export const fetchSettingsEpic = createBaseRobotApiEpic(FETCH_SETTINGS)
-export const setSettingsEpic = createBaseRobotApiEpic(SET_SETTINGS)
-export const fetchPipetteSettingsEpic = createBaseRobotApiEpic(
-  FETCH_PIPETTE_SETTINGS
-)
-export const setPipetteSettingsEpic = createBaseRobotApiEpic(
-  SET_PIPETTE_SETTINGS
-)
+const fetchSettingsEpic = createBaseRobotApiEpic(FETCH_SETTINGS)
+const setSettingsEpic = createBaseRobotApiEpic(SET_SETTINGS)
+const fetchPipetteSettingsEpic = createBaseRobotApiEpic(FETCH_PIPETTE_SETTINGS)
+const setPipetteSettingsEpic = createBaseRobotApiEpic(SET_PIPETTE_SETTINGS)
+
+// if we're fetching pipette settings, we're going to need to know what
+// pipettes are attached, too
+const fetchPipettesForSettingsEpic: Epic = action$ =>
+  action$.pipe(
+    ofType(FETCH_PIPETTE_SETTINGS),
+    switchMap<RobotApiAction, _, RobotApiAction>(a =>
+      of(fetchPipettes(a.payload.host))
+    )
+  )
 
 export const settingsEpic = combineEpics(
   fetchSettingsEpic,
   setSettingsEpic,
   fetchPipetteSettingsEpic,
-  setPipetteSettingsEpic
+  setPipetteSettingsEpic,
+  fetchPipettesForSettingsEpic
 )
 
 export function settingsReducer(
