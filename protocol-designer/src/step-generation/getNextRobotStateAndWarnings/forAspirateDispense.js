@@ -11,7 +11,10 @@ import {
   totalVolume,
 } from '../utils'
 import * as warningCreators from '../warningCreators'
-import type { AspirateDispenseArgsV1 as AspirateDispenseArgs } from '@opentrons/shared-data'
+import type {
+  AspirateParams,
+  DispenseParams,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type {
   InvariantContext,
   RobotState,
@@ -28,7 +31,7 @@ type PipetteLiquidStateAcc = {
 }
 
 export default function getNextRobotStateAndWarningsForAspDisp(
-  args: AspirateDispenseArgs,
+  args: AspirateParams | DispenseParams,
   invariantContext: InvariantContext,
   prevRobotState: RobotState
 ): RobotStateAndWarnings {

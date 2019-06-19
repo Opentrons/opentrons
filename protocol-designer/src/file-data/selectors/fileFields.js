@@ -12,10 +12,10 @@ export const getCurrentProtocolExists: Selector<boolean> = createSelector(
 )
 
 export const protocolName: Selector<
-  $PropertyType<FileMetadataFields, 'protocol-name'>
+  $PropertyType<FileMetadataFields, 'protocolName'>
 > = createSelector(
   rootSelector,
-  state => state.fileMetadata['protocol-name']
+  state => state.fileMetadata.protocolName
 )
 
 export const getFileMetadata: Selector<FileMetadataFields> = createSelector(

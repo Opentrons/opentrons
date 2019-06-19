@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 import cx from 'classnames'
 
-import type { PipettesResponse } from '../../http-api-client'
+import type { PipettesState } from '../../robot-api'
 import type { Pipette } from '../../robot'
 import { constants as robotConstants } from '../../robot'
 
@@ -11,12 +11,12 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { InstrumentGroup, AlertItem } from '@opentrons/components'
 import styles from './styles.css'
 
-type Props = {
+type Props = {|
   pipettes: Array<Pipette>,
   currentPipette: ?Pipette,
-  actualPipettes: ?PipettesResponse,
+  actualPipettes: ?PipettesState,
   changePipetteUrl: string,
-}
+|}
 
 const { PIPETTE_MOUNTS } = robotConstants
 const ATTACH_ALERT = 'Pipette missing'
@@ -28,10 +28,9 @@ export default function Pipettes(props: Props) {
 
   const infoByMount = PIPETTE_MOUNTS.reduce((result, mount) => {
     const pipette = pipettes.find(p => p.mount === mount)
-
-    const pipetteConfig = pipette ? getPipetteModelSpecs(pipette.name) : null
+    const pipetteConfig = getPipetteModelSpecs(pipette?.name || '')
     const actualPipetteConfig = getPipetteModelSpecs(
-      actualPipettes?.[mount].model || ''
+      actualPipettes?.[mount]?.model || ''
     )
 
     const isDisabled = !pipette || mount !== currentMount

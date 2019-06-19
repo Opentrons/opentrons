@@ -1,6 +1,6 @@
 // @flow
-import type { SchemaV1ProtocolFile } from './flowTypes/schemaV1'
-import type { SchemaV3ProtocolFile } from './flowTypes/schemaV3'
+import type { ProtocolFile as SchemaV1ProtocolFile } from './flowTypes/schemaV1'
+import type { ProtocolFile as SchemaV3ProtocolFile } from './flowTypes/schemaV3'
 
 type ProtocolData =
   | $Shape<SchemaV1ProtocolFile<{}>>
@@ -20,6 +20,3 @@ export function getProtocolSchemaVersion(data: ProtocolData): ?number {
   }
   return null
 }
-
-export * from './flowTypes/schemaV1'
-export * from './flowTypes/schemaV3'

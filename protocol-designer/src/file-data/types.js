@@ -1,8 +1,5 @@
 // @flow
-import type { SchemaV1ProtocolFile } from '@opentrons/shared-data'
-export type FileMetadataFields = $PropertyType<
-  SchemaV1ProtocolFile<{}>,
-  'metadata'
->
+import type { ProtocolFile } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 
+export type FileMetadataFields = $PropertyType<ProtocolFile<{}>, 'metadata'>
 export type FileMetadataFieldAccessors = $Keys<FileMetadataFields>

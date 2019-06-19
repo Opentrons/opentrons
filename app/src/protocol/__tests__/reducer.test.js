@@ -67,7 +67,7 @@ describe('protocolReducer', () => {
         payload: {
           name: 'foo.py',
           protocolText: '# foo.py',
-          metadata: { 'protocol-name': 'foo' },
+          metadata: { protocolName: 'foo' },
         },
       },
       initialState: { file: null, contents: null, data: null },
@@ -78,7 +78,7 @@ describe('protocolReducer', () => {
           lastModified: null,
         },
         contents: '# foo.py',
-        data: { metadata: { 'protocol-name': 'foo' } },
+        data: { metadata: { protocolName: 'foo' } },
       },
     },
     {

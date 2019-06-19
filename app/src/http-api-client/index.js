@@ -4,7 +4,6 @@ import { combineReducers } from 'redux'
 import apiReducer from './reducer'
 import { calibrationReducer, type CalibrationAction } from './calibration'
 import type { HealthAction } from './health'
-import type { PipettesAction } from './pipettes'
 import type { MotorsAction } from './motors'
 import type { ResetAction } from './reset'
 import { robotReducer, type RobotAction } from './robot'
@@ -47,7 +46,6 @@ export type HttpApiAction =
   | HealthAction
   | MotorsAction
   | NetworkingAction
-  | PipettesAction
   | ResetAction
   | RobotAction
   | ServerAction
@@ -65,8 +63,6 @@ export {
 export * from './health'
 
 export * from './reset'
-
-export * from './pipettes'
 
 export * from './motors'
 

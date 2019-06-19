@@ -1,5 +1,8 @@
 // @flow
 import { getLabwareDefURI } from '@opentrons/shared-data'
+import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
+import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture12Trough.json'
+import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture96Plate.json'
 import moveLiquidFormToArgs, {
   getMixData,
   type HydratedMoveLiquidFormData,
@@ -11,19 +14,14 @@ import {
 import { getOrderedWells } from '../../../utils'
 jest.mock('../../../utils')
 
+const ASPIRATE_WELL = 'A2' // default source is trough for these tests
+const DISPENSE_WELL = 'C3' // default dest in 96 flat for these tests
+
 describe('move liquid step form -> command creator args', () => {
   let hydratedForm: ?HydratedMoveLiquidFormData = null
-  const sourceLabwareDef = {
-    version: 123,
-    namespace: 'foo',
-    parameters: { loadName: 'sourceLabwareMock' },
-  }
+  const sourceLabwareDef = fixture12Trough
   const sourceLabwareType = getLabwareDefURI(sourceLabwareDef)
-  const destLabwareDef = {
-    version: 123,
-    namespace: 'foo',
-    parameters: { loadName: 'destLabwareMock' },
-  }
+  const destLabwareDef = fixture96Plate
   const destLabwareType = getLabwareDefURI(destLabwareDef)
   beforeEach(() => {
     // $FlowFixMe: mock methods
@@ -38,7 +36,10 @@ describe('move liquid step form -> command creator args', () => {
       description: null,
 
       fields: {
-        pipette: { id: 'pipetteId' },
+        pipette: {
+          id: 'pipetteId',
+          spec: fixtureP10Single,
+        },
         volume: 10,
         path: 'single',
         changeTip: 'always',
@@ -47,7 +48,7 @@ describe('move liquid step form -> command creator args', () => {
           type: sourceLabwareType,
           def: sourceLabwareDef,
         },
-        aspirate_wells: ['B1'],
+        aspirate_wells: [ASPIRATE_WELL],
         aspirate_wellOrder_first: 'l2r',
         aspirate_wellOrder_second: 't2b',
         aspirate_flowRate: null,
@@ -63,7 +64,7 @@ describe('move liquid step form -> command creator args', () => {
           type: destLabwareType,
           def: destLabwareDef,
         },
-        dispense_wells: ['B2'],
+        dispense_wells: [DISPENSE_WELL],
         dispense_wellOrder_first: 'r2l',
         dispense_wellOrder_second: 'b2t',
         dispense_flowRate: null,
@@ -90,13 +91,13 @@ describe('move liquid step form -> command creator args', () => {
 
     expect(getOrderedWells).toHaveBeenCalledTimes(2)
     expect(getOrderedWells).toHaveBeenCalledWith(
-      ['B1'],
+      [ASPIRATE_WELL],
       sourceLabwareDef,
       'l2r',
       't2b'
     )
     expect(getOrderedWells).toHaveBeenCalledWith(
-      ['B2'],
+      [DISPENSE_WELL],
       destLabwareDef,
       'r2l',
       'b2t'
@@ -111,9 +112,9 @@ describe('move liquid step form -> command creator args', () => {
       volume: 10,
       changeTip: 'always',
       sourceLabware: 'sourceLabwareId',
-      sourceWells: ['B1'],
+      sourceWells: [ASPIRATE_WELL],
       destLabware: 'destLabwareId',
-      destWells: ['B2'],
+      destWells: [DISPENSE_WELL],
     })
 
     // no form-specific fields should be passed along
@@ -126,14 +127,14 @@ describe('move liquid step form -> command creator args', () => {
   const checkboxFieldCases = [
     {
       checkboxField: 'aspirate_touchTip_checkbox',
-      formFields: { aspirate_touchTip_mmFromBottom: 42 },
+      formFields: { aspirate_touchTip_mmFromBottom: 101 },
       expectedArgsUnchecked: {
         touchTipAfterAspirate: false,
-        touchTipAfterAspirateOffsetMmFromBottom: null,
+        touchTipAfterAspirateOffsetMmFromBottom: 101,
       },
       expectedArgsChecked: {
         touchTipAfterAspirate: true,
-        touchTipAfterAspirateOffsetMmFromBottom: 42,
+        touchTipAfterAspirateOffsetMmFromBottom: 101,
       },
     },
 
@@ -142,7 +143,7 @@ describe('move liquid step form -> command creator args', () => {
       formFields: { dispense_touchTip_mmFromBottom: 42 },
       expectedArgsUnchecked: {
         touchTipAfterDispense: false,
-        touchTipAfterDispenseOffsetMmFromBottom: null,
+        touchTipAfterDispenseOffsetMmFromBottom: 42,
       },
       expectedArgsChecked: {
         touchTipAfterDispense: true,
@@ -278,7 +279,7 @@ describe('move liquid step form -> command creator args', () => {
       expect(result).toMatchObject({
         disposalVolume: null,
         disposalLabware: 'sourceLabwareId',
-        disposalWell: 'B1',
+        disposalWell: ASPIRATE_WELL,
       })
     })
 
@@ -296,7 +297,7 @@ describe('move liquid step form -> command creator args', () => {
       expect(result).toMatchObject({
         disposalVolume: null,
         disposalLabware: 'destLabwareId',
-        disposalWell: 'B2',
+        disposalWell: DISPENSE_WELL,
       })
     })
   })

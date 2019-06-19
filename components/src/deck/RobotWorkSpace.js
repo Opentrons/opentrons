@@ -1,5 +1,6 @@
 // @flow
 import React, { useRef, type Node, type ElementRef } from 'react'
+import cx from 'classnames'
 import { DeckFromData } from './Deck'
 import type { DeckDefinition } from '@opentrons/shared-data'
 import styles from './RobotWorkSpace.css'
@@ -8,6 +9,7 @@ import type { RobotWorkSpaceRenderProps } from './types'
 type Props = {
   deckDef?: DeckDefinition,
   viewBox?: string,
+  className?: string,
   children?: RobotWorkSpaceRenderProps => Node,
   deckLayerBlacklist?: Array<string>,
 }
@@ -52,7 +54,7 @@ function RobotWorkSpace(props: Props) {
 
   return (
     <svg
-      className={styles.robot_work_space}
+      className={cx(styles.robot_work_space, props.className)}
       viewBox={viewBox || wholeDeckViewBox}
       ref={wrapperRef}
     >

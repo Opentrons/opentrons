@@ -1,18 +1,17 @@
 // @flow
 import { expectTimelineError } from './testMatchers'
-import _blowout from '../commandCreators/atomic/blowout'
+import blowout from '../commandCreators/atomic/blowout'
 import {
   makeContext,
   getInitialRobotStateStandard,
   getRobotStateWithTipStandard,
-  commandCreatorNoErrors,
-  commandCreatorHasErrors,
+  getErrorResult,
+  getSuccessResult,
+  DEFAULT_PIPETTE,
+  SOURCE_LABWARE,
 } from './fixtures'
 
 import updateLiquidState from '../dispenseUpdateLiquidState'
-
-const blowout = commandCreatorNoErrors(_blowout)
-const blowoutWithErrors = commandCreatorHasErrors(_blowout)
 
 jest.mock('../dispenseUpdateLiquidState')
 
@@ -20,6 +19,7 @@ describe('blowout', () => {
   let invariantContext
   let initialRobotState
   let robotStateWithTip
+  let params
 
   beforeEach(() => {
     invariantContext = makeContext()
@@ -30,61 +30,58 @@ describe('blowout', () => {
     updateLiquidState.mockClear()
     // $FlowFixMe: mock methods
     updateLiquidState.mockReturnValue(initialRobotState.liquidState)
+
+    params = {
+      pipette: DEFAULT_PIPETTE,
+      labware: SOURCE_LABWARE,
+      well: 'A1',
+      flowRate: 21.1,
+      offsetFromBottomMm: 1.3,
+    }
   })
 
   test('blowout with tip', () => {
-    const result = blowout({
-      pipette: 'p300SingleId',
-      labware: 'sourcePlateId',
-      well: 'A1',
-    })(invariantContext, robotStateWithTip)
+    const result = blowout(params)(invariantContext, robotStateWithTip)
 
-    expect(result.commands).toEqual([
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
       {
         command: 'blowout',
-        params: {
-          pipette: 'p300SingleId',
-          labware: 'sourcePlateId',
-          well: 'A1',
-        },
+        params,
       },
     ])
 
-    expect(result.robotState).toEqual(robotStateWithTip)
+    expect(res.robotState).toEqual(robotStateWithTip)
   })
 
   test('blowout with invalid pipette ID should throw error', () => {
-    const result = blowoutWithErrors({
+    const result = blowout({
+      ...params,
       pipette: 'badPipette',
-      labware: 'sourcePlateId',
-      well: 'A1',
     })(invariantContext, robotStateWithTip)
 
-    expectTimelineError(result.errors, 'PIPETTE_DOES_NOT_EXIST')
+    expectTimelineError(getErrorResult(result).errors, 'PIPETTE_DOES_NOT_EXIST')
   })
 
   test('blowout with invalid labware ID should throw error', () => {
-    const result = blowoutWithErrors({
-      pipette: 'p300SingleId',
+    const result = blowout({
+      ...params,
       labware: 'badLabware',
-      well: 'A1',
     })(invariantContext, robotStateWithTip)
 
-    expect(result.errors).toHaveLength(1)
-    expect(result.errors[0]).toMatchObject({
+    const res = getErrorResult(result)
+    expect(res.errors).toHaveLength(1)
+    expect(res.errors[0]).toMatchObject({
       type: 'LABWARE_DOES_NOT_EXIST',
     })
   })
 
   test('blowout with no tip should throw error', () => {
-    const result = blowoutWithErrors({
-      pipette: 'p300SingleId',
-      labware: 'sourcePlateId',
-      well: 'A1',
-    })(invariantContext, initialRobotState)
+    const result = blowout(params)(invariantContext, initialRobotState)
 
-    expect(result.errors).toHaveLength(1)
-    expect(result.errors[0]).toMatchObject({
+    const res = getErrorResult(result)
+    expect(res.errors).toHaveLength(1)
+    expect(res.errors[0]).toMatchObject({
       type: 'NO_TIP_ON_PIPETTE',
     })
   })
@@ -97,24 +94,22 @@ describe('blowout', () => {
     })
 
     test('blowout calls dispenseUpdateLiquidState with max volume of pipette', () => {
-      const result = blowout({
-        pipette: 'p300SingleId',
-        labware: 'sourcePlateId',
-        well: 'A1',
-      })(invariantContext, robotStateWithTip)
+      const result = blowout(params)(invariantContext, robotStateWithTip)
 
       expect(updateLiquidState).toHaveBeenCalledWith(
         {
           invariantContext,
-          pipetteId: 'p300SingleId',
-          labwareId: 'sourcePlateId',
+          pipetteId: DEFAULT_PIPETTE,
+          labwareId: SOURCE_LABWARE,
           useFullVolume: true,
           well: 'A1',
         },
         robotStateWithTip.liquidState
       )
 
-      expect(result.robotState.liquidState).toBe(mockLiquidReturnValue)
+      expect(getSuccessResult(result).robotState.liquidState).toBe(
+        mockLiquidReturnValue
+      )
     })
   })
 })

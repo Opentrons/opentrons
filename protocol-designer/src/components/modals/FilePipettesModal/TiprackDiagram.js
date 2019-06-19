@@ -27,7 +27,7 @@ function TiprackDiagram(props: Props) {
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const { definitionURI } = ownProps
   const definition = definitionURI
-    ? labwareDefSelectors.getLabwareDefsById(state)[definitionURI]
+    ? labwareDefSelectors.getLabwareDefsByURI(state)[definitionURI]
     : null
   return { definition }
 }

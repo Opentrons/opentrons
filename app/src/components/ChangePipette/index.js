@@ -18,16 +18,20 @@ import type { Mount } from '../../robot'
 import type { Robot } from '../../discovery'
 import type { Direction, ChangePipetteProps } from './types'
 import type { RobotHome, RobotMove } from '../../http-api-client'
-
+import type { RobotApiRequestState } from '../../robot-api'
 import {
   home,
   moveRobotTo,
-  fetchPipettes,
   disengagePipetteMotors,
   makeGetRobotMove,
   makeGetRobotHome,
-  makeGetRobotPipettes,
 } from '../../http-api-client'
+
+import {
+  fetchPipettes,
+  getPipettesState,
+  getPipettesRequestState,
+} from '../../robot-api'
 
 import ClearDeckAlertModal from '../ClearDeckAlertModal'
 import ExitAlertModal from './ExitAlertModal'
@@ -63,6 +67,7 @@ type SP = {|
   moveRequest: RobotMove,
   homeRequest: RobotHome,
   actualPipette: ?PipetteModelSpecs,
+  checkRequest: RobotApiRequestState | null,
   displayName: string,
   direction: Direction,
   success: boolean,
@@ -76,7 +81,7 @@ type DP = {|
   onPipetteSelect: $PropertyType<PipetteSelectionProps, 'onChange'>,
   moveToFront: () => mixed,
   checkPipette: () => mixed,
-  confirmPipette: () => mixed,
+  goToConfirmUrl: () => mixed,
 |}
 
 const ConnectedChangePipetteRouter = withRouter<OP>(
@@ -122,13 +127,11 @@ function ChangePipetteRouter(props: ChangePipetteProps) {
 function makeMapStateToProps(): (State, OP) => SP {
   const getRobotMove = makeGetRobotMove()
   const getRobotHome = makeGetRobotHome()
-  const getRobotPipettes = makeGetRobotPipettes()
 
   return (state, ownProps) => {
-    const { mount, wantedPipette } = ownProps
-    const pipettes = getRobotPipettes(state, ownProps.robot).response
-    const model = pipettes && pipettes[mount] && pipettes[mount].model
-    const actualPipette = model ? getPipetteModelSpecs(model) : null
+    const { mount, wantedPipette, robot } = ownProps
+    const pipettes = getPipettesState(state, robot.name)
+    const actualPipette = getPipetteModelSpecs(pipettes[mount]?.model || '')
     const direction = actualPipette ? 'detach' : 'attach'
 
     const success =
@@ -146,8 +149,9 @@ function makeMapStateToProps(): (State, OP) => SP {
       success,
       attachedWrong,
       displayName,
-      moveRequest: getRobotMove(state, ownProps.robot),
-      homeRequest: getRobotHome(state, ownProps.robot),
+      checkRequest: getPipettesRequestState(state, robot.name),
+      moveRequest: getRobotMove(state, robot),
+      homeRequest: getRobotHome(state, robot),
       __pipettePlusEnabled: Boolean(
         getConfig(state).devInternal?.enablePipettePlus
       ),
@@ -174,7 +178,7 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
           position: 'change_pipette',
         })
       ).then(disengage),
-    confirmPipette: () => checkPipette().then(() => dispatch(push(confirmUrl))),
+    goToConfirmUrl: () => dispatch(push(confirmUrl)),
   }
 }
 

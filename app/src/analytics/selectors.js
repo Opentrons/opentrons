@@ -16,8 +16,7 @@ import {
   getRobotFirmwareVersion,
 } from '../discovery'
 
-import { getRobotApiState, getPipettesRequest } from '../http-api-client'
-import { getRobotSettingsState } from '../robot-api'
+import { getRobotSettingsState, getPipettesState } from '../robot-api'
 
 import hash from './hash'
 
@@ -66,16 +65,8 @@ export function getRobotAnalyticsData(state: State): RobotAnalyticsData | null {
   const robot = getConnectedRobot(state)
 
   if (robot) {
-    const api = getRobotApiState(state, robot)
-    const pipettesRequest = getPipettesRequest(api)
+    const pipettes = getPipettesState(state, robot.name)
     const settings = getRobotSettingsState(state, robot.name)
-
-    const pipettes = pipettesRequest.response
-      ? {
-          left: pipettesRequest.response.left.model,
-          right: pipettesRequest.response.right.model,
-        }
-      : { left: null, right: null }
 
     return settings.reduce(
       (result, setting) => ({
@@ -85,8 +76,8 @@ export function getRobotAnalyticsData(state: State): RobotAnalyticsData | null {
       {
         robotApiServerVersion: getRobotApiVersion(robot) || '',
         robotSmoothieVersion: getRobotFirmwareVersion(robot) || '',
-        robotLeftPipette: pipettes.left || '',
-        robotRightPipette: pipettes.right || '',
+        robotLeftPipette: pipettes.left?.model || '',
+        robotRightPipette: pipettes.right?.model || '',
       }
     )
   }

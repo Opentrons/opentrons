@@ -54,8 +54,10 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
   const {
     aspirateFlowRateUlSec,
     dispenseFlowRateUlSec,
+    blowoutFlowRateUlSec,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
+    blowoutOffsetFromTopMm,
   } = args
 
   const maxWellsPerChunk = Math.floor(
@@ -90,7 +92,7 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
               volume: args.volume,
               labware: args.sourceLabware,
               well: sourceWell,
-              'flow-rate': aspirateFlowRateUlSec,
+              flowRate: aspirateFlowRateUlSec,
               offsetFromBottomMm: aspirateOffsetFromBottomMm,
             }),
             ...touchTipAfterAspirateCommand,
@@ -156,17 +158,22 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
             times: args.mixInDestination.times,
             aspirateOffsetFromBottomMm,
             dispenseOffsetFromBottomMm,
+            aspirateFlowRateUlSec,
+            dispenseFlowRateUlSec,
           })
         : []
 
-      const blowoutCommand = blowoutUtil(
-        args.pipette,
-        args.sourceLabware,
-        sourceWellChunk[0],
-        args.destLabware,
-        args.destWell,
-        args.blowoutLocation
-      )
+      const blowoutCommand = blowoutUtil({
+        pipette: args.pipette,
+        sourceLabwareId: args.sourceLabware,
+        sourceWell: sourceWellChunk[0],
+        destLabwareId: args.destLabware,
+        destWell: args.destWell,
+        blowoutLocation: args.blowoutLocation,
+        flowRate: blowoutFlowRateUlSec,
+        offsetFromTopMm: blowoutOffsetFromTopMm,
+        invariantContext,
+      })
 
       return [
         ...tipCommands,
@@ -178,11 +185,11 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
           volume: args.volume * sourceWellChunk.length,
           labware: args.destLabware,
           well: args.destWell,
-          'flow-rate': dispenseFlowRateUlSec,
+          flowRate: dispenseFlowRateUlSec,
           offsetFromBottomMm: dispenseOffsetFromBottomMm,
         }),
-        ...touchTipAfterDispenseCommands,
         ...mixAfterCommands,
+        ...touchTipAfterDispenseCommands,
         ...blowoutCommand,
       ]
     }

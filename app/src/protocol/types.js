@@ -1,9 +1,7 @@
 // @flow
 // protocol type defs
-import type {
-  SchemaV1ProtocolFile,
-  SchemaV3ProtocolFile,
-} from '@opentrons/shared-data'
+import type { ProtocolFile as SchemaV1ProtocolFile } from '@opentrons/shared-data/protocol/flowTypes/schemaV1'
+import type { ProtocolFile as SchemaV3ProtocolFile } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 
 // data may be a full JSON protocol or just a metadata dict from Python
 export type ProtocolData =

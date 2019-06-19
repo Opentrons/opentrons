@@ -8,14 +8,12 @@ import type { Service } from '@opentrons/discovery-client'
 import type { State, Action } from '../types'
 import type { BaseRobot } from '../robot'
 import type { HealthState } from './health'
-import type { PipettesState } from './pipettes'
 import type { MotorsState } from './motors'
 import type { ResetState } from './reset'
 import type { NetworkingState } from './networking'
 
 export type RobotApiState = {|
   ...HealthState,
-  ...PipettesState,
   ...MotorsState,
   ...ResetState,
   ...NetworkingState,

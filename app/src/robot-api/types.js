@@ -2,6 +2,7 @@
 import type {
   HealthState,
   ModulesState,
+  PipettesState,
   SettingsState,
 } from './resources/types'
 
@@ -24,6 +25,7 @@ export type RobotApiRequest = {|
   method: Method,
   path: string,
   body?: mixed,
+  query?: { [param: string]: string | boolean | number },
 |}
 
 export type RobotApiResponse = {|
@@ -50,6 +52,7 @@ export type RobotApiAction =
       payload: RobotApiRequest,
       meta: {| id: string |},
     |}
+  | {| type: 'robotApi:FETCH_PIPETTES', payload: RobotApiRequest |}
   | {| type: 'robotApi:FETCH_SETTINGS', payload: RobotApiRequest |}
   | {| type: 'robotApi:FETCH_PIPETTE_SETTINGS', payload: RobotApiRequest |}
   | {| type: 'robotApi:SET_SETTINGS', payload: RobotApiRequest |}
@@ -94,6 +97,7 @@ export type RobotInstanceNetworkingState = {
 export type RobotInstanceResourcesState = {|
   health: HealthState,
   modules: ModulesState,
+  pipettes: PipettesState,
   settings: SettingsState,
 |}
 

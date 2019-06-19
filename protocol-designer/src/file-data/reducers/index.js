@@ -8,7 +8,7 @@ import type { FileMetadataFields } from '../types'
 import type { LoadFileAction, NewProtocolFields } from '../../load-file'
 
 const defaultFields = {
-  'protocol-name': '',
+  protocolName: '',
   author: '',
   description: '',
 }
@@ -36,7 +36,7 @@ function newProtocolMetadata(
 ): FileMetadataFields {
   return {
     ...defaultFields,
-    'protocol-name': action.payload.name || '',
+    protocolName: action.payload.name || '',
     created: Date.now(),
   }
 }
@@ -54,7 +54,7 @@ const fileMetadata = handleActions(
     }),
     SAVE_PROTOCOL_FILE: (state: FileMetadataFields): FileMetadataFields => {
       // NOTE: 'last-modified' is updated "on-demand", in response to user clicking "save/export"
-      return { ...state, 'last-modified': Date.now() }
+      return { ...state, lastModified: Date.now() }
     },
   },
   defaultFields

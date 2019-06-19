@@ -3,13 +3,12 @@ import type { RobotState } from '../types'
 import {
   makeContext,
   getInitialRobotStateStandard,
-  commandCreatorNoErrors,
+  getSuccessResult,
+  DEFAULT_PIPETTE,
 } from './fixtures'
-import _dropAllTips from '../commandCreators/atomic/dropAllTips'
+import dropAllTips from '../commandCreators/atomic/dropAllTips'
 
-const dropAllTips = commandCreatorNoErrors(_dropAllTips)
-
-const p300SingleId = 'p300SingleId'
+const p300SingleId = DEFAULT_PIPETTE
 const p300MultiId = 'p300MultiId'
 
 let initialRobotState
@@ -33,14 +32,16 @@ describe('drop all tips', () => {
     initialRobotState.tipState.pipettes = {}
 
     const result = dropAllTips()(invariantContext, initialRobotState)
-    expect(result.commands).toHaveLength(0)
-    expectNoTipsRemaining(result.robotState)
+    const res = getSuccessResult(result)
+    expect(res.commands).toHaveLength(0)
+    expectNoTipsRemaining(res.robotState)
   })
 
   test('should do nothing with pipette that does not have tips', () => {
     const result = dropAllTips()(invariantContext, initialRobotState)
-    expect(result.commands).toHaveLength(0)
-    expectNoTipsRemaining(result.robotState)
+    const res = getSuccessResult(result)
+    expect(res.commands).toHaveLength(0)
+    expectNoTipsRemaining(res.robotState)
   })
 
   test('should drop tips of one pipette that has them, and not one without', () => {
@@ -50,10 +51,11 @@ describe('drop all tips', () => {
     }
 
     const result = dropAllTips()(invariantContext, initialRobotState)
-    expect(result.commands).toHaveLength(1)
-    expect(result.commands[0].params).toMatchObject({ pipette: p300SingleId })
+    const res = getSuccessResult(result)
+    expect(res.commands).toHaveLength(1)
+    expect(res.commands[0].params).toMatchObject({ pipette: p300SingleId })
 
-    expectNoTipsRemaining(result.robotState)
+    expectNoTipsRemaining(res.robotState)
   })
 
   test('should drop tips for both pipettes, with 2 pipettes that have tips', () => {
@@ -64,8 +66,9 @@ describe('drop all tips', () => {
 
     const result = dropAllTips()(invariantContext, initialRobotState)
     // order of which pipettes drops tips first is arbitrary
-    expect(result.commands).toHaveLength(2)
+    const res = getSuccessResult(result)
+    expect(res.commands).toHaveLength(2)
 
-    expectNoTipsRemaining(result.robotState)
+    expectNoTipsRemaining(res.robotState)
   })
 })

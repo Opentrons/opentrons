@@ -57,8 +57,9 @@
       "required": ["flowRate"],
       "properties": {
         "flowRate": {
-          "description": "Flow rate in uL/sec",
-          "type": "number"
+          "description": "Flow rate in uL/sec. Must be greater than 0",
+          "type": "number",
+          "minimum": 0
         }
       }
     },

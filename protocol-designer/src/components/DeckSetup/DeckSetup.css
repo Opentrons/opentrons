@@ -27,3 +27,8 @@
   height: 2rem;
   line-height: 1.25;
 }
+
+.robot_workspace {
+  width: 100%;
+  height: 100%;
+}

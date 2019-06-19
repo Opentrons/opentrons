@@ -1,15 +1,36 @@
 // @flow
+import flatMap from 'lodash/flatMap'
 import _mix from '../commandCreators/compound/mix'
 import {
   getRobotStateWithTipStandard,
   makeContext,
-  compoundCommandCreatorNoErrors,
-  compoundCommandCreatorHasErrors,
-  commandFixtures as cmd,
+  getSuccessResult,
+  getErrorResult,
+  replaceTipCommands,
+  getFlowRateAndOffsetParams,
+  DEFAULT_PIPETTE,
+  SOURCE_LABWARE,
+  DEST_LABWARE,
+  makeAspirateHelper,
+  makeDispenseHelper,
+  blowoutHelper,
+  makeTouchTipHelper,
 } from './fixtures'
+import { reduceCommandCreators } from '../utils'
 import type { MixArgs } from '../types'
-const mix = compoundCommandCreatorNoErrors(_mix)
-const mixWithErrors = compoundCommandCreatorHasErrors(_mix)
+
+const aspirateHelper = makeAspirateHelper()
+const dispenseHelper = makeDispenseHelper({ labware: SOURCE_LABWARE })
+const touchTipHelper = makeTouchTipHelper()
+// TODO: Ian 2019-06-14 more elegant way to test the blowout offset calculation
+const BLOWOUT_OFFSET_ANY: any = expect.any(Number)
+
+// collapse this compound command creator into the signature of an atomic command creator
+const mix = (args: MixArgs) => (invariantContext, initialRobotState) =>
+  reduceCommandCreators(_mix(args)(invariantContext, initialRobotState))(
+    invariantContext,
+    initialRobotState
+  )
 
 let invariantContext
 let robotStateWithTip
@@ -21,11 +42,12 @@ beforeEach(() => {
     name: 'mix test',
     description: 'test blah blah',
 
-    pipette: 'p300SingleId',
-    labware: 'sourcePlateId',
+    pipette: DEFAULT_PIPETTE,
+    labware: SOURCE_LABWARE,
 
     blowoutLocation: null,
     touchTip: false,
+    ...getFlowRateAndOffsetParams(),
   }
 
   invariantContext = makeContext()
@@ -45,122 +67,75 @@ describe('mix: change tip', () => {
   test('changeTip="always"', () => {
     const args = makeArgs('always')
     const result = mix(args)(invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
 
-    expect(result.commands).toEqual([
-      ...cmd.replaceTipCommands(0),
-      cmd.aspirate('A1', volume),
-      cmd.dispense('A1', volume),
+    expect(res.commands).toEqual(
+      flatMap(args.wells, (well: string, idx: number) => [
+        ...replaceTipCommands(idx),
+        aspirateHelper(well, volume),
+        dispenseHelper(well, volume),
 
-      cmd.aspirate('A1', volume),
-      cmd.dispense('A1', volume),
-
-      ...cmd.replaceTipCommands(1),
-      cmd.aspirate('B1', volume),
-      cmd.dispense('B1', volume),
-
-      cmd.aspirate('B1', volume),
-      cmd.dispense('B1', volume),
-
-      ...cmd.replaceTipCommands(2),
-      cmd.aspirate('C1', volume),
-      cmd.dispense('C1', volume),
-
-      cmd.aspirate('C1', volume),
-      cmd.dispense('C1', volume),
-    ])
+        aspirateHelper(well, volume),
+        dispenseHelper(well, volume),
+      ])
+    )
   })
 
   test('changeTip="once"', () => {
     const args = makeArgs('once')
     const result = mix(args)(invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
 
-    expect(result.commands).toEqual([
-      ...cmd.replaceTipCommands(0),
-      cmd.aspirate('A1', volume),
-      cmd.dispense('A1', volume),
-
-      cmd.aspirate('A1', volume),
-      cmd.dispense('A1', volume),
-
-      cmd.aspirate('B1', volume),
-      cmd.dispense('B1', volume),
-
-      cmd.aspirate('B1', volume),
-      cmd.dispense('B1', volume),
-
-      cmd.aspirate('C1', volume),
-      cmd.dispense('C1', volume),
-
-      cmd.aspirate('C1', volume),
-      cmd.dispense('C1', volume),
+    expect(res.commands).toEqual([
+      ...replaceTipCommands(0),
+      ...flatMap(args.wells, well => [
+        aspirateHelper(well, volume),
+        dispenseHelper(well, volume),
+        aspirateHelper(well, volume),
+        dispenseHelper(well, volume),
+      ]),
     ])
   })
 
   test('changeTip="never"', () => {
     const args = makeArgs('never')
     const result = mix(args)(invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
 
-    expect(result.commands).toEqual([
-      cmd.aspirate('A1', volume),
-      cmd.dispense('A1', volume),
-
-      cmd.aspirate('A1', volume),
-      cmd.dispense('A1', volume),
-
-      cmd.aspirate('B1', volume),
-      cmd.dispense('B1', volume),
-
-      cmd.aspirate('B1', volume),
-      cmd.dispense('B1', volume),
-
-      cmd.aspirate('C1', volume),
-      cmd.dispense('C1', volume),
-
-      cmd.aspirate('C1', volume),
-      cmd.dispense('C1', volume),
-    ])
+    expect(res.commands).toEqual(
+      flatMap(args.wells, well => [
+        aspirateHelper(well, volume),
+        dispenseHelper(well, volume),
+        aspirateHelper(well, volume),
+        dispenseHelper(well, volume),
+      ])
+    )
   })
 })
 
 describe('mix: advanced options', () => {
   const volume = 8
   const times = 2
-  const blowoutLabwareId = 'destPlateId'
+  const blowoutLabwareId = DEST_LABWARE
 
   test('flow rate', () => {
-    const ASPIRATE_OFFSET = 11
-    const DISPENSE_OFFSET = 12
-    const ASPIRATE_FLOW_RATE = 3
-    const DISPENSE_FLOW_RATE = 6
-    const args: MixArgs = {
+    const args = {
       ...mixinArgs,
       volume,
       times,
       wells: ['A1'],
       changeTip: 'once',
-      aspirateOffsetFromBottomMm: ASPIRATE_OFFSET,
-      dispenseOffsetFromBottomMm: DISPENSE_OFFSET,
-      aspirateFlowRateUlSec: ASPIRATE_FLOW_RATE,
-      dispenseFlowRateUlSec: DISPENSE_FLOW_RATE,
-    }
-
-    const aspirateParams = {
-      'flow-rate': ASPIRATE_FLOW_RATE,
-      offsetFromBottomMm: ASPIRATE_OFFSET,
-    }
-    const dispenseParams = {
-      'flow-rate': DISPENSE_FLOW_RATE,
-      offsetFromBottomMm: DISPENSE_OFFSET,
+      ...getFlowRateAndOffsetParams(),
     }
 
     const result = mix(args)(invariantContext, robotStateWithTip)
-    expect(result.commands).toEqual([
-      ...cmd.replaceTipCommands(0),
-      { ...cmd.aspirate('A1', volume, aspirateParams) },
-      { ...cmd.dispense('A1', volume, dispenseParams) },
-
-      { ...cmd.aspirate('A1', volume, aspirateParams) },
-      { ...cmd.dispense('A1', volume, dispenseParams) },
+    const res = getSuccessResult(result)
+    expect(res.commands).toEqual([
+      ...replaceTipCommands(0),
+      aspirateHelper('A1', volume),
+      dispenseHelper('A1', volume),
+      aspirateHelper('A1', volume),
+      dispenseHelper('A1', volume),
     ])
   })
 
@@ -172,39 +147,22 @@ describe('mix: advanced options', () => {
       changeTip: 'always',
       touchTip: true,
       wells: ['A1', 'B1', 'C1'],
-      aspirateOffsetFromBottomMm: null,
-      dispenseOffsetFromBottomMm: null,
-      aspirateFlowRateUlSec: null,
-      dispenseFlowRateUlSec: null,
     }
 
     const result = mix(args)(invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
 
-    expect(result.commands).toEqual([
-      ...cmd.replaceTipCommands(0),
-      cmd.aspirate('A1', volume),
-      cmd.dispense('A1', volume),
+    expect(res.commands).toEqual(
+      flatMap(args.wells, (well: string, idx: number) => [
+        ...replaceTipCommands(idx),
+        aspirateHelper(well, volume),
+        dispenseHelper(well, volume),
 
-      cmd.aspirate('A1', volume),
-      cmd.dispense('A1', volume),
-      cmd.touchTip('A1'),
-
-      ...cmd.replaceTipCommands(1),
-      cmd.aspirate('B1', volume),
-      cmd.dispense('B1', volume),
-
-      cmd.aspirate('B1', volume),
-      cmd.dispense('B1', volume),
-      cmd.touchTip('B1'),
-
-      ...cmd.replaceTipCommands(2),
-      cmd.aspirate('C1', volume),
-      cmd.dispense('C1', volume),
-
-      cmd.aspirate('C1', volume),
-      cmd.dispense('C1', volume),
-      cmd.touchTip('C1'),
-    ])
+        aspirateHelper(well, volume),
+        dispenseHelper(well, volume),
+        touchTipHelper(well),
+      ])
+    )
   })
 
   test('blowout', () => {
@@ -218,32 +176,21 @@ describe('mix: advanced options', () => {
     }
 
     const result = mix(args)(invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
 
-    expect(result.commands).toEqual([
-      ...cmd.replaceTipCommands(0),
-      cmd.aspirate('A1', volume),
-      cmd.dispense('A1', volume),
+    expect(res.commands).toEqual(
+      flatMap(args.wells, (well, idx) => [
+        ...replaceTipCommands(idx),
+        aspirateHelper(well, volume),
+        dispenseHelper(well, volume),
 
-      cmd.aspirate('A1', volume),
-      cmd.dispense('A1', volume),
-      cmd.blowout(blowoutLabwareId),
-
-      ...cmd.replaceTipCommands(1),
-      cmd.aspirate('B1', volume),
-      cmd.dispense('B1', volume),
-
-      cmd.aspirate('B1', volume),
-      cmd.dispense('B1', volume),
-      cmd.blowout(blowoutLabwareId),
-
-      ...cmd.replaceTipCommands(2),
-      cmd.aspirate('C1', volume),
-      cmd.dispense('C1', volume),
-
-      cmd.aspirate('C1', volume),
-      cmd.dispense('C1', volume),
-      cmd.blowout(blowoutLabwareId),
-    ])
+        aspirateHelper(well, volume),
+        dispenseHelper(well, volume),
+        blowoutHelper(blowoutLabwareId, {
+          offsetFromBottomMm: BLOWOUT_OFFSET_ANY,
+        }),
+      ])
+    )
   })
 
   test('touch tip after blowout', () => {
@@ -258,35 +205,22 @@ describe('mix: advanced options', () => {
     }
 
     const result = mix(args)(invariantContext, robotStateWithTip)
+    const res = getSuccessResult(result)
 
-    expect(result.commands).toEqual([
-      ...cmd.replaceTipCommands(0),
-      cmd.aspirate('A1', volume),
-      cmd.dispense('A1', volume),
+    expect(res.commands).toEqual(
+      flatMap(args.wells, (well, idx) => [
+        ...replaceTipCommands(idx),
+        aspirateHelper(well, volume),
+        dispenseHelper(well, volume),
 
-      cmd.aspirate('A1', volume),
-      cmd.dispense('A1', volume),
-      cmd.blowout(blowoutLabwareId),
-      cmd.touchTip('A1'),
-
-      ...cmd.replaceTipCommands(1),
-      cmd.aspirate('B1', volume),
-      cmd.dispense('B1', volume),
-
-      cmd.aspirate('B1', volume),
-      cmd.dispense('B1', volume),
-      cmd.blowout(blowoutLabwareId),
-      cmd.touchTip('B1'),
-
-      ...cmd.replaceTipCommands(2),
-      cmd.aspirate('C1', volume),
-      cmd.dispense('C1', volume),
-
-      cmd.aspirate('C1', volume),
-      cmd.dispense('C1', volume),
-      cmd.blowout(blowoutLabwareId),
-      cmd.touchTip('C1'),
-    ])
+        aspirateHelper(well, volume),
+        dispenseHelper(well, volume),
+        blowoutHelper(blowoutLabwareId, {
+          offsetFromBottomMm: BLOWOUT_OFFSET_ANY,
+        }),
+        touchTipHelper(well),
+      ])
+    )
   })
 })
 
@@ -306,9 +240,10 @@ describe('mix: errors', () => {
       ...errorArgs,
       labware: 'invalidLabwareId',
     }
-    const result = mixWithErrors(args)(invariantContext, robotStateWithTip)
-    expect(result.errors).toHaveLength(1)
-    expect(result.errors[0]).toMatchObject({
+    const result = mix(args)(invariantContext, robotStateWithTip)
+    const res = getErrorResult(result)
+    expect(res.errors).toHaveLength(1)
+    expect(res.errors[0]).toMatchObject({
       type: 'LABWARE_DOES_NOT_EXIST',
     })
   })
@@ -318,9 +253,10 @@ describe('mix: errors', () => {
       ...errorArgs,
       pipette: 'invalidPipetteId',
     }
-    const result = mixWithErrors(args)(invariantContext, robotStateWithTip)
-    expect(result.errors).toHaveLength(1)
-    expect(result.errors[0]).toMatchObject({
+    const result = mix(args)(invariantContext, robotStateWithTip)
+    const res = getErrorResult(result)
+    expect(res.errors).toHaveLength(1)
+    expect(res.errors[0]).toMatchObject({
       type: 'PIPETTE_DOES_NOT_EXIST',
     })
   })

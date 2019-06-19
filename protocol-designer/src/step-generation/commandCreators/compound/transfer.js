@@ -71,6 +71,8 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
     dispenseFlowRateUlSec,
     aspirateOffsetFromBottomMm,
     dispenseOffsetFromBottomMm,
+    blowoutFlowRateUlSec,
+    blowoutOffsetFromTopMm,
   } = args
 
   const effectiveTransferVol = getPipetteWithTipMaxVol(
@@ -198,14 +200,17 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
               })
             : []
 
-          const blowoutCommand = blowoutUtil(
-            args.pipette,
-            args.sourceLabware,
-            sourceWell,
-            args.destLabware,
-            destWell,
-            args.blowoutLocation
-          )
+          const blowoutCommand = blowoutUtil({
+            pipette: args.pipette,
+            sourceLabwareId: args.sourceLabware,
+            sourceWell: sourceWell,
+            destLabwareId: args.destLabware,
+            destWell: destWell,
+            blowoutLocation: args.blowoutLocation,
+            flowRate: blowoutFlowRateUlSec,
+            offsetFromTopMm: blowoutOffsetFromTopMm,
+            invariantContext,
+          })
 
           const nextCommands = [
             ...tipCommands,
@@ -216,7 +221,7 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
               volume: subTransferVol,
               labware: args.sourceLabware,
               well: sourceWell,
-              'flow-rate': aspirateFlowRateUlSec,
+              flowRate: aspirateFlowRateUlSec,
               offsetFromBottomMm: aspirateOffsetFromBottomMm,
             }),
             ...touchTipAfterAspirateCommands,
@@ -225,11 +230,11 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
               volume: subTransferVol,
               labware: args.destLabware,
               well: destWell,
-              'flow-rate': dispenseFlowRateUlSec,
+              flowRate: dispenseFlowRateUlSec,
               offsetFromBottomMm: dispenseOffsetFromBottomMm,
             }),
-            ...touchTipAfterDispenseCommands,
             ...mixInDestinationCommands,
+            ...touchTipAfterDispenseCommands,
             ...blowoutCommand,
           ]
 
