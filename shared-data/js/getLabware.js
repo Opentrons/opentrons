@@ -32,7 +32,7 @@ export function getLabwareV1Def(labwareName: string): ?LabwareDefinition1 {
   return labware
 }
 
-export function getIsV1LabwareTiprack(def: LabwareDefinition1): boolean {
+export function getIsLabwareV1Tiprack(def: LabwareDefinition1): boolean {
   return Boolean(def?.metadata?.isTiprack)
 }
 
@@ -69,7 +69,7 @@ export function getWellPropsForSVGLabwareV1(def: LabwareDefinition1) {
   // Most labware defs have a weird offset,
   // but tips are mostly OK.
   // This is a HACK to make the offset less "off"
-  const isTiprack = getIsV1LabwareTiprack(def)
+  const isTiprack = getIsLabwareV1Tiprack(def)
   let xCorrection = 0
   let yCorrection = 0
   if (!isTiprack) {

@@ -3,7 +3,7 @@ import * as React from 'react'
 import {
   getLabwareV1Def,
   getWellPropsForSVGLabwareV1,
-  getIsV1LabwareTiprack,
+  getIsLabwareV1Tiprack,
   type LabwareDefinition1,
 } from '@opentrons/shared-data'
 
@@ -53,7 +53,7 @@ function createWell(
   }
 
   const { tipVolume } = getLabwareV1Metadata(labwareDefinition)
-  const isTiprack = getIsV1LabwareTiprack(labwareDefinition)
+  const isTiprack = getIsLabwareV1Tiprack(labwareDefinition)
   const allWells = getWellPropsForSVGLabwareV1(labwareDefinition)
   const wellDef = allWells && allWells[wellName]
 
@@ -107,7 +107,7 @@ class Labware extends React.Component<Props> {
     }
 
     const allWellNames = Object.keys(getWellPropsForSVGLabwareV1(labwareDef))
-    const isTiprack = getIsV1LabwareTiprack(labwareDef)
+    const isTiprack = getIsLabwareV1Tiprack(labwareDef)
     const wells = allWellNames.map(wellName =>
       createWell(wellName, labwareType, getTipProps, getWellProps)
     )
