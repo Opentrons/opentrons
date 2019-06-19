@@ -12,4 +12,5 @@ global.APP_SHELL = {
   config: mockElectron.remote.require('./config'),
   discovery: mockElectron.remote.require('./discovery'),
   update: mockElectron.remote.require('./update'),
+  buildroot: mockElectron.remote.require('./buildroot-update'),
 }

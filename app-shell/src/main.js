@@ -9,6 +9,7 @@ import { registerApiUpdate } from './api-update'
 import { registerDiscovery } from './discovery'
 import { registerRobotLogs } from './robot-logs'
 import { registerUpdate } from './update'
+import { registerBuildrootUpdate } from './buildroot-update'
 
 const config = getConfig()
 const log = createLogger(__filename)
@@ -49,6 +50,7 @@ function startUp() {
   const discoveryHandler = registerDiscovery(dispatch)
   const robotLogsHandler = registerRobotLogs(dispatch, mainWindow)
   const updateHandler = registerUpdate(dispatch)
+  const buildrootUpdateHandler = registerBuildrootUpdate(dispatch)
 
   ipcMain.on('dispatch', (_, action) => {
     log.debug('Received action via IPC from renderer', { action })
@@ -57,6 +59,7 @@ function startUp() {
     discoveryHandler(action)
     robotLogsHandler(action)
     updateHandler(action)
+    buildrootUpdateHandler(action)
   })
 
   if (config.devtools) {
