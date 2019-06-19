@@ -24,6 +24,7 @@ import type {
   EditLiquidGroupAction,
   SelectLiquidAction,
   SetWellContentsAction,
+  RenameLabwareAction,
 } from '../actions'
 
 // REDUCERS
@@ -102,7 +103,6 @@ const selectedLiquidGroup = handleActions(
 
 const initialLabwareState: ContainersState = {
   [FIXED_TRASH_ID]: {
-    disambiguationNumber: 1,
     nickname: 'Trash',
   },
 }
@@ -117,7 +117,6 @@ export const containers = handleActions<ContainersState, *>(
       return {
         ...state,
         [id]: {
-          disambiguationNumber: action.payload.disambiguationNumber,
           nickname: null, // create with null nickname, so we force explicit naming.
         },
       }
@@ -132,7 +131,7 @@ export const containers = handleActions<ContainersState, *>(
       ),
     RENAME_LABWARE: (
       state: ContainersState,
-      action: ActionType<typeof actions.renameLabware>
+      action: RenameLabwareAction
     ): ContainersState => {
       const { labwareId, name } = action.payload
       // ignore renaming to whitespace
@@ -150,15 +149,11 @@ export const containers = handleActions<ContainersState, *>(
       state: ContainersState,
       action: DuplicateLabwareAction
     ): ContainersState => {
-      const {
-        duplicateLabwareId,
-        duplicateDisambiguationNumber,
-      } = action.payload
+      const { duplicateLabwareId, duplicateLabwareNickname } = action.payload
       return {
         ...state,
         [duplicateLabwareId]: {
-          disambiguationNumber: duplicateDisambiguationNumber,
-          nickname: null, // create with null nickname, so we force explicit naming.
+          nickname: duplicateLabwareNickname,
         },
       }
     },
@@ -210,7 +205,7 @@ export const savedLabware = handleActions<SavedLabwareState, *>(
     }),
     RENAME_LABWARE: (
       state: SavedLabwareState,
-      action: ActionType<typeof actions.renameLabware>
+      action: RenameLabwareAction
     ) => ({
       ...state,
       [action.payload.labwareId]: true,

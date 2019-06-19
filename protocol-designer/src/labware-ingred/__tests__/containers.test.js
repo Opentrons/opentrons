@@ -51,58 +51,28 @@ describe('DELETE_CONTAINER action', () => {
   })
 })
 
-// TODO: BC 2018-7-25 test SWAP_SLOT_CONTENTS && DUPLICATE_LABWARE
-describe.skip('COPY_LABWARE action', () => {
-  test('copy correct container', () => {
+describe('DUPLICATE_LABWARE action', () => {
+  test('duplicate correct labware', () => {
     expect(
       containers(
         {
-          clonePlate: {
-            id: 'clonePlate',
-            type: '96-flat',
-            name: 'Samples Plate',
-            slot: '1',
-            disambiguationNumber: 1,
-          },
-          otherPlate: {
-            id: 'otherPlate',
-            type: '384-flat',
-            name: 'Destination Plate',
-            slot: '2',
-            disambiguationNumber: 1,
-          },
+          clonePlate: { nickname: 'Samples Plate' },
+          otherPlate: { nickname: 'Destination Plate' },
         },
         {
-          type: 'COPY_LABWARE',
+          type: 'DUPLICATE_LABWARE',
           payload: {
-            fromContainer: 'clonePlate',
-            toContainer: 'newContainer',
+            templateLabwareId: 'clonePlate',
+            duplicateLabwareId: 'newContainer',
+            duplicateLabwareNickname: 'Samples Plate (1)',
             toSlot: '5',
           },
         }
       )
     ).toEqual({
-      clonePlate: {
-        id: 'clonePlate',
-        type: '96-flat',
-        name: 'Samples Plate',
-        slot: '1',
-        disambiguationNumber: 1,
-      },
-      newContainer: {
-        id: 'newContainer',
-        type: '96-flat',
-        name: 'Samples Plate',
-        slot: '5',
-        disambiguationNumber: 2,
-      },
-      otherPlate: {
-        id: 'otherPlate',
-        type: '384-flat',
-        name: 'Destination Plate',
-        slot: '2',
-        disambiguationNumber: 1,
-      },
+      clonePlate: { nickname: 'Samples Plate' },
+      newContainer: { nickname: 'Samples Plate (1)' },
+      otherPlate: { nickname: 'Destination Plate' },
     })
   })
 })
