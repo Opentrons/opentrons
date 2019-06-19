@@ -10,7 +10,7 @@ import styles from './staticLabware.css'
 
 import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
 import LabwareOutline from '../LabwareOutline'
-import { WellMouseEvent } from './types'
+import type { WellMouseEvent } from './types'
 
 export type StaticLabwareProps = {|
   definition: LabwareDefinition2,

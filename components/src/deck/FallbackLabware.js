@@ -9,7 +9,7 @@ import RobotCoordsForeignDiv from './RobotCoordsForeignDiv'
 export default function FallbackLabware() {
   return (
     <g>
-      <LabwareOutline />
+      <LabwareOutline width={SLOT_RENDER_WIDTH} height={SLOT_RENDER_HEIGHT} />
       <RobotCoordsForeignDiv
         width={SLOT_RENDER_WIDTH}
         height={SLOT_RENDER_HEIGHT}
