@@ -60,6 +60,7 @@ const DeckSetup = (props: Props) => {
             deckLayerBlacklist={deckSetupLayerBlacklist}
             deckDef={deckDef}
             viewBox={`-46 -70 ${488} ${514}`} // TODO: put these in variables
+            className={styles.robot_workspace}
           >
             {({ slots, getRobotCoordsFromDOMCoords }) => (
               <>

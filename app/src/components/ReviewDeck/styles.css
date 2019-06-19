@@ -3,6 +3,7 @@
 .prompt {
   max-width: 32rem;
   margin: 0 0 1rem;
+  flex: none;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -29,23 +30,23 @@
   text-align: center;
 }
 
-.deck {
-  width: 100%;
-  overflow: visible;
-}
-
 .page_content_dark {
   display: flex;
   padding: 1rem;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   background-color: color(var(--c-black) alpha(0.99));
-  min-height: 100%;
+  height: 100%;
 }
 
 .deck_map_wrapper {
-  width: 100%;
+  flex: 1 1 0;
+  align-self: stretch;
+  display: flex;
   background-color: var(--c-bg-light);
   border-radius: 6px;
+}
+
+.deck_map {
+  flex: 1;
 }

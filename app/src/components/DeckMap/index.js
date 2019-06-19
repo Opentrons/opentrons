@@ -30,6 +30,7 @@ export type { LabwareItemProps } from './LabwareItem'
 type WithRouterOP = {|
   modulesRequired?: boolean,
   enableLabwareSelection?: boolean,
+  className?: string,
 |}
 
 type OP = {|
@@ -70,12 +71,14 @@ function DeckMap(props: Props) {
     labwareBySlot,
     selectedSlot,
     areTipracksConfirmed,
+    className,
   } = props
   return (
     <RobotWorkSpace
       deckLayerBlacklist={deckSetupLayerBlacklist}
       deckDef={deckDef}
       viewBox={`-46 -10 ${488} ${390}`} // TODO: put these in variables
+      className={className}
     >
       {({ slots }) =>
         map(slots, (slot: $Values<typeof slots>, slotId) => {

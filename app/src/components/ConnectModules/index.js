@@ -42,7 +42,7 @@ function ConnectModules(props: Props) {
       <div className={styles.page_content_dark}>
         <Prompt modulesMissing={modulesMissing} onClick={onPromptClick} />
         <div className={styles.deck_map_wrapper}>
-          <DeckMap modulesRequired />
+          <DeckMap className={styles.deck_map} modulesRequired />
         </div>
       </div>
     </RefreshWrapper>

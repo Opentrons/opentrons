@@ -15,7 +15,7 @@ function CalibrateLabware(props: Props) {
   return (
     <div className={styles.calibrate_labware_wrapper}>
       <InfoBox labware={props.labware} />
-      <DeckMap enableLabwareSelection />
+      <DeckMap className={styles.deck_map} enableLabwareSelection />
     </div>
   )
 }
