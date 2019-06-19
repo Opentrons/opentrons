@@ -1,5 +1,6 @@
 // @flow
 // utility functions
+
 import type { Action, ThunkAction, ThunkPromiseAction } from './types'
 import createLogger from './logger'
 

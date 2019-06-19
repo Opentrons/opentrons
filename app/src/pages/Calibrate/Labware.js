@@ -12,9 +12,9 @@ import { getRobotSettingsState } from '../../robot-api'
 import Page from '../../components/Page'
 import CalibrateLabware from '../../components/CalibrateLabware'
 import SessionHeader from '../../components/SessionHeader'
-import ReviewDeckModal from '../../components/ReviewDeckModal'
+import ReviewDeck from '../../components/ReviewDeck'
 import ConfirmModal from '../../components/CalibrateLabware/ConfirmModal'
-import ConnectModulesModal from '../../components/ConnectModulesModal'
+import ConnectModules from '../../components/ConnectModules'
 
 import type { ContextRouter } from 'react-router'
 import type { State, Dispatch } from '../../types'
@@ -56,13 +56,18 @@ function SetupDeckPage(props: Props) {
     },
   } = props
 
+  const renderPage = () => {
+    if (reviewModules && robot) {
+      return <ConnectModules robot={robot} />
+    } else if (!deckPopulated && !reviewModules) {
+      return <ReviewDeck slot={slot} />
+    } else {
+      return <CalibrateLabware labware={labware} />
+    }
+  }
   return (
     <React.Fragment>
-      <Page titleBarProps={{ title: <SessionHeader /> }}>
-        <CalibrateLabware labware={labware} />
-      </Page>
-      {robot && reviewModules && <ConnectModulesModal robot={robot} />}
-      {!deckPopulated && !reviewModules && <ReviewDeckModal slot={slot} />}
+      <Page titleBarProps={{ title: <SessionHeader /> }}>{renderPage()}</Page>
       <Route
         path={`${url}/confirm`}
         render={() => {

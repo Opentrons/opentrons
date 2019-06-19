@@ -2,12 +2,7 @@
 
 ```js
 <svg height="200" width="300" viewBox="0 0 125 90">
-  <Labware
-    labwareType="96-flat"
-    getWellProps={wellName =>
-      wellName === 'A2' ? { fillColor: 'green' } : null
-    }
-  />
+  <Labware labwareType="96-flat" />
 </svg>
 ```
 
@@ -15,10 +10,7 @@ Tip rack example
 
 ```js
 <svg height="200" width="300" viewBox="0 0 125 90">
-  <Labware
-    labwareType="tiprack-200ul"
-    getTipProps={wellName => (wellName === 'B3' ? { empty: true } : null)}
-  />
+  <Labware labwareType="tiprack-200ul" />
 </svg>
 ```
 

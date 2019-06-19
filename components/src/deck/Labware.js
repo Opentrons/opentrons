@@ -1,10 +1,9 @@
 // @flow
 import * as React from 'react'
-import {
-  getLabware,
-  getWellDefsForSVG,
-  getIsTiprackDeprecated,
-} from '@opentrons/shared-data'
+import map from 'lodash/map'
+import type { LabwareDefinition } from '@opentrons/shared-data'
+import assert from 'assert'
+import { getLabware } from '@opentrons/shared-data'
 
 import LabwareOutline from './LabwareOutline'
 import FallbackLabware from './FallbackLabware'
@@ -12,113 +11,55 @@ import Tip from './Tip'
 import Well from './Well'
 import styles from './Labware.css'
 
-type WellProps = $Diff<
-  React.ElementProps<typeof Well>,
-  { wellDef: *, svgOffset: * }
->
-
-type TipProps = $Diff<
-  React.ElementProps<typeof Tip>,
-  { wellDef: *, tipVolume: * }
->
-
 export type Props = {
-  /** labware type, to get definition from shared-data */
-  labwareType: string,
-  /** optional getter for tip props by wellName (tipracks only) */
-  getTipProps?: (wellName: string) => ?TipProps,
-  /** optional getter for well props by wellName (non-tiprack labware only ) */
-  getWellProps?: (wellName: string) => ?WellProps,
+  /** labware type, to get legacy definition from shared-data */
+  labwareType?: string,
+  definition?: ?LabwareDefinition,
 }
 
-// TODO: Ian 2018-06-27 this fn is called a zillion times, optimize it later
-function getLabwareMetadata(labwareType: string) {
-  const labwareDefinition = getLabware(labwareType)
+// NOTE: this is a legacy component that is only responsible
+// for visualizing a labware schema v1 definition by def or loadName
 
-  if (!labwareDefinition) {
-    console.warn(
-      `No labware type "${labwareType}" in labware definitions, cannot render labware`
-    )
-    return {}
-  }
-
-  const tipVolume =
-    labwareDefinition.metadata && labwareDefinition.metadata.tipVolume
-  return { tipVolume }
-}
-
-function createWell(
-  wellName: string,
-  labwareType: string,
-  getTipProps?: $PropertyType<Props, 'getTipProps'>,
-  getWellProps?: $PropertyType<Props, 'getWellProps'>
-): React.Node {
-  const { tipVolume } = getLabwareMetadata(labwareType)
-  const isTiprack = getIsTiprackDeprecated(labwareType)
-  const allWells = getWellDefsForSVG(labwareType)
-  const wellDef = allWells && allWells[wellName]
-
-  if (!wellDef) {
-    console.warn(
-      `No well definition for labware ${labwareType}, well ${wellName}`
-    )
-    return null
-  }
-
-  // TODO: Ian 2018-06-27 remove scale & transform so this offset isn't needed
-  // Or... this is actually from the labware definitions?? But not tipracks?
-  const svgOffset = {
-    x: 1,
-    y: -3,
-  }
-
-  if (isTiprack) {
-    const tipProps = (getTipProps && getTipProps(wellName)) || {}
-    return (
-      <Tip
-        key={wellName}
-        wellDef={wellDef}
-        tipVolume={tipVolume}
-        {...tipProps}
-      />
-    )
-  }
-
-  const wellProps = (getWellProps && getWellProps(wellName)) || {}
-  return (
-    <Well
-      key={wellName}
-      wellName={wellName}
-      {...wellProps}
-      {...{
-        wellDef,
-        svgOffset,
-      }}
-    />
-  )
-}
-
-// TODO: BC 2018-10-10 this is a class component because it should probably have a sCU for performance reasons
 class Labware extends React.Component<Props> {
   render() {
-    const { labwareType, getTipProps, getWellProps } = this.props
+    const { labwareType, definition } = this.props
 
-    if (!getLabware(labwareType)) {
+    const labwareDefinition =
+      definition || (labwareType ? getLabware(labwareType) : null)
+
+    if (!labwareDefinition) {
       return <FallbackLabware />
     }
 
-    const allWellNames = Object.keys(getWellDefsForSVG(labwareType))
-    const isTiprack = getIsTiprackDeprecated(labwareType)
-    const wells = allWellNames.map(wellName =>
-      createWell(wellName, labwareType, getTipProps, getWellProps)
-    )
+    const tipVolume =
+      labwareDefinition.metadata && labwareDefinition.metadata.tipVolume
+
+    const isTiprack =
+      labwareDefinition.metadata && labwareDefinition.metadata.isTiprack
 
     return (
       <g>
         <LabwareOutline
           className={isTiprack ? styles.tiprack_plate_outline : null}
         />
-        {wells}
+        {map(labwareDefinition.wells, (wellDef, wellName) => {
+          assert(
+            wellDef,
+            `No well definition for labware ${labwareType ||
+              'unknown labware'}, well ${wellName}`
+          )
+          // NOTE x + 1, y + 3 HACK offset from old getWellDefsForSVG has been purposefully
+          // left out here; it's intention was to make the well viz offset less "off"
+          return isTiprack ? (
+            <Tip key={wellName} wellDef={wellDef} tipVolume={tipVolume} />
+          ) : (
+            <Well
+              key={wellName}
+              wellName={wellName}
+              wellDef={{ ...wellDef, x: wellDef.x, y: wellDef.y }}
+            />
+          )
+        })}
       </g>
     )
   }
