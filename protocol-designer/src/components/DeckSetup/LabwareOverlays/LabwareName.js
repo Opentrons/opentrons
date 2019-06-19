@@ -18,7 +18,6 @@ type Props = { ...OP, ...SP }
 const NameOverlay = (props: Props) => {
   const { labwareOnDeck, nickname } = props
   const title = nickname || labwareOnDeck.def.metadata.displayName
-
   return <LabwareNameOverlay title={title} />
 }
 

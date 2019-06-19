@@ -9,11 +9,10 @@ import {
   actions as robotActions,
 } from '../../robot'
 
-import { Deck } from '@opentrons/components'
 import { RefreshWrapper } from '../Page'
-import { Modal } from '../modals'
+import DeckMap from '../DeckMap'
 import Prompt from './Prompt'
-import ReviewModuleItem from './ReviewModuleItem'
+import styles from './styles.css'
 
 import type { State, Dispatch } from '../../types'
 import type { RobotService, SessionModule } from '../../robot'
@@ -30,9 +29,9 @@ type Props = { ...OP, ...SP, ...DP }
 export default connect<Props, OP, SP, DP, State, Dispatch>(
   mapStateToProps,
   mapDispatchToProps
-)(ConnectModulesModal)
+)(ConnectModules)
 
-function ConnectModulesModal(props: Props) {
+function ConnectModules(props: Props) {
   if (!props.modulesRequired) return null
 
   const { modulesMissing, setReviewed, fetchModules } = props
@@ -40,10 +39,12 @@ function ConnectModulesModal(props: Props) {
 
   return (
     <RefreshWrapper refresh={fetchModules}>
-      <Modal>
+      <div className={styles.page_content_dark}>
         <Prompt modulesMissing={modulesMissing} onClick={onPromptClick} />
-        <Deck LabwareComponent={ReviewModuleItem} />
-      </Modal>
+        <div className={styles.deck_map_wrapper}>
+          <DeckMap className={styles.deck_map} modulesRequired />
+        </div>
+      </div>
     </RefreshWrapper>
   )
 }

@@ -68,9 +68,9 @@ class Well extends React.Component<Props> {
     if (isRect) {
       const rectProps = {
         x: wellDef.x,
-        y: wellDef.y - (wellDef.length || 0), // zero fallback for flow
+        y: wellDef.y,
         width: wellDef.width,
-        height: wellDef.y,
+        height: wellDef.length,
       }
 
       return (

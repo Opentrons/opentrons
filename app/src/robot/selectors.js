@@ -6,7 +6,6 @@ import { createSelector } from 'reselect'
 import omitBy from 'lodash/omitBy'
 import { type ConnectionStatus, PIPETTE_MOUNTS, DECK_SLOTS } from './constants'
 
-import type { ContextRouter } from 'react-router'
 import type { OutputSelector } from 'reselect'
 import type { State } from '../types'
 import type {
@@ -432,15 +431,4 @@ export function getOffsetUpdateInProgress(state: State): boolean {
   const request = getCalibrationRequest(state)
 
   return request.type === 'UPDATE_OFFSET' && request.inProgress
-}
-
-// get current pipette selector factory
-// to be used by a react-router Route component
-export const makeGetCurrentPipette = () => {
-  // $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
-  return createSelector(
-    (_, props: ContextRouter) => props.match.params.mount,
-    getPipettes,
-    (mount, pipettes) => pipettes.find(i => i.mount === mount)
-  )
 }

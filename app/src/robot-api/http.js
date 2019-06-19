@@ -2,6 +2,8 @@
 // simple fetch wrapper to format URL for robot and parse JSON response
 import { of, from } from 'rxjs'
 import { switchMap, catchError } from 'rxjs/operators'
+import mapValues from 'lodash/mapValues'
+import toString from 'lodash/toString'
 
 import type { Observable } from 'rxjs'
 import type { RobotApiRequest, RobotApiResponse } from './types'
@@ -9,8 +11,16 @@ import type { RobotApiRequest, RobotApiResponse } from './types'
 const DEFAULT_TIMEOUT_MS = 30000
 
 export function robotApiUrl(request: RobotApiRequest): string {
-  const { host, path } = request
-  return `http://${host.ip}:${host.port}${path}`
+  const { host, path, query } = request
+  let url = `http://${host.ip}:${host.port}${path}`
+
+  if (query) {
+    const stringParamsMap = mapValues(query, toString)
+    const queryParams = new URLSearchParams(stringParamsMap)
+    url += `?${queryParams.toString()}`
+  }
+
+  return url
 }
 
 export function robotApiFetch(

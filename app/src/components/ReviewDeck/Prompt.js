@@ -1,5 +1,5 @@
 // @flow
-// prompt for ReviewDeckModal of labware calibration page
+// prompt for ReviewDeck of labware calibration page
 import * as React from 'react'
 
 import { selectors as robotSelectors, type Labware } from '../../robot'

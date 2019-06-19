@@ -116,6 +116,8 @@ export type StateLabware = {|
   name: string,
   // whether or not the labware is a tiprack (implied from type)
   isTiprack: boolean,
+  // whether or not the labware is a legacy labware (labwareSchemaVersion === 1)
+  isLegacy: boolean,
   // intrument mount to use as the calibrator if isTiprack is true
   calibratorMount: ?Mount,
 |}

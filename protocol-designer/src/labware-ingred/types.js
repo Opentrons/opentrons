@@ -6,7 +6,6 @@ import type { LocationLiquidState } from '../step-generation'
 
 export type DisplayLabware = {|
   nickname: ?string,
-  disambiguationNumber: number,
 |}
 
 export type LabwareTypeById = { [labwareId: string]: ?string }

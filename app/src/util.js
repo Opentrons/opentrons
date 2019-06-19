@@ -1,5 +1,6 @@
 // @flow
 // utility functions
+
 import type { Action, ThunkAction, ThunkPromiseAction } from './types'
 import createLogger from './logger'
 
@@ -39,7 +40,6 @@ export function chainActions(...actions: Array<Chainable>): ThunkPromiseAction {
     function handleAction(action: ?Action): ChainAction {
       if (
         action &&
-        // $FlowFixMe: Flow complains about accessing `error` on payload
         (action.error || (action.payload && action.payload.error))
       ) {
         log.debug('Early return from action chain', { action })

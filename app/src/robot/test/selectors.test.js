@@ -25,7 +25,6 @@ const {
   getUnconfirmedTipracks,
   getUnconfirmedLabware,
   getNextLabware,
-  makeGetCurrentPipette,
   getModulesBySlot,
   getModules,
 } = selectors
@@ -364,35 +363,6 @@ describe('robot selectors', () => {
           tipOn: true,
         },
       ])
-    })
-
-    test('make get current instrument from props', () => {
-      const getCurrentPipette = makeGetCurrentPipette()
-      let props = { match: { params: { mount: 'left' } } }
-
-      expect(getCurrentPipette(state, props)).toEqual({
-        mount: 'left',
-        name: 'p200m',
-        channels: 8,
-        volume: 200,
-        calibration: constants.PROBING,
-        probed: true,
-        tipOn: false,
-      })
-
-      props = { match: { params: { mount: 'right' } } }
-      expect(getCurrentPipette(state, props)).toEqual({
-        mount: 'right',
-        name: 'p50s',
-        channels: 1,
-        volume: 50,
-        calibration: constants.UNPROBED,
-        probed: false,
-        tipOn: true,
-      })
-
-      props = { match: { params: {} } }
-      expect(getCurrentPipette(state, props)).toBeFalsy()
     })
   })
 

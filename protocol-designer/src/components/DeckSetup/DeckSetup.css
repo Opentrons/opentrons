@@ -26,3 +26,8 @@
   background-color: white;
   height: 1rem;
 }
+
+.robot_workspace {
+  width: 100%;
+  height: 100%;
+}
