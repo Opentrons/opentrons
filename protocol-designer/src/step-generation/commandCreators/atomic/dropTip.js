@@ -22,7 +22,7 @@ const dropTip = (pipetteId: string): CommandCreator => (
 
   const commands = [
     {
-      command: 'drop-tip',
+      command: 'dropTip',
       params: {
         pipette: pipetteId,
         labware: FIXED_TRASH_ID,

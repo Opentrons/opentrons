@@ -189,7 +189,9 @@ const updatePatchOnPipetteChange = (
         'dispense_flowRate',
         'aspirate_mix_volume',
         'dispense_mix_volume',
-        'disposalVolume_volume'
+        'disposalVolume_volume',
+        'aspirate_mmFromBottom',
+        'dispense_mmFromBottom'
       ),
     }
   }

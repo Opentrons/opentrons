@@ -18,7 +18,6 @@ import ConfigFormGroup, {
   ConfigQuirkGroup,
 } from './ConfigFormGroup'
 
-import type { Pipette } from '../../http-api-client'
 import type {
   PipetteSettings,
   PipetteSettingsField,
@@ -41,7 +40,7 @@ export type DisplayQuirkFieldProps = {|
 
 type Props = {|
   parentUrl: string,
-  pipette: Pipette,
+  pipetteId: string,
   pipetteConfig: PipetteSettings,
   updateConfig: (id: string, body: PipetteSettingsUpdate) => mixed,
   __showHiddenFields: boolean,
@@ -111,7 +110,7 @@ export default class ConfigForm extends React.Component<Props> {
       }
       return v === '' ? null : { value: Number(v) }
     })
-    this.props.updateConfig(this.props.pipette.id, { fields: { ...params } })
+    this.props.updateConfig(this.props.pipetteId, { fields: { ...params } })
   }
 
   getFieldValue(

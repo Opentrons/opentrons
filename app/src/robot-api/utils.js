@@ -81,7 +81,7 @@ export const passRobotApiErrorAction = (
 export const makeRobotApiRequest = (
   request: RobotApiRequest,
   meta: RequestMeta = {}
-): Observable<RobotApiRequestAction | RobotApiResponseAction> => {
+): Observable<mixed> => {
   const reqAction = of(robotApiRequest(request, meta))
   const resAction = robotApiFetch(request).pipe(
     switchMap<RobotApiResponse, _, RobotApiResponseAction>(res =>
@@ -97,7 +97,7 @@ export const createBaseRobotApiEpic = (
 ): Epic => action$ =>
   action$.pipe(
     ofType(type),
-    switchMap<RobotApiAction, _, RobotApiActionLike>(a =>
+    switchMap<RobotApiAction, _, _>(a =>
       // `any` typed to recast strictly-typed `meta` of RobotApiRequest
       // to loosly-typed `meta` of RobotApi(Request|Response)Action
       makeRobotApiRequest(a.payload, (a: any).meta)

@@ -13,68 +13,16 @@ import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture12
 import fixtureTipRack10Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack10Ul.json'
 import fixtureTipRack300Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack300Ul.json'
 
-import { makeInitialRobotState, reduceCommandCreators } from '../../utils'
+import {
+  DEFAULT_PIPETTE,
+  SOURCE_LABWARE,
+  DEST_LABWARE,
+  TROUGH_LABWARE,
+  FIXED_TRASH_ID,
+} from './commandFixtures'
+import { makeInitialRobotState } from '../../utils'
 import { tiprackWellNamesFlat } from './data'
 import type { InvariantContext, RobotState } from '../../'
-import type {
-  CommandsAndRobotState,
-  CommandCreatorErrorResponse,
-} from '../../types'
-
-/** Used to wrap command creators in tests, effectively casting their results
- **  to normal response or error response
- **/
-export const commandCreatorNoErrors = (command: any) => (commandArgs: *) => (
-  invariantContext: InvariantContext,
-  robotState: RobotState
-): CommandsAndRobotState => {
-  const result = command(commandArgs)(invariantContext, robotState)
-  if (result.errors) {
-    throw new Error('expected no errors, got ' + JSON.stringify(result.errors))
-  }
-  return result
-}
-
-export const commandCreatorHasErrors = (command: *) => (commandArgs: *) => (
-  invariantContext: InvariantContext,
-  robotState: RobotState
-): CommandCreatorErrorResponse => {
-  const result = command(commandArgs)(invariantContext, robotState)
-  if (!result.errors) {
-    throw new Error('expected errors')
-  }
-  return result
-}
-
-export const compoundCommandCreatorNoErrors = (command: *) => (
-  commandArgs: *
-) => (
-  invariantContext: InvariantContext,
-  robotState: RobotState
-): CommandsAndRobotState => {
-  const result = reduceCommandCreators(
-    command(commandArgs)(invariantContext, robotState)
-  )(invariantContext, robotState)
-  if (result.errors) {
-    throw new Error('expected no errors, got ' + JSON.stringify(result.errors))
-  }
-  return result
-}
-
-export const compoundCommandCreatorHasErrors = (command: *) => (
-  commandArgs: *
-) => (
-  invariantContext: InvariantContext,
-  robotState: RobotState
-): CommandCreatorErrorResponse => {
-  const result = reduceCommandCreators(
-    command(commandArgs)(invariantContext, robotState)
-  )(invariantContext, robotState)
-  if (!result.errors) {
-    throw new Error('expected errors')
-  }
-  return result
-}
 
 // Eg {A1: true, B1: true, ...}
 type WellTipState = { [wellName: string]: boolean }
@@ -105,23 +53,23 @@ export function getTipColumn<T>(
 // standard context fixtures to use across tests
 export function makeContext(): InvariantContext {
   const labwareEntities = {
-    trashId: {
-      id: 'trashId',
+    [FIXED_TRASH_ID]: {
+      id: FIXED_TRASH_ID,
       labwareDefURI: getLabwareDefURI(fixtureTrash),
       def: fixtureTrash,
     },
-    sourcePlateId: {
-      id: 'sourcePlateId',
+    [SOURCE_LABWARE]: {
+      id: SOURCE_LABWARE,
       labwareDefURI: getLabwareDefURI(fixture96Plate),
       def: fixture96Plate,
     },
-    destPlateId: {
-      id: 'destPlateId',
+    [DEST_LABWARE]: {
+      id: DEST_LABWARE,
       labwareDefURI: getLabwareDefURI(fixture96Plate),
       def: fixture96Plate,
     },
-    troughId: {
-      id: 'troughId',
+    [TROUGH_LABWARE]: {
+      id: TROUGH_LABWARE,
       labwareDefURI: getLabwareDefURI(fixture12Trough),
       def: fixture12Trough,
     },
@@ -157,9 +105,9 @@ export function makeContext(): InvariantContext {
       tiprackLabwareDef: fixtureTipRack10Ul,
       spec: fixtureP10Multi,
     },
-    p300SingleId: {
+    [DEFAULT_PIPETTE]: {
       name: 'p300_single',
-      id: 'p300SingleId',
+      id: DEFAULT_PIPETTE,
       tiprackDefURI: getLabwareDefURI(fixtureTipRack300Ul),
       tiprackLabwareDef: fixtureTipRack300Ul,
       spec: fixtureP300Single,

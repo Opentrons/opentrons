@@ -53,6 +53,6 @@ type ThunkDispatch = (thunk: ThunkAction) => ?Action
 
 type ThunkPromiseDispatch = (thunk: ThunkPromiseAction) => Promise<?Action>
 
-export type Epic = (action$: Observable<Action>) => Observable<ActionLike>
+export type Epic = (action$: Observable<Action>) => Observable<mixed>
 
 export type Error = { name: string, message: string }

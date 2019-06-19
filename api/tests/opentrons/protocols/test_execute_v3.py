@@ -32,10 +32,6 @@ def test_get_location():
     plate = labware.load("96-flat", 1)
     well = "B2"
 
-    default_values = {
-        'aspirateMmFromBottom': 2
-    }
-
     loaded_labware = {
         "someLabwareId": plate
     }
@@ -48,19 +44,8 @@ def test_get_location():
             "offsetFromBottomMm": offset
         }
         result = execute_v3._get_location(
-            loaded_labware, command_type, command_params, default_values)
+            loaded_labware, command_type, command_params)
         assert result == plate.well(well).bottom(offset)
-
-    command_params = {
-        "labware": "someLabwareId",
-        "well": well
-    }
-
-    # no command-specific offset, use default
-    result = execute_v3._get_location(
-        loaded_labware, command_type, command_params, default_values)
-    assert result == plate.well(well).bottom(
-        default_values['aspirateMmFromBottom'])
 
 
 def test_load_labware(get_labware_fixture):
@@ -148,6 +133,9 @@ def test_dispatch_commands(monkeypatch):
     monkeypatch.setattr(pipette, 'set_flow_rate', mock_set_flow_rate)
     monkeypatch.setattr(execute_v3, '_sleep', mock_sleep)
 
+    aspirateOffset = 12.1
+    dispenseOffset = 12.2
+
     protocol_data = {
         "defaultValues": {
             "aspirateFlowRate": {
@@ -171,7 +159,8 @@ def test_dispatch_commands(monkeypatch):
                     "labware": "sourcePlateId",
                     "well": "A1",
                     "volume": 5,
-                    "flowRate": 123
+                    "flowRate": 123,
+                    "offsetFromBottomMm": aspirateOffset
                 }
             },
             {
@@ -186,7 +175,9 @@ def test_dispatch_commands(monkeypatch):
                     "pipette": "pipetteId",
                     "labware": "destPlateId",
                     "well": "B1",
-                    "volume": 4.5
+                    "volume": 4.5,
+                    "flowRate": 3.5,
+                    "offsetFromBottomMm": dispenseOffset
                 }
             },
         ]
@@ -196,12 +187,12 @@ def test_dispatch_commands(monkeypatch):
         protocol_data, loaded_pipettes, loaded_labware)
 
     assert cmd == [
-        ("aspirate", 5, source_plate['A1']),
+        ("aspirate", 5, source_plate['A1'].bottom(aspirateOffset)),
         ("sleep", 42),
-        ("dispense", 4.5, dest_plate['B1'])
+        ("dispense", 4.5, dest_plate['B1'].bottom(dispenseOffset))
     ]
 
     assert flow_rates == [
-        (123, 102),
-        (101, 102)
+        (123, 123),
+        (3.5, 3.5)
     ]

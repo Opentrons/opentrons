@@ -83,6 +83,3 @@ export function getWellPropsForSVGLabwareV1(def: LabwareDefinition1) {
     y: _getSvgYValueForWell(def, wellDef) + yCorrection,
   }))
 }
-
-export const getLabwareDefURI = (def: LabwareDefinition2): string =>
-  `${def.namespace}/${def.parameters.loadName}/${def.version}`

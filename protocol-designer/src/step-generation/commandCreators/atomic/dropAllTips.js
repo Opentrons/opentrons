@@ -10,7 +10,7 @@ const dropAllTips = (): CommandCreator => (
   invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => {
-  const pipetteIds = Object.keys(prevRobotState.pipettes)
+  const pipetteIds: Array<string> = Object.keys(prevRobotState.pipettes)
   const commandCreators = pipetteIds.map(pipetteId => dropTip(pipetteId))
   return reduceCommandCreators(commandCreators)(
     invariantContext,

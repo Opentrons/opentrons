@@ -3,15 +3,13 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 
+import { clearMoveResponse } from '../../http-api-client'
+
 import {
-  makeGetRobotPipettes,
-  fetchPipettes,
-  clearMoveResponse,
-} from '../../http-api-client'
-
-import { fetchPipetteSettings, getPipetteSettingsState } from '../../robot-api'
-
-import { chainActions } from '../../util'
+  fetchPipetteSettings,
+  getPipettesState,
+  getPipetteSettingsState,
+} from '../../robot-api'
 
 import InstrumentInfo from './InstrumentInfo'
 import { CardContentFlex } from '../layout'
@@ -19,15 +17,15 @@ import { Card, IntervalWrapper } from '@opentrons/components'
 
 import type { State, Dispatch } from '../../types'
 import type { Robot } from '../../discovery'
-import type { Pipette } from '../../http-api-client'
+import type { Pipette } from '../../robot-api'
 
 type OP = {|
   robot: Robot,
 |}
 
 type SP = {|
-  left: ?Pipette,
-  right: ?Pipette,
+  left: Pipette | null,
+  right: Pipette | null,
   showLeftSettings: boolean,
   showRightSettings: boolean,
 |}
@@ -42,7 +40,7 @@ type Props = {| ...OP, ...SP, ...DP |}
 const TITLE = 'Pipettes'
 
 export default connect<Props, OP, SP, _, _, _>(
-  makeMapStateToProps,
+  mapStateToProps,
   mapDispatchToProps
 )(AttachedPipettesCard)
 
@@ -71,41 +69,31 @@ function AttachedPipettesCard(props: Props) {
   )
 }
 
-function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
-  const getRobotPipettes = makeGetRobotPipettes()
+function mapStateToProps(state: State, ownProps: OP): SP {
+  const { robot } = ownProps
+  const { left, right } = getPipettesState(state, robot.name)
 
-  return (state, ownProps) => {
-    const { robot } = ownProps
-    const { response } = getRobotPipettes(state, robot)
-    const { left, right } = response || { left: null, right: null }
-    const showLeftSettings =
-      left && left.id
-        ? Boolean(getPipetteSettingsState(state, robot.name, left.id))
-        : false
+  const showLeftSettings =
+    left && left.id
+      ? Boolean(getPipetteSettingsState(state, robot.name, left.id))
+      : false
 
-    const showRightSettings =
-      right && right.id
-        ? Boolean(getPipetteSettingsState(state, robot.name, right.id))
-        : false
+  const showRightSettings =
+    right && right.id
+      ? Boolean(getPipetteSettingsState(state, robot.name, right.id))
+      : false
 
-    return {
-      left,
-      right,
-      showLeftSettings,
-      showRightSettings,
-    }
+  return {
+    left,
+    right,
+    showLeftSettings,
+    showRightSettings,
   }
 }
 
 function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   return {
-    fetchPipettes: () =>
-      dispatch(
-        chainActions(
-          fetchPipettes(ownProps.robot),
-          fetchPipetteSettings(ownProps.robot)
-        )
-      ),
+    fetchPipettes: () => dispatch(fetchPipetteSettings(ownProps.robot)),
     clearMove: () => dispatch(clearMoveResponse(ownProps.robot)),
   }
 }

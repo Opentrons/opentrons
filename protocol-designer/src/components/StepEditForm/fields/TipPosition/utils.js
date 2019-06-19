@@ -15,9 +15,9 @@ import {
 // name to infer step type!
 export function getDefaultMmFromBottom(args: {
   fieldName: TipOffsetFields,
-  wellHeightMM: number,
+  wellDepthMm: number,
 }): number {
-  const { fieldName, wellHeightMM } = args
+  const { fieldName, wellDepthMm } = args
   switch (fieldName) {
     case 'aspirate_mmFromBottom':
       return DEFAULT_MM_FROM_BOTTOM_ASPIRATE
@@ -32,6 +32,6 @@ export function getDefaultMmFromBottom(args: {
         getIsTouchTipField(fieldName),
         `getDefaultMmFromBottom fn does not know what to do with field ${fieldName}`
       )
-      return DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP + wellHeightMM
+      return DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP + wellDepthMm
   }
 }

@@ -5,15 +5,15 @@ import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
 // NOTE: this is an enum type in the spec, but it's inconvenient to flow-type them.
 type PipetteName = string
 
-export type FilePipetteV3 = {
+export type FilePipette = {
   mount: Mount,
   name: PipetteName,
 }
 
-export type FileLabwareV3 = {
+export type FileLabware = {
   slot: DeckSlotId,
-  labwareDefURI: string,
-  'display-name'?: string,
+  definitionId: string,
+  displayName?: string,
 }
 
 type FlowRateParams = {| flowRate: number |}
@@ -24,30 +24,59 @@ type VolumeParams = {| volume: number |}
 
 type OffsetParams = {| offsetFromBottomMm: number |}
 
-export type CommandV3 =
+type _AspDispAirgapParams = {|
+  ...FlowRateParams,
+  ...PipetteAccessParams,
+  ...VolumeParams,
+  ...OffsetParams,
+|}
+
+export type AspirateParams = _AspDispAirgapParams
+export type DispenseParams = _AspDispAirgapParams
+export type AirGapParams = _AspDispAirgapParams
+
+export type BlowoutParams = {|
+  ...FlowRateParams,
+  ...PipetteAccessParams,
+  ...OffsetParams,
+|}
+
+export type TouchTipParams = {|
+  ...PipetteAccessParams,
+  ...OffsetParams,
+|}
+
+export type PickUpTipParams = PipetteAccessParams
+export type DropTipParams = PipetteAccessParams
+
+export type MoveToSlotParams = {|
+  pipette: string,
+  slot: string,
+  offset?: {|
+    x: number,
+    y: number,
+    z: number,
+  |},
+  minimumZHeight: number,
+|}
+
+export type DelayParams = {|
+  wait: number | true,
+  message?: string,
+|}
+
+export type Command =
   | {|
       command: 'aspirate' | 'dispense' | 'airGap',
-      params: {|
-        ...FlowRateParams,
-        ...PipetteAccessParams,
-        ...VolumeParams,
-        ...OffsetParams,
-      |},
+      params: _AspDispAirgapParams,
     |}
   | {|
       command: 'blowout',
-      params: {|
-        ...FlowRateParams,
-        ...PipetteAccessParams,
-        ...OffsetParams,
-      |},
+      params: BlowoutParams,
     |}
   | {|
       command: 'touchTip',
-      params: {|
-        ...PipetteAccessParams,
-        ...OffsetParams,
-      |},
+      params: TouchTipParams,
     |}
   | {|
       command: 'pickUpTip' | 'dropTip',
@@ -55,27 +84,15 @@ export type CommandV3 =
     |}
   | {|
       command: 'moveToSlot',
-      params: {|
-        pipette: string,
-        slot: string,
-        offset?: {|
-          x: number,
-          y: number,
-          z: number,
-        |},
-        minimumZHeight: number,
-      |},
+      params: MoveToSlotParams,
     |}
   | {|
       command: 'delay',
-      params: {|
-        wait: number | true,
-        message?: string,
-      |},
+      params: DelayParams,
     |}
 
 // NOTE: must be kept in sync with '../schemas/3.json'
-export type SchemaV3ProtocolFile<DesignerApplicationData> = {|
+export type ProtocolFile<DesignerApplicationData> = {|
   schemaVersion: 3,
   metadata: {
     protocolName?: string,
@@ -96,7 +113,7 @@ export type SchemaV3ProtocolFile<DesignerApplicationData> = {|
     model: 'OT-2 Standard',
   },
   pipettes: {
-    [pipetteId: string]: FilePipetteV3,
+    [pipetteId: string]: FilePipette,
   },
   labwareDefinitions: {
     [labwareDefId: string]: LabwareDefinition2,
@@ -108,6 +125,6 @@ export type SchemaV3ProtocolFile<DesignerApplicationData> = {|
       displayName?: string,
     },
   },
-  commands: Array<CommandV3>,
+  commands: Array<Command>,
   commandAnnotations?: Object, // NOTE: intentionally underspecified b/c we haven't decided on this yet
 |}

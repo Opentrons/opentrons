@@ -19,6 +19,7 @@ import {
   repeatArray,
   makeInitialRobotState,
 } from '../utils'
+import { FIXED_TRASH_ID } from './fixtures'
 import type { InvariantContext } from '../types'
 
 let invariantContext
@@ -440,7 +441,7 @@ describe('makeInitialRobotState', () => {
             def: fixtureTipRack300Ul,
           },
           trashId: {
-            id: 'trashId',
+            id: FIXED_TRASH_ID,
             labwareDefURI: getLabwareDefURI(fixtureTrash),
             def: fixtureTrash,
           },

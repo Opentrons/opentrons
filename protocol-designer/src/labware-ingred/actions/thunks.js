@@ -1,46 +1,22 @@
 // @flow
 import assert from 'assert'
 import { uuid } from '../../utils'
-import { selectors as labwareIngredsSelectors } from '../selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import { selectors as uiLabwareSelectors } from '../../ui/labware'
 import type {
   CreateContainerArgs,
   CreateContainerAction,
   DuplicateLabwareAction,
 } from './actions'
-import type { BaseState, GetState, ThunkDispatch } from '../../types'
+import type { GetState, ThunkDispatch } from '../../types'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
-import { getNextAvailableSlot } from '../utils'
-
-function getNextDisambiguationNumber(
-  state: BaseState,
-  newLabwareType: string
-): number {
-  const labwareEntities = stepFormSelectors.getLabwareEntities(state)
-  const labwareNamesMap = labwareIngredsSelectors.getLabwareNameInfo(state)
-  const allIds = Object.keys(labwareEntities)
-  const sameTypeLabware = allIds.filter(
-    labwareId => labwareEntities.type === newLabwareType
-  )
-  const disambigNumbers = sameTypeLabware.map(
-    labwareId =>
-      (labwareNamesMap[labwareId] &&
-        labwareNamesMap[labwareId].disambiguationNumber) ||
-      0
-  )
-
-  return disambigNumbers.length > 0 ? Math.max(...disambigNumbers) + 1 : 1
-}
+import { getNextAvailableSlot, getNextNickname } from '../utils'
 
 export const createContainer = (args: CreateContainerArgs) => (
   dispatch: ThunkDispatch<CreateContainerAction>,
   getState: GetState
 ) => {
   const state = getState()
-  const disambiguationNumber = getNextDisambiguationNumber(
-    state,
-    args.labwareDefURI
-  )
   const initialSetupStep = stepFormSelectors.getSavedStepForms(state)[
     INITIAL_DECK_SETUP_STEP_ID
   ]
@@ -54,7 +30,6 @@ export const createContainer = (args: CreateContainerArgs) => (
       payload: {
         ...args,
         id: `${uuid()}:${args.labwareDefURI}`,
-        disambiguationNumber,
         slot,
       },
     })
@@ -86,18 +61,54 @@ export const duplicateLabware = (templateLabwareId: string) => (
   if (!duplicateSlot)
     console.warn('no slots available, cannot duplicate labware')
 
+  const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
+  const templateNickname = allNicknamesById[templateLabwareId]
+  const duplicateLabwareNickname = getNextNickname(
+    Object.keys(allNicknamesById).map((id: string) => allNicknamesById[id]), // NOTE: flow won't do Object.values here >:(
+    templateNickname
+  )
+
   if (templateLabwareDefURI && duplicateSlot) {
     dispatch({
       type: 'DUPLICATE_LABWARE',
       payload: {
-        duplicateDisambiguationNumber: getNextDisambiguationNumber(
-          state,
-          templateLabwareDefURI
-        ),
+        duplicateLabwareNickname,
         templateLabwareId,
         duplicateLabwareId: uuid(),
         slot: duplicateSlot,
       },
     })
   }
+}
+
+export type RenameLabwareAction = {
+  type: 'RENAME_LABWARE',
+  payload: {
+    labwareId: string,
+    name?: ?string,
+  },
+}
+
+export const renameLabware = (
+  args: $PropertyType<RenameLabwareAction, 'payload'>
+) => (dispatch: ThunkDispatch<RenameLabwareAction>, getState: GetState) => {
+  const { labwareId } = args
+  const state = getState()
+
+  const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
+  const defaultNickname = allNicknamesById[labwareId]
+  const nextNickname = getNextNickname(
+    Object.keys(allNicknamesById)
+      .filter((id: string) => id !== labwareId)
+      .map((id: string) => allNicknamesById[id]), // NOTE: flow won't do Object.values here >:(
+    args.name || defaultNickname
+  )
+
+  return dispatch({
+    type: 'RENAME_LABWARE',
+    payload: {
+      labwareId,
+      name: nextNickname,
+    },
+  })
 }

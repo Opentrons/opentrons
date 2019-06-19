@@ -1,26 +1,39 @@
 // @flow
 import { AIR, createTipLiquidState } from '../utils'
-import { makeContext, getInitialRobotStateStandard } from './fixtures'
+import {
+  makeContext,
+  getInitialRobotStateStandard,
+  DEFAULT_PIPETTE,
+  SOURCE_LABWARE,
+  TROUGH_LABWARE,
+} from './fixtures'
 
 import forAspirateDispense from '../getNextRobotStateAndWarnings/forAspirateDispense'
 import * as warningCreators from '../warningCreators'
 
 let invariantContext
 let initialRobotState
+let flowRatesAndOffsets
+
 beforeEach(() => {
   invariantContext = makeContext()
   initialRobotState = getInitialRobotStateStandard(invariantContext)
+  flowRatesAndOffsets = {
+    flowRate: 1.23,
+    offsetFromBottomMm: 4.32,
+  }
 })
 
 describe('...single-channel pipette', () => {
   let aspirateSingleCh50FromA1Args
-  const labwareId = 'troughId'
+  const labwareId = TROUGH_LABWARE
 
   beforeEach(() => {
     // NOTE: aspirate from TROUGH not sourcePlate
     aspirateSingleCh50FromA1Args = {
+      ...flowRatesAndOffsets,
       labware: labwareId,
-      pipette: 'p300SingleId',
+      pipette: DEFAULT_PIPETTE,
       volume: 50,
       well: 'A1',
     }
@@ -200,10 +213,11 @@ describe('...single-channel pipette', () => {
 
 describe('...8-channel pipette', () => {
   let aspirate8Ch50FromA1Args
-  const labwareId = 'sourcePlateId'
+  const labwareId = SOURCE_LABWARE
 
   beforeEach(() => {
     aspirate8Ch50FromA1Args = {
+      ...flowRatesAndOffsets,
       labware: labwareId,
       pipette: 'p300MultiId',
       volume: 50,
@@ -300,7 +314,7 @@ describe('...8-channel pipette', () => {
 })
 
 describe('8-channel trough', () => {
-  const labwareId = 'troughId'
+  const labwareId = TROUGH_LABWARE
   const troughCases = [
     {
       testName: '20uLx8 from 300uL trough well',
@@ -346,6 +360,7 @@ describe('8-channel trough', () => {
         }
 
         const args = {
+          ...flowRatesAndOffsets,
           pipette: 'p300MultiId',
           well: 'A1',
           labware: labwareId,

@@ -27,7 +27,7 @@ import type {
   ConsolidateArgs,
   DistributeArgs,
   MixArgs,
-  DelayArgs,
+  PauseArgs,
   TransferArgs,
 } from '../step-generation/types'
 
@@ -287,7 +287,7 @@ export function generateSubsteps(
 
   if (stepArgs.commandCreatorFnName === 'delay') {
     // just returns formData
-    const formData: DelayArgs = stepArgs
+    const formData: PauseArgs = stepArgs
     return formData
   }
 

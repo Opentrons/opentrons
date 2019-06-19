@@ -8,8 +8,7 @@ import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import type { ElementProps } from 'react'
-import type { Dispatch } from 'redux'
-import type { BaseState } from '../../../types'
+import type { BaseState, ThunkDispatch } from '../../../types'
 
 type Props = ElementProps<typeof LabwareDetailsCard>
 
@@ -47,7 +46,7 @@ function mapStateToProps(state: BaseState): SP {
 
 function mergeProps(
   stateProps: SP,
-  dispatchProps: { dispatch: Dispatch<*> }
+  dispatchProps: { dispatch: ThunkDispatch<*> }
 ): Props {
   const dispatch = dispatchProps.dispatch
   const { _labwareId, ...passThruProps } = stateProps

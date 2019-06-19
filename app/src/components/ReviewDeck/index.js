@@ -11,9 +11,9 @@ import {
   type Labware,
 } from '../../robot'
 
-import { Modal } from '../modals'
+import DeckMap from '../DeckMap'
 import Prompt from './Prompt'
-import ReviewDeck from './ReviewDeck'
+import styles from './styles.css'
 
 type OP = {| slot: ?string |}
 
@@ -27,16 +27,18 @@ export default connect<Props, OP, SP, {||}, State, Dispatch>(
   mapStateToProps,
   null,
   mergeProps
-)(ReviewDeckModal)
+)(ReviewDeck)
 
-function ReviewDeckModal(props: Props) {
+function ReviewDeck(props: Props) {
   const { currentLabware, onClick } = props
 
   return (
-    <Modal>
+    <div className={styles.page_content_dark}>
       {currentLabware && <Prompt {...currentLabware} onClick={onClick} />}
-      <ReviewDeck />
-    </Modal>
+      <div className={styles.deck_map_wrapper}>
+        <DeckMap className={styles.deck_map} />
+      </div>
+    </div>
   )
 }
 

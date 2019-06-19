@@ -40,7 +40,7 @@ const replaceTip = (pipetteId: string): CommandCreator => (
     ...dropTipResult.commands,
     // pick up tip command
     {
-      command: 'pick-up-tip',
+      command: 'pickUpTip',
       params: {
         pipette: pipetteId,
         labware: nextTiprack.tiprackId,

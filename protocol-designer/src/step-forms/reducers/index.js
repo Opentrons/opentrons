@@ -34,9 +34,9 @@ import type {
 } from '../../labware-ingred/actions'
 import type { FormData, StepIdType } from '../../form-types'
 import type {
-  FileLabwareV1 as FileLabware,
-  FilePipetteV1 as FilePipette,
-} from '@opentrons/shared-data'
+  FileLabware,
+  FilePipette,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 
 import type {
   AddStepAction,
@@ -56,7 +56,7 @@ import type {
   DeletePipettesAction,
   SubstituteStepFormPipettesAction,
 } from '../actions'
-import { getIdsInRange, getLabwareIdInSlot, pipetteModelToName } from '../utils'
+import { getIdsInRange, getLabwareIdInSlot } from '../utils'
 
 type FormState = FormData | null
 
@@ -437,7 +437,7 @@ export const labwareInvariantProperties = handleActions<
       return mapValues(
         file.labware,
         (fileLabware: FileLabware, id: string) => ({
-          type: fileLabware.model,
+          labwareDefURI: fileLabware.definitionId,
         })
       )
     },
@@ -471,7 +471,7 @@ export const pipetteInvariantProperties = handleActions<
           )
           return {
             id: pipetteId,
-            name: filePipette.name || pipetteModelToName(filePipette.model),
+            name: filePipette.name,
             tiprackDefURI,
           }
         }

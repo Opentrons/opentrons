@@ -5,8 +5,7 @@ import cx from 'classnames'
 import { getModuleDisplayName, type ModuleType } from '@opentrons/shared-data'
 
 import { Icon } from '../icons'
-import LabwareWrapper from './LabwareWrapper'
-import { CenteredTextSvg } from '../CenteredTextSvg'
+import RobotCoordsForeignDiv from './RobotCoordsForeignDiv'
 import styles from './Module.css'
 
 export type Props = {
@@ -16,26 +15,23 @@ export type Props = {
   mode: 'default' | 'present' | 'missing' | 'info',
 }
 
-const DIMENSIONS = {
-  x: -28.3,
-  y: -2.5,
-  width: 158.6,
-  height: 90.5,
-}
+const x = -28.3
+const y = 2
+const width = 158.6
+const height = 90.5
 
 export default function Module(props: Props) {
   return (
-    <LabwareWrapper {...DIMENSIONS}>
-      <rect
-        className={styles.module}
-        rx="6"
-        ry="6"
-        width="100%"
-        height="100%"
-        fill="#000"
-      />
+    <RobotCoordsForeignDiv
+      width={width}
+      height={height}
+      x={x}
+      y={y - height}
+      transformWithSVG
+      innerDivProps={{ className: styles.module }}
+    >
       <ModuleItemContents {...props} />
-    </LabwareWrapper>
+    </RobotCoordsForeignDiv>
   )
 }
 
@@ -44,25 +40,14 @@ function ModuleItemContents(props: Props) {
   const { mode, name } = props
   const displayName = getModuleDisplayName(name)
 
-  if (!mode || mode === 'default') {
-    // generic/empty display - just show USB icon
-    return (
-      <Icon className={styles.module_icon} x="8" y="20" width="16" name="usb" />
-    )
-  }
-
   const message =
     mode === 'missing' ? (
-      <React.Fragment>
-        <tspan x="55%" dy="-6">
-          Missing:
-        </tspan>
-        <tspan x="55%" dy="12">
-          {displayName}
-        </tspan>
-      </React.Fragment>
+      <>
+        <p className={styles.module_review_text}>Missing:</p>
+        <p className={styles.module_review_text}>{displayName}</p>
+      </>
     ) : (
-      <tspan x="55%">{displayName}</tspan>
+      <p className={styles.module_review_text}>{displayName}</p>
     )
 
   const iconClassName = cx(styles.module_review_icon, {
@@ -74,6 +59,7 @@ function ModuleItemContents(props: Props) {
     missing: 'alert-circle',
     present: 'check-circle',
     info: 'usb',
+    default: 'usb',
   }
 
   return (
@@ -83,9 +69,9 @@ function ModuleItemContents(props: Props) {
         x="8"
         y="0"
         width="16"
-        name={iconNameByMode[mode]}
+        name={iconNameByMode[mode] || 'usb'}
       />
-      <CenteredTextSvg className={styles.module_review_text} text={message} />
+      <div className={styles.module_text_wrapper}>{message}</div>
     </React.Fragment>
   )
 }

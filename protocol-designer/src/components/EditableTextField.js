@@ -24,7 +24,8 @@ export default class EditableTextField extends React.Component<Props, State> {
     }
   }
 
-  enterEditMode = () => this.setState({ editing: true })
+  enterEditMode = () =>
+    this.setState({ editing: true, transientValue: this.props.value })
 
   handleCancel = () => {
     this.setState({

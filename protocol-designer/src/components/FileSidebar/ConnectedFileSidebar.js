@@ -33,7 +33,7 @@ export default connect<Props, {||}, SP, {||}, _, _>(
 
 function mapStateToProps(state: BaseState): SP {
   const protocolName =
-    fileDataSelectors.getFileMetadata(state)['protocol-name'] || 'untitled'
+    fileDataSelectors.getFileMetadata(state).protocolName || 'untitled'
   const fileData = fileDataSelectors.createFile(state)
   const canDownload = selectors.getCurrentPage(state) !== 'file-splash'
 

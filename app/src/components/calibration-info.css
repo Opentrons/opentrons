@@ -24,6 +24,10 @@
 
   text-transform: uppercase;
   padding-left: 1rem;
+  max-width: 48%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .info_wrapper {

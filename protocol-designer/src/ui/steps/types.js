@@ -1,5 +1,5 @@
 // @flow
-import type { DelayArgs } from '../../step-generation'
+import type { PauseArgs } from '../../step-generation'
 import type { StepIdType } from '../../form-types'
 import type {
   WellIngredientVolumeData,
@@ -56,6 +56,6 @@ export type SourceDestSubstepItem =
   | SourceDestSubstepItemSingleChannel
   | SourceDestSubstepItemMultiChannel
 
-export type SubstepItemData = SourceDestSubstepItem | DelayArgs // Pause substep uses same data as processed form
+export type SubstepItemData = SourceDestSubstepItem | PauseArgs // Pause substep uses same data as processed form
 
 export type SubSteps = { [StepIdType]: ?SubstepItemData }

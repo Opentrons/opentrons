@@ -35,6 +35,7 @@ export default function getDefaultsForStepType(
         path: 'single',
         aspirate_wells_grouped: false,
 
+        aspirate_flowRate: null,
         aspirate_labware: null,
         aspirate_wells: [],
         aspirate_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,
@@ -45,6 +46,7 @@ export default function getDefaultsForStepType(
         aspirate_mmFromBottom: DEFAULT_MM_FROM_BOTTOM_ASPIRATE,
         aspirate_touchTip_checkbox: false,
 
+        dispense_flowRate: null,
         dispense_labware: null,
         dispense_wells: [],
         dispense_wellOrder_first: DEFAULT_WELL_ORDER_FIRST_OPTION,

@@ -9,14 +9,46 @@ import InstructionStep from './InstructionStep'
 import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
+import type { RobotApiRequestState } from '../../robot-api'
 import type { ChangePipetteProps } from './types'
 
 const ATTACH_CONFIRM = 'have robot check connection'
 const DETACH_CONFIRM = 'confirm pipette is detached'
 
 export default function Instructions(props: ChangePipetteProps) {
-  const { wantedPipette, actualPipette, direction, displayName } = props
+  const {
+    wantedPipette,
+    actualPipette,
+    checkRequest,
+    direction,
+    displayName,
+    goToConfirmUrl,
+  } = props
 
+  // useRef rather than useState because this does not affect the render
+  const checking = React.useRef(false)
+  const prevCheckRequest = React.useRef<RobotApiRequestState | null>(null)
+
+  // TODO(mc, 2019-05-15): figure out how to extract to "do something when
+  // request resolves" hook or something
+  React.useEffect(() => {
+    const prevResponse = prevCheckRequest.current?.response
+    const nextResponse = checkRequest?.response
+
+    if (
+      checking.current &&
+      prevCheckRequest.current &&
+      !prevResponse &&
+      nextResponse
+    ) {
+      checking.current = false
+      goToConfirmUrl()
+    }
+
+    prevCheckRequest.current = checkRequest
+  }, [checkRequest, goToConfirmUrl])
+
+  const heading = `${capitalize(direction)} ${displayName} Pipette`
   const titleBar = {
     ...props,
     back: wantedPipette
@@ -24,7 +56,10 @@ export default function Instructions(props: ChangePipetteProps) {
       : { Component: Link, to: props.exitUrl, children: 'exit' },
   }
 
-  const heading = `${capitalize(direction)} ${displayName} Pipette`
+  const checkPipette = () => {
+    props.checkPipette()
+    checking.current = true
+  }
 
   return (
     <ModalPage
@@ -42,7 +77,7 @@ export default function Instructions(props: ChangePipetteProps) {
       {(actualPipette || wantedPipette) && (
         <div>
           <Steps {...props} />
-          <CheckButton onClick={props.confirmPipette}>
+          <CheckButton onClick={checkPipette}>
             {actualPipette ? DETACH_CONFIRM : ATTACH_CONFIRM}
           </CheckButton>
         </div>

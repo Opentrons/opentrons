@@ -20,7 +20,9 @@ export default function CalibrationInfoBox(props: Props) {
     <section className={classnames(styles.info_box, className)}>
       <div className={styles.info_header}>
         <Icon name={iconName} className={styles.info_header_icon} />
-        <h2 className={styles.info_header_title}>{title}</h2>
+        <h2 className={styles.info_header_title} title={title}>
+          {title}
+        </h2>
       </div>
       {children}
     </section>

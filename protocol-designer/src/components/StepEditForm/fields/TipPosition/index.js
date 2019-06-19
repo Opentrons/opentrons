@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { HoverTooltip, FormGroup, InputField } from '@opentrons/components'
+import { getWellsDepth } from '@opentrons/shared-data'
 import i18n from '../../../../localization'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { getDisabledFields } from '../../../../steplist/formLevel'
@@ -32,7 +33,7 @@ type OP = {| fieldName: TipOffsetFields, className?: string |}
 type SP = {|
   disabled: boolean,
   mmFromBottom: ?string,
-  wellHeightMM: ?number,
+  wellDepthMm: ?number,
 |}
 
 type Props = { ...OP, ...SP }
@@ -43,7 +44,7 @@ class TipPositionInput extends React.Component<Props, TipPositionInputState> {
   state: TipPositionInputState = { isModalOpen: false }
 
   handleOpen = () => {
-    if (this.props.wellHeightMM) {
+    if (this.props.wellDepthMm) {
       this.setState({ isModalOpen: true })
     }
   }
@@ -52,7 +53,7 @@ class TipPositionInput extends React.Component<Props, TipPositionInputState> {
   }
 
   render() {
-    const { disabled, fieldName, mmFromBottom, wellHeightMM } = this.props
+    const { disabled, fieldName, mmFromBottom, wellDepthMm } = this.props
     const isTouchTipField = getIsTouchTipField(this.props.fieldName)
 
     const Wrapper = ({ children, hoverTooltipHandlers }) =>
@@ -70,12 +71,12 @@ class TipPositionInput extends React.Component<Props, TipPositionInputState> {
       )
 
     let value = ''
-    if (wellHeightMM != null) {
+    if (wellDepthMm != null) {
       // show default value for field in parens if no mmFromBottom value is selected
       value =
         mmFromBottom != null
           ? mmFromBottom
-          : getDefaultMmFromBottom({ fieldName, wellHeightMM })
+          : getDefaultMmFromBottom({ fieldName, wellDepthMm })
     }
 
     return (
@@ -87,7 +88,7 @@ class TipPositionInput extends React.Component<Props, TipPositionInputState> {
             <TipPositionModal
               fieldName={fieldName}
               closeModal={this.handleClose}
-              wellHeightMM={wellHeightMM}
+              wellDepthMm={wellDepthMm}
               // $FlowFixMe: mmFromBottom is typed as a number in TipPositionModal
               mmFromBottom={mmFromBottom}
               isOpen={this.state.isModalOpen}
@@ -113,7 +114,7 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
     ownProps.fieldName
   )
 
-  let wellHeightMM = null
+  let wellDepthMm = null
   const labwareId: ?string = rawForm && rawForm[labwareFieldName]
   if (labwareId != null) {
     const labwareDef = stepFormSelectors.getLabwareEntities(state)[labwareId]
@@ -121,12 +122,12 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
 
     // NOTE: only taking depth of first well in labware def, UI not currently equipped for multiple depths
     const firstWell = labwareDef.wells['A1']
-    if (firstWell) wellHeightMM = firstWell.depth
+    if (firstWell) wellDepthMm = getWellsDepth(labwareDef, ['A1'])
   }
 
   return {
     disabled: rawForm ? getDisabledFields(rawForm).has(fieldName) : false,
-    wellHeightMM,
+    wellDepthMm,
     mmFromBottom: rawForm && rawForm[fieldName],
   }
 }
