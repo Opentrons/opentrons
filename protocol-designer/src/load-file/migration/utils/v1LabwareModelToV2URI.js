@@ -2,7 +2,7 @@
 import assert from 'assert'
 
 // TODO IMMEDIATELY review and confirm all mappings
-const modelToURIMap = {
+const v1ModelTov2LoadNameMap = {
   '6-well-plate': 'corning_6_wellplate_16.8ml_flat',
   '12-well-plate': 'corning_12_wellplate_6.9ml_flat',
   '24-well-plate': 'corning_24_wellplate_3.4ml_flat',
@@ -48,7 +48,7 @@ const modelToURIMap = {
 // trash-box
 
 export default function v1LabwareModelToV2URI(model: string): string {
-  const uri = `opentrons/${modelToURIMap[model]}/1`
+  const uri = `opentrons/${v1ModelTov2LoadNameMap[model]}/1`
   assert(uri, `expected a v2 URI for v1 labware model "${model}"`)
   return uri
 }
