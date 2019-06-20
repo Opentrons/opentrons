@@ -2,7 +2,8 @@
   "ordering": [["A1"]],
   "brand": {
     "brand": "Agilent",
-    "brandId": ["201252-100"]
+    "brandId": ["201252-100"],
+    "links": ["https://www.agilent.com/store/en_US/Prod-201252-100/201252-100"]
   },
   "metadata": {
     "displayName": "Agilent 1 Well Reservoir 290 mL",

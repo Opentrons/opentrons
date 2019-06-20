@@ -2,7 +2,10 @@
   "ordering": [["A1"]],
   "brand": {
     "brand": "Axygen",
-    "brandId": ["RES-SW1-LP"]
+    "brandId": ["RES-SW1-LP"],
+    "links": [
+      "https://ecatalog.corning.com/life-sciences/b2c/US/en/Genomics-%26-Molecular-Biology/Automation-Consumables/Automation-Reservoirs/Axygen%C2%AE-Reagent-Reservoirs/p/RES-SW1-LP?clear=true"
+    ]
   },
   "metadata": {
     "displayName": "Axygen 1 Well Reservoir 90 mL",
@@ -36,7 +39,7 @@
     {
       "wells": ["A1"],
       "metadata": {
-          "wellBottomShape": "v"
+        "wellBottomShape": "v"
       }
     }
   ],

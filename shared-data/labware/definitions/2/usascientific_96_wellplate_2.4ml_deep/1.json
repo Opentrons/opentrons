@@ -15,10 +15,13 @@
   ],
   "brand": {
     "brand": "USA Scientific",
-    "brandId": ["1896-2000"]
+    "brandId": ["1896-2000"],
+    "links": [
+      "https://www.usascientific.com/2ml-deep96-well-plateone-bulk.aspx"
+    ]
   },
   "metadata": {
-    "displayName": "USA Scientific 96 Well Plate 2.4 mL",
+    "displayName": "USA Scientific 96 Deep Well Plate 2.4 mL",
     "displayCategory": "wellPlate",
     "displayVolumeUnits": "mL",
     "tags": []
