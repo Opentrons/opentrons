@@ -994,7 +994,7 @@
         "units": "mm/s",
         "type": "float"
       },
-      "modelOffset": [0.0, 0.0, 6.05],
+      "modelOffset": [0.0, 0.0, -14.55],
       "plungerCurrent": {
         "value": 1.0,
         "min": 0.01,
@@ -2378,7 +2378,7 @@
         "units": "mm/s",
         "type": "float"
       },
-      "modelOffset": [0.0, 0.0, 12.95],
+      "modelOffset": [0.0, 0.0, 4.45],
       "ulPerMm": [
         {
           "aspirate": [
@@ -3359,7 +3359,7 @@
         "units": "mm/s",
         "type": "float"
       },
-      "modelOffset": [0.0, 0.0, 33.64],
+      "modelOffset": [0.0, 0.0, 25.14],
       "ulPerMm": [
         {
           "aspirate": [
