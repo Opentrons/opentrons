@@ -16,16 +16,16 @@ export function buildrootUpdateReducer(state: ?BuildrootUpdateInfo) {
   return state
 }
 
-export function getBuildrootUpdateFilename(state: State): string {
-  return state.shell.buildrootUpdate.filename
+export function getBuildrootUpdateFilename(state: State): ?string {
+  return state.shell.buildroot?.filename || null
 }
 
-export function getBuildrootApiUpdateVersion(state: State): string {
-  return state.shell.buildrootUpdate.apiVersion
+export function getBuildrootApiUpdateVersion(state: State): ?string {
+  return state.shell.buildroot?.apiVersion || null
 }
 
-export function getBuildrootServerUpdateVersion(state: State): string {
-  return state.shell.buildrootUpdate.serverVersion
+export function getBuildrootServerUpdateVersion(state: State): ?string {
+  return state.shell.buildroot?.serverVersion || null
 }
 
 // caution: this calls an Electron RPC remote, so use sparingly
