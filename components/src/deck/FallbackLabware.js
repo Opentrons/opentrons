@@ -5,10 +5,11 @@ import LabwareOutline from './LabwareOutline'
 import styles from './Labware.css'
 import RobotCoordsForeignDiv from './RobotCoordsForeignDiv'
 
+// TODO: BC 2019-06-18 remove when old Labware component is no longer used anywhere
 export default function FallbackLabware() {
   return (
     <g>
-      <LabwareOutline />
+      <LabwareOutline width={SLOT_RENDER_WIDTH} height={SLOT_RENDER_HEIGHT} />
       <RobotCoordsForeignDiv
         width={SLOT_RENDER_WIDTH}
         height={SLOT_RENDER_HEIGHT}

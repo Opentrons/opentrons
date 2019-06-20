@@ -47,7 +47,7 @@
   }
 
   &.slot_ridges {
-    fill: var(--c-plate-bg);
+    fill: var(--c-lightest-gray);
     fill-rule: evenodd;
     stroke: none;
   }

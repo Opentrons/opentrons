@@ -35,8 +35,8 @@ const LabwareControls = (props: Props) => {
       key={slot.id}
       x={slot.position[0]}
       y={slot.position[1]}
-      width={slot.boundingBox.xDimension}
-      height={slot.boundingBox.yDimension}
+      width={labwareOnDeck.def.dimensions.xDimension}
+      height={labwareOnDeck.def.dimensions.yDimension}
       innerDivProps={{
         className: cx(styles.labware_controls, {
           [styles.can_edit]: canEdit,
