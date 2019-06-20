@@ -30,6 +30,7 @@ export type ChangePipetteProps = {
   robot: Robot,
   back: () => mixed,
   exit: () => mixed,
+  setWantedName: (name: string | null) => mixed,
   moveToFront: () => mixed,
   onPipetteSelect: $PropertyType<PipetteSelectionProps, 'onChange'>,
   checkPipette: () => mixed,

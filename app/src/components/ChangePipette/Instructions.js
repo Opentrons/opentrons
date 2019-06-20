@@ -4,7 +4,10 @@ import { Link } from 'react-router-dom'
 import capitalize from 'lodash/capitalize'
 
 import { ModalPage, PrimaryButton } from '@opentrons/components'
-import { fetchPipettes, useDispatchRobotApiAction } from '../../robot-api'
+import {
+  getPipettesRequestState,
+  useTriggerRobotApiAction,
+} from '../../robot-api'
 import PipetteSelection from './PipetteSelection'
 import InstructionStep from './InstructionStep'
 import styles from './styles.css'
@@ -20,22 +23,24 @@ export default function Instructions(props: ChangePipetteProps) {
     robot,
     wantedPipette,
     actualPipette,
+    setWantedName,
     direction,
     displayName,
     goToConfirmUrl,
   } = props
 
   // TODO(mc, 2019-06-19): move this up when parent uses hooks
-  const checkPipette = useDispatchRobotApiAction(
-    fetchPipettes(robot, true),
-    goToConfirmUrl
+  const checkPipette = useTriggerRobotApiAction(
+    props.checkPipette,
+    state => getPipettesRequestState(state, robot.name),
+    { onFinish: goToConfirmUrl }
   )
 
   const heading = `${capitalize(direction)} ${displayName} Pipette`
   const titleBar = {
     ...props,
     back: wantedPipette
-      ? { onClick: props.back }
+      ? { onClick: () => setWantedName(null) }
       : { Component: Link, to: props.exitUrl, children: 'exit' },
   }
 

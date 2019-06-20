@@ -51,7 +51,7 @@ type OP = {|
   mount: Mount,
   robot: Robot,
   wantedPipette: ?PipetteNameSpecs,
-  setWantedName: (name: string) => mixed,
+  setWantedName: (name: string | null) => mixed,
   baseUrl: string,
   confirmUrl: string,
   exitUrl: string,
