@@ -1,5 +1,6 @@
 // @flow
-import assert from 'assert'
+import { getOnlyLatestDefs } from '../../../labware-defs'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 // TODO IMMEDIATELY review and confirm all mappings
 const v1ModelTov2LoadNameMap = {
@@ -47,8 +48,24 @@ const v1ModelTov2LoadNameMap = {
 // PCR-strip-tall
 // trash-box
 
-export default function v1LabwareModelToV2URI(model: string): string {
-  const uri = `opentrons/${v1ModelTov2LoadNameMap[model]}/1`
-  assert(uri, `expected a v2 URI for v1 labware model "${model}"`)
-  return uri
+export default function v1LabwareModelToV2Def(
+  model: string
+): LabwareDefinition2 {
+  const loadName: ?string = v1ModelTov2LoadNameMap[model]
+  if (!loadName) {
+    throw new Error(`expected a v2 loadName for v1 labware model "${model}"`)
+  }
+
+  const latestDefs = getOnlyLatestDefs()
+  const uri: ?string = Object.keys(latestDefs).find(
+    defURI => latestDefs[defURI].parameters.loadName === loadName
+  )
+
+  if (!uri) {
+    throw new Error(`expected a v2 loadName for v1 labware model "${model}"`)
+  }
+
+  const def = latestDefs[uri]
+
+  return def
 }

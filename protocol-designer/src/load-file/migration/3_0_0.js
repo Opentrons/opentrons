@@ -1,10 +1,10 @@
 // @flow
-import assert from 'assert'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
+import reduce from 'lodash/reduce'
 import uniq from 'lodash/uniq'
-import { getAllDefinitions } from '../../labware-defs/utils'
-import v1LabwareModelToV2URI from './utils/v1LabwareModelToV2URI'
+import v1LabwareModelToV2Def from './utils/v1LabwareModelToV2Def'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import type {
   ProtocolFile,
   FileLabware,
@@ -58,7 +58,7 @@ function migrateLabware(
     const nextLabware: FileLabware = {
       slot: oldLabware.slot,
       displayName: oldLabware['display-name'],
-      definitionId: v1LabwareModelToV2URI(oldLabware.model),
+      definitionId: getLabwareDefURI(v1LabwareModelToV2Def(oldLabware.model)),
     }
     return { ...acc, [labwareId]: nextLabware }
   }, {})
@@ -71,12 +71,15 @@ function getLabwareDefinitions(
   const allLabwareModels = uniq(
     Object.keys(labware).map((labwareId: string) => labware[labwareId].model)
   )
-  const allLabwareURIs = allLabwareModels.map(v1LabwareModelToV2URI)
-  return allLabwareURIs.reduce<LabwareDefinitions>((acc, uri: string) => {
-    const labwareDef = getAllDefinitions()[uri]
-    assert(labwareDef, `could not find labware def for ${uri}`)
-    return { ...acc, [uri]: labwareDef }
-  }, {})
+  const allLabwareDefs = allLabwareModels.map(v1LabwareModelToV2Def)
+  return reduce(
+    allLabwareDefs,
+    (acc, def): LabwareDefinitions => ({
+      ...acc,
+      [getLabwareDefURI(def)]: def,
+    }),
+    {}
+  )
 }
 
 function migrateAppData(appData: PDMetadata): PDMetadata {
@@ -85,7 +88,7 @@ function migrateAppData(appData: PDMetadata): PDMetadata {
     ...appData,
     pipetteTiprackAssignments: mapValues(
       appData.pipetteTiprackAssignments,
-      model => v1LabwareModelToV2URI(model)
+      (model: string): string => getLabwareDefURI(v1LabwareModelToV2Def(model))
     ),
   }
 }
