@@ -1,6 +1,6 @@
 // @flow
-import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture96Plate.json'
-import fixtureTrash from '@opentrons/shared-data/labware/fixtures/2/fixtureTrash.json'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
 import dependentFieldsUpdateMix from '../dependentFieldsUpdateMix'
 import { DEFAULT_MM_FROM_BOTTOM_DISPENSE } from '../../../../constants'
 
@@ -22,8 +22,8 @@ beforeEach(() => {
     },
   }
   labwareEntities = {
-    trashId: { type: 'trash-box', def: fixtureTrash },
-    plateId: { type: '96-flat', def: fixture96Plate },
+    trashId: { type: 'trash-box', def: fixture_trash },
+    plateId: { type: '96-flat', def: fixture_96_plate },
   }
   handleFormHelper = (patch, baseForm) =>
     dependentFieldsUpdateMix(patch, baseForm, pipetteEntities, labwareEntities)

@@ -5,16 +5,16 @@ import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
 // NOTE: this is an enum type in the spec, but it's inconvenient to flow-type them.
 type PipetteName = string
 
-export type FilePipette = {
+export type FilePipette = {|
   mount: Mount,
   name: PipetteName,
-}
+|}
 
-export type FileLabware = {
+export type FileLabware = {|
   slot: DeckSlotId,
   definitionId: string,
   displayName?: string,
-}
+|}
 
 type FlowRateParams = {| flowRate: number |}
 
@@ -119,11 +119,11 @@ export type ProtocolFile<DesignerApplicationData> = {|
     [labwareDefId: string]: LabwareDefinition2,
   },
   labware: {
-    [labwareInstanceId: string]: {
+    [labwareInstanceId: string]: {|
       slot: string,
       definitionId: string,
       displayName?: string,
-    },
+    |},
   },
   commands: Array<Command>,
   commandAnnotations?: Object, // NOTE: intentionally underspecified b/c we haven't decided on this yet

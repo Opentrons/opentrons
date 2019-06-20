@@ -7,11 +7,11 @@ import {
   fixtureP300Single,
   fixtureP300Multi,
 } from '@opentrons/shared-data/pipette/fixtures/name'
-import fixtureTrash from '@opentrons/shared-data/labware/fixtures/2/fixtureTrash.json'
-import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture96Plate.json'
-import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture12Trough.json'
-import fixtureTipRack10Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack10Ul.json'
-import fixtureTipRack300Ul from '@opentrons/shared-data/labware/fixtures/2/fixtureTipRack300Ul.json'
+import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 
 import {
   DEFAULT_PIPETTE,
@@ -55,38 +55,38 @@ export function makeContext(): InvariantContext {
   const labwareEntities = {
     [FIXED_TRASH_ID]: {
       id: FIXED_TRASH_ID,
-      labwareDefURI: getLabwareDefURI(fixtureTrash),
-      def: fixtureTrash,
+      labwareDefURI: getLabwareDefURI(fixture_trash),
+      def: fixture_trash,
     },
     [SOURCE_LABWARE]: {
       id: SOURCE_LABWARE,
-      labwareDefURI: getLabwareDefURI(fixture96Plate),
-      def: fixture96Plate,
+      labwareDefURI: getLabwareDefURI(fixture_96_plate),
+      def: fixture_96_plate,
     },
     [DEST_LABWARE]: {
       id: DEST_LABWARE,
-      labwareDefURI: getLabwareDefURI(fixture96Plate),
-      def: fixture96Plate,
+      labwareDefURI: getLabwareDefURI(fixture_96_plate),
+      def: fixture_96_plate,
     },
     [TROUGH_LABWARE]: {
       id: TROUGH_LABWARE,
-      labwareDefURI: getLabwareDefURI(fixture12Trough),
-      def: fixture12Trough,
+      labwareDefURI: getLabwareDefURI(fixture_12_trough),
+      def: fixture_12_trough,
     },
     tiprack1Id: {
       id: 'tiprack1Id',
-      labwareDefURI: getLabwareDefURI(fixtureTipRack300Ul),
-      def: fixtureTipRack300Ul,
+      labwareDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
+      def: fixture_tiprack_300_ul,
     },
     tiprack2Id: {
       id: 'tiprack2Id',
-      labwareDefURI: getLabwareDefURI(fixtureTipRack300Ul),
-      def: fixtureTipRack300Ul,
+      labwareDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
+      def: fixture_tiprack_300_ul,
     },
     tiprack3Id: {
       id: 'tiprack3Id',
-      labwareDefURI: getLabwareDefURI(fixtureTipRack300Ul),
-      def: fixtureTipRack300Ul,
+      labwareDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
+      def: fixture_tiprack_300_ul,
     },
   }
 
@@ -94,29 +94,29 @@ export function makeContext(): InvariantContext {
     p10SingleId: {
       name: 'p10_single',
       id: 'p10SingleId',
-      tiprackDefURI: getLabwareDefURI(fixtureTipRack10Ul),
-      tiprackLabwareDef: fixtureTipRack10Ul,
+      tiprackDefURI: getLabwareDefURI(fixture_tiprack_10_ul),
+      tiprackLabwareDef: fixture_tiprack_10_ul,
       spec: fixtureP10Single,
     },
     p10MultiId: {
       name: 'p10_multi',
       id: 'p10MultiId',
-      tiprackDefURI: getLabwareDefURI(fixtureTipRack10Ul),
-      tiprackLabwareDef: fixtureTipRack10Ul,
+      tiprackDefURI: getLabwareDefURI(fixture_tiprack_10_ul),
+      tiprackLabwareDef: fixture_tiprack_10_ul,
       spec: fixtureP10Multi,
     },
     [DEFAULT_PIPETTE]: {
       name: 'p300_single',
       id: DEFAULT_PIPETTE,
-      tiprackDefURI: getLabwareDefURI(fixtureTipRack300Ul),
-      tiprackLabwareDef: fixtureTipRack300Ul,
+      tiprackDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
+      tiprackLabwareDef: fixture_tiprack_300_ul,
       spec: fixtureP300Single,
     },
     p300MultiId: {
       name: 'p300_multi',
       id: 'p300MultiId',
-      tiprackDefURI: getLabwareDefURI(fixtureTipRack300Ul),
-      tiprackLabwareDef: fixtureTipRack300Ul,
+      tiprackDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
+      tiprackLabwareDef: fixture_tiprack_300_ul,
       spec: fixtureP300Multi,
     },
   }

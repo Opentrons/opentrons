@@ -1,11 +1,11 @@
-import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture12Trough.json'
-import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture96Plate.json'
-import fixture384Plate from '@opentrons/shared-data/labware/fixtures/2/fixture384Plate.json'
+import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import fixture_384_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_384_plate.json'
 import { getWellSetForMultichannel } from '../utils'
 
 describe('getWellSetForMultichannel (integration test)', () => {
   test('96-flat', () => {
-    const labware = fixture96Plate
+    const labware = fixture_96_plate
     expect(getWellSetForMultichannel(labware, 'A1')).toEqual([
       'A1',
       'B1',
@@ -52,12 +52,12 @@ describe('getWellSetForMultichannel (integration test)', () => {
   })
 
   test('invalid well', () => {
-    const labware = fixture96Plate
+    const labware = fixture_96_plate
     expect(getWellSetForMultichannel(labware, 'A13')).toBeFalsy()
   })
 
   test('trough-12row', () => {
-    const labware = fixture12Trough
+    const labware = fixture_12_trough
     expect(getWellSetForMultichannel(labware, 'A1')).toEqual([
       'A1',
       'A1',
@@ -82,7 +82,7 @@ describe('getWellSetForMultichannel (integration test)', () => {
   })
 
   test('384-plate', () => {
-    const labware = fixture384Plate
+    const labware = fixture_384_plate
     expect(getWellSetForMultichannel(labware, 'C1')).toEqual([
       'A1',
       'C1',

@@ -804,7 +804,7 @@ Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
           "isTiprack": false,
-          "loadName": "generic_96_wellplate_340ul_flat",
+          "loadName": "fixture_96_plate",
         },
         "schemaVersion": 2,
         "version": 1,
@@ -1676,7 +1676,7 @@ Object {
         },
       },
       "id": "destPlateId",
-      "labwareDefURI": "fixture/generic_96_wellplate_340ul_flat/1",
+      "labwareDefURI": "fixture/fixture_96_plate/1",
     },
     "sourcePlateId": Object {
       "def": Object {
@@ -1937,7 +1937,7 @@ Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
           "isTiprack": false,
-          "loadName": "generic_96_wellplate_340ul_flat",
+          "loadName": "fixture_96_plate",
         },
         "schemaVersion": 2,
         "version": 1,
@@ -2809,7 +2809,7 @@ Object {
         },
       },
       "id": "sourcePlateId",
-      "labwareDefURI": "fixture/generic_96_wellplate_340ul_flat/1",
+      "labwareDefURI": "fixture/fixture_96_plate/1",
     },
     "tiprack1Id": Object {
       "def": Object {
@@ -3069,7 +3069,7 @@ Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
           "isTiprack": true,
-          "loadName": "opentrons_96_tiprack_300ul",
+          "loadName": "fixture_tiprack_300_ul",
           "tipLength": 59.17,
           "tipOverlap": 7.47,
         },
@@ -3943,7 +3943,7 @@ Object {
         },
       },
       "id": "tiprack1Id",
-      "labwareDefURI": "fixture/opentrons_96_tiprack_300ul/1",
+      "labwareDefURI": "fixture/fixture_tiprack_300_ul/1",
     },
     "tiprack2Id": Object {
       "def": Object {
@@ -4203,7 +4203,7 @@ Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
           "isTiprack": true,
-          "loadName": "opentrons_96_tiprack_300ul",
+          "loadName": "fixture_tiprack_300_ul",
           "tipLength": 59.17,
           "tipOverlap": 7.47,
         },
@@ -5077,7 +5077,7 @@ Object {
         },
       },
       "id": "tiprack2Id",
-      "labwareDefURI": "fixture/opentrons_96_tiprack_300ul/1",
+      "labwareDefURI": "fixture/fixture_tiprack_300_ul/1",
     },
     "tiprack3Id": Object {
       "def": Object {
@@ -5337,7 +5337,7 @@ Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
           "isTiprack": true,
-          "loadName": "opentrons_96_tiprack_300ul",
+          "loadName": "fixture_tiprack_300_ul",
           "tipLength": 59.17,
           "tipOverlap": 7.47,
         },
@@ -6211,7 +6211,7 @@ Object {
         },
       },
       "id": "tiprack3Id",
-      "labwareDefURI": "fixture/opentrons_96_tiprack_300ul/1",
+      "labwareDefURI": "fixture/fixture_tiprack_300_ul/1",
     },
     "trashId": Object {
       "def": Object {
@@ -6256,7 +6256,7 @@ Object {
           "format": "trash",
           "isMagneticModuleCompatible": false,
           "isTiprack": false,
-          "loadName": "opentrons_1_trash_1100ml_fixed",
+          "loadName": "fixture_trash",
           "quirks": Array [
             "fixedTrash",
             "centerMultichannelOnWells",
@@ -6278,7 +6278,7 @@ Object {
         },
       },
       "id": "trashId",
-      "labwareDefURI": "fixture/opentrons_1_trash_1100ml_fixed/1",
+      "labwareDefURI": "fixture/fixture_trash/1",
     },
     "troughId": Object {
       "def": Object {
@@ -6367,7 +6367,7 @@ Object {
           "format": "trough",
           "isMagneticModuleCompatible": false,
           "isTiprack": false,
-          "loadName": "usascientific_12_reservoir_22ml",
+          "loadName": "fixture_12_trough",
           "quirks": Array [
             "centerMultichannelOnWells",
           ],
@@ -6498,7 +6498,7 @@ Object {
         },
       },
       "id": "troughId",
-      "labwareDefURI": "fixture/usascientific_12_reservoir_22ml/1",
+      "labwareDefURI": "fixture/fixture_12_trough/1",
     },
   },
   "pipetteEntities": Object {
@@ -6521,7 +6521,7 @@ Object {
         "maxVolume": 10,
         "minVolume": 1,
       },
-      "tiprackDefURI": "fixture/opentrons_96_tiprack_10ul/1",
+      "tiprackDefURI": "fixture/fixture_tiprack_10_ul/1",
       "tiprackLabwareDef": Object {
         "brand": Object {
           "brand": "Opentrons",
@@ -6777,7 +6777,7 @@ Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
           "isTiprack": true,
-          "loadName": "opentrons_96_tiprack_10ul",
+          "loadName": "fixture_tiprack_10_ul",
           "tipLength": 39.2,
           "tipOverlap": 6.2,
         },
@@ -7670,7 +7670,7 @@ Object {
         "maxVolume": 10,
         "minVolume": 1,
       },
-      "tiprackDefURI": "fixture/opentrons_96_tiprack_10ul/1",
+      "tiprackDefURI": "fixture/fixture_tiprack_10_ul/1",
       "tiprackLabwareDef": Object {
         "brand": Object {
           "brand": "Opentrons",
@@ -7926,7 +7926,7 @@ Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
           "isTiprack": true,
-          "loadName": "opentrons_96_tiprack_10ul",
+          "loadName": "fixture_tiprack_10_ul",
           "tipLength": 39.2,
           "tipOverlap": 6.2,
         },
@@ -8819,7 +8819,7 @@ Object {
         "maxVolume": 300,
         "minVolume": 30,
       },
-      "tiprackDefURI": "fixture/opentrons_96_tiprack_300ul/1",
+      "tiprackDefURI": "fixture/fixture_tiprack_300_ul/1",
       "tiprackLabwareDef": Object {
         "brand": Object {
           "brand": "Opentrons",
@@ -9077,7 +9077,7 @@ Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
           "isTiprack": true,
-          "loadName": "opentrons_96_tiprack_300ul",
+          "loadName": "fixture_tiprack_300_ul",
           "tipLength": 59.17,
           "tipOverlap": 7.47,
         },
@@ -9970,7 +9970,7 @@ Object {
         "maxVolume": 300,
         "minVolume": 30,
       },
-      "tiprackDefURI": "fixture/opentrons_96_tiprack_300ul/1",
+      "tiprackDefURI": "fixture/fixture_tiprack_300_ul/1",
       "tiprackLabwareDef": Object {
         "brand": Object {
           "brand": "Opentrons",
@@ -10228,7 +10228,7 @@ Object {
           "format": "96Standard",
           "isMagneticModuleCompatible": false,
           "isTiprack": true,
-          "loadName": "opentrons_96_tiprack_300ul",
+          "loadName": "fixture_tiprack_300_ul",
           "tipLength": 59.17,
           "tipOverlap": 7.47,
         },

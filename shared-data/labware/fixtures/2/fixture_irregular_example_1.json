@@ -37,7 +37,7 @@
     "format": "irregular",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "generic_55_tuberack_50x3ml_5x10ml"
+    "loadName": "fixture_irregular_example_1"
   },
   "wells": {
     "A1": {

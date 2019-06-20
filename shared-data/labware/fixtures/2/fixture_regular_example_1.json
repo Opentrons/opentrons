@@ -9,7 +9,7 @@
     "brand": "opentrons"
   },
   "parameters": {
-    "loadName": "opentrons_2_wellplate_100ul",
+    "loadName": "fixture_regular_example_1",
     "format": "96Standard",
     "isTiprack": false,
     "isMagneticModuleCompatible": false

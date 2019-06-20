@@ -10,7 +10,16 @@ import {
 } from '../index.js'
 import { splitWellsOnColumn, sortWells } from '../../helpers/index.js'
 
-import exampleLabware1 from '../../../labware/fixtures/2/irregularLabwareExample1.json'
+import fixture_irregular_example_1 from '../../../labware/fixtures/2/fixture_irregular_example_1.json'
+
+// NOTE: loadName needs to be replaced here b/c fixture has a non-default loadName
+const exampleLabware1 = {
+  ...fixture_irregular_example_1,
+  parameters: {
+    ...fixture_irregular_example_1.parameters,
+    loadName: 'generic_55_tuberack_50x3ml_5x10ml',
+  },
+}
 
 describe('test helper functions', () => {
   test('cornerOffsetFromSlot outputs correctly', () => {

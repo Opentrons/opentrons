@@ -14,7 +14,7 @@ import type {
 import type { FormPatch } from '../../steplist/actions'
 import type { FormData } from '../../form-types'
 
-type PDMetadata = {
+export type PDMetadata = {
   pipetteTiprackAssignments: { [pipetteId: string]: string },
 
   dismissedWarnings: {
@@ -45,7 +45,7 @@ type PDMetadata = {
   orderedStepIds: Array<string>,
 }
 
-type PDProtocolFile = ProtocolFile<PDMetadata>
+export type PDProtocolFile = ProtocolFile<PDMetadata>
 
 type LegacyPipetteEntities = {
   [pipetteId: string]: {
