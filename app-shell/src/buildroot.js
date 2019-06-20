@@ -27,33 +27,22 @@ export function registerBuildrootUpdate() {
   return () => {}
 }
 
-export function getBuildrootUpdateInfo(): BuildrootUpdateInfo {
-  try {
-    assert(
-      updateFilename && updateApiVersion && updateServerVersion,
-      'Update info was not initialized'
-    )
-
+export function getBuildrootUpdateInfo(): ?BuildrootUpdateInfo {
+  if (updateFilename && updateApiVersion && updateServerVersion) {
     return {
       filename: path.basename(updateFilename),
       apiVersion: updateApiVersion,
       serverVersion: updateServerVersion,
     }
-  } catch (error) {
-    log.error('Unable to detect Buildroot update files', { error })
   }
-  return {
-    filename: null,
-    apiVersion: null,
-    serverVersion: null,
-  }
+
+  return null
 }
 
 export function getUpdateFileContents(): Promise<Buffer> {
-  assert(
-    updateFilename && updateApiVersion && updateServerVersion,
-    'Update file info was not initialized'
-  )
+  if (updateFilename) {
+    return Promise.reject(new Error('No buildroot file present'))
+  }
 
   return fse.readFile(updateFilename)
 }

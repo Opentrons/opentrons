@@ -5,7 +5,7 @@ import { combineReducers } from 'redux'
 import createLogger from '../logger'
 import { updateReducer } from './update'
 import { apiUpdateReducer } from './api-update'
-import { buildrootUpdateReducer } from './buildroot-update'
+import { buildrootReducer } from './buildroot'
 
 import type { Service } from '@opentrons/discovery-client'
 import type {
@@ -38,7 +38,7 @@ const log = createLogger(__filename)
 
 export * from './update'
 export * from './api-update'
-export * from './buildroot-update'
+export * from './buildroot'
 
 const API_RELEASE_NOTES = CURRENT_RELEASE_NOTES.replace(
   /<!-- start:@opentrons\/app -->([\S\s]*?)<!-- end:@opentrons\/app -->/,
@@ -49,7 +49,7 @@ export { CURRENT_VERSION, CURRENT_RELEASE_NOTES, API_RELEASE_NOTES }
 export const shellReducer = combineReducers<_, Action>({
   update: updateReducer,
   apiUpdate: apiUpdateReducer,
-  buildroot: buildrootUpdateReducer,
+  buildroot: buildrootReducer,
 })
 
 export const shellMiddleware: Middleware = store => {

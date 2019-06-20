@@ -1,5 +1,5 @@
 import { mockResolvedValue } from '../../../__util__/mock-promise'
-import * as buildroot from '../buildroot-update'
+import * as buildroot from '../buildroot'
 
 const { buildroot: mockBuildrootUpdate } = global.APP_SHELL
 
@@ -22,7 +22,7 @@ describe('shell/api-update', () => {
       apiVersion: '1.2.3',
     })
 
-    expect(buildroot.buildrootUpdateReducer(undefined, {})).toEqual({
+    expect(buildroot.buildrootReducer(undefined, {})).toEqual({
       filename: 'foo.zip',
       apiVersion: '1.2.3',
     })
@@ -41,20 +41,8 @@ describe('shell/api-update', () => {
   describe('selectors', () => {
     const SPECS = [
       {
-        name: 'getBuildrootApiUpdateVersion',
-        selector: buildroot.getBuildrootApiUpdateVersion,
-        state: { shell: { buildroot: { apiVersion: '1.0.0' } } },
-        expected: '1.0.0',
-      },
-      {
-        name: 'getBuildrootServerUpdateVersion',
-        selector: buildroot.getBuildrootServerUpdateVersion,
-        state: { shell: { buildroot: { serverVersion: '1.0.0' } } },
-        expected: '1.0.0',
-      },
-      {
-        name: 'getBuildrootUpdateFilename',
-        selector: buildroot.getBuildrootUpdateFilename,
+        name: 'getBuildrootUpdateInfo',
+        selector: buildroot.getBuildrootUpdateInfo,
         state: {
           shell: {
             buildroot: {
@@ -64,7 +52,11 @@ describe('shell/api-update', () => {
             },
           },
         },
-        expected: 'foobar.zip',
+        expected: {
+          filename: 'foobar.zip',
+          apiVersion: '1.0.0',
+          serverVersion: '1.0.0',
+        },
       },
     ]
 

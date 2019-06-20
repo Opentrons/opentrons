@@ -9,7 +9,7 @@ import { registerApiUpdate } from './api-update'
 import { registerDiscovery } from './discovery'
 import { registerRobotLogs } from './robot-logs'
 import { registerUpdate } from './update'
-import { registerBuildrootUpdate } from './buildroot-update'
+import { registerBuildrootUpdate } from './buildroot'
 
 const config = getConfig()
 const log = createLogger(__filename)
