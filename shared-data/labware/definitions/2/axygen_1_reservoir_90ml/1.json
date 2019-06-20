@@ -1,42 +1,42 @@
 {
   "ordering": [["A1"]],
   "brand": {
-    "brand": "Agilent",
-    "brandId": ["201252-100"]
+    "brand": "Axygen",
+    "brandId": ["RES-SW1-LP"]
   },
   "metadata": {
-    "displayName": "Agilent 1 Well Reservoir 290 mL",
+    "displayName": "Axygen 1 Well Reservoir 90 mL",
     "displayCategory": "reservoir",
     "displayVolumeUnits": "mL",
     "tags": []
   },
   "dimensions": {
     "xDimension": 127.76,
-    "yDimension": 85.57,
-    "zDimension": 44.04
+    "yDimension": 85.47,
+    "zDimension": 19.05
   },
   "cornerOffsetFromSlot": {
     "x": 0,
-    "y": -0.09,
+    "y": 0.01,
     "z": 0
   },
   "wells": {
     "A1": {
-      "depth": 39.22,
+      "depth": 12.42,
       "shape": "rectangular",
-      "xDimension": 108,
-      "yDimension": 72,
-      "totalLiquidVolume": 290000,
+      "xDimension": 106.76,
+      "yDimension": 70.52,
+      "totalLiquidVolume": 90000,
       "x": 63.88,
       "y": 11.24,
-      "z": 4.82
+      "z": 6.63
     }
   },
   "groups": [
     {
       "wells": ["A1"],
       "metadata": {
-        "wellBottomShape": "v"
+          "wellBottomShape": "v"
       }
     }
   ],
@@ -44,7 +44,7 @@
     "format": "trough",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "agilent_1_reservoir_290ml"
+    "loadName": "axygen_1_reservoir_90ml"
   },
   "namespace": "opentrons",
   "version": 1,
