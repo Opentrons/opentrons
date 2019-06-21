@@ -42,6 +42,7 @@ module.exports = {
 
   app: {
     getPath: () => '__mock-app-path__',
+    once: jest.fn(),
   },
 
   ipcRenderer: {
