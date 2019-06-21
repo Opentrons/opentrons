@@ -8,20 +8,22 @@ import {
   WELL_X_DIM,
   WELL_Y_DIM,
   DIAMETER,
+  DEPTH,
+  TOTAL_LENGTH,
   MM,
 } from '../../localization'
 import { LabeledValueTable, LowercaseText } from '../ui'
 import { getMeasurementDiagram } from '../measurement-guide'
 
-import type { LabwareWellGroupProperties } from '../../types'
+import type { LabwareWellGroupProperties, LabwareParameters } from '../../types'
 
 // safe toFixed
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
 
 export type WellDimensionsProps = {|
+  labwareParams: LabwareParameters,
   wellProperties: LabwareWellGroupProperties,
   wellLabel: string,
-  depthLabel: string,
   category: string,
   labelSuffix?: string,
   className?: string,
@@ -29,8 +31,8 @@ export type WellDimensionsProps = {|
 
 export default function WellDimensions(props: WellDimensionsProps) {
   const {
+    labwareParams,
     wellProperties,
-    depthLabel,
     wellLabel,
     labelSuffix,
     className,
@@ -38,9 +40,17 @@ export default function WellDimensions(props: WellDimensionsProps) {
   } = props
   const {
     shape,
+    depth,
     metadata: { wellBottomShape },
   } = wellProperties
-  const dimensions = [{ label: depthLabel, value: wellProperties.depth }]
+  const { isTiprack, tipLength } = labwareParams
+  const dimensions = []
+
+  if (isTiprack && tipLength) {
+    dimensions.push({ label: TOTAL_LENGTH, value: toFixed(tipLength) })
+  } else if (depth) {
+    dimensions.push({ label: DEPTH, value: toFixed(depth) })
+  }
 
   if (shape) {
     if (shape.shape === 'circular') {
