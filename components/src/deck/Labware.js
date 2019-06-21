@@ -1,15 +1,18 @@
 // @flow
 import * as React from 'react'
 import map from 'lodash/map'
-import type { LabwareDefinition1 } from '@opentrons/shared-data'
 import assert from 'assert'
-import { getLabwareV1Def as getLabware } from '@opentrons/shared-data'
+import {
+  SLOT_RENDER_WIDTH,
+  SLOT_RENDER_HEIGHT,
+  getLabwareV1Def as getLabware,
+} from '@opentrons/shared-data'
+import type { LabwareDefinition1 } from '@opentrons/shared-data'
 
 import LabwareOutline from './LabwareOutline'
 import FallbackLabware from './FallbackLabware'
 import Tip from './Tip'
 import Well from './Well'
-import styles from './Labware.css'
 
 export type Props = {
   /** labware type, to get legacy definition from shared-data */
@@ -40,7 +43,9 @@ class Labware extends React.Component<Props> {
     return (
       <g>
         <LabwareOutline
-          className={isTiprack ? styles.tiprack_plate_outline : null}
+          width={SLOT_RENDER_WIDTH}
+          height={SLOT_RENDER_HEIGHT}
+          isTiprack={isTiprack}
         />
         {map(labwareDefinition.wells, (wellDef, wellName) => {
           assert(

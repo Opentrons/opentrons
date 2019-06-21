@@ -9,7 +9,7 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '../../../../step-generation'
 
-const fixtureTiprack10Ul = {
+const fixture_tiprack_10_ul = {
   parameters: { isTiprack: true },
   wells: { A1: { totalLiquidVolume: 1000 } },
 }
@@ -23,7 +23,7 @@ beforeEach(() => {
       name: 'p10_single',
       spec: fixtureP10Single,
       tiprackModel: 'tiprack-10ul',
-      tiprackLabwareDef: fixtureTiprack10Ul,
+      tiprackLabwareDef: fixture_tiprack_10_ul,
     },
   }
   labwareEntities = {}

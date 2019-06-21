@@ -1,7 +1,7 @@
 // @flow
-import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture96Plate.json'
-import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture12Trough.json'
-import fixture384Plate from '@opentrons/shared-data/labware/fixtures/2/fixture384Plate.json'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
+import fixture_384_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_384_plate.json'
 
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
@@ -266,8 +266,8 @@ describe('...8-channel pipette', () => {
   describe('dispense into empty column with different ingreds in each tip:', () => {
     const tests = [
       {
-        labwareType: 'fixture96Plate',
-        def: fixture96Plate,
+        labwareType: 'fixture_96_plate',
+        def: fixture_96_plate,
         expectedLabwareMatch: {
           sourcePlateId: {
             A1: {
@@ -285,8 +285,8 @@ describe('...8-channel pipette', () => {
         },
       },
       {
-        labwareType: 'fixture12Trough',
-        def: fixture12Trough,
+        labwareType: 'fixture_12_trough',
+        def: fixture_12_trough,
         expectedLabwareMatch: {
           sourcePlateId: {
             A1: {
@@ -299,8 +299,8 @@ describe('...8-channel pipette', () => {
         },
       },
       {
-        labwareType: 'fixture384Plate',
-        def: fixture384Plate,
+        labwareType: 'fixture_384_plate',
+        def: fixture_384_plate,
         expectedLabwareMatch: {
           sourcePlateId: {
             A1: {

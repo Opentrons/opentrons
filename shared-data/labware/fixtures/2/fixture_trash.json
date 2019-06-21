@@ -22,7 +22,7 @@
   "parameters": {
     "format": "trash",
     "isTiprack": false,
-    "loadName": "opentrons_1_trash_1100ml_fixed",
+    "loadName": "fixture_trash",
     "isMagneticModuleCompatible": false,
     "quirks": ["fixedTrash", "centerMultichannelOnWells"]
   },

@@ -3,8 +3,25 @@ import range from 'lodash/range'
 
 import { createRegularLabware } from '../index.js'
 
-import exampleLabware1 from '../../../labware/fixtures/2/labwareExample1.json'
-import exampleLabware2 from '../../../labware/fixtures/2/labwareExample2.json'
+import fixture_regular_example_1 from '../../../labware/fixtures/2/fixture_regular_example_1.json'
+import fixture_regular_example_2 from '../../../labware/fixtures/2/fixture_regular_example_2.json'
+
+// NOTE: loadName needs to be replaced here b/c fixture has a non-default loadName
+const exampleLabware1 = {
+  ...fixture_regular_example_1,
+  parameters: {
+    ...fixture_regular_example_1.parameters,
+    loadName: 'opentrons_2_wellplate_100ul',
+  },
+}
+
+const exampleLabware2 = {
+  ...fixture_regular_example_2,
+  parameters: {
+    ...fixture_regular_example_2.parameters,
+    loadName: 'generic_6_wellplate_1ml',
+  },
+}
 
 describe('createLabware', () => {
   let labware1

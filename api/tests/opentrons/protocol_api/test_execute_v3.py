@@ -6,7 +6,7 @@ from opentrons.protocol_api import execute_v3, ProtocolContext
 
 def test_load_labware_v2(loop, get_labware_fixture):
     ctx = ProtocolContext(loop=loop)
-    custom_trough_def = get_labware_fixture('fixture12Trough')
+    custom_trough_def = get_labware_fixture('fixture_12_trough')
     data = {
         "labwareDefinitions": {
             "someTroughDef": custom_trough_def

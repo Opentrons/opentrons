@@ -35,7 +35,7 @@
   "parameters": {
     "format": "96Standard",
     "isTiprack": false,
-    "loadName": "generic_96_wellplate_340ul_flat",
+    "loadName": "fixture_96_plate",
     "isMagneticModuleCompatible": false
   },
   "wells": {

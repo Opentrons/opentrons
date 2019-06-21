@@ -50,7 +50,7 @@ def test_get_location():
 
 def test_load_labware(get_labware_fixture):
     robot.reset()
-    fixture_96_plate = get_labware_fixture('fixture96Plate')
+    fixture_96_plate = get_labware_fixture('fixture_96_plate')
     data = {
         "labwareDefinitions": {
             "someDefId": fixture_96_plate

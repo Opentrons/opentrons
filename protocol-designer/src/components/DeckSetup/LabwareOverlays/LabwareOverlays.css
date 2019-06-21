@@ -3,6 +3,9 @@
 .labware_controls {
   height: 100%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
 .labware_controls.can_edit {
@@ -21,6 +24,7 @@
   align-items: flex-start;
   color: white;
   font-size: var(--fs-body-1);
+  border-radius: 0.5rem;
 }
 
 .slot_overlay.with_form {

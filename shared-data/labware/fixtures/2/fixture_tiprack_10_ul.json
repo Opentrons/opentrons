@@ -38,7 +38,7 @@
     "isMagneticModuleCompatible": false,
     "tipLength": 39.2,
     "tipOverlap": 6.2,
-    "loadName": "opentrons_96_tiprack_10ul"
+    "loadName": "fixture_tiprack_10_ul"
   },
   "wells": {
     "H1": {

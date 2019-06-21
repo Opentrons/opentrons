@@ -12,12 +12,12 @@
   align-items: center;
 }
 
-.plate_outline {
+.labware_outline {
   fill: var(--c-white);
   stroke: var(--c-black);
 }
 
-.tiprack_plate_outline {
+.tiprack_outline {
   fill: var(--c-plate-bg);
   stroke: var(--c-charcoal);
 }
