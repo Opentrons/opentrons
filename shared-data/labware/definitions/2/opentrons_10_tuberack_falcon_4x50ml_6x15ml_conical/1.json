@@ -33,7 +33,7 @@
   "wells": {
     "A1": {
       "totalLiquidVolume": 15000,
-      "diameter": 14.5,
+      "diameter": 14.9,
       "shape": "circular",
       "depth": 117.98,
       "x": 13.88,
@@ -42,7 +42,7 @@
     },
     "B1": {
       "totalLiquidVolume": 15000,
-      "diameter": 14.5,
+      "diameter": 14.9,
       "shape": "circular",
       "depth": 117.98,
       "x": 13.88,
@@ -51,7 +51,7 @@
     },
     "C1": {
       "totalLiquidVolume": 15000,
-      "diameter": 14.5,
+      "diameter": 14.9,
       "shape": "circular",
       "depth": 117.98,
       "x": 13.88,
@@ -60,7 +60,7 @@
     },
     "A2": {
       "totalLiquidVolume": 15000,
-      "diameter": 14.5,
+      "diameter": 14.9,
       "shape": "circular",
       "depth": 117.98,
       "x": 38.88,
@@ -69,7 +69,7 @@
     },
     "B2": {
       "totalLiquidVolume": 15000,
-      "diameter": 14.5,
+      "diameter": 14.9,
       "shape": "circular",
       "depth": 117.98,
       "x": 38.88,
@@ -78,7 +78,7 @@
     },
     "C2": {
       "totalLiquidVolume": 15000,
-      "diameter": 14.5,
+      "diameter": 14.9,
       "shape": "circular",
       "depth": 117.98,
       "x": 38.88,
@@ -87,7 +87,7 @@
     },
     "A3": {
       "totalLiquidVolume": 50000,
-      "diameter": 26.45,
+      "diameter": 27.81,
       "shape": "circular",
       "depth": 113.85,
       "x": 71.38,
@@ -96,7 +96,7 @@
     },
     "B3": {
       "totalLiquidVolume": 50000,
-      "diameter": 26.45,
+      "diameter": 27.81,
       "shape": "circular",
       "depth": 113.85,
       "x": 71.38,
@@ -105,7 +105,7 @@
     },
     "A4": {
       "totalLiquidVolume": 50000,
-      "diameter": 26.45,
+      "diameter": 27.81,
       "shape": "circular",
       "depth": 113.85,
       "x": 106.38,
@@ -114,7 +114,7 @@
     },
     "B4": {
       "totalLiquidVolume": 50000,
-      "diameter": 26.45,
+      "diameter": 27.81,
       "shape": "circular",
       "depth": 113.85,
       "x": 106.38,
