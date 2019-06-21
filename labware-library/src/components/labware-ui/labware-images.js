@@ -3,6 +3,12 @@
 // TODO(mc, 2019-05-29): shared-data? components-library?
 
 export default {
+  agilent_1_reservoir_290ml: [
+    require('../../images/agilent_1_reservoir_290ml_side_view.jpg'),
+  ],
+  axygen_1_reservoir_90ml: [
+    require('../../images/axygen_1_reservoir_90ml_side_view.jpg'),
+  ],
   biorad_96_wellplate_200ul_pcr: [
     require('../../images/biorad_96_wellplate_200ul_pcr_photo_three_quarters.jpg'),
   ],
@@ -102,7 +108,8 @@ export default {
   usascientific_12_reservoir_22ml: [
     require('../../images/usascientific_12_reservoir_22ml_side_view.jpg'),
   ],
-  'generic_96_wellplate_1.5ml_deep': [
-    require('../../images/generic_96_wellplate_1.5ml_deep_side_view.jpg'),
+  'usascientific_96_wellplate_2.4ml_deep': [
+    require('../../images/usascientific_96_wellplate_2.4ml_deep_side_view.jpg'),
   ],
+  'generic_96_wellplate_1.5ml_deep': [],
 }
