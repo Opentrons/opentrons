@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import capitalize from 'lodash/capitalize'
 
@@ -29,10 +30,13 @@ export default function Instructions(props: ChangePipetteProps) {
     goToConfirmUrl,
   } = props
 
-  // TODO(mc, 2019-06-19): move this up when parent uses hooks
+  // TODO(mc, 2019-06-19): move these up when parent uses hooks
+  const requestState = useSelector(state =>
+    getPipettesRequestState(state, robot.name)
+  )
   const checkPipette = useTriggerRobotApiAction(
     props.checkPipette,
-    state => getPipettesRequestState(state, robot.name),
+    requestState,
     { onFinish: goToConfirmUrl }
   )
 
