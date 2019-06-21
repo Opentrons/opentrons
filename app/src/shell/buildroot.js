@@ -1,4 +1,5 @@
 // @flow
+import semver from 'semver'
 import type { State } from '../types'
 
 export type BuildrootUpdateInfo = {|
@@ -28,4 +29,28 @@ export function getBuildrootUpdateInfo(
 // caution: this calls an Electron RPC remote, so use sparingly
 export function getBuildrootUpdateContents(): Promise<Blob> {
   return getUpdateFileContents().then(contents => new Blob([contents]))
+}
+
+const compareCurrentVersionToUpdate = (
+  currentVersion: ?string,
+  updateVersion: string
+): boolean => {
+  const current = semver.valid(currentVersion)
+  if (!current) return false
+
+  if (current && semver.gt(updateVersion, currentVersion)) {
+    return true
+  }
+  return false
+}
+
+export function getBuildrootUpdateAvailable(
+  state: State,
+  currentVersion: string
+): boolean {
+  const updateVersion = getBuildrootUpdateInfo(state)?.apiVersion
+  if (currentVersion && updateVersion) {
+    return compareCurrentVersionToUpdate(currentVersion, updateVersion)
+  }
+  return false
 }
