@@ -35,7 +35,7 @@
   "wells": {
     "C1": {
       "depth": 117.98,
-      "diameter": 14.5,
+      "diameter": 14.9,
       "shape": "circular",
       "totalLiquidVolume": 15000,
       "x": 13.88,
@@ -44,7 +44,7 @@
     },
     "B1": {
       "depth": 117.98,
-      "diameter": 14.5,
+      "diameter": 14.9,
       "shape": "circular",
       "totalLiquidVolume": 15000,
       "x": 13.88,
@@ -53,7 +53,7 @@
     },
     "A1": {
       "depth": 117.98,
-      "diameter": 14.5,
+      "diameter": 14.9,
       "shape": "circular",
       "totalLiquidVolume": 15000,
       "x": 13.88,
@@ -62,7 +62,7 @@
     },
     "C2": {
       "depth": 117.98,
-      "diameter": 14.5,
+      "diameter": 14.9,
       "shape": "circular",
       "totalLiquidVolume": 15000,
       "x": 38.88,
@@ -71,7 +71,7 @@
     },
     "B2": {
       "depth": 117.98,
-      "diameter": 14.5,
+      "diameter": 14.9,
       "shape": "circular",
       "totalLiquidVolume": 15000,
       "x": 38.88,
@@ -80,7 +80,7 @@
     },
     "A2": {
       "depth": 117.98,
-      "diameter": 14.5,
+      "diameter": 14.9,
       "shape": "circular",
       "totalLiquidVolume": 15000,
       "x": 38.88,
@@ -89,7 +89,7 @@
     },
     "C3": {
       "depth": 117.98,
-      "diameter": 14.5,
+      "diameter": 14.9,
       "shape": "circular",
       "totalLiquidVolume": 15000,
       "x": 63.88,
@@ -98,7 +98,7 @@
     },
     "B3": {
       "depth": 117.98,
-      "diameter": 14.5,
+      "diameter": 14.9,
       "shape": "circular",
       "totalLiquidVolume": 15000,
       "x": 63.88,
@@ -107,7 +107,7 @@
     },
     "A3": {
       "depth": 117.98,
-      "diameter": 14.5,
+      "diameter": 14.9,
       "shape": "circular",
       "totalLiquidVolume": 15000,
       "x": 63.88,
@@ -116,7 +116,7 @@
     },
     "C4": {
       "depth": 117.98,
-      "diameter": 14.5,
+      "diameter": 14.9,
       "shape": "circular",
       "totalLiquidVolume": 15000,
       "x": 88.88,
@@ -125,7 +125,7 @@
     },
     "B4": {
       "depth": 117.98,
-      "diameter": 14.5,
+      "diameter": 14.9,
       "shape": "circular",
       "totalLiquidVolume": 15000,
       "x": 88.88,
@@ -134,7 +134,7 @@
     },
     "A4": {
       "depth": 117.98,
-      "diameter": 14.5,
+      "diameter": 14.9,
       "shape": "circular",
       "totalLiquidVolume": 15000,
       "x": 88.88,
@@ -143,7 +143,7 @@
     },
     "C5": {
       "depth": 117.98,
-      "diameter": 14.5,
+      "diameter": 14.9,
       "shape": "circular",
       "totalLiquidVolume": 15000,
       "x": 113.88,
@@ -152,7 +152,7 @@
     },
     "B5": {
       "depth": 117.98,
-      "diameter": 14.5,
+      "diameter": 14.9,
       "shape": "circular",
       "totalLiquidVolume": 15000,
       "x": 113.88,
@@ -161,7 +161,7 @@
     },
     "A5": {
       "depth": 117.98,
-      "diameter": 14.5,
+      "diameter": 14.9,
       "shape": "circular",
       "totalLiquidVolume": 15000,
       "x": 113.88,
