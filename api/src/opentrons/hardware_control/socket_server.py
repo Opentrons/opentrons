@@ -287,4 +287,5 @@ async def run(sock_path: str,
     loop = asyncio.get_event_loop()
     server = Server(api, loop)
     await server.start(sock_path)
+    LOG.info(f"Hardware control socket server started on {sock_path}")
     return server
