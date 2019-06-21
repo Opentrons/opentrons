@@ -1,10 +1,7 @@
 // @flow
 import uniqBy from 'lodash/uniqBy'
 
-import {
-  WELL_TYPE_BY_CATEGORY,
-  WELL_DEPTH_BY_CATEGORY,
-} from '../../localization'
+import { WELL_TYPE_BY_CATEGORY } from '../../localization'
 
 import type { LabwareWellGroupProperties, LabwareDefinition } from '../../types'
 
@@ -12,9 +9,6 @@ export type LabelSpec = LabwareDefinition | LabwareWellGroupProperties
 
 export const getWellLabel = (spec: LabelSpec, fallback?: LabelSpec) =>
   getLabel(WELL_TYPE_BY_CATEGORY, spec, fallback)
-
-export const getWellDepthLabel = (spec: LabelSpec, fallback?: LabelSpec) =>
-  getLabel(WELL_DEPTH_BY_CATEGORY, spec, fallback)
 
 function getLabel(
   labelMap: { [string]: string },
