@@ -313,19 +313,20 @@ Our release process is still a work-in-progress. All projects are currently vers
 
 1.  `make bump` (see details below)
 2.  Inspect version bumps and changelogs
-3.  Edit the user-facing changelog at `app-shell/build/release-notes.md` to add the new notes
-4.  `git checkout -b release_${version}` (The branch name _must_ match `release_*` to trigger signed builds that can be used as RCs)
-5.  `git add --all`
-6.  `git cz`
+3.  Edit the user-facing changelog at `app-shell/build/release-notes.md` to add the new notes for the app
+4.  Edit the user-facing changelog at `api/release-notes.md` to add the new notes for the robot software
+5.  `git checkout -b release_${version}` (The branch name _must_ match `release_*` to trigger signed builds that can be used as RCs)
+6.  `git add --all`
+7.  `git cz`
     - Type: `chore`
     - Scope: `release`
     - Message: `${version}`
-7.  Open a PR into `edge`
-8.  Squash merge the PR once approved
-9.  Verify that CI is green on `edge` and test the build artifacts
-10. Pull latest `edge` to your machine
-11. `git tag -a v${version} -m 'chore(release): ${version}'`
-12. `git push --tags`
+8.  Open a PR into `edge`
+9.  Squash merge the PR once approved
+10. Verify that CI is green on `edge` and test the build artifacts
+11. Pull latest `edge` to your machine
+12. `git tag -a v${version} -m 'chore(release): ${version}'`
+13. `git push --tags`
 
 #### `make bump` usage
 
