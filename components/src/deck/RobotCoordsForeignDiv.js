@@ -27,7 +27,7 @@ const RobotCoordsForeignDiv = (props: Props) => {
   return (
     <foreignObject
       {...{ x, y, height, width, className }}
-      transform={transformWithSVG ? 'scale(1, -1)' : 'none'}
+      transform={transformWithSVG ? 'scale(1, -1)' : null}
     >
       <div
         style={{
