@@ -8,6 +8,7 @@ import {
   fetchHealthAndIgnored,
   makeGetRobotUpdateInfo,
 } from '../../http-api-client'
+import { getConfig } from '../../config'
 import { getRobotApiVersion, getRobotFirmwareVersion } from '../../discovery'
 import { checkShellUpdate, getBuildrootUpdateAvailable } from '../../shell'
 
@@ -27,6 +28,7 @@ type SP = {|
   version: string,
   updateInfo: RobotUpdateInfo,
   buildrootUpdateAvailable: boolean,
+  __buildRootEnabled: boolean,
 |}
 
 type DP = {|
@@ -54,10 +56,16 @@ function InformationCard(props: Props) {
     updateUrl,
     checkAppUpdate,
     version,
+    buildrootUpdateAvailable,
   } = props
   const { name, displayName, serverOk } = robot
   const firmwareVersion = getRobotFirmwareVersion(robot) || 'Unknown'
-  const updateText = updateInfo.type || 'Reinstall'
+  let updateText: string
+  if (props.__buildRootEnabled && buildrootUpdateAvailable) {
+    updateText = 'Upgrade'
+  } else {
+    updateText = updateInfo.type || 'Reinstall'
+  }
 
   return (
     <RefreshCard watch={name} refresh={fetchHealth} title={TITLE}>
@@ -94,6 +102,9 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
       updateInfo: getUpdateInfo(state, ownProps.robot),
       buildrootUpdateAvailable:
         version && getBuildrootUpdateAvailable(state, version),
+      __buildRootEnabled: Boolean(
+        getConfig(state).devInternal?.enableBuildRoot
+      ),
     }
   }
 }

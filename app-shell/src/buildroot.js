@@ -8,6 +8,9 @@ import { app } from 'electron'
 import createLogger from './log'
 
 import type { BuildrootUpdateInfo } from '@opentrons/app/src/shell'
+import type { Action } from '@opentrons/app/src/types'
+
+type Dispatch = Action => void
 
 const log = createLogger(__filename)
 
@@ -22,12 +25,19 @@ let updateFilename: string
 let updateApiVersion: string
 let updateServerVersion: string
 
-export function registerBuildrootUpdate() {
+export function registerBuildrootUpdate(dispatch: Dispatch) {
   initializeUpdateFileInfo()
-  return () => {}
+
+  return function handleAction(action: Action) {
+    switch (action.type) {
+      case 'shell:CHECK_UPDATE':
+        const payload = getBuildrootUpdateInfo()
+        dispatch({ type: 'buildroot:UPDATE_INFO', payload })
+    }
+  }
 }
 
-export function getBuildrootUpdateInfo(): ?BuildrootUpdateInfo {
+export function getBuildrootUpdateInfo(): BuildrootUpdateInfo | null {
   if (updateFilename && updateApiVersion && updateServerVersion) {
     return {
       filename: path.basename(updateFilename),

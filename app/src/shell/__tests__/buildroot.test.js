@@ -3,7 +3,9 @@ import * as buildroot from '../buildroot'
 
 const { buildroot: mockBuildrootUpdate } = global.APP_SHELL
 
-describe('shell/api-update', () => {
+const reducer = buildroot.buildrootReducer
+
+describe('shell/buildroot', () => {
   let _Blob
 
   beforeEach(() => {
@@ -16,18 +18,6 @@ describe('shell/api-update', () => {
     jest.clearAllMocks()
   })
 
-  test('reducer puts update info in state', () => {
-    mockBuildrootUpdate.getBuildrootUpdateInfo.mockReturnValue({
-      filename: 'foo.zip',
-      apiVersion: '1.2.3',
-    })
-
-    expect(buildroot.buildrootReducer(undefined, {})).toEqual({
-      filename: 'foo.zip',
-      apiVersion: '1.2.3',
-    })
-  })
-
   test('getBuildrootUpdateContents puts file from app-shell into a Blob', () => {
     const contents = 'update'
 
@@ -35,6 +25,56 @@ describe('shell/api-update', () => {
 
     return expect(buildroot.getBuildrootUpdateContents()).resolves.toEqual({
       blob: ['update'],
+    })
+  })
+
+  describe('action creators', () => {
+    const SPECS = [
+      {
+        name: 'buildroot:SET_UPDATE_SEEN',
+        creator: buildroot.setBuildrootUpdateSeen,
+        args: [],
+        expected: { type: 'buildroot:SET_UPDATE_SEEN' },
+      },
+    ]
+    SPECS.forEach(spec => {
+      const { name, creator, args, expected } = spec
+      test(name, () => expect(creator(...args)).toEqual(expected))
+    })
+  })
+
+  describe('reducer', () => {
+    const SPECS = [
+      {
+        name: 'handles buildroot:UPDATE_INFO',
+        action: {
+          type: 'buildroot:UPDATE_INFO',
+          payload: {
+            filename: 'foobar.zip',
+            apiVersion: '1.0.0',
+            serverVersion: '1.0.0',
+          },
+        },
+        initialState: { info: null, seen: false },
+        expected: {
+          info: {
+            filename: 'foobar.zip',
+            apiVersion: '1.0.0',
+            serverVersion: '1.0.0',
+          },
+          seen: false,
+        },
+      },
+      {
+        name: 'handles buildroot:SET_UPDATE_SEEN',
+        action: { type: 'buildroot:SET_UPDATE_SEEN' },
+        initialState: { info: null, seen: false },
+        expected: { info: null, seen: true },
+      },
+    ]
+    SPECS.forEach(spec => {
+      const { name, action, initialState, expected } = spec
+      test(name, () => expect(reducer(initialState, action)).toEqual(expected))
     })
   })
 
@@ -46,9 +86,11 @@ describe('shell/api-update', () => {
         state: {
           shell: {
             buildroot: {
-              filename: 'foobar.zip',
-              apiVersion: '1.0.0',
-              serverVersion: '1.0.0',
+              info: {
+                filename: 'foobar.zip',
+                apiVersion: '1.0.0',
+                serverVersion: '1.0.0',
+              },
             },
           },
         },
@@ -57,6 +99,16 @@ describe('shell/api-update', () => {
           apiVersion: '1.0.0',
           serverVersion: '1.0.0',
         },
+      },
+      {
+        name: 'getBuildrootUpdateSeen',
+        selector: buildroot.getBuildrootUpdateSeen,
+        state: {
+          shell: {
+            seen: false,
+          },
+        },
+        expected: false,
       },
     ]
 

@@ -1,6 +1,6 @@
 // @flow
 import semver from 'semver'
-import type { State } from '../types'
+import type { State, Action } from '../types'
 
 export type BuildrootUpdateInfo = {|
   filename: string,
@@ -8,22 +8,48 @@ export type BuildrootUpdateInfo = {|
   serverVersion: string,
 |}
 
+export type BuildrootState = {
+  seen: boolean,
+  info: BuildrootUpdateInfo | null,
+}
+
 const {
-  buildroot: {
-    getBuildrootUpdateInfo: getBuildrootInitialState,
-    getUpdateFileContents,
-  },
+  buildroot: { getUpdateFileContents },
 } = global.APP_SHELL
 
-export function buildrootReducer(state: ?BuildrootUpdateInfo) {
-  if (state === undefined) return getBuildrootInitialState()
+export type BuildrootAction =
+  | {| type: 'buildroot:UPDATE_INFO', payload: BuildrootUpdateInfo | null |}
+  | {| type: 'buildroot:SET_UPDATE_SEEN' |}
+
+export function setBuildrootUpdateSeen(): BuildrootAction {
+  return { type: 'buildroot:SET_UPDATE_SEEN' }
+}
+
+const INITIAL_STATE = {
+  seen: false,
+  info: null,
+}
+export function buildrootReducer(
+  state: BuildrootState = INITIAL_STATE,
+  action: Action
+) {
+  switch (action.type) {
+    case 'buildroot:UPDATE_INFO':
+      return { ...state, info: action.payload }
+    case 'buildroot:SET_UPDATE_SEEN':
+      return { ...state, seen: true }
+  }
   return state
 }
 
 export function getBuildrootUpdateInfo(
   state: State
 ): BuildrootUpdateInfo | null {
-  return state.shell.buildroot || null
+  return state.shell.buildroot.info || null
+}
+
+export function getBuildrootUpdateSeen(state: State): boolean {
+  return state.shell.buildroot?.seen || false
 }
 
 // caution: this calls an Electron RPC remote, so use sparingly
