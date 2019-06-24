@@ -5,7 +5,7 @@ import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import omitBy from 'lodash/omitBy'
 import flow from 'lodash/flow'
-import { getLabware, getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getLabwareV1Def, getPipetteNameSpecs } from '@opentrons/shared-data'
 import type {
   FileLabware,
   FilePipette,
@@ -70,7 +70,7 @@ function getPipetteCapacityLegacy(
     )
   }
   const specs = getPipetteNameSpecs(pipetteName)
-  const tiprackDef = getLabware(pipette.tiprackModel)
+  const tiprackDef = getLabwareV1Def(pipette.tiprackModel)
   if (specs && tiprackDef && tiprackDef.metadata.tipVolume) {
     return Math.min(specs.maxVolume, tiprackDef.metadata.tipVolume)
   }

@@ -12,8 +12,8 @@ export type WellDefinition = {
   'total-liquid-volume': number,
 }
 
-// typedef for deprectated labware definitions
-export type LabwareDefinition = {
+// typedef for labware definitions under v1 labware schema
+export type LabwareDefinition1 = {
   metadata: {
     name: string,
     format: string,
@@ -30,9 +30,6 @@ export type LabwareDefinition = {
   },
 }
 
-export type AllLabwareDefinitions = {
-  [name: string]: LabwareDefinition,
-}
 // TODO(mc, 2019-05-29): Remove this enum in favor of string + exported
 // constants + unit tests to catch typos in our definitions. Make changes
 // here and in shared-data/labware/schemas/2.json

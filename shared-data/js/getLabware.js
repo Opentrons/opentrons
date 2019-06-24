@@ -5,7 +5,7 @@ import mapValues from 'lodash/mapValues'
 import definitions from '../build/labware.json'
 import { SLOT_RENDER_HEIGHT, FIXED_TRASH_RENDER_HEIGHT } from './constants'
 import type {
-  LabwareDefinition,
+  LabwareDefinition1,
   LabwareDefinition2,
   WellDefinition,
 } from './types'
@@ -27,15 +27,13 @@ export const LABWAREV2_DO_NOT_LIST = [
   'opentrons_1_trash_1100ml_fixed',
 ]
 
-export function getLabware(labwareName: string): ?LabwareDefinition {
-  const labware: ?LabwareDefinition = definitions[labwareName]
+export function getLabwareV1Def(labwareName: string): ?LabwareDefinition1 {
+  const labware: ?LabwareDefinition1 = definitions[labwareName]
   return labware
 }
 
-// TODO: Ian 2019-04-11 DEPRECATED REMOVE
-export function getIsTiprackDeprecated(labwareName: string): boolean {
-  const labware = getLabware(labwareName)
-  return Boolean(labware && labware.metadata && labware.metadata.isTiprack)
+export function getIsLabwareV1Tiprack(def: LabwareDefinition1): boolean {
+  return Boolean(def?.metadata?.isTiprack)
 }
 
 export function getIsTiprack(labwareDef: LabwareDefinition2): boolean {
@@ -52,7 +50,11 @@ export function getIsTiprack(labwareDef: LabwareDefinition2): boolean {
 
 // TODO: BC 2019-02-28 The height constants used here should be replaced with the heights
 // in the dimensions field of the corresponding labware in definitions
-const _getSvgYValueForWell = (labwareName: string, wellDef: WellDefinition) => {
+const _getSvgYValueForWell = (
+  def: LabwareDefinition1,
+  wellDef: WellDefinition
+) => {
+  const labwareName = def.metadata.name
   const renderHeight =
     labwareName === 'fixed-trash'
       ? FIXED_TRASH_RENDER_HEIGHT
@@ -60,16 +62,14 @@ const _getSvgYValueForWell = (labwareName: string, wellDef: WellDefinition) => {
   return renderHeight - wellDef.y
 }
 
-// TODO IMMEDIATELY: DEPRECATED, remove
 /** For display. Flips Y axis to match SVG, applies offset to wells */
-export function getWellDefsForSVG(labwareName: string) {
-  const labware = getLabware(labwareName)
-  const wellDefs = labware && labware.wells
+export function getWellPropsForSVGLabwareV1(def: LabwareDefinition1) {
+  const wellDefs = def && def.wells
 
   // Most labware defs have a weird offset,
   // but tips are mostly OK.
   // This is a HACK to make the offset less "off"
-  const isTiprack = getIsTiprackDeprecated(labwareName)
+  const isTiprack = getIsLabwareV1Tiprack(def)
   let xCorrection = 0
   let yCorrection = 0
   if (!isTiprack) {
@@ -80,6 +80,6 @@ export function getWellDefsForSVG(labwareName: string) {
   return mapValues(wellDefs, (wellDef: WellDefinition) => ({
     ...wellDef,
     x: wellDef.x + xCorrection,
-    y: _getSvgYValueForWell(labwareName, wellDef) + yCorrection,
+    y: _getSvgYValueForWell(def, wellDef) + yCorrection,
   }))
 }

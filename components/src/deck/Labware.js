@@ -2,13 +2,12 @@
 import * as React from 'react'
 import map from 'lodash/map'
 import assert from 'assert'
-
 import {
-  type LabwareDefinition,
   SLOT_RENDER_WIDTH,
   SLOT_RENDER_HEIGHT,
-  getLabware,
+  getLabwareV1Def as getLabware,
 } from '@opentrons/shared-data'
+import type { LabwareDefinition1 } from '@opentrons/shared-data'
 
 import LabwareOutline from './LabwareOutline'
 import FallbackLabware from './FallbackLabware'
@@ -18,7 +17,7 @@ import Well from './Well'
 export type Props = {
   /** labware type, to get legacy definition from shared-data */
   labwareType?: string,
-  definition?: ?LabwareDefinition,
+  definition?: ?LabwareDefinition1,
 }
 
 // NOTE: this is a legacy component that is only responsible

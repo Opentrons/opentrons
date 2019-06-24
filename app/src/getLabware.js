@@ -1,8 +1,8 @@
 // @flow
 import groupBy from 'lodash/groupBy'
 import type {
+  LabwareDefinition1,
   LabwareDefinition2,
-  LabwareDefinition,
 } from '@opentrons/shared-data'
 
 // require all definitions in the labware/definitions/1 directory
@@ -13,8 +13,8 @@ const labwareSchemaV1DefsContext = (require: any).context(
   /\.json$/, // import filter
   'sync' // load every definition into one synchronous chunk
 )
-let labwareSchemaV1Defs: $ReadOnlyArray<LabwareDefinition> | null = null
-function getLegacyLabwareDefs(): $ReadOnlyArray<LabwareDefinition> {
+let labwareSchemaV1Defs: $ReadOnlyArray<LabwareDefinition1> | null = null
+function getLegacyLabwareDefs(): $ReadOnlyArray<LabwareDefinition1> {
   if (!labwareSchemaV1Defs) {
     labwareSchemaV1Defs = labwareSchemaV1DefsContext
       .keys()
@@ -26,7 +26,7 @@ function getLegacyLabwareDefs(): $ReadOnlyArray<LabwareDefinition> {
 
 export function getLegacyLabwareDef(
   loadName: ?string
-): LabwareDefinition | null {
+): LabwareDefinition1 | null {
   const def = getLegacyLabwareDefs().find(d => d.metadata.name === loadName)
   return def || null
 }
