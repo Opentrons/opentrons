@@ -17,7 +17,7 @@
   "version": 1,
   "namespace": "opentrons",
   "metadata": {
-    "displayName": "GEB 96 Tip Rack 10 µL",
+    "displayName": "GEB 96 Tip Rack 10 µL (Retired)",
     "displayVolumeUnits": "µL",
     "displayCategory": "tipRack",
     "tags": []

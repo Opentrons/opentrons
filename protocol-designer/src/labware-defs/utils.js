@@ -1,14 +1,10 @@
 // @flow
 import groupBy from 'lodash/groupBy'
-import reduce from 'lodash/reduce'
 import {
   getLabwareDefURI,
-  LABWAREV2_DO_NOT_LIST,
   type LabwareDefinition2,
 } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from './types'
-
-const OPENTRONS_NAMESPACE = 'opentrons'
 
 // TODO: Ian 2019-04-11 getAllDefinitions also exists (differently) in labware-library,
 // should reconcile differences & make a general util fn imported from shared-data
