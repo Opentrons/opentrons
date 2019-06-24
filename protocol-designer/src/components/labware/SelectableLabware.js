@@ -155,7 +155,7 @@ class SelectableLabware extends React.Component<Props> {
                 this.handleMouseEnterWell({ wellName, event })
                 makeHandleMouseEnterWell(
                   wellName,
-                  wellContents[wellName].ingreds
+                  wellContents[wellName]?.ingreds
                 )(event)
               }}
             />

@@ -140,11 +140,15 @@ export const getAllWellContentsForActiveItem: Selector<WellContentsByLabware> = 
       ...robotStateTimeline.timeline,
       { robotState: lastValidRobotState },
     ]
-    let timelineIdx = timeline.length - 1 // default to last valid robot state
+    const lastValidRobotStateIdx = timeline.length - 1
+    let timelineIdx = lastValidRobotStateIdx // default to last valid robot state
 
     if (activeItem.isStep) {
-      timelineIdx = orderedStepIds.findIndex(id => id === activeItem.id)
-    } else if (!activeItem.isStep && activeItem.id === START_TERMINAL_ITEM_ID) {
+      timelineIdx = Math.min(
+        orderedStepIds.findIndex(id => id === activeItem.id),
+        lastValidRobotStateIdx
+      )
+    } else if (activeItem.id === START_TERMINAL_ITEM_ID) {
       timelineIdx = 0
     }
 
