@@ -23,8 +23,14 @@ function getRootReducer() {
     wellSelection: require('./well-selection/reducers').default,
   })
 
+  // TODO: Ian 2019-06-25 consider making file loading non-committal
+  // so UNDO_LOAD_FILE doesnt' just reset Redux state
   return (state: any, action) => {
-    if (action.type === 'LOAD_FILE' || action.type === 'CREATE_NEW_PROTOCOL') {
+    if (
+      action.type === 'LOAD_FILE' ||
+      action.type === 'CREATE_NEW_PROTOCOL' ||
+      action.type === 'UNDO_LOAD_FILE'
+    ) {
       // reset entire state, rehydrate from localStorage
       const resetState = rootReducer(undefined, rehydratePersistedAction())
 

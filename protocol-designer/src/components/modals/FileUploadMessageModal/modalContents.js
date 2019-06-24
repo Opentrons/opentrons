@@ -40,10 +40,10 @@ const invalidJsonModal = (errorMessage: ?string): ModalContents => ({
   ),
 })
 
-const didMigrateModal: ModalContents = {
+const genericDidMigrateMessage: ModalContents = {
   title: 'Your protocol was made in an older version of Protocol Designer',
   body: (
-    <React.Fragment>
+    <>
       <p>
         Your protocol will be automatically updated to the latest version.
         Please note that the updated file will be incompatible with older
@@ -56,8 +56,63 @@ const didMigrateModal: ModalContents = {
         the robot.
       </p>
       <p>As always, please contact us with any questions or feedback.</p>
-    </React.Fragment>
+    </>
   ),
+}
+
+const toV3MigrationMessage: ModalContents = {
+  title:
+    'Your protocol must be updated to work with the updated Protocol Designer',
+  okButtonText: "yes, update my protocol's labware",
+  body: (
+    <div className={styles.migration_message}>
+      <div className={styles.section_header}>What is changing</div>
+      <p>
+        All labware definitions (the information that tells your robot about the
+        geometry of labware) are being updated to a newer version
+      </p>
+
+      <div className={styles.section_header}>Why we made this update</div>
+      <p>
+        {
+          "These definitions should be more accurate and thus more reliable across our users' robots."
+        }
+      </p>
+
+      <div className={styles.section_header}>
+        What this means for your protocol
+      </div>
+      <div>
+        <p>
+          If you update your protocol then all labware in it will be switched to
+          the new definition version. This means that:
+        </p>
+        <ol>
+          <li>You will need to re-calibrate all labware in the protocol.</li>
+          <li>
+            We recommend you do a dry run or one with water just to make sure
+            everything is still working fine.
+          </li>
+        </ol>
+      </div>
+
+      <div className={styles.section_header}>
+        {"What happens if you don't update"}
+      </div>
+      <p>
+        You will still be able to run your protocol as usual with the older
+        labware definitions. However in order to make further updates with the
+        Protocol Designer you will need to update your protocol.
+      </p>
+    </div>
+  ),
+}
+
+function getMigrationMessage(migrationsRan: Array<string>): ModalContents {
+  if (migrationsRan.includes('3.0.0')) {
+    return toV3MigrationMessage
+  }
+  return genericDidMigrateMessage
 }
 
 export default function getModalContents(
@@ -76,8 +131,8 @@ export default function getModalContents(
     }
   }
   switch (uploadResponse.messageKey) {
-    case 'didMigrate':
-      return didMigrateModal
+    case 'DID_MIGRATE':
+      return getMigrationMessage(uploadResponse.migrationsRan)
     default: {
       assert(
         false,

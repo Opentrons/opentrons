@@ -29,7 +29,11 @@ export const getMigrationVersionsToRunFromVersion = (
 
 const masterMigration = (
   file: any
-): { file: PDProtocolFile, didMigrate: boolean } => {
+): {
+  file: PDProtocolFile,
+  didMigrate: boolean,
+  migrationsRan: Array<string>,
+} => {
   const designerApplication =
     file.designerApplication || file['designer-application']
 
@@ -50,6 +54,7 @@ const masterMigration = (
   return {
     file: migratedFile,
     didMigrate: migrationVersionsToRun.length > 0,
+    migrationsRan: migrationVersionsToRun,
   }
 }
 

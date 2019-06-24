@@ -13,3 +13,27 @@
   margin: 0 1rem;
   color: var(--c-red);
 }
+
+.migration_message {
+  & p,
+  & li {
+    line-height: 1.5;
+  }
+
+  & ol {
+    padding-left: 2rem;
+  }
+
+  & li {
+    margin: 0.5rem 0;
+  }
+}
+
+.section_header {
+  font-weight: var(--fw-semibold);
+  margin: 1.5rem 0 1rem 0;
+
+  &::after {
+    content: ':';
+  }
+}
