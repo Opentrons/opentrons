@@ -1,5 +1,6 @@
 // @flow
 // app shell discovery module
+import { app } from 'electron'
 import Store from 'electron-store'
 import throttle from 'lodash/throttle'
 
@@ -49,6 +50,8 @@ export function registerDiscovery(dispatch: Action => void) {
   handleConfigChange('discovery.candidates', value =>
     client.setCandidates(['[fd00:0:cafe:fefe::1]'].concat(value))
   )
+
+  app.once('will-quit', () => client.stop())
 
   return function handleIncomingAction(action: Action) {
     log.debug('handling action in discovery', { action })

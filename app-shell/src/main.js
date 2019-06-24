@@ -28,7 +28,8 @@ if (config.devtools) {
 let mainWindow
 let rendererLogger
 
-app.on('ready', startUp)
+app.once('ready', startUp)
+app.once('window-all-closed', () => app.quit())
 
 function startUp() {
   log.info('Starting App')
@@ -37,6 +38,7 @@ function startUp() {
   mainWindow = createUi()
   rendererLogger = createRendererLogger()
 
+  mainWindow.once('closed', () => (mainWindow = null))
   initializeMenu()
 
   // wire modules to UI dispatches

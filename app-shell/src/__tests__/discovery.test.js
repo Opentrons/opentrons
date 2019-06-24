@@ -1,10 +1,12 @@
 // tests for the app-shell's discovery module
 import EventEmitter from 'events'
+import { app } from 'electron'
 import Store from 'electron-store'
 import DiscoveryClient from '@opentrons/discovery-client'
 import { registerDiscovery } from '../discovery'
 import { getConfig, getOverrides } from '../config'
 
+jest.mock('electron')
 jest.mock('electron-store')
 jest.mock('@opentrons/discovery-client')
 jest.mock('../log')
@@ -62,6 +64,22 @@ describe('app-shell/discovery', () => {
   test('calls client.start on "discovery:START"', () => {
     registerDiscovery(dispatch)({ type: 'discovery:START' })
     expect(mockClient.start).toHaveBeenCalledTimes(2)
+  })
+
+  test('calls client.stop when electron app emits "will-quit"', () => {
+    expect(app.once).toHaveBeenCalledTimes(0)
+
+    registerDiscovery(dispatch)
+
+    expect(mockClient.stop).toHaveBeenCalledTimes(0)
+    expect(app.once).toHaveBeenCalledTimes(1)
+
+    const [event, handler] = app.once.mock.calls[0]
+    expect(event).toEqual('will-quit')
+
+    // trigger event handler
+    handler()
+    expect(mockClient.stop).toHaveBeenCalledTimes(1)
   })
 
   test('sets poll speed on "discovery:START" and "discovery:FINISH"', () => {
