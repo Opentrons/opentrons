@@ -10,7 +10,7 @@ import PipetteDiagram from './PipetteDiagram'
 import TiprackDiagram from './TiprackDiagram'
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
-import { getAllAddableLabware } from '../../../labware-defs/utils'
+import { getOnlyLatestDefs } from '../../../labware-defs/utils'
 import type { FormPipette } from '../../../step-forms'
 
 const pipetteOptionsWithNone = [{ name: 'None', value: '' }, ...pipetteOptions]
@@ -26,7 +26,7 @@ export default function ChangePipetteFields(props: Props) {
   const { values, handleChange } = props
 
   const tiprackOptions = useMemo(() => {
-    const defs = getAllAddableLabware()
+    const defs = getOnlyLatestDefs()
     return reduce(
       defs,
       (acc, def: $Values<typeof defs>) => {

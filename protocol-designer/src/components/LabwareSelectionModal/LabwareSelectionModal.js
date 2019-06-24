@@ -8,7 +8,7 @@ import {
 } from '@opentrons/shared-data'
 import startCase from 'lodash/startCase'
 import reduce from 'lodash/reduce'
-import { getAllAddableLabware } from '../../labware-defs/utils'
+import { getOnlyLatestDefs } from '../../labware-defs/utils'
 import { Portal } from '../portals/TopPortal'
 import { PDTitledList } from '../lists'
 import LabwareItem from './LabwareItem'
@@ -22,15 +22,13 @@ type Props = {
   permittedTipracks: Array<string>,
 }
 
-// TODO: BC 2019-05-10 ideally this should be pulled from the definitions
-// and it's usage should be memoized by the useMemo below
 const orderedCategories: Array<string> = [
   'tipRack',
   'tubeRack',
   'wellPlate',
   'reservoir',
   'aluminumBlock',
-  'trash',
+  // 'trash', // NOTE: trash intentionally hidden
 ]
 
 const LabwareDropdown = (props: Props) => {
@@ -40,7 +38,7 @@ const LabwareDropdown = (props: Props) => {
   const [previewedLabware, previewLabware] = useState<?LabwareDefinition2>(null)
 
   const labwareByCategory = useMemo(() => {
-    const defs = getAllAddableLabware()
+    const defs = getOnlyLatestDefs()
     return reduce(
       defs,
       (acc, def: $Values<typeof defs>) => {

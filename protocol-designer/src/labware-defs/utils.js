@@ -69,24 +69,6 @@ export function getOnlyLatestDefs(): LabwareDefByDefURI {
   return _latestDefs
 }
 
-// filter out "do not list" labware
-export function getAllAddableLabware(): LabwareDefByDefURI {
-  const latestDefs = getOnlyLatestDefs()
-  return reduce(
-    latestDefs,
-    (acc, def: $Values<typeof latestDefs>, uri) => {
-      if (
-        def.namespace === OPENTRONS_NAMESPACE &&
-        LABWAREV2_DO_NOT_LIST.includes(def.parameters.loadName)
-      ) {
-        return acc
-      }
-      return { ...acc, [uri]: def }
-    },
-    {}
-  )
-}
-
 // NOTE: this is different than labware library,
 // in PD we wanna get always by labware URI (namespace/loadName/version) never by loadName
 export function _getSharedLabware(labwareDefURI: string): ?LabwareDefinition2 {
