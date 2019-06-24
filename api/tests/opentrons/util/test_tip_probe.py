@@ -5,7 +5,7 @@ from opentrons.util.calibration_functions import update_instrument_config
 
 @pytest.fixture
 def config(monkeypatch):
-    default = robot_configs._build_config({}, {})._replace(
+    default = robot_configs.build_config({}, {})._replace(
         gantry_calibration=[
             [1.0, 0.0, 0.0, 0.0],
             [0.0, 1.0, 0.0, 0.0],
@@ -37,7 +37,7 @@ def config(monkeypatch):
     def dummy_default(a, b):
         return default
 
-    monkeypatch.setattr(robot_configs, '_build_config', dummy_default)
+    monkeypatch.setattr(robot_configs, 'build_config', dummy_default)
     return default
 
 
@@ -118,8 +118,8 @@ def test_update_instrument_config(fixture):
         "Expected instrument position to update relative to mover in pose tree"
 
     filename = CONFIG['robot_settings_file']
-    _, expected = robot_configs._config_to_save(
-        robot_configs._build_config([[]], {}))
+    _, expected = robot_configs.config_to_save(
+        robot_configs.build_config([[]], {}))
     expected['instrument_offset']['right']['single'] = [5.0, 5.0, 0.0]
     expected['tip_length']['Pipette'] = 55.0
 

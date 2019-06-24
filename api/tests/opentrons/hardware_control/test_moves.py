@@ -8,7 +8,7 @@ from opentrons.hardware_control.types import Axis, CriticalPoint
 async def test_controller_home(loop):
     c = hc.API.build_hardware_simulator(
         loop=loop,
-        config=robot_configs._build_config({}, {}))
+        config=robot_configs.build_config({}, {}))
     await c.home()
 
     assert c._current_position == {Axis.X: 418,

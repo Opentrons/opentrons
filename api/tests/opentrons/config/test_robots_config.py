@@ -73,7 +73,7 @@ def test_load_corrupt_json():
 
 
 def test_build_config():
-    built_config = robot_configs._build_config(dummy_cal, dummy_settings)
+    built_config = robot_configs.build_config(dummy_cal, dummy_settings)
 
     assert built_config.gantry_calibration == dummy_cal
     for key in [k for k in dummy_settings.keys() if k != 'tip_probe']:
@@ -89,7 +89,7 @@ def test_build_config():
     settings = copy.deepcopy(dummy_settings)
     settings['instrument_offset'].update({'right': {}})
 
-    built_config = robot_configs._build_config(dummy_cal, settings)
+    built_config = robot_configs.build_config(dummy_cal, settings)
     expected = {
             'left': {
                 'single': [1, 2, 3],
@@ -109,9 +109,9 @@ def test_dictify_roundtrip():
         = robot_configs._default_probe_dimensions()
     new_settings['tip_probe']['center']\
         = robot_configs._default_probe_center()
-    built_config = robot_configs._build_config(dummy_cal, dummy_settings)
-    new_cal, new_config = robot_configs._config_to_save(built_config)
+    built_config = robot_configs.build_config(dummy_cal, dummy_settings)
+    new_cal, new_config = robot_configs.config_to_save(built_config)
     assert new_cal == dummy_cal
     assert new_config == new_settings
-    new_config = robot_configs._build_config(new_cal, new_config)
+    new_config = robot_configs.build_config(new_cal, new_config)
     assert new_config == built_config
