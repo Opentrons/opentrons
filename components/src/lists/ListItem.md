@@ -17,7 +17,7 @@ If the ListItem is passed a `url` prop, it will wrap its children in a `react-ro
 // <StaticRouter> used here for example purposes
 const { StaticRouter } = require('react-router-dom')
 
-;<StaticRouter>
+;<StaticRouter context={{}}>
   <TitledList title="List Title Here">
     <ListItem url="#">Go somewhere</ListItem>
     <ListItem url="#" isDisabled>
