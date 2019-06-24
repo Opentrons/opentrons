@@ -1,14 +1,10 @@
 // @flow
 import groupBy from 'lodash/groupBy'
-import reduce from 'lodash/reduce'
 import {
   getLabwareDefURI,
-  LABWAREV2_DO_NOT_LIST,
   type LabwareDefinition2,
 } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from './types'
-
-const OPENTRONS_NAMESPACE = 'opentrons'
 
 // TODO: Ian 2019-04-11 getAllDefinitions also exists (differently) in labware-library,
 // should reconcile differences & make a general util fn imported from shared-data
@@ -67,24 +63,6 @@ export function getOnlyLatestDefs(): LabwareDefByDefURI {
     )
   }
   return _latestDefs
-}
-
-// filter out "do not list" labware
-export function getAllAddableLabware(): LabwareDefByDefURI {
-  const latestDefs = getOnlyLatestDefs()
-  return reduce(
-    latestDefs,
-    (acc, def: $Values<typeof latestDefs>, uri) => {
-      if (
-        def.namespace === OPENTRONS_NAMESPACE &&
-        LABWAREV2_DO_NOT_LIST.includes(def.parameters.loadName)
-      ) {
-        return acc
-      }
-      return { ...acc, [uri]: def }
-    },
-    {}
-  )
 }
 
 // NOTE: this is different than labware library,
