@@ -3,7 +3,6 @@
 import { useRef, useEffect } from 'react'
 import { usePrevious } from '@opentrons/components'
 
-import type { State } from '../types'
 import type { RobotApiResponse, RobotApiRequestState } from './types'
 
 export type Handlers = $Shape<{

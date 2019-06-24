@@ -1,5 +1,4 @@
 // @flow
-// generic react hooks that don't fit cleanly anywhere else
 import { useEffect, useRef } from 'react'
 
 /**
@@ -15,7 +14,7 @@ export function usePrevious<T>(value: T): T | void {
 
   useEffect(() => {
     prevRef.current = value
-  })
+  }, [value])
 
   return prevRef.current
 }
