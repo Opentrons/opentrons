@@ -1,7 +1,7 @@
 // @flow
 import React, { useMemo } from 'react'
 import { DropdownField, FormGroup, type Mount } from '@opentrons/components'
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
 import isEmpty from 'lodash/isEmpty'
 import reduce from 'lodash/reduce'
 import i18n from '../../../localization'
@@ -34,7 +34,7 @@ export default function ChangePipetteFields(props: Props) {
         return [
           ...acc,
           {
-            name: def.metadata.displayName,
+            name: getLabwareDisplayName(def),
             value: getLabwareDefURI(def),
           },
         ]

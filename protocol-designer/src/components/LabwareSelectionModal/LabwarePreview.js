@@ -6,7 +6,10 @@ import {
   LabeledValue,
   RobotWorkSpace,
 } from '@opentrons/components'
-import { type LabwareDefinition2 } from '@opentrons/shared-data'
+import {
+  getLabwareDisplayName,
+  type LabwareDefinition2,
+} from '@opentrons/shared-data'
 import i18n from '../../localization'
 import styles from './styles.css'
 
@@ -35,7 +38,7 @@ const LabwarePreview = (props: Props) => {
     <div style={{ left: leftValue }} className={styles.labware_preview_wrapper}>
       <div className={styles.labware_preview}>
         <h3 className={styles.labware_preview_header}>
-          {props.labwareDef?.metadata?.displayName}
+          {props.labwareDef ? getLabwareDisplayName(props.labwareDef) : ''}
         </h3>
         <div className={styles.labware_detail_row}>
           <div className={styles.labware_render_wrapper}>

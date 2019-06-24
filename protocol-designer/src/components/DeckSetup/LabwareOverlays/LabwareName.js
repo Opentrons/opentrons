@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { LabwareNameOverlay } from '@opentrons/components'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 import type { BaseState, ThunkDispatch } from '../../../types'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import type { LabwareOnDeck } from '../../../step-forms'
@@ -17,7 +18,7 @@ type Props = { ...OP, ...SP }
 
 const NameOverlay = (props: Props) => {
   const { labwareOnDeck, nickname } = props
-  const title = nickname || labwareOnDeck.def.metadata.displayName
+  const title = nickname || getLabwareDisplayName(labwareOnDeck.def)
   return <LabwareNameOverlay title={title} />
 }
 

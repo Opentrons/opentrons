@@ -12,8 +12,32 @@ export * from './volume'
 export const getLabwareDefURI = (def: LabwareDefinition2): string =>
   `${def.namespace}/${def.parameters.loadName}/${def.version}`
 
-export const getLabwareDisplayName = (labwareDef: LabwareDefinition2) =>
-  labwareDef.metadata.displayName
+// Load names of "retired" labware
+const RETIRED_LABWARE = [
+  'geb_96_tiprack_10ul',
+  'geb_96_tiprack_1000ul',
+  'generic_96_wellplate_300ul_pcr',
+  'generic_96_wellplate_1.5ml_deep',
+  'opentrons_1_trash_850ml_fixed',
+  'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic',
+  'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap_acrylic',
+  'opentrons_24_tuberack_generic_0.75ml_snapcap_acrylic',
+  'opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip',
+  'opentrons_96_aluminumblock_biorad_wellplate_200ul',
+  'tipone_96_tiprack_200ul',
+]
+
+export const getLabwareDisplayName = (labwareDef: LabwareDefinition2) => {
+  const { displayName } = labwareDef.metadata
+
+  if (
+    labwareDef.namespace === 'opentrons' &&
+    RETIRED_LABWARE.includes(labwareDef.parameters.loadName)
+  ) {
+    return `(Retired) ${displayName}`
+  }
+  return displayName
+}
 
 export const getLabwareFormat = (labwareDef: LabwareDefinition2) =>
   labwareDef.parameters.format
