@@ -16,7 +16,7 @@ PYTHON_OPENTRONS_API_SETUP_TYPE = setuptools
 PYTHON_OPENTRONS_API_SITE_METHOD = local
 PYTHON_OPENTRONS_API_SITE = $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)
 PYTHON_OPENTRONS_API_SUBDIR = api
-PYTHON_OPENTRONS_API_POST_INSTALL_TARGET_HOOKS = PYTHON_OPENTRONS_API_INSTALL_VERSION
+PYTHON_OPENTRONS_API_POST_INSTALL_TARGET_HOOKS = PYTHON_OPENTRONS_API_INSTALL_VERSION PYTHON_OPENTRONS_API_INSTALL_RELEASE_NOTES
 
 define OTAPI_DUMP_BR_VERSION
 	$(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py api dump_br_version)
@@ -36,6 +36,10 @@ define PYTHON_OPENTRONS_API_INSTALL_INIT_SYSTEMD
 
   ln -sf ../opentrons-api-server.service \
     $(TARGET_DIR)/etc/systemd/system/opentrons.target.wants/opentrons-api-server.service
+endef
+
+define PYTHON_OPENTRONS_API_INSTALL_RELEASE_NOTES
+	$(INSTALL) -D -m 0644 $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/api/release-notes.md $(BINARIES_DIR)/release-notes.md
 endef
 
 # Calling inner-python-package directly instead of using python-package macro
