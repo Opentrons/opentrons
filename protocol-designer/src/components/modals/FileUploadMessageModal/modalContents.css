@@ -15,6 +15,9 @@
 }
 
 .migration_message {
+  overflow-y: auto;
+  height: 50vh;
+
   & p,
   & li {
     line-height: 1.5;

@@ -1,4 +1,5 @@
 // @flow
+import i18n from '../../../localization'
 import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
 import modalStyles from '../modal.css'
@@ -21,8 +22,12 @@ export default function FileUploadMessageModal(props: Props) {
     <AlertModal
       heading={title}
       buttons={[
-        { children: 'cancel', onClick: cancelProtocolMigration },
-        { children: okButtonText || 'ok', onClick: dismissModal },
+        { children: i18n.t('button.cancel'), onClick: cancelProtocolMigration },
+        {
+          children: okButtonText || 'ok',
+          onClick: dismissModal,
+          className: modalStyles.long_button,
+        },
       ]}
       className={modalStyles.modal}
       alertOverlay
