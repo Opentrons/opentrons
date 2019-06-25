@@ -205,7 +205,8 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
     const restartRequest = getRestartRequest(state, robot)
     const updateInfo = getRobotUpdateInfo(state, robot)
     const buildrootUpdateAvailable =
-      version && getBuildrootUpdateAvailable(state, version)
+      !!version && getBuildrootUpdateAvailable(state, version)
+
     const buildrootUpdateSeen = getBuildrootUpdateSeen(state)
     const __buildRootEnabled = Boolean(
       getConfig(state).devInternal?.enableBuildRoot
