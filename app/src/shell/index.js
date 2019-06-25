@@ -18,6 +18,7 @@ import type {
 import type { ViewableRobot } from '../discovery'
 import type { Config } from '../config'
 import type { ShellUpdateAction } from './update'
+import type { BuildrootAction } from './buildroot'
 
 type ShellLogsDownloadAction = {|
   type: 'shell:DOWNLOAD_LOGS',
@@ -25,7 +26,10 @@ type ShellLogsDownloadAction = {|
   meta: {| shell: true |},
 |}
 
-export type ShellAction = ShellUpdateAction | ShellLogsDownloadAction
+export type ShellAction =
+  | ShellUpdateAction
+  | ShellLogsDownloadAction
+  | BuildrootAction
 
 const {
   ipcRenderer,

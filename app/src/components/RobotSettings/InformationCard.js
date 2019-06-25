@@ -8,8 +8,10 @@ import {
   fetchHealthAndIgnored,
   makeGetRobotUpdateInfo,
 } from '../../http-api-client'
+import { getConfig } from '../../config'
 import { getRobotApiVersion, getRobotFirmwareVersion } from '../../discovery'
-import { checkShellUpdate } from '../../shell'
+import { checkShellUpdate, getBuildrootUpdateAvailable } from '../../shell'
+
 import { RefreshCard, LabeledValue, OutlineButton } from '@opentrons/components'
 import { CardContentQuarter } from '../layout'
 
@@ -23,7 +25,10 @@ type OP = {|
 |}
 
 type SP = {|
+  version: string,
   updateInfo: RobotUpdateInfo,
+  buildrootUpdateAvailable: boolean,
+  __buildRootEnabled: boolean,
 |}
 
 type DP = {|
@@ -44,11 +49,23 @@ export default connect<Props, OP, SP, _, _, _>(
 )(InformationCard)
 
 function InformationCard(props: Props) {
-  const { robot, updateInfo, fetchHealth, updateUrl, checkAppUpdate } = props
+  const {
+    robot,
+    updateInfo,
+    fetchHealth,
+    updateUrl,
+    checkAppUpdate,
+    version,
+    buildrootUpdateAvailable,
+  } = props
   const { name, displayName, serverOk } = robot
-  const version = getRobotApiVersion(robot) || 'Unknown'
   const firmwareVersion = getRobotFirmwareVersion(robot) || 'Unknown'
-  const updateText = updateInfo.type || 'Reinstall'
+  let updateText: string
+  if (props.__buildRootEnabled && buildrootUpdateAvailable) {
+    updateText = 'Upgrade'
+  } else {
+    updateText = updateInfo.type || 'Reinstall'
+  }
 
   return (
     <RefreshCard watch={name} refresh={fetchHealth} title={TITLE}>
@@ -78,9 +95,18 @@ function InformationCard(props: Props) {
 function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
   const getUpdateInfo = makeGetRobotUpdateInfo()
 
-  return (state, ownProps) => ({
-    updateInfo: getUpdateInfo(state, ownProps.robot),
-  })
+  return (state, ownProps) => {
+    const version = getRobotApiVersion(ownProps.robot) || 'Unknown'
+    return {
+      version,
+      updateInfo: getUpdateInfo(state, ownProps.robot),
+      buildrootUpdateAvailable:
+        version && getBuildrootUpdateAvailable(state, version),
+      __buildRootEnabled: Boolean(
+        getConfig(state).devInternal?.enableBuildRoot
+      ),
+    }
+  }
 }
 
 function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {

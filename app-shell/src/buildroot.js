@@ -6,8 +6,12 @@ import fse from 'fs-extra'
 import { app } from 'electron'
 
 import createLogger from './log'
+import { getConfig } from './config'
 
 import type { BuildrootUpdateInfo } from '@opentrons/app/src/shell'
+import type { Action } from '@opentrons/app/src/types'
+
+type Dispatch = Action => void
 
 const log = createLogger(__filename)
 
@@ -22,12 +26,25 @@ let updateFilename: string
 let updateApiVersion: string
 let updateServerVersion: string
 
-export function registerBuildrootUpdate() {
-  initializeUpdateFileInfo()
-  return () => {}
+export function registerBuildrootUpdate(dispatch: Dispatch) {
+  const buildrootEnabled = getConfig('devInternal').enableBuildRoot
+
+  if (buildrootEnabled) {
+    initializeUpdateFileInfo()
+  }
+
+  return function handleAction(action: Action) {
+    if (buildrootEnabled) {
+      switch (action.type) {
+        case 'shell:CHECK_UPDATE':
+          const payload = getBuildrootUpdateInfo()
+          dispatch({ type: 'buildroot:UPDATE_INFO', payload })
+      }
+    }
+  }
 }
 
-export function getBuildrootUpdateInfo(): ?BuildrootUpdateInfo {
+export function getBuildrootUpdateInfo(): BuildrootUpdateInfo | null {
   if (updateFilename && updateApiVersion && updateServerVersion) {
     return {
       filename: path.basename(updateFilename),

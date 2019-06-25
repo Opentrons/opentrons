@@ -1,0 +1,13 @@
+@import '@opentrons/components';
+
+.system_update_modal {
+  padding: 4rem 2rem 1rem;
+}
+
+.system_update_warning {
+  font-weight: var(--fw-semibold);
+}
+
+.view_update_button {
+  width: auto;
+}

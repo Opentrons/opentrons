@@ -8,7 +8,14 @@ import {
   selectors as robotSelectors,
   actions as robotActions,
 } from '../../robot'
-import { CONNECTABLE, REACHABLE } from '../../discovery'
+import { getConfig } from '../../config'
+import { CONNECTABLE, REACHABLE, getRobotApiVersion } from '../../discovery'
+import {
+  getBuildrootUpdateAvailable,
+  getBuildrootUpdateSeen,
+  setBuildrootUpdateSeen,
+} from '../../shell'
+
 import {
   makeGetRobotHome,
   clearHomeResponse,
@@ -24,6 +31,7 @@ import RobotSettings, {
   ConnectAlertModal,
 } from '../../components/RobotSettings'
 import UpdateRobot from '../../components/RobotSettings/UpdateRobot'
+import UpdateBuildroot from '../../components/RobotSettings/UpdateBuildroot'
 import CalibrateDeck from '../../components/CalibrateDeck'
 import ConnectBanner from '../../components/RobotSettings/ConnectBanner'
 import ReachableRobotBanner from '../../components/RobotSettings/ReachableRobotBanner'
@@ -49,6 +57,9 @@ type SP = {|
   showConnectAlert: boolean,
   homeInProgress: ?boolean,
   homeError: ?Error,
+  buildrootUpdateAvailable: boolean,
+  __buildRootEnabled: boolean,
+  buildrootUpdateSeen: boolean,
 |}
 
 type DP = {| dispatch: Dispatch |}
@@ -58,6 +69,7 @@ type Props = {
   ...SP,
   closeHomeAlert?: () => mixed,
   closeConnectAlert: () => mixed,
+  ignoreBuildrootUpdate: () => mixed,
 }
 
 export default withRouter<WithRouterOP>(
@@ -82,6 +94,7 @@ function RobotSettingsPage(props: Props) {
     showConnectAlert,
     closeConnectAlert,
     showUpdateModal,
+    ignoreBuildrootUpdate,
     match: { path, url },
   } = props
 
@@ -112,6 +125,19 @@ function RobotSettingsPage(props: Props) {
         <Route
           path={`${path}/${UPDATE_FRAGMENT}`}
           render={() => {
+            if (
+              props.buildrootUpdateAvailable &&
+              props.buildrootUpdateSeen === false &&
+              props.__buildRootEnabled
+            ) {
+              return (
+                <UpdateBuildroot
+                  robot={robot}
+                  parentUrl={url}
+                  ignoreBuildrootUpdate={ignoreBuildrootUpdate}
+                />
+              )
+            }
             return <UpdateRobot robot={robot} appUpdate={appUpdate} />
           }}
         />
@@ -172,25 +198,45 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
 
   return (state, ownProps) => {
     const { robot } = ownProps
+    const version = getRobotApiVersion(robot)
     const connectRequest = robotSelectors.getConnectRequest(state)
     const homeRequest = getHomeRequest(state, robot)
     const ignoredRequest = getUpdateIgnoredRequest(state, robot)
     const restartRequest = getRestartRequest(state, robot)
     const updateInfo = getRobotUpdateInfo(state, robot)
-    const showUpdateModal =
-      // only show the alert modal if there's an upgrade available
-      updateInfo.type === 'upgrade' &&
-      // and we haven't already ignored the upgrade
-      ignoredRequest.response &&
-      ignoredRequest.response.version !== updateInfo.version &&
-      // and we're not actively restarting
-      !restartRequest.inProgress &&
-      // TODO(mc, 2018-09-27): clear this state out on disconnect otherwise
-      // restartRequest.response latches this modal closed (which is fine,
-      // but only for this specific modal)
-      !restartRequest.response
+    const buildrootUpdateAvailable =
+      !!version && getBuildrootUpdateAvailable(state, version)
+
+    const buildrootUpdateSeen = getBuildrootUpdateSeen(state)
+    const __buildRootEnabled = Boolean(
+      getConfig(state).devInternal?.enableBuildRoot
+    )
+    let showUpdateModal: ?boolean
+    if (__buildRootEnabled) {
+      // TODO (ka 2019-06-24): Layer in ignore and restart complexity
+      showUpdateModal =
+        buildrootUpdateAvailable &&
+        // have not ignored update this session
+        !buildrootUpdateSeen
+    } else {
+      showUpdateModal =
+        // only show the alert modal if there's an upgrade available
+        updateInfo.type === 'upgrade' &&
+        // and we haven't already ignored the upgrade
+        ignoredRequest.response &&
+        ignoredRequest.response.version !== updateInfo.version &&
+        // and we're not actively restarting
+        !restartRequest.inProgress &&
+        // TODO(mc, 2018-09-27): clear this state out on disconnect otherwise
+        // restartRequest.response latches this modal closed (which is fine,
+        // but only for this specific modal)
+        !restartRequest.response
+    }
 
     return {
+      __buildRootEnabled,
+      buildrootUpdateAvailable,
+      buildrootUpdateSeen,
       showUpdateModal: !!showUpdateModal,
       homeInProgress: homeRequest && homeRequest.inProgress,
       homeError: homeRequest && homeRequest.error,
@@ -206,6 +252,7 @@ function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
     ...stateProps,
     ...ownProps,
     closeConnectAlert: () => dispatch(robotActions.clearConnectResponse()),
+    ignoreBuildrootUpdate: () => dispatch(setBuildrootUpdateSeen()),
   }
 
   if (robot) {
