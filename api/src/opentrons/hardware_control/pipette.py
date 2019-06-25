@@ -140,7 +140,7 @@ class Pipette:
     def ok_to_add_volume(self, volume_incr: float) -> bool:
         return self.current_volume + volume_incr <= self.config.max_volume
 
-    def add_tip(self, tip_length) -> None:
+    def add_tip(self, tip_length: float) -> None:
         """
         Add a tip to the pipette for position tracking and validation
         (effectively updates the pipette's critical point)

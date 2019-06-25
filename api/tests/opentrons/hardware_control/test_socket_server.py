@@ -4,10 +4,14 @@ import os
 import sys
 import tempfile
 from types import MethodType
+from typing import Dict, List, Optional
 
 import pytest
 
-from opentrons.types import Mount
+from opentrons.config import robot_configs
+from opentrons.types import Mount, Point
+from opentrons.hardware_control.pipette import Pipette
+from opentrons.hardware_control.types import Axis, CriticalPoint
 import opentrons.hardware_control as hc
 import opentrons.hardware_control.socket_server as sockserv
 
@@ -209,3 +213,29 @@ async def test_complex_method(hc_stream_server, loop, monkeypatch):
     assert 'result' in gai_resp
     assert gai_resp['result']['LEFT']\
         == server._api.attached_instruments[Mount.LEFT]
+
+
+@pytest.mark.parametrize(
+    'paramtype,native,serializable', [
+        (Mount, Mount.LEFT, 'LEFT'),
+        (Axis, Axis.A, 'A'),
+        (CriticalPoint, CriticalPoint.NOZZLE, 'NOZZLE'),
+        (Point, Point(1, 2, 3), [1, 2, 3]),
+        (Dict[Mount, str], {Mount.LEFT: 'way hay'}, {'LEFT': 'way hay'}),
+        (Dict[Axis, bool], {Axis.X: True}, {'X': True}),
+        (robot_configs.robot_config,
+         robot_configs.load(),
+         list(robot_configs.config_to_save(robot_configs.load()))),
+        (Dict[Mount, Pipette.DictType],
+         {Mount.LEFT: {'asdasd': 2, 'asda': False}},
+         {'LEFT': {'asdasd': 2, 'asda': False}}),
+        (List[Axis], [Axis.X, Axis.A], ['X', 'A']),
+        (Optional[CriticalPoint], None, None),
+        (Optional[CriticalPoint], CriticalPoint.NOZZLE, 'NOZZLE'),
+    ]
+)
+def test_serializers(paramtype, native, serializable, config_tempdir):
+    assert paramtype in sockserv._SERDES
+    serdes = sockserv._SERDES[paramtype]
+    assert serdes.serializer(native) == serializable
+    assert serdes.deserializer(serializable) == native
