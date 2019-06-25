@@ -198,7 +198,7 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
 
   return (state, ownProps) => {
     const { robot } = ownProps
-    const version = getRobotApiVersion(robot) || 'Unknown'
+    const version = getRobotApiVersion(robot)
     const connectRequest = robotSelectors.getConnectRequest(state)
     const homeRequest = getHomeRequest(state, robot)
     const ignoredRequest = getUpdateIgnoredRequest(state, robot)
