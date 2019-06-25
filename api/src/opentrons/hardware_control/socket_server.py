@@ -217,7 +217,7 @@ class JsonRpcProtocol(asyncio.Protocol):
         self._buffer += data.decode()  # hope this isn't incomplete
         try:
             _, pos = self._decoder.raw_decode(self._buffer)
-        except json.JSONDecodeError as e:
+        except json.JSONDecodeError:
             # If someone sends us garbage that isn't valid json, we need to
             # not get stuck in a bad state. If we're always accumulating data
             # until we no longer get an error, then consider if the first thing
