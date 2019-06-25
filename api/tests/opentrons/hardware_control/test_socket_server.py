@@ -1,4 +1,5 @@
 import asyncio
+import inspect
 import json
 import os
 import sys
@@ -7,6 +8,7 @@ from types import MethodType
 from typing import Dict, List, Optional
 
 import pytest
+import jsonrpcclient
 
 from opentrons.config import robot_configs
 from opentrons.types import Mount, Point
@@ -14,6 +16,7 @@ from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis, CriticalPoint
 import opentrons.hardware_control as hc
 import opentrons.hardware_control.socket_server as sockserv
+import opentrons.hardware_control.socket_client as sockcli
 
 
 pytestmark = pytest.mark.skipif(sys.platform.startswith('win'),
@@ -21,7 +24,7 @@ pytestmark = pytest.mark.skipif(sys.platform.startswith('win'),
 
 
 @pytest.fixture
-async def hc_stream_server(loop):
+async def socket_server(loop):
     # Using tempfile the library module rather than the tmpfile fixture here
     # because the path length limit for sockets is 100-ish characters
     with tempfile.TemporaryDirectory() as td:
@@ -32,107 +35,114 @@ async def hc_stream_server(loop):
     await server.stop()
 
 
-async def test_multi_write_json(hc_stream_server, loop, monkeypatch):
-    sock, server = hc_stream_server
-
-    invoked_with = []
-    should_return = 'check it out'
-
-    called = asyncio.Event()
-
-    async def fake_dispatch(call_str):
-        nonlocal invoked_with
-        nonlocal called
-        invoked_with.append(call_str)
-        try:
-            return should_return
-        finally:
-            called.set()
-
-    monkeypatch.setattr(server, '_dispatch', fake_dispatch)
-
-    reader, writer = await asyncio.open_unix_connection(
-        sock, limit=15)
-    writer.write(b'{"theres                       "')
-    await writer.drain()
-    writer.write(b': "more"}                       ')
-    await writer.drain()
-    await called.wait()
-    assert invoked_with[0] == '{"theres                       ": "more"}'
-    readback = await reader.readexactly(len(should_return.encode()))
-    assert readback == should_return.encode()
+@pytest.fixture
+async def socket_stream_pair(loop, socket_server):
+    # Using tempfile the library module rather than the tmpfile fixture here
+    # because the path length limit for sockets is 100-ish characters
+    sock, server = socket_server
+    client = await sockcli.UnixSocketClient.build(sock)
+    yield client, server
 
 
-async def test_task_cancel(hc_stream_server, loop, monkeypatch):
-    sock, server = hc_stream_server
+@pytest.fixture
+async def socket_adapter(loop, socket_server):
+    # Like socket_stream_pair but using an adapter
+    sock, server = socket_server
+    adapter = sockcli.JsonRpcAdapter(sock, loop)
+    await adapter.connect()
+    yield adapter, server
 
-    async def forever_dispatch(_ignored):
+
+async def test_multi_write_json(socket_stream_pair, loop, monkeypatch):
+    client, server = socket_stream_pair
+
+    request = {'jsonrpc': '2.0', 'method': 'pause_with_message',
+               'params': {'message': 'hi there'}, 'id': 1}
+    request_str = json.dumps(request).encode()
+    request_len = len(request_str)
+    parts = [request_str[:int(request_len/3)],
+             request_str[int(request_len/3): 2*int(request_len/3)],
+             request_str[2*int(request_len/3):]]
+    # Write the request in parts to make sure we can stitch them
+    for part in parts:
+        client._connection.writer.write(part)
+        await client._connection.writer.drain()
+        await asyncio.sleep(0.1)
+
+    resp = await client._connection.decoder.read_object()
+    assert resp['id'] == 1
+    assert resp['result'] is None
+
+
+async def test_task_cancel(socket_server, loop, monkeypatch):
+    sock, server = socket_server
+
+    async def fake_dispatch(_ignored):
         while True:
             await asyncio.sleep(10)
 
-    monkeypatch.setattr(server, '_dispatch', forever_dispatch)
-    reader, writer = await asyncio.open_unix_connection(
-        sock, limit=15)
-    writer.write(b'{"hi": "there"}')
-    await writer.drain()
-    # wait for the server task to get woken
-    while not server._protocol_instances:
-        await asyncio.sleep(0.001)
-    # cancel the dispatch task
-    for pi in server._protocol_instances:
-        for ift in pi._inflight:
-            ift.cancel()
-    dec = sockserv.JsonStreamDecoder(reader)
-    decd = await dec.read_object()
-    assert decd['jsonrpc'] == '2.0'
-    assert decd['error']['code'] == -32063
-    assert decd['error']['message'] == 'execution cancelled'
-    assert 'data' in decd['error']
+    monkeypatch.setattr(server, '_dispatch', fake_dispatch)
+
+    async def cancel():
+        # wait for the server task to get woken
+        while not server._protocol_instances:
+            await asyncio.sleep(0.001)
+        # cancel the dispatch task
+        for pi in server._protocol_instances:
+            while not pi._inflight:
+                await asyncio.sleep(0.001)
+            for ift in pi._inflight:
+                print("about to call cancel")
+                ift.cancel()
+                print("called cancel")
+    client = await sockcli.UnixSocketClient.build(sock)
+    pause_obj, _whocares = await asyncio.gather(
+        client.request('pause_with_message', message='hi there'),
+        cancel(),
+        return_exceptions=True)
+    assert isinstance(
+        pause_obj, jsonrpcclient.exceptions.ReceivedErrorResponseError)
+    print(pause_obj.response.data)
+    assert pause_obj.response.code == -32063
+    assert pause_obj.response.message == 'execution cancelled'
 
 
-async def test_dispatch_exception(hc_stream_server, loop, monkeypatch):
-    sock, server = hc_stream_server
+async def test_dispatch_exception(socket_server, loop, monkeypatch):
+    sock, server = socket_server
 
     async def error_dispatch(_ignored):
         raise Exception()
 
     monkeypatch.setattr(server, '_dispatch', error_dispatch)
-    reader, writer = await asyncio.open_unix_connection(
-        sock, limit=15)
-    writer.write(b'{"hi": "there"}')
-    await writer.drain()
-    decoder = sockserv.JsonStreamDecoder(reader)
-    obj = await decoder.read_object()
-    assert obj['jsonrpc'] == '2.0'
-    assert obj['error']['code'] == -32063
-    assert obj['error']['message'] == 'uncaught exception in dispatch'
-    assert 'data' in obj['error']
+    client = await sockcli.UnixSocketClient.build(sock)
+    with pytest.raises(
+            jsonrpcclient.exceptions.ReceivedErrorResponseError)\
+            as excinfo:
+        await client.request('pause_with_message', message='hi there')
+    assert excinfo.value.response.code == -32063
 
 
-async def test_errors_from_invoke(hc_stream_server, loop):
+async def test_errors_from_invoke(socket_stream_pair, loop):
     """ Test that various jsonrpc errors actually get back to us """
 
-    sock, server = hc_stream_server
-    reader, writer = await asyncio.open_unix_connection(
-        sock)
-    decoder = sockserv.JsonStreamDecoder(reader)
-    writer.write(b'aojsbdakbsdkabsdkh')
-    writer.write(json.dumps({'this is invalid': 'jsonrpc'}).encode())
-    resp = await decoder.read_object()
+    client, server = socket_stream_pair
+    client._connection.writer.write(b'aojsbdakbsdkabsdkh')
+    client._connection.writer.write(
+        json.dumps({'this is invalid': 'jsonrpc'}).encode())
+    resp = await client._connection.decoder.read_object()
     assert resp['jsonrpc'] == '2.0'
     assert resp['error']['code'] == -32600
-    writer.write(
+    client._connection.writer.write(
         json.dumps({'jsonrpc': '2.0', 'method': 'aouhsoashdas',
                     'params': [], 'id': 1}).encode())
-    resp = await decoder.read_object()
+    resp = await client._connection.decoder.read_object()
     assert resp['error']['code'] == -32601
 
 
-async def test_basic_method(hc_stream_server, loop, monkeypatch):
+async def test_basic_method(socket_stream_pair, loop, monkeypatch):
     """ Test methods with no non-serializable argument types """
-    sock, server = hc_stream_server
-    reader, writer = await asyncio.open_unix_connection(
-        sock)
+    client, server = socket_stream_pair
+
     # Check a non-async method and make sure it works
     passed_message = None
 
@@ -144,16 +154,13 @@ async def test_basic_method(hc_stream_server, loop, monkeypatch):
     monkeypatch.setattr(
         server._api, 'pause_with_message', bound)
     server._methods = sockserv.build_jrpc_methods(server._api)
-    request = json.dumps({'jsonrpc': '2.0', 'method': 'pause_with_message',
-                          'params': {'message': 'why hello!'},
-                          'id': 1})
-    writer.write(request.encode())
-    decoder = sockserv.JsonStreamDecoder(reader)
-    resp = await decoder.read_object()
-    assert resp == {'jsonrpc': '2.0', 'result': None, 'id': 1}
+    resp = await client.request('pause_with_message', message='hello')
+    assert isinstance(resp.data, jsonrpcclient.response.SuccessResponse)
+    assert resp.data.result is None
 
     passed_fw = None
     passed_modeset = None
+    assert passed_message == 'hello'
 
     async def fake_update_firmware(obj,
                                    firmware_file,
@@ -170,50 +177,29 @@ async def test_basic_method(hc_stream_server, loop, monkeypatch):
     bound = MethodType(fake_update_firmware, server._api)
     monkeypatch.setattr(server._api, 'update_firmware', bound)
     server._methods = sockserv.build_jrpc_methods(server._api)
-    request = json.dumps({'jsonrpc': '2.0', 'method': 'update_firmware',
-                          'params': {'firmware_file': "cool file.hex",
-                                     'explicit_modeset': False},
-                          'id': 2})
-    writer.write(request.encode())
-    resp = await decoder.read_object()
-    assert resp == {'jsonrpc': '2.0',
-                    'result': 'i programmed the cool file',
-                    'id': 2}
-    assert passed_fw == 'cool file.hex'
+    resp = await client.request('update_firmware',
+                                firmware_file='some cool file',
+                                explicit_modeset=False)
+
+    assert isinstance(resp.data, jsonrpcclient.response.SuccessResponse)
+    assert resp.data.result == 'i programmed the cool file'
+
+    assert passed_fw == 'some cool file'
     assert passed_modeset is False
 
 
-async def test_complex_method(hc_stream_server, loop, monkeypatch):
+async def test_complex_method(socket_stream_pair, loop, monkeypatch):
     """ Test methods with arguments and returns that need serialization """
-    sock, server = hc_stream_server
-    reader, writer = await asyncio.open_unix_connection(
-        sock)
-    decoder = sockserv.JsonStreamDecoder(reader)
-    request = json.dumps({
-        'jsonrpc': '2.0', 'method': 'cache_instruments',
-        'params': {
-            'require': {
-                'left': 'p300_single_v1.5',
-                'right': 'p1000_single_v1'
-            }
-        },
-        'id': 1
-    })
-    writer.write(request.encode())
-    resp = await decoder.read_object()
-    assert resp['id'] == 1
-    assert 'error' not in resp, resp
-    assert resp['result'] is None
-    gai = json.dumps({
-        'jsonrpc': '2.0', 'method': 'get_attached_instruments',
-        'params': {}, 'id': 2
-    })
-    writer.write(gai.encode())
-    gai_resp = await decoder.read_object()
-    assert gai_resp['id'] == 2
-    assert 'result' in gai_resp
+    client, server = socket_stream_pair
+    resp = await client.request('cache_instruments',
+                                require={Mount.LEFT: 'p300_single_v1.5',
+                                         Mount.RIGHT: 'p1000_single_v1'})
+    assert isinstance(resp.data, jsonrpcclient.response.SuccessResponse)
+    assert resp.data.result is None
+    gai_resp = await client.request('get_attached_instruments')
+    assert isinstance(gai_resp.data, jsonrpcclient.response.SuccessResponse)
     attached = await server._api.attached_instruments
-    assert gai_resp['result']['LEFT']\
+    assert gai_resp.data.result[Mount.LEFT]\
         == attached[Mount.LEFT]
 
 
@@ -241,3 +227,17 @@ def test_serializers(paramtype, native, serializable, config_tempdir):
     serdes = sockserv._SERDES[paramtype]
     assert serdes.serializer(native) == serializable
     assert serdes.deserializer(serializable) == native
+
+
+@pytest.mark.parametrize(
+    "which_prop",
+    [pname for pname, prop
+     in inspect.getmembers(hc.API,
+                           lambda p: isinstance(p, property))
+     if pname not in ['loop', 'attached_modules', 'is_simulator_sync']])
+async def test_client_property(socket_adapter, which_prop, loop):
+    sim = hc.API.build_hardware_simulator(loop=loop)
+    client, server = socket_adapter
+    remote_prop = await getattr(client, which_prop)
+    local_prop = await getattr(sim, which_prop)
+    assert remote_prop == local_prop
