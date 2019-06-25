@@ -176,10 +176,11 @@ class API(HardwareAPILike):
         self._loop = loop
         self._lock = asyncio.Lock(loop=loop)
 
-    @property
-    def is_simulator(self) -> bool:
+    def get_is_simulator(self) -> bool:
         """ `True` if this is a simulator; `False` otherwise. """
         return isinstance(self._backend, Simulator)
+
+    is_simulator = property(fget=get_is_simulator)
 
     async def register_callback(self, cb):
         """ Allows the caller to register a callback, and returns a closure
@@ -192,24 +193,20 @@ class API(HardwareAPILike):
 
         return unregister
 
-    # Query API
-    @property
-    def fw_version(self) -> str:
-        """ Return the firmware version of the connected hardware.
+    def get_fw_version(self) -> str:
+        """
+        Return the firmware version of the connected hardware.
 
         The version is a string retrieved directly from the attached hardware
         (or possibly simulator).
-        """
-        return self.get_fw_version()
-
-    def get_fw_version(self) -> str:
-        """ A method implementation of :py:attr:`fw_version`.
         """
         from_backend = self._backend.fw_version
         if from_backend is None:
             return 'unknown'
         else:
             return from_backend
+
+    fw_version = property(fget=get_fw_version)
 
     # Incidentals (i.e. not motion) API
     @_log_call
@@ -305,9 +302,8 @@ class API(HardwareAPILike):
         mod_log.info("Instruments found: {}".format(
             self._attached_instruments))
 
-    @property
-    def attached_instruments(self) -> Dict[top_types.Mount,
-                                           Pipette.DictType]:
+    def get_attached_instruments(self) -> Dict[top_types.Mount,
+                                               Pipette.DictType]:
         """ Get the status dicts of the cached attached instruments.
 
         Also available as :py:meth:`get_attached_instruments`.
@@ -340,10 +336,7 @@ class API(HardwareAPILike):
             instruments[mount]['has_tip'] = instr.has_tip
         return instruments
 
-    def get_attached_instruments(self) -> Dict[top_types.Mount,
-                                               Pipette.DictType]:
-        """ Function implementation of :py:attr:`attached_instruments` """
-        return self.attached_instruments
+    attached_instruments = property(fget=get_attached_instruments)
 
     @property
     def attached_modules(self):
@@ -773,11 +766,12 @@ class API(HardwareAPILike):
             else:
                 self._current_position.update(target_position)
 
-    @property
-    def engaged_axes(self) -> Dict[Axis, bool]:
+    def get_engaged_axes(self) -> Dict[Axis, bool]:
         """ Which axes are engaged and holding. """
         return {Axis[ax]: eng
                 for ax, eng in self._backend.engaged_axes().items()}
+
+    engaged_axes = property(fget=get_engaged_axes)
 
     async def disengage_axes(self, which: List[Axis]):
         self._backend.disengage_axes([ax.name for ax in which])
@@ -817,8 +811,7 @@ class API(HardwareAPILike):
             return top_types.Point(0, 0, 0)
 
     # Gantry/frame (i.e. not pipette) config API
-    @property
-    def config(self) -> robot_configs.robot_config:
+    def get_config(self) -> robot_configs.robot_config:
         """ Get the robot's configuration object.
 
         :returns .robot_config: The object.
@@ -826,7 +819,10 @@ class API(HardwareAPILike):
         return self._config
 
     def set_config(self, config: robot_configs.robot_config):
+        """ Replace the currently-loaded config """
         self._config = config
+
+    config = property(fget=get_config, fset=set_config)
 
     def update_config(self, **kwargs):
         """ Update values of the robot's configuration.

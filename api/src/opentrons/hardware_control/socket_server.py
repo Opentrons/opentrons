@@ -13,10 +13,11 @@ from typing import Any, Awaitable, Callable, Dict, Optional, Set
 import jsonrpcserver
 
 from opentrons import types as top_types
+from opentrons.config import robot_configs
 
 from . import API, types, pipette
 
-LOG = logging.getLogger()
+LOG = logging.getLogger(__name__)
 
 
 SerDes = namedtuple('SerDes', ('serializer', 'deserializer'))
@@ -37,7 +38,7 @@ _SERDES = {
         deserializer=lambda lst: top_types.Point(*lst)),
     Dict[top_types.Mount, str]: SerDes(
         serializer=lambda require: {
-            mount.name(): val for mount, val in require.items()},
+            mount.name: val for mount, val in require.items()},
         deserializer=lambda require: {
             top_types.Mount[key.upper()]: val for key, val in require.items()}
     ),
@@ -50,7 +51,21 @@ _SERDES = {
             top_types.Mount[mount_name.upper()]: pipette_info
             for mount_name, pipette_info in json_dict.items()
         }
+    ),
+    Dict[types.Axis, bool]: SerDes(
+        serializer=lambda axisdict: {
+            ax.name: engaged for ax, engaged in axisdict.items()
+        },
+        deserializer=lambda namedict: {
+            types.Axis[ax.upper()]: engaged
+            for ax, engaged in namedict.items()
+        }
+    ),
+    robot_configs.robot_config: SerDes(
+        serializer=lambda config: list(robot_configs.config_to_save(config)),
+        deserializer=lambda clist: robot_configs.build_config(*clist)
     )
+
 }
 
 
