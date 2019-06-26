@@ -8,17 +8,17 @@ import type { FileUploadMessage } from '../../../load-file'
 const INVALID_FILE_TYPE: ModalContents = {
   title: 'Incorrect file type',
   body: (
-    <React.Fragment>
+    <>
       <p>Only JSON files created in the Protocol Designer can be imported.</p>
       <p>At this time Python protocol files are not supported.</p>
-    </React.Fragment>
+    </>
   ),
 }
 
 const invalidJsonModal = (errorMessage: ?string): ModalContents => ({
   title: 'Invalid JSON file',
   body: (
-    <React.Fragment>
+    <>
       <p>
         This file is either missing information it needs to import properly or
         contains sections that the Protocol Designer cannot read.
@@ -36,7 +36,7 @@ const invalidJsonModal = (errorMessage: ?string): ModalContents => ({
         <p>Error message:</p>
         <p className={styles.error_text}>{errorMessage}</p>
       </div>
-    </React.Fragment>
+    </>
   ),
 })
 
@@ -61,49 +61,40 @@ const genericDidMigrateMessage: ModalContents = {
 }
 
 const toV3MigrationMessage: ModalContents = {
-  title:
-    'Your protocol must be updated to work with the updated Protocol Designer',
-  okButtonText: "yes, update my protocol's labware",
+  title: 'Update protocol to use new labware definitions',
+  okButtonText: 'update protocol',
   body: (
     <div className={styles.migration_message}>
-      <div className={styles.section_header}>What is changing</div>
       <p>
-        All labware definitions (the information that tells your robot about the
-        geometry of labware) are being updated to a newer version
-      </p>
-
-      <div className={styles.section_header}>Why we made this update</div>
-      <p>
-        {
-          "These definitions should be more accurate and thus more reliable across our users' robots."
-        }
+        <strong>
+          To import your file successfully, you must update your protocol to use
+          the new labware definitions.
+        </strong>{' '}
+        Your protocol was made using an older version of Protocol Designer.
+        Since then, Protocol Designer has been improved to include new labware
+        definitions which are more accurate and reliable.
       </p>
 
       <div className={styles.section_header}>
         What this means for your protocol
       </div>
-      <div>
-        <p>
-          If you update your protocol then all labware in it will be switched to
-          the new definition version. This means that:
-        </p>
-        <ol>
-          <li>You will need to re-calibrate all labware in the protocol.</li>
-          <li>
-            We recommend you do a dry run or one with water just to make sure
-            everything is still working fine.
-          </li>
-        </ol>
-      </div>
+      <p>
+        Updating your protocol to use the new labware definitions will as a
+        result require you to re-calibrate all labware in your protocol prior to
+        running it on your robot. We recommend you try a dry run or one with
+        water to ensure everything is working as expected.
+      </p>
 
       <div className={styles.section_header}>
         {"What happens if you don't update"}
       </div>
-      <p>
-        You will still be able to run your protocol as usual with the older
-        labware definitions. However in order to make further updates with the
-        Protocol Designer you will need to update your protocol.
-      </p>
+      <div>
+        <p>
+          If you choose not to update, you will still be able to run your
+          protocol as usual with older labware, however you will not be able to
+          make further updates to this protocol using the Protocol Designer.
+        </p>
+      </div>
     </div>
   ),
 }

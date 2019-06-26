@@ -26,7 +26,7 @@ export default function FileUploadMessageModal(props: Props) {
         {
           children: okButtonText || 'ok',
           onClick: dismissModal,
-          className: modalStyles.long_button,
+          className: modalStyles.ok_button,
         },
       ]}
       className={modalStyles.modal}

@@ -15,20 +15,12 @@
 }
 
 .migration_message {
-  overflow-y: auto;
-  height: 50vh;
-
-  & p,
-  & li {
+  & p {
     line-height: 1.5;
   }
 
-  & ol {
-    padding-left: 2rem;
-  }
-
-  & li {
-    margin: 0.5rem 0;
+  & strong {
+    font-weight: var(--fw-semibold);
   }
 }
 
