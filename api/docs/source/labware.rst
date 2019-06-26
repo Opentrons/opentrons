@@ -105,7 +105,7 @@ Create
 .. Note::
     The current custom labware creation mechanisms in the API are fairly
     limited. We're working on a much more robust system for custom labware
-    defintions. If the current API isn't able to support your labware, please
+    definitions. If the current API isn't able to support your labware, please
     reach out to our support team.
 
 Using ``labware.create``, you can create your own custom labware. The labware
@@ -118,12 +118,12 @@ regularly-spaced columns and rows.
 
     if plate_name not in labware.list():
         labware.create(
-            plate_name,        # name of you labware
-            grid=(3, 6),       # number of (columns, rows)
-            spacing=(12, 12),  # distances (mm) between each (column, row)
-            diameter=5,        # diameter (mm) of each well
-            depth=10,          # depth (mm) of each well
-            volume=200)        # volume (µL) of each well
+            custom_plate_name,  # name of you labware
+            grid=(3, 6),        # number of (columns, rows)
+            spacing=(12, 12),   # distances (mm) between each (column, row)
+            diameter=5,         # diameter (mm) of each well
+            depth=10,           # depth (mm) of each well
+            volume=200)         # volume (µL) of each well
 
     custom_plate = labware.load(custom_plate_name, slot='3')
 
@@ -177,7 +177,7 @@ If you would like to delete a labware you have already added to the database
     must be ``tiprack-REST-OF-LABWARE-NAME`` in order for the software to act
     reliably.
 
-List (depreacted)
+List (deprecated)
 =================
 
 ``labware.list`` returns an array of all labware load names in the old,
