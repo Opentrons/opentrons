@@ -95,7 +95,10 @@ def initialize_robot(loop):
         log.exception("Error while connecting to motor driver: {}".format(e))
         fw_version = None
     else:
-        fw_version = hardware.fw_version
+        if ff.use_protocol_api_v2():
+            fw_version = loop.run_until_complete(hardware.fw_version)
+        else:
+            fw_version = hardware.fw_version
     log.info("Smoothie FW version: {}".format(fw_version))
     if fw_version != packed_smoothie_fw_ver:
         log.info("Executing smoothie update: current vers {}, packed vers {}"
@@ -119,8 +122,14 @@ def run(**kwargs):
     an additional argument of 'patch_old_init'. kwargs are hence used to allow
     the use of different length args
     """
-    logging_config.log_init(hardware.config.log_level)
     loop = asyncio.get_event_loop()
+    if ff.use_protocol_api_v2():
+        robot_conf = loop.run_until_complete(hardware.config)
+    else:
+        robot_conf = hardware.config
+
+    logging_config.log_init(robot_conf.log_level)
+
     log.info("API server version:  {}".format(__version__))
     if not os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
         initialize_robot(loop)

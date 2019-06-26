@@ -93,7 +93,9 @@ class CLITool:
             unhandled_input=self._on_key_press,
             event_loop=loop
         )
-        self._config = self.hardware.config
+
+        self._asyncio_loop = loop
+
         self.current_transform = identity_deck_transform()
 
         # Other state
@@ -351,10 +353,13 @@ class CLITool:
         log.debug("save_transform calibration_matrix: {}".format(
             gantry_calibration))
 
-        self.hardware.update_config(gantry_calibration=gantry_calibration)
+        self.hardware.update_config(
+            gantry_calibration=gantry_calibration)
         res = str(self.hardware.config)
 
-        return '{}\n{}'.format(res, save_config(self.hardware.config))
+        return '{}\n{}'.format(
+            res,
+            save_config(self.hardware.config))
 
     def save_z_value(self) -> str:
         actual_z = self._position()[-1]
@@ -524,7 +529,7 @@ def get_calibration_points():
     }
 
 
-def main():
+def main(loop=None):
     """
     A CLI application for performing factory calibration of an Opentrons robot
 
@@ -560,7 +565,8 @@ def main():
     #  - For xyz coordinates, (0, 0, 0) is the lower-left corner of the robot
     cli = CLITool(
         point_set=get_calibration_points(),
-        tip_length=51.7)
+        tip_length=51.7,
+        loop=loop)
     hardware = cli.hardware
     backup_configuration_and_reload(hardware)
     if not feature_flags.use_protocol_api_v2():
