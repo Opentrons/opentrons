@@ -16,7 +16,7 @@
 
 .migration_message {
   & p {
-    line-height: 1.5;
+    line-height: var(--lh-copy);
   }
 
   & strong {
