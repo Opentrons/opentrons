@@ -8,7 +8,7 @@ describe('useTriggerRobotApiAction', () => {
   const mockTrigger = jest.fn()
   const mockOnFinish = jest.fn()
 
-  const UseTriggerTester = (props: {
+  const TestUseTrigger = (props: {
     trigger: () => mixed,
     requestState: RobotApiRequestState | null,
     onFinish: () => mixed,
@@ -27,7 +27,7 @@ describe('useTriggerRobotApiAction', () => {
 
   test('calling returned function triggers API call', () => {
     const wrapper = mount(
-      <UseTriggerTester
+      <TestUseTrigger
         trigger={mockTrigger}
         requestState={null}
         onFinish={mockOnFinish}
@@ -41,7 +41,7 @@ describe('useTriggerRobotApiAction', () => {
 
   test('if request state switches to completed, calls onFinish', () => {
     const wrapper = mount(
-      <UseTriggerTester
+      <TestUseTrigger
         trigger={mockTrigger}
         requestState={null}
         onFinish={mockOnFinish}
@@ -59,7 +59,7 @@ describe('useTriggerRobotApiAction', () => {
 
   test('does not call onFinish if request was never triggered', () => {
     const wrapper = mount(
-      <UseTriggerTester
+      <TestUseTrigger
         trigger={mockTrigger}
         requestState={null}
         onFinish={mockOnFinish}

@@ -4,7 +4,7 @@ import { mount } from 'enzyme'
 import { usePrevious } from '..'
 
 describe('usePrevious hook', () => {
-  const UsePreviousTester = (props: { value: string }) => {
+  const TestUsePrevious = (props: { value: string }) => {
     const prevValue = usePrevious(props.value)
     return (
       <span>{typeof prevValue === 'undefined' ? 'undefined' : prevValue}</span>
@@ -12,12 +12,12 @@ describe('usePrevious hook', () => {
   }
 
   test('initial previous value is `undefined', () => {
-    const wrapper = mount(<UsePreviousTester value="foo" />)
+    const wrapper = mount(<TestUsePrevious value="foo" />)
     expect(wrapper.html()).toEqual('<span>undefined</span>')
   })
 
   test('saves previous values', () => {
-    const wrapper = mount(<UsePreviousTester value="foo" />)
+    const wrapper = mount(<TestUsePrevious value="foo" />)
     wrapper.setProps({ value: 'bar' })
     expect(wrapper.html()).toEqual('<span>foo</span>')
     wrapper.setProps({ value: 'baz' })

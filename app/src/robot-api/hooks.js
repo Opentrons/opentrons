@@ -21,7 +21,7 @@ export type Handlers = $Shape<{
  * @example
  * import {useDispatch, useSelector} from 'react-redux'
  * import type {State} from '../../types'
- * import {fetchPiepttes, getPipettesRequestState} from '../../robot-api'
+ * import {fetchPipettes, getPipettesRequestState} from '../../robot-api'
  *
  * type Props = { robot: Robot, goToNextScreen: () => mixed }
  *
