@@ -15,8 +15,9 @@ from opentrons.hardware_control.types import Axis, CriticalPoint
 import opentrons.hardware_control as hc
 import opentrons.hardware_control.socket_server as sockserv
 
-if sys.platform.startswith('win'):
-    pytest.skip('No unix domain sockets on windows')
+
+pytestmark = pytest.mark.skipif(sys.platform.startswith('win'),
+                                reason='No unix domain sockets on windows')
 
 
 @pytest.fixture
