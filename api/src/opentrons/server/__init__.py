@@ -64,10 +64,10 @@ class ThreadedAsyncLock:
         pref = f"[ThreadedAsyncLock tid {threading.get_ident()} "\
             f"task {asyncio.Task.current_task()}] "
         log.debug(pref + 'will acquire')
-        then = time.clock()
+        then = time.perf_counter()
         while not self._thread_lock.acquire(blocking=False):
             await asyncio.sleep(0.1)
-        now = time.clock()
+        now = time.perf_counter()
         log.debug(pref + f'acquired in {now-then}s')
 
     async def __aexit__(self, exc_type, exc, tb):
