@@ -64,6 +64,16 @@ export const loadProtocolFile = (
   }
 }
 
+export type UndoLoadFile = {
+  type: 'UNDO_LOAD_FILE',
+}
+
+// TODO: Ian 2019-06-25 consider making file loading non-committal
+// so UNDO_LOAD_FILE doesnt' just reset Redux state
+export const undoLoadFile = (): UndoLoadFile => ({
+  type: 'UNDO_LOAD_FILE',
+})
+
 export type CreateNewProtocolAction = {
   type: 'CREATE_NEW_PROTOCOL',
   payload: NewProtocolFields,

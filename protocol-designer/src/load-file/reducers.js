@@ -15,7 +15,11 @@ const fileUploadMessage = handleActions<FileUploadMessageState, *>(
     ): FileUploadMessageState => action.payload,
     LOAD_FILE: (state, action: LoadFileAction): FileUploadMessageState =>
       action.payload.didMigrate
-        ? { isError: false, messageKey: 'didMigrate' }
+        ? {
+            isError: false,
+            messageKey: 'DID_MIGRATE',
+            migrationsRan: action.payload.migrationsRan,
+          }
         : state,
     DISMISS_FILE_UPLOAD_MESSAGE: (): FileUploadMessageState => null,
   },

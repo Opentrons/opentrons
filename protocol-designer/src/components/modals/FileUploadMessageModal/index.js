@@ -25,6 +25,7 @@ function mapStateToProps(state: BaseState): SP {
 
 function mapDispatchToProps(dispatch: Dispatch<*>): DP {
   return {
+    cancelProtocolMigration: () => dispatch(loadFileActions.undoLoadFile()),
     dismissModal: () => dispatch(loadFileActions.dismissFileUploadMessage()),
   }
 }
