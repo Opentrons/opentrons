@@ -15,7 +15,7 @@ const v1ModelTov2LoadNameMap = {
   'biorad-hardshell-96-PCR': 'biorad_96_wellplate_200ul_pcr',
   'fixed-trash': 'opentrons_1_trash_1100ml_fixed',
   'opentrons-aluminum-block-2ml-eppendorf':
-    'opentrons_24_aluminumblock_generic_2ml_screwcap', // TODO: opentrons-aluminum-block-2ml-eppendorf not in spreadsheet
+    'opentrons_24_aluminumblock_generic_2ml_screwcap',
   'opentrons-aluminum-block-2ml-screwcap':
     'opentrons_24_aluminumblock_generic_2ml_screwcap',
   'opentrons-aluminum-block-96-PCR-plate':
