@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { push, goBack } from 'react-router-redux'
+import { push, goBack } from 'connected-react-router'
 import { Switch, Route, withRouter } from 'react-router'
 
 import type { State, Dispatch } from '../../types'

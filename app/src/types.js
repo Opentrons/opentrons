@@ -2,7 +2,7 @@
 // @flow
 // application types
 import type { Store as ReduxStore, Dispatch as ReduxDispatch } from 'redux'
-import type { RouterAction } from 'react-router-redux'
+import type { RouterAction } from 'connected-react-router'
 import type { Observable } from 'rxjs'
 
 import typeof reducer from './reducer'

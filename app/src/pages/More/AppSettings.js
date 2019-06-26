@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Route, Switch, Redirect, type ContextRouter } from 'react-router'
-import { push } from 'react-router-redux'
+import { push } from 'connected-react-router'
 
 import {
   getShellUpdateState,

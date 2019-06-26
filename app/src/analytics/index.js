@@ -26,7 +26,7 @@ const MIXPANEL_OPTS = {
   opt_out_tracking_by_default: true,
   // user details are persisted in our own config store
   disable_persistence: true,
-  // pageviews tracked manually via react-router-redux events
+  // pageviews tracked manually via connected-react-router events
   track_pageview: false,
 }
 

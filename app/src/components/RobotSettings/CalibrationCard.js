@@ -2,7 +2,7 @@
 // Card for displaying/initiating factory calibration
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { push } from 'react-router-redux'
+import { push } from 'connected-react-router'
 
 import { CONNECTABLE } from '../../discovery'
 import { startDeckCalibration } from '../../http-api-client'
