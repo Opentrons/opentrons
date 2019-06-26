@@ -94,9 +94,9 @@ class FilePage extends React.Component<Props, State> {
                   >
                     <InputField
                       placeholder="Untitled"
-                      name="protocol-name"
+                      name="protocolName"
                       onChange={handleChange}
-                      value={values['protocol-name']}
+                      value={values['protocolName']}
                     />
                   </FormGroup>
 
