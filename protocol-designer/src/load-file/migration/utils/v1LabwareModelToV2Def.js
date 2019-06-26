@@ -33,9 +33,11 @@ const v1ModelTov2LoadNameMap = {
   'opentrons-tuberack-2ml-screwcap':
     'opentrons_24_tuberack_generic_2ml_screwcap',
   'opentrons-tuberack-50ml': 'opentrons_6_tuberack_falcon_50ml_conical',
+  'PCR-strip-tall': 'opentrons_96_aluminumblock_generic_pcr_strip_200ul',
   'tiprack-10ul': 'opentrons_96_tiprack_10ul',
   'tiprack-200ul': 'tipone_96_tiprack_200ul',
   'tiprack-1000ul': 'opentrons_96_tiprack_1000ul',
+  'trash-box': 'agilent_1_reservoir_290ml',
   'trough-12row': 'usascientific_12_reservoir_22ml',
   'tube-rack-.75ml': 'opentrons_24_tuberack_generic_0.75ml_snapcap_acrylic',
   'tube-rack-2ml':
@@ -43,9 +45,6 @@ const v1ModelTov2LoadNameMap = {
   'tube-rack-15_50ml':
     'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic',
 }
-// TODO: missing mappings for:
-// PCR-strip-tall
-// trash-box
 
 export default function v1LabwareModelToV2Def(
   model: string

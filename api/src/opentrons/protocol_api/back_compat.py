@@ -196,9 +196,8 @@ class BCLabware:
 
     LW_NO_EQUIVALENT = {'24-vial-plate', '48-vial-plate', '5ml-3x4',
                         '96-well-plate-20mm', 'MALDI-plate',
-                        'PCR-strip-tall', 'T25-flask',
-                        'T75-flask', 'alum-block-pcr-strips', 'e-gelgol',
-                        'hampton-1ml-deep-block', 'point',
+                        'T25-flask', 'T75-flask', 'alum-block-pcr-strips',
+                        'e-gelgol', 'hampton-1ml-deep-block', 'point',
                         'rigaku-compact-crystallization-plate',
                         'small_vial_rack_16x45', 'temperature-plate',
                         'tiprack-10ul-H', 'trough-12row-short',
@@ -229,9 +228,11 @@ class BCLabware:
         'opentrons-tuberack-2ml-eppendorf': 'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap',            # noqa(E501)
         'opentrons-tuberack-2ml-screwcap': 'opentrons_24_tuberack_generic_2ml_screwcap',              # noqa(E501)
         'opentrons-tuberack-50ml': 'opentrons_6_tuberack_falcon_50ml_conical',
+        'PCR-strip-tall': 'opentrons_96_aluminumblock_generic_pcr_strip_200ul',
         'tiprack-10ul': 'opentrons_96_tiprack_10ul',
         'tiprack-200ul': 'tipone_96_tiprack_200ul',
         'tiprack-1000ul': 'opentrons_96_tiprack_1000ul',
+        'trash-box': 'agilent_1_reservoir_290ml',
         'trough-12row': 'usascientific_12_reservoir_22ml',
         'tube-rack-.75ml': 'opentrons_24_tuberack_generic_0.75ml_snapcap_acrylic',  # noqa(E501)
         'tube-rack-2ml': 'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap_acrylic',  # noqa(E501)
