@@ -27,7 +27,7 @@ let updateApiVersion: string
 let updateServerVersion: string
 
 export function registerBuildrootUpdate(dispatch: Dispatch) {
-  const buildrootEnabled = getConfig('devInternal').enableBuildRoot
+  const buildrootEnabled = getConfig('devInternal')?.enableBuildRoot
 
   if (buildrootEnabled) {
     initializeUpdateFileInfo()
