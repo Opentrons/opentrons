@@ -226,6 +226,7 @@ export const getPipettesForInstrumentGroup: Selector<PipettesForInstrumentGroup>
           description: _getPipetteDisplayName(pipetteOnDeck.name),
           isDisabled: false,
           tiprackModel: getLabwareDisplayName(tiprackDef),
+          // TODO(mc, 2019-06-27): `tiprack` is missing in InstrumentInfoProps; is it used?
           tiprack: { model: pipetteOnDeck.tiprackDefURI },
         }
 

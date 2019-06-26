@@ -154,7 +154,7 @@ exports[`TitleBar renders TitleBar with back button correctly 1`] = `
   className="title_bar"
 >
   <button
-    className="button_flat inverted"
+    className="button_flat title_button inverted"
     onClick={[Function]}
     title="Back"
     type="button"
@@ -173,25 +173,21 @@ exports[`TitleBar renders TitleBar with back button correctly 1`] = `
     </svg>
     back
   </button>
-  <div
-    className="title_wrapper"
+  <h1
+    className="title right"
   >
-    <h1
-      className="title"
-    >
-      foo
-    </h1>
-    <span
-      className="separator"
-    >
-      |
-    </span>
-    <h2
-      className="subtitle"
-    >
-      bar
-    </h2>
-  </div>
+    foo
+  </h1>
+  <span
+    className="separator"
+  >
+    |
+  </span>
+  <h2
+    className="subtitle"
+  >
+    bar
+  </h2>
 </header>
 `;
 
@@ -199,25 +195,21 @@ exports[`TitleBar renders TitleBar with subtitle correctly 1`] = `
 <header
   className="title_bar"
 >
-  <div
-    className="title_wrapper"
+  <h1
+    className="title"
   >
-    <h1
-      className="title"
-    >
-      foo
-    </h1>
-    <span
-      className="separator"
-    >
-      |
-    </span>
-    <h2
-      className="subtitle"
-    >
-      bar
-    </h2>
-  </div>
+    foo
+  </h1>
+  <span
+    className="separator"
+  >
+    |
+  </span>
+  <h2
+    className="subtitle"
+  >
+    bar
+  </h2>
 </header>
 `;
 
@@ -225,14 +217,10 @@ exports[`TitleBar renders TitleBar without subtitle correctly 1`] = `
 <header
   className="title_bar"
 >
-  <div
-    className="title_wrapper"
+  <h1
+    className="title"
   >
-    <h1
-      className="title"
-    >
-      foo
-    </h1>
-  </div>
+    foo
+  </h1>
 </header>
 `;

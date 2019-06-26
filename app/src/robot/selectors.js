@@ -4,10 +4,14 @@ import padStart from 'lodash/padStart'
 import some from 'lodash/some'
 import { createSelector } from 'reselect'
 import omitBy from 'lodash/omitBy'
-import { type ConnectionStatus, PIPETTE_MOUNTS, DECK_SLOTS } from './constants'
+
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import { getLatestLabwareDef } from '../getLabware'
+import { PIPETTE_MOUNTS, DECK_SLOTS } from './constants'
 
 import type { OutputSelector } from 'reselect'
 import type { State } from '../types'
+import type { ConnectionStatus } from './constants'
 import type {
   Mount,
   Pipette,
@@ -197,8 +201,11 @@ export function getPipettesByMount(state: State) {
   return session(state).pipettesByMount
 }
 
-// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
-export const getPipettes = createSelector(
+export const getPipettes: OutputSelector<
+  State,
+  void,
+  Array<Pipette>
+> = createSelector(
   getPipettesByMount,
   (state: State) => calibration(state).probedByMount,
   (state: State) => calibration(state).tipOnByMount,
@@ -240,6 +247,7 @@ export const getPipettes = createSelector(
           calibration,
           probed,
           tipOn,
+          modelSpecs: getPipetteModelSpecs(pipette.name) || null,
         }
       }
     )
@@ -309,8 +317,11 @@ export function getLabwareBySlot(state: State) {
   return session(state).labwareBySlot
 }
 
-// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
-export const getLabware = createSelector(
+export const getLabware: OutputSelector<
+  State,
+  void,
+  Array<Labware>
+> = createSelector(
   getPipettesByMount,
   getLabwareBySlot,
   (state: State) => calibration(state).confirmedBySlot,
@@ -320,7 +331,9 @@ export const getLabware = createSelector(
       .filter(isSlot)
       .map(slot => {
         const labware = lwBySlot[slot]
-        const { type, isTiprack } = labware
+        const { type, isTiprack, isLegacy } = labware
+
+        const definition = isLegacy ? null : getLatestLabwareDef(type)
 
         // labware is confirmed if:
         //   - tiprack: labware in slot is confirmed
@@ -355,7 +368,7 @@ export const getLabware = createSelector(
           }
         }
 
-        return { ...labware, calibration, confirmed, isMoving }
+        return { ...labware, calibration, confirmed, isMoving, definition }
       })
       .sort((a, b) => {
         if (a.isTiprack && !b.isTiprack) return -1

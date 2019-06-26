@@ -15,8 +15,6 @@ export type InstrumentInfoProps = {
   showMountLabel?: ?boolean,
   /** human-readable description, eg 'p300 Single-channel' */
   description: string,
-  /** recommended tip type */
-  tipType?: string,
   /** paired tiprack model */
   tiprackModel?: string,
   /** if disabled, pipette & its info are grayed out */
@@ -46,9 +44,6 @@ export default function InstrumentInfo(props: InstrumentInfoProps) {
           title={props.showMountLabel ? `${props.mount} pipette` : 'pipette'}
           value={props.description}
         />
-        {props.tipType && (
-          <InfoItem title={'suggested tip type'} value={props.tipType} />
-        )}
         {props.tiprackModel && (
           <InfoItem title={'tip rack'} value={props.tiprackModel} />
         )}

@@ -38,18 +38,6 @@ exports[`InstrumentGroup Renders correctly 1`] = `
           p300 8-Channel
         </span>
       </div>
-      <div>
-        <h2
-          className="title"
-        >
-          suggested tip type
-        </h2>
-        <span
-          className="value"
-        >
-          150
-        </span>
-      </div>
     </div>
     <div
       className="pipette_icon"
@@ -75,18 +63,6 @@ exports[`InstrumentGroup Renders correctly 1`] = `
           className="value"
         >
           p10 Single
-        </span>
-      </div>
-      <div>
-        <h2
-          className="title"
-        >
-          suggested tip type
-        </h2>
-        <span
-          className="value"
-        >
-          10
         </span>
       </div>
     </div>

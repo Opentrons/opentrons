@@ -42,7 +42,7 @@ type Props = {
 }
 
 const TITLE = 'Pipette Setup'
-// used to guarentee mount param in route is left or right
+// used to guarantee mount param in route is left or right
 const RE_MOUNT = '(left|right)'
 
 type OP = {|

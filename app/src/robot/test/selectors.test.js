@@ -352,6 +352,7 @@ describe('robot selectors', () => {
           calibration: constants.PROBING,
           probed: true,
           tipOn: false,
+          modelSpecs: null,
         },
         {
           mount: 'right',
@@ -361,6 +362,7 @@ describe('robot selectors', () => {
           calibration: constants.UNPROBED,
           probed: false,
           tipOn: true,
+          modelSpecs: null,
         },
       ])
     })
@@ -545,6 +547,7 @@ describe('robot selectors', () => {
           calibration: 'unconfirmed',
           confirmed: false,
           calibratorMount: 'left',
+          definition: null,
         },
         // then single channel tiprack
         {
@@ -555,6 +558,7 @@ describe('robot selectors', () => {
           calibration: 'moving-to-slot',
           confirmed: false,
           calibratorMount: 'right',
+          definition: null,
         },
         // then other labware by slot
         {
@@ -564,6 +568,7 @@ describe('robot selectors', () => {
           isMoving: false,
           calibration: 'unconfirmed',
           confirmed: true,
+          definition: null,
         },
         // then other labware by slot
         {
@@ -574,6 +579,7 @@ describe('robot selectors', () => {
           calibration: 'unconfirmed',
           // note: labware a in slot 7 is confirmed because confirmed in slot 5
           confirmed: true,
+          definition: null,
         },
         {
           slot: '9',
@@ -582,6 +588,7 @@ describe('robot selectors', () => {
           isMoving: false,
           calibration: 'unconfirmed',
           confirmed: false,
+          definition: null,
         },
       ])
     })
@@ -596,6 +603,7 @@ describe('robot selectors', () => {
           calibration: 'unconfirmed',
           confirmed: false,
           calibratorMount: 'left',
+          definition: null,
         },
         {
           slot: '1',
@@ -605,6 +613,7 @@ describe('robot selectors', () => {
           calibration: 'moving-to-slot',
           confirmed: false,
           calibratorMount: 'right',
+          definition: null,
         },
       ])
     })
@@ -619,6 +628,7 @@ describe('robot selectors', () => {
           calibration: 'unconfirmed',
           confirmed: false,
           calibratorMount: 'left',
+          definition: null,
         },
         {
           slot: '1',
@@ -628,6 +638,7 @@ describe('robot selectors', () => {
           calibration: 'moving-to-slot',
           confirmed: false,
           calibratorMount: 'right',
+          definition: null,
         },
         {
           slot: '9',
@@ -636,6 +647,7 @@ describe('robot selectors', () => {
           isMoving: false,
           calibration: 'unconfirmed',
           confirmed: false,
+          definition: null,
         },
       ])
     })
@@ -649,6 +661,7 @@ describe('robot selectors', () => {
         calibration: 'unconfirmed',
         confirmed: false,
         calibratorMount: 'left',
+        definition: null,
       })
 
       const nextState = {
@@ -672,6 +685,7 @@ describe('robot selectors', () => {
         isMoving: false,
         calibration: 'unconfirmed',
         confirmed: false,
+        definition: null,
       })
     })
   })
