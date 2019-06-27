@@ -21,11 +21,6 @@
   "schemaVersion": 2,
   "version": 1,
   "namespace": "opentrons",
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
-  },
   "wells": {
     "B1": {
       "depth": 113.78,

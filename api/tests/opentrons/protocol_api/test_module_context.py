@@ -2,8 +2,6 @@ import json
 import pkgutil
 
 import opentrons.protocol_api as papi
-from opentrons.types import Point
-
 import pytest
 
 
@@ -165,26 +163,19 @@ def test_semithermocycler_labware_accessor(loop):
 
 def test_module_load_labware(loop):
     ctx = papi.ProtocolContext(loop)
-    labware_name = 'generic_96_wellplate_340ul_flat'
     # TODO Ian 2019-05-29 load fixtures, not real defs
-    labware_def = json.loads(
-        pkgutil.get_data(
-            'opentrons',
-            f'shared_data/labware/definitions/2/{labware_name}/1.json'))
+    labware_name = 'generic_96_wellplate_340ul_flat'
     ctx._hw_manager.hardware._backend._attached_modules = [
         ('mod0', 'tempdeck')]
     mod = ctx.load_module('Temperature Module', 1)
     assert mod.labware is None
     lw = mod.load_labware_by_name(labware_name)
-    lw_offset = Point(labware_def['cornerOffsetFromSlot']['x'],
-                      labware_def['cornerOffsetFromSlot']['y'],
-                      labware_def['cornerOffsetFromSlot']['z'])
-    assert lw._offset == lw_offset + mod._geometry.location.point
+    assert lw._offset == mod._geometry.location.point
     assert lw.name == labware_name
     # Test load with old name
     mod2 = ctx.load_module('tempdeck', 2)
     lw2 = mod2.load_labware_by_name(labware_name)
-    assert lw2._offset == lw_offset + mod2._geometry.location.point
+    assert lw2._offset == mod2._geometry.location.point
     assert lw2.name == labware_name
 
 

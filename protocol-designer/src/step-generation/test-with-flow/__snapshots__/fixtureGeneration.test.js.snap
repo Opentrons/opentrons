@@ -550,11 +550,6 @@ Object {
         "brand": Object {
           "brand": "generic",
         },
-        "cornerOffsetFromSlot": Object {
-          "x": 0,
-          "y": 0,
-          "z": 0,
-        },
         "dimensions": Object {
           "xDimension": 127.76,
           "yDimension": 85.48,
@@ -1683,11 +1678,6 @@ Object {
         "brand": Object {
           "brand": "generic",
         },
-        "cornerOffsetFromSlot": Object {
-          "x": 0,
-          "y": 0,
-          "z": 0,
-        },
         "dimensions": Object {
           "xDimension": 127.76,
           "yDimension": 85.48,
@@ -2815,11 +2805,6 @@ Object {
       "def": Object {
         "brand": Object {
           "brand": "Opentrons",
-        },
-        "cornerOffsetFromSlot": Object {
-          "x": 0,
-          "y": 0,
-          "z": 0,
         },
         "dimensions": Object {
           "xDimension": 127.76,
@@ -3950,11 +3935,6 @@ Object {
         "brand": Object {
           "brand": "Opentrons",
         },
-        "cornerOffsetFromSlot": Object {
-          "x": 0,
-          "y": 0,
-          "z": 0,
-        },
         "dimensions": Object {
           "xDimension": 127.76,
           "yDimension": 85.48,
@@ -5083,11 +5063,6 @@ Object {
       "def": Object {
         "brand": Object {
           "brand": "Opentrons",
-        },
-        "cornerOffsetFromSlot": Object {
-          "x": 0,
-          "y": 0,
-          "z": 0,
         },
         "dimensions": Object {
           "xDimension": 127.76,
@@ -6218,11 +6193,6 @@ Object {
         "brand": Object {
           "brand": "Opentrons",
         },
-        "cornerOffsetFromSlot": Object {
-          "x": 0,
-          "y": 0,
-          "z": 0,
-        },
         "dimensions": Object {
           "xDimension": 172.86,
           "yDimension": 165.86,
@@ -6287,11 +6257,6 @@ Object {
           "brandId": Array [
             "1061-8150",
           ],
-        },
-        "cornerOffsetFromSlot": Object {
-          "x": 0,
-          "y": 0.32,
-          "z": 0,
         },
         "dimensions": Object {
           "xDimension": 127.76,
@@ -6525,11 +6490,6 @@ Object {
       "tiprackLabwareDef": Object {
         "brand": Object {
           "brand": "Opentrons",
-        },
-        "cornerOffsetFromSlot": Object {
-          "x": 0.01,
-          "y": -0.02,
-          "z": 0,
         },
         "dimensions": Object {
           "xDimension": 127.75,
@@ -7675,11 +7635,6 @@ Object {
         "brand": Object {
           "brand": "Opentrons",
         },
-        "cornerOffsetFromSlot": Object {
-          "x": 0.01,
-          "y": -0.02,
-          "z": 0,
-        },
         "dimensions": Object {
           "xDimension": 127.75,
           "yDimension": 85.5,
@@ -8823,11 +8778,6 @@ Object {
       "tiprackLabwareDef": Object {
         "brand": Object {
           "brand": "Opentrons",
-        },
-        "cornerOffsetFromSlot": Object {
-          "x": 0,
-          "y": 0,
-          "z": 0,
         },
         "dimensions": Object {
           "xDimension": 127.76,
@@ -9974,11 +9924,6 @@ Object {
       "tiprackLabwareDef": Object {
         "brand": Object {
           "brand": "Opentrons",
-        },
-        "cornerOffsetFromSlot": Object {
-          "x": 0,
-          "y": 0,
-          "z": 0,
         },
         "dimensions": Object {
           "xDimension": 127.76,

@@ -22,11 +22,6 @@
     "displayVolumeUnits": "µL",
     "tags": []
   },
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
-  },
   "dimensions": {
     "yDimension": 85.48,
     "xDimension": 127.76,

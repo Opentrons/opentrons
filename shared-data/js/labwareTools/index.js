@@ -5,7 +5,6 @@ import range from 'lodash/range'
 import round from 'lodash/round'
 
 import labwareSchema from '../../labware/schemas/2.json'
-import { SLOT_WIDTH_MM, SLOT_LENGTH_MM } from '../constants'
 import {
   toWellName,
   sortWells,
@@ -225,14 +224,6 @@ function calculateCoordinates(
   }, {})
 }
 
-export function _calculateCornerOffset(dimensions: Dimensions): Offset {
-  return {
-    x: round(SLOT_LENGTH_MM - dimensions.xDimension, 2),
-    y: round(SLOT_WIDTH_MM - dimensions.yDimension, 2),
-    z: 0,
-  }
-}
-
 function ensureBrand(brand?: Brand): Brand {
   return brand || { brand: 'generic' }
 }
@@ -279,7 +270,6 @@ export function createRegularLabware(args: RegularLabwareProps): Definition {
     brand,
     metadata,
     dimensions,
-    cornerOffsetFromSlot: _calculateCornerOffset(dimensions),
     wells: calculateCoordinates(well, ordering, spacing, offset),
     groups: [{ wells: flatten(ordering), metadata: {} }],
     parameters: { ...args.parameters, loadName },
@@ -325,7 +315,6 @@ export function createIrregularLabware(
     brand,
     metadata,
     dimensions,
-    cornerOffsetFromSlot: _calculateCornerOffset(dimensions),
     parameters: { ...args.parameters, loadName, format: 'irregular' },
     ordering: determineIrregularOrdering(Object.keys(wells)),
     namespace,

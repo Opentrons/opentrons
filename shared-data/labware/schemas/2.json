@@ -58,7 +58,6 @@
     "metadata",
     "brand",
     "parameters",
-    "cornerOffsetFromSlot",
     "ordering",
     "dimensions",
     "wells",
@@ -167,17 +166,6 @@
         "items": {
           "type": "string"
         }
-      }
-    },
-    "cornerOffsetFromSlot": {
-      "type": "object",
-      "additionalProperties": false,
-      "description": "Distance from left-front-bottom corner of slot to left-front-bottom corner of labware",
-      "required": ["x", "y", "z"],
-      "properties": {
-        "x": { "type": "number" },
-        "y": { "type": "number" },
-        "z": { "type": "number" }
       }
     },
     "dimensions": {

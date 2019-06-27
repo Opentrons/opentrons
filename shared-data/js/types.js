@@ -136,7 +136,6 @@ export type LabwareDefinition2 = {|
   namespace: string,
   metadata: LabwareMetadata,
   dimensions: LabwareDimensions,
-  cornerOffsetFromSlot: LabwareOffset,
   parameters: LabwareParameters,
   brand: LabwareBrand,
   ordering: Array<Array<string>>,

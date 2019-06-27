@@ -16,15 +16,10 @@
     "displayName": "Opentrons 24 Tube Rack with Generic 2 mL Screwcap",
     "tags": []
   },
-  "cornerOffsetFromSlot": {
-    "x": 0.01,
-    "y": -0.02,
-    "z": 0
-  },
   "dimensions": {
     "xDimension": 127.75,
     "yDimension": 85.5,
-    "zDimension": 84.0
+    "zDimension": 84
   },
   "parameters": {
     "format": "irregular",

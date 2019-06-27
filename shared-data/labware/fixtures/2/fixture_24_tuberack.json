@@ -16,15 +16,10 @@
     "displayName": "Opentrons screwcap 2mL tuberack",
     "tags": ["2", "mL", "screwcap", "tuberack", "Opentrons", "E&K Scientific"]
   },
-  "cornerOffsetFromSlot": {
-    "x": 0.01,
-    "y": -0.02,
-    "z": 0
-  },
   "dimensions": {
     "xDimension": 127.75,
     "yDimension": 85.5,
-    "zDimension": 84.0
+    "zDimension": 84
   },
   "parameters": {
     "format": "irregular",

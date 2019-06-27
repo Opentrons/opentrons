@@ -5,33 +5,28 @@ minimalLabwareDef = {
     "metadata": {
         "displayName": "minimal labware"
     },
-    "cornerOffsetFromSlot": {
-        "x": 10,
-        "y": 10,
-        "z": 5
-    },
     "parameters": {
         "isTiprack": False,
     },
     "ordering": [["A1"], ["A2"]],
     "wells": {
         "A1": {
-          "depth": 40,
-          "totalLiquidVolume": 100,
-          "diameter": 30,
-          "x": 0,
-          "y": 0,
-          "z": 0,
-          "shape": "circular"
+            "depth": 40,
+            "totalLiquidVolume": 100,
+            "diameter": 30,
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "shape": "circular"
         },
         "A2": {
-          "depth": 40,
-          "totalLiquidVolume": 100,
-          "diameter": 30,
-          "x": 10,
-          "y": 0,
-          "z": 0,
-          "shape": "circular"
+            "depth": 40,
+            "totalLiquidVolume": 100,
+            "diameter": 30,
+            "x": 10,
+            "y": 0,
+            "z": 0,
+            "shape": "circular"
         }
     },
     "dimensions": {
@@ -45,69 +40,64 @@ minimalLabwareDef2 = {
     "metadata": {
         "displayName": "other test labware"
     },
-    "cornerOffsetFromSlot": {
-            "x": 10,
-            "y": 10,
-            "z": 5
-    },
     "parameters": {
         "isTiprack": False,
     },
     "ordering": [["A1", "B1", "C1"], ["A2", "B2", "C2"]],
     "wells": {
         "A1": {
-          "depth": 40,
-          "totalLiquidVolume": 100,
-          "diameter": 30,
-          "x": 0,
-          "y": 18,
-          "z": 0,
-          "shape": "circular"
+            "depth": 40,
+            "totalLiquidVolume": 100,
+            "diameter": 30,
+            "x": 0,
+            "y": 18,
+            "z": 0,
+            "shape": "circular"
         },
         "B1": {
-          "depth": 40,
-          "totalLiquidVolume": 100,
-          "diameter": 30,
-          "x": 0,
-          "y": 9,
-          "z": 0,
-          "shape": "circular"
+            "depth": 40,
+            "totalLiquidVolume": 100,
+            "diameter": 30,
+            "x": 0,
+            "y": 9,
+            "z": 0,
+            "shape": "circular"
         },
         "C1": {
-          "depth": 40,
-          "totalLiquidVolume": 100,
-          "diameter": 30,
-          "x": 0,
-          "y": 0,
-          "z": 0,
-          "shape": "circular"
+            "depth": 40,
+            "totalLiquidVolume": 100,
+            "diameter": 30,
+            "x": 0,
+            "y": 0,
+            "z": 0,
+            "shape": "circular"
         },
         "A2": {
-          "depth": 40,
-          "totalLiquidVolume": 100,
-          "diameter": 30,
-          "x": 9,
-          "y": 18,
-          "z": 0,
-          "shape": "circular"
+            "depth": 40,
+            "totalLiquidVolume": 100,
+            "diameter": 30,
+            "x": 9,
+            "y": 18,
+            "z": 0,
+            "shape": "circular"
         },
         "B2": {
-          "depth": 40,
-          "totalLiquidVolume": 100,
-          "diameter": 30,
-          "x": 9,
-          "y": 9,
-          "z": 0,
-          "shape": "circular"
+            "depth": 40,
+            "totalLiquidVolume": 100,
+            "diameter": 30,
+            "x": 9,
+            "y": 9,
+            "z": 0,
+            "shape": "circular"
         },
         "C2": {
-          "depth": 40,
-          "totalLiquidVolume": 100,
-          "diameter": 30,
-          "x": 9,
-          "y": 0,
-          "z": 0,
-          "shape": "circular"
+            "depth": 40,
+            "totalLiquidVolume": 100,
+            "diameter": 30,
+            "x": 9,
+            "y": 0,
+            "z": 0,
+            "shape": "circular"
         }
     },
     "dimensions": {
@@ -124,7 +114,7 @@ def test_labware_init():
     ordering = [well for col in minimalLabwareDef['ordering'] for well in col]
     assert fake_labware._ordering == ordering
     assert fake_labware._well_definition == minimalLabwareDef['wells']
-    assert fake_labware._offset == Point(x=10, y=10, z=5)
+    assert fake_labware._offset == Point(x=0, y=0, z=0)
 
 
 def test_well_pattern():

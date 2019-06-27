@@ -16,11 +16,6 @@
     "displayName": "Opentrons 24 Tube Rack with Eppendorf 2 mL Safe-Lock Snapcap",
     "tags": []
   },
-  "cornerOffsetFromSlot": {
-    "x": 0.01,
-    "y": -0.02,
-    "z": 0
-  },
   "dimensions": {
     "xDimension": 127.75,
     "yDimension": 85.5,

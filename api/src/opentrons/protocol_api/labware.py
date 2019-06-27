@@ -215,14 +215,12 @@ class Labware:
         # Directly from definition
         self._well_definition = definition['wells']
         self._parameters = definition['parameters']
-        offset = definition['cornerOffsetFromSlot']
         self._dimensions = definition['dimensions']
         # Inferred from definition
         self._ordering = [well
                           for col in definition['ordering']
                           for well in col]
-        self._offset\
-            = Point(offset['x'], offset['y'], offset['z']) + parent.point
+        self._offset = parent.point
         self._parent = parent.labware
         # Applied properties
         self.set_calibration(self._calibrated_offset)

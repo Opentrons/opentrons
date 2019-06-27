@@ -9,11 +9,6 @@
     "displayName": "Tall Fixed Trash",
     "tags": ["trash", "opentrons", "tall"]
   },
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
-  },
   "dimensions": {
     "xDimension": 172.86,
     "yDimension": 165.86,

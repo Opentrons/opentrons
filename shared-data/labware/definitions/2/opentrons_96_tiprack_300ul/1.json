@@ -22,11 +22,6 @@
     "displayCategory": "tipRack",
     "tags": []
   },
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
-  },
   "dimensions": {
     "xDimension": 127.76,
     "yDimension": 85.48,

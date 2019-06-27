@@ -13,11 +13,6 @@ exports[`LabwareList component renders 1`] = `
             "1061-8150",
           ],
         },
-        "cornerOffsetFromSlot": Object {
-          "x": 0,
-          "y": 0.32,
-          "z": 0,
-        },
         "dimensions": Object {
           "xDimension": 127.76,
           "yDimension": 85.8,
@@ -233,11 +228,6 @@ exports[`LabwareList component renders 1`] = `
           "brandId": Array [
             "649020",
           ],
-        },
-        "cornerOffsetFromSlot": Object {
-          "x": 0.01,
-          "y": -0.02,
-          "z": 0,
         },
         "dimensions": Object {
           "xDimension": 127.75,
@@ -570,11 +560,6 @@ exports[`LabwareList component renders 1`] = `
             "3701",
             "3702",
           ],
-        },
-        "cornerOffsetFromSlot": Object {
-          "x": 0,
-          "y": -0.01,
-          "z": 0,
         },
         "dimensions": Object {
           "xDimension": 127.76,
@@ -4897,11 +4882,6 @@ exports[`LabwareList component renders 1`] = `
         "brand": Object {
           "brand": "generic",
         },
-        "cornerOffsetFromSlot": Object {
-          "x": 0,
-          "y": 0,
-          "z": 0,
-        },
         "dimensions": Object {
           "xDimension": 127.76,
           "yDimension": 85.48,
@@ -6031,11 +6011,6 @@ exports[`LabwareList component renders 1`] = `
         "brand": Object {
           "brand": "generic",
         },
-        "cornerOffsetFromSlot": Object {
-          "x": 0,
-          "y": 0,
-          "z": 0,
-        },
         "dimensions": Object {
           "xDimension": 127.76,
           "yDimension": 85.48,
@@ -6713,11 +6688,6 @@ exports[`LabwareList component renders 1`] = `
             "t40u9sernisofsea",
           ],
         },
-        "cornerOffsetFromSlot": Object {
-          "x": 0,
-          "y": 0,
-          "z": 0,
-        },
         "dimensions": Object {
           "xDimension": 127.76,
           "yDimension": 85.48,
@@ -6783,11 +6753,6 @@ exports[`LabwareList component renders 1`] = `
       Object {
         "brand": Object {
           "brand": "generic",
-        },
-        "cornerOffsetFromSlot": Object {
-          "x": 77.76,
-          "y": 35.48,
-          "z": 0,
         },
         "dimensions": Object {
           "xDimension": 50,
@@ -6898,11 +6863,6 @@ exports[`LabwareList component renders 1`] = `
       Object {
         "brand": Object {
           "brand": "Opentrons",
-        },
-        "cornerOffsetFromSlot": Object {
-          "x": 0.01,
-          "y": -0.02,
-          "z": 0,
         },
         "dimensions": Object {
           "xDimension": 127.75,
@@ -8032,11 +7992,6 @@ exports[`LabwareList component renders 1`] = `
         "brand": Object {
           "brand": "Opentrons",
         },
-        "cornerOffsetFromSlot": Object {
-          "x": 0.01,
-          "y": -0.02,
-          "z": 0,
-        },
         "dimensions": Object {
           "xDimension": 127.75,
           "yDimension": 85.5,
@@ -9164,11 +9119,6 @@ exports[`LabwareList component renders 1`] = `
       Object {
         "brand": Object {
           "brand": "Opentrons",
-        },
-        "cornerOffsetFromSlot": Object {
-          "x": 0,
-          "y": 0,
-          "z": 0,
         },
         "dimensions": Object {
           "xDimension": 127.76,

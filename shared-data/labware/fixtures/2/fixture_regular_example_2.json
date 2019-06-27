@@ -16,11 +16,6 @@
   "schemaVersion": 2,
   "version": 1,
   "namespace": "fixture",
-  "cornerOffsetFromSlot": {
-    "x": 77.76,
-    "y": 35.48,
-    "z": 0
-  },
   "dimensions": {
     "xDimension": 50,
     "yDimension": 50,

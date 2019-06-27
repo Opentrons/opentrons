@@ -442,11 +442,6 @@
     "displayCategory": "wellPlate",
     "tags": []
   },
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": -0.01,
-    "z": 0
-  },
   "dimensions": {
     "xDimension": 127.76,
     "yDimension": 85.47,
