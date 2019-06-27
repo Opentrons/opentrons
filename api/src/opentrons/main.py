@@ -169,7 +169,6 @@ def main():
         parents=[build_arg_parser()])
     arg_parser.add_argument(
         '--hardware-server', action='store_true',
-        default=False,
         help='Run a jsonrpc server allowing rpc to the'
         ' hardware controller. Only works on buildroot '
         'because extra dependencies are required.')
