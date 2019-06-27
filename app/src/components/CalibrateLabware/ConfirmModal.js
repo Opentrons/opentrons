@@ -37,7 +37,7 @@ export default function ConfirmModal(props: Props) {
 
   const titleBar = {
     title: 'Calibrate Labware',
-    // subtitle is capitalized by CSS, and "µL" capitalized looks is "µL"
+    // subtitle is capitalized by CSS, and "µL" capitalized is "ML"
     subtitle: labwareDisplayName.replace('µL', 'uL'),
     back: { onClick: onBackClick, disabled: backClickDisabled },
   }

@@ -66,6 +66,7 @@ export default function LabwareItem(props: LabwareItemProps) {
     ) : (
       <div className={styles.name_overlay}>
         <p className={styles.display_name} title={title}>
+          {/* title is capitalized by CSS, and "µL" capitalized is "ML" */}
           {title.replace('µL', 'uL')}
         </p>
         <p className={styles.subtitle} title={name}>
