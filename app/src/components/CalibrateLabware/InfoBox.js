@@ -10,6 +10,7 @@ import {
   actions as robotActions,
 } from '../../robot'
 
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { PrimaryButton } from '@opentrons/components'
 import CalibrationInfoBox from '../CalibrationInfoBox'
 import CalibrationInfoContent from '../CalibrationInfoContent'
@@ -30,7 +31,7 @@ type SP = {|
 
 type DP = {| dispatch: Dispatch |}
 
-type Props = {
+type Props = {|
   ...OP,
   button: ?{
     type: LabwareType,
@@ -38,7 +39,7 @@ type Props = {
     isConfirmed: ?boolean,
     onClick: () => void,
   },
-}
+|}
 
 export default connect<Props, OP, SP, {||}, State, Dispatch>(
   mapStateToProps,
@@ -57,7 +58,9 @@ function InfoBox(props: Props) {
   if (labware) {
     const labwareType = robotSelectors.labwareType(labware)
 
-    title = labware.type
+    title = labware.definition
+      ? getLabwareDisplayName(labware.definition)
+      : labware.type
     confirmed = labware.confirmed
     description = confirmed
       ? `${capitalize(labwareType)} is calibrated`
