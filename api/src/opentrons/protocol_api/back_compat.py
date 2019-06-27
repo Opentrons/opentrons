@@ -194,9 +194,9 @@ class BCLabware:
     def __init__(self, ctx: ProtocolContext) -> None:
         self._ctx = ctx
 
-    LW_NO_EQUIVALENT = {'24-vial-plate', '48-vial-plate', '5ml-3x4',
+    LW_NO_EQUIVALENT = {'24-vial-rack', '48-vial-plate', '5ml-3x4',
                         '96-well-plate-20mm', 'MALDI-plate',
-                        'T25-flask', 'T75-flask', 'alum-block-pcr-strips',
+                        'T25-flask', 'T75-flask', 'biotix-resevoir',
                         'e-gelgol', 'hampton-1ml-deep-block', 'point',
                         'rigaku-compact-crystallization-plate',
                         'small_vial_rack_16x45', 'temperature-plate',
@@ -217,6 +217,7 @@ class BCLabware:
         '96-PCR-flat': 'biorad_96_wellplate_200ul_pcr',
         '96-PCR-tall': 'biorad_96_wellplate_200ul_pcr',
         'biorad-hardshell-96-PCR': 'biorad_96_wellplate_200ul_pcr',
+        'alum-block-pcr-strips': 'opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip',  # noqa(E501)
         'opentrons-aluminum-block-2ml-eppendorf': 'opentrons_24_aluminumblock_generic_2ml_screwcap',       # noqa(E501)
         'opentrons-aluminum-block-2ml-screwcap': 'opentrons_24_aluminumblock_generic_2ml_screwcap',        # noqa(E501)
         'opentrons-aluminum-block-96-PCR-plate': 'opentrons_96_aluminum_biorad_plate_200_ul',  # noqa(E501)
