@@ -442,11 +442,6 @@
     "displayCategory": "wellPlate",
     "tags": ["SBS", "microplate", "112", "uL", "384 wells"]
   },
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": -0.01,
-    "z": 0
-  },
   "dimensions": {
     "xDimension": 127.76,
     "yDimension": 85.47,
@@ -4312,5 +4307,10 @@
         "wellBottomShape": "flat"
       }
     }
-  ]
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
 }

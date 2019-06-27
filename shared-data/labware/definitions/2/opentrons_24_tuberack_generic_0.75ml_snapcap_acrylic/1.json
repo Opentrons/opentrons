@@ -23,11 +23,6 @@
     "yDimension": 85.48,
     "zDimension": 55
   },
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
-  },
   "wells": {
     "D1": {
       "depth": 20,
@@ -294,5 +289,10 @@
   ],
   "namespace": "opentrons",
   "version": 1,
-  "schemaVersion": 2
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
 }

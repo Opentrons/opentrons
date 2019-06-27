@@ -172,7 +172,7 @@
     "cornerOffsetFromSlot": {
       "type": "object",
       "additionalProperties": false,
-      "description": "Distance from left-front-bottom corner of slot to left-front-bottom corner of labware",
+      "description": "Distance from left-front-bottom corner of slot to left-front-bottom corner of labware bounding box. Used for labware that spans multiple slots. For labware that does not span multiple slots, x/y/z should all be zero.",
       "required": ["x", "y", "z"],
       "properties": {
         "x": { "type": "number" },

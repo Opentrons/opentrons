@@ -107,11 +107,6 @@
     "yDimension": 85.5,
     "zDimension": 123.76
   },
-  "cornerOffsetFromSlot": {
-    "x": 0.01,
-    "y": -0.02,
-    "z": 0
-  },
   "parameters": {
     "format": "irregular",
     "isTiprack": false,
@@ -158,5 +153,10 @@
   ],
   "namespace": "opentrons",
   "version": 1,
-  "schemaVersion": 2
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
 }

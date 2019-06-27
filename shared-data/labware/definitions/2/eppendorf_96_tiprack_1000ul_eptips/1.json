@@ -22,11 +22,6 @@
     "displayCategory": "tipRack",
     "tags": []
   },
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
-  },
   "dimensions": {
     "xDimension": 127.76,
     "yDimension": 85.48,
@@ -37,7 +32,7 @@
     "isTiprack": true,
     "isMagneticModuleCompatible": false,
     "tipLength": 70.7,
-    "tipOverlap": 0.0,
+    "tipOverlap": 0,
     "loadName": "eppendorf_96_tiprack_1000ul_eptips"
   },
   "wells": {
@@ -1015,5 +1010,10 @@
       ],
       "metadata": {}
     }
-  ]
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
 }
