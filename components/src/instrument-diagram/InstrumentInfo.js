@@ -8,15 +8,13 @@ import InstrumentDiagram from './InstrumentDiagram'
 
 import styles from './instrument.css'
 
-export type InstrumentInfoProps = {
+export type InstrumentInfoProps = {|
   /** 'left' or 'right' */
   mount: Mount,
   /** if true, show labels 'LEFT PIPETTE' / 'RIGHT PIPETTE' */
   showMountLabel?: ?boolean,
   /** human-readable description, eg 'p300 Single-channel' */
   description: string,
-  /** recommended tip type */
-  tipType?: string,
   /** paired tiprack model */
   tiprackModel?: string,
   /** if disabled, pipette & its info are grayed out */
@@ -29,7 +27,7 @@ export type InstrumentInfoProps = {
   infoClassName?: string,
   /** children to display under the info */
   children?: React.Node,
-}
+|}
 
 export default function InstrumentInfo(props: InstrumentInfoProps) {
   const className = cx(
@@ -46,9 +44,6 @@ export default function InstrumentInfo(props: InstrumentInfoProps) {
           title={props.showMountLabel ? `${props.mount} pipette` : 'pipette'}
           value={props.description}
         />
-        {props.tipType && (
-          <InfoItem title={'suggested tip type'} value={props.tipType} />
-        )}
         {props.tiprackModel && (
           <InfoItem title={'tip rack'} value={props.tiprackModel} />
         )}

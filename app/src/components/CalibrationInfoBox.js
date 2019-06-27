@@ -4,12 +4,12 @@ import classnames from 'classnames'
 import { Icon } from '@opentrons/components'
 import styles from './calibration-info.css'
 
-type Props = {
+type Props = {|
   title: string,
   confirmed: boolean,
   className?: string,
   children: React.Node,
-}
+|}
 
 export default function CalibrationInfoBox(props: Props) {
   const { className, confirmed, title, children } = props

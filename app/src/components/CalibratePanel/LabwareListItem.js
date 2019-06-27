@@ -1,20 +1,21 @@
 // @flow
 import * as React from 'react'
 
-import type { Labware } from '../../robot'
-
-import { ListItem } from '@opentrons/components'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
+import { ListItem, HoverTooltip } from '@opentrons/components'
 import styles from './styles.css'
 
-type LabwareItemProps = {
+import type { Labware } from '../../robot'
+
+type LabwareListItemProps = {|
+  ...$Exact<Labware>,
   isDisabled: boolean,
   onClick: () => mixed,
-}
+|}
 
-type Props = Labware & LabwareItemProps
-
-export default function LabwareListItem(props: Props) {
+export default function LabwareListItem(props: LabwareListItemProps) {
   const {
+    name,
     type,
     slot,
     calibratorMount,
@@ -22,10 +23,12 @@ export default function LabwareListItem(props: Props) {
     confirmed,
     isDisabled,
     onClick,
+    definition,
   } = props
 
   const url = `/calibrate/labware/${slot}`
   const iconName = confirmed ? 'check-circle' : 'checkbox-blank-circle-outline'
+  const displayName = definition ? getLabwareDisplayName(definition) : type
 
   return (
     <ListItem
@@ -36,17 +39,35 @@ export default function LabwareListItem(props: Props) {
       activeClassName={styles.active}
     >
       <div className={styles.item_info}>
-        <span>Slot {slot}</span>
+        <span className={styles.item_info_location}>Slot {slot}</span>
         {isTiprack && (
-          <span>
-            <span className={styles.tiprack_item_mount}>
-              {calibratorMount && calibratorMount.charAt(0).toUpperCase()}
-            </span>
-            Tiprack
+          <span className={styles.tiprack_item_mount}>
+            {calibratorMount && calibratorMount.charAt(0).toUpperCase()}
           </span>
         )}
-        <span>{type}</span>
+        <HoverTooltip
+          tooltipComponent={
+            <LabwareNameTooltip name={name} displayName={displayName} />
+          }
+        >
+          {handlers => (
+            <span {...handlers} className={styles.labware_item_name}>
+              {displayName}
+            </span>
+          )}
+        </HoverTooltip>
       </div>
     </ListItem>
+  )
+}
+
+function LabwareNameTooltip(props: {| name: string, displayName: string |}) {
+  const { name, displayName } = props
+
+  return (
+    <div className={styles.item_info_tooltip}>
+      <p>{name}</p>
+      <p>{displayName}</p>
+    </div>
   )
 }

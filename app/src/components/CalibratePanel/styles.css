@@ -6,18 +6,40 @@
   }
 }
 
-.tiprack_item_mount {
-  font-weight: var(--fw-bold);
-  padding-right: 0.75rem;
-}
-
 .item_info {
   flex: 1;
   display: flex;
-  justify-content: space-between;
+  overflow: hidden;
 }
 
 .active {
   color: var(--c-highlight);
   background-color: var(--c-bg-selected);
+}
+
+.item_info_location {
+  flex: none;
+  width: 2.5rem;
+  margin-right: 1rem;
+}
+
+.tiprack_item_mount {
+  flex: none;
+  font-weight: var(--fw-semibold);
+  margin-right: 1.5rem;
+}
+
+.labware_item_name {
+  @apply --truncate;
+
+  width: 100%;
+}
+
+.item_info_tooltip {
+  @apply --font-body-1-light;
+
+  & > p:first-child {
+    font-weight: var(--fw-semibold);
+    margin-bottom: 0.5rem;
+  }
 }

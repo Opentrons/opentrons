@@ -2,7 +2,12 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { Link } from 'react-router-dom'
-import { SLOT_RENDER_HEIGHT, SLOT_RENDER_WIDTH } from '@opentrons/shared-data'
+
+import {
+  getLabwareDisplayName,
+  SLOT_RENDER_HEIGHT,
+  SLOT_RENDER_WIDTH,
+} from '@opentrons/shared-data'
 
 import {
   RobotCoordsForeignDiv,
@@ -13,7 +18,7 @@ import {
 } from '@opentrons/components'
 
 import { type Labware } from '../../robot'
-import { getLatestLabwareDef, getLegacyLabwareDef } from '../../getLabware'
+import { getLegacyLabwareDef } from '../../getLabware'
 
 import styles from './styles.css'
 
@@ -28,8 +33,7 @@ export type LabwareItemProps = {
 
 export default function LabwareItem(props: LabwareItemProps) {
   const { labware, highlighted, areTipracksConfirmed, handleClick } = props
-
-  const { isTiprack, confirmed, name, type, slot } = labware
+  const { isTiprack, confirmed, name, type, slot, definition } = labware
 
   const showSpinner = highlighted && labware.calibration === 'moving-to-slot'
   const clickable = highlighted !== null
@@ -37,17 +41,21 @@ export default function LabwareItem(props: LabwareItemProps) {
     clickable &&
     ((isTiprack && confirmed) || (!isTiprack && areTipracksConfirmed === false))
 
-  const title = humanizeLabwareType(type)
+  let title
+  let item
+  let width
+  let height
 
-  let item = <LabwareComponent definition={getLegacyLabwareDef(type)} />
-  let width = SLOT_RENDER_WIDTH
-  let height = SLOT_RENDER_HEIGHT
-
-  const def = getLatestLabwareDef(type)
-  if (!labware.isLegacy && def) {
-    item = <LabwareRender definition={def} />
-    width = def.dimensions.xDimension
-    height = def.dimensions.yDimension
+  if (definition) {
+    item = <LabwareRender definition={definition} />
+    width = definition.dimensions.xDimension
+    height = definition.dimensions.yDimension
+    title = getLabwareDisplayName(definition)
+  } else {
+    item = <LabwareComponent definition={getLegacyLabwareDef(type)} />
+    width = SLOT_RENDER_WIDTH
+    height = SLOT_RENDER_HEIGHT
+    title = humanizeLabwareType(type)
   }
 
   const renderContents = () => {
@@ -58,7 +66,8 @@ export default function LabwareItem(props: LabwareItemProps) {
     ) : (
       <div className={styles.name_overlay}>
         <p className={styles.display_name} title={title}>
-          {title}
+          {/* title is capitalized by CSS, and "µL" capitalized is "ML" */}
+          {title.replace('µL', 'uL')}
         </p>
         <p className={styles.subtitle} title={name}>
           {name}

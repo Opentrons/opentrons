@@ -51,12 +51,17 @@ export default function TitleBar(props: TitleBarProps) {
 
   return (
     <header className={cx(styles.title_bar, className)}>
-      {back && <FlatButton inverted iconName={'chevron-left'} {...back} />}
-      <div className={styles.title_wrapper}>
-        <h1 className={styles.title}>{title}</h1>
-        {separator}
-        {subheading}
-      </div>
+      {back && (
+        <FlatButton
+          inverted
+          iconName={'chevron-left'}
+          className={styles.title_button}
+          {...back}
+        />
+      )}
+      <h1 className={cx(styles.title, { [styles.right]: back })}>{title}</h1>
+      {separator}
+      {subheading}
     </header>
   )
 }

@@ -23,12 +23,7 @@ export default function PipetteListItem(props: Props) {
     ? 'check-circle'
     : 'checkbox-blank-circle-outline'
 
-  const description = pipette
-    ? `${capitalize(pipette.channels === 8 ? 'multi' : 'single')}-channel`
-    : 'N/A'
-
-  const name = pipette ? pipette.name : 'N/A'
-
+  const description = pipette?.modelSpecs?.displayName || 'N/A'
   return (
     <ListItem
       isDisabled={isDisabled}
@@ -38,9 +33,8 @@ export default function PipetteListItem(props: Props) {
       activeClassName={styles.active}
     >
       <div className={styles.item_info}>
-        <span>{capitalize(mount)}</span>
+        <span className={styles.item_info_location}>{capitalize(mount)}</span>
         <span>{description}</span>
-        <span>{name}</span>
       </div>
     </ListItem>
   )

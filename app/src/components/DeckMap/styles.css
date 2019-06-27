@@ -65,18 +65,15 @@
 }
 
 .display_name {
+  @apply --truncate;
+
   font-weight: var(--fw-semibold);
   color: var(--c-font-light);
   text-transform: uppercase;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .subtitle {
+  @apply --truncate;
+
   color: var(--c-font-light);
-  text-transform: uppercase;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }

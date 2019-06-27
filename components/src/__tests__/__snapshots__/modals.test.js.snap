@@ -167,7 +167,7 @@ exports[`modals ModalPage renders correctly 1`] = `
     className="title_bar title_bar"
   >
     <button
-      className="button_flat inverted"
+      className="button_flat title_button inverted"
       onClick={[Function]}
       title="Back"
       type="button"
@@ -186,25 +186,21 @@ exports[`modals ModalPage renders correctly 1`] = `
       </svg>
       back
     </button>
-    <div
-      className="title_wrapper"
+    <h1
+      className="title right"
     >
-      <h1
-        className="title"
-      >
-        Title
-      </h1>
-      <span
-        className="separator"
-      >
-        |
-      </span>
-      <h2
-        className="subtitle"
-      >
-        Subtitle
-      </h2>
-    </div>
+      Title
+    </h1>
+    <span
+      className="separator"
+    >
+      |
+    </span>
+    <h2
+      className="subtitle"
+    >
+      Subtitle
+    </h2>
   </header>
   <div
     className="modal_page_contents"
@@ -229,7 +225,7 @@ exports[`modals SpinnerModalPage renders correctly 1`] = `
     className="title_bar title_bar"
   >
     <button
-      className="button_flat inverted"
+      className="button_flat title_button inverted"
       disabled={true}
       title="Back"
       type="button"
@@ -248,25 +244,21 @@ exports[`modals SpinnerModalPage renders correctly 1`] = `
       </svg>
       back
     </button>
-    <div
-      className="title_wrapper"
+    <h1
+      className="title right"
     >
-      <h1
-        className="title"
-      >
-        Title
-      </h1>
-      <span
-        className="separator"
-      >
-        |
-      </span>
-      <h2
-        className="subtitle"
-      >
-        Subtitle
-      </h2>
-    </div>
+      Title
+    </h1>
+    <span
+      className="separator"
+    >
+      |
+    </span>
+    <h2
+      className="subtitle"
+    >
+      Subtitle
+    </h2>
   </header>
   <div
     className="modal"
