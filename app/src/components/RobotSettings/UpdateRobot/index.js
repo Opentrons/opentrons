@@ -13,7 +13,13 @@ import type { ViewableRobot } from '../../../discovery'
 import type { ShellUpdateState } from '../../../shell'
 import type { RobotServerUpdate } from '../../../http-api-client'
 
-type OP = {| robot: ViewableRobot, appUpdate: ShellUpdateState |}
+type OP = {|
+  robot: ViewableRobot,
+  appUpdate: ShellUpdateState,
+  appVersion: string,
+  robotVersion: string,
+  __buildrootEnabled: boolean,
+|}
 
 type SP = {| updateRequest: RobotServerUpdate |}
 
@@ -22,7 +28,7 @@ type Props = { ...OP, ...SP }
 export default connect<Props, OP, SP, _, _, _>(makeMapStateToProps)(UpdateRobot)
 
 function UpdateRobot(props: Props) {
-  const { updateRequest, robot, appUpdate } = props
+  const { updateRequest, robot, appUpdate, appVersion, robotVersion } = props
 
   if (updateRequest.response) {
     return <RestartRobotModal robot={robot} />
@@ -32,7 +38,15 @@ function UpdateRobot(props: Props) {
     return <SpinnerModal message="Robot is updating" alertOverlay />
   }
 
-  return <UpdateRobotModal robot={robot} appUpdate={appUpdate} />
+  return (
+    <UpdateRobotModal
+      robot={robot}
+      appUpdate={appUpdate}
+      appVersion={appVersion}
+      robotVersion={robotVersion}
+      __buildrootEnabled={props.__buildrootEnabled}
+    />
+  )
 }
 
 function makeMapStateToProps(): (State, OP) => SP {

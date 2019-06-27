@@ -11,9 +11,8 @@ import {
 import { getConfig } from '../../config'
 import { CONNECTABLE, REACHABLE, getRobotApiVersion } from '../../discovery'
 import {
-  getBuildrootUpdateAvailable,
-  getBuildrootUpdateSeen,
-  setBuildrootUpdateSeen,
+  CURRENT_VERSION,
+  getUpdateInfo as getBuildrootUpdateInfo,
 } from '../../shell'
 
 import {
@@ -31,7 +30,6 @@ import RobotSettings, {
   ConnectAlertModal,
 } from '../../components/RobotSettings'
 import UpdateRobot from '../../components/RobotSettings/UpdateRobot'
-import UpdateBuildroot from '../../components/RobotSettings/UpdateBuildroot'
 import CalibrateDeck from '../../components/CalibrateDeck'
 import ConnectBanner from '../../components/RobotSettings/ConnectBanner'
 import ReachableRobotBanner from '../../components/RobotSettings/ReachableRobotBanner'
@@ -57,9 +55,9 @@ type SP = {|
   showConnectAlert: boolean,
   homeInProgress: ?boolean,
   homeError: ?Error,
-  buildrootUpdateAvailable: boolean,
-  __buildRootEnabled: boolean,
-  buildrootUpdateSeen: boolean,
+  appVersion: string,
+  robotVersion: string,
+  __buildrootEnabled: boolean,
 |}
 
 type DP = {| dispatch: Dispatch |}
@@ -69,7 +67,6 @@ type Props = {
   ...SP,
   closeHomeAlert?: () => mixed,
   closeConnectAlert: () => mixed,
-  ignoreBuildrootUpdate: () => mixed,
 }
 
 export default withRouter<WithRouterOP>(
@@ -88,13 +85,14 @@ function RobotSettingsPage(props: Props) {
   const {
     robot,
     appUpdate,
+    appVersion,
+    robotVersion,
     homeInProgress,
     homeError,
     closeHomeAlert,
     showConnectAlert,
     closeConnectAlert,
     showUpdateModal,
-    ignoreBuildrootUpdate,
     match: { path, url },
   } = props
 
@@ -115,6 +113,8 @@ function RobotSettingsPage(props: Props) {
         )}
 
         <RobotSettings
+          appVersion={appVersion}
+          robotVersion={robotVersion}
           robot={robot}
           updateUrl={updateUrl}
           calibrateDeckUrl={calibrateDeckUrl}
@@ -125,20 +125,15 @@ function RobotSettingsPage(props: Props) {
         <Route
           path={`${path}/${UPDATE_FRAGMENT}`}
           render={() => {
-            if (
-              props.buildrootUpdateAvailable &&
-              props.buildrootUpdateSeen === false &&
-              props.__buildRootEnabled
-            ) {
-              return (
-                <UpdateBuildroot
-                  robot={robot}
-                  parentUrl={url}
-                  ignoreBuildrootUpdate={ignoreBuildrootUpdate}
-                />
-              )
-            }
-            return <UpdateRobot robot={robot} appUpdate={appUpdate} />
+            return (
+              <UpdateRobot
+                robot={robot}
+                appUpdate={appUpdate}
+                appVersion={appVersion}
+                robotVersion={robotVersion}
+                __buildrootEnabled={props.__buildrootEnabled}
+              />
+            )
           }}
         />
 
@@ -198,26 +193,23 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
 
   return (state, ownProps) => {
     const { robot } = ownProps
-    const version = getRobotApiVersion(robot)
+    const appVersion = CURRENT_VERSION
+    const robotVersion = getRobotApiVersion(robot) || 'unknown'
     const connectRequest = robotSelectors.getConnectRequest(state)
     const homeRequest = getHomeRequest(state, robot)
     const ignoredRequest = getUpdateIgnoredRequest(state, robot)
     const restartRequest = getRestartRequest(state, robot)
-    const updateInfo = getRobotUpdateInfo(state, robot)
-    const buildrootUpdateAvailable =
-      !!version && getBuildrootUpdateAvailable(state, version)
 
-    const buildrootUpdateSeen = getBuildrootUpdateSeen(state)
-    const __buildRootEnabled = Boolean(
+    const __buildrootEnabled = Boolean(
       getConfig(state).devInternal?.enableBuildRoot
     )
+    const updateInfo = __buildrootEnabled
+      ? getBuildrootUpdateInfo(appVersion, robotVersion)
+      : getRobotUpdateInfo(state, ownProps.robot)
+
     let showUpdateModal: ?boolean
-    if (__buildRootEnabled) {
-      // TODO (ka 2019-06-24): Layer in ignore and restart complexity
-      showUpdateModal =
-        buildrootUpdateAvailable &&
-        // have not ignored update this session
-        !buildrootUpdateSeen
+    if (__buildrootEnabled) {
+      showUpdateModal = robotVersion !== appVersion
     } else {
       showUpdateModal =
         // only show the alert modal if there's an upgrade available
@@ -234,9 +226,9 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
     }
 
     return {
-      __buildRootEnabled,
-      buildrootUpdateAvailable,
-      buildrootUpdateSeen,
+      __buildrootEnabled,
+      appVersion,
+      robotVersion,
       showUpdateModal: !!showUpdateModal,
       homeInProgress: homeRequest && homeRequest.inProgress,
       homeError: homeRequest && homeRequest.error,
@@ -252,7 +244,6 @@ function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
     ...stateProps,
     ...ownProps,
     closeConnectAlert: () => dispatch(robotActions.clearConnectResponse()),
-    ignoreBuildrootUpdate: () => dispatch(setBuildrootUpdateSeen()),
   }
 
   if (robot) {

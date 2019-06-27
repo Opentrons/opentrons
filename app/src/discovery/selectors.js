@@ -37,6 +37,8 @@ type GroupedRobotsMap = {
   },
 }
 
+export type BuildrootStatus = 'balena' | 'migrating' | 'buildroot'
+
 type GetGroupedRobotsMap = Selector<State, void, GroupedRobotsMap>
 type GetConnectableRobots = Selector<State, void, Array<Robot>>
 type GetReachableRobots = Selector<State, void, Array<ReachableRobot>>
@@ -148,3 +150,29 @@ export const getRobotApiVersion = (robot: AnyRobot): ?string =>
 export const getRobotFirmwareVersion = (robot: AnyRobot): ?string =>
   (robot.health && robot.health.fw_version) ||
   (robot.serverHealth && robot.serverHealth.smoothieVersion)
+
+export const getRobotBuildrootStatus = (
+  robot: AnyRobot
+): BuildrootStatus | null => {
+  if (robot.serverHealth) {
+    // no capabilities object present, robot is on balena and not migration capable
+    if (!robot.serverHealth.capabilities) {
+      return 'balena'
+    }
+    // migration capable proceed to step 2 automatically
+    if (
+      robot.serverHealth.capabilities &&
+      robot.serverHealth.capabilities['buildroot-migration']
+    ) {
+      return 'migrating'
+    }
+    // robot is already on buildroot and capable of receiving normal buidlroot updates
+    if (
+      robot.serverHealth.capabilities &&
+      robot.serverHealth.capabilities['buildroot-update']
+    ) {
+      return 'buildroot'
+    }
+  }
+  return null
+}

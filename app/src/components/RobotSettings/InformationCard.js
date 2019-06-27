@@ -9,8 +9,11 @@ import {
   makeGetRobotUpdateInfo,
 } from '../../http-api-client'
 import { getConfig } from '../../config'
-import { getRobotApiVersion, getRobotFirmwareVersion } from '../../discovery'
-import { checkShellUpdate, getBuildrootUpdateAvailable } from '../../shell'
+import { getRobotFirmwareVersion } from '../../discovery'
+import {
+  checkShellUpdate,
+  getUpdateInfo as getBuildrootUpdateInfo,
+} from '../../shell'
 
 import { RefreshCard, LabeledValue, OutlineButton } from '@opentrons/components'
 import { CardContentQuarter } from '../layout'
@@ -20,15 +23,15 @@ import type { RobotUpdateInfo } from '../../http-api-client'
 import type { ViewableRobot } from '../../discovery'
 
 type OP = {|
+  appVersion: string,
+  robotVersion: string,
   robot: ViewableRobot,
   updateUrl: string,
+  robotVersion: string,
 |}
 
 type SP = {|
-  version: string,
   updateInfo: RobotUpdateInfo,
-  buildrootUpdateAvailable: boolean,
-  __buildRootEnabled: boolean,
 |}
 
 type DP = {|
@@ -55,17 +58,11 @@ function InformationCard(props: Props) {
     fetchHealth,
     updateUrl,
     checkAppUpdate,
-    version,
-    buildrootUpdateAvailable,
+    robotVersion,
   } = props
   const { name, displayName, serverOk } = robot
   const firmwareVersion = getRobotFirmwareVersion(robot) || 'Unknown'
-  let updateText: string
-  if (props.__buildRootEnabled && buildrootUpdateAvailable) {
-    updateText = 'Upgrade'
-  } else {
-    updateText = updateInfo.type || 'Reinstall'
-  }
+  const updateText = updateInfo.type || 'Reinstall'
 
   return (
     <RefreshCard watch={name} refresh={fetchHealth} title={TITLE}>
@@ -73,7 +70,7 @@ function InformationCard(props: Props) {
         <LabeledValue label={NAME_LABEL} value={displayName} />
       </CardContentQuarter>
       <CardContentQuarter>
-        <LabeledValue label={SERVER_VERSION_LABEL} value={version} />
+        <LabeledValue label={SERVER_VERSION_LABEL} value={robotVersion} />
       </CardContentQuarter>
       <CardContentQuarter>
         <LabeledValue label={FIRMWARE_VERSION_LABEL} value={firmwareVersion} />
@@ -93,18 +90,17 @@ function InformationCard(props: Props) {
 }
 
 function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
-  const getUpdateInfo = makeGetRobotUpdateInfo()
+  const getRobotUpdateInfo = makeGetRobotUpdateInfo()
 
   return (state, ownProps) => {
-    const version = getRobotApiVersion(ownProps.robot) || 'Unknown'
+    const __buildrootEnabled = Boolean(
+      getConfig(state).devInternal?.enableBuildRoot
+    )
+    const updateInfo = __buildrootEnabled
+      ? getBuildrootUpdateInfo(ownProps.appVersion, ownProps.robotVersion)
+      : getRobotUpdateInfo(state, ownProps.robot)
     return {
-      version,
-      updateInfo: getUpdateInfo(state, ownProps.robot),
-      buildrootUpdateAvailable:
-        version && getBuildrootUpdateAvailable(state, version),
-      __buildRootEnabled: Boolean(
-        getConfig(state).devInternal?.enableBuildRoot
-      ),
+      updateInfo,
     }
   }
 }

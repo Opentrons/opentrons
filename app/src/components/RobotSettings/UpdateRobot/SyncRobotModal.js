@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 
 import SyncRobotMessage from './SyncRobotMessage'
 import VersionList from './VersionList'
+import UpdateBuildroot from '../UpdateBuildroot'
 import { ScrollableAlertModal } from '../../modals'
 import ReleaseNotes from '../../ReleaseNotes'
 
@@ -20,6 +21,9 @@ type Props = {
   ignoreUpdate: () => mixed,
   update: () => mixed,
   showReleaseNotes: boolean,
+  __buildrootEnabled: boolean,
+  buildrootUpdateAvailable: boolean,
+  buildrootUpdateSeen: boolean,
 }
 
 type SyncRobotState = {
@@ -46,6 +50,9 @@ export default class SyncRobotModal extends React.Component<
       update,
       ignoreUpdate,
       parentUrl,
+      buildrootUpdateSeen,
+      __buildrootEnabled,
+      buildrootUpdateAvailable,
     } = this.props
 
     const { version } = updateInfo
@@ -78,6 +85,16 @@ export default class SyncRobotModal extends React.Component<
           onClick: update,
         },
       ]
+    }
+
+    const showMigrationModal =
+      buildrootUpdateAvailable &&
+      showReleaseNotes &&
+      __buildrootEnabled &&
+      !buildrootUpdateSeen
+
+    if (showMigrationModal) {
+      return <UpdateBuildroot ignoreUpdate={ignoreUpdate} />
     }
 
     return (

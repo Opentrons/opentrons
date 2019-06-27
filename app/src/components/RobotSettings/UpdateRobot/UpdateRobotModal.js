@@ -12,7 +12,13 @@ import {
 
 import { getRobotApiVersion } from '../../../discovery'
 
-import { CURRENT_VERSION } from '../../../shell'
+import {
+  CURRENT_VERSION,
+  getUpdateInfo,
+  getBuildrootUpdateInfo,
+  getBuildrootUpdateSeen,
+  setBuildrootUpdateSeen,
+} from '../../../shell'
 
 import UpdateAppModal from './UpdateAppModal'
 import SyncRobotModal from './SyncRobotModal'
@@ -20,15 +26,24 @@ import ReinstallModal from './ReinstallModal'
 
 import type { State, Dispatch } from '../../../types'
 import type { ShellUpdateState } from '../../../shell'
+
 import type { ViewableRobot } from '../../../discovery'
 import type { RobotUpdateInfo } from '../../../http-api-client'
 
-type OP = {| robot: ViewableRobot, appUpdate: ShellUpdateState |}
+type OP = {|
+  robot: ViewableRobot,
+  appUpdate: ShellUpdateState,
+  appVersion: string,
+  robotVersion: string,
+  __buildrootEnabled: boolean,
+|}
 
 type SP = {|
   appVersion: string,
   robotVersion: string,
   robotUpdateInfo: RobotUpdateInfo,
+  buildrootUpdateSeen: boolean,
+  buildrootUpdateAvailable: boolean,
 |}
 
 type DP = {| dispatch: Dispatch |}
@@ -61,6 +76,7 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
       appVersion,
       robotVersion,
       robotUpdateInfo,
+      buildrootUpdateSeen,
       appUpdate: { available: appUpdateAvailable, info: appUpdateInfo },
     } = this.props
     const { ignoreAppUpdate } = this.state
@@ -68,7 +84,7 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
     const robotUpdateVersion = robotUpdateInfo.version
     const availableUpdate = appUpdateVersion || robotUpdateVersion
     const versionProps = { appVersion, robotVersion, availableUpdate }
-    const isUpgrade = robotUpdateInfo.type === 'upgrade'
+    const isUpgrade = !!robotUpdateInfo.type
     const onClick = isUpgrade ? this.setIgnoreAppUpdate : this.props.update
 
     if (appUpdateAvailable && !ignoreAppUpdate) {
@@ -89,7 +105,10 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
           versionProps={versionProps}
           update={this.props.update}
           ignoreUpdate={this.props.ignoreUpdate}
-          showReleaseNotes={isUpgrade && ignoreAppUpdate}
+          __buildrootEnabled={this.props.__buildrootEnabled}
+          buildrootUpdateAvailable={this.props.buildrootUpdateAvailable}
+          buildrootUpdateSeen={this.props.buildrootUpdateSeen}
+          showReleaseNotes={buildrootUpdateSeen && isUpgrade && ignoreAppUpdate}
         />
       )
     } else {
@@ -101,23 +120,40 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
 function makeMapStateToProps(): (State, OP) => SP {
   const getRobotUpdateInfo = makeGetRobotUpdateInfo()
 
-  return (state, ownProps) => ({
-    appVersion: CURRENT_VERSION,
-    robotVersion: getRobotApiVersion(ownProps.robot) || 'Unknown',
-    robotUpdateInfo: getRobotUpdateInfo(state, ownProps.robot),
-  })
+  return (state, ownProps) => {
+    const robotUpdateInfo = ownProps.__buildrootEnabled
+      ? getUpdateInfo(ownProps.appVersion, ownProps.robotVersion)
+      : getRobotUpdateInfo(state, ownProps.robot)
+    const buildrootUpdateInfo = getBuildrootUpdateInfo(state)
+    const buildrootUpdateAvailable = Boolean(buildrootUpdateInfo?.filename)
+    return {
+      appVersion: CURRENT_VERSION,
+      robotVersion: getRobotApiVersion(ownProps.robot) || 'Unknown',
+      robotUpdateInfo,
+      buildrootUpdateAvailable,
+      buildrootUpdateSeen: getBuildrootUpdateSeen(state),
+    }
+  }
 }
 
 function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
-  const { robot } = ownProps
+  const { robot, __buildrootEnabled } = ownProps
   const { robotUpdateInfo } = stateProps
   const { dispatch } = dispatchProps
   const parentUrl = `/robots/${robot.name}`
   const close = () => dispatch(push(parentUrl))
-  let ignoreUpdate = robotUpdateInfo.type
-    ? () =>
-        dispatch(setIgnoredUpdate(robot, robotUpdateInfo.version)).then(close)
-    : close
+  let ignoreUpdate
+  if (__buildrootEnabled) {
+    ignoreUpdate = () => {
+      dispatch(setBuildrootUpdateSeen())
+      dispatch(push(parentUrl))
+    }
+  } else {
+    ignoreUpdate = robotUpdateInfo.type
+      ? () =>
+          dispatch(setIgnoredUpdate(robot, robotUpdateInfo.version)).then(close)
+      : close
+  }
 
   return {
     ...ownProps,

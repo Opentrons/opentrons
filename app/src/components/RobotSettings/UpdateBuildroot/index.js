@@ -1,27 +1,20 @@
 // @flow
 import * as React from 'react'
-import { Link } from 'react-router-dom'
 import { AlertModal } from '@opentrons/components'
 import styles from './styles.css'
 
 type Props = {
-  parentUrl: string,
-  ignoreBuildrootUpdate: () => mixed,
+  ignoreUpdate: () => mixed,
 }
+
 const HEADING = 'Robot System Update Available'
 export default function UpdateBuildroot(props: Props) {
-  const { parentUrl, ignoreBuildrootUpdate } = props
-  const notNowButton = {
-    Component: Link,
-    to: parentUrl,
-    children: 'not now',
-    onClick: ignoreBuildrootUpdate,
-  }
+  const { ignoreUpdate } = props
   return (
     <AlertModal
       heading={HEADING}
       buttons={[
-        notNowButton,
+        { children: 'not now', onClick: ignoreUpdate },
         {
           children: 'view robot update',
           className: styles.view_update_button,
@@ -31,7 +24,7 @@ export default function UpdateBuildroot(props: Props) {
       contentsClassName={styles.system_update_modal}
     >
       <p className={styles.system_update_warning}>
-        This update is a little different than previous updates.{' '}
+        This update is a little different than previous updates.
       </p>
 
       <p>

@@ -13,6 +13,13 @@ export type BuildrootState = {
   info: BuildrootUpdateInfo | null,
 }
 
+// TODO (ka 2019-6-27): These types are the same as in http-api-update server
+// Once feature flag removed, swap out all instances of the server version with these
+
+export type RobotUpdateType = 'upgrade' | 'downgrade' | null
+
+export type RobotUpdateInfo = { version: string, type: RobotUpdateType }
+
 const {
   buildroot: { getUpdateFileContents },
 } = global.APP_SHELL
@@ -79,4 +86,18 @@ export function getBuildrootUpdateAvailable(
     return compareCurrentVersionToUpdate(currentVersion, updateVersion)
   }
   return false
+}
+
+export function getUpdateInfo(
+  appVersion: string,
+  robotVersion: string
+): RobotUpdateInfo {
+  const current = semver.valid(robotVersion)
+  let type = null
+  if (current && semver.gt(appVersion, robotVersion)) {
+    type = 'upgrade'
+  } else if (current && semver.lt(appVersion, robotVersion)) {
+    type = 'downgrade'
+  }
+  return { version: appVersion, type: type }
 }

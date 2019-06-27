@@ -13,6 +13,8 @@ import ConnectAlertModal from './ConnectAlertModal'
 import type { ViewableRobot } from '../../discovery'
 
 type Props = {
+  appVersion: string,
+  robotVersion: string,
   robot: ViewableRobot,
   updateUrl: string,
   calibrateDeckUrl: string,
@@ -20,7 +22,14 @@ type Props = {
 }
 
 export default function RobotSettings(props: Props) {
-  const { robot, updateUrl, calibrateDeckUrl, resetUrl } = props
+  const {
+    robot,
+    updateUrl,
+    calibrateDeckUrl,
+    resetUrl,
+    appVersion,
+    robotVersion,
+  } = props
 
   return (
     <CardContainer>
@@ -28,7 +37,12 @@ export default function RobotSettings(props: Props) {
         <StatusCard robot={robot} />
       </CardRow>
       <CardRow>
-        <InformationCard robot={robot} updateUrl={updateUrl} />
+        <InformationCard
+          robot={robot}
+          updateUrl={updateUrl}
+          appVersion={appVersion}
+          robotVersion={robotVersion}
+        />
       </CardRow>
       <CardRow>
         <ControlsCard robot={robot} calibrateDeckUrl={calibrateDeckUrl} />
