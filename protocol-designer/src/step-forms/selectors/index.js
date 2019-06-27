@@ -1,7 +1,11 @@
 // @flow
 import type { ElementProps } from 'react'
 import type { DeckSlotId } from '@opentrons/shared-data'
-import type { DropdownOption, Mount } from '@opentrons/components'
+import type {
+  DropdownOption,
+  Mount,
+  InstrumentInfoProps,
+} from '@opentrons/components'
 import { typeof InstrumentGroup as InstrumentGroupProps } from '@opentrons/components'
 import assert from 'assert'
 import forEach from 'lodash/forEach'
@@ -220,14 +224,12 @@ export const getPipettesForInstrumentGroup: Selector<PipettesForInstrumentGroup>
         const pipetteSpec = pipetteOnDeck.spec
         const tiprackDef = pipetteOnDeck.tiprackLabwareDef
 
-        const pipetteForInstrumentGroup = {
+        const pipetteForInstrumentGroup: InstrumentInfoProps = {
           mount: pipetteOnDeck.mount,
           channels: pipetteSpec ? pipetteSpec.channels : undefined,
           description: _getPipetteDisplayName(pipetteOnDeck.name),
           isDisabled: false,
           tiprackModel: getLabwareDisplayName(tiprackDef),
-          // TODO(mc, 2019-06-27): `tiprack` is missing in InstrumentInfoProps; is it used?
-          tiprack: { model: pipetteOnDeck.tiprackDefURI },
         }
 
         return {
