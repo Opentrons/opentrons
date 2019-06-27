@@ -8,22 +8,22 @@ metadata = {
 }
 
 # a 12 row trough for sources, and 96 well plate for output
-trough = containers.load('usascientific_12_reservoir_22ml', '3', 'trough')
-plate = containers.load('biorad_96_wellplate_200ul_pcr', '1', 'plate')
+trough = containers.load('trough-12row', '3', 'trough')
+plate = containers.load('96-PCR-flat', '1', 'plate')
 
 # a tip rack for our pipette
-p300rack = containers.load('opentrons_96_tiprack_300ul', '2', 'tiprack')
+p200rack = containers.load('tiprack-200ul', '2', 'tiprack')
 
-# create a p300 pipette on robot axis B
-p300 = instruments.P300_Single(mount="left", tip_racks=[p300rack])
+# create a p200 pipette on robot axis B
+p200 = instruments.P300_Single(mount="left", tip_racks=[p200rack])
 
 # simple, atomic commands to control fine details
-p300.pick_up_tip()
-p300.aspirate(50, trough.wells('A1'))
-p300.dispense(plate.wells('D1'))
+p200.pick_up_tip()
+p200.aspirate(50, trough.wells('A1'))
+p200.dispense(plate.wells('D1'))
 
 # macro commands like .distribute() make writing long sequences easier
-p300.distribute(
+p200.distribute(
     50,
     trough.wells('A1'),
     plate.wells(
@@ -37,7 +37,7 @@ p300.distribute(
     disposal_vol=0
 )
 
-p300.distribute(
+p200.distribute(
     50,
     trough.wells('A2'),
     plate.wells(
