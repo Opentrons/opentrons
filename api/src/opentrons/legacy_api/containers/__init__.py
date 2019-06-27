@@ -168,20 +168,20 @@ def _load_new_well(well_data, saved_offset, lw_format):
 
     if lw_format == 'trough':
         well_tuple = (
-            well_data['x'] - well_data['xDimension'] / 2 + saved_offset.x,
-            well_data['y'] + well_data['yDimension'] / 2 + saved_offset.y,
+            well_data['x'] - well_data['xDimension']/2 + saved_offset.x,
+            well_data['y'] + well_data['yDimension']/2 + saved_offset.y,
             well_data['z'] + saved_offset.z)
     else:
         well_tuple = (
-            well_data['x'] - well.x_size() / 2 + saved_offset.x,
-            well_data['y'] - well.y_size() / 2 + saved_offset.y,
+            well_data['x'] - well.x_size()/2 + saved_offset.x,
+            well_data['y'] - well.y_size()/2 + saved_offset.y,
             well_data['z'] + saved_offset.z)
     return (well, well_tuple)
 
 
 def _look_up_offsets(labware_hash):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
-    labware_offset_path = calibration_path / '{}.json'.format(labware_hash)
+    labware_offset_path = calibration_path/'{}.json'.format(labware_hash)
     if labware_offset_path.exists():
         calibration_data = new_labware._read_file(str(labware_offset_path))
         offset_array = calibration_data['default']['offset']
@@ -194,7 +194,7 @@ def save_new_offsets(labware_hash, delta):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
     if not calibration_path.exists():
         calibration_path.mkdir(parents=True, exist_ok=True)
-    labware_offset_path = calibration_path / '{}.json'.format(labware_hash)
+    labware_offset_path = calibration_path/'{}.json'.format(labware_hash)
     calibration_data = new_labware._helper_offset_data_format(
         str(labware_offset_path), delta)
     with labware_offset_path.open('w') as f:
@@ -222,7 +222,7 @@ def load_new_labware_def(definition):
     container.properties['type'] = container_name
     lw_format = definition['parameters']['format']
 
-    container._coordinates = Vector(0, 0, 0)
+    container._coordinates = Vector(definition['cornerOffsetFromSlot'])
     for well_name in itertools.chain(*definition['ordering']):
         well_obj, well_pos = _load_new_well(
             definition['wells'][well_name], saved_offset, lw_format)

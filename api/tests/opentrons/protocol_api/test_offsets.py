@@ -14,6 +14,11 @@ minimalLabwareDef = {
     "metadata": {
         "displayName": "minimal labware"
     },
+    "cornerOffsetFromSlot": {
+        "x": 10,
+        "y": 10,
+        "z": 5
+    },
     "parameters": {
         "isTiprack": True,
         "tipLength": 55.3,
@@ -22,22 +27,22 @@ minimalLabwareDef = {
     "ordering": [["A1"], ["A2"]],
     "wells": {
         "A1": {
-            "depth": 40,
-            "totalLiquidVolume": 100,
-            "diameter": 30,
-            "x": 0,
-            "y": 0,
-            "z": 0,
-            "shape": "circular"
+          "depth": 40,
+          "totalLiquidVolume": 100,
+          "diameter": 30,
+          "x": 0,
+          "y": 0,
+          "z": 0,
+          "shape": "circular"
         },
         "A2": {
-            "depth": 40,
-            "totalLiquidVolume": 100,
-            "diameter": 30,
-            "x": 10,
-            "y": 0,
-            "z": 0,
-            "shape": "circular"
+          "depth": 40,
+          "totalLiquidVolume": 100,
+          "diameter": 30,
+          "x": 10,
+          "y": 0,
+          "z": 0,
+          "shape": "circular"
         }
     },
     "dimensions": {
@@ -123,8 +128,8 @@ def test_schema_shape(monkeypatch, clear_calibration):
                                    Location(Point(0, 0, 0), 'deck'))
 
     monkeypatch.setattr(
-        labware,
-        '_hash_labware_def', mock_hash_labware
+       labware,
+       '_hash_labware_def', mock_hash_labware
     )
 
     labware.save_calibration(test_labware, Point(1, 1, 1))
@@ -174,18 +179,18 @@ def test_wells_rebuilt_with_offset():
     test_labware = labware.Labware(minimalLabwareDef,
                                    Location(Point(0, 0, 0), 'deck'))
     old_wells = test_labware._wells
-    assert test_labware._offset == Point(0, 0, 0)
-    assert test_labware._calibrated_offset == Point(0, 0, 0)
-    labware.save_calibration(test_labware, Point(1, 2, 3))
+    assert test_labware._offset == Point(10, 10, 5)
+    assert test_labware._calibrated_offset == Point(10, 10, 5)
+    labware.save_calibration(test_labware, Point(2, 2, 2))
     new_wells = test_labware._wells
     assert old_wells[0] != new_wells[0]
-    assert test_labware._offset == Point(0, 0, 0)
-    assert test_labware._calibrated_offset == Point(1, 2, 3)
+    assert test_labware._offset == Point(10, 10, 5)
+    assert test_labware._calibrated_offset == Point(12, 12, 7)
 
 
 def test_clear_calibrations():
     calpath = config.CONFIG['labware_calibration_offsets_dir_v4']
-    with open(calpath / '1.json', 'w') as offset_file:
+    with open(calpath/'1.json', 'w') as offset_file:
         test_offset = {
             "default": {
                 "offset": [1, 2, 3],
@@ -201,11 +206,10 @@ def test_clear_calibrations():
 
 
 def test_hash_labware_def():
-    def1a = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.00003, 1 / 3]}
-    def1aa = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.00003, 1 / 3]}
-    def1b = {"metadata": {"a": "blah"},
-             "importantStuff": [1.1, 0.00003, 1 / 3]}
-    def2 = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.000033, 1 / 3]}
+    def1a = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.00003, 1/3]}
+    def1aa = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.00003, 1/3]}
+    def1b = {"metadata": {"a": "blah"}, "importantStuff": [1.1, 0.00003, 1/3]}
+    def2 = {"metadata": {"a": 123}, "importantStuff": [1.1, 0.000033, 1/3]}
 
     # identity preserved across json serialization+deserialization
     assert labware._hash_labware_def(def1a) == \

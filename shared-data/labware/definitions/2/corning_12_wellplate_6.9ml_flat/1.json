@@ -1,13 +1,33 @@
 {
   "ordering": [
-    ["A1", "B1", "C1"],
-    ["A2", "B2", "C2"],
-    ["A3", "B3", "C3"],
-    ["A4", "B4", "C4"]
+    [
+      "A1",
+      "B1",
+      "C1"
+    ],
+    [
+      "A2",
+      "B2",
+      "C2"
+    ],
+    [
+      "A3",
+      "B3",
+      "C3"
+    ],
+    [
+      "A4",
+      "B4",
+      "C4"
+    ]
   ],
   "brand": {
     "brand": "Corning",
-    "brandId": ["3336", "3512", "3513"],
+    "brandId": [
+      "3336",
+      "3512",
+      "3513"
+    ],
     "links": [
       "https://ecatalog.corning.com/life-sciences/b2c/US/en/Microplates/Assay-Microplates/96-Well-Microplates/Costar%C2%AE-Multiple-Well-Cell-Culture-Plates/p/3513?clear=true"
     ]
@@ -162,5 +182,10 @@
         "wellBottomShape": "flat"
       }
     }
-  ]
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
 }

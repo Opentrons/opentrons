@@ -48,5 +48,10 @@
       "wells": ["A1", "A2"],
       "metadata": {}
     }
-  ]
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
 }

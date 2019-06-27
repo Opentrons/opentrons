@@ -33,8 +33,13 @@ export type LabwareRenderProps = {|
 |}
 
 export default function LabwareRender(props: LabwareRenderProps) {
+  const cornerOffsetFromSlot = props.definition.cornerOffsetFromSlot
   return (
-    <g>
+    <g
+      transform={`translate(${cornerOffsetFromSlot.x}, ${
+        cornerOffsetFromSlot.y
+      })`}
+    >
       <StaticLabware
         definition={props.definition}
         onMouseEnterWell={props.onMouseEnterWell}

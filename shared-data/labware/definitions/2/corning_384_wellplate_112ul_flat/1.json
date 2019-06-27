@@ -3913,7 +3913,14 @@
   },
   "brand": {
     "brand": "Corning",
-    "brandId": ["3640", "3662", "3680", "3700", "3701", "3702"],
+    "brandId": [
+      "3640",
+      "3662",
+      "3680",
+      "3700",
+      "3701",
+      "3702"
+    ],
     "links": [
       "https://ecatalog.corning.com/life-sciences/b2c/US/en/Microplates/Assay-Microplates/384-Well-Microplates/Corning%C2%AE-384-well-Clear-Polystyrene-Microplates/p/corning384WellClearPolystyreneMicroplates"
     ]
@@ -4310,5 +4317,10 @@
         "wellBottomShape": "flat"
       }
     }
-  ]
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
 }

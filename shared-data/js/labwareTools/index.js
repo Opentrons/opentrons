@@ -276,6 +276,7 @@ export function createRegularLabware(args: RegularLabwareProps): Definition {
     namespace,
     version,
     schemaVersion: SCHEMA_VERSION,
+    cornerOffsetFromSlot: { x: 0, y: 0, z: 0 },
   })
 }
 
@@ -320,5 +321,6 @@ export function createIrregularLabware(
     namespace,
     version,
     schemaVersion: SCHEMA_VERSION,
+    cornerOffsetFromSlot: { x: 0, y: 0, z: 0 },
   })
 }

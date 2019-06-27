@@ -208,6 +208,11 @@ Object {
           "t40u9sernisofsea",
         ],
       },
+      "cornerOffsetFromSlot": Object {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+      },
       "dimensions": Object {
         "xDimension": 127.76,
         "yDimension": 85.48,
