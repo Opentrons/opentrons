@@ -1,17 +1,9 @@
 {
-  "ordering": [
-    [
-      "A1"
-    ]
-  ],
+  "ordering": [["A1"]],
   "brand": {
     "brand": "Agilent",
-    "brandId": [
-      "201252-100"
-    ],
-    "links": [
-      "https://www.agilent.com/store/en_US/Prod-201252-100/201252-100"
-    ]
+    "brandId": ["201252-100"],
+    "links": ["https://www.agilent.com/store/en_US/Prod-201252-100/201252-100"]
   },
   "metadata": {
     "displayName": "Agilent 1 Well Reservoir 290 mL",
@@ -38,9 +30,7 @@
   },
   "groups": [
     {
-      "wells": [
-        "A1"
-      ],
+      "wells": ["A1"],
       "metadata": {
         "wellBottomShape": "v"
       }
@@ -51,9 +41,7 @@
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "agilent_1_reservoir_290ml",
-    "quirks": [
-      "centerMultichannelOnWells"
-    ]
+    "quirks": ["centerMultichannelOnWells"]
   },
   "namespace": "opentrons",
   "version": 1,

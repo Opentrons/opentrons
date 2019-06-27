@@ -1,14 +1,8 @@
 {
-  "ordering": [
-    [
-      "A1"
-    ]
-  ],
+  "ordering": [["A1"]],
   "brand": {
     "brand": "Axygen",
-    "brandId": [
-      "RES-SW1-LP"
-    ],
+    "brandId": ["RES-SW1-LP"],
     "links": [
       "https://ecatalog.corning.com/life-sciences/b2c/US/en/Genomics-%26-Molecular-Biology/Automation-Consumables/Automation-Reservoirs/Axygen%C2%AE-Reagent-Reservoirs/p/RES-SW1-LP?clear=true"
     ]
@@ -38,9 +32,7 @@
   },
   "groups": [
     {
-      "wells": [
-        "A1"
-      ],
+      "wells": ["A1"],
       "metadata": {
         "wellBottomShape": "flat"
       }
@@ -51,9 +43,7 @@
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "axygen_1_reservoir_90ml",
-    "quirks": [
-      "centerMultichannelOnWells"
-    ]
+    "quirks": ["centerMultichannelOnWells"]
   },
   "namespace": "opentrons",
   "version": 1,

@@ -114,33 +114,14 @@
     "loadName": "opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic"
   },
   "ordering": [
-    [
-      "A1",
-      "B1",
-      "C1"
-    ],
-    [
-      "A2",
-      "B2",
-      "C2"
-    ],
-    [
-      "A3",
-      "B3"
-    ],
-    [
-      "A4",
-      "B4"
-    ]
+    ["A1", "B1", "C1"],
+    ["A2", "B2", "C2"],
+    ["A3", "B3"],
+    ["A4", "B4"]
   ],
   "groups": [
     {
-      "wells": [
-        "A3",
-        "B3",
-        "A4",
-        "B4"
-      ],
+      "wells": ["A3", "B3", "A4", "B4"],
       "metadata": {
         "displayName": "Falcon 4x50 mL Conical",
         "displayCategory": "tubeRack",
@@ -148,24 +129,14 @@
       },
       "brand": {
         "brand": "Falcon",
-        "brandId": [
-          "352070",
-          "352098"
-        ],
+        "brandId": ["352070", "352098"],
         "links": [
           "https://ecatalog.corning.com/life-sciences/b2c/US/en/Liquid-Handling/Tubes,-Liquid-Handling/Centrifuge-Tubes/Falcon%C2%AE-Conical-Centrifuge-Tubes/p/falconConicalTubes"
         ]
       }
     },
     {
-      "wells": [
-        "A1",
-        "B1",
-        "C1",
-        "A2",
-        "B2",
-        "C2"
-      ],
+      "wells": ["A1", "B1", "C1", "A2", "B2", "C2"],
       "metadata": {
         "displayName": "Falcon 6x15 mL Conical",
         "displayCategory": "tubeRack",
@@ -173,13 +144,7 @@
       },
       "brand": {
         "brand": "Falcon",
-        "brandId": [
-          "352095",
-          "352096",
-          "352097",
-          "352099",
-          "352196"
-        ],
+        "brandId": ["352095", "352096", "352097", "352099", "352196"],
         "links": [
           "https://ecatalog.corning.com/life-sciences/b2c/US/en/Liquid-Handling/Tubes,-Liquid-Handling/Centrifuge-Tubes/Falcon%C2%AE-Conical-Centrifuge-Tubes/p/falconConicalTubes"
         ]

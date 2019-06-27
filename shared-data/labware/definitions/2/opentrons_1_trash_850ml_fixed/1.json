@@ -1,9 +1,5 @@
 {
-  "ordering": [
-    [
-      "A1"
-    ]
-  ],
+  "ordering": [["A1"]],
   "metadata": {
     "displayCategory": "trash",
     "displayVolumeUnits": "mL",
@@ -23,10 +19,7 @@
     "isTiprack": false,
     "loadName": "opentrons_1_trash_850ml_fixed",
     "isMagneticModuleCompatible": false,
-    "quirks": [
-      "fixedTrash",
-      "centerMultichannelOnWells"
-    ]
+    "quirks": ["fixedTrash", "centerMultichannelOnWells"]
   },
   "wells": {
     "A1": {
@@ -45,9 +38,7 @@
   },
   "groups": [
     {
-      "wells": [
-        "A1"
-      ],
+      "wells": ["A1"],
       "metadata": {}
     }
   ],

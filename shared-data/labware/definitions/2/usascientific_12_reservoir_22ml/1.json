@@ -1,41 +1,17 @@
 {
   "ordering": [
-    [
-      "A1"
-    ],
-    [
-      "A2"
-    ],
-    [
-      "A3"
-    ],
-    [
-      "A4"
-    ],
-    [
-      "A5"
-    ],
-    [
-      "A6"
-    ],
-    [
-      "A7"
-    ],
-    [
-      "A8"
-    ],
-    [
-      "A9"
-    ],
-    [
-      "A10"
-    ],
-    [
-      "A11"
-    ],
-    [
-      "A12"
-    ]
+    ["A1"],
+    ["A2"],
+    ["A3"],
+    ["A4"],
+    ["A5"],
+    ["A6"],
+    ["A7"],
+    ["A8"],
+    ["A9"],
+    ["A10"],
+    ["A11"],
+    ["A12"]
   ],
   "schemaVersion": 2,
   "version": 1,
@@ -56,9 +32,7 @@
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "usascientific_12_reservoir_22ml",
-    "quirks": [
-      "centerMultichannelOnWells"
-    ]
+    "quirks": ["centerMultichannelOnWells"]
   },
   "wells": {
     "A1": {
@@ -205,9 +179,7 @@
   ],
   "brand": {
     "brand": "USA Scientific",
-    "brandId": [
-      "1061-8150"
-    ],
+    "brandId": ["1061-8150"],
     "links": [
       "https://www.usascientific.com/12-channel-automation-reservoir.aspx"
     ]

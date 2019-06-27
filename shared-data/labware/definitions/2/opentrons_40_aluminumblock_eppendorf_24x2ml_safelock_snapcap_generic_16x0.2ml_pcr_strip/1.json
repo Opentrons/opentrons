@@ -363,10 +363,7 @@
   },
   "brand": {
     "brand": "Opentrons",
-    "brandId": [
-      "4ti-0785/M",
-      "649020"
-    ]
+    "brandId": ["4ti-0785/M", "649020"]
   },
   "metadata": {
     "displayName": "Opentrons 40 Well Aluminum Block with Eppendorf 24x2 mL Safe-Lock Snapcap, Generic 16x0.2 mL PCR Strip",
@@ -389,62 +386,14 @@
     "loadName": "opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip"
   },
   "ordering": [
-    [
-      "A1",
-      "B1",
-      "C1",
-      "D1",
-      "E1",
-      "F1",
-      "G1",
-      "H1"
-    ],
-    [
-      "A3",
-      "B3",
-      "C3",
-      "D3"
-    ],
-    [
-      "A4",
-      "B4",
-      "C4",
-      "D4"
-    ],
-    [
-      "A5",
-      "B5",
-      "C5",
-      "D5"
-    ],
-    [
-      "A6",
-      "B6",
-      "C6",
-      "D6"
-    ],
-    [
-      "A7",
-      "B7",
-      "C7",
-      "D7"
-    ],
-    [
-      "A8",
-      "B8",
-      "C8",
-      "D8"
-    ],
-    [
-      "A13",
-      "B13",
-      "C13",
-      "D13",
-      "E13",
-      "F13",
-      "G13",
-      "H13"
-    ]
+    ["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
+    ["A3", "B3", "C3", "D3"],
+    ["A4", "B4", "C4", "D4"],
+    ["A5", "B5", "C5", "D5"],
+    ["A6", "B6", "C6", "D6"],
+    ["A7", "B7", "C7", "D7"],
+    ["A8", "B8", "C8", "D8"],
+    ["A13", "B13", "C13", "D13", "E13", "F13", "G13", "H13"]
   ],
   "groups": [
     {
