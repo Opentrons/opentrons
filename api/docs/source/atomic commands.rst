@@ -257,7 +257,7 @@ When calling ``touch_tip()`` on a pipette, we have the option to specify a locat
 .. code-block:: python
 
     pipette.touch_tip()                  # touch tip within current location
-    pipette.touch_tip(-2)                # touch tip 2mm below the top of the current location
+    pipette.touch_tip(v_offset=-2)       # touch tip 2mm below the top of the current location
     pipette.touch_tip(plate.wells('B1')) # touch tip within plate:B1
 
 
