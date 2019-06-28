@@ -5,8 +5,7 @@ import numpy as np
 
 from opentrons.config import (CONFIG,
                               robot_configs,
-                              advanced_settings as advs,
-                              feature_flags as ff)
+                              advanced_settings as advs)
 from opentrons.types import Mount
 from opentrons.deck_calibration import dc_main
 from opentrons.deck_calibration.dc_main import get_calibration_points

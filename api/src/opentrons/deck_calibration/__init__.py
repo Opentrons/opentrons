@@ -1,5 +1,3 @@
-import asyncio
-
 from opentrons.config import feature_flags as ff
 from opentrons import types
 

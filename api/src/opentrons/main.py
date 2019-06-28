@@ -114,7 +114,7 @@ def initialize_robot(loop):
     log.info(f"Name: {name()}")
 
 
-def run(**kwargs):
+def run(**kwargs):  # noqa(C901)
     """
     This function was necessary to separate from main() to accommodate for
     server startup path on system 3.0, which is server.main. In the case where
