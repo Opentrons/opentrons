@@ -197,14 +197,13 @@ class BCLabware:
     LW_NO_EQUIVALENT = {'24-vial-rack', '48-vial-plate', '5ml-3x4',
                         '96-well-plate-20mm', 'MALDI-plate',
                         'T25-flask', 'T75-flask', 'e-gelgol',
-                        'hampton-1ml-deep-block', 'magdeck', 'point',
+                        'hampton-1ml-deep-block', 'point',
                         'rigaku-compact-crystallization-plate',
-                        'small_vial_rack_16x45', 'tempdeck',
-                        'temperature-plate', 'tiprack-10ul-H',
-                        'trough-12row-short', 'trough-1row-25ml',
-                        'trough-1row-test', 'tube-rack-2ml-9x9',
-                        'tube-rack-5ml-96', 'tube-rack-80well',
-                        'wheaton_vial_rack'}
+                        'small_vial_rack_16x45', 'temperature-plate',
+                        'tiprack-10ul-H', 'trough-12row-short',
+                        'trough-1row-25ml', 'trough-1row-test',
+                        'tube-rack-2ml-9x9', 'tube-rack-5ml-96',
+                        'tube-rack-80well', 'wheaton_vial_rack'}
     """ Labwares that are no longer supported in this version """
 
     LW_TRANSLATION = {
@@ -264,6 +263,8 @@ class BCLabware:
                 raise NotImplementedError("Labware {} is not supported"
                                           .format(container_name))
             elif container_name in ('magdeck', 'tempdeck'):
+                # TODO(mc, 2019-06-28): when modules BC implemented, change
+                # error type and message to point user to modules.load
                 raise NotImplementedError("Module load not yet implemented")
             else:
                 name = container_name
