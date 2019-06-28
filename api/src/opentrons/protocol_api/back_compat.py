@@ -196,14 +196,15 @@ class BCLabware:
 
     LW_NO_EQUIVALENT = {'24-vial-rack', '48-vial-plate', '5ml-3x4',
                         '96-well-plate-20mm', 'MALDI-plate',
-                        'T25-flask', 'T75-flask', 'biotix-resevoir',
-                        'e-gelgol', 'hampton-1ml-deep-block', 'point',
+                        'T25-flask', 'T75-flask', 'e-gelgol',
+                        'hampton-1ml-deep-block', 'magdeck', 'point',
                         'rigaku-compact-crystallization-plate',
-                        'small_vial_rack_16x45', 'temperature-plate',
-                        'tiprack-10ul-H', 'trough-12row-short',
-                        'trough-1row-25ml', 'trough-1row-test',
-                        'tube-rack-2ml-9x9', 'tube-rack-5ml-96',
-                        'tube-rack-80well', 'wheaton_vial_rack'}
+                        'small_vial_rack_16x45', 'tempdeck',
+                        'temperature-plate', 'tiprack-10ul-H',
+                        'trough-12row-short', 'trough-1row-25ml',
+                        'trough-1row-test', 'tube-rack-2ml-9x9',
+                        'tube-rack-5ml-96', 'tube-rack-80well',
+                        'wheaton_vial_rack'}
     """ Labwares that are no longer supported in this version """
 
     LW_TRANSLATION = {
