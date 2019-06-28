@@ -11,6 +11,7 @@ import ReleaseNotes from '../../ReleaseNotes'
 import { API_RELEASE_NOTES } from '../../../shell'
 
 import type { RobotUpdateInfo } from '../../../http-api-client'
+import type { BuildrootStatus } from '../../../discovery'
 import type { VersionProps } from './types'
 import type { ButtonProps } from '@opentrons/components'
 
@@ -24,10 +25,12 @@ type Props = {
   __buildrootEnabled: boolean,
   buildrootUpdateAvailable: boolean,
   buildrootUpdateSeen: boolean,
+  buildrootStatus: BuildrootStatus | null,
 }
 
 type SyncRobotState = {
   showReleaseNotes: boolean,
+  migrationWarningSeen: boolean,
 }
 
 export default class SyncRobotModal extends React.Component<
@@ -36,11 +39,18 @@ export default class SyncRobotModal extends React.Component<
 > {
   constructor(props: Props) {
     super(props)
-    this.state = { showReleaseNotes: this.props.showReleaseNotes }
+    this.state = {
+      showReleaseNotes: this.props.showReleaseNotes,
+      migrationWarningSeen: false,
+    }
   }
 
   setShowReleaseNotes = () => {
     this.setState({ showReleaseNotes: true })
+  }
+
+  setMigrationWarningSeen = () => {
+    this.setState({ migrationWarningSeen: true })
   }
 
   render() {
@@ -53,10 +63,11 @@ export default class SyncRobotModal extends React.Component<
       buildrootUpdateSeen,
       __buildrootEnabled,
       buildrootUpdateAvailable,
+      buildrootStatus,
     } = this.props
 
     const { version } = updateInfo
-    const { showReleaseNotes } = this.state
+    const { showReleaseNotes, migrationWarningSeen } = this.state
 
     const heading = `Robot Server Version ${version} Available`
     let buttons: Array<?ButtonProps>
@@ -67,6 +78,7 @@ export default class SyncRobotModal extends React.Component<
         {
           children: 'Update Robot Server',
           onClick: update,
+          disabled: __buildrootEnabled,
         },
       ]
     } else if (updateInfo.type === 'upgrade') {
@@ -87,14 +99,23 @@ export default class SyncRobotModal extends React.Component<
       ]
     }
 
+    const notMigrated = buildrootStatus === 'balena' || buildrootStatus === null
+
     const showMigrationModal =
-      buildrootUpdateAvailable &&
       showReleaseNotes &&
-      __buildrootEnabled &&
-      !buildrootUpdateSeen
+      notMigrated &&
+      !buildrootUpdateSeen &&
+      buildrootUpdateAvailable &&
+      !migrationWarningSeen &&
+      __buildrootEnabled
 
     if (showMigrationModal) {
-      return <UpdateBuildroot ignoreUpdate={ignoreUpdate} />
+      return (
+        <UpdateBuildroot
+          ignoreUpdate={ignoreUpdate}
+          viewUpdate={this.setMigrationWarningSeen}
+        />
+      )
     }
 
     return (

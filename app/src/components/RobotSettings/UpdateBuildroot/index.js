@@ -5,11 +5,12 @@ import styles from './styles.css'
 
 type Props = {
   ignoreUpdate: () => mixed,
+  viewUpdate: () => mixed,
 }
 
 const HEADING = 'Robot System Update Available'
 export default function UpdateBuildroot(props: Props) {
-  const { ignoreUpdate } = props
+  const { ignoreUpdate, viewUpdate } = props
   return (
     <AlertModal
       heading={HEADING}
@@ -17,6 +18,7 @@ export default function UpdateBuildroot(props: Props) {
         { children: 'not now', onClick: ignoreUpdate },
         {
           children: 'view robot update',
+          onClick: viewUpdate,
           className: styles.view_update_button,
         },
       ]}

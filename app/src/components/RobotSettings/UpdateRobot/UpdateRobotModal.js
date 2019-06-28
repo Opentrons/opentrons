@@ -10,7 +10,7 @@ import {
   setIgnoredUpdate,
 } from '../../../http-api-client'
 
-import { getRobotApiVersion } from '../../../discovery'
+import { getRobotApiVersion, getRobotBuildrootStatus } from '../../../discovery'
 
 import {
   CURRENT_VERSION,
@@ -27,7 +27,7 @@ import ReinstallModal from './ReinstallModal'
 import type { State, Dispatch } from '../../../types'
 import type { ShellUpdateState } from '../../../shell'
 
-import type { ViewableRobot } from '../../../discovery'
+import type { ViewableRobot, BuildrootStatus } from '../../../discovery'
 import type { RobotUpdateInfo } from '../../../http-api-client'
 
 type OP = {|
@@ -44,6 +44,7 @@ type SP = {|
   robotUpdateInfo: RobotUpdateInfo,
   buildrootUpdateSeen: boolean,
   buildrootUpdateAvailable: boolean,
+  buildrootStatus: BuildrootStatus | null,
 |}
 
 type DP = {| dispatch: Dispatch |}
@@ -108,6 +109,7 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
           __buildrootEnabled={this.props.__buildrootEnabled}
           buildrootUpdateAvailable={this.props.buildrootUpdateAvailable}
           buildrootUpdateSeen={this.props.buildrootUpdateSeen}
+          buildrootStatus={this.props.buildrootStatus}
           showReleaseNotes={buildrootUpdateSeen && isUpgrade && ignoreAppUpdate}
         />
       )
@@ -132,6 +134,7 @@ function makeMapStateToProps(): (State, OP) => SP {
       robotUpdateInfo,
       buildrootUpdateAvailable,
       buildrootUpdateSeen: getBuildrootUpdateSeen(state),
+      buildrootStatus: getRobotBuildrootStatus(ownProps.robot),
     }
   }
 }

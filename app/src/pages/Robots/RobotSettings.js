@@ -13,6 +13,7 @@ import { CONNECTABLE, REACHABLE, getRobotApiVersion } from '../../discovery'
 import {
   CURRENT_VERSION,
   getUpdateInfo as getBuildrootUpdateInfo,
+  getBuildrootUpdateSeen,
 } from '../../shell'
 
 import {
@@ -203,13 +204,16 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
     const __buildrootEnabled = Boolean(
       getConfig(state).devInternal?.enableBuildRoot
     )
+
     const updateInfo = __buildrootEnabled
       ? getBuildrootUpdateInfo(appVersion, robotVersion)
       : getRobotUpdateInfo(state, ownProps.robot)
 
+    const buildrootUpdateSeen = getBuildrootUpdateSeen(state)
+
     let showUpdateModal: ?boolean
     if (__buildrootEnabled) {
-      showUpdateModal = robotVersion !== appVersion
+      showUpdateModal = robotVersion !== appVersion && !buildrootUpdateSeen
     } else {
       showUpdateModal =
         // only show the alert modal if there's an upgrade available
