@@ -37,7 +37,7 @@ def test_highest_z():
     assert deck.highest_z == 0
     lw = labware.load(labware_name, deck.position_for(1))
     deck[1] = lw
-    assert deck.highest_z == lw.wells()[0].top().point.z
+    assert deck.highest_z == pytest.approx(lw.wells()[0].top().point.z)
     del deck[1]
     assert deck.highest_z == 0
     mod = labware.load_module('tempdeck', deck.position_for(8))

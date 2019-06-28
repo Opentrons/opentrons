@@ -61,8 +61,8 @@ def test_labware_mappings(loop, monkeypatch):
     assert lw_label == 'hey there'
 
     with pytest.raises(NotImplementedError,
-                       match='Labware 24-vial-plate is not supported'):
-        bc.load('24-vial-plate', 2)
+                       match='Labware 24-vial-rack is not supported'):
+        bc.load('24-vial-rack', 2)
 
     with pytest.raises(NotImplementedError,
                        match='Module load not yet implemented'):

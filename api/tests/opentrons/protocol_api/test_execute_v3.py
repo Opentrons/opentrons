@@ -100,7 +100,7 @@ def test_dispatch_commands(monkeypatch, loop):
         ("set: flow_rate", {"aspirate": 2.5, "dispense": 2.5}),
         ("dispense", (4.5, dest_plate.wells_by_index()['B1'].bottom(1),)),
         ("touch_tip", (dest_plate.wells_by_index()['B1'],),
-            {"v_offset": 0.46000000000000085}),
+            {"v_offset": 0.33000000000000007}),
         ("set: flow_rate", {"aspirate": 2, "dispense": 2}),
         ("blow_out", (dest_plate.wells_by_index()['B1'],)),
         ("move_to", (ctx.deck.position_for('5').move(Point(1, 2, 3)),),
