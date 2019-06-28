@@ -19,6 +19,7 @@ import type { BaseState, Selector } from '../../types'
 type GetTipCallback = (
   wellName: string
 ) => ?{ empty: boolean, highlighted: boolean }
+
 type GetTipSelector = OutputSelector<
   BaseState,
   { labwareId: string },
@@ -129,7 +130,7 @@ export const getMissingTipsByLabwareId: Selector<{
 
       if (timelineIdx == null) {
         console.error(`Expected non-null timelineIdx for step ${stepId}`)
-        return noop
+        return {}
       }
 
       const prevFrame = timeline[timelineIdx - 1]

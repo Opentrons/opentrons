@@ -1,6 +1,6 @@
 // @flow
 import React, { useMemo } from 'react'
-import { DropdownField, FormGroup, type Mount } from '@opentrons/components'
+import { DropdownField, FormGroup } from '@opentrons/components'
 import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
 import isEmpty from 'lodash/isEmpty'
 import reduce from 'lodash/reduce'
@@ -11,13 +11,13 @@ import TiprackDiagram from './TiprackDiagram'
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 import { getOnlyLatestDefs } from '../../../labware-defs/utils'
-import type { FormPipette } from '../../../step-forms'
+import type { FormPipettesByMount } from '../../../step-forms'
 
 const pipetteOptionsWithNone = [{ name: 'None', value: '' }, ...pipetteOptions]
 
 type Props = {
   initialTabIndex?: number,
-  values: { [Mount]: FormPipette },
+  values: FormPipettesByMount,
   // this handleChange should expect all fields to have name={Mount.pipetteFieldName}
   handleChange: (SyntheticInputEvent<*>) => mixed,
 }

@@ -1,33 +1,28 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { push } from 'connected-react-router'
 import { AlertModal } from '@opentrons/components'
 
+import type { Dispatch } from '../../types'
 import { actions as robotActions } from '../../robot'
-
-type Props = {
-  back: () => mixed,
-  cancel: () => mixed,
-}
 
 const HEADING = 'Are you sure you want to cancel this run?'
 const CANCEL_TEXT = 'cancel run'
 const BACK_TEXT = 'go back'
 
-const mapDispatchToProps = dispatch => ({
-  back: () => {
+export default function ExitAlertModal() {
+  const dispatch = useDispatch<Dispatch>()
+  const back = () => {
+    // $FlowFixMe: RPC robotActions.resume is untyped
     dispatch(robotActions.resume())
     dispatch(push('/run'))
-  },
-  cancel: () => {
+  }
+  const cancel = () => {
+    // $FlowFixMe: RPC robotActions.resume is untyped
     dispatch(robotActions.cancel())
     dispatch(push('/run'))
-  },
-})
-
-function ExitAlertModal(props: Props) {
-  const { back, cancel } = props
+  }
 
   return (
     <AlertModal
@@ -42,8 +37,3 @@ function ExitAlertModal(props: Props) {
     </AlertModal>
   )
 }
-
-export default connect<Props, {||}, {||}, _, _, _>(
-  null,
-  mapDispatchToProps
-)(ExitAlertModal)
