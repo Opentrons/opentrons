@@ -12,6 +12,14 @@ from opentrons.system import udev, resin
 from opentrons.util import logging_config
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
 
+try:
+    from opentrons.hardware_control.socket_server\
+        import run as install_hardware_server
+except ImportError:
+    async def install_hardware_server(sock_path, api):  # type: ignore
+        log.warning("Cannot start hardware server: missing dependency")
+
+
 log = logging.getLogger(__name__)
 
 
@@ -131,7 +139,14 @@ def run(**kwargs):
                 "Could not setup udev rules, modules may not be detected")
     # Explicitly unlock resin updates in case a prior server left them locked
     resin.unlock_updates()
-
+    if kwargs.get('hardware_server'):
+        if ff.use_protocol_api_v2():
+            loop.run_until_complete(
+                install_hardware_server(kwargs['hardware_server_socket'],
+                                        hardware._api))
+        else:
+            log.warning(
+                "Hardware server requested but apiv1 selected, not starting")
     server.run(kwargs.get('hostname'), kwargs.get('port'), kwargs.get('path'),
                loop)
 
@@ -152,6 +167,15 @@ def main():
     arg_parser = ArgumentParser(
         description="Opentrons robot software",
         parents=[build_arg_parser()])
+    arg_parser.add_argument(
+        '--hardware-server', action='store_true',
+        help='Run a jsonrpc server allowing rpc to the'
+        ' hardware controller. Only works on buildroot '
+        'because extra dependencies are required.')
+    arg_parser.add_argument(
+        '--hardware-server-socket', action='store',
+        default='/var/run/opentrons-hardware.sock',
+        help='Override for the hardware server socket')
     args = arg_parser.parse_args()
     run(**vars(args))
     arg_parser.exit(message="Stopped\n")

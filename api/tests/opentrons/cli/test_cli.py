@@ -26,7 +26,7 @@ def test_clear_config(mock_config, async_server):
     hardware = async_server['com.opentrons.hardware']
     dc_main.clear_configuration_and_reload(hardware)
 
-    assert hardware.config == robot_configs._build_config({}, {})
+    assert hardware.config == robot_configs.build_config({}, {})
 
 
 def test_save_and_clear_config(mock_config, async_server):

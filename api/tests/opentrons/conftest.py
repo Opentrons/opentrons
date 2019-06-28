@@ -43,6 +43,15 @@ MAIN_TESTER_DB = str(os.path.join(
 )
 
 
+@pytest.fixture(autouse=True)
+def asyncio_loop_exception_handler(loop):
+    def exception_handler(loop, context):
+        pytest.fail(str(context))
+    loop.set_exception_handler(exception_handler)
+    yield
+    loop.set_exception_handler(None)
+
+
 def state(topic, state):
     def _match(item):
         return \
