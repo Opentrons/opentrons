@@ -42,6 +42,8 @@ pypi_password ?=
 
 # Host key location for buildroot robot
 br_ssh_key ?= ~/.ssh/robot_key
+# Pubkey location for buildroot robot to install with install-key
+br_ssh_pubkey ?= $(br_ssh_key).pub
 # Other SSH args for buildroot robots
 br_ssh_opts ?= -o stricthostkeychecking=no
 
@@ -164,6 +166,12 @@ systemctl stop opentrons-api-server &&\
 mount -o remount,rw / &&\
 cd /usr/lib/python3.7/site-packages &&\
 unzip -o /data/opentrons-*.whl && cleanup || cleanup"
+
+.PHONY: install-key
+install-key:
+	curl -X POST $(host):31950/server/ssh_keys\
+		-H "Content-Type: application/json"\
+		-d "{\"key\":\"$(shell cat $(br_ssh_pubkey))\"}"
 
 .PHONY: flash
 flash:
