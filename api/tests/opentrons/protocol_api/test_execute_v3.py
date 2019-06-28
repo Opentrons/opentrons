@@ -61,7 +61,7 @@ class MockPipette(object):
 
 
 def test_dispatch_commands(monkeypatch, loop):
-    with open(Path(__file__).parent/'data'/'v3_json_dispatch.json',
+    with open(Path(__file__).parent / 'data' / 'v3_json_dispatch.json',
               'r') as f:
         protocol_data = json.load(f)
 
@@ -77,9 +77,9 @@ def test_dispatch_commands(monkeypatch, loop):
     monkeypatch.setattr(ctx, 'delay', mock_delay)
 
     source_plate = ctx.load_labware_by_name(
-        'generic_96_wellplate_340ul_flat', '1')
+        'corning_96_wellplate_360ul_flat', '1')
     dest_plate = ctx.load_labware_by_name(
-        'generic_96_wellplate_340ul_flat', '2')
+        'corning_96_wellplate_360ul_flat', '2')
     tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_10ul', '3')
 
     loaded_labware = {
@@ -100,7 +100,7 @@ def test_dispatch_commands(monkeypatch, loop):
         ("set: flow_rate", {"aspirate": 2.5, "dispense": 2.5}),
         ("dispense", (4.5, dest_plate.wells_by_index()['B1'].bottom(1),)),
         ("touch_tip", (dest_plate.wells_by_index()['B1'],),
-            {"v_offset": 0.46000000000000085}),
+            {"v_offset": 0.33000000000000007}),
         ("set: flow_rate", {"aspirate": 2, "dispense": 2}),
         ("blow_out", (dest_plate.wells_by_index()['B1'],)),
         ("move_to", (ctx.deck.position_for('5').move(Point(1, 2, 3)),),

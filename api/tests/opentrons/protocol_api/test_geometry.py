@@ -5,7 +5,7 @@ from opentrons.protocol_api.geometry import Deck, plan_moves
 from opentrons.protocol_api import labware
 from opentrons.hardware_control.types import CriticalPoint
 
-labware_name = 'generic_96_wellplate_340ul_flat'
+labware_name = 'corning_96_wellplate_360ul_flat'
 trough_name = 'usascientific_12_reservoir_22ml'
 
 
@@ -37,7 +37,7 @@ def test_highest_z():
     assert deck.highest_z == 0
     lw = labware.load(labware_name, deck.position_for(1))
     deck[1] = lw
-    assert deck.highest_z == lw.wells()[0].top().point.z
+    assert deck.highest_z == pytest.approx(lw.wells()[0].top().point.z)
     del deck[1]
     assert deck.highest_z == 0
     mod = labware.load_module('tempdeck', deck.position_for(8))

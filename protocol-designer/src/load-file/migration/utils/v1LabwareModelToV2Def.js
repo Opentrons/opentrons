@@ -2,21 +2,20 @@
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-// TODO IMMEDIATELY review and confirm all mappings
 const v1ModelTov2LoadNameMap = {
   '6-well-plate': 'corning_6_wellplate_16.8ml_flat',
   '12-well-plate': 'corning_12_wellplate_6.9ml_flat',
   '24-well-plate': 'corning_24_wellplate_3.4ml_flat',
   '48-well-plate': 'corning_48_wellplate_1.6ml_flat',
   '384-plate': 'corning_384_wellplate_112ul_flat',
-  '96-deep-well': 'generic_96_wellplate_1.5ml_deep',
-  '96-flat': 'generic_96_wellplate_340ul_flat',
-  '96-PCR-flat': 'biorad_96_wellplate_200ul_pcr', // TODO: 96-PCR-flat not in spreadsheet
-  '96-PCR-tall': 'generic_96_wellplate_300ul_pcr',
+  '96-deep-well': 'usascientific_96_wellplate_2.4ml_deep',
+  '96-flat': 'corning_96_wellplate_360ul_flat',
+  '96-PCR-flat': 'biorad_96_wellplate_200ul_pcr',
+  '96-PCR-tall': 'biorad_96_wellplate_200ul_pcr',
   'biorad-hardshell-96-PCR': 'biorad_96_wellplate_200ul_pcr',
-  'fixed-trash': 'opentrons_1_trash_1100ml_fixed', // TODO: spreadsheet says to use the smaller one opentrons_1_trash_850ml_fixed but we should use the bigger one, right?
+  'fixed-trash': 'opentrons_1_trash_1100ml_fixed',
   'opentrons-aluminum-block-2ml-eppendorf':
-    'opentrons_24_aluminumblock_generic_2ml_screwcap', // TODO: opentrons-aluminum-block-2ml-eppendorf not in spreadsheet
+    'opentrons_24_aluminumblock_generic_2ml_screwcap',
   'opentrons-aluminum-block-2ml-screwcap':
     'opentrons_24_aluminumblock_generic_2ml_screwcap',
   'opentrons-aluminum-block-96-PCR-plate':
@@ -34,9 +33,11 @@ const v1ModelTov2LoadNameMap = {
   'opentrons-tuberack-2ml-screwcap':
     'opentrons_24_tuberack_generic_2ml_screwcap',
   'opentrons-tuberack-50ml': 'opentrons_6_tuberack_falcon_50ml_conical',
-  'tiprack-10ul': 'opentrons_96_tiprack_10ul', // TODO: spreadsheet says to use GEB: geb_96_tiprack_10ul
+  'PCR-strip-tall': 'opentrons_96_aluminumblock_generic_pcr_strip_200ul',
+  'tiprack-10ul': 'opentrons_96_tiprack_10ul',
   'tiprack-200ul': 'tipone_96_tiprack_200ul',
-  'tiprack-1000ul': 'opentrons_96_tiprack_1000ul', // TODO: spreadsheet says to use GEB: geb_96_tiprack_1000ul
+  'tiprack-1000ul': 'opentrons_96_tiprack_1000ul',
+  'trash-box': 'agilent_1_reservoir_290ml',
   'trough-12row': 'usascientific_12_reservoir_22ml',
   'tube-rack-.75ml': 'opentrons_24_tuberack_generic_0.75ml_snapcap_acrylic',
   'tube-rack-2ml':
@@ -44,9 +45,6 @@ const v1ModelTov2LoadNameMap = {
   'tube-rack-15_50ml':
     'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic',
 }
-// TODO: missing mappings for:
-// PCR-strip-tall
-// trash-box
 
 export default function v1LabwareModelToV2Def(
   model: string

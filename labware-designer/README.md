@@ -61,7 +61,7 @@ To build a _regular_ labware, the `options` object should have the following sha
 | `version`    | [Version](#Version)       | no       | Version of the definition, should be incremented if non-metadata info is altered (defaults to `1`) |
 | `namespace`  | [Namepace](#Namespace)    | no       | Defaults to "custom_beta"                                                                          |
 
-This example generates [generic_96_wellplate_340ul_flat.json][]:
+This example generates [corning_96_wellplate_360ul_flat.json][]:
 
 ```js
 const options = {
@@ -90,13 +90,13 @@ const options = {
     diameter: 6.4,
     totalLiquidVolume: 380,
   },
-  brand: { brand: 'generic' },
+  brand: { brand: 'corning' },
 }
 
 const labware = sharedData.createRegularLabware(options)
 ```
 
-[generic_96_wellplate_340ul_flat.json]: ../shared-data/labware/definitions/2/generic_96_wellplate_340ul_flat/1.json
+[corning_96_wellplate_360ul_flat.json]: ../shared-data/labware/definitions/2/corning_96_wellplate_360ul_flat/1.json
 
 ### createIrregularLabware(options: IrregularLabwareProps): LabwareDefinition2
 

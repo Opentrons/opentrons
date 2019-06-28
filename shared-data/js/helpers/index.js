@@ -16,8 +16,6 @@ export const getLabwareDefURI = (def: LabwareDefinition2): string =>
 const RETIRED_LABWARE = [
   'geb_96_tiprack_10ul',
   'geb_96_tiprack_1000ul',
-  'generic_96_wellplate_300ul_pcr',
-  'generic_96_wellplate_1.5ml_deep',
   'opentrons_1_trash_850ml_fixed',
   'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic',
   'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap_acrylic',
