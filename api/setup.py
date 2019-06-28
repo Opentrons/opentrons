@@ -2,12 +2,16 @@
 # https://hynek.me/articles/sharing-your-labor-of-love-pypi-quick-and-dirty/
 import sys
 import codecs
+import distutils.log
+import json
 import os
 import os.path
+import shutil
+import tempfile
+
 from setuptools import setup, find_packages
 from setuptools.command import build_py, sdist
 
-import json
 
 # make stdout blocking since Travis sets it to nonblocking
 if os.name == 'posix':
@@ -29,12 +33,14 @@ SHARED_DATA_SUBDIRS = ['deck',
 DEST_BASE_PATH = 'shared_data'
 
 
-def get_shared_data_files():
+def get_shared_data_files(root=None):
+    if not root:
+        root = SHARED_DATA_PATH
     to_include = []
     for subdir in SHARED_DATA_SUBDIRS:
-        top = os.path.join(SHARED_DATA_PATH, subdir)
+        top = os.path.join(root, subdir)
         for dirpath, dirnames, filenames in os.walk(top):
-            from_source = os.path.relpath(dirpath, SHARED_DATA_PATH)
+            from_source = os.path.relpath(dirpath, root)
             to_include.extend([os.path.join(from_source, fname)
                                for fname in filenames])
     return to_include
@@ -46,13 +52,24 @@ class SDistWithSharedData(sdist.sdist):
 
     def make_release_tree(self, base_dir, files):
         self.announce("adding opentrons data files to base dir {}"
-                      .format(base_dir))
+                      .format(base_dir),
+                      level=distutils.log.INFO)
         for data_file in get_shared_data_files():
             sdist_dest = os.path.join(base_dir, DEST_BASE_PATH)
             self.mkpath(os.path.join(sdist_dest, 'opentrons',
                                      os.path.dirname(data_file)))
-            self.copy_file(os.path.join(SHARED_DATA_PATH, data_file),
-                           os.path.join(sdist_dest, data_file))
+            if data_file.endswith('json'):
+                self.announce(f"minifying {data_file}",
+                              level=20)
+                inf = json.load(
+                    open(os.path.join(SHARED_DATA_PATH, data_file)))
+                json.dump(
+                    inf,
+                    open(os.path.join(sdist_dest, data_file), 'w'),
+                    separators=(',', ':'))
+            else:
+                self.copy_file(os.path.join(SHARED_DATA_PATH, data_file),
+                               os.path.join(sdist_dest, data_file))
         super().make_release_tree(base_dir, files)
 
 
@@ -72,12 +89,30 @@ class BuildWithSharedData(build_py.build_py):
         # should be something ending in opentrons
         build_base = os.path.commonpath([f[2] for f in files])
         # We want a list of paths to only files relative to ../shared-data
-        to_include = get_shared_data_files()
+        self._tempdir = tempfile.mkdtemp()
+        temp_shared = os.path.join(self._tempdir, 'shared-data')
+        shutil.copytree(SHARED_DATA_PATH, temp_shared)
+        to_include = get_shared_data_files(temp_shared)
+        for fname in [
+                infile for infile in to_include
+                if infile.endswith('json')]:
+            fullpath = os.path.join(temp_shared, fname)
+            instr = open(fullpath, 'rb').read()
+            inobj = json.loads(instr.decode())
+            outstr = json.dumps(inobj, separators=(',', ':')).encode()
+            open(fullpath, 'wb').write(outstr)
+            self.announce(
+                f"minified {fname}: saved {len(instr)-len(outstr)}B",
+                level=distutils.log.INFO)
         destination = os.path.join(build_base, DEST_BASE_PATH)
         # And finally, tell the system about our files
-        files.append(('opentrons', SHARED_DATA_PATH,
+        files.append(('opentrons', temp_shared,
                       destination, to_include))
         return files
+
+    def __del__(self):
+        if hasattr(self, '_tempdir') and self._tempdir:
+            shutil.rmtree(self._tempdir)
 
 
 def get_version():
