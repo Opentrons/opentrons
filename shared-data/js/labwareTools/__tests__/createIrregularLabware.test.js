@@ -6,7 +6,6 @@ import {
   _irregularWellName,
   _generateIrregularLoadName,
   _calculateWellCoord,
-  _calculateCornerOffset,
 } from '../index.js'
 import { splitWellsOnColumn, sortWells } from '../../helpers/index.js'
 
@@ -22,28 +21,6 @@ const exampleLabware1 = {
 }
 
 describe('test helper functions', () => {
-  test('cornerOffsetFromSlot outputs correctly', () => {
-    // If smaller than slot, positive values
-    // If larger than slot, negative values
-    const smallerDims = {
-      xDimension: 100,
-      yDimension: 80,
-      zDimension: 10,
-    }
-    const largerDims = {
-      xDimension: 200,
-      yDimension: 90,
-      zDimension: 10,
-    }
-    const offset = _calculateCornerOffset(smallerDims)
-    const offset2 = _calculateCornerOffset(largerDims)
-
-    expect(offset.x).toBeGreaterThan(0)
-    expect(offset.y).toBeGreaterThan(0)
-    expect(offset2.x).toBeLessThan(0)
-    expect(offset2.y).toBeLessThan(0)
-  })
-
   test('Well name generated correctly', () => {
     const grid = { row: 2, column: 2 }
     const gridStart = [

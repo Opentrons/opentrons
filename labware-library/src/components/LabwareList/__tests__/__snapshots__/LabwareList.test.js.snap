@@ -15,7 +15,7 @@ exports[`LabwareList component renders 1`] = `
         },
         "cornerOffsetFromSlot": Object {
           "x": 0,
-          "y": 0.32,
+          "y": 0,
           "z": 0,
         },
         "dimensions": Object {
@@ -235,8 +235,8 @@ exports[`LabwareList component renders 1`] = `
           ],
         },
         "cornerOffsetFromSlot": Object {
-          "x": 0.01,
-          "y": -0.02,
+          "x": 0,
+          "y": 0,
           "z": 0,
         },
         "dimensions": Object {
@@ -573,7 +573,7 @@ exports[`LabwareList component renders 1`] = `
         },
         "cornerOffsetFromSlot": Object {
           "x": 0,
-          "y": -0.01,
+          "y": 0,
           "z": 0,
         },
         "dimensions": Object {
@@ -6785,8 +6785,8 @@ exports[`LabwareList component renders 1`] = `
           "brand": "generic",
         },
         "cornerOffsetFromSlot": Object {
-          "x": 77.76,
-          "y": 35.48,
+          "x": 0,
+          "y": 0,
           "z": 0,
         },
         "dimensions": Object {
@@ -6900,8 +6900,8 @@ exports[`LabwareList component renders 1`] = `
           "brand": "Opentrons",
         },
         "cornerOffsetFromSlot": Object {
-          "x": 0.01,
-          "y": -0.02,
+          "x": 0,
+          "y": 0,
           "z": 0,
         },
         "dimensions": Object {
@@ -8033,8 +8033,8 @@ exports[`LabwareList component renders 1`] = `
           "brand": "Opentrons",
         },
         "cornerOffsetFromSlot": Object {
-          "x": 0.01,
-          "y": -0.02,
+          "x": 0,
+          "y": 0,
           "z": 0,
         },
         "dimensions": Object {

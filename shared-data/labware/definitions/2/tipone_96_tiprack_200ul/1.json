@@ -32,11 +32,6 @@
   "namespace": "opentrons",
   "schemaVersion": 2,
   "version": 1,
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
-  },
   "wells": {
     "H1": {
       "depth": 10.54,
@@ -1013,5 +1008,10 @@
       ],
       "metadata": {}
     }
-  ]
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
 }

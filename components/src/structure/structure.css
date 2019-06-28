@@ -12,7 +12,6 @@
 .title_bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   height: 3rem;
   text-transform: uppercase;
   background-color: var(--c-dark-gray);
@@ -26,7 +25,6 @@
 .title,
 .subtitle,
 .separator {
-  display: inline-block;
   font-size: var(--fs-header);
   margin: 0;
 }
@@ -36,16 +34,23 @@
   font-weight: var(--fw-semibold);
 }
 
-.title_wrapper {
-  padding: 1rem 1.5rem;
+.title,
+.subtitle {
+  @apply --truncate;
+
+  padding: 0 1.5rem;
+}
+
+.title.right {
+  margin-left: auto;
 }
 
 .subtitle {
   font-weight: normal;
 }
 
-.separator {
-  padding: 0 1.75rem;
+.title_button {
+  flex: none;
 }
 
 .page_tabs {

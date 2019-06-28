@@ -1,9 +1,9 @@
 {
   "protocol-schema": "1.0.0",
   "metadata": {
-    "protocol-name": "untitled",
-    "author": "",
-    "description": "",
+    "protocol-name": "Some name!",
+    "author": "Author name",
+    "description": "Description here",
     "created": 1560957631666,
     "category": null,
     "subcategory": null,

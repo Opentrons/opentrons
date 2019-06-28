@@ -7,13 +7,13 @@ import { TitleBar, type TitleBarProps } from '../structure'
 
 import styles from './modals.css'
 
-type Props = {
+type Props = {|
   /** Props for title bar at top of modal page */
   titleBar: TitleBarProps,
   contentsClassName?: string,
-  heading?: string,
+  heading?: React.Node,
   children?: React.Node,
-}
+|}
 
 export default function ModalPage(props: Props) {
   const { titleBar, heading } = props

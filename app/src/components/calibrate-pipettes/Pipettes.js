@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import cx from 'classnames'
 
 import type { PipettesState } from '../../robot-api'
-import type { Pipette } from '../../robot'
+import type { Pipette, Labware } from '../../robot'
 import { constants as robotConstants } from '../../robot'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
@@ -13,6 +13,7 @@ import styles from './styles.css'
 
 type Props = {|
   pipettes: Array<Pipette>,
+  labware: Array<Labware>,
   currentPipette: ?Pipette,
   actualPipettes: ?PipettesState,
   changePipetteUrl: string,
@@ -23,22 +24,32 @@ const ATTACH_ALERT = 'Pipette missing'
 const CHANGE_ALERT = 'Incorrect pipette attached'
 
 export default function Pipettes(props: Props) {
-  const { currentPipette, pipettes, actualPipettes, changePipetteUrl } = props
+  const {
+    currentPipette,
+    pipettes,
+    labware,
+    actualPipettes,
+    changePipetteUrl,
+  } = props
   const currentMount = currentPipette && currentPipette.mount
 
   const infoByMount = PIPETTE_MOUNTS.reduce((result, mount) => {
     const pipette = pipettes.find(p => p.mount === mount)
-    const pipetteConfig = getPipetteModelSpecs(pipette?.name || '')
+    const tiprack = labware.find(
+      lw => lw.isTiprack && lw.calibratorMount === mount
+    )
+    const pipetteConfig = pipette?.modelSpecs
     const actualPipetteConfig = getPipetteModelSpecs(
       actualPipettes?.[mount]?.model || ''
     )
 
     const isDisabled = !pipette || mount !== currentMount
     const details = !pipetteConfig
-      ? { description: 'N/A', tipType: 'N/A' }
+      ? { description: 'N/A', tiprackModel: 'N/A' }
       : {
           description: pipetteConfig.displayName,
-          tipType: `${pipetteConfig.maxVolume} µL`,
+          tiprackModel:
+            tiprack?.definition?.metadata.displayName || tiprack?.name || 'N/A',
           channels: pipetteConfig.channels,
         }
 

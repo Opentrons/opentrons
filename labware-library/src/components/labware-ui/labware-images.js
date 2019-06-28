@@ -21,6 +21,9 @@ export default {
   corning_384_wellplate_112ul_flat: [
     require('../../images/corning_384_wellplate_112ul_flat_photo_three_quarters.jpg'),
   ],
+  corning_96_wellplate_360ul_flat: [
+    require('../../images/corning_96_wellplate_360ul_flat_three_quarters.jpg'),
+  ],
   'corning_48_wellplate_1.6ml_flat': [
     require('../../images/corning_48_wellplate_1.6ml_flat_photo_three_quarters.jpg'),
   ],

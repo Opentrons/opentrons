@@ -379,11 +379,6 @@
   "namespace": "opentrons",
   "schemaVersion": 2,
   "version": 1,
-  "cornerOffsetFromSlot": {
-    "x": 0.01,
-    "y": -0.02,
-    "z": 0
-  },
   "parameters": {
     "format": "irregular",
     "isTiprack": false,
@@ -476,5 +471,10 @@
         "links": []
       }
     }
-  ]
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
 }

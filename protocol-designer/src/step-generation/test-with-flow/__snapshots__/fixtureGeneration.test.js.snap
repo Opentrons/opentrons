@@ -6290,7 +6290,7 @@ Object {
         },
         "cornerOffsetFromSlot": Object {
           "x": 0,
-          "y": 0.32,
+          "y": 0,
           "z": 0,
         },
         "dimensions": Object {
@@ -6527,8 +6527,8 @@ Object {
           "brand": "Opentrons",
         },
         "cornerOffsetFromSlot": Object {
-          "x": 0.01,
-          "y": -0.02,
+          "x": 0,
+          "y": 0,
           "z": 0,
         },
         "dimensions": Object {
@@ -7676,8 +7676,8 @@ Object {
           "brand": "Opentrons",
         },
         "cornerOffsetFromSlot": Object {
-          "x": 0.01,
-          "y": -0.02,
+          "x": 0,
+          "y": 0,
           "z": 0,
         },
         "dimensions": Object {

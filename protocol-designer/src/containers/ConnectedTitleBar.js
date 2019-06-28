@@ -111,7 +111,10 @@ function mapStateToProps(state: BaseState): SP {
           _page,
           _liquidPlacementMode: liquidPlacementMode,
           title: labwareNickname,
-          subtitle: labwareEntity && getLabwareDisplayName(labwareEntity.def),
+          // TODO(mc, 2019-06-27): µL to uL replacement needed to handle CSS capitalization
+          subtitle:
+            labwareEntity &&
+            getLabwareDisplayName(labwareEntity.def).replace('µL', 'uL'),
           backButtonLabel: 'Deck',
         }
       }
@@ -131,7 +134,9 @@ function mapStateToProps(state: BaseState): SP {
             drilledDownLabwareId
           ]
           title = nickname
-          subtitle = labwareDef && getLabwareDisplayName(labwareDef)
+          // TODO(mc, 2019-06-27): µL to uL replacement needed to handle CSS capitalization
+          subtitle =
+            labwareDef && getLabwareDisplayName(labwareDef).replace('µL', 'uL')
         }
       } else if (selectedStep) {
         if (wellSelectionLabwareKey) {

@@ -34,11 +34,6 @@
     "yDimension": 85.48,
     "zDimension": 65.89
   },
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
-  },
   "wells": {
     "H1": {
       "depth": 39.2,
@@ -1015,5 +1010,10 @@
       ],
       "metadata": {}
     }
-  ]
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
 }

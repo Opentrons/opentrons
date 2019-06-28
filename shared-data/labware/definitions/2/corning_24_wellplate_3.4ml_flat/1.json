@@ -28,11 +28,6 @@
     "yDimension": 85.47,
     "zDimension": 20.27
   },
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0.01,
-    "z": 0
-  },
   "wells": {
     "D1": {
       "shape": "circular",
@@ -289,5 +284,10 @@
         "wellBottomShape": "flat"
       }
     }
-  ]
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
 }

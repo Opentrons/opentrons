@@ -1,6 +1,11 @@
 // @flow
 // common robot types
-import type { PipetteChannels, ModuleType } from '@opentrons/shared-data'
+import type {
+  PipetteModelSpecs,
+  PipetteChannels,
+  ModuleType,
+  LabwareDefinition2,
+} from '@opentrons/shared-data'
 import type { Mount } from '@opentrons/components'
 import typeof reducer from './reducer'
 
@@ -92,7 +97,7 @@ export type StatePipette = {
   // TLDR: this `name` needs to be renamed in a future PR to `model`
   name: string,
   // volume of the instrument
-  // TODO(mc, 2018-01-17): this is used to drive tip propbe setup
+  // TODO(mc, 2018-01-17): this is used to drive tip probe setup
   // instructions which is incorrect and needs to be rethought
   volume: number,
 }
@@ -102,6 +107,7 @@ export type Pipette = {
   calibration: PipetteCalibrationStatus,
   probed: boolean,
   tipOn: boolean,
+  modelSpecs: PipetteModelSpecs | null,
 }
 
 // labware as stored in redux state
@@ -118,7 +124,7 @@ export type StateLabware = {|
   isTiprack: boolean,
   // whether or not the labware is a legacy labware (labwareSchemaVersion === 1)
   isLegacy: boolean,
-  // intrument mount to use as the calibrator if isTiprack is true
+  // instrument mount to use as the calibrator if isTiprack is true
   calibratorMount: ?Mount,
 |}
 
@@ -127,6 +133,7 @@ export type Labware = {
   calibration: LabwareCalibrationStatus,
   confirmed: boolean,
   isMoving: boolean,
+  definition: LabwareDefinition2 | null,
 }
 
 export type LabwareType = 'tiprack' | 'labware'

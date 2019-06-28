@@ -21,15 +21,10 @@
   "schemaVersion": 2,
   "version": 1,
   "namespace": "opentrons",
-  "cornerOffsetFromSlot": {
-    "x": 0,
-    "y": 0,
-    "z": 0
-  },
   "wells": {
     "B1": {
       "depth": 113.78,
-      "diameter": 26.45,
+      "diameter": 27.81,
       "shape": "circular",
       "totalLiquidVolume": 50000,
       "x": 35.5,
@@ -38,7 +33,7 @@
     },
     "A1": {
       "depth": 113.78,
-      "diameter": 26.45,
+      "diameter": 27.81,
       "shape": "circular",
       "totalLiquidVolume": 50000,
       "x": 35.5,
@@ -47,7 +42,7 @@
     },
     "B2": {
       "depth": 113.78,
-      "diameter": 26.45,
+      "diameter": 27.81,
       "shape": "circular",
       "totalLiquidVolume": 50000,
       "x": 70.5,
@@ -56,7 +51,7 @@
     },
     "A2": {
       "depth": 113.78,
-      "diameter": 26.45,
+      "diameter": 27.81,
       "shape": "circular",
       "totalLiquidVolume": 50000,
       "x": 70.5,
@@ -65,7 +60,7 @@
     },
     "B3": {
       "depth": 113.78,
-      "diameter": 26.45,
+      "diameter": 27.81,
       "shape": "circular",
       "totalLiquidVolume": 50000,
       "x": 105.5,
@@ -74,7 +69,7 @@
     },
     "A3": {
       "depth": 113.78,
-      "diameter": 26.45,
+      "diameter": 27.81,
       "shape": "circular",
       "totalLiquidVolume": 50000,
       "x": 105.5,
@@ -104,5 +99,10 @@
         ]
       }
     }
-  ]
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
 }

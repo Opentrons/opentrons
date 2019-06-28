@@ -8,27 +8,20 @@ metadata = {
     'source': 'Opentrons Repository'
 }
 
-tiprack_s1 = containers.load('tiprack-200ul', '6', label='s1')
-tiprack_s2 = containers.load('tiprack-200ul', '3', label='s2')
+tiprack_s1 = containers.load('opentrons_96_tiprack_300ul', '10', label='s1')
+tiprack_s2 = containers.load('opentrons_96_tiprack_300ul', '3', label='s2')
 
-tiprack_m1 = containers.load('tiprack-200ul', '4', label='m1')
-tiprack_m2 = containers.load('tiprack-200ul', '1', label='m2')
+tiprack_m1 = containers.load('opentrons_96_tiprack_300ul', '4', label='m1')
+tiprack_m2 = containers.load('opentrons_96_tiprack_300ul', '1', label='m2')
 
-trough = containers.load('trough-12row', '8')
-plate = containers.load('96-PCR-flat', '5')
+trough = containers.load('usascientific_12_reservoir_22ml', '11')
+plate = containers.load('biorad_96_wellplate_200ul_pcr', '5')
 
-multi = instruments.Pipette(
-    name="p200",
-    tip_racks=[tiprack_m2, tiprack_m1],
-    mount="left",
-    channels=8
-)
+multi = instruments.P300_Multi(
+    tip_racks=[tiprack_m2, tiprack_m1], mount='left')
 
-single = instruments.Pipette(
-    name="p200s",
-    tip_racks=[tiprack_s2, tiprack_s1],
-    mount="right"
-)
+single = instruments.P300_Single(
+    tip_racks=[tiprack_s2, tiprack_s1], mount='right')
 
 single.pick_up_tip(tiprack_s1[0])
 single.aspirate(25, trough[0])
