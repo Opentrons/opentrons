@@ -233,7 +233,7 @@ To help with code quality and maintainability, we use a collection of tools that
 - [Linters][lint]
   - Analyze the code for various potential bugs and errors
   - [Pylama][pylama] - Python code audit tool
-  - [ESLint][eslint] - JavsScript/JSON linter
+  - [ESLint][eslint] - JavaScript/JSON linter
   - [stylelint][] - CSS linter
 - [Typecheckers][type-check]
   - Verify that the code is [type safe][type-safe]
@@ -284,6 +284,60 @@ Most, if not all, of the tools above have plugins available for your code editor
 - mypy - Search your editor's package manager
 - Flow - <https://flow.org/en/docs/editors/>
 - Prettier - <https://prettier.io/docs/en/editors.html>
+
+### Adding dependencies
+
+#### JavaScript
+
+JavaScript dependencies are installed by [yarn][]. When calling yarn, you should do so from the repository level.
+
+##### Adding a development dependency
+
+A development dependency is any dependency that is used only to help manage the project. Examples of development dependencies would be:
+
+- Build tools (webpack, babel)
+- Testing/linting/checking tools (jest, flow, eslint)
+- Libraries used only in support scripts (aws, express)
+
+To add a development dependency:
+
+```shell
+# with long option names
+yarn add --dev --ignore-workspace-root-check <dependency_name>
+
+# or, with less typing
+yarn add -DW <dependency_name>
+```
+
+##### Adding a project dependency
+
+A project dependency is a dependency that an application or library will `import` _at run time_. Examples of project dependencies would be:
+
+- UI / state-management libraries (react, redux)
+- General utility libraries (lodash)
+
+Project dependencies should be added _to the specific project that depends on them_. To add one:
+
+```shell
+yarn workspace <project_name> add <dependency_name>
+```
+
+##### Adding type definitions
+
+After you have installed a dependency (development or project), you may find that you need to also install [flow][] type definitions. Without type definitions for our external dependencies, we are unable to typecheck anything we `import`. We use [flow-typed][] to install community-created type definitions. To add type definitions for an installed package:
+
+```shell
+yarn run flow-typed install <dependency_name>@<installed_version>
+```
+
+Not every JavaScript package has an available flow-typed definition. In this case, flow-typed will generate a stub file in the directory `flow-typed/npm/`. You may find it useful to fill out this stub; See the [flow-typed wiki][writing-flow-definitions] for a library definition writing guide.
+
+[flow-typed]: https://github.com/flow-typed/flow-typed
+[writing-flow-definitions]: https://github.com/flow-typed/flow-typed/wiki/Contributing-Library-Definitions
+
+#### Python
+
+This section is a WIP; please check back later!
 
 ### Opentrons API
 
@@ -430,6 +484,7 @@ You probably built against x86_64 and tried to run it on a Raspberry Pi. Switch 
 [kibana-contributing]: https://github.com/elastic/kibana/blob/master/CONTRIBUTING.md
 [makefiles]: https://en.wikipedia.org/wiki/Makefile
 [nvm]: https://github.com/creationix/nvm
+[yarn]: https://yarnpkg.com/
 [yarn-install]: https://yarnpkg.com/en/docs/install
 [commitizen]: https://github.com/commitizen/cz-cli
 [conventional-commits]: https://conventionalcommits.org/

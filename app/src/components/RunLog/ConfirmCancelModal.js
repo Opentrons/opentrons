@@ -14,12 +14,12 @@ const BACK_TEXT = 'go back'
 export default function ExitAlertModal() {
   const dispatch = useDispatch<Dispatch>()
   const back = () => {
-    // $FlowFixMe: RPC robotActions.resume is untyped
+    // $FlowFixMe(mc, 2019-07-01): RPC robotActions.resume is untyped
     dispatch(robotActions.resume())
     dispatch(push('/run'))
   }
   const cancel = () => {
-    // $FlowFixMe: RPC robotActions.resume is untyped
+    // $FlowFixMe(mc, 2019-07-01): RPC robotActions.cancel is untyped
     dispatch(robotActions.cancel())
     dispatch(push('/run'))
   }

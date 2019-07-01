@@ -52,14 +52,6 @@ uninstall:
 	$(MAKE) -C $(API_DIR) clean uninstall
 	shx rm -rf '**/node_modules'
 
-# install flow typed definitions for all JS projects that use flow
-# typedefs are commited, so only needs to be run when we want to update
-.PHONY: install-types
-install-types:
-	flow-mono align-versions
-	flow-mono install-types --overwrite --flowVersion=0.61.0
-	flow-typed install --overwrite --flowVersion=0.61.0
-
 .PHONY: push-api
 push-api: export host = $(usb_host)
 push-api:
