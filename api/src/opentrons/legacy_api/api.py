@@ -97,7 +97,7 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
-        return self.pipette_by_name(mount, 'p20_GEN2_single',
+        return self.pipette_by_name(mount, 'p20_single_GEN2',
                                     trash_container, tip_racks,
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
@@ -111,7 +111,7 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
-        return self.pipette_by_name(mount, 'p20_GEN2_multi',
+        return self.pipette_by_name(mount, 'p20_multi_GEN2',
                                     trash_container, tip_racks,
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
@@ -167,7 +167,7 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
-        return self.pipette_by_name(mount, 'p300_GEN2_single',
+        return self.pipette_by_name(mount, 'p300_single_GEN2',
                                     trash_container, tip_racks,
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
@@ -181,7 +181,7 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
-        return self.pipette_by_name(mount, 'p300_GEN2_multi',
+        return self.pipette_by_name(mount, 'p300_multi_GEN2',
                                     trash_container, tip_racks,
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
@@ -242,7 +242,7 @@ class InstrumentsWrapper(object):
             mount, name_or_model)
         config = pipette_config.load(pipette_model_version, pip_id)
 
-        if pip_id and name_or_model not in pipette_model_version:
+        if pip_id and name_or_model != pipette_model_version.split('_v')[0]:
             log.warning(
                 f"Using a deprecated constructor for {pipette_model_version}")
             constructor_config = pipette_config.name_config()[name_or_model]
@@ -326,25 +326,19 @@ class InstrumentsWrapper(object):
         attached_model = robot.get_attached_pipettes()[mount]['model']
 
         if attached_model and\
-                'p20_GEN2' in attached_model and 'p10' in expected_model_substring:
+                'p20' in attached_model and 'p10_' in expected_model_substring:
             # Special use-case where volume does not match, but we still
             # want a valid model name to be passed
-            print("P20 USE CASE")
-            print(attached_model.split('_')[1])
-            if attached_model.split('_')[1] ==\
-                    expected_model_substring.split('_')[2]:
+            if expected_model_substring.split('_')[1] ==\
+                    attached_model.split('_')[1]:
                 return attached_model
 
-        print("Expected model substring")
-        print(expected_model_substring.split('p'))
-        print("Attached Model")
-        if attached_model:
-            print(attached_model.split('GEN2'))
-        if attached_model and expected_model_substring in attached_model:
+        if attached_model and\
+                expected_model_substring == attached_model.split('_v')[0]:
             return attached_model
         elif attached_model and 'GEN2' in attached_model and\
-                expected_model_substring.split('_')[1] in\
-                attached_model.split('_')[1]:
+                expected_model_substring in\
+                attached_model.split('_GEN2'):
             # Allow for backwards compatibility in old pipette constructors
             return attached_model
         else:
@@ -354,8 +348,9 @@ class InstrumentsWrapper(object):
             #
             # from all available config models that match the expected string,
             # pick the first one for simulation
+            # expected_model_substring == m.split('_v')[0]
             return list(filter(
-                lambda m: expected_model_substring in m,
+                lambda m: expected_model_substring == m.split('_v')[0],
                 pipette_config.config_models))[0]
 
 

@@ -43,11 +43,11 @@ MODELS = {
         'P1KSV15': 'p1000_single_v1.5'
     },
     'v2': {
-        'P3HSV20': 'p300_GEN2_single_v2.0',
-        'P3HMV20': 'p300_GEN2_multi_v2.0',
-        'P1KSV20': 'p1000_GEN2_single_v2.0',
-        'P20SV20': 'p20_GEN2_single_v2.0',
-        'P20MV20': 'p20_GEN2_multi_v2.0',
+        'P3HSV20': 'p300_single_GEN2_v2.0',
+        'P3HMV20': 'p300_multi_GEN2_v2.0',
+        'P1KSV20': 'p1000_single_GEN2_v2.0',
+        'P20SV20': 'p20_single_GEN2_v2.0',
+        'P20MV20': 'p20_multi_GEN2_v2.0',
     }
 }
 
