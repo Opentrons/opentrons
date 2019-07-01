@@ -88,7 +88,7 @@ class InstrumentsWrapper(object):
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
 
-    def P20_Plus_Single(
+    def P20_Single_GEN2(
             self,
             mount,
             trash_container='',
@@ -97,7 +97,21 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
-        return self.pipette_by_name(mount, 'p+20_single',
+        return self.pipette_by_name(mount, 'p20_GEN2_single',
+                                    trash_container, tip_racks,
+                                    aspirate_flow_rate, dispense_flow_rate,
+                                    min_volume, max_volume)
+
+    def P20_Multi_GEN2(
+            self,
+            mount,
+            trash_container='',
+            tip_racks=[],
+            aspirate_flow_rate=None,
+            dispense_flow_rate=None,
+            min_volume=None,
+            max_volume=None):
+        return self.pipette_by_name(mount, 'p20_GEN2_multi',
                                     trash_container, tip_racks,
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
@@ -144,7 +158,7 @@ class InstrumentsWrapper(object):
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
 
-    def P300_Plus_Single(
+    def P300_Single_GEN2(
             self,
             mount,
             trash_container='',
@@ -153,7 +167,21 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
-        return self.pipette_by_name(mount, 'p+300_single',
+        return self.pipette_by_name(mount, 'p300_GEN2_single',
+                                    trash_container, tip_racks,
+                                    aspirate_flow_rate, dispense_flow_rate,
+                                    min_volume, max_volume)
+
+    def P300_Multi_GEN2(
+            self,
+            mount,
+            trash_container='',
+            tip_racks=[],
+            aspirate_flow_rate=None,
+            dispense_flow_rate=None,
+            min_volume=None,
+            max_volume=None):
+        return self.pipette_by_name(mount, 'p300_GEN2_multi',
                                     trash_container, tip_racks,
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
@@ -186,7 +214,7 @@ class InstrumentsWrapper(object):
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
 
-    def P1000_Plus_Single(
+    def P1000_Single_GEN2(
             self,
             mount,
             trash_container='',
@@ -195,7 +223,7 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
-        return self.pipette_by_name(mount, 'p+1000_single',
+        return self.pipette_by_name(mount, 'p1000_single_GEN2',
                                     trash_container, tip_racks,
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
@@ -298,18 +326,25 @@ class InstrumentsWrapper(object):
         attached_model = robot.get_attached_pipettes()[mount]['model']
 
         if attached_model and\
-                'p+20' in attached_model and 'p10' in expected_model_substring:
+                'p20_GEN2' in attached_model and 'p10' in expected_model_substring:
             # Special use-case where volume does not match, but we still
             # want a valid model name to be passed
+            print("P20 USE CASE")
+            print(attached_model.split('_')[1])
             if attached_model.split('_')[1] ==\
-                    expected_model_substring.split('_')[1]:
+                    expected_model_substring.split('_')[2]:
                 return attached_model
 
+        print("Expected model substring")
+        print(expected_model_substring.split('p'))
+        print("Attached Model")
+        if attached_model:
+            print(attached_model.split('GEN2'))
         if attached_model and expected_model_substring in attached_model:
             return attached_model
-        elif attached_model and '+' in attached_model and\
-                expected_model_substring.split('p')[1] in\
-                attached_model.split('+')[1]:
+        elif attached_model and 'GEN2' in attached_model and\
+                expected_model_substring.split('_')[1] in\
+                attached_model.split('_')[1]:
             # Allow for backwards compatibility in old pipette constructors
             return attached_model
         else:

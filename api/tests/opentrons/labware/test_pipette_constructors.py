@@ -7,20 +7,22 @@ from opentrons.legacy_api.instruments import Pipette
 factories = [
     ('p10_single', instruments.P10_Single),
     ('p10_multi', instruments.P10_Multi),
-    ('p+20_single', instruments.P20_Plus_Single),
+    ('p20_GEN2_single', instruments.P20_Single_GEN2),
     ('p50_single', instruments.P50_Single),
     ('p50_multi', instruments.P50_Multi),
     ('p300_single', instruments.P300_Single),
-    ('p+300_single', instruments.P300_Plus_Single),
+    ('p300_GEN2_single', instruments.P300_Single_GEN2),
     ('p300_multi', instruments.P300_Multi),
     ('p1000_single', instruments.P1000_Single),
-    ('p+1000_single', instruments.P1000_Plus_Single),
+    ('p1000_GEN2_single', instruments.P1000_Single_GEN2),
 ]
 
 backcompat_pips = [
-    ('p+20_single', 'p10_single', instruments.P10_Single),
-    ('p+300_single', 'p300_single', instruments.P300_Single),
-    ('p+1000_single', 'p1000_single', instruments.P1000_Single),
+    ('p20_GEN2_single', 'p10_single', instruments.P10_Single),
+    ('p300_GEN2_single', 'p300_single', instruments.P300_Single),
+    ('p20_GEN2_multi', 'p10_multi', instruments.P10_Multi),
+    ('p300_GEN2_multi', 'p300_multi', instruments.P300_Multi),
+    ('p1000_GEN2_single', 'p1000_single', instruments.P1000_Single),
 ]
 
 
