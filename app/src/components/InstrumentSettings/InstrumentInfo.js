@@ -29,8 +29,10 @@ const LABEL_BY_MOUNT = {
 export default function PipetteInfo(props: Props) {
   const { mount, model, robotName, onChangeClick, showSettings } = props
   const label = LABEL_BY_MOUNT[mount]
-  const pipette = model ? getPipetteModelSpecs(model) : null
-  const channels = pipette?.channels
+  const pipette = model && getPipetteModelSpecs(model)
+
+  const { displayName, channels } = pipette || {}
+
   const direction = model ? 'change' : 'attach'
 
   const changeUrl = `/robots/${robotName}/instruments/pipettes/change/${mount}`
@@ -44,7 +46,8 @@ export default function PipetteInfo(props: Props) {
     <div className={className}>
       <LabeledValue
         label={label}
-        value={(model || 'None').split('_').join(' ')}
+        value={(displayName || 'None').replace(/-/, '‑')} // non breaking hyphen
+        valueClassName={styles.pipette_display_name}
       />
 
       <div className={styles.button_group}>
