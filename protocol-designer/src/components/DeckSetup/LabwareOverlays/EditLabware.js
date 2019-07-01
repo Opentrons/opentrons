@@ -67,7 +67,11 @@ const EditLabware = (props: Props) => {
       draggedItem && draggedItem.labwareOnDeck.slot === labwareOnDeck.slot
 
     const contents = draggedItem ? (
-      <div className={styles.overlay_button}>
+      <div
+        className={cx(styles.overlay_button, {
+          [styles.drag_text]: isBeingDragged,
+        })}
+      >
         {i18n.t(
           `deck.overlay.slot.${
             isBeingDragged ? 'drag_to_new_slot' : 'place_here'

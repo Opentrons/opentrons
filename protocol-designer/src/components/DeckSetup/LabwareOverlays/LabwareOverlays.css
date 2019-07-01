@@ -58,6 +58,10 @@
   opacity: 0.5;
 }
 
+.overlay_button.drag_text {
+  color: var(--c-font-dark);
+}
+
 .button_spacer {
   flex: 1;
 }
