@@ -19,7 +19,7 @@ from typing import Any, Dict, Union, List, Optional, Tuple
 from opentrons import types as top_types
 from opentrons.util import linal
 from .simulator import Simulator
-from opentrons.config import robot_configs
+from opentrons.config import robot_configs, feature_flags as fflags
 from .pipette import Pipette
 try:
     from .controller import Controller
