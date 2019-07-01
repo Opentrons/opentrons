@@ -132,10 +132,11 @@ function RobotSettingsPage(props: Props) {
         <Route
           path={`${path}/${UPDATE_FRAGMENT}`}
           render={() => {
-            if (props.__buildRootEnabled) {
+            if (props.__buildRootEnabled && !props.buildrootUpdateSeen) {
               return (
                 <UpdateBuildroot
                   robot={robot}
+                  appUpdate={appUpdate}
                   parentUrl={url}
                   buildrootStatus={buildrootStatus}
                   ignoreBuildrootUpdate={ignoreBuildrootUpdate}
@@ -218,11 +219,13 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
     )
     let showUpdateModal: ?boolean
     if (__buildRootEnabled) {
-      showUpdateModal =
-        // buidlroot update not seen
-        !buildrootUpdateSeen &&
-        // version mismatch or robot is still on balena
-        (robotVersion !== updateInfo.version || buildrootStatus === 'balena')
+      if (!buildrootUpdateSeen) {
+        showUpdateModal =
+          // version mismatch or robot is still on balena
+          robotVersion !== updateInfo.version || buildrootStatus === 'balena'
+      } else {
+        showUpdateModal = false
+      }
     } else {
       showUpdateModal =
         // only show the alert modal if there's an upgrade available

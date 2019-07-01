@@ -1,15 +1,28 @@
 // @flow
 import * as React from 'react'
+
 import SystemUpdateModal from './SystemUpdateModal'
-import type { BuildrootStatus } from '../../../discovery'
+import UpdateRobotModal from './UpdateRobotModal'
+
+import type { BuildrootStatus, ViewableRobot } from '../../../discovery'
+import type { ShellUpdateState } from '../../../shell'
 
 type Props = {
+  robot: ViewableRobot,
+  appUpdate: ShellUpdateState,
   parentUrl: string,
   buildrootStatus: BuildrootStatus | null,
   ignoreBuildrootUpdate: () => mixed,
 }
+
 export default function UpdateBuildroot(props: Props) {
-  const { buildrootStatus, parentUrl, ignoreBuildrootUpdate } = props
+  const {
+    robot,
+    appUpdate,
+    buildrootStatus,
+    parentUrl,
+    ignoreBuildrootUpdate,
+  } = props
   if (buildrootStatus === 'balena') {
     return (
       <SystemUpdateModal
@@ -17,6 +30,8 @@ export default function UpdateBuildroot(props: Props) {
         parentUrl={parentUrl}
       />
     )
+  } else if (buildrootStatus === 'buildroot') {
+    return <UpdateRobotModal robot={robot} appUpdate={appUpdate} />
   }
   return null
 }

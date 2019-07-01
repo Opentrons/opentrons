@@ -56,16 +56,11 @@ function InformationCard(props: Props) {
     updateUrl,
     checkAppUpdate,
     version,
-    buildrootUpdateAvailable,
   } = props
   const { name, displayName, serverOk } = robot
   const firmwareVersion = getRobotFirmwareVersion(robot) || 'Unknown'
-  let updateText: string
-  if (props.__buildRootEnabled && buildrootUpdateAvailable) {
-    updateText = 'Upgrade'
-  } else {
-    updateText = updateInfo.type || 'Reinstall'
-  }
+
+  const updateText = updateInfo.type || 'Reinstall'
 
   return (
     <RefreshCard watch={name} refresh={fetchHealth} title={TITLE}>
