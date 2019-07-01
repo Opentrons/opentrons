@@ -12,6 +12,7 @@ def test_migrates_empty_object():
       'disableHomeOnBoot': None,
       'useProtocolApi2': None,
       'useOldAspirationFunctions': None,
+      'useOldStepsPerMM': None
     })
 
 
@@ -23,6 +24,7 @@ def test_migrates_versionless_new_config():
       'disableHomeOnBoot': True,
       'useProtocolApi2': False,
       'useOldAspirationFunctions': True,
+      'useOldStepsPerMM': None
     })
 
     assert(version == 1)
@@ -33,6 +35,7 @@ def test_migrates_versionless_new_config():
       'disableHomeOnBoot': True,
       'useProtocolApi2': None,
       'useOldAspirationFunctions': True,
+      'useOldStepsPerMM': None
     })
 
 
@@ -52,6 +55,7 @@ def test_migrates_versionless_old_config():
       'disableHomeOnBoot': None,
       'useProtocolApi2': None,
       'useOldAspirationFunctions': None,
+      'useOldStepsPerMM': None
     })
 
 
@@ -69,4 +73,5 @@ def test_ignores_invalid_keys():
       'disableHomeOnBoot': None,
       'useProtocolApi2': None,
       'useOldAspirationFunctions': None,
+      'useOldStepsPerMM': None
     })

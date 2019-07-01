@@ -32,3 +32,6 @@ def use_protocol_api_v2():
 
 def use_old_aspiration_functions():
     return get_setting_with_env_overload('useOldAspirationFunctions')
+
+def old_steps_per_mm():
+    return get_setting_with_env_overload('useOldStepsPerMM')

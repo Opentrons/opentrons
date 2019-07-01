@@ -70,6 +70,11 @@ settings = [
                     ' P50M, and P300S pipettes. Note this will cause the '
                     ' default aspirate behavior (ul to mm conversion) to '
                     ' function as it did prior to version 3.7.0.'
+    ),
+    Setting(
+        _id='useOldStepsPerMM',
+        title='Use Previous Pipette Motor Steps Per MM value',
+        description='Use the older steps per mm value'
     )
 ]
 
@@ -92,7 +97,6 @@ def get_all_adv_settings() -> Dict[str, Dict[str, Union[str, bool, None]]]:
     settings_file = CONFIG['feature_flags_file']
 
     values, _ = _read_settings_file(settings_file)
-
     return {
         key: {**settings_by_id[key].__dict__,
               'value': value}
@@ -206,6 +210,10 @@ def _migrate(data: Mapping[str, Any]) -> SettingsData:
         log.info(
             "Migrating advanced settings from version {} to {}"
             .format(version, target_version))
+
+    for s in settings_by_id:
+        if s not in next.keys():
+            next[s] = None
 
     for m in migrations:
         next = m(next)

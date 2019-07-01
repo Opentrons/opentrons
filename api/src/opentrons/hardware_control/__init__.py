@@ -269,11 +269,14 @@ class API(HardwareAPILike):
                 self._attached_instruments[mount] = p
                 mount_axis = Axis.by_mount(mount)
                 plunger_axis = Axis.of_plunger(mount)
+                # (TODO) Note this feature flag can be removed once a motor is
+                # chosen by hardware for the pipette gen2
+                steps_per_mm = 2133.33 if fflags.old_steps_per_mm() else 3200
                 if 'v2' in model:
                     # Check if new model of pipettes, load smoothie configs
                     # for this particular model
                     self._backend._smoothie_driver.update_steps_per_mm(
-                        {plunger_axis.name: 2133.33})
+                        {plunger_axis.name: steps_per_mm})
                     # TODO(LC25-4-2019): Modify configs to update to as
                     # testing informs better values
                     self._backend._smoothie_driver.update_pipette_config(
