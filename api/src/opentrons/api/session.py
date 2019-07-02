@@ -456,11 +456,24 @@ def extract_metadata(parsed):
 
 
 def infer_version_from_imports(parsed):
-    imports = [
+    # Imports in the form of `import opentrons.robot` will have an entry in
+    # parsed.body[i].names[0].name in the form "opentrons.robot"
+    ot_imports = list(filter(
+        lambda x: 'opentrons' in x,
+        [obj.names[0].name for obj in parsed.body
+         if isinstance(obj, ast.Import)]))
+
+    # Imports in the form of `from opentrons import robot` (with or without an
+    # `as ___` statement) will have an entry in parsed.body[i].module
+    # containing "opentrons"
+    ot_from_imports = [
         obj.names[0].name for obj in parsed.body
-        if isinstance(obj, ast.Import) or isinstance(obj, ast.ImportFrom)]
+        if isinstance(obj, ast.ImportFrom) and 'opentrons' in obj.module]
+
+    # If any of these are populated, filter for entries with v1-specific terms
+    opentrons_imports = ot_imports + ot_from_imports
     v1evidence = ['robot' in i or 'instruments' in i or 'modules' in i
-                  for i in imports]
+                  for i in opentrons_imports]
     if any(v1evidence):
         return '1'
     else:
@@ -478,7 +491,7 @@ def infer_version(metadata, parsed):
 
     If that variable does not exist or if it does not contain the 'apiLevel'
     key, the API version will be inferred from the imports. A script with an
-    import containing 'robot', 'instuments', or 'modules' will be assumed to
+    import containing 'robot', 'instruments', or 'modules' will be assumed to
     be an APIv1 protocol. If none of these are present, it is assumed to be an
     APIv2 protocol (note that 'labware' is not in this list, as there is a
     valid APIv2 import named 'labware').
