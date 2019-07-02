@@ -9,3 +9,11 @@
 .edit_icon_right {
   float: right;
 }
+
+.static_value {
+  display: inline-block;
+  height: 1.5em;
+  max-width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
