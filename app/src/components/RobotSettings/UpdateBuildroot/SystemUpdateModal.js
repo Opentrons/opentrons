@@ -17,7 +17,6 @@ type Props = {
   buildrootUpdateAvailable: boolean,
   ignoreUpdate: () => mixed,
 }
-const HEADING = 'Robot System Update Available'
 export default function UpdateBuildroot(props: Props) {
   const [showReleaseNotes, setShowReleaseNotes] = React.useState<boolean>(false)
   const viewReleaseNotes = () => setShowReleaseNotes(true)
@@ -30,12 +29,14 @@ export default function UpdateBuildroot(props: Props) {
     onClick: ignoreUpdate,
   }
   let buttons: Array<?ButtonProps>
+  let heading = 'Robot System Update Available'
 
   if (showReleaseNotes && !buildrootUpdateAvailable) {
     return <DownloadUpdateModal notNowButton={notNowButton} />
   }
 
   if (showReleaseNotes) {
+    heading = 'Robot System Update'
     buttons = [
       notNowButton,
       {
@@ -56,7 +57,7 @@ export default function UpdateBuildroot(props: Props) {
   }
 
   return (
-    <ScrollableAlertModal heading={HEADING} buttons={buttons} alertOverlay>
+    <ScrollableAlertModal heading={heading} buttons={buttons} alertOverlay>
       {showReleaseNotes ? (
         <ReleaseNotes source={BUILDROOT_RELEASE_NOTES} />
       ) : (

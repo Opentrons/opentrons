@@ -49,10 +49,9 @@ export default class SyncRobotModal extends React.Component<
       buildrootUpdateAvailable,
     } = this.props
 
-    const { version } = updateInfo
     const { showReleaseNotes } = this.state
 
-    const heading = `Robot Server Version ${version} Available`
+    let heading = 'Robot Update Available'
     let buttons: Array<?ButtonProps>
 
     const notNowButton = {
@@ -67,6 +66,7 @@ export default class SyncRobotModal extends React.Component<
     }
 
     if (showReleaseNotes) {
+      heading = 'Robot Update'
       buttons = [
         notNowButton,
         {
