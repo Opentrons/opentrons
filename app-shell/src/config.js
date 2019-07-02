@@ -13,6 +13,8 @@ import createLogger from './log'
 import type { Action } from '@opentrons/app/src/types'
 import type { Config } from '@opentrons/app/src/config'
 
+export type { Config }
+
 // make sure all arguments are included in production
 const argv =
   'defaultApp' in process ? process.argv.slice(2) : process.argv.slice(1)
@@ -31,6 +33,11 @@ const DEFAULTS: Config = {
   // app update config
   update: {
     channel: pkg.version.includes('beta') ? 'beta' : 'latest',
+  },
+
+  buildroot: {
+    manifestUrl:
+      'https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json',
   },
 
   // logging config
@@ -113,6 +120,8 @@ export function getOverrides(path?: string) {
   return getIn(overrides(), path)
 }
 
+// TODO(mc, 2010-07-01): getConfig with path parameter can't be typed
+// Remove the path parameter
 export function getConfig(path?: string) {
   const result = store().get(path)
   const over = getIn(overrides(), path)

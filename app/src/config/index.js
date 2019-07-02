@@ -23,6 +23,11 @@ export type Config = {
     channel: UpdateChannel,
   },
 
+  // robot update config
+  buildroot: {
+    manifestUrl: string,
+  },
+
   // logging config
   log: {
     level: {

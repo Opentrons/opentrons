@@ -16,8 +16,8 @@ type Dispatch = Action => void
 updater.logger = createLogger(__filename)
 updater.autoDownload = false
 
-export const CURRENT_VERSION = updater.currentVersion.version
-export const CURRENT_RELEASE_NOTES = fs.readFileSync(
+export const CURRENT_VERSION: string = updater.currentVersion.version
+export const CURRENT_RELEASE_NOTES: string = fs.readFileSync(
   path.join(__dirname, '../build/release-notes.md'),
   'utf8'
 )
