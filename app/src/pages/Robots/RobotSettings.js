@@ -101,6 +101,7 @@ function RobotSettingsPage(props: Props) {
     closeConnectAlert,
     showUpdateModal,
     buildrootStatus,
+    buildrootUpdateAvailable,
     ignoreBuildrootUpdate,
     match: { path, url },
   } = props
@@ -139,6 +140,7 @@ function RobotSettingsPage(props: Props) {
                   appUpdate={appUpdate}
                   parentUrl={url}
                   buildrootStatus={buildrootStatus}
+                  buildrootUpdateAvailable={buildrootUpdateAvailable}
                   ignoreBuildrootUpdate={ignoreBuildrootUpdate}
                 />
               )

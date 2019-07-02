@@ -3,9 +3,11 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 import SyncRobotMessage from './SyncRobotMessage'
 import VersionList from './VersionList'
+import DownloadUpdateModal from './DownloadUpdateModal'
 import { ScrollableAlertModal } from '../../modals'
 import ReleaseNotes from '../../ReleaseNotes'
 import { BUILDROOT_RELEASE_NOTES } from '../../../shell'
+
 import type { RobotUpdateInfo } from '../../../http-api-client'
 import type { VersionProps } from './types'
 import type { ButtonProps } from '@opentrons/components'
@@ -17,6 +19,7 @@ type Props = {
   ignoreUpdate: () => mixed,
   update: () => mixed,
   showReleaseNotes: boolean,
+  buildrootUpdateAvailable: boolean,
 }
 
 type SyncRobotState = {
@@ -43,6 +46,7 @@ export default class SyncRobotModal extends React.Component<
       update,
       ignoreUpdate,
       parentUrl,
+      buildrootUpdateAvailable,
     } = this.props
 
     const { version } = updateInfo
@@ -56,6 +60,10 @@ export default class SyncRobotModal extends React.Component<
       to: parentUrl,
       onClick: ignoreUpdate,
       children: 'not now',
+    }
+
+    if (showReleaseNotes && !buildrootUpdateAvailable) {
+      return <DownloadUpdateModal notNowButton={notNowButton} />
     }
 
     if (showReleaseNotes) {

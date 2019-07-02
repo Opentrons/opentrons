@@ -5,20 +5,24 @@ import { Link } from 'react-router-dom'
 import { ScrollableAlertModal } from '../../modals'
 import ReleaseNotes from '../../ReleaseNotes'
 import { BUILDROOT_RELEASE_NOTES } from '../../../shell'
+import DownloadUpdateModal from './DownloadUpdateModal'
 import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
+import type { ViewableRobot } from '../../../discovery'
 
 type Props = {
+  robot: ViewableRobot,
   parentUrl: string,
+  buildrootUpdateAvailable: boolean,
   ignoreUpdate: () => mixed,
 }
 const HEADING = 'Robot System Update Available'
 export default function UpdateBuildroot(props: Props) {
   const [showReleaseNotes, setShowReleaseNotes] = React.useState<boolean>(false)
   const viewReleaseNotes = () => setShowReleaseNotes(true)
-  console.log(BUILDROOT_RELEASE_NOTES)
-  const { parentUrl, ignoreUpdate } = props
+
+  const { parentUrl, ignoreUpdate, buildrootUpdateAvailable } = props
   const notNowButton = {
     Component: Link,
     to: parentUrl,
@@ -26,6 +30,10 @@ export default function UpdateBuildroot(props: Props) {
     onClick: ignoreUpdate,
   }
   let buttons: Array<?ButtonProps>
+
+  if (showReleaseNotes && !buildrootUpdateAvailable) {
+    return <DownloadUpdateModal notNowButton={notNowButton} />
+  }
 
   if (showReleaseNotes) {
     buttons = [

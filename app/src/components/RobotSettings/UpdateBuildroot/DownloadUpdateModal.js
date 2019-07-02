@@ -3,22 +3,18 @@
 
 import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
-import styles from './styles.css'
+
+import type { ButtonProps } from '@opentrons/components'
 
 type Props = {
-  ignoreUpdate: () => mixed,
+  notNowButton: ButtonProps,
 }
 
-const HEADING = 'Robot System Update in Progress'
+const HEADING = 'Robot System Update Downloading'
 export default function DownloadUpdate(props: Props) {
-  const { ignoreUpdate } = props
+  const { notNowButton } = props
   return (
-    <AlertModal
-      heading={HEADING}
-      buttons={[{ children: 'cancel', onClick: ignoreUpdate }]}
-      alertOverlay
-      contentsClassName={styles.system_update_modal}
-    >
+    <AlertModal heading={HEADING} buttons={[notNowButton]} alertOverlay>
       <h2>screen not implemented</h2>
     </AlertModal>
   )

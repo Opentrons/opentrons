@@ -12,26 +12,37 @@ type Props = {
   appUpdate: ShellUpdateState,
   parentUrl: string,
   buildrootStatus: BuildrootStatus | null,
+  buildrootUpdateAvailable: boolean,
   ignoreBuildrootUpdate: () => mixed,
 }
 
 export default function UpdateBuildroot(props: Props) {
   const {
     robot,
+    parentUrl,
     appUpdate,
     buildrootStatus,
-    parentUrl,
+    buildrootUpdateAvailable,
     ignoreBuildrootUpdate,
   } = props
   if (buildrootStatus === 'balena') {
     return (
       <SystemUpdateModal
-        ignoreUpdate={ignoreBuildrootUpdate}
+        robot={robot}
         parentUrl={parentUrl}
+        ignoreUpdate={ignoreBuildrootUpdate}
+        buildrootUpdateAvailable={buildrootUpdateAvailable}
       />
     )
   } else if (buildrootStatus === 'buildroot') {
-    return <UpdateRobotModal robot={robot} appUpdate={appUpdate} />
+    return (
+      <UpdateRobotModal
+        robot={robot}
+        parentUrl={parentUrl}
+        appUpdate={appUpdate}
+        buildrootUpdateAvailable={buildrootUpdateAvailable}
+      />
+    )
   }
   return null
 }

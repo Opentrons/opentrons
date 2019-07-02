@@ -22,7 +22,12 @@ import type { ShellUpdateState } from '../../../shell'
 import type { ViewableRobot } from '../../../discovery'
 import type { RobotUpdateInfo } from '../../../http-api-client'
 
-type OP = {| robot: ViewableRobot, appUpdate: ShellUpdateState |}
+type OP = {|
+  robot: ViewableRobot,
+  parentUrl: string,
+  appUpdate: ShellUpdateState,
+  buildrootUpdateAvailable: boolean,
+|}
 
 type SP = {|
   appVersion: string,
@@ -35,7 +40,6 @@ type DP = {| dispatch: Dispatch |}
 type Props = {
   ...OP,
   ...SP,
-  parentUrl: string,
   ignoreUpdate: () => mixed,
   update: () => mixed,
 }
@@ -60,6 +64,7 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
       appVersion,
       robotVersion,
       robotUpdateInfo,
+      buildrootUpdateAvailable,
       appUpdate: { available: appUpdateAvailable, info: appUpdateInfo },
     } = this.props
     const { ignoreAppUpdate } = this.state
@@ -89,6 +94,7 @@ class UpdateRobotModal extends React.Component<Props, UpdateRobotState> {
           update={this.props.update}
           ignoreUpdate={this.props.ignoreUpdate}
           showReleaseNotes={isUpgrade && ignoreAppUpdate}
+          buildrootUpdateAvailable={buildrootUpdateAvailable}
         />
       )
     } else {
