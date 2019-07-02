@@ -4,7 +4,8 @@ import * as React from 'react'
 import SyncRobotMessage from './SyncRobotMessage'
 import VersionList from './VersionList'
 import { ScrollableAlertModal } from '../../modals'
-
+import ReleaseNotes from '../../ReleaseNotes'
+import { BUILDROOT_RELEASE_NOTES } from '../../../shell'
 import type { RobotUpdateInfo } from '../../../http-api-client'
 import type { VersionProps } from './types'
 import type { ButtonProps } from '@opentrons/components'
@@ -80,7 +81,7 @@ export default class SyncRobotModal extends React.Component<
         key={String(showReleaseNotes)}
       >
         {showReleaseNotes ? (
-          <h2>TODO: get release notes from buildroot</h2>
+          <ReleaseNotes source={BUILDROOT_RELEASE_NOTES} />
         ) : (
           <React.Fragment>
             <SyncRobotMessage updateInfo={updateInfo} />

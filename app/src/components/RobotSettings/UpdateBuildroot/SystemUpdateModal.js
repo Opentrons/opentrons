@@ -3,6 +3,8 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 
 import { ScrollableAlertModal } from '../../modals'
+import ReleaseNotes from '../../ReleaseNotes'
+import { BUILDROOT_RELEASE_NOTES } from '../../../shell'
 import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
@@ -15,6 +17,7 @@ const HEADING = 'Robot System Update Available'
 export default function UpdateBuildroot(props: Props) {
   const [showReleaseNotes, setShowReleaseNotes] = React.useState<boolean>(false)
   const viewReleaseNotes = () => setShowReleaseNotes(true)
+  console.log(BUILDROOT_RELEASE_NOTES)
   const { parentUrl, ignoreUpdate } = props
   const notNowButton = {
     Component: Link,
@@ -45,16 +48,11 @@ export default function UpdateBuildroot(props: Props) {
   }
 
   return (
-    <ScrollableAlertModal
-      heading={HEADING}
-      buttons={buttons}
-      alertOverlay
-      contentsClassName={styles.system_update_modal}
-    >
+    <ScrollableAlertModal heading={HEADING} buttons={buttons} alertOverlay>
       {showReleaseNotes ? (
-        <h2>TODO: get release notes from buildroot</h2>
+        <ReleaseNotes source={BUILDROOT_RELEASE_NOTES} />
       ) : (
-        <>
+        <div className={styles.system_update_modal}>
           <p className={styles.system_update_warning}>
             This update is a little different than previous updates.{' '}
           </p>
@@ -70,7 +68,7 @@ export default function UpdateBuildroot(props: Props) {
             discoverable via USB or Wifi throughout the entire migration
             process.
           </p>
-        </>
+        </div>
       )}
     </ScrollableAlertModal>
   )
