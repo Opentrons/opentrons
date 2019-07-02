@@ -1,13 +1,9 @@
 // @flow
 import * as React from 'react'
-import { Link } from 'react-router-dom'
 
 import SyncRobotMessage from './SyncRobotMessage'
 import VersionList from './VersionList'
 import { ScrollableAlertModal } from '../../modals'
-import ReleaseNotes from '../../ReleaseNotes'
-
-import { API_RELEASE_NOTES } from '../../../shell'
 
 import type { RobotUpdateInfo } from '../../../http-api-client'
 import type { VersionProps } from './types'
@@ -40,13 +36,7 @@ export default class SyncRobotModal extends React.Component<
   }
 
   render() {
-    const {
-      updateInfo,
-      versionProps,
-      update,
-      ignoreUpdate,
-      parentUrl,
-    } = this.props
+    const { updateInfo, versionProps, update, ignoreUpdate } = this.props
 
     const { version } = updateInfo
     const { showReleaseNotes } = this.state
@@ -73,7 +63,7 @@ export default class SyncRobotModal extends React.Component<
       ]
     } else if (updateInfo.type === 'downgrade') {
       buttons = [
-        { Component: Link, to: parentUrl, children: 'not now' },
+        { onClick: ignoreUpdate, children: 'not now' },
         {
           children: 'Downgrade Robot',
           onClick: update,
@@ -90,7 +80,7 @@ export default class SyncRobotModal extends React.Component<
         key={String(showReleaseNotes)}
       >
         {showReleaseNotes ? (
-          <ReleaseNotes source={API_RELEASE_NOTES} />
+          <h2>TODO: get release notes from buildroot</h2>
         ) : (
           <React.Fragment>
             <SyncRobotMessage updateInfo={updateInfo} />

@@ -19,20 +19,17 @@ type Props = {
 }
 
 export default function UpdateAppModal(props: Props) {
-  const { updateInfo, parentUrl, versionProps, onClick, ignoreUpdate } = props
+  const { parentUrl, versionProps, onClick, ignoreUpdate } = props
   const HEADING = `Robot Server Version ${
     versionProps.availableUpdate
   } Available`
-  const isUpgrade = updateInfo.type === 'upgrade'
-  let notNowButton
-  if (isUpgrade) {
-    notNowButton = {
-      onClick: ignoreUpdate,
-      children: 'not now',
-    }
-  } else {
-    notNowButton = { Component: Link, to: parentUrl, children: 'not now' }
+  const notNowButton = {
+    Component: Link,
+    to: parentUrl,
+    children: 'not now',
+    onClick: ignoreUpdate,
   }
+
   return (
     <AlertModal
       heading={HEADING}
