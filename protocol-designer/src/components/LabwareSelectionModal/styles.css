@@ -40,9 +40,14 @@
   color: inherit;
 }
 
+.view_measurements_link,
+.labware_name {
+  padding: 1rem 0.5rem;
+}
+
 .labware_list_item {
-  padding: 0.75rem;
   display: flex;
+  padding: 0;
 
   & .view_measurements_link {
     display: none;
