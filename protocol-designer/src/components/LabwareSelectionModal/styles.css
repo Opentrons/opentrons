@@ -31,6 +31,11 @@
 
 /* ----- */
 
+.view_measurements_link,
+.labware_name {
+  padding: 1rem 0.5rem;
+}
+
 .view_measurements_link {
   flex: 0.6;
   text-transform: uppercase;
@@ -38,11 +43,10 @@
   cursor: pointer;
   text-decoration: none;
   color: inherit;
-}
 
-.view_measurements_link,
-.labware_name {
-  padding: 1rem 0.5rem;
+  &:hover {
+    background-color: var(--c-bg-hover);
+  }
 }
 
 .labware_list_item {
