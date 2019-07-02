@@ -62,25 +62,6 @@
   }
 }
 
-/* TODO: Ian 2018-07-26 replace these image with some alternative design...
- * these are still ugly but not going to be long-lived. Might be tooltips, dunno
- */
-.labware_list_item:hover::after {
-  position: absolute;
-  width: 32rem;
-  height: 15rem;
-  background-color: var(--c-white);
-  content: var(--image-url);
-  border: var(--bd-light);
-  top: 4rem;
-  left: 10rem;
-
-  /* Images too large, and need to be cropped from left */
-  zoom: 0.5;
-  clip-path: inset(0 0 0 360px);
-  z-index: 5000;
-}
-
 .labware_preview_wrapper {
   position: absolute;
   display: flex;

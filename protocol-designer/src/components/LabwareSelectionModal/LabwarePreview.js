@@ -32,7 +32,7 @@ const LabwarePreview = (props: Props) => {
   // NOTE: this is a temporary magic value that positions the preview component
   // in a fixed place relative to the labware dropdown, while still letting
   // it overflow the sidebar nav if necessary
-  const leftValue = (global.innerWidth - 365) / 2 - 216
+  const leftValue = (global.innerWidth - 365) / 2 - 260
 
   return (
     <div style={{ left: leftValue }} className={styles.labware_preview_wrapper}>
