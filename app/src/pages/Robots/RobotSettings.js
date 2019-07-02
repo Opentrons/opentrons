@@ -132,7 +132,7 @@ function RobotSettingsPage(props: Props) {
         <Route
           path={`${path}/${UPDATE_FRAGMENT}`}
           render={() => {
-            if (props.__buildRootEnabled && !props.buildrootUpdateSeen) {
+            if (props.__buildRootEnabled) {
               return (
                 <UpdateBuildroot
                   robot={robot}

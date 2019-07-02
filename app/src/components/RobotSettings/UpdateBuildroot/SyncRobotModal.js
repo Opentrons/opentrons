@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-
+import { Link } from 'react-router-dom'
 import SyncRobotMessage from './SyncRobotMessage'
 import VersionList from './VersionList'
 import { ScrollableAlertModal } from '../../modals'
@@ -37,7 +37,13 @@ export default class SyncRobotModal extends React.Component<
   }
 
   render() {
-    const { updateInfo, versionProps, update, ignoreUpdate } = this.props
+    const {
+      updateInfo,
+      versionProps,
+      update,
+      ignoreUpdate,
+      parentUrl,
+    } = this.props
 
     const { version } = updateInfo
     const { showReleaseNotes } = this.state
@@ -45,26 +51,33 @@ export default class SyncRobotModal extends React.Component<
     const heading = `Robot Server Version ${version} Available`
     let buttons: Array<?ButtonProps>
 
+    const notNowButton = {
+      Component: Link,
+      to: parentUrl,
+      onClick: ignoreUpdate,
+      children: 'not now',
+    }
+
     if (showReleaseNotes) {
       buttons = [
-        { onClick: ignoreUpdate, children: 'not now' },
+        notNowButton,
         {
-          children: 'Update Robot Server',
+          children: 'Update Robot',
           onClick: update,
           disabled: true,
         },
       ]
     } else if (updateInfo.type === 'upgrade') {
       buttons = [
-        { onClick: ignoreUpdate, children: 'not now' },
+        notNowButton,
         {
-          children: 'View Robot Server Update',
+          children: 'View Robot Update',
           onClick: this.setShowReleaseNotes,
         },
       ]
     } else if (updateInfo.type === 'downgrade') {
       buttons = [
-        { onClick: ignoreUpdate, children: 'not now' },
+        notNowButton,
         {
           children: 'Downgrade Robot',
           onClick: update,

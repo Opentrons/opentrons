@@ -60,6 +60,7 @@ function InformationCard(props: Props) {
   const { name, displayName, serverOk } = robot
   const firmwareVersion = getRobotFirmwareVersion(robot) || 'Unknown'
 
+  // NOTE: this logic still makes sense when buildroot is associated with a version bump
   const updateText = updateInfo.type || 'Reinstall'
 
   return (

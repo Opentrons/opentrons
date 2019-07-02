@@ -12,7 +12,7 @@ type Props = {
   update: () => mixed,
 }
 
-const HEADING = 'Robot Server is up to date'
+const HEADING = 'Robot is up to date'
 const REINSTALL_MESSAGE =
   "It looks like your robot is already up to date, but if you're experiencing issues you can re-apply the latest update."
 
@@ -23,7 +23,7 @@ export default function ReinstallModal(props: Props) {
       heading={HEADING}
       buttons={[
         { Component: Link, to: parentUrl, children: 'not now' },
-        { onClick: update, children: 'Reinstall', disabled: true },
+        { disabled: true, onClick: update, children: 'Reinstall' },
       ]}
       alertOverlay
     >
