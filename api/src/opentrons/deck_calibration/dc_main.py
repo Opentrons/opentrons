@@ -580,7 +580,10 @@ def main(loop=None):
     cli.ui_loop.run()
     if feature_flags.use_protocol_api_v2():
         hardware.set_lights(rails=False)
-    print('Robot config: \n', cli._config)
+    try:
+        print('Robot config: \n', cli.hardware.config)
+    except Exception:
+        pass
 
 
 def notify_and_restart():
