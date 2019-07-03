@@ -105,7 +105,7 @@ def init_pipette():
     :return: The pipette type and mount chosen for deck calibration
     """
     global session
-    pipette_info = set_current_mount(session.adapter, session)
+    pipette_info = set_current_mount(session)
     pipette = pipette_info['pipette']
     res = {}
     if pipette:
@@ -124,9 +124,9 @@ def init_pipette():
     return res
 
 
-def get_pipettes(hardware):
+def get_pipettes(sess):
     if not feature_flags.use_protocol_api_v2():
-        attached_pipettes = hardware.get_attached_pipettes()
+        attached_pipettes = sess.adapter.get_attached_pipettes()
         left_pipette = None
         right_pipette = None
         left = attached_pipettes.get('left')
@@ -137,13 +137,13 @@ def get_pipettes(hardware):
             right_pipette = instruments.pipette_by_name(
                 'right', right['model'])
     else:
-        attached_pipettes = hardware.attached_instruments
+        attached_pipettes = sess.adapter.attached_instruments
         left_pipette = attached_pipettes.get(Mount.LEFT)
         right_pipette = attached_pipettes.get(Mount.RIGHT)
     return right_pipette, left_pipette
 
 
-def set_current_mount(hardware, session):
+def set_current_mount(session):
     """
     Choose the pipette in which to execute commands. If there is no pipette,
     or it is uncommissioned, the pipette is not mounted.
@@ -158,7 +158,7 @@ def set_current_mount(hardware, session):
     pipette = None
     right_channel = None
     left_channel = None
-    right_pipette, left_pipette = get_pipettes(hardware)
+    right_pipette, left_pipette = get_pipettes(session)
     if right_pipette:
         if not feature_flags.use_protocol_api_v2():
             right_channel = right_pipette.channels
@@ -184,23 +184,23 @@ def set_current_mount(hardware, session):
         pipette = left_pipette
         session.cp = CriticalPoint.FRONT_NOZZLE
 
-    model, pip_id = _get_model_name(pipette, hardware)
+    model, pip_id = _get_model_name(pipette, session.adapter)
     session.pipette_id = pip_id
     return {'pipette': pipette, 'model': model}
 
 
-def _get_model_name(pipette, hardware):
+def _get_model_name(pipette, adapter):
     model = None
     pip_id = None
     if pipette:
         if not feature_flags.use_protocol_api_v2():
             model = pipette.model
-            pip_info = hardware.get_attached_pipettes()[pipette.mount]
+            pip_info = adapter.get_attached_pipettes()[pipette.mount]
             pip_id = pip_info['id']
         else:
             model = pipette.get('model')
             mount = Mount.LEFT if pipette['mount'] == 'left' else Mount.RIGHT
-            pip_info = hardware.attached_instruments[mount]
+            pip_info = adapter.attached_instruments[mount]
             pip_id = pip_info['pipette_id']
 
     return model, pip_id

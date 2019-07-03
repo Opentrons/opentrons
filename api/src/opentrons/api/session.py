@@ -238,7 +238,6 @@ class Session(object):
                     run_protocol(protocol_code=self._protocol,
                                  simulate=True,
                                  context=self._simulating_ctx)
-                sim.join()
             else:
                 self._hardware.broker = self._broker
                 self._hardware.cache_instrument_models()
