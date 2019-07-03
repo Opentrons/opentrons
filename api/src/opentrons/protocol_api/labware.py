@@ -826,36 +826,6 @@ def _get_path_to_labware(load_name: str, namespace: str, version: int) -> Path:
     return def_path
 
 
-# NOTE: Ian 2019-07-02 this fn is not currently used, remove if we decide
-# not to use it for anything
-def _get_path_to_latest_labware(load_name: str, namespace: str) -> Path:
-    # Get path to highest-versioned labware within a given namespace
-    if namespace == OPENTRONS_NAMESPACE:
-        base_path = STANDARD_DEFS_PATH
-    else:
-        base_path = CONFIG['labware_user_definitions_dir_v4'] / namespace
-
-    loadname_dir = base_path / load_name
-    if not loadname_dir.is_dir():
-        raise FileNotFoundError(f'labware {load_name} not found in namespace' +
-                                f' {namespace}')
-
-    result = None
-    files_by_version = sorted(
-        [d for d in loadname_dir.iterdir()
-            if d.is_file() and d.name.endswith('.json')],
-        key=lambda dirpath: int(dirpath.stem))
-    if len(files_by_version) == 0:
-        raise RuntimeError(
-            f'No json files found in {loadname_dir}, expected at least one')
-    result = files_by_version[-1]
-
-    if result is None:
-        raise FileNotFoundError(f'No labware "{load_name}" exists ' +
-                                f'in namespace "{namespace}"')
-    return result
-
-
 def save_definition(
     labware_def: Dict[str, Any],
     force: bool = False
