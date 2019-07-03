@@ -1,8 +1,9 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
+import cx from 'classnames'
+import { HoverTooltip, PrimaryButton, Icon } from '@opentrons/components'
 import i18n from '../localization'
-import { HoverTooltip, PrimaryButton } from '@opentrons/components'
 import { actions as steplistActions } from '../steplist'
 import { stepIconsByType, type StepType } from '../form-types'
 import type { ThunkDispatch } from '../types'
@@ -15,14 +16,14 @@ type State = { expanded?: boolean }
 type DP = $Exact<Props>
 
 class StepCreationButton extends React.Component<Props, State> {
-  state = { expanded: false }
+  state = { expanded: true }
 
   handleExpandClick = (e: SyntheticEvent<>) => {
     this.setState({ expanded: !this.state.expanded })
   }
 
   handleMouseLeave = (e: SyntheticEvent<>) => {
-    this.setState({ expanded: false })
+    // this.setState({ expanded: false })
   }
 
   render() {
@@ -30,14 +31,23 @@ class StepCreationButton extends React.Component<Props, State> {
     const supportedSteps = ['moveLiquid', 'mix', 'pause']
 
     return (
-      <div
-        className={styles.list_item_button}
-        onMouseLeave={this.handleMouseLeave}
-      >
-        <PrimaryButton onClick={this.handleExpandClick}>
-          {i18n.t('button.add_step')}
-        </PrimaryButton>
-
+      <>
+        <div
+          className={styles.list_item_button_wrapper}
+          onMouseLeave={this.handleMouseLeave}
+        >
+          <PrimaryButton
+            onClick={this.handleExpandClick}
+            className={cx(styles.list_item_button, {
+              [styles.active]: this.state.expanded,
+            })}
+          >
+            <div className={styles.step_creation_icon_wrapper}>
+              <Icon name="plus" className={styles.step_creation_icon} />
+            </div>
+            {i18n.t('button.add_step')}
+          </PrimaryButton>
+        </div>
         <div className={styles.buttons_popover}>
           {this.state.expanded &&
             supportedSteps.map(stepType => (
@@ -54,15 +64,21 @@ class StepCreationButton extends React.Component<Props, State> {
                   <PrimaryButton
                     hoverTooltipHandlers={hoverTooltipHandlers}
                     onClick={this.props.makeAddStep(stepType)}
-                    iconName={stepIconsByType[stepType]}
+                    className={styles.step_creation_option}
                   >
+                    <div className={styles.step_creation_icon_wrapper}>
+                      <Icon
+                        name={stepIconsByType[stepType]}
+                        className={styles.step_creation_icon}
+                      />
+                    </div>
                     {i18n.t(`application.stepType.${stepType}`, stepType)}
                   </PrimaryButton>
                 )}
               </HoverTooltip>
             ))}
         </div>
-      </div>
+      </>
     )
   }
 }

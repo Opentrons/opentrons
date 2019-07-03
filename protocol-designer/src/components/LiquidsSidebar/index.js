@@ -37,8 +37,12 @@ function LiquidsSidebar(props: Props) {
           title={name || `Unnamed Ingredient ${ingredientId}`} // fallback, should not happen
         />
       ))}
-      <div className={listButtonStyles.list_item_button}>
-        <PrimaryButton iconName="water" onClick={createNewLiquid}>
+      <div className={listButtonStyles.list_item_button_wrapper}>
+        <PrimaryButton
+          iconName="water"
+          onClick={createNewLiquid}
+          className={listButtonStyles.list_item_button}
+        >
           {i18n.t('button.new_liquid')}
         </PrimaryButton>
       </div>
