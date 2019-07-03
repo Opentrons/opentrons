@@ -24,13 +24,22 @@ type Props = {
   alertOverlay?: boolean,
   /** override default alert icon */
   iconName?: IconName,
+  /** restricts scroll outside of Modal when open, true by default */
+  restrictOuterScroll?: boolean,
 }
 
 /**
  * Generic alert modal with a heading and a set of buttons at the bottom
  */
 export default function AlertModal(props: Props) {
-  const { heading, buttons, className, onCloseClick, alertOverlay } = props
+  const {
+    heading,
+    buttons,
+    className,
+    onCloseClick,
+    alertOverlay,
+    restrictOuterScroll,
+  } = props
   const iconName = props.iconName || 'alert'
   const wrapperStyle = cx(
     styles.alert_modal_wrapper,
@@ -46,6 +55,7 @@ export default function AlertModal(props: Props) {
       contentsClassName={wrapperStyle}
       onCloseClick={onCloseClick}
       alertOverlay={alertOverlay}
+      restrictOuterScroll={restrictOuterScroll}
     >
       {heading && (
         <div className={styles.alert_modal_heading}>
