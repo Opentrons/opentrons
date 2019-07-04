@@ -103,7 +103,9 @@ test-js:
 	jest \
 		--coverage=$(cover) \
 		--watch=$(watch) \
-		--updateSnapshot=$(updateSnapshot)
+		--updateSnapshot=$(updateSnapshot) \
+		--no-cache=$(if $(CI),true,false) \
+		--ci=$(if $(CI),true,false)
 
 # lints and typechecks
 .PHONY: lint
