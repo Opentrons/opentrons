@@ -211,7 +211,7 @@ class ProtocolContext(CommandPublisher):
             location: types.DeckLocation,
             label: str = None,
             namespace: str = None,
-            version: int = None
+            version: int = 1
     ) -> Labware:
         """ A convenience function to specify a piece of labware by name.
 
@@ -233,7 +233,7 @@ class ProtocolContext(CommandPublisher):
         :param str namespace: The namespace the labware definition belongs to.
             If unspecified, will search 'opentrons' then 'custom_beta'
         :param int version: The version of the labware definition. If
-            unspecified, will use the latest version.
+            unspecified, will use version 1.
         """
         labware_def = get_labware_definition(load_name, namespace, version)
         return self.load_labware_from_definition(labware_def, location, label)
