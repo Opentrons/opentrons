@@ -16,14 +16,14 @@ type State = { expanded?: boolean }
 type DP = $Exact<Props>
 
 class StepCreationButton extends React.Component<Props, State> {
-  state = { expanded: true }
+  state = { expanded: false }
 
   handleExpandClick = (e: SyntheticEvent<>) => {
     this.setState({ expanded: !this.state.expanded })
   }
 
   handleMouseLeave = (e: SyntheticEvent<>) => {
-    // this.setState({ expanded: false })
+    this.setState({ expanded: false })
   }
 
   render() {
@@ -31,19 +31,19 @@ class StepCreationButton extends React.Component<Props, State> {
     const supportedSteps = ['moveLiquid', 'mix', 'pause']
 
     return (
-      <>
-        <div
-          className={styles.list_item_button_wrapper}
-          onMouseLeave={this.handleMouseLeave}
-        >
+      <div
+        onMouseLeave={this.handleMouseLeave}
+        className={styles.list_item_interaction_wrapper}
+      >
+        <div className={styles.list_item_button_wrapper}>
           <PrimaryButton
             onClick={this.handleExpandClick}
             className={cx(styles.list_item_button, {
               [styles.active]: this.state.expanded,
             })}
           >
-            <div className={styles.step_creation_icon_wrapper}>
-              <Icon name="plus" className={styles.step_creation_icon} />
+            <div className={styles.list_button_icon_wrapper}>
+              <Icon name="plus" className={styles.list_button_icon} />
             </div>
             {i18n.t('button.add_step')}
           </PrimaryButton>
@@ -66,10 +66,10 @@ class StepCreationButton extends React.Component<Props, State> {
                     onClick={this.props.makeAddStep(stepType)}
                     className={styles.step_creation_option}
                   >
-                    <div className={styles.step_creation_icon_wrapper}>
+                    <div className={styles.list_button_icon_wrapper}>
                       <Icon
                         name={stepIconsByType[stepType]}
-                        className={styles.step_creation_icon}
+                        className={styles.list_button_icon}
                       />
                     </div>
                     {i18n.t(`application.stepType.${stepType}`, stepType)}
@@ -78,7 +78,7 @@ class StepCreationButton extends React.Component<Props, State> {
               </HoverTooltip>
             ))}
         </div>
-      </>
+      </div>
     )
   }
 }

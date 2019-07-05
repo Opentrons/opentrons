@@ -1,18 +1,22 @@
 .list_item_button_wrapper {
-  z-index: 5;
   position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
+.list_item_interaction_wrapper {
+  margin: 1rem 3rem;
+}
+
 .buttons_popover {
   position: absolute;
-  left: 2rem;
-  right: 2rem;
+  left: 3rem;
+  right: 3rem;
   display: flex;
   flex-direction: column;
   align-items: center;
+  z-index: 1;
 }
 
 .list_item_button,
@@ -21,6 +25,12 @@
   align-items: center;
   width: 11.5rem;
   padding: 0.25rem 0.5rem;
+}
+
+.list_item_button.active {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  box-shadow: none;
 }
 
 .step_creation_option:not(:last-child) {
@@ -37,13 +47,13 @@
   border-bottom-right-radius: 0;
 }
 
-.step_creation_icon_wrapper {
+.list_button_icon_wrapper {
   height: 2.25rem;
   width: 2.25rem;
   margin-right: 0.75rem;
 }
 
-.step_creation_icon {
+.list_button_icon {
   margin: 0.25rem 0.125rem;
   height: 75%;
   width: auto;
