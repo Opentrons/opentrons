@@ -550,6 +550,7 @@ def _get_labware(command):
     interactions = []
 
     location = command.get('location')
+
     instrument = command.get('instrument')
 
     placeable = location
