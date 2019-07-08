@@ -66,6 +66,11 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
   }
   const pipetteSpec = invariantContext.pipetteEntities[args.pipette].spec
 
+  // TODO: BC 2019-07-08 these argument names are a bit misleading, instead of being values bound
+  // to the action of aspiration of dispensing in a given command, they are actually values bound
+  // to a given labware associated with a command (e.g. Source, Destination). For this reason we
+  // currently remapping the inner mix values. Those calls to mixUtil should become easier to read
+  // when we decide to rename these fields/args... probably all the way up to the UI level.
   const {
     aspirateFlowRateUlSec,
     dispenseFlowRateUlSec,
