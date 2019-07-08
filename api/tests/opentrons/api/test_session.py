@@ -48,7 +48,6 @@ def labware_setup(hardware):
             'locations': [plates[0][0], plates[1]],
             'instrument': p1000
         }
-
     ]
 
     return (p50, p1000), tip_racks, plates, commands
