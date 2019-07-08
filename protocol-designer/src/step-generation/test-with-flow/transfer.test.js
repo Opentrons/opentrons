@@ -14,6 +14,8 @@ import {
   makeTouchTipHelper,
   pickUpTipHelper,
   dropTipHelper,
+  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+  DISPENSE_OFFSET_FROM_BOTTOM_MM,
 } from './fixtures'
 import { reduceCommandCreators } from '../utils'
 import _transfer from '../commandCreators/compound/transfer'
@@ -478,7 +480,10 @@ describe('advanced options', () => {
       expect(res.commands).toEqual([
         // pre-wet aspirate/dispense
         aspirateHelper('A1', 300),
-        dispenseHelper('A1', 300, { labware: SOURCE_LABWARE }),
+        dispenseHelper('A1', 300, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
 
         // "real" aspirate/dispenses
         aspirateHelper('A1', 300),
@@ -533,8 +538,6 @@ describe('advanced options', () => {
       mixinArgs = {
         ...mixinArgs,
         volume: 350,
-        aspirateOffsetFromBottomMm: 60,
-        dispenseOffsetFromBottomMm: 5,
         mixBeforeAspirate: {
           volume: 250,
           times: 2,
@@ -544,46 +547,29 @@ describe('advanced options', () => {
       // written here for less verbose `commands` below
       const mixCommands = [
         // mix 1
-<<<<<<< HEAD
         aspirateHelper('A1', 250),
-        dispenseHelper('A1', 250, { labware: SOURCE_LABWARE }),
+        dispenseHelper('A1', 250, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
         // mix 2
         aspirateHelper('A1', 250),
-        dispenseHelper('A1', 250, { labware: SOURCE_LABWARE }),
-=======
-        cmd.aspirate('A1', 250, { offsetFromBottomMm: 60 }),
-        cmd.dispense('A1', 250, { offsetFromBottomMm: 60 }),
-        // mix 2
-        cmd.aspirate('A1', 250, { offsetFromBottomMm: 60 }),
-        cmd.dispense('A1', 250, { offsetFromBottomMm: 60 }),
->>>>>>> extend transfer, consolidate, and distribute tests
+        dispenseHelper('A1', 250, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
       ]
 
       const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         ...mixCommands,
-<<<<<<< HEAD
         aspirateHelper('A1', 300),
         dispenseHelper('B1', 300),
 
         ...mixCommands,
         aspirateHelper('A1', 50),
         dispenseHelper('B1', 50),
-=======
-        cmd.aspirate('A1', 300, { offsetFromBottomMm: 60 }),
-        cmd.dispense('B1', 300, {
-          labware: 'destPlateId',
-          offsetFromBottomMm: 5,
-        }),
-
-        ...mixCommands,
-        cmd.aspirate('A1', 50, { offsetFromBottomMm: 60 }),
-        cmd.dispense('B1', 50, {
-          labware: 'destPlateId',
-          offsetFromBottomMm: 5,
-        }),
->>>>>>> extend transfer, consolidate, and distribute tests
       ])
     })
 
@@ -595,8 +581,6 @@ describe('advanced options', () => {
       mixinArgs = {
         ...mixinArgs,
         volume: 350,
-        aspirateOffsetFromBottomMm: 60,
-        dispenseOffsetFromBottomMm: 5,
         mixInDestination: {
           volume: 250,
           times: 2,
@@ -606,11 +590,16 @@ describe('advanced options', () => {
       // written here for less verbose `commands` below
       const mixCommands = [
         // mix 1
-<<<<<<< HEAD
-        aspirateHelper('B1', 250, { labware: DEST_LABWARE }),
+        aspirateHelper('B1', 250, {
+          labware: DEST_LABWARE,
+          offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+        }),
         dispenseHelper('B1', 250),
         // mix 2
-        aspirateHelper('B1', 250, { labware: DEST_LABWARE }),
+        aspirateHelper('B1', 250, {
+          labware: DEST_LABWARE,
+          offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+        }),
         dispenseHelper('B1', 250),
       ]
 
@@ -623,41 +612,6 @@ describe('advanced options', () => {
 
         aspirateHelper('A1', 50),
         dispenseHelper('B1', 50),
-=======
-        cmd.aspirate('B1', 250, {
-          labware: 'destPlateId',
-          offsetFromBottomMm: 5,
-        }),
-        cmd.dispense('B1', 250, {
-          labware: 'destPlateId',
-          offsetFromBottomMm: 5,
-        }),
-        // mix 2
-        cmd.aspirate('B1', 250, {
-          labware: 'destPlateId',
-          offsetFromBottomMm: 5,
-        }),
-        cmd.dispense('B1', 250, {
-          labware: 'destPlateId',
-          offsetFromBottomMm: 5,
-        }),
-      ]
-
-      const result = transfer(transferArgs)(invariantContext, robotStateWithTip)
-      expect(result.commands).toEqual([
-        cmd.aspirate('A1', 300, { offsetFromBottomMm: 60 }),
-        cmd.dispense('B1', 300, {
-          labware: 'destPlateId',
-          offsetFromBottomMm: 5,
-        }),
-        ...mixCommands,
-
-        cmd.aspirate('A1', 50, { offsetFromBottomMm: 60 }),
-        cmd.dispense('B1', 50, {
-          labware: 'destPlateId',
-          offsetFromBottomMm: 5,
-        }),
->>>>>>> extend transfer, consolidate, and distribute tests
         ...mixCommands,
       ])
     })

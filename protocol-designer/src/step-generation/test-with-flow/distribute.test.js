@@ -16,12 +16,12 @@ import {
   makeTouchTipHelper,
   pickUpTipHelper,
   dropTipHelper,
+  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
 } from './fixtures'
 import { reduceCommandCreators } from '../utils'
 import _distribute from '../commandCreators/compound/distribute'
 import type { DistributeArgs } from '../types'
 
-<<<<<<< HEAD
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()
 const touchTipHelper = makeTouchTipHelper()
@@ -37,11 +37,6 @@ const distribute = (args: DistributeArgs) => (
     invariantContext,
     initialRobotState
   )
-=======
-// shorthand
-const dispenseInDest = (well, volume, otherArgs) =>
-  cmd.dispense(well, volume, { labware: 'destPlateId', ...otherArgs })
->>>>>>> extend transfer, consolidate, and distribute tests
 
 let mixinArgs
 let invariantContext
@@ -98,19 +93,11 @@ describe('distribute: minimal example', () => {
       invariantContext,
       robotStateWithTip
     )
-<<<<<<< HEAD
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       aspirateHelper('A1', 180),
       dispenseHelper('A2', 60),
       dispenseHelper('A3', 60),
-=======
-
-    expect(result.commands).toEqual([
-      cmd.aspirate('A1', 180),
-      dispenseInDest('A2', 60),
-      dispenseInDest('A3', 60),
->>>>>>> extend transfer, consolidate, and distribute tests
       blowoutSingleToTrash,
     ])
   })
@@ -130,7 +117,6 @@ describe('tip handling for multiple distribute chunks', () => {
       invariantContext,
       robotStateWithTip
     )
-<<<<<<< HEAD
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual([
@@ -144,20 +130,6 @@ describe('tip handling for multiple distribute chunks', () => {
       aspirateHelper('A1', 240),
       dispenseHelper('A4', 90),
       dispenseHelper('A5', 90),
-=======
-
-    expect(result.commands).toEqual([
-      cmd.dropTip('A1'),
-      cmd.pickUpTip('A1'),
-      cmd.aspirate('A1', 240),
-      dispenseInDest('A2', 90),
-      dispenseInDest('A3', 90),
-      blowoutSingleToTrash,
-
-      cmd.aspirate('A1', 240),
-      dispenseInDest('A4', 90),
-      dispenseInDest('A5', 90),
->>>>>>> extend transfer, consolidate, and distribute tests
 
       blowoutSingleToTrash,
     ])
@@ -176,7 +148,6 @@ describe('tip handling for multiple distribute chunks', () => {
       invariantContext,
       robotStateWithTip
     )
-<<<<<<< HEAD
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual([
@@ -193,23 +164,6 @@ describe('tip handling for multiple distribute chunks', () => {
       aspirateHelper('A1', 240),
       dispenseHelper('A4', 90),
       dispenseHelper('A5', 90),
-=======
-
-    expect(result.commands).toEqual([
-      cmd.dropTip('A1'),
-      cmd.pickUpTip('A1'),
-      cmd.aspirate('A1', 240),
-      dispenseInDest('A2', 90),
-      dispenseInDest('A3', 90),
-      blowoutSingleToTrash,
-
-      // next chunk, change tip
-      cmd.dropTip('A1'),
-      cmd.pickUpTip('B1'),
-      cmd.aspirate('A1', 240),
-      dispenseInDest('A4', 90),
-      dispenseInDest('A5', 90),
->>>>>>> extend transfer, consolidate, and distribute tests
       blowoutSingleToTrash,
     ])
   })
@@ -229,7 +183,6 @@ describe('tip handling for multiple distribute chunks', () => {
     )
     const res = getSuccessResult(result)
 
-<<<<<<< HEAD
     expect(res.commands).toEqual([
       aspirateHelper('A1', 240),
       dispenseHelper('A2', 90),
@@ -238,16 +191,6 @@ describe('tip handling for multiple distribute chunks', () => {
       aspirateHelper('A1', 240),
       dispenseHelper('A4', 90),
       dispenseHelper('A5', 90),
-=======
-    expect(result.commands).toEqual([
-      cmd.aspirate('A1', 240),
-      dispenseInDest('A2', 90),
-      dispenseInDest('A3', 90),
-      blowoutSingleToTrash,
-      cmd.aspirate('A1', 240),
-      dispenseInDest('A4', 90),
-      dispenseInDest('A5', 90),
->>>>>>> extend transfer, consolidate, and distribute tests
       blowoutSingleToTrash,
     ])
   })
@@ -284,9 +227,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       destWells: ['A2', 'A3', 'A4', 'A5', 'A6'],
       changeTip: 'never',
       volume: 120,
-
-      aspirateOffsetFromBottomMm: 60,
-      dispenseOffsetFromBottomMm: 5,
       mixBeforeAspirate: { times: 2, volume: 50 },
       disposalVolume: 12,
       disposalLabware: SOURCE_LABWARE,
@@ -298,48 +238,36 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     )
     const res = getSuccessResult(result)
     const aspirateVol = 120 * 2 + 12
-
-<<<<<<< HEAD
+    const mixCommands = [
+      // mix 1
+      aspirateHelper('A1', 50),
+      dispenseHelper('A1', 50, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
+      // mix 2
+      aspirateHelper('A1', 50),
+      dispenseHelper('A1', 50, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
+    ]
     expect(res.commands).toEqual([
+      ...mixCommands,
       aspirateHelper('A1', aspirateVol),
       dispenseHelper('A2', 120),
       dispenseHelper('A3', 120),
       blowoutSingleToSourceA1,
 
+      ...mixCommands,
       aspirateHelper('A1', aspirateVol),
       dispenseHelper('A4', 120),
       dispenseHelper('A5', 120),
       blowoutSingleToSourceA1,
 
+      ...mixCommands,
       aspirateHelper('A1', 120 + 12),
       dispenseHelper('A6', 120),
-=======
-    const mixCommands = [
-      // mix 1
-      cmd.aspirate('A1', 50, { offsetFromBottomMm: 60 }),
-      cmd.dispense('A1', 50, { offsetFromBottomMm: 60 }), // dispense to sourcePlateId at aspirateOffsetFromBottomMm
-      // mix 2
-      cmd.aspirate('A1', 50, { offsetFromBottomMm: 60 }),
-      cmd.dispense('A1', 50, { offsetFromBottomMm: 60 }), // dispense to sourcePlateId at aspirateOffsetFromBottomMm
-    ]
-
-    expect(result.commands).toEqual([
-      ...mixCommands,
-      cmd.aspirate('A1', aspirateVol, { offsetFromBottomMm: 60 }),
-      dispenseInDest('A2', 120, { offsetFromBottomMm: 5 }),
-      dispenseInDest('A3', 120, { offsetFromBottomMm: 5 }),
-      blowoutSingleToSourceA1,
-
-      ...mixCommands,
-      cmd.aspirate('A1', aspirateVol, { offsetFromBottomMm: 60 }),
-      dispenseInDest('A4', 120, { offsetFromBottomMm: 5 }),
-      dispenseInDest('A5', 120, { offsetFromBottomMm: 5 }),
-      blowoutSingleToSourceA1,
-
-      ...mixCommands,
-      cmd.aspirate('A1', 120 + 12, { offsetFromBottomMm: 60 }),
-      dispenseInDest('A6', 120, { offsetFromBottomMm: 5 }),
->>>>>>> extend transfer, consolidate, and distribute tests
       blowoutSingleToSourceA1,
     ])
   })
@@ -396,7 +324,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     )
     const res = getSuccessResult(result)
 
-<<<<<<< HEAD
     expect(res.commands).toEqual([
       aspirateHelper('A1', 240),
       touchTipHelper('A1'),
@@ -408,19 +335,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       touchTipHelper('A1'),
       dispenseHelper('A4', 90),
       dispenseHelper('A5', 90),
-=======
-    expect(result.commands).toEqual([
-      cmd.aspirate('A1', 240),
-      cmd.touchTip('A1'),
-      dispenseInDest('A2', 90),
-      dispenseInDest('A3', 90),
-      blowoutSingleToTrash,
-
-      cmd.aspirate('A1', 240),
-      cmd.touchTip('A1'),
-      dispenseInDest('A4', 90),
-      dispenseInDest('A5', 90),
->>>>>>> extend transfer, consolidate, and distribute tests
       blowoutSingleToTrash,
     ])
   })
@@ -438,7 +352,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       invariantContext,
       robotStateWithTip
     )
-<<<<<<< HEAD
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual([
@@ -454,26 +367,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       touchTipHelper('A4', { labware: DEST_LABWARE }),
       dispenseHelper('A5', 90),
       touchTipHelper('A5', { labware: DEST_LABWARE }),
-=======
-
-    function touchTip(well: string) {
-      return cmd.touchTip(well, { labware: 'destPlateId' })
-    }
-
-    expect(result.commands).toEqual([
-      cmd.aspirate('A1', 240),
-      dispenseInDest('A2', 90),
-      touchTip('A2'),
-      dispenseInDest('A3', 90),
-      touchTip('A3'),
-      blowoutSingleToTrash,
-
-      cmd.aspirate('A1', 240),
-      dispenseInDest('A4', 90),
-      touchTip('A4'),
-      dispenseInDest('A5', 90),
-      touchTip('A5'),
->>>>>>> extend transfer, consolidate, and distribute tests
       blowoutSingleToTrash,
     ])
   })
@@ -508,15 +401,20 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     const mixCommands = [
       // mix 1
       aspirateHelper('A1', 250),
-      dispenseHelper('A1', 250, { labware: SOURCE_LABWARE }),
+      dispenseHelper('A1', 250, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
       // mix 2
       aspirateHelper('A1', 250),
-      dispenseHelper('A1', 250, { labware: SOURCE_LABWARE }),
+      dispenseHelper('A1', 250, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
     ]
 
     expect(res.commands).toEqual([
       ...mixCommands,
-<<<<<<< HEAD
       aspirateHelper('A1', aspirateVol),
       dispenseHelper('A2', volume),
       dispenseHelper('A3', volume),
@@ -526,17 +424,6 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       aspirateHelper('A1', aspirateVol),
       dispenseHelper('A4', volume),
       dispenseHelper('A5', volume),
-=======
-      cmd.aspirate('A1', aspirateVol),
-      dispenseInDest('A2', volume),
-      dispenseInDest('A3', volume),
-      blowoutSingleToSourceA1,
-
-      ...mixCommands,
-      cmd.aspirate('A1', aspirateVol),
-      dispenseInDest('A4', volume),
-      dispenseInDest('A5', volume),
->>>>>>> extend transfer, consolidate, and distribute tests
       blowoutSingleToSourceA1,
     ])
   })

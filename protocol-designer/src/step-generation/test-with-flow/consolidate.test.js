@@ -2,7 +2,10 @@
 import cloneDeep from 'lodash/cloneDeep'
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
-import type { AspirateDispenseArgsV1 as AspirateDispenseArgs } from '@opentrons/shared-data'
+import type {
+  AspirateParams,
+  DispenseParams,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import {
   getInitialRobotStateStandard,
   getRobotStatePickedUpTipStandard,
@@ -47,7 +50,7 @@ const consolidate = (args: ConsolidateArgs) => (
 function tripleMix(
   well: string,
   volume: number,
-  params: $Shape<AspirateDispenseArgs>
+  params: $Shape<AspirateParams> | $Shape<DispenseParams>
 ) {
   return [
     aspirateHelper(well, volume, params),
