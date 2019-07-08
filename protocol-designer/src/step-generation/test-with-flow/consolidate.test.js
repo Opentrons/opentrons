@@ -271,7 +271,7 @@ describe('consolidate single-channel', () => {
       ...tripleMix('A1', 50, {
         labware: SOURCE_LABWARE,
         offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
-      }), // TODO: offsetFromBottomMm
+      }),
 
       aspirateHelper('A1', 100),
       aspirateHelper('A2', 100),
