@@ -330,7 +330,12 @@ class InstrumentsWrapper(object):
                 expected_model_substring:
             return attached_model
         else:
-            return expected_model_substring
+            # In the case that the expected model substring does not equal
+            # attached model name or backcompat name, then take the expected
+            # model substring and create a fallback model name.
+            if 'GEN2' in expected_model_substring:
+                return expected_model_substring.split('_GEN2')[0] + '_v2.0'
+            return expected_model_substring.split('_v')[0] + '_v1'
 
 
 instruments = InstrumentsWrapper(robot)
