@@ -5,16 +5,16 @@ from opentrons.config import pipette_config
 from opentrons.legacy_api.instruments import Pipette
 
 factories = [
-    ('p10_single', instruments.P10_Single),
-    ('p10_multi', instruments.P10_Multi),
-    ('p20_single_GEN2', instruments.P20_Single_GEN2),
-    ('p50_single', instruments.P50_Single),
-    ('p50_multi', instruments.P50_Multi),
-    ('p300_single', instruments.P300_Single),
-    ('p300_single_GEN2', instruments.P300_Single_GEN2),
-    ('p300_multi', instruments.P300_Multi),
-    ('p1000_single', instruments.P1000_Single),
-    ('p1000_single_GEN2', instruments.P1000_Single_GEN2),
+    ('p10_single_v1.3', 'p10_single', instruments.P10_Single),
+    ('p10_multi_v1.5', 'p10_multi', instruments.P10_Multi),
+    ('p20_single_v2.0', 'p20_single_GEN2', instruments.P20_Single_GEN2),
+    ('p50_single_v1.3', 'p50_single', instruments.P50_Single),
+    ('p50_multi_v1.5', 'p50_multi', instruments.P50_Multi),
+    ('p300_single_v1.3', 'p300_single', instruments.P300_Single),
+    ('p300_single_v2.0', 'p300_single_GEN2', instruments.P300_Single_GEN2),
+    ('p300_multi_v1.5', 'p300_multi', instruments.P300_Multi),
+    ('p1000_single_v1.3', 'p1000_single', instruments.P1000_Single),
+    ('p1000_single_v2.0', 'p1000_single_GEN2', instruments.P1000_Single_GEN2),
 ]
 
 backcompat_pips = [
@@ -28,7 +28,7 @@ backcompat_pips = [
 
 @pytest.mark.parametrize('factory', factories)
 def test_pipette_contructors(factory, monkeypatch):
-    expected_name, make_pipette = factory
+    model_name, expected_name, make_pipette = factory
 
     aspirate_flow_rate = None
     dispense_flow_rate = None
@@ -42,10 +42,16 @@ def test_pipette_contructors(factory, monkeypatch):
     monkeypatch.setattr(Pipette, 'set_flow_rate', mock_set_flow_rate)
     robot.reset()
 
+    fake_pip = {'left': {'model': None, 'id': None, 'name': None},
+                'right': {
+                    'model': model_name,
+                    'id': 'FakePip',
+                    'name': expected_name}}
+    monkeypatch.setattr(robot, 'model_by_mount', fake_pip)
     # note: not using named parameters here to catch any breakage due to
     # argument reordering
     pipette = make_pipette(
-        'left',  # mount
+        'right',  # mount
         '',      # trash_container
         [],      # tip_racks
         21,      # aspirate_flow_rate
@@ -55,7 +61,7 @@ def test_pipette_contructors(factory, monkeypatch):
     )
 
     assert pipette.name.startswith(expected_name) is True
-    assert pipette.mount == 'left'
+    assert pipette.mount == 'right'
     assert pipette.trash_container == robot.fixed_trash[0]
     assert pipette.tip_racks == []
     assert aspirate_flow_rate == 21
@@ -72,7 +78,7 @@ def test_backwards_compatibility(backcompat, monkeypatch):
 
     fake_pip = {'left': {'model': None, 'id': None, 'name': None},
                 'right': {
-                    'model': expected_name + '_v2.0',
+                    'model': expected_name.split('_GEN2')[0] + '_v2.0',
                     'id': 'FakePip',
                     'name': expected_name}}
     monkeypatch.setattr(robot, 'model_by_mount', fake_pip)

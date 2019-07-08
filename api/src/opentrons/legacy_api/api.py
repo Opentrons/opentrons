@@ -52,9 +52,7 @@ class InstrumentsWrapper(object):
         pipette_model_version = self.retrieve_version_number(
             mount, name_or_model)
         attached = self.robot.get_attached_pipettes()
-        if attached[mount]['model'] == pipette_model_version\
-           and attached[mount]['id']\
-           and attached[mount]['id'] != 'uncommissioned':
+        if attached[mount]['id'] and attached[mount]['id'] != 'uncommissioned':
             pip_id = attached[mount]['id']
         else:
             pip_id = None
@@ -242,17 +240,19 @@ class InstrumentsWrapper(object):
             mount, name_or_model)
         config = pipette_config.load(pipette_model_version, pip_id)
 
-        if pip_id and name_or_model != pipette_model_version.split('_v')[0]:
+        if pip_id and config.backcompat_name == name_or_model:
             log.warning(
                 f"Using a deprecated constructor for {pipette_model_version}")
             constructor_config = pipette_config.name_config()[name_or_model]
             config = config._replace(
                 min_volume=constructor_config['minVolume'],
                 max_volume=constructor_config['maxVolume'])
+            name_or_model = config.name
         return self._create_pipette_from_config(
             config=config,
             mount=mount,
-            name=pipette_model_version,
+            name=name_or_model,
+            model=pipette_model_version,
             trash_container=trash_container,
             tip_racks=tip_racks,
             aspirate_flow_rate=aspirate_flow_rate,
@@ -265,6 +265,7 @@ class InstrumentsWrapper(object):
             config,
             mount,
             name,
+            model=None,
             trash_container='',
             tip_racks=[],
             aspirate_flow_rate=None,
@@ -286,12 +287,7 @@ class InstrumentsWrapper(object):
             'bottom': config.bottom,
             'blow_out': config.blow_out,
             'drop_tip': config.drop_tip}
-        if '_v' in name:
-            model = name
-            name = name.split('_v')[0]
-        else:
-            model = name
-            name = name
+
         p = self.Pipette(
             model_offset=config.model_offset,
             mount=mount,
@@ -320,38 +316,21 @@ class InstrumentsWrapper(object):
         return p
 
     def retrieve_version_number(self, mount, expected_model_substring):
-        if pipette_config.HAS_MODEL_RE.match(expected_model_substring):
-            return expected_model_substring
-
         attached_model = robot.get_attached_pipettes()[mount]['model']
-
-        if attached_model and\
-                'p20' in attached_model and 'p10_' in expected_model_substring:
-            # Special use-case where volume does not match, but we still
-            # want a valid model name to be passed
-            if expected_model_substring.split('_')[1] ==\
-                    attached_model.split('_')[1]:
-                return attached_model
-
-        if attached_model and\
-                expected_model_substring == attached_model.split('_v')[0]:
-            return attached_model
-        elif attached_model and 'GEN2' in attached_model and\
-                expected_model_substring in\
-                attached_model.split('_GEN2'):
-            # Allow for backwards compatibility in old pipette constructors
-            return attached_model
-        else:
-            # pass a default pipette model-version for when robot is simulating
-            # this allows any pipette to be simulated, regardless of what is
-            # actually attached/cached on the robot's mounts
-            #
-            # from all available config models that match the expected string,
-            # pick the first one for simulation
-            # expected_model_substring == m.split('_v')[0]
+        try:
+            attached_model_config = pipette_config.configs[attached_model]
+        except KeyError:
             return list(filter(
                 lambda m: expected_model_substring == m.split('_v')[0],
                 pipette_config.config_models))[0]
+
+        if attached_model_config.get('name') == expected_model_substring:
+            return attached_model
+        elif attached_model_config.get('backcompatName') ==\
+                expected_model_substring:
+            return attached_model
+        else:
+            return expected_model_substring
 
 
 instruments = InstrumentsWrapper(robot)

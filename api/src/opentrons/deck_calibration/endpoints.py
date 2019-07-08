@@ -132,10 +132,10 @@ def get_pipettes(hardware):
         left = attached_pipettes.get('left')
         right = attached_pipettes.get('right')
         if left['model'] in pipette_config.config_models:
-            left_pipette = instruments.pipette_by_name('left', left['model'])
+            left_pipette = instruments.pipette_by_name('left', left['name'])
         if right['model'] in pipette_config.config_models:
             right_pipette = instruments.pipette_by_name(
-                'right', right['model'])
+                'right', right['name'])
     else:
         attached_pipettes = hardware.attached_instruments
         left_pipette = attached_pipettes.get(Mount.LEFT)
