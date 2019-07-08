@@ -1,6 +1,6 @@
 // @flow
 
-// TODO(mc, 2019-07-02): resolve comments below
+// TODO(mc, 2019-07-02): remove some fields from this object
 export type ReleaseSetUrls = {
   // not needed by the app
   fullImage: string,

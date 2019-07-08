@@ -10,17 +10,13 @@ import { CURRENT_VERSION } from '../update'
 import { downloadManifest, getReleaseSet } from './release-manifest'
 import { getReleaseFiles } from './release-files'
 
+import type { Action, Dispatch } from '../types'
 import type { ReleaseSetFilepaths } from './types'
 import type { BuildrootUpdateInfo } from '@opentrons/app/src/shell'
-import type { Action } from '@opentrons/app/src/types'
-
-type Dispatch = Action => void
 
 const log = createLogger(__filename)
 
-const userDataPath = app.getPath('userData') // how do we want to handle user upload vs auto-download
-
-const DIRECTORY = path.join(userDataPath, '__ot_buildroot__')
+const DIRECTORY = path.join(app.getPath('userData'), '__ot_buildroot__')
 
 let updateSet: ReleaseSetFilepaths | null = null
 
