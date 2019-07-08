@@ -1,5 +1,5 @@
 // discovery selectors tests
-import * as discovery from '..'
+import * as discovery from '../selectors'
 
 const makeFullyUp = (
   name,

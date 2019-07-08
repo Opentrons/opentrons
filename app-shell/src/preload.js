@@ -4,7 +4,7 @@
 // for security reasons
 import { ipcRenderer, remote } from 'electron'
 
-global.APP_SHELL = {
+global.APP_SHELL_REMOTE = {
   ipcRenderer,
   apiUpdate: remote.require('./api-update'),
   config: remote.require('./config'),
