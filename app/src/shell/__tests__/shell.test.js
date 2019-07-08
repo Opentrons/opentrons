@@ -2,13 +2,12 @@
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
 
+import mockRemote from '../remote'
 import { shellMiddleware, getShellConfig } from '..'
-
-jest.mock('../../logger')
 
 const middlewares = [thunk, shellMiddleware]
 const mockStore = configureMockStore(middlewares)
-const { ipcRenderer: mockIpc, config: mockConfig } = global.APP_SHELL
+const { ipcRenderer: mockIpc, config: mockConfig } = mockRemote
 
 describe('app shell module', () => {
   afterEach(() => {

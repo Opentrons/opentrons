@@ -1,7 +1,8 @@
 import { mockResolvedValue } from '../../../__util__/mock-promise'
+import mockRemote from '../remote'
 import * as apiUpdate from '../api-update'
 
-const { apiUpdate: mockApiUpdate } = global.APP_SHELL
+const { apiUpdate: mockApiUpdate } = mockRemote
 
 describe('shell/api-update', () => {
   let _Blob
