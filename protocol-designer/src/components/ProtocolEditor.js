@@ -12,7 +12,7 @@ import FileUploadMessageModal from './modals/FileUploadMessageModal'
 import GateModal from './modals/GateModal'
 import { PortalRoot as MainPageModalPortalRoot } from '../components/portals/MainPageModalPortal'
 import { PortalRoot as TopPortalRoot } from './portals/TopPortal'
-import { SCROLL_ON_SELECT_STEP_CLASSNAME } from '../steplist/actions'
+import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../ui/steps/actions'
 import styles from './ProtocolEditor.css'
 
 const showGateModal =
@@ -26,15 +26,15 @@ function ProtocolEditor() {
       <div className={styles.wrapper}>
         <ConnectedNav />
         <ConnectedSidebar />
-        <div
-          className={cx(
-            styles.main_page_wrapper,
-            SCROLL_ON_SELECT_STEP_CLASSNAME
-          )}
-        >
+        <div className={styles.main_page_wrapper}>
           <ConnectedTitleBar />
 
-          <div className={styles.main_page_content}>
+          <div
+            className={cx(
+              styles.main_page_content,
+              MAIN_CONTENT_FORCED_SCROLL_CLASSNAME
+            )}
+          >
             <NewFileModal useProtocolFields />
             <FileUploadMessageModal />
             {/* TODO: Ian 2018-06-28 All main page modals will go here */}
