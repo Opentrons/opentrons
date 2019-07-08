@@ -43,6 +43,15 @@ MAIN_TESTER_DB = str(os.path.join(
 )
 
 
+@pytest.fixture(autouse=True)
+def asyncio_loop_exception_handler(loop):
+    def exception_handler(loop, context):
+        pytest.fail(str(context))
+    loop.set_exception_handler(exception_handler)
+    yield
+    loop.set_exception_handler(None)
+
+
 def state(topic, state):
     def _match(item):
         return \
@@ -141,6 +150,26 @@ def using_api2(loop):
     opentrons.reset_globals(version=2, loop=loop)
     try:
         yield opentrons.hardware
+    finally:
+        try:
+            loop.run_until_complete(opentrons.hardware.reset())
+        except RuntimeError:
+            loop.create_task(opentrons.hardware.reset())
+        if None is oldenv:
+            os.environ.pop('OT_API_FF_useProtocolApi2')
+        else:
+            os.environ['OT_API_FF_useProtocolApi2'] = oldenv
+        opentrons.reset_globals(loop=loop)
+        opentrons.hardware.set_config(config.robot_configs.load())
+
+
+@contextlib.contextmanager
+def using_sync_api2(loop):
+    oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
+    os.environ['OT_API_FF_useProtocolApi2'] = '1'
+    opentrons.reset_globals(version=2, loop=loop)
+    try:
+        yield hc.adapters.SynchronousAdapter(opentrons.hardware)
     finally:
         try:
             loop.run_until_complete(opentrons.hardware.reset())
@@ -330,6 +359,16 @@ def hardware(request, loop, virtual_smoothie_env):
         yield hw
 
 
+@pytest.fixture(params=[using_api1, using_sync_api2])
+def sync_hardware(request, loop, virtual_smoothie_env):
+    if request.node.get_marker('api1_only') and request.param != using_api1:
+        pytest.skip('requires api1 only')
+    elif request.node.get_marker('api2_only') and request.param != using_api2:
+        pytest.skip('requires api2 only')
+    with request.param(loop) as hw:
+        yield hw
+
+
 @pytest.fixture
 def main_router(loop, virtual_smoothie_env, hardware):
     from opentrons.api.routers import MainRouter
@@ -376,7 +415,7 @@ def model(robot, hardware, loop, request):
             {Mount.RIGHT: 'p300_single'}))
         instrument = models.Instrument(pip, context=ctx)
         plate = ctx.load_labware_by_name(
-            lw_name or 'generic_96_wellplate_340ul_flat', 1)
+            lw_name or 'corning_96_wellplate_360ul_flat', 1)
         rob = hardware
         container = models.Container(plate, context=ctx)
     else:

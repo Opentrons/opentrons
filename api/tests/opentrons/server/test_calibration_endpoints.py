@@ -470,6 +470,7 @@ async def test_set_and_jog_integration(
     monkeypatch.setattr(endpoints, '_get_uuid', uuid_mock)
 
     token_res = await async_client.post('/calibration/deck/start')
+    assert token_res.status == 201, token_res
     token_text = await token_res.json()
     token = token_text['token']
 

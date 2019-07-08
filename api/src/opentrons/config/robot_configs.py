@@ -258,8 +258,8 @@ def _build_conf_dict(
         return from_conf
 
 
-def _build_config(deck_cal: List[List[float]],
-                  robot_settings: Dict[str, Any]) -> robot_config:
+def build_config(deck_cal: List[List[float]],
+                 robot_settings: Dict[str, Any]) -> robot_config:
     cfg = robot_config(
         name=robot_settings.get('name', 'Ada Lovelace'),
         version=int(robot_settings.get('version', ROBOT_CONFIG_VERSION)),
@@ -286,7 +286,7 @@ def _build_config(deck_cal: List[List[float]],
     return cfg
 
 
-def _config_to_save(
+def config_to_save(
         config: robot_config) -> Tuple[List[List[float]], Dict[str, Any]]:
     top = dict(config._asdict())
     top['tip_probe'] = dict(top['tip_probe']._asdict())
@@ -303,11 +303,11 @@ def load(deck_cal_file=None):
     settings_file = CONFIG['robot_settings_file']
     log.debug("Loading robot settings from {}".format(settings_file))
     robot_settings = _load_json(settings_file) or {}
-    return _build_config(deck_cal, robot_settings)
+    return build_config(deck_cal, robot_settings)
 
 
 def save_deck_calibration(config: robot_config, dc_filename=None, tag=None):
-    cal_lists, _ = _config_to_save(config)
+    cal_lists, _ = config_to_save(config)
 
     dc_filename = dc_filename or CONFIG['deck_calibration_file']
     if tag:
@@ -319,7 +319,7 @@ def save_deck_calibration(config: robot_config, dc_filename=None, tag=None):
 
 
 def save_robot_settings(config: robot_config, rs_filename=None, tag=None):
-    _, config_dict = _config_to_save(config)
+    _, config_dict = config_to_save(config)
 
     # Save everything else in a different file
     rs_filename = rs_filename or CONFIG['robot_settings_file']

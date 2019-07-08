@@ -63,45 +63,39 @@ exports[`modals AlertModal renders correctly 1`] = `
 
 exports[`modals ContinueModal renders correctly 1`] = `
 <div
-  onScrollCapture={[Function]}
-  onTouchMoveCapture={[Function]}
-  onWheelCapture={[Function]}
+  className="modal"
 >
   <div
-    className="modal"
+    className="overlay clickable"
+    onClick={[Function]}
+  />
+  <div
+    className="modal_contents alert_modal_wrapper no_alert_header"
   >
     <div
-      className="overlay clickable"
-      onClick={[Function]}
-    />
-    <div
-      className="modal_contents alert_modal_wrapper no_alert_header"
+      className="alert_modal_contents"
     >
-      <div
-        className="alert_modal_contents"
+      children
+    </div>
+    <div
+      className="alert_modal_buttons"
+    >
+      <button
+        className="button_outline alert_button"
+        onClick={[Function]}
+        title="Cancel"
+        type="button"
       >
-        children
-      </div>
-      <div
-        className="alert_modal_buttons"
+        Cancel
+      </button>
+      <button
+        className="button_outline alert_button"
+        onClick={[Function]}
+        title="Continue"
+        type="button"
       >
-        <button
-          className="button_outline alert_button"
-          onClick={[Function]}
-          title="Cancel"
-          type="button"
-        >
-          Cancel
-        </button>
-        <button
-          className="button_outline alert_button"
-          onClick={[Function]}
-          title="Continue"
-          type="button"
-        >
-          Continue
-        </button>
-      </div>
+        Continue
+      </button>
     </div>
   </div>
 </div>

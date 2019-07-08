@@ -4,7 +4,10 @@ Basic usage (click overlay to close):
 initialState = { isOpen: true }
 ;<div style={{ position: 'relative', width: '32em', height: '16rem' }}>
   {state.isOpen && (
-    <Modal onCloseClick={() => setState({ isOpen: false })}>
+    <Modal
+      onCloseClick={() => setState({ isOpen: false })}
+      restrictOuterScroll={false}
+    >
       <span>Modal contents</span>
     </Modal>
   )}
@@ -19,6 +22,7 @@ initialState = { isOpen: true }
 ;<div style={{ position: 'relative', width: '32em', height: '16rem' }}>
   {state.isOpen && (
     <Modal
+      restrictOuterScroll={false}
       onCloseClick={() => setState({ isOpen: false })}
       heading={'Optional styled heading'}
     >

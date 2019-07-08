@@ -17,6 +17,7 @@ pip := pipenv run pip
 pytest := pipenv run py.test
 pipenv_opts := --dev
 pipenv_opts += $(and $(CI),--keep-outdated --clear)
+wheel_opts := $(if $(or $(CI),$(V),$(VERBOSE)),,-q)
 
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
@@ -42,6 +43,8 @@ pypi_password ?=
 
 # Host key location for buildroot robot
 br_ssh_key ?= ~/.ssh/robot_key
+# Pubkey location for buildroot robot to install with install-key
+br_ssh_pubkey ?= $(br_ssh_key).pub
 # Other SSH args for buildroot robots
 br_ssh_opts ?= -o stricthostkeychecking=no
 
@@ -79,7 +82,7 @@ uninstall:
 
 $(wheel_pattern): setup.py $(ot_sources)
 	$(clean_cmd)
-	$(python) setup.py bdist_wheel
+	$(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) rm -rf build
 	$(python)	-m twine check $@
 	$(SHX) ls dist
@@ -164,6 +167,12 @@ systemctl stop opentrons-api-server &&\
 mount -o remount,rw / &&\
 cd /usr/lib/python3.7/site-packages &&\
 unzip -o /data/opentrons-*.whl && cleanup || cleanup"
+
+.PHONY: install-key
+install-key:
+	curl -X POST $(host):31950/server/ssh_keys\
+		-H "Content-Type: application/json"\
+		-d "{\"key\":\"$(shell cat $(br_ssh_pubkey))\"}"
 
 .PHONY: flash
 flash:

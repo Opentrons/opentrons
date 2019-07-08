@@ -17,7 +17,7 @@
   left: 0;
   right: 0;
   top: 12%;
-  max-width: 25rem;
+  max-width: 28rem;
   margin: auto;
   padding: 1rem 2rem;
   user-select: none;
@@ -31,27 +31,35 @@
 
 /* ----- */
 
-.labware_list_item {
-  padding: 0.75rem 1rem;
+.view_measurements_link,
+.labware_name {
+  padding: 1rem 0.5rem;
 }
 
-/* TODO: Ian 2018-07-26 replace these image with some alternative design...
- * these are still ugly but not going to be long-lived. Might be tooltips, dunno
- */
-.labware_list_item:hover::after {
-  position: absolute;
-  width: 32rem;
-  height: 15rem;
-  background-color: var(--c-white);
-  content: var(--image-url);
-  border: var(--bd-light);
-  top: 4rem;
-  left: 10rem;
+.view_measurements_link {
+  flex: 0.6;
+  text-transform: uppercase;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
 
-  /* Images too large, and need to be cropped from left */
-  zoom: 0.5;
-  clip-path: inset(0 0 0 360px);
-  z-index: 5000;
+  &:hover {
+    background-color: var(--c-bg-hover);
+  }
+}
+
+.labware_list_item {
+  display: flex;
+  padding: 0;
+
+  & .view_measurements_link {
+    display: none;
+  }
+
+  &:hover .view_measurements_link {
+    display: inherit;
+  }
 }
 
 .labware_preview_wrapper {
@@ -96,4 +104,8 @@
   flex-direction: column;
   flex: 1;
   padding: 0.25rem 1rem;
+}
+
+.labware_name {
+  text-align: left;
 }

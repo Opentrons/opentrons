@@ -130,10 +130,14 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
             check = attr.__wrapped__
         except AttributeError:
             check = attr
+        loop = object.__getattribute__(self, '_loop')
         if asyncio.iscoroutinefunction(check):
-            loop = object.__getattribute__(self, '_loop')
             # Return a synchronized version of the coroutine
             return functools.partial(self.call_coroutine_sync, loop, attr)
+        elif asyncio.iscoroutine(check):
+            # Catch awaitable properties and reify the future before returning
+            fut = asyncio.run_coroutine_threadsafe(check, loop)
+            return fut.result()
 
         return attr
 
@@ -175,10 +179,11 @@ class SingletonAdapter(HardwareAPILike):
         """
         old_api = object.__getattribute__(self, '_api')
         loop = old_api._loop
+        config = loop.run_until_complete(old_api.config)
         new_api = loop.run_until_complete(API.build_hardware_controller(
             loop=loop,
             port=port,
-            config=copy.copy(old_api.config),
+            config=copy.copy(config),
             force=force))
         old_api._loop.run_until_complete(new_api.cache_instruments())
         setattr(self, '_api', new_api)
@@ -186,25 +191,27 @@ class SingletonAdapter(HardwareAPILike):
     def disconnect(self):
         """ Disconnect from connected hardware. """
         old_api = object.__getattribute__(self, '_api')
+        config = old_api._loop.run_until_complete(old_api.config)
         new_api = API.build_hardware_simulator(
             loop=old_api._loop,
-            config=copy.copy(old_api.config))
+            config=copy.copy(config))
         setattr(self, '_api', new_api)
 
     def is_connected(self):
         """ `True` if connected (e.g. has a real controller backing it). """
         api = object.__getattribute__(self, '_api')
-        return api.is_simulator
+        return api.is_simulator_sync
 
     async def disengage_axes(self, which: List[str]):
         api = object.__getattribute__(self, '_api')
         await api.disengage_axes([Axis[ax.upper()] for ax in which])
 
-    def get_attached_pipettes(self):
+    async def get_attached_pipettes(self):
         """ Mimic the behavior of robot.get_attached_pipettes"""
         api = object.__getattribute__(self, '_api')
         instrs = {}
-        for mount, data in api.attached_instruments.items():
+        attached = await api.attached_instruments
+        for mount, data in attached.items():
             instrs[mount.name.lower()] = {
                 'model': data.get('model', None),
                 'name': data.get('name', None),

@@ -14,6 +14,7 @@ import asyncio
 from collections import OrderedDict
 import contextlib
 import functools
+import inspect
 import logging
 from typing import Any, Dict, Union, List, Optional, Tuple
 from opentrons import types as top_types
@@ -34,10 +35,16 @@ mod_log = logging.getLogger(__name__)
 
 
 def _log_call(func):
-    @functools.wraps(func)
-    def _log_call_inner(*args, **kwargs):
-        args[0]._log.debug(func.__name__)
-        return func(*args, **kwargs)
+    if inspect.iscoroutinefunction(func):
+        @functools.wraps(func)
+        async def _log_call_inner(*args, **kwargs):
+            args[0]._log.debug(func.__name__)
+            return await func(*args, **kwargs)
+    else:
+        @functools.wraps(func)
+        def _log_call_inner(*args, **kwargs):
+            args[0]._log.debug(func.__name__)
+            return func(*args, **kwargs)
     return _log_call_inner
 
 
@@ -169,9 +176,14 @@ class API(HardwareAPILike):
         self._loop = loop
         self._lock = asyncio.Lock(loop=loop)
 
-    @property
-    def is_simulator(self) -> bool:
+    async def get_is_simulator(self) -> bool:
         """ `True` if this is a simulator; `False` otherwise. """
+        return self.is_simulator_sync
+
+    is_simulator = property(fget=get_is_simulator)
+
+    @property
+    def is_simulator_sync(self):
         return isinstance(self._backend, Simulator)
 
     async def register_callback(self, cb):
@@ -185,10 +197,9 @@ class API(HardwareAPILike):
 
         return unregister
 
-    # Query API
-    @property
-    def fw_version(self) -> str:
-        """ Return the firmware version of the connected hardware.
+    async def get_fw_version(self) -> str:
+        """
+        Return the firmware version of the connected hardware.
 
         The version is a string retrieved directly from the attached hardware
         (or possibly simulator).
@@ -199,9 +210,11 @@ class API(HardwareAPILike):
         else:
             return from_backend
 
+    fw_version = property(fget=get_fw_version)
+
     # Incidentals (i.e. not motion) API
     @_log_call
-    def set_lights(self, button: bool = None, rails: bool = None):
+    async def set_lights(self, button: bool = None, rails: bool = None):
         """ Control the robot lights.
 
         :param button: If specified, turn the button light on (`True`) or
@@ -214,7 +227,7 @@ class API(HardwareAPILike):
         self._backend.set_lights(button, rails)
 
     @_log_call
-    def get_lights(self) -> Dict[str, bool]:
+    async def get_lights(self) -> Dict[str, bool]:
         """ Return the current status of the robot lights.
 
         :returns: A dict of the lights: `{'button': bool, 'rails': bool}`
@@ -293,14 +306,30 @@ class API(HardwareAPILike):
         mod_log.info("Instruments found: {}".format(
             self._attached_instruments))
 
-    @property
-    def attached_instruments(self):
+    async def get_attached_instruments(self) -> Dict[top_types.Mount,
+                                                     Pipette.DictType]:
+        """ Get the status dicts of the cached attached instruments.
+
+        Also available as :py:meth:`get_attached_instruments`.
+
+        This returns a dictified version of the
+        :py:class:`hardware_control.pipette.Pipette` as a dict keyed by
+        the :py:class:`top_types.Mount` to which the pipette is attached.
+        If no pipette is attached on a given mount, the mount key will
+        still be present but will have the value ``None``.
+
+        Note that this is only a query of a cached value; to actively scan
+        for changes, use :py:meth:`cache_instruments`. This process deactivates
+        the motors and should be used sparingly.
+        """
         configs = ['name', 'min_volume', 'max_volume', 'channels',
                    'aspirate_flow_rate', 'dispense_flow_rate',
                    'pipette_id', 'current_volume', 'display_name',
                    'tip_length', 'model']
-        instruments = {top_types.Mount.LEFT: {},
-                       top_types.Mount.RIGHT: {}}
+        instruments: Dict[top_types.Mount, Pipette.DictType] = {
+            top_types.Mount.LEFT: {},
+            top_types.Mount.RIGHT: {}
+        }
         for mount in top_types.Mount:
             instr = self._attached_instruments[mount]
             if not instr:
@@ -310,6 +339,8 @@ class API(HardwareAPILike):
                 instruments[mount][key] = instr_dict[key]
             instruments[mount]['has_tip'] = instr.has_tip
         return instruments
+
+    attached_instruments = property(fget=get_attached_instruments)
 
     @property
     def attached_modules(self):
@@ -341,7 +372,7 @@ class API(HardwareAPILike):
 
     # Global actions API
     @_log_call
-    def pause(self):
+    async def pause(self):
         """
         Pause motion of the robot after a current motion concludes.
 
@@ -355,14 +386,14 @@ class API(HardwareAPILike):
         """
         self._backend.pause()
 
-    def pause_with_message(self, message):
+    async def pause_with_message(self, message):
         self._log.warning('Pause with message: {}'.format(message))
         for cb in self._callbacks:
             cb(message)
-        self.pause()
+        await self.pause()
 
     @_log_call
-    def resume(self):
+    async def resume(self):
         """
         Resume motion after a call to :py:meth:`pause`.
         """
@@ -436,12 +467,13 @@ class API(HardwareAPILike):
                 smoothie_pos.update(self._backend.home(smoothie_plungers))
             self._current_position = self._deck_from_smoothie(smoothie_pos)
 
-    def add_tip(
+    async def add_tip(
             self,
             mount: top_types.Mount,
             tip_length: float):
         instr = self._attached_instruments[mount]
-        instr_dict = self.attached_instruments[mount]
+        attached = await self.attached_instruments
+        instr_dict = attached[mount]
         if instr and not instr.has_tip:
             instr.add_tip(tip_length=tip_length)
             instr_dict['has_tip'] = True
@@ -449,9 +481,10 @@ class API(HardwareAPILike):
         else:
             mod_log.warning('attach tip called while tip already attached')
 
-    def remove_tip(self, mount: top_types.Mount):
+    async def remove_tip(self, mount: top_types.Mount):
         instr = self._attached_instruments[mount]
-        instr_dict = self.attached_instruments[mount]
+        attached = await self.attached_instruments
+        instr_dict = attached[mount]
         if instr and instr.has_tip:
             instr.remove_tip()
             instr_dict['has_tip'] = False
@@ -489,9 +522,9 @@ class API(HardwareAPILike):
         left = (with_enum[Axis.X],
                 with_enum[Axis.Y],
                 with_enum[Axis.by_mount(top_types.Mount.LEFT)])
-        right_deck = linal.apply_reverse(self.config.gantry_calibration,
+        right_deck = linal.apply_reverse(self._config.gantry_calibration,
                                          right)
-        left_deck = linal.apply_reverse(self.config.gantry_calibration,
+        left_deck = linal.apply_reverse(self._config.gantry_calibration,
                                         left)
         deck_pos = {Axis.X: right_deck[0],
                     Axis.Y: right_deck[1],
@@ -524,7 +557,7 @@ class API(HardwareAPILike):
             if mount == mount.RIGHT:
                 offset = top_types.Point(0, 0, 0)
             else:
-                offset = top_types.Point(*self.config.mount_offset)
+                offset = top_types.Point(*self._config.mount_offset)
             z_ax = Axis.by_mount(mount)
             plunger_ax = Axis.of_plunger(mount)
             cp = self._critical_point_for(mount, critical_point)
@@ -594,7 +627,7 @@ class API(HardwareAPILike):
         await self._cache_and_maybe_retract_mount(mount)
         z_axis = Axis.by_mount(mount)
         if mount == top_types.Mount.LEFT:
-            offset = top_types.Point(*self.config.mount_offset)
+            offset = top_types.Point(*self._config.mount_offset)
         else:
             offset = top_types.Point(0, 0, 0)
         cp = self._critical_point_for(mount, critical_point)
@@ -701,7 +734,7 @@ class API(HardwareAPILike):
         # size; unfortunately, mypy can’t quite figure out the length check
         # above that makes this OK
         transformed = linal.apply_transform(  # type: ignore
-            self.config.gantry_calibration, to_transform)
+            self._config.gantry_calibration, to_transform)
 
         # Since target_position is an OrderedDict with the axes ordered by
         # (x, y, z, a, b, c), and we’ll only have one of a or z (as checked
@@ -739,11 +772,12 @@ class API(HardwareAPILike):
             else:
                 self._current_position.update(target_position)
 
-    @property
-    def engaged_axes(self) -> Dict[Axis, bool]:
+    async def get_engaged_axes(self) -> Dict[Axis, bool]:
         """ Which axes are engaged and holding. """
         return {Axis[ax]: eng
                 for ax, eng in self._backend.engaged_axes().items()}
+
+    engaged_axes = property(fget=get_engaged_axes)
 
     async def disengage_axes(self, which: List[Axis]):
         self._backend.disengage_axes([ax.name for ax in which])
@@ -783,8 +817,7 @@ class API(HardwareAPILike):
             return top_types.Point(0, 0, 0)
 
     # Gantry/frame (i.e. not pipette) config API
-    @property
-    def config(self) -> robot_configs.robot_config:
+    async def get_config(self) -> robot_configs.robot_config:
         """ Get the robot's configuration object.
 
         :returns .robot_config: The object.
@@ -792,9 +825,12 @@ class API(HardwareAPILike):
         return self._config
 
     def set_config(self, config: robot_configs.robot_config):
+        """ Replace the currently-loaded config """
         self._config = config
 
-    def update_config(self, **kwargs):
+    config = property(fget=get_config, fset=set_config)
+
+    async def update_config(self, **kwargs):
         """ Update values of the robot's configuration.
 
         `kwargs` should contain keys of the robot's configuration. For
@@ -1284,9 +1320,9 @@ class API(HardwareAPILike):
         with _assure_tip():
             return await self._do_tp(pip, mount)
 
-    def update_instrument_offset(self, mount,
-                                 new_offset: top_types.Point = None,
-                                 from_tip_probe: top_types.Point = None):
+    async def update_instrument_offset(self, mount,
+                                       new_offset: top_types.Point = None,
+                                       from_tip_probe: top_types.Point = None):
         """ Update the instrument offset for a pipette on the specified mount.
 
         This will update both the stored value in the robot settings and
@@ -1318,6 +1354,6 @@ class API(HardwareAPILike):
         inst_offs[mount.name.lower()][pip_type] = [new_offset.x,
                                                    new_offset.y,
                                                    new_offset.z]
-        self.update_config(instrument_offset=inst_offs)
+        await self.update_config(instrument_offset=inst_offs)
         pip.update_instrument_offset(new_offset)
         robot_configs.save_robot_settings(self._config)

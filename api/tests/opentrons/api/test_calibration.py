@@ -97,7 +97,7 @@ async def test_tip_probe_v1(main_router, model):
 
 
 async def test_correct_hotspots():
-    config = robot_configs._build_config([], {})
+    config = robot_configs.build_config([], {})
 
     tip_length = 47
     switch_clearance = 7.5

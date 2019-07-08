@@ -20,6 +20,7 @@ const alertContents = {
         { children: 'bar', onClick: () => setState({ alert: 'bar' }) },
         { children: 'close', onClick: () => setState({ alert: '' }) },
       ]}
+      restrictOuterScroll={false}
     >
       {alertContents[state.alert]}
     </AlertModal>
@@ -50,6 +51,7 @@ const alertContents = {
         { children: 'bar', onClick: () => setState({ alert: 'bar' }) },
         { children: 'close', onClick: () => setState({ alert: '' }) },
       ]}
+      restrictOuterScroll={false}
     >
       {alertContents[state.alert]}
     </AlertModal>
@@ -80,6 +82,7 @@ const alertContents = {
         { children: 'close', onClick: () => setState({ alert: '' }) },
       ]}
       alertOverlay
+      restrictOuterScroll={false}
     >
       {alertContents[state.alert]}
     </AlertModal>
@@ -108,6 +111,7 @@ const alertContents = {
         { children: 'bar', onClick: () => setState({ alert: 'bar' }) },
         { children: 'close', onClick: () => setState({ alert: '' }) },
       ]}
+      restrictOuterScroll={false}
     >
       {alertContents[state.alert]}
     </AlertModal>

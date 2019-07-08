@@ -73,7 +73,11 @@ async def get_attached_pipettes(request):
         else:
             hw.cache_instrument_models()
     response = {}
-    for mount, data in hw.get_attached_pipettes().items():
+    if ff.use_protocol_api_v2():
+        attached = await hw.get_attached_pipettes()
+    else:
+        attached = hw.get_attached_pipettes()
+    for mount, data in attached.items():
         response[mount] = {
             'model': data['model'],
             'name': data['name'],
@@ -230,9 +234,13 @@ async def get_engaged_axes(request):
         {"x": {"enabled": true}, "y": {"enabled": false}, ...}
     """
     hw = hw_from_req(request)
+    if ff.use_protocol_api_v2():
+        engaged = await hw.engaged_axes
+    else:
+        engaged = hw.engaged_axes
     return web.json_response(
         {str(k).lower(): {'enabled': v}
-         for k, v in hw.engaged_axes.items()})
+         for k, v in engaged.items()})
 
 
 async def disengage_axes(request):
@@ -495,7 +503,11 @@ async def identify(request):
 
 async def get_rail_lights(request):
     hw = hw_from_req(request)
-    return web.json_response({'on': hw.get_lights()['rails']})
+    if ff.use_protocol_api_v2():
+        on = await hw.get_lights()
+    else:
+        on = hw.get_lights()
+    return web.json_response({'on': on['rails']})
 
 
 async def set_rail_lights(request):
@@ -507,8 +519,10 @@ async def set_rail_lights(request):
         return web.json_response(
             {'message': '"on" must be true or false, got {}'.format(on)},
             status=400)
-
-    hw.set_lights(rails=on)
+    if ff.use_protocol_api_v2():
+        await hw.set_lights(rails=on)
+    else:
+        hw.set_lights(rails=on)
     return web.json_response({'on': on})
 
 

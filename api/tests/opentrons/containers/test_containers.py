@@ -81,7 +81,7 @@ def test_load_legacy_slot_names(robot):
 
 def test_new_slot_names(robot):
     trough = 'usascientific_12_reservoir_22ml'
-    plate = 'generic_96_wellplate_340ul_flat'
+    plate = 'corning_96_wellplate_360ul_flat'
     tuberack = 'opentrons_6_tuberack_falcon_50ml_conical'
 
     cont = new_load(trough)
