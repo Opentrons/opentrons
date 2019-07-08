@@ -92,7 +92,7 @@ export const clearWellSelectionLabwareKey = (): ClearWellSelectionLabwareKeyActi
   payload: null,
 })
 
-export const SCROLL_ON_SELECT_STEP_CLASSNAME = 'scroll_on_select_step'
+export const MAIN_CONTENT_FORCED_SCROLL_CLASSNAME = 'main_content_forced_scroll'
 
 export type SelectStepAction = { type: 'SELECT_STEP', payload: StepIdType }
 // NOTE: 'newStepType' arg is only used when generating a new step
@@ -144,7 +144,9 @@ export const selectStep = (
 
   // scroll to top of all elements with the special class
   forEach(
-    global.document.getElementsByClassName(SCROLL_ON_SELECT_STEP_CLASSNAME),
+    global.document.getElementsByClassName(
+      MAIN_CONTENT_FORCED_SCROLL_CLASSNAME
+    ),
     elem => {
       elem.scrollTop = 0
     }
