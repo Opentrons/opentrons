@@ -1073,7 +1073,7 @@ class Pipette(CommandPublisher):
             # When container typing is implemented, make sure that
             # when returning to a tiprack, tips are dropped within the rack
             if 'rack' in location.get_parent().get_type():
-                half_tip_length = self._tip_length / 2
+                half_tip_length = self._check_tip_length_quirk()
                 location = location.top(-half_tip_length)
             elif 'trash' in location.get_parent().get_type():
                 loc, coords = location.top()
@@ -1121,6 +1121,11 @@ class Pipette(CommandPublisher):
         )
 
         return self
+
+    def _check_tip_length_quirk(self):
+        if 'returnTipHeight' in self.quirks:
+            return self._tip_length / 1.2
+        return self._tip_length / 2
 
     def _shake_off_tips(self, location, quirk):
         # tips don't always fall off, especially if resting against

@@ -3415,7 +3415,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["dropTipShake"]
+      "quirks": ["dropTipShake", "pickupTipShake", "returnTipHeight"]
     }
   },
   "mutableConfigs": [
@@ -3436,5 +3436,7 @@
     "defaultDispenseFlowRate",
     "quirks"
   ],
-  "validQuirks": ["pickupTipShake", "dropTipShake", "doubleDropTip"]
+  "validQuirks": [
+    "pickupTipShake", "dropTipShake", "doubleDropTip", "returnTipHeight"
+  ]
 }
