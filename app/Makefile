@@ -57,4 +57,4 @@ dev-shell:
 .PHONY: dev-deps
 dev-deps:
 	$(MAKE) -C $(discovery_client_dir)
-	$(MAKE) -C $(shell_dir) lib
+	$(MAKE) -C $(shell_dir) clean lib

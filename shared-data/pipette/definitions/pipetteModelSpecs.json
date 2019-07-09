@@ -929,8 +929,9 @@
       },
       "quirks": ["dropTipShake", "doubleDropTip"]
     },
-    "p+20_single_v2.0": {
-      "name": "p+20_single",
+    "p20_single_v2.0": {
+      "name": "p20_single_GEN2",
+      "backcompatName": "p10_single",
       "top": {
         "value": 19.5,
         "min": -45,
@@ -2313,8 +2314,9 @@
       },
       "quirks": ["dropTipShake"]
     },
-    "p+300_single_v2.0": {
-      "name": "p+300_single",
+    "p300_single_v2.0": {
+      "name": "p300_single_GEN2",
+      "backcompatName": "p300_single",
       "top": {
         "value": 19.5,
         "min": 5,
@@ -3294,8 +3296,9 @@
         "max": 100
       }
     },
-    "p+1000_single_v2.0": {
-      "name": "p+1000_single",
+    "p1000_single_v2.0": {
+      "name": "p1000_single_GEN2",
+      "backcompatName": "p1000_single",
       "top": {
         "value": 19.5,
         "min": 5,

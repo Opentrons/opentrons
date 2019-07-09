@@ -1,34 +1,8 @@
-import { mockResolvedValue } from '../../../__util__/mock-promise'
-import mockRemote from '../remote'
 import * as buildroot from '../buildroot'
-
-const { buildroot: mockBuildrootUpdate } = mockRemote
 
 const reducer = buildroot.buildrootReducer
 
 describe('shell/buildroot', () => {
-  let _Blob
-
-  beforeEach(() => {
-    _Blob = global.Blob
-    global.Blob = jest.fn(input => ({ blob: input }))
-  })
-
-  afterEach(() => {
-    global.Blob = _Blob
-    jest.clearAllMocks()
-  })
-
-  test('getBuildrootUpdateContents puts file from app-shell into a Blob', () => {
-    const contents = 'update'
-
-    mockResolvedValue(mockBuildrootUpdate.getUpdateFileContents, contents)
-
-    return expect(buildroot.getBuildrootUpdateContents()).resolves.toEqual({
-      blob: ['update'],
-    })
-  })
-
   describe('action creators', () => {
     const SPECS = [
       {
@@ -50,27 +24,31 @@ describe('shell/buildroot', () => {
         name: 'handles buildroot:UPDATE_INFO',
         action: {
           type: 'buildroot:UPDATE_INFO',
-          payload: {
-            filename: 'foobar.zip',
-            apiVersion: '1.0.0',
-            serverVersion: '1.0.0',
-          },
+          payload: { version: '1.0.0', releaseNotes: 'release notes' },
         },
-        initialState: { info: null, seen: false },
+        initialState: { ...buildroot.INITIAL_STATE, info: null },
         expected: {
-          info: {
-            filename: 'foobar.zip',
-            apiVersion: '1.0.0',
-            serverVersion: '1.0.0',
-          },
-          seen: false,
+          ...buildroot.INITIAL_STATE,
+          info: { version: '1.0.0', releaseNotes: 'release notes' },
         },
       },
       {
         name: 'handles buildroot:SET_UPDATE_SEEN',
         action: { type: 'buildroot:SET_UPDATE_SEEN' },
-        initialState: { info: null, seen: false },
-        expected: { info: null, seen: true },
+        initialState: { ...buildroot.INITIAL_STATE, seen: false },
+        expected: { ...buildroot.INITIAL_STATE, seen: true },
+      },
+      {
+        name: 'handles buildroot:DOWNLOAD_PROGRESS',
+        action: { type: 'buildroot:DOWNLOAD_PROGRESS', payload: 42 },
+        initialState: { ...buildroot.INITIAL_STATE, downloadProgress: null },
+        expected: { ...buildroot.INITIAL_STATE, downloadProgress: 42 },
+      },
+      {
+        name: 'handles buildroot:DOWNLOAD_ERROR',
+        action: { type: 'buildroot:DOWNLOAD_ERROR', payload: 'AH' },
+        initialState: { ...buildroot.INITIAL_STATE, downloadError: null },
+        expected: { ...buildroot.INITIAL_STATE, downloadError: 'AH' },
       },
     ]
     SPECS.forEach(spec => {
