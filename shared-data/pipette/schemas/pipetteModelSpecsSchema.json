@@ -106,8 +106,7 @@
             "quirks": {
               "type": "array",
               "items": {
-                "type": "string",
-                "enum": ["pickupTipShake", "dropTipShake", "doubleDropTip"]
+                "type": "string"
               }
             },
             "tipLength": {

@@ -286,7 +286,7 @@ class API(HardwareAPILike):
                     # Check if new model of pipettes, load smoothie configs
                     # for this particular model
                     self._backend._smoothie_driver.update_steps_per_mm(
-                        {plunger_axis.name: 2133.33})
+                        {plunger_axis.name: 3200})
                     # TODO(LC25-4-2019): Modify configs to update to as
                     # testing informs better values
                     self._backend._smoothie_driver.update_pipette_config(
