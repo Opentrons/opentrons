@@ -1,7 +1,8 @@
 import { mockResolvedValue } from '../../../__util__/mock-promise'
+import mockRemote from '../remote'
 import * as buildroot from '../buildroot'
 
-const { buildroot: mockBuildrootUpdate } = global.APP_SHELL
+const { buildroot: mockBuildrootUpdate } = mockRemote
 
 const reducer = buildroot.buildrootReducer
 

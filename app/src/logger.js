@@ -1,6 +1,6 @@
 // @flow
 // logger
-const { ipcRenderer } = global.APP_SHELL
+import remote from './shell/remote'
 
 // TODO(mc, 2018-05-17): put this type somewhere common to app and app-shell
 export type LogLevel =
@@ -54,6 +54,6 @@ function log(level: LogLevel, message: string, label: string, meta?: {}) {
     console.dir(meta)
   }
 
-  // send to main process for logfile collection
-  ipcRenderer.send('log', { level, message, label, ...meta })
+  // send to main process for log file collection
+  remote.ipcRenderer.send('log', { level, message, label, ...meta })
 }

@@ -368,5 +368,6 @@ async def test_transform_from_moves_v2(
         [const_zero, const_zero, const_one_, delta_z___],
         [const_zero, const_zero, const_zero, const_one_]]
 
-    actual_transform = hardware.config.gantry_calibration
+    conf = await hardware.config
+    actual_transform = conf.gantry_calibration
     assert np.allclose(actual_transform, expected_transform)

@@ -2,6 +2,10 @@
 import cloneDeep from 'lodash/cloneDeep'
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
+import type {
+  AspirateParams,
+  DispenseParams,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import {
   getInitialRobotStateStandard,
   getRobotStatePickedUpTipStandard,
@@ -21,6 +25,8 @@ import {
   blowoutHelper,
   pickUpTipHelper,
   dropTipHelper,
+  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+  DISPENSE_OFFSET_FROM_BOTTOM_MM,
 } from './fixtures'
 import { reduceCommandCreators } from '../utils'
 import _consolidate from '../commandCreators/compound/consolidate'
@@ -41,14 +47,18 @@ const consolidate = (args: ConsolidateArgs) => (
     _consolidate(args)(invariantContext, initialRobotState)
   )(invariantContext, initialRobotState)
 
-function tripleMix(well: string, volume: number, labware: string) {
+function tripleMix(
+  well: string,
+  volume: number,
+  params: $Shape<AspirateParams> | $Shape<DispenseParams>
+) {
   return [
-    aspirateHelper(well, volume, { labware }),
-    dispenseHelper(well, volume, { labware }),
-    aspirateHelper(well, volume, { labware }),
-    dispenseHelper(well, volume, { labware }),
-    aspirateHelper(well, volume, { labware }),
-    dispenseHelper(well, volume, { labware }),
+    aspirateHelper(well, volume, params),
+    dispenseHelper(well, volume, params),
+    aspirateHelper(well, volume, params),
+    dispenseHelper(well, volume, params),
+    aspirateHelper(well, volume, params),
+    dispenseHelper(well, volume, params),
   ]
 }
 
@@ -244,7 +254,7 @@ describe('consolidate single-channel', () => {
     expect(res.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
 
-  test('mix on aspirate should mix before aspirate in first well of chunk only', () => {
+  test('mix on aspirate should mix before aspirate in first well of chunk only, and tip position bound to labware', () => {
     const data = {
       ...mixinArgs,
       volume: 100,
@@ -258,14 +268,20 @@ describe('consolidate single-channel', () => {
     expect(res.commands).toEqual([
       pickUpTipHelper('A1'),
 
-      ...tripleMix('A1', 50, SOURCE_LABWARE),
+      ...tripleMix('A1', 50, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
 
       aspirateHelper('A1', 100),
       aspirateHelper('A2', 100),
       aspirateHelper('A3', 100),
       dispenseHelper('B1', 300),
 
-      ...tripleMix('A4', 50, SOURCE_LABWARE),
+      ...tripleMix('A4', 50, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
 
       aspirateHelper('A4', 100),
       dispenseHelper('B1', 100),
@@ -288,11 +304,20 @@ describe('consolidate single-channel', () => {
       pickUpTipHelper('A1'),
       // Start mix
       aspirateHelper('A1', 50),
-      dispenseHelper('A1', 50, { labware: SOURCE_LABWARE }),
+      dispenseHelper('A1', 50, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
       aspirateHelper('A1', 50),
-      dispenseHelper('A1', 50, { labware: SOURCE_LABWARE }),
+      dispenseHelper('A1', 50, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
       aspirateHelper('A1', 50),
-      dispenseHelper('A1', 50, { labware: SOURCE_LABWARE }),
+      dispenseHelper('A1', 50, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
       // done mix
       aspirateHelper('A1', 125),
       aspirateHelper('A2', 125),
@@ -300,11 +325,20 @@ describe('consolidate single-channel', () => {
 
       // Start mix
       aspirateHelper('A3', 50),
-      dispenseHelper('A3', 50, { labware: SOURCE_LABWARE }),
+      dispenseHelper('A3', 50, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
       aspirateHelper('A3', 50),
-      dispenseHelper('A3', 50, { labware: SOURCE_LABWARE }),
+      dispenseHelper('A3', 50, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
       aspirateHelper('A3', 50),
-      dispenseHelper('A3', 50, { labware: SOURCE_LABWARE }),
+      dispenseHelper('A3', 50, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
       // done mix
 
       aspirateHelper('A3', 125),
@@ -332,12 +366,18 @@ describe('consolidate single-channel', () => {
       aspirateHelper('A3', 100),
       dispenseHelper('B1', 300),
 
-      ...tripleMix('B1', 53, DEST_LABWARE),
+      ...tripleMix('B1', 53, {
+        labware: DEST_LABWARE,
+        offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+      }),
 
       aspirateHelper('A4', 100),
       dispenseHelper('B1', 100),
 
-      ...tripleMix('B1', 53, DEST_LABWARE),
+      ...tripleMix('B1', 53, {
+        labware: DEST_LABWARE,
+        offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+      }),
     ])
     expect(res.robotState).toMatchObject(robotStatePickedUpOneTipNoLiquidState)
   })
@@ -361,13 +401,19 @@ describe('consolidate single-channel', () => {
       aspirateHelper('A3', 100),
       dispenseHelper('B1', 300),
 
-      ...tripleMix('B1', 54, DEST_LABWARE),
+      ...tripleMix('B1', 54, {
+        labware: DEST_LABWARE,
+        offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+      }),
 
       blowoutHelper(null, { offsetFromBottomMm: BLOWOUT_OFFSET_ANY }),
       aspirateHelper('A4', 100),
       dispenseHelper('B1', 100),
 
-      ...tripleMix('B1', 54, DEST_LABWARE),
+      ...tripleMix('B1', 54, {
+        labware: DEST_LABWARE,
+        offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+      }),
 
       blowoutHelper(null, { offsetFromBottomMm: BLOWOUT_OFFSET_ANY }),
     ])
@@ -394,7 +440,10 @@ describe('consolidate single-channel', () => {
 
       // pre-wet tip
       aspirateHelper('A1', preWetVol),
-      dispenseHelper('A1', preWetVol, { labware: SOURCE_LABWARE }),
+      dispenseHelper('A1', preWetVol, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
       // done pre-wet
 
       aspirateHelper('A1', 150),
@@ -403,7 +452,10 @@ describe('consolidate single-channel', () => {
 
       // pre-wet tip, now with A3
       aspirateHelper('A3', preWetVol),
-      dispenseHelper('A3', preWetVol, { labware: SOURCE_LABWARE }),
+      dispenseHelper('A3', preWetVol, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
       // done pre-wet
 
       aspirateHelper('A3', 150),

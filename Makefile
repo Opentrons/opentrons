@@ -104,7 +104,6 @@ test-js:
 		--coverage=$(cover) \
 		--watch=$(watch) \
 		--updateSnapshot=$(updateSnapshot) \
-		--no-cache=$(if $(CI),true,false) \
 		--ci=$(if $(CI),true,false)
 
 # lints and typechecks

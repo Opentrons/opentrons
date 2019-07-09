@@ -1,5 +1,6 @@
 // @flow
 import semver from 'semver'
+import remote from './remote'
 import type { State, Action } from '../types'
 
 export type BuildrootUpdateInfo = {|
@@ -15,7 +16,7 @@ export type BuildrootState = {
 
 const {
   buildroot: { getUpdateFileContents },
-} = global.APP_SHELL
+} = remote
 
 export type BuildrootAction =
   | {| type: 'buildroot:UPDATE_INFO', payload: BuildrootUpdateInfo | null |}

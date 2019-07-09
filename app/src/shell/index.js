@@ -3,6 +3,7 @@
 import { combineReducers } from 'redux'
 
 import createLogger from '../logger'
+import remote from './remote'
 import { updateReducer } from './update'
 import { apiUpdateReducer } from './api-update'
 import { buildrootReducer } from './buildroot'
@@ -36,7 +37,7 @@ const {
   update: { CURRENT_VERSION, CURRENT_RELEASE_NOTES },
   config: { getConfig },
   discovery: { getRobots },
-} = global.APP_SHELL
+} = remote
 
 const log = createLogger(__filename)
 

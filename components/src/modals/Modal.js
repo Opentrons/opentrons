@@ -16,8 +16,10 @@ type ModalProps = {
   className?: string,
   /** classes to apply to the contents box */
   contentsClassName?: string,
-  /** lightens overlay (alert modal over existing modal)**/
+  /** lightens overlay (alert modal over existing modal) */
   alertOverlay?: boolean,
+  /** restricts scroll outside of Modal when open, true by default */
+  restrictOuterScroll?: boolean,
   innerRef?: React.Ref<*>,
 }
 
@@ -32,9 +34,11 @@ export default function Modal(props: ModalProps) {
     onCloseClick,
     heading,
     innerRef,
+    restrictOuterScroll = true,
   } = props
+  const Wrapper = restrictOuterScroll ? RemoveScroll : React.Fragment
   return (
-    <RemoveScroll>
+    <Wrapper>
       <div
         className={cx(styles.modal, props.className, {
           [styles.alert_modal]: alertOverlay,
@@ -49,6 +53,6 @@ export default function Modal(props: ModalProps) {
           {props.children}
         </div>
       </div>
-    </RemoveScroll>
+    </Wrapper>
   )
 }

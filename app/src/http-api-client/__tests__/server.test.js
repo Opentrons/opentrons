@@ -1,7 +1,6 @@
 // server api tests
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
-import electron from 'electron'
 import { setter } from '@thi.ng/paths'
 
 import client from '../client'
@@ -17,7 +16,6 @@ import {
   reducer,
 } from '..'
 
-jest.mock('electron')
 jest.mock('../client')
 
 const REQUESTS_TO_TEST = [
@@ -34,8 +32,6 @@ describe('server API client', () => {
   let robot
 
   beforeEach(() => {
-    client.__clearMock()
-    electron.__clearMock()
     robot = {
       name: 'opentrons',
       ip: '1.2.3.4',
@@ -46,6 +42,10 @@ describe('server API client', () => {
       health: {},
       serverHealth: {},
     }
+  })
+
+  afterEach(() => {
+    jest.clearAllMocks()
   })
 
   describe('selectors', () => {
