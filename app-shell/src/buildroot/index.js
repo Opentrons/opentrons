@@ -104,11 +104,7 @@ function cacheUpdateSet(
 ): Promise<BuildrootUpdateInfo> {
   updateSet = filepaths
 
-  const getReleaseNotes = updateSet.releaseNotes
-    ? readFile(updateSet.releaseNotes, 'utf8')
-    : Promise.resolve(null)
-
-  return getReleaseNotes.then(releaseNotes => ({
+  return readFile(updateSet.releaseNotes, 'utf8').then(releaseNotes => ({
     version: CURRENT_VERSION,
     releaseNotes,
   }))

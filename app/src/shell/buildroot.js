@@ -4,7 +4,7 @@ import type { State, Action } from '../types'
 
 export type BuildrootUpdateInfo = {|
   version: string,
-  releaseNotes: string | null,
+  releaseNotes: string,
 |}
 
 export type BuildrootState = {
