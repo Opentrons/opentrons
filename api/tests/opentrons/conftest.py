@@ -35,13 +35,6 @@ Protocol = namedtuple(
     'Protocol',
     ['text', 'filename'])
 
-# Note: When dummy_db or robot fixtures are used, this db is copied into a
-# a temp testing_db that is deleted in between tests to allow for db mutation
-MAIN_TESTER_DB = str(os.path.join(
-    os.path.dirname(
-        globals()["__file__"]), 'testing_database.db')
-)
-
 
 @pytest.fixture(autouse=True)
 def asyncio_loop_exception_handler(loop):
