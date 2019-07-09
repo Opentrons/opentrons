@@ -47,6 +47,22 @@
     "maxVolume": 20,
     "channels": 1
   },
+  "p20_multi_GEN2": {
+    "displayName": "P20 8-Channel GEN2",
+    "defaultAspirateFlowRate": {
+      "value": 5,
+      "min": 0.001,
+      "max": 5000
+    },
+    "defaultDispenseFlowRate": {
+      "value": 10,
+      "min": 0.001,
+      "max": 5000
+    },
+    "minVolume": 1,
+    "maxVolume": 20,
+    "channels": 8
+  },
   "p50_single": {
     "displayName": "P50 Single-Channel",
     "defaultAspirateFlowRate": {
@@ -108,6 +124,22 @@
       "max": 600
     },
     "channels": 1,
+    "minVolume": 20,
+    "maxVolume": 300
+  },
+  "p300_multi_GEN2": {
+    "displayName": "P300 8-Channel GEN2",
+    "defaultAspirateFlowRate": {
+      "value": 150,
+      "min": 0.001,
+      "max": 600
+    },
+    "defaultDispenseFlowRate": {
+      "value": 300,
+      "min": 0.001,
+      "max": 600
+    },
+    "channels": 8,
     "minVolume": 20,
     "maxVolume": 300
   },
