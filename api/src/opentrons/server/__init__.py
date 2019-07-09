@@ -100,20 +100,24 @@ def init(loop=None, hardware: 'HardwareAPILike' = None):
         checked_hardware = hardware
     else:
         checked_hardware = opentrons.hardware
+    log.info(f"Server using hardware {checked_hardware} {id(checked_hardware)}")
     app['com.opentrons.hardware'] = checked_hardware
     app['com.opentrons.motion_lock'] = ThreadedAsyncLock()
     app['com.opentrons.rpc'] = RPCServer(
         app, MainRouter(
-            checked_hardware, lock=app['com.opentrons.motion_lock']))
+            checked_hardware, loop, lock=app['com.opentrons.motion_lock']))
     app['com.opentrons.http'] = HTTPServer(app, CONFIG['log_dir'])
 
     return app
 
 
-def run(hostname=None, port=None, path=None, loop=None):
+def run(hostname=None, port=None, path=None, loop=None, hardware=None):
     """
     The arguments are not all optional. Either a path or hostname+port should
     be specified; you have to specify one.
+
+    If hardware is specified, it will be used to back the server instead of
+    the singleton.
     """
     if path:
         log.debug("Starting Opentrons server application on {}".format(
@@ -124,4 +128,4 @@ def run(hostname=None, port=None, path=None, loop=None):
             hostname, port))
         path = None
 
-    web.run_app(init(loop), host=hostname, port=port, path=path)
+    web.run_app(init(loop, hardware), host=hostname, port=port, path=path)

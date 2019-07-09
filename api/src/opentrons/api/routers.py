@@ -12,7 +12,8 @@ class MainRouter:
         self._notifications = Notifications(topics, self._broker, loop=loop)
 
         if hardware and ff.use_protocol_api_v2():
-            hardware = adapters.SynchronousAdapter(hardware)
+            hardware = adapters.SynchronousAdapter(
+                hardware, loop, own_loop=False)
         self.session_manager = SessionManager(
             hardware=hardware,
             loop=loop,

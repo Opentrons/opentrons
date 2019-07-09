@@ -2,7 +2,7 @@ import os
 import logging
 import asyncio
 import re
-from opentrons import HERE
+from opentrons import HERE, reset_globals
 from opentrons import server
 from opentrons.server.main import build_arg_parser
 from argparse import ArgumentParser
@@ -15,10 +15,16 @@ from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
 try:
     from opentrons.hardware_control.socket_server\
         import run as install_hardware_server
+    from opentrons.hardware_control.socket_client\
+        import JsonRpcSingletonAdapter
 except ImportError:
     async def install_hardware_server(sock_path, api):  # type: ignore
         log.warning("Cannot start hardware server: missing dependency")
 
+    class JsonRpcSingletonAdapter:
+        def __init__(self, *args, **kwargs):
+            raise RuntimeError(
+                "Cannot run as hardware client: missing dependency")
 
 log = logging.getLogger(__name__)
 
@@ -79,8 +85,9 @@ async def _do_fw_update(new_fw_path, new_fw_ver):
         os.environ['ENABLE_VIRTUAL_SMOOTHIE'] = 'true'
 
 
-def initialize_robot(loop):
+def initialize_robot(loop, hardware):
     packed_smoothie_fw_file, packed_smoothie_fw_ver = _find_smoothie_file()
+    log.info(f"Hardware is {hardware} {id(hardware)}")
     try:
         if ff.use_protocol_api_v2():
             hardware.connect(force=True)
@@ -123,24 +130,41 @@ def run(**kwargs):  # noqa(C901)
     the use of different length args
     """
     loop = asyncio.get_event_loop()
+    local_hardware = hardware
+    if kwargs.get('hardware_client'):
+        if ff.use_protocol_api_v2():
+            log.info(f"Hardware was {hardware} {id(hardware)}")
+            log.info("Starting hardware controller client")
+            local_hardware = loop.run_until_complete(
+                JsonRpcSingletonAdapter.build(
+                    kwargs['hardware_server_socket'],
+                    loop))
+            log.info(
+                f"Connected hardware client to "
+                f"{kwargs['hardware_server_socket']}")
+            reset_globals(2, loop, local_hardware)
+            log.info(f"Hardware now contains {hardware} {id(hardware)}")
+        else:
+            log.warning(
+                "Hardware client requested but apiv1 selected, not starting")
     if ff.use_protocol_api_v2():
-        robot_conf = loop.run_until_complete(hardware.config)
+        robot_conf = loop.run_until_complete(local_hardware.config)
     else:
-        robot_conf = hardware.config
+        robot_conf = local_hardware.config
 
     logging_config.log_init(robot_conf.log_level)
 
     log.info("API server version:  {}".format(__version__))
     if not os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
-        initialize_robot(loop)
+        initialize_robot(loop, local_hardware)
         if ff.use_protocol_api_v2():
-            loop.run_until_complete(hardware.cache_instruments())
+            loop.run_until_complete(local_hardware.cache_instruments())
         if not ff.disable_home_on_boot():
             log.info("Homing Z axes")
             if ff.use_protocol_api_v2():
-                loop.run_until_complete(hardware.home_z())
+                loop.run_until_complete(local_hardware.home_z())
             else:
-                hardware.home_z()
+                local_hardware.home_z()
         try:
             udev.setup_rules_file()
         except Exception:
@@ -152,12 +176,12 @@ def run(**kwargs):  # noqa(C901)
         if ff.use_protocol_api_v2():
             loop.run_until_complete(
                 install_hardware_server(kwargs['hardware_server_socket'],
-                                        hardware._api))
+                                        local_hardware._api))
         else:
             log.warning(
                 "Hardware server requested but apiv1 selected, not starting")
     server.run(kwargs.get('hostname'), kwargs.get('port'), kwargs.get('path'),
-               loop)
+               loop, local_hardware)
 
 
 def main():
@@ -176,11 +200,18 @@ def main():
     arg_parser = ArgumentParser(
         description="Opentrons robot software",
         parents=[build_arg_parser()])
-    arg_parser.add_argument(
+    sockserver_group = arg_parser.add_mutually_exclusive_group()
+    sockserver_group.add_argument(
         '--hardware-server', action='store_true',
         help='Run a jsonrpc server allowing rpc to the'
         ' hardware controller. Only works on buildroot '
         'because extra dependencies are required.')
+    sockserver_group.add_argument(
+        '--hardware-client', action='store_true',
+        help='Instead of running a hardware controller directly, connect to a '
+        'running hardware controller via local socket. Something else must '
+        'have previously started the hardware controller. Only works on '
+        'buildroot because extra dependencies are required.')
     arg_parser.add_argument(
         '--hardware-server-socket', action='store',
         default='/var/run/opentrons-hardware.sock',

@@ -9,6 +9,7 @@ from typing import Any, Callable, Dict, List, NamedTuple, Optional, Union
 from jsonrpcclient.async_client import AsyncClient
 from jsonrpcclient.response import Response, SuccessResponse
 
+from .adapters import SingletonAdapter
 from .socket_server import serializer_for, deserializer_for
 from .types import HardwareAPILike
 from . import API
@@ -251,6 +252,14 @@ class JsonRpcAdapter(HardwareAPILike):
 
         self._coromap = generate_proxies(API, self, async_only)
         self._client: Optional[UnixSocketClient] = None
+        self._lock = asyncio.Lock(loop=self._loop)
+
+    def set_loop(self, loop: asyncio.AbstractEventLoop):
+        self._loop = loop
+
+    @property
+    def loop(self):
+        return self._loop
 
     async def connect(self):
         assert not self._client, 'Already connected'
@@ -267,7 +276,8 @@ class JsonRpcAdapter(HardwareAPILike):
                 f"Retrieving value for property {attr_name} using{getter}")
 
             async def prop_wrapper():
-                resp = await self._client.request(getter)
+                async with self._lock:
+                    resp = await self._client.request(getter)
                 return resp.data.result
 
             return prop_wrapper()
@@ -277,8 +287,63 @@ class JsonRpcAdapter(HardwareAPILike):
             @functools.wraps(dummy_meth)
             async def _wrapper(*args, **kwargs):
                 bound = dummy_sig.bind(*args, **kwargs)
-                res = await self._client.request(attr_name,
-                                                 **bound.arguments)
+                async with self._lock:
+                    LOG.debug(f"Emitting RPC call {attr_name}({bound})")
+                    res = await self._client.request(attr_name,
+                                                     **bound.arguments)
+                LOG.debug(f"RPC result: {res}")
                 return res.data.result
+
+            return _wrapper
         else:
-            return AttributeError(attr_name)
+            raise AttributeError(attr_name)
+
+
+class JsonRpcSingletonAdapter(SingletonAdapter):
+    """ A fusion of SIngletonAdapter and JsonRpcAdapter meant for ease
+    of use as the back compat opentrons.robot global singleton
+    """
+    def __init__(self,
+                 hw_socket: str,
+                 loop: asyncio.AbstractEventLoop = None) -> None:
+        self._jrpc = JsonRpcAdapter(hw_socket, loop)
+        self._loop = loop
+        super().__init__(loop)
+        # self._api is from the singleton adapter parent
+        self._sim = self._api
+
+    async def _prep(self):
+        await self._jrpc.connect()
+
+    @classmethod
+    async def build(
+            cls,
+            hw_socket: str,
+            loop: asyncio.AbstractEventLoop = None)\
+            -> 'JsonRpcSingletonAdapter':
+        """ Build the adapter and connect it in one call """
+        obj = cls(hw_socket, loop)
+        await obj._prep()
+        return obj
+
+    def __getattr__(self, attr_name: str):
+        if self.is_connected():
+            return getattr(self._jrpc, attr_name)
+        else:
+            return getattr(self._sim, attr_name)
+
+    def connect(self, port: str = None, force: bool = False):
+        """ Connect to a remote client.
+
+        Overrides the singletonadapter connect and provides the same
+        api.
+        """
+        self._api = self._jrpc
+        LOG.info("Connected to remote hardware server")
+
+    def disconnect(self):
+        self._api = self._sim
+        LOG.info("Disconnected from remote hardware server")
+
+    def is_connected(self):
+        return self._api is self._jrpc

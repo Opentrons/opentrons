@@ -34,7 +34,8 @@ def exception_handler(loop, context):
     loop.default_exception_handler(context)
 
 
-async def arun(config: rc.robot_config = None,
+async def arun(sock: str,
+               config: rc.robot_config = None,
                port: str = None):
     """ Asynchronous entrypoint for the server
 
@@ -43,9 +44,12 @@ async def arun(config: rc.robot_config = None,
     """
     rconf = config or rc.load()
     hc = await API.build_hardware_controller(rconf, port) # noqa(F841)
+    from .socket_server import run as ss_run
+    return await ss_run(sock, hc)
 
 
-def run(config: rc.robot_config = None,
+def run(socket: str,
+        config: rc.robot_config = None,
         port: str = None):
     """ Synchronous entrypoint for the server.
 
@@ -56,7 +60,7 @@ def run(config: rc.robot_config = None,
     """
     loop = asyncio.get_event_loop()
     loop.set_exception_handler(exception_handler)
-    loop.run_until_complete(arun(config, port))
+    loop.run_until_complete(arun(socket, config, port))
     loop.run_forever()
 
 
@@ -64,8 +68,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Opentrons hardware control server')
     parser.add_argument(
-        '-s', '--smoothie-port',
+        '-p', '--smoothie-port',
         help='Port on which to talk to smoothie, autodetected by default',
         default=None)
+    parser.add_argument(
+        '-s', '--socket',
+        help='Path to the socket to establish for the server',
+        default='/var/run/opentrons-hardware.sock')
     args = parser.parse_args()  # noqa(F841)
-    run(port=args.port)
+    run(args.socket, port=args.smoothie_port)

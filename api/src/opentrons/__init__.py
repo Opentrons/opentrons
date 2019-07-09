@@ -36,7 +36,7 @@ if version < (3, 5):
             version[0], version[1]))
 
 
-def build_globals(version=None, loop=None):
+def build_globals(version=None, loop=None, hw_override=None):
     if version is None:
         checked_version =\
             2 if config.feature_flags.use_protocol_api_v2() else 1
@@ -46,7 +46,10 @@ def build_globals(version=None, loop=None):
         return robotv1, resetv1, instrumentsv1, containersv1,\
             labwarev1, modulesv1, robotv1
     elif checked_version == 2:
-        hw = adapters.SingletonAdapter(loop)
+        if hw_override:
+            hw = hw_override
+        else:
+            hw = adapters.SingletonAdapter(loop)
         rob, instr, con, lw, mod = bcbuild(hw, loop)
         set_globals(rob, instr, lw, mod)
         return rob, resetv2, instr, lw, lw, mod, hw
@@ -55,7 +58,7 @@ def build_globals(version=None, loop=None):
                            .format(version))
 
 
-def reset_globals(version=None, loop=None):
+def reset_globals(version=None, loop=None, hw_override=None):
     """ Reinitialize the global singletons with a given API version.
 
     :param version: 1 or 2. If `None`, pulled from the `useProtocolApiV2`
@@ -70,7 +73,7 @@ def reset_globals(version=None, loop=None):
     global hardware
 
     robot, reset, instruments, containers, labware, modules, hardware\
-        = build_globals(version, loop)
+        = build_globals(version, loop, hw_override)
 
 
 robot, reset, instruments, containers, labware, modules, hardware\

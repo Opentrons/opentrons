@@ -3,12 +3,15 @@
 import asyncio
 import copy
 import functools
+import logging
 import threading
+import time
 from typing import List, Mapping
 
 from . import API
 from .types import Axis, HardwareAPILike
 
+log = logging.getLogger(__name__)
 
 try:
     from .socket_client import JsonRpcAdapter as jra
@@ -43,12 +46,13 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
     """
 
     @classmethod
-    def build(cls, builder, *args, build_loop=None, **kwargs):
+    def build(cls, builder, *args, build_loop=None, own_loop=True, **kwargs):
         """ Build a hardware control API and initialize the adapter in one call
 
         :param builder: the builder method to use (e.g.
                         :py:meth:`hardware_control.API.build_hardware_simulator`)
         :param args: Args to forward to the builder method
+        :param build_loop: kwarg only. A loop to use to build the api.
         :param kwargs: Kwargs to forward to the builder method
         """
         loop = asyncio.new_event_loop()
@@ -60,11 +64,12 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
             api = checked_loop.run_until_complete(builder(*args, **kwargs))
         else:
             api = builder(*args, **kwargs)
-        return cls(api, loop)
+        return cls(api, loop, own_loop=own_loop)
 
     def __init__(self,
                  api: API,
-                 loop: asyncio.AbstractEventLoop = None) -> None:
+                 loop: asyncio.AbstractEventLoop = None,
+                 own_loop: bool = True) -> None:
         """ Build the SynchronousAdapter.
 
         :param api: The API instance to wrap
@@ -74,17 +79,40 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
                      be run elsewhere. If not specified (which should be the
                      normal use case) the adapter will start a new event loop
                      for the worker thread.
+        :param own_loop: ``True`` (default) to own the loop that executes
+                         calls, and run it in a separate thread. If ``False``,
+                         the loop is not explicitly run and is assumed to be
+                         running in another thread. This is useful if the calls
+                         to the adapter are coming from a worker thread and the
+                         loop is in a main thread.
+
+        The arguments here have basically three different cases of combination:
+        - loop specified as a loop, own_loop = True: adapter was created in the
+          main thread and the loop is being injected (tests, mostly)
+        - loop not specified, own_loop = True: Adapter was created in the main
+          thread and can run whatever it wants
+        - loop specified, own_loop = False: Adapter is being called from a
+          worker thread and the specified loop is being run in either the main
+          thread or a different worker, presumably shared
+
+        Not specifying the loop and also setting own_loop=False is not allowed
+        and results in an exception.
         """
+        if not loop and not own_loop:
+            raise RuntimeError("No loop specified and cannot create")
         checked_loop = loop or asyncio.new_event_loop()
         api.set_loop(checked_loop)
         self._loop = checked_loop
         self._api = api
         self._call_lock = threading.Lock()
         self._cached_sync_mods: Mapping[str, SynchronousAdapter] = {}
-        super().__init__(
-            target=self._event_loop_in_thread,
-            name='SynchAdapter thread for {}'.format(repr(api)))
-        super().start()
+        if own_loop:
+            super().__init__(
+                target=self._event_loop_in_thread,
+                name='SynchAdapter thread for {}'.format(repr(api)))
+            super().start()
+        else:
+            super().__init__()
 
     def _event_loop_in_thread(self):
         loop = object.__getattribute__(self, '_loop')
@@ -95,7 +123,8 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
         thread_loop = object.__getattribute__(self, '_loop')
         if thread_loop.is_running():
             thread_loop.call_soon_threadsafe(lambda: thread_loop.stop())
-        super().join()
+        if object.__getattribute__(self, 'is_alive')():
+            super().join()
 
     def __del__(self):
         try:
@@ -227,8 +256,10 @@ class SingletonAdapter(HardwareAPILike):
     async def get_attached_pipettes(self):
         """ Mimic the behavior of robot.get_attached_pipettes"""
         api = object.__getattribute__(self, '_api')
+        log.info(f"get attached instruments: api is {api}")
         instrs = {}
         attached = await api.attached_instruments
+        log.info(f"attached instruments: {attached}")
         for mount, data in attached.items():
             instrs[mount.name.lower()] = {
                 'model': data.get('model', None),
