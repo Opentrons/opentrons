@@ -100,6 +100,20 @@ class InstrumentsWrapper(object):
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
 
+    def P20_Multi_GEN2(
+            self,
+            mount,
+            trash_container='',
+            tip_racks=[],
+            aspirate_flow_rate=None,
+            dispense_flow_rate=None,
+            min_volume=None,
+            max_volume=None):
+        return self.pipette_by_name(mount, 'p20_multi_GEN2',
+                                    trash_container, tip_racks,
+                                    aspirate_flow_rate, dispense_flow_rate,
+                                    min_volume, max_volume)
+
     def P50_Single(
             self,
             mount,
@@ -152,6 +166,20 @@ class InstrumentsWrapper(object):
             min_volume=None,
             max_volume=None):
         return self.pipette_by_name(mount, 'p300_single_GEN2',
+                                    trash_container, tip_racks,
+                                    aspirate_flow_rate, dispense_flow_rate,
+                                    min_volume, max_volume)
+
+    def P300_Multi_GEN2(
+            self,
+            mount,
+            trash_container='',
+            tip_racks=[],
+            aspirate_flow_rate=None,
+            dispense_flow_rate=None,
+            min_volume=None,
+            max_volume=None):
+        return self.pipette_by_name(mount, 'p300_multi_GEN2',
                                     trash_container, tip_racks,
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
