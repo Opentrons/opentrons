@@ -130,6 +130,7 @@ class Pipette(CommandPublisher):
             dispense_flow_rate=None,
             plunger_current=0.5,
             drop_tip_current=0.5,
+            return_tip_height=None,
             drop_tip_speed=DEFAULT_DROP_TIP_SPEED,
             plunger_positions=PLUNGER_POSITIONS,
             pick_up_current=DEFAULT_PLUNGE_CURRENT,
@@ -207,6 +208,10 @@ class Pipette(CommandPublisher):
             raise TypeError(
                 'Invalid type {} for microlters/mm function'.format(
                     volume_fn_type))
+
+        self._return_tip_height = return_tip_height
+        if not self._return_tip_height:
+            self._return_tip_height = 0.5
 
         self._pick_up_current = None
         self.set_pick_up_current(DEFAULT_PLUNGE_CURRENT)
@@ -1073,7 +1078,7 @@ class Pipette(CommandPublisher):
             # When container typing is implemented, make sure that
             # when returning to a tiprack, tips are dropped within the rack
             if 'rack' in location.get_parent().get_type():
-                half_tip_length = self._check_tip_length_quirk()
+                half_tip_length = self._tip_length * self._return_tip_height
                 location = location.top(-half_tip_length)
             elif 'trash' in location.get_parent().get_type():
                 loc, coords = location.top()
@@ -1121,11 +1126,6 @@ class Pipette(CommandPublisher):
         )
 
         return self
-
-    def _check_tip_length_quirk(self):
-        if 'returnTipHeight' in self.quirks:
-            return self._tip_length / 1.2
-        return self._tip_length / 2
 
     def _shake_off_tips(self, location, quirk):
         # tips don't always fall off, especially if resting against

@@ -118,7 +118,7 @@
               "type": "object",
               "value": { "$ref": "#/definitions/positiveNumber" }
             },
-            "returnTipHeight": { "$ref": "#/definitions/returnTipHeightRange"}
+            "returnTipHeight": { "$ref": "#/definitions/returnTipHeightRange" }
           }
         }
       }

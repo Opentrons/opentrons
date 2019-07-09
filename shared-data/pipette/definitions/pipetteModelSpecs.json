@@ -3440,7 +3440,5 @@
     "defaultDispenseFlowRate",
     "quirks"
   ],
-  "validQuirks": [
-    "pickupTipShake", "dropTipShake", "doubleDropTip"
-  ]
+  "validQuirks": ["pickupTipShake", "dropTipShake", "doubleDropTip"]
 }

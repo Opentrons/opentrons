@@ -36,7 +36,8 @@ pipette_config = namedtuple(
         'tip_length',  # TODO (andy): remove from pipette, move to tip-rack
         'display_name',
         'name',
-        'backcompat_name'
+        'backcompat_name',
+        'return_tip_height'
     ]
 )
 
@@ -188,7 +189,8 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
         tip_length=ensure_value(cfg, 'tipLength', MUTABLE_CONFIGS),
         display_name=ensure_value(cfg, 'displayName', MUTABLE_CONFIGS),
         name=cfg.get('name'),
-        backcompat_name=cfg.get('backcompatName')
+        backcompat_name=cfg.get('backcompatName'),
+        return_tip_height=cfg.get('returnTipHeight')
     )
 
     return res
