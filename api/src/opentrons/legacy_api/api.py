@@ -52,9 +52,7 @@ class InstrumentsWrapper(object):
         pipette_model_version = self.retrieve_version_number(
             mount, name_or_model)
         attached = self.robot.get_attached_pipettes()
-        if attached[mount]['model'] == pipette_model_version\
-           and attached[mount]['id']\
-           and attached[mount]['id'] != 'uncommissioned':
+        if attached[mount]['id'] and attached[mount]['id'] != 'uncommissioned':
             pip_id = attached[mount]['id']
         else:
             pip_id = None
@@ -88,7 +86,7 @@ class InstrumentsWrapper(object):
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
 
-    def P20_Plus_Single(
+    def P20_Single_GEN2(
             self,
             mount,
             trash_container='',
@@ -97,7 +95,7 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
-        return self.pipette_by_name(mount, 'p+20_single',
+        return self.pipette_by_name(mount, 'p20_single_GEN2',
                                     trash_container, tip_racks,
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
@@ -144,7 +142,7 @@ class InstrumentsWrapper(object):
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
 
-    def P300_Plus_Single(
+    def P300_Single_GEN2(
             self,
             mount,
             trash_container='',
@@ -153,7 +151,7 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
-        return self.pipette_by_name(mount, 'p+300_single',
+        return self.pipette_by_name(mount, 'p300_single_GEN2',
                                     trash_container, tip_racks,
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
@@ -186,7 +184,7 @@ class InstrumentsWrapper(object):
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
 
-    def P1000_Plus_Single(
+    def P1000_Single_GEN2(
             self,
             mount,
             trash_container='',
@@ -195,7 +193,7 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
-        return self.pipette_by_name(mount, 'p+1000_single',
+        return self.pipette_by_name(mount, 'p1000_single_GEN2',
                                     trash_container, tip_racks,
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
@@ -214,17 +212,19 @@ class InstrumentsWrapper(object):
             mount, name_or_model)
         config = pipette_config.load(pipette_model_version, pip_id)
 
-        if pip_id and name_or_model not in pipette_model_version:
+        if pip_id and config.backcompat_name == name_or_model:
             log.warning(
                 f"Using a deprecated constructor for {pipette_model_version}")
             constructor_config = pipette_config.name_config()[name_or_model]
             config = config._replace(
                 min_volume=constructor_config['minVolume'],
                 max_volume=constructor_config['maxVolume'])
+            name_or_model = config.name
         return self._create_pipette_from_config(
             config=config,
             mount=mount,
-            name=pipette_model_version,
+            name=name_or_model,
+            model=pipette_model_version,
             trash_container=trash_container,
             tip_racks=tip_racks,
             aspirate_flow_rate=aspirate_flow_rate,
@@ -237,6 +237,7 @@ class InstrumentsWrapper(object):
             config,
             mount,
             name,
+            model=None,
             trash_container='',
             tip_racks=[],
             aspirate_flow_rate=None,
@@ -258,12 +259,7 @@ class InstrumentsWrapper(object):
             'bottom': config.bottom,
             'blow_out': config.blow_out,
             'drop_tip': config.drop_tip}
-        if '_v' in name:
-            model = name
-            name = name.split('_v')[0]
-        else:
-            model = name
-            name = name
+
         p = self.Pipette(
             model_offset=config.model_offset,
             mount=mount,
@@ -292,36 +288,26 @@ class InstrumentsWrapper(object):
         return p
 
     def retrieve_version_number(self, mount, expected_model_substring):
-        if pipette_config.HAS_MODEL_RE.match(expected_model_substring):
-            return expected_model_substring
-
         attached_model = robot.get_attached_pipettes()[mount]['model']
+        try:
+            attached_model_config = pipette_config.configs[attached_model]
+        except KeyError:
+            return list(filter(
+                lambda m: expected_model_substring == m.split('_v')[0],
+                pipette_config.config_models))[0]
 
-        if attached_model and\
-                'p+20' in attached_model and 'p10' in expected_model_substring:
-            # Special use-case where volume does not match, but we still
-            # want a valid model name to be passed
-            if attached_model.split('_')[1] ==\
-                    expected_model_substring.split('_')[1]:
-                return attached_model
-
-        if attached_model and expected_model_substring in attached_model:
+        if attached_model_config.get('name') == expected_model_substring:
             return attached_model
-        elif attached_model and '+' in attached_model and\
-                expected_model_substring.split('p')[1] in\
-                attached_model.split('+')[1]:
-            # Allow for backwards compatibility in old pipette constructors
+        elif attached_model_config.get('backcompatName') ==\
+                expected_model_substring:
             return attached_model
         else:
-            # pass a default pipette model-version for when robot is simulating
-            # this allows any pipette to be simulated, regardless of what is
-            # actually attached/cached on the robot's mounts
-            #
-            # from all available config models that match the expected string,
-            # pick the first one for simulation
-            return list(filter(
-                lambda m: expected_model_substring in m,
-                pipette_config.config_models))[0]
+            # In the case that the expected model substring does not equal
+            # attached model name or backcompat name, then take the expected
+            # model substring and create a fallback model name.
+            if 'GEN2' in expected_model_substring:
+                return expected_model_substring.split('_GEN2')[0] + '_v2.0'
+            return expected_model_substring.split('_v')[0] + '_v1'
 
 
 instruments = InstrumentsWrapper(robot)
