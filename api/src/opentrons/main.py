@@ -21,10 +21,6 @@ except ImportError:
     async def install_hardware_server(sock_path, api):  # type: ignore
         log.warning("Cannot start hardware server: missing dependency")
 
-    class JsonRpcSingletonAdapter:
-        def __init__(self, *args, **kwargs):
-            raise RuntimeError(
-                "Cannot run as hardware client: missing dependency")
 
 log = logging.getLogger(__name__)
 
@@ -133,7 +129,6 @@ def run(**kwargs):  # noqa(C901)
     local_hardware = hardware
     if kwargs.get('hardware_client'):
         if ff.use_protocol_api_v2():
-            log.info(f"Hardware was {hardware} {id(hardware)}")
             log.info("Starting hardware controller client")
             local_hardware = loop.run_until_complete(
                 JsonRpcSingletonAdapter.build(
@@ -143,7 +138,6 @@ def run(**kwargs):  # noqa(C901)
                 f"Connected hardware client to "
                 f"{kwargs['hardware_server_socket']}")
             reset_globals(2, loop, local_hardware)
-            log.info(f"Hardware now contains {hardware} {id(hardware)}")
         else:
             log.warning(
                 "Hardware client requested but apiv1 selected, not starting")

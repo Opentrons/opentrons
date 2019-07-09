@@ -5,7 +5,6 @@ import copy
 import functools
 import logging
 import threading
-import time
 from typing import List, Mapping
 
 from . import API

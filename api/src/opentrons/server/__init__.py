@@ -100,7 +100,6 @@ def init(loop=None, hardware: 'HardwareAPILike' = None):
         checked_hardware = hardware
     else:
         checked_hardware = opentrons.hardware
-    log.info(f"Server using hardware {checked_hardware} {id(checked_hardware)}")
     app['com.opentrons.hardware'] = checked_hardware
     app['com.opentrons.motion_lock'] = ThreadedAsyncLock()
     app['com.opentrons.rpc'] = RPCServer(

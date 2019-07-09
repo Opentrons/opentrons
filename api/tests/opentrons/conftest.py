@@ -372,7 +372,7 @@ def sync_hardware(request, loop, virtual_smoothie_env):
 @pytest.fixture
 def main_router(loop, virtual_smoothie_env, hardware):
     from opentrons.api.routers import MainRouter
-    router = MainRouter(hardware, loop)
+    router = MainRouter(hardware, loop, allow_own_loop=True)
     router.wait_until = partial(
         wait_until,
         notifications=router.notifications,
