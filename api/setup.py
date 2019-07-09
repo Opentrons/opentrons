@@ -196,5 +196,8 @@ if __name__ == "__main__":
             'Source Code On Github':
             "https://github.com/Opentrons/opentrons/tree/edge/api",
             'Documentation': "https://docs.opentrons.com"
+        },
+        extras_require={
+            'hc_jsonrpc': ['jsonrpcclient>=3.3.3', 'jsonrpcserver>=4.0.4']
         }
     )
