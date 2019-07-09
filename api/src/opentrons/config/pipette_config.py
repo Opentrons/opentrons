@@ -35,7 +35,8 @@ pipette_config = namedtuple(
         'ul_per_mm',
         'quirks',
         'tip_length',  # TODO (andy): remove from pipette, move to tip-rack
-        'display_name'
+        'display_name',
+        'return_tip_height'
     ]
 )
 
