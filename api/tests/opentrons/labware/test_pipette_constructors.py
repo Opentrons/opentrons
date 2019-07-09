@@ -22,7 +22,7 @@ factories = [
 backcompat_pips = [
     ('p20_single_GEN2', 'p10_single', instruments.P10_Single),
     ('p300_single_GEN2', 'p300_single', instruments.P300_Single),
-	('p20_multi_GEN2', 'p10_multi', instruments.P10_Multi),
+    ('p20_multi_GEN2', 'p10_multi', instruments.P10_Multi),
     ('p300_multi_GEN2', 'p300_multi', instruments.P300_Multi),
     ('p1000_single_GEN2', 'p1000_single', instruments.P1000_Single),
 ]
