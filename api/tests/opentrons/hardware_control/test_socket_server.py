@@ -241,3 +241,15 @@ async def test_client_property(socket_adapter, which_prop, loop):
     remote_prop = await getattr(client, which_prop)
     local_prop = await getattr(sim, which_prop)
     assert remote_prop == local_prop
+
+
+async def test_adapter_method(socket_adapter, loop, monkeypatch):
+    """ Test methods with arguments and returns that need serialization """
+    client, server = socket_adapter
+    resp = await client.cache_instruments(
+        require={Mount.LEFT: 'p300_single_v1.5',
+                 Mount.RIGHT: 'p1000_single_v1'})
+    assert resp is None
+    gai_resp = await client.get_attached_instruments()
+    attached = await server._api.attached_instruments
+    assert gai_resp == attached
