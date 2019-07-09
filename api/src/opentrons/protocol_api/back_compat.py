@@ -72,7 +72,6 @@ class BCRobot:
         except RuntimeError:  # If this was called from an async context
             return 'unknown'  # return a default
 
-
     def __getattr__(self, name):
         """ Provide transparent access to the protocol context """
         return getattr(self._ctx, name)
