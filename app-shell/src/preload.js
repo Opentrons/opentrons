@@ -10,5 +10,4 @@ global.APP_SHELL_REMOTE = {
   config: remote.require('./config'),
   discovery: remote.require('./discovery'),
   update: remote.require('./update'),
-  buildroot: remote.require('./buildroot'),
 }

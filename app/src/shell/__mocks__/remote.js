@@ -21,8 +21,4 @@ module.exports = {
     CURRENT_VERSION: '0.0.0',
     CURRENT_RELEASE_NOTES: 'Release notes for 0.0.0',
   },
-  buildroot: {
-    getBuildrootUpdateInfo: jest.fn(),
-    getUpdateFileContents: jest.fn(),
-  },
 }

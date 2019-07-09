@@ -1,24 +1,22 @@
 // @flow
 import semver from 'semver'
-import remote from './remote'
 import type { State, Action } from '../types'
 
 export type BuildrootUpdateInfo = {|
-  filename: string,
-  apiVersion: string,
-  serverVersion: string,
+  version: string,
+  releaseNotes: string,
 |}
 
 export type BuildrootState = {
   seen: boolean,
+  downloadProgress: null,
+  downloadError: string | null,
   info: BuildrootUpdateInfo | null,
 }
 
-const {
-  buildroot: { getUpdateFileContents },
-} = remote
-
 export type BuildrootAction =
+  | {| type: 'buildroot:DOWNLOAD_PROGRESS', payload: number |}
+  | {| type: 'buildroot:DOWNLOAD_ERROR', payload: string |}
   | {| type: 'buildroot:UPDATE_INFO', payload: BuildrootUpdateInfo | null |}
   | {| type: 'buildroot:SET_UPDATE_SEEN' |}
 
@@ -26,10 +24,13 @@ export function setBuildrootUpdateSeen(): BuildrootAction {
   return { type: 'buildroot:SET_UPDATE_SEEN' }
 }
 
-const INITIAL_STATE = {
+export const INITIAL_STATE: BuildrootState = {
   seen: false,
   info: null,
+  downloadProgress: null,
+  downloadError: null,
 }
+
 export function buildrootReducer(
   state: BuildrootState = INITIAL_STATE,
   action: Action
@@ -39,7 +40,12 @@ export function buildrootReducer(
       return { ...state, info: action.payload }
     case 'buildroot:SET_UPDATE_SEEN':
       return { ...state, seen: true }
+    case 'buildroot:DOWNLOAD_PROGRESS':
+      return { ...state, downloadProgress: action.payload }
+    case 'buildroot:DOWNLOAD_ERROR':
+      return { ...state, downloadError: action.payload }
   }
+
   return state
 }
 
@@ -53,10 +59,12 @@ export function getBuildrootUpdateSeen(state: State): boolean {
   return state.shell.buildroot?.seen || false
 }
 
-// caution: this calls an Electron RPC remote, so use sparingly
-export function getBuildrootUpdateContents(): Promise<Blob> {
-  return getUpdateFileContents().then(contents => new Blob([contents]))
-}
+// TODO(mc, 2019-07-08): because of the size of this file, we should have
+// update request streamed directly from the main process. Remove this
+// commented out function when we have that in place
+// export function getBuildrootUpdateContents(): Promise<Blob> {
+//   return getUpdateFileContents().then(contents => new Blob([contents]))
+// }
 
 const compareCurrentVersionToUpdate = (
   currentVersion: ?string,
@@ -75,7 +83,7 @@ export function getBuildrootUpdateAvailable(
   state: State,
   currentVersion: string
 ): boolean {
-  const updateVersion = getBuildrootUpdateInfo(state)?.apiVersion
+  const updateVersion = getBuildrootUpdateInfo(state)?.version
   if (currentVersion && updateVersion) {
     return compareCurrentVersionToUpdate(currentVersion, updateVersion)
   }
