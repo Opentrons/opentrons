@@ -21,6 +21,10 @@
   }
 }
 
+.pipette_display_name {
+  width: min-content;
+}
+
 .image {
   height: 8rem;
   width: 2.25rem;
