@@ -80,6 +80,30 @@ describe('shell/buildroot', () => {
         },
       },
       {
+        name: 'getBuildrootDownloadError',
+        selector: buildroot.getBuildrootDownloadError,
+        state: {
+          shell: {
+            buildroot: {
+              downloadError: 'error with download',
+            },
+          },
+        },
+        expected: 'error with download',
+      },
+      {
+        name: 'getBuildrootDownloadProgress',
+        selector: buildroot.getBuildrootDownloadProgress,
+        state: {
+          shell: {
+            buildroot: {
+              downloadProgress: 10,
+            },
+          },
+        },
+        expected: 10,
+      },
+      {
         name: 'getBuildrootUpdateSeen',
         selector: buildroot.getBuildrootUpdateSeen,
         state: {
