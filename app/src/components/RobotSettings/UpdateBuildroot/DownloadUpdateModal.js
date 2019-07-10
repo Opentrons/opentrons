@@ -25,11 +25,13 @@ export default function DownloadUpdate(props: Props) {
         <p>Some informative text about connecting to the internet</p>
       </>
     )
+  } else {
+    message = <p>Download progress: 0%</p>
   }
   return (
     <AlertModal heading={HEADING} buttons={[notNowButton]} alertOverlay>
       <h2>Screens not fully implemented!</h2>
-      <h3>{message}</h3>
+      {message}
     </AlertModal>
   )
 }
