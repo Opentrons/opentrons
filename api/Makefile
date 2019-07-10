@@ -46,7 +46,7 @@ br_ssh_key ?= ~/.ssh/robot_key
 # Pubkey location for buildroot robot to install with install-key
 br_ssh_pubkey ?= $(br_ssh_key).pub
 # Other SSH args for buildroot robots
-br_ssh_opts ?= -o stricthostkeychecking=no
+ssh_opts ?= -o stricthostkeychecking=no -o userknownhostsfile=/dev/null
 
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 
@@ -160,8 +160,8 @@ push: wheel
 
 .PHONY: push-buildroot
 push-buildroot: wheel
-	scp -i $(br_ssh_key) $(br_ssh_opts) $(wheel_file) root@$(host):/data/
-	ssh -i $(br_ssh_key) $(br_ssh_opts) root@$(host) \
+	scp -i $(br_ssh_key) $(ssh_opts) $(wheel_file) root@$(host):/data/
+	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host) \
 "function cleanup () { rm -f /data/opentrons*.whl && mount -o remount,ro / && systemctl start opentrons-api-server; } ;\
 systemctl stop opentrons-api-server &&\
 mount -o remount,rw / &&\
@@ -211,4 +211,4 @@ change-left:
 # User must currently specify host, e.g.: `make term host=169.254.202.176`
 .PHONY: term
 term:
-	ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no root@$(host)
+	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host)
