@@ -4,6 +4,7 @@ This should not be imported directly; it is used to provide backwards
 compatible singletons in opentrons/__init__.py.
 """
 
+import asyncio
 import importlib.util
 from typing import Any, List
 
@@ -37,9 +38,11 @@ class BCRobot:
 
     def __init__(self,
                  hardware: hc.adapters.SingletonAdapter,
-                 protocol_ctx: ProtocolContext) -> None:
+                 protocol_ctx: ProtocolContext,
+                 loop: asyncio.AbstractEventLoop = None) -> None:
         self._hardware = hardware
         self._ctx = protocol_ctx
+        self._loop = loop or asyncio.get_event_loop()
 
     def connect(self, port: str = None,
                 options: Any = None):
@@ -64,7 +67,10 @@ class BCRobot:
 
     @property
     def fw_version(self):
-        return self._hardware.fw_version
+        try:
+            return self._loop.run_until_complete(self._hardware.fw_version)
+        except RuntimeError:  # If this was called from an async context
+            return 'unknown'  # return a default
 
     def __getattr__(self, name):
         """ Provide transparent access to the protocol context """
@@ -289,7 +295,7 @@ class BCModules:
 def build_globals(hardware=None, loop=None):
     hw = hardware or hc.adapters.SingletonAdapter(loop)
     ctx = ProtocolContext(loop)
-    rob = BCRobot(hw, ctx)
+    rob = BCRobot(hw, ctx, loop)
     instr = BCInstruments(ctx)
     lw = BCLabware(ctx)
     mod = BCModules(ctx)
