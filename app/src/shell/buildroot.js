@@ -59,6 +59,14 @@ export function getBuildrootUpdateSeen(state: State): boolean {
   return state.shell.buildroot?.seen || false
 }
 
+export function getBuildrootDownloadProgress(state: State): number | null {
+  return state.shell.buildroot.downloadProgress || null
+}
+
+export function getBuildrootDownloadError(state: State): string | null {
+  return state.shell.buildroot.downloadError || null
+}
+
 // TODO(mc, 2019-07-08): because of the size of this file, we should have
 // update request streamed directly from the main process. Remove this
 // commented out function when we have that in place

@@ -4,10 +4,16 @@ import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 
 import { getRobotBuildrootStatus } from '../../../discovery'
-import { getBuildrootUpdateInfo, setBuildrootUpdateSeen } from '../../../shell'
+import {
+  getBuildrootUpdateInfo,
+  getBuildrootDownloadProgress,
+  getBuildrootDownloadError,
+  setBuildrootUpdateSeen,
+} from '../../../shell'
 import { makeGetRobotUpdateInfo } from '../../../http-api-client'
 
 import SystemUpdateModal from './SystemUpdateModal'
+import DownloadUpdateModal from './DownloadUpdateModal'
 import ReleaseNotesModal from './ReleaseNotesModal'
 
 import type { State, Dispatch } from '../../../types'
@@ -23,6 +29,8 @@ type OP = {|
 type SP = {|
   buildrootStatus: BuildrootStatus | null,
   buildrootUpdateInfo: BuildrootUpdateInfo | null,
+  buildrootDownloadProgress: number | null,
+  buildrootDownloadError: string | null,
   robotUpdateInfo: RobotUpdateInfo,
 |}
 
@@ -38,8 +46,9 @@ function ViewUpdateModal(props: Props) {
     ignoreUpdate,
     robotUpdateInfo,
     buildrootUpdateInfo,
+    buildrootDownloadError,
+    buildrootDownloadProgress,
   } = props
-  // TODO (ka 2019-7-10): This does not need to be a link or remove merge props
   const notNowButton = {
     onClick: ignoreUpdate,
     children: 'not now',
@@ -50,6 +59,14 @@ function ViewUpdateModal(props: Props) {
       <SystemUpdateModal
         notNowButton={notNowButton}
         viewReleaseNotes={viewReleaseNotes}
+      />
+    )
+  } else if (!buildrootUpdateInfo) {
+    return (
+      <DownloadUpdateModal
+        notNowButton={notNowButton}
+        error={buildrootDownloadError}
+        progress={buildrootDownloadProgress}
       />
     )
   } else if (showReleaseNotes && robotUpdateInfo.type === 'upgrade') {
@@ -69,6 +86,8 @@ function mapStateToProps(): (state: State, ownProps: OP) => SP {
   return (state, ownProps) => ({
     buildrootStatus: getRobotBuildrootStatus(ownProps.robot),
     buildrootUpdateInfo: getBuildrootUpdateInfo(state),
+    buildrootDownloadProgress: getBuildrootDownloadProgress(state),
+    buildrootDownloadError: getBuildrootDownloadError(state),
     robotUpdateInfo: getRobotUpdateInfo(state, ownProps.robot),
   })
 }
