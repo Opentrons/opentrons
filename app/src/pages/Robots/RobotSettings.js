@@ -15,11 +15,7 @@ import {
   getRobotApiVersion,
   getRobotBuildrootStatus,
 } from '../../discovery'
-import {
-  getBuildrootUpdateAvailable,
-  getBuildrootUpdateSeen,
-  setBuildrootUpdateSeen,
-} from '../../shell'
+import { getBuildrootUpdateSeen, setBuildrootUpdateSeen } from '../../shell'
 
 import {
   makeGetRobotHome,
@@ -62,7 +58,6 @@ type SP = {|
   showConnectAlert: boolean,
   homeInProgress: ?boolean,
   homeError: ?Error,
-  buildrootUpdateAvailable: boolean,
   __buildRootEnabled: boolean,
   buildrootUpdateSeen: boolean,
   buildrootStatus: BuildrootStatus | null,
@@ -101,7 +96,6 @@ function RobotSettingsPage(props: Props) {
     closeConnectAlert,
     showUpdateModal,
     buildrootStatus,
-    buildrootUpdateAvailable,
     ignoreBuildrootUpdate,
     match: { path, url },
   } = props
@@ -140,7 +134,6 @@ function RobotSettingsPage(props: Props) {
                   appUpdate={appUpdate}
                   parentUrl={url}
                   buildrootStatus={buildrootStatus}
-                  buildrootUpdateAvailable={buildrootUpdateAvailable}
                   ignoreBuildrootUpdate={ignoreBuildrootUpdate}
                 />
               )
@@ -211,9 +204,6 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
     const ignoredRequest = getUpdateIgnoredRequest(state, robot)
     const restartRequest = getRestartRequest(state, robot)
     const updateInfo = getRobotUpdateInfo(state, robot)
-
-    const buildrootUpdateAvailable =
-      !!robotVersion && getBuildrootUpdateAvailable(state, robotVersion)
     const buildrootStatus = getRobotBuildrootStatus(robot)
     const buildrootUpdateSeen = getBuildrootUpdateSeen(state)
     const __buildRootEnabled = Boolean(
@@ -221,13 +211,8 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
     )
     let showUpdateModal: ?boolean
     if (__buildRootEnabled) {
-      if (!buildrootUpdateSeen) {
-        showUpdateModal =
-          // version mismatch or robot is still on balena
-          robotVersion !== updateInfo.version || buildrootStatus === 'balena'
-      } else {
-        showUpdateModal = false
-      }
+      showUpdateModal =
+        !buildrootUpdateSeen && robotVersion !== updateInfo.version
     } else {
       showUpdateModal =
         // only show the alert modal if there's an upgrade available
@@ -246,7 +231,6 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
     return {
       __buildRootEnabled,
       buildrootStatus,
-      buildrootUpdateAvailable,
       buildrootUpdateSeen,
       showUpdateModal: !!showUpdateModal,
       homeInProgress: homeRequest && homeRequest.inProgress,
