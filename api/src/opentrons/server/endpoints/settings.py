@@ -121,9 +121,8 @@ async def reset(request: web.Request) -> web.Response:  # noqa(C901)
             config.tip_length.clear()
         rc.save_robot_settings(config)
     if data.get('labwareCalibration'):
-        if ff.use_protocol_api_v2():
-            labware.clear_calibrations()
-        else:
+        labware.clear_calibrations()
+        if not ff.use_protocol_api_v2():
             db.reset()
 
     if data.get('customLabware'):
