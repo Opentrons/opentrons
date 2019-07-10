@@ -87,9 +87,10 @@ function validateDefinition(definition: Definition): Definition {
   const valid = validate(definition)
 
   if (!valid) {
+    console.error('Definition:', definition)
+    console.error('Validation Errors:', validate.errors)
     throw new Error(
-      'Labware failed to validate against the schema:\n\n' +
-        JSON.stringify(validate.errors, null, 4)
+      'Generated labware failed to validate, please check your inputs'
     )
   }
 

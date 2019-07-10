@@ -200,8 +200,9 @@
     "wells": {
       "type": "object",
       "description": "Unordered object of well objects with position and dimensional information",
+      "additionalProperties": false,
       "patternProperties": {
-        "['A' - 'Z'][*]": {
+        "[A-Z][0-9]+": {
           "type": "object",
           "additionalProperties": false,
           "required": ["depth", "shape", "totalLiquidVolume", "x", "y", "z"],
