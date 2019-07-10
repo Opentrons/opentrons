@@ -74,6 +74,7 @@ function ViewUpdateModal(props: Props) {
       <ReleaseNotesModal
         notNowButton={notNowButton}
         releaseNotes={buildrootUpdateInfo?.releaseNotes}
+        buildrootStatus={buildrootStatus}
       />
     )
   }
