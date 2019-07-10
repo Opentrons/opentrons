@@ -1051,7 +1051,7 @@ class Pipette(CommandPublisher):
             self._working_volume = float(
                 min(self.max_volume, location.max_volume()))
         except KeyError:
-            log.warning('No tip liquid volume, defaulting to max volume.')
+            log.info('No tip liquid volume, defaulting to max volume.')
             self._working_volume = float(self.max_volume)
         return self
 
