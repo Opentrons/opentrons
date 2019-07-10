@@ -66,17 +66,15 @@ describe('shell/buildroot', () => {
           shell: {
             buildroot: {
               info: {
-                filename: 'foobar.zip',
-                apiVersion: '1.0.0',
-                serverVersion: '1.0.0',
+                releaseNotes: 'some release notes',
+                version: '1.0.0',
               },
             },
           },
         },
         expected: {
-          filename: 'foobar.zip',
-          apiVersion: '1.0.0',
-          serverVersion: '1.0.0',
+          releaseNotes: 'some release notes',
+          version: '1.0.0',
         },
       },
       {
