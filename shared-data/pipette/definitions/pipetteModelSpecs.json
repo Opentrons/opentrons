@@ -3778,7 +3778,8 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["dropTipShake"]
+      "quirks": ["dropTipShake", "pickupTipShake"],
+      "returnTipHeight": 0.83
     }
   },
   "mutableConfigs": [
