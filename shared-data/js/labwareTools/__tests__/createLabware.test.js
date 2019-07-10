@@ -1,7 +1,7 @@
 import omit from 'lodash/omit'
 import range from 'lodash/range'
 
-import { createRegularLabware } from '../index.js'
+import { createRegularLabware } from '..'
 
 import fixture_regular_example_1 from '../../../labware/fixtures/2/fixture_regular_example_1.json'
 import fixture_regular_example_2 from '../../../labware/fixtures/2/fixture_regular_example_2.json'
@@ -28,12 +28,15 @@ describe('createLabware', () => {
   let labware2
   let well1
   let well2
+  let offset1
+  let offset2
 
   beforeEach(() => {
     well1 = omit(exampleLabware1.wells.A1, ['x', 'y', 'z'])
     well2 = omit(exampleLabware2.wells.A1, ['x', 'y', 'z'])
-    const offset1 = { x: 10, y: 10, z: 55 }
-    const offset2 = { x: 10, y: 10, z: 50 }
+    offset1 = { x: 10, y: 10, z: 55 }
+    offset2 = { x: 10, y: 10, z: 40 }
+
     labware1 = createRegularLabware({
       metadata: exampleLabware1.metadata,
       parameters: exampleLabware1.parameters,
@@ -52,7 +55,7 @@ describe('createLabware', () => {
       dimensions: exampleLabware2.dimensions,
       offset: offset2,
       grid: { row: 3, column: 2 },
-      spacing: { row: 9, column: 9 },
+      spacing: { row: 10, column: 10 },
       well: well2,
       namespace: 'fixture',
     })
@@ -72,35 +75,38 @@ describe('createLabware', () => {
   })
 
   test('well XYZ generates correctly', () => {
-    const spacing = { row: 11.8, column: 12.1 }
-    const grid = { row: 8, column: 12 }
-    const offset = { x: 10, y: 10, z: 55 }
+    const spacing = { row: 10, column: 10 }
+    const grid = { row: 3, column: 2 }
+
+    const { yDimension } = exampleLabware2.dimensions
     const labware3 = createRegularLabware({
       metadata: exampleLabware2.metadata,
       parameters: exampleLabware2.parameters,
       dimensions: exampleLabware2.dimensions,
-      offset,
+      offset: offset2,
       grid,
       spacing,
       well: well2,
     })
 
     const expectedXByCol = range(
-      offset.x,
-      grid.column * spacing.column + offset.x,
+      offset2.x,
+      offset2.x + grid.column * spacing.column,
       spacing.column
     )
+
     const expectedYByRow = range(
-      offset.y,
-      grid.row * spacing.row + offset.y,
-      spacing.row
-    ).reverse()
+      yDimension - offset2.y,
+      yDimension - offset2.y - spacing.row * grid.row,
+      -spacing.row
+    )
+
     labware3.ordering.forEach((column, cIndex) => {
       column.forEach((wellName, rIndex) => {
         const well = labware3.wells[wellName]
         expect(well.x).toBeCloseTo(expectedXByCol[cIndex], 2)
         expect(well.y).toBeCloseTo(expectedYByRow[rIndex], 2)
-        expect(well.z).toBeCloseTo(offset.z - well.depth, 2)
+        expect(well.z).toBeCloseTo(offset2.z - well.depth, 2)
       })
     })
   })
