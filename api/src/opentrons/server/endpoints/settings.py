@@ -121,9 +121,8 @@ async def reset(request: web.Request) -> web.Response:  # noqa(C901)
             config.tip_length.clear()
         rc.save_robot_settings(config)
     if data.get('labwareCalibration'):
-        if ff.use_protocol_api_v2():
-            labware.clear_calibrations()
-        else:
+        labware.clear_calibrations()
+        if not ff.use_protocol_api_v2():
             db.reset()
 
     if data.get('customLabware'):
@@ -239,8 +238,14 @@ async def set_log_level(request: web.Request) -> web.Response:
 
     logging.getLogger('opentrons').setLevel(level_val)
     hw = request.app['com.opentrons.hardware']
-    hw.update_config(log_level=log_level)
-    rc.save_robot_settings(hw.config)
+
+    if ff.use_protocol_api_v2():
+        await hw.update_config(log_level=log_level)
+        conf = await hw.config
+    else:
+        hw.update_config(log_level=log_level)
+        conf = hw.config
+    rc.save_robot_settings(conf)
     return web.json_response(
         status=200,
         data={'message': f'log_level set to {log_level}'})

@@ -10,8 +10,10 @@ import pkg from '../package.json'
 import createLogger from './log'
 
 // TODO(mc, 2018-08-08): figure out type exports from app
-import type { Action } from '@opentrons/app/src/types'
 import type { Config } from '@opentrons/app/src/config'
+import type { Action, Dispatch } from './types'
+
+export type { Config }
 
 // make sure all arguments are included in production
 const argv =
@@ -31,6 +33,11 @@ const DEFAULTS: Config = {
   // app update config
   update: {
     channel: pkg.version.includes('beta') ? 'beta' : 'latest',
+  },
+
+  buildroot: {
+    manifestUrl:
+      'https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json',
   },
 
   // logging config
@@ -87,7 +94,7 @@ const overrides = () => _over || (_over = yargsParser(argv, PARSE_ARGS_OPTS))
 const log = () => _log || (_log = createLogger(__filename))
 
 // initialize and register the config module with dispatches from the UI
-export function registerConfig(dispatch: Action => void) {
+export function registerConfig(dispatch: Dispatch) {
   return function handleIncomingAction(action: Action) {
     if (action.type === 'config:UPDATE') {
       const { payload } = action
@@ -113,6 +120,8 @@ export function getOverrides(path?: string) {
   return getIn(overrides(), path)
 }
 
+// TODO(mc, 2010-07-01): getConfig with path parameter can't be typed
+// Remove the path parameter
 export function getConfig(path?: string) {
   const result = store().get(path)
   const over = getIn(overrides(), path)

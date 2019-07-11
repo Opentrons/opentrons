@@ -73,8 +73,11 @@ function mapStateToProps(state: BaseState): SP {
     state
   )
 
+  // TODO(mc, 2019-06-27): µL to uL replacement needed to handle CSS capitalization
   const labwareNickname =
-    selectedLabwareId != null ? labwareNames[selectedLabwareId] : null
+    selectedLabwareId != null
+      ? labwareNames[selectedLabwareId].replace('µL', 'uL')
+      : null
   const labwareEntity =
     selectedLabwareId != null
       ? stepFormSelectors.getLabwareEntities(state)[selectedLabwareId]
@@ -133,8 +136,8 @@ function mapStateToProps(state: BaseState): SP {
           const nickname = uiLabwareSelectors.getLabwareNicknamesById(state)[
             drilledDownLabwareId
           ]
-          title = nickname
           // TODO(mc, 2019-06-27): µL to uL replacement needed to handle CSS capitalization
+          title = nickname.replace('µL', 'uL')
           subtitle =
             labwareDef && getLabwareDisplayName(labwareDef).replace('µL', 'uL')
         }

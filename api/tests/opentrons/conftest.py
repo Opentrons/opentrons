@@ -163,6 +163,26 @@ def using_api2(loop):
         opentrons.hardware.set_config(config.robot_configs.load())
 
 
+@contextlib.contextmanager
+def using_sync_api2(loop):
+    oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
+    os.environ['OT_API_FF_useProtocolApi2'] = '1'
+    opentrons.reset_globals(version=2, loop=loop)
+    try:
+        yield hc.adapters.SynchronousAdapter(opentrons.hardware)
+    finally:
+        try:
+            loop.run_until_complete(opentrons.hardware.reset())
+        except RuntimeError:
+            loop.create_task(opentrons.hardware.reset())
+        if None is oldenv:
+            os.environ.pop('OT_API_FF_useProtocolApi2')
+        else:
+            os.environ['OT_API_FF_useProtocolApi2'] = oldenv
+        opentrons.reset_globals(loop=loop)
+        opentrons.hardware.set_config(config.robot_configs.load())
+
+
 @pytest.fixture
 def ensure_api2(request, loop):
     with using_api2(loop):
@@ -331,6 +351,16 @@ def virtual_smoothie_env(monkeypatch):
 
 @pytest.fixture(params=[using_api1, using_api2])
 def hardware(request, loop, virtual_smoothie_env):
+    if request.node.get_marker('api1_only') and request.param != using_api1:
+        pytest.skip('requires api1 only')
+    elif request.node.get_marker('api2_only') and request.param != using_api2:
+        pytest.skip('requires api2 only')
+    with request.param(loop) as hw:
+        yield hw
+
+
+@pytest.fixture(params=[using_api1, using_sync_api2])
+def sync_hardware(request, loop, virtual_smoothie_env):
     if request.node.get_marker('api1_only') and request.param != using_api1:
         pytest.skip('requires api1 only')
     elif request.node.get_marker('api2_only') and request.param != using_api2:

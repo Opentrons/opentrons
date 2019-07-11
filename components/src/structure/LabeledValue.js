@@ -13,6 +13,8 @@ type Props = {
   value: React.Node,
   /** Additional className */
   className?: string,
+  /** Additional value className */
+  valueClassName?: string,
 }
 
 export default function LabeledValue(props: Props) {
@@ -22,7 +24,9 @@ export default function LabeledValue(props: Props) {
   return (
     <div className={className}>
       <p className={styles.labeled_value_label}>{label}:</p>
-      <p className={styles.labeled_value_value}>{value}</p>
+      <p className={cx(styles.labeled_value_value, props.valueClassName)}>
+        {value}
+      </p>
     </div>
   )
 }

@@ -64,7 +64,9 @@ const EditLabware = (props: Props) => {
     )
   } else {
     const isBeingDragged =
-      draggedItem && draggedItem.labwareOnDeck.slot === labwareOnDeck.slot
+      draggedItem &&
+      draggedItem.labwareOnDeck &&
+      draggedItem.labwareOnDeck.slot === labwareOnDeck.slot
 
     const contents = draggedItem ? (
       <div

@@ -1,7 +1,6 @@
 import copy
 import logging
 import json
-import re
 from collections import namedtuple
 from typing import Any, Dict, List, Union, Tuple, Sequence, Optional
 import pkgutil
@@ -35,7 +34,10 @@ pipette_config = namedtuple(
         'ul_per_mm',
         'quirks',
         'tip_length',  # TODO (andy): remove from pipette, move to tip-rack
-        'display_name'
+        'display_name',
+        'name',
+        'backcompat_name',
+        'return_tip_height'
     ]
 )
 
@@ -59,9 +61,6 @@ Z_OFFSET_P10 = -13  # longest single-channel pipette
 Z_OFFSET_P50 = 0
 Z_OFFSET_P300 = 0
 Z_OFFSET_P1000 = 20  # shortest single-channel pipette
-
-HAS_MODEL_RE = re.compile('^p.+_v.+$')
-#: If a prospective model string matches this, it has a full model number
 
 
 def model_config() -> Dict[str, Any]:
@@ -188,7 +187,10 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
         ul_per_mm=ul_per_mm,
         quirks=validate_quirks(ensure_value(cfg, 'quirks', MUTABLE_CONFIGS)),
         tip_length=ensure_value(cfg, 'tipLength', MUTABLE_CONFIGS),
-        display_name=ensure_value(cfg, 'displayName', MUTABLE_CONFIGS)
+        display_name=ensure_value(cfg, 'displayName', MUTABLE_CONFIGS),
+        name=cfg.get('name'),
+        backcompat_name=cfg.get('backcompatName'),
+        return_tip_height=cfg.get('returnTipHeight')
     )
 
     return res

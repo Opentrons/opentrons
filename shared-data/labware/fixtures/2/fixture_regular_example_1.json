@@ -29,7 +29,7 @@
       "totalLiquidVolume": 100,
       "diameter": 30,
       "x": 10,
-      "y": 10,
+      "y": 75.48,
       "z": 15,
       "shape": "circular"
     },
@@ -38,7 +38,7 @@
       "totalLiquidVolume": 100,
       "diameter": 30,
       "x": 20,
-      "y": 10,
+      "y": 75.48,
       "z": 15,
       "shape": "circular"
     }

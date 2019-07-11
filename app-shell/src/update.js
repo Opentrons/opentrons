@@ -7,17 +7,14 @@ import { autoUpdater as updater } from 'electron-updater'
 import createLogger from './log'
 import { getConfig } from './config'
 
-// TODO(mc, 2018-08-08): figure out type exports from app
-import type { Action, Error as PlainError } from '@opentrons/app/src/types'
 import type { UpdateInfo } from '@opentrons/app/src/shell'
-
-type Dispatch = Action => void
+import type { Action, Dispatch, PlainError } from './types'
 
 updater.logger = createLogger(__filename)
 updater.autoDownload = false
 
-export const CURRENT_VERSION = updater.currentVersion.version
-export const CURRENT_RELEASE_NOTES = fs.readFileSync(
+export const CURRENT_VERSION: string = updater.currentVersion.version
+export const CURRENT_RELEASE_NOTES: string = fs.readFileSync(
   path.join(__dirname, '../build/release-notes.md'),
   'utf8'
 )

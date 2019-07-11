@@ -24,11 +24,11 @@ exports[`LabwareGuide component renders 1`] = `
       >
         <a
           className="labware_guide_link"
-          href="#"
+          href="https://support.opentrons.com/en/articles/3136501-what-is-a-labware-definition"
           rel="noopener noreferrer"
           target="_blank"
         >
-          How to choose labware
+          What is a labware definition?
         </a>
       </li>
       <li
@@ -36,11 +36,23 @@ exports[`LabwareGuide component renders 1`] = `
       >
         <a
           className="labware_guide_link"
-          href="#"
+          href="https://support.opentrons.com/en/articles/3136507-using-the-labware-library"
           rel="noopener noreferrer"
           target="_blank"
         >
-          Making custom definitions
+          Using the labware library
+        </a>
+      </li>
+      <li
+        key="2"
+      >
+        <a
+          className="labware_guide_link"
+          href="https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          Creating custom labware definitions
         </a>
       </li>
     </ul>

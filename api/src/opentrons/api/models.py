@@ -3,12 +3,21 @@ from opentrons.protocol_api import labware
 from opentrons.legacy_api.containers import Slot, placeable
 
 
-def _get_parent_slot(placeable):
+def _get_parent_slot_legacy(placeable):
     if isinstance(placeable, Slot) or not placeable:
         res = placeable
     else:
-        res = _get_parent_slot(placeable.parent)
+        res = _get_parent_slot_legacy(placeable.parent)
     return res
+
+
+def _get_parent_slot(labware_obj):
+    if isinstance(
+            labware_obj.parent,
+            (labware.ModuleGeometry, labware.ThermocyclerGeometry)):
+        return labware_obj.parent.parent
+    else:
+        return labware_obj.parent
 
 
 class Container:
@@ -21,13 +30,13 @@ class Container:
         if isinstance(container, placeable.Placeable):
             self.name = container.get_name()
             self.type = container.get_type()
-            self.slot = _get_parent_slot(container).get_name()
+            self.slot = _get_parent_slot_legacy(container).get_name()
             self.is_legacy = container.properties.get(
                 'labware_hash') is None
         else:
             self.name = container.name
             self.type = container.name
-            self.slot = container.parent
+            self.slot = _get_parent_slot(container)
             self.is_legacy = False
         self.instruments = [
             Instrument(instrument)

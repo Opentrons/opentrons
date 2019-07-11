@@ -17,32 +17,32 @@
   "version": 1,
   "namespace": "fixture",
   "dimensions": {
-    "xDimension": 50,
-    "yDimension": 50,
-    "zDimension": 50
+    "xDimension": 40,
+    "yDimension": 40,
+    "zDimension": 40
   },
   "ordering": [["A1", "B1", "C1"], ["A2", "B2", "C2"]],
   "wells": {
     "A1": {
-      "depth": 40,
+      "depth": 30,
       "totalLiquidVolume": 1000,
       "diameter": 30,
       "x": 10,
-      "y": 28,
+      "y": 30,
       "z": 10,
       "shape": "circular"
     },
     "B1": {
-      "depth": 40,
+      "depth": 30,
       "totalLiquidVolume": 1000,
       "diameter": 30,
       "x": 10,
-      "y": 19,
+      "y": 20,
       "z": 10,
       "shape": "circular"
     },
     "C1": {
-      "depth": 40,
+      "depth": 30,
       "totalLiquidVolume": 1000,
       "diameter": 30,
       "x": 10,
@@ -51,28 +51,28 @@
       "shape": "circular"
     },
     "A2": {
-      "depth": 40,
+      "depth": 30,
       "totalLiquidVolume": 1000,
       "diameter": 30,
-      "x": 19,
-      "y": 28,
+      "x": 20,
+      "y": 30,
       "z": 10,
       "shape": "circular"
     },
     "B2": {
-      "depth": 40,
+      "depth": 30,
       "totalLiquidVolume": 1000,
       "diameter": 30,
-      "x": 19,
-      "y": 19,
+      "x": 20,
+      "y": 20,
       "z": 10,
       "shape": "circular"
     },
     "C2": {
-      "depth": 40,
+      "depth": 30,
       "totalLiquidVolume": 1000,
       "diameter": 30,
-      "x": 19,
+      "x": 20,
       "y": 10,
       "z": 10,
       "shape": "circular"

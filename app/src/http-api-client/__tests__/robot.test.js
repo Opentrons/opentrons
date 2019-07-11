@@ -29,11 +29,13 @@ describe('robot/*', () => {
   let store
 
   beforeEach(() => {
-    client.__clearMock()
-
     robot = { name: NAME, ip: '1.2.3.4', port: '1234' }
     state = { api: { robot: {} } }
     store = mockStore(state)
+  })
+
+  afterEach(() => {
+    client.__clearMock()
   })
 
   describe('moveRobotTo action creator', () => {
