@@ -533,6 +533,13 @@ class InstrumentContext(CommandPublisher):
 
     @property
     def default_speed(self) -> float:
+        """ The speed at which the robot's gantry moves.
+
+        By default, 400 mm/s. Changing this value will change the speed of the
+        pipette when moving between labware. In addition to changing the
+        default, the speed of individual motions can be changed with the
+        ``speed`` argument to :py:meth:`InstrumentContext.move_to`.
+        """
         return self._default_speed
 
     @default_speed.setter
