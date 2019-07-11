@@ -26,7 +26,8 @@
   },
   "win": {
     "target": ["nsis"],
-    "publisherName": "Opentrons Labworks Inc."
+    "publisherName": "Opentrons Labworks Inc.",
+    "timeStampServer": "http://timestamp.digicert.com"
   },
   "linux": {
     "target": ["AppImage"],
