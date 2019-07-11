@@ -263,14 +263,16 @@ def test_aspirate(loop, get_labware_def, monkeypatch):
 
     assert asp_called_with == (Mount.RIGHT, 2.0, 1.0)
     assert move_called_with == (Mount.RIGHT, lw.wells()[0].bottom().point,
-                                {'critical_point': None})
+                                {'critical_point': None,
+                                 'speed': 400})
 
     instr.well_bottom_clearance = 1.0
     instr.aspirate(2.0, lw.wells()[0])
     dest_point, dest_lw = lw.wells()[0].bottom()
     dest_point = dest_point._replace(z=dest_point.z + 1.0)
     assert move_called_with == (Mount.RIGHT, dest_point,
-                                {'critical_point': None})
+                                {'critical_point': None,
+                                 'speed': 400})
 
     move_called_with = None
     instr.aspirate(2.0)
@@ -303,14 +305,16 @@ def test_dispense(loop, get_labware_def, monkeypatch):
     assert 'dispensing' in ','.join([cmd.lower() for cmd in ctx.commands()])
     assert disp_called_with == (Mount.RIGHT, 2.0, 1.0)
     assert move_called_with == (Mount.RIGHT, lw.wells()[0].bottom().point,
-                                {'critical_point': None})
+                                {'critical_point': None,
+                                 'speed': 400})
 
     instr.well_bottom_clearance = 1.0
     instr.dispense(2.0, lw.wells()[0])
     dest_point, dest_lw = lw.wells()[0].bottom()
     dest_point = dest_point._replace(z=dest_point.z + 1.0)
     assert move_called_with == (Mount.RIGHT, dest_point,
-                                {'critical_point': None})
+                                {'critical_point': None,
+                                 'speed': 400})
 
     move_called_with = None
     instr.dispense(2.0)
