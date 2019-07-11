@@ -63,7 +63,7 @@ def _load_container_by_name(container_name):
             log.info(f"Loaded {container_name} from {meth.__name__}")
             break
         except (ValueError, KeyError):
-            log.info(f"{container_name} not in {meth.__name__}")
+            log.exception(f"{container_name} not in {meth.__name__}")
     else:
         raise KeyError(f"Unknown labware {container_name}")
     return container

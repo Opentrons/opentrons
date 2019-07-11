@@ -233,11 +233,7 @@ def load_new_labware_def(definition):
 
     container._coordinates = Vector(definition['cornerOffsetFromSlot'])
     for well_name in itertools.chain(*definition['ordering']):
-        try:
-            well_obj, well_pos = _load_new_well(
-                definition['wells'][well_name], saved_offset, lw_format)
-        except Exception:
-            log.exception("couldn't add well ")
-            raise
+        well_obj, well_pos = _load_new_well(
+            definition['wells'][well_name], saved_offset, lw_format)
         container.add(well_obj, well_name, well_pos)
     return container
