@@ -153,6 +153,13 @@ def save_custom_container(data):
 
 
 def _load_new_well(well_data, saved_offset, lw_format):
+    # There are two key hacks in here to make troughs work:
+    # - do not specify the size of the well
+    # - specify the center without subtracting the size (since
+    #   the size is 0) in x, and _add_ 7/16 of the size in y
+    #   so that the nominal center leaves the nozzle centered in
+    #   an imaginary well instead of centering itself over the
+    #   top wall of the trough.
     props = {
         'depth': well_data['depth'],
         'total-liquid-volume': well_data['totalLiquidVolume'],
@@ -160,7 +167,9 @@ def _load_new_well(well_data, saved_offset, lw_format):
     if well_data['shape'] == 'circular':
         props['diameter'] = well_data['diameter']
     elif well_data['shape'] == 'rectangular':
-        pass
+        if lw_format != 'trough':
+            props['length'] = well_data['yDimension']
+            props['width'] = well_data['xDimension']
     else:
         raise ValueError(
             f"Bad definition for well shape: {well_data['shape']}")
@@ -168,8 +177,8 @@ def _load_new_well(well_data, saved_offset, lw_format):
 
     if lw_format == 'trough':
         well_tuple = (
-            well_data['x'] - well_data['xDimension']/2 + saved_offset.x,
-            well_data['y'] + well_data['yDimension']/2 + saved_offset.y,
+            well_data['x'] + saved_offset.x,
+            well_data['y'] + 7*well_data['yDimension']/16 + saved_offset.y,
             well_data['z'] + saved_offset.z)
     else:
         well_tuple = (
