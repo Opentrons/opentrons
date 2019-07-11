@@ -393,7 +393,7 @@ class API(HardwareAPILike):
         await self.pause()
 
     @_log_call
-    async def resume(self):
+    def resume(self):
         """
         Resume motion after a call to :py:meth:`pause`.
         """
