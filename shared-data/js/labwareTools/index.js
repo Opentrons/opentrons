@@ -223,7 +223,7 @@ export function determineIrregularOrdering(
 // Private helper functions to calculate the XYZ coordinates of a give well
 // Will return a nested object of all well objects for a labware
 function calculateCoordinates(
-  well: InputWell,
+  wellProps: InputWell,
   ordering: Array<Array<string>>,
   spacing: Cell,
   offset: Offset,
@@ -231,18 +231,19 @@ function calculateCoordinates(
 ): WellMap {
   const { yDimension } = dimensions
 
-  // Note, reverse() on its own mutates ordering. Use slice() as a workaround
-  // to prevent mutation
-  return ordering.reduce((wells, column, cIndex) => {
-    column.forEach((element, rIndex) => {
-      wells[element] = {
-        ...well,
-        x: round(cIndex * spacing.column + offset.x, 2),
-        y: round(yDimension - offset.y - rIndex * spacing.row, 2),
-        z: round(offset.z - well.depth, 2),
-      }
-    })
-    return wells
+  return ordering.reduce<WellMap>((wellMap, column, cIndex) => {
+    return column.reduce<WellMap>(
+      (colWellMap, wellName, rIndex) => ({
+        ...colWellMap,
+        [wellName]: {
+          ...wellProps,
+          x: round(cIndex * spacing.column + offset.x, 2),
+          y: round(yDimension - offset.y - rIndex * spacing.row, 2),
+          z: round(offset.z - wellProps.depth, 2),
+        },
+      }),
+      wellMap
+    )
   }, {})
 }
 
