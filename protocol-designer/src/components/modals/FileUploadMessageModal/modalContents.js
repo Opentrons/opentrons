@@ -79,10 +79,10 @@ const toV3MigrationMessage: ModalContents = {
         What this means for your protocol
       </div>
       <p>
-        Updating your protocol to use the new labware definitions will as a
-        result require you to re-calibrate all labware in your protocol prior to
-        running it on your robot. We recommend you try a dry run or one with
-        water to ensure everything is working as expected.
+        Updating your protocol to use the new labware definitions will
+        consequently require you to re-calibrate all labware in your protocol
+        prior to running it on your robot. We recommend you try a dry run or one
+        with water to ensure everything is working as expected.
       </p>
 
       <div className={styles.section_header}>
@@ -94,6 +94,12 @@ const toV3MigrationMessage: ModalContents = {
           protocol as usual with older labware, however you will not be able to
           make further updates to this protocol using the Protocol Designer.
         </p>
+      </div>
+
+      <div className={styles.note}>
+        Please note that in order to run the updated protocol on your robot
+        successfully, the OT-2 App and robot are required to be updated to
+        version 3.10.0 or higher.
       </div>
     </div>
   ),

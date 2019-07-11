@@ -32,3 +32,14 @@
     content: ':';
   }
 }
+
+.note {
+  font-style: italic;
+  margin: 1rem 0 1rem 1rem;
+  text-indent: -1rem;
+  line-height: var(--lh-copy);
+
+  &::before {
+    content: '* ';
+  }
+}
