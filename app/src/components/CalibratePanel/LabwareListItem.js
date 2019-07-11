@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import cx from 'classnames'
 
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { ListItem, HoverTooltip } from '@opentrons/components'
@@ -32,31 +33,30 @@ export default function LabwareListItem(props: LabwareListItemProps) {
 
   return (
     <ListItem
-      isDisabled={isDisabled}
-      url={url}
-      onClick={onClick}
+      url={!isDisabled ? url : undefined}
+      onClick={!isDisabled ? onClick : undefined}
       iconName={iconName}
+      className={cx({ [styles.disabled]: isDisabled })}
       activeClassName={styles.active}
     >
-      <div className={styles.item_info}>
-        <span className={styles.item_info_location}>Slot {slot}</span>
-        {isTiprack && (
-          <span className={styles.tiprack_item_mount}>
-            {calibratorMount && calibratorMount.charAt(0).toUpperCase()}
-          </span>
+      <HoverTooltip
+        tooltipComponent={
+          <LabwareNameTooltip name={name} displayName={displayName} />
+        }
+      >
+        {handlers => (
+          <div {...handlers} className={styles.item_info}>
+            <span className={styles.item_info_location}>Slot {slot}</span>
+            {isTiprack && (
+              <span className={styles.tiprack_item_mount}>
+                {calibratorMount && calibratorMount.charAt(0).toUpperCase()}
+              </span>
+            )}
+
+            <span className={styles.labware_item_name}>{displayName}</span>
+          </div>
         )}
-        <HoverTooltip
-          tooltipComponent={
-            <LabwareNameTooltip name={name} displayName={displayName} />
-          }
-        >
-          {handlers => (
-            <span {...handlers} className={styles.labware_item_name}>
-              {displayName}
-            </span>
-          )}
-        </HoverTooltip>
-      </div>
+      </HoverTooltip>
     </ListItem>
   )
 }
