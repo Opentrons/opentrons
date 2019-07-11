@@ -5,9 +5,13 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 from opentrons import config  # noqa(E402)
 from opentrons.data_storage import database_migration  # noqa(E402)
 
+
 if os.environ.get('OT_UPDATE_SERVER') != 'true'\
    and not config.feature_flags.use_protocol_api_v2():
-    database_migration.check_version_and_perform_necessary_migrations()
+    database_migration.check_version_and_perform_full_migration()
+else:
+    database_migration.check_version_and_perform_minimal_migrations()
+
 
 import opentrons.hardware_control.adapters as adapters  # noqa(E402)
 from .protocol_api.back_compat import (build_globals as bcbuild,  # noqa(E402)
