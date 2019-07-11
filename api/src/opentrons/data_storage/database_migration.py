@@ -44,17 +44,17 @@ def rotate_container_for_alpha(container):
     return container
 
 
-# FIXME: (JG 10/6/17) container rotation below is hacky.
-# This should be done based on the deck and/or slots in pose tracking
-def migrate_containers_and_wells():
+def ensure_containers_and_wells():
     print("Loading json containers...")
     load_all_containers_from_disk()
-    print("Json container file load complete.")
-    print("Starting migration...")
-    for container_name in list_container_names():
+    json_containers = list_container_names()
+    print("Json container file load complete, listing database")
+    current_containers = database.list_all_containers()
+    to_update = set(json_containers) - set(current_containers)
+    print(f"Found {len(to_update)} containers to add. Starting migration...")
+    for container_name in to_update:
         print('migrating {} from json to database'.format(container_name))
         container = get_persisted_container(container_name)
-
         container = rotate_container_for_alpha(container)
         print(
             "CONTAINER: {}, {}".format(
@@ -62,7 +62,12 @@ def migrate_containers_and_wells():
                 container._coordinates))
 
         database.save_new_container(container, container_name)
-    print("Database migration complete!")
+    current_containers = database.list_all_containers()
+    missing = set(json_containers) - set(current_containers)
+    if missing:
+        print(f"MIGRATION FAILED: MISSING {missing}")
+    else:
+        print("Database migration complete!")
 
 
 def execute_schema_change(conn, sql_command):
@@ -80,5 +85,5 @@ def check_version_and_perform_necessary_migrations():
     if db_version == 0:
         execute_schema_change(conn, create_table_ContainerWells)
         execute_schema_change(conn, create_table_Containers)
-        migrate_containers_and_wells()
         database.set_version(1)
+    ensure_containers_and_wells()
