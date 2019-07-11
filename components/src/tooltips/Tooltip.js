@@ -65,8 +65,11 @@ export default function Tooltip<ChildProps: {}>(
           positionFixed={props.positionFixed}
         >
           {({ ref, style, placement, arrowProps }) => {
+            // remove optional -start and -end modifiers for arrow style
+            // https://popper.js.org/popper-documentation.html#Popper.placements
+            const arrowPlacement = placement?.replace(/-(?:start|end)/, '')
             let { style: arrowStyle } = arrowProps
-            if (placement === 'left' || placement === 'right') {
+            if (arrowPlacement === 'left' || arrowPlacement === 'right') {
               arrowStyle = { top: '0.6em' }
             }
             const tooltipContents = (
@@ -78,7 +81,7 @@ export default function Tooltip<ChildProps: {}>(
               >
                 {props.tooltipComponent}
                 <div
-                  className={cx(styles.arrow, styles[placement])}
+                  className={cx(styles.arrow, styles[arrowPlacement])}
                   ref={arrowProps.ref}
                   style={arrowStyle}
                 />
