@@ -124,9 +124,9 @@ class Deck(UserDict):
         col_offset = 132.5
         for idx in range(1, 13):
             self.data[idx] = None
-        self._positions = {idx+1: types.Point((idx % 3) * col_offset,
-                                              idx//3 * row_offset,
-                                              0)
+        self._positions = {idx + 1: types.Point((idx % 3) * col_offset,
+                                                idx // 3 * row_offset,
+                                                0)
                            for idx in range(12)}
         self._highest_z = 0.0
 
