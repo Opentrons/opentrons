@@ -2,7 +2,7 @@ import asyncio
 from . import mod_abc
 from typing import Union, Optional
 from opentrons.drivers.thermocycler.driver import (
-    Thermocycler as ThermocyclerDriver, ThermocyclerError)
+    Thermocycler as ThermocyclerDriver)
 
 
 class SimulatingDriver:
@@ -17,8 +17,8 @@ class SimulatingDriver:
         self._lid_heating_active = False
 
     async def open(self):
-        # TODO: BC 2019-07-11 once safe threshold is established in firmware, handle
-        # UI level warning responsibly here
+        # TODO: BC 2019-07-11 once safe threshold is established in
+        # firmware, handle UI level warning responsibly here
 
         # if self._active:
         #     raise ThermocyclerError(
