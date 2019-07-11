@@ -1348,7 +1348,7 @@ class InstrumentContext(CommandPublisher):
         try:
             for move in moves:
                 self._hw_manager.hardware.move_to(
-                    self._mount, move[0], critical_point=move[1])
+                    self._mount, move[0], critical_point=move[1], speed=speed)
         except Exception:
             self._ctx.location_cache = None
             raise
