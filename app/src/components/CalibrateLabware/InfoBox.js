@@ -11,15 +11,11 @@ import {
 } from '../../robot'
 
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { PrimaryButton } from '@opentrons/components'
-import CalibrationInfoBox from '../CalibrationInfoBox'
-import CalibrationInfoContent from '../CalibrationInfoContent'
+import { Icon, PrimaryButton } from '@opentrons/components'
+import styles from './styles.css'
 
 import type { Mount, Labware, LabwareType } from '../../robot'
 import type { State, Dispatch } from '../../types'
-
-// TODO(mc, 2018-02-05): match screens instead of using this old component
-// import ConfirmCalibrationPrompt from '../deck/ConfirmCalibrationPrompt'
 
 type OP = {| labware: ?Labware |}
 
@@ -78,18 +74,26 @@ function InfoBox(props: Props) {
     }
   }
 
+  const iconName = confirmed ? 'check-circle' : 'checkbox-blank-circle-outline'
+
   return (
-    <CalibrationInfoBox confirmed={confirmed} title={title}>
-      <CalibrationInfoContent
-        leftChildren={<p>{description}</p>}
-        rightChildren={
-          button &&
-          showButton && (
-            <PrimaryButton onClick={button.onClick}>{buttonText}</PrimaryButton>
-          )
-        }
-      />
-    </CalibrationInfoBox>
+    <div className={styles.info_box}>
+      <div className={styles.info_box_left}>
+        <h2 className={styles.info_box_title}>
+          <Icon name={iconName} className={styles.info_box_icon} />
+          {title}
+        </h2>
+        <div className={styles.info_box_description}>{description}</div>
+      </div>
+      {button && showButton && (
+        <PrimaryButton
+          className={styles.info_box_button}
+          onClick={button.onClick}
+        >
+          {buttonText}
+        </PrimaryButton>
+      )}
+    </div>
   )
 }
 

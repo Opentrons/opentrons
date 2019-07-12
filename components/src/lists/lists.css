@@ -17,6 +17,10 @@
 }
 
 .disabled {
+  /*
+   * TODO(mc, 2019-07-11): pointer-events: none should probably be delegated
+   * to the component user (causes hovertooltip problems)
+   */
   pointer-events: none;
   background-color: transparent;
 
