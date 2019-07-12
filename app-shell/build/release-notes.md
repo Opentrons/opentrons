@@ -1,24 +1,30 @@
-# Changes from 3.8.3 to 3.9.0
+# Changes from 3.9.0 to 3.10.0
 
-For more details, please see the full [technical change log][changelog]
+For more details about this release, please see the full [technical change log][changelog]
 
 [changelog]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
 
 <!-- start:@opentrons/app -->
+
 ## Opentrons App
+
+We've got a big update for you! In conjunction with this release, we've launched our completely new [Labware Library][labware-library], powered by a set of completely new labware definitions. This site should make discovering your OT-2's built-in labware much easier. Please let us know what you think!
+
+[labware-library]: https://labware.opentrons.com
 
 ### New features
 
-- Added support for more upcoming pipette hardware revisions
-- Ability to modify pipette behaviors under Pipette > Settings Page
+- Rebuilt the deck map render from the ground up in order to support...
+- ...rendering the new [Labware Library][labware-library] definitions
 
 ### Bug fixes
 
-- Correctly verify attached pipettes with an uploaded protocol
+- Fixed an issue with the app not shutting down properly, leaving phantom processes running in the background
+- Ensure long labware names don't break and overflow the UI
 
 ### Known issues
 
-- The app's run log is still having problems displaying the current run step, especially if pauses and resumes are involved ([#2047][2047])
+- The app's run log displays the wrong current run step, especially when pauses and resumes are involved ([#2047][2047])
 - The app should prevent you from starting a pipette swap while a protocol is executing, but it does not ([#2020][2020])
 - If a protocol run encounters an error, the app will suppress the error message instead of displaying it ([#1828][1828])
 
@@ -29,24 +35,29 @@ For more details, please see the full [technical change log][changelog]
 <!-- end:@opentrons/app -->
 
 <!-- start:@opentrons/api -->
-## OT2 and Protocol API
+
+## OT-2 and Protocol API
+
+This update includes a set of all new, high-quality labware definitions! The older definitions are still on your robot and will continue to work, but we **highly** recommend you switch your protocols over to the new definitions as soon as you are able. If you're Protocol Designer user, the latest Protocol Designer will use these new definitions automatically. If you're a Python API user, please see the latest [Labware API docs][labware-api] for details about how to switch.
+
+The new definitions are highly accurate and based on actual engineering data from labware manufacturers. Because the format of labware definitions has changed drastically under-the-hood, calibration data will not transfer between legacy definitions and library definitions. Please plan your protocol updates accordingly.
+
+[labware-library]: https://labware.opentrons.com
+[labware-api]: https://docs.opentrons.com/labware.html
 
 ### New Features
 
-- There is a more accurate definition for Opentrons 1000ul tips. You can load it via `opentrons-tiprack-1000ul`
-- Remove hard-coded smoothie timeouts to prevent issues with extremely long aspirations and dispenses.
-- Added support for more upcoming pipette hardware revisions
-- Enable pipette behavior settings to be configurable in the App
+- Added support for new labware definitions! See the Opentrons [Labware Library][labware-library] and the [Labware API docs][labware-api] for more details
+- Added support for newer pipette models
 
 ### Bug fixes
 
-- Better support firmware updates
+- Increased the height of the pipette in the first step of deck calibration to better account for tip length
+- Improved the legacy labware database boot-up process to avoid lost definitions
+- Removed usage of an old built-in Python method that was causing a protocol cancellation issue
 
 ### Known issues
 
-- While the underlying definition is correct, there is a known API bug that is causing the robot to think a "50ml" tube in a "15/50ml" tuberack is the same height as the "15ml" tube
+- While the underlying definition is correct, there is a known API bug that is causing the robot to think a "50ml" tube in a "15/50ml" tube rack is the same height as the "15ml" tube
 - When attaching or detaching a pipette from the left mount, the robot homes twice in the X direction
-
-
-[schema-v3]: https://github.com/Opentrons/opentrons/blob/edge/shared-data/protocol-json-schema/protocolSchemaV3.json
-<!-- end:@opentrons/api -->
+  <!-- end:@opentrons/api -->
