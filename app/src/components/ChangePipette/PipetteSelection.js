@@ -24,7 +24,7 @@ export default function PipetteSelection(props: PipetteSelectionProps) {
     pipetteOptions = OPTIONS
   } else {
     pipetteOptions = filter(OPTIONS, function(pipette) {
-      return !pipette.name.includes('+')
+      return !pipette.name.includes('GEN2')
     })
   }
 
