@@ -1,60 +1,11 @@
-.list_item_button_wrapper {
+.list_item_button {
+  z-index: 5;
   position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.list_item_interaction_wrapper {
-  margin: 1rem 3rem;
+  padding: 1rem 2rem 1.25rem 2rem;
 }
 
 .buttons_popover {
   position: absolute;
-  left: 3rem;
-  right: 3rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  z-index: 1;
-}
-
-.list_item_button,
-.step_creation_option {
-  display: flex;
-  align-items: center;
-  width: 11.5rem;
-  padding: 0.25rem 0.5rem;
-}
-
-.list_item_button.active {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  box-shadow: none;
-}
-
-.step_creation_option:not(:last-child) {
-  border-radius: 0;
-}
-
-.step_creation_option:last-child {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
-
-.step_creation_button.active {
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.list_button_icon_wrapper {
-  height: 2.25rem;
-  width: 2.25rem;
-  margin-right: 0.75rem;
-}
-
-.list_button_icon {
-  height: 75%;
-  width: auto;
-  margin: 0.25rem 0.125rem;
+  left: 2rem;
+  right: 2rem;
 }

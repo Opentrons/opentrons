@@ -1,9 +1,8 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import cx from 'classnames'
-import { HoverTooltip, PrimaryButton, Icon } from '@opentrons/components'
 import i18n from '../localization'
+import { HoverTooltip, PrimaryButton } from '@opentrons/components'
 import { actions as steplistActions } from '../steplist'
 import { stepIconsByType, type StepType } from '../form-types'
 import type { ThunkDispatch } from '../types'
@@ -32,22 +31,13 @@ class StepCreationButton extends React.Component<Props, State> {
 
     return (
       <div
+        className={styles.list_item_button}
         onMouseLeave={this.handleMouseLeave}
-        className={styles.list_item_interaction_wrapper}
       >
-        <div className={styles.list_item_button_wrapper}>
-          <PrimaryButton
-            onClick={this.handleExpandClick}
-            className={cx(styles.list_item_button, {
-              [styles.active]: this.state.expanded,
-            })}
-          >
-            <div className={styles.list_button_icon_wrapper}>
-              <Icon name="plus" className={styles.list_button_icon} />
-            </div>
-            {i18n.t('button.add_step')}
-          </PrimaryButton>
-        </div>
+        <PrimaryButton onClick={this.handleExpandClick}>
+          {i18n.t('button.add_step')}
+        </PrimaryButton>
+
         <div className={styles.buttons_popover}>
           {this.state.expanded &&
             supportedSteps.map(stepType => (
@@ -64,14 +54,8 @@ class StepCreationButton extends React.Component<Props, State> {
                   <PrimaryButton
                     hoverTooltipHandlers={hoverTooltipHandlers}
                     onClick={this.props.makeAddStep(stepType)}
-                    className={styles.step_creation_option}
+                    iconName={stepIconsByType[stepType]}
                   >
-                    <div className={styles.list_button_icon_wrapper}>
-                      <Icon
-                        name={stepIconsByType[stepType]}
-                        className={styles.list_button_icon}
-                      />
-                    </div>
                     {i18n.t(`application.stepType.${stepType}`, stepType)}
                   </PrimaryButton>
                 )}

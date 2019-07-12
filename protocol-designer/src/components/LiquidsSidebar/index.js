@@ -2,12 +2,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import i18n from '../../localization'
-import {
-  PrimaryButton,
-  SidePanel,
-  swatchColors,
-  Icon,
-} from '@opentrons/components'
+import { PrimaryButton, SidePanel, swatchColors } from '@opentrons/components'
 import { PDTitledList } from '../lists'
 import listButtonStyles from '../listButtons.css'
 
@@ -42,21 +37,10 @@ function LiquidsSidebar(props: Props) {
           title={name || `Unnamed Ingredient ${ingredientId}`} // fallback, should not happen
         />
       ))}
-      <div className={listButtonStyles.list_item_interaction_wrapper}>
-        <div className={listButtonStyles.list_item_button_wrapper}>
-          <PrimaryButton
-            onClick={createNewLiquid}
-            className={listButtonStyles.list_item_button}
-          >
-            <div className={listButtonStyles.list_button_icon_wrapper}>
-              <Icon
-                name="water"
-                className={listButtonStyles.list_button_icon}
-              />
-            </div>
-            {i18n.t('button.new_liquid')}
-          </PrimaryButton>
-        </div>
+      <div className={listButtonStyles.list_item_button}>
+        <PrimaryButton iconName="water" onClick={createNewLiquid}>
+          {i18n.t('button.new_liquid')}
+        </PrimaryButton>
       </div>
     </SidePanel>
   )
