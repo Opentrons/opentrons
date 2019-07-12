@@ -1,6 +1,8 @@
 @import '@opentrons/components';
 
 .step_description {
+  @apply --font-body-1-dark;
+
   padding: 0.5rem;
   border-bottom: var(--bd-light);
 }

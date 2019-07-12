@@ -40,10 +40,10 @@ const LabwareControls = (props: Props) => {
       innerDivProps={{
         className: cx(styles.labware_controls, {
           [styles.can_edit]: canEdit,
-          [styles.highlighted_border_div]: highlighted,
         }),
       }}
     >
+      {highlighted && <div className={styles.highlighted_border_div} />}
       {canEdit ? (
         <EditLabware labwareOnDeck={labwareOnDeck} />
       ) : (

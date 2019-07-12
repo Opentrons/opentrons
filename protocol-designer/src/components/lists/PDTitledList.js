@@ -11,6 +11,7 @@ export default function PDTitledList(props: Props) {
   return (
     <TitledList
       {...props}
+      titleBarClass={styles.pd_titled_list_title}
       className={cx(styles.pd_titled_list, props.className)}
     />
   )
