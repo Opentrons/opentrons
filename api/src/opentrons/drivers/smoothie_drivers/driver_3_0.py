@@ -985,7 +985,6 @@ class SmoothieDriver_3_0_0:
             if is_alarm or is_error:
                 raise SmoothieError(ret_code)
 
-
     def _remove_unwanted_characters(self, command, response):
         # smoothieware can enter a weird state, where it repeats back
         # the sent command at the beginning of its response.
