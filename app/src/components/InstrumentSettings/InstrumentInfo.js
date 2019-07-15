@@ -64,6 +64,8 @@ export default function PipetteInfo(props: Props) {
         {channels && (
           <InstrumentDiagram
             channels={channels}
+            mount={mount}
+            generation={displayName.includes('GEN2') ? 2 : 1} // get programmatically from sd when version in data
             className={styles.pipette_diagram}
           />
         )}
