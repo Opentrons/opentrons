@@ -12,42 +12,60 @@ type Props = {
 export default function SessionAlert(props: Props) {
   const { sessionStatus, className, onResetClick } = props
 
-  const completeMessage = (
-    <p>
-      Run complete! <a onClick={onResetClick}>Reset run</a> to run protocol
-      again.
-    </p>
-  )
-  const pauseMessage = 'Run paused'
-  const cancelMessage = (
-    <p>
-      Run canceled. <a onClick={onResetClick}>Reset run</a> to run protocol
-      again.
-    </p>
-  )
-
   switch (sessionStatus) {
     case 'finished':
       return (
         <AlertItem
-          type="success"
-          title={completeMessage}
           className={className}
+          type="success"
+          title={
+            <p>
+              Run complete! <a onClick={onResetClick}>Reset run</a> to run
+              protocol again.
+            </p>
+          }
         />
       )
+
     case 'paused':
       return (
         <AlertItem
-          type="info"
-          title={pauseMessage}
           className={className}
+          type="info"
           icon={{ name: 'pause-circle' }}
+          title="Run paused"
         />
       )
+
     case 'stopped':
       return (
-        <AlertItem type="warning" title={cancelMessage} className={className} />
+        <AlertItem
+          className={className}
+          type="warning"
+          title={
+            <p>
+              Run canceled. <a onClick={onResetClick}>Reset run</a> to run
+              protocol again.
+            </p>
+          }
+        />
       )
+
+    case 'error':
+      return (
+        <AlertItem
+          className={className}
+          type="error"
+          title={
+            <p>
+              Run encountered an error. <a onClick={onResetClick}>Reset run</a>{' '}
+              to run protocol again. Please contact support if you need help
+              resolving this issue.
+            </p>
+          }
+        />
+      )
+
     default:
       return null
   }

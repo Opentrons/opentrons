@@ -128,7 +128,7 @@ export default function sessionReducer(
 
 function handleSessionUpdate(state: State, action: SessionUpdateAction): State {
   const {
-    payload: { state: sessionState, startTime, lastCommand },
+    payload: { state: sessionStateUpdate, startTime, lastCommand },
   } = action
   let { protocolCommandsById } = state
 
@@ -143,6 +143,13 @@ function handleSessionUpdate(state: State, action: SessionUpdateAction): State {
       [lastCommand.id]: command,
     }
   }
+
+  // TODO(mc, 2019-07-15): remove this workaround when API issue is resolved
+  // https://github.com/Opentrons/opentrons/issues/2994
+  const sessionState =
+    state.state === 'stopped' && sessionStateUpdate === 'error'
+      ? 'stopped'
+      : sessionStateUpdate
 
   return { ...state, state: sessionState, startTime, protocolCommandsById }
 }
@@ -182,8 +189,9 @@ function handleRun(state: State, action: any): State {
 function handleRunResponse(state: State, action: any): State {
   const { error, payload } = action
 
-  if (error)
+  if (error) {
     return { ...state, runRequest: { inProgress: false, error: payload } }
+  }
 
   return { ...state, runRequest: { inProgress: false, error: null } }
 }
