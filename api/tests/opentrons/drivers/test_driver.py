@@ -4,6 +4,8 @@ import pytest
 
 from tests.opentrons.conftest import fuzzy_assert
 from opentrons.config.robot_configs import DEFAULT_GANTRY_STEPS_PER_MM
+from opentrons.drivers import serial_communication
+from opentrons.drivers.smoothie_drivers import driver_3_0
 
 
 def position(x, y, z, a, b, c):
@@ -886,8 +888,6 @@ def test_pause_in_protocol(model):
 
 @pytest.mark.api1_only
 def test_send_command_with_retry(model, monkeypatch):
-    from opentrons.drivers import serial_communication
-
     robot = model.robot
     robot._driver.simulating = False
 
@@ -1022,3 +1022,26 @@ def test_unstick_axes(model):
     # from pprint import pprint
     # pprint(current_log)
     assert current_log == expected
+
+
+@pytest.mark.api1_only
+def test_alarm_unhandled(model, monkeypatch):
+    driver = model.robot._driver
+    driver.simulating = False
+    killmsg = 'ALARM: Kill button pressed - reset or M999 to continue\r\n'
+
+    def fake_write_and_return(cmdstr, ack, conn, timeout=None):
+
+        return cmdstr + killmsg
+
+    monkeypatch.setattr(serial_communication, 'write_and_return',
+                        fake_write_and_return)
+    assert serial_communication.write_and_return is fake_write_and_return
+    driver.move({'X': 0})
+
+    driver._is_hard_halting.set()
+
+    with pytest.raises(driver_3_0.SmoothieAlarm):
+        driver.move({'X': 25})
+
+    assert not driver._is_hard_halting.is_set()
