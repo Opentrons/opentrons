@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import cx from 'classnames'
 
 import type { PipetteChannels } from '@opentrons/shared-data'
 import type { Mount } from '../../robot'
@@ -15,6 +16,7 @@ type DiagramProps = {
   mount: Mount,
   channels: PipetteChannels,
   diagram: Diagram,
+  generation: number,
 }
 
 type Props = DiagramProps & {
@@ -24,60 +26,29 @@ type Props = DiagramProps & {
 
 type Channels = 'single' | 'multi'
 
-// TODO(mc, 2018-04-06): there must be a better way...
-//   this object is way nicer than a giant if/else ladder though
-const DIAGRAMS: {
-  [Direction]: { [Mount]: { [Channels]: { [Diagram]: string } } },
-} = {
-  attach: {
-    left: {
-      single: {
-        screws: require('./images/attach-left-single-screws@3x.png'),
-        tab: require('./images/attach-left-single-tab@3x.png'),
-      },
-      multi: {
-        screws: require('./images/attach-left-multi-screws@3x.png'),
-        tab: require('./images/attach-left-multi-tab@3x.png'),
-      },
-    },
-    right: {
-      single: {
-        screws: require('./images/attach-right-single-screws@3x.png'),
-        tab: require('./images/attach-right-single-tab@3x.png'),
-      },
-      multi: {
-        screws: require('./images/attach-right-multi-screws@3x.png'),
-        tab: require('./images/attach-right-multi-tab@3x.png'),
-      },
-    },
-  },
-  detach: {
-    left: {
-      single: {
-        screws: require('./images/detach-left-single-screws@3x.png'),
-        tab: require('./images/detach-left-single-tab@3x.png'),
-      },
-      multi: {
-        screws: require('./images/detach-left-multi-screws@3x.png'),
-        tab: require('./images/detach-left-multi-tab@3x.png'),
-      },
-    },
-    right: {
-      single: {
-        screws: require('./images/detach-right-single-screws@3x.png'),
-        tab: require('./images/detach-right-single-tab@3x.png'),
-      },
-      multi: {
-        screws: require('./images/detach-right-multi-screws@3x.png'),
-        tab: require('./images/detach-right-multi-tab@3x.png'),
-      },
-    },
-  },
+function getDiagramsSrc(
+  channels: Channels,
+  generation: number,
+  direction: Direction
+) {
+  switch (generation) {
+    case 2:
+      return {
+        screws: require(`./images/${direction}-left-${channels}-GEN2-screws@3x.png`),
+        tab: require(`./images/${direction}-left-${channels}-GEN2-tab@3x.png`),
+      }
+    case 1:
+    default:
+      return {
+        screws: require(`./images/${direction}-left-${channels}-screws@3x.png`),
+        tab: require(`./images/${direction}-left-${channels}-tab@3x.png`),
+      }
+  }
 }
 
 export default function InstructionStep(props: Props) {
-  const { diagram } = props
-  const diagramSrc = getDiagramSrc(props)
+  const { diagram, channels, generation, direction, mount } = props
+  const diagramsSrcByName = getDiagramsSrc(channels, generation, direction)
 
   return (
     <fieldset className={styles.step}>
@@ -86,14 +57,12 @@ export default function InstructionStep(props: Props) {
       {diagram === 'screws' && (
         <img src={screwdriverSrc} className={styles.screwdriver} />
       )}
-      <img src={diagramSrc} className={styles.diagram} />
+      <img
+        src={diagramsSrcByName[diagram]}
+        className={cx(styles.diagram, {
+          [styles.flipped_image]: mount === 'right',
+        })}
+      />
     </fieldset>
   )
-}
-
-export function getDiagramSrc(props: DiagramProps): string {
-  const { direction, mount, channels, diagram } = props
-  const channelsKey = channels === 8 ? 'multi' : 'single'
-
-  return DIAGRAMS[direction][mount][channelsKey][diagram]
 }
