@@ -1,7 +1,9 @@
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from opentrons import commands
 
-LABWARE_ENGAGE_HEIGHT = {'biorad-hardshell-96-PCR': 18}    # mm
+LABWARE_ENGAGE_HEIGHT = {
+    'biorad-hardshell-96-PCR': 18,
+    'biorad_96_wellplate_200ul_pcr': 18}    # mm
 MAX_ENGAGE_HEIGHT = 45  # mm from home position
 
 
