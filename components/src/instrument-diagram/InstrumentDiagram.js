@@ -9,15 +9,21 @@ import singleGEN2Src from './pipetteGEN2Single.png'
 import multiGEN2Src from './pipetteGEN2Multi.png'
 import styles from './instrument.css'
 
-const PIPETTE_THUMB_MAP = {
-  1: {
-    single: singleSrc,
-    multi: multiSrc,
-  },
-  2: {
-    single: singleGEN2Src,
-    multi: multiGEN2Src,
-  },
+const getPipetteThumb = ({
+  generation,
+  channels,
+}: {
+  generation: number,
+  channels: number,
+}) => {
+  switch (generation) {
+    case 1:
+      return channels === 1 ? singleSrc : multiSrc
+    case 2:
+      return channels === 1 ? singleGEN2Src : multiGEN2Src
+    default:
+      return singleSrc
+  }
 }
 
 type Props = {
@@ -34,7 +40,7 @@ export default function InstrumentDiagram(props: Props) {
     <div className={props.className}>
       <img
         className={cx({ [styles.flipped_image]: mount === 'right' })}
-        src={PIPETTE_THUMB_MAP[generation][channels]}
+        src={getPipetteThumb({ generation, channels })}
       />
     </div>
   )
