@@ -121,6 +121,19 @@ class SmoothieError(Exception):
         return f'SmoothieError: {self.command} returned {self.ret_code}'
 
 
+class SmoothieAlarm(Exception):
+    def __init__(self, ret_code: str = None, command: str = None) -> None:
+        self.ret_code = ret_code
+        self.command = command
+        super().__init__()
+
+    def __repr__(self):
+        return f'<SmoothieAlarm: {self.ret_code} from {self.command}>'
+
+    def __str__(self):
+        return f'SmoothieAlarm: {self.command} returned {self.ret_code}'
+
+
 class ParseError(Exception):
     pass
 
@@ -349,6 +362,7 @@ class SmoothieDriver_3_0_0:
                     pass
 
             self._serial_lock = DummyLock()
+        self._is_hard_halting = Event()
 
     @property
     def homed_position(self):
@@ -938,20 +952,39 @@ class SmoothieDriver_3_0_0:
             command + SMOOTHIE_COMMAND_TERMINATOR,
             5.0, DEFAULT_COMMAND_RETRIES)
         cmd_ret = self._remove_unwanted_characters(command, cmd_ret)
-        self._handle_return(cmd_ret, GCODES['HOME'] in command)
+        self._handle_return(cmd_ret)
         wait_ret = serial_communication.write_and_return(
             GCODES['WAIT'] + SMOOTHIE_COMMAND_TERMINATOR,
             SMOOTHIE_ACK, self._connection, timeout=12000)
         wait_ret = self._remove_unwanted_characters(
             GCODES['WAIT'], wait_ret)
-        self._handle_return(wait_ret, GCODES['HOME'] in command)
+        self._handle_return(wait_ret)
         return cmd_ret.strip()
 
-    def _handle_return(self, ret_code: str, was_home: bool):
-        # Smoothieware returns error state if a switch was hit while moving
-        if (ERROR_KEYWORD in ret_code.lower()) or \
-                (ALARM_KEYWORD in ret_code.lower()):
-            raise SmoothieError(ret_code)
+    def _handle_return(self, ret_code: str):
+        """ Check the return string from smoothie for an error condition.
+
+        Usually raises a SmoothieError, which can be handled by the error
+        handling in write_with_retries. However, if the hard halt line has
+        been set, we need to catch that halt and _not_ handle it, since it
+        is used for things like cancelling protocols and needs to be
+        handled elsewhere. In that case, we raise SmoothieAlarm, which isn't
+        (and shouldn't be) handled by the normal error handling.
+        """
+        is_alarm = ALARM_KEYWORD in ret_code.lower()
+        is_error = ERROR_KEYWORD in ret_code.lower()
+        if self._is_hard_halting.is_set():
+            # This is the alarm from setting the hard halt
+            if is_alarm:
+                self._is_hard_halting.clear()
+                raise SmoothieAlarm(ret_code)
+            elif is_error:
+                # this would be a race condition
+                raise SmoothieError(ret_code)
+        else:
+            if is_alarm or is_error:
+                raise SmoothieError(ret_code)
+
 
     def _remove_unwanted_characters(self, command, response):
         # smoothieware can enter a weird state, where it repeats back
@@ -1553,6 +1586,7 @@ class SmoothieDriver_3_0_0:
         if self.simulating:
             pass
         else:
+            self._is_hard_halting.set()
             gpio.set_low(gpio.OUTPUT_PINS['HALT'])
             sleep(0.25)
             gpio.set_high(gpio.OUTPUT_PINS['HALT'])
