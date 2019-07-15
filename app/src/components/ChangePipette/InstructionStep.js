@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import cx from 'classnames'
 
 import type { PipetteChannels } from '@opentrons/shared-data'
 import type { Mount } from '../../robot'
@@ -24,45 +23,32 @@ type Props = DiagramProps & {
   children: React.Node,
 }
 
-type Channels = 'single' | 'multi'
+function getDiagramsSrc(props: Props) {
+  const { channels, generation, direction, mount, diagram } = props
+  const channelsKey = channels === 8 ? 'multi' : 'single'
 
-function getDiagramsSrc(
-  channels: Channels,
-  generation: number,
-  direction: Direction
-) {
+  console.log(
+    `./images/${direction}-${mount}-${channelsKey}-GEN2-${diagram}@3x.png`
+  )
+
   switch (generation) {
     case 2:
-      return {
-        screws: require(`./images/${direction}-left-${channels}-GEN2-screws@3x.png`),
-        tab: require(`./images/${direction}-left-${channels}-GEN2-tab@3x.png`),
-      }
+      return require(`./images/${direction}-${mount}-${channelsKey}-GEN2-${diagram}@3x.png`)
     case 1:
     default:
-      return {
-        screws: require(`./images/${direction}-left-${channels}-screws@3x.png`),
-        tab: require(`./images/${direction}-left-${channels}-tab@3x.png`),
-      }
+      return require(`./images/${direction}-${mount}-${channelsKey}-${diagram}@3x.png`)
   }
 }
 
 export default function InstructionStep(props: Props) {
-  const { diagram, channels, generation, direction, mount } = props
-  const diagramsSrcByName = getDiagramsSrc(channels, generation, direction)
-
   return (
     <fieldset className={styles.step}>
       <legend className={styles.step_legend}>Step {props.step}</legend>
       <div>{props.children}</div>
-      {diagram === 'screws' && (
+      {props.diagram === 'screws' && (
         <img src={screwdriverSrc} className={styles.screwdriver} />
       )}
-      <img
-        src={diagramsSrcByName[diagram]}
-        className={cx(styles.diagram, {
-          [styles.flipped_image]: mount === 'right',
-        })}
-      />
+      <img src={getDiagramsSrc(props)} className={styles.diagram} />
     </fieldset>
   )
 }
