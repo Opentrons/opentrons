@@ -884,7 +884,9 @@ class Robot(CommandPublisher):
         """
         Stops execution of the protocol. (alias for `halt`)
         """
-        self.halt()
+        self._driver.kill()
+        self.reset()
+        self.home()
 
     @commands.publish.both(command=commands.resume)
     def resume(self):
@@ -897,9 +899,7 @@ class Robot(CommandPublisher):
         """
         Stops execution of both the protocol and the Smoothie board immediately
         """
-        self._driver.kill()
-        self.reset()
-        self.home()
+        self._driver.hard_halt()
 
     def get_attached_pipettes(self):
         """
