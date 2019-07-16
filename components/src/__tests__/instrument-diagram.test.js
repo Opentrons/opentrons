@@ -5,13 +5,33 @@ import { InstrumentDiagram, InstrumentGroup } from '..'
 
 describe('InstrumentDiagram', () => {
   test('Single-channel renders correctly', () => {
-    const tree = Renderer.create(<InstrumentDiagram channels={1} />).toJSON()
+    const tree = Renderer.create(
+      <InstrumentDiagram channels={1} generation={1} />
+    ).toJSON()
 
     expect(tree).toMatchSnapshot()
   })
 
   test('Multi-channel renders correctly', () => {
-    const tree = Renderer.create(<InstrumentDiagram channels={8} />).toJSON()
+    const tree = Renderer.create(
+      <InstrumentDiagram channels={8} generation={1} />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('Single-channel GEN2 renders correctly', () => {
+    const tree = Renderer.create(
+      <InstrumentDiagram channels={1} generation={2} />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('Multi-channel GEN2 renders correctly', () => {
+    const tree = Renderer.create(
+      <InstrumentDiagram channels={8} generation={2} />
+    ).toJSON()
 
     expect(tree).toMatchSnapshot()
   })

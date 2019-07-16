@@ -18,22 +18,22 @@ type Props = {
 }
 export default function PipetteDiagram(props: Props) {
   const { leftPipette, rightPipette } = props
-  const leftChannels = getChannels(leftPipette)
-  const rightChannels = getChannels(rightPipette)
+  const leftSpecs = getPipetteNameSpecs(leftPipette)
+  const rightSpecs = getPipetteNameSpecs(rightPipette)
 
   return (
     <React.Fragment>
-      {leftPipette && leftChannels ? (
+      {leftPipette && leftSpecs ? (
         <InstrumentDiagram
-          channels={leftChannels}
+          channels={leftSpecs.channels}
           className={styles.left_pipette}
         />
       ) : (
         <div className={styles.left_pipette} />
       )}
-      {rightPipette && rightChannels ? (
+      {rightPipette && rightSpecs ? (
         <InstrumentDiagram
-          channels={rightChannels}
+          channels={rightSpecs.channels}
           className={styles.right_pipette}
         />
       ) : (
