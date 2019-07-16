@@ -95,7 +95,7 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
-        return self.pipette_by_name(mount, 'p20_single_GEN2',
+        return self.pipette_by_name(mount, 'p20_single_gen2',
                                     trash_container, tip_racks,
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
@@ -109,7 +109,7 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
-        return self.pipette_by_name(mount, 'p20_multi_GEN2',
+        return self.pipette_by_name(mount, 'p20_multi_gen2',
                                     trash_container, tip_racks,
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
@@ -165,7 +165,7 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
-        return self.pipette_by_name(mount, 'p300_single_GEN2',
+        return self.pipette_by_name(mount, 'p300_single_gen2',
                                     trash_container, tip_racks,
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
@@ -179,7 +179,7 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
-        return self.pipette_by_name(mount, 'p300_multi_GEN2',
+        return self.pipette_by_name(mount, 'p300_multi_gen2',
                                     trash_container, tip_racks,
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
@@ -221,7 +221,7 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None):
-        return self.pipette_by_name(mount, 'p1000_single_GEN2',
+        return self.pipette_by_name(mount, 'p1000_single_gen2',
                                     trash_container, tip_racks,
                                     aspirate_flow_rate, dispense_flow_rate,
                                     min_volume, max_volume)
@@ -333,8 +333,8 @@ class InstrumentsWrapper(object):
             # In the case that the expected model substring does not equal
             # attached model name or backcompat name, then take the expected
             # model substring and create a fallback model name.
-            if 'GEN2' in expected_model_substring:
-                return expected_model_substring.split('_GEN2')[0] + '_v2.0'
+            if 'gen2' in expected_model_substring:
+                return expected_model_substring.split('_gen2')[0] + '_v2.0'
             return expected_model_substring.split('_v')[0] + '_v1'
 
 
