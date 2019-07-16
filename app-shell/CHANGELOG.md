@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.10.0"></a>
+# [3.10.0](https://github.com/Opentrons/opentrons/compare/v3.9.0...v3.10.0) (2019-07-15)
+
+
+### Bug Fixes
+
+* **app-shell:** Add missing existence check to FF object ([#3638](https://github.com/Opentrons/opentrons/issues/3638)) ([3e784c4](https://github.com/Opentrons/opentrons/commit/3e784c4))
+* **app-shell:** Clean up main window and DC on app quit ([#3622](https://github.com/Opentrons/opentrons/issues/3622)) ([d4a5c3e](https://github.com/Opentrons/opentrons/commit/d4a5c3e)), closes [#3482](https://github.com/Opentrons/opentrons/issues/3482)
+
+
+
+
+
 <a name="3.9.0"></a>
 # [3.9.0](https://github.com/Opentrons/opentrons/compare/v3.8.3...v3.9.0) (2019-05-29)
 
