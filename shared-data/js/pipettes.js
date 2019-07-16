@@ -7,6 +7,7 @@ export type PipetteChannels = 1 | 8
 export type PipetteNameSpecs = {
   name: string,
   displayName: string,
+  displayCategory: ?string,
   minVolume: number,
   maxVolume: number,
   defaultAspirateFlowRate: { value: number },
