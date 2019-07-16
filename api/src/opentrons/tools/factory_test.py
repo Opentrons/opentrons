@@ -10,6 +10,8 @@ from opentrons.config import infer_config_base_dir
 from opentrons.drivers.rpi_drivers import gpio
 from opentrons.drivers import serial_communication
 
+log = logging.getLogger(__name__)
+
 
 RESULT_SPACE = '\t- {}'
 FAIL = 'FAIL\t*** !!! ***'
@@ -94,6 +96,34 @@ def run_quiet_process(command):
     subprocess.check_output('{} &> /dev/null'.format(command), shell=True)
 
 
+def _get_unique_smoothie_responses(responses):
+    """ Find the number of truly unique responses from the smoothie, ignoring
+
+    - Responses that are only different because of interjected \r\n
+    - Responses that are only different by \r or \n replacing a single char
+
+    Both of these errors are results of race conditions between smoothie
+    terminal echo mode and responses, and do not indicate serial failures.
+    """
+    uniques = list(set(responses))  # Eliminate exact repetitions
+    # eliminate "uniques" that are really just the second \r\n racing
+    # with the smoothie's return values
+    true_uniques = [uniques[0]]
+    for unique in uniques[1:]:
+        if len(unique) != len(uniques[0]):
+            true_uniques.append(unique)
+            continue
+        for a, b in zip(uniques[0], unique):
+            if a in '\r\n':
+                continue
+            elif b in '\r\n':
+                continue
+            elif a != b:
+                true_uniques.append(unique)
+                break
+    return true_uniques
+
+
 def test_smoothie_gpio(port_name=''):
     def _write_and_return(msg):
         return serial_communication.write_and_return(
@@ -120,27 +150,11 @@ def test_smoothie_gpio(port_name=''):
     # check that if we write the same thing to the smoothie a bunch
     # it works
     data = [_write_and_return('version') for i in range(100)]
-    uniques = list(set(data))  # Eliminate exact repetitions
-    # eliminate "uniques" that are really just the second \r\n racing
-    # with the smoothie's return values
-    true_uniques = [uniques[0]]
-    for unique in uniques[1:]:
-        if len(unique) != len(uniques[0]):
-            true_uniques.append(unique)
-            continue
-        for a, b in zip(uniques[0], unique):
-            if a in '\r\n':
-                continue
-            elif b in '\r\n':
-                continue
-            elif a != b:
-                true_uniques.append(unique)
-                break
-
+    true_uniques = _get_unique_smoothie_responses(data)
     if len(true_uniques) == 1:
         print(RESULT_SPACE.format(PASS))
     else:
-        print(true_uniques)
+        log.info(f'true uniques: {true_uniques}')
         print(RESULT_SPACE.format(FAIL))
 
     print('HALT')
