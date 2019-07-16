@@ -8,6 +8,10 @@
     },
     "channels": {
       "enum": [1, 8]
+    },
+    "displayCategory": {
+      "type": "string",
+      "enum": ["OG", "GEN2"]
     }
   },
 
@@ -39,7 +43,7 @@
           "max": { "$ref": "#/definitions/positiveNumber" }
         },
         "displayName": { "type": "string" },
-        "displayCategory": { "type": "string" },
+        "displayCategory": { "$ref": "#/definitions/displayCategory" },
         "maxVolume": { "$ref": "#/definitions/positiveNumber" },
         "minVolume": { "$ref": "#/definitions/positiveNumber" }
       }
