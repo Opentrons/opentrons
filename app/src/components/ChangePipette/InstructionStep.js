@@ -27,10 +27,6 @@ function getDiagramsSrc(props: Props) {
   const { channels, generation, direction, mount, diagram } = props
   const channelsKey = channels === 8 ? 'multi' : 'single'
 
-  console.log(
-    `./images/${direction}-${mount}-${channelsKey}-GEN2-${diagram}@3x.png`
-  )
-
   switch (generation) {
     case 2:
       return require(`./images/${direction}-${mount}-${channelsKey}-GEN2-${diagram}@3x.png`)
