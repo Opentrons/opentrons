@@ -39,6 +39,7 @@
           "max": { "$ref": "#/definitions/positiveNumber" }
         },
         "displayName": { "type": "string" },
+        "displayCategory": { "type": "string" },
         "maxVolume": { "$ref": "#/definitions/positiveNumber" },
         "minVolume": { "$ref": "#/definitions/positiveNumber" }
       }
