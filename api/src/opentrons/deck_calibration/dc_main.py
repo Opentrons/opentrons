@@ -4,6 +4,7 @@
 
 import asyncio
 import urwid
+import argparse
 import atexit
 import os
 import sys
@@ -563,10 +564,23 @@ def main(loop=None):
     # Notes:
     #  - 200ul tip is 51.7mm long when attached to a pipette
     #  - For xyz coordinates, (0, 0, 0) is the lower-left corner of the robot
+    parser = argparse.ArgumentParser(prog='opentrons deck calibration')
+    parser.add_argument(
+        '-p', '--pipette', default='p300_single_v1',
+        help='The pipette model you would like to deck calibrate with.')
+    parser.add_argument(
+        '--tiprack', default=None,
+        help='Add a tiprack to pick up tip from')
+
+    args = parser.parse_args()
+
     cli = CLITool(
         point_set=get_calibration_points(),
         tip_length=51.7,
-        loop=loop)
+        loop=loop,
+        pipette_model=args.pipette,
+        tip_rack=args.tiprack)
+
     hardware = cli.hardware
     backup_configuration_and_reload(hardware)
     if not feature_flags.use_protocol_api_v2():
