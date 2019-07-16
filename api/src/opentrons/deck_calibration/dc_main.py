@@ -55,7 +55,7 @@ class CLITool:
         such as a web-server that would be able to call those functions behind
         HTTP endpoints.
     """
-    def __init__(self, point_set, tip_length, loop=None):
+    def __init__(self, point_set, tip_length, pipette, tiprack, loop=None):
         # URWID user interface objects
         if not loop:
             loop = asyncio.get_event_loop()
@@ -81,12 +81,16 @@ class CLITool:
         if not feature_flags.use_protocol_api_v2():
             self.hardware = robot
             self._current_mount = right
+            self._pipette = pipette
         else:
             api = opentrons.hardware_control.API
             self.hardware = adapters.SynchronousAdapter.build(
                 api.build_hardware_controller, force=True)
             self._current_mount = types.Mount.RIGHT
+            self._pipette = pipette
             self.hardware.cache_instruments()
+
+        self._tiprack = tiprack
 
         self.ui_loop = urwid.MainLoop(
             self._filler,
