@@ -5,13 +5,6 @@ import * as React from 'react'
 import styles from './FilePipettesModal.css'
 import { InstrumentDiagram } from '@opentrons/components'
 
-function getChannels(pipetteName: ?string): ?number {
-  if (!pipetteName) return null
-
-  const pipetteData = getPipetteNameSpecs(pipetteName)
-  return (pipetteData && pipetteData.channels) || null
-}
-
 type Props = {
   leftPipette: ?string,
   rightPipette: ?string,
@@ -26,6 +19,7 @@ export default function PipetteDiagram(props: Props) {
       {leftPipette && leftSpecs ? (
         <InstrumentDiagram
           channels={leftSpecs.channels}
+          displayCategory={leftSpecs.displayCategory}
           className={styles.left_pipette}
         />
       ) : (
@@ -34,6 +28,7 @@ export default function PipetteDiagram(props: Props) {
       {rightPipette && rightSpecs ? (
         <InstrumentDiagram
           channels={rightSpecs.channels}
+          displayCategory={rightSpecs.displayCategory}
           className={styles.right_pipette}
         />
       ) : (

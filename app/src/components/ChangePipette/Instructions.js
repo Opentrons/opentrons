@@ -74,12 +74,11 @@ export default function Instructions(props: ChangePipetteProps) {
 }
 
 function Steps(props: ChangePipetteProps) {
-  const { direction } = props
+  const { direction, displayCategory } = props
 
   const channels = props.actualPipette
     ? props.actualPipette.channels
     : props.wantedPipette?.channels || 1
-  const generation = props.displayName.includes('GEN2') ? 2 : 1 // get programmatically from sd when version in data
 
   let stepOne
   let stepTwo
@@ -112,7 +111,7 @@ function Steps(props: ChangePipetteProps) {
         step="one"
         diagram="screws"
         channels={channels}
-        generation={generation}
+        displayCategory={displayCategory}
         {...props}
       >
         {stepOne}
@@ -121,7 +120,7 @@ function Steps(props: ChangePipetteProps) {
         step="two"
         diagram="tab"
         channels={channels}
-        generation={generation}
+        displayCategory={displayCategory}
         {...props}
       >
         {stepTwo}

@@ -6,7 +6,7 @@ import { InstrumentDiagram, InstrumentGroup } from '..'
 describe('InstrumentDiagram', () => {
   test('Single-channel renders correctly', () => {
     const tree = Renderer.create(
-      <InstrumentDiagram channels={1} generation={1} />
+      <InstrumentDiagram channels={1} displayCategory="OG" />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -14,7 +14,7 @@ describe('InstrumentDiagram', () => {
 
   test('Multi-channel renders correctly', () => {
     const tree = Renderer.create(
-      <InstrumentDiagram channels={8} generation={1} />
+      <InstrumentDiagram channels={8} displayCategory="OG" />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -22,7 +22,7 @@ describe('InstrumentDiagram', () => {
 
   test('Single-channel GEN2 renders correctly', () => {
     const tree = Renderer.create(
-      <InstrumentDiagram channels={1} generation={2} />
+      <InstrumentDiagram channels={1} displayCategory="GEN2" />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -30,7 +30,7 @@ describe('InstrumentDiagram', () => {
 
   test('Multi-channel GEN2 renders correctly', () => {
     const tree = Renderer.create(
-      <InstrumentDiagram channels={8} generation={2} />
+      <InstrumentDiagram channels={8} displayCategory="GEN2" />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()

@@ -31,7 +31,7 @@ export default function PipetteInfo(props: Props) {
   const label = LABEL_BY_MOUNT[mount]
   const pipette = model && getPipetteModelSpecs(model)
 
-  const { displayName, channels } = pipette || {}
+  const { displayName, channels, displayCategory } = pipette || {}
 
   const direction = model ? 'change' : 'attach'
 
@@ -65,7 +65,7 @@ export default function PipetteInfo(props: Props) {
           <InstrumentDiagram
             channels={channels}
             mount={mount}
-            generation={displayName.includes('GEN2') ? 2 : 1} // get programmatically from sd when version in data
+            displayCategory={displayCategory}
             className={styles.pipette_diagram}
           />
         )}

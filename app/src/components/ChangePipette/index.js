@@ -137,12 +137,16 @@ function makeMapStateToProps(): (State, OP) => SP {
     const displayName =
       actualPipette?.displayName || wantedPipette?.displayName || ''
 
+    const displayCategory =
+      actualPipette?.displayCategory || wantedPipette?.displayCategory || ''
+
     return {
       actualPipette,
       direction,
       success,
       attachedWrong,
       displayName,
+      displayCategory,
       moveRequest: getRobotMove(state, robot),
       homeRequest: getRobotHome(state, robot),
       __pipettePlusEnabled: Boolean(

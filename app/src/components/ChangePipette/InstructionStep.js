@@ -1,7 +1,10 @@
 // @flow
 import * as React from 'react'
 
-import type { PipetteChannels } from '@opentrons/shared-data'
+import type {
+  PipetteChannels,
+  PipetteDisplayCategory,
+} from '@opentrons/shared-data'
 import type { Mount } from '../../robot'
 import type { Direction } from './types'
 
@@ -15,7 +18,7 @@ type DiagramProps = {
   mount: Mount,
   channels: PipetteChannels,
   diagram: Diagram,
-  generation: number,
+  displayCategory: PipetteDisplayCategory,
 }
 
 type Props = DiagramProps & {
@@ -24,13 +27,13 @@ type Props = DiagramProps & {
 }
 
 function getDiagramsSrc(props: Props) {
-  const { channels, generation, direction, mount, diagram } = props
+  const { channels, displayCategory, direction, mount, diagram } = props
   const channelsKey = channels === 8 ? 'multi' : 'single'
 
-  switch (generation) {
-    case 2:
+  switch (displayCategory) {
+    case 'GEN2':
       return require(`./images/${direction}-${mount}-${channelsKey}-GEN2-${diagram}@3x.png`)
-    case 1:
+    case 'OG':
     default:
       return require(`./images/${direction}-${mount}-${channelsKey}-${diagram}@3x.png`)
   }
