@@ -82,7 +82,11 @@ function UpdateRobotModal(props: Props) {
     )
   } else {
     return (
-      <ReinstallModal {...props} update={proceed} versionProps={versionProps} />
+      <ReinstallModal
+        {...props}
+        proceed={proceed}
+        versionProps={versionProps}
+      />
     )
   }
 }

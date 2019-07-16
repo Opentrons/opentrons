@@ -9,7 +9,7 @@ import styles from './styles.css'
 type Props = {
   versionProps: VersionProps,
   parentUrl: string,
-  update: () => mixed,
+  proceed: () => mixed,
 }
 
 const HEADING = 'Robot is up to date'
@@ -17,13 +17,13 @@ const REINSTALL_MESSAGE =
   "It looks like your robot is already up to date, but if you're experiencing issues you can re-apply the latest update."
 
 export default function ReinstallModal(props: Props) {
-  const { parentUrl, update, versionProps } = props
+  const { parentUrl, proceed, versionProps } = props
   return (
     <AlertModal
       heading={HEADING}
       buttons={[
         { Component: Link, to: parentUrl, children: 'not now' },
-        { disabled: true, onClick: update, children: 'Reinstall' },
+        { onClick: proceed, children: 'Reinstall' },
       ]}
       alertOverlay
     >

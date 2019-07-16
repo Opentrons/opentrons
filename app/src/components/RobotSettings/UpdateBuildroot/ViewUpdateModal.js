@@ -24,6 +24,7 @@ import type { RobotUpdateInfo } from '../../../http-api-client'
 type OP = {|
   robot: ViewableRobot,
   parentUrl: string,
+  setCurrentStep: (step: string) => mixed,
 |}
 
 type SP = {|
@@ -39,8 +40,11 @@ type DP = {| dispatch: Dispatch |}
 type Props = { ...OP, ...SP, ignoreUpdate: () => mixed }
 
 function ViewUpdateModal(props: Props) {
-  const [showReleaseNotes, setShowReleaseNotes] = React.useState<boolean>(false)
-  const viewReleaseNotes = () => setShowReleaseNotes(true)
+  const [
+    migrationWarningSeen,
+    setMigrationWarningSeen,
+  ] = React.useState<boolean>(false)
+
   const {
     buildrootStatus,
     ignoreUpdate,
@@ -48,17 +52,36 @@ function ViewUpdateModal(props: Props) {
     buildrootUpdateInfo,
     buildrootDownloadError,
     buildrootDownloadProgress,
+    setCurrentStep,
   } = props
   const notNowButton = {
     onClick: ignoreUpdate,
     children: 'not now',
   }
 
-  if (buildrootStatus === 'balena' && !showReleaseNotes) {
+  React.useEffect(() => {
+    const proceedToInstall = () => setCurrentStep('installUpdate')
+    if (robotUpdateInfo.type !== 'upgrade' && buildrootUpdateInfo) {
+      if (
+        (buildrootStatus === 'balena' && migrationWarningSeen) ||
+        buildrootStatus !== 'balena'
+      ) {
+        proceedToInstall()
+      }
+    }
+  }, [
+    buildrootStatus,
+    buildrootUpdateInfo,
+    migrationWarningSeen,
+    robotUpdateInfo.type,
+    setCurrentStep,
+  ])
+
+  if (buildrootStatus === 'balena' && !migrationWarningSeen) {
     return (
       <SystemUpdateModal
         notNowButton={notNowButton}
-        viewReleaseNotes={viewReleaseNotes}
+        viewReleaseNotes={() => setMigrationWarningSeen(true)}
       />
     )
   } else if (!buildrootUpdateInfo) {
@@ -69,7 +92,7 @@ function ViewUpdateModal(props: Props) {
         progress={buildrootDownloadProgress}
       />
     )
-  } else if (showReleaseNotes && robotUpdateInfo.type === 'upgrade') {
+  } else {
     return (
       <ReleaseNotesModal
         notNowButton={notNowButton}
@@ -78,8 +101,6 @@ function ViewUpdateModal(props: Props) {
       />
     )
   }
-
-  return null
 }
 
 function mapStateToProps(): (state: State, ownProps: OP) => SP {

@@ -41,7 +41,6 @@ export default function SyncRobotModal(props: Props) {
       {
         children: 'Downgrade Robot',
         onClick: proceed,
-        disabled: true,
       },
     ]
   }

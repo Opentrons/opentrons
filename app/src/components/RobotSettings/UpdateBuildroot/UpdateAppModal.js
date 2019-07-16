@@ -20,9 +20,7 @@ type Props = {
 
 export default function UpdateAppModal(props: Props) {
   const { parentUrl, versionProps, onClick, ignoreUpdate } = props
-  const HEADING = `Robot Server Version ${
-    versionProps.availableUpdate
-  } Available`
+  const HEADING = `Robot Version ${versionProps.availableUpdate} Available`
   const notNowButton = {
     Component: Link,
     to: parentUrl,
