@@ -1,4 +1,4 @@
-# web project deploy
+# Web Project Deploy Process
 
 Our web projects go through the following deploy lifecycle:
 
@@ -9,13 +9,13 @@ Our web projects go through the following deploy lifecycle:
 
 This directory contains scripts to perform steps 2, 3, and 4.
 
-## usage
+## Usage
 
 Before running any of these scripts, the release in question must be tagged and that tag must have been built by Travis and deployed to the sandbox.
 
 **IMPORTANT**: All scripts take an optional `--dryrun, -d` flag. **Always** run your command with `--dryrun` enabled first, inspect the script output, _then_ run it for real.
 
-### cut a new version to sandbox
+### Cut a new version to sandbox
 
 This process is still manual. Check out the commit you would like to release, and:
 
@@ -43,7 +43,7 @@ http://sandbox.${project_domain}/${name}@${version}
 http://sandbox.designer.opentrons.com/protocol-designer@3.0.0/
 ```
 
-### promote sandbox to staging
+### Promote sandbox to staging
 
 Once the sandbox build has been appropriately tested, you may promote the sandbox build to staging.
 
@@ -60,7 +60,7 @@ For example, to deploy version 3.0.0 of Protocol Designer version to staging:
 node ./scripts/deploy/promote-to-staging designer.opentrons.com protocol-designer@3.0.0
 ```
 
-### promote staging to production
+### Promote staging to production
 
 When the version under test is ready for release, you should promote the staging environment to production.
 
@@ -76,7 +76,7 @@ For example, to deploy whatever is in Protocol Designer staging to production:
 node ./scripts/deploy/promote-to-production designer.opentrons.com
 ```
 
-### rollback
+### Rollback
 
 ```shell
 node ./scripts/deploy/rollback <projectDomain> <environment>
