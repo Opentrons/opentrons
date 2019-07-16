@@ -33,7 +33,7 @@
     },
     "channels": 8
   },
-  "p20_single_GEN2": {
+  "p20_single_gen2": {
     "displayName": "P20 Single-Channel GEN2",
     "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
@@ -50,7 +50,7 @@
     "maxVolume": 20,
     "channels": 1
   },
-  "p20_multi_GEN2": {
+  "p20_multi_gen2": {
     "displayName": "P20 8-Channel GEN2",
     "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
@@ -118,7 +118,7 @@
     "minVolume": 30,
     "maxVolume": 300
   },
-  "p300_single_GEN2": {
+  "p300_single_gen2": {
     "displayName": "P300 Single-Channel GEN2",
     "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
@@ -135,7 +135,7 @@
     "minVolume": 20,
     "maxVolume": 300
   },
-  "p300_multi_GEN2": {
+  "p300_multi_gen2": {
     "displayName": "P300 8-Channel GEN2",
     "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
@@ -186,7 +186,7 @@
     "minVolume": 100,
     "maxVolume": 1000
   },
-  "p1000_single_GEN2": {
+  "p1000_single_gen2": {
     "displayName": "P1000 Single-Channel GEN2",
     "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
