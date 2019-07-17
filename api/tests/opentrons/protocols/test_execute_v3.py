@@ -111,8 +111,8 @@ def test_dispatch_commands(monkeypatch):
     def mock_dispense(volume, location):
         cmd.append(("dispense", volume, location))
 
-    def mock_set_flow_rate(aspirate, dispense):
-        flow_rates.append((aspirate, dispense))
+    def mock_set_flow_rate(aspirate, dispense, blow_out):
+        flow_rates.append((aspirate, dispense, blow_out))
 
     pipette = instruments.P10_Single('left')
 
@@ -135,6 +135,7 @@ def test_dispatch_commands(monkeypatch):
 
     aspirateOffset = 12.1
     dispenseOffset = 12.2
+    blowoutOffset = 15
 
     protocol_data = {
         "defaultValues": {
@@ -180,6 +181,16 @@ def test_dispatch_commands(monkeypatch):
                     "offsetFromBottomMm": dispenseOffset
                 }
             },
+            {
+                "command": "blowout",
+                "params": {
+                    "pipette": "pipetteId",
+                    "labware": "destPlateId",
+                    "well": "C1",
+                    "flowRate": 7,
+                    "offsetFromBottomMm": blowoutOffset
+                }
+            },
         ]
     }
 
@@ -189,10 +200,12 @@ def test_dispatch_commands(monkeypatch):
     assert cmd == [
         ("aspirate", 5, source_plate['A1'].bottom(aspirateOffset)),
         ("sleep", 42),
-        ("dispense", 4.5, dest_plate['B1'].bottom(dispenseOffset))
+        ("dispense", 4.5, dest_plate['B1'].bottom(dispenseOffset)),
+        ("blowout", dest_plate['C1'].bottom(blowoutOffset))
     ]
 
     assert flow_rates == [
-        (123, 123),
-        (3.5, 3.5)
+        (123, 123, 123),
+        (3.5, 3.5, 3.5),
+        (7 ,7, 7)
     ]
