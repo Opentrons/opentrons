@@ -60,11 +60,11 @@ export function getBuildrootUpdateSeen(state: State): boolean {
 }
 
 export function getBuildrootDownloadProgress(state: State): number | null {
-  return state.shell.buildroot.downloadProgress || null
+  return state.shell.buildroot.downloadProgress
 }
 
 export function getBuildrootDownloadError(state: State): string | null {
-  return state.shell.buildroot.downloadError || null
+  return state.shell.buildroot.downloadError
 }
 
 // TODO(mc, 2019-07-08): because of the size of this file, we should have

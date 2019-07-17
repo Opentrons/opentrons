@@ -6,11 +6,11 @@ import { AlertModal } from '@opentrons/components'
 
 import type { ButtonProps } from '@opentrons/components'
 
-type Props = {
+type Props = {|
   notNowButton: ButtonProps,
   error: string | null,
   progress: number | null,
-}
+|}
 
 const HEADING = 'Robot System Update Downloading'
 export default function DownloadUpdate(props: Props) {

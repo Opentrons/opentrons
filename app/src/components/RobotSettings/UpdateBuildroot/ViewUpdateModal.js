@@ -60,13 +60,12 @@ function ViewUpdateModal(props: Props) {
   }
 
   React.useEffect(() => {
-    const proceedToInstall = () => setCurrentStep('installUpdate')
     if (robotUpdateInfo.type !== 'upgrade' && buildrootUpdateInfo) {
       if (
         (buildrootStatus === 'balena' && migrationWarningSeen) ||
         buildrootStatus !== 'balena'
       ) {
-        proceedToInstall()
+        setCurrentStep('installUpdate')
       }
     }
   }, [
