@@ -1,10 +1,12 @@
 // @flow
 import React from 'react'
 import cx from 'classnames'
-import assert from 'assert'
-import type { PipetteDisplayCategory } from '@opentrons/shared-data'
+import type {
+  PipetteNameSpecs,
+  PipetteModelSpecs,
+} from '@opentrons/shared-data'
 
-import type { Mount } from '../../robot'
+import type { Mount } from '../robot-types'
 import singleSrc from './pipetteSingle.png'
 import multiSrc from './pipetteMulti.png'
 import singleGEN2Src from './pipetteGEN2Single.png'
@@ -12,18 +14,14 @@ import multiGEN2Src from './pipetteGEN2Multi.png'
 import styles from './instrument.css'
 
 type Props = {
-  channels?: number,
+  pipetteSpecs?: ?PipetteNameSpecs | ?PipetteModelSpecs,
   className?: string,
   mount: Mount,
-  displayCategory: PipetteDisplayCategory,
 }
 
 export default function InstrumentDiagram(props: Props) {
-  const { displayCategory, channels, mount } = props
-  assert(
-    displayCategory,
-    'expected a pipette displayCategory in InstrumentDiagram'
-  )
+  const { pipetteSpecs, mount } = props
+  const { displayCategory, channels } = pipetteSpecs || {}
 
   let imgSrc
   switch (displayCategory) {

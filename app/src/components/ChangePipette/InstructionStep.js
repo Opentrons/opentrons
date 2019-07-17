@@ -26,7 +26,7 @@ type Props = DiagramProps & {
   children: React.Node,
 }
 
-function getDiagramsSrc(props: Props) {
+export function getDiagramsSrc(props: DiagramProps) {
   const { channels, displayCategory, direction, mount, diagram } = props
   const channelsKey = channels === 8 ? 'multi' : 'single'
 

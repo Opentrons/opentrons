@@ -11,25 +11,25 @@ type Props = {
 }
 export default function PipetteDiagram(props: Props) {
   const { leftPipette, rightPipette } = props
-  const leftSpecs = getPipetteNameSpecs(leftPipette)
-  const rightSpecs = getPipetteNameSpecs(rightPipette)
+  const leftSpecs = leftPipette && getPipetteNameSpecs(leftPipette)
+  const rightSpecs = rightPipette && getPipetteNameSpecs(rightPipette)
 
   return (
     <React.Fragment>
       {leftPipette && leftSpecs ? (
         <InstrumentDiagram
-          channels={leftSpecs.channels}
-          displayCategory={leftSpecs.displayCategory}
+          pipetteSpecs={leftSpecs}
           className={styles.left_pipette}
+          mount="left"
         />
       ) : (
         <div className={styles.left_pipette} />
       )}
       {rightPipette && rightSpecs ? (
         <InstrumentDiagram
-          channels={rightSpecs.channels}
-          displayCategory={rightSpecs.displayCategory}
+          pipetteSpecs={rightSpecs}
           className={styles.right_pipette}
+          mount="right"
         />
       ) : (
         <div className={styles.right_pipette} />

@@ -29,9 +29,9 @@ const LABEL_BY_MOUNT = {
 export default function PipetteInfo(props: Props) {
   const { mount, model, robotName, onChangeClick, showSettings } = props
   const label = LABEL_BY_MOUNT[mount]
-  const pipette = model && getPipetteModelSpecs(model)
+  const pipette = model ? getPipetteModelSpecs(model) : null
 
-  const { displayName, channels, displayCategory } = pipette || {}
+  const { displayName, channels } = pipette || {}
 
   const direction = model ? 'change' : 'attach'
 
@@ -63,9 +63,8 @@ export default function PipetteInfo(props: Props) {
       <div className={styles.image}>
         {channels && (
           <InstrumentDiagram
-            channels={channels}
+            pipetteSpecs={pipette}
             mount={mount}
-            displayCategory={displayCategory}
             className={styles.pipette_diagram}
           />
         )}

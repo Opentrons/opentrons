@@ -1,9 +1,27 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`InstrumentDiagram Multi-channel GEN2 renders correctly 1`] = `
+<div>
+  <img
+    className=""
+    src="pipetteGEN2Multi.png"
+  />
+</div>
+`;
+
 exports[`InstrumentDiagram Multi-channel renders correctly 1`] = `
 <div>
   <img
     src="pipetteMulti.png"
+  />
+</div>
+`;
+
+exports[`InstrumentDiagram Single-channel GEN2 renders correctly 1`] = `
+<div>
+  <img
+    className=""
+    src="pipetteGEN2Single.png"
   />
 </div>
 `;

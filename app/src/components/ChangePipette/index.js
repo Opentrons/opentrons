@@ -6,6 +6,7 @@ import { Switch, Route, withRouter, type Match } from 'react-router'
 import {
   getPipetteNameSpecs,
   getPipetteModelSpecs,
+  type PipetteDisplayCategory,
 } from '@opentrons/shared-data'
 import { getConfig } from '../../config'
 
@@ -63,6 +64,7 @@ type SP = {|
   homeRequest: RobotHome,
   actualPipette: ?PipetteModelSpecs,
   displayName: string,
+  displayCategory: ?PipetteDisplayCategory,
   direction: Direction,
   success: boolean,
   attachedWrong: boolean,
@@ -138,7 +140,7 @@ function makeMapStateToProps(): (State, OP) => SP {
       actualPipette?.displayName || wantedPipette?.displayName || ''
 
     const displayCategory =
-      actualPipette?.displayCategory || wantedPipette?.displayCategory || ''
+      actualPipette?.displayCategory || wantedPipette?.displayCategory
 
     return {
       actualPipette,
