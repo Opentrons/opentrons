@@ -6,6 +6,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  border-radius: 0.5rem;
 }
 
 .labware_controls.can_edit {
@@ -58,6 +59,10 @@
   opacity: 0.5;
 }
 
+.overlay_button.drag_text {
+  color: var(--c-font-dark);
+}
+
 .button_spacer {
   flex: 1;
 }
@@ -86,7 +91,10 @@
 }
 
 .highlighted_border_div {
+  @apply --absolute-fill;
+
   border-color: var(--c-highlight);
   border-width: 3px;
   border-style: solid;
+  border-radius: 0.5rem;
 }

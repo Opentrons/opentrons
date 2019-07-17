@@ -16,6 +16,7 @@ import {
   makeTouchTipHelper,
   pickUpTipHelper,
   dropTipHelper,
+  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
 } from './fixtures'
 import { reduceCommandCreators } from '../utils'
 import _distribute from '../commandCreators/compound/distribute'
@@ -216,7 +217,7 @@ describe('tip handling for multiple distribute chunks', () => {
   })
 })
 
-describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
+describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position', () => {
   test('mix before aspirate, then aspirate disposal volume', () => {
     // NOTE this also tests "uneven final chunk" eg A6 in [A2 A3 | A4 A5 | A6]
     // which is especially relevant to disposal volume
@@ -226,8 +227,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
       destWells: ['A2', 'A3', 'A4', 'A5', 'A6'],
       changeTip: 'never',
       volume: 120,
-
-      mixFirstAspirate: true,
+      mixBeforeAspirate: { times: 2, volume: 50 },
       disposalVolume: 12,
       disposalLabware: SOURCE_LABWARE,
       disposalWell: 'A1',
@@ -238,18 +238,34 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
     )
     const res = getSuccessResult(result)
     const aspirateVol = 120 * 2 + 12
-
+    const mixCommands = [
+      // mix 1
+      aspirateHelper('A1', 50),
+      dispenseHelper('A1', 50, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
+      // mix 2
+      aspirateHelper('A1', 50),
+      dispenseHelper('A1', 50, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
+    ]
     expect(res.commands).toEqual([
+      ...mixCommands,
       aspirateHelper('A1', aspirateVol),
       dispenseHelper('A2', 120),
       dispenseHelper('A3', 120),
       blowoutSingleToSourceA1,
 
+      ...mixCommands,
       aspirateHelper('A1', aspirateVol),
       dispenseHelper('A4', 120),
       dispenseHelper('A5', 120),
       blowoutSingleToSourceA1,
 
+      ...mixCommands,
       aspirateHelper('A1', 120 + 12),
       dispenseHelper('A6', 120),
       blowoutSingleToSourceA1,
@@ -385,10 +401,16 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch', () => {
     const mixCommands = [
       // mix 1
       aspirateHelper('A1', 250),
-      dispenseHelper('A1', 250, { labware: SOURCE_LABWARE }),
+      dispenseHelper('A1', 250, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
       // mix 2
       aspirateHelper('A1', 250),
-      dispenseHelper('A1', 250, { labware: SOURCE_LABWARE }),
+      dispenseHelper('A1', 250, {
+        labware: SOURCE_LABWARE,
+        offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+      }),
     ]
 
     expect(res.commands).toEqual([

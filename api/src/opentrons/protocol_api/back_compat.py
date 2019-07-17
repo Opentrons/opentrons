@@ -4,6 +4,7 @@ This should not be imported directly; it is used to provide backwards
 compatible singletons in opentrons/__init__.py.
 """
 
+import asyncio
 import importlib.util
 from typing import Any, List
 
@@ -37,9 +38,11 @@ class BCRobot:
 
     def __init__(self,
                  hardware: hc.adapters.SingletonAdapter,
-                 protocol_ctx: ProtocolContext) -> None:
+                 protocol_ctx: ProtocolContext,
+                 loop: asyncio.AbstractEventLoop = None) -> None:
         self._hardware = hardware
         self._ctx = protocol_ctx
+        self._loop = loop or asyncio.get_event_loop()
 
     def connect(self, port: str = None,
                 options: Any = None):
@@ -64,7 +67,10 @@ class BCRobot:
 
     @property
     def fw_version(self):
-        return self._hardware.fw_version
+        try:
+            return self._loop.run_until_complete(self._hardware.fw_version)
+        except RuntimeError:  # If this was called from an async context
+            return 'unknown'  # return a default
 
     def __getattr__(self, name):
         """ Provide transparent access to the protocol context """
@@ -194,34 +200,34 @@ class BCLabware:
     def __init__(self, ctx: ProtocolContext) -> None:
         self._ctx = ctx
 
-    LW_NO_EQUIVALENT = {'24-vial-plate', '48-vial-plate', '5ml-3x4',
-                        '96-PCR-tall', '96-deep-well', '96-well-plate-20mm',
-                        'MALDI-plate', 'PCR-strip-tall', 'T25-flask',
-                        'T75-flask', 'alum-block-pcr-strips', 'e-gelgol',
+    LW_NO_EQUIVALENT = {'24-vial-rack', '48-vial-plate', '5ml-3x4',
+                        '96-well-plate-20mm', 'MALDI-plate',
+                        'T25-flask', 'T75-flask', 'e-gelgol',
                         'hampton-1ml-deep-block', 'point',
-                        'opentrons-aluminum-block-PCR-strips-200ul',
                         'rigaku-compact-crystallization-plate',
                         'small_vial_rack_16x45', 'temperature-plate',
-                        'tiprack-10ul-H', 'tiprack-200ul',
-                        'trough-12row-short', 'trough-1row-25ml',
-                        'trough-1row-test', 'tube-rack-.75ml',
+                        'tiprack-10ul-H', 'trough-12row-short',
+                        'trough-1row-25ml', 'trough-1row-test',
                         'tube-rack-2ml-9x9', 'tube-rack-5ml-96',
-                        'tube-rack-80well', 'wheaton_vial_rack',
-                        'tube-rack-15_50ml', 'tube-rack-2ml'}
+                        'tube-rack-80well', 'wheaton_vial_rack'}
     """ Labwares that are no longer supported in this version """
 
     LW_TRANSLATION = {
+        '6-well-plate': 'corning_6_wellplate_16.8ml_flat',
         '12-well-plate': 'corning_12_wellplate_6.9_ml',
         '24-well-plate': 'corning_24_wellplate_3.4_ml',
+        '48-well-plate': 'corning_48_wellplate_1.6ml_flat',
         '384-plate': 'corning_384_wellplate_112ul_flat',
-        '48-well-plate': 'corning_48_wellplate_1.6_ml',
-        '6-well-plate': 'corning_6_wellplate_16.8ml_flat',
+        '96-deep-well': 'usascientific_96_wellplate_2.4ml_deep',
+        '96-flat': 'corning_96_wellplate_360ul_flat',
         '96-PCR-flat': 'biorad_96_wellplate_200ul_pcr',
-        '96-flat': 'generic_96_wellplate_340ul_flat',
+        '96-PCR-tall': 'biorad_96_wellplate_200ul_pcr',
         'biorad-hardshell-96-PCR': 'biorad_96_wellplate_200ul_pcr',
+        'alum-block-pcr-strips': 'opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip',  # noqa(E501)
         'opentrons-aluminum-block-2ml-eppendorf': 'opentrons_24_aluminumblock_generic_2ml_screwcap',       # noqa(E501)
         'opentrons-aluminum-block-2ml-screwcap': 'opentrons_24_aluminumblock_generic_2ml_screwcap',        # noqa(E501)
         'opentrons-aluminum-block-96-PCR-plate': 'opentrons_96_aluminum_biorad_plate_200_ul',  # noqa(E501)
+        'opentrons-aluminum-block-PCR-strips-200ul': 'opentrons_96_aluminumblock_generic_pcr_strip_200ul',  # noqa(E501)
         'opentrons-tiprack-300ul': 'opentrons_96_tiprack_300ul',
         'opentrons-tuberack-1.5ml-eppendorf': 'opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap',        # noqa(E501)
         'opentrons-tuberack-15_50ml': 'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical',        # noqa(E501)
@@ -229,10 +235,17 @@ class BCLabware:
         'opentrons-tuberack-2ml-eppendorf': 'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap',            # noqa(E501)
         'opentrons-tuberack-2ml-screwcap': 'opentrons_24_tuberack_generic_2ml_screwcap',              # noqa(E501)
         'opentrons-tuberack-50ml': 'opentrons_6_tuberack_falcon_50ml_conical',
-        'tiprack-1000ul': 'opentrons_96_tiprack_1000ul',
+        'PCR-strip-tall': 'opentrons_96_aluminumblock_generic_pcr_strip_200ul',
         'tiprack-10ul': 'opentrons_96_tiprack_10ul',
-        'trough-12row': 'usascientific_12_reservoir_22ml'
+        'tiprack-200ul': 'tipone_96_tiprack_200ul',
+        'tiprack-1000ul': 'opentrons_96_tiprack_1000ul',
+        'trash-box': 'agilent_1_reservoir_290ml',
+        'trough-12row': 'usascientific_12_reservoir_22ml',
+        'tube-rack-.75ml': 'opentrons_24_tuberack_generic_0.75ml_snapcap_acrylic',  # noqa(E501)
+        'tube-rack-2ml': 'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap_acrylic',  # noqa(E501)
+        'tube-rack-15_50ml': 'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic',  # noqa(E501)
     }
+
     """ A table mapping old labware names to new labware names"""
 
     def load(self, container_name, slot, label=None, share=False):
@@ -256,6 +269,8 @@ class BCLabware:
                 raise NotImplementedError("Labware {} is not supported"
                                           .format(container_name))
             elif container_name in ('magdeck', 'tempdeck'):
+                # TODO(mc, 2019-06-28): when modules BC implemented, change
+                # error type and message to point user to modules.load
                 raise NotImplementedError("Module load not yet implemented")
             else:
                 name = container_name
@@ -280,7 +295,7 @@ class BCModules:
 def build_globals(hardware=None, loop=None):
     hw = hardware or hc.adapters.SingletonAdapter(loop)
     ctx = ProtocolContext(loop)
-    rob = BCRobot(hw, ctx)
+    rob = BCRobot(hw, ctx, loop)
     instr = BCInstruments(ctx)
     lw = BCLabware(ctx)
     mod = BCModules(ctx)

@@ -7,6 +7,45 @@
   right: 0;
 }
 
+.info_box {
+  display: flex;
+  align-items: center;
+  margin: 1rem;
+  padding: 1.5rem;
+  border: var(--bd-light);
+}
+
+.info_box_left {
+  margin-right: 1rem;
+}
+
+.info_box_title {
+  @apply --font-header-dark;
+
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.info_box_description {
+  @apply --font-body-2-dark;
+}
+
+.info_box_icon {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 1rem;
+}
+
+.info_box_button {
+  flex: none;
+  width: auto;
+  margin-left: auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
 .modal_contents {
   background-color: white;
 }

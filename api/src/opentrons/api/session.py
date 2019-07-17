@@ -238,7 +238,6 @@ class Session(object):
                     run_protocol(protocol_code=self._protocol,
                                  simulate=True,
                                  context=self._simulating_ctx)
-                sim.join()
             else:
                 self._hardware.broker = self._broker
                 self._hardware.cache_instrument_models()
@@ -280,10 +279,14 @@ class Session(object):
             # TODO Ian 2018-05-16 use protocol JSON schema to raise
             # warning/error here if the protocol_text doesn't follow the schema
             self._protocol = json.loads(self.protocol_text)
+            version = 'JSON'
         else:
             parsed = ast.parse(self.protocol_text, filename=self.name)
             self.metadata = extract_metadata(parsed)
             self._protocol = compile(parsed, filename=self.name, mode='exec')
+            version = infer_version(self.metadata, parsed)
+
+        log.info(f"Protocol API version: {version}")
 
         try:
             self._broker.set_logger(self._sim_logger)
@@ -449,6 +452,53 @@ def extract_metadata(parsed):
             values = [v.s for v in obj.value.values]
             metadata = dict(zip(keys, values))
     return metadata
+
+
+def infer_version_from_imports(parsed):
+    # Imports in the form of `import opentrons.robot` will have an entry in
+    # parsed.body[i].names[0].name in the form "opentrons.robot"
+    ot_imports = list(filter(
+        lambda x: 'opentrons' in x,
+        [obj.names[0].name for obj in parsed.body
+         if isinstance(obj, ast.Import)]))
+
+    # Imports in the form of `from opentrons import robot` (with or without an
+    # `as ___` statement) will have an entry in parsed.body[i].module
+    # containing "opentrons"
+    ot_from_imports = [
+        obj.names[0].name for obj in parsed.body
+        if isinstance(obj, ast.ImportFrom) and 'opentrons' in obj.module]
+
+    # If any of these are populated, filter for entries with v1-specific terms
+    opentrons_imports = ot_imports + ot_from_imports
+    v1evidence = ['robot' in i or 'instruments' in i or 'modules' in i
+                  for i in opentrons_imports]
+    if any(v1evidence):
+        return '1'
+    else:
+        return '2'
+
+
+def infer_version(metadata, parsed):
+    """
+    Infer protocol API version based on a combination of metadata and imports.
+
+    If a protocol specifies its API version using the 'apiLevel' key of a top-
+    level dict variable named `metadata`, the value for that key will be
+    returned as the version (the value will be stringified, so numeric or
+    string values can be used).
+
+    If that variable does not exist or if it does not contain the 'apiLevel'
+    key, the API version will be inferred from the imports. A script with an
+    import containing 'robot', 'instruments', or 'modules' will be assumed to
+    be an APIv1 protocol. If none of these are present, it is assumed to be an
+    APIv2 protocol (note that 'labware' is not in this list, as there is a
+    valid APIv2 import named 'labware').
+    """
+    if metadata and \
+            'apiLevel' in metadata and str(metadata['apiLevel']) in ['1', '2']:
+        return str(metadata['apiLevel'])
+    return infer_version_from_imports(parsed)
 
 
 def _accumulate(iterable):

@@ -1,7 +1,7 @@
 // @flow
 import i18n from '../../../localization'
 import * as React from 'react'
-import { AlertModal } from '@opentrons/components'
+import { AlertModal, OutlineButton } from '@opentrons/components'
 import modalStyles from '../modal.css'
 import getModalContents from './modalContents'
 import type { FileUploadMessage } from '../../../load-file'
@@ -18,21 +18,36 @@ export default function FileUploadMessageModal(props: Props) {
   if (!message) return null
 
   const { title, body, okButtonText } = getModalContents(message)
+  const buttons = [
+    {
+      children: okButtonText || 'ok',
+      onClick: dismissModal,
+      className: modalStyles.ok_button,
+    },
+    {
+      children: i18n.t('button.cancel'),
+      onClick: cancelProtocolMigration,
+    },
+  ]
   return (
     <AlertModal
       heading={title}
-      buttons={[
-        { children: i18n.t('button.cancel'), onClick: cancelProtocolMigration },
-        {
-          children: okButtonText || 'ok',
-          onClick: dismissModal,
-          className: modalStyles.ok_button,
-        },
-      ]}
       className={modalStyles.modal}
+      contentsClassName={modalStyles.scrollable_modal_contents}
       alertOverlay
     >
-      {body}
+      <div className={modalStyles.scrollable_modal_wrapper}>
+        <div className={modalStyles.scrollable_modal_scroll}>{body}</div>
+        <div>
+          {buttons.map((button, index) => (
+            <OutlineButton
+              {...button}
+              key={index}
+              className={modalStyles.bottom_button}
+            />
+          ))}
+        </div>
+      </div>
     </AlertModal>
   )
 }

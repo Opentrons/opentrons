@@ -3,7 +3,6 @@ import React, { useState, useMemo } from 'react'
 import { useOnClickOutside, OutlineButton } from '@opentrons/components'
 import {
   getLabwareDefURI,
-  getLabwareDisplayName,
   type DeckSlotId,
   type LabwareDefinition2,
 } from '@opentrons/shared-data'
@@ -90,8 +89,7 @@ const LabwareDropdown = (props: Props) => {
                 labwareByCategory[category].map((labwareDef, index) => (
                   <LabwareItem
                     key={index}
-                    containerType={getLabwareDefURI(labwareDef)}
-                    displayName={getLabwareDisplayName(labwareDef)}
+                    labwareDef={labwareDef}
                     selectLabware={selectLabware}
                     onMouseEnter={() => previewLabware(labwareDef)}
                     onMouseLeave={() => previewLabware()}

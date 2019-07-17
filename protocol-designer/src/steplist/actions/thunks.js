@@ -9,8 +9,6 @@ import { actions as tutorialActions } from '../../tutorial'
 import type { StepType, StepIdType } from '../../form-types'
 import type { GetState, ThunkDispatch } from '../../types'
 
-export const SCROLL_ON_SELECT_STEP_CLASSNAME = 'scroll_on_select_step'
-
 export type SelectStepAction = {
   type: 'SELECT_STEP',
   payload: StepIdType,

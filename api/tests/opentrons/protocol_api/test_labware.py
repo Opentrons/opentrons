@@ -115,7 +115,7 @@ def test_from_center_cartesian():
 
 
 def test_backcompat():
-    labware_name = 'generic_96_wellplate_340ul_flat'
+    labware_name = 'corning_96_wellplate_360ul_flat'
     labware_def = labware.get_labware_definition(labware_name)
     lw = labware.Labware(labware_def, Location(Point(0, 0, 0), 'Test Slot'))
 
@@ -160,7 +160,7 @@ def test_backcompat():
 
 
 def test_well_parent():
-    labware_name = 'generic_96_wellplate_340ul_flat'
+    labware_name = 'corning_96_wellplate_360ul_flat'
     labware_def = labware.get_labware_definition(labware_name)
     lw = labware.Labware(labware_def, Location(Point(0, 0, 0), 'Test Slot'))
     parent = Location(Point(7, 8, 9), lw)
@@ -188,7 +188,7 @@ def test_tip_tracking_init():
     for well in tiprack.wells():
         assert well.has_tip
 
-    labware_name = 'generic_96_wellplate_340ul_flat'
+    labware_name = 'corning_96_wellplate_360ul_flat'
     labware_def = labware.get_labware_definition(labware_name)
     lw = labware.Labware(labware_def, Location(Point(0, 0, 0), 'Test Slot'))
     assert not lw.is_tiprack
@@ -355,7 +355,7 @@ def test_module_load():
 
 def test_module_load_labware():
     module_names = ['tempdeck', 'magdeck']
-    labware_name = 'generic_96_wellplate_340ul_flat'
+    labware_name = 'corning_96_wellplate_360ul_flat'
     labware_def = labware.get_labware_definition(labware_name)
     for name in module_names:
         mod = labware.load_module(name, Location(Point(0, 0, 0), 'test'))

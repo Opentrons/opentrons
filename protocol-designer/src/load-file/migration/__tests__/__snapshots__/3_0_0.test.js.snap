@@ -256,7 +256,7 @@ Object {
           "shape": "circular",
           "totalLiquidVolume": 100,
           "x": 10,
-          "y": 10,
+          "y": 75.48,
           "z": 15,
         },
         "A2": Object {
@@ -265,7 +265,7 @@ Object {
           "shape": "circular",
           "totalLiquidVolume": 100,
           "x": 20,
-          "y": 10,
+          "y": 75.48,
           "z": 15,
         },
       },

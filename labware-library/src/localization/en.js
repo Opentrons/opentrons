@@ -69,3 +69,9 @@ export const API_NAME = 'api name'
 export const COPIED_TO_CLIPBOARD = 'Copied to clipboard!'
 export const VARIOUS = 'Various'
 export const NA = 'N/A'
+
+export const LABWARE_GUIDE = 'Labware Guide'
+export const WHAT_IS_A_LABWARE_DEFINITION = 'What is a labware definition?'
+export const USING_THE_LABWARE_LIBRARY = 'Using the labware library'
+export const CREATING_CUSTOM_LABWARE_DEFINITIONS =
+  'Creating custom labware definitions'

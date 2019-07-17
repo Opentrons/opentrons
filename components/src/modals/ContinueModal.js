@@ -32,6 +32,7 @@ export default function ContinueModal(props: ContinueModalProps) {
       className={className}
       buttons={buttons}
       onCloseClick={onCancelClick}
+      restrictOuterScroll={false}
     >
       {props.children}
     </AlertModal>

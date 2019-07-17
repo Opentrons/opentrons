@@ -1,4 +1,5 @@
 // @flow
+import remote from './remote'
 import type { State } from '../types'
 
 export type ApiUpdateInfo = {
@@ -8,7 +9,7 @@ export type ApiUpdateInfo = {
 
 const {
   apiUpdate: { getUpdateInfo, getUpdateFileContents },
-} = global.APP_SHELL
+} = remote
 
 export function apiUpdateReducer(state: ?ApiUpdateInfo) {
   if (!state) return getUpdateInfo()

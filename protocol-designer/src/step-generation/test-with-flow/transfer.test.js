@@ -14,6 +14,8 @@ import {
   makeTouchTipHelper,
   pickUpTipHelper,
   dropTipHelper,
+  ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+  DISPENSE_OFFSET_FROM_BOTTOM_MM,
 } from './fixtures'
 import { reduceCommandCreators } from '../utils'
 import _transfer from '../commandCreators/compound/transfer'
@@ -478,7 +480,10 @@ describe('advanced options', () => {
       expect(res.commands).toEqual([
         // pre-wet aspirate/dispense
         aspirateHelper('A1', 300),
-        dispenseHelper('A1', 300, { labware: SOURCE_LABWARE }),
+        dispenseHelper('A1', 300, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
 
         // "real" aspirate/dispenses
         aspirateHelper('A1', 300),
@@ -543,10 +548,16 @@ describe('advanced options', () => {
       const mixCommands = [
         // mix 1
         aspirateHelper('A1', 250),
-        dispenseHelper('A1', 250, { labware: SOURCE_LABWARE }),
+        dispenseHelper('A1', 250, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
         // mix 2
         aspirateHelper('A1', 250),
-        dispenseHelper('A1', 250, { labware: SOURCE_LABWARE }),
+        dispenseHelper('A1', 250, {
+          labware: SOURCE_LABWARE,
+          offsetFromBottomMm: ASPIRATE_OFFSET_FROM_BOTTOM_MM,
+        }),
       ]
 
       const result = transfer(mixinArgs)(invariantContext, robotStateWithTip)
@@ -579,10 +590,16 @@ describe('advanced options', () => {
       // written here for less verbose `commands` below
       const mixCommands = [
         // mix 1
-        aspirateHelper('B1', 250, { labware: DEST_LABWARE }),
+        aspirateHelper('B1', 250, {
+          labware: DEST_LABWARE,
+          offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+        }),
         dispenseHelper('B1', 250),
         // mix 2
-        aspirateHelper('B1', 250, { labware: DEST_LABWARE }),
+        aspirateHelper('B1', 250, {
+          labware: DEST_LABWARE,
+          offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
+        }),
         dispenseHelper('B1', 250),
       ]
 

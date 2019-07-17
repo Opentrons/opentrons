@@ -222,7 +222,7 @@ export class DiscoveryClient extends EventEmitter {
 
   _rediscover(): void {
     const knownIps = getKnownIps(this._browser)
-    log(this._logger, 'debug', 'refreshing advertising flags', { knownIps })
+    log(this._logger, 'silly', 'refreshing advertising flags', { knownIps })
 
     const nextServices = this.services.map(s =>
       updateService(s, {
@@ -236,7 +236,7 @@ export class DiscoveryClient extends EventEmitter {
   }
 
   _handleUp(browserService: BrowserService): void {
-    log(this._logger, 'debug', 'mdns service detected', { browserService })
+    log(this._logger, 'silly', 'mdns service detected', { browserService })
     const service = fromMdnsBrowser(browserService)
 
     if (service) this._handleService(service)
@@ -283,7 +283,7 @@ export class DiscoveryClient extends EventEmitter {
       this.services = nextServices
       this._poll()
 
-      log(this._logger, 'debug', 'updated services', { updated })
+      log(this._logger, 'silly', 'updated services', { updated })
       this.emit(SERVICE_EVENT, updated)
     }
   }

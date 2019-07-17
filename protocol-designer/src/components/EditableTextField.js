@@ -81,7 +81,7 @@ export default class EditableTextField extends React.Component<Props, State> {
 
     return (
       <div onClick={this.enterEditMode} className={className}>
-        {value}
+        <div className={styles.static_value}>{value}</div>
         <Icon name="pencil" className={styles.edit_icon_right} />
       </div>
     )

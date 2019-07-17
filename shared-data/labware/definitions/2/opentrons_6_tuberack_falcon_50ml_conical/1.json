@@ -16,65 +16,65 @@
   "dimensions": {
     "xDimension": 127.76,
     "yDimension": 85.48,
-    "zDimension": 122
+    "zDimension": 120.3
   },
   "schemaVersion": 2,
   "version": 1,
   "namespace": "opentrons",
   "wells": {
     "B1": {
-      "depth": 113.78,
+      "depth": 113,
       "diameter": 27.81,
       "shape": "circular",
       "totalLiquidVolume": 50000,
       "x": 35.5,
       "y": 25.24,
-      "z": 8.22
+      "z": 7.3
     },
     "A1": {
-      "depth": 113.78,
+      "depth": 113,
       "diameter": 27.81,
       "shape": "circular",
       "totalLiquidVolume": 50000,
       "x": 35.5,
       "y": 60.24,
-      "z": 8.22
+      "z": 7.3
     },
     "B2": {
-      "depth": 113.78,
+      "depth": 113,
       "diameter": 27.81,
       "shape": "circular",
       "totalLiquidVolume": 50000,
       "x": 70.5,
       "y": 25.24,
-      "z": 8.22
+      "z": 7.3
     },
     "A2": {
-      "depth": 113.78,
+      "depth": 113,
       "diameter": 27.81,
       "shape": "circular",
       "totalLiquidVolume": 50000,
       "x": 70.5,
       "y": 60.24,
-      "z": 8.22
+      "z": 7.3
     },
     "B3": {
-      "depth": 113.78,
+      "depth": 113,
       "diameter": 27.81,
       "shape": "circular",
       "totalLiquidVolume": 50000,
       "x": 105.5,
       "y": 25.24,
-      "z": 8.22
+      "z": 7.3
     },
     "A3": {
-      "depth": 113.78,
+      "depth": 113,
       "diameter": 27.81,
       "shape": "circular",
       "totalLiquidVolume": 50000,
       "x": 105.5,
       "y": 60.24,
-      "z": 8.22
+      "z": 7.3
     }
   },
   "parameters": {

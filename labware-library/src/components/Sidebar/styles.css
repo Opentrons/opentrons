@@ -16,7 +16,7 @@
 .labware_guide_container {
   border: var(--bd-light);
   border-radius: 3px;
-  padding: var(--spacing-4) var(--spacing-6);
+  padding: var(--spacing-5);
 }
 
 .labware_guide_title {
@@ -24,6 +24,7 @@
 
   display: flex;
   align-items: center;
+  margin-bottom: var(--spacing-5);
   font-weight: var(--fw-semibold);
 }
 
@@ -35,9 +36,9 @@
 
 .labware_guide_link {
   display: block;
-  line-height: var(--lh-title);
+  line-height: var(--lh-copy);
   font-size: var(--fs-body-1);
-  margin-top: var(--spacing-3);
+  margin-top: var(--spacing-2);
   color: var(--c-blue);
 }
 

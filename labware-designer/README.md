@@ -23,7 +23,7 @@ Any labware that does not meet the criteria of 'regular'. A labware is irregular
 ## Launching the Tool
 
 First you should make sure that you run `make install` within the `opentrons` top level folder.
-If you are up-to-date on all other directories you can simply run `yarn` instead.
+If you are up-to-date on all other directories you can simply run `make install-js` instead.
 Next you have two options:
 
 1. From the top level folder type: `make -C labware-designer dev`
@@ -42,89 +42,139 @@ OR
 The generator has the following functions:
 
 - `sharedData.createRegularLabware` - Generate regular labware definition
-- `sharedData.createIrregularLabware` - Generate irrgular labware definition
+- `sharedData.createIrregularLabware` - Generate irregular labware definition
+
+**Note**: The generator will make a best-effort to generate a sane load name, but it may need to be edited manually based on specific needs.
 
 ### createRegularLabware(options: RegularLabwareProps): LabwareDefinition2
 
 To build a _regular_ labware, the `options` object should have the following shape:
 
-| field        | type                      | required | description                                                                                        |
-| ------------ | ------------------------- | -------- | -------------------------------------------------------------------------------------------------- |
-| `metadata`   | [Metadata](#Metadata)     | yes      | Information about the labware                                                                      |
-| `parameters` | [Parameters](#Parameters) | yes      | Parameters that affect labware functionality                                                       |
-| `dimensions` | [Dimensions](#Dimensions) | yes      | Overall dimensions of the labware                                                                  |
-| `offset`     | [Offset](#Offset)         | yes      | Distance from labware's top-left corner to well A1                                                 |
-| `grid`       | [Grid](#Grid)             | yes      | Number of rows and columns of wells                                                                |
-| `spacing`    | [Spacing](#Spacing)       | yes      | Distance between rows and columns                                                                  |
-| `well`       | [Well](#Well)             | yes      | Well parameters                                                                                    |
-| `brand`      | [Brand](#Brand)           | no       | Labware manufacturer ("generic" if omitted)                                                        |
-| `version`    | [Version](#Version)       | no       | Version of the definition, should be incremented if non-metadata info is altered (defaults to `1`) |
-| `namespace`  | [Namepace](#Namespace)    | no       | Defaults to "custom_beta"                                                                          |
+| field             | type                              | required | description                                                                                        |
+| ----------------- | --------------------------------- | -------- | -------------------------------------------------------------------------------------------------- |
+| `metadata`        | [Metadata](#Metadata)             | yes      | Information about the labware                                                                      |
+| `parameters`      | [Parameters](#Parameters)         | yes      | Parameters that affect labware functionality                                                       |
+| `dimensions`      | [Dimensions](#Dimensions)         | yes      | Overall dimensions of the labware                                                                  |
+| `offset`          | [Offset](#Offset)                 | yes      | Distance from labware's top-left corner to well A1                                                 |
+| `grid`            | [Grid](#Grid)                     | yes      | Number of rows and columns of wells                                                                |
+| `spacing`         | [Spacing](#Spacing)               | yes      | Distance between rows and columns                                                                  |
+| `well`            | [Well](#Well)                     | yes      | Well parameters                                                                                    |
+| `group`           | [Group](#Group)                   | no       | Well group parameters                                                                              |
+| `brand`           | [Brand](#Brand)                   | no       | Labware manufacturer ("generic" if omitted)                                                        |
+| `version`         | [number](#Version)                | no       | Version of the definition, should be incremented if non-metadata info is altered (defaults to `1`) |
+| `namespace`       | [string](#Namespace)              | no       | Defaults to "custom_beta"                                                                          |
+| `loadNamePostfix` | [Array<string>](#LoadNamePostfix) | no       | Array of additional strings to postfix the loadName with                                           |
 
-This example generates [generic_96_wellplate_340ul_flat.json][]:
+This example generates [corning_96_wellplate_360ul_flat][]:
 
 ```js
 const options = {
+  namespace: 'opentrons',
   metadata: {
-    displayName: 'ANSI 96 Standard Microplate',
+    displayName: 'Corning 96 Well Plate 360 µL Flat',
     displayCategory: 'wellPlate',
     displayVolumeUnits: 'µL',
-    tags: ['flat', 'microplate', 'SBS', 'ANSI', 'generic'],
+    tags: [],
   },
+  loadNamePostfix: ['flat'],
   parameters: {
     format: '96Standard',
     isTiprack: false,
     isMagneticModuleCompatible: false,
   },
-  offset: { x: 14.38, y: 11.24, z: 14.35 },
+  offset: { x: 14.38, y: 11.23, z: 14.22 },
   dimensions: {
     xDimension: 127.76,
-    yDimension: 85.48,
-    zDimension: 14.35,
+    yDimension: 85.47,
+    zDimension: 14.22,
   },
   grid: { row: 8, column: 12 },
   spacing: { row: 9, column: 9 },
   well: {
-    depth: 10.54,
+    depth: 10.67,
     shape: 'circular',
-    diameter: 6.4,
-    totalLiquidVolume: 380,
+    diameter: 6.86,
+    totalLiquidVolume: 360,
   },
-  brand: { brand: 'generic' },
+  group: {
+    metadata: {
+      wellBottomShape: 'flat',
+    },
+  },
+  brand: {
+    brand: 'Corning',
+    brandId: [
+      '3650',
+      '3916',
+      '3915',
+      '3361',
+      '3590',
+      '9018',
+      '3591',
+      '9017',
+      '3641',
+      '3628',
+      '3370',
+      '2507',
+      '2509',
+      '2503',
+      '3665',
+      '3600',
+      '3362',
+      '3917',
+      '3912',
+      '3925',
+      '3922',
+      '3596',
+      '3977',
+      '3598',
+      '3599',
+      '3585',
+      '3595',
+      '3300',
+      '3474',
+    ],
+    links: [
+      'https://ecatalog.corning.com/life-sciences/b2c/US/en/Microplates/Assay-Microplates/96-Well-Microplates/Corning%C2%AE-96-well-Solid-Black-and-White-Polystyrene-Microplates/p/corning96WellSolidBlackAndWhitePolystyreneMicroplates',
+    ],
+  },
 }
 
 const labware = sharedData.createRegularLabware(options)
 ```
 
-[generic_96_wellplate_340ul_flat.json]: ../shared-data/labware/definitions/2/generic_96_wellplate_340ul_flat/1.json
+[corning_96_wellplate_360ul_flat]: ../shared-data/labware/definitions/2/corning_96_wellplate_360ul_flat/1.json
 
 ### createIrregularLabware(options: IrregularLabwareProps): LabwareDefinition2
 
 To build an _irregular_ labware, the `options` object should have the following shape:
 
-| field        | type                           | required | description                                                                                        |
-| ------------ | ------------------------------ | -------- | -------------------------------------------------------------------------------------------------- |
-| `metadata`   | [Metadata](#Metadata)          | yes      | Information about the labware                                                                      |
-| `parameters` | [Parameters](#Parameters)      | yes      | Parameters that affect labware functionality                                                       |
-| `dimensions` | [Dimensions](#Dimensions)      | yes      | Overall dimensions of the labware                                                                  |
-| `offset`     | Array<[Offset](#Offset) >      | yes      | Distances from labware's top-left corner to first well of each grid                                |
-| `grid`       | Array<[Grid](#Grid)>           | yes      | Number of rows and columns per grid                                                                |
-| `spacing`    | Array<[Spacing](#Spacing)>     | yes      | Distance between rows and columns per grid                                                         |
-| `well`       | Array<[Well](#Well)>           | yes      | Well parameters per grid                                                                           |
-| `gridStart`  | Array<[GridStart](#GridStart)> | yes      | Well naming scheme per grid                                                                        |
-| `brand`      | [Brand](#Brand)                | no       | Labware manufacturer ("generic" if omitted)                                                        |
-| `version`    | [Version](#Version)            | no       | Version of the definition, should be incremented if non-metadata info is altered (defaults to `1`) |
-| `namespace`  | [Namepace](#Namespace)         | no       | Defaults to "custom_beta"                                                                          |
+| field             | type                              | required | description                                                                                        |
+| ----------------- | --------------------------------- | -------- | -------------------------------------------------------------------------------------------------- |
+| `metadata`        | [Metadata](#Metadata)             | yes      | Information about the labware                                                                      |
+| `parameters`      | [Parameters](#Parameters)         | yes      | Parameters that affect labware functionality                                                       |
+| `dimensions`      | [Dimensions](#Dimensions)         | yes      | Overall dimensions of the labware                                                                  |
+| `offset`          | Array<[Offset](#Offset)>          | yes      | Distances from labware's top-left corner to first well of each grid                                |
+| `grid`            | Array<[Grid](#Grid)>              | yes      | Number of rows and columns per grid                                                                |
+| `spacing`         | Array<[Spacing](#Spacing)>        | yes      | Distance between rows and columns per grid                                                         |
+| `well`            | Array<[Well](#Well)>              | yes      | Well parameters per grid                                                                           |
+| `gridStart`       | Array<[GridStart](#GridStart)>    | yes      | Well naming scheme per grid                                                                        |
+| `group`           | Array<[Group](#Group)>            | no       | Well group parameters per grid                                                                     |
+| `brand`           | [Brand](#Brand)                   | no       | Labware manufacturer information                                                                   |
+| `version`         | [number](#Version)                | no       | Version of the definition, should be incremented if non-metadata info is altered (defaults to `1`) |
+| `namespace`       | [string](#Namespace)              | no       | Defaults to "custom_beta"                                                                          |
+| `loadNamePostfix` | [Array<string>](#LoadNamePostfix) | no       | Array of additional strings to postfix the loadName with                                           |
 
-This example generates [opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical.json][]
+This example generates [opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical][]
 
 ```js
 const options = {
+  namespace: 'opentrons',
   metadata: {
-    displayName: 'Opentrons 6x15mL 4x50mL tube rack',
+    displayName: 'Opentrons 10 Tube Rack with Falcon 4x50 mL, 6x15 mL Conical',
     displayCategory: 'tubeRack',
     displayVolumeUnits: 'mL',
-    tags: ['opentrons', 'modular', 'tuberack', '15', 'mL', '50'],
+    tags: [],
   },
   parameters: {
     format: 'irregular',
@@ -142,13 +192,13 @@ const options = {
   well: [
     {
       totalLiquidVolume: 15000,
-      diameter: 14.5,
+      diameter: 14.9,
       shape: 'circular',
       depth: 117.98,
     },
     {
       totalLiquidVolume: 50000,
-      diameter: 26.45,
+      diameter: 27.81,
       shape: 'circular',
       depth: 113.85,
     },
@@ -157,9 +207,46 @@ const options = {
     { rowStart: 'A', colStart: '1', rowStride: 1, colStride: 1 },
     { rowStart: 'A', colStart: '3', rowStride: 1, colStride: 1 },
   ],
-  brand: { brand: 'Opentrons', brandId: ['352096', '352070'] },
+  group: [
+    {
+      metadata: {
+        displayName: 'Falcon 6x15 mL Conical',
+        displayCategory: 'tubeRack',
+        wellBottomShape: 'v',
+      },
+      brand: {
+        brand: 'Falcon',
+        brandId: ['352095', '352096', '352097', '352099', '352196'],
+        links: [
+          'https://ecatalog.corning.com/life-sciences/b2c/US/en/Liquid-Handling/Tubes,-Liquid-Handling/Centrifuge-Tubes/Falcon%C2%AE-Conical-Centrifuge-Tubes/p/falconConicalTubes',
+        ],
+      },
+    },
+    {
+      metadata: {
+        displayName: 'Falcon 4x50 mL Conical',
+        displayCategory: 'tubeRack',
+        wellBottomShape: 'v',
+      },
+      brand: {
+        brand: 'Falcon',
+        brandId: ['352070', '352098'],
+        links: [
+          'https://ecatalog.corning.com/life-sciences/b2c/US/en/Liquid-Handling/Tubes,-Liquid-Handling/Centrifuge-Tubes/Falcon%C2%AE-Conical-Centrifuge-Tubes/p/falconConicalTubes',
+        ],
+      },
+    },
+  ],
+  brand: {
+    brand: 'Opentrons',
+    brandId: [],
+    links: [
+      'https://shop.opentrons.com/collections/opentrons-tips/products/tube-rack-set-1',
+    ],
+  },
 }
 
+// load name will need to be edited manually
 const labware = sharedData.createIrregularLabware(options)
 ```
 
@@ -168,6 +255,8 @@ const labware = sharedData.createIrregularLabware(options)
 ### Types
 
 #### Metadata
+
+Type: object
 
 Metadata that affects how the labware is displayed to the user but does not affect labware functionality.
 
@@ -206,6 +295,8 @@ Fields:
 - `tags` is a list of generic words that a user may search for to find the labware
 
 #### Parameters
+
+Type: object
 
 Parameters that affect how the labware is operated on by the robot
 
@@ -247,6 +338,8 @@ loadName = `${brand}_${numWells}_${displayCategory}_${totalVol}_${displayVolumeU
 
 #### Well
 
+Type: object
+
 Properties to apply to every well in a given grid.
 
 Example:
@@ -277,6 +370,8 @@ Note: The full well schema includes `x`, `y`, and `z` fields, but they should no
 
 #### Grid
 
+Type: object
+
 The number of rows and columns in a regular labware or irregular labware grid
 
 Example:
@@ -296,6 +391,8 @@ Fields:
 | column | number | yes      | Number of columns (running down the x-axis) |
 
 #### Spacing
+
+Type: object
 
 Center-to-center distance in **mm** between rows and columns in a regular labware or irregular labware grid
 
@@ -317,6 +414,8 @@ Fields:
 
 #### Offset
 
+Type: object
+
 The distance in **mm** from the **upper left corner of the labware, flush with the deck** to the **top-center of well `A1`** (or the first well in an irregular labware grid).
 
 Example:
@@ -331,13 +430,15 @@ const offset = {
 
 Fields:
 
-| field | type   | required | description               |
-| ----- | ------ | -------- | ------------------------- |
-| x     | number | yes      | X-axis distance in **mm** |
-| y     | number | yes      | Y-axis distance in **mm** |
-| z     | number | yes      | Z-axis distance in **mm** |
+| field | type   | required | description                                  |
+| ----- | ------ | -------- | -------------------------------------------- |
+| x     | number | yes      | X-axis distance to well top-center in **mm** |
+| y     | number | yes      | Y-axis distance to well top-center in **mm** |
+| z     | number | yes      | Z-axis distance to well top-center in **mm** |
 
 #### Dimensions
+
+Type: object
 
 Overall dimensions in **mm** of the labware
 
@@ -369,6 +470,8 @@ Fields:
 
 #### GridStart
 
+Type: object
+
 Used to generate well names for irregular labware. The object represents creating a "range" of well names with step intervals included. For example, starting at well "A1" with a column stride of 2 would result in the grid names being ordered as: "A1", "B1", ...; "A3", "B3", ...; etc.
 
 Example:
@@ -395,9 +498,40 @@ Fields:
 | rowStride | number | yes      | How much to increment the row name when it rolls over |
 | colStride | number | yes      | How much to increment the column when it rolls over   |
 
+#### Group
+
+Type: object
+
+Each grid will be placed into a corresponding well group in the labware definition. A well group is a collection of wells that share certain properties (at the moment, just metadata).
+
+Fields:
+
+| field    | type                            | required | description                                           |
+| -------- | ------------------------------- | -------- | ----------------------------------------------------- |
+| metadata | [GroupMetadata](#GroupMetadata) | yes      | Well group metadata                                   |
+| brand    | [Brand](#Brand)                 | no       | Well group brand information (e.g. tube manufacturer) |
+
+#### GroupMetadata
+
+Type: object
+
+Display metadata for a given well group
+
+Fields:
+
+| field           | type             | required | description                                                              |
+| --------------- | ---------------- | -------- | ------------------------------------------------------------------------ |
+| displayName     | string           | no       | Display name of the group                                                |
+| displayCategory | string           | no       | Category of the group, which may differ from the category of the labware |
+| wellBottomShape | enum: flat, u, v | no       | Shape that best describes the bottom shape of the wells in the group     |
+
+**Note**: `groups[].metadata.displayCategory` may differ from the `metadata.displayCategory` of the overall labware in certain cases. For example, the aluminum block definitions have a category of `aluminumBlock`, but their well groups have categories of `tubeRack` or `wellPlate` depending on if there are tubes or a well plate inserted into the block, respectively.
+
 #### Brand
 
-Brand information for the labware
+Type: object
+
+Brand information for the labware or well group
 
 Example:
 
@@ -410,20 +544,40 @@ const brand = {
 
 Fields:
 
-| field   | type           | required | description             |
-| ------- | -------------- | -------- | ----------------------- |
-| brand   | string         | yes      | Manufacturer/brand name |
-| brandId | Array<string/> | no       | Matching product IDs    |
+| field   | type           | required | description                        |
+| ------- | -------------- | -------- | ---------------------------------- |
+| brand   | string         | yes      | Manufacturer/brand name            |
+| brandId | Array<string/> | no       | Matching product IDs               |
+| links   | Array<string/> | no       | Link(s) to manufacturer webpage(s) |
 
 If a `brand` object not input, the resulting definition will have: `"brand": {"brand": "generic"}`.
 
 #### Namespace
 
+Type: string
+
 Labware definitions are placed under namespaces on a robot. All Opentrons definitions are namespaced under `"opentrons"`. Custom user-created labware definitions should be namespaced under `"custom_beta"`. Custom labware is in beta. You may lose your calibration data in a future release.
 
 #### Version
 
+Type: number
+
 Version is an incrementing integer, starting at 1. Multiple versions of a labware definition can be uploaded to a robot together. When updating a definition, you should increment the version. Exception: if you only change metadata and nothing else, you do not need to update the version.
+
+#### LoadNamePostfix
+
+Type: Array<string\>
+
+You may use the `loadNamePostfix` array to append additional, underscore separated strings to the load name. For example...
+
+```js
+const options = {
+  // ...
+  loadNamePostfix: ['flat'],
+}
+```
+
+...would result in the load name: `${originalGeneratedLoadName}_flat`
 
 ## Explanation of Numerical inputs
 

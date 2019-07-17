@@ -6,7 +6,8 @@
     "measurements": "Labware Measurements",
     "well_count": "# of wells",
     "max_vol": "Max Volume",
-    "see_details": "See detail page"
+    "see_details": "See detail page",
+    "view_measurements": "view measurements"
   },
   "tip_position": {
     "title": "Tip Positioning",

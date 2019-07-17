@@ -157,7 +157,7 @@ class ProtocolContext(CommandPublisher):
                 ctx.home()
             # after the with block, the context is connected to the same
             # hardware control API it was connected to before, even if
-            # an error occured in the code inside the with block
+            # an error occurred in the code inside the with block
 
         """
         old_hw = self._hw_manager.hardware
@@ -211,11 +211,11 @@ class ProtocolContext(CommandPublisher):
             location: types.DeckLocation,
             label: str = None,
             namespace: str = None,
-            version: int = None
+            version: int = 1
     ) -> Labware:
         """ A convenience function to specify a piece of labware by name.
 
-        For labware already defined by Opentrons, this is a convient way
+        For labware already defined by Opentrons, this is a convenient way
         to collapse the two stages of labware initialization (creating
         the labware and adding it to the protocol) into one.
 
@@ -233,7 +233,7 @@ class ProtocolContext(CommandPublisher):
         :param str namespace: The namespace the labware definition belongs to.
             If unspecified, will search 'opentrons' then 'custom_beta'
         :param int version: The version of the labware definition. If
-            unspecified, will use the latest version.
+            unspecified, will use version 1.
         """
         labware_def = get_labware_definition(load_name, namespace, version)
         return self.load_labware_from_definition(labware_def, location, label)
@@ -507,6 +507,7 @@ class InstrumentContext(CommandPublisher):
                  log_parent: logging.Logger,
                  tip_racks: List[Labware] = None,
                  trash: Labware = None,
+                 default_speed: float = 400.0,
                  **config_kwargs) -> None:
 
         super().__init__(ctx.broker)
@@ -522,11 +523,28 @@ class InstrumentContext(CommandPublisher):
         else:
             self.trash_container = trash
 
+        self._default_speed = default_speed
+
         self._last_location: Union[Labware, Well, None] = None
         self._last_tip_picked_up_from: Union[Well, None] = None
         self._log = log_parent.getChild(repr(self))
         self._log.info("attached")
         self._well_bottom_clearance = 0.5
+
+    @property
+    def default_speed(self) -> float:
+        """ The speed at which the robot's gantry moves.
+
+        By default, 400 mm/s. Changing this value will change the speed of the
+        pipette when moving between labware. In addition to changing the
+        default, the speed of individual motions can be changed with the
+        ``speed`` argument to :py:meth:`InstrumentContext.move_to`.
+        """
+        return self._default_speed
+
+    @default_speed.setter
+    def default_speed(self, speed: float):
+        self._default_speed = speed
 
     def aspirate(self,
                  volume: float = None,
@@ -1299,7 +1317,8 @@ class InstrumentContext(CommandPublisher):
         return self._ctx.delay()
 
     def move_to(self, location: types.Location, force_direct: bool = False,
-                minimum_z_height: float = None
+                minimum_z_height: float = None,
+                speed: float = None
                 ) -> 'InstrumentContext':
         """ Move the instrument.
 
@@ -1309,11 +1328,16 @@ class InstrumentContext(CommandPublisher):
                         without arc motion.
         :param minimum_z_height: When specified, this Z margin is able to raise
                                  (but never lower) the mid-arc height.
+        :param speed: The speed at which to move. By default,
+                      :py:attr:`InstrumentContext.default_speed`
         """
         if self._ctx.location_cache:
             from_lw = self._ctx.location_cache.labware
         else:
             from_lw = None
+
+        if not speed:
+            speed = self.default_speed
 
         from_center = 'centerMultichannelOnWells'\
             in quirks_from_any_parent(from_lw)
@@ -1331,7 +1355,7 @@ class InstrumentContext(CommandPublisher):
         try:
             for move in moves:
                 self._hw_manager.hardware.move_to(
-                    self._mount, move[0], critical_point=move[1])
+                    self._mount, move[0], critical_point=move[1], speed=speed)
         except Exception:
             self._ctx.location_cache = None
             raise

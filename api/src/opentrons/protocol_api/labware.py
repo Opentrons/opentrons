@@ -826,34 +826,6 @@ def _get_path_to_labware(load_name: str, namespace: str, version: int) -> Path:
     return def_path
 
 
-def _get_path_to_latest_labware(load_name: str, namespace: str) -> Path:
-    # Get path to highest-versioned labware within a given namespace
-    if namespace == OPENTRONS_NAMESPACE:
-        base_path = STANDARD_DEFS_PATH
-    else:
-        base_path = CONFIG['labware_user_definitions_dir_v4'] / namespace
-
-    loadname_dir = base_path / load_name
-    if not loadname_dir.is_dir():
-        raise FileNotFoundError(f'labware {load_name} not found in namespace' +
-                                f' {namespace}')
-
-    result = None
-    files_by_version = sorted(
-        [d for d in loadname_dir.iterdir()
-            if d.is_file() and d.name.endswith('.json')],
-        key=lambda dirpath: int(dirpath.stem))
-    if len(files_by_version) == 0:
-        raise RuntimeError(
-            f'No json files found in {loadname_dir}, expected at least one')
-    result = files_by_version[-1]
-
-    if result is None:
-        raise FileNotFoundError(f'No labware "{load_name}" exists ' +
-                                f'in namespace "{namespace}"')
-    return result
-
-
 def save_definition(
     labware_def: Dict[str, Any],
     force: bool = False
@@ -902,18 +874,17 @@ def delete_all_custom_labware() -> None:
 def get_labware_definition(
     load_name: str,
     namespace: str = None,
-    version: int = None
+    version: int = 1
 ) -> Dict[str, Any]:
     """
     Look up and return a definition by load_name + namespace + version and
         return it or raise an exception
 
     :param str load_name: corresponds to 'loadName' key in definition
-    :param str namespace: The namespace the labware definition belongs to. If
-        unspecified, will search in this order: 'opentrons', 'custom_beta',
-        then all other namespaces together.
+    :param str namespace: The namespace the labware definition belongs to.
+        If unspecified, will search 'opentrons' then 'custom_beta'
     :param int version: The version of the labware definition. If unspecified,
-        will use the latest version.
+        will use version 1.
     """
     load_name = load_name.lower()
     if namespace is None:
@@ -929,10 +900,7 @@ def get_labware_definition(
             f'{CUSTOM_NAMESPACE}, please specify it')
 
     namespace = namespace.lower()
-    if version:
-        def_path = _get_path_to_labware(load_name, namespace, version)
-    else:
-        def_path = _get_path_to_latest_labware(load_name, namespace)
+    def_path = _get_path_to_labware(load_name, namespace, version)
 
     try:
         with open(def_path, 'r') as f:
@@ -951,7 +919,7 @@ def load(
     parent: Location,
     label: str = None,
     namespace: str = None,
-    version: int = None
+    version: int = 1
 ) -> Labware:
     """
     Return a labware object constructed from a labware definition dict looked
@@ -964,17 +932,12 @@ def load(
     :param parent: A :py:class:`.Location` representing the location where
                    the front and left most point of the outside of labware is
                    (often the front-left corner of a slot on the deck).
-    :param str namespace: The namespace the labware definition belongs to. If
-        unspecified, will search in this order: 'opentrons', 'custom_beta',
-        then all other namespaces together.
-    :param int version: The version of the labware definition. If unspecified,
-        will use the latest version.
     :param str label: An optional label that will override the labware's
                       display name from its definition
     :param str namespace: The namespace the labware definition belongs to.
         If unspecified, will search 'opentrons' then 'custom_beta'
     :param int version: The version of the labware definition. If unspecified,
-        will use the latest version.
+        will use version 1.
     """
     definition = get_labware_definition(load_name, namespace, version)
     return load_from_definition(definition, parent, label)

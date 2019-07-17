@@ -5,14 +5,29 @@ import * as React from 'react'
 import { Icon } from '@opentrons/components'
 import styles from './styles.css'
 
-// TODO(mc, 2019-03-14): i18n
-const EN_LABWARE_GUIDE = 'Labware Guide'
-const EN_HOW_TO_CHOOSE_LABWARE = 'How to choose labware'
-const EN_MAKING_CUSTOM_DEFINITIONS = 'Making custom definitions'
+import {
+  LABWARE_GUIDE,
+  WHAT_IS_A_LABWARE_DEFINITION,
+  USING_THE_LABWARE_LIBRARY,
+  CREATING_CUSTOM_LABWARE_DEFINITIONS,
+} from '../../localization'
 
 const LINKS = [
-  { label: EN_HOW_TO_CHOOSE_LABWARE, href: '#' },
-  { label: EN_MAKING_CUSTOM_DEFINITIONS, href: '#' },
+  {
+    label: WHAT_IS_A_LABWARE_DEFINITION,
+    href:
+      'https://support.opentrons.com/en/articles/3136501-what-is-a-labware-definition',
+  },
+  {
+    label: USING_THE_LABWARE_LIBRARY,
+    href:
+      'https://support.opentrons.com/en/articles/3136507-using-the-labware-library',
+  },
+  {
+    label: CREATING_CUSTOM_LABWARE_DEFINITIONS,
+    href:
+      'https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions',
+  },
 ]
 
 export default function LabwareGuide() {
@@ -24,7 +39,7 @@ export default function LabwareGuide() {
             className={styles.labware_guide_icon}
             name="book-open-page-variant"
           />
-          {EN_LABWARE_GUIDE}
+          {LABWARE_GUIDE}
         </h2>
         <ul className={styles.labware_guide_list}>
           {LINKS.map((a, i) => (

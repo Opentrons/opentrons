@@ -29,13 +29,12 @@ def test_clear_config(mock_config, async_server):
     assert hardware.config == robot_configs.build_config({}, {})
 
 
-def test_save_and_clear_config(mock_config, async_server):
+def test_save_and_clear_config(mock_config, sync_hardware, loop):
     # Clear should happen automatically after the following import, resetting
     # the deck cal to the default value
+    hardware = sync_hardware
     from opentrons.deck_calibration import dc_main
     import os
-
-    hardware = async_server['com.opentrons.hardware']
 
     hardware.config.gantry_calibration[0][3] = 10
 
@@ -45,7 +44,6 @@ def test_save_and_clear_config(mock_config, async_server):
     tag = "testing"
     root, ext = os.path.splitext(base_filename)
     filename = "{}-{}{}".format(root, tag, ext)
-
     dc_main.backup_configuration_and_reload(hardware, tag=tag)
     # After reset gantry calibration should be I(4,4)
     assert hardware.config.gantry_calibration\
@@ -159,6 +157,7 @@ def test_mount_offset(mock_config, loop, monkeypatch, async_server):
 
     monkeypatch.setattr(
         hardware, 'config', mock_config)
+
     tip_length = 51.7
     tool = dc_main.CLITool(
         point_set=get_calibration_points(), tip_length=tip_length, loop=loop)

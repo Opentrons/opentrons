@@ -93,10 +93,10 @@ test-py:
 .PHONY: test-js
 test-js:
 	jest \
-		--runInBand=$(if $(CI),true,false) \
 		--coverage=$(cover) \
 		--watch=$(watch) \
-		--updateSnapshot=$(updateSnapshot)
+		--updateSnapshot=$(updateSnapshot) \
+		--ci=$(if $(CI),true,false)
 
 # lints and typechecks
 .PHONY: lint

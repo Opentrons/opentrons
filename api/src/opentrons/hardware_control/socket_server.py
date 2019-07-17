@@ -131,10 +131,20 @@ def _build_serializable_method(method_name, method):  # noqa(C901)
 def build_jrpc_methods(api: API) -> jsonrpcserver.methods.Methods:
     """ Builds the Methods object for jrpcserver from an api instance """
     methods = jsonrpcserver.methods.Methods()
+
+    def _scrape(meth):
+        return inspect.iscoroutinefunction(meth)\
+            and not meth.__name__.startswith('_')
+
+    # If we do inspect.getmembers() on the api instance, then it will access
+    # property objects, which calls their getters. Since those getters are
+    # now async, that will create and orphan a coroutine. Instead, we can
+    # do inspect.getmembers() on the API _class_, so that properties aren't
+    # called, and then pull the object from the _instance_ to actually bind
+    # into our method list
     for mname, mobj in inspect.getmembers(
-            api,
-            lambda m: inspect.ismethod(m) and not m.__name__.startswith('_')):
-        wrapper = _build_serializable_method(mname, mobj)
+            api.__class__, _scrape):
+        wrapper = _build_serializable_method(mname, getattr(api, mname))
         methods.add(**{mname: wrapper})
     return methods
 

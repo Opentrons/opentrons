@@ -63,7 +63,7 @@ def _load_container_by_name(container_name):
             log.info(f"Loaded {container_name} from {meth.__name__}")
             break
         except (ValueError, KeyError):
-            log.info(f"{container_name} not in {meth.__name__}")
+            log.exception(f"{container_name} not in {meth.__name__}")
     else:
         raise KeyError(f"Unknown labware {container_name}")
     return container
@@ -291,7 +291,7 @@ class Robot(CommandPublisher):
             if model_value and 'v2' in model_value:
                 # Check if new model of pipettes, load smoothie configs
                 # for this particular model
-                self._driver.update_steps_per_mm({plunger_axis: 2133.33})
+                self._driver.update_steps_per_mm({plunger_axis: 3200})
                 # TODO(LC25-4-2019): Modify configs to update to as
                 # testing informs better values
                 self._driver.update_pipette_config(

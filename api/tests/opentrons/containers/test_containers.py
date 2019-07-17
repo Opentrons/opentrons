@@ -81,7 +81,7 @@ def test_load_legacy_slot_names(robot):
 
 def test_new_slot_names(robot):
     trough = 'usascientific_12_reservoir_22ml'
-    plate = 'generic_96_wellplate_340ul_flat'
+    plate = 'corning_96_wellplate_360ul_flat'
     tuberack = 'opentrons_6_tuberack_falcon_50ml_conical'
 
     cont = new_load(trough)
@@ -97,7 +97,7 @@ def test_load_new_trough(robot):
     cont = new_load(trough)
     assert cont.size() == (0, 0, 0)
     assert cont.wells('A1')._coordinates \
-        == (13.94 - 4.165, 42.9 + 35.94, 2.29)
+        == (13.94, 42.9 + 31.4475, 2.29)
 
 
 def test_containers_list(robot):

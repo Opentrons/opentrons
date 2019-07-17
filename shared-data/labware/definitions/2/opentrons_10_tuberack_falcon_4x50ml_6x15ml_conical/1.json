@@ -17,7 +17,7 @@
   "dimensions": {
     "xDimension": 127.75,
     "yDimension": 85.5,
-    "zDimension": 123.76
+    "zDimension": 124.35
   },
   "parameters": {
     "format": "irregular",
@@ -30,91 +30,91 @@
       "totalLiquidVolume": 15000,
       "diameter": 14.9,
       "shape": "circular",
-      "depth": 117.98,
+      "depth": 117.5,
       "x": 13.88,
       "y": 67.75,
-      "z": 5.78
+      "z": 6.85
     },
     "B1": {
       "totalLiquidVolume": 15000,
       "diameter": 14.9,
       "shape": "circular",
-      "depth": 117.98,
+      "depth": 117.5,
       "x": 13.88,
       "y": 42.75,
-      "z": 5.78
+      "z": 6.85
     },
     "C1": {
       "totalLiquidVolume": 15000,
       "diameter": 14.9,
       "shape": "circular",
-      "depth": 117.98,
+      "depth": 117.5,
       "x": 13.88,
       "y": 17.75,
-      "z": 5.78
+      "z": 6.85
     },
     "A2": {
       "totalLiquidVolume": 15000,
       "diameter": 14.9,
       "shape": "circular",
-      "depth": 117.98,
+      "depth": 117.5,
       "x": 38.88,
       "y": 67.75,
-      "z": 5.78
+      "z": 6.85
     },
     "B2": {
       "totalLiquidVolume": 15000,
       "diameter": 14.9,
       "shape": "circular",
-      "depth": 117.98,
+      "depth": 117.5,
       "x": 38.88,
       "y": 42.75,
-      "z": 5.78
+      "z": 6.85
     },
     "C2": {
       "totalLiquidVolume": 15000,
       "diameter": 14.9,
       "shape": "circular",
-      "depth": 117.98,
+      "depth": 117.5,
       "x": 38.88,
       "y": 17.75,
-      "z": 5.78
+      "z": 6.85
     },
     "A3": {
       "totalLiquidVolume": 50000,
       "diameter": 27.81,
       "shape": "circular",
-      "depth": 113.85,
+      "depth": 113,
       "x": 71.38,
       "y": 60.25,
-      "z": 5.95
+      "z": 7.3
     },
     "B3": {
       "totalLiquidVolume": 50000,
       "diameter": 27.81,
       "shape": "circular",
-      "depth": 113.85,
+      "depth": 113,
       "x": 71.38,
       "y": 25.25,
-      "z": 5.95
+      "z": 7.3
     },
     "A4": {
       "totalLiquidVolume": 50000,
       "diameter": 27.81,
       "shape": "circular",
-      "depth": 113.85,
+      "depth": 113,
       "x": 106.38,
       "y": 60.25,
-      "z": 5.95
+      "z": 7.3
     },
     "B4": {
       "totalLiquidVolume": 50000,
       "diameter": 27.81,
       "shape": "circular",
-      "depth": 113.85,
+      "depth": 113,
       "x": 106.38,
       "y": 25.25,
-      "z": 5.95
+      "z": 7.3
     }
   },
   "brand": {
@@ -126,21 +126,6 @@
   },
   "groups": [
     {
-      "wells": ["A3", "B3", "A4", "B4"],
-      "metadata": {
-        "displayName": "Falcon 4x50 mL Conical",
-        "displayCategory": "tubeRack",
-        "wellBottomShape": "v"
-      },
-      "brand": {
-        "brand": "Falcon",
-        "brandId": ["352070", "352098"],
-        "links": [
-          "https://ecatalog.corning.com/life-sciences/b2c/US/en/Liquid-Handling/Tubes,-Liquid-Handling/Centrifuge-Tubes/Falcon%C2%AE-Conical-Centrifuge-Tubes/p/falconConicalTubes"
-        ]
-      }
-    },
-    {
       "wells": ["A1", "B1", "C1", "A2", "B2", "C2"],
       "metadata": {
         "displayName": "Falcon 6x15 mL Conical",
@@ -150,6 +135,21 @@
       "brand": {
         "brand": "Falcon",
         "brandId": ["352095", "352096", "352097", "352099", "352196"],
+        "links": [
+          "https://ecatalog.corning.com/life-sciences/b2c/US/en/Liquid-Handling/Tubes,-Liquid-Handling/Centrifuge-Tubes/Falcon%C2%AE-Conical-Centrifuge-Tubes/p/falconConicalTubes"
+        ]
+      }
+    },
+    {
+      "wells": ["A3", "B3", "A4", "B4"],
+      "metadata": {
+        "displayName": "Falcon 4x50 mL Conical",
+        "displayCategory": "tubeRack",
+        "wellBottomShape": "v"
+      },
+      "brand": {
+        "brand": "Falcon",
+        "brandId": ["352070", "352098"],
         "links": [
           "https://ecatalog.corning.com/life-sciences/b2c/US/en/Liquid-Handling/Tubes,-Liquid-Handling/Centrifuge-Tubes/Falcon%C2%AE-Conical-Centrifuge-Tubes/p/falconConicalTubes"
         ]

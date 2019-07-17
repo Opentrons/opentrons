@@ -348,18 +348,52 @@ Be sure to check out the [API `README`][api-readme] for additional instructions.
 make -C api dev
 # run API with robot's motor driver connected via USB to UART cable
 make -C api dev ENABLE_VIRTUAL_SMOOTHIE=false
+```
 
+To put the API on a test robot, if it's on balena do:
+
+```shell
 # push the current contents of the api directory to robot for testing
 # defaults to currently connected ethernet robot
 make push-api
 # takes optional host variable for other robots
 make push-api host=${some_other_ip_address}
+```
 
+and if it's on buildroot do:
+
+```shell
+# push the current contents of the api directory to robot for testing
+# defaults to currently connected ethernet robot
+make -C api push-buildroot
+# takes optional host variable for other robots
+make -C api push-buildroot host=${some_other_ip_address}
+```
+
+Note that there is no separate `restart` command because `push-buildroot` restarts the systemd unit controlling the API server. This only pushes the python wheel containing the API server; if you have edited the systemd unit, you'll need to `scp` it manually and then do `systemctl daemon-reload` on the robot before restarting the api server.
+
+To SSH into the robot, do
+```
 # SSH into the currently connected ethernet robot
 make term
 # takes optional host variable for other robots
 make term host=${some_other_ip_address}
 ```
+
+If the robot is on buildroot and `make term` complains about not having a key, you may need to install a public key on the robot. To do this, create an ssh key and install it:
+
+```shell
+ssh-keygen # note the path you save the key to
+make -C api install-key br_ssh_pubkey=/path/to/pubkey
+```
+
+and subsequently, when you do `make term`, add the `br_ssh_key=/path/to/key` option:
+
+```shell
+make term br_ssh_key=/path/to/privkey
+```
+
+If you create the key as `~/.ssh/robot_key` and `~/.ssh/robot_key.pub` then `make term` and `make install-key` will work without arguments.
 
 ### Releasing (for Opentrons developers)
 
@@ -470,6 +504,45 @@ panic: standard_init_linux.go:175: exec user process caused "exec format error"
 
 You probably built against x86_64 and tried to run it on a Raspberry Pi. Switch to the "raspberrypi" `FROM` line.
 
+## Robot Environment
+
+When you have sshd in to a robot using `make term`, its behavior depends on whether it is on balena or on buildroot. You can tell by doing `ps | head -n 2`; if pid 1 is `systemd`, you're on buildroot and if it is `tini` you're on balena.
+
+### Log Locations
+
+#### Balena
+
+The files `/data/logs/api.log.*` and `/data/logs/serial.log.*` contain logs from the api server and serial system, respectively. Only things logged with python `logging` are here. To get logs printed to stdout by the api server, you can check balena. nginx logs are in `/var/log/nginx`. This system is inside a docker container; you can get a shell to the host from balena if you need deeper logging. However, things printed to stdout and stderr by the api server are only available in the balena log viewer and therefore are frequently lost.
+
+#### Buildroot
+
+Buildroot robots use [systemd-journald][] for log management. This is a single log manager for everything on the system. It is administrated using the [journalctl][] utility. You can view logs by just doing `journalctl` (it may be better to do `journalctl --no-pager | less` to get a better log viewer), or stream them by doing `journalctl -f`. Any command that displays logs can be narrowed down by using a syslog identifier: `journalctl -f SYSLOG_IDENTIFIER=opentrons-api` will only print logs from the api server's loggers, for instance. Our syslog identifiers are:
+- `opentrons-api`: The API server - anything sent to `logging` logs from the api server package, except the serial logs
+- `opentrons-update-server`: Anything sent to `logging` logs from the update server packate
+- `opentrons-api-serial`: The serial logs
+
+### State Management
+
+#### Balena
+
+You can't really restart anything from inside a shell on balena, since it all runs in a docker container. Instead, you can do `restart` and restart the docker container, but this will disconnect you. Stop ongoing processes by doing `ps`, finding the pid, and then doing `kill (pid)`. This can be useful to temporarily run one of the servers directly, to see what it prints out on the command line. Note that when you do this the environment won't be quite the same as what the server sees when it is run directly by balena due to the implementation details of `docker run`, `tini`, and our start scripts.
+
+#### Buildroot
+
+Buildroot robots use `systemd` as their init system. Every process that we run has an associated systemd unit, which defines and configures its behavior when the robot starts. You can use the [systemctl][] utility to mess around with or inspect the system state. For instance, if you do `systemctl status opentrons-api-server` you will see whether the api server is running or not, and a dump of its logs. You can restart units with `systemctl restart (unitname)`, start and stop them with `systemctl start` and `systemctl stop`, and so on. Note that if you make changes to unit files, you have to run `systemctl daemon-reload` (no further arguments) for the init daemon to see the changes.
+
+Our systemd units are:
+- `opentrons-api-server`: The API server
+- `opentrons-update-server`: The update server
+
+
+### Other System Admin Notes
+
+#### Buildroot
+
+When a robot is running on buildroot, its filesystem is mounted from two separate locations. `/data`, `/var`, and `/home` are from the "data" partition, and everything else is from the root partition (or generated by the system). The root partition is what gets updated, by being overwritten. To make this work, the root partition is mounted readonly, which causes writes to files in that partition to fail with the error "readonly filesystem". To prevent this, you can remount the partition:
+`mount -o remount,rw /`
+
 [repo]: https://github.com/Opentrons/opentrons
 [api-readme]: ./api/README.rst
 [easyfix]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Aeasyfix
@@ -491,3 +564,6 @@ You probably built against x86_64 and tried to run it on a Raspberry Pi. Switch 
 [lerna]: https://github.com/lerna/lerna
 [lerna-publish]: https://github.com/lerna/lerna#publish
 [semver-inc]: https://github.com/npm/node-semver#functions
+[systemd-journald]: https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html
+[journalctl]: https://www.freedesktop.org/software/systemd/man/journalctl.html
+[systemctl]: https://www.google.com/search?client=firefox-b-1-d&q=systemctl

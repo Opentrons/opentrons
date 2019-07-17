@@ -14,8 +14,7 @@ import createLogger from './log'
 
 import type { Service } from '@opentrons/discovery-client'
 
-// TODO(mc, 2018-08-08): figure out type exports from app
-import type { Action } from '@opentrons/app/src/types'
+import type { Action, Dispatch } from './types'
 
 const log = createLogger(__filename)
 
@@ -28,7 +27,7 @@ let config
 let store
 let client
 
-export function registerDiscovery(dispatch: Action => void) {
+export function registerDiscovery(dispatch: Dispatch) {
   const onServiceUpdate = throttle(handleServices, UPDATE_THROTTLE_MS)
 
   config = getConfig('discovery')

@@ -41,7 +41,7 @@ function LabwareList(props: Props) {
   const { labware, disabled, setLabware } = props
 
   return (
-    <TitledList title="labware" disabled={disabled}>
+    <TitledList title="labware">
       {labware.map(lw => (
         <LabwareListItem
           {...lw}
