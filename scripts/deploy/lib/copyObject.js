@@ -1,4 +1,3 @@
-// copy an object from one bucket to another
 'use strict'
 
 const mime = require('mime')
@@ -11,6 +10,21 @@ const getCopyParams = obj => ({
   MetadataDirective: 'REPLACE',
 })
 
+/**
+ * Copy an object to an S3 bucket
+ *
+ * @param {S3} s3 - AWS.S3 instance
+ * @param {S3Object} sourceObj - Object to copy
+ * @param {string} destBucket - Destination bucket
+ * @param {string} [destPath] - Destination bucket folder (root if unspecified)
+ * @param {boolean} [dryrun] - Do not actually execute the copy
+ * @returns {Promise} Promise that resolves when the copy is complete
+ *
+ * @typedef S3Object
+ * @property {string} Bucket - Object bucket
+ * @property {String} Prefix - Deploy folder in bucket
+ * @property {string} Key - Full key to object
+ */
 module.exports = function copyObject(
   s3,
   sourceObj,

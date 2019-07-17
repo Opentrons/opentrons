@@ -4,14 +4,14 @@
 const assert = require('assert')
 const AWS = require('aws-sdk')
 
-const getArgs = require('./lib/getArgs')
+const parseArgs = require('./lib/parseArgs')
 const syncBuckets = require('./lib/syncBuckets')
 const { getDeployMetadata } = require('./lib/deploy-metadata')
 
 const USAGE =
   '\nUsage:\n  node ./scripts/deploy/promote-to-staging <project_domain> [--deploy]'
 
-const { args, flags } = getArgs(process.argv.slice(2))
+const { args, flags } = parseArgs(process.argv.slice(2))
 const [projectDomain] = args
 const dryrun = !flags.includes('--deploy')
 

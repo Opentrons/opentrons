@@ -90,6 +90,8 @@ node ./scripts/deploy/promote-to-production designer.opentrons.com --deploy
 
 ### Rollback
 
+If a release goes poorly, you can roll an environment back to its previous release. Please note that **our rollback depth is 1**. If you need to rollback further, you will need to go through the regular sandbox > staging > production flow with a given tag.
+
 ```shell
 # dryrun
 node ./scripts/deploy/rollback <projectDomain> <environment>

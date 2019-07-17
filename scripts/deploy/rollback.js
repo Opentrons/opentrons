@@ -4,7 +4,7 @@
 const assert = require('assert')
 const AWS = require('aws-sdk')
 
-const getArgs = require('./lib/getArgs')
+const parseArgs = require('./lib/parseArgs')
 const syncBuckets = require('./lib/syncBuckets')
 const {
   getDeployMetadata,
@@ -14,7 +14,7 @@ const {
 const USAGE =
   '\nUsage:\n  node ./scripts/deploy/rollback <project_domain> <environment> [--deploy]'
 
-const { args, flags } = getArgs(process.argv.slice(2))
+const { args, flags } = parseArgs(process.argv.slice(2))
 const [projectDomain, environment] = args
 const dryrun = !flags.includes('--deploy')
 
@@ -31,10 +31,13 @@ const rollbackBucket =
 
 getDeployMetadata(s3, rollbackBucket)
   .then(deployMetadata => {
-    const { previous, current } = deployMetadata
+    const { previous } = deployMetadata
 
     console.log(`${rollbackBucket} deploy metadata: %j`, deployMetadata)
-    assert(previous, 'Unable to find previous deploy tag')
+    assert(
+      previous,
+      'Unable to find previous deploy tag; was this environment already rolled back?'
+    )
 
     return syncBuckets(
       s3,
@@ -47,7 +50,7 @@ getDeployMetadata(s3, rollbackBucket)
           s3,
           rollbackBucket,
           '',
-          { previous: current || null, current: previous || null },
+          { previous: null, current: previous || null },
           dryrun
         )
       )

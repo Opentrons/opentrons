@@ -1,4 +1,3 @@
-// sync a source bucket and optional path with a dest bucket and optional path
 'use strict'
 
 const assert = require('assert')
@@ -6,7 +5,16 @@ const getExistingObjects = require('./getExistingObjects')
 const getObjectsToRemove = require('./getObjectsToRemove')
 const copyObject = require('./copyObject')
 const removeObject = require('./removeObject')
-
+/**
+ * Sync a source bucket to a destination bucket. Copies objects from source
+ * and deletes any objects in destination that don't exist in source
+ *
+ * @param {AWS.S3} s3 - AWS.S3 instance
+ * @param {{bucket: string, path?: string}} source - Source bucket and optional path
+ * @param {{bucket: string, path?: string}} destination - Destination bucket and optional path
+ * @param {boolean} [dryrun] - Don't actually copy or remove anything
+ * @returns {Promise} A promise that resolves when the sync is done
+ */
 module.exports = function syncBuckets(s3, source, destination, dryrun) {
   const makeCopyTask = obj =>
     copyObject(s3, obj, destination.bucket, destination.path, dryrun)
