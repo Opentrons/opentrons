@@ -41,9 +41,6 @@ type Props = {
 }
 
 function UpdateRobotModal(props: Props) {
-  const [ignoreAppUpdate, setIgnoreAppUpdate] = React.useState<boolean>(false)
-  const setAppUpdateIgnored = () => setIgnoreAppUpdate(true)
-
   const {
     parentUrl,
     appVersion,
@@ -56,16 +53,14 @@ function UpdateRobotModal(props: Props) {
   const robotUpdateVersion = robotUpdateInfo.version
   const availableUpdate = appUpdateVersion || robotUpdateVersion
   const versionProps = { appVersion, robotVersion, availableUpdate }
-  const isUpgrade = robotUpdateInfo.type === 'upgrade'
   const proceed = () => setCurrentStep('viewUpdateInfo')
-  const onClick = isUpgrade ? setAppUpdateIgnored : proceed
 
-  if (appUpdateAvailable && !ignoreAppUpdate) {
+  if (appUpdateAvailable) {
     return (
       <UpdateAppModal
         updateInfo={robotUpdateInfo}
         parentUrl={parentUrl}
-        onClick={onClick}
+        onClick={proceed}
         versionProps={versionProps}
         ignoreUpdate={props.ignoreUpdate}
       />
