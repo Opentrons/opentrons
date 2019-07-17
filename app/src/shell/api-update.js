@@ -9,6 +9,7 @@ export type ApiUpdateInfo = {
 
 const {
   apiUpdate: { getUpdateInfo, getUpdateFileContents },
+  update: { CURRENT_VERSION },
 } = remote
 
 export function apiUpdateReducer(state: ?ApiUpdateInfo) {
@@ -21,6 +22,9 @@ export function getApiUpdateFilename(state: State): string {
 }
 
 export function getApiUpdateVersion(state: State): string {
+  if (state.config?.devInternal?.enableBuildRoot) {
+    return CURRENT_VERSION
+  }
   return state.shell.apiUpdate.version
 }
 

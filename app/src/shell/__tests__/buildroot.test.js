@@ -66,18 +66,40 @@ describe('shell/buildroot', () => {
           shell: {
             buildroot: {
               info: {
-                filename: 'foobar.zip',
-                apiVersion: '1.0.0',
-                serverVersion: '1.0.0',
+                releaseNotes: 'some release notes',
+                version: '1.0.0',
               },
             },
           },
         },
         expected: {
-          filename: 'foobar.zip',
-          apiVersion: '1.0.0',
-          serverVersion: '1.0.0',
+          releaseNotes: 'some release notes',
+          version: '1.0.0',
         },
+      },
+      {
+        name: 'getBuildrootDownloadError',
+        selector: buildroot.getBuildrootDownloadError,
+        state: {
+          shell: {
+            buildroot: {
+              downloadError: 'error with download',
+            },
+          },
+        },
+        expected: 'error with download',
+      },
+      {
+        name: 'getBuildrootDownloadProgress',
+        selector: buildroot.getBuildrootDownloadProgress,
+        state: {
+          shell: {
+            buildroot: {
+              downloadProgress: 10,
+            },
+          },
+        },
+        expected: 10,
       },
       {
         name: 'getBuildrootUpdateSeen',

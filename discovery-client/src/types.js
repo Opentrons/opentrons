@@ -9,12 +9,19 @@ export type HealthResponse = {
   logs?: Array<string>,
 }
 
+export type Capability = 'buildroot-migration' | 'buildroot-update' | 'restart'
+
+export type CapabilityMap = {
+  [capabilityName: Capability]: string,
+}
+
 export type ServerHealthResponse = {
   name: string,
   apiServerVersion: string,
   updateServerVersion: string,
   smoothieVersion: string,
   systemVersion: string,
+  capabilities?: CapabilityMap,
 }
 
 export type Candidate = {

@@ -1,7 +1,11 @@
 @import '@opentrons/components';
 
 .system_update_modal {
-  padding: 4rem 2rem 1rem;
+  padding: 0 1rem;
+
+  & > p {
+    margin-bottom: 1rem;
+  }
 }
 
 .system_update_warning {
@@ -10,4 +14,25 @@
 
 .view_update_button {
   width: auto;
+}
+
+.version_list {
+  @apply --font-body-1-dark;
+
+  margin: 0 0 1.5rem 2rem;
+}
+
+.sync_link {
+  color: var(--c-blue);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.sync_message {
+  margin-left: 1rem;
+  padding-bottom: 1rem;
+}
+
+.reinstall_message {
+  margin-left: 1rem;
 }
