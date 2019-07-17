@@ -7,24 +7,24 @@ from opentrons.legacy_api.instruments import Pipette
 factories = [
     ('p10_single_v1.3', 'p10_single', instruments.P10_Single),
     ('p10_multi_v1.5', 'p10_multi', instruments.P10_Multi),
-    ('p20_single_v2.0', 'p20_single_GEN2', instruments.P20_Single_GEN2),
-    ('p20_multi_v2.0', 'p20_multi_GEN2', instruments.P20_Multi_GEN2),
+    ('p20_single_v2.0', 'p20_single_gen2', instruments.P20_Single_GEN2),
+    ('p20_multi_v2.0', 'p20_multi_gen2', instruments.P20_Multi_GEN2),
     ('p50_single_v1.3', 'p50_single', instruments.P50_Single),
     ('p50_multi_v1.5', 'p50_multi', instruments.P50_Multi),
     ('p300_single_v1.3', 'p300_single', instruments.P300_Single),
-    ('p300_single_v2.0', 'p300_single_GEN2', instruments.P300_Single_GEN2),
-    ('p300_multi_v2.0', 'p300_multi_GEN2', instruments.P300_Multi_GEN2),
+    ('p300_single_v2.0', 'p300_single_gen2', instruments.P300_Single_GEN2),
+    ('p300_multi_v2.0', 'p300_multi_gen2', instruments.P300_Multi_GEN2),
     ('p300_multi_v1.5', 'p300_multi', instruments.P300_Multi),
     ('p1000_single_v1.3', 'p1000_single', instruments.P1000_Single),
-    ('p1000_single_v2.0', 'p1000_single_GEN2', instruments.P1000_Single_GEN2),
+    ('p1000_single_v2.0', 'p1000_single_gen2', instruments.P1000_Single_GEN2),
 ]
 
 backcompat_pips = [
-    ('p20_single_GEN2', 'p10_single', instruments.P10_Single),
-    ('p300_single_GEN2', 'p300_single', instruments.P300_Single),
-    ('p20_multi_GEN2', 'p10_multi', instruments.P10_Multi),
-    ('p300_multi_GEN2', 'p300_multi', instruments.P300_Multi),
-    ('p1000_single_GEN2', 'p1000_single', instruments.P1000_Single),
+    ('p20_single_gen2', 'p10_single', instruments.P10_Single),
+    ('p300_single_gen2', 'p300_single', instruments.P300_Single),
+    ('p20_multi_gen2', 'p10_multi', instruments.P10_Multi),
+    ('p300_multi_gen2', 'p300_multi', instruments.P300_Multi),
+    ('p1000_single_gen2', 'p1000_single', instruments.P1000_Single),
 ]
 
 
@@ -80,7 +80,7 @@ def test_backwards_compatibility(backcompat, monkeypatch):
 
     fake_pip = {'left': {'model': None, 'id': None, 'name': None},
                 'right': {
-                    'model': expected_name.split('_GEN2')[0] + '_v2.0',
+                    'model': expected_name.split('_gen2')[0] + '_v2.0',
                     'id': 'FakePip',
                     'name': expected_name}}
     monkeypatch.setattr(robot, 'model_by_mount', fake_pip)
