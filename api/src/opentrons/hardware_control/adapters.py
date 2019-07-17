@@ -224,6 +224,3 @@ class SingletonAdapter(HardwareAPILike):
                     = data.get('tip_length', None)
 
         return instrs
-
-    def stop(self):
-        self._api._loop.run_until_complete(self._api.halt())

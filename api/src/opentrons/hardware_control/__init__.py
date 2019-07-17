@@ -372,7 +372,7 @@ class API(HardwareAPILike):
 
     # Global actions API
     @_log_call
-    async def pause(self):
+    def pause(self):
         """
         Pause motion of the robot after a current motion concludes.
 
@@ -386,11 +386,11 @@ class API(HardwareAPILike):
         """
         self._backend.pause()
 
-    async def pause_with_message(self, message):
+    def pause_with_message(self, message):
         self._log.warning('Pause with message: {}'.format(message))
         for cb in self._callbacks:
             cb(message)
-        await self.pause()
+        self.pause()
 
     @_log_call
     def resume(self):
@@ -400,14 +400,31 @@ class API(HardwareAPILike):
         self._backend.resume()
 
     @_log_call
-    async def halt(self):
-        """ Immediately stop motion, reset, and home.
+    def halt(self):
+        """ Immediately stop motion.
+
+        Calls to :py:meth:`stop` through the synch adapter while other calls
+        are ongoing will typically wait until those calls are done, since most
+        of the async calls here in fact block the loop while they talk to
+        smoothie. To provide actual immediate halting, call this method which
+        does not require use of the loop.
+
+        After this call, the smoothie will be in a bad state until a call to
+        :py:meth:`stop`.
+        """
+        self._log.info("Halting")
+        self._backend.hard_halt()
+
+    async def stop(self):
+        """
+        Stop motion as soon as possible, reset, and home.
 
         This will cancel motion (after the current call to :py:meth:`move`;
         see :py:meth:`pause` for more detail), then home and reset the
         robot.
         """
         self._backend.halt()
+        self._log.info("Recovering from halt")
         await self.reset()
         await self.home()
 

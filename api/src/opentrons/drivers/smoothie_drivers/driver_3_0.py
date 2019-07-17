@@ -1533,7 +1533,7 @@ class SmoothieDriver_3_0_0:
         any other state needed for the driver.
         """
         log.debug("kill")
-        self._smoothie_hard_halt()
+        self.hard_halt()
         self._reset_from_error()
         self._setup()
 
@@ -1579,7 +1579,7 @@ class SmoothieDriver_3_0_0:
             gpio.set_high(gpio.OUTPUT_PINS['ISP'])
             sleep(0.25)
 
-    def _smoothie_hard_halt(self):
+    def hard_halt(self):
         log.debug('Halting Smoothie (simulating: {})'.format(
             self.simulating))
         if self.simulating:
