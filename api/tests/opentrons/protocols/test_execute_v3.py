@@ -111,6 +111,9 @@ def test_dispatch_commands(monkeypatch):
     def mock_dispense(volume, location):
         cmd.append(("dispense", volume, location))
 
+    def mock_blowout(location):
+        cmd.append(("blowout", location))
+
     def mock_set_flow_rate(aspirate, dispense, blow_out):
         flow_rates.append((aspirate, dispense, blow_out))
 
@@ -130,6 +133,7 @@ def test_dispatch_commands(monkeypatch):
 
     monkeypatch.setattr(pipette, 'aspirate', mock_aspirate)
     monkeypatch.setattr(pipette, 'dispense', mock_dispense)
+    monkeypatch.setattr(pipette, 'blow_out', mock_blowout)
     monkeypatch.setattr(pipette, 'set_flow_rate', mock_set_flow_rate)
     monkeypatch.setattr(execute_v3, '_sleep', mock_sleep)
 
@@ -207,5 +211,5 @@ def test_dispatch_commands(monkeypatch):
     assert flow_rates == [
         (123, 123, 123),
         (3.5, 3.5, 3.5),
-        (7 ,7, 7)
+        (7, 7, 7)
     ]
