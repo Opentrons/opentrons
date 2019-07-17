@@ -1,23 +1,32 @@
 Single channel OG:
 
-```js
-<InstrumentDiagram channels={1} displayCategory="OG" />
-```
+````js
+<InstrumentDiagram
+  mount="left"
+  pipetteSpecs={{ channels: 1, displayCategory: 'OG' }}
+/>```
 
 Multi channel OG:
 
 ```js
-<InstrumentDiagram channels={8} displayCategory="OG" />
-```
+<InstrumentDiagram
+  mount="right"
+  pipetteSpecs={{ channels: 8, displayCategory: 'OG' }}
+/>```
 
 Single channel GEN2:
 
 ```js
-<InstrumentDiagram channels={1} displayCategory="GEN2" />
-```
+<InstrumentDiagram
+  mount="left"
+  pipetteSpecs={{ channels: 1, displayCategory: 'GEN2' }}
+/>```
 
 Multi channel GEN2:
 
 ```js
-<InstrumentDiagram channels={8} displayCategory="GEN2" />
-```
+<InstrumentDiagram
+  mount="right"
+  pipetteSpecs={{ channels: 8, displayCategory: 'GEN2' }}
+/>```
+````
