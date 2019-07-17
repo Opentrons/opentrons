@@ -338,6 +338,12 @@ class API(HardwareAPILike):
             for key in configs:
                 instruments[mount][key] = instr_dict[key]
             instruments[mount]['has_tip'] = instr.has_tip
+            instruments[mount]['aspirate_speed'] = self._plunger_speed(
+                instr, instr.config.aspirate_flow_rate, 'aspirate')
+            instruments[mount]['dispense_speed'] = self._plunger_speed(
+                instr, instr.config.dispense_flow_rate, 'dispense')
+            instruments[mount]['blow_out_speed'] = self._plunger_speed(
+                instr, instr.config.blow_out_flow_rate, 'dispense')
         return instruments
 
     attached_instruments = property(fget=get_attached_instruments)
@@ -905,7 +911,8 @@ class API(HardwareAPILike):
                 this_pipette,
                 this_pipette.current_volume + asp_vol,
                 'aspirate')
-        speed = this_pipette.config.aspirate_flow_rate * rate
+        flow_rate = this_pipette.config.aspirate_flow_rate * rate
+        speed = self._plunger_speed(this_pipette, flow_rate, 'aspirate')
         try:
             await self._move_plunger(mount, dist, speed=speed)
         except Exception:
@@ -951,9 +958,10 @@ class API(HardwareAPILike):
                 this_pipette,
                 this_pipette.current_volume - disp_vol,
                 'dispense')
-        speed = this_pipette.config.dispense_flow_rate * rate
+        flow_rate = this_pipette.config.dispense_flow_rate * rate
+        speed = self._plunger_speed(this_pipette, flow_rate, 'dispense')
         try:
-            await self._move_plunger(mount, dist, speed)
+            await self._move_plunger(mount, dist, speed=speed)
         except Exception:
             self._log.exception('Dispense failed')
             this_pipette.set_current_volume(0)
@@ -966,6 +974,16 @@ class API(HardwareAPILike):
         mm = ul / instr.ul_per_mm(ul, action)
         position = mm + instr.config.bottom
         return round(position, 6)
+
+    def _plunger_speed(
+            self, instr: Pipette, ul_per_s: float, action: str) -> float:
+        mm_per_s = ul_per_s / instr.ul_per_mm(instr.config.max_volume, action)
+        return round(mm_per_s, 6)
+
+    def _plunger_flowrate(
+            self, instr: Pipette, mm_per_s: float, action: str) -> float:
+        ul_per_s = mm_per_s * instr.ul_per_mm(instr.config.max_volume, action)
+        return round(ul_per_s, 6)
 
     @_log_call
     async def blow_out(self, mount):
@@ -980,10 +998,12 @@ class API(HardwareAPILike):
 
         self._backend.set_active_current(Axis.of_plunger(mount),
                                          this_pipette.config.plunger_current)
+        speed = self._plunger_speed(
+            this_pipette, this_pipette.config.blow_out_flow_rate, 'dispense')
         try:
             await self._move_plunger(
                 mount, this_pipette.config.blow_out,
-                speed=this_pipette.config.blow_out_flow_rate)
+                speed=speed)
         except Exception:
             self._log.exception('Blow out failed')
             raise
@@ -1165,6 +1185,26 @@ class API(HardwareAPILike):
             this_pipette.update_config_item('dispense_flow_rate', dispense)
         if blow_out:
             this_pipette.update_config_item('blow_out_flow_rate', blow_out)
+
+    @_log_call
+    def set_pipette_speed(self, mount,
+                          aspirate=None, dispense=None, blow_out=None):
+        this_pipette = self._attached_instruments[mount]
+        if not this_pipette:
+            raise top_types.PipetteNotAttachedError(
+                "No pipette attached to {} mount".format(mount))
+        if aspirate:
+            this_pipette.update_config_item(
+                'aspirate_flow_rate',
+                self._plunger_flowrate(this_pipette, aspirate, 'aspirate'))
+        if dispense:
+            this_pipette.update_config_item(
+                'dispense_flow_rate',
+                self._plunger_flowrate(this_pipette, dispense, 'dispense'))
+        if blow_out:
+            this_pipette.update_config_item(
+                'blow_out_flow_rate',
+                self._plunger_flowrate(this_pipette, blow_out, 'dispense'))
 
     @_log_call
     async def discover_modules(self):
