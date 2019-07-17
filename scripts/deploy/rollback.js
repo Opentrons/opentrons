@@ -12,11 +12,11 @@ const {
 } = require('./lib/deploy-metadata')
 
 const USAGE =
-  '\nUsage:\n  node ./scripts/deploy/rollback <project_domain> <environment> [--dryrun]'
+  '\nUsage:\n  node ./scripts/deploy/rollback <project_domain> <environment> [--deploy]'
 
 const { args, flags } = getArgs(process.argv.slice(2))
 const [projectDomain, environment] = args
-const dryrun = flags.includes('--dryrun') || flags.includes('-d')
+const dryrun = !flags.includes('--deploy')
 
 assert(
   projectDomain && (environment === 'staging' || environment === 'production'),

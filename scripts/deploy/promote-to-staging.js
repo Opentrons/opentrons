@@ -12,11 +12,11 @@ const {
 } = require('./lib/deploy-metadata')
 
 const USAGE =
-  '\nUsage:\n  node ./scripts/deploy/promote-to-staging <project_domain> <tag> [--dryrun]'
+  '\nUsage:\n  node ./scripts/deploy/promote-to-staging <project_domain> <tag> [--deploy]'
 
 const { args, flags } = getArgs(process.argv.slice(2))
 const [projectDomain, tag] = args
-const dryrun = flags.includes('--dryrun') || flags.includes('-d')
+const dryrun = !flags.includes('--deploy')
 
 assert(projectDomain && tag, USAGE)
 

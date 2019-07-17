@@ -9,11 +9,11 @@ const syncBuckets = require('./lib/syncBuckets')
 const { getDeployMetadata } = require('./lib/deploy-metadata')
 
 const USAGE =
-  '\nUsage:\n  node ./scripts/deploy/promote-to-staging <project_domain> [--dryrun]'
+  '\nUsage:\n  node ./scripts/deploy/promote-to-staging <project_domain> [--deploy]'
 
 const { args, flags } = getArgs(process.argv.slice(2))
 const [projectDomain] = args
-const dryrun = flags.includes('--dryrun') || flags.includes('-d')
+const dryrun = !flags.includes('--deploy')
 
 assert(projectDomain, USAGE)
 

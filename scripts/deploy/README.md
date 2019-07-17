@@ -13,7 +13,7 @@ This directory contains scripts to perform steps 2, 3, and 4.
 
 Before running any of these scripts, the release in question must be tagged and that tag must have been built by Travis and deployed to the sandbox.
 
-**IMPORTANT**: All scripts take an optional `--dryrun, -d` flag. **Always** run your command with `--dryrun` enabled first, inspect the script output, _then_ run it for real.
+**IMPORTANT**: All scripts will do a dryrun by default. **Always** do a dryrun before deploying for real. After you have inspected your dryrun, run the actual deploy by passing the optional `--deploy` flag.
 
 ### Cut a new version to sandbox
 
@@ -48,7 +48,11 @@ http://sandbox.designer.opentrons.com/protocol-designer@3.0.0/
 Once the sandbox build has been appropriately tested, you may promote the sandbox build to staging.
 
 ```shell
+# dryrun
 node ./scripts/deploy/promote-to-staging <projectDomain> <tag>
+
+# deploy
+node ./scripts/deploy/promote-to-staging <projectDomain> <tag> --deploy
 ```
 
 - `projectDomain` - The production domain of the given project
@@ -65,7 +69,11 @@ node ./scripts/deploy/promote-to-staging designer.opentrons.com protocol-designe
 When the version under test is ready for release, you should promote the staging environment to production.
 
 ```shell
+# dryrun
 node ./scripts/deploy/promote-to-production <projectDomain>
+
+# deploy
+node ./scripts/deploy/promote-to-production <projectDomain> --deploy
 ```
 
 - `projectDomain` - The production domain of the given project
@@ -73,13 +81,21 @@ node ./scripts/deploy/promote-to-production <projectDomain>
 For example, to deploy whatever is in Protocol Designer staging to production:
 
 ```shell
+# dryrun
 node ./scripts/deploy/promote-to-production designer.opentrons.com
+
+# deploy
+node ./scripts/deploy/promote-to-production designer.opentrons.com --deploy
 ```
 
 ### Rollback
 
 ```shell
+# dryrun
 node ./scripts/deploy/rollback <projectDomain> <environment>
+
+# deploy
+node ./scripts/deploy/rollback <projectDomain> <environment> --deploy
 ```
 
 - `projectDomain` - The production domain of the given project
