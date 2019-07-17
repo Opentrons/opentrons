@@ -5,7 +5,9 @@
 Labware
 ######################
 
-We spend a fair amount of time organizing and counting wells when writing Python protocols. This section describes the different ways we can access wells and groups of wells.
+We spend a fair amount of time organizing and counting wells when writing
+Python protocols. This section describes the different ways we can access
+wells and groups of wells.
 
 ************************************
 
@@ -13,435 +15,50 @@ We spend a fair amount of time organizing and counting wells when writing Python
 Labware Library
 ******************
 
-The Opentrons API comes with many common labware built in. These can be loaded into you Python protocol using the ``labware.load()`` method, and the specific name of the labware you need.
+The Opentrons API comes with many common labware built in. These can be loaded
+into your Python protocol by using the ``labware.load()`` method with the
+specific load name of the labware you need.
 
-Under the `Opentrons Labware`_ are a list of some of the most commonly used labware in the API, as well as images for how they look.
+Please see the `Opentrons Labware Library`__ for a list of currently supported
+labware, along with visualizations, pictures, and load names.
 
-If you are interested in using your own labware that is not included in the API, please take a look at how to create custom labware definitions using ``labware.create()``, or contact Opentrons Support.
+__ https://labware.opentrons.com
 
-.. note::
+.. Tip::
 
-    All names are case-sensitive, copying and pasting from this list into the protocol editor will ensure no errors are made.
+    Copy and paste load names directly from the Labware Library to ensure
+    your ``load()`` statements get the correct definitions.
 
-.. note::
-
-    We are in the process of revising the labware definitions used on the OT2. Documentation for previously existing definitions is left over from OT1, and is incomplete. `Check out this webpage`__ to see a visualization of all the API's legacy built-in labware definitions. For JSON protocols see the visualizations and descriptions under `Opentrons Labware`_.
-
-__ https://andysigler.github.io/ot-api-containerviz/
-
+If you are interested in using your own labware that is not included in the
+API, please take a look at how to create custom labware definitions using
+``labware.create()``, or contact Opentrons Support.
 
 **********************
 
 Placing labware on the robot deck
-=====
+=================================
 
 The robot deck is made up of slots labeled 1, 2, 3, 4, and so on.
 
 .. image:: img/DeckMapEmpty.png
 
-To tell the robot what labware will be on the deck for your protocol, use `labware.load`
-after importing labware as follows:
+To tell the robot what labware will be on the deck for your protocol, use
+``labware.load`` after importing ``labware`` as follows:
 
 .. code-block:: python
 
-   from opentrons import labware
+    from opentrons import labware
 
-.. code-block:: python
+    # ...
 
-  samples_rack = labware.load('tube-rack-2ml', slot='1')
+    tiprack = labware.load('opentrons_96_tiprack_300ul', slot='1')
 
 
 **********************
 
-*********************
-Opentrons Labware
-*********************
-
-Tipracks
-========
-opentrons-tiprack-10ul
-----------------------
-Tiprack for a 10ul pipette (single or 8-channel) *does not require an adapter*
-
-.. code-block:: python
-
-  labware.load('opentrons-tiprack-10ul', slot)
-
-**Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
-
-.. image::  img/labware_lib/opentrons_10ul_tips.png
-
-
-tiprack-10ul
-------------
-Tiprack for a 10ul pipette (single or 8-channel) *requires an adapter*
-
-.. code-block:: python
-
-  labware.load('tiprack-10ul', slot)
-
-**Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
-
-.. image:: img/labware_lib/geb_10ul_tips.png
-
-
-opentrons-tiprack-300ul
------------------------
-Tiprack for both a 50ul and 300ul pipette (single or 8-channel)
-
-.. code-block:: python
-
-  labware.load('opentrons-tiprack-300ul', slot)
-
-**Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
-
-|tiprack_left| |tiprack_right|
-
-
-.. |tiprack_left| image:: img/labware_lib/OT2TipRackP50_P300_TOP.png
-
-.. |tiprack_right| image:: img/labware_lib/OT2TipRackP50_P300_ISO.png
-
-Aluminum Blocks
-===============
-
-Aluminum blocks are typically paired with a temperature module. Can also be used as a standalone container.
-
-opentrons-aluminum-block-2ml-eppendorf
---------------------------------------
-A 2ml tube holder, specifically based off of eppendorf snapcap tubes.
-
-.. code-block:: python
-
-  labware.load('opentrons-aluminum-block-2ml-eppendorf', slot)
-
-**Accessing Wells:** *single channel* ``['A1']-['D6']``
-
-|2ml_alum_left| |2ml_alum_right|
-
-.. |2ml_alum_left| image:: img/labware_lib/24x1.5mL_TOP.png
-
-.. |2ml_alum_right| image:: img/labware_lib/24x1.5mL_ISO.png
-
-
-opentrons-aluminum-block-2ml-screwcap
--------------------------------------
-A 2ml tube holder, specifically based off of screwcap tubes
-
-.. code-block:: python
-
-  labware.load('opentrons-aluminum-block-2ml-screwcap', slot)
-
-**Accessing Wells:** *single channel* ``['A1']-['D6']``
-
-|2ml_alum_left| |2ml_alum_right|
-
-.. |2ml_alum_left| image:: img/labware_lib/24x1.5mL_TOP.png
-
-.. |2ml_alum_right| image:: img/labware_lib/24x1.5mL_ISO.png
-
-opentrons-aluminum-block-96-PCR-plate
--------------------------------------
-A flat plate which acts as an adaptor for a well plate. This particular definition is modeled after the
-96-well biorad hardshell plate.
-
-.. code-block:: python
-
-  labware.load('opentrons-aluminum-block-96-PCR-plate', slot)
-
-**Accessing Wells:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
-
-opentrons-aluminum-block-PCR-strips-200ul
------------------------------------
-A 96 well adaptor meant to hold 96 PCR strips with 200ul max volume.
-
-.. code-block:: python
-
-  labware.load('opentrons-aluminum-block-PCR-strips-200ul', slot)
-
-**Accessing Wells:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
-
-|96tube_left| |96tube_right|
-
-.. |96tube_left| image:: img/labware_lib/96well_aluminumblock_TOP.png
-
-.. |96tube_right| image:: img/labware_lib/96well_aluminumblock_ISO.png
-
-Modular Tuberack
-================
-
-opentrons-tuberack-2ml-eppendorf
---------------------------------
-
-This tuberack insert definition is for snapcap tubes ranging from 2-5ml.
-
-|2ml_left| |2ml_right|
-
-.. |2ml_left| image:: img/labware_lib/24x2mL-5mL_TOP.png
-
-.. |2ml_right| image:: img/labware_lib/24x2mL-5mL_ISO.png
-
-opentrons-tuberack-2ml-screwcap
--------------------------------
-
-This tuberack insert definition is for screwcap tubes ranging from 2-5ml.
-
-|2ml_left| |2ml_right|
-
-.. |2ml_left| image:: img/labware_lib/24x2mL-5mL_TOP.png
-
-.. |2ml_right| image:: img/labware_lib/24x2mL-5mL_ISO.png
-
-
-opentrons-tuberack-15ml
------------------------
-
-|15ml_left| |15ml_right|
-
-.. |15ml_left| image:: img/labware_lib/15x15mL_TOP.png
-
-.. |15ml_right| image:: img/labware_lib/15x15mL_ISO.png
-
-opentrons-tuberack-50ml
------------------------
-
-|50ml_left| |50ml_right|
-
-.. |50ml_left| image:: img/labware_lib/6x50mL_TOP.png
-
-.. |50ml_right| image:: img/labware_lib/6x50mL_ISO.png
-
-opentrons-tuberack-15_50ml
---------------------------
-
-|15_50ml_left| |15_50ml_right|
-
-.. |15_50ml_left| image:: img/labware_lib/6x15mL_4x50mL_TOP.png
-
-.. |15_50ml_right| image:: img/labware_lib/6x15mL_4x50mL_ISO.png
-
-Point
-=====
-
-Use ``point`` when there is only one position per labware, such as a scale.
-
-.. code-block:: python
-
-    my_container = labware.load('point', slot)
-
-You can access the point position as ``my_labware.wells('A1')`` or ``my_labware.wells(0)``.
-
-**********************
-
-Tipracks
-==========
-
-tiprack-200ul
--------------
-
-Tip rack for a 200 or 300 uL pipette (single or 8-channel)
-
-.. code-block:: python
-
-    labware.load('tiprack-200ul', slot)
-
-**Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
-
-.. image:: img/labware_lib/Tiprack-200ul.png
-
-opentrons-tiprack-300ul
----------------
-
-This is a custom-made 300ul tiprack for the OT 2 model (single or 8-channel)
-
-.. code-block:: python
-
-    labware.load('opentrons-tiprack-300ul', slot)
-
-
-**Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
-
-`Check out our available tipracks here`__
-
-__ https://shop.opentrons.com/collections/opentrons-tips
-
-tiprack-1000ul
---------------
-
-Tip rack for a 1000 uL pipette (single or 8-channel)
-
-.. code-block:: python
-
-    labware.load('tiprack-1000ul', slot)
-
-**Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
-
-.. image:: img/labware_lib/Tiprack-1000.png
-
-opentrons-tiprack-1000ul
----------------
-
-This is a custom-made 1000ul tiprack for the OT 2 model (single or 8-channel)
-
-.. code-block:: python
-
-    labware.load('opentrons-tiprack-1000ul', slot)
-
-
-**Accessing Tips:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
-
-`Check out our available tipracks here`__
-
-__ https://shop.opentrons.com/collections/opentrons-tips
-
-tiprack-1000ul-chem
--------------------
-
-Tip rack for 1000ul chem (10x10)
-
-.. code-block:: python
-
-    labware.load('tiprack-1000ul-chem', slot)
-
-**Accessing Tips:** *single channel* ``[0]-[99]``
-
-.. image:: img/labware_lib/Tiprack-1000ul-chem.png
-
-**********************
-
-Troughs
-========
-
-trough-12row
--------------
-
-12 row reservoir
-
-.. code-block:: python
-
-    labware.load('trough-12row', slot)
-
-**Accessing Rows:** *single channel* or *8-channel* ``['A1']-['A12']``
-
-.. image:: img/labware_lib/Trough-12row.png
-
-**********************
-
-Tube Racks
-==========
-
-tube-rack-.75ml
--------------
-
-4x6 rack that holds .75 mL microcentrifuge tubes
-
-.. code-block:: python
-
-    labware.load('tube-rack-.75ml', slot)
-
-**Accessing Tubes:** *single channel* ``['A1']-['D6']``
-
-.. image:: img/labware_lib/Tuberack-075ml.png
-
-tube-rack-2ml
--------------
-
-4x6 rack that holds 1.5 mL microcentrifuge tubes and 2 mL microcentrifuge tubes
-
-.. code-block:: python
-
-    labware.load('tube-rack-2ml', slot)
-
-**Accessing Tubes:** *single channel* ``['A1']-['D6']``
-
-.. image:: img/labware_lib/Tuberack-2ml.png
-
-tube-rack-15_50ml
-------------------
-
-rack that holds 6 15 mL tubes and 4 50 mL tubes
-
-.. code-block:: python
-
-    labware.load('tube-rack-15_50ml', slot)
-
-**Accessing Tubes:** *single channel* ``['A1']-['A3'], ['B1']-['B3'], ['C1']-['C2'], ['D1']-['D2']``
-
-.. image:: img/labware_lib/Tuberack-15-50ml.png
-
-
-Plates
-=======
-
-96-deep-well
--------------
-
-See dimensions in diagram below.
-
-.. code-block:: python
-
-    labware.load('96-deep-well', slot)
-
-**Accessing Wells:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
-
-.. image:: img/labware_lib/96-Deep-Well.png
-
-96-PCR-tall
--------------
-
-See dimensions in diagram below.
-
-.. code-block:: python
-
-    labware.load('96-PCR-tall', slot)
-
-**Accessing Wells:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
-
-.. image:: img/labware_lib/96-PCR-Tall.png
-
-96-PCR-flat
--------------
-
-See dimensions in diagram below.
-
-.. code-block:: python
-
-    labware.load('96-PCR-flat', slot)
-
-**Accessing Wells:** *single channel* ``['A1']-['H12']``, *8-channel* ``['A1']-['A12']``
-
-.. image:: img/labware_lib/96-PCR-Flatt.png
-
-PCR-strip-tall
-----------------
-
-See dimensions in diagram below.
-
-.. code-block:: python
-
-    labware.load('PCR-strip-tall', slot)
-
-**Accessing Wells:** *single channel* ``['A1']-['A8']``, *8-channel* ``['A1']``
-
-.. image:: img/labware_lib/96-PCR-Strip.png
-
-384-plate
-----------
-
-See dimensions in diagram below.
-
-.. code-block:: python
-
-    labware.load('384-plate', slot)
-
-**Accessing Wells:** *single channel* ``['A1']-['P24']``, *multi-channel* ``['A1']-['A24]``
-
-.. image:: img/labware_lib/384-plate.png
-
-
-**************
-Labware Module
-**************
+************************
+Labware Import Reference
+************************
 
 .. code-block:: python
 
@@ -450,83 +67,70 @@ Labware Module
     '''
     from opentrons import labware
 
-List
-====
-
-Once the labware module is loaded, you can see a list of all containers currently inside the API by calling ``labware.list()``
-
-.. code-block:: python
-
-    labware.list()
-
 Load
 ====
 
-Labware is loaded with two arguments: 1) the labware type, and 2) the deck slot it will be placed in on the robot.
+``labware.load`` tells the robot that your protocol will be using a given
+labware in a certain slot.
 
 .. code-block:: python
 
-    p = labware.load('96-flat', '1')
+    my_labware = labware.load('usascientific_12_reservoir_22ml', slot='1')
 
-A third optional argument can be used to give a labware a unique name.
+A third optional argument can be used to give a labware a nickname for display
+in the Opentrons App.
 
 .. code-block:: python
 
-    p = labware.load('96-flat', '2', 'any-name-you-want')
+    my_labware = labware.load('usascientific_12_reservoir_22ml',
+                     slot='2',
+                     label='any-name-you-want')
 
-Unique names are useful in a few scenarios. First, they allow the labware to have independent calibration data from other labware in the same slot. In the example above, the container named 'any-name-you-want' will assume different calibration data from the unnamed plate, even though they are the same type and in the same slot.
 
-.. note::
+Sometimes, you may need to place a labware on top of something else on the
+deck, like modules. For this, you should use the ``share`` parameter.
 
-    Calibration data refers to the saved positions for each labware on deck, and is a part of the `Opentrons App calibration procedure`__.
+.. code-block:: python
 
-__ https://support.opentrons.com/guide-for-getting-started-with-the-ot-2/6-calibrate-the-ot-2/b-pipette-and-labware-calibration
+    from opentrons import labware, modules
+
+    td = modules.load('tempdeck', slot='1')
+    plate = labware.load('opentrons_96_aluminumblock_biorad_wellplate_200ul',
+                         slot='1',
+                         share=True)
 
 Create
 ======
 
-In addition to the default labware that come with the Opentrons API, you can create your own custom labware.
+.. Note::
+    The current custom labware creation mechanisms in the API are fairly
+    limited. We're working on a much more robust system for custom labware
+    definitions. If the current API isn't able to support your labware, please
+    reach out to our support team.
 
-Through the API's call labware.create(), you can create simple grid labware, which consist of circular wells arranged in columns and rows.
+Using ``labware.create``, you can create your own custom labware. The labware
+created through this method must consist of circular wells arranged in
+regularly-spaced columns and rows.
 
 .. code-block:: python
 
-    plate_name = '3x6_plate'
+    custom_plate_name = 'custom_18_wellplate_200ul'
+
     if plate_name not in labware.list():
-        custom_plate = labware.create(
-            plate_name,                    # name of you labware
-            grid=(3, 6),                    # specify amount of (columns, rows)
-            spacing=(12, 12),               # distances (mm) between each (column, row)
-            diameter=5,                     # diameter (mm) of each well on the plate
-            depth=10,                       # depth (mm) of each well on the plate
-            volume=200)
+        labware.create(
+            custom_plate_name,  # name of you labware
+            grid=(3, 6),        # number of (columns, rows)
+            spacing=(12, 12),   # distances (mm) between each (column, row)
+            diameter=5,         # diameter (mm) of each well
+            depth=10,           # depth (mm) of each well
+            volume=200)         # volume (µL) of each well
 
-When you create your custom labware it will return the custom plate. You should only need to run
-this once among all of your protocols for the same custom labware because the data is automatically saved on the robot.
-
-In this example, the call to `labware.create` is wrapped in an if-block, so that it does not try to add the definition
-to a robot where this has already been run (which would cause an error). If a labware has already been added to the database
-(by previously calling `labware.create`, the if-block will not execute, and the rest of the protocol will use the definition
-that was already created and calibrated.
-
-**Note** There is some specialty labware that will require you to specify the type within your labware name.
-If you are creating a custom tiprack, it must be `tiprack`-REST-OF-LABWARE-NAME in order for the program to act reliably.
-
-If you would like to delete a labware you have already added to the database, you can do the following:
-
-.. code-block:: python
-
-    from opentrons.data_storage import database
-    database.delete_container('3x6_plate')
-
-This allows you to make changes to the labware within the database under the same name.
-
-.. code-block:: python
+    custom_plate = labware.load(custom_plate_name, slot='3')
 
     for well in custom_plate.wells():
         print(well)
 
-will print out...
+The above example will print out...
 
 .. code-block:: python
 
@@ -549,14 +153,46 @@ will print out...
     <Well B6>
     <Well C6>
 
+You only need to call ``labware.create`` once. It will save the labware
+definition on the robot so that your labware will be available to all your
+subsequent protocol runs.
 
-**********************
+``labware.create`` **will throw an error if you try to call it more than once
+with the same load name**. In the example above, the call to `labware.create`
+is wrapped in an if-block so it does not try to add the definition twice, which
+would cause an error.
+
+If you would like to delete a labware you have already added to the database
+(for example: to make changes to its definition), you can do the following:
 
 .. code-block:: python
 
-    from opentrons import labware, robot
+    from opentrons.data_storage import database
 
-    plate = labware.load('96-flat', 'A1')
+    database.delete_container('custom_18_wellplate_200ul')
+
+.. Note::
+    There is some specialty labware that will require you to specify the
+    type within your labware name. If you are creating a custom tip rack, it
+    must be ``tiprack-REST-OF-LABWARE-NAME`` in order for the software to act
+    reliably.
+
+List (deprecated)
+=================
+
+``labware.list`` returns an array of all labware load names in the old,
+unsupported format.
+
+.. code-block:: python
+
+    labware.list()
+
+.. Tip::
+    For a list of all currently supported labware, please visit the Opentrons
+    `Labware Library`__
+
+__ https://labware.opentrons.com
+
 
 ******************
 Accessing Wells
@@ -565,12 +201,15 @@ Accessing Wells
 Individual Wells
 ================
 
-When writing a protocol using the API, you will be spending most of your time selecting which wells to transfer liquids to and from.
+When writing a protocol using the API, you will need to select which wells to
+transfer liquids to and from.
 
-The OT-One deck and labware are all set up with the same coordinate system - lettered rows ``['A']-['END']`` and numbered columns ``['1']-['END']``.
+The OT-2 deck and labware are all set up with the same coordinate system
+
+- Lettered rows ``['A']-['END']``
+- Numbered columns ``['1']-['END']``.
 
 .. image:: img/well_iteration/Well_Iteration.png
-
 
 .. code-block:: python
 
@@ -579,33 +218,51 @@ The OT-One deck and labware are all set up with the same coordinate system - let
     '''
     from opentrons import labware
 
-    plate = labware.load('96-flat', '1')
+    plate = labware.load('corning_24_wellplate_3.4ml_flat', slot='1')
 
 Wells by Name
 -------------
 
-Once a labware is loaded into your protocol, you can easily access the many wells within it using ``wells()`` method. ``wells()`` takes the name of the well as an argument, and will return the well at that location.
+Once a labware is loaded into your protocol, you can easily access the many
+wells within it using ``wells()`` method. ``wells()`` takes the name of the
+well as an argument, and will return the well at that location.
 
 .. code-block:: python
 
-    plate.wells('A1')
-    plate.wells('H12')
+    a1 = plate.wells('A1')
+    d6 = plate.wells('D6')
 
 Wells by Index
 --------------
 
-Wells can be referenced by their "string" name, as demonstrated above. However, they can also be referenced with zero-indexing, with the first well in a labware being at position 0.
+Wells can be referenced by their "string" name, as demonstrated above.
+However, they can also be referenced with zero-indexing, with the first well in
+a labware being at position 0.
 
 .. code-block:: python
 
     plate.wells(0)   # well A1
-    plate.wells(95)  # well H12
+    plate.wells(23)  # well D6
+
+.. Tip::
+    You may find well names (e.g. ``B3``) to be easier to reason with,
+    especially with irregular labware (e.g.
+    ``opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical``). Whichever well
+    access method you use, your protocol will be most maintainable if you pick
+    one method and don't use the other one.
 
 Columns and Rows
 ----------------
 
-A labware's wells are organized within a series of columns and rows, which are also labelled on standard labware. In the API, rows are given letter names (``'A'`` through ``'H'`` for example) and go left to right, while columns are given numbered names (``'1'`` through ``'12'`` for example) and go from front to back.
-You can access a specific row or column by using the ``rows()`` and ``columns()`` methods on a labware. These will return all wells within that row or column.
+A labware's wells are organized within a series of columns and rows, which are
+also labelled on standard labware. In the API, rows are given letter names
+(``'A'`` through ``'D'`` for example) and go left to right, while columns are
+given numbered names (``'1'`` through ``'6'`` for example) and go from front to
+back.
+
+You can access a specific row or column by using the ``rows()`` and
+``columns()`` methods on a labware. These will return all wells within that row
+or column.
 
 .. code-block:: python
 
@@ -619,31 +276,33 @@ will print out...
 
 .. code-block:: python
 
-    Column "1" has 8 wells
-    Row "A" has 12 wells
+    Column "1" has 4 wells
+    Row "A" has 6 wells
 
-The ``rows()`` or ``cols()`` methods can be used in combination with the ``wells()`` method to access wells within that row or column. In the example below, both lines refer to well ``'A1'``.
+The ``rows()`` or ``cols()`` methods can be used in combination with the
+``wells()`` method to access wells within that row or column. In the example
+below, both lines refer to well ``'A1'``.
 
 .. code-block:: python
 
     plate.cols('1').wells('A')
     plate.rows('A').wells('1')
 
-**********************
-
-.. code-block:: python
-
-    from opentrons import labware, robot
-
-    plate = labware.load('96-flat', '1')
+.. Tip::
+    The example above works but is a little convoluted. If you can, always get
+    individual wells like A1 with ``wells('A1')`` or ``wells(0)``
 
 
 Multiple Wells
 ==============
 
-If we had to reference each well one at a time, our protocols could get very very long.
+If we had to reference each well one at a time, our protocols could get very
+long.
 
-When describing a liquid transfer, we can point to groups of wells for the liquid's source and/or destination. Or, we can get a group of wells that we want to loop through.
+When describing a liquid transfer, we can point to groups of wells for the
+liquid's source and/or destination. Or, we can get a group of wells and loop
+(or iterate) through them.
+
 
 .. code-block:: python
 
@@ -652,18 +311,19 @@ When describing a liquid transfer, we can point to groups of wells for the liqui
     '''
     from opentrons import labware
 
-    plate = labware.load('96-flat', '2')
+    plate = labware.load('corning_24_wellplate_3.4ml_flat', slot='1')
 
 Wells
 -----
 
-The ``wells()`` method can return a single well, or it can return a list of wells when multiple arguments are passed.
+The ``wells()`` method can return a single well, or it can return a list of
+wells when multiple arguments are passed.
 
 Here is an example or accessing a list of wells, each specified by name:
 
 .. code-block:: python
 
-    w = plate.wells('A1', 'B2', 'C3', 'H12')
+    w = plate.wells('A1', 'B2', 'C3', 'D4')
 
     print(w)
 
@@ -671,13 +331,14 @@ will print out...
 
 .. code-block:: python
 
-    <WellSeries: <Well A1><Well B2><Well C3><Well H12>>
+    <WellSeries: <Well A1><Well B2><Well C3><Well D4>>
 
-Multiple wells can be treated just like a normal Python list, and can be iterated through:
+Multiple wells can be treated just like a normal Python list, and can be
+iterated through:
 
 .. code-block:: python
 
-    for w in plate.wells('A1', 'B2', 'C3', 'H12'):
+    for w in plate.wells('A1', 'B2', 'C3', 'D4'):
         print(w)
 
 will print out...
@@ -687,16 +348,18 @@ will print out...
     <Well A1>
     <Well B2>
     <Well C3>
-    <Well H12>
+    <Well D3>
 
 Wells To
 --------
 
-Instead of having to list the name of every well, we can also create a range of wells with a start and end point. The first argument is the starting well, and the ``to=`` argument is the last well.
+Instead of having to list the name of every well, we can also create a range of
+wells with a start and end point. The first argument is the starting well, and
+the ``to=`` argument is the last well.
 
 .. code-block:: python
 
-    for w in plate.wells('A1', to='H1'):
+    for w in plate.wells('A1', to='D1'):
         print(w)
 
 will print out...
@@ -707,26 +370,21 @@ will print out...
     <Well B1>
     <Well C1>
     <Well D1>
-    <Well E1>
-    <Well F1>
-    <Well G1>
-    <Well H1>
 
-These lists of wells can also move in the reverse direction along your labware. For example, setting the ``to=`` argument to a well that comes before the starting position is allowed:
+These lists of wells can also move in the reverse direction along your labware.
+For example, setting the ``to=`` argument to a well that comes before the
+starting position is allowed:
 
 .. code-block:: python
 
-    for w in plate.wells('H1', to='A1'):
+    for w in plate.wells('D1', to='A1'):
         print(w)
 
 will print out...
 
 .. code-block:: python
 
-    <Well H1>
-    <Well G1>
-    <Well F1>
-    <Well E1>
+    <Well D1>
     <Well C1>
     <Well B1>
     <Well A1>
@@ -734,11 +392,13 @@ will print out...
 Wells Length
 ------------
 
-Another way you can create a list of wells is by specifying the length= of the well list you need, in addition to the starting point. The example below will return eight wells, starting at well ``'A1'``:
+Another way you can create a list of wells is by specifying the length of the
+well list you need, including the starting well. The example below will
+return 4 wells, starting at well ``'A1'``:
 
 .. code-block:: python
 
-    for w in plate.wells('A1', length=8):
+    for w in plate.wells('A1', length=4):
         print(w)
 
 will print out...
@@ -749,16 +409,12 @@ will print out...
     <Well B1>
     <Well C1>
     <Well D1>
-    <Well E1>
-    <Well F1>
-    <Well G1>
-    <Well H1>
 
 Columns and Rows
 ----------------
 
-Columns and Rows
-The same arguments described above can be used with ``rows()`` and ``cols()`` to create lists of rows or columns.
+The same arguments described above can be used with ``rows()`` and ``cols()``
+to create lists of rows or columns.
 
 Here is an example of iterating through rows:
 
@@ -771,44 +427,40 @@ will print out...
 
 .. code-block:: python
 
-<WellSeries:
-    <WellSeries: <Well A1><Well A2><Well A3><Well A4><Well A5><Well A6><Well A7><Well A8><Well A9><Well A10><Well A11><Well A12>>
-    <WellSeries: <Well B1><Well B2><Well B3><Well B4><Well B5><Well B6><Well B7><Well B8><Well B9><Well B10><Well B11><Well B12>>
-    <WellSeries: <Well C1><Well C2><Well C3><Well C4><Well C5><Well C6><Well C7><Well C8><Well C9><Well C10><Well C11><Well C12>>
->
+    <WellSeries: <Well A1><Well A2><Well A3><Well A4><Well A5><Well A6>>
+    <WellSeries: <Well B1><Well B2><Well B3><Well B4><Well B5><Well B6>>
+    <WellSeries: <Well C1><Well C2><Well C3><Well C4><Well C5><Well C6>>
 
 And here is an example of iterating through columns:
 
 .. code-block:: python
 
-    for c in plate.cols('1', to='10'):
+    for c in plate.cols('1', to='6'):
         print(c)
 
 will print out...
 
 .. code-block:: python
 
-<WellSeries:
-    <WellSeries: <Well A1><Well B1><Well C1><Well D1><Well E1><Well F1><Well G1><Well H1>>
-    <WellSeries: <Well A2><Well B2><Well C2><Well D2><Well E2><Well F2><Well G2><Well H2>>
-    <WellSeries: <Well A3><Well B3><Well C3><Well D3><Well E3><Well F3><Well G3><Well H3>>
-    <WellSeries: <Well A4><Well B4><Well C4><Well D4><Well E4><Well F4><Well G4><Well H4>>
-    <WellSeries: <Well A5><Well B5><Well C5><Well D5><Well E5><Well F5><Well G5><Well H5>>
-    <WellSeries: <Well A6><Well B6><Well C6><Well D6><Well E6><Well F6><Well G6><Well H6>>
-    <WellSeries: <Well A7><Well B7><Well C7><Well D7><Well E7><Well F7><Well G7><Well H7>>
-    <WellSeries: <Well A8><Well B8><Well C8><Well D8><Well E8><Well F8><Well G8><Well H8>>
-    <WellSeries: <Well A9><Well B9><Well C9><Well D9><Well E9><Well F9><Well G9><Well H9>>
-    <WellSeries: <Well A10><Well B10><Well C10><Well D10><Well E10><Well F10><Well G10><Well H10>>
->
+    <WellSeries: <Well A1><Well B1><Well C1><Well D1>>
+    <WellSeries: <Well A2><Well B2><Well C2><Well D2>>
+    <WellSeries: <Well A3><Well B3><Well C3><Well D3>>
+    <WellSeries: <Well A4><Well B4><Well C4><Well D4>>
+    <WellSeries: <Well A5><Well B5><Well C5><Well D5>>
+    <WellSeries: <Well A6><Well B6><Well C6><Well D6>>
 
 
 Slices
 ------
 
-Labware can also be treating similarly to Python lists, and can therefore handle slices.
+Labware can also be treating similarly to Python lists, and can therefore
+handle slices.
 
 .. code-block:: python
 
+    # start at index 0
+    # slice until index 8, without including it
+    # increment by 2
     for w in plate[0:8:2]:
         print(w)
 
@@ -818,10 +470,11 @@ will print out...
 
     <Well A1>
     <Well C1>
-    <Well E1>
-    <Well G1>
+    <Well A2>
+    <Well C2>
 
-The API's labware are also prepared to take string values for the slice's ``start`` and ``stop`` positions.
+The API's labware are also prepared to take string values for the slice's
+``start`` and ``stop`` positions.
 
 .. code-block:: python
 
@@ -834,8 +487,6 @@ will print out...
 
     <Well A1>
     <Well C1>
-    <Well E1>
-    <Well G1>
 
 .. code-block:: python
 
@@ -849,6 +500,110 @@ will print out...
     <Well B1>
     <Well B3>
     <Well B5>
-    <Well B7>
-    <Well B9>
-    <Well B11>
+
+*****************************
+Deprecated Labware Load Names
+*****************************
+
+Prior to version ``3.10.0`` of the Opentrons API, we used a completely
+different set of labware load names. They will continue to work until version
+``4.0.0`` is released, but they should be considered deprecated.
+
+We recommend you switch over to using the load names from the Labware Library
+as soon as possible. The following mapping can be used as a guide:
+
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+|                  Deprecated                   |                                         Recommended                                         |                                            Notes                                             |
++===============================================+=============================================================================================+==============================================================================================+
+| ``6-well-plate``                              | ``corning_6_wellplate_16.8ml_flat``                                                         |                                                                                              |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``12-well-plate``                             | ``corning_12_wellplate_6.9ml_flat``                                                         |                                                                                              |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``24-well-plate``                             | ``corning_24_wellplate_3.4ml_flat``                                                         |                                                                                              |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``48-well-plate``                             | ``corning_48_wellplate_1.6ml_flat``                                                         |                                                                                              |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``384-plate``                                 | ``corning_384_wellplate_112ul_flat``                                                        |                                                                                              |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``96-deep-well``                              | ``usascientific_96_wellplate_2.4ml_deep``                                                   | This labware has square wells                                                                |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``96-flat``                                   | ``corning_96_wellplate_360ul_flat``                                                         |                                                                                              |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``96-PCR-flat``                               | ``biorad_96_wellplate_200ul_pcr``                                                           |                                                                                              |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``96-PCR-tall``                               | ``biorad_96_wellplate_200ul_pcr``                                                           |                                                                                              |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``alum-block-pcr-strips``                     | ``opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip`` | This product has been discontinued                                                           |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``biorad-hardshell-96-PCR``                   | ``biorad_96_wellplate_200ul_pcr``                                                           |                                                                                              |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``opentrons-aluminum-block-2ml-eppendorf``    | ``opentrons_24_aluminumblock_generic_2ml_screwcap``                                         | Opentrons Aluminum Block Set                                                                 |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``opentrons-aluminum-block-2ml-screwcap``     | ``opentrons_24_aluminumblock_generic_2ml_screwcap``                                         | Opentrons Aluminum Block Set                                                                 |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``opentrons-aluminum-block-96-PCR-plate``     | ``opentrons_96_aluminumblock_biorad_wellplate_200ul``                                       | Opentrons Aluminum Block Set                                                                 |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``opentrons-aluminum-block-PCR-strips-200ul`` | ``opentrons_96_aluminumblock_generic_pcr_strip_200ul``                                      | Opentrons Aluminum Block Set                                                                 |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``opentrons-tiprack-300ul``                   | ``opentrons_96_tiprack_300ul``                                                              |                                                                                              |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``opentrons-tuberack-1.5ml-eppendorf``        | ``opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap``                                  | Opentrons 4-in-1 Tube Rack Set                                                               |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``opentrons-tuberack-15_50ml``                | ``opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical``                                      | Opentrons 4-in-1 Tube Rack Set                                                               |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``opentrons-tuberack-15ml``                   | ``opentrons_15_tuberack_falcon_15ml_conical``                                               | Opentrons 4-in-1 Tube Rack Set                                                               |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``opentrons-tuberack-2ml-eppendorf``          | ``opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap``                                    | Opentrons 4-in-1 Tube Rack Set                                                               |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``opentrons-tuberack-2ml-screwcap``           | ``opentrons_24_tuberack_generic_2ml_screwcap``                                              | Opentrons 4-in-1 Tube Rack Set                                                               |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``opentrons-tuberack-50ml``                   | ``opentrons_6_tuberack_falcon_50ml_conical``                                                | Opentrons 4-in-1 Tube Rack Set                                                               |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``PCR-strip-tall``                            | ``opentrons_96_aluminumblock_generic_pcr_strip_200ul``                                      |                                                                                              |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``tiprack-10ul``                              | ``opentrons_96_tiprack_10ul``                                                               | If possible, please use an Opentrons tip rack rather than a rack with a slot adapter         |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``tiprack-200ul``                             | ``tipone_96_tiprack_200ul``                                                                 | If possible, please use an Opentrons tip rack rather than a rack with a slot adapter         |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``tiprack-1000ul``                            | ``opentrons_96_tiprack_1000ul``                                                             | If possible, please use an Opentrons tip rack rather than a rack with a slot adapter         |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``trash-box`                                  | ``agilent_1_reservoir_290ml``                                                               | ``trash-box`` is no longer supported; we recommend using a 1-well reservoir for liquid trash |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``trough-12row``                              | ``usascientific_12_reservoir_22ml``                                                         |                                                                                              |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``tube-rack-.75ml``                           | ``opentrons_24_tuberack_generic_0.75ml_snapcap_acrylic``                                    | Discontinued; please upgrade to the Opentrons 4-in-1 Tube Rack Set                           |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``tube-rack-2ml``                             | ``opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap_acrylic``                            | Discontinued; please upgrade to the Opentrons 4-in-1 Tube Rack Set                           |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+| ``tube-rack-15_50ml``                         | ``opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic``                              | Discontinued; please upgrade to the Opentrons 4-in-1 Tube Rack Set                           |
++-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
+
+.. Note::
+    If your labware is missing from the list above, or you're unsure how to
+    update your protocol's load names, please contact our support team
+
+The following load names do not have a new definitions available, and could
+eventually be removed. They will continue to function normally for now. If you
+have any concerns about their deprecation and/or removal, please reach out!
+
+- ``24-vial-rack``
+- ``48-vial-plate``
+- ``5ml-3x4``
+- ``96-well-plate-20mm``
+- ``MALDI-plate``
+- ``T25-flask``
+- ``T75-flask``
+- ``e-gelgol``
+- ``hampton-1ml-deep-block``
+- ``point``
+- ``rigaku-compact-crystallization-plate``
+- ``small_vial_rack_16x45``
+- ``temperature-plate``
+- ``tiprack-10ul-H``
+- ``trough-12row-short``
+- ``trough-1row-25ml``
+- ``trough-1row-test``
+- ``tube-rack-2ml-9x9``
+- ``tube-rack-5ml-96``
+- ``tube-rack-80well``
+- ``wheaton_vial_rack``

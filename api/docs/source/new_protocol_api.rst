@@ -35,11 +35,11 @@ The design goal of the Opentrons API is to make code readable and easy to unders
     Begin the protocol
 
     Add a 96 well plate, and place it in slot '2' of the robot deck
-    Add a 200uL tip rack, and place it in slot '1' of the robot deck
+    Add a 300 µL tip rack, and place it in slot '1' of the robot deck
 
-    Add a single-channel 300uL pipette to the left mount, and tell it to use that tip rack
+    Add a single-channel 300 µL pipette to the left mount, and tell it to use that tip rack
 
-    Transfer 100uL from the plate's 'A1' well to it's 'B2' well
+    Transfer 100 µL from the plate's 'A1' well to its 'B2' well
 
 If we were to rewrite this with the Opentrons API, it would look like the following:
 
@@ -49,15 +49,14 @@ If we were to rewrite this with the Opentrons API, it would look like the follow
     metadata = {
         'protocolName': 'My Protocol',
         'author': 'Name <email@address.com>',
-        'description': 'Simple protocol to get started using OT2',
-        'source': 'Opentrons Protocol Tutorial'
+        'description': 'Simple protocol to get started using OT2'
     }
 
     # protocol run function
     def run(protocol_context):
 
         # labware
-        plate = protocol_context.load_labware_by_name('generic_96_wellplate_340ul_flat', '2')
+        plate = protocol_context.load_labware_by_name('corning_96_wellplate_360ul_flat', '2')
         tiprack = protocol_context.load_labware_by_name('opentrons_96_tiprack_300ul', '1')
 
         # pipettes
@@ -86,7 +85,7 @@ Metadata
 
 Metadata is a dictionary of data that is read by the server and returned to client applications (such as the Opentrons Run App). It is not needed to run a protocol (and is entirely optional), but if present can help the client application display additional data about the protocol currently being executed.
 
-The fields above ("protocolName", "author", "description", and "source") are the recommended fields, but the metadata dictionary can contain fewer fields, or additional fields as desired (though non-standard fields may not be rendered by the client, depending on how it is designed).
+The fields above ("protocolName", "author", and "description") are the recommended fields, but the metadata dictionary can contain fewer fields, or additional fields as desired (though non-standard fields may not be rendered by the client, depending on how it is designed).
 
 Run Function
 ^^^^^^^^^^^^
@@ -106,71 +105,27 @@ Labware
 
 The labware section informs the protocol context what labware is present on the robot’s deck. In this section, you define the tip racks, well plates, troughs, tubes, or anything else you’ve put on the deck.
 
-Each labware is given a name (ex: ``'generic_96_wellplate_340ul_flat'``), and the slot on the robot it will be placed (ex: ``'2'``). A list of valid labware can be found in :ref:`protocol-api-valid-labware`. In this example, we’ll use ``'generic_96_wellplate_340ul_flat'`` (an ANSI standard 96-well plate) and ``'opentrons_96_tiprack_300ul'``, the Opentrons standard 300 uL tiprack.
+Each labware is given a name (ex: ``'corning_96_wellplate_360ul_flat'``), and the slot on the robot it will be placed (ex: ``'2'``). A list of valid labware can be found in :ref:`protocol-api-valid-labware`. In this example, we’ll use ``'corning_96_wellplate_360ul_flat'`` (an ANSI standard 96-well plate) and ``'opentrons_96_tiprack_300ul'``, the Opentrons standard 300 µL tiprack.
 
 From the example above, the "labware" section looked like:
 
 .. code-block:: python
 
-    plate = protocol_context.load_labware_by_name('generic_96_wellplate_340ul_flat', '2')
+    plate = protocol_context.load_labware_by_name('corning_96_wellplate_360ul_flat', '2')
     tiprack = protocol_context.load_labware_by_name('opentrons_96_tiprack_300ul', '1')
 
 
-and informed the protocol context that the deck contains a 300 uL tiprack in slot 1 and a 96 well plate in slot 2.
+and informed the protocol context that the deck contains a 300 µL tiprack in slot 1 and a 96 well plate in slot 2.
 
 More complete documentation on labware methods (such as the ``.wells()`` method) is available in :ref:`protocol-api-labware`.
 
 .. _protocol-api-valid-labware:
 
-This table lists the names of valid labwares that can be loaded with :py:meth:`.ProtocolContext.load_labware_by_name`, along with the name of the legacy labware definition each is equivalent to (if any).
+To see the labware names that can be loaded with
+:py:meth:`.ProtocolContext.load_labware_by_name`, please see the
+`Opentrons Labware Library`__
 
-+-------------------------------------------+----------------------------------------+
-| API 2 Labware Name                        | API 1 Labware Name                     |
-+===========================================+========================================+
-| biorad_96_wellplate_200ul_pcr            | 96-pcr-flat                            |
-+-------------------------------------------+----------------------------------------+
-| corning_12_wellplate_6.9_ml               | 12-well-plate                          |
-+-------------------------------------------+----------------------------------------+
-| corning_24_wellplate_3.4_ml               | 24-well-plate                          |
-+-------------------------------------------+----------------------------------------+
-| corning_384_wellplate_112ul_flat              | 384-plate                              |
-+-------------------------------------------+----------------------------------------+
-| corning_48_wellplate_1.6_ml               | 48-well-plate                          |
-+-------------------------------------------+----------------------------------------+
-| corning_6_wellplate_16.8ml_flat               | 6-well-plate                           |
-+-------------------------------------------+----------------------------------------+
-| eppendorf_96_tiprack_1000ul_eptips              | --                                     |
-+-------------------------------------------+----------------------------------------+
-| eppendorf_96_tiprack_10ul_eptips                | --                                     |
-+-------------------------------------------+----------------------------------------+
-| generic_96_wellplate_340ul_flat               | 96-flat                                |
-+-------------------------------------------+----------------------------------------+
-| opentrons_15_tuberack_15_ml_falcon        | opentrons-tuberack-15ml                |
-+-------------------------------------------+----------------------------------------+
-| opentrons_24_aluminumblock_generic_2ml_screwcap       | opentrons-aluminum-block-2ml-eppendorf |
-+-------------------------------------------+----------------------------------------+
-| opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap    | opentrons-tuberack-1.5ml-eppendorf     |
-+-------------------------------------------+----------------------------------------+
-| opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap      | opentrons-tuberack-2ml-eppendorf       |
-+-------------------------------------------+----------------------------------------+
-| opentrons_24_tuberack_generic_2ml_screwcap       | opentrons-tuberack-2ml-screwcap        |
-+-------------------------------------------+----------------------------------------+
-| opentrons_6_tuberack_falcon_50ml_conical         | opentrons-tuberack-50ml                |
-+-------------------------------------------+----------------------------------------+
-| opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical        | opentrons-tuberack-15_50ml             |
-+-------------------------------------------+----------------------------------------+
-| opentrons_96_aluminum_biorad_plate_200_ul | opentrons-aluminum-block-96-PCR-plate  |
-+-------------------------------------------+----------------------------------------+
-| opentrons_96_aluminumblock_generic_pcr_strip_200ul     | --                                     |
-+-------------------------------------------+----------------------------------------+
-| opentrons_96_tiprack_1000ul              | tiprack-1000ul                         |
-+-------------------------------------------+----------------------------------------+
-| opentrons_96_tiprack_10ul                | tiprack-10ul                           |
-+-------------------------------------------+----------------------------------------+
-| opentrons_96_tiprack_300ul               | opentrons-tiprack-300ul                |
-+-------------------------------------------+----------------------------------------+
-| usascientific_12_reservoir_22ml            | trough-12row                           |
-+-------------------------------------------+----------------------------------------+
+__ https://labware.opentrons.com
 
 
 Pipettes
@@ -198,7 +153,7 @@ From the example above, the "commands" section looked like:
     pipette.aspirate(100, plate.wells_by_index()['A1'])
     pipette.dispense(100, plate.wells_by_index()['B2'])
 
-which does exactly what it says - aspirate 100 uL from A1 and dispense it all in B2.
+which does exactly what it says - aspirate 100 µL from A1 and dispense it all in B2.
 
 Complete documentation of pipettes and pipette commands can be found in :ref:`protocol_api-protocols-and-instruments`.
 

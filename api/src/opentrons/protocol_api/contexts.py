@@ -157,7 +157,7 @@ class ProtocolContext(CommandPublisher):
                 ctx.home()
             # after the with block, the context is connected to the same
             # hardware control API it was connected to before, even if
-            # an error occured in the code inside the with block
+            # an error occurred in the code inside the with block
 
         """
         old_hw = self._hw_manager.hardware
@@ -215,7 +215,7 @@ class ProtocolContext(CommandPublisher):
     ) -> Labware:
         """ A convenience function to specify a piece of labware by name.
 
-        For labware already defined by Opentrons, this is a convient way
+        For labware already defined by Opentrons, this is a convenient way
         to collapse the two stages of labware initialization (creating
         the labware and adding it to the protocol) into one.
 
