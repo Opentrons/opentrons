@@ -325,7 +325,7 @@ class API(HardwareAPILike):
         configs = ['name', 'min_volume', 'max_volume', 'channels',
                    'aspirate_flow_rate', 'dispense_flow_rate',
                    'pipette_id', 'current_volume', 'display_name',
-                   'tip_length', 'model']
+                   'tip_length', 'model', 'blow_out_flow_rate']
         instruments: Dict[top_types.Mount, Pipette.DictType] = {
             top_types.Mount.LEFT: {},
             top_types.Mount.RIGHT: {}
@@ -982,7 +982,8 @@ class API(HardwareAPILike):
                                          this_pipette.config.plunger_current)
         try:
             await self._move_plunger(
-                mount, this_pipette.config.blow_out)
+                mount, this_pipette.config.blow_out,
+                speed=this_pipette.config.blow_out_flow_rate)
         except Exception:
             self._log.exception('Blow out failed')
             raise
@@ -1152,7 +1153,8 @@ class API(HardwareAPILike):
             instr.update_config_item(key, pos_dict[key])
 
     @_log_call
-    def set_flow_rate(self, mount, aspirate=None, dispense=None):
+    def set_flow_rate(self, mount,
+                      aspirate=None, dispense=None, blow_out=None):
         this_pipette = self._attached_instruments[mount]
         if not this_pipette:
             raise top_types.PipetteNotAttachedError(
@@ -1161,6 +1163,8 @@ class API(HardwareAPILike):
             this_pipette.update_config_item('aspirate_flow_rate', aspirate)
         if dispense:
             this_pipette.update_config_item('dispense_flow_rate', dispense)
+        if blow_out:
+            this_pipette.update_config_item('blow_out_flow_rate', blow_out)
 
     @_log_call
     async def discover_modules(self):

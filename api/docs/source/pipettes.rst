@@ -48,8 +48,7 @@ In this example, we are using a Single-Channel 300uL pipette.
 Plunger Flow Rates
 ==================
 
-The speeds at which the pipette will aspirate and dispense can be set through ``aspirate_speed`` and ``dispense_speed``.
-The values are in microliters/seconds, and have varying defaults depending on the model.
+The speeds at which the pipette will aspirate and dispense can be set through ``aspirate_speed``, ``dispense_speed``, and ``blow_out_speed`` in units of millimeters of plunger travel per second, or through ``aspirate_flow_rate``, ``dispense_flow_rate``, and ``blow_out_flow_rate`` in units of microliters/second. These have varying defaults depending on the model.
 
 
 .. code-block:: python
@@ -57,7 +56,8 @@ The values are in microliters/seconds, and have varying defaults depending on th
     pipette = instruments.P300_Single(
         mount='right',
         aspirate_flow_rate=200,
-        dispense_flow_rate=600)
+        dispense_flow_rate=600,
+        blow_out_flow_rate=600)
 
 
 Minimum and Maximum Volume
@@ -83,6 +83,7 @@ P10_Single
 
 - Aspirate Default: 5 μl/s
 - Dispense Default: 10 μl/s
+- Blow Out Default: 32 μl/s
 - Minimum Volume: 1 μl
 - Maximum Volume: 10 μl
 
@@ -91,6 +92,7 @@ P10_Multi
 
 - Aspirate Default: 5 μl/s
 - Dispense Default: 10 μl/s
+- Blow Out Default: 32 μl/s
 - Minimum Volume: 1 μl
 - Maximum Volume: 10 μl
 
@@ -99,6 +101,7 @@ P50_Single
 
 - Aspirate Default: 25 μl/s
 - Dispense Default: 50 μl/s
+- Blow Out Default: 118 μl/s
 - Minimum Volume: 5 μl
 - Maximum Volume: 50 μl
 
@@ -107,6 +110,7 @@ P50_Multi
 
 - Aspirate Default: 25 μl/s
 - Dispense Default: 50 μl/s
+- Blow Out Default: 122 μl/s
 - Minimum Volume: 5 μl
 - Maximum Volume: 50 μl
 
@@ -115,6 +119,7 @@ P300_Single
 
 - Aspirate Default: 150 μl/s
 - Dispense Default: 300 μl/s
+- Blow Out Default: 753 μl/s
 - Minimum Volume: 30 μl
 - Maximum Volume: 300 μl
 
@@ -123,6 +128,7 @@ P300_Multi
 
 - Aspirate Default: 150 μl/s
 - Dispense Default: 300 μl/s
+- Blow Out Default: 772 μl/s
 - Minimum Volume: 30 μl
 - Maximum Volume: 300 μl
 
@@ -131,6 +137,7 @@ P1000_Single
 
 - Aspirate Default: 500 μl/s
 - Dispense Default: 1000 μl/s
+- Blow Out Default: 2453 μl/s
 - Minimum Volume: 100 μl
 - Maximum Volume: 1000 μl
 

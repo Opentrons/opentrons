@@ -3798,6 +3798,7 @@
     "tipLength",
     "defaultAspirateFlowRate",
     "defaultDispenseFlowRate",
+    "defaultBlowOutFlowRate",
     "quirks"
   ],
   "validQuirks": ["pickupTipShake", "dropTipShake", "doubleDropTip"]

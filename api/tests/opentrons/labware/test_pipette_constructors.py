@@ -34,12 +34,15 @@ def test_pipette_contructors(factory, monkeypatch):
 
     aspirate_flow_rate = None
     dispense_flow_rate = None
+    blow_out_flow_rate = None
 
-    def mock_set_flow_rate(self, aspirate, dispense):
+    def mock_set_flow_rate(self, aspirate, dispense, blow_out):
         nonlocal aspirate_flow_rate
         nonlocal dispense_flow_rate
+        nonlocal blow_out_flow_rate
         aspirate_flow_rate = aspirate
         dispense_flow_rate = dispense
+        blow_out_flow_rate = blow_out
 
     monkeypatch.setattr(Pipette, 'set_flow_rate', mock_set_flow_rate)
     robot.reset()
@@ -59,7 +62,8 @@ def test_pipette_contructors(factory, monkeypatch):
         21,      # aspirate_flow_rate
         42,      # dispense_flow_rate
         7,       # min_volume
-        8        # max_volume
+        8,       # max_volume
+        25,      # blow_out_flow_rate
     )
 
     assert pipette.name.startswith(expected_name) is True
@@ -68,6 +72,7 @@ def test_pipette_contructors(factory, monkeypatch):
     assert pipette.tip_racks == []
     assert aspirate_flow_rate == 21
     assert dispense_flow_rate == 42
+    assert blow_out_flow_rate == 25
     assert pipette.min_volume == 7
     assert pipette.max_volume == 8
 
