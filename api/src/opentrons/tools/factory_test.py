@@ -1,4 +1,5 @@
 import atexit
+import logging
 import optparse
 import os
 import socket
@@ -7,6 +8,9 @@ import subprocess
 from opentrons import robot
 from opentrons.config import infer_config_base_dir
 from opentrons.drivers.rpi_drivers import gpio
+from opentrons.drivers import serial_communication
+
+log = logging.getLogger(__name__)
 
 
 RESULT_SPACE = '\t- {}'
@@ -92,14 +96,39 @@ def run_quiet_process(command):
     subprocess.check_output('{} &> /dev/null'.format(command), shell=True)
 
 
-def test_smoothie_gpio(port_name=''):
-    from opentrons.drivers import serial_communication
-    from opentrons.drivers.smoothie_drivers.driver_3_0 import SMOOTHIE_ACK
+def _get_unique_smoothie_responses(responses):
+    """ Find the number of truly unique responses from the smoothie, ignoring
 
+    - Responses that are only different because of interjected \r\n
+    - Responses that are only different by \r or \n replacing a single char
+
+    Both of these errors are results of race conditions between smoothie
+    terminal echo mode and responses, and do not indicate serial failures.
+    """
+    uniques = list(set(responses))  # Eliminate exact repetitions
+    # eliminate "uniques" that are really just the second \r\n racing
+    # with the smoothie's return values
+    true_uniques = [uniques[0]]
+    for unique in uniques[1:]:
+        if len(unique) != len(uniques[0]):
+            true_uniques.append(unique)
+            continue
+        for a, b in zip(uniques[0], unique):
+            if a in '\r\n':
+                continue
+            elif b in '\r\n':
+                continue
+            elif a != b:
+                true_uniques.append(unique)
+                break
+    return true_uniques
+
+
+def test_smoothie_gpio(port_name=''):
     def _write_and_return(msg):
         return serial_communication.write_and_return(
-            msg + '\r\n\r\n',
-            SMOOTHIE_ACK,
+            msg + '\r\n',
+            'ok\r\n',
             robot._driver._connection,
             timeout=1)
 
@@ -118,10 +147,14 @@ def test_smoothie_gpio(port_name=''):
 
     print('DATA LOSS')
     [_write_and_return('version') for i in range(10)]
+    # check that if we write the same thing to the smoothie a bunch
+    # it works
     data = [_write_and_return('version') for i in range(100)]
-    if len(set(data)) == 1:
+    true_uniques = _get_unique_smoothie_responses(data)
+    if len(true_uniques) == 1:
         print(RESULT_SPACE.format(PASS))
     else:
+        log.info(f'true uniques: {true_uniques}')
         print(RESULT_SPACE.format(FAIL))
 
     print('HALT')
@@ -258,6 +291,7 @@ def get_optional_port_name():
 
 if __name__ == '__main__':
     # put quotes around filepaths to allow whitespaces
+    logging.basicConfig(filename='factory-test.log')
     data_folder_quoted = '"{}"'.format(DATA_FOLDER)
     video_filepath_quoted = '"{}"'.format(VIDEO_FILEPATH)
     atexit.register(_reset_lights)

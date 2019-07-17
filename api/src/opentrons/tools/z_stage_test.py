@@ -13,6 +13,7 @@ QC Gantry Test
 """
 
 import atexit
+import logging
 import optparse
 
 from opentrons import robot
@@ -156,6 +157,7 @@ def run_z_stage():
 if __name__ == '__main__':
     atexit.register(_exit_test)
     options, args = get_options()
+    logging.basicConfig(filename='z-stage-test.log')
     try:
         robot.connect()
         print("In Progress.. ")
