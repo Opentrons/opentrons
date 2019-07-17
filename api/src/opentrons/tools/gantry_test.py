@@ -7,6 +7,7 @@ with Max speed. This will result to a good assembly vs a bad assembly process.
 
 Author: Carlos Fernandez
 """
+import logging
 import optparse
 
 from opentrons import robot
@@ -130,7 +131,7 @@ if __name__ == '__main__':
     b_x_max = 417.2
     b_y_max = 320
     tolerance_mm = 0.5
-
+    logging.basicConfig(filename='gantry-test.log')
     try:
         connect_to_port()
         robot.home()
