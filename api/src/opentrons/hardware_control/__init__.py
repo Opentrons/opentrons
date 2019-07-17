@@ -372,7 +372,7 @@ class API(HardwareAPILike):
 
     # Global actions API
     @_log_call
-    async def pause(self):
+    def pause(self):
         """
         Pause motion of the robot after a current motion concludes.
 
@@ -386,11 +386,11 @@ class API(HardwareAPILike):
         """
         self._backend.pause()
 
-    async def pause_with_message(self, message):
+    def pause_with_message(self, message):
         self._log.warning('Pause with message: {}'.format(message))
         for cb in self._callbacks:
             cb(message)
-        await self.pause()
+        self.pause()
 
     @_log_call
     def resume(self):

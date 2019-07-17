@@ -133,24 +133,25 @@ async def test_basic_method(hc_stream_server, loop, monkeypatch):
     sock, server = hc_stream_server
     reader, writer = await asyncio.open_unix_connection(
         sock)
-    # Check a non-async method and make sure it works
-    passed_message = None
+    # Check a method that requires no arg xforms and make sure it works
+    passed_duration = None
 
-    def fake_pause_with_message(obj, message):
-        nonlocal passed_message
-        passed_message = message
+    def fake_delay(obj, duration_s):
+        nonlocal passed_duration
+        passed_duration = duration_s
 
-    bound = MethodType(fake_pause_with_message, server._api)
+    bound = MethodType(fake_delay, server._api)
     monkeypatch.setattr(
-        server._api, 'pause_with_message', bound)
+        server._api, 'delay', bound)
     server._methods = sockserv.build_jrpc_methods(server._api)
-    request = json.dumps({'jsonrpc': '2.0', 'method': 'pause_with_message',
-                          'params': {'message': 'why hello!'},
+    request = json.dumps({'jsonrpc': '2.0', 'method': 'delay',
+                          'params': {'duration_s': 15.2},
                           'id': 1})
     writer.write(request.encode())
     decoder = sockserv.JsonStreamDecoder(reader)
     resp = await decoder.read_object()
     assert resp == {'jsonrpc': '2.0', 'result': None, 'id': 1}
+    assert passed_duration == 15.2
 
     passed_fw = None
     passed_modeset = None

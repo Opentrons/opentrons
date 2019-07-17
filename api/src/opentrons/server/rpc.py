@@ -274,6 +274,7 @@ class RPCServer(object):
     async def make_call(self, func, token):
         response = {'$': {'type': CALL_RESULT_MESSAGE, 'token': token}}
         try:
+            log.info(f"RPC call: {func} begins")
             call_result = await self.loop.run_in_executor(
                 self.executor, self.call_and_serialize, func)
             response['$']['status'] = 'success'
@@ -305,6 +306,7 @@ class RPCServer(object):
                     'traceback': trace
                 }
         finally:
+            log.info(f"RPC call: {func} ends")
             response['data'] = call_result
         return response
 
