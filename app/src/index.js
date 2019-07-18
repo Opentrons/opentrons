@@ -45,7 +45,7 @@ const composeEnhancers =
 
 const store = createStore(rootReducer, composeEnhancers(middleware))
 
-epicMiddlware.run(rootEpic)
+epicMiddleware.run(rootEpic)
 
 const renderApp = () =>
   ReactDom.render(
