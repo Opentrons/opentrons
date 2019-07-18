@@ -1,6 +1,10 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
+import type {
+  PipetteNameSpecs,
+  PipetteModelSpecs,
+} from '@opentrons/shared-data'
 
 import type { Mount } from '../robot-types'
 import InfoItem from './InfoItem.js'
@@ -19,8 +23,8 @@ export type InstrumentInfoProps = {|
   tiprackModel?: string,
   /** if disabled, pipette & its info are grayed out */
   isDisabled: boolean,
-  /** usually 1 or 8 */
-  channels?: number,
+  /** specs of mounted pipette */
+  pipetteSpecs?: ?PipetteModelSpecs | ?PipetteNameSpecs,
   /** classes to apply */
   className?: string,
   /** classes to apply to the info group child */
@@ -49,10 +53,11 @@ export default function InstrumentInfo(props: InstrumentInfoProps) {
         )}
         {props.children}
       </div>
-      {props.channels && (
+      {props.pipetteSpecs && (
         <InstrumentDiagram
-          channels={props.channels}
+          pipetteSpecs={props.pipetteSpecs}
           className={styles.pipette_icon}
+          mount={props.mount}
         />
       )}
     </div>

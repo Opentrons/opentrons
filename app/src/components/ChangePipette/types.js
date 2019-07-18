@@ -2,6 +2,7 @@
 import type {
   PipetteNameSpecs,
   PipetteModelSpecs,
+  PipetteDisplayCategory,
 } from '@opentrons/shared-data'
 
 import type { Mount } from '../../robot'
@@ -18,6 +19,7 @@ export type ChangePipetteProps = {
   wantedPipette: ?PipetteNameSpecs,
   actualPipette: ?PipetteModelSpecs,
   displayName: string,
+  displayCategory: PipetteDisplayCategory,
   direction: Direction,
   success: boolean,
   attachedWrong: boolean,

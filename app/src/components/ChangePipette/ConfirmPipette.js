@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import { Icon, PrimaryButton, ModalPage } from '@opentrons/components'
 
 import type { ChangePipetteProps } from './types'
-import { getDiagramSrc } from './InstructionStep'
+import { getDiagramsSrc } from './InstructionStep'
 import styles from './styles.css'
 
 const EXIT_BUTTON_MESSAGE = 'exit pipette setup'
@@ -83,7 +83,7 @@ function StatusDetails(props: ChangePipetteProps) {
         <div>
           <img
             className={styles.confirm_diagram}
-            src={getDiagramSrc({
+            src={getDiagramsSrc({
               ...props,
               channels: wantedPipette.channels,
               diagram: 'tab',

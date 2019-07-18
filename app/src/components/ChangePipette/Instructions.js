@@ -75,7 +75,8 @@ export default function Instructions(props: ChangePipetteProps) {
 }
 
 function Steps(props: ChangePipetteProps) {
-  const { direction } = props
+  const { direction, displayCategory } = props
+
   const channels = props.actualPipette
     ? props.actualPipette.channels
     : props.wantedPipette?.channels || 1
@@ -111,11 +112,18 @@ function Steps(props: ChangePipetteProps) {
         step="one"
         diagram="screws"
         channels={channels}
+        displayCategory={displayCategory}
         {...props}
       >
         {stepOne}
       </InstructionStep>
-      <InstructionStep step="two" diagram="tab" channels={channels} {...props}>
+      <InstructionStep
+        step="two"
+        diagram="tab"
+        channels={channels}
+        displayCategory={displayCategory}
+        {...props}
+      >
         {stepTwo}
       </InstructionStep>
     </div>

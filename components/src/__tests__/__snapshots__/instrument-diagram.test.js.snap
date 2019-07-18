@@ -1,8 +1,27 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`InstrumentDiagram Multi-channel GEN2 renders correctly 1`] = `
+<div>
+  <img
+    className=""
+    src="pipetteMulti.png"
+  />
+</div>
+`;
+
 exports[`InstrumentDiagram Multi-channel renders correctly 1`] = `
 <div>
   <img
+    className=""
+    src="pipetteMulti.png"
+  />
+</div>
+`;
+
+exports[`InstrumentDiagram Single-channel GEN2 renders correctly 1`] = `
+<div>
+  <img
+    className=""
     src="pipetteMulti.png"
   />
 </div>
@@ -11,7 +30,8 @@ exports[`InstrumentDiagram Multi-channel renders correctly 1`] = `
 exports[`InstrumentDiagram Single-channel renders correctly 1`] = `
 <div>
   <img
-    src="pipetteSingle.png"
+    className=""
+    src="pipetteMulti.png"
   />
 </div>
 `;
@@ -43,6 +63,7 @@ exports[`InstrumentGroup Renders correctly 1`] = `
       className="pipette_icon"
     >
       <img
+        className=""
         src="pipetteMulti.png"
       />
     </div>
@@ -70,6 +91,7 @@ exports[`InstrumentGroup Renders correctly 1`] = `
       className="pipette_icon"
     >
       <img
+        className="flipped_image"
         src="pipetteSingle.png"
       />
     </div>

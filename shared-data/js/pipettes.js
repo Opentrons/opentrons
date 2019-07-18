@@ -3,11 +3,12 @@ import pipetteNameSpecs from '../pipette/definitions/pipetteNameSpecs.json'
 import pipetteModelSpecs from '../pipette/definitions/pipetteModelSpecs.json'
 
 export type PipetteChannels = 1 | 8
+export type PipetteDisplayCategory = 'OG' | 'GEN2'
 
 export type PipetteNameSpecs = {
   name: string,
   displayName: string,
-  displayCategory: ?string,
+  displayCategory?: PipetteDisplayCategory,
   minVolume: number,
   maxVolume: number,
   defaultAspirateFlowRate: { value: number },
