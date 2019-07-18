@@ -1,15 +1,16 @@
 // @flow
+import type { Options } from '@opentrons/components'
 
 export type LabwareType =
   | 'wellPlate'
   | 'reservoir'
   | 'tuberack'
   | 'aluminumBlock'
-export const labwareTypes: Array<LabwareType> = [
-  'wellPlate',
-  'reservoir',
-  'tuberack',
-  'aluminumBlock',
+export const labwareTypeOptions: Options = [
+  { name: 'Well Plate', value: 'wellPlate' },
+  { name: 'Reservoir', value: 'reservoir' },
+  { name: 'Tube Rack', value: 'tuberack' },
+  { name: 'Aluminum Block', value: 'aluminumBlock' },
 ]
 
 export type WellShape = 'circular' | 'rectangular'
@@ -26,23 +27,23 @@ export const aluminumBlockChildLabwareTypes = [
 ] // TODO derive from labware
 export const tuberackInsertOptions = [
   {
-    label: '6 tubes',
-    value: 'TODO loadName of labware def here',
+    name: '6 tubes',
+    value: 'TODO loadName of labware def here: 6 tubes',
     image: 'TODO image URL here',
   },
   {
-    label: '10 tubes (2 size)',
-    value: 'TODO loadName of labware def here',
+    name: '10 tubes (2 size)',
+    value: 'TODO loadName of labware def here: 10 tubes (2 size)',
     image: 'TODO image URL here',
   },
   {
-    label: '15 tubes',
-    value: 'TODO loadName of labware def here',
+    name: '15 tubes',
+    value: 'TODO loadName of labware def here: 15 tubes',
     image: 'TODO image URL here',
   },
   {
-    label: '24 tubes (snap cap)',
-    value: 'TODO loadName of labware def here',
+    name: '24 tubes (snap cap)',
+    value: 'TODO loadName of labware def here: 24 tubes (snap cap)',
     image: 'TODO image URL here',
   },
 ]
