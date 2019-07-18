@@ -8,6 +8,7 @@ import reduce from 'lodash/reduce'
 import type { Options } from '@opentrons/components'
 import type {
   RootState,
+  ContainersState,
   DrillDownLabwareId,
   SelectedContainerId,
   SelectedLiquidGroupState,
@@ -18,7 +19,7 @@ import type {
   LiquidGroup,
   OrderedLiquids,
 } from './types'
-import type { BaseState, Selector } from './../types'
+import type { BaseState, MemoizedSelector } from './../types'
 
 // TODO: Ian 2019-02-15 no RootSlice, use BaseState
 type RootSlice = { labwareIngred: RootState }
@@ -26,7 +27,7 @@ type RootSlice = { labwareIngred: RootState }
 const rootSelector = (state: RootSlice): RootState => state.labwareIngred
 
 // NOTE: not intended for UI use! Use getLabwareNicknamesById for the string.
-const getLabwareNameInfo: Selector<*> = createSelector(
+const getLabwareNameInfo: MemoizedSelector<ContainersState> = createSelector(
   rootSelector,
   s => s.containers
 )
@@ -36,20 +37,20 @@ const getLiquidGroupsById = (state: RootSlice) =>
 const getLiquidsByLabwareId = (state: RootSlice) =>
   rootSelector(state).ingredLocations
 
-const getNextLiquidGroupId: Selector<string> = createSelector(
+const getNextLiquidGroupId: MemoizedSelector<string> = createSelector(
   getLiquidGroupsById,
   ingredGroups =>
     (max(Object.keys(ingredGroups).map(id => parseInt(id))) + 1 || 0).toString()
 )
 
-const getLiquidNamesById: Selector<{
+const getLiquidNamesById: MemoizedSelector<{
   [ingredId: string]: string,
 }> = createSelector(
   getLiquidGroupsById,
   ingredGroups => mapValues(ingredGroups, (ingred: LiquidGroup) => ingred.name)
 )
 
-const getLiquidSelectionOptions: Selector<Options> = createSelector(
+const getLiquidSelectionOptions: MemoizedSelector<Options> = createSelector(
   getLiquidGroupsById,
   liquidGroupsById => {
     return Object.keys(liquidGroupsById).map(id => ({
@@ -68,17 +69,17 @@ const selectedAddLabwareSlot = (state: BaseState) =>
 
 const getSavedLabware = (state: BaseState) => rootSelector(state).savedLabware
 
-const getSelectedLabwareId: Selector<SelectedContainerId> = createSelector(
+const getSelectedLabwareId: MemoizedSelector<SelectedContainerId> = createSelector(
   rootSelector,
   rootState => rootState.selectedContainerId
 )
 
-const getSelectedLiquidGroupState: Selector<SelectedLiquidGroupState> = createSelector(
+const getSelectedLiquidGroupState: MemoizedSelector<SelectedLiquidGroupState> = createSelector(
   rootSelector,
   rootState => rootState.selectedLiquidGroup
 )
 
-const getDrillDownLabwareId: Selector<DrillDownLabwareId> = createSelector(
+const getDrillDownLabwareId: MemoizedSelector<DrillDownLabwareId> = createSelector(
   rootSelector,
   rootState => rootState.drillDownLabwareId
 )
@@ -90,7 +91,7 @@ type IngredGroupFields = {
     ...$Exact<IngredInputs>,
   },
 }
-const allIngredientGroupFields: Selector<AllIngredGroupFields> = createSelector(
+const allIngredientGroupFields: MemoizedSelector<AllIngredGroupFields> = createSelector(
   getLiquidGroupsById,
   ingreds =>
     reduce(
@@ -107,7 +108,7 @@ const allIngredientGroupFields: Selector<AllIngredGroupFields> = createSelector(
     )
 )
 
-const allIngredientNamesIds: BaseState => OrderedLiquids = createSelector(
+const allIngredientNamesIds: MemoizedSelector<OrderedLiquids> = createSelector(
   getLiquidGroupsById,
   ingreds =>
     Object.keys(ingreds).map(ingredId => ({
@@ -116,14 +117,14 @@ const allIngredientNamesIds: BaseState => OrderedLiquids = createSelector(
     }))
 )
 
-const getLabwareSelectionMode: Selector<boolean> = createSelector(
+const getLabwareSelectionMode: MemoizedSelector<boolean> = createSelector(
   rootSelector,
   rootState => {
     return rootState.modeLabwareSelection !== false
   }
 )
 
-const getLiquidGroupsOnDeck: Selector<Array<string>> = createSelector(
+const getLiquidGroupsOnDeck: MemoizedSelector<Array<string>> = createSelector(
   getLiquidsByLabwareId,
   ingredLocationsByLabware => {
     let liquidGroups: Set<string> = new Set()
@@ -148,7 +149,7 @@ const getLiquidGroupsOnDeck: Selector<Array<string>> = createSelector(
   }
 )
 
-const getDeckHasLiquid: Selector<boolean> = createSelector(
+const getDeckHasLiquid: MemoizedSelector<boolean> = createSelector(
   getLiquidGroupsOnDeck,
   liquidGroups => liquidGroups.length > 0
 )

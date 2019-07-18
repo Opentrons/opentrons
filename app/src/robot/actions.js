@@ -272,7 +272,7 @@ export const actions = {
     return { type: actionTypes.SET_DECK_POPULATED, payload }
   },
 
-  // pick up a tip with intrument on `mount` from tiprack in `slot`
+  // pick up a tip with instrument on `mount` from tiprack in `slot`
   pickupAndHome(mount: Mount, slot: Slot): LabwareCalibrationAction {
     return {
       type: 'robot:PICKUP_AND_HOME',

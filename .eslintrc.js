@@ -17,6 +17,11 @@ module.exports = {
 
   rules: {
     camelcase: 'off',
+    // TODO(mc, 2019-06-28): these flowtype rules are noisy (~1000 warnings),
+    // so disabling globally; enable locally if working on fresh code
+    // 'flowtype/require-exact-type': 'warn',
+    // 'flowtype/spread-exact-type': 'warn',
+    'react/display-name': 'off',
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
   },
@@ -31,6 +36,7 @@ module.exports = {
   settings: {
     react: {
       version: '16.8',
+      flowVersion: '0.102',
     },
   },
 
