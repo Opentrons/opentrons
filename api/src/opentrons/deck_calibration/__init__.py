@@ -2,7 +2,7 @@ from opentrons.config import feature_flags as ff
 from opentrons import types
 
 # Application constants
-SAFE_HEIGHT = 130
+SAFE_HEIGHT = 100
 
 left = 'Z'
 right = 'A'

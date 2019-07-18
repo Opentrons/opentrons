@@ -165,6 +165,7 @@ class Pipette(CommandPublisher):
         self.model_offset = model_offset
 
         self.tip_attached = False
+        self._fallback_tip_length = fallback_tip_length
         self.instrument_actuator = None
         self.instrument_mover = None
 
