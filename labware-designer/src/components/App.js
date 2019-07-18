@@ -1,9 +1,17 @@
 // @flow
 import * as React from 'react'
-import { DropdownField, InputField, type Options } from '@opentrons/components'
+import {
+  DropdownField,
+  InputField,
+  RadioGroup,
+  type Options,
+} from '@opentrons/components'
 import {
   labwareTypeOptions,
   tuberackInsertOptions,
+  wellBottomShapeOptions,
+  wellShapeOptions,
+  yesNoOptions,
   type LabwareFields,
 } from '../fields'
 
@@ -130,6 +138,33 @@ const Dropdown = (props: DropdownProps) => {
   )
 }
 
+type RadioFieldProps = {
+  formDispatch: FormAction => mixed,
+  formState: LabwareFields,
+  field: $Keys<LabwareFields>,
+  options: Options,
+  label?: string,
+}
+const RadioField = (props: RadioFieldProps) => {
+  const fieldState = props.formState[props.field]
+  // TODO make action creator
+  return (
+    <div>
+      <strong>{props.label}</strong>
+      <RadioGroup
+        onChange={e =>
+          props.formDispatch({
+            type: UPDATE_LABWARE_FORM_FIELD,
+            payload: { field: props.field, value: e.currentTarget.value },
+          })
+        }
+        options={props.options}
+        value={fieldState}
+      />
+    </div>
+  )
+}
+
 const App = () => {
   const [formState, formDispatch] = React.useReducer<
     FormReducer,
@@ -172,7 +207,13 @@ const App = () => {
       </div>
       {/* PAGE 1 - Labware */}
       {/* tuberackSides: Array<string> maybe?? */}
-      heterogeneousWells: boolean
+      <RadioField
+        field="heterogeneousWells"
+        label="Regularity"
+        options={wellShapeOptions}
+        formState={formState}
+        formDispatch={formDispatch}
+      />
       <Field
         field="footprintXDimension"
         label="Length"
@@ -197,14 +238,26 @@ const App = () => {
         formState={formState}
         formDispatch={formDispatch}
       />
-      irregularRowSpacing: boolean
+      <RadioField
+        field="irregularRowSpacing"
+        label="Row spacing"
+        options={yesNoOptions}
+        formState={formState}
+        formDispatch={formDispatch}
+      />
       <Field
         field="gridColumns"
         label="# of columns"
         formState={formState}
         formDispatch={formDispatch}
       />
-      irregularColumnSpacing: boolean
+      <RadioField
+        field="irregularColumnSpacing"
+        label="Column spacing"
+        options={yesNoOptions}
+        formState={formState}
+        formDispatch={formDispatch}
+      />
       {/* PAGE 2 */}
       <Field
         field="wellVolume"
@@ -212,7 +265,13 @@ const App = () => {
         formState={formState}
         formDispatch={formDispatch}
       />
-      wellShape: 'circular' | 'rectangular'
+      <RadioField
+        field="wellShape"
+        label="Well shape"
+        options={wellShapeOptions}
+        formState={formState}
+        formDispatch={formDispatch}
+      />
       <Field
         field="wellDiameter"
         label="Diameter"
@@ -231,7 +290,13 @@ const App = () => {
         formState={formState}
         formDispatch={formDispatch}
       />
-      wellBottomShape: 'flat' | 'round' | 'v'
+      <Dropdown
+        field="wellBottomShape"
+        label="Bottom shape"
+        options={wellBottomShapeOptions}
+        formState={formState}
+        formDispatch={formDispatch}
+      />
       <Field
         field="wellDepth"
         label="Depth"
@@ -271,7 +336,7 @@ const App = () => {
         formState={formState}
         formDispatch={formDispatch}
       />
-      {'brandId: Array<string>'}
+      {'brandId: Array<string> (TODO!!!)'}
       {/* PAGE 4 */}
       <Field
         field="loadName"

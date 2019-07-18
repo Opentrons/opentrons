@@ -1,12 +1,11 @@
 // @flow
-import type { Options } from '@opentrons/components'
 
 export type LabwareType =
   | 'wellPlate'
   | 'reservoir'
   | 'tuberack'
   | 'aluminumBlock'
-export const labwareTypeOptions: Options = [
+export const labwareTypeOptions: Array<{ name: string, value: LabwareType }> = [
   { name: 'Well Plate', value: 'wellPlate' },
   { name: 'Reservoir', value: 'reservoir' },
   { name: 'Tube Rack', value: 'tuberack' },
@@ -14,10 +13,25 @@ export const labwareTypeOptions: Options = [
 ]
 
 export type WellShape = 'circular' | 'rectangular'
-export const wellShapes: Array<WellShape> = ['circular', 'rectangular']
+export const wellShapeOptions: Array<{ name: string, value: WellShape }> = [
+  { name: 'Circular', value: 'circular' },
+  { name: 'Rectangular', value: 'rectangular' },
+]
 
 export type WellBottomShape = 'flat' | 'round' | 'v'
-export const wellBottomShapes: Array<WellBottomShape> = ['flat', 'round', 'v']
+export const wellBottomShapeOptions: Array<{
+  name: string,
+  value: WellBottomShape,
+}> = [
+  { name: 'Flat', value: 'flat' },
+  { name: 'Round', value: 'round' },
+  { name: 'V-Bottom', value: 'v' },
+]
+
+export const yesNoOptions: Array<{ name: string, value: 'true' | 'false' }> = [
+  { name: 'Yes', value: 'true' },
+  { name: 'No', value: 'false' },
+]
 
 export const aluminumBlockTypes = [
   /* TODO */
