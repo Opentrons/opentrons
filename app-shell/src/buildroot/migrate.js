@@ -9,11 +9,13 @@ import globby from 'globby'
 import { fetch, postFile } from '../http'
 import type { RobotHost } from '@opentrons/app/src/robot-api'
 
-const API_WHEEL_PATTERN = path.join(__dirname, '../../../api/dist/*.whl')
-const SERVER_WHEEL_PATTERN = path.join(
+const PREMIGRATION_WHL_DIR = path.join(
   __dirname,
-  '../../build/update-server/*.whl'
+  '../../build/br-premigration-wheels'
 )
+
+const API_WHL_PATTERN = path.join(PREMIGRATION_WHL_DIR, 'opentrons-*.whl')
+const SERVER_WHL_PATTERN = path.join(PREMIGRATION_WHL_DIR, 'otupdate-*.whl')
 
 const getWheel = (pattern: string): Promise<string> =>
   globby(pattern).then(matches => {
@@ -28,8 +30,8 @@ export function getPremigrationWheels(): Promise<{
   api: string,
   updateServer: string,
 }> {
-  const getApiWheel = getWheel(API_WHEEL_PATTERN)
-  const getServerWheel = getWheel(SERVER_WHEEL_PATTERN)
+  const getApiWheel = getWheel(API_WHL_PATTERN)
+  const getServerWheel = getWheel(SERVER_WHL_PATTERN)
 
   return Promise.all([getApiWheel, getServerWheel]).then(
     ([api, updateServer]) => ({ api, updateServer })
