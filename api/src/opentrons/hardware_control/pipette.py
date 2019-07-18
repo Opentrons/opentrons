@@ -29,6 +29,7 @@ class Pipette:
         self._model = model
         self._current_volume = 0.0
         self._current_tip_length = 0.0
+        self._fallback_tip_length = self._config.tip_length
         self._has_tip = False
         self._pipette_id = pipette_id
         pip_type = 'multi' if self._config.channels > 1 else 'single'
