@@ -96,7 +96,7 @@ def downloaded_update_file(request, extracted_update_file):
     rootfs_hash_path = os.path.join(extracted_update_file, 'rootfs.ext4.hash')
     bootfs_path = os.path.join(extracted_update_file, 'boot.vfat')
     bootfs_hash_path = os.path.join(extracted_update_file, 'boot.vfat.hash')
-    zip_path = os.path.join(extracted_update_file, 'ot2-migration.zip')
+    zip_path = os.path.join(extracted_update_file, 'ot2-system.zip')
     with zipfile.ZipFile(zip_path, 'w') as zf:
         for marker, filepath in [('exclude_rootfs_ext4', rootfs_path),
                                  ('exclude_rootfs_ext4_hash',

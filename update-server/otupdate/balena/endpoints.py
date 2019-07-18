@@ -23,8 +23,8 @@ def build_health_endpoint(
             'restart': '/server/update/restart'}
     }
     if with_migration:
-        health_dict.update({'buildroot-migration':
-                            '/server/update/migration/begin'})
+        health_dict['capabilities']['buildroot-migration']\
+            = '/server/update/migration/begin'
 
     async def health(request: web.Request) -> web.Response:
         return web.json_response(
