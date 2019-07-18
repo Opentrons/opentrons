@@ -25,11 +25,11 @@ import App from './components/App'
 
 const log = createLogger(__filename)
 
-const epicMiddlware = createEpicMiddleware()
+const epicMiddleware = createEpicMiddleware()
 
 const middleware = applyMiddleware(
   thunk,
-  epicMiddlware,
+  epicMiddleware,
   robotApiMiddleware(),
   shellMiddleware,
   analyticsMiddleware,
