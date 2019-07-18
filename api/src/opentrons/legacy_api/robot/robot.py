@@ -62,8 +62,8 @@ def _load_container_by_name(container_name):
                 container.properties['type'] = container_name
             log.info(f"Loaded {container_name} from {meth.__name__}")
             break
-        except (ValueError, KeyError):
-            log.exception(f"{container_name} not in {meth.__name__}")
+        except (ValueError, KeyError) as e:
+            log.info(f"{container_name} not in {meth.__name__} ({repr(e)})")
     else:
         raise KeyError(f"Unknown labware {container_name}")
     return container
@@ -1113,6 +1113,7 @@ class Robot(CommandPublisher):
         new = these - known
         gone = known - these
         for mod in gone:
+            log.info(f"Module {mod} disconnected")
             self._attached_modules.pop(mod)
         for mod in new:
             module_class = modules.SUPPORTED_MODULES[discovered[mod][1]]
@@ -1124,3 +1125,5 @@ class Robot(CommandPublisher):
                 self._attached_modules[mod].connect()
             except AttributeError:
                 log.exception('Failed to connect module')
+            else:
+                log.info(f"Module {mod} discovered and connected")

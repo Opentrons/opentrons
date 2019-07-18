@@ -53,20 +53,26 @@ def clear_buffer(serial_connection):
     serial_connection.reset_input_buffer()
 
 
-def _write_to_device_and_return(cmd, ack, device_connection):
+def _write_to_device_and_return(cmd, ack, device_connection, tag=None):
     '''Writes to a serial device.
     - Formats command
     - Wait for ack return
     - return parsed response'''
-    log.debug('Write -> {}'.format(cmd.encode()))
-    device_connection.write(cmd.encode())
-    response = device_connection.read_until(ack.encode())
-    log.debug('Read <- {}'.format(response))
-    if ack.encode() not in response:
+
+    if not tag:
+        tag = device_connection.port
+
+    encoded_write = cmd.encode()
+    encoded_ack = ack.encode()
+    log.debug(f'{tag}: Write -> {encoded_write}')
+    device_connection.write(encoded_write)
+    response = device_connection.read_until(encoded_ack)
+    log.debug(f'{tag}: Read <- {response}')
+    if encoded_ack not in response:
         raise SerialNoResponse(
             'No response from serial port after {} second(s)'.format(
                 device_connection.timeout))
-    clean_response = _parse_serial_response(response, ack.encode())
+    clean_response = _parse_serial_response(response, encoded_ack)
     if clean_response:
         return clean_response.decode()
     return ''
@@ -82,12 +88,14 @@ def _connect(port_name, baudrate):
     return ser
 
 
-def _attempt_command_recovery(command, ack, serial_conn):
+def _attempt_command_recovery(command, ack, serial_conn, tag=None):
     '''Recovery after following a failed write_and_return() atempt'''
+    if not tag:
+        tag = serial_conn.port
     with serial_with_temp_timeout(serial_conn, RECOVERY_TIMEOUT) as device:
-        response = _write_to_device_and_return(command, ack, device)
+        response = _write_to_device_and_return(command, ack, device, tag=tag)
     if response is None:
-        log.debug("No valid response during _attempt_command_recovery")
+        log.debug(f"{tag}: No valid response during _attempt_command_recovery")
         raise RuntimeError(
             "Recovery attempted - no valid serial response "
             "for command: {} in {} seconds".format(
@@ -96,12 +104,14 @@ def _attempt_command_recovery(command, ack, serial_conn):
 
 
 def write_and_return(
-        command, ack, serial_connection, timeout=DEFAULT_WRITE_TIMEOUT):
+        command, ack, serial_connection,
+        timeout=DEFAULT_WRITE_TIMEOUT, tag=None):
     '''Write a command and return the response'''
     clear_buffer(serial_connection)
     with serial_with_temp_timeout(
             serial_connection, timeout) as device_connection:
-        response = _write_to_device_and_return(command, ack, device_connection)
+        response = _write_to_device_and_return(
+            command, ack, device_connection, tag)
     return response
 
 
