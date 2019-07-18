@@ -1,6 +1,7 @@
 'use strict'
 
 const path = require('path')
+const webpack = require('webpack')
 const merge = require('webpack-merge')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
@@ -32,6 +33,8 @@ const pages = [{ location: '', title: pkg.productName }]
 //     )
 // }
 
+const LABWARE_LIBRARY_ENV_VAR_PREFIX = 'OT_LL'
+
 module.exports = merge(baseConfig, {
   entry: JS_ENTRY,
 
@@ -41,6 +44,12 @@ module.exports = merge(baseConfig, {
 
   plugins: [
     ...pages.map(makeHtmlPlugin),
+    new webpack.EnvironmentPlugin(
+      Object.keys(process.env)
+        .filter(v => v.startsWith(LABWARE_LIBRARY_ENV_VAR_PREFIX))
+        .concat(['NODE_ENV'])
+    ),
+
     new FaviconsWebpackPlugin({
       logo: './src/images/favicon-logo.png',
       prefix: 'icons-[hash]/',

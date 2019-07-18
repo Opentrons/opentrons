@@ -12,19 +12,28 @@ import Page from './Page'
 import LabwareList from '../LabwareList'
 import LabwareDetails from '../LabwareDetails'
 import styles from './styles.css'
+import LabwareCreatorApp from '@opentrons/labware-designer'
 
 import type { DefinitionRouteRenderProps } from '../../definitions'
 
 export function App(props: DefinitionRouteRenderProps) {
   const { definition, location } = props
   const scrollRef = React.useRef<HTMLDivElement | null>(null)
-  const filters = getFilters(location)
-  const detailPage = Boolean(definition)
 
   React.useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = 0
     window.scrollTo(0, 0)
   }, [location.pathname, location.search])
+
+  if (
+    process.env.OT_LL_LABWARE_CREATOR === '1' &&
+    location.pathname === '/create'
+  ) {
+    return <LabwareCreatorApp />
+  }
+
+  const filters = getFilters(location)
+  const detailPage = Boolean(definition)
 
   return (
     <div

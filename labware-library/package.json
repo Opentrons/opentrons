@@ -16,6 +16,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@opentrons/components": "3.10.0",
+    "@opentrons/labware-designer": "3.10.0",
     "classnames": "^2.2.5",
     "lodash": "^4.17.4",
     "query-string": "^6.2.0",

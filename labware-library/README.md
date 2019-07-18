@@ -78,6 +78,7 @@ This project (along with our other front-end projects) uses [webpack][] to gener
 
 Certain environment variables, when set, will affect the artifact output.
 
-| variable | value                         | description                                 |
-| -------- | ----------------------------- | ------------------------------------------- |
-| NODE_ENV | production, development, test | Optimizes output for a specific environment |
+| variable              | value                         | description                                 |
+| --------------------- | ----------------------------- | ------------------------------------------- |
+| NODE_ENV              | production, development, test | Optimizes output for a specific environment |
+| OT_LL_LABWARE_CREATOR | 0 for false, 1 for true       | Shows labware creator page at /create       |

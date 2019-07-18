@@ -1,5 +1,4 @@
-import * as sharedData from '@opentrons/shared-data'
+// @flow
+import App from './components/App'
 
-// TODO
-window.sharedData = sharedData
-console.log('Functions are available under global "sharedData":', sharedData)
+export default App
