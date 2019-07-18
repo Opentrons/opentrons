@@ -7,7 +7,7 @@ import cx from 'classnames'
 import { FlatButton, type ButtonProps } from '../buttons'
 import styles from './structure.css'
 
-export type TitleBarProps = {
+export type TitleBarProps = {|
   title: React.Node,
   subtitle?: React.Node,
   back?: ButtonProps,
@@ -17,7 +17,7 @@ export type TitleBarProps = {
   onBackClick?: () => mixed,
   backClickDisabled?: boolean,
   backButtonLabel?: string,
-}
+|}
 
 export default function TitleBar(props: TitleBarProps) {
   const {

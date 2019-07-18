@@ -1400,14 +1400,22 @@ class InstrumentContext(CommandPublisher):
         difference is the units in which this property is specified.
         """
         return {'aspirate': self.hw_pipette['aspirate_flow_rate'],
-                'dispense': self.hw_pipette['dispense_flow_rate']}
+                'dispense': self.hw_pipette['dispense_flow_rate'],
+                'blow_out': self.hw_pipette['blow_out_flow_rate']}
 
     @flow_rate.setter
     def flow_rate(self, new_flow_rate: Dict[str, float]) -> None:
         """ Update the speeds (in uL/s) for the pipette.
 
-        :param new_flow_rate: A dict containing at least one of 'aspirate'
-                              and 'dispense', mapping to new speeds in uL/s.
+        :param new_flow_rate: A dict containing at least one of ``'aspirate'``,
+                              ``'dispense'``, or ``'blow_out'``, mapping to
+                              new speeds in uL/s.
+
+        For instance:
+
+        .. code-block:: python
+
+          instrument.flow_rate = {'aspirate': 50}
         """
         self._hw_manager.hardware.set_flow_rate(self._mount, **new_flow_rate)
 

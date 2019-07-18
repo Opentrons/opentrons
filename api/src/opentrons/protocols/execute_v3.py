@@ -89,8 +89,8 @@ def _set_flow_rate(
 
     pipette.set_flow_rate(
         aspirate=flow_rate_param,
-        dispense=flow_rate_param)
-    return
+        dispense=flow_rate_param,
+        blow_out=flow_rate_param)
 
 
 # C901 code complexity is due to long elif block, ok in this case (Ian+Ben)
@@ -112,8 +112,8 @@ def dispatch_commands(protocol_data, loaded_pipettes, loaded_labware):  # noqa: 
         volume = params.get('volume')
 
         if pipette:
-            # Aspirate/Dispense flow rate must be set each time for commands
-            # which use pipettes right now.
+            # Aspirate/Dispense/Blowout flow rate must be set each time for
+            # commands which use pipettes right now.
             # Flow rate is persisted inside the Pipette object
             # and is settable but not easily gettable
             _set_flow_rate(

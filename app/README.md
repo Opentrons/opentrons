@@ -15,25 +15,22 @@ This desktop application is built with [Electron][]. You can find the Electron w
 To get started: clone the Opentrons/opentrons repository, set up your computer for development as specified in the [contributing guide][contributing-guide-setup], and then:
 
 ```shell
+# change into the cloned directory
+cd opentrons
 # prerequisite: install dependencies as specified in project setup
 make install
-# change into the app directory
-cd app
-# install flow-types for testing in development
-make install-types
 # launch the dev server / electron app in dev mode
-make dev
+make -C app dev
 ```
 
 At this point, the Electron app will be running with [HMR][] and various Chrome devtools enabled. The app and dev server look for the following environment variables (defaults set in Makefile):
 
-| variable             | default      | description                                          |
-| -------------------- | ------------ | ---------------------------------------------------- |
-| `NODE_ENV`           | `production` | Environment: production, development, or test        |
-| `PORT`               | `8090`       | Development server port                              |
-| `SKIP_WIRED_POLL`    | unset        | Turn off polling for directly connected wired robots |
-| `OT_APP_INTERCOM_ID` | unset        | Sets the Intercom application ID                     |
-| `OT_APP_MIXPANEL_ID` | unset        | Sets the Mixpanel application ID                     |
+| variable             | default      | description                                   |
+| -------------------- | ------------ | --------------------------------------------- |
+| `NODE_ENV`           | `production` | Environment: production, development, or test |
+| `PORT`               | `8090`       | Development server port                       |
+| `OT_APP_INTERCOM_ID` | unset        | Sets the Intercom application ID              |
+| `OT_APP_MIXPANEL_ID` | unset        | Sets the Mixpanel application ID              |
 
 **Note:** you may want to be running the Opentrons API in a different terminal while developing the app. Please see [the contributing guide][contributing-guide-running-the-api] for API specific instructions.
 
@@ -57,9 +54,9 @@ Some important directories:
 
 ## testing
 
-To run tests:
+Tests for the App are run from the top-level along with all other JS project tests.
 
-- `make test` - Run all tests
+- `make test-js` - Run all JavaScript tests
 
 Test tasks can also be run with the following arguments:
 
@@ -76,9 +73,9 @@ The UI bundle can be built by itself with:
 
 ```shell
 # default target is "clean dist"
-make
+make -C app
 # build without cleaning
-make dist
+make -C app dist
 ```
 
 The UI build process looks for the following environment variables:
@@ -91,7 +88,7 @@ The UI build process looks for the following environment variables:
 For example, if you wanted to analyze the production JS bundle:
 
 ```shell
-ANALYZER=true make
+ANALYZER=1 make -C app
 ```
 
 [style-guide]: https://standardjs.com

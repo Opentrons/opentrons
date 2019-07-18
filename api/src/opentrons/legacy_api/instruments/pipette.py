@@ -29,6 +29,7 @@ DEFAULT_DROP_TIP_SPEED = 5
 
 DEFAULT_ASPIRATE_SPEED = 5
 DEFAULT_DISPENSE_SPEED = 10
+DEFAULT_BLOW_OUT_SPEED = 60
 
 DEFAULT_TIP_PRESS_INCREMENT = 1
 DEFAULT_TIP_PRESS_COUNT = 3
@@ -126,6 +127,7 @@ class Pipette(CommandPublisher):
             tip_racks=[],
             aspirate_speed=DEFAULT_ASPIRATE_SPEED,
             dispense_speed=DEFAULT_DISPENSE_SPEED,
+            blow_out_speed=DEFAULT_BLOW_OUT_SPEED,
             aspirate_flow_rate=None,
             dispense_flow_rate=None,
             plunger_current=0.5,
@@ -139,7 +141,8 @@ class Pipette(CommandPublisher):
             pick_up_presses=DEFAULT_TIP_PRESS_COUNT,
             pick_up_speed=DEFAULT_TIP_PICK_UP_SPEED,
             quirks=[],
-            fallback_tip_length=51.7):  # TODO (andy): move to tip-rack
+            fallback_tip_length=51.7,
+            blow_out_flow_rate=None):
 
         super().__init__(robot.broker)
         self.robot = robot
@@ -225,11 +228,14 @@ class Pipette(CommandPublisher):
         self._drop_tip_current = drop_tip_current
 
         self.speeds = {}
-        self.set_speed(aspirate=aspirate_speed, dispense=dispense_speed)
+        self.set_speed(aspirate=aspirate_speed,
+                       dispense=dispense_speed,
+                       blow_out=blow_out_speed)
         self._drop_tip_speed = drop_tip_speed
 
         self.set_flow_rate(
-            aspirate=aspirate_flow_rate, dispense=dispense_flow_rate)
+            aspirate=aspirate_flow_rate, dispense=dispense_flow_rate,
+            blow_out=blow_out_flow_rate)
 
         # TODO (andy): remove from pipette, move to tip-rack
         self.robot.config.tip_length[self.model] = \
@@ -721,10 +727,18 @@ class Pipette(CommandPublisher):
 
         self.move_to(location)
         self.instrument_actuator.set_active_current(self._plunger_current)
+
+        speed = self.speeds['blow_out']
+        self.instrument_actuator.push_speed()
+        self.instrument_actuator.set_speed(speed)
+
         self.robot.poses = self.instrument_actuator.move(
             self.robot.poses,
             x=self._get_plunger_position('blow_out')
         )
+
+        self.instrument_actuator.pop_speed()
+
         self.current_volume = 0
 
         return self
@@ -1696,7 +1710,7 @@ class Pipette(CommandPublisher):
         # definition, unblocking ability to use multiple types of tips
         return self.robot.config.tip_length[self.model]
 
-    def set_speed(self, aspirate=None, dispense=None):
+    def set_speed(self, aspirate=None, dispense=None, blow_out=None):
         """
         Set the speed (mm/second) the :any:`Pipette` plunger will move
         during :meth:`aspirate` and :meth:`dispense`
@@ -1715,9 +1729,11 @@ class Pipette(CommandPublisher):
             self.speeds['aspirate'] = aspirate
         if dispense:
             self.speeds['dispense'] = dispense
+        if blow_out:
+            self.speeds['blow_out'] = blow_out
         return self
 
-    def set_flow_rate(self, aspirate=None, dispense=None):
+    def set_flow_rate(self, aspirate=None, dispense=None, blow_out=None):
         """
         Set the speed (uL/second) the :any:`Pipette` plunger will move
         during :meth:`aspirate` and :meth:`dispense`. The speed is set using
@@ -1743,6 +1759,10 @@ class Pipette(CommandPublisher):
             ul_per_mm = self._ul_per_mm(ul, 'dispense')
             self.set_speed(
                 dispense=round(dispense / ul_per_mm, 6))
+        if blow_out:
+            ul_per_mm = self._ul_per_mm(ul, 'dispense')
+            self.set_speed(
+                blow_out=round(blow_out / ul_per_mm, 6))
         return self
 
     def set_pick_up_current(self, amperes):

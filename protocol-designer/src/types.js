@@ -1,4 +1,6 @@
 // @flow
+import type { OutputSelector } from 'reselect'
+
 import type { RootState as Analytics } from './analytics'
 import type { RootState as Dismiss } from './dismiss'
 import type { RootState as FileData } from './file-data'
@@ -9,6 +11,7 @@ import type { RootState as StepForms } from './step-forms'
 import type { RootState as Tutorial } from './tutorial'
 import type { RootState as UI } from './ui'
 import type { RootState as WellSelection } from './well-selection/reducers'
+
 export type BaseState = {
   analytics: Analytics,
   dismiss: Dismiss,
@@ -24,6 +27,7 @@ export type BaseState = {
 
 export type GetState = () => BaseState
 export type Selector<T> = BaseState => T
+export type MemoizedSelector<T> = OutputSelector<BaseState, void, T>
 
 // eslint-disable-next-line no-use-before-define
 export type ThunkDispatch<A> = (action: A | ThunkAction<A>) => A

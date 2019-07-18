@@ -26,6 +26,7 @@
         "displayName",
         "defaultAspirateFlowRate",
         "defaultDispenseFlowRate",
+        "defaultBlowOutFlowRate",
         "maxVolume",
         "minVolume"
       ],
@@ -38,6 +39,11 @@
           "max": { "$ref": "#/definitions/positiveNumber" }
         },
         "defaultDispenseFlowRate": {
+          "value": { "$ref": "#/definitions/positiveNumber" },
+          "min": { "$ref": "#/definitions/positiveNumber" },
+          "max": { "$ref": "#/definitions/positiveNumber" }
+        },
+        "defaultBlowOutFlowRate": {
           "value": { "$ref": "#/definitions/positiveNumber" },
           "min": { "$ref": "#/definitions/positiveNumber" },
           "max": { "$ref": "#/definitions/positiveNumber" }

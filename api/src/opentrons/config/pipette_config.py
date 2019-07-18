@@ -37,7 +37,8 @@ pipette_config = namedtuple(
         'display_name',
         'name',
         'backcompat_name',
-        'return_tip_height'
+        'return_tip_height',
+        'blow_out_flow_rate',
     ]
 )
 
@@ -190,7 +191,9 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
         display_name=ensure_value(cfg, 'displayName', MUTABLE_CONFIGS),
         name=cfg.get('name'),
         backcompat_name=cfg.get('backcompatName'),
-        return_tip_height=cfg.get('returnTipHeight')
+        return_tip_height=cfg.get('returnTipHeight'),
+        blow_out_flow_rate=ensure_value(
+            cfg, 'defaultBlowOutFlowRate', MUTABLE_CONFIGS),
     )
 
     return res

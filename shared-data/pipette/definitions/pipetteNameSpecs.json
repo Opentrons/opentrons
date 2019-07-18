@@ -14,6 +14,11 @@
       "value": 10,
       "min": 0.001,
       "max": 50
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 1000,
+      "min": 5,
+      "max": 1000
     }
   },
   "p10_multi": {
@@ -31,6 +36,11 @@
       "min": 0.001,
       "max": 50
     },
+    "defaultBlowOutFlowRate": {
+      "value": 1000,
+      "min": 5,
+      "max": 1000
+    },
     "channels": 8
   },
   "p20_single_gen2": {
@@ -38,13 +48,18 @@
     "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
       "value": 5,
-      "min": 0.001,
-      "max": 5000
+      "min": 0.08,
+      "max": 24
     },
     "defaultDispenseFlowRate": {
       "value": 10,
-      "min": 0.001,
-      "max": 5000
+      "min": 0.08,
+      "max": 24
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 24,
+      "min": 0.08,
+      "max": 24
     },
     "minVolume": 1,
     "maxVolume": 20,
@@ -55,13 +70,18 @@
     "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
       "value": 5,
-      "min": 0.001,
-      "max": 5000
+      "min": 0.08,
+      "max": 24
     },
     "defaultDispenseFlowRate": {
       "value": 10,
-      "min": 0.001,
-      "max": 5000
+      "min": 0.08,
+      "max": 24
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 24,
+      "min": 0.08,
+      "max": 24
     },
     "minVolume": 1,
     "maxVolume": 20,
@@ -80,6 +100,11 @@
       "min": 0.001,
       "max": 100
     },
+    "defaultBlowOutFlowRate": {
+      "value": 1000,
+      "min": 5,
+      "max": 1000
+    },
     "channels": 1,
     "minVolume": 5,
     "maxVolume": 50
@@ -96,6 +121,11 @@
       "value": 50,
       "min": 0.001,
       "max": 100
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 1000,
+      "min": 5,
+      "max": 1000
     },
     "channels": 8,
     "minVolume": 5,
@@ -114,6 +144,11 @@
       "min": 0.001,
       "max": 600
     },
+    "defaultBlowOutFlowRate": {
+      "value": 1000,
+      "min": 5,
+      "max": 1000
+    },
     "channels": 1,
     "minVolume": 30,
     "maxVolume": 300
@@ -123,13 +158,18 @@
     "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
       "value": 150,
-      "min": 0.001,
-      "max": 600
+      "min": 1,
+      "max": 275
     },
     "defaultDispenseFlowRate": {
-      "value": 300,
-      "min": 0.001,
-      "max": 600
+      "value": 275,
+      "min": 1,
+      "max": 275.31
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 275,
+      "min": 1,
+      "max": 275
     },
     "channels": 1,
     "minVolume": 20,
@@ -140,13 +180,18 @@
     "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
       "value": 150,
-      "min": 0.001,
-      "max": 600
+      "min": 1,
+      "max": 275
     },
     "defaultDispenseFlowRate": {
-      "value": 300,
-      "min": 0.001,
-      "max": 600
+      "value": 275,
+      "min": 1,
+      "max": 275
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 275,
+      "min": 1,
+      "max": 275
     },
     "channels": 8,
     "minVolume": 20,
@@ -165,6 +210,11 @@
       "min": 0.001,
       "max": 600
     },
+    "defaultBlowOutFlowRate": {
+      "value": 1000,
+      "min": 5,
+      "max": 1000
+    },
     "channels": 8,
     "minVolume": 30,
     "maxVolume": 300
@@ -182,6 +232,11 @@
       "min": 50,
       "max": 2000
     },
+    "defaultBlowOutFlowRate": {
+      "value": 1000,
+      "min": 5,
+      "max": 1000
+    },
     "channels": 1,
     "minVolume": 100,
     "maxVolume": 1000
@@ -191,13 +246,18 @@
     "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
       "value": 500,
-      "min": 50,
-      "max": 2000
+      "min": 3,
+      "max": 812
     },
     "defaultDispenseFlowRate": {
-      "value": 1000,
-      "min": 50,
-      "max": 2000
+      "value": 800,
+      "min": 3,
+      "max": 812
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 800,
+      "min": 3,
+      "max": 812
     },
     "channels": 1,
     "minVolume": 100,
