@@ -9,7 +9,7 @@ const syncBuckets = require('./lib/syncBuckets')
 const { getDeployMetadata } = require('./lib/deploy-metadata')
 
 const USAGE =
-  '\nUsage:\n  node ./scripts/deploy/promote-to-staging <project_domain> [--deploy]'
+  '\nUsage:\n  node ./scripts/deploy/promote-to-production <project_domain> [--deploy]'
 
 const { args, flags } = parseArgs(process.argv.slice(2))
 const [projectDomain] = args
