@@ -1,7 +1,11 @@
 {
     "_meta": {
         "hash": {
+<<<<<<< HEAD
             "sha256": "f9f8941737cd60a0dd7f14169eae2c0449bb84bbf4dd1e2965248dde9200ed69"
+=======
+            "sha256": "7fe0c82039586caa50d9d7f8a6b09655c0c0964df2fcf32880f21e583f8ca597"
+>>>>>>> chore(api): New python dependency: pyserial-asyncio
         },
         "pipfile-spec": 6,
         "requires": {
@@ -71,13 +75,6 @@
             ],
             "version": "==3.0.4"
         },
-        "funcsigs": {
-            "hashes": [
-                "sha256:330cc27ccbf7f1e992e69fef78261dc7c6569012cf397db8d3de0234e6c937ca",
-                "sha256:a7bb0f2cf3a3fd1ab2732cb49eba4252c2af4240442415b4abce3b87022a8f50"
-            ],
-            "version": "==1.0.2"
-        },
         "idna": {
             "hashes": [
                 "sha256:c357b3f628cf53ae2c4c05627ecc484553142ca23264e593d327bcde5e9c3407",
@@ -94,6 +91,7 @@
         },
         "jsonrpcserver": {
             "hashes": [
+<<<<<<< HEAD
                 "sha256:5920722e7fef17d01b82d2bc77aa4f553dbabac075bc4a32e9ee0a96ed065935"
             ],
             "index": "pypi",
@@ -107,6 +105,19 @@
             ],
             "index": "pypi",
             "version": "==2.5.1"
+=======
+                "sha256:56f3ab21aad908920538ab32e0a608c1d39ccb0e00c7a112f13484e53b434542"
+            ],
+            "index": "pypi",
+            "version": "==4.0.4"
+        },
+        "jsonschema": {
+            "hashes": [
+                "sha256:0c0a81564f181de3212efa2d17de1910f8732fa1b71c42266d983cd74304e20d",
+                "sha256:a5f6559964a3851f59040d3b961de5e68e70971afb88ba519d27e6a039efff1a"
+            ],
+            "version": "==3.0.1"
+>>>>>>> chore(api): New python dependency: pyserial-asyncio
         },
         "multidict": {
             "hashes": [
@@ -176,6 +187,12 @@
             "index": "pypi",
             "version": "==1.15.1"
         },
+        "pyrsistent": {
+            "hashes": [
+                "sha256:50cffebc87ca91b9d4be2dcc2e479272bcb466b5a0487b6c271f7ddea6917e14"
+            ],
+            "version": "==0.15.3"
+        },
         "pyserial": {
             "hashes": [
                 "sha256:6e2d401fdee0eab996cf734e67773a0143b932772ca8b42451440cfed942c627",
@@ -191,6 +208,21 @@
             "index": "pypi",
             "markers": "sys_platform == 'linux'",
             "version": "==234"
+        },
+        "pyserial-asyncio": {
+            "hashes": [
+                "sha256:861d975029498e777a67c6d6d392e20b84a79c01608f3778c978d0106467c8f8",
+                "sha256:c40677a8874d8c24d4423a97498746de776f6dbcd0efbb8fa43dcf011a589aee"
+            ],
+            "index": "pypi",
+            "version": "==0.4"
+        },
+        "six": {
+            "hashes": [
+                "sha256:3350809f0555b11f552448330d0b52d5f24c91a322ea4a15ef22629740f3761c",
+                "sha256:d16a0141ec1a18405cd4ce8b4613101da75da0e9a7aec5bdd4fa804d0e0eba73"
+            ],
+            "version": "==1.12.0"
         },
         "urwid": {
             "hashes": [
@@ -411,6 +443,16 @@
             ],
             "version": "==2.10.1"
         },
+<<<<<<< HEAD
+=======
+        "jsonschema": {
+            "hashes": [
+                "sha256:0c0a81564f181de3212efa2d17de1910f8732fa1b71c42266d983cd74304e20d",
+                "sha256:a5f6559964a3851f59040d3b961de5e68e70971afb88ba519d27e6a039efff1a"
+            ],
+            "version": "==3.0.1"
+        },
+>>>>>>> chore(api): New python dependency: pyserial-asyncio
         "markupsafe": {
             "hashes": [
                 "sha256:00bc623926325b26bb9605ae9eae8a215691f33cae5df11ca5424f06f2d1f473",
@@ -561,10 +603,16 @@
         },
         "pydocstyle": {
             "hashes": [
+<<<<<<< HEAD
                 "sha256:04c84e034ebb56eb6396c820442b8c4499ac5eb94a3bda88951ac3dc519b6058",
                 "sha256:66aff87ffe34b1e49bff2dd03a88ce6843be2f3346b0c9814410d34987fbab59"
             ],
             "version": "==4.0.1"
+=======
+                "sha256:58c421dd605eec0bce65df8b8e5371bb7ae421582cdf0ba8d9435ac5b0ffc36a"
+            ],
+            "version": "==4.0.0"
+>>>>>>> chore(api): New python dependency: pyserial-asyncio
         },
         "pyflakes": {
             "hashes": [
@@ -590,10 +638,16 @@
         },
         "pyparsing": {
             "hashes": [
+<<<<<<< HEAD
                 "sha256:6f98a7b9397e206d78cc01df10131398f1c8b8510a2f4d97d9abd82e1aacdd80",
                 "sha256:d9338df12903bbf5d65a0e4e87c2161968b10d2e489652bb47001d82a9b028b4"
             ],
             "version": "==2.4.2"
+=======
+                "sha256:50cffebc87ca91b9d4be2dcc2e479272bcb466b5a0487b6c271f7ddea6917e14"
+            ],
+            "version": "==0.15.3"
+>>>>>>> chore(api): New python dependency: pyserial-asyncio
         },
         "pytest": {
             "hashes": [
@@ -670,10 +724,17 @@
         },
         "tqdm": {
             "hashes": [
+<<<<<<< HEAD
                 "sha256:438d6a735167099d75e5fd9a55175c6727c4dbba345ae406b2886c2728fe3e80",
                 "sha256:ebc205051d79b49989140f5f6c73ec23fce5f590cbc4d9cd6e4c47f168fa0f10"
             ],
             "version": "==4.34.0"
+=======
+                "sha256:14a285392c32b6f8222ecfbcd217838f88e11630affe9006cd0e94c7eff3cb61",
+                "sha256:25d4c0ea02a305a688e7e9c2cdc8f862f989ef2a4701ab28ee963295f5b109ab"
+            ],
+            "version": "==4.32.2"
+>>>>>>> chore(api): New python dependency: pyserial-asyncio
         },
         "twine": {
             "hashes": [
