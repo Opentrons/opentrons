@@ -373,6 +373,7 @@ make -C api push-buildroot host=${some_other_ip_address}
 Note that there is no separate `restart` command because `push-buildroot` restarts the systemd unit controlling the API server. This only pushes the python wheel containing the API server; if you have edited the systemd unit, you'll need to `scp` it manually and then do `systemctl daemon-reload` on the robot before restarting the api server.
 
 To SSH into the robot, do
+
 ```
 # SSH into the currently connected ethernet robot
 make term
@@ -397,7 +398,7 @@ If you create the key as `~/.ssh/robot_key` and `~/.ssh/robot_key.pub` then `mak
 
 ### Releasing (for Opentrons developers)
 
-Our release process is still a work-in-progress. All projects are currently versioned together to ensure interoperability.
+Our release process is still a work-in-progress. The app and API projects are currently versioned together to ensure interoperability.
 
 1.  `make bump` (see details below)
 2.  Inspect version bumps and changelogs
@@ -461,6 +462,15 @@ We use [lerna][], a monorepo management tool, to work with our various projects.
 yarn run lerna [opts]
 ```
 
+#### Releasing Web Projects
+
+The following web projects are versioned and released independently from the app and API:
+
+- `protocol-designer`
+- `labware-library`
+
+See [scripts/deploy/README.md](./scripts/deploy/README.md) for the release process of these projects.
+
 ## Prior Art
 
 This Contributing Guide was influenced by a lot of work done on existing Contributing Guides. They're great reads if you have the time!
@@ -517,6 +527,7 @@ The files `/data/logs/api.log.*` and `/data/logs/serial.log.*` contain logs from
 #### Buildroot
 
 Buildroot robots use [systemd-journald][] for log management. This is a single log manager for everything on the system. It is administrated using the [journalctl][] utility. You can view logs by just doing `journalctl` (it may be better to do `journalctl --no-pager | less` to get a better log viewer), or stream them by doing `journalctl -f`. Any command that displays logs can be narrowed down by using a syslog identifier: `journalctl -f SYSLOG_IDENTIFIER=opentrons-api` will only print logs from the api server's loggers, for instance. Our syslog identifiers are:
+
 - `opentrons-api`: The API server - anything sent to `logging` logs from the api server package, except the serial logs
 - `opentrons-update-server`: Anything sent to `logging` logs from the update server packate
 - `opentrons-api-serial`: The serial logs
@@ -532,9 +543,9 @@ You can't really restart anything from inside a shell on balena, since it all ru
 Buildroot robots use `systemd` as their init system. Every process that we run has an associated systemd unit, which defines and configures its behavior when the robot starts. You can use the [systemctl][] utility to mess around with or inspect the system state. For instance, if you do `systemctl status opentrons-api-server` you will see whether the api server is running or not, and a dump of its logs. You can restart units with `systemctl restart (unitname)`, start and stop them with `systemctl start` and `systemctl stop`, and so on. Note that if you make changes to unit files, you have to run `systemctl daemon-reload` (no further arguments) for the init daemon to see the changes.
 
 Our systemd units are:
+
 - `opentrons-api-server`: The API server
 - `opentrons-update-server`: The update server
-
 
 ### Other System Admin Notes
 
