@@ -1216,11 +1216,13 @@ class API(HardwareAPILike):
         gone = known - these
         for mod in gone:
             self._attached_modules.pop(mod)
+            self._log.info(f"Module {mod} disconnected")
         for mod in new:
             self._attached_modules[mod]\
                 = await self._backend.build_module(discovered[mod][0],
                                                    discovered[mod][1],
                                                    self.pause_with_message)
+            self._log.info(f"Module {mod} discovered and attached")
         return list(self._attached_modules.values())
 
     @_log_call

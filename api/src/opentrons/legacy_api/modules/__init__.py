@@ -100,7 +100,7 @@ def discover() -> List[Tuple[str, Any]]:
                             .format(name, port))
                 continue
             discovered_modules.append((port, name))
-    log.info('Discovered modules: {}'.format(discovered_modules))
+    log.debug('Discovered modules: {}'.format(discovered_modules))
 
     return discovered_modules
 
