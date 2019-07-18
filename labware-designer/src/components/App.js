@@ -1,19 +1,18 @@
 // @flow
 import * as React from 'react'
-import {
-  DropdownField,
-  InputField,
-  RadioGroup,
-  type Options,
-} from '@opentrons/components'
+import { DropdownField, InputField, RadioGroup } from '@opentrons/components'
 import {
   labwareTypeOptions,
-  tuberackInsertOptions,
+  tubeRackInsertOptions,
   wellBottomShapeOptions,
   wellShapeOptions,
   yesNoOptions,
   type LabwareFields,
+  type ProcessedLabwareFields,
+  type ProcessedLabwareCommonFields,
+  type ProcessedLabwareTypeFields,
 } from '../fields'
+import fieldsToLabware from '../fieldsToLabware'
 
 const getDefaultFormState = (): LabwareFields => ({
   labwareType: null,
@@ -21,7 +20,7 @@ const getDefaultFormState = (): LabwareFields => ({
   aluminumBlockType: null,
   aluminumBlockChildLabwareType: null,
 
-  tuberackSides: [],
+  tubeRackSides: [],
   footprintXDimension: null,
   footprintYDimension: null,
   labwareZDimension: null,
@@ -63,16 +62,18 @@ type UpdateFieldAction = {|
   type: typeof UPDATE_LABWARE_FORM_FIELD,
   payload: {|
     field: string,
-    value: mixed,
+    value: $Values<LabwareFields>,
   |},
 |}
 
 // NOTE: this will be an enum of all actions handled by formReducer
 type FormAction = UpdateFieldAction
 
-type FormReducer = (state: LabwareFields, action: FormAction) => LabwareFields
-const formReducer: FormReducer = (state, action) => {
-  console.log({ action })
+const formReducer = (
+  state: LabwareFields,
+  action: FormAction
+): LabwareFields => {
+  console.debug({ action })
 
   // TODO IMMEDIATELY figure out reducer, still WIP
   switch (action.type) {
@@ -91,7 +92,7 @@ type FieldProps = {
   label?: string,
 }
 const Field = (props: FieldProps) => {
-  const [fieldState, setFieldState] = React.useState<mixed>(
+  const [fieldState, setFieldState] = React.useState<$Values<LabwareFields>>(
     props.formState[props.field]
   )
   // TODO make action creator for UPDATE_FORM_FIELD
@@ -105,7 +106,7 @@ const Field = (props: FieldProps) => {
         })
       }
       label={props.label}
-      value={fieldState}
+      value={Array.isArray(fieldState) ? fieldState.join(', ') : fieldState}
     />
   )
 }
@@ -115,11 +116,18 @@ type DropdownProps = {
   formDispatch: FormAction => mixed,
   formState: LabwareFields,
   field: $Keys<LabwareFields>,
-  options: Options,
+  options: Array<Object>, // Array<{| name: string, value: string, image?: string |}>, // TODO IMMEDIATELY
   label?: string,
 }
 const Dropdown = (props: DropdownProps) => {
   const fieldState = props.formState[props.field]
+  if (fieldState != null && typeof fieldState !== 'string') {
+    console.error(
+      `Tried to pass non ?string value to option field ${props.field}`,
+      fieldState
+    )
+    return null
+  }
   // TODO make action creator
   return (
     <div>
@@ -142,11 +150,18 @@ type RadioFieldProps = {
   formDispatch: FormAction => mixed,
   formState: LabwareFields,
   field: $Keys<LabwareFields>,
-  options: Options,
+  options: Array<{ name: string, value: string, children?: React.Node }>,
   label?: string,
 }
 const RadioField = (props: RadioFieldProps) => {
   const fieldState = props.formState[props.field]
+  if (fieldState != null && typeof fieldState !== 'string') {
+    console.error(
+      `Tried to pass non ?string value to option field ${props.field}`,
+      fieldState
+    )
+    return null
+  }
   // TODO make action creator
   return (
     <div>
@@ -159,17 +174,114 @@ const RadioField = (props: RadioFieldProps) => {
           })
         }
         options={props.options}
-        value={fieldState}
+        value={fieldState == null ? undefined : fieldState}
       />
     </div>
   )
 }
 
+// For a LabwareFields object that has already been actually validated, cast it into ProcessedLabwareFields.
+// This fn should NEVER return null in production, the Maybe is just an escape hatch for Flow
+const processValidForm = (fields: LabwareFields): ?ProcessedLabwareFields => {
+  const {
+    wellBottomShape,
+    brand,
+    loadName,
+    displayName,
+    labwareType,
+    aluminumBlockType,
+    aluminumBlockChildLabwareType,
+    tubeRackInsertLoadName,
+    tubeRackSides,
+  } = fields
+  if (
+    wellBottomShape == null ||
+    brand == null ||
+    loadName == null ||
+    displayName == null ||
+    labwareType == null
+  ) {
+    console.error('Got a nullsy required field! This should not happen', fields)
+    return null
+  }
+  const commonFields: ProcessedLabwareCommonFields = {
+    footprintXDimension: Number(fields.footprintXDimension),
+    footprintYDimension: Number(fields.footprintYDimension),
+    labwareZDimension: Number(fields.labwareZDimension),
+
+    gridRows: Number(fields.gridRows),
+    gridColumns: Number(fields.gridColumns),
+    gridSpacingX: Number(fields.gridSpacingX),
+    gridSpacingY: Number(fields.gridSpacingY),
+    gridOffsetX: Number(fields.gridOffsetX),
+    gridOffsetY: Number(fields.gridOffsetY),
+
+    // NOTE: these fields don't *really* need to be here after processing, but might be useful down the road?
+    heterogeneousWells: fields.heterogeneousWells === 'true',
+    irregularRowSpacing: fields.irregularRowSpacing === 'true',
+    irregularColumnSpacing: fields.irregularColumnSpacing === 'true',
+
+    wellVolume: Number(fields.wellVolume),
+    wellBottomShape,
+    wellDepth: Number(fields.wellDepth),
+
+    brand,
+    brandId: fields.brandId,
+
+    loadName,
+    displayName,
+  }
+
+  const wellShapeFields =
+    fields.wellShape === 'circular'
+      ? {
+          wellShape: 'circular',
+          wellDiameter: Number(fields.wellDiameter),
+        }
+      : {
+          wellShape: 'rectangular',
+          wellXDimension: Number(fields.wellXDimension),
+          wellYDimension: Number(fields.wellYDimension),
+        }
+
+  let labwareTypeFields: ?ProcessedLabwareTypeFields = null
+  if (labwareType === 'aluminumBlock') {
+    if (aluminumBlockChildLabwareType == null) {
+      console.error('aluminumBlockChildLabwareType should not be nullsy')
+      return null
+    }
+    labwareTypeFields = {
+      labwareType: 'aluminumBlock',
+      aluminumBlockType,
+      aluminumBlockChildLabwareType,
+    }
+  } else if (labwareType === 'tubeRack') {
+    if (tubeRackInsertLoadName == null) {
+      console.error('aluminumBlockChildLabwareType should not be nullsy')
+      return null
+    }
+    labwareTypeFields = {
+      labwareType: 'tubeRack',
+      tubeRackInsertLoadName,
+      tubeRackSides,
+    }
+  } else {
+    labwareTypeFields = { labwareType }
+  }
+
+  return {
+    commonFields,
+    wellShapeFields,
+    labwareTypeFields,
+  }
+}
+
 const App = () => {
-  const [formState, formDispatch] = React.useReducer<
-    FormReducer,
-    LabwareFields
-  >(formReducer, getDefaultFormState())
+  // TODO: can't make Flow understand useReducer
+  const [formState, formDispatch] = React.useReducer<*, *>(
+    formReducer,
+    getDefaultFormState()
+  )
 
   return (
     <div>
@@ -184,21 +296,21 @@ const App = () => {
       <Dropdown
         field="tubeRackInsertLoadName"
         label="Which tube rack insert"
-        options={tuberackInsertOptions}
+        options={tubeRackInsertOptions}
         formState={formState}
         formDispatch={formDispatch}
       />
       <Dropdown
         field="aluminumBlockType"
         label="Which aluminum block"
-        options={tuberackInsertOptions}
+        options={tubeRackInsertOptions}
         formState={formState}
         formDispatch={formDispatch}
       />
       <Dropdown
         field="aluminumBlockChildLabwareType"
         label="What labware is on top of your 96 well aluminum block"
-        options={tuberackInsertOptions}
+        options={tubeRackInsertOptions}
         formState={formState}
         formDispatch={formDispatch}
       />
@@ -206,7 +318,7 @@ const App = () => {
         Import File
       </div>
       {/* PAGE 1 - Labware */}
-      {/* tuberackSides: Array<string> maybe?? */}
+      {/* tubeRackSides: Array<string> maybe?? */}
       <RadioField
         field="heterogeneousWells"
         label="Regularity"
@@ -350,7 +462,16 @@ const App = () => {
         formState={formState}
         formDispatch={formDispatch}
       />
-      <div onClick={() => window.alert('TODO not implemented!')}>
+      <div
+        onClick={() => {
+          const validForm = processValidForm(formState)
+          if (validForm) {
+            console.log(fieldsToLabware(validForm))
+          } else {
+            console.warn('form not valid!')
+          }
+        }}
+      >
         SAVE LABWARE
       </div>
     </div>
