@@ -289,7 +289,6 @@ class CLITool:
         self.current_position = self._position()
         return 'Jog: {}'.format([axis, str(direction), str(step)])
 
-
     def _helper_pickup(self, p, top):
         for i in range(int(p._pick_up_presses)):
             # move nozzle down into the tip
