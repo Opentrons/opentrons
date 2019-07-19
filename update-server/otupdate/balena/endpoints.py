@@ -19,11 +19,11 @@ def build_health_endpoint(
         'systemVersion': system_version,
         'capabilities': {
             'bootstrap': '/server/update/bootstrap',
-            'balena-update': '/server/update',
+            'balenaUpdate': '/server/update',
             'restart': '/server/update/restart'}
     }
     if with_migration:
-        health_dict['capabilities']['buildroot-migration']\
+        health_dict['capabilities']['buildrootMigration']\
             = '/server/update/migration/begin'
 
     async def health(request: web.Request) -> web.Response:
