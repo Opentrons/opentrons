@@ -36,7 +36,7 @@ async def test_server_boot(loop, test_client):
         'systemVersion': 'unknown',
         'capabilities': {
             'bootstrap': '/server/update/bootstrap',
-            'balena-update': '/server/update',
+            'balenaUpdate': '/server/update',
             'restart': '/server/update/restart'
         }
     }
@@ -61,7 +61,8 @@ async def test_server_boot(loop, test_client):
     resp = await cli.get('/server/update/health')
     res = await resp.json()
     assert resp.status == 200
-    assert res['buildroot-migration'] == '/server/update/migration/begin'
+    assert res['capabilities']['buildrootMigration']\
+        == '/server/update/migration/begin'
 
 
 async def test_bootstrap_fail(monkeypatch, loop, test_client):

@@ -150,7 +150,7 @@ async def file_upload(
     """ Serves /update/:session/file
 
     Requires multipart (encoding doesn't matter) with a file field in the
-    body called 'ot2-migration.zip'.
+    body called 'ot2-system.zip'.
     """
     if session.stage != Stages.AWAITING_FILE:
         return web.json_response(
@@ -159,7 +159,7 @@ async def file_upload(
             status=409)
     reader = await request.multipart()
     async for part in reader:
-        if part.name != 'ot2-migration.zip':
+        if part.name != 'ot2-system.zip':
             LOG.warning(
                 f"Unknown field name {part.name} in file_upload, ignoring")
             await part.release()
@@ -169,7 +169,7 @@ async def file_upload(
     _begin_validation(
         session,
         asyncio.get_event_loop(),
-        os.path.join(session.download_path, 'ot2-migration.zip'),
+        os.path.join(session.download_path, 'ot2-system.zip'),
         request.app.get(constants.ROBOT_NAME_VARNAME, 'opentrons'))
 
     return web.json_response(data=session.state,

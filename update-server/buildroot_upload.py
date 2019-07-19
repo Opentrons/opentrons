@@ -32,10 +32,9 @@ async def do_update(update_file: str, host: str, kind: UPDATE_KIND):
     async with aiohttp.ClientSession() as session:
         if kind == UPDATE_KIND.MIGRATE:
             root = host + '/server/update/migration'
-            filename = 'ot2-migration.zip'
         else:
             root = host + '/server/update'
-            filename = 'ot2-system.zip'
+        filename = 'ot2-system.zip'
         print(f"Starting update of {update_file.name} to {host}")
         begin_resp = await session.post(root + '/begin')
         if begin_resp.status == 409:
