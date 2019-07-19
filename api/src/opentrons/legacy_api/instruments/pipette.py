@@ -249,6 +249,11 @@ class Pipette(CommandPublisher):
         self.current_volume = 0
         self.reset_tip_tracking()
 
+    @property
+    def has_tip(self):
+        # Added in for backcompat purposes in CLI
+        return self.tip_attached
+
     def has_tip_rack(self):
         """
         Returns True of this :any:`Pipette` was instantiated with tip_racks
