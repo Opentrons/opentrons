@@ -38,5 +38,5 @@ export default combineReducers<_, Action>({
   discovery: discoveryReducer,
   protocol: protocolReducer,
   shell: shellReducer,
-  router: connectRouter(history),
+  router: connectRouter<_, Action>(history),
 })
