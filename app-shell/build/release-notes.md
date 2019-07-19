@@ -1,4 +1,4 @@
-# Changes from 3.9.0 to 3.10.0
+# Changes from 3.9.0 to 3.10.1
 
 This update includes a set of all new, high-quality labware definitions! The older definitions are still on your robot and will continue to work, but we **highly** recommend you switch to the new ones.
 
@@ -23,6 +23,7 @@ For more details about this release, please see the full [technical change log][
 [changelog]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
 [pd]: https://designer.opentrons.com
 [pd-help]: https://intercom.help/opentrons-protocol-designer/
+[pipette-docs]: https://docs.opentrons.com/pipettes.html#plunger-flow-rates
 
 <!-- start:@opentrons/app -->
 
@@ -57,6 +58,7 @@ For more details about this release, please see the full [technical change log][
 
 - Added support for new labware definitions! See the [Labware Library][labware-library] and the [Labware API docs][labware-api] for more details
 - Added support for newer pipette models
+- Added support for setting the flow rate of the pipette during blowout. See the [Pipette documentation][pipette-docs] for more details.
 
 ### Bug fixes
 
