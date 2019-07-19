@@ -1,14 +1,18 @@
 // @flow
 // fetch wrapper to throw if response is not ok
-import { createWriteStream } from 'fs'
+import { createReadStream, createWriteStream } from 'fs'
 import { Transform, Readable } from 'stream'
 import pump from 'pump'
 import _fetch from 'electron-fetch'
+import FormData from 'form-data'
 
 export type DownloadProgress = {| downloaded: number, size: number | null |}
 
-export function fetch(input: RequestInfo): Promise<Response> {
-  return _fetch(input).then(response => {
+export function fetch(
+  input: RequestInfo,
+  init?: RequestOptions
+): Promise<Response> {
+  return _fetch(input, init).then(response => {
     if (!response.ok) {
       const error = `${response.status} - ${response.statusText}`
       throw new Error(`Request error: ${error}`)
@@ -62,4 +66,17 @@ export function fetchToFile(
       })
     })
   })
+}
+
+export function postFile(
+  input: RequestInfo,
+  name: string,
+  source: string
+): Promise<Response> {
+  const body = new FormData()
+  body.append(name, createReadStream(source))
+
+  console.log('POST', input)
+
+  return fetch(input, { body, method: 'POST' })
 }

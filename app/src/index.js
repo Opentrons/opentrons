@@ -25,11 +25,11 @@ import App from './components/App'
 
 const log = createLogger(__filename)
 
-const epicMiddlware = createEpicMiddleware()
+const epicMiddleware = createEpicMiddleware()
 
 const middleware = applyMiddleware(
   thunk,
-  epicMiddlware,
+  epicMiddleware,
   robotApiMiddleware(),
   shellMiddleware,
   analyticsMiddleware,
@@ -45,7 +45,7 @@ const composeEnhancers =
 
 const store = createStore(rootReducer, composeEnhancers(middleware))
 
-epicMiddlware.run(rootEpic)
+epicMiddleware.run(rootEpic)
 
 const renderApp = () =>
   ReactDom.render(

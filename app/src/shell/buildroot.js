@@ -1,6 +1,8 @@
 // @flow
 import semver from 'semver'
+
 import type { State, Action } from '../types'
+import type { RobotHost } from '../robot-api'
 
 export type BuildrootUpdateInfo = {|
   version: string,
@@ -19,6 +21,14 @@ export type BuildrootAction =
   | {| type: 'buildroot:DOWNLOAD_ERROR', payload: string |}
   | {| type: 'buildroot:UPDATE_INFO', payload: BuildrootUpdateInfo | null |}
   | {| type: 'buildroot:SET_UPDATE_SEEN' |}
+  | {|
+      type: 'buildroot:START_PREMIGRATION',
+      payload: RobotHost,
+      meta: {| shell: true |},
+    |}
+  | {| type: 'buildroot:PREMIGRATION_STARTED' |}
+  | {| type: 'buildroot:PREMIGRATION_DONE' |}
+  | {| type: 'buildroot:PREMIGRATION_ERROR', payload: string |}
 
 export function setBuildrootUpdateSeen(): BuildrootAction {
   return { type: 'buildroot:SET_UPDATE_SEEN' }

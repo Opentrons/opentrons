@@ -9,10 +9,14 @@ import { getConfig } from '../config'
 import { CURRENT_VERSION } from '../update'
 import { downloadManifest, getReleaseSet } from './release-manifest'
 import { getReleaseFiles } from './release-files'
+import { getPremigrationWheels, startPremigration } from './migrate'
 
 import type { Action, Dispatch } from '../types'
 import type { ReleaseSetFilepaths } from './types'
-import type { BuildrootUpdateInfo } from '@opentrons/app/src/shell'
+import type {
+  BuildrootUpdateInfo,
+  BuildrootAction,
+} from '@opentrons/app/src/shell'
 
 const log = createLogger(__filename)
 
@@ -21,7 +25,7 @@ const DIRECTORY = path.join(app.getPath('userData'), '__ot_buildroot__')
 let updateSet: ReleaseSetFilepaths | null = null
 
 export function registerBuildrootUpdate(dispatch: Dispatch) {
-  const buildrootEnabled = getConfig('devInternal')?.enableBuildRoot
+  const buildrootEnabled = Boolean(getConfig('devInternal')?.enableBuildRoot)
   log.debug('buildroot status', { enabled: buildrootEnabled })
 
   return function handleAction(action: Action) {
@@ -29,6 +33,32 @@ export function registerBuildrootUpdate(dispatch: Dispatch) {
       switch (action.type) {
         case 'shell:CHECK_UPDATE':
           checkForBuildrootUpdate(dispatch)
+          break
+
+        case 'buildroot:START_PREMIGRATION': {
+          const robot = action.payload
+
+          dispatch({ type: 'buildroot:PREMIGRATION_STARTED' })
+          getPremigrationWheels()
+            .then(wheels => {
+              log.info('Starting robot premigration', { robot, wheels })
+              return startPremigration(robot, wheels.api, wheels.updateServer)
+            })
+            .then(
+              (): BuildrootAction => ({
+                type: 'buildroot:PREMIGRATION_DONE',
+              })
+            )
+            .catch(
+              (error: Error): BuildrootAction => ({
+                type: 'buildroot:PREMIGRATION_ERROR',
+                payload: error.message,
+              })
+            )
+            .then(dispatch)
+
+          break
+        }
       }
     }
   }
