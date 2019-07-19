@@ -25,7 +25,6 @@ def unpack_location(location):
         placeable, coordinates = location.top()
 
     elif isinstance(location, tuple):
-        print("I'm a tuple")
         placeable, coordinates = location
 
     else:

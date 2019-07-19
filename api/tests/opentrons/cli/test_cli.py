@@ -20,22 +20,29 @@ def mock_config():
 # params=['p300_single_v1.4', 'p300_single_v2.0'], ids=['model1', 'model2']
 @pytest.fixture
 def model1():
-    return 'p300_single_v1.4'
+    return ('p300_single_v1.4', 'p300_single')
 
 @pytest.fixture
 def model2():
-    return 'p300_single_v2.0'
+    return ('p300_single_v2.0', 'p300_single_gen2')
 
 @pytest.fixture
-def mock_models(monkeypatch, model1, model2):
+def hardware(monkeypatch, async_server, model1, model2):
+    hardware = async_server['com.opentrons.hardware']
     if model1:
-        monkeypatch.setattr(robot, 'model_by_mount', {
-            'left': {'model': model1, 'id': None, 'name': None},
-            'right': {'model': model1, 'id': None, 'name': None}})
+        monkeypatch.setattr(hardware, 'model_by_mount', {
+            'left': {'model': model1[0], 'id': 'fakeid', 'name': model1[1]},
+            'right': {'model': model1[0], 'id': 'fakeid2', 'name': model1[1]}})
     elif model2:
-        monkeypatch.setattr(robot, 'model_by_mount', {
-            'left': {'model': model2, 'id': None, 'name': None},
-            'right': {'model': model2, 'id': None, 'name': None}})
+        monkeypatch.setattr(hardware, 'model_by_mount', {
+            'left': {'model': model2[0], 'id': 'fakeid', 'name': model2[1]},
+            'right': {'model': model2[0], 'id': 'fakeid2', 'name': model2[1]}})
+
+    def fake_cached():
+        return hardware.model_by_mount
+
+    monkeypatch.setattr(hardware, 'cache_instrument_models', fake_cached)
+    yield hardware
 
 @pytest.mark.api1_only
 def test_clear_config(mock_config, async_server):
@@ -110,13 +117,11 @@ async def test_new_deck_points():
 @pytest.mark.skipif(
     sys.platform.startswith("win"), reason="Incompatible with Windows")
 @pytest.mark.api1_only
-def test_move_output(mock_config, loop, async_server, monkeypatch, mock_models):
+def test_move_output(mock_config, loop, monkeypatch, hardware):
     # Check that the robot moves to the correct locations
     # TODO: Make tests for both APIs
-    hardware = async_server['com.opentrons.hardware']
-
     tool = dc_main.CLITool(
-        get_calibration_points(), hardware, 'p300_single_v1.4',loop=loop)
+        get_calibration_points(), hardware, loop=loop)
 
     assert tool.hardware is hardware
     # Move to all three calibration points
@@ -132,32 +137,16 @@ def test_move_output(mock_config, loop, async_server, monkeypatch, mock_models):
     sys.platform.startswith("win"), reason="Incompatible with Windows")
 @pytest.mark.api1_only
 @pytest.mark.model2
-def test_tip_probe(mock_config, loop, async_server, monkeypatch, mock_models):
+def test_tip_probe(mock_config, loop, monkeypatch, hardware):
     # Test that tip probe returns successfully
-    hardware = async_server['com.opentrons.hardware']
-    fake_pip = {'left': {'model': None, 'id': None, 'name': None},
-                'right': {
-                    'model': 'p300_single_v2.0',
-                    'id': 'FakePip',
-                    'name': 'p300_single_GEN2'}}
-    monkeypatch.setattr(hardware, 'model_by_mount', fake_pip)
+
     # TODO (maybe): Figure out how to prevent the pytest loop fixture
     # from getting closed by the CLI tool on exit for API V2
-    # monkeypatch.setattr(
-    #     dc_main.CLITool, 'hardware', hardware)
-
     tool = dc_main.CLITool(
-        get_calibration_points(), hardware, 'p300_single_v2.0', loop=loop)
+        get_calibration_points(), hardware, loop=loop)
 
     assert tool.hardware is hardware
-
-    version = async_server['api_version']
     point_after = (10, 10, 10)
-    if version == 2:
-        # Keeping here for future use if TODO can be figured out.
-        mount = Mount.RIGHT
-    else:
-        mount = 'right'
     output = tool.probe(point_after)
     assert output == 'Tip probe'
 
@@ -166,29 +155,18 @@ def test_tip_probe(mock_config, loop, async_server, monkeypatch, mock_models):
     sys.platform.startswith("win"), reason="Incompatible with Windows")
 @pytest.mark.api1_only
 @pytest.mark.model1
-def test_mount_offset(mock_config, mock_models, loop, monkeypatch, async_server):
+def test_mount_offset(mock_config, hardware, loop, monkeypatch):
     # Check that mount offset gives the expected output when position is
     # slightly changed
-    hardware = async_server['com.opentrons.hardware']
 
     def fake_position(something):
         return [11.13, 8, 51.7]
 
-    # monkeypatch.setattr(
-    #     dc_main.CLITool, 'hardware', hardware)
-
     monkeypatch.setattr(
         hardware, 'config', mock_config)
 
-    fake_pip = {'left': {'model': None, 'id': None, 'name': None},
-                'right': {
-                    'model': 'p300_single_v1.4',
-                    'id': 'FakePip',
-                    'name': 'p300_single'}}
-    monkeypatch.setattr(hardware, 'model_by_mount', fake_pip)
-
     tool = dc_main.CLITool(
-        get_calibration_points(), hardware, 'p300_single_v1.4', loop=loop)
+        get_calibration_points(), hardware, loop=loop)
 
     monkeypatch.setattr(
         dc_main.CLITool, '_position', fake_position)
@@ -204,26 +182,14 @@ def test_mount_offset(mock_config, mock_models, loop, monkeypatch, async_server)
 @pytest.mark.api1_only
 @pytest.mark.model1
 def test_gantry_matrix_output(
-        mock_config, mock_models, loop, async_server, monkeypatch):
+        mock_config, hardware, loop, monkeypatch):
     # Check that the robot moves to the correct locations
     # TODO: Make tests for both APIs
-    hardware = async_server['com.opentrons.hardware']
 
-    # monkeypatch.setattr(
-    #     dc_main.CLITool, 'hardware', hardware)
+    monkeypatch.setattr(hardware, 'config', mock_config)
 
-    monkeypatch.setattr(
-        hardware, 'config', mock_config)
-
-
-    fake_pip = {'left': {'model': None, 'id': None, 'name': None},
-                'right': {
-                    'model': 'p300_single_v1.4',
-                    'id': 'FakePip',
-                    'name': 'p300_single'}}
-    monkeypatch.setattr(hardware, 'model_by_mount', fake_pip)
     tool = dc_main.CLITool(
-        get_calibration_points(), hardware, 'p300_single_v1.4', loop=loop)
+        get_calibration_points(), hardware, loop=loop)
 
     expected = [
         [1.00, 0.00, 0.00,  0.00],
@@ -249,13 +215,13 @@ def test_gantry_matrix_output(
 @pytest.mark.api1_only
 @pytest.mark.model2
 def test_try_pickup_tip(
-        mock_config, mock_models, async_server, monkeypatch, loop):
+        mock_config, hardware, monkeypatch, loop):
     # Check that the robot moves to the correct locations
     # TODO: Make tests for both APIs
-    hardware = async_server['com.opentrons.hardware']
     def fake_read_model(mount):
         return model2()
-    monkeypatch.setattr(hardware._driver, 'read_pipette_model', fake_read_model)
+    monkeypatch.setattr(
+        hardware._driver, 'read_pipette_model', fake_read_model)
 
     monkeypatch.setattr(
         hardware, 'config', mock_config)
@@ -263,9 +229,5 @@ def test_try_pickup_tip(
     tool = dc_main.CLITool(
         get_calibration_points(),
         hardware,
-        'p300_single_v2.0',
-        pipette_left='p300_single_v2.0',
-        tiprack_right='opentrons_96_tiprack_300ul',
-        tiprack_left='opentrons_96_tiprack_300ul',
         loop=loop)
     tool.try_pickup_tip()
