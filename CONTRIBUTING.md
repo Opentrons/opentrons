@@ -233,7 +233,7 @@ To help with code quality and maintainability, we use a collection of tools that
 - [Linters][lint]
   - Analyze the code for various potential bugs and errors
   - [Pylama][pylama] - Python code audit tool
-  - [ESLint][eslint] - JavsScript/JSON linter
+  - [ESLint][eslint] - JavaScript/JSON linter
   - [stylelint][] - CSS linter
 - [Typecheckers][type-check]
   - Verify that the code is [type safe][type-safe]
@@ -285,6 +285,60 @@ Most, if not all, of the tools above have plugins available for your code editor
 - Flow - <https://flow.org/en/docs/editors/>
 - Prettier - <https://prettier.io/docs/en/editors.html>
 
+### Adding dependencies
+
+#### JavaScript
+
+JavaScript dependencies are installed by [yarn][]. When calling yarn, you should do so from the repository level.
+
+##### Adding a development dependency
+
+A development dependency is any dependency that is used only to help manage the project. Examples of development dependencies would be:
+
+- Build tools (webpack, babel)
+- Testing/linting/checking tools (jest, flow, eslint)
+- Libraries used only in support scripts (aws, express)
+
+To add a development dependency:
+
+```shell
+# with long option names
+yarn add --dev --ignore-workspace-root-check <dependency_name>
+
+# or, with less typing
+yarn add -DW <dependency_name>
+```
+
+##### Adding a project dependency
+
+A project dependency is a dependency that an application or library will `import` _at run time_. Examples of project dependencies would be:
+
+- UI / state-management libraries (react, redux)
+- General utility libraries (lodash)
+
+Project dependencies should be added _to the specific project that depends on them_. To add one:
+
+```shell
+yarn workspace <project_name> add <dependency_name>
+```
+
+##### Adding type definitions
+
+After you have installed a dependency (development or project), you may find that you need to also install [flow][] type definitions. Without type definitions for our external dependencies, we are unable to typecheck anything we `import`. We use [flow-typed][] to install community-created type definitions. To add type definitions for an installed package:
+
+```shell
+yarn run flow-typed install <dependency_name>@<installed_version>
+```
+
+Not every JavaScript package has an available flow-typed definition. In this case, flow-typed will generate a stub file in the directory `flow-typed/npm/`. You may find it useful to fill out this stub; See the [flow-typed wiki][writing-flow-definitions] for a library definition writing guide.
+
+[flow-typed]: https://github.com/flow-typed/flow-typed
+[writing-flow-definitions]: https://github.com/flow-typed/flow-typed/wiki/Contributing-Library-Definitions
+
+#### Python
+
+This section is a WIP; please check back later!
+
 ### Opentrons API
 
 Be sure to check out the [API `README`][api-readme] for additional instructions. To run the Opentrons API in development mode:
@@ -319,6 +373,7 @@ make -C api push-buildroot host=${some_other_ip_address}
 Note that there is no separate `restart` command because `push-buildroot` restarts the systemd unit controlling the API server. This only pushes the python wheel containing the API server; if you have edited the systemd unit, you'll need to `scp` it manually and then do `systemctl daemon-reload` on the robot before restarting the api server.
 
 To SSH into the robot, do
+
 ```
 # SSH into the currently connected ethernet robot
 make term
@@ -343,7 +398,7 @@ If you create the key as `~/.ssh/robot_key` and `~/.ssh/robot_key.pub` then `mak
 
 ### Releasing (for Opentrons developers)
 
-Our release process is still a work-in-progress. All projects are currently versioned together to ensure interoperability.
+Our release process is still a work-in-progress. The app and API projects are currently versioned together to ensure interoperability.
 
 1.  `make bump` (see details below)
 2.  Inspect version bumps and changelogs
@@ -407,6 +462,15 @@ We use [lerna][], a monorepo management tool, to work with our various projects.
 yarn run lerna [opts]
 ```
 
+#### Releasing Web Projects
+
+The following web projects are versioned and released independently from the app and API:
+
+- `protocol-designer`
+- `labware-library`
+
+See [scripts/deploy/README.md](./scripts/deploy/README.md) for the release process of these projects.
+
 ## Prior Art
 
 This Contributing Guide was influenced by a lot of work done on existing Contributing Guides. They're great reads if you have the time!
@@ -463,6 +527,7 @@ The files `/data/logs/api.log.*` and `/data/logs/serial.log.*` contain logs from
 #### Buildroot
 
 Buildroot robots use [systemd-journald][] for log management. This is a single log manager for everything on the system. It is administrated using the [journalctl][] utility. You can view logs by just doing `journalctl` (it may be better to do `journalctl --no-pager | less` to get a better log viewer), or stream them by doing `journalctl -f`. Any command that displays logs can be narrowed down by using a syslog identifier: `journalctl -f SYSLOG_IDENTIFIER=opentrons-api` will only print logs from the api server's loggers, for instance. Our syslog identifiers are:
+
 - `opentrons-api`: The API server - anything sent to `logging` logs from the api server package, except the serial logs
 - `opentrons-update-server`: Anything sent to `logging` logs from the update server packate
 - `opentrons-api-serial`: The serial logs
@@ -478,9 +543,9 @@ You can't really restart anything from inside a shell on balena, since it all ru
 Buildroot robots use `systemd` as their init system. Every process that we run has an associated systemd unit, which defines and configures its behavior when the robot starts. You can use the [systemctl][] utility to mess around with or inspect the system state. For instance, if you do `systemctl status opentrons-api-server` you will see whether the api server is running or not, and a dump of its logs. You can restart units with `systemctl restart (unitname)`, start and stop them with `systemctl start` and `systemctl stop`, and so on. Note that if you make changes to unit files, you have to run `systemctl daemon-reload` (no further arguments) for the init daemon to see the changes.
 
 Our systemd units are:
+
 - `opentrons-api-server`: The API server
 - `opentrons-update-server`: The update server
-
 
 ### Other System Admin Notes
 
@@ -503,6 +568,7 @@ When a robot is running on buildroot, its filesystem is mounted from two separat
 [kibana-contributing]: https://github.com/elastic/kibana/blob/master/CONTRIBUTING.md
 [makefiles]: https://en.wikipedia.org/wiki/Makefile
 [nvm]: https://github.com/creationix/nvm
+[yarn]: https://yarnpkg.com/
 [yarn-install]: https://yarnpkg.com/en/docs/install
 [commitizen]: https://github.com/commitizen/cz-cli
 [conventional-commits]: https://conventionalcommits.org/

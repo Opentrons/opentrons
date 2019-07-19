@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/app",
-  "version": "3.9.0",
+  "version": "3.10.1",
   "description": "Opentrons desktop application UI",
   "main": "src/index.js",
   "repository": {
@@ -17,12 +17,12 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "devDependencies": {
-    "flow-bin": "^0.97.0",
-    "flow-typed": "^2.5.1"
+    "flow-bin": "^0.102.0",
+    "flow-typed": "^2.5.2"
   },
   "dependencies": {
-    "@opentrons/components": "3.9.0",
-    "@opentrons/shared-data": "3.9.0",
+    "@opentrons/components": "3.10.1",
+    "@opentrons/shared-data": "3.10.1",
     "@thi.ng/paths": "^1.6.5",
     "classnames": "^2.2.5",
     "connected-react-router": "^6.4.0",
@@ -44,7 +44,7 @@
     "redux-thunk": "^2.3.0",
     "remark": "^9.0.0",
     "remark-react": "^4.0.3",
-    "reselect": "^3.0.1",
+    "reselect": "^4.0.0",
     "rxjs": "^6.5.1",
     "semver": "^5.5.0",
     "winston": "^2.2.0"

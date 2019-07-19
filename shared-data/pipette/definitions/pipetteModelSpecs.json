@@ -930,7 +930,7 @@
       "quirks": ["dropTipShake", "doubleDropTip"]
     },
     "p20_single_v2.0": {
-      "name": "p20_single_GEN2",
+      "name": "p20_single_gen2",
       "backcompatName": "p10_single",
       "top": {
         "value": 19.5,
@@ -968,7 +968,7 @@
         "type": "float"
       },
       "pickUpDistance": {
-        "value": 12,
+        "value": 14,
         "min": 1,
         "max": 20,
         "units": "mm",
@@ -1020,13 +1020,33 @@
       "ulPerMm": [
         {
           "aspirate": [
-            [1.8263, -0.0958, 1.088],
-            [2.5222, -0.104, 1.1031],
-            [3.2354, -0.0447, 0.9536],
-            [12.5135, -0.0021, 0.8079],
-            [26, 0, 0.8]
+            [1.308, 0.06663, 0.6237],
+            [2.095, 0.05661, 0.6428],
+            [2.865, 0.02327, 0.6675],
+            [3.6, 0.0211, 0.7054],
+            [4.413, 0.01897, 0.7224],
+            [5.135, 0.012, 0.7448],
+            [5.9, 0.00514, 0.7111],
+            [8.913, 0.001729, 0.7325],
+            [12.013, 0.0015, 0.7276],
+            [15.11, 0.00145, 0.7379],
+            [18.22, 0.00126, 0.7402],
+            [22, 0.0011, 0.7423]
           ],
-          "dispense": [[26, 0, 0.8]]
+          "dispense": [
+            [1.308, 0.06663, 0.6237],
+            [2.095, 0.05661, 0.6428],
+            [2.865, 0.02327, 0.6675],
+            [3.6, 0.0211, 0.7054],
+            [4.413, 0.01897, 0.7224],
+            [5.135, 0.012, 0.7448],
+            [5.9, 0.00514, 0.7111],
+            [8.913, 0.001729, 0.7325],
+            [12.013, 0.0015, 0.7276],
+            [15.11, 0.00145, 0.7379],
+            [18.22, 0.00126, 0.7402],
+            [22, 0.0011, 0.7423]
+          ]
         }
       ],
 
@@ -1040,7 +1060,7 @@
       "quirks": ["dropTipShake"]
     },
     "p20_multi_v2.0": {
-      "name": "p20_multi_GEN2",
+      "name": "p20_multi_gen2",
       "backcompatName": "p10_multi",
       "top": {
         "value": 19.5,
@@ -1585,12 +1605,12 @@
       "ulPerMm": [
         {
           "aspirate": [
-            [5.762111167 , 0.02912395377 , 2.7132],
-            [7.208999967 , 0.001758534127 , 2.8709],
-            [10.18300033 , 0.008684827443 , 2.8210],
-            [35.954444 , 0.003367098915 , 2.8751],
-            [42.075889 , 0.001505686352 , 2.9421],
-            [50 , 0.001091358226 , 2.9595]
+            [5.762111167, 0.02912395377, 2.7132],
+            [7.208999967, 0.001758534127, 2.8709],
+            [10.18300033, 0.008684827443, 2.821],
+            [35.954444, 0.003367098915, 2.8751],
+            [42.075889, 0.001505686352, 2.9421],
+            [50, 0.001091358226, 2.9595]
           ],
           "dispense": [[50, 0, 2.931601299]]
         }
@@ -2554,7 +2574,7 @@
       "quirks": ["dropTipShake"]
     },
     "p300_single_v2.0": {
-      "name": "p300_single_GEN2",
+      "name": "p300_single_gen2",
       "backcompatName": "p300_single",
       "top": {
         "value": 19.5,
@@ -2585,14 +2605,14 @@
         "type": "float"
       },
       "pickUpCurrent": {
-        "value": 0.1,
+        "value": 0.125,
         "min": 0.05,
         "max": 2.0,
         "units": "amps",
         "type": "float"
       },
       "pickUpDistance": {
-        "value": 11,
+        "value": 17,
         "min": 1,
         "max": 30,
         "units": "mm",
@@ -2652,14 +2672,14 @@
         "type": "float"
       },
       "dropTipCurrent": {
-        "value": 1.0,
+        "value": 1.25,
         "min": 0.1,
         "max": 0.8,
         "units": "amps",
         "type": "float"
       },
       "dropTipSpeed": {
-        "value": 15,
+        "value": 7,
         "min": 0.001,
         "max": 30,
         "units": "mm/sec",
@@ -2667,7 +2687,7 @@
       },
 
       "tipLength": {
-        "value": 52.1,
+        "value": 47.65,
         "units": "mm",
         "type": "float",
         "min": 0,
@@ -3100,7 +3120,7 @@
       "quirks": ["dropTipShake", "doubleDropTip"]
     },
     "p300_multi_v2.0": {
-      "name": "p300_multi_GEN2",
+      "name": "p300_multi_gen2",
       "backcompatName": "p300_multi",
       "top": {
         "value": 19.5,
@@ -3657,7 +3677,7 @@
       }
     },
     "p1000_single_v2.0": {
-      "name": "p1000_single_GEN2",
+      "name": "p1000_single_gen2",
       "backcompatName": "p1000_single",
       "top": {
         "value": 19.5,
@@ -3688,14 +3708,14 @@
         "type": "float"
       },
       "pickUpCurrent": {
-        "value": 0.1,
+        "value": 0.17,
         "min": 0.05,
         "max": 2.0,
         "units": "amps",
         "type": "float"
       },
       "pickUpDistance": {
-        "value": 12,
+        "value": 17,
         "min": 1,
         "max": 30,
         "units": "mm",
@@ -3757,14 +3777,14 @@
         "type": "float"
       },
       "dropTipCurrent": {
-        "value": 1.0,
+        "value": 1.25,
         "min": 0.1,
         "max": 0.8,
         "units": "amps",
         "type": "float"
       },
       "dropTipSpeed": {
-        "value": 15,
+        "value": 7,
         "min": 0.001,
         "max": 30,
         "units": "mm/sec",
@@ -3772,7 +3792,7 @@
       },
 
       "tipLength": {
-        "value": 79.5,
+        "value": 76.5,
         "units": "mm",
         "type": "float",
         "min": 0,
@@ -3798,6 +3818,7 @@
     "tipLength",
     "defaultAspirateFlowRate",
     "defaultDispenseFlowRate",
+    "defaultBlowOutFlowRate",
     "quirks"
   ],
   "validQuirks": ["pickupTipShake", "dropTipShake", "doubleDropTip"]

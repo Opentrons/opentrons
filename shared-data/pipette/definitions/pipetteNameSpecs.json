@@ -1,6 +1,7 @@
 {
   "p10_single": {
     "displayName": "P10 Single-Channel",
+    "displayCategory": "OG",
     "minVolume": 1,
     "maxVolume": 10,
     "channels": 1,
@@ -13,10 +14,16 @@
       "value": 10,
       "min": 0.001,
       "max": 50
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 1000,
+      "min": 5,
+      "max": 1000
     }
   },
   "p10_multi": {
     "displayName": "P10 8-Channel",
+    "displayCategory": "OG",
     "minVolume": 1,
     "maxVolume": 10,
     "defaultAspirateFlowRate": {
@@ -29,35 +36,52 @@
       "min": 0.001,
       "max": 50
     },
+    "defaultBlowOutFlowRate": {
+      "value": 1000,
+      "min": 5,
+      "max": 1000
+    },
     "channels": 8
   },
-  "p20_single_GEN2": {
+  "p20_single_gen2": {
     "displayName": "P20 Single-Channel GEN2",
+    "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
       "value": 5,
-      "min": 0.001,
-      "max": 5000
+      "min": 0.08,
+      "max": 24
     },
     "defaultDispenseFlowRate": {
       "value": 10,
-      "min": 0.001,
-      "max": 5000
+      "min": 0.08,
+      "max": 24
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 24,
+      "min": 0.08,
+      "max": 24
     },
     "minVolume": 1,
     "maxVolume": 20,
     "channels": 1
   },
-  "p20_multi_GEN2": {
+  "p20_multi_gen2": {
     "displayName": "P20 8-Channel GEN2",
+    "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
       "value": 5,
-      "min": 0.001,
-      "max": 5000
+      "min": 0.08,
+      "max": 24
     },
     "defaultDispenseFlowRate": {
       "value": 10,
-      "min": 0.001,
-      "max": 5000
+      "min": 0.08,
+      "max": 24
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 24,
+      "min": 0.08,
+      "max": 24
     },
     "minVolume": 1,
     "maxVolume": 20,
@@ -65,6 +89,7 @@
   },
   "p50_single": {
     "displayName": "P50 Single-Channel",
+    "displayCategory": "OG",
     "defaultAspirateFlowRate": {
       "value": 25,
       "min": 0.001,
@@ -74,6 +99,11 @@
       "value": 50,
       "min": 0.001,
       "max": 100
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 1000,
+      "min": 5,
+      "max": 1000
     },
     "channels": 1,
     "minVolume": 5,
@@ -81,6 +111,7 @@
   },
   "p50_multi": {
     "displayName": "P50 8-Channel",
+    "displayCategory": "OG",
     "defaultAspirateFlowRate": {
       "value": 25,
       "min": 0.001,
@@ -91,12 +122,18 @@
       "min": 0.001,
       "max": 100
     },
+    "defaultBlowOutFlowRate": {
+      "value": 1000,
+      "min": 5,
+      "max": 1000
+    },
     "channels": 8,
     "minVolume": 5,
     "maxVolume": 50
   },
   "p300_single": {
     "displayName": "P300 Single-Channel",
+    "displayCategory": "OG",
     "defaultAspirateFlowRate": {
       "value": 150,
       "min": 0.001,
@@ -106,38 +143,55 @@
       "value": 300,
       "min": 0.001,
       "max": 600
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 1000,
+      "min": 5,
+      "max": 1000
     },
     "channels": 1,
     "minVolume": 30,
     "maxVolume": 300
   },
-  "p300_single_GEN2": {
+  "p300_single_gen2": {
     "displayName": "P300 Single-Channel GEN2",
+    "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
       "value": 150,
-      "min": 0.001,
-      "max": 600
+      "min": 1,
+      "max": 275
     },
     "defaultDispenseFlowRate": {
-      "value": 300,
-      "min": 0.001,
-      "max": 600
+      "value": 275,
+      "min": 1,
+      "max": 275.31
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 275,
+      "min": 1,
+      "max": 275
     },
     "channels": 1,
     "minVolume": 20,
     "maxVolume": 300
   },
-  "p300_multi_GEN2": {
+  "p300_multi_gen2": {
     "displayName": "P300 8-Channel GEN2",
+    "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
       "value": 150,
-      "min": 0.001,
-      "max": 600
+      "min": 1,
+      "max": 275
     },
     "defaultDispenseFlowRate": {
-      "value": 300,
-      "min": 0.001,
-      "max": 600
+      "value": 275,
+      "min": 1,
+      "max": 275
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 275,
+      "min": 1,
+      "max": 275
     },
     "channels": 8,
     "minVolume": 20,
@@ -145,6 +199,7 @@
   },
   "p300_multi": {
     "displayName": "P300 8-Channel",
+    "displayCategory": "OG",
     "defaultAspirateFlowRate": {
       "value": 150,
       "min": 0.001,
@@ -155,12 +210,18 @@
       "min": 0.001,
       "max": 600
     },
+    "defaultBlowOutFlowRate": {
+      "value": 1000,
+      "min": 5,
+      "max": 1000
+    },
     "channels": 8,
     "minVolume": 30,
     "maxVolume": 300
   },
   "p1000_single": {
     "displayName": "P1000 Single-Channel",
+    "displayCategory": "OG",
     "defaultAspirateFlowRate": {
       "value": 500,
       "min": 50,
@@ -170,22 +231,33 @@
       "value": 1000,
       "min": 50,
       "max": 2000
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 1000,
+      "min": 5,
+      "max": 1000
     },
     "channels": 1,
     "minVolume": 100,
     "maxVolume": 1000
   },
-  "p1000_single_GEN2": {
+  "p1000_single_gen2": {
     "displayName": "P1000 Single-Channel GEN2",
+    "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
       "value": 500,
-      "min": 50,
-      "max": 2000
+      "min": 3,
+      "max": 812
     },
     "defaultDispenseFlowRate": {
-      "value": 1000,
-      "min": 50,
-      "max": 2000
+      "value": 800,
+      "min": 3,
+      "max": 812
+    },
+    "defaultBlowOutFlowRate": {
+      "value": 800,
+      "min": 3,
+      "max": 812
     },
     "channels": 1,
     "minVolume": 100,

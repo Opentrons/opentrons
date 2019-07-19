@@ -45,3 +45,5 @@ export type UnreachableRobot = {
 export type ViewableRobot = Robot | ReachableRobot
 
 export type AnyRobot = Robot | ReachableRobot | UnreachableRobot
+
+export type BuildrootStatus = 'balena' | 'migrating' | 'buildroot'

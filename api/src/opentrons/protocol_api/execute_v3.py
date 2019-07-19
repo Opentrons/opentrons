@@ -44,7 +44,8 @@ def _set_flow_rate(pipette, params) -> None:
 
     pipette.flow_rate = {
         'aspirate': flow_rate_param,
-        'dispense': flow_rate_param
+        'dispense': flow_rate_param,
+        'blow_out': flow_rate_param,
     }
 
 

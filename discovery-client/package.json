@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/discovery-client",
-  "version": "3.9.0",
+  "version": "3.10.1",
   "description": "Node.js client for discovering Opentrons robots on the network",
   "main": "lib/index.js",
   "bin": {
@@ -18,8 +18,8 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons#readme",
   "devDependencies": {
-    "flow-bin": "^0.97.0",
-    "flow-typed": "^2.5.1"
+    "flow-bin": "^0.102.0",
+    "flow-typed": "^2.5.2"
   },
   "dependencies": {
     "escape-string-regexp": "^1.0.5",

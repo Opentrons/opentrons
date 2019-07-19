@@ -44,7 +44,10 @@ describe('shell/api-update', () => {
       {
         name: 'getApiUpdateVersion',
         selector: apiUpdate.getApiUpdateVersion,
-        state: { shell: { apiUpdate: { version: '1.0.0' } } },
+        state: {
+          shell: { apiUpdate: { version: '1.0.0' } },
+          config: { devInternal: { enableBuildRoot: false } },
+        },
         expected: '1.0.0',
       },
       {

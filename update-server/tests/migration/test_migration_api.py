@@ -173,7 +173,7 @@ async def test_migration_happypath(otupdate_test_client, update_session,
     # Upload
     resp = await otupdate_test_client.post(
         session_endpoint(update_session, 'file'),
-        data={'ot2-migration.zip': open(downloaded_update_file, 'rb')})
+        data={'ot2-system.zip': open(downloaded_update_file, 'rb')})
     assert resp.status == 201
     body = await resp.json()
     assert body['stage'] == 'validating'
@@ -227,7 +227,7 @@ async def test_update_catches_validation_fail(otupdate_test_client,
     # Upload
     resp = await otupdate_test_client.post(
         session_endpoint(update_session, 'file'),
-        data={'ot2-migration.zip': open(downloaded_update_file, 'rb')})
+        data={'ot2-system.zip': open(downloaded_update_file, 'rb')})
     assert resp.status == 201
     body = await resp.json()
     assert body['stage'] == 'validating'

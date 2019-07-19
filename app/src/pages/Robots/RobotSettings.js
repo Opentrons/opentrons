@@ -9,12 +9,13 @@ import {
   actions as robotActions,
 } from '../../robot'
 import { getConfig } from '../../config'
-import { CONNECTABLE, REACHABLE, getRobotApiVersion } from '../../discovery'
 import {
-  getBuildrootUpdateAvailable,
-  getBuildrootUpdateSeen,
-  setBuildrootUpdateSeen,
-} from '../../shell'
+  CONNECTABLE,
+  REACHABLE,
+  getRobotApiVersion,
+  getRobotBuildrootStatus,
+} from '../../discovery'
+import { getBuildrootUpdateSeen, setBuildrootUpdateSeen } from '../../shell'
 
 import {
   makeGetRobotHome,
@@ -39,7 +40,7 @@ import ResetRobotModal from '../../components/RobotSettings/ResetRobotModal'
 
 import type { ContextRouter } from 'react-router'
 import type { State, Dispatch, Error } from '../../types'
-import type { ViewableRobot } from '../../discovery'
+import type { ViewableRobot, BuildrootStatus } from '../../discovery'
 import type { ShellUpdateState } from '../../shell'
 
 type WithRouterOP = {|
@@ -57,9 +58,9 @@ type SP = {|
   showConnectAlert: boolean,
   homeInProgress: ?boolean,
   homeError: ?Error,
-  buildrootUpdateAvailable: boolean,
   __buildRootEnabled: boolean,
   buildrootUpdateSeen: boolean,
+  buildrootStatus: BuildrootStatus | null,
 |}
 
 type DP = {| dispatch: Dispatch |}
@@ -94,6 +95,7 @@ function RobotSettingsPage(props: Props) {
     showConnectAlert,
     closeConnectAlert,
     showUpdateModal,
+    buildrootStatus,
     ignoreBuildrootUpdate,
     match: { path, url },
   } = props
@@ -125,15 +127,13 @@ function RobotSettingsPage(props: Props) {
         <Route
           path={`${path}/${UPDATE_FRAGMENT}`}
           render={() => {
-            if (
-              props.buildrootUpdateAvailable &&
-              props.buildrootUpdateSeen === false &&
-              props.__buildRootEnabled
-            ) {
+            if (props.__buildRootEnabled) {
               return (
                 <UpdateBuildroot
                   robot={robot}
+                  appUpdate={appUpdate}
                   parentUrl={url}
+                  buildrootStatus={buildrootStatus}
                   ignoreBuildrootUpdate={ignoreBuildrootUpdate}
                 />
               )
@@ -198,26 +198,21 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
 
   return (state, ownProps) => {
     const { robot } = ownProps
-    const version = getRobotApiVersion(robot)
+    const robotVersion = getRobotApiVersion(robot)
     const connectRequest = robotSelectors.getConnectRequest(state)
     const homeRequest = getHomeRequest(state, robot)
     const ignoredRequest = getUpdateIgnoredRequest(state, robot)
     const restartRequest = getRestartRequest(state, robot)
     const updateInfo = getRobotUpdateInfo(state, robot)
-    const buildrootUpdateAvailable =
-      !!version && getBuildrootUpdateAvailable(state, version)
-
+    const buildrootStatus = getRobotBuildrootStatus(robot)
     const buildrootUpdateSeen = getBuildrootUpdateSeen(state)
     const __buildRootEnabled = Boolean(
       getConfig(state).devInternal?.enableBuildRoot
     )
     let showUpdateModal: ?boolean
     if (__buildRootEnabled) {
-      // TODO (ka 2019-06-24): Layer in ignore and restart complexity
       showUpdateModal =
-        buildrootUpdateAvailable &&
-        // have not ignored update this session
-        !buildrootUpdateSeen
+        !buildrootUpdateSeen && robotVersion !== updateInfo.version
     } else {
       showUpdateModal =
         // only show the alert modal if there's an upgrade available
@@ -235,7 +230,7 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
 
     return {
       __buildRootEnabled,
-      buildrootUpdateAvailable,
+      buildrootStatus,
       buildrootUpdateSeen,
       showUpdateModal: !!showUpdateModal,
       homeInProgress: homeRequest && homeRequest.inProgress,

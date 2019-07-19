@@ -22,11 +22,17 @@ Object {
     "min": 0.001,
     "value": 5,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 50,
     "min": 0.001,
     "value": 10,
   },
+  "displayCategory": "OG",
   "displayName": "P10 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -210,11 +216,17 @@ Object {
     "min": 0.001,
     "value": 5,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 50,
     "min": 0.001,
     "value": 10,
   },
+  "displayCategory": "OG",
   "displayName": "P10 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -398,11 +410,17 @@ Object {
     "min": 0.001,
     "value": 5,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 50,
     "min": 0.001,
     "value": 10,
   },
+  "displayCategory": "OG",
   "displayName": "P10 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -586,11 +604,17 @@ Object {
     "min": 0.001,
     "value": 5,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 50,
     "min": 0.001,
     "value": 10,
   },
+  "displayCategory": "OG",
   "displayName": "P10 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -744,11 +768,17 @@ Object {
     "min": 0.001,
     "value": 5,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 50,
     "min": 0.001,
     "value": 10,
   },
+  "displayCategory": "OG",
   "displayName": "P10 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -937,11 +967,17 @@ Object {
     "min": 0.001,
     "value": 5,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 50,
     "min": 0.001,
     "value": 10,
   },
+  "displayCategory": "OG",
   "displayName": "P10 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -1130,11 +1166,17 @@ Object {
     "min": 0.001,
     "value": 5,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 50,
     "min": 0.001,
     "value": 10,
   },
+  "displayCategory": "OG",
   "displayName": "P10 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -1323,11 +1365,17 @@ Object {
     "min": 0.001,
     "value": 5,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 50,
     "min": 0.001,
     "value": 10,
   },
+  "displayCategory": "OG",
   "displayName": "P10 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -1480,11 +1528,17 @@ Object {
     "min": 0.001,
     "value": 25,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 100,
     "min": 0.001,
     "value": 50,
   },
+  "displayCategory": "OG",
   "displayName": "P50 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -1658,11 +1712,17 @@ Object {
     "min": 0.001,
     "value": 25,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 100,
     "min": 0.001,
     "value": 50,
   },
+  "displayCategory": "OG",
   "displayName": "P50 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -1836,11 +1896,17 @@ Object {
     "min": 0.001,
     "value": 25,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 100,
     "min": 0.001,
     "value": 50,
   },
+  "displayCategory": "OG",
   "displayName": "P50 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -2014,11 +2080,17 @@ Object {
     "min": 0.001,
     "value": 25,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 100,
     "min": 0.001,
     "value": 50,
   },
+  "displayCategory": "OG",
   "displayName": "P50 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -2172,11 +2244,17 @@ Object {
     "min": 0.001,
     "value": 25,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 100,
     "min": 0.001,
     "value": 50,
   },
+  "displayCategory": "OG",
   "displayName": "P50 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -2350,11 +2428,17 @@ Object {
     "min": 0.001,
     "value": 25,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 100,
     "min": 0.001,
     "value": 50,
   },
+  "displayCategory": "OG",
   "displayName": "P50 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -2528,11 +2612,17 @@ Object {
     "min": 0.001,
     "value": 25,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 100,
     "min": 0.001,
     "value": 50,
   },
+  "displayCategory": "OG",
   "displayName": "P50 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -2706,11 +2796,17 @@ Object {
     "min": 0.001,
     "value": 150,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 600,
     "min": 0.001,
     "value": 300,
   },
+  "displayCategory": "OG",
   "displayName": "P300 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -2848,11 +2944,17 @@ Object {
     "min": 0.001,
     "value": 150,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 600,
     "min": 0.001,
     "value": 300,
   },
+  "displayCategory": "OG",
   "displayName": "P300 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -2990,11 +3092,17 @@ Object {
     "min": 0.001,
     "value": 150,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 600,
     "min": 0.001,
     "value": 300,
   },
+  "displayCategory": "OG",
   "displayName": "P300 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -3132,11 +3240,17 @@ Object {
     "min": 0.001,
     "value": 150,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 600,
     "min": 0.001,
     "value": 300,
   },
+  "displayCategory": "OG",
   "displayName": "P300 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -3275,11 +3389,17 @@ Object {
     "min": 0.001,
     "value": 150,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 600,
     "min": 0.001,
     "value": 300,
   },
+  "displayCategory": "OG",
   "displayName": "P300 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -3473,11 +3593,17 @@ Object {
     "min": 0.001,
     "value": 150,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 600,
     "min": 0.001,
     "value": 300,
   },
+  "displayCategory": "OG",
   "displayName": "P300 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -3671,11 +3797,17 @@ Object {
     "min": 0.001,
     "value": 150,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 600,
     "min": 0.001,
     "value": 300,
   },
+  "displayCategory": "OG",
   "displayName": "P300 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -3869,11 +4001,17 @@ Object {
     "min": 0.001,
     "value": 150,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 600,
     "min": 0.001,
     "value": 300,
   },
+  "displayCategory": "OG",
   "displayName": "P300 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -4031,11 +4169,17 @@ Object {
     "min": 50,
     "value": 500,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 2000,
     "min": 50,
     "value": 1000,
   },
+  "displayCategory": "OG",
   "displayName": "P1000 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -4194,11 +4338,17 @@ Object {
     "min": 50,
     "value": 500,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 2000,
     "min": 50,
     "value": 1000,
   },
+  "displayCategory": "OG",
   "displayName": "P1000 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -4357,11 +4507,17 @@ Object {
     "min": 50,
     "value": 500,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 2000,
     "min": 50,
     "value": 1000,
   },
+  "displayCategory": "OG",
   "displayName": "P1000 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -4520,11 +4676,17 @@ Object {
     "min": 50,
     "value": 500,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 2000,
     "min": 50,
     "value": 1000,
   },
+  "displayCategory": "OG",
   "displayName": "P1000 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -4669,11 +4831,17 @@ Object {
     "min": 0.001,
     "value": 5,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 50,
     "min": 0.001,
     "value": 10,
   },
+  "displayCategory": "OG",
   "displayName": "P10 8-Channel",
   "maxVolume": 10,
   "minVolume": 1,
@@ -4689,11 +4857,17 @@ Object {
     "min": 0.001,
     "value": 5,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 50,
     "min": 0.001,
     "value": 10,
   },
+  "displayCategory": "OG",
   "displayName": "P10 Single-Channel",
   "maxVolume": 10,
   "minVolume": 1,
@@ -4709,11 +4883,17 @@ Object {
     "min": 0.001,
     "value": 25,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 100,
     "min": 0.001,
     "value": 50,
   },
+  "displayCategory": "OG",
   "displayName": "P50 8-Channel",
   "maxVolume": 50,
   "minVolume": 5,
@@ -4729,11 +4909,17 @@ Object {
     "min": 0.001,
     "value": 25,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 100,
     "min": 0.001,
     "value": 50,
   },
+  "displayCategory": "OG",
   "displayName": "P50 Single-Channel",
   "maxVolume": 50,
   "minVolume": 5,
@@ -4749,11 +4935,17 @@ Object {
     "min": 0.001,
     "value": 150,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 600,
     "min": 0.001,
     "value": 300,
   },
+  "displayCategory": "OG",
   "displayName": "P300 8-Channel",
   "maxVolume": 300,
   "minVolume": 30,
@@ -4769,11 +4961,17 @@ Object {
     "min": 0.001,
     "value": 150,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 600,
     "min": 0.001,
     "value": 300,
   },
+  "displayCategory": "OG",
   "displayName": "P300 Single-Channel",
   "maxVolume": 300,
   "minVolume": 30,
@@ -4789,11 +4987,17 @@ Object {
     "min": 50,
     "value": 500,
   },
+  "defaultBlowOutFlowRate": Object {
+    "max": 1000,
+    "min": 5,
+    "value": 1000,
+  },
   "defaultDispenseFlowRate": Object {
     "max": 2000,
     "min": 50,
     "value": 1000,
   },
+  "displayCategory": "OG",
   "displayName": "P1000 Single-Channel",
   "maxVolume": 1000,
   "minVolume": 100,

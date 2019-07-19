@@ -4,6 +4,8 @@ import pytest
 
 from tests.opentrons.conftest import fuzzy_assert
 from opentrons.config.robot_configs import DEFAULT_GANTRY_STEPS_PER_MM
+from opentrons.drivers import serial_communication
+from opentrons.drivers.smoothie_drivers import driver_3_0
 
 
 def position(x, y, z, a, b, c):
@@ -65,7 +67,7 @@ def test_remove_serial_echo(smoothie, monkeypatch):
     from opentrons.drivers.smoothie_drivers import driver_3_0
     smoothie.simulating = False
 
-    def return_echo_response(command, ack, connection, timeout):
+    def return_echo_response(command, ack, connection, timeout, tag=None):
         if 'some-data' in command:
             return command + 'TESTS-RULE'
         return command
@@ -86,7 +88,7 @@ def test_remove_serial_echo(smoothie, monkeypatch):
         driver_3_0.SMOOTHIE_ACK)
     assert res == 'TESTS-RULE'
 
-    def return_echo_response(command, ack, connection, timeout):
+    def return_echo_response(command, ack, connection, timeout, tag=None):
         if 'some-data' in command:
             return command.strip() + '\r\nT\r\nESTS-RULE'
         return command
@@ -125,7 +127,7 @@ def test_dwell_and_activate_axes(smoothie, monkeypatch):
     smoothie._setup()
     smoothie.simulating = False
 
-    def write_with_log(command, ack, connection, timeout):
+    def write_with_log(command, ack, connection, timeout, tag=None):
         command_log.append(command.strip())
         return driver_3_0.SMOOTHIE_ACK
 
@@ -170,7 +172,7 @@ def test_disable_motor(smoothie, monkeypatch):
     command_log = []
     smoothie.simulating = False
 
-    def write_with_log(command, ack, connection, timeout):
+    def write_with_log(command, ack, connection, timeout, tag=None):
         command_log.append(command.strip())
         return driver_3_0.SMOOTHIE_ACK
 
@@ -206,7 +208,7 @@ def test_plunger_commands(smoothie, monkeypatch):
     smoothie.home()
     smoothie.simulating = False
 
-    def write_with_log(command, ack, connection, timeout):
+    def write_with_log(command, ack, connection, timeout, tag=None):
         command_log.append(command.strip())
         return driver_3_0.SMOOTHIE_ACK
 
@@ -310,7 +312,7 @@ def test_set_active_current(smoothie, monkeypatch):
     smoothie.home()
     smoothie.simulating = False
 
-    def write_with_log(command, ack, connection, timeout):
+    def write_with_log(command, ack, connection, timeout, tag=None):
         command_log.append(command.strip())
         return driver_3_0.SMOOTHIE_ACK
 
@@ -380,7 +382,7 @@ def test_set_acceleration(smoothie, monkeypatch):
     smoothie.home()
     smoothie.simulating = False
 
-    def write_with_log(command, ack, connection, timeout):
+    def write_with_log(command, ack, connection, timeout, tag=None):
         command_log.append(command.strip())
         return driver_3_0.SMOOTHIE_ACK
 
@@ -717,7 +719,7 @@ def test_clear_limit_switch(smoothie, monkeypatch):
     driver.home('xyza')
     cmd_list = []
 
-    def write_mock(command, ack, serial_connection, timeout):
+    def write_mock(command, ack, serial_connection, timeout, tag=None):
         nonlocal cmd_list
         cmd_list.append(command)
         if GCODES['MOVE'] in command:
@@ -812,7 +814,7 @@ def test_speed_change(model, monkeypatch):
     from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
 
-    def write_with_log(command, ack, connection, timeout):
+    def write_with_log(command, ack, connection, timeout, tag=None):
         if 'G0F' in command:
             command_log.append(command.strip())
         elif 'M114' in command:
@@ -848,7 +850,7 @@ def test_max_speed_change(model, monkeypatch):
     from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
 
-    def write_with_log(command, ack, connection, timeout):
+    def write_with_log(command, ack, connection, timeout, tag=None):
         if 'M203.1' in command or 'G0F' in command:
             command_log.append(command.strip())
         return driver_3_0.SMOOTHIE_ACK
@@ -886,14 +888,12 @@ def test_pause_in_protocol(model):
 
 @pytest.mark.api1_only
 def test_send_command_with_retry(model, monkeypatch):
-    from opentrons.drivers import serial_communication
-
     robot = model.robot
     robot._driver.simulating = False
 
     count = 0
 
-    def _no_response(command, ack, connection, timeout):
+    def _no_response(command, ack, connection, timeout, tag=None):
         nonlocal count
         count += 1
         if count < 3:
@@ -1022,3 +1022,26 @@ def test_unstick_axes(model):
     # from pprint import pprint
     # pprint(current_log)
     assert current_log == expected
+
+
+@pytest.mark.api1_only
+def test_alarm_unhandled(model, monkeypatch):
+    driver = model.robot._driver
+    driver.simulating = False
+    killmsg = 'ALARM: Kill button pressed - reset or M999 to continue\r\n'
+
+    def fake_write_and_return(cmdstr, ack, conn, timeout=None, tag=None):
+
+        return cmdstr + killmsg
+
+    monkeypatch.setattr(serial_communication, 'write_and_return',
+                        fake_write_and_return)
+    assert serial_communication.write_and_return is fake_write_and_return
+    driver.move({'X': 0})
+
+    driver._is_hard_halting.set()
+
+    with pytest.raises(driver_3_0.SmoothieAlarm):
+        driver.move({'X': 25})
+
+    assert not driver._is_hard_halting.is_set()

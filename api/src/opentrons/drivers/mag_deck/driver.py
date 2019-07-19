@@ -293,7 +293,8 @@ class MagDeck:
                 cmd,
                 MAG_DECK_ACK,
                 self._connection,
-                timeout)
+                timeout,
+                tag=f'magdeck {id(self)}')
         except SerialNoResponse as e:
             retries -= 1
             if retries <= 0:

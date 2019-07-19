@@ -226,7 +226,7 @@ export const getPipettesForInstrumentGroup: Selector<PipettesForInstrumentGroup>
 
         const pipetteForInstrumentGroup: InstrumentInfoProps = {
           mount: pipetteOnDeck.mount,
-          channels: pipetteSpec ? pipetteSpec.channels : undefined,
+          pipetteSpecs: pipetteSpec,
           description: _getPipetteDisplayName(pipetteOnDeck.name),
           isDisabled: false,
           tiprackModel: getLabwareDisplayName(tiprackDef),

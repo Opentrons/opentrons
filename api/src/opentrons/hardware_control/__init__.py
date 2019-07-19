@@ -325,7 +325,7 @@ class API(HardwareAPILike):
         configs = ['name', 'min_volume', 'max_volume', 'channels',
                    'aspirate_flow_rate', 'dispense_flow_rate',
                    'pipette_id', 'current_volume', 'display_name',
-                   'tip_length', 'model']
+                   'tip_length', 'model', 'blow_out_flow_rate']
         instruments: Dict[top_types.Mount, Pipette.DictType] = {
             top_types.Mount.LEFT: {},
             top_types.Mount.RIGHT: {}
@@ -338,6 +338,12 @@ class API(HardwareAPILike):
             for key in configs:
                 instruments[mount][key] = instr_dict[key]
             instruments[mount]['has_tip'] = instr.has_tip
+            instruments[mount]['aspirate_speed'] = self._plunger_speed(
+                instr, instr.config.aspirate_flow_rate, 'aspirate')
+            instruments[mount]['dispense_speed'] = self._plunger_speed(
+                instr, instr.config.dispense_flow_rate, 'dispense')
+            instruments[mount]['blow_out_speed'] = self._plunger_speed(
+                instr, instr.config.blow_out_flow_rate, 'dispense')
         return instruments
 
     attached_instruments = property(fget=get_attached_instruments)
@@ -372,7 +378,7 @@ class API(HardwareAPILike):
 
     # Global actions API
     @_log_call
-    async def pause(self):
+    def pause(self):
         """
         Pause motion of the robot after a current motion concludes.
 
@@ -386,11 +392,11 @@ class API(HardwareAPILike):
         """
         self._backend.pause()
 
-    async def pause_with_message(self, message):
+    def pause_with_message(self, message):
         self._log.warning('Pause with message: {}'.format(message))
         for cb in self._callbacks:
             cb(message)
-        await self.pause()
+        self.pause()
 
     @_log_call
     def resume(self):
@@ -400,14 +406,31 @@ class API(HardwareAPILike):
         self._backend.resume()
 
     @_log_call
-    async def halt(self):
-        """ Immediately stop motion, reset, and home.
+    def halt(self):
+        """ Immediately stop motion.
+
+        Calls to :py:meth:`stop` through the synch adapter while other calls
+        are ongoing will typically wait until those calls are done, since most
+        of the async calls here in fact block the loop while they talk to
+        smoothie. To provide actual immediate halting, call this method which
+        does not require use of the loop.
+
+        After this call, the smoothie will be in a bad state until a call to
+        :py:meth:`stop`.
+        """
+        self._log.info("Halting")
+        self._backend.hard_halt()
+
+    async def stop(self):
+        """
+        Stop motion as soon as possible, reset, and home.
 
         This will cancel motion (after the current call to :py:meth:`move`;
         see :py:meth:`pause` for more detail), then home and reset the
         robot.
         """
         self._backend.halt()
+        self._log.info("Recovering from halt")
         await self.reset()
         await self.home()
 
@@ -888,7 +911,8 @@ class API(HardwareAPILike):
                 this_pipette,
                 this_pipette.current_volume + asp_vol,
                 'aspirate')
-        speed = this_pipette.config.aspirate_flow_rate * rate
+        flow_rate = this_pipette.config.aspirate_flow_rate * rate
+        speed = self._plunger_speed(this_pipette, flow_rate, 'aspirate')
         try:
             await self._move_plunger(mount, dist, speed=speed)
         except Exception:
@@ -934,9 +958,10 @@ class API(HardwareAPILike):
                 this_pipette,
                 this_pipette.current_volume - disp_vol,
                 'dispense')
-        speed = this_pipette.config.dispense_flow_rate * rate
+        flow_rate = this_pipette.config.dispense_flow_rate * rate
+        speed = self._plunger_speed(this_pipette, flow_rate, 'dispense')
         try:
-            await self._move_plunger(mount, dist, speed)
+            await self._move_plunger(mount, dist, speed=speed)
         except Exception:
             self._log.exception('Dispense failed')
             this_pipette.set_current_volume(0)
@@ -949,6 +974,16 @@ class API(HardwareAPILike):
         mm = ul / instr.ul_per_mm(ul, action)
         position = mm + instr.config.bottom
         return round(position, 6)
+
+    def _plunger_speed(
+            self, instr: Pipette, ul_per_s: float, action: str) -> float:
+        mm_per_s = ul_per_s / instr.ul_per_mm(instr.config.max_volume, action)
+        return round(mm_per_s, 6)
+
+    def _plunger_flowrate(
+            self, instr: Pipette, mm_per_s: float, action: str) -> float:
+        ul_per_s = mm_per_s * instr.ul_per_mm(instr.config.max_volume, action)
+        return round(ul_per_s, 6)
 
     @_log_call
     async def blow_out(self, mount):
@@ -963,9 +998,12 @@ class API(HardwareAPILike):
 
         self._backend.set_active_current(Axis.of_plunger(mount),
                                          this_pipette.config.plunger_current)
+        speed = self._plunger_speed(
+            this_pipette, this_pipette.config.blow_out_flow_rate, 'dispense')
         try:
             await self._move_plunger(
-                mount, this_pipette.config.blow_out)
+                mount, this_pipette.config.blow_out,
+                speed=speed)
         except Exception:
             self._log.exception('Blow out failed')
             raise
@@ -1135,7 +1173,8 @@ class API(HardwareAPILike):
             instr.update_config_item(key, pos_dict[key])
 
     @_log_call
-    def set_flow_rate(self, mount, aspirate=None, dispense=None):
+    def set_flow_rate(self, mount,
+                      aspirate=None, dispense=None, blow_out=None):
         this_pipette = self._attached_instruments[mount]
         if not this_pipette:
             raise top_types.PipetteNotAttachedError(
@@ -1144,6 +1183,28 @@ class API(HardwareAPILike):
             this_pipette.update_config_item('aspirate_flow_rate', aspirate)
         if dispense:
             this_pipette.update_config_item('dispense_flow_rate', dispense)
+        if blow_out:
+            this_pipette.update_config_item('blow_out_flow_rate', blow_out)
+
+    @_log_call
+    def set_pipette_speed(self, mount,
+                          aspirate=None, dispense=None, blow_out=None):
+        this_pipette = self._attached_instruments[mount]
+        if not this_pipette:
+            raise top_types.PipetteNotAttachedError(
+                "No pipette attached to {} mount".format(mount))
+        if aspirate:
+            this_pipette.update_config_item(
+                'aspirate_flow_rate',
+                self._plunger_flowrate(this_pipette, aspirate, 'aspirate'))
+        if dispense:
+            this_pipette.update_config_item(
+                'dispense_flow_rate',
+                self._plunger_flowrate(this_pipette, dispense, 'dispense'))
+        if blow_out:
+            this_pipette.update_config_item(
+                'blow_out_flow_rate',
+                self._plunger_flowrate(this_pipette, blow_out, 'dispense'))
 
     @_log_call
     async def discover_modules(self):
@@ -1155,11 +1216,13 @@ class API(HardwareAPILike):
         gone = known - these
         for mod in gone:
             self._attached_modules.pop(mod)
+            self._log.info(f"Module {mod} disconnected")
         for mod in new:
             self._attached_modules[mod]\
                 = await self._backend.build_module(discovered[mod][0],
                                                    discovered[mod][1],
                                                    self.pause_with_message)
+            self._log.info(f"Module {mod} discovered and attached")
         return list(self._attached_modules.values())
 
     @_log_call

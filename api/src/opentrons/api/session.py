@@ -306,6 +306,7 @@ class Session(object):
         return self
 
     def stop(self):
+        self._hardware.halt()
         self._hardware.stop()
         self.set_state('stopped')
         return self
@@ -343,13 +344,16 @@ class Session(object):
             self._pre_run_hooks()
             if ff.use_protocol_api_v2():
                 self._hardware.cache_instruments()
-                ctx = ProtocolContext(loop=self._loop, broker=self._broker)
+                ctx = ProtocolContext(
+                    loop=self._loop, broker=self._broker)
                 ctx.connect(self._hardware)
                 ctx.home()
                 if self._is_json_protocol:
-                    run_protocol(protocol_json=self._protocol, context=ctx)
+                    run_protocol(protocol_json=self._protocol,
+                                 context=ctx)
                 else:
-                    run_protocol(protocol_code=self._protocol, context=ctx)
+                    run_protocol(protocol_code=self._protocol,
+                                 context=ctx)
             else:
                 self._hardware.broker = self._broker
                 if self._is_json_protocol:

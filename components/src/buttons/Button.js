@@ -27,7 +27,7 @@ export type ButtonProps = {
   /** type of button (default "button") */
   type?: 'submit' | 'reset' | 'button',
   /** custom element or component to use instead of `<button>` */
-  Component?: React.ElementType,
+  Component?: string | React.AbstractComponent<any>,
   /** handlers for HoverTooltipComponent */
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
   /** html tabindex property */
@@ -38,7 +38,7 @@ export type ButtonProps = {
 const STRIP_PROPS = ['inverted', 'iconName', 'children', 'Component']
 
 /**
- * Basic, unstyled button. You probably want to use a styled button
+ * Basic, un-styled button. You probably want to use a styled button
  * instead. All buttons take the same props.
  *
  * If you need access to the ButtonProps type, you can:

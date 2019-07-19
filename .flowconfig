@@ -10,18 +10,35 @@
 <PROJECT_ROOT>/update-server/.*
 
 [untyped]
-.*/node_modules/.*
-<PROJECT_ROOT>/shared-data/deck/\(definitions\|fixtures\)/.*
-<PROJECT_ROOT>/shared-data/labware/definitions/.*
-<PROJECT_ROOT>/shared-data/module/\(definitions\|fixtures\)/.*
+; TODO(mc, 2019-06-28): upgrade react-select for types that don't fail
+.*/node_modules/react-select/.*
 
 [include]
 
 [libs]
 
 [lints]
+deprecated-type=warn
+; TODO(mc, 2019-06-28): turn this on once flow-typed defs have caught up
+implicit-inexact-object=off
+sketchy-null=warn
+sketchy-number=warn
+unnecessary-optional-chain=warn
+untyped-type-import=error
 
 [options]
 module.name_mapper.extension='css' -> '@opentrons/components/interfaces/CSSModule.js'
+module.ignore_non_literal_requires=true
 merge_timeout=300
 esproposal.optional_chaining=enable
+
+[strict]
+deprecated-type
+nonstrict-import
+sketchy-null
+sketchy-number
+unclear-type
+unnecessary-optional-chain
+unsafe-getters-setters
+untyped-import
+untyped-type-import

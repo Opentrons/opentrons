@@ -94,6 +94,7 @@ def setup_logging():
     # add the handlers to the logger
     logger.addHandler(fh)
     logger.addHandler(ch)
+    logging.getLogger().handlers = [fh, ch]
     return logger
 
 

@@ -1,12 +1,11 @@
 @import '@opentrons/components';
 
 :root {
-
   --bg-modal-transparent: {
     max-width: 30rem;
     padding-top: 3rem;
     background-color: transparent;
-  };
+  }
 }
 
 .modal {
@@ -142,4 +141,9 @@
   margin: 2rem auto 0 auto;
   padding-left: 2.5rem;
   padding-right: 2.5rem;
+}
+
+.flipped_image {
+  transform: scaleX(-1);
+  filter: FlipH;
 }

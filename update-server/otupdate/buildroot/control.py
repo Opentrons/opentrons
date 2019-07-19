@@ -48,7 +48,7 @@ def build_health_endpoint(
                 'smoothieVersion': 'unimplemented',
                 'systemVersion': version_dict.get(
                     'buildroot_version', 'unknown'),
-                'capabilities': {'buildroot-update': '/server/update/begin',
+                'capabilities': {'buildrootUpdate': '/server/update/begin',
                                  'restart': '/server/restart'}
             },
             headers={'Access-Control-Allow-Origin': '*'}

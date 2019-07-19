@@ -146,7 +146,7 @@ class Pipette:
         Add a tip to the pipette for position tracking and validation
         (effectively updates the pipette's critical point)
 
-        :param tip_length: a positive, non-zero float representing the distance
+        :param tip_length: a positive, non-zero float presenting the distance
             in Z from the end of the pipette nozzle to the end of the tip
         :return:
         """

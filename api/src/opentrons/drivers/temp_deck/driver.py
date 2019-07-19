@@ -202,7 +202,8 @@ class TempDeck:
         self._send_command('\r\n', timeout=DEFAULT_TEMP_DECK_TIMEOUT)
 
     # Potential place for command optimization (buffering, flushing, etc)
-    def _send_command(self, command, timeout=DEFAULT_TEMP_DECK_TIMEOUT):
+    def _send_command(
+            self, command, timeout=DEFAULT_TEMP_DECK_TIMEOUT, tag=None):
         """
 
         """
@@ -220,13 +221,16 @@ class TempDeck:
 
         return ret_code.strip()
 
-    def _recursive_write_and_return(self, cmd, timeout, retries):
+    def _recursive_write_and_return(self, cmd, timeout, retries, tag=None):
+        if not tag:
+            tag = f'tempdeck {id(self)}'
         try:
             return serial_communication.write_and_return(
                 cmd,
                 TEMP_DECK_ACK,
                 self._connection,
-                timeout)
+                timeout,
+                tag=tag)
         except SerialNoResponse as e:
             retries -= 1
             if retries <= 0:
@@ -236,11 +240,13 @@ class TempDeck:
                 self._connection.close()
                 self._connection.open()
             return self._recursive_write_and_return(
-                cmd, timeout, retries)
+                cmd, timeout, retries, tag=tag)
 
     def _recursive_update_temperature(self, retries):
         try:
-            res = self._send_command(GCODES['GET_TEMP'])
+            res = self._send_command(
+                GCODES['GET_TEMP'],
+                tag=f'tempdeck {id(self)} rut')
             res = utils.parse_temperature_response(
                   res, utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
             self._temperature.update(res)

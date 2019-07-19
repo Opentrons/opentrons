@@ -8,6 +8,10 @@
     },
     "channels": {
       "enum": [1, 8]
+    },
+    "displayCategory": {
+      "type": "string",
+      "enum": ["OG", "GEN2"]
     }
   },
 
@@ -22,6 +26,7 @@
         "displayName",
         "defaultAspirateFlowRate",
         "defaultDispenseFlowRate",
+        "defaultBlowOutFlowRate",
         "maxVolume",
         "minVolume"
       ],
@@ -38,7 +43,13 @@
           "min": { "$ref": "#/definitions/positiveNumber" },
           "max": { "$ref": "#/definitions/positiveNumber" }
         },
+        "defaultBlowOutFlowRate": {
+          "value": { "$ref": "#/definitions/positiveNumber" },
+          "min": { "$ref": "#/definitions/positiveNumber" },
+          "max": { "$ref": "#/definitions/positiveNumber" }
+        },
         "displayName": { "type": "string" },
+        "displayCategory": { "$ref": "#/definitions/displayCategory" },
         "maxVolume": { "$ref": "#/definitions/positiveNumber" },
         "minVolume": { "$ref": "#/definitions/positiveNumber" }
       }

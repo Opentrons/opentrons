@@ -50,7 +50,7 @@ export default function Pipettes(props: Props) {
           description: pipetteConfig.displayName,
           tiprackModel:
             tiprack?.definition?.metadata.displayName || tiprack?.name || 'N/A',
-          channels: pipetteConfig.channels,
+          pipetteSpecs: pipetteConfig,
         }
 
     let showAlert = false

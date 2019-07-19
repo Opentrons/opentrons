@@ -26,7 +26,8 @@ class UpdateSession:
     State machine for update sessions
     """
     def __init__(self, storage_path: str) -> None:
-        self._token = base64.urlsafe_b64encode(uuid.uuid4().bytes).decode()
+        self._token = base64.urlsafe_b64encode(uuid.uuid4().bytes)\
+                            .decode().strip('=')
         self._stage = Stages.AWAITING_FILE
         self._progress = 0.0
         self._message = ''
