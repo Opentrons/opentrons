@@ -11,8 +11,8 @@ import {
   type ProcessedLabwareFields,
   type ProcessedLabwareCommonFields,
   type ProcessedLabwareTypeFields,
-} from '../fields'
-import fieldsToLabware from '../fieldsToLabware'
+} from './fields'
+import fieldsToLabware from './fieldsToLabware'
 
 const getDefaultFormState = (): LabwareFields => ({
   labwareType: null,

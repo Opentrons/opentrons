@@ -12,7 +12,7 @@ import Page from './Page'
 import LabwareList from '../LabwareList'
 import LabwareDetails from '../LabwareDetails'
 import styles from './styles.css'
-import LabwareCreatorApp from '@opentrons/labware-designer'
+import LabwareCreatorApp from '../../labware-creator'
 
 import type { DefinitionRouteRenderProps } from '../../definitions'
 
