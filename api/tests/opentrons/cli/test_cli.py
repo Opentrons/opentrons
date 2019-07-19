@@ -3,11 +3,9 @@ import pytest
 import sys
 import numpy as np
 
-from opentrons import robot
 from opentrons.config import (CONFIG,
                               robot_configs,
                               advanced_settings as advs)
-from opentrons.types import Mount
 from opentrons.deck_calibration import dc_main
 from opentrons.deck_calibration.dc_main import get_calibration_points
 from opentrons.deck_calibration.endpoints import expected_points
@@ -17,14 +15,17 @@ from opentrons.deck_calibration.endpoints import expected_points
 def mock_config():
     yield robot_configs.load()
     robot_configs.clear()
-# params=['p300_single_v1.4', 'p300_single_v2.0'], ids=['model1', 'model2']
+
+
 @pytest.fixture
 def model1():
     return ('p300_single_v1.4', 'p300_single')
 
+
 @pytest.fixture
 def model2():
     return ('p300_single_v2.0', 'p300_single_gen2')
+
 
 @pytest.fixture
 def hardware(monkeypatch, async_server, model1, model2):
@@ -43,6 +44,7 @@ def hardware(monkeypatch, async_server, model1, model2):
 
     monkeypatch.setattr(hardware, 'cache_instrument_models', fake_cached)
     yield hardware
+
 
 @pytest.mark.api1_only
 def test_clear_config(mock_config, async_server):
@@ -230,4 +232,5 @@ def test_try_pickup_tip(
         get_calibration_points(),
         hardware,
         loop=loop)
-    tool.try_pickup_tip()
+    output = tool.try_pickup_tip()
+    assert output == 'Picked up tip!'
