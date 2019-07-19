@@ -39,7 +39,7 @@ export type {
 
 export type { RobotMove, RobotHome, RobotLights } from './robot'
 
-export type State = $Call<typeof reducer>
+export type State = $Call<typeof reducer, void, Action>
 
 export type HttpApiAction =
   | CalibrationAction

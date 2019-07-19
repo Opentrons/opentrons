@@ -38,17 +38,17 @@ type CalibrationRequest = {
   error: ?{ message: string },
 }
 
-export type State = {
-  +deckPopulated: ?boolean,
-  +modulesReviewed: ?boolean,
+export type CalibrationState = $ReadOnly<{
+  deckPopulated: ?boolean,
+  modulesReviewed: ?boolean,
 
-  +probedByMount: { [Mount]: boolean },
-  +tipOnByMount: { [Mount]: boolean },
+  probedByMount: { [Mount]: boolean },
+  tipOnByMount: { [Mount]: boolean },
 
-  +confirmedBySlot: { [Slot]: boolean },
+  confirmedBySlot: { [Slot]: boolean },
 
-  +calibrationRequest: CalibrationRequest,
-}
+  calibrationRequest: CalibrationRequest,
+}>
 
 // TODO(mc, 2018-01-11): replace actionType constants with Flow types
 const {
@@ -60,7 +60,7 @@ const {
   CONFIRM_LABWARE,
 } = actionTypes
 
-const INITIAL_STATE: State = {
+const INITIAL_STATE: CalibrationState = {
   deckPopulated: null,
   modulesReviewed: null,
 
@@ -74,9 +74,9 @@ const INITIAL_STATE: State = {
 }
 
 export default function calibrationReducer(
-  state: State = INITIAL_STATE,
+  state: CalibrationState = INITIAL_STATE,
   action: Action
-): State {
+): CalibrationState {
   switch (action.type) {
     case 'robot:DISCONNECT_RESPONSE':
     case 'robot:REFRESH_SESSION':
@@ -161,18 +161,24 @@ export default function calibrationReducer(
   return state
 }
 
-function handleSetDeckPopulated(state: State, action: any): State {
+function handleSetDeckPopulated(
+  state: CalibrationState,
+  action: any
+): CalibrationState {
   return { ...state, deckPopulated: action.payload }
 }
 
 function handleSetModulesReviewed(
-  state: State,
+  state: CalibrationState,
   action: SetModulesReviewedAction
-): State {
+): CalibrationState {
   return { ...state, modulesReviewed: action.payload }
 }
 
-function handleMoveToFront(state: State, action: any): State {
+function handleMoveToFront(
+  state: CalibrationState,
+  action: any
+): CalibrationState {
   if (!action.payload || !action.payload.mount) return state
 
   const {
@@ -192,7 +198,10 @@ function handleMoveToFront(state: State, action: any): State {
   }
 }
 
-function handleMoveToFrontResponse(state: State, action: any): State {
+function handleMoveToFrontResponse(
+  state: CalibrationState,
+  action: any
+): CalibrationState {
   const { payload, error } = action
 
   return {
@@ -205,7 +214,10 @@ function handleMoveToFrontResponse(state: State, action: any): State {
   }
 }
 
-function handleProbeTip(state: State, action: any) {
+function handleProbeTip(
+  state: CalibrationState,
+  action: any
+): CalibrationState {
   if (!action.payload || !action.payload.mount) return state
 
   const {
@@ -227,7 +239,10 @@ function handleProbeTip(state: State, action: any) {
   }
 }
 
-function handleProbeTipResponse(state: State, action: any) {
+function handleProbeTipResponse(
+  state: CalibrationState,
+  action: any
+): CalibrationState {
   const { payload, error } = action
 
   return {
@@ -241,14 +256,20 @@ function handleProbeTipResponse(state: State, action: any) {
   }
 }
 
-function handleConfirmProbed(state: State, action: ConfirmProbedAction): State {
+function handleConfirmProbed(
+  state: CalibrationState,
+  action: ConfirmProbedAction
+): CalibrationState {
   return {
     ...state,
     probedByMount: { ...state.probedByMount, [action.payload]: true },
   }
 }
 
-function handleMoveTo(state: State, action: LabwareCalibrationAction): State {
+function handleMoveTo(
+  state: CalibrationState,
+  action: LabwareCalibrationAction
+): CalibrationState {
   const { mount, slot } = action.payload
 
   return {
@@ -266,9 +287,9 @@ function handleMoveTo(state: State, action: LabwareCalibrationAction): State {
 }
 
 function handleMoveToSuccess(
-  state: State,
+  state: CalibrationState,
   action: CalibrationSuccessAction
-): State {
+): CalibrationState {
   const {
     calibrationRequest: { slot },
   } = state
@@ -285,9 +306,9 @@ function handleMoveToSuccess(
 }
 
 function handleMoveToFailure(
-  state: State,
+  state: CalibrationState,
   action: CalibrationFailureAction
-): State {
+): CalibrationState {
   const {
     calibrationRequest: { slot },
   } = state
@@ -306,9 +327,9 @@ function handleMoveToFailure(
 }
 
 function handlePickupAndHome(
-  state: State,
+  state: CalibrationState,
   action: LabwareCalibrationAction
-): State {
+): CalibrationState {
   const {
     payload: { mount, slot },
   } = action
@@ -328,9 +349,9 @@ function handlePickupAndHome(
 }
 
 function handlePickupAndHomeSuccess(
-  state: State,
+  state: CalibrationState,
   action: CalibrationSuccessAction
-): State {
+): CalibrationState {
   const {
     calibrationRequest: { mount, slot },
   } = state
@@ -352,9 +373,9 @@ function handlePickupAndHomeSuccess(
 }
 
 function handlePickupAndHomeFailure(
-  state: State,
+  state: CalibrationState,
   action: CalibrationFailureAction
-): State {
+): CalibrationState {
   const {
     calibrationRequest: { mount, slot },
   } = state
@@ -373,9 +394,9 @@ function handlePickupAndHomeFailure(
 }
 
 function handleDropTipAndHome(
-  state: State,
+  state: CalibrationState,
   action: LabwareCalibrationAction
-): State {
+): CalibrationState {
   const {
     payload: { mount, slot },
   } = action
@@ -393,9 +414,9 @@ function handleDropTipAndHome(
 }
 
 function handleDropTipAndHomeSuccess(
-  state: State,
+  state: CalibrationState,
   action: CalibrationSuccessAction
-): State {
+): CalibrationState {
   const {
     calibrationRequest: { mount, slot },
   } = state
@@ -416,9 +437,9 @@ function handleDropTipAndHomeSuccess(
 }
 
 function handleDropTipAndHomeFailure(
-  state: State,
+  state: CalibrationState,
   action: CalibrationFailureAction
-): State {
+): CalibrationState {
   const {
     calibrationRequest: { mount, slot },
   } = state
@@ -437,9 +458,9 @@ function handleDropTipAndHomeFailure(
 }
 
 function handleConfirmTiprack(
-  state: State,
+  state: CalibrationState,
   action: LabwareCalibrationAction
-): State {
+): CalibrationState {
   const {
     payload: { mount, slot },
   } = action
@@ -457,9 +478,9 @@ function handleConfirmTiprack(
 }
 
 function handleConfirmTiprackSuccess(
-  state: State,
+  state: CalibrationState,
   action: CalibrationSuccessAction
-): State {
+): CalibrationState {
   const {
     calibrationRequest: { mount, slot },
   } = state
@@ -486,9 +507,9 @@ function handleConfirmTiprackSuccess(
 }
 
 function handleConfirmTiprackFailure(
-  state: State,
+  state: CalibrationState,
   action: CalibrationFailureAction
-): State {
+): CalibrationState {
   const {
     calibrationRequest: { mount, slot },
   } = state
@@ -506,7 +527,10 @@ function handleConfirmTiprackFailure(
   }
 }
 
-function handleJog(state: State, action: PipetteCalibrationAction): State {
+function handleJog(
+  state: CalibrationState,
+  action: PipetteCalibrationAction
+): CalibrationState {
   const {
     payload: { mount },
   } = action
@@ -525,9 +549,9 @@ function handleJog(state: State, action: PipetteCalibrationAction): State {
 }
 
 function handleJogSuccess(
-  state: State,
+  state: CalibrationState,
   action: CalibrationSuccessAction
-): State {
+): CalibrationState {
   return {
     ...state,
     calibrationRequest: {
@@ -539,9 +563,9 @@ function handleJogSuccess(
 }
 
 function handleJogFailure(
-  state: State,
+  state: CalibrationState,
   action: CalibrationFailureAction
-): State {
+): CalibrationState {
   const error = action.payload
 
   return {
@@ -555,9 +579,9 @@ function handleJogFailure(
 }
 
 function handleUpdateOffset(
-  state: State,
+  state: CalibrationState,
   action: LabwareCalibrationAction
-): State {
+): CalibrationState {
   const {
     payload: { mount, slot },
   } = action
@@ -575,9 +599,9 @@ function handleUpdateOffset(
 }
 
 function handleUpdateOffsetSuccess(
-  state: State,
+  state: CalibrationState,
   action: CalibrationSuccessAction
-): State {
+): CalibrationState {
   const {
     calibrationRequest: { mount, slot },
   } = state
@@ -598,9 +622,9 @@ function handleUpdateOffsetSuccess(
 }
 
 function handleUpdateOffsetFailure(
-  state: State,
+  state: CalibrationState,
   action: CalibrationFailureAction
-): State {
+): CalibrationState {
   const {
     calibrationRequest: { mount, slot },
   } = state
@@ -618,7 +642,10 @@ function handleUpdateOffsetFailure(
   }
 }
 
-function handleConfirmLabware(state, action: any) {
+function handleConfirmLabware(
+  state: CalibrationState,
+  action: any
+): CalibrationState {
   if (!action.payload || !action.payload.labware) return state
 
   const {

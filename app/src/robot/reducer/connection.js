@@ -10,7 +10,7 @@ import type {
   DisconnectResponseAction,
 } from '../actions'
 
-type State = {
+export type ConnectionState = {
   connectedTo: ?string,
   connectRequest: {
     inProgress: boolean,
@@ -24,7 +24,7 @@ type State = {
   unexpectedDisconnect: boolean,
 }
 
-const INITIAL_STATE: State = {
+const INITIAL_STATE: ConnectionState = {
   connectedTo: null,
   connectRequest: { inProgress: false, error: null, name: '' },
   disconnectRequest: { inProgress: false, error: null },
@@ -32,9 +32,9 @@ const INITIAL_STATE: State = {
 }
 
 export default function connectionReducer(
-  state?: State,
+  state?: ConnectionState,
   action: Action
-): State {
+): ConnectionState {
   if (state == null) return INITIAL_STATE
 
   switch (action.type) {
@@ -60,7 +60,10 @@ export default function connectionReducer(
   return state
 }
 
-function handleConnect(state: State, action: ConnectAction): State {
+function handleConnect(
+  state: ConnectionState,
+  action: ConnectAction
+): ConnectionState {
   const {
     payload: { name },
   } = action
@@ -69,9 +72,9 @@ function handleConnect(state: State, action: ConnectAction): State {
 }
 
 function handleConnectResponse(
-  state: State,
+  state: ConnectionState,
   action: ConnectResponseAction
-): State {
+): ConnectionState {
   const error = action.payload.error || null
   let connectedTo = state.connectRequest.name
   let requestName = ''
@@ -88,14 +91,17 @@ function handleConnectResponse(
   }
 }
 
-function handleDisconnect(state: State, action: DisconnectAction): State {
+function handleDisconnect(
+  state: ConnectionState,
+  action: DisconnectAction
+): ConnectionState {
   return { ...state, disconnectRequest: { inProgress: true, error: null } }
 }
 
 function handleDisconnectResponse(
-  state: State,
+  state: ConnectionState,
   action: DisconnectResponseAction
-): State {
+): ConnectionState {
   return {
     ...state,
     connectedTo: null,
@@ -105,8 +111,8 @@ function handleDisconnectResponse(
 }
 
 function handleClearConnectResponse(
-  state: State,
+  state: ConnectionState,
   action: ClearConnectResponseAction
-): State {
+): ConnectionState {
   return { ...state, connectRequest: INITIAL_STATE.connectRequest }
 }

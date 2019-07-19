@@ -6,7 +6,7 @@ import { connectRouter } from 'connected-react-router'
 import { combineReducers } from 'redux'
 
 // oldest robot api state
-import { reducer as robotReducer } from './robot'
+import { robotReducer } from './robot'
 
 // old api state
 import { reducer as apiReducer } from './http-api-client'
@@ -26,11 +26,12 @@ import { discoveryReducer } from './discovery'
 // protocol state
 import { protocolReducer } from './protocol'
 
-import type { Action } from './types'
+import type { Reducer } from 'redux'
+import type { State, Action } from './types'
 
 export const history = createHistory()
 
-export default combineReducers<_, Action>({
+const rootReducer: Reducer<State, Action> = combineReducers<_, Action>({
   robot: robotReducer,
   api: apiReducer,
   robotApi: robotApiReducer,
@@ -40,3 +41,5 @@ export default combineReducers<_, Action>({
   shell: shellReducer,
   router: connectRouter<_, Action>(history),
 })
+
+export default rootReducer

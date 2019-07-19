@@ -8,6 +8,7 @@ import { updateReducer } from './update'
 import { apiUpdateReducer } from './api-update'
 import { buildrootReducer } from './buildroot'
 
+import type { Reducer } from 'redux'
 import type { Service } from '@opentrons/discovery-client'
 import type {
   Middleware,
@@ -18,13 +19,20 @@ import type {
 } from '../types'
 import type { ViewableRobot } from '../discovery'
 import type { Config } from '../config'
-import type { ShellUpdateAction } from './update'
-import type { BuildrootAction } from './buildroot'
+import type { ApiUpdateInfo as ApiUpdateState } from './api-update'
+import type { ShellUpdateState, ShellUpdateAction } from './update'
+import type { BuildrootState, BuildrootAction } from './buildroot'
 
 type ShellLogsDownloadAction = {|
   type: 'shell:DOWNLOAD_LOGS',
   payload: {| logUrls: Array<string> |},
   meta: {| shell: true |},
+|}
+
+export type ShellState = {|
+  update: ShellUpdateState,
+  apiUpdate: ApiUpdateState,
+  buildroot: BuildrootState,
 |}
 
 export type ShellAction =
@@ -51,7 +59,10 @@ const API_RELEASE_NOTES = CURRENT_RELEASE_NOTES.replace(
 )
 export { CURRENT_VERSION, CURRENT_RELEASE_NOTES, API_RELEASE_NOTES }
 
-export const shellReducer = combineReducers<_, Action>({
+export const shellReducer: Reducer<ShellState, Action> = combineReducers<
+  _,
+  Action
+>({
   update: updateReducer,
   apiUpdate: apiUpdateReducer,
   buildroot: buildrootReducer,

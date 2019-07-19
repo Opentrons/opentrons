@@ -16,11 +16,11 @@ type RobotsMap = { [name: string]: Array<Service> }
 
 type RestartsMap = { [name: string]: ?RestartStatus }
 
-type DiscoveryState = {
+export type DiscoveryState = {|
   scanning: boolean,
   robotsByName: RobotsMap,
   restartsByName: RestartsMap,
-}
+|}
 
 type StartAction = {|
   type: 'discovery:START',
