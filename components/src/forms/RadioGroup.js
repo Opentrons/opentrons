@@ -24,6 +24,8 @@ type Props = {
   labelTextClassName?: ?string,
   /** if is included, RadioGroup will use error style. The content of the string is ignored. */
   error?: ?string,
+  /** 'name' attr of input */
+  name?: string,
 }
 
 export default function RadioGroup(props: Props) {
@@ -57,6 +59,7 @@ export default function RadioGroup(props: Props) {
             <input
               className={cx(styles.input_field, styles.accessibly_hidden)}
               type="radio"
+              name={props.name}
               value={radio.value}
               checked={radio.value === props.value}
               onChange={props.onChange}

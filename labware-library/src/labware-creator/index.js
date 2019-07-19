@@ -1,5 +1,7 @@
 // @flow
 import * as React from 'react'
+import { Formik, Field } from 'formik'
+import * as Yup from 'yup'
 import { DropdownField, InputField, RadioGroup } from '@opentrons/components'
 import {
   labwareTypeOptions,
@@ -20,7 +22,7 @@ const getDefaultFormState = (): LabwareFields => ({
   aluminumBlockType: null,
   aluminumBlockChildLabwareType: null,
 
-  tubeRackSides: [],
+  // tubeRackSides: [],
   footprintXDimension: null,
   footprintYDimension: null,
   labwareZDimension: null,
@@ -55,130 +57,153 @@ const getDefaultFormState = (): LabwareFields => ({
   displayName: null,
 })
 
-const UPDATE_LABWARE_FORM_FIELD: 'UPDATE_LABWARE_FORM_FIELD' =
-  'UPDATE_LABWARE_FORM_FIELD'
+// TODO: DRY this validation schema
+const labwareFormSchema = Yup.object().shape({
+  labwareType: Yup.string()
+    .oneOf(labwareTypeOptions.map(o => o.value))
+    .required(),
+  tubeRackInsertLoadName: Yup.string().when('labwareType', {
+    is: 'tubeRack',
+    then: Yup.string().required(),
+    otherwise: Yup.string().nullable(),
+  }),
+  aluminumBlockType: Yup.string().when('labwareType', {
+    is: 'aluminumBlock',
+    then: Yup.string().required(),
+    otherwise: Yup.string().nullable(),
+  }),
+  aluminumBlockChildLabwareType: Yup.string().when('labwareType', {
+    is: 'aluminumBlock',
+    then: Yup.string().required(),
+    otherwise: Yup.string().nullable(),
+  }),
 
-type UpdateFieldAction = {|
-  type: typeof UPDATE_LABWARE_FORM_FIELD,
-  payload: {|
-    field: string,
-    value: $Values<LabwareFields>,
-  |},
-|}
+  // tubeRackSides: Array<string>
+  footprintXDimension: Yup.number()
+    .min(0)
+    .required(),
+  footprintYDimension: Yup.number()
+    .min(0)
+    .required(),
+  labwareZDimension: Yup.number()
+    .min(0)
+    .required(),
 
-// NOTE: this will be an enum of all actions handled by formReducer
-type FormAction = UpdateFieldAction
+  gridRows: Yup.number()
+    .min(0)
+    .integer()
+    .required(),
+  gridColumns: Yup.number()
+    .min(0)
+    .integer()
+    .required(),
+  gridSpacingX: Yup.number()
+    .min(0)
+    .required(),
+  gridSpacingY: Yup.number()
+    .min(0)
+    .required(),
+  gridOffsetX: Yup.number()
+    .min(0)
+    .required(),
+  gridOffsetY: Yup.number()
+    .min(0)
+    .required(),
 
-const formReducer = (
-  state: LabwareFields,
-  action: FormAction
-): LabwareFields => {
-  console.debug({ action })
+  heterogeneousWells: Yup.boolean()
+    .oneOf([true], 'heterogeneousWells bad TODO!')
+    .required(),
+  irregularRowSpacing: Yup.boolean()
+    .oneOf([true], 'irregularRowSpacing bad TODO!')
+    .required(),
+  irregularColumnSpacing: Yup.boolean()
+    .oneOf([true], 'irregularColumnSpacing bad TODO!')
+    .required(),
 
-  // TODO IMMEDIATELY figure out reducer, still WIP
-  switch (action.type) {
-    case UPDATE_LABWARE_FORM_FIELD:
-      // TODO LATER: masking & casting
-      return { ...state, [action.payload.field]: action.payload.value }
-    default:
-      return state
-  }
-}
+  wellVolume: Yup.number()
+    .min(0)
+    .required(),
+  wellBottomShape: Yup.string()
+    .oneOf(wellBottomShapeOptions.map(o => o.value))
+    .required(),
+  wellDepth: Yup.number()
+    .min(0)
+    .required(),
+  wellShape: Yup.string()
+    .oneOf(wellShapeOptions.map(o => o.value))
+    .required(),
 
-type FieldProps = {
-  formDispatch: FormAction => mixed,
-  formState: LabwareFields,
-  field: $Keys<LabwareFields>,
+  // used with circular well shape only
+  wellDiameter: Yup.number().when('wellShape', {
+    is: 'circular',
+    then: Yup.number()
+      .min(0)
+      .required(),
+    otherwise: Yup.number().nullable(),
+  }),
+
+  // used with rectangular well shape only
+  wellXDimension: Yup.number().when('wellShape', {
+    is: 'rectangular',
+    then: Yup.number()
+      .min(0)
+      .required(),
+    otherwise: Yup.number().nullable(),
+  }),
+  wellYDimension: Yup.number().when('wellShape', {
+    is: 'rectangular',
+    then: Yup.number()
+      .min(0)
+      .required(),
+    otherwise: Yup.number().nullable(),
+  }),
+
+  brand: Yup.string().required(),
+  brandId: Yup.array().of(Yup.string()),
+
+  loadName: Yup.string().required(),
+  displayName: Yup.string().required(),
+})
+
+type TextFieldProps = {
+  name: $Keys<LabwareFields>,
   label?: string,
 }
-const Field = (props: FieldProps) => {
-  const [fieldState, setFieldState] = React.useState<$Values<LabwareFields>>(
-    props.formState[props.field]
-  )
-  // TODO make action creator for UPDATE_FORM_FIELD
-  return (
-    <InputField
-      onChange={e => setFieldState(e.target.value)}
-      onBlur={e =>
-        props.formDispatch({
-          type: UPDATE_LABWARE_FORM_FIELD,
-          payload: { field: props.field, value: e.currentTarget.value },
-        })
-      }
-      label={props.label}
-      value={Array.isArray(fieldState) ? fieldState.join(', ') : fieldState}
-    />
-  )
-}
+const TextField = (props: TextFieldProps) => (
+  <Field name={props.name}>
+    {({ field, form }) => <InputField {...field} label={props.label} />}
+  </Field>
+)
 
-// TODO IMMEDIATELY: needs to support images, use react-select
 type DropdownProps = {
-  formDispatch: FormAction => mixed,
-  formState: LabwareFields,
-  field: $Keys<LabwareFields>,
+  name: $Keys<LabwareFields>,
   options: Array<Object>, // Array<{| name: string, value: string, image?: string |}>, // TODO IMMEDIATELY
   label?: string,
 }
-const Dropdown = (props: DropdownProps) => {
-  const fieldState = props.formState[props.field]
-  if (fieldState != null && typeof fieldState !== 'string') {
-    console.error(
-      `Tried to pass non ?string value to option field ${props.field}`,
-      fieldState
-    )
-    return null
-  }
-  // TODO make action creator
-  return (
-    <div>
-      <strong>{props.label}</strong>
-      <DropdownField
-        onChange={e =>
-          props.formDispatch({
-            type: UPDATE_LABWARE_FORM_FIELD,
-            payload: { field: props.field, value: e.currentTarget.value },
-          })
-        }
-        options={props.options}
-        value={fieldState}
-      />
-    </div>
-  )
-}
+const Dropdown = (props: DropdownProps) => (
+  <div>
+    <strong>{props.label}</strong>
+    <Field name={props.name}>
+      {({ field, form }) => (
+        <DropdownField {...field} options={props.options} />
+      )}
+    </Field>
+  </div>
+)
 
 type RadioFieldProps = {
-  formDispatch: FormAction => mixed,
-  formState: LabwareFields,
-  field: $Keys<LabwareFields>,
+  name: $Keys<LabwareFields>,
   options: Array<{ name: string, value: string, children?: React.Node }>,
   label?: string,
 }
-const RadioField = (props: RadioFieldProps) => {
-  const fieldState = props.formState[props.field]
-  if (fieldState != null && typeof fieldState !== 'string') {
-    console.error(
-      `Tried to pass non ?string value to option field ${props.field}`,
-      fieldState
-    )
-    return null
-  }
-  // TODO make action creator
-  return (
-    <div>
-      <strong>{props.label}</strong>
-      <RadioGroup
-        onChange={e =>
-          props.formDispatch({
-            type: UPDATE_LABWARE_FORM_FIELD,
-            payload: { field: props.field, value: e.currentTarget.value },
-          })
-        }
-        options={props.options}
-        value={fieldState == null ? undefined : fieldState}
-      />
-    </div>
-  )
-}
+const RadioField = (props: RadioFieldProps) => (
+  <div>
+    <strong>{props.label}</strong>
+    <Field name={props.name}>
+      {({ form, field }) => <RadioGroup {...field} options={props.options} />}
+    </Field>
+  </div>
+)
 
 // For a LabwareFields object that has already been actually validated, cast it into ProcessedLabwareFields.
 // This fn should NEVER return null in production, the Maybe is just an escape hatch for Flow
@@ -192,7 +217,7 @@ const processValidForm = (fields: LabwareFields): ?ProcessedLabwareFields => {
     aluminumBlockType,
     aluminumBlockChildLabwareType,
     tubeRackInsertLoadName,
-    tubeRackSides,
+    // tubeRackSides,
   } = fields
   if (
     wellBottomShape == null ||
@@ -263,7 +288,7 @@ const processValidForm = (fields: LabwareFields): ?ProcessedLabwareFields => {
     labwareTypeFields = {
       labwareType: 'tubeRack',
       tubeRackInsertLoadName,
-      tubeRackSides,
+      // tubeRackSides,
     }
   } else {
     labwareTypeFields = { labwareType }
@@ -276,206 +301,110 @@ const processValidForm = (fields: LabwareFields): ?ProcessedLabwareFields => {
   }
 }
 
-const App = () => {
-  // TODO: can't make Flow understand useReducer
-  const [formState, formDispatch] = React.useReducer<*, *>(
-    formReducer,
-    getDefaultFormState()
-  )
+const App = () => (
+  <Formik
+    initialValues={getDefaultFormState()}
+    validationSchema={labwareFormSchema}
+    onSubmit={(values: LabwareFields) => {
+      const castValues = labwareFormSchema.cast(values)
+      console.log(
+        'your cast form values (they are not used right now!)',
+        castValues
+      )
 
-  return (
-    <div>
-      <h1>Labware Creator</h1>
-      <Dropdown
-        field="labwareType"
-        label="Which labware"
-        options={labwareTypeOptions}
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <Dropdown
-        field="tubeRackInsertLoadName"
-        label="Which tube rack insert"
-        options={tubeRackInsertOptions}
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <Dropdown
-        field="aluminumBlockType"
-        label="Which aluminum block"
-        options={tubeRackInsertOptions}
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <Dropdown
-        field="aluminumBlockChildLabwareType"
-        label="What labware is on top of your 96 well aluminum block"
-        options={tubeRackInsertOptions}
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <div onClick={() => window.alert('TODO not implemented!')}>
-        Import File
+      const validForm = processValidForm(values)
+      console.log('validForm', validForm)
+      if (validForm) {
+        console.log('your labware def:', fieldsToLabware(validForm))
+      } else {
+        console.warn(
+          'form not valid! this should not get past Yup validation :('
+        )
+      }
+    }}
+  >
+    {({ handleSubmit, values, errors }) => (
+      <div>
+        <h1>Labware Creator</h1>
+        <Dropdown
+          name="labwareType"
+          label="Which labware"
+          options={labwareTypeOptions}
+        />
+        <Dropdown
+          name="tubeRackInsertLoadName"
+          label="Which tube rack insert"
+          options={tubeRackInsertOptions}
+        />
+        <Dropdown
+          name="aluminumBlockType"
+          label="Which aluminum block"
+          options={tubeRackInsertOptions}
+        />
+        <Dropdown
+          name="aluminumBlockChildLabwareType"
+          label="What labware is on top of your 96 well aluminum block"
+          options={tubeRackInsertOptions}
+        />
+        <div onClick={() => window.alert('TODO not implemented!')}>
+          Import File
+        </div>
+        {/* PAGE 1 - Labware */}
+        {/* tubeRackSides: Array<string> maybe?? */}
+        <RadioField
+          name="heterogeneousWells"
+          label="Regularity"
+          options={yesNoOptions}
+        />
+        <TextField name="footprintXDimension" label="Length" />
+        <TextField name="footprintYDimension" label="Width" />
+        <TextField name="labwareZDimension" label="Height" />
+        <TextField name="gridRows" label="# of rows" />
+        <RadioField
+          name="irregularRowSpacing"
+          label="Row spacing"
+          options={yesNoOptions}
+        />
+        <TextField name="gridColumns" label="# of columns" />
+        <RadioField
+          name="irregularColumnSpacing"
+          label="Column spacing"
+          options={yesNoOptions}
+        />
+        {/* PAGE 2 */}
+        <TextField name="wellVolume" label="Volume" />
+        <RadioField
+          name="wellShape"
+          label="Well shape"
+          options={wellShapeOptions}
+        />
+        <TextField name="wellDiameter" label="Diameter" />
+        <TextField name="wellXDimension" label="Well X" />
+        <TextField name="wellYDimension" label="Well Y" />
+        <Dropdown
+          name="wellBottomShape"
+          label="Bottom shape"
+          options={wellBottomShapeOptions}
+        />
+        <TextField name="wellDepth" label="Depth" />
+        <div>SPACING</div>
+        <TextField name="gridSpacingX" label="Xs" />
+        <TextField name="gridSpacingY" label="Ys" />
+        <div>OFFSET</div>
+        <TextField name="gridOffsetX" label="Xo" />
+        <TextField name="gridOffsetY" label="Yo" />
+        {/* PAGE 3 */}
+        <TextField name="brand" label="Brand" />
+        {'brandId: Array<string> (TODO!!!)'}
+        {/* PAGE 4 */}
+        <TextField name="loadName" label="Load Name" />
+        <TextField name="displayName" label="Display Name" />
+        <div>
+          <div onClick={handleSubmit}>SAVE LABWARE</div>
+        </div>
       </div>
-      {/* PAGE 1 - Labware */}
-      {/* tubeRackSides: Array<string> maybe?? */}
-      <RadioField
-        field="heterogeneousWells"
-        label="Regularity"
-        options={wellShapeOptions}
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <Field
-        field="footprintXDimension"
-        label="Length"
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <Field
-        field="footprintYDimension"
-        label="Width"
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <Field
-        field="labwareZDimension"
-        label="Height"
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <Field
-        field="gridRows"
-        label="# of rows"
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <RadioField
-        field="irregularRowSpacing"
-        label="Row spacing"
-        options={yesNoOptions}
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <Field
-        field="gridColumns"
-        label="# of columns"
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <RadioField
-        field="irregularColumnSpacing"
-        label="Column spacing"
-        options={yesNoOptions}
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      {/* PAGE 2 */}
-      <Field
-        field="wellVolume"
-        label="Volume"
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <RadioField
-        field="wellShape"
-        label="Well shape"
-        options={wellShapeOptions}
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <Field
-        field="wellDiameter"
-        label="Diameter"
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <Field
-        field="wellXDimension"
-        label="Well X"
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <Field
-        field="wellYDimension"
-        label="Well Y"
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <Dropdown
-        field="wellBottomShape"
-        label="Bottom shape"
-        options={wellBottomShapeOptions}
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <Field
-        field="wellDepth"
-        label="Depth"
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <div>SPACING</div>
-      <Field
-        field="gridSpacingX"
-        label="Xs"
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <Field
-        field="gridSpacingY"
-        label="Ys"
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <div>OFFSET</div>
-      <Field
-        field="gridOffsetX"
-        label="Xo"
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <Field
-        field="gridOffsetY"
-        label="Yo"
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      {/* PAGE 3 */}
-      <Field
-        field="brand"
-        label="Brand"
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      {'brandId: Array<string> (TODO!!!)'}
-      {/* PAGE 4 */}
-      <Field
-        field="loadName"
-        label="Load Name"
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <Field
-        field="displayName"
-        label="Display Name"
-        formState={formState}
-        formDispatch={formDispatch}
-      />
-      <div
-        onClick={() => {
-          const validForm = processValidForm(formState)
-          if (validForm) {
-            console.log(fieldsToLabware(validForm))
-          } else {
-            console.warn('form not valid!')
-          }
-        }}
-      >
-        SAVE LABWARE
-      </div>
-    </div>
-  )
-}
+    )}
+  </Formik>
+)
 
 export default App

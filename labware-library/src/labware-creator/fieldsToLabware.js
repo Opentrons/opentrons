@@ -47,7 +47,7 @@ export default function fieldsToLabware(
         //   tags?: Array<string>, // TODO: ???
       },
       parameters: {
-        format: fields.labwareType,
+        format: 'irregular', // TODO! Cannot use fields.labwareType, must be "96Standard", "384Standard", "trough", "irregular", or "trash"
         isTiprack: fields.labwareType === 'tiprack', // NOTE: 'tiprack' is not a possible labwareType now anyway
         //   tipLength?: number,
         isMagneticModuleCompatible: false, // TODO: how to determine?
@@ -57,7 +57,7 @@ export default function fieldsToLabware(
       dimensions: {
         xDimension: fields.footprintXDimension,
         yDimension: fields.footprintYDimension,
-        zDimension: fields.labwareZDimension, // TODO: why labware vs footprint distinction in the field names?
+        zDimension: fields.labwareZDimension,
       },
       brand: {
         brand: fields.brand,
@@ -67,7 +67,11 @@ export default function fieldsToLabware(
       version: 1,
       namespace: 'ot_custom', // TODO IMMEDIATELY verify that's the conventional custom labware
       //   loadNamePostfix: [], // TODO: ???
-      offset: { x: fields.gridOffsetX, y: fields.gridOffsetY, z: 0 /* ??? */ },
+      offset: {
+        x: fields.gridOffsetX,
+        y: fields.gridOffsetY,
+        z: fields.labwareZDimension, // TODO: ???
+      },
       grid: {
         column: fields.gridColumns,
         row: fields.gridRows,

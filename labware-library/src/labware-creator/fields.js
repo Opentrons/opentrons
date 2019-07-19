@@ -67,7 +67,7 @@ export type LabwareFields = {|
   aluminumBlockType: ?string, // eg, '24well' or '96well'
   aluminumBlockChildLabwareType: ?LabwareType,
 
-  tubeRackSides: Array<string>, // eg, []
+  // tubeRackSides: Array<string>, // eg, []
   footprintXDimension: ?string,
   footprintYDimension: ?string,
   labwareZDimension: ?string,
@@ -113,7 +113,7 @@ export type ProcessedLabwareTypeFields =
   | {|
       labwareType: 'tubeRack',
       tubeRackInsertLoadName: string,
-      tubeRackSides: Array<string>,
+      // tubeRackSides: Array<string>,
     |}
   | {|
       labwareType: 'wellPlate' | 'reservoir',

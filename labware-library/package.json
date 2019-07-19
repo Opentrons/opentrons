@@ -16,13 +16,14 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@opentrons/components": "3.10.0",
-    "@opentrons/labware-designer": "3.10.0",
     "classnames": "^2.2.5",
+    "formik": "^1.5.8",
     "lodash": "^4.17.4",
     "query-string": "^6.2.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-hot-loader": "^4.8.0",
-    "react-router-dom": "^5.0.0"
+    "react-router-dom": "^5.0.0",
+    "yup": "^0.27.0"
   }
 }
