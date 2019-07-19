@@ -23,6 +23,7 @@ import type {
   Robot,
   ReachableRobot,
   UnreachableRobot,
+  ViewableRobot,
   AnyRobot,
   ConnectableStatus,
   ReachableStatus,
@@ -43,7 +44,7 @@ type GetConnectableRobots = Selector<State, void, Array<Robot>>
 type GetReachableRobots = Selector<State, void, Array<ReachableRobot>>
 type GetUnreachableRobots = Selector<State, void, Array<UnreachableRobot>>
 type GetAllRobots = Selector<State, void, Array<AnyRobot>>
-type GetLiveRobots = Selector<State, void, Array<Robot | ReachableRobot>>
+type GetLiveRobots = Selector<State, void, Array<ViewableRobot>>
 type GetConnectedRobot = Selector<State, void, ?Robot>
 
 export const CONNECTABLE: ConnectableStatus = 'connectable'
@@ -150,6 +151,7 @@ export const getRobotFirmwareVersion = (robot: AnyRobot): ?string =>
   (robot.health && robot.health.fw_version) ||
   (robot.serverHealth && robot.serverHealth.smoothieVersion)
 
+// TODO(mc, 2019-07-19): replace with selector(s) in app/src/shell/buildroot
 export const getRobotBuildrootStatus = (
   robot: AnyRobot
 ): BuildrootStatus | null => {
@@ -161,14 +163,14 @@ export const getRobotBuildrootStatus = (
     // migration capable proceed to step 2 automatically
     if (
       robot.serverHealth.capabilities &&
-      robot.serverHealth.capabilities['buildroot-migration']
+      robot.serverHealth.capabilities['buildrootMigration']
     ) {
       return 'migrating'
     }
     // robot is already on buildroot and capable of receiving normal buildroot updates
     if (
       robot.serverHealth.capabilities &&
-      robot.serverHealth.capabilities['buildroot-update']
+      robot.serverHealth.capabilities['buildrootUpdate']
     ) {
       return 'buildroot'
     }
