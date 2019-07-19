@@ -12,7 +12,7 @@ type TimeProps = {
 export default function RunTimer(props: TimeProps) {
   const { startTime, runTime } = props
   let startTimeStamp
-  if (startTime) {
+  if (typeof startTime === 'number') {
     startTimeStamp = `${moment(startTime).format('hh:mm:ss a')}`
   }
   return (

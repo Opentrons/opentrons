@@ -11,7 +11,7 @@ export type BuildrootUpdateInfo = {|
 
 export type BuildrootState = {
   seen: boolean,
-  downloadProgress: null,
+  downloadProgress: number | null,
   downloadError: string | null,
   info: BuildrootUpdateInfo | null,
 }
@@ -44,7 +44,7 @@ export const INITIAL_STATE: BuildrootState = {
 export function buildrootReducer(
   state: BuildrootState = INITIAL_STATE,
   action: Action
-) {
+): BuildrootState {
   switch (action.type) {
     case 'buildroot:UPDATE_INFO':
       return { ...state, info: action.payload }

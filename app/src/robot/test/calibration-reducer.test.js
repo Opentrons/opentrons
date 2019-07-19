@@ -1,5 +1,5 @@
 // calibration reducer tests
-import { reducer, actionTypes } from '../'
+import { robotReducer as reducer, actionTypes } from '../'
 
 const EXPECTED_INITIAL_STATE = {
   deckPopulated: null,

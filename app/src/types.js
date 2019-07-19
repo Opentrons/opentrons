@@ -2,17 +2,27 @@
 // @flow
 // application types
 import type { Store as ReduxStore, Dispatch as ReduxDispatch } from 'redux'
-import type { RouterAction } from 'connected-react-router'
+import type { RouterState, RouterAction } from 'connected-react-router'
 import type { Observable } from 'rxjs'
 
-import typeof reducer from './reducer'
-import type { RobotApiAction } from './robot-api'
-import type { HttpApiAction } from './http-api-client'
-import type { Action as RobotAction } from './robot'
-import type { ShellAction } from './shell'
-import type { ConfigAction } from './config'
-import type { DiscoveryAction } from './discovery'
-import type { ProtocolAction } from './protocol'
+import type { RobotApiState, RobotApiAction } from './robot-api'
+import type { State as HttpApiState, HttpApiAction } from './http-api-client'
+import type { RobotState, Action as RobotAction } from './robot'
+import type { ShellState, ShellAction } from './shell'
+import type { Config, ConfigAction } from './config'
+import type { DiscoveryState, DiscoveryAction } from './discovery'
+import type { ProtocolState, ProtocolAction } from './protocol'
+
+export type State = $ReadOnly<{|
+  robot: RobotState,
+  api: HttpApiState,
+  robotApi: RobotApiState,
+  config: Config,
+  discovery: DiscoveryState,
+  protocol: ProtocolState,
+  shell: ShellState,
+  router: RouterState,
+|}>
 
 export type Action =
   | RobotAction
@@ -25,8 +35,6 @@ export type Action =
   | ProtocolAction
 
 export type ActionLike = {| type: string, payload: any, meta: any |}
-
-export type State = $Call<reducer, {}, Action>
 
 export type GetState = () => State
 

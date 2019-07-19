@@ -12,7 +12,7 @@ const {
   update: { CURRENT_VERSION },
 } = remote
 
-export function apiUpdateReducer(state: ?ApiUpdateInfo) {
+export function apiUpdateReducer(state: ?ApiUpdateInfo): ApiUpdateInfo {
   if (!state) return getUpdateInfo()
   return state
 }

@@ -1,5 +1,5 @@
 // connection reducer tests
-import { reducer } from '../'
+import { robotReducer as reducer } from '../'
 
 const getState = state => state.connection
 

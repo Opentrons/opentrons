@@ -13,7 +13,7 @@ import type { Dispatch } from '../../types'
 
 type OP = {| mount: Mount, backUrl: string |}
 
-type DP = {| onContinueClick: () => void, onCancelClick: () => void |}
+type DP = {| onContinueClick: () => mixed, onCancelClick: () => mixed |}
 
 type Props = { ...OP, ...DP }
 
@@ -45,7 +45,6 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
       dispatch(robotActions.moveToFront(mount))
       dispatch(push(backUrl))
     },
-    // $FlowFixMe: connected-react-router action creators are not typed
     onCancelClick: () => dispatch(push(backUrl)),
   }
 }
