@@ -347,9 +347,6 @@ class InstrumentsWrapper(object):
 
     def retrieve_version_number(self, mount, expected_model_substring):
         attached_model = robot.get_attached_pipettes()[mount]['model']
-        log.info(f"Attached model is {attached_model}")
-        # log.info(f"Pipette config info {pipette_config.configs}")
-        # log.info(f"Pipette model info {pipette_config.config_models}")
         try:
             attached_model_config = pipette_config.configs[attached_model]
         except KeyError:
