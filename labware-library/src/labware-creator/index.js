@@ -7,7 +7,10 @@ import {
   DropdownField,
   InputField,
   RadioGroup,
+  LabwareRender,
+  RobotWorkSpace,
 } from '@opentrons/components'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import {
   labwareTypeOptions,
   tubeRackInsertOptions,
@@ -485,12 +488,47 @@ const HeightGuidingText = (props: {| labwareType: ?LabwareType |}) => {
   }
   return (
     <>
-      <p>
-        'Include any well lip in the measurement. Exclude any cover or cap.'
-      </p>
+      <p>Include any well lip in the measurement. Exclude any cover or cap.</p>
       {footer}
     </>
   )
+}
+
+// TODO IMMEDIATELY this is copied from PD, make it a component library component??
+function SingleLabware(props: {| definition: LabwareDefinition2 |}) {
+  return (
+    <RobotWorkSpace
+      viewBox={`0 0 ${props.definition.dimensions.xDimension} ${
+        props.definition.dimensions.yDimension
+      }`}
+    >
+      {() => <LabwareRender {...props} />}
+    </RobotWorkSpace>
+  )
+}
+
+type ConditionalLabwareRenderProps = {|
+  values: LabwareFields,
+|}
+const ConditionalLabwareRender = (props: ConditionalLabwareRenderProps) => {
+  const { values } = props
+  const definition = React.useMemo(() => {
+    // TODO IMMEDIATELY: you don't need all the fields just for this render,
+    // eg some required definition data like well volume, height, and bottom shape don't affect the render.
+    // A few other fields don't even go into the definition (eg "is row spacing uniform" etc).
+    //
+    // TODO IMMEDIATELY: BUG: Right now this whitescreens sometimes throwing 'Generated labware failed to validate,
+    // please check your inputs'. That's from createRegularLabware.
+    // (It's something about the wells' Z being NEGATIVE for some reason, I think well height field needs be >= well depth ???)
+    // 1. Only have it validate and throw if you do `validate: true` or something
+    // 2. Validate the definition in here, and have it display a special error asking user to contact support if
+    //   JSON schema validation fails when the rest of the form validation passes.
+    const validForm = processValidForm(values)
+    return validForm ? fieldsToLabware(validForm) : null
+  }, [values])
+
+  const errorComponent = 'Cannot render labware, invalid inputs' // TODO get SVG for no-definition
+  return definition ? <SingleLabware definition={definition} /> : errorComponent
 }
 
 const App = () => (
@@ -515,7 +553,7 @@ const App = () => (
       }
     }}
   >
-    {({ handleSubmit, values, errors }) => (
+    {({ handleSubmit, values, isValid, errors }) => (
       <div>
         <h1>Labware Creator</h1>
         <Section
@@ -744,6 +782,7 @@ const App = () => (
         <div>
           <div onClick={handleSubmit}>SAVE LABWARE</div>
         </div>
+        <ConditionalLabwareRender values={values} />
       </div>
     )}
   </Formik>

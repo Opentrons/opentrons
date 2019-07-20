@@ -38,7 +38,7 @@ export const yesNoOptions = [
 
 export const aluminumBlockTypes = [
   /* TODO */
-] // TODO derive from labware
+] // TODO write name/value/image
 export const aluminumBlockChildLabwareTypes = [
   /* TODO */
 ] // TODO derive from labware
