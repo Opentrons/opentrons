@@ -214,6 +214,8 @@ def test_gantry_matrix_output(
     hardware.reset()
 
 
+@pytest.mark.skipif(
+    sys.platform.startswith("win"), reason="Incompatible with Windows")
 @pytest.mark.api1_only
 @pytest.mark.model2
 def test_try_pickup_tip(
