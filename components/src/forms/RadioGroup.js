@@ -6,6 +6,8 @@ import { Icon } from '../icons'
 import styles from './forms.css'
 
 type Props = {
+  /** blur handler */
+  onBlur?: (event: SyntheticInputEvent<*>) => mixed,
   /** change handler */
   onChange: (event: SyntheticInputEvent<*>) => mixed,
   /** value that is checked */
@@ -62,6 +64,7 @@ export default function RadioGroup(props: Props) {
               name={props.name}
               value={radio.value}
               checked={radio.value === props.value}
+              onBlur={props.onBlur}
               onChange={props.onChange}
             />
             <div className={cx(props.labelTextClassName, styles.label_text)}>

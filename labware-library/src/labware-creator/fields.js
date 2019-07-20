@@ -1,5 +1,9 @@
 // @flow
 
+export const X_DIMENSION = 127.76
+export const Y_DIMENSION = 85.48
+export const XY_ALLOWED_VARIANCE = 0.25
+
 export type LabwareType =
   | 'wellPlate'
   | 'reservoir'
@@ -25,7 +29,7 @@ export const wellBottomShapeOptions = [
   { name: 'V-Bottom', value: 'v' },
 ]
 
-export type BooleanString = 'true' | 'false'
+export type BooleanString = 'true' | 'false' // TODO IMMEDIATELY revisit
 
 export const yesNoOptions = [
   { name: 'Yes', value: 'true' },
@@ -44,11 +48,12 @@ export const tubeRackInsertOptions = [
     value: 'TODO loadName of labware def here: 6 tubes',
     image: 'TODO image URL here',
   },
-  {
-    name: '10 tubes (2 size)',
-    value: 'TODO loadName of labware def here: 10 tubes (2 size)',
-    image: 'TODO image URL here',
-  },
+  // TODO: We're punting on the 2-size 10 tube rack!
+  // {
+  //   name: '10 tubes (2 size)',
+  //   value: 'TODO loadName of labware def here: 10 tubes (2 size)',
+  //   image: 'TODO image URL here',
+  // },
   {
     name: '15 tubes',
     value: 'TODO loadName of labware def here: 15 tubes',

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="361" height="254" viewBox="0 0 361 254">
+    <g fill="none" fill-rule="evenodd">
+        <path stroke="#000" stroke-width="2" d="M216.775 73.476v46.029c0 20.484-16.605 37.089-37.09 37.089h-.534c-20.484 0-37.09-16.605-37.09-37.09V73.477"/>
+        <path stroke="#000" stroke-width=".5" d="M122.809 73.25h4.655v8.5h9.625v-8.5h5.198M216.809 73.25h4.655v8.5h11.125v-8.5h4.698" opacity=".5"/>
+        <path stroke="#3FB1FF" stroke-width="2" d="M236.588 157.25h-112M143.588 74.25h72"/>
+        <path stroke="#000" stroke-width=".5" d="M48.061 73.476v46.029c0 20.484 16.605 37.089 37.09 37.089h.534c20.484 0 37.09-16.605 37.09-37.09V73.477M237.061 73.476v46.029c0 20.484 16.605 37.089 37.09 37.089h.534c20.484 0 37.09-16.605 37.09-37.09V73.477" opacity=".5"/>
+        <path stroke="#CCC" d="M48.088 81.75h263.5" opacity=".5"/>
+        <path stroke="#3FB1FF" stroke-dasharray="2,2" d="M180.088 149.215v-68.93"/>
+        <path fill="#3FB1FF" d="M180.088 155.25c1.054-2.84 2.852-6.363 4.756-8.547l-4.756 1.72-4.755-1.72c1.904 2.184 3.702 5.707 4.755 8.547M180.088 74.25c1.054 2.84 2.852 6.363 4.756 8.547l-4.756-1.72-4.755 1.72c1.904-2.184 3.702-5.707 4.755-8.547"/>
+        <text fill="#3FB1FF" font-family="OpenSans-SemiBoldItalic, Open Sans" font-size="15" font-style="italic" font-weight="500" letter-spacing=".025" transform="translate(48 73)">
+            <tspan x="107.372" y="107.069">DEPTH</tspan>
+        </text>
+        <path stroke="#000" stroke-width=".5" d="M40 73v89h281V73" opacity=".5"/>
+    </g>
+</svg>

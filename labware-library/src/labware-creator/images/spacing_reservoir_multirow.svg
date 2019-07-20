@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="361" height="254" viewBox="0 0 361 254">
+    <defs>
+        <path id="a" d="M.5.068h178v204H.5z"/>
+        <path id="c" d="M.5.068h167v193H.5z"/>
+    </defs>
+    <g fill="none" fill-rule="evenodd">
+        <path stroke="#3FB1FF" stroke-width="2" d="M68 110.853h73M68.89 200.853h71.22M231 32.853V92.03M154 32.853v60"/>
+        <path stroke="#3FB1FF" stroke-dasharray="2,2" d="M89.088 194.818v-82.93"/>
+        <path fill="#3FB1FF" d="M89.088 200.853c1.054-2.84 2.852-6.363 4.756-8.547l-4.756 1.72-4.755-1.72c1.904 2.184 3.702 5.707 4.755 8.547M89.088 110.853c1.054 2.84 2.852 6.363 4.756 8.548l-4.756-1.72-4.755 1.72c1.904-2.185 3.702-5.708 4.755-8.548"/>
+        <path stroke="#3FB1FF" stroke-dasharray="2,2" d="M160.035 39.173h63.93"/>
+        <path fill="#3FB1FF" d="M154 39.173c2.84 1.054 6.363 2.852 8.547 4.756l-1.72-4.756 1.72-4.755c-2.184 1.904-5.707 3.703-8.547 4.755M230 39.173c-2.84 1.054-6.363 2.852-8.547 4.756l1.72-4.756-1.72-4.755c2.184 1.904 5.708 3.703 8.547 4.755"/>
+        <text fill="#3FB1FF" font-family="OpenSans-SemiBoldItalic, Open Sans" font-size="15" font-style="italic" font-weight="500" transform="translate(38)">
+            <tspan x="30.39" y="157.667">Y</tspan>
+        </text>
+        <text fill="#3FB1FF" font-family="OpenSans-SemiBoldItalic, Open Sans" font-size="8.745" font-style="italic" font-weight="500" transform="translate(38)">
+            <tspan x="38.763" y="164.181">S</tspan>
+        </text>
+        <text fill="#3FB1FF" font-family="OpenSans-SemiBoldItalic, Open Sans" font-size="15" font-style="italic" font-weight="500" transform="translate(38)">
+            <tspan x="141.39" y="28.667">X</tspan>
+        </text>
+        <text fill="#3FB1FF" font-family="OpenSans-SemiBoldItalic, Open Sans" font-size="8.745" font-style="italic" font-weight="500" transform="translate(38)">
+            <tspan x="150.195" y="35.181">S</tspan>
+        </text>
+        <g transform="translate(93 41.786)">
+            <mask id="b" fill="#fff">
+                <use xlink:href="#a"/>
+            </mask>
+            <path stroke="#B3B3B3" d="M357 267.5H6c-.55 0-1-.45-1-1V6.232c0-.55.45-1 1-1h351c.55 0 1 .45 1 1V266.5c0 .55-.45 1-1 1z" mask="url(#b)"/>
+        </g>
+        <g transform="translate(104 52.786)">
+            <mask id="d" fill="#fff">
+                <use xlink:href="#c"/>
+            </mask>
+            <path stroke="#B3B3B3" d="M328.672 244.903H12.328c-4.211 0-7.656-3.445-7.656-7.656V13.81c0-4.21 3.445-7.656 7.656-7.656h316.344c4.21 0 7.656 3.445 7.656 7.656v223.437c0 4.211-3.445 7.656-7.656 7.656z" mask="url(#d)"/>
+        </g>
+        <text fill="#666" font-family="OpenSans-Regular, Open Sans" font-size="15" opacity=".5" transform="translate(38)">
+            <tspan x="0" y="108.426">A</tspan>
+        </text>
+        <text fill="#666" font-family="OpenSans-Regular, Open Sans" font-size="15" opacity=".5" transform="translate(38)">
+            <tspan x="0" y="199.426">B</tspan>
+        </text>
+        <text fill="#666" font-family="OpenSans-Regular, Open Sans" font-size="15" letter-spacing=".033" opacity=".5" transform="translate(38)">
+            <tspan x="113" y="16.426">1 2 </tspan>
+        </text>
+        <path stroke="#000" stroke-width="2" d="M125.5 153.853h57v-84h-57zM202 152.853h57v-84h-57zM125.5 245.853h57v-84h-57zM202 244.853h57v-84h-57z"/>
+    </g>
+</svg>
