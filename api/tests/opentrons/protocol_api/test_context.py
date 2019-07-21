@@ -448,8 +448,15 @@ def test_blow_out(loop, monkeypatch):
         move_location = loc
 
     monkeypatch.setattr(instr, 'move_to', fake_move)
+
     instr.blow_out()
+    assert move_location is None
+
+    instr.aspirate(10)
+    instr.blow_out(lw.wells()[0])
+
     assert move_location == lw.wells()[0].top()
+
 
 
 def test_transfer_options(loop, monkeypatch):
