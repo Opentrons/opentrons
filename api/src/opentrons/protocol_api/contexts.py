@@ -738,28 +738,30 @@ class InstrumentContext(CommandPublisher):
                               :py:meth:`dispense`)
         :returns: This instance
         """
-        if location is None:
-            if not self._ctx.location_cache:
-                raise RuntimeError('No valid current location cache present')
-            else:
-                location = self._ctx.location_cache.labware  # type: ignore
-                # type checked below
 
         if isinstance(location, Well):
             if location.parent.is_tiprack:
                 self._log.warning('Blow_out being performed on a tiprack. '
                                   'Please re-check your code')
-            target = location.top()
-        elif isinstance(location, types.Location) and not \
-                isinstance(location.labware, Well):
+            loc = location.top()
+            self.move_to(loc)
+        elif isinstance(location, types.Location):
+            loc = location
+            self.move_to(loc)
+        elif location is not None:
             raise TypeError(
-                'location should be a Well or None, but it is {}'
+                'location should be a Well or Location, but it is {}'
                 .format(location))
+        elif self._ctx.location_cache:
+            # if location cache exists, pipette blows out immediately at
+            # current location, no movement is needed
+            pass
         else:
-            raise TypeError(
-                'location should be a Well or None, but it is {}'
-                .format(location))
-        self.move_to(target)
+            raise RuntimeError(
+                "If blow out is called without an explicit location, another"
+                " method that moves to a location (such as move_to or "
+                "dispense) must previously have been called so the robot "
+                "knows where it is.")
         self._hw_manager.hardware.blow_out(self._mount)
         return self
 
