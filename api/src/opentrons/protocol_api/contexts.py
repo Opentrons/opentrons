@@ -753,7 +753,9 @@ class InstrumentContext(CommandPublisher):
                 'location should be a Well or Location, but it is {}'
                 .format(location))
         elif self._ctx.location_cache:
-            loc = self._ctx.location_cache
+            # if location cache exists, pipette blows out immediately at
+            # current location, no movement is needed
+            pass
         else:
             raise RuntimeError(
                 "If blow out is called without an explicit location, another"
