@@ -5,6 +5,7 @@ import * as Yup from 'yup'
 import {
   AlertItem,
   DropdownField,
+  PrimaryButton,
   InputField,
   RadioGroup,
   LabwareRender,
@@ -31,6 +32,7 @@ import type {
   WellBottomShape,
 } from './fields'
 import fieldsToLabware from './fieldsToLabware'
+import styles from './styles.css'
 
 const getDefaultFormState = (): LabwareFields => ({
   labwareType: null,
@@ -75,6 +77,7 @@ const getDefaultFormState = (): LabwareFields => ({
 
 // TODO: add decimal-point constraint where needed (Yup.mixed.test ?)
 // TODO: DRY this validation schema
+// TODO: correct, readable validation error messages
 const labwareFormSchema = Yup.object().shape({
   labwareType: Yup.string()
     .oneOf(labwareTypeOptions.map(o => o.value))
@@ -186,12 +189,16 @@ const labwareFormSchema = Yup.object().shape({
 
 type TextFieldProps = {
   name: $Keys<LabwareFields>,
+  units?: $PropertyType<React.ElementProps<typeof InputField>, 'units'>,
   label?: string,
 }
 const TextField = (props: TextFieldProps) => (
-  <Field name={props.name}>
-    {({ field, form }) => <InputField {...field} label={props.label} />}
-  </Field>
+  <div className={styles.field_wrapper}>
+    <div className={styles.field_label}>{props.label}</div>
+    <Field name={props.name}>
+      {({ field, form }) => <InputField {...field} units={props.units} />}
+    </Field>
+  </div>
 )
 
 type DropdownProps = {
@@ -200,8 +207,8 @@ type DropdownProps = {
   label?: string,
 }
 const Dropdown = (props: DropdownProps) => (
-  <div>
-    <strong>{props.label}</strong>
+  <div className={styles.field_wrapper}>
+    <div className={styles.field_label}>{props.label}</div>
     <Field name={props.name}>
       {({ field, form }) => (
         <DropdownField {...field} options={props.options} />
@@ -216,10 +223,12 @@ type RadioFieldProps = {
   label?: string,
 }
 const RadioField = (props: RadioFieldProps) => (
-  <div>
-    <strong>{props.label}</strong>
+  <div className={styles.field_wrapper}>
+    <div className={styles.field_label}>{props.label}</div>
     <Field name={props.name}>
-      {({ form, field }) => <RadioGroup {...field} options={props.options} />}
+      {({ form, field }) => (
+        <RadioGroup {...field} options={props.options} inline />
+      )}
     </Field>
   </div>
 )
@@ -227,12 +236,13 @@ const RadioField = (props: RadioFieldProps) => (
 // TODO: Make this DRY, don't require fields (in children) and also fieldList.
 type SectionProps = {|
   label: string,
-  fieldList: Array<$Keys<LabwareFields>>,
+  fieldList?: Array<$Keys<LabwareFields>>,
   children?: React.Node,
-  formik?: any, // TODO IMMEDIATELY type this
+  formik?: any, // TODO IMMEDIATELY type this??
 |}
 const Section = connect((props: SectionProps) => {
-  const dirtyFieldNames = props.fieldList.filter(
+  const fieldList = props.fieldList || []
+  const dirtyFieldNames = fieldList.filter(
     name => props.formik?.touched?.[name]
   )
   const allErrors = dirtyFieldNames.map(name => {
@@ -243,8 +253,8 @@ const Section = connect((props: SectionProps) => {
     return null
   })
   return (
-    <div>
-      <h2>{props.label}</h2>
+    <div className={styles.section_wrapper}>
+      <h2 className={styles.section_header}>{props.label}</h2>
       <div>{allErrors}</div>
       {props.children}
     </div>
@@ -531,6 +541,37 @@ const ConditionalLabwareRender = (props: ConditionalLabwareRenderProps) => {
   return definition ? <SingleLabware definition={definition} /> : errorComponent
 }
 
+// TODO IMMEDIATELY: set up links
+const IntroCopy = () => (
+  <>
+    <p>Use this tool if you are creating one of the following:</p>
+    <ul>
+      <li>
+        Well plates and reservoirs which can be made via the labware creator
+        (refer to <a href="#TODO">this guide</a> for more information)
+      </li>
+      <li>
+        Tubes + the <a href="#TODO">Opentrons tube rack</a>
+      </li>
+      <li>
+        Tubes / plates + the <a href="#TODO">Opentrons aluminum block</a>
+      </li>
+      <p>
+        For all other custom labware, please use this{' '}
+        <a href="#TODO">request form</a>
+      </p>
+    </ul>
+
+    <p>
+      <strong>Please note:</strong> We strongly recommend you reference
+      mechanical drawing to ensure accurate measurements for defining labware,
+      only relying on manual measurements to supplement missing information. To
+      learn more about ways to access mechanical drawings from manufacturers,
+      please refer to <a href="#TODO">this guide</a>.
+    </p>
+  </>
+)
+
 const App = () => (
   <Formik
     initialValues={getDefaultFormState()}
@@ -554,10 +595,11 @@ const App = () => (
     }}
   >
     {({ handleSubmit, values, isValid, errors }) => (
-      <div>
-        <h1>Labware Creator</h1>
+      <div className={styles.labware_creator}>
+        <h2>Custom Labware Creator</h2>
+        <IntroCopy />
         <Section
-          label="Create a new definition"
+          label="Labware Type"
           fieldList={[
             'labwareType',
             'tubeRackInsertLoadName',
@@ -567,7 +609,7 @@ const App = () => (
         >
           <Dropdown
             name="labwareType"
-            label="Which labware"
+            label="What type of labware are you creating?"
             options={labwareTypeOptions}
           />
           <Dropdown
@@ -585,16 +627,13 @@ const App = () => (
             label="What labware is on top of your 96 well aluminum block"
             options={tubeRackInsertOptions}
           />
-          <div onClick={() => window.alert('TODO not implemented!')}>
-            Import File
-          </div>
         </Section>
         {/* PAGE 1 - Labware */}
         <Section label="Regularity" fieldList={['heterogeneousWells']}>
           {/* tubeRackSides: Array<string> maybe?? */}
           <RadioField
             name="heterogeneousWells"
-            label="Are your wells the same shape and size?"
+            label="Are all your wells the same shape and size?"
             options={yesNoOptions}
           />
         </Section>
@@ -603,7 +642,10 @@ const App = () => (
           fieldList={['footprintXDimension', 'footprintYDimension']}
         >
           <div>
-            <p>Ensure measurement is taken from the very bottom of plate.</p>
+            <p>
+              Ensure measurement is taken from the <strong>very bottom</strong>{' '}
+              of plate.
+            </p>
             <p>
               The footprint measurement helps determine if the labware fits
               firmly into the slots on the OT-2 deck.
@@ -628,7 +670,7 @@ const App = () => (
             labwareType={values.labwareType}
             aluminumBlockChildLabwareType={values.aluminumBlockChildLabwareType}
           />
-          <TextField name="labwareZDimension" label="Height" />
+          <TextField name="labwareZDimension" label="Height" units="mm" />
         </Section>
         <Section
           label="Grid"
@@ -668,10 +710,10 @@ const App = () => (
           <div>
             <p>Total maximum volume of each well.</p>
           </div>
-          <TextField name="wellVolume" label="Max volume per well" />
+          <TextField name="wellVolume" label="Max volume per well" units="μL" />
         </Section>
         <Section
-          label="Well Shape"
+          label="Well Shape & Sides"
           fieldList={[
             'wellShape',
             'wellDiameter',
@@ -681,10 +723,9 @@ const App = () => (
         >
           <div>
             <p>
-              Reference measurement from the <strong>inside</strong> of the
-              well. Ignore any lip.
+              Reference the <strong>inside</strong> of the well. Ignore any lip.
             </p>
-            <p>This helps the robot locate the sides of the well.</p>
+            <p>Diameter helps the robot locate the sides of the wells.</p>
           </div>
           <WellXYImg wellShape={values.wellShape} />
           <RadioField
@@ -692,12 +733,12 @@ const App = () => (
             label="Well shape"
             options={wellShapeOptions}
           />
-          <TextField name="wellDiameter" label="Diameter" />
-          <TextField name="wellXDimension" label="Well X" />
-          <TextField name="wellYDimension" label="Well Y" />
+          <TextField name="wellDiameter" label="Diameter" units="mm" />
+          <TextField name="wellXDimension" label="Well X" units="mm" />
+          <TextField name="wellYDimension" label="Well Y" units="mm" />
         </Section>
         <Section
-          label="Bottom & Depth"
+          label="Well Bottom & Depth"
           fieldList={['wellBottomShape', 'wellDepth']}
         >
           <div>
@@ -722,9 +763,12 @@ const App = () => (
             label="Bottom shape"
             options={wellBottomShapeOptions}
           />
-          <TextField name="wellDepth" label="Depth" />
+          <TextField name="wellDepth" label="Depth" units="mm" />
         </Section>
-        <Section label="Spacing" fieldList={['gridSpacingX', 'gridSpacingY']}>
+        <Section
+          label="Well Spacing"
+          fieldList={['gridSpacingX', 'gridSpacingY']}
+        >
           <div>
             <p>
               Spacing is between the <strong>center</strong> of wells.
@@ -739,10 +783,10 @@ const App = () => (
             wellShape={values.wellShape}
             gridRows={values.gridRows}
           />
-          <TextField name="gridSpacingX" label="X Spacing (Xs)" />
-          <TextField name="gridSpacingY" label="Y Spacing (Ys)" />
+          <TextField name="gridSpacingX" label="X Spacing (Xs)" units="mm" />
+          <TextField name="gridSpacingY" label="Y Spacing (Ys)" units="mm" />
         </Section>
-        <Section label="Offset" fieldList={['gridOffsetX', 'gridOffsetY']}>
+        <Section label="Grid Offset" fieldList={['gridOffsetX', 'gridOffsetY']}>
           <div>
             <p>
               Find the measurement from the center of{' '}
@@ -758,16 +802,15 @@ const App = () => (
               the slot{"'"}s top left corner.
             </p>
           </div>
-          <TextField name="gridOffsetX" label="X Offset (Xo)" />
-          <TextField name="gridOffsetY" label="Y Offset (Yo)" />
+          <TextField name="gridOffsetX" label="X Offset (Xo)" units="mm" />
+          <TextField name="gridOffsetY" label="Y Offset (Yo)" units="mm" />
         </Section>
-
-        {/* TODO: is this a Section with no fields??? */}
-        <div>
+        <Section label="Check your work">
           <p>
             Check that the size, spacing, and shape of your wells looks correct.
           </p>
-        </div>
+          <ConditionalLabwareRender values={values} />
+        </Section>
 
         {/* PAGE 3 */}
         <Section label="Description" fieldList={['brand']}>
@@ -776,13 +819,30 @@ const App = () => (
         </Section>
         {/* PAGE 4 */}
         <Section label="File" fieldList={['loadName', 'displayName']}>
-          <TextField name="loadName" label="Load Name" />
-          <TextField name="displayName" label="Display Name" />
+          <TextField
+            name="displayName"
+            label="Display Name ('File name' ??? TODO)"
+          />
+          <TextField name="loadName" label="API Load Name" />
         </Section>
-        <div>
-          <div onClick={handleSubmit}>SAVE LABWARE</div>
+        <div className={styles.double_check_before_exporting}>
+          <p>DOUBLE CHECK YOUR WORK BEFORE EXPORTING!</p>
+          <p>
+            If you are not comfortable reading a JSON labware definition then
+            consider noting down the values you put in these fields. You will
+            not be able to re-import your file back into the labware creator to
+            read or edit it.
+          </p>
         </div>
-        <ConditionalLabwareRender values={values} />
+        <div>
+          <PrimaryButton
+            className={styles.export_button}
+            onClick={handleSubmit}
+            disabled={!isValid}
+          >
+            EXPORT FILE
+          </PrimaryButton>
+        </div>
       </div>
     )}
   </Formik>
