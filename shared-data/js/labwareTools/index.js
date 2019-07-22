@@ -59,6 +59,7 @@ export type BaseLabwareProps = {|
   version?: number,
   namespace?: string,
   loadNamePostfix?: Array<string>,
+  strict?: ?boolean, // If true, throws error on failed validation
 |}
 
 export type RegularLabwareProps = {|
@@ -83,15 +84,20 @@ export type IrregularLabwareProps = {|
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 const validate = ajv.compile(labwareSchema)
 
-function validateDefinition(definition: Definition): Definition {
+function validateDefinition(
+  definition: Definition,
+  strict: boolean = true
+): Definition {
   const valid = validate(definition)
 
   if (!valid) {
     console.error('Definition:', definition)
     console.error('Validation Errors:', validate.errors)
-    throw new Error(
-      'Generated labware failed to validate, please check your inputs'
-    )
+    if (strict) {
+      throw new Error(
+        'Generated labware failed to validate, please check your inputs'
+      )
+    }
   }
 
   return definition
@@ -268,6 +274,7 @@ function createName(
 // or the labware definition schema in labware/schemas/
 export function createRegularLabware(args: RegularLabwareProps): Definition {
   const { offset, dimensions, grid, spacing, well, loadNamePostfix = [] } = args
+  const strict = args.strict || false
   const version = args.version || 1
   const namespace = args.namespace || DEFAULT_CUSTOM_NAMESPACE
   const ordering = determineOrdering(grid)
@@ -290,19 +297,22 @@ export function createRegularLabware(args: RegularLabwareProps): Definition {
     ...loadNamePostfix,
   ])
 
-  return validateDefinition({
-    ordering,
-    brand,
-    metadata,
-    dimensions,
-    wells: calculateCoordinates(well, ordering, spacing, offset, dimensions),
-    groups: [{ ...groupBase, wells: flatten(ordering) }],
-    parameters: { ...args.parameters, loadName },
-    namespace,
-    version,
-    schemaVersion: SCHEMA_VERSION,
-    cornerOffsetFromSlot: { x: 0, y: 0, z: 0 },
-  })
+  return validateDefinition(
+    {
+      ordering,
+      brand,
+      metadata,
+      dimensions,
+      wells: calculateCoordinates(well, ordering, spacing, offset, dimensions),
+      groups: [{ ...groupBase, wells: flatten(ordering) }],
+      parameters: { ...args.parameters, loadName },
+      namespace,
+      version,
+      schemaVersion: SCHEMA_VERSION,
+      cornerOffsetFromSlot: { x: 0, y: 0, z: 0 },
+    },
+    strict
+  )
 }
 
 // Generator function for labware definitions within an irregular grid format
@@ -311,6 +321,7 @@ export function createIrregularLabware(
   args: IrregularLabwareProps
 ): Definition {
   const { offset, dimensions, grid, spacing, well, gridStart, group } = args
+  const strict = args.strict || false
   const namespace = args.namespace || DEFAULT_CUSTOM_NAMESPACE
   const version = args.version || 1
   const { wells, groups } = determineIrregularLayout(
@@ -336,17 +347,20 @@ export function createIrregularLabware(
     brand: brand.brand,
   })
 
-  return validateDefinition({
-    wells,
-    groups,
-    brand,
-    metadata,
-    dimensions,
-    parameters: { ...args.parameters, loadName, format: 'irregular' },
-    ordering: determineIrregularOrdering(Object.keys(wells)),
-    namespace,
-    version,
-    schemaVersion: SCHEMA_VERSION,
-    cornerOffsetFromSlot: { x: 0, y: 0, z: 0 },
-  })
+  return validateDefinition(
+    {
+      wells,
+      groups,
+      brand,
+      metadata,
+      dimensions,
+      parameters: { ...args.parameters, loadName, format: 'irregular' },
+      ordering: determineIrregularOrdering(Object.keys(wells)),
+      namespace,
+      version,
+      schemaVersion: SCHEMA_VERSION,
+      cornerOffsetFromSlot: { x: 0, y: 0, z: 0 },
+    },
+    strict
+  )
 }
