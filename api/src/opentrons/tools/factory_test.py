@@ -2,6 +2,7 @@ import atexit
 import logging
 import optparse
 import os
+import re
 import socket
 import subprocess
 
@@ -12,7 +13,7 @@ from opentrons.drivers import serial_communication
 
 log = logging.getLogger(__name__)
 
-
+IP_ADDRESS_SEARCH = re.compile(r'^(\d+\.\d+){3}')
 RESULT_SPACE = '\t- {}'
 FAIL = 'FAIL\t*** !!! ***'
 PASS = 'PASS'
@@ -45,9 +46,10 @@ def _find_storage_device():
 
 
 def _this_wifi_ip_address():
-    gw = os.popen('ip -4 route show default').read().split()
+    gw = os.popen('ip -f inet addr show eth0').read().split()
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect((gw[2], 0))
+    list_ips = [ip for ip in gw if IP_ADDRESS_SEARCH.match(ip)]
+    s.connect((list_ips[0], 0))
     return s.getsockname()[0]
 
 
