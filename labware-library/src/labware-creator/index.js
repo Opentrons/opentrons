@@ -3,6 +3,7 @@ import * as React from 'react'
 import { Formik, Field, connect } from 'formik'
 import * as Yup from 'yup'
 import cloneDeep from 'lodash/cloneDeep'
+import { saveAs } from 'file-saver'
 import {
   AlertItem,
   AlertModal,
@@ -191,7 +192,12 @@ const labwareFormSchema = Yup.object().shape({
   brand: Yup.string().required(),
   brandId: Yup.array().of(Yup.string()),
 
-  loadName: Yup.string().required(),
+  loadName: Yup.string()
+    .required()
+    .matches(
+      /^[a-z0-9._]+$/,
+      'Load name can only contain lowercase letters, numbers, dot (.) and underscore (_). Spaces are not allowed.'
+    ),
   displayName: Yup.string().required(),
 })
 
@@ -526,25 +532,79 @@ function SingleLabware(props: {| definition: LabwareDefinition2 |}) {
 type ConditionalLabwareRenderProps = {|
   values: LabwareFields,
 |}
+const NUMERICAL_FIELDS_REQUIRED_FOR_RENDER = [
+  // NOTE: not requiring labware x/y/z because Z doesn't affect render and X/Y are restricted enough to not affect render that much
+  // 'footprintXDimension',
+  // 'footprintYDimension',
+  // 'labwareZDimension',
+  'gridRows',
+  'gridColumns',
+  'gridSpacingX',
+  'gridSpacingY',
+  'gridOffsetX',
+  'gridOffsetY',
+]
 const ConditionalLabwareRender = (props: ConditionalLabwareRenderProps) => {
   const definition = React.useMemo(() => {
     const values = cloneDeep(props.values)
+    // Don't try to render if any required values are missing/invalid
+    // TODO IMMEDIATELY: how much of this can Yup do? Can you make a subschema of only the fields that matter to labware render?
+    const hasMissingNumericalFields = NUMERICAL_FIELDS_REQUIRED_FOR_RENDER.some(
+      field => isNaN(Number(values[field]))
+    )
+    let hasMissingWellShapeFields = true
+    if (
+      values.wellShape === 'circular' &&
+      !isNaN(Number(values.wellDiameter))
+    ) {
+      hasMissingWellShapeFields = false
+    } else if (
+      values.wellShape === 'rectangular' &&
+      ['wellXDimension', 'wellYDimension'].every(
+        field => !isNaN(Number(values[field]))
+      )
+    ) {
+      hasMissingWellShapeFields = false
+    }
+
+    // if (hasMissingNumericalFields || hasMissingWellShapeFields) {
+    //   return null
+    // } // TODO IMMEDIATELY
+
     // Fill arbitrary values in to any missing fields that aren't needed for this render,
     // eg some required definition data like well volume, height, and bottom shape don't affect the render.
+    values.footprintXDimension = values.footprintXDimension || `${X_DIMENSION}`
+    values.footprintYDimension = values.footprintYDimension || `${Y_DIMENSION}`
     values.labwareZDimension = values.wellDepth || '100'
     values.wellDepth = values.wellDepth || '80'
-    values.wellDepth = values.wellVolume || '50'
-    values.brand = values.brand || ''
+    values.wellVolume = values.wellVolume || '50'
+    values.wellBottomShape = values.wellBottomShape || 'flat'
+    values.labwareType = values.labwareType || 'wellPlate'
+
+    values.displayName = values.displayName || 'Some Labware'
+    values.loadName = values.loadName || 'some_labware'
+    values.brand = values.brand || 'somebrand'
     // A few other fields don't even go into the definition (eg "is row spacing uniform" etc).
     values.heterogeneousWells = 'true'
     values.irregularRowSpacing = 'true'
     values.irregularColumnSpacing = 'true'
 
+    let yupCast = null
+    try {
+      yupCast = labwareFormSchema.cast(values)
+    } catch (error) {}
+    console.log('yup output inside conditional labware', yupCast)
+    if (yupCast === null) {
+      return null
+    }
     const validForm = processValidForm(values)
+    console.log('conditional labware render with ', { values, validForm })
     let def = null
     try {
       if (validForm) {
         def = fieldsToLabware(validForm)
+      } else {
+        console.log('invalid, no def for conditional render')
       }
     } catch (error) {
       // TODO: the creator throws errors if labware fails to validate
@@ -650,8 +710,12 @@ const App = () => {
           const validForm = processValidForm(values)
           console.log('validForm', validForm)
           if (validForm) {
-            // TODO save file here
-            console.log('your labware def:', fieldsToLabware(validForm))
+            const def = fieldsToLabware(validForm)
+            console.log('your labware def:', def)
+            const blob = new Blob([JSON.stringify(def, null, 4)], {
+              type: 'application/json',
+            })
+            saveAs(blob, validForm.commonFields.displayName)
           } else {
             console.error(
               'form passed Yup validation but not processValidForm!',

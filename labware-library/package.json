@@ -17,6 +17,7 @@
   "dependencies": {
     "@opentrons/components": "3.10.1",
     "classnames": "^2.2.5",
+    "file-saver": "^2.0.1",
     "formik": "^1.5.8",
     "lodash": "^4.17.4",
     "query-string": "^6.2.0",
