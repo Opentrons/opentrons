@@ -160,7 +160,7 @@ def test_smoothie_gpio(port_name=''):
     print('HALT')
     d._connection.reset_input_buffer()
     # drop the HALT line LOW, and make sure there is an error state
-    d._smoothie_hard_halt()
+    d.hard_halt()
 
     old_timeout = int(d._connection.timeout)
     d._connection.timeout = 1  # 1 second
