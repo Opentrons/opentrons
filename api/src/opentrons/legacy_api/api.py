@@ -351,7 +351,7 @@ class InstrumentsWrapper(object):
             attached_model_config = pipette_config.configs[attached_model]
         except KeyError:
             return list(filter(
-                lambda m: expected_model_substring == m.split('_v')[0],
+                lambda m: m.split('_v')[0] in expected_model_substring,
                 pipette_config.config_models))[0]
 
         if attached_model_config.get('name') == expected_model_substring:
