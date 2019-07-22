@@ -36,12 +36,23 @@ export const yesNoOptions = [
   { name: 'No', value: 'false' },
 ]
 
-export const aluminumBlockTypes = [
-  /* TODO */
-] // TODO write name/value/image
-export const aluminumBlockChildLabwareTypes = [
+export const aluminumBlockTypeOptions = [
+  {
+    name: '96 well',
+    value: '96well',
+    image: 'TODO image URL here',
+  },
+  {
+    name: '24 well',
+    value: '24well',
+    image: 'TODO image URL here',
+  },
+]
+
+export const aluminumBlockChildLabwareTypeOptions = [
   /* TODO */
 ] // TODO derive from labware
+
 export const tubeRackInsertOptions = [
   {
     name: '6 tubes',

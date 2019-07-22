@@ -15,6 +15,8 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import {
   labwareTypeOptions,
   tubeRackInsertOptions,
+  aluminumBlockTypeOptions,
+  aluminumBlockChildLabwareTypeOptions,
   wellBottomShapeOptions,
   wellShapeOptions,
   yesNoOptions,
@@ -379,19 +381,16 @@ const HeightImg = (props: HeightImgProps) => {
       src = require('./images/height_aluminumBlock_plate.svg')
     }
   }
-  return src != null ? <img src={src} /> : null
+  return <img src={src} />
 }
 
 const WellXYImg = (props: {| wellShape: WellShape |}) => {
   const { wellShape } = props
-  let src
-  if (wellShape === 'circular') {
-    src = require('./images/wellXY_circular.svg')
-  }
+  let src = require('./images/wellXY_circular.svg')
   if (wellShape === 'rectangular') {
     src = require('./images/wellXY_rectangular.svg')
   }
-  return src != null ? <img src={src} /> : null
+  return <img src={src} />
 }
 
 const XYSpacingImg = (props: {|
@@ -423,27 +422,28 @@ type DepthImgProps = {|
 |}
 const DepthImg = (props: DepthImgProps) => {
   const { labwareType, wellBottomShape } = props
+  const defaultSrc = require('./images/depth_plate_flat.svg')
   let src
 
-  if (wellBottomShape == null) return null
+  if (!wellBottomShape) return <img src={defaultSrc} />
 
-  if (labwareType === 'wellPlate') {
-    const imgMap = {
-      v: require('./images/depth_plate_v.svg'),
-      flat: require('./images/depth_plate_flat.svg'),
-      round: require('./images/depth_plate_round.svg'),
-    }
-    src = imgMap[wellBottomShape]
-  } else if (labwareType === 'reservoir' || labwareType === 'tubeRack') {
+  if (labwareType === 'reservoir' || labwareType === 'tubeRack') {
     const imgMap = {
       v: require('./images/depth_reservoir-and-tubes_v.svg'),
       flat: require('./images/depth_reservoir-and-tubes_flat.svg'),
       round: require('./images/depth_reservoir-and-tubes_round.svg'),
     }
     src = imgMap[wellBottomShape]
+  } else {
+    const imgMap = {
+      v: require('./images/depth_plate_v.svg'),
+      flat: require('./images/depth_plate_flat.svg'),
+      round: require('./images/depth_plate_round.svg'),
+    }
+    src = imgMap[wellBottomShape]
   }
 
-  return src != null ? <img src={src} /> : null
+  return <img src={src != null ? src : defaultSrc} />
 }
 
 const XYOffsetImg = (props: {|
@@ -612,21 +612,27 @@ const App = () => (
             label="What type of labware are you creating?"
             options={labwareTypeOptions}
           />
-          <Dropdown
-            name="tubeRackInsertLoadName"
-            label="Which tube rack insert"
-            options={tubeRackInsertOptions}
-          />
-          <Dropdown
-            name="aluminumBlockType"
-            label="Which aluminum block"
-            options={tubeRackInsertOptions}
-          />
-          <Dropdown
-            name="aluminumBlockChildLabwareType"
-            label="What labware is on top of your 96 well aluminum block"
-            options={tubeRackInsertOptions}
-          />
+          {values.labwareType === 'tubeRack' && (
+            <Dropdown
+              name="tubeRackInsertLoadName"
+              label="Which tube rack insert?"
+              options={tubeRackInsertOptions}
+            />
+          )}
+          {values.labwareType === 'aluminumBlock' && (
+            <>
+              <Dropdown
+                name="aluminumBlockType"
+                label="Which aluminum block?"
+                options={aluminumBlockTypeOptions}
+              />
+              <Dropdown
+                name="aluminumBlockChildLabwareType"
+                label="What labware is on top of your aluminum block?"
+                options={aluminumBlockChildLabwareTypeOptions}
+              />
+            </>
+          )}
         </Section>
         {/* PAGE 1 - Labware */}
         <Section label="Regularity" fieldList={['heterogeneousWells']}>
