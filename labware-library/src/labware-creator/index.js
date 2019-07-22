@@ -152,6 +152,10 @@ const labwareFormSchema = Yup.object().shape({
     .required(),
   wellDepth: Yup.number()
     .min(0)
+    .max(
+      Yup.ref('labwareZDimension'),
+      'Well depth cannot exceed labware height'
+    )
     .required(),
   wellShape: Yup.string()
     .oneOf(wellShapeOptions.map(o => o.value))
@@ -534,7 +538,16 @@ const ConditionalLabwareRender = (props: ConditionalLabwareRenderProps) => {
     // 2. Validate the definition in here, and have it display a special error asking user to contact support if
     //   JSON schema validation fails when the rest of the form validation passes.
     const validForm = processValidForm(values)
-    return validForm ? fieldsToLabware(validForm) : null
+    let def = null
+    try {
+      if (validForm) {
+        def = fieldsToLabware(validForm)
+      }
+    } catch (error) {
+      // TODO: the creator throws errors if labware fails to validate
+      console.error(error)
+    }
+    return validForm ? def : null
   }, [values])
 
   const errorComponent = 'Cannot render labware, invalid inputs' // TODO get SVG for no-definition
@@ -739,9 +752,15 @@ const App = () => (
             label="Well shape"
             options={wellShapeOptions}
           />
-          <TextField name="wellDiameter" label="Diameter" units="mm" />
-          <TextField name="wellXDimension" label="Well X" units="mm" />
-          <TextField name="wellYDimension" label="Well Y" units="mm" />
+          {values.wellShape === 'circular' && (
+            <TextField name="wellDiameter" label="Diameter" units="mm" />
+          )}
+          {values.wellShape === 'rectangular' && (
+            <>
+              <TextField name="wellXDimension" label="Well X" units="mm" />
+              <TextField name="wellYDimension" label="Well Y" units="mm" />
+            </>
+          )}
         </Section>
         <Section
           label="Well Bottom & Depth"

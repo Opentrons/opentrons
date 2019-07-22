@@ -35,16 +35,12 @@ export default function fieldsToLabware(
             yDimension: fields.wellYDimension,
           }
 
-    // TODO IMMEDIATELY derive these
-    const columnSpacing = 12
-    const rowSpacing = 14
-
     return createRegularLabware({
       metadata: {
         displayName: fields.displayName,
         displayCategory: fields.labwareType,
         displayVolumeUnits: 'µL',
-        //   tags?: Array<string>, // TODO: ???
+        //   tags?: Array<string>, // TODO LATER?
       },
       parameters: {
         format: 'irregular', // TODO! Cannot use fields.labwareType, must be "96Standard", "384Standard", "trough", "irregular", or "trash"
@@ -52,7 +48,7 @@ export default function fieldsToLabware(
         //   tipLength?: number,
         isMagneticModuleCompatible: false, // TODO: how to determine?
         //   magneticModuleEngageHeight?: number, // TODO: how to determine?
-        //   quirks?: Array<string>,
+        //   quirks?: Array<string>, // TODO: how to determine?
       },
       dimensions: {
         xDimension: fields.footprintXDimension,
@@ -70,15 +66,17 @@ export default function fieldsToLabware(
       offset: {
         x: fields.gridOffsetX,
         y: fields.gridOffsetY,
-        z: fields.labwareZDimension, // TODO: ???
+        // NOTE: must give wells a z offset b/c `well.z = offset.z - wellDepth`.
+        // We don't account for lip in Labware Creator now, so labware's offset.z is the SAME as labwareZDimension.
+        z: fields.labwareZDimension,
       },
       grid: {
         column: fields.gridColumns,
         row: fields.gridRows,
       },
       spacing: {
-        column: columnSpacing,
-        row: rowSpacing,
+        column: fields.gridSpacingX,
+        row: fields.gridSpacingY,
       },
       well: wellProperties,
       // group: {} // TODO: ???
