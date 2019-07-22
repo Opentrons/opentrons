@@ -450,13 +450,18 @@ def test_blow_out(loop, monkeypatch):
     monkeypatch.setattr(instr, 'move_to', fake_move)
 
     instr.blow_out()
+    # pipette should not move, if no location is passed
     assert move_location is None
 
     instr.aspirate(10)
     instr.blow_out(lw.wells()[0])
-
+    # pipette should blow out at the top of the well as default
     assert move_location == lw.wells()[0].top()
 
+    instr.aspirate(10)
+    instr.blow_out(lw.wells()[0].bottom())
+    # pipette should blow out at the location defined
+    assert move_location == lw.wells()[0].bottom()
 
 
 def test_transfer_options(loop, monkeypatch):
