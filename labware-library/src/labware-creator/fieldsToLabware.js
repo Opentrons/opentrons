@@ -7,13 +7,8 @@ import {
 import type { ProcessedLabwareFields } from './fields'
 
 export default function fieldsToLabware(
-  allFields: ProcessedLabwareFields
+  fields: ProcessedLabwareFields
 ): LabwareDefinition2 {
-  const fields = {
-    ...allFields.labwareTypeFields,
-    ...allFields.wellShapeFields,
-    ...allFields.commonFields,
-  }
   const isRegularLabware = true // TODO IMMEDIATELY derive from fields, I think only the 15-50-esque tube rack has multiple grids.
 
   if (isRegularLabware) {

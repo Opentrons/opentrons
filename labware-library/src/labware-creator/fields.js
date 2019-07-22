@@ -47,11 +47,31 @@ export const aluminumBlockTypeOptions = [
     value: '24well',
     image: 'TODO image URL here',
   },
+  {
+    name: 'Flat - not available',
+    value: 'flat',
+    image: 'TODO image URL here',
+    disabled: true,
+  },
 ]
 
-export const aluminumBlockChildLabwareTypeOptions = [
-  /* TODO */
-] // TODO derive from labware
+export const aluminumBlockChildTypeOptions = [
+  {
+    name: 'Tubes',
+    value: 'tubes',
+    image: 'TODO image URL here',
+  },
+  {
+    name: 'PCR + Tube Strip',
+    value: 'pcrAndTubeStrip',
+    image: 'TODO image URL here',
+  },
+  {
+    name: 'PCR Plate',
+    value: 'pcrPlate',
+    image: 'TODO image URL here',
+  },
+]
 
 export const tubeRackInsertOptions = [
   {
@@ -81,7 +101,7 @@ export type LabwareFields = {|
   labwareType: ?LabwareType,
   tubeRackInsertLoadName: ?string,
   aluminumBlockType: ?string, // eg, '24well' or '96well'
-  aluminumBlockChildLabwareType: ?LabwareType,
+  aluminumBlockChildType: ?string,
 
   // tubeRackSides: Array<string>, // eg, []
   footprintXDimension: ?string,
@@ -118,35 +138,17 @@ export type LabwareFields = {|
   displayName: ?string,
 |}
 
-// PROCESSED FIELDS
+// NOTE: these fields & types should be kept in sync with Yup schema `labwareFormSchema`.
+// Also, this type def is simplified -- IRL, wellDiameter is only a number when wellShape === 'circular', and void otherwise.
+// These could be represented by some complex union types, but that wouldn't really get us anywhere.
+// Yup and not Flow is the authority on making sure the data is correct here.
+export type ProcessedLabwareFields = {|
+  labwareType: LabwareType,
+  tubeRackInsertLoadName: string,
+  aluminumBlockType: string,
+  aluminumBlockChildType: string,
 
-export type ProcessedLabwareTypeFields =
-  | {|
-      labwareType: 'aluminumBlock',
-      aluminumBlockType: ?string,
-      aluminumBlockChildLabwareType: LabwareType,
-    |}
-  | {|
-      labwareType: 'tubeRack',
-      tubeRackInsertLoadName: string,
-      // tubeRackSides: Array<string>,
-    |}
-  | {|
-      labwareType: 'wellPlate' | 'reservoir',
-    |}
-
-type ProcessedWellShapeFields =
-  | {|
-      wellShape: 'circular',
-      wellDiameter: number,
-    |}
-  | {|
-      wellShape: 'rectangular',
-      wellXDimension: number,
-      wellYDimension: number,
-    |}
-
-export type ProcessedLabwareCommonFields = {|
+  // tubeRackSides: Array<string>, // eg, []
   footprintXDimension: number,
   footprintYDimension: number,
   labwareZDimension: number,
@@ -158,25 +160,25 @@ export type ProcessedLabwareCommonFields = {|
   gridOffsetX: number,
   gridOffsetY: number,
 
-  // NOTE: these fields don't *really* need to be here after processing, but might be useful down the road?
-  heterogeneousWells: boolean,
-  irregularRowSpacing: boolean,
-  irregularColumnSpacing: boolean,
+  heterogeneousWells: BooleanString,
+  irregularRowSpacing: BooleanString,
+  irregularColumnSpacing: BooleanString,
 
   wellVolume: number,
   wellBottomShape: WellBottomShape,
   wellDepth: number,
+  wellShape: WellShape,
+
+  // used with circular well shape only
+  wellDiameter: number,
+
+  // used with rectangular well shape only
+  wellXDimension: number,
+  wellYDimension: number,
 
   brand: string,
   brandId: Array<string>,
 
   loadName: string,
   displayName: string,
-|}
-
-// Split up the enum cases so Flow doesn't explode
-export type ProcessedLabwareFields = {|
-  labwareTypeFields: ProcessedLabwareTypeFields,
-  wellShapeFields: ProcessedWellShapeFields,
-  commonFields: ProcessedLabwareCommonFields,
 |}

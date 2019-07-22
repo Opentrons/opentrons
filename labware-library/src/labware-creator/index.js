@@ -19,7 +19,7 @@ import {
   labwareTypeOptions,
   tubeRackInsertOptions,
   aluminumBlockTypeOptions,
-  aluminumBlockChildLabwareTypeOptions,
+  aluminumBlockChildTypeOptions,
   wellBottomShapeOptions,
   wellShapeOptions,
   yesNoOptions,
@@ -31,8 +31,6 @@ import type {
   LabwareFields,
   LabwareType,
   ProcessedLabwareFields,
-  ProcessedLabwareCommonFields,
-  ProcessedLabwareTypeFields,
   WellShape,
   WellBottomShape,
 } from './fields'
@@ -43,7 +41,7 @@ const getDefaultFormState = (): LabwareFields => ({
   labwareType: null,
   tubeRackInsertLoadName: null,
   aluminumBlockType: null,
-  aluminumBlockChildLabwareType: null,
+  aluminumBlockChildType: null,
 
   // tubeRackSides: [],
   footprintXDimension: null,
@@ -97,7 +95,7 @@ const labwareFormSchema = Yup.object().shape({
     then: Yup.string().required(),
     otherwise: Yup.string().nullable(),
   }),
-  aluminumBlockChildLabwareType: Yup.string().when('labwareType', {
+  aluminumBlockChildType: Yup.string().when('labwareType', {
     is: 'aluminumBlock',
     then: Yup.string().required(),
     otherwise: Yup.string().nullable(),
@@ -113,28 +111,28 @@ const labwareFormSchema = Yup.object().shape({
     .max(Y_DIMENSION + XY_ALLOWED_VARIANCE)
     .required(),
   labwareZDimension: Yup.number()
-    .min(0)
+    .moreThan(0)
     .required(),
 
   gridRows: Yup.number()
-    .min(0)
+    .moreThan(0)
     .integer()
     .required(),
   gridColumns: Yup.number()
-    .min(0)
+    .moreThan(0)
     .integer()
     .required(),
   gridSpacingX: Yup.number()
-    .min(0)
+    .moreThan(0)
     .required(),
   gridSpacingY: Yup.number()
-    .min(0)
+    .moreThan(0)
     .required(),
   gridOffsetX: Yup.number()
-    .min(0)
+    .moreThan(0)
     .required(),
   gridOffsetY: Yup.number()
-    .min(0)
+    .moreThan(0)
     .required(),
 
   heterogeneousWells: Yup.boolean()
@@ -148,13 +146,13 @@ const labwareFormSchema = Yup.object().shape({
     .required(),
 
   wellVolume: Yup.number()
-    .min(0)
+    .moreThan(0)
     .required(),
   wellBottomShape: Yup.string()
     .oneOf(wellBottomShapeOptions.map(o => o.value))
     .required(),
   wellDepth: Yup.number()
-    .min(0)
+    .moreThan(0)
     .max(
       Yup.ref('labwareZDimension'),
       'Well depth cannot exceed labware height'
@@ -168,7 +166,7 @@ const labwareFormSchema = Yup.object().shape({
   wellDiameter: Yup.number().when('wellShape', {
     is: 'circular',
     then: Yup.number()
-      .min(0)
+      .moreThan(0)
       .required(),
     otherwise: Yup.number().nullable(),
   }),
@@ -177,14 +175,14 @@ const labwareFormSchema = Yup.object().shape({
   wellXDimension: Yup.number().when('wellShape', {
     is: 'rectangular',
     then: Yup.number()
-      .min(0)
+      .moreThan(0)
       .required(),
     otherwise: Yup.number().nullable(),
   }),
   wellYDimension: Yup.number().when('wellShape', {
     is: 'rectangular',
     then: Yup.number()
-      .min(0)
+      .moreThan(0)
       .required(),
     otherwise: Yup.number().nullable(),
   }),
@@ -275,120 +273,21 @@ const Section = connect((props: SectionProps) => {
   )
 })
 
-// TODO IMMEDIATELY: Yup is sufficient for this, right? Is it OK to leave Maybe's instead of enum-branching, and handling that
-// (for flow only, should not happen at runtime) in the fieldsToLabware fn?
-//
-// For a LabwareFields object that has already been actually validated, cast it into ProcessedLabwareFields.
-// This fn should NEVER return null in production, the Maybe is just an escape hatch for Flow
-const processValidForm = (fields: LabwareFields): ?ProcessedLabwareFields => {
-  const {
-    wellBottomShape,
-    brand,
-    loadName,
-    displayName,
-    labwareType,
-    aluminumBlockType,
-    aluminumBlockChildLabwareType,
-    tubeRackInsertLoadName,
-    // tubeRackSides,
-  } = fields
-  if (
-    wellBottomShape == null ||
-    brand == null ||
-    loadName == null ||
-    displayName == null ||
-    labwareType == null
-  ) {
-    console.error('Got a nullsy required field! This should not happen', fields)
-    return null
-  }
-  const commonFields: ProcessedLabwareCommonFields = {
-    footprintXDimension: Number(fields.footprintXDimension),
-    footprintYDimension: Number(fields.footprintYDimension),
-    labwareZDimension: Number(fields.labwareZDimension),
-
-    gridRows: Number(fields.gridRows),
-    gridColumns: Number(fields.gridColumns),
-    gridSpacingX: Number(fields.gridSpacingX),
-    gridSpacingY: Number(fields.gridSpacingY),
-    gridOffsetX: Number(fields.gridOffsetX),
-    gridOffsetY: Number(fields.gridOffsetY),
-
-    // NOTE: these fields don't *really* need to be here after processing, but might be useful down the road?
-    heterogeneousWells: fields.heterogeneousWells === 'true',
-    irregularRowSpacing: fields.irregularRowSpacing === 'true',
-    irregularColumnSpacing: fields.irregularColumnSpacing === 'true',
-
-    wellVolume: Number(fields.wellVolume),
-    wellBottomShape,
-    wellDepth: Number(fields.wellDepth),
-
-    brand,
-    brandId: fields.brandId,
-
-    loadName,
-    displayName,
-  }
-
-  const wellShapeFields =
-    fields.wellShape === 'circular'
-      ? {
-          wellShape: 'circular',
-          wellDiameter: Number(fields.wellDiameter),
-        }
-      : {
-          wellShape: 'rectangular',
-          wellXDimension: Number(fields.wellXDimension),
-          wellYDimension: Number(fields.wellYDimension),
-        }
-
-  let labwareTypeFields: ?ProcessedLabwareTypeFields = null
-  if (labwareType === 'aluminumBlock') {
-    if (aluminumBlockChildLabwareType == null) {
-      console.error('aluminumBlockChildLabwareType should not be nullsy')
-      return null
-    }
-    labwareTypeFields = {
-      labwareType: 'aluminumBlock',
-      aluminumBlockType,
-      aluminumBlockChildLabwareType,
-    }
-  } else if (labwareType === 'tubeRack') {
-    if (tubeRackInsertLoadName == null) {
-      console.error('aluminumBlockChildLabwareType should not be nullsy')
-      return null
-    }
-    labwareTypeFields = {
-      labwareType: 'tubeRack',
-      tubeRackInsertLoadName,
-      // tubeRackSides,
-    }
-  } else {
-    labwareTypeFields = { labwareType }
-  }
-
-  return {
-    commonFields,
-    wellShapeFields,
-    labwareTypeFields,
-  }
-}
-
 type HeightImgProps = {|
   labwareType: ?LabwareType,
-  aluminumBlockChildLabwareType: ?string,
+  aluminumBlockChildType: ?string,
 |}
 
 const HeightImg = (props: HeightImgProps) => {
-  const { labwareType, aluminumBlockChildLabwareType } = props
+  const { labwareType, aluminumBlockChildType } = props
   let src = require('./images/height_plate-and-reservoir.svg')
   if (labwareType === 'tubeRack') {
     src = require('./images/height_tubeRack.svg')
   } else if (labwareType === 'aluminumBlock') {
-    if (aluminumBlockChildLabwareType === 'tubeRack') {
+    if (aluminumBlockChildType === 'tubeRack') {
       // TODO IMMEDIATELY it's not going to literally equal 'tubeRack' right??
       src = require('./images/height_aluminumBlock_tubes.svg')
-    } else if (aluminumBlockChildLabwareType === 'wellPlate') {
+    } else if (aluminumBlockChildType === 'wellPlate') {
       // TODO IMMEDIATELY it's not going to literally equal 'wellPlate' right??
       src = require('./images/height_aluminumBlock_plate.svg')
     }
@@ -532,44 +431,10 @@ function SingleLabware(props: {| definition: LabwareDefinition2 |}) {
 type ConditionalLabwareRenderProps = {|
   values: LabwareFields,
 |}
-const NUMERICAL_FIELDS_REQUIRED_FOR_RENDER = [
-  // NOTE: not requiring labware x/y/z because Z doesn't affect render and X/Y are restricted enough to not affect render that much
-  // 'footprintXDimension',
-  // 'footprintYDimension',
-  // 'labwareZDimension',
-  'gridRows',
-  'gridColumns',
-  'gridSpacingX',
-  'gridSpacingY',
-  'gridOffsetX',
-  'gridOffsetY',
-]
+
 const ConditionalLabwareRender = (props: ConditionalLabwareRenderProps) => {
   const definition = React.useMemo(() => {
     const values = cloneDeep(props.values)
-    // Don't try to render if any required values are missing/invalid
-    // TODO IMMEDIATELY: how much of this can Yup do? Can you make a subschema of only the fields that matter to labware render?
-    const hasMissingNumericalFields = NUMERICAL_FIELDS_REQUIRED_FOR_RENDER.some(
-      field => isNaN(Number(values[field]))
-    )
-    let hasMissingWellShapeFields = true
-    if (
-      values.wellShape === 'circular' &&
-      !isNaN(Number(values.wellDiameter))
-    ) {
-      hasMissingWellShapeFields = false
-    } else if (
-      values.wellShape === 'rectangular' &&
-      ['wellXDimension', 'wellYDimension'].every(
-        field => !isNaN(Number(values[field]))
-      )
-    ) {
-      hasMissingWellShapeFields = false
-    }
-
-    // if (hasMissingNumericalFields || hasMissingWellShapeFields) {
-    //   return null
-    // } // TODO IMMEDIATELY
 
     // Fill arbitrary values in to any missing fields that aren't needed for this render,
     // eg some required definition data like well volume, height, and bottom shape don't affect the render.
@@ -589,28 +454,22 @@ const ConditionalLabwareRender = (props: ConditionalLabwareRenderProps) => {
     values.irregularRowSpacing = 'true'
     values.irregularColumnSpacing = 'true'
 
-    let yupCast = null
+    let castValues: ?ProcessedLabwareFields = null
     try {
-      yupCast = labwareFormSchema.cast(values)
+      castValues = labwareFormSchema.cast(values)
     } catch (error) {}
-    console.log('yup output inside conditional labware', yupCast)
-    if (yupCast === null) {
+    console.log('yup output inside conditional labware', castValues)
+    if (castValues === null) {
       return null
     }
-    const validForm = processValidForm(values)
-    console.log('conditional labware render with ', { values, validForm })
+
     let def = null
-    try {
-      if (validForm) {
-        def = fieldsToLabware(validForm)
-      } else {
-        console.log('invalid, no def for conditional render')
-      }
-    } catch (error) {
-      // TODO: the creator throws errors if labware fails to validate
-      console.error(error)
+    if (castValues) {
+      def = fieldsToLabware(castValues)
+    } else {
+      console.log('invalid, no def for conditional render')
     }
-    return validForm ? def : null
+    return def
   }, [props.values])
 
   const errorComponent = 'Cannot render labware, invalid inputs' // TODO get SVG for no-definition
@@ -701,27 +560,14 @@ const App = () => {
         initialValues={getDefaultFormState()}
         validationSchema={labwareFormSchema}
         onSubmit={(values: LabwareFields) => {
-          const castValues = labwareFormSchema.cast(values)
-          console.log(
-            'your cast form values (they are not used right now!)',
-            castValues
+          const castValues: ProcessedLabwareFields = labwareFormSchema.cast(
+            values
           )
-
-          const validForm = processValidForm(values)
-          console.log('validForm', validForm)
-          if (validForm) {
-            const def = fieldsToLabware(validForm)
-            console.log('your labware def:', def)
-            const blob = new Blob([JSON.stringify(def, null, 4)], {
-              type: 'application/json',
-            })
-            saveAs(blob, validForm.commonFields.displayName)
-          } else {
-            console.error(
-              'form passed Yup validation but not processValidForm!',
-              { values }
-            )
-          }
+          const def = fieldsToLabware(castValues)
+          const blob = new Blob([JSON.stringify(def, null, 4)], {
+            type: 'application/json',
+          })
+          saveAs(blob, castValues.displayName)
         }}
       >
         {({ handleSubmit, values, isValid, errors }) => (
@@ -734,7 +580,7 @@ const App = () => {
                 'labwareType',
                 'tubeRackInsertLoadName',
                 'aluminumBlockType',
-                'aluminumBlockChildLabwareType',
+                'aluminumBlockChildType',
               ]}
             >
               <Dropdown
@@ -757,9 +603,9 @@ const App = () => {
                     options={aluminumBlockTypeOptions}
                   />
                   <Dropdown
-                    name="aluminumBlockChildLabwareType"
+                    name="aluminumBlockChildType"
                     label="What labware is on top of your aluminum block?"
-                    options={aluminumBlockChildLabwareTypeOptions}
+                    options={aluminumBlockChildTypeOptions}
                   />
                 </>
               )}
@@ -804,9 +650,7 @@ const App = () => {
               </div>
               <HeightImg
                 labwareType={values.labwareType}
-                aluminumBlockChildLabwareType={
-                  values.aluminumBlockChildLabwareType
-                }
+                aluminumBlockChildType={values.aluminumBlockChildType}
               />
               <TextField name="labwareZDimension" label="Height" units="mm" />
             </Section>
