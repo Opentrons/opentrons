@@ -36,3 +36,34 @@
 .reinstall_message {
   margin-left: 1rem;
 }
+
+.download_message {
+  font-weight: var(--fw-semibold);
+}
+
+.download_error {
+  font-style: italic;
+}
+
+.progress_bar_container {
+  position: relative;
+  height: 1.75rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  border: solid 2px var(--c-dark-gray);
+  text-align: right;
+}
+
+.progress_bar {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border: solid 2px var(--c-white);
+  border-radius: 3px;
+  background-color: #006fff;
+}
+
+.progress_text {
+  line-height: 1.75;
+  padding: 0.5rem 0.25rem;
+}
