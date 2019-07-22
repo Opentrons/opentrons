@@ -239,7 +239,16 @@ const RadioField = (props: RadioFieldProps) => (
     <div className={styles.field_label}>{props.label}</div>
     <Field name={props.name}>
       {({ form, field }) => (
-        <RadioGroup {...field} options={props.options} inline />
+        <RadioGroup
+          {...field}
+          onChange={e => {
+            field.onChange(e)
+            // do not wait until blur to make radio field 'dirty'
+            field.onBlur(e)
+          }}
+          options={props.options}
+          inline
+        />
       )}
     </Field>
   </div>
