@@ -24,6 +24,25 @@ describe('app/shell/buildroot action creators', () => {
       args: [],
       expected: { type: 'buildroot:UNEXPECTED_ERROR' },
     },
+    {
+      name: 'buildroot:UPLOAD_FILE',
+      creator: actions.uploadBuildrootFile,
+      args: [{ name: 'robot-name' }, '/server/update/token/file'],
+      expected: {
+        type: 'buildroot:UPLOAD_FILE',
+        payload: {
+          host: { name: 'robot-name' },
+          path: '/server/update/token/file',
+        },
+        meta: { shell: true },
+      },
+    },
+    {
+      name: 'buildroot:CLEAR_SESSION',
+      creator: actions.clearBuildrootSession,
+      args: [],
+      expected: { type: 'buildroot:CLEAR_SESSION' },
+    },
   ]
 
   SPECS.forEach(spec => {

@@ -9,7 +9,7 @@ import { getConfig } from '../config'
 import { CURRENT_VERSION } from '../update'
 import { downloadManifest, getReleaseSet } from './release-manifest'
 import { getReleaseFiles } from './release-files'
-import { getPremigrationWheels, startPremigration } from './migrate'
+import { getPremigrationWheels, startPremigration, uploadFile } from './update'
 
 import type { Action, Dispatch } from '../types'
 import type { ReleaseSetFilepaths } from './types'
@@ -60,23 +60,23 @@ export function registerBuildrootUpdate(dispatch: Dispatch) {
 
           break
         }
+
+        case 'buildroot:UPLOAD_FILE': {
+          const { host, path } = action.payload
+          const file = updateSet?.system
+
+          if (file == null) {
+            return dispatch({ type: 'buildroot:UNEXPECTED_ERROR' })
+          }
+
+          uploadFile(host, path, file).catch(() =>
+            dispatch({ type: 'buildroot:UNEXPECTED_ERROR' })
+          )
+        }
       }
     }
   }
 }
-
-// TODO(mc, 2019-07-01): send streaming upload from main process rather than
-// sending this big file over to the UI thread. Remove this commented out
-// function when we have that in place
-// export function getUpdateFileContents(): Promise<Buffer> {
-//   const systemFile = updateSet?.system
-
-//   if (systemFile) {
-//     return Promise.reject(new Error('No buildroot file present'))
-//   }
-
-//   return readFile(systemFile)
-// }
 
 // check for a buildroot update matching the current app version
 //   1. Ensure the buildroot directory exists

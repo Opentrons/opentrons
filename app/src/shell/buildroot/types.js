@@ -19,9 +19,15 @@ export type UpdateSessionStage =
 
 export type BuildrootUpdateSession = {|
   robotName: string,
-  triggerUpdate: boolean,
   token: string | null,
   pathPrefix: string | null,
+  stage: UpdateSessionStage | null,
+  progress: number | null,
+  triggerUpdate: boolean,
+  uploadStarted: boolean,
+  committed: boolean,
+  restarted: boolean,
+  error: boolean,
 |}
 
 export type BuildrootState = {|
@@ -43,6 +49,8 @@ export type UnexpectedBuildrootError = {|
 |}
 
 export type BuildrootAction =
+  | StartBuildrootUpdateAction
+  | UnexpectedBuildrootError
   | {| type: 'buildroot:DOWNLOAD_PROGRESS', payload: number |}
   | {| type: 'buildroot:DOWNLOAD_ERROR', payload: string |}
   | {| type: 'buildroot:UPDATE_INFO', payload: BuildrootUpdateInfo | null |}
@@ -55,5 +63,9 @@ export type BuildrootAction =
   | {| type: 'buildroot:PREMIGRATION_STARTED' |}
   | {| type: 'buildroot:PREMIGRATION_DONE', payload: string |}
   | {| type: 'buildroot:PREMIGRATION_ERROR', payload: string |}
-  | StartBuildrootUpdateAction
-  | UnexpectedBuildrootError
+  | {|
+      type: 'buildroot:UPLOAD_FILE',
+      payload: {| host: RobotHost, path: string |},
+      meta: {| shell: true |},
+    |}
+  | {| type: 'buildroot:CLEAR_SESSION' |}
