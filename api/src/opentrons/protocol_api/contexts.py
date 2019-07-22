@@ -738,28 +738,30 @@ class InstrumentContext(CommandPublisher):
                               :py:meth:`dispense`)
         :returns: This instance
         """
-        if location is None:
-            if not self._ctx.location_cache:
-                raise RuntimeError('No valid current location cache present')
-            else:
-                location = self._ctx.location_cache.labware  # type: ignore
-                # type checked below
 
         if isinstance(location, Well):
             if location.parent.is_tiprack:
                 self._log.warning('Blow_out being performed on a tiprack. '
                                   'Please re-check your code')
-            target = location.top()
-        elif isinstance(location, types.Location) and not \
-                isinstance(location.labware, Well):
+            loc = location.top()
+            self.move_to(loc)
+        elif isinstance(location, types.Location):
+            loc = location
+            self.move_to(loc)
+        elif location is not None:
             raise TypeError(
-                'location should be a Well or None, but it is {}'
+                'location should be a Well or Location, but it is {}'
                 .format(location))
+        elif self._ctx.location_cache:
+            # if location cache exists, pipette blows out immediately at
+            # current location, no movement is needed
+            pass
         else:
-            raise TypeError(
-                'location should be a Well or None, but it is {}'
-                .format(location))
-        self.move_to(target)
+            raise RuntimeError(
+                "If blow out is called without an explicit location, another"
+                " method that moves to a location (such as move_to or "
+                "dispense) must previously have been called so the robot "
+                "knows where it is.")
         self._hw_manager.hardware.blow_out(self._mount)
         return self
 
@@ -1369,25 +1371,33 @@ class InstrumentContext(CommandPublisher):
         return self._mount.name.lower()
 
     @property
-    def speeds(self) -> Dict[str, float]:
-        """ The speeds (in mm/s) configured for the pipette, as a dict.
+    def speed(self) -> Dict[str, float]:
+        """ The speeds (in mm/s) configured for the pipette plunger, as a dict.
 
-        The keys will be 'aspirate' and 'dispense' (e.g. the keys of
-        :py:class:`MODE`)
+        The keys will be ``'aspirate'``, ``'dispense'``, and ``'blow_out'``
 
-        :note: This property is equivalent to :py:attr:`speeds`; the only
-        difference is the units in which this property is specified.
+        :note: This property is equivalent to :py:attr:`flow_rate`; the only
+        difference is the units in which this property is specified. Specifying
+        this attribute uses the units of the linear speed of the plunger inside
+        the pipette, while :py:attr:`flow_rate` uses the units of the
+        volumetric flow rate of liquid into or out of the tip.
+
+        :note: When setting this attribute, make sure to assign values to it
+        rather than modifying the entries. For example, always do
+
+        .. code-block:: python
+
+          instrument.speed = {'aspirate': 30}
         """
-        raise NotImplementedError
+        return {
+            'aspirate': self.hw_pipette['aspirate_speed'],
+            'dispense': self.hw_pipette['dispense_speed'],
+            'blow_out': self.hw_pipette['blow_out_speed']}
 
-    @speeds.setter
-    def speeds(self, new_speeds: Dict[str, float]) -> None:
-        """ Update the speeds (in mm/s) set for the pipette.
-
-        :param new_speeds: A dict containing at least one of 'aspirate'
-                           and 'dispense',  mapping to new speeds in mm/s.
-        """
-        raise NotImplementedError
+    @speed.setter
+    def speed(self, new_speeds: Dict[str, float]) -> None:
+        self._hw_manager.hardware.set_pipette_speed(self._mount,
+                                                    **new_speeds)
 
     @property
     def flow_rate(self) -> Dict[str, float]:
@@ -1396,8 +1406,18 @@ class InstrumentContext(CommandPublisher):
         Returns a dict with the keys 'aspirate' and 'dispense' and correspoding
         values are the flow rates for each operation.
 
-        :note: This property is equivalent to :py:attr:`speeds`; the only
-        difference is the units in which this property is specified.
+        :note: This property is equivalent to :py:attr:`speed`; the only
+        difference is the units in which this property is specified. Specifying
+        this property uses the units of the volumetric flow rate of liquid into
+        or out of the tip, while :py:attr:`speed` uses the units of the linear
+        speed of the plunger inside the pipette.
+
+        :note: When setting this attribute, make sure to assign values to it
+        rather than modifying the entries. For example, always do
+
+        .. code-block:: python
+
+          instrument.flow_rate = {'aspirate': 50}
         """
         return {'aspirate': self.hw_pipette['aspirate_flow_rate'],
                 'dispense': self.hw_pipette['dispense_flow_rate'],
@@ -1405,18 +1425,6 @@ class InstrumentContext(CommandPublisher):
 
     @flow_rate.setter
     def flow_rate(self, new_flow_rate: Dict[str, float]) -> None:
-        """ Update the speeds (in uL/s) for the pipette.
-
-        :param new_flow_rate: A dict containing at least one of ``'aspirate'``,
-                              ``'dispense'``, or ``'blow_out'``, mapping to
-                              new speeds in uL/s.
-
-        For instance:
-
-        .. code-block:: python
-
-          instrument.flow_rate = {'aspirate': 50}
-        """
         self._hw_manager.hardware.set_flow_rate(self._mount, **new_flow_rate)
 
     @property

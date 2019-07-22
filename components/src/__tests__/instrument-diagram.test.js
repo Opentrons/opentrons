@@ -5,13 +5,33 @@ import { InstrumentDiagram, InstrumentGroup } from '..'
 
 describe('InstrumentDiagram', () => {
   test('Single-channel renders correctly', () => {
-    const tree = Renderer.create(<InstrumentDiagram channels={1} />).toJSON()
+    const tree = Renderer.create(
+      <InstrumentDiagram channels={1} displayCategory="OG" />
+    ).toJSON()
 
     expect(tree).toMatchSnapshot()
   })
 
   test('Multi-channel renders correctly', () => {
-    const tree = Renderer.create(<InstrumentDiagram channels={8} />).toJSON()
+    const tree = Renderer.create(
+      <InstrumentDiagram channels={8} displayCategory="OG" />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('Single-channel GEN2 renders correctly', () => {
+    const tree = Renderer.create(
+      <InstrumentDiagram channels={1} displayCategory="GEN2" />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  test('Multi-channel GEN2 renders correctly', () => {
+    const tree = Renderer.create(
+      <InstrumentDiagram channels={8} displayCategory="GEN2" />
+    ).toJSON()
 
     expect(tree).toMatchSnapshot()
   })
@@ -25,14 +45,14 @@ describe('InstrumentGroup', () => {
           mount: 'left',
           description: 'p300 8-Channel',
           tipType: '150',
-          channels: 8,
+          pipetteSpecs: { channels: 8, displayCategory: 'OG' },
           className: 'foo',
         }}
         right={{
           mount: 'right',
           description: 'p10 Single',
           tipType: '10',
-          channels: 1,
+          pipetteSpecs: { channels: 1, displayCategory: 'OG' },
           isDisabled: true,
           className: 'blah',
         }}

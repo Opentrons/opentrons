@@ -17,7 +17,7 @@ import type { State, Dispatch } from '../../types'
 type SP = {|
   isRunning: boolean,
   isPaused: boolean,
-  startTime: number,
+  startTime: ?number,
   isReadyToRun: boolean,
   runTime: string,
   disabled: boolean,

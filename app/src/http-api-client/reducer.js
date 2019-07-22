@@ -12,12 +12,12 @@ import type { MotorsState } from './motors'
 import type { ResetState } from './reset'
 import type { NetworkingState } from './networking'
 
-export type RobotApiState = {|
+export type RobotApiState = $Shape<{|
   ...HealthState,
   ...MotorsState,
   ...ResetState,
   ...NetworkingState,
-|}
+|}>
 
 type ApiState = { [name: string]: ?RobotApiState }
 

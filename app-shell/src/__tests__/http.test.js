@@ -67,13 +67,13 @@ describe('app-shell main http module', () => {
   ]
 
   SUCCESS_SPECS.forEach(spec => {
-    const { name, method, request, response, expected } = spec
+    const { name, method, request, requestOptions, response, expected } = spec
 
     test(name, () => {
       mockFetch.mockResolvedValueOnce(response)
 
       return method(request).then(result => {
-        expect(mockFetch).toHaveBeenCalledWith(request)
+        expect(mockFetch).toHaveBeenCalledWith(request, requestOptions)
         expect(result).toEqual(expected)
       })
     })

@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.10.1"></a>
+## [3.10.1](https://github.com/opentrons/opentrons/compare/v3.10.0...v3.10.1) (2019-07-19)
+
+
+### Bug Fixes
+
+* **api:** apiv2: Correctly handle flow rates and plunger speeds ([#3739](https://github.com/opentrons/opentrons/issues/3739)) ([01c0fcb](https://github.com/opentrons/opentrons/commit/01c0fcb)), closes [#3737](https://github.com/opentrons/opentrons/issues/3737) [#3270](https://github.com/opentrons/opentrons/issues/3270)
+* **api:** apiv2: fix protocol cancel ([#3725](https://github.com/opentrons/opentrons/issues/3725)) ([b2b8c46](https://github.com/opentrons/opentrons/commit/b2b8c46))
+* **protocol-designer:** update various styles to match designs ([#3714](https://github.com/opentrons/opentrons/issues/3714)) ([ad0562c](https://github.com/opentrons/opentrons/commit/ad0562c)), closes [#2122](https://github.com/opentrons/opentrons/issues/2122)
+
+
+### Features
+
+* **api:** Make blow out flow rate settable ([#3735](https://github.com/opentrons/opentrons/issues/3735)) ([e12b4fd](https://github.com/opentrons/opentrons/commit/e12b4fd)), closes [#3733](https://github.com/opentrons/opentrons/issues/3733)
+* **app:** add GEN2 images to change pipette ([#3734](https://github.com/opentrons/opentrons/issues/3734)) ([1016c16](https://github.com/opentrons/opentrons/commit/1016c16)), closes [#3630](https://github.com/opentrons/opentrons/issues/3630)
+* **protocol-designer:** update migration modal copy ([#3709](https://github.com/opentrons/opentrons/issues/3709)) ([e3d1ffa](https://github.com/opentrons/opentrons/commit/e3d1ffa)), closes [#3696](https://github.com/opentrons/opentrons/issues/3696)
+* **shared-data:** add displayCategory to pipetteNameSpecs and schema ([#3731](https://github.com/opentrons/opentrons/issues/3731)) ([3b39dea](https://github.com/opentrons/opentrons/commit/3b39dea))
+
+
+
+
+
 <a name="3.10.0"></a>
 # [3.10.0](https://github.com/Opentrons/opentrons/compare/v3.9.0...v3.10.0) (2019-07-15)
 

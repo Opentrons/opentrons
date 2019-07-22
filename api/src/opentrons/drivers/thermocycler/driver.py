@@ -178,7 +178,8 @@ class TCPoller(threading.Thread):
     def _recursive_write_and_return(self, cmd, timeout, retries):
         try:
             return serial_communication.write_and_return(
-                cmd, TC_ACK, self._connection, timeout)
+                cmd, TC_ACK, self._connection, timeout,
+                tag=f'thermocycler {id(self)}')
         except SerialNoResponse as e:
             retries -= 1
             if retries <= 0:

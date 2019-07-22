@@ -28,6 +28,7 @@ untyped-type-import=error
 
 [options]
 module.name_mapper.extension='css' -> '@opentrons/components/interfaces/CSSModule.js'
+module.ignore_non_literal_requires=true
 merge_timeout=300
 esproposal.optional_chaining=enable
 

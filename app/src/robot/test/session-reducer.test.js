@@ -1,5 +1,5 @@
 // session reducer tests
-import { reducer, actionTypes } from '../'
+import { robotReducer as reducer, actionTypes } from '../'
 
 describe('robot reducer - session', () => {
   const now = Date.now()

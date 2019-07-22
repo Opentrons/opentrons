@@ -2,6 +2,7 @@
 
 import json
 import pkgutil
+from unittest import mock
 
 import opentrons.protocol_api as papi
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
@@ -447,8 +448,20 @@ def test_blow_out(loop, monkeypatch):
         move_location = loc
 
     monkeypatch.setattr(instr, 'move_to', fake_move)
+
     instr.blow_out()
+    # pipette should not move, if no location is passed
+    assert move_location is None
+
+    instr.aspirate(10)
+    instr.blow_out(lw.wells()[0])
+    # pipette should blow out at the top of the well as default
     assert move_location == lw.wells()[0].top()
+
+    instr.aspirate(10)
+    instr.blow_out(lw.wells()[0].bottom())
+    # pipette should blow out at the location defined
+    assert move_location == lw.wells()[0].bottom()
 
 
 def test_transfer_options(loop, monkeypatch):
@@ -524,3 +537,45 @@ def test_transfer_options(loop, monkeypatch):
         dispense=tf.DispenseOpts()
     )
     assert transfer_options == expected_xfer_options2
+
+
+def test_flow_rate(loop, monkeypatch):
+    ctx = papi.ProtocolContext(loop)
+    old_sfm = ctx._hw_manager.hardware
+
+    def pass_on(aspirate=None, dispense=None, blow_out=None):
+        old_sfm(aspirate=None, dispense=None, blow_out=None)
+
+    set_flow_rate = mock.Mock(side_effect=pass_on)
+    monkeypatch.setattr(ctx._hw_manager.hardware, 'set_flow_rate',
+                        set_flow_rate)
+    instr = ctx.load_instrument('p300_single', Mount.RIGHT)
+
+    ctx.home()
+    instr.flow_rate = {'aspirate': 1}
+    assert set_flow_rate.called_with(aspirate=1)
+    set_flow_rate.reset_mock()
+    instr.flow_rate = {'dispense': 10, 'blow_out': 2}
+    assert set_flow_rate.called_with(dispense=10, blow_out=2)
+    assert instr.flow_rate == {'aspirate': 1, 'dispense': 10, 'blow_out': 2}
+
+
+def test_pipette_speed(loop, monkeypatch):
+    ctx = papi.ProtocolContext(loop)
+    old_sfm = ctx._hw_manager.hardware
+
+    def pass_on(aspirate=None, dispense=None, blow_out=None):
+        old_sfm(aspirate=None, dispense=None, blow_out=None)
+
+    set_speed = mock.Mock(side_effect=pass_on)
+    monkeypatch.setattr(ctx._hw_manager.hardware, 'set_pipette_speed',
+                        set_speed)
+    instr = ctx.load_instrument('p300_single', Mount.RIGHT)
+
+    ctx.home()
+    instr.speed = {'aspirate': 1}
+    assert set_speed.called_with(aspirate=1)
+    set_speed.reset_mock()
+    instr.speed = {'dispense': 10, 'blow_out': 2}
+    assert set_speed.called_with(dispense=10, blow_out=2)
+    assert instr.speed == {'aspirate': 1, 'dispense': 10, 'blow_out': 2}

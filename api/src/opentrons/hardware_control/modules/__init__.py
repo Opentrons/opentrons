@@ -59,7 +59,7 @@ def discover() -> List[Tuple[str, str]]:
                 continue
             absolute_port = '/dev/modules/{}'.format(port)
             discovered_modules.append((absolute_port, name))
-    log.info('Discovered modules: {}'.format(discovered_modules))
+    log.debug('Discovered modules: {}'.format(discovered_modules))
 
     return discovered_modules
 

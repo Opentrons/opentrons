@@ -955,7 +955,8 @@ class SmoothieDriver_3_0_0:
         self._handle_return(cmd_ret)
         wait_ret = serial_communication.write_and_return(
             GCODES['WAIT'] + SMOOTHIE_COMMAND_TERMINATOR,
-            SMOOTHIE_ACK, self._connection, timeout=12000)
+            SMOOTHIE_ACK, self._connection, timeout=12000,
+            tag='smoothie')
         wait_ret = self._remove_unwanted_characters(
             GCODES['WAIT'], wait_ret)
         self._handle_return(wait_ret)
@@ -1015,7 +1016,8 @@ class SmoothieDriver_3_0_0:
                     cmd,
                     SMOOTHIE_ACK,
                     self._connection,
-                    timeout=timeout)
+                    timeout=timeout,
+                    tag='smoothie')
                 if attempt != 0:
                     log.warning(
                         f"required {attempt} retries for {cmd.strip()}")

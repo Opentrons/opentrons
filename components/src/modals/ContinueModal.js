@@ -7,9 +7,9 @@ type ContinueModalProps = {
   /** optional classes to apply */
   className?: string,
   /** cancellation handler (also passed to `Modal`'s `onCloseClick`) */
-  onCancelClick: () => void,
+  onCancelClick: () => mixed,
   /** continuation handler */
-  onContinueClick: () => void,
+  onContinueClick: () => mixed,
   /** modal contents */
   children: React.Node,
 }

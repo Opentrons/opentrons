@@ -27,7 +27,7 @@ function ResponseError(
   }
 }
 
-// not a real Error so it can be copied across worker boundries
+// not a real Error so it can be copied across worker boundaries
 export function FetchError(error: Error): ApiRequestError {
   return { name: error.name, message: error.message }
 }

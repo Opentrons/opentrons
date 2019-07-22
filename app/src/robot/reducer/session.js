@@ -21,7 +21,7 @@ type Request = {
   error: ?{ message: string },
 }
 
-export type State = {
+export type SessionState = {
   sessionRequest: Request,
   state: SessionStatus,
   errors: Array<{}>,
@@ -60,7 +60,7 @@ const {
   TICK_RUN_TIME,
 } = actionTypes
 
-const INITIAL_STATE: State = {
+const INITIAL_STATE: SessionState = {
   // loading a protocol
   sessionRequest: { inProgress: false, error: null },
   state: '',
@@ -83,9 +83,9 @@ const INITIAL_STATE: State = {
 }
 
 export default function sessionReducer(
-  state: State = INITIAL_STATE,
+  state: SessionState = INITIAL_STATE,
   action: Action
-): State {
+): SessionState {
   switch (action.type) {
     case 'robot:DISCONNECT_RESPONSE':
       return INITIAL_STATE
@@ -126,7 +126,10 @@ export default function sessionReducer(
   return state
 }
 
-function handleSessionUpdate(state: State, action: SessionUpdateAction): State {
+function handleSessionUpdate(
+  state: SessionState,
+  action: SessionUpdateAction
+): SessionState {
   const {
     payload: { state: sessionStateUpdate, startTime, lastCommand },
   } = action
@@ -154,7 +157,7 @@ function handleSessionUpdate(state: State, action: SessionUpdateAction): State {
   return { ...state, state: sessionState, startTime, protocolCommandsById }
 }
 
-function handleSessionInProgress(state: State): State {
+function handleSessionInProgress(state: SessionState): SessionState {
   return {
     ...state,
     runTime: 0,
@@ -163,7 +166,7 @@ function handleSessionInProgress(state: State): State {
   }
 }
 
-function handleSessionResponse(state: State, action: any): State {
+function handleSessionResponse(state: SessionState, action: any): SessionState {
   const { payload } = action
 
   if (payload.error) {
@@ -182,11 +185,11 @@ function handleSessionResponse(state: State, action: any): State {
   }
 }
 
-function handleRun(state: State, action: any): State {
+function handleRun(state: SessionState, action: any): SessionState {
   return { ...state, runTime: 0, runRequest: { inProgress: true, error: null } }
 }
 
-function handleRunResponse(state: State, action: any): State {
+function handleRunResponse(state: SessionState, action: any): SessionState {
   const { error, payload } = action
 
   if (error) {
@@ -196,15 +199,15 @@ function handleRunResponse(state: State, action: any): State {
   return { ...state, runRequest: { inProgress: false, error: null } }
 }
 
-function handleTickRunTime(state: State, action: any): State {
+function handleTickRunTime(state: SessionState, action: any): SessionState {
   return { ...state, runTime: Date.now() }
 }
 
-function handlePause(state: State, action: any): State {
+function handlePause(state: SessionState, action: any): SessionState {
   return { ...state, pauseRequest: { inProgress: true, error: null } }
 }
 
-function handlePauseResponse(state: State, action: any): State {
+function handlePauseResponse(state: SessionState, action: any): SessionState {
   const { error, payload } = action
 
   if (error) {
@@ -214,11 +217,11 @@ function handlePauseResponse(state: State, action: any): State {
   return { ...state, pauseRequest: { inProgress: false, error: null } }
 }
 
-function handleResume(state: State, action: any): State {
+function handleResume(state: SessionState, action: any): SessionState {
   return { ...state, resumeRequest: { inProgress: true, error: null } }
 }
 
-function handleResumeResponse(state: State, action: any): State {
+function handleResumeResponse(state: SessionState, action: any): SessionState {
   const { error, payload } = action
 
   if (error) {
@@ -228,11 +231,11 @@ function handleResumeResponse(state: State, action: any): State {
   return { ...state, resumeRequest: { inProgress: false, error: null } }
 }
 
-function handleCancel(state: State, action: any): State {
+function handleCancel(state: SessionState, action: any): SessionState {
   return { ...state, cancelRequest: { inProgress: true, error: null } }
 }
 
-function handleCancelResponse(state: State, action: any): State {
+function handleCancelResponse(state: SessionState, action: any): SessionState {
   const { error, payload } = action
   if (error) {
     return { ...state, cancelRequest: { inProgress: false, error: payload } }

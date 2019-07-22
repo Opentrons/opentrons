@@ -23,7 +23,7 @@ def test_get_temp_deck_temperature():
     command_log = []
     return_string = 'T:none C:90'
 
-    def _mock_send_command(self, command, timeout=None):
+    def _mock_send_command(self, command, timeout=None, tag=None):
         nonlocal command_log, return_string
         command_log += [command]
         return return_string
@@ -56,7 +56,7 @@ def test_fail_get_temp_deck_temperature():
 
     done = False
 
-    def _mock_send_command1(self, command, timeout=None):
+    def _mock_send_command1(self, command, timeout=None, tag=None):
         nonlocal done
         done = True
         return 'T:none C:90'
@@ -70,7 +70,7 @@ def test_fail_get_temp_deck_temperature():
 
     assert temp_deck._temperature == {'current': 90, 'target': None}
 
-    def _mock_send_command2(self, command, timeout=None):
+    def _mock_send_command2(self, command, timeout=None, tag=None):
         nonlocal done
         done = True
         return 'Tx:none C:1'    # Failure premise
@@ -93,7 +93,7 @@ def test_set_temp_deck_temperature(monkeypatch):
     temp_deck.simulating = False
     command_log = []
 
-    def _mock_send_command(self, command, timeout=None):
+    def _mock_send_command(self, command, timeout=None, tag=None):
         nonlocal command_log
         command_log += [command]
         return ''
@@ -113,7 +113,8 @@ def test_fail_set_temp_deck_temperature(monkeypatch):
 
     error_msg = 'ERROR: some error here'
 
-    def _raise_error(self, command, ack, serial_connection, timeout=None):
+    def _raise_error(
+            self, command, ack, serial_connection, timeout=None, tag=None):
         nonlocal error_msg
         return error_msg
 
@@ -129,7 +130,8 @@ def test_fail_set_temp_deck_temperature(monkeypatch):
 
     error_msg = 'Alarm: something alarming happened here'
 
-    def _raise_error(self, command, ack, serial_connection, timeout=None):
+    def _raise_error(
+            self, command, ack, serial_connection, timeout=None, tag=None):
         nonlocal error_msg
         return error_msg
 
@@ -148,7 +150,7 @@ def test_turn_off_temp_deck(monkeypatch):
     temp_deck.simulating = False
     command_log = []
 
-    def _mock_send_command(self, command, timeout=None):
+    def _mock_send_command(self, command, timeout=None, tag=None):
         nonlocal command_log
         command_log += [command]
         return ''
@@ -172,7 +174,7 @@ def test_get_device_info(monkeypatch):
     firmware_version = 'edge-1a2b345'
     serial = 'td20180102A01'
 
-    def _mock_send_command(self, command, timeout=None):
+    def _mock_send_command(self, command, timeout=None, tag=None):
         nonlocal command_log
         command_log += [command]
         return 'model:' + model \
@@ -202,7 +204,7 @@ def test_fail_get_device_info(monkeypatch):
     firmware_version = 'edge-1a2b345'
     serial = 'td20180102A01'
 
-    def _mock_send_command(self, command, timeout=None):
+    def _mock_send_command(self, command, timeout=None, tag=None):
         nonlocal command_log
         command_log += [command]
         return 'modelXX:' + model \
@@ -223,7 +225,7 @@ def test_dfu_command(monkeypatch):
     temp_deck.simulating = False
     command_log = []
 
-    def _mock_send_command(self, command, timeout=None):
+    def _mock_send_command(self, command, timeout=None, tag=None):
         nonlocal command_log
         command_log += [command]
         return ''

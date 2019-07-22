@@ -3,7 +3,6 @@
 import padStart from 'lodash/padStart'
 import some from 'lodash/some'
 import { createSelector } from 'reselect'
-import omitBy from 'lodash/omitBy'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { getLatestLabwareDef } from '../getLabware'
@@ -14,6 +13,7 @@ import type { State } from '../types'
 import type { ConnectionStatus } from './constants'
 import type {
   Mount,
+  Slot,
   Pipette,
   PipetteCalibrationStatus,
   Labware,
@@ -28,6 +28,7 @@ const connection = (state: State) => state.robot.connection
 const session = (state: State) => state.robot.session
 const sessionRequest = (state: State) => session(state).sessionRequest
 const cancelRequest = (state: State) => session(state).cancelRequest
+
 export function isMount(target: ?string): boolean {
   return PIPETTE_MOUNTS.indexOf(target) > -1
 }
@@ -264,7 +265,7 @@ export const getNextPipette = createSelector(
   }
 )
 
-// returns the mount of the pipette to use for deckware calibration
+// returns the mount of the pipette to use for labware calibration
 // TODO(mc, 2018-02-07): be smarter about the backup case
 // $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export const getCalibrator = createSelector(
@@ -287,7 +288,7 @@ export const getPipettesCalibrated = createSelector(
   (pipettes): boolean => pipettes.length !== 0 && pipettes.every(i => i.probed)
 )
 
-export function getModulesBySlot(state: State): { [string]: ?SessionModule } {
+export function getModulesBySlot(state: State): { [Slot]: SessionModule } {
   return session(state).modulesBySlot
 }
 
@@ -301,15 +302,10 @@ export const getModules: OutputSelector<
   state => state.config,
   (modulesBySlot, config) => {
     const tcEnabled = !!config.devInternal?.enableThermocycler
-    let modules = modulesBySlot
-    if (!tcEnabled) {
-      modules = omitBy(modulesBySlot, m => {
-        return m?.name === 'thermocycler'
-      })
-    }
-    return Object.keys(modules)
-      .map(slot => modules[slot])
-      .filter(Boolean)
+
+    return Object.keys(modulesBySlot)
+      .map((slot: Slot) => modulesBySlot[slot])
+      .filter((m: SessionModule) => tcEnabled || m.name !== 'thermocycler')
   }
 )
 
@@ -329,7 +325,7 @@ export const getLabware: OutputSelector<
   (instByMount, lwBySlot, confirmedBySlot, calibrationRequest): Labware[] => {
     return Object.keys(lwBySlot)
       .filter(isSlot)
-      .map(slot => {
+      .map<Labware>((slot: Slot) => {
         const labware = lwBySlot[slot]
         const { type, isTiprack, isLegacy } = labware
 
@@ -340,7 +336,7 @@ export const getLabware: OutputSelector<
         //   - non-tiprack: labware in slot or any of same type is confirmed
         const confirmed = some(
           confirmedBySlot,
-          (value, key) =>
+          (value: boolean, key: Slot) =>
             value === true &&
             (key === slot || (!isTiprack && type === lwBySlot[key].type))
         )
@@ -376,19 +372,26 @@ export const getLabware: OutputSelector<
         if (!a.isTiprack && !b.isTiprack) return 0
 
         // both a and b are tipracks, sort multi-channel calibrators first
-        const aChannels = instByMount[a.calibratorMount].channels
-        const bChannels = instByMount[b.calibratorMount].channels
+        const aChannels =
+          a.calibratorMount != null
+            ? instByMount[a.calibratorMount].channels
+            : 0
+        const bChannels =
+          b.calibratorMount != null
+            ? instByMount[b.calibratorMount].channels
+            : 0
+
         return bChannels - aChannels
       })
   }
 )
 
-export function getModulesReviewed(state: State) {
-  return calibration(state).modulesReviewed
+export function getModulesReviewed(state: State): boolean {
+  return Boolean(calibration(state).modulesReviewed)
 }
 
-export function getDeckPopulated(state: State) {
-  return calibration(state).deckPopulated
+export function getDeckPopulated(state: State): boolean {
+  return Boolean(calibration(state).deckPopulated)
 }
 
 // $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector

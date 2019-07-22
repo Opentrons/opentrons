@@ -36,6 +36,11 @@
   min-height: 8rem;
 }
 
+.flipped_image {
+  transform: scaleX(-1);
+  filter: FlipH;
+}
+
 .pipette_icon {
   grid-area: img;
   text-align: center;
