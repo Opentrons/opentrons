@@ -4,7 +4,7 @@ import { Formik } from 'formik'
 import cloneDeep from 'lodash/cloneDeep'
 import mapValues from 'lodash/mapValues'
 import { saveAs } from 'file-saver'
-import { AlertModal, PrimaryButton } from '@opentrons/components'
+import { AlertItem, AlertModal, PrimaryButton } from '@opentrons/components'
 import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
 import {
   labwareTypeOptions,
@@ -17,6 +17,7 @@ import {
   wellShapeOptions,
   yesNoOptions,
   tubeRackAutofills,
+  MAX_SUGGESTED_Z,
 } from './fields'
 import {
   initialStatus,
@@ -240,6 +241,23 @@ const displayAsTube = (values: LabwareFields) =>
     values.aluminumBlockType === '96well' &&
     ['tubes', 'pcrTubeStrip'].includes(values.aluminumBlockChildType))
 
+const getHeightAlerts = (
+  values: LabwareFields,
+  touched: { [$Keys<LabwareFields>]: boolean }
+) => {
+  const { labwareZDimension } = values
+  const zAsNum = Number(labwareZDimension) // NOTE: if empty string or null, may be cast to 0, but that's fine for `>`
+  if (touched.labwareZDimension && zAsNum > MAX_SUGGESTED_Z) {
+    return (
+      <AlertItem
+        type="info"
+        title="This labware may be too tall to work with some pipette + tip combinations. Please test on robot."
+      />
+    )
+  }
+  return null
+}
+
 const App = () => {
   const [
     showExportErrorModal,
@@ -382,6 +400,7 @@ const App = () => {
                   : 'Height'
               }
               fieldList={['labwareZDimension']}
+              additionalAlerts={getHeightAlerts(values, touched)}
             >
               <div>
                 <HeightGuidingText labwareType={values.labwareType} />

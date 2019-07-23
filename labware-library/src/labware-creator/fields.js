@@ -1,8 +1,9 @@
 // @flow
-
 export const X_DIMENSION = 127.76
 export const Y_DIMENSION = 85.48
 export const XY_ALLOWED_VARIANCE = 0.25
+export const MAX_SUGGESTED_Z = 124
+export const MAX_Z_DIMENSION = 195
 
 export type Options = Array<{|
   name: string,

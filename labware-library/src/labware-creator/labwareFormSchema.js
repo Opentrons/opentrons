@@ -1,5 +1,6 @@
 // @flow
 import * as Yup from 'yup'
+import { getAllLoadNames } from '../definitions'
 import {
   labwareTypeOptions,
   wellBottomShapeOptions,
@@ -8,6 +9,7 @@ import {
   X_DIMENSION,
   Y_DIMENSION,
   XY_ALLOWED_VARIANCE,
+  MAX_Z_DIMENSION,
 } from './fields'
 
 const REQUIRED_FIELD = '${label} is required' // eslint-disable-line no-template-curly-in-string
@@ -78,7 +80,9 @@ const labwareFormSchema = Yup.object().shape({
     .min(Y_DIMENSION - XY_ALLOWED_VARIANCE)
     .max(Y_DIMENSION + XY_ALLOWED_VARIANCE)
     .required(),
-  labwareZDimension: requiredPositiveNumber(LABELS.labwareZDimension),
+  labwareZDimension: requiredPositiveNumber(LABELS.labwareZDimension).lessThan(
+    MAX_Z_DIMENSION
+  ),
 
   gridRows: requiredPositiveInteger(LABELS.gridRows),
   gridColumns: requiredPositiveInteger(LABELS.gridColumns),
@@ -130,10 +134,15 @@ const labwareFormSchema = Yup.object().shape({
   brand: requiredString(LABELS.brand),
   brandId: Yup.array().of(Yup.string()),
 
-  loadName: requiredString(LABELS.loadName).matches(
-    /^[a-z0-9._]+$/,
-    '${label} can only contain lowercase letters, numbers, dot (.) and underscore (_). Spaces are not allowed.' // eslint-disable-line no-template-curly-in-string
-  ),
+  loadName: requiredString(LABELS.loadName)
+    .matches(
+      /^[a-z0-9._]+$/,
+      '${label} can only contain lowercase letters, numbers, dot (.) and underscore (_). Spaces are not allowed.' // eslint-disable-line no-template-curly-in-string
+    )
+    .notOneOf(
+      getAllLoadNames(),
+      'This load name already exists in the Opentrons default labware library. Please edit the load name to make it unique.'
+    ),
   displayName: requiredString(LABELS.displayName),
 })
 

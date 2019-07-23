@@ -10,6 +10,7 @@ import type { LabwareFields } from '../fields'
 type Props = {|
   label: string,
   formik: any, // TODO IMMEDIATELY type this??
+  additionalAlerts?: React.Node,
   fieldList?: Array<$Keys<LabwareFields>>,
   children?: React.Node,
 |}
@@ -35,6 +36,8 @@ const Section = connect((props: Props) => {
       )
     }
   }
+
+  // show Formik errors (from Yup) as WARNINGs for all dirty fields within this Section
   const dirtyFieldNames = fieldList.filter(
     name => props.formik?.touched?.[name]
   )
@@ -45,10 +48,14 @@ const Section = connect((props: Props) => {
     }
     return null
   })
+
   return (
     <div className={styles.section_wrapper}>
       <h2 className={styles.section_header}>{props.label}</h2>
-      <div>{allErrors}</div>
+      <div>
+        {allErrors}
+        {props.additionalAlerts}
+      </div>
       {props.children}
     </div>
   )

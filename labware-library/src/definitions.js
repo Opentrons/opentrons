@@ -5,6 +5,7 @@ import * as React from 'react'
 import { Route } from 'react-router-dom'
 import isEqual from 'lodash/isEqual'
 import groupBy from 'lodash/groupBy'
+import uniq from 'lodash/uniq'
 import uniqBy from 'lodash/uniqBy'
 import uniqWith from 'lodash/uniqWith'
 import round from 'lodash/round'
@@ -46,6 +47,20 @@ const getOnlyLatestDefs = (labwareList: LabwareList): LabwareList => {
     const resultIdx = group.findIndex(d => d.version === highestVersionNum)
     return group[resultIdx]
   })
+}
+
+let allLoadNames: Array<string> | null = null
+// ALL unique load names, not just the non-blacklisted ones
+export function getAllLoadNames(): Array<string> {
+  if (!allLoadNames) {
+    allLoadNames = uniq(
+      definitionsContext
+        .keys()
+        .map(name => definitionsContext(name))
+        .map(def => def.parameters.loadName)
+    )
+  }
+  return allLoadNames
 }
 
 let definitions: LabwareList | null = null
