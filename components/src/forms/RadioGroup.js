@@ -13,11 +13,11 @@ type Props = {
   /** value that is checked */
   value?: string,
   /** Array of {name, value} data with optional children */
-  options?: Array<{
+  options?: Array<{|
     name: string,
     value: string,
     children?: React.Node,
-  }>,
+  |}>,
   /** Show radio buttons inline instead of stacked */
   inline?: boolean,
   /** classes to apply to outer div */

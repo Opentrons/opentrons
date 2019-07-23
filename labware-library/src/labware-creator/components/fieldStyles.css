@@ -1,0 +1,13 @@
+@import '@opentrons/components';
+
+.field_wrapper {
+  margin: 1rem 0;
+  max-width: 20rem;
+}
+
+.field_label {
+  @apply --font-body-1-dark;
+
+  font-weight: var(--fw-semibold);
+  margin-bottom: 0.25rem;
+}

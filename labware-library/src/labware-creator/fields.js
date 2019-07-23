@@ -4,12 +4,19 @@ export const X_DIMENSION = 127.76
 export const Y_DIMENSION = 85.48
 export const XY_ALLOWED_VARIANCE = 0.25
 
+export type Options = Array<{|
+  name: string,
+  value: string,
+  disabled?: boolean,
+  imgSrc?: string,
+|}>
+
 export type LabwareType =
   | 'wellPlate'
   | 'reservoir'
   | 'tubeRack'
   | 'aluminumBlock'
-export const labwareTypeOptions = [
+export const labwareTypeOptions: Options = [
   { name: 'Well Plate', value: 'wellPlate' },
   { name: 'Reservoir', value: 'reservoir' },
   { name: 'Tube Rack', value: 'tubeRack' },
@@ -17,13 +24,13 @@ export const labwareTypeOptions = [
 ]
 
 export type WellShape = 'circular' | 'rectangular'
-export const wellShapeOptions = [
+export const wellShapeOptions: Options = [
   { name: 'Circular', value: 'circular' },
   { name: 'Rectangular', value: 'rectangular' },
 ]
 
 export type WellBottomShape = 'flat' | 'round' | 'v'
-export const wellBottomShapeOptions = [
+export const wellBottomShapeOptions: Options = [
   { name: 'Flat', value: 'flat' },
   { name: 'Round', value: 'round' },
   { name: 'V-Bottom', value: 'v' },
@@ -34,43 +41,6 @@ export type BooleanString = 'true' | 'false' // TODO IMMEDIATELY revisit
 export const yesNoOptions = [
   { name: 'Yes', value: 'true' },
   { name: 'No', value: 'false' },
-]
-
-export const aluminumBlockTypeOptions = [
-  {
-    name: '96 well',
-    value: '96well',
-    image: 'TODO image URL here',
-  },
-  {
-    name: '24 well',
-    value: '24well',
-    image: 'TODO image URL here',
-  },
-  {
-    name: 'Flat - not available',
-    value: 'flat',
-    image: 'TODO image URL here',
-    disabled: true,
-  },
-]
-
-export const aluminumBlockChildTypeOptions = [
-  {
-    name: 'Tubes',
-    value: 'tubes',
-    image: 'TODO image URL here',
-  },
-  {
-    name: 'PCR + Tube Strip',
-    value: 'pcrAndTubeStrip',
-    image: 'TODO image URL here',
-  },
-  {
-    name: 'PCR Plate',
-    value: 'pcrPlate',
-    image: 'TODO image URL here',
-  },
 ]
 
 export type LabwareFields = {|
@@ -159,26 +129,26 @@ export type ProcessedLabwareFields = {|
   displayName: string,
 |}
 
-export const tubeRackInsertOptions = [
+export const tubeRackInsertOptions: Options = [
   {
     name: '6 tubes',
     value: '6tubes',
-    image: require('./images/6x50mL_insert_large.png'),
+    imgSrc: require('./images/6x50mL_insert_large.png'),
   },
   {
     name: '15 tubes',
     value: '15tubes',
-    image: require('./images/15x15mL_insert_large.png'),
+    imgSrc: require('./images/15x15mL_insert_large.png'),
   },
   {
     name: '24 tubes (snap cap)',
     value: '24tubesSnapCap',
-    image: require('./images/24x1_5mL_insert_large.png'),
+    imgSrc: require('./images/24x1_5mL_insert_large.png'),
   },
   {
     name: '10 tubes (2 size)',
     value: '10tubes',
-    image: require('./images/6x15mL_and_4x50mL_insert_large.png'),
+    imgSrc: require('./images/6x15mL_and_4x50mL_insert_large.png'),
     disabled: true, // 6 + 4 tube rack not yet supported
   },
 ]
@@ -224,4 +194,104 @@ export const tubeRackAutofills: {
     gridOffsetX: '13.88',
     gridOffsetY: '17.74',
   },
+}
+
+// NOTE: these images are from labware-library, not labware creator's local images dir
+export const aluminumBlockTypeOptions: Options = [
+  {
+    name: '96 well',
+    value: '96well',
+    imgSrc: require('../images/opentrons_96_aluminumblock_side_view.jpg'),
+  },
+  {
+    name: '24 well',
+    value: '24well',
+    imgSrc: require('../images/opentrons_24_aluminumblock_side_view.jpg'),
+  },
+  {
+    name: 'Flat - not available',
+    value: 'flat',
+    imgSrc: require('../images/opentrons_flat_aluminumblock_side_view.jpg'),
+    disabled: true,
+  },
+]
+
+export const aluminumBlockChildTypeOptions: Options = [
+  {
+    name: 'Tubes',
+    value: 'tubes',
+  },
+  {
+    name: 'PCR Tube Strip',
+    value: 'pcrTubeStrip',
+  },
+  {
+    name: 'PCR Plate',
+    value: 'pcrPlate',
+  },
+]
+
+export const aluminumBlockAutofills = {
+  tubes: {
+    // NOTE: based on opentrons_24_aluminumblock_generic_2ml_screwcap
+    footprintXDimension: '127.75',
+    footprintYDimension: '85.50',
+    gridRows: '4',
+    gridColumns: '6',
+    gridSpacingX: '17.25',
+    gridSpacingY: '17.25',
+    gridOffsetX: '20.75',
+    gridOffsetY: '16.87',
+  },
+  pcrTubeStrip: {
+    // NOTE: based on opentrons_96_aluminumblock_generic_pcr_strip_200ul
+    footprintXDimension: '127.75',
+    footprintYDimension: '85.50',
+    gridRows: '8',
+    gridColumns: '12',
+    gridSpacingX: '9.00',
+    gridSpacingY: '9.00',
+    gridOffsetX: '14.38',
+    gridOffsetY: '11.25',
+  },
+  pcrPlate: {
+    // NOTE: based on opentrons_96_aluminumblock_biorad_wellplate_200ul
+    footprintXDimension: '127.75',
+    footprintYDimension: '85.50',
+    gridRows: '8',
+    gridColumns: '12',
+    gridSpacingX: '9.00',
+    gridSpacingY: '9.00',
+    gridOffsetX: '14.38',
+    gridOffsetY: '11.24',
+  },
+}
+
+export const LABELS: { [$Keys<LabwareFields>]: string } = {
+  labwareType: 'What type of labware are you creating?',
+  tubeRackInsertLoadName: 'Which tube rack insert?',
+  aluminumBlockType: 'Which aluminum block?',
+  aluminumBlockChildType: 'What labware is on top of your aluminum block?',
+  heterogeneousWells: 'Are all your wells the same shape and size?',
+  footprintXDimension: 'Length',
+  footprintYDimension: 'Width',
+  labwareZDimension: 'Height',
+  gridRows: 'Number of rows',
+  gridColumns: 'Number of columns',
+  irregularRowSpacing: 'Are all of your rows evenly spaced?',
+  irregularColumnSpacing: 'Are all of your columns evenly spaced?',
+  wellVolume: 'Max volume per well',
+  wellShape: 'Well shape',
+  wellDiameter: 'Diameter',
+  wellXDimension: 'Well X',
+  wellYDimension: 'Well Y',
+  wellBottomShape: 'Bottom shape',
+  wellDepth: 'Depth',
+  gridSpacingX: 'X Spacing (Xs)',
+  gridSpacingY: 'Y Spacing (Ys)',
+  gridOffsetX: 'X Offset (Xo)',
+  gridOffsetY: 'Y Offset (Yo)',
+  brand: 'Brand',
+  displayName: "Display Name ('File name' ??? TODO)",
+  loadName: 'API Load Name',
 }

@@ -1,14 +1,12 @@
 // @flow
 import * as React from 'react'
-import { Formik, Field, connect } from 'formik'
+import { Formik, Field } from 'formik'
 import * as Yup from 'yup'
 import cloneDeep from 'lodash/cloneDeep'
 import mapValues from 'lodash/mapValues'
 import { saveAs } from 'file-saver'
 import {
-  AlertItem,
   AlertModal,
-  DropdownField,
   PrimaryButton,
   InputField,
   RadioGroup,
@@ -25,16 +23,21 @@ import {
   wellShapeOptions,
   yesNoOptions,
   tubeRackAutofills,
+  LABELS,
   X_DIMENSION,
   Y_DIMENSION,
   XY_ALLOWED_VARIANCE,
 } from './fields'
+import Dropdown from './components/Dropdown'
+import Section from './components/Section'
 import fieldsToLabware from './fieldsToLabware'
 import styles from './styles.css'
+import fieldStyles from './components/fieldStyles.css'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LabwareFields,
   LabwareType,
+  Options,
   ProcessedLabwareFields,
   WellShape,
   WellBottomShape,
@@ -82,35 +85,6 @@ const getDefaultFormState = (): LabwareFields => ({
   loadName: null,
   displayName: null,
 })
-
-const LABELS: { [$Keys<LabwareFields>]: string } = {
-  labwareType: 'What type of labware are you creating?',
-  tubeRackInsertLoadName: 'Which tube rack insert?',
-  aluminumBlockType: 'Which aluminum block?',
-  aluminumBlockChildType: 'What labware is on top of your aluminum block?',
-  heterogeneousWells: 'Are all your wells the same shape and size?',
-  footprintXDimension: 'Length',
-  footprintYDimension: 'Width',
-  labwareZDimension: 'Height',
-  gridRows: 'Number of rows',
-  gridColumns: 'Number of columns',
-  irregularRowSpacing: 'Are all of your rows evenly spaced?',
-  irregularColumnSpacing: 'Are all of your columns evenly spaced?',
-  wellVolume: 'Max volume per well',
-  wellShape: 'Well shape',
-  wellDiameter: 'Diameter',
-  wellXDimension: 'Well X',
-  wellYDimension: 'Well Y',
-  wellBottomShape: 'Bottom shape',
-  wellDepth: 'Depth',
-  gridSpacingX: 'X Spacing (Xs)',
-  gridSpacingY: 'Y Spacing (Ys)',
-  gridOffsetX: 'X Offset (Xo)',
-  gridOffsetY: 'Y Offset (Yo)',
-  brand: 'Brand',
-  displayName: "Display Name ('File name' ??? TODO)",
-  loadName: 'API Load Name',
-}
 
 const REQUIRED_FIELD = '${label} is required' // eslint-disable-line no-template-curly-in-string
 const requiredString = (label: string) =>
@@ -247,14 +221,16 @@ type MakeAutofillOnChangeArgs = {|
   setTouched: Object => mixed,
 |}
 const makeAutofillOnChange = ({
-  name,
   autofills,
   values,
   touched,
   setValues,
   setTouched,
-}: MakeAutofillOnChangeArgs) => (e: SyntheticEvent<HTMLSelectElement>) => {
-  const value = e.currentTarget.value
+}: MakeAutofillOnChangeArgs) => (name: string, value: ?string) => {
+  if (value == null) {
+    console.log(`no value for ${name}, skipping autofill`)
+    return
+  }
   const autofillValues = autofills[value]
   if (autofillValues) {
     setValues({
@@ -293,8 +269,8 @@ const TextField = (props: TextFieldProps) => {
     form.setFieldValue(props.name, nextValue)
   }
   return (
-    <div className={styles.field_wrapper}>
-      <div className={styles.field_label}>{LABELS[name]}</div>
+    <div className={fieldStyles.field_wrapper}>
+      <div className={fieldStyles.field_label}>{LABELS[name]}</div>
       <Field name={props.name}>
         {({ field, form }) => (
           <InputField
@@ -308,34 +284,13 @@ const TextField = (props: TextFieldProps) => {
   )
 }
 
-type DropdownProps = {|
-  name: $Keys<LabwareFields>,
-  options: Array<Object>, // Array<{| name: string, value: string, image?: string |}>, // TODO IMMEDIATELY
-  /** optionally override Formik Field's field.onChange */
-  onChange?: (e: SyntheticEvent<HTMLSelectElement>) => mixed,
-|}
-const Dropdown = (props: DropdownProps) => (
-  <div className={styles.field_wrapper}>
-    <div className={styles.field_label}>{LABELS[props.name]}</div>
-    <Field name={props.name}>
-      {({ field, form }) => (
-        <DropdownField
-          {...field}
-          onChange={props.onChange || field.onChange}
-          options={props.options}
-        />
-      )}
-    </Field>
-  </div>
-)
-
 type RadioFieldProps = {|
   name: $Keys<LabwareFields>,
-  options: Array<{ name: string, value: string, children?: React.Node }>,
+  options: Options,
 |}
 const RadioField = (props: RadioFieldProps) => (
-  <div className={styles.field_wrapper}>
-    <div className={styles.field_label}>{LABELS[props.name]}</div>
+  <div className={fieldStyles.field_wrapper}>
+    <div className={fieldStyles.field_label}>{LABELS[props.name]}</div>
     <Field name={props.name}>
       {({ form, field }) => (
         <RadioGroup
@@ -352,34 +307,6 @@ const RadioField = (props: RadioFieldProps) => (
     </Field>
   </div>
 )
-
-// TODO: Make this DRY, don't require fields (in children) and also fieldList.
-type SectionProps = {|
-  label: string,
-  fieldList?: Array<$Keys<LabwareFields>>,
-  children?: React.Node,
-  formik?: any, // TODO IMMEDIATELY type this??
-|}
-const Section = connect((props: SectionProps) => {
-  const fieldList = props.fieldList || []
-  const dirtyFieldNames = fieldList.filter(
-    name => props.formik?.touched?.[name]
-  )
-  const allErrors = dirtyFieldNames.map(name => {
-    const errors: ?string = props.formik?.errors?.[name]
-    if (errors != null) {
-      return <AlertItem key={name} type="warning" title={errors} />
-    }
-    return null
-  })
-  return (
-    <div className={styles.section_wrapper}>
-      <h2 className={styles.section_header}>{props.label}</h2>
-      <div>{allErrors}</div>
-      {props.children}
-    </div>
-  )
-})
 
 type HeightImgProps = {|
   labwareType: ?LabwareType,
@@ -704,7 +631,7 @@ const App = () => {
                 <Dropdown
                   name="tubeRackInsertLoadName"
                   options={tubeRackInsertOptions}
-                  onChange={makeAutofillOnChange({
+                  onValueChange={makeAutofillOnChange({
                     name: 'tubeRackInsertLoadName',
                     autofills: tubeRackAutofills,
                     values,
