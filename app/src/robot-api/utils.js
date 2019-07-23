@@ -99,7 +99,7 @@ export const createBaseRobotApiEpic = (
     ofType(type),
     switchMap<RobotApiAction, _, _>(a =>
       // `any` typed to recast strictly-typed `meta` of RobotApiRequest
-      // to loosly-typed `meta` of RobotApi(Request|Response)Action
+      // to loosely-typed `meta` of RobotApi(Request|Response)Action
       makeRobotApiRequest(a.payload, (a: any).meta)
     )
   )

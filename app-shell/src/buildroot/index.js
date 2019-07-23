@@ -47,6 +47,7 @@ export function registerBuildrootUpdate(dispatch: Dispatch) {
             .then(
               (): BuildrootAction => ({
                 type: 'buildroot:PREMIGRATION_DONE',
+                payload: robot.name,
               })
             )
             .catch(

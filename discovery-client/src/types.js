@@ -9,10 +9,15 @@ export type HealthResponse = {
   logs?: Array<string>,
 }
 
-export type Capability = 'buildroot-migration' | 'buildroot-update' | 'restart'
+export type Capability =
+  | 'bootstrap'
+  | 'balenaUpdate'
+  | 'buildrootMigration'
+  | 'buildrootUpdate'
+  | 'restart'
 
 export type CapabilityMap = {
-  [capabilityName: Capability]: string,
+  [capabilityName: Capability]: ?string,
 }
 
 export type ServerHealthResponse = {
