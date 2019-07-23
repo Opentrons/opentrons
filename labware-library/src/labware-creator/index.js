@@ -78,149 +78,181 @@ const getDefaultFormState = (): LabwareFields => ({
   displayName: null,
 })
 
+const LABELS: { [$Keys<LabwareFields>]: string } = {
+  labwareType: 'What type of labware are you creating?',
+  tubeRackInsertLoadName: 'Which tube rack insert?',
+  aluminumBlockType: 'Which aluminum block?',
+  aluminumBlockChildType: 'What labware is on top of your aluminum block?',
+  heterogeneousWells: 'Are all your wells the same shape and size?',
+  footprintXDimension: 'Length',
+  footprintYDimension: 'Width',
+  labwareZDimension: 'Height',
+  gridRows: 'Number of rows',
+  gridColumns: 'Number of columns',
+  irregularRowSpacing: 'Are all of your rows evenly spaced?',
+  irregularColumnSpacing: 'Are all of your columns evenly spaced?',
+  wellVolume: 'Max volume per well',
+  wellShape: 'Well shape',
+  wellDiameter: 'Diameter',
+  wellXDimension: 'Well X',
+  wellYDimension: 'Well Y',
+  wellBottomShape: 'Bottom shape',
+  wellDepth: 'Depth',
+  gridSpacingX: 'X Spacing (Xs)',
+  gridSpacingY: 'Y Spacing (Ys)',
+  gridOffsetX: 'X Offset (Xo)',
+  gridOffsetY: 'Y Offset (Yo)',
+  brand: 'Brand',
+  displayName: "Display Name ('File name' ??? TODO)",
+  loadName: 'API Load Name',
+}
+
+const REQUIRED_FIELD = '${label} is required' // eslint-disable-line no-template-curly-in-string
+const requiredString = (label: string) =>
+  Yup.string()
+    .label(label)
+    .typeError(REQUIRED_FIELD)
+    .required()
+const MUST_BE_A_NUMBER = '${label} must be a number' // eslint-disable-line no-template-curly-in-string
+
 // TODO: add decimal-point constraint where needed (Yup.mixed.test ?)
-// TODO: DRY this validation schema
-// TODO: correct, readable validation error messages
+const requiredPositiveNumber = (label: string) =>
+  Yup.number()
+    .label(label)
+    .typeError(MUST_BE_A_NUMBER)
+    .moreThan(0)
+    .required()
+
+const requiredPositiveInteger = (label: string) =>
+  Yup.number()
+    .label(label)
+    .typeError(MUST_BE_A_NUMBER)
+    .moreThan(0)
+    .integer()
+    .required()
+
+const aluminumBlockRequiredString = (label: string) =>
+  Yup.mixed().when('labwareType', {
+    is: 'aluminumBlock',
+    then: requiredString(label),
+    otherwise: Yup.mixed().nullable(),
+  })
+
+const unsupportedLabwareIfFalse = (label: string) =>
+  Yup.boolean()
+    .label(label)
+    .typeError(REQUIRED_FIELD)
+    .oneOf([true], 'TODO! Text here')
+    .required()
+
 const labwareFormSchema = Yup.object().shape({
-  labwareType: Yup.string()
-    .oneOf(labwareTypeOptions.map(o => o.value))
-    .required(),
-  tubeRackInsertLoadName: Yup.string().when('labwareType', {
+  labwareType: requiredString(LABELS.labwareType).oneOf(
+    labwareTypeOptions.map(o => o.value)
+  ),
+  tubeRackInsertLoadName: Yup.mixed().when('labwareType', {
     is: 'tubeRack',
-    then: Yup.string().required(),
-    otherwise: Yup.string().nullable(),
+    then: requiredString(LABELS.tubeRackInsertLoadName),
+    otherwise: Yup.mixed().nullable(),
   }),
-  aluminumBlockType: Yup.string().when('labwareType', {
-    is: 'aluminumBlock',
-    then: Yup.string().required(),
-    otherwise: Yup.string().nullable(),
-  }),
-  aluminumBlockChildType: Yup.string().when('labwareType', {
-    is: 'aluminumBlock',
-    then: Yup.string().required(),
-    otherwise: Yup.string().nullable(),
-  }),
+  aluminumBlockType: aluminumBlockRequiredString(LABELS.aluminumBlockType),
+  aluminumBlockChildType: aluminumBlockRequiredString(
+    LABELS.aluminumBlockChildType
+  ),
 
   // tubeRackSides: Array<string>
   footprintXDimension: Yup.number()
+    .label(LABELS.footprintXDimension)
+    .typeError(MUST_BE_A_NUMBER)
     .min(X_DIMENSION - XY_ALLOWED_VARIANCE)
     .max(X_DIMENSION + XY_ALLOWED_VARIANCE)
     .required(),
   footprintYDimension: Yup.number()
+    .label(LABELS.footprintYDimension)
+    .typeError(MUST_BE_A_NUMBER)
     .min(Y_DIMENSION - XY_ALLOWED_VARIANCE)
     .max(Y_DIMENSION + XY_ALLOWED_VARIANCE)
     .required(),
-  labwareZDimension: Yup.number()
-    .moreThan(0)
-    .required(),
+  labwareZDimension: requiredPositiveNumber(LABELS.labwareZDimension),
 
-  gridRows: Yup.number()
-    .moreThan(0)
-    .integer()
-    .required(),
-  gridColumns: Yup.number()
-    .moreThan(0)
-    .integer()
-    .required(),
-  gridSpacingX: Yup.number()
-    .moreThan(0)
-    .required(),
-  gridSpacingY: Yup.number()
-    .moreThan(0)
-    .required(),
-  gridOffsetX: Yup.number()
-    .moreThan(0)
-    .required(),
-  gridOffsetY: Yup.number()
-    .moreThan(0)
-    .required(),
+  gridRows: requiredPositiveInteger(LABELS.gridRows),
+  gridColumns: requiredPositiveInteger(LABELS.gridColumns),
+  gridSpacingX: requiredPositiveNumber(LABELS.gridSpacingX),
+  gridSpacingY: requiredPositiveNumber(LABELS.gridSpacingY),
+  gridOffsetX: requiredPositiveNumber(LABELS.gridOffsetX),
+  gridOffsetY: requiredPositiveNumber(LABELS.gridOffsetY),
 
-  heterogeneousWells: Yup.boolean()
-    .oneOf([true], 'heterogeneousWells bad TODO!')
-    .required(),
-  irregularRowSpacing: Yup.boolean()
-    .oneOf([true], 'irregularRowSpacing bad TODO!')
-    .required(),
-  irregularColumnSpacing: Yup.boolean()
-    .oneOf([true], 'irregularColumnSpacing bad TODO!')
-    .required(),
+  heterogeneousWells: unsupportedLabwareIfFalse(LABELS.heterogeneousWells),
+  irregularRowSpacing: unsupportedLabwareIfFalse(LABELS.irregularRowSpacing),
+  irregularColumnSpacing: unsupportedLabwareIfFalse(
+    LABELS.irregularColumnSpacing
+  ),
 
-  wellVolume: Yup.number()
-    .moreThan(0)
-    .required(),
-  wellBottomShape: Yup.string()
-    .oneOf(wellBottomShapeOptions.map(o => o.value))
-    .required(),
+  wellVolume: requiredPositiveNumber(LABELS.wellVolume),
+  wellBottomShape: requiredString(LABELS.wellBottomShape).oneOf(
+    wellBottomShapeOptions.map(o => o.value)
+  ),
   wellDepth: Yup.number()
+    .label(LABELS.wellDepth)
+    .typeError(MUST_BE_A_NUMBER)
     .moreThan(0)
     .max(
       Yup.ref('labwareZDimension'),
       'Well depth cannot exceed labware height'
     )
     .required(),
-  wellShape: Yup.string()
-    .oneOf(wellShapeOptions.map(o => o.value))
-    .required(),
+  wellShape: requiredString(LABELS.wellShape).oneOf(
+    wellShapeOptions.map(o => o.value)
+  ),
 
   // used with circular well shape only
-  wellDiameter: Yup.number().when('wellShape', {
+  wellDiameter: Yup.mixed().when('wellShape', {
     is: 'circular',
-    then: Yup.number()
-      .moreThan(0)
-      .required(),
-    otherwise: Yup.number().nullable(),
+    then: requiredPositiveNumber(LABELS.wellDiameter),
+    otherwise: Yup.mixed().nullable(),
   }),
 
   // used with rectangular well shape only
-  wellXDimension: Yup.number().when('wellShape', {
+  wellXDimension: Yup.mixed().when('wellShape', {
     is: 'rectangular',
-    then: Yup.number()
-      .moreThan(0)
-      .required(),
-    otherwise: Yup.number().nullable(),
+    then: requiredPositiveNumber(LABELS.wellXDimension),
+    otherwise: Yup.mixed().nullable(),
   }),
-  wellYDimension: Yup.number().when('wellShape', {
+  wellYDimension: Yup.mixed().when('wellShape', {
     is: 'rectangular',
-    then: Yup.number()
-      .moreThan(0)
-      .required(),
-    otherwise: Yup.number().nullable(),
+    then: requiredPositiveNumber(LABELS.wellYDimension),
+    otherwise: Yup.mixed().nullable(),
   }),
 
-  brand: Yup.string().required(),
+  brand: requiredString(LABELS.brand),
   brandId: Yup.array().of(Yup.string()),
 
-  loadName: Yup.string()
-    .required()
-    .matches(
-      /^[a-z0-9._]+$/,
-      'Load name can only contain lowercase letters, numbers, dot (.) and underscore (_). Spaces are not allowed.'
-    ),
-  displayName: Yup.string().required(),
+  loadName: requiredString(LABELS.loadName).matches(
+    /^[a-z0-9._]+$/,
+    '${label} can only contain lowercase letters, numbers, dot (.) and underscore (_). Spaces are not allowed.' // eslint-disable-line no-template-curly-in-string
+  ),
+  displayName: requiredString(LABELS.displayName),
 })
 
-type TextFieldProps = {
+type TextFieldProps = {|
   name: $Keys<LabwareFields>,
   units?: $PropertyType<React.ElementProps<typeof InputField>, 'units'>,
-  label?: string,
-}
+|}
 const TextField = (props: TextFieldProps) => (
   <div className={styles.field_wrapper}>
-    <div className={styles.field_label}>{props.label}</div>
+    <div className={styles.field_label}>{LABELS[props.name]}</div>
     <Field name={props.name}>
       {({ field, form }) => <InputField {...field} units={props.units} />}
     </Field>
   </div>
 )
 
-type DropdownProps = {
+type DropdownProps = {|
   name: $Keys<LabwareFields>,
   options: Array<Object>, // Array<{| name: string, value: string, image?: string |}>, // TODO IMMEDIATELY
-  label?: string,
-}
+|}
 const Dropdown = (props: DropdownProps) => (
   <div className={styles.field_wrapper}>
-    <div className={styles.field_label}>{props.label}</div>
+    <div className={styles.field_label}>{LABELS[props.name]}</div>
     <Field name={props.name}>
       {({ field, form }) => (
         <DropdownField {...field} options={props.options} />
@@ -229,14 +261,13 @@ const Dropdown = (props: DropdownProps) => (
   </div>
 )
 
-type RadioFieldProps = {
+type RadioFieldProps = {|
   name: $Keys<LabwareFields>,
   options: Array<{ name: string, value: string, children?: React.Node }>,
-  label?: string,
-}
+|}
 const RadioField = (props: RadioFieldProps) => (
   <div className={styles.field_wrapper}>
-    <div className={styles.field_label}>{props.label}</div>
+    <div className={styles.field_label}>{LABELS[props.name]}</div>
     <Field name={props.name}>
       {({ form, field }) => (
         <RadioGroup
@@ -592,15 +623,10 @@ const App = () => {
                 'aluminumBlockChildType',
               ]}
             >
-              <Dropdown
-                name="labwareType"
-                label="What type of labware are you creating?"
-                options={labwareTypeOptions}
-              />
+              <Dropdown name="labwareType" options={labwareTypeOptions} />
               {values.labwareType === 'tubeRack' && (
                 <Dropdown
                   name="tubeRackInsertLoadName"
-                  label="Which tube rack insert?"
                   options={tubeRackInsertOptions}
                 />
               )}
@@ -608,12 +634,10 @@ const App = () => {
                 <>
                   <Dropdown
                     name="aluminumBlockType"
-                    label="Which aluminum block?"
                     options={aluminumBlockTypeOptions}
                   />
                   <Dropdown
                     name="aluminumBlockChildType"
-                    label="What labware is on top of your aluminum block?"
                     options={aluminumBlockChildTypeOptions}
                   />
                 </>
@@ -622,11 +646,7 @@ const App = () => {
             {/* PAGE 1 - Labware */}
             <Section label="Regularity" fieldList={['heterogeneousWells']}>
               {/* tubeRackSides: Array<string> maybe?? */}
-              <RadioField
-                name="heterogeneousWells"
-                label="Are all your wells the same shape and size?"
-                options={yesNoOptions}
-              />
+              <RadioField name="heterogeneousWells" options={yesNoOptions} />
             </Section>
             <Section
               label="Footprint"
@@ -643,8 +663,8 @@ const App = () => {
                 </p>
               </div>
               <img src={require('./images/footprint.svg')} />
-              <TextField name="footprintXDimension" label="Length" units="mm" />
-              <TextField name="footprintYDimension" label="Width" units="mm" />
+              <TextField name="footprintXDimension" units="mm" />
+              <TextField name="footprintYDimension" units="mm" />
             </Section>
             <Section
               label={
@@ -661,7 +681,7 @@ const App = () => {
                 labwareType={values.labwareType}
                 aluminumBlockChildType={values.aluminumBlockChildType}
               />
-              <TextField name="labwareZDimension" label="Height" units="mm" />
+              <TextField name="labwareZDimension" units="mm" />
             </Section>
             <Section
               label="Grid"
@@ -684,16 +704,11 @@ const App = () => {
                 labwareType={values.labwareType}
                 wellShape={values.wellShape}
               />
-              <TextField name="gridRows" label="Number of rows" />
-              <RadioField
-                name="irregularRowSpacing"
-                label="Are all of your rows evenly spaced?"
-                options={yesNoOptions}
-              />
-              <TextField name="gridColumns" label="Number of columns" />
+              <TextField name="gridRows" />
+              <RadioField name="irregularRowSpacing" options={yesNoOptions} />
+              <TextField name="gridColumns" />
               <RadioField
                 name="irregularColumnSpacing"
-                label="Are all of your columns evenly spaced?"
                 options={yesNoOptions}
               />
             </Section>
@@ -702,11 +717,7 @@ const App = () => {
               <div>
                 <p>Total maximum volume of each well.</p>
               </div>
-              <TextField
-                name="wellVolume"
-                label="Max volume per well"
-                units="μL"
-              />
+              <TextField name="wellVolume" units="μL" />
             </Section>
             <Section
               label="Well Shape & Sides"
@@ -725,18 +736,14 @@ const App = () => {
                 <p>Diameter helps the robot locate the sides of the wells.</p>
               </div>
               <WellXYImg wellShape={values.wellShape} />
-              <RadioField
-                name="wellShape"
-                label="Well shape"
-                options={wellShapeOptions}
-              />
+              <RadioField name="wellShape" options={wellShapeOptions} />
               {values.wellShape === 'circular' && (
-                <TextField name="wellDiameter" label="Diameter" units="mm" />
+                <TextField name="wellDiameter" units="mm" />
               )}
               {values.wellShape === 'rectangular' && (
                 <>
-                  <TextField name="wellXDimension" label="Well X" units="mm" />
-                  <TextField name="wellYDimension" label="Well Y" units="mm" />
+                  <TextField name="wellXDimension" units="mm" />
+                  <TextField name="wellYDimension" units="mm" />
                 </>
               )}
             </Section>
@@ -765,10 +772,9 @@ const App = () => {
               />
               <Dropdown
                 name="wellBottomShape"
-                label="Bottom shape"
                 options={wellBottomShapeOptions}
               />
-              <TextField name="wellDepth" label="Depth" units="mm" />
+              <TextField name="wellDepth" units="mm" />
             </Section>
             <Section
               label="Well Spacing"
@@ -788,16 +794,8 @@ const App = () => {
                 wellShape={values.wellShape}
                 gridRows={values.gridRows}
               />
-              <TextField
-                name="gridSpacingX"
-                label="X Spacing (Xs)"
-                units="mm"
-              />
-              <TextField
-                name="gridSpacingY"
-                label="Y Spacing (Ys)"
-                units="mm"
-              />
+              <TextField name="gridSpacingX" units="mm" />
+              <TextField name="gridSpacingY" units="mm" />
             </Section>
             <Section
               label="Grid Offset"
@@ -818,8 +816,8 @@ const App = () => {
                   from the slot{"'"}s top left corner.
                 </p>
               </div>
-              <TextField name="gridOffsetX" label="X Offset (Xo)" units="mm" />
-              <TextField name="gridOffsetY" label="Y Offset (Yo)" units="mm" />
+              <TextField name="gridOffsetX" units="mm" />
+              <TextField name="gridOffsetY" units="mm" />
             </Section>
             <Section label="Check your work">
               <p>
@@ -831,16 +829,13 @@ const App = () => {
 
             {/* PAGE 3 */}
             <Section label="Description" fieldList={['brand']}>
-              <TextField name="brand" label="Brand" />
+              <TextField name="brand" />
               {'brandId: Array<string> (TODO!!!)'}
             </Section>
             {/* PAGE 4 */}
             <Section label="File" fieldList={['loadName', 'displayName']}>
-              <TextField
-                name="displayName"
-                label="Display Name ('File name' ??? TODO)"
-              />
-              <TextField name="loadName" label="API Load Name" />
+              <TextField name="displayName" />
+              <TextField name="loadName" />
             </Section>
             <div className={styles.double_check_before_exporting}>
               <p>DOUBLE CHECK YOUR WORK BEFORE EXPORTING!</p>
