@@ -87,11 +87,9 @@ const labwareFormSchema = Yup.object().shape({
   gridOffsetX: requiredPositiveNumber(LABELS.gridOffsetX),
   gridOffsetY: requiredPositiveNumber(LABELS.gridOffsetY),
 
-  heterogeneousWells: unsupportedLabwareIfFalse(LABELS.heterogeneousWells),
-  irregularRowSpacing: unsupportedLabwareIfFalse(LABELS.irregularRowSpacing),
-  irregularColumnSpacing: unsupportedLabwareIfFalse(
-    LABELS.irregularColumnSpacing
-  ),
+  homogeneousWells: unsupportedLabwareIfFalse(LABELS.homogeneousWells),
+  regularRowSpacing: unsupportedLabwareIfFalse(LABELS.regularRowSpacing),
+  regularColumnSpacing: unsupportedLabwareIfFalse(LABELS.regularColumnSpacing),
 
   wellVolume: requiredPositiveNumber(LABELS.wellVolume),
   wellBottomShape: requiredString(LABELS.wellBottomShape).oneOf(

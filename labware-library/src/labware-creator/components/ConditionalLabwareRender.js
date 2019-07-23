@@ -43,9 +43,9 @@ const ConditionalLabwareRender = (props: ConditionalLabwareRenderProps) => {
     values.loadName = values.loadName || 'some_labware'
     values.brand = values.brand || 'somebrand'
     // A few other fields don't even go into the definition (eg "is row spacing uniform" etc).
-    values.heterogeneousWells = 'true'
-    values.irregularRowSpacing = 'true'
-    values.irregularColumnSpacing = 'true'
+    values.homogeneousWells = 'true'
+    values.regularRowSpacing = 'true'
+    values.regularColumnSpacing = 'true'
 
     let castValues: ?ProcessedLabwareFields = null
     try {

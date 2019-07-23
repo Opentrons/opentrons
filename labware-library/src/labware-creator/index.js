@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import { Formik } from 'formik'
+import cloneDeep from 'lodash/cloneDeep'
 import mapValues from 'lodash/mapValues'
 import { saveAs } from 'file-saver'
 import { AlertModal, PrimaryButton } from '@opentrons/components'
@@ -17,6 +18,11 @@ import {
   yesNoOptions,
   tubeRackAutofills,
 } from './fields'
+import {
+  initialStatus,
+  setIsAutopopulated,
+  type FormikStatus,
+} from './formikStatus'
 import labwareFormSchema from './labwareFormSchema'
 import fieldsToLabware from './fieldsToLabware'
 import ConditionalLabwareRender from './components/ConditionalLabwareRender'
@@ -39,24 +45,38 @@ const maskTo2Decimal = makeMaskToDecimal(2)
 type MakeAutofillOnChangeArgs = {|
   name: $Keys<LabwareFields>,
   autofills: { [string]: $Shape<LabwareFields> },
+  status: FormikStatus,
   values: LabwareFields,
   touched: Object,
-  setValues: Object => mixed,
-  setTouched: Object => mixed,
+  setStatus: FormikStatus => void,
+  setTouched: ({ [$Keys<LabwareFields>]: boolean }) => void,
+  setValues: ($Shape<LabwareFields>) => void,
 |}
 const makeAutofillOnChange = ({
   autofills,
   values,
+  status,
   touched,
   setValues,
   setTouched,
+  setStatus,
 }: MakeAutofillOnChangeArgs) => (name: string, value: ?string) => {
   if (value == null) {
     console.log(`no value for ${name}, skipping autofill`)
     return
   }
-  const autofillValues = autofills[value]
-  if (autofillValues) {
+  const _autofillValues = autofills[value]
+  if (_autofillValues) {
+    let autofillValues = cloneDeep(_autofillValues)
+    // mix in some 'derived' autofill values
+    if ('gridRows' in autofillValues) {
+      autofillValues.regularRowSpacing = 'true'
+    }
+    if ('gridColumns' in autofillValues) {
+      autofillValues.regularColumnSpacing = 'true'
+    }
+
+    const namesToTrue = mapValues(autofillValues, () => true)
     setValues({
       ...values,
       ...autofillValues,
@@ -64,8 +84,9 @@ const makeAutofillOnChange = ({
     })
     setTouched({
       ...touched,
-      ...mapValues(autofillValues, () => true),
+      ...namesToTrue,
     })
+    setIsAutopopulated(Object.keys(autofillValues), status, setStatus)
   } else {
     console.error(
       `expected autofills for ${name}: ${value} -- is the value missing from the autofills object?`
@@ -245,6 +266,7 @@ const App = () => {
       )}
       <Formik
         initialValues={getDefaultFormState()}
+        initialStatus={initialStatus}
         validationSchema={labwareFormSchema}
         onSubmit={(values: LabwareFields) => {
           const castValues: ProcessedLabwareFields = labwareFormSchema.cast(
@@ -262,9 +284,11 @@ const App = () => {
           values,
           isValid,
           errors,
+          status,
           touched,
-          setValues,
+          setStatus,
           setTouched,
+          setValues,
         }) => (
           <div className={styles.labware_creator}>
             <h2>Custom Labware Creator</h2>
@@ -287,9 +311,11 @@ const App = () => {
                     name: 'tubeRackInsertLoadName',
                     autofills: tubeRackAutofills,
                     values,
+                    status,
                     touched,
-                    setValues,
+                    setStatus,
                     setTouched,
+                    setValues,
                   })}
                 />
               )}
@@ -301,9 +327,11 @@ const App = () => {
                     name: 'aluminumBlockType',
                     autofills: aluminumBlockAutofills,
                     values,
+                    status,
                     touched,
-                    setValues,
+                    setStatus,
                     setTouched,
+                    setValues,
                   })}
                 />
               )}
@@ -317,9 +345,9 @@ const App = () => {
                 )}
             </Section>
             {/* PAGE 1 - Labware */}
-            <Section label="Regularity" fieldList={['heterogeneousWells']}>
+            <Section label="Regularity" fieldList={['homogeneousWells']}>
               {/* tubeRackSides: Array<string> maybe?? */}
-              <RadioField name="heterogeneousWells" options={yesNoOptions} />
+              <RadioField name="homogeneousWells" options={yesNoOptions} />
             </Section>
             <Section
               label="Footprint"
@@ -373,8 +401,8 @@ const App = () => {
               fieldList={[
                 'gridRows',
                 'gridColumns',
-                'irregularRowSpacing',
-                'irregularColumnSpacing',
+                'regularRowSpacing',
+                'regularColumnSpacing',
               ]}
             >
               <div>
@@ -390,12 +418,9 @@ const App = () => {
                 wellShape={values.wellShape}
               />
               <TextField name="gridRows" inputMasks={[maskToInteger]} />
-              <RadioField name="irregularRowSpacing" options={yesNoOptions} />
+              <RadioField name="regularRowSpacing" options={yesNoOptions} />
               <TextField name="gridColumns" inputMasks={[maskToInteger]} />
-              <RadioField
-                name="irregularColumnSpacing"
-                options={yesNoOptions}
-              />
+              <RadioField name="regularColumnSpacing" options={yesNoOptions} />
             </Section>
             {/* PAGE 2 */}
             <Section label="Well/Tube Volume" fieldList={['wellVolume']}>
@@ -553,7 +578,11 @@ const App = () => {
             {/* PAGE 4 */}
             <Section label="File" fieldList={['loadName', 'displayName']}>
               <TextField name="displayName" />
-              <TextField name="loadName" inputMasks={[maskLoadName]} />
+              <TextField
+                name="loadName"
+                caption="Only lower case letters, numbers, periods, and underscores may be used"
+                inputMasks={[maskLoadName]}
+              />
             </Section>
             <div className={styles.double_check_before_exporting}>
               <p>DOUBLE CHECK YOUR WORK BEFORE EXPORTING!</p>
