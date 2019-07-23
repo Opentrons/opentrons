@@ -6,8 +6,8 @@ import pytest
 from opentrons import robot, types
 from opentrons.legacy_api import modules as legacy_modules
 
-from opentrons.hardware_control import modules
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
+from opentrons.hardware_control import modules
 from opentrons import instruments
 from opentrons.config import pipette_config
 
@@ -33,12 +33,26 @@ async def test_get_pipettes_uncommissioned(
     }
 
     if async_server['api_version'] == 1:
-        def mock_parse_fail(self, gcode, mount):
+        def mock_parse_fail(gcode, mount):
+            pass
+
+        def fake_update_config(axis, data):
+            pass
+
+        def fake_update_steps_per_mm(data):
             pass
 
         monkeypatch.setattr(
-            SmoothieDriver_3_0_0, '_read_from_pipette', mock_parse_fail)
+            async_server['com.opentrons.hardware']._driver,
+            '_read_from_pipette', mock_parse_fail)
+        monkeypatch.setattr(
+            async_server['com.opentrons.hardware']._driver,
+            'update_pipette_config', fake_update_config)
+        monkeypatch.setattr(
+            async_server['com.opentrons.hardware']._driver,
+            'update_steps_per_mm', fake_update_steps_per_mm)
         robot._driver.simulating = False
+
     else:
         hw = async_server['com.opentrons.hardware']._backend
         hw._attached_instruments[types.Mount.LEFT] = {
