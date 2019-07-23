@@ -157,7 +157,6 @@ export const tubeRackInsertOptions: Options = [
 // NOTE: these are duplicate data derived from tube rack defs, but
 // are intentionally duplicated to be the source of truth about the
 // *tube rack inserts* (as opposed to defs that use the insert)
-// TODO IMMEDIATELY: should diameter be included here too?
 export const tubeRackAutofills: {
   [tubeRackInsertLoadName: string]: $Shape<LabwareFields>,
 } = {
@@ -216,6 +215,31 @@ export const aluminumBlockTypeOptions: Options = [
   },
 ]
 
+export const aluminumBlockAutofills = {
+  '24well': {
+    // NOTE: based on opentrons_24_aluminumblock_generic_2ml_screwcap
+    footprintXDimension: '127.75',
+    footprintYDimension: '85.50',
+    gridRows: '4',
+    gridColumns: '6',
+    gridSpacingX: '17.25',
+    gridSpacingY: '17.25',
+    gridOffsetX: '20.75',
+    gridOffsetY: '16.87',
+  },
+  '96well': {
+    // NOTE: based on opentrons_96_aluminumblock_generic_pcr_strip_200ul
+    footprintXDimension: '127.75',
+    footprintYDimension: '85.50',
+    gridRows: '8',
+    gridColumns: '12',
+    gridSpacingX: '9.00',
+    gridSpacingY: '9.00',
+    gridOffsetX: '14.38',
+    gridOffsetY: '11.25',
+  },
+}
+
 export const aluminumBlockChildTypeOptions: Options = [
   {
     name: 'Tubes',
@@ -230,42 +254,6 @@ export const aluminumBlockChildTypeOptions: Options = [
     value: 'pcrPlate',
   },
 ]
-
-export const aluminumBlockAutofills = {
-  tubes: {
-    // NOTE: based on opentrons_24_aluminumblock_generic_2ml_screwcap
-    footprintXDimension: '127.75',
-    footprintYDimension: '85.50',
-    gridRows: '4',
-    gridColumns: '6',
-    gridSpacingX: '17.25',
-    gridSpacingY: '17.25',
-    gridOffsetX: '20.75',
-    gridOffsetY: '16.87',
-  },
-  pcrTubeStrip: {
-    // NOTE: based on opentrons_96_aluminumblock_generic_pcr_strip_200ul
-    footprintXDimension: '127.75',
-    footprintYDimension: '85.50',
-    gridRows: '8',
-    gridColumns: '12',
-    gridSpacingX: '9.00',
-    gridSpacingY: '9.00',
-    gridOffsetX: '14.38',
-    gridOffsetY: '11.25',
-  },
-  pcrPlate: {
-    // NOTE: based on opentrons_96_aluminumblock_biorad_wellplate_200ul
-    footprintXDimension: '127.75',
-    footprintYDimension: '85.50',
-    gridRows: '8',
-    gridColumns: '12',
-    gridSpacingX: '9.00',
-    gridSpacingY: '9.00',
-    gridOffsetX: '14.38',
-    gridOffsetY: '11.24',
-  },
-}
 
 export const getDefaultFormState = (): LabwareFields => ({
   labwareType: null,

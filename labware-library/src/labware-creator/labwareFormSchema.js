@@ -18,7 +18,6 @@ const requiredString = (label: string) =>
     .required()
 const MUST_BE_A_NUMBER = '${label} must be a number' // eslint-disable-line no-template-curly-in-string
 
-// TODO: add decimal-point constraint where needed (Yup.mixed.test ?)
 const requiredPositiveNumber = (label: string) =>
   Yup.number()
     .label(label)
@@ -33,13 +32,6 @@ const requiredPositiveInteger = (label: string) =>
     .moreThan(0)
     .integer()
     .required()
-
-const aluminumBlockRequiredString = (label: string) =>
-  Yup.mixed().when('labwareType', {
-    is: 'aluminumBlock',
-    then: requiredString(label),
-    otherwise: Yup.mixed().nullable(),
-  })
 
 const unsupportedLabwareIfFalse = (label: string) =>
   Yup.boolean()
@@ -57,9 +49,20 @@ const labwareFormSchema = Yup.object().shape({
     then: requiredString(LABELS.tubeRackInsertLoadName),
     otherwise: Yup.mixed().nullable(),
   }),
-  aluminumBlockType: aluminumBlockRequiredString(LABELS.aluminumBlockType),
-  aluminumBlockChildType: aluminumBlockRequiredString(
-    LABELS.aluminumBlockChildType
+  aluminumBlockType: Yup.mixed().when('labwareType', {
+    is: 'aluminumBlock',
+    then: requiredString(LABELS.aluminumBlockType),
+    otherwise: Yup.mixed().nullable(),
+  }),
+  aluminumBlockChildType: Yup.mixed().when(
+    ['labwareType', 'aluminumBlockType'],
+    {
+      // only required for 96-well aluminum block
+      is: (labwareType, aluminumBlockType) =>
+        labwareType === 'aluminumBlock' && aluminumBlockType === '96well',
+      then: requiredString(LABELS.aluminumBlockChildType),
+      otherwise: Yup.mixed().nullable(),
+    }
   ),
 
   // tubeRackSides: Array<string>

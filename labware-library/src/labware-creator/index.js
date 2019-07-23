@@ -8,6 +8,7 @@ import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
 import {
   labwareTypeOptions,
   tubeRackInsertOptions,
+  aluminumBlockAutofills,
   aluminumBlockTypeOptions,
   aluminumBlockChildTypeOptions,
   getDefaultFormState,
@@ -17,13 +18,13 @@ import {
   tubeRackAutofills,
 } from './fields'
 import labwareFormSchema from './labwareFormSchema'
+import fieldsToLabware from './fieldsToLabware'
 import ConditionalLabwareRender from './components/ConditionalLabwareRender'
 import Dropdown from './components/Dropdown'
-import LinkOut from './components/LinkOut'
+import IntroCopy from './components/IntroCopy'
 import RadioField from './components/RadioField'
-import TextField from './components/TextField'
 import Section from './components/Section'
-import fieldsToLabware from './fieldsToLabware'
+import TextField from './components/TextField'
 import styles from './styles.css'
 import type {
   LabwareFields,
@@ -83,11 +84,9 @@ const HeightImg = (props: HeightImgProps) => {
   if (labwareType === 'tubeRack') {
     src = require('./images/height_tubeRack.svg')
   } else if (labwareType === 'aluminumBlock') {
-    if (aluminumBlockChildType === 'tubeRack') {
-      // TODO IMMEDIATELY it's not going to literally equal 'tubeRack' right??
+    if (['tubes', 'pcrTubeStrip'].includes(aluminumBlockChildType)) {
       src = require('./images/height_aluminumBlock_tubes.svg')
-    } else if (aluminumBlockChildType === 'wellPlate') {
-      // TODO IMMEDIATELY it's not going to literally equal 'wellPlate' right??
+    } else {
       src = require('./images/height_aluminumBlock_plate.svg')
     }
   }
@@ -214,45 +213,11 @@ const HeightGuidingText = (props: {| labwareType: ?LabwareType |}) => {
   )
 }
 
-const IntroCopy = () => (
-  <>
-    <p>Use this tool if you are creating one of the following:</p>
-    <ul>
-      <li>
-        Well plates and reservoirs which can be made via the labware creator
-        (refer to{' '}
-        <LinkOut href="https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions">
-          this guide
-        </LinkOut>{' '}
-        for more information)
-      </li>
-      <li>
-        Tubes + the{' '}
-        <LinkOut href="https://shop.opentrons.com/collections/racks-and-adapters/products/tube-rack-set-1">
-          Opentrons tube rack
-        </LinkOut>
-      </li>
-      <li>
-        Tubes / plates + the{' '}
-        <LinkOut href="https://shop.opentrons.com/collections/racks-and-adapters/products/aluminum-block-set">
-          Opentrons aluminum block
-        </LinkOut>
-      </li>
-      <p>
-        For all other custom labware, please use this{' '}
-        <LinkOut href="https://opentrons-ux.typeform.com/to/xi8h0W">
-          request form
-        </LinkOut>
-      </p>
-    </ul>
-
-    <p>
-      <strong>Please note:</strong> We strongly recommend you reference
-      mechanical drawing to ensure accurate measurements for defining labware,
-      only relying on manual measurements to supplement missing information.
-    </p>
-  </>
-)
+const displayAsTube = (values: LabwareFields) =>
+  values.labwareType === 'tubeRack' ||
+  (values.labwareType === 'aluminumBlock' &&
+    values.aluminumBlockType === '96well' &&
+    ['tubes', 'pcrTubeStrip'].includes(values.aluminumBlockChildType))
 
 const App = () => {
   const [
@@ -329,17 +294,27 @@ const App = () => {
                 />
               )}
               {values.labwareType === 'aluminumBlock' && (
-                <>
-                  <Dropdown
-                    name="aluminumBlockType"
-                    options={aluminumBlockTypeOptions}
-                  />
+                <Dropdown
+                  name="aluminumBlockType"
+                  options={aluminumBlockTypeOptions}
+                  onValueChange={makeAutofillOnChange({
+                    name: 'aluminumBlockType',
+                    autofills: aluminumBlockAutofills,
+                    values,
+                    touched,
+                    setValues,
+                    setTouched,
+                  })}
+                />
+              )}
+              {values.labwareType === 'aluminumBlock' &&
+                values.aluminumBlockType === '96well' && (
+                  // Only show for '96well' aluminum block type
                   <Dropdown
                     name="aluminumBlockChildType"
                     options={aluminumBlockChildTypeOptions}
                   />
-                </>
-              )}
+                )}
             </Section>
             {/* PAGE 1 - Labware */}
             <Section label="Regularity" fieldList={['heterogeneousWells']}>
@@ -482,10 +457,7 @@ const App = () => {
                   Reference the measurement from the top of the well (include
                   any lip but exclude any cap) to the bottom of the{' '}
                   <strong>inside</strong> of the{' '}
-                  {values.labwareType === 'tubeRack'
-                    ? 'tube'
-                    : 'well' /* TODO: also use 'tube' with aluminum block that has tube */}
-                  .
+                  {displayAsTube(values) ? 'tube' : 'well'}.
                 </p>
 
                 <p>

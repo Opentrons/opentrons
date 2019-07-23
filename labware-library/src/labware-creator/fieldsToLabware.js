@@ -56,7 +56,7 @@ export default function fieldsToLabware(
         //   links: []
       },
       version: 1,
-      namespace: 'ot_custom', // TODO IMMEDIATELY verify that's the conventional custom labware
+      //   namespace: 'you can put a namespace here',
       //   loadNamePostfix: [], // TODO: ???
       offset: {
         x: fields.gridOffsetX,
