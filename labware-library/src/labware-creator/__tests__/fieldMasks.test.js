@@ -1,6 +1,8 @@
 // @flow
 import { makeMaskToDecimal, maskToInteger, maskLoadName } from '../fieldMasks'
 
+// TODO(Ian, 2019-07-23): some fancy util could make these tests much less verbose
+
 describe('makeMaskToDecimal', () => {
   test('1 decimal', () => {
     const maskTo1Decimal = makeMaskToDecimal(1)
@@ -11,18 +13,36 @@ describe('makeMaskToDecimal', () => {
     expect(maskTo1Decimal('1.2', '1.23')).toEqual('1.2')
     // no invalid chars
     expect(maskTo1Decimal('1.2', '1.2a')).toEqual('1.2')
+    // can delete
+    expect(maskTo1Decimal('1.2', '1.')).toEqual('1.')
+    expect(maskTo1Decimal('1', '')).toEqual('')
+    // allow leading dot
+    expect(maskTo1Decimal('', '.')).toEqual('.')
+    expect(maskTo1Decimal('.', '.1')).toEqual('.1')
+    // but not too much
+    expect(maskTo1Decimal('.1', '.12')).toEqual('.1')
   })
 
   test('2 decimal', () => {
-    const maskTo2Decimal = makeMaskToDecimal(1)
+    const maskTo2Decimal = makeMaskToDecimal(2)
     expect(maskTo2Decimal('', '1')).toEqual('1')
     expect(maskTo2Decimal('1', '1.')).toEqual('1.')
     expect(maskTo2Decimal('1.', '1.2')).toEqual('1.2')
-    expect(maskTo2Decimal('1.2', '1.23')).toEqual('1.2')
+    expect(maskTo2Decimal('1.2', '1.23')).toEqual('1.23')
     // no more decimals
     expect(maskTo2Decimal('1.23', '1.234')).toEqual('1.23')
     // no invalid chars
     expect(maskTo2Decimal('1.2', '1.2a')).toEqual('1.2')
+    // can delete
+    expect(maskTo2Decimal('1.23', '1.2')).toEqual('1.2')
+    expect(maskTo2Decimal('1.2', '1.')).toEqual('1.')
+    expect(maskTo2Decimal('1', '')).toEqual('')
+    // allow leading dot
+    expect(maskTo2Decimal('', '.')).toEqual('.')
+    expect(maskTo2Decimal('.', '.1')).toEqual('.1')
+    expect(maskTo2Decimal('.1', '.12')).toEqual('.12')
+    // but not too much
+    expect(maskTo2Decimal('.12', '.123')).toEqual('.12')
   })
 })
 
@@ -40,6 +60,10 @@ describe('maskToInteger', () => {
     expect(maskToInteger('1', '12')).toEqual('12')
     expect(maskToInteger('12', '123')).toEqual('123')
   })
+
+  test('allows delete', () => {
+    expect(maskToInteger('1', '')).toEqual('')
+  })
 })
 
 describe('maskLoadName', () => {
@@ -55,5 +79,8 @@ describe('maskLoadName', () => {
   test('ignores bad chars', () => {
     expect(maskLoadName('', '-')).toEqual('')
     expect(maskLoadName('a', 'a-')).toEqual('a')
+  })
+  test('allows delete', () => {
+    expect(maskLoadName('a', '')).toEqual('')
   })
 })
