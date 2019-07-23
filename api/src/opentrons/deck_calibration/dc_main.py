@@ -115,6 +115,7 @@ class CLITool:
         self._steps = [0.1, 0.25, 0.5, 1, 5, 10, 20, 40, 80]
         self._steps_index = 2
         self._current_point = 1
+        self._model_offset = self._pipettes[self._current_mount].model_offset
         deck_height = 0
         if feature_flags.use_protocol_api_v2():
             deck_height = 0
@@ -198,6 +199,15 @@ class CLITool:
     def actual_points(self, points):
         self._actual_points = points
 
+    @property
+    def model_offset(self):
+        # Model offset for current pipette
+        return self._model_offset
+
+    @model_offset.setter
+    def model_offset(self, offset):
+        self._model_offset = offset
+
     def current_step(self):
         return self._steps[self._steps_index]
 
@@ -273,7 +283,8 @@ class CLITool:
         """
         if not feature_flags.use_protocol_api_v2():
             res = self._driver_to_deck_coords(
-                position(self._current_mount, self.hardware))
+                position(
+                    self._current_mount, self.hardware, self._model_offset))
         else:
             res = position(
                 self._current_mount, self.hardware, CriticalPoint.TIP)
@@ -421,6 +432,7 @@ class CLITool:
         return (lx - mx, ly - my, lz - mz)
 
     def switch_mounts(self):
+        self.move_to_safe_height()
         if not feature_flags.use_protocol_api_v2():
             r_pipette = right
             l_pipette = left
@@ -434,6 +446,7 @@ class CLITool:
             self._current_mount = r_pipette
         self._tip_length =\
             self._pipettes[self._current_mount]._fallback_tip_length
+        self._model_offset = self._pipettes[self._current_mount].model_offset
         return f"Switched mount to {self._current_mount}"
 
     def validate_mount_offset(self):
@@ -449,14 +462,11 @@ class CLITool:
             targ = self._expected_points[1]
         self.validate(self._expected_points[1], 1, r_pipette)
         next_pip = self._pipettes[l_pipette]
+        self.switch_mounts()
         if next_pip and next_pip.has_tip:
             self.validate(targ, 0, l_pipette)
             return 'Mount offset complete'
         else:
-            self._current_mount = l_pipette
-            _, _, cz = self._position()
-            if cz < SAFE_HEIGHT:
-                self.move_to_safe_height()
             tx, ty, _ = self._deck_to_driver_coords(self._expected_points[1])
             self.hardware._driver.move(
                 {'X': tx, 'Y': ty, 'Z': SAFE_HEIGHT-self._tip_length})
@@ -476,12 +486,6 @@ class CLITool:
         """
         self._current_point = point_num
         if not feature_flags.use_protocol_api_v2():
-            _, _, cz = self._position()
-            if self._current_mount != pipette_mount and cz < SAFE_HEIGHT:
-                self.move_to_safe_height()
-
-            self._current_mount = pipette_mount
-
             _, _, cz = self._position()
             if cz < SAFE_HEIGHT:
                 self.move_to_safe_height()
