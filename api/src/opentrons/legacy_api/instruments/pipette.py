@@ -743,7 +743,7 @@ class Pipette(CommandPublisher):
 
         return self
 
-    def touch_tip(self, location=None, radius=1.0, v_offset=-1.0, speed=60.0):
+    def touch_tip(self, location=None, radius=1.0, v_offset=-1.0, speed=60.0, pattern = 'cross'):
         """
         Touch the :any:`Pipette` tip to the sides of a well,
         with the intent of removing left-over droplets
@@ -818,14 +818,54 @@ class Pipette(CommandPublisher):
             self.move_to(location)
 
         v_offset = (0, 0, v_offset)
-
-        well_edges = [
+        
+        if pattern == 'cross':
+            well_edges = [
+            location.from_center(x=radius, y=0, z=1),       # right edge
+            location.from_center(x=0, y=0, z=1),
+            location.from_center(x=radius * -1, y=0, z=1),  # left edge
+            location.from_center(x=0,y=0,z=1),
+            location.from_center(x=0, y=radius, z=1),       # back edge
+            location.from_center(x=0,y=0,z=1),
+            location.from_center(x=0, y=radius * -1, z=1),   # front edge
+            location.from_center(x=0, y=0,z=1)
+        ]
+        
+        if pattern == 'cross2':
+            well_edges = [
             location.from_center(x=radius, y=0, z=1),       # right edge
             location.from_center(x=radius * -1, y=0, z=1),  # left edge
+            location.from_center(x=0,y=0,z=1),
             location.from_center(x=0, y=radius, z=1),       # back edge
-            location.from_center(x=0, y=radius * -1, z=1)   # front edge
+            location.from_center(x=0, y=radius * -1, z=1),   # front edge
+            location.from_center(x=0, y=0,z=1)
         ]
-
+        if pattern == 'x-cross':
+            well_edges = [
+            location.from_center(x=radius, y=radius, z=1),       # right edge
+            location.from_center(x=radius * -1, y=radius *-1, z=1),  # left edge
+            location.from_center(x=0,y=0,z=1),
+            location.from_center(x=radius*-1, y=radius, z=1),       # back edge
+            location.from_center(x=radius, y=radius * -1, z=1),   # front edge
+            location.from_center(x=0, y=0,z=1)
+        ]
+        
+        if pattern == 'line':
+            well_edges = [
+                location.from_center(x=0, y=0, z=1),       # right edge
+                location.from_center(x=radius * -1, y=0, z=1),  # left edge
+                location.from_center(x=0, y=0,z=1),
+                location.from_center(x=radius ,y =0, z=1),
+                location.from_center(x=0, y=0, z=1)
+            ]
+            
+        if pattern == 'line2':
+            well_edges = [
+                location.from_center(x=radius * -1, y=0, z=1),  # left edge
+                location.from_center(x=radius ,y =0, z=1),
+                location.from_center(x=0, y=0, z=1)
+            ]
+            
         # Apply vertical offset to well edges
         well_edges = map(lambda x: x + v_offset, well_edges)
 
