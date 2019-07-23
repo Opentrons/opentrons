@@ -14,7 +14,7 @@ import {
   LabwareRender,
   RobotWorkSpace,
 } from '@opentrons/components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
 import {
   labwareTypeOptions,
   tubeRackInsertOptions,
@@ -27,6 +27,9 @@ import {
   Y_DIMENSION,
   XY_ALLOWED_VARIANCE,
 } from './fields'
+import fieldsToLabware from './fieldsToLabware'
+import styles from './styles.css'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LabwareFields,
   LabwareType,
@@ -34,8 +37,8 @@ import type {
   WellShape,
   WellBottomShape,
 } from './fields'
-import fieldsToLabware from './fieldsToLabware'
-import styles from './styles.css'
+
+const maskTo2Decimal = makeMaskToDecimal(2)
 
 const getDefaultFormState = (): LabwareFields => ({
   labwareType: null,
@@ -236,15 +239,37 @@ const labwareFormSchema = Yup.object().shape({
 type TextFieldProps = {|
   name: $Keys<LabwareFields>,
   units?: $PropertyType<React.ElementProps<typeof InputField>, 'units'>,
+  inputMasks?: Array<(prevValue: string, update: string) => string>,
 |}
-const TextField = (props: TextFieldProps) => (
-  <div className={styles.field_wrapper}>
-    <div className={styles.field_label}>{LABELS[props.name]}</div>
-    <Field name={props.name}>
-      {({ field, form }) => <InputField {...field} units={props.units} />}
-    </Field>
-  </div>
-)
+const TextField = (props: TextFieldProps) => {
+  const { name, units } = props
+  const inputMasks = props.inputMasks || []
+  const makeHandleChange = ({ field, form }) => (
+    e: SyntheticEvent<HTMLInputElement>
+  ) => {
+    const prevValue = field.value
+    const rawValue = e.currentTarget.value
+    const nextValue = inputMasks.reduce(
+      (acc, maskFn) => maskFn(prevValue, acc),
+      rawValue
+    )
+    form.setFieldValue(props.name, nextValue)
+  }
+  return (
+    <div className={styles.field_wrapper}>
+      <div className={styles.field_label}>{LABELS[name]}</div>
+      <Field name={props.name}>
+        {({ field, form }) => (
+          <InputField
+            {...field}
+            onChange={makeHandleChange({ field, form })}
+            units={units}
+          />
+        )}
+      </Field>
+    </div>
+  )
+}
 
 type DropdownProps = {|
   name: $Keys<LabwareFields>,
@@ -663,8 +688,16 @@ const App = () => {
                 </p>
               </div>
               <img src={require('./images/footprint.svg')} />
-              <TextField name="footprintXDimension" units="mm" />
-              <TextField name="footprintYDimension" units="mm" />
+              <TextField
+                name="footprintXDimension"
+                inputMasks={[maskTo2Decimal]}
+                units="mm"
+              />
+              <TextField
+                name="footprintYDimension"
+                inputMasks={[maskTo2Decimal]}
+                units="mm"
+              />
             </Section>
             <Section
               label={
@@ -681,7 +714,11 @@ const App = () => {
                 labwareType={values.labwareType}
                 aluminumBlockChildType={values.aluminumBlockChildType}
               />
-              <TextField name="labwareZDimension" units="mm" />
+              <TextField
+                name="labwareZDimension"
+                inputMasks={[maskTo2Decimal]}
+                units="mm"
+              />
             </Section>
             <Section
               label="Grid"
@@ -704,9 +741,9 @@ const App = () => {
                 labwareType={values.labwareType}
                 wellShape={values.wellShape}
               />
-              <TextField name="gridRows" />
+              <TextField name="gridRows" inputMasks={[maskToInteger]} />
               <RadioField name="irregularRowSpacing" options={yesNoOptions} />
-              <TextField name="gridColumns" />
+              <TextField name="gridColumns" inputMasks={[maskToInteger]} />
               <RadioField
                 name="irregularColumnSpacing"
                 options={yesNoOptions}
@@ -717,7 +754,11 @@ const App = () => {
               <div>
                 <p>Total maximum volume of each well.</p>
               </div>
-              <TextField name="wellVolume" units="μL" />
+              <TextField
+                name="wellVolume"
+                inputMasks={[maskTo2Decimal]}
+                units="μL"
+              />
             </Section>
             <Section
               label="Well Shape & Sides"
@@ -738,12 +779,24 @@ const App = () => {
               <WellXYImg wellShape={values.wellShape} />
               <RadioField name="wellShape" options={wellShapeOptions} />
               {values.wellShape === 'circular' && (
-                <TextField name="wellDiameter" units="mm" />
+                <TextField
+                  name="wellDiameter"
+                  inputMasks={[maskTo2Decimal]}
+                  units="mm"
+                />
               )}
               {values.wellShape === 'rectangular' && (
                 <>
-                  <TextField name="wellXDimension" units="mm" />
-                  <TextField name="wellYDimension" units="mm" />
+                  <TextField
+                    name="wellXDimension"
+                    inputMasks={[maskTo2Decimal]}
+                    units="mm"
+                  />
+                  <TextField
+                    name="wellYDimension"
+                    inputMasks={[maskTo2Decimal]}
+                    units="mm"
+                  />
                 </>
               )}
             </Section>
@@ -774,7 +827,11 @@ const App = () => {
                 name="wellBottomShape"
                 options={wellBottomShapeOptions}
               />
-              <TextField name="wellDepth" units="mm" />
+              <TextField
+                name="wellDepth"
+                inputMasks={[maskTo2Decimal]}
+                units="mm"
+              />
             </Section>
             <Section
               label="Well Spacing"
@@ -794,8 +851,16 @@ const App = () => {
                 wellShape={values.wellShape}
                 gridRows={values.gridRows}
               />
-              <TextField name="gridSpacingX" units="mm" />
-              <TextField name="gridSpacingY" units="mm" />
+              <TextField
+                name="gridSpacingX"
+                inputMasks={[maskTo2Decimal]}
+                units="mm"
+              />
+              <TextField
+                name="gridSpacingY"
+                inputMasks={[maskTo2Decimal]}
+                units="mm"
+              />
             </Section>
             <Section
               label="Grid Offset"
@@ -816,8 +881,16 @@ const App = () => {
                   from the slot{"'"}s top left corner.
                 </p>
               </div>
-              <TextField name="gridOffsetX" units="mm" />
-              <TextField name="gridOffsetY" units="mm" />
+              <TextField
+                name="gridOffsetX"
+                inputMasks={[maskTo2Decimal]}
+                units="mm"
+              />
+              <TextField
+                name="gridOffsetY"
+                inputMasks={[maskTo2Decimal]}
+                units="mm"
+              />
             </Section>
             <Section label="Check your work">
               <p>
@@ -835,7 +908,7 @@ const App = () => {
             {/* PAGE 4 */}
             <Section label="File" fieldList={['loadName', 'displayName']}>
               <TextField name="displayName" />
-              <TextField name="loadName" />
+              <TextField name="loadName" inputMasks={[maskLoadName]} />
             </Section>
             <div className={styles.double_check_before_exporting}>
               <p>DOUBLE CHECK YOUR WORK BEFORE EXPORTING!</p>
