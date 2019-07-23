@@ -1,216 +1,39 @@
 // @flow
 import * as React from 'react'
-import { Formik, Field } from 'formik'
-import * as Yup from 'yup'
-import cloneDeep from 'lodash/cloneDeep'
+import { Formik } from 'formik'
 import mapValues from 'lodash/mapValues'
 import { saveAs } from 'file-saver'
-import {
-  AlertModal,
-  PrimaryButton,
-  InputField,
-  RadioGroup,
-  LabwareRender,
-  RobotWorkSpace,
-} from '@opentrons/components'
+import { AlertModal, PrimaryButton } from '@opentrons/components'
 import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
 import {
   labwareTypeOptions,
   tubeRackInsertOptions,
   aluminumBlockTypeOptions,
   aluminumBlockChildTypeOptions,
+  getDefaultFormState,
   wellBottomShapeOptions,
   wellShapeOptions,
   yesNoOptions,
   tubeRackAutofills,
-  LABELS,
-  X_DIMENSION,
-  Y_DIMENSION,
-  XY_ALLOWED_VARIANCE,
 } from './fields'
+import labwareFormSchema from './labwareFormSchema'
+import ConditionalLabwareRender from './components/ConditionalLabwareRender'
 import Dropdown from './components/Dropdown'
+import LinkOut from './components/LinkOut'
+import RadioField from './components/RadioField'
+import TextField from './components/TextField'
 import Section from './components/Section'
 import fieldsToLabware from './fieldsToLabware'
 import styles from './styles.css'
-import fieldStyles from './components/fieldStyles.css'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
   LabwareFields,
   LabwareType,
-  Options,
   ProcessedLabwareFields,
   WellShape,
   WellBottomShape,
 } from './fields'
 
 const maskTo2Decimal = makeMaskToDecimal(2)
-
-const getDefaultFormState = (): LabwareFields => ({
-  labwareType: null,
-  tubeRackInsertLoadName: null,
-  aluminumBlockType: null,
-  aluminumBlockChildType: null,
-
-  // tubeRackSides: [],
-  footprintXDimension: null,
-  footprintYDimension: null,
-  labwareZDimension: null,
-
-  gridRows: null,
-  gridColumns: null,
-  gridSpacingX: null,
-  gridSpacingY: null,
-  gridOffsetX: null,
-  gridOffsetY: null,
-
-  heterogeneousWells: null,
-  irregularRowSpacing: null,
-  irregularColumnSpacing: null,
-
-  wellVolume: null,
-  wellBottomShape: null,
-  wellDepth: null,
-  wellShape: null,
-
-  // used with circular well shape only
-  wellDiameter: null,
-
-  // used with rectangular well shape only
-  wellXDimension: null,
-  wellYDimension: null,
-
-  brand: null,
-  brandId: [],
-
-  loadName: null,
-  displayName: null,
-})
-
-const REQUIRED_FIELD = '${label} is required' // eslint-disable-line no-template-curly-in-string
-const requiredString = (label: string) =>
-  Yup.string()
-    .label(label)
-    .typeError(REQUIRED_FIELD)
-    .required()
-const MUST_BE_A_NUMBER = '${label} must be a number' // eslint-disable-line no-template-curly-in-string
-
-// TODO: add decimal-point constraint where needed (Yup.mixed.test ?)
-const requiredPositiveNumber = (label: string) =>
-  Yup.number()
-    .label(label)
-    .typeError(MUST_BE_A_NUMBER)
-    .moreThan(0)
-    .required()
-
-const requiredPositiveInteger = (label: string) =>
-  Yup.number()
-    .label(label)
-    .typeError(MUST_BE_A_NUMBER)
-    .moreThan(0)
-    .integer()
-    .required()
-
-const aluminumBlockRequiredString = (label: string) =>
-  Yup.mixed().when('labwareType', {
-    is: 'aluminumBlock',
-    then: requiredString(label),
-    otherwise: Yup.mixed().nullable(),
-  })
-
-const unsupportedLabwareIfFalse = (label: string) =>
-  Yup.boolean()
-    .label(label)
-    .typeError(REQUIRED_FIELD)
-    .oneOf([true], 'TODO! Text here')
-    .required()
-
-const labwareFormSchema = Yup.object().shape({
-  labwareType: requiredString(LABELS.labwareType).oneOf(
-    labwareTypeOptions.map(o => o.value)
-  ),
-  tubeRackInsertLoadName: Yup.mixed().when('labwareType', {
-    is: 'tubeRack',
-    then: requiredString(LABELS.tubeRackInsertLoadName),
-    otherwise: Yup.mixed().nullable(),
-  }),
-  aluminumBlockType: aluminumBlockRequiredString(LABELS.aluminumBlockType),
-  aluminumBlockChildType: aluminumBlockRequiredString(
-    LABELS.aluminumBlockChildType
-  ),
-
-  // tubeRackSides: Array<string>
-  footprintXDimension: Yup.number()
-    .label(LABELS.footprintXDimension)
-    .typeError(MUST_BE_A_NUMBER)
-    .min(X_DIMENSION - XY_ALLOWED_VARIANCE)
-    .max(X_DIMENSION + XY_ALLOWED_VARIANCE)
-    .required(),
-  footprintYDimension: Yup.number()
-    .label(LABELS.footprintYDimension)
-    .typeError(MUST_BE_A_NUMBER)
-    .min(Y_DIMENSION - XY_ALLOWED_VARIANCE)
-    .max(Y_DIMENSION + XY_ALLOWED_VARIANCE)
-    .required(),
-  labwareZDimension: requiredPositiveNumber(LABELS.labwareZDimension),
-
-  gridRows: requiredPositiveInteger(LABELS.gridRows),
-  gridColumns: requiredPositiveInteger(LABELS.gridColumns),
-  gridSpacingX: requiredPositiveNumber(LABELS.gridSpacingX),
-  gridSpacingY: requiredPositiveNumber(LABELS.gridSpacingY),
-  gridOffsetX: requiredPositiveNumber(LABELS.gridOffsetX),
-  gridOffsetY: requiredPositiveNumber(LABELS.gridOffsetY),
-
-  heterogeneousWells: unsupportedLabwareIfFalse(LABELS.heterogeneousWells),
-  irregularRowSpacing: unsupportedLabwareIfFalse(LABELS.irregularRowSpacing),
-  irregularColumnSpacing: unsupportedLabwareIfFalse(
-    LABELS.irregularColumnSpacing
-  ),
-
-  wellVolume: requiredPositiveNumber(LABELS.wellVolume),
-  wellBottomShape: requiredString(LABELS.wellBottomShape).oneOf(
-    wellBottomShapeOptions.map(o => o.value)
-  ),
-  wellDepth: Yup.number()
-    .label(LABELS.wellDepth)
-    .typeError(MUST_BE_A_NUMBER)
-    .moreThan(0)
-    .max(
-      Yup.ref('labwareZDimension'),
-      'Well depth cannot exceed labware height'
-    )
-    .required(),
-  wellShape: requiredString(LABELS.wellShape).oneOf(
-    wellShapeOptions.map(o => o.value)
-  ),
-
-  // used with circular well shape only
-  wellDiameter: Yup.mixed().when('wellShape', {
-    is: 'circular',
-    then: requiredPositiveNumber(LABELS.wellDiameter),
-    otherwise: Yup.mixed().nullable(),
-  }),
-
-  // used with rectangular well shape only
-  wellXDimension: Yup.mixed().when('wellShape', {
-    is: 'rectangular',
-    then: requiredPositiveNumber(LABELS.wellXDimension),
-    otherwise: Yup.mixed().nullable(),
-  }),
-  wellYDimension: Yup.mixed().when('wellShape', {
-    is: 'rectangular',
-    then: requiredPositiveNumber(LABELS.wellYDimension),
-    otherwise: Yup.mixed().nullable(),
-  }),
-
-  brand: requiredString(LABELS.brand),
-  brandId: Yup.array().of(Yup.string()),
-
-  loadName: requiredString(LABELS.loadName).matches(
-    /^[a-z0-9._]+$/,
-    '${label} can only contain lowercase letters, numbers, dot (.) and underscore (_). Spaces are not allowed.' // eslint-disable-line no-template-curly-in-string
-  ),
-  displayName: requiredString(LABELS.displayName),
-})
 
 type MakeAutofillOnChangeArgs = {|
   name: $Keys<LabwareFields>,
@@ -248,65 +71,6 @@ const makeAutofillOnChange = ({
     )
   }
 }
-
-type TextFieldProps = {|
-  name: $Keys<LabwareFields>,
-  units?: $PropertyType<React.ElementProps<typeof InputField>, 'units'>,
-  inputMasks?: Array<(prevValue: string, update: string) => string>,
-|}
-const TextField = (props: TextFieldProps) => {
-  const { name, units } = props
-  const inputMasks = props.inputMasks || []
-  const makeHandleChange = ({ field, form }) => (
-    e: SyntheticEvent<HTMLInputElement>
-  ) => {
-    const prevValue = field.value
-    const rawValue = e.currentTarget.value
-    const nextValue = inputMasks.reduce(
-      (acc, maskFn) => maskFn(prevValue, acc),
-      rawValue
-    )
-    form.setFieldValue(props.name, nextValue)
-  }
-  return (
-    <div className={fieldStyles.field_wrapper}>
-      <div className={fieldStyles.field_label}>{LABELS[name]}</div>
-      <Field name={props.name}>
-        {({ field, form }) => (
-          <InputField
-            {...field}
-            onChange={makeHandleChange({ field, form })}
-            units={units}
-          />
-        )}
-      </Field>
-    </div>
-  )
-}
-
-type RadioFieldProps = {|
-  name: $Keys<LabwareFields>,
-  options: Options,
-|}
-const RadioField = (props: RadioFieldProps) => (
-  <div className={fieldStyles.field_wrapper}>
-    <div className={fieldStyles.field_label}>{LABELS[props.name]}</div>
-    <Field name={props.name}>
-      {({ form, field }) => (
-        <RadioGroup
-          {...field}
-          onChange={e => {
-            field.onChange(e)
-            // do not wait until blur to make radio field 'dirty'
-            field.onBlur(e)
-          }}
-          options={props.options}
-          inline
-        />
-      )}
-    </Field>
-  </div>
-)
 
 type HeightImgProps = {|
   labwareType: ?LabwareType,
@@ -449,83 +213,6 @@ const HeightGuidingText = (props: {| labwareType: ?LabwareType |}) => {
     </>
   )
 }
-
-// TODO IMMEDIATELY this is copied from PD, make it a component library component??
-function SingleLabware(props: {| definition: LabwareDefinition2 |}) {
-  return (
-    <RobotWorkSpace
-      viewBox={`0 0 ${props.definition.dimensions.xDimension} ${
-        props.definition.dimensions.yDimension
-      }`}
-    >
-      {() => <LabwareRender {...props} />}
-    </RobotWorkSpace>
-  )
-}
-
-type ConditionalLabwareRenderProps = {|
-  values: LabwareFields,
-|}
-
-const ConditionalLabwareRender = (props: ConditionalLabwareRenderProps) => {
-  const definition = React.useMemo(() => {
-    const values = cloneDeep(props.values)
-
-    // Fill arbitrary values in to any missing fields that aren't needed for this render,
-    // eg some required definition data like well volume, height, and bottom shape don't affect the render.
-    values.footprintXDimension = values.footprintXDimension || `${X_DIMENSION}`
-    values.footprintYDimension = values.footprintYDimension || `${Y_DIMENSION}`
-    values.labwareZDimension = values.wellDepth || '100'
-    values.wellDepth = values.wellDepth || '80'
-    values.wellVolume = values.wellVolume || '50'
-    values.wellBottomShape = values.wellBottomShape || 'flat'
-    values.labwareType = values.labwareType || 'wellPlate'
-
-    values.displayName = values.displayName || 'Some Labware'
-    values.loadName = values.loadName || 'some_labware'
-    values.brand = values.brand || 'somebrand'
-    // A few other fields don't even go into the definition (eg "is row spacing uniform" etc).
-    values.heterogeneousWells = 'true'
-    values.irregularRowSpacing = 'true'
-    values.irregularColumnSpacing = 'true'
-
-    let castValues: ?ProcessedLabwareFields = null
-    try {
-      castValues = labwareFormSchema.cast(values)
-    } catch (error) {}
-    console.log('yup output inside conditional labware', castValues)
-    if (castValues === null) {
-      return null
-    }
-
-    let def = null
-    if (castValues) {
-      def = fieldsToLabware(castValues)
-    } else {
-      console.log('invalid, no def for conditional render')
-    }
-    return def
-  }, [props.values])
-
-  const errorComponent = 'Cannot render labware, invalid inputs' // TODO get SVG for no-definition
-  return definition ? <SingleLabware definition={definition} /> : errorComponent
-}
-
-type LinkOutProps = {|
-  href: string,
-  className?: ?string,
-  children?: React.Node,
-|}
-const LinkOut = (props: LinkOutProps) => (
-  <a
-    className={props.className}
-    href={props.href}
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    {props.children}
-  </a>
-)
 
 const IntroCopy = () => (
   <>

@@ -267,6 +267,47 @@ export const aluminumBlockAutofills = {
   },
 }
 
+export const getDefaultFormState = (): LabwareFields => ({
+  labwareType: null,
+  tubeRackInsertLoadName: null,
+  aluminumBlockType: null,
+  aluminumBlockChildType: null,
+
+  // tubeRackSides: [],
+  footprintXDimension: null,
+  footprintYDimension: null,
+  labwareZDimension: null,
+
+  gridRows: null,
+  gridColumns: null,
+  gridSpacingX: null,
+  gridSpacingY: null,
+  gridOffsetX: null,
+  gridOffsetY: null,
+
+  heterogeneousWells: null,
+  irregularRowSpacing: null,
+  irregularColumnSpacing: null,
+
+  wellVolume: null,
+  wellBottomShape: null,
+  wellDepth: null,
+  wellShape: null,
+
+  // used with circular well shape only
+  wellDiameter: null,
+
+  // used with rectangular well shape only
+  wellXDimension: null,
+  wellYDimension: null,
+
+  brand: null,
+  brandId: [],
+
+  loadName: null,
+  displayName: null,
+})
+
 export const LABELS: { [$Keys<LabwareFields>]: string } = {
   labwareType: 'What type of labware are you creating?',
   tubeRackInsertLoadName: 'Which tube rack insert?',
