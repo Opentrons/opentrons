@@ -101,10 +101,10 @@ export const cancelSessionOnConflictEpic: LooseEpic = action$ =>
         error?.payload.status === 409
       )
     }),
-    switchMap<RobotApiResponseAction, _, mixed>(action => {
+    switchMap<RobotApiResponseAction, _, mixed>(errAction => {
       // filter ensures pathPrefix exists here
-      const pathPrefix: string = (action.meta.buildrootPrefix: any)
-      const { host } = action.payload
+      const pathPrefix: string = (errAction.meta.buildrootPrefix: any)
+      const { host } = errAction.payload
       const cancelRequest = {
         method: 'POST',
         host,
@@ -124,8 +124,8 @@ export const triggerUpdateAfterCancelEpic: LooseEpic = action$ =>
       const response = passRobotApiResponseAction(action)
       return response?.meta.buildrootRetry === true
     }),
-    switchMap<RobotApiResponseAction, _, mixed>(action => {
-      const { host } = action.payload
+    switchMap<RobotApiResponseAction, _, mixed>(respAction => {
+      const { host } = respAction.payload
       return of(startBuildrootUpdate(host.name))
     })
   )
@@ -142,9 +142,9 @@ export const triggerUpdateAfterPremigrationEpic: Epic = (_, state$) =>
         robot.serverHealth?.capabilities != null
       )
     }),
-    switchMap<State, _, BuildrootAction>(state => {
+    switchMap<State, _, BuildrootAction>(stateWithRobot => {
       // filter ensures robotName exists here
-      const robotName: string = (getBuildrootRobotName(state): any)
+      const robotName: string = (getBuildrootRobotName(stateWithRobot): any)
       return of(startBuildrootUpdate(robotName))
     })
   )
@@ -160,11 +160,11 @@ export const statusPollEpic: LooseEpic = (action$, state$) =>
         typeof response?.meta.buildrootPrefix === 'string'
       )
     }),
-    mergeMap<RobotApiResponseAction, _, mixed>(action => {
+    mergeMap<RobotApiResponseAction, _, mixed>(respAction => {
       // filter above ensures pathPrefix exists here
-      const pathPrefix: string = (action.meta.buildrootPrefix: any)
-      const token: string = action.payload.body.token
-      const { host } = action.payload
+      const pathPrefix: string = (respAction.meta.buildrootPrefix: any)
+      const token: string = respAction.payload.body.token
+      const { host } = respAction.payload
       const path = `${pathPrefix}/${token}/status`
       const request = { method: 'GET', host, path }
       const meta = { buildrootStatus: true }
@@ -205,9 +205,9 @@ const passActiveSession = (props: $Shape<BuildrootUpdateSession>) => (
 export const uploadFileEpic: Epic = (_, state$) =>
   state$.pipe(
     filter(passActiveSession({ stage: 'awaiting-file', uploadStarted: false })),
-    switchMap<State, _, BuildrootAction>(state => {
-      const host: ViewableRobot = (getBuildrootRobot(state): any)
-      const session = getBuildrootSession(state)
+    switchMap<State, _, BuildrootAction>(stateWithSession => {
+      const host: ViewableRobot = (getBuildrootRobot(stateWithSession): any)
+      const session = getBuildrootSession(stateWithSession)
       const pathPrefix: string = (session?.pathPrefix: any)
       const token: string = (session?.token: any)
 
@@ -219,9 +219,9 @@ export const uploadFileEpic: Epic = (_, state$) =>
 export const commitUpdateEpic: Epic = (_, state$) =>
   state$.pipe(
     filter(passActiveSession({ stage: 'done', committed: false })),
-    switchMap<State, _, BuildrootAction>(state => {
-      const host: ViewableRobot = (getBuildrootRobot(state): any)
-      const session = getBuildrootSession(state)
+    switchMap<State, _, BuildrootAction>(stateWithSession => {
+      const host: ViewableRobot = (getBuildrootRobot(stateWithSession): any)
+      const session = getBuildrootSession(stateWithSession)
       const pathPrefix: string = (session?.pathPrefix: any)
       const token: string = (session?.token: any)
       const path = `${pathPrefix}/${token}/commit`
@@ -236,8 +236,8 @@ export const commitUpdateEpic: Epic = (_, state$) =>
 export const restartAfterCommitEpic: Epic = (_, state$) =>
   state$.pipe(
     filter(passActiveSession({ stage: 'ready-for-restart', restarted: false })),
-    switchMap<State, _, BuildrootAction>(state => {
-      const host: ViewableRobot = (getBuildrootRobot(state): any)
+    switchMap<State, _, BuildrootAction>(stateWithSession => {
+      const host: ViewableRobot = (getBuildrootRobot(stateWithSession): any)
       const path = host.serverHealth?.capabilities?.restart || '/server/restart'
       const request = { method: 'POST', host, path }
       const meta = { buildrootRestart: true }
