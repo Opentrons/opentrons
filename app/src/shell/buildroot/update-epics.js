@@ -201,9 +201,7 @@ const passActiveSession = (props: $Shape<BuildrootUpdateSession>) => (
   )
 }
 
-// TODO(mc, 2019-07-19): epic to listen for /status success and:
-//   2. Trigger commit if ready to commit and update not yet committed
-//   3. Trigger restart if ready for restart and not yet restarted
+// upload the update file to the robot when it switches to `awaiting-file`
 export const uploadFileEpic: Epic = (_, state$) =>
   state$.pipe(
     filter(passActiveSession({ stage: 'awaiting-file', uploadStarted: false })),
@@ -217,6 +215,7 @@ export const uploadFileEpic: Epic = (_, state$) =>
     })
   )
 
+// commit the update file on the robot when it switches to `done`
 export const commitUpdateEpic: Epic = (_, state$) =>
   state$.pipe(
     filter(passActiveSession({ stage: 'done', committed: false })),
@@ -233,6 +232,7 @@ export const commitUpdateEpic: Epic = (_, state$) =>
     })
   )
 
+// restart the robot when it switches to `ready-for-restart`
 export const restartAfterCommitEpic: Epic = (_, state$) =>
   state$.pipe(
     filter(passActiveSession({ stage: 'ready-for-restart', restarted: false })),

@@ -118,6 +118,7 @@ export function buildrootReducer(
 
   if (apiError !== null) {
     if (
+      apiError.meta.buildrootRetry === true ||
       apiError.meta.buildrootCommit === true ||
       apiError.meta.buildrootRestart === true
     ) {

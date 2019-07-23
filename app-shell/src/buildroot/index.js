@@ -69,9 +69,10 @@ export function registerBuildrootUpdate(dispatch: Dispatch) {
             return dispatch({ type: 'buildroot:UNEXPECTED_ERROR' })
           }
 
-          uploadFile(host, path, file).catch(() =>
+          uploadFile(host, path, file).catch(error => {
+            log.warn('Error uploading update to robot', { path, file, error })
             dispatch({ type: 'buildroot:UNEXPECTED_ERROR' })
-          )
+          })
         }
       }
     }
