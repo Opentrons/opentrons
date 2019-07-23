@@ -73,30 +73,6 @@ export const aluminumBlockChildTypeOptions = [
   },
 ]
 
-export const tubeRackInsertOptions = [
-  {
-    name: '6 tubes',
-    value: 'TODO loadName of labware def here: 6 tubes',
-    image: 'TODO image URL here',
-  },
-  // TODO: We're punting on the 2-size 10 tube rack!
-  // {
-  //   name: '10 tubes (2 size)',
-  //   value: 'TODO loadName of labware def here: 10 tubes (2 size)',
-  //   image: 'TODO image URL here',
-  // },
-  {
-    name: '15 tubes',
-    value: 'TODO loadName of labware def here: 15 tubes',
-    image: 'TODO image URL here',
-  },
-  {
-    name: '24 tubes (snap cap)',
-    value: 'TODO loadName of labware def here: 24 tubes (snap cap)',
-    image: 'TODO image URL here',
-  },
-]
-
 export type LabwareFields = {|
   labwareType: ?LabwareType,
   tubeRackInsertLoadName: ?string,
@@ -182,3 +158,70 @@ export type ProcessedLabwareFields = {|
   loadName: string,
   displayName: string,
 |}
+
+export const tubeRackInsertOptions = [
+  {
+    name: '6 tubes',
+    value: '6tubes',
+    image: require('./images/6x50mL_insert_large.png'),
+  },
+  {
+    name: '15 tubes',
+    value: '15tubes',
+    image: require('./images/15x15mL_insert_large.png'),
+  },
+  {
+    name: '24 tubes (snap cap)',
+    value: '24tubesSnapCap',
+    image: require('./images/24x1_5mL_insert_large.png'),
+  },
+  {
+    name: '10 tubes (2 size)',
+    value: '10tubes',
+    image: require('./images/6x15mL_and_4x50mL_insert_large.png'),
+    disabled: true, // 6 + 4 tube rack not yet supported
+  },
+]
+
+// fields that get auto-filled when tubeRackInsertLoadName is selected
+// NOTE: these are duplicate data derived from tube rack defs, but
+// are intentionally duplicated to be the source of truth about the
+// *tube rack inserts* (as opposed to defs that use the insert)
+// TODO IMMEDIATELY: should diameter be included here too?
+export const tubeRackAutofills: {
+  [tubeRackInsertLoadName: string]: $Shape<LabwareFields>,
+} = {
+  '6tubes': {
+    // NOTE: based on opentrons_6_tuberack_falcon_50ml_conical
+    footprintXDimension: '127.76',
+    footprintYDimension: '85.48',
+    gridRows: '2',
+    gridColumns: '3',
+    gridSpacingX: '35.0',
+    gridSpacingY: '35.0',
+    gridOffsetX: '35.50',
+    gridOffsetY: '25.24',
+  },
+  '24tubesSnapCap': {
+    // NOTE: based on opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap
+    footprintXDimension: '127.75',
+    footprintYDimension: '85.50',
+    gridRows: '4',
+    gridColumns: '6',
+    gridSpacingX: '19.89',
+    gridSpacingY: '19.28',
+    gridOffsetX: '18.21',
+    gridOffsetY: '10.07',
+  },
+  '15tubes': {
+    // NOTE: based on opentrons_15_tuberack_falcon_15ml_conical
+    footprintXDimension: '127.76',
+    footprintYDimension: '85.48',
+    gridRows: '3',
+    gridColumns: '5',
+    gridSpacingX: '25.00',
+    gridSpacingY: '25.00',
+    gridOffsetX: '13.88',
+    gridOffsetY: '17.74',
+  },
+}

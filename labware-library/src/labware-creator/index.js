@@ -3,6 +3,7 @@ import * as React from 'react'
 import { Formik, Field, connect } from 'formik'
 import * as Yup from 'yup'
 import cloneDeep from 'lodash/cloneDeep'
+import mapValues from 'lodash/mapValues'
 import { saveAs } from 'file-saver'
 import {
   AlertItem,
@@ -23,6 +24,7 @@ import {
   wellBottomShapeOptions,
   wellShapeOptions,
   yesNoOptions,
+  tubeRackAutofills,
   X_DIMENSION,
   Y_DIMENSION,
   XY_ALLOWED_VARIANCE,
@@ -236,6 +238,41 @@ const labwareFormSchema = Yup.object().shape({
   displayName: requiredString(LABELS.displayName),
 })
 
+type MakeAutofillOnChangeArgs = {|
+  name: $Keys<LabwareFields>,
+  autofills: { [string]: $Shape<LabwareFields> },
+  values: LabwareFields,
+  touched: Object,
+  setValues: Object => mixed,
+  setTouched: Object => mixed,
+|}
+const makeAutofillOnChange = ({
+  name,
+  autofills,
+  values,
+  touched,
+  setValues,
+  setTouched,
+}: MakeAutofillOnChangeArgs) => (e: SyntheticEvent<HTMLSelectElement>) => {
+  const value = e.currentTarget.value
+  const autofillValues = autofills[value]
+  if (autofillValues) {
+    setValues({
+      ...values,
+      ...autofillValues,
+      [name]: value,
+    })
+    setTouched({
+      ...touched,
+      ...mapValues(autofillValues, () => true),
+    })
+  } else {
+    console.error(
+      `expected autofills for ${name}: ${value} -- is the value missing from the autofills object?`
+    )
+  }
+}
+
 type TextFieldProps = {|
   name: $Keys<LabwareFields>,
   units?: $PropertyType<React.ElementProps<typeof InputField>, 'units'>,
@@ -274,13 +311,19 @@ const TextField = (props: TextFieldProps) => {
 type DropdownProps = {|
   name: $Keys<LabwareFields>,
   options: Array<Object>, // Array<{| name: string, value: string, image?: string |}>, // TODO IMMEDIATELY
+  /** optionally override Formik Field's field.onChange */
+  onChange?: (e: SyntheticEvent<HTMLSelectElement>) => mixed,
 |}
 const Dropdown = (props: DropdownProps) => (
   <div className={styles.field_wrapper}>
     <div className={styles.field_label}>{LABELS[props.name]}</div>
     <Field name={props.name}>
       {({ field, form }) => (
-        <DropdownField {...field} options={props.options} />
+        <DropdownField
+          {...field}
+          onChange={props.onChange || field.onChange}
+          options={props.options}
+        />
       )}
     </Field>
   </div>
@@ -635,7 +678,15 @@ const App = () => {
           saveAs(blob, castValues.displayName)
         }}
       >
-        {({ handleSubmit, values, isValid, errors }) => (
+        {({
+          handleSubmit,
+          values,
+          isValid,
+          errors,
+          touched,
+          setValues,
+          setTouched,
+        }) => (
           <div className={styles.labware_creator}>
             <h2>Custom Labware Creator</h2>
             <IntroCopy />
@@ -653,6 +704,14 @@ const App = () => {
                 <Dropdown
                   name="tubeRackInsertLoadName"
                   options={tubeRackInsertOptions}
+                  onChange={makeAutofillOnChange({
+                    name: 'tubeRackInsertLoadName',
+                    autofills: tubeRackAutofills,
+                    values,
+                    touched,
+                    setValues,
+                    setTouched,
+                  })}
                 />
               )}
               {values.labwareType === 'aluminumBlock' && (
