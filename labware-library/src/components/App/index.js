@@ -12,7 +12,6 @@ import Page from './Page'
 import LabwareList from '../LabwareList'
 import LabwareDetails from '../LabwareDetails'
 import styles from './styles.css'
-import LabwareCreatorApp from '../../labware-creator'
 
 import type { DefinitionRouteRenderProps } from '../../definitions'
 
@@ -24,14 +23,6 @@ export function App(props: DefinitionRouteRenderProps) {
     if (scrollRef.current) scrollRef.current.scrollTop = 0
     window.scrollTo(0, 0)
   }, [location.pathname, location.search])
-
-  // FOR NOW: only show labware creator in local dev or in sandbox
-  const ENABLE_LABWARE_CREATOR = /^http:\/\/(localhost|sandbox\.labware\.opentrons\.com)/.test(
-    window.location.href
-  )
-  if (ENABLE_LABWARE_CREATOR && location.pathname === '/create') {
-    return <LabwareCreatorApp />
-  }
 
   const filters = getFilters(location)
   const detailPage = Boolean(definition)
