@@ -20,7 +20,7 @@ from typing import Any, Dict, Union, List, Optional, Tuple
 from opentrons import types as top_types
 from opentrons.util import linal
 from .simulator import Simulator
-from opentrons.config import robot_configs
+from opentrons.config import robot_configs, pipette_config
 from .pipette import Pipette
 try:
     from .controller import Controller
@@ -280,18 +280,23 @@ class API(HardwareAPILike):
                     self._config.instrument_offset[mount.name.lower()],
                     instrument_data['id'])
                 self._attached_instruments[mount] = p
-                mount_axis = Axis.by_mount(mount)
-                plunger_axis = Axis.of_plunger(mount)
-
+                cfg = pipette_config.load(model)
+                home_pos = cfg.home_position
+                max_travel = cfg.max_travel
+                steps_mm = cfg.steps_per_mm
             else:
                 self._attached_instruments[mount] = None
+                home_pos = self._config.default_pipette_configs['homePosition']
+                max_travel = self._config.default_pipette_configs['maxTravel']
+                steps_mm = self._config.default_pipette_configs['stepsPerMM']
+            mount_axis = Axis.by_mount(mount)
+            plunger_axis = Axis.of_plunger(mount)
             self._backend._smoothie_driver.update_steps_per_mm(
-                {plunger_axis.name: 768})
-
+                {plunger_axis.name: steps_mm})
             self._backend._smoothie_driver.update_pipette_config(
-                mount_axis.name, {'home': 220})
+                mount_axis.name, {'home': home_pos})
             self._backend._smoothie_driver.update_pipette_config(
-                plunger_axis.name, {'max_travel': 30})
+                plunger_axis.name, {'max_travel': max_travel})
         mod_log.info("Instruments found: {}".format(
             self._attached_instruments))
 

@@ -292,11 +292,11 @@ class Robot(CommandPublisher):
                 cfg = pipette_config.load(model_value)
                 home_pos = cfg.home_position
                 max_travel = cfg.max_travel
-                steps_per_mm = cfg.steps_per_mm
+                steps_mm = cfg.steps_per_mm
             else:
-                home_pos = self.config.DEFAULT_PIPETTE_CONFIGS['homePosition']
-                max_travel = self.config.DEFAULT_PIPETTE_CONFIGS['maxTravel']
-                steps_mm = self.config.DEFAULT_PIPETTE_CONFIGS['stepsPerMM']
+                home_pos = self.config.default_pipette_configs['homePosition']
+                max_travel = self.config.default_pipette_configs['maxTravel']
+                steps_mm = self.config.default_pipette_configs['stepsPerMM']
 
             self._driver.update_steps_per_mm({plunger_axis: steps_mm})
             self._driver.update_pipette_config(mount_axis, {'home': home_pos})

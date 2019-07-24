@@ -176,7 +176,8 @@ robot_config = namedtuple(
         'default_max_speed',
         'mount_offset',
         'log_level',
-        'tip_probe'
+        'tip_probe',
+        'default_pipette_configs'
     ]
 )
 
@@ -287,7 +288,9 @@ def build_config(deck_cal: List[List[float]],
             'default_max_speed', DEFAULT_MAX_SPEEDS),
         log_level=robot_settings.get('log_level', DEFAULT_LOG_LEVEL),
         tip_probe=_build_tip_probe(
-            _tip_probe_settings_with_migration(robot_settings))
+            _tip_probe_settings_with_migration(robot_settings)),
+        default_pipette_configs=robot_settings.get(
+            'default_pipette_configs', DEFAULT_PIPETTE_CONFIGS)
     )
     return cfg
 
