@@ -917,9 +917,8 @@ class InstrumentContext(CommandPublisher):
         return self
 
     def pick_up_tip(  # noqa(C901)
-            self,
-            location: Union[types.Location, Well] = None,
-            presses: int = 3,
+            self, location: Union[types.Location, Well] = None,
+            presses: int = None,
             increment: float = 1.0) -> 'InstrumentContext':
         """
         Pick up a tip for the pipette to run liquid-handling commands with
