@@ -48,10 +48,6 @@ def _log_call(func):
     return _log_call_inner
 
 
-class MustHomeError(RuntimeError):
-    pass
-
-
 class NoTipAttachedError(RuntimeError):
     pass
 
@@ -575,7 +571,7 @@ class API(HardwareAPILike):
         the nozzle will be returned.
         """
         if not self._current_position:
-            raise MustHomeError
+            await self.home()
         async with self._motion_lock:
             if mount == mount.RIGHT:
                 offset = top_types.Point(0, 0, 0)
@@ -604,6 +600,7 @@ class API(HardwareAPILike):
         use (see :py:meth:`current_position`).
         """
         cur_pos = await self.current_position(mount, critical_point)
+        self._log.info(f"Building position from {cur_pos}")
         return top_types.Point(x=cur_pos[Axis.X],
                                y=cur_pos[Axis.Y],
                                z=cur_pos[Axis.by_mount(mount)])
@@ -645,7 +642,7 @@ class API(HardwareAPILike):
                                when no tip is applied will result in an error.
         """
         if not self._current_position:
-            raise MustHomeError
+            await self.home()
 
         await self._cache_and_maybe_retract_mount(mount)
         z_axis = Axis.by_mount(mount)
@@ -671,22 +668,19 @@ class API(HardwareAPILike):
         axes are to be moved, they will do so at the same speed
         """
         if not self._current_position:
-            raise MustHomeError
+            await self.home()
 
         await self._cache_and_maybe_retract_mount(mount)
 
         z_axis = Axis.by_mount(mount)
-        try:
-            target_position = OrderedDict(
-                ((Axis.X,
-                  self._current_position[Axis.X] + delta.x),
-                 (Axis.Y,
-                  self._current_position[Axis.Y] + delta.y),
-                 (z_axis,
-                  self._current_position[z_axis] + delta.z))
-                )
-        except KeyError:
-            raise MustHomeError
+        target_position = OrderedDict(
+            ((Axis.X,
+              self._current_position[Axis.X] + delta.x),
+             (Axis.Y,
+              self._current_position[Axis.Y] + delta.y),
+             (z_axis,
+              self._current_position[z_axis] + delta.z))
+        )
         await self._move(target_position, speed=speed)
 
     async def _cache_and_maybe_retract_mount(self, mount: top_types.Mount):
@@ -714,10 +708,7 @@ class API(HardwareAPILike):
               self._current_position[z_axis]),
              (pl_axis, dist))
         )
-        try:
-            await self._move(all_axes_pos, speed, False)
-        except KeyError:
-            raise MustHomeError
+        await self._move(all_axes_pos, speed, False)
 
     async def _move(self, target_position: 'OrderedDict[Axis, float]',
                     speed: float = None, home_flagged_axes: bool = True):

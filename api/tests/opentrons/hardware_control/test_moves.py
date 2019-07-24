@@ -1,3 +1,4 @@
+from unittest.mock import Mock
 import pytest
 from opentrons import types
 from opentrons import hardware_control as hc
@@ -49,8 +50,10 @@ async def test_controller_home(loop):
 async def test_controller_musthome(hardware_api):
     abs_position = types.Point(30, 20, 10)
     mount = types.Mount.RIGHT
-    with pytest.raises(hc.MustHomeError):
-        await hardware_api.move_to(mount, abs_position)
+    home = Mock()
+    home.side_effect = hardware_api.home
+    await hardware_api.move_to(mount, abs_position)
+    assert home.called_once()
 
 
 async def test_home_specific_sim(hardware_api, monkeypatch):
