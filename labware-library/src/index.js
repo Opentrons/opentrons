@@ -6,7 +6,7 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import App from './components/App'
 import LabwareCreator from './labware-creator'
 
-import './public-path'
+import { getPublicPath } from './public-path'
 import './styles.global.css'
 
 const $root = document.getElementById('root')
@@ -18,7 +18,7 @@ if (!$root) {
 ReactDom.render(
   <BrowserRouter>
     <Switch>
-      <Route path="/create" component={LabwareCreator} />
+      <Route path={`${getPublicPath()}create`} component={LabwareCreator} />
       <Route component={App} />
     </Switch>
   </BrowserRouter>,
