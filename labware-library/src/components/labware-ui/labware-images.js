@@ -102,6 +102,15 @@ export default {
   opentrons_96_tiprack_300ul: [
     require('../../images/opentrons_96_tiprack_300ul_side_view.jpg'),
   ],
+  opentrons_96_filtertiprack_1000ul: [
+    require('../../images/opentrons_96_tiprack_1000ul_side_view.jpg'),
+  ],
+  opentrons_96_filtertiprack_10ul: [
+    require('../../images/opentrons_96_tiprack_10ul_side_view.jpg'),
+  ],
+  opentrons_96_filtertiprack_200ul: [
+    require('../../images/opentrons_96_tiprack_300ul_side_view.jpg'),
+  ],
   tipone_96_tiprack_200ul: [
     require('../../images/tipone_96_tiprack_200ul_side_view.jpg'),
     require('../../images/tipone_200ul_tip_side_view.jpg'),
