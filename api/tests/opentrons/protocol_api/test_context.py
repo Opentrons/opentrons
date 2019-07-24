@@ -176,6 +176,24 @@ def test_return_tip(loop, get_labware_def):
     assert tiprack.wells()[0].has_tip
 
 
+def test_use_filter_tips(loop, get_labware_def):
+    ctx = papi.ProtocolContext(loop)
+    ctx.home()
+
+    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_10ul', 2)
+
+    mount = Mount.LEFT
+
+    instr = ctx.load_instrument('p300_single', mount)
+    pipette: Pipette = ctx._hw_manager.hardware._attached_instruments[mount]
+
+    assert pipette.available_volume == pipette.config.max_volume
+
+    instr.pick_up_tip(tiprack.wells()[0])
+    assert pipette.available_volume < pipette.config.max_volume
+    instr.drop_tip()
+
+
 def test_pick_up_tip_no_location(loop, get_labware_def):
     ctx = papi.ProtocolContext(loop)
     ctx.home()

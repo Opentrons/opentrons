@@ -1112,6 +1112,12 @@ class API(HardwareAPILike):
 
         await self.retract(mount, instr.config.pick_up_distance)
 
+    def set_working_volume(self, mount, tip_volume):
+        instr = self._attached_instruments[mount]
+        assert instr
+        self._log.info("Updating working volume based on tip total volume")
+        instr.set_working_volume(tip_volume)
+
     @_log_call
     async def drop_tip(self, mount, home_after=True):
         """

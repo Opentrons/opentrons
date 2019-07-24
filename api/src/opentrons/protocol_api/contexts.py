@@ -1133,6 +1133,8 @@ class InstrumentContext(CommandPublisher):
         # Note that the hardware API pick_up_tip action includes homing z after
         cmds.do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
                         'after', self, None, instrument=self, location=target)
+        self._hw_manager.hardware.set_working_volume(
+            self._mount, target._volume)
         tiprack.use_tips(target, num_channels)
         self._last_tip_picked_up_from = target
 
