@@ -16,7 +16,10 @@ const JS_PRERENDER_ENTRY = path.join(__dirname, './src/prerender.js')
 const HTML_ENTRY = path.join(__dirname, './src/index.hbs')
 const OUT_PATH = path.join(__dirname, 'dist')
 
-const pages = [{ location: '', title: pkg.productName }]
+const pages = [
+  { location: '', title: pkg.productName },
+  { location: 'create', title: 'Labware Creator' },
+]
 
 // TODO(mc, 2019-04-05): uncommenting this block (and the imports above) will
 //   statically prerender the labware detail pages, but build takes ~5 minutes.
