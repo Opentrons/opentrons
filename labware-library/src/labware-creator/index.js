@@ -3,6 +3,7 @@ import * as React from 'react'
 import { Formik } from 'formik'
 import mapValues from 'lodash/mapValues'
 import { saveAs } from 'file-saver'
+import JSZip from 'jszip'
 import { AlertItem, AlertModal, PrimaryButton } from '@opentrons/components'
 import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
 import {
@@ -286,11 +287,18 @@ const App = () => {
           const castValues: ProcessedLabwareFields = labwareFormSchema.cast(
             values
           )
+          const { displayName } = castValues
           const def = fieldsToLabware(castValues)
-          const blob = new Blob([JSON.stringify(def, null, 4)], {
-            type: 'application/json',
-          })
-          saveAs(blob, castValues.displayName)
+
+          const zip = new JSZip()
+          zip.file(`${displayName}.json`, JSON.stringify(def, null, 4))
+          zip.file(
+            `calibrate_${displayName}.py`,
+            'print("Pretend protocol here")'
+          )
+          zip
+            .generateAsync({ type: 'blob' })
+            .then(blob => saveAs(blob, `${displayName}.zip`))
         }}
       >
         {({

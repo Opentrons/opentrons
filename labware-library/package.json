@@ -19,6 +19,7 @@
     "classnames": "^2.2.5",
     "file-saver": "^2.0.1",
     "formik": "^1.5.8",
+    "jszip": "^3.2.2",
     "lodash": "^4.17.4",
     "query-string": "^6.2.0",
     "react": "^16.8.6",
