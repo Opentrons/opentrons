@@ -38,7 +38,7 @@
   "thermocycler": {
     "labwareOffset": {
       "x": -0.02,
-      "y": -9.3,
+      "y": 81.2,
       "z": 103.44
     },
     "dimensions": {
@@ -56,8 +56,8 @@
   },
   "semithermocycler": {
     "labwareOffset": {
-      "x": -0.02,
-      "y": -4.47,
+      "x": -21.02,
+      "y": 81.2,
       "z": 103.44
     },
     "dimensions": {
