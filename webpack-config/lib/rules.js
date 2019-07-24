@@ -102,7 +102,8 @@ module.exports = {
     use: {
       loader: 'file-loader',
       options: {
-        name: DEV_MODE ? '[path][name].[ext]' : 'images/[name].[hash].[ext]',
+        name: DEV_MODE ? '[path][name].[ext]' : '[name].[hash].[ext]',
+        outputPath: 'images',
       },
     },
   },
