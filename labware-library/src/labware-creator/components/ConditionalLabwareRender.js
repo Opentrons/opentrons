@@ -1,31 +1,23 @@
 // @flow
 import * as React from 'react'
 import cloneDeep from 'lodash/cloneDeep'
-import { LabwareRender, RobotWorkSpace } from '@opentrons/components'
+import {
+  LabwareRender,
+  LabwareOutline,
+  RobotCoordsForeignDiv,
+  RobotWorkSpace,
+} from '@opentrons/components'
 import { X_DIMENSION, Y_DIMENSION } from '../fields'
 import labwareFormSchema from '../labwareFormSchema'
 import fieldsToLabware from '../fieldsToLabware'
 import type { LabwareFields, ProcessedLabwareFields } from '../fields'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import styles from './ConditionalLabwareRender.css'
 
-// TODO IMMEDIATELY this is copied from PD, make it a component library component??
-function SingleLabware(props: {| definition: LabwareDefinition2 |}) {
-  return (
-    <RobotWorkSpace
-      viewBox={`0 0 ${props.definition.dimensions.xDimension} ${
-        props.definition.dimensions.yDimension
-      }`}
-    >
-      {() => <LabwareRender {...props} />}
-    </RobotWorkSpace>
-  )
-}
-
-type ConditionalLabwareRenderProps = {|
+type Props = {|
   values: LabwareFields,
 |}
 
-const ConditionalLabwareRender = (props: ConditionalLabwareRenderProps) => {
+const ConditionalLabwareRender = (props: Props) => {
   const definition = React.useMemo(() => {
     const values = cloneDeep(props.values)
 
@@ -65,8 +57,33 @@ const ConditionalLabwareRender = (props: ConditionalLabwareRenderProps) => {
     return def
   }, [props.values])
 
-  const errorComponent = 'Cannot render labware, invalid inputs' // TODO get SVG for no-definition
-  return definition ? <SingleLabware definition={definition} /> : errorComponent
+  const xDim = definition ? definition.dimensions.xDimension : X_DIMENSION
+  const yDim = definition ? definition.dimensions.yDimension : Y_DIMENSION
+
+  return (
+    <RobotWorkSpace viewBox={`0 0 ${xDim} ${yDim}`}>
+      {() =>
+        definition ? (
+          <LabwareRender definition={definition} />
+        ) : (
+          <>
+            <LabwareOutline />
+            <RobotCoordsForeignDiv
+              x={0}
+              y={0}
+              width={xDim}
+              height={yDim}
+              innerDivProps={{ className: styles.error_text_wrapper }}
+            >
+              <div className={styles.error_text}>
+                Add missing info to see labware preview
+              </div>
+            </RobotCoordsForeignDiv>
+          </>
+        )
+      }
+    </RobotWorkSpace>
+  )
 }
 
 export default ConditionalLabwareRender
