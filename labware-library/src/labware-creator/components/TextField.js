@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { Field } from 'formik'
 import { InputField } from '@opentrons/components'
-import { getIsAutopopulated } from '../formikStatus'
+import { getIsAutofilled } from '../formSelectors'
 import { LABELS, type LabwareFields } from '../fields'
 import fieldStyles from './fieldStyles.css'
 
@@ -15,8 +15,8 @@ type Props = {|
   units?: $PropertyType<InputFieldProps, 'units'>,
 |}
 
-// NOTE(Ian 2019-07-23): per-field hide-when-autopopulated is not yet necessary,
-// because sections are laid out to contain groups of autopopulated fields.
+// NOTE(Ian 2019-07-23): per-field hide-when-autofilled is not yet necessary,
+// because sections are laid out to contain groups of autofilled fields.
 // This functionality in TextField may be removed if we clearly don't need it.
 const TextField = (props: Props) => {
   const { caption, name, units } = props
@@ -35,8 +35,8 @@ const TextField = (props: Props) => {
   return (
     <Field name={props.name}>
       {({ field, form }) =>
-        // hide if field has been autopopulated
-        getIsAutopopulated(props.name, form.status) ? null : (
+        // hide if field has been autofilled
+        getIsAutofilled(props.name, form.values) ? null : (
           <div className={fieldStyles.field_wrapper}>
             <div className={fieldStyles.field_label}>{LABELS[name]}</div>
             <InputField

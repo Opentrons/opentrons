@@ -4,7 +4,7 @@ import compact from 'lodash/compact'
 import uniq from 'lodash/uniq'
 import { connect } from 'formik'
 import { AlertItem } from '@opentrons/components'
-import { getIsAutopopulated } from '../formikStatus'
+import { getIsAutofilled } from '../formSelectors'
 import LinkOut from './LinkOut'
 import styles from './Section.css'
 import { IRREGULAR_LABWARE_ERROR, type LabwareFields } from '../fields'
@@ -20,18 +20,15 @@ type Props = {|
 const Section = connect((props: Props) => {
   const fieldList = props.fieldList || []
   if (props.fieldList != null && fieldList.length > 0) {
-    const numFieldsAutopopulated = props.fieldList
-      .map(field => getIsAutopopulated(field, props.formik.status))
+    const numFieldsAutofilled = props.fieldList
+      .map(field => getIsAutofilled(field, props.formik.values))
       .filter(Boolean).length
 
-    if (numFieldsAutopopulated === fieldList.length) {
-      // all fields are autopopulated
+    if (numFieldsAutofilled === fieldList.length) {
+      // all fields are autofilled
       return null
     }
-    if (
-      numFieldsAutopopulated > 0 &&
-      numFieldsAutopopulated !== fieldList.length
-    ) {
+    if (numFieldsAutofilled > 0 && numFieldsAutofilled !== fieldList.length) {
       console.error(
         `section "${
           props.label

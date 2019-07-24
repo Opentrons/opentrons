@@ -259,6 +259,19 @@ export const aluminumBlockChildTypeOptions: Options = [
   },
 ]
 
+export const getImplicitAutofillValues = (
+  preAutofilledValues: LabwareFields
+): $Shape<LabwareFields> => {
+  let result: $Shape<LabwareFields> = {}
+  if ('gridRows' in preAutofilledValues) {
+    result.regularRowSpacing = 'true'
+  }
+  if ('gridColumns' in preAutofilledValues) {
+    result.regularColumnSpacing = 'true'
+  }
+  return result
+}
+
 export const getDefaultFormState = (): LabwareFields => ({
   labwareType: null,
   tubeRackInsertLoadName: null,
