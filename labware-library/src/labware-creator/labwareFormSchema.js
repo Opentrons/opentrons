@@ -11,6 +11,7 @@ import {
   Y_DIMENSION,
   XY_ALLOWED_VARIANCE,
   MAX_Z_DIMENSION,
+  type ProcessedLabwareFields,
 } from './fields'
 
 const REQUIRED_FIELD = '${label} is required' // eslint-disable-line no-template-curly-in-string
@@ -135,7 +136,19 @@ const labwareFormSchema = Yup.object().shape({
   }),
 
   brand: requiredString(LABELS.brand),
-  brandId: Yup.array().of(Yup.string()),
+  brandId: Yup.mixed()
+    .nullable()
+    .transform(
+      (
+        currentValue: ?string,
+        originalValue: ?string
+      ): $PropertyType<ProcessedLabwareFields, 'brandId'> =>
+        (currentValue || '')
+          .trim()
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean)
+    ),
 
   loadName: requiredString(LABELS.loadName)
     .matches(

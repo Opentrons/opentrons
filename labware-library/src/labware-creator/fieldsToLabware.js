@@ -52,7 +52,7 @@ export default function fieldsToLabware(
       },
       brand: {
         brand: fields.brand,
-        //   brandId: [],
+        brandId: fields.brandId,
         //   links: []
       },
       version: 1,

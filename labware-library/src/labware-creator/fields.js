@@ -82,7 +82,7 @@ export type LabwareFields = {|
   wellYDimension: ?string,
 
   brand: ?string,
-  brandId: Array<string>,
+  brandId: ?string, // comma-separated values
 
   loadName: ?string,
   displayName: ?string,
@@ -294,7 +294,7 @@ export const getDefaultFormState = (): LabwareFields => ({
   wellYDimension: null,
 
   brand: null,
-  brandId: [],
+  brandId: null,
 
   loadName: null,
   displayName: null,
@@ -325,6 +325,7 @@ export const LABELS: { [$Keys<LabwareFields>]: string } = {
   gridOffsetX: 'X Offset (Xo)',
   gridOffsetY: 'Y Offset (Yo)',
   brand: 'Brand',
-  displayName: "Display Name ('File name' ??? TODO)",
+  brandId: 'Manufacturer/Catalog #',
+  displayName: 'Display Name',
   loadName: 'API Load Name',
 }

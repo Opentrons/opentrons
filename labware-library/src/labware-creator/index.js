@@ -601,9 +601,9 @@ const App = () => {
             </Section>
 
             {/* PAGE 3 */}
-            <Section label="Description" fieldList={['brand']}>
+            <Section label="Description" fieldList={['brand', 'brandId']}>
               <TextField name="brand" />
-              {'brandId: Array<string> (TODO!!!)'}
+              <TextField name="brandId" caption="Separate multiple by comma" />
             </Section>
             {/* PAGE 4 */}
             <Section label="File" fieldList={['loadName', 'displayName']}>
