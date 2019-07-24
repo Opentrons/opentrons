@@ -1,10 +1,13 @@
 // @flow
 import * as React from 'react'
+import compact from 'lodash/compact'
+import uniq from 'lodash/uniq'
 import { connect } from 'formik'
 import { AlertItem } from '@opentrons/components'
 import { getIsAutopopulated } from '../formikStatus'
+import LinkOut from './LinkOut'
 import styles from './Section.css'
-import type { LabwareFields } from '../fields'
+import { IRREGULAR_LABWARE_ERROR, type LabwareFields } from '../fields'
 
 // TODO: Make this DRY, don't require fields (in children) and also fieldList.
 type Props = {|
@@ -41,19 +44,34 @@ const Section = connect((props: Props) => {
   const dirtyFieldNames = fieldList.filter(
     name => props.formik?.touched?.[name]
   )
-  const allErrors = dirtyFieldNames.map(name => {
-    const errors: ?string = props.formik.errors[name]
-    if (errors != null) {
-      return <AlertItem key={name} type="warning" title={errors} />
+  const allErrors: Array<string> = uniq(
+    compact(dirtyFieldNames.map(name => props.formik.errors[name]))
+  )
+  const allErrorAlerts = allErrors.map(error => {
+    if (error === IRREGULAR_LABWARE_ERROR) {
+      // TODO IMMEDIATELY get real link to labware request form
+      return (
+        <AlertItem
+          key={error}
+          type="error"
+          title={
+            <>
+              Your labware is not compatible with the Labware Creator. Please
+              fill out <LinkOut href="#TODO">this form</LinkOut> to request a
+              custom labware definition.
+            </>
+          }
+        />
+      )
     }
-    return null
+    return <AlertItem key={error} type="warning" title={error} />
   })
 
   return (
     <div className={styles.section_wrapper}>
       <h2 className={styles.section_header}>{props.label}</h2>
       <div>
-        {allErrors}
+        {allErrorAlerts}
         {props.additionalAlerts}
       </div>
       {props.children}

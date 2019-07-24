@@ -5,6 +5,9 @@ export const XY_ALLOWED_VARIANCE = 0.25
 export const MAX_SUGGESTED_Z = 124
 export const MAX_Z_DIMENSION = 195
 
+// magic string for all validation errors that direct user away to the labware request form
+export const IRREGULAR_LABWARE_ERROR = 'IRREGULAR_LABWARE_ERROR'
+
 export type Options = Array<{|
   name: string,
   value: string,

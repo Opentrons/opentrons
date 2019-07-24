@@ -5,6 +5,7 @@ import {
   labwareTypeOptions,
   wellBottomShapeOptions,
   wellShapeOptions,
+  IRREGULAR_LABWARE_ERROR,
   LABELS,
   X_DIMENSION,
   Y_DIMENSION,
@@ -39,9 +40,10 @@ const unsupportedLabwareIfFalse = (label: string) =>
   Yup.boolean()
     .label(label)
     .typeError(REQUIRED_FIELD)
-    .oneOf([true], 'TODO! Text here')
+    .oneOf([true], IRREGULAR_LABWARE_ERROR)
     .required()
 
+// NOTE: all IRREGULAR_LABWARE_ERROR messages will be converted to a special 'error' Alert
 const labwareFormSchema = Yup.object().shape({
   labwareType: requiredString(LABELS.labwareType).oneOf(
     labwareTypeOptions.map(o => o.value)
@@ -71,17 +73,18 @@ const labwareFormSchema = Yup.object().shape({
   footprintXDimension: Yup.number()
     .label(LABELS.footprintXDimension)
     .typeError(MUST_BE_A_NUMBER)
-    .min(X_DIMENSION - XY_ALLOWED_VARIANCE)
-    .max(X_DIMENSION + XY_ALLOWED_VARIANCE)
+    .min(X_DIMENSION - XY_ALLOWED_VARIANCE, IRREGULAR_LABWARE_ERROR)
+    .max(X_DIMENSION + XY_ALLOWED_VARIANCE, IRREGULAR_LABWARE_ERROR)
     .required(),
   footprintYDimension: Yup.number()
     .label(LABELS.footprintYDimension)
     .typeError(MUST_BE_A_NUMBER)
-    .min(Y_DIMENSION - XY_ALLOWED_VARIANCE)
-    .max(Y_DIMENSION + XY_ALLOWED_VARIANCE)
+    .min(Y_DIMENSION - XY_ALLOWED_VARIANCE, IRREGULAR_LABWARE_ERROR)
+    .max(Y_DIMENSION + XY_ALLOWED_VARIANCE, IRREGULAR_LABWARE_ERROR)
     .required(),
-  labwareZDimension: requiredPositiveNumber(LABELS.labwareZDimension).lessThan(
-    MAX_Z_DIMENSION
+  labwareZDimension: requiredPositiveNumber(LABELS.labwareZDimension).max(
+    MAX_Z_DIMENSION,
+    IRREGULAR_LABWARE_ERROR
   ),
 
   gridRows: requiredPositiveInteger(LABELS.gridRows),
