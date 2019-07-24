@@ -110,6 +110,12 @@ DEFAULT_ACCELERATION: Dict[str, float] = {
     'C': C_ACCELERATION
 }
 
+DEFAULT_PIPETTE_CONFIGS: Dict[str, float] = {
+    'homePosition': 220,
+    'stepsPerMM': 768,
+    'maxTravel': 30
+}
+
 DEFAULT_GANTRY_STEPS_PER_MM: Dict[str, float] = {
     'X': 80.00,
     'Y': 80.00,

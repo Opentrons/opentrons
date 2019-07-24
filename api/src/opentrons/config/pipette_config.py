@@ -39,6 +39,9 @@ pipette_config = namedtuple(
         'backcompat_name',
         'return_tip_height',
         'blow_out_flow_rate',
+        'max_travel',
+        'home_position',
+        'steps_per_mm'
     ]
 )
 
@@ -194,6 +197,9 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
         return_tip_height=cfg.get('returnTipHeight'),
         blow_out_flow_rate=ensure_value(
             cfg, 'defaultBlowOutFlowRate', MUTABLE_CONFIGS),
+        max_travel=cfg.get('travelDistance'),
+        home_position=cfg.get('homePosition'),
+        steps_per_mm=cfg.get('stepsPerMM')
     )
 
     return res

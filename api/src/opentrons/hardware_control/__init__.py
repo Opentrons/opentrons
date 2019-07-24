@@ -282,27 +282,16 @@ class API(HardwareAPILike):
                 self._attached_instruments[mount] = p
                 mount_axis = Axis.by_mount(mount)
                 plunger_axis = Axis.of_plunger(mount)
-                if 'v2' in model:
-                    # Check if new model of pipettes, load smoothie configs
-                    # for this particular model
-                    self._backend._smoothie_driver.update_steps_per_mm(
-                        {plunger_axis.name: 3200})
-                    # TODO(LC25-4-2019): Modify configs to update to as
-                    # testing informs better values
-                    self._backend._smoothie_driver.update_pipette_config(
-                        mount_axis.name, {'home': 172.15})
-                    self._backend._smoothie_driver.update_pipette_config(
-                        plunger_axis.name, {'max_travel': 60})
-                else:
-                    self._backend._smoothie_driver.update_steps_per_mm(
-                        {plunger_axis.name: 768})
 
-                    self._backend._smoothie_driver.update_pipette_config(
-                        mount_axis.name, {'home': 220})
-                    self._backend._smoothie_driver.update_pipette_config(
-                        plunger_axis.name, {'max_travel': 30})
             else:
                 self._attached_instruments[mount] = None
+            self._backend._smoothie_driver.update_steps_per_mm(
+                {plunger_axis.name: 768})
+
+            self._backend._smoothie_driver.update_pipette_config(
+                mount_axis.name, {'home': 220})
+            self._backend._smoothie_driver.update_pipette_config(
+                plunger_axis.name, {'max_travel': 30})
         mod_log.info("Instruments found: {}".format(
             self._attached_instruments))
 
