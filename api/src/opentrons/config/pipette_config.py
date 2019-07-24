@@ -131,6 +131,7 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
 
     # Load the model config and update with the name config
     cfg = copy.deepcopy(configs[pipette_model])
+    print(name_config()[cfg['name']])
     cfg.update(copy.deepcopy(name_config()[cfg['name']]))
     # Load overrides if we have a pipette id
     if pipette_id:
@@ -162,6 +163,7 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
         log.info("Using new aspiration functions")
         ul_per_mm = cfg['ulPerMm'][-1]
 
+    smoothie_configs = cfg.get('smoothieConfigs')
     res = pipette_config(
         top=ensure_value(
             cfg, 'top', MUTABLE_CONFIGS),
@@ -197,9 +199,9 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
         return_tip_height=cfg.get('returnTipHeight'),
         blow_out_flow_rate=ensure_value(
             cfg, 'defaultBlowOutFlowRate', MUTABLE_CONFIGS),
-        max_travel=cfg.get('travelDistance'),
-        home_position=cfg.get('homePosition'),
-        steps_per_mm=cfg.get('stepsPerMM')
+        max_travel=smoothie_configs.get('travelDistance'),
+        home_position=smoothie_configs.get('homePosition'),
+        steps_per_mm=smoothie_configs.get('stepsPerMM')
     )
 
     return res

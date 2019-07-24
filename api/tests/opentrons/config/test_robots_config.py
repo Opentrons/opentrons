@@ -35,7 +35,7 @@ dummy_settings = {
     'high_current': {'X': 1, 'Y': 2, 'Z': 3, 'A': 4, 'B': 5, 'C': 6},
     'default_max_speed': {'X': 1, 'Y': 2, 'Z': 3, 'A': 4, 'B': 5, 'C': 6},
     'default_pipette_configs': {
-        'homePosition': 220, 'maxTravel': 30,'stepsPerMM': 768},
+        'homePosition': 220, 'maxTravel': 30, 'stepsPerMM': 768},
     'log_level': 'NADA',
     'tip_probe': {
         'bounce_distance': 5.0,
