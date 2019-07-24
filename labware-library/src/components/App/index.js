@@ -25,10 +25,11 @@ export function App(props: DefinitionRouteRenderProps) {
     window.scrollTo(0, 0)
   }, [location.pathname, location.search])
 
-  if (
-    process.env.OT_LL_LABWARE_CREATOR === '1' &&
-    location.pathname === '/create'
-  ) {
+  // FOR NOW: only show labware creator in local dev or in sandbox
+  const ENABLE_LABWARE_CREATOR = /^http:\/\/(localhost|sandbox\.labware\.opentrons\.com)/.test(
+    window.location.href
+  )
+  if (ENABLE_LABWARE_CREATOR && location.pathname === '/create') {
     return <LabwareCreatorApp />
   }
 
