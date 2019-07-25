@@ -116,8 +116,18 @@ def _do_schema_changes():
     db_version = database.get_version()
     if db_version == 0:
         log.info("doing database schema migration")
-        execute_schema_change(conn, create_table_ContainerWells)
-        execute_schema_change(conn, create_table_Containers)
+        try:
+            execute_schema_change(conn, create_table_ContainerWells)
+        except sqlite3.OperationalError:
+            log.warning(
+                "Creation of container wells failed, robot may have been "
+                "interrupted during last boot")
+        try:
+            execute_schema_change(conn, create_table_Containers)
+        except sqlite3.OperationalError:
+            log.warning(
+                "Creation of containers failed, robot may have been "
+                "interrupted during last boot")
         database.set_version(1)
     return conn
 
