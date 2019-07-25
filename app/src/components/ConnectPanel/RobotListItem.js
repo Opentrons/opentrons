@@ -21,7 +21,7 @@ export function RobotListItem(props: RobotItemProps) {
 
   return (
     <li className={styles.robot_group}>
-      <RobotLink url={`/robots/${name}`} className={styles.robot_item} exact>
+      <RobotLink url={`/robots/${name}`} className={styles.robot_item}>
         <NotificationIcon
           name={local ? 'usb' : 'wifi'}
           className={styles.robot_item_icon}
