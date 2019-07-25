@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.10.2"></a>
+## [3.10.2](https://github.com/opentrons/opentrons/compare/v3.10.0...v3.10.2) (2019-07-25)
+
+
+### Bug Fixes
+
+* **api:** Allow gen2 reference in protocol without pipette attached ([#3760](https://github.com/opentrons/opentrons/issues/3760)) ([e6c0b48](https://github.com/opentrons/opentrons/commit/e6c0b48))
+* **api:** apiv1: handle partial db schema changes ([#3783](https://github.com/opentrons/opentrons/issues/3783)) ([5d52cd7](https://github.com/opentrons/opentrons/commit/5d52cd7))
+* **api:** Save the difference between offsets in labwarev2 cal ([#3782](https://github.com/Opentrons/opentrons/commit/35a095aa5d74e02a183c71ddf58ad7ee97360a6a))
+* **api:** apiv2: Correctly handle flow rates and plunger speeds ([#3739](https://github.com/opentrons/opentrons/issues/3739)) ([01c0fcb](https://github.com/opentrons/opentrons/commit/01c0fcb)), closes [#3737](https://github.com/opentrons/opentrons/issues/3737) [#3270](https://github.com/opentrons/opentrons/issues/3270)
+* **api:** apiv2: Display locs for drop/pickup from implicit locs ([#3774](https://github.com/opentrons/opentrons/issues/3774)) ([cf7710f](https://github.com/opentrons/opentrons/commit/cf7710f)), closes [#3364](https://github.com/opentrons/opentrons/issues/3364)
+* **api:** apiv2: fix protocol cancel ([#3725](https://github.com/opentrons/opentrons/issues/3725)) ([b2b8c46](https://github.com/opentrons/opentrons/commit/b2b8c46))
+* **api:** apiv2: simulator should find pipettes by name versus model ([#3779](https://github.com/opentrons/opentrons/issues/3779)) ([a0fd72b](https://github.com/opentrons/opentrons/commit/a0fd72b))
+* **api:** fix blow out logic ([#3764](https://github.com/opentrons/opentrons/issues/3764)) ([fb99bf0](https://github.com/opentrons/opentrons/commit/fb99bf0))
+* **api:** Modify delay and motors which are disengaged ([#3770](https://github.com/opentrons/opentrons/issues/3770)) ([1eb760c](https://github.com/opentrons/opentrons/commit/1eb760c))
+* **api:** Remove model name check for non-gen2 pipettes ([#3761](https://github.com/opentrons/opentrons/issues/3761)) ([263b536](https://github.com/opentrons/opentrons/commit/263b536))
+* **api:** Use pip config presses by default ([#3778](https://github.com/opentrons/opentrons/issues/3778)) ([8fce1a9](https://github.com/opentrons/opentrons/commit/8fce1a9))
+* **factory_scripts:** Remove old func name and refactor IP look-up ([#3763](https://github.com/opentrons/opentrons/issues/3763)) ([2847cad](https://github.com/opentrons/opentrons/commit/2847cad))
+* **protocol-designer:** update various styles to match designs ([#3714](https://github.com/opentrons/opentrons/issues/3714)) ([ad0562c](https://github.com/opentrons/opentrons/commit/ad0562c)), closes [#2122](https://github.com/opentrons/opentrons/issues/2122)
+
+
+### Features
+
+* **api:** Make blow out flow rate settable ([#3735](https://github.com/opentrons/opentrons/issues/3735)) ([e12b4fd](https://github.com/opentrons/opentrons/commit/e12b4fd)), closes [#3733](https://github.com/opentrons/opentrons/issues/3733)
+* **api:** prevent over-aspiration with filter tips in v1  ([#3692](https://github.com/opentrons/opentrons/issues/3692)) ([487927a](https://github.com/opentrons/opentrons/commit/487927a))
+* **app:** add GEN2 images to change pipette ([#3734](https://github.com/opentrons/opentrons/issues/3734)) ([1016c16](https://github.com/opentrons/opentrons/commit/1016c16)), closes [#3630](https://github.com/opentrons/opentrons/issues/3630)
+* **protocol-designer:** update migration modal copy ([#3709](https://github.com/opentrons/opentrons/issues/3709)) ([e3d1ffa](https://github.com/opentrons/opentrons/commit/e3d1ffa)), closes [#3696](https://github.com/opentrons/opentrons/issues/3696)
+* **shared-data:** add displayCategory to pipetteNameSpecs and schema ([#3731](https://github.com/opentrons/opentrons/issues/3731)) ([3b39dea](https://github.com/opentrons/opentrons/commit/3b39dea))
+* **shared-data:** labwareV2: add filter tip racks ([#3777](https://github.com/opentrons/opentrons/issues/3777)) ([0dd5285](https://github.com/opentrons/opentrons/commit/0dd5285))
+
+
+
+
+
 <a name="3.10.1"></a>
 ## [3.10.1](https://github.com/opentrons/opentrons/compare/v3.10.0...v3.10.1) (2019-07-19)
 
