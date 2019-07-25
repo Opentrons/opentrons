@@ -10,7 +10,7 @@ export function getModuleDisplayName(name: ModuleType): string {
   return displayName
 }
 
-// use a name like 'magdeck' to get whole module definition
-export function getModuleDisplayName(name: ModuleType): string {
-  return moduleSpecs[name]
-}
+// // use a name like 'magdeck' to get whole module definition
+// export function getModuleDisplayName(name: ModuleType): string {
+//   return moduleSpecs[name]
+// }

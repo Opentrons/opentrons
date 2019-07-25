@@ -37,9 +37,9 @@
   },
   "thermocycler": {
     "labwareOffset": {
-      "x": -0.02,
-      "y": 81.2,
-      "z": 103.44
+      "x": 0,
+      "y": 82.56,
+      "z": 97.8
     },
     "dimensions": {
       "bareOverallHeight": 98.0,
@@ -56,9 +56,9 @@
   },
   "semithermocycler": {
     "labwareOffset": {
-      "x": -21.02,
-      "y": 81.2,
-      "z": 103.44
+      "x": -23.28,
+      "y": 82.56,
+      "z": 97.8
     },
     "dimensions": {
       "bareOverallHeight": 98.0,
