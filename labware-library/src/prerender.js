@@ -13,6 +13,7 @@ export type PrerenderProps = {
   location: string,
 }
 
+// TODO IMMEDIATELY: DELETE THIS!
 export default function prerender(props: PrerenderProps): string {
   return `<div id="root">${ReactDomServer.renderToString(
     <StaticRouter location={props.location} context={{}}>

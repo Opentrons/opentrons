@@ -1,8 +1,9 @@
 // @flow
 // labware library entry
 import * as React from 'react'
-import ReactDom from 'react-dom'
+import { hydrate, render } from 'react-dom'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
+
 import App from './components/App'
 import LabwareCreator from './labware-creator'
 
@@ -15,12 +16,17 @@ if (!$root) {
   throw new Error('fatal: #root not found')
 }
 
-ReactDom.render(
+const Root = () => (
   <BrowserRouter>
     <Switch>
       <Route path={`${getPublicPath()}create`} component={LabwareCreator} />
       <Route component={App} />
     </Switch>
-  </BrowserRouter>,
-  $root
+  </BrowserRouter>
 )
+
+if ($root.hasChildNodes()) {
+  hydrate(<Root />, $root)
+} else {
+  render(<Root />, $root)
+}

@@ -27,5 +27,8 @@
     "react-hot-loader": "^4.8.0",
     "react-router-dom": "^5.0.0",
     "yup": "^0.27.0"
+  },
+  "devDependencies": {
+    "react-snap": "^1.23.0"
   }
 }

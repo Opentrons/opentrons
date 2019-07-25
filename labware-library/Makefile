@@ -17,6 +17,7 @@ clean:
 dist: export NODE_ENV := production
 dist:
 	webpack --profile
+	node ./renderStatic.js
 
 # development assets server
 .PHONY: dev
