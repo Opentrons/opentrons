@@ -17,15 +17,15 @@ def find_config(prefix: str) -> str:
     """ Find the most recent config matching `prefix` """
     if prefix in config_models:
         return prefix
-    else:
-        # We need to check for the nickname of pipettes if the prefix given
-        # is not the exact model. This is because gen2 nicknames are not
-        # subsets of gen2 pipette model strings.
-        matches = [conf for conf in config_models
-                   if configs[conf]['name'].startswith(prefix)]
+
+    # We need to check for the nickname of pipettes if the prefix given
+    # is not the exact model. This is because gen2 nicknames are not
+    # subsets of gen2 pipette model strings.
+    matches = [conf for conf in config_models
+               if configs[conf]['name'].startswith(prefix)]
+
     if not matches:
         raise KeyError('No match found for prefix {}'.format(prefix))
-
     else:
         return sorted(matches)[0]
 
