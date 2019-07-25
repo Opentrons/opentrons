@@ -20,7 +20,7 @@ from typing import Any, Dict, Union, List, Optional, Tuple
 from opentrons import types as top_types
 from opentrons.util import linal
 from .simulator import Simulator
-from opentrons.config import robot_configs, pipette_config
+from opentrons.config import robot_configs
 from .pipette import Pipette
 try:
     from .controller import Controller
@@ -280,10 +280,9 @@ class API(HardwareAPILike):
                     self._config.instrument_offset[mount.name.lower()],
                     instrument_data['id'])
                 self._attached_instruments[mount] = p
-                cfg = pipette_config.load(model)
-                home_pos = cfg.home_position
-                max_travel = cfg.max_travel
-                steps_mm = cfg.steps_per_mm
+                home_pos = p.config.home_position
+                max_travel = p.config.max_travel
+                steps_mm = p.config.steps_per_mm
             else:
                 self._attached_instruments[mount] = None
                 home_pos = self._config.default_pipette_configs['homePosition']
