@@ -1,7 +1,6 @@
 @import '@opentrons/components';
-
 .setup_panel {
-  & > * {
+  &>* {
     margin: 0.5rem 0 1.5rem;
   }
 }
@@ -31,8 +30,19 @@
 
 .labware_item_name {
   @apply --truncate;
-
   width: 100%;
+}
+
+.module_name {
+  @apply --truncate;
+  width: 100%;
+  text-transform: uppercase;
+}
+
+.slot_contents_names {
+  @apply --truncate;
+  display: flex;
+  flex-direction: column;
 }
 
 /*
@@ -40,14 +50,14 @@
  * as a workaround to fix HoverTooltip not working on ListItems due to
  * pointer-events: none
  */
+
 .disabled * {
   color: var(--c-font-disabled);
 }
 
 .item_info_tooltip {
   @apply --font-body-1-light;
-
-  & > p:first-child {
+  &>p:first-child {
     font-weight: var(--fw-semibold);
     margin-bottom: 0.5rem;
   }

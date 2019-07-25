@@ -42,13 +42,12 @@ export default function Module(props: Props) {
       y = 4
       break
     }
-    case 'thermocycler':
-    case 'semithermocycler': {
+    case 'thermocycler': {
       // TODO: BC 2019-07-24 these are taken from snapshots of the cad file, they should
       // be included in the module spec schema and added to the data
       width = 172
       height = 259.7
-      x = props.name === 'thermocycler' ? -22.125 : -45.4
+      x = -22.125
     }
   }
 

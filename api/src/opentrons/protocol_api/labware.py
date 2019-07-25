@@ -683,6 +683,9 @@ class ThermocyclerGeometry(ModuleGeometry):
         super().__init__(definition, parent)
         self._lid_height = definition["dimensions"]["lidHeight"]
         self._lid_status = 'open'   # Needs to reflect true status
+        # TODO: BC 2019-07-25 add affordance for "semi" configuration offset to be
+        # from a flag in context, according to drawings, the only difference
+        # is -23.28mm in the x-axis
 
     @property
     def highest_z(self) -> float:
@@ -699,6 +702,7 @@ class ThermocyclerGeometry(ModuleGeometry):
     def lid_status(self, status) -> None:
         self._lid_status = status
 
+    # NOTE: this func is unused until "semi" configuration
     def labware_accessor(self, labware: Labware) -> Labware:
         # Block first three columns from being accessed
         definition = labware._definition
@@ -710,8 +714,6 @@ class ThermocyclerGeometry(ModuleGeometry):
             '{} is already on this module'.format(self._labware)
         assert self.lid_status != 'closed', \
             'Cannot place labware in closed module'
-        if self.load_name == 'semithermocycler':
-            labware = self.labware_accessor(labware)
         self._labware = labware
         return self._labware
 
@@ -993,7 +995,7 @@ def load_module_from_definition(
                    is (often the front-left corner of a slot on the deck).
     """
     mod_name = definition['loadName']
-    if mod_name == 'thermocycler' or mod_name == 'semithermocycler':
+    if mod_name == 'thermocycler':
         mod: Union[ModuleGeometry, ThermocyclerGeometry] = \
                 ThermocyclerGeometry(definition, parent)
     else:

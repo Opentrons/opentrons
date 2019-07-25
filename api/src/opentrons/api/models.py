@@ -11,13 +11,11 @@ def _get_parent_slot_legacy(placeable):
     return res
 
 
-def _get_parent_slot(labware_obj):
-    if isinstance(
-            labware_obj.parent,
-            (labware.ModuleGeometry, labware.ThermocyclerGeometry)):
-        return labware_obj.parent.parent
+def _get_parent_slot_and_position(labware_obj):
+    if isinstance(labware_obj.parent, (labware.ModuleGeometry)):
+        return (labware_obj.parent.parent, labware_obj.parent._offset)
     else:
-        return labware_obj.parent
+        return (labware_obj.parent, None)
 
 
 class Container:
@@ -26,6 +24,7 @@ class Container:
         self._container = container
         self._context = context
         self.id = id(container)
+        self.labware_offset_from_slot = 0
 
         if isinstance(container, placeable.Placeable):
             self.name = container.get_name()
@@ -36,7 +35,9 @@ class Container:
         else:
             self.name = container.name
             self.type = container.name
-            self.slot = _get_parent_slot(container)
+            slot, position = _get_parent_slot_and_position(container)
+            self.slot = slot
+            self.position = position
             self.is_legacy = False
         self.instruments = [
             Instrument(instrument)
