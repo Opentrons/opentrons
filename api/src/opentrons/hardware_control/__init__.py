@@ -1115,7 +1115,9 @@ class API(HardwareAPILike):
     def set_working_volume(self, mount, tip_volume):
         instr = self._attached_instruments[mount]
         assert instr
-        self._log.info("Updating working volume based on tip total volume")
+        self._log.info(
+            "Updating working volume on pipette mount: {}, tip volume: {} ul"
+            .format(mount, tip_volume))
         instr.set_working_volume(tip_volume)
 
     @_log_call
