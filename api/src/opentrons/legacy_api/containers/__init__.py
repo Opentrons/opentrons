@@ -203,9 +203,11 @@ def save_new_offsets(labware_hash, delta):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
     if not calibration_path.exists():
         calibration_path.mkdir(parents=True, exist_ok=True)
+    old_delta = _look_up_offsets(labware_hash)
+    new_delta = old_delta + Point(x=delta[0], y=delta[1], z=delta[2])
     labware_offset_path = calibration_path/'{}.json'.format(labware_hash)
     calibration_data = new_labware._helper_offset_data_format(
-        str(labware_offset_path), delta)
+        str(labware_offset_path), new_delta)
     with labware_offset_path.open('w') as f:
         json.dump(calibration_data, f)
 
