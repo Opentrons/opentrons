@@ -9,37 +9,6 @@ from opentrons.config import pipette_config
 from opentrons.trackers import pose_tracker
 
 
-@pytest.mark.api1_only
-def test_use_filter_tips():
-    # test tips with lower working volume than max volume of pipette used to
-    # ensure that the pipette never over-aspirates with a smaller pipette tip
-    tipracks = [
-        'opentrons_96_filtertiprack_10ul',
-        'opentrons_96_filtertiprack_200ul',
-        'opentrons_96_filtertiprack_1000ul'
-    ]
-    for t in tipracks:
-        robot.reset()
-        tip_rack = containers_load(robot, t, '3')
-        plate = containers_load(robot, '96-flat', '1')
-        p300 = instruments.P300_Single(
-            mount='left', tip_racks=[tip_rack])
-
-        p300.pick_up_tip()
-        p300.aspirate(plate[0])
-
-        # working volume should be the lesser of the pipette max volume
-        # and the tip max volume
-        assert p300.current_volume == p300._working_volume
-        assert p300.current_volume == min(
-            tip_rack[0].max_volume(), p300.max_volume)
-
-        # working volume should revert back to pipette max volume if no tip
-        # is attached
-        p300.return_tip()
-        assert p300._working_volume == p300.max_volume
-
-
 def test_pipette_version_1_0_and_1_3_extended_travel():
     models = [
         'p10_single', 'p10_multi', 'p50_single', 'p50_multi',
@@ -194,7 +163,7 @@ def test_retract():
     current_pos = pose_tracker.absolute(
         robot.poses,
         p300)
-    assert current_pos[2] == plate[0].coordinates()[2]
+    assert current_pos[2] == plate[0].top()[1][2]
 
     p300.retract()
 
@@ -280,7 +249,7 @@ def test_trough_move_to():
     p300.pick_up_tip()
     p300.move_to(trough)
     current_pos = pose_tracker.absolute(robot.poses, p300)
-    assert isclose(current_pos, (0, 0, 38)).all()
+    assert isclose(current_pos, (0, 0, 40)).all()
 
 
 def test_delay_calls(monkeypatch):

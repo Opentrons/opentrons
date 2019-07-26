@@ -35,6 +35,13 @@ Protocol = namedtuple(
     'Protocol',
     ['text', 'filename'])
 
+# Note: When dummy_db or robot fixtures are used, this db is copied into a
+# a temp testing_db that is deleted in between tests to allow for db mutation
+MAIN_TESTER_DB = str(os.path.join(
+    os.path.dirname(
+        globals()["__file__"]), 'testing_database.db')
+)
+
 
 @pytest.fixture(autouse=True)
 def asyncio_loop_exception_handler(loop):
@@ -77,11 +84,8 @@ def print_db_path(db):
 def config_tempdir(tmpdir):
     os.environ['OT_API_CONFIG_DIR'] = str(tmpdir)
     config.reload()
-    old_db_path = database.database_path
-    shutil.copyfile(
-        database.database_path, config.CONFIG['labware_database_file'])
-    database.change_database(str(config.CONFIG['labware_database_file']))
-    yield tmpdir, old_db_path
+    database.change_database(config.CONFIG['labware_database_file'])
+    yield tmpdir
 
 
 @pytest.fixture(autouse=True)
@@ -105,10 +109,13 @@ def wifi_keys_tempdir(config_tempdir):
 
 # Builds a temp db to allow mutations during testing
 @pytest.fixture(autouse=True)
-def dummy_db(config_tempdir):
-    _, old_db_path = config_tempdir
+def dummy_db(config_tempdir, tmpdir):
+    temp_db_path = str(tmpdir.mkdir('testing').join("database.db"))
+    shutil.copy2(MAIN_TESTER_DB, temp_db_path)
+    database.change_database(temp_db_path)
     yield None
-    database.change_database(old_db_path)
+    database.change_database(MAIN_TESTER_DB)
+    os.remove(temp_db_path)
 
 
 # -------feature flag fixtures-------------

@@ -68,8 +68,7 @@ def test_pos_tracker_persistance(virtual_smoothie_env):
     robot.reset()
     p300 = instruments.P300_Single(mount='left')
     plate = containers_load(robot, 'trough-12row', '5')
-    assert robot.max_placeable_height_on_deck(plate) == \
-        plate[0].coordinates()[2]
+    assert robot.max_placeable_height_on_deck(plate) == 40.0
 
     robot.poses = p300._move(robot.poses, x=10, y=10, z=10)
     robot.calibrate_container_with_instrument(plate, p300, save=False)

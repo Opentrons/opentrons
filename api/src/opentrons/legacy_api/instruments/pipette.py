@@ -198,8 +198,6 @@ class Pipette(CommandPublisher):
         self.max_volume = max_volume
         self.min_volume = min_volume
 
-        self._working_volume = self.max_volume
-
         volume_fn_type = type(ul_per_mm)
         if dict is volume_fn_type:
             self.ul_per_mm = ul_per_mm
@@ -427,7 +425,7 @@ class Pipette(CommandPublisher):
         if not helpers.is_number(volume):
             if volume and not location:
                 location = volume
-            volume = self._working_volume - self.current_volume
+            volume = self.max_volume - self.current_volume
 
         display_location = location if location else self.previous_placeable
 
@@ -436,11 +434,11 @@ class Pipette(CommandPublisher):
 
         # if volume is specified as 0uL, then do nothing
         if volume != 0:
-            if self.current_volume + volume > self._working_volume:
+            if self.current_volume + volume > self.max_volume:
                 raise RuntimeWarning(
-                    'Pipette with working volume of {0} cannot hold volume {1}'
+                    'Pipette with max volume of {0} cannot hold volume {1}'
                     .format(
-                        self._working_volume,
+                        self.max_volume,
                         self.current_volume + volume)
                 )
 
@@ -674,11 +672,10 @@ class Pipette(CommandPublisher):
             log.warning("Cannot mix without a tip attached.")
 
         if volume is None:
-            volume = self._working_volume
+            volume = self.max_volume
 
         if not location and self.previous_placeable:
             location = self.previous_placeable
-            volume = self._working_volume
 
         do_publish(self.broker, commands.mix, self.mix, 'before',
                    self, None, None, repetitions, volume, location, rate)
@@ -1045,14 +1042,6 @@ class Pipette(CommandPublisher):
             self, location=location, presses=presses, increment=increment)
         do_publish(self.broker, commands.pick_up_tip, self.pick_up_tip,
                    'after', self, None, self, location, presses, increment)
-
-        # update working volume
-        try:
-            self._working_volume = float(
-                min(self.max_volume, location.max_volume()))
-        except KeyError:
-            log.info('No tip liquid volume, defaulting to max volume.')
-            self._working_volume = float(self.max_volume)
         return self
 
     def drop_tip(self, location=None, home_after=True):
@@ -1145,7 +1134,6 @@ class Pipette(CommandPublisher):
         self._shake_off_tips(location, 'dropTipShake')
 
         self.current_volume = 0
-        self._working_volume = self.max_volume
         self.current_tip(None)
         self._remove_tip(
             length=self._tip_length
@@ -1534,16 +1522,16 @@ class Pipette(CommandPublisher):
         if volume < 0:
             raise RuntimeError(
                 "Volume must be a positive number, got {}.".format(volume))
-        if volume > self._working_volume:
+        if volume > self.max_volume:
             raise RuntimeError(
-                "{0}µl exceeds pipette's working volume ({1}ul).".format(
-                    volume, self._working_volume))
+                "{0}µl exceeds pipette's maximum volume ({1}ul).".format(
+                    volume, self.max_volume))
         if volume < self.min_volume:
             self.robot.add_warning(
                 "{0}µl is less than pipette's min_volume ({1}ul).".format(
                     volume, self.min_volume))
 
-        return volume / self._working_volume
+        return volume / self.max_volume
 
     def _multichannel_transfer(self, s, d):
         # Helper function for multi-channel use-case
@@ -1596,13 +1584,7 @@ class Pipette(CommandPublisher):
                 'dispense': {'location': t[i], 'volume': v[i]}
             })
 
-        if not self.tip_attached:
-            try:
-                max_vol = self.get_next_tip().max_volume()
-            except KeyError:
-                max_vol = self._working_volume
-        else:
-            max_vol = self._working_volume
+        max_vol = self.max_volume
         max_vol -= kwargs.get('air_gap', 0)  # air
 
         if kwargs.get('divide', True):
