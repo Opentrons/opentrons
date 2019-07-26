@@ -8,6 +8,7 @@ export type BuildrootUpdateInfo = {|
 
 export type BuildrootStatus = 'balena' | 'migrating' | 'buildroot'
 
+// stage response from API
 // update-server/otupdate/buildroot/update_session.py
 export type UpdateSessionStage =
   | 'awaiting-file'
@@ -17,11 +18,27 @@ export type UpdateSessionStage =
   | 'ready-for-restart'
   | 'error'
 
+// client-side update process step to decide what UI to display / API to call next
+export type UpdateSessionStep =
+  | 'premigration'
+  | 'premigrationRestart'
+  | 'getToken'
+  | 'uploadFile'
+  | 'processFile'
+  | 'commitUpdate'
+  | 'restart'
+  | 'restarting'
+  | 'finished'
+
 export type BuildrootUpdateSession = {|
   robotName: string,
-  triggerUpdate: boolean,
   token: string | null,
   pathPrefix: string | null,
+  stage: UpdateSessionStage | null,
+  step: UpdateSessionStep | null,
+  progress: number | null,
+  // TODO(mc, 2019-07-25): error messages
+  error: boolean,
 |}
 
 export type BuildrootState = {|
@@ -43,6 +60,8 @@ export type UnexpectedBuildrootError = {|
 |}
 
 export type BuildrootAction =
+  | StartBuildrootUpdateAction
+  | UnexpectedBuildrootError
   | {| type: 'buildroot:DOWNLOAD_PROGRESS', payload: number |}
   | {| type: 'buildroot:DOWNLOAD_ERROR', payload: string |}
   | {| type: 'buildroot:UPDATE_INFO', payload: BuildrootUpdateInfo | null |}
@@ -52,8 +71,13 @@ export type BuildrootAction =
       payload: RobotHost,
       meta: {| shell: true |},
     |}
-  | {| type: 'buildroot:PREMIGRATION_STARTED' |}
   | {| type: 'buildroot:PREMIGRATION_DONE', payload: string |}
   | {| type: 'buildroot:PREMIGRATION_ERROR', payload: string |}
-  | StartBuildrootUpdateAction
-  | UnexpectedBuildrootError
+  | {|
+      type: 'buildroot:UPLOAD_FILE',
+      payload: {| host: RobotHost, path: string |},
+      meta: {| shell: true |},
+    |}
+  | {| type: 'buildroot:FILE_UPLOAD_DONE', payload: string |}
+  | {| type: 'buildroot:SET_SESSION_STEP', payload: UpdateSessionStep |}
+  | {| type: 'buildroot:CLEAR_SESSION' |}

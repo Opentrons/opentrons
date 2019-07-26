@@ -1,8 +1,17 @@
 // @flow
 // epics to control the buildroot migration / update flow
+import every from 'lodash/every'
 import { combineEpics, ofType } from 'redux-observable'
-import { of } from 'rxjs'
-import { filter, switchMap, withLatestFrom } from 'rxjs/operators'
+import { of, interval, concat } from 'rxjs'
+import {
+  filter,
+  switchMap,
+  mergeMap,
+  takeUntil,
+  withLatestFrom,
+} from 'rxjs/operators'
+
+import { getRobotApiVersion } from '../../discovery/selectors'
 
 import {
   makeRobotApiRequest,
@@ -11,6 +20,7 @@ import {
 } from '../../robot-api'
 
 import {
+  getBuildrootUpdateInfo,
   getBuildrootSession,
   getBuildrootRobotName,
   getBuildrootRobot,
@@ -20,12 +30,23 @@ import {
   BR_START_UPDATE,
   startBuildrootUpdate,
   startBuildrootPremigration,
+  uploadBuildrootFile,
+  setBuildrootSessionStep,
   unexpectedBuildrootError,
 } from './actions'
 
 import type { State, Epic, LooseEpic } from '../../types'
+import type { ViewableRobot } from '../../discovery'
 import type { RobotApiResponseAction } from '../../robot-api'
-import type { BuildrootAction, StartBuildrootUpdateAction } from './types'
+
+import type {
+  BuildrootAction,
+  StartBuildrootUpdateAction,
+  BuildrootUpdateSession,
+} from './types'
+
+export const POLL_INTERVAL_MS = 2000
+export const REDISCOVERY_TIME_MS = 60000
 
 // listen for the kickoff action and:
 //   if not ready for buildroot, kickoff premigration
@@ -85,10 +106,10 @@ export const cancelSessionOnConflictEpic: LooseEpic = action$ =>
         error?.payload.status === 409
       )
     }),
-    switchMap<RobotApiResponseAction, _, mixed>(action => {
+    switchMap<RobotApiResponseAction, _, mixed>(errAction => {
       // filter ensures pathPrefix exists here
-      const pathPrefix: string = (action.meta.buildrootPrefix: any)
-      const { host } = action.payload
+      const pathPrefix: string = (errAction.meta.buildrootPrefix: any)
+      const { host } = errAction.payload
       const cancelRequest = {
         method: 'POST',
         host,
@@ -108,8 +129,8 @@ export const triggerUpdateAfterCancelEpic: LooseEpic = action$ =>
       const response = passRobotApiResponseAction(action)
       return response?.meta.buildrootRetry === true
     }),
-    switchMap<RobotApiResponseAction, _, mixed>(action => {
-      const { host } = action.payload
+    switchMap<RobotApiResponseAction, _, mixed>(respAction => {
+      const { host } = respAction.payload
       return of(startBuildrootUpdate(host.name))
     })
   )
@@ -122,27 +143,162 @@ export const triggerUpdateAfterPremigrationEpic: Epic = (_, state$) =>
       const robot = getBuildrootRobot(state)
       return (
         robot !== null &&
-        session?.triggerUpdate === true &&
+        session?.step === 'premigrationRestart' &&
         robot.serverHealth?.capabilities != null
       )
     }),
-    switchMap<State, _, BuildrootAction>(state => {
+    switchMap<State, _, BuildrootAction>(stateWithRobot => {
       // filter ensures robotName exists here
-      const robotName: string = (getBuildrootRobotName(state): any)
+      const robotName: string = (getBuildrootRobotName(stateWithRobot): any)
       return of(startBuildrootUpdate(robotName))
     })
   )
 
-// TODO(mc, 2019-07-19): epic to listen for /begin success and start /status poll
+// epic to listen for /begin success (via meta.buildrootToken) and start a
+// status poll until the status switches to 'ready-for-restart'
+export const statusPollEpic: LooseEpic = (action$, state$) =>
+  action$.pipe(
+    filter(action => {
+      const response = passRobotApiResponseAction(action)
+      return (
+        response?.meta.buildrootToken === true &&
+        typeof response?.meta.buildrootPrefix === 'string'
+      )
+    }),
+    mergeMap<RobotApiResponseAction, _, mixed>(respAction => {
+      // filter above ensures pathPrefix exists here
+      const pathPrefix: string = (respAction.meta.buildrootPrefix: any)
+      const token: string = respAction.payload.body.token
+      const { host } = respAction.payload
+      const path = `${pathPrefix}/${token}/status`
+      const request = { method: 'GET', host, path }
+      const meta = { buildrootStatus: true }
 
-// TODO(mc, 2019-07-19): epic to listen for /status success and:
-//   1. Trigger file upload if ready for file and file upload not yet started
-//   2. Trigger commit if ready to commit and update not yet committed
-//   3. Trigger restart if ready for restart and not yet restarted
+      return interval(POLL_INTERVAL_MS).pipe(
+        switchMap(() => makeRobotApiRequest(request, meta)),
+        takeUntil(
+          state$.pipe(
+            filter<State, _>(state => {
+              const session = getBuildrootSession(state)
+              return (
+                session?.stage === 'ready-for-restart' ||
+                session?.error === true ||
+                session === null
+              )
+            })
+          )
+        )
+      )
+    })
+  )
+
+// filter for an active session with given properties
+const passActiveSession = (props: $Shape<BuildrootUpdateSession>) => (
+  state: State
+): boolean => {
+  const robot = getBuildrootRobot(state)
+  const session = getBuildrootSession(state)
+
+  return (
+    robot !== null &&
+    typeof session?.pathPrefix === 'string' &&
+    typeof session?.token === 'string' &&
+    every(props, (value, key) => session?.[key] === value)
+  )
+}
+
+// upload the update file to the robot when it switches to `awaiting-file`
+export const uploadFileEpic: Epic = (_, state$) =>
+  state$.pipe(
+    filter(passActiveSession({ stage: 'awaiting-file', step: 'getToken' })),
+    switchMap<State, _, BuildrootAction>(stateWithSession => {
+      const host: ViewableRobot = (getBuildrootRobot(stateWithSession): any)
+      const session = getBuildrootSession(stateWithSession)
+      const pathPrefix: string = (session?.pathPrefix: any)
+      const token: string = (session?.token: any)
+
+      return of(uploadBuildrootFile(host, `${pathPrefix}/${token}/file`))
+    })
+  )
+
+// commit the update file on the robot when it switches to `done`
+export const commitUpdateEpic: Epic = (_, state$) =>
+  state$.pipe(
+    filter(passActiveSession({ stage: 'done', step: 'processFile' })),
+    switchMap<State, _, BuildrootAction>(stateWithSession => {
+      const host: ViewableRobot = (getBuildrootRobot(stateWithSession): any)
+      const session = getBuildrootSession(stateWithSession)
+      const pathPrefix: string = (session?.pathPrefix: any)
+      const token: string = (session?.token: any)
+      const path = `${pathPrefix}/${token}/commit`
+      const request = { method: 'POST', host, path }
+      const meta = { buildrootCommit: true }
+
+      return makeRobotApiRequest(request, meta)
+    })
+  )
+
+// restart the robot when it switches to `ready-for-restart`
+export const restartAfterCommitEpic: Epic = (_, state$) =>
+  state$.pipe(
+    filter(
+      passActiveSession({ stage: 'ready-for-restart', step: 'commitUpdate' })
+    ),
+    switchMap<State, _, BuildrootAction>(stateWithSession => {
+      const host: ViewableRobot = (getBuildrootRobot(stateWithSession): any)
+      const path = host.serverHealth?.capabilities?.restart || '/server/restart'
+      const request = { method: 'POST', host, path }
+      const meta = { buildrootRestart: true }
+
+      return concat(
+        makeRobotApiRequest(request, meta),
+        of({ type: 'discovery:START', meta: { shell: true } })
+      )
+    })
+  )
+
+export const watchForOfflineAfterRestartEpic: Epic = (_, state$) =>
+  state$.pipe(
+    filter(state => {
+      const session = getBuildrootSession(state)
+      const robot = getBuildrootRobot(state)
+      return Boolean(robot?.ok) === false && session?.step === 'restart'
+    }),
+    switchMap(() => of(setBuildrootSessionStep('restarting')))
+  )
+
+export const watchForOnlineAfterRestartEpic: Epic = (_, state$) =>
+  state$.pipe(
+    filter(state => {
+      const session = getBuildrootSession(state)
+      const robot = getBuildrootRobot(state)
+
+      return Boolean(robot?.ok) && session?.step === 'restarting'
+    }),
+    switchMap(state => {
+      const info = getBuildrootUpdateInfo(state)
+      const robot: ViewableRobot = (getBuildrootRobot(state): any)
+      const finishedAction =
+        info !== null && getRobotApiVersion(robot) === info.version
+          ? setBuildrootSessionStep('finished')
+          : unexpectedBuildrootError()
+
+      return of(finishedAction, {
+        type: 'discovery:FINISH',
+        meta: { shell: true },
+      })
+    })
+  )
 
 export const buildrootUpdateEpic = combineEpics(
   startUpdateEpic,
   cancelSessionOnConflictEpic,
   triggerUpdateAfterPremigrationEpic,
-  triggerUpdateAfterCancelEpic
+  triggerUpdateAfterCancelEpic,
+  statusPollEpic,
+  uploadFileEpic,
+  commitUpdateEpic,
+  restartAfterCommitEpic,
+  watchForOfflineAfterRestartEpic,
+  watchForOnlineAfterRestartEpic
 )

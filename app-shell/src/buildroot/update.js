@@ -51,3 +51,13 @@ export function startPremigration(
     .then(() => postFile(serverUrl, 'whl', serverWheelPath))
     .then(() => fetch(restartUrl, { method: 'POST' }))
 }
+
+export function uploadFile(
+  robot: RobotHost,
+  urlPath: string,
+  file: string
+): Promise<mixed> {
+  const url = `http://${robot.ip}:${robot.port}${urlPath}`
+
+  return postFile(url, path.basename(file), file)
+}
