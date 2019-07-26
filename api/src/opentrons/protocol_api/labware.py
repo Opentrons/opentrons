@@ -683,9 +683,9 @@ class ThermocyclerGeometry(ModuleGeometry):
         super().__init__(definition, parent)
         self._lid_height = definition["dimensions"]["lidHeight"]
         self._lid_status = 'open'   # Needs to reflect true status
-        # TODO: BC 2019-07-25 add affordance for "semi" configuration offset to be
-        # from a flag in context, according to drawings, the only difference
-        # is -23.28mm in the x-axis
+        # TODO: BC 2019-07-25 add affordance for "semi" configuration offset
+        # to be from a flag in context, according to drawings, the only
+        # difference is -23.28mm in the x-axis
 
     @property
     def highest_z(self) -> float:
