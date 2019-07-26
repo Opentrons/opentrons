@@ -10,6 +10,7 @@ const outputPathAbs = path.join(__dirname, outputPath)
 run({
   source: outputPath,
   include: ['/', '/create/'],
+  skipThirdPartyRequests: true,
 })
   .then(() => {
     const pages = glob.sync(path.join(outputPathAbs, '**', '*.html'))
@@ -22,8 +23,8 @@ run({
           .replace('\\', '/') || '.'
       console.log({ pagePath, relativePath })
       const newPage = page
-        .replace(/src="\//g, `src="${relativePath}/`)
-        .replace(/link href="\//g, `link href="${relativePath}/`)
+        .replace(/src="\/(?=[^/])/g, `src="${relativePath}/`)
+        .replace(/link href="\/(?=[^/])/g, `link href="${relativePath}/`)
       fs.writeFileSync(pagePath, newPage)
     })
   })
