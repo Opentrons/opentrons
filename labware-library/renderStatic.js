@@ -10,6 +10,7 @@ const outputPathAbs = path.join(__dirname, outputPath)
 run({
   source: outputPath,
   include: ['/', '/create/'],
+  skipThirdPartyRequests: true,
 })
   .then(() => {
     const pages = glob.sync(path.join(outputPathAbs, '**', '*.html'))
