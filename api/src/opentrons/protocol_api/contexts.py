@@ -2039,6 +2039,24 @@ class ThermocyclerContext(ModuleContext):
         return self._module.set_temperature(
             temp=temp, hold_time=hold_time, ramp_rate=ramp_rate)
 
+    @cmds.publish.both(command=cmds.thermocycler_cycle_temperatures)
+    def cycle_temperatures(self, stages: List[Tuple[float, float, Optional[float]]], repetitions: int):
+        """ For a given number of repetitions, cycle through a list of temperatures in
+        degrees C for a set hold time.
+
+        :param stages: List of unique stages that make up a single cycle. Each item
+                       in list maps to valid parameters of the set_temperature method.
+                       NOTE: hold_time must be finite for each stage.
+        :param repetitions: The number of times to repeat the cycled stages.
+        """
+        #  TODO: update total cycles on API instance
+        for index, rep in enumerate(range(repetitions)):
+            #  TODO: set cycle counter on API instance
+            # publish(command=cmds.update_cycle_counter, index)
+            for stage in stages:
+                self.set_temperature(*stage)
+                self.wait_for_hold()
+
     @property
     def current_lid_target(self):
         return self._module.lid_target
