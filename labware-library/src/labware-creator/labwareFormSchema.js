@@ -160,6 +160,7 @@ const labwareFormSchema = Yup.object().shape({
       'This load name already exists in the Opentrons default labware library. Please edit the load name to make it unique.'
     ),
   displayName: requiredString(LABELS.displayName),
+  pipetteName: requiredString(LABELS.pipetteName),
 })
 
 export default labwareFormSchema

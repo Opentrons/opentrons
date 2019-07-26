@@ -38,6 +38,7 @@ const ConditionalLabwareRender = (props: Props) => {
     values.homogeneousWells = 'true'
     values.regularRowSpacing = 'true'
     values.regularColumnSpacing = 'true'
+    values.pipetteName = 'whatever'
 
     let castValues: ?ProcessedLabwareFields = null
     try {

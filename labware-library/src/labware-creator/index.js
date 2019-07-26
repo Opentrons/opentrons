@@ -21,6 +21,7 @@ import {
   MAX_SUGGESTED_Z,
 } from './fields'
 import labwareFormSchema from './labwareFormSchema'
+import labwareTestProtocol, { pipetteNameOptions } from './labwareTestProtocol'
 import fieldsToLabware from './fieldsToLabware'
 import ConditionalLabwareRender from './components/ConditionalLabwareRender'
 import Dropdown from './components/Dropdown'
@@ -287,14 +288,14 @@ const App = () => {
           const castValues: ProcessedLabwareFields = labwareFormSchema.cast(
             values
           )
-          const { displayName } = castValues
+          const { displayName, pipetteName } = castValues
           const def = fieldsToLabware(castValues)
 
           const zip = new JSZip()
           zip.file(`${displayName}.json`, JSON.stringify(def, null, 4))
           zip.file(
             `calibrate_${displayName}.py`,
-            'print("Pretend protocol here")'
+            labwareTestProtocol({ pipetteName, definition: def })
           )
           zip
             .generateAsync({ type: 'blob' })
@@ -600,6 +601,14 @@ const App = () => {
                 caption="Only lower case letters, numbers, periods, and underscores may be used"
                 inputMasks={[maskLoadName]}
               />
+              <div className={styles.double_check_before_exporting}>
+                <p>GENERATE A PROTOCOL TO TEST YOUR DEFINITION</p>
+                <p>
+                  Use a short test protocol to test whether a pipette can hit
+                  key points on your labware.
+                </p>
+              </div>
+              <Dropdown name="pipetteName" options={pipetteNameOptions} />
             </Section>
             <div className={styles.double_check_before_exporting}>
               <p>DOUBLE CHECK YOUR WORK BEFORE EXPORTING!</p>
