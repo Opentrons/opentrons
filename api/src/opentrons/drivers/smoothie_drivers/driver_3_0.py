@@ -34,15 +34,6 @@ HOMED_POSITION = {
     'C': 19
 }
 
-EEPROM_DEFAULT = {
-    'X': 0.0,
-    'Y': 0.0,
-    'Z': 0.0,
-    'A': 0.0,
-    'B': 0.0,
-    'C': 0.0
-}
-
 PLUNGER_BACKLASH_MM = 0.3
 LOW_CURRENT_Z_SPEED = 30
 CURRENT_CHANGE_DELAY = 0.005
@@ -287,7 +278,6 @@ class SmoothieDriver_3_0_0:
     def __init__(self, config, handle_locks=True):
         self.run_flag = Event()
         self.run_flag.set()
-        self.dist_from_eeprom = EEPROM_DEFAULT.copy()
 
         self._position = HOMED_POSITION.copy()
         self.log = []

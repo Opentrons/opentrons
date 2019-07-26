@@ -225,3 +225,42 @@ def test_calibrate_labware(virtual_smoothie_env, monkeypatch):
     new_pose = pose_tracker.absolute(robot.poses, plate[0])
 
     assert isclose(new_pose, (old_x + 1, old_y + 2, old_z - 3)).all()
+
+
+def test_cache_instruments(monkeypatch):
+    # Test that smoothie runtime configs are set at run when
+    # cache_instrument_models is called
+    robot.reset()
+    fake_pip = {'left': {
+                    'model': 'p10_single_v1.3',
+                    'id': 'FakePip2',
+                    'name': 'p10_single'},
+                'right': {
+                    'model': 'p300_single_v2.0',
+                    'id': 'FakePip',
+                    'name': 'p300_single_gen2'}}
+    monkeypatch.setattr(robot, 'model_by_mount', fake_pip)
+
+    def fake_func1(value):
+        return value
+
+    def fake_func2(mount, value):
+        return mount, value
+
+    def fake_read(mount):
+        return robot.model_by_mount[mount]['model']
+    # With nothing specified at init or expected, we should have nothing
+    robot._driver.update_steps_per_mm = mock.Mock(fake_func1)
+    robot._driver.update_pipette_config = mock.Mock(fake_func2)
+    monkeypatch.setattr(robot._driver, 'read_pipette_model', fake_read)
+    robot.cache_instrument_models()
+    steps_mm_calls = [mock.call({'B': 768}), mock.call({'C': 3200})]
+    pip_config_calls = [
+        mock.call('Z', {'home': 220}),
+        mock.call('A', {'home': 172.15}),
+        mock.call('B', {'max_travel': 30}),
+        mock.call('C', {'max_travel': 60})]
+    robot._driver.update_steps_per_mm.assert_has_calls(
+        steps_mm_calls, any_order=True)
+    robot._driver.update_pipette_config.assert_has_calls(
+        pip_config_calls, any_order=True)

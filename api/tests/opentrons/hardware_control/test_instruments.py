@@ -87,20 +87,56 @@ async def test_cache_instruments_hc(monkeypatch, dummy_instruments,
 
 
 async def test_cache_instruments_sim(loop, dummy_instruments):
+
+    def fake_func1(value):
+        return value
+
+    def fake_func2(mount, value):
+        return mount, value
+
     sim = hc.API.build_hardware_simulator(loop=loop)
     # With nothing specified at init or expected, we should have nothing
+    sim._backend._smoothie_driver.update_steps_per_mm = mock.Mock(fake_func1)
+    sim._backend._smoothie_driver.update_pipette_config = mock.Mock(fake_func2)
+
     await sim.cache_instruments()
     attached = await sim.attached_instruments
     assert attached == {
         types.Mount.LEFT: {}, types.Mount.RIGHT: {}}
+    steps_mm_calls = [mock.call({'B': 768}), mock.call({'C': 768})]
+    pip_config_calls = [
+        mock.call('Z', {'home': 220}),
+        mock.call('A', {'home': 220}),
+        mock.call('B', {'max_travel': 30}),
+        mock.call('C', {'max_travel': 30})]
+    sim._backend._smoothie_driver.update_steps_per_mm.assert_has_calls(
+        steps_mm_calls, any_order=True)
+    sim._backend._smoothie_driver.update_pipette_config.assert_has_calls(
+        pip_config_calls, any_order=True)
+
+    sim._backend._smoothie_driver.update_steps_per_mm.reset_mock()
+    sim._backend._smoothie_driver.update_pipette_config.reset_mock()
     # When we expect instruments, we should get what we expect since nothing
     # was specified at init time
-    await sim.cache_instruments({types.Mount.LEFT: 'p10_single_v1.3'})
+    await sim.cache_instruments(
+        {types.Mount.LEFT: 'p10_single_v1.3',
+         types.Mount.RIGHT: 'p300_single_v2.0'})
     attached = await sim.attached_instruments
     assert attached[types.Mount.LEFT]['model']\
         == 'p10_single_v1.3'
     assert attached[types.Mount.LEFT]['name']\
         == 'p10_single'
+
+    steps_mm_calls = [mock.call({'B': 768}), mock.call({'C': 3200})]
+    pip_config_calls = [
+        mock.call('Z', {'home': 220}),
+        mock.call('A', {'home': 172.15}),
+        mock.call('B', {'max_travel': 30}),
+        mock.call('C', {'max_travel': 60})]
+    sim._backend._smoothie_driver.update_steps_per_mm.assert_has_calls(
+        steps_mm_calls, any_order=True)
+    sim._backend._smoothie_driver.update_pipette_config.assert_has_calls(
+        pip_config_calls, any_order=True)
     # If we use prefixes, that should work too
     await sim.cache_instruments({types.Mount.RIGHT: 'p300_single'})
     attached = await sim.attached_instruments
@@ -117,6 +153,7 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
     assert sorted(
         attached[types.Mount.LEFT].keys()) == \
         instrument_keys
+
     # If we specify conflicting expectations and init arguments we should
     # get a RuntimeError
     with pytest.raises(RuntimeError):

@@ -288,25 +288,20 @@ class Robot(CommandPublisher):
                 name_value = None
             plunger_axis = 'B' if mount == 'left' else 'C'
             mount_axis = 'Z' if mount == 'left' else 'A'
-            if model_value and 'v2' in model_value:
-                # Check if new model of pipettes, load smoothie configs
-                # for this particular model
-                self._driver.update_steps_per_mm({plunger_axis: 3200})
-                # TODO(LC25-4-2019): Modify configs to update to as
-                # testing informs better values
-                self._driver.update_pipette_config(
-                    mount_axis, {'home': 172.15})
-                self._driver.update_pipette_config(
-                    plunger_axis, {'max_travel': 60})
-                self._driver.dist_from_eeprom[mount_axis] = 47.8
+            if model_value:
+                cfg = pipette_config.load(model_value)
+                home_pos = cfg.home_position
+                max_travel = cfg.max_travel
+                steps_mm = cfg.steps_per_mm
             else:
-                self._driver.dist_from_eeprom[mount_axis] = 0.0
-                self._driver.update_steps_per_mm(
-                    {plunger_axis: 768})
+                home_pos = self.config.default_pipette_configs['homePosition']
+                max_travel = self.config.default_pipette_configs['maxTravel']
+                steps_mm = self.config.default_pipette_configs['stepsPerMM']
 
-                self._driver.update_pipette_config(mount_axis, {'home': 220})
-                self._driver.update_pipette_config(
-                    plunger_axis, {'max_travel': 30})
+            self._driver.update_steps_per_mm({plunger_axis: steps_mm})
+            self._driver.update_pipette_config(mount_axis, {'home': home_pos})
+            self._driver.update_pipette_config(
+                plunger_axis, {'max_travel': max_travel})
 
             if model_value:
                 id_response = self._driver.read_pipette_id(mount)

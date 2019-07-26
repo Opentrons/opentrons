@@ -276,29 +276,22 @@ class API(HardwareAPILike):
                     self._config.instrument_offset[mount.name.lower()],
                     instrument_data['id'])
                 self._attached_instruments[mount] = p
-                mount_axis = Axis.by_mount(mount)
-                plunger_axis = Axis.of_plunger(mount)
-                if 'v2' in model:
-                    # Check if new model of pipettes, load smoothie configs
-                    # for this particular model
-                    self._backend._smoothie_driver.update_steps_per_mm(
-                        {plunger_axis.name: 3200})
-                    # TODO(LC25-4-2019): Modify configs to update to as
-                    # testing informs better values
-                    self._backend._smoothie_driver.update_pipette_config(
-                        mount_axis.name, {'home': 172.15})
-                    self._backend._smoothie_driver.update_pipette_config(
-                        plunger_axis.name, {'max_travel': 60})
-                else:
-                    self._backend._smoothie_driver.update_steps_per_mm(
-                        {plunger_axis.name: 768})
-
-                    self._backend._smoothie_driver.update_pipette_config(
-                        mount_axis.name, {'home': 220})
-                    self._backend._smoothie_driver.update_pipette_config(
-                        plunger_axis.name, {'max_travel': 30})
+                home_pos = p.config.home_position
+                max_travel = p.config.max_travel
+                steps_mm = p.config.steps_per_mm
             else:
                 self._attached_instruments[mount] = None
+                home_pos = self._config.default_pipette_configs['homePosition']
+                max_travel = self._config.default_pipette_configs['maxTravel']
+                steps_mm = self._config.default_pipette_configs['stepsPerMM']
+            mount_axis = Axis.by_mount(mount)
+            plunger_axis = Axis.of_plunger(mount)
+            self._backend._smoothie_driver.update_steps_per_mm(
+                {plunger_axis.name: steps_mm})
+            self._backend._smoothie_driver.update_pipette_config(
+                mount_axis.name, {'home': home_pos})
+            self._backend._smoothie_driver.update_pipette_config(
+                plunger_axis.name, {'max_travel': max_travel})
         mod_log.info("Instruments found: {}".format(
             self._attached_instruments))
 
