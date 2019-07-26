@@ -144,6 +144,34 @@ describe('app/shell/buildroot selectors', () => {
           { name: 'another-robot-name', host: '10.10.0.2', port: 31950 },
         ]),
     },
+    {
+      name: 'getBuildrootRobot after migration with opentrons-robot-name',
+      selector: selectors.getBuildrootRobot,
+      state: {
+        shell: {
+          buildroot: {
+            session: { robotName: 'opentrons-robot-name' },
+          },
+        },
+      },
+      expected: {
+        name: 'robot-name',
+        host: '10.10.0.0',
+        port: 31950,
+        serverHealth: { capabilities: { buildrootUpdate: '/' } },
+      },
+      setup: () =>
+        getLiveRobots.mockReturnValueOnce([
+          { name: 'other-robot-name', host: '10.10.0.1', port: 31950 },
+          {
+            name: 'robot-name',
+            host: '10.10.0.0',
+            port: 31950,
+            serverHealth: { capabilities: { buildrootUpdate: '/' } },
+          },
+          { name: 'another-robot-name', host: '10.10.0.2', port: 31950 },
+        ]),
+    },
   ]
 
   SPECS.forEach(spec => {

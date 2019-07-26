@@ -44,7 +44,20 @@ export const getBuildrootRobot: OutputSelector<
 > = createSelector(
   getLiveRobots,
   getBuildrootRobotName,
-  (robots, robotName) => robots.find(r => r.name === robotName) || null
+  (robots, robotName) => {
+    if (robotName === null) return null
+
+    return (
+      robots.find(robot => {
+        const searchName =
+          robot.serverHealth?.capabilities?.buildrootUpdate != null
+            ? robotName.replace(/^opentrons-/, '')
+            : robotName
+
+        return robot.name === searchName
+      }) || null
+    )
+  }
 )
 
 const compareCurrentVersionToUpdate = (
