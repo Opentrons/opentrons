@@ -1,4 +1,4 @@
-# Changes from 3.9.0 to 3.10.1
+# Changes from 3.9.0 to 3.10.2
 
 This update includes a set of all new, high-quality labware definitions! The older definitions are still on your robot and will continue to work, but we **highly** recommend you switch to the new ones.
 
@@ -66,7 +66,8 @@ For more details about this release, please see the full [technical change log][
 - Improved the legacy labware database boot-up process to avoid lost definitions
 - Removed usage of an old built-in Python method that was causing a protocol cancellation issue
 - Improved the reliability of the run cancellation response to the UI
-
+- Fixed an issue that could cause the robot to fail to boot if its previous boot was interrupted
+ 
 ### Known issues
 
 - While the underlying definition is correct, there is a known API bug that is causing the robot to think a "50ml" tube in a "15/50ml" tube rack is the same height as the "15ml" tube
