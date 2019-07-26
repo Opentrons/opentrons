@@ -13,7 +13,7 @@ def _get_parent_slot_legacy(placeable):
 
 def _get_parent_slot_and_position(labware_obj):
     if isinstance(labware_obj.parent, (labware.ModuleGeometry)):
-        return (labware_obj.parent.parent, labware_obj.parent._offset)
+        return (labware_obj.parent.parent, labware_obj.parent.labware_offset)
     else:
         return (labware_obj.parent, None)
 
