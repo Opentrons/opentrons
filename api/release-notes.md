@@ -1,4 +1,4 @@
-# Robot Software Changes from 3.9.0 to 3.10.2
+# Robot Software Changes from 3.9.0 to 3.10.3
 
 This update includes a set of all new, high-quality labware definitions! The older definitions are still on your robot and will continue to work, but we **highly** recommend you switch to the new ones.
 
@@ -19,6 +19,7 @@ For more details about this release, please see the full [technical change log][
 - Improved the reliability of the run cancellation response to the UI
 - Fix an issue where the calibration of v2 labware would vary with repeated calibrations
 - Fix an issue that could cause the robot to fail to boot if its previous boot was interrupted
+- Fixed an issue introduced in 3.10.2 that caused errors in transfers, consolidates, and dispenses using P50 pipettes.
 
 ## Known issues
 
