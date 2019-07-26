@@ -5,26 +5,53 @@ import { Link } from 'react-router-dom'
 import { getPublicPath } from '../../public-path'
 import styles from './styles.css'
 
-export const SUBDOMAIN_NAV_LINKS = [
+type Links = Array<{|
+  name: string,
+  url: string,
+  gtm: {| action: string, category: string, label: string |},
+  linkout: boolean,
+|}>
+
+export const SUBDOMAIN_NAV_LINKS: Links = [
   {
     name: 'Python API',
     url: 'https://docs.opentrons.com/',
-    gtm: { action: 'click', category: 'l-toolbar', label: 'opentrons-api' },
+    linkout: true,
+    gtm: {
+      action: 'click',
+      category: 'l-toolbar',
+      label: 'opentrons-api',
+    },
   },
   {
     name: 'Labware Library',
-    to: getPublicPath(),
-    gtm: { action: 'click', category: 'l-toolbar', label: 'labware-library' },
+    url: getPublicPath(),
+    linkout: false,
+    gtm: {
+      action: 'click',
+      category: 'l-toolbar',
+      label: 'labware-library',
+    },
   },
   {
     name: 'Protocol Library',
     url: 'https://protocols.opentrons.com/',
-    gtm: { action: 'click', category: 'l-toolbar', label: 'protocol-library' },
+    linkout: true,
+    gtm: {
+      action: 'click',
+      category: 'l-toolbar',
+      label: 'protocol-library',
+    },
   },
   {
     name: 'Protocol Designer',
     url: 'https://designer.opentrons.com/',
-    gtm: { action: 'click', category: 'l-toolbar', label: 'protocol-designer' },
+    linkout: true,
+    gtm: {
+      action: 'click',
+      category: 'l-toolbar',
+      label: 'protocol-designer',
+    },
   },
 ]
 
@@ -34,12 +61,14 @@ export function SubdomainNav() {
       {SUBDOMAIN_NAV_LINKS.map((link, index) => {
         const {
           gtm: { category, label, action },
+          linkout,
+          url,
         } = link
-        if (link.to) {
+        if (!linkout) {
           return (
             <li key={index}>
               <Link
-                to={link.to}
+                to={url}
                 className={styles.subdomain_link}
                 data-gtm-category={category}
                 data-gtm-label={label}
