@@ -23,5 +23,8 @@
     "react-dom": "^16.8.6",
     "react-hot-loader": "^4.8.0",
     "react-router-dom": "^5.0.0"
+  },
+  "devDependencies": {
+    "react-snap": "^1.23.0"
   }
 }
