@@ -391,6 +391,15 @@ def thermocycler_set_temp(temp, hold_time):
         }
     )
 
+def thermocycler_cycle_temperatures(stages, repetitions):
+    text = f'Thermocycler starting {repetitions} repetitions of cycle composed of the following stages:'
+    return make_command(
+        name=command_types.THERMOCYCLER_CYCLE_TEMPS,
+        payload={
+            'text': text,
+            'stages': str(stages)
+        }
+    )
 
 def thermocycler_wait_for_hold():
     text = "Waiting for hold time duration"
