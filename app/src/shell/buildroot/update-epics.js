@@ -2,7 +2,7 @@
 // epics to control the buildroot migration / update flow
 import every from 'lodash/every'
 import { combineEpics, ofType } from 'redux-observable'
-import { of, interval } from 'rxjs'
+import { of, interval, concat } from 'rxjs'
 import {
   filter,
   switchMap,
@@ -11,6 +11,8 @@ import {
   withLatestFrom,
 } from 'rxjs/operators'
 
+import { getRobotApiVersion } from '../../discovery/selectors'
+
 import {
   makeRobotApiRequest,
   passRobotApiResponseAction,
@@ -18,6 +20,7 @@ import {
 } from '../../robot-api'
 
 import {
+  getBuildrootUpdateInfo,
   getBuildrootSession,
   getBuildrootRobotName,
   getBuildrootRobot,
@@ -28,6 +31,7 @@ import {
   startBuildrootUpdate,
   startBuildrootPremigration,
   uploadBuildrootFile,
+  setBuildrootSessionStep,
   unexpectedBuildrootError,
 } from './actions'
 
@@ -41,7 +45,8 @@ import type {
   BuildrootUpdateSession,
 } from './types'
 
-export const UPDATE_STATUS_POLL_INTERVAL_MS = 2000
+export const POLL_INTERVAL_MS = 2000
+export const REDISCOVERY_TIME_MS = 60000
 
 // listen for the kickoff action and:
 //   if not ready for buildroot, kickoff premigration
@@ -138,7 +143,7 @@ export const triggerUpdateAfterPremigrationEpic: Epic = (_, state$) =>
       const robot = getBuildrootRobot(state)
       return (
         robot !== null &&
-        session?.triggerUpdate === true &&
+        session?.step === 'premigrationRestart' &&
         robot.serverHealth?.capabilities != null
       )
     }),
@@ -169,7 +174,7 @@ export const statusPollEpic: LooseEpic = (action$, state$) =>
       const request = { method: 'GET', host, path }
       const meta = { buildrootStatus: true }
 
-      return interval(UPDATE_STATUS_POLL_INTERVAL_MS).pipe(
+      return interval(POLL_INTERVAL_MS).pipe(
         switchMap(() => makeRobotApiRequest(request, meta)),
         takeUntil(
           state$.pipe(
@@ -177,7 +182,8 @@ export const statusPollEpic: LooseEpic = (action$, state$) =>
               const session = getBuildrootSession(state)
               return (
                 session?.stage === 'ready-for-restart' ||
-                session?.error === true
+                session?.error === true ||
+                session === null
               )
             })
           )
@@ -204,7 +210,7 @@ const passActiveSession = (props: $Shape<BuildrootUpdateSession>) => (
 // upload the update file to the robot when it switches to `awaiting-file`
 export const uploadFileEpic: Epic = (_, state$) =>
   state$.pipe(
-    filter(passActiveSession({ stage: 'awaiting-file', uploadStarted: false })),
+    filter(passActiveSession({ stage: 'awaiting-file', step: 'getToken' })),
     switchMap<State, _, BuildrootAction>(stateWithSession => {
       const host: ViewableRobot = (getBuildrootRobot(stateWithSession): any)
       const session = getBuildrootSession(stateWithSession)
@@ -218,7 +224,7 @@ export const uploadFileEpic: Epic = (_, state$) =>
 // commit the update file on the robot when it switches to `done`
 export const commitUpdateEpic: Epic = (_, state$) =>
   state$.pipe(
-    filter(passActiveSession({ stage: 'done', committed: false })),
+    filter(passActiveSession({ stage: 'done', step: 'processFile' })),
     switchMap<State, _, BuildrootAction>(stateWithSession => {
       const host: ViewableRobot = (getBuildrootRobot(stateWithSession): any)
       const session = getBuildrootSession(stateWithSession)
@@ -235,14 +241,52 @@ export const commitUpdateEpic: Epic = (_, state$) =>
 // restart the robot when it switches to `ready-for-restart`
 export const restartAfterCommitEpic: Epic = (_, state$) =>
   state$.pipe(
-    filter(passActiveSession({ stage: 'ready-for-restart', restarted: false })),
+    filter(
+      passActiveSession({ stage: 'ready-for-restart', step: 'commitUpdate' })
+    ),
     switchMap<State, _, BuildrootAction>(stateWithSession => {
       const host: ViewableRobot = (getBuildrootRobot(stateWithSession): any)
       const path = host.serverHealth?.capabilities?.restart || '/server/restart'
       const request = { method: 'POST', host, path }
       const meta = { buildrootRestart: true }
 
-      return makeRobotApiRequest(request, meta)
+      return concat(
+        makeRobotApiRequest(request, meta),
+        of({ type: 'discovery:START', meta: { shell: true } })
+      )
+    })
+  )
+
+export const watchForOfflineAfterRestartEpic: Epic = (_, state$) =>
+  state$.pipe(
+    filter(state => {
+      const session = getBuildrootSession(state)
+      const robot = getBuildrootRobot(state)
+      return Boolean(robot?.ok) === false && session?.step === 'restart'
+    }),
+    switchMap(() => of(setBuildrootSessionStep('restarting')))
+  )
+
+export const watchForOnlineAfterRestartEpic: Epic = (_, state$) =>
+  state$.pipe(
+    filter(state => {
+      const session = getBuildrootSession(state)
+      const robot = getBuildrootRobot(state)
+
+      return Boolean(robot?.ok) && session?.step === 'restarting'
+    }),
+    switchMap(state => {
+      const info = getBuildrootUpdateInfo(state)
+      const robot: ViewableRobot = (getBuildrootRobot(state): any)
+      const finishedAction =
+        info !== null && getRobotApiVersion(robot) === info.version
+          ? setBuildrootSessionStep('finished')
+          : unexpectedBuildrootError()
+
+      return of(finishedAction, {
+        type: 'discovery:FINISH',
+        meta: { shell: true },
+      })
     })
   )
 
@@ -254,5 +298,7 @@ export const buildrootUpdateEpic = combineEpics(
   statusPollEpic,
   uploadFileEpic,
   commitUpdateEpic,
-  restartAfterCommitEpic
+  restartAfterCommitEpic,
+  watchForOfflineAfterRestartEpic,
+  watchForOnlineAfterRestartEpic
 )

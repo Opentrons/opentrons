@@ -8,6 +8,7 @@ export type BuildrootUpdateInfo = {|
 
 export type BuildrootStatus = 'balena' | 'migrating' | 'buildroot'
 
+// stage response from API
 // update-server/otupdate/buildroot/update_session.py
 export type UpdateSessionStage =
   | 'awaiting-file'
@@ -17,16 +18,26 @@ export type UpdateSessionStage =
   | 'ready-for-restart'
   | 'error'
 
+// client-side update process step to decide what UI to display / API to call next
+export type UpdateSessionStep =
+  | 'premigration'
+  | 'premigrationRestart'
+  | 'getToken'
+  | 'uploadFile'
+  | 'processFile'
+  | 'commitUpdate'
+  | 'restart'
+  | 'restarting'
+  | 'finished'
+
 export type BuildrootUpdateSession = {|
   robotName: string,
   token: string | null,
   pathPrefix: string | null,
   stage: UpdateSessionStage | null,
+  step: UpdateSessionStep | null,
   progress: number | null,
-  triggerUpdate: boolean,
-  uploadStarted: boolean,
-  committed: boolean,
-  restarted: boolean,
+  // TODO(mc, 2019-07-25): error messages
   error: boolean,
 |}
 
@@ -60,7 +71,6 @@ export type BuildrootAction =
       payload: RobotHost,
       meta: {| shell: true |},
     |}
-  | {| type: 'buildroot:PREMIGRATION_STARTED' |}
   | {| type: 'buildroot:PREMIGRATION_DONE', payload: string |}
   | {| type: 'buildroot:PREMIGRATION_ERROR', payload: string |}
   | {|
@@ -68,4 +78,6 @@ export type BuildrootAction =
       payload: {| host: RobotHost, path: string |},
       meta: {| shell: true |},
     |}
+  | {| type: 'buildroot:FILE_UPLOAD_DONE', payload: string |}
+  | {| type: 'buildroot:SET_SESSION_STEP', payload: UpdateSessionStep |}
   | {| type: 'buildroot:CLEAR_SESSION' |}

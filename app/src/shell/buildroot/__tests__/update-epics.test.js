@@ -64,14 +64,14 @@ describe('buildroot update epics', () => {
 
         selectors.getBuildrootRobot.mockReturnValueOnce(brRobot)
         makeRobotApiRequest.mockImplementationOnce((req, meta) =>
-          cold('--a', { a: { req, meta } })
+          cold('-a', { a: { req, meta } })
         )
 
         const action$ = hot('-a', { a: action })
-        const state$ = hot('s-', { s: state })
+        const state$ = hot('a-', { a: state })
         const output$ = epics.startUpdateEpic(action$, state$)
 
-        expectObservable(output$).toBe('---a', {
+        expectObservable(output$).toBe('--a', {
           a: {
             req: {
               method: 'POST',
@@ -90,14 +90,14 @@ describe('buildroot update epics', () => {
 
         selectors.getBuildrootRobot.mockReturnValueOnce(brReadyRobot)
         makeRobotApiRequest.mockImplementationOnce((req, meta) =>
-          cold('--a', { a: { req, meta } })
+          cold('-a', { a: { req, meta } })
         )
 
         const action$ = hot('-a', { a: action })
-        const state$ = hot('s-', { s: state })
+        const state$ = hot('a-', { a: state })
         const output$ = epics.startUpdateEpic(action$, state$)
 
-        expectObservable(output$).toBe('---a', {
+        expectObservable(output$).toBe('--a', {
           a: {
             req: {
               method: 'POST',
@@ -120,7 +120,7 @@ describe('buildroot update epics', () => {
         selectors.getBuildrootRobot.mockReturnValueOnce(balenaRobot)
 
         const action$ = hot('-a', { a: action })
-        const state$ = hot('s-', { s: state })
+        const state$ = hot('a-', { a: state })
         const output$ = epics.startUpdateEpic(action$, state$)
 
         expectObservable(output$).toBe('-a', {
@@ -136,7 +136,7 @@ describe('buildroot update epics', () => {
         selectors.getBuildrootRobot.mockReturnValueOnce(robot)
 
         const action$ = hot('-a', { a: action })
-        const state$ = hot('s-', { s: state })
+        const state$ = hot('a-', { a: state })
         const output$ = epics.startUpdateEpic(action$, state$)
 
         expectObservable(output$).toBe('-a', {
@@ -157,13 +157,13 @@ describe('buildroot update epics', () => {
 
         passRobotApiErrorAction.mockImplementationOnce(a => a)
         makeRobotApiRequest.mockImplementationOnce((req, meta) =>
-          cold('--a', { a: { req, meta } })
+          cold('-a', { a: { req, meta } })
         )
 
         const action$ = hot('-a', { a: action })
         const output$ = epics.cancelSessionOnConflictEpic(action$)
 
-        expectObservable(output$).toBe('---a', {
+        expectObservable(output$).toBe('--a', {
           a: {
             req: {
               method: 'POST',
@@ -202,10 +202,10 @@ describe('buildroot update epics', () => {
       selectors.getBuildrootRobotName.mockReturnValueOnce(brReadyRobot.name)
       selectors.getBuildrootSession.mockReturnValueOnce({
         robot: brReadyRobot.name,
-        triggerUpdate: true,
+        step: 'premigrationRestart',
       })
 
-      const state$ = hot('-s', { s: state })
+      const state$ = hot('-a', { a: state })
       const output$ = epics.triggerUpdateAfterPremigrationEpic(null, state$)
 
       expectObservable(output$).toBe('-a', {
@@ -215,40 +215,41 @@ describe('buildroot update epics', () => {
   })
 
   test('statusPollEpic', () => {
-    testScheduler.run(({ hot, cold, expectObservable }) => {
-      const action = {
-        type: 'robotApi:RESPONSE__POST__/server/update/begin',
-        payload: { host: brRobot, ok: true, body: { token: 'a-token' } },
-        meta: { buildrootPrefix: '/server/update', buildrootToken: true },
+    testScheduler.run(
+      ({ hot, cold, expectObservable, expectSubscriptions }) => {
+        const action = {
+          type: 'robotApi:RESPONSE__POST__/server/update/begin',
+          payload: { host: brRobot, ok: true, body: { token: 'a-token' } },
+          meta: { buildrootPrefix: '/server/update', buildrootToken: true },
+        }
+
+        selectors.getBuildrootSession
+          .mockReturnValue({ stage: 'ready-for-restart' })
+          .mockReturnValueOnce({ stage: null })
+
+        passRobotApiResponseAction.mockImplementationOnce(a => a)
+        makeRobotApiRequest.mockImplementation((req, meta) =>
+          cold('a', { a: { req, meta } })
+        )
+
+        const action$ = hot('-a', { a: action })
+        const state$ = hot('-x 4s y 2s y #', { x: state, y: state })
+        const output$ = epics.statusPollEpic(action$, state$)
+        const expectedPoll = {
+          req: {
+            method: 'GET',
+            host: brRobot,
+            path: '/server/update/a-token/status',
+          },
+          meta: { buildrootStatus: true },
+        }
+
+        expectSubscriptions(state$.subscriptions).toBe('-^ 4s !')
+        expectObservable(output$).toBe('- 2s a 1999ms a', {
+          a: expectedPoll,
+        })
       }
-
-      selectors.getBuildrootSession
-        .mockReturnValueOnce({ stage: null })
-        .mockReturnValueOnce({ stage: 'ready-for-restart' })
-        .mockReturnValueOnce({ stage: 'ready-for-restart' })
-
-      passRobotApiResponseAction.mockImplementationOnce(a => a)
-      makeRobotApiRequest.mockImplementation((req, meta) =>
-        cold('a', { a: { req, meta } })
-      )
-
-      const action$ = hot('-a', { a: action })
-      const state$ = cold('a- 5s b 1s c', { a: state, b: state, c: state })
-      const output$ = epics.statusPollEpic(action$, state$)
-      const expectedPoll = {
-        req: {
-          method: 'GET',
-          host: brRobot,
-          path: '/server/update/a-token/status',
-        },
-        meta: { buildrootStatus: true },
-      }
-
-      expectObservable(output$).toBe('- 2s a 1999ms b', {
-        a: expectedPoll,
-        b: expectedPoll,
-      })
-    })
+    )
   })
 
   test('uploadFileEpic', () => {
@@ -257,7 +258,7 @@ describe('buildroot update epics', () => {
         pathPrefix: '/server/update/migration',
         token: 'tok',
         stage: 'awaiting-file',
-        uploadStarted: false,
+        step: 'getToken',
       }
 
       selectors.getBuildrootRobot.mockReturnValue(brReadyRobot)
@@ -282,7 +283,7 @@ describe('buildroot update epics', () => {
         pathPrefix: '/server/update',
         token: 'tok',
         stage: 'done',
-        committed: false,
+        step: 'processFile',
       }
 
       selectors.getBuildrootRobot.mockReturnValue(brRobot)
@@ -314,7 +315,7 @@ describe('buildroot update epics', () => {
         pathPrefix: '/server/update',
         token: 'a-token',
         stage: 'ready-for-restart',
-        restarted: false,
+        step: 'commitUpdate',
       }
 
       selectors.getBuildrootRobot.mockReturnValue(brRobot)

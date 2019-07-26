@@ -22,6 +22,7 @@ const log = createLogger(__filename)
 
 const DIRECTORY = path.join(app.getPath('userData'), '__ot_buildroot__')
 
+let checkingForUpdates = false
 let updateSet: ReleaseSetFilepaths | null = null
 
 export function registerBuildrootUpdate(dispatch: Dispatch) {
@@ -32,13 +33,17 @@ export function registerBuildrootUpdate(dispatch: Dispatch) {
     if (buildrootEnabled) {
       switch (action.type) {
         case 'shell:CHECK_UPDATE':
-          checkForBuildrootUpdate(dispatch)
+          if (!checkingForUpdates) {
+            checkingForUpdates = true
+            checkForBuildrootUpdate(dispatch).then(
+              () => (checkingForUpdates = false)
+            )
+          }
           break
 
         case 'buildroot:START_PREMIGRATION': {
           const robot = action.payload
 
-          dispatch({ type: 'buildroot:PREMIGRATION_STARTED' })
           getPremigrationWheels()
             .then(wheels => {
               log.info('Starting robot premigration', { robot, wheels })
@@ -69,10 +74,16 @@ export function registerBuildrootUpdate(dispatch: Dispatch) {
             return dispatch({ type: 'buildroot:UNEXPECTED_ERROR' })
           }
 
-          uploadFile(host, path, file).catch(error => {
-            log.warn('Error uploading update to robot', { path, file, error })
-            dispatch({ type: 'buildroot:UNEXPECTED_ERROR' })
-          })
+          uploadFile(host, path, file)
+            .then(() => ({
+              type: 'buildroot:FILE_UPLOAD_DONE',
+              payload: host.name,
+            }))
+            .catch(error => {
+              log.warn('Error uploading update to robot', { path, file, error })
+              return { type: 'buildroot:UNEXPECTED_ERROR' }
+            })
+            .then(dispatch)
         }
       }
     }
@@ -86,11 +97,11 @@ export function registerBuildrootUpdate(dispatch: Dispatch) {
 //      a. If the files need downloading, dispatch progress updates to UI
 //   4. Cache the filepaths of the update files in memory
 //   5. Dispatch info or error to UI
-export function checkForBuildrootUpdate(dispatch: Dispatch): void {
+export function checkForBuildrootUpdate(dispatch: Dispatch): Promise<mixed> {
   const manifestUrl = getConfig('buildroot').manifestUrl
   const fileDownloadDir = path.join(DIRECTORY, CURRENT_VERSION)
 
-  ensureDir(fileDownloadDir)
+  return ensureDir(fileDownloadDir)
     .then(() => downloadManifest(manifestUrl))
     .then(manifest => {
       const urls = getReleaseSet(manifest, CURRENT_VERSION)

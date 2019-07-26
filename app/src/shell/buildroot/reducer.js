@@ -19,15 +19,12 @@ export const INITIAL_STATE: BuildrootState = {
 
 export const initialSession = (robotName: string) => ({
   robotName,
-  triggerUpdate: false,
-  uploadStarted: false,
-  committed: false,
-  restarted: false,
-  error: false,
+  step: null,
   token: null,
   pathPrefix: null,
   stage: null,
   progress: null,
+  error: false,
 })
 
 export function buildrootReducer(
@@ -50,11 +47,26 @@ export function buildrootReducer(
     case actions.BR_START_UPDATE:
       return { ...state, session: initialSession(action.payload) }
 
-    case actions.BR_UPLOAD_FILE:
-      return { ...state, session: { ...state.session, uploadStarted: true } }
+    case actions.BR_START_PREMIGRATION:
+      return {
+        ...state,
+        session: { ...state.session, step: 'premigration' },
+      }
 
     case actions.BR_PREMIGRATION_DONE:
-      return { ...state, session: { ...state.session, triggerUpdate: true } }
+      return {
+        ...state,
+        session: { ...state.session, step: 'premigrationRestart' },
+      }
+
+    case actions.BR_UPLOAD_FILE:
+      return { ...state, session: { ...state.session, step: 'uploadFile' } }
+
+    case actions.BR_FILE_UPLOAD_DONE:
+      return { ...state, session: { ...state.session, step: 'processFile' } }
+
+    case actions.BR_SET_SESSION_STEP:
+      return { ...state, session: { ...state.session, step: action.payload } }
 
     case actions.BR_CLEAR_SESSION:
       return { ...state, session: null }
@@ -69,12 +81,16 @@ export function buildrootReducer(
   const apiError = passRobotApiErrorAction(action)
 
   if (apiRequest !== null) {
+    if (apiRequest.meta.buildrootToken === true) {
+      return { ...state, session: { ...state.session, step: 'getToken' } }
+    }
+
     if (apiRequest.meta.buildrootCommit === true) {
-      return { ...state, session: { ...state.session, committed: true } }
+      return { ...state, session: { ...state.session, step: 'commitUpdate' } }
     }
 
     if (apiRequest.meta.buildrootRestart === true) {
-      return { ...state, session: { ...state.session, restarted: true } }
+      return { ...state, session: { ...state.session, step: 'restart' } }
     }
   }
 
@@ -91,7 +107,6 @@ export function buildrootReducer(
         session: {
           ...state.session,
           robotName: host.name,
-          triggerUpdate: false,
           token: apiResponse.payload.body.token,
           pathPrefix: apiResponse.meta.buildrootPrefix,
         },

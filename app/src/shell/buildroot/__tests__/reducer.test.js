@@ -2,15 +2,12 @@ import { INITIAL_STATE, buildrootReducer } from '../reducer'
 
 const BASE_SESSION = {
   robotName: 'robot-name',
-  triggerUpdate: false,
-  uploadStarted: false,
-  committed: false,
-  restarted: false,
-  error: false,
+  step: null,
   token: null,
   pathPrefix: null,
   stage: null,
   progress: null,
+  error: false,
 }
 
 describe('app/shell/buildroot reducer', () => {
@@ -52,15 +49,43 @@ describe('app/shell/buildroot reducer', () => {
       expected: { ...INITIAL_STATE, session: BASE_SESSION },
     },
     {
-      name: 'handles buildroot:PREMIGRATION_DONE',
+      name: 'handles buildroot:START_PREMIGRATION',
       action: {
-        type: 'buildroot:PREMIGRATION_DONE',
-        payload: 'robot-name',
+        type: 'buildroot:START_PREMIGRATION',
+        payload: { name: 'robot-name', ip: '10.10.0.0', port: 31950 },
       },
       initialState: { ...INITIAL_STATE, session: BASE_SESSION },
       expected: {
         ...INITIAL_STATE,
-        session: { ...BASE_SESSION, triggerUpdate: true },
+        session: { ...BASE_SESSION, step: 'premigration' },
+      },
+    },
+    {
+      name: 'handles buildroot:PREMIGRATION_DONE',
+      action: { type: 'buildroot:PREMIGRATION_DONE' },
+      initialState: {
+        ...INITIAL_STATE,
+        session: { ...BASE_SESSION, step: 'premigration' },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        session: { ...BASE_SESSION, step: 'premigrationRestart' },
+      },
+    },
+    {
+      name: 'handles robotApi:REQUEST__POST__/session/update/begin',
+      action: {
+        type: 'robotApi:REQUEST__POST__/session/update/begin',
+        payload: { host: { name: 'robot-name' }, body: { token: 'foobar' } },
+        meta: { buildrootPrefix: '/session/update', buildrootToken: true },
+      },
+      initialState: { ...INITIAL_STATE, session: BASE_SESSION },
+      expected: {
+        ...INITIAL_STATE,
+        session: {
+          ...BASE_SESSION,
+          step: 'getToken',
+        },
       },
     },
     {
@@ -81,26 +106,6 @@ describe('app/shell/buildroot reducer', () => {
       },
     },
     {
-      name: 'handles robotApi:RESPONSE__POST__/session/update/migration/begin',
-      action: {
-        type: 'robotApi:RESPONSE__POST__/session/update/migration/begin',
-        payload: { host: { name: 'robot-name' }, body: { token: 'a-token' } },
-        meta: {
-          buildrootPrefix: '/session/update/migration',
-          buildrootToken: true,
-        },
-      },
-      initialState: { ...INITIAL_STATE, session: BASE_SESSION },
-      expected: {
-        ...INITIAL_STATE,
-        session: {
-          ...BASE_SESSION,
-          token: 'a-token',
-          pathPrefix: '/session/update/migration',
-        },
-      },
-    },
-    {
       name: 'handles robotApi:RESPONSE__POST__/session/update/:token/status',
       action: {
         type: 'robotApi:RESPONSE__POST__/session/update/a-token/status',
@@ -110,23 +115,10 @@ describe('app/shell/buildroot reducer', () => {
         },
         meta: { buildrootStatus: true },
       },
-      initialState: {
-        ...INITIAL_STATE,
-        session: {
-          ...BASE_SESSION,
-          token: 'a-token',
-          pathPrefix: '/session/update',
-        },
-      },
+      initialState: { ...INITIAL_STATE, session: BASE_SESSION },
       expected: {
         ...INITIAL_STATE,
-        session: {
-          ...BASE_SESSION,
-          token: 'a-token',
-          pathPrefix: '/session/update',
-          stage: 'awaiting-file',
-          progress: 10,
-        },
+        session: { ...BASE_SESSION, stage: 'awaiting-file', progress: 10 },
       },
     },
     {
@@ -141,22 +133,28 @@ describe('app/shell/buildroot reducer', () => {
       },
       initialState: {
         ...INITIAL_STATE,
+        session: { ...BASE_SESSION, step: 'getToken' },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        session: { ...BASE_SESSION, step: 'uploadFile' },
+      },
+    },
+    {
+      name: 'handles buildroot:FILE_UPLOAD_DONE',
+      action: { type: 'buildroot:FILE_UPLOAD_DONE' },
+      initialState: {
+        ...INITIAL_STATE,
         session: {
           ...BASE_SESSION,
-          token: 'a-token',
-          pathPrefix: '/session/update',
-          stage: 'awaiting-file',
-          uploadStarted: false,
+          step: 'uploadFile',
         },
       },
       expected: {
         ...INITIAL_STATE,
         session: {
           ...BASE_SESSION,
-          token: 'a-token',
-          pathPrefix: '/session/update',
-          stage: 'awaiting-file',
-          uploadStarted: true,
+          step: 'processFile',
         },
       },
     },
@@ -171,20 +169,14 @@ describe('app/shell/buildroot reducer', () => {
         ...INITIAL_STATE,
         session: {
           ...BASE_SESSION,
-          committed: false,
-          token: 'a-token',
-          pathPrefix: '/session/update',
-          stage: 'done',
+          step: 'processFile',
         },
       },
       expected: {
         ...INITIAL_STATE,
         session: {
           ...BASE_SESSION,
-          committed: true,
-          token: 'a-token',
-          pathPrefix: '/session/update',
-          stage: 'done',
+          step: 'commitUpdate',
         },
       },
     },
@@ -197,19 +189,11 @@ describe('app/shell/buildroot reducer', () => {
       },
       initialState: {
         ...INITIAL_STATE,
-        session: {
-          ...BASE_SESSION,
-          restarted: false,
-          stage: 'ready-for-restart',
-        },
+        session: { ...BASE_SESSION, step: 'commitUpdate' },
       },
       expected: {
         ...INITIAL_STATE,
-        session: {
-          ...BASE_SESSION,
-          restarted: true,
-          stage: 'ready-for-restart',
-        },
+        session: { ...BASE_SESSION, step: 'restart' },
       },
     },
     {

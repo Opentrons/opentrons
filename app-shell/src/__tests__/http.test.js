@@ -1,10 +1,10 @@
-import mockFetch from 'electron-fetch'
+import mockFetch from 'node-fetch'
 import isError from 'lodash/isError'
 
 import * as Http from '../http'
 
 jest.mock('../config')
-jest.mock('electron-fetch', () => jest.fn())
+jest.mock('node-fetch', () => jest.fn())
 
 describe('app-shell main http module', () => {
   beforeEach(() => {
