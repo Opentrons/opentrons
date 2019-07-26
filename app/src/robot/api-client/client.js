@@ -484,16 +484,9 @@ export default function client(dispatch) {
     }
 
     function addApiContainerToLabware(apiContainer) {
-      const {
-        _id,
-        name,
-        type,
-        slot,
-        position,
-        is_legacy: isLegacy,
-      } = apiContainer
+      const { _id, name, type, slot, is_legacy: isLegacy } = apiContainer
       const isTiprack = RE_TIPRACK.test(type)
-      const labware = { _id, name, slot, position, type, isTiprack, isLegacy }
+      const labware = { _id, name, slot, type, isTiprack, isLegacy }
 
       if (isTiprack && apiContainer.instruments.length > 0) {
         // if tiprack used by both pipettes, prefer single for calibration

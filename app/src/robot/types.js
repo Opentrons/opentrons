@@ -113,8 +113,6 @@ export type StateLabware = {|
   _id: number,
   // slot labware is installed in
   slot: Slot,
-  // deck coordinates of labware when not in slot
-  position: ?Array<number>,
   // unique type of the labware
   type: string,
   // user defined name of the labware

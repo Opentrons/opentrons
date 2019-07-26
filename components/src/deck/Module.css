@@ -1,4 +1,5 @@
 @import '@opentrons/components';
+
 .module {
   color: var(--c-black);
   background-color: var(--c-black);
@@ -6,13 +7,13 @@
   width: 100%;
   height: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 }
 
 .module_review_icon {
   color: var(--c-white);
-  margin: 0 1rem 0 0;
+  margin: 0 1rem 0 0.5rem;
   height: 16px;
   width: 16px;
 }

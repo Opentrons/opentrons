@@ -2,10 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import {
-  getLabwareDisplayName,
-  getModuleDisplayName,
-} from '@opentrons/shared-data'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { ListItem, HoverTooltip } from '@opentrons/components'
 import styles from './styles.css'
 
@@ -28,17 +25,11 @@ export default function LabwareListItem(props: LabwareListItemProps) {
     isDisabled,
     onClick,
     definition,
-    moduleName,
   } = props
 
   const url = `/calibrate/labware/${slot}`
   const iconName = confirmed ? 'check-circle' : 'checkbox-blank-circle-outline'
   const displayName = definition ? getLabwareDisplayName(definition) : type
-  let displaySlot = `Slot ${slot}`
-  if (moduleName === 'thermocycler') {
-    displaySlot = 'Slots 7, 8, 10, & 11'
-  }
-  const moduleDisplayName = moduleName && getModuleDisplayName(moduleName)
 
   return (
     <ListItem
@@ -51,30 +42,19 @@ export default function LabwareListItem(props: LabwareListItemProps) {
       <HoverTooltip
         placement="bottom-end"
         tooltipComponent={
-          <LabwareNameTooltip
-            name={name}
-            displayName={
-              moduleDisplayName
-                ? `${displayName} on ${moduleDisplayName}`
-                : displayName
-            }
-          />
+          <LabwareNameTooltip name={name} displayName={displayName} />
         }
       >
         {handlers => (
           <div {...handlers} className={styles.item_info}>
-            <span className={styles.item_info_location}>{displaySlot}</span>
+            <span className={styles.item_info_location}>Slot {slot}</span>
             {isTiprack && (
               <span className={styles.tiprack_item_mount}>
                 {calibratorMount && calibratorMount.charAt(0).toUpperCase()}
               </span>
             )}
-            <div className={styles.slot_contents_names}>
-              {moduleName && (
-                <span className={styles.module_name}>{moduleDisplayName}</span>
-              )}
-              <span className={styles.labware_item_name}>{displayName}</span>
-            </div>
+
+            <span className={styles.labware_item_name}>{displayName}</span>
           </div>
         )}
       </HoverTooltip>

@@ -1,9 +1,8 @@
 // @flow
-import React, { useMemo } from 'react'
+import * as React from 'react'
 import cx from 'classnames'
 
 import { getModuleDisplayName, type ModuleType } from '@opentrons/shared-data'
-import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import { Icon } from '../icons'
 import RobotCoordsForeignDiv from './RobotCoordsForeignDiv'
@@ -16,41 +15,12 @@ export type Props = {
   mode: 'default' | 'present' | 'missing' | 'info',
 }
 
+const x = -28.3
+const y = 2
+const width = 158.6
+const height = 90.5
+
 export default function Module(props: Props) {
-  // TODO: BC 2019-7-23 get these from shared data, once absolute
-  // dimensions are added to data
-  const deckDef = useMemo(() => getDeckDefinitions()['ot2_standard'], [])
-  let x = 0
-  let y = 0
-  let {
-    xDimension: width,
-    yDimension: height,
-  } = deckDef?.locations?.orderedSlots[0]?.boundingBox
-
-  switch (props.name) {
-    case 'magdeck': {
-      width = 137
-      height = 91
-      x = -7
-      y = 4
-      break
-    }
-    case 'tempdeck': {
-      width = 196
-      height = 91
-      x = -66
-      y = 4
-      break
-    }
-    case 'thermocycler': {
-      // TODO: BC 2019-07-24 these are taken from snapshots of the cad file, they should
-      // be included in the module spec schema and added to the data
-      width = 172
-      height = 259.7
-      x = -22.125
-    }
-  }
-
   return (
     <RobotCoordsForeignDiv
       width={width}
@@ -74,20 +44,10 @@ function ModuleItemContents(props: Props) {
     mode === 'missing' ? (
       <>
         <p className={styles.module_review_text}>Missing:</p>
-        {displayName.split(' ').map((chunk, i) => (
-          <p key={i} className={styles.module_review_text}>
-            {chunk}
-          </p>
-        ))}
+        <p className={styles.module_review_text}>{displayName}</p>
       </>
     ) : (
-      <>
-        {displayName.split(' ').map((chunk, i) => (
-          <p key={i} className={styles.module_review_text}>
-            {chunk}
-          </p>
-        ))}
-      </>
+      <p className={styles.module_review_text}>{displayName}</p>
     )
 
   const iconClassName = cx(styles.module_review_icon, {
