@@ -22,8 +22,8 @@ run({
           .replace('\\', '/') || '.'
       console.log({ pagePath, relativePath })
       const newPage = page
-        .replace(/src="\//g, `src="${relativePath}/`)
-        .replace(/link href="\//g, `link href="${relativePath}/`)
+        .replace(/src="\/(?=[^/])/g, `src="${relativePath}/`)
+        .replace(/link href="\/(?=[^/])/g, `link href="${relativePath}/`)
       fs.writeFileSync(pagePath, newPage)
     })
   })
