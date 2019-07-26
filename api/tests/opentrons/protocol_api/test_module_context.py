@@ -148,19 +148,19 @@ def test_thermocycler_temp(loop):
     assert mod.hold_time == 0
     assert mod.ramp_rate is None
 
-# NOTE: this test should be rewritten when "semi" config is built
-# def test_semithermocycler_labware_accessor(loop):
-#     # Check that you can only access 9 columns of the 96 well plate loaded
-#     ctx = papi.ProtocolContext(loop)
-#     ctx._hw_manager.hardware._backend._attached_modules = [
-#         ('mod0', 'thermocycler')]
-#     mod = ctx.load_module('semithermocycler', 1)
-#     # open before loading labware
-#     mod.open()
-#     mod.load_labware_by_name('biorad_96_wellplate_200ul_pcr')
 
-#     assert len(mod.labware.columns()) == 9
-#     assert mod.labware.wells().__repr__()[1:3] == 'A4'
+def test_semithermocycler_labware_accessor(loop):
+    # Check that you can only access 9 columns of the 96 well plate loaded
+    ctx = papi.ProtocolContext(loop)
+    ctx._hw_manager.hardware._backend._attached_modules = [
+        ('mod0', 'thermocycler')]
+    mod = ctx.load_module('semithermocycler', 1)
+    # open before loading labware
+    mod.open()
+    mod.load_labware_by_name('biorad_96_wellplate_200ul_pcr')
+
+    assert len(mod.labware.columns()) == 9
+    assert mod.labware.wells().__repr__()[1:3] == 'A4'
 
 
 def test_module_load_labware(loop):

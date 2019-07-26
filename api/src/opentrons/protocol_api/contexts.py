@@ -241,9 +241,32 @@ class ProtocolContext(CommandPublisher):
     def load_module(
             self, module_name: str,
             location: types.DeckLocation) -> ModuleTypes:
+        mod_map = {
+            'magdeck': {
+                'hc_name': 'magdeck',
+                'geo_name': 'magdeck'},
+            'magnetic module': {
+                'hc_name': 'magdeck',
+                'geo_name': 'magdeck'},
+            'tempdeck': {
+                'hc_name': 'tempdeck',
+                'geo_name': 'tempdeck'},
+            'temperature module': {
+                'hc_name': 'tempdeck',
+                'geo_name': 'tempdeck'},
+            'thermocycler': {
+                'hc_name': 'thermocycler',
+                'geo_name': 'thermocycler'},
+            'semithermocycler': {
+                'hc_name': 'thermocycler',
+                'geo_name': 'semithermocycler'}
+            }
         try:
+            hc_mod_name = mod_map[module_name.lower()]['hc_name']
+            geo_mod_name = mod_map[module_name.lower()]['geo_name']
+
             geometry = load_module(
-                module_name, self._deck_layout.position_for(location))
+                geo_mod_name, self._deck_layout.position_for(location))
         except KeyError:
             self._log.error(f'Unsupported Module: {module_name}')
             raise ValueError(f'Unsupported Module: {module_name}')
@@ -252,9 +275,9 @@ class ProtocolContext(CommandPublisher):
         mod_class = {
             'magdeck': MagneticModuleContext,
             'tempdeck': TemperatureModuleContext,
-            'thermocycler': ThermocyclerContext}[module_name]
+            'thermocycler': ThermocyclerContext}[hc_mod_name]
         for mod in self._hw_manager.hardware.discover_modules():
-            if mod.name() == module_name:
+            if mod.name() == hc_mod_name:
                 hc_mod_instance = mod
                 break
 
@@ -262,7 +285,7 @@ class ProtocolContext(CommandPublisher):
             mod_type = {
                 'magdeck': modules.magdeck.MagDeck,
                 'tempdeck': modules.tempdeck.TempDeck,
-                'thermocycler': modules.thermocycler.Thermocycler}[module_name]
+                'thermocycler': modules.thermocycler.Thermocycler}[hc_mod_name]
             hc_mod_instance = mod_type(
                 port='', simulating=True, loop=self._loop)
         if hc_mod_instance:
