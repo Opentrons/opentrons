@@ -1047,10 +1047,10 @@ class Pipette(CommandPublisher):
                    'after', self, None, self, location, presses, increment)
 
         # update working volume
-        try:
+        if location.max_volume():
             self._working_volume = float(
                 min(self.max_volume, location.max_volume()))
-        except KeyError:
+        else:
             log.info('No tip liquid volume, defaulting to max volume.')
             self._working_volume = float(self.max_volume)
         return self
@@ -1596,7 +1596,8 @@ class Pipette(CommandPublisher):
                 'dispense': {'location': t[i], 'volume': v[i]}
             })
 
-        if not self.tip_attached and self.tip_racks:
+        if not self.tip_attached and self.tip_racks and \
+                self.tip_racks[0][0].max_volume():
             max_vol = min(
                 self.tip_racks[0][0].max_volume(), self._working_volume)
         else:
