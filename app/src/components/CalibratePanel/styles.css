@@ -35,11 +35,26 @@
   width: 100%;
 }
 
+.module_name {
+  @apply --truncate;
+
+  width: 100%;
+  text-transform: uppercase;
+}
+
+.slot_contents_names {
+  @apply --truncate;
+
+  display: flex;
+  flex-direction: column;
+}
+
 /*
  * TODO(mc, 2019-07-11): Copy-pasted from components/src/lists/lists.css
  * as a workaround to fix HoverTooltip not working on ListItems due to
  * pointer-events: none
  */
+
 .disabled * {
   color: var(--c-font-disabled);
 }

@@ -668,6 +668,15 @@ class ModuleGeometry:
         return self._location
 
     @property
+    def labware_offset(self) -> Point:
+        """
+        :return: a :py:class:`.Point` representing the transformation
+        between the critical point of the module and the critical
+        point of its contained labware
+        """
+        return self._offset
+
+    @property
     def highest_z(self) -> float:
         if self.labware:
             return self.labware.highest_z + self._over_labware

@@ -12,11 +12,12 @@ import {
 } from '../../robot'
 
 import type { State, Dispatch } from '../../types'
-import type { Labware, Mount } from '../../robot'
+import type { Labware, Mount, Slot, SessionModule } from '../../robot'
 
 type SP = {|
   disabled: boolean,
   labware: Array<Labware>,
+  modulesBySlot: { [Slot]: SessionModule },
   _calibrator: ?Mount,
   _deckPopulated: boolean,
 |}
@@ -25,6 +26,7 @@ type DP = {| dispatch: Dispatch |}
 
 type Props = {
   labware: Array<Labware>,
+  modulesBySlot: { [Slot]: SessionModule },
   disabled: boolean,
   setLabware: (labware: Labware) => mixed,
 }
@@ -38,7 +40,7 @@ export default withRouter<{||}>(
 )
 
 function LabwareList(props: Props) {
-  const { labware, disabled, setLabware } = props
+  const { labware, disabled, setLabware, modulesBySlot } = props
 
   return (
     <TitledList title="labware">
@@ -46,6 +48,11 @@ function LabwareList(props: Props) {
         <LabwareListItem
           {...lw}
           key={lw.slot}
+          moduleName={
+            modulesBySlot &&
+            modulesBySlot[lw.slot] &&
+            modulesBySlot[lw.slot].name
+          }
           isDisabled={disabled}
           confirmed={lw.confirmed}
           onClick={() => setLabware(lw)}
@@ -58,6 +65,7 @@ function LabwareList(props: Props) {
 function mapStateToProps(state: State): SP {
   return {
     labware: robotSelectors.getNotTipracks(state),
+    modulesBySlot: robotSelectors.getModulesBySlot(state),
     disabled: !robotSelectors.getTipracksConfirmed(state),
     _calibrator: robotSelectors.getCalibratorMount(state),
     _deckPopulated: robotSelectors.getDeckPopulated(state),
@@ -65,11 +73,18 @@ function mapStateToProps(state: State): SP {
 }
 
 function mergeProps(stateProps: SP, dispatchProps: DP): Props {
-  const { labware, disabled, _calibrator, _deckPopulated } = stateProps
+  const {
+    labware,
+    modulesBySlot,
+    disabled,
+    _calibrator,
+    _deckPopulated,
+  } = stateProps
   const { dispatch } = dispatchProps
 
   return {
     labware,
+    modulesBySlot,
     disabled,
     setLabware: lw => {
       const calibrator = lw.calibratorMount || _calibrator
