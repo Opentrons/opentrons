@@ -31,18 +31,14 @@ update_files := "dist/@(alpha|beta|latest)*.@(yml|json)"
 publish_dir := dist/publish
 
 # TODO(mc, 2018-03-27): move all this to some sort of envfile
-# TODO(mc, 2018-03-07): tag logic here is too naive since PD will tag its
-#   releases independently. See TODO in .travis.yml and revisit this logic
 # build id suffix to add to artifacts
 # if no build number -> dev
-# if tagged build (branch == tag) -> b$(BUILD_NUMBER)
+# if tagged build (tag ~= ^v.+) -> b$(BUILD_NUMBER)
 # if branch exists -> b$(BUILD_NUMBER)-$(BRANCH_NAME)
-branch := $(filter-out $(OT_TAG),$(OT_BRANCH))
-branch_suffix := $(and $(branch),-$(branch))
-build_id := $(or $(and $(OT_BUILD),b$(OT_BUILD)$(branch_suffix)),dev)
-
 # only copy update files publish directory on tagged builds
-publish_update := $(OT_TAG)
+publish_update := $(filter v%,$(OT_TAG))
+branch_suffix := $(if $(publish_update),,-$(OT_BRANCH))
+build_id := $(or $(and $(OT_BUILD),b$(OT_BUILD)$(branch_suffix)),dev)
 
 builder := electron-builder -p never
 

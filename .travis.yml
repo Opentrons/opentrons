@@ -138,9 +138,7 @@ jobs:
       name: 'Build/deploy Opentrons App for POSIX (unsigned dev builds)'
       os: linux
       script: make -C app-shell dist-posix
-      # TODO(mc, 2019-03-07): app-shell makefile still looks for presense of
-      # tag rather than correct tag format. For now, skip app builds entirely if
-      # tag is present but does not match ^v
+      # skip app builds entirely if tag is present but does not match ^v
       if: tag IS blank AND (NOT branch =~ ^(edge|release_.+)$)
 
     - # build the Opentrons App for Linux (tagged / edge / RC builds)
