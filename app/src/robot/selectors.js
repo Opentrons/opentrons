@@ -321,8 +321,15 @@ export const getLabware: OutputSelector<
   getPipettesByMount,
   getLabwareBySlot,
   (state: State) => calibration(state).confirmedBySlot,
+  getModulesBySlot,
   getCalibrationRequest,
-  (instByMount, lwBySlot, confirmedBySlot, calibrationRequest): Labware[] => {
+  (
+    instByMount,
+    lwBySlot,
+    confirmedBySlot,
+    modulesBySlot,
+    calibrationRequest
+  ): Labware[] => {
     return Object.keys(lwBySlot)
       .filter(isSlot)
       .map<Labware>((slot: Slot) => {
@@ -333,12 +340,16 @@ export const getLabware: OutputSelector<
 
         // labware is confirmed if:
         //   - tiprack: labware in slot is confirmed
-        //   - non-tiprack: labware in slot or any of same type is confirmed
+        //   - non-tiprack: labware in slot or any of same type in same
+        // type of parent (e.g. slot, tempdeck, thermocycler) is confirmed
         const confirmed = some(
           confirmedBySlot,
           (value: boolean, key: Slot) =>
             value === true &&
-            (key === slot || (!isTiprack && type === lwBySlot[key].type))
+            (key === slot ||
+              (!isTiprack &&
+                type === lwBySlot[key].type &&
+                modulesBySlot[key]?.name === modulesBySlot[slot]?.name))
         )
 
         let calibration: LabwareCalibrationStatus = 'unconfirmed'
