@@ -21,8 +21,11 @@ describe('app/shell/buildroot action creators', () => {
     {
       name: 'buildroot:UNEXPECTED_ERROR',
       creator: actions.unexpectedBuildrootError,
-      args: [],
-      expected: { type: 'buildroot:UNEXPECTED_ERROR' },
+      args: ['AH!'],
+      expected: {
+        type: 'buildroot:UNEXPECTED_ERROR',
+        payload: { message: 'AH!' },
+      },
     },
     {
       name: 'buildroot:UPLOAD_FILE',

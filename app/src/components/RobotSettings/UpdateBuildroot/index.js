@@ -28,10 +28,10 @@ export default function UpdateBuildroot(props: Props) {
   const session = useSelector(getBuildrootSession)
   const dispatch = useDispatch<Dispatch>()
 
-  const ignoreAndClose = React.useCallback(() => {
+  // set update seen on component mount
+  React.useEffect(() => {
     dispatch(setBuildrootUpdateSeen())
-    close()
-  }, [dispatch, close])
+  }, [dispatch])
 
   const goToViewUpdate = React.useCallback(() => setViewUpdateInfo(true), [])
 
@@ -59,7 +59,7 @@ export default function UpdateBuildroot(props: Props) {
       <VersionInfoModal
         robot={robot}
         robotUpdateType={robotUpdateType}
-        close={ignoreAndClose}
+        close={close}
         proceed={goToViewUpdate}
       />
     )
@@ -69,7 +69,7 @@ export default function UpdateBuildroot(props: Props) {
     <ViewUpdateModal
       robotUpdateType={robotUpdateType}
       robotSystemType={robotSystemType}
-      close={ignoreAndClose}
+      close={close}
       proceed={installUpdate}
     />
   )

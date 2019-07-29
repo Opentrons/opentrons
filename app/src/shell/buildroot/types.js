@@ -58,9 +58,9 @@ export type StartBuildrootUpdateAction = {|
   payload: string,
 |}
 
-// TODO(mc, 2019-07-19): flesh this action type out so it's actually useful
 export type UnexpectedBuildrootError = {|
   type: 'buildroot:UNEXPECTED_ERROR',
+  payload: {| message: string |},
 |}
 
 export type BuildrootAction =

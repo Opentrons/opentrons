@@ -140,7 +140,9 @@ describe('buildroot update epics', () => {
         const output$ = epics.startUpdateEpic(action$, state$)
 
         expectObservable(output$).toBe('-a', {
-          a: actions.unexpectedBuildrootError(),
+          a: actions.unexpectedBuildrootError(
+            'Unable to find online robot with name robot'
+          ),
         })
       })
     })
