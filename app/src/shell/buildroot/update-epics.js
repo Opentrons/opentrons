@@ -297,26 +297,22 @@ export const watchForOnlineAfterRestartEpic: Epic = (_, state$) =>
       const robot: ViewableRobot = (getBuildrootRobot(stateWithRobot): any)
       const robotVersion = getRobotApiVersion(robot)
       const targetVersion = info?.version
-
-      if (
-        targetVersion != null &&
-        robotVersion != null &&
-        robotVersion === targetVersion
-      ) {
-        return of(setBuildrootSessionStep('finished'), {
-          type: 'discovery:FINISH',
-          meta: { shell: true },
-        })
-      }
-
       const actual = robotVersion || 'unknown'
       const expected = targetVersion || 'unknown'
 
-      return of(
-        unexpectedBuildrootError(
-          `robot reconnected with version ${actual}, but we expected ${expected}`
-        )
-      )
+      const finishAction =
+        targetVersion != null &&
+        robotVersion != null &&
+        robotVersion === targetVersion
+          ? setBuildrootSessionStep('finished')
+          : unexpectedBuildrootError(
+              `robot reconnected with version ${actual}, but we expected ${expected}`
+            )
+
+      return of(finishAction, {
+        type: 'discovery:FINISH',
+        meta: { shell: true },
+      })
     })
   )
 

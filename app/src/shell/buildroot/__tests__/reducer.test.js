@@ -7,7 +7,7 @@ const BASE_SESSION = {
   pathPrefix: null,
   stage: null,
   progress: null,
-  error: false,
+  error: null,
 }
 
 describe('app/shell/buildroot reducer', () => {

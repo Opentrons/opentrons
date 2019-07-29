@@ -31,7 +31,7 @@ export function robotApiFetch(
   const url = robotApiUrl(request)
   const options: RequestOptions = { method }
 
-  if (reqBody) {
+  if (reqBody != null) {
     if (typeof reqBody === 'object') options.body = JSON.stringify(reqBody)
   }
 

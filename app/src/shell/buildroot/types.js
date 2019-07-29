@@ -41,8 +41,7 @@ export type BuildrootUpdateSession = {|
   step: UpdateSessionStep | null,
   stage: UpdateSessionStage | null,
   progress: number | null,
-  // TODO(mc, 2019-07-25): error messages
-  error: boolean,
+  error: string | null,
 |}
 
 export type BuildrootState = {|
