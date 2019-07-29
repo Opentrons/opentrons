@@ -676,7 +676,6 @@ class ModuleGeometry:
         """
         return self._offset
 
-
     @property
     def highest_z(self) -> float:
         if self.labware:
