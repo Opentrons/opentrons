@@ -5,9 +5,9 @@ import type { Options } from './fields'
 // no P50 for now
 const tiprackForPipette = {
   P10_Single: 'opentrons_96_tiprack_10ul',
-  P10_Multi: 'opentrons_96_tiprack_10ul',
+  // P10_Multi: 'opentrons_96_tiprack_10ul',
   P300_Single: 'opentrons_96_tiprack_300ul',
-  P300_Multi: 'opentrons_96_tiprack_300ul',
+  // P300_Multi: 'opentrons_96_tiprack_300ul',
   P1000_Single: 'opentrons_96_tiprack_1000ul',
 }
 
@@ -21,9 +21,8 @@ type LabwareTestProtocolArgs = {|
 |}
 const labwareTestProtocol = (args: LabwareTestProtocolArgs): string => {
   const { pipetteName, definition } = args
-  const mount = 'right' // NOTE: for now, we'll ONLY use right so that mount-offset issues are reduced
-
   const tiprackLoadName = tiprackForPipette[pipetteName]
+  const mount = 'right' // NOTE: for now, we'll ONLY use right so that mount-offset issues are reduced
 
   return `import json
 import operator

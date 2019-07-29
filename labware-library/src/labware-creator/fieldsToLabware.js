@@ -6,10 +6,16 @@ import {
 } from '@opentrons/shared-data'
 import type { ProcessedLabwareFields } from './fields'
 
+// TODO Ian 2019-07-29: move this constant to shared-data?
+// This is the distance from channel 1 to channel 8 of any 8-channel, not tied to name/model
+export const MULTI_CHANNEL_WIDTH_MM = 64
+
 export default function fieldsToLabware(
   fields: ProcessedLabwareFields
 ): LabwareDefinition2 {
-  const isRegularLabware = true // TODO IMMEDIATELY derive from fields, I think only the 15-50-esque tube rack has multiple grids.
+  // NOTE Ian 2019-07-27: only the 15-50-esque tube rack has multiple grids,
+  // and it is not supported in labware creator. So all are regular.
+  const isRegularLabware = true
 
   if (isRegularLabware) {
     const commonWellProperties = {
@@ -30,20 +36,39 @@ export default function fieldsToLabware(
             yDimension: fields.wellYDimension,
           }
 
+    // NOTE Ian 2019-07-29: Cannot use fields.labwareType, must be "96Standard", "384Standard", "trough", "irregular", or "trash".
+    // Also note that 'irregular' in `format` just means "not 96/384 standard, not trough, and not trash",
+    // it doesn't imply anything about having multiple grids or not.
+    let format = 'irregular'
+    let quirks = []
+
+    const heightOrDiameter =
+      fields.wellShape === 'circular'
+        ? fields.wellDiameter
+        : fields.wellYDimension
+    if (fields.gridRows === 1 && heightOrDiameter >= MULTI_CHANNEL_WIDTH_MM) {
+      quirks = [...quirks, 'centerMultichannelOnWells']
+
+      // Legacy API (v1) uses `lw_format == 'trough'` instead of centerMultichannelOnWells quirk.
+      format = 'trough'
+    }
+
     return createRegularLabware({
       metadata: {
         displayName: fields.displayName,
         displayCategory: fields.labwareType,
         displayVolumeUnits: 'µL',
-        //   tags?: Array<string>, // TODO LATER?
       },
       parameters: {
-        format: 'irregular', // TODO! Cannot use fields.labwareType, must be "96Standard", "384Standard", "trough", "irregular", or "trash"
+        format,
+        quirks,
+
         isTiprack: fields.labwareType === 'tiprack', // NOTE: 'tiprack' is not a possible labwareType now anyway
         //   tipLength?: number,
-        isMagneticModuleCompatible: false, // TODO: how to determine?
-        //   magneticModuleEngageHeight?: number, // TODO: how to determine?
-        //   quirks?: Array<string>, // TODO: how to determine?
+
+        // Currently, assume labware is not magnetic module compatible. We don't have the information here.
+        isMagneticModuleCompatible: false,
+        //   magneticModuleEngageHeight?: number,
       },
       dimensions: {
         xDimension: fields.footprintXDimension,
@@ -56,13 +81,12 @@ export default function fieldsToLabware(
         //   links: []
       },
       version: 1,
-      //   namespace: 'you can put a namespace here',
-      //   loadNamePostfix: [], // TODO: ???
       offset: {
         x: fields.gridOffsetX,
         y: fields.gridOffsetY,
         // NOTE: must give wells a z offset b/c `well.z = offset.z - wellDepth`.
-        // We don't account for lip in Labware Creator now, so labware's offset.z is the SAME as labwareZDimension.
+        // We include well lip as part of Z dimension in Labware Creator's fields,
+        // so labware's offset.z is the SAME as labwareZDimension.
         z: fields.labwareZDimension,
       },
       grid: {
@@ -74,7 +98,6 @@ export default function fieldsToLabware(
         row: fields.gridSpacingY,
       },
       well: wellProperties,
-      // group: {} // TODO: ???
     })
   } else {
     throw new Error('use of createIrregularLabware not yet implemented')
