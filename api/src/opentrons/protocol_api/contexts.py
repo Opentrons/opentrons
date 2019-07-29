@@ -1775,9 +1775,21 @@ class ThermocyclerContext(ModuleContext):
     def status(self):
         return self._module.status
 
+    def _prepare_for_lid_move(self):
+        loaded_instrument = next(value for key, value in list(
+            self._ctx.loaded_instruments.items()), None)
+        if loaded_instrument is not None:
+            loaded_instrument.move_to(self._ctx.fixed_trash.top())
+        else:
+            MODULE_LOG.warning(
+                "There are no loaded instruments, so the gantry"
+                " cannot assure a safe position to avoid colliding"
+                " with the lid of the Thermocycler Module.")
+
     @cmds.publish.both(command=cmds.thermocycler_open)
     def open(self):
         """ Opens the lid"""
+        self._prepare_for_lid_move()
         self._geometry.lid_status = self._module.open()
         self._ctx.deck.recalculate_high_z()
         return self._geometry.lid_status
@@ -1785,6 +1797,7 @@ class ThermocyclerContext(ModuleContext):
     @cmds.publish.both(command=cmds.thermocycler_close)
     def close(self):
         """ Closes the lid"""
+        self._prepare_for_lid_move()
         self._geometry.lid_status = self._module.close()
         self._ctx.deck.recalculate_high_z()
         return self._geometry.lid_status
