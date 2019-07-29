@@ -6,7 +6,7 @@ import glob from 'glob'
 
 const DECK_FIXTURE_PATTERN = path.join(
   __dirname,
-  '../../../shared-data/deck/fixtures/2/*.json'
+  '../../../../shared-data/deck/fixtures/1/*.json'
 )
 
 const allDecks = glob.sync(DECK_FIXTURE_PATTERN).map(require)

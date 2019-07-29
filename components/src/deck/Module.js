@@ -10,7 +10,7 @@ import RobotCoordsForeignDiv from './RobotCoordsForeignDiv'
 import styles from './Module.css'
 
 export type Props = {
-  /** name of module, eg 'magdeck' or 'tempdeck' */
+  /** name of module, eg 'magdeck', 'tempdeck', or 'thermocycler' */
   name: ModuleType,
   /** display mode: 'default', 'present', 'missing', or 'info' */
   mode: 'default' | 'present' | 'missing' | 'info',
