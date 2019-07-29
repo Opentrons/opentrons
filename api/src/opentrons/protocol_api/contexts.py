@@ -241,43 +241,25 @@ class ProtocolContext(CommandPublisher):
     def load_module(
             self, module_name: str,
             location: types.DeckLocation) -> ModuleTypes:
-        mod_map = {
-            'magdeck': {
-                'hc_name': 'magdeck',
-                'geo_name': 'magdeck'},
-            'magnetic module': {
-                'hc_name': 'magdeck',
-                'geo_name': 'magdeck'},
-            'tempdeck': {
-                'hc_name': 'tempdeck',
-                'geo_name': 'tempdeck'},
-            'temperature module': {
-                'hc_name': 'tempdeck',
-                'geo_name': 'tempdeck'},
-            'thermocycler': {
-                'hc_name': 'thermocycler',
-                'geo_name': 'thermocycler'},
-            'semithermocycler': {
-                'hc_name': 'thermocycler',
-                'geo_name': 'semithermocycler'}
-            }
+        mod_id = module_name.lower()
+        if mod_id == 'magnetic module':
+            mod_id = 'magdeck'
+        if mod_id == 'temperature module':
+            mod_id = 'tempdeck'
         try:
-            hc_mod_name = mod_map[module_name.lower()]['hc_name']
-            geo_mod_name = mod_map[module_name.lower()]['geo_name']
-
             geometry = load_module(
-                geo_mod_name, self._deck_layout.position_for(location))
+                mod_id, self._deck_layout.position_for(location))
         except KeyError:
-            self._log.error(f'Unsupported Module: {module_name}')
-            raise ValueError(f'Unsupported Module: {module_name}')
+            self._log.error(f'Unsupported Module: {mod_id}')
+            raise ValueError(f'Unsupported Module: {mod_id}')
         hc_mod_instance = None
         hw = self._hw_manager.hardware._api._backend
         mod_class = {
             'magdeck': MagneticModuleContext,
             'tempdeck': TemperatureModuleContext,
-            'thermocycler': ThermocyclerContext}[hc_mod_name]
+            'thermocycler': ThermocyclerContext}[mod_id]
         for mod in self._hw_manager.hardware.discover_modules():
-            if mod.name() == hc_mod_name:
+            if mod.name() == mod_id:
                 hc_mod_instance = mod
                 break
 
@@ -285,7 +267,7 @@ class ProtocolContext(CommandPublisher):
             mod_type = {
                 'magdeck': modules.magdeck.MagDeck,
                 'tempdeck': modules.tempdeck.TempDeck,
-                'thermocycler': modules.thermocycler.Thermocycler}[hc_mod_name]
+                'thermocycler': modules.thermocycler.Thermocycler}[mod_id]
             hc_mod_instance = mod_type(
                 port='', simulating=True, loop=self._loop)
         if hc_mod_instance:
@@ -295,7 +277,7 @@ class ProtocolContext(CommandPublisher):
                                 self._loop)
         else:
             raise RuntimeError(
-                f'Could not find specified module: {module_name}')
+                f'Could not find specified module: {mod_id}')
         self._deck_layout[location] = geometry
         return mod_ctx
 
