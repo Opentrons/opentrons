@@ -4,7 +4,7 @@ import compact from 'lodash/compact'
 import uniq from 'lodash/uniq'
 import { connect } from 'formik'
 import { AlertItem } from '@opentrons/components'
-import { getIsAutofilled } from '../formSelectors'
+import { getIsHidden } from '../formSelectors'
 import LinkOut from './LinkOut'
 import styles from './Section.css'
 import { IRREGULAR_LABWARE_ERROR, type LabwareFields } from '../fields'
@@ -20,20 +20,13 @@ type Props = {|
 const Section = connect((props: Props) => {
   const fieldList = props.fieldList || []
   if (props.fieldList != null && fieldList.length > 0) {
-    const numFieldsAutofilled = props.fieldList
-      .map(field => getIsAutofilled(field, props.formik.values))
+    const numFieldsHidden = props.fieldList
+      .map(field => getIsHidden(field, props.formik.values))
       .filter(Boolean).length
 
-    if (numFieldsAutofilled === fieldList.length) {
-      // all fields are autofilled
+    if (numFieldsHidden === fieldList.length) {
+      // all fields are hidden, don't render this Section
       return null
-    }
-    if (numFieldsAutofilled > 0 && numFieldsAutofilled !== fieldList.length) {
-      console.error(
-        `section "${
-          props.label
-        }" has fields where some but not all are autofilled - this shouldn't happen?!`
-      )
     }
   }
 

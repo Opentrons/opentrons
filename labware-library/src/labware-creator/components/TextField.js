@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { Field } from 'formik'
 import { InputField } from '@opentrons/components'
-import { getIsAutofilled } from '../formSelectors'
+import { getIsHidden } from '../formSelectors'
 import { LABELS, type LabwareFields } from '../fields'
 import fieldStyles from './fieldStyles.css'
 
@@ -35,8 +35,7 @@ const TextField = (props: Props) => {
   return (
     <Field name={props.name}>
       {({ field, form }) =>
-        // hide if field has been autofilled
-        getIsAutofilled(props.name, form.values) ? null : (
+        getIsHidden(props.name, form.values) ? null : (
           <div className={fieldStyles.field_wrapper}>
             <div className={fieldStyles.field_label}>{LABELS[name]}</div>
             <InputField

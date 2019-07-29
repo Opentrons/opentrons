@@ -90,8 +90,16 @@ const labwareFormSchema = Yup.object().shape({
 
   gridRows: requiredPositiveInteger(LABELS.gridRows),
   gridColumns: requiredPositiveInteger(LABELS.gridColumns),
-  gridSpacingX: requiredPositiveNumber(LABELS.gridSpacingX),
-  gridSpacingY: requiredPositiveNumber(LABELS.gridSpacingY),
+  gridSpacingX: Yup.mixed().when('gridColumns', {
+    is: 1,
+    then: Yup.mixed().default(0),
+    otherwise: requiredPositiveNumber(LABELS.gridSpacingX),
+  }),
+  gridSpacingY: Yup.mixed().when('gridRows', {
+    is: 1,
+    then: Yup.mixed().default(0),
+    otherwise: requiredPositiveNumber(LABELS.gridSpacingY),
+  }),
   gridOffsetX: requiredPositiveNumber(LABELS.gridOffsetX),
   gridOffsetY: requiredPositiveNumber(LABELS.gridOffsetY),
 

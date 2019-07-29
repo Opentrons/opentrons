@@ -265,6 +265,8 @@ export const aluminumBlockChildTypeOptions: Options = [
   },
 ]
 
+// For DRYness, these values aren't explicitly included in the autofill objects (eg tubeRackAutofills),
+// but should be included in the autofill spread
 export const getImplicitAutofillValues = (
   preAutofilledValues: LabwareFields
 ): $Shape<LabwareFields> => {
