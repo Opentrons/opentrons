@@ -5,6 +5,7 @@ import cx from 'classnames'
 import {
   getLabwareDisplayName,
   getModuleDisplayName,
+  type ModuleType,
 } from '@opentrons/shared-data'
 import { ListItem, HoverTooltip } from '@opentrons/components'
 import styles from './styles.css'
@@ -13,6 +14,7 @@ import type { Labware } from '../../robot'
 
 type LabwareListItemProps = {|
   ...$Exact<Labware>,
+  moduleName?: ModuleType,
   isDisabled: boolean,
   onClick: () => mixed,
 |}
