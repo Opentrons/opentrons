@@ -586,7 +586,7 @@ class TransferPlan:
                 while (sum([a[0] for a in asp_grouped]) +
                        self._strategy.disposal_volume +
                        self._strategy.air_gap * len(asp_grouped) +
-                       current_xfer[0]) < self._instr.max_volume:
+                       current_xfer[0]) <= self._instr.max_volume:
                     asp_grouped.append(current_xfer)
                     current_xfer = next(plan_iter)
             except StopIteration:
@@ -632,23 +632,30 @@ class TransferPlan:
         if self._strategy.air_gap:
             yield self._format_dict('dispense', [self._strategy.air_gap])
 
-    def _after_dispense(self, loc, is_disp_next=False):
+    def _after_dispense(self, loc, is_disp_next=False):  # noqa(C901)
         # This sequence of actions is subject to change
         if not is_disp_next:
+            # If the next command is an aspirate, we are switching
+            # between aspirate and dispense.
             if self._instr.current_volume == 0:
+                # If we're empty, then this is when after mixes come into play
                 if self._strategy.mix_strategy == MixStrategy.AFTER or \
                         self._strategy.mix_strategy == MixStrategy.BOTH:
                     yield self._format_dict('mix', kwargs=self._mix_after_opts)
                 if self._strategy.blow_out_strategy \
                    == BlowOutStrategy.DEST_IF_EMPTY:
                     yield self._format_dict('blow_out', [loc])
+            # If we're not empty but we're about to aspirate, we need a
+            # blowout.
             if self._strategy.blow_out_strategy == BlowOutStrategy.TRASH:
                 yield self._format_dict('blow_out', [
                     self._instr.trash_container.wells()[0]])
             elif self._strategy.blow_out_strategy == \
                     BlowOutStrategy.CUSTOM_LOCATION:
                 yield self._format_dict('blow_out', kwargs=self._blow_opts)
-
+            elif self._strategy.disposal_volume:
+                yield self._format_dict('blow_out', [
+                    self._instr.trash_container.wells()[0]])
         else:
             # Used by distribute
             if self._strategy.air_gap:

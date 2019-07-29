@@ -1132,13 +1132,19 @@ class InstrumentContext(CommandPublisher):
                        well.
         :param source: A single well from where liquid will be aspirated.
         :param dest: List of Wells where liquid will be dispensed to.
-        :param kwargs: See :py:meth:`transfer`.
+        :param kwargs: See :py:meth:`transfer`. Some arguments are changed.
+                       Specifically,
+                       - ``mix_after``, if specified, is ignored.
+                       - ``disposal_volume``, if not specified, is set to the
+                         minimum volume of the pipette
         :returns: This instance
         """
         self._log.debug("Distributing {} from {} to {}"
                         .format(volume, source, dest))
         kwargs['mode'] = 'distribute'
-        kwargs['disposal_volume'] = kwargs.get('disposal_vol', self.min_volume)
+        kwargs['disposal_volume'] = kwargs.get(
+            'disposal_volume', self.min_volume)
+        kwargs['mix_after'] = (0, 0)
         return self.transfer(volume, source, dest, **kwargs)
 
     @cmds.publish.both(command=cmds.consolidate)
@@ -1154,12 +1160,17 @@ class InstrumentContext(CommandPublisher):
                        well.
         :param source: List of wells from where liquid will be aspirated.
         :param dest: The single well into which liquid will be dispensed.
-        :param kwargs: See :py:meth:`transfer`.
+        :param kwargs: See :py:meth:`transfer`. Some arguments are changed.
+                       Specifically,
+                       - ``mix_before``, if specified, is ignored.
+                       - ``disposal_volume`` is ignored and set to 0.
         :returns: This instance
         """
         self._log.debug("Consolidate {} from {} to {}"
                         .format(volume, source, dest))
         kwargs['mode'] = 'consolidate'
+        kwargs['mix_before'] = (0, 0)
+        kwargs['disposal_volume'] = 0
         return self.transfer(volume, source, dest, **kwargs)
 
     @cmds.publish.both(command=cmds.transfer)
@@ -1231,7 +1242,7 @@ class InstrumentContext(CommandPublisher):
               :py:meth:`mix` after each :py:meth:`dispense` during the
               transfer. The tuple is interpreted as (repetitions, volume).
 
-            * *disposal_vol* (``float``) --
+            * *disposal_volume* (``float``) --
               (:py:meth:`distribute` only) Volume of liquid to be disposed off
               after distributing. When dispensing multiple times from the same
               tip, it is recommended to aspirate an extra amount of liquid to
@@ -1254,30 +1265,8 @@ class InstrumentContext(CommandPublisher):
             volume, source, dest))
 
         kwargs['mode'] = kwargs.get('mode', 'transfer')
-        mix_opts = transfers.Mix()
-        if 'mix_before' in kwargs and 'mix_after' in kwargs:
-            mix_strategy = transfers.MixStrategy.BOTH
-            before_opts = kwargs['mix_before']
-            after_opts = kwargs['mix_after']
-            mix_opts = mix_opts._replace(
-                mix_after=mix_opts.mix_after._replace(
-                    repetitions=after_opts[0], volume=after_opts[1]),
-                mix_before=mix_opts.mix_before._replace(
-                    repetitions=before_opts[0], volume=before_opts[1]))
-        elif 'mix_before' in kwargs:
-            mix_strategy = transfers.MixStrategy.BEFORE
-            before_opts = kwargs['mix_before']
-            mix_opts = mix_opts._replace(
-                mix_before=mix_opts.mix_before._replace(
-                    repetitions=before_opts[0], volume=before_opts[1]))
-        elif 'mix_after' in kwargs:
-            mix_strategy = transfers.MixStrategy.AFTER
-            after_opts = kwargs['mix_after']
-            mix_opts = mix_opts._replace(
-                mix_after=mix_opts.mix_after._replace(
-                    repetitions=after_opts[0], volume=after_opts[1]))
-        else:
-            mix_strategy = transfers.MixStrategy.NEVER
+
+        mix_strategy, mix_opts = self._mix_from_kwargs(kwargs)
 
         if trash:
             drop_tip = transfers.DropTipStrategy.TRASH
@@ -1295,15 +1284,20 @@ class InstrumentContext(CommandPublisher):
         touch_tip = None
         if kwargs.get('touch_tip'):
             touch_tip = transfers.TouchTipStrategy.ALWAYS
+
         default_args = transfers.Transfer()
+
+        disposal = kwargs.get('disposal_volume')
+        if disposal is None:
+            disposal = default_args.disposal_volume
+
         transfer_args = transfers.Transfer(
             new_tip=new_tip or default_args.new_tip,
             air_gap=kwargs.get('air_gap') or default_args.air_gap,
             carryover=kwargs.get('carryover') or default_args.carryover,
             gradient_function=(kwargs.get('gradient_function') or
                                default_args.gradient_function),
-            disposal_volume=(kwargs.get('disposal_volume') or
-                             default_args.disposal_volume),
+            disposal_volume=disposal,
             mix_strategy=mix_strategy,
             drop_tip_strategy=drop_tip,
             blow_out_strategy=blow_out or default_args.blow_out_strategy,
@@ -1312,6 +1306,8 @@ class InstrumentContext(CommandPublisher):
         )
         transfer_options = transfers.TransferOptions(transfer=transfer_args,
                                                      mix=mix_opts)
+
+        self._log.info(f"Transfer options: {transfer_options}")
         plan = transfers.TransferPlan(volume, source, dest, self,
                                       kwargs['mode'], transfer_options)
         self._execute_transfer(plan)
@@ -1320,6 +1316,55 @@ class InstrumentContext(CommandPublisher):
     def _execute_transfer(self, plan: transfers.TransferPlan):
         for cmd in plan:
             getattr(self, cmd['method'])(*cmd['args'], **cmd['kwargs'])
+
+    @staticmethod
+    def _mix_from_kwargs(
+            top_kwargs: Dict[str, Any])\
+            -> Tuple[transfers.MixStrategy, transfers.Mix]:
+
+        def _mix_requested(kwargs, opt):
+            """
+            Helper for determining mix options from :py:meth:`transfer` kwargs
+            Mixes can be ignored in kwargs by either
+            - Not specifying the kwarg
+            - Specifying it as None
+            - Specifying it as (0, 0)
+
+            This handles all these cases.
+            """
+            val = kwargs.get(opt)
+            if None is val:
+                return False
+            if val == (0, 0):
+                return False
+            return True
+
+        mix_opts = transfers.Mix()
+        if _mix_requested(top_kwargs, 'mix_before')\
+           and _mix_requested(top_kwargs, 'mix_after'):
+            mix_strategy = transfers.MixStrategy.BOTH
+            before_opts = top_kwargs['mix_before']
+            after_opts = top_kwargs['mix_after']
+            mix_opts = mix_opts._replace(
+                mix_after=mix_opts.mix_after._replace(
+                    repetitions=after_opts[0], volume=after_opts[1]),
+                mix_before=mix_opts.mix_before._replace(
+                    repetitions=before_opts[0], volume=before_opts[1]))
+        elif _mix_requested(top_kwargs, 'mix_before'):
+            mix_strategy = transfers.MixStrategy.BEFORE
+            before_opts = top_kwargs['mix_before']
+            mix_opts = mix_opts._replace(
+                mix_before=mix_opts.mix_before._replace(
+                    repetitions=before_opts[0], volume=before_opts[1]))
+        elif _mix_requested(top_kwargs, 'mix_after'):
+            mix_strategy = transfers.MixStrategy.AFTER
+            after_opts = top_kwargs['mix_after']
+            mix_opts = mix_opts._replace(
+                mix_after=mix_opts.mix_after._replace(
+                    repetitions=after_opts[0], volume=after_opts[1]))
+        else:
+            mix_strategy = transfers.MixStrategy.NEVER
+        return mix_strategy, mix_opts
 
     def delay(self):
         return self._ctx.delay()

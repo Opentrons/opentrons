@@ -481,7 +481,8 @@ def test_transfer_options(loop, monkeypatch):
 
     monkeypatch.setattr(instr, '_execute_transfer', fake_execute_transfer)
     instr.transfer(10, lw1.columns()[0], lw2.columns()[0],
-                   new_tip='always', mix_before=(2, 10), blow_out=True)
+                   new_tip='always', mix_before=(2, 10),
+                   mix_after=(3, 20), blow_out=True)
     expected_xfer_options1 = tf.TransferOptions(
         transfer=tf.Transfer(
             new_tip=TransferTipPolicy.ALWAYS,
@@ -489,17 +490,19 @@ def test_transfer_options(loop, monkeypatch):
             carryover=True,
             gradient_function=None,
             disposal_volume=0,
-            mix_strategy=tf.MixStrategy.BEFORE,
+            mix_strategy=tf.MixStrategy.BOTH,
             drop_tip_strategy=tf.DropTipStrategy.TRASH,
             blow_out_strategy=tf.BlowOutStrategy.TRASH,
             touch_tip_strategy=tf.TouchTipStrategy.NEVER
         ),
         pick_up_tip=tf.PickUpTipOpts(),
-        mix=tf.Mix(mix_before=tf.MixOpts(
-            repetitions=2,
-            volume=10,
-            rate=None),
-            mix_after=tf.MixOpts()
+        mix=tf.Mix(
+            mix_before=tf.MixOpts(repetitions=2,
+                                  volume=10,
+                                  rate=None),
+            mix_after=tf.MixOpts(repetitions=3,
+                                 volume=20,
+                                 rate=None)
         ),
         blow_out=tf.BlowOutOpts(),
         touch_tip=tf.TouchTipOpts(),
@@ -511,7 +514,9 @@ def test_transfer_options(loop, monkeypatch):
     instr.pick_up_tip()
     instr.distribute(50, lw1.rows()[0][0], lw2.columns()[0],
                      new_tip='never', touch_tip=True, trash=False,
-                     disposal_vol=10, mix_after=(3, 20))
+                     disposal_volume=10,
+                     mix_before=(2, 30),
+                     mix_after=(3, 20))
     instr.drop_tip()
     expected_xfer_options2 = tf.TransferOptions(
         transfer=tf.Transfer(
@@ -520,17 +525,16 @@ def test_transfer_options(loop, monkeypatch):
             carryover=True,
             gradient_function=None,
             disposal_volume=10,
-            mix_strategy=tf.MixStrategy.AFTER,
+            mix_strategy=tf.MixStrategy.BEFORE,
             drop_tip_strategy=tf.DropTipStrategy.RETURN,
             blow_out_strategy=tf.BlowOutStrategy.NONE,
             touch_tip_strategy=tf.TouchTipStrategy.ALWAYS
         ),
         pick_up_tip=tf.PickUpTipOpts(),
-        mix=tf.Mix(mix_before=tf.MixOpts(),
-                   mix_after=tf.MixOpts(repetitions=3,
-                                        volume=20,
-                                        rate=None)
-                   ),
+        mix=tf.Mix(mix_before=tf.MixOpts(repetitions=2,
+                                         volume=30,
+                                         rate=None),
+                   mix_after=tf.MixOpts()),
         blow_out=tf.BlowOutOpts(),
         touch_tip=tf.TouchTipOpts(),
         aspirate=tf.AspirateOpts(),
