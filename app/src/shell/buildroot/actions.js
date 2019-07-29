@@ -75,6 +75,6 @@ export function clearBuildrootSession(): BuildrootAction {
 }
 
 // TODO(mc, 2019-07-21): flesh this action out
-export function unexpectedBuildrootError(): BuildrootAction {
-  return { type: BR_UNEXPECTED_ERROR }
+export function unexpectedBuildrootError(message: string): BuildrootAction {
+  return { type: BR_UNEXPECTED_ERROR, payload: { message } }
 }

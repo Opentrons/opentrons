@@ -1,5 +1,5 @@
 import * as selectors from '../selectors'
-import { getLiveRobots } from '../../../discovery/selectors'
+import { getViewableRobots } from '../../../discovery/selectors'
 
 jest.mock('../../../discovery/selectors')
 
@@ -138,7 +138,7 @@ describe('app/shell/buildroot selectors', () => {
       },
       expected: { name: 'robot-name', host: '10.10.0.0', port: 31950 },
       setup: () =>
-        getLiveRobots.mockReturnValueOnce([
+        getViewableRobots.mockReturnValueOnce([
           { name: 'other-robot-name', host: '10.10.0.1', port: 31950 },
           { name: 'robot-name', host: '10.10.0.0', port: 31950 },
           { name: 'another-robot-name', host: '10.10.0.2', port: 31950 },
@@ -161,7 +161,7 @@ describe('app/shell/buildroot selectors', () => {
         serverHealth: { capabilities: { buildrootUpdate: '/' } },
       },
       setup: () =>
-        getLiveRobots.mockReturnValueOnce([
+        getViewableRobots.mockReturnValueOnce([
           { name: 'other-robot-name', host: '10.10.0.1', port: 31950 },
           {
             name: 'robot-name',

@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { getConfig, removeManualIp } from '../../../config'
-import { getLiveRobots } from '../../../discovery'
+import { getViewableRobots } from '../../../discovery'
 
 import type { State, Dispatch } from '../../../types'
 import type { DiscoveryCandidates } from '../../../config'
@@ -47,7 +47,7 @@ function IpList(props: Props) {
 
 function mapStateToProps(state: State): SP {
   return {
-    robots: getLiveRobots(state),
+    robots: getViewableRobots(state),
     candidates: getConfig(state).discovery.candidates,
   }
 }

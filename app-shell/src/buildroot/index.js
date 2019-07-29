@@ -71,7 +71,10 @@ export function registerBuildrootUpdate(dispatch: Dispatch) {
           const file = updateSet?.system
 
           if (file == null) {
-            return dispatch({ type: 'buildroot:UNEXPECTED_ERROR' })
+            return dispatch({
+              type: 'buildroot:UNEXPECTED_ERROR',
+              payload: { message: 'Buildroot update file not downloaded' },
+            })
           }
 
           uploadFile(host, path, file)
@@ -79,9 +82,15 @@ export function registerBuildrootUpdate(dispatch: Dispatch) {
               type: 'buildroot:FILE_UPLOAD_DONE',
               payload: host.name,
             }))
-            .catch(error => {
+            .catch((error: Error) => {
               log.warn('Error uploading update to robot', { path, file, error })
-              return { type: 'buildroot:UNEXPECTED_ERROR' }
+
+              return {
+                type: 'buildroot:UNEXPECTED_ERROR',
+                payload: {
+                  message: `Error uploading update to robot: ${error.message}`,
+                },
+              }
             })
             .then(dispatch)
         }

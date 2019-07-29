@@ -1,141 +1,71 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
+import { useSelector } from 'react-redux'
 
-import { getRobotBuildrootStatus } from '../../../discovery'
 import {
   getBuildrootUpdateInfo,
   getBuildrootDownloadProgress,
   getBuildrootDownloadError,
-  setBuildrootUpdateSeen,
 } from '../../../shell'
-import { makeGetRobotUpdateInfo } from '../../../http-api-client'
 
-import SystemUpdateModal from './SystemUpdateModal'
+import SystemMigrationModal from './SystemMigrationModal'
 import DownloadUpdateModal from './DownloadUpdateModal'
 import ReleaseNotesModal from './ReleaseNotesModal'
 
-import type { State, Dispatch } from '../../../types'
-import type { ViewableRobot, BuildrootStatus } from '../../../discovery'
-import type { BuildrootUpdateInfo } from '../../../shell'
-import type { RobotUpdateInfo } from '../../../http-api-client'
+import type { BuildrootUpdateType, RobotSystemType } from '../../../shell'
 
-type OP = {|
-  robot: ViewableRobot,
-  parentUrl: string,
-  setCurrentStep: (step: string) => mixed,
+type Props = {|
+  robotUpdateType: BuildrootUpdateType,
+  robotSystemType: RobotSystemType | null,
+  close: () => mixed,
+  proceed: () => mixed,
 |}
 
-type SP = {|
-  buildrootStatus: BuildrootStatus | null,
-  buildrootUpdateInfo: BuildrootUpdateInfo | null,
-  buildrootDownloadProgress: number | null,
-  buildrootDownloadError: string | null,
-  robotUpdateInfo: RobotUpdateInfo,
-|}
+export default function ViewUpdateModal(props: Props) {
+  const { robotUpdateType, robotSystemType, close, proceed } = props
+  const updateInfo = useSelector(getBuildrootUpdateInfo)
+  const downloadProgress = useSelector(getBuildrootDownloadProgress)
+  const downloadError = useSelector(getBuildrootDownloadError)
 
-type DP = {| dispatch: Dispatch |}
-
-type Props = { ...OP, ...SP, ignoreUpdate: () => mixed }
-
-function ViewUpdateModal(props: Props) {
   const [
-    migrationWarningSeen,
-    setMigrationWarningSeen,
-  ] = React.useState<boolean>(false)
+    showMigrationWarning,
+    setShowMigrationWarning,
+  ] = React.useState<boolean>(robotSystemType === 'balena')
 
-  const {
-    buildrootStatus,
-    ignoreUpdate,
-    robotUpdateInfo,
-    buildrootUpdateInfo,
-    buildrootDownloadError,
-    buildrootDownloadProgress,
-    setCurrentStep,
-  } = props
-  const notNowButton = {
-    onClick: ignoreUpdate,
-    children: 'not now',
-  }
+  const notNowButton = { onClick: close, children: 'not now' }
 
-  React.useEffect(() => {
-    if (robotUpdateInfo.type !== 'upgrade' && buildrootUpdateInfo) {
-      if (
-        (buildrootStatus === 'balena' && migrationWarningSeen) ||
-        buildrootStatus !== 'balena'
-      ) {
-        setCurrentStep('installUpdate')
-      }
+  React.useLayoutEffect(() => {
+    if (updateInfo && robotUpdateType !== 'upgrade' && !showMigrationWarning) {
+      proceed()
     }
-  }, [
-    buildrootStatus,
-    buildrootUpdateInfo,
-    migrationWarningSeen,
-    robotUpdateInfo.type,
-    setCurrentStep,
-  ])
+  }, [updateInfo, robotUpdateType, showMigrationWarning, proceed])
 
-  if (buildrootStatus === 'balena' && !migrationWarningSeen) {
+  if (showMigrationWarning) {
     return (
-      <SystemUpdateModal
+      <SystemMigrationModal
         notNowButton={notNowButton}
-        viewReleaseNotes={() => setMigrationWarningSeen(true)}
+        updateType={robotUpdateType}
+        proceed={() => setShowMigrationWarning(false)}
       />
     )
-  } else if (!buildrootUpdateInfo) {
+  }
+
+  if (updateInfo === null) {
     return (
       <DownloadUpdateModal
         notNowButton={notNowButton}
-        error={buildrootDownloadError}
-        progress={buildrootDownloadProgress}
-      />
-    )
-  } else {
-    return (
-      <ReleaseNotesModal
-        notNowButton={notNowButton}
-        releaseNotes={buildrootUpdateInfo?.releaseNotes}
-        buildrootStatus={buildrootStatus}
+        error={downloadError}
+        progress={downloadProgress}
       />
     )
   }
+
+  return (
+    <ReleaseNotesModal
+      notNowButton={notNowButton}
+      releaseNotes={updateInfo.releaseNotes}
+      systemType={robotSystemType}
+      proceed={proceed}
+    />
+  )
 }
-
-function mapStateToProps(): (state: State, ownProps: OP) => SP {
-  const getRobotUpdateInfo = makeGetRobotUpdateInfo()
-  return (state, ownProps) => ({
-    buildrootStatus: getRobotBuildrootStatus(ownProps.robot),
-    buildrootUpdateInfo: getBuildrootUpdateInfo(state),
-    buildrootDownloadProgress: getBuildrootDownloadProgress(state),
-    buildrootDownloadError: getBuildrootDownloadError(state),
-    robotUpdateInfo: getRobotUpdateInfo(state, ownProps.robot),
-  })
-}
-
-// TODO (ka 2019-7-10): This is identical to UpdateRobotModal,
-// consider moving this up to index
-function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
-  const { parentUrl } = ownProps
-  const { robotUpdateInfo } = stateProps
-  const { dispatch } = dispatchProps
-  const close = () => dispatch(push(parentUrl))
-  let ignoreUpdate = robotUpdateInfo.type
-    ? () => {
-        dispatch(setBuildrootUpdateSeen())
-        close()
-      }
-    : close
-
-  return {
-    ...ownProps,
-    ...stateProps,
-    ignoreUpdate,
-  }
-}
-
-export default connect<Props, OP, SP, {||}, State, Dispatch>(
-  mapStateToProps,
-  null,
-  mergeProps
-)(ViewUpdateModal)

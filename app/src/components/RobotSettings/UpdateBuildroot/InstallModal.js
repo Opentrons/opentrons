@@ -1,29 +1,44 @@
 // @flow
 import * as React from 'react'
-import { Link } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
 
 import { AlertModal } from '@opentrons/components'
+import { clearBuildrootSession } from '../../../shell'
 
-type Props = {
-  parentUrl: string,
-  ignoreUpdate: () => mixed,
-}
+import type { Dispatch } from '../../../types'
+import type { ViewableRobot } from '../../../discovery'
+import type { BuildrootUpdateSession, RobotSystemType } from '../../../shell'
+
+type Props = {|
+  robot: ViewableRobot,
+  robotSystemType: RobotSystemType | null,
+  session: BuildrootUpdateSession,
+  close: () => mixed,
+|}
 
 export default function InstallModal(props: Props) {
+  const { session, close } = props
+  const dispatch = useDispatch<Dispatch>()
+  const buttons = []
+
+  if (session.step === 'finished' || session.error) {
+    buttons.push({
+      children: 'close',
+      onClick: () => {
+        close()
+        dispatch(clearBuildrootSession())
+      },
+    })
+  }
+
   return (
     <AlertModal
-      heading="Feature not Implemented"
-      buttons={[
-        {
-          Component: Link,
-          to: props.parentUrl,
-          children: 'not now',
-          onClick: props.ignoreUpdate,
-        },
-      ]}
+      heading="Modal not implemented"
+      buttons={buttons}
+      restrictOuterScroll={false}
       alertOverlay
     >
-      <p>TODO: Check Migration vs Update</p>
+      <p>{JSON.stringify(session, null, 2)}</p>
     </AlertModal>
   )
 }

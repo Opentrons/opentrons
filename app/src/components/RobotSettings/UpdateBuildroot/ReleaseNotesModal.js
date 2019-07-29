@@ -4,28 +4,35 @@ import { ScrollableAlertModal } from '../../modals'
 import ReleaseNotes from '../../ReleaseNotes'
 import styles from './styles.css'
 import type { ButtonProps } from '@opentrons/components'
-import type { BuildrootStatus } from '../../../discovery'
+import type { RobotSystemType } from '../../../shell'
 
 type Props = {
   notNowButton: ButtonProps,
-  releaseNotes: ?string,
-  buildrootStatus: BuildrootStatus | null,
+  releaseNotes: string,
+  systemType: RobotSystemType | null,
+  proceed: () => mixed,
 }
 
 export default function ReleaseNotesModal(props: Props) {
-  const { notNowButton, releaseNotes, buildrootStatus } = props
+  const { notNowButton, releaseNotes, systemType, proceed } = props
   const heading =
-    buildrootStatus === 'buildroot' ? 'Robot Update' : 'Robot System Update'
+    systemType === 'buildroot' ? 'Robot Update' : 'Robot System Update'
   const buttons = [
     notNowButton,
     {
+      onClick: proceed,
       children: 'update robot',
       className: styles.view_update_button,
-      disabled: true,
     },
   ]
+
   return (
-    <ScrollableAlertModal heading={heading} buttons={buttons} alertOverlay>
+    <ScrollableAlertModal
+      heading={heading}
+      buttons={buttons}
+      restrictOuterScroll={false}
+      alertOverlay
+    >
       <ReleaseNotes source={releaseNotes} />
     </ScrollableAlertModal>
   )

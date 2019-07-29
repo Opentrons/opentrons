@@ -2,12 +2,20 @@
 import semver from 'semver'
 import { createSelector } from 'reselect'
 
-import { getLiveRobots } from '../../discovery/selectors'
+import {
+  getViewableRobots,
+  getRobotApiVersion,
+} from '../../discovery/selectors'
+import remote from '../remote'
 
-import type { OutputSelector } from 'reselect'
 import type { State } from '../../types'
 import type { ViewableRobot } from '../../discovery'
-import type { BuildrootUpdateInfo, BuildrootUpdateSession } from './types'
+import type {
+  BuildrootUpdateInfo,
+  BuildrootUpdateSession,
+  BuildrootUpdateType,
+  RobotSystemType,
+} from './types'
 
 export function getBuildrootUpdateInfo(
   state: State
@@ -37,12 +45,8 @@ export function getBuildrootRobotName(state: State): string | null {
   return state.shell.buildroot.session?.robotName || null
 }
 
-export const getBuildrootRobot: OutputSelector<
-  State,
-  void,
-  ViewableRobot | null
-> = createSelector(
-  getLiveRobots,
+export const getBuildrootRobot: State => ViewableRobot | null = createSelector(
+  getViewableRobots,
   getBuildrootRobotName,
   (robots, robotName) => {
     if (robotName === null) return null
@@ -81,4 +85,46 @@ export function getBuildrootUpdateAvailable(
   return updateVersion != null
     ? compareCurrentVersionToUpdate(currentVersion, updateVersion)
     : false
+}
+
+export function compareRobotVersionToUpdate(
+  robot: ViewableRobot
+): BuildrootUpdateType {
+  const currentVersion = getRobotApiVersion(robot)
+  // TODO(mc, 2019-07-23): get this from state once BR state info can come in piecemeal
+  const updateVersion: string = remote.update.CURRENT_VERSION
+
+  const validCurrent: string | null = semver.valid(currentVersion)
+  const validUpdate: string | null = semver.valid(updateVersion)
+  let type = 'upgrade'
+
+  if (validCurrent && validUpdate) {
+    if (semver.gt(validUpdate, validCurrent)) {
+      type = 'upgrade'
+    } else if (semver.lt(validUpdate, validCurrent)) {
+      type = 'downgrade'
+    } else if (semver.eq(validUpdate, validCurrent)) {
+      type = 'reinstall'
+    }
+  }
+
+  return type
+}
+
+export function getRobotSystemType(
+  robot: ViewableRobot
+): RobotSystemType | null {
+  const { serverHealth } = robot
+
+  if (serverHealth) {
+    const { capabilities } = serverHealth
+
+    if (!capabilities || capabilities.balenaUpdate) {
+      return 'balena'
+    }
+
+    return 'buildroot'
+  }
+
+  return null
 }

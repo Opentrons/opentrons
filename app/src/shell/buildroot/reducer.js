@@ -24,7 +24,7 @@ export const initialSession = (robotName: string) => ({
   pathPrefix: null,
   stage: null,
   progress: null,
-  error: false,
+  error: null,
 })
 
 export function buildrootReducer(
@@ -72,7 +72,10 @@ export function buildrootReducer(
       return { ...state, session: null }
 
     case actions.BR_UNEXPECTED_ERROR:
-      return { ...state, session: { ...state.session, error: true } }
+      return {
+        ...state,
+        session: { ...state.session, error: action.payload.message },
+      }
   }
 
   // HTTP API responses are not strongly typed, so check them separately
@@ -137,7 +140,11 @@ export function buildrootReducer(
       apiError.meta.buildrootCommit === true ||
       apiError.meta.buildrootRestart === true
     ) {
-      return { ...state, session: { ...state.session, error: true } }
+      const { method, path, status, body } = apiError.payload
+      const error: string =
+        body?.message || `${method} ${path} failed with status ${status}`
+
+      return { ...state, session: { ...state.session, error } }
     }
   }
 

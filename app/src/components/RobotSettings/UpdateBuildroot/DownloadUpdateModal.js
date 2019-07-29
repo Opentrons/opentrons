@@ -13,42 +13,41 @@ type Props = {|
 |}
 
 const HEADING = 'Robot System Update'
-export default function DownloadUpdate(props: Props) {
+
+export default function DownloadUpdateModal(props: Props) {
   const { notNowButton, error, progress } = props
 
-  let message
-
-  const progressMessage = (
-    <div className={styles.system_update_modal}>
-      <p className={styles.download_message}>
-        Robot update download in progress...
-      </p>
-      <ProgressBar progress={progress} />
-      <p>
-        Please keep app connected to the internet until the download is
-        complete.
-      </p>
-    </div>
-  )
-
-  if (progress) {
-    message = progressMessage
-  } else if (error) {
-    message = (
-      <div className={styles.system_update_modal}>
-        <p className={styles.download_message}>
-          There was an error downloading robot update files:
-        </p>
-        <p className={styles.download_error}>{error}</p>
-        <p>To download this update you must be connected to the internet.</p>
-      </div>
-    )
-  } else {
-    message = progressMessage
-  }
   return (
-    <AlertModal heading={HEADING} buttons={[notNowButton]} alertOverlay>
-      {message}
+    <AlertModal
+      heading={HEADING}
+      buttons={[notNowButton]}
+      restrictOuterScroll={false}
+      alertOverlay
+    >
+      <div className={styles.system_update_modal}>
+        {error !== null ? (
+          <>
+            <p className={styles.download_message}>
+              There was an error downloading robot update files:
+            </p>
+            <p className={styles.download_error}>{error}</p>
+            <p>
+              To download this update you must be connected to the internet.
+            </p>
+          </>
+        ) : (
+          <>
+            <p className={styles.download_message}>
+              Robot update download in progress...
+            </p>
+            <ProgressBar progress={progress} />
+            <p>
+              Please keep app connected to the internet until the download is
+              complete.
+            </p>
+          </>
+        )}
+      </div>
     </AlertModal>
   )
 }
@@ -58,8 +57,9 @@ type ProgressBarProps = {
 }
 
 function ProgressBar(props: ProgressBarProps) {
-  const { progress } = props
-  const width = progress && `${progress}%`
+  const progress = props.progress || 0
+  const width = `${progress}%`
+
   return (
     <div className={styles.progress_bar_container}>
       <span className={styles.progress_text}>{progress}%</span>

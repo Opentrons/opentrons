@@ -42,7 +42,6 @@ export type ShellAction =
 
 const {
   ipcRenderer,
-  update: { CURRENT_VERSION, CURRENT_RELEASE_NOTES },
   config: { getConfig },
   discovery: { getRobots },
 } = remote
@@ -53,10 +52,13 @@ export * from './update'
 export * from './api-update'
 export * from './buildroot'
 
+const CURRENT_VERSION: string = remote.update.CURRENT_VERSION
+const CURRENT_RELEASE_NOTES: string = remote.update.CURRENT_RELEASE_NOTES
 const API_RELEASE_NOTES = CURRENT_RELEASE_NOTES.replace(
   /<!-- start:@opentrons\/app -->([\S\s]*?)<!-- end:@opentrons\/app -->/,
   ''
 )
+
 export { CURRENT_VERSION, CURRENT_RELEASE_NOTES, API_RELEASE_NOTES }
 
 export const shellReducer: Reducer<ShellState, Action> = combineReducers<
