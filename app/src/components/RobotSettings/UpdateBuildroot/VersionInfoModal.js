@@ -62,6 +62,11 @@ export default function VersionInfoModal(props: Props) {
         version={versionProps.availableUpdate}
       />
     )
+    primaryButton = {
+      onClick: proceed,
+      children:
+        robotUpdateType === 'upgrade' ? 'View Robot Update' : 'Downgrade Robot',
+    }
   } else {
     heading = REINSTALL_HEADING
     message = <p className={styles.reinstall_message}>{REINSTALL_MESSAGE}</p>
