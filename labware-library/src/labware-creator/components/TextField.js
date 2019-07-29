@@ -10,6 +10,7 @@ type InputFieldProps = React.ElementProps<typeof InputField>
 
 type Props = {|
   name: $Keys<LabwareFields>,
+  placeholder?: string,
   caption?: $PropertyType<InputFieldProps, 'caption'>,
   inputMasks?: Array<(prevValue: string, update: string) => string>,
   units?: $PropertyType<InputFieldProps, 'units'>,
@@ -19,7 +20,7 @@ type Props = {|
 // because sections are laid out to contain groups of autofilled fields.
 // This functionality in TextField may be removed if we clearly don't need it.
 const TextField = (props: Props) => {
-  const { caption, name, units } = props
+  const { caption, name, placeholder, units } = props
   const inputMasks = props.inputMasks || []
   const makeHandleChange = ({ field, form }) => (
     e: SyntheticEvent<HTMLInputElement>
@@ -41,6 +42,7 @@ const TextField = (props: Props) => {
             <InputField
               {...field}
               caption={caption}
+              placeholder={placeholder}
               onChange={makeHandleChange({ field, form })}
               units={units}
             />

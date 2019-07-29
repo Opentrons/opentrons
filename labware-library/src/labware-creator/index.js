@@ -21,6 +21,7 @@ import {
   MAX_SUGGESTED_Z,
 } from './fields'
 import labwareFormSchema from './labwareFormSchema'
+import { getDefaultDisplayName, getDefaultLoadName } from './formSelectors'
 import labwareTestProtocol, { pipetteNameOptions } from './labwareTestProtocol'
 import fieldsToLabware from './fieldsToLabware'
 import ConditionalLabwareRender from './components/ConditionalLabwareRender'
@@ -288,8 +289,9 @@ const App = () => {
           const castValues: ProcessedLabwareFields = labwareFormSchema.cast(
             values
           )
-          const { displayName, pipetteName } = castValues
+          const { pipetteName } = castValues
           const def = fieldsToLabware(castValues)
+          const { displayName } = def.metadata
 
           const zip = new JSZip()
           zip.file(`${displayName}.json`, JSON.stringify(def, null, 4))
@@ -594,10 +596,17 @@ const App = () => {
               <TextField name="brandId" caption="Separate multiple by comma" />
             </Section>
             {/* PAGE 4 */}
-            <Section label="File" fieldList={['loadName', 'displayName']}>
-              <TextField name="displayName" />
+            <Section
+              label="File"
+              fieldList={['loadName', 'displayName', 'pipetteName']}
+            >
+              <TextField
+                name="displayName"
+                placeholder={getDefaultDisplayName(values)}
+              />
               <TextField
                 name="loadName"
+                placeholder={getDefaultLoadName(values)}
                 caption="Only lower case letters, numbers, periods, and underscores may be used"
                 inputMasks={[maskLoadName]}
               />

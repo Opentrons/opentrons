@@ -158,16 +158,20 @@ const labwareFormSchema = Yup.object().shape({
           .filter(Boolean)
     ),
 
-  loadName: requiredString(LABELS.loadName)
-    .matches(
-      /^[a-z0-9._]+$/,
-      '${label} can only contain lowercase letters, numbers, dot (.) and underscore (_). Spaces are not allowed.' // eslint-disable-line no-template-curly-in-string
-    )
+  loadName: Yup.string()
+    .nullable()
+    .label(LABELS.loadName)
     .notOneOf(
       getAllLoadNames(),
       'This load name already exists in the Opentrons default labware library. Please edit the load name to make it unique.'
+    )
+    .matches(
+      /^[a-z0-9._]+$/,
+      '${label} can only contain lowercase letters, numbers, dot (.) and underscore (_). Spaces are not allowed.' // eslint-disable-line no-template-curly-in-string
     ),
-  displayName: requiredString(LABELS.displayName),
+  displayName: Yup.mixed()
+    .nullable()
+    .label(LABELS.displayName),
   pipetteName: requiredString(LABELS.pipetteName),
 })
 

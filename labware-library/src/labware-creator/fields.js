@@ -132,8 +132,8 @@ export type ProcessedLabwareFields = {|
   brand: string,
   brandId: Array<string>,
 
-  loadName: string,
-  displayName: string,
+  loadName: ?string,
+  displayName: ?string,
 
   // fields for test protocol
   pipetteName: string,

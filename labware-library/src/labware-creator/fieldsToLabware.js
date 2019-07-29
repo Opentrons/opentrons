@@ -1,5 +1,6 @@
 // @flow
 import {
+  createDefaultDisplayName,
   createRegularLabware,
   //   createIrregularLabware,
   type LabwareDefinition2,
@@ -16,11 +17,14 @@ export default function fieldsToLabware(
   // NOTE Ian 2019-07-27: only the 15-50-esque tube rack has multiple grids,
   // and it is not supported in labware creator. So all are regular.
   const isRegularLabware = true
+  const displayVolumeUnits = 'µL'
+  const displayCategory = fields.labwareType
 
   if (isRegularLabware) {
+    const totalLiquidVolume = fields.wellVolume
     const commonWellProperties = {
       depth: fields.wellDepth,
-      totalLiquidVolume: fields.wellVolume,
+      totalLiquidVolume,
     }
     const wellProperties =
       fields.wellShape === 'circular'
@@ -55,9 +59,18 @@ export default function fieldsToLabware(
 
     return createRegularLabware({
       metadata: {
-        displayName: fields.displayName,
-        displayCategory: fields.labwareType,
-        displayVolumeUnits: 'µL',
+        displayName:
+          fields.displayName ||
+          createDefaultDisplayName({
+            displayCategory,
+            displayVolumeUnits,
+            gridRows: fields.gridRows,
+            gridColumns: fields.gridColumns,
+            totalLiquidVolume,
+            brandName: fields.brand,
+          }),
+        displayCategory,
+        displayVolumeUnits,
       },
       parameters: {
         format,

@@ -1,5 +1,9 @@
 // @flow
 import {
+  createRegularLoadName,
+  createDefaultDisplayName,
+} from '@opentrons/shared-data'
+import {
   aluminumBlockAutofills,
   getImplicitAutofillValues,
   tubeRackAutofills,
@@ -53,3 +57,24 @@ export const getIsHidden = (
   name: $Keys<LabwareFields>,
   values: LabwareFields
 ) => _getIsAutofilled(name, values) || _getIsDefaulted(name, values)
+
+const _valuesToCreateNameArgs = (values: LabwareFields) => {
+  const gridRows = Number(values.gridRows) || 1
+  const gridColumns = Number(values.gridColumns) || 1
+  const brand = (values.brand || '').trim()
+
+  return {
+    gridColumns,
+    gridRows,
+    displayCategory: values.labwareType || '',
+    displayVolumeUnits: 'µL',
+    brandName: brand === '' ? undefined : brand,
+    totalLiquidVolume: Number(values.wellVolume) || 0,
+  }
+}
+
+export const getDefaultLoadName = (values: LabwareFields): string =>
+  createRegularLoadName(_valuesToCreateNameArgs(values))
+
+export const getDefaultDisplayName = (values: LabwareFields): string =>
+  createDefaultDisplayName(_valuesToCreateNameArgs(values))
