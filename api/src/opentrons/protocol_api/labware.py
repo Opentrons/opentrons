@@ -726,20 +726,25 @@ class ThermocyclerGeometry(ModuleGeometry):
         self._labware = labware
         return self._labware
 
-def _get_parent_identifier(parent: [Labware, Well, str, ModuleGeometry, None]):
+
+def _get_parent_identifier(
+        parent: Union[Labware, Well, str, ModuleGeometry, None]):
     if isinstance(parent, ModuleGeometry):
         # treat a given labware on a given module type as same
         return parent.load_name
     else:
-        return '' # treat all slots as same
+        return ''  # treat all slots as same
+
 
 def _hash_labware_def(labware_def: Dict[str, Any]) -> str:
     # remove keys that do not affect run
     blacklist = ['metadata', 'brand', 'groups']
-    def_no_metadata = {k: v for k, v in labware_def.items() if k not in blacklist}
+    def_no_metadata = {
+        k: v for k, v in labware_def.items() if k not in blacklist}
     sorted_def_str = json.dumps(
         def_no_metadata, sort_keys=True, separators=(',', ':'))
     return sha256(sorted_def_str.encode('utf-8')).hexdigest()
+
 
 def _get_labware_offset_path(labware: Labware):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
