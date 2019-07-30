@@ -1776,8 +1776,9 @@ class ThermocyclerContext(ModuleContext):
         return self._module.status
 
     def _prepare_for_lid_move(self):
-        loaded_instrument = next(value for key, value in list(
-            self._ctx.loaded_instruments.items()), None)
+        loaded_instrument = next((value for key, value in
+                                 self._ctx.loaded_instruments.items()),
+                                 None)
         if loaded_instrument is not None:
             loaded_instrument.move_to(self._ctx.fixed_trash.top())
         else:
