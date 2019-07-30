@@ -39,7 +39,6 @@ run({
               .join('/') || '.'
 
           const relativizeUrl = url => {
-            console.log(url)
             if (url.host) {
               return url.href
             } else {
