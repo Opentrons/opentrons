@@ -1,8 +1,8 @@
 'use strict'
 const { run } = require('react-snap')
 const path = require('path')
-const glob = require('glob')
-const fs = require('fs')
+const fs = require('fs-extra')
+const globby = require('globby')
 
 const outputPath = 'dist'
 const outputPathAbs = path.join(__dirname, outputPath)
@@ -12,20 +12,29 @@ run({
   include: ['/', '/create/'],
   skipThirdPartyRequests: true,
 })
-  .then(() => {
-    const pages = glob.sync(path.join(outputPathAbs, '**', '*.html'))
-    pages.forEach(pagePath => {
-      const page = fs.readFileSync(pagePath, 'utf8')
-      const relativePath =
-        path
-          .relative(path.dirname(pagePath), outputPathAbs)
-          // if on windows, \ -> / for url paths (untested)
-          .replace('\\', '/') || '.'
-      console.log({ pagePath, relativePath })
-      const newPage = page
-        .replace(/src="\/(?=[^/])/g, `src="${relativePath}/`)
-        .replace(/link href="\/(?=[^/])/g, `link href="${relativePath}/`)
-      fs.writeFileSync(pagePath, newPage)
-    })
-  })
+  .then(() => globby(path.join(outputPathAbs, '**/*.html')))
+  .then(pagePaths =>
+    Promise.all(
+      pagePaths.map(pagePath =>
+        fs.readFile(pagePath, 'utf8').then(page => {
+          // convert filesystem path to URL relative path
+          const relativePath =
+            path
+              .relative(path.dirname(pagePath), outputPathAbs)
+              // split & join in case you have a Windows path
+              .split(path.sep)
+              .map(encodeURIComponent)
+              .join('/') || '.'
+          console.log(
+            `PRERENDER: prefixing links in ${pagePath} with "${relativePath}/"`
+          )
+          const newPage = page
+            .replace(/src="\/(?=[^/])/g, `src="${relativePath}/`)
+            .replace(/link href="\/(?=[^/])/g, `link href="${relativePath}/`)
+
+          return fs.writeFile(pagePath, newPage)
+        })
+      )
+    )
+  )
   .catch(console.error)
