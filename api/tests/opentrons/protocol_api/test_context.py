@@ -243,18 +243,8 @@ def test_aspirate(loop, get_labware_def, monkeypatch):
     lw = ctx.load_labware_by_name('corning_96_wellplate_360ul_flat', 1)
     instr = ctx.load_instrument('p10_single', Mount.RIGHT)
 
-    asp_called_with = None
-
-    async def fake_hw_aspirate(mount, volume=None, rate=1.0):
-        nonlocal asp_called_with
-        asp_called_with = (mount, volume, rate)
-
-    move_called_with = None
-
-    def fake_move(mount, loc, **kwargs):
-        nonlocal move_called_with
-        move_called_with = (mount, loc, kwargs)
-
+    fake_hw_aspirate = mock.Mock()
+    fake_move = mock.Mock()
     monkeypatch.setattr(ctx._hw_manager.hardware._api,
                         'aspirate', fake_hw_aspirate)
     monkeypatch.setattr(ctx._hw_manager.hardware._api, 'move_to', fake_move)
@@ -262,22 +252,31 @@ def test_aspirate(loop, get_labware_def, monkeypatch):
     instr.aspirate(2.0, lw.wells()[0].bottom())
     assert 'aspirating' in ','.join([cmd.lower() for cmd in ctx.commands()])
 
-    assert asp_called_with == (Mount.RIGHT, 2.0, 1.0)
-    assert move_called_with == (Mount.RIGHT, lw.wells()[0].bottom().point,
-                                {'critical_point': None,
-                                 'speed': 400})
-
+    fake_hw_aspirate.assert_called_once_with(Mount.RIGHT, 2.0, 1.0)
+    assert fake_move.call_args_list[-2] ==\
+        mock.call(Mount.RIGHT, lw.wells()[0].top().point,
+                  critical_point=None, speed=400)
+    assert fake_move.call_args_list[-1] ==\
+        mock.call(Mount.RIGHT, lw.wells()[0].bottom().point,
+                  critical_point=None, speed=400)
+    fake_move.reset_mock()
+    fake_hw_aspirate.reset_mock()
     instr.well_bottom_clearance = 1.0
     instr.aspirate(2.0, lw.wells()[0])
     dest_point, dest_lw = lw.wells()[0].bottom()
     dest_point = dest_point._replace(z=dest_point.z + 1.0)
-    assert move_called_with == (Mount.RIGHT, dest_point,
-                                {'critical_point': None,
-                                 'speed': 400})
-
-    move_called_with = None
+    assert fake_move.call_args_list[-2] ==\
+        mock.call(Mount.RIGHT, lw.wells()[0].top().point,
+                  critical_point=None, speed=400)
+    assert fake_move.call_args_list[-1] ==\
+        mock.call(Mount.RIGHT, dest_point, critical_point=None, speed=400)
+    assert len(fake_move.call_args_list) == 2
+    fake_move.reset_mock()
+    ctx._hw_manager.hardware._api\
+                            ._attached_instruments[Mount.RIGHT]\
+                            ._current_volume = 1
     instr.aspirate(2.0)
-    assert move_called_with is None
+    fake_move.assert_not_called()
 
 
 def test_dispense(loop, get_labware_def, monkeypatch):

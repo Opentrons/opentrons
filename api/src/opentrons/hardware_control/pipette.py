@@ -37,6 +37,8 @@ class Pipette:
                                      if self._pipette_id else '<unknown>')
         self._log.info("loaded: {}, instr offset {}"
                        .format(model, self._instrument_offset))
+        self.ready_to_aspirate = False
+        #: True if ready to aspirate
 
     def update_instrument_offset(self, new_offset: Point):
         self._log.info("updated instrument offset to {}".format(new_offset))

@@ -859,6 +859,40 @@ class API(HardwareAPILike):
 
     # Pipette action API
     @_log_call
+    async def prepare_for_aspirate(
+            self, mount: top_types.Mount, rate: float = 1.0):
+        """
+        Prepare the pipette for aspiration.
+
+        This must happen after every :py:meth:`blow_out` and should probably be
+        called before every :py:meth:`aspirate`, while the pipette tip is not
+        immersed in a well. It ensures that the plunger is at the 0-volume
+        position of the pipette if necessary (if not necessary, it does
+        nothing).
+
+        If :py:meth:`aspirate` is called immediately after :py:meth:`blow_out`,
+        the plunger is left at the ``blow_out`` position, below the ``bottom``
+        position, and moving the plunger up during :py:meth:`aspirate` is
+        expected to aspirate liquid - :py:meth:`aspirate` is called once the
+        pipette tip is already in the well. This will cause a subtle over
+        aspiration. To make the problem more obvious, :py:meth:`aspirate` will
+        raise an exception if this method has not previously been called.
+        """
+        this_pipette = self._attached_instruments[mount]
+        if not this_pipette:
+            raise top_types.PipetteNotAttachedError(
+                "No pipette attached to {} mount".format(mount.name))
+        if this_pipette.current_volume == 0:
+            speed = self._plunger_speed(
+                this_pipette,
+                this_pipette.config.blow_out_flow_rate,
+                'aspirate')
+            await self._move_plunger(
+                mount, this_pipette.config.bottom,
+                speed=(speed*rate))
+        this_pipette.ready_to_aspirate = True
+
+    @_log_call
     async def aspirate(self, mount: top_types.Mount, volume: float = None,
                        rate: float = 1.0):
         """
@@ -866,6 +900,14 @@ class API(HardwareAPILike):
         from the *current location*. If no volume is passed, `aspirate` will
         default to max available volume (after taking into account the volume
         already present in the tip).
+
+        The function :py:meth:`prepare_for_aspirate` must be called prior to
+        calling this function, while the tip is above the well. This ensures
+        that the pipette tip is in the proper position at the bottom of the
+        pipette to begin aspiration, and prevents subtle over-aspiration if
+        an aspirate is done immediately after :py:meth:`blow_out`. If
+        :py:meth:`prepare_for_aspirate` has not been called since the last
+        call to :py:meth:`aspirate`, an exception will be raised.
 
         mount : Mount.LEFT or Mount.RIGHT
         volume : [float] The number of microliters to aspirate
@@ -876,6 +918,12 @@ class API(HardwareAPILike):
         if not this_pipette:
             raise top_types.PipetteNotAttachedError(
                 "No pipette attached to {} mount".format(mount.name))
+
+        if this_pipette.current_volume == 0\
+           and not this_pipette.ready_to_aspirate:
+            raise RuntimeError('Pipette not ready to aspirate')
+        this_pipette.ready_to_aspirate = False
+
         if volume is None:
             asp_vol = this_pipette.available_volume
             mod_log.debug(
