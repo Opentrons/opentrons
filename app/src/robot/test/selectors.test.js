@@ -510,6 +510,13 @@ describe('robot selectors', () => {
             7: { slot: '7', type: 'a', isTiprack: false },
             9: { slot: '9', type: 'b', isTiprack: false },
           },
+          modulesBySlot: {
+            1: {
+              _id: 1,
+              slot: '1',
+              name: 'tempdeck',
+            },
+          },
           pipettesByMount: {
             left: { name: 'p200', mount: 'left', channels: 8, volume: 200 },
             right: { name: 'p50', mount: 'right', channels: 1, volume: 50 },
