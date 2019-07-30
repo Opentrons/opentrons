@@ -743,8 +743,7 @@ def _hash_labware_def(labware_def: Dict[str, Any]) -> str:
 
 def _get_labware_offset_path(labware: Labware):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
-    if not calibration_path.exists():
-        calibration_path.mkdir(parents=True, exist_ok=True)
+    calibration_path.mkdir(parents=True, exist_ok=True)
 
     parent_id = _get_parent_identifier(labware.parent)
     labware_hash = _hash_labware_def(labware._definition)
