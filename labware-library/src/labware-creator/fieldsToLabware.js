@@ -96,7 +96,8 @@ export default function fieldsToLabware(
       version: 1,
       offset: {
         x: fields.gridOffsetX,
-        y: fields.gridOffsetY,
+        // NOTE: offsets are from labware top upper left corner to the well, so Y is inverted
+        y: fields.footprintYDimension - fields.gridOffsetY,
         // NOTE: must give wells a z offset b/c `well.z = offset.z - wellDepth`.
         // We include well lip as part of Z dimension in Labware Creator's fields,
         // so labware's offset.z is the SAME as labwareZDimension.
