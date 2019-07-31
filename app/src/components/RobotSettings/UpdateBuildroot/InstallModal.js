@@ -1,12 +1,9 @@
 // @flow
 import * as React from 'react'
-import { useDispatch } from 'react-redux'
 
 import { AlertModal } from '@opentrons/components'
 import InstallModalContents from './InstallModalContents'
-import { clearBuildrootSession } from '../../../shell'
 
-import type { Dispatch } from '../../../types'
 import type { ViewableRobot } from '../../../discovery'
 import type { BuildrootUpdateSession, RobotSystemType } from '../../../shell'
 
@@ -19,17 +16,10 @@ type Props = {|
 
 export default function InstallModal(props: Props) {
   const { session, close, robotSystemType } = props
-  const dispatch = useDispatch<Dispatch>()
   const buttons = []
 
-  if (session.step === 'finished' || session.error) {
-    buttons.push({
-      children: 'close',
-      onClick: () => {
-        close()
-        dispatch(clearBuildrootSession())
-      },
-    })
+  if (session.step === 'finished' || session.error !== null) {
+    buttons.push({ children: 'close', onClick: close })
   }
 
   let heading: string
@@ -53,7 +43,10 @@ export default function InstallModal(props: Props) {
       restrictOuterScroll={false}
       alertOverlay
     >
-      <InstallModalContents {...props} />
+      <InstallModalContents
+        robotSystemType={robotSystemType}
+        session={session}
+      />
     </AlertModal>
   )
 }

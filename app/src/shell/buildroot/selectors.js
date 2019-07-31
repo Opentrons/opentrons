@@ -35,6 +35,20 @@ export function getBuildrootUpdateSeen(state: State): boolean {
   return state.shell.buildroot.seen || false
 }
 
+export function getBuildrootUpdateInProgress(
+  state: State,
+  robotName: string
+): boolean {
+  const session = getBuildrootSession(state)
+  const brRobotName = getBuildrootRobotName(state)
+
+  return (
+    brRobotName === robotName &&
+    session?.step !== 'finished' &&
+    session?.error === null
+  )
+}
+
 export function getBuildrootDownloadProgress(state: State): number | null {
   return state.shell.buildroot.downloadProgress
 }

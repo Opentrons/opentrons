@@ -9,6 +9,7 @@ import {
   startBuildrootUpdate,
   setBuildrootUpdateSeen,
   getBuildrootSession,
+  clearBuildrootSession,
   getRobotSystemType,
   compareRobotVersionToUpdate,
 } from '../../../shell'
@@ -27,11 +28,21 @@ export default function UpdateBuildroot(props: Props) {
   const [viewUpdateInfo, setViewUpdateInfo] = React.useState(false)
   const session = useSelector(getBuildrootSession)
   const dispatch = useDispatch<Dispatch>()
+  const { step, error } = session || { step: null, error: null }
 
   // set update seen on component mount
   React.useEffect(() => {
     dispatch(setBuildrootUpdateSeen())
   }, [dispatch])
+
+  // clear buildroot state on component dismount if done
+  React.useEffect(() => {
+    if (step === 'finished' || error !== null) {
+      return () => {
+        dispatch(clearBuildrootSession())
+      }
+    }
+  }, [dispatch, step, error])
 
   const goToViewUpdate = React.useCallback(() => setViewUpdateInfo(true), [])
 

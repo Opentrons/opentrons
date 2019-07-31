@@ -10,7 +10,12 @@ import {
 } from '../../robot'
 import { getConfig } from '../../config'
 import { CONNECTABLE, REACHABLE, getRobotApiVersion } from '../../discovery'
-import { getBuildrootUpdateSeen, getBuildrootRobot } from '../../shell'
+import {
+  getBuildrootUpdateSeen,
+  getBuildrootRobot,
+  getBuildrootUpdateInfo,
+  getBuildrootUpdateInProgress,
+} from '../../shell'
 
 import {
   makeGetRobotHome,
@@ -196,11 +201,11 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
     const restartRequest = getRestartRequest(state, robot)
     const updateInfo = getRobotUpdateInfo(state, robot)
     const buildrootUpdateSeen = getBuildrootUpdateSeen(state)
-    const currentBrRobot = getBuildrootRobot(state)
+    const buildrootUpdateInfo = getBuildrootUpdateInfo(state)
     const __buildRootEnabled = Boolean(
       getConfig(state).devInternal?.enableBuildRoot
     )
-    const updateInProgress = currentBrRobot === robot
+    const updateInProgress = getBuildrootUpdateInProgress(state, robot.name)
     let showUpdateModal: ?boolean
 
     if (__buildRootEnabled) {
@@ -209,7 +214,8 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
       showUpdateModal =
         updateInProgress ||
         (!buildrootUpdateSeen &&
-          robotVersion !== updateInfo.version &&
+          buildrootUpdateInfo !== null &&
+          robotVersion !== buildrootUpdateInfo.version &&
           currentBrRobot === null)
     } else {
       showUpdateModal =
