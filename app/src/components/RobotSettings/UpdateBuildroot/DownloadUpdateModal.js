@@ -3,6 +3,7 @@
 
 import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
+import { ProgressBar } from './progress'
 import styles from './styles.css'
 import type { ButtonProps } from '@opentrons/components'
 
@@ -49,21 +50,5 @@ export default function DownloadUpdateModal(props: Props) {
         )}
       </div>
     </AlertModal>
-  )
-}
-
-type ProgressBarProps = {
-  progress: number | null,
-}
-
-function ProgressBar(props: ProgressBarProps) {
-  const progress = props.progress || 0
-  const width = `${progress}%`
-
-  return (
-    <div className={styles.progress_bar_container}>
-      <span className={styles.progress_text}>{progress}%</span>
-      <div style={{ width: width }} className={styles.progress_bar} />
-    </div>
   )
 }

@@ -3,6 +3,7 @@ import * as React from 'react'
 import { useDispatch } from 'react-redux'
 
 import { AlertModal } from '@opentrons/components'
+import InstallModalContents from './InstallModalContents'
 import { clearBuildrootSession } from '../../../shell'
 
 import type { Dispatch } from '../../../types'
@@ -17,7 +18,7 @@ type Props = {|
 |}
 
 export default function InstallModal(props: Props) {
-  const { session, close } = props
+  const { session, close, robotSystemType } = props
   const dispatch = useDispatch<Dispatch>()
   const buttons = []
 
@@ -31,14 +32,28 @@ export default function InstallModal(props: Props) {
     })
   }
 
+  let heading: string
+  if (robotSystemType === 'balena') {
+    if (
+      session.step === 'premigration' ||
+      session.step === 'premigrationRestart'
+    ) {
+      heading = 'Robot Update: Step 1 of 2'
+    } else {
+      heading = 'Robot Update: Step 2 of 2'
+    }
+  } else if (robotSystemType === 'buildroot') {
+    heading = 'Robot Update'
+  }
+
   return (
     <AlertModal
-      heading="Modal not implemented"
+      heading={heading}
       buttons={buttons}
       restrictOuterScroll={false}
       alertOverlay
     >
-      <p>{JSON.stringify(session, null, 2)}</p>
+      <InstallModalContents {...props} />
     </AlertModal>
   )
 }
