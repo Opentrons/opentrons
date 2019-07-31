@@ -7,6 +7,26 @@ import type { ThermocyclerModule } from '../../robot-api'
 import StatusCard from './StatusCard'
 import CardContentRow from './CardContentRow'
 import StatusItem from './StatusItem'
+import styles from './styles.css'
+
+type TempsItemProps = {
+  title: string,
+  current: number,
+  target: ?number,
+}
+const TempsItem = ({ title, current, target }: TempsItemProps) => (
+  <div>
+    <h5 className={styles.label}>{title}</h5>
+    <div className={styles.data_row}>
+      <p>Current:</p>
+      <p>{`${current} °C`}</p>
+    </div>
+    <div className={styles.data_row}>
+      <p>Target:</p>
+      <p>{target ? `${target} °C` : 'None'}</p>
+    </div>
+  </div>
+)
 
 type Props = {|
   module: ThermocyclerModule,
@@ -18,21 +38,15 @@ const ThermocyclerCard = ({ module }: Props) => (
       <StatusItem status={module.status} />
     </CardContentRow>
     <CardContentRow>
-      <LabeledValue
-        label="Current Temp"
-        value={`${module.data.currentTemp} °C`}
+      <TempsItem
+        title="Base Temp"
+        current={module.data.currentTemp}
+        target={module.data.targetTemp}
       />
-      <LabeledValue
-        label="Target Temp"
-        value={module.data.targetTemp ? `${module.data.targetTemp} °C` : 'None'}
-      />
-      <LabeledValue
-        label="Current Lid Temp"
-        value={`${module.data.lidTemp} °C`}
-      />
-      <LabeledValue
-        label="Target Lid Temp"
-        value={module.data.targetTemp ? `${module.data.lidTarget} °C` : 'None'}
+      <TempsItem
+        title="Lid Temp"
+        current={module.data.lidTemp}
+        target={module.data.lidTarget}
       />
     </CardContentRow>
     {module.data.totalCycleCount !== null && (
