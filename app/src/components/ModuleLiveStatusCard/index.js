@@ -12,10 +12,11 @@ import type { TempDeckModule } from '../../robot-api'
 import type { Robot } from '../../discovery'
 
 import TempDeckCard from './TempDeckCard'
+import MagDeckCard from './MagDeckCard'
 import ThermocyclerCard from './ThermocyclerCard'
 
 const POLL_TEMPDECK_INTERVAL_MS = 1000
-const LIVE_STATUS_MODULES = ['tempdeck', 'thermocycler']
+const LIVE_STATUS_MODULES = ['magdeck', 'tempdeck', 'thermocycler']
 
 type SP = {|
   _robot: ?Robot,
@@ -47,6 +48,7 @@ const ModuleLiveStatusCards = (props: Props) => {
           case 'thermocycler':
             return <ThermocyclerCard module={module} />
           case 'magdeck':
+            return <MagDeckCard module={module} />
           default:
             return null
         }
