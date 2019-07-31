@@ -8,8 +8,12 @@ import createLogger from '../log'
 import { getConfig } from '../config'
 import { CURRENT_VERSION } from '../update'
 import { downloadManifest, getReleaseSet } from './release-manifest'
-import { getReleaseFiles } from './release-files'
-import { getPremigrationWheels, startPremigration, uploadFile } from './update'
+import { getReleaseFiles, readUserFileInfo } from './release-files'
+import {
+  getPremigrationWheels,
+  startPremigration,
+  uploadSystemFile,
+} from './update'
 
 import type { Action, Dispatch } from '../types'
 import type { ReleaseSetFilepaths } from './types'
@@ -67,8 +71,8 @@ export function registerBuildrootUpdate(dispatch: Dispatch) {
         }
 
         case 'buildroot:UPLOAD_FILE': {
-          const { host, path } = action.payload
-          const file = updateSet?.system
+          const { host, path, systemFile } = action.payload
+          const file = systemFile !== null ? systemFile : updateSet?.system
 
           if (file == null) {
             return dispatch({
@@ -77,7 +81,7 @@ export function registerBuildrootUpdate(dispatch: Dispatch) {
             })
           }
 
-          uploadFile(host, path, file)
+          uploadSystemFile(host, path, file)
             .then(() => ({
               type: 'buildroot:FILE_UPLOAD_DONE',
               payload: host.name,
@@ -93,6 +97,28 @@ export function registerBuildrootUpdate(dispatch: Dispatch) {
               }
             })
             .then(dispatch)
+
+          break
+        }
+
+        case 'buildroot:READ_USER_FILE': {
+          const { systemFile } = action.payload
+
+          readUserFileInfo(systemFile)
+            .then(userFile => ({
+              type: 'buildroot:USER_FILE_INFO',
+              payload: {
+                systemFile: userFile.systemFile,
+                version: userFile.versionInfo.opentrons_api_version,
+              },
+            }))
+            .catch((error: Error) => ({
+              type: 'buildroot:UNEXPECTED_ERROR',
+              payload: { message: error.message },
+            }))
+            .then(dispatch)
+
+          break
         }
       }
     }

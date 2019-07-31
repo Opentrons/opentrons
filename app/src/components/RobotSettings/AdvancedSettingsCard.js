@@ -103,7 +103,7 @@ function AdvancedSettingsCard(props: Props) {
       {settings.map(s => (
         <BooleanSettingToggle {...s} key={s.id} set={set} />
       ))}
-      {props.__buildRootEnabled && <UploadRobotUpdate />}
+      {props.__buildRootEnabled && <UploadRobotUpdate robotName={robot.name} />}
     </RefreshCard>
   )
 }

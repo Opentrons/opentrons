@@ -20,7 +20,7 @@ import {
 } from '../../robot-api'
 
 import {
-  getBuildrootUpdateInfo,
+  getBuildrootTargetVersion,
   getBuildrootSession,
   getBuildrootRobotName,
   getBuildrootRobot,
@@ -28,8 +28,10 @@ import {
 
 import {
   BR_START_UPDATE,
+  BR_USER_FILE_INFO,
   startBuildrootUpdate,
   startBuildrootPremigration,
+  readUserBuildrootFile,
   uploadBuildrootFile,
   setBuildrootSessionStep,
   unexpectedBuildrootError,
@@ -59,13 +61,18 @@ export const startUpdateEpic: Epic = (action$, state$) =>
     switchMap<[StartBuildrootUpdateAction, State], _, mixed>(
       ([action, state]) => {
         // BR_START_UPDATE will set the active updating robot in state
-        const robotName = action.payload
+        const { robotName, systemFile } = action.payload
         const host = getBuildrootRobot(state)
         const serverHealth = host?.serverHealth || null
 
         // we need the target robot's update server to be up to do anything
         if (host !== null && serverHealth !== null) {
           const capabilities = serverHealth.capabilities || null
+
+          // if action passed a system file, we need to read that file
+          if (systemFile !== null) {
+            return of(readUserBuildrootFile(systemFile))
+          }
 
           // if capabilities is empty, the robot requires premigration
           if (capabilities === null) {
@@ -167,6 +174,17 @@ export const triggerUpdateAfterPremigrationEpic: Epic = (_, state$) =>
     })
   )
 
+export const triggerUpdateAfterUserFileInfo: Epic = (action$, state$) =>
+  action$.pipe(
+    ofType(BR_USER_FILE_INFO),
+    withLatestFrom(state$),
+    filter(([_, state]) => getBuildrootRobotName(state) !== null),
+    switchMap<[BuildrootAction, State], _, BuildrootAction>(([_, state]) => {
+      const robotName: string = (getBuildrootRobotName(state): any)
+      return of(startBuildrootUpdate(robotName))
+    })
+  )
+
 // epic to listen for /begin success (via meta.buildrootToken) and start a
 // status poll until the status switches to 'ready-for-restart'
 export const statusPollEpic: LooseEpic = (action$, state$) =>
@@ -230,8 +248,11 @@ export const uploadFileEpic: Epic = (_, state$) =>
       const session = getBuildrootSession(stateWithSession)
       const pathPrefix: string = (session?.pathPrefix: any)
       const token: string = (session?.token: any)
+      const systemFile = session?.userFileInfo?.systemFile || null
 
-      return of(uploadBuildrootFile(host, `${pathPrefix}/${token}/file`))
+      return of(
+        uploadBuildrootFile(host, `${pathPrefix}/${token}/file`, systemFile)
+      )
     })
   )
 
@@ -293,10 +314,9 @@ export const watchForOnlineAfterRestartEpic: Epic = (_, state$) =>
       )
     }),
     switchMap<State, _, mixed>(stateWithRobot => {
-      const info = getBuildrootUpdateInfo(stateWithRobot)
+      const targetVersion = getBuildrootTargetVersion(stateWithRobot)
       const robot: ViewableRobot = (getBuildrootRobot(stateWithRobot): any)
       const robotVersion = getRobotApiVersion(robot)
-      const targetVersion = info?.version
       const actual = robotVersion || 'unknown'
       const expected = targetVersion || 'unknown'
 
@@ -321,6 +341,7 @@ export const buildrootUpdateEpic = combineEpics(
   cancelSessionOnConflictEpic,
   triggerUpdateAfterPremigrationEpic,
   triggerUpdateAfterCancelEpic,
+  triggerUpdateAfterUserFileInfo,
   statusPollEpic,
   uploadFileEpic,
   commitUpdateEpic,

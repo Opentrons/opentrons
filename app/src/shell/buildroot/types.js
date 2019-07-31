@@ -10,6 +10,11 @@ export type BuildrootUpdateInfo = {|
   releaseNotes: string,
 |}
 
+export type BuildrootUserFileInfo = {|
+  systemFile: string,
+  version: string,
+|}
+
 export type BuildrootStatus = 'balena' | 'migrating' | 'buildroot'
 
 // stage response from API
@@ -36,6 +41,7 @@ export type UpdateSessionStep =
 
 export type BuildrootUpdateSession = {|
   robotName: string,
+  userFileInfo: BuildrootUserFileInfo | null,
   token: string | null,
   pathPrefix: string | null,
   step: UpdateSessionStep | null,
@@ -54,7 +60,7 @@ export type BuildrootState = {|
 
 export type StartBuildrootUpdateAction = {|
   type: 'buildroot:START_UPDATE',
-  payload: string,
+  payload: {| robotName: string, systemFile: string | null |},
 |}
 
 export type UnexpectedBuildrootError = {|
@@ -68,6 +74,7 @@ export type BuildrootAction =
   | {| type: 'buildroot:DOWNLOAD_PROGRESS', payload: number |}
   | {| type: 'buildroot:DOWNLOAD_ERROR', payload: string |}
   | {| type: 'buildroot:UPDATE_INFO', payload: BuildrootUpdateInfo | null |}
+  | {| type: 'buildroot:USER_FILE_INFO', payload: BuildrootUserFileInfo |}
   | {| type: 'buildroot:SET_UPDATE_SEEN' |}
   | {|
       type: 'buildroot:START_PREMIGRATION',
@@ -77,8 +84,13 @@ export type BuildrootAction =
   | {| type: 'buildroot:PREMIGRATION_DONE', payload: string |}
   | {| type: 'buildroot:PREMIGRATION_ERROR', payload: string |}
   | {|
+      type: 'buildroot:READ_USER_FILE',
+      payload: {| systemFile: string |},
+      meta: {| shell: true |},
+    |}
+  | {|
       type: 'buildroot:UPLOAD_FILE',
-      payload: {| host: RobotHost, path: string |},
+      payload: {| host: RobotHost, path: string, systemFile: string | null |},
       meta: {| shell: true |},
     |}
   | {| type: 'buildroot:FILE_UPLOAD_DONE', payload: string |}

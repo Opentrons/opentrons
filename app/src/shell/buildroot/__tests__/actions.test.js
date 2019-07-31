@@ -19,6 +19,24 @@ describe('app/shell/buildroot action creators', () => {
       },
     },
     {
+      name: 'buildroot:START_UPDATE',
+      creator: actions.startBuildrootUpdate,
+      args: ['robot'],
+      expected: {
+        type: 'buildroot:START_UPDATE',
+        payload: { robotName: 'robot', systemFile: null },
+      },
+    },
+    {
+      name: 'buildroot:START_UPDATE with user file',
+      creator: actions.startBuildrootUpdate,
+      args: ['robot', '/path/to/system.zip'],
+      expected: {
+        type: 'buildroot:START_UPDATE',
+        payload: { robotName: 'robot', systemFile: '/path/to/system.zip' },
+      },
+    },
+    {
       name: 'buildroot:UNEXPECTED_ERROR',
       creator: actions.unexpectedBuildrootError,
       args: ['AH!'],
@@ -28,14 +46,43 @@ describe('app/shell/buildroot action creators', () => {
       },
     },
     {
+      name: 'buildroot:READ_USER_FILE',
+      creator: actions.readUserBuildrootFile,
+      args: ['/server/update/token/file'],
+      expected: {
+        type: 'buildroot:READ_USER_FILE',
+        payload: { systemFile: '/server/update/token/file' },
+        meta: { shell: true },
+      },
+    },
+    {
       name: 'buildroot:UPLOAD_FILE',
       creator: actions.uploadBuildrootFile,
-      args: [{ name: 'robot-name' }, '/server/update/token/file'],
+      args: [{ name: 'robot-name' }, '/server/update/token/file', null],
       expected: {
         type: 'buildroot:UPLOAD_FILE',
         payload: {
           host: { name: 'robot-name' },
           path: '/server/update/token/file',
+          systemFile: null,
+        },
+        meta: { shell: true },
+      },
+    },
+    {
+      name: 'buildroot:UPLOAD_FILE with file specified',
+      creator: actions.uploadBuildrootFile,
+      args: [
+        { name: 'robot-name' },
+        '/server/update/token/file',
+        '/path/to/system.zip',
+      ],
+      expected: {
+        type: 'buildroot:UPLOAD_FILE',
+        payload: {
+          host: { name: 'robot-name' },
+          path: '/server/update/token/file',
+          systemFile: '/path/to/system.zip',
         },
         meta: { shell: true },
       },
