@@ -54,7 +54,12 @@ export default function fieldsToLabware(
       quirks = [...quirks, 'centerMultichannelOnWells']
 
       // Legacy API (v1) uses `lw_format == 'trough'` instead of centerMultichannelOnWells quirk.
-      format = 'trough'
+      // HOWEVER, setting format to 'trough' also makes the well size zero, so you can't
+      // position the tip to the edges of the labware.
+      // Optimizing for the APIv1 labware test protocol (which is always with a single-channel)
+      // over APIv1 protocol use, we'll AVOID setting the format to 'trough' here
+      //
+      // format = 'trough' // Uncomment to break test protocol but allow multichannel use in APIv1
     }
 
     return createRegularLabware({
