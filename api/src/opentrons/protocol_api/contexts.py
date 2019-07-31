@@ -2051,7 +2051,7 @@ class ThermocyclerContext(ModuleContext):
                       NOTE: hold_time must be defined and finite for each stage.
         :param repetitions: The number of times to repeat the cycled steps.
         """
-        return self._module.cycle_temperature(
+        return self._module.cycle_temperatures(
             steps=steps, repetitions=repetitions)
 
     @property

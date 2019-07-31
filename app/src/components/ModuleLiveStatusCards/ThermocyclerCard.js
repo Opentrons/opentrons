@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import moment from 'moment'
 import { LabeledValue } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
@@ -62,6 +63,15 @@ const ThermocyclerCard = ({ module }: Props) => (
           value={`${module.data.currentStepIndex} / ${
             module.data.totalStepCount
           }`}
+        />
+        <LabeledValue
+          label="Time remaining for step"
+          value={`${moment
+            .utc(
+              // NOTE: moment still doesn't allow duration formatting, hence fake moment creation
+              moment.duration(module.data.holdTime, 'seconds').asMilliseconds()
+            )
+            .format('HH:mm:ss')}`}
         />
       </CardContentRow>
     )}
