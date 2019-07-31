@@ -42,11 +42,9 @@ def _set_flow_rate(pipette, params) -> None:
     if not (flow_rate_param > 0):
         raise RuntimeError('Positive flowRate param required')
 
-    pipette.flow_rate = {
-        'aspirate': flow_rate_param,
-        'dispense': flow_rate_param,
-        'blow_out': flow_rate_param,
-    }
+    pipette.flow_rate.aspirate = flow_rate_param
+    pipette.flow_rate.dispense = flow_rate_param
+    pipette.flow_rate.blow_out = flow_rate_param
 
 
 def load_labware_from_json_defs(

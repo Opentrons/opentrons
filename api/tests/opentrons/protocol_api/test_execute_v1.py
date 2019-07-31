@@ -182,6 +182,8 @@ def test_dispatch_commands(monkeypatch, loop):
     ]
 
     assert flow_rates == [
-        (123, 102),
-        (101, 102)
+        (123, None),
+        (None, 102),
+        (101, None),
+        (None, 102),
     ]

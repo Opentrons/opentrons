@@ -47,9 +47,48 @@ class MockPipette(object):
                 self.log.append((name, args))
         return log_fn
 
+    def _make_operation_setter(self, name):
+        class Setter:
+            def __init__(self, name, log):
+                self._name = name
+                self._log = log
+                self._aspirate = 0
+                self._blow_out = 0
+                self._dispense = 0
+
+            @property
+            def aspirate(self):
+                return self._aspirate
+
+            @aspirate.setter
+            def aspirate(self, new_val):
+                self._log.append(('set: ' + name + '.aspirate', (new_val,)))
+                self._aspirate = new_val
+
+            @property
+            def dispense(self):
+                return self._dispense
+
+            @dispense.setter
+            def dispense(self, new_val):
+                self._log.append(('set: ' + name + '.dispense', (new_val,)))
+                self._dispense = new_val
+
+            @property
+            def blow_out(self):
+                return self._blow_out
+
+            @blow_out.setter
+            def blow_out(self, new_val):
+                self._log.append(('set: ' + name + '.blow_out', (new_val,)))
+                self._blow_out = new_val
+        return Setter(name, self.log)
+
     def __getattr__(self, name):
         if name == 'log':
             return self.log
+        elif name == 'flow_rate':
+            return self._make_operation_setter(name)
         else:
             return self._make_logger(name)
 
@@ -94,20 +133,20 @@ def test_dispatch_commands(monkeypatch, loop):
 
     assert command_log == [
         ("pick_up_tip", (tiprack.wells_by_index()['B1'],)),
-        ("set: flow_rate", {"aspirate": 3,
-                            "dispense": 3,
-                            "blow_out": 3}),
+        ("set: flow_rate.aspirate", (3,)),
+        ("set: flow_rate.dispense", (3,)),
+        ("set: flow_rate.blow_out", (3,)),
         ("aspirate", (5, source_plate.wells_by_index()['A1'].bottom(2),)),
         ("delay", 42),
-        ("set: flow_rate", {"aspirate": 2.5,
-                            "dispense": 2.5,
-                            "blow_out": 2.5}),
+        ("set: flow_rate.aspirate", (2.5,)),
+        ("set: flow_rate.dispense", (2.5,)),
+        ("set: flow_rate.blow_out", (2.5,)),
         ("dispense", (4.5, dest_plate.wells_by_index()['B1'].bottom(1),)),
         ("touch_tip", (dest_plate.wells_by_index()['B1'],),
             {"v_offset": 0.33000000000000007}),
-        ("set: flow_rate", {"aspirate": 2,
-                            "dispense": 2,
-                            "blow_out": 2}),
+        ("set: flow_rate.aspirate", (2,)),
+        ("set: flow_rate.dispense", (2,)),
+        ("set: flow_rate.blow_out", (2,)),
         ("blow_out", (dest_plate.wells_by_index()['B1'],)),
         ("move_to", (ctx.deck.position_for('5').move(Point(1, 2, 3)),),
             {"force_direct": None, "minimum_z_height": None}),

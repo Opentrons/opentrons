@@ -261,7 +261,7 @@ def test_aspirate(loop, get_labware_def, monkeypatch):
                   critical_point=None, speed=400)
     fake_move.reset_mock()
     fake_hw_aspirate.reset_mock()
-    instr.well_bottom_clearance = 1.0
+    instr.well_bottom_clearance.aspirate = 1.0
     instr.aspirate(2.0, lw.wells()[0])
     dest_point, dest_lw = lw.wells()[0].bottom()
     dest_point = dest_point._replace(z=dest_point.z + 1.0)
@@ -275,6 +275,7 @@ def test_aspirate(loop, get_labware_def, monkeypatch):
     ctx._hw_manager.hardware._api\
                             ._attached_instruments[Mount.RIGHT]\
                             ._current_volume = 1
+
     instr.aspirate(2.0)
     fake_move.assert_not_called()
 
@@ -308,10 +309,10 @@ def test_dispense(loop, get_labware_def, monkeypatch):
                                 {'critical_point': None,
                                  'speed': 400})
 
-    instr.well_bottom_clearance = 1.0
+    instr.well_bottom_clearance.dispense = 2.0
     instr.dispense(2.0, lw.wells()[0])
     dest_point, dest_lw = lw.wells()[0].bottom()
-    dest_point = dest_point._replace(z=dest_point.z + 1.0)
+    dest_point = dest_point._replace(z=dest_point.z + 2.0)
     assert move_called_with == (Mount.RIGHT, dest_point,
                                 {'critical_point': None,
                                  'speed': 400})
@@ -546,8 +547,8 @@ def test_flow_rate(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     old_sfm = ctx._hw_manager.hardware
 
-    def pass_on(aspirate=None, dispense=None, blow_out=None):
-        old_sfm(aspirate=None, dispense=None, blow_out=None)
+    def pass_on(mount, aspirate=None, dispense=None, blow_out=None):
+        old_sfm(mount, aspirate=None, dispense=None, blow_out=None)
 
     set_flow_rate = mock.Mock(side_effect=pass_on)
     monkeypatch.setattr(ctx._hw_manager.hardware, 'set_flow_rate',
@@ -555,19 +556,24 @@ def test_flow_rate(loop, monkeypatch):
     instr = ctx.load_instrument('p300_single', Mount.RIGHT)
 
     ctx.home()
-    instr.flow_rate = {'aspirate': 1}
-    assert set_flow_rate.called_with(aspirate=1)
+    instr.flow_rate.aspirate = 1
+    assert set_flow_rate.called_once_with(Mount.RIGHT, aspirate=1)
     set_flow_rate.reset_mock()
-    instr.flow_rate = {'dispense': 10, 'blow_out': 2}
-    assert set_flow_rate.called_with(dispense=10, blow_out=2)
-    assert instr.flow_rate == {'aspirate': 1, 'dispense': 10, 'blow_out': 2}
+    instr.flow_rate.dispense = 10
+    assert set_flow_rate.called_once_with(Mount.RIGHT, dispense=10)
+    set_flow_rate.reset_mock()
+    instr.flow_rate.blow_out = 2
+    assert set_flow_rate.called_once_with(Mount.RIGHT, blow_out=2)
+    assert instr.flow_rate.aspirate == 1
+    assert instr.flow_rate.dispense == 10
+    assert instr.flow_rate.blow_out == 2
 
 
 def test_pipette_speed(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     old_sfm = ctx._hw_manager.hardware
 
-    def pass_on(aspirate=None, dispense=None, blow_out=None):
+    def pass_on(mount, aspirate=None, dispense=None, blow_out=None):
         old_sfm(aspirate=None, dispense=None, blow_out=None)
 
     set_speed = mock.Mock(side_effect=pass_on)
@@ -576,9 +582,12 @@ def test_pipette_speed(loop, monkeypatch):
     instr = ctx.load_instrument('p300_single', Mount.RIGHT)
 
     ctx.home()
-    instr.speed = {'aspirate': 1}
-    assert set_speed.called_with(aspirate=1)
-    set_speed.reset_mock()
-    instr.speed = {'dispense': 10, 'blow_out': 2}
-    assert set_speed.called_with(dispense=10, blow_out=2)
-    assert instr.speed == {'aspirate': 1, 'dispense': 10, 'blow_out': 2}
+    instr.speed.aspirate = 1
+    assert set_speed.called_once_with(Mount.RIGHT, dispense=1)
+    instr.speed.dispense = 10
+    instr.speed.blow_out = 2
+    assert set_speed.called_with(Mount.RIGHT, dispense=10)
+    assert set_speed.called_with(Mount.RIGHT, blow_out=2)
+    assert instr.speed.aspirate == 1
+    assert instr.speed.dispense == 10
+    assert instr.speed.blow_out == 2
