@@ -46,4 +46,6 @@ updated component library cards after redesign/refactor
 
 .data_row {
   display: flex;
+  justify-content: space-between;
+  margin-right: 1rem;
 }

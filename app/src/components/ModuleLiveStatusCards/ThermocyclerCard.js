@@ -49,7 +49,7 @@ const ThermocyclerCard = ({ module }: Props) => (
         target={module.data.lidTarget}
       />
     </CardContentRow>
-    {module.data.totalCycleCount !== null && (
+    {module.data.totalCycleCount != null && (
       <CardContentRow>
         <LabeledValue
           label="Cycle #"
