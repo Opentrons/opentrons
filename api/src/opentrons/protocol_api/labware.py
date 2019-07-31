@@ -727,13 +727,32 @@ class ThermocyclerGeometry(ModuleGeometry):
         return self._labware
 
 
-def _hash_labware_def(labware: Dict[str, Any]) -> str:
+def _get_parent_identifier(
+        parent: Union[Labware, Well, str, ModuleGeometry, None]):
+    if isinstance(parent, ModuleGeometry):
+        # treat a given labware on a given module type as same
+        return parent.load_name
+    else:
+        return ''  # treat all slots as same
+
+
+def _hash_labware_def(labware_def: Dict[str, Any]) -> str:
     # remove keys that do not affect run
     blacklist = ['metadata', 'brand', 'groups']
-    def_no_metadata = {k: v for k, v in labware.items() if k not in blacklist}
+    def_no_metadata = {
+        k: v for k, v in labware_def.items() if k not in blacklist}
     sorted_def_str = json.dumps(
         def_no_metadata, sort_keys=True, separators=(',', ':'))
     return sha256(sorted_def_str.encode('utf-8')).hexdigest()
+
+
+def _get_labware_offset_path(labware: Labware):
+    calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
+    calibration_path.mkdir(parents=True, exist_ok=True)
+
+    parent_id = _get_parent_identifier(labware.parent)
+    labware_hash = _hash_labware_def(labware._definition)
+    return calibration_path/f'{labware_hash}{parent_id}.json'
 
 
 def save_calibration(labware: Labware, delta: Point):
@@ -743,11 +762,7 @@ def save_calibration(labware: Labware, delta: Point):
     using labware id as the filename. If the file does exist, load it and
     modify the delta and the lastModified fields under the "default" key.
     """
-    calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
-    if not calibration_path.exists():
-        calibration_path.mkdir(parents=True, exist_ok=True)
-    labware_hash = _hash_labware_def(labware._definition)
-    labware_offset_path = calibration_path/'{}.json'.format(labware_hash)
+    labware_offset_path = _get_labware_offset_path(labware)
     calibration_data = _helper_offset_data_format(
         str(labware_offset_path), delta)
     with labware_offset_path.open('w') as f:
@@ -762,11 +777,7 @@ def save_tip_length(labware: Labware, length: float):
     using labware id as the filename. If the file does exist, load it and
     modify the length and the lastModified fields under the "tipLength" key.
     """
-    calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
-    if not calibration_path.exists():
-        calibration_path.mkdir(parents=True, exist_ok=True)
-    labware_hash = _hash_labware_def(labware._definition)
-    labware_offset_path = calibration_path/'{}.json'.format(labware_hash)
+    labware_offset_path = _get_labware_offset_path(labware)
     calibration_data = _helper_tip_length_data_format(
         str(labware_offset_path), length)
     with labware_offset_path.open('w') as f:
@@ -778,9 +789,7 @@ def load_calibration(labware: Labware):
     """
     Look up a calibration if it exists and apply it to the given labware.
     """
-    calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
-    labware_hash = _hash_labware_def(labware._definition)
-    labware_offset_path = calibration_path/'{}.json'.format(labware_hash)
+    labware_offset_path = _get_labware_offset_path(labware)
     if labware_offset_path.exists():
         calibration_data = _read_file(str(labware_offset_path))
         offset_array = calibration_data['default']['offset']

@@ -981,7 +981,7 @@ class Robot(CommandPublisher):
                                             instrument,
                                             save: bool
                                             ):
-        '''Calibrates a container using the bottom of the first well'''
+        '''Calibrates a container using the top or bottom of the first well'''
         well = container[0]
 
         # Get the relative position of well with respect to instrument
