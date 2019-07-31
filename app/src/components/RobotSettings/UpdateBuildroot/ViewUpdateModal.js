@@ -8,7 +8,7 @@ import {
   getBuildrootDownloadError,
 } from '../../../shell'
 
-import SystemMigrationModal from './SystemMigrationModal'
+import MigrationWarningModal from './MigrationWarningModal'
 import DownloadUpdateModal from './DownloadUpdateModal'
 import ReleaseNotesModal from './ReleaseNotesModal'
 
@@ -42,7 +42,7 @@ export default function ViewUpdateModal(props: Props) {
 
   if (showMigrationWarning) {
     return (
-      <SystemMigrationModal
+      <MigrationWarningModal
         notNowButton={notNowButton}
         updateType={robotUpdateType}
         proceed={() => setShowMigrationWarning(false)}
