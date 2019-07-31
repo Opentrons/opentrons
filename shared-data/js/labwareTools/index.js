@@ -272,7 +272,7 @@ function joinLoadName(
 
 type RegularNameProps = {
   displayCategory: string,
-  displayVolumeUnits: string,
+  displayVolumeUnits: VolumeUnits,
   gridRows: number,
   gridColumns: number,
   totalLiquidVolume: number,

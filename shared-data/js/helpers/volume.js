@@ -11,7 +11,7 @@ const SCALE_BY_UNITS = {
 
 export function getDisplayVolume(
   volumeInMicroliters: number,
-  displayUnits?: string = 'µL',
+  displayUnits?: LabwareVolumeUnits = 'µL',
   digits?: number
 ): string {
   const volume = volumeInMicroliters / SCALE_BY_UNITS[displayUnits]
@@ -19,7 +19,7 @@ export function getDisplayVolume(
   return `${typeof digits === 'number' ? round(volume, digits) : volume}`
 }
 
-export function getAsciiVolumeUnits(displayUnits: string) {
+export function getAsciiVolumeUnits(displayUnits: LabwareVolumeUnits) {
   if (displayUnits === 'µL') return 'uL'
   return displayUnits
 }
