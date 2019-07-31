@@ -340,7 +340,10 @@ class Placeable(object):
         """
         Returns placeable's maximum liquid volume in uL
         """
-        return self.properties['total-liquid-volume']
+        try:
+            return self.properties['total-liquid-volume']
+        except KeyError:
+            return None
 
     def x_size(self):
         """

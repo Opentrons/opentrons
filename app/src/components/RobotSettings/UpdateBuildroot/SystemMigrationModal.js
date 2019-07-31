@@ -5,27 +5,35 @@ import { ScrollableAlertModal } from '../../modals'
 import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
+import type { BuildrootUpdateType } from '../../../shell'
 
-type Props = {
+type Props = {|
   notNowButton: ButtonProps,
-  viewReleaseNotes: () => mixed,
-}
+  updateType: BuildrootUpdateType,
+  proceed: () => mixed,
+|}
 
 const HEADING = 'Robot System Update Available'
-export default function UpdateBuildroot(props: Props) {
-  const { notNowButton, viewReleaseNotes } = props
+
+export default function SystemMigrationModal(props: Props) {
+  const { notNowButton, updateType, proceed } = props
 
   const buttons: Array<?ButtonProps> = [
     notNowButton,
     {
-      children: 'view robot update',
+      children: updateType === 'upgrade' ? 'view robot update' : 'update robot',
       className: styles.view_update_button,
-      onClick: viewReleaseNotes,
+      onClick: proceed,
     },
   ]
 
   return (
-    <ScrollableAlertModal heading={HEADING} buttons={buttons} alertOverlay>
+    <ScrollableAlertModal
+      heading={HEADING}
+      buttons={buttons}
+      restrictOuterScroll={false}
+      alertOverlay
+    >
       <div className={styles.system_update_modal}>
         <p className={styles.system_update_warning}>
           This update is a little different than previous updates.{' '}
@@ -33,13 +41,13 @@ export default function UpdateBuildroot(props: Props) {
 
         <p>
           In addition to delivering new features, this update changes the
-          robot’s operating system to improve robot stabillity and support.
+          robot’s operating system to improve robot stability and support.
         </p>
 
         <p>
           Please note that this update will take an estimated 10-15 minutes,
           will reboot your robot two times, and requires your OT-2 to remain
-          discoverable via USB or Wifi throughout the entire migration process.
+          discoverable via USB or Wi-Fi throughout the entire migration process.
         </p>
       </div>
     </ScrollableAlertModal>

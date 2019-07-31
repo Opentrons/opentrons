@@ -9,13 +9,8 @@ import {
   actions as robotActions,
 } from '../../robot'
 import { getConfig } from '../../config'
-import {
-  CONNECTABLE,
-  REACHABLE,
-  getRobotApiVersion,
-  getRobotBuildrootStatus,
-} from '../../discovery'
-import { getBuildrootUpdateSeen, setBuildrootUpdateSeen } from '../../shell'
+import { CONNECTABLE, REACHABLE, getRobotApiVersion } from '../../discovery'
+import { getBuildrootUpdateSeen, getBuildrootRobot } from '../../shell'
 
 import {
   makeGetRobotHome,
@@ -41,7 +36,7 @@ import ResetRobotModal from '../../components/RobotSettings/ResetRobotModal'
 import type { ContextRouter } from 'react-router'
 import type { State, Dispatch, Error } from '../../types'
 import type { ViewableRobot } from '../../discovery'
-import type { ShellUpdateState, BuildrootStatus } from '../../shell'
+import type { ShellUpdateState } from '../../shell'
 
 type WithRouterOP = {|
   robot: ViewableRobot,
@@ -58,20 +53,18 @@ type SP = {|
   showConnectAlert: boolean,
   homeInProgress: ?boolean,
   homeError: ?Error,
+  updateInProgress: boolean,
   __buildRootEnabled: boolean,
-  buildrootUpdateSeen: boolean,
-  buildrootStatus: BuildrootStatus | null,
 |}
 
 type DP = {| dispatch: Dispatch |}
 
-type Props = {
+type Props = {|
   ...OP,
   ...SP,
   closeHomeAlert?: () => mixed,
   closeConnectAlert: () => mixed,
-  ignoreBuildrootUpdate: () => mixed,
-}
+|}
 
 export default withRouter<WithRouterOP>(
   connect<Props, OP, SP, {||}, State, Dispatch>(
@@ -95,8 +88,7 @@ function RobotSettingsPage(props: Props) {
     showConnectAlert,
     closeConnectAlert,
     showUpdateModal,
-    buildrootStatus,
-    ignoreBuildrootUpdate,
+    updateInProgress,
     match: { path, url },
   } = props
 
@@ -105,11 +97,13 @@ function RobotSettingsPage(props: Props) {
   const calibrateDeckUrl = `${url}/${CALIBRATE_DECK_FRAGMENT}`
   const resetUrl = `${url}/${RESET_FRAGMENT}`
 
-  // TODO(mc, 2018-05-08): pass parentUrl to RobotSettings
+  // TODO(mc, 2018-07-26): these routes are too complicated and mess with the
+  // active state of the robot side-panel links. Remove in favor of a component
+  // or redux state-based solution
   return (
-    <React.Fragment>
+    <>
       <Page titleBarProps={titleBarProps}>
-        {robot.status === REACHABLE && (
+        {robot.status === REACHABLE && !updateInProgress && (
           <ReachableRobotBanner key={robot.name} {...robot} />
         )}
         {robot.status === CONNECTABLE && (
@@ -126,15 +120,12 @@ function RobotSettingsPage(props: Props) {
       <Switch>
         <Route
           path={`${path}/${UPDATE_FRAGMENT}`}
-          render={() => {
+          render={routeProps => {
             if (props.__buildRootEnabled) {
               return (
                 <UpdateBuildroot
                   robot={robot}
-                  appUpdate={appUpdate}
-                  parentUrl={url}
-                  buildrootStatus={buildrootStatus}
-                  ignoreBuildrootUpdate={ignoreBuildrootUpdate}
+                  close={() => routeProps.history.push(url)}
                 />
               )
             }
@@ -186,7 +177,7 @@ function RobotSettingsPage(props: Props) {
       {showConnectAlert && (
         <ConnectAlertModal onCloseClick={closeConnectAlert} />
       )}
-    </React.Fragment>
+    </>
   )
 }
 
@@ -204,15 +195,22 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
     const ignoredRequest = getUpdateIgnoredRequest(state, robot)
     const restartRequest = getRestartRequest(state, robot)
     const updateInfo = getRobotUpdateInfo(state, robot)
-    const buildrootStatus = getRobotBuildrootStatus(robot)
     const buildrootUpdateSeen = getBuildrootUpdateSeen(state)
+    const currentBrRobot = getBuildrootRobot(state)
     const __buildRootEnabled = Boolean(
       getConfig(state).devInternal?.enableBuildRoot
     )
+    const updateInProgress = currentBrRobot === robot
     let showUpdateModal: ?boolean
+
     if (__buildRootEnabled) {
+      const currentBrRobot = getBuildrootRobot(state)
+
       showUpdateModal =
-        !buildrootUpdateSeen && robotVersion !== updateInfo.version
+        updateInProgress ||
+        (!buildrootUpdateSeen &&
+          robotVersion !== updateInfo.version &&
+          currentBrRobot === null)
     } else {
       showUpdateModal =
         // only show the alert modal if there's an upgrade available
@@ -230,8 +228,7 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
 
     return {
       __buildRootEnabled,
-      buildrootStatus,
-      buildrootUpdateSeen,
+      updateInProgress,
       showUpdateModal: !!showUpdateModal,
       homeInProgress: homeRequest && homeRequest.inProgress,
       homeError: homeRequest && homeRequest.error,
@@ -247,7 +244,6 @@ function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
     ...stateProps,
     ...ownProps,
     closeConnectAlert: () => dispatch(robotActions.clearConnectResponse()),
-    ignoreBuildrootUpdate: () => dispatch(setBuildrootUpdateSeen()),
   }
 
   if (robot) {

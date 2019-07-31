@@ -1,6 +1,10 @@
 // @flow
 import type { RobotHost } from '../../robot-api'
 
+export type BuildrootUpdateType = 'upgrade' | 'downgrade' | 'reinstall'
+
+export type RobotSystemType = 'balena' | 'buildroot'
+
 export type BuildrootUpdateInfo = {|
   version: string,
   releaseNotes: string,
@@ -34,11 +38,10 @@ export type BuildrootUpdateSession = {|
   robotName: string,
   token: string | null,
   pathPrefix: string | null,
-  stage: UpdateSessionStage | null,
   step: UpdateSessionStep | null,
+  stage: UpdateSessionStage | null,
   progress: number | null,
-  // TODO(mc, 2019-07-25): error messages
-  error: boolean,
+  error: string | null,
 |}
 
 export type BuildrootState = {|
@@ -54,9 +57,9 @@ export type StartBuildrootUpdateAction = {|
   payload: string,
 |}
 
-// TODO(mc, 2019-07-19): flesh this action type out so it's actually useful
 export type UnexpectedBuildrootError = {|
   type: 'buildroot:UNEXPECTED_ERROR',
+  payload: {| message: string |},
 |}
 
 export type BuildrootAction =

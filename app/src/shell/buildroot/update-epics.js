@@ -59,6 +59,7 @@ export const startUpdateEpic: Epic = (action$, state$) =>
     switchMap<[StartBuildrootUpdateAction, State], _, mixed>(
       ([action, state]) => {
         // BR_START_UPDATE will set the active updating robot in state
+        const robotName = action.payload
         const host = getBuildrootRobot(state)
         const serverHealth = host?.serverHealth || null
 
@@ -86,9 +87,21 @@ export const startUpdateEpic: Epic = (action$, state$) =>
 
             return makeRobotApiRequest({ method: 'POST', host, path }, meta)
           }
+
+          return of(
+            unexpectedBuildrootError(
+              `Robot ${robotName} has incorrect capabilities shape: ${JSON.stringify(
+                capabilities
+              )}`
+            )
+          )
         }
 
-        return of(unexpectedBuildrootError())
+        return of(
+          unexpectedBuildrootError(
+            `Unable to find online robot with name ${robotName}`
+          )
+        )
       }
     )
   )
@@ -201,6 +214,7 @@ const passActiveSession = (props: $Shape<BuildrootUpdateSession>) => (
 
   return (
     robot !== null &&
+    !session?.error &&
     typeof session?.pathPrefix === 'string' &&
     typeof session?.token === 'string' &&
     every(props, (value, key) => session?.[key] === value)
@@ -262,7 +276,8 @@ export const watchForOfflineAfterRestartEpic: Epic = (_, state$) =>
     filter(state => {
       const session = getBuildrootSession(state)
       const robot = getBuildrootRobot(state)
-      return Boolean(robot?.ok) === false && session?.step === 'restart'
+
+      return !robot?.ok && !session?.error && session?.step === 'restart'
     }),
     switchMap(() => of(setBuildrootSessionStep('restarting')))
   )
@@ -273,17 +288,28 @@ export const watchForOnlineAfterRestartEpic: Epic = (_, state$) =>
       const session = getBuildrootSession(state)
       const robot = getBuildrootRobot(state)
 
-      return Boolean(robot?.ok) && session?.step === 'restarting'
+      return (
+        Boolean(robot?.ok) && !session?.error && session?.step === 'restarting'
+      )
     }),
-    switchMap(state => {
-      const info = getBuildrootUpdateInfo(state)
-      const robot: ViewableRobot = (getBuildrootRobot(state): any)
-      const finishedAction =
-        info !== null && getRobotApiVersion(robot) === info.version
-          ? setBuildrootSessionStep('finished')
-          : unexpectedBuildrootError()
+    switchMap<State, _, mixed>(stateWithRobot => {
+      const info = getBuildrootUpdateInfo(stateWithRobot)
+      const robot: ViewableRobot = (getBuildrootRobot(stateWithRobot): any)
+      const robotVersion = getRobotApiVersion(robot)
+      const targetVersion = info?.version
+      const actual = robotVersion || 'unknown'
+      const expected = targetVersion || 'unknown'
 
-      return of(finishedAction, {
+      const finishAction =
+        targetVersion != null &&
+        robotVersion != null &&
+        robotVersion === targetVersion
+          ? setBuildrootSessionStep('finished')
+          : unexpectedBuildrootError(
+              `robot reconnected with version ${actual}, but we expected ${expected}`
+            )
+
+      return of(finishAction, {
         type: 'discovery:FINISH',
         meta: { shell: true },
       })
