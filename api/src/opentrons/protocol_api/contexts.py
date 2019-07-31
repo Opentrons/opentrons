@@ -1972,6 +1972,7 @@ class ThermocyclerContext(ModuleContext):
         self._module = hw_module
         self._loop = loop
         self._protocol_lid_target = None
+
         super().__init__(ctx, geometry)
 
     @property
@@ -2040,22 +2041,18 @@ class ThermocyclerContext(ModuleContext):
             temp=temp, hold_time=hold_time, ramp_rate=ramp_rate)
 
     @cmds.publish.both(command=cmds.thermocycler_cycle_temperatures)
-    def cycle_temperatures(self, stages: List[Tuple[float, float, Optional[float]]], repetitions: int):
-        """ For a given number of repetitions, cycle through a list of temperatures in
-        degrees C for a set hold time.
+    def cycle_temperatures(self,
+            steps: List[Tuple[float, float, Optional[float]]], repetitions: int):
+        """ For a given number of repetitions, cycle through a list of
+        temperatures in degrees C for a set hold time.
 
-        :param stages: List of unique stages that make up a single cycle. Each item
-                       in list maps to valid parameters of the set_temperature method.
-                       NOTE: hold_time must be finite for each stage.
-        :param repetitions: The number of times to repeat the cycled stages.
+        :param steps: List of unique steps that make up a single cycle. Each tuple
+                      in list maps to parameters of the set_temperature method.
+                      NOTE: hold_time must be defined and finite for each stage.
+        :param repetitions: The number of times to repeat the cycled steps.
         """
-        #  TODO: update total cycles on API instance
-        for index, rep in enumerate(range(repetitions)):
-            #  TODO: set cycle counter on API instance
-            # publish(command=cmds.update_cycle_counter, index)
-            for stage in stages:
-                self.set_temperature(*stage)
-                self.wait_for_hold()
+        return self._module.cycle_temperature(
+            steps=steps, repetitions=repetitions)
 
     @property
     def current_lid_target(self):
@@ -2117,6 +2114,26 @@ class ThermocyclerContext(ModuleContext):
     def hold_time(self):
         """ Remaining hold time in sec"""
         return self._module.hold_time
+
+    @property
+    def total_cycle_count(self):
+        """ Number of repetitions for current set cycle"""
+        return self._module.total_cycle_count
+
+    @property
+    def current_cycle_index(self):
+        """ Index of the current set cycle repetition"""
+        return self._module.current_cycle_index
+
+    @property
+    def total_step_count(self):
+        """ Number of steps within the current cycle"""
+        return self._module.total_step_count
+
+    @property
+    def current_step_index(self):
+        """ Index of the current step within the current cycle"""
+        return self._module.current_step_index
 
     @cmds.publish.both(command=cmds.thermocycler_deactivate)
     def deactivate(self):

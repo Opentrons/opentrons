@@ -1,6 +1,6 @@
 import asyncio
 from . import mod_abc
-from typing import Union, Optional
+from typing import Union, Optional, List, Tuple
 from opentrons.drivers.thermocycler.driver import (
     Thermocycler as ThermocyclerDriver)
 
@@ -151,6 +151,10 @@ class Thermocycler(mod_abc.AbstractModule):
         self._port = port
         self._device_info = None
         self._poller = None
+        self._total_cycle_count = None
+        self._current_cycle_index = None
+        self._total_step_count = None
+        self._current_step_index = None
 
     async def deactivate(self):
         await self._driver.deactivate()
@@ -167,6 +171,17 @@ class Thermocycler(mod_abc.AbstractModule):
     async def set_temperature(self, temp, hold_time=None, ramp_rate=None):
         await self._driver.set_temperature(
             temp=temp, hold_time=hold_time, ramp_rate=ramp_rate)
+
+    async def cycle_temperatures(self,
+                                 steps: List[Tuple[float, float, Optional[float]]], repetitions: int):
+        self._total_cycle_count = repetitions
+        self._total_step_count = len(steps)
+        for rep_idx, rep in enumerate(range(repetitions)):
+            self._current_cycle_index = rep_idx + 1  # because scientists start at 1
+            for step_idx, step in enumerate(steps):
+                self._current_step_index = step_idx + 1  # because scientists start at 1
+                self.set_temperature(*step)
+                self.wait_for_hold()
 
     async def set_lid_temperature(self, temp: Optional[float]):
         """ Set the lid temperature in deg Celsius """
@@ -237,6 +252,22 @@ class Thermocycler(mod_abc.AbstractModule):
         return self._device_info
 
     @property
+    def total_cycle_count(self):
+        return self._total_cycle_count
+
+    @property
+    def current_cycle_index(self):
+        return self._current_cycle_index
+
+    @property
+    def total_step_count(self):
+        return self._total_step_count
+
+    @property
+    def current_step_index(self):
+        return self._current_step_index
+
+    @property
     def live_data(self):
         return {
             'status': self.status,
@@ -247,7 +278,11 @@ class Thermocycler(mod_abc.AbstractModule):
                 'currentTemp': self.temperature,
                 'targetTemp': self.target,
                 'holdTime': self.hold_time,
-                'rampRate': self.ramp_rate
+                'rampRate': self.ramp_rate,
+                'currentCycleIndex': self.current_cycle_index,
+                'totalCycleCount': self.total_cycle_count,
+                'currentStepIndex': self.current_step_index,
+                'totalStepCount': self.total_step_count,
             }
         }
 

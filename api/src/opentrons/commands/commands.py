@@ -3,6 +3,7 @@ from opentrons.broker import Broker
 
 import functools
 import inspect
+from pprint import pprint
 from typing import Union, Sequence, List, Any
 
 from opentrons.legacy_api.containers import (Well as OldWell,
@@ -391,13 +392,13 @@ def thermocycler_set_temp(temp, hold_time):
         }
     )
 
-def thermocycler_cycle_temperatures(stages, repetitions):
-    text = f'Thermocycler starting {repetitions} repetitions of cycle composed of the following stages:'
+def thermocycler_cycle_temperatures(steps, repetitions):
+    text = f'Thermocycler starting {repetitions} repetitions of cycle composed of the following steps: {steps}'
     return make_command(
         name=command_types.THERMOCYCLER_CYCLE_TEMPS,
         payload={
             'text': text,
-            'stages': str(stages)
+            'steps': pprint(steps)
         }
     )
 

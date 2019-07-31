@@ -97,18 +97,22 @@ async def get_attached_modules(request):
     {
         "modules": [
             {
-                /** name of module */
+                /** machine readable identifying name of module */
                 "name": "string",
-                /** model identifier (i.e. part number) */
-                "model": "string",
+                /** human-presentable name of module */
+                "displayName": "string",
+                /** module system port path*/
+                "port": "string",
                 /** unique serial number */
                 "serial": "string",
+                /** model identifier (i.e. part number) */
+                "model": "string",
                 /** current firmware version */
                 "fwVersion": "string",
                 /** human readable status */
                 "status": "string",
-                /** human readable display name */
-                "displayName": "string",
+                /** live module data*/
+                "data": "dict",
             },
             // ...
         ],
@@ -199,7 +203,7 @@ async def execute_module_command(request):
                                  status=404)
 
     matching_mod = next((mod for mod in hw_mods if
-                        mod.device_info.get('serial') == requested_serial),
+                         mod.device_info.get('serial') == requested_serial),
                         None)
 
     if not matching_mod:
