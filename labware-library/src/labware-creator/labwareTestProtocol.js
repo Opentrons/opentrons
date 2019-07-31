@@ -25,7 +25,6 @@ const labwareTestProtocol = (args: LabwareTestProtocolArgs): string => {
   const mount = 'right' // NOTE: for now, we'll ONLY use right so that mount-offset issues are reduced
 
   return `import json
-import operator
 from opentrons import robot, labware, instruments
 
 TOP_RIGHT_CROSS_COORDS = [380.87, 258.0, 0]
@@ -63,39 +62,31 @@ def run_custom_protocol(pipette_name, mount, tiprack_load_name, labware_def):
     num_cols = len(labware_def.get('ordering', [[]]))
     num_rows = len(labware_def.get('ordering', [[]])[0])
 
-    # use uniq to remove duplicate wells from 1-row and/or 1-column labware
+    # remove duplicate wells
     well_locs = uniq([
         'A1',
-        '{}1'.format(chr(ord('A') + num_rows - 1)),
-        '{}{}'.format(chr(ord('A') + num_rows - 1), str(num_cols)),
         '{}{}'.format(chr(ord('A') + num_rows - 1), str(num_cols))])
 
     for well_loc in well_locs:
         well = test_labware.wells(well_loc)
+        all_4_edges = [
+            [well.from_center(x=-1, y=0, z=1), 'left'],
+            [well.from_center(x=0, y=-1, z=1), 'bottom'],
+            [well.from_center(x=1, y=0, z=1), 'right'],
+            [well.from_center(x=0, y=1, z=1), 'top']
+        ]
+
         pipette.move_to(well.bottom())
         robot.pause("Moved to the bottom of the well")
+
         pipette.move_to(well.top())
         robot.pause("Moved to the top of the well")
-        # TODO: is this 0.1mm offset being added here necessary?
-        from_center_result1 = tuple(
-            map(operator.add, well.from_center(x=-1, y=0, z=1), (0, 0, 0.1)))
-        from_center_result2 = tuple(
-            map(operator.add, well.from_center(x=0, y=-1, z=1), (0, 0, 0.1)))
-        from_center_result3 = tuple(
-            map(operator.add, well.from_center(x=1, y=0, z=1), (0, 0, 0.1)))
-        from_center_result4 = tuple(
-            map(operator.add, well.from_center(x=0, y=1, z=1), (0, 0, 0.1)))
-        pipette.move_to((well, from_center_result1))
-        robot.pause()
-        pipette.move_to(well.top())
-        pipette.move_to((well, from_center_result2))
-        robot.pause()
-        pipette.move_to(well.top())
-        pipette.move_to((well, from_center_result3))
-        robot.pause()
-        pipette.move_to(well.top())
-        pipette.move_to((well, from_center_result4))
-        robot.pause("Move to the left and top")
+        
+        for edge_pos, edge_name in all_4_edges:
+            pipette.move_to(well.top())
+            pipette.move_to((well, edge_pos))
+            robot.pause(f'Moved to {edge_name} edge')
+
         pipette.blow_out(well)
 
 
