@@ -54,7 +54,7 @@ def test_labware_mappings(loop, monkeypatch):
 
     ctx = ProtocolContext(loop)
     bc = back_compat.BCLabware(ctx)
-    monkeypatch.setattr(ctx, 'load_labware_by_name', fake_ctx_load)
+    monkeypatch.setattr(ctx, 'load_labware', fake_ctx_load)
     obj = bc.load('384-plate', 2, 'hey there')
     assert obj == 'heres a fake labware'
     assert lw_name == 'corning_384_wellplate_112ul_flat'

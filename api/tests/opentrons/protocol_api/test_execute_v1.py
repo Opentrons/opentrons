@@ -43,7 +43,7 @@ async def test_load_pipettes(loop, protocol_data):
 @pytest.mark.parametrize('command_type', ['aspirate', 'dispense'])
 def test_get_location_with_offset(loop, command_type):
     ctx = ProtocolContext(loop=loop)
-    plate = ctx.load_labware_by_name("corning_96_wellplate_360ul_flat", 1)
+    plate = ctx.load_labware("corning_96_wellplate_360ul_flat", 1)
     well = "B2"
 
     default_values = {
@@ -156,9 +156,9 @@ def test_dispatch_commands(monkeypatch, loop):
 
     insts = execute_v1.load_pipettes_from_json(ctx, protocol_data)
 
-    source_plate = ctx.load_labware_by_name(
+    source_plate = ctx.load_labware(
         'corning_96_wellplate_360ul_flat', '1')
-    dest_plate = ctx.load_labware_by_name(
+    dest_plate = ctx.load_labware(
         'corning_96_wellplate_360ul_flat', '2')
 
     loaded_labware = {

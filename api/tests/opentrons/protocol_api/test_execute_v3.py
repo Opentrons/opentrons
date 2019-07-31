@@ -115,11 +115,11 @@ def test_dispatch_commands(monkeypatch, loop):
 
     monkeypatch.setattr(ctx, 'delay', mock_delay)
 
-    source_plate = ctx.load_labware_by_name(
+    source_plate = ctx.load_labware(
         'corning_96_wellplate_360ul_flat', '1')
-    dest_plate = ctx.load_labware_by_name(
+    dest_plate = ctx.load_labware(
         'corning_96_wellplate_360ul_flat', '2')
-    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_10ul', '3')
+    tiprack = ctx.load_labware('opentrons_96_tiprack_10ul', '3')
 
     loaded_labware = {
         'sourcePlateId': source_plate,

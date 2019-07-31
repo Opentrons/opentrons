@@ -116,8 +116,7 @@ class ProtocolContext(CommandPublisher):
         else:
             trash_name = 'opentrons_1_trash_1100ml_fixed'
 
-        self.load_labware_by_name(
-            trash_name, '12')
+        self.load_labware(trash_name, '12')
 
     def __del__(self):
         if getattr(self, '_unsubscribe_commands', None):
@@ -204,7 +203,7 @@ class ProtocolContext(CommandPublisher):
         self._deck_layout[location] = labware_obj
         return labware_obj
 
-    def load_labware_by_name(
+    def load_labware(
             self,
             load_name: str,
             location: types.DeckLocation,
@@ -212,7 +211,7 @@ class ProtocolContext(CommandPublisher):
             namespace: str = None,
             version: int = 1
     ) -> Labware:
-        """ A convenience function to specify a piece of labware by name.
+        """ Load a labware onto the deck given its name.
 
         For labware already defined by Opentrons, this is a convenient way
         to collapse the two stages of labware initialization (creating
@@ -236,6 +235,20 @@ class ProtocolContext(CommandPublisher):
         """
         labware_def = get_labware_definition(load_name, namespace, version)
         return self.load_labware_from_definition(labware_def, location, label)
+
+    def load_labware_by_name(
+            self,
+            load_name: str,
+            location: types.DeckLocation,
+            label: str = None,
+            namespace: str = None,
+            version: int = 1
+    ) -> Labware:
+        MODULE_LOG.warning(
+            'load_labware_by_name is deprecated and will be removed in '
+            'version 3.12.0. please use load_labware')
+        return self.load_labware(
+            load_name, location, label, namespace, version)
 
     def load_module(
             self, module_name: str,
@@ -1742,28 +1755,34 @@ class ModuleContext(CommandPublisher):
         self._geometry = geometry
         self._ctx = ctx
 
-    def load_labware(self, labware: Labware) -> Labware:
+    def load_labware_object(self, labware: Labware) -> Labware:
         """ Specify the presence of a piece of labware on the module.
 
         :param labware: The labware object. This object should be already
                         initialized and its parent should be set to this
                         module's geometry. To initialize and load a labware
                         onto the module in one step, see
-                        :py:meth:`load_labware_by_name`.
+                        :py:meth:`load_labware`.
         :returns: The properly-linked labware object
         """
         mod_labware = self._geometry.add_labware(labware)
         self._ctx.deck.recalculate_high_z()
         return mod_labware
 
-    def load_labware_by_name(self, name: str) -> Labware:
+    def load_labware(self, name: str) -> Labware:
         """ Specify the presence of a piece of labware on the module.
 
         :param name: The name of the labware object.
         :returns: The initialized and loaded labware object.
         """
         lw = load(name, self._geometry.location)
-        return self.load_labware(lw)
+        return self.load_labware_object(lw)
+
+    def load_labware_by_name(self, name: str) -> Labware:
+        MODULE_LOG.warning(
+            'load_labware_by_name is deprecated and will be removed in '
+            'version 3.12.0. please use load_labware')
+        return self.load_labware(name)
 
     @property
     def labware(self) -> Optional[Labware]:
@@ -1869,7 +1888,7 @@ class MagneticModuleContext(ModuleContext):
         """
         self._module.calibrate()
 
-    def load_labware(self, labware: Labware) -> Labware:
+    def load_labware_object(self, labware: Labware) -> Labware:
         """
         Load labware onto a Magnetic Module, checking if it is compatible
         """
@@ -1878,7 +1897,7 @@ class MagneticModuleContext(ModuleContext):
                 "This labware ({}) is not explicitly compatible with the"
                 " Magnetic Module. You will have to specify a height when"
                 " calling engage().")
-        return super().load_labware(labware)
+        return super().load_labware_object(labware)
 
     @cmds.publish.both(command=cmds.magdeck_engage)
     def engage(self, height: float = None, offset: float = None):

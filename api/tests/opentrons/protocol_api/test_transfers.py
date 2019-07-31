@@ -8,9 +8,9 @@ from opentrons.protocol_api import transfers as tx
 @pytest.fixture
 def _instr_labware(loop):
     ctx = papi.ProtocolContext(loop)
-    lw1 = ctx.load_labware_by_name('biorad_96_wellplate_200ul_pcr', 1)
-    lw2 = ctx.load_labware_by_name('corning_96_wellplate_360ul_flat', 2)
-    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_300ul', 3)
+    lw1 = ctx.load_labware('biorad_96_wellplate_200ul_pcr', 1)
+    lw2 = ctx.load_labware('corning_96_wellplate_360ul_flat', 2)
+    tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 3)
     instr = ctx.load_instrument('p300_single', Mount.RIGHT,
                                 tip_racks=[tiprack])
 
