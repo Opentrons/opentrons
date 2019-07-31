@@ -15,7 +15,7 @@ updated component library cards after redesign/refactor
   @apply --font-body-2-dark;
 
   padding: 1rem 0.5rem 0;
-  font-weight: --fw-bold;
+  font-weight: var(--fw-bold);
   text-transform: uppercase;
 }
 
