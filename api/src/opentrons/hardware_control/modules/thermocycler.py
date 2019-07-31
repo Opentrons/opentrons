@@ -157,6 +157,10 @@ class Thermocycler(mod_abc.AbstractModule):
         self._current_step_index = None
 
     async def deactivate(self):
+        self._total_cycle_count = None
+        self._current_cycle_index = None
+        self._total_step_count = None
+        self._current_step_index = None
         await self._driver.deactivate()
 
     async def open(self) -> str:
@@ -180,8 +184,8 @@ class Thermocycler(mod_abc.AbstractModule):
             self._current_cycle_index = rep_idx + 1  # because scientists start at 1
             for step_idx, step in enumerate(steps):
                 self._current_step_index = step_idx + 1  # because scientists start at 1
-                self.set_temperature(*step)
-                self.wait_for_hold()
+                await self.set_temperature(*step)
+                await self.wait_for_hold()
 
     async def set_lid_temperature(self, temp: Optional[float]):
         """ Set the lid temperature in deg Celsius """
