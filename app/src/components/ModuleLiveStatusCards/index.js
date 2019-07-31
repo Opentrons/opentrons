@@ -44,11 +44,11 @@ const ModuleLiveStatusCards = (props: Props) => {
       {liveStatusModules.map(module => {
         switch (module.name) {
           case 'tempdeck':
-            return <TempDeckCard module={module} />
+            return <TempDeckCard key={module.serial} module={module} />
           case 'thermocycler':
-            return <ThermocyclerCard module={module} />
+            return <ThermocyclerCard key={module.serial} module={module} />
           case 'magdeck':
-            return <MagDeckCard module={module} />
+            return <MagDeckCard key={module.serial} module={module} />
           default:
             return null
         }
