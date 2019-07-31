@@ -1788,8 +1788,8 @@ class ThermocyclerContext(ModuleContext):
         else:
             trash_top = self._ctx.fixed_trash.wells()[0].top()
             high_z = self._ctx.deck.highest_z
-            safe_point = types.Point(x=trash_top.point.x, y=trash_top.point.y,
-                                        z=high_z)
+            safe_point = types.Point(x=trash_top.point.x,
+                                     y=trash_top.point.y, z=high_z)
             safe_loc = types.Location(safe_point, None)
             instrument.move_to(safe_loc, minimum_z_height=high_z)
 
