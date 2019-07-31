@@ -1781,16 +1781,17 @@ class ThermocyclerContext(ModuleContext):
                               if instr is not None]
         try:
             instrument = loaded_instruments[0]
-            trash_top = self._ctx.fixed_trash.wells()[0].top()
-            high_z = self._ctx.deck.highest_z
-            safe_point = types.Point(x=trash_top.point.x, y=trash_top.point.y,
-                                     z=high_z)
-            safe_loc = types.Location(safe_point, None)
-            instrument.move_to(safe_loc, minimum_z_height=high_z)
         except IndexError:
             MODULE_LOG.warning(
                 "Cannot assure a safe gantry position to avoid colliding"
                 " with the lid of the Thermocycler Module.")
+        else:
+            trash_top = self._ctx.fixed_trash.wells()[0].top()
+            high_z = self._ctx.deck.highest_z
+            safe_point = types.Point(x=trash_top.point.x, y=trash_top.point.y,
+                                        z=high_z)
+            safe_loc = types.Location(safe_point, None)
+            instrument.move_to(safe_loc, minimum_z_height=high_z)
 
     @cmds.publish.both(command=cmds.thermocycler_open)
     def open(self):
