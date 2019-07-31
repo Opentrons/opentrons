@@ -41,7 +41,7 @@ def _get_well(loaded_labware: Dict[str, labware.Labware],
         raise ValueError(
             'Command tried to use labware "{}", but that ID does not exist '
             'in protocol\'s "labware" section'.format(labwareId))
-    return plate.wells_by_index()[well]
+    return plate[well]
 
 
 # TODO (Ian 2018-08-22) once Pipette has more sensible way of managing

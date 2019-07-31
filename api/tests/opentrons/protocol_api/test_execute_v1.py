@@ -67,9 +67,9 @@ def test_get_location_with_offset(loop, command_type):
         assert offs == offset
         result = execute_v1._get_location_with_offset(
             loaded_labware, command_type, command_params, default_values)
-        assert result.labware == plate.wells_by_index()[well]
+        assert result.labware == plate[well]
         assert result.point\
-            == plate.wells_by_index()[well].bottom().point + Point(z=offset)
+            == plate[well].bottom().point + Point(z=offset)
 
     command_params = {
         "labware": "someLabwareId",
@@ -83,7 +83,7 @@ def test_get_location_with_offset(loop, command_type):
     assert execute_v1._get_bottom_offset(
         command_type, command_params, default_values) == default
     assert result.point\
-        == plate.wells_by_index()[well].bottom().point + Point(z=default)
+        == plate[well].bottom().point + Point(z=default)
 
 
 def test_load_labware(loop):
@@ -176,9 +176,9 @@ def test_dispatch_commands(monkeypatch, loop):
         ctx, protocol_data, insts, loaded_labware)
 
     assert cmd == [
-        ("aspirate", 5, source_plate.wells_by_index()['A1'].bottom()),
+        ("aspirate", 5, source_plate['A1'].bottom()),
         ("sleep", 42),
-        ("dispense", 4.5, dest_plate.wells_by_index()['B1'].bottom())
+        ("dispense", 4.5, dest_plate['B1'].bottom())
     ]
 
     assert flow_rates == [

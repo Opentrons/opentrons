@@ -139,7 +139,7 @@ def test_pick_up_and_drop_tip(loop, get_labware_def):
     pipette: Pipette = ctx._hw_manager.hardware._attached_instruments[mount]
     model_offset = Point(*pipette.config.model_offset)
     assert pipette.critical_point() == model_offset
-    target_location = tiprack.wells_by_index()['A1'].top()
+    target_location = tiprack['A1'].top()
 
     instr.pick_up_tip(target_location)
     assert not tiprack.wells()[0].has_tip
@@ -166,7 +166,7 @@ def test_return_tip(loop, get_labware_def):
     pipette: Pipette\
         = ctx._hw_manager.hardware._attached_instruments[mount]
 
-    target_location = tiprack.wells_by_index()['A1'].top()
+    target_location = tiprack['A1'].top()
     instr.pick_up_tip(target_location)
     assert not tiprack.wells()[0].has_tip
     assert pipette.has_tip

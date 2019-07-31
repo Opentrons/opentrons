@@ -132,23 +132,23 @@ def test_dispatch_commands(monkeypatch, loop):
         ctx, protocol_data, insts, loaded_labware)
 
     assert command_log == [
-        ("pick_up_tip", (tiprack.wells_by_index()['B1'],)),
+        ("pick_up_tip", (tiprack['B1'],)),
         ("set: flow_rate.aspirate", (3,)),
         ("set: flow_rate.dispense", (3,)),
         ("set: flow_rate.blow_out", (3,)),
-        ("aspirate", (5, source_plate.wells_by_index()['A1'].bottom(2),)),
+        ("aspirate", (5, source_plate['A1'].bottom(2),)),
         ("delay", 42),
         ("set: flow_rate.aspirate", (2.5,)),
         ("set: flow_rate.dispense", (2.5,)),
         ("set: flow_rate.blow_out", (2.5,)),
-        ("dispense", (4.5, dest_plate.wells_by_index()['B1'].bottom(1),)),
-        ("touch_tip", (dest_plate.wells_by_index()['B1'],),
+        ("dispense", (4.5, dest_plate['B1'].bottom(1),)),
+        ("touch_tip", (dest_plate['B1'],),
             {"v_offset": 0.33000000000000007}),
         ("set: flow_rate.aspirate", (2,)),
         ("set: flow_rate.dispense", (2,)),
         ("set: flow_rate.blow_out", (2,)),
-        ("blow_out", (dest_plate.wells_by_index()['B1'],)),
+        ("blow_out", (dest_plate['B1'],)),
         ("move_to", (ctx.deck.position_for('5').move(Point(1, 2, 3)),),
             {"force_direct": None, "minimum_z_height": None}),
-        ("drop_tip", (ctx.fixed_trash.wells_by_index()['A1'],))
+        ("drop_tip", (ctx.fixed_trash['A1'],))
     ]

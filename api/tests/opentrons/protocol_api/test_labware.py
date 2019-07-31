@@ -123,9 +123,9 @@ def test_backcompat():
     # because dimensional parameters could be subject to modification through
     # calibration, whereas here we are testing for "identity" in a way that is
     # related to the combination of well name, labware name, and slot name
-    well_a1_name = repr(lw.wells_by_index()['A1'])
-    well_b2_name = repr(lw.wells_by_index()['B2'])
-    well_c3_name = repr(lw.wells_by_index()['C3'])
+    well_a1_name = repr(lw.wells_by_name()['A1'])
+    well_b2_name = repr(lw.wells_by_name()['B2'])
+    well_c3_name = repr(lw.wells_by_name()['C3'])
 
     w2 = lw.well(0)
     assert repr(w2) == well_a1_name

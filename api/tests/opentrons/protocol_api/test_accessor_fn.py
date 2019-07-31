@@ -149,7 +149,7 @@ def test_wells_accessor():
     assert fake_labware.wells()[1]._position == a2
 
 
-def test_wells_index_accessor():
+def test_wells_name_accessor():
     deck = Location(Point(0, 0, 0), 'deck')
     fake_labware = labware.Labware(minimalLabwareDef, deck)
     depth1 = minimalLabwareDef['wells']['A1']['depth']
@@ -159,8 +159,30 @@ def test_wells_index_accessor():
     offset = fake_labware._offset
     a1 = Point(x=offset[0], y=offset[1], z=offset[2] + depth1)
     a2 = Point(x=offset[0] + x, y=offset[1] + y, z=offset[2] + depth2)
-    assert fake_labware.wells_by_index()['A1']._position == a1
-    assert fake_labware.wells_by_index()['A2']._position == a2
+    assert fake_labware.wells_by_name()['A1']._position == a1
+    assert fake_labware.wells_by_name()['A2']._position == a2
+
+
+def test_deprecated_index_accessors():
+    deck = Location(Point(0, 0, 0), 'deck')
+    fake_labware = labware.Labware(minimalLabwareDef, deck)
+    assert fake_labware.wells_by_name() == fake_labware.wells_by_index()
+    assert fake_labware.rows_by_name() == fake_labware.rows_by_index()
+    assert fake_labware.columns_by_name() == fake_labware.columns_by_index()
+
+
+def test_dict_accessor():
+    deck = Location(Point(0, 0, 0), 'deck')
+    fake_labware = labware.Labware(minimalLabwareDef, deck)
+    depth1 = minimalLabwareDef['wells']['A1']['depth']
+    depth2 = minimalLabwareDef['wells']['A2']['depth']
+    x = minimalLabwareDef['wells']['A2']['x']
+    y = minimalLabwareDef['wells']['A2']['y']
+    offset = fake_labware._offset
+    a1 = Point(x=offset[0], y=offset[1], z=offset[2] + depth1)
+    a2 = Point(x=offset[0] + x, y=offset[1] + y, z=offset[2] + depth2)
+    assert fake_labware['A1']._position == a1
+    assert fake_labware['A2']._position == a2
 
 
 def test_rows_accessor():
@@ -179,7 +201,7 @@ def test_rows_accessor():
     assert fake_labware.rows()[1][1]._position == b2
 
 
-def test_row_index_accessor():
+def test_row_name_accessor():
     deck = Location(Point(0, 0, 0), 'deck')
     fake_labware = labware.Labware(minimalLabwareDef2, deck)
     depth1 = minimalLabwareDef2['wells']['A1']['depth']
@@ -191,8 +213,8 @@ def test_row_index_accessor():
     offset = fake_labware._offset
     a1 = Point(x=offset[0] + x1, y=offset[1] + y1, z=offset[2] + depth1)
     b2 = Point(x=offset[0] + x2, y=offset[1] + y2, z=offset[2] + depth2)
-    assert fake_labware.rows_by_index()['A'][0]._position == a1
-    assert fake_labware.rows_by_index()['B'][1]._position == b2
+    assert fake_labware.rows_by_name()['A'][0]._position == a1
+    assert fake_labware.rows_by_name()['B'][1]._position == b2
 
 
 def test_cols_accessor():
@@ -209,7 +231,7 @@ def test_cols_accessor():
     assert fake_labware.columns()[1][0]._position == a2
 
 
-def test_col_index_accessor():
+def test_col_name_accessor():
     deck = Location(Point(0, 0, 0), 'deck')
     fake_labware = labware.Labware(minimalLabwareDef, deck)
     depth1 = minimalLabwareDef['wells']['A1']['depth']
@@ -219,5 +241,5 @@ def test_col_index_accessor():
     offset = fake_labware._offset
     a1 = Point(x=offset[0], y=offset[1], z=offset[2] + depth1)
     a2 = Point(x=offset[0] + x, y=offset[1] + y, z=offset[2] + depth2)
-    assert fake_labware.columns_by_index()['1'][0]._position == a1
-    assert fake_labware.columns_by_index()['2'][0]._position == a2
+    assert fake_labware.columns_by_name()['1'][0]._position == a1
+    assert fake_labware.columns_by_name()['2'][0]._position == a2

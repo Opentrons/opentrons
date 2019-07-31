@@ -27,7 +27,7 @@ def _get_well(loaded_labware: Dict[str, labware.Labware],
     labwareId = params['labware']
     well = params['well']
     plate = loaded_labware[labwareId]
-    return plate.wells_by_index()[well]
+    return plate[well]
 
 
 # TODO (Ian 2019-04-05) once Pipette commands allow flow rate as an
