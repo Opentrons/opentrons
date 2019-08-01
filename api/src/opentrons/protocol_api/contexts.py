@@ -2057,7 +2057,7 @@ class ThermocyclerContext(ModuleContext):
                     isinstance(step, list) and step[1] is None):
                 raise ValueError("hold_time must be defined for each step in cycle")
 
-        MODULE_LOG.info('CONTEXT CYCLE START')
+        MODULE_LOG.debug('CONTEXT CYCLE START')
         return self._module.cycle_temperatures(
             steps=steps, repetitions=repetitions)
 

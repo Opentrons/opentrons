@@ -190,6 +190,7 @@ class Thermocycler(mod_abc.AbstractModule):
         return await self._driver.close()
 
     async def set_temperature(self, temp, hold_time=None, ramp_rate=None):
+        MODULE_LOG.debug('SET TEMP')
         await self._driver.set_temperature(
             temp=temp, hold_time=hold_time, ramp_rate=ramp_rate)
 
@@ -198,17 +199,17 @@ class Thermocycler(mod_abc.AbstractModule):
                               repetitions: int):
         for rep_idx, rep in enumerate(range(repetitions)):
             self._current_cycle_index = rep_idx + 1  # because scientists start at 1
-            MODULE_LOG.info('CYCLE START')
+            MODULE_LOG.debug('CYCLE START')
             for step_idx, step in enumerate(steps):
                 self._current_step_index = step_idx + 1  # because scientists start at 1
                 if self._paused_event.is_set():
-                    MODULE_LOG.info('PAUSE FLAG CAUGHT ON WAIT')
+                    MODULE_LOG.debug('PAUSE FLAG CAUGHT ON WAIT')
                     await self._paused_event.wait()
                 if isinstance(step, dict):
-                    MODULE_LOG.info('BEFORE DICT STEP')
+                    MODULE_LOG.debug('BEFORE DICT STEP')
                     await self.set_temperature(**step)
                 else:
-                    MODULE_LOG.info('BEFORE TUPLE STEP')
+                    MODULE_LOG.debug('BEFORE TUPLE STEP')
                     await self.set_temperature(*step)
                 await self.wait_for_hold()
 
@@ -220,7 +221,7 @@ class Thermocycler(mod_abc.AbstractModule):
         cycle_task = asyncio.create_task(
             self._execute_cycles(steps, repetitions))
         self._current_cycle_task = cycle_task
-        MODULE_LOG.info('JUST BEFORE TASK')
+        MODULE_LOG.debug('JUST BEFORE TASK')
         await cycle_task
 
     async def set_lid_temperature(self, temp: Optional[float]):
