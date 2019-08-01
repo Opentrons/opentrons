@@ -1,6 +1,6 @@
 // @flow
 import type { Action } from '../../types'
-import type { BuildrootState } from './types'
+import type { BuildrootState, BuildrootUpdateSession } from './types'
 
 import {
   passRobotApiRequestAction,
@@ -17,8 +17,12 @@ export const INITIAL_STATE: BuildrootState = {
   session: null,
 }
 
-export const initialSession = (robotName: string) => ({
+export const initialSession = (
+  robotName: string,
+  session: BuildrootUpdateSession | null
+) => ({
   robotName,
+  userFileInfo: session?.userFileInfo || null,
   step: null,
   token: null,
   pathPrefix: null,
@@ -45,7 +49,16 @@ export function buildrootReducer(
       return { ...state, downloadError: action.payload }
 
     case actions.BR_START_UPDATE:
-      return { ...state, session: initialSession(action.payload) }
+      return {
+        ...state,
+        session: initialSession(action.payload.robotName, state.session),
+      }
+
+    case actions.BR_USER_FILE_INFO:
+      return {
+        ...state,
+        session: { ...state.session, userFileInfo: action.payload },
+      }
 
     case actions.BR_START_PREMIGRATION:
       return {
@@ -120,7 +133,7 @@ export function buildrootReducer(
       apiResponse.meta.buildrootStatus === true &&
       typeof apiResponse.payload.body.stage === 'string'
     ) {
-      const { stage, progress } = apiResponse.payload.body
+      const { stage, progress, message } = apiResponse.payload.body
 
       return {
         ...state,
@@ -129,6 +142,7 @@ export function buildrootReducer(
           stage,
           progress:
             typeof progress === 'number' ? Math.round(progress * 100) : null,
+          error: stage === 'error' ? (message: string) : state.session?.error,
         },
       }
     }

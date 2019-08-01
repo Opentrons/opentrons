@@ -6,12 +6,12 @@ import styles from './styles.css'
 import type { ButtonProps } from '@opentrons/components'
 import type { RobotSystemType } from '../../../shell'
 
-type Props = {
+type Props = {|
   notNowButton: ButtonProps,
   releaseNotes: string,
   systemType: RobotSystemType | null,
   proceed: () => mixed,
-}
+|}
 
 export default function ReleaseNotesModal(props: Props) {
   const { notNowButton, releaseNotes, systemType, proceed } = props

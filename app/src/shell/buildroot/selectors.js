@@ -23,8 +23,28 @@ export function getBuildrootUpdateInfo(
   return state.shell.buildroot.info || null
 }
 
+export function getBuildrootTargetVersion(state: State): string | null {
+  return (
+    state.shell.buildroot.session?.userFileInfo?.version ||
+    state.shell.buildroot.info?.version ||
+    null
+  )
+}
+
 export function getBuildrootUpdateSeen(state: State): boolean {
   return state.shell.buildroot.seen || false
+}
+
+export function getBuildrootUpdateInProgress(
+  state: State,
+  robot: ViewableRobot
+): boolean {
+  const session = getBuildrootSession(state)
+  const brRobot = getBuildrootRobot(state)
+
+  return (
+    robot === brRobot && session?.step !== 'finished' && session?.error === null
+  )
 }
 
 export function getBuildrootDownloadProgress(state: State): number | null {

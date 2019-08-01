@@ -1,14 +1,20 @@
 // @flow
 // functions for downloading and storing release files
 // TODO(mc, 2019-07-02): cleanup old downloads
+import assert from 'assert'
 import path from 'path'
+import { promisify } from 'util'
 import tempy from 'tempy'
 import { move, readdir } from 'fs-extra'
+import StreamZip from 'node-stream-zip'
+import getStream from 'get-stream'
 
 import createLogger from '../log'
 import { fetchToFile } from '../http'
 import type { DownloadProgress } from '../http'
-import type { ReleaseSetUrls, ReleaseSetFilepaths } from './types'
+import type { ReleaseSetUrls, ReleaseSetFilepaths, UserFileInfo } from './types'
+
+const VERSION_FILENAME = 'VERSION.json'
 
 const log = createLogger(__filename)
 const outPath = (dir: string, url: string) => path.join(dir, path.basename(url))
@@ -74,5 +80,48 @@ export function downloadReleaseFiles(
       system: systemPath,
       releaseNotes: notesPath,
     }))
+  })
+}
+
+export function readUserFileInfo(systemFile: string): Promise<UserFileInfo> {
+  const openZip = new Promise((resolve, reject) => {
+    const zip = new StreamZip({ file: systemFile, storeEntries: true })
+      .once('ready', handleReady)
+      .once('error', handleError)
+
+    function handleReady() {
+      cleanup()
+      resolve(zip)
+    }
+
+    function handleError(error: Error) {
+      cleanup()
+      zip.close()
+      reject(error)
+    }
+
+    function cleanup() {
+      zip.removeListener('ready', handleReady)
+      zip.removeListener('error', handleError)
+    }
+  })
+
+  return openZip.then(zip => {
+    const entries = zip.entries()
+    const streamFromZip = promisify(zip.stream.bind(zip))
+
+    assert(VERSION_FILENAME in entries, `${VERSION_FILENAME} not in archive`)
+
+    const result = streamFromZip(VERSION_FILENAME)
+      .then(getStream)
+      .then(JSON.parse)
+      .then(versionInfo => ({
+        systemFile,
+        versionInfo,
+      }))
+
+    result.finally(() => zip.close())
+
+    return result
   })
 }

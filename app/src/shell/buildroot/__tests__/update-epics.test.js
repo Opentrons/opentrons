@@ -129,6 +129,25 @@ describe('buildroot update epics', () => {
       })
     })
 
+    test('with systemFile in payload sends READ_USER_FILE', () => {
+      testScheduler.run(({ hot, expectObservable }) => {
+        const action = actions.startBuildrootUpdate(
+          robot.name,
+          '/path/to/system.zip'
+        )
+
+        selectors.getBuildrootRobot.mockReturnValueOnce(balenaRobot)
+
+        const action$ = hot('-a', { a: action })
+        const state$ = hot('a-', { a: state })
+        const output$ = epics.startUpdateEpic(action$, state$)
+
+        expectObservable(output$).toBe('-a', {
+          a: actions.readUserBuildrootFile('/path/to/system.zip'),
+        })
+      })
+    })
+
     test('with bad robot sends UNEXPECTED_ERROR', () => {
       testScheduler.run(({ hot, expectObservable }) => {
         const action = actions.startBuildrootUpdate(robot.name)
@@ -273,7 +292,8 @@ describe('buildroot update epics', () => {
       expectObservable(output$).toBe('-a', {
         a: actions.uploadBuildrootFile(
           brReadyRobot,
-          '/server/update/migration/tok/file'
+          '/server/update/migration/tok/file',
+          null
         ),
       })
     })
@@ -339,6 +359,49 @@ describe('buildroot update epics', () => {
           },
           meta: { buildrootRestart: true },
         },
+      })
+    })
+  })
+
+  describe('user file upload epics', () => {
+    test('triggerUpdateAfterUserFileInfo', () => {
+      testScheduler.run(({ hot, cold, expectObservable }) => {
+        selectors.getBuildrootRobotName.mockReturnValue(balenaRobot.name)
+
+        const action$ = hot('-a', { a: { type: 'buildroot:USER_FILE_INFO' } })
+        const state$ = hot('a-', { a: state })
+        const output$ = epics.triggerUpdateAfterUserFileInfo(action$, state$)
+
+        expectObservable(output$).toBe('-a', {
+          a: actions.startBuildrootUpdate(balenaRobot.name),
+        })
+      })
+    })
+
+    test('uploadFileEpic sends systemFile if it exists in session', () => {
+      testScheduler.run(({ hot, expectObservable }) => {
+        const session = {
+          pathPrefix: '/server/update/migration',
+          token: 'tok',
+          stage: 'awaiting-file',
+          step: 'getToken',
+          userFileInfo: { systemFile: '/path/to/system.zip' },
+        }
+
+        selectors.getBuildrootRobot.mockReturnValue(brReadyRobot)
+        selectors.getBuildrootSession.mockReturnValue(session)
+
+        const action$ = null
+        const state$ = hot('-a', { a: state })
+        const output$ = epics.uploadFileEpic(action$, state$)
+
+        expectObservable(output$).toBe('-a', {
+          a: actions.uploadBuildrootFile(
+            brReadyRobot,
+            '/server/update/migration/tok/file',
+            '/path/to/system.zip'
+          ),
+        })
       })
     })
   })

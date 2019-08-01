@@ -28,6 +28,25 @@ describe('app/shell/buildroot selectors', () => {
       },
     },
     {
+      name: 'getBuildrootTargetVersion with auto-downloaded file',
+      selector: selectors.getBuildrootTargetVersion,
+      state: { shell: { buildroot: { info: { version: '1.0.0' } } } },
+      expected: '1.0.0',
+    },
+    {
+      name: 'getBuildrootTargetVersion with user file',
+      selector: selectors.getBuildrootTargetVersion,
+      state: {
+        shell: {
+          buildroot: {
+            info: { version: '1.0.0' },
+            session: { userFileInfo: { version: '1.0.1' } },
+          },
+        },
+      },
+      expected: '1.0.1',
+    },
+    {
       name: 'getBuildrootDownloadError',
       selector: selectors.getBuildrootDownloadError,
       state: {

@@ -63,6 +63,7 @@
   border: solid 2px var(--c-white);
   border-radius: 3px;
   background-color: #006fff;
+  transition: width ease-in-out 0.5s;
 }
 
 .progress_text {

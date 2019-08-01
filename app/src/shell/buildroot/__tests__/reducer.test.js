@@ -2,6 +2,7 @@ import { INITIAL_STATE, buildrootReducer } from '../reducer'
 
 const BASE_SESSION = {
   robotName: 'robot-name',
+  userFileInfo: null,
   step: null,
   token: null,
   pathPrefix: null,
@@ -25,6 +26,29 @@ describe('app/shell/buildroot reducer', () => {
       },
     },
     {
+      name: 'handles buildroot:USER_FILE_INFO',
+      action: {
+        type: 'buildroot:USER_FILE_INFO',
+        payload: {
+          systemFile: '/path/to/system.zip',
+          version: '1.0.0',
+          releaseNotes: 'release notes',
+        },
+      },
+      initialState: { ...INITIAL_STATE, session: { robotName: 'robot-name' } },
+      expected: {
+        ...INITIAL_STATE,
+        session: {
+          robotName: 'robot-name',
+          userFileInfo: {
+            systemFile: '/path/to/system.zip',
+            version: '1.0.0',
+            releaseNotes: 'release notes',
+          },
+        },
+      },
+    },
+    {
       name: 'handles buildroot:SET_UPDATE_SEEN',
       action: { type: 'buildroot:SET_UPDATE_SEEN' },
       initialState: { ...INITIAL_STATE, seen: false },
@@ -44,9 +68,35 @@ describe('app/shell/buildroot reducer', () => {
     },
     {
       name: 'handles buildroot:START_UPDATE',
-      action: { type: 'buildroot:START_UPDATE', payload: 'robot-name' },
+      action: {
+        type: 'buildroot:START_UPDATE',
+        payload: { robotName: 'robot-name' },
+      },
       initialState: { ...INITIAL_STATE, session: null },
       expected: { ...INITIAL_STATE, session: BASE_SESSION },
+    },
+    {
+      name: 'buildroot:START_UPDATE preserves user file info',
+      action: {
+        type: 'buildroot:START_UPDATE',
+        payload: { robotName: 'robot-name' },
+      },
+      initialState: {
+        ...INITIAL_STATE,
+        session: {
+          ...BASE_SESSION,
+          robotName: 'robot-name',
+          userFileInfo: { systemFile: 'system.zip' },
+        },
+      },
+      expected: {
+        ...INITIAL_STATE,
+        session: {
+          ...BASE_SESSION,
+          robotName: 'robot-name',
+          userFileInfo: { systemFile: 'system.zip' },
+        },
+      },
     },
     {
       name: 'handles buildroot:START_PREMIGRATION',
