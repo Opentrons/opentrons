@@ -5,6 +5,9 @@ module.exports = {
     '<rootDir>/scripts/setup-enzyme.js',
     '<rootDir>/scripts/setup-global-mocks.js',
   ],
+  globals: {
+    __webpack_public_path__: '/',
+  },
   moduleNameMapper: {
     '\\.(css)$': 'identity-obj-proxy',
   },
