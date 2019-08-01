@@ -1790,7 +1790,8 @@ class ThermocyclerContext(ModuleContext):
             high_point = self._ctx._hw_manager.hardware.current_position(
                     instr._mount)
             trash_top = self._ctx.fixed_trash.wells()[0].top()
-            safe_point = trash_top.point._replace(z=high_point[Axis.by_mount(instr._mount)])
+            safe_point = trash_top.point._replace(
+                    z=high_point[Axis.by_mount(instr._mount)])
             instr.move_to(types.Location(safe_point, None), force_direct=True)
 
     @cmds.publish.both(command=cmds.thermocycler_open)
