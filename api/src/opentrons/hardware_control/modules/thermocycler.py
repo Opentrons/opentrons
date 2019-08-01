@@ -1,5 +1,5 @@
 import asyncio
-from . import mod_abc
+from . import mod_abc, types
 from typing import Union, Optional, List, Tuple
 from opentrons.drivers.thermocycler.driver import (
     Thermocycler as ThermocyclerDriver)
@@ -151,10 +151,25 @@ class Thermocycler(mod_abc.AbstractModule):
         self._port = port
         self._device_info = None
         self._poller = None
+
+        self._paused_event = asyncio.Event()
+        self._current_cycle_task = None
         self._total_cycle_count = None
         self._current_cycle_index = None
         self._total_step_count = None
         self._current_step_index = None
+
+    def pause():
+        self._paused_event.set()
+
+    def resume():
+        self._paused_event.clear()
+
+    def cancel():
+        if self._current_cycle_task:
+            self._current_cycle_task.cancel()
+            self._current_cycle_task = None
+            self._paused_event.clear()
 
     async def deactivate(self):
         self._total_cycle_count = None
@@ -165,7 +180,6 @@ class Thermocycler(mod_abc.AbstractModule):
 
     async def open(self) -> str:
         """ Open the lid if it is closed"""
-        # TODO add temperature protection if over 70 C
         return await self._driver.open()
 
     async def close(self) -> str:
@@ -176,16 +190,30 @@ class Thermocycler(mod_abc.AbstractModule):
         await self._driver.set_temperature(
             temp=temp, hold_time=hold_time, ramp_rate=ramp_rate)
 
-    async def cycle_temperatures(self,
-                                 steps: List[Tuple[float, float, Optional[float]]], repetitions: int):
-        self._total_cycle_count = repetitions
-        self._total_step_count = len(steps)
+    async def _execute_cycles(self,
+                              steps: List[types.ThermocyclerStep],
+                              repetitions: int):
         for rep_idx, rep in enumerate(range(repetitions)):
             self._current_cycle_index = rep_idx + 1  # because scientists start at 1
             for step_idx, step in enumerate(steps):
                 self._current_step_index = step_idx + 1  # because scientists start at 1
-                await self.set_temperature(*step)
+                if self._paused_event.is_set():
+                    await self._paused_event.wait()
+                if isinstance(step, dict):
+                    await self.set_temperature(**step)
+                else:
+                    await self.set_temperature(*step)
                 await self.wait_for_hold()
+
+    async def cycle_temperatures(self,
+                                 steps: List[types.ThermocyclerStep],
+                                 repetitions: int):
+        self._total_cycle_count = repetitions
+        self._total_step_count = len(steps)
+        cycle_task = asyncio.create_task(
+            self._execute_cycles(steps, repetitions))
+        self._current_cycle_task = cycle_task
+        await cycle_task
 
     async def set_lid_temperature(self, temp: Optional[float]):
         """ Set the lid temperature in deg Celsius """
