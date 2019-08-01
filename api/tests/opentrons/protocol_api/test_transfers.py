@@ -75,7 +75,7 @@ def test_default_transfers(_instr_labware):
         dist_plan_list.append(step)
     exp2 = [{'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
             {'method': 'aspirate',
-             'args': [250, lw1.columns()[0][0], 1.0], 'kwargs': {}},
+             'args': [300, lw1.columns()[0][0], 1.0], 'kwargs': {}},
             {'method': 'dispense',
              'args': [50, lw2.columns()[0][0], 1.0], 'kwargs': {}},
             {'method': 'dispense',
@@ -86,10 +86,10 @@ def test_default_transfers(_instr_labware):
              'args': [50, lw2.columns()[0][3], 1.0], 'kwargs': {}},
             {'method': 'dispense',
              'args': [50, lw2.columns()[0][4], 1.0], 'kwargs': {}},
-            {'method': 'aspirate',
-             'args': [150, lw1.columns()[0][0], 1.0], 'kwargs': {}},
             {'method': 'dispense',
              'args': [50, lw2.columns()[0][5], 1.0], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [100, lw1.columns()[0][0], 1.0], 'kwargs': {}},
             {'method': 'dispense',
              'args': [50, lw2.columns()[0][6], 1.0], 'kwargs': {}},
             {'method': 'dispense',
@@ -396,7 +396,7 @@ def test_touchtip_mix(_instr_labware):
     for step in dist_plan:
         dist_plan_list.append(step)
     exp2 = [{'method': 'aspirate',
-             'args': [240, lw1.columns()[1][0], 1.0], 'kwargs': {}},
+             'args': [300, lw1.columns()[1][0], 1.0], 'kwargs': {}},
             {'method': 'touch_tip', 'args': [], 'kwargs': {}},
             {'method': 'dispense',
              'args': [60, lw2.rows()[1][1], 1.0], 'kwargs': {}},
@@ -409,10 +409,6 @@ def test_touchtip_mix(_instr_labware):
             {'method': 'touch_tip', 'args': [], 'kwargs': {}},
             {'method': 'dispense',
              'args': [60, lw2.rows()[1][4], 1.0], 'kwargs': {}},
-            {'method': 'mix', 'args': [], 'kwargs': {}},
-            {'method': 'touch_tip', 'args': [], 'kwargs': {}},
-            {'method': 'aspirate',
-             'args': [60, lw1.columns()[1][0], 1.0], 'kwargs': {}},
             {'method': 'touch_tip', 'args': [], 'kwargs': {}},
             {'method': 'dispense',
              'args': [60, lw2.rows()[1][5], 1.0], 'kwargs': {}},
@@ -517,3 +513,124 @@ def test_all_options(_instr_labware):
             {'method': 'touch_tip', 'args': [], 'kwargs': {'speed': 1.6}},
             {'method': 'return_tip', 'args': [], 'kwargs': {}}]
     assert xfer_plan_list == exp1
+
+
+def test_oversized_distribute(_instr_labware):
+    _instr_labware['ctx'].home()
+    lw1 = _instr_labware['lw1']
+    lw2 = _instr_labware['lw2']
+
+    xfer_plan = tx.TransferPlan(700, lw1.columns()[0][0], lw2.rows()[0][1:3],
+                                _instr_labware['instr'])
+    xfer_plan_list = []
+    for step in xfer_plan:
+        xfer_plan_list.append(step)
+    exp1 = [{'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [300, lw1.wells_by_index()['A1'], 1.0], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [300, lw2.wells_by_index()['A2'], 1.0], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [200, lw1.wells_by_index()['A1'], 1.0], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [200, lw2.wells_by_index()['A2'], 1.0], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [200, lw1.wells_by_index()['A1'], 1.0], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [200, lw2.wells_by_index()['A2'], 1.0], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [300, lw1.wells_by_index()['A1'], 1.0], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [300, lw2.wells_by_index()['A3'], 1.0], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [200, lw1.wells_by_index()['A1'], 1.0], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [200, lw2.wells_by_index()['A3'], 1.0], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [200, lw1.wells_by_index()['A1'], 1.0], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [200, lw2.wells_by_index()['A3'], 1.0], 'kwargs': {}},
+            {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
+    assert xfer_plan_list == exp1
+
+
+def test_oversized_consolidate(_instr_labware):
+    _instr_labware['ctx'].home()
+    lw1 = _instr_labware['lw1']
+    lw2 = _instr_labware['lw2']
+
+    xfer_plan = tx.TransferPlan(700,
+                                lw2.rows()[0][1:3],
+                                lw1.wells_by_index()['A1'],
+                                _instr_labware['instr'])
+    xfer_plan_list = []
+    for step in xfer_plan:
+        xfer_plan_list.append(step)
+    exp1 = [{'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [300, lw2.wells_by_index()['A2'], 1.0], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [300, lw1.wells_by_index()['A1'], 1.0], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [200, lw2.wells_by_index()['A2'], 1.0], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [200, lw1.wells_by_index()['A1'], 1.0], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [200, lw2.wells_by_index()['A2'], 1.0], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [200, lw1.wells_by_index()['A1'], 1.0], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [300, lw2.wells_by_index()['A3'], 1.0], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [300, lw1.wells_by_index()['A1'], 1.0], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [200, lw2.wells_by_index()['A3'], 1.0], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [200, lw1.wells_by_index()['A1'], 1.0], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [200, lw2.wells_by_index()['A3'], 1.0], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [200, lw1.wells_by_index()['A1'], 1.0], 'kwargs': {}},
+            {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
+    assert xfer_plan_list == exp1
+
+
+def test_oversized_transfer(_instr_labware):
+    _instr_labware['ctx'].home()
+    lw1 = _instr_labware['lw1']
+    lw2 = _instr_labware['lw2']
+
+    xfer_plan = tx.TransferPlan(700, lw2.rows()[0][1:3], lw1.columns()[0][1:3],
+                                _instr_labware['instr'])
+    xfer_plan_list = []
+    for step in xfer_plan:
+        xfer_plan_list.append(step)
+    exp1 = [{'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [300, lw2.wells_by_index()['A2'], 1.0], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [300, lw1.wells_by_index()['B1'], 1.0], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [200, lw2.wells_by_index()['A2'], 1.0], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [200, lw1.wells_by_index()['B1'], 1.0], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [200, lw2.wells_by_index()['A2'], 1.0], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [200, lw1.wells_by_index()['B1'], 1.0], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [300, lw2.wells_by_index()['A3'], 1.0], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [300, lw1.wells_by_index()['C1'], 1.0], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [200, lw2.wells_by_index()['A3'], 1.0], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [200, lw1.wells_by_index()['C1'], 1.0], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [200, lw2.wells_by_index()['A3'], 1.0], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [200, lw1.wells_by_index()['C1'], 1.0], 'kwargs': {}},
+            {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
+    assert xfer_plan_list == exp1
+
+
