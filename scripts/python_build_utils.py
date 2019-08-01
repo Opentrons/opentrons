@@ -1,5 +1,7 @@
 """ Tools to bridge the Makefiles and the python build environment
 (or provide utilities) for python subprojects
+
+NOTE: This file must be python2.7 compatible
 """
 
 import argparse
@@ -44,6 +46,38 @@ def normalize_version(project):
     return str(vers_obj)
 
 
+def _ref_from_sha(sha):
+    # codebuild leaves us in detached HEAD, so we need to pull some
+    # gymnastics to get a nice branch name. First, get all the tag and head
+    # refs
+    allrefs = subprocess.check_output(
+        ['git', 'show-ref', '--tags', '--heads'],
+        cwd=HERE).strip().decode().split('\n')
+    # Keep...
+    matching = [
+        this_ref for this_sha, this_ref in   # the refs
+        [ref_plus_sha.split(' ')
+         for ref_plus_sha in allrefs if ref_plus_sha]
+        if this_sha == sha  # matching the HEAD SHA
+    ]
+    # matching is now a list of refs pointing precisely to this sha. we
+    # can now prioritize and pick the best:
+    # tags are the best
+    for match in matching:
+        if 'tags' in match:
+            return match.split('/')[-1]
+    # local branches are next best
+    for match in matching:
+        if 'remotes' not in match:
+            return match.split('/')[-1]
+    # remote branches are ok I guess but we need to avoid remotes/origin/HEAD
+    for match in matching:
+        if 'HEAD' not in match:
+            return match.split('/')[-1]
+    # Just return an abbreviated sha because we officially have no idea
+    return sha[:12]
+
+
 def dump_br_version(project):
     """ Dump an enhanced version json including
     - The version from package.json
@@ -52,9 +86,8 @@ def dump_br_version(project):
     """
     normalized = get_version(project)
     sha = subprocess.check_output(
-        ['git', 'rev-parse', 'HEAD'], cwd=HERE).strip()
-    branch = subprocess.check_output(
-        ['git', 'rev-parse', '--abbrev-ref', 'HEAD'], cwd=HERE).strip()
+        ['git', 'rev-parse', 'HEAD'], cwd=HERE).strip().decode()
+    branch = _ref_from_sha(sha)
     pref = br_version_prefixes[project]
     return json.dumps({pref+'_version': normalized,
                        pref+'_sha': sha,
