@@ -184,6 +184,7 @@ class CLITool:
             unhandled_input=self._on_key_press,
             event_loop=loop
         )
+        log.debug("Starting gantry calibration command line interface (CLI)")
 
     @property
     def hardware(self):
@@ -602,7 +603,6 @@ class CLITool:
             probe_center = tuple(probe_instrument(
                 self._pipettes[mount],
                 hw))
-            log.debug("Setting probe center to {}".format(probe_center))
         else:
             probe_center = hw.locate_tip_probe_center(mount)
             _, _, cz = position(mount, hw, CriticalPoint.TIP)
@@ -610,7 +610,7 @@ class CLITool:
             # when moving from tip box -> other point on the deck
             pt = types.Point(x=move_after[0], y=move_after[1], z=cz)
             hw.move_to(mount, pt)
-
+        log.debug("Setting probe center to {}".format(probe_center))
         hw.update_config(
             tip_probe=hw.config.tip_probe._replace(center=probe_center))
         return 'Tip probe'
@@ -724,7 +724,7 @@ def main(loop=None):
 
 
 def notify_and_restart():
-    print('Exiting configuration tool and restarting system')
+    log.debug('Exiting configuration tool and restarting system')
     if ARCHITECTURE == SystemArchitecture.BALENA:
         os.system("kill 1")
     else:
