@@ -22,6 +22,7 @@ from opentrons.util.calibration_functions import probe_instrument
 from opentrons.util.linal import (solve, add_z, apply_transform,
                                   identity_deck_transform)
 from opentrons.util.vector import Vector
+from opentrons.util import logging_config
 
 from . import (
     left, right, SAFE_HEIGHT, cli_dots_set,
@@ -138,6 +139,7 @@ class CLITool:
 
         slot5 = self._test_points['slot5']
 
+        logging_config.log_init(self.hardware.config.log_level)
         self.key_map = {
             '-': lambda: self.decrease_step(),
             '=': lambda: self.increase_step(),
@@ -321,6 +323,8 @@ class CLITool:
     def try_pickup_tip(self):
         pipette = self._pipettes[self._current_mount]
         self._tip_length = pipette._fallback_tip_length
+        # Check that pipette does not have tip attached, if it does remove it.
+        self._clear_tips(pipette)
         if not feature_flags.use_protocol_api_v2():
             top = self._position()
             self._helper_pickup(pipette, top)
@@ -331,6 +335,13 @@ class CLITool:
                 tip_length=self._tip_length)
         return "Picked up tip!"
 
+    def _clear_tips(self, pipette):
+        if pipette.has_tip:
+            if not feature_flags.use_protocol_api_v2():
+                pipette._remove_tip(self._tip_length)
+            else:
+                self.hardware.remove_tip(self._current_mount)
+
     def home(self) -> str:
         """
         Return the robot to the home position and update the position tracker
@@ -338,6 +349,13 @@ class CLITool:
         self.hardware.home()
         self.current_position = self._position()
         return 'Homed'
+
+    def select_home(self, axes) -> str:
+        if feature_flags.use_protocol_api_v2():
+            self.hardware._backend._smoothie_driver.home(axes)
+        else:
+            self.hardware._driver.home(axes)
+        return f'Homed {axes}'
 
     def save_point(self) -> str:
         """
@@ -432,22 +450,30 @@ class CLITool:
         return (lx - mx, ly - my, lz - mz)
 
     def switch_mounts(self):
-        self.move_to_safe_height()
         if not feature_flags.use_protocol_api_v2():
+            self.select_home(self._current_mount)
             r_pipette = right
             l_pipette = left
         else:
             r_pipette = types.Mount.RIGHT
             l_pipette = types.Mount.LEFT
+            axes = right if self._current_mount == r_pipette else left
+            self.select_home(axes)
 
         if self._current_mount == r_pipette:
             self._current_mount = l_pipette
         else:
             self._current_mount = r_pipette
-        self._tip_length =\
-            self._pipettes[self._current_mount]._fallback_tip_length
-        self._model_offset = self._pipettes[self._current_mount].model_offset
-        return f"Switched mount to {self._current_mount}"
+        self.move_to_safe_height()
+        if self._pipettes[self._current_mount]:
+            self._tip_length =\
+                self._pipettes[self._current_mount]._fallback_tip_length
+            self._model_offset =\
+                self._pipettes[self._current_mount].model_offset
+            return f"Switched mount to {self._current_mount}"
+        else:
+            return f"Switched mount, but please add pipette to {self._current_mount}"
+
 
     def validate_mount_offset(self):
         # move the RIGHT pipette to expected point, then immediately after
@@ -467,9 +493,7 @@ class CLITool:
             self.validate(targ, 0, l_pipette)
             return 'Mount offset complete'
         else:
-            tx, ty, _ = self._deck_to_driver_coords(self._expected_points[1])
-            self.hardware._driver.move(
-                {'X': tx, 'Y': ty, 'Z': SAFE_HEIGHT-self._tip_length})
+            self.move_to_safe_height()
             return 'Please attach a pipette or pick up tip and try again.'
 
     def validate(
@@ -497,8 +521,10 @@ class CLITool:
             self.move_to_safe_height()
             pt1 = types.Point(x=point[0], y=point[1], z=SAFE_HEIGHT)
             pt2 = types.Point(*point)
-            self.hardware.move_to(self._current_mount, pt1)
-            self.hardware.move_to(self._current_mount, pt2)
+            self.hardware.move_to(self._current_mount, pt1, critical_point=CriticalPoint.TIP)
+            log.info(f"position after first move {self._position()}")
+            self.hardware.move_to(self._current_mount, pt2, critical_point=CriticalPoint.TIP)
+            log.info(f"position after second move {self._position()}")
         return 'moved to point {}'.format(point)
 
     def move_to_safe_height(self):
@@ -526,9 +552,11 @@ class CLITool:
                 mount_key = right
             else:
                 mount_key = mount
-            if attached['name'] and pip_func:
-                self._pipettes[mount_key] = pip_func(mount, attached['name'])
-            elif attached['name']:
+            if attached.get('name') and pip_func:
+                if not self._pipettes.get(mount_key):
+                    self._pipettes[mount_key] = pip_func(
+                        mount, attached['name'])
+            elif attached.get('name'):
                 self._pipettes[mount_key] =\
                     self.hardware._attached_instruments[mount_key]
             else:
