@@ -27,10 +27,10 @@ const labwareTestProtocol = (args: LabwareTestProtocolArgs): string => {
   return `import json
 from opentrons import robot, labware, instruments
 
-CALIBRATION_CROSS_COORDS = [12.13, 9.0, 0.0]
-CALIBRATION_CROSS_SLOT = '1'
+CALIBRATION_CROSS_COORDS = [380.87, 9.0, 0.0]
+CALIBRATION_CROSS_SLOT = '3'
 TEST_LABWARE_SLOT = CALIBRATION_CROSS_SLOT
-TIPRACK_SLOT = '7'
+TIPRACK_SLOT = '5'
 
 
 def uniq(l):
