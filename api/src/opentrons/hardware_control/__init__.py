@@ -790,7 +790,7 @@ class API(HardwareAPILike):
         self._backend.disengage_axes([ax.name for ax in which])
 
     @_log_call
-    async def retract(self, mount: top_types.Mount, margin: float):
+    async def retract(self, mount: top_types.Mount, margin: float = 10):
         """ Pull the specified mount up to its home position.
 
         Works regardless of critical point or home status.

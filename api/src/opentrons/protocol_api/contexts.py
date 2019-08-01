@@ -12,7 +12,7 @@ import opentrons.config.robot_configs as rc
 from opentrons.config import feature_flags as fflags
 from opentrons.hardware_control import adapters, modules
 from opentrons.hardware_control.simulator import Simulator
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control.types import CriticalPoint, Axis
 
 from . import geometry
 from . import transfers
@@ -1780,18 +1780,18 @@ class ThermocyclerContext(ModuleContext):
                               self._ctx.loaded_instruments.items()
                               if instr is not None]
         try:
-            instrument = loaded_instruments[0]
+            instr = loaded_instruments[0]
         except IndexError:
             MODULE_LOG.warning(
                 "Cannot assure a safe gantry position to avoid colliding"
                 " with the lid of the Thermocycler Module.")
         else:
+            self._ctx._hw_manager.hardware.retract(instr._mount)
+            high_point = self._ctx._hw_manager.hardware.current_position(
+                    instr._mount)
             trash_top = self._ctx.fixed_trash.wells()[0].top()
-            high_z = self._ctx.deck.highest_z
-            safe_point = types.Point(x=trash_top.point.x,
-                                     y=trash_top.point.y, z=high_z)
-            safe_loc = types.Location(safe_point, None)
-            instrument.move_to(safe_loc, minimum_z_height=high_z)
+            safe_point = trash_top.point._replace(z=high_point[Axis.by_mount(instr._mount)])
+            instr.move_to(types.Location(safe_point, None), force_direct=True)
 
     @cmds.publish.both(command=cmds.thermocycler_open)
     def open(self):
