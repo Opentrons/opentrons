@@ -27,9 +27,10 @@ const labwareTestProtocol = (args: LabwareTestProtocolArgs): string => {
   return `import json
 from opentrons import robot, labware, instruments
 
-TOP_RIGHT_CROSS_COORDS = [380.87, 258.0, 0]
-TIPRACK_SLOT = '10'
-TEST_LABWARE_SLOT = '5'
+CALIBRATION_CROSS_COORDS = [12.13, 9.0, 0.0]
+CALIBRATION_CROSS_SLOT = '1'
+TEST_LABWARE_SLOT = CALIBRATION_CROSS_SLOT
+TIPRACK_SLOT = '7'
 
 
 def uniq(l):
@@ -52,8 +53,12 @@ def run_custom_protocol(pipette_name, mount, tiprack_load_name, labware_def):
     )
 
     pipette.pick_up_tip()
-    pipette.move_to((robot.deck, TOP_RIGHT_CROSS_COORDS))
-    robot.pause(f"Confirm {mount} pipette is at slot 9 calibration cross")
+    pipette.move_to((robot.deck, CALIBRATION_CROSS_COORDS))
+    robot.pause(
+        f"Confirm {mount} pipette is at slot {CALIBRATION_CROSS_SLOT} calibration cross")
+
+    pipette.retract()
+    robot.pause(f"Place your labware in Slot {TEST_LABWARE_SLOT}")
 
     # NOTE: this doesn't work on 1-row reservoir, b/c of WellSeries
     # num_cols = len(test_labware.columns())
@@ -81,7 +86,7 @@ def run_custom_protocol(pipette_name, mount, tiprack_load_name, labware_def):
 
         pipette.move_to(well.top())
         robot.pause("Moved to the top of the well")
-        
+
         for edge_pos, edge_name in all_4_edges:
             pipette.move_to(well.top())
             pipette.move_to((well, edge_pos))
