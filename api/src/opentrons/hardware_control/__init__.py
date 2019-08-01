@@ -48,6 +48,10 @@ def _log_call(func):
     return _log_call_inner
 
 
+class MustHomeError(RuntimeError):
+    pass
+
+
 class NoTipAttachedError(RuntimeError):
     pass
 

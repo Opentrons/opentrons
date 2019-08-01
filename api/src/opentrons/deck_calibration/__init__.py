@@ -62,7 +62,7 @@ y_row = 1
 z_row = 2
 
 
-def position(axis, hardware, cp=(0, 0, 0)):
+def position(axis, hardware, cp=None):
     """
     Read position from driver into a tuple and map 3-rd value
     to the axis of a pipette currently used.
@@ -72,7 +72,7 @@ def position(axis, hardware, cp=(0, 0, 0)):
 
     if not ff.use_protocol_api_v2():
         p = hardware._driver.position
-        return (p['X'] + cp[0], p['Y'] + cp[1], p[axis] + cp[2])
+        return (p['X'], p['Y'], p[axis])
     else:
         p = hardware.gantry_position(axis, critical_point=cp, refresh=True)
         return (p.x, p.y, p.z)

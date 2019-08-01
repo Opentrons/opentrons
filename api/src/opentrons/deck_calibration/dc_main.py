@@ -285,9 +285,10 @@ class CLITool:
         coordinates
         """
         if not feature_flags.use_protocol_api_v2():
-            res = self._driver_to_deck_coords(
-                position(
-                    self._current_mount, self.hardware, self._model_offset))
+            px, py, pz = self._driver_to_deck_coords(
+                position(self._current_mount, self.hardware))
+            mox, moy, moz = self._model_offset
+            res = (px + mox, py + moy, pz + moz)
         else:
             res = position(
                 self._current_mount, self.hardware, CriticalPoint.TIP)
