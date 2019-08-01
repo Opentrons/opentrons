@@ -32,6 +32,9 @@ CALIBRATION_CROSS_SLOT = '3'
 TEST_LABWARE_SLOT = CALIBRATION_CROSS_SLOT
 TIPRACK_SLOT = '5'
 
+RATE = 0.25  # % of default speeds
+SLOWER_RATE = 0.1
+
 
 def uniq(l):
     res = []
@@ -41,10 +44,14 @@ def uniq(l):
     return res
 
 
+def set_speed(rate):
+    robot.head_speed(x=(600 * rate), y=(400 * rate),
+                      z=(125 * rate), a=(125 * rate))
+
+
 def run_custom_protocol(pipette_name, mount, tiprack_load_name, labware_def):
     tiprack = labware.load(tiprack_load_name, TIPRACK_SLOT)
     pipette = getattr(instruments, pipette_name)(mount, tip_racks=[tiprack])
-
     test_labware = robot.add_container_by_definition(
         labware_def,
         TEST_LABWARE_SLOT,
@@ -52,7 +59,15 @@ def run_custom_protocol(pipette_name, mount, tiprack_load_name, labware_def):
             'displayName', 'test labware')
     )
 
+    num_cols = len(labware_def.get('ordering', [[]]))
+    num_rows = len(labware_def.get('ordering', [[]])[0])
+    well_locs = uniq([
+        'A1',
+        '{}{}'.format(chr(ord('A') + num_rows - 1), str(num_cols))])
+
     pipette.pick_up_tip()
+    set_speed(RATE)
+
     pipette.move_to((robot.deck, CALIBRATION_CROSS_COORDS))
     robot.pause(
         f"Confirm {mount} pipette is at slot {CALIBRATION_CROSS_SLOT} calibration cross")
@@ -60,39 +75,34 @@ def run_custom_protocol(pipette_name, mount, tiprack_load_name, labware_def):
     pipette.retract()
     robot.pause(f"Place your labware in Slot {TEST_LABWARE_SLOT}")
 
-    # NOTE: this doesn't work on 1-row reservoir, b/c of WellSeries
-    # num_cols = len(test_labware.columns())
-    # num_rows = len(test_labware.rows())
-
-    num_cols = len(labware_def.get('ordering', [[]]))
-    num_rows = len(labware_def.get('ordering', [[]])[0])
-
-    # remove duplicate wells
-    well_locs = uniq([
-        'A1',
-        '{}{}'.format(chr(ord('A') + num_rows - 1), str(num_cols))])
-
     for well_loc in well_locs:
         well = test_labware.wells(well_loc)
         all_4_edges = [
             [well.from_center(x=-1, y=0, z=1), 'left'],
-            [well.from_center(x=0, y=-1, z=1), 'bottom'],
             [well.from_center(x=1, y=0, z=1), 'right'],
-            [well.from_center(x=0, y=1, z=1), 'top']
+            [well.from_center(x=0, y=-1, z=1), 'front'],
+            [well.from_center(x=0, y=1, z=1), 'back']
         ]
 
-        pipette.move_to(well.bottom())
-        robot.pause("Moved to the bottom of the well")
-
+        set_speed(RATE)
         pipette.move_to(well.top())
         robot.pause("Moved to the top of the well")
 
         for edge_pos, edge_name in all_4_edges:
-            pipette.move_to(well.top())
+            set_speed(SLOWER_RATE)
             pipette.move_to((well, edge_pos))
             robot.pause(f'Moved to {edge_name} edge')
 
+        set_speed(RATE)
+        pipette.move_to(well.bottom())
+        robot.pause("Moved to the bottom of the well")
+
+        # need to interact with labware for it to show on deck map
         pipette.blow_out(well)
+
+
+    set_speed(1.0)
+    pipette.return_tip()
 
 
 LABWARE_DEF = """${JSON.stringify(definition)}"""
