@@ -94,7 +94,7 @@ class Well:
             raise ValueError(
                 'Shape "{}" is not a supported well shape'.format(
                     well_props['shape']))
-        self._max_volume = well_props['totalLiquidVolume']
+        self.max_volume = well_props['totalLiquidVolume']
         self._depth = well_props['depth']
 
     @property

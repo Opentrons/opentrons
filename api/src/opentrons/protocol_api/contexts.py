@@ -1134,7 +1134,7 @@ class InstrumentContext(CommandPublisher):
         cmds.do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
                         'after', self, None, instrument=self, location=target)
         self._hw_manager.hardware.set_working_volume(
-            self._mount, target._max_volume)
+            self._mount, target.max_volume)
         tiprack.use_tips(target, num_channels)
         self._last_tip_picked_up_from = target
 
@@ -1412,6 +1412,12 @@ class InstrumentContext(CommandPublisher):
         if kwargs.get('blow_out'):
             blow_out = transfers.BlowOutStrategy.TRASH
 
+        if self.tip_racks and new_tip != types.TransferTipPolicy.NEVER:
+            max_volume = min(
+                self.tip_racks[0].wells()[0].max_volume, self.max_volume)
+        else:
+            max_volume = None
+
         touch_tip = None
         if kwargs.get('touch_tip'):
             touch_tip = transfers.TouchTipStrategy.ALWAYS
@@ -1433,12 +1439,12 @@ class InstrumentContext(CommandPublisher):
             drop_tip_strategy=drop_tip,
             blow_out_strategy=blow_out or default_args.blow_out_strategy,
             touch_tip_strategy=(touch_tip or
-                                default_args.touch_tip_strategy)
+                                default_args.touch_tip_strategy),
+            max_volume=max_volume
         )
         transfer_options = transfers.TransferOptions(transfer=transfer_args,
                                                      mix=mix_opts)
 
-        self._log.info(f"Transfer options: {transfer_options}")
         plan = transfers.TransferPlan(volume, source, dest, self,
                                       kwargs['mode'], transfer_options)
         self._execute_transfer(plan)

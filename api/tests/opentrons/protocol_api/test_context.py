@@ -184,14 +184,18 @@ def test_use_filter_tips(loop, get_labware_def):
 
     mount = Mount.LEFT
 
-    instr = ctx.load_instrument('p300_single', mount)
+    instr = ctx.load_instrument('p300_single', mount, tip_racks=[tiprack])
     pipette: Pipette = ctx._hw_manager.hardware._attached_instruments[mount]
 
     assert pipette.available_volume == pipette.config.max_volume
 
-    instr.pick_up_tip(tiprack.wells()[0])
+    instr.pick_up_tip()
     assert pipette.available_volume < pipette.config.max_volume
     instr.drop_tip()
+
+    plate = ctx.load_labware_by_name('biorad_96_wellplate_200ul_pcr', 1)
+    instr.pick_up_tip()
+    instr.transfer(30, plate.wells('A1'), plate.wells('A2'), new_tip='never')
 
 
 def test_pick_up_tip_no_location(loop, get_labware_def):
