@@ -426,17 +426,12 @@ const App = () => {
               ]}
             >
               <div>
-                <p>Check that the grid roughly resembles your labware.</p>
                 <p>
-                  Spacing and well dimensions will be adjusted in the next
-                  section.
+                  The grid of wells on your labware is arranged in a number of
+                  rows (run horizontally across your labware, left to right) and
+                  columns (run top to bottom).
                 </p>
               </div>
-              <img src={require('./images/offset_helpText.svg')} />
-              <XYOffsetImg
-                labwareType={values.labwareType}
-                wellShape={values.wellShape}
-              />
               <TextField name="gridRows" inputMasks={[maskToInteger]} />
               <RadioField name="regularRowSpacing" options={yesNoOptions} />
               <TextField name="gridColumns" inputMasks={[maskToInteger]} />
@@ -570,6 +565,15 @@ const App = () => {
                   Corner offset informs the robot how far the grid of wells is
                   from the slot{"'"}s top left corner.
                 </p>
+                <div>
+                  <img src={require('./images/offset_helpText.svg')} />
+                </div>
+                <div>
+                  <XYOffsetImg
+                    labwareType={values.labwareType}
+                    wellShape={values.wellShape}
+                  />
+                </div>
               </div>
               <TextField
                 name="gridOffsetX"
