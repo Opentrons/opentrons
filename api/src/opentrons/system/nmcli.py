@@ -292,7 +292,7 @@ async def available_ssids() -> List[Dict[str, Any]]:
 
 async def is_connected() -> str:
     """ Return nmcli's connection measure: none/portal/limited/full/unknown"""
-    res, _ = await _call(['networking', 'connectivity'])
+    res, _ = await _call(['networking', 'connectivity', 'check'])
     return res
 
 
