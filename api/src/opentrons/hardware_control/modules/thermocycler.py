@@ -3,6 +3,9 @@ from . import mod_abc, types
 from typing import Union, Optional, List, Tuple
 from opentrons.drivers.thermocycler.driver import (
     Thermocycler as ThermocyclerDriver)
+import logging
+
+MODULE_LOG = logging.getLogger(__name__)
 
 
 class SimulatingDriver:
@@ -195,13 +198,17 @@ class Thermocycler(mod_abc.AbstractModule):
                               repetitions: int):
         for rep_idx, rep in enumerate(range(repetitions)):
             self._current_cycle_index = rep_idx + 1  # because scientists start at 1
+            MODULE_LOG.info('CYCLE START')
             for step_idx, step in enumerate(steps):
                 self._current_step_index = step_idx + 1  # because scientists start at 1
                 if self._paused_event.is_set():
+                    MODULE_LOG.info('PAUSE FLAG CAUGHT ON WAIT')
                     await self._paused_event.wait()
                 if isinstance(step, dict):
+                    MODULE_LOG.info('BEFORE DICT STEP')
                     await self.set_temperature(**step)
                 else:
+                    MODULE_LOG.info('BEFORE TUPLE STEP')
                     await self.set_temperature(*step)
                 await self.wait_for_hold()
 
@@ -213,6 +220,7 @@ class Thermocycler(mod_abc.AbstractModule):
         cycle_task = asyncio.create_task(
             self._execute_cycles(steps, repetitions))
         self._current_cycle_task = cycle_task
+        MODULE_LOG.info('JUST BEFORE TASK')
         await cycle_task
 
     async def set_lid_temperature(self, temp: Optional[float]):
