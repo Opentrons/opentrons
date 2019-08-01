@@ -205,7 +205,7 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
     const __buildRootEnabled = Boolean(
       getConfig(state).devInternal?.enableBuildRoot
     )
-    const updateInProgress = getBuildrootUpdateInProgress(state, robot.name)
+    const updateInProgress = getBuildrootUpdateInProgress(state, robot)
     let showUpdateModal: ?boolean
 
     if (__buildRootEnabled) {

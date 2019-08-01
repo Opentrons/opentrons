@@ -37,15 +37,13 @@ export function getBuildrootUpdateSeen(state: State): boolean {
 
 export function getBuildrootUpdateInProgress(
   state: State,
-  robotName: string
+  robot: ViewableRobot
 ): boolean {
   const session = getBuildrootSession(state)
-  const brRobotName = getBuildrootRobotName(state)
+  const brRobot = getBuildrootRobot(state)
 
   return (
-    brRobotName === robotName &&
-    session?.step !== 'finished' &&
-    session?.error === null
+    robot === brRobot && session?.step !== 'finished' && session?.error === null
   )
 }
 
