@@ -97,6 +97,9 @@ class Simulator:
         self._log = MODULE_LOG.getChild(repr(self))
         self._strict_attached = bool(strict_attached_instruments)
 
+    def update_position(self) -> Dict[str, float]:
+        return self._position
+
     def move(self, target_position: Dict[str, float],
              home_flagged_axes: bool = True, speed: float = None):
         if self._run_flag.is_set():

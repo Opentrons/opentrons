@@ -548,7 +548,8 @@ class API(HardwareAPILike):
     async def current_position(
             self,
             mount: top_types.Mount,
-            critical_point: CriticalPoint = None) -> Dict[Axis, float]:
+            critical_point: CriticalPoint = None,
+            refresh: bool = False) -> Dict[Axis, float]:
         """ Return the postion (in deck coords) of the critical point of the
         specified mount.
 
@@ -563,9 +564,12 @@ class API(HardwareAPILike):
         specified mount but `CriticalPoint.TIP` was specified, the position of
         the nozzle will be returned.
         """
-        if not self._current_position:
-            await self.home()
+        if not self._current_position and not refresh:
+            raise MustHomeError
         async with self._motion_lock:
+            if refresh:
+                self._current_position = self._deck_from_smoothie(
+                    self._backend.update_position())
             if mount == mount.RIGHT:
                 offset = top_types.Point(0, 0, 0)
             else:
@@ -583,7 +587,8 @@ class API(HardwareAPILike):
     async def gantry_position(
             self,
             mount: top_types.Mount,
-            critical_point: CriticalPoint = None) -> top_types.Point:
+            critical_point: CriticalPoint = None,
+            refresh: bool = False) -> top_types.Point:
         """ Return the position of the critical point as pertains to the gantry
 
         This ignores the plunger position and gives the Z-axis a predictable
@@ -592,8 +597,7 @@ class API(HardwareAPILike):
         `critical_point` specifies an override to the current critical point to
         use (see :py:meth:`current_position`).
         """
-        cur_pos = await self.current_position(mount, critical_point)
-        self._log.info(f"Building position from {cur_pos}")
+        cur_pos = await self.current_position(mount, critical_point, refresh)
         return top_types.Point(x=cur_pos[Axis.X],
                                y=cur_pos[Axis.Y],
                                z=cur_pos[Axis.by_mount(mount)])
@@ -721,12 +725,10 @@ class API(HardwareAPILike):
         to_transform = tuple((tp
                               for ax, tp in target_position.items()
                               if ax in Axis.gantry_axes()))
-
         # Pre-fill the dict we’ll send to the backend with the axes we don’t
         # need to transform
         smoothie_pos = {ax.name: pos for ax, pos in target_position.items()
                         if ax not in Axis.gantry_axes()}
-
         # We’d better have all of (x, y, (z or a)) or none of them since the
         # gantry transform requires them all
         if len(to_transform) != 3:

@@ -74,7 +74,7 @@ def position(axis, hardware, cp=(0, 0, 0)):
         p = hardware._driver.position
         return (p['X'] + cp[0], p['Y'] + cp[1], p[axis] + cp[2])
     else:
-        p = hardware.gantry_position(axis, critical_point=cp)
+        p = hardware.gantry_position(axis, critical_point=cp, refresh=True)
         return (p.x, p.y, p.z)
 
 
