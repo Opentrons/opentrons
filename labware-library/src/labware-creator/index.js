@@ -610,14 +610,11 @@ const App = () => {
                 caption="Only lower case letters, numbers, periods, and underscores may be used"
                 inputMasks={[maskLoadName]}
               />
-              <div className={styles.double_check_before_exporting}>
-                <p>GENERATE A PROTOCOL TO TEST YOUR DEFINITION</p>
-                <p>
-                  Use a short test protocol to test whether a pipette can hit
-                  key points on your labware.
-                </p>
-              </div>
-              <Dropdown name="pipetteName" options={pipetteNameOptions} />
+              <Dropdown
+                name="pipetteName"
+                options={pipetteNameOptions}
+                caption="Files are exported with a protocol that will use a single channel pipette to test whether a pipette can hit key points on your labware"
+              />
             </Section>
             <div className={styles.double_check_before_exporting}>
               <p>DOUBLE CHECK YOUR WORK BEFORE EXPORTING!</p>

@@ -10,6 +10,7 @@ import styles from './Dropdown.css'
 type Props = {|
   name: $Keys<LabwareFields>,
   options: Options,
+  caption?: string,
   /** optionally override the default onValueChange */
   onValueChange?: $PropertyType<
     React.ElementProps<typeof SelectField>,
@@ -41,6 +42,7 @@ const Dropdown = (props: Props) => {
         {({ field, form }) => (
           <SelectField
             name={field.name}
+            caption={props.caption}
             value={field.value}
             onLoseFocus={() => field.onBlur()}
             onValueChange={
