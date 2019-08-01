@@ -472,8 +472,8 @@ class CLITool:
                 self._pipettes[self._current_mount].model_offset
             return f"Switched mount to {self._current_mount}"
         else:
-            return f"Switched mount, but please add pipette to {self._current_mount}"
-
+            return ("Switched mount, but please add pipette\n"
+                    f"to {self._current_mount}")
 
     def validate_mount_offset(self):
         # move the RIGHT pipette to expected point, then immediately after
@@ -521,10 +521,8 @@ class CLITool:
             self.move_to_safe_height()
             pt1 = types.Point(x=point[0], y=point[1], z=SAFE_HEIGHT)
             pt2 = types.Point(*point)
-            self.hardware.move_to(self._current_mount, pt1, critical_point=CriticalPoint.TIP)
-            log.info(f"position after first move {self._position()}")
-            self.hardware.move_to(self._current_mount, pt2, critical_point=CriticalPoint.TIP)
-            log.info(f"position after second move {self._position()}")
+            self.hardware.move_to(self._current_mount, pt1)
+            self.hardware.move_to(self._current_mount, pt2)
         return 'moved to point {}'.format(point)
 
     def move_to_safe_height(self):
@@ -606,7 +604,7 @@ class CLITool:
                 hw))
             log.debug("Setting probe center to {}".format(probe_center))
         else:
-            probe_center = hw.locate_tip_probe_center(mount, self._tip_length)
+            probe_center = hw.locate_tip_probe_center(mount)
             _, _, cz = position(mount, hw, CriticalPoint.TIP)
             # work around to prevent pipette tip crashing into tip box
             # when moving from tip box -> other point on the deck

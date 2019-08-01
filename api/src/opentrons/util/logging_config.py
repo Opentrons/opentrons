@@ -45,6 +45,10 @@ def _balena_config(level_value: int) -> Dict[str, Any]:
                 'handlers': ['debug', 'api'],
                 'level': level_value,
             },
+            'opentrons.deck_calibration': {
+                'handlers': ['debug', 'api'],
+                'level': level_value,
+            },
             'opentrons.drivers.serial_communication': {
                 'handlers': ['serial'],
                 'level': logging.DEBUG,
