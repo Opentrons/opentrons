@@ -45,3 +45,31 @@ export type UnreachableRobot = {
 export type ViewableRobot = Robot | ReachableRobot
 
 export type AnyRobot = Robot | ReachableRobot | UnreachableRobot
+
+export type StartDiscoveryAction = {|
+  type: 'discovery:START',
+  payload: {| timeout: number | null |},
+  meta: {| shell: true |},
+|}
+
+export type FinishDiscoveryAction = {|
+  type: 'discovery:FINISH',
+  meta: {| shell: true |},
+|}
+
+export type UpdateListAction = {|
+  type: 'discovery:UPDATE_LIST',
+  payload: {| robots: Array<Service> |},
+|}
+
+export type RemoveRobotAction = {|
+  type: 'discovery:REMOVE',
+  payload: {| robotName: string |},
+  meta: {| shell: true |},
+|}
+
+export type DiscoveryAction =
+  | StartDiscoveryAction
+  | FinishDiscoveryAction
+  | UpdateListAction
+  | RemoveRobotAction
