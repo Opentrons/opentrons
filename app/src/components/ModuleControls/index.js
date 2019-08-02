@@ -7,7 +7,7 @@ import TemperatureControls from './TemperatureControls'
 import { setTargetTemp } from '../../robot-api'
 
 import type { State, Dispatch } from '../../types'
-import type { TempDeckModule, SetTemperatureRequest } from '../../robot-api'
+import type { TempDeckModule, ModuleCommandRequest } from '../../robot-api'
 import type { Robot } from '../../discovery'
 
 type OP = {|
@@ -16,7 +16,7 @@ type OP = {|
 |}
 
 type DP = {|
-  setTargetTemp: (request: SetTemperatureRequest) => mixed,
+  setTargetTemp: (request: ModuleCommandRequest) => mixed,
 |}
 
 type Props = { ...OP, ...DP }

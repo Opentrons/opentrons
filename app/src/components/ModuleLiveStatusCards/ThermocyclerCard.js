@@ -4,11 +4,12 @@ import moment from 'moment'
 import { LabeledValue } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import type { ThermocyclerModule } from '../../robot-api'
+import type { ThermocyclerModule, ModuleCommandRequest } from '../../robot-api'
 import StatusCard from './StatusCard'
 import CardContentRow from './CardContentRow'
 import StatusItem from './StatusItem'
 import styles from './styles.css'
+import TemperatureControl from './TemperatureControl'
 
 type TempsItemProps = {
   title: string,
@@ -31,12 +32,17 @@ const TempsItem = ({ title, current, target }: TempsItemProps) => (
 
 type Props = {|
   module: ThermocyclerModule,
+  sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
 |}
 
-const ThermocyclerCard = ({ module }: Props) => (
+const ThermocyclerCard = ({ module, sendModuleCommand }: Props) => (
   <StatusCard title={getModuleDisplayName(module.name)}>
     <CardContentRow>
       <StatusItem status={module.status} />
+      <TemperatureControl
+        module={module}
+        sendModuleCommand={sendModuleCommand}
+      />
     </CardContentRow>
     <CardContentRow>
       <TempsItem

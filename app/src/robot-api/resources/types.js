@@ -63,7 +63,7 @@ export type ThermocyclerModule = {|
   data: ThermocyclerData,
 |}
 
-export type SetTemperatureRequest = {|
+export type ModuleCommandRequest = {|
   command_type: 'set_temperature' | 'deactivate',
   args?: Array<number>,
 |}
