@@ -86,6 +86,10 @@ class Controller:
             config=self.config, handle_locks=False)
         self._cached_fw_version: Optional[str] = None
 
+    def update_position(self) -> Dict[str, float]:
+        self._smoothie_driver.update_position()
+        return self._smoothie_driver.position
+
     def move(self, target_position: Dict[str, float],
              home_flagged_axes: bool = True, speed: float = None):
         with self._set_temp_speed(speed):

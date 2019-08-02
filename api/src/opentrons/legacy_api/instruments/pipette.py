@@ -165,6 +165,7 @@ class Pipette(CommandPublisher):
         self.model_offset = model_offset
 
         self.tip_attached = False
+        self._fallback_tip_length = fallback_tip_length
         self.instrument_actuator = None
         self.instrument_mover = None
 
@@ -255,6 +256,14 @@ class Pipette(CommandPublisher):
         self.previous_placeable = None
         self.current_volume = 0
         self.reset_tip_tracking()
+
+    @property
+    def has_tip(self):
+        """
+        Returns whether a pipette has a tip attached. Added in for backcompat
+        purposes in deck calibration CLI tool.
+        """
+        return self.tip_attached
 
     def has_tip_rack(self):
         """

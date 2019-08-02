@@ -27,8 +27,10 @@ class Pipette:
         self._config = pipette_config.load(model, pipette_id)
         self._name = pipette_config.name_for_model(model)
         self._model = model
+        self._model_offset = self._config.model_offset
         self._current_volume = 0.0
         self._current_tip_length = 0.0
+        self._fallback_tip_length = self._config.tip_length
         self._has_tip = False
         self._pipette_id = pipette_id
         pip_type = 'multi' if self._config.channels > 1 else 'single'
@@ -45,6 +47,10 @@ class Pipette:
     @property
     def config(self) -> pipette_config.pipette_config:
         return self._config
+
+    @property
+    def model_offset(self):
+        return self._model_offset
 
     def update_config_item(self, elem_name: str, elem_val: Any):
         self._log.info("updated config: {}={}".format(elem_name, elem_val))
@@ -80,20 +86,20 @@ class Pipette:
             cp_type = CriticalPoint.TIP
             tip_length = self.current_tip_length
         if cp_override == CriticalPoint.XY_CENTER:
-            mod_offset_xy = [0, 0, self.config.model_offset[2]]
+            mod_offset_xy = [0, 0, self.model_offset[2]]
             cp_type = CriticalPoint.XY_CENTER
         elif cp_override == CriticalPoint.FRONT_NOZZLE:
             mod_offset_xy = [
-                0, -self.config.model_offset[1], self.config.model_offset[2]]
+                0, -self.model_offset[1], self.model_offset[2]]
             cp_type = CriticalPoint.FRONT_NOZZLE
         else:
-            mod_offset_xy = self.config.model_offset
+            mod_offset_xy = self.model_offset
         mod_and_tip = Point(mod_offset_xy[0],
                             mod_offset_xy[1],
                             mod_offset_xy[2] - tip_length)
         cp = mod_and_tip + self._instrument_offset._replace(z=0)
         if self._log.isEnabledFor(logging.DEBUG):
-            mo = 'model offset: {} + '.format(self.config.model_offset)\
+            mo = 'model offset: {} + '.format(self.model_offset)\
                 if cp_type != CriticalPoint.XY_CENTER else ''
             info_str = 'cp: {}{}: {}=({}instr offset xy: {}'\
                 .format(cp_type, '(from override)' if cp_override else '',

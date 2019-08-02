@@ -2,7 +2,7 @@ from opentrons.config import feature_flags as ff
 from opentrons import types
 
 # Application constants
-SAFE_HEIGHT = 130
+SAFE_HEIGHT = 100
 
 left = 'Z'
 right = 'A'
@@ -65,14 +65,16 @@ z_row = 2
 def position(axis, hardware, cp=None):
     """
     Read position from driver into a tuple and map 3-rd value
-    to the axis of a pipette currently used
+    to the axis of a pipette currently used.
+
+    The critical point takes into account the model offset of a given pipette.
     """
 
     if not ff.use_protocol_api_v2():
         p = hardware._driver.position
         return (p['X'], p['Y'], p[axis])
     else:
-        p = hardware.gantry_position(axis, critical_point=cp)
+        p = hardware.gantry_position(axis, critical_point=cp, refresh=True)
         return (p.x, p.y, p.z)
 
 

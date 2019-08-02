@@ -4,6 +4,7 @@
 
 import asyncio
 import urwid
+import argparse
 import atexit
 import os
 import sys
@@ -20,13 +21,16 @@ from opentrons.config import (robot_configs, feature_flags,
 from opentrons.util.calibration_functions import probe_instrument
 from opentrons.util.linal import (solve, add_z, apply_transform,
                                   identity_deck_transform)
+from opentrons.util.vector import Vector
+from opentrons.util import logging_config
+
 from . import (
     left, right, SAFE_HEIGHT, cli_dots_set,
     position, jog, apply_mount_offset)
 
 # TODO: add tests for methods, split out current point behavior per comment
 # TODO:   below, and total result on robot against prior version of this app
-
+DEFAULT_TIP_LENGTH = 51.7
 log = logging.getLogger(__name__)
 
 
@@ -54,7 +58,13 @@ class CLITool:
         such as a web-server that would be able to call those functions behind
         HTTP endpoints.
     """
-    def __init__(self, point_set, tip_length, loop=None):
+    def __init__(
+            self,
+            point_set,
+            hardware,
+            pickup_tip=None,
+            loop=None,
+            log_level=None):
         # URWID user interface objects
         if not loop:
             loop = asyncio.get_event_loop()
@@ -76,39 +86,39 @@ class CLITool:
         self._status_text_box = urwid.Text('')
         self._pile = urwid.Pile([self._tip_text_box, self._status_text_box])
         self._filler = urwid.Filler(self._pile, 'top')
-
+        self.hardware = hardware
+        self._pipettes = {}
         if not feature_flags.use_protocol_api_v2():
-            self.hardware = robot
             self._current_mount = right
         else:
-            api = opentrons.hardware_control.API
-            self.hardware = adapters.SynchronousAdapter.build(
-                api.build_hardware_controller, force=True)
             self._current_mount = types.Mount.RIGHT
-            self.hardware.cache_instruments()
 
-        self.ui_loop = urwid.MainLoop(
-            self._filler,
-            handle_mouse=False,
-            unhandled_input=self._on_key_press,
-            event_loop=loop
-        )
-
-        self._asyncio_loop = loop
-
+        self.update_pipette_models()
         self.current_transform = identity_deck_transform()
-
+        self._tip_length = DEFAULT_TIP_LENGTH
         # Other state
-        self._tip_length = tip_length
-        if feature_flags.use_protocol_api_v2():
-            self.hardware.add_tip(types.Mount.RIGHT, self._tip_length)
-            if self.hardware.attached_instruments[types.Mount.LEFT]:
-                self.hardware.add_tip(types.Mount.LEFT, self._tip_length)
+        if not pickup_tip:
+            self._tip_length =\
+                self._pipettes[self._current_mount]._fallback_tip_length
+            if feature_flags.use_protocol_api_v2():
+                self.hardware.add_tip(
+                    types.Mount.RIGHT,
+                    self._tip_length)
+                if self._pipettes[types.Mount.LEFT]:
+                    self.hardware.add_tip(
+                        types.Mount.LEFT,
+                        self._pipettes[types.Mount.LEFT]._fallback_tip_length)
+            else:
+                for pip in self._pipettes.values():
+                    if pip:
+                        pip._add_tip(pip._tip_length)
+
         self.current_position = (0, 0, 0)
         self._steps = [0.1, 0.25, 0.5, 1, 5, 10, 20, 40, 80]
         self._steps_index = 2
         self._current_point = 1
-
+        self._model_offset = self._pipettes[self._current_mount].model_offset
+        deck_height = 0
         if feature_flags.use_protocol_api_v2():
             deck_height = 0
         else:
@@ -129,13 +139,15 @@ class CLITool:
             'corner9': (330.14, 222.78, deck_height)}
 
         slot5 = self._test_points['slot5']
-
+        log_val = self.hardware.config.log_level
+        if log_level:
+            log_val = log_level.upper()
+        logging_config.log_init(log_val)
         self.key_map = {
             '-': lambda: self.decrease_step(),
             '=': lambda: self.increase_step(),
             'z': lambda: self.save_z_value(),
-            'p': lambda: self.probe(
-                self._tip_length, self.hardware, self._current_mount, slot5),
+            'p': lambda: self.probe(slot5),
             'enter': lambda: self.save_point(),
             '\\': lambda: self.home(),
             ' ': lambda: self.save_transform(),
@@ -144,11 +156,14 @@ class CLITool:
                 self._current_mount, +1, self.current_step()),
             'a': lambda: self._jog(
                 self._current_mount, -1, self.current_step()),
+            'n': lambda: self.update_pipette_models(),
             'up': lambda: self._jog('Y', +1, self.current_step()),
             'down': lambda: self._jog('Y', -1, self.current_step()),
             'left': lambda: self._jog('X', -1, self.current_step()),
             'right': lambda: self._jog('X', +1, self.current_step()),
             'm': lambda: self.validate_mount_offset(),
+            's': lambda: self.switch_mounts(),
+            't': lambda: self.try_pickup_tip(),
             '1': lambda: self.validate(
                 self._expected_points[1], 1, self._current_mount),
             '2': lambda: self.validate(
@@ -166,6 +181,14 @@ class CLITool:
             '?': lambda: self.print_instructions(),
         }
 
+        self.ui_loop = urwid.MainLoop(
+            self._filler,
+            handle_mouse=False,
+            unhandled_input=self._on_key_press,
+            event_loop=loop
+        )
+        log.debug("Starting gantry calibration command line interface (CLI)")
+
     @property
     def hardware(self):
         return self._hardware
@@ -173,14 +196,6 @@ class CLITool:
     @hardware.setter
     def hardware(self, hardware):
         self._hardware = hardware
-    #
-    # @property
-    # def calibration_matrix(self):
-    #     return self._calibration_matrix
-    #
-    # @calibration_matrix.setter
-    # def calibration_matrix(self, calibration):
-    #     self._calibration_matrix = calibration
 
     @property
     def actual_points(self):
@@ -190,6 +205,15 @@ class CLITool:
     def actual_points(self, points):
         self._actual_points = points
 
+    @property
+    def model_offset(self):
+        # Model offset for current pipette
+        return self._model_offset
+
+    @model_offset.setter
+    def model_offset(self, offset):
+        self._model_offset = offset
+
     def current_step(self):
         return self._steps[self._steps_index]
 
@@ -198,9 +222,10 @@ class CLITool:
             'A CLI application for performing factory calibration',
             'of an Opentrons robot',
             'Instructions:',
-            '- Robot must be set up with two 300ul or 50ul single-channel',
-            'pipettes installed on the right-hand and left-hand mount.',
-            '- Put a GEB 300ul tip onto the pipette.',
+            '- Attach any single-channel pipette; you do not need a left-hand',
+            'pipette until mount calibration.',
+            '- Put a GEB 300ul tip onto the pipette or pick up a tip from',
+            'a tipbox anywhere on the deck.'
             '- Use the arrow keys to jog the robot over slot 5 in an',
             'open space that is not an engraving or a hole.',
             '- Use the "q" and "a" keys to jog the pipette up',
@@ -217,6 +242,9 @@ class CLITool:
             '- Press "p" to perform tip probe.',
             'Press the space bar to save again.',
             '- Press "m" to perform mount calibration.',
+            '- If you do not have a left pipette attached it will prompt you',
+            'to attach a pipette using the "n" command',
+            '- Either press "m" again or jog back to position 1',
             'Press enter and then space bar to save again.',
             '- Use backslash to home both pipettes and',
             'optionally press 4,5,6,7 again.',
@@ -260,8 +288,10 @@ class CLITool:
         coordinates
         """
         if not feature_flags.use_protocol_api_v2():
-            res = self._driver_to_deck_coords(
+            px, py, pz = self._driver_to_deck_coords(
                 position(self._current_mount, self.hardware))
+            mox, moy, moz = self._model_offset
+            res = (px + mox, py + moy, pz + moz)
         else:
             res = position(
                 self._current_mount, self.hardware, CriticalPoint.TIP)
@@ -277,6 +307,46 @@ class CLITool:
         self.current_position = self._position()
         return 'Jog: {}'.format([axis, str(direction), str(step)])
 
+    def _helper_pickup(self, p, top):
+        for i in range(int(p._pick_up_presses)):
+            # move nozzle down into the tip
+            p.instrument_mover.push_speed()
+            p.instrument_mover.push_active_current()
+            p.instrument_mover.set_active_current(p._pick_up_current)
+            p.instrument_mover.set_speed(p._pick_up_speed)
+            dist = (-1 * p._pick_up_distance) + (-1 * p._pick_up_increment * i)
+            location_pickup = Vector(top[0], top[1], dist + top[2])
+            self.hardware.move_to(
+                (self.hardware.deck, location_pickup), p, 'direct')
+            self.hardware.move_to((self.hardware.deck, top), p, 'direct')
+            # move nozzle back up
+            p.instrument_mover.pop_active_current()
+            p.instrument_mover.pop_speed()
+        self.hardware.poses = p.instrument_mover.fast_home(
+            self.hardware.poses, p._pick_up_distance)
+
+    def try_pickup_tip(self):
+        pipette = self._pipettes[self._current_mount]
+        self._tip_length = pipette._fallback_tip_length
+        # Check that pipette does not have tip attached, if it does remove it.
+        self._clear_tips(pipette)
+        if not feature_flags.use_protocol_api_v2():
+            top = self._position()
+            self._helper_pickup(pipette, top)
+            pipette._add_tip(pipette._tip_length)
+        else:
+            self.hardware.pick_up_tip(
+                self._current_mount,
+                tip_length=self._tip_length)
+        return "Picked up tip!"
+
+    def _clear_tips(self, pipette):
+        if pipette.has_tip:
+            if not feature_flags.use_protocol_api_v2():
+                pipette._remove_tip(self._tip_length)
+            else:
+                self.hardware.remove_tip(self._current_mount)
+
     def home(self) -> str:
         """
         Return the robot to the home position and update the position tracker
@@ -284,6 +354,13 @@ class CLITool:
         self.hardware.home()
         self.current_position = self._position()
         return 'Homed'
+
+    def select_home(self, axes) -> str:
+        if feature_flags.use_protocol_api_v2():
+            self.hardware._backend._smoothie_driver.home(axes)
+        else:
+            self.hardware._driver.home(axes)
+        return f'Homed {axes}'
 
     def save_point(self) -> str:
         """
@@ -377,6 +454,32 @@ class CLITool:
         mx, my, mz = self.hardware.config.mount_offset
         return (lx - mx, ly - my, lz - mz)
 
+    def switch_mounts(self):
+        if not feature_flags.use_protocol_api_v2():
+            self.select_home(self._current_mount)
+            r_pipette = right
+            l_pipette = left
+        else:
+            r_pipette = types.Mount.RIGHT
+            l_pipette = types.Mount.LEFT
+            axes = right if self._current_mount == r_pipette else left
+            self.select_home(axes)
+
+        if self._current_mount == r_pipette:
+            self._current_mount = l_pipette
+        else:
+            self._current_mount = r_pipette
+        self.move_to_safe_height()
+        if self._pipettes[self._current_mount]:
+            self._tip_length =\
+                self._pipettes[self._current_mount]._fallback_tip_length
+            self._model_offset =\
+                self._pipettes[self._current_mount].model_offset
+            return f"Switched mount to {self._current_mount}"
+        else:
+            return ("Switched mount, but please add pipette\n"
+                    f"to {self._current_mount}")
+
     def validate_mount_offset(self):
         # move the RIGHT pipette to expected point, then immediately after
         # move the LEFT pipette to that same point
@@ -389,8 +492,14 @@ class CLITool:
             l_pipette = types.Mount.LEFT
             targ = self._expected_points[1]
         self.validate(self._expected_points[1], 1, r_pipette)
-
-        self.validate(targ, 0, l_pipette)
+        next_pip = self._pipettes[l_pipette]
+        self.switch_mounts()
+        if next_pip and next_pip.has_tip:
+            self.validate(targ, 0, l_pipette)
+            return 'Mount offset complete'
+        else:
+            self.move_to_safe_height()
+            return 'Please attach a pipette or pick up tip and try again.'
 
     def validate(
             self,
@@ -406,12 +515,6 @@ class CLITool:
         """
         self._current_point = point_num
         if not feature_flags.use_protocol_api_v2():
-            _, _, cz = self._position()
-            if self._current_mount != pipette_mount and cz < SAFE_HEIGHT:
-                self.move_to_safe_height()
-
-            self._current_mount = pipette_mount
-
             _, _, cz = self._position()
             if cz < SAFE_HEIGHT:
                 self.move_to_safe_height()
@@ -435,6 +538,32 @@ class CLITool:
         else:
             pt = types.Point(x=cx, y=cy, z=SAFE_HEIGHT)
             self.hardware.move_to(self._current_mount, pt)
+
+    def update_pipette_models(self):
+        if feature_flags.use_protocol_api_v2():
+            self.hardware.cache_instruments()
+            cached = self.hardware.get_attached_instruments()
+            pip_func = None
+        else:
+            self.hardware.cache_instrument_models()
+            cached = self.hardware.get_attached_pipettes()
+            pip_func = instruments.pipette_by_name
+        for mount, attached in cached.items():
+            if mount == 'left':
+                mount_key = left
+            elif mount == 'right':
+                mount_key = right
+            else:
+                mount_key = mount
+            if attached.get('name') and pip_func:
+                if not self._pipettes.get(mount_key):
+                    self._pipettes[mount_key] = pip_func(
+                        mount, attached['name'])
+            elif attached.get('name'):
+                self._pipettes[mount_key] =\
+                    self.hardware._attached_instruments[mount_key]
+            else:
+                self._pipettes[mount_key] = None
 
     def exit(self):
         if feature_flags.use_protocol_api_v2():
@@ -471,24 +600,23 @@ class CLITool:
         self._status_text_box.set_text(text)
 
     # Functions for backing key-press
-    def probe(self, tip_length: float, hardware, mount, move_after) -> str:
-
+    def probe(self, move_after) -> str:
+        hw = self.hardware
+        mount = self._current_mount
         if not feature_flags.use_protocol_api_v2():
-            hardware.reset()
-            pipette = instruments.P300_Single(mount='right')   # type: ignore
             probe_center = tuple(probe_instrument(
-                pipette, robot, tip_length=tip_length))
-            log.debug("Setting probe center to {}".format(probe_center))
+                self._pipettes[mount],
+                hw))
         else:
-            probe_center = hardware.locate_tip_probe_center(mount, tip_length)
-            _, _, cz = position(mount, hardware, CriticalPoint.TIP)
+            probe_center = hw.locate_tip_probe_center(mount)
+            _, _, cz = position(mount, hw, CriticalPoint.TIP)
             # work around to prevent pipette tip crashing into tip box
             # when moving from tip box -> other point on the deck
             pt = types.Point(x=move_after[0], y=move_after[1], z=cz)
-            hardware.move_to(mount, pt)
-
-        hardware.update_config(
-            tip_probe=hardware.config.tip_probe._replace(center=probe_center))
+            hw.move_to(mount, pt)
+        log.debug("Setting probe center to {}".format(probe_center))
+        hw.update_config(
+            tip_probe=hw.config.tip_probe._replace(center=probe_center))
         return 'Tip probe'
 
 
@@ -563,18 +691,37 @@ def main(loop=None):
     # Notes:
     #  - 200ul tip is 51.7mm long when attached to a pipette
     #  - For xyz coordinates, (0, 0, 0) is the lower-left corner of the robot
-    cli = CLITool(
-        point_set=get_calibration_points(),
-        tip_length=51.7,
-        loop=loop)
-    hardware = cli.hardware
-    backup_configuration_and_reload(hardware)
+    parser = argparse.ArgumentParser(prog='opentrons deck calibration',
+                                     description=__doc__)
+    parser.add_argument(
+        '-t', '--pickupTip',
+        help='What to output during simulations',
+        default=None)
+    parser.add_argument(
+        '-l', '--log-level', action='store',
+        help=('Log level for deck calibration.'),
+        choices=['error', 'warning', 'info', 'debug'],
+        default='info')
+    args = parser.parse_args()
+
     if not feature_flags.use_protocol_api_v2():
+        hardware = robot
         hardware.connect()
         hardware.turn_on_rail_lights()
         atexit.register(hardware.turn_off_rail_lights)
     else:
+        api = opentrons.hardware_control.API
+        hardware = adapters.SynchronousAdapter.build(
+            api.build_hardware_controller, force=True)
         hardware.set_lights(rails=True)
+    backup_configuration_and_reload(hardware)
+    cli = CLITool(
+        point_set=get_calibration_points(),
+        hardware=hardware,
+        pickup_tip=args.pickupTip,
+        loop=loop,
+        log_level=args.log_level)
+
     cli.home()
     # lights help the script user to see the points on the deck
     cli.ui_loop.run()
@@ -587,7 +734,7 @@ def main(loop=None):
 
 
 def notify_and_restart():
-    print('Exiting configuration tool and restarting system')
+    log.debug('Exiting configuration tool and restarting system')
     if ARCHITECTURE == SystemArchitecture.BALENA:
         os.system("kill 1")
     else:
