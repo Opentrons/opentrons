@@ -63,7 +63,8 @@ class CLITool:
             point_set,
             hardware,
             pickup_tip=None,
-            loop=None):
+            loop=None,
+            log_level=None):
         # URWID user interface objects
         if not loop:
             loop = asyncio.get_event_loop()
@@ -138,8 +139,10 @@ class CLITool:
             'corner9': (330.14, 222.78, deck_height)}
 
         slot5 = self._test_points['slot5']
-
-        logging_config.log_init(self.hardware.config.log_level)
+        log_val = self.hardware.config.log_level
+        if log_level:
+            log_val = log_level.upper()
+        logging_config.log_init(log_val)
         self.key_map = {
             '-': lambda: self.decrease_step(),
             '=': lambda: self.increase_step(),
@@ -694,6 +697,11 @@ def main(loop=None):
         '-t', '--pickupTip',
         help='What to output during simulations',
         default=None)
+    parser.add_argument(
+        '-l', '--log-level', action='store',
+        help=('Log level for deck calibration.'),
+        choices=['error', 'warning', 'info', 'debug'],
+        default='info')
     args = parser.parse_args()
 
     if not feature_flags.use_protocol_api_v2():
@@ -711,7 +719,8 @@ def main(loop=None):
         point_set=get_calibration_points(),
         hardware=hardware,
         pickup_tip=args.pickupTip,
-        loop=loop)
+        loop=loop,
+        log_level=args.log_level)
 
     cli.home()
     # lights help the script user to see the points on the deck

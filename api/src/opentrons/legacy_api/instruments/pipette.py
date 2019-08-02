@@ -259,7 +259,10 @@ class Pipette(CommandPublisher):
 
     @property
     def has_tip(self):
-        # Added in for backcompat purposes in CLI
+        """
+        Returns whether a pipette has a tip attached. Added in for backcompat
+        purposes in deck calibration CLI tool.
+        """
         return self.tip_attached
 
     def has_tip_rack(self):

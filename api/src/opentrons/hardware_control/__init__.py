@@ -600,6 +600,9 @@ class API(HardwareAPILike):
 
         `critical_point` specifies an override to the current critical point to
         use (see :py:meth:`current_position`).
+
+        `refresh` if set to True, update the cached position using the
+        smoothie driver (see :py:meth:`current_position`).
         """
         cur_pos = await self.current_position(mount, critical_point, refresh)
         return top_types.Point(x=cur_pos[Axis.X],
