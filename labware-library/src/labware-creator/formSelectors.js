@@ -44,10 +44,16 @@ export const _getIsDefaulted = (
   name: $Keys<LabwareFields>,
   values: LabwareFields
 ): boolean => {
-  if (name === 'gridSpacingX' && Number(values.gridColumns) === 1) {
+  if (
+    ['gridSpacingX', 'regularColumnSpacing'].includes(name) &&
+    Number(values.gridColumns) === 1
+  ) {
     return true
   }
-  if (name === 'gridSpacingY' && Number(values.gridRows) === 1) {
+  if (
+    ['gridSpacingY', 'regularRowSpacing'].includes(name) &&
+    Number(values.gridRows) === 1
+  ) {
     return true
   }
   return false
