@@ -61,6 +61,7 @@ export default function fieldsToLabware(
     }
 
     const def = createRegularLabware({
+      strict: false,
       metadata: {
         displayName: fields.displayName,
         displayCategory,
