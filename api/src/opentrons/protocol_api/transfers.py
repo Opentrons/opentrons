@@ -1,6 +1,7 @@
 import enum
 from typing import (Any, List, Optional, Union, NamedTuple,
-                    Callable, TYPE_CHECKING)
+                    Callable, Generator, Iterator, Tuple,
+                    TYPE_CHECKING)
 from .labware import Well
 from opentrons import types
 
@@ -455,8 +456,12 @@ class TransferPlan:
             -> Touch tip -> Dispense air gap -> Dispense -> Mix if empty ->
             -> Blow out -> Touch tip -> Drop tip*
         """
-        plan_iter = zip(self._volumes, self._sources, self._dests)
-        for step_vol, src, dest in plan_iter:
+        plan_iter = self._expand_for_volume_constraints(
+            self._volumes, zip(self._sources, self._dests),
+            self._instr.max_volume
+            - self._strategy.disposal_volume
+            - self._strategy.air_gap)
+        for step_vol, (src, dest) in plan_iter:
             if self._strategy.new_tip == types.TransferTipPolicy.ALWAYS:
                 yield self._format_dict('pick_up_tip', kwargs=self._tip_opts)
             max_vol = self._instr.max_volume - \
@@ -513,7 +518,11 @@ class TransferPlan:
         # recommend users to specify a disposal vol when using distribute.
         # First method keeps distribute consistent with current behavior while
         # the other maintains consistency in default behaviors of all functions
-        plan_iter = zip(self._volumes, self._dests)
+        plan_iter = self._expand_for_volume_constraints(
+            self._volumes, self._dests,
+            self._instr.max_volume
+            - self._strategy.disposal_volume
+            - self._strategy.air_gap)
 
         done = False
         current_xfer = next(plan_iter)
@@ -525,7 +534,7 @@ class TransferPlan:
                 while (sum(a[0] for a in asp_grouped) +
                        self._strategy.disposal_volume +
                        self._strategy.air_gap +
-                       current_xfer[0]) < self._instr.max_volume:
+                       current_xfer[0]) <= self._instr.max_volume:
                     asp_grouped.append(current_xfer)
                     current_xfer = next(plan_iter)
             except StopIteration:
@@ -537,6 +546,24 @@ class TransferPlan:
                 yield from self._dispense_actions(step[0], step[1],
                                                   step is not asp_grouped[-1])
         yield from self._new_tip_action()
+
+    @staticmethod
+    def _expand_for_volume_constraints(
+            volumes: Iterator[float],
+            targets: Iterator[Well],
+            max_volume: float) -> Generator[Tuple[float, Well], None, None]:
+        """ Split a sequence of proposed transfers if necessary to keep each
+        transfer under the given max volume.
+        """
+        for volume, target in zip(volumes, targets):
+            while volume > max_volume * 2:
+                yield max_volume, target
+                volume -= max_volume
+
+            if volume > max_volume:
+                volume /= 2
+                yield volume, target
+            yield volume, target
 
     def _plan_consolidate(self):
         """
@@ -575,7 +602,8 @@ class TransferPlan:
                *.. Aspirate -> Air gap -> Touch tip ->..
                .. Aspirate -> .....*
         """
-        plan_iter = zip(self._volumes, self._sources)
+        plan_iter = self._expand_for_volume_constraints(
+            self._volumes, self._sources, self._instr.max_volume)
         current_xfer = next(plan_iter)
         if self._strategy.new_tip == types.TransferTipPolicy.ALWAYS:
             yield self._format_dict('pick_up_tip', kwargs=self._tip_opts)
@@ -586,7 +614,7 @@ class TransferPlan:
                 while (sum([a[0] for a in asp_grouped]) +
                        self._strategy.disposal_volume +
                        self._strategy.air_gap * len(asp_grouped) +
-                       current_xfer[0]) < self._instr.max_volume:
+                       current_xfer[0]) <= self._instr.max_volume:
                     asp_grouped.append(current_xfer)
                     current_xfer = next(plan_iter)
             except StopIteration:
@@ -632,23 +660,30 @@ class TransferPlan:
         if self._strategy.air_gap:
             yield self._format_dict('dispense', [self._strategy.air_gap])
 
-    def _after_dispense(self, loc, is_disp_next=False):
+    def _after_dispense(self, loc, is_disp_next=False):  # noqa(C901)
         # This sequence of actions is subject to change
         if not is_disp_next:
+            # If the next command is an aspirate, we are switching
+            # between aspirate and dispense.
             if self._instr.current_volume == 0:
+                # If we're empty, then this is when after mixes come into play
                 if self._strategy.mix_strategy == MixStrategy.AFTER or \
                         self._strategy.mix_strategy == MixStrategy.BOTH:
                     yield self._format_dict('mix', kwargs=self._mix_after_opts)
                 if self._strategy.blow_out_strategy \
                    == BlowOutStrategy.DEST_IF_EMPTY:
                     yield self._format_dict('blow_out', [loc])
+            # If we're not empty but we're about to aspirate, we need a
+            # blowout.
             if self._strategy.blow_out_strategy == BlowOutStrategy.TRASH:
                 yield self._format_dict('blow_out', [
                     self._instr.trash_container.wells()[0]])
             elif self._strategy.blow_out_strategy == \
                     BlowOutStrategy.CUSTOM_LOCATION:
                 yield self._format_dict('blow_out', kwargs=self._blow_opts)
-
+            elif self._strategy.disposal_volume:
+                yield self._format_dict('blow_out', [
+                    self._instr.trash_container.wells()[0]])
         else:
             # Used by distribute
             if self._strategy.air_gap:
