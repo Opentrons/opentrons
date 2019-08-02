@@ -7,9 +7,10 @@ import {
   wellShapeOptions,
   IRREGULAR_LABWARE_ERROR,
   LABELS,
-  X_DIMENSION,
-  Y_DIMENSION,
-  XY_ALLOWED_VARIANCE,
+  MAX_X_DIMENSION,
+  MIN_X_DIMENSION,
+  MAX_Y_DIMENSION,
+  MIN_Y_DIMENSION,
   MAX_Z_DIMENSION,
   type ProcessedLabwareFields,
 } from './fields'
@@ -74,14 +75,14 @@ const labwareFormSchema = Yup.object().shape({
   footprintXDimension: Yup.number()
     .label(LABELS.footprintXDimension)
     .typeError(MUST_BE_A_NUMBER)
-    .min(X_DIMENSION - XY_ALLOWED_VARIANCE, IRREGULAR_LABWARE_ERROR)
-    .max(X_DIMENSION + XY_ALLOWED_VARIANCE, IRREGULAR_LABWARE_ERROR)
+    .min(MIN_X_DIMENSION, IRREGULAR_LABWARE_ERROR)
+    .max(MAX_X_DIMENSION, IRREGULAR_LABWARE_ERROR)
     .required(),
   footprintYDimension: Yup.number()
     .label(LABELS.footprintYDimension)
     .typeError(MUST_BE_A_NUMBER)
-    .min(Y_DIMENSION - XY_ALLOWED_VARIANCE, IRREGULAR_LABWARE_ERROR)
-    .max(Y_DIMENSION + XY_ALLOWED_VARIANCE, IRREGULAR_LABWARE_ERROR)
+    .min(MIN_Y_DIMENSION, IRREGULAR_LABWARE_ERROR)
+    .max(MAX_Y_DIMENSION, IRREGULAR_LABWARE_ERROR)
     .required(),
   labwareZDimension: requiredPositiveNumber(LABELS.labwareZDimension).max(
     MAX_Z_DIMENSION,

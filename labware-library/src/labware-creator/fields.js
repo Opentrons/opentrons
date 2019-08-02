@@ -1,7 +1,8 @@
 // @flow
-export const X_DIMENSION = 127.76
-export const Y_DIMENSION = 85.48
-export const XY_ALLOWED_VARIANCE = 0.25
+export const MAX_X_DIMENSION = 127.99
+export const MIN_X_DIMENSION = 127.7
+export const MAX_Y_DIMENSION = 85.99
+export const MIN_Y_DIMENSION = 85.4
 export const MAX_SUGGESTED_Z = 124
 export const MAX_Z_DIMENSION = 195
 

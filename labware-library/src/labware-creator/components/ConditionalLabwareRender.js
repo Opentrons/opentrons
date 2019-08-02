@@ -7,7 +7,10 @@ import {
   RobotCoordsForeignDiv,
   RobotWorkSpace,
 } from '@opentrons/components'
-import { X_DIMENSION, Y_DIMENSION } from '../fields'
+import {
+  SLOT_LENGTH_MM as DEFAULT_X_DIMENSION,
+  SLOT_WIDTH_MM as DEFAULT_Y_DIMENSION,
+} from '@opentrons/shared-data'
 import labwareFormSchema from '../labwareFormSchema'
 import fieldsToLabware from '../fieldsToLabware'
 import type { LabwareFields, ProcessedLabwareFields } from '../fields'
@@ -23,8 +26,10 @@ const ConditionalLabwareRender = (props: Props) => {
 
     // Fill arbitrary values in to any missing fields that aren't needed for this render,
     // eg some required definition data like well volume, height, and bottom shape don't affect the render.
-    values.footprintXDimension = values.footprintXDimension || `${X_DIMENSION}`
-    values.footprintYDimension = values.footprintYDimension || `${Y_DIMENSION}`
+    values.footprintXDimension =
+      values.footprintXDimension || `${DEFAULT_X_DIMENSION}`
+    values.footprintYDimension =
+      values.footprintYDimension || `${DEFAULT_Y_DIMENSION}`
     values.labwareZDimension = values.wellDepth || '100'
     values.wellDepth = values.wellDepth || '80'
     values.wellVolume = values.wellVolume || '50'
@@ -58,8 +63,12 @@ const ConditionalLabwareRender = (props: Props) => {
     return def
   }, [props.values])
 
-  const xDim = definition ? definition.dimensions.xDimension : X_DIMENSION
-  const yDim = definition ? definition.dimensions.yDimension : Y_DIMENSION
+  const xDim = definition
+    ? definition.dimensions.xDimension
+    : DEFAULT_X_DIMENSION
+  const yDim = definition
+    ? definition.dimensions.yDimension
+    : DEFAULT_Y_DIMENSION
 
   return (
     <RobotWorkSpace viewBox={`0 0 ${xDim} ${yDim}`}>
