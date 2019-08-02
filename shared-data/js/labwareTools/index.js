@@ -31,6 +31,7 @@ import type {
 // NOTE: leaving this 'beta' to reduce conflicts with future labware cloud namespaces
 const DEFAULT_CUSTOM_NAMESPACE = 'custom_beta'
 const SCHEMA_VERSION = 2
+const DEFAULT_BRAND_NAME = 'generic'
 
 type Cell = {|
   row: number,
@@ -59,6 +60,7 @@ export type BaseLabwareProps = {|
   version?: number,
   namespace?: string,
   loadNamePostfix?: Array<string>,
+  strict?: ?boolean, // If true, throws error on failed validation
 |}
 
 export type RegularLabwareProps = {|
@@ -83,15 +85,20 @@ export type IrregularLabwareProps = {|
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 const validate = ajv.compile(labwareSchema)
 
-function validateDefinition(definition: Definition): Definition {
+function validateDefinition(
+  definition: Definition,
+  strict: boolean = true
+): Definition {
   const valid = validate(definition)
 
   if (!valid) {
     console.error('Definition:', definition)
     console.error('Validation Errors:', validate.errors)
-    throw new Error(
-      'Generated labware failed to validate, please check your inputs'
-    )
+    if (strict) {
+      throw new Error(
+        'Generated labware failed to validate, please check your inputs'
+      )
+    }
   }
 
   return definition
@@ -192,7 +199,7 @@ export function _generateIrregularLoadName(args: {
     return `${numWells}x${wellVolume}${loadNameUnits}`
   })
 
-  return createName([
+  return joinLoadName([
     brand,
     totalWellCount,
     displayCategory,
@@ -248,18 +255,71 @@ function calculateCoordinates(
 }
 
 function ensureBrand(brand?: Brand): Brand {
-  return brand || { brand: 'generic' }
+  return brand || { brand: DEFAULT_BRAND_NAME }
 }
 
 // joins the input array with _ to create a name, making sure to lowercase the
 // result and remove all invalid characters (allowed characters: [a-z0-9_.])
-function createName(
+function joinLoadName(
   fragments: Array<string | number | Array<string | number>>
 ): string {
   return flatten(fragments)
+    .map(s => String(s).replace(/_/g, ''))
     .join('_')
     .toLowerCase()
     .replace(/[^a-z0-9_.]/g, '')
+}
+
+type RegularNameProps = {
+  displayCategory: string,
+  displayVolumeUnits: VolumeUnits,
+  gridRows: number,
+  gridColumns: number,
+  totalLiquidVolume: number,
+  brandName?: string,
+  loadNamePostfix?: Array<string>,
+}
+
+function _createNameWithJoin(
+  args: RegularNameProps,
+  joinFn: (Array<string | number | Array<string | number>>) => string
+): string {
+  const {
+    gridRows,
+    gridColumns,
+    displayCategory,
+    totalLiquidVolume,
+    displayVolumeUnits,
+    brandName = DEFAULT_BRAND_NAME,
+    loadNamePostfix = [],
+  } = args
+  const numWells = gridRows * gridColumns
+  return joinFn([
+    brandName,
+    numWells,
+    displayCategory,
+    `${getDisplayVolume(
+      totalLiquidVolume,
+      displayVolumeUnits
+    )}${getAsciiVolumeUnits(displayVolumeUnits)}`,
+    ...loadNamePostfix,
+  ])
+}
+
+export function createRegularLoadName(args: RegularNameProps): string {
+  return _createNameWithJoin(args, joinLoadName)
+}
+
+export function createDefaultDisplayName(args: RegularNameProps): string {
+  return _createNameWithJoin(args, arr =>
+    flatten(arr)
+      .map(i => {
+        const subs = String(i)
+        return `${subs.slice(0, 1).toUpperCase()}${subs.slice(1)}`.trim()
+      })
+      .filter(s => s !== '')
+      .join(' ')
+  )
 }
 
 // Generator function for labware definitions within a regular grid format
@@ -267,42 +327,43 @@ function createName(
 // For further info on these parameters look at labware examples in __tests__
 // or the labware definition schema in labware/schemas/
 export function createRegularLabware(args: RegularLabwareProps): Definition {
-  const { offset, dimensions, grid, spacing, well, loadNamePostfix = [] } = args
+  const { offset, dimensions, grid, spacing, well, loadNamePostfix } = args
+  const strict = args.strict || true
   const version = args.version || 1
   const namespace = args.namespace || DEFAULT_CUSTOM_NAMESPACE
   const ordering = determineOrdering(grid)
-  const numWells = grid.row * grid.column
   const brand = ensureBrand(args.brand)
   const groupBase = args.group || { metadata: {} }
   const metadata = {
     ...args.metadata,
     displayVolumeUnits: ensureVolumeUnits(args.metadata.displayVolumeUnits),
   }
-
-  const loadName = createName([
-    brand.brand,
-    numWells,
-    metadata.displayCategory,
-    `${getDisplayVolume(
-      well.totalLiquidVolume,
-      metadata.displayVolumeUnits
-    )}${getAsciiVolumeUnits(metadata.displayVolumeUnits)}`,
-    ...loadNamePostfix,
-  ])
-
-  return validateDefinition({
-    ordering,
-    brand,
-    metadata,
-    dimensions,
-    wells: calculateCoordinates(well, ordering, spacing, offset, dimensions),
-    groups: [{ ...groupBase, wells: flatten(ordering) }],
-    parameters: { ...args.parameters, loadName },
-    namespace,
-    version,
-    schemaVersion: SCHEMA_VERSION,
-    cornerOffsetFromSlot: { x: 0, y: 0, z: 0 },
+  const loadName = createRegularLoadName({
+    gridColumns: grid.column,
+    gridRows: grid.row,
+    displayCategory: metadata.displayCategory,
+    displayVolumeUnits: metadata.displayVolumeUnits,
+    totalLiquidVolume: well.totalLiquidVolume,
+    brandName: brand.brand,
+    loadNamePostfix,
   })
+
+  return validateDefinition(
+    {
+      ordering,
+      brand,
+      metadata,
+      dimensions,
+      wells: calculateCoordinates(well, ordering, spacing, offset, dimensions),
+      groups: [{ ...groupBase, wells: flatten(ordering) }],
+      parameters: { ...args.parameters, loadName },
+      namespace,
+      version,
+      schemaVersion: SCHEMA_VERSION,
+      cornerOffsetFromSlot: { x: 0, y: 0, z: 0 },
+    },
+    strict
+  )
 }
 
 // Generator function for labware definitions within an irregular grid format
@@ -311,6 +372,7 @@ export function createIrregularLabware(
   args: IrregularLabwareProps
 ): Definition {
   const { offset, dimensions, grid, spacing, well, gridStart, group } = args
+  const strict = args.strict || true
   const namespace = args.namespace || DEFAULT_CUSTOM_NAMESPACE
   const version = args.version || 1
   const { wells, groups } = determineIrregularLayout(
@@ -336,17 +398,20 @@ export function createIrregularLabware(
     brand: brand.brand,
   })
 
-  return validateDefinition({
-    wells,
-    groups,
-    brand,
-    metadata,
-    dimensions,
-    parameters: { ...args.parameters, loadName, format: 'irregular' },
-    ordering: determineIrregularOrdering(Object.keys(wells)),
-    namespace,
-    version,
-    schemaVersion: SCHEMA_VERSION,
-    cornerOffsetFromSlot: { x: 0, y: 0, z: 0 },
-  })
+  return validateDefinition(
+    {
+      wells,
+      groups,
+      brand,
+      metadata,
+      dimensions,
+      parameters: { ...args.parameters, loadName, format: 'irregular' },
+      ordering: determineIrregularOrdering(Object.keys(wells)),
+      namespace,
+      version,
+      schemaVersion: SCHEMA_VERSION,
+      cornerOffsetFromSlot: { x: 0, y: 0, z: 0 },
+    },
+    strict
+  )
 }
