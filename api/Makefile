@@ -91,6 +91,7 @@ wheel: $(wheel_file)
 
 .PHONY: test
 test: local-install
+	$(python) ../scripts/python_build_utils.py api ensure_wheel_size
 	$(pytest) $(tests) $(test_opts)
 
 .PHONY: lint
