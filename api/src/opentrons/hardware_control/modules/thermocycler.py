@@ -155,24 +155,26 @@ class Thermocycler(mod_abc.AbstractModule):
         self._device_info = None
         self._poller = None
 
-        self._paused_event = asyncio.Event()
+        self._running_flag = asyncio.Event(loop=self._loop)
         self._current_cycle_task = None
         self._total_cycle_count = None
         self._current_cycle_index = None
         self._total_step_count = None
         self._current_step_index = None
 
-    def pause():
-        self._paused_event.set()
+    def pause(self):
+        self._running_flag.clear()
+        MODULE_LOG.debug('TC PAUSE')
 
-    def resume():
-        self._paused_event.clear()
+    def resume(self):
+        self._loop.call_soon_threadsafe(self._running_flag.set)
+        MODULE_LOG.debug('TC RESUME')
 
-    def cancel():
+    def cancel(self):
         if self._current_cycle_task:
             self._current_cycle_task.cancel()
             self._current_cycle_task = None
-            self._paused_event.clear()
+            self._running_flag.clear()
 
     async def deactivate(self):
         self._total_cycle_count = None
@@ -202,9 +204,7 @@ class Thermocycler(mod_abc.AbstractModule):
             MODULE_LOG.debug('CYCLE START')
             for step_idx, step in enumerate(steps):
                 self._current_step_index = step_idx + 1  # because scientists start at 1
-                if self._paused_event.is_set():
-                    MODULE_LOG.debug('PAUSE FLAG CAUGHT ON WAIT')
-                    await self._paused_event.wait()
+                await self._running_flag.wait()
                 if isinstance(step, dict):
                     MODULE_LOG.debug('BEFORE DICT STEP')
                     await self.set_temperature(**step)
@@ -216,10 +216,11 @@ class Thermocycler(mod_abc.AbstractModule):
     async def cycle_temperatures(self,
                                  steps: List[types.ThermocyclerStep],
                                  repetitions: int):
+        self._running_flag.set()
         self._total_cycle_count = repetitions
         self._total_step_count = len(steps)
-        cycle_task = asyncio.create_task(
-            self._execute_cycles(steps, repetitions))
+        cycle_task = self._loop.create_task(self._execute_cycles(steps,
+                                                                 repetitions))
         self._current_cycle_task = cycle_task
         MODULE_LOG.debug('JUST BEFORE TASK')
         await cycle_task
@@ -346,6 +347,7 @@ class Thermocycler(mod_abc.AbstractModule):
 
     def set_loop(self, newLoop):
         self._loop = newLoop
+        self._running_flag = asyncio.Event(loop=self._loop)
 
     async def _connect(self):
         await self._driver.connect(self._port)

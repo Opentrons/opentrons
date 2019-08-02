@@ -49,3 +49,21 @@ updated component library cards after redesign/refactor
   justify-content: space-between;
   margin-right: 1rem;
 }
+
+.target_input {
+  @apply --font-form-default;
+
+  width: 8rem;
+  height: 2.3rem;
+  background-color: var(--c-light-gray);
+  border-radius: var(--bd-radius-form-field);
+  border-width: 0;
+  padding: 0.25rem 0.25rem 0.25rem 0.5rem;
+  margin-top: 0.5rem;
+
+  &:focus {
+    outline: none;
+    background-color: var(--c-white);
+    box-shadow: 0 0.125rem 0.25rem 0 color(var(--c-black) alpha(0.5));
+  }
+}

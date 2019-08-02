@@ -10,6 +10,7 @@ import StatusItem from './StatusItem'
 
 type Props = {|
   module: TempDeckModule,
+  sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
 |}
 
 const TempDeckCard = ({ module }: Props) => (

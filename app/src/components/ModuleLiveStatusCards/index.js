@@ -3,7 +3,12 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 
 import { getConnectedRobot } from '../../discovery'
-import { fetchModules, getModulesState } from '../../robot-api'
+import {
+  fetchModules,
+  getModulesState,
+  setTargetTemp,
+  type ModuleCommandRequest,
+} from '../../robot-api'
 
 import { IntervalWrapper } from '@opentrons/components'
 
@@ -25,15 +30,21 @@ type SP = {|
 
 type DP = {|
   _fetchModules: (_robot: Robot) => mixed,
+  _sendModuleCommand: (
+    _robot: Robot,
+    serial: string,
+    request: ModuleCommandRequest
+  ) => mixed,
 |}
 
 type Props = {|
   liveStatusModules: Array<TempDeckModule | ThermocyclerModule>,
   fetchModules: () => mixed,
+  sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
 |}
 
 const ModuleLiveStatusCards = (props: Props) => {
-  const { liveStatusModules, fetchModules } = props
+  const { liveStatusModules, fetchModules, sendModuleCommand } = props
   if (liveStatusModules.length === 0) return null
 
   return (
@@ -44,9 +55,21 @@ const ModuleLiveStatusCards = (props: Props) => {
       {liveStatusModules.map(module => {
         switch (module.name) {
           case 'tempdeck':
-            return <TempDeckCard key={module.serial} module={module} />
+            return (
+              <TempDeckCard
+                key={module.serial}
+                module={module}
+                sendModuleCommand={sendModuleCommand}
+              />
+            )
           case 'thermocycler':
-            return <ThermocyclerCard key={module.serial} module={module} />
+            return (
+              <ThermocyclerCard
+                key={module.serial}
+                module={module}
+                sendModuleCommand={sendModuleCommand}
+              />
+            )
           case 'magdeck':
             return <MagDeckCard key={module.serial} module={module} />
           default:
@@ -74,16 +97,20 @@ function mapStateToProps(state: State): SP {
 function mapDispatchToProps(dispatch: Dispatch): DP {
   return {
     _fetchModules: _robot => dispatch(fetchModules(_robot)),
+    _sendModuleCommand: (_robot, serial, request) =>
+      dispatch(setTargetTemp(_robot, serial, request)),
   }
 }
 
 function mergeProps(stateProps: SP, dispatchProps: DP): Props {
-  const { _fetchModules } = dispatchProps
+  const { _fetchModules, _sendModuleCommand } = dispatchProps
   const { _robot, liveStatusModules } = stateProps
 
   return {
     liveStatusModules,
     fetchModules: () => _robot && _fetchModules(_robot),
+    sendModuleCommand: (serial, request) =>
+      _robot && _sendModuleCommand(_robot, serial, request),
   }
 }
 

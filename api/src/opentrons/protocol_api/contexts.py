@@ -280,8 +280,8 @@ class ProtocolContext(CommandPublisher):
                 'magdeck': modules.magdeck.MagDeck,
                 'tempdeck': modules.tempdeck.TempDeck,
                 'thermocycler': modules.thermocycler.Thermocycler}[mod_id]
-            hc_mod_instance = mod_type(
-                port='', simulating=True, loop=self._loop)
+            hc_mod_instance = adapters.SynchronousAdapter(mod_type(
+                port='', simulating=True, loop=self._loop))
         if hc_mod_instance:
             mod_ctx = mod_class(self,
                                 hc_mod_instance,
@@ -2058,6 +2058,7 @@ class ThermocyclerContext(ModuleContext):
                 raise ValueError("hold_time must be defined for each step in cycle")
 
         MODULE_LOG.debug('CONTEXT CYCLE START')
+        MODULE_LOG.debug(self._module)
         return self._module.cycle_temperatures(
             steps=steps, repetitions=repetitions)
 
