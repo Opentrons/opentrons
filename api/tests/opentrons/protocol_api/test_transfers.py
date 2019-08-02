@@ -632,5 +632,3 @@ def test_oversized_transfer(_instr_labware):
              'args': [200, lw1.wells_by_index()['C1'], 1.0], 'kwargs': {}},
             {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
     assert xfer_plan_list == exp1
-
-
