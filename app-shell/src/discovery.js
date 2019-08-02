@@ -59,8 +59,12 @@ export function registerDiscovery(dispatch: Dispatch) {
       case 'discovery:START':
         handleServices()
         return client.setPollInterval(FAST_POLL_INTERVAL_MS).start()
+
       case 'discovery:FINISH':
         return client.setPollInterval(SLOW_POLL_INTERVAL_MS)
+
+      case 'discovery:REMOVE':
+        return client.remove(action.payload.robotName)
     }
   }
 

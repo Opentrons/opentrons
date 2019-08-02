@@ -60,7 +60,10 @@ export default function InstallModalContents(props: Props) {
     updateMessage = 'Hang tight! This may take about 3-5 minutes.'
   } else if (step === 'getToken' || step === 'uploadFile') {
     updateMessage = 'Sending update file to robot'
-  } else if (step === 'processFile' && session.stage === 'validating') {
+  } else if (
+    step === 'processFile' &&
+    (session.stage === 'awaiting-file' || session.stage === 'validating')
+  ) {
     updateMessage = 'Validating update file'
   } else if (step === 'processFile' || step === 'commitUpdate') {
     updateMessage = 'Applying update to robot'
@@ -68,7 +71,7 @@ export default function InstallModalContents(props: Props) {
 
   const progressComponent =
     step === 'processFile' || step === 'commitUpdate' ? (
-      <ProgressBar progress={progress} />
+      <ProgressBar key={step} progress={progress} />
     ) : (
       <ProgressSpinner />
     )

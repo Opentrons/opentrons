@@ -11,7 +11,13 @@ import {
   withLatestFrom,
 } from 'rxjs/operators'
 
-import { getRobotApiVersion } from '../../discovery/selectors'
+// imported directly to avoid circular dependencies between discovery and shell
+import { getAllRobots, getRobotApiVersion } from '../../discovery/selectors'
+import {
+  startDiscovery,
+  finishDiscovery,
+  removeRobot,
+} from '../../discovery/actions'
 
 import {
   makeRobotApiRequest,
@@ -48,7 +54,7 @@ import type {
 } from './types'
 
 export const POLL_INTERVAL_MS = 2000
-export const REDISCOVERY_TIME_MS = 60000
+export const REDISCOVERY_TIME_MS = 1200000
 
 // listen for the kickoff action and:
 //   if not ready for buildroot, kickoff premigration
@@ -287,7 +293,7 @@ export const restartAfterCommitEpic: Epic = (_, state$) =>
 
       return concat(
         makeRobotApiRequest(request, meta),
-        of({ type: 'discovery:START', meta: { shell: true } })
+        of(startDiscovery(REDISCOVERY_TIME_MS))
       )
     })
   )
@@ -329,10 +335,31 @@ export const watchForOnlineAfterRestartEpic: Epic = (_, state$) =>
               `robot reconnected with version ${actual}, but we expected ${expected}`
             )
 
-      return of(finishAction, {
-        type: 'discovery:FINISH',
-        meta: { shell: true },
-      })
+      return of(finishAction, finishDiscovery())
+    })
+  )
+
+// if robot was renamed as part of migration, remove old robot name, balena
+// robots have name opentrons-robot-name, BR robots have robot-name
+// getBuildrootRobot will handle that logic, so we can compare name in state
+// vs the actual robot we're interacting with
+export const removeMigratedRobotsEpic: Epic = (_, state$) =>
+  state$.pipe(
+    filter(state => {
+      const robotName = getBuildrootRobotName(state)
+      const robot = getBuildrootRobot(state)
+      const allRobots = getAllRobots(state)
+
+      return (
+        robot !== null &&
+        robotName !== null &&
+        robot.name !== robotName &&
+        allRobots.some(r => r.name === robotName)
+      )
+    }),
+    switchMap<State, _, _>(stateWithRobotName => {
+      const robotName: string = (getBuildrootRobotName(stateWithRobotName): any)
+      return of(removeRobot(robotName))
     })
   )
 
@@ -347,5 +374,6 @@ export const buildrootUpdateEpic = combineEpics(
   commitUpdateEpic,
   restartAfterCommitEpic,
   watchForOfflineAfterRestartEpic,
-  watchForOnlineAfterRestartEpic
+  watchForOnlineAfterRestartEpic,
+  removeMigratedRobotsEpic
 )
