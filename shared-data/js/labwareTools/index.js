@@ -328,7 +328,7 @@ export function createDefaultDisplayName(args: RegularNameProps): string {
 // or the labware definition schema in labware/schemas/
 export function createRegularLabware(args: RegularLabwareProps): Definition {
   const { offset, dimensions, grid, spacing, well, loadNamePostfix } = args
-  const strict = args.strict || false
+  const strict = args.strict || true
   const version = args.version || 1
   const namespace = args.namespace || DEFAULT_CUSTOM_NAMESPACE
   const ordering = determineOrdering(grid)
@@ -372,7 +372,7 @@ export function createIrregularLabware(
   args: IrregularLabwareProps
 ): Definition {
   const { offset, dimensions, grid, spacing, well, gridStart, group } = args
-  const strict = args.strict || false
+  const strict = args.strict || true
   const namespace = args.namespace || DEFAULT_CUSTOM_NAMESPACE
   const version = args.version || 1
   const { wells, groups } = determineIrregularLayout(
