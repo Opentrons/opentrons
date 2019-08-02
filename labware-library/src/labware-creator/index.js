@@ -18,7 +18,11 @@ import {
   wellShapeOptions,
   yesNoOptions,
   tubeRackAutofills,
+  SUGGESTED_X,
+  SUGGESTED_Y,
+  SUGGESTED_XY_RANGE,
   MAX_SUGGESTED_Z,
+  LINK_CUSTOM_LABWARE_FORM,
 } from './fields'
 import labwareFormSchema from './labwareFormSchema'
 import { getDefaultDisplayName, getDefaultLoadName } from './formSelectors'
@@ -27,6 +31,7 @@ import fieldsToLabware from './fieldsToLabware'
 import ConditionalLabwareRender from './components/ConditionalLabwareRender'
 import Dropdown from './components/Dropdown'
 import IntroCopy from './components/IntroCopy'
+import LinkOut from './components/LinkOut'
 import RadioField from './components/RadioField'
 import Section from './components/Section'
 import TextField from './components/TextField'
@@ -247,6 +252,33 @@ const getHeightAlerts = (
   return null
 }
 
+const xyMessage = (
+  <div>
+    Our recommended footprint for labware is {SUGGESTED_X} by {SUGGESTED_Y} +/-
+    1mm. If you can fit your labware snugly into a single slot on the deck
+    continue through the form. If not please request custom labware via{' '}
+    <LinkOut href={LINK_CUSTOM_LABWARE_FORM}>this form</LinkOut>.
+  </div>
+)
+
+const getXYDimensionAlerts = (
+  values: LabwareFields,
+  touched: { [$Keys<LabwareFields>]: boolean }
+) => {
+  const xAsNum = Number(values.footprintXDimension)
+  const yAsNum = Number(values.footprintYDimension)
+  const showXInfo =
+    touched.footprintXDimension &&
+    Math.abs(xAsNum - SUGGESTED_X) > SUGGESTED_XY_RANGE
+  const showYInfo =
+    touched.footprintYDimension &&
+    Math.abs(yAsNum - SUGGESTED_Y) > SUGGESTED_XY_RANGE
+
+  return showXInfo || showYInfo ? (
+    <AlertItem type="info" title={xyMessage} />
+  ) : null
+}
+
 const App = () => {
   const [
     showExportErrorModal,
@@ -371,6 +403,7 @@ const App = () => {
             <Section
               label="Footprint"
               fieldList={['footprintXDimension', 'footprintYDimension']}
+              additionalAlerts={getXYDimensionAlerts(values, touched)}
             >
               <div>
                 <p>

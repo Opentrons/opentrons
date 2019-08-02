@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import LinkOut from './LinkOut'
+import { LINK_CUSTOM_LABWARE_FORM } from '../fields'
 
 const IntroCopy = () => (
   <>
@@ -28,9 +29,7 @@ const IntroCopy = () => (
       </li>
       <p>
         For all other custom labware, please use this{' '}
-        <LinkOut href="https://opentrons-ux.typeform.com/to/xi8h0W">
-          request form
-        </LinkOut>
+        <LinkOut href={LINK_CUSTOM_LABWARE_FORM}>request form</LinkOut>
       </p>
     </ul>
 

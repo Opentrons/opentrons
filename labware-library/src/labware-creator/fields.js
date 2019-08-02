@@ -1,15 +1,24 @@
 // @flow
-export const MAX_X_DIMENSION = 127.99
-export const MIN_X_DIMENSION = 127.7
-export const MAX_Y_DIMENSION = 85.99
-export const MIN_Y_DIMENSION = 85.4
-export const MAX_SUGGESTED_Z = 124
+export const MAX_X_DIMENSION = 129
+export const MIN_X_DIMENSION = 127
+export const SUGGESTED_X = 127.76
+
+export const MAX_Y_DIMENSION = 87
+export const MIN_Y_DIMENSION = 85
+export const SUGGESTED_Y = 85.47
+
+export const SUGGESTED_XY_RANGE = 1
+
 export const MAX_Z_DIMENSION = 195
+export const MAX_SUGGESTED_Z = 124
 
 export const DISPLAY_VOLUME_UNITS = 'µL'
 
 // magic string for all validation errors that direct user away to the labware request form
 export const IRREGULAR_LABWARE_ERROR = 'IRREGULAR_LABWARE_ERROR'
+
+export const LINK_CUSTOM_LABWARE_FORM =
+  'https://opentrons-ux.typeform.com/to/xi8h0W'
 
 export type Options = Array<{|
   name: string,
