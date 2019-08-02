@@ -668,6 +668,15 @@ class ModuleGeometry:
         return self._location
 
     @property
+    def labware_offset(self) -> Point:
+        """
+        :return: a :py:class:`.Point` representing the transformation
+        between the critical point of the module and the critical
+        point of its contained labware
+        """
+        return self._offset
+
+    @property
     def highest_z(self) -> float:
         if self.labware:
             return self.labware.highest_z + self._over_labware
@@ -683,6 +692,9 @@ class ThermocyclerGeometry(ModuleGeometry):
         super().__init__(definition, parent)
         self._lid_height = definition["dimensions"]["lidHeight"]
         self._lid_status = 'open'   # Needs to reflect true status
+        # TODO: BC 2019-07-25 add affordance for "semi" configuration offset
+        # to be from a flag in context, according to drawings, the only
+        # difference is -23.28mm in the x-axis
 
     @property
     def highest_z(self) -> float:
@@ -699,6 +711,7 @@ class ThermocyclerGeometry(ModuleGeometry):
     def lid_status(self, status) -> None:
         self._lid_status = status
 
+    # NOTE: this func is unused until "semi" configuration
     def labware_accessor(self, labware: Labware) -> Labware:
         # Block first three columns from being accessed
         definition = labware._definition
@@ -710,19 +723,36 @@ class ThermocyclerGeometry(ModuleGeometry):
             '{} is already on this module'.format(self._labware)
         assert self.lid_status != 'closed', \
             'Cannot place labware in closed module'
-        if self.load_name == 'semithermocycler':
-            labware = self.labware_accessor(labware)
         self._labware = labware
         return self._labware
 
 
-def _hash_labware_def(labware: Dict[str, Any]) -> str:
+def _get_parent_identifier(
+        parent: Union[Labware, Well, str, ModuleGeometry, None]):
+    if isinstance(parent, ModuleGeometry):
+        # treat a given labware on a given module type as same
+        return parent.load_name
+    else:
+        return ''  # treat all slots as same
+
+
+def _hash_labware_def(labware_def: Dict[str, Any]) -> str:
     # remove keys that do not affect run
     blacklist = ['metadata', 'brand', 'groups']
-    def_no_metadata = {k: v for k, v in labware.items() if k not in blacklist}
+    def_no_metadata = {
+        k: v for k, v in labware_def.items() if k not in blacklist}
     sorted_def_str = json.dumps(
         def_no_metadata, sort_keys=True, separators=(',', ':'))
     return sha256(sorted_def_str.encode('utf-8')).hexdigest()
+
+
+def _get_labware_offset_path(labware: Labware):
+    calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
+    calibration_path.mkdir(parents=True, exist_ok=True)
+
+    parent_id = _get_parent_identifier(labware.parent)
+    labware_hash = _hash_labware_def(labware._definition)
+    return calibration_path/f'{labware_hash}{parent_id}.json'
 
 
 def save_calibration(labware: Labware, delta: Point):
@@ -732,11 +762,7 @@ def save_calibration(labware: Labware, delta: Point):
     using labware id as the filename. If the file does exist, load it and
     modify the delta and the lastModified fields under the "default" key.
     """
-    calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
-    if not calibration_path.exists():
-        calibration_path.mkdir(parents=True, exist_ok=True)
-    labware_hash = _hash_labware_def(labware._definition)
-    labware_offset_path = calibration_path/'{}.json'.format(labware_hash)
+    labware_offset_path = _get_labware_offset_path(labware)
     calibration_data = _helper_offset_data_format(
         str(labware_offset_path), delta)
     with labware_offset_path.open('w') as f:
@@ -751,11 +777,7 @@ def save_tip_length(labware: Labware, length: float):
     using labware id as the filename. If the file does exist, load it and
     modify the length and the lastModified fields under the "tipLength" key.
     """
-    calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
-    if not calibration_path.exists():
-        calibration_path.mkdir(parents=True, exist_ok=True)
-    labware_hash = _hash_labware_def(labware._definition)
-    labware_offset_path = calibration_path/'{}.json'.format(labware_hash)
+    labware_offset_path = _get_labware_offset_path(labware)
     calibration_data = _helper_tip_length_data_format(
         str(labware_offset_path), length)
     with labware_offset_path.open('w') as f:
@@ -767,9 +789,7 @@ def load_calibration(labware: Labware):
     """
     Look up a calibration if it exists and apply it to the given labware.
     """
-    calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
-    labware_hash = _hash_labware_def(labware._definition)
-    labware_offset_path = calibration_path/'{}.json'.format(labware_hash)
+    labware_offset_path = _get_labware_offset_path(labware)
     if labware_offset_path.exists():
         calibration_data = _read_file(str(labware_offset_path))
         offset_array = calibration_data['default']['offset']
@@ -993,7 +1013,7 @@ def load_module_from_definition(
                    is (often the front-left corner of a slot on the deck).
     """
     mod_name = definition['loadName']
-    if mod_name == 'thermocycler' or mod_name == 'semithermocycler':
+    if mod_name == 'thermocycler':
         mod: Union[ModuleGeometry, ThermocyclerGeometry] = \
                 ThermocyclerGeometry(definition, parent)
     else:

@@ -1,7 +1,7 @@
 // @flow
 
-export type VersionProps = {
+export type VersionProps = {|
   appVersion: string,
-  robotVersion: string,
+  robotVersion: string | null,
   availableUpdate: string,
-}
+|}

@@ -84,7 +84,7 @@ function DeckMap(props: Props) {
         map(slots, (slot: $Values<typeof slots>, slotId) => {
           if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
           const moduleInSlot = modulesBySlot && modulesBySlot[slotId]
-          const labwareInSlot = labwareBySlot && labwareBySlot[slotId]
+          const allLabwareInSlot = labwareBySlot && labwareBySlot[slotId]
 
           return (
             <React.Fragment key={slotId}>
@@ -100,12 +100,18 @@ function DeckMap(props: Props) {
                   />
                 </g>
               )}
-              {some(labwareInSlot) &&
-                map(labwareInSlot, labware => (
+              {some(allLabwareInSlot) &&
+                map(allLabwareInSlot, labware => (
                   <LabwareItem
                     key={labware._id}
-                    x={slot.position[0]}
-                    y={slot.position[1]}
+                    x={
+                      slot.position[0] +
+                      (labware.position ? labware.position[0] : 0)
+                    }
+                    y={
+                      slot.position[1] +
+                      (labware.position ? labware.position[1] : 0)
+                    }
                     labware={labware}
                     areTipracksConfirmed={areTipracksConfirmed}
                     highlighted={selectedSlot ? slotId === selectedSlot : null}

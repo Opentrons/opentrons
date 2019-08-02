@@ -15,7 +15,7 @@ import { checkShellUpdate, shellMiddleware } from './shell'
 import { apiClientMiddleware as robotApiMiddleware } from './robot'
 import { initializeAnalytics, analyticsMiddleware } from './analytics'
 import { initializeSupport, supportMiddleware } from './support'
-import { startDiscovery, discoveryMiddleware } from './discovery'
+import { startDiscovery } from './discovery'
 
 import rootReducer, { history } from './reducer'
 import rootEpic from './epic'
@@ -34,7 +34,6 @@ const middleware = applyMiddleware(
   shellMiddleware,
   analyticsMiddleware,
   supportMiddleware,
-  discoveryMiddleware,
   routerMiddleware(history)
 )
 

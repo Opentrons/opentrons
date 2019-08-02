@@ -5,7 +5,7 @@ from threading import Event
 from typing import Dict, Optional, List, Tuple
 from contextlib import contextmanager
 from opentrons import types
-from opentrons.config.pipette_config import config_models
+from opentrons.config.pipette_config import config_models, configs
 from opentrons.drivers.smoothie_drivers import SimulatingDriver
 from . import modules
 
@@ -15,11 +15,17 @@ MODULE_LOG = logging.getLogger(__name__)
 
 def find_config(prefix: str) -> str:
     """ Find the most recent config matching `prefix` """
-    matches = [conf for conf in config_models if conf.startswith(prefix)]
+    if prefix in config_models:
+        return prefix
+
+    # We need to check for the nickname of pipettes if the prefix given
+    # is not the exact model. This is because gen2 nicknames are not
+    # subsets of gen2 pipette model strings.
+    matches = [conf for conf in config_models
+               if configs[conf]['name'].startswith(prefix)]
+
     if not matches:
         raise KeyError('No match found for prefix {}'.format(prefix))
-    if prefix in matches:
-        return prefix
     else:
         return sorted(matches)[0]
 

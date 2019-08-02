@@ -16,6 +16,7 @@ const PREMIGRATION_WHL_DIR = path.join(
 
 const API_WHL_PATTERN = path.join(PREMIGRATION_WHL_DIR, 'opentrons-*.whl')
 const SERVER_WHL_PATTERN = path.join(PREMIGRATION_WHL_DIR, 'otupdate-*.whl')
+const SYSTEM_FILENAME = 'ot2-system.zip'
 
 const getWheel = (pattern: string): Promise<string> =>
   globby(pattern).then(matches => {
@@ -50,4 +51,14 @@ export function startPremigration(
   return postFile(apiUrl, 'whl', apiWheelPath)
     .then(() => postFile(serverUrl, 'whl', serverWheelPath))
     .then(() => fetch(restartUrl, { method: 'POST' }))
+}
+
+export function uploadSystemFile(
+  robot: RobotHost,
+  urlPath: string,
+  file: string
+): Promise<mixed> {
+  const url = `http://${robot.ip}:${robot.port}${urlPath}`
+
+  return postFile(url, SYSTEM_FILENAME, file)
 }

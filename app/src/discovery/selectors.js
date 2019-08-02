@@ -15,7 +15,6 @@ import semver from 'semver'
 // that requires us to bypass the robot entry point here
 import { getConnectedRobotName } from '../robot/selectors'
 
-import type { OutputSelector as Selector } from 'reselect'
 import type { Service } from '@opentrons/discovery-client'
 import type { State } from '../types'
 import type {
@@ -23,11 +22,11 @@ import type {
   Robot,
   ReachableRobot,
   UnreachableRobot,
+  ViewableRobot,
   AnyRobot,
   ConnectableStatus,
   ReachableStatus,
   UnreachableStatus,
-  BuildrootStatus,
 } from './types'
 
 type GroupedRobotsMap = {
@@ -38,13 +37,13 @@ type GroupedRobotsMap = {
   },
 }
 
-type GetGroupedRobotsMap = Selector<State, void, GroupedRobotsMap>
-type GetConnectableRobots = Selector<State, void, Array<Robot>>
-type GetReachableRobots = Selector<State, void, Array<ReachableRobot>>
-type GetUnreachableRobots = Selector<State, void, Array<UnreachableRobot>>
-type GetAllRobots = Selector<State, void, Array<AnyRobot>>
-type GetLiveRobots = Selector<State, void, Array<Robot | ReachableRobot>>
-type GetConnectedRobot = Selector<State, void, ?Robot>
+type GetGroupedRobotsMap = State => GroupedRobotsMap
+type GetConnectableRobots = State => Array<Robot>
+type GetReachableRobots = State => Array<ReachableRobot>
+type GetUnreachableRobots = State => Array<UnreachableRobot>
+type GetAllRobots = State => Array<AnyRobot>
+type GetViewableRobots = State => Array<ViewableRobot>
+type GetConnectedRobot = State => ?Robot
 
 export const CONNECTABLE: ConnectableStatus = 'connectable'
 export const REACHABLE: ReachableStatus = 'reachable'
@@ -131,7 +130,7 @@ export const getAllRobots: GetAllRobots = createSelector(
   concat
 )
 
-export const getLiveRobots: GetLiveRobots = createSelector(
+export const getViewableRobots: GetViewableRobots = createSelector(
   getConnectableRobots,
   getReachableRobots,
   concat
@@ -149,29 +148,3 @@ export const getRobotApiVersion = (robot: AnyRobot): ?string =>
 export const getRobotFirmwareVersion = (robot: AnyRobot): ?string =>
   (robot.health && robot.health.fw_version) ||
   (robot.serverHealth && robot.serverHealth.smoothieVersion)
-
-export const getRobotBuildrootStatus = (
-  robot: AnyRobot
-): BuildrootStatus | null => {
-  if (robot.serverHealth) {
-    // no capabilities object present, robot is on balena and not migration capable
-    if (!robot.serverHealth.capabilities) {
-      return 'balena'
-    }
-    // migration capable proceed to step 2 automatically
-    if (
-      robot.serverHealth.capabilities &&
-      robot.serverHealth.capabilities['buildroot-migration']
-    ) {
-      return 'migrating'
-    }
-    // robot is already on buildroot and capable of receiving normal buildroot updates
-    if (
-      robot.serverHealth.capabilities &&
-      robot.serverHealth.capabilities['buildroot-update']
-    ) {
-      return 'buildroot'
-    }
-  }
-  return null
-}

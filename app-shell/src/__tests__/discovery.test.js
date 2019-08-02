@@ -189,7 +189,7 @@ describe('app-shell/discovery', () => {
   })
 
   // ensures config override works with only one candidate specified
-  test('canidates in config can be single value', () => {
+  test('candidates in config can be single value', () => {
     getConfig.mockReturnValue({ enabled: true, candidates: '1.2.3.4' })
     registerDiscovery(dispatch)
 
@@ -200,7 +200,7 @@ describe('app-shell/discovery', () => {
     )
   })
 
-  test('services from overridden canidates are not persisted', () => {
+  test('services from overridden candidates are not persisted', () => {
     getConfig.mockReturnValue({ enabled: true, candidates: 'localhost' })
     getOverrides.mockImplementation(key => {
       if (key === 'discovery.candidates') return ['1.2.3.4', '5.6.7.8']
@@ -230,5 +230,15 @@ describe('app-shell/discovery', () => {
     expect(Store.__store.set).toHaveBeenCalledWith('services', [
       { name: 'bar' },
     ])
+  })
+
+  test('calls client.remove on discovery:REMOVE', () => {
+    const handleAction = registerDiscovery(dispatch)
+    handleAction({
+      type: 'discovery:REMOVE',
+      payload: { robotName: 'robot-name' },
+    })
+
+    expect(mockClient.remove).toHaveBeenCalledWith('robot-name')
   })
 })

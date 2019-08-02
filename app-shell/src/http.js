@@ -3,14 +3,18 @@
 import { createReadStream, createWriteStream } from 'fs'
 import { Transform, Readable } from 'stream'
 import pump from 'pump'
-import _fetch from 'electron-fetch'
+import _fetch from 'node-fetch'
 import FormData from 'form-data'
+
+import type { Request, RequestInit, Response } from 'node-fetch'
+
+type RequestInput = Request | string
 
 export type DownloadProgress = {| downloaded: number, size: number | null |}
 
 export function fetch(
-  input: RequestInfo,
-  init?: RequestOptions
+  input: RequestInput,
+  init?: RequestInit
 ): Promise<Response> {
   return _fetch(input, init).then(response => {
     if (!response.ok) {
@@ -22,17 +26,17 @@ export function fetch(
   })
 }
 
-export function fetchJson<Body>(input: RequestInfo): Promise<Body> {
+export function fetchJson<Body>(input: RequestInput): Promise<Body> {
   return fetch(input).then(response => response.json())
 }
 
-export function fetchText(input: RequestInfo): Promise<string> {
+export function fetchText(input: Request): Promise<string> {
   return fetch(input).then(response => response.text())
 }
 
 // TODO(mc, 2019-07-02): break this function up and test its components
 export function fetchToFile(
-  input: RequestInfo,
+  input: RequestInput,
   destination: string,
   options?: $Shape<{ onProgress: (progress: DownloadProgress) => mixed }>
 ): Promise<string> {
@@ -40,7 +44,7 @@ export function fetchToFile(
     let downloaded = 0
     const size = Number(response.headers.get('Content-Length')) || null
 
-    // with electron fetch, response.body will be a Node.js readable stream
+    // with node-fetch, response.body will be a Node.js readable stream
     // rather than a browser-land ReadableStream
     const inputStream: Readable = (response.body: any)
     const outputStream = createWriteStream(destination)
@@ -69,14 +73,12 @@ export function fetchToFile(
 }
 
 export function postFile(
-  input: RequestInfo,
+  input: RequestInput,
   name: string,
   source: string
 ): Promise<Response> {
   const body = new FormData()
   body.append(name, createReadStream(source))
-
-  console.log('POST', input)
 
   return fetch(input, { body, method: 'POST' })
 }

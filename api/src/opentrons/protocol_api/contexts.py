@@ -12,7 +12,7 @@ import opentrons.config.robot_configs as rc
 from opentrons.config import feature_flags as fflags
 from opentrons.hardware_control import adapters, modules
 from opentrons.hardware_control.simulator import Simulator
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control.types import CriticalPoint, Axis
 
 from . import geometry
 from . import transfers
@@ -241,43 +241,25 @@ class ProtocolContext(CommandPublisher):
     def load_module(
             self, module_name: str,
             location: types.DeckLocation) -> ModuleTypes:
-        mod_map = {
-            'magdeck': {
-                'hc_name': 'magdeck',
-                'geo_name': 'magdeck'},
-            'magnetic module': {
-                'hc_name': 'magdeck',
-                'geo_name': 'magdeck'},
-            'tempdeck': {
-                'hc_name': 'tempdeck',
-                'geo_name': 'tempdeck'},
-            'temperature module': {
-                'hc_name': 'tempdeck',
-                'geo_name': 'tempdeck'},
-            'thermocycler': {
-                'hc_name': 'thermocycler',
-                'geo_name': 'thermocycler'},
-            'semithermocycler': {
-                'hc_name': 'thermocycler',
-                'geo_name': 'semithermocycler'}
-            }
+        mod_id = module_name.lower()
+        if mod_id == 'magnetic module':
+            mod_id = 'magdeck'
+        if mod_id == 'temperature module':
+            mod_id = 'tempdeck'
         try:
-            hc_mod_name = mod_map[module_name.lower()]['hc_name']
-            geo_mod_name = mod_map[module_name.lower()]['geo_name']
-
             geometry = load_module(
-                geo_mod_name, self._deck_layout.position_for(location))
+                mod_id, self._deck_layout.position_for(location))
         except KeyError:
-            self._log.error(f'Unsupported Module: {module_name}')
-            raise ValueError(f'Unsupported Module: {module_name}')
+            self._log.error(f'Unsupported Module: {mod_id}')
+            raise ValueError(f'Unsupported Module: {mod_id}')
         hc_mod_instance = None
         hw = self._hw_manager.hardware._api._backend
         mod_class = {
             'magdeck': MagneticModuleContext,
             'tempdeck': TemperatureModuleContext,
-            'thermocycler': ThermocyclerContext}[hc_mod_name]
+            'thermocycler': ThermocyclerContext}[mod_id]
         for mod in self._hw_manager.hardware.discover_modules():
-            if mod.name() == hc_mod_name:
+            if mod.name() == mod_id:
                 hc_mod_instance = mod
                 break
 
@@ -285,7 +267,7 @@ class ProtocolContext(CommandPublisher):
             mod_type = {
                 'magdeck': modules.magdeck.MagDeck,
                 'tempdeck': modules.tempdeck.TempDeck,
-                'thermocycler': modules.thermocycler.Thermocycler}[hc_mod_name]
+                'thermocycler': modules.thermocycler.Thermocycler}[mod_id]
             hc_mod_instance = mod_type(
                 port='', simulating=True, loop=self._loop)
         if hc_mod_instance:
@@ -295,7 +277,7 @@ class ProtocolContext(CommandPublisher):
                                 self._loop)
         else:
             raise RuntimeError(
-                f'Could not find specified module: {module_name}')
+                f'Could not find specified module: {mod_id}')
         self._deck_layout[location] = geometry
         return mod_ctx
 
@@ -916,10 +898,10 @@ class InstrumentContext(CommandPublisher):
 
         return self
 
-    @cmds.publish.both(command=cmds.pick_up_tip)  # noqa(C901)
-    def pick_up_tip(self, location: Union[types.Location, Well] = None,
-                    presses: int = 3,
-                    increment: float = 1.0) -> 'InstrumentContext':
+    def pick_up_tip(  # noqa(C901)
+            self, location: Union[types.Location, Well] = None,
+            presses: int = None,
+            increment: float = 1.0) -> 'InstrumentContext':
         """
         Pick up a tip for the pipette to run liquid-handling commands with
 
@@ -995,19 +977,21 @@ class InstrumentContext(CommandPublisher):
                 " However, it is a {}".format(location))
 
         assert tiprack.is_tiprack, "{} is not a tiprack".format(str(tiprack))
-
+        cmds.do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
+                        'before', None, None, instrument=self, location=target)
         self.move_to(target.top())
 
         self._hw_manager.hardware.pick_up_tip(
             self._mount, tiprack.tip_length, presses, increment)
         # Note that the hardware API pick_up_tip action includes homing z after
-
+        cmds.do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
+                        'after', self, None, instrument=self, location=target)
         tiprack.use_tips(target, num_channels)
         self._last_tip_picked_up_from = target
+
         return self
 
-    @cmds.publish.both(command=cmds.drop_tip)
-    def drop_tip(
+    def drop_tip(  # noqa(C901)
             self,
             location: Union[types.Location, Well] = None)\
             -> 'InstrumentContext':
@@ -1074,8 +1058,12 @@ class InstrumentContext(CommandPublisher):
                 "types.Location (e.g. the return value from "
                 "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
                 " However, it is a {}".format(location))
+        cmds.do_publish(self.broker, cmds.drop_tip, self.drop_tip,
+                        'before', None, None, instrument=self, location=target)
         self.move_to(target)
         self._hw_manager.hardware.drop_tip(self._mount)
+        cmds.do_publish(self.broker, cmds.drop_tip, self.drop_tip,
+                        'after', self, None, instrument=self, location=target)
         if isinstance(target.labware, Well)\
            and target.labware.parent.is_tiprack:
             # If this is a tiprack we can try and add the tip back to the
@@ -1787,9 +1775,29 @@ class ThermocyclerContext(ModuleContext):
     def status(self):
         return self._module.status
 
+    def _prepare_for_lid_move(self):
+        loaded_instruments = [instr for mount, instr in
+                              self._ctx.loaded_instruments.items()
+                              if instr is not None]
+        try:
+            instr = loaded_instruments[0]
+        except IndexError:
+            MODULE_LOG.warning(
+                "Cannot assure a safe gantry position to avoid colliding"
+                " with the lid of the Thermocycler Module.")
+        else:
+            self._ctx._hw_manager.hardware.retract(instr._mount)
+            high_point = self._ctx._hw_manager.hardware.current_position(
+                    instr._mount)
+            trash_top = self._ctx.fixed_trash.wells()[0].top()
+            safe_point = trash_top.point._replace(
+                    z=high_point[Axis.by_mount(instr._mount)])
+            instr.move_to(types.Location(safe_point, None), force_direct=True)
+
     @cmds.publish.both(command=cmds.thermocycler_open)
     def open(self):
         """ Opens the lid"""
+        self._prepare_for_lid_move()
         self._geometry.lid_status = self._module.open()
         self._ctx.deck.recalculate_high_z()
         return self._geometry.lid_status
@@ -1797,6 +1805,7 @@ class ThermocyclerContext(ModuleContext):
     @cmds.publish.both(command=cmds.thermocycler_close)
     def close(self):
         """ Closes the lid"""
+        self._prepare_for_lid_move()
         self._geometry.lid_status = self._module.close()
         self._ctx.deck.recalculate_high_z()
         return self._geometry.lid_status

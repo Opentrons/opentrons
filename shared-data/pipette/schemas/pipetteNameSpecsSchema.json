@@ -51,7 +51,16 @@
         "displayName": { "type": "string" },
         "displayCategory": { "$ref": "#/definitions/displayCategory" },
         "maxVolume": { "$ref": "#/definitions/positiveNumber" },
-        "minVolume": { "$ref": "#/definitions/positiveNumber" }
+        "minVolume": { "$ref": "#/definitions/positiveNumber" },
+        "smoothieConfigs": {
+          "type": "object",
+          "description": "Runtime smoothie configs per pipette type",
+          "properties": {
+            "stepsPerMM": { "type": "number" },
+            "homePosition": { "type": "number" },
+            "travelDistance": { "type": "number" }
+          }
+        }
       }
     }
   }

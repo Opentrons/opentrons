@@ -178,19 +178,19 @@ def _load_new_well(well_data, saved_offset, lw_format):
     if lw_format == 'trough':
         well_tuple = (
             well_data['x'] + saved_offset.x,
-            well_data['y'] + 7*well_data['yDimension']/16 + saved_offset.y,
+            well_data['y'] + 7 * well_data['yDimension'] / 16 + saved_offset.y,
             well_data['z'] + saved_offset.z)
     else:
         well_tuple = (
-            well_data['x'] - well.x_size()/2 + saved_offset.x,
-            well_data['y'] - well.y_size()/2 + saved_offset.y,
+            well_data['x'] - well.x_size() / 2 + saved_offset.x,
+            well_data['y'] - well.y_size() / 2 + saved_offset.y,
             well_data['z'] + saved_offset.z)
     return (well, well_tuple)
 
 
 def _look_up_offsets(labware_hash):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
-    labware_offset_path = calibration_path/'{}.json'.format(labware_hash)
+    labware_offset_path = calibration_path / '{}.json'.format(labware_hash)
     if labware_offset_path.exists():
         calibration_data = new_labware._read_file(str(labware_offset_path))
         offset_array = calibration_data['default']['offset']
@@ -203,9 +203,11 @@ def save_new_offsets(labware_hash, delta):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
     if not calibration_path.exists():
         calibration_path.mkdir(parents=True, exist_ok=True)
-    labware_offset_path = calibration_path/'{}.json'.format(labware_hash)
+    old_delta = _look_up_offsets(labware_hash)
+    new_delta = old_delta + Point(x=delta[0], y=delta[1], z=delta[2])
+    labware_offset_path = calibration_path / '{}.json'.format(labware_hash)
     calibration_data = new_labware._helper_offset_data_format(
-        str(labware_offset_path), delta)
+        str(labware_offset_path), new_delta)
     with labware_offset_path.open('w') as f:
         json.dump(calibration_data, f)
 

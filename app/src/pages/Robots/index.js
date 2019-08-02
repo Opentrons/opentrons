@@ -1,20 +1,18 @@
 // @flow
 // connect and configure robots page
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { withRouter, Route, Switch, Redirect } from 'react-router'
-import find from 'lodash/find'
 
 import createLogger from '../../logger'
 
 import {
   CONNECTABLE,
   getConnectedRobot,
-  getConnectableRobots,
-  getReachableRobots,
+  getViewableRobots,
 } from '../../discovery'
 
-import { getShellUpdateState } from '../../shell'
+import { getShellUpdateState, getBuildrootRobot } from '../../shell'
 
 import { Splash } from '@opentrons/components'
 import Page from '../../components/Page'
@@ -22,54 +20,37 @@ import RobotSettings from './RobotSettings'
 import InstrumentSettings from './InstrumentSettings'
 
 import type { ContextRouter } from 'react-router'
-import type { State } from '../../types'
-import type { ViewableRobot } from '../../discovery'
-import type { ShellUpdateState } from '../../shell'
 
-type OP = ContextRouter
-
-type SP = {|
-  robot: ?ViewableRobot,
-  connectedName: ?string,
-  appUpdate: ShellUpdateState,
-|}
-
-type Props = { ...OP, ...SP }
+type Props = {| ...ContextRouter |}
 
 const log = createLogger(__filename)
 
-export default withRouter<{||}>(
-  connect<Props, ContextRouter, SP, _, _, _>(mapStateToProps)(Robots)
-)
+export function Robots(props: Props) {
+  const { path, url, params } = props.match
+  const { name } = params
 
-function Robots(props: Props) {
-  const {
-    robot,
-    connectedName,
-    appUpdate,
-    match: {
-      path,
-      url,
-      params: { name },
-    },
-  } = props
+  const appUpdate = useSelector(getShellUpdateState)
+  const viewableRobots = useSelector(getViewableRobots)
+  const connectedRobot = useSelector(getConnectedRobot)
+  const buildrootRobot = useSelector(getBuildrootRobot)
+  const robot = viewableRobots.find(r => r.name === name) || null
 
   if (appUpdate.available && !appUpdate.seen) {
     log.warn('App update available on load, redirecting to app update.')
-    return <Redirect to={'menu/app/update'} />
-  }
-
-  if (name && !robot) {
-    const redirectUrl = url.replace(`/${name}`, '')
-    log.warn(`Robot ${name} does not exist; redirecting`, { redirectUrl })
-    return <Redirect to={redirectUrl} />
-  } else if (!name && connectedName) {
-    const redirectUrl = `${url}/${connectedName}`
-    log.debug(`Connected to ${connectedName}; redirecting`, { redirectUrl })
-    return <Redirect to={redirectUrl} />
+    return <Redirect to={'/menu/app/update'} />
   }
 
   if (!robot) {
+    const baseUrl = name != null ? url.replace(`/${name}`, '') : url
+
+    if (buildrootRobot) {
+      return <Redirect to={`${baseUrl}/${buildrootRobot.name}`} />
+    }
+
+    if (connectedRobot) {
+      return <Redirect to={`${baseUrl}/${connectedRobot.name}`} />
+    }
+
     return (
       <Page>
         <Splash />
@@ -93,18 +74,4 @@ function Robots(props: Props) {
   )
 }
 
-function mapStateToProps(state: State, ownProps: OP): SP {
-  const { name } = ownProps.match.params
-  const robots: Array<ViewableRobot> = getConnectableRobots(state).concat(
-    getReachableRobots(state)
-  )
-  const connectedRobot = getConnectedRobot(state)
-  const connectedName = connectedRobot && connectedRobot.name
-  const robot: ?ViewableRobot = find(robots, { name })
-
-  return {
-    robot,
-    connectedName,
-    appUpdate: getShellUpdateState(state),
-  }
-}
+export default withRouter<{||}>(Robots)

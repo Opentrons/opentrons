@@ -108,6 +108,11 @@ Object {
   "quirks": Array [
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -302,6 +307,11 @@ Object {
   "quirks": Array [
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -496,6 +506,11 @@ Object {
   "quirks": Array [
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -691,6 +706,11 @@ Object {
     "dropTipShake",
     "doubleDropTip",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -854,6 +874,11 @@ Object {
   "quirks": Array [
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -1053,6 +1078,11 @@ Object {
   "quirks": Array [
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -1252,6 +1282,11 @@ Object {
   "quirks": Array [
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -1451,6 +1486,11 @@ Object {
   "quirks": Array [
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -1614,6 +1654,11 @@ Object {
   "quirks": Array [
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -1798,6 +1843,11 @@ Object {
   "quirks": Array [
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -1982,6 +2032,11 @@ Object {
   "quirks": Array [
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -2167,6 +2222,11 @@ Object {
     "dropTipShake",
     "doubleDropTip",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -2330,6 +2390,11 @@ Object {
   "quirks": Array [
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -2514,6 +2579,11 @@ Object {
   "quirks": Array [
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -2698,6 +2768,11 @@ Object {
   "quirks": Array [
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -2882,6 +2957,11 @@ Object {
   "quirks": Array [
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -3030,6 +3110,11 @@ Object {
   "quirks": Array [
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -3178,6 +3263,11 @@ Object {
   "quirks": Array [
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -3327,6 +3417,11 @@ Object {
     "dropTipShake",
     "doubleDropTip",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -3475,6 +3570,11 @@ Object {
   "quirks": Array [
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -3679,6 +3779,11 @@ Object {
   "quirks": Array [
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -3883,6 +3988,11 @@ Object {
   "quirks": Array [
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -4087,6 +4197,11 @@ Object {
   "quirks": Array [
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -4256,6 +4371,11 @@ Object {
     "pickupTipShake",
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -4425,6 +4545,11 @@ Object {
     "pickupTipShake",
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -4594,6 +4719,11 @@ Object {
     "pickupTipShake",
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -4763,6 +4893,11 @@ Object {
     "pickupTipShake",
     "dropTipShake",
   ],
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
   "tipLength": Object {
     "max": 100,
     "min": 0,
@@ -4846,6 +4981,11 @@ Object {
   "maxVolume": 10,
   "minVolume": 1,
   "name": "p10_multi",
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
 }
 `;
 
@@ -4872,6 +5012,11 @@ Object {
   "maxVolume": 10,
   "minVolume": 1,
   "name": "p10_single",
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
 }
 `;
 
@@ -4898,6 +5043,11 @@ Object {
   "maxVolume": 50,
   "minVolume": 5,
   "name": "p50_multi",
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
 }
 `;
 
@@ -4924,6 +5074,11 @@ Object {
   "maxVolume": 50,
   "minVolume": 5,
   "name": "p50_single",
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
 }
 `;
 
@@ -4950,6 +5105,11 @@ Object {
   "maxVolume": 300,
   "minVolume": 30,
   "name": "p300_multi",
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
 }
 `;
 
@@ -4976,6 +5136,11 @@ Object {
   "maxVolume": 300,
   "minVolume": 30,
   "name": "p300_single",
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
 }
 `;
 
@@ -5002,5 +5167,10 @@ Object {
   "maxVolume": 1000,
   "minVolume": 100,
   "name": "p1000_single",
+  "smoothieConfigs": Object {
+    "homePosition": 220,
+    "stepsPerMM": 768,
+    "travelDistance": 30,
+  },
 }
 `;

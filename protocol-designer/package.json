@@ -10,7 +10,7 @@
   "name": "protocol-designer",
   "productName": "Opentrons Protocol Designer BETA",
   "private": true,
-  "version": "3.10.1",
+  "version": "3.10.2",
   "description": "Protocol designer app",
   "main": "src/index.js",
   "bugs": {
@@ -19,8 +19,8 @@
   "homepage": "https://github.com/Opentrons/opentrons",
   "license": "Apache-2.0",
   "dependencies": {
-    "@opentrons/components": "3.10.1",
-    "@typeform/embed": "^0.7.0",
+    "@opentrons/components": "3.10.2",
+    "@typeform/embed": "^0.10.0",
     "classnames": "^2.2.5",
     "cookie": "^0.3.1",
     "file-saver": "^2.0.1",

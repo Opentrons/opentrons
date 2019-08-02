@@ -37,9 +37,9 @@
   },
   "thermocycler": {
     "labwareOffset": {
-      "x": -0.02,
-      "y": -9.3,
-      "z": 103.44
+      "x": 0,
+      "y": 82.56,
+      "z": 97.8
     },
     "dimensions": {
       "bareOverallHeight": 98.0,
@@ -52,25 +52,6 @@
     },
     "displayName": "Full Plate Thermocycler Module",
     "loadName": "thermocycler",
-    "quirks": []
-  },
-  "semithermocycler": {
-    "labwareOffset": {
-      "x": -0.02,
-      "y": -4.47,
-      "z": 103.44
-    },
-    "dimensions": {
-      "bareOverallHeight": 98.0,
-      "overLabwareHeight": 0.0,
-      "lidHeight": 37.7
-    },
-    "calibrationPoint": {
-      "x": 20.78,
-      "y": 20.55
-    },
-    "displayName": "Semi-Plate Thermocycler Module",
-    "loadName": "semithermocycler",
     "quirks": []
   }
 }

@@ -34,18 +34,10 @@ HOMED_POSITION = {
     'C': 19
 }
 
-EEPROM_DEFAULT = {
-    'X': 0.0,
-    'Y': 0.0,
-    'Z': 0.0,
-    'A': 0.0,
-    'B': 0.0,
-    'C': 0.0
-}
-
 PLUNGER_BACKLASH_MM = 0.3
 LOW_CURRENT_Z_SPEED = 30
 CURRENT_CHANGE_DELAY = 0.005
+PIPETTE_READ_DELAY = 0.1
 
 Y_SWITCH_BACK_OFF_MM = 28
 Y_SWITCH_REVERSE_BACK_OFF_MM = 10
@@ -286,7 +278,6 @@ class SmoothieDriver_3_0_0:
     def __init__(self, config, handle_locks=True):
         self.run_flag = Event()
         self.run_flag.set()
-        self.dist_from_eeprom = EEPROM_DEFAULT.copy()
 
         self._position = HOMED_POSITION.copy()
         self.log = []
@@ -1168,8 +1159,8 @@ class SmoothieDriver_3_0_0:
             # EMI interference from both plunger motors has been found to
             # prevent the I2C lines from communicating between Smoothieware and
             # pipette's onboard EEPROM. To avoid, turn off both plunger motors
-            self.disengage_axis('BC')
-            self.delay(CURRENT_CHANGE_DELAY)
+            self.disengage_axis('ZABC')
+            self.delay(PIPETTE_READ_DELAY)
             # request from Smoothieware the information from that pipette
             res = self._send_command(gcode + mount)
             if res:

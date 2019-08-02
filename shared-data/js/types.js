@@ -212,3 +212,24 @@ export type DeckDefinition = {|
   metadata: DeckMetadata,
   layers: { [string]: DeckLayer },
 |}
+
+export type ModuleDimensions = {|
+  bareOverallHeight: number,
+  overLabwareHeight: number,
+  lidHeight: number,
+|}
+
+export type ModuleCalibrationPoint = {|
+  x: number,
+  y: number,
+  z?: number,
+|}
+
+export type ModuleDefinition = {|
+  labwareOffset: LabwareOffset,
+  dimensions: ModuleDimensions,
+  calibrationPoint: ModuleCalibrationPoint,
+  displayName: string,
+  loadName: string,
+  quirks: Array<string>,
+|}

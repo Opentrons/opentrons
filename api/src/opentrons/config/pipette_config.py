@@ -39,6 +39,9 @@ pipette_config = namedtuple(
         'backcompat_name',
         'return_tip_height',
         'blow_out_flow_rate',
+        'max_travel',
+        'home_position',
+        'steps_per_mm'
     ]
 )
 
@@ -159,6 +162,7 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
         log.info("Using new aspiration functions")
         ul_per_mm = cfg['ulPerMm'][-1]
 
+    smoothie_configs = cfg['smoothieConfigs']
     res = pipette_config(
         top=ensure_value(
             cfg, 'top', MUTABLE_CONFIGS),
@@ -194,6 +198,9 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
         return_tip_height=cfg.get('returnTipHeight'),
         blow_out_flow_rate=ensure_value(
             cfg, 'defaultBlowOutFlowRate', MUTABLE_CONFIGS),
+        max_travel=smoothie_configs['travelDistance'],
+        home_position=smoothie_configs['homePosition'],
+        steps_per_mm=smoothie_configs['stepsPerMM']
     )
 
     return res

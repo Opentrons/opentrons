@@ -17,14 +17,14 @@ def clear_container_cache():
 
 @pytest.fixture
 def old_container_data(config_tempdir):
-
+    tempdir, _ = config_tempdir
     source = os.path.join(
         os.path.dirname(__file__),
         'data'
     )
-    containers_dir = os.path.join(config_tempdir, 'containers')
+    containers_dir = os.path.join(tempdir, 'containers')
     shutil.copytree(source, containers_dir)
-    yield config_tempdir
+    yield tempdir
 
 
 def test_get_custom_container_files(old_container_data):

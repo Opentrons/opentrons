@@ -8,8 +8,12 @@ import createLogger from '../log'
 import { getConfig } from '../config'
 import { CURRENT_VERSION } from '../update'
 import { downloadManifest, getReleaseSet } from './release-manifest'
-import { getReleaseFiles } from './release-files'
-import { getPremigrationWheels, startPremigration } from './migrate'
+import { getReleaseFiles, readUserFileInfo } from './release-files'
+import {
+  getPremigrationWheels,
+  startPremigration,
+  uploadSystemFile,
+} from './update'
 
 import type { Action, Dispatch } from '../types'
 import type { ReleaseSetFilepaths } from './types'
@@ -22,6 +26,7 @@ const log = createLogger(__filename)
 
 const DIRECTORY = path.join(app.getPath('userData'), '__ot_buildroot__')
 
+let checkingForUpdates = false
 let updateSet: ReleaseSetFilepaths | null = null
 
 export function registerBuildrootUpdate(dispatch: Dispatch) {
@@ -32,13 +37,17 @@ export function registerBuildrootUpdate(dispatch: Dispatch) {
     if (buildrootEnabled) {
       switch (action.type) {
         case 'shell:CHECK_UPDATE':
-          checkForBuildrootUpdate(dispatch)
+          if (!checkingForUpdates) {
+            checkingForUpdates = true
+            checkForBuildrootUpdate(dispatch).then(
+              () => (checkingForUpdates = false)
+            )
+          }
           break
 
         case 'buildroot:START_PREMIGRATION': {
           const robot = action.payload
 
-          dispatch({ type: 'buildroot:PREMIGRATION_STARTED' })
           getPremigrationWheels()
             .then(wheels => {
               log.info('Starting robot premigration', { robot, wheels })
@@ -47,6 +56,7 @@ export function registerBuildrootUpdate(dispatch: Dispatch) {
             .then(
               (): BuildrootAction => ({
                 type: 'buildroot:PREMIGRATION_DONE',
+                payload: robot.name,
               })
             )
             .catch(
@@ -59,23 +69,61 @@ export function registerBuildrootUpdate(dispatch: Dispatch) {
 
           break
         }
+
+        case 'buildroot:UPLOAD_FILE': {
+          const { host, path, systemFile } = action.payload
+          const file = systemFile !== null ? systemFile : updateSet?.system
+
+          if (file == null) {
+            return dispatch({
+              type: 'buildroot:UNEXPECTED_ERROR',
+              payload: { message: 'Buildroot update file not downloaded' },
+            })
+          }
+
+          uploadSystemFile(host, path, file)
+            .then(() => ({
+              type: 'buildroot:FILE_UPLOAD_DONE',
+              payload: host.name,
+            }))
+            .catch((error: Error) => {
+              log.warn('Error uploading update to robot', { path, file, error })
+
+              return {
+                type: 'buildroot:UNEXPECTED_ERROR',
+                payload: {
+                  message: `Error uploading update to robot: ${error.message}`,
+                },
+              }
+            })
+            .then(dispatch)
+
+          break
+        }
+
+        case 'buildroot:READ_USER_FILE': {
+          const { systemFile } = action.payload
+
+          readUserFileInfo(systemFile)
+            .then(userFile => ({
+              type: 'buildroot:USER_FILE_INFO',
+              payload: {
+                systemFile: userFile.systemFile,
+                version: userFile.versionInfo.opentrons_api_version,
+              },
+            }))
+            .catch((error: Error) => ({
+              type: 'buildroot:UNEXPECTED_ERROR',
+              payload: { message: error.message },
+            }))
+            .then(dispatch)
+
+          break
+        }
       }
     }
   }
 }
-
-// TODO(mc, 2019-07-01): send streaming upload from main process rather than
-// sending this big file over to the UI thread. Remove this commented out
-// function when we have that in place
-// export function getUpdateFileContents(): Promise<Buffer> {
-//   const systemFile = updateSet?.system
-
-//   if (systemFile) {
-//     return Promise.reject(new Error('No buildroot file present'))
-//   }
-
-//   return readFile(systemFile)
-// }
 
 // check for a buildroot update matching the current app version
 //   1. Ensure the buildroot directory exists
@@ -84,11 +132,11 @@ export function registerBuildrootUpdate(dispatch: Dispatch) {
 //      a. If the files need downloading, dispatch progress updates to UI
 //   4. Cache the filepaths of the update files in memory
 //   5. Dispatch info or error to UI
-export function checkForBuildrootUpdate(dispatch: Dispatch): void {
+export function checkForBuildrootUpdate(dispatch: Dispatch): Promise<mixed> {
   const manifestUrl = getConfig('buildroot').manifestUrl
   const fileDownloadDir = path.join(DIRECTORY, CURRENT_VERSION)
 
-  ensureDir(fileDownloadDir)
+  return ensureDir(fileDownloadDir)
     .then(() => downloadManifest(manifestUrl))
     .then(manifest => {
       const urls = getReleaseSet(manifest, CURRENT_VERSION)

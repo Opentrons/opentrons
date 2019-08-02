@@ -48,10 +48,6 @@ def _log_call(func):
     return _log_call_inner
 
 
-class MustHomeError(RuntimeError):
-    pass
-
-
 class NoTipAttachedError(RuntimeError):
     pass
 
@@ -280,29 +276,22 @@ class API(HardwareAPILike):
                     self._config.instrument_offset[mount.name.lower()],
                     instrument_data['id'])
                 self._attached_instruments[mount] = p
-                mount_axis = Axis.by_mount(mount)
-                plunger_axis = Axis.of_plunger(mount)
-                if 'v2' in model:
-                    # Check if new model of pipettes, load smoothie configs
-                    # for this particular model
-                    self._backend._smoothie_driver.update_steps_per_mm(
-                        {plunger_axis.name: 3200})
-                    # TODO(LC25-4-2019): Modify configs to update to as
-                    # testing informs better values
-                    self._backend._smoothie_driver.update_pipette_config(
-                        mount_axis.name, {'home': 172.15})
-                    self._backend._smoothie_driver.update_pipette_config(
-                        plunger_axis.name, {'max_travel': 60})
-                else:
-                    self._backend._smoothie_driver.update_steps_per_mm(
-                        {plunger_axis.name: 768})
-
-                    self._backend._smoothie_driver.update_pipette_config(
-                        mount_axis.name, {'home': 220})
-                    self._backend._smoothie_driver.update_pipette_config(
-                        plunger_axis.name, {'max_travel': 30})
+                home_pos = p.config.home_position
+                max_travel = p.config.max_travel
+                steps_mm = p.config.steps_per_mm
             else:
                 self._attached_instruments[mount] = None
+                home_pos = self._config.default_pipette_configs['homePosition']
+                max_travel = self._config.default_pipette_configs['maxTravel']
+                steps_mm = self._config.default_pipette_configs['stepsPerMM']
+            mount_axis = Axis.by_mount(mount)
+            plunger_axis = Axis.of_plunger(mount)
+            self._backend._smoothie_driver.update_steps_per_mm(
+                {plunger_axis.name: steps_mm})
+            self._backend._smoothie_driver.update_pipette_config(
+                mount_axis.name, {'home': home_pos})
+            self._backend._smoothie_driver.update_pipette_config(
+                plunger_axis.name, {'max_travel': max_travel})
         mod_log.info("Instruments found: {}".format(
             self._attached_instruments))
 
@@ -575,7 +564,7 @@ class API(HardwareAPILike):
         the nozzle will be returned.
         """
         if not self._current_position:
-            raise MustHomeError
+            await self.home()
         async with self._motion_lock:
             if mount == mount.RIGHT:
                 offset = top_types.Point(0, 0, 0)
@@ -604,6 +593,7 @@ class API(HardwareAPILike):
         use (see :py:meth:`current_position`).
         """
         cur_pos = await self.current_position(mount, critical_point)
+        self._log.info(f"Building position from {cur_pos}")
         return top_types.Point(x=cur_pos[Axis.X],
                                y=cur_pos[Axis.Y],
                                z=cur_pos[Axis.by_mount(mount)])
@@ -645,7 +635,7 @@ class API(HardwareAPILike):
                                when no tip is applied will result in an error.
         """
         if not self._current_position:
-            raise MustHomeError
+            await self.home()
 
         await self._cache_and_maybe_retract_mount(mount)
         z_axis = Axis.by_mount(mount)
@@ -671,22 +661,19 @@ class API(HardwareAPILike):
         axes are to be moved, they will do so at the same speed
         """
         if not self._current_position:
-            raise MustHomeError
+            await self.home()
 
         await self._cache_and_maybe_retract_mount(mount)
 
         z_axis = Axis.by_mount(mount)
-        try:
-            target_position = OrderedDict(
-                ((Axis.X,
-                  self._current_position[Axis.X] + delta.x),
-                 (Axis.Y,
-                  self._current_position[Axis.Y] + delta.y),
-                 (z_axis,
-                  self._current_position[z_axis] + delta.z))
-                )
-        except KeyError:
-            raise MustHomeError
+        target_position = OrderedDict(
+            ((Axis.X,
+              self._current_position[Axis.X] + delta.x),
+             (Axis.Y,
+              self._current_position[Axis.Y] + delta.y),
+             (z_axis,
+              self._current_position[z_axis] + delta.z))
+        )
         await self._move(target_position, speed=speed)
 
     async def _cache_and_maybe_retract_mount(self, mount: top_types.Mount):
@@ -714,10 +701,7 @@ class API(HardwareAPILike):
               self._current_position[z_axis]),
              (pl_axis, dist))
         )
-        try:
-            await self._move(all_axes_pos, speed, False)
-        except KeyError:
-            raise MustHomeError
+        await self._move(all_axes_pos, speed, False)
 
     async def _move(self, target_position: 'OrderedDict[Axis, float]',
                     speed: float = None, home_flagged_axes: bool = True):
@@ -806,7 +790,7 @@ class API(HardwareAPILike):
         self._backend.disengage_axes([ax.name for ax in which])
 
     @_log_call
-    async def retract(self, mount: top_types.Mount, margin: float):
+    async def retract(self, mount: top_types.Mount, margin: float = 10):
         """ Pull the specified mount up to its home position.
 
         Works regardless of critical point or home status.

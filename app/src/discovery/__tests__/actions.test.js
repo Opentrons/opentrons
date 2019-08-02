@@ -1,44 +1,49 @@
 // discovery actions test
-import configureMockStore from 'redux-mock-store'
-import thunk from 'redux-thunk'
-
-import { startDiscovery } from '..'
-
-const middlewares = [thunk]
-const mockStore = configureMockStore(middlewares)
+import * as actions from '../actions'
 
 describe('discovery actions', () => {
-  let store
+  const SPECS = [
+    {
+      name: 'startDiscovery',
+      creator: actions.startDiscovery,
+      args: [],
+      expected: {
+        type: 'discovery:START',
+        payload: { timeout: null },
+        meta: { shell: true },
+      },
+    },
+    {
+      name: 'startDiscovery with timeout specified',
+      creator: actions.startDiscovery,
+      args: [30000],
+      expected: {
+        type: 'discovery:START',
+        payload: { timeout: 30000 },
+        meta: { shell: true },
+      },
+    },
+    {
+      name: 'finishDiscovery',
+      creator: actions.finishDiscovery,
+      args: [],
+      expected: { type: 'discovery:FINISH', meta: { shell: true } },
+    },
+    {
+      name: 'removeRobot',
+      creator: actions.removeRobot,
+      args: ['robot-name'],
+      expected: {
+        type: 'discovery:REMOVE',
+        payload: { robotName: 'robot-name' },
+        meta: { shell: true },
+      },
+    },
+  ]
 
-  beforeEach(() => {
-    jest.useFakeTimers()
-    store = mockStore({ config: { discovery: { enabled: true } } })
-  })
+  SPECS.forEach(spec => {
+    const { name, creator, args, expected } = spec
 
-  afterEach(() => {
-    jest.clearAllTimers()
-    jest.useRealTimers()
-  })
-
-  test('startDiscovery', () => {
-    const expectedTimeout = 30000
-    const expectedStart = { type: 'discovery:START', meta: { shell: true } }
-    const expectedFinish = { type: 'discovery:FINISH', meta: { shell: true } }
-
-    store.dispatch(startDiscovery())
-    expect(store.getActions()).toEqual([expectedStart])
-    jest.runTimersToTime(expectedTimeout)
-    expect(store.getActions()).toEqual([expectedStart, expectedFinish])
-  })
-
-  test('startDiscovery with timeout', () => {
-    const expectedTimeout = 60000
-    const expectedStart = { type: 'discovery:START', meta: { shell: true } }
-    const expectedFinish = { type: 'discovery:FINISH', meta: { shell: true } }
-
-    store.dispatch(startDiscovery(60000))
-    expect(store.getActions()).toEqual([expectedStart])
-    jest.runTimersToTime(expectedTimeout)
-    expect(store.getActions()).toEqual([expectedStart, expectedFinish])
+    test(name, () => expect(creator(...args)).toEqual(expected))
   })
 })

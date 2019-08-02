@@ -2,7 +2,7 @@
 import * as React from 'react'
 import semver from 'semver'
 import styles from './styles.css'
-import type { VersionProps } from './types.js'
+import type { VersionProps } from './types'
 
 const NEWER_VERSION = (
   <strong>A newer version of the robot server is available.</strong>
@@ -21,8 +21,11 @@ const UPDATE_APP = (
 )
 
 export default function UpdateAppMessage(props: VersionProps) {
-  const { appVersion, robotVersion } = props
-  const versionsMatch = semver.eq(appVersion, robotVersion)
+  const { appVersion, availableUpdate } = props
+  const versionsMatch =
+    semver.valid(appVersion) && semver.valid(availableUpdate)
+      ? semver.eq(appVersion, availableUpdate)
+      : false
 
   return (
     <p className={styles.sync_message}>

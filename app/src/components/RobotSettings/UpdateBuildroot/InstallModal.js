@@ -1,29 +1,52 @@
 // @flow
 import * as React from 'react'
-import { Link } from 'react-router-dom'
 
 import { AlertModal } from '@opentrons/components'
+import InstallModalContents from './InstallModalContents'
 
-type Props = {
-  parentUrl: string,
-  ignoreUpdate: () => mixed,
-}
+import type { ViewableRobot } from '../../../discovery'
+import type { BuildrootUpdateSession, RobotSystemType } from '../../../shell'
+
+type Props = {|
+  robot: ViewableRobot,
+  robotSystemType: RobotSystemType | null,
+  session: BuildrootUpdateSession,
+  close: () => mixed,
+|}
 
 export default function InstallModal(props: Props) {
+  const { session, close, robotSystemType } = props
+  const buttons = []
+
+  if (session.step === 'finished' || session.error !== null) {
+    buttons.push({ children: 'close', onClick: close })
+  }
+
+  let heading: string
+  if (robotSystemType === 'balena') {
+    if (
+      session.step === 'premigration' ||
+      session.step === 'premigrationRestart'
+    ) {
+      heading = 'Robot Update: Step 1 of 2'
+    } else {
+      heading = 'Robot Update: Step 2 of 2'
+    }
+  } else if (robotSystemType === 'buildroot') {
+    heading = 'Robot Update'
+  }
+
   return (
     <AlertModal
-      heading="Feature not Implemented"
-      buttons={[
-        {
-          Component: Link,
-          to: props.parentUrl,
-          children: 'not now',
-          onClick: props.ignoreUpdate,
-        },
-      ]}
+      heading={heading}
+      buttons={buttons}
+      restrictOuterScroll={false}
       alertOverlay
     >
-      <p>TODO: Check Migration vs Update</p>
+      <InstallModalContents
+        robotSystemType={robotSystemType}
+        session={session}
+      />
     </AlertModal>
   )
 }

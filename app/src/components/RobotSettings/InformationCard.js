@@ -93,11 +93,11 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
 
   return (state, ownProps) => {
     const version = getRobotApiVersion(ownProps.robot) || 'Unknown'
+
     return {
       version,
       updateInfo: getUpdateInfo(state, ownProps.robot),
-      buildrootUpdateAvailable:
-        version && getBuildrootUpdateAvailable(state, version),
+      buildrootUpdateAvailable: getBuildrootUpdateAvailable(state, version),
       __buildRootEnabled: Boolean(
         getConfig(state).devInternal?.enableBuildRoot
       ),
