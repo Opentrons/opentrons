@@ -49,31 +49,36 @@ const getOnlyLatestDefs = (labwareList: LabwareList): LabwareList => {
   })
 }
 
+function _getAllDefs(): Array<LabwareDefinition2> {
+  return definitionsContext.keys().map(name => definitionsContext(name))
+}
+
 let allLoadNames: Array<string> | null = null
 // ALL unique load names, not just the non-blacklisted ones
 export function getAllLoadNames(): Array<string> {
   if (!allLoadNames) {
-    allLoadNames = uniq(
-      definitionsContext
-        .keys()
-        .map(name => definitionsContext(name))
-        .map(def => def.parameters.loadName)
-    )
+    allLoadNames = uniq(_getAllDefs().map(def => def.parameters.loadName))
   }
   return allLoadNames
+}
+
+let allDisplayNames: Array<string> | null = null
+// ALL unique display names, not just the non-blacklisted ones
+export function getAllDisplayNames(): Array<string> {
+  if (!allDisplayNames) {
+    allDisplayNames = uniq(_getAllDefs().map(def => def.metadata.displayName))
+  }
+  return allDisplayNames
 }
 
 let definitions: LabwareList | null = null
 
 export function getAllDefinitions(): LabwareList {
   if (!definitions) {
-    const allDefs = definitionsContext
-      .keys()
-      .map(name => definitionsContext(name))
-      .filter(
-        (d: LabwareDefinition2) =>
-          LABWAREV2_DO_NOT_LIST.indexOf(d.parameters.loadName) === -1
-      )
+    const allDefs = _getAllDefs().filter(
+      (d: LabwareDefinition2) =>
+        LABWAREV2_DO_NOT_LIST.indexOf(d.parameters.loadName) === -1
+    )
     definitions = getOnlyLatestDefs(allDefs)
   }
 

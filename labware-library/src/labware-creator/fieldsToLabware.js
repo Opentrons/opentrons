@@ -1,11 +1,10 @@
 // @flow
 import {
-  createDefaultDisplayName,
   createRegularLabware,
   //   createIrregularLabware,
   type LabwareDefinition2,
 } from '@opentrons/shared-data'
-import type { ProcessedLabwareFields } from './fields'
+import { DISPLAY_VOLUME_UNITS, type ProcessedLabwareFields } from './fields'
 
 // TODO Ian 2019-07-29: move this constant to shared-data?
 // This is the distance from channel 1 to channel 8 of any 8-channel, not tied to name/model
@@ -17,7 +16,6 @@ export default function fieldsToLabware(
   // NOTE Ian 2019-07-27: only the 15-50-esque tube rack has multiple grids,
   // and it is not supported in labware creator. So all are regular.
   const isRegularLabware = true
-  const displayVolumeUnits = 'µL'
   const displayCategory = fields.labwareType
 
   if (isRegularLabware) {
@@ -62,20 +60,11 @@ export default function fieldsToLabware(
       // format = 'trough' // Uncomment to break test protocol but allow multichannel use in APIv1
     }
 
-    return createRegularLabware({
+    const def = createRegularLabware({
       metadata: {
-        displayName:
-          fields.displayName ||
-          createDefaultDisplayName({
-            displayCategory,
-            displayVolumeUnits,
-            gridRows: fields.gridRows,
-            gridColumns: fields.gridColumns,
-            totalLiquidVolume,
-            brandName: fields.brand,
-          }),
+        displayName: fields.displayName,
         displayCategory,
-        displayVolumeUnits,
+        displayVolumeUnits: DISPLAY_VOLUME_UNITS,
       },
       parameters: {
         format,
@@ -117,6 +106,11 @@ export default function fieldsToLabware(
       },
       well: wellProperties,
     })
+
+    // overwrite loadName from createRegularLabware with ours
+    def.parameters.loadName = fields.loadName
+
+    return def
   } else {
     throw new Error('use of createIrregularLabware not yet implemented')
     // return createIrregularLabware({ TODO })

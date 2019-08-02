@@ -6,6 +6,7 @@ import {
 import {
   aluminumBlockAutofills,
   getImplicitAutofillValues,
+  DISPLAY_VOLUME_UNITS,
   tubeRackAutofills,
   type LabwareFields,
 } from './fields'
@@ -67,7 +68,7 @@ const _valuesToCreateNameArgs = (values: LabwareFields) => {
     gridColumns,
     gridRows,
     displayCategory: values.labwareType || '',
-    displayVolumeUnits: 'µL',
+    displayVolumeUnits: DISPLAY_VOLUME_UNITS,
     brandName: brand === '' ? undefined : brand,
     totalLiquidVolume: Number(values.wellVolume) || 0,
   }

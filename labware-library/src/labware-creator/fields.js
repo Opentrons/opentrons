@@ -6,6 +6,8 @@ export const MIN_Y_DIMENSION = 85.4
 export const MAX_SUGGESTED_Z = 124
 export const MAX_Z_DIMENSION = 195
 
+export const DISPLAY_VOLUME_UNITS = 'µL'
+
 // magic string for all validation errors that direct user away to the labware request form
 export const IRREGULAR_LABWARE_ERROR = 'IRREGULAR_LABWARE_ERROR'
 
@@ -133,8 +135,9 @@ export type ProcessedLabwareFields = {|
   brand: string,
   brandId: Array<string>,
 
-  loadName: ?string,
-  displayName: ?string,
+  // if loadName or displayName are left blank, Yup schema generates them
+  loadName: string,
+  displayName: string,
 
   // fields for test protocol
   pipetteName: string,
