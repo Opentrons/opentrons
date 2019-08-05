@@ -84,13 +84,13 @@ $(wheel_pattern): setup.py $(ot_sources)
 	$(clean_cmd)
 	$(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) rm -rf build
-	$(python)	-m twine check $@
 	$(SHX) ls dist
 
 wheel: $(wheel_file)
 
 .PHONY: test
 test: local-install
+	$(python)	-m twine check $(wheel_file)
 	$(python) ../scripts/python_build_utils.py api ensure_wheel_size
 	$(pytest) $(tests) $(test_opts)
 
