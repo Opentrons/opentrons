@@ -189,7 +189,7 @@ def _load_new_well(well_data, saved_offset, lw_format):
 
 
 def _look_up_offsets(labware_hash):
-    calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
+    calibration_path = CONFIG['labware_calibration_offsets_dir_v2']
     labware_offset_path = calibration_path / '{}.json'.format(labware_hash)
     if labware_offset_path.exists():
         calibration_data = new_labware._read_file(str(labware_offset_path))
@@ -200,7 +200,7 @@ def _look_up_offsets(labware_hash):
 
 
 def save_new_offsets(labware_hash, delta):
-    calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
+    calibration_path = CONFIG['labware_calibration_offsets_dir_v2']
     if not calibration_path.exists():
         calibration_path.mkdir(parents=True, exist_ok=True)
     old_delta = _look_up_offsets(labware_hash)

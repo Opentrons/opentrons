@@ -145,7 +145,7 @@ async def execute_reset_tests_v2(cli):
     # Make sure we actually delete the database
     resp = await cli.post('/settings/reset', json={'labwareCalibration': True})
     body = await resp.json()
-    assert not os.listdir(config.CONFIG['labware_calibration_offsets_dir_v4'])
+    assert not os.listdir(config.CONFIG['labware_calibration_offsets_dir_v2'])
     assert resp.status == 200
     assert body == {}
 
