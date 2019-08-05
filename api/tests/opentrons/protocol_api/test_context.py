@@ -516,7 +516,6 @@ def test_transfer_options(loop, monkeypatch):
             drop_tip_strategy=tf.DropTipStrategy.TRASH,
             blow_out_strategy=tf.BlowOutStrategy.TRASH,
             touch_tip_strategy=tf.TouchTipStrategy.NEVER,
-            max_volume=300
         ),
         pick_up_tip=tf.PickUpTipOpts(),
         mix=tf.Mix(

@@ -54,7 +54,6 @@ class Transfer(NamedTuple):
     drop_tip_strategy: DropTipStrategy = DropTipStrategy.TRASH
     blow_out_strategy: BlowOutStrategy = BlowOutStrategy.NONE
     touch_tip_strategy: TouchTipStrategy = TouchTipStrategy.NEVER
-    max_volume: Optional[float] = None
 
 
 Transfer.new_tip.__doc__ = """
@@ -179,13 +178,6 @@ Transfer.touch_tip_strategy.__doc__ = """
 
     To customize the behavior of touch tips, see
     :py:attr:`.TransferOptions.touch_tip`.
-    """
-
-Transfer.max_volume.__doc__ = """
-    Controls maximum volume held in the pipette at any time during the transfer
-
-    This can be used to limit the total volume if using filter tips or smaller
-    tips. If ``None``, use default max volume of the pipette.
     """
 
 
@@ -367,6 +359,7 @@ class TransferPlan:
                  sources,
                  dests,
                  instr: 'InstrumentContext',
+                 max_volume: float,
                  mode: Optional[str] = None,
                  options: Optional[TransferOptions] = None
                  ) -> None:
@@ -410,10 +403,7 @@ class TransferPlan:
         self._touch_tip_opts = self._options.touch_tip
         self._mix_before_opts = self._options.mix.mix_before
         self._mix_after_opts = self._options.mix.mix_after
-        if self._strategy.max_volume is None:
-            self._strategy = self._strategy._replace(
-                max_volume=instr._hw_manager.hardware._attached_instruments[
-                    instr._mount].working_volume)
+        self._max_volume = max_volume
 
         if not mode:
             if len(sources) < len(dests):
@@ -476,7 +466,7 @@ class TransferPlan:
         for step_vol, (src, dest) in plan_iter:
             if self._strategy.new_tip == types.TransferTipPolicy.ALWAYS:
                 yield self._format_dict('pick_up_tip', kwargs=self._tip_opts)
-            max_vol = self._strategy.max_volume - \
+            max_vol = self._max_volume - \
                 self._strategy.disposal_volume - self._strategy.air_gap
             xferred_vol = 0
             while xferred_vol < step_vol:
@@ -546,7 +536,7 @@ class TransferPlan:
                 while (sum(a[0] for a in asp_grouped) +
                        self._strategy.disposal_volume +
                        self._strategy.air_gap +
-                       current_xfer[0]) <= self._strategy.max_volume:
+                       current_xfer[0]) <= self._max_volume:
                     asp_grouped.append(current_xfer)
                     current_xfer = next(plan_iter)
             except StopIteration:
@@ -626,7 +616,7 @@ class TransferPlan:
                 while (sum([a[0] for a in asp_grouped]) +
                        self._strategy.disposal_volume +
                        self._strategy.air_gap * len(asp_grouped) +
-                       current_xfer[0]) <= self._strategy.max_volume:
+                       current_xfer[0]) <= self._max_volume:
                     asp_grouped.append(current_xfer)
                     current_xfer = next(plan_iter)
             except StopIteration:
