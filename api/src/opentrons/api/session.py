@@ -130,6 +130,7 @@ class Session(object):
         self.containers = None
         self.modules = None
         self.metadata = {}
+        self.api_level = None
 
         self.startTime = None
         self._motion_lock = motion_lock
@@ -285,6 +286,8 @@ class Session(object):
             self.metadata = extract_metadata(parsed)
             self._protocol = compile(parsed, filename=self.name, mode='exec')
             version = infer_version(self.metadata, parsed)
+
+        self.api_level = 2 if ff.use_protocol_api_v2() else 1
 
         if ff.use_protocol_api_v2() and version == '1':
             raise RuntimeError(

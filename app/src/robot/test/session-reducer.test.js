@@ -32,6 +32,7 @@ describe('robot reducer - session', () => {
       cancelRequest: { inProgress: false, error: null },
       startTime: null,
       runTime: 0,
+      apiLevel: 1,
     })
   })
 

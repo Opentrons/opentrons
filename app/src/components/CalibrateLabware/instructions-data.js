@@ -11,6 +11,7 @@ type TypeKey =
   | 'plate384'
   | 'plate96'
   | 'reservoir'
+  | 'reservoirCentered'
 
 const DIAGRAMS: { [TypeKey]: { [Channels]: { [Step]: string } } } = {
   tiprack: {
@@ -26,6 +27,16 @@ const DIAGRAMS: { [TypeKey]: { [Channels]: { [Step]: string } } } = {
   reservoir: {
     single: {
       one: require('./images/step-1-trough-single@3x.png'),
+      two: require('./images/step-2-trough-single@3x.png'),
+    },
+    multi: {
+      one: require('./images/step-1-trough-multi@3x.png'),
+      two: require('./images/step-2-trough-multi@3x.png'),
+    },
+  },
+  reservoirCentered: {
+    single: {
+      one: require('./images/step-1-trough-centered-single@3x.png'),
       two: require('./images/step-2-trough-single@3x.png'),
     },
     multi: {
@@ -106,6 +117,16 @@ const DIAGRAMS_BOTTOM: { [TypeKey]: { [Channels]: { [Step]: string } } } = {
       two: require('./images/step-2-trough-bottom@3x.png'),
     },
   },
+  reservoirCentered: {
+    single: {
+      one: require('./images/step-1-trough-centered-single@3x.png'),
+      two: require('./images/step-2-trough-bottom@3x.png'),
+    },
+    multi: {
+      one: require('./images/step-1-trough-multi@3x.png'),
+      two: require('./images/step-2-trough-multi@3x.png'),
+    },
+  },
   tuberack: {
     single: {
       one: require('./images/step-1-tuberack@3x.png'),
@@ -179,6 +200,26 @@ const INSTRUCTIONS: {
   reservoir: {
     single: {
       one: 'Jog pipette until tip is centered by the back of reservoir A1.',
+      two: (
+        <p>
+          Jog pipette tip until it is <strong>flush</strong> with the top of the
+          reservoir.
+        </p>
+      ),
+    },
+    multi: {
+      one: 'Jog pipette until tips are centered above reservoir A1.',
+      two: (
+        <p>
+          Jog pipette tips until they are <strong>flush</strong> with the top of
+          the reservoir.
+        </p>
+      ),
+    },
+  },
+  reservoirCentered: {
+    single: {
+      one: 'Jog pipette until tip is centered above reservoir A1.',
       two: (
         <p>
           Jog pipette tip until it is <strong>flush</strong> with the top of the
@@ -312,6 +353,26 @@ const INSTRUCTIONS_BOTTOM: {
       ),
     },
   },
+  reservoirCentered: {
+    single: {
+      one: 'Jog pipette until tip is centered above reservoir A1.',
+      two: (
+        <p>
+          Jog pipette until the tip is <strong>just barely</strong> touching the
+          bottom.
+        </p>
+      ),
+    },
+    multi: {
+      one: 'Jog pipette until tips are centered above reservoir A1.',
+      two: (
+        <p>
+          Jog pipette until tips are <strong>just barely</strong> touching the
+          bottom.
+        </p>
+      ),
+    },
+  },
   tuberack: {
     single: {
       one: 'Jog pipette until tip is centered above tube A1.',
@@ -390,14 +451,19 @@ export function getInstructionsByType(props: LabwareCalibrationProps) {
 }
 
 function getTypeKey(props: LabwareCalibrationProps) {
-  const { type, isTiprack } = props.labware
+  const { labware, useCenteredTroughs } = props
+  const { type, isTiprack } = labware
   let typeKey
   if (isTiprack) {
     typeKey = 'tiprack'
   } else if (type.includes('trough')) {
     typeKey = 'trough'
   } else if (type.includes('reservoir')) {
-    typeKey = 'reservoir'
+    if (useCenteredTroughs) {
+      typeKey = 'reservoirCentered'
+    } else {
+      typeKey = 'reservoir'
+    }
   } else if (type.includes('tube') || type.includes('vial')) {
     typeKey = 'tuberack'
   } else if (type.includes('384')) {

@@ -315,6 +315,7 @@ describe('api client', () => {
         pipettesByMount: {},
         labwareBySlot: {},
         modulesBySlot: {},
+        apiLevel: 1,
       })
     })
 

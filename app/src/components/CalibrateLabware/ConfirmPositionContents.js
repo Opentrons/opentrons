@@ -15,6 +15,7 @@ type OP = {|
   labware: Labware,
   calibrator: Pipette,
   calibrateToBottom: boolean,
+  useCenteredTroughs: boolean,
 |}
 
 type DP = {|
