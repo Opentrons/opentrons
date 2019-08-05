@@ -24,7 +24,7 @@ const _getLabwareDef = (
   )
 }
 
-const _makeLabwareDefsObj = (customDefs: LabwareDefByDefURI) => {
+const _makeCustomLabwareDefsObj = (customDefs: LabwareDefByDefURI) => {
   const allCustomIds = Object.keys(customDefs)
   const customDefsById = allCustomIds.reduce(
     (acc, id) => ({
@@ -34,15 +34,24 @@ const _makeLabwareDefsObj = (customDefs: LabwareDefByDefURI) => {
     {}
   )
 
-  return { ...getAllDefinitions(), ...customDefsById }
+  return { ...customDefsById }
+}
+
+const _makeAllLabwareDefsObj = (customDefs: LabwareDefByDefURI) => {
+  return { ...getAllDefinitions(), ..._makeCustomLabwareDefsObj(customDefs) }
 }
 
 export const _getLabwareDefsByIdRootState: StepFormRootState => LabwareDefByDefURI = createSelector(
   (rootState: StepFormRootState) => rootState.labwareDefs.customDefs,
-  _makeLabwareDefsObj
+  _makeAllLabwareDefsObj
 )
 
 export const getLabwareDefsByURI: Selector<LabwareDefByDefURI> = createSelector(
   state => rootSelector(state).customDefs,
-  _makeLabwareDefsObj
+  _makeAllLabwareDefsObj
+)
+
+export const getCustomLabwareDefsByURI: Selector<LabwareDefByDefURI> = createSelector(
+  state => rootSelector(state).customDefs,
+  _makeCustomLabwareDefsObj
 )

@@ -14,13 +14,18 @@ import { PDTitledList } from '../lists'
 import LabwareItem from './LabwareItem'
 import LabwarePreview from './LabwarePreview'
 import styles from './styles.css'
+import type { LabwareDefByDefURI } from '../../labware-defs'
 
 type Props = {
   onClose: (e?: *) => mixed,
+  onUploadLabware: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
   selectLabware: (containerType: string) => mixed,
+  customLabwareDefs: LabwareDefByDefURI,
   slot: ?DeckSlotId,
   permittedTipracks: Array<string>,
 }
+
+const CUSTOM_CATEGORY = 'custom'
 
 const orderedCategories: Array<string> = [
   'tipRack',
@@ -32,10 +37,22 @@ const orderedCategories: Array<string> = [
 ]
 
 const LabwareDropdown = (props: Props) => {
-  const { permittedTipracks, onClose, slot, selectLabware } = props
+  const {
+    customLabwareDefs,
+    permittedTipracks,
+    onClose,
+    onUploadLabware,
+    slot,
+    selectLabware,
+  } = props
 
   const [selectedCategory, selectCategory] = useState<?string>(null)
   const [previewedLabware, previewLabware] = useState<?LabwareDefinition2>(null)
+
+  const customLabwareURIs: Array<string> = useMemo(
+    () => Object.keys(customLabwareDefs),
+    [customLabwareDefs]
+  )
 
   const labwareByCategory = useMemo(() => {
     const defs = getOnlyLatestDefs()
@@ -97,7 +114,30 @@ const LabwareDropdown = (props: Props) => {
                 ))}
             </PDTitledList>
           ))}
+          <PDTitledList
+            title="Custom Labware"
+            collapsed={selectedCategory !== CUSTOM_CATEGORY}
+            onCollapseToggle={makeToggleCategory(CUSTOM_CATEGORY)}
+            onClick={makeToggleCategory(CUSTOM_CATEGORY)}
+            className={styles.labware_selection_modal}
+          >
+            {customLabwareURIs.map((labwareURI, index) => (
+              <LabwareItem
+                key={index}
+                labwareDef={customLabwareDefs[labwareURI]}
+                selectLabware={selectLabware}
+                onMouseEnter={() =>
+                  previewLabware(customLabwareDefs[labwareURI])
+                }
+                onMouseLeave={() => previewLabware()}
+              />
+            ))}
+          </PDTitledList>
         </ul>
+        <OutlineButton Component="label">
+          Upload custom labware
+          <input type="file" onChange={onUploadLabware} />
+        </OutlineButton>
         <OutlineButton onClick={onClose}>CLOSE</OutlineButton>
       </div>
     </>
