@@ -251,10 +251,10 @@ class BCLabware:
     def load(self, container_name, slot, label=None, share=False):
         """ Load a piece of labware by specifying its name and position.
 
-        This method calls :py:meth:`.ProtocolContext.load_labware_by_name`;
+        This method calls :py:meth:`.ProtocolContext.load_labware`;
         see that documentation for more information on arguments and return
         values. Calls to this function should be replaced with calls to
-        :py:meth:`.Protocolcontext.load_labware_by_name`.
+        :py:meth:`.Protocolcontext.load_labware`.
 
         In addition, this function contains translations between old
         labware names and new labware names.
@@ -275,7 +275,7 @@ class BCLabware:
             else:
                 name = container_name
 
-        return self._ctx.load_labware_by_name(name, slot, label)
+        return self._ctx.load_labware(name, slot, label)
 
     def create(self, *args, **kwargs):
         raise NotImplementedError

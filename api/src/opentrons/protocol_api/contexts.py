@@ -1,10 +1,6 @@
 import asyncio
 import contextlib
 import logging
-from .labware import (Well, Labware, load, get_labware_definition,
-                      load_from_definition, load_module,
-                      ModuleGeometry, quirks_from_any_parent,
-                      ThermocyclerGeometry)
 from typing import Any, Dict, List, Optional, Union, Tuple, Sequence
 from opentrons import types, hardware_control as hc, commands as cmds
 from opentrons.commands import CommandPublisher
@@ -13,7 +9,10 @@ from opentrons.config import feature_flags as fflags
 from opentrons.hardware_control import adapters, modules
 from opentrons.hardware_control.simulator import Simulator
 from opentrons.hardware_control.types import CriticalPoint, Axis
-
+from .labware import (Well, Labware, load, get_labware_definition,
+                      load_from_definition, load_module,
+                      ModuleGeometry, quirks_from_any_parent,
+                      ThermocyclerGeometry)
 from . import geometry
 from . import transfers
 
@@ -117,8 +116,7 @@ class ProtocolContext(CommandPublisher):
         else:
             trash_name = 'opentrons_1_trash_1100ml_fixed'
 
-        self.load_labware_by_name(
-            trash_name, '12')
+        self.load_labware(trash_name, '12')
 
     def __del__(self):
         if getattr(self, '_unsubscribe_commands', None):
@@ -205,7 +203,7 @@ class ProtocolContext(CommandPublisher):
         self._deck_layout[location] = labware_obj
         return labware_obj
 
-    def load_labware_by_name(
+    def load_labware(
             self,
             load_name: str,
             location: types.DeckLocation,
@@ -213,7 +211,7 @@ class ProtocolContext(CommandPublisher):
             namespace: str = None,
             version: int = 1
     ) -> Labware:
-        """ A convenience function to specify a piece of labware by name.
+        """ Load a labware onto the deck given its name.
 
         For labware already defined by Opentrons, this is a convenient way
         to collapse the two stages of labware initialization (creating
@@ -237,6 +235,20 @@ class ProtocolContext(CommandPublisher):
         """
         labware_def = get_labware_definition(load_name, namespace, version)
         return self.load_labware_from_definition(labware_def, location, label)
+
+    def load_labware_by_name(
+            self,
+            load_name: str,
+            location: types.DeckLocation,
+            label: str = None,
+            namespace: str = None,
+            version: int = 1
+    ) -> Labware:
+        MODULE_LOG.warning(
+            'load_labware_by_name is deprecated and will be removed in '
+            'version 3.12.0. please use load_labware')
+        return self.load_labware(
+            load_name, location, label, namespace, version)
 
     def load_module(
             self, module_name: str,
@@ -482,6 +494,119 @@ class InstrumentContext(CommandPublisher):
     instances are returned from :py:meth:`ProtcolContext.load_instrument`.
     """
 
+    class FlowRates:
+        def __init__(self,
+                     instr: 'InstrumentContext') -> None:
+            self._instr = instr
+
+        @staticmethod
+        def _assert_gzero(val: Any) -> float:
+            try:
+                new_val = float(val)
+                assert new_val > 0.0
+                return new_val
+            except (TypeError, ValueError, AssertionError):
+                raise AssertionError(
+                    'flow rate should be a numerical value in ul/s')
+
+        @property
+        def aspirate(self) -> float:
+            return self._instr.hw_pipette['aspirate_flow_rate']
+
+        @aspirate.setter
+        def aspirate(self, new_val: float):
+            self._instr._hw_manager.hardware.set_flow_rate(
+                mount=self._instr._mount,
+                aspirate=self._assert_gzero(new_val))
+
+        @property
+        def dispense(self) -> float:
+            return self._instr.hw_pipette['dispense_flow_rate']
+
+        @dispense.setter
+        def dispense(self, new_val: float):
+            self._instr._hw_manager.hardware.set_flow_rate(
+                mount=self._instr._mount,
+                dispense=self._assert_gzero(new_val))
+
+        @property
+        def blow_out(self) -> float:
+            return self._instr.hw_pipette['blow_out_flow_rate']
+
+        @blow_out.setter
+        def blow_out(self, new_val: float):
+            self._instr._hw_manager.hardware.set_flow_rate(
+                mount=self._instr._mount,
+                blow_out=self._assert_gzero(new_val))
+
+    class PlungerSpeeds:
+        def __init__(self,
+                     instr: 'InstrumentContext') -> None:
+            self._instr = instr
+
+        @staticmethod
+        def _assert_gzero(val: Any) -> float:
+            try:
+                new_val = float(val)
+                assert new_val > 0.0
+                return new_val
+            except (TypeError, ValueError, AssertionError):
+                raise AssertionError(
+                    'speed should be a numerical value in ul/s')
+
+        @property
+        def aspirate(self) -> float:
+            return self._instr.hw_pipette['aspirate_speed']
+
+        @aspirate.setter
+        def aspirate(self, new_val: float):
+            self._instr._hw_manager.hardware.set_pipette_speed(
+                mount=self._instr._mount,
+                aspirate=self._assert_gzero(new_val))
+
+        @property
+        def dispense(self) -> float:
+            return self._instr.hw_pipette['dispense_speed']
+
+        @dispense.setter
+        def dispense(self, new_val: float):
+            self._instr._hw_manager.hardware.set_pipette_speed(
+                mount=self._instr._mount,
+                dispense=self._assert_gzero(new_val))
+
+        @property
+        def blow_out(self) -> float:
+            return self._instr.hw_pipette['blow_out_speed']
+
+        @blow_out.setter
+        def blow_out(self, new_val: float):
+            self._instr._hw_manager.hardware.set_pipette_speed(
+                mount=self._instr._mount,
+                blow_out=self._assert_gzero(new_val))
+
+    class Clearances:
+        def __init__(self,
+                     default_aspirate: float,
+                     default_dispense: float) -> None:
+            self._aspirate = default_aspirate
+            self._dispense = default_dispense
+
+        @property
+        def aspirate(self) -> float:
+            return self._aspirate
+
+        @aspirate.setter
+        def aspirate(self, new_val: float):
+            self._aspirate = float(new_val)
+
+        @property
+        def dispense(self) -> float:
+            return self._dispense
+
+        @dispense.setter
+        def dispense(self, new_val: float):
+            self._dispense = float(new_val)
+
     def __init__(self,
                  ctx: ProtocolContext,
                  hardware_mgr: ProtocolContext.HardwareManager,
@@ -511,7 +636,10 @@ class InstrumentContext(CommandPublisher):
         self._last_tip_picked_up_from: Union[Well, None] = None
         self._log = log_parent.getChild(repr(self))
         self._log.info("attached")
-        self._well_bottom_clearance = 0.5
+        self._well_bottom_clearance = InstrumentContext.Clearances(
+            default_aspirate=1.0, default_dispense=1.0)
+        self._flow_rates = InstrumentContext.FlowRates(self)
+        self._speeds = InstrumentContext.PlungerSpeeds(self)
 
     @property
     def default_speed(self) -> float:
@@ -545,7 +673,7 @@ class InstrumentContext(CommandPublisher):
         :type volume: int or float
         :param location: Where to aspirate from. If `location` is a
                          :py:class:`.Well`, the robot will aspirate from
-                         :py:attr:`well_bottom_clearance` mm
+                         :py:attr:`well_bottom_clearance```.aspirate`` mm
                          above the bottom of the well. If `location` is a
                          :py:class:`.Location` (i.e. the result of
                          :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the
@@ -567,7 +695,8 @@ class InstrumentContext(CommandPublisher):
         if isinstance(location, Well):
             point, well = location.bottom()
             dest = types.Location(
-                point + types.Point(0, 0, self.well_bottom_clearance),
+                point + types.Point(0, 0,
+                                    self.well_bottom_clearance.aspirate),
                 well)
         elif isinstance(location, types.Location):
             dest = location
@@ -627,7 +756,7 @@ class InstrumentContext(CommandPublisher):
         :type volume: int or float
         :param location: Where to dispense into. If `location` is a
                          :py:class:`.Well`, the robot will dispense into
-                         :py:attr:`well_bottom_clearance` mm
+                         :py:attr:`well_bottom_clearance```.dispense`` mm
                          above the bottom of the well. If `location` is a
                          :py:class:`.Location` (i.e. the result of
                          :py:meth:`.Well.top` or :py:meth:`.Well.bottom`), the
@@ -651,7 +780,8 @@ class InstrumentContext(CommandPublisher):
             else:
                 point, well = location.bottom()
                 loc = types.Location(
-                    point + types.Point(0, 0, self.well_bottom_clearance),
+                    point + types.Point(0, 0,
+                                        self.well_bottom_clearance.dispense),
                     well)
             self.move_to(loc)
         elif isinstance(location, types.Location):
@@ -1421,61 +1551,56 @@ class InstrumentContext(CommandPublisher):
         return self._mount.name.lower()
 
     @property
-    def speed(self) -> Dict[str, float]:
-        """ The speeds (in mm/s) configured for the pipette plunger, as a dict.
+    def speed(self) -> 'InstrumentContext.PlungerSpeeds':
+        """ The speeds (in mm/s) configured for the pipette plunger.
 
-        The keys will be ``'aspirate'``, ``'dispense'``, and ``'blow_out'``
+        This is an object with attributes ``aspirate``, ``dispense``, and
+        ``blow_out`` holding the plunger speeds for the corresponding
+        operation.
 
-        :note: This property is equivalent to :py:attr:`flow_rate`; the only
-        difference is the units in which this property is specified. Specifying
-        this attribute uses the units of the linear speed of the plunger inside
-        the pipette, while :py:attr:`flow_rate` uses the units of the
-        volumetric flow rate of liquid into or out of the tip.
+        .. note::
+            This property is equivalent to :py:attr:`flow_rate`; the only
+            difference is the units in which this property is specified.
+            Specifying this attribute uses the units of the linear speed of
+            the plunger inside the pipette, while :py:attr:`flow_rate` uses
+            the units of the volumetric flow rate of liquid into or out of the
+            tip. Because :py:attr:`speed` and :py:attr:`flow_rate` modify the
+            same values, setting one will override the other.
 
-        :note: When setting this attribute, make sure to assign values to it
-        rather than modifying the entries. For example, always do
+        For instance, to set the plunger speed during an aspirate action, do
 
-        .. code-block:: python
+        .. code-block :: python
 
-          instrument.speed = {'aspirate': 30}
+            instrument.speed.aspirate = 50
+
         """
-        return {
-            'aspirate': self.hw_pipette['aspirate_speed'],
-            'dispense': self.hw_pipette['dispense_speed'],
-            'blow_out': self.hw_pipette['blow_out_speed']}
-
-    @speed.setter
-    def speed(self, new_speeds: Dict[str, float]) -> None:
-        self._hw_manager.hardware.set_pipette_speed(self._mount,
-                                                    **new_speeds)
+        return self._speeds
 
     @property
-    def flow_rate(self) -> Dict[str, float]:
-        """ The speeds (in uL/s) configured for the pipette, as a dict.
+    def flow_rate(self) -> 'InstrumentContext.FlowRates':
+        """ The speeds (in uL/s) configured for the pipette.
 
-        Returns a dict with the keys 'aspirate' and 'dispense' and correspoding
-        values are the flow rates for each operation.
+        This is an object with attributes ``aspirate``, ``dispense``, and
+        ``blow_out`` holding the flow rates for the corresponding operation.
 
-        :note: This property is equivalent to :py:attr:`speed`; the only
-        difference is the units in which this property is specified. Specifying
-        this property uses the units of the volumetric flow rate of liquid into
-        or out of the tip, while :py:attr:`speed` uses the units of the linear
-        speed of the plunger inside the pipette.
+        .. note::
+          This property is equivalent to :py:attr:`speed`; the only
+          difference is the units in which this property is specified.
+          specifiying this property uses the units of the volumetric flow rate
+          of liquid into or out of the tip, while :py:attr:`speed` uses the
+          units of the linear speed of the plunger inside the pipette.
+          Because :py:attr:`speed` and :py:attr:`flow_rate` modify the
+          same values, setting one will override the other.
 
-        :note: When setting this attribute, make sure to assign values to it
-        rather than modifying the entries. For example, always do
+        For instance, to change the flow rate for aspiration on an instrument
+        you would do
 
-        .. code-block:: python
+        .. code-block :: python
 
-          instrument.flow_rate = {'aspirate': 50}
+            instrument.flow_rate.aspirate = 50
+
         """
-        return {'aspirate': self.hw_pipette['aspirate_flow_rate'],
-                'dispense': self.hw_pipette['dispense_flow_rate'],
-                'blow_out': self.hw_pipette['blow_out_flow_rate']}
-
-    @flow_rate.setter
-    def flow_rate(self, new_flow_rate: Dict[str, float]) -> None:
-        self._hw_manager.hardware.set_flow_rate(self._mount, **new_flow_rate)
+        return self._flow_rates
 
     @property
     def pick_up_current(self) -> float:
@@ -1583,20 +1708,26 @@ class InstrumentContext(CommandPublisher):
         return self.hw_pipette['channels']
 
     @property
-    def well_bottom_clearance(self) -> float:
+    def well_bottom_clearance(self) -> 'InstrumentContext.Clearances':
         """ The distance above the bottom of a well to aspirate or dispense.
+
+        This is an object with attributes ``aspirate`` and ``dispense``,
+        describing the default heights of the corresponding operation. The
+        default is 1.0mm for both aspirate and dispense.
 
         When :py:meth:`aspirate` or :py:meth:`dispense` is given a
         :py:class:`.Well` rather than a full :py:class:`.Location`, the robot
         will move this distance above the bottom of the well to aspirate or
         dispense.
+
+        To change, set the corresponding attribute. For instance,
+
+        .. code-block:: python
+
+            instr.well_bottom_clearance.aspirate = 1
+
         """
         return self._well_bottom_clearance
-
-    @well_bottom_clearance.setter
-    def well_bottom_clearance(self, clearance: float):
-        assert clearance >= 0
-        self._well_bottom_clearance = clearance
 
     def __repr__(self):
         return '<{}: {} in {}>'.format(self.__class__.__name__,
@@ -1624,28 +1755,34 @@ class ModuleContext(CommandPublisher):
         self._geometry = geometry
         self._ctx = ctx
 
-    def load_labware(self, labware: Labware) -> Labware:
+    def load_labware_object(self, labware: Labware) -> Labware:
         """ Specify the presence of a piece of labware on the module.
 
         :param labware: The labware object. This object should be already
                         initialized and its parent should be set to this
                         module's geometry. To initialize and load a labware
                         onto the module in one step, see
-                        :py:meth:`load_labware_by_name`.
+                        :py:meth:`load_labware`.
         :returns: The properly-linked labware object
         """
         mod_labware = self._geometry.add_labware(labware)
         self._ctx.deck.recalculate_high_z()
         return mod_labware
 
-    def load_labware_by_name(self, name: str) -> Labware:
+    def load_labware(self, name: str) -> Labware:
         """ Specify the presence of a piece of labware on the module.
 
         :param name: The name of the labware object.
         :returns: The initialized and loaded labware object.
         """
         lw = load(name, self._geometry.location)
-        return self.load_labware(lw)
+        return self.load_labware_object(lw)
+
+    def load_labware_by_name(self, name: str) -> Labware:
+        MODULE_LOG.warning(
+            'load_labware_by_name is deprecated and will be removed in '
+            'version 3.12.0. please use load_labware')
+        return self.load_labware(name)
 
     @property
     def labware(self) -> Optional[Labware]:
@@ -1751,7 +1888,7 @@ class MagneticModuleContext(ModuleContext):
         """
         self._module.calibrate()
 
-    def load_labware(self, labware: Labware) -> Labware:
+    def load_labware_object(self, labware: Labware) -> Labware:
         """
         Load labware onto a Magnetic Module, checking if it is compatible
         """
@@ -1760,7 +1897,7 @@ class MagneticModuleContext(ModuleContext):
                 "This labware ({}) is not explicitly compatible with the"
                 " Magnetic Module. You will have to specify a height when"
                 " calling engage().")
-        return super().load_labware(labware)
+        return super().load_labware_object(labware)
 
     @cmds.publish.both(command=cmds.magdeck_engage)
     def engage(self, height: float = None, offset: float = None):

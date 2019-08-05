@@ -1,4 +1,13 @@
-"""This module will replace Placeable"""
+""" opentrons.protocol_api.labware: classes and functions for labware handling
+
+This module provides things like :py:class:`Labware`, :py:class:`Well`, and
+:py:class:`ModuleGeometry` to encapsulate labware instances used in protocols
+and their wells. It also provides helper functions to load and save labware
+and labware calibration offsets. It contains all the code necessary to
+transform from labware symbolic points (such as "well a1 of an opentrons
+tiprack") to points in deck coordinates.
+"""
+import logging
 import json
 import re
 import time
@@ -15,6 +24,8 @@ from typing import Any, List, Dict, Optional, Union
 from opentrons.types import Location
 from opentrons.types import Point
 from opentrons.config import CONFIG
+
+MODULE_LOG = logging.getLogger(__name__)
 
 # TODO: Ian 2019-05-23 where to store these constants?
 OPENTRONS_NAMESPACE = 'opentrons'
@@ -186,6 +197,27 @@ class Labware:
     This class represents a labware, such as a PCR plate, a tube rack, trough,
     tip rack, etc. It defines the physical geometry of the labware, and
     provides methods for accessing wells within the labware.
+
+    It is commonly created by calling :py:meth:`ProtocolContext.load_labware`.
+
+    To access a labware's wells, you can use its well accessor methods:
+    :py:meth:`wells_by_name`, :py:meth:`wells`, :py:meth:`columns`,
+    :py:meth:`rows`, :py:meth:`rows_by_name`, and :py:meth:`columns_by_name`.
+    You can also use an instance of a labware as a Python dictionary, accessing
+    wells by their names. The following example shows how to use all of these
+    methods to access well A1:
+
+    .. code-block :: python
+
+       labware = context.load_labware('corning_96_wellplate_360ul_flat', 1)
+       labware['A1']
+       labware.wells_by_name()['A1']
+       labware.wells()[0]
+       labware.rows()[0][0]
+       labware.columns()[0][0]
+       labware.rows_by_name()['A'][0]
+       labware.columns_by_name()[0][0]
+
     """
     def __init__(
             self, definition: dict,
@@ -229,6 +261,9 @@ class Labware:
 
         self._pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
         self._definition = definition
+
+    def __getitem__(self, key: str) -> Well:
+        return self.wells_by_name()[key]
 
     @property
     def parent(self) -> Union['Labware', 'Well', str, 'ModuleGeometry', None]:
@@ -300,11 +335,11 @@ class Labware:
         return self._calibrated_offset
 
     def well(self, idx) -> Well:
-        """Deprecated---use result of `wells` or `wells_by_index`"""
+        """Deprecated---use result of `wells` or `wells_by_name`"""
         if isinstance(idx, int):
             res = self._wells[idx]
         elif isinstance(idx, str):
-            res = self.wells_by_index()[idx]
+            res = self.wells_by_name()[idx]
         else:
             res = NotImplemented
         return res
@@ -331,23 +366,29 @@ class Labware:
         elif isinstance(args[0], int):
             res = [self._wells[idx] for idx in args]
         elif isinstance(args[0], str):
-            res = [self.wells_by_index()[idx] for idx in args]
+            res = [self.wells_by_name()[idx] for idx in args]
         else:
             raise TypeError
         return res
 
-    def wells_by_index(self) -> Dict[str, Well]:
+    def wells_by_name(self) -> Dict[str, Well]:
         """
         Accessor function used to create a look-up table of Wells by name.
 
         With indexing one can treat it as a typical python
         dictionary whose keys are well names. To access well A1, for example,
-        simply write: labware.wells_by_index()['A1']
+        simply write: labware.wells_by_name()['A1']
 
         :return: Dictionary of well objects keyed by well name
         """
         return {well: wellObj
                 for well, wellObj in zip(self._ordering, self._wells)}
+
+    def wells_by_index(self) -> Dict[str, Well]:
+        MODULE_LOG.warning(
+            'wells_by_index is deprecated and will be deleted in version '
+            '3.12.0. please wells_by_name or dict access')
+        return self.wells_by_name()
 
     def rows(self, *args) -> List[List[Well]]:
         """
@@ -378,18 +419,24 @@ class Labware:
             raise TypeError
         return res
 
-    def rows_by_index(self) -> Dict[str, List[Well]]:
+    def rows_by_name(self) -> Dict[str, List[Well]]:
         """
         Accessor function used to navigate through a labware by row name.
 
         With indexing one can treat it as a typical python dictionary.
-        To access row A for example, simply write: labware.rows_by_index()['A']
+        To access row A for example, simply write: labware.rows_by_name()['A']
         This will output ['A1', 'A2', 'A3', 'A4'...].
 
         :return: Dictionary of Well lists keyed by row name
         """
         row_dict = self._create_indexed_dictionary(group=1)
         return row_dict
+
+    def rows_by_index(self) -> Dict[str, List[Well]]:
+        MODULE_LOG.warning(
+            'rows_by_index is deprecated and will be deleted in version '
+            '3.12.0. please use rows_by_name')
+        return self.rows_by_name()
 
     def columns(self, *args) -> List[List[Well]]:
         """
@@ -421,19 +468,25 @@ class Labware:
             raise TypeError
         return res
 
-    def columns_by_index(self) -> Dict[str, List[Well]]:
+    def columns_by_name(self) -> Dict[str, List[Well]]:
         """
         Accessor function used to navigate through a labware by column name.
 
         With indexing one can treat it as a typical python dictionary.
         To access row A for example,
-        simply write: labware.columns_by_index()['1']
+        simply write: labware.columns_by_name()['1']
         This will output ['A1', 'B1', 'C1', 'D1'...].
 
         :return: Dictionary of Well lists keyed by column name
         """
         col_dict = self._create_indexed_dictionary(group=2)
         return col_dict
+
+    def columns_by_index(self) -> Dict[str, List[Well]]:
+        MODULE_LOG.warning(
+            'columns_by_index is deprecated and will be deleted in version '
+            '3.12.0. please use columns_by_name')
+        return self.columns_by_name()
 
     @property
     def highest_z(self) -> float:

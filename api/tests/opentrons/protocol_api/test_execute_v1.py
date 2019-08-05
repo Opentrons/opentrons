@@ -43,7 +43,7 @@ async def test_load_pipettes(loop, protocol_data):
 @pytest.mark.parametrize('command_type', ['aspirate', 'dispense'])
 def test_get_location_with_offset(loop, command_type):
     ctx = ProtocolContext(loop=loop)
-    plate = ctx.load_labware_by_name("corning_96_wellplate_360ul_flat", 1)
+    plate = ctx.load_labware("corning_96_wellplate_360ul_flat", 1)
     well = "B2"
 
     default_values = {
@@ -67,9 +67,9 @@ def test_get_location_with_offset(loop, command_type):
         assert offs == offset
         result = execute_v1._get_location_with_offset(
             loaded_labware, command_type, command_params, default_values)
-        assert result.labware == plate.wells_by_index()[well]
+        assert result.labware == plate[well]
         assert result.point\
-            == plate.wells_by_index()[well].bottom().point + Point(z=offset)
+            == plate[well].bottom().point + Point(z=offset)
 
     command_params = {
         "labware": "someLabwareId",
@@ -83,7 +83,7 @@ def test_get_location_with_offset(loop, command_type):
     assert execute_v1._get_bottom_offset(
         command_type, command_params, default_values) == default
     assert result.point\
-        == plate.wells_by_index()[well].bottom().point + Point(z=default)
+        == plate[well].bottom().point + Point(z=default)
 
 
 def test_load_labware(loop):
@@ -156,9 +156,9 @@ def test_dispatch_commands(monkeypatch, loop):
 
     insts = execute_v1.load_pipettes_from_json(ctx, protocol_data)
 
-    source_plate = ctx.load_labware_by_name(
+    source_plate = ctx.load_labware(
         'corning_96_wellplate_360ul_flat', '1')
-    dest_plate = ctx.load_labware_by_name(
+    dest_plate = ctx.load_labware(
         'corning_96_wellplate_360ul_flat', '2')
 
     loaded_labware = {
@@ -176,12 +176,14 @@ def test_dispatch_commands(monkeypatch, loop):
         ctx, protocol_data, insts, loaded_labware)
 
     assert cmd == [
-        ("aspirate", 5, source_plate.wells_by_index()['A1'].bottom()),
+        ("aspirate", 5, source_plate['A1'].bottom()),
         ("sleep", 42),
-        ("dispense", 4.5, dest_plate.wells_by_index()['B1'].bottom())
+        ("dispense", 4.5, dest_plate['B1'].bottom())
     ]
 
     assert flow_rates == [
-        (123, 102),
-        (101, 102)
+        (123, None),
+        (None, 102),
+        (101, None),
+        (None, 102),
     ]

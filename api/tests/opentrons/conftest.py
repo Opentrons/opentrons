@@ -407,7 +407,7 @@ def model(robot, hardware, loop, request):
         loop.run_until_complete(hardware.cache_instruments(
             {Mount.RIGHT: 'p300_single'}))
         instrument = models.Instrument(pip, context=ctx)
-        plate = ctx.load_labware_by_name(
+        plate = ctx.load_labware(
             lw_name or 'corning_96_wellplate_360ul_flat', 1)
         rob = hardware
         container = models.Container(plate, context=ctx)

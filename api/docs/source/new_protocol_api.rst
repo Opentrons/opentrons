@@ -56,15 +56,15 @@ If we were to rewrite this with the Opentrons API, it would look like the follow
     def run(protocol_context):
 
         # labware
-        plate = protocol_context.load_labware_by_name('corning_96_wellplate_360ul_flat', '2')
-        tiprack = protocol_context.load_labware_by_name('opentrons_96_tiprack_300ul', '1')
+        plate = protocol_context.load_labware('corning_96_wellplate_360ul_flat', '2')
+        tiprack = protocol_context.load_labware('opentrons_96_tiprack_300ul', '1')
 
         # pipettes
         pipette = protocol_context.load_instrument('p300_single', 'left', tip_racks=[tiprack])
 
         # commands
-        pipette.aspirate(100, plate.wells_by_index()['A1'])
-        pipette.dispense(100, plate.wells_by_index()['B2'])
+        pipette.aspirate(100, plate['A1'])
+        pipette.dispense(100, plate['B2'])
 
 
 **********************
@@ -111,8 +111,8 @@ From the example above, the "labware" section looked like:
 
 .. code-block:: python
 
-    plate = protocol_context.load_labware_by_name('corning_96_wellplate_360ul_flat', '2')
-    tiprack = protocol_context.load_labware_by_name('opentrons_96_tiprack_300ul', '1')
+    plate = protocol_context.load_labware('corning_96_wellplate_360ul_flat', '2')
+    tiprack = protocol_context.load_labware('opentrons_96_tiprack_300ul', '1')
 
 
 and informed the protocol context that the deck contains a 300 µL tiprack in slot 1 and a 96 well plate in slot 2.
@@ -122,7 +122,7 @@ More complete documentation on labware methods (such as the ``.wells()`` method)
 .. _protocol-api-valid-labware:
 
 To see the labware names that can be loaded with
-:py:meth:`.ProtocolContext.load_labware_by_name`, please see the
+:py:meth:`.ProtocolContext.load_labware`, please see the
 `Opentrons Labware Library`__
 
 __ https://labware.opentrons.com
@@ -150,8 +150,8 @@ From the example above, the "commands" section looked like:
 
 .. code-block:: python
 
-    pipette.aspirate(100, plate.wells_by_index()['A1'])
-    pipette.dispense(100, plate.wells_by_index()['B2'])
+    pipette.aspirate(100, plate['A1'])
+    pipette.dispense(100, plate['B2'])
 
 which does exactly what it says - aspirate 100 µL from A1 and dispense it all in B2.
 
@@ -173,7 +173,7 @@ A Temperature Module, for example, can be loaded and used in a protocol like thi
         master_mix = labware.load('opentrons_6_tuberack_falcon_50ml_conical')
 
         for target_well in temp_plate.wells():
-            pipette.transfer(50, master_mix.wells_by_index()['A1'], target_well)
+            pipette.transfer(50, master_mix['A1'], target_well)
 
         target_temp = 80.0  # degrees Celcius
         temp_mod.set_temp(target_temp)

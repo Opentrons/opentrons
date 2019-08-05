@@ -27,7 +27,7 @@ def _get_well(loaded_labware: Dict[str, labware.Labware],
     labwareId = params['labware']
     well = params['well']
     plate = loaded_labware[labwareId]
-    return plate.wells_by_index()[well]
+    return plate[well]
 
 
 # TODO (Ian 2019-04-05) once Pipette commands allow flow rate as an
@@ -42,11 +42,9 @@ def _set_flow_rate(pipette, params) -> None:
     if not (flow_rate_param > 0):
         raise RuntimeError('Positive flowRate param required')
 
-    pipette.flow_rate = {
-        'aspirate': flow_rate_param,
-        'dispense': flow_rate_param,
-        'blow_out': flow_rate_param,
-    }
+    pipette.flow_rate.aspirate = flow_rate_param
+    pipette.flow_rate.dispense = flow_rate_param
+    pipette.flow_rate.blow_out = flow_rate_param
 
 
 def load_labware_from_json_defs(

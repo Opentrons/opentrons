@@ -41,7 +41,7 @@ def _get_well(loaded_labware: Dict[str, labware.Labware],
         raise ValueError(
             'Command tried to use labware "{}", but that ID does not exist '
             'in protocol\'s "labware" section'.format(labwareId))
-    return plate.wells_by_index()[well]
+    return plate[well]
 
 
 # TODO (Ian 2018-08-22) once Pipette has more sensible way of managing
@@ -60,24 +60,15 @@ def _set_flow_rate(
 
     flow_rate_param = params.get('flow-rate')
 
-    if flow_rate_param is not None:
-        if command_type == 'aspirate':
-            pipette.flow_rate = {
-                'aspirate': flow_rate_param,
-                'dispense': default_dispense
-            }
-            return
-        if command_type == 'dispense':
-            pipette.flow_rate = {
-                'aspirate': default_aspirate,
-                'dispense': flow_rate_param
-            }
-            return
-
-    pipette.flow_rate = {
-        'aspirate': default_aspirate,
-        'dispense': default_dispense
-    }
+    if flow_rate_param is not None and command_type == 'aspirate':
+        pipette.flow_rate.aspirate = flow_rate_param
+        pipette.flow_rate.dispense = default_dispense
+    elif flow_rate_param is not None and command_type == 'dispense':
+        pipette.flow_rate.aspirate = default_aspirate
+        pipette.flow_rate.dispense = flow_rate_param
+    else:
+        pipette.flow_rate.aspirate = default_aspirate
+        pipette.flow_rate.dispense = default_dispense
 
 
 def load_labware_from_json_loadnames(

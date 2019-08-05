@@ -157,13 +157,38 @@ def test_thermocycler_temp(loop):
 #     mod = ctx.load_module('semithermocycler', 1)
 #     # open before loading labware
 #     mod.open()
-#     mod.load_labware_by_name('biorad_96_wellplate_200ul_pcr')
+#     mod.load_labware('biorad_96_wellplate_200ul_pcr')
 
 #     assert len(mod.labware.columns()) == 9
 #     assert mod.labware.wells().__repr__()[1:3] == 'A4'
 
 
 def test_module_load_labware(loop):
+    ctx = papi.ProtocolContext(loop)
+    labware_name = 'corning_96_wellplate_360ul_flat'
+    # TODO Ian 2019-05-29 load fixtures, not real defs
+    labware_def = json.loads(
+        pkgutil.get_data(
+            'opentrons',
+            f'shared_data/labware/definitions/2/{labware_name}/1.json'))
+    ctx._hw_manager.hardware._backend._attached_modules = [
+        ('mod0', 'tempdeck')]
+    mod = ctx.load_module('Temperature Module', 1)
+    assert mod.labware is None
+    lw = mod.load_labware(labware_name)
+    lw_offset = Point(labware_def['cornerOffsetFromSlot']['x'],
+                      labware_def['cornerOffsetFromSlot']['y'],
+                      labware_def['cornerOffsetFromSlot']['z'])
+    assert lw._offset == lw_offset + mod._geometry.location.point
+    assert lw.name == labware_name
+    # Test load with old name
+    mod2 = ctx.load_module('tempdeck', 2)
+    lw2 = mod2.load_labware(labware_name)
+    assert lw2._offset == lw_offset + mod2._geometry.location.point
+    assert lw2.name == labware_name
+
+
+def test_deprecated_module_load_labware(loop):
     ctx = papi.ProtocolContext(loop)
     labware_name = 'corning_96_wellplate_360ul_flat'
     # TODO Ian 2019-05-29 load fixtures, not real defs
@@ -183,7 +208,7 @@ def test_module_load_labware(loop):
     assert lw.name == labware_name
     # Test load with old name
     mod2 = ctx.load_module('tempdeck', 2)
-    lw2 = mod2.load_labware_by_name(labware_name)
+    lw2 = mod2.load_labware(labware_name)
     assert lw2._offset == lw_offset + mod2._geometry.location.point
     assert lw2.name == labware_name
 
@@ -199,7 +224,7 @@ def test_magdeck_labware_props(loop):
     ctx._hw_manager.hardware._backend._attached_modules = [('mod0', 'magdeck')]
     mod = ctx.load_module('magdeck', 1)
     assert mod.labware is None
-    mod.load_labware_by_name(labware_name)
+    mod.load_labware(labware_name)
     mod.engage()
     lw_offset = labware_def['parameters']['magneticModuleEngageHeight']
     assert mod._module._driver.plate_height == lw_offset
@@ -211,7 +236,7 @@ def test_magdeck_labware_props(loop):
     assert mod._module._driver.plate_height == 3
     mod._geometry.reset_labware()
     labware_name = 'corning_96_wellplate_360ul_flat'
-    mod.load_labware_by_name(labware_name)
+    mod.load_labware(labware_name)
     with pytest.raises(ValueError):
         mod.engage()
     with pytest.raises(ValueError):
