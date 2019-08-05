@@ -47,7 +47,7 @@ updated component library cards after redesign/refactor
 .data_row {
   display: flex;
   justify-content: space-between;
-  margin-right: 3rem;
+  max-width: 7rem;
 }
 
 .compact_labeled_value > p{
