@@ -8,8 +8,8 @@ export type ApiUpdateInfo = {
 }
 
 const {
+  CURRENT_VERSION,
   apiUpdate: { getUpdateInfo, getUpdateFileContents },
-  update: { CURRENT_VERSION },
 } = remote
 
 export function apiUpdateReducer(state: ?ApiUpdateInfo): ApiUpdateInfo {

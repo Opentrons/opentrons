@@ -43,7 +43,7 @@ function startUp() {
 
   // wire modules to UI dispatches
   const dispatch = action => {
-    log.debug('Sending action via IPC to renderer', { action })
+    log.silly('Sending action via IPC to renderer', { action })
     mainWindow.webContents.send('dispatch', action)
   }
 

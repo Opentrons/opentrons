@@ -3,11 +3,19 @@
 // defines subset of Electron API that renderer process is allowed to access
 // for security reasons
 import { ipcRenderer, remote } from 'electron'
+import cloneDeep from 'lodash/cloneDeep'
+
+const { getConfig } = remote.require('./config')
+const { getRobots } = remote.require('./discovery')
+const { CURRENT_VERSION, CURRENT_RELEASE_NOTES } = remote.require('./update')
 
 global.APP_SHELL_REMOTE = {
   ipcRenderer,
+  CURRENT_VERSION,
+  CURRENT_RELEASE_NOTES,
+  INITIAL_CONFIG: cloneDeep(getConfig()),
+  INITIAL_ROBOTS: getRobots(),
+
+  // TODO(mc, 2019-08-05): remove when we remove __buildrootEnabled FF
   apiUpdate: remote.require('./api-update'),
-  config: remote.require('./config'),
-  discovery: remote.require('./discovery'),
-  update: remote.require('./update'),
 }
