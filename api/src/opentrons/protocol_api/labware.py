@@ -800,7 +800,7 @@ def _hash_labware_def(labware_def: Dict[str, Any]) -> str:
 
 
 def _get_labware_offset_path(labware: Labware):
-    calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
+    calibration_path = CONFIG['labware_calibration_offsets_dir_v2']
     calibration_path.mkdir(parents=True, exist_ok=True)
 
     parent_id = _get_parent_identifier(labware.parent)
@@ -894,7 +894,7 @@ def _get_path_to_labware(load_name: str, namespace: str, version: int) -> Path:
         # all labware in OPENTRONS_NAMESPACE is bundled in wheel
         return STANDARD_DEFS_PATH / load_name / f'{version}.json'
 
-    base_path = CONFIG['labware_user_definitions_dir_v4']
+    base_path = CONFIG['labware_user_definitions_dir_v2']
     def_path = base_path / namespace / load_name / f'{version}.json'
     return def_path
 
@@ -939,7 +939,7 @@ def save_definition(
 
 
 def delete_all_custom_labware() -> None:
-    custom_def_dir = CONFIG['labware_user_definitions_dir_v4']
+    custom_def_dir = CONFIG['labware_user_definitions_dir_v2']
     if custom_def_dir.is_dir():
         shutil.rmtree(custom_def_dir)
 
@@ -1043,7 +1043,7 @@ def clear_calibrations():
     Delete all calibration files for labware. This includes deleting tip-length
     data for tipracks.
     """
-    calibration_path = CONFIG['labware_calibration_offsets_dir_v4']
+    calibration_path = CONFIG['labware_calibration_offsets_dir_v2']
     try:
         targets = [
             f for f in calibration_path.iterdir() if f.suffix == '.json']

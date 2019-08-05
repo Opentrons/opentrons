@@ -54,7 +54,7 @@ minimalLabwareDef = {
 
 
 def path(calibration_name):
-    return config.CONFIG['labware_calibration_offsets_dir_v4']\
+    return config.CONFIG['labware_calibration_offsets_dir_v2']\
         / '{}.json'.format(calibration_name)
 
 
@@ -189,7 +189,7 @@ def test_wells_rebuilt_with_offset():
 
 
 def test_clear_calibrations():
-    calpath = config.CONFIG['labware_calibration_offsets_dir_v4']
+    calpath = config.CONFIG['labware_calibration_offsets_dir_v2']
     with open(calpath/'1.json', 'w') as offset_file:
         test_offset = {
             "default": {
