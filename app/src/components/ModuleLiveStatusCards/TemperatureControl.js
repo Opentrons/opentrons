@@ -1,7 +1,8 @@
 // @flow
 import React, { useState } from 'react'
-import { OutlineButton } from '@opentrons/components'
+import { OutlineButton, AlertModal, InputField } from '@opentrons/components'
 import type { ThermocyclerModule, ModuleCommandRequest } from '../../robot-api'
+import { Portal } from '../portal'
 import styles from './styles.css'
 
 type Props = {
@@ -10,27 +11,60 @@ type Props = {
 }
 const TemperatureControl = ({ module, sendModuleCommand }: Props) => {
   const [temperatureInput, setTemperatureInput] = useState('')
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   const hasTarget = module.status !== 'idle'
   const handleClick = () => {
-    const body = hasTarget
-      ? { command_type: 'deactivate' }
-      : {
-          command_type: 'set_temperature',
-          args: [Number(temperatureInput)],
-        }
-    sendModuleCommand(module.serial, body)
+    if (hasTarget) {
+      sendModuleCommand(module.serial, { command_type: 'deactivate' })
+    } else {
+      setIsModalOpen(true)
+    }
+  }
+
+  const handleSubmitTemp = () => {
+    sendModuleCommand(module.serial, {
+      command_type: 'set_temperature',
+      args: [Number(temperatureInput)],
+    })
+    setIsModalOpen(false)
   }
   return (
     <>
-      {!hasTarget && (
-        <input
-          className={styles.target_input}
-          value={temperatureInput}
-          onChange={e => setTemperatureInput(e.target.value)}
-        />
+      {!hasTarget && isModalOpen && (
+        <Portal>
+          <AlertModal
+            heading="Set Thermocycler Module Base Temp"
+            iconName="None"
+            buttons={[
+              {
+                children: 'Cancel',
+                onClick: () => setIsModalOpen(false),
+              },
+              {
+                children: 'Save',
+                onClick: handleSubmitTemp,
+              },
+            ]}
+            alertOverlay
+          >
+            <p>Pre heat or cool Thermocycler Module base temperature.</p>
+            <div className={styles.set_temp_field}>
+              <label className={styles.set_temp_label}>Set Target Temp:</label>
+              <InputField
+                className={styles.set_temp_input}
+                units="°C"
+                value={temperatureInput}
+                onChange={e => setTemperatureInput(e.target.value)}
+              />
+            </div>
+          </AlertModal>
+        </Portal>
       )}
-      <OutlineButton onClick={handleClick}>
+      <OutlineButton
+        onClick={handleClick}
+        className={styles.temp_control_button}
+      >
         {hasTarget ? 'Deactivate' : 'Set Temp'}
       </OutlineButton>
     </>
