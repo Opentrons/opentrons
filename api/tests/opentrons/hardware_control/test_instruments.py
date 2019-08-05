@@ -166,6 +166,21 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
     await sim.cache_instruments({types.Mount.LEFT: 'p300_multi'})
 
 
+async def test_prep_aspirate(dummy_instruments, loop):
+    hw_api = hc.API.build_hardware_simulator(
+        attached_instruments=dummy_instruments, loop=loop)
+    await hw_api.home()
+    await hw_api.cache_instruments()
+    # If we're empty and haven't prepared, we should get an error
+    with pytest.raises(RuntimeError):
+        await hw_api.aspirate(types.Mount.LEFT, 1, 1.0)
+    # If we're empty and have prepared, we should be fine
+    await hw_api.prepare_for_aspirate(types.Mount.LEFT)
+    await hw_api.aspirate(types.Mount.LEFT, 1)
+    # If we're not empty, we should be fine
+    await hw_api.aspirate(types.Mount.LEFT, 1)
+
+
 async def test_aspirate_new(dummy_instruments, loop):
     hw_api = hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments, loop=loop)
@@ -173,6 +188,7 @@ async def test_aspirate_new(dummy_instruments, loop):
     await hw_api.cache_instruments()
     aspirate_ul = 3.0
     aspirate_rate = 2
+    await hw_api.prepare_for_aspirate(types.Mount.LEFT)
     await hw_api.aspirate(types.Mount.LEFT, aspirate_ul, aspirate_rate)
     new_plunger_pos = 6.05285
     pos = await hw_api.current_position(types.Mount.LEFT)
@@ -186,6 +202,7 @@ async def test_aspirate_old(dummy_instruments, loop, old_aspiration):
     await hw_api.cache_instruments()
     aspirate_ul = 3.0
     aspirate_rate = 2
+    await hw_api.prepare_for_aspirate(types.Mount.LEFT)
     await hw_api.aspirate(types.Mount.LEFT, aspirate_ul, aspirate_rate)
     new_plunger_pos = 5.660769
     pos = await hw_api.current_position(types.Mount.LEFT)
@@ -200,6 +217,7 @@ async def test_dispense(dummy_instruments, loop):
     await hw_api.cache_instruments()
     aspirate_ul = 10.0
     aspirate_rate = 2
+    await hw_api.prepare_for_aspirate(types.Mount.LEFT)
     await hw_api.aspirate(types.Mount.LEFT, aspirate_ul, aspirate_rate)
 
     dispense_1 = 3.0
@@ -266,6 +284,7 @@ async def test_aspirate_flow_rate(dummy_instruments, loop, monkeypatch):
     mock_move_plunger.side_effect = instant_future
     monkeypatch.setattr(hw_api, '_move_plunger', mock_move_plunger)
     pip = hw_api._attached_instruments[mount]
+    await hw_api.prepare_for_aspirate(types.Mount.LEFT)
     await hw_api.aspirate(types.Mount.LEFT, 2)
     assert mock_move_plunger.called_with(
         mount,
@@ -274,6 +293,7 @@ async def test_aspirate_flow_rate(dummy_instruments, loop, monkeypatch):
             pip, pip.config.aspirate_flow_rate, 'aspirate')
     )
     mock_move_plunger.reset_mock()
+    await hw_api.prepare_for_aspirate(types.Mount.LEFT)
     await hw_api.aspirate(types.Mount.LEFT, 2, rate=0.5)
     assert mock_move_plunger.called_with(
         mount,
@@ -283,6 +303,7 @@ async def test_aspirate_flow_rate(dummy_instruments, loop, monkeypatch):
     )
     mock_move_plunger.reset_mock()
     hw_api.set_flow_rate(mount, aspirate=1)
+    await hw_api.prepare_for_aspirate(types.Mount.LEFT)
     await hw_api.aspirate(types.Mount.LEFT, 2)
     assert mock_move_plunger.called_with(
         mount,
@@ -290,6 +311,7 @@ async def test_aspirate_flow_rate(dummy_instruments, loop, monkeypatch):
         speed=hw_api._plunger_speed(pip, 2, 'aspirate')
     )
     mock_move_plunger.reset_mock()
+    await hw_api.prepare_for_aspirate(types.Mount.LEFT)
     await hw_api.aspirate(types.Mount.LEFT, 2, rate=0.5)
     assert mock_move_plunger.called_with(
         mount,
@@ -298,6 +320,7 @@ async def test_aspirate_flow_rate(dummy_instruments, loop, monkeypatch):
     )
     mock_move_plunger.reset_mock()
     hw_api.set_pipette_speed(mount, aspirate=10)
+    await hw_api.prepare_for_aspirate(types.Mount.LEFT)
     await hw_api.aspirate(types.Mount.LEFT, 1)
     assert mock_move_plunger.called_with(
         mount,
@@ -305,6 +328,7 @@ async def test_aspirate_flow_rate(dummy_instruments, loop, monkeypatch):
         speed=10
     )
     mock_move_plunger.reset_mock()
+    await hw_api.prepare_for_aspirate(types.Mount.LEFT)
     await hw_api.aspirate(types.Mount.LEFT, 1, rate=0.5)
     assert mock_move_plunger.called_with(
         mount,
@@ -319,6 +343,7 @@ async def test_dispense_flow_rate(dummy_instruments, loop, monkeypatch):
     mount = types.Mount.LEFT
     await hw_api.home()
     await hw_api.cache_instruments()
+    await hw_api.prepare_for_aspirate(types.Mount.LEFT)
     await hw_api.aspirate(mount, 10)
     mock_move_plunger = mock.Mock()
 
@@ -395,6 +420,7 @@ async def test_blowout_flow_rate(dummy_instruments, loop, monkeypatch):
     monkeypatch.setattr(hw_api, '_move_plunger', mock_move_plunger)
     pip = hw_api._attached_instruments[mount]
 
+    await hw_api.prepare_for_aspirate(mount)
     await hw_api.aspirate(mount, 10)
     mock_move_plunger.reset_mock()
     await hw_api.blow_out(mount)
@@ -407,6 +433,7 @@ async def test_blowout_flow_rate(dummy_instruments, loop, monkeypatch):
     mock_move_plunger.reset_mock()
 
     hw_api.set_flow_rate(mount, blow_out=2)
+    await hw_api.prepare_for_aspirate(mount)
     await hw_api.aspirate(mount, 10)
     mock_move_plunger.reset_mock()
     await hw_api.blow_out(types.Mount.LEFT)
@@ -418,6 +445,7 @@ async def test_blowout_flow_rate(dummy_instruments, loop, monkeypatch):
     mock_move_plunger.reset_mock()
 
     hw_api.set_pipette_speed(mount, blow_out=15)
+    await hw_api.prepare_for_aspirate(mount)
     await hw_api.aspirate(types.Mount.LEFT, 10)
     mock_move_plunger.reset_mock()
     await hw_api.blow_out(types.Mount.LEFT)

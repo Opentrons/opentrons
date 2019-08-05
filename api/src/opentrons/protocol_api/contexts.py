@@ -566,30 +566,47 @@ class InstrumentContext(CommandPublisher):
 
         if isinstance(location, Well):
             point, well = location.bottom()
-            loc = types.Location(
+            dest = types.Location(
                 point + types.Point(0, 0, self.well_bottom_clearance),
                 well)
-            self.move_to(loc)
         elif isinstance(location, types.Location):
-            loc = location
-            self.move_to(location)
+            dest = location
         elif location is not None:
             raise TypeError(
                 'location should be a Well or Location, but it is {}'
                 .format(location))
         elif self._ctx.location_cache:
-            loc = self._ctx.location_cache
+            dest = self._ctx.location_cache
         else:
             raise RuntimeError(
                 "If aspirate is called without an explicit location, another"
                 " method that moves to a location (such as move_to or "
                 "dispense) must previously have been called so the robot "
                 "knows where it is.")
+
+        if self.current_volume == 0:
+            # Make sure we're at the top of the labware and clear of any
+            # liquid to prepare the pipette for aspiration
+            if isinstance(dest.labware, Well):
+                self.move_to(dest.labware.top())
+            else:
+                # TODO(seth,2019/7/29): This should be a warning exposed via
+                # rpc to the runapp
+                self._log.warning(
+                    "When aspirate is called on something other than a well"
+                    " relative position, we can't move to the top of the well"
+                    " to prepare for aspiration. This might cause over "
+                    " aspiration if the previous command is a blow_out.")
+            self._hw_manager.hardware.prepare_for_aspirate(self._mount)
+            self.move_to(dest)
+        elif dest != self._ctx.location_cache:
+            self.move_to(dest)
+
         cmds.do_publish(self.broker, cmds.aspirate, self.aspirate,
-                        'before', None, None, self, volume, loc, rate)
+                        'before', None, None, self, volume, dest, rate)
         self._hw_manager.hardware.aspirate(self._mount, volume, rate)
         cmds.do_publish(self.broker, cmds.aspirate, self.aspirate,
-                        'after', self, None, self, volume, loc, rate)
+                        'after', self, None, self, volume, dest, rate)
         return self
 
     def dispense(self,
