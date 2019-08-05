@@ -188,6 +188,7 @@ Transfer.max_volume.__doc__ = """
     tips. If ``None``, use default max volume of the pipette.
     """
 
+
 class PickUpTipOpts(NamedTuple):
     """
     Options to customize :py:attr:`.Transfer.new_tip`.
@@ -411,7 +412,8 @@ class TransferPlan:
         self._mix_after_opts = self._options.mix.mix_after
         if self._strategy.max_volume is None:
             self._strategy = self._strategy._replace(
-                max_volume=instr.working_volume)
+                max_volume=instr._hw_manager.hardware._attached_instruments[
+                    instr._mount].working_volume)
 
         if not mode:
             if len(sources) < len(dests):

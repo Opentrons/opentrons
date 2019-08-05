@@ -128,14 +128,15 @@ class Pipette:
         return (self._current_tip_length
                 - self._instrument_offset.z)
 
-    def set_working_volume(self, tip_volume: float):
-        """ The working volume is the current tip max volume """
-        self._working_volume = min(self.config.max_volume, tip_volume)
-
     @property
     def working_volume(self) -> float:
         """ The working volume of the pipette """
         return self._working_volume
+
+    @working_volume.setter
+    def working_volume(self, tip_volume: float):
+        """ The working volume is the current tip max volume """
+        self._working_volume = min(self.config.max_volume, tip_volume)
 
     @property
     def available_volume(self) -> float:

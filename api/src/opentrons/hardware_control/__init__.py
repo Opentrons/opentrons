@@ -1118,7 +1118,7 @@ class API(HardwareAPILike):
         self._log.info(
             "Updating working volume on pipette mount: {}, tip volume: {} ul"
             .format(mount, tip_volume))
-        instr.set_working_volume(tip_volume)
+        instr.working_volume = tip_volume
 
     @_log_call
     async def drop_tip(self, mount, home_after=True):
