@@ -453,9 +453,9 @@ def test_touchtip_mix(_instr_labware):
     # ========== Consolidate ==========
     consd_plan = tx.TransferPlan(
         60, lw1.columns()[1], lw2.rows()[1][1],
-         _instr_labware['instr'],
-         max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
-         options=options)
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        options=options)
     consd_plan_list = []
     for step in consd_plan:
         consd_plan_list.append(step)
@@ -559,8 +559,10 @@ def test_oversized_distribute(_instr_labware):
     lw1 = _instr_labware['lw1']
     lw2 = _instr_labware['lw2']
 
-    xfer_plan = tx.TransferPlan(700, lw1.columns()[0][0], lw2.rows()[0][1:3],
-                                _instr_labware['instr'])
+    xfer_plan = tx.TransferPlan(
+        700, lw1.columns()[0][0], lw2.rows()[0][1:3],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'])
     xfer_plan_list = []
     for step in xfer_plan:
         xfer_plan_list.append(step)
@@ -598,10 +600,11 @@ def test_oversized_consolidate(_instr_labware):
     lw1 = _instr_labware['lw1']
     lw2 = _instr_labware['lw2']
 
-    xfer_plan = tx.TransferPlan(700,
-                                lw2.rows()[0][1:3],
-                                lw1.wells_by_index()['A1'],
-                                _instr_labware['instr'])
+    xfer_plan = tx.TransferPlan(
+        700, lw2.rows()[0][1:3],
+        lw1.wells_by_index()['A1'],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'])
     xfer_plan_list = []
     for step in xfer_plan:
         xfer_plan_list.append(step)
@@ -639,8 +642,10 @@ def test_oversized_transfer(_instr_labware):
     lw1 = _instr_labware['lw1']
     lw2 = _instr_labware['lw2']
 
-    xfer_plan = tx.TransferPlan(700, lw2.rows()[0][1:3], lw1.columns()[0][1:3],
-                                _instr_labware['instr'])
+    xfer_plan = tx.TransferPlan(
+        700, lw2.rows()[0][1:3], lw1.columns()[0][1:3],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'])
     xfer_plan_list = []
     for step in xfer_plan:
         xfer_plan_list.append(step)
