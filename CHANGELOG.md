@@ -293,7 +293,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **api:** Fix mistakenly-changed pick up current for p10s1.4 ([#3155](https://github.com/opentrons/opentrons/issues/3155)) ([7474752](https://github.com/opentrons/opentrons/commit/7474752))
 * **api:** Fix the mount calibration pipette control ([#3228](https://github.com/opentrons/opentrons/issues/3228)) ([962b0a7](https://github.com/opentrons/opentrons/commit/962b0a7))
 * **api:** Manually publish to broker in param-mangling commands ([#3159](https://github.com/opentrons/opentrons/issues/3159)) ([17e86bf](https://github.com/opentrons/opentrons/commit/17e86bf)), closes [#3105](https://github.com/opentrons/opentrons/issues/3105)
-* **docs:** Catch some last api v2 references ([#3224](https://github.com/opentrons/opentrons/issues/3224)) ([f1940c6](https://github.com/opentrons/opentrons/commit/f1940c6))
+* **docs:** Catch some last api v4 references ([#3224](https://github.com/opentrons/opentrons/issues/3224)) ([f1940c6](https://github.com/opentrons/opentrons/commit/f1940c6))
 * **docs:** Fix broken support link in docs ([#3230](https://github.com/opentrons/opentrons/issues/3230)) ([95663fe](https://github.com/opentrons/opentrons/commit/95663fe))
 * **docs:** Fix typo and clarify intro in docs, deploy on edge ([#3154](https://github.com/opentrons/opentrons/issues/3154)) ([0e2c994](https://github.com/opentrons/opentrons/commit/0e2c994))
 * **protocol-designer:** fix drop tip offset bug ([#3126](https://github.com/opentrons/opentrons/issues/3126)) ([6db63f4](https://github.com/opentrons/opentrons/commit/6db63f4)), closes [#3122](https://github.com/opentrons/opentrons/issues/3122) [#3123](https://github.com/opentrons/opentrons/issues/3123)
