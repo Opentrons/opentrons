@@ -8,6 +8,7 @@ import InstallModal from './InstallModal'
 import {
   startBuildrootUpdate,
   setBuildrootUpdateSeen,
+  buildrootUpdateIgnored,
   getBuildrootSession,
   clearBuildrootSession,
   getRobotSystemType,
@@ -32,8 +33,8 @@ export default function UpdateBuildroot(props: Props) {
 
   // set update seen on component mount
   React.useEffect(() => {
-    dispatch(setBuildrootUpdateSeen())
-  }, [dispatch])
+    dispatch(setBuildrootUpdateSeen(robotName))
+  }, [dispatch, robotName])
 
   // clear buildroot state on component dismount if done
   React.useEffect(() => {
@@ -45,6 +46,11 @@ export default function UpdateBuildroot(props: Props) {
   }, [dispatch, step, error])
 
   const goToViewUpdate = React.useCallback(() => setViewUpdateInfo(true), [])
+
+  const ignoreUpdate = React.useCallback(() => {
+    dispatch(buildrootUpdateIgnored(robotName))
+    close()
+  }, [dispatch, robotName, close])
 
   const installUpdate = React.useCallback(
     () => dispatch(startBuildrootUpdate(robotName)),
@@ -70,7 +76,7 @@ export default function UpdateBuildroot(props: Props) {
       <VersionInfoModal
         robot={robot}
         robotUpdateType={robotUpdateType}
-        close={close}
+        close={ignoreUpdate}
         proceed={goToViewUpdate}
       />
     )
@@ -78,9 +84,10 @@ export default function UpdateBuildroot(props: Props) {
 
   return (
     <ViewUpdateModal
+      robotName={robotName}
       robotUpdateType={robotUpdateType}
       robotSystemType={robotSystemType}
-      close={close}
+      close={ignoreUpdate}
       proceed={installUpdate}
     />
   )

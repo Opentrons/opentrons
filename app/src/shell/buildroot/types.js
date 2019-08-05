@@ -1,5 +1,5 @@
 // @flow
-import type { RobotHost } from '../../robot-api'
+import type { RobotHost } from '../../robot-api/types'
 
 export type BuildrootUpdateType = 'upgrade' | 'downgrade' | 'reinstall'
 
@@ -75,7 +75,9 @@ export type BuildrootAction =
   | {| type: 'buildroot:DOWNLOAD_ERROR', payload: string |}
   | {| type: 'buildroot:UPDATE_INFO', payload: BuildrootUpdateInfo | null |}
   | {| type: 'buildroot:USER_FILE_INFO', payload: BuildrootUserFileInfo |}
-  | {| type: 'buildroot:SET_UPDATE_SEEN' |}
+  | {| type: 'buildroot:SET_UPDATE_SEEN', meta: {| robotName: string |} |}
+  | {| type: 'buildroot:CHANGELOG_SEEN', meta: {| robotName: string |} |}
+  | {| type: 'buildroot:UPDATE_IGNORED', meta: {| robotName: string |} |}
   | {|
       type: 'buildroot:START_PREMIGRATION',
       payload: RobotHost,

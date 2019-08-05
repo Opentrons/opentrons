@@ -135,11 +135,13 @@ export type SessionResponseAction = {|
     protocolText: string,
     metadata?: ?$PropertyType<ProtocolData, 'metadata'>,
   |},
+  meta: {| freshUpload: boolean |},
 |}
 
 export type SessionErrorAction = {|
   type: 'robot:SESSION_ERROR',
   payload: {| error: Error |},
+  meta: {| freshUpload: boolean |},
 |}
 
 export type SessionUpdateAction = {|
@@ -250,11 +252,16 @@ export const actions = {
   sessionResponse(
     error: ?Error,
     // TODO(mc, 2018-01-23): type Session (see reducers/session.js)
-    session: any
+    session: any,
+    freshUpload: boolean
   ): SessionResponseAction | SessionErrorAction {
-    if (error) return { type: 'robot:SESSION_ERROR', payload: { error } }
+    const meta = { freshUpload }
 
-    return { type: 'robot:SESSION_RESPONSE', payload: session }
+    if (error) {
+      return { type: 'robot:SESSION_ERROR', payload: { error }, meta }
+    }
+
+    return { type: 'robot:SESSION_RESPONSE', payload: session, meta }
   },
 
   sessionUpdate(update: SessionUpdate): SessionUpdateAction {

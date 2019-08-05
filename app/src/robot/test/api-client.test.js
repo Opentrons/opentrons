@@ -306,16 +306,20 @@ describe('api client', () => {
     let expectedInitial
 
     beforeEach(() => {
-      expectedInitial = actions.sessionResponse(null, {
-        name: session.name,
-        state: session.state,
-        protocolText: session.protocol_text,
-        protocolCommands: [],
-        protocolCommandsById: {},
-        pipettesByMount: {},
-        labwareBySlot: {},
-        modulesBySlot: {},
-      })
+      expectedInitial = actions.sessionResponse(
+        null,
+        {
+          name: session.name,
+          state: session.state,
+          protocolText: session.protocol_text,
+          protocolCommands: [],
+          protocolCommandsById: {},
+          pipettesByMount: {},
+          labwareBySlot: {},
+          modulesBySlot: {},
+        },
+        false
+      )
     })
 
     test('dispatches sessionResponse on connect', () => {
@@ -334,7 +338,11 @@ describe('api client', () => {
     })
 
     test('handles connnect without session', () => {
-      const notExpected = actions.sessionResponse(null, expect.anything())
+      const notExpected = actions.sessionResponse(
+        null,
+        expect.anything(),
+        false
+      )
 
       sessionManager.session = null
 
@@ -355,7 +363,8 @@ describe('api client', () => {
             3: { id: 3, description: 'd', handledAt: null, children: [] },
             4: { id: 4, description: 'e', handledAt: null, children: [] },
           },
-        })
+        }),
+        false
       )
 
       session.commands = [
@@ -386,7 +395,7 @@ describe('api client', () => {
       )
     })
 
-    test('maps api instruments and intruments by mount', () => {
+    test('maps api instruments and instruments by mount', () => {
       const expected = actions.sessionResponse(
         null,
         expect.objectContaining({
@@ -406,7 +415,8 @@ describe('api client', () => {
               volume: 50,
             },
           },
-        })
+        }),
+        false
       )
 
       session.instruments = [
@@ -435,7 +445,8 @@ describe('api client', () => {
             5: { _id: 2, slot: '5', name: 'b', type: 'B', isTiprack: false },
             9: { _id: 3, slot: '9', name: 'c', type: 'C', isTiprack: false },
           },
-        })
+        }),
+        false
       )
 
       session.containers = [
@@ -474,7 +485,8 @@ describe('api client', () => {
               name: 'magdeck',
             },
           },
-        })
+        }),
+        false
       )
 
       session.modules = [
@@ -505,7 +517,8 @@ describe('api client', () => {
             author: 'baz',
             source: 'qux',
           },
-        })
+        }),
+        false
       )
 
       session.metadata = {
@@ -525,7 +538,7 @@ describe('api client', () => {
     })
 
     test('sends error if received malformed session from API', () => {
-      const expected = actions.sessionResponse(expect.anything())
+      const expected = actions.sessionResponse(expect.anything(), null, false)
 
       session.commands = [{ foo: 'bar' }]
       session.command_log = null
