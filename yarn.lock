@@ -2317,6 +2317,11 @@ asap@^2.0.0, asap@^2.0.6, asap@~2.0.3:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/asap/-/asap-2.0.6.tgz#e50347611d7e690943208bbdafebcbc2fb866d46"
 
+asciichart@^1.5.9:
+  version "1.5.9"
+  resolved "https://registry.yarnpkg.com/asciichart/-/asciichart-1.5.9.tgz#09707b13e2d4cb71b13dd1866fffcd15f76c005c"
+  integrity sha512-1q/HY2qSQ4WvTryixibCX37ST2nqSYnUalVX4HtZtImb8DWRnoGB93hvPkpUypNILLosfMcceICSDYgFCeC2iw==
+
 asn1.js@^4.0.0:
   version "4.9.2"
   resolved "https://registry.yarnpkg.com/asn1.js/-/asn1.js-4.9.2.tgz#8117ef4f7ed87cd8f89044b5bff97ac243a16c9a"

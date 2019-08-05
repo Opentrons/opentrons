@@ -24,6 +24,7 @@
     "@opentrons/components": "3.11.0-alpha.1",
     "@opentrons/shared-data": "3.11.0-alpha.1",
     "@thi.ng/paths": "^1.6.5",
+    "asciichart": "^1.5.9",
     "classnames": "^2.2.5",
     "connected-react-router": "^6.4.0",
     "events": "^3.0.0",
