@@ -2053,7 +2053,7 @@ class ThermocyclerContext(ModuleContext):
         :param repetitions: The number of times to repeat the cycled steps.
         """
         for step in steps:
-            if (isinstance(step, dict) and step.hold_time is None) or (
+            if (isinstance(step, dict) and step['hold_time'] is None) or (
                     isinstance(step, list) and step[1] is None):
                 raise ValueError("hold_time must be defined for each step in cycle")
 
