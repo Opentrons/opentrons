@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import moment from 'moment'
+import cx from 'classnames'
 import { LabeledValue } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
@@ -17,14 +18,14 @@ type TempsItemProps = {
   target: ?number,
 }
 const TempsItem = ({ title, current, target }: TempsItemProps) => (
-  <div>
-    <h5 className={styles.label}>{title}</h5>
+  <div className={styles.temps_item}>
+    <p className={styles.label}>{title}</p>
     <div className={styles.data_row}>
-      <p>Current:</p>
+      <p className={styles.inline_labeled_value}>Current:</p>
       <p>{`${current} °C`}</p>
     </div>
     <div className={styles.data_row}>
-      <p>Target:</p>
+      <p className={styles.inline_labeled_value}>Target:</p>
       <p>{target ? `${target} °C` : 'None'}</p>
     </div>
   </div>
@@ -60,25 +61,38 @@ const ThermocyclerCard = ({ module, sendModuleCommand }: Props) => (
       <CardContentRow>
         <LabeledValue
           label="Cycle #"
+          className={styles.compact_labeled_value}
           value={`${module.data.currentCycleIndex} / ${
             module.data.totalCycleCount
           }`}
         />
         <LabeledValue
           label="Step #"
+          className={styles.compact_labeled_value}
           value={`${module.data.currentStepIndex} / ${
             module.data.totalStepCount
           }`}
         />
-        <LabeledValue
-          label="Time remaining for step"
-          value={`${moment
-            .utc(
-              // NOTE: moment still doesn't allow duration formatting, hence fake moment creation
-              moment.duration(module.data.holdTime, 'seconds').asMilliseconds()
-            )
-            .format('HH:mm:ss')}`}
-        />
+        <span
+          className={cx(
+            styles.inline_labeled_value,
+            styles.time_remaining_wrapper
+          )}
+        >
+          <p className={styles.time_remaining_label}>
+            Time remaining for step:
+          </p>
+          <p>
+            {`${moment
+              .utc(
+                // NOTE: moment still doesn't allow duration formatting, hence fake moment creation
+                moment
+                  .duration(module.data.holdTime, 'seconds')
+                  .asMilliseconds()
+              )
+              .format('HH:mm:ss')}`}
+          </p>
+        </span>
       </CardContentRow>
     )}
   </StatusCard>

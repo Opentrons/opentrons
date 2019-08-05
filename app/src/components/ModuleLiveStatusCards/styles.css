@@ -47,10 +47,44 @@ updated component library cards after redesign/refactor
 .data_row {
   display: flex;
   justify-content: space-between;
-  margin-right: 1rem;
+  margin-right: 3rem;
 }
 
-.target_input {
+.compact_labeled_value > p{
+  margin-bottom: 0;
+}
+
+.inline_labeled_value {
+  @apply --font-body-1-dark;
+
+  display: flex;
+}
+
+.time_remaining_wrapper {
+  margin-top: 0.5rem;
+}
+
+.time_remaining_label {
+  margin-right: 1rem;
+  font-weight: var(--fw-semibold);
+}
+
+.temp_control_button {
+  width: 7rem;
+}
+
+.set_temp_field {
+  display: flex;
+  flex-direction: column;
+}
+
+.set_temp_label {
+  @apply --font-body-1-dark;
+
+  font-weight: var(--fw-semibold);
+}
+
+.set_temp_input {
   @apply --font-form-default;
 
   width: 8rem;

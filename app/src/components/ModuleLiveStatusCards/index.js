@@ -45,14 +45,32 @@ type Props = {|
 
 const ModuleLiveStatusCards = (props: Props) => {
   const { liveStatusModules, fetchModules, sendModuleCommand } = props
-  if (liveStatusModules.length === 0) return null
+  // if (liveStatusModules.length === 0) return null
 
+  const stubs = [
+    {
+      serial: 'dummySerial',
+      status: 'idle',
+      name: 'thermocycler',
+      data: {
+        lidTemp: 30,
+        currentTemp: 40,
+        targetTemp: 90,
+        lidTarget: 22,
+        totalCycleCount: 10,
+        currentCycleIndex: 1,
+        totalStepCount: 3,
+        currentStepIndex: 1,
+      },
+    },
+  ]
   return (
     <IntervalWrapper
       refresh={fetchModules}
       interval={POLL_TEMPDECK_INTERVAL_MS}
     >
-      {liveStatusModules.map(module => {
+      {/* {liveStatusModules.map(module => { */}
+      {stubs.map(module => {
         switch (module.name) {
           case 'tempdeck':
             return (
