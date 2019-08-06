@@ -77,7 +77,6 @@ updated component library cards after redesign/refactor
   display: flex;
   flex-direction: column;
   width: 8rem;
-  height: 2.3rem;
 }
 
 .set_temp_label {
