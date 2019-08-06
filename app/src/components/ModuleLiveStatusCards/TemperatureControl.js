@@ -34,15 +34,15 @@ const TemperatureControl = ({ module, sendModuleCommand }: Props) => {
     })
     setIsModalOpen(false)
   }
-  const alertBody = `Pre heat or cool ${getModuleDisplayName(
-    module.name
-  )} base temperature.`
+
+  const displayName = getModuleDisplayName(module.name)
+  const alertBody = `Pre heat or cool ${displayName} base temperature.`
   return (
     <>
       {!hasTarget && isModalOpen && (
         <Portal>
           <AlertModal
-            heading="Set Thermocycler Module Base Temp"
+            heading={`Set ${displayName} Base Temp`}
             iconName={null}
             buttons={[
               {
