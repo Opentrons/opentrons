@@ -10,7 +10,7 @@ import {
 import { SidePanel, SidePanelGroup } from '@opentrons/components'
 import RunTimer from './RunTimer'
 import RunControls from './RunControls'
-import ModuleLiveStatusCards from '../ModuleLiveStatusCards'
+import TempDeckStatusCard from '../TempDeckStatusCard'
 
 import type { State, Dispatch } from '../../types'
 
@@ -61,7 +61,7 @@ function RunPanel(props: Props) {
         <RunTimer startTime={props.startTime} runTime={props.runTime} />
         <RunControls {...props} />
       </SidePanelGroup>
-      <ModuleLiveStatusCards />
+      <TempDeckStatusCard />
     </SidePanel>
   )
 }

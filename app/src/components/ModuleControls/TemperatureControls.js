@@ -6,10 +6,10 @@ import TempField from './TempField'
 
 import styles from './styles.css'
 
-import type { ModuleCommandRequest } from '../../robot-api'
+import type { SetTemperatureRequest } from '../../robot-api'
 
 type Props = {
-  setTemp: (request: ModuleCommandRequest) => mixed,
+  setTemp: (request: SetTemperatureRequest) => mixed,
 }
 
 export default class TemperatureControls extends React.Component<Props> {

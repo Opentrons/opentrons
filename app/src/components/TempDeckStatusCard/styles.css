@@ -1,0 +1,45 @@
+@import '@opentrons/components';
+
+/*
+TODO (ka 2018-7-25): These components and thier styles should be replaced width
+updated component library cards after redesign/refactor
+*/
+
+.status_card {
+  position: relative;
+  margin-top: 1rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.33);
+}
+
+.card_title {
+  @apply --font-body-2-dark;
+
+  padding: 1rem 0.5rem 0;
+  font-weight: --fw-bold;
+  text-transform: uppercase;
+}
+
+.card_row {
+  padding: 1rem 0.5rem;
+  text-align: justify;
+  font-size: var(--fs-body-1);
+}
+
+.card_row:not(:last-child) {
+  border-bottom: var(--bd-light);
+  border-bottom-width: 1px;
+}
+
+.card_row > div {
+  display: inline-block;
+  min-width: 50%;
+}
+
+.label {
+  text-transform: capitalize;
+  font-weight: var(--fw-semibold);
+}
+
+.value {
+  text-transform: capitalize;
+}

@@ -46,24 +46,7 @@ export type MagDeckData = {|
   engaged: boolean,
 |}
 
-export type ThermocyclerData = {|
-  lid: 'open' | 'closed',
-  lidTarget: ?number,
-  lidTemp: number,
-  currentTemp: number,
-  targetTemp: ?number,
-  holdTime: ?number,
-  rampRate: ?number,
-|}
-
-export type ThermocyclerModule = {|
-  ...BaseModule,
-  name: 'thermocycler',
-  displayName: 'Thermocycler Module',
-  data: ThermocyclerData,
-|}
-
-export type ModuleCommandRequest = {|
+export type SetTemperatureRequest = {|
   command_type: 'set_temperature' | 'deactivate',
   args?: Array<number>,
 |}

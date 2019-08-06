@@ -15,7 +15,7 @@ import type { State as AppState, ActionLike } from '../../types'
 import type { RobotHost, RobotApiAction } from '../types'
 import type {
   Module,
-  ModuleCommandRequest,
+  SetTemperatureRequest,
   ModulesState as State,
 } from './types'
 
@@ -53,7 +53,7 @@ export const fetchModuleData = (
 export const setTargetTemp = (
   host: RobotHost,
   id: string,
-  body: ModuleCommandRequest
+  body: SetTemperatureRequest
 ): RobotApiAction => ({
   type: SET_MODULE_TARGET_TEMP,
   payload: { host, body, method: POST, path: `/modules/${id}` },
