@@ -1,6 +1,7 @@
 // @flow
 import React, { useState } from 'react'
 import { OutlineButton, AlertModal, InputField } from '@opentrons/components'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 import type { ThermocyclerModule, ModuleCommandRequest } from '../../robot-api'
 import { Portal } from '../portal'
 import styles from './styles.css'
@@ -29,6 +30,9 @@ const TemperatureControl = ({ module, sendModuleCommand }: Props) => {
     })
     setIsModalOpen(false)
   }
+  const alertBody = `Pre heat or cool ${getModuleDisplayName(
+    module.name
+  )} base temperature.`
   return (
     <>
       {!hasTarget && isModalOpen && (
@@ -48,7 +52,7 @@ const TemperatureControl = ({ module, sendModuleCommand }: Props) => {
             ]}
             alertOverlay
           >
-            <p>Pre heat or cool Thermocycler Module base temperature.</p>
+            <p>{alertBody}</p>
             <div className={styles.set_temp_field}>
               <label className={styles.set_temp_label}>Set Target Temp:</label>
               <InputField

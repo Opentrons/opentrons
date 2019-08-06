@@ -9,6 +9,7 @@ import {
   setTargetTemp,
   type ModuleCommandRequest,
 } from '../../robot-api'
+import { selectors as robotSelectors } from '../../robot'
 
 import { IntervalWrapper } from '@opentrons/components'
 
@@ -26,6 +27,7 @@ const LIVE_STATUS_MODULES = ['magdeck', 'tempdeck', 'thermocycler']
 type SP = {|
   _robot: ?Robot,
   liveStatusModules: Array<TempDeckModule | ThermocyclerModule>,
+  isProtocolActive: boolean,
 |}
 
 type DP = {|
@@ -39,31 +41,20 @@ type DP = {|
 
 type Props = {|
   liveStatusModules: Array<TempDeckModule | ThermocyclerModule>,
+  isProtocolActive: boolean,
   fetchModules: () => mixed,
   sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
 |}
 
 const ModuleLiveStatusCards = (props: Props) => {
-  const { liveStatusModules, fetchModules, sendModuleCommand } = props
+  const {
+    liveStatusModules,
+    isProtocolActive,
+    fetchModules,
+    sendModuleCommand,
+  } = props
   if (liveStatusModules.length === 0) return null
 
-  // const stubs = [
-  //   {
-  //     serial: 'dummySerial',
-  //     status: 'idle',
-  //     name: 'thermocycler',
-  //     data: {
-  //       lidTemp: 30,
-  //       currentTemp: 40,
-  //       targetTemp: 90,
-  //       lidTarget: 22,
-  //       totalCycleCount: 10,
-  //       currentCycleIndex: 1,
-  //       totalStepCount: 3,
-  //       currentStepIndex: 1,
-  //     },
-  //   },
-  // ]
   return (
     <IntervalWrapper
       refresh={fetchModules}
@@ -77,6 +68,7 @@ const ModuleLiveStatusCards = (props: Props) => {
                 key={module.serial}
                 module={module}
                 sendModuleCommand={sendModuleCommand}
+                isProtocolActive={isProtocolActive}
               />
             )
           case 'thermocycler':
@@ -85,6 +77,7 @@ const ModuleLiveStatusCards = (props: Props) => {
                 key={module.serial}
                 module={module}
                 sendModuleCommand={sendModuleCommand}
+                isProtocolActive={isProtocolActive}
               />
             )
           case 'magdeck':
@@ -108,6 +101,7 @@ function mapStateToProps(state: State): SP {
   return {
     _robot,
     liveStatusModules,
+    isProtocolActive: robotSelectors.getIsActive(state),
   }
 }
 
@@ -121,10 +115,11 @@ function mapDispatchToProps(dispatch: Dispatch): DP {
 
 function mergeProps(stateProps: SP, dispatchProps: DP): Props {
   const { _fetchModules, _sendModuleCommand } = dispatchProps
-  const { _robot, liveStatusModules } = stateProps
+  const { _robot, liveStatusModules, isProtocolActive } = stateProps
 
   return {
     liveStatusModules,
+    isProtocolActive,
     fetchModules: () => _robot && _fetchModules(_robot),
     sendModuleCommand: (serial, request) =>
       _robot && _sendModuleCommand(_robot, serial, request),
