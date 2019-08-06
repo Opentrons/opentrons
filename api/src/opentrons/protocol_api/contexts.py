@@ -2046,15 +2046,17 @@ class ThermocyclerContext(ModuleContext):
         """ For a given number of repetitions, cycle through a list of
         temperatures in degrees C for a set hold time.
 
-        :param steps: List of unique steps that make up a single cycle. Each tuple
-                      in list maps to parameters of the set_temperature method.
+        :param steps: List of unique steps that make up a single cycle.
+                      Each tuple in list maps to parameters of the
+                      set_temperature method.
                       NOTE: hold_time must be defined and finite for each step.
         :param repetitions: The number of times to repeat the cycled steps.
         """
         for step in steps:
             if (isinstance(step, dict) and step['hold_time'] is None) or (
                     isinstance(step, list) and step[1] is None):
-                raise ValueError("hold_time must be defined for each step in cycle")
+                raise ValueError(
+                        "hold_time must be defined for each step in cycle")
         return self._module.cycle_temperatures(
             steps=steps, repetitions=repetitions)
 

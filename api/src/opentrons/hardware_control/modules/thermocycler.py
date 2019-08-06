@@ -1,6 +1,6 @@
 import asyncio
 from . import mod_abc, types
-from typing import Union, Optional, List, Tuple
+from typing import Union, Optional, List
 from opentrons.drivers.thermocycler.driver import (
     Thermocycler as ThermocyclerDriver)
 import logging
@@ -156,7 +156,7 @@ class Thermocycler(mod_abc.AbstractModule):
         self._poller = None
 
         self._running_flag = asyncio.Event(loop=self._loop)
-        self._current_cycle_task: asyncio.Task = None
+        self._current_cycle_task: Optional[asyncio.Task] = None
 
         self._total_cycle_count: Optional[int] = None
         self._current_cycle_index: Optional[int] = None
@@ -198,9 +198,9 @@ class Thermocycler(mod_abc.AbstractModule):
                               steps: List[types.ThermocyclerStep],
                               repetitions: int):
         for rep_idx, rep in enumerate(range(repetitions)):
-            self._current_cycle_index = rep_idx + 1  # because scientists start at 1
+            self._current_cycle_index = rep_idx + 1  # science starts at 1
             for step_idx, step in enumerate(steps):
-                self._current_step_index = step_idx + 1  # because scientists start at 1
+                self._current_step_index = step_idx + 1  # science starts at 1
                 await self._running_flag.wait()
                 if isinstance(step, dict):
                     await self.set_temperature(**step)

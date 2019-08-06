@@ -393,7 +393,6 @@ class API(HardwareAPILike):
         self._backend.pause()
         self._call_on_attached_modules("pause")
 
-
     def pause_with_message(self, message):
         self._log.warning('Pause with message: {}'.format(message))
         for cb in self._callbacks:
