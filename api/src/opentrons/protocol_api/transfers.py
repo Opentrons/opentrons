@@ -359,6 +359,7 @@ class TransferPlan:
                  sources,
                  dests,
                  instr: 'InstrumentContext',
+                 max_volume: float,
                  mode: Optional[str] = None,
                  options: Optional[TransferOptions] = None
                  ) -> None:
@@ -402,6 +403,7 @@ class TransferPlan:
         self._touch_tip_opts = self._options.touch_tip
         self._mix_before_opts = self._options.mix.mix_before
         self._mix_after_opts = self._options.mix.mix_after
+        self._max_volume = max_volume
 
         if not mode:
             if len(sources) < len(dests):
@@ -464,7 +466,7 @@ class TransferPlan:
         for step_vol, (src, dest) in plan_iter:
             if self._strategy.new_tip == types.TransferTipPolicy.ALWAYS:
                 yield self._format_dict('pick_up_tip', kwargs=self._tip_opts)
-            max_vol = self._instr.max_volume - \
+            max_vol = self._max_volume - \
                 self._strategy.disposal_volume - self._strategy.air_gap
             xferred_vol = 0
             while xferred_vol < step_vol:
@@ -534,7 +536,7 @@ class TransferPlan:
                 while (sum(a[0] for a in asp_grouped) +
                        self._strategy.disposal_volume +
                        self._strategy.air_gap +
-                       current_xfer[0]) <= self._instr.max_volume:
+                       current_xfer[0]) <= self._max_volume:
                     asp_grouped.append(current_xfer)
                     current_xfer = next(plan_iter)
             except StopIteration:
@@ -614,7 +616,7 @@ class TransferPlan:
                 while (sum([a[0] for a in asp_grouped]) +
                        self._strategy.disposal_volume +
                        self._strategy.air_gap * len(asp_grouped) +
-                       current_xfer[0]) <= self._instr.max_volume:
+                       current_xfer[0]) <= self._max_volume:
                     asp_grouped.append(current_xfer)
                     current_xfer = next(plan_iter)
             except StopIteration:

@@ -318,7 +318,8 @@ class API(HardwareAPILike):
         configs = ['name', 'min_volume', 'max_volume', 'channels',
                    'aspirate_flow_rate', 'dispense_flow_rate',
                    'pipette_id', 'current_volume', 'display_name',
-                   'tip_length', 'model', 'blow_out_flow_rate']
+                   'tip_length', 'model', 'blow_out_flow_rate',
+                   'working_volume']
         instruments: Dict[top_types.Mount, Pipette.DictType] = {
             top_types.Mount.LEFT: {},
             top_types.Mount.RIGHT: {}
@@ -1111,6 +1112,14 @@ class API(HardwareAPILike):
             await self._shake_off_tips(mount)
 
         await self.retract(mount, instr.config.pick_up_distance)
+
+    def set_working_volume(self, mount, tip_volume):
+        instr = self._attached_instruments[mount]
+        assert instr
+        self._log.info(
+            "Updating working volume on pipette mount: {}, tip volume: {} ul"
+            .format(mount, tip_volume))
+        instr.working_volume = tip_volume
 
     @_log_call
     async def drop_tip(self, mount, home_after=True):

@@ -1045,6 +1045,18 @@ class InstrumentContext(CommandPublisher):
 
         return self
 
+    def _select_tiprack_from_list(
+            self, tip_racks, num_channels) -> Tuple[Labware, Well]:
+        try:
+            tr = tip_racks[0]
+        except IndexError:
+            raise OutOfTipsError
+        next_tip = tr.next_tip(num_channels)
+        if next_tip:
+            return tr, next_tip
+        else:
+            return self._select_tiprack_from_list(tip_racks[1:], num_channels)
+
     def pick_up_tip(  # noqa(C901)
             self, location: Union[types.Location, Well] = None,
             presses: int = None,
@@ -1091,17 +1103,6 @@ class InstrumentContext(CommandPublisher):
         """
         num_channels = self.channels
 
-        def _select_tiprack_from_list(tip_racks) -> Tuple[Labware, Well]:
-            try:
-                tr = tip_racks[0]
-            except IndexError:
-                raise OutOfTipsError
-            next_tip = tr.next_tip(num_channels)
-            if next_tip:
-                return tr, next_tip
-            else:
-                return _select_tiprack_from_list(tip_racks[1:])
-
         if location and isinstance(location, types.Location):
             if isinstance(location.labware, Labware):
                 tiprack = location.labware
@@ -1115,7 +1116,8 @@ class InstrumentContext(CommandPublisher):
             tiprack = location.parent
             target = location
         elif not location:
-            tiprack, target = _select_tiprack_from_list(self.tip_racks)
+            tiprack, target = self._select_tiprack_from_list(
+                self.tip_racks, num_channels)
         else:
             raise TypeError(
                 "If specified, location should be an instance of "
@@ -1133,6 +1135,8 @@ class InstrumentContext(CommandPublisher):
         # Note that the hardware API pick_up_tip action includes homing z after
         cmds.do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
                         'after', self, None, instrument=self, location=target)
+        self._hw_manager.hardware.set_working_volume(
+            self._mount, target.max_volume)
         tiprack.use_tips(target, num_channels)
         self._last_tip_picked_up_from = target
 
@@ -1410,6 +1414,13 @@ class InstrumentContext(CommandPublisher):
         if kwargs.get('blow_out'):
             blow_out = transfers.BlowOutStrategy.TRASH
 
+        if new_tip != types.TransferTipPolicy.NEVER:
+            tr, next_tip = self._select_tiprack_from_list(
+                    self.tip_racks, self.channels)
+            max_volume = min(next_tip.max_volume, self.max_volume)
+        else:
+            max_volume = self.hw_pipette['working_volume']
+
         touch_tip = None
         if kwargs.get('touch_tip'):
             touch_tip = transfers.TouchTipStrategy.ALWAYS
@@ -1435,9 +1446,7 @@ class InstrumentContext(CommandPublisher):
         )
         transfer_options = transfers.TransferOptions(transfer=transfer_args,
                                                      mix=mix_opts)
-
-        self._log.info(f"Transfer options: {transfer_options}")
-        plan = transfers.TransferPlan(volume, source, dest, self,
+        plan = transfers.TransferPlan(volume, source, dest, self, max_volume,
                                       kwargs['mode'], transfer_options)
         self._execute_transfer(plan)
         return self

@@ -176,6 +176,23 @@ def test_return_tip(loop, get_labware_def):
     assert tiprack.wells()[0].has_tip
 
 
+def test_use_filter_tips(loop, get_labware_def):
+    ctx = papi.ProtocolContext(loop)
+    ctx.home()
+
+    tiprack = ctx.load_labware_by_name('opentrons_96_filtertiprack_200ul', 2)
+
+    mount = Mount.LEFT
+
+    instr = ctx.load_instrument('p300_single', mount, tip_racks=[tiprack])
+    pipette: Pipette = ctx._hw_manager.hardware._attached_instruments[mount]
+
+    assert pipette.available_volume == pipette.config.max_volume
+
+    instr.pick_up_tip()
+    assert pipette.available_volume < pipette.config.max_volume
+
+
 def test_pick_up_tip_no_location(loop, get_labware_def):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
@@ -493,7 +510,7 @@ def test_transfer_options(loop, monkeypatch):
             mix_strategy=tf.MixStrategy.BOTH,
             drop_tip_strategy=tf.DropTipStrategy.TRASH,
             blow_out_strategy=tf.BlowOutStrategy.TRASH,
-            touch_tip_strategy=tf.TouchTipStrategy.NEVER
+            touch_tip_strategy=tf.TouchTipStrategy.NEVER,
         ),
         pick_up_tip=tf.PickUpTipOpts(),
         mix=tf.Mix(
