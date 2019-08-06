@@ -180,7 +180,7 @@ def test_use_filter_tips(loop, get_labware_def):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
 
-    tiprack = ctx.load_labware_by_name('opentrons_96_tiprack_10ul', 2)
+    tiprack = ctx.load_labware_by_name('opentrons_96_filtertiprack_200ul', 2)
 
     mount = Mount.LEFT
 
@@ -191,11 +191,6 @@ def test_use_filter_tips(loop, get_labware_def):
 
     instr.pick_up_tip()
     assert pipette.available_volume < pipette.config.max_volume
-    instr.drop_tip()
-
-    plate = ctx.load_labware_by_name('biorad_96_wellplate_200ul_pcr', 1)
-    instr.pick_up_tip()
-    instr.transfer(30, plate.wells('A1'), plate.wells('A2'), new_tip='never')
 
 
 def test_pick_up_tip_no_location(loop, get_labware_def):
