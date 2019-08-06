@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 
-import { ScrollableAlertModal } from '../../modals'
+import { AlertModal } from '@opentrons/components'
 import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
@@ -28,7 +28,7 @@ export default function MigrationWarningModal(props: Props) {
   ]
 
   return (
-    <ScrollableAlertModal
+    <AlertModal
       heading={HEADING}
       buttons={buttons}
       restrictOuterScroll={false}
@@ -50,6 +50,6 @@ export default function MigrationWarningModal(props: Props) {
           discoverable via USB or Wi-Fi throughout the entire migration process.
         </p>
       </div>
-    </ScrollableAlertModal>
+    </AlertModal>
   )
 }

@@ -33,7 +33,10 @@ export default function ViewUpdateModal(props: Props) {
     setShowMigrationWarning,
   ] = React.useState<boolean>(robotSystemType === 'balena')
 
-  const notNowButton = { onClick: close, children: 'not now' }
+  const notNowButton = {
+    onClick: close,
+    children: downloadError !== null ? 'close' : 'not now',
+  }
   const showReleaseNotes = robotUpdateType === 'upgrade'
 
   React.useLayoutEffect(() => {
