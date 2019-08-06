@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+<a name="3.11.0-alpha.0"></a>
+# [3.11.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.10.3...v3.11.0-alpha.0) (2019-08-06)
+
+
+### Bug Fixes
+
+* **api:** Allow gen2 reference in protocol without pipette attached ([#3760](https://github.com/Opentrons/opentrons/issues/3760)) ([e6c0b48](https://github.com/Opentrons/opentrons/commit/e6c0b48))
+* **api:** apiv1: fix transfer volume ([#3792](https://github.com/Opentrons/opentrons/issues/3792)) ([e3099af](https://github.com/Opentrons/opentrons/commit/e3099af))
+* **api:** apiv1: handle partial db schema changes ([#3783](https://github.com/Opentrons/opentrons/issues/3783)) ([5d52cd7](https://github.com/Opentrons/opentrons/commit/5d52cd7))
+* **api:** apiv2: Correctly handle flow rates and plunger speeds ([#3739](https://github.com/Opentrons/opentrons/issues/3739)) ([01c0fcb](https://github.com/Opentrons/opentrons/commit/01c0fcb)), closes [#3737](https://github.com/Opentrons/opentrons/issues/3737) [#3270](https://github.com/Opentrons/opentrons/issues/3270)
+* **api:** apiv2: Display locs for drop/pickup from implicit locs ([#3774](https://github.com/Opentrons/opentrons/issues/3774)) ([cf7710f](https://github.com/Opentrons/opentrons/commit/cf7710f)), closes [#3364](https://github.com/Opentrons/opentrons/issues/3364)
+* **api:** apiv2: fix mix, blowout in advanced steps ([#3799](https://github.com/Opentrons/opentrons/issues/3799)) ([48fc442](https://github.com/Opentrons/opentrons/commit/48fc442)), closes [#3719](https://github.com/Opentrons/opentrons/issues/3719)
+* **api:** apiv2: fix overaspiration after blowout ([#3801](https://github.com/Opentrons/opentrons/issues/3801)) ([61e82c3](https://github.com/Opentrons/opentrons/commit/61e82c3)), closes [#3797](https://github.com/Opentrons/opentrons/issues/3797)
+* **api:** apiv2: fix protocol cancel ([#3725](https://github.com/Opentrons/opentrons/issues/3725)) ([b2b8c46](https://github.com/Opentrons/opentrons/commit/b2b8c46))
+* **api:** apiv2: simulator should find pipettes by name versus model ([#3779](https://github.com/Opentrons/opentrons/issues/3779)) ([a0fd72b](https://github.com/Opentrons/opentrons/commit/a0fd72b))
+* **api:** duplicate mix with blowout during transfer ([#3810](https://github.com/Opentrons/opentrons/issues/3810)) ([9a70c36](https://github.com/Opentrons/opentrons/commit/9a70c36)), closes [#2607](https://github.com/Opentrons/opentrons/issues/2607)
+* **api:** fix blow out logic ([#3764](https://github.com/Opentrons/opentrons/issues/3764)) ([fb99bf0](https://github.com/Opentrons/opentrons/commit/fb99bf0))
+* **api:** force nmcli to actively check for connectivity ([#3811](https://github.com/Opentrons/opentrons/issues/3811)) ([c200de3](https://github.com/Opentrons/opentrons/commit/c200de3)), closes [#3768](https://github.com/Opentrons/opentrons/issues/3768)
+* **api:** Modify delay and motors which are disengaged ([#3770](https://github.com/Opentrons/opentrons/issues/3770)) ([1eb760c](https://github.com/Opentrons/opentrons/commit/1eb760c))
+* **api:** Remove model name check for non-gen2 pipettes ([#3761](https://github.com/Opentrons/opentrons/issues/3761)) ([263b536](https://github.com/Opentrons/opentrons/commit/263b536))
+* **api:** Use pip config presses by default ([#3778](https://github.com/Opentrons/opentrons/issues/3778)) ([8fce1a9](https://github.com/Opentrons/opentrons/commit/8fce1a9))
+* **factory_scripts:** Remove old func name and refactor IP look-up ([#3763](https://github.com/Opentrons/opentrons/issues/3763)) ([2847cad](https://github.com/Opentrons/opentrons/commit/2847cad))
+
+
+### Features
+
+* **api:** Make blow out flow rate settable ([#3735](https://github.com/Opentrons/opentrons/issues/3735)) ([e12b4fd](https://github.com/Opentrons/opentrons/commit/e12b4fd)), closes [#3733](https://github.com/Opentrons/opentrons/issues/3733)
+* **api:** move gantry to safe spot while TC lid moves ([#3807](https://github.com/Opentrons/opentrons/issues/3807)) ([752295c](https://github.com/Opentrons/opentrons/commit/752295c))
+* **api:** prevent over-aspiration with filter tips in v1  ([#3692](https://github.com/Opentrons/opentrons/issues/3692)) ([487927a](https://github.com/Opentrons/opentrons/commit/487927a))
+* **app:** display TC on Deck Map ([#3786](https://github.com/Opentrons/opentrons/issues/3786)) ([272a6ad](https://github.com/Opentrons/opentrons/commit/272a6ad)), closes [#3553](https://github.com/Opentrons/opentrons/issues/3553) [#3064](https://github.com/Opentrons/opentrons/issues/3064)
+* **app, api:** Key calibration by parent-type/labware-type combo ([#3800](https://github.com/Opentrons/opentrons/issues/3800)) ([ba0df67](https://github.com/Opentrons/opentrons/commit/ba0df67)), closes [#3775](https://github.com/Opentrons/opentrons/issues/3775)
+* **shared-data:** add displayCategory to pipetteNameSpecs and schema ([#3731](https://github.com/Opentrons/opentrons/issues/3731)) ([3b39dea](https://github.com/Opentrons/opentrons/commit/3b39dea))
+
+
+
+
+<a name="3.10.3"></a>
+## [3.10.3](https://github.com/Opentrons/opentrons/compare/v3.10.2...v3.10.3) (2019-07-26)
+
+
+### Bug Fixes
+
+* **api:** revert: "feat(api): prevent over-aspiration with filter tips in v1 ([#3692](https://github.com/opentrons/opentrons/issues/3692)) ([bd0808d](https://github.com/Opentrons/opentrons/commit/bd0808d726b7b17c35fa0116638b28f143d140e0))
+
+
+
 <a name="3.10.2"></a>
 ## [3.10.2](https://github.com/Opentrons/opentrons/compare/v3.10.0...v3.10.2) (2019-07-25)
 
