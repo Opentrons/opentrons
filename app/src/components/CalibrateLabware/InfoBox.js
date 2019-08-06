@@ -8,13 +8,17 @@ import capitalize from 'lodash/capitalize'
 import {
   selectors as robotSelectors,
   actions as robotActions,
+  type Mount,
+  type Labware,
+  type LabwareType,
 } from '../../robot'
+import { getConnectedRobot } from '../../discovery'
+import { getModulesState } from '../../robot-api'
 
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { Icon, PrimaryButton } from '@opentrons/components'
 import styles from './styles.css'
 
-import type { Mount, Labware, LabwareType } from '../../robot'
 import type { State, Dispatch } from '../../types'
 
 type OP = {| labware: ?Labware |}
@@ -109,6 +113,13 @@ function mapStateToProps(state: State, ownProps: OP): SP {
 
   if (_buttonTarget && _buttonTarget.calibratorMount) {
     _calibratorMount = _buttonTarget.calibratorMount
+  }
+
+  const robot = getConnectedRobot(state)
+  const sessionModules = robotSelectors.getModules(state)
+  const actualModules = getModulesState(state, robot.name)
+  if (some(sessionModules, (module) => module.name === 'thermocycler') {
+
   }
 
   return {
