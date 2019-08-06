@@ -453,6 +453,8 @@ export default function client(dispatch) {
         )
       }
 
+      update.apiLevel = apiSession.api_level || 1
+
       dispatch(actions.sessionResponse(null, update, freshUpload))
     } catch (error) {
       dispatch(actions.sessionResponse(error, null, freshUpload))

@@ -255,6 +255,10 @@ export const getPipettes: OutputSelector<
   }
 )
 
+export function getApiLevel(state: State) {
+  return session(state).apiLevel
+}
+
 // $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export const getNextPipette = createSelector(
   getPipettes,

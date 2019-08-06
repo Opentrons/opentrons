@@ -3,13 +3,13 @@
 import { combineEpics } from 'redux-observable'
 
 import { analyticsEpic } from './analytics'
-import { buildrootUpdateEpic } from './shell'
 import { discoveryEpic } from './discovery'
 import { robotApiEpic } from './robot-api'
+import { shellEpic } from './shell'
 
 export default combineEpics(
   analyticsEpic,
-  buildrootUpdateEpic,
   discoveryEpic,
-  robotApiEpic
+  robotApiEpic,
+  shellEpic
 )

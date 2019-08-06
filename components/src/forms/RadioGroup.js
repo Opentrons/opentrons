@@ -6,16 +6,18 @@ import { Icon } from '../icons'
 import styles from './forms.css'
 
 type Props = {
+  /** blur handler */
+  onBlur?: (event: SyntheticInputEvent<*>) => mixed,
   /** change handler */
   onChange: (event: SyntheticInputEvent<*>) => mixed,
   /** value that is checked */
   value?: string,
   /** Array of {name, value} data with optional children */
-  options?: Array<{
+  options?: Array<{|
     name: string,
     value: string,
     children?: React.Node,
-  }>,
+  |}>,
   /** Show radio buttons inline instead of stacked */
   inline?: boolean,
   /** classes to apply to outer div */
@@ -24,6 +26,8 @@ type Props = {
   labelTextClassName?: ?string,
   /** if is included, RadioGroup will use error style. The content of the string is ignored. */
   error?: ?string,
+  /** 'name' attr of input */
+  name?: string,
 }
 
 export default function RadioGroup(props: Props) {
@@ -57,8 +61,10 @@ export default function RadioGroup(props: Props) {
             <input
               className={cx(styles.input_field, styles.accessibly_hidden)}
               type="radio"
+              name={props.name}
               value={radio.value}
               checked={radio.value === props.value}
+              onBlur={props.onBlur}
               onChange={props.onChange}
             />
             <div className={cx(props.labelTextClassName, styles.label_text)}>

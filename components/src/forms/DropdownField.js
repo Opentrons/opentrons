@@ -5,11 +5,11 @@ import cx from 'classnames'
 import { Icon } from '..'
 import styles from './forms.css'
 
-export type DropdownOption = {
+export type DropdownOption = {|
   name: string,
   value: string,
   disabled?: boolean,
-}
+|}
 
 export type Options = Array<DropdownOption>
 
