@@ -1,11 +1,8 @@
 import asyncio
-from . import mod_abc, types
-from typing import Union, Optional, List, Tuple
+from . import mod_abc
+from typing import Union, Optional
 from opentrons.drivers.thermocycler.driver import (
     Thermocycler as ThermocyclerDriver)
-import logging
-
-MODULE_LOG = logging.getLogger(__name__)
 
 
 class SimulatingDriver:
@@ -155,36 +152,12 @@ class Thermocycler(mod_abc.AbstractModule):
         self._device_info = None
         self._poller = None
 
-        self._running_flag = asyncio.Event(loop=self._loop)
-        self._current_cycle_task = None
-        self._total_cycle_count = None
-        self._current_cycle_index = None
-        self._total_step_count = None
-        self._current_step_index = None
-
-    def pause(self):
-        self._running_flag.clear()
-        MODULE_LOG.debug('TC PAUSE')
-
-    def resume(self):
-        self._loop.call_soon_threadsafe(self._running_flag.set)
-        MODULE_LOG.debug('TC RESUME')
-
-    def cancel(self):
-        if self._current_cycle_task:
-            self._current_cycle_task.cancel()
-            self._current_cycle_task = None
-            self._running_flag.clear()
-
     async def deactivate(self):
-        self._total_cycle_count = None
-        self._current_cycle_index = None
-        self._total_step_count = None
-        self._current_step_index = None
         await self._driver.deactivate()
 
     async def open(self) -> str:
         """ Open the lid if it is closed"""
+        # TODO add temperature protection if over 70 C
         return await self._driver.open()
 
     async def close(self) -> str:
@@ -192,38 +165,8 @@ class Thermocycler(mod_abc.AbstractModule):
         return await self._driver.close()
 
     async def set_temperature(self, temp, hold_time=None, ramp_rate=None):
-        MODULE_LOG.debug('SET TEMP')
         await self._driver.set_temperature(
             temp=temp, hold_time=hold_time, ramp_rate=ramp_rate)
-
-    async def _execute_cycles(self,
-                              steps: List[types.ThermocyclerStep],
-                              repetitions: int):
-        for rep_idx, rep in enumerate(range(repetitions)):
-            self._current_cycle_index = rep_idx + 1  # because scientists start at 1
-            MODULE_LOG.debug('CYCLE START')
-            for step_idx, step in enumerate(steps):
-                self._current_step_index = step_idx + 1  # because scientists start at 1
-                await self._running_flag.wait()
-                if isinstance(step, dict):
-                    MODULE_LOG.debug('BEFORE DICT STEP')
-                    await self.set_temperature(**step)
-                else:
-                    MODULE_LOG.debug('BEFORE TUPLE STEP')
-                    await self.set_temperature(*step)
-                await self.wait_for_hold()
-
-    async def cycle_temperatures(self,
-                                 steps: List[types.ThermocyclerStep],
-                                 repetitions: int):
-        self._running_flag.set()
-        self._total_cycle_count = repetitions
-        self._total_step_count = len(steps)
-        cycle_task = self._loop.create_task(self._execute_cycles(steps,
-                                                                 repetitions))
-        self._current_cycle_task = cycle_task
-        MODULE_LOG.debug('JUST BEFORE TASK')
-        await cycle_task
 
     async def set_lid_temperature(self, temp: Optional[float]):
         """ Set the lid temperature in deg Celsius """
@@ -294,22 +237,6 @@ class Thermocycler(mod_abc.AbstractModule):
         return self._device_info
 
     @property
-    def total_cycle_count(self):
-        return self._total_cycle_count
-
-    @property
-    def current_cycle_index(self):
-        return self._current_cycle_index
-
-    @property
-    def total_step_count(self):
-        return self._total_step_count
-
-    @property
-    def current_step_index(self):
-        return self._current_step_index
-
-    @property
     def live_data(self):
         return {
             'status': self.status,
@@ -320,11 +247,7 @@ class Thermocycler(mod_abc.AbstractModule):
                 'currentTemp': self.temperature,
                 'targetTemp': self.target,
                 'holdTime': self.hold_time,
-                'rampRate': self.ramp_rate,
-                'currentCycleIndex': self.current_cycle_index,
-                'totalCycleCount': self.total_cycle_count,
-                'currentStepIndex': self.current_step_index,
-                'totalStepCount': self.total_step_count,
+                'rampRate': self.ramp_rate
             }
         }
 
@@ -347,7 +270,6 @@ class Thermocycler(mod_abc.AbstractModule):
 
     def set_loop(self, newLoop):
         self._loop = newLoop
-        self._running_flag = asyncio.Event(loop=self._loop)
 
     async def _connect(self):
         await self._driver.connect(self._port)

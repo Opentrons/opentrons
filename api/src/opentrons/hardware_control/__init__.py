@@ -370,12 +370,6 @@ class API(HardwareAPILike):
                                                    checked_loop,
                                                    explicit_modeset)
 
-    def _call_on_attached_modules(self, method):
-        for module in self.attached_modules.values():
-            maybe_module_method = getattr(module, method, None)
-            if callable(maybe_module_method):
-                maybe_module_method()
-
     # Global actions API
     @_log_call
     def pause(self):
@@ -391,8 +385,6 @@ class API(HardwareAPILike):
         :py:meth:`resume`.
         """
         self._backend.pause()
-        self._call_on_attached_modules("pause")
-
 
     def pause_with_message(self, message):
         self._log.warning('Pause with message: {}'.format(message))
@@ -406,7 +398,6 @@ class API(HardwareAPILike):
         Resume motion after a call to :py:meth:`pause`.
         """
         self._backend.resume()
-        self._call_on_attached_modules("resume")
 
     @_log_call
     def halt(self):
@@ -434,7 +425,6 @@ class API(HardwareAPILike):
         """
         self._backend.halt()
         self._log.info("Recovering from halt")
-        self._call_on_attached_modules("cancel")
         await self.reset()
         await self.home()
 

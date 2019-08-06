@@ -280,8 +280,8 @@ class ProtocolContext(CommandPublisher):
                 'magdeck': modules.magdeck.MagDeck,
                 'tempdeck': modules.tempdeck.TempDeck,
                 'thermocycler': modules.thermocycler.Thermocycler}[mod_id]
-            hc_mod_instance = adapters.SynchronousAdapter(mod_type(
-                port='', simulating=True, loop=self._loop))
+            hc_mod_instance = mod_type(
+                port='', simulating=True, loop=self._loop)
         if hc_mod_instance:
             mod_ctx = mod_class(self,
                                 hc_mod_instance,
@@ -1972,7 +1972,6 @@ class ThermocyclerContext(ModuleContext):
         self._module = hw_module
         self._loop = loop
         self._protocol_lid_target = None
-
         super().__init__(ctx, geometry)
 
     @property
@@ -2040,28 +2039,6 @@ class ThermocyclerContext(ModuleContext):
         return self._module.set_temperature(
             temp=temp, hold_time=hold_time, ramp_rate=ramp_rate)
 
-    @cmds.publish.both(command=cmds.thermocycler_cycle_temperatures)
-    def cycle_temperatures(self,
-                           steps: List[modules.types.ThermocyclerStep],
-                           repetitions: int):
-        """ For a given number of repetitions, cycle through a list of
-        temperatures in degrees C for a set hold time.
-
-        :param steps: List of unique steps that make up a single cycle. Each tuple
-                      in list maps to parameters of the set_temperature method.
-                      NOTE: hold_time must be defined and finite for each step.
-        :param repetitions: The number of times to repeat the cycled steps.
-        """
-        for step in steps:
-            if (isinstance(step, dict) and step['hold_time'] is None) or (
-                    isinstance(step, list) and step[1] is None):
-                raise ValueError("hold_time must be defined for each step in cycle")
-
-        MODULE_LOG.debug('CONTEXT CYCLE START')
-        MODULE_LOG.debug(self._module)
-        return self._module.cycle_temperatures(
-            steps=steps, repetitions=repetitions)
-
     @property
     def current_lid_target(self):
         return self._module.lid_target
@@ -2122,26 +2099,6 @@ class ThermocyclerContext(ModuleContext):
     def hold_time(self):
         """ Remaining hold time in sec"""
         return self._module.hold_time
-
-    @property
-    def total_cycle_count(self):
-        """ Number of repetitions for current set cycle"""
-        return self._module.total_cycle_count
-
-    @property
-    def current_cycle_index(self):
-        """ Index of the current set cycle repetition"""
-        return self._module.current_cycle_index
-
-    @property
-    def total_step_count(self):
-        """ Number of steps within the current cycle"""
-        return self._module.total_step_count
-
-    @property
-    def current_step_index(self):
-        """ Index of the current step within the current cycle"""
-        return self._module.current_step_index
 
     @cmds.publish.both(command=cmds.thermocycler_deactivate)
     def deactivate(self):

@@ -1,11 +1,8 @@
-
 from . import types as command_types
 from opentrons.broker import Broker
 
-import json
 import functools
 import inspect
-from pprint import pprint
 from typing import Union, Sequence, List, Any
 
 from opentrons.legacy_api.containers import (Well as OldWell,
@@ -394,15 +391,6 @@ def thermocycler_set_temp(temp, hold_time):
         }
     )
 
-def thermocycler_cycle_temperatures(steps, repetitions):
-    text = f'Thermocycler starting {repetitions} repetitions of cycle composed of the following steps: {steps}'
-    return make_command(
-        name=command_types.THERMOCYCLER_CYCLE_TEMPS,
-        payload={
-            'text': text,
-            'steps': pprint(steps)
-        }
-    )
 
 def thermocycler_wait_for_hold():
     text = "Waiting for hold time duration"
