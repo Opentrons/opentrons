@@ -2,6 +2,7 @@
 // modules endpoints
 import { combineEpics } from 'redux-observable'
 import pathToRegexp from 'path-to-regexp'
+import some from 'lodash/some'
 
 import {
   getRobotApiState,
@@ -10,6 +11,9 @@ import {
   GET,
   POST,
 } from '../utils'
+
+import { getConnectedRobot } from '../../discovery'
+import { selectors as robotSelectors } from '../../robot'
 
 import type { State as AppState, ActionLike } from '../../types'
 import type { RobotHost, RobotApiAction } from '../types'
@@ -109,4 +113,18 @@ export function getModulesState(
 
   // TODO: remove this filter when feature flag removed
   return modules.filter(m => tcEnabled || m.name !== 'thermocycler')
+}
+
+export function getAreModulesReadyForLabwareCalibration(
+  state: AppState
+): boolean {
+  const robot = getConnectedRobot(state)
+  const sessionModules = robotSelectors.getModules(state)
+  const actualModules = getModulesState(state, robot.name)
+  if (some(sessionModules, module => module.name === 'thermocycler')) {
+    // actualModules
+    return true
+  } else {
+    return true
+  }
 }
