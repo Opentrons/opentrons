@@ -268,11 +268,7 @@ const compareCurrentVersionToUpdate = (
 }
 
 export const makeGetRobotUpdateInfo = () => {
-  const selector: OutputSelector<
-    State,
-    AnyRobot,
-    RobotUpdateInfo
-  > = createSelector(
+  const selector: (State, AnyRobot) => RobotUpdateInfo = createSelector(
     (_, robot) => getRobotApiVersion(robot),
     getApiUpdateVersion,
     compareCurrentVersionToUpdate
