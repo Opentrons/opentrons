@@ -1,9 +1,6 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import asciichart from 'asciichart'
-import round from 'lodash/round'
-import camelCase from 'lodash/camelCase'
 
 import { SpinnerModal } from '@opentrons/components'
 import SessionAlert from './SessionAlert'
@@ -57,59 +54,6 @@ export default class CommandList extends React.Component<CommandListProps> {
       }
 
       if (isLast) liProps.ref = 'ensureVisible'
-
-      const cycleCommandMatch = description.match(
-        /Thermocycler starting.*: (\[.*\])/
-      )
-      if (cycleCommandMatch && cycleCommandMatch[1]) {
-        const dirtyStages = cycleCommandMatch[1].split(/[)}], /)
-        const cleanStages = dirtyStages.map(dirtyStage => {
-          if (dirtyStage.includes('(')) {
-            const dirtyArgs = dirtyStage.split(',')
-            const cleanArgs = dirtyArgs.map(da => da.replace(/[^0-9]*/g, ''))
-            return {
-              temperature: cleanArgs[0] && Number(cleanArgs[0]),
-              holdTime: cleanArgs[1] && Number(cleanArgs[1]),
-              rampRate: cleanArgs[2] && Number(cleanArgs[2]),
-            }
-          } else if (dirtyStage.includes('{')) {
-            const dirtyKwargs = dirtyStage.split(',')
-            return dirtyKwargs.reduce((acc, dirtyKwarg) => {
-              const kwargMatch = dirtyKwarg.match(
-                /^[^a-z]([a-z_]*)[^a-z0-9]*([0-9]*)[^0-9]*$/
-              )
-              if (kwargMatch && kwargMatch[1] && kwargMatch[2]) {
-                return {
-                  ...acc,
-                  [camelCase(kwargMatch[1])]: kwargMatch[2],
-                }
-              }
-            }, {})
-          }
-        })
-        if (cleanStages.length > 0) {
-          const xCount = 60
-          let chartPoints = new Array(xCount)
-          const totalTime = cleanStages.reduce(
-            (acc, stage) => acc + stage.holdTime,
-            0
-          )
-          const withPercentages = cleanStages.map(stage => ({
-            ...stage,
-            holdTimePercentage: round((stage.holdTime / totalTime) * xCount, 0),
-          }))
-          let lastIndex = 0
-          withPercentages.forEach(stage => {
-            const stageStart = lastIndex
-            while (lastIndex < stage.holdTimePercentage + stageStart) {
-              chartPoints[lastIndex] = stage.temperature
-              lastIndex++
-            }
-          })
-          const plot = asciichart.plot(chartPoints, { height: 10 })
-          console.info(plot)
-        }
-      }
 
       return (
         <li {...liProps}>
