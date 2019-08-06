@@ -5,7 +5,6 @@ from opentrons.broker import Broker
 import json
 import functools
 import inspect
-from pprint import pprint
 from typing import Union, Sequence, List, Any
 
 from opentrons.legacy_api.containers import (Well as OldWell,
@@ -400,7 +399,7 @@ def thermocycler_cycle_temperatures(steps, repetitions):
         name=command_types.THERMOCYCLER_CYCLE_TEMPS,
         payload={
             'text': text,
-            'steps': pprint(steps)
+            'steps': json.dumps(steps)
         }
     )
 

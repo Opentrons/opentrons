@@ -1972,7 +1972,6 @@ class ThermocyclerContext(ModuleContext):
         self._module = hw_module
         self._loop = loop
         self._protocol_lid_target = None
-
         super().__init__(ctx, geometry)
 
     @property
@@ -2056,9 +2055,6 @@ class ThermocyclerContext(ModuleContext):
             if (isinstance(step, dict) and step['hold_time'] is None) or (
                     isinstance(step, list) and step[1] is None):
                 raise ValueError("hold_time must be defined for each step in cycle")
-
-        MODULE_LOG.debug('CONTEXT CYCLE START')
-        MODULE_LOG.debug(self._module)
         return self._module.cycle_temperatures(
             steps=steps, repetitions=repetitions)
 
