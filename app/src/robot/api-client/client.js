@@ -21,6 +21,7 @@ const RE_VOLUME = /.*?(\d+).*?/
 const RE_TIPRACK = /tiprack/i
 
 export default function client(dispatch) {
+  let freshUpload = false
   let rpcClient
   let remote
 
@@ -149,6 +150,7 @@ export default function client(dispatch) {
     const { name } = state.protocol.file
     const { contents } = action.payload
 
+    freshUpload = true
     remote.session_manager
       .create(name, contents)
       .then(apiSession => {
@@ -156,7 +158,10 @@ export default function client(dispatch) {
         // state change will trigger a session notification, which will
         // dispatch a successful sessionResponse
       })
-      .catch(error => dispatch(actions.sessionResponse(error)))
+      .catch(error => {
+        dispatch(actions.sessionResponse(error, null, freshUpload))
+        freshUpload = false
+      })
   }
 
   function moveToFront(state, action) {
@@ -448,16 +453,14 @@ export default function client(dispatch) {
         )
       }
 
-      if (apiSession.api_level) {
-        update.apiLevel = apiSession.api_level
-      } else {
-        update.apiLevel = 1
-      }
+      update.apiLevel = apiSession.api_level || 1
 
-      dispatch(actions.sessionResponse(null, update))
+      dispatch(actions.sessionResponse(null, update, freshUpload))
     } catch (error) {
-      dispatch(actions.sessionResponse(error))
+      dispatch(actions.sessionResponse(error, null, freshUpload))
     }
+
+    freshUpload = false
 
     function makeHandleCommand(depth = 0) {
       return function handleCommand(command) {

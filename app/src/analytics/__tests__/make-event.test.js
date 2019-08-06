@@ -50,25 +50,27 @@ describe('analytics events map', () => {
     const success = robotActions.connectResponse()
     const failure = robotActions.connectResponse(new Error('AH'))
 
-    expect(makeEvent(success, state('wired'))).toEqual({
-      name: 'robotConnect',
-      properties: { method: 'usb', success: true, error: '' },
-    })
+    return Promise.all([
+      expect(makeEvent(success, state('wired'))).resolves.toEqual({
+        name: 'robotConnect',
+        properties: { method: 'usb', success: true, error: '' },
+      }),
 
-    expect(makeEvent(failure, state('wired'))).toEqual({
-      name: 'robotConnect',
-      properties: { method: 'usb', success: false, error: 'AH' },
-    })
+      expect(makeEvent(failure, state('wired'))).resolves.toEqual({
+        name: 'robotConnect',
+        properties: { method: 'usb', success: false, error: 'AH' },
+      }),
 
-    expect(makeEvent(success, state('wireless'))).toEqual({
-      name: 'robotConnect',
-      properties: { method: 'wifi', success: true, error: '' },
-    })
+      expect(makeEvent(success, state('wireless'))).resolves.toEqual({
+        name: 'robotConnect',
+        properties: { method: 'wifi', success: true, error: '' },
+      }),
 
-    expect(makeEvent(failure, state('wireless'))).toEqual({
-      name: 'robotConnect',
-      properties: { method: 'wifi', success: false, error: 'AH' },
-    })
+      expect(makeEvent(failure, state('wireless'))).resolves.toEqual({
+        name: 'robotConnect',
+        properties: { method: 'wifi', success: false, error: 'AH' },
+      }),
+    ])
   })
 
   describe('events with protocol data', () => {
@@ -79,58 +81,60 @@ describe('analytics events map', () => {
     })
 
     test('robot:PROTOCOL_UPLOAD > protocolUploadRequest', () => {
-      const prevState = {}
       const nextState = {}
       const success = { type: 'protocol:UPLOAD', payload: {} }
 
-      return expect(makeEvent(success, nextState, prevState)).resolves.toEqual({
+      return expect(makeEvent(success, nextState)).resolves.toEqual({
         name: 'protocolUploadRequest',
         properties: protocolData,
       })
     })
 
     test('robot:SESSION_RESPONSE with upload in flight', () => {
-      const prevState = {
-        robot: { session: { sessionRequest: { inProgress: true } } },
-      }
       const nextState = {}
-      const success = { type: 'robot:SESSION_RESPONSE', payload: {} }
+      const success = {
+        type: 'robot:SESSION_RESPONSE',
+        payload: {},
+        meta: { freshUpload: true },
+      }
 
-      return expect(makeEvent(success, nextState, prevState)).resolves.toEqual({
+      return expect(makeEvent(success, nextState)).resolves.toEqual({
         name: 'protocolUploadResponse',
         properties: { success: true, error: '', ...protocolData },
       })
     })
 
     test('robot:SESSION_ERROR with upload in flight', () => {
-      const prevState = {
-        robot: { session: { sessionRequest: { inProgress: true } } },
-      }
       const nextState = {}
       const failure = {
         type: 'robot:SESSION_ERROR',
         payload: { error: new Error('AH') },
+        meta: { freshUpload: true },
       }
 
-      return expect(makeEvent(failure, nextState, prevState)).resolves.toEqual({
+      return expect(makeEvent(failure, nextState)).resolves.toEqual({
         name: 'protocolUploadResponse',
         properties: { success: false, error: 'AH', ...protocolData },
       })
     })
 
     test('robot:SESSION_RESPONSE/ERROR with no upload in flight', () => {
-      const prevState = {
-        robot: { session: { sessionRequest: { inProgress: false } } },
-      }
       const nextState = {}
-      const success = { type: 'robot:SESSION_RESPONSE', payload: {} }
+      const success = {
+        type: 'robot:SESSION_RESPONSE',
+        payload: {},
+        meta: { freshUpload: false },
+      }
       const failure = {
         type: 'robot:SESSION_ERROR',
         payload: { error: new Error('AH') },
+        meta: { freshUpload: false },
       }
 
-      expect(makeEvent(success, nextState, prevState)).toBeNull()
-      expect(makeEvent(failure, nextState, prevState)).toBeNull()
+      return Promise.all([
+        expect(makeEvent(success, nextState)).resolves.toBeNull(),
+        expect(makeEvent(failure, nextState)).resolves.toBeNull(),
+      ])
     })
 
     test('robot:RUN -> runStart event', () => {

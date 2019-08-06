@@ -1,12 +1,18 @@
 // @flow
 import * as React from 'react'
+import { useDispatch } from 'react-redux'
+
+import { buildrootChangelogSeen } from '../../../shell'
 import { ScrollableAlertModal } from '../../modals'
 import ReleaseNotes from '../../ReleaseNotes'
 import styles from './styles.css'
+
 import type { ButtonProps } from '@opentrons/components'
+import type { Dispatch } from '../../../types'
 import type { RobotSystemType } from '../../../shell'
 
 type Props = {|
+  robotName: string,
   notNowButton: ButtonProps,
   releaseNotes: string,
   systemType: RobotSystemType | null,
@@ -14,7 +20,13 @@ type Props = {|
 |}
 
 export default function ReleaseNotesModal(props: Props) {
-  const { notNowButton, releaseNotes, systemType, proceed } = props
+  const { robotName, notNowButton, releaseNotes, systemType, proceed } = props
+  const dispatch = useDispatch<Dispatch>()
+
+  React.useEffect(() => {
+    dispatch(buildrootChangelogSeen(robotName))
+  }, [dispatch, robotName])
+
   const heading =
     systemType === 'buildroot' ? 'Robot Update' : 'Robot System Update'
   const buttons = [

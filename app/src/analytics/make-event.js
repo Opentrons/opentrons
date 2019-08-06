@@ -3,7 +3,12 @@
 import createLogger from '../logger'
 import { selectors as robotSelectors } from '../robot'
 import { getConnectedRobot } from '../discovery'
-import { getProtocolAnalyticsData, getRobotAnalyticsData } from './selectors'
+import * as brActions from '../shell/buildroot/actions'
+import {
+  getProtocolAnalyticsData,
+  getRobotAnalyticsData,
+  getBuildrootAnalyticsData,
+} from './selectors'
 
 import type { State, Action } from '../types'
 import type { AnalyticsEvent } from './types'
@@ -12,34 +17,37 @@ const log = createLogger(__filename)
 
 export default function makeEvent(
   action: Action,
-  nextState: State,
-  prevState: State
-): null | AnalyticsEvent | Promise<AnalyticsEvent | null> {
+  state: State
+): Promise<AnalyticsEvent | null> {
   switch (action.type) {
-    case 'robot:CONNECT_RESPONSE':
-      const robot = getConnectedRobot(nextState)
+    case 'robot:CONNECT_RESPONSE': {
+      const robot = getConnectedRobot(state)
 
       if (!robot) {
         log.warn('No robot found for connect response')
-        return null
+        return Promise.resolve(null)
       }
 
-      return {
+      const data = getRobotAnalyticsData(state)
+
+      return Promise.resolve({
         name: 'robotConnect',
         properties: {
+          ...data,
           success: !action.payload.error,
           method: robot.local ? 'usb' : 'wifi',
           error: (action.payload.error && action.payload.error.message) || '',
         },
-      }
+      })
+    }
 
     // TODO (ka, 2018-6-6): add file open type 'button' | 'drag-n-drop' (work required in action meta)
     case 'protocol:UPLOAD': {
-      return getProtocolAnalyticsData(nextState).then(data => ({
+      return getProtocolAnalyticsData(state).then(data => ({
         name: 'protocolUploadRequest',
         properties: {
           ...data,
-          ...getRobotAnalyticsData(nextState),
+          ...getRobotAnalyticsData(state),
         },
       }))
     }
@@ -48,14 +56,14 @@ export default function makeEvent(
     case 'robot:SESSION_ERROR': {
       // only fire event if we had a protocol upload in flight; we don't want
       // to fire if user connects to robot with protocol already loaded
-      if (!prevState.robot.session.sessionRequest.inProgress) return null
-      const { type: actionType, payload: actionPayload } = action
+      const { type: actionType, payload: actionPayload, meta } = action
+      if (!meta.freshUpload) return Promise.resolve(null)
 
-      return getProtocolAnalyticsData(nextState).then(data => ({
+      return getProtocolAnalyticsData(state).then(data => ({
         name: 'protocolUploadResponse',
         properties: {
           ...data,
-          ...getRobotAnalyticsData(nextState),
+          ...getRobotAnalyticsData(state),
           success: actionType === 'robot:SESSION_RESPONSE',
           error: (actionPayload.error && actionPayload.error.message) || '',
         },
@@ -64,11 +72,11 @@ export default function makeEvent(
 
     // $FlowFixMe(mc, 2018-05-28): flow type robot:RUN
     case 'robot:RUN': {
-      return getProtocolAnalyticsData(nextState).then(data => ({
+      return getProtocolAnalyticsData(state).then(data => ({
         name: 'runStart',
         properties: {
           ...data,
-          ...getRobotAnalyticsData(nextState),
+          ...getRobotAnalyticsData(state),
         },
       }))
     }
@@ -78,15 +86,15 @@ export default function makeEvent(
     // session.stop from triggering a run error
     // $FlowFixMe(mc, 2018-05-28): flow type robot:RUN_RESPONSE
     case 'robot:RUN_RESPONSE': {
-      const runTime = robotSelectors.getRunSeconds(nextState)
+      const runTime = robotSelectors.getRunSeconds(state)
       const success = !action.error
       const error = action.error ? action.payload.message || '' : ''
 
-      return getProtocolAnalyticsData(nextState).then(data => ({
+      return getProtocolAnalyticsData(state).then(data => ({
         name: 'runFinish',
         properties: {
           ...data,
-          ...getRobotAnalyticsData(nextState),
+          ...getRobotAnalyticsData(state),
           runTime,
           success,
           error,
@@ -96,9 +104,9 @@ export default function makeEvent(
 
     // $FlowFixMe(ka, 2018-06-5): flow type robot:PAUSE
     case 'robot:PAUSE': {
-      const runTime = robotSelectors.getRunSeconds(nextState)
+      const runTime = robotSelectors.getRunSeconds(state)
 
-      return getProtocolAnalyticsData(nextState).then(data => ({
+      return getProtocolAnalyticsData(state).then(data => ({
         name: 'runPause',
         properties: { ...data, runTime },
       }))
@@ -106,9 +114,9 @@ export default function makeEvent(
 
     // $FlowFixMe(ka, 2018-06-5): flow type robot:RESUME
     case 'robot:RESUME': {
-      const runTime = robotSelectors.getRunSeconds(nextState)
+      const runTime = robotSelectors.getRunSeconds(state)
 
-      return getProtocolAnalyticsData(nextState).then(data => ({
+      return getProtocolAnalyticsData(state).then(data => ({
         name: 'runResume',
         properties: { ...data, runTime },
       }))
@@ -116,13 +124,63 @@ export default function makeEvent(
 
     // $FlowFixMe(ka, 2018-06-5): flow type robot:CANCEL
     case 'robot:CANCEL':
-      const runTime = robotSelectors.getRunSeconds(nextState)
+      const runTime = robotSelectors.getRunSeconds(state)
 
-      return getProtocolAnalyticsData(nextState).then(data => ({
+      return getProtocolAnalyticsData(state).then(data => ({
         name: 'runCancel',
         properties: { ...data, runTime },
       }))
+
+    // buildroot update events
+    case brActions.BR_SET_UPDATE_SEEN: {
+      const data = getBuildrootAnalyticsData(state, action.meta.robotName)
+      return Promise.resolve({
+        name: 'robotUpdateView',
+        properties: { ...data },
+      })
+    }
+
+    case brActions.BR_CHANGELOG_SEEN: {
+      const data = getBuildrootAnalyticsData(state, action.meta.robotName)
+      return Promise.resolve({
+        name: 'robotUpdateChangeLogView',
+        properties: { ...data },
+      })
+    }
+
+    case brActions.BR_UPDATE_IGNORED: {
+      const data = getBuildrootAnalyticsData(state, action.meta.robotName)
+      return Promise.resolve({
+        name: 'robotUpdateIgnore',
+        properties: { ...data },
+      })
+    }
+
+    case brActions.BR_START_UPDATE: {
+      const data = getBuildrootAnalyticsData(state)
+      return Promise.resolve({
+        name: 'robotUpdateInitiate',
+        properties: { ...data },
+      })
+    }
+
+    case brActions.BR_UNEXPECTED_ERROR: {
+      const data = getBuildrootAnalyticsData(state)
+      return Promise.resolve({
+        name: 'robotUpdateError',
+        properties: { ...data },
+      })
+    }
+
+    case brActions.BR_SET_SESSION_STEP: {
+      if (action.payload !== 'finished') return Promise.resolve(null)
+      const data = getBuildrootAnalyticsData(state)
+      return Promise.resolve({
+        name: 'robotUpdateComplete',
+        properties: { ...data },
+      })
+    }
   }
 
-  return null
+  return Promise.resolve(null)
 }
