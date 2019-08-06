@@ -7,16 +7,28 @@ import type { TempDeckModule } from '../../robot-api'
 import StatusCard from './StatusCard'
 import CardContentRow from './CardContentRow'
 import StatusItem from './StatusItem'
+import TemperatureControl from './TemperatureControl'
 
 type Props = {|
   module: TempDeckModule,
   sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
+  isProtocolActive: boolean,
 |}
 
-const TempDeckCard = ({ module }: Props) => (
+const TempDeckCard = ({
+  module,
+  sendModuleCommand,
+  isProtocolActive,
+}: Props) => (
   <StatusCard title={getModuleDisplayName(module.name)}>
     <CardContentRow>
       <StatusItem status={module.status} />
+      {!isProtocolActive && (
+        <TemperatureControl
+          module={module}
+          sendModuleCommand={sendModuleCommand}
+        />
+      )}
     </CardContentRow>
     <CardContentRow>
       <LabeledValue
