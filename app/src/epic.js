@@ -2,8 +2,8 @@
 // root application epic
 import { combineEpics } from 'redux-observable'
 
-import { buildrootUpdateEpic } from './shell'
 import { discoveryEpic } from './discovery'
 import { robotApiEpic } from './robot-api'
+import { shellEpic } from './shell'
 
-export default combineEpics(buildrootUpdateEpic, discoveryEpic, robotApiEpic)
+export default combineEpics(discoveryEpic, robotApiEpic, shellEpic)

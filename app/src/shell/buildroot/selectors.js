@@ -112,7 +112,7 @@ export function compareRobotVersionToUpdate(
 ): BuildrootUpdateType {
   const currentVersion = getRobotApiVersion(robot)
   // TODO(mc, 2019-07-23): get this from state once BR state info can come in piecemeal
-  const updateVersion: string = remote.update.CURRENT_VERSION
+  const updateVersion: string = remote.CURRENT_VERSION
 
   const validCurrent: string | null = semver.valid(currentVersion)
   const validUpdate: string | null = semver.valid(updateVersion)

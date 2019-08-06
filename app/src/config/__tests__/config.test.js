@@ -1,9 +1,7 @@
 // config tests
 import { updateConfig, configReducer, getConfig } from '..'
 
-import * as mockShell from '../../shell'
-
-jest.mock('../../shell', () => ({ getShellConfig: jest.fn() }))
+jest.mock('../../shell/remote', () => ({ INITIAL_CONFIG: { isConfig: true } }))
 
 describe('config', () => {
   let state
@@ -36,8 +34,6 @@ describe('config', () => {
     })
 
     test('gets store and overrides from remote for initial state', () => {
-      mockShell.getShellConfig.mockReturnValue({ isConfig: true })
-
       expect(configReducer(null, {})).toEqual({ isConfig: true })
     })
 
