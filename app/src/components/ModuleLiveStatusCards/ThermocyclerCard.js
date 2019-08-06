@@ -12,11 +12,11 @@ import StatusItem from './StatusItem'
 import styles from './styles.css'
 import TemperatureControl from './TemperatureControl'
 
-type TempsItemProps = {
+type TempsItemProps = {|
   title: string,
   current: number,
   target: ?number,
-}
+|}
 const TempsItem = ({ title, current, target }: TempsItemProps) => (
   <div className={styles.temps_item}>
     <p className={styles.label}>{title}</p>
@@ -35,17 +35,19 @@ type Props = {|
   module: ThermocyclerModule,
   sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
   isProtocolActive: boolean,
+  __tempControlsEnabled: boolean,
 |}
 
 const ThermocyclerCard = ({
   module,
   sendModuleCommand,
   isProtocolActive,
+  __tempControlsEnabled,
 }: Props) => (
   <StatusCard title={getModuleDisplayName(module.name)}>
     <CardContentRow>
       <StatusItem status={module.status} />
-      {!isProtocolActive && (
+      {__tempControlsEnabled && !isProtocolActive && (
         <TemperatureControl
           module={module}
           sendModuleCommand={sendModuleCommand}
@@ -64,44 +66,47 @@ const ThermocyclerCard = ({
         target={module.data.lidTarget}
       />
     </CardContentRow>
-    {module.data.totalCycleCount != null && (
-      <CardContentRow>
-        <LabeledValue
-          label="Cycle #"
-          className={styles.compact_labeled_value}
-          value={`${module.data.currentCycleIndex} / ${
-            module.data.totalCycleCount
-          }`}
-        />
-        <LabeledValue
-          label="Step #"
-          className={styles.compact_labeled_value}
-          value={`${module.data.currentStepIndex} / ${
-            module.data.totalStepCount
-          }`}
-        />
-        <span
-          className={cx(
-            styles.inline_labeled_value,
-            styles.time_remaining_wrapper
-          )}
-        >
-          <p className={styles.time_remaining_label}>
-            Time remaining for step:
-          </p>
-          <p>
-            {`${moment
-              .utc(
-                // NOTE: moment still doesn't allow duration formatting, hence fake moment creation
-                moment
-                  .duration(module.data.holdTime, 'seconds')
-                  .asMilliseconds()
-              )
-              .format('HH:mm:ss')}`}
-          </p>
-        </span>
-      </CardContentRow>
-    )}
+    {module.data.totalCycleCount != null &&
+      module.data.currentCycleIndex != null &&
+      module.data.totalStepCount != null &&
+      module.data.currentStepIndex != null && (
+        <CardContentRow>
+          <LabeledValue
+            label="Cycle #"
+            className={styles.compact_labeled_value}
+            value={`${module.data.currentCycleIndex} / ${
+              module.data.totalCycleCount
+            }`}
+          />
+          <LabeledValue
+            label="Step #"
+            className={styles.compact_labeled_value}
+            value={`${module.data.currentStepIndex} / ${
+              module.data.totalStepCount
+            }`}
+          />
+          <span
+            className={cx(
+              styles.inline_labeled_value,
+              styles.time_remaining_wrapper
+            )}
+          >
+            <p className={styles.time_remaining_label}>
+              Time remaining for step:
+            </p>
+            <p>
+              {`${moment
+                .utc(
+                  // NOTE: moment still doesn't allow duration formatting, hence fake moment creation
+                  moment
+                    .duration(module.data.holdTime, 'seconds')
+                    .asMilliseconds()
+                )
+                .format('HH:mm:ss')}`}
+            </p>
+          </span>
+        </CardContentRow>
+      )}
   </StatusCard>
 )
 

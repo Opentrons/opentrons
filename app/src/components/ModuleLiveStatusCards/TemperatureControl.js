@@ -2,14 +2,18 @@
 import React, { useState } from 'react'
 import { OutlineButton, AlertModal, InputField } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-import type { ThermocyclerModule, ModuleCommandRequest } from '../../robot-api'
+import type {
+  ThermocyclerModule,
+  TempDeckModule,
+  ModuleCommandRequest,
+} from '../../robot-api'
 import { Portal } from '../portal'
 import styles from './styles.css'
 
-type Props = {
-  module: ThermocyclerModule,
+type Props = {|
+  module: ThermocyclerModule | TempDeckModule,
   sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
-}
+|}
 const TemperatureControl = ({ module, sendModuleCommand }: Props) => {
   const [temperatureInput, setTemperatureInput] = useState('')
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -39,7 +43,7 @@ const TemperatureControl = ({ module, sendModuleCommand }: Props) => {
         <Portal>
           <AlertModal
             heading="Set Thermocycler Module Base Temp"
-            iconName="None"
+            iconName={null}
             buttons={[
               {
                 children: 'Cancel',
