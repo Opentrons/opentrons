@@ -13,6 +13,7 @@ export type LabwareCalibrationProps = {
   calibrator: Pipette,
   calibrateToBottom: boolean,
   buttonText: string,
+  useCenteredTroughs: boolean,
 }
 
 export default function ConfirmPositionDiagram(props: LabwareCalibrationProps) {

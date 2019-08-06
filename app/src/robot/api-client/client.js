@@ -448,6 +448,12 @@ export default function client(dispatch) {
         )
       }
 
+      if (apiSession.api_level) {
+        update.apiLevel = apiSession.api_level
+      } else {
+        update.apiLevel = 1
+      }
+
       dispatch(actions.sessionResponse(null, update))
     } catch (error) {
       dispatch(actions.sessionResponse(error))
