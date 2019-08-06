@@ -76,28 +76,13 @@ updated component library cards after redesign/refactor
 .set_temp_field {
   display: flex;
   flex-direction: column;
+  width: 8rem;
+  height: 2.3rem;
 }
 
 .set_temp_label {
   @apply --font-body-1-dark;
 
   font-weight: var(--fw-semibold);
-}
-
-.set_temp_input {
-  @apply --font-form-default;
-
-  width: 8rem;
-  height: 2.3rem;
-  background-color: var(--c-light-gray);
-  border-radius: var(--bd-radius-form-field);
-  border-width: 0;
-  padding: 0.25rem 0.25rem 0.25rem 0.5rem;
-  margin-top: 0.5rem;
-
-  &:focus {
-    outline: none;
-    background-color: var(--c-white);
-    box-shadow: 0 0.125rem 0.25rem 0 color(var(--c-black) alpha(0.5));
-  }
+  margin-bottom: 0.5rem;
 }

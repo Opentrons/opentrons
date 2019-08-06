@@ -56,7 +56,6 @@ const TemperatureControl = ({ module, sendModuleCommand }: Props) => {
             <div className={styles.set_temp_field}>
               <label className={styles.set_temp_label}>Set Target Temp:</label>
               <InputField
-                className={styles.set_temp_input}
                 units="°C"
                 value={temperatureInput}
                 onChange={e => setTemperatureInput(e.target.value)}

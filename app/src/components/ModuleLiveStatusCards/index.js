@@ -21,7 +21,7 @@ import TempDeckCard from './TempDeckCard'
 import MagDeckCard from './MagDeckCard'
 import ThermocyclerCard from './ThermocyclerCard'
 
-const POLL_TEMPDECK_INTERVAL_MS = 1000
+const POLL_MODULES_INTERVAL_MS = 1000
 const LIVE_STATUS_MODULES = ['magdeck', 'tempdeck', 'thermocycler']
 
 type SP = {|
@@ -56,10 +56,7 @@ const ModuleLiveStatusCards = (props: Props) => {
   if (liveStatusModules.length === 0) return null
 
   return (
-    <IntervalWrapper
-      refresh={fetchModules}
-      interval={POLL_TEMPDECK_INTERVAL_MS}
-    >
+    <IntervalWrapper refresh={fetchModules} interval={POLL_MODULES_INTERVAL_MS}>
       {liveStatusModules.map(module => {
         switch (module.name) {
           case 'tempdeck':
