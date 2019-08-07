@@ -378,15 +378,15 @@ def thermocycler_open():
     )
 
 
-def thermocycler_set_temp(temp, hold_time):
-    text = "Setting thermocycler temperature to {temp} deg. celsius ".format(
-            temp=temp)
+def thermocycler_set_temp(temperature, hold_time):
+    text = "Setting thermocycler temperature to {temperature} °C ".format(
+            temperature=temperature)
     if hold_time is not None:
         text += " with a hold time of {} seconds".format(hold_time)
     return make_command(
         name=command_types.THERMOCYCLER_SET_TEMP,
         payload={
-            'temp': temp,
+            'temperature': temperature,
             'hold_time': hold_time,
             'text': text
         }
