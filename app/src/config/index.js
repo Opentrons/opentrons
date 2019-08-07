@@ -6,9 +6,17 @@ import remove from 'lodash/remove'
 import remote from '../shell/remote'
 
 import type { State, Action, ThunkAction } from '../types'
-import type { Config, UpdateConfigAction } from './types'
+import type { Config, UpdateConfigAction, DevInternalFlag } from './types'
 
 export * from './types'
+
+export const DEV_INTERNAL_FLAGS: Array<DevInternalFlag> = [
+  'allPipetteConfig',
+  'tempdeckControls',
+  'enableThermocycler',
+  'enablePipettePlus',
+  'enableBuildRoot',
+]
 
 // trigger a config value update to the app-shell via shell middleware
 export function updateConfig(path: string, value: any): UpdateConfigAction {
@@ -40,6 +48,14 @@ export function toggleDevTools(): ThunkAction {
   return (dispatch, getState) => {
     const devToolsOn = getConfig(getState()).devtools
     return dispatch(updateConfig('devtools', !devToolsOn))
+  }
+}
+
+export function toggleDevInternalFlag(flag: DevInternalFlag): ThunkAction {
+  return (dispatch, getState) => {
+    const devInternal = getConfig(getState()).devInternal
+    const isFlagOn = devInternal ? devInternal[flag] : false
+    return dispatch(updateConfig(`devInternal.${flag}`, !isFlagOn))
   }
 }
 
