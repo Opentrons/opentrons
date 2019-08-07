@@ -12,5 +12,5 @@
   },
   "npmClient": "yarn",
   "useWorkspaces": true,
-  "version": "3.10.2"
+  "version": "3.11.0-alpha.1"
 }
