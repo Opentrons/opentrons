@@ -350,7 +350,7 @@ def magdeck_calibrate():
 
 def tempdeck_set_temp(celsius):
     text = "Setting temperature deck module temperature " \
-           "to {temp} deg. celsius (rounded off to nearest integer)".format(
+           "to {temp} °C (rounded off to nearest integer)".format(
             temp=round(float(celsius),
                        utils.TEMPDECK_GCODE_ROUNDING_PRECISION))
     return make_command(
