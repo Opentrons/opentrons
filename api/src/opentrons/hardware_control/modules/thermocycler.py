@@ -190,9 +190,12 @@ class Thermocycler(mod_abc.AbstractModule):
         """ Close the lid if it is open"""
         return await self._driver.close()
 
-    async def set_temperature(self, temp, hold_time=None, ramp_rate=None):
+    async def set_temperature(self, temperature,
+                              hold_time=None, ramp_rate=None):
         await self._driver.set_temperature(
-            temp=temp, hold_time=hold_time, ramp_rate=ramp_rate)
+            temp=temperature, hold_time=hold_time, ramp_rate=ramp_rate)
+        if hold_time:
+            await self.wait_for_hold()
 
     async def _execute_cycles(self,
                               steps: List[types.ThermocyclerStep],
@@ -200,8 +203,8 @@ class Thermocycler(mod_abc.AbstractModule):
         for rep in range(repetitions):
             self._current_cycle_index = rep + 1  # science starts at 1
             for step_idx, step in enumerate(steps):
-                self._current_step_index = step_idx + 1  # science starts at 1
                 await self._running_flag.wait()
+                self._current_step_index = step_idx + 1  # science starts at 1
                 await self.set_temperature(**step)
                 await self.wait_for_hold()
 

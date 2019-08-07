@@ -2020,45 +2020,45 @@ class ThermocyclerContext(ModuleContext):
 
     @cmds.publish.both(command=cmds.thermocycler_set_temp)
     def set_temperature(self,
-                        temp: float,
+                        temperature: float,
                         hold_time: float = None,
                         ramp_rate: float = None):
-        """ Set the target temperature, in C.
+        """ Set the target temperature, in °C.
 
         Valid operational range yet to be determined.
-        :param temp: The target temperature, in degrees C.
-        :param hold_time: The time to hold after reaching temperature. If
-                          ``hold_time`` is not specified, the Thermocycler will
-                          hold this temperature indefinitely (requiring manual
-                          intervention to end the cycle).
-        :param ramp_rate: The target rate of temperature change, in degC/sec.
+        :param temperature: The target temperature, in °C.
+        :param hold_time: The time to hold, after reaching temperature, before
+                          proceeding to the next command. If ``hold_time``
+                          is not specified, the Thermocycler will
+                          hold this temperature indefinitely.
+        :param ramp_rate: The target rate of temperature change, in °C/sec.
                           If ``ramp_rate`` is not specified, it will default to
                           the maximum ramp rate as defined in the device
                           configuration.
         """
         return self._module.set_temperature(
-            temp=temp, hold_time=hold_time, ramp_rate=ramp_rate)
+            temperature=temperature, hold_time=hold_time, ramp_rate=ramp_rate)
 
     @cmds.publish.both(command=cmds.thermocycler_cycle_temperatures)
     def cycle_temperatures(self,
                            steps: List[modules.types.ThermocyclerStep],
                            repetitions: int):
         """ For a given number of repetitions, cycle through a list of
-        temperatures in degrees C for a set hold time.
+        temperatures in °C for a set hold time.
 
         :param steps: List of unique steps that make up a single cycle.
                       Each list item maps to parameters of the
                       set_temperature method as a dict of float values with
-                      keys 'temp', 'hold_time', and optionally 'ramp_rate'.
+                      keys 'temperature', 'hold_time', & optional 'ramp_rate'.
                       NOTE: unlike the set_temperature method, hold_time
                       must be defined and finite for each step.
         :param repetitions: The number of times to repeat the cycled steps.
         """
         for step in steps:
-            if (step['temp'] is None):
+            if step.get('temperature') is None:
                 raise ValueError(
-                        "temp must be defined for each step in cycle")
-            if (step['hold_time'] is None):
+                        "temperature must be defined for each step in cycle")
+            if step.get('hold_time') is None:
                 raise ValueError(
                         "hold_time must be defined for each step in cycle")
         return self._module.cycle_temperatures(
