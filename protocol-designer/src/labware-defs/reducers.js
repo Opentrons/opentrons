@@ -1,39 +1,52 @@
 // @flow
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import type { Action } from '../types'
-import type { CreateCustomLabwareDef } from './actions'
-import {
-  getLabwareDefURI,
-  type LabwareDefinition2,
-} from '@opentrons/shared-data'
-type CustomDefs = { [defLookup: string]: LabwareDefinition2 }
-
+import type { LabwareUploadMessage, LabwareDefByDefURI } from './types'
+import type {
+  CreateCustomLabwareDef,
+  LabwareUploadMessageAction,
+} from './actions'
 const customDefs = handleActions(
   {
     CREATE_CUSTOM_LABWARE_DEF: (
-      state: CustomDefs,
+      state: LabwareDefByDefURI,
       action: CreateCustomLabwareDef
-    ): CustomDefs => {
-      const lookup = getLabwareDefURI(action.payload.def)
-      if (lookup in state) {
-        console.warn(`overwriting custom labware ${lookup}`)
+    ): LabwareDefByDefURI => {
+      const uri = getLabwareDefURI(action.payload.def)
+      if (uri in state && action.payload.overwrite !== true) {
+        console.warn(`overwriting custom labware ${uri}`)
       }
       return {
         ...state,
-        [lookup]: action.payload.def,
+        [uri]: action.payload.def,
       }
     },
   },
   {}
 )
 
+const labwareUploadMessage = handleActions<?LabwareUploadMessage, *>(
+  {
+    LABWARE_UPLOAD_MESSAGE: (
+      state,
+      action: LabwareUploadMessageAction
+    ): LabwareUploadMessage => action.payload,
+    CREATE_CUSTOM_LABWARE_DEF: () => null,
+    DISMISS_LABWARE_UPLOAD_MESSAGE: () => null,
+  },
+  null
+)
+
 export type RootState = {
-  customDefs: CustomDefs,
+  customDefs: LabwareDefByDefURI,
+  labwareUploadMessage: ?LabwareUploadMessage,
 }
 
 const _allReducers = {
   customDefs,
+  labwareUploadMessage,
 }
 
 export const rootReducer = combineReducers<_, Action>(_allReducers)

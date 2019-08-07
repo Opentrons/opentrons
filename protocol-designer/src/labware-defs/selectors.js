@@ -3,7 +3,7 @@ import { createSelector } from 'reselect'
 import { _getSharedLabware, getAllDefinitions } from './utils'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { BaseState, Selector } from '../types'
-import type { LabwareDefByDefURI } from './types'
+import type { LabwareDefByDefURI, LabwareUploadMessage } from './types'
 import type { RootState } from './reducers'
 import type { RootState as StepFormRootState } from '../step-forms'
 
@@ -55,3 +55,6 @@ export const getCustomLabwareDefsByURI: Selector<LabwareDefByDefURI> = createSel
   state => rootSelector(state).customDefs,
   _makeCustomLabwareDefsObj
 )
+
+export const getLabwareUploadMessage: Selector<?LabwareUploadMessage> = state =>
+  rootSelector(state).labwareUploadMessage
