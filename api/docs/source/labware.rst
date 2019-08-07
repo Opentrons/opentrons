@@ -501,6 +501,10 @@ will print out...
     <Well B3>
     <Well B5>
 
+
+.. _deprecated_labware:
+
+
 *****************************
 Deprecated Labware Load Names
 *****************************

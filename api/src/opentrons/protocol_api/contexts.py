@@ -1317,7 +1317,7 @@ class InstrumentContext(CommandPublisher):
         # TODO: ..trash or the original well.
         # TODO: What should happen if the user passes a non-first-row well
         # TODO: ..as src/dest *while using multichannel pipette?
-        r"""
+        """
         Transfer will move a volume of liquid from a source location(s)
         to a dest location(s). It is a higher-level command, incorporating
         other :py:class:`InstrumentContext` commands, like :py:meth:`aspirate`

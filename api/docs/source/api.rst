@@ -1,8 +1,8 @@
 .. _api:
 
 
-API Reference
-===============
+API Version 1 Reference
+=======================
 
 .. module:: opentrons
 
@@ -14,7 +14,7 @@ Robot
 All protocols are set up, simulated and executed using a Robot class.
 
 .. autoclass:: opentrons.legacy_api.robot.Robot
-   :members: connect, home, reset, run, simulate, commands, move_to, disconnect, head_speed, pause, resume, stop, get_warnings, add_instrument, get_motor
+   :members: connect, home, reset, commands, move_to, disconnect, head_speed, pause, resume, stop, get_warnings, add_instrument
 
 Pipette
 -----------------
@@ -33,4 +33,3 @@ Simulation
 .. automodule:: opentrons.simulate
    :exclude-members: CommandScraper, AccumulatingHandler, main
    :members:
-

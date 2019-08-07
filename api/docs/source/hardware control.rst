@@ -1,4 +1,4 @@
-.. _robot:
+.. _hardware control:
 
 .. code-block:: python
 
