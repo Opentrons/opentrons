@@ -1,13 +1,14 @@
 {
   "command": {
-    "publish": {
-      "cdVersion": "prerelease",
+    "version": {
+      "allowBranch": "release_*",
       "conventionalCommits": true,
       "exact": true,
-      "forcePublish": "*",
-      "preid": "alpha",
-      "skipNpm": true,
-      "skipGit": true
+      "includeMergedTags": true,
+      "message": "chore(release): publish %v",
+      "gitTagVersion": false,
+      "push": false,
+      "preid": "alpha"
     }
   },
   "npmClient": "yarn",
