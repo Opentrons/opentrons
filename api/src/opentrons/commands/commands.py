@@ -401,7 +401,7 @@ def thermocycler_cycle_temperatures(steps, repetitions):
         name=command_types.THERMOCYCLER_CYCLE_TEMPS,
         payload={
             'text': text,
-            'steps': json.dumps(steps)
+            'steps': steps
         }
     )
 

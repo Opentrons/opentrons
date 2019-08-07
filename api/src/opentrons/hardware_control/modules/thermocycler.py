@@ -164,7 +164,7 @@ class Thermocycler(mod_abc.AbstractModule):
         self._current_step_index: Optional[int] = None
 
     def pause(self):
-        self._running_flag.clear()
+        self._loop.call_soon_threadsafe(self._running_flag.clear)
 
     def resume(self):
         self._loop.call_soon_threadsafe(self._running_flag.set)
@@ -173,7 +173,7 @@ class Thermocycler(mod_abc.AbstractModule):
         if self._current_cycle_task:
             self._current_cycle_task.cancel()
             self._current_cycle_task = None
-            self._running_flag.clear()
+            self._loop.call_soon_threadsafe(self._running_flag.clear)
 
     async def deactivate(self):
         self._total_cycle_count = None
@@ -197,15 +197,12 @@ class Thermocycler(mod_abc.AbstractModule):
     async def _execute_cycles(self,
                               steps: List[types.ThermocyclerStep],
                               repetitions: int):
-        for rep_idx, rep in enumerate(range(repetitions)):
-            self._current_cycle_index = rep_idx + 1  # science starts at 1
+        for rep in range(repetitions):
+            self._current_cycle_index = rep + 1  # science starts at 1
             for step_idx, step in enumerate(steps):
                 self._current_step_index = step_idx + 1  # science starts at 1
                 await self._running_flag.wait()
-                if isinstance(step, dict):
-                    await self.set_temperature(**step)
-                else:
-                    await self.set_temperature(*step)
+                await self.set_temperature(**step)
                 await self.wait_for_hold()
 
     async def cycle_temperatures(self,

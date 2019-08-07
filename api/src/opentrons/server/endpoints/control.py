@@ -93,25 +93,25 @@ async def get_attached_pipettes(request):
 async def get_attached_modules(request):
     """
     On success (including an empty "modules" list if no modules are detected):
-    // status: 200
+    # status: 200
     {
         "modules": [
             {
-                /** machine readable identifying name of module */
+                # machine readable identifying name of module
                 "name": "string",
-                /** human-presentable name of module */
+                # human-presentable name of module
                 "displayName": "string",
-                /** module system port path*/
+                # module system port pat
                 "port": "string",
-                /** unique serial number */
+                # unique serial number
                 "serial": "string",
-                /** model identifier (i.e. part number) */
+                # model identifier (i.e. part number)
                 "model": "string",
-                /** current firmware version */
+                # current firmware version
                 "fwVersion": "string",
-                /** human readable status */
+                # human readable status
                 "status": "string",
-                /** live module data*/
+                # live module dat
                 "data": "dict",
             },
             // ...
@@ -119,7 +119,7 @@ async def get_attached_modules(request):
     }
 
     On failure:
-    // status: 500
+    # status: 500
     {
         "message": "..."
     }

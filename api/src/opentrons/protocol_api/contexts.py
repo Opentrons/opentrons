@@ -2047,14 +2047,18 @@ class ThermocyclerContext(ModuleContext):
         temperatures in degrees C for a set hold time.
 
         :param steps: List of unique steps that make up a single cycle.
-                      Each tuple in list maps to parameters of the
-                      set_temperature method.
-                      NOTE: hold_time must be defined and finite for each step.
+                      Each list item maps to parameters of the
+                      set_temperature method as a dict of float values with
+                      keys 'temp', 'hold_time', and optionally 'ramp_rate'.
+                      NOTE: unlike the set_temperature method, hold_time
+                      must be defined and finite for each step.
         :param repetitions: The number of times to repeat the cycled steps.
         """
         for step in steps:
-            if (isinstance(step, dict) and step['hold_time'] is None) or (
-                    isinstance(step, list) and step[1] is None):
+            if (step['temp'] is None):
+                raise ValueError(
+                        "temp must be defined for each step in cycle")
+            if (step['hold_time'] is None):
                 raise ValueError(
                         "hold_time must be defined for each step in cycle")
         return self._module.cycle_temperatures(
