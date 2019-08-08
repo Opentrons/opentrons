@@ -23,7 +23,7 @@ type Props = {
   /** lightens overlay (alert modal over existing modal) */
   alertOverlay?: boolean,
   /** override default alert icon */
-  iconName?: IconName,
+  iconName?: ?IconName,
   /** restricts scroll outside of Modal when open, true by default */
   restrictOuterScroll?: boolean,
 }
@@ -59,7 +59,9 @@ export default function AlertModal(props: Props) {
     >
       {heading && (
         <div className={styles.alert_modal_heading}>
-          <Icon name={iconName} className={styles.alert_modal_icon} />
+          {props.iconName !== null && (
+            <Icon name={iconName} className={styles.alert_modal_icon} />
+          )}
           {heading}
         </div>
       )}
