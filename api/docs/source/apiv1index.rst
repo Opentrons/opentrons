@@ -3,7 +3,6 @@ Opentrons API Version 1
 =======================
 
 .. toctree::
-    :hidden:
     :maxdepth: 1
 
     labware
