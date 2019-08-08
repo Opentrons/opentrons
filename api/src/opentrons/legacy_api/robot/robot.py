@@ -873,7 +873,30 @@ class Robot(CommandPublisher):
         """
         Pauses execution of the protocol. Use :meth:`resume` to resume
         """
+        self.execute_pause()
+
+    def execute_pause(self):
+        """ Pause the driver
+
+        This method should not be called inside a protocol. Use
+        :py:meth:`pause` instead
+        """
         self._driver.pause()
+
+    @commands.publish.both(command=commands.resume)
+    def resume(self):
+        """
+        Resume execution of the protocol after :meth:`pause`
+        """
+        self.execute_resume()
+
+    def execute_resume(self):
+        """ Resume the driver after :meth:`execute_pause`
+
+        This method should not be called inside a protocol. Use
+        :py:meth:`resume` instead
+        """
+        self._driver.resume()
 
     def stop(self):
         """
@@ -882,13 +905,6 @@ class Robot(CommandPublisher):
         self._driver.kill()
         self.reset()
         self.home()
-
-    @commands.publish.both(command=commands.resume)
-    def resume(self):
-        """
-        Resume execution of the protocol after :meth:`pause`
-        """
-        self._driver.resume()
 
     def halt(self):
         """

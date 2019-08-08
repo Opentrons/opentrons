@@ -324,12 +324,24 @@ class Session(object):
         return self
 
     def pause(self):
-        self._hardware.pause()
+        if ff.use_protocol_api_v2():
+            self._hardware.pause()
+        # robot.pause in the legacy API will publish commands to the broker
+        # use the broker-less execute_pause instead
+        else:
+            self._hardware.execute_pause()
+
         self.set_state('paused')
         return self
 
     def resume(self):
-        self._hardware.resume()
+        if ff.use_protocol_api_v2():
+            self._hardware.resume()
+        # robot.resume in the legacy API will publish commands to the broker
+        # use the broker-less execute_resume instead
+        else:
+            self._hardware.execute_resume()
+
         self.set_state('running')
         return self
 
