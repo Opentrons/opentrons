@@ -575,7 +575,7 @@ When a robot is running on buildroot, its filesystem is mounted from two separat
 [commitizen]: https://github.com/commitizen/cz-cli
 [conventional-commits]: https://conventionalcommits.org/
 [lerna]: https://github.com/lerna/lerna
-[lerna-publish]: https://github.com/lerna/lerna/tree/v3.16.4/commands/version
+[lerna-version]: https://github.com/lerna/lerna/tree/v3.16.4/commands/version
 [semver-inc]: https://github.com/npm/node-semver#functions
 [systemd-journald]: https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html
 [journalctl]: https://www.freedesktop.org/software/systemd/man/journalctl.html

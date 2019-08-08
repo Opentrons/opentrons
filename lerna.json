@@ -5,7 +5,6 @@
       "conventionalCommits": true,
       "exact": true,
       "includeMergedTags": true,
-      "message": "chore(release): publish %v",
       "gitTagVersion": false,
       "push": false,
       "preid": "alpha"
