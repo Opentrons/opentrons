@@ -1,8 +1,22 @@
-.. _apiv2index:
-
 =======================
 Opentrons API Version 1
 =======================
+
+.. toctree::
+    :hidden:
+    :maxdepth: 1
+
+    labware
+    pipettes
+    atomic commands
+    complex commands
+    hardware control
+    modules
+    examples
+    api
+
+Overview
+++++++++
 
 How it Looks
 ---------------
@@ -127,17 +141,4 @@ From the example above, the "commands" section looked like:
 
 .. code-block:: python
 
-    pipette.transfer(100, plate.wells('A1'), plate.wells('B1'))
-
-
-.. toctree::
-    :hidden:
-
-    labware
-    pipettes
-    atomic commands
-    complex commands
-    hardware control
-    modules
-    examples
-    api
+    pipette.transfer(100, plate.wells('A1'), plate.wells('B1')) 

@@ -171,6 +171,8 @@ html_theme_options = {
 #
 html_title = 'Opentrons API v2.0'
 
+sidebar_include_hidden=True
+
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #
 # html_short_title = None

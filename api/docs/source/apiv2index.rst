@@ -3,7 +3,22 @@
 Opentrons API Version 2
 ========================
 
+
+.. toctree::
+    :hidden:
+
+    new_labware
+    new_pipette
+    new atomic commands
+    new complex commands
+    new_hardware_control
+    new_protocol_api
+    new_examples
+
+
 .. _protocol-api-robot:
+Overview
+++++++++
 
 How it Looks
 ---------------
@@ -80,14 +95,3 @@ Opentrons API version 2 protocols are structured around a function called ``run(
 This object is called the *protocol context*, and is always an instance of the :py:class:`.ProtocolContext` class. The protocol context plays the same role as the ``robot``, ``labware``, ``instruments``, and ``modules`` objects in past versions of the API, with one important difference: it is only one object; and because it is passed in to your protocol rather than imported, it is possible for the API to be much more rigorous about separating simulation from reality.
 
 The key point is that there is no longer any need to ``import opentrons`` at the top of every protocol, since the *robot* now *runs the protocol*, rather than the *protocol running the robot*.
-
-.. toctree::
-    :hidden:
-
-    new_labware
-    new_pipette
-    new atomic commands
-    new complex commands
-    new_hardware_control
-    new_protocol_api
-    new_examples

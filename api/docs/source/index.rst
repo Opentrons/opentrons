@@ -56,11 +56,8 @@ __ https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md
 
 
 .. toctree::
-    :includehidden:
+    :hidden:
 
     writing
     apiv1index
-
-.. |br| raw:: html
-
-   <br />
+    apiv2index
