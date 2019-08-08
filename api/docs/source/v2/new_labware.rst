@@ -92,7 +92,7 @@ Individual Well Dictionary access into a labware
 ------------------------------------------------
 Once a labware is loaded into your protocol, you can easily access the many
 wells within it by using dictionary indexing. If a well does not exist in this labware,
-you will receive a `KeyError`.
+you will receive a ``KeyError``.
 
 .. code-block:: python
 

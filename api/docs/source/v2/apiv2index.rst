@@ -9,6 +9,7 @@ Opentrons API Version 2
 
     new_pipette
     new_labware
+    new_modules
     new_atomic_commands
     new_complex_commands
     new_hardware_control

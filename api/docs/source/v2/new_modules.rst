@@ -8,10 +8,9 @@ Modules are peripherals that attach to the OT-2 to extend its capabilities.
 
 Modules currently supported are the Temperature, Magnetic and Thermocycler Module.
 
-This documentation and modules API is subject to change. Check :ref:`protocol-api-modules` or on
-our github for updated information.
+This is not an exhaustive list of functionality for modules. Check :ref:`protocol-api-modules` or on
+our github for full explanations of methods.
 
-This code is only valid on software version 4.0.0 or later.
 
 Loading your Module onto a deck
 ===============================
@@ -53,9 +52,9 @@ All modules have the ability to check what state they are currently in. To do th
 
     status = module.status
 
-For the temperature module this will return a string stating whether it's `heating`, `cooling`, `holding at target` or `idle`.
-For the magnetic module this will return a string stating whether it's `engaged` or `disengaged`.
-For the thermocycler module this will return `holding at target` or `idle`. There are more detailed status checks which can be found in at :ref:`thermocycler-section`
+For the temperature module this will return a string stating whether it's ``'heating'``, ``'cooling'``, ``'holding at target'`` or ``'idle'``.
+For the magnetic module this will return a string stating whether it's ``'engaged'`` or ``'disengaged'``.
+For the thermocycler module this will return ``'holding at target'`` or ``'idle'``. There are more detailed status checks which can be found in at :ref:`thermocycler-section`
 
 ******************
 Temperature Module
@@ -90,11 +89,11 @@ This function will pause your protocol until your target temperature is reached.
     temp_mod.set_temperature(4)
     temp_mod.wait_for_temp()
 
-Before using `wait_for_temp()` you must set a target temperature with `set_temperature()`.
+Before using ``wait_for_temp()`` you must set a target temperature with ``set_temperature()``.
 Once the target temperature is set, when you want the protocol to wait until the module
-reaches the target you can call `wait_for_temp().`
+reaches the target you can call ``wait_for_temp().``
 
-If no target temperature is set via `set_temperature()`, the protocol will be stuck in
+If no target temperature is set via ``set_temperature()``, the protocol will be stuck in
 an indefinite loop.
 
 Read the Current Temperature
@@ -116,7 +115,7 @@ We can read the target temperature of the module by the following:
 Deactivate
 ^^^^^^^^^^
 This function will stop heating or cooling and will turn off the fan on the module.
-You would still be able to call `set_temperature()` function to initiate a heating
+You would still be able to call ``set_temperature()`` function to initiate a heating
 or cooling phase again.
 
 .. code-block:: python
@@ -125,7 +124,7 @@ or cooling phase again.
 
 ** Note**
 You can also deactivate your temperature module through our Run App by
-clicking on the `Pipettes & Modules` tab. Your temperature module will automatically
+clicking on the ``Pipettes & Modules`` tab. Your temperature module will automatically
 deactivate if another protocol is uploaded to the app. Your temperature module will
 not deactivate automatically upon protocol end, cancel or re-setting a protocol.
 
@@ -157,7 +156,7 @@ Engage
 The destination of the magnets can be specified in several different
 ways, based on internally stored default heights for labware:
 
-   - If neither `height` nor `offset` is specified **and** the labware is support on the magnetic module,
+   - If neither ``height`` nor ``offset`` is specified **and** the labware is support on the magnetic module,
      the magnets will raise to a reasonable default height based on the specified
      labware.
 
@@ -165,7 +164,7 @@ ways, based on internally stored default heights for labware:
 
          mag_mod.engage()
 
-   - If `height` is specified, it should be a distance in mm from the
+   - If ``height`` is specified, it should be a distance in mm from the
      home position of the magnets.
 
      .. code-block:: python
@@ -175,7 +174,7 @@ ways, based on internally stored default heights for labware:
 **Note** Only certain labwares have defined engage heights for the Magnetic
 Module. If a labware that does not have a defined engage height is
 loaded on the Magnetic Module (or if no labware is loaded), then
-`height` must be specified.
+``height`` must be specified.
 
 Disengage
 ^^^^^^^^^
@@ -215,23 +214,36 @@ Set Temperature
 ^^^^^^^^^^^^^^^
 To set the temperature of the bottom plate you have a few options:
 
-  - If you only specify a temperature in celcius, the thermocycler will hold this temperature indefinitely until powered off.
+Temperature
++++++++++++
 
-    .. code-block:: python
+If you only specify a temperature in celcius, the thermocycler will hold this temperature indefinitely until powered off.
 
-            tc_mod.set_temperature(4)
+.. code-block:: python
 
-  - If you set a temperature and a hold time, the thermocycler will hold the temperature for the specified amount of time. Time is in seconds.
+        tc_mod.set_temperature(4)
 
-    .. code-block:: python
+Hold Time
++++++++++
 
-            tc_mod.set_temperature(4, hold_time=60)
+If you set a temperature and a hold time, the thermocycler will hold the temperature for the specified amount of time. Time is in seconds.
 
-  - Lastly, you can modify the ramp rate in degC/sec for a given temperature.   **Do not change this parameter unless you know what you're doing**
+.. code-block:: python
 
-    .. code-block:: python
+        tc_mod.set_temperature(4, hold_time=60)
 
-            tc_mod.set_temperature(4, hold_time=60, ramp_rate=0.5)
+Ramp Rate
++++++++++
+
+Lastly, you can modify the ramp rate in degC/sec for a given temperature.
+
+.. code-block:: python
+
+        tc_mod.set_temperature(4, hold_time=60, ramp_rate=0.5)
+
+.. warning::
+
+  Do not change this parameter unless you know what you're doing.
 
 Set Lid Temperature
 ^^^^^^^^^^^^^^^^^^^
@@ -243,4 +255,4 @@ To set the temperature of the lid in celcius:
 
 Open Lid
 ^^^^^^^^
-If you want to perform liquid handling steps on the thermocycler you must
+If you want to perform liquid handling steps on the thermocycler you must ensure that the lid of the thermocycler is open.
