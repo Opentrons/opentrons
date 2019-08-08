@@ -40,12 +40,8 @@ transfer liquids to and from.
 Rows of wells (see image below) on a labware are typically labeled with capital letters starting with ``'A'``;
 for instance, an 8x12 96 well plate will have rows ``'A'`` through ``'H'``.
 
-- Lettered rows ``['A']-['END']``
-
 Columns of wells (see image below) on a labware are typically labeled with numerical indices starting with ``'1'``;
 for instance, an 8x12 96 well plate will have columns ``'1'`` through ``'12'``.
-
-- Numbered columns ``['1']-['END']``.
 
 For all well accessing functions, the starting well will always be at the top left corner of the labware.
 The ending well will be in the bottom right, see the diagram below for further explanation.
