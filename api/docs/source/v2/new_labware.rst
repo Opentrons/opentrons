@@ -54,7 +54,7 @@ transfer liquids to and from.
 For all well accessing functions, the starting well will always be at the top left corner of the labware.
 The ending well will be in the bottom right, see the diagram below for further explanation.
 
-.. image:: img/well_iteration/Well_Iteration.png
+.. image:: ../img/well_iteration/Well_Iteration.png
 
 .. code-block:: python
 

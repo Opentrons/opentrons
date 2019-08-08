@@ -7,9 +7,9 @@ Opentrons API Version 1
 
     labware
     pipettes
-    atomic commands
-    complex commands
-    hardware control
+    atomic_commands
+    complex_commands
+    hardware_control
     modules
     examples
     api
