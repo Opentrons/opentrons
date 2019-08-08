@@ -11,7 +11,7 @@ We’ve designed it in a way we hope is accessible to anyone with basic Python a
 Getting Started
 ---------------
 
-New to Python? Check out our :ref:`docs_restructure_apiv2` page first before continuing. To get a sense of the typical structure of our scripts, take a look at our :ref:`examples` page.
+New to Python? Check out our :ref:`writing` page first before continuing. To get a sense of the typical structure of our scripts, take a look at our :ref:`examples` page.
 
 Our API requires Python version 3.6.4 or later. Once this is set up on your computer, you can simply use `pip` to install the Opentrons package.
 
