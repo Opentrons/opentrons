@@ -1,8 +1,8 @@
 .. _api:
 
 
-API Version 1 Reference
-=======================
+API Reference
+==============
 
 .. module:: opentrons
 

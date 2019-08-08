@@ -1,3 +1,5 @@
+.. _v2-complex-commands:
+
 ########################
-New Complex Commands
+Complex Commands
 ########################

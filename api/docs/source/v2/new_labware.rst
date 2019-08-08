@@ -27,16 +27,6 @@ To see the labware names that can be loaded with
 
 __ https://labware.opentrons.com
 
-
-*****************************
-Invalid Labware Load Names
-*****************************
-
-Once you make the switch to API Version 2, you will no longer be able to use definition names from the opentrons standard labware in API Version 1.
-
-For your reference, a labware map was made and can be found at :ref:`deprecated_labware`.
-
-
 **************************
 Accessing Wells in Labware
 **************************
@@ -90,9 +80,10 @@ The table below lists out the different methods available to you and their diffe
 +------------------------+---------------------------------------------------------------------------------------------------------------+
 
 Accessing Individual Wells
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**Individual Well Dictionary access into a labware**
+Individual Well Dictionary access into a labware
+------------------------------------------------
 Once a labware is loaded into your protocol, you can easily access the many
 wells within it by using dictionary indexing. If a well does not exist in this labware,
 you will receive a `KeyError`.
@@ -102,7 +93,8 @@ you will receive a `KeyError`.
     a1 = plate['A1']
     d6 = plate.wells_by_name()['D6']
 
-**Individual Well List access into a labware**
+Individual Well List access into a labware
+------------------------------------------
 Wells can be referenced by their "string" name, as demonstrated above.
 However, they can also be referenced with zero-indexing, with the first well in
 a labware being at position 0.
@@ -120,7 +112,7 @@ a labware being at position 0.
     one method and don't use the other one.
 
 Accessing Groups of Wells
--------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^
 If we had to reference each well one at a time, our protocols could get very
 long.
 
@@ -173,3 +165,12 @@ or..
         print(well_obj)
 
 and it will return the individual well objects in row A.
+
+
+*****************************
+Invalid Labware Load Names
+*****************************
+
+Once you make the switch to API Version 2, you will no longer be able to use definition names from the opentrons standard labware in API Version 1.
+
+For your reference, a labware map was made and can be found at :ref:`deprecated_labware`.

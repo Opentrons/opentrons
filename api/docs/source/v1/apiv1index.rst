@@ -1,6 +1,6 @@
-=======================
-Opentrons API Version 1
-=======================
+==============
+Opentrons API
+==============
 
 .. toctree::
     :maxdepth: 1
@@ -140,4 +140,4 @@ From the example above, the "commands" section looked like:
 
 .. code-block:: python
 
-    pipette.transfer(100, plate.wells('A1'), plate.wells('B1')) 
+    pipette.transfer(100, plate.wells('A1'), plate.wells('B1'))
