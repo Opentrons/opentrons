@@ -280,8 +280,8 @@ class ProtocolContext(CommandPublisher):
                 'magdeck': modules.magdeck.MagDeck,
                 'tempdeck': modules.tempdeck.TempDeck,
                 'thermocycler': modules.thermocycler.Thermocycler}[mod_id]
-            hc_mod_instance = mod_type(
-                port='', simulating=True, loop=self._loop)
+            hc_mod_instance = adapters.SynchronousAdapter(mod_type(
+                port='', simulating=True, loop=self._loop))
         if hc_mod_instance:
             mod_ctx = mod_class(self,
                                 hc_mod_instance,
@@ -2020,24 +2020,49 @@ class ThermocyclerContext(ModuleContext):
 
     @cmds.publish.both(command=cmds.thermocycler_set_temp)
     def set_temperature(self,
-                        temp: float,
+                        temperature: float,
                         hold_time: float = None,
                         ramp_rate: float = None):
-        """ Set the target temperature, in C.
+        """ Set the target temperature, in °C.
 
         Valid operational range yet to be determined.
-        :param temp: The target temperature, in degrees C.
-        :param hold_time: The time to hold after reaching temperature. If
-                          ``hold_time`` is not specified, the Thermocycler will
-                          hold this temperature indefinitely (requiring manual
-                          intervention to end the cycle).
-        :param ramp_rate: The target rate of temperature change, in degC/sec.
+        :param temperature: The target temperature, in °C.
+        :param hold_time: The time to hold, after reaching temperature, before
+                          proceeding to the next command. If ``hold_time``
+                          is not specified, the Thermocycler will
+                          hold this temperature indefinitely.
+        :param ramp_rate: The target rate of temperature change, in °C/sec.
                           If ``ramp_rate`` is not specified, it will default to
                           the maximum ramp rate as defined in the device
                           configuration.
         """
         return self._module.set_temperature(
-            temp=temp, hold_time=hold_time, ramp_rate=ramp_rate)
+            temperature=temperature, hold_time=hold_time, ramp_rate=ramp_rate)
+
+    @cmds.publish.both(command=cmds.thermocycler_cycle_temperatures)
+    def cycle_temperatures(self,
+                           steps: List[modules.types.ThermocyclerStep],
+                           repetitions: int):
+        """ For a given number of repetitions, cycle through a list of
+        temperatures in °C for a set hold time.
+
+        :param steps: List of unique steps that make up a single cycle.
+                      Each list item maps to parameters of the
+                      set_temperature method as a dict of float values with
+                      keys 'temperature', 'hold_time', & optional 'ramp_rate'.
+                      NOTE: unlike the set_temperature method, hold_time
+                      must be defined and finite for each step.
+        :param repetitions: The number of times to repeat the cycled steps.
+        """
+        for step in steps:
+            if step.get('temperature') is None:
+                raise ValueError(
+                        "temperature must be defined for each step in cycle")
+            if step.get('hold_time') is None:
+                raise ValueError(
+                        "hold_time must be defined for each step in cycle")
+        return self._module.cycle_temperatures(
+            steps=steps, repetitions=repetitions)
 
     @property
     def current_lid_target(self):
@@ -2099,6 +2124,26 @@ class ThermocyclerContext(ModuleContext):
     def hold_time(self):
         """ Remaining hold time in sec"""
         return self._module.hold_time
+
+    @property
+    def total_cycle_count(self):
+        """ Number of repetitions for current set cycle"""
+        return self._module.total_cycle_count
+
+    @property
+    def current_cycle_index(self):
+        """ Index of the current set cycle repetition"""
+        return self._module.current_cycle_index
+
+    @property
+    def total_step_count(self):
+        """ Number of steps within the current cycle"""
+        return self._module.total_step_count
+
+    @property
+    def current_step_index(self):
+        """ Index of the current step within the current cycle"""
+        return self._module.current_step_index
 
     @cmds.publish.both(command=cmds.thermocycler_deactivate)
     def deactivate(self):

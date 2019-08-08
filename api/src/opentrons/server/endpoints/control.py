@@ -93,29 +93,33 @@ async def get_attached_pipettes(request):
 async def get_attached_modules(request):
     """
     On success (including an empty "modules" list if no modules are detected):
-    // status: 200
+    # status: 200
     {
         "modules": [
             {
-                /** name of module */
+                # machine readable identifying name of module
                 "name": "string",
-                /** model identifier (i.e. part number) */
-                "model": "string",
-                /** unique serial number */
-                "serial": "string",
-                /** current firmware version */
-                "fwVersion": "string",
-                /** human readable status */
-                "status": "string",
-                /** human readable display name */
+                # human-presentable name of module
                 "displayName": "string",
+                # module system port pat
+                "port": "string",
+                # unique serial number
+                "serial": "string",
+                # model identifier (i.e. part number)
+                "model": "string",
+                # current firmware version
+                "fwVersion": "string",
+                # human readable status
+                "status": "string",
+                # live module dat
+                "data": "dict",
             },
             // ...
         ],
     }
 
     On failure:
-    // status: 500
+    # status: 500
     {
         "message": "..."
     }
@@ -199,7 +203,7 @@ async def execute_module_command(request):
                                  status=404)
 
     matching_mod = next((mod for mod in hw_mods if
-                        mod.device_info.get('serial') == requested_serial),
+                         mod.device_info.get('serial') == requested_serial),
                         None)
 
     if not matching_mod:
