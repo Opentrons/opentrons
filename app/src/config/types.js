@@ -7,6 +7,13 @@ export type UpdateChannel = 'latest' | 'beta' | 'alpha'
 
 export type DiscoveryCandidates = string | Array<string>
 
+export type DevInternalFlag =
+  | 'allPipetteConfig'
+  | 'tempdeckControls'
+  | 'enableThermocycler'
+  | 'enablePipettePlus'
+  | 'enableBuildRoot'
+
 export type Config = {
   devtools: boolean,
 
@@ -65,11 +72,7 @@ export type Config = {
 
   // internal development flags
   devInternal?: {
-    allPipetteConfig?: boolean,
-    tempdeckControls?: boolean,
-    enableThermocycler?: boolean,
-    enablePipettePlus?: boolean,
-    enableBuildRoot?: boolean,
+    [DevInternalFlag]: boolean,
   },
 }
 

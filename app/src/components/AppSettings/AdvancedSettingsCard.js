@@ -3,8 +3,17 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, Route, Link } from 'react-router-dom'
+import startCase from 'lodash/startCase'
 
-import { getConfig, updateConfig, toggleDevTools } from '../../config'
+import {
+  getConfig,
+  updateConfig,
+  toggleDevTools,
+  toggleDevInternalFlag,
+  DEV_INTERNAL_FLAGS,
+  type Config,
+  type DevInternalFlag,
+} from '../../config'
 import { Card } from '@opentrons/components'
 import { LabeledToggle, LabeledSelect, LabeledButton } from '../controls'
 import AddManualIp from './AddManualIp'
@@ -20,11 +29,13 @@ type OP = {
 
 type SP = {|
   devToolsOn: boolean,
+  devInternal: $PropertyType<Config, 'devInternal'>,
   channel: UpdateChannel,
 |}
 
 type DP = {|
   toggleDevTools: () => mixed,
+  toggleDevInternalFlag: DevInternalFlag => mixed,
   handleChannel: (event: SyntheticInputEvent<HTMLSelectElement>) => mixed,
 |}
 
@@ -86,6 +97,15 @@ function AdvancedSettingsCard(props: Props) {
             manually add its IP address or hostname here
           </p>
         </LabeledButton>
+        {props.devToolsOn &&
+          DEV_INTERNAL_FLAGS.map(flag => (
+            <LabeledToggle
+              key={flag}
+              label={`__DEV__ ${startCase(flag)}`}
+              toggledOn={props.devInternal ? props.devInternal[flag] : false}
+              onClick={() => props.toggleDevInternalFlag(flag)}
+            />
+          ))}
       </Card>
       <Route
         path={`${props.match.path}/add-ip`}
@@ -100,6 +120,7 @@ function mapStateToProps(state: State): SP {
 
   return {
     devToolsOn: config.devtools,
+    devInternal: config.devInternal,
     channel: config.update.channel,
   }
 }
@@ -107,6 +128,8 @@ function mapStateToProps(state: State): SP {
 function mapDispatchToProps(dispatch: Dispatch, ownProps: OP) {
   return {
     toggleDevTools: () => dispatch(toggleDevTools()),
+    toggleDevInternalFlag: (flag: DevInternalFlag) =>
+      dispatch(toggleDevInternalFlag(flag)),
     handleChannel: event => {
       dispatch(updateConfig('update.channel', event.target.value))
 
