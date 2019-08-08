@@ -43,7 +43,7 @@ onto the module. You can do this via:
 
     my_labware = module.load_labware('Labware Definition Name')
 
-Where module is the variable name you saved your module to. You do not need to specify the slot.
+Where ``module`` is the variable name you saved your module to. You do not need to specify the slot.
 
 Checking the status of your Module
 ==================================
@@ -136,8 +136,8 @@ Magnetic Module
 
 The magnetic module has two actions:
 
-- engage: The magnetic stage rises to a default height unless an *offset* or a custom *height* is specified
-- disengage: The magnetic stage moves down to its home position
+- ``engage``: The magnetic stage rises to a default height unless an *offset* or a custom *height* is specified
+- ``disengage``: The magnetic stage moves down to its home position
 
 You can also specify a custom engage height for the magnets so you can use a different labware with the magdeck.
 In the future, we will have adapters to support tuberacks as well as deep well plates.
@@ -243,4 +243,4 @@ To set the temperature of the lid in celcius:
 
 Open Lid
 ^^^^^^^^
-If you want to perform liquid handling steps on the thermocycler you must 
+If you want to perform liquid handling steps on the thermocycler you must

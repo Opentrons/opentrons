@@ -1,11 +1,11 @@
-.. _new atomic commands:
+.. _v2-atomic-commands:
 
 ########################
 Atomic Liquid Handling
 ########################
 
 Atomic liquid handling refers to the smallest individual action that can be completed on a robot.
-For example, a liquid transfer at its core, found in :ref:`v2-complex-commands`, can be separated into a series of `pick_up_tip()`, `aspirate()`, `dispense()`, `drop_tip()` etc.
+For example, a liquid transfer at its core, found in :ref:`v2-complex-commands`, can be separated into a series of ``pick_up_tip()``, ``aspirate()``, ``dispense()``, ``drop_tip()`` etc.
 
 For the purposes of this section we can assume that we already have the following:
 
@@ -109,7 +109,7 @@ If we try to ``pick_up_tip()`` again when all the tips have been used, the Opent
 Liquid Control
 ****************
 
-This is the fun section, where we get to move things around and pipette! This section describes the ``Pipette`` object's many liquid-handling commands, as well as how to move the ``robot``.
+This is the fun section, where we get to move things around and pipette! This section describes the ``InstrumentContext`` object's many liquid-handling commands, as well as how to move the ``robot``.
 Please note that the default now for pipette aspirate and dispense location is a 1mm offset from the **bottom** of the well now.
 
 **********************
@@ -141,7 +141,7 @@ We can also simply specify how many microliters to aspirate, and not mention a l
 
 Now our pipette's tip is holding 100uL.
 
-We can also specify only the location to aspirate from. If we do not tell the pipette how many microliters to aspirate, it will by default fill up the remaining volume in it's tip. In this example, since we already have 100uL in the tip, the pipette will aspirate another 200uL
+We can also specify only the location to aspirate from. If we do not tell the pipette how many microliters to aspirate, it will by default fill up the remaining volume in its tip. In this example, since we already have 100uL in the tip, the pipette will aspirate another 200uL
 
 .. code-block:: python
 
@@ -151,12 +151,12 @@ We can also specify only the location to aspirate from. If we do not tell the pi
 Dispense
 ========
 
-To dispense is to push out liquid from the pipette's tip. It's usage in the Opentrons API is nearly identical to ``aspirate()``, in that you can specify microliters and location, only microliters, or only a location:
+To dispense is to push out liquid from the pipette's tip. Its usage in the Opentrons API is nearly identical to ``aspirate()``, in that you can specify microliters and location, only microliters, or only a location:
 
 .. code-block:: python
 
     pipette.dispense(50, plate['B1']) # dispense 50uL to plate:B1
-    pipette.dispense(50)                    # dispense 50uL to current position
+    pipette.dispense(50)              # dispense 50uL to current position
     pipette.dispense(plate['B2'])     # dispense until pipette empties to plate:B2
 
 That final dispense without specifying a microliter amount will dispense all remaining liquids in the tip to ``plate['B2']``, and now our pipette is empty.
@@ -166,11 +166,11 @@ Blow Out
 
 To blow out is to push an extra amount of air through the pipette's tip, so as to make sure that any remaining droplets are expelled.
 
-When calling ``blow_out()`` on a pipette, we have the option to specify a location to blow out the remaining liquid. If no location is specified, the pipette will blow out from it's current position.
+When calling ``blow_out()`` on a pipette, we have the option to specify a location to blow out the remaining liquid. If no location is specified, the pipette will blow out from its current position.
 
 .. code-block:: python
 
-    pipette.blow_out()                  # blow out in current location
+    pipette.blow_out()            # blow out in current location
     pipette.blow_out(plate['B3']) # blow out in current plate:B3
 
 
@@ -185,10 +185,12 @@ Touch tip can take up to 4 arguments: ``touch_tip(location, radius, v_offset, sp
 
 .. code-block:: python
 
-    pipette.touch_tip()                  # touch tip within current location
-    pipette.touch_tip(v_offset=-2)       # touch tip 2mm below the top of the current location
+    pipette.touch_tip()            # touch tip within current location
+    pipette.touch_tip(v_offset=-2) # touch tip 2mm below the top of the current location
     pipette.touch_tip(plate['B1']) # touch tip within plate:B1
-    pipette.touch_tip(plate['B1'], radius=0.75, v_offset=-2) # touch tip in plate:B1, at 75% of total radius and -2mm from top of well
+    pipette.touch_tip(plate['B1'], # touch tip in plate:B1, at 75% of total radius and -2mm from top of well
+                      radius=0.75,
+                      v_offset=-2)
 
 
 Mix
@@ -201,8 +203,8 @@ The mix command takes three arguments: ``mix(repetitions, volume, location)``
 .. code-block:: python
 
     pipette.mix(4, 100, plate.['A2'])   # mix 4 times, 100uL, in plate:A2
-    pipette.mix(3, 50)                       # mix 3 times, 50uL, in current location
-    pipette.mix(2)                           # mix 2 times, pipette's max volume, in current location
+    pipette.mix(3, 50)                  # mix 3 times, 50uL, in current location
+    pipette.mix(2)                      # mix 2 times, pipette's max volume, in current location
 
 
 Air Gap
@@ -223,7 +225,7 @@ Moving
 Move To
 =======
 
-Pipette's are able to ``move_to()`` any location on the deck.
+Pipettes are able to ``move_to()`` any location on the deck.
 
 For example, we can move to the first tip in our tip rack:
 
@@ -247,7 +249,7 @@ If instead you would like the robot to move in a straight line to the target loc
 
     pipette.move_to(plate['A1'], force_direct=True)
 
-.. note::
+.. warning::
 
     Moving without an arc will run the risk of colliding with things on your deck. Be very careful when using this option.
 

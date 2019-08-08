@@ -1,4 +1,4 @@
-.. _hardware control:
+.. _hardware-control:
 
 .. code-block:: python
 

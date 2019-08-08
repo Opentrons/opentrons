@@ -4,7 +4,9 @@
 Creating a Pipette
 ########################
 
-Pipettes are created and attached to a specific mount on the OT-2 (``'left'`` or ``'right'``).
+Pipettes are created and attached to a specific mount on the OT-2 (``'left'`` or ``'right'``) on the OT-2 using the function ``load_instrument``
+from the ``ProtocolContext`` class. This will return an ``InstrumentContext`` object. See :ref:`v2-atomic-commands` and :ref:`v2-complex-commands`
+for liquid handling commands from the ``InstrumentContext`` class.
 
 There are other parameters for pipettes, but the most important are the tip rack(s) it will use during the protocol.
 
@@ -12,12 +14,10 @@ Pipette Model(s)
 ===================
 Currently in our API there are 7 pipette models to correspond with the offered pipette models on our website.
 
-.. note::
-
 They are as follows:
 
 +---------------------------------------+-----------------------------+
-|          Pipette Type                 |         Nickname            |
+|          Pipette Type                 |     Model Name              |
 +=======================================+=============================+
 | ``P10 Single``   (1 - 10 ul)          | ``'p10_single'``            |
 +---------------------------------------+-----------------------------+
@@ -36,13 +36,22 @@ They are as follows:
 
 
 For every pipette type you are using in a protocol, you must use one of the
-
-model nick names specified above. For example, if you want to control a ``P300 Single``,
-
+model names specified above. For example, if you want to control a ``P300 Single``,
 the command might look something like:
 
 .. code-block:: python
 
+    pipette = protocol_context.load_instrument('p300_single', 'left')
+
+
+Adding Tip Racks
+================
+As stated at the beginning of this section, the most important non-mandatory parameter to add on a pipette would be tipracks.
+This parameter accepts a *list* of tiprack labware objects which allows 1-n amount of tipracks. Associating tipracks with your pipette
+allows for automatic tip tracking throughout your protocol which is further discussed in :ref:`v2-atomic-commands` and :ref:`v2-complex-commands`.
+
+.. code-block:: python
+    tiprack = protocol_context.load_labware('opentrons_96_tiprack_300ul', '1')
     pipette = protocol_context.load_instrument('p300_single', 'left', tip_racks=[tiprack])
 
 Plunger Flow Rates
@@ -75,7 +84,7 @@ Defaults
 
 The given defaults for every pipette model is the following:
 
-**P10_Single**
+**p10_single**
 
 - Aspirate Default: 5 μl/s
 - Dispense Default: 10 μl/s
@@ -83,7 +92,7 @@ The given defaults for every pipette model is the following:
 - Minimum Volume: 1 μl
 - Maximum Volume: 10 μl
 
-**P10_Multi**
+**p10_multi**
 
 - Aspirate Default: 5 μl/s
 - Dispense Default: 10 μl/s
@@ -91,7 +100,7 @@ The given defaults for every pipette model is the following:
 - Minimum Volume: 1 μl
 - Maximum Volume: 10 μl
 
-**P50_Single**
+**p50_single**
 
 - Aspirate Default: 25 μl/s
 - Dispense Default: 50 μl/s
@@ -99,7 +108,7 @@ The given defaults for every pipette model is the following:
 - Minimum Volume: 5 μl
 - Maximum Volume: 50 μl
 
-**P50_Multi**
+**p50_multi**
 
 - Aspirate Default: 25 μl/s
 - Dispense Default: 50 μl/s
@@ -107,7 +116,7 @@ The given defaults for every pipette model is the following:
 - Minimum Volume: 5 μl
 - Maximum Volume: 50 μl
 
-**P300_Single**
+**p300_single**
 
 - Aspirate Default: 150 μl/s
 - Dispense Default: 300 μl/s
@@ -115,7 +124,7 @@ The given defaults for every pipette model is the following:
 - Minimum Volume: 30 μl
 - Maximum Volume: 300 μl
 
-**P300_Multi**
+**p300_multi**
 
 - Aspirate Default: 150 μl/s
 - Dispense Default: 300 μl/s
@@ -123,7 +132,7 @@ The given defaults for every pipette model is the following:
 - Minimum Volume: 30 μl
 - Maximum Volume: 300 μl
 
-**P1000_Single**
+**p1000_single**
 
 - Aspirate Default: 500 μl/s
 - Dispense Default: 1000 μl/s
