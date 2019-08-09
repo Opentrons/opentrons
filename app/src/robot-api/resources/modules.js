@@ -121,7 +121,7 @@ export const getUnpreparedModules = (state: AppState): Array<Module> => {
   if (!robot) return []
 
   const sessionModules = robotSelectors.getModules(state)
-  const actualModules = getModulesState(state, robot.name)
+  const actualModules = getModulesState(state, robot.name) || []
 
   const preparableModules = sessionModules.reduce(
     (acc, mod) =>
@@ -133,9 +133,10 @@ export const getUnpreparedModules = (state: AppState): Array<Module> => {
       preparableModules.includes(mod.name)
     )
     return actualPreparableModules.reduce((acc, mod) => {
-      if (mod.name === 'thermocycler') {
-        return mod.data.lid !== 'open' ? [...acc, mod] : acc
+      if (mod.name === 'thermocycler' && mod.data.lid !== 'open') {
+        return [...acc, mod]
       }
+      return acc
     }, [])
   } else {
     return []

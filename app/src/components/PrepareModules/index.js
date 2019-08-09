@@ -9,8 +9,13 @@ import {
   Icon,
 } from '@opentrons/components'
 
-import { fetchModules, sendModuleCommand, type Module } from '../../robot-api'
-
+import {
+  fetchModules,
+  sendModuleCommand,
+  type Module,
+  type ModuleCommandRequest,
+} from '../../robot-api'
+import type { Robot } from '../../discovery'
 import type { State, Dispatch } from '../../types'
 import DeckMap from '../DeckMap'
 import styles from './styles.css'
@@ -18,17 +23,22 @@ import { Portal } from '../portal'
 
 const FETCH_MODULES_POLL_INTERVAL_MS = 1000
 
-type OP = {| modules: Array<Module> |}
+type OP = {| robot: ?Robot, modules: Array<Module> |}
 
-type DP = {| setReviewed: () => mixed, fetchModules: () => mixed |}
+type DP = {|
+  sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
+  fetchModules: () => mixed,
+|}
 
 type Props = { ...OP, ...DP }
 
 function PrepareModules(props: Props) {
-  const { modules, sendModuleCommand, fetchModules } = props
+  const { modules, sendModuleCommand, fetchModules, robot } = props
 
   // update on interval to respond to prepared modules
   useInterval(fetchModules, FETCH_MODULES_POLL_INTERVAL_MS)
+
+  if (!robot) return null
 
   const handleOpenLidClick = () => {
     modules
@@ -36,7 +46,10 @@ function PrepareModules(props: Props) {
       .forEach(mod => sendModuleCommand(mod.serial, { command_type: 'open' }))
   }
 
-  const isHandling = some(modules, mod => mod.data?.lid === 'in_between')
+  const isHandling = some(
+    modules,
+    mod => mod.name === 'thermocycler' && mod.data?.lid === 'in_between'
+  )
   return (
     <div className={styles.page_content_dark}>
       <div className={styles.deck_map_wrapper}>
@@ -76,8 +89,10 @@ function PrepareModules(props: Props) {
 
 function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   return {
-    fetchModules: () => dispatch(fetchModules(ownProps.robot)),
+    fetchModules: () =>
+      ownProps.robot && dispatch(fetchModules(ownProps.robot)),
     sendModuleCommand: (serial, request) =>
+      ownProps.robot &&
       dispatch(sendModuleCommand(ownProps.robot, serial, request)),
   }
 }
