@@ -5,17 +5,17 @@ import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 import capitalize from 'lodash/capitalize'
 
-import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { Icon, PrimaryButton } from '@opentrons/components'
 import {
   selectors as robotSelectors,
   actions as robotActions,
-  type Mount,
-  type Labware,
-  type LabwareType,
 } from '../../robot'
-import type { State, Dispatch } from '../../types'
+
+import { getLabwareDisplayName } from '@opentrons/shared-data'
+import { Icon, PrimaryButton } from '@opentrons/components'
 import styles from './styles.css'
+
+import type { Mount, Labware, LabwareType } from '../../robot'
+import type { State, Dispatch } from '../../types'
 
 type OP = {| labware: ?Labware |}
 
@@ -77,25 +77,23 @@ function InfoBox(props: Props) {
   const iconName = confirmed ? 'check-circle' : 'checkbox-blank-circle-outline'
 
   return (
-    <>
-      <div className={styles.info_box}>
-        <div className={styles.info_box_left}>
-          <h2 className={styles.info_box_title}>
-            <Icon name={iconName} className={styles.info_box_icon} />
-            {title}
-          </h2>
-          <div className={styles.info_box_description}>{description}</div>
-        </div>
-        {button && showButton && (
-          <PrimaryButton
-            className={styles.info_box_button}
-            onClick={button.onClick}
-          >
-            {buttonText}
-          </PrimaryButton>
-        )}
+    <div className={styles.info_box}>
+      <div className={styles.info_box_left}>
+        <h2 className={styles.info_box_title}>
+          <Icon name={iconName} className={styles.info_box_icon} />
+          {title}
+        </h2>
+        <div className={styles.info_box_description}>{description}</div>
       </div>
-    </>
+      {button && showButton && (
+        <PrimaryButton
+          className={styles.info_box_button}
+          onClick={button.onClick}
+        >
+          {buttonText}
+        </PrimaryButton>
+      )}
+    </div>
   )
 }
 
