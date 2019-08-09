@@ -1,7 +1,10 @@
 // @flow
 // modules endpoints
-import { combineEpics } from 'redux-observable'
+import { combineEpics, ofType } from 'redux-observable'
 import pathToRegexp from 'path-to-regexp'
+import { of } from 'rxjs'
+
+import { switchMap, withLatestFrom, filter } from 'rxjs/operators'
 
 import {
   getRobotApiState,
@@ -67,10 +70,21 @@ const fetchModulesEpic = createBaseRobotApiEpic(FETCH_MODULES)
 const fetchModuleDataEpic = createBaseRobotApiEpic(FETCH_MODULE_DATA)
 const sendModuleCommandEpic = createBaseRobotApiEpic(SEND_MODULE_COMMAND)
 
+const eagerlyLoadModulesEpic: Epic = (action$, state$) =>
+  action$.pipe(
+    ofType('robot:CONNECT_RESPONSE'),
+    filter(action => !action.payload?.error),
+    withLatestFrom(state$),
+    switchMap<[ConnectResponseAction, State], _, mixed>(([action, state]) => {
+      return of(fetchModules(getConnectedRobot(state)))
+    })
+  )
+
 export const modulesEpic = combineEpics(
   fetchModulesEpic,
   fetchModuleDataEpic,
-  sendModuleCommandEpic
+  sendModuleCommandEpic,
+  eagerlyLoadModulesEpic
 )
 
 export function modulesReducer(
