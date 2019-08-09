@@ -6,7 +6,7 @@ import { getConnectedRobot } from '../../discovery'
 import {
   fetchModules,
   getModulesState,
-  setTargetTemp,
+  sendModuleCommand,
   type ModuleCommandRequest,
   type Module,
 } from '../../robot-api'
@@ -115,7 +115,7 @@ function mapDispatchToProps(dispatch: Dispatch): DP {
   return {
     _fetchModules: _robot => dispatch(fetchModules(_robot)),
     _sendModuleCommand: (_robot, serial, request) =>
-      dispatch(setTargetTemp(_robot, serial, request)),
+      dispatch(sendModuleCommand(_robot, serial, request)),
   }
 }
 
