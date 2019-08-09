@@ -22,7 +22,7 @@ import { Portal } from '../portal'
 
 const FETCH_MODULES_POLL_INTERVAL_MS = 1000
 
-type Props = {| robot: ?RobotHost, modules: Array<Module> |}
+type Props = {| robot: RobotHost, modules: Array<Module> |}
 
 function PrepareModules(props: Props) {
   const { modules, robot } = props

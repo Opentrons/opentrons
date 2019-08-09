@@ -60,8 +60,12 @@ function SetupDeckPage(props: Props) {
     },
   } = props
 
+  if (!robot) {
+    return <Redirect to="/" />
+  }
+
   const renderPage = () => {
-    if (hasModulesLeftToReview && robot) {
+    if (hasModulesLeftToReview) {
       return <ConnectModules robot={robot} />
     } else if (unpreparedModules.length > 0) {
       return <PrepareModules robot={robot} modules={unpreparedModules} />
