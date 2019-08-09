@@ -48,7 +48,7 @@ export type RobotApiAction =
       meta: {| id: string |},
     |}
   | {|
-      type: 'robotApi:SET_MODULE_TARGET_TEMP',
+      type: 'robotApi:SEND_MODULE_COMMAND',
       payload: RobotApiRequest,
       meta: {| id: string |},
     |}

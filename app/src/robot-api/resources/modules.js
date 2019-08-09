@@ -11,6 +11,9 @@ import {
   POST,
 } from '../utils'
 
+import { getConnectedRobot } from '../../discovery'
+import { selectors as robotSelectors } from '../../robot'
+
 import type { State as AppState, ActionLike } from '../../types'
 import type { RobotHost, RobotApiAction } from '../types'
 import type {
@@ -26,8 +29,8 @@ export const FETCH_MODULES: 'robotApi:FETCH_MODULES' = 'robotApi:FETCH_MODULES'
 export const FETCH_MODULE_DATA: 'robotApi:FETCH_MODULE_DATA' =
   'robotApi:FETCH_MODULE_DATA'
 
-export const SET_MODULE_TARGET_TEMP: 'robotApi:SET_MODULE_TARGET_TEMP' =
-  'robotApi:SET_MODULE_TARGET_TEMP'
+export const SEND_MODULE_COMMAND: 'robotApi:SEND_MODULE_COMMAND' =
+  'robotApi:SEND_MODULE_COMMAND'
 
 export const MODULES_PATH = '/modules'
 // TODO(mc, 2019-04-29): these endpoints should not have different paths
@@ -50,24 +53,24 @@ export const fetchModuleData = (
   meta: { id },
 })
 
-export const setTargetTemp = (
+export const sendModuleCommand = (
   host: RobotHost,
   id: string,
   body: ModuleCommandRequest
 ): RobotApiAction => ({
-  type: SET_MODULE_TARGET_TEMP,
+  type: SEND_MODULE_COMMAND,
   payload: { host, body, method: POST, path: `/modules/${id}` },
   meta: { id },
 })
 
 const fetchModulesEpic = createBaseRobotApiEpic(FETCH_MODULES)
 const fetchModuleDataEpic = createBaseRobotApiEpic(FETCH_MODULE_DATA)
-const setTargetTempEpic = createBaseRobotApiEpic(SET_MODULE_TARGET_TEMP)
+const sendModuleCommandEpic = createBaseRobotApiEpic(SEND_MODULE_COMMAND)
 
 export const modulesEpic = combineEpics(
   fetchModulesEpic,
   fetchModuleDataEpic,
-  setTargetTempEpic
+  sendModuleCommandEpic
 )
 
 export function modulesReducer(
@@ -109,4 +112,33 @@ export function getModulesState(
 
   // TODO: remove this filter when feature flag removed
   return modules.filter(m => tcEnabled || m.name !== 'thermocycler')
+}
+
+const PREPARABLE_MODULES = ['thermocycler']
+
+export const getUnpreparedModules = (state: AppState): Array<Module> => {
+  const robot = getConnectedRobot(state)
+  if (!robot) return []
+
+  const sessionModules = robotSelectors.getModules(state)
+  const actualModules = getModulesState(state, robot.name) || []
+
+  const preparableModules = sessionModules.reduce(
+    (acc, mod) =>
+      PREPARABLE_MODULES.includes(mod.name) ? [...acc, mod.name] : acc,
+    []
+  )
+  if (preparableModules.length > 0) {
+    const actualPreparableModules = actualModules.filter(mod =>
+      preparableModules.includes(mod.name)
+    )
+    return actualPreparableModules.reduce((acc, mod) => {
+      if (mod.name === 'thermocycler' && mod.data.lid !== 'open') {
+        return [...acc, mod]
+      }
+      return acc
+    }, [])
+  } else {
+    return []
+  }
 }
