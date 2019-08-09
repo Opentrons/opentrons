@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import some from 'lodash/some'
 import {
   useInterval,
@@ -13,37 +13,38 @@ import {
   fetchModules,
   sendModuleCommand,
   type Module,
-  type ModuleCommandRequest,
+  type RobotHost,
 } from '../../robot-api'
-import type { Robot } from '../../discovery'
-import type { State, Dispatch } from '../../types'
+import type { Dispatch } from '../../types'
 import DeckMap from '../DeckMap'
 import styles from './styles.css'
 import { Portal } from '../portal'
 
 const FETCH_MODULES_POLL_INTERVAL_MS = 1000
 
-type OP = {| robot: ?Robot, modules: Array<Module> |}
-
-type DP = {|
-  sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
-  fetchModules: () => mixed,
-|}
-
-type Props = { ...OP, ...DP }
+type Props = {| robot: ?RobotHost, modules: Array<Module> |}
 
 function PrepareModules(props: Props) {
-  const { modules, sendModuleCommand, fetchModules, robot } = props
+  const { modules, robot } = props
+
+  const dispatch = useDispatch<Dispatch>()
 
   // update on interval to respond to prepared modules
-  useInterval(fetchModules, FETCH_MODULES_POLL_INTERVAL_MS)
-
-  if (!robot) return null
+  useInterval(
+    () => robot && dispatch(fetchModules(robot)),
+    FETCH_MODULES_POLL_INTERVAL_MS
+  )
 
   const handleOpenLidClick = () => {
     modules
       .filter(mod => mod.name === 'thermocycler')
-      .forEach(mod => sendModuleCommand(mod.serial, { command_type: 'open' }))
+      .forEach(
+        mod =>
+          robot &&
+          dispatch(
+            sendModuleCommand(robot, mod.serial, { command_type: 'open' })
+          )
+      )
   }
 
   const isHandling = some(
@@ -87,17 +88,4 @@ function PrepareModules(props: Props) {
   )
 }
 
-function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
-  return {
-    fetchModules: () =>
-      ownProps.robot && dispatch(fetchModules(ownProps.robot)),
-    sendModuleCommand: (serial, request) =>
-      ownProps.robot &&
-      dispatch(sendModuleCommand(ownProps.robot, serial, request)),
-  }
-}
-
-export default connect<Props, OP, {||}, DP, State, Dispatch>(
-  null,
-  mapDispatchToProps
-)(PrepareModules)
+export default PrepareModules
