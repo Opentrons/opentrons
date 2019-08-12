@@ -1,3 +1,5 @@
+.. _new-labware:
+
 ########
 Labware
 ########
@@ -5,34 +7,30 @@ Labware
 
 The labware section informs the protocol context what labware is present on the robot’s deck. In this section, you define the tip racks, well plates, troughs, tubes, or anything else you’ve put on the deck.
 
-Each labware is given a name (ex: ``'corning_96_wellplate_360ul_flat'``), and the slot on the robot it will be placed (ex: ``'2'``). A list of valid labware can be found in :ref:`protocol-api-valid-labware`. In this example, we’ll use ``'corning_96_wellplate_360ul_flat'`` (an ANSI standard 96-well plate) and ``'opentrons_96_tiprack_300ul'``, the Opentrons standard 300 µL tiprack.
+Each labware is given a name (ex: ``'corning_96_wellplate_360ul_flat'``), and the slot on the robot it will be placed (ex: ``'2'``). The first place to look for the names of labware should always be the `Opentrons Labware Library <https://labware.opentrons.com>`_, where Opentrons maintains a database of labwares, their load names, what they look like, manufacturer part numbers, and more. In this example, we’ll use ``'corning_96_wellplate_360ul_flat'`` (`an ANSI standard 96-well plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_) and ``'opentrons_96_tiprack_300ul'`` (`the Opentrons standard 300 µL tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_).
 
 From the example given on the home page, the "labware" section looked like:
 
 .. code-block:: python
 
-    plate = protocol_context.load_labware('corning_96_wellplate_360ul_flat', '2')
-    tiprack = protocol_context.load_labware('opentrons_96_tiprack_300ul', '1')
+    plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '2')
+    tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
 
 
 and informed the protocol context that the deck contains a 300 µL tiprack in slot 1 and a 96 well plate in slot 2.
 
-More complete documentation on labware methods (such as the ``.wells()`` method) is available in :ref:`protocol-api-labware`.
+Labware is loaded into a protocol using :py:meth:`.ProtocolContext.load_labware`, which returns a
+:py:meth:`opentrons.protocol_api.labware.Labware` object. You'll never create one of these objects
+directly, only store them in variables from the return value of :py:meth:`.ProtocolContext.load_labware`.
 
-.. _protocol-api-valid-labware:
-
-To see the labware names that can be loaded with
-:py:meth:`.ProtocolContext.load_labware`, please see the
-`Opentrons Labware Library`__
-
-__ https://labware.opentrons.com
+.. _new-well-access:
 
 **************************
 Accessing Wells in Labware
 **************************
 
 Well Ordering
-^^^^^^^^^^^^^^
+^^^^^^^^^^^^^
 
 When writing a protocol using the API, you will need to select which wells to
 transfer liquids to and from.
@@ -53,9 +51,9 @@ The ending well will be in the bottom right, see the diagram below for further e
     '''
     Examples in this section expect the following
     '''
-    def run(protocol_context):
+    def run(protocol):
 
-        plate = protocol_context.load_labware('corning_24_wellplate_3.4ml_flat', slot='1')
+        plate = protocol.load_labware('corning_24_wellplate_3.4ml_flat', slot='1')
 
 
 Accessor Methods
@@ -65,38 +63,39 @@ That is why all of our labware accessor methods return either a dictionary, list
 
 The table below lists out the different methods available to you and their differences.
 
-+------------------------+---------------------------------------------------------------------------------------------------------------+
-|   Method Name          |         Returns                                                                                               |
-+========================+===============================================================================================================+
-|   ``wells()``          | List of all wells, i.e. [labware:A1, labware:B1, labware:C1...]                                               |
-+------------------------+---------------------------------------------------------------------------------------------------------------+
-|   ``rows()``           | List of a list ordered by row, i.e [[labware:A1, labware:A2...], [labware:B1, labware:B2..]]                  |
-+------------------------+---------------------------------------------------------------------------------------------------------------+
-| ``columns()``          | List of a list ordered by column, i.e. [[labware:A1, labware:B1..], [labware:A2, labware:B2..]]               |
-+------------------------+---------------------------------------------------------------------------------------------------------------+
-| ``wells_by_name()``    | Dictionary with well names as keys, i.e. {'A1': labware:A1, 'B1': labware:B1}                                 |
-+------------------------+---------------------------------------------------------------------------------------------------------------+
-| ``rows_by_name()``     | Dictionary with row names as keys, i.e. {'A': [labware:A1, labware:A2..], 'B': [labware:B1, labware:B2]}      |
-+------------------------+---------------------------------------------------------------------------------------------------------------+
-| ``columns_by_name()``  | Dictionary with column names as keys, i.e. {'1': [labware:A1, labware:B1..], '2': [labware:A2, labware:B2..]} |
-+------------------------+---------------------------------------------------------------------------------------------------------------+
++-------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+|   Method Name                       |         Returns                                                                                                   |
++=====================================+===================================================================================================================+
+| :py:meth:`.Labware.wells`           | List of all wells, i.e. ``[labware:A1, labware:B1, labware:C1...]``                                               |
++-------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| :py:meth:`.Labware.rows`            | List of a list ordered by row, i.e ``[[labware:A1, labware:A2...], [labware:B1, labware:B2..]]``                  |
++-------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| :py:meth:`.Labware.columns`         | List of a list ordered by column, i.e. ``[[labware:A1, labware:B1..], [labware:A2, labware:B2..]]``               |
++-------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| :py:meth:`.Labware.wells_by_name`   | Dictionary with well names as keys, i.e. ``{'A1': labware:A1, 'B1': labware:B1}``                                 |
++-------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| :py:meth:`.Labware.rows_by_name`    | Dictionary with row names as keys, i.e. ``{'A': [labware:A1, labware:A2..], 'B': [labware:B1, labware:B2]}``      |
++-------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+| :py:meth:`.Labware.columns_by_name` | Dictionary with column names as keys, i.e. ``{'1': [labware:A1, labware:B1..], '2': [labware:A2, labware:B2..]}`` |
++-------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 
 Accessing Individual Wells
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Individual Well Dictionary access into a labware
-------------------------------------------------
+Dictionary Access
+-----------------
 Once a labware is loaded into your protocol, you can easily access the many
 wells within it by using dictionary indexing. If a well does not exist in this labware,
-you will receive a ``KeyError``.
+you will receive a ``KeyError``. This is equivalent to using the return value of
+:py:meth:`.Labware.wells_by_name`:
 
 .. code-block:: python
 
     a1 = plate['A1']
     d6 = plate.wells_by_name()['D6']
 
-Individual Well List access into a labware
-------------------------------------------
+List Access From ``wells``
+--------------------------
 Wells can be referenced by their "string" name, as demonstrated above.
 However, they can also be referenced with zero-indexing, with the first well in
 a labware being at position 0.
@@ -106,12 +105,14 @@ a labware being at position 0.
     plate.wells()[0]   # well A1
     plate.wells()[23]  # well D6
 
-.. Tip::
+.. tip::
+
     You may find well names (e.g. ``B3``) to be easier to reason with,
     especially with irregular labware (e.g.
-    ``opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical``). Whichever well
-    access method you use, your protocol will be most maintainable if you pick
-    one method and don't use the other one.
+    ``opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical``
+    (`Labware Library <https://labware.opentrons.com/opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical>`_).
+    Whichever well access method you use, your protocol will be most maintainable
+    if you pick one method and don't use the other one.
 
 Accessing Groups of Wells
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -128,9 +129,10 @@ also labelled on standard labware. In the API, rows are given letter names
 given numbered names (``'1'`` through ``'6'`` for example) and go from front to
 back.
 
-You can access a specific row or column by using the ``rows_by_name()`` and
-``columns_by_name()`` methods on a labware. These methods both return a dictionary
-with the row or column name as the index
+You can access a specific row or column by using the
+:py:meth:`.Labware.rows_by_name` and :py:meth:`.Labware.columns_by_name` methods
+on a labware. These methods both return a dictionary with the row or column name
+as the index:
 
 .. code-block:: python
 
@@ -159,7 +161,7 @@ For example, if I wanted to access the individual wells of row 'A' in my well pl
     for well in plate.rows()[0]:
         print(well)
 
-or..
+or,
 
 .. code-block:: python
 
@@ -169,10 +171,118 @@ or..
 and it will return the individual well objects in row A.
 
 
-*****************************
-Invalid Labware Load Names
-*****************************
+.. _v2-location-within-wells:
 
-Once you make the switch to API Version 2, you will no longer be able to use definition names from the opentrons standard labware in API Version 1.
+********************************
+Specifying Position Within Wells
+********************************
 
-For your reference, a labware map was made and can be found at :ref:`deprecated_labware`.
+The functions listed above (in the :ref:`new-well-access` section) return objects
+(or lists, lists of lists, dictionaries, or dictionaries of lists of objects)
+representing wells. These are :py:class:`opentrons.protocol_api.labware.Well`
+objects. Similar to the :py:class:`.Labware` objects, you'll never create one of
+these directly - only handle them as the return values of various methods.
+:py:class:`.Well` objects have some useful methods on them, however, which allow
+you to more closely specify the location to which the robot should move *inside*
+a given well.
+
+Each of these methods returns an object called a :py:class:`opentrons.types.Location`,
+which encapsulates a position in deck coordinates (see :ref:`protocol-api-deck-coords`)
+and a well with which it is associated. This lets you do further manipulations on the
+positions returned by these methods. All :py:class:`.InstrumentContext` methods that
+involve positions accept these :py:class:`.Location` objects.
+
+
+Position Modifiers
+^^^^^^^^^^^^^^^^^^
+
+Top
+---
+
+The method :py:meth:`.Well.top` returns a position at the top center of the well. This
+is a good position to use for :ref:`new-blow-out` or any other operation where you
+don't want to be contacting the liquid. In addition, :py:meth:`.Well.top` takes an
+optional argument ``z``, which is a distance in mm to move relative to the top
+vertically (positive numbers move up, and negative numbers move down):
+
+.. code-block:: python
+
+   plate['A1'].top()     # This is the top center of the well
+   plate['A1'].top(z=1)  # This is 1mm above the top center of the well
+   plate['A1'].top(z=-1) # This is 1mm below the top center of the well
+
+Bottom
+------
+
+The method :py:meth:`.Well.bottom` returns a position at the bottom center of the
+well. This could be a good position to start at when considering where to aspirate,
+or any other operation where you want to be contacting the liquid. In addition,
+:py:meth:`.Well.bottom` takes an optional argument ``z``, which is a distance in mm
+to move relative to the bottom vertically (positive numbers move up, and negative
+numbers move down):
+
+.. code-block:: python
+
+   plate['A1'].bottom()     # This is the bottom center of the well
+   plate['A1'].bottom(z=1)  # This is 1mm above the bottom center of the well
+   plate['A1'].bottom(z=-1) # This is 1mm below the bottom center of the well.
+                            # this may be dangerous!
+
+
+.. warning::
+
+    Negative ``z`` arguments to :py:meth:`.Well.bottom` may cause the tip to
+    collide with the bottom of the well. The OT-2 has no sensors to detect this,
+    and if it happens the robot will be too high in z for the rest of the
+    protocol.
+
+
+.. note::
+
+   If you are using this to change the position at which the robot does
+   :ref:`new-aspirate` or :ref:`new-dispense` throughout the protocol, consider
+   setting the default aspirate or dispense offset with
+   :py:attr:`.InstrumentContext.well_bottom_clearance`
+   (see :ref:`new-default-op-positions`).
+
+Center
+------
+
+The method :py:meth:`.Well.center` returns a position centered in the well both
+vertically and horizontally. This can be a good place to start for precise
+control of positions within the well for unusual or custom labware.
+
+.. code-block:: python
+
+   plate['A1'].center() # This is the vertical and horizontal center of the well
+
+Manipulating Positions
+^^^^^^^^^^^^^^^^^^^^^^
+
+The objects returned by the position modifier functions are all instances of
+:py:class:`opentrons.types.Location`, which are
+`named tuples <https://docs.python.org/3/library/collections.html#collections.namedtuple>`_
+representing the combination of a point in space (another named tuple) and
+a reference to the associated :py:class:`.Well` (or :py:class:`.Labware`, or
+slot name, depending on context).
+
+To further change positions, you can use :py:meth:`.Location.move`, which
+lets you move the Location. This function takes a single argument, ``point``,
+which should be a :py:class:`opentrons.types.Point`. This is a named tuple
+with elements ``x``, ``y``, and ``z``, representing a 3 dimensional point.
+
+To move a location, you create a :py:class:`.types.Point` representing a
+3d offset and give it to :py:meth:`.Location.move`:
+
+.. code-block:: python
+
+   from opentrons import types
+
+   def run(protocol):
+        plate = protocol.load_labware(
+           'corning_24_wellplate_3.4ml_flat', slot='1')
+        plate['A1'].center().move(
+           types.Point(x=1, y=1, z=1)) # 1mm up, to the right, and towards the
+                                       # back of the robot
+
+`
