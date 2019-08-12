@@ -1,4 +1,18 @@
 // @flow
+import { of } from 'rxjs'
+
+import { combineEpics, ofType } from 'redux-observable'
+import { switchMap, withLatestFrom, filter } from 'rxjs/operators'
+
+import { getConnectedRobot } from '../../discovery'
+import type { ConnectResponseAction } from '../../robot/actions'
+import type { ActionLike, State as AppState, Epic } from '../../types'
+import type {
+  RobotApiAction,
+  RobotHost,
+  RobotApiRequestState,
+  PipettesState as State,
+} from '../types'
 import {
   getRobotApiState,
   getRobotApiRequestState,
@@ -6,14 +20,6 @@ import {
   passRobotApiResponseAction,
   GET,
 } from '../utils'
-
-import type { ActionLike, State as AppState } from '../../types'
-import type {
-  RobotApiAction,
-  RobotHost,
-  RobotApiRequestState,
-  PipettesState as State,
-} from '../types'
 
 export const FETCH_PIPETTES: 'robotApi:FETCH_PIPETTES' =
   'robotApi:FETCH_PIPETTES'
@@ -28,7 +34,24 @@ export const fetchPipettes = (
   payload: { host, method: GET, path: PIPETTES_PATH, query: { refresh } },
 })
 
-export const pipettesEpic = createBaseRobotApiEpic(FETCH_PIPETTES)
+const eagerlyLoadPipettesEpic: Epic = (action$, state$) =>
+  action$.pipe(
+    ofType('robot:CONNECT_RESPONSE'),
+    filter(action => !action.payload?.error),
+    withLatestFrom(state$),
+    switchMap<[ConnectResponseAction, AppState], _, mixed>(
+      ([action, state]) => {
+        const robotHost = getConnectedRobot(state)
+        return robotHost ? of(fetchPipettes(robotHost)) : of(null)
+      }
+    ),
+    filter(Boolean)
+  )
+
+export const pipettesEpic = combineEpics(
+  createBaseRobotApiEpic(FETCH_PIPETTES),
+  eagerlyLoadPipettesEpic
+)
 
 const INITIAL_STATE: State = { left: null, right: null }
 
