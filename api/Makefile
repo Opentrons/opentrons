@@ -50,6 +50,8 @@ ssh_opts ?= -o stricthostkeychecking=no -o userknownhostsfile=/dev/null
 
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 
+# PDF builds must succeed on ci, not necessary for local builds
+which_pdf := $(if $(CI),docs-pdf-ci,docs-pdf-local)
 
 # Source discovery
 # For the python sources
@@ -99,7 +101,7 @@ lint: $(ot_py_sources)
 	$(python) -m mypy src/opentrons
 	$(python) -m pylama src/opentrons tests
 
-.PHONY: docs docs-html docs-doctest docs-pdf
+.PHONY: docs docs-html docs-doctest docs-pdf-local docs-pdf-ci
 
 docs-html: local-install
 	$(SHX) rm -rf docs/build/html
@@ -109,16 +111,22 @@ docs-doctest: local-install
 	$(SHX) rm -rf docs/build/doctest
 	pipenv run sphinx-build -b doctest -d docs/build/doctrees docs/source docs/build/doctest
 
-docs-pdf: local-install
+docs-pdf-local: local-install
+	echo "Local pdf install"
 	-$(SHX) rm -rf docs/build/pdf
 	-pipenv run sphinx-build -b latex -d docs/build/doctrees docs/source docs/build/pdf
-	-$(MAKE) -C docs/build/pdf all-pdf > /dev/null
+	-$(MAKE) -C docs/build/pdf all-pdf
 
-.PHONY: docs
-docs: docs-pdf docs-html
+docs-pdf-ci: local-install
+	echo "CI pdf install"
+	$(SHX) rm -rf docs/build/pdf
+	pipenv run sphinx-build -b latex -d docs/build/doctrees docs/source docs/build/pdf
+	$(MAKE) -C docs/build/pdf all-pdf >/dev/null
+	$(SHX) ls docs/build/pdf/*.pdf
+
+docs: docs-html $(which_pdf)
 	$(SHX) mkdir -p docs/dist
 	$(SHX) cp -R docs/build/html/. docs/public/. docs/dist
-	-$(SHX) cp docs/build/pdf/OpentronsAPI.pdf docs/dist/_static
 
 .PHONY: publish
 publish:
