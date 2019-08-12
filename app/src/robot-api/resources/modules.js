@@ -16,8 +16,9 @@ import {
 
 import { getConnectedRobot } from '../../discovery'
 import { selectors as robotSelectors } from '../../robot'
+import type { ConnectResponseAction } from '../../robot/actions'
 
-import type { State as AppState, ActionLike } from '../../types'
+import type { State as AppState, ActionLike, Epic } from '../../types'
 import type { RobotHost, RobotApiAction } from '../types'
 import type {
   Module,
@@ -75,9 +76,13 @@ const eagerlyLoadModulesEpic: Epic = (action$, state$) =>
     ofType('robot:CONNECT_RESPONSE'),
     filter(action => !action.payload?.error),
     withLatestFrom(state$),
-    switchMap<[ConnectResponseAction, State], _, mixed>(([action, state]) => {
-      return of(fetchModules(getConnectedRobot(state)))
-    })
+    switchMap<[ConnectResponseAction, AppState], _, mixed>(
+      ([action, state]) => {
+        const robotHost = getConnectedRobot(state)
+        return robotHost ? of(fetchModules(robotHost)) : of(null)
+      }
+    ),
+    filter(Boolean)
   )
 
 export const modulesEpic = combineEpics(
