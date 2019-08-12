@@ -1054,8 +1054,7 @@ def clear_calibrations():
 
 
 def load_module_from_definition(
-        definition: dict, parent: Location) -> \
-            Union[ModuleGeometry, ThermocyclerGeometry]:
+        definition: dict, parent: Location) -> ModuleGeometry:
     """
     Return a :py:class:`ModuleGeometry` object from a specified definition
 
@@ -1067,7 +1066,7 @@ def load_module_from_definition(
     """
     mod_name = definition['loadName']
     if mod_name == 'thermocycler':
-        mod: Union[ModuleGeometry, ThermocyclerGeometry] = \
+        mod: ModuleGeometry = \
                 ThermocyclerGeometry(definition, parent)
     else:
         mod = ModuleGeometry(definition, parent)
@@ -1075,7 +1074,8 @@ def load_module_from_definition(
     return mod
 
 
-def load_module(name: str, parent: Location) -> ModuleGeometry:
+
+def load_module(name: str, parent: Optional[Location]) -> ModuleGeometry:
     """
     Return a :py:class:`ModuleGeometry` object from a definition looked up
     by name.

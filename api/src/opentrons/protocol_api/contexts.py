@@ -1,6 +1,8 @@
 import asyncio
 import contextlib
 import logging
+import json
+import pkgutil
 from typing import Any, Dict, List, Optional, Union, Tuple, Sequence
 from opentrons import types, hardware_control as hc, commands as cmds
 from opentrons.commands import CommandPublisher
@@ -250,17 +252,46 @@ class ProtocolContext(CommandPublisher):
         return self.load_labware(
             load_name, location, label, namespace, version)
 
+    def _resolve_module_location(
+            self, module_name: str,
+            location: Optional[types.DeckLocation]) -> types.DeckLocation:
+        # TODO: support deck loadName as a param
+        def_path = 'shared_data/deck/definitions/1/ot2_standard.json'
+        deck_def = json.loads(  # type: ignore
+            pkgutil.get_data('opentrons', def_path))
+        slots = deck_def['locations']['orderedSlots']
+        if isinstance(location, str):
+            slot_def = next(
+                    (slot for slot in slots if slot['id'] == location), None)
+            if module_name in slot_def['compatibleModules']:
+                return location
+            else:
+                raise AssertionError(
+                    f'module {module_name} cannot be loaded' \
+                    ' into slot {location}')
+        else:
+            valid_slots = [slot['id'] for slot in slots
+                    if slot['compatibleModules'] == module_name]
+            if len(valid_slots) == 1:
+                return valid_slot[0]
+            else:
+                raise AssertionError(
+                    f'module {module_name} does not have a default' \
+                    ' location, you must specify a slot')
+
     def load_module(
             self, module_name: str,
-            location: types.DeckLocation) -> ModuleTypes:
+            location: Optional[types.DeckLocation] = None) -> ModuleTypes:
         mod_id = module_name.lower()
         if mod_id == 'magnetic module':
             mod_id = 'magdeck'
         if mod_id == 'temperature module':
             mod_id = 'tempdeck'
+
         try:
-            geometry = load_module(
-                mod_id, self._deck_layout.position_for(location))
+            resolved_location = self._resolve_module_location(module_name, location)
+            location_pos = self._deck_layout.position_for(resolved_location)
+            geometry = load_module(mod_id, location_pos)
         except KeyError:
             self._log.error(f'Unsupported Module: {mod_id}')
             raise ValueError(f'Unsupported Module: {mod_id}')
