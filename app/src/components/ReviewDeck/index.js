@@ -1,7 +1,7 @@
 // @flow
 // deck review modal for labware calibration page
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
 import type { State, Dispatch } from '../../types'
 import {
@@ -30,11 +30,26 @@ export default connect<Props, OP, SP, {||}, State, Dispatch>(
 )(ReviewDeck)
 
 function ReviewDeck(props: Props) {
-  const { currentLabware, onClick } = props
+  const { slot } = props
+
+  const dispatch = useDispatch<Dispatch>()
+  const allLabware = useSelector(robotSelectors.getLabware)
+  const calibratorMount = useSelector(robotSelectors.getCalibratorMount)
+
+  const currentLabware = allLabware.find(lw => lw.slot === slot)
+
+  const handleClick = () => {
+    const prepareNestedLabware = true // TODO: get from elsewhere
+    if (prepareNestedLabware) {
+    } else if (currentLabware && calibratorMount) {
+      const mountToUse = currentLabware.calibratorMount || calibratorMount
+      dispatch(robotActions.moveTo(mountToUse, currentLabware.slot))
+    }
+  }
 
   return (
     <div className={styles.page_content_dark}>
-      {currentLabware && <Prompt {...currentLabware} onClick={onClick} />}
+      {currentLabware && <Prompt {...currentLabware} onClick={handleClick} />}
       <div className={styles.deck_map_wrapper}>
         <DeckMap className={styles.deck_map} />
       </div>
@@ -62,10 +77,9 @@ function mergeProps(stateProps: SP, dispatchProps: DP): Props {
 
   return {
     ...stateProps,
-    onClick: () => {
-      if (currentLabware && _calibratorMount) {
-        dispatch(robotActions.moveTo(_calibratorMount, currentLabware.slot))
-      }
-    },
+    confirmAndMoveTo: () =>
+      currentLabware &&
+      _calibratorMount &&
+      dispatch(robotActions.moveTo(_calibratorMount, currentLabware.slot)),
   }
 }
