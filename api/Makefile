@@ -112,7 +112,7 @@ docs-doctest: local-install
 docs-pdf: local-install
 	-$(SHX) rm -rf docs/build/pdf
 	-pipenv run sphinx-build -b latex -d docs/build/doctrees docs/source docs/build/pdf
-	-$(MAKE) -C docs/build/pdf all-pdf
+	-$(MAKE) -C docs/build/pdf all-pdf > /dev/null
 
 .PHONY: docs
 docs: docs-pdf docs-html

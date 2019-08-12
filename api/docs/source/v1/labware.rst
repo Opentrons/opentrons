@@ -40,7 +40,7 @@ Placing labware on the robot deck
 
 The robot deck is made up of slots labeled 1, 2, 3, 4, and so on.
 
-.. image:: img/DeckMapEmpty.png
+.. image:: ../img/DeckMapEmpty.png
 
 To tell the robot what labware will be on the deck for your protocol, use
 ``labware.load`` after importing ``labware`` as follows:
@@ -209,7 +209,7 @@ The OT-2 deck and labware are all set up with the same coordinate system
 - Lettered rows ``['A']-['END']``
 - Numbered columns ``['1']-['END']``.
 
-.. image:: img/well_iteration/Well_Iteration.png
+.. image:: ../img/well_iteration/Well_Iteration.png
 
 .. code-block:: python
 
@@ -501,6 +501,10 @@ will print out...
     <Well B3>
     <Well B5>
 
+
+.. _deprecated_labware:
+
+
 *****************************
 Deprecated Labware Load Names
 *****************************
@@ -567,7 +571,7 @@ as soon as possible. The following mapping can be used as a guide:
 +-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
 | ``tiprack-1000ul``                            | ``opentrons_96_tiprack_1000ul``                                                             | If possible, please use an Opentrons tip rack rather than a rack with a slot adapter         |
 +-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
-| ``trash-box`                                  | ``agilent_1_reservoir_290ml``                                                               | ``trash-box`` is no longer supported; we recommend using a 1-well reservoir for liquid trash |
+| ``trash-box``                                 | ``agilent_1_reservoir_290ml``                                                               | ``trash-box`` is no longer supported; we recommend using a 1-well reservoir for liquid trash |
 +-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+
 | ``trough-12row``                              | ``usascientific_12_reservoir_22ml``                                                         |                                                                                              |
 +-----------------------------------------------+---------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------+

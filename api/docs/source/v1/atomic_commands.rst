@@ -380,4 +380,3 @@ To have your protocol pause for any given number of minutes or seconds, simply c
     pipette.delay(seconds=2)             # pause for 2 seconds
     pipette.delay(minutes=5)             # pause for 5 minutes
     pipette.delay(minutes=5, seconds=2)  # pause for 5 minutes and 2 seconds
-
