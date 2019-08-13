@@ -1,7 +1,9 @@
 from collections import UserDict
 import functools
 import logging
-from typing import List, Optional, Tuple, Union
+import pkgutil
+import json
+from typing import Any, List, Optional, Tuple, Union, Dict
 
 from opentrons import types
 from .labware import (Labware, Well, ModuleGeometry,
@@ -129,6 +131,10 @@ class Deck(UserDict):
                                                 0)
                            for idx in range(12)}
         self._highest_z = 0.0
+        # TODO: support deck loadName as a param
+        def_path = 'shared_data/deck/definitions/1/ot2_standard.json'
+        self._definition = json.loads(  # type: ignore
+            pkgutil.get_data('opentrons', def_path))
 
     @staticmethod
     def _assure_int(key: object) -> int:
@@ -194,7 +200,45 @@ class Deck(UserDict):
         for item in [lw for lw in self.data.values() if lw]:
             self._highest_z = max(item.highest_z, self._highest_z)
 
+    def get_slot_definition(self, slot_name) -> Dict[str, Any]:
+        slots: List[Dict] = self._definition['locations']['orderedSlots']
+        slot_def = next(
+            (slot for slot in slots if slot['id'] == slot_name), None)
+        if not slot_def:
+            slot_ids = [slot['id'] for slot in slots]
+            raise ValueError(f'slot {slot_name} could not be found,'
+                             f'valid deck slots are: {slot_ids}')
+        return slot_def
+
+    def resolve_module_location(
+            self, module_name: str,
+            location: Optional[types.DeckLocation]) -> types.DeckLocation:
+        if isinstance(location, str) or isinstance(location, int):
+            slot_def: Dict[str, Any] = self.get_slot_definition(
+                str(location))
+            compatible_modules: List[str] = slot_def['compatibleModules']
+            if module_name in compatible_modules:
+                return location
+            else:
+                raise AssertionError(
+                    f'module {module_name} cannot be loaded'
+                    ' into slot {location}')
+        else:
+            valid_slots = [slot['id'] for slot in self.slots if module_name
+                           in slot['compatibleModules']]
+            if len(valid_slots) == 1:
+                return valid_slots[0]
+            else:
+                raise AssertionError(
+                    f'module {module_name} does not have a default'
+                    ' location, you must specify a slot')
+
     @property
     def highest_z(self) -> float:
         """ Return the tallest known point on the deck. """
         return self._highest_z
+
+    @property
+    def slots(self) -> List[Dict]:
+        """ Return the definition of the loaded robot deck. """
+        return self._definition['locations']['orderedSlots']

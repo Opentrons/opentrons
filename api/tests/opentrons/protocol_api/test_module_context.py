@@ -34,7 +34,7 @@ def test_no_slot_module_error(loop):
         assert ctx.load_module('magdeck')
 
 
-def test_bad_slot_module_error(loop):
+def test_invalid_slot_module_error(loop):
     ctx = papi.ProtocolContext(loop)
     ctx._hw_manager.hardware._backend._attached_modules = [
         ('mod0', 'tempdeck')]
@@ -43,12 +43,21 @@ def test_bad_slot_module_error(loop):
         assert ctx.load_module('thermocycler', 1)
 
 
+def test_bad_slot_module_error(loop):
+    ctx = papi.ProtocolContext(loop)
+    ctx._hw_manager.hardware._backend._attached_modules = [
+        ('mod0', 'tempdeck')]
+    ctx.home()
+    with pytest.raises(ValueError):
+        assert ctx.load_module('thermocycler', 42)
+
+
 def test_incorrect_module_error(loop):
     ctx = papi.ProtocolContext(loop)
     ctx._hw_manager.hardware._backend._attached_modules = [
         ('mod0', 'tempdeck')]
     ctx.home()
-    with pytest.raises(AssertionError):
+    with pytest.raises(ValueError):
         assert ctx.load_module('the cool module', 1)
 
 

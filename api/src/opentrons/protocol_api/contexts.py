@@ -1,8 +1,6 @@
 import asyncio
 import contextlib
 import logging
-import json
-import pkgutil
 from typing import Any, Dict, List, Optional, Union, Tuple, Sequence
 from opentrons import types, hardware_control as hc, commands as cmds
 from opentrons.commands import CommandPublisher
@@ -252,59 +250,15 @@ class ProtocolContext(CommandPublisher):
         return self.load_labware(
             load_name, location, label, namespace, version)
 
-    def _resolve_module_name(self, module_name: str) -> str:
-        alias_map = {
-            'magnetic module': 'magdeck',
-            'temperature module': 'tempdeck',
-            'thermocycler module': 'thermocycler'
-        }
-        lower_name = module_name.lower()
-        return alias_map.get(lower_name, lower_name)
-
-    def _resolve_module_location(
-            self, module_name: str,
-            location: Optional[types.DeckLocation]) -> types.DeckLocation:
-        # TODO: support deck loadName as a param
-        def_path = 'shared_data/deck/definitions/1/ot2_standard.json'
-        deck_def = json.loads(  # type: ignore
-            pkgutil.get_data('opentrons', def_path))
-        slots: List[Dict] = deck_def['locations']['orderedSlots']
-        if isinstance(location, str) or isinstance(location, int):
-            slot_def: Optional[Dict[str, Any]] = next(
-                    (slot for slot in slots if slot['id'] == str(location)),
-                    None)
-            if not slot_def:
-                raise ValueError(f'slot {location} could not be found')
-            compatible_modules: List[str] = slot_def['compatibleModules']
-            if module_name in compatible_modules:
-                return location
-            else:
-                raise AssertionError(
-                    f'module {module_name} cannot be loaded'
-                    ' into slot {location}')
-        else:
-            valid_slots = [slot['id'] for slot in slots if module_name
-                           in slot['compatibleModules']]
-            if len(valid_slots) == 1:
-                return valid_slots[0]
-            else:
-                raise AssertionError(
-                    f'module {module_name} does not have a default'
-                    ' location, you must specify a slot')
-
     def load_module(
             self, module_name: str,
             location: Optional[types.DeckLocation] = None) -> ModuleTypes:
-
-        try:
-            resolved_name = self._resolve_module_name(module_name)
-            resolved_location = self._resolve_module_location(
-                    resolved_name, location)
-            location_pos = self._deck_layout.position_for(resolved_location)
-            geometry = load_module(resolved_name, location_pos)
-        except KeyError:
-            self._log.error(f'Unsupported Module: {resolved_name}')
-            raise ValueError(f'Unsupported Module: {resolved_name}')
+        resolved_name = ModuleGeometry.resolve_module_name(module_name)
+        resolved_location = self._deck_layout.resolve_module_location(
+                resolved_name, location)
+        geometry = load_module(resolved_name,
+                               self._deck_layout.position_for(
+                                    resolved_location))
         hc_mod_instance = None
         hw = self._hw_manager.hardware._api._backend
         mod_class = {

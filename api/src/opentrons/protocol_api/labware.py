@@ -650,11 +650,28 @@ class Labware:
 
 class ModuleGeometry:
     """
-    This class represents an active peripheral, such as an Opentrons MagBead
-    Module or Temperature Module. It defines the physical geometry of the
-    device (primarily the offset that modifies the position of the labware
-    mounted on top of it).
+    This class represents an active peripheral, such as an Opentrons Magnetic
+    Module, Temperature Module or Thermocycler Module. It defines the physical
+    geometry of the device (primarily the offset that modifies the position of
+    the labware mounted on top of it).
     """
+
+    @classmethod
+    def resolve_module_name(cls, module_name: str):
+        alias_map = {
+            'magdeck': 'magdeck',
+            'magnetic module': 'magdeck',
+            'tempdeck': 'tempdeck',
+            'temperature module': 'tempdeck',
+            'thermocycler': 'thermocycler',
+            'thermocycler module': 'thermocycler'
+        }
+        lower_name = module_name.lower()
+        resolved_name = alias_map.get(lower_name, None)
+        if not resolved_name:
+            raise ValueError(f'{module_name} is not a valid module load name')
+        return resolved_name
+
     def __init__(self,
                  definition: dict,
                  parent: Location) -> None:
