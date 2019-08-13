@@ -16,7 +16,7 @@ Moving 100uL from one well to another:
 
     from opentrons import protocol_api
 
-    def run(protocol: protocol_api.contexts.ProtocolContext):
+    def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
         tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
         p300 = protocol.load_instrument('p300_single', 'right', tip_racks=[tiprack_1])
@@ -30,7 +30,7 @@ This accomplishes the same thing as the following basic commands:
 
     from opentrons import protocol_api
 
-    def run(protocol: protocol_api.contexts.ProtocolContext):
+    def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
         tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
         p300 = protocol.load_instrument('p300_single', 'right', tip_racks=[tiprack_1])
@@ -52,7 +52,7 @@ Loops in Python allow your protocol to perform many actions, or act upon many we
 
     from opentrons import protocol_api
 
-    def run(protocol: protocol_api.contexts.ProtocolContext):
+    def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
         tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
         trough = protocol.load_labware('usascientific_12_reservoir_22ml', 4)
@@ -77,7 +77,7 @@ The OT-2 pipettes can do some things that a human cannot do with a pipette, like
 
     from opentrons import protocol_api
 
-    def run(protocol: protocol_api.contexts.ProtocolContext):
+    def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
         tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
         trough = protocol.load_labware('usascientific_12_reservoir_22ml', 4)
@@ -102,7 +102,7 @@ This example first spreads a dilutent to all wells of a plate. It then dilutes 8
 
     from opentrons import protocol_api
 
-    def run(protocol: protocol_api.contexts.ProtocolContext):
+    def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
         tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
         tiprack_2 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
@@ -137,7 +137,7 @@ Deposit various volumes of liquids into the same plate of wells, and automatical
 
     from opentrons import protocol_api
 
-    def run(protocol: protocol_api.contexts.ProtocolContext):
+    def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
         tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
         tiprack_2 = protocol.load_labware('opentrons_96_tiprack_300ul', 3)

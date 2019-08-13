@@ -326,7 +326,7 @@ will be displayed in the Opentrons app when protocol execution pauses.
 
     from opentrons import protocol_api
 
-    def run(protocol: protocol_api.contexts.ProtocolContext):
+    def run(protocol: protocol_api.ProtocolContext):
         # The start of your protocol goes here...
 
         # The robot stops here until you press resume. It will display the message in
@@ -354,7 +354,7 @@ None of these functions take any arguments:
 
     from opentrons import protocol_api, types
 
-    def run(protocol: protocol_api.contexts.ProtocolContext):
+    def run(protocol: protocol_api.ProtocolContext):
         pipette = protocol.load_instrument('p300_single', 'right')
         protocol.home() # Homes the gantry, z axes, and plungers
         pipette.home()  # Homes the right z axis and plunger
@@ -371,7 +371,7 @@ during protocol execution:
 
     from opentrons import protocol_api, types
 
-    def run(protocol: protocol_api.contexts.ProtocolContext):
+    def run(protocol: protocol_api.ProtocolContext):
         protocol.comment('Hello, world!')
 
 

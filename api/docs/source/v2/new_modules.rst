@@ -19,7 +19,11 @@ within a protocol. To do this, you call the following *inside* the run function:
 
 .. code-block:: python
 
-    module = protocol_context.load_module('Module Name', slot)
+    from opentrons import protocol_api
+
+    def run(protocol: protocol_api.ProtocolContext):
+         module = protocol.load_module('Module Name', slot)
+
 
 You can reference your module in a few different ways. The valid names can be found below. They are not case-sensitive.
 
@@ -40,7 +44,11 @@ onto the module. You can do this via:
 
 .. code-block:: python
 
-    my_labware = module.load_labware('Labware Definition Name')
+    from opentrons import protocol_api
+
+    def run(protocol: protocol_api.ProtocolContext):
+         module = protocol.load_module('Module Name', slot)
+         my_labware = module.load_labware('labware_definition_name')
 
 Where ``module`` is the variable name you saved your module to. You do not need to specify the slot.
 
@@ -50,7 +58,11 @@ All modules have the ability to check what state they are currently in. To do th
 
 .. code-block:: python
 
-    status = module.status
+    from opentrons import protocol_api
+
+    def run(protocol: protocol_api.ProtocolContext):
+         module = protocol.load_module('Module Name', slot)
+         status = module.status
 
 For the temperature module this will return a string stating whether it's ``'heating'``, ``'cooling'``, ``'holding at target'`` or ``'idle'``.
 For the magnetic module this will return a string stating whether it's ``'engaged'`` or ``'disengaged'``.
@@ -68,9 +80,12 @@ section, assume we have the following already:
 
 .. code-block:: python
 
-    def run(protocol_context):
-        temp_mod = protocol_context.load_module('temperature module', '1')
+    from opentrons import protocol_api
+
+    def run(protocol: protocol_api.ProtocolContext):
+        temp_mod = protocol.load_module('temperature module', '1')
         plate = temp_mod.load_labware('corning_96_wellplate_360ul_flat')
+        # The code from the rest of the examples in this section goes here
 
 Set Temperature
 ^^^^^^^^^^^^^^^
@@ -146,9 +161,12 @@ section, assume we have the following already:
 
 .. code-block:: python
 
-    def run(protocol_context):
-        mag_mod = protocol_context.load_module('magnetic module', '1')
+    from opentrons import protocol_api
+
+    def run(protocol: protocol_api.ProtocolContext):
+        mag_mod = protocol.load_module('magnetic module', '1')
         plate = mag_mod.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
+        # The code from the rest of the examples in this section goes here
 
 Engage
 ^^^^^^
@@ -205,8 +223,10 @@ For the purposes of this section, assume we have the following already:
 
 .. code-block:: python
 
-    def run(protocol_context):
-        tc_mod = protocol_context.load_module('thermocycler module', '1')
+    from opentrons import protocol_api
+
+    def run(protocol: protocol_api.ProtocolContext):
+        tc_mod = protocol.load_module('thermocycler module', '1')
         plate = tc_mod.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
 
 

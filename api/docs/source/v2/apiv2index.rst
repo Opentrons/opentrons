@@ -53,7 +53,7 @@ If we were to rewrite this with the Opentrons API, it would look like the follow
     }
 
     # protocol run function
-    def run(protocol: protocol_api.contexts.ProtocolContext):
+    def run(protocol: protocol_api.ProtocolContext):
 
         # labware
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '2')
@@ -99,7 +99,7 @@ Opentrons API version 2 protocols are structured around a function called ``run(
 
    from opentrons import protocol_api
 
-   def run(protocol: protocol_api.contexts.ProtocolContext):
+   def run(protocol: protocol_api.ProtocolContext):
        pass
 
 This function must be named exactly ``run`` and must take exactly one mandatory argument (its name doesn’t matter, but we recommend ``protocol`` since this argument represents the protocol that the robot will execute).

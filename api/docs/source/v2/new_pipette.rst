@@ -23,7 +23,7 @@ a list of associated tipracks:
 
     from opentrons import protocol_api
 
-    def run(protocol: protocol_api.contexts.ProtocolContext):
+    def run(protocol: protocol_api.ProtocolContext):
         # Load a P50 multi on the left slot
         left = protocol.load_instrument('p50_multi', 'left')
         # Load a P1000 Single on the right slot, with two racks of tips
@@ -75,7 +75,7 @@ For instance, in this protocol you can see the effects of specifying tipracks:
 
 .. code-block:: python
    from opentrons import protocol_api
-   def run(protocol: protocol_api.contexts.ProtocolContext):
+   def run(protocol: protocol_api.ProtocolContext):
        tiprack_left = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
        tiprack_right = protocol.load_labware('opentrons_96_tiprack_300ul', '2')
        left_pipette = protocol.load_instrument('p300_single', 'left')
@@ -133,7 +133,7 @@ Each of these attributes can be altered without affecting the others.
 .. code-block:: python
     from opentrons import protocol_api
 
-    def run(protocol: protocol_api.contexts.ProtocolContext):
+    def run(protocol: protocol_api.ProtocolContext):
         tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
         pipette = protocol.load_instrument(
             'p300_single', 'right', tip_racks=[tiprack])
@@ -195,7 +195,7 @@ executed as part of a transfer.
 
     from opentrons import protocol_api, types
 
-    def run(protocol: protocol_api.contexts.ProtocolContext):
+    def run(protocol: protocol_api.ProtocolContext):
         tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
         pipette = protocol.load_instrument('p300_single', 'right')
         plate = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
@@ -236,7 +236,7 @@ the overall speed of the gantry. Its default is 400 mm/s.
 
     from opentrons import protocol_api, types
 
-    def run(protocol: protocol_api.contexts.ProtocolContext):
+    def run(protocol: protocol_api.ProtocolContext):
         pipette = protocol.load_instrument('p300_single', 'right')
         # Move to 50mm above the front left of slot 5, very quickly
         pipette.move_to(protocol.deck.position_for('5').move(types.Point(z=50)))
