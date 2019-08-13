@@ -111,8 +111,7 @@
 }
 
 /* TODO: Ian 2019-08-05 copied from FileSidebar.css, consider merging as new component  */
-.upload_button,
-.button {
+.upload_button {
   margin: 0.75rem 0;
   width: 100%;
 }

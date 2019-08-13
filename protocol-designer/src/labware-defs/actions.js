@@ -54,16 +54,16 @@ const replaceCustomLabwareDefs = (
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 const validate = ajv.compile(labwareSchema)
 
-const _labwareDefsMatchLoadName = (
+const _labwareDefsMatchingLoadName = (
   labwareDefs: Array<LabwareDefinition2>,
   loadName: string
-) => labwareDefs.some(def => def.parameters.loadName === loadName)
+) => labwareDefs.filter(def => def.parameters.loadName === loadName)
 
-const _labwareDefsMatchDisplayName = (
+const _labwareDefsMatchingDisplayName = (
   labwareDefs: Array<LabwareDefinition2>,
   displayName: string
 ) =>
-  labwareDefs.some(
+  labwareDefs.filter(
     def =>
       def.metadata.displayName.trim().toLowerCase() ===
       displayName.trim().toLowerCase()
@@ -88,9 +88,7 @@ export const createCustomLabwareDef = (
   if (!file.name.match(/\.json$/i)) {
     return dispatch(
       labwareUploadMessage({
-        messageType: 'INVALID_JSON_FILE',
-        message:
-          "The Protocol Designer only accepts custom JSON labware definitions made with our Labware Creator. This isn't a .json file!",
+        messageType: 'NOT_JSON',
       })
     )
   }
@@ -99,7 +97,6 @@ export const createCustomLabwareDef = (
     const result = readEvent.currentTarget.result
     let parsedLabwareDef: ?LabwareDefinition2
 
-    // TODO: Ian 2019-08-05 all the error messaging described in product doc
     try {
       parsedLabwareDef = JSON.parse(result)
     } catch (error) {
@@ -108,7 +105,7 @@ export const createCustomLabwareDef = (
       return dispatch(
         labwareUploadMessage({
           messageType: 'INVALID_JSON_FILE',
-          message: error.message,
+          errorText: error.message,
         })
       )
     }
@@ -123,47 +120,66 @@ export const createCustomLabwareDef = (
       return dispatch(
         labwareUploadMessage({
           messageType: 'INVALID_JSON_FILE',
-          message:
-            'The Protocol Designer only accepts custom JSON labware definitions made with our Labware Creator',
         })
       )
     } else if (allLabwareDefs.some(def => isEqual(def, parsedLabwareDef))) {
       return dispatch(
         labwareUploadMessage({
           messageType: 'EXACT_LABWARE_MATCH',
-          message: 'This labware is already available to use.',
         })
       )
-    } else if (
-      _labwareDefsMatchLoadName(customLabwareDefs, loadName) ||
-      _labwareDefsMatchDisplayName(customLabwareDefs, displayName)
+    }
+
+    const defsMatchingCustomLoadName = _labwareDefsMatchingLoadName(
+      customLabwareDefs,
+      loadName
+    )
+    const defsMatchingCustomDisplayName = _labwareDefsMatchingDisplayName(
+      customLabwareDefs,
+      displayName
+    )
+    if (
+      defsMatchingCustomLoadName.length > 0 ||
+      defsMatchingCustomDisplayName.length > 0
     ) {
       return dispatch(
         labwareUploadMessage({
           messageType: 'ASK_FOR_LABWARE_OVERWRITE',
-          message:
-            'The load name and/or display name matches that of another CUSTOM labware',
+          defsMatchingLoadName: defsMatchingCustomLoadName,
+          defsMatchingDisplayName: defsMatchingCustomDisplayName,
           pendingDef: parsedLabwareDef,
         })
       )
-    } else if (
-      _labwareDefsMatchLoadName(allLabwareDefs, loadName) ||
-      _labwareDefsMatchDisplayName(allLabwareDefs, displayName)
+    }
+
+    const allDefsMatchingLoadName = _labwareDefsMatchingLoadName(
+      allLabwareDefs,
+      loadName
+    )
+    const allDefsMatchingDisplayName = _labwareDefsMatchingDisplayName(
+      allLabwareDefs,
+      displayName
+    )
+    if (
+      allDefsMatchingLoadName.length > 0 ||
+      allDefsMatchingDisplayName.length > 0
     ) {
       return dispatch(
         labwareUploadMessage({
           messageType: 'LABWARE_NAME_CONFLICT',
-          message:
-            'The load name and/or display name matches that of another STANDARD labware',
-        })
-      )
-    } else {
-      return dispatch(
-        createCustomLabwareDefAction({
-          def: parsedLabwareDef,
+          defsMatchingLoadName: allDefsMatchingLoadName,
+          defsMatchingDisplayName: allDefsMatchingDisplayName,
+          // message: // TODO IMMEDIATELY
+          //   'The load name and/or display name matches that of another STANDARD labware',
         })
       )
     }
+
+    return dispatch(
+      createCustomLabwareDefAction({
+        def: parsedLabwareDef,
+      })
+    )
   }
   reader.readAsText(file)
 }
@@ -187,8 +203,8 @@ export const overwriteLabware = (): ThunkAction<*> => (
       .filter(
         d =>
           !isEqual(d, newDef) && // don't delete the def we just added!
-          (_labwareDefsMatchLoadName([d], loadName) ||
-            _labwareDefsMatchDisplayName([d], displayName))
+          (_labwareDefsMatchingLoadName([d], loadName).length > 0 ||
+            _labwareDefsMatchingDisplayName([d], displayName).length > 0)
       )
       .map(getLabwareDefURI)
     if (defURIsToOverwrite.length > 0) {
