@@ -11,7 +11,7 @@ Overview
 
 The difference between this section and :ref:`v2-atomic-commands` is ease of use. With complex liquid handling commands, you can more easily handle larger
 groups of wells to perform repetitive actions. The main downside to using complex liquid handling commands is that you cannot control the
-order in which operations are executed. In this section we will attempt to thoroughly explain when and how specific actions are executed.
+order in which operations are executed. In this section we will order in which operations are executed. In this section we explain when and how specific actions are executed.
 
 The examples in this section will use the following set-up:
 
@@ -28,15 +28,15 @@ You can follow along and simulate the protocol using our protocol simulator, whi
 
 There are three general complex liquid handling commands. The differences can be found in the table below
 
-+-----------------+----------------------------------------------------+------------------------------------------------------+-------------------------------------------+
-|    Method       |   One source well to a group of destination wells  |   Many source wells to a group of destination wells  | Many source wells to one destination well |
-+=================+====================================================+======================================================+===========================================+
-| ``transfer``    |                   Yes                              |                      Yes                             |                   Yes                     |
-+-----------------+----------------------------------------------------+------------------------------------------------------+-------------------------------------------+
-| ``distribute``  |                   Yes                              |                       No                             |                    No                     |
-+-----------------+----------------------------------------------------+------------------------------------------------------+-------------------------------------------+
-| ``consolidate`` |                   No                               |                       No                             |                    No                     |
-+-----------------+----------------------------------------------------+------------------------------------------------------+-------------------------------------------+
++------------------------------------------+----------------------------------------------------+------------------------------------------------------+-------------------------------------------+
+|    Method                                |   One source well to a group of destination wells  |   Many source wells to a group of destination wells  | Many source wells to one destination well |
++==========================================+====================================================+======================================================+===========================================+
+| :py:meth:`.InstrumentContext.transfer`   |                   Yes                              |                      Yes                             |                   Yes                     |
++------------------------------------------+----------------------------------------------------+------------------------------------------------------+-------------------------------------------+
+| :py:meth:`.InstrumentContext.distribute` |                   Yes                              |                       No                             |                    No                     |
++------------------------------------------+----------------------------------------------------+------------------------------------------------------+-------------------------------------------+
+| :py:meth:`.InstrumentContext.consolidate`|                   No                               |                       No                             |                    No                     |
++------------------------------------------+----------------------------------------------------+------------------------------------------------------+-------------------------------------------+
 
 You can also refer to these images for further clarification.
 
@@ -77,7 +77,7 @@ Consolidate
 Parameters
 ----------
 
-Parameters for our complex liquid handling listed in *order* of operation. Check out the :ref:`complex_params` section for examples on how to use these parameters.
+Parameters for our complex liquid handling listed in order of operation. Check out the :ref:`complex_params` section for examples on how to use these parameters.
 
 +--------------------------------+------------------------------------------------------+----------------------------+------------------------------------+------------------------------------+
 |          Parameter(s)          |                     Options                          |     Transfer Defaults      |        Distribute Defaults         |       Consolidate Defaults         |
@@ -106,8 +106,8 @@ Parameters for our complex liquid handling listed in *order* of operation. Check
 Transfer
 ========
 
-The most versatile of the complex liquid handling functions is ``transfer()``. For a majority of use-cases you will most likely want to use this complex command.
-Below you will find a few scenarios utilizing the ``transfer()`` command.
+The most versatile of the complex liquid handling functions is :py:meth:`.InstrumentContext.transfer`. For a majority of use-cases you will most likely want to use this complex command.
+Below you will find a few scenarios utilizing the :py:meth:`.InstrumentContext.transfer` command.
 
 
 Basic
@@ -119,13 +119,13 @@ The example below will transfer 100 uL from well ``'A1'`` to well ``'B1'``, auto
 
     pipette.transfer(100, plate.wells_by_name()['A1'], plate.wells_by_name()['B1'])
 
-Transfer commands will automatically create entire series of ``aspirate()``, ``dispense()``, and other ``InstrumentContext`` commands.
+Transfer commands will automatically create entire series of :py:meth:`.InstrumentContext.aspirate`, :py:meth:`.InstrumentContext.dispense`, and other :py:meth:`.InstrumentContext` commands.
 
 
 Large Volumes
 -------------
 
-Volumes larger than the pipette's ``max_volume`` will automatically divide into smaller transfers.
+Volumes larger than the pipette's ``max_volume`` :ref:`defaults` will automatically divide into smaller transfers.
 
 .. code-block:: python
 
@@ -245,7 +245,7 @@ will have the steps...
 Distribute and Consolidate
 ==========================
 
-Save time and tips with the ``distribute()`` and ``consolidate()`` commands. These are nearly identical to ``transfer()``, except that they will combine multiple transfer's into a single tip.
+Save time and tips with the :py:meth:`.InstrumentContext.distribute` and :py:meth:`.InstrumentContext.consolidate` commands. These are nearly identical to :py:meth:`.InstrumentContext.transfer`, except that they will combine multiple transfers into a single tip.
 
 Consolidate
 -----------
@@ -375,26 +375,65 @@ will have the steps...
     Blowing out at well A1 in "12"
     Dropping tip well A1 in "12"
 
+Re-Visiting Order of Operations
+===============================
+
+Given this sample code, what is the order of operations?
+
+.. code-block:: python
+
+    pipette.transfer(
+        100,
+        [plate.wells_by_name()[well_name] for well_name in ['A1', 'A2', 'A3']],
+        [plate.wells_by_name()[well_name] for well_name in ['B1', 'B2', 'B3']],
+        new_tip='always',
+        disposal_volume=10,
+        touch_tip=True,
+        air_gap=10,
+        mix_before=(2, 50),
+        mix_after=(2, 50),
+        blow_out=True)
+
+The order in which the parameters are listed inside of a complex method are irrelevant. Instead, the order in which
+parameters are executed is as follows:
+
+1. Tip logic
+2. Mix at source location
+3. Aspirate + Any disposal volume
+4. Touch tip
+5. Air gap
+6. Dispense
+7. Touch tip
+
+<------Repeat above for all wells------>
+
+8. Empty disposal volume into trash
+9. Blow Out
+
+Notice how blow out only occurs after getting rid of disposal volume. If you want blow out to occur after every dispense, you should not
+include a disposal volume.
+
+****************************
 
 Which Command Should I Use?
 ===========================
 
 Now that you know a little more about the different complex liquid handling options, which one should you use?
 
-You already know how each method handles different groups of wells from :ref:`overview`, and we can refer to the chart below again to refresh your memory.
+Each method handles groups of wells differently. We tried to encapsulate the different options you might encounter when utilizing complex commands in the table below.
 
-+-----------------+----------------------------------------------------+------------------------------------------------------+-------------------------------------------+
-|    Method       |   One source well to a group of destination wells  |   Many source wells to a group of destination wells  | Many source wells to one destination well |
-+=================+====================================================+======================================================+===========================================+
-| ``transfer``    |                   Yes                              |                      Yes                             |                   Yes                     |
-+-----------------+----------------------------------------------------+------------------------------------------------------+-------------------------------------------+
-| ``distribute``  |                   Yes                              |                       No                             |                    No                     |
-+-----------------+----------------------------------------------------+------------------------------------------------------+-------------------------------------------+
-| ``consolidate`` |                   No                               |                       No                             |                    No                     |
-+-----------------+----------------------------------------------------+------------------------------------------------------+-------------------------------------------+
++------------------------------------------+----------------------------------------------------+------------------------------------------------------+-------------------------------------------+
+|    Method                                |   One source well to a group of destination wells  |   Many source wells to a group of destination wells  | Many source wells to one destination well |
++==========================================+====================================================+======================================================+===========================================+
+| :py:meth:`.InstrumentContext.transfer`   |                   Yes                              |                      Yes                             |                   Yes                     |
++------------------------------------------+----------------------------------------------------+------------------------------------------------------+-------------------------------------------+
+| :py:meth:`.InstrumentContext.distribute` |                   Yes                              |                       No                             |                    No                     |
++------------------------------------------+----------------------------------------------------+------------------------------------------------------+-------------------------------------------+
+| :py:meth:`.InstrumentContext.consolidate`|                   No                               |                       No                             |                    No                     |
++------------------------------------------+----------------------------------------------------+------------------------------------------------------+-------------------------------------------+
 
-You can check out the table below on how each method compares for things such as contamination or speed. If a method is considered
-extremely good at a particular category it is marked with an ``X``
+You can also check out this other table below on how each method compares for things such as contamination or speed. If a method is intended for a particular category,
+it is marked with an ``X``.
 
 +------------+----------+---------+-----------------+---------------+
 |            | Accuracy |  Speed  | Waste Reduction | Contamination |
@@ -417,7 +456,10 @@ Below are some examples of the parameters described in :ref:`params_table`.
 
 new_tip
 -------
-Recall that this parameter handles tip change logic.
+
+This parameter handles tip logic. You have options of ``always``, ``once`` and ``never``. The default for every complex command is ``once``.
+
+If you want to avoid cross-contamination and increase accuracy, you should set this parameter to ``always``.
 
 Always Get a New Tip
 ^^^^^^^^^^^^^^^^^^^^
@@ -487,10 +529,10 @@ will have the steps...
     ...
     Dropping tip well A1 in "12"
 
-Trash or Return Tip
---------------------
+trash
+-----
 
-By default, the transfer command will drop the pipette's tips in the trash container. However, if you wish to instead return the tip to it's tip rack, you can set ``trash=False``.
+By default, the transfer command will drop the pipette's tips in the trash container. However, if you wish to instead return the tip to its tip rack, you can set ``trash=False``.
 
 .. code-block:: python
 
@@ -512,10 +554,10 @@ will have the steps...
     Returning tip
     Dropping tip well A1 in "2"
 
-Touch Tip
+touch_tip
 ---------
 
-A touch-tip can be performed after every aspirate and dispense by setting ``touch_tip=True``.
+A :ref:`touch-tip` can be performed after every aspirate and dispense by setting ``touch_tip=True``.
 
 .. code-block:: python
 
@@ -538,10 +580,10 @@ will have the steps...
     Touching tip
     Dropping tip well A1 in "12"
 
-Blow Out
+blow_out
 --------
 
-A blow-out can be performed after every dispense that leaves the tip empty by setting ``blow_out=True``.
+A :ref:`blow-out` can be performed after every dispense that leaves the tip empty by setting ``blow_out=True``.
 
 .. code-block:: python
 
@@ -563,10 +605,10 @@ will have the steps...
     Blowing out
     Dropping tip well A1 in "12"
 
-Mix Before/After
-----------------
+mix_before, mix_after
+---------------------
 
-A mix can be performed before every aspirate by setting ``mix_before=``. The value of ``mix_before=`` must be a tuple, the 1st value is the number of repetitions, the 2nd value is the amount of liquid to mix.
+A :ref:`mix` can be performed before every aspirate by setting ``mix_before=``. The value of ``mix_before=`` must be a tuple, the 1st value is the number of repetitions, the 2nd value is the amount of liquid to mix.
 
 .. code-block:: python
 
@@ -600,10 +642,10 @@ will have the steps...
     Dispensing 75.0 uL into well A2 in "1"
     Dropping tip well A1 in "12"
 
-Air Gap
+air_gap
 -------
 
-An air gap can be performed after every aspirate by setting ``air_gap=int``, where the value is the volume of air in microliters to aspirate after aspirating the liquid.
+An :ref:`air-gap` can be performed after every aspirate by setting ``air_gap=int``, where the value is the volume of air in microliters to aspirate after aspirating the liquid.
 
 .. code-block:: python
 
@@ -627,10 +669,12 @@ will have the steps...
     Dispensing 100.0 uL into well A2 in "1"
     Dropping tip well A1 in "12"
 
-Disposal Volume
+disposal_volume
 ---------------
 
-When dispensing multiple times from the same tip, it is recommended to aspirate an extra amount of liquid to be disposed of after distributing. This added ``disposal_vol`` can be set as an optional argument. There is a default disposal volume (equal to the pipette's minimum volume), which will be blown out at the trash after the dispenses.
+When dispensing multiple times from the same tip, it is recommended to aspirate an extra amount of liquid to be disposed of after distributing. This added ``disposal_vol`` can be set as an optional argument.
+
+There is a default disposal volume (equal to the pipette's minimum volume :ref:`Defaults`), which will be blown out at the trash after the dispenses.
 
 .. code-block:: python
 
@@ -638,7 +682,7 @@ When dispensing multiple times from the same tip, it is recommended to aspirate 
         30,
         [plate.wells_by_name()[well_name] for well_name in ['A1', 'A2']],
         plate.columns_by_name()['2'],
-        disposal_vol=60)   # include extra liquid to make dispenses more accurate, 20% of total volume
+        disposal_volume=60)   # include extra liquid to make dispenses more accurate, 20% of total volume
 
 
 will have the steps...

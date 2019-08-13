@@ -161,6 +161,8 @@ To dispense is to push out liquid from the pipette's tip. Its usage in the Opent
 
 That final dispense without specifying a microliter amount will dispense all remaining liquids in the tip to ``plate['B2']``, and now our pipette is empty.
 
+.. _blow-out:
+
 Blow Out
 ========
 
@@ -173,6 +175,7 @@ When calling ``blow_out()`` on a pipette, we have the option to specify a locati
     pipette.blow_out()            # blow out in current location
     pipette.blow_out(plate['B3']) # blow out in current plate:B3
 
+.. _touch-tip:
 
 Touch Tip
 =========
@@ -192,6 +195,7 @@ Touch tip can take up to 4 arguments: ``touch_tip(location, radius, v_offset, sp
                       radius=0.75,
                       v_offset=-2)
 
+.. _mix:
 
 Mix
 ===
@@ -206,6 +210,7 @@ The mix command takes three arguments: ``mix(repetitions, volume, location)``
     pipette.mix(3, 50)                  # mix 3 times, 50uL, in current location
     pipette.mix(2)                      # mix 2 times, pipette's max volume, in current location
 
+.. _air-gap:
 
 Air Gap
 =======
