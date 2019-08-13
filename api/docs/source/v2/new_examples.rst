@@ -62,7 +62,7 @@ Loops in Python allow your protocol to perform many actions, or act upon many we
         # etc...
 
         # range() starts at 0 and stops before 12, creating a range of 0-11
-        for i in range(12):
+        for i in range(8):
             p300.distribute(200, trough.wells()[i], plate.rows()[i])
 
 ******************************

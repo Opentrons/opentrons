@@ -45,14 +45,15 @@ If we were to rewrite this with the Opentrons API, it would look like the follow
 
     from opentrons import protocol_api
 
-   # metadata
+    # metadata
     metadata = {
         'protocolName': 'My Protocol',
         'author': 'Name <email@address.com>',
         'description': 'Simple protocol to get started using OT2'
     }
 
-    # protocol run function
+    # protocol run function. the part after the colon lets your editor know
+    # where to look for autocomplete suggestions
     def run(protocol: protocol_api.ProtocolContext):
 
         # labware
@@ -88,7 +89,7 @@ Metadata
 
 Metadata is a dictionary of data that is read by the server and returned to client applications (such as the Opentrons Run App). It is not needed to run a protocol (and is entirely optional), but if present can help the client application display additional data about the protocol currently being executed.
 
-The fields above (``"protocolName"``, ``"author"``, and ``"description"``) are the recommended fields, but the metadata dictionary can contain fewer fields, or additional fields as desired (though non-standard fields may not be rendered by the client, depending on how it is designed).
+The fields above (``"protocolName"``, ``"author"``, and ``"description"``) are the recommended fields, but the metadata dictionary can contain fewer fields, or additional fields as desired (though non-standard fields are not displayed by the Opentrons app).
 
 The Run Function and the Protocol Context
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -111,7 +112,7 @@ The object ``protocol`` is the *protocol context*, which represents the robot an
 The protocol context has two responsibilities:
 
 1) Remember, track, and check the robot’s state
-2) Expose the functions that make the robot act
+2) Expose the functions that make the robot execute actions
 
 The protocol context plays the same role as the ``robot``, ``labware``, ``instruments``, and ``modules`` objects in past versions of the API, with one important difference: it is only one object; and because it is passed in to your protocol rather than imported, it is possible for the API to be much more rigorous about separating simulation from reality.
 
@@ -125,9 +126,9 @@ The next step is defining the labware required for your protocol. You must tell 
 
 The name of a labware is a string that is different for each kind of labware. You can look up labware to add to your protocol on the Opentrons `Labware Library <https://labware.opentrons.com>`_.
 
-The slot is the labelled location on the deck in which you've placed the labware. These are numbers from 1-11.
+The slot is the labelled location on the deck in which you've placed the labware. The available slots are numbered from 1-11.
 
-Our example protocol above loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 2 (``plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)``) and an `Opentrons 300ul Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slot 1 (``tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', 1)``). These can be referenced later in the protocol as ``plate`` and ``tiprack`` respectively.
+Our example protocol above loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 2 (``plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)``) and an `Opentrons 300ul Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slot 1 (``tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', 1)``). These can be referenced later in the protocol as ``plate`` and ``tiprack`` respectively. Check out `the python docs <https://docs.python.org/3/index.html>`_ for further clarification on using variables effectively in your code.
 
 You can find more information about handling labware in the :ref:`new-labware` section.
 
@@ -139,104 +140,17 @@ After defining labware, you define the instruments required for your protocol. Y
 
 The ``model`` of the pipette is the kind of pipette that should be attached; the ``mount`` is either ``"left"`` or ``"right"``; and ``tip_racks`` is a list of the objects representing tip racks that this instrument should use. Specifying ``tip_racks`` is optional, but if you don't then you'll have to manually specify where the instrument should pick up tips from every time you try and pick up a tip.
 
-See :ref:`new-pipette-models` for a list of pipettes you can specify in your protocol.
+See :ref:`new-pipette` for more information on creating and working with pipettes.
 
 Our example protocol above loads a P300 Single-channel pipette (``'p300_single'``) in the left mount (``'left'``), and uses the Opentrons 300ul tiprack we loaded previously as a source of tips (``tip_racks=[tiprack]``).
 
-You can find more information about handling pipettes in the :ref:`new_pipette` section.
 
 Commands
 ^^^^^^^^
 
-Once the instruments and labware the protocols are required are defined, the next step is to define the commands that make up the protocol. The most common commands are ``aspirate()``, ``dispense()``, ``pick_up_tip()``, and ``drop_tip()``. These and many others are described in the :ref:`v2-atomic-commands` and :ref:`v2-complex-commands` sections, which go into more detail about the commands and how they work. These commands typically specify which wells of which labware to interact with (using the labware you defined in the Labware section), and are methods of the instruments you created in the Pipettes section. For instance, in our example protocol you use the pipette you defined to
+Once the instruments and labware the protocols are required are defined, the next step is to define the commands that make up the protocol. The most common commands are ``aspirate()``, ``dispense()``, ``pick_up_tip()``, and ``drop_tip()``. These and many others are described in the :ref:`v2-atomic-commands` and :ref:`v2-complex-commands` sections, which go into more detail about the commands and how they work. These commands typically specify which wells of which labware to interact with using the labware you defined earlier, and are methods of the instruments you created in the pipette section. For instance, in our example protocol you use the pipette you defined to
 
 1) Pick up a tip (implicitly from the tiprack you specified in slot 1 and assigned to the pipette): ``pipette.pick_up_tip()``
 2) Aspirate 100ul from well A1 of the 96 well plate you specified in slot 2: ``pipette.aspirate(100, plate['A1'])``
 3) Dispense 100ul into well A2 of the 96 well plate you specified in slot 2: ``pipette.dispense(100, plate['A2'])``
 4) Drop the tip (implicitly into the trash at the back right of the robot's deck): ``pipette.drop_tip()``
-
-Simplifiying and Modularizing Protocols
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The commands section can become very long as protocols become more complicated. One way to handle this is to identify parts of the protocol that are similar to each other and put them in their own functions, called from the ``run()`` function. For instance, what if we have a protocol that needs to transfer every second well in column 1 to column 2, then to column 3, and so on:
-
-.. code-block:: python
-
-    from opentrons import protocol_api
-
-    metadata = {'protocolName': 'Complex Protocol'}
-
-    def run(protocol: protocol_api.ProtocolContext):
-        # labware
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '2')
-        tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
-
-        # pipettes
-        left_pipette = protocol.load_instrument(
-             'p300_single', 'left', tip_racks=[tiprack])
-
-        # commands
-        left_pipette.pick_up_tip()
-
-        # Column 1 to column 2
-        left_pipette.aspirate(100, plate['A1'])
-        left_pipette.dispense(100, plate['A2'])
-        left_pipette.aspirate(100, plate['C1'])
-        left_pipette.dispense(100, plate['C2'])
-        left_pipette.aspirate(100, plate['E1'])
-        left_pipette.dispense(100, plate['E2'])
-        left_pipette.aspirate(100, plate['G1'])
-        left_pipette.dispense(100, plate['G2'])
-
-        # Column 2 to column 3
-        left_pipette.aspirate(100, plate['A2'])
-        left_pipette.dispense(100, plate['A3'])
-        left_pipette.aspirate(100, plate['C2'])
-        left_pipette.dispense(100, plate['C3'])
-        left_pipette.aspirate(100, plate['E2'])
-        left_pipette.dispense(100, plate['E3'])
-        left_pipette.aspirate(100, plate['G2'])
-        left_pipette.dispense(100, plate['G3'])
-
-        left_pipette.drop_tip()
-
-
-It's a contrived example, but it's already getting long, and putting in a loop won't help much because it's complex. However, what if we modularized it:
-
-.. code-block:: python
-
-    from opentrons import protocol_api
-
-    metadata = {'protocolName': 'Complex Protocol'}
-
-    def run(protocol: protocol_api.ProtocolContext):
-        # labware
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '2')
-        tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
-
-        # pipettes
-        left_pipette = protocol.load_instrument(
-             'p300_single', 'left', tip_racks=[tiprack])
-
-        # commands
-        left_pipette.pick_up_tip()
-        transfer_skip_rows(
-            left_pipette, plate.columns()[0], plate.columns()[1])
-        transfer_skip_rows(
-            left_pipette, plate.columns()[1], plate.columns()[2])
-        left_pipette.drop_tip()
-
-
-    def transfer_skip_rows(instrument, from_column, to_column):
-        """ Transfer from one column to another, skipping rows """
-        instrument.aspirate(100, from_column[0])
-        instrument.dispense(100, to_column[0])
-        instrument.aspirate(100, from_column[2])
-        instrument.dispense(100, to_column[2])
-        instrument.aspirate(100, from_column[4])
-        instrument.dispense(100, to_column[4])
-        instrument.aspirate(100, from_column[6])
-        instrument.dispense(100, to_column[6])
-
-
-Now, it's much easier to read through the ``run()`` function and see the *intent* of the protocol, and you can still go look at how ``transfer_skip_rows()`` is implemented if you want more details. Note that the two functions are defined very similarly, and ``transfer_skip_rows()`` is explicitly called from ``run()``. Remember, when the protocol is executed or simulated, the robot calls the ``run()`` function - so only code called from ``run()`` will execute.

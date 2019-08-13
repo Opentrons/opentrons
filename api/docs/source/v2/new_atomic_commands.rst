@@ -1,8 +1,8 @@
 .. _v2-atomic-commands:
 
-##############
-Basic Commands
-##############
+#######################
+Building Block Commands
+#######################
 
 Basic commands are the smallest individual actions that can be completed on a robot.
 For example, a liquid transfer at its core, found in :ref:`v2-complex-commands`, can be separated into a series of ``pick_up_tip()``, ``aspirate()``, ``dispense()``, ``drop_tip()`` etc.
@@ -40,7 +40,7 @@ Before any liquid handling can be done, your pipette must have a tip on it. The 
 
    pipette.pick_up_tip(tiprack['A1'])
 
-If you have associated a tiprack with your pipette such as in the :ref:`new_pipette` section or :ref:`protocol_api-protocols-and-instruments`, then you can simply call
+If you have associated a tiprack with your pipette such as in the :ref:`new-pipette` section or :ref:`protocol_api-protocols-and-instruments`, then you can simply call
 
 .. code-block:: python
 
@@ -300,9 +300,9 @@ Usually the above option is useful when moving inside of a well. Take a look at 
     pipette.move_to(plate['A1'].top(-2), force_direct=True)
     pipette.move_to(plate['A2'])
 
-*******
-Utility
-*******
+****************
+Utility Commands
+****************
 
 Delay
 =====

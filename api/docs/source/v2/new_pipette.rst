@@ -1,4 +1,4 @@
-.. _new_pipette:
+.. _new-pipette:
 
 ########
 Pipettes
