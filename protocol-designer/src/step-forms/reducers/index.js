@@ -7,12 +7,11 @@ import cloneDeep from 'lodash/cloneDeep'
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
-
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import {
   rootReducer as labwareDefsRootReducer,
   type RootState as LabwareDefsRootState,
 } from '../../labware-defs'
-
 import { INITIAL_DECK_SETUP_STEP_ID, FIXED_TRASH_ID } from '../../constants.js'
 import { getPDMetadata } from '../../file-types'
 import {
@@ -24,6 +23,7 @@ import {
   _getPipetteEntitiesRootState,
   _getLabwareEntitiesRootState,
 } from '../selectors'
+import { getIdsInRange, getLabwareIdInSlot } from '../utils'
 
 import type { LoadFileAction } from '../../load-file'
 import type {
@@ -32,12 +32,12 @@ import type {
   DuplicateLabwareAction,
   SwapSlotContentsAction,
 } from '../../labware-ingred/actions'
+import type { ReplaceCustomLabwareDefs } from '../../labware-defs/actions'
 import type { FormData, StepIdType } from '../../form-types'
 import type {
   FileLabware,
   FilePipette,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
-
 import type {
   AddStepAction,
   ChangeFormInputAction,
@@ -50,13 +50,16 @@ import type {
   SaveStepFormAction,
 } from '../../steplist/actions'
 import type { StepItemData } from '../../steplist/types'
-import type { NormalizedPipetteById, NormalizedLabwareById } from '../types'
+import type {
+  NormalizedPipetteById,
+  NormalizedLabware,
+  NormalizedLabwareById,
+} from '../types'
 import type {
   CreatePipettesAction,
   DeletePipettesAction,
   SubstituteStepFormPipettesAction,
 } from '../actions'
-import { getIdsInRange, getLabwareIdInSlot } from '../utils'
 
 type FormState = FormData | null
 
@@ -441,6 +444,21 @@ export const labwareInvariantProperties = handleActions<
         })
       )
     },
+    REPLACE_CUSTOM_LABWARE_DEFS: (
+      // TODO IMMEDIATELY: UNIT TEST
+      state: NormalizedLabwareById,
+      action: ReplaceCustomLabwareDefs
+    ): NormalizedLabwareById =>
+      mapValues(
+        state,
+        (prev: NormalizedLabware): NormalizedLabware =>
+          action.payload.defURIsToOverwrite.includes(prev.labwareDefURI)
+            ? {
+                ...prev,
+                labwareDefURI: getLabwareDefURI(action.payload.newDef),
+              }
+            : prev
+      ),
   },
   initialLabwareState
 )

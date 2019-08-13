@@ -4,6 +4,7 @@ import Ajv from 'ajv'
 import isEqual from 'lodash/isEqual'
 import values from 'lodash/values'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import * as labwareDefSelectors from './selectors'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { GetState, ThunkAction, ThunkDispatch } from '../types'
@@ -25,7 +26,6 @@ export type CreateCustomLabwareDef = {|
   type: 'CREATE_CUSTOM_LABWARE_DEF',
   payload: {|
     def: LabwareDefinition2,
-    overwrite: boolean,
   |},
 |}
 
@@ -33,6 +33,21 @@ const createCustomLabwareDefAction = (
   payload: $PropertyType<CreateCustomLabwareDef, 'payload'>
 ): CreateCustomLabwareDef => ({
   type: 'CREATE_CUSTOM_LABWARE_DEF',
+  payload,
+})
+
+export type ReplaceCustomLabwareDefs = {|
+  type: 'REPLACE_CUSTOM_LABWARE_DEFS',
+  payload: {|
+    defURIsToOverwrite: Array<string>,
+    newDef: LabwareDefinition2,
+  |},
+|}
+
+const replaceCustomLabwareDefs = (
+  payload: $PropertyType<ReplaceCustomLabwareDefs, 'payload'>
+): ReplaceCustomLabwareDefs => ({
+  type: 'REPLACE_CUSTOM_LABWARE_DEFS',
   payload,
 })
 
@@ -146,7 +161,6 @@ export const createCustomLabwareDef = (
       return dispatch(
         createCustomLabwareDefAction({
           def: parsedLabwareDef,
-          overwrite: false,
         })
       )
     }
@@ -159,10 +173,27 @@ export const overwriteLabware = (): ThunkAction<*> => (
   getState: GetState
 ) => {
   // get def used to overwrite existing def from the labware upload message
-  const def = labwareDefSelectors.getLabwareUploadMessage(getState())
+  const newDef = labwareDefSelectors.getLabwareUploadMessage(getState())
     ?.pendingDef
-  if (def) {
-    dispatch(createCustomLabwareDefAction({ def, overwrite: true }))
+
+  if (newDef) {
+    // TODO IMMEDIATELY can this happen upstream? Duplicate code!!!
+    const loadName = newDef?.parameters?.loadName || ''
+    const displayName = newDef?.metadata?.displayName || ''
+    const customLabwareDefs: Array<LabwareDefinition2> = values(
+      labwareDefSelectors.getCustomLabwareDefsByURI(getState())
+    )
+    const defURIsToOverwrite = customLabwareDefs
+      .filter(
+        d =>
+          !isEqual(d, newDef) && // don't delete the def we just added!
+          (_labwareDefsMatchLoadName([d], loadName) ||
+            _labwareDefsMatchDisplayName([d], displayName))
+      )
+      .map(getLabwareDefURI)
+    if (defURIsToOverwrite.length > 0) {
+      dispatch(replaceCustomLabwareDefs({ defURIsToOverwrite, newDef }))
+    }
   } else {
     assert(
       false,
