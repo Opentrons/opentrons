@@ -3,7 +3,6 @@ import contextlib
 import logging
 import json
 import pkgutil
-from pprint import pprint
 from typing import Any, Dict, List, Optional, Union, Tuple, Sequence
 from opentrons import types, hardware_control as hc, commands as cmds
 from opentrons.commands import CommandPublisher
@@ -287,8 +286,6 @@ class ProtocolContext(CommandPublisher):
             valid_slots = [slot['id'] for slot in slots if module_name
                            in slot['compatibleModules']]
             if len(valid_slots) == 1:
-                pprint(valid_slots)
-                pprint(valid_slots[0])
                 return valid_slots[0]
             else:
                 raise AssertionError(
@@ -304,7 +301,6 @@ class ProtocolContext(CommandPublisher):
             resolved_location = self._resolve_module_location(
                     resolved_name, location)
             location_pos = self._deck_layout.position_for(resolved_location)
-            pprint(location_pos)
             geometry = load_module(resolved_name, location_pos)
         except KeyError:
             self._log.error(f'Unsupported Module: {resolved_name}')
