@@ -1,0 +1,227 @@
+/************************
+        Footer
+************************/
+
+
+
+footer {
+    background-color: #333;
+    width: 100%;
+    *zoom: 1;
+    padding-top: 48px;
+    padding-bottom: 48px;
+}
+
+footer:before,
+footer:after {
+    content: " ";
+    display: table;
+}
+
+footer:after {
+    clear: both;
+}
+
+footer .wrapper {
+    width: 90%;
+    margin: 0 auto;
+    font-size: 1em;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+@media only screen and (min-device-width: 769px) and (min-width: 769px) {
+    footer .wrapper {
+        width: 90%;
+    }
+}
+
+footer .wrapper section.social-signup {
+    width: 98%;
+    display: block;
+    padding: 0%;
+    margin: 0;
+    font-size: 16px;
+    vertical-align: top;
+    font-family: "AkkoPro-Light", sans-serif;
+}
+
+@media only screen and (min-device-width: 769px) and (min-width: 769px) {
+    footer .wrapper section.social-signup {
+        display: inline-block;
+        width: 41.66667%;
+        vertical-align: top;
+        padding-left: 1%;
+        padding-right: 1%;
+        margin-right: -4px;
+    }
+}
+
+footer .wrapper section.social-signup h3 {
+    margin-bottom: 12px;
+    color: white;
+}
+
+footer .wrapper section.footer-menu {
+    width: 98%;
+    display: block;
+    padding: 0%;
+    margin: 0;
+    font-size: 16px;
+    vertical-align: top;
+    color: white;
+    display: none;
+}
+
+@media only screen and (min-device-width: 769px) and (min-width: 769px) {
+    footer .wrapper section.footer-menu {
+        display: inline-block;
+        width: 50%;
+        vertical-align: top;
+        padding-left: 1%;
+        padding-right: 1%;
+        margin-right: -4px;
+    }
+}
+
+@media only screen and (min-device-width: 769px) and (min-width: 769px) {
+    footer .wrapper section.footer-menu {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+    }
+}
+
+footer .wrapper section.footer-menu ul {
+    list-style-type: none;
+    display: inline-block;
+    flex: 1 1 100px;
+    padding: 0 20px;
+    vertical-align: top;
+    text-align: left;
+    white-space: nowrap;
+}
+
+footer .wrapper section.footer-menu ul:not(:last-child) {
+    border-right: 3px solid #666;
+}
+
+footer .wrapper section.footer-menu ul:last-child {
+    padding-right: 0;
+    flex: 1 0 50px;
+}
+
+footer .wrapper section.footer-menu ul li:first-child,
+footer .wrapper section.footer-menu ul li:first-child a {
+    font-weight: 400;
+    text-transform: uppercase;
+    padding-bottom: 24px;
+    color: white;
+}
+
+footer .wrapper section.footer-menu ul li a {
+    color: #777;
+    font-weight: 400;
+    text-decoration: none;
+}
+
+@media only screen and (min-device-width: 769px) and (min-width: 769px) {
+    footer .wrapper section.footer-menu ul li a {
+        font-size: 1.5vw;
+    }
+}
+
+@media only screen and (min-device-width: 960px) and (min-width: 960px) {
+    footer .wrapper section.footer-menu ul li a {
+        font-size: 16px;
+    }
+}
+
+footer .wrapper section.footer-menu ul li a.buy {
+    text-decoration: underline;
+}
+
+div.social-links {
+    margin-bottom: 12px;
+    text-align: left;
+}
+
+div.social-links img {
+    display: inline-block;
+    width: 34px;
+    margin-right: 10px;
+}
+
+p.copyrite {
+    font-family: "Open Sans", sans-serif;
+    font-size: 10px;
+    color: white;
+}
+
+div#mc_embed_signup_scroll {
+    padding: 0;
+    color: black;
+}
+
+div#mc_embed_signup_scroll input {
+    max-width: 100%;
+    width: 98%;
+    height: 34px;
+    margin-top: 5px;
+    padding-left: 10px;
+    border: none;
+    font-size: 12px;
+    vertical-align: bottom;
+    border-radius: 6px;
+}
+
+@media only screen and (min-device-width: 769px) and (min-width: 769px) {
+    div#mc_embed_signup_scroll input {
+        max-width: 70%;
+    }
+}
+
+div#mc_embed_signup_scroll input.subscribe {
+    color: black;
+    padding: 6px 10px;
+    font-size: 16px;
+    width: 100%;
+    min-width: 100px;
+    height: 34px;
+    background-color: #EEE;
+}
+
+@media only screen and (min-device-width: 960px) and (min-width: 960px) {
+    div#mc_embed_signup_scroll input.subscribe {
+        margin-left: 5px;
+        width: 20%;
+    }
+}
+
+div#mc_embed_signup_scroll input.subscribe:hover {
+    padding-top: 5px;
+    cursor: pointer;
+    color: black;
+}
+
+div.hero {
+    width: 100vw;
+    height: 100vh;
+    padding: 0 1%;
+    position: relative;
+    overflow: hidden;
+    background: url("https://s3.amazonaws.com/opentrons-landing-img/hero_landing.jpg") no-repeat center center;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    text-align: center;
+    color: white;
+    font-family: "Open Sans", sans-serif;
+}
+
+footer .hiring{
+    color: #006FFF;
+
+  }

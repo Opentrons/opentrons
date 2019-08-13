@@ -419,16 +419,18 @@ Our release process is still a work-in-progress. The app and API projects are cu
 
 #### `make bump` usage
 
-`make bump` runs `lerna publish` (with npm and git push disabled) to bump all required files. You can pass options to lerna with the `opts` environment variable. See the [lerna publish docs][lerna-publish] for available options. The most important options are:
+`make bump` runs `lerna version` (with git tag and push disabled) to bump all required files. You can pass options to lerna with the `version` environment variable. See the [lerna version docs][lerna-version] for available options. The most important options are:
 
+- First positional argument: bump type _or_ explicit version
+  - Default: `prerelease`
+  - Valid bumps: `major`, `minor`, `patch`, `premajor`, `preminor`, `prepatch`, `prerelease`
+  - See [semver.inc][semver-inc] for keyword meanings
 - `--preid` - Used to specify the pre-release identifier
   - Default: `alpha`
   - Valid: `alpha`, `beta`
-- `--cd-version` - Used to specify a semantic version bump
-  - Default: `prerelease`
-  - Valid: `major`, `minor`, `patch`, `premajor`, `preminor`, `prepatch`, `prerelease`
-  - See [semver.inc][semver-inc] for keyword meanings
-- `--repo-version` - Used to specify an explicit version
+- `--allow-branch` - Specifically allow a branch to be bumped
+  - By default, Lerna will only accept a bump on a branch named `release_*`
+  - You may need to use this option for a hotfix
 
 ```shell
 # by default, bump to next alpha prerelease:
@@ -437,22 +439,22 @@ Our release process is still a work-in-progress. The app and API projects are cu
 make bump
 
 # equivalent to above
-make bump opts="--preid=alpha --cd-version=prerelease"
+make bump version="prerelease"
 
 # bump to a beta version, the standard practice for a new release
-make bump opts="--preid=beta"
+make bump version="prerelease --preid=beta"
 
 # prerelease minor version bump (e.g. 3.0.0 -> 3.1.0-alpha.0)
-make bump opts="--cd-version=preminor"
+make bump version="preminor"
 
 # minor version bump (e.g. 3.0.0-alpha.0 -> 3.1.0)
-make bump opts="--cd-version=minor"
+make bump version="minor"
 
 # bump to an explicit version
-make bump opts="--repo-version=42.0.0"
+make bump version="42.0.0"
 
-# bump a patch version, e.g. for a hotfix that does not require a beta
-make bump opts="--cd-version=patch"
+# bump a patch version, e.g. for a hotfix
+make bump version="patch --allow-branch hotfix_*"
 ```
 
 We use [lerna][], a monorepo management tool, to work with our various projects. You can use lerna to do things like see which projects have changed since the last release, or run a command in every project directory. To run a one-off lerna command, use:
@@ -573,7 +575,7 @@ When a robot is running on buildroot, its filesystem is mounted from two separat
 [commitizen]: https://github.com/commitizen/cz-cli
 [conventional-commits]: https://conventionalcommits.org/
 [lerna]: https://github.com/lerna/lerna
-[lerna-publish]: https://github.com/lerna/lerna#publish
+[lerna-version]: https://github.com/lerna/lerna/tree/v3.16.4/commands/version
 [semver-inc]: https://github.com/npm/node-semver#functions
 [systemd-journald]: https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html
 [journalctl]: https://www.freedesktop.org/software/systemd/man/journalctl.html

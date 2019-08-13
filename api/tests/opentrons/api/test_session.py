@@ -162,7 +162,7 @@ async def test_load_and_run(
 
     await loop.run_in_executor(executor=None,
                                func=run)
-    assert len(session.command_log) == 7
+    assert len(session.command_log) == 6
 
     res = []
     index = 0
@@ -182,7 +182,7 @@ async def test_load_and_run(
     assert main_router.notifications.queue.qsize() == 0,\
         'Notification should be empty after receiving "finished" state change'
     session.run()
-    assert len(session.command_log) == 7, \
+    assert len(session.command_log) == 6, \
         "Clears command log on the next run"
 
 

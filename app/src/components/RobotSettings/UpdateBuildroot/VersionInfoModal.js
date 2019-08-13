@@ -41,7 +41,7 @@ export default function VersionInfoModal(props: Props) {
   }
 
   let heading = ''
-  let primaryButton = null
+  let primaryButton = { className: styles.view_update_button }
   let message = null
   let secondaryMessage = null
 
@@ -50,6 +50,7 @@ export default function VersionInfoModal(props: Props) {
     message = <UpdateAppMessage {...versionProps} />
     secondaryMessage = <SkipAppUpdateMessage onClick={proceed} />
     primaryButton = {
+      ...primaryButton,
       Component: Link,
       to: '/menu/app/update',
       children: 'View App Update',
@@ -63,6 +64,7 @@ export default function VersionInfoModal(props: Props) {
       />
     )
     primaryButton = {
+      ...primaryButton,
       onClick: proceed,
       children:
         robotUpdateType === 'upgrade' ? 'View Robot Update' : 'Downgrade Robot',
@@ -70,7 +72,11 @@ export default function VersionInfoModal(props: Props) {
   } else {
     heading = REINSTALL_HEADING
     message = <p className={styles.reinstall_message}>{REINSTALL_MESSAGE}</p>
-    primaryButton = { onClick: proceed, children: 'Reinstall' }
+    primaryButton = {
+      ...primaryButton,
+      onClick: proceed,
+      children: 'Reinstall',
+    }
   }
 
   return (

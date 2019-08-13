@@ -8,7 +8,7 @@ import styles from './styles.css'
 type Props = {
   label: string,
   toggledOn: boolean,
-  children: React.Node,
+  children?: React.Node,
   onClick: () => mixed,
 }
 
@@ -26,7 +26,7 @@ export default function LabeledToggle(props: Props) {
         />
       }
     >
-      {props.children}
+      {props.children ? props.children : null}
     </LabeledControl>
   )
 }

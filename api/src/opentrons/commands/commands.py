@@ -1,3 +1,4 @@
+
 from . import types as command_types
 from opentrons.broker import Broker
 
@@ -349,7 +350,7 @@ def magdeck_calibrate():
 
 def tempdeck_set_temp(celsius):
     text = "Setting temperature deck module temperature " \
-           "to {temp} deg. celsius (rounded off to nearest integer)".format(
+           "to {temp} °C (rounded off to nearest integer)".format(
             temp=round(float(celsius),
                        utils.TEMPDECK_GCODE_ROUNDING_PRECISION))
     return make_command(
@@ -377,17 +378,29 @@ def thermocycler_open():
     )
 
 
-def thermocycler_set_temp(temp, hold_time):
-    text = "Setting thermocycler temperature to {temp} deg. celsius ".format(
-            temp=temp)
+def thermocycler_set_temp(temperature, hold_time):
+    text = "Setting thermocycler temperature to {temperature} °C ".format(
+            temperature=temperature)
     if hold_time is not None:
         text += " with a hold time of {} seconds".format(hold_time)
     return make_command(
         name=command_types.THERMOCYCLER_SET_TEMP,
         payload={
-            'temp': temp,
+            'temperature': temperature,
             'hold_time': hold_time,
             'text': text
+        }
+    )
+
+
+def thermocycler_cycle_temperatures(steps, repetitions):
+    text = f'Thermocycler starting {repetitions} repetitions' \
+            ' of cycle composed of the following steps: {steps}'
+    return make_command(
+        name=command_types.THERMOCYCLER_CYCLE_TEMPS,
+        payload={
+            'text': text,
+            'steps': steps
         }
     )
 

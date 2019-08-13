@@ -33,7 +33,7 @@ instrument_keys = sorted([
     'name', 'min_volume', 'max_volume', 'aspirate_flow_rate', 'channels',
     'dispense_flow_rate', 'pipette_id', 'current_volume', 'display_name',
     'tip_length', 'has_tip', 'model', 'blow_out_flow_rate',
-    'blow_out_speed', 'aspirate_speed', 'dispense_speed'])
+    'blow_out_speed', 'aspirate_speed', 'dispense_speed', 'working_volume'])
 
 
 async def test_cache_instruments(dummy_instruments, loop):

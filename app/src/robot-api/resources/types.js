@@ -14,7 +14,7 @@ export type HealthState = {|
 // TODO(mc, 2019-04-25): normalize?
 export type ModulesState = Array<Module>
 
-export type Module = MagDeckModule | TempDeckModule
+export type Module = MagDeckModule | TempDeckModule | ThermocyclerModule
 
 export type BaseModule = {|
   model: string,
@@ -46,8 +46,29 @@ export type MagDeckData = {|
   engaged: boolean,
 |}
 
-export type SetTemperatureRequest = {|
-  command_type: 'set_temperature' | 'deactivate',
+export type ThermocyclerData = {|
+  lid: 'open' | 'closed' | 'in_between',
+  lidTarget: ?number,
+  lidTemp: number,
+  currentTemp: number,
+  targetTemp: ?number,
+  holdTime: ?number,
+  rampRate: ?number,
+  totalStepCount: ?number,
+  currentStepIndex: ?number,
+  totalCycleCount: ?number,
+  currentCycleIndex: ?number,
+|}
+
+export type ThermocyclerModule = {|
+  ...BaseModule,
+  name: 'thermocycler',
+  displayName: 'Thermocycler Module',
+  data: ThermocyclerData,
+|}
+
+export type ModuleCommandRequest = {|
+  command_type: 'set_temperature' | 'deactivate' | 'open',
   args?: Array<number>,
 |}
 

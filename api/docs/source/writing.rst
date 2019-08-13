@@ -87,9 +87,10 @@ You must make sure that you install the `opentrons` package for whichever kernel
    import sys
    !{sys.executable} -m pip install opentrons
 
+.. _simulate-block:
 
-Simulating
-==========
+Simulating Your Scripts
+=======================
 
 Once the Opentrons Python package is installed, you can simulate protocols in your terminal using the ``opentrons_simulate`` command:
 
@@ -152,5 +153,3 @@ Here, you can select a notebook and develop protocols that will be saved on the 
    This tells the notebook to connect to the robot’s hardware so the commands you enter actually cause the robot to move.
 
    However, this happens automatically when you upload a protocol through the Opentrons app, and connecting twice will cause errors. To avoid this, **remove the call to robot.connect()** before uploading the protocol through the Opentrons app.
-
-

@@ -15,7 +15,7 @@ updated component library cards after redesign/refactor
   @apply --font-body-2-dark;
 
   padding: 1rem 0.5rem 0;
-  font-weight: --fw-bold;
+  font-weight: var(--fw-semibold);
   text-transform: uppercase;
 }
 
@@ -42,4 +42,46 @@ updated component library cards after redesign/refactor
 
 .value {
   text-transform: capitalize;
+}
+
+.data_row {
+  display: flex;
+  justify-content: space-between;
+  max-width: 7rem;
+}
+
+.compact_labeled_value > p {
+  margin-bottom: 0;
+}
+
+.inline_labeled_value {
+  @apply --font-body-1-dark;
+
+  display: flex;
+}
+
+.time_remaining_wrapper {
+  margin-top: 0.5rem;
+}
+
+.time_remaining_label {
+  margin-right: 1rem;
+  font-weight: var(--fw-semibold);
+}
+
+.temp_control_button {
+  width: 7rem;
+}
+
+.set_temp_field {
+  display: flex;
+  flex-direction: column;
+  width: 8rem;
+}
+
+.set_temp_label {
+  @apply --font-body-1-dark;
+
+  font-weight: var(--fw-semibold);
+  margin-bottom: 0.5rem;
 }

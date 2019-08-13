@@ -26,8 +26,10 @@ def test_default_transfers(_instr_labware):
     lw2 = _instr_labware['lw2']
 
     # ========== Transfer ===========
-    xfer_plan = tx.TransferPlan(100, lw1.columns()[0], lw2.columns()[0],
-                                _instr_labware['instr'])
+    xfer_plan = tx.TransferPlan(
+        100, lw1.columns()[0], lw2.columns()[0],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'])
     xfer_plan_list = []
     for step in xfer_plan:
         xfer_plan_list.append(step)
@@ -68,8 +70,10 @@ def test_default_transfers(_instr_labware):
     assert xfer_plan_list == exp1
 
     # ========== Distribute ===========
-    dist_plan = tx.TransferPlan(50, lw1.columns()[0][0], lw2.columns()[0],
-                                _instr_labware['instr'])
+    dist_plan = tx.TransferPlan(
+        50, lw1.columns()[0][0], lw2.columns()[0],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'])
     dist_plan_list = []
     for step in dist_plan:
         dist_plan_list.append(step)
@@ -98,8 +102,10 @@ def test_default_transfers(_instr_labware):
     assert dist_plan_list == exp2
 
     # ========== Consolidate ===========
-    consd_plan = tx.TransferPlan(50, lw1.columns()[0], lw2.columns()[0][0],
-                                 _instr_labware['instr'])
+    consd_plan = tx.TransferPlan(
+        50, lw1.columns()[0], lw2.columns()[0][0],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'])
     consd_plan_list = []
     for step in consd_plan:
         consd_plan_list.append(step)
@@ -138,22 +144,31 @@ def test_no_new_tip(_instr_labware):
         transfer=options.transfer._replace(
             new_tip=TransferTipPolicy.NEVER))
     # ========== Transfer ==========
-    xfer_plan = tx.TransferPlan(100, lw1.columns()[0], lw2.columns()[0],
-                                _instr_labware['instr'], options=options)
+    xfer_plan = tx.TransferPlan(
+        100, lw1.columns()[0], lw2.columns()[0],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        options=options)
     for step in xfer_plan:
         assert step['method'] != 'pick_up_tip'
         assert step['method'] != 'drop_tip'
 
     # ========== Distribute ===========
-    dist_plan = tx.TransferPlan(30, lw1.columns()[0][0], lw2.columns()[0],
-                                _instr_labware['instr'], options=options)
+    dist_plan = tx.TransferPlan(
+        30, lw1.columns()[0][0], lw2.columns()[0],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        options=options)
     for step in dist_plan:
         assert step['method'] != 'pick_up_tip'
         assert step['method'] != 'drop_tip'
 
     # ========== Consolidate ===========
-    consd_plan = tx.TransferPlan(40, lw1.columns()[0], lw2.rows()[0][1],
-                                 _instr_labware['instr'], options=options)
+    consd_plan = tx.TransferPlan(
+        40, lw1.columns()[0], lw2.rows()[0][1],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        options=options)
     for step in consd_plan:
         assert step['method'] != 'pick_up_tip'
         assert step['method'] != 'drop_tip'
@@ -172,9 +187,12 @@ def test_new_tip_always(_instr_labware, monkeypatch):
             new_tip=TransferTipPolicy.ALWAYS,
             drop_tip_strategy=tx.DropTipStrategy.TRASH))
 
-    xfer_plan = tx.TransferPlan(100,
-                                lw1.columns()[0][1:5], lw2.columns()[0][1:5],
-                                _instr_labware['instr'], options=options)
+    xfer_plan = tx.TransferPlan(
+        100,
+        lw1.columns()[0][1:5], lw2.columns()[0][1:5],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        options=options)
     xfer_plan_list = []
     for step in xfer_plan:
         xfer_plan_list.append(step)
@@ -220,8 +238,11 @@ def test_transfer_w_airgap_blowout(_instr_labware):
             new_tip=TransferTipPolicy.NEVER))
 
     # ========== Transfer ==========
-    xfer_plan = tx.TransferPlan(100, lw1.columns()[0][1:5], lw2.rows()[0][1:5],
-                                _instr_labware['instr'], options=options)
+    xfer_plan = tx.TransferPlan(
+        100, lw1.columns()[0][1:5], lw2.rows()[0][1:5],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        options=options)
     xfer_plan_list = []
     for step in xfer_plan:
         xfer_plan_list.append(step)
@@ -267,8 +288,11 @@ def test_transfer_w_airgap_blowout(_instr_labware):
     assert xfer_plan_list == exp1
 
     # ========== Distribute ==========
-    dist_plan = tx.TransferPlan(60, lw1.columns()[1][0], lw2.rows()[1][1:6],
-                                _instr_labware['instr'], options=options)
+    dist_plan = tx.TransferPlan(
+        60, lw1.columns()[1][0], lw2.rows()[1][1:6],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        options=options)
     dist_plan_list = []
     for step in dist_plan:
         dist_plan_list.append(step)
@@ -301,8 +325,11 @@ def test_transfer_w_airgap_blowout(_instr_labware):
     assert dist_plan_list == exp2
 
     # ========== Consolidate ==========
-    consd_plan = tx.TransferPlan(60, lw1.columns()[1], lw2.rows()[1][1],
-                                 _instr_labware['instr'], options=options)
+    consd_plan = tx.TransferPlan(
+        60, lw1.columns()[1], lw2.rows()[1][1],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        options=options)
     consd_plan_list = []
     for step in consd_plan:
         consd_plan_list.append(step)
@@ -354,8 +381,11 @@ def test_touchtip_mix(_instr_labware):
             mix_strategy=tx.MixStrategy.AFTER))
 
     # ========== Transfer ==========
-    xfer_plan = tx.TransferPlan(100, lw1.columns()[0][1:5], lw2.rows()[0][1:5],
-                                _instr_labware['instr'], options=options)
+    xfer_plan = tx.TransferPlan(
+        100, lw1.columns()[0][1:5], lw2.rows()[0][1:5],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        options=options)
     xfer_plan_list = []
     for step in xfer_plan:
         xfer_plan_list.append(step)
@@ -390,8 +420,11 @@ def test_touchtip_mix(_instr_labware):
     assert xfer_plan_list == exp1
 
     # ========== Distribute ==========
-    dist_plan = tx.TransferPlan(60, lw1.columns()[1][0], lw2.rows()[1][1:6],
-                                _instr_labware['instr'], options=options)
+    dist_plan = tx.TransferPlan(
+        60, lw1.columns()[1][0], lw2.rows()[1][1:6],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        options=options)
     dist_plan_list = []
     for step in dist_plan:
         dist_plan_list.append(step)
@@ -418,8 +451,11 @@ def test_touchtip_mix(_instr_labware):
     assert dist_plan_list == exp2
 
     # ========== Consolidate ==========
-    consd_plan = tx.TransferPlan(60, lw1.columns()[1], lw2.rows()[1][1],
-                                 _instr_labware['instr'], options=options)
+    consd_plan = tx.TransferPlan(
+        60, lw1.columns()[1], lw2.rows()[1][1],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        options=options)
     consd_plan_list = []
     for step in consd_plan:
         consd_plan_list.append(step)
@@ -483,8 +519,11 @@ def test_all_options(_instr_labware):
         aspirate=options.aspirate._replace(
             rate=1.5))
 
-    xfer_plan = tx.TransferPlan(100, lw1.columns()[0][1:4], lw2.rows()[0][1:4],
-                                _instr_labware['instr'], options=options)
+    xfer_plan = tx.TransferPlan(
+        100, lw1.columns()[0][1:4], lw2.rows()[0][1:4],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        options=options)
     xfer_plan_list = []
     for step in xfer_plan:
         xfer_plan_list.append(step)
@@ -520,8 +559,10 @@ def test_oversized_distribute(_instr_labware):
     lw1 = _instr_labware['lw1']
     lw2 = _instr_labware['lw2']
 
-    xfer_plan = tx.TransferPlan(700, lw1.columns()[0][0], lw2.rows()[0][1:3],
-                                _instr_labware['instr'])
+    xfer_plan = tx.TransferPlan(
+        700, lw1.columns()[0][0], lw2.rows()[0][1:3],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'])
     xfer_plan_list = []
     for step in xfer_plan:
         xfer_plan_list.append(step)
@@ -559,10 +600,11 @@ def test_oversized_consolidate(_instr_labware):
     lw1 = _instr_labware['lw1']
     lw2 = _instr_labware['lw2']
 
-    xfer_plan = tx.TransferPlan(700,
-                                lw2.rows()[0][1:3],
-                                lw1.wells_by_index()['A1'],
-                                _instr_labware['instr'])
+    xfer_plan = tx.TransferPlan(
+        700, lw2.rows()[0][1:3],
+        lw1.wells_by_index()['A1'],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'])
     xfer_plan_list = []
     for step in xfer_plan:
         xfer_plan_list.append(step)
@@ -600,8 +642,10 @@ def test_oversized_transfer(_instr_labware):
     lw1 = _instr_labware['lw1']
     lw2 = _instr_labware['lw2']
 
-    xfer_plan = tx.TransferPlan(700, lw2.rows()[0][1:3], lw1.columns()[0][1:3],
-                                _instr_labware['instr'])
+    xfer_plan = tx.TransferPlan(
+        700, lw2.rows()[0][1:3], lw1.columns()[0][1:3],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'])
     xfer_plan_list = []
     for step in xfer_plan:
         xfer_plan_list.append(step)

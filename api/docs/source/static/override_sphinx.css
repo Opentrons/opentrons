@@ -52,6 +52,15 @@ div.body h5 {
     font-family: "Open Sans", "sans-serif";
 }
 
+/* Suppressing the display of the toctrees rendered in the doc body means we
+can use the :hidden: argument to the toctree directive to control whether
+toctree elements are rendered in the sidebar, rather than having to always
+hide everything so it doesn't show up in the document
+*/
+div.toctree-wrapper.compound {
+    display: none;
+}
+
 /* div.sphinxsidebar h3 a,
 div.sphinxsidebar h3 a:hover,
 /*div.body h2 {
