@@ -3,6 +3,7 @@ import contextlib
 import logging
 import json
 import pkgutil
+from pprint import pprint
 from typing import Any, Dict, List, Optional, Union, Tuple, Sequence
 from opentrons import types, hardware_control as hc, commands as cmds
 from opentrons.commands import CommandPublisher
@@ -271,9 +272,11 @@ class ProtocolContext(CommandPublisher):
                     ' into slot {location}')
         else:
             valid_slots = [slot['id'] for slot in slots
-                    if slot['compatibleModules'] == module_name]
+                    if module_name in slot['compatibleModules']]
             if len(valid_slots) == 1:
-                return valid_slot[0]
+                pprint(valid_slots)
+                pprint(valid_slots[0])
+                return valid_slots[0]
             else:
                 raise AssertionError(
                     f'module {module_name} does not have a default' \
@@ -291,6 +294,7 @@ class ProtocolContext(CommandPublisher):
         try:
             resolved_location = self._resolve_module_location(module_name, location)
             location_pos = self._deck_layout.position_for(resolved_location)
+            pprint(location_pos)
             geometry = load_module(mod_id, location_pos)
         except KeyError:
             self._log.error(f'Unsupported Module: {mod_id}')
@@ -321,7 +325,7 @@ class ProtocolContext(CommandPublisher):
         else:
             raise RuntimeError(
                 f'Could not find specified module: {mod_id}')
-        self._deck_layout[location] = geometry
+        self._deck_layout[resolved_location] = geometry
         return mod_ctx
 
     @property
