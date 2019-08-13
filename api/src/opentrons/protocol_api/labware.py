@@ -1074,8 +1074,7 @@ def load_module_from_definition(
     return mod
 
 
-
-def load_module(name: str, parent: Optional[Location]) -> ModuleGeometry:
+def load_module(name: str, parent: Location) -> ModuleGeometry:
     """
     Return a :py:class:`ModuleGeometry` object from a definition looked up
     by name.

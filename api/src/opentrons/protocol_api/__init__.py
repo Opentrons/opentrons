@@ -18,5 +18,6 @@ __all__ = ['run_protocol',
            'InstrumentContext',
            'TemperatureModuleContext',
            'MagneticModuleContext',
+           'ThermocyclerContext',
            'back_compat',
            'labware']

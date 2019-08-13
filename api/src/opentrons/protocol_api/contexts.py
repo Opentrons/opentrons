@@ -253,7 +253,7 @@ class ProtocolContext(CommandPublisher):
         return self.load_labware(
             load_name, location, label, namespace, version)
 
-    def _resolve_module_name(self, module_name: str) ->  str:
+    def _resolve_module_name(self, module_name: str) -> str:
         alias_map = {
             'magnetic module': 'magdeck',
             'temperature module': 'tempdeck',
@@ -269,26 +269,30 @@ class ProtocolContext(CommandPublisher):
         def_path = 'shared_data/deck/definitions/1/ot2_standard.json'
         deck_def = json.loads(  # type: ignore
             pkgutil.get_data('opentrons', def_path))
-        slots = deck_def['locations']['orderedSlots']
+        slots: List[Dict] = deck_def['locations']['orderedSlots']
         if isinstance(location, str) or isinstance(location, int):
-            slot_def = next(
-                    (slot for slot in slots if slot['id'] == str(location)), None)
-            if module_name in slot_def['compatibleModules']:
+            slot_def: Optional[Dict[str, Any]] = next(
+                    (slot for slot in slots if slot['id'] == str(location)),
+                    None)
+            if not slot_def:
+                raise ValueError(f'slot {location} could not be found')
+            compatible_modules: List[str] = slot_def['compatibleModules']
+            if module_name in compatible_modules:
                 return location
             else:
                 raise AssertionError(
-                    f'module {module_name} cannot be loaded' \
+                    f'module {module_name} cannot be loaded'
                     ' into slot {location}')
         else:
-            valid_slots = [slot['id'] for slot in slots
-                    if module_name in slot['compatibleModules']]
+            valid_slots = [slot['id'] for slot in slots if module_name
+                           in slot['compatibleModules']]
             if len(valid_slots) == 1:
                 pprint(valid_slots)
                 pprint(valid_slots[0])
                 return valid_slots[0]
             else:
                 raise AssertionError(
-                    f'module {module_name} does not have a default' \
+                    f'module {module_name} does not have a default'
                     ' location, you must specify a slot')
 
     def load_module(
