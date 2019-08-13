@@ -78,6 +78,7 @@ The minimum and maximum volume of the pipette will be set according to the volum
 
 To find defaults for volume as well as liquid handling default speeds, see below.
 
+.. _defaults:
 
 Defaults
 ========
