@@ -8,7 +8,8 @@ from . import back_compat, labware
 from .contexts import (ProtocolContext,
                        InstrumentContext,
                        TemperatureModuleContext,
-                       MagneticModuleContext)
+                       MagneticModuleContext,
+                       ThermocyclerContext)
 from .execute import run_protocol
 
 

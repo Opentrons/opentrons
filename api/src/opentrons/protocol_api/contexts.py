@@ -253,6 +253,15 @@ class ProtocolContext(CommandPublisher):
         return self.load_labware(
             load_name, location, label, namespace, version)
 
+    def _resolve_module_name(self, module_name: str) ->  str:
+        alias_map = {
+            'magnetic module': 'magdeck',
+            'temperature module': 'tempdeck',
+            'thermocycler module': 'thermocycler'
+        }
+        lower_name = module_name.lower()
+        return alias_map.get(lower_name, lower_name)
+
     def _resolve_module_location(
             self, module_name: str,
             location: Optional[types.DeckLocation]) -> types.DeckLocation:
@@ -261,9 +270,9 @@ class ProtocolContext(CommandPublisher):
         deck_def = json.loads(  # type: ignore
             pkgutil.get_data('opentrons', def_path))
         slots = deck_def['locations']['orderedSlots']
-        if isinstance(location, str):
+        if isinstance(location, str) or isinstance(location, int):
             slot_def = next(
-                    (slot for slot in slots if slot['id'] == location), None)
+                    (slot for slot in slots if slot['id'] == str(location)), None)
             if module_name in slot_def['compatibleModules']:
                 return location
             else:
@@ -285,28 +294,25 @@ class ProtocolContext(CommandPublisher):
     def load_module(
             self, module_name: str,
             location: Optional[types.DeckLocation] = None) -> ModuleTypes:
-        mod_id = module_name.lower()
-        if mod_id == 'magnetic module':
-            mod_id = 'magdeck'
-        if mod_id == 'temperature module':
-            mod_id = 'tempdeck'
 
         try:
-            resolved_location = self._resolve_module_location(module_name, location)
+            resolved_name = self._resolve_module_name(module_name)
+            resolved_location = self._resolve_module_location(
+                    resolved_name, location)
             location_pos = self._deck_layout.position_for(resolved_location)
             pprint(location_pos)
-            geometry = load_module(mod_id, location_pos)
+            geometry = load_module(resolved_name, location_pos)
         except KeyError:
-            self._log.error(f'Unsupported Module: {mod_id}')
-            raise ValueError(f'Unsupported Module: {mod_id}')
+            self._log.error(f'Unsupported Module: {resolved_name}')
+            raise ValueError(f'Unsupported Module: {resolved_name}')
         hc_mod_instance = None
         hw = self._hw_manager.hardware._api._backend
         mod_class = {
             'magdeck': MagneticModuleContext,
             'tempdeck': TemperatureModuleContext,
-            'thermocycler': ThermocyclerContext}[mod_id]
+            'thermocycler': ThermocyclerContext}[resolved_name]
         for mod in self._hw_manager.hardware.discover_modules():
-            if mod.name() == mod_id:
+            if mod.name() == resolved_name:
                 hc_mod_instance = mod
                 break
 
@@ -314,7 +320,8 @@ class ProtocolContext(CommandPublisher):
             mod_type = {
                 'magdeck': modules.magdeck.MagDeck,
                 'tempdeck': modules.tempdeck.TempDeck,
-                'thermocycler': modules.thermocycler.Thermocycler}[mod_id]
+                'thermocycler': modules.thermocycler.Thermocycler
+                }[resolved_name]
             hc_mod_instance = adapters.SynchronousAdapter(mod_type(
                 port='', simulating=True, loop=self._loop))
         if hc_mod_instance:
@@ -324,7 +331,7 @@ class ProtocolContext(CommandPublisher):
                                 self._loop)
         else:
             raise RuntimeError(
-                f'Could not find specified module: {mod_id}')
+                f'Could not find specified module: {resolved_name}')
         self._deck_layout[resolved_location] = geometry
         return mod_ctx
 
