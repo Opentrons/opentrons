@@ -1006,7 +1006,7 @@
     "format": "96Standard",
     "isTiprack": false,
     "isMagneticModuleCompatible": true,
-    "magneticModuleEngageHeight": 18,
+    "magneticModuleEngageHeight": 20,
     "loadName": "nest_96_wellplate_100ul_pcr_full_skirt"
   },
   "namespace": "opentrons",

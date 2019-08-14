@@ -3,7 +3,8 @@ from opentrons import commands
 
 LABWARE_ENGAGE_HEIGHT = {
     'biorad-hardshell-96-PCR': 18,
-    'biorad_96_wellplate_200ul_pcr': 18}    # mm
+    'biorad_96_wellplate_200ul_pcr': 18,
+    'nest_96_wellplate_100ul_pcr_full_skirt': 20}    # mm
 MAX_ENGAGE_HEIGHT = 45  # mm from home position
 
 
