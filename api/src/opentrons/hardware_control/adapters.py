@@ -176,9 +176,9 @@ class SingletonAdapter(HardwareAPILike):
                      with the device name `FT232R`; or port name compatible
                      with `serial.Serial<https://pythonhosted.org/pyserial/pyserial_api.html#serial.Serial.__init__>`_.  # noqa(E501)
         :param force: If `True`, connect even if a lockfile is established. See
-                      :py:meth:`.controller.Controller.__init__`. This should
-                      only ever be specified as `True` by the main software
-                      starting.
+                      :py:meth:`.sync_controller.SyncController.__init__`. This
+                      should only ever be specified as `True` by the main
+                      software starting.
         """
         old_api = object.__getattribute__(self, '_api')
         loop = old_api._loop

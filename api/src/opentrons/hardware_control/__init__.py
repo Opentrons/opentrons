@@ -23,10 +23,10 @@ from .simulator import Simulator
 from opentrons.config import robot_configs, pipette_config
 from .pipette import Pipette
 try:
-    from .controller import Controller
+    from .sync_controller import SyncController
 except ModuleNotFoundError:
     # implies windows
-    Controller = None  # type: ignore
+    SyncController = None  # type: ignore
 from . import modules
 from .types import Axis, HardwareAPILike, CriticalPoint
 
@@ -56,7 +56,7 @@ class NoTipAttachedError(RuntimeError):
     pass
 
 
-_Backend = Union[Controller, Simulator]
+_Backend = Union[SyncController, Simulator]
 Instruments = Dict[top_types.Mount, Optional[Pipette]]
 SHAKE_OFF_TIPS_SPEED = 50
 SHAKE_OFF_TIPS_DISTANCE = 2.25
@@ -128,13 +128,13 @@ class API(HardwareAPILike):
         :param loop: An event loop to use. If not specified, use the result of
                      :py:meth:`asyncio.get_event_loop`.
         :param force: If `True`, connect even if a lockfile is present. See
-                      :py:meth:`Controller.__init__`.
+                      :py:meth:`.SyncController.__init__`.
         """
-        if None is Controller:
+        if None is SyncController:
             raise RuntimeError(
                 'The hardware controller may only be instantiated on a robot')
         checked_loop = loop or asyncio.get_event_loop()
-        backend = Controller(config, checked_loop, force=force)
+        backend = SyncController(config, checked_loop, force=force)
         await backend.connect(port)
         return cls(backend, config=config, loop=checked_loop)
 

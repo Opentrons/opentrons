@@ -46,7 +46,7 @@ async def test_cache_instruments(dummy_instruments, loop):
         instrument_keys
 
 
-@pytest.mark.skipif(not hc.Controller,
+@pytest.mark.skipif(not hc.SyncController,
                     reason='hardware controller not available '
                            '(probably windows)')
 async def test_cache_instruments_hc(monkeypatch, dummy_instruments,

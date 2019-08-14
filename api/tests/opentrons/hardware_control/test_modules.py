@@ -56,7 +56,7 @@ async def test_module_update_logic(monkeypatch):
     assert mods[0] is not old
 
 
-@pytest.mark.skipif(not hardware_control.Controller,
+@pytest.mark.skipif(not hardware_control.SyncController,
                     reason='hardware controller not available')
 async def test_module_update_integration(monkeypatch, loop,
                                          cntrlr_mock_connect, running_on_pi):

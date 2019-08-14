@@ -49,7 +49,7 @@ class _Locker:
             _lock.release()
 
 
-class Controller:
+class SyncController:
     """ The concrete instance of the controller for actually controlling
     hardware.
 
@@ -58,7 +58,7 @@ class Controller:
     """
 
     def __init__(self, config, loop, force=False):
-        """ Build a Controller instance.
+        """ Build a SyncController instance.
 
         If another controller is already instantiated on the system (or if
         this is instantiated somewhere other than a robot) then this method

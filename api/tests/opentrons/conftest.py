@@ -487,14 +487,14 @@ def running_on_pi():
     config.IS_ROBOT = oldpi
 
 
-@pytest.mark.skipif(not hc.Controller,
+@pytest.mark.skipif(not hc.SyncController,
                     reason='hardware controller not available '
                            '(probably windows)')
 @pytest.fixture
 def cntrlr_mock_connect(monkeypatch):
     async def mock_connect(obj, port=None):
         return
-    monkeypatch.setattr(hc.Controller, 'connect', mock_connect)
+    monkeypatch.setattr(hc.SyncController, 'connect', mock_connect)
 
 
 @pytest.fixture
