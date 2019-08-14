@@ -1,5 +1,9 @@
 // @flow
-import { legacySteps as steps, orderedStepIds } from '../reducers'
+import {
+  legacySteps as steps,
+  orderedStepIds,
+  labwareInvariantProperties,
+} from '../reducers'
 
 jest.mock('../../labware-defs/utils')
 
@@ -142,6 +146,31 @@ describe('orderedStepIds reducer', () => {
         }
         expect(orderedStepIds(state, action)).toEqual(expected)
       })
+    })
+  })
+})
+
+describe('labwareInvariantProperties reducer', () => {
+  test('replace custom labware def', () => {
+    const prevState = {
+      labwareIdA1: { labwareDefURI: 'foo/a/1' },
+      labwareIdA2: { labwareDefURI: 'foo/a/1' },
+      labwareIdB: { labwareDefURI: 'foo/b/1' },
+    }
+    const result = labwareInvariantProperties(prevState, {
+      type: 'REPLACE_CUSTOM_LABWARE_DEF',
+      payload: {
+        defURIToOverwrite: 'foo/a/1',
+        newDef: { parameters: { loadName: 'a' }, version: 2, namespace: 'foo' },
+        isOverwriteMismatched: false,
+      },
+    })
+    expect(result).toEqual({
+      // changed
+      labwareIdA1: { labwareDefURI: 'foo/a/2' },
+      labwareIdA2: { labwareDefURI: 'foo/a/2' },
+      // unchanged
+      labwareIdB: { labwareDefURI: 'foo/b/1' },
     })
   })
 })

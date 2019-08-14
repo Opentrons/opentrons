@@ -512,7 +512,6 @@ export const labwareInvariantProperties = handleActions<
         })
       )
     },
-    // TODO IMMEDIATELY: UNIT TEST
     REPLACE_CUSTOM_LABWARE_DEF: (
       state: NormalizedLabwareById,
       action: ReplaceCustomLabwareDef
