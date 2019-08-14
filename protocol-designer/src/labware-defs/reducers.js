@@ -2,6 +2,7 @@
 import omit from 'lodash/omit'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
+import pickBy from 'lodash/pickBy'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import type { Action } from '../types'
 import type { LabwareUploadMessage, LabwareDefByDefURI } from './types'
@@ -10,6 +11,11 @@ import type {
   LabwareUploadMessageAction,
   ReplaceCustomLabwareDef,
 } from './actions'
+import type { LoadFileAction } from '../load-file'
+
+// TODO: Ian 2019-08-14 ideally this special string should come from a place accessible to both JS and PY
+const OPENTRONS_NAMESPACE = 'opentrons'
+
 const customDefs = handleActions(
   {
     CREATE_CUSTOM_LABWARE_DEF: (
@@ -26,6 +32,17 @@ const customDefs = handleActions(
       ...omit(state, action.payload.defURIToOverwrite),
       [getLabwareDefURI(action.payload.newDef)]: action.payload.newDef,
     }),
+    LOAD_FILE: (state, action: LoadFileAction) => {
+      // assume any definitions in a loaded protocol with namespace === 'opentrons' are NOT custom defs
+      const customDefsFromFile = pickBy(
+        action.payload.file.labwareDefinitions,
+        def => def.namespace !== OPENTRONS_NAMESPACE
+      )
+      return {
+        ...state,
+        ...customDefsFromFile,
+      }
+    },
   },
   {}
 )
