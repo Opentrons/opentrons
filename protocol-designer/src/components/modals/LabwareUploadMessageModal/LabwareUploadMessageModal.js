@@ -46,7 +46,7 @@ const MessageBody = (props: {| message: LabwareUploadMessage |}) => {
             <strong>
               Shared load name:{' '}
               {defsMatchingLoadName
-                .map(def => def?.parameters?.loadName || '?')
+                .map(def => def?.parameters.loadName || '?')
                 .join(', ')}
             </strong>
           </p>
@@ -56,7 +56,7 @@ const MessageBody = (props: {| message: LabwareUploadMessage |}) => {
             <strong>
               Shared display name:{' '}
               {defsMatchingDisplayName
-                .map(def => def?.metadata?.displayName || '?')
+                .map(def => def?.metadata.displayName || '?')
                 .join(', ')}
             </strong>
           </p>
@@ -69,6 +69,15 @@ const MessageBody = (props: {| message: LabwareUploadMessage |}) => {
           <p>
             If you intended to replace your previous labware with this new
             version then proceed with the Overwrite button below.
+          </p>
+        )}
+        {canOverwrite && message.isOverwriteMismatched && (
+          <p>
+            <strong>WARNING:</strong> the new labware has a different
+            arrangement of wells than the definition it is replacing. Clicking
+            the Overwrite button will deselect all wells in any existing steps
+            that use the overwritten definition. You will have to edit each of
+            those steps and re-select the wells.
           </p>
         )}
       </>
@@ -94,18 +103,18 @@ const MessageBody = (props: {| message: LabwareUploadMessage |}) => {
 type Props = {|
   message: ?LabwareUploadMessage,
   dismissModal: () => mixed,
-  overwriteLabware?: () => mixed,
+  overwriteLabwareDef?: () => mixed,
 |}
 
 const LabwareUploadMessageModal = (props: Props) => {
-  const { message, dismissModal, overwriteLabware } = props
+  const { message, dismissModal, overwriteLabwareDef } = props
   if (!message) return null
 
   let buttons = [{ children: 'OK', onClick: dismissModal }]
   if (message.messageType === 'ASK_FOR_LABWARE_OVERWRITE') {
     buttons = [
       { children: 'CANCEL IMPORT', onClick: dismissModal },
-      { children: 'OVERWRITE LABWARE', onClick: overwriteLabware },
+      { children: 'OVERWRITE LABWARE', onClick: overwriteLabwareDef },
     ]
   }
 

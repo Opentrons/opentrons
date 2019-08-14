@@ -3,9 +3,12 @@ import assert from 'assert'
 import Ajv from 'ajv'
 import isEqual from 'lodash/isEqual'
 import values from 'lodash/values'
+import uniq from 'lodash/uniq'
+import uniqBy from 'lodash/uniqBy'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import * as labwareDefSelectors from './selectors'
+import { getAllWellSetsForLabware } from '../well-selection/utils'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { GetState, ThunkAction, ThunkDispatch } from '../types'
 import type { LabwareUploadMessage } from './types'
@@ -36,20 +39,60 @@ const createCustomLabwareDefAction = (
   payload,
 })
 
-export type ReplaceCustomLabwareDefs = {|
-  type: 'REPLACE_CUSTOM_LABWARE_DEFS',
+export type ReplaceCustomLabwareDef = {|
+  type: 'REPLACE_CUSTOM_LABWARE_DEF',
   payload: {|
-    defURIsToOverwrite: Array<string>,
+    defURIToOverwrite: string,
     newDef: LabwareDefinition2,
+    isOverwriteMismatched: boolean,
   |},
 |}
 
-const replaceCustomLabwareDefs = (
-  payload: $PropertyType<ReplaceCustomLabwareDefs, 'payload'>
-): ReplaceCustomLabwareDefs => ({
-  type: 'REPLACE_CUSTOM_LABWARE_DEFS',
+const replaceCustomLabwareDef = (
+  payload: $PropertyType<ReplaceCustomLabwareDef, 'payload'>
+): ReplaceCustomLabwareDef => ({
+  type: 'REPLACE_CUSTOM_LABWARE_DEF',
   payload,
 })
+
+export const overwriteLabwareDef = (): ThunkAction<*> => (
+  dispatch: ThunkDispatch<*>,
+  getState: GetState
+) => {
+  const state = getState()
+  // get def used to overwrite existing def from the labware upload message
+  const message = labwareDefSelectors.getLabwareUploadMessage(state)
+  if (message && message.messageType === 'ASK_FOR_LABWARE_OVERWRITE') {
+    const newDef = message.pendingDef
+    // TODO IMMEDIATELY should this come from the upload message instead of being derived here? Yes it should.
+    const defURIsToOverwrite = [
+      ...message.defsMatchingDisplayName,
+      ...message.defsMatchingLoadName,
+    ].map(getLabwareDefURI)
+    assert(
+      uniq(defURIsToOverwrite).length === 1,
+      'overwriteLabwareDef thunk expected exactly 1 URI to overwrite'
+    )
+    const defURIToOverwrite = defURIsToOverwrite[0]
+
+    if (defURIsToOverwrite.length > 0) {
+      dispatch(
+        replaceCustomLabwareDef({
+          defURIToOverwrite,
+          newDef,
+          isOverwriteMismatched: message.isOverwriteMismatched,
+        })
+      )
+    }
+  } else {
+    assert(
+      false,
+      `overwriteLabwareDef thunk expected ASK_FOR_LABWARE_OVERWRITE message, got ${
+        message ? message.messageType : 'no message'
+      }`
+    )
+  }
+}
 
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 const validate = ajv.compile(labwareSchema)
@@ -68,6 +111,20 @@ const _labwareDefsMatchingDisplayName = (
       def.metadata.displayName.trim().toLowerCase() ===
       displayName.trim().toLowerCase()
   )
+
+const getIsOverwriteMismatched = (
+  newDef: LabwareDefinition2,
+  overwrittenDef: LabwareDefinition2
+): boolean => {
+  const matchedWellOrdering = isEqual(newDef.ordering, overwrittenDef.ordering)
+  const matchedMultiUse =
+    matchedWellOrdering &&
+    isEqual(
+      getAllWellSetsForLabware(newDef),
+      getAllWellSetsForLabware(overwrittenDef)
+    )
+  return !(matchedWellOrdering && matchedMultiUse)
+}
 
 export const createCustomLabwareDef = (
   event: SyntheticInputEvent<HTMLInputElement>
@@ -142,12 +199,24 @@ export const createCustomLabwareDef = (
       defsMatchingCustomLoadName.length > 0 ||
       defsMatchingCustomDisplayName.length > 0
     ) {
+      const matchingDefs = [
+        ...defsMatchingCustomLoadName,
+        ...defsMatchingCustomDisplayName,
+      ]
+      assert(
+        uniqBy(matchingDefs, getLabwareDefURI).length === 1,
+        'expected exactly 1 matching labware def to ask to overwrite'
+      )
       return dispatch(
         labwareUploadMessage({
           messageType: 'ASK_FOR_LABWARE_OVERWRITE',
           defsMatchingLoadName: defsMatchingCustomLoadName,
           defsMatchingDisplayName: defsMatchingCustomDisplayName,
           pendingDef: parsedLabwareDef,
+          isOverwriteMismatched: getIsOverwriteMismatched(
+            parsedLabwareDef,
+            matchingDefs[0]
+          ),
         })
       )
     }
@@ -169,8 +238,7 @@ export const createCustomLabwareDef = (
           messageType: 'LABWARE_NAME_CONFLICT',
           defsMatchingLoadName: allDefsMatchingLoadName,
           defsMatchingDisplayName: allDefsMatchingDisplayName,
-          // message: // TODO IMMEDIATELY
-          //   'The load name and/or display name matches that of another STANDARD labware',
+          pendingDef: parsedLabwareDef,
         })
       )
     }
@@ -182,40 +250,6 @@ export const createCustomLabwareDef = (
     )
   }
   reader.readAsText(file)
-}
-
-export const overwriteLabware = (): ThunkAction<*> => (
-  dispatch: ThunkDispatch<*>,
-  getState: GetState
-) => {
-  // get def used to overwrite existing def from the labware upload message
-  const newDef = labwareDefSelectors.getLabwareUploadMessage(getState())
-    ?.pendingDef
-
-  if (newDef) {
-    // TODO IMMEDIATELY can this happen upstream? Duplicate code!!!
-    const loadName = newDef?.parameters?.loadName || ''
-    const displayName = newDef?.metadata?.displayName || ''
-    const customLabwareDefs: Array<LabwareDefinition2> = values(
-      labwareDefSelectors.getCustomLabwareDefsByURI(getState())
-    )
-    const defURIsToOverwrite = customLabwareDefs
-      .filter(
-        d =>
-          !isEqual(d, newDef) && // don't delete the def we just added!
-          (_labwareDefsMatchingLoadName([d], loadName).length > 0 ||
-            _labwareDefsMatchingDisplayName([d], displayName).length > 0)
-      )
-      .map(getLabwareDefURI)
-    if (defURIsToOverwrite.length > 0) {
-      dispatch(replaceCustomLabwareDefs({ defURIsToOverwrite, newDef }))
-    }
-  } else {
-    assert(
-      false,
-      'overwriteLabware thunk expected pendingDef in labwareUploadMessage'
-    )
-  }
 }
 
 type DismissLabwareUploadMessage = {|

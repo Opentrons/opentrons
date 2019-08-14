@@ -7,8 +7,8 @@ import type { Action } from '../types'
 import type { LabwareUploadMessage, LabwareDefByDefURI } from './types'
 import type {
   CreateCustomLabwareDef,
-  ReplaceCustomLabwareDefs,
   LabwareUploadMessageAction,
+  ReplaceCustomLabwareDef,
 } from './actions'
 const customDefs = handleActions(
   {
@@ -22,8 +22,8 @@ const customDefs = handleActions(
         [uri]: action.payload.def,
       }
     },
-    REPLACE_CUSTOM_LABWARE_DEFS: (state, action: ReplaceCustomLabwareDefs) => ({
-      ...omit(state, action.payload.defURIsToOverwrite),
+    REPLACE_CUSTOM_LABWARE_DEF: (state, action: ReplaceCustomLabwareDef) => ({
+      ...omit(state, action.payload.defURIToOverwrite),
       [getLabwareDefURI(action.payload.newDef)]: action.payload.newDef,
     }),
   },
@@ -37,7 +37,7 @@ const labwareUploadMessage = handleActions<?LabwareUploadMessage, *>(
       action: LabwareUploadMessageAction
     ): LabwareUploadMessage => action.payload,
     CREATE_CUSTOM_LABWARE_DEF: () => null,
-    REPLACE_CUSTOM_LABWARE_DEFS: () => null,
+    REPLACE_CUSTOM_LABWARE_DEF: () => null,
     DISMISS_LABWARE_UPLOAD_MESSAGE: () => null,
   },
   null

@@ -25,7 +25,8 @@ function mapStateToProps(state: BaseState): SP {
 
 function mapDispatchToProps(dispatch: Dispatch<any>): DP {
   return {
-    overwriteLabware: () => dispatch(labwareDefActions.overwriteLabware()),
+    overwriteLabwareDef: () =>
+      dispatch(labwareDefActions.overwriteLabwareDef()),
     dismissModal: () =>
       dispatch(labwareDefActions.dismissLabwareUploadMessage()),
   }

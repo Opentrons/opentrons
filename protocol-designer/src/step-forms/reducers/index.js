@@ -32,7 +32,7 @@ import type {
   DuplicateLabwareAction,
   SwapSlotContentsAction,
 } from '../../labware-ingred/actions'
-import type { ReplaceCustomLabwareDefs } from '../../labware-defs/actions'
+import type { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
 import type { FormData, StepIdType } from '../../form-types'
 import type {
   FileLabware,
@@ -162,6 +162,7 @@ type SavedStepFormsActions =
   | ChangeSavedStepFormAction
   | DuplicateLabwareAction
   | SwapSlotContentsAction
+  | ReplaceCustomLabwareDef
 
 export const savedStepForms = (
   rootState: RootState,
@@ -388,6 +389,73 @@ export const savedStepForms = (
         },
       }
     }
+    case 'REPLACE_CUSTOM_LABWARE_DEF': {
+      // no mismatch, it's safe to keep all steps as they are
+      if (!action.payload.isOverwriteMismatched) return savedStepForms
+
+      // Reset all well-selection fields of any steps, where the labware of those selected wells is having its def replaced
+      // (otherwise, a mismatched definition with different wells or different multi-channel arrangement can break the step forms)
+      const stepIds = Object.keys(savedStepForms)
+      const labwareEntities = _getLabwareEntitiesRootState(rootState)
+      const labwareIdsToDeselect = Object.keys(labwareEntities).filter(
+        labwareId =>
+          labwareEntities[labwareId].labwareDefURI ===
+          action.payload.defURIToOverwrite
+      )
+
+      const savedStepsUpdate = stepIds.reduce((acc, stepId) => {
+        const prevStepForm = savedStepForms[stepId]
+        const defaults = getDefaultsForStepType(prevStepForm.stepType)
+
+        if (!prevStepForm) {
+          assert(false, `expected stepForm for id ${stepId}`)
+          return acc
+        }
+
+        let fieldsToUpdate = {}
+        if (prevStepForm.stepType === 'moveLiquid') {
+          if (labwareIdsToDeselect.includes(prevStepForm.aspirate_labware)) {
+            fieldsToUpdate = {
+              ...fieldsToUpdate,
+              aspirate_wells: defaults.aspirate_wells,
+            }
+          }
+          if (labwareIdsToDeselect.includes(prevStepForm.dispense_labware)) {
+            fieldsToUpdate = {
+              ...fieldsToUpdate,
+              dispense_wells: defaults.dispense_wells,
+            }
+          }
+        } else if (
+          prevStepForm.stepType === 'mix' &&
+          labwareIdsToDeselect.includes(prevStepForm.labware)
+        ) {
+          fieldsToUpdate = {
+            wells: defaults.wells,
+          }
+        }
+
+        if (Object.keys(fieldsToUpdate).length === 0) {
+          return acc
+        }
+
+        const updatedFields = handleFormChange(
+          fieldsToUpdate,
+          prevStepForm,
+          _getPipetteEntitiesRootState(rootState),
+          _getLabwareEntitiesRootState(rootState)
+        )
+
+        return {
+          ...acc,
+          [stepId]: {
+            ...prevStepForm,
+            ...updatedFields,
+          },
+        }
+      }, {})
+      return { ...savedStepForms, ...savedStepsUpdate }
+    }
 
     default:
       return savedStepForms
@@ -444,15 +512,15 @@ export const labwareInvariantProperties = handleActions<
         })
       )
     },
-    REPLACE_CUSTOM_LABWARE_DEFS: (
-      // TODO IMMEDIATELY: UNIT TEST
+    // TODO IMMEDIATELY: UNIT TEST
+    REPLACE_CUSTOM_LABWARE_DEF: (
       state: NormalizedLabwareById,
-      action: ReplaceCustomLabwareDefs
+      action: ReplaceCustomLabwareDef
     ): NormalizedLabwareById =>
       mapValues(
         state,
         (prev: NormalizedLabware): NormalizedLabware =>
-          action.payload.defURIsToOverwrite.includes(prev.labwareDefURI)
+          action.payload.defURIToOverwrite === prev.labwareDefURI
             ? {
                 ...prev,
                 labwareDefURI: getLabwareDefURI(action.payload.newDef),
