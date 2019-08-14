@@ -106,27 +106,30 @@ lint: $(ot_py_sources)
 docs-html: local-install
 	$(SHX) rm -rf docs/build/html
 	pipenv run sphinx-build -b html -d docs/build/doctrees docs/source docs/build/html
+	$(SHX) mkdir -p docs/dist
+	$(SHX) cp -R docs/build/html/. docs/public/. docs/dist
 
 docs-doctest: local-install
 	$(SHX) rm -rf docs/build/doctest
 	pipenv run sphinx-build -b doctest -d docs/build/doctrees docs/source docs/build/doctest
 
-docs-pdf-local: local-install
-	echo "Local pdf install"
-	-$(SHX) rm -rf docs/build/pdf
+docs-pdf-prep: local-install
+	$(SHX) rm -rf docs/build/pdf
+	$(SHX) mkdir -p docs/dist
+
+docs-pdf-local: docs-pdf-prep
 	-pipenv run sphinx-build -b latex -d docs/build/doctrees docs/source docs/build/pdf
 	-$(MAKE) -C docs/build/pdf all-pdf
 
-docs-pdf-ci: local-install
-	echo "CI pdf install"
-	$(SHX) rm -rf docs/build/pdf
+docs-pdf-ci: docs-pdf-prep
 	pipenv run sphinx-build -b latex -d docs/build/doctrees docs/source docs/build/pdf
 	$(MAKE) -C docs/build/pdf all-pdf >/dev/null
 	$(SHX) ls docs/build/pdf/*.pdf
+	$(SHX) cp docs/build/pdf/*.pdf docs/dist/
 
-docs: docs-html $(which_pdf)
-	$(SHX) mkdir -p docs/dist
-	$(SHX) cp -R docs/build/html/. docs/public/. docs/dist
+docs-pdf: $(which_pdf)
+
+docs: docs-html docs-pdf
 
 .PHONY: publish
 publish:

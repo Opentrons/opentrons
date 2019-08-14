@@ -17,12 +17,17 @@ The examples in this section will use the following set-up:
 
 .. code-block:: python
 
-    def run(protocol_context):
-        plate = protocol_context.load_labware('corning_96_wellplate_360ul_flat', 1)
+    from opentrons import protocol_api
 
-        tiprack = protocol_context.load_labware('opentrons_96_tiprack_300ul', 2)
+    def run(protocol: protocol_api.ProtocolContext):
+        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
+        tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
+        pipette = protocol.load_instrument('p300_single', mount='left', tip_racks=[tiprack])
 
-        pipette = protocol_context.load_instrument('p300_single', mount='left', tip_racks=[tiprack])
+        # The code used in the rest of the examples goes here
+
+
+This loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 1 and a `Opentrons 300ul Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slot 2, and uses a P300 Single pipette.
 
 You can follow along and simulate the protocol using our protocol simulator, which can be installed by following the instructions at :ref:`writing`.
 

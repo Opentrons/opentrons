@@ -16,6 +16,42 @@ def test_load_module(loop):
     assert isinstance(mod, papi.TemperatureModuleContext)
 
 
+def test_load_module_default_slot(loop):
+    ctx = papi.ProtocolContext(loop)
+    ctx._hw_manager.hardware._backend._attached_modules = [
+        ('mod0', 'tempdeck')]
+    ctx.home()
+    mod = ctx.load_module('thermocycler')
+    assert isinstance(mod, papi.ThermocyclerContext)
+
+
+def test_no_slot_module_error(loop):
+    ctx = papi.ProtocolContext(loop)
+    ctx._hw_manager.hardware._backend._attached_modules = [
+        ('mod0', 'tempdeck')]
+    ctx.home()
+    with pytest.raises(AssertionError):
+        assert ctx.load_module('magdeck')
+
+
+def test_invalid_slot_module_error(loop):
+    ctx = papi.ProtocolContext(loop)
+    ctx._hw_manager.hardware._backend._attached_modules = [
+        ('mod0', 'tempdeck')]
+    ctx.home()
+    with pytest.raises(AssertionError):
+        assert ctx.load_module('thermocycler', 1)
+
+
+def test_bad_slot_module_error(loop):
+    ctx = papi.ProtocolContext(loop)
+    ctx._hw_manager.hardware._backend._attached_modules = [
+        ('mod0', 'tempdeck')]
+    ctx.home()
+    with pytest.raises(ValueError):
+        assert ctx.load_module('thermocycler', 42)
+
+
 def test_incorrect_module_error(loop):
     ctx = papi.ProtocolContext(loop)
     ctx._hw_manager.hardware._backend._attached_modules = [
@@ -81,8 +117,8 @@ def test_thermocycler_lid(loop):
     ctx = papi.ProtocolContext(loop)
     ctx._hw_manager.hardware._backend._attached_modules = [
         ('mod0', 'thermocycler')]
-    mod = ctx.load_module('thermocycler', 1)
-    assert ctx.deck[1] == mod._geometry
+    mod = ctx.load_module('thermocycler')
+    assert ctx.deck[7] == mod._geometry
 
     assert mod.lid_status == 'open'
 
@@ -115,7 +151,7 @@ def test_thermocycler_temp(loop):
     ctx = papi.ProtocolContext(loop)
     ctx._hw_manager.hardware._backend._attached_modules = [
         ('mod0', 'thermocycler')]
-    mod = ctx.load_module('Thermocycler', 1)
+    mod = ctx.load_module('thermocycler')
 
     assert mod.target is None
 
