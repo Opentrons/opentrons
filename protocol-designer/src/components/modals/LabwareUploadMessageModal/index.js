@@ -1,4 +1,5 @@
 // @flow
+import assert from 'assert'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import {
@@ -15,24 +16,45 @@ type SP = {|
   message: $PropertyType<Props, 'message'>,
 |}
 
-type DP = $Rest<$Exact<Props>, SP>
-
 function mapStateToProps(state: BaseState): SP {
   return {
     message: labwareDefSelectors.getLabwareUploadMessage(state),
   }
 }
 
-function mapDispatchToProps(dispatch: Dispatch<any>): DP {
+function mergeProps(
+  stateProps: SP,
+  dispatchProps: { dispatch: Dispatch<any> }
+): Props {
+  const { dispatch } = dispatchProps
+  const { message } = stateProps
   return {
-    overwriteLabwareDef: () =>
-      dispatch(labwareDefActions.overwriteLabwareDef()),
+    ...stateProps,
+    overwriteLabwareDef: () => {
+      if (message && message.messageType === 'ASK_FOR_LABWARE_OVERWRITE') {
+        dispatch(
+          labwareDefActions.replaceCustomLabwareDef({
+            defURIToOverwrite: message.defURIToOverwrite,
+            newDef: message.newDef,
+            isOverwriteMismatched: message.isOverwriteMismatched,
+          })
+        )
+      } else {
+        assert(
+          false,
+          `labware def should only be overwritten when messageType is ASK_FOR_LABWARE_OVERWRITE. Got ${String(
+            message?.messageType
+          )}`
+        )
+      }
+    },
     dismissModal: () =>
       dispatch(labwareDefActions.dismissLabwareUploadMessage()),
   }
 }
 
-export default connect<Props, {||}, SP, DP, _, _>(
+export default connect<Props, {||}, SP, _, _, _>(
   mapStateToProps,
-  mapDispatchToProps
+  null,
+  mergeProps
 )(LabwareUploadMessageModal)

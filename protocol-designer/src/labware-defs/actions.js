@@ -47,30 +47,12 @@ export type ReplaceCustomLabwareDef = {|
   |},
 |}
 
-const replaceCustomLabwareDef = (
+export const replaceCustomLabwareDef = (
   payload: $PropertyType<ReplaceCustomLabwareDef, 'payload'>
 ): ReplaceCustomLabwareDef => ({
   type: 'REPLACE_CUSTOM_LABWARE_DEF',
   payload,
 })
-
-export const overwriteLabwareDef = (): ThunkAction<*> => (
-  dispatch: ThunkDispatch<*>,
-  getState: GetState
-) => {
-  const state = getState()
-  // get def used to overwrite existing def from the labware upload message
-  const message = labwareDefSelectors.getLabwareUploadMessage(state)
-  if (message && message.messageType === 'ASK_FOR_LABWARE_OVERWRITE') {
-    return dispatch(
-      replaceCustomLabwareDef({
-        defURIToOverwrite: message.defURIToOverwrite,
-        newDef: message.newDef,
-        isOverwriteMismatched: message.isOverwriteMismatched,
-      })
-    )
-  }
-}
 
 const ajv = new Ajv({ allErrors: true, jsonPointers: true })
 const validate = ajv.compile(labwareSchema)
