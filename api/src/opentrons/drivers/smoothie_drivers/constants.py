@@ -3,12 +3,12 @@ ALARM_KEYWORD = 'alarm'
 
 # TODO (artyom, ben 20171026): move to config
 HOMED_POSITION = {
-    'X': 418,
-    'Y': 353,
-    'Z': 218,
-    'A': 218,
-    'B': 19,
-    'C': 19
+    'X': 418.0,
+    'Y': 353.0,
+    'Z': 218.0,
+    'A': 218.0,
+    'B': 19.0,
+    'C': 19.0
 }
 
 EEPROM_DEFAULT = {

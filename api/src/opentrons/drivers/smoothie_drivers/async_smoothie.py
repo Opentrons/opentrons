@@ -36,7 +36,7 @@ from .util import (SmoothieError, SmoothieAlarm, ParseError,
                    parse_position_response, parse_instrument_data,
                    parse_switch_values, parse_homing_status_values,
                    remove_unwanted_characters, build_home_behaviors,
-                   byte_array_to_ascii_string)
+                   byte_array_to_ascii_string, byte_array_to_hex_string)
 '''
 - Driver is responsible for providing an interface for motion control
 - Driver is the only system component that knows about GCODES or how smoothie
@@ -646,12 +646,16 @@ class AsyncSmoothie:
             # be) rare so it's probably fine, but the actual solution to this
             # is locking at a higher level like in APIv2.
             await self._reset_from_error()
-            error_axis = se.ret_code.strip()[-1]
-            if GCODES['HOME'] not in command and error_axis in 'XYZABC':
-                log.warning(
-                    f"alarm/error in {se.ret_code}, homing {error_axis}")
-                await self.home(error_axis)
-                raise SmoothieError(se.ret_code, command)
+            if se.ret_code:
+                error_axis = se.ret_code.strip()[-1]
+                if GCODES['HOME'] not in command and error_axis in 'XYZABC':
+                    log.warning(
+                        f"alarm/error in {se.ret_code}, homing {error_axis}")
+                    await self.home(error_axis)
+                    raise SmoothieError(se.ret_code, command)
+            else:
+                log.warning(f'Unknown smoothie error: {se}')
+                raise
             return ''
 
     def _handle_return(self, ret_code: str):
@@ -833,13 +837,13 @@ class AsyncSmoothie:
             await self.disengage_axis('BC')
             await self.delay(CURRENT_CHANGE_DELAY)
             # request from Smoothieware the information from that pipette
-            res = await self._send_command(gcode + mount)
-            if res:
-                res = parse_instrument_data(res)
-                assert mount in res
+            response = await self._send_command(gcode + mount)
+            if response:
+                result = parse_instrument_data(response)
+                assert mount in result
                 # data is read/written as strings of HEX characters
                 # to avoid firmware weirdness in how it parses GCode arguments
-                return byte_array_to_ascii_string(res[mount])
+                return byte_array_to_ascii_string(result[mount])
         except (ParseError, AssertionError, SmoothieError):
             pass
         return None
@@ -990,7 +994,8 @@ class AsyncSmoothie:
                     log.debug("home: {}".format(command))
                     await self._send_command(
                         command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
-                    await self.update_homed_flags(flags={ax: True for ax in axes})
+                    await self.update_homed_flags(
+                        flags={ax: True for ax in axes})
                 finally:
                     # always dwell an axis after it has been homed
                     self.dwell_axes(axes)
@@ -1097,12 +1102,10 @@ class AsyncSmoothie:
             await self.pop_axis_max_speed()
 
     def pause(self):
-        if not self.simulating:
-            self.run_flag.clear()
+        self.run_flag.clear()
 
     def resume(self):
-        if not self.simulating:
-            self.run_flag.set()
+        self.run_flag.set()
 
     async def delay(self, seconds):
         # per http://smoothieware.org/supported-g-codes:

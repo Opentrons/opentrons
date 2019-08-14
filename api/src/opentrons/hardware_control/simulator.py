@@ -97,11 +97,11 @@ class Simulator:
         self._log = MODULE_LOG.getChild(repr(self))
         self._strict_attached = bool(strict_attached_instruments)
 
-    def update_position(self) -> Dict[str, float]:
+    async def update_position(self) -> Dict[str, float]:
         return self._position
 
-    def move(self, target_position: Dict[str, float],
-             home_flagged_axes: bool = True, speed: float = None):
+    async def move(self, target_position: Dict[str, float],
+                   home_flagged_axes: bool = True, speed: float = None):
         if self._run_flag.is_set():
             self._log.warning("Move to {} would be blocked by pause"
                               .format(target_position))
@@ -109,7 +109,7 @@ class Simulator:
         self._engaged_axes.update({ax: True
                                    for ax in target_position})
 
-    def home(self, axes: List[str] = None) -> Dict[str, float]:
+    async def home(self, axes: List[str] = None) -> Dict[str, float]:
         if self._run_flag.is_set():
             self._log.warning("Home would be blocked by pause")
         # driver_3_0-> HOMED_POSITION
@@ -120,12 +120,12 @@ class Simulator:
                                    for ax in checked_axes})
         return self._position
 
-    def fast_home(self, axis: str, margin: float) -> Dict[str, float]:
+    async def fast_home(self, axis: str, margin: float) -> Dict[str, float]:
         self._position[axis] = _HOME_POSITION[axis]
         self._engaged_axes[axis] = True
         return self._position
 
-    def get_attached_instruments(
+    async def get_attached_instruments(
             self, expected: Dict[types.Mount, str])\
             -> Dict[types.Mount, Dict[str, Optional[str]]]:
         """ Update the internal cache of attached instruments.
@@ -184,7 +184,7 @@ class Simulator:
     def set_active_current(self, axis, amp):
         pass
 
-    def get_attached_modules(self) -> List[Tuple[str, str]]:
+    async def get_attached_modules(self) -> List[Tuple[str, str]]:
         return self._attached_modules
 
     @contextmanager
@@ -227,7 +227,7 @@ class Simulator:
     def engaged_axes(self):
         return self._engaged_axes
 
-    def disengage_axes(self, axes: List[str]):
+    async def disengage_axes(self, axes: List[str]):
         self._engaged_axes.update({ax: False for ax in axes})
 
     def set_lights(self, button: Optional[bool], rails: Optional[bool]):
@@ -248,13 +248,13 @@ class Simulator:
     def resume(self):
         self._run_flag.set()
 
-    def halt(self):
+    async def halt(self):
         self._run_flag.set()
 
     def hard_halt(self):
         self._run_flag.set()
 
-    def probe(self, axis: str, distance: float) -> Dict[str, float]:
+    async def probe(self, axis: str, distance: float) -> Dict[str, float]:
         self._position[axis.upper()] = self._position[axis.upper()] + distance
         return self._position
 

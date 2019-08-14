@@ -18,6 +18,7 @@ class ParseError(Exception):
 class SerialNoResponse(Exception):
     pass
 
+
 def parse_string_value_from_substring(substring) -> str:
     '''
     Returns the ascii value in the expected string "N:aa11bb22", where "N" is

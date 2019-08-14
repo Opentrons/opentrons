@@ -277,7 +277,7 @@ class API(HardwareAPILike):
 
         """
         self._log.info("Updating instrument model cache")
-        found = self._backend.get_attached_instruments(require or {})
+        found = await self._backend.get_attached_instruments(checked_require)
         for mount, instrument_data in found.items():
             model = instrument_data.get('model')
 
@@ -452,7 +452,7 @@ class API(HardwareAPILike):
         see :py:meth:`pause` for more detail), then home and reset the
         robot.
         """
-        self._backend.halt()
+        await self._backend.halt()
         self._log.info("Recovering from halt")
         self._call_on_attached_modules("cancel")
         await self.reset()
@@ -509,9 +509,11 @@ class API(HardwareAPILike):
         smoothie_plungers = [ax.name.upper() for ax in plungers]
         async with self._motion_lock:
             if smoothie_gantry:
-                smoothie_pos.update(self._backend.home(smoothie_gantry))
+                pos = await self._backend.home(smoothie_gantry)
+                smoothie_pos.update(pos)
             if smoothie_plungers:
-                smoothie_pos.update(self._backend.home(smoothie_plungers))
+                pos = await self._backend.home(smoothie_plungers)
+                smoothie_pos.update(pos)
             self._current_position = self._deck_from_smoothie(smoothie_pos)
 
     async def add_tip(
@@ -603,8 +605,8 @@ class API(HardwareAPILike):
             raise MustHomeError
         async with self._motion_lock:
             if refresh:
-                self._current_position = self._deck_from_smoothie(
-                    self._backend.update_position())
+                new_pos = await self._backend.update_position()
+                self._current_position = self._deck_from_smoothie(new_pos)
             if mount == mount.RIGHT:
                 offset = top_types.Point(0, 0, 0)
             else:
@@ -811,8 +813,8 @@ class API(HardwareAPILike):
                                 bounds[ax.name][0], bounds[ax.name][1]))
         async with self._motion_lock:
             try:
-                self._backend.move(smoothie_pos, speed=speed,
-                                   home_flagged_axes=home_flagged_axes)
+                await self._backend.move(smoothie_pos, speed=speed,
+                                         home_flagged_axes=home_flagged_axes)
             except Exception:
                 self._log.exception('Move failed')
                 self._current_position.clear()
@@ -828,7 +830,7 @@ class API(HardwareAPILike):
     engaged_axes = property(fget=get_engaged_axes)
 
     async def disengage_axes(self, which: List[Axis]):
-        self._backend.disengage_axes([ax.name for ax in which])
+        await self._backend.disengage_axes([ax.name for ax in which])
 
     @_log_call
     async def retract(self, mount: top_types.Mount, margin: float = 10):
@@ -838,7 +840,8 @@ class API(HardwareAPILike):
         """
         smoothie_ax = Axis.by_mount(mount).name.upper()
         async with self._motion_lock:
-            smoothie_pos = self._backend.fast_home(smoothie_ax, margin)
+            smoothie_pos = await self._backend.fast_home(
+                smoothie_ax, margin)
             self._current_position = self._deck_from_smoothie(smoothie_pos)
 
     def _critical_point_for(
@@ -1182,7 +1185,7 @@ class API(HardwareAPILike):
             if home_after:
                 safety_margin = abs(bottom-droptip)
                 async with self._motion_lock:
-                    smoothie_pos = self._backend.fast_home(
+                    smoothie_pos = await self._backend.fast_home(
                         plunger_ax.name.upper(), safety_margin)
                     self._current_position = self._deck_from_smoothie(
                         smoothie_pos)
@@ -1289,8 +1292,9 @@ class API(HardwareAPILike):
 
     @_log_call
     async def discover_modules(self):
+        mods = await self._backend.get_attached_modules()
         discovered = {port + model: (port, model)
-                      for port, model in self._backend.get_attached_modules()}
+                      for port, model in mods}
         these = set(discovered.keys())
         known = set(self._attached_modules.keys())
         new = these - known
@@ -1378,9 +1382,10 @@ class API(HardwareAPILike):
                 to_probe = ax_en
             # Probe and retrieve the position afterwards
             async with self._motion_lock:
+                probe_res = await self._backend.probe(
+                    to_probe.name.lower(), hs.probe_distance)
                 self._current_position = self._deck_from_smoothie(
-                    self._backend.probe(
-                        to_probe.name.lower(), hs.probe_distance))
+                    probe_res)
             xyz = await self.gantry_position(mount)
             # Store the upated position.
             self._log.debug(

@@ -87,27 +87,27 @@ class SyncController:
             config=self.config, handle_locks=False)
         self._cached_fw_version: Optional[str] = None
 
-    def update_position(self) -> Dict[str, float]:
+    async def update_position(self) -> Dict[str, float]:
         self._smoothie_driver.update_position()
         return self._smoothie_driver.position
 
-    def move(self, target_position: Dict[str, float],
-             home_flagged_axes: bool = True, speed: float = None):
+    async def move(self, target_position: Dict[str, float],
+                   home_flagged_axes: bool = True, speed: float = None):
         with self._set_temp_speed(speed):
             self._smoothie_driver.move(
                 target_position, home_flagged_axes=home_flagged_axes)
 
-    def home(self, axes: List[str] = None) -> Dict[str, float]:
+    async def home(self, axes: List[str] = None) -> Dict[str, float]:
         if axes:
             args: Tuple[Any, ...] = (''.join(axes),)
         else:
             args = tuple()
         return self._smoothie_driver.home(*args)
 
-    def fast_home(self, axis: str, margin: float) -> Dict[str, float]:
+    async def fast_home(self, axis: str, margin: float) -> Dict[str, float]:
         return self._smoothie_driver.fast_home(axis, margin)
 
-    def get_attached_instruments(
+    async def get_attached_instruments(
             self, expected: Dict[Mount, str])\
             -> Dict[Mount, Dict[str, Optional[str]]]:
         """ Find the instruments attached to our mounts.
@@ -147,10 +147,10 @@ class SyncController:
         finally:
             self._smoothie_driver.pop_active_current()
 
-    def set_pipette_speed(self, val: float):
+    async def set_pipette_speed(self, val: float):
         self._smoothie_driver.set_speed(val)
 
-    def get_attached_modules(self) -> List[Tuple[str, str]]:
+    async def get_attached_modules(self) -> List[Tuple[str, str]]:
         return modules.discover()
 
     async def build_module(self,
@@ -214,7 +214,7 @@ class SyncController:
     def engaged_axes(self) -> Dict[str, bool]:
         return self._smoothie_driver.engaged_axes
 
-    def disengage_axes(self, axes: List[str]):
+    async def disengage_axes(self, axes: List[str]):
         self._smoothie_driver.disengage_axis(''.join(axes))
 
     def set_lights(self, button: Optional[bool], rails: Optional[bool]):
@@ -236,13 +236,13 @@ class SyncController:
     def resume(self):
         self._smoothie_driver.resume()
 
-    def halt(self):
+    async def halt(self):
         self._smoothie_driver.kill()
 
     def hard_halt(self):
         self._smoothie_driver.hard_halt()
 
-    def probe(self, axis: str, distance: float) -> Dict[str, float]:
+    async def probe(self, axis: str, distance: float) -> Dict[str, float]:
         """ Run a probe and return the new position dict
         """
         return self._smoothie_driver.probe_axis(axis, distance)
