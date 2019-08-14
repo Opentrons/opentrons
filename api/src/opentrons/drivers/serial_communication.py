@@ -1,34 +1,19 @@
+<<<<<<< HEAD
 import serial  # type: ignore
 from serial.tools import list_ports  # type: ignore
+=======
+>>>>>>> refactor(api): Pull shared funcs and constants out of smoothie
 import contextlib
 import logging
+
+import serial
+from .utils import parse_serial_response, SerialNoResponse, get_ports_by_name
 
 log = logging.getLogger(__name__)
 
 RECOVERY_TIMEOUT = 10
 DEFAULT_SERIAL_TIMEOUT = 5
 DEFAULT_WRITE_TIMEOUT = 30
-
-
-class SerialNoResponse(Exception):
-    pass
-
-
-def get_ports_by_name(device_name):
-    '''Returns all serial devices with a given name'''
-    filtered_devices = filter(
-        lambda device: device_name in device[1],
-        list_ports.comports()
-    )
-    device_ports = [device[0] for device in filtered_devices]
-    return device_ports
-
-
-def get_port_by_VID(vid):
-    '''Returns first serial device with a given VID'''
-    for d in list_ports.comports():
-        if d.vid == vid:
-            return d[0]
 
 
 @contextlib.contextmanager
@@ -39,14 +24,6 @@ def serial_with_temp_timeout(serial_connection, timeout):
         serial_connection.timeout = timeout
     yield serial_connection
     serial_connection.timeout = saved_timeout
-
-
-def _parse_serial_response(response, ack):
-    if ack in response:
-        parsed_response = response.split(ack)[0]
-        return parsed_response.strip()
-    else:
-        return None
 
 
 def clear_buffer(serial_connection):
@@ -72,7 +49,7 @@ def _write_to_device_and_return(cmd, ack, device_connection, tag=None):
         raise SerialNoResponse(
             'No response from serial port after {} second(s)'.format(
                 device_connection.timeout))
-    clean_response = _parse_serial_response(response, encoded_ack)
+    clean_response = parse_serial_response(response, encoded_ack)
     if clean_response:
         return clean_response.decode()
     return ''

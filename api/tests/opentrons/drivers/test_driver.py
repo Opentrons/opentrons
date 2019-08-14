@@ -1,11 +1,18 @@
+from copy import deepcopy
 from threading import Thread
+from time import sleep
+import types
 from unittest.mock import Mock
+
+from numpy import isclose
 import pytest
 
-from tests.opentrons.conftest import fuzzy_assert
+from opentrons.trackers import pose_tracker
 from opentrons.config.robot_configs import DEFAULT_GANTRY_STEPS_PER_MM
 from opentrons.drivers import serial_communication
-from opentrons.drivers.smoothie_drivers import driver_3_0
+from opentrons.drivers.smoothie_drivers import driver_3_0, constants, util
+
+from tests.opentrons.conftest import fuzzy_assert
 
 
 def position(x, y, z, a, b, c):
@@ -13,7 +20,6 @@ def position(x, y, z, a, b, c):
 
 
 def test_update_position(smoothie):
-    import types
     driver = smoothie
     driver.simulating = False
     _old_send_command = driver._send_command
@@ -63,8 +69,6 @@ def test_update_position(smoothie):
 
 
 def test_remove_serial_echo(smoothie, monkeypatch):
-    from opentrons.drivers import serial_communication
-    from opentrons.drivers.smoothie_drivers import driver_3_0
     smoothie.simulating = False
 
     def return_echo_response(command, ack, connection, timeout, tag=None):
@@ -102,27 +106,7 @@ def test_remove_serial_echo(smoothie, monkeypatch):
     assert res == 'TESTS-RULE'
 
 
-def test_parse_position_response(smoothie):
-    from opentrons.drivers.smoothie_drivers import driver_3_0 as drv
-    good_data = 'ok M114.2 X:10 Y:20: Z:30 A:40 B:50 C:60'
-    bad_data = 'ok M114.2 X:10 Y:20: Z:30A:40 B:50 C:60'
-    res = drv._parse_position_response(good_data)
-    expected = {
-        'X': 10,
-        'Y': 20,
-        'Z': 30,
-        'A': 40,
-        'B': 50,
-        'C': 60,
-    }
-    assert res == expected
-    with pytest.raises(drv.ParseError):
-        drv._parse_position_response(bad_data)
-
-
 def test_dwell_and_activate_axes(smoothie, monkeypatch):
-    from opentrons.drivers import serial_communication
-    from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
     smoothie._setup()
     smoothie.simulating = False
@@ -137,7 +121,7 @@ def test_dwell_and_activate_axes(smoothie, monkeypatch):
     monkeypatch.setattr(serial_communication, 'write_and_return',
                         write_with_log)
     monkeypatch.setattr(
-        driver_3_0, '_parse_position_response', _parse_position_response)
+        util, 'parse_position_response', _parse_position_response)
 
     smoothie.activate_axes('X')
     smoothie._set_saved_current()
@@ -161,14 +145,10 @@ def test_dwell_and_activate_axes(smoothie, monkeypatch):
         ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
         ['M400'],
     ]
-    # from pprint import pprint
-    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
 
 
 def test_disable_motor(smoothie, monkeypatch):
-    from opentrons.drivers import serial_communication
-    from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
     smoothie.simulating = False
 
@@ -182,7 +162,7 @@ def test_disable_motor(smoothie, monkeypatch):
     monkeypatch.setattr(serial_communication, 'write_and_return',
                         write_with_log)
     monkeypatch.setattr(
-        driver_3_0, '_parse_position_response', _parse_position_response)
+        util, 'parse_position_response', _parse_position_response)
 
     smoothie.disengage_axis('X')
     smoothie.disengage_axis('XYZ')
@@ -195,14 +175,10 @@ def test_disable_motor(smoothie, monkeypatch):
         ['M18[ABC]+'],
         ['M400'],
     ]
-    # from pprint import pprint
-    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
 
 
 def test_plunger_commands(smoothie, monkeypatch):
-    from opentrons.drivers import serial_communication
-    from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
     smoothie._setup()
     smoothie.home()
@@ -218,7 +194,7 @@ def test_plunger_commands(smoothie, monkeypatch):
     monkeypatch.setattr(
         serial_communication, 'write_and_return', write_with_log)
     monkeypatch.setattr(
-        driver_3_0, '_parse_position_response', _parse_position_response)
+        driver_3_0, 'parse_position_response', _parse_position_response)
 
     smoothie.home()
     expected = [
@@ -257,8 +233,6 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['M114.2'],
         ['M400'],
     ]
-    # from pprint import pprint
-    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
     command_log = []
 
@@ -267,8 +241,6 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 G0.+'],
         ['M400'],
     ]
-    # from pprint import pprint
-    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
     command_log = []
 
@@ -279,8 +251,6 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
         ['M400'],
     ]
-    # from pprint import pprint
-    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
     command_log = []
 
@@ -299,14 +269,10 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005'],
         ['M400'],
     ]
-    # from pprint import pprint
-    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
 
 
 def test_set_active_current(smoothie, monkeypatch):
-    from opentrons.drivers import serial_communication
-    from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
     smoothie._setup()
     smoothie.home()
@@ -322,7 +288,7 @@ def test_set_active_current(smoothie, monkeypatch):
     monkeypatch.setattr(serial_communication, 'write_and_return',
                         write_with_log)
     monkeypatch.setattr(
-        driver_3_0, '_parse_position_response', _parse_position_response)
+        driver_3_0, 'parse_position_response', _parse_position_response)
 
     smoothie.set_active_current(
         {'X': 2, 'Y': 2, 'Z': 2, 'A': 2, 'B': 2, 'C': 2})
@@ -349,8 +315,6 @@ def test_set_active_current(smoothie, monkeypatch):
         ['M114.2'],  # update the position
         ['M400'],
     ]
-    # from pprint import pprint
-    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
 
 
@@ -375,8 +339,6 @@ def test_pipette_configs(smoothie, monkeypatch):
 
 
 def test_set_acceleration(smoothie, monkeypatch):
-    from opentrons.drivers import serial_communication
-    from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
     smoothie._setup()
     smoothie.home()
@@ -392,7 +354,7 @@ def test_set_acceleration(smoothie, monkeypatch):
     monkeypatch.setattr(serial_communication, 'write_and_return',
                         write_with_log)
     monkeypatch.setattr(
-        driver_3_0, '_parse_position_response', _parse_position_response)
+        util, 'parse_position_response', _parse_position_response)
 
     smoothie.set_acceleration(
         {'X': 1, 'Y': 2, 'Z': 3, 'A': 4, 'B': 5, 'C': 6})
@@ -412,8 +374,6 @@ def test_set_acceleration(smoothie, monkeypatch):
         ['M204 S10000 A4 B5 C6 X1 Y2 Z3'],
         ['M400'],
     ]
-    # from pprint import pprint
-    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
 
 
@@ -421,7 +381,6 @@ def test_active_dwelling_current_push_pop(smoothie):
     assert smoothie._active_current_settings != \
         smoothie._dwelling_current_settings
 
-    from copy import deepcopy
     old_active_currents = deepcopy(smoothie._active_current_settings)
     old_dwelling_currents = deepcopy(smoothie._dwelling_current_settings)
 
@@ -455,7 +414,6 @@ def test_functional(smoothie):
 
 @pytest.mark.api1_only
 def test_set_pick_upcurrent(model):
-    import types
     driver = model.robot._driver
 
     set_current = driver._save_current
@@ -488,8 +446,6 @@ def test_set_pick_upcurrent(model):
         {'A': 0.8},
         {'A': 0.1}
     ]
-    # from pprint import pprint
-    # pprint(current_log)
     assert current_log == expected
 
     driver._save_current = set_current
@@ -497,7 +453,6 @@ def test_set_pick_upcurrent(model):
 
 @pytest.mark.api1_only
 def test_drop_tip_current(model):
-    import types
     driver = model.robot._driver
 
     old_save_current = driver._save_current
@@ -531,26 +486,12 @@ def test_drop_tip_current(model):
         {'C': 0.123},   # move back to 'bottom' position
         {'C': 0.05}     # dwell
     ]
-    # from pprint import pprint
-    # pprint(current_log)
     assert current_log == expected
 
     driver._save_current = old_save_current
 
 
-def test_parse_pipette_data():
-    from opentrons.drivers.smoothie_drivers.driver_3_0 import \
-        _parse_instrument_data, _byte_array_to_hex_string
-    msg = 'TestsRule!!'
-    mount = 'L'
-    good_data = mount + ': ' + _byte_array_to_hex_string(msg.encode())
-    parsed = _parse_instrument_data(good_data).get(mount)
-    assert parsed.decode() == msg
-
-
 def test_read_and_write_pipettes(smoothie):
-    import types
-    from opentrons.drivers.smoothie_drivers.driver_3_0 import GCODES
 
     driver = smoothie
     _old_send_command = driver._send_command
@@ -561,13 +502,13 @@ def test_read_and_write_pipettes(smoothie):
 
     def _new_send_message(self, command, timeout=None):
         nonlocal written_id, written_model, mount
-        if GCODES['READ_INSTRUMENT_ID'] in command:
+        if constants.GCODES['READ_INSTRUMENT_ID'] in command:
             return mount + ': ' + written_id
-        elif GCODES['READ_INSTRUMENT_MODEL'] in command:
+        elif constants.GCODES['READ_INSTRUMENT_MODEL'] in command:
             return mount + ': ' + written_model
-        if GCODES['WRITE_INSTRUMENT_ID'] in command:
+        if constants.GCODES['WRITE_INSTRUMENT_ID'] in command:
             written_id = command[command.index(mount) + 1:]
-        elif GCODES['WRITE_INSTRUMENT_MODEL'] in command:
+        elif constants.GCODES['WRITE_INSTRUMENT_MODEL'] in command:
             written_model = command[command.index(mount) + 1:]
 
     driver._send_command = types.MethodType(_new_send_message, driver)
@@ -590,16 +531,12 @@ def test_read_and_write_pipettes(smoothie):
 
 
 def test_read_pipette_v13(smoothie):
-    import types
-    from opentrons.drivers.smoothie_drivers.driver_3_0 import \
-        _byte_array_to_hex_string
-
     driver = smoothie
     _old_send_command = driver._send_command
     driver.simulating = False
 
     def _new_send_message(self, command, timeout=None):
-        return 'L:' + _byte_array_to_hex_string(b'p300_single_v13')
+        return 'L:' + util.byte_array_to_hex_string(b'p300_single_v13')
 
     driver._send_command = types.MethodType(_new_send_message, driver)
 
@@ -712,9 +649,6 @@ def test_clear_limit_switch(smoothie, monkeypatch):
     encoded in this test. If requirements change around physical behavior, then
     this test will need to be revised.
     """
-    from opentrons.drivers.smoothie_drivers.driver_3_0 import (
-        serial_communication, GCODES, SmoothieError)
-
     driver = smoothie
     driver.home('xyza')
     cmd_list = []
@@ -722,9 +656,9 @@ def test_clear_limit_switch(smoothie, monkeypatch):
     def write_mock(command, ack, serial_connection, timeout, tag=None):
         nonlocal cmd_list
         cmd_list.append(command)
-        if GCODES['MOVE'] in command:
+        if constants.GCODES['MOVE'] in command:
             return "ALARM: Hard limit +C"
-        elif GCODES['CURRENT_POSITION'] in command:
+        elif constants.GCODES['CURRENT_POSITION'] in command:
             return 'ok M114.2 X:10 Y:20: Z:30 A:40 B:50 C:60'
         else:
             return "ok"
@@ -733,7 +667,7 @@ def test_clear_limit_switch(smoothie, monkeypatch):
 
     driver.simulating = False
     # This will cause a limit-switch error and not back off
-    with pytest.raises(SmoothieError):
+    with pytest.raises(util.SmoothieError):
         driver.move({'C': 100})
 
     # from pprint import pprint
@@ -767,9 +701,6 @@ def test_pause_resume(model):
     True, but when testing whether `pause` actually pauses and `resume`
     resumes, `simulating` must be False.
     """
-    from numpy import isclose
-    from opentrons.trackers import pose_tracker
-    from time import sleep
 
     pipette = model.instrument._instrument
     robot = model.robot
@@ -810,8 +741,6 @@ def test_speed_change(model, monkeypatch):
     robot = model.robot
     robot._driver.simulating = False
 
-    from opentrons.drivers import serial_communication
-    from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
 
     def write_with_log(command, ack, connection, timeout, tag=None):
@@ -835,8 +764,6 @@ def test_speed_change(model, monkeypatch):
         ['G0F2400'],  # pipette's default dispense speed in mm/min
         ['G0F24000'],
     ]
-    # from pprint import pprint
-    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
 
 
@@ -846,8 +773,6 @@ def test_max_speed_change(model, monkeypatch):
     robot = model.robot
     robot._driver.simulating = False
 
-    from opentrons.drivers import serial_communication
-    from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
 
     def write_with_log(command, ack, connection, timeout, tag=None):
@@ -872,8 +797,6 @@ def test_max_speed_change(model, monkeypatch):
         ['G0F{}'.format(321 * 60)],
         ['G0F{}'.format(123 * 60)],
     ]
-    # from pprint import pprint
-    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
 
 
@@ -916,7 +839,6 @@ def test_send_command_with_retry(model, monkeypatch):
 
 @pytest.mark.api1_only
 def test_unstick_axes(model):
-    import types
     driver = model.robot._driver
     driver.simulating = False
 
@@ -952,8 +874,6 @@ def test_unstick_axes(model):
         'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',  # set plunger current
         'M203.1 A125 B40 C40 X600 Y400 Z125'  # return to normal speed
     ]
-    # from pprint import pprint
-    # pprint(current_log)
     assert current_log == expected
 
     current_log = []
@@ -965,8 +885,6 @@ def test_unstick_axes(model):
         'M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 G0A-1X-1Y-1Z-1',
         'M203.1 A125 B40 C40 X600 Y400 Z125'  # return to normal speed
     ]
-    # from pprint import pprint
-    # pprint(current_log)
     assert current_log == expected
 
     def send_command_mock(self, command, timeout=None):
@@ -993,8 +911,6 @@ def test_unstick_axes(model):
         'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',  # low current C
         'M203.1 A125 B40 C40 X600 Y400 Z125'  # reset max-speeds
     ]
-    # from pprint import pprint
-    # pprint(current_log)
     assert current_log == expected
 
     def send_command_mock(self, command, timeout=None):
@@ -1019,8 +935,6 @@ def test_unstick_axes(model):
         'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',  # low current BC
         'M203.1 A125 B40 C40 X600 Y400 Z125'  # reset max-speeds
     ]
-    # from pprint import pprint
-    # pprint(current_log)
     assert current_log == expected
 
 

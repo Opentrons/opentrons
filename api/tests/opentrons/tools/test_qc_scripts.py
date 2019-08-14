@@ -1,4 +1,14 @@
+import io
+import types
+from contextlib import redirect_stdout
+
 import pytest
+
+from opentrons import robot
+from opentrons.tools import write_pipette_memory as wpm
+from opentrons.drivers.smoothie_drivers.constants import GCODES
+from opentrons.drivers.smoothie_drivers.util import byte_array_to_hex_string
+
 
 pipette_barcode_to_model = {
     'P10S20180101A01': 'p10_single_v1',
@@ -41,13 +51,6 @@ def test_parse_model_from_barcode():
 
 
 def test_read_old_pipette_id_and_model():
-    import io
-    import types
-    from contextlib import redirect_stdout
-    from opentrons import robot
-    from opentrons.tools import write_pipette_memory as wpm
-    from opentrons.drivers.smoothie_drivers.driver_3_0 import \
-        GCODES, _byte_array_to_hex_string
 
     driver = robot._driver
     driver.simulating = False
@@ -74,9 +77,9 @@ def test_read_old_pipette_id_and_model():
 
         def _new_send_message(self, command, timeout=None):
             if GCODES['READ_INSTRUMENT_ID'] in command:
-                return 'R:' + _byte_array_to_hex_string(old_id.encode())
+                return 'R:' + byte_array_to_hex_string(old_id.encode())
             elif GCODES['READ_INSTRUMENT_MODEL'] in command:
-                return 'R:' + _byte_array_to_hex_string(old_model.encode())
+                return 'R:' + byte_array_to_hex_string(old_model.encode())
             else:
                 return ''
 
@@ -94,12 +97,6 @@ def test_read_old_pipette_id_and_model():
 
 
 def test_write_new_pipette_id_and_model():
-    import types
-    from opentrons import robot
-    from opentrons.tools import write_pipette_memory as wpm
-    from opentrons.drivers.smoothie_drivers.driver_3_0 import \
-        GCODES, _byte_array_to_hex_string
-
     driver = robot._driver
     driver.simulating = False
     _old_send_command = driver._send_command
@@ -109,9 +106,9 @@ def test_write_new_pipette_id_and_model():
         def _new_send_message(self, command, timeout=None):
             nonlocal new_id, new_model
             if GCODES['READ_INSTRUMENT_ID'] in command:
-                return 'R:' + _byte_array_to_hex_string(new_id.encode())
+                return 'R:' + byte_array_to_hex_string(new_id.encode())
             elif GCODES['READ_INSTRUMENT_MODEL'] in command:
-                return 'R:' + _byte_array_to_hex_string(new_model.encode())
+                return 'R:' + byte_array_to_hex_string(new_model.encode())
             else:
                 return ''
 

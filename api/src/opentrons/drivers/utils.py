@@ -1,6 +1,7 @@
-
 import logging
-from typing import Optional, Mapping
+from typing import List, Mapping, Optional
+
+from serial.tools import list_ports
 
 log = logging.getLogger(__name__)
 
@@ -13,6 +14,9 @@ TC_GCODE_ROUNDING_PRECISION = 2
 class ParseError(Exception):
     pass
 
+
+class SerialNoResponse(Exception):
+    pass
 
 def parse_string_value_from_substring(substring) -> str:
     '''
@@ -117,3 +121,33 @@ def parse_device_information(
         if key not in res:
             raise ParseError(error_msg)
     return res
+
+
+def get_ports_by_name(device_name: str) -> List[str]:
+    '''Returns all serial devices with a given name'''
+    filtered_devices = filter(
+        lambda device: device_name in device[1],
+        list_ports.comports()
+    )
+    device_ports = [device[0] for device in filtered_devices]
+    return device_ports
+
+
+def get_port_by_VID(vid: str) -> Optional[str]:
+    '''Returns first serial device with a given VID'''
+    for d in list_ports.comports():
+        if d.vid == vid:
+            return d[0]
+    return None
+
+
+def parse_serial_response(response: str, ack: str) -> Optional[str]:
+    """ Strip acknowledge blocks from serial responses
+
+    If no acknowledge block is found, return None
+    """
+    if ack in response:
+        parsed_response = response.split(ack)[0]
+        return parsed_response.strip()
+    else:
+        return None

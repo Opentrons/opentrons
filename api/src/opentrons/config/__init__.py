@@ -46,6 +46,7 @@ IS_LINUX = sys.platform.startswith('linux')
 IS_ROBOT = bool(IS_LINUX and os.environ.get('RUNNING_ON_PI'))
 #: This is the correct thing to check to see if we’re running on a robot
 IS_VIRTUAL = bool(os.environ.get('ENABLE_VIRTUAL_SMOOTHIE'))
+SMOOTHIE_ID = os.environ.get('OT_SMOOTHIE_ID', 'FT232R')
 
 
 class SystemArchitecture(Enum):

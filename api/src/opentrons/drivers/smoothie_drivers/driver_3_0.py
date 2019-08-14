@@ -11,6 +11,36 @@ from serial.serialutil import SerialException  # type: ignore
 from opentrons.drivers import serial_communication
 from opentrons.drivers.rpi_drivers import gpio
 from opentrons.system import smoothie_update
+
+from .constants import (AXES, HOMED_POSITION,
+                        DEFAULT_AXES_SPEED, GCODES,
+                        GCODE_ROUNDING_PRECISION,
+                        DEFAULT_STABILIZE_DELAY,
+                        DEFAULT_COMMAND_RETRIES,
+                        CURRENT_CHANGE_DELAY,
+                        DISABLE_AXES,
+                        SMOOTHIE_BOOT_TIMEOUT,
+                        DEFAULT_SMOOTHIE_TIMEOUT,
+                        DEFAULT_MOVEMENT_TIMEOUT,
+                        SMOOTHIE_COMMAND_TERMINATOR,
+                        SMOOTHIE_ACK,
+                        ALARM_KEYWORD, ERROR_KEYWORD,
+                        Y_BACKOFF_LOW_CURRENT,
+                        Y_BACKOFF_SLOW_SPEED,
+                        Y_SWITCH_BACK_OFF_MM,
+                        Y_SWITCH_REVERSE_BACK_OFF_MM,
+                        Y_RETRACT_SPEED,
+                        Y_RETRACT_DISTANCE,
+                        XY_HOMING_SPEED,
+                        PIPETTE_READ_DELAY,
+                        PLUNGER_BACKLASH_MM,
+                        UNSTICK_DISTANCE,
+                        UNSTICK_SPEED,)
+from .util import (SmoothieError, SmoothieAlarm, ParseError,
+                   parse_position_response, parse_instrument_data,
+                   parse_switch_values, parse_homing_status_values,
+                   remove_unwanted_characters, build_home_behaviors,
+                   byte_array_to_ascii_string, byte_array_to_hex_string)
 '''
 - Driver is responsible for providing an interface for motion control
 - Driver is the only system component that knows about GCODES or how smoothie
@@ -21,258 +51,6 @@ from opentrons.system import smoothie_update
 '''
 
 log = logging.getLogger(__name__)
-
-ERROR_KEYWORD = 'error'
-ALARM_KEYWORD = 'alarm'
-
-# TODO (artyom, ben 20171026): move to config
-HOMED_POSITION = {
-    'X': 418,
-    'Y': 353,
-    'Z': 218,
-    'A': 218,
-    'B': 19,
-    'C': 19
-}
-
-PLUNGER_BACKLASH_MM = 0.3
-LOW_CURRENT_Z_SPEED = 30
-CURRENT_CHANGE_DELAY = 0.005
-PIPETTE_READ_DELAY = 0.1
-
-Y_SWITCH_BACK_OFF_MM = 28
-Y_SWITCH_REVERSE_BACK_OFF_MM = 10
-Y_BACKOFF_LOW_CURRENT = 0.8
-Y_BACKOFF_SLOW_SPEED = 50
-Y_RETRACT_SPEED = 8
-Y_RETRACT_DISTANCE = 3
-
-UNSTICK_DISTANCE = 1
-UNSTICK_SPEED = 1
-
-DEFAULT_AXES_SPEED = 400
-
-XY_HOMING_SPEED = 80
-
-HOME_SEQUENCE = ['ZABC', 'X', 'Y']
-AXES = ''.join(HOME_SEQUENCE)
-# Ignore these axis when sending move or home command
-DISABLE_AXES = ''
-
-MOVEMENT_ERROR_MARGIN = 1/160  # Largest movement in mm for any step
-SEC_PER_MIN = 60
-
-DEFAULT_SMOOTHIE_TIMEOUT = 1
-DEFAULT_MOVEMENT_TIMEOUT = 30
-SMOOTHIE_BOOT_TIMEOUT = 3
-DEFAULT_STABILIZE_DELAY = 0.1
-
-DEFAULT_COMMAND_RETRIES = 3
-
-GCODES = {'HOME': 'G28.2',
-          'MOVE': 'G0',
-          'DWELL': 'G4',
-          'CURRENT_POSITION': 'M114.2',
-          'LIMIT_SWITCH_STATUS': 'M119',
-          'PROBE': 'G38.2 F420',  # 420 mm/min (7 mm/sec) to avoid resonance
-          'ABSOLUTE_COORDS': 'G90',
-          'RELATIVE_COORDS': 'G91',
-          'RESET_FROM_ERROR': 'M999',
-          'PUSH_SPEED': 'M120',
-          'POP_SPEED': 'M121',
-          'SET_SPEED': 'G0F',
-          'STEPS_PER_MM': 'M92',
-          'READ_INSTRUMENT_ID': 'M369',
-          'WRITE_INSTRUMENT_ID': 'M370',
-          'READ_INSTRUMENT_MODEL': 'M371',
-          'WRITE_INSTRUMENT_MODEL': 'M372',
-          'SET_MAX_SPEED': 'M203.1',
-          'SET_CURRENT': 'M907',
-          'DISENGAGE_MOTOR': 'M18',
-          'HOMING_STATUS': 'G28.6',
-          'ACCELERATION': 'M204 S10000',
-          'WAIT': 'M400'}
-
-# Number of digits after the decimal point for coordinates being sent
-# to Smoothie
-GCODE_ROUNDING_PRECISION = 3
-
-SMOOTHIE_COMMAND_TERMINATOR = '\r\n\r\n'
-SMOOTHIE_ACK = 'ok\r\nok\r\n'
-
-
-class SmoothieError(Exception):
-    def __init__(self, ret_code: str = None, command: str = None) -> None:
-        self.ret_code = ret_code
-        self.command = command
-        super().__init__()
-
-    def __repr__(self):
-        return f'<SmoothieError: {self.ret_code} from {self.command}>'
-
-    def __str__(self):
-        return f'SmoothieError: {self.command} returned {self.ret_code}'
-
-
-class SmoothieAlarm(Exception):
-    def __init__(self, ret_code: str = None, command: str = None) -> None:
-        self.ret_code = ret_code
-        self.command = command
-        super().__init__()
-
-    def __repr__(self):
-        return f'<SmoothieAlarm: {self.ret_code} from {self.command}>'
-
-    def __str__(self):
-        return f'SmoothieAlarm: {self.command} returned {self.ret_code}'
-
-
-class ParseError(Exception):
-    pass
-
-
-def _parse_number_from_substring(smoothie_substring):
-    '''
-    Returns the number in the expected string "N:12.3", where "N" is the
-    axis, and "12.3" is a floating point value for the axis' position
-    '''
-    try:
-        return round(
-            float(smoothie_substring.split(':')[1]),
-            GCODE_ROUNDING_PRECISION
-        )
-    except (ValueError, IndexError, TypeError, AttributeError):
-        log.exception('Unexpected argument to _parse_number_from_substring:')
-        raise ParseError(
-            'Unexpected argument to _parse_number_from_substring: {}'.format(
-                smoothie_substring))
-
-
-def _parse_axis_from_substring(smoothie_substring):
-    '''
-    Returns the axis in the expected string "N:12.3", where "N" is the
-    axis, and "12.3" is a floating point value for the axis' position
-    '''
-    try:
-        return smoothie_substring.split(':')[0].title()  # upper 1st letter
-    except (ValueError, IndexError, TypeError, AttributeError):
-        log.exception('Unexpected argument to _parse_axis_from_substring:')
-        raise ParseError(
-            'Unexpected argument to _parse_axis_from_substring: {}'.format(
-                smoothie_substring))
-
-
-def _parse_position_response(raw_axis_values):
-    parsed_values = raw_axis_values.strip().split(' ')
-    if len(parsed_values) < 8:
-        msg = 'Unexpected response in _parse_position_response: {}'.format(
-            raw_axis_values)
-        log.error(msg)
-        raise ParseError(msg)
-
-    data = {
-        _parse_axis_from_substring(s): _parse_number_from_substring(s)
-        for s in parsed_values[2:]  # remove first two items ('ok', 'MCS:')
-    }
-    return data
-
-
-def _parse_instrument_data(smoothie_response):
-    try:
-        items = smoothie_response.split('\n')[0].strip().split(':')
-        mount = items[0]
-        # data received from Smoothieware is stringified HEX values
-        # because of how Smoothieware handles GCODE messages
-        data = bytearray.fromhex(items[1])
-    except (ValueError, IndexError, TypeError, AttributeError):
-        raise ParseError(
-            'Unexpected argument to _parse_instrument_data: {}'.format(
-                smoothie_response))
-    return {mount: data}
-
-
-def _byte_array_to_ascii_string(byte_array):
-    # remove trailing null characters
-    try:
-        for c in [b'\x00', b'\xFF']:
-            if c in byte_array:
-                byte_array = byte_array[:byte_array.index(c)]
-        res = byte_array.decode()
-    except (ValueError, TypeError, AttributeError):
-        log.exception('Unexpected argument to _byte_array_to_ascii_string:')
-        raise ParseError(
-            'Unexpected argument to _byte_array_to_ascii_string: {}'.format(
-                byte_array))
-    return res
-
-
-def _byte_array_to_hex_string(byte_array):
-    # data must be sent as stringified HEX values
-    # because of how Smoothieware parses GCODE messages
-    try:
-        res = ''.join('%02x' % b for b in byte_array)
-    except TypeError:
-        log.exception('Unexpected argument to _byte_array_to_hex_string:')
-        raise ParseError(
-            'Unexpected argument to _byte_array_to_hex_string: {}'.format(
-                byte_array))
-    return res
-
-
-def _parse_switch_values(raw_switch_values):
-    if not raw_switch_values or not isinstance(raw_switch_values, str):
-        raise ParseError(
-            'Unexpected argument to _parse_switch_values: {}'.format(
-                raw_switch_values))
-
-    # probe has a space after it's ":" for some reason
-    if 'Probe: ' in raw_switch_values:
-        raw_switch_values = raw_switch_values.replace('Probe: ', 'Probe:')
-
-    parsed_values = raw_switch_values.strip().split(' ')
-    res = {
-        _parse_axis_from_substring(s): bool(_parse_number_from_substring(s))
-        for s in parsed_values
-        if any([n in s for n in ['max', 'Probe']])
-    }
-    # remove the extra "_max" character from each axis key in the dict
-    res = {
-        key.split('_')[0]: val
-        for key, val in res.items()
-    }
-    if len((list(AXES) + ['Probe']) & res.keys()) != 7:
-        raise ParseError(
-            'Unexpected argument to _parse_switch_values: {}'.format(
-                raw_switch_values))
-    return res
-
-
-def _parse_homing_status_values(raw_homing_status_values):
-    '''
-        Parse the Smoothieware response to a G28.6 command (homing-status)
-        A "1" means it has been homed, and "0" means it has not been homed
-
-        Example response after homing just X axis:
-        "X:1 Y:0 Z:0 A:0 B:0 C:0"
-
-        returns: dict
-            Key is axis, value is True if the axis needs to be homed
-    '''
-    if not raw_homing_status_values or \
-            not isinstance(raw_homing_status_values, str):
-        raise ParseError(
-            'Unexpected argument to _parse_homing_status_values: {}'.format(
-                raw_homing_status_values))
-    parsed_values = raw_homing_status_values.strip().split(' ')
-    res = {
-        _parse_axis_from_substring(s): bool(_parse_number_from_substring(s))
-        for s in parsed_values
-    }
-    if len(list(AXES) & res.keys()) != 6:
-        raise ParseError(
-            'Unexpected argument to _parse_homing_status_values: {}'.format(
-                raw_homing_status_values))
-    return res
 
 
 class SmoothieDriver_3_0_0:
@@ -380,7 +158,7 @@ class SmoothieDriver_3_0_0:
                 try:
                     position_response = self._send_command(
                         GCODES['CURRENT_POSITION'])
-                    return _parse_position_response(position_response)
+                    return parse_position_response(position_response)
                 except ParseError as e:
                     retries -= 1
                     if retries <= 0:
@@ -591,7 +369,7 @@ class SmoothieDriver_3_0_0:
     def switch_state(self):
         '''Returns the state of all SmoothieBoard limit switches'''
         res = self._send_command(GCODES['LIMIT_SWITCH_STATUS'])
-        return _parse_switch_values(res)
+        return parse_switch_values(res)
 
     def update_homed_flags(self, flags=None):
         '''
@@ -622,7 +400,7 @@ class SmoothieDriver_3_0_0:
             def _recursive_update_homed_flags(retries):
                 try:
                     res = self._send_command(GCODES['HOMING_STATUS'])
-                    flags = _parse_homing_status_values(res)
+                    flags = parse_homing_status_values(res)
                     self.homed_flags.update(flags)
                 except ParseError as e:
                     retries -= 1
@@ -649,7 +427,7 @@ class SmoothieDriver_3_0_0:
     def set_speed(self, value):
         ''' set total axes movement speed in mm/second'''
         self._combined_speed = float(value)
-        speed_per_min = int(self._combined_speed * SEC_PER_MIN)
+        speed_per_min = int(self._combined_speed * 60)
         command = GCODES['SET_SPEED'] + str(speed_per_min)
         log.debug("set_speed: {}".format(command))
         self._send_command(command)
@@ -943,13 +721,13 @@ class SmoothieDriver_3_0_0:
         cmd_ret = self._write_with_retries(
             command + SMOOTHIE_COMMAND_TERMINATOR,
             5.0, DEFAULT_COMMAND_RETRIES)
-        cmd_ret = self._remove_unwanted_characters(command, cmd_ret)
+        cmd_ret = remove_unwanted_characters(command, cmd_ret)
         self._handle_return(cmd_ret)
         wait_ret = serial_communication.write_and_return(
             GCODES['WAIT'] + SMOOTHIE_COMMAND_TERMINATOR,
             SMOOTHIE_ACK, self._connection, timeout=12000,
             tag='smoothie')
-        wait_ret = self._remove_unwanted_characters(
+        wait_ret = remove_unwanted_characters(
             GCODES['WAIT'], wait_ret)
         self._handle_return(wait_ret)
         return cmd_ret.strip()
@@ -977,29 +755,6 @@ class SmoothieDriver_3_0_0:
         else:
             if is_alarm or is_error:
                 raise SmoothieError(ret_code)
-
-    def _remove_unwanted_characters(self, command, response):
-        # smoothieware can enter a weird state, where it repeats back
-        # the sent command at the beginning of its response.
-        # Check for this echo, and strips the command from the response
-        remove_from_response = [
-            c.strip() for c in command.strip().split(' ') if c.strip()]
-
-        # also removing any inadvertant newline/return characters
-        # this is ok because all data we need from Smoothie is returned on
-        # the first line in the response
-        remove_from_response += ['\r', '\n']
-        modified_response = str(response)
-
-        for cmd in remove_from_response:
-            modified_response = modified_response.replace(cmd, '')
-
-        if modified_response != response:
-            log.debug('Removed characters from response: {}'.format(
-                response))
-            log.debug('Newly formatted response: {}'.format(modified_response))
-
-        return modified_response
 
     def _write_with_retries(self, cmd: str, timeout: float, retries: int):
         for attempt in range(retries):
@@ -1165,11 +920,11 @@ class SmoothieDriver_3_0_0:
             # request from Smoothieware the information from that pipette
             res = self._send_command(gcode + mount)
             if res:
-                res = _parse_instrument_data(res)
+                res = parse_instrument_data(res)
                 assert mount in res
                 # data is read/written as strings of HEX characters
                 # to avoid firmware weirdness in how it parses GCode arguments
-                return _byte_array_to_ascii_string(res[mount])
+                return byte_array_to_ascii_string(res[mount])
         except (ParseError, AssertionError, SmoothieError):
             pass
         return None
@@ -1203,7 +958,7 @@ class SmoothieDriver_3_0_0:
         self.delay(CURRENT_CHANGE_DELAY)
         # data is read/written as strings of HEX characters
         # to avoid firmware weirdness in how it parses GCode arguments
-        byte_string = _byte_array_to_hex_string(
+        byte_string = byte_array_to_hex_string(
             bytearray(data_string.encode()))
         command = gcode + mount + byte_string
         log.debug("_write_to_pipette: {}".format(command))
@@ -1296,37 +1051,8 @@ class SmoothieDriver_3_0_0:
 
         self.run_flag.wait()
 
-        axis = axis.upper()
-
-        # If Y is requested make sure we home X first
-        if 'Y' in axis:
-            axis += 'X'
-        # If horizontal movement is requested, ensure we raise the instruments
-        if 'X' in axis:
-            axis += 'ZA'
-        # These two additions are safe even if they duplicate requested axes
-        # because of the use of set operations below, which will de-duplicate
-        # characters from the resulting string
-
-        # HOME_SEQUENCE defines a pattern for homing, specifically that the
-        # ZABC axes should be homed first so that horizontal movement doesn't
-        # happen with the pipette down (which could bump into things). Then
-        # the X axis is homed, which has to happen before Y. Finally Y can be
-        # homed. This variable will contain the sequence just explained, but
-        # filters out unrequested axes using set intersection (&) and then
-        # filters out disabled axes using set difference (-)
-        home_sequence = list(filter(
-            None,
-            [
-                ''.join(set(group) & set(axis) - set(disabled))
-                for group in HOME_SEQUENCE
-            ]))
-
-        non_moving_axes = ''.join([
-            ax
-            for ax in AXES
-            if ax not in home_sequence
-        ])
+        home_sequence, non_moving_axes = build_home_behaviors(
+            axis, disabled)
         self.dwell_axes(non_moving_axes)
 
         for axes in home_sequence:
