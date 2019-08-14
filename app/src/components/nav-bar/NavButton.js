@@ -9,8 +9,11 @@ import {
   constants as robotConstants,
 } from '../../robot'
 
-import { getConnectedRobotUpgradeAvailable } from '../../http-api-client'
-import { getAvailableShellUpdate } from '../../shell'
+import {
+  getAvailableShellUpdate,
+  compareRobotVersionToUpdate,
+} from '../../shell'
+import { getConnectedRobot } from '../../discovery'
 import { NavButton } from '@opentrons/components'
 
 import type { ContextRouter } from 'react-router'
@@ -33,7 +36,11 @@ function mapStateToProps(state: State, ownProps: OP): $Exact<Props> {
   const isProtocolDone = robotSelectors.getIsDone(state)
   const isConnected =
     robotSelectors.getConnectionStatus(state) === robotConstants.CONNECTED
-  const robotNotification = getConnectedRobotUpgradeAvailable(state)
+  const connectedRobot = getConnectedRobot(state)
+  const robotNotification = Boolean(
+    connectedRobot &&
+      compareRobotVersionToUpdate(connectedRobot) !== 'reinstall'
+  )
   const moreNotification = getAvailableShellUpdate(state) != null
 
   switch (name) {

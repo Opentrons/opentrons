@@ -10,7 +10,6 @@ import {
   getRobotSettingsState,
 } from '../../robot-api'
 
-import { getConfig } from '../../config'
 import { CONNECTABLE } from '../../discovery'
 import { downloadLogs } from '../../shell'
 import { RefreshCard } from '@opentrons/components'
@@ -28,7 +27,6 @@ type OP = {|
 
 type SP = {|
   settings: RobotSettings,
-  __buildRootEnabled: boolean,
 |}
 
 type DP = {|
@@ -103,7 +101,7 @@ function AdvancedSettingsCard(props: Props) {
       {settings.map(s => (
         <BooleanSettingToggle {...s} key={s.id} set={set} />
       ))}
-      {props.__buildRootEnabled && <UploadRobotUpdate robotName={robot.name} />}
+      <UploadRobotUpdate robotName={robot.name} />
     </RefreshCard>
   )
 }
@@ -114,7 +112,6 @@ function mapStateToProps(state: State, ownProps: OP): SP {
 
   return {
     settings: settings,
-    __buildRootEnabled: Boolean(getConfig(state).devInternal?.enableBuildRoot),
   }
 }
 

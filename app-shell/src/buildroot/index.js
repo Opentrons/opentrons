@@ -30,96 +30,91 @@ let checkingForUpdates = false
 let updateSet: ReleaseSetFilepaths | null = null
 
 export function registerBuildrootUpdate(dispatch: Dispatch) {
-  const buildrootEnabled = Boolean(getConfig('devInternal')?.enableBuildRoot)
-  log.debug('buildroot status', { enabled: buildrootEnabled })
-
   return function handleAction(action: Action) {
-    if (buildrootEnabled) {
-      switch (action.type) {
-        case 'shell:CHECK_UPDATE':
-          if (!checkingForUpdates) {
-            checkingForUpdates = true
-            checkForBuildrootUpdate(dispatch).then(
-              () => (checkingForUpdates = false)
-            )
-          }
-          break
+    switch (action.type) {
+      case 'shell:CHECK_UPDATE':
+        if (!checkingForUpdates) {
+          checkingForUpdates = true
+          checkForBuildrootUpdate(dispatch).then(
+            () => (checkingForUpdates = false)
+          )
+        }
+        break
 
-        case 'buildroot:START_PREMIGRATION': {
-          const robot = action.payload
+      case 'buildroot:START_PREMIGRATION': {
+        const robot = action.payload
 
-          getPremigrationWheels()
-            .then(wheels => {
-              log.info('Starting robot premigration', { robot, wheels })
-              return startPremigration(robot, wheels.api, wheels.updateServer)
+        getPremigrationWheels()
+          .then(wheels => {
+            log.info('Starting robot premigration', { robot, wheels })
+            return startPremigration(robot, wheels.api, wheels.updateServer)
+          })
+          .then(
+            (): BuildrootAction => ({
+              type: 'buildroot:PREMIGRATION_DONE',
+              payload: robot.name,
             })
-            .then(
-              (): BuildrootAction => ({
-                type: 'buildroot:PREMIGRATION_DONE',
-                payload: robot.name,
-              })
-            )
-            .catch(
-              (error: Error): BuildrootAction => ({
-                type: 'buildroot:PREMIGRATION_ERROR',
-                payload: error.message,
-              })
-            )
-            .then(dispatch)
+          )
+          .catch(
+            (error: Error): BuildrootAction => ({
+              type: 'buildroot:PREMIGRATION_ERROR',
+              payload: error.message,
+            })
+          )
+          .then(dispatch)
 
-          break
+        break
+      }
+
+      case 'buildroot:UPLOAD_FILE': {
+        const { host, path, systemFile } = action.payload
+        const file = systemFile !== null ? systemFile : updateSet?.system
+
+        if (file == null) {
+          return dispatch({
+            type: 'buildroot:UNEXPECTED_ERROR',
+            payload: { message: 'Buildroot update file not downloaded' },
+          })
         }
 
-        case 'buildroot:UPLOAD_FILE': {
-          const { host, path, systemFile } = action.payload
-          const file = systemFile !== null ? systemFile : updateSet?.system
+        uploadSystemFile(host, path, file)
+          .then(() => ({
+            type: 'buildroot:FILE_UPLOAD_DONE',
+            payload: host.name,
+          }))
+          .catch((error: Error) => {
+            log.warn('Error uploading update to robot', { path, file, error })
 
-          if (file == null) {
-            return dispatch({
+            return {
               type: 'buildroot:UNEXPECTED_ERROR',
-              payload: { message: 'Buildroot update file not downloaded' },
-            })
-          }
-
-          uploadSystemFile(host, path, file)
-            .then(() => ({
-              type: 'buildroot:FILE_UPLOAD_DONE',
-              payload: host.name,
-            }))
-            .catch((error: Error) => {
-              log.warn('Error uploading update to robot', { path, file, error })
-
-              return {
-                type: 'buildroot:UNEXPECTED_ERROR',
-                payload: {
-                  message: `Error uploading update to robot: ${error.message}`,
-                },
-              }
-            })
-            .then(dispatch)
-
-          break
-        }
-
-        case 'buildroot:READ_USER_FILE': {
-          const { systemFile } = action.payload
-
-          readUserFileInfo(systemFile)
-            .then(userFile => ({
-              type: 'buildroot:USER_FILE_INFO',
               payload: {
-                systemFile: userFile.systemFile,
-                version: userFile.versionInfo.opentrons_api_version,
+                message: `Error uploading update to robot: ${error.message}`,
               },
-            }))
-            .catch((error: Error) => ({
-              type: 'buildroot:UNEXPECTED_ERROR',
-              payload: { message: error.message },
-            }))
-            .then(dispatch)
+            }
+          })
+          .then(dispatch)
 
-          break
-        }
+        break
+      }
+
+      case 'buildroot:READ_USER_FILE': {
+        const { systemFile } = action.payload
+
+        readUserFileInfo(systemFile)
+          .then(userFile => ({
+            type: 'buildroot:USER_FILE_INFO',
+            payload: {
+              systemFile: userFile.systemFile,
+              version: userFile.versionInfo.opentrons_api_version,
+            },
+          }))
+          .catch((error: Error) => ({
+            type: 'buildroot:UNEXPECTED_ERROR',
+            payload: { message: error.message },
+          }))
+          .then(dispatch)
+
+        break
       }
     }
   }

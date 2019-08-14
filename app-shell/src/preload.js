@@ -15,7 +15,4 @@ global.APP_SHELL_REMOTE = {
   CURRENT_RELEASE_NOTES,
   INITIAL_CONFIG: cloneDeep(getConfig()),
   INITIAL_ROBOTS: getRobots(),
-
-  // TODO(mc, 2019-08-05): remove when we remove __buildrootEnabled FF
-  apiUpdate: remote.require('./api-update'),
 }

@@ -15,7 +15,6 @@ export const DEV_INTERNAL_FLAGS: Array<DevInternalFlag> = [
   'tempdeckControls',
   'enableThermocycler',
   'enablePipettePlus',
-  'enableBuildRoot',
 ]
 
 // trigger a config value update to the app-shell via shell middleware
