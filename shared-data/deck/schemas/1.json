@@ -122,7 +122,13 @@
           "description": "Ordered slots available for placing labware",
           "items": {
             "type": "object",
-            "required": ["id", "position", "boundingBox", "displayName"],
+            "required": [
+              "id",
+              "position",
+              "boundingBox",
+              "displayName",
+              "compatibleModules"
+            ],
             "properties": {
               "id": {
                 "description": "Unique identifier for slot",
@@ -137,6 +143,14 @@
               "displayName": {
                 "description": "An optional human-readable nickname for this slot Eg \"Slot 1\" or \"Fixed Trash\"",
                 "type": "string"
+              },
+              "compatibleModules": {
+                "description": "An array of module loadNames that can be placed in this slot.",
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["magdeck", "tempdeck", "thermocycler"]
+                }
               }
             }
           }

@@ -226,9 +226,14 @@ For the purposes of this section, assume we have the following already:
     from opentrons import protocol_api
 
     def run(protocol: protocol_api.ProtocolContext):
-        tc_mod = protocol.load_module('thermocycler module', '1')
+        tc_mod = protocol.load_module('thermocycler module')
         plate = tc_mod.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
 
+.. note::
+
+    When loading the Thermocycler Module, it is not necessary to specify a slot.
+    This is because the Thermocycler Module has a default position that covers Slots 7, 8, 10, and 11.
+    This is the only valid location for the Thermocycler Module on the OT2 deck.
 
 Set Temperature
 ^^^^^^^^^^^^^^^
