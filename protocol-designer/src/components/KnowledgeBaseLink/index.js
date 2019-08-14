@@ -6,6 +6,7 @@ export const KNOWLEDGEBASE_ROOT_URL =
 
 export const links = {
   multiDispense: `${KNOWLEDGEBASE_ROOT_URL}/building-a-protocol/steps/paths`,
+  protocolSteps: `${KNOWLEDGEBASE_ROOT_URL}/en/collections/1606688-building-a-protocol#steps`,
 }
 
 type Link = $Keys<typeof links>
