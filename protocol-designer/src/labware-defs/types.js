@@ -15,7 +15,7 @@ export type LabwareUploadMessageType =
 type NameConflictFields = {|
   defsMatchingLoadName: Array<LabwareDefinition2>,
   defsMatchingDisplayName: Array<LabwareDefinition2>,
-  pendingDef: LabwareDefinition2,
+  newDef: LabwareDefinition2,
 |}
 
 export type LabwareUploadMessage =
@@ -33,8 +33,6 @@ export type LabwareUploadMessage =
   | {|
       ...NameConflictFields,
       messageType: 'ASK_FOR_LABWARE_OVERWRITE',
-      defsMatchingLoadName: Array<LabwareDefinition2>,
-      defsMatchingDisplayName: Array<LabwareDefinition2>,
-      pendingDef: LabwareDefinition2,
+      defURIToOverwrite: string,
       isOverwriteMismatched: boolean, // "mismatched" if labware is significantly different than the one it is intending to replace
     |}

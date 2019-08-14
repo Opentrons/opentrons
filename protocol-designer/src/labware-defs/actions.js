@@ -3,7 +3,6 @@ import assert from 'assert'
 import Ajv from 'ajv'
 import isEqual from 'lodash/isEqual'
 import values from 'lodash/values'
-import uniq from 'lodash/uniq'
 import uniqBy from 'lodash/uniqBy'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
 import { getLabwareDefURI } from '@opentrons/shared-data'
@@ -63,33 +62,12 @@ export const overwriteLabwareDef = (): ThunkAction<*> => (
   // get def used to overwrite existing def from the labware upload message
   const message = labwareDefSelectors.getLabwareUploadMessage(state)
   if (message && message.messageType === 'ASK_FOR_LABWARE_OVERWRITE') {
-    const newDef = message.pendingDef
-    // TODO IMMEDIATELY should this come from the upload message instead of being derived here? Yes it should.
-    const defURIsToOverwrite = [
-      ...message.defsMatchingDisplayName,
-      ...message.defsMatchingLoadName,
-    ].map(getLabwareDefURI)
-    assert(
-      uniq(defURIsToOverwrite).length === 1,
-      'overwriteLabwareDef thunk expected exactly 1 URI to overwrite'
-    )
-    const defURIToOverwrite = defURIsToOverwrite[0]
-
-    if (defURIsToOverwrite.length > 0) {
-      dispatch(
-        replaceCustomLabwareDef({
-          defURIToOverwrite,
-          newDef,
-          isOverwriteMismatched: message.isOverwriteMismatched,
-        })
-      )
-    }
-  } else {
-    assert(
-      false,
-      `overwriteLabwareDef thunk expected ASK_FOR_LABWARE_OVERWRITE message, got ${
-        message ? message.messageType : 'no message'
-      }`
+    return dispatch(
+      replaceCustomLabwareDef({
+        defURIToOverwrite: message.defURIToOverwrite,
+        newDef: message.newDef,
+        isOverwriteMismatched: message.isOverwriteMismatched,
+      })
     )
   }
 }
@@ -212,7 +190,8 @@ export const createCustomLabwareDef = (
           messageType: 'ASK_FOR_LABWARE_OVERWRITE',
           defsMatchingLoadName: defsMatchingCustomLoadName,
           defsMatchingDisplayName: defsMatchingCustomDisplayName,
-          pendingDef: parsedLabwareDef,
+          newDef: parsedLabwareDef,
+          defURIToOverwrite: getLabwareDefURI(matchingDefs[0]),
           isOverwriteMismatched: getIsOverwriteMismatched(
             parsedLabwareDef,
             matchingDefs[0]
@@ -238,7 +217,7 @@ export const createCustomLabwareDef = (
           messageType: 'LABWARE_NAME_CONFLICT',
           defsMatchingLoadName: allDefsMatchingLoadName,
           defsMatchingDisplayName: allDefsMatchingDisplayName,
-          pendingDef: parsedLabwareDef,
+          newDef: parsedLabwareDef,
         })
       )
     }
