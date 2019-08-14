@@ -7,7 +7,7 @@ Labware
 
 The labware section informs the protocol context what labware is present on the robot’s deck. In this section, you define the tip racks, well plates, troughs, tubes, or anything else you’ve put on the deck.
 
-Each labware is given a name (ex: ``'corning_96_wellplate_360ul_flat'``), and the slot on the robot it will be placed (ex: ``'2'``). The first place to look for the names of labware should always be the `Opentrons Labware Library <https://labware.opentrons.com>`_, where Opentrons maintains a database of labwares, their load names, what they look like, manufacturer part numbers, and more. In this example, we’ll use ``'corning_96_wellplate_360ul_flat'`` (`an ANSI standard 96-well plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_) and ``'opentrons_96_tiprack_300ul'`` (`the Opentrons standard 300 µL tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_).
+Each labware is given a name (e.g. ``'corning_96_wellplate_360ul_flat'``), and the slot on the robot it will be placed (e.g. ``'2'``). The first place to look for the names of labware should always be the `Opentrons Labware Library <https://labware.opentrons.com>`_, where Opentrons maintains a database of labwares, their load names, what they look like, manufacturer part numbers, and more. In this example, we’ll use ``'corning_96_wellplate_360ul_flat'`` (`an ANSI standard 96-well plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_) and ``'opentrons_96_tiprack_300ul'`` (`the Opentrons standard 300 µL tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_).
 
 From the example given on the home page, the "labware" section looked like:
 
@@ -233,7 +233,7 @@ numbers move down):
 
     Negative ``z`` arguments to :py:meth:`.Well.bottom` may cause the tip to
     collide with the bottom of the well. The OT-2 has no sensors to detect this,
-    and if it happens the robot will be too high in z for the rest of the
+    and if it happens, the robot will be too high in z for the rest of the
     protocol.
 
 

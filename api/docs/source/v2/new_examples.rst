@@ -71,7 +71,7 @@ Loops in Python allow your protocol to perform many actions, or act upon many we
 Multiple Air Gaps
 *****************
 
-The OT-2 pipettes can do some things that a human cannot do with a pipette, like accurately alternate between aspirating and creating air gaps within the same tip. The below example will aspirate from five wells in the trough, while creating a air gap between each sample.
+The OT-2 pipettes can do some things that a human cannot do with a pipette, like accurately alternate between aspirating and creating air gaps within the same tip. The below example will aspirate from five wells in the trough, while creating an air gap between each sample.
 
 .. code-block:: python
 

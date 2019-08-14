@@ -24,7 +24,7 @@ Overview
 How it Looks
 ------------
 
-The design goal of the Opentrons API is to make code readable and easy to understand. For example, below is a short set of instruction to transfer from well ``'A1'`` to well ``'B1'`` that even a computer could understand:
+The design goal of the Opentrons API is to make code readable and easy to understand. For example, below is a short set of instructions to transfer from well ``'A1'`` to well ``'B1'`` that even a computer could understand:
 
 .. code-block:: none
 
@@ -148,7 +148,7 @@ Our example protocol above loads a P300 Single-channel pipette (``'p300_single'`
 Commands
 ^^^^^^^^
 
-Once the instruments and labware the protocols are required are defined, the next step is to define the commands that make up the protocol. The most common commands are ``aspirate()``, ``dispense()``, ``pick_up_tip()``, and ``drop_tip()``. These and many others are described in the :ref:`v2-atomic-commands` and :ref:`v2-complex-commands` sections, which go into more detail about the commands and how they work. These commands typically specify which wells of which labware to interact with using the labware you defined earlier, and are methods of the instruments you created in the pipette section. For instance, in our example protocol you use the pipette you defined to
+Once the instruments and labware required for the protocol are defined, the next step is to define the commands that make up the protocol. The most common commands are ``aspirate()``, ``dispense()``, ``pick_up_tip()``, and ``drop_tip()``. These and many others are described in the :ref:`v2-atomic-commands` and :ref:`v2-complex-commands` sections, which go into more detail about the commands and how they work. These commands typically specify which wells of which labware to interact with, using the labware you defined earlier, and are methods of the instruments you created in the pipette section. For instance, in our example protocol, you use the pipette you defined to:
 
 1) Pick up a tip (implicitly from the tiprack you specified in slot 1 and assigned to the pipette): ``pipette.pick_up_tip()``
 2) Aspirate 100ul from well A1 of the 96 well plate you specified in slot 2: ``pipette.aspirate(100, plate['A1'])``
