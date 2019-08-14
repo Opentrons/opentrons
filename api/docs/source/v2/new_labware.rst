@@ -20,7 +20,7 @@ From the example given on the home page, the "labware" section looked like:
 and informed the protocol context that the deck contains a 300 µL tiprack in slot 1 and a 96 well plate in slot 2.
 
 Labware is loaded into a protocol using :py:meth:`.ProtocolContext.load_labware`, which returns a
-:py:meth:`opentrons.protocol_api.labware.Labware` object. You'll never create one of these objects
+:py:class:`opentrons.protocol_api.labware.Labware` object. You'll never create one of these objects
 directly, only store them in variables from the return value of :py:meth:`.ProtocolContext.load_labware`.
 
 .. _new-well-access:

@@ -61,7 +61,7 @@ Loops in Python allow your protocol to perform many actions, or act upon many we
         # distribute 20uL from trough:A2 -> plate:row:2
         # etc...
 
-        # range() starts at 0 and stops before 12, creating a range of 0-11
+        # range() starts at 0 and stops before 8, creating a range of 0-7
         for i in range(8):
             p300.distribute(200, trough.wells()[i], plate.rows()[i])
 
@@ -85,7 +85,8 @@ The OT-2 pipettes can do some things that a human cannot do with a pipette, like
         p300.pick_up_tip()
 
         for well in trough.wells():
-            p300.aspirate(35, well).air_gap(10)
+            p300.aspirate(35, well)
+            p300.air_gap(10)
             p300.dispense(plate['A1'])
 
         p300.return_tip()
