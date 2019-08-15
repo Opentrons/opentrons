@@ -1983,10 +1983,10 @@
     "@thi.ng/checks" "^1.5.13"
     "@thi.ng/errors" "^0.1.11"
 
-"@typeform/embed@^0.10.0":
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/@typeform/embed/-/embed-0.10.0.tgz#377a0558c8c743e2f2b0d87761ad8557bc0e955e"
-  integrity sha512-4MRVxuyDOwh2tH2Q1Q0X1dsqU45gYzbj8EidfG6XiuTQ5dYZ8NfX+jE4yHB/PQbSeX41V0FVG+Ag74iwAb8Mbw==
+"@typeform/embed@^0.12.1":
+  version "0.12.1"
+  resolved "https://registry.yarnpkg.com/@typeform/embed/-/embed-0.12.1.tgz#05307cca0b762fe50d81ee0a5945a86d401b57ac"
+  integrity sha512-zaQ/bZahbdOexDeOyxKh4L1+pdWQhV5tu2NHl7xA2sR+bRA71hqzwFG920I0aLStOcD8oAO0JSFPVjvBcjCYlg==
   dependencies:
     classnames "^2.2.5"
     core-js "^3.0.1"
