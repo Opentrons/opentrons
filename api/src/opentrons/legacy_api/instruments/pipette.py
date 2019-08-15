@@ -818,57 +818,86 @@ class Pipette(CommandPublisher):
             self.move_to(location)
 
         v_offset = (0, 0, v_offset)
-        
+
+        #motion path
+        if pattern == 'v1.0':
+            well_edges = [
+                location.from_center(x=radius, y=0, z=1),       # right edge
+                location.from_center(x=radius * -1, y=0, z=1),  # left edge
+                location.from_center(x=0, y=radius, z=1),       # back edge
+                location.from_center(x=0, y=radius * -1, z=1)   # front edge
+            ]
+
         if pattern == 'cross':
             well_edges = [
             location.from_center(x=radius, y=0, z=1),       # right edge
-            location.from_center(x=0, y=0, z=1),
+            location.from_center(x=0, y=0, z=1),            # return back to origin
             location.from_center(x=radius * -1, y=0, z=1),  # left edge
-            location.from_center(x=0,y=0,z=1),
+            location.from_center(x=0,y=0,z=1),              # return back to origin
             location.from_center(x=0, y=radius, z=1),       # back edge
-            location.from_center(x=0,y=0,z=1),
-            location.from_center(x=0, y=radius * -1, z=1),   # front edge
-            location.from_center(x=0, y=0,z=1)
+            location.from_center(x=0,y=0,z=1),              # return back to origin
+            location.from_center(x=0, y=radius * -1, z=1),  # front edge
+            location.from_center(x=0, y=0,z=1)              # return back to origin
         ]
-        
+
         if pattern == 'cross2':
             well_edges = [
             location.from_center(x=radius, y=0, z=1),       # right edge
             location.from_center(x=radius * -1, y=0, z=1),  # left edge
-            location.from_center(x=0,y=0,z=1),
+            location.from_center(x=0,y=0,z=1),              # return back to origin
             location.from_center(x=0, y=radius, z=1),       # back edge
-            location.from_center(x=0, y=radius * -1, z=1),   # front edge
-            location.from_center(x=0, y=0,z=1)
+            location.from_center(x=0, y=radius * -1, z=1),  # front edge
+            location.from_center(x=0, y=0,z=1)              # return back to origin
         ]
+
         if pattern == 'x-cross':
             well_edges = [
-            location.from_center(x=radius, y=radius, z=1),       # right edge
-            location.from_center(x=radius * -1, y=radius *-1, z=1),  # left edge
-            location.from_center(x=0,y=0,z=1),
-            location.from_center(x=radius*-1, y=radius, z=1),       # back edge
-            location.from_center(x=radius, y=radius * -1, z=1),   # front edge
-            location.from_center(x=0, y=0,z=1)
+            location.from_center(x=0, y=0, z=1),                    # Start at center
+            location.from_center(x=radius, y=radius, z=1),          # right diagonal edge
+            location.from_center(x=radius * -1, y=radius *-1, z=1), # left diagonal edge
+            location.from_center(x=0,y=0,z=1),                      # return back to origin
+            location.from_center(x=radius*-1, y=radius, z=1),       # left diagonal edge
+            location.from_center(x=radius, y=radius * -1, z=1),     # right diagonal edge
+            location.from_center(x=0, y=0,z=1)                      # return back to center
         ]
-        
+
+        if pattern == 'asterisk':
+            well_edges = [
+            location.from_center(x=0, y=0, z=1),                    # return back to center
+            location.from_center(x=radius, y=radius, z=1),          # right edge
+            location.from_center(x=radius * -1, y=radius *-1, z=1), # left edge
+            location.from_center(x=0,y=0,z=1),                      # return back to center
+            location.from_center(x=radius*-1, y=radius, z=1),       # back edge
+            location.from_center(x=radius, y=radius * -1, z=1),     # front edge
+            location.from_center(x=0, y=0,z=1),                     # return back to center
+            location.from_center(x=0, y=radius, z=1),               # right edge
+            location.from_center(x=0, y=radius *-1,z=1),            # left edge
+            location.from_center(x=0, y=0, z=1),                    # return back to center
+            location.from_center(x=radius, y=0, z=1),               # right edge
+            location.from_center(x=radius*-1, y =0, z=1),           # left edge
+            location.from_center(x=0, y=0, z=1)                     # return back to center
+        ]
+
         if pattern == 'line':
             well_edges = [
-                location.from_center(x=0, y=0, z=1),       # right edge
+                location.from_center(x=0, y=0, z=1),            # center of well
                 location.from_center(x=radius * -1, y=0, z=1),  # left edge
-                location.from_center(x=0, y=0,z=1),
-                location.from_center(x=radius ,y =0, z=1),
-                location.from_center(x=0, y=0, z=1)
+                location.from_center(x=0, y=0,z=1),             # return back to center
+                location.from_center(x=radius ,y =0, z=1),      # right edge
+                location.from_center(x=0, y=0, z=1)             # return back to center
             ]
-            
+
         if pattern == 'line2':
             well_edges = [
+                location.from_center(x=0, y=0, z=1),            # center of well
                 location.from_center(x=radius * -1, y=0, z=1),  # left edge
-                location.from_center(x=radius ,y =0, z=1),
-                location.from_center(x=0, y=0, z=1)
+                location.from_center(x=radius ,y =0, z=1),      # right edge
+                location.from_center(x=0, y=0, z=1)             # return back to center
             ]
-            
+
         # Apply vertical offset to well edges
         well_edges = map(lambda x: x + v_offset, well_edges)
-
+        print(well_edges)
         self.robot.gantry.push_speed()
         self.robot.gantry.set_speed(speed)
         [self.move_to((location, e), strategy='direct') for e in well_edges]
