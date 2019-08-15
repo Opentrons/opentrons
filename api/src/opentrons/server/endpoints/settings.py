@@ -8,53 +8,41 @@ from opentrons.config import (advanced_settings as advs,
                               robot_configs as rc,
                               feature_flags as ff,
                               pipette_config as pc,
-                              IS_ROBOT)
+                              IS_ROBOT,
+                              ARCHITECTURE,
+                              SystemArchitecture)
 from opentrons.data_storage import database as db
 from opentrons.protocol_api import labware
 
+if ARCHITECTURE == SystemArchitecture.BUILDROOT:
+    from opentrons.system import log_control
+
 log = logging.getLogger(__name__)
 
-if ff.use_protocol_api_v2():
-    _settings_reset_options = [
-        {
-            'id': 'tipProbe',
-            'name': 'Instrument Offset',
-            'description': 'Clear instrument offset calibration data'
-        },
-        {
-            'id': 'labwareCalibration',
-            'name': 'Labware Calibration',
-            'description': 'Clear labware calibration'
-        },
-        {
-            'id': 'bootScripts',
-            'name': 'Boot Scripts',
-            'description': 'Clear custom boot scripts'
-        },
-        {
-            'id': 'customLabware',
-            'name': 'Custom Labware',
-            'description': 'Clear custom labware definitions'
-        }
-    ]
-else:
-    _settings_reset_options = [
-        {
-            'id': 'tipProbe',
-            'name': 'Tip Length',
-            'description': 'Clear tip probe data'
-        },
-        {
-            'id': 'labwareCalibration',
-            'name': 'Labware Calibration',
-            'description': 'Clear labware calibration'
-        },
-        {
-            'id': 'bootScripts',
-            'name': 'Boot Scripts',
-            'description': 'Clear custom boot scripts'
-        }
-    ]
+_apiv2_settings_reset_options = [{
+        'id': 'customLabware',
+        'name': 'Custom Labware',
+        'description': 'Clear custom labware definitions'
+    }]
+
+
+_settings_reset_options = [
+    {
+        'id': 'tipProbe',
+        'name': 'Instrument Offset',
+        'description': 'Clear instrument offset calibration data'
+    },
+    {
+        'id': 'labwareCalibration',
+        'name': 'Labware Calibration',
+        'description': 'Clear labware calibration'
+    },
+    {
+        'id': 'bootScripts',
+        'name': 'Boot Scripts',
+        'description': 'Clear custom boot scripts'
+    }
+]
 
 
 async def get_advanced_settings(request: web.Request) -> web.Response:
@@ -82,20 +70,38 @@ async def set_advanced_setting(request: web.Request) -> web.Response:
     data = await request.json()
     key = data.get('id')
     value = data.get('value')
+    log.info(f'set_advanced_setting: {key} -> {value}')
     if key and key in advs.settings_by_id.keys():
         advs.set_adv_setting(key, value)
         res = _get_adv_settings()
         status = 200
+        if key == 'disableLogAggregation'\
+           and ARCHITECTURE == SystemArchitecture.BUILDROOT:
+            code, stdout, stderr = await log_control.set_syslog_level(
+                'emerg' if value else 'info')
+            if code != 0:
+                log.error(
+                    f"Could not set log control: {code}: stdout={stdout}"
+                    f" stderr={stderr}")
+                res = {'message': 'Failed to set log upstreaming: {code}'}
+                status = 500
+                log.error(res)
     else:
         res = {'message': 'ID {} not found in settings list'.format(key)}
         status = 400
+        log.info(f'set_advanced_setting: bad request: {key} invalid')
     return web.json_response(res, status=status)
 
 
 def _check_reset(reset_req: Dict[str, str]) -> Tuple[bool, str]:
+
+    if ff.use_protocol_api_v2():
+        to_use = _settings_reset_options + _apiv2_settings_reset_options
+    else:
+        to_use = _settings_reset_options
     for requested_reset in reset_req.keys():
         if requested_reset not in [opt['id']
-                                   for opt in _settings_reset_options]:
+                                   for opt in to_use]:
             log.error('Bad reset option {} requested'.format(requested_reset))
             return (False, requested_reset)
     return (True, '')
@@ -140,7 +146,11 @@ async def reset(request: web.Request) -> web.Response:  # noqa(C901)
 async def available_resets(request: web.Request) -> web.Response:
     """ Indicate what parts of the user configuration are available for reset.
     """
-    return web.json_response({'options': _settings_reset_options}, status=200)
+    if ff.use_protocol_api_v2():
+        to_use = _settings_reset_options + _apiv2_settings_reset_options
+    else:
+        to_use = _settings_reset_options
+    return web.json_response({'options': to_use}, status=200)
 
 
 async def pipette_settings(request: web.Request) -> web.Response:
