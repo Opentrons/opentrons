@@ -689,7 +689,6 @@ class InstrumentContext(CommandPublisher):
                                 rate))
 
         if volume:
-            print(f"volume: {volume}, class: {volume.__class__}")
             if isinstance(volume, (int, float)):
                 volume = float(volume)
             elif isinstance(volume, (Well, types.Location, list)) \
@@ -905,6 +904,8 @@ class InstrumentContext(CommandPublisher):
             self.aspirate(volume, rate=rate)
             repetitions -= 1
         self.dispense(volume, rate=rate)
+        cmds.do_publish(self.broker, cmds.mix, self.mix, 'after', self, None,
+                        self, repetitions, volume, location, rate)
         return self
 
     @cmds.publish.both(command=cmds.blow_out)
