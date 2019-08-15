@@ -209,5 +209,6 @@ class Pipette:
                             'model': self.model,
                             'pipette_id': self.pipette_id,
                             'has_tip': self.has_tip,
-                            'working_volume': self.working_volume})
+                            'working_volume': self.working_volume,
+                            'available_volume': self.available_volume})
         return config_dict

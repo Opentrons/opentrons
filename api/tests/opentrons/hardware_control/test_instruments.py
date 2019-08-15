@@ -33,7 +33,8 @@ instrument_keys = sorted([
     'name', 'min_volume', 'max_volume', 'aspirate_flow_rate', 'channels',
     'dispense_flow_rate', 'pipette_id', 'current_volume', 'display_name',
     'tip_length', 'has_tip', 'model', 'blow_out_flow_rate',
-    'blow_out_speed', 'aspirate_speed', 'dispense_speed', 'working_volume'])
+    'blow_out_speed', 'aspirate_speed', 'dispense_speed', 'working_volume',
+    'available_volume'])
 
 
 async def test_cache_instruments(dummy_instruments, loop):
@@ -226,7 +227,8 @@ async def test_dispense(dummy_instruments, loop):
     assert (await hw_api.current_position(types.Mount.LEFT))[Axis.B]\
         == plunger_pos_1
 
-    await hw_api.dispense(types.Mount.LEFT, rate=2)
+    disp_vol = aspirate_ul - dispense_1
+    await hw_api.dispense(types.Mount.LEFT, disp_vol, rate=2)
     plunger_pos_2 = 2
     assert (await hw_api.current_position(types.Mount.LEFT))[Axis.B]\
         == plunger_pos_2

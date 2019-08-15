@@ -688,6 +688,29 @@ class InstrumentContext(CommandPublisher):
                                 location if location else 'current position',
                                 rate))
 
+        if volume:
+            print(f"volume: {volume}, class: {volume.__class__}")
+            if isinstance(volume, (int, float)):
+                volume = float(volume)
+            elif isinstance(volume, (Well, types.Location, list)) \
+                    and not location:
+                location = volume
+                volume = self.available_volume
+                self._log.debug("No aspirate volume defined. Aspirating up to "
+                                "pipette available_volume ({}uL)".format(
+                                    volume))
+            else:
+                raise TypeError("Volume should be an Int or a Float, but it "
+                                "is {}.".format(volume))
+        else:
+            volume = self.available_volume
+            self._log.debug("No aspirate volume defined. Aspirating up to "
+                            "pipette available_volume ({}uL)".format(
+                                volume))
+
+        if isinstance(location, list) and len(location) == 1:
+            location = location[0]
+
         if isinstance(location, Well):
             point, well = location.bottom()
             dest = types.Location(
@@ -770,6 +793,30 @@ class InstrumentContext(CommandPublisher):
                         .format(volume,
                                 location if location else 'current position',
                                 rate))
+
+        if volume:
+            if isinstance(volume, (int, float)):
+                volume = float(volume)
+            elif isinstance(volume, (Well, types.Location, list)) \
+                    and not location:
+                location = volume
+                volume = self.current_volume
+                self._log.debug("No dispense volume specified. Dispensing all "
+                                "remaining liquid ({}uL) from pipette".format
+                                (volume))
+            else:
+                raise TypeError(
+                    "volume should be an int or a float, but it is {}".format(
+                        volume))
+        else:
+            volume = self.current_volume
+            self._log.debug("No dispense volume specified. Dispensing all "
+                            "remaining liquid ({}uL) from pipette".format
+                            (volume))
+
+        if isinstance(location, list) and len(location) == 1:
+            location = location[0]
+
         if isinstance(location, Well):
             if 'fixedTrash' in quirks_from_any_parent(location):
                 loc = location.top()
@@ -802,7 +849,6 @@ class InstrumentContext(CommandPublisher):
                         'after', self, None, self, volume, loc, rate)
         return self
 
-    @cmds.publish.both(command=cmds.mix)
     def mix(self,
             repetitions: int = 1,
             volume: float = None,
@@ -829,6 +875,29 @@ class InstrumentContext(CommandPublisher):
                 location if location else 'current position', rate))
         if not self.hw_pipette['has_tip']:
             raise hc.NoTipAttachedError('Pipette has no tip. Aborting mix()')
+
+        if volume:
+            if isinstance(volume, (int, float)):
+                volume = float(volume)
+            elif isinstance(volume, (Well, types.Location, list)) \
+                    and not location:
+                location = volume
+                volume = self.available_volume
+                self._log.debug("No mix volume specified. Mixing with pipette "
+                                "available volume ({}uL)".format(volume))
+            else:
+                raise TypeError("Volume should be an Int or a Float, but it "
+                                "is {}.".format(volume))
+        else:
+            volume = self.available_volume
+            self._log.debug("No mix volume specified. Mixing with pipette "
+                            "available volume ({}uL)".format(volume))
+
+        if isinstance(location, list) and len(location) == 1:
+            location = location[0]
+
+        cmds.do_publish(self.broker, cmds.mix, self.mix, 'before', None, None,
+                        self, repetitions, volume, location, rate)
 
         self.aspirate(volume, location, rate)
         while repetitions - 1 > 0:
@@ -1001,8 +1070,10 @@ class InstrumentContext(CommandPublisher):
         if not self.hw_pipette['has_tip']:
             raise hc.NoTipAttachedError('Pipette has no tip. Aborting air_gap')
 
-        if height is None:
+        if not volume and not height:
+            volume = self.available_volume
             height = 5
+
         loc = self._ctx.location_cache
         if not loc or not isinstance(loc.labware, Well):
             raise RuntimeError('No previous Well cached to perform air gap')
@@ -1694,6 +1765,13 @@ class InstrumentContext(CommandPublisher):
         The current amount of liquid, in microliters, held in the pipette.
         """
         return self.hw_pipette['current_volume']
+
+    @property
+    def available_volume(self) -> float:
+        """
+        The maximum amount of liquid the pipette can aspirate at a given time.
+        """
+        return float(self.hw_pipette['available_volume'])
 
     @property
     def hw_pipette(self) -> Dict[str, Any]:

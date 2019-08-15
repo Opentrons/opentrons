@@ -319,7 +319,7 @@ class API(HardwareAPILike):
                    'aspirate_flow_rate', 'dispense_flow_rate',
                    'pipette_id', 'current_volume', 'display_name',
                    'tip_length', 'model', 'blow_out_flow_rate',
-                   'working_volume']
+                   'working_volume', 'available_volume']
         instruments: Dict[top_types.Mount, Pipette.DictType] = {
             top_types.Mount.LEFT: {},
             top_types.Mount.RIGHT: {}
@@ -912,7 +912,7 @@ class API(HardwareAPILike):
         this_pipette.ready_to_aspirate = True
 
     @_log_call
-    async def aspirate(self, mount: top_types.Mount, volume: float = None,
+    async def aspirate(self, mount: top_types.Mount, volume: float,
                        rate: float = 1.0):
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
@@ -943,24 +943,16 @@ class API(HardwareAPILike):
             raise RuntimeError('Pipette not ready to aspirate')
         this_pipette.ready_to_aspirate = False
 
-        if volume is None:
-            asp_vol = this_pipette.available_volume
-            mod_log.debug(
-                "No aspirate volume defined. Aspirating up to pipette "
-                "max_volume ({}uL)".format(this_pipette.config.max_volume))
-        else:
-            asp_vol = volume
-
-        assert this_pipette.ok_to_add_volume(asp_vol), \
+        assert this_pipette.ok_to_add_volume(volume), \
             "Cannot aspirate more than pipette max volume"
-        if asp_vol == 0:
+        if volume == 0:
             return
 
         self._backend.set_active_current(
              Axis.of_plunger(mount), this_pipette.config.plunger_current)
         dist = self._plunger_position(
                 this_pipette,
-                this_pipette.current_volume + asp_vol,
+                this_pipette.current_volume + volume,
                 'aspirate')
         flow_rate = this_pipette.config.aspirate_flow_rate * rate
         speed = self._plunger_speed(this_pipette, flow_rate, 'aspirate')
@@ -971,7 +963,7 @@ class API(HardwareAPILike):
             this_pipette.set_current_volume(0)
             raise
         else:
-            this_pipette.add_current_volume(asp_vol)
+            this_pipette.add_current_volume(volume)
 
     @_log_call
     async def dispense(self, mount: top_types.Mount, volume: float = None,
@@ -990,24 +982,15 @@ class API(HardwareAPILike):
         if not this_pipette:
             raise top_types.PipetteNotAttachedError(
                 "No pipette attached to {} mount".format(mount.name))
-        if volume is None:
-            disp_vol = this_pipette.current_volume
-            mod_log.debug("No dispense volume specified. Dispensing all "
-                          "remaining liquid ({}uL) from pipette".format
-                          (disp_vol))
-        else:
-            disp_vol = volume
-        # Ensure we don't dispense more than the current volume
-        disp_vol = min(this_pipette.current_volume, disp_vol)
 
-        if disp_vol == 0:
+        if volume == 0:
             return
 
         self._backend.set_active_current(
             Axis.of_plunger(mount), this_pipette.config.plunger_current)
         dist = self._plunger_position(
                 this_pipette,
-                this_pipette.current_volume - disp_vol,
+                this_pipette.current_volume - volume,
                 'dispense')
         flow_rate = this_pipette.config.dispense_flow_rate * rate
         speed = self._plunger_speed(this_pipette, flow_rate, 'dispense')
@@ -1018,7 +1001,7 @@ class API(HardwareAPILike):
             this_pipette.set_current_volume(0)
             raise
         else:
-            this_pipette.remove_current_volume(disp_vol)
+            this_pipette.remove_current_volume(volume)
 
     def _plunger_position(self, instr: Pipette, ul: float,
                           action: str) -> float:

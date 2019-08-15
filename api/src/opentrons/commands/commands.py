@@ -235,7 +235,7 @@ def comment(msg):
 
 
 def mix(instrument, repetitions, volume, location):
-    text = 'Mixing {repetitions} times with a volume of {volume}ul'.format(
+    text = 'Mixing {repetitions} times with a volume of {volume} ul'.format(
         repetitions=repetitions, volume=volume
     )
     return make_command(
