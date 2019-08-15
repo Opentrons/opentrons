@@ -61,6 +61,7 @@ export default function FileSidebar(props: Props) {
               },
               {
                 children: 'CONTINUE WITH EXPORT',
+                className: modalStyles.long_button,
                 onClick: () => {
                   saveFile(downloadData)
                   setShowNoCommandsModal(false)
