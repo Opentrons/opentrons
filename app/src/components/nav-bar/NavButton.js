@@ -48,7 +48,7 @@ function mapStateToProps(state: State, ownProps: OP): $Exact<Props> {
       }
     case 'upload':
       return {
-        disabled: connectedRobot != null || isProtocolRunning,
+        disabled: connectedRobot == null || isProtocolRunning,
         iconName: 'ot-file',
         title: 'protocol',
         url: '/upload',
