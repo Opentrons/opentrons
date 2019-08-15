@@ -12,7 +12,6 @@ export type DevInternalFlag =
   | 'tempdeckControls'
   | 'enableThermocycler'
   | 'enablePipettePlus'
-  | 'enableBuildRoot'
 
 export type Config = {
   devtools: boolean,

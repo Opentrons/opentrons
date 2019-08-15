@@ -8,7 +8,6 @@ import {
   selectors as robotSelectors,
   actions as robotActions,
 } from '../../robot'
-import { getConfig } from '../../config'
 import { CONNECTABLE, REACHABLE } from '../../discovery'
 import {
   getBuildrootUpdateSeen,
@@ -17,13 +16,7 @@ import {
   compareRobotVersionToUpdate,
 } from '../../shell'
 
-import {
-  makeGetRobotHome,
-  clearHomeResponse,
-  makeGetRobotIgnoredUpdateRequest,
-  makeGetRobotRestartRequest,
-  makeGetRobotUpdateInfo,
-} from '../../http-api-client'
+import { makeGetRobotHome, clearHomeResponse } from '../../http-api-client'
 
 import { SpinnerModalPage } from '@opentrons/components'
 import { ErrorModal } from '../../components/modals'
@@ -31,7 +24,6 @@ import Page from '../../components/Page'
 import RobotSettings, {
   ConnectAlertModal,
 } from '../../components/RobotSettings'
-import UpdateRobot from '../../components/RobotSettings/UpdateRobot'
 import UpdateBuildroot from '../../components/RobotSettings/UpdateBuildroot'
 import CalibrateDeck from '../../components/CalibrateDeck'
 import ConnectBanner from '../../components/RobotSettings/ConnectBanner'
@@ -59,7 +51,6 @@ type SP = {|
   homeInProgress: ?boolean,
   homeError: ?Error,
   updateInProgress: boolean,
-  __buildRootEnabled: boolean,
 |}
 
 type DP = {| dispatch: Dispatch |}
@@ -86,7 +77,6 @@ const RESET_FRAGMENT = 'reset'
 function RobotSettingsPage(props: Props) {
   const {
     robot,
-    appUpdate,
     homeInProgress,
     homeError,
     closeHomeAlert,
@@ -126,15 +116,12 @@ function RobotSettingsPage(props: Props) {
         <Route
           path={`${path}/${UPDATE_FRAGMENT}`}
           render={routeProps => {
-            if (props.__buildRootEnabled) {
-              return (
-                <UpdateBuildroot
-                  robot={robot}
-                  close={() => routeProps.history.push(url)}
-                />
-              )
-            }
-            return <UpdateRobot robot={robot} appUpdate={appUpdate} />
+            return (
+              <UpdateBuildroot
+                robot={robot}
+                close={() => routeProps.history.push(url)}
+              />
+            )
           }}
         />
 
@@ -188,49 +175,22 @@ function RobotSettingsPage(props: Props) {
 
 function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
   const getHomeRequest = makeGetRobotHome()
-  const getUpdateIgnoredRequest = makeGetRobotIgnoredUpdateRequest()
-  const getRestartRequest = makeGetRobotRestartRequest()
-  const getRobotUpdateInfo = makeGetRobotUpdateInfo()
 
   return (state, ownProps) => {
     const { robot } = ownProps
     const connectRequest = robotSelectors.getConnectRequest(state)
     const homeRequest = getHomeRequest(state, robot)
-    const ignoredRequest = getUpdateIgnoredRequest(state, robot)
-    const restartRequest = getRestartRequest(state, robot)
-    const updateInfo = getRobotUpdateInfo(state, robot)
     const buildrootUpdateSeen = getBuildrootUpdateSeen(state)
-    const __buildRootEnabled = Boolean(
-      getConfig(state).devInternal?.enableBuildRoot
-    )
     const updateInProgress = getBuildrootUpdateInProgress(state, robot)
-    let showUpdateModal: ?boolean
+    const currentBrRobot = getBuildrootRobot(state)
 
-    if (__buildRootEnabled) {
-      const currentBrRobot = getBuildrootRobot(state)
-
-      showUpdateModal =
-        updateInProgress ||
-        (!buildrootUpdateSeen &&
-          compareRobotVersionToUpdate(robot) !== 'reinstall' &&
-          currentBrRobot === null)
-    } else {
-      showUpdateModal =
-        // only show the alert modal if there's an upgrade available
-        updateInfo.type === 'upgrade' &&
-        // and we haven't already ignored the upgrade
-        ignoredRequest.response &&
-        ignoredRequest.response.version !== updateInfo.version &&
-        // and we're not actively restarting
-        !restartRequest.inProgress &&
-        // TODO(mc, 2018-09-27): clear this state out on disconnect otherwise
-        // restartRequest.response latches this modal closed (which is fine,
-        // but only for this specific modal)
-        !restartRequest.response
-    }
+    const showUpdateModal =
+      updateInProgress ||
+      (!buildrootUpdateSeen &&
+        compareRobotVersionToUpdate(robot) !== 'reinstall' &&
+        currentBrRobot === null)
 
     return {
-      __buildRootEnabled,
       updateInProgress,
       showUpdateModal: !!showUpdateModal,
       homeInProgress: homeRequest && homeRequest.inProgress,
