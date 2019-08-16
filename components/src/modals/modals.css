@@ -72,6 +72,10 @@
   border-radius: 0;
 }
 
+.alert_modal_heading.no_icon_heading {
+  padding-left: 2rem;
+}
+
 .no_alert_header {
   padding-top: 1.5rem;
 }

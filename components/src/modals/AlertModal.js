@@ -58,7 +58,11 @@ export default function AlertModal(props: Props) {
       restrictOuterScroll={restrictOuterScroll}
     >
       {heading && (
-        <div className={styles.alert_modal_heading}>
+        <div
+          className={cx(styles.alert_modal_heading, {
+            [styles.no_icon_heading]: props.iconName === null,
+          })}
+        >
           {props.iconName !== null && (
             <Icon name={iconName} className={styles.alert_modal_icon} />
           )}
