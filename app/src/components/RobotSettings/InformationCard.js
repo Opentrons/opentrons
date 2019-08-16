@@ -9,7 +9,7 @@ import { getRobotApiVersion, getRobotFirmwareVersion } from '../../discovery'
 import {
   getBuildrootRobot,
   checkShellUpdate,
-  compareRobotVersionToUpdate,
+  getBuildrootUpdateAvailable,
 } from '../../shell'
 
 import {
@@ -39,11 +39,16 @@ const UPDATE_SERVER_UNAVAILABLE =
   "Unable to update because your robot's update server is not responding"
 const OTHER_ROBOT_UPDATING =
   'Unable to update because your app is currently updating a different robot'
+const NO_UPDATE_FILES =
+  'No robot update files found for this version of the app; please check again later'
 
 const UPDATE_RECHECK_DELAY_MS = 60000
 
 export default function InformationCard(props: Props) {
   const { robot, updateUrl } = props
+  const updateType = useSelector(state =>
+    getBuildrootUpdateAvailable(state, robot)
+  )
   const dispatch = useDispatch<Dispatch>()
   const checkAppUpdate = React.useCallback(() => dispatch(checkShellUpdate()), [
     dispatch,
@@ -55,19 +60,21 @@ export default function InformationCard(props: Props) {
   const version = getRobotApiVersion(robot)
   const firmwareVersion = getRobotFirmwareVersion(robot)
 
+  const updateFilesUnavailable = updateType === null
   const updateServerUnavailable = !serverOk
   const otherRobotUpdating = Boolean(buildrootRobot && buildrootRobot !== robot)
-  const updateDisabled = updateServerUnavailable || otherRobotUpdating
+  const updateDisabled =
+    updateFilesUnavailable || updateServerUnavailable || otherRobotUpdating
 
-  const updateButtonText = compareRobotVersionToUpdate(robot)
-
-  const updateButtonTooltip = updateDisabled ? (
-    <span>
-      {updateServerUnavailable
-        ? UPDATE_SERVER_UNAVAILABLE
-        : OTHER_ROBOT_UPDATING}
-    </span>
-  ) : null
+  const updateButtonText = updateType || 'up to date'
+  let updateButtonTooltip = null
+  if (otherRobotUpdating) {
+    updateButtonTooltip = <span>{OTHER_ROBOT_UPDATING}</span>
+  } else if (updateServerUnavailable) {
+    updateButtonTooltip = <span>{UPDATE_SERVER_UNAVAILABLE}</span>
+  } else if (updateFilesUnavailable) {
+    updateButtonTooltip = <span>{NO_UPDATE_FILES}</span>
+  }
 
   // check for available updates on an interval
   useInterval(checkAppUpdate, UPDATE_RECHECK_DELAY_MS)

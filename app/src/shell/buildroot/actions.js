@@ -2,6 +2,9 @@
 import type { RobotHost } from '../../robot-api/types'
 import type { BuildrootAction, UpdateSessionStep } from './types'
 
+export const BR_UPDATE_VERSION: 'buildroot:UPDATE_VERSION' =
+  'buildroot:UPDATE_VERSION'
+
 export const BR_UPDATE_INFO: 'buildroot:UPDATE_INFO' = 'buildroot:UPDATE_INFO'
 
 export const BR_USER_FILE_INFO: 'buildroot:USER_FILE_INFO' =
