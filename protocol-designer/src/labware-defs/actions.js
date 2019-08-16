@@ -2,6 +2,7 @@
 import assert from 'assert'
 import Ajv from 'ajv'
 import isEqual from 'lodash/isEqual'
+import flatten from 'lodash/flatten'
 import values from 'lodash/values'
 import uniqBy from 'lodash/uniqBy'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
@@ -129,10 +130,14 @@ export const createCustomLabwareDef = (
 
     const valid: boolean =
       parsedLabwareDef === null ? false : validate(parsedLabwareDef)
+    const hasWellA1 = flatten(parsedLabwareDef?.ordering || []).includes('A1')
     const loadName = parsedLabwareDef?.parameters?.loadName || ''
     const displayName = parsedLabwareDef?.metadata?.displayName || ''
 
-    if (!valid) {
+    if (!hasWellA1) {
+      console.warn('uploaded labware conforms to schema, but has no well A1!')
+    }
+    if (!valid || !hasWellA1) {
       console.debug('validation errors:', validate.errors)
       return dispatch(
         labwareUploadMessage({
