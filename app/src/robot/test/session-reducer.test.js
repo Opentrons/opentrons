@@ -30,6 +30,7 @@ describe('robot reducer - session', () => {
       pauseRequest: { inProgress: false, error: null },
       resumeRequest: { inProgress: false, error: null },
       cancelRequest: { inProgress: false, error: null },
+      remoteTimeCompensation: null,
       startTime: null,
       runTime: 0,
       apiLevel: 1,
@@ -76,6 +77,7 @@ describe('robot reducer - session', () => {
 
     expect(reducer(state, action).session).toEqual({
       sessionRequest: { inProgress: true, error: null },
+      remoteTimeCompensation: null,
       startTime: null,
       runTime: 0,
     })
@@ -129,6 +131,7 @@ describe('robot reducer - session', () => {
       session: {
         state: 'loaded',
         startTime: null,
+        remoteTimeCompensation: null,
         protocolCommands: [0, 1, 2],
         protocolCommandsById: {
           0: { id: 0, handledAt: 2 },
@@ -142,10 +145,14 @@ describe('robot reducer - session', () => {
         startTime: 1,
         lastCommand: { id: 1, handledAt: 3 },
       },
+      meta: {
+        now: 6,
+      },
     }
 
     expect(reducer(state, action).session).toEqual({
       state: 'running',
+      remoteTimeCompensation: 3,
       startTime: 1,
       protocolCommands: [0, 1, 2],
       protocolCommandsById: {

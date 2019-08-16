@@ -551,7 +551,7 @@ describe('api client', () => {
 
     test('sends SESSION_UPDATE if session notification has lastCommand', () => {
       const update = { state: 'running', startTime: 1, lastCommand: null }
-      const expected = actions.sessionUpdate(update)
+      const expected = actions.sessionUpdate(update, expect.any(Number))
 
       return sendConnect()
         .then(() => sendNotification('session', update))

@@ -173,7 +173,9 @@ describe('robot selectors', () => {
   })
 
   test('getStartTime', () => {
-    const state = makeState({ session: { startTime: 42 } })
+    const state = makeState({
+      session: { startTime: 48, remoteTimeCompensation: -6 },
+    })
     expect(getStartTime(state)).toBe(42)
   })
 

@@ -71,9 +71,13 @@ describe('robot actions', () => {
 
   test('SESSION_UPDATE action', () => {
     const update = { state: 'running', startTime: 1 }
-    const expected = { type: 'robot:SESSION_UPDATE', payload: update }
+    const expected = {
+      type: 'robot:SESSION_UPDATE',
+      payload: update,
+      meta: { now: 1234 },
+    }
 
-    expect(actions.sessionUpdate(update)).toEqual(expected)
+    expect(actions.sessionUpdate(update, 1234)).toEqual(expected)
   })
 
   test('set modules reviewed action', () => {
