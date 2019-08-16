@@ -54,6 +54,7 @@
 
 .long_button {
   width: auto;
+  max-width: none;
 }
 
 .scrollable_modal_wrapper {

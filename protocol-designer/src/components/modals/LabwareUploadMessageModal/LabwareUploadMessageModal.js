@@ -1,7 +1,12 @@
 // @flow
 import assert from 'assert'
+import cx from 'classnames'
 import * as React from 'react'
-import { AlertModal, OutlineButton } from '@opentrons/components'
+import {
+  AlertModal,
+  OutlineButton,
+  type ButtonProps,
+} from '@opentrons/components'
 import i18n from '../../../localization'
 import modalStyles from '../modal.css'
 import type { LabwareUploadMessage } from '../../../labware-defs'
@@ -110,11 +115,15 @@ const LabwareUploadMessageModal = (props: Props) => {
   const { message, dismissModal, overwriteLabwareDef } = props
   if (!message) return null
 
-  let buttons = [{ children: 'OK', onClick: dismissModal }]
+  let buttons: Array<ButtonProps> = [{ children: 'OK', onClick: dismissModal }]
   if (message.messageType === 'ASK_FOR_LABWARE_OVERWRITE') {
     buttons = [
       { children: 'CANCEL IMPORT', onClick: dismissModal },
-      { children: 'OVERWRITE LABWARE', onClick: overwriteLabwareDef },
+      {
+        children: 'OVERWRITE LABWARE',
+        onClick: overwriteLabwareDef,
+        className: modalStyles.long_button,
+      },
     ]
   }
 
@@ -131,7 +140,7 @@ const LabwareUploadMessageModal = (props: Props) => {
         <OutlineButton
           {...button}
           key={index}
-          className={modalStyles.bottom_button}
+          className={cx(modalStyles.bottom_button, button.className)}
         />
       ))}
     </AlertModal>
