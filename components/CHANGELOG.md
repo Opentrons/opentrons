@@ -3,14 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-<a name="3.11.0-alpha.1"></a>
-# [3.11.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.10.3...v3.11.0-alpha.1) (2019-08-07)
+# [3.11.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.10.3...v3.11.0-alpha.2) (2019-08-16)
 
 
 ### Features
 
-* **app:** add GEN2 images to change pipette ([#3734](https://github.com/Opentrons/opentrons/issues/3734)) ([1016c16](https://github.com/Opentrons/opentrons/commit/1016c16)), closes [#3630](https://github.com/Opentrons/opentrons/issues/3630)
+* **app:** add control of modules to run cards ([#3841](https://github.com/Opentrons/opentrons/issues/3841)) ([9b34f9f](https://github.com/Opentrons/opentrons/commit/9b34f9f))
 * **app:** display TC on Deck Map ([#3786](https://github.com/Opentrons/opentrons/issues/3786)) ([272a6ad](https://github.com/Opentrons/opentrons/commit/272a6ad)), closes [#3553](https://github.com/Opentrons/opentrons/issues/3553) [#3064](https://github.com/Opentrons/opentrons/issues/3064)
+
 
 
 

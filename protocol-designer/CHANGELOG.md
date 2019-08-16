@@ -3,20 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-<a name="3.11.0-alpha.1"></a>
-# [3.11.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.10.3...v3.11.0-alpha.1) (2019-08-07)
+# [3.11.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.10.3...v3.11.0-alpha.2) (2019-08-16)
 
 
 ### Bug Fixes
 
 * **protocol-designer:** update typeform version ([#3794](https://github.com/Opentrons/opentrons/issues/3794)) ([46c6503](https://github.com/Opentrons/opentrons/commit/46c6503))
-* **protocol-designer:** update various styles to match designs ([#3714](https://github.com/Opentrons/opentrons/issues/3714)) ([ad0562c](https://github.com/Opentrons/opentrons/commit/ad0562c)), closes [#2122](https://github.com/Opentrons/opentrons/issues/2122)
 
 
 ### Features
 
-* **app:** add GEN2 images to change pipette ([#3734](https://github.com/Opentrons/opentrons/issues/3734)) ([1016c16](https://github.com/Opentrons/opentrons/commit/1016c16)), closes [#3630](https://github.com/Opentrons/opentrons/issues/3630)
-* **protocol-designer:** update migration modal copy ([#3709](https://github.com/Opentrons/opentrons/issues/3709)) ([e3d1ffa](https://github.com/Opentrons/opentrons/commit/e3d1ffa)), closes [#3696](https://github.com/Opentrons/opentrons/issues/3696)
+* **protocol-designer:** bump typeform/embed to v0.12.1 ([#3865](https://github.com/Opentrons/opentrons/issues/3865)) ([617d5ad](https://github.com/Opentrons/opentrons/commit/617d5ad))
+* **protocol-designer:** warn user when exporting w/o steps ([#3864](https://github.com/Opentrons/opentrons/issues/3864)) ([1a129ec](https://github.com/Opentrons/opentrons/commit/1a129ec)), closes [#3060](https://github.com/Opentrons/opentrons/issues/3060)
+
 
 
 
