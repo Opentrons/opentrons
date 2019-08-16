@@ -4,8 +4,6 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { makeGetRobotUpdateInfo } from '../../http-api-client'
-import { getConfig } from '../../config'
 import { getRobotApiVersion, getRobotFirmwareVersion } from '../../discovery'
 
 import {
@@ -24,7 +22,7 @@ import {
 
 import { CardContentQuarter } from '../layout'
 
-import type { State, Dispatch } from '../../types'
+import type { Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery'
 
 type Props = {|
@@ -54,15 +52,6 @@ export default function InformationCard(props: Props) {
   const { displayName, serverOk } = robot
   const buildrootRobot = useSelector(getBuildrootRobot)
 
-  // TODO(mc, 2019-08-06): remove when we switch BR on by default
-  const __buildrootEnabled = useSelector(
-    state => getConfig(state).devInternal?.enableBuildRoot
-  )
-  const getUpdateInfo = React.useMemo(() => makeGetRobotUpdateInfo(), [])
-  const legacyUpdateInfo = useSelector<State, _>(state =>
-    getUpdateInfo(state, robot)
-  )
-
   const version = getRobotApiVersion(robot)
   const firmwareVersion = getRobotFirmwareVersion(robot)
 
@@ -70,10 +59,7 @@ export default function InformationCard(props: Props) {
   const otherRobotUpdating = Boolean(buildrootRobot && buildrootRobot !== robot)
   const updateDisabled = updateServerUnavailable || otherRobotUpdating
 
-  const updateButtonText =
-    __buildrootEnabled === true
-      ? compareRobotVersionToUpdate(robot)
-      : legacyUpdateInfo.type || 'reinstall'
+  const updateButtonText = compareRobotVersionToUpdate(robot)
 
   const updateButtonTooltip = updateDisabled ? (
     <span>

@@ -8,7 +8,6 @@ import { filter, tap, ignoreElements } from 'rxjs/operators'
 import createLogger from '../logger'
 import remote from './remote'
 import { updateReducer } from './update'
-import { apiUpdateReducer } from './api-update'
 import { buildrootReducer, buildrootUpdateEpic } from './buildroot'
 
 import type { Reducer } from 'redux'
@@ -30,7 +29,6 @@ const { ipcRenderer } = remote
 const log = createLogger(__filename)
 
 export * from './update'
-export * from './api-update'
 export * from './buildroot'
 export * from './types'
 
@@ -48,7 +46,6 @@ export const shellReducer: Reducer<ShellState, Action> = combineReducers<
   Action
 >({
   update: updateReducer,
-  apiUpdate: apiUpdateReducer,
   buildroot: buildrootReducer,
 })
 

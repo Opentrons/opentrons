@@ -4,7 +4,7 @@ from opentrons.config.advanced_settings import _migrate
 def test_migrates_empty_object():
     settings, version = _migrate({})
 
-    assert(version == 1)
+    assert(version == 2)
     assert(settings == {
       'shortFixedTrash': None,
       'calibrateToBottom': None,
@@ -12,6 +12,7 @@ def test_migrates_empty_object():
       'disableHomeOnBoot': None,
       'useProtocolApi2': None,
       'useOldAspirationFunctions': None,
+      'disableLogAggregation': None
     })
 
 
@@ -25,7 +26,7 @@ def test_migrates_versionless_new_config():
       'useOldAspirationFunctions': True,
     })
 
-    assert(version == 1)
+    assert(version == 2)
     assert(settings == {
       'shortFixedTrash': True,
       'calibrateToBottom': True,
@@ -33,6 +34,7 @@ def test_migrates_versionless_new_config():
       'disableHomeOnBoot': True,
       'useProtocolApi2': None,
       'useOldAspirationFunctions': True,
+      'disableLogAggregation': None,
     })
 
 
@@ -44,7 +46,7 @@ def test_migrates_versionless_old_config():
       'disable-home-on-boot': False,
     })
 
-    assert(version == 1)
+    assert(version == 2)
     assert(settings == {
       'shortFixedTrash': None,
       'calibrateToBottom': None,
@@ -52,6 +54,7 @@ def test_migrates_versionless_old_config():
       'disableHomeOnBoot': None,
       'useProtocolApi2': None,
       'useOldAspirationFunctions': None,
+      'disableLogAggregation': None
     })
 
 
@@ -61,7 +64,7 @@ def test_ignores_invalid_keys():
       'splitLabwareDefinitions': True
     })
 
-    assert(version == 1)
+    assert(version == 2)
     assert(settings == {
       'shortFixedTrash': None,
       'calibrateToBottom': None,
@@ -69,4 +72,27 @@ def test_ignores_invalid_keys():
       'disableHomeOnBoot': None,
       'useProtocolApi2': None,
       'useOldAspirationFunctions': None,
+      'disableLogAggregation': None,
     })
+
+
+def test_migrates_v1_config():
+    settings, version = _migrate({
+      '_version': 1,
+      'shortFixedTrash': True,
+      'calibrateToBottom': True,
+      'deckCalibrationDots': False,
+      'disableHomeOnBoot': True,
+      'useProtocolApi2': False,
+      'useOldAspirationFunctions': True,
+    })
+    assert version == 2
+    assert settings == {
+        'shortFixedTrash': True,
+        'calibrateToBottom': True,
+        'deckCalibrationDots': False,
+        'disableHomeOnBoot': True,
+        'useProtocolApi2': False,
+        'useOldAspirationFunctions': True,
+        'disableLogAggregation': None
+    }
