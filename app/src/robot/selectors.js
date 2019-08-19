@@ -345,7 +345,6 @@ export const getLabware: OutputSelector<
       .filter(isSlot)
       .map<Labware>((slot: Slot) => {
         const labware = lwBySlot[slot]
-        console.log({ labware, lwBySlot, slot })
         const { type, isTiprack, isLegacy } = labware
 
         let definition = null
