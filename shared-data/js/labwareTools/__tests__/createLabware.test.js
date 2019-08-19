@@ -26,6 +26,7 @@ const exampleLabware2 = {
 describe('createLabware', () => {
   let labware1
   let labware2
+  let labware2Args
   let well1
   let well2
   let offset1
@@ -49,7 +50,7 @@ describe('createLabware', () => {
       namespace: 'fixture',
     })
 
-    labware2 = createRegularLabware({
+    labware2Args = {
       metadata: exampleLabware2.metadata,
       parameters: exampleLabware2.parameters,
       dimensions: exampleLabware2.dimensions,
@@ -58,7 +59,8 @@ describe('createLabware', () => {
       spacing: { row: 10, column: 10 },
       well: well2,
       namespace: 'fixture',
-    })
+    }
+    labware2 = createRegularLabware(labware2Args)
   })
 
   afterEach(() => {
@@ -109,5 +111,16 @@ describe('createLabware', () => {
         expect(well.z).toBeCloseTo(offset2.z - well.depth, 2)
       })
     })
+  })
+
+  test('failing to validate against labware schema throws w/o "strict"', () => {
+    const args = {
+      ...labware2Args,
+      // this spacing should make negative well `y` value and fail schema validation
+      spacing: { row: 999, column: 999 },
+    }
+
+    expect(() => createRegularLabware(args)).toThrowErrorMatchingSnapshot()
+    expect(() => createRegularLabware({ ...args, strict: false })).not.toThrow()
   })
 })

@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`createLabware failing to validate against labware schema throws w/o "strict" 1`] = `"Generated labware failed to validate, please check your inputs"`;
