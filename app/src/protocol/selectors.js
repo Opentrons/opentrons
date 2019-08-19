@@ -6,6 +6,8 @@ import { getter } from '@thi.ng/paths'
 import { getProtocolSchemaVersion } from '@opentrons/shared-data'
 import { fileIsJson, fileToType } from './protocol-data'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { ProtocolFile as SchemaV3ProtocolFile } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { OutputSelector } from 'reselect'
 import type { State } from '../types'
 import type { ProtocolData, ProtocolType } from './types'
@@ -71,6 +73,35 @@ export const getProtocolFilename: StringSelector = createSelector(
 //   getProtocolFile,
 //   file => file && file.lastModified
 // )
+
+export const getLabwareDefBySlotForJSONProtocol: OutputSelector<
+  State,
+  void,
+  { [slot: string]: LabwareDefinition2 }
+> = createSelector(
+  getProtocolData,
+  (_data: any) => {
+    if (_data?.schemaVersion === 3) {
+      // TODO: Ian 2019-08-15 flow cannot infer ProtocolData enum by schemaVersion === 3
+      const data: SchemaV3ProtocolFile<{}> = _data
+      return Object.keys(data.labware).reduce((acc, labwareId) => {
+        const labware = data.labware[labwareId]
+        const slot = labware.slot
+        if (slot in acc) {
+          console.warn(
+            `expected 1 labware per slot, slot ${slot} contains multiple labware`
+          )
+        }
+        const labwareDef = data.labwareDefinitions[labware.definitionId]
+        return {
+          ...acc,
+          [slot]: labwareDef,
+        }
+      }, {})
+    }
+    return {}
+  }
+)
 
 export const getProtocolDisplayData: $Shape<ProtocolInfoSelector> = createSelector(
   getProtocolData,
