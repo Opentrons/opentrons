@@ -2,7 +2,7 @@
 
 This update migrates the Opentrons Robot OS to a new underlying technology - buildroot. This change allows us to better control the robot's system and provide better updates without requiring internet connectivity.
 
-Updating your robot to 3.11.0 will take 5-10 minutes, and your Opentrons App must stay connected to the robot the entire time.
+Updating your robot to 3.11.0 will take 3-5 minutes, and your Opentrons App must stay connected to the robot the entire time.
 
 For more details about this release, please see the full [technical change log][changelog]
 
