@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.11.0-alpha.3](https://github.com/opentrons/opentrons/compare/v3.11.0-alpha.2...v3.11.0-alpha.3) (2019-08-19)
+
+
+### Bug Fixes
+
+* **shared-data:** fix "strict" arg for labware creation ([#3874](https://github.com/opentrons/opentrons/issues/3874)) ([bd604e2](https://github.com/opentrons/opentrons/commit/bd604e2))
+
+
+### Features
+
+* **app:** Add robot logging opt-out alert ([#3869](https://github.com/opentrons/opentrons/issues/3869)) ([9ab6938](https://github.com/opentrons/opentrons/commit/9ab6938))
+
+
+
+
+
 # [3.11.0-alpha.2](https://github.com/opentrons/opentrons/compare/v3.10.3...v3.11.0-alpha.2) (2019-08-16)
 
 
