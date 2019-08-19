@@ -6,10 +6,11 @@ import { createSelector } from 'reselect'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { getLatestLabwareDef } from '../getLabware'
-import { getLabwareDefBySlotForJSONProtocol } from '../protocol'
 import { PIPETTE_MOUNTS, DECK_SLOTS } from './constants'
 
 import type { OutputSelector } from 'reselect'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { ProtocolFile as SchemaV3ProtocolFile } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { State } from '../types'
 import type { ConnectionStatus } from './constants'
 import type {
@@ -321,6 +322,40 @@ export const getModules: OutputSelector<
 export function getLabwareBySlot(state: State) {
   return session(state).labwareBySlot
 }
+
+// TODO: Ian 2019-08-19 to avoid a circular dependency bug which drops APP_SHELL_REMOTE, this selector
+// is duplicated from protocol/selectors.js :(
+const _getProtocolDataDUPLICATE = (state: State) => state.protocol?.data
+
+// TODO: Ian 2019-08-19 if circular dependency bug is resolved, move to protocol/selectors.js
+export const getLabwareDefBySlotForJSONProtocol: OutputSelector<
+  State,
+  void,
+  { [slot: string]: LabwareDefinition2 }
+> = createSelector(
+  _getProtocolDataDUPLICATE,
+  (_data: any) => {
+    if (_data?.schemaVersion === 3) {
+      // TODO: Ian 2019-08-15 flow cannot infer ProtocolData enum by schemaVersion === 3
+      const data: SchemaV3ProtocolFile<{}> = _data
+      return Object.keys(data.labware).reduce((acc, labwareId) => {
+        const labware = data.labware[labwareId]
+        const slot = labware.slot
+        if (slot in acc) {
+          console.warn(
+            `expected 1 labware per slot, slot ${slot} contains multiple labware`
+          )
+        }
+        const labwareDef = data.labwareDefinitions[labware.definitionId]
+        return {
+          ...acc,
+          [slot]: labwareDef,
+        }
+      }, {})
+    }
+    return {}
+  }
+)
 
 export const getLabware: OutputSelector<
   State,
