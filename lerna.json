@@ -7,7 +7,8 @@
       "includeMergedTags": true,
       "gitTagVersion": false,
       "push": false,
-      "preid": "alpha"
+      "preid": "alpha",
+      "forcePublish": "*"
     }
   },
   "npmClient": "yarn",
