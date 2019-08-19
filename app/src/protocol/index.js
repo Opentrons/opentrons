@@ -13,6 +13,8 @@ import {
   filenameToMimeType,
 } from './protocol-data'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { ProtocolFile as SchemaV3ProtocolFile } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { OutputSelector } from 'reselect'
 import type { State, Action, ThunkAction } from '../types'
 import type {
@@ -145,7 +147,8 @@ const stripDirAndExtension = f => path.basename(f, path.extname(f))
 
 export const getProtocolFile = (state: State) => state.protocol.file
 export const getProtocolContents = (state: State) => state.protocol.contents
-export const getProtocolData = (state: State) => state.protocol.data
+// NOTE: Ian 2019-08-15 protocol?.data safe get isn't necessary, but useful in unit tests with partial State
+export const getProtocolData = (state: State) => state.protocol?.data
 
 export const getProtocolFilename: StringSelector = createSelector(
   getProtocolFile,
@@ -190,6 +193,35 @@ export const getProtocolDisplayData: $Shape<ProtocolInfoSelector> = createSelect
       appName: appName,
       appVersion: appVersion,
     }
+  }
+)
+
+export const getLabwareDefBySlotForJSONProtocol: OutputSelector<
+  State,
+  void,
+  { [slot: string]: LabwareDefinition2 }
+> = createSelector(
+  getProtocolData,
+  (_data: any) => {
+    if (_data?.schemaVersion === 3) {
+      // TODO: Ian 2019-08-15 flow cannot infer ProtocolData enum by schemaVersion === 3
+      const data: SchemaV3ProtocolFile<{}> = _data
+      return Object.keys(data.labware).reduce((acc, labwareId) => {
+        const labware = data.labware[labwareId]
+        const slot = labware.slot
+        if (slot in acc) {
+          console.warn(
+            `expected 1 labware per slot, slot ${slot} contains multiple labware`
+          )
+        }
+        const labwareDef = data.labwareDefinitions[labware.definitionId]
+        return {
+          ...acc,
+          [slot]: labwareDef,
+        }
+      }, {})
+    }
+    return {}
   }
 )
 

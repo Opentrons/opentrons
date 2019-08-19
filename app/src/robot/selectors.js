@@ -6,6 +6,7 @@ import { createSelector } from 'reselect'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { getLatestLabwareDef } from '../getLabware'
+import { getLabwareDefBySlotForJSONProtocol } from '../protocol'
 import { PIPETTE_MOUNTS, DECK_SLOTS } from './constants'
 
 import type { OutputSelector } from 'reselect'
@@ -331,20 +332,27 @@ export const getLabware: OutputSelector<
   (state: State) => calibration(state).confirmedBySlot,
   getModulesBySlot,
   getCalibrationRequest,
+  getLabwareDefBySlotForJSONProtocol,
   (
     instByMount,
     lwBySlot,
     confirmedBySlot,
     modulesBySlot,
-    calibrationRequest
+    calibrationRequest,
+    labwareDefsBySlotForJSONProtocol
   ): Labware[] => {
     return Object.keys(lwBySlot)
       .filter(isSlot)
       .map<Labware>((slot: Slot) => {
         const labware = lwBySlot[slot]
+        console.log({ labware, lwBySlot, slot })
         const { type, isTiprack, isLegacy } = labware
 
-        const definition = isLegacy ? null : getLatestLabwareDef(type)
+        let definition = null
+        if (!isLegacy) {
+          definition =
+            labwareDefsBySlotForJSONProtocol[slot] || getLatestLabwareDef(type)
+        }
 
         // labware is confirmed if:
         //   - tiprack: labware in slot is confirmed
