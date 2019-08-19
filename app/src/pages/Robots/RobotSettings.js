@@ -13,7 +13,7 @@ import {
   getBuildrootUpdateSeen,
   getBuildrootRobot,
   getBuildrootUpdateInProgress,
-  compareRobotVersionToUpdate,
+  getBuildrootUpdateAvailable,
 } from '../../shell'
 
 import { makeGetRobotHome, clearHomeResponse } from '../../http-api-client'
@@ -181,13 +181,14 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
     const connectRequest = robotSelectors.getConnectRequest(state)
     const homeRequest = getHomeRequest(state, robot)
     const buildrootUpdateSeen = getBuildrootUpdateSeen(state)
+    const buildrootUpdateType = getBuildrootUpdateAvailable(state, robot)
     const updateInProgress = getBuildrootUpdateInProgress(state, robot)
     const currentBrRobot = getBuildrootRobot(state)
 
     const showUpdateModal =
       updateInProgress ||
       (!buildrootUpdateSeen &&
-        compareRobotVersionToUpdate(robot) !== 'reinstall' &&
+        buildrootUpdateType === 'upgrade' &&
         currentBrRobot === null)
 
     return {

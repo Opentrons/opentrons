@@ -12,7 +12,7 @@ import {
   getBuildrootSession,
   clearBuildrootSession,
   getRobotSystemType,
-  compareRobotVersionToUpdate,
+  getBuildrootUpdateAvailable,
 } from '../../../shell'
 
 import type { Dispatch } from '../../../types'
@@ -28,6 +28,9 @@ export default function UpdateBuildroot(props: Props) {
   const robotName = robot.name
   const [viewUpdateInfo, setViewUpdateInfo] = React.useState(false)
   const session = useSelector(getBuildrootSession)
+  const robotUpdateType = useSelector(state =>
+    getBuildrootUpdateAvailable(state, robot)
+  )
   const dispatch = useDispatch<Dispatch>()
   const { step, error } = session || { step: null, error: null }
 
@@ -58,7 +61,6 @@ export default function UpdateBuildroot(props: Props) {
   )
 
   const robotSystemType = getRobotSystemType(robot)
-  const robotUpdateType = compareRobotVersionToUpdate(robot)
 
   if (session) {
     return (

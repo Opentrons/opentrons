@@ -18,7 +18,7 @@ import type { ViewableRobot } from '../../../discovery'
 
 type Props = {|
   robot: ViewableRobot,
-  robotUpdateType: BuildrootUpdateType,
+  robotUpdateType: BuildrootUpdateType | null,
   close: () => mixed,
   proceed: () => mixed,
 |}
@@ -46,7 +46,7 @@ export default function VersionInfoModal(props: Props) {
   let secondaryMessage = null
 
   if (appUpdate.available) {
-    heading = `Robot Version ${versionProps.availableUpdate} Available`
+    heading = `App Version ${versionProps.availableUpdate} Available`
     message = <UpdateAppMessage {...versionProps} />
     secondaryMessage = <SkipAppUpdateMessage onClick={proceed} />
     primaryButton = {

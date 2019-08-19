@@ -8,7 +8,7 @@ import { selectors as robotSelectors } from '../../robot'
 
 import {
   getAvailableShellUpdate,
-  compareRobotVersionToUpdate,
+  getBuildrootUpdateAvailable,
 } from '../../shell'
 import { getConnectedRobot } from '../../discovery'
 import { NavButton } from '@opentrons/components'
@@ -32,10 +32,9 @@ function mapStateToProps(state: State, ownProps: OP): $Exact<Props> {
   const isProtocolRunning = robotSelectors.getIsRunning(state)
   const isProtocolDone = robotSelectors.getIsDone(state)
   const connectedRobot = getConnectedRobot(state)
-  const robotNotification = Boolean(
-    connectedRobot &&
-      compareRobotVersionToUpdate(connectedRobot) !== 'reinstall'
-  )
+  const robotNotification =
+    connectedRobot != null &&
+    getBuildrootUpdateAvailable(state, connectedRobot) === 'upgrade'
   const moreNotification = getAvailableShellUpdate(state) != null
 
   switch (name) {
