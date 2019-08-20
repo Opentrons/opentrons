@@ -24,7 +24,7 @@ import type {
 import type { ViewableRobot } from '../discovery'
 import type { ShellState } from './types'
 
-const { ipcRenderer } = remote
+const { ipcRenderer, CURRENT_VERSION, CURRENT_RELEASE_NOTES } = remote
 
 const log = createLogger(__filename)
 
@@ -32,14 +32,7 @@ export * from './update'
 export * from './buildroot'
 export * from './types'
 
-const CURRENT_VERSION: string = remote.CURRENT_VERSION
-const CURRENT_RELEASE_NOTES: string = remote.CURRENT_RELEASE_NOTES
-const API_RELEASE_NOTES = CURRENT_RELEASE_NOTES.replace(
-  /<!-- start:@opentrons\/app -->([\S\s]*?)<!-- end:@opentrons\/app -->/,
-  ''
-)
-
-export { CURRENT_VERSION, CURRENT_RELEASE_NOTES, API_RELEASE_NOTES }
+export { CURRENT_VERSION, CURRENT_RELEASE_NOTES }
 
 export const shellReducer: Reducer<ShellState, Action> = combineReducers<
   _,
