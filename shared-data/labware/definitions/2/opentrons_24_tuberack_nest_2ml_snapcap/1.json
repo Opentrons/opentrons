@@ -15,246 +15,246 @@
     ]
   },
   "metadata": {
-    "displayName": "Opentrons 24 Well Aluminum Block with NEST 2 mL Screwcap",
-    "displayCategory": "aluminumBlock",
+    "displayName": "Opentrons 24 Tube Rack with NEST 2 mL Snapcap",
+    "displayCategory": "tubeRack",
     "displayVolumeUnits": "mL",
     "tags": []
   },
   "dimensions": {
     "xDimension": 127.75,
     "yDimension": 85.5,
-    "zDimension": 49.5
+    "zDimension": 79.45
   },
   "wells": {
     "A1": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 20.75,
-      "y": 68.62,
-      "z": 5.45
+      "x": 18.21,
+      "y": 75.42,
+      "z": 40.17
     },
     "B1": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 20.75,
-      "y": 51.37,
-      "z": 5.45
+      "x": 18.21,
+      "y": 55.53,
+      "z": 40.17
     },
     "C1": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 20.75,
-      "y": 34.12,
-      "z": 5.45
+      "x": 18.21,
+      "y": 35.64,
+      "z": 40.17
     },
     "D1": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 20.75,
-      "y": 16.87,
-      "z": 5.45
+      "x": 18.21,
+      "y": 15.75,
+      "z": 40.17
     },
     "A2": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 38,
-      "y": 68.62,
-      "z": 5.45
+      "x": 37.49,
+      "y": 75.42,
+      "z": 40.17
     },
     "B2": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 38,
-      "y": 51.37,
-      "z": 5.45
+      "x": 37.49,
+      "y": 55.53,
+      "z": 40.17
     },
     "C2": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 38,
-      "y": 34.12,
-      "z": 5.45
+      "x": 37.49,
+      "y": 35.64,
+      "z": 40.17
     },
     "D2": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 38,
-      "y": 16.87,
-      "z": 5.45
+      "x": 37.49,
+      "y": 15.75,
+      "z": 40.17
     },
     "A3": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 55.25,
-      "y": 68.62,
-      "z": 5.45
+      "x": 56.77,
+      "y": 75.42,
+      "z": 40.17
     },
     "B3": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 55.25,
-      "y": 51.37,
-      "z": 5.45
+      "x": 56.77,
+      "y": 55.53,
+      "z": 40.17
     },
     "C3": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 55.25,
-      "y": 34.12,
-      "z": 5.45
+      "x": 56.77,
+      "y": 35.64,
+      "z": 40.17
     },
     "D3": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 55.25,
-      "y": 16.87,
-      "z": 5.45
+      "x": 56.77,
+      "y": 15.75,
+      "z": 40.17
     },
     "A4": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 72.5,
-      "y": 68.62,
-      "z": 5.45
+      "x": 76.05,
+      "y": 75.42,
+      "z": 40.17
     },
     "B4": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 72.5,
-      "y": 51.37,
-      "z": 5.45
+      "x": 76.05,
+      "y": 55.53,
+      "z": 40.17
     },
     "C4": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 72.5,
-      "y": 34.12,
-      "z": 5.45
+      "x": 76.05,
+      "y": 35.64,
+      "z": 40.17
     },
     "D4": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 72.5,
-      "y": 16.87,
-      "z": 5.45
+      "x": 76.05,
+      "y": 15.75,
+      "z": 40.17
     },
     "A5": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 89.75,
-      "y": 68.62,
-      "z": 5.45
+      "x": 95.33,
+      "y": 75.42,
+      "z": 40.17
     },
     "B5": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 89.75,
-      "y": 51.37,
-      "z": 5.45
+      "x": 95.33,
+      "y": 55.53,
+      "z": 40.17
     },
     "C5": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 89.75,
-      "y": 34.12,
-      "z": 5.45
+      "x": 95.33,
+      "y": 35.64,
+      "z": 40.17
     },
     "D5": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 89.75,
-      "y": 16.87,
-      "z": 5.45
+      "x": 95.33,
+      "y": 15.75,
+      "z": 40.17
     },
     "A6": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 107,
-      "y": 68.62,
-      "z": 5.45
+      "x": 114.61,
+      "y": 75.42,
+      "z": 40.17
     },
     "B6": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 107,
-      "y": 51.37,
-      "z": 5.45
+      "x": 114.61,
+      "y": 55.53,
+      "z": 40.17
     },
     "C6": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 107,
-      "y": 34.12,
-      "z": 5.45
+      "x": 114.61,
+      "y": 35.64,
+      "z": 40.17
     },
     "D6": {
-      "depth": 44.05,
+      "depth": 39.28,
       "shape": "circular",
-      "diameter": 8.69,
+      "diameter": 10.18,
       "totalLiquidVolume": 2000,
-      "x": 107,
-      "y": 16.87,
-      "z": 5.45
+      "x": 114.61,
+      "y": 15.75,
+      "z": 40.17
     }
   },
   "groups": [
     {
       "metadata": {
-        "displayName": "NEST 24x2 mL Screwcap",
+        "displayName": "NEST 24x2 mL Snapcap",
         "displayCategory": "tubeRack",
-        "wellBottomShape": "v"
+        "wellBottomShape": "u"
       },
       "brand": {
         "brand": "NEST",
-        "brandId": ["635001"],
+        "brandId": ["620611", "620011"],
         "links": [
-          "http://www.cell-nest.com/page94?_l=en&product_id=227&product_category=84"
+          "http://www.cell-nest.com/page94?_l=en&product_id=108&product_category=84"
         ]
       },
       "wells": [
@@ -289,7 +289,7 @@
     "format": "irregular",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_24_aluminumblock_nest_2ml_screwcap"
+    "loadName": "opentrons_24_tuberack_nest_2ml_snapcap"
   },
   "namespace": "opentrons",
   "version": 1,
