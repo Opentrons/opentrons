@@ -4,10 +4,12 @@ import { setIn } from '@thi.ng/paths'
 import remove from 'lodash/remove'
 
 import remote from '../shell/remote'
+import { getConfig } from './selectors'
 
-import type { State, Action, ThunkAction } from '../types'
+import type { Action, ThunkAction } from '../types'
 import type { Config, UpdateConfigAction, DevInternalFlag } from './types'
 
+export * from './selectors'
 export * from './types'
 
 export const DEV_INTERNAL_FLAGS: Array<DevInternalFlag> = [
@@ -37,10 +39,6 @@ export function configReducer(state: ?Config, action: Action): Config {
   }
 
   return state
-}
-
-export function getConfig(state: State): Config {
-  return state.config
 }
 
 export function toggleDevTools(): ThunkAction {
