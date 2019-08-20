@@ -1,19 +1,18 @@
+import asyncio
 import atexit
 import logging
 import optparse
 import os
-import re
-import socket
 import subprocess
 
 from opentrons import robot
 from opentrons.config import infer_config_base_dir
 from opentrons.drivers.rpi_drivers import gpio
 from opentrons.drivers import serial_communication
+from opentrons.system import nmcli
 
 log = logging.getLogger(__name__)
 
-IP_ADDRESS_SEARCH = re.compile(r'^(\d+\.\d+){3}')
 RESULT_SPACE = '\t- {}'
 FAIL = 'FAIL\t*** !!! ***'
 PASS = 'PASS'
@@ -46,11 +45,11 @@ def _find_storage_device():
 
 
 def _this_wifi_ip_address():
-    gw = os.popen('ip -f inet addr show eth0').read().split()
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    list_ips = [ip for ip in gw if IP_ADDRESS_SEARCH.match(ip)]
-    s.connect((list_ips[0], 0))
-    return s.getsockname()[0]
+    loop = asyncio.get_event_loop()
+    wifi_info = loop.run_until_complete(
+        nmcli.iface_info(nmcli.NETWORK_IFACES.WIFI))
+    assert wifi_info['ipAddress'], 'Not connected to wifi'
+    return wifi_info['ipAddress'].split('/')[0]
 
 
 def _erase_data(filepath):
