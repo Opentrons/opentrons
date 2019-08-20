@@ -19,7 +19,7 @@ PASS = 'PASS'
 
 USB_MOUNT_FILEPATH = '/mnt/usbdrive'
 DATA_FOLDER = str(infer_config_base_dir())
-VIDEO_FILEPATH = os.path.join(DATA_FOLDER, 'cam_test.mp4')
+VIDEO_FILEPATH = os.path.join(DATA_FOLDER, 'cam_test.jpg')
 AUDIO_FILE_PATH = '/etc/audio/speaker-test.mp3'
 
 
@@ -229,7 +229,7 @@ def test_speaker():
 def record_camera(filepath):
     print('USB Camera')
     # record 1 second of video from the USB camera
-    c = 'ffmpeg -video_size 320x240 -i /dev/video0 -t 00:00:01 {} -loglevel quiet'  # NOQA
+    c = 'ffmpeg -f video4linux2 -s 640x480 -i /dev/video0 -ss 0:0:1 -frames 1 {}'  # NOQA
     try:
         run_quiet_process(c.format(filepath))
         print(RESULT_SPACE.format(PASS))
