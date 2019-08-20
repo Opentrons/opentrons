@@ -174,7 +174,9 @@ export const getRunProgress = createSelector(
 export function getStartTime(state: State): number | null {
   const { startTime, remoteTimeCompensation } = session(state)
 
-  return startTime != null ? startTime + (remoteTimeCompensation || 0) : null
+  return startTime != null && remoteTimeCompensation !== null
+    ? startTime + remoteTimeCompensation
+    : null
 }
 
 // $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
