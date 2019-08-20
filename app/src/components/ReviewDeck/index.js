@@ -77,7 +77,6 @@ function ReviewDeck(props: Props) {
             <PrimaryButton
               className={styles.open_lid_button}
               onClick={() => {
-                setMustPrepNestedLabware(false)
                 continueToCalibrate()
               }}
             >

@@ -38,14 +38,15 @@ function InfoBoxButton(props: Props) {
     useSelector(robotSelectors.getCalibratorMount)
 
   if (buttonTargetIsNext || !targetConfirmed) {
-    const type = robotSelectors.labwareType(buttonTarget),
+    const type = robotSelectors.labwareType(buttonTarget)
     return (
       <PrimaryButton
         className={styles.info_box_button}
         onClick={() => {
           dispatch(robotActions.moveTo(mountToUse, buttonTarget.slot))
           dispatch(push(`/calibrate/labware/${buttonTarget.slot}`))
-        }} >
+        }}
+      >
         {buttonTargetIsNext ? `Move to next ${type}` : `Move to ${type}`}
       </PrimaryButton>
     )

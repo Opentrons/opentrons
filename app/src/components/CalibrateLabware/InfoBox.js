@@ -7,7 +7,13 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { Icon } from '@opentrons/components'
 import styles from './styles.css'
 
-import type { Labware, LabwareType } from '../../robot'
+import {
+  selectors as robotSelectors,
+  actions as robotActions,
+  type Labware,
+  type LabwareType,
+} from '../../robot'
+import InfoBoxButton from './InfoBoxButton'
 
 type Props = {| labware: ?Labware |}
 

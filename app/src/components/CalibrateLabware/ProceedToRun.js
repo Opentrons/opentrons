@@ -1,13 +1,15 @@
 // @flow
 // info panel for labware calibration page
-import * as React from 'react'
+import React, { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { push } from 'connected-react-router'
 import { PrimaryButton } from '@opentrons/components'
+import some from 'lodash/some'
 
 import { selectors as robotSelectors } from '../../robot'
 import type { Dispatch } from '../../types'
 import styles from './styles.css'
+import pcrSealSrc from '../../img/place_pcr_seal.png'
 
 type Props = {|
   returnTip: () => mixed,
@@ -23,31 +25,25 @@ function InfoBoxButton(props: Props) {
   )
 
   const handleClick = () => {
-      // $FlowFixMe: robotActions.returnTip is not typed
-      returnTip()
-      dispatch(push(`/run`))
-    }
+    // $FlowFixMe: robotActions.returnTip is not typed
+    returnTip()
+    dispatch(push(`/run`))
   }
 
   return (
     <>
-      <PrimaryButton
-        className={styles.info_box_button}
-        onClick={handleClick}
-      >
+      <PrimaryButton className={styles.info_box_button} onClick={handleClick}>
         return tip and proceed to run
       </PrimaryButton>
       {mustPrepForRun && (
         <Portal>
-          <AlertModal
-            iconName={null}
-            heading="Place PCR seal on Thermocycler"
-          >
-            <span className={styles.secure_latch_instructions}>
+          <AlertModal iconName={null} heading="Place PCR seal on Thermocycler">
+            <span className={styles.place_seal_instructions}>
               Place rubber PCR seal on lid of Thermocycler Module
             </span>
             <p className={styles.secure_latch_explanation}>
-              Doing this prior to the run enables a tight seal to reduce evaporation.
+              Doing this prior to the run enables a tight seal to reduce
+              evaporation.
             </p>
             <div className={styles.modal_image_wrapper}>
               <img
@@ -58,7 +54,9 @@ function InfoBoxButton(props: Props) {
             </div>
             <PrimaryButton
               className={styles.open_lid_button}
-              onClick={() => {setMustPrepForRun(false)}}
+              onClick={() => {
+                setMustPrepForRun(false)
+              }}
             >
               Confirm PCR Seal is in place
             </PrimaryButton>
