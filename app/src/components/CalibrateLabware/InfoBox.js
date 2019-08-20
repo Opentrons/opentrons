@@ -9,7 +9,6 @@ import styles from './styles.css'
 
 import {
   selectors as robotSelectors,
-  actions as robotActions,
   type Labware,
   type LabwareType,
 } from '../../robot'

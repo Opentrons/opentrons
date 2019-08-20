@@ -13,7 +13,7 @@ import { PrimaryButton } from '@opentrons/components'
 import styles from './styles.css'
 
 import type { Mount, Labware } from '../../robot'
-import type { State, Dispatch, ThunkAction } from '../../types'
+import type { Dispatch } from '../../types'
 
 import ProceedToRun from './ProceedToRun'
 
@@ -23,18 +23,17 @@ function InfoBoxButton(props: Props) {
   const { labware } = props
   const dispatch = useDispatch<Dispatch>()
 
-  const nextLabware =
-    !labware || labware.calibration === 'confirmed'
-      ? useSelector(robotSelectors.getNextLabware)
-      : null
-  const buttonTarget = nextLabware || labware
+  const nextLabware = useSelector(robotSelectors.getNextLabware)
+  const robotCalibratorMount = useSelector(robotSelectors.getCalibratorMount)
+  const nextLabwareTarget =
+    !labware || labware.calibration === 'confirmed' ? nextLabware : null
+  const buttonTarget = nextLabwareTarget || labware
 
   const buttonTargetIsNext =
-    buttonTarget != null && buttonTarget === nextLabware
+    buttonTarget != null && buttonTarget === nextLabwareTarget
   const targetConfirmed = buttonTarget && buttonTarget.confirmed
   const mountToUse: ?Mount =
-    (buttonTarget && buttonTarget.calibratorMount) ||
-    useSelector(robotSelectors.getCalibratorMount)
+    (buttonTarget && buttonTarget.calibratorMount) || robotCalibratorMount
 
   if (!buttonTarget || (labware && labware.isMoving) || !mountToUse) return null
 

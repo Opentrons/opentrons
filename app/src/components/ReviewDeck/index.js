@@ -27,10 +27,12 @@ function ReviewDeck(props: Props) {
   const calibratorMount = useSelector(robotSelectors.getCalibratorMount)
   const sessionModules = useSelector(robotSelectors.getModules)
 
-  const [mustPrepNestedLabware, setMustPrepNestedLabware] = useState(
-    some(sessionModules, mod => mod.name === 'thermocycler')
-  )
   const [isPrepNestedLabwareOpen, setIsPrepNestedLabwareOpen] = useState(false)
+
+  const mustPrepNestedLabware = some(
+    sessionModules,
+    mod => mod.name === 'thermocycler'
+  )
 
   const currentLabware = allLabware.find(lw => lw.slot === slot)
 
