@@ -13,7 +13,7 @@ import { PrimaryButton } from '@opentrons/components'
 import styles from './styles.css'
 
 import type { Mount, Labware } from '../../robot'
-import type { State, Dispatch } from '../../types'
+import type { State, Dispatch, ThunkAction } from '../../types'
 
 import ProceedToRun from './ProceedToRun'
 
@@ -28,14 +28,15 @@ function InfoBoxButton(props: Props) {
       ? useSelector(robotSelectors.getNextLabware)
       : null
   const buttonTarget = nextLabware || labware
-  if (!buttonTarget || labware.isMoving) return null
 
   const buttonTargetIsNext =
     buttonTarget != null && buttonTarget === nextLabware
   const targetConfirmed = buttonTarget && buttonTarget.confirmed
-  const mountToUse: Mount =
-    buttonTarget.calibratorMount ||
+  const mountToUse: ?Mount =
+    (buttonTarget && buttonTarget.calibratorMount) ||
     useSelector(robotSelectors.getCalibratorMount)
+
+  if (!buttonTarget || (labware && labware.isMoving) || !mountToUse) return null
 
   if (buttonTargetIsNext || !targetConfirmed) {
     const type = robotSelectors.labwareType(buttonTarget)
@@ -54,6 +55,7 @@ function InfoBoxButton(props: Props) {
     return (
       <ProceedToRun
         returnTip={() => {
+          // $FlowFixMe(BC, 2019-08-20): tagForRobotApi typing
           dispatch(robotActions.returnTip(mountToUse))
         }}
       />
