@@ -1,5 +1,7 @@
 # Opentrons Platform
 
+This is a dummy change to test branch protections.
+
 [![Travis CI][travis-badge]][travis]
 [![AppVeyor][appveyor-badge]][appveyor]
 [![Codecov][codecov-badge]][codecov]
