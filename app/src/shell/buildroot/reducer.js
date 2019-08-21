@@ -88,6 +88,7 @@ export function buildrootReducer(
     case actions.BR_CLEAR_SESSION:
       return { ...state, session: null }
 
+    case actions.BR_PREMIGRATION_ERROR:
     case actions.BR_UNEXPECTED_ERROR:
       return {
         ...state,

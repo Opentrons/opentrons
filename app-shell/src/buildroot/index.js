@@ -9,11 +9,7 @@ import { getConfig } from '../config'
 import { CURRENT_VERSION } from '../update'
 import { downloadManifest, getReleaseSet } from './release-manifest'
 import { getReleaseFiles, readUserFileInfo } from './release-files'
-import {
-  getPremigrationWheels,
-  startPremigration,
-  uploadSystemFile,
-} from './update'
+import { startPremigration, uploadSystemFile } from './update'
 
 import type { Action, Dispatch } from '../types'
 import type { ReleaseSetUrls, ReleaseSetFilepaths } from './types'
@@ -44,11 +40,9 @@ export function registerBuildrootUpdate(dispatch: Dispatch) {
       case 'buildroot:START_PREMIGRATION': {
         const robot = action.payload
 
-        getPremigrationWheels()
-          .then(wheels => {
-            log.info('Starting robot premigration', { robot, wheels })
-            return startPremigration(robot, wheels.api, wheels.updateServer)
-          })
+        log.info('Starting robot premigration', { robot })
+
+        startPremigration(robot)
           .then(
             (): BuildrootAction => ({
               type: 'buildroot:PREMIGRATION_DONE',
@@ -58,7 +52,7 @@ export function registerBuildrootUpdate(dispatch: Dispatch) {
           .catch(
             (error: Error): BuildrootAction => ({
               type: 'buildroot:PREMIGRATION_ERROR',
-              payload: error.message,
+              payload: { message: error.message },
             })
           )
           .then(dispatch)
