@@ -21,6 +21,7 @@
   "dependencies": {
     "@opentrons/components": "3.11.1",
     "@typeform/embed": "^0.12.1",
+    "ajv": "^6.10.2",
     "classnames": "^2.2.5",
     "cookie": "^0.3.1",
     "file-saver": "^2.0.1",

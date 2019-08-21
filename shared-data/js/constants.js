@@ -10,3 +10,5 @@ export const SLOT_RENDER_HEIGHT = SLOT_WIDTH_MM // along Y axis in SVG coords
 
 // taken from opentrons_1_trash_1100ml_fixed v1's dimensions
 export const FIXED_TRASH_RENDER_HEIGHT = 165.86 // along Y axis in SVG coords
+
+export const OPENTRONS_LABWARE_NAMESPACE = 'opentrons'

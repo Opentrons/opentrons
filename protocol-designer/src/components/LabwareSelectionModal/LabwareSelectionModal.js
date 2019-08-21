@@ -8,19 +8,25 @@ import {
 } from '@opentrons/shared-data'
 import startCase from 'lodash/startCase'
 import reduce from 'lodash/reduce'
+import i18n from '../../localization'
 import { getOnlyLatestDefs } from '../../labware-defs/utils'
 import { Portal } from '../portals/TopPortal'
 import { PDTitledList } from '../lists'
 import LabwareItem from './LabwareItem'
 import LabwarePreview from './LabwarePreview'
 import styles from './styles.css'
+import type { LabwareDefByDefURI } from '../../labware-defs'
 
 type Props = {
   onClose: (e?: *) => mixed,
+  onUploadLabware: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
   selectLabware: (containerType: string) => mixed,
+  customLabwareDefs: LabwareDefByDefURI,
   slot: ?DeckSlotId,
   permittedTipracks: Array<string>,
 }
+
+const CUSTOM_CATEGORY = 'custom'
 
 const orderedCategories: Array<string> = [
   'tipRack',
@@ -32,10 +38,22 @@ const orderedCategories: Array<string> = [
 ]
 
 const LabwareDropdown = (props: Props) => {
-  const { permittedTipracks, onClose, slot, selectLabware } = props
+  const {
+    customLabwareDefs,
+    permittedTipracks,
+    onClose,
+    onUploadLabware,
+    slot,
+    selectLabware,
+  } = props
 
   const [selectedCategory, selectCategory] = useState<?string>(null)
   const [previewedLabware, previewLabware] = useState<?LabwareDefinition2>(null)
+
+  const customLabwareURIs: Array<string> = useMemo(
+    () => Object.keys(customLabwareDefs),
+    [customLabwareDefs]
+  )
 
   const labwareByCategory = useMemo(() => {
     const defs = getOnlyLatestDefs()
@@ -76,6 +94,27 @@ const LabwareDropdown = (props: Props) => {
       <div ref={wrapperRef} className={styles.labware_dropdown}>
         <div className={styles.title}>Slot {slot} Labware</div>
         <ul>
+          {customLabwareURIs.length > 0 ? (
+            <PDTitledList
+              title="Custom Labware"
+              collapsed={selectedCategory !== CUSTOM_CATEGORY}
+              onCollapseToggle={makeToggleCategory(CUSTOM_CATEGORY)}
+              onClick={makeToggleCategory(CUSTOM_CATEGORY)}
+              className={styles.labware_selection_modal}
+            >
+              {customLabwareURIs.map((labwareURI, index) => (
+                <LabwareItem
+                  key={index}
+                  labwareDef={customLabwareDefs[labwareURI]}
+                  selectLabware={selectLabware}
+                  onMouseEnter={() =>
+                    previewLabware(customLabwareDefs[labwareURI])
+                  }
+                  onMouseLeave={() => previewLabware()}
+                />
+              ))}
+            </PDTitledList>
+          ) : null}
           {orderedCategories.map(category => (
             <PDTitledList
               key={category}
@@ -98,7 +137,19 @@ const LabwareDropdown = (props: Props) => {
             </PDTitledList>
           ))}
         </ul>
-        <OutlineButton onClick={onClose}>CLOSE</OutlineButton>
+        <OutlineButton Component="label" className={styles.upload_button}>
+          {i18n.t('button.upload_custom_labware')}
+          <input
+            type="file"
+            onChange={e => {
+              onUploadLabware(e)
+              selectCategory(CUSTOM_CATEGORY)
+            }}
+          />
+        </OutlineButton>
+        <OutlineButton onClick={onClose}>
+          {i18n.t('button.close')}
+        </OutlineButton>
       </div>
     </>
   )

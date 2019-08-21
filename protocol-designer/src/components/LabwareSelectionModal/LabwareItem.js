@@ -5,6 +5,7 @@ import { PDListItem } from '../lists'
 import styles from './styles.css'
 import {
   getLabwareDefURI,
+  getLabwareDefIsStandard,
   getLabwareDisplayName,
   type LabwareDefinition2,
 } from '@opentrons/shared-data'
@@ -35,7 +36,7 @@ export default function LabwareItem(props: Props) {
       onMouseLeave={onMouseLeave}
     >
       <div className={styles.labware_name}>{displayName}</div>
-      {labwareDef.namespace === 'opentrons' ? (
+      {getLabwareDefIsStandard(labwareDef) ? (
         <a
           className={styles.view_measurements_link}
           target="_blank"

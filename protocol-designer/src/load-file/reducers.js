@@ -55,6 +55,8 @@ const unsavedChanges = (
     case 'DELETE_STEP':
     case 'SAVE_STEP_FORM':
     case 'SAVE_FILE_METADATA':
+    case 'CREATE_CUSTOM_LABWARE_DEF':
+    case 'REPLACE_CUSTOM_LABWARE_DEF':
       return true
     default:
       return state

@@ -30,7 +30,9 @@ let cache: {
     wellSetByPrimaryWell: WellSetByPrimaryWell,
   },
 } = {}
-const _getAllWellSetsForLabwareMemoized = (
+
+// memoized
+export const getAllWellSetsForLabware = (
   labwareDef: LabwareDefinition2
 ): WellSetByPrimaryWell => {
   const labwareDefURI = getLabwareDefURI(labwareDef)
@@ -54,6 +56,6 @@ export function getWellSetForMultichannel(
    * Ie: C2 for 96-flat => ['A2', 'B2', 'C2', ... 'H2']
    * Or A1 for trough => ['A1', 'A1', 'A1', ...]
    **/
-  const allWellSets = _getAllWellSetsForLabwareMemoized(labwareDef)
+  const allWellSets = getAllWellSetsForLabware(labwareDef)
   return allWellSets.find((wellSet: Array<string>) => wellSet.includes(well))
 }
