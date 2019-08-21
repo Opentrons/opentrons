@@ -12,13 +12,6 @@
     "build/br-premigration-wheels",
     "!Makefile"
   ],
-  "extraResources": [
-    {
-      "from": "../api/dist",
-      "to": "./api/dist",
-      "filter": ["**/*"]
-    }
-  ],
   "artifactName": "${productName}-v${version}-${os}-${env.BUILD_ID}.${ext}",
   "asar": true,
   "mac": {
