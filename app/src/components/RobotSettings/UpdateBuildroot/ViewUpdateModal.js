@@ -16,7 +16,7 @@ import type { BuildrootUpdateType, RobotSystemType } from '../../../shell'
 
 type Props = {|
   robotName: string,
-  robotUpdateType: BuildrootUpdateType,
+  robotUpdateType: BuildrootUpdateType | null,
   robotSystemType: RobotSystemType | null,
   close: () => mixed,
   proceed: () => mixed,

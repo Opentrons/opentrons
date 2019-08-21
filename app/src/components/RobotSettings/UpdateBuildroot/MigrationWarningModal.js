@@ -9,7 +9,7 @@ import type { BuildrootUpdateType } from '../../../shell'
 
 type Props = {|
   notNowButton: ButtonProps,
-  updateType: BuildrootUpdateType,
+  updateType: BuildrootUpdateType | null,
   proceed: () => mixed,
 |}
 
@@ -45,7 +45,7 @@ export default function MigrationWarningModal(props: Props) {
         </p>
 
         <p>
-          Please note that this update will take an estimated 10-15 minutes,
+          Please note that this update will take an estimated 3 to 5 minutes,
           will reboot your robot two times, and requires your OT-2 to remain
           discoverable via USB or Wi-Fi throughout the entire migration process.
         </p>

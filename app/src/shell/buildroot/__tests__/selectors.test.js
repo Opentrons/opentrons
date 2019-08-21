@@ -1,5 +1,8 @@
 import * as selectors from '../selectors'
-import { getViewableRobots } from '../../../discovery/selectors'
+import {
+  getViewableRobots,
+  getRobotApiVersion,
+} from '../../../discovery/selectors'
 
 jest.mock('../../../discovery/selectors')
 
@@ -17,20 +20,18 @@ describe('app/shell/buildroot selectors', () => {
           buildroot: {
             info: {
               releaseNotes: 'some release notes',
-              version: '1.0.0',
             },
           },
         },
       },
       expected: {
         releaseNotes: 'some release notes',
-        version: '1.0.0',
       },
     },
     {
       name: 'getBuildrootTargetVersion with auto-downloaded file',
       selector: selectors.getBuildrootTargetVersion,
-      state: { shell: { buildroot: { info: { version: '1.0.0' } } } },
+      state: { shell: { buildroot: { version: '1.0.0' } } },
       expected: '1.0.0',
     },
     {
@@ -39,7 +40,7 @@ describe('app/shell/buildroot selectors', () => {
       state: {
         shell: {
           buildroot: {
-            info: { version: '1.0.0' },
+            version: '1.0.0',
             session: { userFileInfo: { version: '1.0.1' } },
           },
         },
@@ -88,12 +89,15 @@ describe('app/shell/buildroot selectors', () => {
       state: {
         shell: {
           buildroot: {
-            info: { version: '1.0.0' },
+            version: '1.0.0',
           },
         },
       },
-      args: ['0.9.9'],
-      expected: true,
+      args: [{ name: 'robot-name' }],
+      expected: 'upgrade',
+      setup: () => {
+        getRobotApiVersion.mockReturnValueOnce('0.9.9')
+      },
     },
     {
       name: 'getBuildrootUpdateAvailable with greater version',
@@ -101,12 +105,15 @@ describe('app/shell/buildroot selectors', () => {
       state: {
         shell: {
           buildroot: {
-            info: { version: '1.0.0' },
+            version: '1.0.0',
           },
         },
       },
-      args: ['1.0.1'],
-      expected: false,
+      args: [{ name: 'robot-name' }],
+      expected: 'downgrade',
+      setup: () => {
+        getRobotApiVersion.mockReturnValueOnce('1.0.1')
+      },
     },
     {
       name: 'getBuildrootUpdateAvailable with same version',
@@ -114,12 +121,31 @@ describe('app/shell/buildroot selectors', () => {
       state: {
         shell: {
           buildroot: {
-            info: { version: '1.0.0' },
+            version: '1.0.0',
           },
         },
       },
-      args: ['1.0.0'],
-      expected: false,
+      args: [{ name: 'robot-name' }],
+      expected: 'reinstall',
+      setup: () => {
+        getRobotApiVersion.mockReturnValueOnce('1.0.0')
+      },
+    },
+    {
+      name: 'getBuildrootUpdateAvailable with no update available',
+      selector: selectors.getBuildrootUpdateAvailable,
+      state: {
+        shell: {
+          buildroot: {
+            version: null,
+          },
+        },
+      },
+      args: [{ name: 'robot-name' }],
+      expected: null,
+      setup: () => {
+        getRobotApiVersion.mockReturnValueOnce('1.0.0')
+      },
     },
     {
       name: 'getBuildrootUpdateSession',

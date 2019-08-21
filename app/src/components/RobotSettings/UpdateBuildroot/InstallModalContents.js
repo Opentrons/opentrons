@@ -57,7 +57,7 @@ export default function InstallModalContents(props: Props) {
     step === 'restart' ||
     step === 'restarting'
   ) {
-    updateMessage = 'Hang tight! This may take about 3-5 minutes.'
+    updateMessage = 'Hang tight! This may take up to 3 minutes.'
   } else if (step === 'getToken' || step === 'uploadFile') {
     updateMessage = 'Sending update file to robot'
   } else if (

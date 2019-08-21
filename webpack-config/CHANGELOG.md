@@ -3,13 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-<a name="3.11.0-alpha.1"></a>
-# [3.11.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.10.3...v3.11.0-alpha.1) (2019-08-07)
+# [3.11.0](https://github.com/Opentrons/opentrons/compare/v3.10.3...v3.11.0) (2019-08-21)
 
 
 ### Features
 
 * **labware-library:** support static rendering of labware library ([#3791](https://github.com/Opentrons/opentrons/issues/3791)) ([793b624](https://github.com/Opentrons/opentrons/commit/793b624))
+
 
 
 

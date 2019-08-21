@@ -25,6 +25,8 @@ import {
   passRobotApiErrorAction,
 } from '../../robot-api'
 
+import { actions as robotActions } from '../../robot'
+
 import {
   getBuildrootTargetVersion,
   getBuildrootSession,
@@ -363,6 +365,12 @@ export const removeMigratedRobotsEpic: Epic = (_, state$) =>
     })
   )
 
+export const disconnectRpcOnStartEpic: Epic = action$ =>
+  action$.pipe(
+    ofType(BR_START_UPDATE),
+    switchMap<_, _, mixed>(() => of(robotActions.disconnect()))
+  )
+
 export const buildrootUpdateEpic = combineEpics(
   startUpdateEpic,
   cancelSessionOnConflictEpic,
@@ -375,5 +383,6 @@ export const buildrootUpdateEpic = combineEpics(
   restartAfterCommitEpic,
   watchForOfflineAfterRestartEpic,
   watchForOnlineAfterRestartEpic,
-  removeMigratedRobotsEpic
+  removeMigratedRobotsEpic,
+  disconnectRpcOnStartEpic
 )
