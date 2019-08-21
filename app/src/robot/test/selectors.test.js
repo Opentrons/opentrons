@@ -27,6 +27,7 @@ const {
   getNextLabware,
   getModulesBySlot,
   getModules,
+  getDeckPopulated,
 } = selectors
 
 describe('robot selectors', () => {
@@ -695,5 +696,12 @@ describe('robot selectors', () => {
         definition: null,
       })
     })
+  })
+
+  test('getDeckPopulated', () => {
+    let state = makeState({ calibration: { deckPopulated: null } })
+    expect(getDeckPopulated(state)).toEqual(null)
+    state = makeState({ calibration: { deckPopulated: false } })
+    expect(getDeckPopulated(state)).toEqual(false)
   })
 })
