@@ -418,8 +418,8 @@ Our release process is still a work-in-progress. The app and API projects are cu
 12. Run QA on this release. If issues are found, create prs targeted on the release branch. To create new alpha releases, repeat steps 4-11.
 13. Once QA is a pass, bump to your target version with `make bump` (see below again)
 14. Tag the release: `git tag -a v${version} -m 'chore(release): ${version}'` and `git push origin v${version}`
-15. Do a NORMAL MERGE into `master`. Do NOT squash or rebase.
-16. Do a NORMAL MERGE of `master` into `edge`.
+15. Do a NORMAL MERGE into `master`. Do NOT squash or rebase. This should be done from your local command line: `git checkout master`, `git merge release_${version}`, `git push origin master`. This will succeed as long as the release PR is reviewed and status checks have passed.
+16. Open a pr of `master` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`: `git checkout edge`, `git pull`, `git merge master`. Use the pr title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the pr is approved and status checks pass.
 
 ### Releasing Robot Software Stack Hotfixes
 
@@ -440,8 +440,8 @@ Our release process is still a work-in-progress. The app and API projects are cu
 12. Run QA on this release. If issues are found, create prs targeted on the release branch. To create new alpha releases, repeat steps 4-11.
 13. Once QA is a pass, bump to your target version with `make bump` (see below again)
 14. Tag the release: `git tag -a v${version} -m 'chore(release): ${version}'` and `git push origin v${version}`
-15. Do a NORMAL MERGE into `master`. Do NOT squash or rebase.
-16. Do a NORMAL MERGE of `master` into `edge`.
+15. Do a NORMAL MERGE into `master`. Do NOT squash or rebase. This should be done from your local command line: `git checkout master`, `git merge release_${version}`, `git push origin master`. This will succeed as long as the release PR is reviewed and status checks have passed.
+16. Open a pr of `master` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`: `git checkout edge`, `git pull`, `git merge master`. Use the pr title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the pr is approved and status checks pass.
 
 
 #### `make bump` usage
