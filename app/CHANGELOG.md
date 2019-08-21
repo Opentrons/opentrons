@@ -3,42 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.11.0-alpha.6](https://github.com/Opentrons/opentrons/compare/v3.11.0-alpha.5...v3.11.0-alpha.6) (2019-08-20)
-
-**Note:** Version bump only for package @opentrons/app
-
-
-
-
-
-# [3.11.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v3.11.0-alpha.4...v3.11.0-alpha.5) (2019-08-19)
-
-**Note:** Version bump only for package @opentrons/app
-
-
-
-
-
-# [3.11.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v3.11.0-alpha.3...v3.11.0-alpha.4) (2019-08-19)
-
-**Note:** Version bump only for package @opentrons/app
-
-
-
-
-
-# [3.11.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v3.11.0-alpha.2...v3.11.0-alpha.3) (2019-08-19)
-
-
-### Features
-
-* **app:** Add robot logging opt-out alert ([#3869](https://github.com/Opentrons/opentrons/issues/3869)) ([9ab6938](https://github.com/Opentrons/opentrons/commit/9ab6938))
-
-
-
-
-
-# [3.11.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.10.3...v3.11.0-alpha.2) (2019-08-16)
+# [3.11.0](https://github.com/Opentrons/opentrons/compare/v3.10.3...v3.11.0) (2019-08-21)
 
 
 ### Bug Fixes
@@ -49,6 +14,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
+* **app:** Add robot logging opt-out alert ([#3869](https://github.com/Opentrons/opentrons/issues/3869)) ([9ab6938](https://github.com/Opentrons/opentrons/commit/9ab6938))
 * **app:** add control of modules to run cards ([#3841](https://github.com/Opentrons/opentrons/issues/3841)) ([9b34f9f](https://github.com/Opentrons/opentrons/commit/9b34f9f))
 * **app:** display TC on Deck Map ([#3786](https://github.com/Opentrons/opentrons/issues/3786)) ([272a6ad](https://github.com/Opentrons/opentrons/commit/272a6ad)), closes [#3553](https://github.com/Opentrons/opentrons/issues/3553) [#3064](https://github.com/Opentrons/opentrons/issues/3064)
 * **app:** Enable buildroot updates by default ([#3861](https://github.com/Opentrons/opentrons/issues/3861)) ([bf68ad9](https://github.com/Opentrons/opentrons/commit/bf68ad9)), closes [#3822](https://github.com/Opentrons/opentrons/issues/3822)

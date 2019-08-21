@@ -3,57 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.11.0-alpha.6](https://github.com/opentrons/opentrons/compare/v3.11.0-alpha.5...v3.11.0-alpha.6) (2019-08-20)
-
-**Note:** Version bump only for package opentrons
-
-
-
-
-
-# [3.11.0-alpha.5](https://github.com/opentrons/opentrons/compare/v3.11.0-alpha.4...v3.11.0-alpha.5) (2019-08-19)
-
-**Note:** Version bump only for package opentrons
-
-
-
-
-
-# [3.11.0-alpha.4](https://github.com/opentrons/opentrons/compare/v3.11.0-alpha.3...v3.11.0-alpha.4) (2019-08-19)
-
-**Note:** Version bump only for package opentrons
-
-
-
-
-
-# [3.11.0-alpha.3](https://github.com/opentrons/opentrons/compare/v3.11.0-alpha.2...v3.11.0-alpha.3) (2019-08-19)
-
+# [3.11.0](https://github.com/opentrons/opentrons/compare/v3.10.3...v3.11.0) (2019-08-21)
 
 ### Bug Fixes
 
 * **shared-data:** fix "strict" arg for labware creation ([#3874](https://github.com/opentrons/opentrons/issues/3874)) ([bd604e2](https://github.com/opentrons/opentrons/commit/bd604e2))
-
-
-### Features
-
-* **app:** Add robot logging opt-out alert ([#3869](https://github.com/opentrons/opentrons/issues/3869)) ([9ab6938](https://github.com/opentrons/opentrons/commit/9ab6938))
-
-
-
-
-
-# [3.11.0-alpha.2](https://github.com/opentrons/opentrons/compare/v3.10.3...v3.11.0-alpha.2) (2019-08-16)
-
-
-### Bug Fixes
-
 * **api:** apiv1: fix transfer volume ([#3792](https://github.com/opentrons/opentrons/issues/3792)) ([e3099af](https://github.com/opentrons/opentrons/commit/e3099af))
 * **api:** apiv2: fix mix, blowout in advanced steps ([#3799](https://github.com/opentrons/opentrons/issues/3799)) ([48fc442](https://github.com/opentrons/opentrons/commit/48fc442)), closes [#3719](https://github.com/opentrons/opentrons/issues/3719)
 * **api:** apiv2: fix overaspiration after blowout ([#3801](https://github.com/opentrons/opentrons/issues/3801)) ([61e82c3](https://github.com/opentrons/opentrons/commit/61e82c3)), closes [#3797](https://github.com/opentrons/opentrons/issues/3797)
 * **api:** Do not publish commands for RPC pause/resume in APIv1 ([#3850](https://github.com/opentrons/opentrons/issues/3850)) ([72952ba](https://github.com/opentrons/opentrons/commit/72952ba))
 * **api:** duplicate mix with blowout during transfer ([#3810](https://github.com/opentrons/opentrons/issues/3810)) ([9a70c36](https://github.com/opentrons/opentrons/commit/9a70c36)), closes [#2607](https://github.com/opentrons/opentrons/issues/2607)
-* **api:** fix blow out logic ([#3764](https://github.com/opentrons/opentrons/issues/3764)) ([fb99bf0](https://github.com/opentrons/opentrons/commit/fb99bf0))
 * **api:** force nmcli to actively check for connectivity ([#3811](https://github.com/opentrons/opentrons/issues/3811)) ([c200de3](https://github.com/opentrons/opentrons/commit/c200de3)), closes [#3768](https://github.com/opentrons/opentrons/issues/3768)
 * **app:** eagerly fetch modules and instruments on robot connect ([#3854](https://github.com/opentrons/opentrons/issues/3854)) ([88f5aec](https://github.com/opentrons/opentrons/commit/88f5aec)), closes [#3844](https://github.com/opentrons/opentrons/issues/3844)
 * **app:** Remove Electron RPC remote objects from Redux state ([#3820](https://github.com/opentrons/opentrons/issues/3820)) ([d5f3fe3](https://github.com/opentrons/opentrons/commit/d5f3fe3))
@@ -62,6 +21,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
+* **app:** Add robot logging opt-out alert ([#3869](https://github.com/opentrons/opentrons/issues/3869)) ([9ab6938](https://github.com/opentrons/opentrons/commit/9ab6938))
 * **api:** Add a log aggregation optout ([#3868](https://github.com/opentrons/opentrons/issues/3868)) ([ccb0b94](https://github.com/opentrons/opentrons/commit/ccb0b94)), closes [#3866](https://github.com/opentrons/opentrons/issues/3866)
 * **api:** apiv2: prevent over-aspiration with filter tips ([#3781](https://github.com/opentrons/opentrons/issues/3781)) ([4cc3023](https://github.com/opentrons/opentrons/commit/4cc3023))
 * **api:** cycle temperatures, pause, cancel, and resume to TC control ([#3839](https://github.com/opentrons/opentrons/issues/3839)) ([6841419](https://github.com/opentrons/opentrons/commit/6841419)), closes [#3581](https://github.com/opentrons/opentrons/issues/3581)
