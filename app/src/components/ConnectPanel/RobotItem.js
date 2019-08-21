@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { withRouter, type ContextRouter } from 'react-router'
 
 import { actions as robotActions } from '../../robot'
-import { compareRobotVersionToUpdate } from '../../shell'
+import { getBuildrootUpdateAvailable } from '../../shell'
 import { RobotListItem } from './RobotListItem.js'
 
 import type { State, Dispatch } from '../../types'
@@ -28,9 +28,12 @@ export default withRouter<WithRouterOP>(
 )
 
 function mapStateToProps(state: State, ownProps: OP): SP {
+  const { robot } = ownProps
+  const updateType = getBuildrootUpdateAvailable(state, robot)
+
   return {
-    upgradable: compareRobotVersionToUpdate(ownProps.robot) !== 'reinstall',
-    selected: ownProps.match.params.name === ownProps.robot.name,
+    upgradable: updateType === 'upgrade',
+    selected: ownProps.match.params.name === robot.name,
   }
 }
 

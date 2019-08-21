@@ -18,7 +18,7 @@ import {
 } from '../discovery'
 
 import {
-  getBuildrootUpdateInfo,
+  getBuildrootUpdateVersion,
   getBuildrootRobot,
   getBuildrootSession,
   getRobotSystemType,
@@ -100,14 +100,14 @@ export function getBuildrootAnalyticsData(
   state: State,
   robotName: string | null = null
 ): BuildrootAnalyticsData | null {
-  const info = getBuildrootUpdateInfo(state)
+  const updateVersion = getBuildrootUpdateVersion(state)
   const session = getBuildrootSession(state)
   const robot =
     robotName === null
       ? getBuildrootRobot(state)
       : getViewableRobots(state).find(r => r.name === robotName) || null
 
-  if (info === null || robot === null) return null
+  if (updateVersion === null || robot === null) return null
 
   const currentVersion = getRobotApiVersion(robot) || 'unknown'
   const currentSystem = getRobotSystemType(robot) || 'unknown'
@@ -115,7 +115,7 @@ export function getBuildrootAnalyticsData(
   return {
     currentVersion,
     currentSystem,
-    updateVersion: info.version,
+    updateVersion,
     error: session?.error || null,
   }
 }

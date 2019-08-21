@@ -7,10 +7,11 @@
       "includeMergedTags": true,
       "gitTagVersion": false,
       "push": false,
-      "preid": "alpha"
+      "preid": "alpha",
+      "forcePublish": "*"
     }
   },
   "npmClient": "yarn",
   "useWorkspaces": true,
-  "version": "3.11.0-alpha.1"
+  "version": "3.11.0"
 }
