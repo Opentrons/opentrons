@@ -337,7 +337,6 @@ Not every JavaScript package has an available flow-typed definition. In this cas
 
 #### Python
 
-This section is a WIP; please check back later!
 
 ### Opentrons API
 
@@ -396,26 +395,54 @@ make term br_ssh_key=/path/to/privkey
 
 If you create the key as `~/.ssh/robot_key` and `~/.ssh/robot_key.pub` then `make term` and `make install-key` will work without arguments.
 
-### Releasing (for Opentrons developers)
+## Releasing Software (for Opentrons developers)
+
+### Releasing Robot Software Stack
 
 Our release process is still a work-in-progress. The app and API projects are currently versioned together to ensure interoperability.
 
-1.  `make bump` (see details below)
-2.  Inspect version bumps and changelogs
-3.  Edit the user-facing changelog at `app-shell/build/release-notes.md` to add the new notes for the app
-4.  Edit the user-facing changelog at `api/release-notes.md` to add the new notes for the robot software
-5.  `git checkout -b release_${version}` (The branch name _must_ match `release_*` to trigger signed builds that can be used as RCs)
-6.  `git add --all`
-7.  `git cz`
+1. Ensure you have a buildroot release created in github with all the changes you want in this release
+2.  `git checkout -b release_${version}` (The branch name _must_ match `release_*` to trigger signed builds that can be used as RCs). `git push --set-upstream origin release_${version}` to push the branch (without any changes).
+3.  Open a PR into `master` for your branch.
+4.  `make bump` to create an alpha version (see below)
+5.  Inspect version bumps and changelogs
+6.  Edit the user-facing changelog at `app-shell/build/release-notes.md` to add the new notes for the app
+7.  Edit the user-facing changelog at `api/release-notes.md` to add the new notes for the robot software
+8.  `git add --all`
+9.  `git cz`
     - Type: `chore`
     - Scope: `release`
     - Message: `${version}`
-8.  Open a PR into `edge`
-9.  Squash merge the PR once approved
-10. Verify that CI is green on `edge` and test the build artifacts
-11. Pull latest `edge` to your machine
-12. `git tag -a v${version} -m 'chore(release): ${version}'`
-13. `git push --tags`
+10. Gather reviews on changelogs and release notes until everybody is satisfied
+11. Tag the release branch as an alpha version; this is a release candidate that will undergo qa: `git tag -a v${version} -m 'chore(release): ${version}''` and `git push origin v${version}`
+12. Run QA on this release. If issues are found, create prs targeted on the release branch. To create new alpha releases, repeat steps 4-11.
+13. Once QA is a pass, bump to your target version with `make bump` (see below again)
+14. Tag the release: `git tag -a v${version} -m 'chore(release): ${version}'` and `git push origin v${version}`
+15. Do a NORMAL MERGE into `master`. Do NOT squash or rebase. This should be done from your local command line: `git checkout master`, `git merge release_${version}`, `git push origin master`. This will succeed as long as the release PR is reviewed and status checks have passed.
+16. Open a pr of `master` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`: `git checkout edge`, `git pull`, `git merge master`. Use the pr title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the pr is approved and status checks pass.
+
+### Releasing Robot Software Stack Hotfixes
+
+1. Ensure you have a buildroot release created in github with all the changes you want to see
+2. Create and push a branch called `release_${version}`. 
+3. Target the hotfix PRs on this branch.
+4. On the release branch, once the fixes have been merged, `make bump` to create an appropriate alpha version (see below)
+5. Inspect version bumps and changelogs
+6.  Edit the user-facing changelog at `app-shell/build/release-notes.md` to add the new notes for the app
+7.  Edit the user-facing changelog at `api/release-notes.md` to add the new notes for the robot software
+8. `git add --all`
+9. `git cz`
+   - Type: `chore`
+   - Scope: `release`
+   - Message: `${version}`
+10. Push this commit
+11. Tag the alpha version; this is a release candidate that will undergo qa: `git tag -a v${version} -m 'chore(release): ${version}'` and `git push origin v${version}`
+12. Run QA on this release. If issues are found, create prs targeted on the release branch. To create new alpha releases, repeat steps 4-11.
+13. Once QA is a pass, bump to your target version with `make bump` (see below again)
+14. Tag the release: `git tag -a v${version} -m 'chore(release): ${version}'` and `git push origin v${version}`
+15. Do a NORMAL MERGE into `master`. Do NOT squash or rebase. This should be done from your local command line: `git checkout master`, `git merge release_${version}`, `git push origin master`. This will succeed as long as the release PR is reviewed and status checks have passed.
+16. Open a pr of `master` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`: `git checkout edge`, `git pull`, `git merge master`. Use the pr title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the pr is approved and status checks pass.
+
 
 #### `make bump` usage
 
@@ -423,7 +450,7 @@ Our release process is still a work-in-progress. The app and API projects are cu
 
 - First positional argument: bump type _or_ explicit version
   - Default: `prerelease`
-  - Valid bumps: `major`, `minor`, `patch`, `premajor`, `preminor`, `prepatch`, `prerelease`
+  - Valid bumps: `major`, `minor`, `patch`, `premajor`, `preminor`, `prepatch`, `prerelease`. Alpha versions should be created with `premajor`, `preminor`, `prepatch`, or `prerelease`. Releases should be `major`, `minor`, or `patch`.
   - See [semver.inc][semver-inc] for keyword meanings
 - `--preid` - Used to specify the pre-release identifier
   - Default: `alpha`
@@ -464,7 +491,7 @@ We use [lerna][], a monorepo management tool, to work with our various projects.
 yarn run lerna [opts]
 ```
 
-#### Releasing Web Projects
+### Releasing Web Projects
 
 The following web projects are versioned and released independently from the app and API:
 
@@ -473,48 +500,6 @@ The following web projects are versioned and released independently from the app
 
 See [scripts/deploy/README.md](./scripts/deploy/README.md) for the release process of these projects.
 
-## Prior Art
-
-This Contributing Guide was influenced by a lot of work done on existing Contributing Guides. They're great reads if you have the time!
-
-- [React.js Contributing Guide][react-contributing]
-- [Node.js Contributing Guide][node-contributing]
-- [Kibana Contributing Guide][kibana-contributing]
-
-## Developer "Gotchas"
-
-This section contains general information about problems we've encountered before so we don't have to keep researching the same issue over and over (and instead of keeping the info in the heads of individual developers)
-
-### Docker issues
-
-#### COPY
-
-If you get an error in Docker build like this:
-
-```
-Step 24/45 : COPY ./api-server-lib /tmp/api-server-lib
-COPY failed: stat /var/lib/docker/tmp/docker-builder657112660/api-server-lib: no such file or directory
-```
-
-You need to add an exception the directory to the ".dockerignore" file. In this case, the exception is `!/api-server-lib/**`
-
-#### Architecture
-
-If you run a Docker image on your computer and get:
-
-```
-Unknown target IFA type: 6
-```
-
-You probably built against the wrong CPU architecture (ARM instead of x86_64). The top of the Dockerfile has two `FROM` lines, with one of them commented out. Comment out the one that contains "raspberrypi3" and uncomment the one that contains "amd64", and then re-build your image.
-
-If you get:
-
-```
-panic: standard_init_linux.go:175: exec user process caused "exec format error"
-```
-
-You probably built against x86_64 and tried to run it on a Raspberry Pi. Switch to the "raspberrypi" `FROM` line.
 
 ## Robot Environment
 
@@ -556,6 +541,14 @@ Our systemd units are:
 When a robot is running on buildroot, its filesystem is mounted from two separate locations. `/data`, `/var`, and `/home` are from the "data" partition, and everything else is from the root partition (or generated by the system). The root partition is what gets updated, by being overwritten. To make this work, the root partition is mounted readonly, which causes writes to files in that partition to fail with the error "readonly filesystem". To prevent this, you can remount the partition:
 `mount -o remount,rw /`
 
+## Prior Art
+
+This Contributing Guide was influenced by a lot of work done on existing Contributing Guides. They're great reads if you have the time!
+
+- [React.js Contributing Guide][react-contributing]
+- [Node.js Contributing Guide][node-contributing]
+- [Kibana Contributing Guide][kibana-contributing]
+
 [repo]: https://github.com/Opentrons/opentrons
 [api-readme]: ./api/README.rst
 [easyfix]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Aeasyfix
@@ -580,3 +573,4 @@ When a robot is running on buildroot, its filesystem is mounted from two separat
 [systemd-journald]: https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html
 [journalctl]: https://www.freedesktop.org/software/systemd/man/journalctl.html
 [systemctl]: https://www.google.com/search?client=firefox-b-1-d&q=systemctl
+

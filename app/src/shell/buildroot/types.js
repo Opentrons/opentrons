@@ -85,7 +85,7 @@ export type BuildrootAction =
       meta: {| shell: true |},
     |}
   | {| type: 'buildroot:PREMIGRATION_DONE', payload: string |}
-  | {| type: 'buildroot:PREMIGRATION_ERROR', payload: string |}
+  | {| type: 'buildroot:PREMIGRATION_ERROR', payload: {| message: string |} |}
   | {|
       type: 'buildroot:READ_USER_FILE',
       payload: {| systemFile: string |},
