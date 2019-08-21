@@ -1,8 +1,6 @@
-# Changes from 3.10.3 to 3.11.0
+# Changes from 3.10.3 to 3.11.1
 
-This update includes support for the new Opentrons Robot OS 3.11.0, which provides more comprehensive updates without requiring internet connectivity. It also allows you to calibrate labware placed on a module separately from labware placed on the deck.
-
-<!-- start:@opentrons/app -->
+This update includes support for the new Opentrons Robot OS 3.11, which provides more comprehensive updates without requiring internet connectivity. It also allows you to calibrate labware placed on a module separately from labware placed on the deck.
 
 ## Opentrons App
 
@@ -21,6 +19,3 @@ This update includes support for the new Opentrons Robot OS 3.11.0, which provid
 
 [2047]: https://github.com/Opentrons/opentrons/issues/2047
 [2020]: https://github.com/Opentrons/opentrons/issues/2020
-
-<!-- end:@opentrons/app -->
-
