@@ -61,6 +61,10 @@ export default {
     require('../../images/opentrons_24_aluminumblock_side_view.jpg'),
     require('../../images/generic_2ml_screwcap_tube.jpg'),
   ],
+  'opentrons_24_aluminumblock_nest_0.5ml_screwcap': [
+    require('../../images/opentrons_24_aluminumblock_side_view.jpg'),
+    require('../../images/nest_0.5ml_screwcap_tube.jpg'),
+  ],
   'opentrons_24_aluminumblock_nest_1.5ml_screwcap': [
     require('../../images/opentrons_24_aluminumblock_side_view.jpg'),
     require('../../images/nest_1.5ml_screwcap_tube.jpg'),
@@ -84,6 +88,10 @@ export default {
   opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap: [
     require('../../images/opentrons_24_tuberack_side_view.jpg'),
     require('../../images/eppendorf_2ml_safelock_snapcap_tube.jpg'),
+  ],
+  'opentrons_24_tuberack_nest_0.5ml_screwcap': [
+    require('../../images/opentrons_24_tuberack_side_view.jpg'),
+    require('../../images/nest_0.5ml_screwcap_tube.jpg'),
   ],
   'opentrons_24_tuberack_nest_1.5ml_screwcap': [
     require('../../images/opentrons_24_tuberack_side_view.jpg'),
