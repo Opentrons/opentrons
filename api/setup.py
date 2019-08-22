@@ -29,9 +29,6 @@ SHARED_DATA_SUBDIRS = ['deck',
                        'module',
                        'pipette',
                        'protocol']
-# Subdirectories of the SHARED_DATA_SUBDIRS to ignore
-SHARED_DATA_BLACKLIST = ['flowtypes',  # js type information
-                         'fixtures']
 # Where, relative to the package root, we put the files we copy
 DEST_BASE_PATH = 'shared_data'
 
@@ -43,10 +40,6 @@ def get_shared_data_files(root=None):
     for subdir in SHARED_DATA_SUBDIRS:
         top = os.path.join(root, subdir)
         for dirpath, dirnames, filenames in os.walk(top):
-            if any([bl in dirpath.lower() for bl in SHARED_DATA_BLACKLIST]):
-                print(f"ignoring {dirpath}")
-                continue
-            print(f"including {dirpath}")
             from_source = os.path.relpath(dirpath, root)
             to_include.extend([os.path.join(from_source, fname)
                                for fname in filenames])
