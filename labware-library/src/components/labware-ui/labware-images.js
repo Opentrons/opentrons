@@ -44,6 +44,9 @@ export default {
     require('../../images/geb_96_tiprack_10ul_side_view.jpg'),
     require('../../images/geb_10ul_tip_side_view.jpg'),
   ],
+  nest_96_wellplate_200ul_flat: [
+    require('../../images/nest_96_wellplate_200ul_flat_three_quarters.jpg'),
+  ],
   opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical: [
     require('../../images/opentrons_10_tuberack_4_6_side_view.jpg'),
     require('../../images/falcon_50ml_15ml_conical_tubes.jpg'),
