@@ -2,6 +2,8 @@
 import { setIn } from '@thi.ng/paths'
 import { NAME, selectors, constants } from '../'
 
+jest.mock('../../protocol/selectors')
+
 const makeState = state => ({ [NAME]: state })
 
 const {

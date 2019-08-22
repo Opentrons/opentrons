@@ -16,6 +16,7 @@ import MockSession from './__mocks__/session'
 import MockCalibrationMangager from './__mocks__/calibration-manager'
 
 jest.mock('../../rpc/client')
+jest.mock('../../protocol/selectors')
 
 describe('api client', () => {
   let dispatch
