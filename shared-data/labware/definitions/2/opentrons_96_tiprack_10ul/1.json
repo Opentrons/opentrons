@@ -1009,7 +1009,7 @@
     "loadName": "opentrons_96_tiprack_10ul"
   },
   "namespace": "opentrons",
-  "version": 1,
+  "version": 2,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
     "x": 0,
