@@ -1,6 +1,8 @@
-from numpy import add
 import time
 import datetime
+
+from numpy import add  # type: ignore
+
 from opentrons import instruments, robot
 
 

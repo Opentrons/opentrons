@@ -1,5 +1,7 @@
-from numpy import array
 from typing import Tuple
+
+from numpy import array  # type: ignore
+
 from opentrons.trackers.pose_tracker import (
     Point, change_base, absolute
 )

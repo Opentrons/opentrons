@@ -16,7 +16,7 @@ from opentrons.api.routers import MainRouter
 import opentrons
 
 if TYPE_CHECKING:
-    from opentons.hardware_control.types import HardwareAPILike  # noqa(F501)
+    from opentrons.hardware_control.types import HardwareAPILike  # noqa(F501)
 
 log = logging.getLogger(__name__)
 

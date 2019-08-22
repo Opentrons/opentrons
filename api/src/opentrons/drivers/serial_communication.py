@@ -1,5 +1,5 @@
-import serial
-from serial.tools import list_ports
+import serial  # type: ignore
+from serial.tools import list_ports  # type: ignore
 import contextlib
 import logging
 

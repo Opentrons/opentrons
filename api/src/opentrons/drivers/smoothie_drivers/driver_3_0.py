@@ -5,7 +5,8 @@ from time import sleep
 from threading import Event, RLock
 from typing import Any, Dict, Optional
 
-from serial.serialutil import SerialException
+from numpy import isclose  # type: ignore
+from serial.serialutil import SerialException  # type: ignore
 
 from opentrons.drivers import serial_communication
 from opentrons.drivers.rpi_drivers import gpio
@@ -1229,8 +1230,6 @@ class SmoothieDriver_3_0_0:
             1) Smoothieware boots or resets, 2) if a HALT gcode or signal
             is sent, or 3) a homing/limitswitch error occured.
         '''
-        from numpy import isclose
-
         self.run_flag.wait()
 
         def valid_movement(coords, axis):

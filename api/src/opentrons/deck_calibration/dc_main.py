@@ -3,15 +3,15 @@
 # pylama:ignore=C901,W0401
 
 import asyncio
-import urwid
+import urwid  # type: ignore
 import argparse
 import atexit
 import os
 import sys
 import logging
 from typing import Tuple
-from numpy.linalg import inv
-from numpy import dot, array
+from numpy.linalg import inv  # type: ignore
+from numpy import dot, array  # type: ignore
 import opentrons
 from opentrons import robot, instruments, types
 from opentrons.hardware_control import adapters

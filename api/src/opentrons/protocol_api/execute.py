@@ -6,19 +6,11 @@ import traceback
 import sys
 from typing import Any, Callable, Dict
 
+import jsonschema  # type: ignore
+
 from .contexts import ProtocolContext
 from . import execute_v1, execute_v3
 from opentrons import config
-
-# TODO: Ian 2019-04-09 once we are able to add new python dependencies,
-# add jsonschema. Until then, this will only work for developers and all
-# uses of jsonschema must be skipped when the module isn't available for import
-# NOTE: jsonschema is currently installed only as dependency of jupyter's
-# `nbnotebook`, not directly by our Pipfile
-try:
-    import jsonschema
-except ModuleNotFoundError:
-    jsonschema = None
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -158,11 +150,6 @@ def get_schema_for_protocol(protocol_json: Dict[Any, Any]) -> Dict[Any, Any]:
 
 
 def validate_protocol(protocol_json: Dict[Any, Any]):
-    if not jsonschema:
-        MODULE_LOG.debug('jsonschema not able to be imported, skipping ' +
-                         'schema validation')
-        return
-
     protocol_schema = get_schema_for_protocol(protocol_json)
 
     # instruct schema how to resolve all $ref's used in protocol schemas

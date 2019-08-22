@@ -10,7 +10,7 @@ import json
 import logging
 from typing import Any, Awaitable, Callable, Dict, List, Optional, Set
 
-import jsonrpcserver
+import jsonrpcserver  # type: ignore
 
 from opentrons import types as top_types
 from opentrons.config import robot_configs

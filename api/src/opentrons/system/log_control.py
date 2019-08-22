@@ -11,7 +11,7 @@ import logging
 import syslog
 from typing import Any, Deque, Dict, List, Tuple
 
-import systemd.journal as journal
+import systemd.journal as journal  # type: ignore
 
 
 LOG = logging.getLogger(__name__)

@@ -4,9 +4,8 @@ from typing import Any, NamedTuple, TYPE_CHECKING, Union
 if TYPE_CHECKING:
     from typing import (Optional,       # noqa(F401) Used for typechecking
                         Tuple)
-    from .labware import (Labware,      # noqa(F401) Used for typechecking
-                          Well,
-                          ModuleGeometry)
+    from .protocol_api.labware import (  # noqa(F401) Used for typechecking
+        Labware, Well, ModuleGeometry)
 
 
 class PipetteNotAttachedError(KeyError):
