@@ -164,14 +164,14 @@ deploy: wheel
                             $(wheel_file)
 
 .PHONY: push
-push: wheel
+push-balena: wheel
 	curl -X POST \
 		-H "Content-Type: multipart/form-data" \
 		-F "whl=@$(wildcard dist/opentrons-*.whl)" \
 		http://$(host):31950/server/update
 
 .PHONY: push-buildroot
-push-buildroot: wheel
+push: wheel
 	scp -i $(br_ssh_key) $(ssh_opts) $(wheel_file) root@$(host):/data/
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host) \
 "function cleanup () { rm -f /data/opentrons*.whl && mount -o remount,ro / && systemctl start opentrons-api-server; } ;\
@@ -185,13 +185,6 @@ install-key:
 	curl -X POST $(host):31950/server/ssh_keys\
 		-H "Content-Type: application/json"\
 		-d "{\"key\":\"$(shell cat $(br_ssh_pubkey))\"}"
-
-.PHONY: flash
-flash:
-	curl -X POST \
-		-H "Content-Type: multipart/form-data" \
-		-F "hex=@$(firmware)" \
-		http://$(host):31950/server/update/firmware
 
 .PHONY: restart
 restart:

@@ -359,17 +359,15 @@ make push-api
 make push-api host=${some_other_ip_address}
 ```
 
-and if it's on buildroot do:
+and if it's still on balena do:
 
 ```shell
 # push the current contents of the api directory to robot for testing
 # defaults to currently connected ethernet robot
-make -C api push-buildroot
+make -C api push-balena
 # takes optional host variable for other robots
-make -C api push-buildroot host=${some_other_ip_address}
+make -C api push-balena host=${some_other_ip_address}
 ```
-
-Note that there is no separate `restart` command because `push-buildroot` restarts the systemd unit controlling the API server. This only pushes the python wheel containing the API server; if you have edited the systemd unit, you'll need to `scp` it manually and then do `systemctl daemon-reload` on the robot before restarting the api server.
 
 To SSH into the robot, do
 
@@ -380,7 +378,7 @@ make term
 make term host=${some_other_ip_address}
 ```
 
-If the robot is on buildroot and `make term` complains about not having a key, you may need to install a public key on the robot. To do this, create an ssh key and install it:
+If  `make term` complains about not having a key, you may need to install a public key on the robot. To do this, create an ssh key and install it:
 
 ```shell
 ssh-keygen # note the path you save the key to
