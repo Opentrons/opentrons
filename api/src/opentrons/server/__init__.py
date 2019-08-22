@@ -106,7 +106,7 @@ def init(loop=None, hardware: 'HardwareAPILike' = None):
         app, MainRouter(
             checked_hardware, lock=app['com.opentrons.motion_lock']))
     app['com.opentrons.http'] = HTTPServer(app, CONFIG['log_dir'])
-
+    app.on_shutdown.freeze()
     return app
 
 

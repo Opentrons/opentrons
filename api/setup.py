@@ -110,11 +110,11 @@ DESCRIPTION = (
     "writing automated biology lab protocols easy.")
 PACKAGES = find_packages(where='src')
 INSTALL_REQUIRES = [
-    'pyserial==3.2.1',
-    'aiohttp==2.3.8',
-    'numpy>=1.12.1',
+    'pyserial==3.4',
+    'aiohttp==3.4.4',
+    'numpy>=1.15.1',
     'urwid==1.3.1',
-    'jsonschema',
+    'jsonschema>=2.5.1',
 ]
 
 

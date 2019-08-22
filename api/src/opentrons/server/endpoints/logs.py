@@ -98,8 +98,8 @@ async def set_syslog_level(request: web.Request) -> web.Response:
     try:
         body = await request.json()
     except json.JSONDecodeError:
-        return web.json_respose(status=400,
-                                data={"message": "request must be json"})
+        return web.json_response(status=400,
+                                 data={"message": "request must be json"})
     if 'log_level' not in body:
         return web.json_response(
             status=400,
