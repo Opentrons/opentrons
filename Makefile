@@ -25,9 +25,8 @@ ifeq ($(watch), true)
 	cover := false
 endif
 
-# run at usage (=), not on makefile parse (:=) but with caching
-get_usb_host=$(shell yarn run -s discovery find -i 169.254 fd00 -c "[fd00:0:cafe:fefe::1]")
-usb_host=$(if usb_host,$(usb_host),$(get_usb_host))
+# run at usage (=), not on makefile parse (:=)
+usb_host=$(shell yarn run -s discovery find -i 169.254 fd00 -c "[fd00:0:cafe:fefe::1]")
 
 
 $(function usb_host_cache)
@@ -74,6 +73,7 @@ push-api-buildroot: push-api
 
 .PHONY: push-update-server
 push-update-server: export host = $(usb_host)
+push-update-server:
 	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
 	$(MAKE) -C $(UPDATE_SERVER_DIR) push
 
@@ -82,7 +82,8 @@ push: export host=$(usb_host)
 push:
 	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
 	$(MAKE) -C $(API_DIR) push
-	$(MAEK) -C $(UPDATE_SERVER_DIR) push
+	sleep 1
+	$(MAKE) -C $(UPDATE_SERVER_DIR) push
 
 
 .PHONY: term
