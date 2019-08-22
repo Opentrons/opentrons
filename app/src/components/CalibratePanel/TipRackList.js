@@ -60,7 +60,7 @@ function mapStateToProps(state: State): SP {
     tipracks: robotSelectors.getTipracks(state),
     disabled: robotSelectors.getTipracksConfirmed(state),
     _calibrator: robotSelectors.getCalibratorMount(state),
-    _deckPopulated: robotSelectors.getDeckPopulated(state),
+    _deckPopulated: Boolean(robotSelectors.getDeckPopulated(state)),
   }
 }
 

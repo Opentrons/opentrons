@@ -409,8 +409,9 @@ export function getModulesReviewed(state: State): boolean {
   return Boolean(calibration(state).modulesReviewed)
 }
 
-export function getDeckPopulated(state: State): boolean {
-  return Boolean(calibration(state).deckPopulated)
+export function getDeckPopulated(state: State): boolean | null {
+  const { deckPopulated } = calibration(state)
+  return deckPopulated != null ? deckPopulated : null
 }
 
 // $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector

@@ -1,15 +1,16 @@
-# Robot OS Changes from 3.10.3 to 3.11.1
+# Robot OS Changes from 3.10.3 to 3.11.2
 
 This update migrates the Opentrons Robot OS to a new underlying technology - buildroot. This change allows us to better control the robot's system and provide better updates without requiring internet connectivity.
 
-Updating your robot to 3.11.1 will take up to 10 minutes, and your Opentrons App must stay connected to the robot the entire time. If you have manually installed Python packages on your robot, you will have to reinstall them after this update.
+Updating your robot from 3.10 to 3.11 will take up to 10 minutes, and your Opentrons App must stay connected to the robot the entire time. If you have manually installed Python packages on your robot, you will have to reinstall them after this update.
 
 For more details about this release, please see the full [technical change log][changelog]
 
 ## New Features
 
+- **SSH access to the OT-2 now requires public-key authentication**. Please see [this support article][ot2-ssh] for details on how to generate and install a public key to gain ssh access to the OT-2.
 - Added support for setting the flow rate of the pipette during blowout operations. `set_flow_rate` and `set_speed` now take a `blow_out` parameter. See the [API Docs][blowoutflowrate] for more details.
-- Store labware calibration separately if a labware is placed on a module. For instance, a well plate on a Temperature Module can now be calibrated separately from a well plate placed on the deck.
+- Labware calibration is now stored separately if a labware is placed on a module. For instance, a well plate on a Temperature Module can now be calibrated separately from a well plate placed on the deck.
 - Added support for filter tips in [200 ul][filter-200], [1000 ul][filter-1k], and [10ul][filter-10] sizes; when the 200 ul tips are used with a P300 Single or Multi pipette, the pipette's maximum volume will be reduced to 200 ul.
 
 ## Bug fixes
@@ -24,6 +25,7 @@ For more details about this release, please see the full [technical change log][
 - When attaching or detaching a pipette from the left mount, the robot homes twice in the X direction
 
 [changelog]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
+[ot2-ssh]: https://support.opentrons.com/en/articles/3203681-enabling-ssh-access-to-your-ot2
 [blowoutflowrate]: https://docs.opentrons.com/atomic%20commands.html#controlling-speed
 [filter-200]: https://labware.opentrons.com/opentrons_96_filtertiprack_200ul
 [filter-1k]: https://labware.opentrons.com/opentrons_96_filtertiprack_1000ul

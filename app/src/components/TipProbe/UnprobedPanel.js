@@ -51,7 +51,7 @@ function mapStateToProps(state, ownProps: OP): SP {
   const deckPopulated = robotSelectors.getDeckPopulated(state)
 
   return {
-    _showContinueModal: deckPopulated || deckPopulated == null,
+    _showContinueModal: deckPopulated === true || deckPopulated === null,
   }
 }
 
