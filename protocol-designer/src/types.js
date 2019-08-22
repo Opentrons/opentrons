@@ -4,6 +4,7 @@ import type { OutputSelector } from 'reselect'
 import type { RootState as Analytics } from './analytics'
 import type { RootState as Dismiss } from './dismiss'
 import type { RootState as FileData } from './file-data'
+import type { RootState as FeatureFlags } from './feature-flags'
 import type { RootState as LabwareIngred } from './labware-ingred/reducers'
 import type { RootState as LoadFile } from './load-file'
 import type { RootState as Navigation } from './navigation'
@@ -16,6 +17,7 @@ export type BaseState = {
   analytics: Analytics,
   dismiss: Dismiss,
   fileData: FileData,
+  featureFlags: FeatureFlags,
   labwareIngred: LabwareIngred,
   loadFile: LoadFile,
   navigation: Navigation,

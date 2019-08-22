@@ -8,7 +8,6 @@ import {
   ToggleButton,
   LabeledValue,
 } from '@opentrons/components'
-import styles from './SettingsPage.css'
 import {
   actions as analyticsActions,
   selectors as analyticsSelectors,
@@ -17,8 +16,10 @@ import {
   actions as tutorialActions,
   selectors as tutorialSelectors,
 } from '../../tutorial'
-import type { BaseState, ThunkDispatch } from '../../types'
 import { OLDEST_MIGRATEABLE_VERSION } from '../../load-file/migration'
+import FeatureFlagCard from './FeatureFlagCard'
+import styles from './SettingsPage.css'
+import type { BaseState, ThunkDispatch } from '../../types'
 
 type Props = {
   canClearHintDismissals: boolean,
@@ -87,6 +88,7 @@ function SettingsApp(props: Props) {
           </ul>
         </div>
       </Card>
+      <FeatureFlagCard />
     </div>
   )
 }

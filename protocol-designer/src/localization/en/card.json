@@ -7,9 +7,10 @@
     "restore_hints": "Restore all hints and tips notifications"
   },
   "title": {
-    "privacy": "Privacy",
+    "information": "Information",
+    "feature_flags": "Feature Flags",
     "hints": "Hints",
-    "information": "Information"
+    "privacy": "Privacy"
   },
   "toggle": {
     "share_session": "Share sessions with the Opentrons Product Team"

@@ -1,0 +1,6 @@
+{
+  "OT_PD_SHOW_UPLOAD_CUSTOM_LABWARE_BUTTON": {
+    "title": "Upload custom labware",
+    "description": "Show the \"Upload Custom Labware\" button to enable adding custom labware to protocol"
+  }
+}

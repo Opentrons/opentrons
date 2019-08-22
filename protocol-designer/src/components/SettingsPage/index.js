@@ -12,10 +12,7 @@ type Props = { currentPage: Page }
 
 const SettingsPage = (props: Props) => {
   switch (props.currentPage) {
-    case 'settings-features': {
-      // TODO: BC 2018-09-01 when we have feature flags put them here
-      return <div>Feature Flags Coming Soon...</div>
-    }
+    // TODO: Ian 2019-08-21 when we have other pages, put them here
     case 'settings-app':
     default:
       return <SettingsApp />

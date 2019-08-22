@@ -24,6 +24,7 @@ type Props = {
   customLabwareDefs: LabwareDefByDefURI,
   slot: ?DeckSlotId,
   permittedTipracks: Array<string>,
+  showUploadCustomLabwareButton: ?boolean,
 }
 
 const CUSTOM_CATEGORY = 'custom'
@@ -137,16 +138,18 @@ const LabwareDropdown = (props: Props) => {
             </PDTitledList>
           ))}
         </ul>
-        <OutlineButton Component="label" className={styles.upload_button}>
-          {i18n.t('button.upload_custom_labware')}
-          <input
-            type="file"
-            onChange={e => {
-              onUploadLabware(e)
-              selectCategory(CUSTOM_CATEGORY)
-            }}
-          />
-        </OutlineButton>
+        {props.showUploadCustomLabwareButton && (
+          <OutlineButton Component="label" className={styles.upload_button}>
+            {i18n.t('button.upload_custom_labware')}
+            <input
+              type="file"
+              onChange={e => {
+                onUploadLabware(e)
+                selectCategory(CUSTOM_CATEGORY)
+              }}
+            />
+          </OutlineButton>
+        )}
         <OutlineButton onClick={onClose}>
           {i18n.t('button.close')}
         </OutlineButton>
