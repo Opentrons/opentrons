@@ -1,8 +1,8 @@
 // discovery reducer test
 import { discoveryReducer } from '..'
 
-jest.mock('../../shell', () => ({
-  getShellRobots: () => [
+jest.mock('../../shell/remote', () => ({
+  INITIAL_ROBOTS: [
     { name: 'foo', ip: '192.168.1.1', port: 31950 },
     { name: 'bar', ip: '192.168.1.2', port: 31950 },
   ],

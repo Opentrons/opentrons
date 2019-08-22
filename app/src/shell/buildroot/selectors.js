@@ -6,7 +6,6 @@ import {
   getViewableRobots,
   getRobotApiVersion,
 } from '../../discovery/selectors'
-import remote from '../remote'
 
 import type { State } from '../../types'
 import type { ViewableRobot } from '../../discovery'
@@ -17,6 +16,10 @@ import type {
   RobotSystemType,
 } from './types'
 
+export function getBuildrootUpdateVersion(state: State): string | null {
+  return state.shell.buildroot.version || null
+}
+
 export function getBuildrootUpdateInfo(
   state: State
 ): BuildrootUpdateInfo | null {
@@ -26,7 +29,7 @@ export function getBuildrootUpdateInfo(
 export function getBuildrootTargetVersion(state: State): string | null {
   return (
     state.shell.buildroot.session?.userFileInfo?.version ||
-    state.shell.buildroot.info?.version ||
+    state.shell.buildroot.version ||
     null
   )
 }
@@ -84,42 +87,19 @@ export const getBuildrootRobot: State => ViewableRobot | null = createSelector(
   }
 )
 
-const compareCurrentVersionToUpdate = (
-  currentVersion: string,
-  updateVersion: string
-): boolean => {
-  const validCurrent = semver.valid(currentVersion)
-  const validUpdate = semver.valid(updateVersion)
-
-  return validCurrent !== null && validUpdate !== null
-    ? semver.gt(validUpdate, validCurrent)
-    : false
-}
-
 export function getBuildrootUpdateAvailable(
   state: State,
-  currentVersion: string
-): boolean {
-  const updateVersion = getBuildrootUpdateInfo(state)?.version
-
-  return updateVersion != null
-    ? compareCurrentVersionToUpdate(currentVersion, updateVersion)
-    : false
-}
-
-export function compareRobotVersionToUpdate(
   robot: ViewableRobot
-): BuildrootUpdateType {
+): BuildrootUpdateType | null {
+  const updateVersion = getBuildrootUpdateVersion(state)
   const currentVersion = getRobotApiVersion(robot)
-  // TODO(mc, 2019-07-23): get this from state once BR state info can come in piecemeal
-  const updateVersion: string = remote.update.CURRENT_VERSION
 
   const validCurrent: string | null = semver.valid(currentVersion)
   const validUpdate: string | null = semver.valid(updateVersion)
-  let type = 'upgrade'
+  let type = null
 
-  if (validCurrent && validUpdate) {
-    if (semver.gt(validUpdate, validCurrent)) {
+  if (validUpdate) {
+    if (!validCurrent || semver.gt(validUpdate, validCurrent)) {
       type = 'upgrade'
     } else if (semver.lt(validUpdate, validCurrent)) {
       type = 'downgrade'

@@ -252,6 +252,30 @@ describe('app/shell/buildroot reducer', () => {
       initialState: { ...INITIAL_STATE, session: BASE_SESSION },
       expected: { ...INITIAL_STATE, session: null },
     },
+    {
+      name: 'handles buildroot:UNEXPECTED_ERROR',
+      action: {
+        type: 'buildroot:UNEXPECTED_ERROR',
+        payload: { message: 'AH!' },
+      },
+      initialState: { ...INITIAL_STATE, info: null },
+      expected: {
+        ...INITIAL_STATE,
+        session: { ...INITIAL_STATE.session, error: 'AH!' },
+      },
+    },
+    {
+      name: 'handles buildroot:PREMIGRATION_ERROR',
+      action: {
+        type: 'buildroot:PREMIGRATION_ERROR',
+        payload: { message: 'AH!' },
+      },
+      initialState: { ...INITIAL_STATE, info: null },
+      expected: {
+        ...INITIAL_STATE,
+        session: { ...INITIAL_STATE.session, error: 'AH!' },
+      },
+    },
   ]
 
   SPECS.forEach(spec => {

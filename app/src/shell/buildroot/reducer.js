@@ -11,6 +11,7 @@ import * as actions from './actions'
 
 export const INITIAL_STATE: BuildrootState = {
   seen: false,
+  version: null,
   info: null,
   downloadProgress: null,
   downloadError: null,
@@ -36,6 +37,9 @@ export function buildrootReducer(
   action: Action
 ): BuildrootState {
   switch (action.type) {
+    case actions.BR_UPDATE_VERSION:
+      return { ...state, version: action.payload }
+
     case actions.BR_UPDATE_INFO:
       return { ...state, info: action.payload }
 
@@ -84,6 +88,7 @@ export function buildrootReducer(
     case actions.BR_CLEAR_SESSION:
       return { ...state, session: null }
 
+    case actions.BR_PREMIGRATION_ERROR:
     case actions.BR_UNEXPECTED_ERROR:
       return {
         ...state,

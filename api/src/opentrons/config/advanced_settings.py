@@ -4,7 +4,7 @@ import os
 import sys
 from typing import Any, Dict, Mapping, Tuple, Union, Optional, TYPE_CHECKING
 
-from opentrons.config import CONFIG
+from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
 
 if TYPE_CHECKING:
     from pathlib import Path  # noqa(F401) - imported for types
@@ -70,8 +70,17 @@ settings = [
                     ' P50M, and P300S pipettes. Note this will cause the '
                     ' default aspirate behavior (ul to mm conversion) to '
                     ' function as it did prior to version 3.7.0.'
-    )
+    ),
 ]
+
+if ARCHITECTURE == SystemArchitecture.BUILDROOT:
+    settings.append(
+        Setting(
+            _id='disableLogAggregation',
+            title='Disable Opentrons Log Collection',
+            description='Prevent the robot from sending its logs to Opentrons'
+                        ' for analysis. Opentrons uses these logs to'
+                        ' troubleshoot robot issues and spot error trends.'))
 
 settings_by_id = {s.id: s for s in settings}
 settings_by_old_id = {s.old_id: s for s in settings}
@@ -183,7 +192,17 @@ def _migrate0to1(previous: Mapping[str, Any]) -> SettingsMap:
     return next
 
 
-_MIGRATIONS = [_migrate0to1]
+def _migrate1to2(previous: SettingsMap) -> SettingsMap:
+    """
+    Migration to version 2 of the feature flags file. Adds the
+    disableLogAggregation config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap['disableLogAggregation'] = None
+    return newmap
+
+
+_MIGRATIONS = [_migrate0to1, _migrate1to2]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
 for how the migration functions are applied. Each migration function should

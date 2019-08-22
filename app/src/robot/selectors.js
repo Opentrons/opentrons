@@ -88,6 +88,10 @@ export function getIsReadyToRun(state: State): boolean {
   return getSessionStatus(state) === ('loaded': SessionStatus)
 }
 
+export function getIsActive(state: State): boolean {
+  return getSessionStatus(state) === ('running': SessionStatus)
+}
+
 export function getIsRunning(state: State): boolean {
   const status = getSessionStatus(state)
 
@@ -255,6 +259,10 @@ export const getPipettes: OutputSelector<
   }
 )
 
+export function getApiLevel(state: State) {
+  return session(state).apiLevel
+}
+
 // $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export const getNextPipette = createSelector(
   getPipettes,
@@ -401,8 +409,9 @@ export function getModulesReviewed(state: State): boolean {
   return Boolean(calibration(state).modulesReviewed)
 }
 
-export function getDeckPopulated(state: State): boolean {
-  return Boolean(calibration(state).deckPopulated)
+export function getDeckPopulated(state: State): boolean | null {
+  const { deckPopulated } = calibration(state)
+  return deckPopulated != null ? deckPopulated : null
 }
 
 // $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector

@@ -3,6 +3,76 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.11.2](https://github.com/Opentrons/opentrons/compare/v3.11.1...v3.11.2) (2019-08-21)
+
+
+### Bug Fixes
+
+* **app:** Fix regression breaking trash removal modal before tip probe ([f0d1da3](https://github.com/Opentrons/opentrons/commit/f0d1da3))
+
+
+
+
+
+## [3.11.1](https://github.com/Opentrons/opentrons/compare/v3.11.0...v3.11.1) (2019-08-21)
+
+
+### Bug Fixes
+
+* **app:** Fix paths to BR premigration wheels on Windows ([0ff8638](https://github.com/Opentrons/opentrons/commit/0ff8638))
+
+
+
+
+
+# [3.11.0](https://github.com/opentrons/opentrons/compare/v3.10.3...v3.11.0) (2019-08-21)
+
+### Bug Fixes
+
+* **shared-data:** fix "strict" arg for labware creation ([#3874](https://github.com/opentrons/opentrons/issues/3874)) ([bd604e2](https://github.com/opentrons/opentrons/commit/bd604e2))
+* **api:** apiv1: fix transfer volume ([#3792](https://github.com/opentrons/opentrons/issues/3792)) ([e3099af](https://github.com/opentrons/opentrons/commit/e3099af))
+* **api:** apiv2: fix mix, blowout in advanced steps ([#3799](https://github.com/opentrons/opentrons/issues/3799)) ([48fc442](https://github.com/opentrons/opentrons/commit/48fc442)), closes [#3719](https://github.com/opentrons/opentrons/issues/3719)
+* **api:** apiv2: fix overaspiration after blowout ([#3801](https://github.com/opentrons/opentrons/issues/3801)) ([61e82c3](https://github.com/opentrons/opentrons/commit/61e82c3)), closes [#3797](https://github.com/opentrons/opentrons/issues/3797)
+* **api:** Do not publish commands for RPC pause/resume in APIv1 ([#3850](https://github.com/opentrons/opentrons/issues/3850)) ([72952ba](https://github.com/opentrons/opentrons/commit/72952ba))
+* **api:** duplicate mix with blowout during transfer ([#3810](https://github.com/opentrons/opentrons/issues/3810)) ([9a70c36](https://github.com/opentrons/opentrons/commit/9a70c36)), closes [#2607](https://github.com/opentrons/opentrons/issues/2607)
+* **api:** force nmcli to actively check for connectivity ([#3811](https://github.com/opentrons/opentrons/issues/3811)) ([c200de3](https://github.com/opentrons/opentrons/commit/c200de3)), closes [#3768](https://github.com/opentrons/opentrons/issues/3768)
+* **app:** eagerly fetch modules and instruments on robot connect ([#3854](https://github.com/opentrons/opentrons/issues/3854)) ([88f5aec](https://github.com/opentrons/opentrons/commit/88f5aec)), closes [#3844](https://github.com/opentrons/opentrons/issues/3844)
+* **app:** Remove Electron RPC remote objects from Redux state ([#3820](https://github.com/opentrons/opentrons/issues/3820)) ([d5f3fe3](https://github.com/opentrons/opentrons/commit/d5f3fe3))
+* **protocol-designer:** update typeform version ([#3794](https://github.com/opentrons/opentrons/issues/3794)) ([46c6503](https://github.com/opentrons/opentrons/commit/46c6503))
+
+
+### Features
+
+* **app:** Add robot logging opt-out alert ([#3869](https://github.com/opentrons/opentrons/issues/3869)) ([9ab6938](https://github.com/opentrons/opentrons/commit/9ab6938))
+* **api:** Add a log aggregation optout ([#3868](https://github.com/opentrons/opentrons/issues/3868)) ([ccb0b94](https://github.com/opentrons/opentrons/commit/ccb0b94)), closes [#3866](https://github.com/opentrons/opentrons/issues/3866)
+* **api:** apiv2: prevent over-aspiration with filter tips ([#3781](https://github.com/opentrons/opentrons/issues/3781)) ([4cc3023](https://github.com/opentrons/opentrons/commit/4cc3023))
+* **api:** cycle temperatures, pause, cancel, and resume to TC control ([#3839](https://github.com/opentrons/opentrons/issues/3839)) ([6841419](https://github.com/opentrons/opentrons/commit/6841419)), closes [#3581](https://github.com/opentrons/opentrons/issues/3581)
+* **api:** move gantry to safe spot while TC lid moves ([#3807](https://github.com/opentrons/opentrons/issues/3807)) ([752295c](https://github.com/opentrons/opentrons/commit/752295c))
+* **api:** prevent over-aspiration with filter tips in v1  ([#3692](https://github.com/opentrons/opentrons/issues/3692)) ([487927a](https://github.com/opentrons/opentrons/commit/487927a))
+* **app:** add control of modules to run cards ([#3841](https://github.com/opentrons/opentrons/issues/3841)) ([9b34f9f](https://github.com/opentrons/opentrons/commit/9b34f9f))
+* **app:** display TC on Deck Map ([#3786](https://github.com/opentrons/opentrons/issues/3786)) ([272a6ad](https://github.com/opentrons/opentrons/commit/272a6ad)), closes [#3553](https://github.com/opentrons/opentrons/issues/3553) [#3064](https://github.com/opentrons/opentrons/issues/3064)
+* **app:** Enable buildroot updates by default ([#3861](https://github.com/opentrons/opentrons/issues/3861)) ([bf68ad9](https://github.com/opentrons/opentrons/commit/bf68ad9)), closes [#3822](https://github.com/opentrons/opentrons/issues/3822)
+* **app:** prompt to open TC lid before labware calibration ([#3853](https://github.com/opentrons/opentrons/issues/3853)) ([2b7efbc](https://github.com/opentrons/opentrons/commit/2b7efbc)), closes [#3066](https://github.com/opentrons/opentrons/issues/3066)
+* **app, api:** Key calibration by parent-type/labware-type combo ([#3800](https://github.com/opentrons/opentrons/issues/3800)) ([ba0df67](https://github.com/opentrons/opentrons/commit/ba0df67)), closes [#3775](https://github.com/opentrons/opentrons/issues/3775)
+* **docs:** Add transfers page for API v2 ([#3857](https://github.com/opentrons/opentrons/issues/3857)) ([08a7d4c](https://github.com/opentrons/opentrons/commit/08a7d4c))
+* **labware-library:** support static rendering of labware library ([#3791](https://github.com/opentrons/opentrons/issues/3791)) ([793b624](https://github.com/opentrons/opentrons/commit/793b624))
+* **protocol-designer:** bump typeform/embed to v0.12.1 ([#3865](https://github.com/opentrons/opentrons/issues/3865)) ([617d5ad](https://github.com/opentrons/opentrons/commit/617d5ad))
+* **protocol-designer:** warn user when exporting w/o steps ([#3864](https://github.com/opentrons/opentrons/issues/3864)) ([1a129ec](https://github.com/opentrons/opentrons/commit/1a129ec)), closes [#3060](https://github.com/opentrons/opentrons/issues/3060)
+
+
+
+
+
+<a name="3.10.3"></a>
+## [3.10.3](https://github.com/opentrons/opentrons/compare/v3.10.2...v3.10.3) (2019-07-26)
+
+### Bug Fixes
+
+* **api:** revert: "feat(api): prevent over-aspiration with filter tips in v1 ([#3692](https://github.com/opentrons/opentrons/issues/3692)) ([bd0808d](https://github.com/Opentrons/opentrons/commit/bd0808d726b7b17c35fa0116638b28f143d140e0))
+
+
+
+
 <a name="3.10.2"></a>
 ## [3.10.2](https://github.com/opentrons/opentrons/compare/v3.10.0...v3.10.2) (2019-07-25)
 

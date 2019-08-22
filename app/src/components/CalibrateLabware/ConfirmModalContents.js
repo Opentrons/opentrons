@@ -15,7 +15,7 @@ import InProgressContents from './InProgressContents'
 
 type OP = {| labware: Labware, calibrateToBottom: boolean |}
 
-type SP = {| calibrator: ?Pipette |}
+type SP = {| calibrator: ?Pipette, useCenteredTroughs: boolean |}
 
 type Props = { ...OP, ...SP }
 
@@ -24,7 +24,7 @@ export default connect<Props, OP, _, _, _, _>(mapStateToProps)(
 )
 
 function ConfirmModalContents(props: Props) {
-  const { labware, calibrator, calibrateToBottom } = props
+  const { labware, calibrator, calibrateToBottom, useCenteredTroughs } = props
   if (!calibrator) return null
 
   switch (labware.calibration) {
@@ -36,6 +36,7 @@ function ConfirmModalContents(props: Props) {
           labware={labware}
           calibrator={calibrator}
           calibrateToBottom={calibrateToBottom}
+          useCenteredTroughs={useCenteredTroughs}
         />
       )
 
@@ -60,6 +61,6 @@ function mapStateToProps(state, ownProps: OP): SP {
   const calibrator =
     pipettes.find(i => i.mount === calibratorMount) ||
     robotSelectors.getCalibrator(state)
-
-  return { calibrator }
+  const useCenteredTroughs = robotSelectors.getApiLevel(state) > 1
+  return { calibrator, useCenteredTroughs }
 }

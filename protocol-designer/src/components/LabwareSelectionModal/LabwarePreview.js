@@ -8,6 +8,7 @@ import {
 } from '@opentrons/components'
 import {
   getLabwareDisplayName,
+  getLabwareDefIsStandard,
   type LabwareDefinition2,
 } from '@opentrons/shared-data'
 import i18n from '../../localization'
@@ -51,10 +52,12 @@ const LabwarePreview = (props: Props) => {
             </RobotWorkSpace>
           </div>
           <div className={styles.labware_detail_column}>
-            <LabeledValue
-              label={i18n.t('modal.labware_selection.measurements')}
-              value={i18n.t('modal.labware_selection.see_details')}
-            />
+            {getLabwareDefIsStandard(labwareDef) && (
+              <LabeledValue
+                label={i18n.t('modal.labware_selection.measurements')}
+                value={i18n.t('modal.labware_selection.see_details')}
+              />
+            )}
             <div className={styles.labware_detail_row}>
               <LabeledValue
                 label={i18n.t('modal.labware_selection.well_count')}

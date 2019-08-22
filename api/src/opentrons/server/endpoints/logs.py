@@ -1,18 +1,13 @@
-import asyncio
-import collections
-import datetime
 import json
 import logging
-import syslog
-from typing import Any, Deque, Dict, List, Mapping
+
+from typing import Any, Dict, Mapping
 
 from aiohttp import web
-import systemd.journal as journal
 
+from opentrons.system import log_control
 
 LOG = logging.getLogger(__name__)
-
-MAX_RECORDS = 1000000
 
 
 def _get_options(params: Mapping[str, str],
@@ -38,7 +33,7 @@ def _get_options(params: Mapping[str, str],
     if 'records' in params:
         try:
             records = int(params['records'])
-            if records <= 0 or records > MAX_RECORDS:
+            if records <= 0 or records > log_control.MAX_RECORDS:
                 raise ValueError(records)
         except (ValueError, TypeError):
             LOG.exception(f"Bad records count requested: {params['records']}")
@@ -47,74 +42,17 @@ def _get_options(params: Mapping[str, str],
     return response
 
 
-async def _get_records(syslog_selector: str, record_count: int)\
-          -> Deque[Dict[str, Any]]:
-    """ Get log records up to record count.
-    """
-    loop = asyncio.get_event_loop()
-    log_deque: Deque[Dict[str, Any]] = collections.deque(maxlen=record_count)
-    with journal.Reader(journal.SYSTEM_ONLY) as r:
-        r.add_match(SYSLOG_IDENTIFIER=syslog_selector)
-        last_time = loop.time()
-        for record in r:
-            log_deque.append(record)
-            now = loop.time()
-            if (now-last_time) > 0.1:
-                last_time = now
-                await asyncio.sleep(0.01)
-    return log_deque
-
-
-def _format_record_text(record: Dict[str, Any]) -> str:
-    dict_rec = _format_record_dict(record)
-    return f'{dict_rec["time"]} {dict_rec["logger"]} '\
-        f'[{dict_rec["level_name"]}]: {dict_rec["message"]}'
-
-
-def _format_text(records: Deque[Dict[str, Any]]) -> str:
-    return '\n'.join([_format_record_text(record) for record in records])
-
-
-_SYSLOG_PRIORITY_TO_NAME = {
-    syslog.LOG_EMERG: 'emergency',
-    syslog.LOG_CRIT: 'critical',
-    syslog.LOG_ERR: 'error',
-    syslog.LOG_WARNING: 'warning',
-    syslog.LOG_INFO: 'info',
-    syslog.LOG_DEBUG: 'debug',
-    syslog.LOG_ALERT: 'alert',
-    syslog.LOG_NOTICE: 'notice'
-}
-
-
-def _format_record_dict(record: Dict[str, Any]) -> Dict[str, Any]:
-    return {
-        'logger': record.get('LOGGER', '<unknown>'),
-        'level': record.get('PRIORITY'),
-        'level_name': _SYSLOG_PRIORITY_TO_NAME.get(  # type: ignore
-            record.get('PRIORITY'), '<unknown>'),
-        'file': record.get('CODE_FILE', '<unknown>'),
-        'line': record.get('CODE_LINE', '<unknown>'),
-        'func': record.get('CODE_FUNC', '<unknown>'),
-        'time': record.get(
-            '__REALTIME_TIMESTAMP',
-            datetime.datetime.fromtimestamp(0)).isoformat(),
-        'boot': str(record.get('_BOOT_ID', '<unknown>')),
-        'message': record.get('MESSAGE', '<unknown>')
-    }
-
-
-def _prep_for_json(records: Deque[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    return [_format_record_dict(rec) for rec in records]
-
-
 async def _get_log_response(syslog_selector: str, record_count: int,
                             record_format: str) -> web.Response:
-    records = await _get_records(syslog_selector, record_count)
+
     if record_format == 'json':
-        return web.json_response(data=_prep_for_json(records))
+        records = await log_control.get_records_serializable(
+            syslog_selector, record_count)
+        return web.json_response(data=records)
     else:
-        return web.Response(text=_format_text(records))
+        text = await log_control.get_records_text(
+            syslog_selector, record_count)
+        return web.Response(text=text)
 
 
 async def get_logs_by_id(request: web.Request) -> web.Response:
@@ -156,11 +94,6 @@ async def set_syslog_level(request: web.Request) -> web.Response:
 
     POST /settings/log_level/upstream {"log_level": str level, null} -> 200 OK
 
-    Similar to :py:meth:`opentrons.server.endpoints.settings.set_log_level`,
-    the level should be a python log level like "debug", "info", "warning", or
-    "error". If it is null, sets the minimum log level to emergency which we
-    do not log at since there's not really a matching level in python logging,
-    which effectively disables log upstreaming.
     """
     try:
         body = await request.json()
@@ -187,13 +120,8 @@ async def set_syslog_level(request: web.Request) -> web.Response:
             return web.json_response(
                 status=400,
                 data={"message": f"invalid log level {log_level}"})
-    with open('/var/lib/syslog-ng/min-level', 'w') as ml:
-        ml.write(syslog_level)
-    proc = await asyncio.create_subprocess_exec(
-        'syslog-ng-ctl', 'reload',
-        stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
-    stdout, stderr = await proc.communicate()
-    code = proc.returncode
+
+    code, stdout, stderr = await log_control.set_syslog_level(syslog_level)
     if code != 0:
         msg = f'Could not reload config: {stdout} {stderr}'
         LOG.error(msg)

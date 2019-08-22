@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { withRouter, type ContextRouter } from 'react-router'
 
 import { actions as robotActions } from '../../robot'
-import { makeGetRobotUpdateInfo } from '../../http-api-client'
+import { getBuildrootUpdateAvailable } from '../../shell'
 import { RobotListItem } from './RobotListItem.js'
 
 import type { State, Dispatch } from '../../types'
@@ -22,18 +22,19 @@ export type RobotItemProps = { ...OP, ...SP, ...DP }
 
 export default withRouter<WithRouterOP>(
   connect<RobotItemProps, OP, SP, DP, State, Dispatch>(
-    makeMapStateToProps,
+    mapStateToProps,
     mapDispatchToProps
   )(RobotListItem)
 )
 
-function makeMapStateToProps(): (State, OP) => SP {
-  const getUpdateInfo = makeGetRobotUpdateInfo()
+function mapStateToProps(state: State, ownProps: OP): SP {
+  const { robot } = ownProps
+  const updateType = getBuildrootUpdateAvailable(state, robot)
 
-  return (state, ownProps) => ({
-    upgradable: getUpdateInfo(state, ownProps.robot).type === 'upgrade',
-    selected: ownProps.match.params.name === ownProps.robot.name,
-  })
+  return {
+    upgradable: updateType === 'upgrade',
+    selected: ownProps.match.params.name === robot.name,
+  }
 }
 
 function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {

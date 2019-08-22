@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 
-import { ScrollableAlertModal } from '../../modals'
+import { AlertModal } from '@opentrons/components'
 import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
@@ -9,7 +9,7 @@ import type { BuildrootUpdateType } from '../../../shell'
 
 type Props = {|
   notNowButton: ButtonProps,
-  updateType: BuildrootUpdateType,
+  updateType: BuildrootUpdateType | null,
   proceed: () => mixed,
 |}
 
@@ -28,7 +28,7 @@ export default function MigrationWarningModal(props: Props) {
   ]
 
   return (
-    <ScrollableAlertModal
+    <AlertModal
       heading={HEADING}
       buttons={buttons}
       restrictOuterScroll={false}
@@ -45,11 +45,11 @@ export default function MigrationWarningModal(props: Props) {
         </p>
 
         <p>
-          Please note that this update will take an estimated 10-15 minutes,
-          will reboot your robot two times, and requires your OT-2 to remain
-          discoverable via USB or Wi-Fi throughout the entire migration process.
+          Please note that this update will take up to 10 minutes, will reboot
+          your robot two times, and requires your OT-2 to remain discoverable
+          via USB or Wi-Fi throughout the entire migration process.
         </p>
       </div>
-    </ScrollableAlertModal>
+    </AlertModal>
   )
 }

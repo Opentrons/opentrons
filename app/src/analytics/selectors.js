@@ -11,10 +11,18 @@ import {
 } from '../protocol'
 
 import {
+  getViewableRobots,
   getConnectedRobot,
   getRobotApiVersion,
   getRobotFirmwareVersion,
 } from '../discovery'
+
+import {
+  getBuildrootUpdateVersion,
+  getBuildrootRobot,
+  getBuildrootSession,
+  getRobotSystemType,
+} from '../shell'
 
 import { getRobotSettingsState, getPipettesState } from '../robot-api'
 
@@ -22,7 +30,12 @@ import hash from './hash'
 
 import type { OutputSelector } from 'reselect'
 import type { State } from '../types'
-import type { ProtocolAnalyticsData, RobotAnalyticsData } from './types'
+
+import type {
+  ProtocolAnalyticsData,
+  RobotAnalyticsData,
+  BuildrootAnalyticsData,
+} from './types'
 
 type ProtocolDataSelector = OutputSelector<State, void, ProtocolAnalyticsData>
 
@@ -46,20 +59,18 @@ const _getUnhashedProtocolAnalyticsData: ProtocolDataSelector = createSelector(
   })
 )
 
-// TODO(mc, 2019-01-22): it would be good to have some way of caching these
-// hashes; reselect isn't geared towards async, so perhaps RxJS / observables?
-export function getProtocolAnalyticsData(
-  state: State
-): Promise<ProtocolAnalyticsData> {
-  const data = _getUnhashedProtocolAnalyticsData(state)
-  const hashTasks = [hash(data.protocolAuthor), hash(data.protocolText)]
+export const getProtocolAnalyticsData: State => Promise<ProtocolAnalyticsData> = createSelector(
+  _getUnhashedProtocolAnalyticsData,
+  data => {
+    const hashTasks = [hash(data.protocolAuthor), hash(data.protocolText)]
 
-  return Promise.all(hashTasks).then(result => {
-    const [protocolAuthor, protocolText] = result
-
-    return { ...data, protocolAuthor, protocolText }
-  })
-}
+    return Promise.all(hashTasks).then(([protocolAuthor, protocolText]) => ({
+      ...data,
+      protocolAuthor,
+      protocolText,
+    }))
+  }
+)
 
 export function getRobotAnalyticsData(state: State): RobotAnalyticsData | null {
   const robot = getConnectedRobot(state)
@@ -83,4 +94,28 @@ export function getRobotAnalyticsData(state: State): RobotAnalyticsData | null {
   }
 
   return null
+}
+
+export function getBuildrootAnalyticsData(
+  state: State,
+  robotName: string | null = null
+): BuildrootAnalyticsData | null {
+  const updateVersion = getBuildrootUpdateVersion(state)
+  const session = getBuildrootSession(state)
+  const robot =
+    robotName === null
+      ? getBuildrootRobot(state)
+      : getViewableRobots(state).find(r => r.name === robotName) || null
+
+  if (updateVersion === null || robot === null) return null
+
+  const currentVersion = getRobotApiVersion(robot) || 'unknown'
+  const currentSystem = getRobotSystemType(robot) || 'unknown'
+
+  return {
+    currentVersion,
+    currentSystem,
+    updateVersion,
+    error: session?.error || null,
+  }
 }

@@ -59,7 +59,7 @@ async def test_notifications(session, session_manager, protocol, root, connect, 
     await socket.receive_json()  # Skip ack
     res = await socket.receive_json()
 
-    assert len(res['data']['v']['command_log']['v']) == 76
+    assert len(res['data']['v']['command_log']['v']) == 75
 
     states = [
         response['data']['v']['payload']['v']['state']

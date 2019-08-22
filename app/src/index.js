@@ -10,10 +10,10 @@ import { ConnectedRouter, routerMiddleware } from 'connected-react-router'
 import { createEpicMiddleware } from 'redux-observable'
 
 import createLogger from './logger'
-import { checkShellUpdate, shellMiddleware } from './shell'
+import { checkShellUpdate } from './shell'
 
 import { apiClientMiddleware as robotApiMiddleware } from './robot'
-import { initializeAnalytics, analyticsMiddleware } from './analytics'
+import { initializeAnalytics } from './analytics'
 import { initializeSupport, supportMiddleware } from './support'
 import { startDiscovery } from './discovery'
 
@@ -31,8 +31,6 @@ const middleware = applyMiddleware(
   thunk,
   epicMiddleware,
   robotApiMiddleware(),
-  shellMiddleware,
-  analyticsMiddleware,
   supportMiddleware,
   routerMiddleware(history)
 )

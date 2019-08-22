@@ -1,6 +1,7 @@
 // @flow
 import assert from 'assert'
 import uniq from 'lodash/uniq'
+import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import type { LabwareDefinition2 } from '../types'
 
 export { canPipetteUseLabware } from './canPipetteUseLabware'
@@ -8,6 +9,9 @@ export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { default as getWellTotalVolume } from './getWellTotalVolume'
 export { default as wellIsRect } from './wellIsRect'
 export * from './volume'
+
+export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
+  def?.namespace === OPENTRONS_LABWARE_NAMESPACE
 
 export const getLabwareDefURI = (def: LabwareDefinition2): string =>
   `${def.namespace}/${def.parameters.loadName}/${def.version}`
@@ -29,7 +33,7 @@ export const getLabwareDisplayName = (labwareDef: LabwareDefinition2) => {
   const { displayName } = labwareDef.metadata
 
   if (
-    labwareDef.namespace === 'opentrons' &&
+    getLabwareDefIsStandard(labwareDef) &&
     RETIRED_LABWARE.includes(labwareDef.parameters.loadName)
   ) {
     return `(Retired) ${displayName}`

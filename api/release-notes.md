@@ -1,30 +1,32 @@
-# Robot Software Changes from 3.9.0 to 3.10.2
+# Robot OS Changes from 3.10.3 to 3.11.2
 
-This update includes a set of all new, high-quality labware definitions! The older definitions are still on your robot and will continue to work, but we **highly** recommend you switch to the new ones.
+This update migrates the Opentrons Robot OS to a new underlying technology - buildroot. This change allows us to better control the robot's system and provide better updates without requiring internet connectivity.
 
-These new labware definitions are based on engineering data from labware manufacturers. They can be viewed using our new [Labware Library][labware-library], where you can browse and search for labware definitions in order to use them in your protocols. Please let us know what you think!
+Updating your robot from 3.10 to 3.11 will take up to 10 minutes, and your Opentrons App must stay connected to the robot the entire time. If you have manually installed Python packages on your robot, you will have to reinstall them after this update.
 
 For more details about this release, please see the full [technical change log][changelog]
 
 ## New Features
 
-- Added support for new labware definitions! See the [Labware Library][labware-library] and the [Labware API docs][labware-api] for more details
-- Added support for newer pipette models
+- **SSH access to the OT-2 now requires public-key authentication**. Please see [this support article][ot2-ssh] for details on how to generate and install a public key to gain ssh access to the OT-2.
+- Added support for setting the flow rate of the pipette during blowout operations. `set_flow_rate` and `set_speed` now take a `blow_out` parameter. See the [API Docs][blowoutflowrate] for more details.
+- Labware calibration is now stored separately if a labware is placed on a module. For instance, a well plate on a Temperature Module can now be calibrated separately from a well plate placed on the deck.
+- Added support for filter tips in [200 ul][filter-200], [1000 ul][filter-1k], and [10ul][filter-10] sizes; when the 200 ul tips are used with a P300 Single or Multi pipette, the pipette's maximum volume will be reduced to 200 ul.
 
 ## Bug fixes
 
-- Increased the height of the pipette in the first step of deck calibration to better account for tip length
-- Improved the legacy labware database boot-up process to avoid lost definitions
-- Removed usage of an old built-in Python method that was causing a protocol cancellation issue
-- Improved the reliability of the run cancellation response to the UI
-- Fix an issue where the calibration of v2 labware would vary with repeated calibrations
-- Fix an issue that could cause the robot to fail to boot if its previous boot was interrupted
+- Fixed an incorrect mix after a blowout during a transfer when `mix_after` and `blow_out` are both specified
+- Fixed incorrect handling of transfers involving volumes too large for a single aspirate
+- Fixed an issue where clicking pause during a protocol could lead to the runlog being out of sync
 
 ## Known issues
 
 - While the underlying definition is correct, there is a known API bug that is causing the robot to think a "50ml" tube in a "15/50ml" tube rack is the same height as the "15ml" tube
 - When attaching or detaching a pipette from the left mount, the robot homes twice in the X direction
 
-[labware-library]: https://labware.opentrons.com
-[labware-api]: https://docs.opentrons.com/labware.html
 [changelog]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
+[ot2-ssh]: https://support.opentrons.com/en/articles/3203681-enabling-ssh-access-to-your-ot2
+[blowoutflowrate]: https://docs.opentrons.com/atomic%20commands.html#controlling-speed
+[filter-200]: https://labware.opentrons.com/opentrons_96_filtertiprack_200ul
+[filter-1k]: https://labware.opentrons.com/opentrons_96_filtertiprack_1000ul
+[filter-10]: https://labware.opentrons.com/opentrons_96_filtertiprack_10ul

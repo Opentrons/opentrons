@@ -5,8 +5,29 @@ describe('app/shell/buildroot action creators', () => {
     {
       name: 'buildroot:SET_UPDATE_SEEN',
       creator: actions.setBuildrootUpdateSeen,
-      args: [],
-      expected: { type: 'buildroot:SET_UPDATE_SEEN' },
+      args: ['robot-name'],
+      expected: {
+        type: 'buildroot:SET_UPDATE_SEEN',
+        meta: { robotName: 'robot-name' },
+      },
+    },
+    {
+      name: 'buildroot:UPDATE_IGNORED',
+      creator: actions.buildrootUpdateIgnored,
+      args: ['robot-name'],
+      expected: {
+        type: 'buildroot:UPDATE_IGNORED',
+        meta: { robotName: 'robot-name' },
+      },
+    },
+    {
+      name: 'buildroot:CHANGELOG_SEEN',
+      creator: actions.buildrootChangelogSeen,
+      args: ['robot-name'],
+      expected: {
+        type: 'buildroot:CHANGELOG_SEEN',
+        meta: { robotName: 'robot-name' },
+      },
     },
     {
       name: 'buildroot:START_PREMIGRATION',

@@ -1,7 +1,7 @@
 {
   "name": "@opentrons/app-shell",
   "productName": "Opentrons",
-  "version": "3.10.2",
+  "version": "3.11.2",
   "description": "Opentrons desktop application",
   "main": "lib/main.js",
   "scripts": {
@@ -21,10 +21,10 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "devDependencies": {
-    "@opentrons/app": "3.10.2"
+    "@opentrons/app": "3.11.2"
   },
   "dependencies": {
-    "@opentrons/discovery-client": "3.10.2",
+    "@opentrons/discovery-client": "3.11.2",
     "@thi.ng/paths": "^1.6.5",
     "dateformat": "^3.0.3",
     "electron-debug": "^2.0.0",
@@ -34,7 +34,6 @@
     "form-data": "^2.5.0",
     "fs-extra": "^6.0.1",
     "get-stream": "^5.1.0",
-    "globby": "^10.0.1",
     "merge-options": "^1.0.1",
     "node-fetch": "^2.6.0",
     "node-stream-zip": "^1.8.2",

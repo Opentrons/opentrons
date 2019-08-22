@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.11.2](https://github.com/Opentrons/opentrons/compare/v3.11.1...v3.11.2) (2019-08-21)
+
+**Note:** Version bump only for package @opentrons/shared-data
+
+
+
+
+
+## [3.11.1](https://github.com/Opentrons/opentrons/compare/v3.11.0...v3.11.1) (2019-08-21)
+
+**Note:** Version bump only for package @opentrons/shared-data
+
+
+
+
+
+# [3.11.0](https://github.com/Opentrons/opentrons/compare/v3.10.3...v3.11.0) (2019-08-21)
+
+
+### Bug Fixes
+
+* **shared-data:** fix "strict" arg for labware creation ([#3874](https://github.com/Opentrons/opentrons/issues/3874)) ([bd604e2](https://github.com/Opentrons/opentrons/commit/bd604e2))
+
+
+### Features
+
+* **app:** display TC on Deck Map ([#3786](https://github.com/Opentrons/opentrons/issues/3786)) ([272a6ad](https://github.com/Opentrons/opentrons/commit/272a6ad)), closes [#3553](https://github.com/Opentrons/opentrons/issues/3553) [#3064](https://github.com/Opentrons/opentrons/issues/3064)
+
+
+
+
+
+<a name="3.10.3"></a>
+## [3.10.3](https://github.com/Opentrons/opentrons/compare/v3.10.2...v3.10.3) (2019-07-26)
+
+**Note:** Version bump only for package @opentrons/shared-data
+
+
+
+
 <a name="3.10.2"></a>
 ## [3.10.2](https://github.com/Opentrons/opentrons/compare/v3.10.0...v3.10.2) (2019-07-25)
 

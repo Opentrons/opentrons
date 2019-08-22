@@ -52,6 +52,11 @@
   margin-left: 1rem;
 }
 
+.long_button {
+  width: auto;
+  max-width: none;
+}
+
 .scrollable_modal_wrapper {
   display: flex;
   flex-direction: column;

@@ -4,10 +4,10 @@ import { connect } from 'react-redux'
 import ModuleData from './ModuleData'
 import TemperatureControls from './TemperatureControls'
 
-import { setTargetTemp } from '../../robot-api'
+import { sendModuleCommand } from '../../robot-api'
 
 import type { State, Dispatch } from '../../types'
-import type { TempDeckModule, SetTemperatureRequest } from '../../robot-api'
+import type { TempDeckModule, ModuleCommandRequest } from '../../robot-api'
 import type { Robot } from '../../discovery'
 
 type OP = {|
@@ -16,7 +16,7 @@ type OP = {|
 |}
 
 type DP = {|
-  setTargetTemp: (request: SetTemperatureRequest) => mixed,
+  sendModuleCommand: (request: ModuleCommandRequest) => mixed,
 |}
 
 type Props = { ...OP, ...DP }
@@ -27,13 +27,13 @@ export default connect<Props, OP, {||}, DP, State, Dispatch>(
 )(ModuleControls)
 
 function ModuleControls(props: Props) {
-  const { module, setTargetTemp } = props
+  const { module, sendModuleCommand } = props
   const { currentTemp, targetTemp } = module.data
 
   return (
     <>
       <ModuleData currentTemp={currentTemp} targetTemp={targetTemp} />
-      <TemperatureControls setTemp={setTargetTemp} />
+      <TemperatureControls setTemp={sendModuleCommand} />
     </>
   )
 }
@@ -43,6 +43,7 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   const { serial } = module
 
   return {
-    setTargetTemp: request => dispatch(setTargetTemp(robot, serial, request)),
+    sendModuleCommand: request =>
+      dispatch(sendModuleCommand(robot, serial, request)),
   }
 }

@@ -4,7 +4,7 @@ import groupBy from 'lodash/groupBy'
 import mapValues from 'lodash/mapValues'
 import some from 'lodash/some'
 
-import { getShellRobots } from '../shell'
+import remote from '../shell/remote'
 import * as actions from './actions'
 
 import type { Service } from '@opentrons/discovery-client'
@@ -29,15 +29,14 @@ export type DiscoveryState = {|
 export const RESTART_PENDING: RestartStatus = 'pending'
 export const RESTART_DOWN: RestartStatus = 'down'
 
-// getShellRobots makes a sync RPC call, so use sparingly
-const initialState: DiscoveryState = {
+const INITIAL_STATE: DiscoveryState = {
   scanning: false,
-  robotsByName: normalizeRobots(getShellRobots()),
   restartsByName: {},
+  robotsByName: normalizeRobots(remote.INITIAL_ROBOTS),
 }
 
 export function discoveryReducer(
-  state: DiscoveryState = initialState,
+  state: DiscoveryState = INITIAL_STATE,
   action: Action
 ): DiscoveryState {
   switch (action.type) {

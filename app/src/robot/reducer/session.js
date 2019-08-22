@@ -45,6 +45,7 @@ export type SessionState = {
   cancelRequest: Request,
   startTime: ?number,
   runTime: number,
+  apiLevel: number,
 }
 
 // TODO(mc, 2018-01-11): replace actionType constants with Flow types
@@ -80,6 +81,7 @@ const INITIAL_STATE: SessionState = {
   cancelRequest: { inProgress: false, error: null },
   startTime: null,
   runTime: 0,
+  apiLevel: 1,
 }
 
 export default function sessionReducer(

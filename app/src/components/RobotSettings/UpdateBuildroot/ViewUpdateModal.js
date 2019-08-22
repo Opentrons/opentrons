@@ -15,14 +15,15 @@ import ReleaseNotesModal from './ReleaseNotesModal'
 import type { BuildrootUpdateType, RobotSystemType } from '../../../shell'
 
 type Props = {|
-  robotUpdateType: BuildrootUpdateType,
+  robotName: string,
+  robotUpdateType: BuildrootUpdateType | null,
   robotSystemType: RobotSystemType | null,
   close: () => mixed,
   proceed: () => mixed,
 |}
 
 export default function ViewUpdateModal(props: Props) {
-  const { robotUpdateType, robotSystemType, close, proceed } = props
+  const { robotName, robotUpdateType, robotSystemType, close, proceed } = props
   const updateInfo = useSelector(getBuildrootUpdateInfo)
   const downloadProgress = useSelector(getBuildrootDownloadProgress)
   const downloadError = useSelector(getBuildrootDownloadError)
@@ -32,13 +33,17 @@ export default function ViewUpdateModal(props: Props) {
     setShowMigrationWarning,
   ] = React.useState<boolean>(robotSystemType === 'balena')
 
-  const notNowButton = { onClick: close, children: 'not now' }
+  const notNowButton = {
+    onClick: close,
+    children: downloadError !== null ? 'close' : 'not now',
+  }
+  const showReleaseNotes = robotUpdateType === 'upgrade'
 
   React.useLayoutEffect(() => {
-    if (updateInfo && robotUpdateType !== 'upgrade' && !showMigrationWarning) {
+    if (updateInfo && !showReleaseNotes && !showMigrationWarning) {
       proceed()
     }
-  }, [updateInfo, robotUpdateType, showMigrationWarning, proceed])
+  }, [updateInfo, showReleaseNotes, showMigrationWarning, proceed])
 
   if (showMigrationWarning) {
     return (
@@ -60,12 +65,17 @@ export default function ViewUpdateModal(props: Props) {
     )
   }
 
-  return (
-    <ReleaseNotesModal
-      notNowButton={notNowButton}
-      releaseNotes={updateInfo.releaseNotes}
-      systemType={robotSystemType}
-      proceed={proceed}
-    />
-  )
+  if (showReleaseNotes) {
+    return (
+      <ReleaseNotesModal
+        robotName={robotName}
+        notNowButton={notNowButton}
+        releaseNotes={updateInfo.releaseNotes}
+        systemType={robotSystemType}
+        proceed={proceed}
+      />
+    )
+  }
+
+  return null
 }

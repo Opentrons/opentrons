@@ -1,6 +1,10 @@
 // @flow
 
-export type ProtocolAnalyticsData = {
+import type { Config } from '../config'
+
+export type AnalyticsConfig = $PropertyType<Config, 'analytics'>
+
+export type ProtocolAnalyticsData = {|
   protocolType: string,
   protocolAppName: string,
   protocolAppVersion: string,
@@ -8,9 +12,9 @@ export type ProtocolAnalyticsData = {
   protocolName: string,
   protocolAuthor: string,
   protocolText: string,
-}
+|}
 
-export type RobotAnalyticsData = {
+export type RobotAnalyticsData = {|
   robotApiServerVersion: string,
   robotSmoothieVersion: string,
   robotLeftPipette: string,
@@ -19,9 +23,18 @@ export type RobotAnalyticsData = {
   // feaure flags
   // e.g. robotFF_settingName
   [ffName: string]: boolean,
-}
+|}
+
+export type BuildrootAnalyticsData = {|
+  currentVersion: string,
+  currentSystem: string,
+  updateVersion: string,
+  error: string | null,
+|}
 
 export type AnalyticsEvent = {|
   name: string,
   properties: {},
 |}
+
+export type TrackEventArgs = [AnalyticsEvent, AnalyticsConfig]

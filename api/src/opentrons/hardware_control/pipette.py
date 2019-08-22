@@ -29,6 +29,7 @@ class Pipette:
         self._model = model
         self._model_offset = self._config.model_offset
         self._current_volume = 0.0
+        self._working_volume = self._config.max_volume
         self._current_tip_length = 0.0
         self._fallback_tip_length = self._config.tip_length
         self._has_tip = False
@@ -128,13 +129,23 @@ class Pipette:
                 - self._instrument_offset.z)
 
     @property
+    def working_volume(self) -> float:
+        """ The working volume of the pipette """
+        return self._working_volume
+
+    @working_volume.setter
+    def working_volume(self, tip_volume: float):
+        """ The working volume is the current tip max volume """
+        self._working_volume = min(self.config.max_volume, tip_volume)
+
+    @property
     def available_volume(self) -> float:
         """ The amount of liquid possible to aspirate """
-        return self.config.max_volume - self.current_volume
+        return self.working_volume - self.current_volume
 
     def set_current_volume(self, new_volume: float):
         assert new_volume >= 0
-        assert new_volume <= self.config.max_volume
+        assert new_volume <= self.working_volume
         self._current_volume = new_volume
 
     def add_current_volume(self, volume_incr: float):
@@ -146,7 +157,7 @@ class Pipette:
         self._current_volume -= volume_incr
 
     def ok_to_add_volume(self, volume_incr: float) -> bool:
-        return self.current_volume + volume_incr <= self.config.max_volume
+        return self.current_volume + volume_incr <= self.working_volume
 
     def add_tip(self, tip_length: float) -> None:
         """
@@ -197,5 +208,6 @@ class Pipette:
                             'name': self.name,
                             'model': self.model,
                             'pipette_id': self.pipette_id,
-                            'has_tip': self.has_tip})
+                            'has_tip': self.has_tip,
+                            'working_volume': self.working_volume})
         return config_dict

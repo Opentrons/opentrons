@@ -169,7 +169,8 @@ html_theme_options = {
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
 #
-html_title = 'Opentrons API v2.0'
+html_title = 'Opentrons API Documentation'
+
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #
@@ -209,11 +210,25 @@ html_static_path = ['static']
 # html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
-#
+# Use separate sidebar nav overrides to force (for apiv2) or ignore
+# (apiv1) the apiv2 hidden toctree elements (our sphinx overrides css
+# forces the body toctrees hidden using css)
 html_sidebars = {
-    '**': [
+    'v1/*': [
         'about.html',
-        'toc-with-nav.html',
+        'toc-with-nav-force-no-hidden.html',
+        'relations.html',
+        'searchbox.html'
+    ],
+    '*': [
+        'about.html',
+        'toc-with-nav-force-no-hidden.html',
+        'relations.html',
+        'searchbox.html'
+    ],
+    'v2/*': [
+        'about.html',
+        'toc-with-nav-force-show-hidden.html',
         'relations.html',
         'searchbox.html'
     ],

@@ -35,7 +35,13 @@ export type ButtonProps = {
 }
 
 // props to strip if using a custom component
-const STRIP_PROPS = ['inverted', 'iconName', 'children', 'Component']
+const STRIP_PROPS = [
+  'inverted',
+  'iconName',
+  'children',
+  'Component',
+  'hoverTooltipHandlers',
+]
 
 /**
  * Basic, un-styled button. You probably want to use a styled button

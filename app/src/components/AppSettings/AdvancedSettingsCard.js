@@ -3,40 +3,48 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, Route, Link } from 'react-router-dom'
+import startCase from 'lodash/startCase'
 
-import { getConfig, updateConfig, toggleDevTools } from '../../config'
+import {
+  getConfig,
+  getUpdateChannelOptions,
+  updateConfig,
+  toggleDevTools,
+  toggleDevInternalFlag,
+  DEV_INTERNAL_FLAGS,
+  type Config,
+  type DevInternalFlag,
+} from '../../config'
 import { Card } from '@opentrons/components'
 import { LabeledToggle, LabeledSelect, LabeledButton } from '../controls'
 import AddManualIp from './AddManualIp'
 
 import type { ContextRouter } from 'react-router'
+import type { DropdownOption } from '@opentrons/components'
 import type { State, Dispatch } from '../../types'
-import type { UpdateChannel } from '../../config'
+import type { UpdateChannel } from '../../config/types'
 
-type OP = {
+type OP = {|
   ...ContextRouter,
   checkUpdate: () => mixed,
-}
+|}
 
 type SP = {|
   devToolsOn: boolean,
+  devInternal: $PropertyType<Config, 'devInternal'>,
   channel: UpdateChannel,
+  channelOptions: Array<DropdownOption>,
 |}
 
 type DP = {|
   toggleDevTools: () => mixed,
+  toggleDevInternalFlag: DevInternalFlag => mixed,
   handleChannel: (event: SyntheticInputEvent<HTMLSelectElement>) => mixed,
 |}
 
-type Props = { ...$Exact<OP>, ...SP, ...DP }
+type Props = {| ...OP, ...SP, ...DP |}
 
 const TITLE = 'Advanced Settings'
-
-// TODO(mc, 2018-08-03): enable "alpha" option
-const CHANNEL_OPTIONS = [
-  { name: 'Stable', value: (('latest': UpdateChannel): string) },
-  { name: 'Beta', value: (('beta': UpdateChannel): string) },
-]
 
 export default withRouter(
   connect(
@@ -52,7 +60,7 @@ function AdvancedSettingsCard(props: Props) {
         <LabeledSelect
           label="Update Channel"
           value={props.channel}
-          options={CHANNEL_OPTIONS}
+          options={props.channelOptions}
           onChange={props.handleChannel}
         >
           <p>
@@ -86,6 +94,15 @@ function AdvancedSettingsCard(props: Props) {
             manually add its IP address or hostname here
           </p>
         </LabeledButton>
+        {props.devToolsOn &&
+          DEV_INTERNAL_FLAGS.map(flag => (
+            <LabeledToggle
+              key={flag}
+              label={`__DEV__ ${startCase(flag)}`}
+              toggledOn={props.devInternal ? props.devInternal[flag] : false}
+              onClick={() => props.toggleDevInternalFlag(flag)}
+            />
+          ))}
       </Card>
       <Route
         path={`${props.match.path}/add-ip`}
@@ -100,13 +117,17 @@ function mapStateToProps(state: State): SP {
 
   return {
     devToolsOn: config.devtools,
+    devInternal: config.devInternal,
     channel: config.update.channel,
+    channelOptions: getUpdateChannelOptions(state),
   }
 }
 
 function mapDispatchToProps(dispatch: Dispatch, ownProps: OP) {
   return {
     toggleDevTools: () => dispatch(toggleDevTools()),
+    toggleDevInternalFlag: (flag: DevInternalFlag) =>
+      dispatch(toggleDevInternalFlag(flag)),
     handleChannel: event => {
       dispatch(updateConfig('update.channel', event.target.value))
 

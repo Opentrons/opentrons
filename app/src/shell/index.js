@@ -1,99 +1,76 @@
 // @flow
 // desktop shell module
 import { combineReducers } from 'redux'
+import { combineEpics } from 'redux-observable'
+import { fromEvent } from 'rxjs'
+import { filter, tap, ignoreElements } from 'rxjs/operators'
 
 import createLogger from '../logger'
 import remote from './remote'
 import { updateReducer } from './update'
-import { apiUpdateReducer } from './api-update'
-import { buildrootReducer } from './buildroot'
+import { buildrootReducer, buildrootUpdateEpic } from './buildroot'
 
 import type { Reducer } from 'redux'
-import type { Service } from '@opentrons/discovery-client'
+
 import type {
-  Middleware,
+  LooseEpic,
   ThunkAction,
   Action,
+  ActionLike,
   Dispatch,
   GetState,
 } from '../types'
+
 import type { ViewableRobot } from '../discovery'
-import type { Config } from '../config'
-import type { ApiUpdateInfo as ApiUpdateState } from './api-update'
-import type { ShellUpdateState, ShellUpdateAction } from './update'
-import type { BuildrootState, BuildrootAction } from './buildroot'
+import type { ShellState } from './types'
 
-type ShellLogsDownloadAction = {|
-  type: 'shell:DOWNLOAD_LOGS',
-  payload: {| logUrls: Array<string> |},
-  meta: {| shell: true |},
-|}
-
-export type ShellState = {|
-  update: ShellUpdateState,
-  apiUpdate: ApiUpdateState,
-  buildroot: BuildrootState,
-|}
-
-export type ShellAction =
-  | ShellUpdateAction
-  | ShellLogsDownloadAction
-  | BuildrootAction
-
-const {
-  ipcRenderer,
-  config: { getConfig },
-  discovery: { getRobots },
-} = remote
+const { ipcRenderer, CURRENT_VERSION, CURRENT_RELEASE_NOTES } = remote
 
 const log = createLogger(__filename)
 
 export * from './update'
-export * from './api-update'
 export * from './buildroot'
+export * from './types'
 
-const CURRENT_VERSION: string = remote.update.CURRENT_VERSION
-const CURRENT_RELEASE_NOTES: string = remote.update.CURRENT_RELEASE_NOTES
-const API_RELEASE_NOTES = CURRENT_RELEASE_NOTES.replace(
-  /<!-- start:@opentrons\/app -->([\S\s]*?)<!-- end:@opentrons\/app -->/,
-  ''
-)
-
-export { CURRENT_VERSION, CURRENT_RELEASE_NOTES, API_RELEASE_NOTES }
+export { CURRENT_VERSION, CURRENT_RELEASE_NOTES }
 
 export const shellReducer: Reducer<ShellState, Action> = combineReducers<
   _,
   Action
 >({
   update: updateReducer,
-  apiUpdate: apiUpdateReducer,
   buildroot: buildrootReducer,
 })
 
-export const shellMiddleware: Middleware = store => {
-  const { dispatch } = store
+export const sendActionToShellEpic: LooseEpic = action$ =>
+  action$.pipe(
+    filter<ActionLike>((action: ActionLike) => action.meta?.shell === true),
+    tap<ActionLike>((shellAction: ActionLike) =>
+      ipcRenderer.send('dispatch', shellAction)
+    ),
+    ignoreElements()
+  )
 
-  ipcRenderer.on('dispatch', (_, action) => {
-    log.debug('Received action from main via IPC', { action })
-    dispatch(action)
-  })
+export const receiveActionFromShellEpic = () =>
+  // IPC event listener: (IpcRendererEvent, ...args) => void
+  // our action is the only argument, so pluck it out from index 1
+  fromEvent<ActionLike>(
+    ipcRenderer,
+    'dispatch',
+    (_: mixed, incoming: ActionLike) => incoming
+  ).pipe<ActionLike>(
+    tap(incoming => {
+      log.debug('Received action from main via IPC', {
+        actionType: incoming.type,
+      })
+    })
+  )
 
-  return next => action => {
-    if (action.meta && action.meta.shell) ipcRenderer.send('dispatch', action)
-
-    return next(action)
-  }
-}
-
-// getShellConfig makes a sync RPC call, so use sparingly
-export function getShellConfig(): Config {
-  return getConfig()
-}
-
-// getShellRobots makes a sync RPC call, so use sparingly
-export function getShellRobots(): Array<Service> {
-  return getRobots()
-}
+export const shellEpic = combineEpics(
+  sendActionToShellEpic,
+  receiveActionFromShellEpic,
+  buildrootUpdateEpic
+)
 
 export function downloadLogs(robot: ViewableRobot): ThunkAction {
   return (dispatch: Dispatch, getState: GetState) => {

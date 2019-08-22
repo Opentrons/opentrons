@@ -3,6 +3,47 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.11.2](https://github.com/Opentrons/opentrons/compare/v3.11.1...v3.11.2) (2019-08-21)
+
+**Note:** Version bump only for package protocol-designer
+
+
+
+
+
+## [3.11.1](https://github.com/Opentrons/opentrons/compare/v3.11.0...v3.11.1) (2019-08-21)
+
+**Note:** Version bump only for package protocol-designer
+
+
+
+
+
+# [3.11.0](https://github.com/Opentrons/opentrons/compare/v3.10.3...v3.11.0) (2019-08-21)
+
+
+### Bug Fixes
+
+* **protocol-designer:** update typeform version ([#3794](https://github.com/Opentrons/opentrons/issues/3794)) ([46c6503](https://github.com/Opentrons/opentrons/commit/46c6503))
+
+
+### Features
+
+* **protocol-designer:** bump typeform/embed to v0.12.1 ([#3865](https://github.com/Opentrons/opentrons/issues/3865)) ([617d5ad](https://github.com/Opentrons/opentrons/commit/617d5ad))
+* **protocol-designer:** warn user when exporting w/o steps ([#3864](https://github.com/Opentrons/opentrons/issues/3864)) ([1a129ec](https://github.com/Opentrons/opentrons/commit/1a129ec)), closes [#3060](https://github.com/Opentrons/opentrons/issues/3060)
+
+
+
+
+
+<a name="3.10.3"></a>
+## [3.10.3](https://github.com/Opentrons/opentrons/compare/v3.10.2...v3.10.3) (2019-07-26)
+
+**Note:** Version bump only for package @opentrons/protocol-designer
+
+
+
+
 <a name="3.10.2"></a>
 ## [3.10.2](https://github.com/Opentrons/opentrons/compare/v3.10.0...v3.10.2) (2019-07-25)
 

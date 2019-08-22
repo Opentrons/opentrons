@@ -1,114 +1,116 @@
 // @flow
 // RobotSettings card for robot status
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import {
-  fetchHealthAndIgnored,
-  makeGetRobotUpdateInfo,
-} from '../../http-api-client'
-import { getConfig } from '../../config'
 import { getRobotApiVersion, getRobotFirmwareVersion } from '../../discovery'
-import { checkShellUpdate, getBuildrootUpdateAvailable } from '../../shell'
 
-import { RefreshCard, LabeledValue, OutlineButton } from '@opentrons/components'
+import {
+  getBuildrootRobot,
+  checkShellUpdate,
+  getBuildrootUpdateAvailable,
+} from '../../shell'
+
+import {
+  Card,
+  LabeledValue,
+  OutlineButton,
+  HoverTooltip,
+  useInterval,
+} from '@opentrons/components'
+
 import { CardContentQuarter } from '../layout'
 
-import type { State, Dispatch } from '../../types'
-import type { RobotUpdateInfo } from '../../http-api-client'
+import type { Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery'
 
-type OP = {|
+type Props = {|
   robot: ViewableRobot,
   updateUrl: string,
 |}
-
-type SP = {|
-  version: string,
-  updateInfo: RobotUpdateInfo,
-  buildrootUpdateAvailable: boolean,
-  __buildRootEnabled: boolean,
-|}
-
-type DP = {|
-  fetchHealth: () => mixed,
-  checkAppUpdate: () => mixed,
-|}
-
-type Props = { ...OP, ...SP, ...DP }
 
 const TITLE = 'Information'
 const NAME_LABEL = 'Robot name'
 const SERVER_VERSION_LABEL = 'Server version'
 const FIRMWARE_VERSION_LABEL = 'Firmware version'
 
-export default connect<Props, OP, SP, _, _, _>(
-  makeMapStateToProps,
-  mapDispatchToProps
-)(InformationCard)
+const UPDATE_SERVER_UNAVAILABLE =
+  "Unable to update because your robot's update server is not responding"
+const OTHER_ROBOT_UPDATING =
+  'Unable to update because your app is currently updating a different robot'
+const NO_UPDATE_FILES =
+  'No robot update files found for this version of the app; please check again later'
 
-function InformationCard(props: Props) {
-  const {
-    robot,
-    updateInfo,
-    fetchHealth,
-    updateUrl,
-    checkAppUpdate,
-    version,
-  } = props
-  const { name, displayName, serverOk } = robot
-  const firmwareVersion = getRobotFirmwareVersion(robot) || 'Unknown'
+const UPDATE_RECHECK_DELAY_MS = 60000
 
-  // NOTE: this logic still makes sense when buildroot is associated with a version bump
-  const updateText = updateInfo.type || 'Reinstall'
+export default function InformationCard(props: Props) {
+  const { robot, updateUrl } = props
+  const updateType = useSelector(state =>
+    getBuildrootUpdateAvailable(state, robot)
+  )
+  const dispatch = useDispatch<Dispatch>()
+  const checkAppUpdate = React.useCallback(() => dispatch(checkShellUpdate()), [
+    dispatch,
+  ])
+
+  const { displayName, serverOk } = robot
+  const buildrootRobot = useSelector(getBuildrootRobot)
+
+  const version = getRobotApiVersion(robot)
+  const firmwareVersion = getRobotFirmwareVersion(robot)
+
+  const updateFilesUnavailable = updateType === null
+  const updateServerUnavailable = !serverOk
+  const otherRobotUpdating = Boolean(buildrootRobot && buildrootRobot !== robot)
+  const updateDisabled =
+    updateFilesUnavailable || updateServerUnavailable || otherRobotUpdating
+
+  const updateButtonText = updateType || 'up to date'
+  let updateButtonTooltip = null
+  if (otherRobotUpdating) {
+    updateButtonTooltip = <span>{OTHER_ROBOT_UPDATING}</span>
+  } else if (updateServerUnavailable) {
+    updateButtonTooltip = <span>{UPDATE_SERVER_UNAVAILABLE}</span>
+  } else if (updateFilesUnavailable) {
+    updateButtonTooltip = <span>{NO_UPDATE_FILES}</span>
+  }
+
+  // check for available updates on an interval
+  useInterval(checkAppUpdate, UPDATE_RECHECK_DELAY_MS)
 
   return (
-    <RefreshCard watch={name} refresh={fetchHealth} title={TITLE}>
+    <Card title={TITLE}>
       <CardContentQuarter>
         <LabeledValue label={NAME_LABEL} value={displayName} />
       </CardContentQuarter>
       <CardContentQuarter>
-        <LabeledValue label={SERVER_VERSION_LABEL} value={version} />
+        <LabeledValue
+          label={SERVER_VERSION_LABEL}
+          value={version || 'Unknown'}
+        />
       </CardContentQuarter>
       <CardContentQuarter>
-        <LabeledValue label={FIRMWARE_VERSION_LABEL} value={firmwareVersion} />
+        <LabeledValue
+          label={FIRMWARE_VERSION_LABEL}
+          value={firmwareVersion || 'Unknown'}
+        />
       </CardContentQuarter>
       <CardContentQuarter>
-        <OutlineButton
-          Component={Link}
-          to={updateUrl}
-          onClick={checkAppUpdate}
-          disabled={!serverOk}
-        >
-          {updateText}
-        </OutlineButton>
+        <HoverTooltip tooltipComponent={updateButtonTooltip}>
+          {hoverTooltipHandlers => (
+            <div {...hoverTooltipHandlers}>
+              <OutlineButton
+                Component={Link}
+                to={updateUrl}
+                disabled={updateDisabled}
+              >
+                {updateButtonText}
+              </OutlineButton>
+            </div>
+          )}
+        </HoverTooltip>
       </CardContentQuarter>
-    </RefreshCard>
+    </Card>
   )
-}
-
-function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
-  const getUpdateInfo = makeGetRobotUpdateInfo()
-
-  return (state, ownProps) => {
-    const version = getRobotApiVersion(ownProps.robot) || 'Unknown'
-
-    return {
-      version,
-      updateInfo: getUpdateInfo(state, ownProps.robot),
-      buildrootUpdateAvailable: getBuildrootUpdateAvailable(state, version),
-      __buildRootEnabled: Boolean(
-        getConfig(state).devInternal?.enableBuildRoot
-      ),
-    }
-  }
-}
-
-function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
-  return {
-    // TODO(mc, 2018-10-10): only need to fetch ignored
-    fetchHealth: () => dispatch(fetchHealthAndIgnored(ownProps.robot)),
-    checkAppUpdate: () => dispatch(checkShellUpdate()),
-  }
 }

@@ -9,6 +9,7 @@ import ConnectedTitleBar from '../containers/ConnectedTitleBar'
 import ConnectedMainPanel from '../containers/ConnectedMainPanel'
 import NewFileModal from './modals/NewFileModal'
 import FileUploadMessageModal from './modals/FileUploadMessageModal'
+import LabwareUploadMessageModal from './modals/LabwareUploadMessageModal'
 import GateModal from './modals/GateModal'
 import { PortalRoot as MainPageModalPortalRoot } from '../components/portals/MainPageModalPortal'
 import { PortalRoot as TopPortalRoot } from './portals/TopPortal'
@@ -37,6 +38,7 @@ function ProtocolEditor() {
           >
             <NewFileModal useProtocolFields />
             <FileUploadMessageModal />
+            <LabwareUploadMessageModal />
             {/* TODO: Ian 2018-06-28 All main page modals will go here */}
             <MainPageModalPortalRoot />
 

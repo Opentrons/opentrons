@@ -130,6 +130,7 @@ class Session(object):
         self.containers = None
         self.modules = None
         self.metadata = {}
+        self.api_level = None
 
         self.startTime = None
         self._motion_lock = motion_lock
@@ -286,6 +287,8 @@ class Session(object):
             self._protocol = compile(parsed, filename=self.name, mode='exec')
             version = infer_version(self.metadata, parsed)
 
+        self.api_level = 2 if ff.use_protocol_api_v2() else 1
+
         if ff.use_protocol_api_v2() and version == '1':
             raise RuntimeError(
                 'This protocol targets Protocol API V1, but the robot is set '
@@ -321,12 +324,24 @@ class Session(object):
         return self
 
     def pause(self):
-        self._hardware.pause()
+        if ff.use_protocol_api_v2():
+            self._hardware.pause()
+        # robot.pause in the legacy API will publish commands to the broker
+        # use the broker-less execute_pause instead
+        else:
+            self._hardware.execute_pause()
+
         self.set_state('paused')
         return self
 
     def resume(self):
-        self._hardware.resume()
+        if ff.use_protocol_api_v2():
+            self._hardware.resume()
+        # robot.resume in the legacy API will publish commands to the broker
+        # use the broker-less execute_resume instead
+        else:
+            self._hardware.execute_resume()
+
         self.set_state('running')
         return self
 

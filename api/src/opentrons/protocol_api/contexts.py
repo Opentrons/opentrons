@@ -252,26 +252,21 @@ class ProtocolContext(CommandPublisher):
 
     def load_module(
             self, module_name: str,
-            location: types.DeckLocation) -> ModuleTypes:
-        mod_id = module_name.lower()
-        if mod_id == 'magnetic module':
-            mod_id = 'magdeck'
-        if mod_id == 'temperature module':
-            mod_id = 'tempdeck'
-        try:
-            geometry = load_module(
-                mod_id, self._deck_layout.position_for(location))
-        except KeyError:
-            self._log.error(f'Unsupported Module: {mod_id}')
-            raise ValueError(f'Unsupported Module: {mod_id}')
+            location: Optional[types.DeckLocation] = None) -> ModuleTypes:
+        resolved_name = ModuleGeometry.resolve_module_name(module_name)
+        resolved_location = self._deck_layout.resolve_module_location(
+                resolved_name, location)
+        geometry = load_module(resolved_name,
+                               self._deck_layout.position_for(
+                                    resolved_location))
         hc_mod_instance = None
         hw = self._hw_manager.hardware._api._backend
         mod_class = {
             'magdeck': MagneticModuleContext,
             'tempdeck': TemperatureModuleContext,
-            'thermocycler': ThermocyclerContext}[mod_id]
+            'thermocycler': ThermocyclerContext}[resolved_name]
         for mod in self._hw_manager.hardware.discover_modules():
-            if mod.name() == mod_id:
+            if mod.name() == resolved_name:
                 hc_mod_instance = mod
                 break
 
@@ -279,9 +274,10 @@ class ProtocolContext(CommandPublisher):
             mod_type = {
                 'magdeck': modules.magdeck.MagDeck,
                 'tempdeck': modules.tempdeck.TempDeck,
-                'thermocycler': modules.thermocycler.Thermocycler}[mod_id]
-            hc_mod_instance = mod_type(
-                port='', simulating=True, loop=self._loop)
+                'thermocycler': modules.thermocycler.Thermocycler
+                }[resolved_name]
+            hc_mod_instance = adapters.SynchronousAdapter(mod_type(
+                port='', simulating=True, loop=self._loop))
         if hc_mod_instance:
             mod_ctx = mod_class(self,
                                 hc_mod_instance,
@@ -289,8 +285,8 @@ class ProtocolContext(CommandPublisher):
                                 self._loop)
         else:
             raise RuntimeError(
-                f'Could not find specified module: {mod_id}')
-        self._deck_layout[location] = geometry
+                f'Could not find specified module: {resolved_name}')
+        self._deck_layout[resolved_location] = geometry
         return mod_ctx
 
     @property
@@ -1045,6 +1041,18 @@ class InstrumentContext(CommandPublisher):
 
         return self
 
+    def _select_tiprack_from_list(
+            self, tip_racks, num_channels) -> Tuple[Labware, Well]:
+        try:
+            tr = tip_racks[0]
+        except IndexError:
+            raise OutOfTipsError
+        next_tip = tr.next_tip(num_channels)
+        if next_tip:
+            return tr, next_tip
+        else:
+            return self._select_tiprack_from_list(tip_racks[1:], num_channels)
+
     def pick_up_tip(  # noqa(C901)
             self, location: Union[types.Location, Well] = None,
             presses: int = None,
@@ -1091,17 +1099,6 @@ class InstrumentContext(CommandPublisher):
         """
         num_channels = self.channels
 
-        def _select_tiprack_from_list(tip_racks) -> Tuple[Labware, Well]:
-            try:
-                tr = tip_racks[0]
-            except IndexError:
-                raise OutOfTipsError
-            next_tip = tr.next_tip(num_channels)
-            if next_tip:
-                return tr, next_tip
-            else:
-                return _select_tiprack_from_list(tip_racks[1:])
-
         if location and isinstance(location, types.Location):
             if isinstance(location.labware, Labware):
                 tiprack = location.labware
@@ -1115,7 +1112,8 @@ class InstrumentContext(CommandPublisher):
             tiprack = location.parent
             target = location
         elif not location:
-            tiprack, target = _select_tiprack_from_list(self.tip_racks)
+            tiprack, target = self._select_tiprack_from_list(
+                self.tip_racks, num_channels)
         else:
             raise TypeError(
                 "If specified, location should be an instance of "
@@ -1133,6 +1131,8 @@ class InstrumentContext(CommandPublisher):
         # Note that the hardware API pick_up_tip action includes homing z after
         cmds.do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
                         'after', self, None, instrument=self, location=target)
+        self._hw_manager.hardware.set_working_volume(
+            self._mount, target.max_volume)
         tiprack.use_tips(target, num_channels)
         self._last_tip_picked_up_from = target
 
@@ -1410,6 +1410,13 @@ class InstrumentContext(CommandPublisher):
         if kwargs.get('blow_out'):
             blow_out = transfers.BlowOutStrategy.TRASH
 
+        if new_tip != types.TransferTipPolicy.NEVER:
+            tr, next_tip = self._select_tiprack_from_list(
+                    self.tip_racks, self.channels)
+            max_volume = min(next_tip.max_volume, self.max_volume)
+        else:
+            max_volume = self.hw_pipette['working_volume']
+
         touch_tip = None
         if kwargs.get('touch_tip'):
             touch_tip = transfers.TouchTipStrategy.ALWAYS
@@ -1435,9 +1442,7 @@ class InstrumentContext(CommandPublisher):
         )
         transfer_options = transfers.TransferOptions(transfer=transfer_args,
                                                      mix=mix_opts)
-
-        self._log.info(f"Transfer options: {transfer_options}")
-        plan = transfers.TransferPlan(volume, source, dest, self,
+        plan = transfers.TransferPlan(volume, source, dest, self, max_volume,
                                       kwargs['mode'], transfer_options)
         self._execute_transfer(plan)
         return self
@@ -2011,24 +2016,49 @@ class ThermocyclerContext(ModuleContext):
 
     @cmds.publish.both(command=cmds.thermocycler_set_temp)
     def set_temperature(self,
-                        temp: float,
+                        temperature: float,
                         hold_time: float = None,
                         ramp_rate: float = None):
-        """ Set the target temperature, in C.
+        """ Set the target temperature, in °C.
 
         Valid operational range yet to be determined.
-        :param temp: The target temperature, in degrees C.
-        :param hold_time: The time to hold after reaching temperature. If
-                          ``hold_time`` is not specified, the Thermocycler will
-                          hold this temperature indefinitely (requiring manual
-                          intervention to end the cycle).
-        :param ramp_rate: The target rate of temperature change, in degC/sec.
+        :param temperature: The target temperature, in °C.
+        :param hold_time: The time to hold, after reaching temperature, before
+                          proceeding to the next command. If ``hold_time``
+                          is not specified, the Thermocycler will
+                          hold this temperature indefinitely.
+        :param ramp_rate: The target rate of temperature change, in °C/sec.
                           If ``ramp_rate`` is not specified, it will default to
                           the maximum ramp rate as defined in the device
                           configuration.
         """
         return self._module.set_temperature(
-            temp=temp, hold_time=hold_time, ramp_rate=ramp_rate)
+            temperature=temperature, hold_time=hold_time, ramp_rate=ramp_rate)
+
+    @cmds.publish.both(command=cmds.thermocycler_cycle_temperatures)
+    def cycle_temperatures(self,
+                           steps: List[modules.types.ThermocyclerStep],
+                           repetitions: int):
+        """ For a given number of repetitions, cycle through a list of
+        temperatures in °C for a set hold time.
+
+        :param steps: List of unique steps that make up a single cycle.
+                      Each list item maps to parameters of the
+                      set_temperature method as a dict of float values with
+                      keys 'temperature', 'hold_time', & optional 'ramp_rate'.
+                      NOTE: unlike the set_temperature method, hold_time
+                      must be defined and finite for each step.
+        :param repetitions: The number of times to repeat the cycled steps.
+        """
+        for step in steps:
+            if step.get('temperature') is None:
+                raise ValueError(
+                        "temperature must be defined for each step in cycle")
+            if step.get('hold_time') is None:
+                raise ValueError(
+                        "hold_time must be defined for each step in cycle")
+        return self._module.cycle_temperatures(
+            steps=steps, repetitions=repetitions)
 
     @property
     def current_lid_target(self):
@@ -2090,6 +2120,26 @@ class ThermocyclerContext(ModuleContext):
     def hold_time(self):
         """ Remaining hold time in sec"""
         return self._module.hold_time
+
+    @property
+    def total_cycle_count(self):
+        """ Number of repetitions for current set cycle"""
+        return self._module.total_cycle_count
+
+    @property
+    def current_cycle_index(self):
+        """ Index of the current set cycle repetition"""
+        return self._module.current_cycle_index
+
+    @property
+    def total_step_count(self):
+        """ Number of steps within the current cycle"""
+        return self._module.total_step_count
+
+    @property
+    def current_step_index(self):
+        """ Index of the current step within the current cycle"""
+        return self._module.current_step_index
 
     @cmds.publish.both(command=cmds.thermocycler_deactivate)
     def deactivate(self):

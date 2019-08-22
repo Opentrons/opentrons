@@ -1,12 +1,11 @@
 // @flow
-import type { RobotHost } from '../../robot-api'
+import type { RobotHost } from '../../robot-api/types'
 
 export type BuildrootUpdateType = 'upgrade' | 'downgrade' | 'reinstall'
 
 export type RobotSystemType = 'balena' | 'buildroot'
 
 export type BuildrootUpdateInfo = {|
-  version: string,
   releaseNotes: string,
 |}
 
@@ -54,6 +53,7 @@ export type BuildrootState = {|
   seen: boolean,
   downloadProgress: number | null,
   downloadError: string | null,
+  version: string | null,
   info: BuildrootUpdateInfo | null,
   session: BuildrootUpdateSession | null,
 |}
@@ -73,16 +73,19 @@ export type BuildrootAction =
   | UnexpectedBuildrootError
   | {| type: 'buildroot:DOWNLOAD_PROGRESS', payload: number |}
   | {| type: 'buildroot:DOWNLOAD_ERROR', payload: string |}
-  | {| type: 'buildroot:UPDATE_INFO', payload: BuildrootUpdateInfo | null |}
+  | {| type: 'buildroot:UPDATE_VERSION', payload: string |}
+  | {| type: 'buildroot:UPDATE_INFO', payload: BuildrootUpdateInfo |}
   | {| type: 'buildroot:USER_FILE_INFO', payload: BuildrootUserFileInfo |}
-  | {| type: 'buildroot:SET_UPDATE_SEEN' |}
+  | {| type: 'buildroot:SET_UPDATE_SEEN', meta: {| robotName: string |} |}
+  | {| type: 'buildroot:CHANGELOG_SEEN', meta: {| robotName: string |} |}
+  | {| type: 'buildroot:UPDATE_IGNORED', meta: {| robotName: string |} |}
   | {|
       type: 'buildroot:START_PREMIGRATION',
       payload: RobotHost,
       meta: {| shell: true |},
     |}
   | {| type: 'buildroot:PREMIGRATION_DONE', payload: string |}
-  | {| type: 'buildroot:PREMIGRATION_ERROR', payload: string |}
+  | {| type: 'buildroot:PREMIGRATION_ERROR', payload: {| message: string |} |}
   | {|
       type: 'buildroot:READ_USER_FILE',
       payload: {| systemFile: string |},

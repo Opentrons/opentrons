@@ -318,7 +318,8 @@ class API(HardwareAPILike):
         configs = ['name', 'min_volume', 'max_volume', 'channels',
                    'aspirate_flow_rate', 'dispense_flow_rate',
                    'pipette_id', 'current_volume', 'display_name',
-                   'tip_length', 'model', 'blow_out_flow_rate']
+                   'tip_length', 'model', 'blow_out_flow_rate',
+                   'working_volume']
         instruments: Dict[top_types.Mount, Pipette.DictType] = {
             top_types.Mount.LEFT: {},
             top_types.Mount.RIGHT: {}
@@ -369,6 +370,12 @@ class API(HardwareAPILike):
                                                    checked_loop,
                                                    explicit_modeset)
 
+    def _call_on_attached_modules(self, method):
+        for module in self.attached_modules.values():
+            maybe_module_method = getattr(module, method, None)
+            if callable(maybe_module_method):
+                maybe_module_method()
+
     # Global actions API
     @_log_call
     def pause(self):
@@ -384,6 +391,7 @@ class API(HardwareAPILike):
         :py:meth:`resume`.
         """
         self._backend.pause()
+        self._call_on_attached_modules("pause")
 
     def pause_with_message(self, message):
         self._log.warning('Pause with message: {}'.format(message))
@@ -397,6 +405,7 @@ class API(HardwareAPILike):
         Resume motion after a call to :py:meth:`pause`.
         """
         self._backend.resume()
+        self._call_on_attached_modules("resume")
 
     @_log_call
     def halt(self):
@@ -424,6 +433,7 @@ class API(HardwareAPILike):
         """
         self._backend.halt()
         self._log.info("Recovering from halt")
+        self._call_on_attached_modules("cancel")
         await self.reset()
         await self.home()
 
@@ -1111,6 +1121,14 @@ class API(HardwareAPILike):
             await self._shake_off_tips(mount)
 
         await self.retract(mount, instr.config.pick_up_distance)
+
+    def set_working_volume(self, mount, tip_volume):
+        instr = self._attached_instruments[mount]
+        assert instr
+        self._log.info(
+            "Updating working volume on pipette mount: {}, tip volume: {} ul"
+            .format(mount, tip_volume))
+        instr.working_volume = tip_volume
 
     @_log_call
     async def drop_tip(self, mount, home_after=True):

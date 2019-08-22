@@ -57,14 +57,16 @@ describe('robot actions', () => {
     const success = {
       type: 'robot:SESSION_RESPONSE',
       payload: session,
+      meta: { freshUpload: true },
     }
     const failure = {
       type: 'robot:SESSION_ERROR',
       payload: { error },
+      meta: { freshUpload: false },
     }
 
-    expect(actions.sessionResponse(null, session)).toEqual(success)
-    expect(actions.sessionResponse(error)).toEqual(failure)
+    expect(actions.sessionResponse(null, session, true)).toEqual(success)
+    expect(actions.sessionResponse(error, null, false)).toEqual(failure)
   })
 
   test('SESSION_UPDATE action', () => {

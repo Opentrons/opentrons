@@ -84,9 +84,9 @@ describe('test helper functions', () => {
 
 describe('test createIrregularLabware function', () => {
   let labware1
-
+  let labware1Args
   beforeEach(() => {
-    labware1 = createIrregularLabware({
+    labware1Args = {
       namespace: 'fixture',
       metadata: {
         displayName: 'Fake Irregular Container',
@@ -125,7 +125,8 @@ describe('test createIrregularLabware function', () => {
         { rowStart: 'A', colStart: '1', rowStride: 2, colStride: 1 },
         { rowStart: 'B', colStart: '1', rowStride: 1, colStride: 1 },
       ],
-    })
+    }
+    labware1 = createIrregularLabware(labware1Args)
   })
 
   test('irregular ordering generates as expected', () => {
@@ -173,5 +174,18 @@ describe('test createIrregularLabware function', () => {
     })
 
     expect(loadName).toEqual('somebrand_6_wellplate_6x4ml')
+  })
+
+  test('failing to validate against labware schema throws w/o "strict"', () => {
+    const args = {
+      ...labware1Args,
+      // negative y offset should fail schema validation by making well `y` negative
+      offset: [{ x: 10, y: -9999, z: 69.48 }, { x: 15, y: -9999, z: 69.48 }],
+    }
+
+    expect(() => createIrregularLabware(args)).toThrowErrorMatchingSnapshot()
+    expect(() =>
+      createIrregularLabware({ ...args, strict: false })
+    ).not.toThrow()
   })
 })

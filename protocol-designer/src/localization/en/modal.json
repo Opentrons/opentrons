@@ -21,6 +21,15 @@
     },
     "field_label": "Distance from bottom of well"
   },
+  "labware_upload_message": {
+    "title": {
+      "INVALID_JSON_FILE": "Incompatible file type",
+      "NOT_JSON": "Incompatible file type",
+      "EXACT_LABWARE_MATCH": "Duplicate labware definition",
+      "LABWARE_NAME_CONFLICT": "Duplicate labware name",
+      "ASK_FOR_LABWARE_OVERWRITE": "Duplicate labware name"
+    }
+  },
   "new_protocol": {
     "title": "Create New Protocol"
   },
