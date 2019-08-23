@@ -280,10 +280,7 @@ type RegularNameProps = {
   loadNamePostfix?: Array<string>,
 }
 
-function _createNameWithJoin(
-  args: RegularNameProps,
-  joinFn: (Array<string | number | Array<string | number>>) => string
-): string {
+export function createRegularLoadName(args: RegularNameProps): string {
   const {
     gridRows,
     gridColumns,
@@ -294,7 +291,7 @@ function _createNameWithJoin(
     loadNamePostfix = [],
   } = args
   const numWells = gridRows * gridColumns
-  return joinFn([
+  return joinLoadName([
     brandName,
     numWells,
     displayCategory,
@@ -306,20 +303,35 @@ function _createNameWithJoin(
   ])
 }
 
-export function createRegularLoadName(args: RegularNameProps): string {
-  return _createNameWithJoin(args, joinLoadName)
+const capitalize = (_s: string): string => {
+  const s = _s.trim()
+  return `${s.slice(0, 1).toUpperCase()}${s.slice(1)}`
 }
 
+// TODO: Ian 2019-08-23 consider using this in the labware creation functions instead of manually entering displayName
 export function createDefaultDisplayName(args: RegularNameProps): string {
-  return _createNameWithJoin(args, arr =>
-    flatten(arr)
-      .map(i => {
-        const subs = String(i)
-        return `${subs.slice(0, 1).toUpperCase()}${subs.slice(1)}`.trim()
-      })
-      .filter(s => s !== '')
-      .join(' ')
-  )
+  const {
+    gridRows,
+    gridColumns,
+    displayCategory,
+    totalLiquidVolume,
+    displayVolumeUnits,
+    brandName = DEFAULT_BRAND_NAME,
+    loadNamePostfix = [],
+  } = args
+  const numWells = gridRows * gridColumns
+  return [
+    ...brandName.split(' ').map(capitalize),
+    numWells,
+    capitalize(displayCategory.replace(/([a-z])([A-Z])/g, '$1 $2')),
+    getDisplayVolume(totalLiquidVolume, displayVolumeUnits),
+    displayVolumeUnits,
+    ...loadNamePostfix.map(capitalize),
+  ]
+    .filter(s => s !== '')
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 // Generator function for labware definitions within a regular grid format
