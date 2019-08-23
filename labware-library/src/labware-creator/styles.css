@@ -1,27 +1,42 @@
 @import '@opentrons/components';
+@import '../styles/breakpoints.css';
 
 .labware_creator {
   @apply --font-body-2-dark;
 
-  max-width: 60rem;
+  max-width: 50rem;
   margin: 1rem auto;
+  padding: 1rem;
 
   & p {
     margin: 1rem 0;
     line-height: var(--lh-copy);
   }
 
+  & a,
+  & a:visited {
+    color: var(--c-blue);
+  }
+
   & ul {
-    list-style: disc inside;
+    list-style: disc;
+    padding-left: 1.25rem;
+    line-height: var(--lh-copy);
+  }
+
+  & li {
+    line-height: var(--lh-copy);
+    padding-bottom: 0.5rem;
   }
 
   & strong {
     font-weight: var(--fw-semibold);
   }
+}
 
-  & h2 {
-    @apply --font-header-dark;
-  }
+/* TODO (ka 2019-8-23): Removed nesting here to allow for easier style overrides/reduce specificity */
+h2 {
+  @apply --font-header-dark;
 }
 
 .double_check_before_exporting {
@@ -40,4 +55,52 @@
 
 .export_button {
   max-width: 20rem;
+}
+
+.callout {
+  padding: 0 0.75rem;
+  border-radius: 0.5rem;
+  border: var(--bd-light);
+  margin-bottom: 2rem;
+}
+
+.setup_heading {
+  border: none;
+  font-weight: var(--fw-regular);
+}
+
+.flex_row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+
+.new_definition_section,
+.upload_exisiting_section {
+  flex-basis: 100%;
+  flex-shrink: 0;
+}
+
+.new_definition_content {
+  padding-top: 1rem;
+}
+
+.upload_exisiting_section {
+  min-height: 19rem;
+}
+
+@media (--medium) {
+  .new_definition_section {
+    flex-basis: 45%;
+    flex-shrink: 1;
+    padding-right: 2rem;
+    border-right: var(--bd-light);
+  }
+
+  .upload_exisiting_section {
+    padding: 1rem;
+    flex-shrink: 1;
+    padding-right: 0;
+    flex-basis: 55%;
+  }
 }

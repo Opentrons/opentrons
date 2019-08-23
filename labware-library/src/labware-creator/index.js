@@ -5,6 +5,7 @@ import mapValues from 'lodash/mapValues'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import { AlertItem, AlertModal, PrimaryButton } from '@opentrons/components'
+import LabwareCreator from './components/LabwareCreator'
 import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
 import {
   labwareTypeOptions,
@@ -297,388 +298,412 @@ const App = () => {
   })
 
   return (
-    <div>
-      {showExportErrorModal && (
-        <AlertModal
-          className={styles.export_error_modal}
-          heading="Cannot export file"
-          onCloseClick={() => setShowExportErrorModal(false)}
-          buttons={[
-            {
-              onClick: () => setShowExportErrorModal(false),
-              children: 'close',
-            },
-          ]}
-        >
-          Please resolve all invalid fields in order to export the labware
-          definition
-        </AlertModal>
-      )}
-      <Formik
-        initialValues={getDefaultFormState()}
-        validationSchema={labwareFormSchema}
-        onSubmit={(values: LabwareFields) => {
-          const castValues: ProcessedLabwareFields = labwareFormSchema.cast(
-            values
-          )
-          const { pipetteName } = castValues
-          const def = fieldsToLabware(castValues)
-          const { displayName } = def.metadata
+    <LabwareCreator>
+      <div>
+        {showExportErrorModal && (
+          <AlertModal
+            className={styles.export_error_modal}
+            heading="Cannot export file"
+            onCloseClick={() => setShowExportErrorModal(false)}
+            buttons={[
+              {
+                onClick: () => setShowExportErrorModal(false),
+                children: 'close',
+              },
+            ]}
+          >
+            Please resolve all invalid fields in order to export the labware
+            definition
+          </AlertModal>
+        )}
+        <Formik
+          initialValues={getDefaultFormState()}
+          validationSchema={labwareFormSchema}
+          onSubmit={(values: LabwareFields) => {
+            const castValues: ProcessedLabwareFields = labwareFormSchema.cast(
+              values
+            )
+            const { pipetteName } = castValues
+            const def = fieldsToLabware(castValues)
+            const { displayName } = def.metadata
 
-          const zip = new JSZip()
-          zip.file(`${displayName}.json`, JSON.stringify(def, null, 4))
-          zip.file(
-            `calibrate_${displayName}.py`,
-            labwareTestProtocol({ pipetteName, definition: def })
-          )
-          zip
-            .generateAsync({ type: 'blob' })
-            .then(blob => saveAs(blob, `${displayName}.zip`))
-        }}
-      >
-        {({
-          handleSubmit,
-          values,
-          isValid,
-          errors,
-          touched,
-          setTouched,
-          setValues,
-        }) => (
-          <div className={styles.labware_creator}>
-            <h2>Custom Labware Creator</h2>
-            <IntroCopy />
-            <Section
-              label="Labware Type"
-              fieldList={[
-                'labwareType',
-                'tubeRackInsertLoadName',
-                'aluminumBlockType',
-                'aluminumBlockChildType',
-              ]}
-            >
-              <Dropdown name="labwareType" options={labwareTypeOptions} />
-              {values.labwareType === 'tubeRack' && (
-                <Dropdown
-                  name="tubeRackInsertLoadName"
-                  options={tubeRackInsertOptions}
-                  onValueChange={makeAutofillOnChange({
-                    name: 'tubeRackInsertLoadName',
-                    autofills: tubeRackAutofills,
-                    values,
-                    touched,
-                    setTouched,
-                    setValues,
-                  })}
-                />
-              )}
-              {values.labwareType === 'aluminumBlock' && (
-                <Dropdown
-                  name="aluminumBlockType"
-                  options={aluminumBlockTypeOptions}
-                  onValueChange={makeAutofillOnChange({
-                    name: 'aluminumBlockType',
-                    autofills: aluminumBlockAutofills,
-                    values,
-                    touched,
-                    setTouched,
-                    setValues,
-                  })}
-                />
-              )}
-              {values.labwareType === 'aluminumBlock' &&
-                values.aluminumBlockType === '96well' && (
-                  // Only show for '96well' aluminum block type
-                  <Dropdown
-                    name="aluminumBlockChildType"
-                    options={aluminumBlockChildTypeOptions}
-                  />
-                )}
-            </Section>
-            {/* PAGE 1 - Labware */}
-            <Section label="Regularity" fieldList={['homogeneousWells']}>
-              {/* tubeRackSides: Array<string> maybe?? */}
-              <RadioField name="homogeneousWells" options={yesNoOptions} />
-            </Section>
-            <Section
-              label="Footprint"
-              fieldList={['footprintXDimension', 'footprintYDimension']}
-              additionalAlerts={getXYDimensionAlerts(values, touched)}
-            >
-              <div>
-                <p>
-                  Ensure measurement is taken from the{' '}
-                  <strong>very bottom</strong> of plate.
-                </p>
-                <p>
-                  The footprint measurement helps determine if the labware fits
-                  firmly into the slots on the OT-2 deck.
-                </p>
+            const zip = new JSZip()
+            zip.file(`${displayName}.json`, JSON.stringify(def, null, 4))
+            zip.file(
+              `calibrate_${displayName}.py`,
+              labwareTestProtocol({ pipetteName, definition: def })
+            )
+            zip
+              .generateAsync({ type: 'blob' })
+              .then(blob => saveAs(blob, `${displayName}.zip`))
+          }}
+        >
+          {({
+            handleSubmit,
+            values,
+            isValid,
+            errors,
+            touched,
+            setTouched,
+            setValues,
+          }) => (
+            <div className={styles.labware_creator}>
+              <h2>Custom Labware Creator</h2>
+              <IntroCopy />
+              <div className={styles.flex_row}>
+                <div className={styles.new_definition_section}>
+                  <Section
+                    label="Create a new definition"
+                    fieldList={[
+                      'labwareType',
+                      'tubeRackInsertLoadName',
+                      'aluminumBlockType',
+                      'aluminumBlockChildType',
+                    ]}
+                    headingClassName={styles.setup_heading}
+                  >
+                    <div className={styles.new_definition_content}>
+                      <Dropdown
+                        name="labwareType"
+                        options={labwareTypeOptions}
+                      />
+                      {values.labwareType === 'tubeRack' && (
+                        <Dropdown
+                          name="tubeRackInsertLoadName"
+                          options={tubeRackInsertOptions}
+                          onValueChange={makeAutofillOnChange({
+                            name: 'tubeRackInsertLoadName',
+                            autofills: tubeRackAutofills,
+                            values,
+                            touched,
+                            setTouched,
+                            setValues,
+                          })}
+                        />
+                      )}
+                      {values.labwareType === 'aluminumBlock' && (
+                        <Dropdown
+                          name="aluminumBlockType"
+                          options={aluminumBlockTypeOptions}
+                          onValueChange={makeAutofillOnChange({
+                            name: 'aluminumBlockType',
+                            autofills: aluminumBlockAutofills,
+                            values,
+                            touched,
+                            setTouched,
+                            setValues,
+                          })}
+                        />
+                      )}
+                      {values.labwareType === 'aluminumBlock' &&
+                        values.aluminumBlockType === '96well' && (
+                          // Only show for '96well' aluminum block type
+                          <Dropdown
+                            name="aluminumBlockChildType"
+                            options={aluminumBlockChildTypeOptions}
+                          />
+                        )}
+                    </div>
+                  </Section>
+                </div>
+                <div className={styles.upload_exisiting_section}>
+                  <h2 className={styles.setup_heading}>
+                    Edit a file you’ve built with our labware creator.{' '}
+                  </h2>
+                </div>
               </div>
-              <img src={require('./images/footprint.svg')} />
-              <TextField
-                name="footprintXDimension"
-                inputMasks={[maskTo2Decimal]}
-                units="mm"
-              />
-              <TextField
-                name="footprintYDimension"
-                inputMasks={[maskTo2Decimal]}
-                units="mm"
-              />
-            </Section>
-            <Section
-              label={
-                ['aluminumBlock', 'tubeRack'].includes(values.labwareType)
-                  ? 'Total Height'
-                  : 'Height'
-              }
-              fieldList={['labwareZDimension']}
-              additionalAlerts={getHeightAlerts(values, touched)}
-            >
-              <div>
-                <HeightGuidingText labwareType={values.labwareType} />
-              </div>
-              <HeightImg
-                labwareType={values.labwareType}
-                aluminumBlockChildType={values.aluminumBlockChildType}
-              />
-              <TextField
-                name="labwareZDimension"
-                inputMasks={[maskTo2Decimal]}
-                units="mm"
-              />
-            </Section>
-            <Section
-              label="Grid"
-              fieldList={[
-                'gridRows',
-                'gridColumns',
-                'regularRowSpacing',
-                'regularColumnSpacing',
-              ]}
-            >
-              <div>
-                <p>
-                  The grid of wells on your labware is arranged in a number of
-                  rows (run horizontally across your labware, left to right) and
-                  columns (run top to bottom).
-                </p>
-              </div>
-              <TextField name="gridRows" inputMasks={[maskToInteger]} />
-              <RadioField name="regularRowSpacing" options={yesNoOptions} />
-              <TextField name="gridColumns" inputMasks={[maskToInteger]} />
-              <RadioField name="regularColumnSpacing" options={yesNoOptions} />
-            </Section>
-            {/* PAGE 2 */}
-            <Section label="Well/Tube Volume" fieldList={['wellVolume']}>
-              <div>
-                <p>Total maximum volume of each well.</p>
-              </div>
-              <TextField
-                name="wellVolume"
-                inputMasks={[maskTo2Decimal]}
-                units="μL"
-              />
-            </Section>
-            <Section
-              label="Well Shape & Sides"
-              fieldList={[
-                'wellShape',
-                'wellDiameter',
-                'wellXDimension',
-                'wellYDimension',
-              ]}
-            >
-              <div>
-                <p>
-                  Reference the <strong>inside</strong> of the well. Ignore any
-                  lip.
-                </p>
-                <p>Diameter helps the robot locate the sides of the wells.</p>
-              </div>
-              <WellXYImg wellShape={values.wellShape} />
-              <RadioField name="wellShape" options={wellShapeOptions} />
-              {values.wellShape === 'circular' && (
+              {/* PAGE 1 - Labware */}
+              <Section label="Regularity" fieldList={['homogeneousWells']}>
+                {/* tubeRackSides: Array<string> maybe?? */}
+                <RadioField name="homogeneousWells" options={yesNoOptions} />
+              </Section>
+              <Section
+                label="Footprint"
+                fieldList={['footprintXDimension', 'footprintYDimension']}
+                additionalAlerts={getXYDimensionAlerts(values, touched)}
+              >
+                <div>
+                  <p>
+                    Ensure measurement is taken from the{' '}
+                    <strong>very bottom</strong> of plate.
+                  </p>
+                  <p>
+                    The footprint measurement helps determine if the labware
+                    fits firmly into the slots on the OT-2 deck.
+                  </p>
+                </div>
+                <img src={require('./images/footprint.svg')} />
                 <TextField
-                  name="wellDiameter"
+                  name="footprintXDimension"
                   inputMasks={[maskTo2Decimal]}
                   units="mm"
                 />
-              )}
-              {values.wellShape === 'rectangular' && (
-                <>
-                  <TextField
-                    name="wellXDimension"
-                    inputMasks={[maskTo2Decimal]}
-                    units="mm"
-                  />
-                  <TextField
-                    name="wellYDimension"
-                    inputMasks={[maskTo2Decimal]}
-                    units="mm"
-                  />
-                </>
-              )}
-            </Section>
-            <Section
-              label="Well Bottom & Depth"
-              fieldList={['wellBottomShape', 'wellDepth']}
-            >
-              <div>
-                <p>
-                  Reference the measurement from the top of the well (include
-                  any lip but exclude any cap) to the bottom of the{' '}
-                  <strong>inside</strong> of the{' '}
-                  {displayAsTube(values) ? 'tube' : 'well'}.
-                </p>
-
-                <p>
-                  Depth informs the robot how far down it can go inside a well.
-                </p>
-              </div>
-              <DepthImg
-                labwareType={values.labwareType}
-                wellBottomShape={values.wellBottomShape}
-              />
-              <Dropdown
-                name="wellBottomShape"
-                options={wellBottomShapeOptions}
-              />
-              <TextField
-                name="wellDepth"
-                inputMasks={[maskTo2Decimal]}
-                units="mm"
-              />
-            </Section>
-            <Section
-              label="Well Spacing"
-              fieldList={['gridSpacingX', 'gridSpacingY']}
-            >
-              <div>
-                <p>
-                  Spacing is between the <strong>center</strong> of wells.
-                </p>
-                <p>
-                  Well spacing measurements inform the robot how far away rows
-                  and columns are from each other.
-                </p>
-              </div>
-              <XYSpacingImg
-                labwareType={values.labwareType}
-                wellShape={values.wellShape}
-                gridRows={values.gridRows}
-              />
-              <TextField
-                name="gridSpacingX"
-                inputMasks={[maskTo2Decimal]}
-                units="mm"
-              />
-              <TextField
-                name="gridSpacingY"
-                inputMasks={[maskTo2Decimal]}
-                units="mm"
-              />
-            </Section>
-            <Section
-              label="Grid Offset"
-              fieldList={['gridOffsetX', 'gridOffsetY']}
-            >
-              <div>
-                <p>
-                  Find the measurement from the center of{' '}
-                  <strong>
-                    {values.labwareType === 'reservoir'
-                      ? 'the top left-most well'
-                      : 'well A1'}
-                  </strong>{' '}
-                  to the edge of the labware{"'"}s footprint.
-                </p>
-                <p>
-                  Corner offset informs the robot how far the grid of wells is
-                  from the slot{"'"}s top left corner.
-                </p>
-                <div>
-                  <img src={require('./images/offset_helpText.svg')} />
-                </div>
-                <div>
-                  <XYOffsetImg
-                    labwareType={values.labwareType}
-                    wellShape={values.wellShape}
-                  />
-                </div>
-              </div>
-              <TextField
-                name="gridOffsetX"
-                inputMasks={[maskTo2Decimal]}
-                units="mm"
-              />
-              <TextField
-                name="gridOffsetY"
-                inputMasks={[maskTo2Decimal]}
-                units="mm"
-              />
-            </Section>
-            <Section label="Check your work">
-              <p>
-                Check that the size, spacing, and shape of your wells looks
-                correct.
-              </p>
-              <ConditionalLabwareRender values={values} />
-            </Section>
-
-            {/* PAGE 3 */}
-            <Section label="Description" fieldList={['brand', 'brandId']}>
-              <TextField name="brand" />
-              <TextField name="brandId" caption="Separate multiple by comma" />
-            </Section>
-            {/* PAGE 4 */}
-            <Section
-              label="File"
-              fieldList={['loadName', 'displayName', 'pipetteName']}
-            >
-              <TextField
-                name="displayName"
-                placeholder={getDefaultDisplayName(values)}
-              />
-              <TextField
-                name="loadName"
-                placeholder={getDefaultLoadName(values)}
-                caption="Only lower case letters, numbers, periods, and underscores may be used"
-                inputMasks={[maskLoadName]}
-              />
-              <Dropdown
-                name="pipetteName"
-                options={pipetteNameOptions}
-                caption="Files are exported with a protocol that will use a single channel pipette to test whether a pipette can hit key points on your labware"
-              />
-            </Section>
-            <div className={styles.double_check_before_exporting}>
-              <p>DOUBLE CHECK YOUR WORK BEFORE EXPORTING!</p>
-              <p>
-                If you are not comfortable reading a JSON labware definition
-                then consider noting down the values you put in these fields.
-                You will not be able to re-import your file back into the
-                labware creator to read or edit it.
-              </p>
-            </div>
-            <div>
-              <PrimaryButton
-                className={styles.export_button}
-                onClick={() => {
-                  if (!isValid && !showExportErrorModal) {
-                    setShowExportErrorModal(true)
-                  }
-                  handleSubmit()
-                }}
+                <TextField
+                  name="footprintYDimension"
+                  inputMasks={[maskTo2Decimal]}
+                  units="mm"
+                />
+              </Section>
+              <Section
+                label={
+                  ['aluminumBlock', 'tubeRack'].includes(values.labwareType)
+                    ? 'Total Height'
+                    : 'Height'
+                }
+                fieldList={['labwareZDimension']}
+                additionalAlerts={getHeightAlerts(values, touched)}
               >
-                EXPORT FILE
-              </PrimaryButton>
+                <div>
+                  <HeightGuidingText labwareType={values.labwareType} />
+                </div>
+                <HeightImg
+                  labwareType={values.labwareType}
+                  aluminumBlockChildType={values.aluminumBlockChildType}
+                />
+                <TextField
+                  name="labwareZDimension"
+                  inputMasks={[maskTo2Decimal]}
+                  units="mm"
+                />
+              </Section>
+              <Section
+                label="Grid"
+                fieldList={[
+                  'gridRows',
+                  'gridColumns',
+                  'regularRowSpacing',
+                  'regularColumnSpacing',
+                ]}
+              >
+                <div>
+                  <p>
+                    The grid of wells on your labware is arranged in a number of
+                    rows (run horizontally across your labware, left to right)
+                    and columns (run top to bottom).
+                  </p>
+                </div>
+                <TextField name="gridRows" inputMasks={[maskToInteger]} />
+                <RadioField name="regularRowSpacing" options={yesNoOptions} />
+                <TextField name="gridColumns" inputMasks={[maskToInteger]} />
+                <RadioField
+                  name="regularColumnSpacing"
+                  options={yesNoOptions}
+                />
+              </Section>
+              {/* PAGE 2 */}
+              <Section label="Well/Tube Volume" fieldList={['wellVolume']}>
+                <div>
+                  <p>Total maximum volume of each well.</p>
+                </div>
+                <TextField
+                  name="wellVolume"
+                  inputMasks={[maskTo2Decimal]}
+                  units="μL"
+                />
+              </Section>
+              <Section
+                label="Well Shape & Sides"
+                fieldList={[
+                  'wellShape',
+                  'wellDiameter',
+                  'wellXDimension',
+                  'wellYDimension',
+                ]}
+              >
+                <div>
+                  <p>
+                    Reference the <strong>inside</strong> of the well. Ignore
+                    any lip.
+                  </p>
+                  <p>Diameter helps the robot locate the sides of the wells.</p>
+                </div>
+                <WellXYImg wellShape={values.wellShape} />
+                <RadioField name="wellShape" options={wellShapeOptions} />
+                {values.wellShape === 'circular' && (
+                  <TextField
+                    name="wellDiameter"
+                    inputMasks={[maskTo2Decimal]}
+                    units="mm"
+                  />
+                )}
+                {values.wellShape === 'rectangular' && (
+                  <>
+                    <TextField
+                      name="wellXDimension"
+                      inputMasks={[maskTo2Decimal]}
+                      units="mm"
+                    />
+                    <TextField
+                      name="wellYDimension"
+                      inputMasks={[maskTo2Decimal]}
+                      units="mm"
+                    />
+                  </>
+                )}
+              </Section>
+              <Section
+                label="Well Bottom & Depth"
+                fieldList={['wellBottomShape', 'wellDepth']}
+              >
+                <div>
+                  <p>
+                    Reference the measurement from the top of the well (include
+                    any lip but exclude any cap) to the bottom of the{' '}
+                    <strong>inside</strong> of the{' '}
+                    {displayAsTube(values) ? 'tube' : 'well'}.
+                  </p>
+
+                  <p>
+                    Depth informs the robot how far down it can go inside a
+                    well.
+                  </p>
+                </div>
+                <DepthImg
+                  labwareType={values.labwareType}
+                  wellBottomShape={values.wellBottomShape}
+                />
+                <Dropdown
+                  name="wellBottomShape"
+                  options={wellBottomShapeOptions}
+                />
+                <TextField
+                  name="wellDepth"
+                  inputMasks={[maskTo2Decimal]}
+                  units="mm"
+                />
+              </Section>
+              <Section
+                label="Well Spacing"
+                fieldList={['gridSpacingX', 'gridSpacingY']}
+              >
+                <div>
+                  <p>
+                    Spacing is between the <strong>center</strong> of wells.
+                  </p>
+                  <p>
+                    Well spacing measurements inform the robot how far away rows
+                    and columns are from each other.
+                  </p>
+                </div>
+                <XYSpacingImg
+                  labwareType={values.labwareType}
+                  wellShape={values.wellShape}
+                  gridRows={values.gridRows}
+                />
+                <TextField
+                  name="gridSpacingX"
+                  inputMasks={[maskTo2Decimal]}
+                  units="mm"
+                />
+                <TextField
+                  name="gridSpacingY"
+                  inputMasks={[maskTo2Decimal]}
+                  units="mm"
+                />
+              </Section>
+              <Section
+                label="Grid Offset"
+                fieldList={['gridOffsetX', 'gridOffsetY']}
+              >
+                <div>
+                  <p>
+                    Find the measurement from the center of{' '}
+                    <strong>
+                      {values.labwareType === 'reservoir'
+                        ? 'the top left-most well'
+                        : 'well A1'}
+                    </strong>{' '}
+                    to the edge of the labware{"'"}s footprint.
+                  </p>
+                  <p>
+                    Corner offset informs the robot how far the grid of wells is
+                    from the slot{"'"}s top left corner.
+                  </p>
+                  <div>
+                    <img src={require('./images/offset_helpText.svg')} />
+                  </div>
+                  <div>
+                    <XYOffsetImg
+                      labwareType={values.labwareType}
+                      wellShape={values.wellShape}
+                    />
+                  </div>
+                </div>
+                <TextField
+                  name="gridOffsetX"
+                  inputMasks={[maskTo2Decimal]}
+                  units="mm"
+                />
+                <TextField
+                  name="gridOffsetY"
+                  inputMasks={[maskTo2Decimal]}
+                  units="mm"
+                />
+              </Section>
+              <Section label="Check your work">
+                <p>
+                  Check that the size, spacing, and shape of your wells looks
+                  correct.
+                </p>
+                <ConditionalLabwareRender values={values} />
+              </Section>
+
+              {/* PAGE 3 */}
+              <Section label="Description" fieldList={['brand', 'brandId']}>
+                <TextField name="brand" />
+                <TextField
+                  name="brandId"
+                  caption="Separate multiple by comma"
+                />
+              </Section>
+              {/* PAGE 4 */}
+              <Section
+                label="File"
+                fieldList={['loadName', 'displayName', 'pipetteName']}
+              >
+                <TextField
+                  name="displayName"
+                  placeholder={getDefaultDisplayName(values)}
+                />
+                <TextField
+                  name="loadName"
+                  placeholder={getDefaultLoadName(values)}
+                  caption="Only lower case letters, numbers, periods, and underscores may be used"
+                  inputMasks={[maskLoadName]}
+                />
+                <Dropdown
+                  name="pipetteName"
+                  options={pipetteNameOptions}
+                  caption="Files are exported with a protocol that will use a single channel pipette to test whether a pipette can hit key points on your labware"
+                />
+              </Section>
+              <div className={styles.double_check_before_exporting}>
+                <p>DOUBLE CHECK YOUR WORK BEFORE EXPORTING!</p>
+                <p>
+                  If you are not comfortable reading a JSON labware definition
+                  then consider noting down the values you put in these fields.
+                  You will not be able to re-import your file back into the
+                  labware creator to read or edit it.
+                </p>
+              </div>
+              <div>
+                <PrimaryButton
+                  className={styles.export_button}
+                  onClick={() => {
+                    if (!isValid && !showExportErrorModal) {
+                      setShowExportErrorModal(true)
+                    }
+                    handleSubmit()
+                  }}
+                >
+                  EXPORT FILE
+                </PrimaryButton>
+              </div>
             </div>
-          </div>
-        )}
-      </Formik>
-    </div>
+          )}
+        </Formik>
+      </div>
+    </LabwareCreator>
   )
 }
 

@@ -11,11 +11,12 @@ import type { LabwareDefinition } from '../../types'
 
 export type BreadcrumbsProps = {|
   definition: LabwareDefinition | null,
+  creator?: boolean,
 |}
 
 export default function Breadcrumbs(props: BreadcrumbsProps) {
-  const { definition } = props
-  if (!definition) return null
+  const { definition, creator } = props
+  if (!definition && !creator) return null
 
   return (
     <div className={styles.breadcrumbs}>
