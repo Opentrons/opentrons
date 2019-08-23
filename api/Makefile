@@ -73,6 +73,7 @@ all: clean wheel
 .PHONY: install
 install:
 	pipenv sync $(pipenv_opts)
+	pipenv run pip freeze
 
 .PHONY: clean
 clean:
