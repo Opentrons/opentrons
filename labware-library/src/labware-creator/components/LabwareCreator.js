@@ -11,7 +11,7 @@ export default function LabwareCreator(props: Props) {
   return (
     <>
       <Nav />
-      <Breadcrumbs creator definition={null} />
+      <Breadcrumbs />
       <div className={styles.page_wrapper}>{props.children}</div>
     </>
   )

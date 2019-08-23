@@ -7,17 +7,7 @@ import { Link } from '../ui'
 
 import styles from './styles.css'
 
-import type { LabwareDefinition } from '../../types'
-
-export type BreadcrumbsProps = {|
-  definition: LabwareDefinition | null,
-  creator?: boolean,
-|}
-
-export default function Breadcrumbs(props: BreadcrumbsProps) {
-  const { definition, creator } = props
-  if (!definition && !creator) return null
-
+export default function Breadcrumbs() {
   return (
     <div className={styles.breadcrumbs}>
       <div className={styles.breadcrumbs_contents}>

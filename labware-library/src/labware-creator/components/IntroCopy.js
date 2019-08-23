@@ -40,7 +40,7 @@ const IntroCopy = () => (
         mechanical drawings to ensure accurate measurements for defining
         labware, only relying on manual measurements to supplement missing
         information. To learn more about ways to access mechanical drawings from
-        manufacturerers, please refer to this guide.
+        manufacturers, please refer to this guide.
       </p>
     </div>
   </>
