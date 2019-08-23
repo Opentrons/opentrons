@@ -76,11 +76,9 @@ export const getProtocolFilename: StringSelector = createSelector(
 //   file => file && file.lastModified
 // )
 
-export const getLabwareDefBySlot: OutputSelector<
-  State,
-  void,
-  { [slot: string]: LabwareDefinition2 }
-> = createSelector(
+export const getLabwareDefBySlot: State => {
+  [slot: string]: LabwareDefinition2 | void,
+} = createSelector(
   getProtocolData,
   (_data: any) => {
     if (_data?.schemaVersion === 3) {

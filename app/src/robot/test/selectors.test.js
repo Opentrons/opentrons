@@ -2,6 +2,8 @@
 import { setIn } from '@thi.ng/paths'
 import { NAME, selectors, constants } from '../'
 
+import { getLabwareDefBySlot } from '../../protocol/selectors'
+
 jest.mock('../../protocol/selectors')
 
 const makeState = state => ({ [NAME]: state })
@@ -32,6 +34,13 @@ const {
 } = selectors
 
 describe('robot selectors', () => {
+  beforeEach(() => {
+    getLabwareDefBySlot.mockReturnValue({})
+  })
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   describe('robot list', () => {
     let state
 
@@ -39,6 +48,10 @@ describe('robot selectors', () => {
       state = {
         robot: { connection: { connectedTo: 'bar' } },
       }
+    })
+
+    afterEach(() => {
+      jest.resetAllMocks()
     })
 
     test('getConnectedRobotName', () => {
