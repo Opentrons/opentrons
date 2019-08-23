@@ -198,22 +198,32 @@ def using_api1(loop):
         opentrons.robot.config = config.robot_configs.load()
 
 
+def _should_skip_api1(request):
+    return request.node.get_closest_marker('api1_only')\
+        and request.param != using_api1
+
+
+def _should_skip_api2(request):
+    return request.node.get_closest_marker('api2_only')\
+        and request.param != using_api2
+
+
 @pytest.fixture(params=[using_api1, using_api2])
 async def async_server(request, virtual_smoothie_env, loop):
-    if request.node.get_marker('api1_only') and request.param != using_api1:
+    if _should_skip_api1(request):
         pytest.skip('requires api1 only')
-    elif request.node.get_marker('api2_only') and request.param != using_api2:
+    elif _should_skip_api2(request):
         pytest.skip('requires api2 only')
     with request.param(loop):
-        app = init(loop)
+        app = init()
         app['api_version'] = 1 if request.param == using_api1 else 2
         yield app
         await app.shutdown()
 
 
 @pytest.fixture
-async def async_client(async_server, loop, test_client):
-    cli = await loop.create_task(test_client(async_server))
+async def async_client(async_server, loop, aiohttp_client):
+    cli = await loop.create_task(aiohttp_client(async_server))
     endpoints.session = None
     yield cli
 
@@ -275,7 +285,7 @@ def session_manager(main_router):
 
 
 @pytest.fixture
-def session(loop, test_client, request, main_router):
+def session(loop, aiohttp_client, request, main_router):
     """
     Create testing session. Tests using this fixture are expected
     to have @pytest.mark.parametrize('root', [value]) decorator set.
@@ -293,9 +303,9 @@ def session(loop, test_client, request, main_router):
     except Exception:
         pass
 
-    app = web.Application(loop=loop, middlewares=[error_middleware])
+    app = web.Application(middlewares=[error_middleware])
     server = rpc.RPCServer(app, root)
-    client = loop.run_until_complete(test_client(server.app))
+    client = loop.run_until_complete(aiohttp_client(server.app))
     socket = loop.run_until_complete(client.ws_connect('/'))
     token = str(uuid())
 
@@ -327,9 +337,9 @@ def fuzzy_assert(result, expected):
 
 
 @pytest.fixture
-def connect(session, test_client):
+def connect(session, aiohttp_client):
     async def _connect():
-        client = await test_client(session.server.app)
+        client = await aiohttp_client(session.server.app)
         return await client.ws_connect('/')
     return _connect
 
@@ -344,9 +354,9 @@ def virtual_smoothie_env(monkeypatch):
 
 @pytest.fixture(params=[using_api1, using_api2])
 def hardware(request, loop, virtual_smoothie_env):
-    if request.node.get_marker('api1_only') and request.param != using_api1:
+    if _should_skip_api1(request):
         pytest.skip('requires api1 only')
-    elif request.node.get_marker('api2_only') and request.param != using_api2:
+    elif _should_skip_api2(request):
         pytest.skip('requires api2 only')
     with request.param(loop) as hw:
         yield hw
@@ -354,9 +364,9 @@ def hardware(request, loop, virtual_smoothie_env):
 
 @pytest.fixture(params=[using_api1, using_sync_api2])
 def sync_hardware(request, loop, virtual_smoothie_env):
-    if request.node.get_marker('api1_only') and request.param != using_api1:
+    if _should_skip_api1(request):
         pytest.skip('requires api1 only')
-    elif request.node.get_marker('api2_only') and request.param != using_api2:
+    elif _should_skip_api2(request):
         pytest.skip('requires api2 only')
     with request.param(loop) as hw:
         yield hw

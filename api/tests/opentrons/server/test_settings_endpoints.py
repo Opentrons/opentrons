@@ -26,7 +26,7 @@ async def attached_pipettes(async_server, request):
     {'left': {'name': str, 'model': str, 'id': str}, 'right'...}
     """
     def marker_with_default(marker: str, default: str) -> str:
-        return request.node.get_marker(marker) or default
+        return request.node.get_closest_marker(marker) or default
     left_mod = marker_with_default('attach_left_model', 'p300_multi_v1')
     left_name = left_mod.split('_v')[0]
     right_mod = marker_with_default('attach_right_model', 'p50_multi_v1')
@@ -66,9 +66,9 @@ def validate_response_body(body):
         assert 'value' in obj, '"value" not found for {}'.format(obj['id'])
 
 
-async def test_get(virtual_smoothie_env, loop, test_client):
-    app = init(loop)
-    cli = await loop.create_task(test_client(app))
+async def test_get(virtual_smoothie_env, loop, aiohttp_client):
+    app = init()
+    cli = await loop.create_task(aiohttp_client(app))
 
     resp = await cli.get('/settings')
     body = await resp.json()
@@ -76,9 +76,9 @@ async def test_get(virtual_smoothie_env, loop, test_client):
     validate_response_body(body)
 
 
-async def test_set(virtual_smoothie_env, loop, test_client):
-    app = init(loop)
-    cli = await loop.create_task(test_client(app))
+async def test_set(virtual_smoothie_env, loop, aiohttp_client):
+    app = init()
+    cli = await loop.create_task(aiohttp_client(app))
     test_id = 'disableHomeOnBoot'
 
     resp = await cli.post('/settings', json={"id": test_id, "value": True})
@@ -90,9 +90,9 @@ async def test_set(virtual_smoothie_env, loop, test_client):
     assert test_setting.get('value')
 
 
-async def test_available_resets(virtual_smoothie_env, loop, test_client):
-    app = init(loop)
-    cli = await loop.create_task(test_client(app))
+async def test_available_resets(virtual_smoothie_env, loop, aiohttp_client):
+    app = init()
+    cli = await loop.create_task(aiohttp_client(app))
 
     resp = await cli.get('/settings/reset/options')
     body = await resp.json()

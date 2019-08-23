@@ -10,15 +10,16 @@ from opentrons.server.endpoints import serverlib_fallback
 from opentrons import modules, robot
 
 
-async def test_restart(virtual_smoothie_env, monkeypatch, loop, test_client):
+async def test_restart(
+        virtual_smoothie_env, monkeypatch, loop, aiohttp_client):
     test_data = {"test": "pass"}
 
     async def mock_restart(request):
         return web.json_response(test_data)
     monkeypatch.setattr(serverlib_fallback, 'restart', mock_restart)
 
-    app = init(loop)
-    cli = await loop.create_task(test_client(app))
+    app = init()
+    cli = await loop.create_task(aiohttp_client(app))
 
     expected = json.dumps(test_data)
     resp = await cli.post('/server/restart')
@@ -27,7 +28,7 @@ async def test_restart(virtual_smoothie_env, monkeypatch, loop, test_client):
     assert text == expected
 
 
-async def test_update(virtual_smoothie_env, monkeypatch, loop, test_client):
+async def test_update(virtual_smoothie_env, monkeypatch, loop, aiohttp_client):
     msg = "success"
     whl_name = "testy.whl"
     serverlib_name = "testylib.whl"
@@ -42,8 +43,8 @@ async def test_update(virtual_smoothie_env, monkeypatch, loop, test_client):
     monkeypatch.setattr(serverlib_fallback, '_install', mock_install)
     monkeypatch.setattr(robot, 'update_firmware', mock_install)
 
-    app = init(loop)
-    cli = await loop.create_task(test_client(app))
+    app = init()
+    cli = await loop.create_task(aiohttp_client(app))
 
     data = {
         'whl': open(os.path.join(tmpdir, whl_name)),
@@ -67,12 +68,12 @@ async def test_update(virtual_smoothie_env, monkeypatch, loop, test_client):
 
 
 async def test_ignore_updates(
-        virtual_smoothie_env, loop, test_client):
+        virtual_smoothie_env, loop, aiohttp_client):
     tmpdir = tempfile.mkdtemp("files")
     ignore_name = "testy_ignore.json"
     serverlib_fallback.filepath = os.path.join(tmpdir, ignore_name)
-    app = init(loop)
-    cli = await loop.create_task(test_client(app))
+    app = init()
+    cli = await loop.create_task(aiohttp_client(app))
     # Test no ignore file found
     r0 = await cli.get('/update/ignore')
     r0body = await r0.text()
@@ -115,11 +116,11 @@ async def test_update_module_firmware(
         dummy_attached_modules,
         virtual_smoothie_env,
         loop,
-        test_client,
+        aiohttp_client,
         monkeypatch):
 
-    app = init(loop)
-    client = await loop.create_task(test_client(app))
+    app = init()
+    client = await loop.create_task(aiohttp_client(app))
     serial_num = 'mdYYYYMMDD123'
     fw_filename = 'dummyFirmware.hex'
     tmpdir = tempfile.mkdtemp("files")
@@ -163,10 +164,10 @@ async def test_fail_update_module_firmware(
         dummy_attached_modules,
         virtual_smoothie_env,
         loop,
-        test_client,
+        aiohttp_client,
         monkeypatch):
-    app = init(loop)
-    client = await loop.create_task(test_client(app))
+    app = init()
+    client = await loop.create_task(aiohttp_client(app))
     serial_num = 'mdYYYYMMDD123'
     fw_filename = 'dummyFirmware.hex'
     tmpdir = tempfile.mkdtemp("files")

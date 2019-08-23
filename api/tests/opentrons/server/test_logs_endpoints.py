@@ -4,9 +4,9 @@ from opentrons.server import init
 
 
 async def test_log_endpoints(
-        virtual_smoothie_env, loop, test_client):
-    app = init(loop)
-    cli = await loop.create_task(test_client(app))
+        virtual_smoothie_env, loop, aiohttp_client):
+    app = init()
+    cli = await loop.create_task(aiohttp_client(app))
 
     # # Test that values are set correctly
     serial_name = "serial.log"

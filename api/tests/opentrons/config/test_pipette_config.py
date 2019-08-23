@@ -11,6 +11,15 @@ defs = json.loads(
         'opentrons', 'shared_data/pipette/definitions/pipetteModelSpecs.json'))
 
 
+def check_sequences_close(first, second):
+    """
+    Check two ul/mm sequences are the same (replaces pytest.approx nested )
+    """
+    assert len(first) == len(second)
+    for f, s in zip(first, second):
+        assert f == pytest.approx(s)
+
+
 @pytest.mark.parametrize('pipette_model',
                          [c for c in pipette_config.config_models if not
                           (c.startswith('p1000')
@@ -22,23 +31,22 @@ def test_versioned_aspiration(pipette_model, monkeypatch):
     monkeypatch.setattr(ff, 'use_old_aspiration_functions',
                         lambda: True)
     was = pipette_config.load(pipette_model)
-    assert was.ul_per_mm['aspirate']\
-        == pytest.approx(
-            defs['config'][pipette_model]['ulPerMm'][0]['aspirate'])
-    assert was.ul_per_mm['dispense']\
-        == pytest.approx(
-            defs['config'][pipette_model]['ulPerMm'][0]['dispense'])
+    check_sequences_close(
+        was.ul_per_mm['aspirate'],
+        defs['config'][pipette_model]['ulPerMm'][0]['aspirate'])
+    check_sequences_close(
+        was.ul_per_mm['dispense'],
+        defs['config'][pipette_model]['ulPerMm'][0]['dispense'])
 
     monkeypatch.setattr(ff, 'use_old_aspiration_functions',
                         lambda: False)
     now = pipette_config.load(pipette_model)
-    assert now.ul_per_mm['aspirate']\
-        == pytest.approx(
-            defs['config'][pipette_model]['ulPerMm'][-1]['aspirate'])
-    assert now.ul_per_mm['dispense']\
-        == pytest.approx(
-            defs['config'][pipette_model]['ulPerMm'][-1]['dispense'])
-
+    check_sequences_close(
+        now.ul_per_mm['aspirate'],
+        defs['config'][pipette_model]['ulPerMm'][-1]['aspirate'])
+    check_sequences_close(
+        now.ul_per_mm['dispense'],
+        defs['config'][pipette_model]['ulPerMm'][-1]['dispense'])
     assert now.ul_per_mm['aspirate'] != was.ul_per_mm['aspirate']
 
 

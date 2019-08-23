@@ -13,9 +13,9 @@ All mocks in this test suite represent actual output from nmcli commands
 
 
 async def test_networking_status(
-        virtual_smoothie_env, loop, test_client, monkeypatch):
-    app = init(loop)
-    cli = await loop.create_task(test_client(app))
+        virtual_smoothie_env, loop, aiohttp_client, monkeypatch):
+    app = init()
+    cli = await loop.create_task(aiohttp_client(app))
 
     async def mock_call(cmd):
         # Command: `nmcli networking connectivity`
@@ -78,9 +78,10 @@ GENERAL.STATE:100 (connected)'''
     assert resp.status == 500
 
 
-async def test_wifi_list(virtual_smoothie_env, loop, test_client, monkeypatch):
-    app = init(loop)
-    cli = await loop.create_task(test_client(app))
+async def test_wifi_list(
+        virtual_smoothie_env, loop, aiohttp_client, monkeypatch):
+    app = init()
+    cli = await loop.create_task(aiohttp_client(app))
 
     expected_res = [
         {'ssid': 'Opentrons', 'signal': 81, 'active': True},
@@ -105,9 +106,9 @@ async def test_wifi_list(virtual_smoothie_env, loop, test_client, monkeypatch):
 
 
 async def test_wifi_configure(
-        virtual_smoothie_env, loop, test_client, monkeypatch):
-    app = init(loop)
-    cli = await loop.create_task(test_client(app))
+        virtual_smoothie_env, loop, aiohttp_client, monkeypatch):
+    app = init()
+    cli = await loop.create_task(aiohttp_client(app))
 
     msg = "Device 'wlan0' successfully activated with '076aa998-0275-4aa0-bf85-e9629021e267'."  # noqa
 
@@ -239,10 +240,10 @@ def test_eap_check_option():
                                      'eapType': 'test'})
 
 
-async def test_list_keys(loop, test_client, wifi_keys_tempdir):
+async def test_list_keys(loop, aiohttp_client, wifi_keys_tempdir):
     dummy_names = ['ad12d1df199bc912', 'cbdda8124128cf', '812410990c5412']
-    app = init(loop)
-    cli = await loop.create_task(test_client(app))
+    app = init()
+    cli = await loop.create_task(aiohttp_client(app))
     empty_resp = await cli.get('/wifi/keys')
     assert empty_resp.status == 200
     empty_body = await empty_resp.json()
@@ -267,10 +268,10 @@ async def test_list_keys(loop, test_client, wifi_keys_tempdir):
             raise KeyError(dn)
 
 
-async def test_key_lifecycle(loop, test_client, wifi_keys_tempdir):
+async def test_key_lifecycle(loop, aiohttp_client, wifi_keys_tempdir):
     with tempfile.TemporaryDirectory() as source_td:
-        app = init(loop)
-        cli = await loop.create_task(test_client(app))
+        app = init()
+        cli = await loop.create_task(aiohttp_client(app))
         empty_resp = await cli.get('/wifi/keys')
         assert empty_resp.status == 200
         empty_body = await empty_resp.json()
@@ -324,9 +325,9 @@ async def test_key_lifecycle(loop, test_client, wifi_keys_tempdir):
         assert dup_del_resp.status == 404
 
 
-async def test_eap_config_options(virtual_smoothie_env, loop, test_client):
-    app = init(loop)
-    cli = await loop.create_task(test_client(app))
+async def test_eap_config_options(virtual_smoothie_env, loop, aiohttp_client):
+    app = init()
+    cli = await loop.create_task(aiohttp_client(app))
     resp = await cli.get('/wifi/eap-options')
 
     assert resp.status == 200

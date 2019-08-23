@@ -84,7 +84,7 @@ class ThreadedAsyncLock:
 
 # Support for running using aiohttp CLI.
 # See: https://docs.aiohttp.org/en/stable/web.html#command-line-interface-cli
-def init(loop=None, hardware: 'HardwareAPILike' = None):
+def init(hardware: 'HardwareAPILike' = None):
     """
     Builds an application and sets up RPC and HTTP servers with it.
 
@@ -95,7 +95,7 @@ def init(loop=None, hardware: 'HardwareAPILike' = None):
                      :py:attr:`opentrons.hardware`
     """
 
-    app = web.Application(loop=loop, middlewares=[error_middleware])
+    app = web.Application(middlewares=[error_middleware])
     if hardware:
         checked_hardware = hardware
     else:
@@ -124,4 +124,4 @@ def run(hostname=None, port=None, path=None, loop=None):
             hostname, port))
         path = None
 
-    web.run_app(init(loop), host=hostname, port=port, path=path)
+    web.run_app(init(), host=hostname, port=port, path=path)
