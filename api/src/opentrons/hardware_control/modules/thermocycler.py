@@ -1,6 +1,6 @@
 import asyncio
 from . import mod_abc, types
-from typing import Union, Optional, List
+from typing import Union, Optional, List, Callable
 from opentrons.drivers.thermocycler.driver import (
     Thermocycler as ThermocyclerDriver)
 import logging
@@ -114,9 +114,9 @@ class Thermocycler(mod_abc.AbstractModule):
     """
     @classmethod
     async def build(cls,
-                    port,
-                    interrupt_callback,
-                    simulating=False,
+                    port: str,
+                    interrupt_callback: mod_abc.InterruptCallback,
+                    simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None):
         """Build and connect to a Thermocycler
         """
@@ -133,18 +133,23 @@ class Thermocycler(mod_abc.AbstractModule):
     def display_name(cls):
         return 'Thermocycler'
 
+    @staticmethod
+    def _build_driver(
+            simulating: bool,
+            interrupt_cb: Callable[[str], None] = None)\
+            -> Union['SimulatingDriver', 'ThermocyclerDriver']:
+        if simulating:
+            return SimulatingDriver()
+        else:
+            return ThermocyclerDriver(interrupt_cb)
+
     def __init__(self,
-                 port,
-                 interrupt_callback=None,
-                 simulating=False,
+                 port: str,
+                 interrupt_callback: mod_abc.InterruptCallback = None,
+                 simulating: bool = False,
                  loop: asyncio.AbstractEventLoop = None) -> None:
         self._interrupt_cb = interrupt_callback
-        if simulating:
-            self._driver: Union['SimulatingDriver', 'ThermocyclerDriver'] \
-                = SimulatingDriver()
-        else:
-            self._driver: Union['SimulatingDriver', 'ThermocyclerDriver'] \
-                = ThermocyclerDriver(interrupt_callback)
+        self._driver = self._build_driver(simulating, interrupt_callback)
 
         if None is loop:
             self._loop = asyncio.get_event_loop()
