@@ -35,7 +35,6 @@ def validate_update(
 
     def zip_callback(progress):
         progress_callback(progress/3.0)
-
     files, sizes = unzip_update(filepath, zip_callback, filenames, filenames)
 
     def rootfs_hash_callback(progress):

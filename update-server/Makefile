@@ -13,7 +13,7 @@ pipenv_opts += $(and $(CI),--keep-outdated)
 
 port ?= 34000
 tests ?= tests
-test_opts ?= -s -vv
+test_opts ?=
 wheel_file = dist/*.whl
 # Host key location for buildroot robot
 br_ssh_key ?= ~/.ssh/robot_key
@@ -47,11 +47,7 @@ clean:
 
 .PHONY: test
 test:
-	$(python) -m pytest \
-		--cov=otupdate \
-		--cov-report term-missing:skip-covered \
-		--cov-report xml:coverage.xml \
-		$(test_opts) $(tests)
+	$(python) -m pytest $(test_opts) $(tests)
 
 .PHONY: lint
 lint:

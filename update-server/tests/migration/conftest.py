@@ -103,7 +103,7 @@ def downloaded_update_file(request, extracted_update_file):
                                   rootfs_hash_path),
                                  ('exclude_boot_vfat', bootfs_path),
                                  ('exclude_boot_vfat_hash', bootfs_hash_path)]:
-            if not request.node.get_marker(marker):
+            if not request.node.get_closest_marker(marker):
                 zf.write(filepath, os.path.basename(filepath))
     return zip_path
 
@@ -138,7 +138,7 @@ def extracted_update_file(request, resin_data_dir):
     for fs_path, hash_path, marker in [
             (rootfs_path, rootfs_hash_path, 'bad_rootfs_ext4_hash'),
             (bootfs_path, bootfs_hash_path, 'bad_boot_vfat_hash')]:
-        if request.node.get_marker(marker):
+        if request.node.get_closest_marker(marker):
             hashval = b'1092uf0ja0fjas0do0sfihoahf0a9'
         else:
             try:
