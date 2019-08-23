@@ -636,6 +636,24 @@ class InstrumentContext(CommandPublisher):
             default_aspirate=1.0, default_dispense=1.0)
         self._flow_rates = InstrumentContext.FlowRates(self)
         self._speeds = InstrumentContext.PlungerSpeeds(self)
+        self._starting_tip = None
+
+    @property
+    def starting_tip(self) -> Union[types.Location, Well]:
+        """ The starting tip from which the pipette pick up
+        """
+        return self._starting_tip
+
+    @starting_tip.setter
+    def starting_tip(self, location: Union[types.Location, Well]):
+        self._starting_tip = location
+
+    def reset_tipracks(self):
+        """ Reload all tips in each tip rack and reset starting tip
+        """
+        for tiprack in self.tip_racks:
+            tiprack.reset()
+        self.starting_tip = None
 
     @property
     def default_speed(self) -> float:
@@ -1043,11 +1061,14 @@ class InstrumentContext(CommandPublisher):
 
     def _select_tiprack_from_list(
             self, tip_racks, num_channels) -> Tuple[Labware, Well]:
-        try:
-            tr = tip_racks[0]
-        except IndexError:
-            raise OutOfTipsError
-        next_tip = tr.next_tip(num_channels)
+        if self.starting_tip:
+            tr = self.starting_tip.parent
+        else:
+            try:
+                tr = tip_racks[0]
+            except IndexError:
+                raise OutOfTipsError
+        next_tip = tr.next_tip(num_channels, self.starting_tip)
         if next_tip:
             return tr, next_tip
         else:

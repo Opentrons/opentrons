@@ -510,7 +510,9 @@ class Labware:
     def tip_length(self, length: float):
         self._parameters['tipLength'] = length + self._parameters['tipOverlap']
 
-    def next_tip(self, num_tips: int = 1) -> Optional[Well]:
+    def next_tip(self,
+                 num_tips: int = 1,
+                 starting_tip: Well = None) -> Optional[Well]:
         """
         Find the next valid well for pick-up.
 
@@ -525,6 +527,15 @@ class Labware:
         assert num_tips > 0, 'Bad call to next_tip: num_tips <= 0'
 
         columns: List[List[Well]] = self.columns()
+
+        if starting_tip:
+            drop_undefined_columns = list(
+                dropwhile(lambda x: starting_tip not in x, columns))
+            columns = [
+                list(dropwhile(lambda w: starting_tip is not w, new))
+                if index == 0 else new
+                for index, new in enumerate(drop_undefined_columns)]
+
         drop_leading_empties = [
             list(dropwhile(lambda x: not x.has_tip, column))
             for column in columns]
@@ -646,6 +657,13 @@ class Labware:
                 raise AssertionError(f'Well {repr(well)} has a tip')
         for well in drop_targets:
             well.has_tip = True
+
+    def reset(self):
+        """Reset all tips in a tiprack
+        """
+        if self.is_tiprack:
+            for well in self.wells():
+                well.has_tip = True
 
 
 class ModuleGeometry:

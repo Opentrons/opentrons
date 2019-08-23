@@ -339,6 +339,31 @@ def test_dispense(loop, get_labware_def, monkeypatch):
     assert move_called_with is None
 
 
+def test_starting_tip_and_reset_tipracks(loop, get_labware_def, monkeypatch):
+    ctx = papi.ProtocolContext(loop)
+    ctx.home()
+
+    tr = ctx.load_labware('opentrons_96_tiprack_300ul', 1)
+    pipL = ctx.load_instrument('p300_single', Mount.LEFT, tip_racks=[tr])
+    pipR = ctx.load_instrument('p300_single', Mount.RIGHT, tip_racks=[tr])
+
+    pipL.starting_tip = tr.wells()[2]
+    assert tr.wells()[2].has_tip
+    pipL.pick_up_tip()
+    pipL.drop_tip()
+    assert not tr.wells()[2].has_tip
+
+    pipR.starting_tip = tr.wells()[2]
+    assert tr.wells()[3].has_tip
+    pipR.pick_up_tip()
+    pipR.drop_tip()
+    assert not tr.wells()[3].has_tip
+
+    pipL.reset_tipracks()
+    assert tr.wells()[2].has_tip
+    assert tr.wells()[3].has_tip
+
+
 def test_hw_manager(loop):
     # When built without an input it should build its own adapter
     mgr = papi.ProtocolContext.HardwareManager(None)
