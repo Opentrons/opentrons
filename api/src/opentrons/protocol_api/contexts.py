@@ -636,16 +636,16 @@ class InstrumentContext(CommandPublisher):
             default_aspirate=1.0, default_dispense=1.0)
         self._flow_rates = InstrumentContext.FlowRates(self)
         self._speeds = InstrumentContext.PlungerSpeeds(self)
-        self._starting_tip = None
+        self._starting_tip: Union[Well, None] = None
 
     @property
-    def starting_tip(self) -> Union[types.Location, Well]:
+    def starting_tip(self) -> Union[Well, None]:
         """ The starting tip from which the pipette pick up
         """
         return self._starting_tip
 
     @starting_tip.setter
-    def starting_tip(self, location: Union[types.Location, Well]):
+    def starting_tip(self, location: Union[Well, None]):
         self._starting_tip = location
 
     def reset_tipracks(self):
