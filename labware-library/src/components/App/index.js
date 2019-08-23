@@ -5,7 +5,7 @@ import { hot } from 'react-hot-loader/root'
 import cx from 'classnames'
 
 import { DefinitionRoute } from '../../definitions'
-import { getFilters } from '../../filters'
+import { useFilters } from '../../filters'
 import Nav, { Breadcrumbs } from '../Nav'
 import Sidebar from '../Sidebar'
 import Page from './Page'
@@ -18,7 +18,7 @@ import type { DefinitionRouteRenderProps } from '../../definitions'
 export function App(props: DefinitionRouteRenderProps) {
   const { definition, location } = props
   const scrollRef = React.useRef<HTMLDivElement | null>(null)
-  const filters = getFilters(location)
+  const filters = useFilters(location)
   const detailPage = Boolean(definition)
 
   React.useEffect(() => {
