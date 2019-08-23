@@ -9,17 +9,17 @@ name = "pypi"
 
 "e1839a8" = {path = ".", editable = true}
 virtualenv = "*"
-aiohttp = "==2.3.8"
+aiohttp = "==3.4.4"
 
 
 [dev-packages]
 
-pylama = "==7.4.3"
-pytest = "==3.4.2"
-pytest-cov = "==2.5.1"
-pytest-aiohttp = "==0.2.0"
+pylama = "*"
+pytest = "*"
+pytest-cov = "*"
+pytest-aiohttp = "*"
 sphinx = "==1.4.8"
-twine = "==1.12.1"
+twine = ">=1.12.0"
 wheel = "==0.30.0"
 coverage = "==4.4.2"
 colorama = "*"
