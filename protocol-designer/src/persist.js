@@ -4,7 +4,9 @@ import assert from 'assert'
 import type { Store } from 'redux'
 import { dismissedHintsPersist } from './tutorial/reducers'
 
-export function rehydratePersistedAction(): { type: 'REHYDRATE_PERSISTED' } {
+export type RehydratePersistedAction = {| type: 'REHYDRATE_PERSISTED' |}
+
+export function rehydratePersistedAction(): RehydratePersistedAction {
   return { type: 'REHYDRATE_PERSISTED' }
 }
 
@@ -13,7 +15,11 @@ function _addStoragePrefix(path: string): string {
 }
 
 // paths from Redux root to all persisted reducers
-const PERSISTED_PATHS = ['analytics.hasOptedIn', 'tutorial.dismissedHints']
+const PERSISTED_PATHS = [
+  'analytics.hasOptedIn',
+  'tutorial.dismissedHints',
+  'featureFlags.flags',
+]
 
 function transformBeforePersist(path: string, reducerState: any) {
   switch (path) {

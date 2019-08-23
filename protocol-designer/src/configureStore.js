@@ -13,6 +13,7 @@ function getRootReducer() {
   const rootReducer: any = combineReducers({
     analytics: require('./analytics').rootReducer,
     dismiss: require('./dismiss').rootReducer,
+    featureFlags: require('./feature-flags').rootReducer,
     fileData: require('./file-data').rootReducer,
     labwareIngred: require('./labware-ingred/reducers').default,
     loadFile: require('./load-file').rootReducer,
@@ -88,8 +89,9 @@ export default function configureStore() {
       [
         './analytics/reducers',
         './dismiss/reducers',
+        './feature-flags/reducers',
         './file-data/reducers',
-        './labware-defs/reducers',
+        './labware-defs/reducers', // NOTE: labware-defs is nested inside step-forms, so it doesn't need to go directly into getRootReducer fn above
         './labware-ingred/reducers',
         './load-file/reducers',
         './navigation/reducers',
