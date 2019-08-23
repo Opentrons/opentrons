@@ -9,7 +9,7 @@ from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, adapters
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
-from opentrons.config.pipette_config import config_models
+from opentrons.config.pipette_config import config_models, name_for_model
 from opentrons.protocol_api import transfers as tf
 
 import pytest
@@ -29,12 +29,12 @@ def get_labware_def(monkeypatch):
 
 def test_load_instrument(loop):
     ctx = papi.ProtocolContext(loop=loop)
-    for config in config_models:
-        loaded = ctx.load_instrument(config, Mount.LEFT, replace=True)
-        assert loaded.model == config
-        prefix = config.split('_v')[0]
-        loaded = ctx.load_instrument(prefix, Mount.RIGHT, replace=True)
-        assert loaded.name.startswith(prefix)
+    for model in config_models:
+        loaded = ctx.load_instrument(model, Mount.LEFT, replace=True)
+        assert loaded.model == model
+        instr_name = name_for_model(model)
+        loaded = ctx.load_instrument(instr_name, Mount.RIGHT, replace=True)
+        assert loaded.name == instr_name
 
 
 async def test_motion(loop):

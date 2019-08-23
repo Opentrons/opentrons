@@ -39,6 +39,7 @@ class Simulator:
     hardware actions. It is suitable for use on a dev machine or on
     a robot with no smoothie connected.
     """
+
     def __init__(
             self,
             attached_instruments: Dict[types.Mount, Dict[str, Optional[str]]],
@@ -211,7 +212,7 @@ class Simulator:
     @property
     def axis_bounds(self) -> Dict[str, Tuple[float, float]]:
         """ The (minimum, maximum) bounds for each axis. """
-        return {ax: (0, pos+0.5) for ax, pos in _HOME_POSITION.items()
+        return {ax: (0, pos + 0.5) for ax, pos in _HOME_POSITION.items()
                 if ax not in 'BC'}
 
     @property

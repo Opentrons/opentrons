@@ -23,7 +23,7 @@ def plan_moves(
         to_loc: types.Location,
         deck: 'Deck',
         well_z_margin: float = 5.0,
-        lw_z_margin: float = 20.0,
+        lw_z_margin: float = 5.0,
         force_direct: bool = False,
         minimum_z_height: float = None)\
         -> List[Tuple[types.Point,
