@@ -16,6 +16,7 @@ type Props = {|
   additionalAlerts?: React.Node,
   fieldList?: Array<$Keys<LabwareFields>>,
   children?: React.Node,
+  headingClassName?: string,
 |}
 const Section = connect((props: Props) => {
   const fieldList = props.fieldList || []
@@ -62,7 +63,9 @@ const Section = connect((props: Props) => {
 
   return (
     <div className={styles.section_wrapper}>
-      <h2 className={styles.section_header}>{props.label}</h2>
+      <h2 className={props.headingClassName || styles.section_header}>
+        {props.label}
+      </h2>
       <div>
         {allErrorAlerts}
         {props.additionalAlerts}

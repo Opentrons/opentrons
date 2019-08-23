@@ -2,6 +2,7 @@
 import * as React from 'react'
 import LinkOut from './LinkOut'
 import { LINK_CUSTOM_LABWARE_FORM } from '../fields'
+import styles from '../styles.css'
 
 const IntroCopy = () => (
   <>
@@ -27,17 +28,21 @@ const IntroCopy = () => (
           Opentrons aluminum block
         </LinkOut>
       </li>
-      <p>
-        For all other custom labware, please use this{' '}
-        <LinkOut href={LINK_CUSTOM_LABWARE_FORM}>request form</LinkOut>
-      </p>
     </ul>
-
     <p>
-      <strong>Please note:</strong> We strongly recommend you reference
-      mechanical drawing to ensure accurate measurements for defining labware,
-      only relying on manual measurements to supplement missing information.
+      For all other custom labware, please use this{' '}
+      <LinkOut href={LINK_CUSTOM_LABWARE_FORM}>request form</LinkOut>
     </p>
+
+    <div className={styles.callout}>
+      <p>
+        <strong>Please note:</strong> We strongly recommend you reference
+        mechanical drawings to ensure accurate measurements for defining
+        labware, only relying on manual measurements to supplement missing
+        information. To learn more about ways to access mechanical drawings from
+        manufacturers, please refer to this guide.
+      </p>
+    </div>
   </>
 )
 

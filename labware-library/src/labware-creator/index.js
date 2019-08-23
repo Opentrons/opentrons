@@ -5,6 +5,7 @@ import mapValues from 'lodash/mapValues'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import { AlertItem, AlertModal, PrimaryButton } from '@opentrons/components'
+import LabwareCreator from './components/LabwareCreator'
 import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
 import {
   labwareTypeOptions,
@@ -297,7 +298,7 @@ const App = () => {
   })
 
   return (
-    <div>
+    <LabwareCreator>
       {showExportErrorModal && (
         <AlertModal
           className={styles.export_error_modal}
@@ -348,53 +349,65 @@ const App = () => {
           <div className={styles.labware_creator}>
             <h2>Custom Labware Creator</h2>
             <IntroCopy />
-            <Section
-              label="Labware Type"
-              fieldList={[
-                'labwareType',
-                'tubeRackInsertLoadName',
-                'aluminumBlockType',
-                'aluminumBlockChildType',
-              ]}
-            >
-              <Dropdown name="labwareType" options={labwareTypeOptions} />
-              {values.labwareType === 'tubeRack' && (
-                <Dropdown
-                  name="tubeRackInsertLoadName"
-                  options={tubeRackInsertOptions}
-                  onValueChange={makeAutofillOnChange({
-                    name: 'tubeRackInsertLoadName',
-                    autofills: tubeRackAutofills,
-                    values,
-                    touched,
-                    setTouched,
-                    setValues,
-                  })}
-                />
-              )}
-              {values.labwareType === 'aluminumBlock' && (
-                <Dropdown
-                  name="aluminumBlockType"
-                  options={aluminumBlockTypeOptions}
-                  onValueChange={makeAutofillOnChange({
-                    name: 'aluminumBlockType',
-                    autofills: aluminumBlockAutofills,
-                    values,
-                    touched,
-                    setTouched,
-                    setValues,
-                  })}
-                />
-              )}
-              {values.labwareType === 'aluminumBlock' &&
-                values.aluminumBlockType === '96well' && (
-                  // Only show for '96well' aluminum block type
-                  <Dropdown
-                    name="aluminumBlockChildType"
-                    options={aluminumBlockChildTypeOptions}
-                  />
-                )}
-            </Section>
+            <div className={styles.flex_row}>
+              <div className={styles.new_definition_section}>
+                <Section
+                  label="Create a new definition"
+                  fieldList={[
+                    'labwareType',
+                    'tubeRackInsertLoadName',
+                    'aluminumBlockType',
+                    'aluminumBlockChildType',
+                  ]}
+                  headingClassName={styles.setup_heading}
+                >
+                  <div className={styles.new_definition_content}>
+                    <Dropdown name="labwareType" options={labwareTypeOptions} />
+                    {values.labwareType === 'tubeRack' && (
+                      <Dropdown
+                        name="tubeRackInsertLoadName"
+                        options={tubeRackInsertOptions}
+                        onValueChange={makeAutofillOnChange({
+                          name: 'tubeRackInsertLoadName',
+                          autofills: tubeRackAutofills,
+                          values,
+                          touched,
+                          setTouched,
+                          setValues,
+                        })}
+                      />
+                    )}
+                    {values.labwareType === 'aluminumBlock' && (
+                      <Dropdown
+                        name="aluminumBlockType"
+                        options={aluminumBlockTypeOptions}
+                        onValueChange={makeAutofillOnChange({
+                          name: 'aluminumBlockType',
+                          autofills: aluminumBlockAutofills,
+                          values,
+                          touched,
+                          setTouched,
+                          setValues,
+                        })}
+                      />
+                    )}
+                    {values.labwareType === 'aluminumBlock' &&
+                      values.aluminumBlockType === '96well' && (
+                        // Only show for '96well' aluminum block type
+                        <Dropdown
+                          name="aluminumBlockChildType"
+                          options={aluminumBlockChildTypeOptions}
+                        />
+                      )}
+                  </div>
+                </Section>
+              </div>
+              <div className={styles.upload_exisiting_section}>
+                <h2 className={styles.setup_heading}>
+                  Edit a file you’ve built with our labware creator.{' '}
+                </h2>
+              </div>
+            </div>
             {/* PAGE 1 - Labware */}
             <Section label="Regularity" fieldList={['homogeneousWells']}>
               {/* tubeRackSides: Array<string> maybe?? */}
@@ -678,7 +691,7 @@ const App = () => {
           </div>
         )}
       </Formik>
-    </div>
+    </LabwareCreator>
   )
 }
 
