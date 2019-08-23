@@ -1,5 +1,6 @@
 // @flow
 // filter helpers
+import { useState, useLayoutEffect } from 'react'
 import queryString from 'query-string'
 import flatMap from 'lodash/flatMap'
 import pickBy from 'lodash/pickBy'
@@ -31,12 +32,23 @@ export function getAllManufacturers(): Array<string> {
   return uniq([FILTER_OFF, ...brands, ...wellGroupBrands])
 }
 
-export function getFilters(location: Location): FilterParams {
-  const queryParams = queryString.parse(location.search)
-  const category = queryParams.category || FILTER_OFF
-  const manufacturer = queryParams.manufacturer || FILTER_OFF
+export function useFilters(location: Location): FilterParams {
+  const [params, setParams] = useState({
+    category: FILTER_OFF,
+    manufacturer: FILTER_OFF,
+  })
 
-  return { category, manufacturer }
+  // layout effect (rather than regular effect) to trigger a state change
+  // before paint if needed
+  useLayoutEffect(() => {
+    const queryParams = queryString.parse(location.search)
+    const category = queryParams.category || FILTER_OFF
+    const manufacturer = queryParams.manufacturer || FILTER_OFF
+
+    setParams({ category, manufacturer })
+  }, [location.search])
+
+  return params
 }
 
 export function buildFiltersUrl(filters: FilterParams): string {
