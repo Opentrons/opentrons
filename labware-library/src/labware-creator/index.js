@@ -328,7 +328,7 @@ const App = () => {
           const zip = new JSZip()
           zip.file(`${displayName}.json`, JSON.stringify(def, null, 4))
           zip.file(
-            `calibrate_${displayName}.py`,
+            `test_${displayName}.py`,
             labwareTestProtocol({ pipetteName, definition: def })
           )
           zip
