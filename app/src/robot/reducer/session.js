@@ -43,6 +43,7 @@ export type SessionState = {
   pauseRequest: Request,
   resumeRequest: Request,
   cancelRequest: Request,
+  remoteTimeCompensation: number | null,
   startTime: ?number,
   runTime: number,
   apiLevel: number,
@@ -79,6 +80,7 @@ const INITIAL_STATE: SessionState = {
   pauseRequest: { inProgress: false, error: null },
   resumeRequest: { inProgress: false, error: null },
   cancelRequest: { inProgress: false, error: null },
+  remoteTimeCompensation: null,
   startTime: null,
   runTime: 0,
   apiLevel: 1,
@@ -134,8 +136,9 @@ function handleSessionUpdate(
 ): SessionState {
   const {
     payload: { state: sessionStateUpdate, startTime, lastCommand },
+    meta: { now },
   } = action
-  let { protocolCommandsById } = state
+  let { protocolCommandsById, remoteTimeCompensation } = state
 
   if (lastCommand) {
     const command = {
@@ -149,6 +152,14 @@ function handleSessionUpdate(
     }
   }
 
+  // compensate for clock differences between the robot and app
+  if (remoteTimeCompensation === null) {
+    const latestRemoteTime = lastCommand?.handledAt || startTime
+    if (latestRemoteTime) {
+      remoteTimeCompensation = now - latestRemoteTime
+    }
+  }
+
   // TODO(mc, 2019-07-15): remove this workaround when API issue is resolved
   // https://github.com/Opentrons/opentrons/issues/2994
   const sessionState =
@@ -156,7 +167,13 @@ function handleSessionUpdate(
       ? 'stopped'
       : sessionStateUpdate
 
-  return { ...state, state: sessionState, startTime, protocolCommandsById }
+  return {
+    ...state,
+    state: sessionState,
+    remoteTimeCompensation,
+    startTime,
+    protocolCommandsById,
+  }
 }
 
 function handleSessionInProgress(state: SessionState): SessionState {
@@ -164,6 +181,7 @@ function handleSessionInProgress(state: SessionState): SessionState {
     ...state,
     runTime: 0,
     startTime: null,
+    remoteTimeCompensation: null,
     sessionRequest: { inProgress: true, error: null },
   }
 }

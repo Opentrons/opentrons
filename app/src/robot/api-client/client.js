@@ -401,7 +401,9 @@ export default function client(dispatch) {
         handledAt: apiSession.lastCommand.handledAt,
       }
 
-      return dispatch(actions.sessionUpdate({ ...update, lastCommand }))
+      return dispatch(
+        actions.sessionUpdate({ ...update, lastCommand }, Date.now())
+      )
     }
 
     // else we're doing a heavy full session deserialization
@@ -425,7 +427,8 @@ export default function client(dispatch) {
 
       if (apiSession.modules) {
         update.modulesBySlot = {}
-        // TODO (ka 2018-7-17): MOCKED MODULES by slot here instead of session.py uncomment below to test
+        // TODO (ka 2018-7-17): MOCKED MODULES by slot here instead of
+        // session.py uncomment below to test
         // update.modulesBySlot = {
         //   '1': {
         //     id: '4374062089',

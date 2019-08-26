@@ -148,6 +148,7 @@ export type SessionErrorAction = {|
 export type SessionUpdateAction = {|
   type: 'robot:SESSION_UPDATE',
   payload: SessionUpdate,
+  meta: {| now: number |},
 |}
 
 export type RefreshSessionAction = {|
@@ -265,10 +266,11 @@ export const actions = {
     return { type: 'robot:SESSION_RESPONSE', payload: session, meta }
   },
 
-  sessionUpdate(update: SessionUpdate): SessionUpdateAction {
+  sessionUpdate(update: SessionUpdate, now: number): SessionUpdateAction {
     return {
       type: 'robot:SESSION_UPDATE',
       payload: update,
+      meta: { now },
     }
   },
 
