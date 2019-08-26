@@ -3,7 +3,7 @@ import * as React from 'react'
 
 import { Icon } from '@opentrons/components'
 import { getDisplayVolume } from '@opentrons/shared-data'
-import { getUniqueWellProperties } from '../../definitions'
+import { getUniqueWellProperties } from '../../labwareInference'
 import {
   MAX_VOLUME,
   SHAPE,
