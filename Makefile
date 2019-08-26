@@ -29,8 +29,6 @@ endif
 usb_host=$(shell yarn run -s discovery find -i 169.254 fd00 -c "[fd00:0:cafe:fefe::1]")
 
 
-$(function usb_host_cache)
-
 # install all project dependencies
 .PHONY: install
 install: install-js install-py
