@@ -1,5 +1,6 @@
 @import '@opentrons/components';
 @import '../styles/breakpoints.css';
+@import '../styles/spacing.css';
 
 .labware_creator {
   @apply --font-body-2-dark;
@@ -53,10 +54,6 @@ h2 {
   z-index: 999;
 }
 
-.export_button {
-  max-width: 20rem;
-}
-
 .callout {
   padding: 0 0.75rem;
   border-radius: 0.5rem;
@@ -72,6 +69,7 @@ h2 {
 .flex_row {
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-between;
   margin: 1rem 0;
 }
 
@@ -89,6 +87,25 @@ h2 {
   min-height: 19rem;
 }
 
+.instructions_column,
+.diagram_column,
+.form_fields_column,
+.brand_column,
+.brand_id_column {
+  flex-basis: 100%;
+  flex-shrink: 0;
+}
+
+.diagram_column,
+.help_text {
+  display: flex;
+  justify-content: center;
+}
+
+.pipette_field_caption {
+  font-size: var(--fs-caption);
+}
+
 @media (--medium) {
   .new_definition_section {
     flex-basis: 45%;
@@ -102,5 +119,61 @@ h2 {
     flex-shrink: 1;
     padding-right: 0;
     flex-basis: 55%;
+  }
+
+  .diagram_column,
+  .form_fields_column,
+  .brand_column,
+  .brand_id_column,
+  .help_text {
+    flex-basis: var(--size-50p);
+    flex-shrink: 1;
+  }
+
+  .instructions_column {
+    padding-right: var(--spacing-7);
+    font-size: var(--fs-caption);
+  }
+
+  .brand_column {
+    padding-right: var(--spacing-8);
+  }
+
+  .form_fields_column {
+    padding-left: var(--spacing-7);
+    max-width: 15rem;
+  }
+
+  .preview_labware {
+    max-width: var(--size-60p);
+    margin: 0 auto;
+  }
+
+  .help_text {
+    max-width: var(--size-50p);
+  }
+
+  .pipette_field_wrapper {
+    max-width: 13rem;
+  }
+}
+
+@media (--large) {
+  .instructions_column,
+  .diagram_column,
+  .form_fields_column,
+  .brand_column {
+    flex-basis: var(--size-third);
+    flex-shrink: 1;
+  }
+
+  .export_form_fields,
+  .brand_id_column {
+    flex-basis: var(--size-two-thirds);
+    flex-shrink: 1;
+  }
+
+  .help_text {
+    max-width: 90%;
   }
 }
