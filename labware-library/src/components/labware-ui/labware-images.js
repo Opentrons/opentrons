@@ -44,6 +44,9 @@ export default {
     require('../../images/geb_96_tiprack_10ul_side_view.jpg'),
     require('../../images/geb_10ul_tip_side_view.jpg'),
   ],
+  nest_96_wellplate_100ul_pcr_full_skirt: [
+    require('../../images/nest_96_wellplate_100ul_pcr_full_skirt_three_quarters.jpg'),
+  ],
   nest_96_wellplate_200ul_flat: [
     require('../../images/nest_96_wellplate_200ul_flat_three_quarters.jpg'),
   ],
