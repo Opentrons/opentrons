@@ -96,15 +96,7 @@ function ChangePipetteRouter(props: ChangePipetteProps) {
     onContinueClick: props.moveToFront,
   }
   if (!moveRequest.inProgress && !moveRequest.response) {
-    return (
-      <ClearDeckAlertModal {...clearDeckProps}>
-        {props.actualPipette && (
-          <p>
-            Detaching a pipette will also clear its related calibration data
-          </p>
-        )}
-      </ClearDeckAlertModal>
-    )
+    return <ClearDeckAlertModal {...clearDeckProps} />
   }
 
   if (moveRequest.inProgress || homeRequest.inProgress) {
