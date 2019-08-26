@@ -102,6 +102,10 @@ h2 {
   justify-content: center;
 }
 
+.pipette_field_caption {
+  font-size: var(--fs-caption);
+}
+
 @media (--medium) {
   .new_definition_section {
     flex-basis: 45%;
@@ -147,6 +151,10 @@ h2 {
 
   .help_text {
     max-width: var(--size-50p);
+  }
+
+  .pipette_field_wrapper {
+    max-width: 13rem;
   }
 }
 

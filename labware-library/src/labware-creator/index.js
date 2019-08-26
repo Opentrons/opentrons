@@ -737,11 +737,14 @@ const App = () => {
                     caption="Only lower case letters, numbers, periods, and underscores may be used"
                     inputMasks={[maskLoadName]}
                   />
-                  <Dropdown
-                    name="pipetteName"
-                    options={pipetteNameOptions}
-                    caption="Files are exported with a protocol that will use a single channel pipette to test whether a pipette can hit key points on your labware"
-                  />
+                  <div className={styles.pipette_field_wrapper}>
+                    <Dropdown name="pipetteName" options={pipetteNameOptions} />
+                  </div>
+                  <p className={styles.pipette_field_caption}>
+                    Files are exported with a protocol that will use a single
+                    channel pipette to test whether a pipette can hit key points
+                    on your labware
+                  </p>
 
                   <PrimaryButton
                     className={styles.export_button}
