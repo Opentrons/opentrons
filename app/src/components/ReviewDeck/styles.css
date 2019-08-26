@@ -50,3 +50,25 @@
 .deck_map {
   flex: 1;
 }
+
+.secure_latch_instructions {
+  @apply --font-body-2-dark;
+
+  font-weight: var(--fw-semibold);
+  padding: 0;
+}
+
+.secure_latch_explanation {
+  @apply --font-body-2-dark;
+}
+
+.modal_image_wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem 0 2rem;
+}
+
+.secure_latch_image {
+  max-width: 24rem;
+}

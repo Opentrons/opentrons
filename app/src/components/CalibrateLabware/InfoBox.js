@@ -1,80 +1,41 @@
 // @flow
 // info panel for labware calibration page
 import * as React from 'react'
-import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
 import capitalize from 'lodash/capitalize'
+
+import { getLabwareDisplayName } from '@opentrons/shared-data'
+import { Icon } from '@opentrons/components'
+import styles from './styles.css'
 
 import {
   selectors as robotSelectors,
-  actions as robotActions,
+  type Labware,
+  type LabwareType,
 } from '../../robot'
+import InfoBoxButton from './InfoBoxButton'
 
-import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { Icon, PrimaryButton } from '@opentrons/components'
-import styles from './styles.css'
-
-import type { Mount, Labware, LabwareType } from '../../robot'
-import type { State, Dispatch } from '../../types'
-
-type OP = {| labware: ?Labware |}
-
-type SP = {|
-  _buttonTarget: ?Labware,
-  _buttonTargetIsNext: boolean,
-  _calibratorMount: ?Mount,
-|}
-
-type DP = {| dispatch: Dispatch |}
-
-type Props = {|
-  ...OP,
-  button: ?{
-    type: LabwareType,
-    isNext: boolean,
-    isConfirmed: ?boolean,
-    onClick: () => void,
-  },
-|}
-
-export default connect<Props, OP, SP, {||}, State, Dispatch>(
-  mapStateToProps,
-  null,
-  mergeProps
-)(InfoBox)
+type Props = {| labware: ?Labware |}
 
 function InfoBox(props: Props) {
-  const { labware, button } = props
+  const { labware } = props
+
   let title = 'No labware selected'
-  let confirmed = false
+  let iconName = 'checkbox-blank-circle-outline'
   let description = 'Please select labware to continue'
-  let showButton = false
-  let buttonText = ''
 
   if (labware) {
-    const labwareType = robotSelectors.labwareType(labware)
-
+    const labwareType: LabwareType = robotSelectors.labwareType(labware)
     title = labware.definition
       ? getLabwareDisplayName(labware.definition)
       : labware.type
-    confirmed = labware.confirmed
-    description = confirmed
-      ? `${capitalize(labwareType)} is calibrated`
-      : `${capitalize(labwareType)} is not yet calibrated`
 
-    if (button) {
-      showButton = !labware.isMoving
-      if (button.isNext) {
-        buttonText = `Move to next ${button.type}`
-      } else if (!button.isConfirmed) {
-        buttonText = `Move to ${button.type}`
-      } else {
-        buttonText = 'return tip and proceed to run'
-      }
+    if (labware.confirmed) {
+      iconName = 'check-circle'
+      description = `${capitalize(labwareType)} is calibrated`
+    } else {
+      description = `${capitalize(labwareType)} is not yet calibrated`
     }
   }
-
-  const iconName = confirmed ? 'check-circle' : 'checkbox-blank-circle-outline'
 
   return (
     <div className={styles.info_box}>
@@ -85,64 +46,9 @@ function InfoBox(props: Props) {
         </h2>
         <div className={styles.info_box_description}>{description}</div>
       </div>
-      {button && showButton && (
-        <PrimaryButton
-          className={styles.info_box_button}
-          onClick={button.onClick}
-        >
-          {buttonText}
-        </PrimaryButton>
-      )}
+      <InfoBoxButton labware={labware} />
     </div>
   )
 }
 
-function mapStateToProps(state: State, ownProps: OP): SP {
-  const { labware } = ownProps
-  const _nextLabware =
-    !labware || labware.calibration === 'confirmed'
-      ? robotSelectors.getNextLabware(state)
-      : null
-
-  const _buttonTarget = _nextLabware || labware
-  let _calibratorMount = robotSelectors.getCalibratorMount(state)
-
-  if (_buttonTarget && _buttonTarget.calibratorMount) {
-    _calibratorMount = _buttonTarget.calibratorMount
-  }
-
-  return {
-    _calibratorMount,
-    _buttonTarget,
-    _buttonTargetIsNext:
-      _buttonTarget != null && _buttonTarget === _nextLabware,
-  }
-}
-
-function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
-  const { _buttonTarget, _buttonTargetIsNext, _calibratorMount } = stateProps
-  const { dispatch } = dispatchProps
-  const targetConfirmed = _buttonTarget && _buttonTarget.confirmed
-
-  let button = null
-
-  if (_buttonTarget) {
-    button = {
-      type: robotSelectors.labwareType(_buttonTarget),
-      isNext: _buttonTargetIsNext,
-      isConfirmed: targetConfirmed,
-      onClick: () => {
-        if (_calibratorMount && (_buttonTargetIsNext || !targetConfirmed)) {
-          dispatch(robotActions.moveTo(_calibratorMount, _buttonTarget.slot))
-          dispatch(push(`/calibrate/labware/${_buttonTarget.slot}`))
-        } else if (_calibratorMount) {
-          // $FlowFixMe: robotActions.returnTip is not typed
-          dispatch(robotActions.returnTip(_calibratorMount))
-          dispatch(push(`/run`))
-        }
-      },
-    }
-  }
-
-  return { ...ownProps, button }
-}
+export default InfoBox
