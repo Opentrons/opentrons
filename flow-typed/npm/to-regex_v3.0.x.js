@@ -4,13 +4,13 @@
 declare module 'to-regex' {
   declare module.exports: (
     patterns: string | RegExp | Array<string | RegExp>,
-    options: {
+    options: {|
       contains?: boolean,
       negate?: boolean,
       nocase?: boolean,
       flags?: string,
       cache?: boolean,
       safe?: boolean,
-    }
-  ) => RegExp;
-};
+    |}
+  ) => RegExp
+}

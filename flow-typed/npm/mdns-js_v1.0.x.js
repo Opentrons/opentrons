@@ -9,10 +9,16 @@ declare module 'mdns-js' {
     stop(): void;
     networking: {
       connections: Array<NetworkConnection>,
+      ...
     };
     connections: {
       services?: {
-        [typeString: string]: {type: MdnsServiceType, addresses: Array<string>},
+        [typeString: string]: {
+          type: MdnsServiceType,
+          addresses: Array<string>,
+          ...
+        },
+        ...
       },
       addresses?: {
         [ip: string]: {
@@ -20,8 +26,11 @@ declare module 'mdns-js' {
           port: number,
           host: string,
           txt: Array<string>,
+          ...
         },
+        ...
       },
+      ...
     };
   }
 
@@ -36,6 +45,7 @@ declare module 'mdns-js' {
     createBrowser: (serviceType: MdnsServiceType) => Browser,
     tcp: (type: string) => MdnsServiceType,
     ServiceType: any,
+    ...
   }
 
   declare type Browser = mdns$Browser
@@ -52,10 +62,12 @@ declare module 'mdns-js' {
     host?: string,
     interfaceIndex: number,
     networkInterface: string,
+    ...
   }
 
   declare type NetworkConnection = {
     interfaceIndex: number,
-    networkInterface: string
+    networkInterface: string,
+    ...
   }
 }

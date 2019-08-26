@@ -1,5 +1,5 @@
-// flow-typed signature: f06f00c3ad0cfedb90c0c6de04b219f3
-// flow-typed version: 3a6d556e4b/react-redux_v5.x.x/flow_>=v0.89.x
+// flow-typed signature: d6e8d9a72e906ae26b83c9b33a1a6e56
+// flow-typed version: c6154227d1/react-redux_v7.x.x/flow_>=v0.104.x
 
 /**
 The order of type arguments for connect() is as follows:
@@ -27,11 +27,12 @@ Decrypting the abbreviations:
   RMP = Returned merge props
   CP = Props for returned component
   Com = React Component
+  SS = Selected state
   ST = Static properties of Com
   EFO = Extra factory options (used only in connectAdvanced)
 */
 
-declare module 'react-redux' {
+declare module "react-redux" {
   // ------------------------------------------------------------
   // Typings for connect()
   // ------------------------------------------------------------
@@ -43,8 +44,8 @@ declare module 'react-redux' {
     areOwnPropsEqual?: (next: OP, prev: OP) => boolean,
     areStatePropsEqual?: (next: SP, prev: SP) => boolean,
     areMergedPropsEqual?: (next: MP, prev: MP) => boolean,
-    context?: React$Context<any>,
-  |}
+    storeKey?: string,
+  |};
 
   declare type MapStateToProps<-S, -OP, +SP> =
     | ((state: S, ownProps: OP) => SP)
@@ -53,9 +54,9 @@ declare module 'react-redux' {
     // like this:
     // const factory: (State, OwnProps) => (State, OwnProps) => StateProps
     // and provide the StateProps type to the SP type parameter.
-    | ((state: S, ownProps: OP) => (state: S, ownProps: OP) => SP)
+    | ((state: S, ownProps: OP) => (state: S, ownProps: OP) => SP);
 
-  declare type Bind<D> = <A, R>((...A) => R) => (...A) => $Call<D, R>
+  declare type Bind<D> = <A, R>((...A) => R) => (...A) => $Call<D, R>;
 
   declare type MapDispatchToPropsFn<D, -OP, +DP> =
     | ((dispatch: D, ownProps: OP) => DP)
@@ -64,7 +65,7 @@ declare module 'react-redux' {
     // like this:
     // const factory: (Dispatch, OwnProps) => (Dispatch, OwnProps) => DispatchProps
     // and provide the DispatchProps type to the DP type parameter.
-    | ((dispatch: D, ownProps: OP) => (dispatch: D, ownProps: OP) => DP)
+    | ((dispatch: D, ownProps: OP) => (dispatch: D, ownProps: OP) => DP);
 
   declare class ConnectedComponent<OP, +WC> extends React$Component<OP> {
     static +WrappedComponent: WC;
@@ -74,32 +75,32 @@ declare module 'react-redux' {
   // happens here in `MP: P`. It means that type wise MP belongs to P,
   // so to say MP >= P.
   declare type Connector<P, OP, MP: P> = <WC: React$ComponentType<P>>(
-    WC
-  ) => Class<ConnectedComponent<OP, WC>> & WC
+    WC,
+  ) => Class<ConnectedComponent<OP, WC>> & WC;
 
   // No `mergeProps` argument
 
   // Got error like inexact OwnProps is incompatible with exact object type?
   // Just make the OP parameter for `connect()` an exact object.
-  declare type MergeOP<OP, D> = {| ...$Exact<OP>, dispatch: D |}
-  declare type MergeOPSP<OP, SP, D> = {| ...$Exact<OP>, ...SP, dispatch: D |}
-  declare type MergeOPDP<OP, DP> = {| ...$Exact<OP>, ...DP |}
-  declare type MergeOPSPDP<OP, SP, DP> = {| ...$Exact<OP>, ...SP, ...DP |}
+  declare type MergeOP<OP, D> = {| ...$Exact<OP>, dispatch: D |};
+  declare type MergeOPSP<OP, SP, D> = {| ...$Exact<OP>, ...SP, dispatch: D |};
+  declare type MergeOPDP<OP, DP> = {| ...$Exact<OP>, ...DP |};
+  declare type MergeOPSPDP<OP, SP, DP> = {| ...$Exact<OP>, ...SP, ...DP |};
 
   declare export function connect<-P, -OP, -SP, -DP, -S, -D>(
     mapStateToProps?: null | void,
     mapDispatchToProps?: null | void,
     mergeProps?: null | void,
-    options?: ?Options<S, OP, {||}, MergeOP<OP, D>>
-  ): Connector<P, OP, MergeOP<OP, D>>
+    options?: ?Options<S, OP, {||}, MergeOP<OP, D>>,
+  ): Connector<P, OP, MergeOP<OP, D>>;
 
   declare export function connect<-P, -OP, -SP, -DP, -S, -D>(
     // If you get error here try adding return type to your mapStateToProps function
     mapStateToProps: MapStateToProps<S, OP, SP>,
     mapDispatchToProps?: null | void,
     mergeProps?: null | void,
-    options?: ?Options<S, OP, SP, MergeOPSP<OP, SP, D>>
-  ): Connector<P, OP, MergeOPSP<OP, SP, D>>
+    options?: ?Options<S, OP, SP, MergeOPSP<OP, SP, D>>,
+  ): Connector<P, OP, MergeOPSP<OP, SP, D>>;
 
   // In this case DP is an object of functions which has been bound to dispatch
   // by the given mapDispatchToProps function.
@@ -107,8 +108,8 @@ declare module 'react-redux' {
     mapStateToProps: null | void,
     mapDispatchToProps: MapDispatchToPropsFn<D, OP, DP>,
     mergeProps?: null | void,
-    options?: ?Options<S, OP, {||}, MergeOPDP<OP, DP>>
-  ): Connector<P, OP, MergeOPDP<OP, DP>>
+    options?: ?Options<S, OP, {||}, MergeOPDP<OP, DP>>,
+  ): Connector<P, OP, MergeOPDP<OP, DP>>;
 
   // In this case DP is an object of action creators not yet bound to dispatch,
   // this difference is not important in the vanila redux,
@@ -117,48 +118,48 @@ declare module 'react-redux' {
     mapStateToProps: null | void,
     mapDispatchToProps: DP,
     mergeProps?: null | void,
-    options?: ?Options<S, OP, {||}, MergeOPDP<OP, DP>>
-  ): Connector<P, OP, MergeOPDP<OP, $ObjMap<DP, Bind<D>>>>
+    options?: ?Options<S, OP, {||}, MergeOPDP<OP, DP>>,
+  ): Connector<P, OP, MergeOPDP<OP, $ObjMap<DP, Bind<D>>>>;
 
   declare export function connect<-P, -OP, -SP, -DP, S, D>(
     // If you get error here try adding return type to your mapStateToProps function
     mapStateToProps: MapStateToProps<S, OP, SP>,
     mapDispatchToProps: MapDispatchToPropsFn<D, OP, DP>,
     mergeProps?: null | void,
-    options?: ?Options<S, OP, SP, {| ...OP, ...SP, ...DP |}>
-  ): Connector<P, OP, {| ...OP, ...SP, ...DP |}>
+    options?: ?Options<S, OP, SP, {| ...OP, ...SP, ...DP |}>,
+  ): Connector<P, OP, {| ...OP, ...SP, ...DP |}>;
 
   declare export function connect<-P, -OP, -SP, -DP, S, D>(
     // If you get error here try adding return type to your mapStateToProps function
     mapStateToProps: MapStateToProps<S, OP, SP>,
     mapDispatchToProps: DP,
     mergeProps?: null | void,
-    options?: ?Options<S, OP, SP, MergeOPSPDP<OP, SP, DP>>
-  ): Connector<P, OP, MergeOPSPDP<OP, SP, $ObjMap<DP, Bind<D>>>>
+    options?: ?Options<S, OP, SP, MergeOPSPDP<OP, SP, DP>>,
+  ): Connector<P, OP, MergeOPSPDP<OP, SP, $ObjMap<DP, Bind<D>>>>;
 
   // With `mergeProps` argument
 
   declare type MergeProps<+P, -OP, -SP, -DP> = (
     stateProps: SP,
     dispatchProps: DP,
-    ownProps: OP
-  ) => P
+    ownProps: OP,
+  ) => P;
 
   declare export function connect<-P, -OP, -SP: {||}, -DP: {||}, S, D>(
     mapStateToProps: null | void,
     mapDispatchToProps: null | void,
     // If you get error here try adding return type to you mapStateToProps function
     mergeProps: MergeProps<P, OP, {||}, {| dispatch: D |}>,
-    options?: ?Options<S, OP, {||}, P>
-  ): Connector<P, OP, P>
+    options?: ?Options<S, OP, {||}, P>,
+  ): Connector<P, OP, P>;
 
   declare export function connect<-P, -OP, -SP, -DP: {||}, S, D>(
     mapStateToProps: MapStateToProps<S, OP, SP>,
     mapDispatchToProps: null | void,
     // If you get error here try adding return type to you mapStateToProps function
     mergeProps: MergeProps<P, OP, SP, {| dispatch: D |}>,
-    options?: ?Options<S, OP, SP, P>
-  ): Connector<P, OP, P>
+    options?: ?Options<S, OP, SP, P>,
+  ): Connector<P, OP, P>;
 
   // In this case DP is an object of functions which has been bound to dispatch
   // by the given mapDispatchToProps function.
@@ -166,8 +167,8 @@ declare module 'react-redux' {
     mapStateToProps: null | void,
     mapDispatchToProps: MapDispatchToPropsFn<D, OP, DP>,
     mergeProps: MergeProps<P, OP, {||}, DP>,
-    options?: ?Options<S, OP, {||}, P>
-  ): Connector<P, OP, P>
+    options?: ?Options<S, OP, {||}, P>,
+  ): Connector<P, OP, P>;
 
   // In this case DP is an object of action creators not yet bound to dispatch,
   // this difference is not important in the vanila redux,
@@ -176,8 +177,8 @@ declare module 'react-redux' {
     mapStateToProps: null | void,
     mapDispatchToProps: DP,
     mergeProps: MergeProps<P, OP, {||}, $ObjMap<DP, Bind<D>>>,
-    options?: ?Options<S, OP, {||}, P>
-  ): Connector<P, OP, P>
+    options?: ?Options<S, OP, {||}, P>,
+  ): Connector<P, OP, P>;
 
   // In this case DP is an object of functions which has been bound to dispatch
   // by the given mapDispatchToProps function.
@@ -185,8 +186,8 @@ declare module 'react-redux' {
     mapStateToProps: MapStateToProps<S, OP, SP>,
     mapDispatchToProps: MapDispatchToPropsFn<D, OP, DP>,
     mergeProps: MergeProps<P, OP, SP, DP>,
-    options?: ?Options<S, OP, SP, P>
-  ): Connector<P, OP, P>
+    options?: ?Options<S, OP, SP, P>,
+  ): Connector<P, OP, P>;
 
   // In this case DP is an object of action creators not yet bound to dispatch,
   // this difference is not important in the vanila redux,
@@ -195,8 +196,21 @@ declare module 'react-redux' {
     mapStateToProps: MapStateToProps<S, OP, SP>,
     mapDispatchToProps: DP,
     mergeProps: MergeProps<P, OP, SP, $ObjMap<DP, Bind<D>>>,
-    options?: ?Options<S, OP, SP, P>
-  ): Connector<P, OP, P>
+    options?: ?Options<S, OP, SP, P>,
+  ): Connector<P, OP, P>;
+
+  // ------------------------------------------------------------
+  // Typings for Hooks
+  // ------------------------------------------------------------
+
+  declare export function useDispatch<D>(): D;
+
+  declare export function useSelector<S, SS>(
+    selector: (state: S) => SS,
+    equalityFn?: (a: SS, b: SS) => boolean,
+  ): SS;
+
+  declare export function useStore<Store>(): Store;
 
   // ------------------------------------------------------------
   // Typings for Provider
@@ -205,13 +219,13 @@ declare module 'react-redux' {
   declare export class Provider<Store> extends React$Component<{
     store: Store,
     children?: React$Node,
-    context?: React$Context<Store>,
+    ...
   }> {}
 
   declare export function createProvider(
     storeKey?: string,
-    subKey?: string
-  ): Class<Provider<*>>
+    subKey?: string,
+  ): Class<Provider<*>>;
 
   // ------------------------------------------------------------
   // Typings for connectAdvanced()
@@ -223,8 +237,9 @@ declare module 'react-redux' {
     renderCountProp?: string,
     shouldHandleStateChanges?: boolean,
     storeKey?: string,
-    withRef?: boolean,
-  }
+    forwardRef?: boolean,
+    ...
+  };
 
   declare type SelectorFactoryOptions<Com> = {
     getDisplayName: (name: string) => string,
@@ -232,16 +247,17 @@ declare module 'react-redux' {
     renderCountProp: ?string,
     shouldHandleStateChanges: boolean,
     storeKey: string,
-    withRef: boolean,
+    forwardRef: boolean,
     displayName: string,
     wrappedComponentName: string,
     WrappedComponent: Com,
-  }
+    ...
+  };
 
   declare type MapStateToPropsEx<S: Object, SP: Object, RSP: Object> = (
     state: S,
-    props: SP
-  ) => RSP
+    props: SP,
+  ) => RSP;
 
   declare type SelectorFactory<
     Com: React$ComponentType<*>,
@@ -249,11 +265,11 @@ declare module 'react-redux' {
     S: Object,
     OP: Object,
     EFO: Object,
-    CP: Object
+    CP: Object,
   > = (
     dispatch: Dispatch,
-    factoryOptions: SelectorFactoryOptions<Com> & EFO
-  ) => MapStateToPropsEx<S, OP, CP>
+    factoryOptions: SelectorFactoryOptions<Com> & EFO,
+  ) => MapStateToPropsEx<S, OP, CP>;
 
   declare export function connectAdvanced<
     Com: React$ComponentType<*>,
@@ -262,32 +278,20 @@ declare module 'react-redux' {
     OP: Object,
     CP: Object,
     EFO: Object,
-    ST: { [_: $Keys<Com>]: any }
+    ST: { [_: $Keys<Com>]: any, ... },
   >(
     selectorFactory: SelectorFactory<Com, D, S, OP, EFO, CP>,
-    connectAdvancedOptions: ?(ConnectAdvancedOptions & EFO)
-  ): (component: Com) => React$ComponentType<OP> & $Shape<ST>
-
-  declare export function batch(fn: () => mixed): void
-
-  declare export function useSelector<S, T>(
-    selector: (state: S) => T,
-    equalityFn?: (next: T, prev: T) => boolean
-  ): T
-
-  declare export function useStore<Store>(): Store
-
-  declare export function useDispatch<D>(): D
-
-  declare export function shallowEqual<T>(a: T, b: T): boolean
+    connectAdvancedOptions: ?(ConnectAdvancedOptions & EFO),
+  ): (component: Com) => React$ComponentType<OP> & $Shape<ST>;
 
   declare export default {
     Provider: typeof Provider,
+    createProvider: typeof createProvider,
     connect: typeof connect,
     connectAdvanced: typeof connectAdvanced,
-    batch: typeof batch,
+    useDispatch: typeof useDispatch,
     useSelector: typeof useSelector,
     useStore: typeof useStore,
-    useDispatch: typeof useDispatch,
-  }
+    ...
+  };
 }
