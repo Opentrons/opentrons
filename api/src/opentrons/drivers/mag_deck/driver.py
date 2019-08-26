@@ -3,7 +3,7 @@ import logging
 from threading import Event
 from time import sleep
 from typing import Optional
-from serial.serialutil import SerialException
+from serial.serialutil import SerialException  # type: ignore
 
 from opentrons.drivers import serial_communication
 from opentrons.drivers.serial_communication import SerialNoResponse

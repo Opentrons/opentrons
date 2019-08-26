@@ -97,17 +97,20 @@ class TempDeck(mod_abc.AbstractModule):
     def display_name(cls) -> str:
         return 'Temperature Deck'
 
+    @staticmethod
+    def _build_driver(
+            simulating: bool) -> Union['SimulatingDriver', 'TempDeckDriver']:
+        if simulating:
+            return SimulatingDriver()
+        else:
+            return TempDeckDriver()
+
     def __init__(self,
                  port,
                  simulating,
                  loop: asyncio.AbstractEventLoop = None) -> None:
-        if simulating:
-            self._driver: Union['SimulatingDriver', 'TempDeckDriver'] \
-                = SimulatingDriver()
-        else:
-            self._driver: Union['SimulatingDriver', 'TempDeckDriver'] \
-                = TempDeckDriver()
 
+        self._driver = self._build_driver(simulating)
         if None is loop:
             self._loop = asyncio.get_event_loop()
         else:

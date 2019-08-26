@@ -6,12 +6,14 @@ SHX := npx shx
 # add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
 PATH := $(shell cd .. && yarn bin):$(PATH)
 
-python := pipenv run python
+pipenv_envvars := $(and $(CI),PIPENV_IGNORE_VIRTUALENVS=1)
+python := $(pipenv_envvars) pipenv run python
 pipenv_opts := --dev
 pipenv_opts += $(and $(CI),--keep-outdated)
+
 port ?= 34000
 tests ?= tests
-test_opts ?= -s -vv
+test_opts ?=
 wheel_file = dist/*.whl
 # Host key location for buildroot robot
 br_ssh_key ?= ~/.ssh/robot_key
@@ -20,13 +22,12 @@ br_ssh_opts ?= -o stricthostkeychecking=no
 # Host key for push-key uploading
 pubkey ?= br_ssh_key
 
-
 # make bootstrap wheel file (= rather than := to expand at every use)
 wheel_file = $(wildcard dist/otupdate-*.whl)
 
 .PHONY: install
 install:
-	pipenv sync $(pipenv_opts)
+	$(pipenv_envvars) pipenv sync $(pipenv_opts)
 
 .PHONY: dev
 dev: export ENABLE_VIRTUAL_SMOOTHIE := true
@@ -46,11 +47,7 @@ clean:
 
 .PHONY: test
 test:
-	$(python) -m pytest \
-		--cov=otupdate \
-		--cov-report term-missing:skip-covered \
-		--cov-report xml:coverage.xml \
-		$(test_opts) $(tests)
+	$(python) -m pytest $(test_opts) $(tests)
 
 .PHONY: lint
 lint:
@@ -74,8 +71,8 @@ bootstrap: wheel
 restart:
 	curl -X POST http://$(host):31950/server/restart
 
-.PHONY: push-buildroot
-push-buildroot: wheel
+.PHONY: push
+push: wheel
 	scp -i $(br_ssh_key) $(br_ssh_opts) $(wheel_file) root@$(host):/data/
 	ssh -i $(br_ssh_key) $(br_ssh_opts) root@$(host) \
 "function cleanup () { rm -f /data/$(wheel_file) && mount -o remount,ro / && systemctl start opentrons-update-server; } ;\
@@ -83,8 +80,3 @@ systemctl stop opentrons-update-server &&\
 mount -o remount,rw / &&\
 cd /usr/lib/python3.7/site-packages &&\
 unzip -o /data/otupdate-*.whl && cleanup || cleanup"
-
-
-.PHONY: push-key
-push-key:
-	curl -X POST -H "Content-Type: application/json" --data-raw "{\"key\": \"$(shell $(SHX) cat $(pubkey))\"}" $(host):31950/server/ssh_keys

@@ -68,6 +68,9 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
             name='SynchAdapter thread for {}'.format(repr(api)))
         super().start()
 
+    def __repr__(self):
+        return '<SynchronousAdapter>'
+
     def _event_loop_in_thread(self):
         loop = object.__getattribute__(self, '_loop')
         loop.run_forever()

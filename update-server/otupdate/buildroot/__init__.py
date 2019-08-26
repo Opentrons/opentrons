@@ -66,7 +66,7 @@ def get_app(system_version_file: str = None,
     if not loop:
         loop = asyncio.get_event_loop()
 
-    app = web.Application(loop=loop, middlewares=[log_error_middleware])
+    app = web.Application(middlewares=[log_error_middleware])
     app[config.CONFIG_VARNAME] = config_obj
     app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
     app[constants.DEVICE_NAME_VARNAME] = name

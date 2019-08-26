@@ -5,7 +5,7 @@ from functools import lru_cache
 from threading import Lock
 from typing import Dict, Any
 
-from numpy import add, subtract
+from numpy import add, subtract  # type: ignore
 
 from opentrons import commands, drivers
 from opentrons.commands import CommandPublisher

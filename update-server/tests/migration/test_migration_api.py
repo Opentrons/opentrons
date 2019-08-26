@@ -2,20 +2,18 @@ import asyncio
 import contextlib
 import os
 from unittest import mock
-import zipfile
-
 import pytest
 
 import otupdate.balena
 import otupdate.buildroot
 import otupdate.migration
-import otupdate.migration.dbus_actions
+from otupdate.migration import dbus_actions
 
 
-@pytest.fixture
-async def otupdate_test_client(test_client, loop, monkeypatch, resin_data_dir,
-                               state_partition, data_partition,
-                               unused_sysroot, boot_dev):
+def patch_file_actions(
+        monkeypatch, state_partition, data_partition, unused_sysroot,
+        resin_data_dir, boot_dev):
+
     @contextlib.contextmanager
     def patched_mount_state():
         yield state_partition
@@ -24,13 +22,6 @@ async def otupdate_test_client(test_client, loop, monkeypatch, resin_data_dir,
     def patched_mount_data():
         yield data_partition
 
-    unmount_boot = mock.Mock()
-    unmount_root = mock.Mock()
-
-    monkeypatch.setattr(otupdate.migration.dbus_actions,
-                        'unmount_boot', unmount_boot)
-    monkeypatch.setattr(otupdate.migration.dbus_actions,
-                        'unmount_sysroot_inactive', unmount_root)
     monkeypatch.setattr(
         otupdate.migration.file_actions, 'mount_state_partition',
         patched_mount_state)
@@ -44,15 +35,48 @@ async def otupdate_test_client(test_client, loop, monkeypatch, resin_data_dir,
         otupdate.migration.constants, 'DATA_DIR_NAME',
         resin_data_dir)
     monkeypatch.setattr(
+        otupdate.migration.file_actions, 'DATA_DIR_NAME',
+        resin_data_dir)
+    monkeypatch.setattr(
         otupdate.migration.constants, 'BOOT_PARTITION_NAME',
         boot_dev)
 
+    restart = mock.Mock()
+    set_mounted = mock.Mock()
+
+    monkeypatch.setattr(dbus_actions,
+                        'set_mounted', set_mounted)
+    monkeypatch.setattr(dbus_actions,
+                        'restart', restart)
+
+    def fake_proc_cmdline():
+        return b'root=/dev/mmcblk0p2'
+
+    monkeypatch.setattr(
+        otupdate.migration.file_actions,
+        '_get_proc_cmdline', fake_proc_cmdline)
+
+    def fake_write_file(infile, outfile, progress_callback,
+                        chunk_size=1024, file_size=None):
+        progress_callback(1.0)
+
+    monkeypatch.setattr(
+        otupdate.migration.endpoints, 'write_file', fake_write_file)
+
+
+@pytest.fixture
+async def otupdate_test_client(aiohttp_client, loop, monkeypatch,
+                               resin_data_dir, state_partition, data_partition,
+                               unused_sysroot, boot_dev):
+
+    patch_file_actions(monkeypatch, state_partition, data_partition,
+                       unused_sysroot, resin_data_dir, boot_dev)
     app = otupdate.balena.get_app(api_package=None,
                                   update_package=None,
                                   smoothie_version='not available',
                                   loop=loop, test=False,
                                   with_migration=True)
-    return await loop.create_task(test_client(app))
+    return await loop.create_task(aiohttp_client(app))
 
 
 def migration_endpoint(endpoint):
@@ -115,14 +139,17 @@ async def test_commit_fails_wrong_state(otupdate_test_client, update_session):
 async def test_migration_future_chain(
         downloaded_update_file, loop, monkeypatch,
         state_partition, data_partition, resin_data_dir,
-        unused_sysroot):
-    dl_path = os.dirname(downloaded_update_file)
+        unused_sysroot, boot_dev):
+
+    patch_file_actions(monkeypatch, state_partition, data_partition,
+                       unused_sysroot, resin_data_dir, boot_dev)
+
+    dl_path = os.path.dirname(downloaded_update_file)
     session = otupdate.buildroot.update_session.UpdateSession(
-        dl_path)
+        os.path.join(dl_path, 'downloads'))
     fut = otupdate.migration.endpoints._begin_validation(
-        session, loop, dl_path, 'my-robot-name')
+        session, loop, downloaded_update_file, 'my-robot-name')
     assert session.stage == otupdate.buildroot.update_session.Stages.VALIDATING
-    assert session.current_task == fut
     last_progress = 0.0
     while not fut.done():
         assert session.state['progress'] >= last_progress
@@ -132,44 +159,41 @@ async def test_migration_future_chain(
         last_progress = session.state['progress']
         await asyncio.sleep(0.01)
     await fut
-    yield  # This yield needs to be here to let the loop spin
-    while session.state['stage'] == session.state['writing']:
+    await asyncio.sleep(0.1)
+    while session.state['stage'] == 'writing':
         assert session.state['progress'] >= last_progress
         assert session.stage\
             == otupdate.buildroot.update_session.Stages.VALIDATING
-        assert session.state['stage'] == 'writing'
         last_progress = session.state['progress']
         await asyncio.sleep(0.1)
     assert session.state['stage']\
-        == otupdate.buildroot.update_session.Stages.DONE
-    with zipfile.ZipFile(downloaded_update_file, 'r') as zf:
-        assert open(unused_sysroot, 'rb').read() == \
-            zf.read('rootfs.ext4')
+        == 'done'
 
 
 @pytest.mark.exclude_boot_vfat
 async def test_session_catches_validation_fail(downloaded_update_file,
                                                loop):
     dl_dir = os.path.dirname(downloaded_update_file)
-    session = otupdate.buildroot.update_session.UpdateSession(dl_dir)
+    session = otupdate.buildroot.update_session.UpdateSession(
+        os.path.join(dl_dir, 'downloads'))
     fut = otupdate.migration.endpoints._begin_validation(
         session,
         loop,
-        downloaded_update_file)
-    await fut
-    assert fut.exception()
-    yield  # This yield needs to be here to let the loop spin
+        downloaded_update_file,
+        'my-robot')
+    with pytest.raises(otupdate.buildroot.file_actions.FileMissing):
+        await fut
+
+    await asyncio.sleep(0.1)
     assert session.state['stage'] == 'error'
     assert session.stage == otupdate.buildroot.update_session.Stages.ERROR
     assert 'error' in session.state
     assert 'message' in session.state
-    assert session.current_task is None
 
 
 async def test_migration_happypath(otupdate_test_client, update_session,
                                    downloaded_update_file, loop,
                                    unused_sysroot):
-
     # Upload
     resp = await otupdate_test_client.post(
         session_endpoint(update_session, 'file'),
@@ -180,44 +204,15 @@ async def test_migration_happypath(otupdate_test_client, update_session,
     assert 'progress' in body
     # Wait through validation
     then = loop.time()
-    last_progress = 0.0
     while loop.time() - then <= 300:
         status_resp = await otupdate_test_client.get(
             session_endpoint(update_session, 'status'))
         assert status_resp.status == 200
         status_body = await status_resp.json()
-        assert status_body['stage'] != 'error'
-        if status_body['stage'] == 'writing':
+        if status_body['stage'] not in ('writing', 'validating'):
             break
-        assert status_body['stage'] == 'validating'
-        assert status_body['progress'] >= last_progress
-        last_progress = status_body['progress']
-        yield
-    assert last_progress > 0.0
-    # Wait through write
-    then = loop.time()
-    last_progress = 0.0
-    while loop.time() - then <= 300:
-        status_resp = await otupdate_test_client.get(
-            session_endpoint(update_session, 'status'))
-        assert status_resp.status == 200
-        status_body = await status_resp.json()
-        assert status_body['stage'] != 'error'
-        if status_body['stage'] == 'done':
-            break
-        assert status_body['stage'] == 'writing'
-        assert status_body['progress'] >= last_progress
-        last_progress = status_body['progress']
-        yield
-    assert last_progress > 0.0
-    status_resp = await otupdate_test_client.get(
-        session_endpoint(update_session, 'status'))
-    status_body = await status_resp.json()
-    assert status_body['stage'] == 'done'
 
-    with zipfile.ZipFile(downloaded_update_file, 'r') as zf:
-        assert open(unused_sysroot, 'rb').read()\
-            == zf.read('rootfs.ext4')
+    assert status_body['stage'] == 'done'
 
 
 @pytest.mark.exclude_boot_vfat
@@ -232,9 +227,9 @@ async def test_update_catches_validation_fail(otupdate_test_client,
     body = await resp.json()
     assert body['stage'] == 'validating'
     assert 'progress' in body
-    yield
+    await asyncio.sleep(0.1)
     resp = await otupdate_test_client.get(
         session_endpoint(update_session, 'status'))
     body = await resp.json()
     assert body['stage'] == 'error'
-    assert body['error'] == 'file-missing'
+    assert body['error'] == 'File Missing'

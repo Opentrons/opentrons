@@ -66,7 +66,7 @@ def get_app(
     bootstrap_fn = partial(
         bootstrap_endp.bootstrap_update_server, test_flag=test)
 
-    app = web.Application(loop=loop)
+    app = web.Application()
     app.router.add_routes([
         web.get('/server/update/health', health),
         web.post('/server/update', install.update_api),

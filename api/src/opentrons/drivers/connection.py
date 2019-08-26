@@ -1,7 +1,7 @@
 import time
 import logging
 
-from serial import SerialException
+from serial import SerialException  # type: ignore
 
 log = logging.getLogger(__name__)
 

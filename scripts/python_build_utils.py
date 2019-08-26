@@ -5,7 +5,6 @@ NOTE: This file must be python2.7 compatible
 """
 
 import argparse
-import glob
 import json
 import os
 import subprocess
@@ -95,24 +94,12 @@ def dump_br_version(project):
                        pref+'_branch': branch})
 
 
-def ensure_wheel_size(project):
-    """ Explode if the wheel in the project is too large """
-    wheelname = {'api': 'opentrons-*.whl',
-                 'update-server': 'otupdate-*.whl'}
-    wheelf = glob.glob(os.path.join(
-        HERE, '..', project, 'dist', wheelname[project]))[0]
-    statinfo = os.stat(wheelf)
-    assert statinfo.st_size < 1024 * 1024, '%s is larger than 1MiB' % wheelf
-
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Perform one of several build-time tasks')
     parser.add_argument(dest='project', metavar='SUBPROJECT', type=str,
                         choices=['api', 'update-server'])
     parser.add_argument(dest='task', metavar='TASK', type=str,
-                        choices=['normalize_version',
-                                 'dump_br_version',
-                                 'ensure_wheel_size'])
+                        choices=['normalize_version', 'dump_br_version'])
     args = parser.parse_args()
     print(locals()[args.task](args.project))

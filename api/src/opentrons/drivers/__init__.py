@@ -5,7 +5,7 @@ import pkg_resources
 import sys
 import logging
 
-import serial
+import serial  # type: ignore
 
 from opentrons.drivers import connection
 

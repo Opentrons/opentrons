@@ -12,12 +12,15 @@ SHX := npx shx
 firmware = $(wildcard smoothie/*.hex)
 
 # python and pipenv config
-python := pipenv run python
-pip := pipenv run pip
-pytest := pipenv run py.test
+pipenv_envvars := $(and $(CI),PIPENV_IGNORE_VIRTUALENVS=1)
+python := $(pipenv_envvars) pipenv run python
+pip := $(pipenv_envvars) pipenv run pip
+pytest := $(pipenv_envvars) pipenv run py.test
+sphinx_build := $(pipenv_envvars) pipenv run sphinx-build
 pipenv_opts := --dev
 pipenv_opts += $(and $(CI),--keep-outdated --clear)
 wheel_opts := $(if $(or $(CI),$(V),$(VERBOSE)),,-q)
+
 
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
@@ -72,7 +75,8 @@ all: clean wheel
 
 .PHONY: install
 install:
-	pipenv sync $(pipenv_opts)
+	$(pipenv_envvars) pipenv sync $(pipenv_opts)
+	$(pipenv_envvars) pipenv run pip freeze
 
 .PHONY: clean
 clean:
@@ -80,7 +84,7 @@ clean:
 
 .PHONY: uninstall
 uninstall:
-	pipenv --rm
+	$(pipenv_envvars)	pipenv --rm
 
 $(wheel_pattern): setup.py $(ot_sources)
 	$(clean_cmd)
@@ -93,7 +97,6 @@ wheel: $(wheel_file)
 .PHONY: test
 test: local-install
 	$(python)	-m twine check $(wheel_file)
-	$(python) ../scripts/python_build_utils.py api ensure_wheel_size
 	$(pytest) $(tests) $(test_opts)
 
 .PHONY: lint
@@ -105,24 +108,24 @@ lint: $(ot_py_sources)
 
 docs-html: local-install
 	$(SHX) rm -rf docs/build/html
-	pipenv run sphinx-build -b html -d docs/build/doctrees docs/source docs/build/html
+	$(sphinx_build) -b html -d docs/build/doctrees docs/source docs/build/html
 	$(SHX) mkdir -p docs/dist
 	$(SHX) cp -R docs/build/html/. docs/public/. docs/dist
 
 docs-doctest: local-install
 	$(SHX) rm -rf docs/build/doctest
-	pipenv run sphinx-build -b doctest -d docs/build/doctrees docs/source docs/build/doctest
+	$(sphinx_build) -b doctest -d docs/build/doctrees docs/source docs/build/doctest
 
 docs-pdf-prep: local-install
 	$(SHX) rm -rf docs/build/pdf
 	$(SHX) mkdir -p docs/dist
 
 docs-pdf-local: docs-pdf-prep
-	-pipenv run sphinx-build -b latex -d docs/build/doctrees docs/source docs/build/pdf
+	-$(sphinx_build) -b latex -d docs/build/doctrees docs/source docs/build/pdf
 	-$(MAKE) -C docs/build/pdf all-pdf
 
 docs-pdf-ci: docs-pdf-prep
-	pipenv run sphinx-build -b latex -d docs/build/doctrees docs/source docs/build/pdf
+	$(sphinx_build) -b latex -d docs/build/doctrees docs/source docs/build/pdf
 	$(MAKE) -C docs/build/pdf all-pdf >/dev/null
 	$(SHX) ls docs/build/pdf/*.pdf
 	$(SHX) cp docs/build/pdf/*.pdf docs/dist/
@@ -146,7 +149,7 @@ local-install: wheel
 
 .PHONY: local-shell
 local-shell: local-install
-	pipenv shell
+	$(pipenv_envvars) pipenv shell
 
 .PHONY: simulate
 simulate: local-install
@@ -164,14 +167,14 @@ deploy: wheel
                             $(wheel_file)
 
 .PHONY: push
-push: wheel
+push-balena: wheel
 	curl -X POST \
 		-H "Content-Type: multipart/form-data" \
 		-F "whl=@$(wildcard dist/opentrons-*.whl)" \
 		http://$(host):31950/server/update
 
 .PHONY: push-buildroot
-push-buildroot: wheel
+push: wheel
 	scp -i $(br_ssh_key) $(ssh_opts) $(wheel_file) root@$(host):/data/
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host) \
 "function cleanup () { rm -f /data/opentrons*.whl && mount -o remount,ro / && systemctl start opentrons-api-server; } ;\
@@ -185,13 +188,6 @@ install-key:
 	curl -X POST $(host):31950/server/ssh_keys\
 		-H "Content-Type: application/json"\
 		-d "{\"key\":\"$(shell cat $(br_ssh_pubkey))\"}"
-
-.PHONY: flash
-flash:
-	curl -X POST \
-		-H "Content-Type: multipart/form-data" \
-		-F "hex=@$(firmware)" \
-		http://$(host):31950/server/update/firmware
 
 .PHONY: restart
 restart:

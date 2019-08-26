@@ -32,11 +32,11 @@ def downloaded_update_file(request, extracted_update_file):
     sig_path = os.path.join(extracted_update_file, 'rootfs.ext4.hash.sig')
     zip_path = os.path.join(extracted_update_file, 'ot2-system.zip')
     with zipfile.ZipFile(zip_path, 'w') as zf:
-        if not request.node.get_marker('exclude_rootfs_ext4'):
+        if not request.node.get_closest_marker('exclude_rootfs_ext4'):
             zf.write(rootfs_path, 'rootfs.ext4')
-        if not request.node.get_marker('exclude_rootfs_ext4_hash'):
+        if not request.node.get_closest_marker('exclude_rootfs_ext4_hash'):
             zf.write(hash_path, 'rootfs.ext4.hash')
-        if not request.node.get_marker('exclude_rootfs_ext4_hash_sig'):
+        if not request.node.get_closest_marker('exclude_rootfs_ext4_hash_sig'):
             zf.write(sig_path, 'rootfs.ext4.hash.sig')
     os.unlink(rootfs_path)
     os.unlink(hash_path)
@@ -58,7 +58,7 @@ def extracted_update_file(request, tmpdir):
     rootfs_contents = os.urandom(100000)
     with open(rootfs_path, 'wb') as rfs:
         rfs.write(rootfs_contents)
-    if request.node.get_marker('bad_hash'):
+    if request.node.get_closest_marker('bad_hash'):
         hashval = b'0oas0ajcs0asd0asjc0ans0d9ajsd0ian0s9djas'
     else:
         try:
@@ -69,7 +69,7 @@ def extracted_update_file(request, tmpdir):
         hashval = re.match(b'^([a-z0-9]+) ', shasum_out).group(1)
     with open(hash_path, 'wb') as rfsh:
         rfsh.write(hashval)
-    if not request.node.get_marker('bad_sig'):
+    if not request.node.get_closest_marker('bad_sig'):
         try:
             subprocess.check_output(['openssl', 'version'])
         except (subprocess.CalledProcessError, FileNotFoundError):
@@ -103,11 +103,11 @@ def otupdate_config(request, tmpdir, testing_cert):
     path = os.path.join(tmpdir, 'config.json')
     conf = {
             'signature_required':
-            not bool(request.node.get_marker('no_signature_required')),
+            not bool(request.node.get_closest_marker('no_signature_required')),
             'download_storage_path': os.path.join(tmpdir, 'downloads')
         }
-    if not request.node.get_marker('no_cert_path'):
-        if request.node.get_marker('bad_cert_path'):
+    if not request.node.get_closest_marker('no_cert_path'):
+        if request.node.get_closest_marker('bad_cert_path'):
             conf.update({'update_cert_path': 'asodhafjasda'})
         else:
             conf.update({'update_cert_path':
@@ -118,7 +118,7 @@ def otupdate_config(request, tmpdir, testing_cert):
 
 
 @pytest.fixture
-async def test_cli(test_client, loop, otupdate_config, monkeypatch):
+async def test_cli(aiohttp_client, loop, otupdate_config, monkeypatch):
     """
     Build an app using dummy versions, then build a test client and return it
     """
@@ -127,7 +127,7 @@ async def test_cli(test_client, loop, otupdate_config, monkeypatch):
         otupdate_config,
         'opentrons-test',
         loop)
-    client = await loop.create_task(test_client(app))
+    client = await loop.create_task(aiohttp_client(app))
     return client
 
 

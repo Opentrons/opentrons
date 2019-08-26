@@ -13,7 +13,7 @@ from otupdate.balena import bootstrap, control
 # Tests should closely reflect the tasks in selftest.py
 
 
-async def test_server_boot(loop, test_client):
+async def test_server_boot(loop, aiohttp_client):
     update_package = os.path.join(
         os.path.abspath(os.path.dirname(otupdate.__file__)), 'package.json')
     with open(update_package) as pkg:
@@ -26,7 +26,7 @@ async def test_server_boot(loop, test_client):
         smoothie_version='not available',
         loop=loop,
         test=True)
-    cli = await loop.create_task(test_client(app))
+    cli = await loop.create_task(aiohttp_client(app))
 
     expected = {
         'name': 'opentrons-dev',
@@ -56,7 +56,7 @@ async def test_server_boot(loop, test_client):
         test=True,
         with_migration=True
     )
-    cli = await loop.create_task(test_client(app))
+    cli = await loop.create_task(aiohttp_client(app))
 
     resp = await cli.get('/server/update/health')
     res = await resp.json()
@@ -65,7 +65,7 @@ async def test_server_boot(loop, test_client):
         == '/server/update/migration/begin'
 
 
-async def test_bootstrap_fail(monkeypatch, loop, test_client):
+async def test_bootstrap_fail(monkeypatch, loop, aiohttp_client):
     async def mock_install(filename, _loop):
         """
         If this test passes (e.g.: if the self-test fails), this function
@@ -124,7 +124,7 @@ print('intentionally malformed'
         smoothie_version='not available',
         loop=loop,
         test=False)
-    cli = await loop.create_task(test_client(app))
+    cli = await loop.create_task(aiohttp_client(app))
 
     resp = await cli.post(
         '/server/update/bootstrap', data={'whl': open(test_wheel, 'rb')})
@@ -134,7 +134,7 @@ print('intentionally malformed'
     assert int(resp.status/100.0) == 4
 
 
-async def test_restart(loop, test_client, monkeypatch):
+async def test_restart(loop, aiohttp_client, monkeypatch):
     restart_flag = False
 
     def mock_restart():
@@ -152,7 +152,7 @@ async def test_restart(loop, test_client, monkeypatch):
         smoothie_version='not available',
         loop=loop,
         test=True)
-    cli = await loop.create_task(test_client(app))
+    cli = await loop.create_task(aiohttp_client(app))
 
     resp = await cli.post('/server/restart')
     res = await resp.json()

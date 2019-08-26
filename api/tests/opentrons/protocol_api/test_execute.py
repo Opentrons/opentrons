@@ -42,13 +42,13 @@ def test_bad_protocol(ensure_api2, loop):
     ctx = ProtocolContext(loop)
     with pytest.raises(execute.MalformedProtocolError) as e:
         execute.run_protocol(protocol_code='print("hi")', context=ctx)
-        assert "No function 'run" in str(e)
+        assert "No function 'run" in str(e.value)
     with pytest.raises(execute.MalformedProtocolError) as e:
         execute.run_protocol(protocol_code='def run(): pass', context=ctx)
-        assert "Function 'run()' does not take any parameters" in str(e)
+        assert "Function 'run()' does not take any parameters" in str(e.value)
     with pytest.raises(execute.MalformedProtocolError) as e:
         execute.run_protocol(protocol_code='def run(a, b): pass', context=ctx)
-        assert "must be called with more than one argument" in str(e)
+        assert "must be called with more than one argument" in str(e.value)
 
 
 def test_proto_with_exception(ensure_api2, loop):
@@ -62,7 +62,7 @@ def run(ctx):
         execute.run_protocol(
             protocol_code=comped,
             context=ctx)
-    assert 'Exception [line 3]: hi' in str(e)
+    assert 'Exception [line 3]: hi' in str(e.value)
 
     nested_exc = '''
 import ast
@@ -78,8 +78,8 @@ def run(ctx):
         execute.run_protocol(
             protocol_code=comped,
             context=ctx)
-    assert '[line 5]' in str(e)
-    assert 'Exception [line 5]: hi' in str(e)
+    assert '[line 5]' in str(e.value)
+    assert 'Exception [line 5]: hi' in str(e.value)
 
 
 def test_get_protocol_schema_version():

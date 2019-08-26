@@ -40,7 +40,7 @@ async def bootstrap_update_server(
     data = await request.post()
     wheel = data.get('whl')
     log.debug('Got whl: {}'.format(wheel))
-    log.debug('  filename: {}'.format(wheel.filename))
+    log.debug('  filename: {}'.format(wheel.filename if wheel else '<none>'))
     res = {'status': 'in progress'}
     tmpd = None
     filename = None
@@ -56,9 +56,9 @@ async def bootstrap_update_server(
 
     if res.get('status') != 'failure':
         tmpd = tempfile.mkdtemp()
-        filename = os.path.join(tmpd, wheel.filename)
+        filename = os.path.join(tmpd, wheel.filename)  # type: ignore
         log.info('Preparing to install: {}'.format(filename))
-        content = wheel.file.read()
+        content = wheel.file.read()  # type: ignore
 
         with open(filename, 'wb') as wf:
             wf.write(content)

@@ -9,7 +9,7 @@ except ModuleNotFoundError:
     select = None  # type: ignore
 from time import sleep
 from typing import Optional, Mapping
-from serial.serialutil import SerialException
+from serial.serialutil import SerialException  # type: ignore
 from opentrons.drivers import serial_communication, utils
 from opentrons.drivers.serial_communication import SerialNoResponse
 

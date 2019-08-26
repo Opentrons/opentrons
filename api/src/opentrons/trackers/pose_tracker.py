@@ -3,8 +3,8 @@ import itertools
 from collections import namedtuple, UserDict
 from typing import Dict, List
 
-import numpy as np
-from numpy.linalg import inv
+import numpy as np  # type: ignore
+from numpy.linalg import inv  # type: ignore
 
 ROOT = 'root'
 

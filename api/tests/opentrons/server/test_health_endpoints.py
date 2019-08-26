@@ -3,9 +3,9 @@ from opentrons import __version__
 from opentrons.server import init
 
 
-async def test_health(virtual_smoothie_env, loop, test_client):
-    app = init(loop)
-    cli = await loop.create_task(test_client(app))
+async def test_health(virtual_smoothie_env, loop, aiohttp_client):
+    app = init()
+    cli = await loop.create_task(aiohttp_client(app))
 
     expected = json.dumps({
         'name': 'opentrons-dev',

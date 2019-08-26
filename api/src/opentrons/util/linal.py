@@ -1,6 +1,6 @@
-import numpy as np
-from numpy import insert, dot
-from numpy.linalg import inv
+import numpy as np  # type: ignore
+from numpy import insert, dot  # type: ignore
+from numpy.linalg import inv  # type: ignore
 from typing import List, Tuple, Union
 
 

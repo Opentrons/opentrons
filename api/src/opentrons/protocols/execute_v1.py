@@ -1,7 +1,9 @@
-from numpy import add
 import time
 import datetime
 from itertools import chain
+
+from numpy import add  # type: ignore
+
 from opentrons import instruments, labware, robot
 
 

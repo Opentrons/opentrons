@@ -75,7 +75,7 @@ async def status(request: web.Request, session: UpdateSession) -> web.Response:
         status=200)
 
 
-async def _save_file(part: BodyPartReader, path: str) -> web.Response:
+async def _save_file(part: BodyPartReader, path: str):
     with open(os.path.join(path, part.name), 'wb') as write:
         while not part.at_eof():
             chunk = await part.read_chunk()
