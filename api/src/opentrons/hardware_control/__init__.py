@@ -247,7 +247,7 @@ class API(HardwareAPILike):
             self.set_lights(button=on)
             on = not on
             now = self._loop.time()
-            await asyncio.sleep(max(0, 0.25-(now-then)))
+            await asyncio.sleep(max(0, 0.25 - (now - then)))
         self.set_lights(button=True)
 
     @_log_call
@@ -264,20 +264,15 @@ class API(HardwareAPILike):
          - Get the attached instrument on each mount and
          - Cache their pipette configs from pipette-config.json
 
-        :param require: If specified, the
-                                        require should
-                                        be a dict of mounts to instrument
-                                        identifier describing the instruments
-                                        expected to be present. This identifier
-                                        can be either an instrument name or
-                                        the more specific instrument model
-                                        string (e.g. 'p10_single' or
-                                        'p10_single_v1.3') This can save a
-                                        subsequent of
-                                        :py:attr:`attached_instruments` and
-                                        also serves as the hook for the
-                                        hardware simulator to decide what is
-                                        attached.
+        :param require: If specified, the require should be a dict
+                        of mounts to instrument identifier describing
+                        the instruments expected to be present. This
+                        identifier can be either an instrument name or
+                        the more specific instrument model string
+                        (e.g. 'p10_single' or 'p10_single_v1.3'). This can
+                        save a subsequent of :py:attr:`attached_instruments`
+                        and also serves as the hook for the hardware
+                        simulator to decide what is attached.
         :raises RuntimeError: If an instrument is expected but not found.
 
         """
@@ -287,10 +282,15 @@ class API(HardwareAPILike):
             model = instrument_data.get('model')
 
             req_instr = require.get(mount, None)
-            if req_instr and not model and not self.is_simulator_sync:
-                raise RuntimeError(
-                    f'mount {mount}: instrument {req_instr} was'
-                    f' requested, but no instrument is present')
+            if req_instr and not self.is_simulator_sync:
+                if not model:
+                    raise RuntimeError(
+                        f'mount {mount}: instrument {req_instr} was'
+                        f' requested, but no instrument is present')
+                if req_instr not in (p.config.name, model):
+                    raise RuntimeError(f'mount {mount}: instrument'
+                                       f' {req_instr} was requested'
+                                       f' but {p.config.name} is present')
 
             if model:
                 p = Pipette(
@@ -298,25 +298,18 @@ class API(HardwareAPILike):
                     self._config.instrument_offset[mount.name.lower()],
                     instrument_data['id'])
 
-                if req_instr and not (
-                        req_instr == p.config.name or req_instr == model) and (
-                        not self.is_simulator_sync):
-                    raise RuntimeError(f'mount {mount}: instrument'
-                                       f' {req_instr} was requested'
-                                       f' but {p.config.name} is present')
-
-                self._attached_instruments[mount] = p
-                home_pos = p.config.home_position
-                max_travel = p.config.max_travel
-                steps_mm = p.config.steps_per_mm
+               self._attached_instruments[mount]=p
+                home_pos=p.config.home_position
+                max_travel=p.config.max_travel
+                steps_mm=p.config.steps_per_mm
             else:
-                self._attached_instruments[mount] = None
-                home_pos = self._config.default_pipette_configs['homePosition']
-                max_travel = self._config.default_pipette_configs['maxTravel']
-                steps_mm = self._config.default_pipette_configs['stepsPerMM']
+                self._attached_instruments[mount]=None
+                home_pos=self._config.default_pipette_configs['homePosition']
+                max_travel=self._config.default_pipette_configs['maxTravel']
+                steps_mm=self._config.default_pipette_configs['stepsPerMM']
 
-            mount_axis = Axis.by_mount(mount)
-            plunger_axis = Axis.of_plunger(mount)
+            mount_axis=Axis.by_mount(mount)
+            plunger_axis=Axis.of_plunger(mount)
             self._backend._smoothie_driver.update_steps_per_mm(
                 {plunger_axis.name: steps_mm})
             self._backend._smoothie_driver.update_pipette_config(

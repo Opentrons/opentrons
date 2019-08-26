@@ -108,10 +108,10 @@ class Controller:
         return self._smoothie_driver.fast_home(axis, margin)
 
     def get_attached_instruments(
-            self, _expected: Dict[Mount, str])\
+            self, expected: Dict[Mount, str])\
             -> Dict[Mount, Dict[str, Optional[str]]]:
         """ Find the instruments attached to our mounts.
-        :param _expected: is ignored, it is just meant to enforce
+        :param expected: is ignored, it is just meant to enforce
                           the same interface as the simulator, where
                           required instruments can be manipulated.
 
