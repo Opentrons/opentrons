@@ -20,7 +20,7 @@ from typing import Any, Dict, Union, List, Optional, Tuple
 from opentrons import types as top_types
 from opentrons.util import linal
 from .simulator import Simulator
-from opentrons.config import robot_configs
+from opentrons.config import robot_configs, pipette_config
 from .pipette import Pipette
 try:
     from .controller import Controller
@@ -287,10 +287,11 @@ class API(HardwareAPILike):
                     raise RuntimeError(
                         f'mount {mount}: instrument {req_instr} was'
                         f' requested, but no instrument is present')
-                if req_instr not in (p.config.name, model):
+                name = pipette_config.name_for_model(model)
+                if req_instr not in (name, model):
                     raise RuntimeError(f'mount {mount}: instrument'
                                        f' {req_instr} was requested'
-                                       f' but {p.config.name} is present')
+                                       f' but {name} is present')
 
             if model:
                 p = Pipette(
@@ -298,18 +299,18 @@ class API(HardwareAPILike):
                     self._config.instrument_offset[mount.name.lower()],
                     instrument_data['id'])
 
-               self._attached_instruments[mount]=p
-                home_pos=p.config.home_position
-                max_travel=p.config.max_travel
-                steps_mm=p.config.steps_per_mm
+                self._attached_instruments[mount] = p
+                home_pos = p.config.home_position
+                max_travel = p.config.max_travel
+                steps_mm = p.config.steps_per_mm
             else:
-                self._attached_instruments[mount]=None
-                home_pos=self._config.default_pipette_configs['homePosition']
-                max_travel=self._config.default_pipette_configs['maxTravel']
-                steps_mm=self._config.default_pipette_configs['stepsPerMM']
+                self._attached_instruments[mount] = None
+                home_pos = self._config.default_pipette_configs['homePosition']
+                max_travel = self._config.default_pipette_configs['maxTravel']
+                steps_mm = self._config.default_pipette_configs['stepsPerMM']
 
-            mount_axis=Axis.by_mount(mount)
-            plunger_axis=Axis.of_plunger(mount)
+            mount_axis = Axis.by_mount(mount)
+            plunger_axis = Axis.of_plunger(mount)
             self._backend._smoothie_driver.update_steps_per_mm(
                 {plunger_axis.name: steps_mm})
             self._backend._smoothie_driver.update_pipette_config(
