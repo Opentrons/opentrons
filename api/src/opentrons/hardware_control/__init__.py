@@ -292,7 +292,7 @@ class API(HardwareAPILike):
                     f'mount {mount}: instrument {req_instr} was'
                     f' requested, but no instrument is present')
 
-            if model is not None:
+            if model:
                 p = Pipette(
                     model,
                     self._config.instrument_offset[mount.name.lower()],
