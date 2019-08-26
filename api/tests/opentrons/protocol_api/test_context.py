@@ -341,6 +341,7 @@ def test_dispense(loop, get_labware_def, monkeypatch):
 
 def test_starting_tip_and_reset_tipracks(loop, get_labware_def, monkeypatch):
     ctx = papi.ProtocolContext(loop)
+    ctx.home()
 
     tr = ctx.load_labware('opentrons_96_tiprack_300ul', 1)
     tr_2 = ctx.load_labware('opentrons_96_tiprack_300ul', 2)

@@ -533,12 +533,14 @@ class Labware:
         columns: List[List[Well]] = self.columns()
 
         if starting_tip:
+            # Remove columns preceding the one with the pipette's starting tip
             drop_undefined_columns = list(
                 dropwhile(lambda x: starting_tip not in x, columns))
-            columns = [
-                list(dropwhile(lambda w: starting_tip is not w, new))
-                if index == 0 else new
-                for index, new in enumerate(drop_undefined_columns)]
+            # Remove tips preceding the starting tip in the first column
+            drop_undefined_columns[0] = list(
+                dropwhile(lambda w: starting_tip is not w,
+                          drop_undefined_columns[0]))
+            columns = drop_undefined_columns
 
         drop_leading_empties = [
             list(dropwhile(lambda x: not x.has_tip, column))
