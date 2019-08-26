@@ -82,7 +82,6 @@ class Pipette:
         we have a tip, or :py:attr:`CriticalPoint.XY_CENTER` - the specified
         critical point will be used.
         """
-
         if not self.has_tip or cp_override == CriticalPoint.NOZZLE:
             cp_type = CriticalPoint.NOZZLE
             tip_length = 0.0
