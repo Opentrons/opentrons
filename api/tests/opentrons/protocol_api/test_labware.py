@@ -372,3 +372,32 @@ def test_module_load_labware():
         mod.reset_labware()
         assert mod.labware is None
         assert mod.highest_z == old_z
+
+
+def test_tiprack_list():
+    labware_name = 'opentrons_96_tiprack_300ul'
+    labware_def = labware.get_labware_definition(labware_name)
+    tiprack = labware.Labware(labware_def,
+                              Location(Point(0, 0, 0), 'Test Slot'))
+    tiprack_2 = labware.Labware(labware_def,
+                                Location(Point(0, 0, 0), 'Test Slot'))
+
+    assert labware.select_tiprack_from_list(
+        [tiprack], 1) == (tiprack, tiprack['A1'])
+
+    assert labware.select_tiprack_from_list(
+        [tiprack], 1, tiprack.wells()[1]) == (tiprack, tiprack['B1'])
+
+    tiprack['C1'].has_tip = False
+    assert labware.select_tiprack_from_list(
+        [tiprack], 1, tiprack.wells()[2]) == (tiprack, tiprack['D1'])
+
+    tiprack['H12'].has_tip = False
+    tiprack_2['A1'].has_tip = False
+    assert labware.select_tiprack_from_list(
+        [tiprack, tiprack_2], 1, tiprack.wells()[95]) == (
+            tiprack_2, tiprack_2['B1'])
+
+    with pytest.raises(labware.OutOfTipsError):
+        labware.select_tiprack_from_list(
+            [tiprack], 1, tiprack.wells()[95])

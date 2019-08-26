@@ -19,7 +19,7 @@ from collections import defaultdict
 from enum import Enum, auto
 from hashlib import sha256
 from itertools import takewhile, dropwhile
-from typing import Any, List, Dict, Optional, Union
+from typing import Any, List, Dict, Optional, Union, Tuple
 
 from opentrons.types import Location
 from opentrons.types import Point
@@ -32,6 +32,10 @@ OPENTRONS_NAMESPACE = 'opentrons'
 CUSTOM_NAMESPACE = 'custom_beta'
 STANDARD_DEFS_PATH = Path(sys.modules['opentrons'].__file__).parent /\
     'shared_data' / 'labware' / 'definitions' / '2'
+
+
+class OutOfTipsError(Exception):
+    pass
 
 
 class WellShape(Enum):
@@ -1138,3 +1142,33 @@ def quirks_from_any_parent(
         else:
             return found
     return recursive_get_quirks(loc, [])
+
+
+def split_tipracks(tip_racks: List[Labware]) -> Tuple[Labware, List[Labware]]:
+    try:
+        rest = tip_racks[1:]
+    except IndexError:
+        rest = []
+    return tip_racks[0], rest
+
+
+def select_tiprack_from_list(
+        tip_racks: List[Labware],
+        num_channels: int,
+        starting_point: Well = None) -> Tuple[Labware, Well]:
+
+    try:
+        first, rest = split_tipracks(tip_racks)
+    except IndexError:
+        raise OutOfTipsError
+
+    if starting_point:
+        assert starting_point.parent is first
+    else:
+        starting_point = first.wells()[0]
+
+    next_tip = first.next_tip(num_channels, starting_point)
+    if next_tip:
+        return first, next_tip
+    else:
+        return select_tiprack_from_list(rest, num_channels)

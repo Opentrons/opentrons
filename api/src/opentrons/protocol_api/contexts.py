@@ -1,5 +1,6 @@
 import asyncio
 import contextlib
+import itertools
 import logging
 from typing import Any, Dict, List, Optional, Union, Tuple, Sequence
 from opentrons import types, hardware_control as hc, commands as cmds
@@ -12,7 +13,9 @@ from opentrons.hardware_control.types import CriticalPoint, Axis
 from .labware import (Well, Labware, load, get_labware_definition,
                       load_from_definition, load_module,
                       ModuleGeometry, quirks_from_any_parent,
-                      ThermocyclerGeometry)
+                      ThermocyclerGeometry, OutOfTipsError,
+                      select_tiprack_from_list)
+
 from . import geometry
 from . import transfers
 
@@ -23,10 +26,6 @@ ModuleTypes = Union[
     'MagneticModuleContext',
     'ThermocyclerContext'
 ]
-
-
-class OutOfTipsError(Exception):
-    pass
 
 
 class ProtocolContext(CommandPublisher):
@@ -1059,20 +1058,15 @@ class InstrumentContext(CommandPublisher):
 
         return self
 
-    def _select_tiprack_from_list(
-            self, tip_racks, num_channels) -> Tuple[Labware, Well]:
-        if self.starting_tip:
-            tr = self.starting_tip.parent
+    def _next_available_tip(self) -> Tuple[Labware, Well]:
+        if not self.starting_tip:
+            return select_tiprack_from_list(
+                self.tip_racks, self.channels)
         else:
-            try:
-                tr = tip_racks[0]
-            except IndexError:
-                raise OutOfTipsError
-        next_tip = tr.next_tip(num_channels, self.starting_tip)
-        if next_tip:
-            return tr, next_tip
-        else:
-            return self._select_tiprack_from_list(tip_racks[1:], num_channels)
+            to_check = list(itertools.dropwhile(
+                lambda tr: self.starting_tip.parent is not tr, self.tip_racks))
+            return select_tiprack_from_list(
+                to_check, self.channels, self.starting_tip)
 
     def pick_up_tip(  # noqa(C901)
             self, location: Union[types.Location, Well] = None,
@@ -1118,12 +1112,10 @@ class InstrumentContext(CommandPublisher):
 
         :returns: This instance
         """
-        num_channels = self.channels
-
         if location and isinstance(location, types.Location):
             if isinstance(location.labware, Labware):
                 tiprack = location.labware
-                target: Well = tiprack.next_tip(num_channels)  # type: ignore
+                target: Well = tiprack.next_tip(self.channels)  # type: ignore
                 if not target:
                     raise OutOfTipsError
             elif isinstance(location.labware, Well):
@@ -1133,8 +1125,7 @@ class InstrumentContext(CommandPublisher):
             tiprack = location.parent
             target = location
         elif not location:
-            tiprack, target = self._select_tiprack_from_list(
-                self.tip_racks, num_channels)
+            tiprack, target = self._next_available_tip()
         else:
             raise TypeError(
                 "If specified, location should be an instance of "
@@ -1154,7 +1145,7 @@ class InstrumentContext(CommandPublisher):
                         'after', self, None, instrument=self, location=target)
         self._hw_manager.hardware.set_working_volume(
             self._mount, target.max_volume)
-        tiprack.use_tips(target, num_channels)
+        tiprack.use_tips(target, self.channels)
         self._last_tip_picked_up_from = target
 
         return self
@@ -1432,8 +1423,7 @@ class InstrumentContext(CommandPublisher):
             blow_out = transfers.BlowOutStrategy.TRASH
 
         if new_tip != types.TransferTipPolicy.NEVER:
-            tr, next_tip = self._select_tiprack_from_list(
-                    self.tip_racks, self.channels)
+            tr, next_tip = self._next_available_tip()
             max_volume = min(next_tip.max_volume, self.max_volume)
         else:
             max_volume = self.hw_pipette['working_volume']

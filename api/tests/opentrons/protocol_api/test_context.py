@@ -341,23 +341,28 @@ def test_dispense(loop, get_labware_def, monkeypatch):
 
 def test_starting_tip_and_reset_tipracks(loop, get_labware_def, monkeypatch):
     ctx = papi.ProtocolContext(loop)
-    ctx.home()
 
     tr = ctx.load_labware('opentrons_96_tiprack_300ul', 1)
-    pipL = ctx.load_instrument('p300_single', Mount.LEFT, tip_racks=[tr])
-    pipR = ctx.load_instrument('p300_single', Mount.RIGHT, tip_racks=[tr])
+    tr_2 = ctx.load_labware('opentrons_96_tiprack_300ul', 2)
+    pipL = ctx.load_instrument('p300_single', Mount.LEFT,
+                               tip_racks=[tr, tr_2])
+    pipR = ctx.load_instrument('p300_single', Mount.RIGHT,
+                               tip_racks=[tr, tr_2])
 
     pipL.starting_tip = tr.wells()[2]
-    assert tr.wells()[2].has_tip
     pipL.pick_up_tip()
+    assert pipL._last_tip_picked_up_from is tr.wells()[2]
     pipL.drop_tip()
-    assert not tr.wells()[2].has_tip
 
     pipR.starting_tip = tr.wells()[2]
-    assert tr.wells()[3].has_tip
     pipR.pick_up_tip()
+    assert pipR._last_tip_picked_up_from is tr.wells()[3]
     pipR.drop_tip()
-    assert not tr.wells()[3].has_tip
+
+    tr.wells()[95].has_tip = False
+    pipL.starting_tip = tr.wells()[95]
+    pipL.pick_up_tip()
+    assert pipL._last_tip_picked_up_from is tr_2.wells()[0]
 
     pipL.reset_tipracks()
     assert tr.wells()[2].has_tip
