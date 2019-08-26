@@ -192,11 +192,26 @@ describe('robot selectors', () => {
     expect(getRunTime(state)).toEqual('00:00:00')
   })
 
+  test('getRunTime with no remoteTimeCompensation', () => {
+    const state = {
+      [NAME]: {
+        session: {
+          remoteTimeCompensation: null,
+          startTime: 40,
+          runTime: 42,
+        },
+      },
+    }
+
+    expect(getRunTime(state)).toEqual('00:00:00')
+  })
+
   test('getRunTime', () => {
     const testGetRunTime = (seconds, expected) => {
       const stateWithRunTime = {
         [NAME]: {
           session: {
+            remoteTimeCompensation: 0,
             startTime: 42,
             runTime: 42 + 1000 * seconds,
           },

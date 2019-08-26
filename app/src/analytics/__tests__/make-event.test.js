@@ -1,9 +1,15 @@
 // events map tests
 import makeEvent from '../make-event'
-import { actions as robotActions } from '../../robot'
+import {
+  actions as robotActions,
+  selectors as robotSelectors,
+} from '../../robot'
+import * as discoverySelectors from '../../discovery/selectors'
 import * as selectors from '../selectors'
 
 jest.mock('../selectors')
+jest.mock('../../robot/selectors')
+jest.mock('../../discovery/selectors')
 
 describe('analytics events map', () => {
   beforeEach(() => {
@@ -11,62 +17,56 @@ describe('analytics events map', () => {
   })
 
   test('robot:CONNECT_RESPONSE -> robotConnected event', () => {
-    const state = name => ({
-      robot: {
-        connection: {
-          connectedTo: name,
-        },
-      },
-      discovery: {
-        robotsByName: {
-          wired: [
-            {
-              name: 'wired',
-              ip: 'foo',
-              port: 123,
-              ok: true,
-              serverOk: true,
-              local: true,
-              health: {},
-              serverHealth: {},
-            },
-          ],
-          wireless: [
-            {
-              name: 'wireless',
-              ip: 'bar',
-              port: 456,
-              ok: true,
-              serverOk: true,
-              local: false,
-              health: {},
-              serverHealth: {},
-            },
-          ],
-        },
-      },
+    discoverySelectors.getConnectedRobot.mockImplementation(state => {
+      if (state === 'wired') {
+        return {
+          name: 'wired',
+          ip: 'foo',
+          port: 123,
+          ok: true,
+          serverOk: true,
+          local: true,
+          health: {},
+          serverHealth: {},
+        }
+      }
+
+      if (state === 'wireless') {
+        return {
+          name: 'wireless',
+          ip: 'bar',
+          port: 456,
+          ok: true,
+          serverOk: true,
+          local: false,
+          health: {},
+          serverHealth: {},
+        }
+      }
+
+      return null
     })
 
     const success = robotActions.connectResponse()
     const failure = robotActions.connectResponse(new Error('AH'))
 
     return Promise.all([
-      expect(makeEvent(success, state('wired'))).resolves.toEqual({
+      expect(makeEvent(success, 'wired')).resolves.toEqual({
         name: 'robotConnect',
         properties: { method: 'usb', success: true, error: '' },
       }),
 
-      expect(makeEvent(failure, state('wired'))).resolves.toEqual({
+      expect(makeEvent(failure, 'wired')).resolves.toEqual({
         name: 'robotConnect',
         properties: { method: 'usb', success: false, error: 'AH' },
       }),
 
-      expect(makeEvent(success, state('wireless'))).resolves.toEqual({
+      expect(makeEvent(success, 'wireless')).resolves.toEqual({
         name: 'robotConnect',
         properties: { method: 'wifi', success: true, error: '' },
       }),
 
-      expect(makeEvent(failure, state('wireless'))).resolves.toEqual({
+      expect(makeEvent(failure, 'wireless')).resolves.toEqual({
         name: 'robotConnect',
         properties: { method: 'wifi', success: false, error: 'AH' },
       }),
@@ -148,15 +148,10 @@ describe('analytics events map', () => {
     })
 
     test('robot:RUN_RESPONSE success -> runFinish event', () => {
-      const state = {
-        robot: {
-          session: {
-            startTime: 1000,
-            runTime: 5000,
-          },
-        },
-      }
+      const state = {}
       const action = { type: 'robot:RUN_RESPONSE', error: false }
+
+      robotSelectors.getRunSeconds.mockReturnValue(4)
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'runFinish',
@@ -165,19 +160,14 @@ describe('analytics events map', () => {
     })
 
     test('robot:RUN_RESPONSE error -> runFinish event', () => {
-      const state = {
-        robot: {
-          session: {
-            startTime: 1000,
-            runTime: 5000,
-          },
-        },
-      }
+      const state = {}
       const action = {
         type: 'robot:RUN_RESPONSE',
         error: true,
         payload: new Error('AH'),
       }
+
+      robotSelectors.getRunSeconds.mockReturnValue(4)
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'runFinish',
@@ -191,15 +181,10 @@ describe('analytics events map', () => {
     })
 
     test('robot:PAUSE -> runPause event', () => {
-      const state = {
-        robot: {
-          session: {
-            startTime: 1000,
-            runTime: 5000,
-          },
-        },
-      }
+      const state = {}
       const action = { type: 'robot:PAUSE' }
+
+      robotSelectors.getRunSeconds.mockReturnValue(4)
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'runPause',
@@ -211,15 +196,10 @@ describe('analytics events map', () => {
     })
 
     test('robot:RESUME -> runResume event', () => {
-      const state = {
-        robot: {
-          session: {
-            startTime: 1000,
-            runTime: 5000,
-          },
-        },
-      }
+      const state = {}
       const action = { type: 'robot:RESUME' }
+
+      robotSelectors.getRunSeconds.mockReturnValue(4)
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'runResume',
@@ -231,15 +211,10 @@ describe('analytics events map', () => {
     })
 
     test('robot:CANCEL-> runCancel event', () => {
-      const state = {
-        robot: {
-          session: {
-            startTime: 1000,
-            runTime: 5000,
-          },
-        },
-      }
+      const state = {}
       const action = { type: 'robot:CANCEL' }
+
+      robotSelectors.getRunSeconds.mockReturnValue(4)
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'runCancel',
