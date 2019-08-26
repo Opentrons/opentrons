@@ -16,7 +16,7 @@ import SessionHeader from '../../components/SessionHeader'
 
 import type { ContextRouter } from 'react-router'
 import type { State, Dispatch } from '../../types'
-import type { Pipette, Labware } from '../../robot'
+import type { Pipette, TiprackByMountMap } from '../../robot'
 import type { PipettesState } from '../../robot-api'
 import type { Robot } from '../../discovery'
 
@@ -24,7 +24,7 @@ type OP = ContextRouter
 
 type SP = {|
   pipettes: Array<Pipette>,
-  labware: Array<Labware>,
+  tipracksByMount: TiprackByMountMap,
   currentPipette: ?Pipette,
   actualPipettes: ?PipettesState,
   _robot: ?Robot,
@@ -48,7 +48,7 @@ export default connect<Props, OP, SP, {||}, State, Dispatch>(
 function CalibratePipettesPage(props: Props) {
   const {
     pipettes,
-    labware,
+    tipracksByMount,
     actualPipettes,
     currentPipette,
     fetchPipettes,
@@ -69,7 +69,7 @@ function CalibratePipettesPage(props: Props) {
         <Pipettes
           {...{
             pipettes,
-            labware,
+            tipracksByMount,
             currentPipette,
             actualPipettes,
             changePipetteUrl,
@@ -101,14 +101,14 @@ function mapStateToProps(state: State, ownProps: OP): SP {
   const { mount } = ownProps.match.params
   const _robot = getConnectedRobot(state)
   const pipettes = robotSelectors.getPipettes(state)
-  const labware = robotSelectors.getLabware(state)
+  const tipracksByMount = robotSelectors.getTipracksByMount(state)
   const currentPipette = pipettes.find(p => p.mount === mount)
   const actualPipettes = _robot && getPipettesState(state, _robot.name)
 
   return {
     _robot,
     pipettes,
-    labware,
+    tipracksByMount,
     actualPipettes,
     currentPipette,
   }

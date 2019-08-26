@@ -3,17 +3,17 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 import cx from 'classnames'
 
-import type { PipettesState } from '../../robot-api'
-import type { Pipette, Labware } from '../../robot'
 import { constants as robotConstants } from '../../robot'
-
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { InstrumentGroup, AlertItem } from '@opentrons/components'
 import styles from './styles.css'
 
+import type { PipettesState } from '../../robot-api'
+import type { Pipette, TiprackByMountMap } from '../../robot'
+
 type Props = {|
   pipettes: Array<Pipette>,
-  labware: Array<Labware>,
+  tipracksByMount: TiprackByMountMap,
   currentPipette: ?Pipette,
   actualPipettes: ?PipettesState,
   changePipetteUrl: string,
@@ -27,7 +27,7 @@ export default function Pipettes(props: Props) {
   const {
     currentPipette,
     pipettes,
-    labware,
+    tipracksByMount,
     actualPipettes,
     changePipetteUrl,
   } = props
@@ -35,9 +35,7 @@ export default function Pipettes(props: Props) {
 
   const infoByMount = PIPETTE_MOUNTS.reduce((result, mount) => {
     const pipette = pipettes.find(p => p.mount === mount)
-    const tiprack = labware.find(
-      lw => lw.isTiprack && lw.calibratorMount === mount
-    )
+    const tiprack = tipracksByMount[mount]
     const pipetteConfig = pipette?.modelSpecs
     const actualPipetteConfig = getPipetteModelSpecs(
       actualPipettes?.[mount]?.model || ''

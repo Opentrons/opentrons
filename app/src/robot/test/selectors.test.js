@@ -25,6 +25,7 @@ const {
   getUnconfirmedTipracks,
   getUnconfirmedLabware,
   getNextLabware,
+  getTipracksByMount,
   getModulesBySlot,
   getModules,
   getDeckPopulated,
@@ -711,6 +712,31 @@ describe('robot selectors', () => {
         calibration: 'unconfirmed',
         confirmed: false,
         definition: null,
+      })
+    })
+
+    test('getTipracksByMount', () => {
+      expect(getTipracksByMount(state)).toEqual({
+        left: {
+          slot: '2',
+          type: 'm',
+          isTiprack: true,
+          isMoving: false,
+          calibration: 'unconfirmed',
+          confirmed: false,
+          calibratorMount: 'left',
+          definition: null,
+        },
+        right: {
+          slot: '1',
+          type: 's',
+          isTiprack: true,
+          isMoving: true,
+          calibration: 'moving-to-slot',
+          confirmed: false,
+          calibratorMount: 'right',
+          definition: null,
+        },
       })
     })
   })

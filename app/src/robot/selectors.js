@@ -21,6 +21,7 @@ import type {
   LabwareType,
   SessionStatus,
   SessionModule,
+  TiprackByMountMap,
 } from './types'
 
 const calibration = (state: State) => state.robot.calibration
@@ -424,8 +425,7 @@ export const getUnconfirmedLabware = createSelector(
   labware => labware.filter(lw => lw.type && !lw.confirmed)
 )
 
-// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
-export const getTipracks = createSelector(
+export const getTipracks: State => Array<Labware> = createSelector(
   getLabware,
   labware => labware.filter(lw => lw.type && lw.isTiprack)
 )
@@ -472,3 +472,14 @@ export function getOffsetUpdateInProgress(state: State): boolean {
 
   return request.type === 'UPDATE_OFFSET' && request.inProgress
 }
+
+// return a tiprack used by the pipette on each mount for calibration processes
+export const getTipracksByMount: (
+  state: State
+) => TiprackByMountMap = createSelector(
+  getTipracks,
+  tipracks => ({
+    left: tipracks.find(tr => tr.calibratorMount === 'left') || null,
+    right: tipracks.find(tr => tr.calibratorMount === 'right') || null,
+  })
+)
