@@ -54,10 +54,6 @@ h2 {
   z-index: 999;
 }
 
-.export_button {
-  max-width: 20rem;
-}
-
 .callout {
   padding: 0 0.75rem;
   border-radius: 0.5rem;
@@ -93,12 +89,15 @@ h2 {
 
 .instructions_column,
 .diagram_column,
-.form_fields_column {
+.form_fields_column,
+.brand_column,
+.brand_id_column {
   flex-basis: 100%;
   flex-shrink: 0;
 }
 
-.diagram_column {
+.diagram_column,
+.help_text {
   display: flex;
   justify-content: center;
 }
@@ -119,7 +118,10 @@ h2 {
   }
 
   .diagram_column,
-  .form_fields_column {
+  .form_fields_column,
+  .brand_column,
+  .brand_id_column,
+  .help_text {
     flex-basis: var(--size-50p);
     flex-shrink: 1;
   }
@@ -127,6 +129,10 @@ h2 {
   .instructions_column {
     padding-right: var(--spacing-7);
     font-size: var(--fs-caption);
+  }
+
+  .brand_column {
+    padding-right: var(--spacing-8);
   }
 
   .form_fields_column {
@@ -138,13 +144,28 @@ h2 {
     max-width: var(--size-60p);
     margin: 0 auto;
   }
+
+  .help_text {
+    max-width: var(--size-50p);
+  }
 }
 
 @media (--large) {
   .instructions_column,
   .diagram_column,
-  .form_fields_column {
+  .form_fields_column,
+  .brand_column {
     flex-basis: var(--size-third);
     flex-shrink: 1;
+  }
+
+  .export_form_fields,
+  .brand_id_column {
+    flex-basis: var(--size-two-thirds);
+    flex-shrink: 1;
+  }
+
+  .help_text {
+    max-width: 90%;
   }
 }

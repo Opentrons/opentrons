@@ -5,7 +5,6 @@ import mapValues from 'lodash/mapValues'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import { AlertItem, AlertModal, PrimaryButton } from '@opentrons/components'
-import LabwareCreator from './components/LabwareCreator'
 import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
 import {
   labwareTypeOptions,
@@ -29,6 +28,7 @@ import labwareFormSchema from './labwareFormSchema'
 import { getDefaultDisplayName, getDefaultLoadName } from './formSelectors'
 import labwareTestProtocol, { pipetteNameOptions } from './labwareTestProtocol'
 import fieldsToLabware from './fieldsToLabware'
+import LabwareCreator from './components/LabwareCreator'
 import ConditionalLabwareRender from './components/ConditionalLabwareRender'
 import Dropdown from './components/Dropdown'
 import IntroCopy from './components/IntroCopy'
@@ -36,6 +36,7 @@ import LinkOut from './components/LinkOut'
 import RadioField from './components/RadioField'
 import Section from './components/Section'
 import TextField from './components/TextField'
+import ImportLabware from './components/ImportLabware'
 import styles from './styles.css'
 import type {
   LabwareFields,
@@ -55,6 +56,7 @@ type MakeAutofillOnChangeArgs = {|
   setTouched: ({ [$Keys<LabwareFields>]: boolean }) => void,
   setValues: ($Shape<LabwareFields>) => void,
 |}
+
 const makeAutofillOnChange = ({
   autofills,
   values,
@@ -409,8 +411,9 @@ const App = () => {
               </div>
               <div className={styles.upload_exisiting_section}>
                 <h2 className={styles.setup_heading}>
-                  Edit a file you’ve built with our labware creator.{' '}
+                  Edit a file you’ve built with our labware creator.
                 </h2>
+                <ImportLabware />
               </div>
             </div>
             {/* PAGE 1 - Labware */}
@@ -698,52 +701,62 @@ const App = () => {
 
             {/* PAGE 3 */}
             <Section label="Description" fieldList={['brand', 'brandId']}>
-              <TextField name="brand" />
-              <TextField name="brandId" caption="Separate multiple by comma" />
+              <div className={styles.flex_row}>
+                <div className={styles.brand_column}>
+                  <TextField name="brand" />
+                </div>
+                <div className={styles.brand_id_column}>
+                  <TextField
+                    name="brandId"
+                    caption="Separate multiple by comma"
+                  />
+                </div>
+              </div>
             </Section>
             {/* PAGE 4 */}
+
             <Section
               label="File"
               fieldList={['loadName', 'displayName', 'pipetteName']}
             >
-              <TextField
-                name="displayName"
-                placeholder={getDefaultDisplayName(values)}
-              />
-              <TextField
-                name="loadName"
-                placeholder={getDefaultLoadName(values)}
-                caption="Only lower case letters, numbers, periods, and underscores may be used"
-                inputMasks={[maskLoadName]}
-              />
-              <Dropdown
-                name="pipetteName"
-                options={pipetteNameOptions}
-                caption="Files are exported with a protocol that will use a single channel pipette to test whether a pipette can hit key points on your labware"
-              />
+              <div className={styles.flex_row}>
+                <div className={styles.instructions_column}>
+                  Your file will be exported with a protocol that will help you
+                  test and troubleshoot your labware definition on the robot.
+                  The protocol requires a Single Channel pipette on the right
+                  mount of your robot.
+                </div>
+                <div className={styles.export_form_fields}>
+                  <TextField
+                    name="displayName"
+                    placeholder={getDefaultDisplayName(values)}
+                  />
+                  <TextField
+                    name="loadName"
+                    placeholder={getDefaultLoadName(values)}
+                    caption="Only lower case letters, numbers, periods, and underscores may be used"
+                    inputMasks={[maskLoadName]}
+                  />
+                  <Dropdown
+                    name="pipetteName"
+                    options={pipetteNameOptions}
+                    caption="Files are exported with a protocol that will use a single channel pipette to test whether a pipette can hit key points on your labware"
+                  />
+
+                  <PrimaryButton
+                    className={styles.export_button}
+                    onClick={() => {
+                      if (!isValid && !showExportErrorModal) {
+                        setShowExportErrorModal(true)
+                      }
+                      handleSubmit()
+                    }}
+                  >
+                    EXPORT FILE
+                  </PrimaryButton>
+                </div>
+              </div>
             </Section>
-            <div className={styles.double_check_before_exporting}>
-              <p>DOUBLE CHECK YOUR WORK BEFORE EXPORTING!</p>
-              <p>
-                If you are not comfortable reading a JSON labware definition
-                then consider noting down the values you put in these fields.
-                You will not be able to re-import your file back into the
-                labware creator to read or edit it.
-              </p>
-            </div>
-            <div>
-              <PrimaryButton
-                className={styles.export_button}
-                onClick={() => {
-                  if (!isValid && !showExportErrorModal) {
-                    setShowExportErrorModal(true)
-                  }
-                  handleSubmit()
-                }}
-              >
-                EXPORT FILE
-              </PrimaryButton>
-            </div>
           </div>
         )}
       </Formik>
