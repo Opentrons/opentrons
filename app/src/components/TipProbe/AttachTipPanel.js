@@ -1,38 +1,47 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import CalibrationInfoContent from '../CalibrationInfoContent'
 import { PrimaryButton } from '@opentrons/components'
 
-import { actions as robotActions } from '../../robot'
+import {
+  actions as robotActions,
+  selectors as robotSelectors,
+} from '../../robot'
 import attachSingle from '../../img/attach_tip_single.png'
 import attachMulti from '../../img/attach_tip_multi.png'
 
 import type { Dispatch } from '../../types'
 import type { TipProbeProps } from './types'
 
-type OP = TipProbeProps
+type Props = TipProbeProps
 
-type DP = {| onProbeTipClick: () => void |}
+export default function AttachTipPanel(props: Props) {
+  const { mount, channels } = props
+  const dispatch = useDispatch<Dispatch>()
+  const tipracksByMount = useSelector(robotSelectors.getTipracksByMount)
+  const tiprack = tipracksByMount[mount]
+  const tiprackName =
+    tiprack?.definition?.metadata.displayName || tiprack?.name || null
 
-type Props = { ...OP, ...DP }
-
-export default connect<Props, OP, {||}, DP, _, _>(
-  null,
-  mapDispatchToProps
-)(AttachTipPanel)
-
-function AttachTipPanel(props: Props) {
-  const { volume, channels, onProbeTipClick } = props
+  // $FlowFixMe: robotActions.probeTip is not typed
+  const handleTipProbe = () => dispatch(robotActions.probeTip(mount))
 
   const leftChildren = (
     <div>
       <p>
-        Place a spare
-        <em>{` ${volume} μL `}</em>
-        tip on pipette before continuing
+        Place a spare tip
+        {tiprackName !== null && (
+          <>
+            {' from'}
+            <br />
+            <strong>{tiprackName}</strong>
+            <br />{' '}
+          </>
+        )}
+        on pipette before continuing
       </p>
-      <PrimaryButton onClick={onProbeTipClick}>
+      <PrimaryButton onClick={handleTipProbe}>
         Confirm Tip Attached
       </PrimaryButton>
     </div>
@@ -48,15 +57,4 @@ function AttachTipPanel(props: Props) {
       rightChildren={rightChildren}
     />
   )
-}
-
-function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
-  const mount = ownProps.mount
-
-  return {
-    onProbeTipClick: () => {
-      // $FlowFixMe: robotActions.probeTip is not typed
-      dispatch(robotActions.probeTip(mount))
-    },
-  }
 }

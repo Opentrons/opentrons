@@ -163,3 +163,8 @@ export type SessionUpdate = {
     handledAt: number,
   },
 }
+
+export type TiprackByMountMap = {|
+  left: Labware | null,
+  right: Labware | null,
+|}
