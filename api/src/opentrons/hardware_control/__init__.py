@@ -20,7 +20,7 @@ from typing import Any, Dict, Union, List, Optional, Tuple
 from opentrons import types as top_types
 from opentrons.util import linal
 from .simulator import Simulator
-from opentrons.config import robot_configs
+from opentrons.config import robot_configs, pipette_config
 from .pipette import Pipette
 try:
     from .controller import Controller
@@ -247,7 +247,7 @@ class API(HardwareAPILike):
             self.set_lights(button=on)
             on = not on
             now = self._loop.time()
-            await asyncio.sleep(max(0, 0.25-(now-then)))
+            await asyncio.sleep(max(0, 0.25 - (now - then)))
         self.set_lights(button=True)
 
     @_log_call
@@ -258,27 +258,47 @@ class API(HardwareAPILike):
 
     @_log_call
     async def cache_instruments(self,
-                                require: Dict[top_types.Mount, str] = None):
+                                require:
+                                Dict[top_types.Mount, str] = {}):
         """
          - Get the attached instrument on each mount and
          - Cache their pipette configs from pipette-config.json
 
-        If specified, the require element should be a dict of mounts to
-        instrument models describing the instruments expected to be present.
-        This can save a subsequent of :py:attr:`attached_instruments` and also
-        serves as the hook for the hardware simulator to decide what is
-        attached.
+        :param require: If specified, the require should be a dict
+                        of mounts to instrument identifier describing
+                        the instruments expected to be present. This
+                        identifier can be either an instrument name or
+                        the more specific instrument model string
+                        (e.g. 'p10_single' or 'p10_single_v1.3'). This can
+                        save a subsequent of :py:attr:`attached_instruments`
+                        and also serves as the hook for the hardware
+                        simulator to decide what is attached.
+        :raises RuntimeError: If an instrument is expected but not found.
+
         """
-        checked_require = require or {}
         self._log.info("Updating instrument model cache")
-        found = self._backend.get_attached_instruments(checked_require)
+        found = self._backend.get_attached_instruments(require or {})
         for mount, instrument_data in found.items():
             model = instrument_data.get('model')
-            if model is not None:
+
+            req_instr = require.get(mount, None)
+            if req_instr and not self.is_simulator_sync:
+                if not model:
+                    raise RuntimeError(
+                        f'mount {mount}: instrument {req_instr} was'
+                        f' requested, but no instrument is present')
+                name = pipette_config.name_for_model(model)
+                if req_instr not in (name, model):
+                    raise RuntimeError(f'mount {mount}: instrument'
+                                       f' {req_instr} was requested'
+                                       f' but {name} is present')
+
+            if model:
                 p = Pipette(
                     model,
                     self._config.instrument_offset[mount.name.lower()],
                     instrument_data['id'])
+
                 self._attached_instruments[mount] = p
                 home_pos = p.config.home_position
                 max_travel = p.config.max_travel
@@ -288,6 +308,7 @@ class API(HardwareAPILike):
                 home_pos = self._config.default_pipette_configs['homePosition']
                 max_travel = self._config.default_pipette_configs['maxTravel']
                 steps_mm = self._config.default_pipette_configs['stepsPerMM']
+
             mount_axis = Axis.by_mount(mount)
             plunger_axis = Axis.of_plunger(mount)
             self._backend._smoothie_driver.update_steps_per_mm(
@@ -665,6 +686,7 @@ class API(HardwareAPILike):
         else:
             offset = top_types.Point(0, 0, 0)
         cp = self._critical_point_for(mount, critical_point)
+
         target_position = OrderedDict(
             ((Axis.X, abs_position.x - offset.x - cp.x),
              (Axis.Y, abs_position.y - offset.y - cp.y),

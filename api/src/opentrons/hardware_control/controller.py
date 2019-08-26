@@ -20,6 +20,7 @@ class _Locker:
 
     There should be one instance of this per process.
     """
+
     def __init__(self, force=False):
         global _lock
 
@@ -110,17 +111,12 @@ class Controller:
             self, expected: Dict[Mount, str])\
             -> Dict[Mount, Dict[str, Optional[str]]]:
         """ Find the instruments attached to our mounts.
+        :param expected: is ignored, it is just meant to enforce
+                          the same interface as the simulator, where
+                          required instruments can be manipulated.
 
-        :param expected: A dict that may contain a mapping from mount to
-                         strings that should prefix instrument model names.
-                         When instruments are scanned, they are matched
-                         against the expectation (if present) and a
-                         :py:attr:`RuntimeError` is raised if there is no
-                         match.
-
-        :raises RuntimeError: If an instrument is expected but not found.
         :returns: A dict with mounts as the top-level keys. Each mount value is
-            a dict with keys 'mount' (containing an instrument model name or
+            a dict with keys 'model' (containing an instrument model name or
             `None`) and 'id' (containing the serial number of the pipette
             attached to that mount, or `None`).
         """
@@ -130,12 +126,6 @@ class Controller:
                 mount.name.lower())
             found_id = self._smoothie_driver.read_pipette_id(
                 mount.name.lower())
-            expected_instr = expected.get(mount, None)
-            if expected_instr and\
-               (not found_model or not found_model.startswith(expected_instr)):
-                raise RuntimeError(
-                    'mount {}: instrument {} was requested but {} is present'
-                    .format(mount.name, expected_instr, found_model))
             to_return[mount] = {
                 'model': found_model,
                 'id': found_id}
@@ -201,7 +191,7 @@ class Controller:
     @property
     def axis_bounds(self) -> Dict[str, Tuple[float, float]]:
         """ The (minimum, maximum) bounds for each axis. """
-        return {ax: (0, pos+.05) for ax, pos
+        return {ax: (0, pos + .05) for ax, pos
                 in self._smoothie_driver.homed_position.items()
                 if ax not in 'BC'}
 
