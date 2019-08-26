@@ -1,26 +1,20 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import { SidePanelGroup } from '@opentrons/components'
 import { selectors as robotSelectors } from '../../robot'
 
 const TITLE = 'Labware Calibration'
 
-type SP = {| title: string, disabled: boolean |}
+type Props = {| children: React.Node |}
 
-type OP = $Rest<$Exact<React.ElementProps<typeof SidePanelGroup>>, SP>
+export default function LabwareGroup(props: Props) {
+  const isRunning = useSelector(robotSelectors.getIsRunning)
 
-type Props = { ...OP, ...SP }
-
-export default connect<Props, OP, SP, _, _, _>(mapStateToProps)(SidePanelGroup)
-
-function mapStateToProps(state): SP {
-  const isRunning = robotSelectors.getIsRunning(state)
-  const disabled = isRunning
-
-  return {
-    title: TITLE,
-    disabled,
-  }
+  return (
+    <SidePanelGroup title={TITLE} disabled={isRunning}>
+      {props.children}
+    </SidePanelGroup>
+  )
 }

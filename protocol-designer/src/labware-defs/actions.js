@@ -112,11 +112,11 @@ export const createCustomLabwareDef = (
   }
 
   reader.onload = readEvent => {
-    const result = readEvent.currentTarget.result
+    const result = ((readEvent.currentTarget: any): FileReader).result
     let parsedLabwareDef: ?LabwareDefinition2
 
     try {
-      parsedLabwareDef = JSON.parse(result)
+      parsedLabwareDef = JSON.parse(((result: any): string))
     } catch (error) {
       console.error(error)
 
