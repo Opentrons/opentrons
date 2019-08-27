@@ -35,8 +35,14 @@ const ImportErrorModal = (props: {|
       buttons={[{ onClick: onClose, children: 'close' }]}
     >
       {ERROR_MAP[importError.key]}
-      {props.importError.message != null && (
-        <div className={styles.error_message}>{importError.message}</div>
+      {importError.messages != null && importError.messages.length > 0 && (
+        <div>
+          {importError.messages.map((message, i) => (
+            <p key={i} className={styles.error_message}>
+              {message}
+            </p>
+          ))}
+        </div>
       )}
     </AlertModal>
   )

@@ -1,10 +1,12 @@
 // @flow
+import Ajv from 'ajv'
 import * as React from 'react'
 import { Formik } from 'formik'
 import mapValues from 'lodash/mapValues'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import { AlertItem, AlertModal, PrimaryButton } from '@opentrons/components'
+import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
 import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
 import {
   labwareTypeOptions,
@@ -51,6 +53,9 @@ import type {
   ProcessedLabwareFields,
   WellShape,
 } from './fields'
+
+const ajv = new Ajv()
+const validateLabwareSchema = ajv.compile(labwareSchema)
 
 const maskTo2Decimal = makeMaskToDecimal(2)
 
@@ -330,17 +335,35 @@ const App = () => {
 
           try {
             parsedLabwareDef = JSON.parse(result)
-            // TODO IMMEDIATELY validate file with JSON Schema here
-            const fields = labwareDefToFields(parsedLabwareDef)
-            if (!fields) {
-              setImportError({ key: 'UNSUPPORTED_LABWARE_PROPERTIES' })
-            } else {
-              setLastUploaded(fields)
-            }
           } catch (error) {
             console.error(error)
-            setImportError({ key: 'INVALID_JSON_FILE', message: error.message })
+            setImportError({
+              key: 'INVALID_JSON_FILE',
+              messages: [error.message],
+            })
+            return
           }
+
+          if (!validateLabwareSchema(parsedLabwareDef)) {
+            console.warn(validateLabwareSchema.errors)
+
+            setImportError({
+              key: 'INVALID_LABWARE_DEF',
+              messages: validateLabwareSchema.errors.map(
+                ajvError =>
+                  `${ajvError.schemaPath}: ${
+                    ajvError.message
+                  }. (${JSON.stringify(ajvError.params)})`
+              ),
+            })
+            return
+          }
+          const fields = labwareDefToFields(parsedLabwareDef)
+          if (!fields) {
+            setImportError({ key: 'UNSUPPORTED_LABWARE_PROPERTIES' })
+            return
+          }
+          setLastUploaded(fields)
         }
         reader.readAsText(file)
       }

@@ -30,7 +30,7 @@ export type ImportErrorKey =
   | 'UNSUPPORTED_LABWARE_PROPERTIES'
 export type ImportError = {|
   key: ImportErrorKey,
-  message?: string,
+  messages?: Array<string>,
 |}
 
 export type Options = Array<{|

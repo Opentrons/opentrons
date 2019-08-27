@@ -61,6 +61,7 @@ h2 {
 .error_message {
   color: var(--c-red);
   font-style: italic;
+  padding: 0.5rem 0;
 }
 
 .callout {
