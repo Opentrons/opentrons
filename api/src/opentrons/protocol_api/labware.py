@@ -1174,3 +1174,10 @@ def select_tiprack_from_list(
         return first, next_tip
     else:
         return select_tiprack_from_list(rest, num_channels)
+
+
+def filter_tipracks_to_start(
+        starting_point: Well,
+        tipracks: List[Labware]) -> List[Labware]:
+    return list(dropwhile(
+        lambda tr: starting_point.parent is not tr, tipracks))

@@ -1,6 +1,5 @@
 import asyncio
 import contextlib
-import itertools
 import logging
 from typing import Any, Dict, List, Optional, Union, Tuple, Sequence
 from opentrons import types, hardware_control as hc, commands as cmds
@@ -14,7 +13,7 @@ from .labware import (Well, Labware, load, get_labware_definition,
                       load_from_definition, load_module,
                       ModuleGeometry, quirks_from_any_parent,
                       ThermocyclerGeometry, OutOfTipsError,
-                      select_tiprack_from_list)
+                      select_tiprack_from_list, filter_tipracks_to_start)
 
 from . import geometry
 from . import transfers
@@ -1059,14 +1058,14 @@ class InstrumentContext(CommandPublisher):
         return self
 
     def _next_available_tip(self) -> Tuple[Labware, Well]:
-        if not self.starting_tip:
+        start = self.starting_tip
+        if start is None:
             return select_tiprack_from_list(
                 self.tip_racks, self.channels)
         else:
-            to_check = list(itertools.dropwhile(
-                lambda tr: self.starting_tip.parent is not tr, self.tip_racks))
             return select_tiprack_from_list(
-                to_check, self.channels, self.starting_tip)
+                filter_tipracks_to_start(start, self.tip_racks),
+                self.channels, start)
 
     def pick_up_tip(  # noqa(C901)
             self, location: Union[types.Location, Well] = None,
