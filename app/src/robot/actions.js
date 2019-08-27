@@ -2,14 +2,13 @@
 // robot actions and action types
 import { _NAME as NAME } from './constants'
 
+import type { Error } from '../types'
 import type { ProtocolData } from '../protocol'
 import type { Mount, Slot, Axis, Direction, SessionUpdate } from './types'
 
 // TODO(mc, 2017-11-22): rename this function to actionType
 const makeRobotActionName = action => `${NAME}:${action}`
 const tagForRobotApi = action => ({ ...action, meta: { robotCommand: true } })
-
-type Error = { message: string }
 
 export type ConnectAction = {|
   type: 'robot:CONNECT',
@@ -99,7 +98,7 @@ export type LabwareCalibrationAction = {|
   |},
 |}
 
-export type CalibrationSuccessAction = {
+export type CalibrationSuccessAction = {|
   type:
     | 'robot:MOVE_TO_SUCCESS'
     | 'robot:JOG_SUCCESS'
@@ -112,7 +111,7 @@ export type CalibrationSuccessAction = {
     isTiprack?: boolean,
     tipOn?: boolean,
   },
-}
+|}
 
 export type CalibrationFailureAction = {|
   type:
@@ -162,10 +161,14 @@ export type CalibrationResponseAction =
   | CalibrationSuccessAction
   | CalibrationFailureAction
 
-export type SetModulesReviewedAction = {
+export type SetModulesReviewedAction = {|
   type: 'robot:SET_MODULES_REVIEWED',
   payload: boolean,
-}
+|}
+
+export type ClearCalibrationRequestAction = {|
+  type: 'robot:CLEAR_CALIBRATION_REQUEST',
+|}
 
 // TODO(mc, 2018-01-23): refactor to use type above
 //   DO NOT ADD NEW ACTIONS HERE
@@ -215,6 +218,7 @@ export type Action =
   | SessionUpdateAction
   | RefreshSessionAction
   | SetModulesReviewedAction
+  | ClearCalibrationRequestAction
 
 export const actions = {
   connect(name: string): ConnectAction {
@@ -555,5 +559,9 @@ export const actions = {
 
   tickRunTime() {
     return { type: actionTypes.TICK_RUN_TIME }
+  },
+
+  clearCalibrationRequest(): ClearCalibrationRequestAction {
+    return { type: 'robot:CLEAR_CALIBRATION_REQUEST' }
   },
 }

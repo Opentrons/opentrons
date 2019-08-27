@@ -337,7 +337,6 @@ Not every JavaScript package has an available flow-typed definition. In this cas
 
 #### Python
 
-
 ### Opentrons API
 
 Be sure to check out the [API `README`][api-readme] for additional instructions. To run the Opentrons API in development mode:
@@ -378,7 +377,7 @@ make term
 make term host=${some_other_ip_address}
 ```
 
-If  `make term` complains about not having a key, you may need to install a public key on the robot. To do this, create an ssh key and install it:
+If `make term` complains about not having a key, you may need to install a public key on the robot. To do this, create an ssh key and install it:
 
 ```shell
 ssh-keygen # note the path you save the key to
@@ -400,17 +399,17 @@ If you create the key as `~/.ssh/robot_key` and `~/.ssh/robot_key.pub` then `mak
 Our release process is still a work-in-progress. The app and API projects are currently versioned together to ensure interoperability.
 
 1. Ensure you have a buildroot release created in github with all the changes you want in this release
-2.  `git checkout -b release_${version}` (The branch name _must_ match `release_*` to trigger signed builds that can be used as RCs). `git push --set-upstream origin release_${version}` to push the branch (without any changes).
-3.  Open a PR into `master` for your branch.
-4.  `make bump` to create an alpha version (see below)
-5.  Inspect version bumps and changelogs
-6.  Edit the user-facing changelog at `app-shell/build/release-notes.md` to add the new notes for the app
-7.  Edit the user-facing changelog at `api/release-notes.md` to add the new notes for the robot software
-8.  `git add --all`
-9.  `git cz`
-    - Type: `chore`
-    - Scope: `release`
-    - Message: `${version}`
+2. `git checkout -b release_${version}` (The branch name _must_ match `release_*` to trigger signed builds that can be used as RCs). `git push --set-upstream origin release_${version}` to push the branch (without any changes).
+3. Open a PR into `master` for your branch.
+4. `make bump` to create an alpha version (see below)
+5. Inspect version bumps and changelogs
+6. Edit the user-facing changelog at `app-shell/build/release-notes.md` to add the new notes for the app
+7. Edit the user-facing changelog at `api/release-notes.md` to add the new notes for the robot software
+8. `git add --all`
+9. `git cz`
+   - Type: `chore`
+   - Scope: `release`
+   - Message: `${version}`
 10. Gather reviews on changelogs and release notes until everybody is satisfied
 11. Tag the release branch as an alpha version; this is a release candidate that will undergo qa: `git tag -a v${version} -m 'chore(release): ${version}''` and `git push origin v${version}`
 12. Run QA on this release. If issues are found, create prs targeted on the release branch. To create new alpha releases, repeat steps 4-11.
@@ -422,12 +421,12 @@ Our release process is still a work-in-progress. The app and API projects are cu
 ### Releasing Robot Software Stack Hotfixes
 
 1. Ensure you have a buildroot release created in github with all the changes you want to see
-2. Create and push a branch called `release_${version}`. 
+2. Create and push a branch called `release_${version}`.
 3. Target the hotfix PRs on this branch.
 4. On the release branch, once the fixes have been merged, `make bump` to create an appropriate alpha version (see below)
 5. Inspect version bumps and changelogs
-6.  Edit the user-facing changelog at `app-shell/build/release-notes.md` to add the new notes for the app
-7.  Edit the user-facing changelog at `api/release-notes.md` to add the new notes for the robot software
+6. Edit the user-facing changelog at `app-shell/build/release-notes.md` to add the new notes for the app
+7. Edit the user-facing changelog at `api/release-notes.md` to add the new notes for the robot software
 8. `git add --all`
 9. `git cz`
    - Type: `chore`
@@ -440,7 +439,6 @@ Our release process is still a work-in-progress. The app and API projects are cu
 14. Tag the release: `git tag -a v${version} -m 'chore(release): ${version}'` and `git push origin v${version}`
 15. Do a NORMAL MERGE into `master`. Do NOT squash or rebase. This should be done from your local command line: `git checkout master`, `git merge release_${version}`, `git push origin master`. This will succeed as long as the release PR is reviewed and status checks have passed.
 16. Open a pr of `master` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`: `git checkout edge`, `git pull`, `git merge master`. Use the pr title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the pr is approved and status checks pass.
-
 
 #### `make bump` usage
 
@@ -497,7 +495,6 @@ The following web projects are versioned and released independently from the app
 - `labware-library`
 
 See [scripts/deploy/README.md](./scripts/deploy/README.md) for the release process of these projects.
-
 
 ## Robot Environment
 
@@ -571,4 +568,3 @@ This Contributing Guide was influenced by a lot of work done on existing Contrib
 [systemd-journald]: https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html
 [journalctl]: https://www.freedesktop.org/software/systemd/man/journalctl.html
 [systemctl]: https://www.google.com/search?client=firefox-b-1-d&q=systemctl
-

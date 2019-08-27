@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import cx from 'classnames'
+
 import CalibrationInfoContent from '../CalibrationInfoContent'
 import { PrimaryButton } from '@opentrons/components'
 
@@ -10,6 +12,7 @@ import {
 } from '../../robot'
 import attachSingle from '../../img/attach_tip_single.png'
 import attachMulti from '../../img/attach_tip_multi.png'
+import styles from './tip-probe.css'
 
 import type { Dispatch } from '../../types'
 import type { TipProbeProps } from './types'
@@ -26,6 +29,7 @@ export default function AttachTipPanel(props: Props) {
 
   // $FlowFixMe: robotActions.probeTip is not typed
   const handleTipProbe = () => dispatch(robotActions.probeTip(mount))
+  const isMulti = channels > 1
 
   const leftChildren = (
     <div>
@@ -39,7 +43,8 @@ export default function AttachTipPanel(props: Props) {
             <br />{' '}
           </>
         )}
-        on pipette before continuing
+        on {isMulti ? 'the back-most channel of' : ''} the pipette before
+        continuing
       </p>
       <PrimaryButton onClick={handleTipProbe}>
         Confirm Tip Attached
@@ -47,9 +52,15 @@ export default function AttachTipPanel(props: Props) {
     </div>
   )
 
-  const imgSrc = channels === 1 ? attachSingle : attachMulti
+  const imgSrc = isMulti ? attachMulti : attachSingle
 
-  const rightChildren = <img src={imgSrc} alt="attach tip" />
+  const rightChildren = (
+    <img
+      src={imgSrc}
+      alt="attach tip"
+      className={cx(styles.pipette_diagram, styles[mount])}
+    />
+  )
 
   return (
     <CalibrationInfoContent

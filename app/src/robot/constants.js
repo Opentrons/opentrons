@@ -22,15 +22,6 @@ export const RUNNING = 'running'
 export const PAUSED = 'paused'
 export const FINISHED = 'finished'
 
-// tip probe calibration states
-// TODO(mc, 2018-01-22): remove constant exports in favor of flowtype
-//   see types.js
-export const UNPROBED = 'unprobed'
-export const PREPARING_TO_PROBE = 'preparing-to-probe'
-export const READY_TO_PROBE = 'ready-to-probe'
-export const PROBING = 'probing'
-export const PROBED = 'probed'
-
 // labware confirmation states
 // TODO(mc, 2018-01-11): remove constant exports in favor of types.js
 export const UNCONFIRMED = 'unconfirmed'
