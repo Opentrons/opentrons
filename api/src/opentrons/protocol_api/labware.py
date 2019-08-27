@@ -19,7 +19,7 @@ from collections import defaultdict
 from enum import Enum, auto
 from hashlib import sha256
 from itertools import takewhile, dropwhile
-from typing import Any, List, Dict, Optional, Union
+from typing import Any, List, Dict, Optional, Union, Tuple
 
 from opentrons.types import Location
 from opentrons.types import Point
@@ -32,6 +32,10 @@ OPENTRONS_NAMESPACE = 'opentrons'
 CUSTOM_NAMESPACE = 'custom_beta'
 STANDARD_DEFS_PATH = Path(sys.modules['opentrons'].__file__).parent /\
     'shared_data' / 'labware' / 'definitions' / '2'
+
+
+class OutOfTipsError(Exception):
+    pass
 
 
 class WellShape(Enum):
@@ -510,7 +514,9 @@ class Labware:
     def tip_length(self, length: float):
         self._parameters['tipLength'] = length + self._parameters['tipOverlap']
 
-    def next_tip(self, num_tips: int = 1) -> Optional[Well]:
+    def next_tip(self,
+                 num_tips: int = 1,
+                 starting_tip: Well = None) -> Optional[Well]:
         """
         Find the next valid well for pick-up.
 
@@ -525,6 +531,17 @@ class Labware:
         assert num_tips > 0, 'Bad call to next_tip: num_tips <= 0'
 
         columns: List[List[Well]] = self.columns()
+
+        if starting_tip:
+            # Remove columns preceding the one with the pipette's starting tip
+            drop_undefined_columns = list(
+                dropwhile(lambda x: starting_tip not in x, columns))
+            # Remove tips preceding the starting tip in the first column
+            drop_undefined_columns[0] = list(
+                dropwhile(lambda w: starting_tip is not w,
+                          drop_undefined_columns[0]))
+            columns = drop_undefined_columns
+
         drop_leading_empties = [
             list(dropwhile(lambda x: not x.has_tip, column))
             for column in columns]
@@ -646,6 +663,13 @@ class Labware:
                 raise AssertionError(f'Well {repr(well)} has a tip')
         for well in drop_targets:
             well.has_tip = True
+
+    def reset(self):
+        """Reset all tips in a tiprack
+        """
+        if self.is_tiprack:
+            for well in self.wells():
+                well.has_tip = True
 
 
 class ModuleGeometry:
@@ -1126,3 +1150,40 @@ def quirks_from_any_parent(
         else:
             return found
     return recursive_get_quirks(loc, [])
+
+
+def split_tipracks(tip_racks: List[Labware]) -> Tuple[Labware, List[Labware]]:
+    try:
+        rest = tip_racks[1:]
+    except IndexError:
+        rest = []
+    return tip_racks[0], rest
+
+
+def select_tiprack_from_list(
+        tip_racks: List[Labware],
+        num_channels: int,
+        starting_point: Well = None) -> Tuple[Labware, Well]:
+
+    try:
+        first, rest = split_tipracks(tip_racks)
+    except IndexError:
+        raise OutOfTipsError
+
+    if starting_point:
+        assert starting_point.parent is first
+    else:
+        starting_point = first.wells()[0]
+
+    next_tip = first.next_tip(num_channels, starting_point)
+    if next_tip:
+        return first, next_tip
+    else:
+        return select_tiprack_from_list(rest, num_channels)
+
+
+def filter_tipracks_to_start(
+        starting_point: Well,
+        tipracks: List[Labware]) -> List[Labware]:
+    return list(dropwhile(
+        lambda tr: starting_point.parent is not tr, tipracks))
