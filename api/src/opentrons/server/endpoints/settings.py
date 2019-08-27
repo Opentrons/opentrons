@@ -41,7 +41,7 @@ _apiv2_settings_reset_options = [
     {
         'id': 'tipProbe',
         'name': 'Instrument Offset',
-        'description': 'Clear instrument offset calibration data'
+        'description': 'Clear instrument offset calibration and tip probe data'
     },
 ] + _common_settings_reset_options
 
