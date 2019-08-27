@@ -768,6 +768,15 @@ class ThermocyclerGeometry(ModuleGeometry):
 
     @property
     def highest_z(self) -> float:
+        # TODO: BC 2019-08-27 this highest_z value represents the distance
+        # from the top of the open TC chassis to the base. Once we have a
+        # more robust collision detection system in place, the collision
+        # model for the TC should change based on it's lid_status
+        # (open or closed). A prerequisite for that check will be
+        # path-specific highest z calculations, as opposed to the current
+        # global check on instrument.move_to. For example: a move from slot 1
+        # to slot 3 should only check the highest z of all deck items between
+        # the source and destination in the x,y plane.
         return super().highest_z
 
     @property
