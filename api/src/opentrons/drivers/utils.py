@@ -1,7 +1,7 @@
 import logging
 from typing import List, Mapping, Optional
 
-from serial.tools import list_ports
+from serial.tools import list_ports  # type: ignore
 
 log = logging.getLogger(__name__)
 

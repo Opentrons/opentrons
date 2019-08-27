@@ -2,8 +2,8 @@ import asyncio
 import logging
 from typing import Any, Dict, Optional
 
-from opentrons.driver.async_serial_communication import AsyncConnection
-from opentrons.drivers.util import SerialNoResponse
+from opentrons.drivers.async_serial_communication import AsyncConnection
+from opentrons.drivers.utils import SerialNoResponse
 from opentrons.drivers.rpi_drivers import gpio
 from opentrons.system import smoothie_update
 from opentrons.config.robot_configs import robot_config
@@ -635,7 +635,7 @@ class AsyncSmoothie:
             self._handle_return(cmd_ret)
             wait_ret = await self._connection.write_and_return(
                 GCODES['WAIT'] + SMOOTHIE_COMMAND_TERMINATOR,
-                SMOOTHIE_ACK, self._connection, timeout=12000)
+                SMOOTHIE_ACK, timeout=12000)
             wait_ret = remove_unwanted_characters(
                 GCODES['WAIT'], wait_ret)
             self._handle_return(wait_ret)
@@ -904,7 +904,7 @@ class AsyncSmoothie:
             1) Smoothieware boots or resets, 2) if a HALT gcode or signal
             is sent, or 3) a homing/limitswitch error occured.
         '''
-        from numpy import isclose
+        from numpy import isclose  # type: ignore
 
         await self.run_flag.wait()
 

@@ -2,7 +2,7 @@ import asyncio
 import logging
 from typing import Optional
 
-import async_serial
+import async_serial  # type: ignore
 
 from .utils import get_ports_by_name, parse_serial_response, SerialNoResponse
 

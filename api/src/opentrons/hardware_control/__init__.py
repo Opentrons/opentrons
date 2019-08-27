@@ -277,7 +277,7 @@ class API(HardwareAPILike):
 
         """
         self._log.info("Updating instrument model cache")
-        found = await self._backend.get_attached_instruments(checked_require)
+        found = await self._backend.get_attached_instruments(require)
         for mount, instrument_data in found.items():
             model = instrument_data.get('model')
 

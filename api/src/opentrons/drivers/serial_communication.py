@@ -1,12 +1,7 @@
-<<<<<<< HEAD
-import serial  # type: ignore
-from serial.tools import list_ports  # type: ignore
-=======
->>>>>>> refactor(api): Pull shared funcs and constants out of smoothie
 import contextlib
 import logging
 
-import serial
+import serial  # type: ignore
 from .utils import parse_serial_response, SerialNoResponse, get_ports_by_name
 
 log = logging.getLogger(__name__)
