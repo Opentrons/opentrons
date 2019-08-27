@@ -2003,7 +2003,6 @@ class ThermocyclerContext(ModuleContext):
         """ Opens the lid"""
         self._prepare_for_lid_move()
         self._geometry.lid_status = self._module.open()
-        self._ctx.deck.recalculate_high_z()
         return self._geometry.lid_status
 
     @cmds.publish.both(command=cmds.thermocycler_close)
@@ -2011,7 +2010,6 @@ class ThermocyclerContext(ModuleContext):
         """ Closes the lid"""
         self._prepare_for_lid_move()
         self._geometry.lid_status = self._module.close()
-        self._ctx.deck.recalculate_high_z()
         return self._geometry.lid_status
 
     @cmds.publish.both(command=cmds.thermocycler_set_temp)
