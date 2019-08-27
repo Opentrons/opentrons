@@ -768,10 +768,7 @@ class ThermocyclerGeometry(ModuleGeometry):
 
     @property
     def highest_z(self) -> float:
-        if self.lid_status == 'closed':
-            return super().highest_z + self._lid_height
-        else:
-            return super().highest_z
+        return super().highest_z
 
     @property
     def lid_status(self) -> str:
