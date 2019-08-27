@@ -408,10 +408,19 @@ const App = () => {
                           options={aluminumBlockChildTypeOptions}
                         />
                       )}
-                    {/* TODO (ka 2019-8-27): Add better logic for disabling */}
+                    {/* TODO (ka 2019-8-27): Move this to LabwareFormSchema */}
                     <PrimaryButton
                       className={styles.start_creating_btn}
-                      disabled={!values.labwareType}
+                      disabled={
+                        !values.labwareType ||
+                        (values.labwareType === 'tubeRack' &&
+                          !values.tubeRackInsertLoadName) ||
+                        (values.labwareType === 'aluminumBlock' &&
+                          !values.aluminumBlockType) ||
+                        (values.labwareType === 'aluminumBlock' &&
+                          values.aluminumBlockType === '96well' &&
+                          !values.aluminumBlockChildType)
+                      }
                       onClick={() => setShowCreatorForm(true)}
                     >
                       start creating labware
