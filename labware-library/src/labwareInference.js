@@ -57,6 +57,7 @@ function getIfConsistent<T>(items: Array<T>): T | null {
   return uniqWith(items, isEqual).length === 1 ? items[0] : null
 }
 
+// TODO IMMEDIATELY write test
 export function getSpacing(
   wells: Array<LabwareWell>,
   axis: 'x' | 'y'

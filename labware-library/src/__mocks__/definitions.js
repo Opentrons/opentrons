@@ -28,6 +28,22 @@ export const getAllLoadNames = jest.fn<Array<void>, Array<string>>(
   () => allLoadNames
 )
 
+const allDisplayNames = uniq(
+  glob
+    .sync(LABWARE_FIXTURE_PATTERN)
+    .map(require)
+    .map(def => def.metadata.displayName)
+)
+
+assert(
+  allDisplayNames.length > 0,
+  `no labware displayNames found, something broke. ${LABWARE_FIXTURE_PATTERN}`
+)
+
+export const getAllDisplayNames = jest.fn<Array<void>, Array<string>>(
+  () => allDisplayNames
+)
+
 const allLabware = glob
   .sync(LABWARE_FIXTURE_PATTERN)
   .map(require)

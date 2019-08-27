@@ -16,6 +16,7 @@ export default function fieldsToLabware(
   // NOTE Ian 2019-07-27: only the 15-50-esque tube rack has multiple grids,
   // and it is not supported in labware creator. So all are regular.
   const isRegularLabware = true
+  const { displayName } = fields
   const displayCategory = fields.labwareType
 
   if (isRegularLabware) {
@@ -60,12 +61,19 @@ export default function fieldsToLabware(
       // format = 'trough' // Uncomment to break test protocol but allow multichannel use in APIv1
     }
 
+    const brand = {
+      brand: fields.brand,
+      brandId: fields.brandId,
+      //   links: []
+    }
+
     const def = createRegularLabware({
       strict: false,
       metadata: {
-        displayName: fields.displayName,
+        displayName,
         displayCategory,
         displayVolumeUnits: DISPLAY_VOLUME_UNITS,
+        tags: [], // specifying tags is not yet supported
       },
       parameters: {
         format,
@@ -83,11 +91,7 @@ export default function fieldsToLabware(
         yDimension: fields.footprintYDimension,
         zDimension: fields.labwareZDimension,
       },
-      brand: {
-        brand: fields.brand,
-        brandId: fields.brandId,
-        //   links: []
-      },
+      brand,
       version: 1,
       offset: {
         x: fields.gridOffsetX,
@@ -106,6 +110,14 @@ export default function fieldsToLabware(
         row: fields.gridSpacingY,
       },
       well: wellProperties,
+      group: {
+        metadata: {
+          displayName,
+          displayCategory,
+          wellBottomShape: fields.wellBottomShape,
+        },
+        brand,
+      },
     })
 
     // overwrite loadName from createRegularLabware with ours

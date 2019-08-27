@@ -562,7 +562,13 @@ Object {
         },
         "groups": Array [
           Object {
+            "brand": Object {
+              "brand": "generic",
+              "brandId": Array [],
+            },
             "metadata": Object {
+              "displayCategory": "wellPlate",
+              "displayName": "ANSI 96 Standard Microplate",
               "wellBottomShape": "flat",
             },
             "wells": Array [
@@ -1695,7 +1701,13 @@ Object {
         },
         "groups": Array [
           Object {
+            "brand": Object {
+              "brand": "generic",
+              "brandId": Array [],
+            },
             "metadata": Object {
+              "displayCategory": "wellPlate",
+              "displayName": "ANSI 96 Standard Microplate",
               "wellBottomShape": "flat",
             },
             "wells": Array [
@@ -6300,7 +6312,15 @@ Object {
         },
         "groups": Array [
           Object {
+            "brand": Object {
+              "brand": "USA Scientific",
+              "brandId": Array [
+                "1061-8150",
+              ],
+            },
             "metadata": Object {
+              "displayCategory": "reservoir",
+              "displayName": "12 Channel Trough",
               "wellBottomShape": "v",
             },
             "wells": Array [

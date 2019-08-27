@@ -1,0 +1,34 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`labwareDefToFields fixture_12_trough 1`] = `
+Object {
+  "aluminumBlockChildType": null,
+  "aluminumBlockType": null,
+  "brand": "USA Scientific",
+  "brandId": "1061-8150",
+  "displayName": "12 Channel Trough",
+  "footprintXDimension": "127.76",
+  "footprintYDimension": "85.8",
+  "gridColumns": "12",
+  "gridOffsetX": "13.94",
+  "gridOffsetY": "42.9",
+  "gridRows": "1",
+  "gridSpacingX": "9.09",
+  "gridSpacingY": null,
+  "homogeneousWells": "true",
+  "labwareType": null,
+  "labwareZDimension": "44.45",
+  "loadName": "fixture_12_trough",
+  "pipetteName": null,
+  "regularColumnSpacing": "true",
+  "regularRowSpacing": "true",
+  "tubeRackInsertLoadName": null,
+  "wellBottomShape": "v",
+  "wellDepth": "42.16",
+  "wellDiameter": null,
+  "wellShape": "rectangular",
+  "wellVolume": "22000",
+  "wellXDimension": "8.33",
+  "wellYDimension": "71.88",
+}
+`;

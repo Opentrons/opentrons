@@ -1,4 +1,8 @@
 // @flow
+import flatten from 'lodash/flatten'
+import isEqual from 'lodash/isEqual'
+import round from 'lodash/round'
+import omit from 'lodash/omit'
 import { getSpacing } from '../labwareInference'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareFields, BooleanString } from './fields'
@@ -10,22 +14,35 @@ const boolToBoolString = (b: boolean): BooleanString => (b ? 'true' : 'false') /
 export default function labwareDefToFields(
   def: LabwareDefinition2
 ): ?LabwareFields {
-  // TODO IMMEDIATELY: use fns from labware-library/definitions.js ???
-  const homogeneousWells = true
-  const regularRowSpacing = true
-  const regularColumnSpacing = true
+  const groups = def.groups || []
+  const allWells = flatten(def.ordering).map(wellName => def.wells[wellName])
+  // single well we'll use to represent the entire labware if homogeneousWell is true
+  const commonWell = def.wells.A1
+
+  const wellDimKeys = ['x', 'y', 'z']
+  const commonWellNoDims = omit(commonWell, wellDimKeys)
+  const homogeneousWells = allWells.every(well =>
+    isEqual(omit(well, wellDimKeys), commonWellNoDims)
+  )
+
+  // don't bother trying to infer row/col regularity, assume `groups` is correct. If `groups` is missing, assume irregular
+  const gridSpacingX = getSpacing(allWells, 'x')
+  const gridSpacingY = getSpacing(allWells, 'y')
+  const regularColumnSpacing = gridSpacingX !== null
+  const regularRowSpacing = gridSpacingY !== null
 
   if (!homogeneousWells || !regularRowSpacing || !regularColumnSpacing) {
     // TODO IMMEDIATELY: somehow handle uploading "irregular" (multi-grid) labware, error messaging
+    console.warn('TODO! unhandled labware def', {
+      homogeneousWells,
+      regularColumnSpacing,
+      regularRowSpacing,
+    })
     return null
   }
 
-  // single well to use to represent the grid
-  const well = def.wells.A1
-  const allWells = Object.keys(def.wells).map(wellName => def.wells[wellName])
-
-  const gridSpacingX = getSpacing(allWells, 'x')
-  const gridSpacingY = getSpacing(allWells, 'y')
+  // use first group, if it exists
+  const group = groups[0] || null
 
   const gridRowsNum = def.ordering[0].length
   const gridColumnsNum = def.ordering.length
@@ -45,33 +62,35 @@ export default function labwareDefToFields(
     gridRows: gridRowsNum > 0 ? String(gridRowsNum) : null,
     gridColumns: gridColumnsNum > 0 ? String(gridColumnsNum) : null,
     gridSpacingX:
-      gridSpacingX == null || gridSpacingX <= 0 ? null : String(gridSpacingX),
+      gridSpacingX == null || gridSpacingX === 0 ? null : String(gridSpacingX),
     gridSpacingY:
-      gridSpacingY == null || gridSpacingY <= 0 ? null : String(gridSpacingY),
+      gridSpacingY == null || gridSpacingY === 0 ? null : String(gridSpacingY),
 
-    gridOffsetX: String(well.x),
-    gridOffsetY: String(well.y),
+    gridOffsetX: String(commonWell.x),
+    // y offset is dist btw labware 'top' (furthest in y) and first well y
+    gridOffsetY: String(round(def.dimensions.yDimension - commonWell.y, 2)),
 
     homogeneousWells: boolToBoolString(homogeneousWells),
     regularRowSpacing: boolToBoolString(regularRowSpacing),
     regularColumnSpacing: boolToBoolString(regularColumnSpacing),
 
-    wellVolume: String(well.totalLiquidVolume),
-    wellBottomShape: null, // TODO IMMEDIATELY how does LL infer this?
-    wellDepth: String(well.depth),
-    wellShape: well.shape,
+    wellVolume: String(commonWell.totalLiquidVolume),
+    wellBottomShape: group?.metadata?.wellBottomShape || null,
+    wellDepth: String(commonWell.depth),
+    wellShape: commonWell.shape,
 
     // used with circular well shape only
-    wellDiameter: well.shape === 'circular' ? String(well.diameter) : null,
+    wellDiameter:
+      commonWell.shape === 'circular' ? String(commonWell.diameter) : null,
 
     // used with rectangular well shape only
     wellXDimension:
-      well.shape === 'rectangular' ? String(well.xDimension) : null,
+      commonWell.shape === 'rectangular' ? String(commonWell.xDimension) : null,
     wellYDimension:
-      well.shape === 'rectangular' ? String(well.yDimension) : null,
+      commonWell.shape === 'rectangular' ? String(commonWell.yDimension) : null,
 
     brand: def.brand.brand,
-    brandId: (def.brand.brandId || []).join(','), // comma-separated values
+    brandId: def.brand.brandId ? def.brand.brandId.join(',') : null, // comma-separated values
 
     loadName: def.parameters.loadName,
     displayName: def.metadata.displayName,

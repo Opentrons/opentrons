@@ -1,13 +1,14 @@
 // @flow
 import labwareDefToFields from '../labwareDefToFields'
-import fixtureRegularExample1 from '@opentrons/shared-data/labware/fixtures/2/fixture_regular_example_1'
+import fixture96Plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
+import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough'
 import fixtureIrregularExample1 from '@opentrons/shared-data/labware/fixtures/2/fixture_irregular_example_1'
 
 jest.mock('../../definitions')
 
 describe('labwareDefToFields', () => {
-  test('fixture_regular_example_1', () => {
-    const def = fixtureRegularExample1
+  test('fixture_96_plate', () => {
+    const def = fixture96Plate
     const result = labwareDefToFields(def)
     expect(result).toEqual({
       labwareType: null,
@@ -19,30 +20,30 @@ describe('labwareDefToFields', () => {
       footprintYDimension: String(def.dimensions.yDimension),
       labwareZDimension: String(def.dimensions.zDimension),
 
-      gridRows: '1',
-      gridColumns: '2',
-      gridSpacingX: '10',
-      gridSpacingY: null, // only single row, no Y spacing
-      gridOffsetX: '10',
-      gridOffsetY: '75.48',
+      gridRows: '8',
+      gridColumns: '12',
+      gridSpacingX: '9',
+      gridSpacingY: '9',
+      gridOffsetX: String(def.wells.A1.x),
+      gridOffsetY: '11.24',
 
       homogeneousWells: 'true',
       regularRowSpacing: 'true',
       regularColumnSpacing: 'true',
 
-      wellVolume: '100',
-      wellBottomShape: null, // TODO IMMEDIATELY: rethink this field?
-      wellDepth: '40',
+      wellVolume: '380',
+      wellBottomShape: 'flat',
+      wellDepth: '10.54',
       wellShape: 'circular',
 
-      wellDiameter: '30',
+      wellDiameter: String(def.wells.A1.diameter),
 
       // used with rectangular well shape only
       wellXDimension: null,
       wellYDimension: null,
 
-      brand: 'opentrons',
-      brandId: 't40u9sernisofsea',
+      brand: 'generic',
+      brandId: null,
 
       loadName: def.parameters.loadName,
       displayName: def.metadata.displayName,
@@ -51,7 +52,17 @@ describe('labwareDefToFields', () => {
     })
   })
 
-  test('fixture_irregular_example_1 should return null (not yet supported)', () => {
+  test('fixture_12_trough', () => {
+    // make sure rectangular wells + single row works as expected
+    const def = fixture12Trough
+    const result = labwareDefToFields(def)
+
+    expect(result.gridSpacingY).toBe(null) // single row -> null Y-spacing
+    expect(result.wellDiameter).toBe(null)
+    expect(result).toMatchSnapshot()
+  })
+
+  test('fixture_irregular_example_1 should return null (until multi-grid labware is supported in LC)', () => {
     const def = fixtureIrregularExample1
     const result = labwareDefToFields(def)
     expect(result).toEqual(null)

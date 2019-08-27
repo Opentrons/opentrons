@@ -1003,7 +1003,13 @@
         "H12"
       ],
       "metadata": {
+        "displayCategory": "wellPlate",
+        "displayName": "ANSI 96 Standard Microplate",
         "wellBottomShape": "flat"
+      },
+      "brand": {
+        "brand": "generic",
+        "brandId": []
       }
     }
   ],
