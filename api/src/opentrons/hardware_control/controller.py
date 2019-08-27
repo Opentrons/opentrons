@@ -1,7 +1,6 @@
 import asyncio
 from contextlib import contextmanager
-import fcntl
-import threading
+import logging
 from typing import Any, Dict, List, Optional, Tuple
 
 from opentrons.drivers.smoothie_drivers import driver_3_0
@@ -11,75 +10,28 @@ from opentrons.types import Mount
 
 from . import modules
 
-_lock = threading.Lock()
 
-
-class _Locker:
-    """ A class that combines a threading.Lock and a file lock to ensure
-    controllers are unique both between processes and within a process.
-
-    There should be one instance of this per process.
-    """
-
-    def __init__(self, force=False):
-        global _lock
-
-        self._thread_lock_acquired = _lock.acquire(blocking=False)
-        self._file_lock_acquired = self._try_acquire_file_lock()
-        if not (self._thread_lock_acquired and self._file_lock_acquired):
-            raise RuntimeError(
-                'Only one hardware controller may be instantiated')
-
-    def _try_acquire_file_lock(self):
-        self._file = open(
-            opentrons.config.CONFIG['hardware_controller_lockfile'],
-            'w')
-        try:
-            fcntl.lockf(self._file, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except OSError:
-            return False
-        else:
-            return True
-
-    def __del__(self):
-        global _lock
-        if self._file_lock_acquired:
-            fcntl.lockf(self._file, fcntl.LOCK_UN)
-        if self._thread_lock_acquired:
-            _lock.release()
+MODULE_LOG = logging.getLogger(__name__)
 
 
 class Controller:
     """ The concrete instance of the controller for actually controlling
     hardware.
-
-    This class may only be instantiated on a robot, and only one instance
-    may be active at any time.
     """
 
-    def __init__(self, config, loop, force=False):
+    def __init__(self, config):
         """ Build a Controller instance.
 
         If another controller is already instantiated on the system (or if
         this is instantiated somewhere other than a robot) then this method
         will raise a RuntimeError.
-
-        If `force` is specified as `True`, delete the lockfile and connect
-        anyway. This is intended specifically for the purpose of fixing an
-        issue where the update server connects to get the smoothie firmware
-        version but does not disconnect. It should only be specified true
-        by the opentrons main server process.
         """
         if not opentrons.config.IS_ROBOT:
-            raise RuntimeError('{} may only be instantiated on a robot'
-                               .format(self.__class__.__name__))
-        try:
-            self._lock = _Locker()
-        except RuntimeError:
-            if force:
-                self._lock = None
-            else:
-                raise
+            MODULE_LOG.warning(
+                'This is intended to run on a robot, and while it can connect '
+                'to a smoothie via a usb/serial adapter unexpected things '
+                'using gpios (such as smoothie reset or light management) '
+                'will fail')
 
         self.config = config or opentrons.config.robot_configs.load()
         # We handle our own locks in the hardware controller thank you

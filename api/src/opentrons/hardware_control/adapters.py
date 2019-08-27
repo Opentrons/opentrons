@@ -168,17 +168,13 @@ class SingletonAdapter(HardwareAPILike):
     def __getattr__(self, attr_name):
         return getattr(self._api, attr_name)
 
-    def connect(self, port: str = None, force: bool = False):
+    def connect(self, port: str = None):
         """ Connect to hardware.
 
         :param port: The port to connect to. May be `None`, in which case the
                      hardware will connect to the first serial port it sees
                      with the device name `FT232R`; or port name compatible
                      with `serial.Serial<https://pythonhosted.org/pyserial/pyserial_api.html#serial.Serial.__init__>`_.  # noqa(E501)
-        :param force: If `True`, connect even if a lockfile is established. See
-                      :py:meth:`.controller.Controller.__init__`. This should
-                      only ever be specified as `True` by the main software
-                      starting.
         """
         old_api = object.__getattribute__(self, '_api')
         loop = old_api._loop
@@ -186,8 +182,7 @@ class SingletonAdapter(HardwareAPILike):
         new_api = loop.run_until_complete(API.build_hardware_controller(
             loop=loop,
             port=port,
-            config=copy.copy(config),
-            force=force))
+            config=copy.copy(config)))
         old_api._loop.run_until_complete(new_api.cache_instruments())
         setattr(self, '_api', new_api)
 

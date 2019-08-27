@@ -82,10 +82,7 @@ async def _do_fw_update(new_fw_path, new_fw_ver):
 def initialize_robot(loop):
     packed_smoothie_fw_file, packed_smoothie_fw_ver = _find_smoothie_file()
     try:
-        if ff.use_protocol_api_v2():
-            hardware.connect(force=True)
-        else:
-            hardware.connect()
+        hardware.connect()
     except Exception as e:
         # The most common reason for this exception (aside from hardware
         # failures such as a disconnected smoothie) is that the smoothie
@@ -105,10 +102,7 @@ def initialize_robot(loop):
                  .format(fw_version, packed_smoothie_fw_ver))
         loop.run_until_complete(
             _do_fw_update(packed_smoothie_fw_file, packed_smoothie_fw_ver))
-        if ff.use_protocol_api_v2():
-            hardware.connect(force=True)
-        else:
-            hardware.connect()
+        hardware.connect()
     else:
         log.info("FW version OK: {}".format(packed_smoothie_fw_ver))
     log.info(f"Name: {name()}")

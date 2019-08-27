@@ -114,8 +114,7 @@ class API(HardwareAPILike):
     async def build_hardware_controller(
             cls, config: robot_configs.robot_config = None,
             port: str = None,
-            loop: asyncio.AbstractEventLoop = None,
-            force: bool = False) -> 'API':
+            loop: asyncio.AbstractEventLoop = None) -> 'API':
         """ Build a hardware controller that will actually talk to hardware.
 
         This method should not be used outside of a real robot, and on a
@@ -127,14 +126,12 @@ class API(HardwareAPILike):
                      (found by scanning for connected FT232Rs).
         :param loop: An event loop to use. If not specified, use the result of
                      :py:meth:`asyncio.get_event_loop`.
-        :param force: If `True`, connect even if a lockfile is present. See
-                      :py:meth:`Controller.__init__`.
         """
         if None is Controller:
             raise RuntimeError(
                 'The hardware controller may only be instantiated on a robot')
         checked_loop = loop or asyncio.get_event_loop()
-        backend = Controller(config, checked_loop, force=force)
+        backend = Controller(config)
         await backend.connect(port)
         return cls(backend, config=config, loop=checked_loop)
 
