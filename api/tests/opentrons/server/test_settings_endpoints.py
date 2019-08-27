@@ -106,18 +106,20 @@ async def test_available_resets(async_client, async_server):
                     'name': 'Boot Scripts',
                     'description': 'Clear custom boot scripts'}]
     else:
-        options = [{'id': 'customLabware',
-                    'name': 'Custom Labware',
-                    'description': 'Clear custom labware definitions'},
-                   {'id': 'tipProbe',
-                    'name': 'Instrument Offset',
-                    'description': 'Clear instrument offset calibration data'},
-                   {'id': 'labwareCalibration',
-                    'name': 'Labware Calibration',
-                    'description': 'Clear labware calibration'},
-                   {'id': 'bootScripts',
-                    'name': 'Boot Scripts',
-                    'description': 'Clear custom boot scripts'}]
+        options = [
+            {'id': 'customLabware',
+             'name': 'Custom Labware',
+             'description': 'Clear custom labware definitions'},
+            {'id': 'tipProbe',
+             'name': 'Instrument Offset',
+             'description':
+             'Clear instrument offset calibration and tip probe data'},
+            {'id': 'labwareCalibration',
+             'name': 'Labware Calibration',
+             'description': 'Clear labware calibration'},
+            {'id': 'bootScripts',
+             'name': 'Boot Scripts',
+             'description': 'Clear custom boot scripts'}]
     assert sorted(options_list, key=lambda el: el['id'])\
         == sorted(options, key=lambda el: el['id'])
 
