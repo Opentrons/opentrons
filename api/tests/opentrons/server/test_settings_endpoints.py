@@ -90,22 +90,36 @@ async def test_set(virtual_smoothie_env, loop, test_client):
     assert test_setting.get('value')
 
 
-async def test_available_resets(virtual_smoothie_env, loop, test_client):
-    app = init(loop)
-    cli = await loop.create_task(test_client(app))
-
-    resp = await cli.get('/settings/reset/options')
+async def test_available_resets(async_client, async_server):
+    resp = await async_client.get('/settings/reset/options')
     body = await resp.json()
     options_list = body.get('options')
     assert resp.status == 200
-    for key in ['tipProbe', 'labwareCalibration', 'bootScripts']:
-        for opt in options_list:
-            if opt['id'] == key:
-                assert 'name' in opt
-                assert 'description' in opt
-                break
-        else:
-            raise KeyError(key)
+    if async_server['api_version'] == 1:
+        options = [{'id': 'tipProbe',
+                    'name': 'Tip Length',
+                    'description': 'Clear tip probe data'},
+                   {'id': 'labwareCalibration',
+                    'name': 'Labware Calibration',
+                    'description': 'Clear labware calibration'},
+                   {'id': 'bootScripts',
+                    'name': 'Boot Scripts',
+                    'description': 'Clear custom boot scripts'}]
+    else:
+        options = [{'id': 'customLabware',
+                    'name': 'Custom Labware',
+                    'description': 'Clear custom labware definitions'},
+                   {'id': 'tipProbe',
+                    'name': 'Instrument Offset',
+                    'description': 'Clear instrument offset calibration data'},
+                   {'id': 'labwareCalibration',
+                    'name': 'Labware Calibration',
+                    'description': 'Clear labware calibration'},
+                   {'id': 'bootScripts',
+                    'name': 'Boot Scripts',
+                    'description': 'Clear custom boot scripts'}]
+    assert sorted(options_list, key=lambda el: el['id'])\
+        == sorted(options, key=lambda el: el['id'])
 
 
 async def execute_reset_tests_v1(cli):

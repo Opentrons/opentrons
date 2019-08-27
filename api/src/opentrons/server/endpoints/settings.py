@@ -2,7 +2,7 @@ from json import JSONDecodeError
 import logging
 import os
 import shutil
-from typing import Dict, Tuple
+from typing import Dict, List, Tuple
 from aiohttp import web
 from opentrons.config import (advanced_settings as advs,
                               robot_configs as rc,
@@ -19,19 +19,7 @@ if ARCHITECTURE == SystemArchitecture.BUILDROOT:
 
 log = logging.getLogger(__name__)
 
-_apiv2_settings_reset_options = [{
-        'id': 'customLabware',
-        'name': 'Custom Labware',
-        'description': 'Clear custom labware definitions'
-    }]
-
-
-_settings_reset_options = [
-    {
-        'id': 'tipProbe',
-        'name': 'Instrument Offset',
-        'description': 'Clear instrument offset calibration data'
-    },
+_common_settings_reset_options = [
     {
         'id': 'labwareCalibration',
         'name': 'Labware Calibration',
@@ -41,8 +29,36 @@ _settings_reset_options = [
         'id': 'bootScripts',
         'name': 'Boot Scripts',
         'description': 'Clear custom boot scripts'
-    }
+    },
 ]
+
+_apiv2_settings_reset_options = [
+    {
+        'id': 'customLabware',
+        'name': 'Custom Labware',
+        'description': 'Clear custom labware definitions'
+    },
+    {
+        'id': 'tipProbe',
+        'name': 'Instrument Offset',
+        'description': 'Clear instrument offset calibration data'
+    },
+] + _common_settings_reset_options
+
+_apiv1_settings_reset_options = [
+    {
+        'id': 'tipProbe',
+        'name': 'Tip Length',
+        'description': 'Clear tip probe data'
+    },
+] + _common_settings_reset_options
+
+
+def reset_options() -> List[Dict[str, str]]:
+    if ff.use_protocol_api_v2():
+        return _apiv2_settings_reset_options
+    else:
+        return _apiv1_settings_reset_options
 
 
 async def get_advanced_settings(request: web.Request) -> web.Response:
@@ -94,14 +110,10 @@ async def set_advanced_setting(request: web.Request) -> web.Response:
 
 
 def _check_reset(reset_req: Dict[str, str]) -> Tuple[bool, str]:
-
-    if ff.use_protocol_api_v2():
-        to_use = _settings_reset_options + _apiv2_settings_reset_options
-    else:
-        to_use = _settings_reset_options
+    opts = reset_options()
     for requested_reset in reset_req.keys():
         if requested_reset not in [opt['id']
-                                   for opt in to_use]:
+                                   for opt in opts]:
             log.error('Bad reset option {} requested'.format(requested_reset))
             return (False, requested_reset)
     return (True, '')
@@ -146,11 +158,7 @@ async def reset(request: web.Request) -> web.Response:  # noqa(C901)
 async def available_resets(request: web.Request) -> web.Response:
     """ Indicate what parts of the user configuration are available for reset.
     """
-    if ff.use_protocol_api_v2():
-        to_use = _settings_reset_options + _apiv2_settings_reset_options
-    else:
-        to_use = _settings_reset_options
-    return web.json_response({'options': to_use}, status=200)
+    return web.json_response({'options': reset_options()}, status=200)
 
 
 async def pipette_settings(request: web.Request) -> web.Response:
