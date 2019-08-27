@@ -75,7 +75,7 @@ export default function labwareDefToFields(
     regularColumnSpacing: boolToBoolString(regularColumnSpacing),
 
     wellVolume: String(commonWell.totalLiquidVolume),
-    wellBottomShape: group?.metadata?.wellBottomShape || null,
+    wellBottomShape: group?.metadata.wellBottomShape || null,
     wellDepth: String(commonWell.depth),
     wellShape: commonWell.shape,
 

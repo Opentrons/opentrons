@@ -1,4 +1,6 @@
 // @flow
+import type { WellBottomShape } from '@opentrons/shared-data'
+
 export const MAX_X_DIMENSION = 129
 export const MIN_X_DIMENSION = 127
 export const SUGGESTED_X = 127.76
@@ -45,10 +47,9 @@ export const wellShapeOptions: Options = [
   { name: 'Rectangular', value: 'rectangular' },
 ]
 
-export type WellBottomShape = 'flat' | 'round' | 'v'
 export const wellBottomShapeOptions: Options = [
   { name: 'Flat', value: 'flat' },
-  { name: 'Round', value: 'round' },
+  { name: 'Round', value: 'u' },
   { name: 'V-Bottom', value: 'v' },
 ]
 

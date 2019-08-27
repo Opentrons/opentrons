@@ -38,12 +38,12 @@ import Section from './components/Section'
 import TextField from './components/TextField'
 import ImportLabware from './components/ImportLabware'
 import styles from './styles.css'
+import type { WellBottomShape } from '@opentrons/shared-data'
 import type {
   LabwareFields,
   LabwareType,
   ProcessedLabwareFields,
   WellShape,
-  WellBottomShape,
 } from './fields'
 
 const maskTo2Decimal = makeMaskToDecimal(2)
@@ -164,14 +164,14 @@ const DepthImg = (props: DepthImgProps) => {
     const imgMap = {
       v: require('./images/depth_reservoir-and-tubes_v.svg'),
       flat: require('./images/depth_reservoir-and-tubes_flat.svg'),
-      round: require('./images/depth_reservoir-and-tubes_round.svg'),
+      u: require('./images/depth_reservoir-and-tubes_round.svg'),
     }
     src = imgMap[wellBottomShape]
   } else {
     const imgMap = {
       v: require('./images/depth_plate_v.svg'),
       flat: require('./images/depth_plate_flat.svg'),
-      round: require('./images/depth_plate_round.svg'),
+      u: require('./images/depth_plate_round.svg'),
     }
     src = imgMap[wellBottomShape]
   }

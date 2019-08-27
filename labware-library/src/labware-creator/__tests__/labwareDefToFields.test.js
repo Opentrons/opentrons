@@ -57,8 +57,8 @@ describe('labwareDefToFields', () => {
     const def = fixture12Trough
     const result = labwareDefToFields(def)
 
-    expect(result.gridSpacingY).toBe(null) // single row -> null Y-spacing
-    expect(result.wellDiameter).toBe(null)
+    expect(result?.gridSpacingY).toBe(null) // single row -> null Y-spacing
+    expect(result?.wellDiameter).toBe(null)
     expect(result).toMatchSnapshot()
   })
 
