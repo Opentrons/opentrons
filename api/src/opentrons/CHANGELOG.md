@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.11.3-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.11.2...v3.11.3-alpha.0) (2019-08-27)
+
+
+### Bug Fixes
+
+* **api:** do not swallow smoothie errors with certain patterns ([#3955](https://github.com/Opentrons/opentrons/issues/3955)) ([5c95c59](https://github.com/Opentrons/opentrons/commit/5c95c59))
+* **api:** Restore the name, desc of tip probe reset in v1 ([#3952](https://github.com/Opentrons/opentrons/issues/3952)) ([27a4e95](https://github.com/Opentrons/opentrons/commit/27a4e95)), closes [#3950](https://github.com/Opentrons/opentrons/issues/3950)
+
+
+
+
+
 ## [3.11.2](https://github.com/Opentrons/opentrons/compare/v3.11.1...v3.11.2) (2019-08-21)
 
 **Note:** Version bump only for package @opentrons/api-server
