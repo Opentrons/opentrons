@@ -40,6 +40,10 @@ h2 {
   @apply --font-header-dark;
 }
 
+.start_creating_btn:focus {
+  outline: none;
+}
+
 .double_check_before_exporting {
   font-style: italic;
   font-weight: var(--fw-semibold);
@@ -87,23 +91,26 @@ h2 {
   min-height: 19rem;
 }
 
+.homogenous_wells_section {
+  max-width: 16rem;
+}
+
 .instructions_column,
 .diagram_column,
 .form_fields_column,
+.export_form_fields,
+.preview_instructions,
 .brand_column,
 .brand_id_column {
   flex-basis: 100%;
   flex-shrink: 0;
+  font-size: var(--fs-body-1);
 }
 
 .diagram_column,
 .help_text {
   display: flex;
   justify-content: center;
-}
-
-.pipette_field_caption {
-  font-size: var(--fs-caption);
 }
 
 @media (--medium) {
@@ -125,14 +132,14 @@ h2 {
   .form_fields_column,
   .brand_column,
   .brand_id_column,
-  .help_text {
+  .help_text,
+  .export_form_fields {
     flex-basis: var(--size-50p);
     flex-shrink: 1;
   }
 
   .instructions_column {
     padding-right: var(--spacing-7);
-    font-size: var(--fs-caption);
   }
 
   .brand_column {

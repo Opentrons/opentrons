@@ -365,5 +365,5 @@ export const LABELS: { [$Keys<LabwareFields>]: string } = {
   brandId: 'Manufacturer/Catalog #',
   displayName: 'Display Name',
   loadName: 'API Load Name',
-  pipetteName: 'Which pipette do you want to use in your test protocol?',
+  pipetteName: 'Test Pipette',
 }
