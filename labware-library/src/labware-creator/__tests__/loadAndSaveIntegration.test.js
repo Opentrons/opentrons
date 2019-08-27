@@ -15,11 +15,11 @@ describe('load and immediately save integrity test', () => {
   const testCases = [
     {
       inputDef: fixture96Plate,
-      extraFields: { pipetteName, labwareType: 'wellPlate' },
+      extraFields: { pipetteName },
     },
     {
       inputDef: fixture12Trough,
-      extraFields: { pipetteName, labwareType: 'reservoir' },
+      extraFields: { pipetteName },
     },
   ]
   testCases.forEach(({ inputDef, extraFields }) => {

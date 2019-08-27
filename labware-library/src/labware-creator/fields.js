@@ -22,6 +22,17 @@ export const IRREGULAR_LABWARE_ERROR = 'IRREGULAR_LABWARE_ERROR'
 export const LINK_CUSTOM_LABWARE_FORM =
   'https://opentrons-ux.typeform.com/to/xi8h0W'
 
+// TODO IMMEDIATELY: make keys consistent with PD/App
+export type ImportErrorKey =
+  | 'NOT_JSON'
+  | 'INVALID_JSON_FILE'
+  | 'INVALID_LABWARE_DEF'
+  | 'UNSUPPORTED_LABWARE_PROPERTIES'
+export type ImportError = {|
+  key: ImportErrorKey,
+  message?: string,
+|}
+
 export type Options = Array<{|
   name: string,
   value: string,

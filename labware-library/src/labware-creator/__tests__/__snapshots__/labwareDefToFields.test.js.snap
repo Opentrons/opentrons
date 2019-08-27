@@ -16,7 +16,7 @@ Object {
   "gridSpacingX": "9.09",
   "gridSpacingY": null,
   "homogeneousWells": "true",
-  "labwareType": null,
+  "labwareType": "reservoir",
   "labwareZDimension": "44.45",
   "loadName": "fixture_12_trough",
   "pipetteName": null,

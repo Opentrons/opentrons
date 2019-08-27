@@ -38,12 +38,14 @@ import RadioField from './components/RadioField'
 import Section from './components/Section'
 import TextField from './components/TextField'
 import ImportLabware from './components/ImportLabware'
+import ImportErrorModal from './components/ImportErrorModal'
 import styles from './styles.css'
 import type {
   LabwareDefinition2,
   WellBottomShape,
 } from '@opentrons/shared-data'
 import type {
+  ImportError,
   LabwareFields,
   LabwareType,
   ProcessedLabwareFields,
@@ -291,33 +293,6 @@ const getXYDimensionAlerts = (
   ) : null
 }
 
-// TODO IMMEDIATELY: make keys consistent with PD/App
-type ImportError = {|
-  key:
-    | 'NOT_JSON'
-    | 'INVALID_JSON_FILE'
-    | 'INVALID_LABWARE_DEF'
-    | 'UNSUPPORTED_LABWARE_PROPERTIES',
-  message?: string,
-|}
-
-const ImportErrorModal = (props: {|
-  onClose: () => mixed,
-  importError: ImportError,
-|}) => (
-  <AlertModal
-    // TODO IMMEDIATELY rename class, or new class?
-    className={styles.export_error_modal}
-    heading="Cannot import file"
-    // TODO IMMEDIATELY is there a 'shortcut' set of props for single-button?
-    onCloseClick={props.onClose}
-    buttons={[{ onClick: props.onClose, children: 'close' }]}
-  >
-    <strong>{props.importError.key}</strong>
-    {props.importError.message}
-  </AlertModal>
-)
-
 const App = () => {
   const [
     showExportErrorModal,
@@ -394,7 +369,7 @@ const App = () => {
       )}
       {showExportErrorModal && (
         <AlertModal
-          className={styles.export_error_modal}
+          className={styles.error_modal}
           heading="Cannot export file"
           onCloseClick={() => setShowExportErrorModal(false)}
           buttons={[

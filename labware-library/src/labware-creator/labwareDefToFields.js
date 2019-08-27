@@ -31,12 +31,29 @@ export default function labwareDefToFields(
   const regularColumnSpacing = gridSpacingX !== null
   const regularRowSpacing = gridSpacingY !== null
 
-  if (!homogeneousWells || !regularRowSpacing || !regularColumnSpacing) {
+  let labwareType: $PropertyType<LabwareFields, 'labwareType'> | null = null
+
+  if (
+    def.metadata.displayCategory === 'wellPlate' ||
+    def.metadata.displayCategory === 'tubeRack' ||
+    def.metadata.displayCategory === 'aluminumBlock' ||
+    def.metadata.displayCategory === 'reservoir'
+  ) {
+    labwareType = def.metadata.displayCategory
+  }
+
+  if (
+    !homogeneousWells ||
+    !regularRowSpacing ||
+    !regularColumnSpacing ||
+    labwareType === null
+  ) {
     // TODO IMMEDIATELY: somehow handle uploading "irregular" (multi-grid) labware, error messaging
     console.warn('TODO! unhandled labware def', {
       homogeneousWells,
       regularColumnSpacing,
       regularRowSpacing,
+      labwareType,
     })
     return null
   }
@@ -49,10 +66,11 @@ export default function labwareDefToFields(
 
   return {
     // NOTE: Ian 2019-08-26 these fields cannot be inferred
-    labwareType: null,
     tubeRackInsertLoadName: null,
     aluminumBlockType: null,
     aluminumBlockChildType: null,
+
+    labwareType,
 
     footprintXDimension: String(def.dimensions.xDimension),
     footprintYDimension: String(def.dimensions.yDimension),
