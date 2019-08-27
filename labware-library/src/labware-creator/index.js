@@ -24,6 +24,7 @@ import {
   MAX_SUGGESTED_Z,
   LINK_CUSTOM_LABWARE_FORM,
 } from './fields'
+import labwareDefToFields from './labwareDefToFields'
 import labwareFormSchema from './labwareFormSchema'
 import { getDefaultDisplayName, getDefaultLoadName } from './formSelectors'
 import labwareTestProtocol, { pipetteNameOptions } from './labwareTestProtocol'
@@ -38,7 +39,10 @@ import Section from './components/Section'
 import TextField from './components/TextField'
 import ImportLabware from './components/ImportLabware'
 import styles from './styles.css'
-import type { WellBottomShape } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  WellBottomShape,
+} from '@opentrons/shared-data'
 import type {
   LabwareFields,
   LabwareType,
@@ -287,6 +291,33 @@ const getXYDimensionAlerts = (
   ) : null
 }
 
+// TODO IMMEDIATELY: make keys consistent with PD/App
+type ImportError = {|
+  key:
+    | 'NOT_JSON'
+    | 'INVALID_JSON_FILE'
+    | 'INVALID_LABWARE_DEF'
+    | 'UNSUPPORTED_LABWARE_PROPERTIES',
+  message?: string,
+|}
+
+const ImportErrorModal = (props: {|
+  onClose: () => mixed,
+  importError: ImportError,
+|}) => (
+  <AlertModal
+    // TODO IMMEDIATELY rename class, or new class?
+    className={styles.export_error_modal}
+    heading="Cannot import file"
+    // TODO IMMEDIATELY is there a 'shortcut' set of props for single-button?
+    onCloseClick={props.onClose}
+    buttons={[{ onClick: props.onClose, children: 'close' }]}
+  >
+    <strong>{props.importError.key}</strong>
+    {props.importError.message}
+  </AlertModal>
+)
+
 const App = () => {
   const [
     showExportErrorModal,
@@ -294,6 +325,53 @@ const App = () => {
   ] = React.useState<boolean>(false)
 
   const [showCreatorForm, setShowCreatorForm] = React.useState<boolean>(false)
+  const [importError, setImportError] = React.useState<ImportError | null>(null)
+
+  const [lastUploaded, setLastUploaded] = React.useState<LabwareFields | null>(
+    null
+  )
+
+  const onUpload = React.useCallback(
+    (event: SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<*>) => {
+      let files: Array<File> = []
+      if (event.dataTransfer && event.dataTransfer.files) {
+        files = (event.dataTransfer.files: any)
+      } else if (event.target.files) {
+        files = (event.target.files: any)
+      }
+
+      const file = files[0]
+      const reader = new FileReader()
+
+      // reset the state of the input to allow file re-uploads
+      event.currentTarget.value = ''
+
+      if (!file.name.endsWith('.json')) {
+        setImportError({ key: 'NOT_JSON' })
+      } else {
+        reader.onload = readEvent => {
+          const result = readEvent.currentTarget.result
+          let parsedLabwareDef: ?LabwareDefinition2
+
+          try {
+            parsedLabwareDef = JSON.parse(result)
+            // TODO IMMEDIATELY validate file with JSON Schema here
+            const fields = labwareDefToFields(parsedLabwareDef)
+            if (!fields) {
+              setImportError({ key: 'UNSUPPORTED_LABWARE_PROPERTIES' })
+            } else {
+              setLastUploaded(fields)
+            }
+          } catch (error) {
+            console.error(error)
+            setImportError({ key: 'INVALID_JSON_FILE', message: error.message })
+          }
+        }
+        reader.readAsText(file)
+      }
+    },
+    []
+  )
 
   React.useEffect(() => {
     if (process.env.NODE_ENV === 'production') {
@@ -308,6 +386,12 @@ const App = () => {
 
   return (
     <LabwareCreator>
+      {importError && (
+        <ImportErrorModal
+          onClose={() => setImportError(null)}
+          importError={importError}
+        />
+      )}
       {showExportErrorModal && (
         <AlertModal
           className={styles.export_error_modal}
@@ -325,7 +409,8 @@ const App = () => {
         </AlertModal>
       )}
       <Formik
-        initialValues={getDefaultFormState()}
+        initialValues={lastUploaded || getDefaultFormState()}
+        enableReinitialize
         validationSchema={labwareFormSchema}
         onSubmit={(values: LabwareFields) => {
           const castValues: ProcessedLabwareFields = labwareFormSchema.cast(
@@ -432,7 +517,7 @@ const App = () => {
                 <h2 className={styles.setup_heading}>
                   Edit a file you’ve built with our labware creator.
                 </h2>
-                <ImportLabware />
+                <ImportLabware onUpload={onUpload} />
               </div>
             </div>
             {showCreatorForm && (
