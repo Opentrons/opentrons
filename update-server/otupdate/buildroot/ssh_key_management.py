@@ -148,7 +148,7 @@ async def add(request: web.Request) -> web.Response:
             ak.write(f'{pubkey}\n')
 
     return web.json_response(
-            data={'message': 'Added key {hashval}',
+            data={'message': f'Added key {hashval}',
                   'key_md5': hashval},
             status=201)
 
