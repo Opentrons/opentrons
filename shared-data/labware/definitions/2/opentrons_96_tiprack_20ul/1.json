@@ -21,7 +21,7 @@
     ]
   },
   "metadata": {
-    "displayName": "Opentrons 96 Tip Rack 10 µL",
+    "displayName": "Opentrons 96 Tip Rack 20 µL",
     "displayCategory": "tipRack",
     "displayVolumeUnits": "µL",
     "tags": []
@@ -1006,10 +1006,10 @@
     "tipLength": 39.2,
     "tipOverlap": 3.29,
     "isMagneticModuleCompatible": false,
-    "loadName": "opentrons_96_tiprack_10ul"
+    "loadName": "opentrons_96_tiprack_20ul"
   },
   "namespace": "opentrons",
-  "version": 2,
+  "version": 1,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
     "x": 0,
