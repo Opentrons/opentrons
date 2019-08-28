@@ -8,3 +8,9 @@
   float: right;
   margin-right: calc(-12.5% - 1.5rem);
 }
+
+.pipette_diagram {
+  &.right {
+    transform: scaleX(-1);
+  }
+}

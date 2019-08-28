@@ -15,7 +15,6 @@ import type {
   Mount,
   Slot,
   Pipette,
-  PipetteCalibrationStatus,
   Labware,
   LabwareCalibrationStatus,
   LabwareType,
@@ -229,32 +228,11 @@ export const getPipettes: OutputSelector<
     return PIPETTE_MOUNTS.filter(mount => pipettesByMount[mount] != null).map(
       mount => {
         const pipette = pipettesByMount[mount]
-
         const probed = probedByMount[mount] || false
         const tipOn = tipOnByMount[mount] || false
-        let calibration: PipetteCalibrationStatus = 'unprobed'
-
-        // TODO(mc: 2018-01-10): rethink pipette level "calibration" prop
-        // TODO(mc: 2018-01-23): handle probe error state better
-        if (calibrationRequest.mount === mount && !calibrationRequest.error) {
-          if (calibrationRequest.type === 'MOVE_TO_FRONT') {
-            calibration = calibrationRequest.inProgress
-              ? 'preparing-to-probe'
-              : 'ready-to-probe'
-          } else if (calibrationRequest.type === 'PROBE_TIP') {
-            if (calibrationRequest.inProgress) {
-              calibration = 'probing'
-            } else if (!probed) {
-              calibration = 'probed-tip-on'
-            } else {
-              calibration = 'probed'
-            }
-          }
-        }
 
         return {
           ...pipette,
-          calibration,
           probed,
           tipOn,
           modelSpecs: getPipetteModelSpecs(pipette.name) || null,

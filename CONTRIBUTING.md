@@ -377,7 +377,7 @@ make term
 make term host=${some_other_ip_address}
 ```
 
-If  `make term` complains about not having a key, you may need to install a public key on the robot. To do this, create an ssh key and install it:
+If `make term` complains about not having a key, you may need to install a public key on the robot. To do this, create an ssh key and install it:
 
 ```shell
 ssh-keygen # note the path you save the key to

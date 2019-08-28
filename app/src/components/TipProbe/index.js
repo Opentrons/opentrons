@@ -1,10 +1,13 @@
 // @flow
 // TipProbe controls
 import * as React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 
-import type { PipetteCalibrationStatus } from '../../robot'
-import type { TipProbeProps } from './types'
+import { usePrevious } from '@opentrons/components'
+import { actions as robotActions } from '../../robot'
+import { getCalibrationRequest } from '../../robot/selectors'
 
+import { ErrorModal } from '../modals'
 import CalibrationInfoBox from '../CalibrationInfoBox'
 import UnprobedPanel from './UnprobedPanel'
 import InstrumentMovingPanel from './InstrumentMovingPanel'
@@ -12,26 +15,70 @@ import AttachTipPanel from './AttachTipPanel'
 import RemoveTipPanel from './RemoveTipPanel'
 import ContinuePanel from './ContinuePanel'
 
+import type { Dispatch } from '../../types'
+import type { TipProbeProps, TipProbeState } from './types'
+
+const PROBE_ERROR_HEADING = 'Error during tip probe'
+const PROBE_ERROR_DESCRIPTION =
+  'The above error occurred while attempting to tip probe. Please try again.'
+
 const PANEL_BY_CALIBRATION: {
-  [PipetteCalibrationStatus]: React.ComponentType<TipProbeProps>,
+  [TipProbeState]: React.ComponentType<TipProbeProps>,
 } = {
   unprobed: UnprobedPanel,
-  'preparing-to-probe': InstrumentMovingPanel,
-  'ready-to-probe': AttachTipPanel,
+  'moving-to-front': InstrumentMovingPanel,
+  'waiting-for-tip': AttachTipPanel,
   probing: InstrumentMovingPanel,
-  'probed-tip-on': RemoveTipPanel,
-  probed: ContinuePanel,
+  'waiting-for-remove-tip': RemoveTipPanel,
+  done: ContinuePanel,
 }
 
 export default function TipProbe(props: TipProbeProps) {
-  const { mount, probed, calibration } = props
+  const { mount, probed } = props
+  const dispatch = useDispatch<Dispatch>()
+  const [probeState, setProbeState] = React.useState<TipProbeState>('unprobed')
+  const prevProbeState = usePrevious(probeState)
   const title = `${mount} pipette calibration`
+  const Panel = PANEL_BY_CALIBRATION[probeState]
+  const calRequest = useSelector(getCalibrationRequest)
 
-  const Panel = PANEL_BY_CALIBRATION[calibration]
+  React.useEffect(() => {
+    const { mount: calMount, type: calType, inProgress, error } = calRequest
+    let nextProbeState = 'unprobed'
+
+    if (!error && calMount === mount) {
+      if (calType === 'MOVE_TO_FRONT') {
+        nextProbeState = inProgress ? 'moving-to-front' : 'waiting-for-tip'
+      } else if (calType === 'PROBE_TIP') {
+        if (inProgress) {
+          nextProbeState = 'probing'
+        } else if (!probed) {
+          nextProbeState = 'waiting-for-remove-tip'
+        } else if (
+          prevProbeState === 'waiting-for-remove-tip' ||
+          prevProbeState === 'done'
+        ) {
+          nextProbeState = 'done'
+        }
+      }
+    }
+
+    setProbeState(nextProbeState)
+  }, [calRequest, mount, probed, prevProbeState])
 
   return (
-    <CalibrationInfoBox confirmed={probed} title={title}>
-      <Panel {...props} />
-    </CalibrationInfoBox>
+    <>
+      <CalibrationInfoBox confirmed={probed} title={title}>
+        <Panel {...props} />
+      </CalibrationInfoBox>
+      {calRequest.error !== null && (
+        <ErrorModal
+          heading={PROBE_ERROR_HEADING}
+          description={PROBE_ERROR_DESCRIPTION}
+          error={calRequest.error}
+          close={() => dispatch(robotActions.clearCalibrationRequest())}
+        />
+      )}
+    </>
   )
 }

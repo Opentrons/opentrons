@@ -344,12 +344,6 @@ describe('robot selectors', () => {
           },
         },
         calibration: {
-          calibrationRequest: {
-            type: 'PROBE_TIP',
-            mount: 'left',
-            inProgress: true,
-            error: null,
-          },
           probedByMount: {
             left: true,
           },
@@ -368,7 +362,6 @@ describe('robot selectors', () => {
           name: 'p200m',
           channels: 8,
           volume: 200,
-          calibration: constants.PROBING,
           probed: true,
           tipOn: false,
           modelSpecs: null,
@@ -378,7 +371,6 @@ describe('robot selectors', () => {
           name: 'p50s',
           channels: 1,
           volume: 50,
-          calibration: constants.UNPROBED,
           probed: false,
           tipOn: true,
           modelSpecs: null,

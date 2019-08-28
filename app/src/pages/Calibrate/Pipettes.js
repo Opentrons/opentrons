@@ -2,7 +2,7 @@
 // setup pipettes component
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { Route, Redirect } from 'react-router'
+import { Redirect } from 'react-router'
 
 import { selectors as robotSelectors } from '../../robot'
 import { getPipettesState, fetchPipettes } from '../../robot-api'
@@ -10,7 +10,6 @@ import { getConnectedRobot } from '../../discovery'
 
 import Page, { RefreshWrapper } from '../../components/Page'
 import TipProbe from '../../components/TipProbe'
-import ConfirmTipProbeModal from '../../components/ConfirmTipProbeModal'
 import { PipetteTabs, Pipettes } from '../../components/calibrate-pipettes'
 import SessionHeader from '../../components/SessionHeader'
 
@@ -55,7 +54,6 @@ function CalibratePipettesPage(props: Props) {
     match: { url, params },
     changePipetteUrl,
   } = props
-  const confirmTipProbeUrl = `${url}/confirm-tip-probe`
 
   // redirect back to mountless route if mount doesn't exist
   if (params.mount && !currentPipette) {
@@ -75,23 +73,7 @@ function CalibratePipettesPage(props: Props) {
             changePipetteUrl,
           }}
         />
-        {!!currentPipette && (
-          <TipProbe
-            {...currentPipette}
-            confirmTipProbeUrl={confirmTipProbeUrl}
-          />
-        )}
-        {!!currentPipette && (
-          <Route
-            path={confirmTipProbeUrl}
-            render={() => (
-              <ConfirmTipProbeModal
-                mount={currentPipette.mount}
-                backUrl={url}
-              />
-            )}
-          />
-        )}
+        {!!currentPipette && <TipProbe {...currentPipette} />}
       </Page>
     </RefreshWrapper>
   )

@@ -4,17 +4,20 @@ import { Link } from 'react-router-dom'
 
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../portal'
+import removeTrashSrc from './img/trash@3x.png'
 import styles from './styles.css'
 
-type Props = {
+type Props = {|
   onContinueClick?: () => mixed,
   onCancelClick?: () => mixed,
-  parentUrl: string,
+  parentUrl?: string,
   cancelText: string,
   continueText: string,
+  removeTrash?: boolean,
   children?: React.Node,
-}
-const HEADING = 'Before continuing, remove from deck:'
+|}
+
+const HEADING = 'Before continuing, please remove:'
 
 export default function ClearDeckAlertModal(props: Props) {
   const {
@@ -23,6 +26,7 @@ export default function ClearDeckAlertModal(props: Props) {
     parentUrl,
     cancelText,
     continueText,
+    removeTrash = false,
   } = props
 
   return (
@@ -32,9 +36,8 @@ export default function ClearDeckAlertModal(props: Props) {
         buttons={[
           {
             children: `${cancelText}`,
-            Component: Link,
-            to: parentUrl,
             onClick: onCancelClick,
+            ...(parentUrl != null ? { Component: Link, to: parentUrl } : {}),
           },
           {
             children: `${continueText}`,
@@ -44,11 +47,17 @@ export default function ClearDeckAlertModal(props: Props) {
         ]}
         alertOverlay
       >
-        <ul className={styles.alert_list}>
-          <li>All tipracks</li>
-          <li>All labware</li>
-        </ul>
-        {props.children && (
+        <div className={styles.alert_instructions}>
+          <ul className={styles.alert_list}>
+            <li>All labware from the deck</li>
+            <li>All tips from pipettes</li>
+            {removeTrash && <li>The removable trash bin</li>}
+          </ul>
+          {removeTrash && (
+            <img className={styles.alert_diagram} src={removeTrashSrc} />
+          )}
+        </div>
+        {props.children != null && (
           <div>
             <p className={styles.alert_note_heading}>Note:</p>
             {props.children}
