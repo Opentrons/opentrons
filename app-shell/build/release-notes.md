@@ -1,4 +1,4 @@
-# Changes from 3.10.3 to 3.11.2
+# Changes from 3.10.3 to 3.11.3
 
 This update includes support for the new Opentrons Robot OS 3.11, which provides more comprehensive updates without requiring internet connectivity. It also allows you to calibrate labware placed on a module separately from labware placed on the deck.
 

@@ -1,4 +1,4 @@
-# Robot OS Changes from 3.10.3 to 3.11.2
+# Robot OS Changes from 3.10.3 to 3.11.3
 
 This update migrates the Opentrons Robot OS to a new underlying technology - buildroot. This change allows us to better control the robot's system and provide better updates without requiring internet connectivity.
 
