@@ -48,11 +48,11 @@ export const loadProtocolFile = (
     fileError('INVALID_FILE_TYPE')
   } else {
     reader.onload = readEvent => {
-      const result = readEvent.currentTarget.result
+      const result = ((readEvent.currentTarget: any): FileReader).result
       let parsedProtocol: ?PDProtocolFile
 
       try {
-        parsedProtocol = JSON.parse(result)
+        parsedProtocol = JSON.parse(((result: any): string))
         // TODO LATER Ian 2018-05-18 validate file with JSON Schema here
         dispatch(loadFileAction(parsedProtocol))
       } catch (error) {

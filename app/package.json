@@ -17,8 +17,8 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "devDependencies": {
-    "flow-bin": "^0.102.0",
-    "flow-typed": "^2.5.2"
+    "flow-bin": "^0.106.2",
+    "flow-typed": "^2.6.1"
   },
   "dependencies": {
     "@opentrons/components": "3.11.3",

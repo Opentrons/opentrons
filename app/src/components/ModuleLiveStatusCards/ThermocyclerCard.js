@@ -99,7 +99,7 @@ const ThermocyclerCard = ({
                 .utc(
                   // NOTE: moment still doesn't allow duration formatting, hence fake moment creation
                   moment
-                    .duration(module.data.holdTime, 'seconds')
+                    .duration(module.data.holdTime || 0, 'seconds')
                     .asMilliseconds()
                 )
                 .format('HH:mm:ss')}`}
