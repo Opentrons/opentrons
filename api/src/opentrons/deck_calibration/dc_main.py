@@ -712,7 +712,7 @@ def main(loop=None):
     else:
         api = opentrons.hardware_control.API
         hardware = adapters.SynchronousAdapter.build(
-            api.build_hardware_controller, force=True)
+            api.build_hardware_controller)
         hardware.set_lights(rails=True)
     backup_configuration_and_reload(hardware)
     cli = CLITool(
