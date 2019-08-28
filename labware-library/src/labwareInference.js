@@ -11,6 +11,8 @@ import type {
   LabwareDefinition,
 } from './types'
 
+const ROUNDING_PRECISION = 2
+
 export function getUniqueWellProperties(
   definition: LabwareDefinition
 ): Array<LabwareWellGroupProperties> {
@@ -41,7 +43,7 @@ export function getUniqueWellProperties(
       xSpacing: getSpacingIfUniform(wellProps, 'x'),
       ySpacing: getSpacingIfUniform(wellProps, 'y'),
       xOffsetFromLeft: xStart,
-      yOffsetFromTop: dimensions.yDimension - yStart,
+      yOffsetFromTop: round(dimensions.yDimension - yStart, ROUNDING_PRECISION),
       wellCount: wellProps.length,
       depth: getIfConsistent(wellDepths),
       totalLiquidVolume: getIfConsistent(wellVolumes),
@@ -54,7 +56,6 @@ export function getIfConsistent<T>(items: Array<T>): T | null {
   return uniqWith(items, isEqual).length === 1 ? items[0] : null
 }
 
-const SPACING_PRECISION = 2
 export function getSpacingIfUniform(
   wells: Array<LabwareWell>,
   axis: 'x' | 'y'
@@ -64,7 +65,7 @@ export function getSpacingIfUniform(
 
   const initialSpacing = round(
     wellPositions[1] - wellPositions[0],
-    SPACING_PRECISION
+    ROUNDING_PRECISION
   )
 
   if (initialSpacing === 0) return null
@@ -72,7 +73,7 @@ export function getSpacingIfUniform(
   for (var i = 2; i < wellPositions.length; i++) {
     const pos = wellPositions[i]
     const prevWellPos = wellPositions[i - 1]
-    const spacing = round(pos - prevWellPos, SPACING_PRECISION)
+    const spacing = round(pos - prevWellPos, ROUNDING_PRECISION)
     if (spacing !== initialSpacing) return null
   }
 
