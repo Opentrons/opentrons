@@ -3,11 +3,12 @@ import flatten from 'lodash/flatten'
 import isEqual from 'lodash/isEqual'
 import round from 'lodash/round'
 import omit from 'lodash/omit'
-import { getSpacing } from '../labwareInference'
+import { getSpacingIfUniform } from '../labwareInference'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { LabwareFields, BooleanString } from './fields'
 
-const boolToBoolString = (b: boolean): BooleanString => (b ? 'true' : 'false') // TODO IMMEDIATELY revisit, is this duplicated elsewhere?
+// NOTE: this is just String() with some typing for flow
+const boolToBoolString = (b: boolean): BooleanString => (b ? 'true' : 'false')
 
 // NOTE: this fn should always be passed an object valid under JSON schema for LabwareDefinition2
 // TODO: Ian 2019-08-26 this shares functionality with getUniqueWellProperties fn in labware-library/src/definitions.js
@@ -26,8 +27,8 @@ export default function labwareDefToFields(
   )
 
   // don't bother trying to infer row/col regularity, assume `groups` is correct. If `groups` is missing, assume irregular
-  const gridSpacingX = getSpacing(allWells, 'x')
-  const gridSpacingY = getSpacing(allWells, 'y')
+  const gridSpacingX = getSpacingIfUniform(allWells, 'x')
+  const gridSpacingY = getSpacingIfUniform(allWells, 'y')
   const regularColumnSpacing = gridSpacingX !== null
   const regularRowSpacing = gridSpacingY !== null
 

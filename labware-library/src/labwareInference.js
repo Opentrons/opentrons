@@ -1,9 +1,9 @@
 // @flow
 import isEqual from 'lodash/isEqual'
-import uniqBy from 'lodash/uniqBy'
 import uniqWith from 'lodash/uniqWith'
 import round from 'lodash/round'
-import orderBy from 'lodash/orderBy'
+import sortedUniq from 'lodash/sortedUniq'
+import uniq from 'lodash/uniq'
 import type {
   LabwareWell,
   LabwareWellShapeProperties,
@@ -17,11 +17,8 @@ export function getUniqueWellProperties(
   const { groups, wells, dimensions } = definition
 
   return groups.map(group => {
-    const wellProps = orderBy(
-      group.wells.map(n => wells[n]),
-      ['x', 'y'],
-      ['asc', 'desc']
-    )
+    const wellProps = group.wells.map(n => wells[n])
+
     const wellDepths = wellProps.map<number>(w => w.depth)
     const wellVolumes = wellProps.map<number>(w => w.totalLiquidVolume)
     const wellShapes = wellProps.map<LabwareWellShapeProperties>(
@@ -41,8 +38,8 @@ export function getUniqueWellProperties(
     return {
       metadata: group.metadata,
       brand: group.brand || null,
-      xSpacing: getSpacing(wellProps, 'x'),
-      ySpacing: getSpacing(wellProps, 'y'),
+      xSpacing: getSpacingIfUniform(wellProps, 'x'),
+      ySpacing: getSpacingIfUniform(wellProps, 'y'),
       xOffsetFromLeft: xStart,
       yOffsetFromTop: dimensions.yDimension - yStart,
       wellCount: wellProps.length,
@@ -53,27 +50,31 @@ export function getUniqueWellProperties(
   })
 }
 
-function getIfConsistent<T>(items: Array<T>): T | null {
+export function getIfConsistent<T>(items: Array<T>): T | null {
   return uniqWith(items, isEqual).length === 1 ? items[0] : null
 }
 
-// TODO IMMEDIATELY write test
-export function getSpacing(
+const SPACING_PRECISION = 2
+export function getSpacingIfUniform(
   wells: Array<LabwareWell>,
   axis: 'x' | 'y'
 ): number | null {
-  return uniqBy<LabwareWell>(wells, axis).reduce<number | null>(
-    (spacing, well, index, uniqueWells) => {
-      if (index > 0) {
-        const prev = uniqueWells[index - 1]
-        const currentSpacing = Math.abs(round(well[axis] - prev[axis], 2))
+  const wellPositions = sortedUniq(uniq(wells.map(well => well[axis])))
+  if (wellPositions.length < 2) return null
 
-        return spacing === 0 || spacing === currentSpacing
-          ? currentSpacing
-          : null
-      }
-      return spacing
-    },
-    0
+  const initialSpacing = round(
+    wellPositions[1] - wellPositions[0],
+    SPACING_PRECISION
   )
+
+  if (initialSpacing === 0) return null
+
+  for (var i = 2; i < wellPositions.length; i++) {
+    const pos = wellPositions[i]
+    const prevWellPos = wellPositions[i - 1]
+    const spacing = round(pos - prevWellPos, SPACING_PRECISION)
+    if (spacing !== initialSpacing) return null
+  }
+
+  return Math.abs(initialSpacing)
 }

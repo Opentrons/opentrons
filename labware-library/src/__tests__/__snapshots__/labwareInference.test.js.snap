@@ -1,0 +1,63 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getUniqueWellProperties fixture_96_plate 1`] = `
+Array [
+  Object {
+    "brand": Object {
+      "brand": "generic",
+      "brandId": Array [],
+    },
+    "depth": 10.54,
+    "metadata": Object {
+      "displayCategory": "wellPlate",
+      "displayName": "ANSI 96 Standard Microplate",
+      "wellBottomShape": "flat",
+    },
+    "shape": Object {
+      "diameter": 6.4,
+      "shape": "circular",
+    },
+    "totalLiquidVolume": 380,
+    "wellCount": 96,
+    "xOffsetFromLeft": 14.38,
+    "xSpacing": 9,
+    "yOffsetFromTop": 11.240000000000009,
+    "ySpacing": 9,
+  },
+]
+`;
+
+exports[`getUniqueWellProperties fixture_irregular_example_1 1`] = `
+Array [
+  Object {
+    "brand": null,
+    "depth": 10.54,
+    "metadata": Object {},
+    "shape": Object {
+      "diameter": 10,
+      "shape": "circular",
+    },
+    "totalLiquidVolume": 3000,
+    "wellCount": 50,
+    "xOffsetFromLeft": 10,
+    "xSpacing": 10,
+    "yOffsetFromTop": 55.480000000000004,
+    "ySpacing": 5,
+  },
+  Object {
+    "brand": null,
+    "depth": 20.54,
+    "metadata": Object {},
+    "shape": Object {
+      "diameter": 15,
+      "shape": "circular",
+    },
+    "totalLiquidVolume": 10000,
+    "wellCount": 5,
+    "xOffsetFromLeft": 15,
+    "xSpacing": 10,
+    "yOffsetFromTop": 70.48,
+    "ySpacing": null,
+  },
+]
+`;
