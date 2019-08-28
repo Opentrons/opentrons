@@ -310,7 +310,12 @@ const App = () => {
 
   React.useEffect(() => {
     if (showCreatorForm && scrollRef.current) {
-      scrollRef.current && window.scrollTo(0, scrollRef.current.offsetTop - 200)
+      scrollRef.current &&
+        window.scrollTo({
+          left: 0,
+          top: scrollRef.current.offsetTop - 200,
+          behavior: 'smooth',
+        })
     }
   }, [scrollRef, showCreatorForm])
 
