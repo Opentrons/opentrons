@@ -23,6 +23,8 @@ export default function ImportLabware(props: Props) {
   )
 }
 
+const stopEvent = (e: SyntheticEvent<>) => e.preventDefault()
+
 function UploadInput(props: UploadInputProps) {
   const { isButton, onUpload } = props
 
@@ -40,7 +42,7 @@ function UploadInput(props: UploadInputProps) {
     : { onDrop: onUpload, className: styles.file_drop }
 
   return (
-    <div className={styles.upload}>
+    <div className={styles.upload} onDragOver={stopEvent} onDrop={stopEvent}>
       <Label {...labelProps}>
         {!isButton && <Icon name="upload" className={styles.file_drop_icon} />}
         {labelText}

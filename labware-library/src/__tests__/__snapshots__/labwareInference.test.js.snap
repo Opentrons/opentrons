@@ -21,7 +21,7 @@ Array [
     "wellCount": 96,
     "xOffsetFromLeft": 14.38,
     "xSpacing": 9,
-    "yOffsetFromTop": 11.240000000000009,
+    "yOffsetFromTop": 11.24,
     "ySpacing": 9,
   },
 ]
@@ -41,7 +41,7 @@ Array [
     "wellCount": 50,
     "xOffsetFromLeft": 10,
     "xSpacing": 10,
-    "yOffsetFromTop": 55.480000000000004,
+    "yOffsetFromTop": 55.48,
     "ySpacing": 5,
   },
   Object {
