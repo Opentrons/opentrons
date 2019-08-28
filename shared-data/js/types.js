@@ -233,3 +233,24 @@ export type ModuleDefinition = {|
   loadName: string,
   quirks: Array<string>,
 |}
+
+export type FlowRateSpec = {|
+  value: number,
+  min: number,
+  max: number,
+|}
+export type PipetteNameSpec = {|
+  displayName: string,
+  displayCategory?: string,
+  minVolume: number,
+  maxVolume: number,
+  channels: number,
+  defaultAspirateFlowRate: FlowRateSpec,
+  defaultDispenseFlowRate: FlowRateSpec,
+  defaultBlowOutFlowRate: FlowRateSpec,
+  smoothieConfigs?: {
+    stepsPerMM: number,
+    homePosition: number,
+    travelDistance: number,
+  },
+|}

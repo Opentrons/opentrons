@@ -1,0 +1,55 @@
+@import '@opentrons/components';
+
+.dropdown_icon_wrapper {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  width: 1.25rem;
+  pointer-events: none;
+
+  & > svg {
+    color: var(--c-dark-gray);
+  }
+
+  &.flipped > svg {
+    transform: rotate(180deg);
+  }
+}
+
+.select_control {
+  @apply --font-body-1-dark;
+
+  background-color: var(--c-light-gray);
+  border: none;
+  padding: 0.25rem 0;
+  outline: none;
+  border-radius: var(--bd-radius-form-field);
+  height: 1.75rem;
+  box-shadow: none;
+
+  &.focus {
+    background-color: var(--c-white);
+    box-shadow: var(--shadow-lvl-1);
+  }
+}
+
+.select_menu {
+  @apply --font-body-1-dark;
+
+  background-color: var(--c-light-gray);
+  border-radius: var(--bd-radius-form-field);
+}
+
+.select_group {
+  &:not(:first-child) {
+    border-top: 1px solid color(var(--c-med-gray) alpha(0.4));
+  }
+}
+
+.select_caption {
+  font-size: var(--fs-caption);
+}
+
+.pipette_option {
+
+}
