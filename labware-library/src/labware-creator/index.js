@@ -327,7 +327,7 @@ const App = () => {
       event.currentTarget.value = ''
 
       if (!file.name.endsWith('.json')) {
-        setImportError({ key: 'NOT_JSON' })
+        setImportError({ key: 'INVALID_FILE_TYPE' })
       } else {
         reader.onload = readEvent => {
           const result = readEvent.currentTarget.result

@@ -5,7 +5,7 @@ import styles from '../styles.css'
 import type { ImportError, ImportErrorKey } from '../fields'
 
 const ERROR_MAP: { [ImportErrorKey]: React.Node } = {
-  NOT_JSON: 'This is not a .json file',
+  INVALID_FILE_TYPE: 'This is not a .json file',
   INVALID_JSON_FILE: 'This is not valid JSON file',
   INVALID_LABWARE_DEF: 'This is not a valid labware definition',
   UNSUPPORTED_LABWARE_PROPERTIES: (
