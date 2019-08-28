@@ -1,0 +1,302 @@
+{
+  "ordering": [
+    ["A1", "B1", "C1", "D1"],
+    ["A2", "B2", "C2", "D2"],
+    ["A3", "B3", "C3", "D3"],
+    ["A4", "B4", "C4", "D4"],
+    ["A5", "B5", "C5", "D5"],
+    ["A6", "B6", "C6", "D6"]
+  ],
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": [],
+    "links": [
+      "https://shop.opentrons.com/collections/opentrons-tips/products/tube-rack-set-1"
+    ]
+  },
+  "metadata": {
+    "displayName": "Opentrons 24 Tube Rack with NEST 2 mL Snapcap",
+    "displayCategory": "tubeRack",
+    "displayVolumeUnits": "mL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127.75,
+    "yDimension": 85.5,
+    "zDimension": 79.45
+  },
+  "wells": {
+    "A1": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 18.21,
+      "y": 75.42,
+      "z": 40.17
+    },
+    "B1": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 18.21,
+      "y": 55.53,
+      "z": 40.17
+    },
+    "C1": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 18.21,
+      "y": 35.64,
+      "z": 40.17
+    },
+    "D1": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 18.21,
+      "y": 15.75,
+      "z": 40.17
+    },
+    "A2": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 37.49,
+      "y": 75.42,
+      "z": 40.17
+    },
+    "B2": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 37.49,
+      "y": 55.53,
+      "z": 40.17
+    },
+    "C2": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 37.49,
+      "y": 35.64,
+      "z": 40.17
+    },
+    "D2": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 37.49,
+      "y": 15.75,
+      "z": 40.17
+    },
+    "A3": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 56.77,
+      "y": 75.42,
+      "z": 40.17
+    },
+    "B3": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 56.77,
+      "y": 55.53,
+      "z": 40.17
+    },
+    "C3": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 56.77,
+      "y": 35.64,
+      "z": 40.17
+    },
+    "D3": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 56.77,
+      "y": 15.75,
+      "z": 40.17
+    },
+    "A4": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 76.05,
+      "y": 75.42,
+      "z": 40.17
+    },
+    "B4": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 76.05,
+      "y": 55.53,
+      "z": 40.17
+    },
+    "C4": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 76.05,
+      "y": 35.64,
+      "z": 40.17
+    },
+    "D4": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 76.05,
+      "y": 15.75,
+      "z": 40.17
+    },
+    "A5": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 95.33,
+      "y": 75.42,
+      "z": 40.17
+    },
+    "B5": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 95.33,
+      "y": 55.53,
+      "z": 40.17
+    },
+    "C5": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 95.33,
+      "y": 35.64,
+      "z": 40.17
+    },
+    "D5": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 95.33,
+      "y": 15.75,
+      "z": 40.17
+    },
+    "A6": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 114.61,
+      "y": 75.42,
+      "z": 40.17
+    },
+    "B6": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 114.61,
+      "y": 55.53,
+      "z": 40.17
+    },
+    "C6": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 114.61,
+      "y": 35.64,
+      "z": 40.17
+    },
+    "D6": {
+      "depth": 39.28,
+      "shape": "circular",
+      "diameter": 10.18,
+      "totalLiquidVolume": 2000,
+      "x": 114.61,
+      "y": 15.75,
+      "z": 40.17
+    }
+  },
+  "groups": [
+    {
+      "metadata": {
+        "displayName": "NEST 24x2 mL Snapcap",
+        "displayCategory": "tubeRack",
+        "wellBottomShape": "u"
+      },
+      "brand": {
+        "brand": "NEST",
+        "brandId": ["620611", "620011"],
+        "links": [
+          "http://www.cell-nest.com/page94?_l=en&product_id=108&product_category=84"
+        ]
+      },
+      "wells": [
+        "A1",
+        "B1",
+        "C1",
+        "D1",
+        "A2",
+        "B2",
+        "C2",
+        "D2",
+        "A3",
+        "B3",
+        "C3",
+        "D3",
+        "A4",
+        "B4",
+        "C4",
+        "D4",
+        "A5",
+        "B5",
+        "C5",
+        "D5",
+        "A6",
+        "B6",
+        "C6",
+        "D6"
+      ]
+    }
+  ],
+  "parameters": {
+    "format": "irregular",
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "opentrons_24_tuberack_nest_2ml_snapcap"
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
+}
