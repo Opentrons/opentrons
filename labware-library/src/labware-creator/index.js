@@ -306,6 +306,14 @@ const App = () => {
     }
   })
 
+  const scrollRef = React.useRef<HTMLDivElement | null>(null)
+
+  React.useEffect(() => {
+    if (showCreatorForm && scrollRef.current) {
+      scrollRef.current && window.scrollTo(0, scrollRef.current.offsetTop - 200)
+    }
+  }, [scrollRef, showCreatorForm])
+
   return (
     <LabwareCreator>
       {showExportErrorModal && (
@@ -435,6 +443,7 @@ const App = () => {
                 <ImportLabware />
               </div>
             </div>
+            <div ref={scrollRef} />
             {showCreatorForm && (
               <>
                 {/* PAGE 1 - Labware */}
