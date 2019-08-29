@@ -50,10 +50,6 @@ describe('robot selectors', () => {
       }
     })
 
-    afterEach(() => {
-      jest.resetAllMocks()
-    })
-
     test('getConnectedRobotName', () => {
       expect(getConnectedRobotName(state)).toEqual('bar')
       state = setIn(state, 'robot.connection.connectedTo', 'foo')
