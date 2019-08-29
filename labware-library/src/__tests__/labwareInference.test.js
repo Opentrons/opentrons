@@ -10,14 +10,20 @@ import {
 describe('getSpacingIfUniform', () => {
   const testCases = [
     {
+      testLabel: '1 well case: return 0',
+      wells: [{ x: 10 }],
+      expected: 0,
+    },
+    {
       testLabel: '2 well case',
       wells: [{ x: 10 }, { x: 20 }],
       expected: 10,
     },
     {
-      testLabel: '2 well case: 0 spacing',
+      testLabel:
+        '2 well case with overlapping wells (eg, single-column labware): return 0',
       wells: [{ x: 10 }, { x: 10 }],
-      expected: null,
+      expected: 0,
     },
     {
       testLabel: '3 well case',
@@ -25,13 +31,14 @@ describe('getSpacingIfUniform', () => {
       expected: 25,
     },
     {
-      testLabel: '3 well case: out of order is non-uniform, return null',
-      wells: [{ x: 50 }, { x: 0 }, { x: 25 }],
-      expected: null,
+      testLabel:
+        '3 well case with overlapping wells (eg, single-column labware): return 0',
+      wells: [{ x: 10 }, { x: 10 }, { x: 10 }],
+      expected: 0,
     },
     {
-      testLabel: '3 well case: zero spacing, return null',
-      wells: [{ x: 25 }, { x: 25 }, { x: 25 }],
+      testLabel: '3 well case: out of order is non-uniform, return null',
+      wells: [{ x: 50 }, { x: 0 }, { x: 25 }],
       expected: null,
     },
     {
@@ -51,14 +58,9 @@ describe('getSpacingIfUniform', () => {
       expected: null,
     },
     {
-      testLabel: 'returns null if only 1 well across axis',
-      wells: [{ x: 10 }],
-      expected: null,
-    },
-    {
-      testLabel: 'returns null with no wells',
+      testLabel: 'returns 0 with no wells',
       wells: [],
-      expected: null,
+      expected: 0,
     },
   ]
   testCases.forEach(({ wells, expected, testLabel }) =>

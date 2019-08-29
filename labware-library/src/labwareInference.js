@@ -56,19 +56,18 @@ export function getIfConsistent<T>(items: Array<T>): T | null {
   return uniqWith(items, isEqual).length === 1 ? items[0] : null
 }
 
+// returning null means "spacing is irregular"; returning 0 means "there is only 1 well along the given axis"
 export function getSpacingIfUniform(
   wells: Array<LabwareWell>,
   axis: 'x' | 'y'
 ): number | null {
   const wellPositions = sortedUniq(uniq(wells.map(well => well[axis])))
-  if (wellPositions.length < 2) return null
+  if (wellPositions.length < 2) return 0
 
   const initialSpacing = round(
     wellPositions[1] - wellPositions[0],
     ROUNDING_PRECISION
   )
-
-  if (initialSpacing === 0) return null
 
   for (var i = 2; i < wellPositions.length; i++) {
     const pos = wellPositions[i]

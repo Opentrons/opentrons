@@ -41,8 +41,8 @@ export default function labwareDefToFields(
   const gridRowsNum = def.ordering[0].length
   const gridColumnsNum = def.ordering.length
 
-  const regularColumnSpacing = xSpacing !== null || gridColumnsNum === 1
-  const regularRowSpacing = ySpacing !== null || gridRowsNum === 1
+  const regularColumnSpacing = xSpacing !== null
+  const regularRowSpacing = ySpacing !== null
 
   let labwareType: $PropertyType<LabwareFields, 'labwareType'> | null = null
 

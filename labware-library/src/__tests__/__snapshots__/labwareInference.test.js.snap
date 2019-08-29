@@ -57,7 +57,7 @@ Array [
     "xOffsetFromLeft": 15,
     "xSpacing": 10,
     "yOffsetFromTop": 70.48,
-    "ySpacing": null,
+    "ySpacing": 0,
   },
 ]
 `;
