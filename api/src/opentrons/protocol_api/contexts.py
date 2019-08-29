@@ -678,8 +678,8 @@ class InstrumentContext(CommandPublisher):
 
         If only a volume is passed, the pipette will aspirate
         from its current position. If only a location is passed (as in
-        ``inster.aspirate(location=wellplate['A1'])``,
-        :py:meth:`aspirate` will default to its :py:attr:`max_volume`.
+        ``instr.aspirate(location=wellplate['A1'])``,
+        :py:meth:`aspirate` will default to the amount of volume available.
 
         :param volume: The volume to aspirate, in microliters. If not
                        specified, :py:attr:`max_volume`.
