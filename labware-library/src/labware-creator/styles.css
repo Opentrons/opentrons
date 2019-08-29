@@ -62,7 +62,6 @@ h2 {
   padding: 0 0.75rem;
   border-radius: 0.5rem;
   border: var(--bd-light);
-  margin-bottom: 2rem;
 }
 
 .setup_heading {
@@ -74,7 +73,7 @@ h2 {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  margin: 1rem 0;
+  margin: 1rem 0 3rem;
 }
 
 .new_definition_section,
@@ -101,7 +100,8 @@ h2 {
 .export_form_fields,
 .preview_instructions,
 .brand_column,
-.brand_id_column {
+.brand_id_column,
+.volume_instructions_column {
   flex-basis: 100%;
   flex-shrink: 0;
   font-size: var(--fs-body-1);
@@ -133,7 +133,8 @@ h2 {
   .brand_column,
   .brand_id_column,
   .help_text,
-  .export_form_fields {
+  .export_form_fields,
+  .volume_instructions_column {
     flex-basis: var(--size-50p);
     flex-shrink: 1;
   }

@@ -223,17 +223,17 @@ export const aluminumBlockTypeOptions: Options = [
   {
     name: '96 well',
     value: '96well',
-    imgSrc: require('../images/opentrons_96_aluminumblock_side_view.jpg'),
+    imgSrc: require('./images/opentrons_96_aluminumblock_side_view.png'),
   },
   {
     name: '24 well',
     value: '24well',
-    imgSrc: require('../images/opentrons_24_aluminumblock_side_view.jpg'),
+    imgSrc: require('./images/opentrons_24_aluminumblock_side_view.png'),
   },
   {
     name: 'Flat - not available',
     value: 'flat',
-    imgSrc: require('../images/opentrons_flat_aluminumblock_side_view.jpg'),
+    imgSrc: require('./images/opentrons_flat_aluminumblock_side_view.png'),
     disabled: true,
   },
 ]

@@ -306,6 +306,23 @@ const App = () => {
     }
   })
 
+  const scrollRef = React.useRef<HTMLDivElement | null>(null)
+
+  const scrollToForm = React.useCallback(() => {
+    setShowCreatorForm(true)
+    window.scrollTo({
+      left: 0,
+      top: scrollRef.current && scrollRef.current.offsetTop - 200,
+      behavior: 'smooth',
+    })
+  }, [scrollRef])
+
+  React.useEffect(() => {
+    if (showCreatorForm) {
+      scrollToForm()
+    }
+  }, [showCreatorForm, scrollToForm])
+
   return (
     <LabwareCreator>
       {showExportErrorModal && (
@@ -421,7 +438,7 @@ const App = () => {
                           values.aluminumBlockType === '96well' &&
                           !values.aluminumBlockChildType)
                       }
-                      onClick={() => setShowCreatorForm(true)}
+                      onClick={scrollToForm}
                     >
                       start creating labware
                     </PrimaryButton>
@@ -435,6 +452,7 @@ const App = () => {
                 <ImportLabware />
               </div>
             </div>
+            <div ref={scrollRef} />
             {showCreatorForm && (
               <>
                 {/* PAGE 1 - Labware */}
@@ -550,9 +568,10 @@ const App = () => {
                 {/* PAGE 2 */}
                 <Section label="Volume" fieldList={['wellVolume']}>
                   <div className={styles.flex_row}>
-                    <div className={styles.instructions_column}>
+                    <div className={styles.volume_instructions_column}>
                       <p>Total maximum volume of each well.</p>
                     </div>
+
                     <div className={styles.form_fields_column}>
                       <TextField
                         name="wellVolume"
