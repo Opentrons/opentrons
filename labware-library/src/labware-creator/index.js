@@ -586,14 +586,7 @@ const App = () => {
                     </div>
                     <div className={styles.form_fields_column}>
                       <RadioField name="wellShape" options={wellShapeOptions} />
-                      {values.wellShape === 'circular' && (
-                        <TextField
-                          name="wellDiameter"
-                          inputMasks={[maskTo2Decimal]}
-                          units="mm"
-                        />
-                      )}
-                      {values.wellShape === 'rectangular' && (
+                      {values.wellShape === 'rectangular' ? (
                         <>
                           <TextField
                             name="wellXDimension"
@@ -606,6 +599,12 @@ const App = () => {
                             units="mm"
                           />
                         </>
+                      ) : (
+                        <TextField
+                          name="wellDiameter"
+                          inputMasks={[maskTo2Decimal]}
+                          units="mm"
+                        />
                       )}
                     </div>
                   </div>
