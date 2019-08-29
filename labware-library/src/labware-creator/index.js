@@ -311,13 +311,13 @@ const App = () => {
   const setFormVisible = React.useCallback(() => setShowCreatorForm(true), [])
 
   const scrollToForm = React.useCallback(() => {
-    setFormVisible()
+    !showCreatorForm && setFormVisible()
     window.scrollTo({
       left: 0,
       top: scrollRef.current && scrollRef.current.offsetTop - 200,
       behavior: 'smooth',
     })
-  }, [scrollRef, setFormVisible])
+  }, [scrollRef, showCreatorForm, setFormVisible])
 
   React.useEffect(() => {
     if (showCreatorForm) {
