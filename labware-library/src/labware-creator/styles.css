@@ -40,6 +40,12 @@ h2 {
   @apply --font-header-dark;
 }
 
+.labware_guide_button {
+  width: auto;
+  margin: 2rem 0 1rem;
+  padding: 0.5rem 2rem;
+}
+
 .start_creating_btn:focus {
   outline: none;
 }
