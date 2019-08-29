@@ -308,16 +308,14 @@ const App = () => {
 
   const scrollRef = React.useRef<HTMLDivElement | null>(null)
 
-  const setFormVisible = React.useCallback(() => setShowCreatorForm(true), [])
-
   const scrollToForm = React.useCallback(() => {
-    !showCreatorForm && setFormVisible()
+    setShowCreatorForm(true)
     window.scrollTo({
       left: 0,
       top: scrollRef.current && scrollRef.current.offsetTop - 200,
       behavior: 'smooth',
     })
-  }, [scrollRef, showCreatorForm, setFormVisible])
+  }, [scrollRef])
 
   React.useEffect(() => {
     if (showCreatorForm) {
