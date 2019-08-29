@@ -308,16 +308,22 @@ const App = () => {
 
   const scrollRef = React.useRef<HTMLDivElement | null>(null)
 
+  const setFormVisible = React.useCallback(() => setShowCreatorForm(true), [])
+
+  const scrollToForm = React.useCallback(() => {
+    setFormVisible()
+    window.scrollTo({
+      left: 0,
+      top: scrollRef.current && scrollRef.current.offsetTop - 200,
+      behavior: 'smooth',
+    })
+  }, [scrollRef, setFormVisible])
+
   React.useEffect(() => {
-    if (showCreatorForm && scrollRef.current) {
-      scrollRef.current &&
-        window.scrollTo({
-          left: 0,
-          top: scrollRef.current.offsetTop - 200,
-          behavior: 'smooth',
-        })
+    if (showCreatorForm) {
+      scrollToForm()
     }
-  }, [scrollRef, showCreatorForm])
+  }, [showCreatorForm, scrollToForm])
 
   return (
     <LabwareCreator>
@@ -434,7 +440,7 @@ const App = () => {
                           values.aluminumBlockType === '96well' &&
                           !values.aluminumBlockChildType)
                       }
-                      onClick={() => setShowCreatorForm(true)}
+                      onClick={scrollToForm}
                     >
                       start creating labware
                     </PrimaryButton>
