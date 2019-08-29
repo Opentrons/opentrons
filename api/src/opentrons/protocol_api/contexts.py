@@ -677,7 +677,8 @@ class InstrumentContext(CommandPublisher):
         from the specified location
 
         If only a volume is passed, the pipette will aspirate
-        from its current position. If only a location is passed,
+        from its current position. If only a location is passed (as in
+        ``inster.aspirate(location=wellplate['A1'])``,
         :py:meth:`aspirate` will default to its :py:attr:`max_volume`.
 
         :param volume: The volume to aspirate, in microliters. If not
@@ -698,6 +699,15 @@ class InstrumentContext(CommandPublisher):
                      defaults to 1.0 (speed will not be modified).
         :type rate: float
         :returns: This instance.
+
+        .. note::
+
+            If ``aspirate`` is called with a single argument, it will not try
+            to guess whether the argument is a volume or location - it is
+            required to be a volume. If you want to call ``aspirate`` with only
+            a location, specify it as a keyword argument:
+            ``instr.aspirate(location=wellplate['A1'])``
+
         """
         self._log.debug("aspirate {} from {} at {}"
                         .format(volume,
@@ -759,9 +769,10 @@ class InstrumentContext(CommandPublisher):
         into the specified location.
 
         If only a volume is passed, the pipette will dispense from its current
-        position. If only a location is passed, all of the liquid aspirated
-        into the pipette will be dispensed (this volume is accessible through
-        :py:attr:`current_volume`).
+        position. If only a location is passed (as in
+        ``instr.dispense(location=wellplate['A1'])``), all of the liquid
+        aspirated into the pipette will be dispensed (this volume is accessible
+        through :py:attr:`current_volume`).
 
         :param volume: The volume of liquid to dispense, in microliters. If not
                        specified, defaults to :py:attr:`current_volume`.
@@ -781,6 +792,15 @@ class InstrumentContext(CommandPublisher):
                      defaults to 1.0 (speed will not be modified).
         :type rate: float
         :returns: This instance.
+
+        .. note::
+
+            If ``dispense`` is called with a single argument, it will not try
+            to guess whether the argument is a volume or location - it is
+            required to be a volume. If you want to call ``dispense`` with only
+            a location, specify it as a keyword argument:
+            ``instr.dispense(location=wellplate['A1'])``
+
         """
         self._log.debug("dispense {} from {} at {}"
                         .format(volume,
@@ -827,17 +847,35 @@ class InstrumentContext(CommandPublisher):
         """
         Mix a volume of liquid (uL) using this pipette.
         If no location is specified, the pipette will mix from its current
-        position. If no Volume is passed, 'mix' will default to its max_volume.
+        position. If no volume is passed, ``mix`` will default to the
+        pipette's :py:attr:`max_volume`.
 
         :param repetitions: how many times the pipette should mix (default: 1)
-        :param volume: number of microlitres to mix (default: self.max_volume)
+        :param volume: number of microlitres to mix (default:
+                       :py:attr:`max_volume`)
         :param location: a Well or a position relative to well.
                          e.g, `plate.rows()[0][0].bottom()`
-                         (types.Location type).
+        :type location: types.Location
         :param rate: Set plunger speed for this mix, where,
-                     speed = rate * (aspirate_speed or dispense_speed)
+                     ``speed = rate * (aspirate_speed or dispense_speed)``
         :raises NoTipAttachedError: If no tip is attached to the pipette.
         :returns: This instance
+
+        .. note::
+
+            All the arguments to ``mix`` are optional; however, if you do
+            not want to specify one of them, all arguments after that one
+            should be keyword arguments. For instance, if you do not want
+            to specify volume, you would call
+            ``pipette.mix(1, location=wellplate['A1'])``. If you do not
+            want to specify repetitions, you would call
+            ``pipette.mix(volume=10, location=wellplate['A1'])``. Unlike
+            previous API versions, ``mix`` will not attempt to guess your
+           inputs; the first argument will always be interpreted as
+           ``repetitions``, the second as ``volume``, and the third as
+           ``location`` unless you use keywords.
+
+
         """
         self._log.debug(
             'mixing {}uL with {} repetitions in {} at rate={}'.format(
@@ -1013,6 +1051,16 @@ class InstrumentContext(CommandPublisher):
                               :py:meth:`dispense`)
 
         :returns: This instance
+
+        .. note::
+
+            Both ``volume`` and height are optional, but unlike previous API
+            versions, if you want to specify only ``height`` you must do it
+            as a keyword argument: ``pipette.air_gap(height=2)``. If you
+            call ``air_gap`` with only one unnamed argument, it will always
+            be interpreted as a volume.
+
+
         """
         if not self.hw_pipette['has_tip']:
             raise hc.NoTipAttachedError('Pipette has no tip. Aborting air_gap')
