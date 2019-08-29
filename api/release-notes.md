@@ -1,4 +1,4 @@
-# Robot OS Changes from 3.10.3 to 3.11.3
+# Robot OS Changes from 3.10.3 to 3.11.4
 
 This update migrates the Opentrons Robot OS to a new underlying technology - buildroot. This change allows us to better control the robot's system and provide better updates without requiring internet connectivity.
 
@@ -18,7 +18,6 @@ For more details about this release, please see the full [technical change log][
 - Fixed an incorrect mix after a blowout during a transfer when `mix_after` and `blow_out` are both specified
 - Fixed incorrect handling of transfers involving volumes too large for a single aspirate
 - Fixed an issue where clicking pause during a protocol could lead to the runlog being out of sync
-- Fixed an issue where missed tip probe actions would not stop the robot from moving and would lead to head crashes
 - Fixed an issue introduced in 3.11.0 where the names of certain factory reset options were incorrect
 
 ## Known issues
