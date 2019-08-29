@@ -10,7 +10,7 @@ import queue
 from typing import Any, List, Mapping
 
 import opentrons
-import opentrons.protocols
+import opentrons.legacy_api.protocols
 import opentrons.commands
 import opentrons.broker
 
@@ -158,7 +158,7 @@ def simulate(protocol_file,
         scraper = CommandScraper(stack_logger, log_level,
                                  opentrons.robot.broker)
         if isinstance(proto, dict):
-            opentrons.protocols.execute_protocol(proto)
+            opentrons.legacy_api.protocols.execute_protocol(proto)
         else:
             exec(proto, {})
     return scraper.commands

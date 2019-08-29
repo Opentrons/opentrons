@@ -13,7 +13,7 @@ from opentrons.legacy_api.containers.placeable import (
     Module as ModulePlaceable, Placeable)
 from opentrons.commands import tree, types as command_types
 from opentrons.commands.commands import is_new_loc, listify
-from opentrons.protocols import execute_protocol
+from opentrons.legacy_api.protocols import execute_protocol
 from opentrons.config import feature_flags as ff
 from opentrons.protocol_api import (ProtocolContext,
                                     labware,
