@@ -564,9 +564,10 @@ const App = () => {
                 {/* PAGE 2 */}
                 <Section label="Volume" fieldList={['wellVolume']}>
                   <div className={styles.flex_row}>
-                    <div className={styles.instructions_column}>
+                    <div className={styles.volume_instructions_column}>
                       <p>Total maximum volume of each well.</p>
                     </div>
+
                     <div className={styles.form_fields_column}>
                       <TextField
                         name="wellVolume"
