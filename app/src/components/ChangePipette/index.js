@@ -161,7 +161,7 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
     exit: () =>
       dispatch(home(robot, mount)).then(() => dispatch(push(parentUrl))),
     back: () => dispatch(goBack()),
-    onPipetteSelect: evt => ownProps.setWantedName(evt.target.value),
+    onPipetteSelect: spec => ownProps.setWantedName(spec.name),
     moveToFront: () =>
       dispatch(
         moveRobotTo(robot, {
