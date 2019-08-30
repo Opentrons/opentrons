@@ -3,23 +3,29 @@ import * as React from 'react'
 import { PrimaryButton, Icon } from '@opentrons/components'
 import styles from './importLabware.css'
 
-type Props = {
+type Props = {|
   onUpload: (
     SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<*>
   ) => void,
-  isButton?: boolean,
-}
+|}
 
-export default function ImportLabware() {
+type UploadInputProps = {|
+  onUpload: $PropertyType<Props, 'onUpload'>,
+  isButton?: boolean,
+|}
+
+export default function ImportLabware(props: Props) {
   return (
     <div className={styles.upload_group}>
-      <UploadInput onUpload={() => console.log('uploading')} />
-      <UploadInput onUpload={() => console.log('uploading')} isButton />
+      <UploadInput onUpload={props.onUpload} />
+      <UploadInput onUpload={props.onUpload} isButton />
     </div>
   )
 }
 
-function UploadInput(props: Props) {
+const stopEvent = (e: SyntheticEvent<>) => e.preventDefault()
+
+function UploadInput(props: UploadInputProps) {
   const { isButton, onUpload } = props
 
   const Label = isButton ? PrimaryButton : 'label'
@@ -36,7 +42,7 @@ function UploadInput(props: Props) {
     : { onDrop: onUpload, className: styles.file_drop }
 
   return (
-    <div className={styles.upload}>
+    <div className={styles.upload} onDragOver={stopEvent} onDrop={stopEvent}>
       <Label {...labelProps}>
         {!isButton && <Icon name="upload" className={styles.file_drop_icon} />}
         {labelText}

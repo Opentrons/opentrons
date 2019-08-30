@@ -1,4 +1,6 @@
 // @flow
+import type { WellBottomShape } from '@opentrons/shared-data'
+
 export const MAX_X_DIMENSION = 129
 export const MIN_X_DIMENSION = 127
 export const SUGGESTED_X = 127.76
@@ -19,6 +21,16 @@ export const IRREGULAR_LABWARE_ERROR = 'IRREGULAR_LABWARE_ERROR'
 
 export const LINK_CUSTOM_LABWARE_FORM =
   'https://opentrons-ux.typeform.com/to/xi8h0W'
+
+export type ImportErrorKey =
+  | 'INVALID_FILE_TYPE'
+  | 'INVALID_JSON_FILE'
+  | 'INVALID_LABWARE_DEF'
+  | 'UNSUPPORTED_LABWARE_PROPERTIES'
+export type ImportError = {|
+  key: ImportErrorKey,
+  messages?: Array<string>,
+|}
 
 export type Options = Array<{|
   name: string,
@@ -45,10 +57,9 @@ export const wellShapeOptions: Options = [
   { name: 'Rectangular', value: 'rectangular' },
 ]
 
-export type WellBottomShape = 'flat' | 'round' | 'v'
 export const wellBottomShapeOptions: Options = [
   { name: 'Flat', value: 'flat' },
-  { name: 'Round', value: 'round' },
+  { name: 'Round', value: 'u' },
   { name: 'V-Bottom', value: 'v' },
 ]
 

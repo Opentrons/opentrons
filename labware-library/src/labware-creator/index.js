@@ -1,10 +1,12 @@
 // @flow
+import Ajv from 'ajv'
 import * as React from 'react'
 import { Formik } from 'formik'
 import mapValues from 'lodash/mapValues'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import { AlertItem, AlertModal, PrimaryButton } from '@opentrons/components'
+import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
 import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
 import {
   labwareTypeOptions,
@@ -24,6 +26,7 @@ import {
   MAX_SUGGESTED_Z,
   LINK_CUSTOM_LABWARE_FORM,
 } from './fields'
+import labwareDefToFields from './labwareDefToFields'
 import labwareFormSchema from './labwareFormSchema'
 import { getDefaultDisplayName, getDefaultLoadName } from './formSelectors'
 import labwareTestProtocol, { pipetteNameOptions } from './labwareTestProtocol'
@@ -37,14 +40,22 @@ import RadioField from './components/RadioField'
 import Section from './components/Section'
 import TextField from './components/TextField'
 import ImportLabware from './components/ImportLabware'
+import ImportErrorModal from './components/ImportErrorModal'
 import styles from './styles.css'
 import type {
+  LabwareDefinition2,
+  WellBottomShape,
+} from '@opentrons/shared-data'
+import type {
+  ImportError,
   LabwareFields,
   LabwareType,
   ProcessedLabwareFields,
   WellShape,
-  WellBottomShape,
 } from './fields'
+
+const ajv = new Ajv()
+const validateLabwareSchema = ajv.compile(labwareSchema)
 
 const maskTo2Decimal = makeMaskToDecimal(2)
 
@@ -164,14 +175,14 @@ const DepthImg = (props: DepthImgProps) => {
     const imgMap = {
       v: require('./images/depth_reservoir-and-tubes_v.svg'),
       flat: require('./images/depth_reservoir-and-tubes_flat.svg'),
-      round: require('./images/depth_reservoir-and-tubes_round.svg'),
+      u: require('./images/depth_reservoir-and-tubes_round.svg'),
     }
     src = imgMap[wellBottomShape]
   } else {
     const imgMap = {
       v: require('./images/depth_plate_v.svg'),
       flat: require('./images/depth_plate_flat.svg'),
-      round: require('./images/depth_plate_round.svg'),
+      u: require('./images/depth_plate_round.svg'),
     }
     src = imgMap[wellBottomShape]
   }
@@ -294,6 +305,71 @@ const App = () => {
   ] = React.useState<boolean>(false)
 
   const [showCreatorForm, setShowCreatorForm] = React.useState<boolean>(false)
+  const [importError, setImportError] = React.useState<ImportError | null>(null)
+
+  const [lastUploaded, setLastUploaded] = React.useState<LabwareFields | null>(
+    null
+  )
+
+  const onUpload = React.useCallback(
+    (event: SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<*>) => {
+      let files: Array<File> = []
+      if (event.dataTransfer && event.dataTransfer.files) {
+        files = (event.dataTransfer.files: any)
+      } else if (event.target.files) {
+        files = (event.target.files: any)
+      }
+
+      const file = files[0]
+      const reader = new FileReader()
+
+      // reset the state of the input to allow file re-uploads
+      event.currentTarget.value = ''
+
+      if (!file.name.endsWith('.json')) {
+        setImportError({ key: 'INVALID_FILE_TYPE' })
+      } else {
+        reader.onload = readEvent => {
+          const result = readEvent.currentTarget.result
+          let parsedLabwareDef: ?LabwareDefinition2
+
+          try {
+            parsedLabwareDef = JSON.parse(result)
+          } catch (error) {
+            console.error(error)
+            setImportError({
+              key: 'INVALID_JSON_FILE',
+              messages: [error.message],
+            })
+            return
+          }
+
+          if (!validateLabwareSchema(parsedLabwareDef)) {
+            console.warn(validateLabwareSchema.errors)
+
+            setImportError({
+              key: 'INVALID_LABWARE_DEF',
+              messages: validateLabwareSchema.errors.map(
+                ajvError =>
+                  `${ajvError.schemaPath}: ${
+                    ajvError.message
+                  }. (${JSON.stringify(ajvError.params)})`
+              ),
+            })
+            return
+          }
+          const fields = labwareDefToFields(parsedLabwareDef)
+          if (!fields) {
+            setImportError({ key: 'UNSUPPORTED_LABWARE_PROPERTIES' })
+            return
+          }
+          setLastUploaded(fields)
+        }
+        reader.readAsText(file)
+      }
+    },
+    []
+  )
 
   React.useEffect(() => {
     if (process.env.NODE_ENV === 'production') {
@@ -325,9 +401,15 @@ const App = () => {
 
   return (
     <LabwareCreator>
+      {importError && (
+        <ImportErrorModal
+          onClose={() => setImportError(null)}
+          importError={importError}
+        />
+      )}
       {showExportErrorModal && (
         <AlertModal
-          className={styles.export_error_modal}
+          className={styles.error_modal}
           heading="Cannot export file"
           onCloseClick={() => setShowExportErrorModal(false)}
           buttons={[
@@ -342,7 +424,8 @@ const App = () => {
         </AlertModal>
       )}
       <Formik
-        initialValues={getDefaultFormState()}
+        initialValues={lastUploaded || getDefaultFormState()}
+        enableReinitialize
         validationSchema={labwareFormSchema}
         onSubmit={(values: LabwareFields) => {
           const castValues: ProcessedLabwareFields = labwareFormSchema.cast(
@@ -449,7 +532,7 @@ const App = () => {
                 <h2 className={styles.setup_heading}>
                   Edit a file you’ve built with our labware creator.
                 </h2>
-                <ImportLabware />
+                <ImportLabware onUpload={onUpload} />
               </div>
             </div>
             <div ref={scrollRef} />

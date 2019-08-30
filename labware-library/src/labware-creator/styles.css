@@ -49,13 +49,19 @@ h2 {
   font-weight: var(--fw-semibold);
 }
 
-.export_error_modal {
+.error_modal {
   position: fixed;
   x: 0;
   y: 0;
   width: 100%;
   height: 100%;
   z-index: 999;
+}
+
+.error_message {
+  color: var(--c-red);
+  font-style: italic;
+  padding: 0.5rem 0;
 }
 
 .callout {

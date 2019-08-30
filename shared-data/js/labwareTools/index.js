@@ -29,7 +29,7 @@ import type {
 } from '../types'
 
 // NOTE: leaving this 'beta' to reduce conflicts with future labware cloud namespaces
-const DEFAULT_CUSTOM_NAMESPACE = 'custom_beta'
+export const DEFAULT_CUSTOM_NAMESPACE = 'custom_beta'
 const SCHEMA_VERSION = 2
 const DEFAULT_BRAND_NAME = 'generic'
 
