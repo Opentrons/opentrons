@@ -30,6 +30,7 @@ class ExceptionInProtocolError(Exception):
     for proper error message formatting by the rpc, since it's only here that
     we can properly figure out formatting
     """
+
     def __init__(self, original_exc, original_tb, message, line):
         self.original_exc = original_exc
         self.original_tb = original_tb
@@ -122,7 +123,7 @@ def run_protocol(protocol: Protocol,
     ProtocolContext.
     """
     if not config.IS_ROBOT:
-        simulate = True # noqa - will be used later
+        simulate = True  # noqa - will be used later
     if None is context and simulate:
         true_context = ProtocolContext()
         true_context.home()

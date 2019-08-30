@@ -44,7 +44,6 @@ class CommandScraper:
     and log messages integrated together. Each element of the list is
     a dict following the pattern in the docs of :py:meth:`simulate`.
     """
-
     def __init__(self,
                  logger: logging.Logger,
                  level: str,
