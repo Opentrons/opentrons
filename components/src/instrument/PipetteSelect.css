@@ -28,8 +28,8 @@
   box-shadow: none;
 
   &.focus {
-    background-color: var(--c-white);
-    box-shadow: var(--shadow-lvl-1);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
   }
 }
 
@@ -37,10 +37,13 @@
   @apply --font-body-1-dark;
 
   background-color: var(--c-light-gray);
-  border-radius: var(--bd-radius-form-field);
+  border-bottom-left-radius:  var(--bd-radius-form-field);
+  border-bottom-right-radius:  var(--bd-radius-form-field);
+  padding-bottom: 0.25rem;
 }
 
 .select_group {
+  padding: 0.25rem 0;
   &:not(:first-child) {
     border-top: 1px solid color(var(--c-med-gray) alpha(0.4));
   }
@@ -50,6 +53,31 @@
   font-size: var(--fs-caption);
 }
 
-.pipette_option {
+.pipette_select {
+  max-width: 15rem;
+}
 
+.pipette_option {
+  display: flex;
+  padding: 0.25rem 0.75rem;
+  cursor: default;
+
+  &:hover {
+    background-color: var(--c-med-gray);
+  }
+}
+
+.pipette_volume_class {
+  cursor: default;
+  min-width: 3.5rem;
+}
+
+.pipette_channels {
+  cursor: default;
+  min-width: 7rem;
+}
+
+.pipette_category {
+  cursor: default;
+  min-width: 2.5rem;
 }
