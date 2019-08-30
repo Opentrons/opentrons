@@ -41,6 +41,7 @@ Drop Tip
 
 Once finished with a tip, the pipette will autonomously remove the tip when we call ``drop_tip()``. We can specify where to drop the tip by passing in a location. The below example drops the tip back at its originating location on the tip rack.
 If no location is specified, it will go to the fixed trash location on the deck.
+
 .. code-block:: python
 
     pipette.drop_tip(tiprack.wells('A1'))
@@ -351,7 +352,7 @@ You can also specify at what height you would like the robot to move to inside o
     pipette.move_to(plate.wells('A1').bottom(2)) # move to 2mm above the bottom of well A1
     pipette.move_to(plate.wells('A1').top(-2))   # move to 2mm below the top of well A1
 
-The above commands will cause the robot's head to first move upwards, then over to above the target location, then finally downwards until the target location is reached. If instead you would like the robot to mive in a straight line to the target location, you can set the movement strategy to ``'direct'``.
+The above commands will cause the robot's head to first move upwards, then over to above the target location, then finally downwards until the target location is reached. If instead you would like the robot to move in a straight line to the target location, you can set the movement strategy to ``'direct'``.
 
 .. code-block:: python
 
