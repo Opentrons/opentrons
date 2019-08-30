@@ -1,20 +1,26 @@
 """ Functions for executing protocols targeting v1
 """
 
+from typing import Any, Dict
+
 from . import execute_v1, execute_v3
 from opentrons.protocol_api.execute import (
-    get_protocol_schema_version, validate_protocol)
+    get_protocol_schema_version, validate_protocol as full_validate)
 
 
-def execute_protocol(protocol_json):
+def validate_protocol(protocol_json: Dict[Any, Any]):
     protocol_version = get_protocol_schema_version(protocol_json)
     if protocol_version > 3:
         raise RuntimeError(
             f'JSON Protocol version {protocol_version} is not yet ' +
             'supported in this version of the API')
 
-    validate_protocol(protocol_json)
+    full_validate(protocol_json)
+    return protocol_json
 
+
+def execute_protocol(protocol_json):
+    protocol_version = get_protocol_schema_version(protocol_json)
     if protocol_version == 3:
         ins = execute_v3.load_pipettes(
             protocol_json)

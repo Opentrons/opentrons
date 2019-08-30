@@ -1,8 +1,6 @@
-import ast
 import asyncio
 from copy import copy
 from functools import reduce, wraps
-import json
 import logging
 from time import time
 from uuid import uuid4
@@ -15,9 +13,11 @@ from opentrons.commands import tree, types as command_types
 from opentrons.commands.commands import is_new_loc, listify
 from opentrons.legacy_api.protocols import execute_protocol
 from opentrons.config import feature_flags as ff
+from opentrons.protocols.types import JsonProtocol, PythonProtocol
+from opentrons.protocols.parse import parse
 from opentrons.protocol_api import (ProtocolContext,
-                                    labware,
-                                    run_protocol)
+                                    labware)
+from opentrons.protocol_api.execute import run_protocol
 from opentrons.hardware_control import adapters, API
 from opentrons.types import Location, Point
 
@@ -231,22 +231,17 @@ class Session(object):
                 self._simulating_ctx = ProtocolContext(self._loop,
                                                        sim,
                                                        self._broker)
-                if self._is_json_protocol:
-                    run_protocol(protocol_json=self._protocol,
-                                 simulate=True,
-                                 context=self._simulating_ctx)
-                else:
-                    run_protocol(protocol_code=self._protocol,
-                                 simulate=True,
-                                 context=self._simulating_ctx)
+                run_protocol(self._protocol,
+                             simulate=True,
+                             context=self._simulating_ctx)
             else:
                 self._hardware.broker = self._broker
                 self._hardware.cache_instrument_models()
                 self._hardware.disconnect()
-                if self._is_json_protocol:
+                if isinstance(self._protocol, JsonProtocol):
                     execute_protocol(self._protocol)
                 else:
-                    exec(self._protocol, {})
+                    exec(self._protocol.contents, {})
         finally:
             # physically attached pipettes are re-cached during robot.connect()
             # which is important, because during a simulation, the robot could
@@ -274,31 +269,25 @@ class Session(object):
 
     def refresh(self):
         self._reset()
-        self._is_json_protocol = self.name.endswith('.json')
-
-        if self._is_json_protocol:
-            # TODO Ian 2018-05-16 use protocol JSON schema to raise
-            # warning/error here if the protocol_text doesn't follow the schema
-            self._protocol = json.loads(self.protocol_text)
-            version = 'JSON'
-        else:
-            parsed = ast.parse(self.protocol_text, filename=self.name)
-            self.metadata = extract_metadata(parsed)
-            self._protocol = compile(parsed, filename=self.name, mode='exec')
-            version = infer_version(self.metadata, parsed)
-
+        self._protocol = parse(self.protocol_text, self.name)
         self.api_level = 2 if ff.use_protocol_api_v2() else 1
+        # self.metadata is exposed via jrpc
+        if isinstance(self._protocol, PythonProtocol):
+            self.metadata = self._protocol.metadata
+            if ff.use_protocol_api_v2()\
+               and self._protocol.api_level == '1':
+                raise RuntimeError(
+                    'This protocol targets Protocol API V1, but the robot is '
+                    'set to Protocol API V2. If this is actually a V2 '
+                    'protocol, please set the \'apiLevel\' to \'2\' in the '
+                    'metadata. If you do not want to be on API V2, please '
+                    'disable the \'Use Protocol API version 2\' toggle in the '
+                    'robot\'s Advanced Settings and restart the robot.')
 
-        if ff.use_protocol_api_v2() and version == '1':
-            raise RuntimeError(
-                'This protocol targets Protocol API V1, but the robot is set '
-                'to Protocol API V2. If this is actually a V2 protocol, '
-                'please set the \'apiLevel\' to \'2\' in the metadata. If you '
-                'do not want to be on API V2, please disable the \'Use '
-                'Protocol API version 2\' toggle in the robot\'s Advanced '
-                'Settings and restart the robot.')
-
-        log.info(f"Protocol API version: {version}")
+            log.info(f"Protocol API version: {self._protocol.api_level}")
+        else:
+            self.metadata = {}
+            log.info(f"JSON protocol")
 
         try:
             self._broker.set_logger(self._sim_logger)
@@ -372,18 +361,13 @@ class Session(object):
                     loop=self._loop, broker=self._broker)
                 ctx.connect(self._hardware)
                 ctx.home()
-                if self._is_json_protocol:
-                    run_protocol(protocol_json=self._protocol,
-                                 context=ctx)
-                else:
-                    run_protocol(protocol_code=self._protocol,
-                                 context=ctx)
+                run_protocol(self._protocol, context=ctx)
             else:
                 self._hardware.broker = self._broker
-                if self._is_json_protocol:
-                    execute_protocol(self._protocol)
+                if isinstance(self._protocol, JsonProtocol):
+                    execute_protocol(self._protocol.contents)
                 else:
-                    exec(self._protocol, {})
+                    exec(self._protocol.contents, {})
             self.set_state('finished')
             self._hardware.home()
         except Exception as e:
@@ -466,67 +450,6 @@ class Session(object):
 
     def _pre_run_hooks(self):
         self._hardware.home_z()
-
-
-def extract_metadata(parsed):
-    metadata = {}
-    assigns = [
-        obj for obj in parsed.body if isinstance(obj, ast.Assign)]
-    for obj in assigns:
-        if isinstance(obj.targets[0], ast.Name) \
-                and obj.targets[0].id == 'metadata' \
-                and isinstance(obj.value, ast.Dict):
-            keys = [k.s for k in obj.value.keys]
-            values = [v.s for v in obj.value.values]
-            metadata = dict(zip(keys, values))
-    return metadata
-
-
-def infer_version_from_imports(parsed):
-    # Imports in the form of `import opentrons.robot` will have an entry in
-    # parsed.body[i].names[0].name in the form "opentrons.robot"
-    ot_imports = list(filter(
-        lambda x: 'opentrons' in x,
-        [obj.names[0].name for obj in parsed.body
-         if isinstance(obj, ast.Import)]))
-
-    # Imports in the form of `from opentrons import robot` (with or without an
-    # `as ___` statement) will have an entry in parsed.body[i].module
-    # containing "opentrons"
-    ot_from_imports = [
-        obj.names[0].name for obj in parsed.body
-        if isinstance(obj, ast.ImportFrom) and 'opentrons' in obj.module]
-
-    # If any of these are populated, filter for entries with v1-specific terms
-    opentrons_imports = ot_imports + ot_from_imports
-    v1evidence = ['robot' in i or 'instruments' in i or 'modules' in i
-                  for i in opentrons_imports]
-    if any(v1evidence):
-        return '1'
-    else:
-        return '2'
-
-
-def infer_version(metadata, parsed):
-    """
-    Infer protocol API version based on a combination of metadata and imports.
-
-    If a protocol specifies its API version using the 'apiLevel' key of a top-
-    level dict variable named `metadata`, the value for that key will be
-    returned as the version (the value will be stringified, so numeric or
-    string values can be used).
-
-    If that variable does not exist or if it does not contain the 'apiLevel'
-    key, the API version will be inferred from the imports. A script with an
-    import containing 'robot', 'instruments', or 'modules' will be assumed to
-    be an APIv1 protocol. If none of these are present, it is assumed to be an
-    APIv2 protocol (note that 'labware' is not in this list, as there is a
-    valid APIv2 import named 'labware').
-    """
-    if metadata and \
-            'apiLevel' in metadata and str(metadata['apiLevel']) in ['1', '2']:
-        return str(metadata['apiLevel'])
-    return infer_version_from_imports(parsed)
 
 
 def _accumulate(iterable):

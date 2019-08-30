@@ -10,11 +10,9 @@ from .contexts import (ProtocolContext,
                        TemperatureModuleContext,
                        MagneticModuleContext,
                        ThermocyclerContext)
-from .execute import run_protocol
 
 
-__all__ = ['run_protocol',
-           'ProtocolContext',
+__all__ = ['ProtocolContext',
            'InstrumentContext',
            'TemperatureModuleContext',
            'MagneticModuleContext',

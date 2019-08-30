@@ -25,7 +25,6 @@ from .legacy_api.api import (robot as robotv1,   # noqa(E402)
                              labware as labwarev1,
                              modules as modulesv1)
 
-
 try:
     with open(os.path.join(HERE, 'package.json')) as pkg:
         package_json = json.load(pkg)

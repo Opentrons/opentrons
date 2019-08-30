@@ -11,6 +11,7 @@ import jsonschema  # type: ignore
 from .contexts import ProtocolContext
 from . import execute_v1, execute_v3
 from opentrons import config
+from opentrons.protocols.types import PythonProtocol, Protocol
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -87,11 +88,11 @@ def _find_protocol_error(tb, proto_name):
         raise KeyError
 
 
-def _run_python(proto: Any, context: ProtocolContext):
+def _run_python(
+        proto: PythonProtocol, context: ProtocolContext):
     new_locs = locals()
     new_globs = globals()
-    name = getattr(proto, 'co_filename', '<protocol>')
-    exec(proto, new_globs, new_locs)
+    exec(proto.contents, new_globs, new_locs)
     # If the protocol is written correctly, it will have defined a function
     # like run(context: ProtocolContext). If so, that function is now in the
     # current scope.
@@ -105,7 +106,7 @@ def _run_python(proto: Any, context: ProtocolContext):
     except Exception as e:
         exc_type, exc_value, tb = sys.exc_info()
         try:
-            frame = _find_protocol_error(tb, name)
+            frame = _find_protocol_error(tb, proto.filename)
         except KeyError:
             # No pretty names, just raise it
             raise e
@@ -168,17 +169,13 @@ def validate_protocol(protocol_json: Dict[Any, Any]):
     jsonschema.validate(protocol_json, protocol_schema, resolver=resolver)
 
 
-def run_protocol(protocol_code: Any = None,
-                 protocol_json: Dict[Any, Any] = None,
+def run_protocol(protocol: Protocol,
                  simulate: bool = False,
                  context: ProtocolContext = None):
     """ Create a ProtocolRunner instance from one of a variety of protocol
     sources.
 
-    :param protocol_bytes: If the protocol is a Python protocol, pass the
-    file contents here.
-    :param protocol_json: If the protocol is a json file, pass the contents
-    here.
+    :param protocol: The :py:class:`.protocols.types.Protocol` to execute
     :param simulate: True to simulate; False to execute. If this is not an
     OT2, ``simulate`` will be forced ``True``.
     :param context: The context to use. If ``None``, create a new
@@ -195,28 +192,24 @@ def run_protocol(protocol_code: Any = None,
     else:
         raise RuntimeError(
             'Will not automatically generate hardware controller')
-    if None is not protocol_code:
-        _run_python(protocol_code, true_context)
-    elif None is not protocol_json:
-        protocol_version = get_protocol_schema_version(protocol_json)
+    if isinstance(protocol, PythonProtocol):
+        _run_python(protocol, true_context)
+    else:
+        protocol_version = get_protocol_schema_version(protocol.contents)
         if protocol_version > 3:
             raise RuntimeError(
                 f'JSON Protocol version {protocol_version} is not yet ' +
                 'supported in this version of the API')
 
-        validate_protocol(protocol_json)
-
         if protocol_version >= 3:
             ins = execute_v3.load_pipettes_from_json(
-                true_context, protocol_json)
+                true_context, protocol.contents)
             lw = execute_v3.load_labware_from_json_defs(
-                true_context, protocol_json)
-            execute_v3.dispatch_json(true_context, protocol_json, ins, lw)
+                true_context, protocol.contents)
+            execute_v3.dispatch_json(true_context, protocol.contents, ins, lw)
         else:
             ins = execute_v1.load_pipettes_from_json(
-                true_context, protocol_json)
+                true_context, protocol.contents)
             lw = execute_v1.load_labware_from_json_loadnames(
-                true_context, protocol_json)
-            execute_v1.dispatch_json(true_context, protocol_json, ins, lw)
-    else:
-        raise RuntimeError("run_protocol must have either code or json")
+                true_context, protocol.contents)
+            execute_v1.dispatch_json(true_context, protocol.contents, ins, lw)

@@ -1,5 +1,6 @@
 import pytest
 from opentrons.protocol_api import execute, ProtocolContext
+from opentrons.protocols.parse import parse
 
 
 def test_api2_runfunc():
@@ -33,21 +34,26 @@ def test_api2_runfunc():
 
 @pytest.mark.parametrize('protocol_file', ['testosaur_v2.py'])
 def test_execute_ok(protocol, protocol_file, ensure_api2, loop):
-    proto = compile(protocol.text, protocol.filename, 'exec')
+    proto = parse(protocol.text, protocol.filename)
     ctx = ProtocolContext(loop)
-    execute.run_protocol(protocol_code=proto, context=ctx)
+    execute.run_protocol(proto, context=ctx)
 
 
 def test_bad_protocol(ensure_api2, loop):
     ctx = ProtocolContext(loop)
+    no_run = parse('print("hi")')
     with pytest.raises(execute.MalformedProtocolError) as e:
-        execute.run_protocol(protocol_code='print("hi")', context=ctx)
+        execute.run_protocol(no_run, context=ctx)
         assert "No function 'run" in str(e.value)
+
+    no_args = parse('def run(): pass')
     with pytest.raises(execute.MalformedProtocolError) as e:
-        execute.run_protocol(protocol_code='def run(): pass', context=ctx)
+        execute.run_protocol(no_args, context=ctx)
         assert "Function 'run()' does not take any parameters" in str(e.value)
+
+    many_args = parse('def run(a, b): pass')
     with pytest.raises(execute.MalformedProtocolError) as e:
-        execute.run_protocol(protocol_code='def run(a, b): pass', context=ctx)
+        execute.run_protocol(many_args, context=ctx)
         assert "must be called with more than one argument" in str(e.value)
 
 
@@ -57,10 +63,10 @@ def test_proto_with_exception(ensure_api2, loop):
 def run(ctx):
     raise Exception("hi")
 '''
-    comped = compile(exc_in_root, 'test_file.py', 'exec')
+    protocol = parse(exc_in_root)
     with pytest.raises(execute.ExceptionInProtocolError) as e:
         execute.run_protocol(
-            protocol_code=comped,
+            protocol,
             context=ctx)
     assert 'Exception [line 3]: hi' in str(e.value)
 
@@ -73,10 +79,10 @@ def this_throws():
 def run(ctx):
     this_throws()
 '''
-    comped = compile(nested_exc, 'nested.py', 'exec')
+    protocol = parse(nested_exc)
     with pytest.raises(execute.ExceptionInProtocolError) as e:
         execute.run_protocol(
-            protocol_code=comped,
+            protocol,
             context=ctx)
     assert '[line 5]' in str(e.value)
     assert 'Exception [line 5]: hi' in str(e.value)

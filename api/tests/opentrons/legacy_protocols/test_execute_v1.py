@@ -1,5 +1,5 @@
 from opentrons import robot, labware, instruments
-from opentrons.protocols import execute_v1
+from opentrons.legacy_api.protocols import execute_v1
 # TODO: Modify all calls to get a Well to use the `wells` method
 
 

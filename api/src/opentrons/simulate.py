@@ -3,7 +3,6 @@ An easy entrypoint for simulating a protocol offline.
 """
 
 import argparse
-import json
 import sys
 import logging
 import queue
@@ -13,6 +12,8 @@ import opentrons
 import opentrons.legacy_api.protocols
 import opentrons.commands
 import opentrons.broker
+from opentrons.protocols import parse
+from opentrons.protocols.types import JsonProtocol
 
 
 class AccumulatingHandler(logging.Handler):
@@ -128,8 +129,10 @@ def simulate(protocol_file,
                            function in a larger application, but most logs that
                            occur during protocol simulation are best associated
                            with the actions in the protocol that cause them.
+                           Default: ``False``
     :type propagate_logs: bool
-    :param log_level: The level of logs to capture in the runlog
+    :param log_level: The level of logs to capture in the runlog. Default:
+                      ``'warning'``
     :type log_level: 'debug', 'info', 'warning', or 'error'
     :returns List[Dict[str, Dict[str, Any]]]: A run log for user output.
     """
@@ -137,30 +140,23 @@ def simulate(protocol_file,
     stack_logger.propagate = propagate_logs
 
     contents = protocol_file.read()
+    protocol = parse.parse(contents, protocol_file.name)
 
     if opentrons.config.feature_flags.use_protocol_api_v2():
-        try:
-            execute_args = {'protocol_json': json.loads(contents)}
-        except json.JSONDecodeError:
-            execute_args = {'protocol_code': contents}
         context = opentrons.protocol_api.contexts.ProtocolContext()
         context.home()
         scraper = CommandScraper(stack_logger, log_level, context.broker)
-        execute_args.update({'simulate': True,
-                             'context': context})
-        opentrons.protocol_api.execute.run_protocol(**execute_args)
+        opentrons.protocol_api.execute.run_protocol(protocol,
+                                                    simulate=True,
+                                                    context=context)
     else:
-        try:
-            proto = json.loads(contents)
-        except json.JSONDecodeError:
-            proto = contents
         opentrons.robot.disconnect()
         scraper = CommandScraper(stack_logger, log_level,
                                  opentrons.robot.broker)
-        if isinstance(proto, dict):
-            opentrons.legacy_api.protocols.execute_protocol(proto)
+        if isinstance(protocol, JsonProtocol):
+            opentrons.legacy_api.protocols.execute_protocol(protocol.contents)
         else:
-            exec(proto, {})
+            exec(protocol.contents, {})
     return scraper.commands
 
 
