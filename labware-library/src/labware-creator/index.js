@@ -596,9 +596,7 @@ const App = () => {
                 >
                   <div className={styles.flex_row}>
                     <div className={styles.instructions_column}>
-                      {values.labwareType === 'tubeRack' ||
-                      values.aluminumBlockChildType === 'tubes' ||
-                      values.aluminumBlockChildType === 'pcrTubeStrip' ? (
+                      {displayAsTube(values) ? (
                         <>
                           <p>
                             Reference the <strong>top</strong> of the{' '}

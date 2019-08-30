@@ -36,8 +36,8 @@ const IntroCopy = () => (
       <p>
         <strong>Please note:</strong> We strongly recommend you reference
         mechanical drawings directly from your supplier/manufacturer and only
-        rely on manual measurements (using callipers when possible) to
-        supplement missing information. Refer to the bottom of{' '}
+        rely on manual measurements (using calipers when possible) to supplement
+        missing information. Refer to the bottom of{' '}
         <LinkOut href={LINK_CUSTOM_LABWARE_GUIDE}>this guide </LinkOut> for some
         tips on how to get the most accuracy with your manual measurements.
       </p>
