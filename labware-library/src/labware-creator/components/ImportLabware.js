@@ -45,7 +45,7 @@ function UploadInput(props: UploadInputProps) {
     <div className={styles.upload} onDragOver={stopEvent} onDrop={stopEvent}>
       <Label {...labelProps}>
         {!isButton && <Icon name="upload" className={styles.file_drop_icon} />}
-        {labelText}
+        <span className={styles.label_text}>{labelText}</span>
         <input className={styles.file_input} type="file" onChange={onUpload} />
       </Label>
     </div>

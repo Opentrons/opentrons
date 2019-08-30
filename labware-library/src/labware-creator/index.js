@@ -42,6 +42,7 @@ import TextField from './components/TextField'
 import ImportLabware from './components/ImportLabware'
 import ImportErrorModal from './components/ImportErrorModal'
 import styles from './styles.css'
+
 import type {
   LabwareDefinition2,
   WellBottomShape,
@@ -67,6 +68,9 @@ type MakeAutofillOnChangeArgs = {|
   setTouched: ({ [$Keys<LabwareFields>]: boolean }) => void,
   setValues: ($Shape<LabwareFields>) => void,
 |}
+
+const PDF_URL =
+  'https://opentrons-publications.s3.us-east-2.amazonaws.com/TestGuide_labware.pdf'
 
 const makeAutofillOnChange = ({
   autofills,
@@ -456,7 +460,7 @@ const App = () => {
           setValues,
         }) => (
           <div className={styles.labware_creator}>
-            <h2>Custom Labware Creator</h2>
+            <h2>Custom Labware Creator BETA</h2>
             <IntroCopy />
             <div className={styles.flex_row}>
               <div className={styles.new_definition_section}>
@@ -623,9 +627,9 @@ const App = () => {
                   <div className={styles.flex_row}>
                     <div className={styles.instructions_column}>
                       <p>
-                        The grid of wells on your labware is arranged in a
-                        number of rows (run horizontally across your labware,
-                        left to right) and columns (run top to bottom).
+                        The grid of wells on your labware is arranged via rows
+                        and columns. Rows run horizontally across your labware
+                        (left to right). Columns run top to bottom.
                       </p>
                     </div>
                     <div className={styles.diagram_column}>
@@ -675,13 +679,30 @@ const App = () => {
                 >
                   <div className={styles.flex_row}>
                     <div className={styles.instructions_column}>
-                      <p>
-                        Reference the <strong>inside</strong> of the well.
-                        Ignore any lip.
-                      </p>
-                      <p>
-                        Diameter helps the robot locate the sides of the wells.
-                      </p>
+                      {displayAsTube(values) ? (
+                        <>
+                          <p>
+                            Reference the <strong>top</strong> of the{' '}
+                            <strong>inside</strong> of the tube. Ignore any lip.{' '}
+                          </p>
+                          <p>
+                            Diameter helps the robot locate the sides of the
+                            tubes. If there are multiple measurements for this
+                            dimension then use the smaller one.{' '}
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <p>
+                            Reference the <strong>inside</strong> of the well.
+                            Ignore any lip.
+                          </p>
+                          <p>
+                            Diameter helps the robot locate the sides of the
+                            wells.
+                          </p>
+                        </>
+                      )}
                     </div>
                     <div className={styles.diagram_column}>
                       <WellXYImg wellShape={values.wellShape} />
@@ -859,10 +880,22 @@ const App = () => {
                   <div className={styles.flex_row}>
                     <div className={styles.instructions_column}>
                       <p>
-                        Your file will be exported with a protocol that will
-                        help you test and troubleshoot your labware definition
-                        on the robot. The protocol requires a Single Channel
-                        pipette on the right mount of your robot.
+                        Files are exported as a zipped file containing 1) the
+                        labware definition as a JSON file, and 2) a test python
+                        protocol referencing the labware to help troubleshoot
+                        the accuracy of the definition on your robot. The test
+                        protocol will require a single channel pipette on the
+                        <strong> right mount</strong> of your robot.{' '}
+                        <LinkOut href={PDF_URL}>Click here</LinkOut> for
+                        instructions on running the test protocol.
+                      </p>
+                      <p>
+                        Please Note: It’s important to create a labware
+                        definition that is precise, and does not rely on
+                        excessive calibration prior to each run to achieve
+                        accuracy. In this way you&apos;ll generate labware
+                        definitions that are reusable and shareable with others
+                        inside or outside your lab.
                       </p>
                     </div>
                     <div className={styles.export_form_fields}>
@@ -882,11 +915,6 @@ const App = () => {
                           options={pipetteNameOptions}
                         />
                       </div>
-                      <p className={styles.pipette_field_caption}>
-                        Files are exported with a protocol that will use a
-                        single channel pipette to test whether a pipette can hit
-                        key points on your labware
-                      </p>
                       <PrimaryButton
                         className={styles.export_button}
                         onClick={() => {

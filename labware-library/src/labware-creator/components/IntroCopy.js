@@ -4,31 +4,29 @@ import LinkOut from './LinkOut'
 import { LINK_CUSTOM_LABWARE_FORM } from '../fields'
 import styles from '../styles.css'
 
+const LINK_CUSTOM_LABWARE_GUIDE =
+  'https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions'
 const IntroCopy = () => (
   <>
-    <p>Use this tool if you are creating one of the following:</p>
-    <ul>
+    <LinkOut
+      href={LINK_CUSTOM_LABWARE_GUIDE}
+      className={styles.labware_guide_button}
+    >
+      read the custom labware guide
+    </LinkOut>
+    <p>
+      This tool will allow you to create definitions for well plates,
+      reservoirs, tubes in Opentrons tube racks, and plates/tubes in Opentrons
+      aluminum blocks.
+    </p>
+    <ol>
+      <li>All your wells/tubes must be the same size and volume.</li>
+      <li>All columns and rows must be evenly spaced.</li>
       <li>
-        Well plates and reservoirs which can be made via the labware creator
-        (refer to{' '}
-        <LinkOut href="https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions">
-          this guide
-        </LinkOut>{' '}
-        for more information)
+        The labware must fit snugly into a slot on the deck without the help of
+        an adapter.
       </li>
-      <li>
-        Tubes + the{' '}
-        <LinkOut href="https://shop.opentrons.com/collections/racks-and-adapters/products/tube-rack-set-1">
-          Opentrons tube rack
-        </LinkOut>
-      </li>
-      <li>
-        Tubes / plates + the{' '}
-        <LinkOut href="https://shop.opentrons.com/collections/racks-and-adapters/products/aluminum-block-set">
-          Opentrons aluminum block
-        </LinkOut>
-      </li>
-    </ul>
+    </ol>
     <p>
       For all other custom labware, please use this{' '}
       <LinkOut href={LINK_CUSTOM_LABWARE_FORM}>request form</LinkOut>
@@ -37,10 +35,11 @@ const IntroCopy = () => (
     <div className={styles.callout}>
       <p>
         <strong>Please note:</strong> We strongly recommend you reference
-        mechanical drawings to ensure accurate measurements for defining
-        labware, only relying on manual measurements to supplement missing
-        information. To learn more about ways to access mechanical drawings from
-        manufacturers, please refer to this guide.
+        mechanical drawings directly from your supplier/manufacturer and only
+        rely on manual measurements (using calipers when possible) to supplement
+        missing information. Refer to the bottom of{' '}
+        <LinkOut href={LINK_CUSTOM_LABWARE_GUIDE}>this guide </LinkOut> for some
+        tips on how to get the most accuracy with your manual measurements.
       </p>
     </div>
   </>
