@@ -14,11 +14,6 @@
     line-height: var(--lh-copy);
   }
 
-  & a,
-  & a:visited {
-    color: var(--c-blue);
-  }
-
   & ul {
     list-style: disc;
     padding-left: 1.25rem;
@@ -35,15 +30,35 @@
   }
 }
 
+a,
+a:visited {
+  color: var(--c-blue);
+}
+
 /* TODO (ka 2019-8-23): Removed nesting here to allow for easier style overrides/reduce specificity */
 h2 {
   @apply --font-header-dark;
 }
 
 .labware_guide_button {
+  display: inline-block;
   width: auto;
   margin: 2rem 0 1rem;
-  padding: 0.5rem 2rem;
+  padding: 1rem 2rem;
+  border-radius: 3px;
+  background-color: var(--c-blue);
+  font-size: var(--fs-body-2);
+  color: white;
+  font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
+  text-transform: uppercase;
+
+  &:hover {
+    background-color: #00f;
+  }
+
+  &:visited {
+    color: white;
+  }
 }
 
 .start_creating_btn:focus {
@@ -72,7 +87,6 @@ h2 {
 
 .setup_heading {
   border: none;
-  font-weight: var(--fw-regular);
 }
 
 .flex_row {

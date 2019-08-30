@@ -35,8 +35,8 @@ export type LabwareType =
 export const labwareTypeOptions: Options = [
   { name: 'Well Plate', value: 'wellPlate' },
   { name: 'Reservoir', value: 'reservoir' },
-  { name: 'Tube Rack', value: 'tubeRack' },
-  { name: 'Aluminum Block', value: 'aluminumBlock' },
+  { name: 'Tubes + Opentrons Tube Rack', value: 'tubeRack' },
+  { name: 'Tubes / Plates + Opentrons Aluminum Block', value: 'aluminumBlock' },
 ]
 
 export type WellShape = 'circular' | 'rectangular'
