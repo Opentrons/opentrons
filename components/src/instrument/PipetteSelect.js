@@ -40,7 +40,7 @@ const clearStyles = () => null
 const PipetteSelect = (props: SelectProps) => {
   const filteredNames = without(
     getAllPipetteNames('maxVolume', 'channels'),
-    ...props.nameBlacklist
+    ...(props.nameBlacklist || [])
   )
   const allPipetteNameSpecs = map(filteredNames, getPipetteNameSpecs)
   const nameSpecsByCategory = groupBy(allPipetteNameSpecs, 'displayCategory')

@@ -19,19 +19,20 @@ const OPTIONS = getAllPipetteNames().map(name => ({
 }))
 
 export default function PipetteSelection(props: PipetteSelectionProps) {
-  let pipetteOptions
-  if (props.__pipettePlusEnabled) {
-    pipetteOptions = OPTIONS
-  } else {
-    pipetteOptions = filter(OPTIONS, function(pipette) {
-      return !pipette.name.includes('GEN2')
-    })
+  let nameBlacklist = []
+  if (!props.__pipettePlusEnabled) {
+    nameBlacklist = [
+      'p20_multi_gen2',
+      'p20_single_gen2',
+      'p300_multi_gen2',
+      'p300_single_gen2',
+      'p1000_single_gen2',
+    ]
   }
-
   return (
     <label className={styles.pipette_selection}>
       <span className={styles.pipette_selection_label}>{LABEL}</span>
-      <PipetteSelect {...props} />
+      <PipetteSelect {...props} nameBlacklist={nameBlacklist} />
     </label>
   )
 }
