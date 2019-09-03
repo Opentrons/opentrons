@@ -931,11 +931,14 @@ class SmoothieDriver_3_0_0:
             # is locking at a higher level like in APIv2.
             self._reset_from_error()
             error_axis = se.ret_code.strip()[-1]
-            if GCODES['HOME'] not in command and error_axis in 'XYZABC':
-                log.warning(
-                    f"alarm/error in {se.ret_code}, homing {error_axis}")
+            log.warning(
+                    f"alarm/error: command={command}, resp={se.ret_code}")
+            if GCODES['MOVE'] in command or GCODES['PROBE'] in command:
+                if error_axis not in 'XYZABC':
+                    error_axis = AXES
+                log.info("Homing after alarm/error")
                 self.home(error_axis)
-                raise SmoothieError(se.ret_code, command)
+            raise SmoothieError(se.ret_code, command)
 
     def _send_command_unsynchronized(self,
                                      command,
