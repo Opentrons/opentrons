@@ -12,6 +12,7 @@ from aiohttp import web
 from opentrons.config import CONFIG
 from .rpc import RPCServer
 from .http import HTTPServer
+from opentrons.hardware_control import adapters
 from opentrons.api.routers import MainRouter
 import opentrons
 
@@ -84,7 +85,7 @@ class ThreadedAsyncLock:
 
 # Support for running using aiohttp CLI.
 # See: https://docs.aiohttp.org/en/stable/web.html#command-line-interface-cli
-def init(hardware: 'HardwareAPILike' = None):
+def init(hardware: 'HardwareAPILike' = None, loop: asyncio.AbstractEventLoop = None):
     """
     Builds an application and sets up RPC and HTTP servers with it.
 
@@ -96,10 +97,14 @@ def init(hardware: 'HardwareAPILike' = None):
     """
 
     app = web.Application(middlewares=[error_middleware])
+    checked_version =\
+        2 if opentrons.config.feature_flags.use_protocol_api_v2() else 1
     if hardware:
         checked_hardware = hardware
-    else:
+    elif checked_version == 1:
         checked_hardware = opentrons.hardware
+    else:
+        checked_hardware = adapters.SingletonAdapter(loop)
     app['com.opentrons.hardware'] = checked_hardware
     app['com.opentrons.motion_lock'] = ThreadedAsyncLock()
     app['com.opentrons.rpc'] = RPCServer(
@@ -124,4 +129,4 @@ def run(hostname=None, port=None, path=None, loop=None):
             hostname, port))
         path = None
 
-    web.run_app(init(), host=hostname, port=port, path=path)
+    web.run_app(init(loop=loop), host=hostname, port=port, path=path)

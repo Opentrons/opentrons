@@ -23,6 +23,7 @@ from opentrons import config, types
 from opentrons.server import init
 from opentrons.deck_calibration import endpoints
 from opentrons import hardware_control as hc
+from opentrons.hardware_control import API, adapters
 from opentrons.protocol_api import ProtocolContext
 from opentrons.types import Mount
 
@@ -140,40 +141,40 @@ def old_aspiration(monkeypatch):
 def using_api2(loop):
     oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
     os.environ['OT_API_FF_useProtocolApi2'] = '1'
-    opentrons.reset_globals(version=2, loop=loop)
+    print(f"Type of the loop {type(loop)}")
+    hardware = adapters.SingletonAdapter(loop)
     try:
-        yield opentrons.hardware
+        yield hardware
     finally:
         try:
-            loop.run_until_complete(opentrons.hardware.reset())
+            loop.run_until_complete(hardware.reset())
         except RuntimeError:
-            loop.create_task(opentrons.hardware.reset())
+            loop.create_task(hardware.reset())
         if None is oldenv:
             os.environ.pop('OT_API_FF_useProtocolApi2')
         else:
             os.environ['OT_API_FF_useProtocolApi2'] = oldenv
-        opentrons.reset_globals(loop=loop)
-        opentrons.hardware.set_config(config.robot_configs.load())
+        hardware.set_config(config.robot_configs.load())
 
 
 @contextlib.contextmanager
 def using_sync_api2(loop):
     oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
     os.environ['OT_API_FF_useProtocolApi2'] = '1'
-    opentrons.reset_globals(version=2, loop=loop)
+    hardware = adapters.SynchronousAdapter(
+        API.build_hardware_controller)
     try:
-        yield hc.adapters.SynchronousAdapter(opentrons.hardware)
+        yield hardware
     finally:
         try:
-            loop.run_until_complete(opentrons.hardware.reset())
+            loop.run_until_complete(hardware.reset())
         except RuntimeError:
-            loop.create_task(opentrons.hardware.reset())
+            loop.create_task(hardware.reset())
         if None is oldenv:
             os.environ.pop('OT_API_FF_useProtocolApi2')
         else:
             os.environ['OT_API_FF_useProtocolApi2'] = oldenv
-        opentrons.reset_globals(loop=loop)
-        opentrons.hardware.set_config(config.robot_configs.load())
+        hardware.set_config(config.robot_configs.load())
 
 
 @pytest.fixture
@@ -187,14 +188,14 @@ def using_api1(loop):
     oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
     if oldenv:
         os.environ.pop('OT_API_FF_useProtocolApi2')
-    opentrons.reset_globals(version=1, loop=loop)
+    opentrons.reset_globals()
     try:
         yield opentrons.hardware
     finally:
         opentrons.hardware.reset()
         if None is not oldenv:
             os.environ['OT_API_FF_useProtocolApi2'] = oldenv
-        opentrons.reset_globals(loop=loop)
+        opentrons.reset_globals()
         opentrons.robot.config = config.robot_configs.load()
 
 
@@ -499,7 +500,7 @@ def cntrlr_mock_connect(monkeypatch):
 
 @pytest.fixture
 def hardware_api(loop):
-    hw_api = hc.API.build_hardware_simulator(loop=loop)
+    hw_api = API.build_hardware_simulator(loop=loop)
     return hw_api
 
 

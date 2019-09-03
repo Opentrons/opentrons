@@ -75,6 +75,13 @@ class API(HardwareAPILike):
     """
 
     CLS_LOG = mod_log.getChild('API')
+    #
+    # def __new__(self,
+    #             backend: _Backend,
+    #             config: robot_configs.robot_config = None,
+    #             loop: asyncio.AbstractEventLoop = None) -> None:
+    #     if __name__ == '__main__':
+    #         self.__init__(backend, config, loop)
 
     def __init__(self,
                  backend: _Backend,
