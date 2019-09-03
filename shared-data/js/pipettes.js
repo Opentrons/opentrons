@@ -21,13 +21,7 @@ export type PipetteModelSpecs = {
   tipLength: { value: number },
 } & PipetteNameSpecs
 
-type SortableProps = 'maxVolume' | 'channels' | 'displayCategory'
-
-// displayCategories sorted by newest to oldest
-export const ALL_PIPETTE_CATEGORIES: Array<PipetteDisplayCategory> = [
-  'GEN2',
-  'OG',
-]
+type SortableProps = 'maxVolume' | 'channels'
 
 // models sorted by channels and then volume by default
 const ALL_PIPETTE_NAMES: Array<string> = Object.keys(pipetteNameSpecs).sort(

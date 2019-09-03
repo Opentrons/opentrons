@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import find from 'lodash/find'
 import groupBy from 'lodash/groupBy'
 import map from 'lodash/map'
 import without from 'lodash/without'
@@ -16,14 +15,14 @@ import {
 import { Icon } from '../icons'
 import styles from './PipetteSelect.css'
 
-type SelectProps = {
-  /** currently selected value */
-  value: ValueType,
+type SelectProps = {|
+  /** currently selected value, optional in case selecting triggers immediate action */
+  value?: string,
   /** react-select change handler */
   onChange: (option: *) => mixed,
   /** list of pipette names to omit */
-  nameBlacklist: Array<string>,
-}
+  nameBlacklist?: Array<string>,
+|}
 
 const SELECT_STYLES = {
   input: () => ({ padding: 0 }),
