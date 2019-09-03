@@ -32,7 +32,7 @@ const SELECT_STYLES = {
   menuList: () => ({ padding: 0 }),
   valueContainer: base => ({
     ...base,
-    padding: '0.25rem 0.75rem',
+    padding: '0 0.75rem',
   }),
 }
 const clearStyles = () => null

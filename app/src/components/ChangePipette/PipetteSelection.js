@@ -1,8 +1,6 @@
 // @flow
 import * as React from 'react'
-import filter from 'lodash/filter'
 
-import { getAllPipetteNames, getPipetteNameSpecs } from '@opentrons/shared-data'
 import { PipetteSelect } from '@opentrons/components'
 import styles from './styles.css'
 
@@ -13,18 +11,12 @@ export type PipetteSelectionProps = {
   __pipettePlusEnabled: boolean,
 }
 
-const OPTIONS = getAllPipetteNames().map(name => ({
-  name: getPipetteNameSpecs(name)?.displayName || name,
-  value: name,
-}))
-
 export default function PipetteSelection(props: PipetteSelectionProps) {
-  let nameBlacklist = []
+  let nameBlacklist = ['p20_multi_gen2', 'p300_multi_gen2']
   if (!props.__pipettePlusEnabled) {
     nameBlacklist = [
-      'p20_multi_gen2',
+      ...nameBlacklist,
       'p20_single_gen2',
-      'p300_multi_gen2',
       'p300_single_gen2',
       'p1000_single_gen2',
     ]
