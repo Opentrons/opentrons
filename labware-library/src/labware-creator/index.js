@@ -16,8 +16,6 @@ import {
   aluminumBlockChildTypeOptions,
   getDefaultFormState,
   getImplicitAutofillValues,
-  wellBottomShapeOptions,
-  wellShapeOptions,
   yesNoOptions,
   tubeRackAutofills,
   SUGGESTED_X,
@@ -39,8 +37,13 @@ import LinkOut from './components/LinkOut'
 import RadioField from './components/RadioField'
 import Section from './components/Section'
 import TextField from './components/TextField'
+import HeightGuidingText from './components/HeightGuidingText'
 import ImportLabware from './components/ImportLabware'
 import ImportErrorModal from './components/ImportErrorModal'
+import {
+  wellShapeOptionsWithIcons,
+  wellBottomShapeOptionsWithIcons,
+} from './components/optionsWithImages'
 import styles from './styles.css'
 
 import type {
@@ -208,50 +211,6 @@ const XYOffsetImg = (props: {|
   return <img src={src} />
 }
 
-const HeightGuidingText = (props: {| labwareType: ?LabwareType |}) => {
-  const { labwareType } = props
-  const footer = (
-    <p>
-      The height measurement informs the robot of the top and bottom of your
-      labware.
-    </p>
-  )
-  if (labwareType === 'tubeRack') {
-    return (
-      <>
-        <p>Place your tubes inside the rack.</p>
-        <p>
-          Reference{' '}
-          <strong>from the top of the tube to bottom of the rack.</strong>{' '}
-          Include any well lip. Exclude any cover or cap.
-        </p>
-        {footer}
-      </>
-    )
-  }
-  if (labwareType === 'aluminumBlock') {
-    return (
-      <>
-        <p>Put your labware on top of the aluminum block.</p>
-        <p>
-          Reference{' '}
-          <strong>
-            from the top of your labware to the bottom of the block.
-          </strong>{' '}
-          Include any well or tube lip. Exclude any cover or cap.
-        </p>
-        {footer}
-      </>
-    )
-  }
-  return (
-    <>
-      <p>Include any well lip in the measurement. Exclude any cover or cap.</p>
-      {footer}
-    </>
-  )
-}
-
 const displayAsTube = (values: LabwareFields) =>
   values.labwareType === 'tubeRack' ||
   (values.labwareType === 'aluminumBlock' &&
@@ -301,41 +260,6 @@ const getXYDimensionAlerts = (
     <AlertItem type="info" title={xyMessage} />
   ) : null
 }
-
-// TODO IMMEDIATELY: factor out
-const WELL_SHAPE_IMAGES = {
-  rectangular: require('../images/rectangularWell.svg'),
-  circular: require('../images/circularWell.svg'),
-}
-
-const WELL_BOTTOM_IMAGES = {
-  flat: require('../images/wellShapeFlat.svg'),
-  u: require('../images/wellShapeU.svg'),
-  v: require('../images/wellShapeV.svg'),
-}
-
-// TODO IMMEDIATELY: DRY
-const wellShapeOptionsWithIcons = wellShapeOptions.map(opt => ({
-  name: opt.name,
-  value: opt.value,
-  children: (
-    <div className={styles.radio_image_label}>
-      <img className={styles.radio_image} src={WELL_SHAPE_IMAGES[opt.value]} />
-      <div>{opt.name}</div>
-    </div>
-  ),
-}))
-
-const wellBottomShapeOptionsWithIcons = wellBottomShapeOptions.map(opt => ({
-  name: opt.name,
-  value: opt.value,
-  children: (
-    <div className={styles.radio_image_label}>
-      <img className={styles.radio_image} src={WELL_BOTTOM_IMAGES[opt.value]} />
-      <div>{opt.name}</div>
-    </div>
-  ),
-}))
 
 const App = () => {
   const [

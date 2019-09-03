@@ -120,22 +120,6 @@ h2 {
   max-width: 16rem;
 }
 
-.hidden {
-  display: none;
-}
-
-.radio_image_label {
-  text-anchor: middle;
-  display: flex;
-  align-items: center;
-  padding: 0.25rem 0;
-}
-
-.radio_image {
-  padding: 0 0.5rem;
-  height: 1.25rem;
-}
-
 .instructions_column,
 .diagram_column,
 .form_fields_column,
