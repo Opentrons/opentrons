@@ -302,6 +302,41 @@ const getXYDimensionAlerts = (
   ) : null
 }
 
+// TODO IMMEDIATELY: factor out
+const WELL_SHAPE_IMAGES = {
+  rectangular: require('../images/rectangularWell.svg'),
+  circular: require('../images/circularWell.svg'),
+}
+
+const WELL_BOTTOM_IMAGES = {
+  flat: require('../images/wellShapeFlat.svg'),
+  u: require('../images/wellShapeU.svg'),
+  v: require('../images/wellShapeV.svg'),
+}
+
+// TODO IMMEDIATELY: DRY
+const wellShapeOptionsWithIcons = wellShapeOptions.map(opt => ({
+  name: opt.name,
+  value: opt.value,
+  children: (
+    <div className={styles.radio_image_label}>
+      <img className={styles.radio_image} src={WELL_SHAPE_IMAGES[opt.value]} />
+      <div>{opt.name}</div>
+    </div>
+  ),
+}))
+
+const wellBottomShapeOptionsWithIcons = wellBottomShapeOptions.map(opt => ({
+  name: opt.name,
+  value: opt.value,
+  children: (
+    <div className={styles.radio_image_label}>
+      <img className={styles.radio_image} src={WELL_BOTTOM_IMAGES[opt.value]} />
+      <div>{opt.name}</div>
+    </div>
+  ),
+}))
+
 const App = () => {
   const [
     showExportErrorModal,
@@ -708,7 +743,11 @@ const App = () => {
                       <WellXYImg wellShape={values.wellShape} />
                     </div>
                     <div className={styles.form_fields_column}>
-                      <RadioField name="wellShape" options={wellShapeOptions} />
+                      <RadioField
+                        name="wellShape"
+                        labelTextClassName={styles.hidden}
+                        options={wellShapeOptionsWithIcons}
+                      />
                       {values.wellShape === 'rectangular' ? (
                         <>
                           <TextField
@@ -757,9 +796,10 @@ const App = () => {
                       />
                     </div>
                     <div className={styles.form_fields_column}>
-                      <Dropdown
+                      <RadioField
                         name="wellBottomShape"
-                        options={wellBottomShapeOptions}
+                        labelTextClassName={styles.hidden}
+                        options={wellBottomShapeOptionsWithIcons}
                       />
                       <TextField
                         name="wellDepth"
