@@ -120,3 +120,14 @@
   position: fixed;
   clip: rect(1px 1px 1px 1px);
 }
+
+.upload_helper_copy {
+  @apply --font-body-1-dark;
+}
+
+/* TODO: Ian 2019-09-03 similar styles for links exist in multiple projects */
+.link {
+  color: var(--c-blue);
+  text-decoration: none;
+  cursor: pointer;
+}
