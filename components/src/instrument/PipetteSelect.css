@@ -37,13 +37,14 @@
   @apply --font-body-1-dark;
 
   background-color: var(--c-light-gray);
-  border-bottom-left-radius:  var(--bd-radius-form-field);
-  border-bottom-right-radius:  var(--bd-radius-form-field);
+  border-bottom-left-radius: var(--bd-radius-form-field);
+  border-bottom-right-radius: var(--bd-radius-form-field);
   padding-bottom: 0.25rem;
 }
 
 .select_group {
   padding: 0.25rem 0;
+
   &:not(:first-child) {
     border-top: 1px solid color(var(--c-med-gray) alpha(0.4));
   }
