@@ -10,6 +10,7 @@ import startCase from 'lodash/startCase'
 import reduce from 'lodash/reduce'
 import i18n from '../../localization'
 import { getOnlyLatestDefs } from '../../labware-defs/utils'
+import KnowledgeBaseLink from '../KnowledgeBaseLink'
 import { Portal } from '../portals/TopPortal'
 import { PDTitledList } from '../lists'
 import LabwareItem from './LabwareItem'
@@ -139,16 +140,25 @@ const LabwareDropdown = (props: Props) => {
           ))}
         </ul>
         {props.showUploadCustomLabwareButton && (
-          <OutlineButton Component="label" className={styles.upload_button}>
-            {i18n.t('button.upload_custom_labware')}
-            <input
-              type="file"
-              onChange={e => {
-                onUploadLabware(e)
-                selectCategory(CUSTOM_CATEGORY)
-              }}
-            />
-          </OutlineButton>
+          <>
+            <OutlineButton Component="label" className={styles.upload_button}>
+              {i18n.t('button.upload_custom_labware')}
+              <input
+                type="file"
+                onChange={e => {
+                  onUploadLabware(e)
+                  selectCategory(CUSTOM_CATEGORY)
+                }}
+              />
+            </OutlineButton>
+            <div className={styles.upload_helper_copy}>
+              {i18n.t('modal.labware_selection.creating_labware_defs')}{' '}
+              <KnowledgeBaseLink className={styles.link} to="customLabware">
+                here
+              </KnowledgeBaseLink>
+              .
+            </div>
+          </>
         )}
         <OutlineButton onClick={onClose}>
           {i18n.t('button.close')}
