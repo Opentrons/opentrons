@@ -5,7 +5,6 @@ import { withRouter } from 'react-router'
 import some from 'lodash/some'
 import map from 'lodash/map'
 import mapValues from 'lodash/mapValues'
-import countBy from 'lodash/countBy'
 import { type DeckSlotId } from '@opentrons/shared-data'
 import type { ContextRouter } from 'react-router'
 
@@ -19,8 +18,7 @@ import {
   type SessionModule,
 } from '../../robot'
 
-import { getModulesState } from '../../robot-api'
-import { getConnectedRobot } from '../../discovery'
+import { getMissingModules } from '../../robot-api'
 
 import LabwareItem from './LabwareItem'
 
@@ -128,30 +126,18 @@ function DeckMap(props: Props) {
 function mapStateToProps(state: State, ownProps: OP): SP {
   let modulesBySlot = mapValues(
     robotSelectors.getModulesBySlot(state),
-    module => ({
-      ...module,
-      mode: 'default',
-    })
+    module => ({ ...module, mode: 'default' })
   )
 
   // only show necessary modules if still need to connect some
-  if (ownProps.modulesRequired) {
-    const robot = getConnectedRobot(state)
-    const sessionModules = robotSelectors.getModules(state)
-    const actualModules = robot ? getModulesState(state, robot.name) : []
-
-    const requiredNames = countBy(sessionModules, 'name')
-    const actualNames = countBy(actualModules, 'name')
+  if (ownProps.modulesRequired === true) {
+    const missingModules = getMissingModules(state)
 
     modulesBySlot = mapValues(
       robotSelectors.getModulesBySlot(state),
       module => {
-        const present =
-          !module || requiredNames[module.name] === actualNames[module.name]
-        return {
-          ...module,
-          mode: present ? 'present' : 'missing',
-        }
+        const present = !missingModules.some(mm => mm.name === module.name)
+        return { ...module, mode: present ? 'present' : 'missing' }
       }
     )
     return {
@@ -166,7 +152,7 @@ function mapStateToProps(state: State, ownProps: OP): SP {
       }),
       {}
     )
-    if (!ownProps.enableLabwareSelection) {
+    if (ownProps.enableLabwareSelection !== true) {
       return {
         labwareBySlot,
         modulesBySlot,

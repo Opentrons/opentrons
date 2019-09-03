@@ -17,5 +17,6 @@
 .alert {
   @apply --absolute-fill;
 
+  z-index: 1;
   bottom: auto;
 }
