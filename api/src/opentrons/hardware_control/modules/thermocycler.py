@@ -201,6 +201,8 @@ class Thermocycler(mod_abc.AbstractModule):
             temp=temperature, hold_time=hold_time, ramp_rate=ramp_rate)
         if hold_time:
             await self.wait_for_hold()
+        else:
+            await self.wait_for_temp()
 
     async def _execute_cycles(self,
                               steps: List[types.ThermocyclerStep],
@@ -227,6 +229,7 @@ class Thermocycler(mod_abc.AbstractModule):
     async def set_lid_temperature(self, temp: Optional[float]):
         """ Set the lid temperature in deg Celsius """
         await self._driver.set_lid_temperature(temp=temp)
+        await self.wait_for_lid_temp()
 
     async def stop_lid_heating(self):
         return await self._driver.stop_lid_heating()
@@ -267,6 +270,10 @@ class Thermocycler(mod_abc.AbstractModule):
     @property
     def lid_status(self):
         return self._driver.lid_status
+
+    @property
+    def lid_temp_status(self):
+        return self._driver.lid_temp_status
 
     @property
     def ramp_rate(self):
