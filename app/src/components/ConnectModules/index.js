@@ -8,7 +8,6 @@ import {
   actions as robotActions,
 } from '../../robot'
 
-import { RefreshWrapper } from '../Page'
 import DeckMap from '../DeckMap'
 import Prompt from './Prompt'
 import styles from './styles.css'
@@ -36,14 +35,12 @@ function ConnectModules(props: Props) {
   const onPromptClick = modulesMissing ? fetchModules : setReviewed
 
   return (
-    <RefreshWrapper refresh={fetchModules}>
-      <div className={styles.page_content_dark}>
-        <Prompt modulesMissing={modulesMissing} onClick={onPromptClick} />
-        <div className={styles.deck_map_wrapper}>
-          <DeckMap className={styles.deck_map} modulesRequired />
-        </div>
+    <div className={styles.page_content_dark}>
+      <Prompt modulesMissing={modulesMissing} onClick={onPromptClick} />
+      <div className={styles.deck_map_wrapper}>
+        <DeckMap className={styles.deck_map} modulesRequired />
       </div>
-    </RefreshWrapper>
+    </div>
   )
 }
 

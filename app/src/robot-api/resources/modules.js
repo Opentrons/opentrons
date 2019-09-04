@@ -2,10 +2,17 @@
 // modules endpoints
 import { combineEpics, ofType } from 'redux-observable'
 import pathToRegexp from 'path-to-regexp'
-import { of } from 'rxjs'
+import { of, interval } from 'rxjs'
 import countBy from 'lodash/countBy'
 
-import { switchMap, withLatestFrom, filter } from 'rxjs/operators'
+import {
+  switchMap,
+  mergeMap,
+  withLatestFrom,
+  filter,
+  map,
+  takeWhile,
+} from 'rxjs/operators'
 
 import {
   getRobotApiState,
@@ -43,6 +50,8 @@ export const MODULES_PATH = '/modules'
 export const MODULE_DATA_PATH = '/modules/:serial/data'
 export const MODULE_BY_SERIAL_PATH = '/modules/:serial'
 
+const POLL_MODULE_INTERVAL_MS = 2000
+
 const RE_MODULE_DATA_PATH = pathToRegexp(MODULE_DATA_PATH)
 
 export const fetchModules = (host: RobotHost): RobotApiAction => ({
@@ -50,6 +59,7 @@ export const fetchModules = (host: RobotHost): RobotApiAction => ({
   payload: { host, method: GET, path: MODULES_PATH },
 })
 
+// TODO(mc, 2019-09-03): this endpoint is not used anywhere; is it needed?
 export const fetchModuleData = (
   host: RobotHost,
   id: string
@@ -73,25 +83,28 @@ const fetchModulesEpic = createBaseRobotApiEpic(FETCH_MODULES)
 const fetchModuleDataEpic = createBaseRobotApiEpic(FETCH_MODULE_DATA)
 const sendModuleCommandEpic = createBaseRobotApiEpic(SEND_MODULE_COMMAND)
 
-const eagerlyLoadModulesEpic: Epic = (action$, state$) =>
+// TODO(mc, 2019-09-03): replace polling with real-time WS notifications
+const pollModulesWhileConnectedEpic: Epic = (action$, state$) =>
   action$.pipe(
     ofType('robot:CONNECT_RESPONSE'),
-    filter(action => !action.payload?.error),
-    withLatestFrom(state$),
-    switchMap<[ConnectResponseAction, AppState], _, mixed>(
-      ([action, state]) => {
-        const robotHost = getConnectedRobot(state)
-        return robotHost ? of(fetchModules(robotHost)) : of(null)
-      }
-    ),
-    filter(Boolean)
+    filter<ConnectResponseAction>(action => !action.payload?.error),
+    mergeMap<_, _, mixed>(() =>
+      interval(POLL_MODULE_INTERVAL_MS).pipe(
+        withLatestFrom(state$),
+        map<[number, AppState], ?RobotHost>(([_, state]) =>
+          getConnectedRobot(state)
+        ),
+        takeWhile<?RobotHost, any>(robot => Boolean(robot)),
+        switchMap<RobotHost, _, mixed>(robot => of(fetchModules(robot)))
+      )
+    )
   )
 
 export const modulesEpic = combineEpics(
   fetchModulesEpic,
   fetchModuleDataEpic,
   sendModuleCommandEpic,
-  eagerlyLoadModulesEpic
+  pollModulesWhileConnectedEpic
 )
 
 export function modulesReducer(

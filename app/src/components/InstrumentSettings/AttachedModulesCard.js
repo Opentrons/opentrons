@@ -3,8 +3,8 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 
-import { Card, IntervalWrapper } from '@opentrons/components'
-import { fetchModules, getModulesState } from '../../robot-api'
+import { Card } from '@opentrons/components'
+import { getModulesState } from '../../robot-api'
 import ModulesCardContents from './ModulesCardContents'
 import { getConfig } from '../../config'
 
@@ -19,32 +19,23 @@ type SP = {|
   __tempControlsEnabled: boolean,
 |}
 
-type DP = {| fetchModules: () => mixed |}
-
-type Props = { ...OP, ...SP, ...DP }
+type Props = {| ...OP, ...SP, dispatch: Dispatch |}
 
 const TITLE = 'Modules'
-const POLL_MODULE_INTERVAL_MS = 5000
 
-export default connect<Props, OP, SP, DP, State, Dispatch>(
-  mapStateToProps,
-  mapDispatchToProps
-)(AttachedModulesCard)
+export default connect<Props, OP, SP, {||}, State, Dispatch>(mapStateToProps)(
+  AttachedModulesCard
+)
 
 function AttachedModulesCard(props: Props) {
   return (
-    <IntervalWrapper
-      interval={POLL_MODULE_INTERVAL_MS}
-      refresh={props.fetchModules}
-    >
-      <Card title={TITLE} column>
-        <ModulesCardContents
-          modules={props.modules}
-          robot={props.robot}
-          showControls={props.__tempControlsEnabled}
-        />
-      </Card>
-    </IntervalWrapper>
+    <Card title={TITLE} column>
+      <ModulesCardContents
+        modules={props.modules}
+        robot={props.robot}
+        showControls={props.__tempControlsEnabled}
+      />
+    </Card>
   )
 }
 
@@ -54,11 +45,5 @@ function mapStateToProps(state: State, ownProps: OP): SP {
     __tempControlsEnabled: Boolean(
       getConfig(state).devInternal?.tempdeckControls
     ),
-  }
-}
-
-function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
-  return {
-    fetchModules: () => dispatch(fetchModules(ownProps.robot)),
   }
 }
