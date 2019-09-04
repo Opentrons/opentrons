@@ -129,9 +129,11 @@ lint-js:
 lint-json:
 	eslint --max-warnings 0 --ext .json .
 
+# stylelint seems to close stdout before make can, causing spurious failures
+# with `write error: stdout`; pipe to tee which will hopefully paper over it
 .PHONY: lint-css
 lint-css:
-	stylelint '**/*.css'
+	stylelint '**/*.css' $(and $(CI),| tee /dev/null)
 
 .PHONY: check-js
 check-js:
