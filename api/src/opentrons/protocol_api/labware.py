@@ -113,6 +113,10 @@ class Well:
     def has_tip(self, value: bool):
         self._has_tip = value
 
+    @property
+    def diameter(self) -> Optional[float]:
+        return self._diameter
+
     def top(self, z: float = 0.0) -> Location:
         """
         :param z: the z distance in mm

@@ -31,6 +31,7 @@ class Pipette:
         self._current_volume = 0.0
         self._working_volume = self._config.max_volume
         self._current_tip_length = 0.0
+        self._current_tip_diameter = 0.0
         self._fallback_tip_length = self._config.tip_length
         self._has_tip = False
         self._pipette_id = pipette_id
@@ -127,6 +128,15 @@ class Pipette:
         """ The length of the current tip attached (0.0 if no tip) """
         return (self._current_tip_length
                 - self._instrument_offset.z)
+
+    @property
+    def current_tip_diameter(self) -> float:
+        """ The diameter of the current tip attached (0.0 if no tip) """
+        return self._current_tip_diameter
+
+    @current_tip_diameter.setter
+    def current_tip_diameter(self, diameter: float):
+        self._current_tip_diameter = diameter
 
     @property
     def working_volume(self) -> float:
