@@ -123,6 +123,8 @@ docs-pdf-prep: local-install
 docs-pdf-local: docs-pdf-prep
 	-$(sphinx_build) -b latex -d docs/build/doctrees docs/source docs/build/pdf
 	-$(MAKE) -C docs/build/pdf all-pdf
+	$(SHX) ls docs/build/pdf/*.pdf
+	$(SHX) cp docs/build/pdf/*.pdf docs/dist/
 
 docs-pdf-ci: docs-pdf-prep
 	$(sphinx_build) -b latex -d docs/build/doctrees docs/source docs/build/pdf
