@@ -23,7 +23,7 @@ export default function apiClientMiddleware() {
           action.error === true ? action.payload : action.payload.error
 
         if (error) {
-          log.warn('Error response from robot', { action })
+          log.warn('Error response from robot', { actionType: action.type })
           if (error.traceback) log.warn(error.traceback)
         }
       }
