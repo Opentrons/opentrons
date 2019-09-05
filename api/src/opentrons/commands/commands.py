@@ -396,7 +396,7 @@ def thermocycler_set_block_temp(temperature,
         clean_minutes = (total_seconds - clean_seconds) / 60
         text += f' with a hold time of'
         if clean_minutes > 0:
-            text += f'{clean_minutes} minutes and'
+            text += f' {clean_minutes} minutes and'
         text += f' {clean_seconds} seconds'
     return make_command(
         name=command_types.THERMOCYCLER_SET_BLOCK_TEMP,

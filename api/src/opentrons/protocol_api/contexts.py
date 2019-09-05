@@ -2134,6 +2134,8 @@ class ThermocyclerContext(ModuleContext):
             and finite for each step.
 
         """
+        if repetitions <= 0:
+            raise ValueError("repetitions must be a positive integer")
         for step in steps:
             if step.get('temperature') is None:
                 raise ValueError(
