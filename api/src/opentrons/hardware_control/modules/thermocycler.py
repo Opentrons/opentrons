@@ -205,7 +205,7 @@ class Thermocycler(mod_abc.AbstractModule):
         hold_time = total_seconds if total_seconds > 0 else 0
         await self._driver.set_temperature(
             temp=temperature, hold_time=hold_time, ramp_rate=ramp_rate)
-        if hold_time_minutes or hold_time_seconds:
+        if hold_time:
             await self.wait_for_hold()
         else:
             await self.wait_for_temp()

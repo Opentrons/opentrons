@@ -157,7 +157,7 @@ def test_thermocycler_temp(loop):
 
     # Test default ramp rate
     mod.set_block_temperature(20, hold_time_seconds=5.0, hold_time_minutes=1.0)
-    assert 'setting thermocycler temperature' in ','.join(
+    assert 'setting thermocycler' in ','.join(
         [cmd.lower() for cmd in ctx.commands()])
     assert mod.block_target_temperature == 20
     assert mod.block_temperature == 20
@@ -166,7 +166,7 @@ def test_thermocycler_temp(loop):
 
     # Test specified ramp rate
     mod.set_block_temperature(41.3, hold_time_seconds=25.5, ramp_rate=2.0)
-    assert 'setting thermocycler temperature' in ','.join(
+    assert 'setting thermocycler' in ','.join(
         [cmd.lower() for cmd in ctx.commands()])
     assert mod.block_target_temperature == 41.3
     assert mod.block_temperature == 41.3
@@ -174,7 +174,7 @@ def test_thermocycler_temp(loop):
 
     # Test infinite hold
     mod.set_block_temperature(13.2)
-    assert 'setting thermocycler temperature' in ','.join(
+    assert 'setting thermocycler' in ','.join(
         [cmd.lower() for cmd in ctx.commands()])
     assert mod.block_target_temperature == 13.2
     assert mod.block_temperature == 13.2

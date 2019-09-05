@@ -2025,7 +2025,6 @@ class ThermocyclerContext(ModuleContext):
                  loop: asyncio.AbstractEventLoop) -> None:
         self._module = hw_module
         self._loop = loop
-        self._default_lid_target = 105
         super().__init__(ctx, geometry)
 
     def _prepare_for_lid_move(self):
@@ -2061,7 +2060,7 @@ class ThermocyclerContext(ModuleContext):
         self._geometry.lid_status = self._module.close()
         return self._geometry.lid_status
 
-    @cmds.publish.both(command=cmds.thermocycler_set_temp)
+    @cmds.publish.both(command=cmds.thermocycler_set_block_temp)
     def set_block_temperature(self,
                               temperature: float,
                               hold_time_seconds: float = None,
@@ -2098,13 +2097,12 @@ class ThermocyclerContext(ModuleContext):
                 hold_time_minutes=hold_time_minutes,
                 ramp_rate=ramp_rate)
 
-    @cmds.publish.both(command=cmds.thermocycler_heat_lid)
-    def set_lid_temperature(self,
-                            temperature: float = None):
+    @cmds.publish.both(command=cmds.thermocycler_set_lid_temperature)
+    def set_lid_temperature(self, temperature: float):
         """ Set the target temperature for the heated lid, in °C.
 
         :param temperature: The target temperature, in °C clamped to the
-                            range 20°C to 105°C. Defaults to 105°C
+                            range 20°C to 105°C.
 
         .. note:
 
@@ -2112,12 +2110,9 @@ class ThermocyclerContext(ModuleContext):
             ``temperature`` has been reached.
 
         """
-        if temperature is None:
-            self._module.set_lid_temperature(self._default_lid_target)
-        else:
-            self._module.set_lid_temperature(temperature)
+        self._module.set_lid_temperature(temperature)
 
-    @cmds.publish.both(command=cmds.thermocycler_cycle_temperatures)
+    @cmds.publish.both(command=cmds.thermocycler_execute_profile)
     def execute_profile(self,
                         steps: List[modules.types.ThermocyclerStep],
                         repetitions: int,
@@ -2154,12 +2149,12 @@ class ThermocyclerContext(ModuleContext):
         return self._module.cycle_temperatures(
             steps=steps, repetitions=repetitions)
 
-    @cmds.publish.both(command=cmds.thermocycler_stop_lid_heating)
+    @cmds.publish.both(command=cmds.thermocycler_deactivate_lid)
     def deactivate_lid(self):
         """ Turn off the heated lid """
         self._module.stop_lid_heating()
 
-    @cmds.publish.both(command=cmds.thermocycler_deactivate)
+    @cmds.publish.both(command=cmds.thermocycler_deactivate_block)
     def deactivate_block(self):
         """ Turn off the well block """
         self._module.deactivate()
