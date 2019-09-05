@@ -2063,39 +2063,40 @@ class ThermocyclerContext(ModuleContext):
 
     @cmds.publish.both(command=cmds.thermocycler_set_temp)
     def set_block_temperature(self,
-                        temperature: float,
-                        hold_time_seconds: float = None,
-                        hold_time_minutes: float = None,
-                        ramp_rate: float = None):
+                              temperature: float,
+                              hold_time_seconds: float = None,
+                              hold_time_minutes: float = None,
+                              ramp_rate: float = None):
         """ Set the target temperature for the well block, in °C.
 
         Valid operational range yet to be determined.
         :param temperature: The target temperature, in °C.
         :param hold_time_minutes: The number of minutes to hold, after reaching
-                                  ``temperature``, before proceeding to the next
-                                  command.
+                                  ``temperature``, before proceeding to the
+                                  next command.
         :param hold_time_seconds: The number of seconds to hold, after reaching
-                                  ``temperature``, before proceeding to the next
-                                  command. If ``hold_time_minutes`` and
+                                  ``temperature``, before proceeding to the
+                                  next command. If ``hold_time_minutes`` and
                                   ``hold_time_seconds`` are not specified,
                                   the Thermocycler will proceed to the next
                                   command after ``temperature`` is reached.
         :param ramp_rate: The target rate of temperature change, in °C/sec.
-                          If ``ramp_rate`` is not specified, it will default to
-                          the maximum ramp rate as defined in the device
+                          If ``ramp_rate`` is not specified, it will default
+                          to the maximum ramp rate as defined in the device
                           configuration.
 
         .. note:
 
-            If ``hold_time_minutes`` and ``hold_time_seconds`` are not specified,
-            the Thermocycler will proceed to the next command after ``temperature``
-            is reached.
+            If ``hold_time_minutes`` and ``hold_time_seconds`` are not
+            specified, the Thermocycler will proceed to the next command
+            after ``temperature`` is reached.
 
         """
-        total_hold_seconds = hold_time_seconds + (hold_time_minutes * 60)
-        return self._module.set_temperature(temperature=temperature,
-                                            hold_time=total_hold_seconds,
-                                            ramp_rate=ramp_rate)
+        return self._module.set_temperature(
+                temperature=temperature,
+                hold_time_seconds=hold_time_seconds,
+                hold_time_minutes=hold_time_minutes,
+                ramp_rate=ramp_rate)
 
     @cmds.publish.both(command=cmds.thermocycler_heat_lid)
     def set_lid_temperature(self,
@@ -2107,8 +2108,8 @@ class ThermocyclerContext(ModuleContext):
 
         .. note:
 
-            The Thermocycler will proceed to the next command after ``temperature``
-            has been reached.
+            The Thermocycler will proceed to the next command after
+            ``temperature`` has been reached.
 
         """
         if temperature is None:
@@ -2142,9 +2143,12 @@ class ThermocyclerContext(ModuleContext):
             if step.get('temperature') is None:
                 raise ValueError(
                         "temperature must be defined for each step in cycle")
-            if step.get('hold_time') is None:
+            hold_mins = step.get('hold_time_minutes')
+            hold_secs = step.get('hold_time_seconds')
+            if hold_mins is None and hold_secs is None:
                 raise ValueError(
-                        "hold_time must be defined for each step in cycle")
+                        "either hold_time_minutes or hold_time_seconds must be"
+                        "defined for each step in cycle")
         if lid_temperature:
             self.set_lid_temperature(lid_temperature)
         return self._module.cycle_temperatures(

@@ -378,16 +378,26 @@ def thermocycler_open():
     )
 
 
-def thermocycler_set_temp(temperature, hold_time):
+def thermocycler_set_temp(temperature, hold_time_seconds, hold_time_minutes):
     text = "Setting thermocycler temperature to {temperature} °C ".format(
             temperature=temperature)
-    if hold_time is not None:
-        text += " with a hold time of {} seconds".format(hold_time)
+    total_seconds = None
+    if hold_time_seconds or hold_time_minutes:
+        given_seconds = hold_time_seconds or 0
+        given_minutes = hold_time_minutes or 0
+        total_seconds = given_seconds + (given_minutes * 60)
+
+        clean_seconds = total_seconds % 60
+        clean_minutes = (total_seconds - clean_seconds) / 60
+        text += f' with a hold time of'
+        if clean_minutes > 0:
+            text += f'{clean_minutes} minutes and'
+        text += f' {clean_seconds} seconds'
     return make_command(
         name=command_types.THERMOCYCLER_SET_TEMP,
         payload={
             'temperature': temperature,
-            'hold_time': hold_time,
+            'hold_time': total_seconds,
             'text': text
         }
     )
