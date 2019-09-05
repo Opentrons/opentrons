@@ -75,13 +75,6 @@ class API(HardwareAPILike):
     """
 
     CLS_LOG = mod_log.getChild('API')
-    #
-    # def __new__(self,
-    #             backend: _Backend,
-    #             config: robot_configs.robot_config = None,
-    #             loop: asyncio.AbstractEventLoop = None) -> None:
-    #     if __name__ == '__main__':
-    #         self.__init__(backend, config, loop)
 
     def __init__(self,
                  backend: _Backend,
@@ -176,6 +169,7 @@ class API(HardwareAPILike):
         """ The event loop used by this instance. """
         return self._loop
 
+    @classmethod
     def set_loop(self, loop: asyncio.AbstractEventLoop):
         self._loop = loop
         self._lock = asyncio.Lock(loop=loop)

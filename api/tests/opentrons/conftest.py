@@ -161,15 +161,15 @@ def using_api2(loop):
 def using_sync_api2(loop):
     oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
     os.environ['OT_API_FF_useProtocolApi2'] = '1'
-    hardware = adapters.SynchronousAdapter(
+    hardware = adapters.SynchronousAdapter.build(
         API.build_hardware_controller)
     try:
         yield hardware
     finally:
         try:
-            loop.run_until_complete(hardware.reset())
+            hardware.reset()
         except RuntimeError:
-            loop.create_task(hardware.reset())
+            hardware.reset()
         if None is oldenv:
             os.environ.pop('OT_API_FF_useProtocolApi2')
         else:
