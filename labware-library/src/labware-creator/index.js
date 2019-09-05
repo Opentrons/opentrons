@@ -16,8 +16,6 @@ import {
   aluminumBlockChildTypeOptions,
   getDefaultFormState,
   getImplicitAutofillValues,
-  wellBottomShapeOptions,
-  wellShapeOptions,
   yesNoOptions,
   tubeRackAutofills,
   SUGGESTED_X,
@@ -39,8 +37,13 @@ import LinkOut from './components/LinkOut'
 import RadioField from './components/RadioField'
 import Section from './components/Section'
 import TextField from './components/TextField'
+import HeightGuidingText from './components/HeightGuidingText'
 import ImportLabware from './components/ImportLabware'
 import ImportErrorModal from './components/ImportErrorModal'
+import {
+  wellShapeOptionsWithIcons,
+  wellBottomShapeOptionsWithIcons,
+} from './components/optionsWithImages'
 import styles from './styles.css'
 
 import type {
@@ -206,50 +209,6 @@ const XYOffsetImg = (props: {|
     src = require('./images/offset_plate_rectangular.svg')
   }
   return <img src={src} />
-}
-
-const HeightGuidingText = (props: {| labwareType: ?LabwareType |}) => {
-  const { labwareType } = props
-  const footer = (
-    <p>
-      The height measurement informs the robot of the top and bottom of your
-      labware.
-    </p>
-  )
-  if (labwareType === 'tubeRack') {
-    return (
-      <>
-        <p>Place your tubes inside the rack.</p>
-        <p>
-          Reference{' '}
-          <strong>from the top of the tube to bottom of the rack.</strong>{' '}
-          Include any well lip. Exclude any cover or cap.
-        </p>
-        {footer}
-      </>
-    )
-  }
-  if (labwareType === 'aluminumBlock') {
-    return (
-      <>
-        <p>Put your labware on top of the aluminum block.</p>
-        <p>
-          Reference{' '}
-          <strong>
-            from the top of your labware to the bottom of the block.
-          </strong>{' '}
-          Include any well or tube lip. Exclude any cover or cap.
-        </p>
-        {footer}
-      </>
-    )
-  }
-  return (
-    <>
-      <p>Include any well lip in the measurement. Exclude any cover or cap.</p>
-      {footer}
-    </>
-  )
 }
 
 const displayAsTube = (values: LabwareFields) =>
@@ -708,7 +667,11 @@ const App = () => {
                       <WellXYImg wellShape={values.wellShape} />
                     </div>
                     <div className={styles.form_fields_column}>
-                      <RadioField name="wellShape" options={wellShapeOptions} />
+                      <RadioField
+                        name="wellShape"
+                        labelTextClassName={styles.hidden}
+                        options={wellShapeOptionsWithIcons}
+                      />
                       {values.wellShape === 'rectangular' ? (
                         <>
                           <TextField
@@ -757,9 +720,10 @@ const App = () => {
                       />
                     </div>
                     <div className={styles.form_fields_column}>
-                      <Dropdown
+                      <RadioField
                         name="wellBottomShape"
-                        options={wellBottomShapeOptions}
+                        labelTextClassName={styles.hidden}
+                        options={wellBottomShapeOptionsWithIcons}
                       />
                       <TextField
                         name="wellDepth"
