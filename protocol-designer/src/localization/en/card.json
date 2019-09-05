@@ -8,7 +8,7 @@
   },
   "title": {
     "information": "Information",
-    "feature_flags": "Feature Flags",
+    "feature_flags": "Experimental Settings",
     "hints": "Hints",
     "privacy": "Privacy"
   },
