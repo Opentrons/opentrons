@@ -26,7 +26,7 @@ type Props = {
 }
 
 const saveFile = (downloadData: $PropertyType<Props, 'downloadData'>) => {
-  const blob = new Blob([JSON.stringify(downloadData.fileData, null, 4)], {
+  const blob = new Blob([JSON.stringify(downloadData.fileData)], {
     type: 'application/json',
   })
   saveAs(blob, downloadData.fileName)
