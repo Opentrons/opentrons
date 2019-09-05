@@ -3798,7 +3798,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["dropTipShake", "pickupTipShakeXY"],
+      "quirks": ["dropTipShake", "pickupTipShake"],
       "returnTipHeight": 0.83
     }
   },
@@ -3821,6 +3821,5 @@
     "defaultBlowOutFlowRate",
     "quirks"
   ],
-  "validQuirks": ["pickupTipShake", "dropTipShake", "doubleDropTip",
-                  "pickupTipShakeXY"]
+  "validQuirks": ["pickupTipShake", "dropTipShake", "doubleDropTip"]
 }

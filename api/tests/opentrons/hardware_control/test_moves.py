@@ -1,4 +1,4 @@
-from unittest.mock import Mock
+from unittest import mock
 import pytest
 from opentrons import types
 from opentrons import hardware_control as hc
@@ -50,7 +50,7 @@ async def test_controller_home(loop):
 async def test_controller_musthome(hardware_api):
     abs_position = types.Point(30, 20, 10)
     mount = types.Mount.RIGHT
-    home = Mock()
+    home = mock.Mock()
     home.side_effect = hardware_api.home
     await hardware_api.move_to(mount, abs_position)
     assert home.called_once()
@@ -282,3 +282,74 @@ async def catch_oob_moves(hardware_api):
         await hardware_api.move_rel(types.Mount.LEFT, types.Point(0, 0, 12))
     await hardware_api.pick_up_tip(types.Mount.LEFT)
     await hardware_api.move_rel(types.Mount.LEFT, types.Point(0, 0, 0))
+
+
+async def test_shake_during_pick_up(hardware_api, monkeypatch):
+    await hardware_api.home()
+    hardware_api._backend._attached_instruments\
+        = {types.Mount.LEFT: {'model': None, 'id': None},
+           types.Mount.RIGHT: {'model': 'p1000_single_v2.0',
+                               'id': 'testyness'}}
+    await hardware_api.cache_instruments()
+
+    shake_tip_pick_up = mock.Mock(
+        side_effect=hardware_api._shake_off_tips_pick_up)
+    monkeypatch.setattr(hardware_api, '_shake_off_tips_pick_up',
+                        shake_tip_pick_up)
+
+    await hardware_api.pick_up_tip(types.Mount.RIGHT, 50)
+
+    shake_tip_calls = [mock.call(types.Mount.RIGHT, 0.3),
+                       mock.call(types.Mount.RIGHT, 0.3)]
+    shake_tip_pick_up.assert_has_calls(shake_tip_calls)
+
+    move_rel = mock.Mock(side_effect=hardware_api.move_rel)
+    monkeypatch.setattr(hardware_api, 'move_rel', move_rel)
+
+    shake_tip_pick_up.reset()
+    await shake_tip_pick_up(types.Mount.RIGHT, 0.3)
+
+    move_rel_calls = [
+        mock.call(types.Mount.RIGHT, types.Point(-0.3, 0, 0), speed=50),
+        mock.call(types.Mount.RIGHT, types.Point(0.6, 0, 0), speed=50),
+        mock.call(types.Mount.RIGHT, types.Point(-0.3, 0, 0), speed=50),
+        mock.call(types.Mount.RIGHT, types.Point(0, -0.3, 0), speed=50),
+        mock.call(types.Mount.RIGHT, types.Point(0, 0.6, 0), speed=50),
+        mock.call(types.Mount.RIGHT, types.Point(0, -0.3, 0), speed=50),
+        mock.call(types.Mount.RIGHT, types.Point(0, 0, 20))]
+    move_rel.assert_has_calls(move_rel_calls)
+
+
+async def test_shake_during_drop(hardware_api, monkeypatch):
+    await hardware_api.home()
+    hardware_api._backend._attached_instruments\
+        = {types.Mount.LEFT: {'model': None, 'id': None},
+           types.Mount.RIGHT: {'model': 'p1000_single_v2.0',
+                               'id': 'testyness'}}
+    await hardware_api.cache_instruments()
+    await hardware_api.add_tip(types.Mount.RIGHT, 50.0)
+    hardware_api.set_current_tip_diameter(types.Mount.RIGHT, 30.0)
+
+    shake_tip_drop = mock.Mock(
+        side_effect=hardware_api._shake_off_tips_drop)
+    monkeypatch.setattr(hardware_api, '_shake_off_tips_drop',
+                        shake_tip_drop)
+
+    await hardware_api.drop_tip(types.Mount.RIGHT)
+    shake_tip_drop.assert_called_once_with(types.Mount.RIGHT, 30)
+
+    # move_rel = mock.Mock(side_effect=hardware_api.move_rel)
+    # monkeypatch.setattr(hardware_api, 'move_rel', move_rel)
+    #
+    # shake_tip_pick_up.reset()
+    # await shake_tip_pick_up(types.Mount.RIGHT, 0.3)
+    #
+    # move_rel_calls = [
+    #     mock.call(types.Mount.RIGHT, types.Point(-0.3, 0, 0), speed=50),
+    #     mock.call(types.Mount.RIGHT, types.Point(0.6, 0, 0), speed=50),
+    #     mock.call(types.Mount.RIGHT, types.Point(-0.3, 0, 0), speed=50),
+    #     mock.call(types.Mount.RIGHT, types.Point(0, -0.3, 0), speed=50),
+    #     mock.call(types.Mount.RIGHT, types.Point(0, 0.6, 0), speed=50),
+    #     mock.call(types.Mount.RIGHT, types.Point(0, -0.3, 0), speed=50),
+    #     mock.call(types.Mount.RIGHT, types.Point(0, 0, 20))]
+    # move_rel.assert_has_calls(move_rel_calls)
