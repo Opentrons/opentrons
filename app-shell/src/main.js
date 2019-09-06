@@ -20,7 +20,7 @@ log.debug('App config', {
 })
 
 if (config.devtools) {
-  require('electron-debug')({ enabled: true, showDevTools: true })
+  require('electron-debug')({ isEnabled: true, showDevTools: true })
 }
 
 // hold on to references so they don't get garbage collected

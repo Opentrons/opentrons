@@ -40,7 +40,9 @@ publish_update := $(filter v%,$(OT_TAG))
 branch_suffix := $(if $(publish_update),,-$(OT_BRANCH))
 build_id := $(or $(and $(OT_BUILD),b$(OT_BUILD)$(branch_suffix)),dev)
 
-builder := electron-builder -p never
+builder := electron-builder \
+	--config electron-builder.config.js \
+	--publish never
 
 electron := electron . \
 	--devtools \
