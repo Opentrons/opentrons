@@ -394,10 +394,10 @@ def thermocycler_set_block_temp(temperature,
 
         clean_seconds = total_seconds % 60
         clean_minutes = (total_seconds - clean_seconds) / 60
-        text += f' with a hold time of'
+        text += f'with a hold time of '
         if clean_minutes > 0:
-            text += f' {clean_minutes} minutes and'
-        text += f' {clean_seconds} seconds'
+            text += f'{clean_minutes} minutes and '
+        text += f'{clean_seconds} seconds'
     return make_command(
         name=command_types.THERMOCYCLER_SET_BLOCK_TEMP,
         payload={
@@ -445,7 +445,7 @@ def thermocycler_set_lid_temperature(temperature):
 
 
 def thermocycler_deactivate_lid():
-    text = "Deactivating lid heating"
+    text = "Deactivating Thermocycler lid heating"
     return make_command(
         name=command_types.THERMOCYCLER_DEACTIVATE_LID,
         payload={'text': text}
@@ -453,7 +453,7 @@ def thermocycler_deactivate_lid():
 
 
 def thermocycler_deactivate_block():
-    text = "Deactivating well block heating"
+    text = "Deactivating Thermocycler well block heating"
     return make_command(
         name=command_types.THERMOCYCLER_DEACTIVATE_BLOCK,
         payload={'text': text}
@@ -461,7 +461,7 @@ def thermocycler_deactivate_block():
 
 
 def thermocycler_deactivate():
-    text = "Deactivating thermocycler"
+    text = "Deactivating Thermocycler"
     return make_command(
         name=command_types.THERMOCYCLER_DEACTIVATE,
         payload={'text': text}
@@ -469,7 +469,7 @@ def thermocycler_deactivate():
 
 
 def thermocycler_wait_for_lid_temp():
-    text = "Waiting for lid to reach target temperature"
+    text = "Waiting for Thermocycler lid to reach target temperature"
     return make_command(
         name=command_types.THERMOCYCLER_WAIT_FOR_LID_TEMP,
         payload={'text': text}
@@ -477,7 +477,7 @@ def thermocycler_wait_for_lid_temp():
 
 
 def thermocycler_close():
-    text = "Closing thermocycler lid"
+    text = "Closing Thermocycler lid"
     return make_command(
         name=command_types.THERMOCYCLER_CLOSE,
         payload={'text': text}

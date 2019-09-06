@@ -232,7 +232,7 @@ class Thermocycler(mod_abc.AbstractModule):
         self._current_cycle_task = cycle_task
         await cycle_task
 
-    async def set_lid_temperature(self, temp: Optional[float]):
+    async def set_lid_temperature(self, temp: float):
         """ Set the lid temperature in deg Celsius """
         await self._driver.set_lid_temperature(temp=temp)
         await self.wait_for_lid_temp()
