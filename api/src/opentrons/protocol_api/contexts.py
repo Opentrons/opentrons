@@ -2025,17 +2025,7 @@ class ThermocyclerContext(ModuleContext):
                  loop: asyncio.AbstractEventLoop) -> None:
         self._module = hw_module
         self._loop = loop
-        self._protocol_lid_target = None
         super().__init__(ctx, geometry)
-
-    @property
-    def lid_status(self):
-        """ Lid open/close status string"""
-        return self._module.lid_status
-
-    @property
-    def status(self):
-        return self._module.status
 
     def _prepare_for_lid_move(self):
         loaded_instruments = [instr for mount, instr in
@@ -2057,115 +2047,155 @@ class ThermocyclerContext(ModuleContext):
             instr.move_to(types.Location(safe_point, None), force_direct=True)
 
     @cmds.publish.both(command=cmds.thermocycler_open)
-    def open(self):
+    def open_lid(self):
         """ Opens the lid"""
         self._prepare_for_lid_move()
         self._geometry.lid_status = self._module.open()
         return self._geometry.lid_status
 
     @cmds.publish.both(command=cmds.thermocycler_close)
-    def close(self):
+    def close_lid(self):
         """ Closes the lid"""
         self._prepare_for_lid_move()
         self._geometry.lid_status = self._module.close()
         return self._geometry.lid_status
 
-    @cmds.publish.both(command=cmds.thermocycler_set_temp)
-    def set_temperature(self,
-                        temperature: float,
-                        hold_time: float = None,
-                        ramp_rate: float = None):
-        """ Set the target temperature, in °C.
+    @cmds.publish.both(command=cmds.thermocycler_set_block_temp)
+    def set_block_temperature(self,
+                              temperature: float,
+                              hold_time_seconds: float = None,
+                              hold_time_minutes: float = None,
+                              ramp_rate: float = None):
+        """ Set the target temperature for the well block, in °C.
 
         Valid operational range yet to be determined.
         :param temperature: The target temperature, in °C.
-        :param hold_time: The time to hold, after reaching temperature, before
-                          proceeding to the next command. If ``hold_time``
-                          is not specified, the Thermocycler will
-                          hold this temperature indefinitely.
+        :param hold_time_minutes: The number of minutes to hold, after reaching
+                                  ``temperature``, before proceeding to the
+                                  next command.
+        :param hold_time_seconds: The number of seconds to hold, after reaching
+                                  ``temperature``, before proceeding to the
+                                  next command. If ``hold_time_minutes`` and
+                                  ``hold_time_seconds`` are not specified,
+                                  the Thermocycler will proceed to the next
+                                  command after ``temperature`` is reached.
         :param ramp_rate: The target rate of temperature change, in °C/sec.
-                          If ``ramp_rate`` is not specified, it will default to
-                          the maximum ramp rate as defined in the device
+                          If ``ramp_rate`` is not specified, it will default
+                          to the maximum ramp rate as defined in the device
                           configuration.
+
+        .. note:
+
+            If ``hold_time_minutes`` and ``hold_time_seconds`` are not
+            specified, the Thermocycler will proceed to the next command
+            after ``temperature`` is reached.
+
         """
         return self._module.set_temperature(
-            temperature=temperature, hold_time=hold_time, ramp_rate=ramp_rate)
+                temperature=temperature,
+                hold_time_seconds=hold_time_seconds,
+                hold_time_minutes=hold_time_minutes,
+                ramp_rate=ramp_rate)
 
-    @cmds.publish.both(command=cmds.thermocycler_cycle_temperatures)
-    def cycle_temperatures(self,
-                           steps: List[modules.types.ThermocyclerStep],
-                           repetitions: int):
-        """ For a given number of repetitions, cycle through a list of
-        temperatures in °C for a set hold time.
+    @cmds.publish.both(command=cmds.thermocycler_set_lid_temperature)
+    def set_lid_temperature(self, temperature: float):
+        """ Set the target temperature for the heated lid, in °C.
+
+        :param temperature: The target temperature, in °C clamped to the
+                            range 20°C to 105°C.
+
+        .. note:
+
+            The Thermocycler will proceed to the next command after
+            ``temperature`` has been reached.
+
+        """
+        self._module.set_lid_temperature(temperature)
+
+    @cmds.publish.both(command=cmds.thermocycler_execute_profile)
+    def execute_profile(self,
+                        steps: List[modules.types.ThermocyclerStep],
+                        repetitions: int):
+        """ Execute a Thermocycler Profile defined as a cycle of
+        :py:attr:`steps` to repeat for a given number of :py:attr:`repetitions`
 
         :param steps: List of unique steps that make up a single cycle.
-                      Each list item maps to parameters of the
-                      set_temperature method as a dict of float values with
-                      keys 'temperature', 'hold_time', & optional 'ramp_rate'.
-                      NOTE: unlike the set_temperature method, hold_time
-                      must be defined and finite for each step.
+                      Each list item should be a dictionary that maps to
+                      the parameters of the :py:meth:`set_block_temperature`
+                      method with keys 'temperature', 'hold_time_seconds',
+                      and 'hold_time_minutes'.
         :param repetitions: The number of times to repeat the cycled steps.
+
+        .. note:
+
+            Unlike the :py:meth:`set_block_temperature`, either or both of
+            'hold_time_minutes' and 'hold_time_seconds' must be defined
+            and finite for each step.
+
         """
+        if repetitions <= 0:
+            raise ValueError("repetitions must be a positive integer")
         for step in steps:
             if step.get('temperature') is None:
                 raise ValueError(
                         "temperature must be defined for each step in cycle")
-            if step.get('hold_time') is None:
+            hold_mins = step.get('hold_time_minutes')
+            hold_secs = step.get('hold_time_seconds')
+            if hold_mins is None and hold_secs is None:
                 raise ValueError(
-                        "hold_time must be defined for each step in cycle")
+                        "either hold_time_minutes or hold_time_seconds must be"
+                        "defined for each step in cycle")
         return self._module.cycle_temperatures(
             steps=steps, repetitions=repetitions)
 
-    @property
-    def current_lid_target(self):
-        return self._module.lid_target
-
-    @property
-    def lid_target(self):
-        return self._protcol_lid_target
-
-    @lid_target.setter
-    def lid_target(self, temp):
-        """ Update lid target temperature"""
-        self._protocol_lid_target = temp
-
-    @cmds.publish.both(command=cmds.thermocycler_heat_lid)
-    def heat_lid(self):
-        """ Start heating thermocycler Lid to ``_protocol_lid_target``
-            degree celsius. If ``_protocol_lid_target`` is None, the lid
-            will be heated to the driver default value.
-        """
-        self._module.set_lid_temperature(self._protocol_lid_target)
-
-    @cmds.publish.both(command=cmds.thermocycler_stop_lid_heating)
-    def stop_lid_heating(self):
-        """ Turn off the lid heatpad """
+    @cmds.publish.both(command=cmds.thermocycler_deactivate_lid)
+    def deactivate_lid(self):
+        """ Turn off the heated lid """
         self._module.stop_lid_heating()
 
-    @cmds.publish.both(command=cmds.thermocycler_wait_for_lid_temp)
-    def wait_for_lid_temp(self):
-        """ Block until the lid heatpad reaches its target temperature"""
-        self._module.wait_for_lid_temp()
+    @cmds.publish.both(command=cmds.thermocycler_deactivate_block)
+    def deactivate_block(self):
+        """ Turn off the well block """
+        self._module.deactivate()
 
-    @cmds.publish.both(command=cmds.thermocycler_wait_for_temp)
-    def wait_for_temp(self):
-        """ Block until the module reaches its setpoint"""
-        self._module.wait_for_temp()
-
-    @cmds.publish.both(command=cmds.thermocycler_wait_for_hold)
-    def wait_for_hold(self):
-        """ Block until hold time has elapsed"""
-        self._module.wait_for_hold()
+    @cmds.publish.both(command=cmds.thermocycler_deactivate)
+    def deactivate(self):
+        """ Turn off the well block, and heated lid """
+        self.deactivate_lid()
+        self.deactivate_block()
 
     @property
-    def temperature(self):
+    def lid_position(self):
+        """ Lid open/close status string"""
+        return self._module.lid_status
+
+    @property
+    def block_temperature_status(self):
+        return self._module.status
+
+    @property
+    def lid_temperature_status(self):
+        return self._module.lid_temp_status
+
+    @property
+    def block_temperature(self):
         """ Current temperature in degrees C"""
         return self._module.temperature
 
     @property
-    def target(self):
+    def block_target_temperature(self):
         """ Target temperature in degrees C"""
         return self._module.target
+
+    @property
+    def lid_temperature(self):
+        """ Current temperature in degrees C"""
+        return self._module.lid_temp
+
+    @property
+    def lid_target_temperature(self):
+        """ Target temperature in degrees C"""
+        return self._module.lid_target
 
     @property
     def ramp_rate(self):
@@ -2196,7 +2226,3 @@ class ThermocyclerContext(ModuleContext):
     def current_step_index(self):
         """ Index of the current step within the current cycle"""
         return self._module.current_step_index
-
-    @cmds.publish.both(command=cmds.thermocycler_deactivate)
-    def deactivate(self):
-        return self._module.deactivate()

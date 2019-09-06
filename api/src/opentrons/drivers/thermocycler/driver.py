@@ -288,7 +288,7 @@ class Thermocycler:
             if retries > TEMP_UPDATE_RETRIES:
                 break
 
-    async def set_lid_temperature(self, temp: Optional[float]) -> None:
+    async def set_lid_temperature(self, temp: float) -> None:
         if temp is None:
             self._lid_target = LID_TARGET_DEFAULT
         else:
