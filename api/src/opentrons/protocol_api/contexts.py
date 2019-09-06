@@ -2115,8 +2115,7 @@ class ThermocyclerContext(ModuleContext):
     @cmds.publish.both(command=cmds.thermocycler_execute_profile)
     def execute_profile(self,
                         steps: List[modules.types.ThermocyclerStep],
-                        repetitions: int,
-                        lid_temperature: float = None):
+                        repetitions: int):
         """ Execute a Thermocycler Profile defined as a cycle of
         :py:attr:`steps` to repeat for a given number of :py:attr:`repetitions`
 
@@ -2146,8 +2145,6 @@ class ThermocyclerContext(ModuleContext):
                 raise ValueError(
                         "either hold_time_minutes or hold_time_seconds must be"
                         "defined for each step in cycle")
-        if lid_temperature:
-            self.set_lid_temperature(lid_temperature)
         return self._module.cycle_temperatures(
             steps=steps, repetitions=repetitions)
 

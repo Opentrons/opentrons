@@ -408,11 +408,9 @@ def thermocycler_set_block_temp(temperature,
     )
 
 
-def thermocycler_execute_profile(steps, repetitions, lid_temperature):
+def thermocycler_execute_profile(steps, repetitions):
     text = f'Thermocycler starting {repetitions} repetitions' \
             ' of cycle composed of the following steps: {steps}'
-    if lid_temperature is not None:
-        text += f', after heated lid reaches {lid_temperature} °C.'
     return make_command(
         name=command_types.THERMOCYCLER_EXECUTE_PROFILE,
         payload={

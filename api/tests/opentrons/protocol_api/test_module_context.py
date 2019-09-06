@@ -214,16 +214,15 @@ def test_thermocycler_profile(loop):
 
     # Test profile with lid temp override
     mod.execute_profile(steps=[{'temperature': 20, 'hold_time_seconds': 50},
-                               {'temperature': 80, 'hold_time_seconds': 70}],
-                        repetitions=5,
-                        lid_temperature=95)
+                               {'temperature': 60, 'hold_time_seconds': 70}],
+                        repetitions=5)
     assert 'thermocycler starting' in ','.join(
         [cmd.lower() for cmd in ctx.commands()])
-    assert mod.block_target_temperature == 80
-    assert mod.block_temperature == 80
+    assert mod.block_target_temperature == 60
+    assert mod.block_temperature == 60
     assert mod.hold_time is not None
-    assert mod.lid_target_temperature == 95
-    assert mod.lid_temperature == 95
+    assert mod.lid_target_temperature == 80
+    assert mod.lid_temperature == 80
 
 
 # NOTE: this test should be rewritten when "semi" config is built
