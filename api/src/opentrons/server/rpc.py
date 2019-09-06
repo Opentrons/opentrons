@@ -84,7 +84,7 @@ class RPCServer(object):
 
         def task_done(future):
             try:
-                result = future.result()
+                future.result()
             except Exception:
                 log.exception("send_task for socket {} threw:".format(_id))
 
@@ -250,7 +250,7 @@ class RPCServer(object):
                     'WebSocket connection closed unexpectedly: {0}'.format(
                         message))
             else:
-                log.warning('Unhanled WSMsgType: {0}'.format(message.type))
+                log.warning('Unhandled WSMsgType: {0}'.format(message.type))
         except Exception:
             log.exception('Error while processing request')
 
