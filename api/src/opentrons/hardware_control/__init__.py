@@ -59,7 +59,8 @@ class NoTipAttachedError(RuntimeError):
 _Backend = Union[Controller, Simulator]
 Instruments = Dict[top_types.Mount, Optional[Pipette]]
 SHAKE_OFF_TIPS_SPEED = 50
-SHAKE_OFF_TIPS_DISTANCE = 2.25
+SHAKE_OFF_TIPS_DROP_DISTANCE = 2.25
+SHAKE_OFF_TIPS_PICKUP_DISTANCE = 0.3
 DROP_TIP_RELEASE_DISTANCE = 20
 
 
@@ -1136,8 +1137,8 @@ class API(HardwareAPILike):
         # the volume chamber and the drop-tip sleeve on p1000.
         # This extra shake ensures those tips are removed
         if 'pickupTipShake' in instr.config.quirks:
-            await self._shake_off_tips_pick_up(mount, 0.3)
-            await self._shake_off_tips_pick_up(mount, 0.3)
+            await self._shake_off_tips_pick_up(mount)
+            await self._shake_off_tips_pick_up(mount)
 
         await self.retract(mount, instr.config.pick_up_distance)
 
@@ -1209,7 +1210,7 @@ class API(HardwareAPILike):
         # tiprack or other tips below it. To ensure the tip has fallen
         # first, shake the pipette to dislodge partially-sealed tips,
         # then second, raise the pipette so loosened tips have room to fall
-        shake_off_dist = SHAKE_OFF_TIPS_DISTANCE
+        shake_off_dist = SHAKE_OFF_TIPS_DROP_DISTANCE
         if tip_diameter > 0.0:
             shake_off_dist = min(shake_off_dist, tip_diameter / 4)
         shake_off_dist = max(shake_off_dist, 1.0)
@@ -1224,11 +1225,13 @@ class API(HardwareAPILike):
         up_pos = top_types.Point(0, 0, DROP_TIP_RELEASE_DISTANCE)
         await self.move_rel(mount, up_pos)
 
-    async def _shake_off_tips_pick_up(self, mount, shake_off_dist):
+    async def _shake_off_tips_pick_up(self, mount):
         # tips don't always fall off, especially if resting against
         # tiprack or other tips below it. To ensure the tip has fallen
         # first, shake the pipette to dislodge partially-sealed tips,
         # then second, raise the pipette so loosened tips have room to fall
+        shake_off_dist = SHAKE_OFF_TIPS_PICKUP_DISTANCE
+
         shake_pos = top_types.Point(-shake_off_dist, 0, 0)  # move left
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
         shake_pos = top_types.Point(2*shake_off_dist, 0, 0)    # move right
