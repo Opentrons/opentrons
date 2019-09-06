@@ -35,8 +35,8 @@ def probe_instrument(instrument, robot, tip_length=None) -> Point:
     robot.poses = instrument._move(robot.poses, z=safe_height)
 
     for hs in hot_spots:
-        x0 = tp.center[0] + hs.x_start_offs
-        y0 = tp.center[1] + hs.y_start_offs
+        x0 = center[0] + hs.x_start_offs
+        y0 = center[1] + hs.y_start_offs
         z0 = hs.z_start_abs
 
         log.info("Moving to {}".format((x0, y0, z0)))
