@@ -1,21 +1,8 @@
 'use strict'
 
-const PRESET_ENV_NO_MODULES = [
-  '@babel/preset-env',
-  {
-    modules: false,
-    // TODO(mc, 2019-03-13): uncomment this line to enable babel polyfill
-    // useBuiltIns: 'usage',
-  },
-]
-
-const PRESET_ENV_CJS_MODULES = ['@babel/preset-env', { modules: 'commonjs' }]
-
 module.exports = {
   env: {
     production: {
-      // TODO(mc, 2019-03-13): add '@babel/plugin-transform-runtime'
-      //   along with useBuiltIns TODO above
       plugins: ['babel-plugin-unassert'],
     },
     development: {
@@ -34,15 +21,32 @@ module.exports = {
     '@babel/plugin-proposal-optional-chaining',
     '@babel/plugin-syntax-dynamic-import',
   ],
-  presets: ['@babel/preset-flow', '@babel/preset-react', PRESET_ENV_NO_MODULES],
+  presets: [
+    '@babel/preset-flow',
+    '@babel/preset-react',
+    ['@babel/preset-env', { modules: false, useBuiltIns: false }],
+  ],
   overrides: [
     {
       test: 'app-shell/**/*',
-      presets: [PRESET_ENV_CJS_MODULES],
+      presets: [
+        [
+          '@babel/preset-env',
+          { modules: 'commonjs', targets: { electron: '6' } },
+        ],
+      ],
     },
     {
-      test: 'discovery-client/**/*',
-      presets: [PRESET_ENV_CJS_MODULES],
+      test: ['discovery-client/**/*'],
+      presets: [
+        ['@babel/preset-env', { modules: 'commonjs', targets: { node: '8' } }],
+      ],
+    },
+    // app that should be polyfilled
+    // these projects require `core-js` in their package.json `dependencies`
+    {
+      test: ['app/**/*', 'labware-library/**/*', 'protocol-designer/**/*'],
+      presets: [['@babel/preset-env', { useBuiltIns: 'usage', corejs: 3 }]],
     },
   ],
 }

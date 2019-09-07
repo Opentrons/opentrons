@@ -17,7 +17,7 @@
 .selected {
   stroke-width: 1;
   stroke: var(--c-highlight);
-  fill: color(var(--c-highlight) alpha(20%));
+  fill: color-mod(var(--c-highlight) alpha(20%));
 }
 
 .highlighted {
@@ -40,7 +40,7 @@
 }
 
 .empty_tip {
-  fill: color(var(--c-charcoal) alpha(40%));
+  fill: color-mod(var(--c-charcoal) alpha(40%));
 }
 
 .tip_fill {

@@ -2,6 +2,7 @@
 import differenceBy from 'lodash/differenceBy'
 import partition from 'lodash/partition'
 import uniqBy from 'lodash/uniqBy'
+import stableSort from 'stable'
 
 import {
   makeService,
@@ -88,7 +89,8 @@ function dedupeServices(list: ServiceList) {
     'name'
   )
 
-  return sanitizedWithIp.concat(dedupedWithoutIp).sort(compareServices)
+  // use a stable sort because core-js polyfills can mess with Array.sort order
+  return stableSort(sanitizedWithIp.concat(dedupedWithoutIp), compareServices)
 }
 
 // sort service list by:

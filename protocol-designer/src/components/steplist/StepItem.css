@@ -172,13 +172,13 @@
 }
 
 .context_menu_item:hover {
-  background-color: color(var(--c-bg-dark) shade(30%));
+  background-color: color-mod(var(--c-bg-dark) shade(30%));
   color: var(--c-font-light);
 }
 
 .context_menu_item:active {
   color: white;
-  background-color: color(var(--c-bg-dark) shade(30%));
+  background-color: color-mod(var(--c-bg-dark) shade(30%));
 }
 
 .step_drag_preview {
