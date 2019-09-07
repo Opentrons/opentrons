@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
+import { withRouter } from 'react-router-dom'
 
 import { TitledList } from '@opentrons/components'
 import LabwareListItem from './LabwareListItem'
@@ -29,7 +29,7 @@ type Props = {
   setLabware: (labware: Labware) => mixed,
 }
 
-export default withRouter<{||}>(
+export default withRouter<{||}, _>(
   connect<Props, _, SP, {||}, State, Dispatch>(
     mapStateToProps,
     null,

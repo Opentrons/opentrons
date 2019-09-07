@@ -1,5 +1,5 @@
 // @flow
-import type { ContextRouter } from 'react-router'
+import type { ContextRouter } from 'react-router-dom'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { RobotService, Mount } from '../../robot'
 import type {
@@ -10,14 +10,10 @@ import type { Jog } from '../JogControls'
 
 export type CalibrationStep = '1' | '2' | '3' | '4' | '5' | '6'
 
-export type WithRouterOP = {|
-  robot: RobotService,
-  parentUrl: string,
-|}
-
 export type OP = {|
   ...ContextRouter,
-  ...WithRouterOP,
+  robot: RobotService,
+  parentUrl: string,
 |}
 
 export type SP = {|

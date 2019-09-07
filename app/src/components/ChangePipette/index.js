@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { push, goBack } from 'connected-react-router'
-import { Switch, Route, withRouter, type Match } from 'react-router'
+import { Switch, Route, withRouter, type Match } from 'react-router-dom'
 import {
   getPipetteNameSpecs,
   getPipetteModelSpecs,
@@ -80,7 +80,7 @@ type DP = {|
   goToConfirmUrl: () => mixed,
 |}
 
-const ConnectedChangePipetteRouter = withRouter<OP>(
+const ConnectedChangePipetteRouter = withRouter<OP, _>(
   connect<ChangePipetteProps, _, SP, DP, State, Dispatch>(
     makeMapStateToProps,
     mapDispatchToProps

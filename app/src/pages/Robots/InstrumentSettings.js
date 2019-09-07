@@ -1,13 +1,13 @@
 // @flow
 import * as React from 'react'
-import { Switch, Route } from 'react-router'
+import { Switch, Route } from 'react-router-dom'
 
 import InstrumentSettings from '../../components/InstrumentSettings'
 import ChangePipette from '../../components/ChangePipette'
 import ConfigurePipette from '../../components/ConfigurePipette'
 import Page from '../../components/Page'
 
-import type { Match } from 'react-router'
+import type { Match } from 'react-router-dom'
 import type { Robot } from '../../discovery'
 
 type Props = {

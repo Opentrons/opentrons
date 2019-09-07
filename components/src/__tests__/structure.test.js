@@ -1,6 +1,6 @@
 // structure components tests
 import React from 'react'
-import { MemoryRouter } from 'react-router'
+import { MemoryRouter } from 'react-router-dom'
 import Renderer from 'react-test-renderer'
 
 import {

@@ -2,17 +2,10 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { push, goBack } from 'connected-react-router'
-import { Switch, Route, withRouter } from 'react-router'
+import { Switch, Route, withRouter } from 'react-router-dom'
 
 import type { State, Dispatch } from '../../types'
-import type {
-  WithRouterOP,
-  OP,
-  SP,
-  DP,
-  CalibrateDeckProps,
-  CalibrationStep,
-} from './types'
+import type { OP, SP, DP, CalibrateDeckProps, CalibrationStep } from './types'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { chainActions } from '../../util'
@@ -41,7 +34,7 @@ const BAD_PIPETTE_ERROR = 'Unexpected pipette response from robot'
 const ERROR_DESCRIPTION =
   'An unexpected error has cleared your deck calibration progress, please try again.'
 
-export default withRouter<WithRouterOP>(
+export default withRouter<_, _>(
   connect<CalibrateDeckProps, OP, SP, _, _, _>(
     makeMapStateToProps,
     mapDispatchToProps

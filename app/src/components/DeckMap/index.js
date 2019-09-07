@@ -1,12 +1,12 @@
 // @flow
 import React, { useMemo, type ElementProps } from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
+import { withRouter } from 'react-router-dom'
 import some from 'lodash/some'
 import map from 'lodash/map'
 import mapValues from 'lodash/mapValues'
 import { type DeckSlotId } from '@opentrons/shared-data'
-import type { ContextRouter } from 'react-router'
+import type { ContextRouter } from 'react-router-dom'
 
 import { RobotWorkSpace, Module as ModuleItem } from '@opentrons/components'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
@@ -25,15 +25,11 @@ import LabwareItem from './LabwareItem'
 export { LabwareItem }
 export type { LabwareItemProps } from './LabwareItem'
 
-type WithRouterOP = {|
+type OP = {|
+  ...ContextRouter,
   modulesRequired?: boolean,
   enableLabwareSelection?: boolean,
   className?: string,
-|}
-
-type OP = {|
-  ...ContextRouter,
-  ...WithRouterOP,
 |}
 
 type DP = {| dispatch: Dispatch |}
@@ -169,6 +165,6 @@ function mapStateToProps(state: State, ownProps: OP): SP {
   }
 }
 
-export default withRouter<WithRouterOP>(
+export default withRouter<_, _>(
   connect<Props, OP, SP, DP, State, Dispatch>(mapStateToProps)(DeckMap)
 )

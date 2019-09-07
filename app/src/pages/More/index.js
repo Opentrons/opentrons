@@ -1,7 +1,7 @@
 // @flow
 // more nav button routes
 import * as React from 'react'
-import { Switch, Route, Redirect, type Match } from 'react-router'
+import { Switch, Route, Redirect, type Match } from 'react-router-dom'
 
 import AppSettings from './AppSettings'
 import Resources from './Resources'

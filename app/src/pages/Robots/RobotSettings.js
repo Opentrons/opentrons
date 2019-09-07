@@ -2,7 +2,7 @@
 // connect and configure robots page
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { withRouter, Route, Switch, Redirect } from 'react-router'
+import { withRouter, Route, Switch, Redirect } from 'react-router-dom'
 
 import {
   selectors as robotSelectors,
@@ -30,19 +30,15 @@ import ConnectBanner from '../../components/RobotSettings/ConnectBanner'
 import ReachableRobotBanner from '../../components/RobotSettings/ReachableRobotBanner'
 import ResetRobotModal from '../../components/RobotSettings/ResetRobotModal'
 
-import type { ContextRouter } from 'react-router'
+import type { ContextRouter } from 'react-router-dom'
 import type { State, Dispatch, Error } from '../../types'
 import type { ViewableRobot } from '../../discovery'
 import type { ShellUpdateState } from '../../shell'
 
-type WithRouterOP = {|
-  robot: ViewableRobot,
-  appUpdate: ShellUpdateState,
-|}
-
 type OP = {|
   ...ContextRouter,
-  ...WithRouterOP,
+  robot: ViewableRobot,
+  appUpdate: ShellUpdateState,
 |}
 
 type SP = {|
@@ -62,7 +58,7 @@ type Props = {|
   closeConnectAlert: () => mixed,
 |}
 
-export default withRouter<WithRouterOP>(
+export default withRouter<_, _>(
   connect<Props, OP, SP, {||}, State, Dispatch>(
     makeMapStateToProps,
     null,

@@ -1,7 +1,7 @@
 // @flow
 // side nav panel container
 import React from 'react'
-import { Switch, Route } from 'react-router'
+import { Switch, Route } from 'react-router-dom'
 
 import ConnectPanel from '../components/ConnectPanel'
 import UploadPanel from '../components/UploadPanel'
