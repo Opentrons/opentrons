@@ -25,7 +25,7 @@ module.exports = {
   /* eslint-enable no-template-curly-in-string */
   asar: true,
   mac: {
-    target: ['dmg', 'zip'],
+    target: process.platform === 'darwin' ? ['dmg', 'zip'] : ['zip'],
     category: 'public.app-category.productivity',
     type: DEV_MODE ? 'development' : 'distribution',
   },
