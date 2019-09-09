@@ -103,7 +103,7 @@ h2 {
 }
 
 .new_definition_section,
-.upload_exisiting_section {
+.upload_existing_section {
   flex-basis: 100%;
   flex-shrink: 0;
 }
@@ -147,7 +147,7 @@ h2 {
     border-right: var(--bd-light);
   }
 
-  .upload_exisiting_section {
+  .upload_existing_section {
     padding: 1rem;
     flex-shrink: 1;
     padding-right: 0;
@@ -210,4 +210,8 @@ h2 {
   .help_text {
     max-width: 90%;
   }
+}
+
+.disabled_section {
+  color: var(--c-font-disabled);
 }
