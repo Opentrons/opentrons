@@ -152,6 +152,7 @@ jobs:
       <<: *app_stage_build
       name: 'Build/deploy Opentrons App for macOS'
       os: osx
+      osx_image: xcode10.3
       script: make -C app-shell dist-osx
       if: tag =~ ^v OR branch =~ ^(edge|release_.+)$
 
