@@ -1,9 +1,5 @@
 @import '@opentrons/components';
 
-.hidden {
-  display: none;
-}
-
 .radio_image_label {
   text-anchor: middle;
   display: flex;
