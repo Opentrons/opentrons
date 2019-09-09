@@ -31,7 +31,6 @@ const {
   getNextLabware,
   getTipracksByMount,
   getModulesBySlot,
-  getModules,
   getDeckPopulated,
 } = selectors
 
