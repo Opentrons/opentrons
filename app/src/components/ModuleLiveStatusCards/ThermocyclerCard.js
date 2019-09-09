@@ -35,19 +35,17 @@ type Props = {|
   module: ThermocyclerModule,
   sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
   isProtocolActive: boolean,
-  __tempControlsEnabled: boolean,
 |}
 
 const ThermocyclerCard = ({
   module,
   sendModuleCommand,
   isProtocolActive,
-  __tempControlsEnabled,
 }: Props) => (
   <StatusCard title={getModuleDisplayName(module.name)}>
     <CardContentRow>
       <StatusItem status={module.status} />
-      {__tempControlsEnabled && !isProtocolActive && (
+      {!isProtocolActive && (
         <TemperatureControl
           module={module}
           sendModuleCommand={sendModuleCommand}

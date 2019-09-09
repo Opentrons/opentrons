@@ -126,11 +126,8 @@ export function getModulesState(
   robotName: string
 ): Array<Module> {
   const robotState = getRobotApiState(state, robotName)
-  const modules = robotState?.resources.modules || []
-  const tcEnabled = Boolean(state.config.devInternal?.enableThermocycler)
 
-  // TODO: remove this filter when feature flag removed
-  return modules.filter(m => tcEnabled || m.name !== 'thermocycler')
+  return robotState?.resources.modules || []
 }
 
 const PREPARABLE_MODULES = ['thermocycler']

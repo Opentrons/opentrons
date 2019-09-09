@@ -498,7 +498,6 @@ describe('robot selectors', () => {
     })
 
     test('get modules', () => {
-      state = setIn(state, 'config.devInternal.enableThermocycler', 'true')
       expect(getModules(state)).toEqual([
         {
           _id: 1,
