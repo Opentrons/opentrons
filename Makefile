@@ -26,7 +26,8 @@ ifeq ($(watch), true)
 endif
 
 # run at usage (=), not on makefile parse (:=)
-usb_host = $(shell yarn run -s discovery find -i 169.254 fd00 -c "[fd00:0:cafe:fefe::1]")
+usb_host=$(shell yarn run -s discovery find -i 169.254 fd00 -c "[fd00:0:cafe:fefe::1]")
+
 
 # install all project dependencies
 .PHONY: install
@@ -52,27 +53,36 @@ uninstall:
 	$(MAKE) -C $(API_DIR) clean uninstall
 	shx rm -rf '**/node_modules'
 
+.PHONY: push-api-balena
+push-api-balena: export host = $(usb_host)
+push-api-balena:
+	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
+	$(MAKE) -C $(API_DIR) push-balena
+	$(MAKE) -C $(API_DIR) restart
+
 .PHONY: push-api
 push-api: export host = $(usb_host)
 push-api:
 	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
 	$(MAKE) -C $(API_DIR) push
-	$(MAKE) -C $(API_DIR) restart
 
 .PHONY: push-api-buildroot
-push-api-buildroot: export host = $(usb_host)
-push-api-buildroot:
-	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
-	$(MAKE) -C $(API_DIR) push-buildroot
-	$(MAKE) -C $(API_DIR) restart
+push-api-buildroot: push-api
 
-.PHONY: api-local-container
-api-local-container:
-	docker build . \
-		--no-cache \
-		--build-arg base_image=resin/amd64-alpine-python:3.6-slim-20180123 \
-		--build-arg running_on_pi="" \
-		--build-arg data_mkdir_path_slash_if_none=/data/system
+.PHONY: push-update-server
+push-update-server: export host = $(usb_host)
+push-update-server:
+	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
+	$(MAKE) -C $(UPDATE_SERVER_DIR) push
+
+.PHONY: push
+push: export host=$(usb_host)
+push:
+	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
+	$(MAKE) -C $(API_DIR) push
+	sleep 1
+	$(MAKE) -C $(UPDATE_SERVER_DIR) push
+
 
 .PHONY: term
 term: export host = $(usb_host)
@@ -119,9 +129,11 @@ lint-js:
 lint-json:
 	eslint --max-warnings 0 --ext .json .
 
+# stylelint seems to close stdout before make can, causing spurious failures
+# with `write error: stdout`; pipe to tee which will hopefully paper over it
 .PHONY: lint-css
 lint-css:
-	stylelint '**/*.css'
+	stylelint '**/*.css' $(and $(CI),| tee /dev/null)
 
 .PHONY: check-js
 check-js:
@@ -132,10 +144,7 @@ check-js:
 coverage:
 	codecov
 
-# TODO(mc, 2018-06-06): update publish call and echo note when lerna splits
-# version bump and publish: https://github.com/lerna/lerna/issues/961
 .PHONY: bump
 bump:
 	@echo "Bumping versions"
-	@echo "(please ignore lerna mentioning 'publish'; publish is disabled)"
-	lerna publish $(opts)
+	lerna version $(or $(version),prerelease)
