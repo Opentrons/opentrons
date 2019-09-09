@@ -10,6 +10,9 @@ jest.mock('../../definitions')
 
 describe('load and immediately save integrity test', () => {
   const pipetteName = 'P10_Single'
+  const fakeDisplayName = 'Fake Display Name'
+  const fakeLoadName = 'fake_load_name'
+
   // include "extraFields" that the user would have to set before being able to save a freshly-loaded definition
   // (without these fields, Yup schema cast would fail)
   const testCases = [
@@ -24,10 +27,19 @@ describe('load and immediately save integrity test', () => {
   ]
   testCases.forEach(({ inputDef, extraFields }) => {
     test(inputDef.parameters.loadName, () => {
+      const initialRawFieldValues = labwareDefToFields(inputDef)
+      // both name fields should be set to null upon import
+      expect(initialRawFieldValues?.displayName).toBe(null)
+      expect(initialRawFieldValues?.loadName).toBe(null)
+
+      // to avoid making this test also test the name-defaulting behavior, we'll put in some fake name values for those fields
       const rawFieldValues = {
-        ...labwareDefToFields(inputDef),
+        ...initialRawFieldValues,
+        displayName: fakeDisplayName,
+        loadName: fakeLoadName,
         ...extraFields,
       }
+
       const processedFieldValues = labwareFormSchema.cast(rawFieldValues)
       const outputDef = fieldsToLabware(processedFieldValues)
 
@@ -47,13 +59,22 @@ describe('load and immediately save integrity test', () => {
           ...inputDef.parameters,
           format: 'irregular', // 'format' use is deprecated, LC always uses 'irregular'
           quirks: inputDef.parameters.quirks || [],
+          loadName: fakeLoadName,
         },
         metadata: {
           ...inputDef.metadata,
           tags: [], // specifying this is not yet supported
           displayVolumeUnits: 'µL', // specifying this is not yet supported
+          displayName: fakeDisplayName,
         },
         namespace: DEFAULT_CUSTOM_NAMESPACE, // specifying this is not yet supported
+        groups: inputDef.groups.map(group => ({
+          ...group,
+          metadata: {
+            ...group.metadata,
+            displayName: fakeDisplayName,
+          },
+        })),
       }
 
       expect(outputDef).toEqual(tweakedInputDef)
