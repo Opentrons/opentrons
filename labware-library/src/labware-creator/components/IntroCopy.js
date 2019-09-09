@@ -1,11 +1,16 @@
 // @flow
 import * as React from 'react'
+import { Link } from 'react-router-dom'
+import { getPublicPath } from '../../public-path'
 import LinkOut from './LinkOut'
 import { LINK_CUSTOM_LABWARE_FORM } from '../fields'
 import styles from '../styles.css'
 
 const LINK_CUSTOM_LABWARE_GUIDE =
   'https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions'
+
+const LINK_LABWARE_LIBRARY = getPublicPath()
+
 const IntroCopy = () => (
   <>
     <LinkOut
@@ -17,7 +22,12 @@ const IntroCopy = () => (
     <p>
       This tool will allow you to create definitions for well plates,
       reservoirs, tubes in Opentrons tube racks, and plates/tubes in Opentrons
-      aluminum blocks.
+      aluminum blocks that do not already exist on the{' '}
+      <Link to={LINK_LABWARE_LIBRARY}>Labware Library</Link>.
+    </p>
+    <p>
+      Use this tool only if your labware meets the following{' '}
+      <strong>requirements:</strong>
     </p>
     <ol>
       <li>All your wells/tubes must be the same size and volume.</li>
@@ -29,7 +39,7 @@ const IntroCopy = () => (
     </ol>
     <p>
       For all other custom labware, please use this{' '}
-      <LinkOut href={LINK_CUSTOM_LABWARE_FORM}>request form</LinkOut>
+      <LinkOut href={LINK_CUSTOM_LABWARE_FORM}>request form</LinkOut>.
     </p>
 
     <div className={styles.callout}>

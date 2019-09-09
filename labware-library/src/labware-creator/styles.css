@@ -30,8 +30,8 @@
   }
 }
 
-a,
-a:visited {
+.labware_creator a,
+.labware_creator a:visited {
   color: var(--c-blue);
 }
 
@@ -40,7 +40,7 @@ h2 {
   @apply --font-header-dark;
 }
 
-.labware_guide_button {
+.labware_creator .labware_guide_button {
   display: inline-block;
   width: auto;
   margin: 2rem 0 1rem;
@@ -110,10 +110,6 @@ h2 {
 
 .new_definition_content {
   padding-top: 1rem;
-}
-
-.upload_exisiting_section {
-  min-height: 19rem;
 }
 
 .homogenous_wells_section {
