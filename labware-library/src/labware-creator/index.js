@@ -499,7 +499,7 @@ const App = () => {
                       [styles.disabled_section]: lastUploaded !== null,
                     })}
                   >
-                    <div className={styles.new_definition_content}>
+                    <div className={styles.labware_type_fields}>
                       {lastUploaded === null ? (
                         <>
                           <Dropdown
@@ -527,16 +527,16 @@ const App = () => {
                   {lastUploaded === null ? (
                     <ImportLabware onUpload={onUpload} />
                   ) : (
-                    <>
+                    <div className={styles.labware_type_fields}>
                       {labwareTypeChildFields}
                       <PrimaryButton
-                        className={styles.start_editing_labware_button}
+                        className={styles.start_creating_btn}
                         onClick={scrollToForm}
                         disabled={!canProceedToForm}
                       >
                         start editing labware
                       </PrimaryButton>
-                    </>
+                    </div>
                   )}
                 </div>
               </div>
