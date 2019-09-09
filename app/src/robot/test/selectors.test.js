@@ -31,6 +31,7 @@ const {
   getNextLabware,
   getTipracksByMount,
   getModulesBySlot,
+  getModules,
   getDeckPopulated,
 } = selectors
 
@@ -494,6 +495,16 @@ describe('robot selectors', () => {
           name: 'tempdeck',
         },
       })
+    })
+
+    test('get modules', () => {
+      expect(getModules(state)).toEqual([
+        {
+          _id: 1,
+          slot: '1',
+          name: 'tempdeck',
+        },
+      ])
     })
   })
 
