@@ -55,13 +55,14 @@ const ModuleLiveStatusCards = (props: Props) => {
 
   return (
     <>
-      {liveStatusModules.map(module => {
+      {liveStatusModules.map((module, index) => {
         switch (module.name) {
           case 'tempdeck':
             return (
               <TempDeckCard
                 key={module.serial}
                 module={module}
+                initiallyExpanded={index === 0}
                 sendModuleCommand={sendModuleCommand}
                 isProtocolActive={isProtocolActive}
                 __tempdeckControlsEnabled={__tempdeckControlsEnabled}
@@ -72,12 +73,19 @@ const ModuleLiveStatusCards = (props: Props) => {
               <ThermocyclerCard
                 key={module.serial}
                 module={module}
+                initiallyExpanded={index === 0}
                 sendModuleCommand={sendModuleCommand}
                 isProtocolActive={isProtocolActive}
               />
             )
           case 'magdeck':
-            return <MagDeckCard key={module.serial} module={module} />
+            return (
+              <MagDeckCard
+                key={module.serial}
+                module={module}
+                initiallyExpanded={index === 0}
+              />
+            )
           default:
             return null
         }
