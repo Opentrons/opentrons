@@ -493,7 +493,7 @@ const App = () => {
               </div>
               <div className={styles.upload_exisiting_section}>
                 <h2 className={styles.setup_heading}>
-                  Edit a file you’ve built with our labware creator.
+                  Edit a file you’ve built with our labware creator
                 </h2>
                 <ImportLabware onUpload={onUpload} />
               </div>

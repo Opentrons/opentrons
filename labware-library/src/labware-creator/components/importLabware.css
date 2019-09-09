@@ -2,13 +2,12 @@
 
 .upload_group {
   width: 75%;
-  margin: 0 auto;
 }
 
 .upload {
-  width: 100%;
+  width: 18rem;
   margin: 1rem 0;
-  padding: 0 1rem;
+  padding: 0 0.25rem;
 }
 
 .file_input {
@@ -18,8 +17,7 @@
 
 .upload_button {
   display: block;
-  margin: 0 auto;
-  width: 17rem;
+  width: 18rem;
 }
 
 .file_drop {
