@@ -29,7 +29,7 @@ type SP = {|
   _robot: ?Robot,
   liveStatusModules: Array<Module>,
   isProtocolActive: boolean,
-  __tempControlsEnabled: boolean,
+  __tempdeckControlsEnabled: boolean,
 |}
 
 type DP = {|
@@ -46,7 +46,7 @@ type Props = {|
   isProtocolActive: boolean,
   fetchModules: () => mixed,
   sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
-  __tempControlsEnabled: boolean,
+  __tempdeckControlsEnabled: boolean,
 |}
 
 const ModuleLiveStatusCards = (props: Props) => {
@@ -55,7 +55,7 @@ const ModuleLiveStatusCards = (props: Props) => {
     isProtocolActive,
     fetchModules,
     sendModuleCommand,
-    __tempControlsEnabled,
+    __tempdeckControlsEnabled,
   } = props
   if (liveStatusModules.length === 0) return null
 
@@ -70,7 +70,7 @@ const ModuleLiveStatusCards = (props: Props) => {
                 module={module}
                 sendModuleCommand={sendModuleCommand}
                 isProtocolActive={isProtocolActive}
-                __tempControlsEnabled={__tempControlsEnabled}
+                __tempdeckControlsEnabled={__tempdeckControlsEnabled}
               />
             )
           case 'thermocycler':
@@ -80,7 +80,6 @@ const ModuleLiveStatusCards = (props: Props) => {
                 module={module}
                 sendModuleCommand={sendModuleCommand}
                 isProtocolActive={isProtocolActive}
-                __tempControlsEnabled={__tempControlsEnabled}
               />
             )
           case 'magdeck':
@@ -105,7 +104,7 @@ function mapStateToProps(state: State): SP {
     _robot,
     liveStatusModules,
     isProtocolActive: robotSelectors.getIsActive(state),
-    __tempControlsEnabled: Boolean(
+    __tempdeckControlsEnabled: Boolean(
       getConfig(state).devInternal?.tempdeckControls
     ),
   }
@@ -125,7 +124,7 @@ function mergeProps(stateProps: SP, dispatchProps: DP): Props {
     _robot,
     liveStatusModules,
     isProtocolActive,
-    __tempControlsEnabled,
+    __tempdeckControlsEnabled,
   } = stateProps
 
   return {
@@ -134,7 +133,7 @@ function mergeProps(stateProps: SP, dispatchProps: DP): Props {
     fetchModules: () => _robot && _fetchModules(_robot),
     sendModuleCommand: (serial, request) =>
       _robot && _sendModuleCommand(_robot, serial, request),
-    __tempControlsEnabled,
+    __tempdeckControlsEnabled,
   }
 }
 

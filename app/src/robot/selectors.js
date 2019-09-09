@@ -292,13 +292,8 @@ export const getModules: OutputSelector<
   getModulesBySlot,
   // TODO (ka 2019-3-26): can't import getConfig due to circular dependency
   state => state.config,
-  (modulesBySlot, config) => {
-    const tcEnabled = !!config.devInternal?.enableThermocycler
-
-    return Object.keys(modulesBySlot)
-      .map((slot: Slot) => modulesBySlot[slot])
-      .filter((m: SessionModule) => tcEnabled || m.name !== 'thermocycler')
-  }
+  (modulesBySlot, config) =>
+    Object.keys(modulesBySlot).map((slot: Slot) => modulesBySlot[slot])
 )
 
 export function getLabwareBySlot(state: State) {

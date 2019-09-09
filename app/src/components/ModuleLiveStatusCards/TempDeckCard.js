@@ -13,19 +13,19 @@ type Props = {|
   module: TempDeckModule,
   sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
   isProtocolActive: boolean,
-  __tempControlsEnabled: boolean,
+  __tempdeckControlsEnabled: boolean,
 |}
 
 const TempDeckCard = ({
   module,
   sendModuleCommand,
   isProtocolActive,
-  __tempControlsEnabled,
+  __tempdeckControlsEnabled,
 }: Props) => (
   <StatusCard title={getModuleDisplayName(module.name)}>
     <CardContentRow>
       <StatusItem status={module.status} />
-      {__tempControlsEnabled && !isProtocolActive && (
+      {__tempdeckControlsEnabled && !isProtocolActive && (
         <TemperatureControl
           module={module}
           sendModuleCommand={sendModuleCommand}
