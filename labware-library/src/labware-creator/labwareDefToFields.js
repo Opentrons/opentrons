@@ -116,8 +116,9 @@ export default function labwareDefToFields(
     brand: def.brand.brand,
     brandId: def.brand.brandId ? def.brand.brandId.join(',') : null, // comma-separated values
 
-    loadName: def.parameters.loadName,
-    displayName: def.metadata.displayName,
+    // NOTE: intentionally null these fields, do not import them
+    loadName: null,
+    displayName: null,
 
     // fields for test protocol
     pipetteName: null,

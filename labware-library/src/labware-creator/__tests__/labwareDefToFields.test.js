@@ -45,8 +45,8 @@ describe('labwareDefToFields', () => {
       brand: 'generic',
       brandId: null,
 
-      loadName: def.parameters.loadName,
-      displayName: def.metadata.displayName,
+      loadName: null, // should be cleared
+      displayName: null, // should be cleared
 
       pipetteName: null,
     })
