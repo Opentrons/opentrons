@@ -84,13 +84,9 @@ class RPCServer(object):
 
         def task_done(future):
             try:
-                result = future.result()
+                future.result()
             except Exception:
                 log.exception("send_task for socket {} threw:".format(_id))
-            else:
-                log.info('send_task for socket {} result: {}'.format(
-                    _id, result))
-            log.debug('Send task for {} finished'.format(_id))
 
         async def send_task(socket, queue):
             while True:
@@ -140,24 +136,20 @@ class RPCServer(object):
                         traceback.format_exc())
                 )
 
-        client = web.WebSocketResponse()
+        client = web.WebSocketResponse(max_msg_size=0)
         client_id = id(client)
 
         # upgrade to Websockets
         await client.prepare(request)
 
         log.info('Opening Websocket {0}'.format(id(client)))
-        log.debug('Tasks: {0}'.format(self.tasks))
-        log.debug('Clients: {0}'.format(self.clients))
 
         try:
-            log.debug('Sending root info to {0}'.format(client_id))
             await client.send_json({
                 '$': {'type': CONTROL_MESSAGE, 'monitor': True},
                 'root': self.call_and_serialize(lambda: self.root),
                 'type': self.call_and_serialize(lambda: type(self.root))
             })
-            log.debug('Root info sent to {0}'.format(client_id))
         except Exception:
             log.exception('While sending root info to {0}'.format(client_id))
 
@@ -241,11 +233,11 @@ class RPCServer(object):
                     _id = id(self.system)
 
                 try:
+                    self.send_ack(token)
                     func = self.build_call(
                         _id=_id,
                         name=data.get('name'),
                         args=data.get('args', []))
-                    self.send_ack(token)
                 except Exception as e:
                     log.exception("Exception during rpc.Server.process:")
                     error = '{0}: {1}'.format(e.__class__.__name__, e)
@@ -258,7 +250,7 @@ class RPCServer(object):
                     'WebSocket connection closed unexpectedly: {0}'.format(
                         message))
             else:
-                log.warning('Unhanled WSMsgType: {0}'.format(message.type))
+                log.warning('Unhandled WSMsgType: {0}'.format(message.type))
         except Exception:
             log.exception('Error while processing request')
 
@@ -274,7 +266,6 @@ class RPCServer(object):
     async def make_call(self, func, token):
         response = {'$': {'type': CALL_RESULT_MESSAGE, 'token': token}}
         try:
-            log.info(f"RPC call: {func} begins")
             call_result = await self.loop.run_in_executor(
                 self.executor, self.call_and_serialize, func)
             response['$']['status'] = 'success'
@@ -306,7 +297,6 @@ class RPCServer(object):
                     'traceback': trace
                 }
         finally:
-            log.info(f"RPC call: {func} ends")
             response['data'] = call_result
         return response
 
