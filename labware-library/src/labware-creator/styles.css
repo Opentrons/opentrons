@@ -139,6 +139,10 @@ h2 {
   justify-content: center;
 }
 
+.hidden {
+  display: none;
+}
+
 @media (--medium) {
   .new_definition_section {
     flex-basis: 45%;
