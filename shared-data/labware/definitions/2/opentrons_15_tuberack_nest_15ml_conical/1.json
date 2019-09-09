@@ -1,0 +1,209 @@
+{
+  "ordering": [
+    ["A1", "B1", "C1"],
+    ["A2", "B2", "C2"],
+    ["A3", "B3", "C3"],
+    ["A4", "B4", "C4"],
+    ["A5", "B5", "C5"]
+  ],
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": [],
+    "links": [
+      "https://shop.opentrons.com/collections/opentrons-tips/products/tube-rack-set-1"
+    ]
+  },
+  "metadata": {
+    "displayName": "Opentrons 15 Tube Rack with NEST 15 mL Conical",
+    "displayCategory": "tubeRack",
+    "displayVolumeUnits": "mL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127.76,
+    "yDimension": 85.48,
+    "zDimension": 124.65
+  },
+  "wells": {
+    "A1": {
+      "depth": 117.8,
+      "shape": "circular",
+      "diameter": 15.5,
+      "totalLiquidVolume": 15000,
+      "x": 13.88,
+      "y": 67.74,
+      "z": 6.85
+    },
+    "B1": {
+      "depth": 117.8,
+      "shape": "circular",
+      "diameter": 15.5,
+      "totalLiquidVolume": 15000,
+      "x": 13.88,
+      "y": 42.74,
+      "z": 6.85
+    },
+    "C1": {
+      "depth": 117.8,
+      "shape": "circular",
+      "diameter": 15.5,
+      "totalLiquidVolume": 15000,
+      "x": 13.88,
+      "y": 17.74,
+      "z": 6.85
+    },
+    "A2": {
+      "depth": 117.8,
+      "shape": "circular",
+      "diameter": 15.5,
+      "totalLiquidVolume": 15000,
+      "x": 38.88,
+      "y": 67.74,
+      "z": 6.85
+    },
+    "B2": {
+      "depth": 117.8,
+      "shape": "circular",
+      "diameter": 15.5,
+      "totalLiquidVolume": 15000,
+      "x": 38.88,
+      "y": 42.74,
+      "z": 6.85
+    },
+    "C2": {
+      "depth": 117.8,
+      "shape": "circular",
+      "diameter": 15.5,
+      "totalLiquidVolume": 15000,
+      "x": 38.88,
+      "y": 17.74,
+      "z": 6.85
+    },
+    "A3": {
+      "depth": 117.8,
+      "shape": "circular",
+      "diameter": 15.5,
+      "totalLiquidVolume": 15000,
+      "x": 63.88,
+      "y": 67.74,
+      "z": 6.85
+    },
+    "B3": {
+      "depth": 117.8,
+      "shape": "circular",
+      "diameter": 15.5,
+      "totalLiquidVolume": 15000,
+      "x": 63.88,
+      "y": 42.74,
+      "z": 6.85
+    },
+    "C3": {
+      "depth": 117.8,
+      "shape": "circular",
+      "diameter": 15.5,
+      "totalLiquidVolume": 15000,
+      "x": 63.88,
+      "y": 17.74,
+      "z": 6.85
+    },
+    "A4": {
+      "depth": 117.8,
+      "shape": "circular",
+      "diameter": 15.5,
+      "totalLiquidVolume": 15000,
+      "x": 88.88,
+      "y": 67.74,
+      "z": 6.85
+    },
+    "B4": {
+      "depth": 117.8,
+      "shape": "circular",
+      "diameter": 15.5,
+      "totalLiquidVolume": 15000,
+      "x": 88.88,
+      "y": 42.74,
+      "z": 6.85
+    },
+    "C4": {
+      "depth": 117.8,
+      "shape": "circular",
+      "diameter": 15.5,
+      "totalLiquidVolume": 15000,
+      "x": 88.88,
+      "y": 17.74,
+      "z": 6.85
+    },
+    "A5": {
+      "depth": 117.8,
+      "shape": "circular",
+      "diameter": 15.5,
+      "totalLiquidVolume": 15000,
+      "x": 113.88,
+      "y": 67.74,
+      "z": 6.85
+    },
+    "B5": {
+      "depth": 117.8,
+      "shape": "circular",
+      "diameter": 15.5,
+      "totalLiquidVolume": 15000,
+      "x": 113.88,
+      "y": 42.74,
+      "z": 6.85
+    },
+    "C5": {
+      "depth": 117.8,
+      "shape": "circular",
+      "diameter": 15.5,
+      "totalLiquidVolume": 15000,
+      "x": 113.88,
+      "y": 17.74,
+      "z": 6.85
+    }
+  },
+  "groups": [
+    {
+      "metadata": {
+        "displayName": "NEST 15x15 mL Conical",
+        "displayCategory": "tubeRack",
+        "wellBottomShape": "v"
+      },
+      "brand": {
+        "brand": "NEST",
+        "brandId": ["601052"],
+        "links": ["http://www.cell-nest.com/page94?_l=en&product_id=110"]
+      },
+      "wells": [
+        "A1",
+        "B1",
+        "C1",
+        "A2",
+        "B2",
+        "C2",
+        "A3",
+        "B3",
+        "C3",
+        "A4",
+        "B4",
+        "C4",
+        "A5",
+        "B5",
+        "C5"
+      ]
+    }
+  ],
+  "parameters": {
+    "format": "irregular",
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "opentrons_15_tuberack_nest_15ml_conical"
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
+}
