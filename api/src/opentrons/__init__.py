@@ -35,8 +35,11 @@ if version < (3, 5):
 
 
 def build_globals():
-    return robotv1, resetv1, instrumentsv1, containersv1,\
-        labwarev1, modulesv1, robotv1
+    if config.feature_flags.use_protocol_api_v2():
+        return None, None, None, None, None, None, None
+    else:
+        return robotv1, resetv1, instrumentsv1, containersv1,\
+            labwarev1, modulesv1, robotv1
 
 
 def reset_globals():

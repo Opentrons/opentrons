@@ -2,7 +2,8 @@ import os
 import logging
 import asyncio
 import re
-from opentrons import HERE, hardware
+import opentrons
+from opentrons import HERE
 from opentrons import server
 from opentrons.hardware_control import adapters
 from opentrons.server.main import build_arg_parser
@@ -189,7 +190,7 @@ def main():
     if ff.use_protocol_api_v2():
         checked_hardware = adapters.SingletonAdapter(asyncio.get_event_loop())
     else:
-        checked_hardware = hardware
+        checked_hardware = opentrons.hardware
     run(checked_hardware, **vars(args))
     arg_parser.exit(message="Stopped\n")
 
