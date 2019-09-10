@@ -1,65 +1,18 @@
 // application menu
-import { app, Menu } from 'electron'
+import { Menu } from 'electron'
 
 import pkg from '../package.json'
-import { getConfig } from './config'
-
-const config = getConfig()
 
 // file or application menu
 const firstMenu = {
-  label: 'File',
-  submenu: [{ role: 'quit' }],
+  role: process.platform === 'darwin' ? 'appMenu' : 'fileMenu',
 }
 
-if (process.platform === 'darwin') {
-  // if mac, first menu is application menu
-  Object.assign(firstMenu, {
-    label: app.getName(),
-    submenu: [
-      { role: 'about' },
-      { type: 'separator' },
-      { role: 'services', submenu: [] },
-      { type: 'separator' },
-      { role: 'hide' },
-      { role: 'hideothers' },
-      { role: 'unhide' },
-      { type: 'separator' },
-      ...firstMenu.submenu,
-    ],
-  })
-}
+const editMenu = { role: 'editMenu' }
 
-const editMenu = {
-  label: 'Edit',
-  submenu: [
-    { role: 'cut' },
-    { role: 'copy' },
-    { role: 'paste' },
-    { role: 'selectall' },
-  ],
-}
+const viewMenu = { role: 'viewMenu' }
 
-const viewMenu = {
-  label: 'View',
-  submenu: [{ role: 'togglefullscreen' }],
-}
-
-if (config.devtools) {
-  Object.assign(viewMenu, {
-    submenu: [
-      { role: 'reload' },
-      { role: 'forcereload' },
-      { type: 'separator' },
-      ...viewMenu.submenu,
-    ],
-  })
-}
-
-const windowMenu = {
-  role: 'window',
-  submenu: [{ role: 'minimize' }, { type: 'separator' }, { role: 'front' }],
-}
+const windowMenu = { role: 'windowMenu' }
 
 const helpMenu = {
   role: 'help',

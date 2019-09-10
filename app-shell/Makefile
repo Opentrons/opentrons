@@ -19,9 +19,6 @@ babel := babel $(src_dir) --root-mode upward --out-dir $(lib_dir) --ignore $(src
 ui_dir := ../app
 discovery_client_dir := ../discovery-client
 
-# directories for robot API update bundled in production build
-api_dist_dir := ../api/dist
-
 # cross-platform noop command
 noop := cd .
 
@@ -40,7 +37,9 @@ publish_update := $(filter v%,$(OT_TAG))
 branch_suffix := $(if $(publish_update),,-$(OT_BRANCH))
 build_id := $(or $(and $(OT_BUILD),b$(OT_BUILD)$(branch_suffix)),dev)
 
-builder := electron-builder -p never
+builder := electron-builder \
+	--config electron-builder.config.js \
+	--publish never
 
 electron := electron . \
 	--devtools \
@@ -72,9 +71,7 @@ lib:
 	$(babel)
 
 .PHONY: deps
-deps: wheel = $(wildcard $(api_dist_dir)/*.whl)
 deps:
-	$(if $(wheel),@echo "Packaging $(wheel)",$(error API wheel required))
 	$(MAKE) -C $(ui_dir)
 	$(MAKE) -C $(discovery_client_dir)
 
