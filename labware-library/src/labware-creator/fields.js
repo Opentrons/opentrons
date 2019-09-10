@@ -327,9 +327,9 @@ export const getDefaultFormState = (): LabwareFields => ({
   regularColumnSpacing: null,
 
   wellVolume: null,
-  wellBottomShape: null,
+  wellBottomShape: 'flat',
   wellDepth: null,
-  wellShape: null,
+  wellShape: 'circular',
 
   // used with circular well shape only
   wellDiameter: null,

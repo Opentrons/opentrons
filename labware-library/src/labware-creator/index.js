@@ -136,13 +136,18 @@ const GridImg = () => {
   return <img src={src} />
 }
 
-const WellXYImg = (props: {| wellShape: WellShape |}) => {
+const WellXYImg = (props: {| wellShape: ?WellShape |}) => {
   const { wellShape } = props
-  let src = require('./images/wellXY_circular.svg')
-  if (wellShape === 'rectangular') {
-    src = require('./images/wellXY_rectangular.svg')
+  const wellShapeToImg: { [WellShape]: string } = {
+    circular: require('./images/wellXY_circular.svg'),
+    rectangular: require('./images/wellXY_rectangular.svg'),
   }
-  return <img src={src} />
+
+  if (wellShape != null && wellShape in wellShapeToImg) {
+    return <img src={wellShapeToImg[wellShape]} />
+  }
+
+  return null
 }
 
 const XYSpacingImg = (props: {|
@@ -174,10 +179,9 @@ type DepthImgProps = {|
 |}
 const DepthImg = (props: DepthImgProps) => {
   const { labwareType, wellBottomShape } = props
-  const defaultSrc = require('./images/depth_plate_flat.svg')
   let src
 
-  if (!wellBottomShape) return <img src={defaultSrc} />
+  if (!wellBottomShape) return null
 
   if (labwareType === 'reservoir' || labwareType === 'tubeRack') {
     const imgMap = {
@@ -195,7 +199,7 @@ const DepthImg = (props: DepthImgProps) => {
     src = imgMap[wellBottomShape]
   }
 
-  return <img src={src != null ? src : defaultSrc} />
+  return <img src={src} />
 }
 
 const XYOffsetImg = (props: {|
