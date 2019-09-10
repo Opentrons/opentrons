@@ -3,12 +3,8 @@
 // TODO(mc, 2019-03-18): move to shared-data?
 import * as React from 'react'
 import { Route } from 'react-router-dom'
-import isEqual from 'lodash/isEqual'
 import groupBy from 'lodash/groupBy'
-import uniqBy from 'lodash/uniqBy'
-import uniqWith from 'lodash/uniqWith'
-import round from 'lodash/round'
-import orderBy from 'lodash/orderBy'
+import uniq from 'lodash/uniq'
 import {
   LABWAREV2_DO_NOT_LIST,
   type LabwareDefinition2,
@@ -16,13 +12,7 @@ import {
 import { getPublicPath } from './public-path'
 
 import type { ContextRouter } from 'react-router-dom'
-import type {
-  LabwareList,
-  LabwareWell,
-  LabwareWellShapeProperties,
-  LabwareWellGroupProperties,
-  LabwareDefinition,
-} from './types'
+import type { LabwareList, LabwareDefinition } from './types'
 
 // require all definitions in the labware/definitions/2 directory
 // require.context is webpack-specific method
@@ -48,17 +38,36 @@ const getOnlyLatestDefs = (labwareList: LabwareList): LabwareList => {
   })
 }
 
+function _getAllDefs(): Array<LabwareDefinition2> {
+  return definitionsContext.keys().map(name => definitionsContext(name))
+}
+
+let allLoadNames: Array<string> | null = null
+// ALL unique load names, not just the non-blacklisted ones
+export function getAllLoadNames(): Array<string> {
+  if (!allLoadNames) {
+    allLoadNames = uniq(_getAllDefs().map(def => def.parameters.loadName))
+  }
+  return allLoadNames
+}
+
+let allDisplayNames: Array<string> | null = null
+// ALL unique display names, not just the non-blacklisted ones
+export function getAllDisplayNames(): Array<string> {
+  if (!allDisplayNames) {
+    allDisplayNames = uniq(_getAllDefs().map(def => def.metadata.displayName))
+  }
+  return allDisplayNames
+}
+
 let definitions: LabwareList | null = null
 
 export function getAllDefinitions(): LabwareList {
   if (!definitions) {
-    const allDefs = definitionsContext
-      .keys()
-      .map(name => definitionsContext(name))
-      .filter(
-        (d: LabwareDefinition2) =>
-          LABWAREV2_DO_NOT_LIST.indexOf(d.parameters.loadName) === -1
-      )
+    const allDefs = _getAllDefs().filter(
+      (d: LabwareDefinition2) =>
+        LABWAREV2_DO_NOT_LIST.indexOf(d.parameters.loadName) === -1
+    )
     definitions = getOnlyLatestDefs(allDefs)
   }
 
@@ -68,69 +77,6 @@ export function getAllDefinitions(): LabwareList {
 export function getDefinition(loadName: ?string): LabwareDefinition | null {
   const def = getAllDefinitions().find(d => d.parameters.loadName === loadName)
   return def || null
-}
-
-export function getUniqueWellProperties(
-  definition: LabwareDefinition
-): Array<LabwareWellGroupProperties> {
-  const { groups, wells, dimensions } = definition
-
-  return groups.map(group => {
-    const wellProps = orderBy(
-      group.wells.map(n => wells[n]),
-      ['x', 'y'],
-      ['asc', 'desc']
-    )
-    const wellDepths = wellProps.map<number>(w => w.depth)
-    const wellVolumes = wellProps.map<number>(w => w.totalLiquidVolume)
-    const wellShapes = wellProps.map<LabwareWellShapeProperties>(
-      (well: LabwareWell) =>
-        well.shape === 'circular'
-          ? { shape: well.shape, diameter: well.diameter }
-          : {
-              shape: well.shape,
-              xDimension: well.xDimension,
-              yDimension: well.yDimension,
-            }
-    )
-
-    const xStart = wellProps[0].x
-    const yStart = wellProps[0].y
-
-    return {
-      metadata: group.metadata,
-      brand: group.brand || null,
-      xSpacing: getSpacing(wellProps, 'x'),
-      ySpacing: getSpacing(wellProps, 'y'),
-      xOffsetFromLeft: xStart,
-      yOffsetFromTop: dimensions.yDimension - yStart,
-      wellCount: wellProps.length,
-      depth: getIfConsistent(wellDepths),
-      totalLiquidVolume: getIfConsistent(wellVolumes),
-      shape: getIfConsistent(wellShapes),
-    }
-  })
-}
-
-function getIfConsistent<T>(items: Array<T>): T | null {
-  return uniqWith(items, isEqual).length === 1 ? items[0] : null
-}
-
-function getSpacing(wells: Array<LabwareWell>, axis: 'x' | 'y'): number | null {
-  return uniqBy<LabwareWell>(wells, axis).reduce<number | null>(
-    (spacing, well, index, uniqueWells) => {
-      if (index > 0) {
-        const prev = uniqueWells[index - 1]
-        const currentSpacing = Math.abs(round(well[axis] - prev[axis], 2))
-
-        return spacing === 0 || spacing === currentSpacing
-          ? currentSpacing
-          : null
-      }
-      return spacing
-    },
-    0
-  )
 }
 
 export type DefinitionRouteRenderProps = {|

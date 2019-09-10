@@ -5,18 +5,7 @@ exports[`App component renders with definition 1`] = `
   className="app is_detail_page"
 >
   <Nav />
-  <Breadcrumbs
-    definition={
-      Object {
-        "brand": Object {
-          "brand": "generic",
-        },
-        "metadata": Object {
-          "displayCategory": "wellPlate",
-        },
-      }
-    }
-  />
+  <Breadcrumbs />
   <Page
     content={
       <LabwareDetails
