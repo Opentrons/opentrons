@@ -35,6 +35,7 @@ Modules
 
 .. autoclass:: opentrons.protocol_api.contexts.ThermocyclerContext
    :members:
+   :exclude-members: total_step_count, current_cycle_index, total_cycle_count, hold_time, ramp_rate, current_step_index
    :inherited-members:
 
 
