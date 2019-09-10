@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/app",
-  "version": "3.11.4",
+  "version": "3.12.0-alpha.0",
   "description": "Opentrons desktop application UI",
   "main": "src/index.js",
   "repository": {
@@ -21,8 +21,8 @@
     "flow-typed": "^2.6.1"
   },
   "dependencies": {
-    "@opentrons/components": "3.11.4",
-    "@opentrons/shared-data": "3.11.4",
+    "@opentrons/components": "3.12.0-alpha.0",
+    "@opentrons/shared-data": "3.12.0-alpha.0",
     "@thi.ng/paths": "^1.6.5",
     "classnames": "^2.2.5",
     "connected-react-router": "^6.4.0",

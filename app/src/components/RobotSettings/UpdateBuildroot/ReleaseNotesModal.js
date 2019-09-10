@@ -28,7 +28,10 @@ export default function ReleaseNotesModal(props: Props) {
   }, [dispatch, robotName])
 
   const heading =
-    systemType === 'buildroot' ? 'Robot Update' : 'Robot System Update'
+    systemType === 'buildroot'
+      ? 'Robot Update'
+      : 'Robot Operating System Update'
+
   const buttons = [
     notNowButton,
     {
