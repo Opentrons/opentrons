@@ -5,8 +5,9 @@ import { hydrate, render } from 'react-dom'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 
 import App from './components/App'
-// import LabwareCreator from './labware-creator'
-// import { getPublicPath } from './public-path'
+import LabwareCreator from './labware-creator'
+
+import { getPublicPath } from './public-path'
 import './styles.global.css'
 
 const $root = document.getElementById('root')
@@ -18,7 +19,7 @@ if (!$root) {
 const Root = () => (
   <BrowserRouter>
     <Switch>
-      {/* <Route path={`${getPublicPath()}create`} component={LabwareCreator} /> */}
+      <Route path={`${getPublicPath()}create`} component={LabwareCreator} />
       <Route component={App} />
     </Switch>
   </BrowserRouter>

@@ -16,12 +16,20 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@opentrons/components": "3.11.4",
+    "ajv": "^6.2.1",
     "classnames": "^2.2.5",
+    "file-saver": "^2.0.1",
+    "formik": "^1.5.8",
+    "jszip": "^3.2.2",
     "lodash": "^4.17.4",
     "query-string": "^6.2.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-hot-loader": "^4.8.0",
-    "react-router-dom": "^5.0.0"
+    "react-router-dom": "^5.0.0",
+    "yup": "^0.27.0"
+  },
+  "devDependencies": {
+    "react-snap": "^1.23.0"
   }
 }
