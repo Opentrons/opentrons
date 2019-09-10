@@ -35,16 +35,8 @@ if version < (3, 5):
 
 
 def build_globals():
-    # checked_version =\
-    #     2 if config.feature_flags.use_protocol_api_v2() else 1
-    # if checked_version == 1:
     return robotv1, resetv1, instrumentsv1, containersv1,\
         labwarev1, modulesv1, robotv1
-    # elif checked_version == 2:
-    #     return None
-    # else:
-    #     raise RuntimeError("Bad API version {}; only API 1 is valid"
-    #                        .format(version))
 
 
 def reset_globals():
@@ -63,6 +55,7 @@ def reset_globals():
 
     robot, reset, instruments, containers, labware, modules, hardware\
         = build_globals()
+
 
 robot, reset, instruments, containers, labware, modules, hardware\
         = build_globals()

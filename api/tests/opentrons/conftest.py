@@ -141,20 +141,17 @@ def old_aspiration(monkeypatch):
 def using_api2(loop):
     oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
     os.environ['OT_API_FF_useProtocolApi2'] = '1'
-    print(f"Type of the loop {type(loop)}")
-    hardware = adapters.SingletonAdapter(loop)
+
+    hw_manager = API.build_hardware_simulator(loop=loop)
     try:
-        yield hardware
+        yield hw_manager
     finally:
-        try:
-            loop.run_until_complete(hardware.reset())
-        except RuntimeError:
-            loop.create_task(hardware.reset())
+        asyncio.ensure_future(hw_manager.reset())
         if None is oldenv:
             os.environ.pop('OT_API_FF_useProtocolApi2')
         else:
             os.environ['OT_API_FF_useProtocolApi2'] = oldenv
-        hardware.set_config(config.robot_configs.load())
+        hw_manager.set_config(config.robot_configs.load())
 
 
 @contextlib.contextmanager
@@ -215,9 +212,13 @@ async def async_server(request, virtual_smoothie_env, loop):
         pytest.skip('requires api1 only')
     elif _should_skip_api2(request):
         pytest.skip('requires api2 only')
-    with request.param(loop):
-        app = init()
-        app['api_version'] = 1 if request.param == using_api1 else 2
+    with request.param(loop) as hw:
+        if request.param == using_api1:
+            app = init(hw)
+            app['api_version'] = 1
+        else:
+            app = init(hw)
+            app['api_version'] = 2
         yield app
         await app.shutdown()
 
@@ -300,7 +301,7 @@ def session(loop, aiohttp_client, request, main_router):
         if not root:
             root = main_router
         # Assume test fixture has init to attach test loop
-        root.init(loop)
+        root.init(loop=loop)
     except Exception:
         pass
 
@@ -423,7 +424,6 @@ def model(robot, hardware, loop, request):
         rob = hardware
         container = models.Container(plate, context=ctx)
     else:
-        print("hardware is {}".format(hardware))
         pipette = Pipette(robot,
                           ul_per_mm=18.5, max_volume=300, mount='right')
         plate = load(robot, lw_name or '96-flat', '1')

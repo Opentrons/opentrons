@@ -93,6 +93,7 @@ class Simulator:
         self._smoothie_driver = SimulatingDriver()
         self._engaged_axes = {ax: True for ax in _HOME_POSITION}
         self._lights = {'button': False, 'rails': False}
+        self._is_connected = False
         self._run_flag = Event()
         self._log = MODULE_LOG.getChild(repr(self))
         self._strict_attached = bool(strict_attached_instruments)
@@ -241,6 +242,17 @@ class Simulator:
 
     async def identify(self):
         pass
+
+    def connect(self, port: str = None):
+        self._is_connected = True
+
+    def disconnect(self):
+        """ Disconnect from connected hardware. """
+        self._is_connected = False
+
+    def is_connected(self):
+        """ `True` if connected (e.g. has a real controller backing it). """
+        return self._is_connected
 
     def pause(self):
         self._run_flag.clear()

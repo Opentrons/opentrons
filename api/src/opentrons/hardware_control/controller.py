@@ -128,6 +128,15 @@ class Controller:
         self._smoothie_driver.connect(port)
         await self.update_fw_version()
 
+    async def disconnect(self):
+        """ Disconnect from connected hardware. """
+        self._smoothie_driver.disconnect()
+        await self.update_fw_version()
+
+    async def is_connected(self):
+        """ `True` if connected (e.g. has a real controller backing it). """
+        return self._smoothie_driver.is_connected()
+
     @contextmanager
     def _set_temp_speed(self, speed):
         if not speed:

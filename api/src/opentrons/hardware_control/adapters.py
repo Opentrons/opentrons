@@ -91,6 +91,38 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
             if thread_loop.is_running():
                 thread_loop.call_soon_threadsafe(lambda: thread_loop.stop())
 
+    def connect(self, port: str = None):
+        """ Connect to hardware.
+
+        :param port: The port to connect to. May be `None`, in which case the
+                     hardware will connect to the first serial port it sees
+                     with the device name `FT232R`; or port name compatible
+                     with `serial.Serial<https://pythonhosted.org/pyserial/pyserial_api.html#serial.Serial.__init__>`_.  # noqa(E501)
+        """
+        old_api = object.__getattribute__(self, '_api')
+        loop = old_api._loop
+        config = loop.run_until_complete(old_api.config)
+        new_api = loop.run_until_complete(API.build_hardware_controller(
+            loop=loop,
+            port=port,
+            config=copy.copy(config)))
+        old_api._loop.run_until_complete(new_api.cache_instruments())
+        setattr(self, '_api', new_api)
+
+    def disconnect(self):
+        """ Disconnect from connected hardware. """
+        old_api = object.__getattribute__(self, '_api')
+        config = old_api._loop.run_until_complete(old_api.config)
+        new_api = API.build_hardware_simulator(
+            loop=old_api._loop,
+            config=copy.copy(config))
+        setattr(self, '_api', new_api)
+
+    def is_connected(self):
+        """ `True` if connected (e.g. has a real controller backing it). """
+        api = object.__getattribute__(self, '_api')
+        return api.is_simulator_sync
+
     def discover_modules(self):
         loop = object.__getattribute__(self, '_loop')
         api = object.__getattribute__(self, '_api')

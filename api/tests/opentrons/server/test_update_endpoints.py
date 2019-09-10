@@ -7,18 +7,20 @@ from aiohttp import web
 from opentrons.server import init
 from opentrons.server.endpoints import update
 from opentrons.server.endpoints import serverlib_fallback
-from opentrons import modules, robot
+from opentrons import modules
 
 
 async def test_restart(
-        virtual_smoothie_env, monkeypatch, loop, aiohttp_client):
+        virtual_smoothie_env, monkeypatch, async_server, aiohttp_client):
     test_data = {"test": "pass"}
+    loop = asyncio.get_event_loop()
 
     async def mock_restart(request):
         return web.json_response(test_data)
-    monkeypatch.setattr(serverlib_fallback, 'restart', mock_restart)
 
-    app = init()
+    monkeypatch.setattr(serverlib_fallback, 'restart', mock_restart)
+    hw = async_server['com.opentrons.hardware']
+    app = init(hw)
     cli = await loop.create_task(aiohttp_client(app))
 
     expected = json.dumps(test_data)
@@ -28,7 +30,10 @@ async def test_restart(
     assert text == expected
 
 
-async def test_update(virtual_smoothie_env, monkeypatch, loop, aiohttp_client):
+@pytest.mark.api1_only
+async def test_update(
+        virtual_smoothie_env, monkeypatch, async_client, async_server):
+    hw = async_server['com.opentrons.hardware']
     msg = "success"
     whl_name = "testy.whl"
     serverlib_name = "testylib.whl"
@@ -41,10 +46,9 @@ async def test_update(virtual_smoothie_env, monkeypatch, loop, aiohttp_client):
     async def mock_install(filename, loop=None, modeset=True):
         return msg
     monkeypatch.setattr(serverlib_fallback, '_install', mock_install)
-    monkeypatch.setattr(robot, 'update_firmware', mock_install)
+    monkeypatch.setattr(hw, 'update_firmware', mock_install)
 
-    app = init()
-    cli = await loop.create_task(aiohttp_client(app))
+    cli = async_client
 
     data = {
         'whl': open(os.path.join(tmpdir, whl_name)),
@@ -68,12 +72,12 @@ async def test_update(virtual_smoothie_env, monkeypatch, loop, aiohttp_client):
 
 
 async def test_ignore_updates(
-        virtual_smoothie_env, loop, aiohttp_client):
+        virtual_smoothie_env, loop, aiohttp_client, async_client):
     tmpdir = tempfile.mkdtemp("files")
     ignore_name = "testy_ignore.json"
     serverlib_fallback.filepath = os.path.join(tmpdir, ignore_name)
-    app = init()
-    cli = await loop.create_task(aiohttp_client(app))
+
+    cli = async_client
     # Test no ignore file found
     r0 = await cli.get('/update/ignore')
     r0body = await r0.text()
@@ -117,10 +121,12 @@ async def test_update_module_firmware(
         virtual_smoothie_env,
         loop,
         aiohttp_client,
-        monkeypatch):
+        monkeypatch,
+        async_client,
+        async_server):
 
-    app = init()
-    client = await loop.create_task(aiohttp_client(app))
+    client = async_client
+    hw = async_server['com.opentrons.hardware']
     serial_num = 'mdYYYYMMDD123'
     fw_filename = 'dummyFirmware.hex'
     tmpdir = tempfile.mkdtemp("files")
@@ -134,8 +140,8 @@ async def test_update_module_firmware(
     async def mock_enter_bootloader(module):
         return '/dev/modules/tty0_bootloader'
 
-    monkeypatch.setattr(robot, 'discover_modules', dummy_discover_modules)
-    monkeypatch.setattr(robot, '_attached_modules', dummy_attached_modules)
+    monkeypatch.setattr(hw, 'discover_modules', dummy_discover_modules)
+    monkeypatch.setattr(hw, '_attached_modules', dummy_attached_modules)
     monkeypatch.setattr(modules, 'enter_bootloader', mock_enter_bootloader)
 
     # ========= Happy path ==========
@@ -163,11 +169,12 @@ async def test_update_module_firmware(
 async def test_fail_update_module_firmware(
         dummy_attached_modules,
         virtual_smoothie_env,
-        loop,
-        aiohttp_client,
-        monkeypatch):
-    app = init()
-    client = await loop.create_task(aiohttp_client(app))
+        monkeypatch,
+        async_client,
+        async_server):
+
+    client = async_client
+    hw = async_server['com.opentrons.hardware']
     serial_num = 'mdYYYYMMDD123'
     fw_filename = 'dummyFirmware.hex'
     tmpdir = tempfile.mkdtemp("files")
@@ -181,8 +188,8 @@ async def test_fail_update_module_firmware(
     async def mock_enter_bootloader(module):
         return '/dev/modules/tty0_bootloader'
 
-    monkeypatch.setattr(robot, 'discover_modules', dummy_discover_modules)
-    monkeypatch.setattr(robot, '_attached_modules', dummy_attached_modules)
+    monkeypatch.setattr(hw, 'discover_modules', dummy_discover_modules)
+    monkeypatch.setattr(hw, '_attached_modules', dummy_attached_modules)
     monkeypatch.setattr(modules, 'enter_bootloader', mock_enter_bootloader)
 
     # ========= Case 1: Port not accessible =========

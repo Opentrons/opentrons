@@ -1,11 +1,8 @@
 import json
 from opentrons import __version__
-from opentrons.server import init
 
 
-async def test_health(virtual_smoothie_env, loop, aiohttp_client):
-    app = init()
-    cli = await loop.create_task(aiohttp_client(app))
+async def test_health(virtual_smoothie_env, loop, async_client):
 
     expected = json.dumps({
         'name': 'opentrons-dev',
@@ -14,7 +11,7 @@ async def test_health(virtual_smoothie_env, loop, aiohttp_client):
         'logs': ['/logs/serial.log', '/logs/api.log'],
         'system_version': '0.0.0'
     })
-    resp = await cli.get('/health')
+    resp = await async_client.get('/health')
     text = await resp.text()
     assert resp.status == 200
     assert text == expected

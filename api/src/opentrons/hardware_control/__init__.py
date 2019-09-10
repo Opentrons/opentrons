@@ -16,7 +16,7 @@ import contextlib
 import functools
 import inspect
 import logging
-from typing import Any, Dict, Union, List, Optional, Tuple
+from typing import Any, Dict, Union, List, Optional, Tuple, cast
 from opentrons import types as top_types
 from opentrons.util import linal
 from .simulator import Simulator
@@ -57,6 +57,7 @@ class NoTipAttachedError(RuntimeError):
 
 
 _Backend = Union[Controller, Simulator]
+Axes_Types = Union[List[str], List[Axis]]
 Instruments = Dict[top_types.Mount, Optional[Pipette]]
 SHAKE_OFF_TIPS_SPEED = 50
 SHAKE_OFF_TIPS_DISTANCE = 2.25
@@ -172,7 +173,7 @@ class API(HardwareAPILike):
     @classmethod
     def set_loop(self, loop: asyncio.AbstractEventLoop):
         self._loop = loop
-        self._lock = asyncio.Lock(loop=loop)
+        self._motion_lock = asyncio.Lock(loop=loop)
 
     async def get_is_simulator(self) -> bool:
         """ `True` if this is a simulator; `False` otherwise. """
@@ -183,6 +184,16 @@ class API(HardwareAPILike):
     @property
     def is_simulator_sync(self):
         return isinstance(self._backend, Simulator)
+
+    async def connect(self, port: str = None):
+        await self._backend.connect(port)
+
+    async def disconnect(self):
+        """ Disconnect from connected hardware. """
+        await self._backend.disconnect()
+
+    def is_connected(self):
+        return self._backend.is_connected
 
     async def register_callback(self, cb):
         """ Allows the caller to register a callback, and returns a closure
@@ -825,8 +836,15 @@ class API(HardwareAPILike):
 
     engaged_axes = property(fget=get_engaged_axes)
 
-    async def disengage_axes(self, which: List[Axis]):
-        self._backend.disengage_axes([ax.name for ax in which])
+    async def disengage_axes(self, which: Axes_Types):
+        if isinstance(which[0], str):
+            which = cast(List[str], which)
+            self._backend.disengage_axes([ax.upper() for ax in which])
+        elif isinstance(which[0], Axis):
+            which = cast(List[Axis], which)
+            self._backend.disengage_axes([ax.name for ax in which])
+        else:
+            raise RuntimeError(f'Incompatible axis type {type(which[0])}')
 
     @_log_call
     async def retract(self, mount: top_types.Mount, margin: float = 10):
@@ -1055,6 +1073,24 @@ class API(HardwareAPILike):
             self, instr: Pipette, mm_per_s: float, action: str) -> float:
         ul_per_s = mm_per_s * instr.ul_per_mm(instr.config.max_volume, action)
         return round(ul_per_s, 6)
+
+    async def get_attached_pipettes(self):
+        """ Mimic the behavior of robot.get_attached_pipettes"""
+        instrs = {}
+        attached = await self.attached_instruments
+        for mount, data in attached.items():
+            instrs[mount.name.lower()] = {
+                'model': data.get('model', None),
+                'name': data.get('name', None),
+                'id': data.get('pipette_id', None),
+                'mount_axis': Axis.by_mount(mount),
+                'plunger_axis': Axis.of_plunger(mount)
+            }
+            if data.get('model'):
+                instrs[mount.name.lower()]['tip_length'] \
+                    = data.get('tip_length', None)
+
+        return instrs
 
     @_log_call
     async def blow_out(self, mount):
