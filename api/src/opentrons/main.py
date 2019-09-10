@@ -80,10 +80,13 @@ async def _do_fw_update(new_fw_path, new_fw_ver):
         os.environ['ENABLE_VIRTUAL_SMOOTHIE'] = 'true'
 
 
-def initialize_robot(loop):
+def initialize_robot(loop, hardware):
     packed_smoothie_fw_file, packed_smoothie_fw_ver = _find_smoothie_file()
     try:
-        hardware.connect()
+        if ff.use_protocol_api_v2():
+            loop.run_until_complete(hardware.connect())
+        else:
+            hardware.connect()
     except Exception as e:
         # The most common reason for this exception (aside from hardware
         # failures such as a disconnected smoothie) is that the smoothie
@@ -128,7 +131,7 @@ def run(hardware, **kwargs):  # noqa(C901)
 
     log.info("API server version:  {}".format(__version__))
     if not os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
-        initialize_robot(loop)
+        initialize_robot(loop, hardware)
         if ff.use_protocol_api_v2():
             loop.run_until_complete(hardware.cache_instruments())
         if not ff.disable_home_on_boot():
@@ -147,7 +150,7 @@ def run(hardware, **kwargs):  # noqa(C901)
         if ff.use_protocol_api_v2():
             loop.run_until_complete(
                 install_hardware_server(kwargs['hardware_server_socket'],
-                                        hardware._api))
+                                        hardware))
         else:
             log.warning(
                 "Hardware server requested but apiv1 selected, not starting")
