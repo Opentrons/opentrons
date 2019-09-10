@@ -1,5 +1,7 @@
 # Opentrons App Changes from 3.11.4 to 3.12.0
 
+**Note for macOS users**: This update is not compatible with macOS 10.9 Mavericks. If you are using 10.9, please upgrade to a later version of macOS (available for free from Apple) to continue to receive Opentrons updates.
+
 For more details about this release, please see the full [technical change log][changelog]
 
 [changelog]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
@@ -7,6 +9,7 @@ For more details about this release, please see the full [technical change log][
 ## New Features
 
 - The app has been updated to support macOS 10.15 Catalina
+  - Unfortunately, due to technical requirements, this means we have dropped support for macOS 10.9 Mavericks
 - The Windows installer now has the option to install the app for all users
 
 ## Bug Fixes

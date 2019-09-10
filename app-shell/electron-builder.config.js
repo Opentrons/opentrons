@@ -48,7 +48,7 @@ module.exports = {
     OT_APP_DEPLOY_BUCKET && OT_APP_DEPLOY_FOLDER
       ? {
           provider: 's3',
-          bucket: OT_APP_DEPLOY_FOLDER,
+          bucket: OT_APP_DEPLOY_BUCKET,
           path: OT_APP_DEPLOY_FOLDER,
         }
       : null,
