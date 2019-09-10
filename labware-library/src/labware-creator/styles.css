@@ -22,7 +22,8 @@
 
   & li {
     line-height: var(--lh-copy);
-    padding-bottom: 0.5rem;
+    margin-left: 2rem;
+    list-style-type: decimal;
   }
 
   & strong {
@@ -43,7 +44,7 @@ h2 {
 .labware_creator .labware_guide_button {
   display: inline-block;
   width: auto;
-  margin: 2rem 0 1rem;
+  margin: 1.5rem 0 0.5rem;
   padding: 1rem 2rem;
   border-radius: 3px;
   background-color: var(--c-blue);
