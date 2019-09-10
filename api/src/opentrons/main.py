@@ -4,7 +4,7 @@ import asyncio
 import re
 from opentrons import HERE, hardware
 from opentrons import server
-from opentrons.hardware_control import API
+from opentrons.hardware_control import adapters
 from opentrons.server.main import build_arg_parser
 from argparse import ArgumentParser
 from opentrons import __version__
@@ -83,10 +83,7 @@ async def _do_fw_update(new_fw_path, new_fw_ver):
 def initialize_robot(loop, hardware):
     packed_smoothie_fw_file, packed_smoothie_fw_ver = _find_smoothie_file()
     try:
-        if ff.use_protocol_api_v2():
-            loop.run_until_complete(hardware.connect())
-        else:
-            hardware.connect()
+        hardware.connect()
     except Exception as e:
         # The most common reason for this exception (aside from hardware
         # failures such as a disconnected smoothie) is that the smoothie
@@ -150,7 +147,7 @@ def run(hardware, **kwargs):  # noqa(C901)
         if ff.use_protocol_api_v2():
             loop.run_until_complete(
                 install_hardware_server(kwargs['hardware_server_socket'],
-                                        hardware))
+                                        hardware._api))
         else:
             log.warning(
                 "Hardware server requested but apiv1 selected, not starting")
@@ -190,8 +187,7 @@ def main():
     args = arg_parser.parse_args()
 
     if ff.use_protocol_api_v2():
-        checked_hardware = asyncio.get_event_loop().run_until_complete(
-            API.build_hardware_controller())
+        checked_hardware = adapters.SingletonAdapter(asyncio.get_event_loop())
     else:
         checked_hardware = hardware
     run(checked_hardware, **vars(args))

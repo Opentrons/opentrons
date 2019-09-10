@@ -23,7 +23,7 @@ from opentrons import config, types
 from opentrons.server import init
 from opentrons.deck_calibration import endpoints
 from opentrons import hardware_control as hc
-from opentrons.hardware_control import API, adapters
+from opentrons.hardware_control import adapters, API
 from opentrons.protocol_api import ProtocolContext
 from opentrons.types import Mount
 
@@ -141,8 +141,7 @@ def old_aspiration(monkeypatch):
 def using_api2(loop):
     oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
     os.environ['OT_API_FF_useProtocolApi2'] = '1'
-
-    hw_manager = API.build_hardware_simulator(loop=loop)
+    hw_manager = adapters.SingletonAdapter(loop)
     try:
         yield hw_manager
     finally:
