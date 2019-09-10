@@ -3,6 +3,7 @@ import itertools
 import logging
 import json
 from opentrons.config import CONFIG
+from opentrons.config.pipette_config import Y_OFFSET_MULTI
 from opentrons.data_storage import database
 from opentrons.util.vector import Vector
 from opentrons.types import Point
@@ -152,7 +153,11 @@ def save_custom_container(data):
         "labware, please use opentrons.containers.create()")
 
 
-def _load_new_well(well_data, saved_offset, lw_format):
+def _load_new_well(well_data, saved_offset, lw_quirks):
+    # We assume a labware is a trough (a.k.a. a reservoir)
+    # if it has the "centerMultichannelOnWells" quirk, and does
+    # *not* have the "fixedTrash" quirk.
+    #
     # There are two key hacks in here to make troughs work:
     # - do not specify the size of the well
     # - specify the center without subtracting the size (since
@@ -160,6 +165,12 @@ def _load_new_well(well_data, saved_offset, lw_format):
     #   so that the nominal center leaves the nozzle centered in
     #   an imaginary well instead of centering itself over the
     #   top wall of the trough.
+    #
+    # If a labware does have the "fixedTrash" quirk, we shift
+    # the center position back by the y-offset of multi-channel
+    # pipettes so that the pipettes get as close as they can
+    # reach to the center of the trash, without colliding with
+    # the back of the frame.
     props = {
         'depth': well_data['depth'],
         'total-liquid-volume': well_data['totalLiquidVolume'],
@@ -167,7 +178,7 @@ def _load_new_well(well_data, saved_offset, lw_format):
     if well_data['shape'] == 'circular':
         props['diameter'] = well_data['diameter']
     elif well_data['shape'] == 'rectangular':
-        if lw_format != 'trough':
+        if "centerMultichannelOnWells" not in lw_quirks:
             props['length'] = well_data['yDimension']
             props['width'] = well_data['xDimension']
     else:
@@ -175,7 +186,12 @@ def _load_new_well(well_data, saved_offset, lw_format):
             f"Bad definition for well shape: {well_data['shape']}")
     well = Well(properties=props)
 
-    if lw_format == 'trough':
+    if "fixedTrash" in lw_quirks:
+        well_tuple = (
+            well_data['x'] + saved_offset.x,
+            well_data['y'] + Y_OFFSET_MULTI + saved_offset.y,
+            well_data['z'] + saved_offset.z)
+    elif "centerMultichannelOnWells" in lw_quirks:
         well_tuple = (
             well_data['x'] + saved_offset.x,
             well_data['y'] + 7 * well_data['yDimension'] / 16 + saved_offset.y,
@@ -231,11 +247,11 @@ def load_new_labware_def(definition):
     log.info(f"Container name {container_name}, hash {labware_hash}")
     container.properties['labware_hash'] = labware_hash
     container.properties['type'] = container_name
-    lw_format = definition['parameters']['format']
+    lw_quirks = definition['parameters'].get('quirks', [])
 
     container._coordinates = Vector(definition['cornerOffsetFromSlot'])
     for well_name in itertools.chain(*definition['ordering']):
         well_obj, well_pos = _load_new_well(
-            definition['wells'][well_name], saved_offset, lw_format)
+            definition['wells'][well_name], saved_offset, lw_quirks)
         container.add(well_obj, well_name, well_pos)
     return container

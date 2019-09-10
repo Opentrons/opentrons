@@ -313,7 +313,7 @@ def test_get_labware(labware_setup):
 async def test_session_model_functional(session_manager, protocol):
     session = session_manager.create(name='<blank>', text=protocol.text)
     assert [container.name for container in session.containers] == \
-           ['tiprack', 'trough', 'plate', 'tall-fixed-trash']
+           ['tiprack', 'trough', 'plate', 'opentrons_1_trash_1100ml_fixed']
     names = [instrument.name for instrument in session.instruments]
     assert names == ['p300_single_v1']
 
@@ -331,9 +331,10 @@ async def test_drop_tip_with_trash(session_manager, protocol, protocol_file):
     """
     session = session_manager.create(name='<blank>', text=protocol.text)
 
-    assert 'tall-fixed-trash' in [c.name for c in session.get_containers()]
+    assert 'opentrons_1_trash_1100ml_fixed' in [
+        c.name for c in session.get_containers()]
     containers = sum([i.containers for i in session.get_instruments()], [])
-    assert 'tall-fixed-trash' in [c.name for c in containers]
+    assert 'opentrons_1_trash_1100ml_fixed' in [c.name for c in containers]
 
 
 @pytest.mark.api1_only

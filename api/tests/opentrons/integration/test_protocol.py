@@ -51,5 +51,5 @@ def test_deck_setup(robot):
     assert isinstance(tiprack, Container)
     assert isinstance(deck, Deck)
     # Check that well location is the same on the robot as the pipette
-    assert robot._deck['12']['tall-fixed-trash'][0] == trash
+    assert robot._deck['12']['opentrons_1_trash_1100ml_fixed'][0] == trash
     assert deck.has_container(tiprack)

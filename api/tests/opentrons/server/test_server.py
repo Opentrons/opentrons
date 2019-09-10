@@ -436,34 +436,3 @@ def message_key(message):
     meta = message['$']
     data = message.get('data', '')
     return str(meta.get('type')) + meta.get('token', '') + str(data)
-
-
-@pytest.mark.api1_only
-@pytest.mark.parametrize('root', [TickTock()])
-async def test_concurrent_and_disconnect(loop, root, session, connect):  # noqa C901
-    n_sockets = 20
-    sockets = await async_iterate([connect() for _ in range(n_sockets)])
-
-    # TODO (artyom, 20170920): look for pattern to call several coroutines
-    # and collect results in one line
-    tokens = await async_iterate([
-        call(socket, id=id(root), name='start', args=[])
-        for socket in sockets])
-
-    await sockets.pop(1).close()
-
-    stop_messages = [result_message(token, 'Done!') for token in tokens]
-    results = await async_iterate(
-        [read_until(socket, stop_messages) for socket in sockets])
-
-    for res in results:
-        # First message is root info
-        assert res.pop(0)['$'] == {'type': 3, 'monitor': True}
-        expected = []
-        # All acks received
-        expected.extend([ack_message(token) for token in tokens])
-        # All results received
-        expected.extend([result_message(token, 'Done!') for token in tokens])
-        # All notifications received. 5 ticks per notifications
-        expected.extend([notification_message(i) for i in range(5)] * n_sockets)  # noqa
-        assert sorted(res, key=message_key) == sorted(expected, key=message_key)  # noqa
