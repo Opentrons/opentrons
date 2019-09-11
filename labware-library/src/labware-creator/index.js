@@ -74,7 +74,7 @@ type MakeAutofillOnChangeArgs = {|
 |}
 
 const PDF_URL =
-  'https://opentrons-publications.s3.us-east-2.amazonaws.com/TestGuide_labware.pdf'
+  'https://opentrons-publications.s3.us-east-2.amazonaws.com/labwareDefinition_testGuide.pdf'
 
 const makeAutofillOnChange = ({
   autofills,
