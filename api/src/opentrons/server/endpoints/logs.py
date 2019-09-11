@@ -18,7 +18,7 @@ def _get_options(params: Mapping[str, str],
     requests will just use defaults.
     """
     response = {
-        'format': 'json',
+        'format': 'text',
         'records': default_length
     }
 
