@@ -232,6 +232,11 @@ def load_new_labware_def(definition):
     container.properties['labware_hash'] = labware_hash
     container.properties['type'] = container_name
     lw_format = definition['parameters']['format']
+    if definition['parameters']['isMagneticModuleCompatible']:
+        engage_height = definition['parameters']['magneticModuleEngageHeight']
+    else:
+        engage_height = None
+    container.properties['magdeck_engage_height'] = engage_height
 
     container._coordinates = Vector(definition['cornerOffsetFromSlot'])
     for well_name in itertools.chain(*definition['ordering']):
