@@ -242,3 +242,19 @@ class Deck(UserDict):
     def slots(self) -> List[Dict]:
         """ Return the definition of the loaded robot deck. """
         return self._definition['locations']['orderedSlots']
+
+    @property
+    def open_slots(self) -> List[Dict]:
+        """ The slot definitions of the currently unobscured
+            lots on the loaded robot deck.
+        """
+        obscured_slot_keys = []
+        for slot_key, item in self.data:
+            if isinstance(item, ThermocyclerGeometry):
+                obscured_slot_keys.extend(['7', '8', '10', '11'])
+            else
+                obscured_slot_keys.append(slot_key)
+
+        self.slots
+
+
