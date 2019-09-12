@@ -1185,7 +1185,7 @@ class InstrumentContext(CommandPublisher):
                         'before', None, None, instrument=self, location=target)
         self.move_to(target.top())
 
-        self._hw_manager.hardware.set_current_tip_diameter(
+        self._hw_manager.hardware.set_current_tiprack_diameter(
             self._mount, target.diameter)
         self._hw_manager.hardware.pick_up_tip(
             self._mount, tiprack.tip_length, presses, increment)

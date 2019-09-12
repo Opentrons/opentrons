@@ -328,7 +328,7 @@ async def test_shake_during_drop(hardware_api, monkeypatch):
                                'id': 'testyness'}}
     await hardware_api.cache_instruments()
     await hardware_api.add_tip(types.Mount.RIGHT, 50.0)
-    hardware_api.set_current_tip_diameter(types.Mount.RIGHT, 30.0)
+    hardware_api.set_current_tiprack_diameter(types.Mount.RIGHT, 30.0)
 
     shake_tips_drop = mock.Mock(
         side_effect=hardware_api._shake_off_tips_drop)

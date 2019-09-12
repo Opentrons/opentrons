@@ -1142,13 +1142,13 @@ class API(HardwareAPILike):
 
         await self.retract(mount, instr.config.pick_up_distance)
 
-    def set_current_tip_diameter(self, mount, tip_diameter):
+    def set_current_tiprack_diameter(self, mount, tiprack_diameter):
         instr = self._attached_instruments[mount]
         assert instr
         self._log.info(
-            "Updating tip diameter on pipette mount: {}, tip diameter: {} mm"
-            .format(mount, tip_diameter))
-        instr.current_tip_diameter = tip_diameter
+            "Updating tip rack diameter on pipette mount: "
+            "{}, tip diameter: {} mm".format(mount, tiprack_diameter))
+        instr.current_tiprack_diameter = tiprack_diameter
 
     def set_working_volume(self, mount, tip_volume):
         instr = self._attached_instruments[mount]
@@ -1198,21 +1198,22 @@ class API(HardwareAPILike):
             await _drop_tip()
         await _drop_tip()
         if 'dropTipShake' in instr.config.quirks:
-            await self._shake_off_tips_drop(mount, instr.current_tip_diameter)
+            await self._shake_off_tips_drop(mount,
+                                            instr.current_tiprack_diameter)
         self._backend.set_active_current(plunger_ax,
                                          instr.config.plunger_current)
         instr.set_current_volume(0)
-        instr.current_tip_diameter = 0.0
+        instr.current_tiprack_diameter = 0.0
         instr.remove_tip()
 
-    async def _shake_off_tips_drop(self, mount, tip_diameter):
+    async def _shake_off_tips_drop(self, mount, tiprack_diameter):
         # tips don't always fall off, especially if resting against
         # tiprack or other tips below it. To ensure the tip has fallen
         # first, shake the pipette to dislodge partially-sealed tips,
         # then second, raise the pipette so loosened tips have room to fall
         shake_off_dist = SHAKE_OFF_TIPS_DROP_DISTANCE
-        if tip_diameter > 0.0:
-            shake_off_dist = min(shake_off_dist, tip_diameter / 4)
+        if tiprack_diameter > 0.0:
+            shake_off_dist = min(shake_off_dist, tiprack_diameter / 4)
         shake_off_dist = max(shake_off_dist, 1.0)
 
         shake_pos = top_types.Point(-shake_off_dist, 0, 0)  # move left
