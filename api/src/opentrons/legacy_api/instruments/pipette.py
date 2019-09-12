@@ -40,7 +40,8 @@ DEFAULT_PLUNGE_CURRENT = 0.1
 DEFAULT_TIP_PICK_UP_SPEED = 30
 
 SHAKE_OFF_TIPS_SPEED = 50
-SHAKE_OFF_TIPS_DISTANCE = 2.25
+SHAKE_OFF_TIPS_DROP_DISTANCE = 2.25
+SHAKE_OFF_TIPS_PICKUP_DISTANCE = 0.3
 
 
 def _sleep(seconds):
@@ -1041,8 +1042,8 @@ class Pipette(CommandPublisher):
             # neighboring tips tend to get stuck in the space between
             # the volume chamber and the drop-tip sleeve on p1000.
             # This extra shake ensures those tips are removed
-            self._shake_off_tips(location, 'pickupTipShake')
-            self._shake_off_tips(location, 'pickupTipShake')
+            self._shake_off_tips_pick_up()
+            self._shake_off_tips_pick_up()
             self.previous_placeable = None  # no longer inside a placeable
             self.robot.poses = self.instrument_mover.fast_home(
                 self.robot.poses, self._pick_up_distance)
@@ -1151,7 +1152,7 @@ class Pipette(CommandPublisher):
         do_publish(self.broker, commands.drop_tip, self.drop_tip,
                    'after', self, None, self, location)
 
-        self._shake_off_tips(location, 'dropTipShake')
+        self._shake_off_tips_drop(location)
 
         self.current_volume = 0
         self._working_volume = self.max_volume
@@ -1162,16 +1163,47 @@ class Pipette(CommandPublisher):
 
         return self
 
-    def _shake_off_tips(self, location, quirk):
+    def _shake_off_tips_pick_up(self):
         # tips don't always fall off, especially if resting against
         # tiprack or other tips below it. To ensure the tip has fallen
         # first, shake the pipette to dislodge partially-sealed tips,
         # then second, raise the pipette so loosened tips have room to fall
 
         # shake the pipette left/right a few millimeters
-        if quirk not in self.quirks:
+        if 'pickupTipShake' not in self.quirks:
             return
-        shake_off_distance = SHAKE_OFF_TIPS_DISTANCE
+        shake_off_distance = SHAKE_OFF_TIPS_PICKUP_DISTANCE
+        self.robot.gantry.push_speed()
+        self.robot.gantry.set_speed(SHAKE_OFF_TIPS_SPEED)
+        self.robot.poses = self._jog(
+            self.robot.poses, 'x', -shake_off_distance)  # move left
+        self.robot.poses = self._jog(
+            self.robot.poses, 'x', shake_off_distance * 2)  # move right
+        self.robot.poses = self._jog(
+            self.robot.poses, 'x', -shake_off_distance)  # move left
+        self.robot.gantry.pop_speed()
+        self.robot.poses = self._jog(
+            self.robot.poses, 'y', -shake_off_distance)  # move left
+        self.robot.poses = self._jog(
+            self.robot.poses, 'y', shake_off_distance * 2)  # move right
+        self.robot.poses = self._jog(
+            self.robot.poses, 'y', -shake_off_distance)  # move left
+        self.robot.gantry.pop_speed()
+
+        # raise the pipette upwards so we are sure tip has fallen off
+        self.robot.poses = self._jog(
+            self.robot.poses, 'z', DROP_TIP_RELEASE_DISTANCE)
+
+    def _shake_off_tips_drop(self, location=None):
+        # tips don't always fall off, especially if resting against
+        # tiprack or other tips below it. To ensure the tip has fallen
+        # first, shake the pipette to dislodge partially-sealed tips,
+        # then second, raise the pipette so loosened tips have room to fall
+
+        # shake the pipette left/right a few millimeters
+        if 'dropTipShake' not in self.quirks:
+            return
+        shake_off_distance = SHAKE_OFF_TIPS_DROP_DISTANCE
         if location:
             placeable, _ = unpack_location(location)
             # ensure the distance is not >25% the diameter of placeable

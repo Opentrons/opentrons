@@ -1,6 +1,7 @@
 # pylama:ignore=E501
 # TODO: Modify all calls to get a Well to use the `wells` method
 from numpy import isclose
+from unittest import mock
 import pytest
 
 from opentrons import instruments, robot
@@ -38,6 +39,100 @@ def test_use_filter_tips():
         # is attached
         p300.return_tip()
         assert p300._working_volume == p300.max_volume
+
+
+@pytest.mark.api1_only
+def test_shake_during_pick_up(monkeypatch):
+    robot.reset()
+    pip = instruments._create_pipette_from_config(
+            config=pipette_config.load('p1000_single_v2.0'),
+            mount='left',
+            name='p1000_single_v2.0')
+    tiprack = containers_load(robot, 'opentrons_96_tiprack_1000ul', '1')
+
+    shake_tips_pick_up = mock.Mock(
+        side_effect=pip._shake_off_tips_pick_up)
+    monkeypatch.setattr(pip, '_shake_off_tips_pick_up',
+                        shake_tips_pick_up)
+
+    # Test double shake for after pick up tips
+    pip.pick_up_tip(tiprack[0])
+    assert shake_tips_pick_up.call_count == 2
+
+    actual_calls = []
+
+    def mock_jog(pose_tree, axis, distance):
+        actual_calls.append((axis, distance))
+
+    monkeypatch.setattr(pip, '_jog', mock_jog)
+
+    # Test shake in both x and y
+    shake_tips_pick_up()
+    expected_calls = [('x', -0.3), ('x', 0.6), ('x', -0.3),
+                      ('y', -0.3), ('y', 0.6), ('y', -0.3),
+                      ('z', 20)]
+    assert actual_calls == expected_calls
+    pip.tip_attached = False
+
+
+@pytest.mark.api1_only
+def test_shake_during_drop(monkeypatch):
+    robot.reset()
+    pip = instruments._create_pipette_from_config(
+            config=pipette_config.load('p1000_single_v2.0'),
+            mount='left',
+            name='p1000_single_v2.0')
+    tiprack = containers_load(robot, 'opentrons_96_tiprack_1000ul', '1')
+
+    shake_tips_drop = mock.Mock(
+        side_effect=pip._shake_off_tips_drop)
+    monkeypatch.setattr(pip, '_shake_off_tips_drop',
+                        shake_tips_drop)
+
+    # Test single shake for after pick up tips
+    pip.tip_attached = True
+    pip.drop_tip(tiprack.wells(0))
+    assert shake_tips_drop.call_count == 1
+
+    actual_calls = []
+
+    def jog_side_effect(pose_tree, axis, distance):
+        actual_calls.append((axis, distance))
+
+    jog = mock.Mock(side_effect=jog_side_effect)
+    monkeypatch.setattr(pip, '_jog', jog)
+
+    # Test shake only in x, with no location passed, shake distance is 2.25
+    shake_tips_drop()
+    expected_calls = [('x', -2.25), ('x', 4.5), ('x', -2.25),
+                      ('z', 20)]
+    assert actual_calls == expected_calls
+
+    # Test drop tip shake at a well with diameter above upper limit (2.25 mm)
+    tiprack.wells(0).properties['width'] = 2.3*4
+    actual_calls.clear()
+    shake_tips_drop(tiprack.wells(0))
+    expected_calls = [('x', -2.25), ('x', 4.5), ('x', -2.25),
+                      ('z', 20)]
+    assert actual_calls == expected_calls
+
+    # Test drop tip shake at a well with diameter between upper limit
+    # and lower limit (1.00 - 2.25 mm)
+    tiprack.wells(0).properties['width'] = 2*4
+    actual_calls.clear()
+    shake_tips_drop(tiprack.wells(0))
+    expected_calls = [('x', -2), ('x', 4), ('x', -2),
+                      ('z', 20)]
+    assert actual_calls == expected_calls
+
+    # Test drop tip shake at a well with diameter below lower limit (1.00 mm)
+    tiprack.wells(0).properties['width'] = 0.9*4
+    actual_calls.clear()
+    shake_tips_drop(tiprack.wells(0))
+    expected_calls = [('x', -1), ('x', 2), ('x', -1),
+                      ('z', 20)]
+    assert actual_calls == expected_calls
+    pip.tip_attached = False
 
 
 def test_pipette_version_1_0_and_1_3_extended_travel():
