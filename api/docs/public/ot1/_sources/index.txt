@@ -59,7 +59,7 @@ If we were to rewrite this with the Opentrons API, it would look like the follow
     pipette = instruments.Pipette(axis='b', max_volume=200, tip_racks=[tiprack])
 
     # commands
-    pipette.transfer(100, plate.wells('A1'), plate.wells('B1'))
+    pipette.transfer(100, plate.wells('A1'), plate.wells('A2'))
 
 **********************
 
