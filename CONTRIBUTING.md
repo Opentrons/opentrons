@@ -400,7 +400,7 @@ If you create the key as `~/.ssh/robot_key` and `~/.ssh/robot_key.pub` then `mak
 Our release process is still a work-in-progress. The app and API projects are currently versioned together to ensure interoperability.
 
 1. Ensure you have a buildroot release created in github with all the changes you want in this release
-2. Checkout `edge` and ake a release branch, without any new changes (the branch name _must_ match `release_*` to trigger signed builds that can be used as RCs):
+2. Checkout `edge` and make a release branch, without any new changes (the branch name _must_ match `release_*` to trigger signed builds that can be used as RCs):
 
 ```shell
 git checkout -b release_${version}
