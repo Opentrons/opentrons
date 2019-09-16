@@ -1,49 +1,47 @@
 // @flow
 // attached modules container card
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 
-import { Card } from '@opentrons/components'
-import { getModulesState } from '../../robot-api'
+import { Card, useInterval } from '@opentrons/components'
+import { fetchModules, getModulesState } from '../../robot-api'
 import ModulesCardContents from './ModulesCardContents'
 import { getConfig } from '../../config'
 
 import type { State, Dispatch } from '../../types'
-import type { Module } from '../../robot-api'
 import type { Robot } from '../../discovery'
 
-type OP = {| robot: Robot |}
-
-type SP = {|
-  modules: Array<Module>,
-  __tempControlsEnabled: boolean,
-|}
-
-type Props = {| ...OP, ...SP, dispatch: Dispatch |}
+type Props = {| robot: Robot |}
 
 const TITLE = 'Modules'
+const POLL_MODULE_INTERVAL_MS = 5000
 
-export default connect<Props, OP, SP, {||}, State, Dispatch>(mapStateToProps)(
-  AttachedModulesCard
-)
+export default function AttachedModulesCard(props: Props) {
+  const { robot } = props
+  const dispatch = useDispatch<Dispatch>()
 
-function AttachedModulesCard(props: Props) {
+  const modules = useSelector((state: State) =>
+    getModulesState(state, robot.name)
+  )
+  const __tempControlsEnabled = Boolean(
+    useSelector(getConfig).devInternal?.tempdeckControls
+  )
+
+  // this component may be mounted if the robot is not currently connected, so
+  // GET /modules ourselves instead of relying on the poll while connected epic
+  useInterval(
+    () => dispatch(fetchModules(robot)),
+    POLL_MODULE_INTERVAL_MS,
+    true
+  )
+
   return (
     <Card title={TITLE} column>
       <ModulesCardContents
-        modules={props.modules}
-        robot={props.robot}
-        showControls={props.__tempControlsEnabled}
+        robot={robot}
+        modules={modules}
+        showControls={__tempControlsEnabled}
       />
     </Card>
   )
-}
-
-function mapStateToProps(state: State, ownProps: OP): SP {
-  return {
-    modules: getModulesState(state, ownProps.robot.name),
-    __tempControlsEnabled: Boolean(
-      getConfig(state).devInternal?.tempdeckControls
-    ),
-  }
 }
