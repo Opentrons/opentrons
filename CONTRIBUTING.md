@@ -400,7 +400,7 @@ If you create the key as `~/.ssh/robot_key` and `~/.ssh/robot_key.pub` then `mak
 Our release process is still a work-in-progress. The app and API projects are currently versioned together to ensure interoperability.
 
 
-1. Ensure you have a buildroot release created in github with all the changes you want in this release, if any. If there are no buildroot changes, you don't have to create a new release; the last tag in buildroot is used for release builds.
+1. Ensure you have a buildroot release created in GitHub with all the changes you want in this release, if any. If there are no buildroot changes, you don't have to create a new release; the last tag in buildroot is used for release builds.
 2. Checkout `edge` and make a release branch, without any new changes. The branch name should match `release_*` to make `make bump` usage easier and make it clear this is a release.
 
 
@@ -422,7 +422,7 @@ git push --set-upstream origin release_${version}
    - Scope: `release`
    - Message: `${version}`
 10. Gather reviews on changelogs and release notes until everybody is satisfied
-11. Tag the release branch as an alpha version; this is a release candidate that will undergo qa:
+11. Tag the release branch as an alpha version; this is a release candidate that will undergo QA:
 
 ```shell
 git tag -a v${version} -m 'chore(release): ${version}''
@@ -463,7 +463,7 @@ git merge --no-ff master
 
 ### Releasing Robot Software Stack Hotfixes
 
-1. Ensure you have a buildroot release created in github with all the changes you want to see, if any. If there aren't any, you don't have to create a new buildroot release; by default, the last tag is used for release builds.
+1. Ensure you have a buildroot release created in GitHub with all the changes you want to see, if any. If there aren't any, you don't have to create a new buildroot release; by default, the last tag is used for release builds.
 2. Checkout `master` and make a release branch, without any new changes. The branch name should match `hotfix_*` to make it clear this is a hotfix, and make `make bump` usage simpler.
 
 
@@ -485,7 +485,7 @@ git push --set-upstream origin hotfix_${version}
    - Scope: `release`
    - Message: `${version}`
 10. Push this commit
-11. Tag the alpha version; this is a release candidate that will undergo qa:
+11. Tag the alpha version; this is a release candidate that will undergo QA:
 
 ```bash
 git tag -a v${version} -m 'chore(release): ${version}'
