@@ -86,6 +86,7 @@ def name_config() -> Dict[str, Any]:
 
 
 config_models = list(model_config()['config'].keys())
+config_names = list(name_config().keys())
 configs = model_config()['config']
 #: A list of pipette model names for which we have config entries
 MUTABLE_CONFIGS = model_config()['mutableConfigs']
