@@ -339,6 +339,7 @@ class InstrumentsWrapper(object):
             pick_up_increment=config.pick_up_increment,
             pick_up_presses=config.pick_up_presses,
             pick_up_speed=config.pick_up_speed,
+            return_tip_height=config.return_tip_height,
             quirks=config.quirks,
             fallback_tip_length=config.tip_length,  # TODO move to labware
             blow_out_flow_rate=config.blow_out_flow_rate)
