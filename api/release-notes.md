@@ -1,33 +1,27 @@
-# Robot OS Changes from 3.10.3 to 3.11.4
-
-This update migrates the Opentrons Robot OS to a new underlying technology - buildroot. This change allows us to better control the robot's system and provide better updates without requiring internet connectivity.
-
-Updating your robot from 3.10 to 3.11 will take up to 10 minutes, and your Opentrons App must stay connected to the robot the entire time. If you have manually installed Python packages on your robot, you will have to reinstall them after this update.
+# Robot OS Changes from 3.11.4 to 3.12.0
 
 For more details about this release, please see the full [technical change log][changelog]
 
+[changelog]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
+
 ## New Features
 
-- **SSH access to the OT-2 now requires public-key authentication**. Please see [this support article][ot2-ssh] for details on how to generate and install a public key to gain ssh access to the OT-2.
-- Added support for setting the flow rate of the pipette during blowout operations. `set_flow_rate` and `set_speed` now take a `blow_out` parameter. See the [API Docs][blowoutflowrate] for more details.
-- Labware calibration is now stored separately if a labware is placed on a module. For instance, a well plate on a Temperature Module can now be calibrated separately from a well plate placed on the deck.
-- Added support for filter tips in [200 ul][filter-200], [1000 ul][filter-1k], and [10ul][filter-10] sizes; when the 200 ul tips are used with a P300 Single or Multi pipette, the pipette's maximum volume will be reduced to 200 ul.
+- We've added definitions for various labware and tubes from [NEST Biotechnology][nest]; check them out in the [Labware Library][labware-library-nest]
 
-## Bug fixes
+[nest]: https://nestbiotechnology.en.ec21.com/
+[labware-library-nest]: https://labware.opentrons.com/?manufacturer=NEST
 
-- Fixed an incorrect mix after a blowout during a transfer when `mix_after` and `blow_out` are both specified
-- Fixed incorrect handling of transfers involving volumes too large for a single aspirate
-- Fixed an issue where clicking pause during a protocol could lead to the runlog being out of sync
-- Fixed an issue introduced in 3.11.0 where the names of certain factory reset options were incorrect
+## Bug Fixes
 
-## Known issues
+- We fixed an issue with the tip probe algorithm to correct for some middle-switch misses
+- We removed some badly behaving code that was arbitrarily causing "large" (>4.5 MB) protocol uploads and simulations to fail
+- We fixed some problems with our Jupyter notebook configuration that were broken during our operating system update in 3.11.x
+  - File deletion has been fixed
+  - Migration of pre-3.11 Jupyter Notebooks to the new location `/var/lib/jupyter/notebooks` has also been fixed
+- Removed an incorrect Network Manager setting that was blocking auto-IP detection for _all_ Ethernet interfaces instead of only the built-in one
+  - Plugging in external USB-to-Ethernet adapters to connect your OT-2 to a wired network should work again
 
-- While the underlying definition is correct, there is a known API bug that is causing the robot to think a "50ml" tube in a "15/50ml" tube rack is the same height as the "15ml" tube
+## Known Issues
+
+- While the underlying definition is correct, there is a known API bug that is causing the robot to think a "50 mL" tube in a "15 / 50 mL" tube rack is the same height as the "15 mL" tube
 - When attaching or detaching a pipette from the left mount, the robot homes twice in the X direction
-
-[changelog]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
-[ot2-ssh]: https://support.opentrons.com/en/articles/3203681-enabling-ssh-access-to-your-ot2
-[blowoutflowrate]: https://docs.opentrons.com/atomic%20commands.html#controlling-speed
-[filter-200]: https://labware.opentrons.com/opentrons_96_filtertiprack_200ul
-[filter-1k]: https://labware.opentrons.com/opentrons_96_filtertiprack_1000ul
-[filter-10]: https://labware.opentrons.com/opentrons_96_filtertiprack_10ul

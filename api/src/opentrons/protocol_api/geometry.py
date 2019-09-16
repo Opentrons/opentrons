@@ -222,7 +222,7 @@ class Deck(UserDict):
             else:
                 raise AssertionError(
                     f'module {module_name} cannot be loaded'
-                    ' into slot {location}')
+                    f' into slot {location}')
         else:
             valid_slots = [slot['id'] for slot in self.slots if module_name
                            in slot['compatibleModules']]

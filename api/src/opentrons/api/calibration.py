@@ -5,7 +5,7 @@ from copy import copy
 from opentrons.util import calibration_functions
 from opentrons.config import feature_flags as ff
 from opentrons.broker import Broker
-from opentrons.types import Point, Mount
+from opentrons.types import Point, Mount, Location
 from opentrons.protocol_api import labware
 from opentrons.hardware_control import CriticalPoint
 
@@ -112,8 +112,14 @@ class CalibrationManager:
         self._set_state('moving')
         if ff.use_protocol_api_v2():
             with instrument._context.temp_connect(self._hardware):
-                instrument._context.location_cache = None
-                inst.pick_up_tip(_well0(container._container))
+                loc = _well0(container._container)
+                instrument._context.location_cache =\
+                    Location(self._hardware.gantry_position(
+                                Mount[inst.mount.upper()],
+                                critical_point=CriticalPoint.NOZZLE,
+                                refresh=True),
+                             loc)
+                inst.pick_up_tip(loc)
         else:
             inst.pick_up_tip(_well0(container._container))
         self._set_state('ready')

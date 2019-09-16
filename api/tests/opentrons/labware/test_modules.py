@@ -100,6 +100,16 @@ def test_run_tempdeck_connected(
     tempdeck.disconnect()  # Necessary to kill the thread started by connect()
 
 
+def test_load_correct_engage_height():
+    robot.reset()
+    md = modules.load('magdeck', '1')
+    test_container = labware.load('biorad_96_wellplate_200ul_pcr',
+                                  '1', share=True)
+    assert test_container.magdeck_engage_height() == 18
+    assert md.labware.get_children_list()[1].magdeck_engage_height() == \
+        test_container.magdeck_engage_height()
+
+
 @pytest.fixture
 def old_bootloader_module():
     module = modules.TempDeck(port='/dev/modules/tty0_tempdeck')

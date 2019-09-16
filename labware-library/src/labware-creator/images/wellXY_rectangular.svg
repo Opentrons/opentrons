@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" 
+    xmlns:xlink="http://www.w3.org/1999/xlink" width="150" height="170" viewBox="0 0 150 170">
+    <defs>
+        <clipPath id="a">
+            <polyline points="46.92 140.37 54.76 140.37 54.76 153.87 46.92 153.87 46.92 140.37" fill="none"/>
+        </clipPath>
+    </defs>
+    <title>wellXY_rectangular</title>
+    <path d="M5.25,112.25h0m.25,0h0m0-.25V17.5H100V112H5.5m95-95H5v95.5h95.5V17" fill="#7f7f7f"/>
+    <rect x="10.25" y="22.25" width="85" height="85" fill="none" stroke="#000" stroke-width="2"/>
+    <path d="M9.75,140.75v-35m85,36v-35" fill="none" stroke="#3fb1ff" stroke-width="2"/>
+    <line x1="18.41" y1="134.87" x2="86.14" y2="134.87" fill="none" stroke="#3fb1ff" stroke-dasharray="2 2"/>
+    <path d="M12.38,134.87a30.15,30.15,0,0,1,8.54,4.76l-1.72-4.76,1.72-4.75a30.12,30.12,0,0,1-8.54,4.75m79.79,0a30.15,30.15,0,0,0-8.54,4.76l1.72-4.76-1.72-4.75a30.12,30.12,0,0,0,8.54,4.75" fill="#3fb1ff" fill-rule="evenodd"/>
+    <g clip-path="url(#a)">
+        <polyline points="54.76 142.09 53.67 142.09 51.07 145.39 49.88 142.09 48.88 142.09 50.42 146.11 46.92 150.65 48.01 150.65 50.83 146.9 52.08 150.65 53.13 150.65 51.51 146.15 54.76 142.09" fill="#3fb1ff"/>
+    </g>
+    <polygon points="132.63 57.09 131.63 57.09 133.03 62.44 132.33 65.65 133.34 65.65 134 62.48 137.68 57.09 136.54 57.09 133.68 61.47 132.63 57.09" fill="#3fb1ff"/>
+    <path d="M94.75,21.75h35m-35,85h35" fill="none" stroke="#3fb1ff" stroke-width="2"/>
+    <line x1="112.25" y1="28.29" x2="112.25" y2="99.21" fill="none" stroke="#3fb1ff" stroke-dasharray="2 2"/>
+    <path d="M112.25,22.25a30.1,30.1,0,0,1-4.76,8.55l4.76-1.72L117,30.8a30.31,30.31,0,0,1-4.75-8.55m0,83a30.1,30.1,0,0,0-4.76-8.55l4.76,1.72L117,96.7a30.31,30.31,0,0,0-4.75,8.55" fill="#3fb1ff" fill-rule="evenodd"/>
+</svg>

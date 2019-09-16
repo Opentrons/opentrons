@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.12.0](https://github.com/Opentrons/opentrons/compare/v3.11.4...v3.12.0) (2019-09-13)
+
+### Bug Fixes
+
+* **app-shell:** Update Electron and add macOS app notarization ([#4011](https://github.com/Opentrons/opentrons/issues/4011)) ([246d6db](https://github.com/Opentrons/opentrons/commit/246d6db)), closes [#3997](https://github.com/Opentrons/opentrons/issues/3997) [#2567](https://github.com/Opentrons/opentrons/issues/2567)
+
+
+
+
+
 ## [3.11.4](https://github.com/Opentrons/opentrons/compare/v3.11.3...v3.11.4) (2019-08-29)
 
 **Note:** Version bump only for package @opentrons/app-shell

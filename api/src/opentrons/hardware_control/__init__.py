@@ -59,7 +59,8 @@ class NoTipAttachedError(RuntimeError):
 _Backend = Union[Controller, Simulator]
 Instruments = Dict[top_types.Mount, Optional[Pipette]]
 SHAKE_OFF_TIPS_SPEED = 50
-SHAKE_OFF_TIPS_DISTANCE = 2.25
+SHAKE_OFF_TIPS_DROP_DISTANCE = 2.25
+SHAKE_OFF_TIPS_PICKUP_DISTANCE = 0.3
 DROP_TIP_RELEASE_DISTANCE = 20
 
 
@@ -1136,10 +1137,18 @@ class API(HardwareAPILike):
         # the volume chamber and the drop-tip sleeve on p1000.
         # This extra shake ensures those tips are removed
         if 'pickupTipShake' in instr.config.quirks:
-            await self._shake_off_tips(mount)
-            await self._shake_off_tips(mount)
+            await self._shake_off_tips_pick_up(mount)
+            await self._shake_off_tips_pick_up(mount)
 
         await self.retract(mount, instr.config.pick_up_distance)
+
+    def set_current_tiprack_diameter(self, mount, tiprack_diameter):
+        instr = self._attached_instruments[mount]
+        assert instr
+        self._log.info(
+            "Updating tip rack diameter on pipette mount: "
+            "{}, tip diameter: {} mm".format(mount, tiprack_diameter))
+        instr.current_tiprack_diameter = tiprack_diameter
 
     def set_working_volume(self, mount, tip_volume):
         instr = self._attached_instruments[mount]
@@ -1189,24 +1198,52 @@ class API(HardwareAPILike):
             await _drop_tip()
         await _drop_tip()
         if 'dropTipShake' in instr.config.quirks:
-            await self._shake_off_tips(mount)
+            await self._shake_off_tips_drop(mount,
+                                            instr.current_tiprack_diameter)
         self._backend.set_active_current(plunger_ax,
                                          instr.config.plunger_current)
         instr.set_current_volume(0)
+        instr.current_tiprack_diameter = 0.0
         instr.remove_tip()
 
-    async def _shake_off_tips(self, mount):
+    async def _shake_off_tips_drop(self, mount, tiprack_diameter):
         # tips don't always fall off, especially if resting against
         # tiprack or other tips below it. To ensure the tip has fallen
         # first, shake the pipette to dislodge partially-sealed tips,
         # then second, raise the pipette so loosened tips have room to fall
-        shake_off_dist = SHAKE_OFF_TIPS_DISTANCE
-        # TODO: ensure the distance is not >25% the diameter of placeable
+        shake_off_dist = SHAKE_OFF_TIPS_DROP_DISTANCE
+        if tiprack_diameter > 0.0:
+            shake_off_dist = min(shake_off_dist, tiprack_diameter / 4)
+        shake_off_dist = max(shake_off_dist, 1.0)
+
         shake_pos = top_types.Point(-shake_off_dist, 0, 0)  # move left
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
         shake_pos = top_types.Point(2*shake_off_dist, 0, 0)    # move right
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
         shake_pos = top_types.Point(-shake_off_dist, 0, 0)  # original position
+        await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
+        # raise the pipette upwards so we are sure tip has fallen off
+        up_pos = top_types.Point(0, 0, DROP_TIP_RELEASE_DISTANCE)
+        await self.move_rel(mount, up_pos)
+
+    async def _shake_off_tips_pick_up(self, mount):
+        # tips don't always fall off, especially if resting against
+        # tiprack or other tips below it. To ensure the tip has fallen
+        # first, shake the pipette to dislodge partially-sealed tips,
+        # then second, raise the pipette so loosened tips have room to fall
+        shake_off_dist = SHAKE_OFF_TIPS_PICKUP_DISTANCE
+
+        shake_pos = top_types.Point(-shake_off_dist, 0, 0)  # move left
+        await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
+        shake_pos = top_types.Point(2*shake_off_dist, 0, 0)    # move right
+        await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
+        shake_pos = top_types.Point(-shake_off_dist, 0, 0)  # original position
+        await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
+        shake_pos = top_types.Point(0, -shake_off_dist, 0)  # move front
+        await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
+        shake_pos = top_types.Point(0, 2*shake_off_dist, 0)    # move back
+        await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
+        shake_pos = top_types.Point(0, -shake_off_dist, 0)  # original position
         await self.move_rel(mount, shake_pos, speed=SHAKE_OFF_TIPS_SPEED)
         # raise the pipette upwards so we are sure tip has fallen off
         up_pos = top_types.Point(0, 0, DROP_TIP_RELEASE_DISTANCE)

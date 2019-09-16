@@ -13,14 +13,13 @@ type Props = {|
   progress: number | null,
 |}
 
-const HEADING = 'Robot System Update'
-
 export default function DownloadUpdateModal(props: Props) {
   const { notNowButton, error, progress } = props
+  const heading = error !== null ? 'Downloading Update' : 'Download Error'
 
   return (
     <AlertModal
-      heading={HEADING}
+      heading={heading}
       buttons={[notNowButton]}
       restrictOuterScroll={false}
       alertOverlay
