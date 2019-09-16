@@ -400,9 +400,15 @@ If you create the key as `~/.ssh/robot_key` and `~/.ssh/robot_key.pub` then `mak
 Our release process is still a work-in-progress. The app and API projects are currently versioned together to ensure interoperability.
 
 1. Ensure you have a buildroot release created in github with all the changes you want in this release
-2. `git checkout -b release_${version}` (The branch name _must_ match `release_*` to trigger signed builds that can be used as RCs). `git push --set-upstream origin release_${version}` to push the branch (without any changes).
+2. Make a release branch, without any new changes (the branch name _must_ match `release_*` to trigger signed builds that can be used as RCs):
+
+```shell
+git checkout -b release_${version}
+git push --set-upstream origin release_${version}
+```
+
 3. Open a PR into `master` for your branch.
-4. `make bump` to create an alpha version (see below)
+4. Bump the version to the appropriate alpha (read [the section below](#make-bump-usage) carefully)
 5. Inspect version bumps and changelogs
    - Make sure the comparison link is to the latest release verison (e.g.: `compare/v3.11.4...v3.12.0)` instead of `compare/v3.12.0-alpha.1...v3.12.0)`)
    - Delete the sub-sections that relate only to alpha releases, so that the changelog is against the latest actual release
@@ -414,19 +420,54 @@ Our release process is still a work-in-progress. The app and API projects are cu
    - Scope: `release`
    - Message: `${version}`
 10. Gather reviews on changelogs and release notes until everybody is satisfied
-11. Tag the release branch as an alpha version; this is a release candidate that will undergo qa: `git tag -a v${version} -m 'chore(release): ${version}''` and `git push origin v${version}`
-12. Run QA on this release. If issues are found, create prs targeted on the release branch. To create new alpha releases, repeat steps 4-11.
-13. Once QA is a pass, bump to your target version with `make bump` (see below again)
-14. Do a NORMAL MERGE into `master`. Do NOT squash or rebase. This should be done from your local command line: `git checkout master`, `git merge --ff-only release_${version}`, `git push origin master`. This will succeed as long as the release PR is reviewed and status checks have passed.
-15. Tag the release: `git tag -a v${version} -m 'chore(release): ${version}'` and `git push origin v${version}`
-16. Open a pr of `master` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`: `git checkout edge`, `git pull`, `git merge --no-ff master`. Use the pr title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the pr is approved and status checks pass.
+11. Tag the release branch as an alpha version; this is a release candidate that will undergo qa:
+
+```shell
+git tag -a v${version} -m 'chore(release): ${version}''
+git push origin v${version}
+```
+
+12. Run QA on this release. If issues are found, create PRs targeted on the release branch. To create new alpha releases, repeat steps 4-11.
+13. Once QA is a pass, bump to the target release version (review [the section below](#make-bump-usage) again)
+14. Do a NORMAL MERGE into `master`. Do NOT squash or rebase. This should be done from your local command line (and will succeed as long as the release PR is reviewed and status checks have passed):
+
+```shell
+# note: make sure you have pulled the latest changes for branch 
+# release_${version} locally before merging into master
+git checkout master
+git merge --ff-only release_${version}
+git push origin master
+```
+
+15. Tag the release: 
+
+```bash
+git tag -a v${version} -m 'chore(release): ${version}'
+git push origin v${version}
+```
+
+16. Open a PR of `master` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`: 
+
+```bash
+git checkout edge
+git pull
+git merge --no-ff master
+```
+
+17. Use the PR title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the PR is approved and status checks pass.
 
 ### Releasing Robot Software Stack Hotfixes
 
 1. Ensure you have a buildroot release created in github with all the changes you want to see
-2. Create and push a branch called `release_${version}`.
+2. Make a release branch, without any new changes (the branch name _must_ match `release_*` to trigger signed builds that can be used as RCs):
+
+```shell
+git checkout -b release_${version}
+git push --set-upstream origin release_${version}
+```
+
 3. Target the hotfix PRs on this branch.
-4. On the release branch, once the fixes have been merged, `make bump` to create an appropriate alpha version (see below)
+4. On the release branch, once the fixes have been merged, bump to the appropriate alpha version (read [the section below](#make-bump-usage) carefully)
 5. Inspect version bumps and changelogs
 6. Edit the user-facing changelog at `app-shell/build/release-notes.md` to add the new notes for the app
 7. Edit the user-facing changelog at `api/release-notes.md` to add the new notes for the robot software
@@ -436,14 +477,43 @@ Our release process is still a work-in-progress. The app and API projects are cu
    - Scope: `release`
    - Message: `${version}`
 10. Push this commit
-11. Tag the alpha version; this is a release candidate that will undergo qa: `git tag -a v${version} -m 'chore(release): ${version}'` and `git push origin v${version}`
-12. Run QA on this release. If issues are found, create prs targeted on the release branch. To create new alpha releases, repeat steps 4-11.
-13. Once QA is a pass, bump to your target version with `make bump` (see below again)
-14. Do a NORMAL MERGE into `master`. Do NOT squash or rebase. This should be done from your local command line: `git checkout master`, `git merge --ff-only release_${version}`, `git push origin master`. This will succeed as long as the release PR is reviewed and status checks have passed.
-15. Tag the release: `git tag -a v${version} -m 'chore(release): ${version}'` and `git push origin v${version}`
-16. Open a pr of `master` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`: `git checkout edge`, `git pull`, `git merge --no-ff master`. Use the pr title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the pr is approved and status checks pass.
+11. Tag the alpha version; this is a release candidate that will undergo qa:
 
-#### `make bump` usage
+```bash
+git tag -a v${version} -m 'chore(release): ${version}'
+git push origin v${version}
+```
+
+12. Run QA on this release. If issues are found, create PRs targeted on the release branch. To create new alpha releases, repeat steps 4-11.
+13. Once QA is a pass, bump to your target version (review [the section below](#make-bump-usage) again)
+14. Do a NORMAL MERGE into `master`. Do NOT squash or rebase. This should be done from your local command line (and will succeed as long as the release PR is reviewed and status checks have passed):
+
+```shell
+# note: make sure you have pulled the latest changes for branch 
+# release_${version} locally before merging into master
+git checkout master
+git merge --ff-only release_${version}
+git push origin master
+```
+
+15. Tag the release: 
+
+```shell
+git tag -a v${version} -m 'chore(release): ${version}'
+git push origin v${version}
+```
+
+16. Open a PR of `master` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`: 
+
+```shell
+git checkout edge
+git pull
+git merge --no-ff master
+```
+
+17. Use the PR title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the PR is approved and status checks pass.
+
+#### make bump usage
 
 `make bump` runs `lerna version` (with git tag and push disabled) to bump all required files. You can pass options to lerna with the `version` environment variable. See the [lerna version docs][lerna-version] for available options. The most important options are:
 
