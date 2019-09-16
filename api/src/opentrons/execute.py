@@ -11,7 +11,7 @@ import asyncio
 import logging
 import sys
 import threading
-from typing import Any, Callable, Dict, Optional, TextIO
+from typing import Any, Callable, Dict, List, Optional, TextIO
 
 from opentrons import protocol_api, robot, legacy_api, __version__
 from opentrons.protocol_api import execute as execute_apiv2
@@ -200,7 +200,7 @@ def make_runlog_cb():
         last_dollar = command['$']
         if command['$'] == 'before':
             print(' '.join([
-                '\t'*level,
+                '\t' * level,
                 command['payload'].get('text', '')
                 .format(**command['payload'])]))
 
