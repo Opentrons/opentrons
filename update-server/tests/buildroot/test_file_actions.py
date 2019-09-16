@@ -5,6 +5,7 @@ Checks functionality and error cases for the update utility functions there
 import binascii
 import hashlib
 import os
+import subprocess
 from unittest import mock
 import zipfile
 
@@ -218,3 +219,34 @@ def test_commit_mismatch(monkeypatch):
                         lambda: new)
     with pytest.raises(RuntimeError):
         file_actions.commit_update()
+
+
+def test_mount_update(monkeypatch, tmpdir):
+    subprocess_mock = mock.Mock()
+    subprocess_mock.return_value = 0
+    monkeypatch.setattr(subprocess, 'check_output', subprocess_mock)
+    unused = file_actions.RootPartitions.THREE
+    monkeypatch.setattr(file_actions, '_find_unused_partition',
+                        lambda: unused)
+    monkeypatch.setattr(file_actions, '_mountpoint_root',
+                        lambda: tmpdir)
+    mountpoint = None
+    with file_actions.mount_update() as mount:
+        subprocess_mock.assert_called_once_with(
+            ['mount', unused.value.path, mount])
+        subprocess_mock.reset_mock()
+        subprocess_mock.return_value = 0
+        mountpoint = mount
+    subprocess_mock.assert_called_once_with(
+        ['umount', mountpoint])
+
+
+def test_write_machine_id(monkeypatch, tmpdir):
+    new = os.path.join(tmpdir, 'new_root')
+    old = os.path.join(tmpdir, 'old_root')
+    os.makedirs(os.path.join(new, 'etc'))
+    os.makedirs(os.path.join(old, 'etc'))
+    mid = '78a59366e08f4650bd2212afd7777eab\n'
+    open(os.path.join(old, 'etc', 'machine-id'), 'w').write(mid)
+    file_actions.write_machine_id(old, new)
+    assert open(os.path.join(new, 'etc', 'machine-id')).read() == mid

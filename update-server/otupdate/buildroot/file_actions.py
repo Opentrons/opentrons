@@ -6,6 +6,7 @@ for an update: unzipping update files, hashing rootfs, checking signatures,
 writing to root partitions
 """
 import binascii
+import contextlib
 import enum
 import hashlib
 import logging
@@ -352,6 +353,44 @@ def write_update(rootfs_filepath: str,
     write_file(rootfs_filepath, part_path, progress_callback,
                chunk_size, file_size)
     return unused
+
+
+def _mountpoint_root():
+    """ provides mountpoint location for :py:meth:`mount_update`.
+
+    exists only for ease of mocking
+    """
+    return '/mnt'
+
+
+@contextlib.contextmanager
+def mount_update():
+    """ Mount the freshly-written partition r/w (to update machine-id).
+
+    Should be used as a context manager, and the yielded value is the path
+    to the mount. When the context manager exits, the partition will be
+    unmounted again and its mountpoint removed.
+
+    :param mountpoint_in: The directory in which to create the mountpoint.
+    """
+    unused = _find_unused_partition()
+    part_path = unused.value.path
+    with tempfile.TemporaryDirectory(dir=_mountpoint_root()) as mountpoint:
+        subprocess.check_output(['mount', part_path, mountpoint])
+        LOG.info(f"mounted {part_path} to {mountpoint}")
+        try:
+            yield mountpoint
+        finally:
+            subprocess.check_output(['umount', mountpoint])
+            LOG.info(f"Unmounted {part_path} from {mountpoint}")
+
+
+def write_machine_id(current_root: str, new_root: str):
+    """ Update the machine id in target rootfs """
+    mid = open(os.path.join(current_root, 'etc', 'machine-id')).read()
+    with open(os.path.join(new_root, 'etc', 'machine-id'), 'w') as new_mid:
+        new_mid.write(mid)
+    LOG.info(f'Wrote machine_id {mid.strip()} to {new_root}/etc/machine-id')
 
 
 def _switch_partition() -> RootPartitions:
