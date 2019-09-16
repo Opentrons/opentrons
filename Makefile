@@ -114,7 +114,7 @@ lint: lint-py lint-js lint-json lint-css check-js
 
 .PHONY: format
 format:
-	prettier --ignore-path .eslintignore --write ".*.@(js|yml)" "**/*.@(js|json|md|yml)"
+	prettier --ignore-path .eslintignore $(if $(CI),--check,--write) ".*.@(js|yml)" "**/*.@(js|json|md|yml)"
 
 .PHONY: lint-py
 lint-py:
