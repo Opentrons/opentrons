@@ -399,10 +399,14 @@ If you create the key as `~/.ssh/robot_key` and `~/.ssh/robot_key.pub` then `mak
 
 Our release process is still a work-in-progress. The app and API projects are currently versioned together to ensure interoperability.
 
+
 1. Ensure you have a buildroot release created in github with all the changes you want in this release, if any. If there are no buildroot changes, you don't have to create a new release; the last tag in buildroot is used for release builds.
-2. Make a release branch, without any new changes (the branch name should match `release_*` to make `make bump` usage easier and make it clear this is a release):
+2. Checkout `edge` and make a release branch, without any new changes. The branch name should match `release_*` to make `make bump` usage easier and make it clear this is a release.
+
 
 ```shell
+git checkout edge
+git pull
 git checkout -b release_${version}
 git push --set-upstream origin release_${version}
 ```
@@ -442,14 +446,14 @@ git push origin master
 
 15. Tag the release: 
 
-```bash
+```shell
 git tag -a v${version} -m 'chore(release): ${version}'
 git push origin v${version}
 ```
 
 16. Open a PR of `master` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`: 
 
-```bash
+```shell
 git checkout edge
 git pull
 git merge --no-ff master
@@ -460,9 +464,12 @@ git merge --no-ff master
 ### Releasing Robot Software Stack Hotfixes
 
 1. Ensure you have a buildroot release created in github with all the changes you want to see, if any. If there aren't any, you don't have to create a new buildroot release; by default, the last tag is used for release builds.
-2. Make a release branch, without any new changes (the branch name should match `hotfix_*` to make it clear this is a hotfix, and make `make bump` usage simpler):
+2. Checkout `master` and make a release branch, without any new changes. The branch name should match `hotfix_*` to make it clear this is a hotfix, and make `make bump` usage simpler.
+
 
 ```shell
+git checkout master
+git pull
 git checkout -b hotfix_${version}
 git push --set-upstream origin hotfix_${version}
 ```
