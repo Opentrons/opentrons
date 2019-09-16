@@ -400,7 +400,7 @@ If you create the key as `~/.ssh/robot_key` and `~/.ssh/robot_key.pub` then `mak
 Our release process is still a work-in-progress. The app and API projects are currently versioned together to ensure interoperability.
 
 1. Ensure you have a buildroot release created in github with all the changes you want in this release
-2. Make a release branch, without any new changes (the branch name _must_ match `release_*` to trigger signed builds that can be used as RCs):
+2. Checkout `edge` and ake a release branch, without any new changes (the branch name _must_ match `release_*` to trigger signed builds that can be used as RCs):
 
 ```shell
 git checkout -b release_${version}
@@ -441,14 +441,14 @@ git push origin master
 
 15. Tag the release: 
 
-```bash
+```shell
 git tag -a v${version} -m 'chore(release): ${version}'
 git push origin v${version}
 ```
 
 16. Open a PR of `master` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`: 
 
-```bash
+```shell
 git checkout edge
 git pull
 git merge --no-ff master
@@ -459,7 +459,7 @@ git merge --no-ff master
 ### Releasing Robot Software Stack Hotfixes
 
 1. Ensure you have a buildroot release created in github with all the changes you want to see
-2. Make a release branch, without any new changes (the branch name _must_ match `release_*` to trigger signed builds that can be used as RCs):
+2. Checkout `master` and make a release branch, without any new changes (the branch name _must_ match `release_*` to trigger signed builds that can be used as RCs):
 
 ```shell
 git checkout -b release_${version}
