@@ -28,7 +28,8 @@ async def poll_status(sess, token, root):
     return await resp.json()
 
 
-async def do_update(update_file: str, host: str, kind: UPDATE_KIND):
+async def do_update(update_file: str, host: str, kind: UPDATE_KIND,
+                    pause_between_steps: bool = False):
     async with aiohttp.ClientSession() as session:
         if kind == UPDATE_KIND.MIGRATE:
             root = host + '/server/update/migration'
@@ -55,8 +56,16 @@ async def do_update(update_file: str, host: str, kind: UPDATE_KIND):
             sys.stderr.write(
                 f'Error response from host: {begin_resp.status}: {body}')
             sys.exit(-1)
+
         begin_body = await begin_resp.json()
         token = begin_body['token']
+
+        msg = f'Session created at {root}/{token}'
+        if pause_between_steps:
+            input(f'{msg}. Press enter to continue to upload and validation')
+        else:
+            print(msg)
+
         print(f"Uploading file...")
         file_resp = await session.post(root + '/' + token + '/file',
                                        data={filename: update_file})
@@ -90,7 +99,12 @@ async def do_update(update_file: str, host: str, kind: UPDATE_KIND):
             print(f'Error writing: {status["error"]}: {status["message"]}')
             sys.exit(-1)
 
-        print()
+        msg = 'File written and validated'
+        if pause_between_steps:
+            input(f'{msg}. Press enter to continue to commit')
+        else:
+            print(msg)
+
         if status['stage'] == 'done':
             print("Committing update...")
             resp = await session.post(root + '/' + token + '/commit')
@@ -98,6 +112,12 @@ async def do_update(update_file: str, host: str, kind: UPDATE_KIND):
                 print(f'Error committing: {status["error"]}: '
                       f'{status["message"]}')
                 sys.exit(-1)
+
+        msg = 'Update commited'
+        if pause_between_steps:
+            input(f'{msg}. Press enter to continue to restart')
+        else:
+            print(msg)
 
         print("Restarting...")
         if kind == UPDATE_KIND.MIGRATE:
@@ -140,12 +160,16 @@ def main():
     parser.add_argument('host', metavar='ROBOT HOSTNAME',
                         type=str,
                         help='The IP of the robot')
+    parser.add_argument('-s', '--step-by-step', action='store_true',
+                        help='Pause until the user hits enter in between each '
+                        'stage. Useful for dev workflows')
     args = parser.parse_args()
     asyncio.get_event_loop().run_until_complete(
         do_update(
             args.update,
             assure_host(args.host),
-            UPDATE_KIND[args.action.upper()]))
+            UPDATE_KIND[args.action.upper()],
+            pause_between_steps=args.step_by_step))
 
 
 if __name__ == '__main__':
