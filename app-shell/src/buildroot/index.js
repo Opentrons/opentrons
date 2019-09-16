@@ -43,18 +43,14 @@ export function registerBuildrootUpdate(dispatch: Dispatch) {
         log.info('Starting robot premigration', { robot })
 
         startPremigration(robot)
-          .then(
-            (): BuildrootAction => ({
-              type: 'buildroot:PREMIGRATION_DONE',
-              payload: robot.name,
-            })
-          )
-          .catch(
-            (error: Error): BuildrootAction => ({
-              type: 'buildroot:PREMIGRATION_ERROR',
-              payload: { message: error.message },
-            })
-          )
+          .then((): BuildrootAction => ({
+            type: 'buildroot:PREMIGRATION_DONE',
+            payload: robot.name,
+          }))
+          .catch((error: Error): BuildrootAction => ({
+            type: 'buildroot:PREMIGRATION_ERROR',
+            payload: { message: error.message },
+          }))
           .then(dispatch)
 
         break

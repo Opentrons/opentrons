@@ -65,9 +65,7 @@ export function getMaxDisposalVolumeForMultidispense(
   if (!rawForm) return null
   assert(
     rawForm.path === 'multiDispense',
-    `getMaxDisposalVolumeForMultidispense expected multiDispense, got path ${
-      rawForm.path
-    }`
+    `getMaxDisposalVolumeForMultidispense expected multiDispense, got path ${rawForm.path}`
   )
   const volume = Number(rawForm.volume)
   const pipetteEntity = pipetteEntities[rawForm.pipette]
@@ -85,9 +83,7 @@ export function volumeInCapacityForMulti(
   const volume = Number(rawForm.volume)
   assert(
     rawForm.pipette in pipetteEntities,
-    `volumeInCapacityForMulti expected pipette ${
-      rawForm.pipette
-    } to be in pipetteEntities`
+    `volumeInCapacityForMulti expected pipette ${rawForm.pipette} to be in pipetteEntities`
   )
   const pipetteEntity = pipetteEntities[rawForm.pipette]
   const pipetteCapacity = pipetteEntity && getPipetteCapacity(pipetteEntity)
