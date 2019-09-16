@@ -10,6 +10,7 @@ import argparse
 import asyncio
 import logging
 import sys
+import threading
 from typing import Any, Callable, Dict, List, Optional, TextIO
 
 from opentrons import protocol_api, robot, legacy_api, __version__
@@ -40,10 +41,27 @@ def get_protocol_api() -> protocol_api.ProtocolContext:
 
     When this function is called, modules and instruments will be recached.
     """
-    global _HWCONTROL
     if not _HWCONTROL:
-        _HWCONTROL = asyncio.get_event_loop().run_until_complete(
-            API.build_hardware_controller())
+        # Build a hardware controller in a worker thread, which is necessary
+        # because ipython runs its notebook in asyncio but the notebook
+        # is at script/repl scope not function scope and is synchronous so
+        # you can't control the loop from inside. If we update to
+        # IPython 7 we can avoid this, but for now we can't
+        def _build_hwcontroller():
+            global _HWCONTROL
+            try:
+                loop = asyncio.get_event_loop()
+            except RuntimeError:
+                loop = asyncio.new_event_loop()
+            _HWCONTROL = loop.run_until_complete(
+                API.build_hardware_controller())
+
+        thread = threading.Thread(
+            target=_build_hwcontroller,
+            name='Hardware-controller-builder')
+        thread.start()
+        thread.join()
+
     context = protocol_api.ProtocolContext(hardware=_HWCONTROL)
     context._hw_manager.hardware.cache_instruments()
     context._hw_manager.hardware.discover_modules()
