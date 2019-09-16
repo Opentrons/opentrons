@@ -81,7 +81,7 @@ def test_calibrated_max_z(virtual_smoothie_env):
     robot.reset()
 
     instruments.P300_Single(mount='left')
-    assert robot.max_deck_height() == 85
+    assert robot.max_deck_height() == 82
 
 
 def test_get_serial_ports_list(monkeypatch):

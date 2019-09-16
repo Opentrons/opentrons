@@ -780,9 +780,11 @@ class Robot(CommandPublisher):
         # @TODO (Laura & Andy) Slot and type of trash
         # needs to be pulled from config file
         if fflags.short_fixed_trash():
-            self._fixed_trash = self.add_container('fixed-trash', '12')
+            self._fixed_trash = self.add_container(
+                'opentrons_1_trash_850ml_fixed', '12')
         else:
-            self._fixed_trash = self.add_container('tall-fixed-trash', '12')
+            self._fixed_trash = self.add_container(
+                'opentrons_1_trash_1100ml_fixed', '12')
 
     @property
     def deck(self):
