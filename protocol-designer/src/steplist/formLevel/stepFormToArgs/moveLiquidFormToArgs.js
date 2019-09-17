@@ -48,9 +48,7 @@ const moveLiquidFormToArgs = (
 ): MoveLiquidStepArgs => {
   assert(
     hydratedFormData.stepType === 'moveLiquid',
-    `moveLiquidFormToArgs called with stepType ${
-      hydratedFormData.stepType
-    }, expected "moveLiquid"`
+    `moveLiquidFormToArgs called with stepType ${hydratedFormData.stepType}, expected "moveLiquid"`
   )
 
   const fields = hydratedFormData.fields
@@ -187,9 +185,7 @@ const moveLiquidFormToArgs = (
     sourceWellsUnordered.length === 1 ||
       destWellsUnordered.length === 1 ||
       sourceWellsUnordered.length === destWellsUnordered.length,
-    `cannot do moveLiquidFormToArgs. Mismatched wells (not 1:N, N:1, or N:N!) for path="single". Neither source (${
-      sourceWellsUnordered.length
-    }) nor dest (${destWellsUnordered.length}) equal 1`
+    `cannot do moveLiquidFormToArgs. Mismatched wells (not 1:N, N:1, or N:N!) for path="single". Neither source (${sourceWellsUnordered.length}) nor dest (${destWellsUnordered.length}) equal 1`
   )
 
   switch (path) {
