@@ -107,7 +107,9 @@ function transferLikeSubsteps(args: {|
   } else {
     // TODO Ian 2018-05-21 Use assert here. Should be unreachable
     console.warn(
-      `transferLikeSubsteps got unsupported stepType "${stepArgs.commandCreatorFnName}"`
+      `transferLikeSubsteps got unsupported stepType "${
+        stepArgs.commandCreatorFnName
+      }"`
     )
     return null
   }

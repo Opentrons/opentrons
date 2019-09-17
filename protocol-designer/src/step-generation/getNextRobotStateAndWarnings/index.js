@@ -40,7 +40,9 @@ export default function getNextRobotStateAndWarnings(
     default:
       assert(
         false,
-        `unknown command: ${command.command} passed to getNextRobotStateAndWarning`
+        `unknown command: ${
+          command.command
+        } passed to getNextRobotStateAndWarning`
       )
       return { robotState: prevRobotState, warnings: [] }
   }

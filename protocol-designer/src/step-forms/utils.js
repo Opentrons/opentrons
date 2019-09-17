@@ -57,7 +57,9 @@ export function denormalizePipetteEntities(
       const spec = getPipetteNameSpecs(pipette.name)
       if (!spec) {
         throw new Error(
-          `no pipette spec for pipette id "${pipetteId}", name "${pipette.name}"`
+          `no pipette spec for pipette id "${pipetteId}", name "${
+            pipette.name
+          }"`
         )
       }
 

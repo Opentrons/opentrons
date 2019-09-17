@@ -72,12 +72,16 @@ const ThermocyclerCard = ({
           <LabeledValue
             label="Cycle #"
             className={styles.compact_labeled_value}
-            value={`${module.data.currentCycleIndex} / ${module.data.totalCycleCount}`}
+            value={`${module.data.currentCycleIndex} / ${
+              module.data.totalCycleCount
+            }`}
           />
           <LabeledValue
             label="Step #"
             className={styles.compact_labeled_value}
-            value={`${module.data.currentStepIndex} / ${module.data.totalStepCount}`}
+            value={`${module.data.currentStepIndex} / ${
+              module.data.totalStepCount
+            }`}
           />
           <span
             className={cx(

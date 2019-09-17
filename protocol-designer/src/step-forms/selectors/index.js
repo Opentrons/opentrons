@@ -75,7 +75,9 @@ function _hydrateLabwareEntity(
   const def = defsByURI[l.labwareDefURI]
   assert(
     def,
-    `could not hydrate labware ${labwareId}, missing def for URI ${l.labwareDefURI}`
+    `could not hydrate labware ${labwareId}, missing def for URI ${
+      l.labwareDefURI
+    }`
   )
   return {
     ...l,

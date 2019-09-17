@@ -93,27 +93,29 @@ function renderLabware(
   return flatMap(
     SLOTNAME_MATRIX,
     (columns: Array<DeckSlotId>, row: number): Array<React.Node> => {
-      return columns.map((slot: DeckSlotId, col: number): React.Node => {
-        if (slot === TRASH_SLOTNAME) return null
+      return columns.map(
+        (slot: DeckSlotId, col: number): React.Node => {
+          if (slot === TRASH_SLOTNAME) return null
 
-        const props = {
-          slot,
-          width: SLOT_RENDER_WIDTH,
-          height: SLOT_RENDER_HEIGHT,
+          const props = {
+            slot,
+            width: SLOT_RENDER_WIDTH,
+            height: SLOT_RENDER_HEIGHT,
+          }
+          const transform = `translate(${[
+            SLOT_RENDER_WIDTH * col + SLOT_SPACING_MM * (col + 1),
+            SLOT_RENDER_HEIGHT * row + SLOT_SPACING_MM * (row + 1),
+          ].join(',')})`
+
+          return (
+            // $FlowFixMe: (mc, 2019-04-18) don't know why flow doesn't like this, don't care because this is going away
+            <g key={slot} transform={transform}>
+              <EmptyDeckSlot {...props} />
+              {LabwareComponent && <LabwareComponent {...props} />}
+            </g>
+          )
         }
-        const transform = `translate(${[
-          SLOT_RENDER_WIDTH * col + SLOT_SPACING_MM * (col + 1),
-          SLOT_RENDER_HEIGHT * row + SLOT_SPACING_MM * (row + 1),
-        ].join(',')})`
-
-        return (
-          // $FlowFixMe: (mc, 2019-04-18) don't know why flow doesn't like this, don't care because this is going away
-          <g key={slot} transform={transform}>
-            <EmptyDeckSlot {...props} />
-            {LabwareComponent && <LabwareComponent {...props} />}
-          </g>
-        )
-      })
+      )
     }
   )
 }

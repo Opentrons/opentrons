@@ -41,7 +41,9 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
   */
   assert(
     args.sourceWells.length === args.destWells.length,
-    `Transfer command creator expected N:N source-to-dest wells ratio. Got ${args.sourceWells.length}:${args.destWells.length}`
+    `Transfer command creator expected N:N source-to-dest wells ratio. Got ${
+      args.sourceWells.length
+    }:${args.destWells.length}`
   )
   // TODO Ian 2018-04-02 following ~10 lines are identical to first lines of consolidate.js...
   const actionName = 'transfer'

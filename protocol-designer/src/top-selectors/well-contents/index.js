@@ -154,7 +154,9 @@ export const getAllWellContentsForActiveItem: Selector<WellContentsByLabware> = 
 
     assert(
       timelineIdx !== -1,
-      `getAllWellContentsForActiveItem got unhandled terminal id: "${activeItem.id}"`
+      `getAllWellContentsForActiveItem got unhandled terminal id: "${
+        activeItem.id
+      }"`
     )
 
     const liquidState = timeline[timelineIdx].robotState.liquidState.labware

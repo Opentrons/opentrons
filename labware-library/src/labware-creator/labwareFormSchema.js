@@ -164,15 +164,16 @@ const labwareFormSchema = Yup.object()
     brand: requiredString(LABELS.brand),
     brandId: Yup.mixed()
       .nullable()
-      .transform((currentValue: ?string, originalValue: ?string): $PropertyType<
-        ProcessedLabwareFields,
-        'brandId'
-      > =>
-        (currentValue || '')
-          .trim()
-          .split(',')
-          .map(s => s.trim())
-          .filter(Boolean)
+      .transform(
+        (
+          currentValue: ?string,
+          originalValue: ?string
+        ): $PropertyType<ProcessedLabwareFields, 'brandId'> =>
+          (currentValue || '')
+            .trim()
+            .split(',')
+            .map(s => s.trim())
+            .filter(Boolean)
       ),
 
     loadName: Yup.string()

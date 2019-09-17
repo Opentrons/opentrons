@@ -8,7 +8,9 @@ type Props = React.ElementProps<typeof LabwareRender>
 export default function SingleLabware(props: Props) {
   return (
     <RobotWorkSpace
-      viewBox={`0 0 ${props.definition.dimensions.xDimension} ${props.definition.dimensions.yDimension}`}
+      viewBox={`0 0 ${props.definition.dimensions.xDimension} ${
+        props.definition.dimensions.yDimension
+      }`}
     >
       {() => <LabwareRender {...props} />}
     </RobotWorkSpace>

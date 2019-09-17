@@ -164,7 +164,9 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
 
         if (!reducedCommandCreator) {
           console.warn(
-            `commandCreatorFnName "${stepArgs.commandCreatorFnName}" not yet implemented for robotStateTimeline`
+            `commandCreatorFnName "${
+              stepArgs.commandCreatorFnName
+            }" not yet implemented for robotStateTimeline`
           )
           return acc
         }

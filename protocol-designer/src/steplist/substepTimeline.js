@@ -66,7 +66,9 @@ const substepTimelineSingle = (commandCreators: Array<CommandCreator>) => (
       ) {
         assert(
           nextFrame.commands.length === 1,
-          `substepTimeline expected nextFrame to have only single commands for ${firstCommand.command}`
+          `substepTimeline expected nextFrame to have only single commands for ${
+            firstCommand.command
+          }`
         )
 
         const commandGroup = firstCommand
@@ -143,7 +145,9 @@ const substepTimeline = (
           ) {
             assert(
               nextFrame.commands.length === 1,
-              `substepTimeline expected nextFrame to have only single commands for ${firstCommand.command}`
+              `substepTimeline expected nextFrame to have only single commands for ${
+                firstCommand.command
+              }`
             )
 
             const { well, volume, labware } = firstCommand.params
