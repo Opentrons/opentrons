@@ -164,7 +164,7 @@ export function getUnpreparedModules(state: AppState): Array<Module> {
   // a) required to be prepared by the session
   // b) not prepared according to isModulePrepared
   return actualModules.filter(
-    m => preparableSessionModules.includes(m.name) && isModulePrepared(m)
+    m => preparableSessionModules.includes(m.name) && !isModulePrepared(m)
   )
 }
 
