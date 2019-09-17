@@ -34,7 +34,7 @@ You can reference your module in a few different ways. The valid names can be fo
 +--------------------------+-----------------------------------------------+
 | ``Magnetic Module``      | ``'Magnetic Module'``, ``'magdeck'``          |
 +--------------------------+-----------------------------------------------+
-| ``Thermocycler Module``  | ``'Thermocycler Module'``, ``'thermocycler'`` |
+| ``Thermocycler Module``  | ``'Thermocycler Module'``, ``'Thermocycler Module'`` |
 +--------------------------+-----------------------------------------------+
 
 Loading Labware onto your Module
@@ -66,7 +66,7 @@ All modules have the ability to check what state they are currently in. To do th
 
 For the temperature module this will return a string stating whether it's ``'heating'``, ``'cooling'``, ``'holding at target'`` or ``'idle'``.
 For the magnetic module this will return a string stating whether it's ``'engaged'`` or ``'disengaged'``.
-For the thermocycler module this will return ``'holding at target'`` or ``'idle'``. There are more detailed status checks which can be found in at :ref:`thermocycler-section`
+For the Thermocycler Module module this will return ``'holding at target'`` or ``'idle'``. There are more detailed status checks which can be found in at :ref:`Thermocycler Module-section`
 
 ******************
 Temperature Module
@@ -204,13 +204,13 @@ The magnetic modules will disengage on power cycle of the device. It will not au
 unless you specify in your protocol.
 
 
-.. _thermocycler-section:
+.. _Thermocycler Module-section:
 
 *******************
 Thermocycler Module
 *******************
 
-The thermocycler is still under active development. The commands are subject to change. A valid operational range has not been determined yet.
+The Thermocycler Module is still under active development. The commands are subject to change. A valid operational range has not been determined yet.
 
 The Thermocycler Module allows users to perform complete experiments that require temperature sensitive reactions
 such as PCR, restriction enzyme etc. Below is a description of a few ways you can control this module.
@@ -225,7 +225,7 @@ For the purposes of this section, assume we have the following already:
     from opentrons import protocol_api
 
     def run(protocol: protocol_api.ProtocolContext):
-        tc_mod = protocol.load_module('thermocycler module')
+        tc_mod = protocol.load_module('Thermocycler Module')
         plate = tc_mod.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
 
 .. note::
@@ -236,37 +236,38 @@ For the purposes of this section, assume we have the following already:
 
 Run App Control
 ^^^^^^^^^^^^^^^
-Certain functionality of the thermocycler module can be controlled in the Opentrons App.
+Certain functionality of the Thermocycler Module can be controlled in the Opentrons App.
 
 Setting a Target Temperature
 ++++++++++++++++++++++++++++
 Before the run of the protocol, when you navigate to the `Run` tab of the Opentrons App, you will
-see a Thermocycler card on the left-hand side like the image below.
+see a Thermocycler Module card on the left-hand side like the image below.
 
 .. image:: ../img/modules/set_target.png
 
-If you wish to set a target temperature for the thermocycler `block` before a protocol run, you may do so.
+If you wish to set a target temperature for the Thermocycler Module `block` before a protocol run, you may do so.
 When you run your actual protocol, the steps will not proceed until the target temperature that was set is reached.
-We recommend using this if you want to pre-heat or pre-cool samples located on your thermocycler.
+We recommend using this if you want to pre-heat or pre-cool samples located on your Thermocycler Module.
 
 Deactivating the Module
 +++++++++++++++++++++++
-Sometimes you may wish to deactivate the thermocycler, such as if you keep your finished samples at a storage temperature before
-taking them out of the thermocycler. During a run, you can press `deactivate` to ensure that your thermocycler is off before
+Sometimes you may wish to deactivate the Thermocycler Module, such as removing samples from the module or shutting the
+module off after use. Before or after a protocol run, you can press `deactivate` to ensure that your Thermocycler Module is off before
 opening the lid.
 
 .. image:: ../img/modules/deactivate_tc.png
 
 .. note::
 
-    Regular protocol cancel **does not** also deactivate the thermocycler. If you want to turn off your thermocycler after canceling a run you
-    **must** press the deactivate button from above.
+    The thermocycler will hold at whatever temperature it was last told to hold at (whether through the
+    Opentrons App or through the protocol), regardless of the status of an ongoing (or not) run.
+    This allows you to cancel a run and be sure that your samples will be held at the temperature specified previously,
+    until you decide to deactivate the module from the Opentrons App as described above.
 
 Lid Motor Control
 ^^^^^^^^^^^^^^^^^
-The thermocycler supports temperature control with the lid open and closed. When the lid is open, the
-thermocycler can be treated as a temperature module and you can perform pipette actions. You can control
-the lid with the methods below.
+The Thermocycler Module supports temperature control with the lid open and closed. When the lid of the Thermocycler Module is open, the pipettes can access the contained 96-well labware.
+You can control the lid with the methods below.
 
 Open Lid
 ++++++++
@@ -285,8 +286,8 @@ Close Lid
 Lid Temperature Control
 ^^^^^^^^^^^^^^^^^^^^^^^
 As mentioned before, users have access to controlling when a lid temperature is set. It is recommended that you set
-the lid temperature before beginning a thermocycler cycle, described later. The range of the thermocycler lid is
-20-105 degrees Celsius.
+the lid temperature before executing a Thermocycler Module profile, described later. The range of the Thermocycler Module lid is
+20°C to 105°C.
 
 Set Lid Temperature
 +++++++++++++++++++
@@ -299,14 +300,14 @@ once the lid temperature has been reached.
 
 Block Temperature Control
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-To set the aluminum block temperature inside the thermocycler, you can use the method :py:meth:`.ThermocyclerContext.set_block_temperature`. It takes in three parameters
-`temperature`, `hold_time_seconds`, `hold_time_minutes` and `ramp_rate` respectively. Only temperature is required, both the hold time parameters and ramp rate are not required.
+To set the aluminum block temperature inside the Thermocycler Module, you can use the method :py:meth:`.ThermocyclerContext.set_block_temperature`. It takes in three parameters
+``temperature``, ``hold_time_seconds``, ``hold_time_minutes`` and ``ramp_rate`` respectively. Only temperature is required, both the hold time parameters and ramp rate are not required.
 
 
 Temperature
 +++++++++++
 
-If you only specify a temperature in celsius, the thermocycler will hold this temperature indefinitely until powered off.
+If you only specify a temperature in celsius, the Thermocycler Module will hold this temperature indefinitely until powered off.
 
 .. code-block:: python
 
@@ -315,13 +316,13 @@ If you only specify a temperature in celsius, the thermocycler will hold this te
 Hold Time
 +++++++++
 
-If you set a temperature and a hold time, the thermocycler will hold the temperature for the specified amount of time. Time can be passed in as minutes or seconds.
-In the example below, the thermocycler will hold the the specified temperature for 1 hour and 60 seconds. If you do not specify a hold time the protocol will
-proceed once
+If you set a temperature and a hold time, the Thermocycler Module will hold the temperature for the specified amount of time. Time can be passed in as minutes or seconds.
+In the example below, the Thermocycler Module will hold the the specified temperature for 45 minutes and 15 seconds. If you do not specify a hold time the protocol will
+proceed once the temperature specified is reached.
 
 .. code-block:: python
 
-        tc_mod.set_block_temperature(4, hold_time_seconds=60, hold_time_minutes=60)
+        tc_mod.set_block_temperature(4, hold_time_seconds=15, hold_time_minutes=45)
 
 Ramp Rate
 +++++++++
@@ -330,18 +331,18 @@ Lastly, you can modify the ramp rate in degC/sec for a given temperature.
 
 .. code-block:: python
 
-        tc_mod.set_block_temperature(4, hold_time=60, ramp_rate=0.5)
+        tc_mod.set_block_temperature(4, hold_time_seconds=60, ramp_rate=0.5)
 
 .. warning::
 
   Do not change this parameter unless you know what you're doing.
 
-Thermocycler Profiles
-^^^^^^^^^^^^^^^^^^^^^
-Unlike the temperature module, the thermocycler can rapidly cycle through temperatures to accomplish heat sensitive reactions. To set up a thermocycler
-profile, like you might on the UI of other thermocyclers, we have created the :py:meth:`.ThermocyclerContext.execute_profile`. A profile requires one or more
-steps which contains a temperature and a hold time. As with the ``set_block_temperature`` method, you have the option of specifying your hold time in seconds or
-minutes with ``hold_time_seconds`` and ``hold_time_minutes``. **Note** This is *only* for controlling the temperature of the `block` in the thermocycler.
+Thermocycler Module Profiles
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Unlike the temperature module, the Thermocycler Module can rapidly cycle through temperatures to accomplish heat-sensitive reactions. To set up a Thermocycler Module
+profile, like you might on the UI of other Thermocycler Modules, use :py:meth:`.ThermocyclerContext.execute_profile`. A profile requires one or more
+steps, each of which must contain a temperature and a hold time. As with the :py:meth:`.ThermocyclerContext.set_block_temperature` method, you have the option of specifying your hold time in seconds or
+minutes with ``hold_time_seconds`` and ``hold_time_minutes``. **Note** This is *only* for controlling the temperature of the `block` in the Thermocycler Module.
 
 .. code-block:: python
 
@@ -352,22 +353,22 @@ minutes with ``hold_time_seconds`` and ``hold_time_minutes``. **Note** This is *
 
         tc_mod.execute_profile(steps=profile, repetitions=30)
 
-Thermocycler Status
-^^^^^^^^^^^^^^^^^^^
-Throughout your protocol, you may want particular information on the current status of your thermocycler. Below are
+Thermocycler Module Status
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+Throughout your protocol, you may want particular information on the current status of your Thermocycler Module. Below are
 a few methods that allow you to do that.
 
 Lid Position
 ++++++++++++
-Returns the current status of the lid position. It can either be `open`, `closed` or `in-between`.
+Returns the current status of the lid position. It can be one of the strings ``'open'``, ``'closed'`` or ``'in_between'``.
 
 .. code-block:: python
 
     tc_mod.lid_position
 
-Lid Temperature Status
+Heated Lid Temperature Status
 ++++++++++++++++++++++
-Returns the current status of the lid temperature. It can either be `holding at target`, `cooling`, or `heating`.
+Returns the current status of the heated lid temperature. It can be one of the strings ``'holding at target'`` or ``'idle'``.
 
 .. code-block:: python
 
@@ -375,20 +376,21 @@ Returns the current status of the lid temperature. It can either be `holding at 
 
 Block Temperature Status
 ++++++++++++++++++++++++
-Returns the current status of the block temperature. It can either be `holding at target`, `cooling`, or `heating`.
+Returns the current status of the well block temperature controller. It can be one of the strings ``'holding at target'``, ``'cooling'``, or ``'heating'``.
 
 .. code-block:: python
 
     tc_mod.block_temperature_status
 
-Thermocycler Deactivate
-^^^^^^^^^^^^^^^^^^^^^^^
-At some points in your protocol, you may want to deactivate certain aspects of your thermocycler. Below you will find three methods,
-:py:meth:`.ThermocyclerContext.deactivate`, :py:meth:`.ThermocyclerContext.deactivate_lid`, :py:meth:`.ThermocyclerContext.deactivate_block`.
+Thermocycler Module Deactivate
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+At some points in your protocol, you may want to deactivate certain aspects of your Thermocycler Module. This can be done with three methods,
+:py:meth:`.ThermocyclerContext.deactivate`, :py:meth:`.ThermocyclerContext.deactivate_lid`, :py:meth:`.ThermocyclerContext.deactivate_block`
+that will be able to turn off certain functionalities of the Thermocycler Module.
 
 Deactivate
 ++++++++++
-This deactivates both the aluminum block and the lid of the thermocycler.
+This deactivates both the well block and the heated lid of the Thermocycler Module.
 
 .. code-block:: python
 
@@ -396,7 +398,7 @@ This deactivates both the aluminum block and the lid of the thermocycler.
 
 Deactivate Lid
 ++++++++++++++
-This deactivates the lid only of the thermocycler.
+This deactivates only the heated lid of the Thermocycler Module.
 
 .. code-block:: python
 
@@ -404,7 +406,7 @@ This deactivates the lid only of the thermocycler.
 
 Deactivate Block
 ++++++++++++++++
-This deactivates the block only of the thermocycler.
+This deactivates only the well block of the Thermocycler Module.
 
 .. code-block:: python
 
