@@ -21,6 +21,7 @@ function InfoBoxButton(props: Props) {
   const dispatch = useDispatch<Dispatch>()
   const sessionModules = useSelector(robotSelectors.getModules)
   const [mustPrepForRun, setMustPrepForRun] = useState(false)
+  const [runPrepModalOpen, setRunPrepModalOpen] = useState(false)
 
   useEffect(() => {
     if (some(sessionModules, mod => mod.name === 'thermocycler')) {
@@ -31,7 +32,11 @@ function InfoBoxButton(props: Props) {
   const handleClick = () => {
     // $FlowFixMe: robotActions.returnTip is not typed
     returnTip()
-    dispatch(push(`/run`))
+    if (mustPrepForRun) {
+      setRunPrepModalOpen(true)
+    } else {
+      dispatch(push(`/run`))
+    }
   }
 
   return (
@@ -39,7 +44,7 @@ function InfoBoxButton(props: Props) {
       <PrimaryButton className={styles.info_box_button} onClick={handleClick}>
         return tip and proceed to run
       </PrimaryButton>
-      {mustPrepForRun && (
+      {runPrepModalOpen && (
         <Portal>
           <AlertModal
             alertOverlay
@@ -63,7 +68,7 @@ function InfoBoxButton(props: Props) {
             <PrimaryButton
               className={styles.open_lid_button}
               onClick={() => {
-                setMustPrepForRun(false)
+                dispatch(push(`/run`))
               }}
             >
               Confirm PCR Seal is in place
