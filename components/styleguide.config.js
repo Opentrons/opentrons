@@ -53,8 +53,8 @@ module.exports = {
       components: 'src/deck/[A-Z]*.js',
     },
     {
-      name: 'Instrument Diagram',
-      components: 'src/instrument-diagram/[A-Z]*.js',
+      name: 'Instrument',
+      components: 'src/instrument/[A-Z]*.js',
     },
     {
       name: 'Structure',
