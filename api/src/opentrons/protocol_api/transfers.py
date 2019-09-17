@@ -210,11 +210,13 @@ class MixOpts(NamedTuple):
 
     repetitions: Optional[int] = None
     volume: Optional[float] = None
+    location: Optional[Union[types.Location, Well]] = None
     rate: Optional[float] = None
 
 
 MixOpts.repetitions.__doc__ = ':py:class:`int`'
 MixOpts.volume.__doc__ = ':py:class:`float`'
+MixOpts.location.__doc__ = ':py:class:`types.Location`'
 MixOpts.rate.__doc__ = ':py:class:`float`'
 
 
@@ -635,7 +637,7 @@ class TransferPlan:
         yield from self._new_tip_action()
 
     def _aspirate_actions(self, vol, loc):
-        yield from self._before_aspirate()
+        yield from self._before_aspirate(loc)
         yield self._format_dict('aspirate',
                                 [vol, loc, self._options.aspirate.rate])
         yield from self._after_aspirate()
@@ -646,11 +648,14 @@ class TransferPlan:
                                 [vol, loc, self._options.dispense.rate])
         yield from self._after_dispense(loc, is_disp_next)
 
-    def _before_aspirate(self):
+    def _before_aspirate(self, loc):
         if self._strategy.mix_strategy == MixStrategy.BEFORE or \
                 self._strategy.mix_strategy == MixStrategy.BOTH:
             if self._instr.current_volume == 0:
-                yield self._format_dict('mix', kwargs=self._mix_before_opts)
+                self._mix_before_opts = \
+                    self._mix_before_opts._replace(location=loc)
+                yield self._format_dict(
+                    'mix', kwargs=self._mix_before_opts)
 
     def _after_aspirate(self):
         if self._strategy.air_gap:
@@ -671,6 +676,8 @@ class TransferPlan:
                 # If we're empty, then this is when after mixes come into play
                 if self._strategy.mix_strategy == MixStrategy.AFTER or \
                         self._strategy.mix_strategy == MixStrategy.BOTH:
+                    self._mix_after_opts = \
+                        self._mix_after_opts._replace(location=loc)
                     yield self._format_dict('mix', kwargs=self._mix_after_opts)
                 if self._strategy.blow_out_strategy \
                    == BlowOutStrategy.DEST_IF_EMPTY:
