@@ -45,9 +45,7 @@ function getDisabledChangeTipOptions(
     }
     default: {
       console.warn(
-        `getChangeTipOptions for stepType ${
-          rawForm.stepType
-        } not yet implemented!`
+        `getChangeTipOptions for stepType ${rawForm.stepType} not yet implemented!`
       )
       return null
     }
