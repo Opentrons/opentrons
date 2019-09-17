@@ -28,7 +28,8 @@
       "NOT_JSON": "Incompatible file type",
       "EXACT_LABWARE_MATCH": "Duplicate labware definition",
       "LABWARE_NAME_CONFLICT": "Duplicate labware name",
-      "ASK_FOR_LABWARE_OVERWRITE": "Duplicate labware name"
+      "ASK_FOR_LABWARE_OVERWRITE": "Duplicate labware name",
+      "USES_STANDARD_NAMESPACE": "Standard (non-custom) Opentrons labware"
     }
   },
   "new_protocol": {
