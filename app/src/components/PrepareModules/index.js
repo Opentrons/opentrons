@@ -2,38 +2,19 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import some from 'lodash/some'
-import {
-  useInterval,
-  PrimaryButton,
-  AlertModal,
-  Icon,
-} from '@opentrons/components'
+import { PrimaryButton, AlertModal, Icon } from '@opentrons/components'
 
-import {
-  fetchModules,
-  sendModuleCommand,
-  type Module,
-  type RobotHost,
-} from '../../robot-api'
+import { sendModuleCommand, type Module, type RobotHost } from '../../robot-api'
 import type { Dispatch } from '../../types'
 import DeckMap from '../DeckMap'
 import styles from './styles.css'
 import { Portal } from '../portal'
 
-const FETCH_MODULES_POLL_INTERVAL_MS = 1000
-
 type Props = {| robot: RobotHost, modules: Array<Module> |}
 
 function PrepareModules(props: Props) {
   const { modules, robot } = props
-
   const dispatch = useDispatch<Dispatch>()
-
-  // update on interval to respond to prepared modules
-  useInterval(
-    () => robot && dispatch(fetchModules(robot)),
-    FETCH_MODULES_POLL_INTERVAL_MS
-  )
 
   const handleOpenLidClick = () => {
     modules

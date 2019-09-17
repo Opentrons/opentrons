@@ -6,6 +6,7 @@ import {
   actions as robotActions,
   selectors as robotSelectors,
 } from '../../robot'
+import { getMissingModules } from '../../robot-api'
 
 import { SidePanel, SidePanelGroup } from '@opentrons/components'
 import RunTimer from './RunTimer'
@@ -19,6 +20,7 @@ type SP = {|
   isPaused: boolean,
   startTime: ?number,
   isReadyToRun: boolean,
+  modulesReady: boolean,
   runTime: string,
   disabled: boolean,
 |}
@@ -30,13 +32,14 @@ type DP = {|
   onResetClick: () => mixed,
 |}
 
-type Props = { ...SP, ...DP }
+type Props = {| ...SP, ...DP |}
 
 const mapStateToProps = (state: State): SP => ({
   isRunning: robotSelectors.getIsRunning(state),
   isPaused: robotSelectors.getIsPaused(state),
   startTime: robotSelectors.getStartTime(state),
   isReadyToRun: robotSelectors.getIsReadyToRun(state),
+  modulesReady: getMissingModules(state).length === 0,
   runTime: robotSelectors.getRunTime(state),
   disabled:
     !robotSelectors.getSessionIsLoaded(state) ||
@@ -59,7 +62,17 @@ function RunPanel(props: Props) {
     <SidePanel title="Execute Run">
       <SidePanelGroup>
         <RunTimer startTime={props.startTime} runTime={props.runTime} />
-        <RunControls {...props} />
+        <RunControls
+          disabled={props.disabled}
+          modulesReady={props.modulesReady}
+          isReadyToRun={props.isReadyToRun}
+          isPaused={props.isPaused}
+          isRunning={props.isRunning}
+          onRunClick={props.onRunClick}
+          onPauseClick={props.onPauseClick}
+          onResumeClick={props.onResumeClick}
+          onResetClick={props.onResetClick}
+        />
       </SidePanelGroup>
       <ModuleLiveStatusCards />
     </SidePanel>

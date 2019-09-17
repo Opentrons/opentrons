@@ -51,7 +51,6 @@ export default function LabwareListItem(props: LabwareListItemProps) {
       activeClassName={styles.active}
     >
       <HoverTooltip
-        placement="bottom-end"
         tooltipComponent={
           <LabwareNameTooltip
             name={name}

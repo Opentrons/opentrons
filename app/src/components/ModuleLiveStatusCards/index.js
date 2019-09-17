@@ -4,7 +4,6 @@ import { connect } from 'react-redux'
 
 import { getConnectedRobot } from '../../discovery'
 import {
-  fetchModules,
   getModulesState,
   sendModuleCommand,
   type ModuleCommandRequest,
@@ -13,8 +12,6 @@ import {
 import { selectors as robotSelectors } from '../../robot'
 import { getConfig } from '../../config'
 
-import { IntervalWrapper } from '@opentrons/components'
-
 import type { State, Dispatch } from '../../types'
 import type { Robot } from '../../discovery'
 
@@ -22,7 +19,6 @@ import TempDeckCard from './TempDeckCard'
 import MagDeckCard from './MagDeckCard'
 import ThermocyclerCard from './ThermocyclerCard'
 
-const POLL_MODULES_INTERVAL_MS = 1000
 const LIVE_STATUS_MODULES = ['magdeck', 'tempdeck', 'thermocycler']
 
 type SP = {|
@@ -33,7 +29,6 @@ type SP = {|
 |}
 
 type DP = {|
-  _fetchModules: (_robot: Robot) => mixed,
   _sendModuleCommand: (
     _robot: Robot,
     serial: string,
@@ -44,7 +39,6 @@ type DP = {|
 type Props = {|
   liveStatusModules: Array<Module>,
   isProtocolActive: boolean,
-  fetchModules: () => mixed,
   sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
   __tempdeckControlsEnabled: boolean,
 |}
@@ -53,14 +47,14 @@ const ModuleLiveStatusCards = (props: Props) => {
   const {
     liveStatusModules,
     isProtocolActive,
-    fetchModules,
     sendModuleCommand,
     __tempdeckControlsEnabled,
   } = props
+
   if (liveStatusModules.length === 0) return null
 
   return (
-    <IntervalWrapper refresh={fetchModules} interval={POLL_MODULES_INTERVAL_MS}>
+    <>
       {liveStatusModules.map(module => {
         switch (module.name) {
           case 'tempdeck':
@@ -88,7 +82,7 @@ const ModuleLiveStatusCards = (props: Props) => {
             return null
         }
       })}
-    </IntervalWrapper>
+    </>
   )
 }
 
@@ -112,14 +106,13 @@ function mapStateToProps(state: State): SP {
 
 function mapDispatchToProps(dispatch: Dispatch): DP {
   return {
-    _fetchModules: _robot => dispatch(fetchModules(_robot)),
     _sendModuleCommand: (_robot, serial, request) =>
       dispatch(sendModuleCommand(_robot, serial, request)),
   }
 }
 
 function mergeProps(stateProps: SP, dispatchProps: DP): Props {
-  const { _fetchModules, _sendModuleCommand } = dispatchProps
+  const { _sendModuleCommand } = dispatchProps
   const {
     _robot,
     liveStatusModules,
@@ -130,7 +123,6 @@ function mergeProps(stateProps: SP, dispatchProps: DP): Props {
   return {
     liveStatusModules,
     isProtocolActive,
-    fetchModules: () => _robot && _fetchModules(_robot),
     sendModuleCommand: (serial, request) =>
       _robot && _sendModuleCommand(_robot, serial, request),
     __tempdeckControlsEnabled,

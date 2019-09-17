@@ -5,9 +5,8 @@ import { connect } from 'react-redux'
 
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { selectors as robotSelectors } from '../../robot'
-import { getModulesState, fetchModules } from '../../robot-api'
+import { getModulesState } from '../../robot-api'
 
-import { RefreshWrapper } from '../Page'
 import InfoSection from './InfoSection'
 import { SectionContentHalf } from '../layout'
 import InstrumentItem from './InstrumentItem'
@@ -26,19 +25,18 @@ type SP = {|
   attachModulesUrl: string,
 |}
 
-type DP = {| fetchModules: () => mixed |}
+type DP = {| dispatch: Dispatch |}
 
-type Props = { ...OP, ...SP, ...DP }
+type Props = {| ...OP, ...SP, ...DP |}
 
 const TITLE = 'Required Modules'
 
-export default connect<Props, OP, SP, DP, _, _>(
-  mapStateToProps,
-  mapDispatchToProps
-)(ProtocolModulesCard)
+export default connect<Props, OP, SP, DP, _, _>(mapStateToProps)(
+  ProtocolModulesCard
+)
 
 function ProtocolModulesCard(props: Props) {
-  const { modules, actualModules, fetchModules, attachModulesUrl } = props
+  const { modules, actualModules, attachModulesUrl } = props
 
   if (modules.length < 1) return null
 
@@ -52,20 +50,18 @@ function ProtocolModulesCard(props: Props) {
   const modulesMatch = moduleInfo.every(m => m.modulesMatch)
 
   return (
-    <RefreshWrapper refresh={fetchModules}>
-      <InfoSection title={TITLE}>
-        <SectionContentHalf>
-          {moduleInfo.map(m => (
-            <InstrumentItem key={m.slot} match={m.modulesMatch}>
-              {m.displayName}{' '}
-            </InstrumentItem>
-          ))}
-        </SectionContentHalf>
-        {!modulesMatch && (
-          <InstrumentWarning instrumentType="module" url={attachModulesUrl} />
-        )}
-      </InfoSection>
-    </RefreshWrapper>
+    <InfoSection title={TITLE}>
+      <SectionContentHalf>
+        {moduleInfo.map(m => (
+          <InstrumentItem key={m.slot} match={m.modulesMatch}>
+            {m.displayName}{' '}
+          </InstrumentItem>
+        ))}
+      </SectionContentHalf>
+      {!modulesMatch && (
+        <InstrumentWarning instrumentType="module" url={attachModulesUrl} />
+      )}
+    </InfoSection>
   )
 }
 
@@ -78,11 +74,5 @@ function mapStateToProps(state: State, ownProps: OP): SP {
     modules: robotSelectors.getModules(state),
     // TODO(mc, 2018-10-10): pass this prop down from page
     attachModulesUrl: `/robots/${robot.name}/instruments`,
-  }
-}
-
-function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
-  return {
-    fetchModules: () => dispatch(fetchModules(ownProps.robot)),
   }
 }
