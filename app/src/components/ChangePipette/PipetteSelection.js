@@ -26,7 +26,7 @@ export default function PipetteSelection(props: PipetteSelectionProps) {
       <span className={styles.pipette_selection_label}>{LABEL}</span>
       <PipetteSelect
         value={props.value}
-        onPipetteChange={props.onChange}
+        onPipetteChange={props.onPipetteChange}
         nameBlacklist={nameBlacklist}
       />
     </label>

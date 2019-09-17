@@ -74,7 +74,7 @@ type SP = {|
 type DP = {|
   exit: () => mixed,
   back: () => mixed,
-  onPipetteSelect: $PropertyType<PipetteSelectionProps, 'onChange'>,
+  onPipetteSelect: $PropertyType<PipetteSelectionProps, 'onPipetteChange'>,
   moveToFront: () => mixed,
   checkPipette: () => mixed,
   goToConfirmUrl: () => mixed,

@@ -57,7 +57,7 @@ export default function Instructions(props: ChangePipetteProps) {
     >
       {!actualPipette && !wantedPipette && (
         <PipetteSelection
-          onChange={props.onPipetteSelect}
+          onPipetteChange={props.onPipetteSelect}
           __pipettePlusEnabled={props.__pipettePlusEnabled}
         />
       )}
