@@ -7,7 +7,7 @@ initialState = { selectedValue: null }
 ;<div style={{ paddingBottom: '10rem' }}>
   {/* Add some space because options menu does not behave well when overlapping with styleguidist's code blocks! */}
   <PipetteSelect
-    onChange={option => {
+    onPipetteChange={option => {
       console.log(option)
       const { value } = option
       setState({ selectedValue: value })

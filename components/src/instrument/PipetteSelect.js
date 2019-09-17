@@ -15,11 +15,19 @@ import {
 import { Icon } from '../icons'
 import styles from './PipetteSelect.css'
 
-type SelectProps = {|
+// TODO: BC 2019-09-17 This component has a lot of shared guts with SelectField
+// Their shared characteristics can be summed up by their usage of react-select
+// in combination with our Opentrons specific design. Ideally we'd
+// like to have one component in CL that acts as our generic "custom" wrapper
+// of react-select, and SelectField and PipetteSelect should contain instances
+// of that generic component. This will be the first step towards using that
+// generic component across all dropdowns in the JS codebase.
+
+type Props = {|
   /** currently selected value, optional in case selecting triggers immediate action */
   value?: string,
   /** react-select change handler */
-  onChange: (option: *) => mixed,
+  onPipetteChange: (option: any) => mixed,
   /** list of pipette names to omit */
   nameBlacklist?: Array<string>,
 |}
@@ -36,7 +44,7 @@ const SELECT_STYLES = {
 }
 const clearStyles = () => null
 
-const PipetteSelect = (props: SelectProps) => {
+const PipetteSelect = (props: Props) => {
   const filteredNames = without(
     getAllPipetteNames('maxVolume', 'channels'),
     ...(props.nameBlacklist || [])
@@ -61,12 +69,13 @@ const PipetteSelect = (props: SelectProps) => {
         IndicatorSeparator: null,
       }}
       options={groupedOptions}
+      onChange={props.onPipetteChange}
       {...props}
     />
   )
 }
 
-function Control(props: *) {
+function Control(props: any) {
   return (
     <components.Control
       {...props}
@@ -78,7 +87,7 @@ function Control(props: *) {
   )
 }
 
-function DropdownIndicator(props: *) {
+function DropdownIndicator(props: any) {
   const iconWrapperCx = cx(styles.dropdown_icon_wrapper, {
     [styles.flipped]: props.selectProps.menuIsOpen,
   })
@@ -94,7 +103,7 @@ function DropdownIndicator(props: *) {
   )
 }
 // custom Menu (options dropdown) component
-function Menu(props: *) {
+function Menu(props: any) {
   return (
     <components.Menu {...props}>
       <div className={styles.select_menu}>{props.children}</div>
@@ -103,7 +112,7 @@ function Menu(props: *) {
 }
 
 // custom option group wrapper component
-function Group(props: *) {
+function Group(props: any) {
   return (
     <components.Group
       {...props}
@@ -136,7 +145,7 @@ function PipetteNameItem(props: PipetteNameSpec) {
   )
 }
 
-function Option(props: *) {
+function Option(props: any) {
   const { innerRef, innerProps, data } = props
 
   return (
@@ -146,7 +155,7 @@ function Option(props: *) {
   )
 }
 
-function ValueContainer(props: *) {
+function ValueContainer(props: any) {
   if (!props.hasValue) {
     return <components.ValueContainer {...props} />
   }
