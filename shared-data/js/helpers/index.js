@@ -4,7 +4,6 @@ import uniq from 'lodash/uniq'
 import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import type { LabwareDefinition2 } from '../types'
 
-export { canPipetteUseLabware } from './canPipetteUseLabware'
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { default as getWellTotalVolume } from './getWellTotalVolume'
 export { default as wellIsRect } from './wellIsRect'

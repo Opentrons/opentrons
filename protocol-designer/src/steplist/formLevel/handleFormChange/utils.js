@@ -2,8 +2,7 @@
 import assert from 'assert'
 import round from 'lodash/round'
 import uniq from 'lodash/uniq'
-import { canPipetteUseLabware } from '@opentrons/shared-data'
-import { getWellSetForMultichannel } from '../../../utils'
+import { getWellSetForMultichannel, canPipetteUseLabware } from '../../../utils'
 import { getPipetteCapacity } from '../../../pipettes/pipetteData'
 import type {
   LabwareDefinition2,

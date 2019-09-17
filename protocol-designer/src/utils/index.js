@@ -74,6 +74,7 @@ export const arrayToWellGroup = (w: Array<string>): WellGroup =>
 
 // cross-PD memoization of well set utils
 export const {
+  canPipetteUseLabware,
   getAllWellSetsForLabware,
   getWellSetForMultichannel,
 } = makeWellSetHelpers()

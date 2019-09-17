@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { getWellRatio } from '../utils'
-import { canPipetteUseLabware } from '@opentrons/shared-data'
+import { canPipetteUseLabware } from '../../utils'
 import type { StepFieldName } from '../../form-types'
 
 /*******************

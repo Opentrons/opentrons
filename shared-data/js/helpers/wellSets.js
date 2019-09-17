@@ -13,8 +13,10 @@
 //
 // If a labware has no possible well sets, then it is not compatible with multi-channel pipettes.
 import { getLabwareDefURI } from '@opentrons/shared-data'
+import uniq from 'lodash/uniq'
 import { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 import type { LabwareDefinition2 } from '../types'
+import type { PipetteNameSpecs } from '../pipettes'
 
 type WellSetByPrimaryWell = Array<Array<string>>
 
@@ -69,5 +71,31 @@ export const makeWellSetHelpers = () => {
     return allWellSets.find((wellSet: Array<string>) => wellSet.includes(well))
   }
 
-  return { getAllWellSetsForLabware, getWellSetForMultichannel }
+  const canPipetteUseLabware = (
+    pipetteSpec: PipetteNameSpecs,
+    labwareDef: LabwareDefinition2
+  ): ?boolean => {
+    if (pipetteSpec.channels === 1) {
+      // assume all labware can be used by single-channel
+      return true
+    }
+
+    const allWellSets = getAllWellSetsForLabware(labwareDef)
+    return allWellSets.some(wellSet => {
+      const uniqueWells = uniq(wellSet)
+      // if all wells are non-null, and there are either 1 (reservoir-like)
+      // or 8 (well plate-like) unique wells in the set,
+      // then assume multi-channel will work
+      return (
+        uniqueWells.every(well => well != null) &&
+        [1, 8].includes(uniqueWells.length)
+      )
+    })
+  }
+
+  return {
+    getAllWellSetsForLabware,
+    getWellSetForMultichannel,
+    canPipetteUseLabware,
+  }
 }
