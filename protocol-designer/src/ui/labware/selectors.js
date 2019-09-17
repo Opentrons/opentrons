@@ -2,11 +2,7 @@
 import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
-import {
-  getIsTiprack,
-  getLabwareDisplayName,
-  getLabwareFormat,
-} from '@opentrons/shared-data'
+import { getIsTiprack, getLabwareDisplayName } from '@opentrons/shared-data'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 
@@ -57,16 +53,16 @@ export const getDisposalLabwareOptions: Selector<Options> = createSelector(
     reduce(
       labwareEntities,
       (acc: Options, labware: LabwareEntity, labwareId): Options => {
-        if (getLabwareFormat(labware.def) === 'trash') {
-          return [
-            ...acc,
-            {
-              name: names[labwareId],
-              value: labwareId,
-            },
-          ]
-        }
-        return acc
+        // TODO: Ian 2019-09-17 if we create a way to distinguish "intended for disposal"
+        // labware, use that here as a filter.
+        // Until then, allow all labware to be used for disposal
+        return [
+          ...acc,
+          {
+            name: names[labwareId],
+            value: labwareId,
+          },
+        ]
       },
       []
     )

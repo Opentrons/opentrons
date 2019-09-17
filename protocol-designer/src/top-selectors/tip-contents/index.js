@@ -3,14 +3,14 @@ import { createSelector } from 'reselect'
 import noop from 'lodash/noop'
 import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
-import type { WellGroup } from '@opentrons/components'
+import { getWellSetForMultichannel } from '../../utils'
 import * as StepGeneration from '../../step-generation'
 import { allSubsteps as getAllSubsteps } from '../substeps'
 import { START_TERMINAL_ITEM_ID, END_TERMINAL_ITEM_ID } from '../../steplist'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as stepsSelectors } from '../../ui/steps'
 import { selectors as fileDataSelectors } from '../../file-data'
-import { getWellSetForMultichannel } from '../../well-selection/utils'
+import type { WellGroup } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { OutputSelector } from 'reselect'
@@ -226,12 +226,11 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
             const hoveredSubstepData =
               substepsForStep.multiRows[substepIndex][0] // just use first multi row
 
-            const wellSet = hoveredSubstepData.activeTips
-              ? getWellSetForMultichannel(
-                  labwareDef,
-                  hoveredSubstepData.activeTips.well
-                )
-              : []
+            let wellSet: ?Array<string> = []
+            const hoveredTipWell = hoveredSubstepData.activeTips?.well
+            if (hoveredTipWell != null) {
+              wellSet = getWellSetForMultichannel(labwareDef, hoveredTipWell)
+            }
 
             highlighted =
               (hoveredSubstepData &&

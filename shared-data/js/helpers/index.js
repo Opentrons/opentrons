@@ -9,6 +9,7 @@ export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
 export { default as getWellTotalVolume } from './getWellTotalVolume'
 export { default as wellIsRect } from './wellIsRect'
 export * from './volume'
+export * from './wellSets'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition2): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE
@@ -40,9 +41,6 @@ export const getLabwareDisplayName = (labwareDef: LabwareDefinition2) => {
   }
   return displayName
 }
-
-export const getLabwareFormat = (labwareDef: LabwareDefinition2) =>
-  labwareDef.parameters.format
 
 export const getTiprackVolume = (labwareDef: LabwareDefinition2): number => {
   assert(
