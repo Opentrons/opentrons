@@ -1,7 +1,8 @@
 import asyncio
 import contextlib
 import logging
-from typing import Any, Dict, List, Optional, Union, Tuple, Sequence
+from typing import (Any, Dict, Iterator, List,
+                    Optional, Sequence, Set, Tuple, Union)
 from opentrons import types, hardware_control as hc, commands as cmds
 from opentrons.commands import CommandPublisher
 import opentrons.config.robot_configs as rc
@@ -100,6 +101,7 @@ class ProtocolContext(CommandPublisher):
         self._deck_layout = geometry.Deck()
         self._instruments: Dict[types.Mount, Optional[InstrumentContext]]\
             = {mount: None for mount in types.Mount}
+        self._modules: Set[ModuleContext] = set()
         self._last_moved_instrument: Optional[types.Mount] = None
         self._location_cache: Optional[types.Location] = None
 
@@ -248,9 +250,62 @@ class ProtocolContext(CommandPublisher):
         return self.load_labware(
             load_name, location, label, namespace, version)
 
+    @property
+    def loaded_labwares(self) -> Dict[int, Union[Labware, ModuleGeometry]]:
+        """ Get the labwares that have been loaded into the protocol context.
+
+        Slots with nothing in them will not be present in the return value.
+
+        .. note::
+
+            If a module is present on the deck but no labware has been loaded
+            into it with :py:meth:`.ModuleContext.load_labware`, there will
+            be no entry for that slot in this value. That means you should not
+            use ``loaded_labwares`` to determine if a slot is available or not,
+            only to get a list of labwares. If you want a data structure of all
+            objects on the deck regardless of type, see :py:attr:`deck`.
+
+
+        :returns: Dict mapping deck slot number to labware, sorted in order of
+                  the locations.
+        """
+        def _only_labwares() -> Iterator[
+                Tuple[int, Union[Labware, ModuleGeometry]]]:
+            for slotnum, slotitem in self._deck_layout.items():
+                if isinstance(slotitem, Labware):
+                    yield slotnum, slotitem
+                elif isinstance(slotitem, ModuleGeometry):
+                    if slotitem.labware:
+                        yield slotnum, slotitem.labware
+
+        return dict(_only_labwares())
+
     def load_module(
             self, module_name: str,
             location: Optional[types.DeckLocation] = None) -> ModuleTypes:
+        """ Load a module onto the deck given its name.
+
+        This is the function to call to use a module in your protocol, like
+        :py:meth:`load_instrument` is the method to call to use an instrument
+        in your protocol. It returns the created and initialized module
+        context, which will be a different class depending on the kind of
+        module loaded.
+
+        A map of deck positions to loaded modules can be accessed later
+        using :py:attr:`loaded_modules`.
+
+        :param str module_name: The name of the module.
+        :param location: The location of the module. This is usually the
+                         name or number of the slot on the deck where you
+                         will be placing the module. Some modules, like
+                         the Thermocycler, are only valid in one deck
+                         location. You do not have to specify a location
+                         when loading a Thermocycler - it will always be
+                         in Slot 7.
+        :type location: str or int or None
+        :returns ModuleContext: The loaded and initialized
+                                :py:class:`ModuleContext`.
+        """
         resolved_name = ModuleGeometry.resolve_module_name(module_name)
         resolved_location = self._deck_layout.resolve_module_location(
                 resolved_name, location)
@@ -284,17 +339,30 @@ class ProtocolContext(CommandPublisher):
         else:
             raise RuntimeError(
                 f'Could not find specified module: {resolved_name}')
+        self._modules.add(mod_ctx)
         self._deck_layout[resolved_location] = geometry
         return mod_ctx
 
     @property
-    def loaded_labwares(self) -> Dict[int, Labware]:
-        """ Get the labwares that have been loaded into the protocol context.
+    def loaded_modules(self) -> Dict[int, 'ModuleContext']:
+        """ Get the modules loaded into the protocol context.
 
-        The return value is a dict mapping locations to labware, sorted
-        in order of the locations.
+        This is a map of deck positions to modules loaded by previous calls
+        to :py:meth:`load_module`. It is not necessarily the same as the
+        modules attached to the robot - for instance, if the robot has a
+        Magnetic Module and a Temperature Module attached, but the protocol
+        has only loaded the Temperature Module with :py:meth:`load_module`,
+        only the Temperature Module will be present.
+
+        :returns Dict[str, ModuleContext]: Dict mapping slot name to module
+                                           contexts. The elements may not be
+                                           ordered by slot number.
         """
-        return dict(self._deck_layout)
+        def _modules() -> Iterator[Tuple[int, 'ModuleContext']]:
+            for module in self._modules:
+                yield int(module.geometry.parent), module
+
+        return dict(_modules())
 
     def load_instrument(
             self,
@@ -368,11 +436,20 @@ class ProtocolContext(CommandPublisher):
     def loaded_instruments(self) -> Dict[str, Optional['InstrumentContext']]:
         """ Get the instruments that have been loaded into the protocol.
 
+        This is a map of mount name to instruments previously loaded with
+        :py:meth:`load_instrument`. It is not necessarily the same as the
+        instruments attached to the robot - for instance, if the robot has
+        an instrument in both mounts but your protocol has only loaded one
+        of them with :py:meth:`load_instrument`, the unused one will not
+        be present.
+
         :returns: A dict mapping mount names in lowercase to the instrument
-                  in that mount, or `None` if no instrument is present.
+                  in that mount. If no instrument is loaded in the mount,
+                  it will not be present
         """
         return {mount.name.lower(): instr for mount, instr
-                in self._instruments.items()}
+                in self._instruments.items()
+                if instr}
 
     def reset(self):
         """ Reset the state of the context and the hardware.
@@ -461,6 +538,15 @@ class ProtocolContext(CommandPublisher):
     @property
     def deck(self) -> geometry.Deck:
         """ The object holding the deck layout of the robot.
+
+        This object behaves like a dictionary with keys for both numeric
+        and string slot numbers (for instance, ``protocol.deck[1]`` and
+        ``protocol.deck['1']`` will both return the object in slot 1). If
+        nothing is loaded into a slot, ``None`` will be present. This object
+        is useful for determining if a slot in the deck is free. Rather than
+        filtering the objects in the deck map yourself, you can also use
+        :py:attr:`loaded_labwares` to see a dict of labwares and
+        :py:attr:`loaded_modules` to see a dict of modules.
         """
         return self._deck_layout
 
@@ -1853,6 +1939,14 @@ class ModuleContext(CommandPublisher):
     def labware(self) -> Optional[Labware]:
         """ The labware (if any) present on this module. """
         return self._geometry.labware
+
+    @property
+    def geometry(self) -> ModuleGeometry:
+        """ The object representing the module as an item on the deck
+
+        :returns: ModuleGeometry
+        """
+        return self._geometry
 
     def __repr__(self):
         return "{} at {} lw {}".format(self.__class__.__name__,
