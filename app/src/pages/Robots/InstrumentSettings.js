@@ -10,10 +10,10 @@ import Page from '../../components/Page'
 import type { Match } from 'react-router-dom'
 import type { Robot } from '../../discovery'
 
-type Props = {
+type Props = {|
   robot: Robot,
   match: Match,
-}
+|}
 
 // used to guarantee mount param in route is left or right
 const RE_MOUNT = '(left|right)'

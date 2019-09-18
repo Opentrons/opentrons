@@ -63,7 +63,9 @@ export function Robots(props: Props) {
       {robot.status === CONNECTABLE && (
         <Route
           path={`${path}/instruments`}
-          render={props => <InstrumentSettings {...props} robot={robot} />}
+          render={props => (
+            <InstrumentSettings robot={robot} match={props.match} />
+          )}
         />
       )}
       <Route

@@ -12,14 +12,14 @@ import type { PipetteSelectionProps } from './PipetteSelection'
 
 export type Direction = 'attach' | 'detach'
 
-export type ChangePipetteProps = {
+export type ChangePipetteProps = {|
   title: string,
   subtitle: string,
   mount: Mount,
   wantedPipette: ?PipetteNameSpecs,
   actualPipette: ?PipetteModelSpecs,
   displayName: string,
-  displayCategory: PipetteDisplayCategory,
+  displayCategory: ?PipetteDisplayCategory,
   direction: Direction,
   success: boolean,
   attachedWrong: boolean,
@@ -38,4 +38,4 @@ export type ChangePipetteProps = {
   checkPipette: () => mixed,
   goToConfirmUrl: () => mixed,
   __pipettePlusEnabled: boolean,
-}
+|}
