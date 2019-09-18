@@ -43,7 +43,9 @@ def _motion_lock(func):
 
 
 class SessionManager(object):
-    def __init__(self, hardware, loop=None, broker=None, lock=None):
+    def __init__(
+            self, hardware, loop=None, broker=None, lock=None, mime_type=None
+    ):
         self._broker = broker or Broker()
         self._loop = loop or asyncio.get_event_loop()
         self.session = None
@@ -59,7 +61,7 @@ class SessionManager(object):
                       adapters.SynchronousAdapter):
             self._hardware.join()
 
-    def create(self, name, text):
+    def create(self, name, contents, mime_type=None):
         if self._session_lock:
             raise Exception(
                 'Cannot create session while simulation in progress')
@@ -71,7 +73,8 @@ class SessionManager(object):
             self._broker.set_logger(session_logger)
             self.session = Session.build_and_prep(
                 name=name,
-                text=text,
+                contents=contents,
+                mime_type=mime_type,
                 hardware=self._hardware,
                 loop=self._loop,
                 broker=self._broker,
@@ -99,20 +102,22 @@ class Session(object):
     TOPIC = 'session'
 
     @classmethod
-    def build_and_prep(cls, name, text, hardware, loop, broker, motion_lock):
-        sess = cls(name, text, hardware, loop, broker, motion_lock)
+    def build_and_prep(
+        cls, name, contents, mime_type, hardware, loop, broker, motion_lock
+    ):
+        protocol = parse(contents, filename=name, mime_type=mime_type)
+        sess = cls(name, protocol, hardware, loop, broker, motion_lock)
         sess.prepare()
         return sess
 
-    def __init__(self, name, text, hardware, loop, broker, motion_lock):
+    def __init__(self, name, protocol, hardware, loop, broker, motion_lock):
         self._broker = broker
         self._default_logger = self._broker.logger
         self._sim_logger = self._broker.logger.getChild('sim')
         self._run_logger = self._broker.logger.getChild('run')
         self._loop = loop
         self.name = name
-        self.protocol_text = text
-        self._protocol = None
+        self._protocol = protocol
         self._hardware = hardware
         self._simulating_ctx = ProtocolContext(
             loop=self._loop, broker=self._broker)
@@ -269,7 +274,6 @@ class Session(object):
 
     def refresh(self):
         self._reset()
-        self._protocol = parse(self.protocol_text, self.name)
         self.api_level = 2 if ff.use_protocol_api_v2() else 1
         # self.metadata is exposed via jrpc
         if isinstance(self._protocol, PythonProtocol):
