@@ -53,6 +53,10 @@ const ModuleLiveStatusCards = (props: Props) => {
 
   if (liveStatusModules.length === 0) return null
 
+  // TODO: IMMEDIATELY useSelector, useDispatch, useState
+  // state to track expanded serial, if no expanded serial default
+  // first in the list on mount.
+
   return (
     <>
       {liveStatusModules.map((module, index) => {
