@@ -6,7 +6,10 @@ import flatten from 'lodash/flatten'
 import values from 'lodash/values'
 import uniqBy from 'lodash/uniqBy'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import {
+  getLabwareDefURI,
+  OPENTRONS_LABWARE_NAMESPACE,
+} from '@opentrons/shared-data'
 import * as labwareDefSelectors from './selectors'
 import { getAllWellSetsForLabware } from '../well-selection/utils'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -142,6 +145,12 @@ export const createCustomLabwareDef = (
       return dispatch(
         labwareUploadMessage({
           messageType: 'INVALID_JSON_FILE',
+        })
+      )
+    } else if (parsedLabwareDef?.namespace === OPENTRONS_LABWARE_NAMESPACE) {
+      return dispatch(
+        labwareUploadMessage({
+          messageType: 'USES_STANDARD_NAMESPACE',
         })
       )
     } else if (allLabwareDefs.some(def => isEqual(def, parsedLabwareDef))) {
