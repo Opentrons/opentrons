@@ -11,7 +11,7 @@ import {
   OPENTRONS_LABWARE_NAMESPACE,
 } from '@opentrons/shared-data'
 import * as labwareDefSelectors from './selectors'
-import { getAllWellSetsForLabware } from '../well-selection/utils'
+import { getAllWellSetsForLabware } from '../utils'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { GetState, ThunkAction, ThunkDispatch } from '../types'
 import type { LabwareUploadMessage } from './types'
