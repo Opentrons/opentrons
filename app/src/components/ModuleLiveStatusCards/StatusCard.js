@@ -2,6 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import styles from './styles.css'
+import { MIXED_WELL_COLOR, CollapsibleItem } from '@opentrons/components'
 
 type Props = {|
   /** Title for the card */
@@ -10,23 +11,33 @@ type Props = {|
   children: ?React.Node,
   /** Optional className for card contents */
   className?: string,
-  initiallyExpanded: boolean,
+  isCardExpanded: boolean,
+  toggleCard: boolean => mixed,
 |}
 
 export default function StatusCard(props: Props) {
-  const [isCollapsed, setIsCollapsed] = React.useState(!props.initiallyExpanded)
-
   return (
-    <div
+    <CollapsibleItem
       className={styles.status_card}
-      onClick={() => setIsCollapsed(!isCollapsed)}
+      onCollapseToggle={() => props.toggleCard(!props.isCardExpanded)}
+      title={props.title}
+      collapsed={!props.isCardExpanded}
+      // selected={props.isCardExpanded}
     >
-      <h3 className={styles.card_title}>{props.title}</h3>
-      {!isCollapsed && (
-        <div className={cx(styles.card_contents, props.className)}>
-          {props.children}
-        </div>
-      )}
-    </div>
+      {props.children}
+    </CollapsibleItem>
   )
+  // return (
+  //   <div
+  //     className={styles.status_card}
+  //     onClick={() => props.toggleCard(!props.isCardExpanded)}
+  //   >
+  //     <h3 className={styles.card_title}>{props.title}</h3>
+  //     {props.isCardExpanded && (
+  //       <div className={cx(styles.card_contents, props.className)}>
+  //         {props.children}
+  //       </div>
+  //     )}
+  //   </div>
+  // )
 }
