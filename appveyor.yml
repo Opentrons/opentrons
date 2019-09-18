@@ -33,7 +33,7 @@ cache:
 
 install:
   # read node version from the first line of .nvmrc
-  - ps: $env:nodejs_version = (Get-Content -Path .nvmrc)[0]
+  - ps: $env:nodejs_version = Get-Content -Path .nvmrc
   - ps: Install-Product node $env:nodejs_version x64
   # install dev dependencies
   - cmd: '%MAKE% -j 2 install'

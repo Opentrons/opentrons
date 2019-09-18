@@ -18,7 +18,7 @@ export default function CowButton(props) {
 
 Usage requirements for dependent projects:
 
-- Node lts/carbon (v8) and yarn
+- Node v12 and yarn
 - The following `dependencies` (peer dependencies of `@opentrons/components`)
   - `react`: `^16.8.6`,
   - `react-router-dom`: `^4.2.2`,

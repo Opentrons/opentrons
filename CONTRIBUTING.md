@@ -148,10 +148,10 @@ Your computer will need the following tools installed to be able to develop with
   pyenv install 3.6.4
   ```
 
-- Node v8 LTS (Carbon) - [nvm][] is optional, but recommended
+- Node v12 - [nvm][] is optional, but recommended
 
   ```shell
-  nvm install lts/carbon
+  nvm install 12
   ```
 
 - [yarn][yarn-install] - JavaScript package manager

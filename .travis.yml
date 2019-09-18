@@ -97,7 +97,9 @@ jobs:
         - make install-js
       script:
         - make test-js
-        - make lint-js lint-css format
+        - make lint-js
+        - make lint-css
+        - make format
         - make -C components
         - make -C protocol-designer
         - make -C labware-library
