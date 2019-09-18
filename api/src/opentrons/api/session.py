@@ -365,7 +365,7 @@ class Session(object):
             else:
                 self._hardware.broker = self._broker
                 if isinstance(self._protocol, JsonProtocol):
-                    execute_protocol(self._protocol.contents)
+                    execute_protocol(self._protocol)
                 else:
                     exec(self._protocol.contents, {})
             self.set_state('finished')

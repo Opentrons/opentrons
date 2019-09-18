@@ -1,0 +1,73 @@
+{
+  "protocol-schema": "1.0.0",
+  "default-values": {
+    "aspirate-flow-rate": {
+      "p300_single_v1": 101
+    },
+    "dispense-flow-rate": {
+      "p300_single_v1": 102
+    },
+    "aspirate-mm-from-bottom": 0,
+    "dispense-mm-from-bottom": 0
+  },
+  "metadata": {
+    "protocol-name": "Simple test protocol v1",
+    "author": "engineering <engineering@opentrons.com>",
+    "description": "A short test protocol",
+    "created": 1223131231,
+    "last-modified": null,
+    "category": null,
+    "subcategory": null,
+    "tags": ["unitTest"]
+  },
+  "robot": {
+    "model": "OT-2 Standard"
+  },
+  "labware": {
+    "sourcePlateId": {
+      "slot": "10",
+      "model": "96-flat"
+    },
+    "destPlateId": {
+      "slot": "11",
+      "model": "96-flat"
+    }
+  },
+  "pipettes": {
+    "pipetteId": {
+      "mount": "left",
+      "model": "p300_single_v1"
+    }
+  },
+  "procedure": [
+    {
+      "subprocedure": [
+        {
+          "command": "aspirate",
+          "params": {
+            "pipette": "pipetteId",
+            "labware": "sourcePlateId",
+            "well": "A1",
+            "volume": 5,
+            "flow-rate": 123
+          }
+        },
+        {
+          "command": "delay",
+          "params": {
+            "wait": 42
+          }
+        },
+        {
+          "command": "dispense",
+          "params": {
+            "pipette": "pipetteId",
+            "labware": "destPlateId",
+            "well": "B1",
+            "volume": 4.5
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,38 +1,18 @@
 """ Functions for executing protocols targeting v1
 """
-
-from typing import Any, Dict
-
 from . import execute_v1, execute_v3
-from opentrons.protocol_api.execute import (
-    get_protocol_schema_version, validate_protocol as full_validate)
+from opentrons.protocols.types import JsonProtocol
 
 
-def validate_protocol(protocol_json: Dict[Any, Any]):
-    protocol_version = get_protocol_schema_version(protocol_json)
-    if protocol_version > 3:
-        raise RuntimeError(
-            f'JSON Protocol version {protocol_version} is not yet ' +
-            'supported in this version of the API')
-
-    full_validate(protocol_json)
-    return protocol_json
-
-
-def execute_protocol(protocol_json):
-    protocol_version = get_protocol_schema_version(protocol_json)
-    if protocol_version == 3:
-        ins = execute_v3.load_pipettes(
-            protocol_json)
-        lw = execute_v3.load_labware(
-            protocol_json)
-        execute_v3.dispatch_commands(protocol_json, ins, lw)
+def execute_protocol(protocol: JsonProtocol):
+    if protocol.schema_version == 3:
+        ins = execute_v3.load_pipettes(protocol.contents)
+        lw = execute_v3.load_labware(protocol.contents)
+        execute_v3.dispatch_commands(protocol.contents, ins, lw)
     else:
-        ins = execute_v1.load_pipettes(
-            protocol_json)
-        lw = execute_v1.load_labware(
-            protocol_json)
-        execute_v1.dispatch_commands(protocol_json, ins, lw)
+        ins = execute_v1.load_pipettes(protocol.contents)
+        lw = execute_v1.load_labware(protocol.contents)
+        execute_v1.dispatch_commands(protocol.contents, ins, lw)
 
     return {
         'pipettes': ins,

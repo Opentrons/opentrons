@@ -1,5 +1,12 @@
 from opentrons import types
 
+metadata = {
+    'protocolName': 'Testosaur',
+    'author': 'Opentrons <engineering@opentrons.com>',
+    'description': 'A variant on "Dinosaur" for testing',
+    'source': 'Opentrons Repository'
+}
+
 
 def run(ctx):
     ctx.home()

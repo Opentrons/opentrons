@@ -1,8 +1,10 @@
-import os
-import json
+from unittest import mock
+
 import pytest
+
 from opentrons.types import Point
-from opentrons.protocol_api import execute_v1, ProtocolContext
+from opentrons.protocol_api import execute_v1, ProtocolContext, execute
+from opentrons.protocols.parse import parse
 
 
 # TODO Ian 2018-11-07 when `model` is dropped, delete its test case
@@ -134,10 +136,8 @@ def test_load_labware_trash(loop):
     assert result['someTrashId'] == ctx.fixed_trash
 
 
-def test_dispatch_commands(monkeypatch, loop):
-    with open(os.path.join(os.path.dirname(__file__), 'data',
-                           'v1_json_dispatch.json'), 'r') as f:
-        protocol_data = json.load(f)
+def test_dispatch_commands(monkeypatch, loop, get_json_protocol_fixture):
+    protocol_data = get_json_protocol_fixture('1', 'simple')
     ctx = ProtocolContext(loop=loop)
     cmd = []
     flow_rates = []
@@ -187,3 +187,12 @@ def test_dispatch_commands(monkeypatch, loop):
         (101, None),
         (None, 102),
     ]
+
+
+def test_legacy_execute_json_v1(monkeypatch, loop, get_json_protocol_fixture):
+    protocol_str = get_json_protocol_fixture('1', 'simple', False)
+    protocol = parse(protocol_str)
+    ctx = ProtocolContext(loop=loop)
+    ctx.home()
+    # Check that we end up executing the protocol ok
+    execute.run_protocol(protocol, True, ctx)

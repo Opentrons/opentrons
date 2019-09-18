@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "3",
+  "metadata": {
+    "protocol-name": "Simple test protocol v1",
+    "author": "engineering <engineering@opentrons.com>",
+    "description": "A short test protocol",
+    "created": 1223131231,
+    "last-modified": null,
+    "category": null,
+    "subcategory": null,
+    "tags": ["unitTest"]
+  },
+  "robot": {
+    "model": "OT-2 Standard"
+  },
+  "commands": [
+    {
+      "command": "pickUpTip",
+      "params": {
+        "pipette": "pipetteId",
+        "labware": "tiprackId",
+        "well": "B1"
+      }
+    },
+    {
+      "command": "aspirate",
+      "params": {
+        "pipette": "pipetteId",
+        "labware": "sourcePlateId",
+        "well": "A1",
+        "volume": 5,
+        "flowRate": 3,
+        "offsetFromBottomMm": 2
+      }
+    },
+    {
+      "command": "delay",
+      "params": {
+        "wait": 42
+      }
+    },
+    {
+      "command": "dispense",
+      "params": {
+        "pipette": "pipetteId",
+        "labware": "destPlateId",
+        "well": "B1",
+        "volume": 4.5,
+        "flowRate": 2.5,
+        "offsetFromBottomMm": 1
+      }
+    },
+    {
+      "command": "touchTip",
+      "params": {
+        "pipette": "pipetteId",
+        "labware": "destPlateId",
+        "well": "B1",
+        "offsetFromBottomMm": 11
+      }
+    },
+    {
+      "command": "blowout",
+      "params": {
+        "pipette": "pipetteId",
+        "labware": "destPlateId",
+        "well": "B1",
+        "flowRate": 2,
+        "offsetFromBottomMm": 12
+      }
+    },
+    {
+      "command": "moveToSlot",
+      "params": {
+        "pipette": "pipetteId",
+        "slot": "5",
+        "offset": {
+          "x": 1,
+          "y": 2,
+          "z": 3
+        }
+      }
+    },
+    {
+      "command": "dropTip",
+      "params": {
+        "pipette": "pipetteId",
+        "labware": "trashId",
+        "well": "A1"
+      }
+    }
+  ]
+}

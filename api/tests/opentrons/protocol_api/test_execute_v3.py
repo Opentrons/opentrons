@@ -1,7 +1,6 @@
-from pathlib import Path
-import json
 from opentrons.types import Point
-from opentrons.protocol_api import execute_v3, ProtocolContext
+from opentrons.protocol_api import execute_v3, ProtocolContext, execute
+from opentrons.protocols.parse import parse
 
 
 def test_load_labware_v2(loop, get_labware_fixture):
@@ -99,11 +98,8 @@ class MockPipette(object):
             self.log.append(("set: {}".format(name), value))
 
 
-def test_dispatch_commands(monkeypatch, loop):
-    with open(Path(__file__).parent / 'data' / 'v3_json_dispatch.json',
-              'r') as f:
-        protocol_data = json.load(f)
-
+def test_dispatch_commands(monkeypatch, loop, get_json_protocol_fixture):
+    protocol_data = get_json_protocol_fixture('3', 'simple')
     command_log = []
     mock_pipette = MockPipette(command_log)
     insts = {"pipetteId": mock_pipette}
@@ -152,3 +148,13 @@ def test_dispatch_commands(monkeypatch, loop):
             {"force_direct": None, "minimum_z_height": None}),
         ("drop_tip", (ctx.fixed_trash['A1'],))
     ]
+
+
+def test_papi_execute_json_v3(monkeypatch, loop, get_json_protocol_fixture):
+    protocol_data = get_json_protocol_fixture(
+        '3', 'testAllAtomicSingleV3', False)
+    protocol = parse(protocol_data, None)
+    ctx = ProtocolContext(loop=loop)
+    ctx.home()
+    # Check that we end up executing the protocol ok
+    execute.run_protocol(protocol, True, ctx)

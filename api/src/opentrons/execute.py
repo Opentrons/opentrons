@@ -14,6 +14,7 @@ import threading
 from typing import Any, Callable, Dict, List, Optional, TextIO
 
 from opentrons import protocol_api, robot, legacy_api, __version__
+from opentrons.protocol_api import execute as execute_apiv2
 from opentrons import commands
 from opentrons.config import feature_flags as ff
 from opentrons.protocols.parse import parse
@@ -172,9 +173,9 @@ def execute(protocol_file: TextIO,
             context.broker.subscribe(
                 commands.command_types.COMMAND, emit_runlog)
         context.home()
-        protocol_api.execute.run_protocol(protocol,
-                                          simulate=False,
-                                          context=context)
+        execute_apiv2.run_protocol(protocol,
+                                   simulate=False,
+                                   context=context)
     else:
         robot.connect()
         robot.cache_instrument_models()
@@ -184,7 +185,7 @@ def execute(protocol_file: TextIO,
             robot.broker.subscribe(
                 commands.command_types.COMMAND, emit_runlog)
         if isinstance(protocol, JsonProtocol):
-            legacy_api.protocols.execute_protocol(protocol.contents)
+            legacy_api.protocols.execute_protocol(protocol)
         else:
             exec(protocol.contents, {})
 

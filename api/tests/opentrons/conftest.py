@@ -512,3 +512,18 @@ def get_labware_fixture():
             return json.load(f)
 
     return _get_labware_fixture
+
+
+@pytest.fixture
+def get_json_protocol_fixture():
+    def _get_json_protocol_fixture(fixture_version, fixture_name, decode=True):
+        with open(pathlib.Path(__file__).parent /
+                  '..'/'..'/'..'/'shared-data'/'protocol'/'fixtures' /
+                  fixture_version/f'{fixture_name}.json', 'r') as f:
+            contents = f.read()
+            if decode:
+                return json.loads(contents)
+            else:
+                return contents
+
+    return _get_json_protocol_fixture

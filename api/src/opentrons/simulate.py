@@ -154,7 +154,7 @@ def simulate(protocol_file,
         scraper = CommandScraper(stack_logger, log_level,
                                  opentrons.robot.broker)
         if isinstance(protocol, JsonProtocol):
-            opentrons.legacy_api.protocols.execute_protocol(protocol.contents)
+            opentrons.legacy_api.protocols.execute_protocol(protocol)
         else:
             exec(protocol.contents, {})
     return scraper.commands

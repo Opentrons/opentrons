@@ -7,6 +7,7 @@ class JsonProtocol(NamedTuple):
     text: str
     filename: Optional[str]
     contents: Dict[str, Any]
+    schema_version: int
 
 
 class PythonProtocol(NamedTuple):
