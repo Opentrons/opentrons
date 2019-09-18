@@ -1,4 +1,5 @@
 // @flow
+import assert from 'assert'
 import cloneDeep from 'lodash/cloneDeep'
 import range from 'lodash/range'
 import mapValues from 'lodash/mapValues'
@@ -18,7 +19,7 @@ import type {
   StepItemSourceDestRow,
 } from './types'
 
-import { consolidate, distribute, transfer, mix } from '../step-generation'
+import { consolidate, distribute, transfer } from '../step-generation'
 
 import type { StepIdType } from '../form-types'
 import type { InvariantContext, RobotState } from '../step-generation'
@@ -26,7 +27,6 @@ import type { InvariantContext, RobotState } from '../step-generation'
 import type {
   ConsolidateArgs,
   DistributeArgs,
-  MixArgs,
   PauseArgs,
   TransferArgs,
 } from '../step-generation/types'
@@ -34,7 +34,7 @@ import type {
 export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
 
 function transferLikeSubsteps(args: {|
-  stepArgs: ConsolidateArgs | DistributeArgs | TransferArgs | MixArgs,
+  stepArgs: ConsolidateArgs | DistributeArgs | TransferArgs,
   invariantContext: InvariantContext,
   robotState: RobotState,
   stepId: StepIdType,
@@ -52,11 +52,11 @@ function transferLikeSubsteps(args: {|
 
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
 
-  // TODO Ian 2018-04-06 use assert here
   if (!pipetteSpec) {
     console.warn(
       `Pipette "${pipetteId}" does not exist, step ${stepId} can't determine channels`
     )
+    assert(false, 'no pipette spec')
     return null
   }
 
@@ -102,13 +102,11 @@ function transferLikeSubsteps(args: {|
       invariantContext,
       robotState
     )
-  } else if (stepArgs.commandCreatorFnName === 'mix') {
-    substepCommandCreators = mix(stepArgs)(invariantContext, robotState)
   } else {
-    // TODO Ian 2018-05-21 Use assert here. Should be unreachable
     console.warn(
       `transferLikeSubsteps got unsupported stepType "${stepArgs.commandCreatorFnName}"`
     )
+    assert(false, 'unsupported stepType')
     return null
   }
 
@@ -159,7 +157,7 @@ function transferLikeSubsteps(args: {|
           return {
             activeTips,
             source,
-            dest: stepArgs.commandCreatorFnName === 'mix' ? source : dest, // NOTE: since source and dest are same for mix, we're showing source on both sides. Otherwise dest would show the intermediate volume state
+            dest,
             volume: showDispenseVol
               ? nextMultiRow.volume
               : currentMultiRow.volume,
@@ -289,11 +287,15 @@ export function generateSubsteps(
     return formData
   }
 
+  if (stepArgs.commandCreatorFnName === 'mix') {
+    // UX choice: don't show substeps for Mix step type
+    return null
+  }
+
   if (
     stepArgs.commandCreatorFnName === 'consolidate' ||
     stepArgs.commandCreatorFnName === 'distribute' ||
-    stepArgs.commandCreatorFnName === 'transfer' ||
-    stepArgs.commandCreatorFnName === 'mix'
+    stepArgs.commandCreatorFnName === 'transfer'
   ) {
     return transferLikeSubsteps({
       stepArgs,
