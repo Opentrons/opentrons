@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import type { BaseState, ThunkDispatch } from '../types'
