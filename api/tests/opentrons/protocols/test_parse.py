@@ -132,12 +132,6 @@ def run(ctx):
     assert check(prot_api2_meta1) == expected[prot_api2_meta1]
     assert check(prot_api2_meta2) == expected[prot_api2_meta2]
 
-    # for protocol, expected_version in expected.items():
-    #     parsed = ast.parse(protocol, filename='test', mode='exec')
-    #     metadata = extract_metadata(parsed)
-    #     detected_version = infer_version(metadata, parsed)
-    #     assert detected_version == expected_version
-
 
 def test_get_protocol_schema_version():
     assert _get_protocol_schema_version({'protocol-schema': '1.0.0'}) == 1

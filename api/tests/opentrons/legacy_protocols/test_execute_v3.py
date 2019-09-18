@@ -224,4 +224,3 @@ def test_legacy_execute_json_v3(get_json_protocol_fixture):
     protocol = JsonProtocol(text=json.dumps(protocol_data), filename=None,
                             contents=protocol_data, schema_version=3)
     execute_protocol(protocol)
-
