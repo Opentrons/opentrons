@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import type { BaseState, ThunkDispatch } from '../types'
@@ -61,11 +60,9 @@ const makeMapStateToProps: () => (BaseState, OP) => SP = () => {
     const argsAndErrors = getArgsAndErrors(state, { stepId })
     const step = getStep(state, { stepId })
 
-    const formAndFieldErrors =
-      argsAndErrors[stepId] && argsAndErrors[stepId].errors
     const hasError =
       fileDataSelectors.getErrorStepId(state) === stepId ||
-      !isEmpty(formAndFieldErrors)
+      argsAndErrors.errors !== undefined
 
     const hasWarnings =
       dismissSelectors.getHasTimelineWarningsPerStep(state)[stepId] ||
