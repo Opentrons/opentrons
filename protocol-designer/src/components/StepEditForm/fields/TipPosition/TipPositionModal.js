@@ -51,9 +51,10 @@ const roundValue = (value: number | string): number =>
 class TipPositionModal extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
-    const initialValue = props.mmFromBottom
-      ? roundValue(props.mmFromBottom)
-      : roundValue(this.getDefaultMmFromBottom())
+    const initialValue =
+      props.mmFromBottom != null
+        ? roundValue(props.mmFromBottom)
+        : roundValue(this.getDefaultMmFromBottom())
     this.state = { value: initialValue }
   }
   componentDidUpdate(prevProps: Props) {
