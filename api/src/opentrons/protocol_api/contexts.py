@@ -255,9 +255,16 @@ class ProtocolContext(CommandPublisher):
         """ Get the labwares that have been loaded into the protocol context.
 
         Slots with nothing in them will not be present in the return value.
-        If a module is in a slot, if a labware is loaded into it that labware
-        will be returned. If no labware is loaded into the module, the module
-        geometry will be returned.
+
+        .. note::
+
+            If a module is present on the deck but no labware has been loaded
+            into it with :py:meth:`.ModuleContext.load_labware`, there will
+            be no entry for that slot in this value. That means you should not
+            use ``loaded_labwares`` to determine if a slot is available or not,
+            only to get a list of labwares. If you want a data structure of all
+            objects on the deck regardless of type, see :py:attr:`deck`.
+
 
         :returns: Dict mapping deck slot number to labware, sorted in order of
                   the locations.
@@ -270,8 +277,6 @@ class ProtocolContext(CommandPublisher):
                 elif isinstance(slotitem, ModuleGeometry):
                     if slotitem.labware:
                         yield slotnum, slotitem.labware
-                    else:
-                        yield slotnum, slotitem
 
         return dict(_only_labwares())
 
@@ -533,6 +538,15 @@ class ProtocolContext(CommandPublisher):
     @property
     def deck(self) -> geometry.Deck:
         """ The object holding the deck layout of the robot.
+
+        This object behaves like a dictionary with keys for both numeric
+        and string slot numbers (for instance, ``protocol.deck[1]`` and
+        ``protocol.deck['1']`` will both return the object in slot 1). If
+        nothing is loaded into a slot, ``None`` will be present. This object
+        is useful for determining if a slot in the deck is free. Rather than
+        filtering the objects in the deck map yourself, you can also use
+        :py:attr:`loaded_labwares` to see a dict of labwares and
+        :py:attr:`loaded_modules` to see a dict of modules.
         """
         return self._deck_layout
 

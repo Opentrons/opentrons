@@ -649,15 +649,14 @@ def test_loaded_labwares(loop):
     assert ctx.loaded_labwares == {12: ctx.fixed_trash}
     lw1 = ctx.load_labware('opentrons_96_tiprack_300ul', 3)
     lw2 = ctx.load_labware('opentrons_96_tiprack_300ul', 8)
-    mod1 = ctx.load_module('tempdeck', 4)
+    ctx.load_module('tempdeck', 4)
     mod2 = ctx.load_module('magdeck', 5)
     mod_lw = mod2.load_labware('biorad_96_wellplate_200ul_pcr')
     assert ctx.loaded_labwares[3] == lw1
     assert ctx.loaded_labwares[8] == lw2
-    assert ctx.loaded_labwares[4] == mod1.geometry
     assert ctx.loaded_labwares[5] == mod_lw
     assert sorted(ctx.loaded_labwares.keys())\
-        == sorted([3, 4, 5, 8, 12])
+        == sorted([3, 5, 8, 12])
 
 
 def test_loaded_modules(loop, monkeypatch):
