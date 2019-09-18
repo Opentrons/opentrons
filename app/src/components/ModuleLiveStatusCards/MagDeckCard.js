@@ -9,13 +9,15 @@ import StatusItem from './StatusItem'
 
 type Props = {|
   module: MagDeckModule,
-  initiallyExpanded: boolean,
+  isCardExpanded: boolean,
+  toggleCard: boolean => mixed,
 |}
 
-const MagDeckCard = ({ module, initiallyExpanded }: Props) => (
+const MagDeckCard = ({ module, isCardExpanded, toggleCard }: Props) => (
   <StatusCard
     title={getModuleDisplayName(module.name)}
-    initiallyExpanded={initiallyExpanded}
+    isCardExpanded={isCardExpanded}
+    toggleCard={toggleCard}
   >
     <CardContentRow>
       <StatusItem status={module.status} />

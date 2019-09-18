@@ -90,14 +90,16 @@ type Props = {|
   module: ThermocyclerModule,
   sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
   isProtocolActive: boolean,
-  initiallyExpanded: boolean,
+  isCardExpanded: boolean,
+  toggleCard: boolean => mixed,
 |}
 
 const ThermocyclerCard = ({
   module,
   sendModuleCommand,
   isProtocolActive,
-  initiallyExpanded,
+  isCardExpanded,
+  toggleCard,
 }: Props) => {
   const {
     currentTemp,
@@ -119,7 +121,8 @@ const ThermocyclerCard = ({
   return (
     <StatusCard
       title={getModuleDisplayName(module.name)}
-      initiallyExpanded={initiallyExpanded}
+      isCardExpanded={isCardExpanded}
+      toggleCard={toggleCard}
     >
       <CardContentRow>
         <StatusItem status={module.status} />

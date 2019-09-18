@@ -13,24 +13,25 @@ type Props = {|
   module: TempDeckModule,
   sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
   isProtocolActive: boolean,
-  __tempdeckControlsEnabled: boolean,
-  initiallyExpanded: boolean,
+  isCardExpanded: boolean,
+  toggleCard: boolean => mixed,
 |}
 
 const TempDeckCard = ({
   module,
   sendModuleCommand,
   isProtocolActive,
-  __tempdeckControlsEnabled,
-  initiallyExpanded,
+  isCardExpanded,
+  toggleCard,
 }: Props) => (
   <StatusCard
     title={getModuleDisplayName(module.name)}
-    initiallyExpanded={initiallyExpanded}
+    isCardExpanded={isCardExpanded}
+    toggleCard={toggleCard}
   >
     <CardContentRow>
       <StatusItem status={module.status} />
-      {__tempdeckControlsEnabled && !isProtocolActive && (
+      {!isProtocolActive && (
         <TemperatureControl
           module={module}
           sendModuleCommand={sendModuleCommand}
