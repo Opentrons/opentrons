@@ -61,11 +61,9 @@ const makeMapStateToProps: () => (BaseState, OP) => SP = () => {
     const argsAndErrors = getArgsAndErrors(state, { stepId })
     const step = getStep(state, { stepId })
 
-    const formAndFieldErrors =
-      argsAndErrors[stepId] && argsAndErrors[stepId].errors
     const hasError =
       fileDataSelectors.getErrorStepId(state) === stepId ||
-      !isEmpty(formAndFieldErrors)
+      argsAndErrors.errors !== undefined
 
     const hasWarnings =
       dismissSelectors.getHasTimelineWarningsPerStep(state)[stepId] ||
