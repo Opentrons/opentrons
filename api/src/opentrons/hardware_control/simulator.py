@@ -5,7 +5,9 @@ from threading import Event
 from typing import Dict, Optional, List, Tuple
 from contextlib import contextmanager
 from opentrons import types
-from opentrons.config.pipette_config import config_models, configs
+from opentrons.config.pipette_config import (config_models,
+                                             config_names,
+                                             configs)
 from opentrons.drivers.smoothie_drivers import SimulatingDriver
 from . import modules
 
@@ -149,6 +151,11 @@ class Simulator:
         to_return: Dict[types.Mount, Dict[str, Optional[str]]] = {}
         for mount in types.Mount:
             expected_instr = expected.get(mount, None)
+            if expected_instr and expected_instr not in\
+               config_models + config_names:
+                raise RuntimeError(
+                    f'mount {mount.name}: invalid pipette type'
+                    f' {expected_instr}')
             init_instr = self._attached_instruments.get(mount, {})
             found_model = init_instr.get('model', '')
             if expected_instr and found_model\
