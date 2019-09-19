@@ -2,7 +2,7 @@
 // view info about the app and update
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { Route, Switch, Redirect, type ContextRouter } from 'react-router'
+import { Route, Switch, Redirect, type ContextRouter } from 'react-router-dom'
 import { push } from 'connected-react-router'
 
 import {

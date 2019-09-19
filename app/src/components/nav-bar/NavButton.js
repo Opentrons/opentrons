@@ -2,7 +2,7 @@
 // nav button container
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
+import { withRouter } from 'react-router-dom'
 
 import { selectors as robotSelectors } from '../../robot'
 
@@ -13,16 +13,14 @@ import {
 import { getConnectedRobot } from '../../discovery'
 import { NavButton } from '@opentrons/components'
 
-import type { ContextRouter } from 'react-router'
+import type { ContextRouter } from 'react-router-dom'
 import type { State } from '../../types'
 
-type WithRouterOP = {| name: string |}
-
-type OP = {| ...ContextRouter, ...WithRouterOP |}
+type OP = {| ...ContextRouter, name: string |}
 
 type Props = React.ElementProps<typeof NavButton>
 
-export default withRouter<WithRouterOP>(
+export default withRouter<_, _>(
   connect<Props, OP, _, _, _, _>(mapStateToProps)(NavButton)
 )
 

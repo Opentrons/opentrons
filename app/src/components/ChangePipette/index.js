@@ -2,14 +2,24 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { push, goBack } from 'connected-react-router'
-import { Switch, Route, withRouter, type Match } from 'react-router'
+import { Switch, Route, withRouter } from 'react-router-dom'
 import {
   getPipetteNameSpecs,
   getPipetteModelSpecs,
   type PipetteDisplayCategory,
 } from '@opentrons/shared-data'
-import { getConfig } from '../../config'
 
+import { getConfig } from '../../config'
+import { fetchPipettes, getPipettesState } from '../../robot-api'
+import {
+  home,
+  moveRobotTo,
+  disengagePipetteMotors,
+  makeGetRobotMove,
+  makeGetRobotHome,
+} from '../../http-api-client'
+
+import type { ContextRouter } from 'react-router-dom'
 import type {
   PipetteNameSpecs,
   PipetteModelSpecs,
@@ -19,15 +29,6 @@ import type { Mount } from '../../robot'
 import type { Robot } from '../../discovery'
 import type { Direction, ChangePipetteProps } from './types'
 import type { RobotHome, RobotMove } from '../../http-api-client'
-import {
-  home,
-  moveRobotTo,
-  disengagePipetteMotors,
-  makeGetRobotMove,
-  makeGetRobotHome,
-} from '../../http-api-client'
-
-import { fetchPipettes, getPipettesState } from '../../robot-api'
 
 import ClearDeckAlertModal from '../ClearDeckAlertModal'
 import ExitAlertModal from './ExitAlertModal'
@@ -36,15 +37,11 @@ import Instructions from './Instructions'
 import ConfirmPipette from './ConfirmPipette'
 import RequestInProgressModal from './RequestInProgressModal'
 
-type Props = {
-  match: Match,
+type Props = {|
+  ...ContextRouter,
   robot: Robot,
   parentUrl: string,
-}
-
-const TITLE = 'Pipette Setup'
-// used to guarantee mount param in route is left or right
-const RE_MOUNT = '(left|right)'
+|}
 
 type OP = {|
   title: string,
@@ -80,8 +77,12 @@ type DP = {|
   goToConfirmUrl: () => mixed,
 |}
 
-const ConnectedChangePipetteRouter = withRouter<OP>(
-  connect<ChangePipetteProps, _, SP, DP, State, Dispatch>(
+const TITLE = 'Pipette Setup'
+// used to guarantee mount param in route is left or right
+const RE_MOUNT = '(left|right)'
+
+const ConnectedChangePipetteRouter = withRouter<_, _>(
+  connect<ChangePipetteProps, OP, SP, DP, State, Dispatch>(
     makeMapStateToProps,
     mapDispatchToProps
   )(ChangePipetteRouter)

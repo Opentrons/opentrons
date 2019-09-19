@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
+import { withRouter } from 'react-router-dom'
 import { push } from 'connected-react-router'
 import find from 'lodash/find'
 
@@ -14,15 +14,16 @@ import { AlertModal } from '@opentrons/components'
 import { Portal } from '../portal'
 import ModalCopy from './ModalCopy'
 
-import type { ContextRouter } from 'react-router'
+import type { ContextRouter } from 'react-router-dom'
 import type { State, Dispatch } from '../../types'
 
+type OP = ContextRouter
 type SP = {| ok: ?boolean |}
 type DP = {| disconnect: () => mixed |}
-type Props = { ...SP, ...DP }
+type Props = {| ...OP, ...SP, ...DP |}
 
-export default withRouter<{||}>(
-  connect<Props, ContextRouter, SP, DP, State, Dispatch>(
+export default withRouter<_, _>(
+  connect<Props, OP, SP, DP, State, Dispatch>(
     mapStateToProps,
     mapDispatchToProps
   )(LostConnectionAlert)

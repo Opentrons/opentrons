@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
+import { withRouter } from 'react-router-dom'
 
 import {
   constants as robotConstants,
@@ -19,7 +19,7 @@ type Props = {
 
 const TITLE = 'Pipette Calibration'
 
-export default withRouter<{||}>(
+export default withRouter<{||}, _>(
   connect<Props, _, _, _, _, _>(mapStateToProps)(PipetteList)
 )
 

@@ -2,7 +2,7 @@
 // upload progress container
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { withRouter, Route, Switch, Redirect } from 'react-router'
+import { withRouter, Route, Switch, Redirect } from 'react-router-dom'
 
 import { selectors as robotSelectors } from '../../robot'
 import { getProtocolFilename } from '../../protocol'
@@ -12,8 +12,8 @@ import { Splash } from '@opentrons/components'
 import Page from '../../components/Page'
 import FileInfo from './FileInfo'
 
-import type { ContextRouter } from 'react-router'
-import type { State } from '../../types'
+import type { ContextRouter } from 'react-router-dom'
+import type { State, Dispatch } from '../../types'
 import type { Robot } from '../../discovery'
 
 type OP = ContextRouter
@@ -26,9 +26,9 @@ type SP = {|
   sessionLoaded: boolean,
 |}
 
-type Props = { ...OP, ...SP }
+type Props = {| ...OP, ...SP, dispatch: Dispatch |}
 
-export default withRouter<{||}>(
+export default withRouter<_, _>(
   connect<Props, OP, SP, _, _, _>(mapStateToProps)(UploadPage)
 )
 

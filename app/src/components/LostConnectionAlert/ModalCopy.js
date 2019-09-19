@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { Switch, Route } from 'react-router'
+import { Switch, Route } from 'react-router-dom'
 
 import styles from './styles.css'
 

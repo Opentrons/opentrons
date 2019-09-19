@@ -2,7 +2,7 @@
 // setup labware page
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { Route, Redirect, withRouter } from 'react-router'
+import { Route, Redirect, withRouter } from 'react-router-dom'
 import { push } from 'connected-react-router'
 
 import { selectors as robotSelectors } from '../../robot'
@@ -18,7 +18,7 @@ import ConfirmModal from '../../components/CalibrateLabware/ConfirmModal'
 import ConnectModules from '../../components/ConnectModules'
 import PrepareModules from '../../components/PrepareModules'
 
-import type { ContextRouter } from 'react-router'
+import type { ContextRouter } from 'react-router-dom'
 import type { State, Dispatch } from '../../types'
 import type { Labware } from '../../robot'
 import type { Robot } from '../../discovery'
@@ -36,9 +36,9 @@ type SP = {|
 
 type DP = {| onBackClick: () => mixed |}
 
-type Props = { ...OP, ...SP, ...DP }
+type Props = {| ...OP, ...SP, ...DP |}
 
-export default withRouter<{||}>(
+export default withRouter<_, _>(
   connect<Props, OP, SP, _, _, _>(
     mapStateToProps,
     mapDispatchToProps

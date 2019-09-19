@@ -1,6 +1,6 @@
 // list and list item components tests
 import React from 'react'
-import { MemoryRouter } from 'react-router'
+import { MemoryRouter } from 'react-router-dom'
 import Renderer from 'react-test-renderer'
 
 import { SidePanelGroup, TitledList, ListItem, ListAlert } from '..'
