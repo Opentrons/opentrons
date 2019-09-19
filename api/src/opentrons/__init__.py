@@ -5,20 +5,19 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 from opentrons import config  # noqa(E402)
 from opentrons.data_storage import database_migration  # noqa(E402)
 
+if not config.feature_flags.use_protocol_api_v2():
+    from .legacy_api.api import (robot as robotv1,   # noqa(E402)
+                                 reset as resetv1,
+                                 instruments as instrumentsv1,
+                                 containers as containersv1,
+                                 labware as labwarev1,
+                                 modules as modulesv1)
 
 if os.environ.get('OT_UPDATE_SERVER') != 'true'\
    and not config.feature_flags.use_protocol_api_v2():
     database_migration.check_version_and_perform_full_migration()
-else:
+elif not config.feature_flags.use_protocol_api_v2():
     database_migration.check_version_and_perform_minimal_migrations()
-
-from .legacy_api.api import (robot as robotv1,   # noqa(E402)
-                             reset as resetv1,
-                             instruments as instrumentsv1,
-                             containers as containersv1,
-                             labware as labwarev1,
-                             modules as modulesv1)
-
 
 try:
     with open(os.path.join(HERE, 'package.json')) as pkg:

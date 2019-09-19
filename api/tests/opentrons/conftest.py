@@ -162,10 +162,7 @@ def using_sync_api2(loop):
     try:
         yield hardware
     finally:
-        try:
-            hardware.reset()
-        except RuntimeError:
-            hardware.reset()
+        hardware.reset()
         if None is oldenv:
             os.environ.pop('OT_API_FF_useProtocolApi2')
         else:
