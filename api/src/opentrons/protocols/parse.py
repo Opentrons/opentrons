@@ -183,10 +183,10 @@ def validate_json(protocol_json: Dict[Any, Any]) -> int:
     version_num = _get_protocol_schema_version(protocol_json)
     protocol_schema = _get_schema_for_protocol(version_num)
     # instruct schema how to resolve all $ref's used in protocol schemas
-    labware_schema_v2 = json.loads(  # type: ignore
-        pkgutil.get_data(
-            'opentrons',
-            'shared_data/labware/schemas/2.json').decode('utf-8'))
+    schema_body = pkgutil.get_data(  # type: ignore
+        'opentrons',
+        'shared_data/labware/schemas/2.json').decode('utf-8')
+    labware_schema_v2 = json.loads(schema_body)
 
     resolver = jsonschema.RefResolver(
         protocol_schema.get('$id', ''),
