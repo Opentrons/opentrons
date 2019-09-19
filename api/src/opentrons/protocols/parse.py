@@ -175,7 +175,7 @@ def _get_schema_for_protocol(version_num: int) -> Dict[Any, Any]:
     if not schema:
         raise RuntimeError('JSON Protocol schema "{}" does not exist'
                            .format(version_num))
-    return json.loads(schema)
+    return json.loads(schema.decode('utf-8'))
 
 
 def validate_json(protocol_json: Dict[Any, Any]) -> int:
@@ -186,7 +186,7 @@ def validate_json(protocol_json: Dict[Any, Any]) -> int:
     labware_schema_v2 = json.loads(  # type: ignore
         pkgutil.get_data(
             'opentrons',
-            'shared_data/labware/schemas/2.json'))
+            'shared_data/labware/schemas/2.json').decode('utf-8'))
 
     resolver = jsonschema.RefResolver(
         protocol_schema.get('$id', ''),
