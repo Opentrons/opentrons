@@ -69,13 +69,16 @@ def get_protocol_api() -> protocol_api.ProtocolContext:
     return context
 
 
-def get_arguments() -> argparse.ArgumentParser:
+def get_arguments(
+        parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     """ Get the argument parser for this module
 
     Useful if you want to use this module as a component of another CLI program
     and want to add its arguments.
+
+    :param parser: A parser to add arguments to.
+    :returns argparse.ArgumentParser: The parser with arguments added.
     """
-    parser = argparse.ArgumentParser(description='Run an OT-2 protocol')
     parser.add_argument(
         '-l', '--log-level',
         choices=['debug', 'info', 'warning', 'error', 'none'],
@@ -85,17 +88,8 @@ def get_arguments() -> argparse.ArgumentParser:
         'this option and should be configured in the config file. If '
         '\'none\', do not show logs')
     parser.add_argument(
-        '-a', '--api-level',
-        choices=['auto', '1', '2'],
-        default='auto',
-        help='Override the automatic deduction of protocol API level to use '
-        'when executing this protocol. By default, the metadata (if any), '
-        'imports, and structure of the protocol are examined; if this isn\'t '
-        'working, you can specify -a 1 or -a 2 here.'
-    )
-    parser.add_argument(
         'protocol', metavar='PROTOCOL',
-        type=argparse.FileType,
+        type=argparse.FileType('r'),
         help='The protocol file to execute. If you pass \'-\', you can pipe '
         'the protocol via stdin; this could be useful if you want to use this '
         'utility as part of an automated workflow.')
@@ -207,14 +201,16 @@ def _main(argv: List[str]) -> int:
                   return code passed to :py:meth:`sys.exit` (0 means success,
                   anything else is a kind of failure).
     """
-    parser = get_arguments()
+    parser = argparse.ArgumentParser(prog='opentrons_execute',
+                                     description='Run an OT-2 protocol')
+    parser = get_arguments(parser)
     # don't want to add this in get_arguments because if somebody upstream is
     # using that parser they probably want their own version
     parser.add_argument(
         '-v', '--version', action='version', version=__version__)
     parser.add_argument(
         '-n', '--no-print-runlog', action='store_true',
-        description='Do not print the commands as they are executed')
+        help='Do not print the commands as they are executed')
     args = parser.parse_args(argv)
     protofile = args.protocol.read()
     printer = None if args.no_print_runlog else _print_runlog

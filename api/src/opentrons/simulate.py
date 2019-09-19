@@ -1,5 +1,7 @@
-"""
-An easy entrypoint for simulating a protocol offline.
+""" opentrons.simulate: functions and entrypoints for simulating protocols
+
+This module has functions that provide a console entrypoint for simulating
+a protocol from the command line.
 """
 
 import argparse
@@ -14,6 +16,7 @@ import opentrons.commands
 import opentrons.broker
 from opentrons.protocols import parse
 from opentrons.protocols.types import JsonProtocol
+import opentrons.protocol_api.execute
 
 
 class AccumulatingHandler(logging.Handler):
@@ -54,12 +57,13 @@ class CommandScraper:
         self._logger = logger
         self._broker = broker
         self._queue = queue.Queue()  # type: ignore
-        level = getattr(logging, level.upper(), logging.WARNING)
-        self._logger.setLevel(level)
-        logger.addHandler(
-            AccumulatingHandler(
-                level,
-                self._queue))
+        if level != 'none':
+            level = getattr(logging, level.upper(), logging.WARNING)
+            self._logger.setLevel(level)
+            logger.addHandler(
+                AccumulatingHandler(
+                    level,
+                    self._queue))
         self._depth = 0
         self._commands: List[Mapping[str, Mapping[str, Any]]] = []
         self._unsub = self._broker.subscribe(
@@ -181,17 +185,42 @@ def format_runlog(runlog: List[Mapping[str, Any]]) -> str:
     return '\n'.join(to_ret)
 
 
+def get_arguments(
+        parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
+    """ Get the argument parser for this module
+
+    Useful if you want to use this module as a component of another CLI program
+    and want to add its arguments.
+
+    :param parser: A parser to add arguments to. If not specified, one will be
+                   created.
+    :returns argparse.ArgumentParser: The parser with arguments added.
+    """
+    parser.add_argument(
+        '-l', '--log-level',
+        choices=['debug', 'info', 'warning', 'error', 'none'],
+        default='warning',
+        help='Specify the level filter for logs to show on the command line. '
+        'Log levels below warning can be chatty. If "none", do not show logs')
+    parser.add_argument(
+        'protocol', metavar='PROTOCOL',
+        type=argparse.FileType('r'),
+        help='The protocol file to simulate. If you pass \'-\', you can pipe '
+        'the protocol via stdin; this could be useful if you want to use this '
+        'utility as part of an automated workflow.')
+    return parser
+
+
 # Note - this script is also set up as a setuptools entrypoint and thus does
 # an absolute minimum of work since setuptools does something odd generating
 # the scripts
 def main():
     """ Run the simulation """
     parser = argparse.ArgumentParser(prog='opentrons_simulate',
-                                     description=__doc__)
-    parser.add_argument(
-        'protocol', metavar='PROTOCOL_FILE',
-        type=argparse.FileType('r'),
-        help='The protocol file to simulate (specify - to read from stdin).')
+                                     description='Simulate an OT-2 protocol')
+    parser = get_arguments(parser)
+    # don't want to add this in get_arguments because if somebody upstream is
+    # using that parser they probably want their own version
     parser.add_argument(
         '-v', '--version', action='version',
         version=f'%(prog)s {opentrons.__version__}',
@@ -201,13 +230,7 @@ def main():
         help='What to output during simulations',
         choices=['runlog', 'nothing'],
         default='runlog')
-    parser.add_argument(
-        '-l', '--log-level', action='store',
-        help=('Log level for the opentrons stack. Anything below warning '
-              'can be chatty'),
-        choices=['error', 'warning', 'info', 'debug'],
-        default='warning'
-    )
+
     args = parser.parse_args()
 
     runlog = simulate(args.protocol, log_level=args.log_level)
