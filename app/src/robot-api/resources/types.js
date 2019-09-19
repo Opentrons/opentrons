@@ -66,9 +66,14 @@ export type ThermocyclerModule = {|
   displayName: 'Thermocycler Module',
   data: ThermocyclerData,
 |}
-
+export type ModuleCommand =
+  | 'set_temperature'
+  | 'set_block_temperature'
+  | 'set_lid_temperature'
+  | 'deactivate'
+  | 'open'
 export type ModuleCommandRequest = {|
-  command_type: 'set_temperature' | 'deactivate' | 'open',
+  command_type: ModuleCommand,
   args?: Array<number>,
 |}
 

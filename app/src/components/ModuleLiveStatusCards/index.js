@@ -15,6 +15,7 @@ import { getConfig } from '../../config'
 import type { State, Dispatch } from '../../types'
 import type { Robot } from '../../discovery'
 
+import useSendModuleCommand from '../ModuleControls/useSendModuleCommand'
 import TempDeckCard from './TempDeckCard'
 import MagDeckCard from './MagDeckCard'
 import ThermocyclerCard from './ThermocyclerCard'
@@ -24,20 +25,9 @@ const ModuleLiveStatusCards = () => {
   const modules: Array<Module> = useSelector(state =>
     robot ? getModulesState(state, robot.name) : []
   )
-  const isProtocolActive: boolean = useSelector(robotSelectors.getIsActive)
   const dispatch = useDispatch<Dispatch>()
-  const sendModuleCommand = React.useCallback(
-    (serial: string, request: ModuleCommandRequest) => {
-      if (!robot) {
-        console.warn(
-          'attempted to send module command with no connected robot present'
-        )
-      } else {
-        dispatch(sendModuleCommandAction(robot, serial, request))
-      }
-    },
-    [robot]
-  )
+  const sendModuleCommand = useSendModuleCommand()
+  const isProtocolActive: boolean = useSelector(robotSelectors.getIsActive)
   const [expandedCard, setExpandedCard] = React.useState(
     modules.length > 0 ? modules[0].serial : ''
   )
