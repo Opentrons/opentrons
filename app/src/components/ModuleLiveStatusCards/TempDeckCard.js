@@ -7,7 +7,7 @@ import type { TempDeckModule, ModuleCommandRequest } from '../../robot-api'
 import StatusCard from './StatusCard'
 import CardContentRow from './CardContentRow'
 import StatusItem from './StatusItem'
-import TemperatureControl from './TemperatureControl'
+import TemperatureControl from '../ModuleControls/TemperatureControl'
 
 type Props = {|
   module: TempDeckModule,

@@ -10,7 +10,7 @@ import StatusCard from './StatusCard'
 import CardContentRow from './CardContentRow'
 import StatusItem from './StatusItem'
 import styles from './styles.css'
-import TemperatureControl from './TemperatureControl'
+import TemperatureControl from '../ModuleControls/TemperatureControl'
 
 type TempsItemProps = {|
   title: string,
@@ -150,7 +150,7 @@ const ThermocyclerCard = ({
           currentStepIndex={currentStepIndex}
         />
       )}
-      {holdTime != null && !executingProfile && (
+      {holdTime != null && holdTime > 0 && !executingProfile && (
         <CardContentRow>
           <TimeRemaining holdTime={holdTime} />
         </CardContentRow>

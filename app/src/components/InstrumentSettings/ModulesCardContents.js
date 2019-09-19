@@ -8,22 +8,16 @@ import type { Robot } from '../../discovery'
 type Props = {
   robot: Robot,
   modules: Array<Module>,
-  showControls: boolean,
 }
 
 export default function ModulesCardContents(props: Props) {
-  const { modules, robot, showControls } = props
+  const { modules, robot } = props
   if (modules.length === 0) return <NoModulesMessage />
 
   return (
     <React.Fragment>
       {modules.map((mod, index) => (
-        <ModuleItem
-          module={mod}
-          key={index}
-          robot={robot}
-          showControls={showControls}
-        />
+        <ModuleItem module={mod} key={index} robot={robot} />
       ))}
     </React.Fragment>
   )

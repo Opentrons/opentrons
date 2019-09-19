@@ -22,22 +22,8 @@ export default function StatusCard(props: Props) {
       onCollapseToggle={() => props.toggleCard(!props.isCardExpanded)}
       title={props.title}
       collapsed={!props.isCardExpanded}
-      // selected={props.isCardExpanded}
     >
       {props.children}
     </CollapsibleItem>
   )
-  // return (
-  //   <div
-  //     className={styles.status_card}
-  //     onClick={() => props.toggleCard(!props.isCardExpanded)}
-  //   >
-  //     <h3 className={styles.card_title}>{props.title}</h3>
-  //     {props.isCardExpanded && (
-  //       <div className={cx(styles.card_contents, props.className)}>
-  //         {props.children}
-  //       </div>
-  //     )}
-  //   </div>
-  // )
 }
