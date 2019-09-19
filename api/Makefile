@@ -104,7 +104,7 @@ lint: $(ot_py_sources)
 	$(python) -m mypy src/opentrons
 	$(python) -m pylama src/opentrons tests
 
-.PHONY: docs docs-html docs-doctest docs-pdf-local docs-pdf-ci
+.PHONY: docs-html docs-doctest docs-pdf-prep docs-pdf-local docs-pdf-ci docs-pdf docs
 
 docs-html: local-install
 	$(SHX) rm -rf docs/build/html
@@ -123,6 +123,8 @@ docs-pdf-prep: local-install
 docs-pdf-local: docs-pdf-prep
 	-$(sphinx_build) -b latex -d docs/build/doctrees docs/source docs/build/pdf
 	-$(MAKE) -C docs/build/pdf all-pdf
+	$(SHX) ls docs/build/pdf/*.pdf
+	$(SHX) cp docs/build/pdf/*.pdf docs/dist/
 
 docs-pdf-ci: docs-pdf-prep
 	$(sphinx_build) -b latex -d docs/build/doctrees docs/source docs/build/pdf
@@ -166,14 +168,14 @@ deploy: wheel
 	$(python) -m twine upload $(twine_auth_args)\
                             $(wheel_file)
 
-.PHONY: push
+.PHONY: push-balena
 push-balena: wheel
 	curl -X POST \
 		-H "Content-Type: multipart/form-data" \
 		-F "whl=@$(wildcard dist/opentrons-*.whl)" \
 		http://$(host):31950/server/update
 
-.PHONY: push-buildroot
+.PHONY: push
 push: wheel
 	scp -i $(br_ssh_key) $(ssh_opts) $(wheel_file) root@$(host):/data/
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host) \

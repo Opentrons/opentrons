@@ -1,35 +1,37 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
+import { useDispatch, useSelector } from 'react-redux'
 
-import CalibrationInfoContent from '../CalibrationInfoContent'
 import { PrimaryButton } from '@opentrons/components'
+import ClearDeckAlertModal from '../ClearDeckAlertModal'
+import CalibrationInfoContent from '../CalibrationInfoContent'
 
-import {
-  actions as robotActions,
-  selectors as robotSelectors,
-} from '../../robot'
+import { actions as robotActions } from '../../robot'
 
-import type { State, Dispatch } from '../../types'
+import { getDeckPopulated } from '../../robot/selectors'
+
+import type { Dispatch } from '../../types'
 import type { TipProbeProps } from './types'
 
-type OP = TipProbeProps
+export default function UnprobedPanel(props: TipProbeProps) {
+  const { mount, probed } = props
+  const [showClearDeck, setShowClearDeck] = React.useState(false)
+  const dispatch = useDispatch<Dispatch>()
+  const deckPopulated = useSelector(getDeckPopulated)
 
-type SP = {| _showContinueModal: boolean |}
+  const moveToFront = () => {
+    // $FlowFixMe: robotActions.moveToFront is not typed
+    dispatch(robotActions.moveToFront(mount))
+    setShowClearDeck(false)
+  }
 
-type DP = {| dispatch: Dispatch |}
-
-type Props = {| ...OP, onPrepareClick: () => void |}
-
-export default connect<Props, OP, SP, {||}, State, Dispatch>(
-  mapStateToProps,
-  null,
-  mergeProps
-)(UnprobedPanel)
-
-function UnprobedPanel(props: Props) {
-  const { probed, onPrepareClick } = props
+  const handleStart = () => {
+    if (deckPopulated === true || deckPopulated === null) {
+      setShowClearDeck(true)
+    } else {
+      moveToFront()
+    }
+  }
 
   const message = !probed
     ? 'Pipette tip is not calibrated'
@@ -40,37 +42,22 @@ function UnprobedPanel(props: Props) {
   const leftChildren = (
     <div>
       <p>{message}</p>
-      <PrimaryButton onClick={onPrepareClick}>{buttonText}</PrimaryButton>
+      <PrimaryButton onClick={handleStart}>{buttonText}</PrimaryButton>
     </div>
   )
 
-  return <CalibrationInfoContent leftChildren={leftChildren} />
-}
-
-function mapStateToProps(state, ownProps: OP): SP {
-  const deckPopulated = robotSelectors.getDeckPopulated(state)
-
-  return {
-    _showContinueModal: deckPopulated === true || deckPopulated === null,
-  }
-}
-
-function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
-  const { _showContinueModal } = stateProps
-  const { dispatch } = dispatchProps
-  const { mount, confirmTipProbeUrl } = ownProps
-
-  const onPrepareClick = _showContinueModal
-    ? () => {
-        dispatch(push(confirmTipProbeUrl))
-      }
-    : () => {
-        // $FlowFixMe: robotActions.moveToFront is not typed
-        dispatch(robotActions.moveToFront(mount))
-      }
-
-  return {
-    ...ownProps,
-    onPrepareClick,
-  }
+  return (
+    <>
+      <CalibrationInfoContent leftChildren={leftChildren} />
+      {showClearDeck && (
+        <ClearDeckAlertModal
+          continueText={'Move pipette to front'}
+          cancelText={'Cancel'}
+          onContinueClick={moveToFront}
+          onCancelClick={() => setShowClearDeck(false)}
+          removeTrash
+        />
+      )}
+    </>
+  )
 }

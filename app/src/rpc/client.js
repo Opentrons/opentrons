@@ -156,7 +156,7 @@ class RpcContext extends EventEmitter {
   }
 
   // cache required metadata from call results
-  // filter type field from type object to avoid getting unecessary types
+  // filter type field from type object to avoid getting unnecessary types
   _cacheCallResultMetadata(resultData) {
     if (!resultData || !resultData.i) {
       return

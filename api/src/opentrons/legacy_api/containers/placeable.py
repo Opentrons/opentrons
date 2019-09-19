@@ -336,6 +336,12 @@ class Placeable(object):
             self.z_size()
         )
 
+    def magdeck_engage_height(self):
+        """
+        Returns magnetic module engage height
+        """
+        return self.properties['magdeck_engage_height']
+
     def max_volume(self):
         """
         Returns placeable's maximum liquid volume in uL

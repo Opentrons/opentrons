@@ -97,7 +97,7 @@ jobs:
         - make install-js
       script:
         - make test-js
-        - make lint-js lint-css
+        - make lint-js lint-css format
         - make -C components
         - make -C protocol-designer
         - make -C labware-library
@@ -152,6 +152,7 @@ jobs:
       <<: *app_stage_build
       name: 'Build/deploy Opentrons App for macOS'
       os: osx
+      osx_image: xcode10.3
       script: make -C app-shell dist-osx
       if: tag =~ ^v OR branch =~ ^(edge|release_.+)$
 

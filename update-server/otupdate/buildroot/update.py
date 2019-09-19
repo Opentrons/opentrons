@@ -8,6 +8,7 @@ import asyncio
 import functools
 import logging
 import os
+from subprocess import CalledProcessError
 
 from typing import Optional
 
@@ -178,6 +179,11 @@ async def commit(
                   f'(currently {session.stage.value.short})'},
             status=409)
     async with request.app[RESTART_LOCK_NAME]:
+        try:
+            with file_actions.mount_update() as new_part:
+                file_actions.write_machine_id('/', new_part)
+        except (OSError, CalledProcessError):
+            LOG.exception('Failed to update machine-id')
         file_actions.commit_update()
         session.set_stage(Stages.READY_FOR_RESTART)
 

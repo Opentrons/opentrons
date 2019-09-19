@@ -31,8 +31,8 @@ GCODES = {
     'DEVICE_INFO': 'M115'
 }
 LID_TARGET_DEFAULT = 105    # Degree celsius
-LID_TARGET_MIN = 20
-LID_TARGET_MAX = 105
+LID_TARGET_MIN = 37
+LID_TARGET_MAX = 110
 TEMP_UPDATE_RETRIES = 15
 
 
@@ -288,7 +288,7 @@ class Thermocycler:
             if retries > TEMP_UPDATE_RETRIES:
                 break
 
-    async def set_lid_temperature(self, temp: Optional[float]) -> None:
+    async def set_lid_temperature(self, temp: float) -> None:
         if temp is None:
             self._lid_target = LID_TARGET_DEFAULT
         else:

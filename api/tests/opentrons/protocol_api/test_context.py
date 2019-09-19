@@ -29,12 +29,15 @@ def get_labware_def(monkeypatch):
 
 def test_load_instrument(loop):
     ctx = papi.ProtocolContext(loop=loop)
+    assert ctx.loaded_instruments == {}
     for model in config_models:
         loaded = ctx.load_instrument(model, Mount.LEFT, replace=True)
+        assert ctx.loaded_instruments[Mount.LEFT.name.lower()] == loaded
         assert loaded.model == model
         instr_name = name_for_model(model)
         loaded = ctx.load_instrument(instr_name, Mount.RIGHT, replace=True)
         assert loaded.name == instr_name
+        assert ctx.loaded_instruments[Mount.RIGHT.name.lower()] == loaded
 
 
 async def test_motion(loop):
@@ -639,3 +642,28 @@ def test_pipette_speed(loop, monkeypatch):
     assert instr.speed.aspirate == 1
     assert instr.speed.dispense == 10
     assert instr.speed.blow_out == 2
+
+
+def test_loaded_labwares(loop):
+    ctx = papi.ProtocolContext(loop)
+    assert ctx.loaded_labwares == {12: ctx.fixed_trash}
+    lw1 = ctx.load_labware('opentrons_96_tiprack_300ul', 3)
+    lw2 = ctx.load_labware('opentrons_96_tiprack_300ul', 8)
+    ctx.load_module('tempdeck', 4)
+    mod2 = ctx.load_module('magdeck', 5)
+    mod_lw = mod2.load_labware('biorad_96_wellplate_200ul_pcr')
+    assert ctx.loaded_labwares[3] == lw1
+    assert ctx.loaded_labwares[8] == lw2
+    assert ctx.loaded_labwares[5] == mod_lw
+    assert sorted(ctx.loaded_labwares.keys())\
+        == sorted([3, 5, 8, 12])
+
+
+def test_loaded_modules(loop, monkeypatch):
+    ctx = papi.ProtocolContext(loop)
+    assert ctx.loaded_modules == {}
+    mod1 = ctx.load_module('tempdeck', 4)
+    mod1.load_labware('biorad_96_wellplate_200ul_pcr')
+    mod2 = ctx.load_module('thermocycler')
+    assert ctx.loaded_modules[4] == mod1
+    assert ctx.loaded_modules[7] == mod2

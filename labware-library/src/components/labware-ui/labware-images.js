@@ -61,6 +61,18 @@ export default {
     require('../../images/opentrons_15_tuberack_side_view.jpg'),
     require('../../images/falcon_15ml_conical_tube.jpg'),
   ],
+  opentrons_10_tuberack_nest_4x50ml_6x15ml_conical: [
+    require('../../images/opentrons_10_tuberack_4_6_side_view.jpg'),
+    require('../../images/nest_50ml_15ml_conical_tubes.jpg'),
+  ],
+  opentrons_15_tuberack_nest_15ml_conical: [
+    require('../../images/opentrons_15_tuberack_side_view.jpg'),
+    require('../../images/nest_15ml_conical_tube.jpg'),
+  ],
+  opentrons_6_tuberack_nest_50ml_conical: [
+    require('../../images/opentrons_6_tuberack_side_view.jpg'),
+    require('../../images/nest_50ml_conical_tube.jpg'),
+  ],
   opentrons_1_trash_1100ml_fixed: [],
   opentrons_1_trash_850ml_fixed: [],
   opentrons_24_aluminumblock_generic_2ml_screwcap: [

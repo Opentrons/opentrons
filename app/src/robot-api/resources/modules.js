@@ -2,9 +2,17 @@
 // modules endpoints
 import { combineEpics, ofType } from 'redux-observable'
 import pathToRegexp from 'path-to-regexp'
-import { of } from 'rxjs'
+import { of, interval } from 'rxjs'
+import countBy from 'lodash/countBy'
 
-import { switchMap, withLatestFrom, filter } from 'rxjs/operators'
+import {
+  switchMap,
+  mergeMap,
+  withLatestFrom,
+  filter,
+  map,
+  takeWhile,
+} from 'rxjs/operators'
 
 import {
   getRobotApiState,
@@ -17,6 +25,7 @@ import {
 import { getConnectedRobot } from '../../discovery'
 import { selectors as robotSelectors } from '../../robot'
 import type { ConnectResponseAction } from '../../robot/actions'
+import type { SessionModule } from '../../robot/types'
 
 import type { State as AppState, ActionLike, Epic } from '../../types'
 import type { RobotHost, RobotApiAction } from '../types'
@@ -41,6 +50,8 @@ export const MODULES_PATH = '/modules'
 export const MODULE_DATA_PATH = '/modules/:serial/data'
 export const MODULE_BY_SERIAL_PATH = '/modules/:serial'
 
+const POLL_MODULE_INTERVAL_MS = 2000
+
 const RE_MODULE_DATA_PATH = pathToRegexp(MODULE_DATA_PATH)
 
 export const fetchModules = (host: RobotHost): RobotApiAction => ({
@@ -48,6 +59,7 @@ export const fetchModules = (host: RobotHost): RobotApiAction => ({
   payload: { host, method: GET, path: MODULES_PATH },
 })
 
+// TODO(mc, 2019-09-03): this endpoint is not used anywhere; is it needed?
 export const fetchModuleData = (
   host: RobotHost,
   id: string
@@ -71,25 +83,28 @@ const fetchModulesEpic = createBaseRobotApiEpic(FETCH_MODULES)
 const fetchModuleDataEpic = createBaseRobotApiEpic(FETCH_MODULE_DATA)
 const sendModuleCommandEpic = createBaseRobotApiEpic(SEND_MODULE_COMMAND)
 
-const eagerlyLoadModulesEpic: Epic = (action$, state$) =>
+// TODO(mc, 2019-09-03): replace polling with real-time WS notifications
+const pollModulesWhileConnectedEpic: Epic = (action$, state$) =>
   action$.pipe(
     ofType('robot:CONNECT_RESPONSE'),
-    filter(action => !action.payload?.error),
-    withLatestFrom(state$),
-    switchMap<[ConnectResponseAction, AppState], _, mixed>(
-      ([action, state]) => {
-        const robotHost = getConnectedRobot(state)
-        return robotHost ? of(fetchModules(robotHost)) : of(null)
-      }
-    ),
-    filter(Boolean)
+    filter<ConnectResponseAction>(action => !action.payload?.error),
+    mergeMap<_, _, mixed>(() =>
+      interval(POLL_MODULE_INTERVAL_MS).pipe(
+        withLatestFrom(state$),
+        map<[number, AppState], ?RobotHost>(([_, state]) =>
+          getConnectedRobot(state)
+        ),
+        takeWhile<?RobotHost, any>(robot => Boolean(robot)),
+        switchMap<RobotHost, _, mixed>(robot => of(fetchModules(robot)))
+      )
+    )
   )
 
 export const modulesEpic = combineEpics(
   fetchModulesEpic,
   fetchModuleDataEpic,
   sendModuleCommandEpic,
-  eagerlyLoadModulesEpic
+  pollModulesWhileConnectedEpic
 )
 
 export function modulesReducer(
@@ -121,43 +136,46 @@ export function modulesReducer(
   return state
 }
 
+const PREPARABLE_MODULES = ['thermocycler']
+
 export function getModulesState(
   state: AppState,
   robotName: string
 ): Array<Module> {
   const robotState = getRobotApiState(state, robotName)
-  const modules = robotState?.resources.modules || []
-  const tcEnabled = Boolean(state.config.devInternal?.enableThermocycler)
 
-  // TODO: remove this filter when feature flag removed
-  return modules.filter(m => tcEnabled || m.name !== 'thermocycler')
+  return robotState?.resources.modules || []
 }
 
-const PREPARABLE_MODULES = ['thermocycler']
+const isModulePrepared = (module: Module): boolean => {
+  if (module.name === 'thermocycler') return module.data.lid === 'open'
+  return false
+}
 
-export const getUnpreparedModules = (state: AppState): Array<Module> => {
+export function getUnpreparedModules(state: AppState): Array<Module> {
   const robot = getConnectedRobot(state)
-  if (!robot) return []
-
   const sessionModules = robotSelectors.getModules(state)
-  const actualModules = getModulesState(state, robot.name) || []
+  const actualModules = robot ? getModulesState(state, robot.name) : []
+  const preparableSessionModules = sessionModules
+    .map(m => m.name)
+    .filter(name => PREPARABLE_MODULES.includes(name))
 
-  const preparableModules = sessionModules.reduce(
-    (acc, mod) =>
-      PREPARABLE_MODULES.includes(mod.name) ? [...acc, mod.name] : acc,
-    []
+  // return actual modules that are both
+  // a) required to be prepared by the session
+  // b) not prepared according to isModulePrepared
+  return actualModules.filter(
+    m => preparableSessionModules.includes(m.name) && !isModulePrepared(m)
   )
-  if (preparableModules.length > 0) {
-    const actualPreparableModules = actualModules.filter(mod =>
-      preparableModules.includes(mod.name)
-    )
-    return actualPreparableModules.reduce((acc, mod) => {
-      if (mod.name === 'thermocycler' && mod.data.lid !== 'open') {
-        return [...acc, mod]
-      }
-      return acc
-    }, [])
-  } else {
-    return []
-  }
+}
+
+export function getMissingModules(state: AppState): Array<SessionModule> {
+  const robot = getConnectedRobot(state)
+  const sessionModules = robotSelectors.getModules(state)
+  const actualModules = robot ? getModulesState(state, robot.name) : []
+  const requiredCountMap: { [string]: number } = countBy(sessionModules, 'name')
+  const actualCountMap: { [string]: number } = countBy(actualModules, 'name')
+
+  return sessionModules.filter(
+    m => requiredCountMap[m.name] > (actualCountMap[m.name] || 0)
+  )
 }

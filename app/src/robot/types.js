@@ -45,16 +45,6 @@ export type RobotService = {
   port: number,
 }
 
-// TODO(mc, 2018-01-22): pay attention to this when deprecating status contants
-//   in constants.js. Also re-evaluate the need for this logic / type
-export type PipetteCalibrationStatus =
-  | 'unprobed'
-  | 'preparing-to-probe'
-  | 'ready-to-probe'
-  | 'probing'
-  | 'probed-tip-on'
-  | 'probed'
-
 // TODO(mc, 2018-01-11): collapse a bunch of these into something like MOVING
 export type LabwareCalibrationStatus =
   | 'unconfirmed'
@@ -101,7 +91,6 @@ export type StatePipette = {
 
 export type Pipette = {
   ...$Exact<StatePipette>,
-  calibration: PipetteCalibrationStatus,
   probed: boolean,
   tipOn: boolean,
   modelSpecs: PipetteModelSpecs | null,

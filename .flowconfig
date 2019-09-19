@@ -19,8 +19,7 @@
 
 [lints]
 deprecated-type=warn
-; TODO(mc, 2019-06-28): turn this on once flow-typed defs have caught up
-implicit-inexact-object=off
+implicit-inexact-object=warn
 sketchy-null=warn
 sketchy-number=warn
 unnecessary-optional-chain=warn
@@ -34,6 +33,7 @@ esproposal.optional_chaining=enable
 
 [strict]
 deprecated-type
+implicit-inexact-object
 nonstrict-import
 sketchy-null
 sketchy-number

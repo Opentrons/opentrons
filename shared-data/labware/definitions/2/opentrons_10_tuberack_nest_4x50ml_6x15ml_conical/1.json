@@ -1,0 +1,160 @@
+{
+  "wells": {
+    "A1": {
+      "totalLiquidVolume": 15000,
+      "diameter": 15.5,
+      "shape": "circular",
+      "depth": 117.8,
+      "x": 13.88,
+      "y": 67.75,
+      "z": 6.85
+    },
+    "B1": {
+      "totalLiquidVolume": 15000,
+      "diameter": 15.5,
+      "shape": "circular",
+      "depth": 117.8,
+      "x": 13.88,
+      "y": 42.75,
+      "z": 6.85
+    },
+    "C1": {
+      "totalLiquidVolume": 15000,
+      "diameter": 15.5,
+      "shape": "circular",
+      "depth": 117.8,
+      "x": 13.88,
+      "y": 17.75,
+      "z": 6.85
+    },
+    "A2": {
+      "totalLiquidVolume": 15000,
+      "diameter": 15.5,
+      "shape": "circular",
+      "depth": 117.8,
+      "x": 38.88,
+      "y": 67.75,
+      "z": 6.85
+    },
+    "B2": {
+      "totalLiquidVolume": 15000,
+      "diameter": 15.5,
+      "shape": "circular",
+      "depth": 117.8,
+      "x": 38.88,
+      "y": 42.75,
+      "z": 6.85
+    },
+    "C2": {
+      "totalLiquidVolume": 15000,
+      "diameter": 15.5,
+      "shape": "circular",
+      "depth": 117.8,
+      "x": 38.88,
+      "y": 17.75,
+      "z": 6.85
+    },
+    "A3": {
+      "totalLiquidVolume": 50000,
+      "diameter": 27.95,
+      "shape": "circular",
+      "depth": 113.05,
+      "x": 71.38,
+      "y": 60.25,
+      "z": 7.3
+    },
+    "B3": {
+      "totalLiquidVolume": 50000,
+      "diameter": 27.95,
+      "shape": "circular",
+      "depth": 113.05,
+      "x": 71.38,
+      "y": 25.25,
+      "z": 7.3
+    },
+    "A4": {
+      "totalLiquidVolume": 50000,
+      "diameter": 27.95,
+      "shape": "circular",
+      "depth": 113.05,
+      "x": 106.38,
+      "y": 60.25,
+      "z": 7.3
+    },
+    "B4": {
+      "totalLiquidVolume": 50000,
+      "diameter": 27.95,
+      "shape": "circular",
+      "depth": 113.05,
+      "x": 106.38,
+      "y": 25.25,
+      "z": 7.3
+    }
+  },
+  "groups": [
+    {
+      "metadata": {
+        "displayName": "NEST 6x15 mL Conical",
+        "displayCategory": "tubeRack",
+        "wellBottomShape": "v"
+      },
+      "brand": {
+        "brand": "NEST",
+        "brandId": ["601052"],
+        "links": ["http://www.cell-nest.com/page94?_l=en&product_id=110"]
+      },
+      "wells": ["A1", "B1", "C1", "A2", "B2", "C2"]
+    },
+    {
+      "metadata": {
+        "displayName": "NEST 4x50 mL Conical",
+        "displayCategory": "tubeRack",
+        "wellBottomShape": "v"
+      },
+      "brand": {
+        "brand": "NEST",
+        "brandId": ["602052"],
+        "links": ["http://www.cell-nest.com/page94?_l=en&product_id=110"]
+      },
+      "wells": ["A3", "B3", "A4", "B4"]
+    }
+  ],
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": [],
+    "links": [
+      "https://shop.opentrons.com/collections/opentrons-tips/products/tube-rack-set-1"
+    ]
+  },
+  "metadata": {
+    "displayName": "Opentrons 10 Tube Rack with NEST 4x50 mL, 6x15 mL Conical",
+    "displayCategory": "tubeRack",
+    "displayVolumeUnits": "mL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127.76,
+    "yDimension": 85.48,
+    "zDimension": 124.65
+  },
+  "parameters": {
+    "format": "irregular",
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "opentrons_10_tuberack_nest_4x50ml_6x15ml_conical"
+  },
+  "ordering": [
+    ["A1", "B1", "C1"],
+    ["A2", "B2", "C2"],
+    ["A3", "B3"],
+    ["A4", "B4"]
+  ],
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
+}

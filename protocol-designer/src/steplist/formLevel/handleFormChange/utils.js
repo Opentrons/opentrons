@@ -2,9 +2,8 @@
 import assert from 'assert'
 import round from 'lodash/round'
 import uniq from 'lodash/uniq'
-import { canPipetteUseLabware } from '@opentrons/shared-data'
+import { getWellSetForMultichannel, canPipetteUseLabware } from '../../../utils'
 import { getPipetteCapacity } from '../../../pipettes/pipetteData'
-import { getWellSetForMultichannel } from '../../../well-selection/utils'
 import type {
   LabwareDefinition2,
   PipetteChannels,
@@ -65,9 +64,7 @@ export function getMaxDisposalVolumeForMultidispense(
   if (!rawForm) return null
   assert(
     rawForm.path === 'multiDispense',
-    `getMaxDisposalVolumeForMultidispense expected multiDispense, got path ${
-      rawForm.path
-    }`
+    `getMaxDisposalVolumeForMultidispense expected multiDispense, got path ${rawForm.path}`
   )
   const volume = Number(rawForm.volume)
   const pipetteEntity = pipetteEntities[rawForm.pipette]
@@ -85,9 +82,7 @@ export function volumeInCapacityForMulti(
   const volume = Number(rawForm.volume)
   assert(
     rawForm.pipette in pipetteEntities,
-    `volumeInCapacityForMulti expected pipette ${
-      rawForm.pipette
-    } to be in pipetteEntities`
+    `volumeInCapacityForMulti expected pipette ${rawForm.pipette} to be in pipetteEntities`
   )
   const pipetteEntity = pipetteEntities[rawForm.pipette]
   const pipetteCapacity = pipetteEntity && getPipetteCapacity(pipetteEntity)

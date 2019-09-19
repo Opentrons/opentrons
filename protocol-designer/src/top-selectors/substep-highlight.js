@@ -1,6 +1,7 @@
 // @flow
 import { createSelector } from 'reselect'
 import { getWellNamePerMultiTip } from '@opentrons/shared-data'
+import { getWellSetForMultichannel } from '../utils'
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 
 import mapValues from 'lodash/mapValues'
@@ -10,7 +11,6 @@ import * as StepGeneration from '../step-generation'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { selectors as fileDataSelectors } from '../file-data'
 import { selectors as stepsSelectors } from '../ui/steps'
-import { getWellSetForMultichannel } from '../well-selection/utils'
 
 import type { WellGroup } from '@opentrons/components'
 import type { Selector } from '../types'

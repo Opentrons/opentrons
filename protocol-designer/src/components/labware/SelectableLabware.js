@@ -2,9 +2,12 @@
 import * as React from 'react'
 import reduce from 'lodash/reduce'
 
-import { getCollidingWells, arrayToWellGroup } from '../../utils'
+import {
+  arrayToWellGroup,
+  getCollidingWells,
+  getWellSetForMultichannel,
+} from '../../utils'
 import { SELECTABLE_WELL_CLASS } from '../../constants'
-import { getWellSetForMultichannel } from '../../well-selection/utils'
 import SingleLabware from './SingleLabware'
 import SelectionRect from '../SelectionRect'
 import WellTooltip from './WellTooltip'

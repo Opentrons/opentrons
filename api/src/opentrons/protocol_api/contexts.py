@@ -1,7 +1,8 @@
 import asyncio
 import contextlib
 import logging
-from typing import Any, Dict, List, Optional, Union, Tuple, Sequence
+from typing import (Any, Dict, Iterator, List,
+                    Optional, Sequence, Set, Tuple, Union)
 from opentrons import types, hardware_control as hc, commands as cmds
 from opentrons.commands import CommandPublisher
 import opentrons.config.robot_configs as rc
@@ -100,6 +101,7 @@ class ProtocolContext(CommandPublisher):
         self._deck_layout = geometry.Deck()
         self._instruments: Dict[types.Mount, Optional[InstrumentContext]]\
             = {mount: None for mount in types.Mount}
+        self._modules: Set[ModuleContext] = set()
         self._last_moved_instrument: Optional[types.Mount] = None
         self._location_cache: Optional[types.Location] = None
 
@@ -248,9 +250,62 @@ class ProtocolContext(CommandPublisher):
         return self.load_labware(
             load_name, location, label, namespace, version)
 
+    @property
+    def loaded_labwares(self) -> Dict[int, Union[Labware, ModuleGeometry]]:
+        """ Get the labwares that have been loaded into the protocol context.
+
+        Slots with nothing in them will not be present in the return value.
+
+        .. note::
+
+            If a module is present on the deck but no labware has been loaded
+            into it with :py:meth:`.ModuleContext.load_labware`, there will
+            be no entry for that slot in this value. That means you should not
+            use ``loaded_labwares`` to determine if a slot is available or not,
+            only to get a list of labwares. If you want a data structure of all
+            objects on the deck regardless of type, see :py:attr:`deck`.
+
+
+        :returns: Dict mapping deck slot number to labware, sorted in order of
+                  the locations.
+        """
+        def _only_labwares() -> Iterator[
+                Tuple[int, Union[Labware, ModuleGeometry]]]:
+            for slotnum, slotitem in self._deck_layout.items():
+                if isinstance(slotitem, Labware):
+                    yield slotnum, slotitem
+                elif isinstance(slotitem, ModuleGeometry):
+                    if slotitem.labware:
+                        yield slotnum, slotitem.labware
+
+        return dict(_only_labwares())
+
     def load_module(
             self, module_name: str,
             location: Optional[types.DeckLocation] = None) -> ModuleTypes:
+        """ Load a module onto the deck given its name.
+
+        This is the function to call to use a module in your protocol, like
+        :py:meth:`load_instrument` is the method to call to use an instrument
+        in your protocol. It returns the created and initialized module
+        context, which will be a different class depending on the kind of
+        module loaded.
+
+        A map of deck positions to loaded modules can be accessed later
+        using :py:attr:`loaded_modules`.
+
+        :param str module_name: The name of the module.
+        :param location: The location of the module. This is usually the
+                         name or number of the slot on the deck where you
+                         will be placing the module. Some modules, like
+                         the Thermocycler, are only valid in one deck
+                         location. You do not have to specify a location
+                         when loading a Thermocycler - it will always be
+                         in Slot 7.
+        :type location: str or int or None
+        :returns ModuleContext: The loaded and initialized
+                                :py:class:`ModuleContext`.
+        """
         resolved_name = ModuleGeometry.resolve_module_name(module_name)
         resolved_location = self._deck_layout.resolve_module_location(
                 resolved_name, location)
@@ -284,17 +339,30 @@ class ProtocolContext(CommandPublisher):
         else:
             raise RuntimeError(
                 f'Could not find specified module: {resolved_name}')
+        self._modules.add(mod_ctx)
         self._deck_layout[resolved_location] = geometry
         return mod_ctx
 
     @property
-    def loaded_labwares(self) -> Dict[int, Labware]:
-        """ Get the labwares that have been loaded into the protocol context.
+    def loaded_modules(self) -> Dict[int, 'ModuleContext']:
+        """ Get the modules loaded into the protocol context.
 
-        The return value is a dict mapping locations to labware, sorted
-        in order of the locations.
+        This is a map of deck positions to modules loaded by previous calls
+        to :py:meth:`load_module`. It is not necessarily the same as the
+        modules attached to the robot - for instance, if the robot has a
+        Magnetic Module and a Temperature Module attached, but the protocol
+        has only loaded the Temperature Module with :py:meth:`load_module`,
+        only the Temperature Module will be present.
+
+        :returns Dict[str, ModuleContext]: Dict mapping slot name to module
+                                           contexts. The elements may not be
+                                           ordered by slot number.
         """
-        return dict(self._deck_layout)
+        def _modules() -> Iterator[Tuple[int, 'ModuleContext']]:
+            for module in self._modules:
+                yield int(module.geometry.parent), module
+
+        return dict(_modules())
 
     def load_instrument(
             self,
@@ -368,11 +436,20 @@ class ProtocolContext(CommandPublisher):
     def loaded_instruments(self) -> Dict[str, Optional['InstrumentContext']]:
         """ Get the instruments that have been loaded into the protocol.
 
+        This is a map of mount name to instruments previously loaded with
+        :py:meth:`load_instrument`. It is not necessarily the same as the
+        instruments attached to the robot - for instance, if the robot has
+        an instrument in both mounts but your protocol has only loaded one
+        of them with :py:meth:`load_instrument`, the unused one will not
+        be present.
+
         :returns: A dict mapping mount names in lowercase to the instrument
-                  in that mount, or `None` if no instrument is present.
+                  in that mount. If no instrument is loaded in the mount,
+                  it will not be present
         """
         return {mount.name.lower(): instr for mount, instr
-                in self._instruments.items()}
+                in self._instruments.items()
+                if instr}
 
     def reset(self):
         """ Reset the state of the context and the hardware.
@@ -461,6 +538,15 @@ class ProtocolContext(CommandPublisher):
     @property
     def deck(self) -> geometry.Deck:
         """ The object holding the deck layout of the robot.
+
+        This object behaves like a dictionary with keys for both numeric
+        and string slot numbers (for instance, ``protocol.deck[1]`` and
+        ``protocol.deck['1']`` will both return the object in slot 1). If
+        nothing is loaded into a slot, ``None`` will be present. This object
+        is useful for determining if a slot in the deck is free. Rather than
+        filtering the objects in the deck map yourself, you can also use
+        :py:attr:`loaded_labwares` to see a dict of labwares and
+        :py:attr:`loaded_modules` to see a dict of modules.
         """
         return self._deck_layout
 
@@ -677,8 +763,9 @@ class InstrumentContext(CommandPublisher):
         from the specified location
 
         If only a volume is passed, the pipette will aspirate
-        from its current position. If only a location is passed,
-        :py:meth:`aspirate` will default to its :py:attr:`max_volume`.
+        from its current position. If only a location is passed (as in
+        ``instr.aspirate(location=wellplate['A1'])``,
+        :py:meth:`aspirate` will default to the amount of volume available.
 
         :param volume: The volume to aspirate, in microliters. If not
                        specified, :py:attr:`max_volume`.
@@ -698,6 +785,15 @@ class InstrumentContext(CommandPublisher):
                      defaults to 1.0 (speed will not be modified).
         :type rate: float
         :returns: This instance.
+
+        .. note::
+
+            If ``aspirate`` is called with a single argument, it will not try
+            to guess whether the argument is a volume or location - it is
+            required to be a volume. If you want to call ``aspirate`` with only
+            a location, specify it as a keyword argument:
+            ``instr.aspirate(location=wellplate['A1'])``
+
         """
         self._log.debug("aspirate {} from {} at {}"
                         .format(volume,
@@ -759,9 +855,10 @@ class InstrumentContext(CommandPublisher):
         into the specified location.
 
         If only a volume is passed, the pipette will dispense from its current
-        position. If only a location is passed, all of the liquid aspirated
-        into the pipette will be dispensed (this volume is accessible through
-        :py:attr:`current_volume`).
+        position. If only a location is passed (as in
+        ``instr.dispense(location=wellplate['A1'])``), all of the liquid
+        aspirated into the pipette will be dispensed (this volume is accessible
+        through :py:attr:`current_volume`).
 
         :param volume: The volume of liquid to dispense, in microliters. If not
                        specified, defaults to :py:attr:`current_volume`.
@@ -781,6 +878,15 @@ class InstrumentContext(CommandPublisher):
                      defaults to 1.0 (speed will not be modified).
         :type rate: float
         :returns: This instance.
+
+        .. note::
+
+            If ``dispense`` is called with a single argument, it will not try
+            to guess whether the argument is a volume or location - it is
+            required to be a volume. If you want to call ``dispense`` with only
+            a location, specify it as a keyword argument:
+            ``instr.dispense(location=wellplate['A1'])``
+
         """
         self._log.debug("dispense {} from {} at {}"
                         .format(volume,
@@ -827,17 +933,35 @@ class InstrumentContext(CommandPublisher):
         """
         Mix a volume of liquid (uL) using this pipette.
         If no location is specified, the pipette will mix from its current
-        position. If no Volume is passed, 'mix' will default to its max_volume.
+        position. If no volume is passed, ``mix`` will default to the
+        pipette's :py:attr:`max_volume`.
 
         :param repetitions: how many times the pipette should mix (default: 1)
-        :param volume: number of microlitres to mix (default: self.max_volume)
+        :param volume: number of microlitres to mix (default:
+                       :py:attr:`max_volume`)
         :param location: a Well or a position relative to well.
                          e.g, `plate.rows()[0][0].bottom()`
-                         (types.Location type).
+        :type location: types.Location
         :param rate: Set plunger speed for this mix, where,
-                     speed = rate * (aspirate_speed or dispense_speed)
+                     ``speed = rate * (aspirate_speed or dispense_speed)``
         :raises NoTipAttachedError: If no tip is attached to the pipette.
         :returns: This instance
+
+        .. note::
+
+            All the arguments to ``mix`` are optional; however, if you do
+            not want to specify one of them, all arguments after that one
+            should be keyword arguments. For instance, if you do not want
+            to specify volume, you would call
+            ``pipette.mix(1, location=wellplate['A1'])``. If you do not
+            want to specify repetitions, you would call
+            ``pipette.mix(volume=10, location=wellplate['A1'])``. Unlike
+            previous API versions, ``mix`` will not attempt to guess your
+           inputs; the first argument will always be interpreted as
+           ``repetitions``, the second as ``volume``, and the third as
+           ``location`` unless you use keywords.
+
+
         """
         self._log.debug(
             'mixing {}uL with {} repetitions in {} at rate={}'.format(
@@ -1013,6 +1137,16 @@ class InstrumentContext(CommandPublisher):
                               :py:meth:`dispense`)
 
         :returns: This instance
+
+        .. note::
+
+            Both ``volume`` and height are optional, but unlike previous API
+            versions, if you want to specify only ``height`` you must do it
+            as a keyword argument: ``pipette.air_gap(height=2)``. If you
+            call ``air_gap`` with only one unnamed argument, it will always
+            be interpreted as a volume.
+
+
         """
         if not self.hw_pipette['has_tip']:
             raise hc.NoTipAttachedError('Pipette has no tip. Aborting air_gap')
@@ -1137,6 +1271,8 @@ class InstrumentContext(CommandPublisher):
                         'before', None, None, instrument=self, location=target)
         self.move_to(target.top())
 
+        self._hw_manager.hardware.set_current_tiprack_diameter(
+            self._mount, target.diameter)
         self._hw_manager.hardware.pick_up_tip(
             self._mount, tiprack.tip_length, presses, increment)
         # Note that the hardware API pick_up_tip action includes homing z after
@@ -1804,6 +1940,14 @@ class ModuleContext(CommandPublisher):
         """ The labware (if any) present on this module. """
         return self._geometry.labware
 
+    @property
+    def geometry(self) -> ModuleGeometry:
+        """ The object representing the module as an item on the deck
+
+        :returns: ModuleGeometry
+        """
+        return self._geometry
+
     def __repr__(self):
         return "{} at {} lw {}".format(self.__class__.__name__,
                                        self._geometry,
@@ -1977,17 +2121,7 @@ class ThermocyclerContext(ModuleContext):
                  loop: asyncio.AbstractEventLoop) -> None:
         self._module = hw_module
         self._loop = loop
-        self._protocol_lid_target = None
         super().__init__(ctx, geometry)
-
-    @property
-    def lid_status(self):
-        """ Lid open/close status string"""
-        return self._module.lid_status
-
-    @property
-    def status(self):
-        return self._module.status
 
     def _prepare_for_lid_move(self):
         loaded_instruments = [instr for mount, instr in
@@ -2009,115 +2143,155 @@ class ThermocyclerContext(ModuleContext):
             instr.move_to(types.Location(safe_point, None), force_direct=True)
 
     @cmds.publish.both(command=cmds.thermocycler_open)
-    def open(self):
+    def open_lid(self):
         """ Opens the lid"""
         self._prepare_for_lid_move()
         self._geometry.lid_status = self._module.open()
         return self._geometry.lid_status
 
     @cmds.publish.both(command=cmds.thermocycler_close)
-    def close(self):
+    def close_lid(self):
         """ Closes the lid"""
         self._prepare_for_lid_move()
         self._geometry.lid_status = self._module.close()
         return self._geometry.lid_status
 
-    @cmds.publish.both(command=cmds.thermocycler_set_temp)
-    def set_temperature(self,
-                        temperature: float,
-                        hold_time: float = None,
-                        ramp_rate: float = None):
-        """ Set the target temperature, in °C.
+    @cmds.publish.both(command=cmds.thermocycler_set_block_temp)
+    def set_block_temperature(self,
+                              temperature: float,
+                              hold_time_seconds: float = None,
+                              hold_time_minutes: float = None,
+                              ramp_rate: float = None):
+        """ Set the target temperature for the well block, in °C.
 
         Valid operational range yet to be determined.
         :param temperature: The target temperature, in °C.
-        :param hold_time: The time to hold, after reaching temperature, before
-                          proceeding to the next command. If ``hold_time``
-                          is not specified, the Thermocycler will
-                          hold this temperature indefinitely.
+        :param hold_time_minutes: The number of minutes to hold, after reaching
+                                  ``temperature``, before proceeding to the
+                                  next command.
+        :param hold_time_seconds: The number of seconds to hold, after reaching
+                                  ``temperature``, before proceeding to the
+                                  next command. If ``hold_time_minutes`` and
+                                  ``hold_time_seconds`` are not specified,
+                                  the Thermocycler will proceed to the next
+                                  command after ``temperature`` is reached.
         :param ramp_rate: The target rate of temperature change, in °C/sec.
-                          If ``ramp_rate`` is not specified, it will default to
-                          the maximum ramp rate as defined in the device
+                          If ``ramp_rate`` is not specified, it will default
+                          to the maximum ramp rate as defined in the device
                           configuration.
+
+        .. note:
+
+            If ``hold_time_minutes`` and ``hold_time_seconds`` are not
+            specified, the Thermocycler will proceed to the next command
+            after ``temperature`` is reached.
+
         """
         return self._module.set_temperature(
-            temperature=temperature, hold_time=hold_time, ramp_rate=ramp_rate)
+                temperature=temperature,
+                hold_time_seconds=hold_time_seconds,
+                hold_time_minutes=hold_time_minutes,
+                ramp_rate=ramp_rate)
 
-    @cmds.publish.both(command=cmds.thermocycler_cycle_temperatures)
-    def cycle_temperatures(self,
-                           steps: List[modules.types.ThermocyclerStep],
-                           repetitions: int):
-        """ For a given number of repetitions, cycle through a list of
-        temperatures in °C for a set hold time.
+    @cmds.publish.both(command=cmds.thermocycler_set_lid_temperature)
+    def set_lid_temperature(self, temperature: float):
+        """ Set the target temperature for the heated lid, in °C.
+
+        :param temperature: The target temperature, in °C clamped to the
+                            range 20°C to 105°C.
+
+        .. note:
+
+            The Thermocycler will proceed to the next command after
+            ``temperature`` has been reached.
+
+        """
+        self._module.set_lid_temperature(temperature)
+
+    @cmds.publish.both(command=cmds.thermocycler_execute_profile)
+    def execute_profile(self,
+                        steps: List[modules.types.ThermocyclerStep],
+                        repetitions: int):
+        """ Execute a Thermocycler Profile defined as a cycle of
+        :py:attr:`steps` to repeat for a given number of :py:attr:`repetitions`
 
         :param steps: List of unique steps that make up a single cycle.
-                      Each list item maps to parameters of the
-                      set_temperature method as a dict of float values with
-                      keys 'temperature', 'hold_time', & optional 'ramp_rate'.
-                      NOTE: unlike the set_temperature method, hold_time
-                      must be defined and finite for each step.
+                      Each list item should be a dictionary that maps to
+                      the parameters of the :py:meth:`set_block_temperature`
+                      method with keys 'temperature', 'hold_time_seconds',
+                      and 'hold_time_minutes'.
         :param repetitions: The number of times to repeat the cycled steps.
+
+        .. note:
+
+            Unlike the :py:meth:`set_block_temperature`, either or both of
+            'hold_time_minutes' and 'hold_time_seconds' must be defined
+            and finite for each step.
+
         """
+        if repetitions <= 0:
+            raise ValueError("repetitions must be a positive integer")
         for step in steps:
             if step.get('temperature') is None:
                 raise ValueError(
                         "temperature must be defined for each step in cycle")
-            if step.get('hold_time') is None:
+            hold_mins = step.get('hold_time_minutes')
+            hold_secs = step.get('hold_time_seconds')
+            if hold_mins is None and hold_secs is None:
                 raise ValueError(
-                        "hold_time must be defined for each step in cycle")
+                        "either hold_time_minutes or hold_time_seconds must be"
+                        "defined for each step in cycle")
         return self._module.cycle_temperatures(
             steps=steps, repetitions=repetitions)
 
-    @property
-    def current_lid_target(self):
-        return self._module.lid_target
-
-    @property
-    def lid_target(self):
-        return self._protcol_lid_target
-
-    @lid_target.setter
-    def lid_target(self, temp):
-        """ Update lid target temperature"""
-        self._protocol_lid_target = temp
-
-    @cmds.publish.both(command=cmds.thermocycler_heat_lid)
-    def heat_lid(self):
-        """ Start heating thermocycler Lid to ``_protocol_lid_target``
-            degree celsius. If ``_protocol_lid_target`` is None, the lid
-            will be heated to the driver default value.
-        """
-        self._module.set_lid_temperature(self._protocol_lid_target)
-
-    @cmds.publish.both(command=cmds.thermocycler_stop_lid_heating)
-    def stop_lid_heating(self):
-        """ Turn off the lid heatpad """
+    @cmds.publish.both(command=cmds.thermocycler_deactivate_lid)
+    def deactivate_lid(self):
+        """ Turn off the heated lid """
         self._module.stop_lid_heating()
 
-    @cmds.publish.both(command=cmds.thermocycler_wait_for_lid_temp)
-    def wait_for_lid_temp(self):
-        """ Block until the lid heatpad reaches its target temperature"""
-        self._module.wait_for_lid_temp()
+    @cmds.publish.both(command=cmds.thermocycler_deactivate_block)
+    def deactivate_block(self):
+        """ Turn off the well block """
+        self._module.deactivate()
 
-    @cmds.publish.both(command=cmds.thermocycler_wait_for_temp)
-    def wait_for_temp(self):
-        """ Block until the module reaches its setpoint"""
-        self._module.wait_for_temp()
-
-    @cmds.publish.both(command=cmds.thermocycler_wait_for_hold)
-    def wait_for_hold(self):
-        """ Block until hold time has elapsed"""
-        self._module.wait_for_hold()
+    @cmds.publish.both(command=cmds.thermocycler_deactivate)
+    def deactivate(self):
+        """ Turn off the well block, and heated lid """
+        self.deactivate_lid()
+        self.deactivate_block()
 
     @property
-    def temperature(self):
+    def lid_position(self):
+        """ Lid open/close status string"""
+        return self._module.lid_status
+
+    @property
+    def block_temperature_status(self):
+        return self._module.status
+
+    @property
+    def lid_temperature_status(self):
+        return self._module.lid_temp_status
+
+    @property
+    def block_temperature(self):
         """ Current temperature in degrees C"""
         return self._module.temperature
 
     @property
-    def target(self):
+    def block_target_temperature(self):
         """ Target temperature in degrees C"""
         return self._module.target
+
+    @property
+    def lid_temperature(self):
+        """ Current temperature in degrees C"""
+        return self._module.lid_temp
+
+    @property
+    def lid_target_temperature(self):
+        """ Target temperature in degrees C"""
+        return self._module.lid_target
 
     @property
     def ramp_rate(self):
@@ -2148,7 +2322,3 @@ class ThermocyclerContext(ModuleContext):
     def current_step_index(self):
         """ Index of the current step within the current cycle"""
         return self._module.current_step_index
-
-    @cmds.publish.both(command=cmds.thermocycler_deactivate)
-    def deactivate(self):
-        return self._module.deactivate()

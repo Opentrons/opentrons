@@ -33,6 +33,13 @@ const MessageBody = (props: {| message: LabwareUploadMessage |}) => {
     )
   } else if (message.messageType === 'EXACT_LABWARE_MATCH') {
     return <p>This labware is identical to one you have already uploaded.</p>
+  } else if (message.messageType === 'USES_STANDARD_NAMESPACE') {
+    return (
+      <p>
+        This labware definition appears to be an Opentrons standard labware.
+        Please upload only custom labware.
+      </p>
+    )
   } else if (
     message.messageType === 'ASK_FOR_LABWARE_OVERWRITE' ||
     message.messageType === 'LABWARE_NAME_CONFLICT'

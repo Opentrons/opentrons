@@ -35,19 +35,17 @@ type Props = {|
   module: ThermocyclerModule,
   sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
   isProtocolActive: boolean,
-  __tempControlsEnabled: boolean,
 |}
 
 const ThermocyclerCard = ({
   module,
   sendModuleCommand,
   isProtocolActive,
-  __tempControlsEnabled,
 }: Props) => (
   <StatusCard title={getModuleDisplayName(module.name)}>
     <CardContentRow>
       <StatusItem status={module.status} />
-      {__tempControlsEnabled && !isProtocolActive && (
+      {!isProtocolActive && (
         <TemperatureControl
           module={module}
           sendModuleCommand={sendModuleCommand}
@@ -74,16 +72,12 @@ const ThermocyclerCard = ({
           <LabeledValue
             label="Cycle #"
             className={styles.compact_labeled_value}
-            value={`${module.data.currentCycleIndex} / ${
-              module.data.totalCycleCount
-            }`}
+            value={`${module.data.currentCycleIndex} / ${module.data.totalCycleCount}`}
           />
           <LabeledValue
             label="Step #"
             className={styles.compact_labeled_value}
-            value={`${module.data.currentStepIndex} / ${
-              module.data.totalStepCount
-            }`}
+            value={`${module.data.currentStepIndex} / ${module.data.totalStepCount}`}
           />
           <span
             className={cx(
@@ -99,7 +93,7 @@ const ThermocyclerCard = ({
                 .utc(
                   // NOTE: moment still doesn't allow duration formatting, hence fake moment creation
                   moment
-                    .duration(module.data.holdTime, 'seconds')
+                    .duration(module.data.holdTime || 0, 'seconds')
                     .asMilliseconds()
                 )
                 .format('HH:mm:ss')}`}

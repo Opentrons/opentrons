@@ -165,6 +165,13 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
         loop=loop, strict_attached_instruments=False)
     await sim.cache_instruments({types.Mount.LEFT: 'p300_multi'})
 
+    with pytest.raises(RuntimeError):
+        # When we say prefixes we really mean names or models should
+        # equally work with some special casing for gen2; if you do
+        # just some arbitrary stuff that happens to be a prefix, that
+        # absolutely should not work
+        await sim.cache_instruments({types.Mount.LEFT: 'p10_sing'})
+
 
 async def test_prep_aspirate(dummy_instruments, loop):
     hw_api = hc.API.build_hardware_simulator(

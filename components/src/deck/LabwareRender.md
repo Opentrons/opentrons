@@ -12,9 +12,7 @@ const fixture_tiprack_300_ul = require('@opentrons/shared-data/labware/fixtures/
 let definition = fixture_96_plate
 
 ;<RobotWorkSpace
-  viewBox={`0 0  ${definition.dimensions.xDimension} ${
-    definition.dimensions.yDimension
-  }`}
+  viewBox={`0 0  ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
 >
   {() => (
     <LabwareRender
@@ -35,9 +33,7 @@ const fixture_tiprack_300_ul = require('@opentrons/shared-data/labware/fixtures/
 let definition = fixture_tiprack_300_ul
 
 ;<RobotWorkSpace
-  viewBox={`0 0  ${definition.dimensions.xDimension} ${
-    definition.dimensions.yDimension
-  }`}
+  viewBox={`0 0  ${definition.dimensions.xDimension} ${definition.dimensions.yDimension}`}
 >
   {() => (
     <LabwareRender

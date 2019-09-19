@@ -75,7 +75,7 @@ restart:
 push: wheel
 	scp -i $(br_ssh_key) $(br_ssh_opts) $(wheel_file) root@$(host):/data/
 	ssh -i $(br_ssh_key) $(br_ssh_opts) root@$(host) \
-"function cleanup () { rm -f /data/$(wheel_file) && mount -o remount,ro / && systemctl start opentrons-update-server; } ;\
+"function cleanup () { rm -f /data/otupdate*.whl && mount -o remount,ro / && systemctl start opentrons-update-server; } ;\
 systemctl stop opentrons-update-server &&\
 mount -o remount,rw / &&\
 cd /usr/lib/python3.7/site-packages &&\

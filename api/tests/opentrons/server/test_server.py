@@ -122,6 +122,11 @@ async def test_exception_during_call(session):
     await session.call()
     res = await session.socket.receive_json()
     assert res.pop('$') == {
+        'type': rpc.CALL_ACK_MESSAGE,
+        'token': session.token
+    }
+    res = await session.socket.receive_json()
+    assert res.pop('$') == {
         'type': rpc.CALL_NACK_MESSAGE,
         'token': session.token
     }

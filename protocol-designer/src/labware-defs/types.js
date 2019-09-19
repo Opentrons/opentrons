@@ -11,6 +11,7 @@ export type LabwareUploadMessageType =
   | 'EXACT_LABWARE_MATCH'
   | 'LABWARE_NAME_CONFLICT'
   | 'ASK_FOR_LABWARE_OVERWRITE'
+  | 'USES_STANDARD_NAMESPACE'
 
 type NameConflictFields = {|
   defsMatchingLoadName: Array<LabwareDefinition2>,
@@ -24,7 +25,7 @@ export type LabwareUploadMessage =
       errorText?: string,
     |}
   | {|
-      messageType: 'EXACT_LABWARE_MATCH',
+      messageType: 'EXACT_LABWARE_MATCH' | 'USES_STANDARD_NAMESPACE',
     |}
   | {|
       ...NameConflictFields,

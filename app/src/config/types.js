@@ -10,7 +10,6 @@ export type DiscoveryCandidates = string | Array<string>
 export type DevInternalFlag =
   | 'allPipetteConfig'
   | 'tempdeckControls'
-  | 'enableThermocycler'
   | 'enablePipettePlus'
 
 export type Config = {

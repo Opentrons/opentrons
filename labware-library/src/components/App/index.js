@@ -33,7 +33,7 @@ export function App(props: DefinitionRouteRenderProps) {
       })}
     >
       <Nav />
-      {detailPage && <Breadcrumbs definition={definition} />}
+      {detailPage && <Breadcrumbs />}
       <Page
         scrollRef={scrollRef}
         detailPage={detailPage}

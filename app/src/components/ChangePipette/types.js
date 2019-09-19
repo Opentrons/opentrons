@@ -34,7 +34,7 @@ export type ChangePipetteProps = {
   exit: () => mixed,
   setWantedName: (name: string | null) => mixed,
   moveToFront: () => mixed,
-  onPipetteSelect: $PropertyType<PipetteSelectionProps, 'onChange'>,
+  onPipetteSelect: $PropertyType<PipetteSelectionProps, 'onPipetteChange'>,
   checkPipette: () => mixed,
   goToConfirmUrl: () => mixed,
   __pipettePlusEnabled: boolean,

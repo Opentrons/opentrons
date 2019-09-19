@@ -371,33 +371,48 @@ def tempdeck_deactivate():
 
 
 def thermocycler_open():
-    text = "Opening thermocycler lid"
+    text = "Opening Thermocycler lid"
     return make_command(
         name=command_types.THERMOCYCLER_OPEN,
         payload={'text': text}
     )
 
 
-def thermocycler_set_temp(temperature, hold_time):
-    text = "Setting thermocycler temperature to {temperature} °C ".format(
-            temperature=temperature)
-    if hold_time is not None:
-        text += " with a hold time of {} seconds".format(hold_time)
+def thermocycler_set_block_temp(temperature,
+                                hold_time_seconds,
+                                hold_time_minutes):
+    text = f'Setting Thermocycler well block temperature to {temperature} °C '
+    total_seconds = None
+    # TODO: BC 2019-09-05 this time resolving logic is partially duplicated
+    # in the thermocycler api class definition, with this command logger
+    # implementation, there isn't a great way to avoid this, but it should
+    # be consolidated as soon as an alternative to the publisher is settled on.
+    if hold_time_seconds or hold_time_minutes:
+        given_seconds = hold_time_seconds or 0
+        given_minutes = hold_time_minutes or 0
+        total_seconds = given_seconds + (given_minutes * 60)
+
+        clean_seconds = total_seconds % 60
+        clean_minutes = (total_seconds - clean_seconds) / 60
+        text += f'with a hold time of '
+        if clean_minutes > 0:
+            text += f'{clean_minutes} minutes and '
+        text += f'{clean_seconds} seconds'
     return make_command(
-        name=command_types.THERMOCYCLER_SET_TEMP,
+        name=command_types.THERMOCYCLER_SET_BLOCK_TEMP,
         payload={
             'temperature': temperature,
-            'hold_time': hold_time,
+            'hold_time': total_seconds,
             'text': text
         }
     )
 
 
-def thermocycler_cycle_temperatures(steps, repetitions):
+def thermocycler_execute_profile(steps, repetitions):
     text = f'Thermocycler starting {repetitions} repetitions' \
             ' of cycle composed of the following steps: {steps}'
     return make_command(
-        name=command_types.THERMOCYCLER_CYCLE_TEMPS,
+        name=command_types.THERMOCYCLER_EXECUTE_PROFILE,
         payload={
             'text': text,
             'steps': steps
@@ -414,31 +429,47 @@ def thermocycler_wait_for_hold():
 
 
 def thermocycler_wait_for_temp():
-    text = "Waiting for thermocycler to reach target"
+    text = "Waiting for Thermocycler to reach target"
     return make_command(
         name=command_types.THERMOCYCLER_WAIT_FOR_TEMP,
         payload={'text': text}
     )
 
 
-def thermocycler_heat_lid():
-    text = "Heating thermocycler lid"
+def thermocycler_set_lid_temperature(temperature):
+    text = f'Setting Thermocycler lid temperature to {temperature} °C '
     return make_command(
-        name=command_types.THERMOCYCLER_HEAT_LID,
+        name=command_types.THERMOCYCLER_SET_LID_TEMP,
         payload={'text': text}
     )
 
 
-def thermocycler_stop_lid_heating():
-    text = "Deactivating lid heating"
+def thermocycler_deactivate_lid():
+    text = "Deactivating Thermocycler lid heating"
     return make_command(
-        name=command_types.THERMOCYCLER_STOP_LID_HEATING,
+        name=command_types.THERMOCYCLER_DEACTIVATE_LID,
+        payload={'text': text}
+    )
+
+
+def thermocycler_deactivate_block():
+    text = "Deactivating Thermocycler well block heating"
+    return make_command(
+        name=command_types.THERMOCYCLER_DEACTIVATE_BLOCK,
+        payload={'text': text}
+    )
+
+
+def thermocycler_deactivate():
+    text = "Deactivating Thermocycler"
+    return make_command(
+        name=command_types.THERMOCYCLER_DEACTIVATE,
         payload={'text': text}
     )
 
 
 def thermocycler_wait_for_lid_temp():
-    text = "Waiting for lid to reach target temperature"
+    text = "Waiting for Thermocycler lid to reach target temperature"
     return make_command(
         name=command_types.THERMOCYCLER_WAIT_FOR_LID_TEMP,
         payload={'text': text}
@@ -446,17 +477,9 @@ def thermocycler_wait_for_lid_temp():
 
 
 def thermocycler_close():
-    text = "Closing thermocycler lid"
+    text = "Closing Thermocycler lid"
     return make_command(
         name=command_types.THERMOCYCLER_CLOSE,
-        payload={'text': text}
-    )
-
-
-def thermocycler_deactivate():
-    text = "Deactivating thermocycler"
-    return make_command(
-        name=command_types.THERMOCYCLER_DEACTIVATE,
         payload={'text': text}
     )
 

@@ -13,7 +13,7 @@ type Props = {|
   proceed: () => mixed,
 |}
 
-const HEADING = 'Robot System Update Available'
+const HEADING = 'Robot Operating System Update Available'
 
 export default function MigrationWarningModal(props: Props) {
   const { notNowButton, updateType, proceed } = props

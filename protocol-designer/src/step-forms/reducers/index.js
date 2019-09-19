@@ -516,15 +516,13 @@ export const labwareInvariantProperties = handleActions<
       state: NormalizedLabwareById,
       action: ReplaceCustomLabwareDef
     ): NormalizedLabwareById =>
-      mapValues(
-        state,
-        (prev: NormalizedLabware): NormalizedLabware =>
-          action.payload.defURIToOverwrite === prev.labwareDefURI
-            ? {
-                ...prev,
-                labwareDefURI: getLabwareDefURI(action.payload.newDef),
-              }
-            : prev
+      mapValues(state, (prev: NormalizedLabware): NormalizedLabware =>
+        action.payload.defURIToOverwrite === prev.labwareDefURI
+          ? {
+              ...prev,
+              labwareDefURI: getLabwareDefURI(action.payload.newDef),
+            }
+          : prev
       ),
   },
   initialLabwareState

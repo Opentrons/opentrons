@@ -15,7 +15,10 @@ import { NAME, actions, constants } from '../'
 import MockSession from './__mocks__/session'
 import MockCalibrationMangager from './__mocks__/calibration-manager'
 
+import { getLabwareDefBySlot } from '../../protocol/selectors'
+
 jest.mock('../../rpc/client')
+jest.mock('../../protocol/selectors')
 
 describe('api client', () => {
   let dispatch
@@ -62,6 +65,8 @@ describe('api client', () => {
     dispatch = jest.fn()
     mockResolvedValue(RpcClient, rpcClient)
 
+    getLabwareDefBySlot.mockReturnValue({})
+
     const _receive = client(dispatch)
 
     sendToClient = (state, action) => {
@@ -72,6 +77,7 @@ describe('api client', () => {
 
   afterEach(() => {
     RpcClient.mockReset()
+    jest.resetAllMocks()
   })
 
   const ROBOT_NAME = 'ot'

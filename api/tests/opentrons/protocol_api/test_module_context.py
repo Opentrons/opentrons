@@ -120,29 +120,29 @@ def test_thermocycler_lid(loop):
     mod = ctx.load_module('thermocycler')
     assert ctx.deck[7] == mod._geometry
 
-    assert mod.lid_status == 'open'
+    assert mod.lid_position == 'open'
 
     # Open should work if the lid is open (no status change)
-    mod.open()
-    assert mod.lid_status == 'open'
+    mod.open_lid()
+    assert mod.lid_position == 'open'
     assert 'opening thermocycler lid' in ','.join(
         [cmd.lower() for cmd in ctx.commands()])
 
     # Close should work if the lid is open
-    mod.close()
-    assert mod.lid_status == 'closed'
+    mod.close_lid()
+    assert mod.lid_position == 'closed'
     assert 'closing thermocycler lid' in ','.join(
         [cmd.lower() for cmd in ctx.commands()])
 
     # Close should work if the lid is closed (no status change)
-    mod.close()
-    assert mod.lid_status == 'closed'
+    mod.close_lid()
+    assert mod.lid_position == 'closed'
     assert mod._geometry.lid_status == 'closed'
     assert mod._geometry.highest_z == (98.0)  # ignore 37.7mm lid for now
 
     # Open should work if the lid is closed
-    mod.open()
-    assert mod.lid_status == 'open'
+    mod.open_lid()
+    assert mod.lid_position == 'open'
     assert mod._geometry.lid_status == 'open'
     assert mod._geometry.highest_z == 98.0
 
@@ -153,36 +153,77 @@ def test_thermocycler_temp(loop):
         ('mod0', 'thermocycler')]
     mod = ctx.load_module('thermocycler')
 
-    assert mod.target is None
+    assert mod.block_target_temperature is None
 
     # Test default ramp rate
-    mod.set_temperature(20, hold_time=5.0)
-    assert 'setting thermocycler temperature' in ','.join(
+    mod.set_block_temperature(20, hold_time_seconds=5.0, hold_time_minutes=1.0)
+    assert 'setting thermocycler' in ','.join(
         [cmd.lower() for cmd in ctx.commands()])
-    mod.wait_for_temp()
-    assert mod.target == 20
-    assert mod.temperature == 20
+    assert mod.block_target_temperature == 20
+    assert mod.block_temperature == 20
     assert mod.hold_time is not None
     assert mod.ramp_rate is None
 
     # Test specified ramp rate
-    mod.set_temperature(41.3, hold_time=25.5, ramp_rate=2.0)
-    assert 'setting thermocycler temperature' in ','.join(
+    mod.set_block_temperature(41.3, hold_time_seconds=25.5, ramp_rate=2.0)
+    assert 'setting thermocycler' in ','.join(
         [cmd.lower() for cmd in ctx.commands()])
-    mod.wait_for_temp()
-    assert mod.target == 41.3
-    assert mod.temperature == 41.3
+    assert mod.block_target_temperature == 41.3
+    assert mod.block_temperature == 41.3
     assert mod.ramp_rate == 2.0
 
     # Test infinite hold
-    mod.set_temperature(13.2)
-    assert 'setting thermocycler temperature' in ','.join(
+    mod.set_block_temperature(13.2)
+    assert 'setting thermocycler' in ','.join(
         [cmd.lower() for cmd in ctx.commands()])
-    mod.wait_for_temp()
-    assert mod.target == 13.2
-    assert mod.temperature == 13.2
+    assert mod.block_target_temperature == 13.2
+    assert mod.block_temperature == 13.2
     assert mod.hold_time == 0
     assert mod.ramp_rate is None
+
+
+def test_thermocycler_profile(loop):
+    ctx = papi.ProtocolContext(loop)
+    ctx._hw_manager.hardware._backend._attached_modules = [
+        ('mod0', 'thermocycler')]
+    mod = ctx.load_module('thermocycler')
+
+    assert mod.block_target_temperature is None
+    assert mod.lid_target_temperature is None
+
+    # Test profile with no lid temp
+    mod.execute_profile(steps=[{'temperature': 10, 'hold_time_seconds': 30},
+                               {'temperature': 30, 'hold_time_seconds': 90}],
+                        repetitions=5)
+    assert 'thermocycler starting' in ','.join(
+        [cmd.lower() for cmd in ctx.commands()])
+    assert mod.block_target_temperature == 30
+    assert mod.block_temperature == 30
+    assert mod.hold_time is not None
+    assert mod.lid_target_temperature is None
+
+    # Test deactivate clears targets
+    mod.deactivate()
+    assert mod.block_target_temperature is None
+    assert mod.lid_target_temperature is None
+
+    # Test set lid temperature
+    mod.set_lid_temperature(80)
+    assert mod.lid_target_temperature == 80
+    assert mod.lid_temperature == 80
+
+    # Test profile with lid temp override
+    mod.execute_profile(steps=[{'temperature': 20, 'hold_time_seconds': 50},
+                               {'temperature': 60, 'hold_time_seconds': 70}],
+                        repetitions=5)
+    assert 'thermocycler starting' in ','.join(
+        [cmd.lower() for cmd in ctx.commands()])
+    assert mod.block_target_temperature == 60
+    assert mod.block_temperature == 60
+    assert mod.hold_time is not None
+    assert mod.lid_target_temperature == 80
+    assert mod.lid_temperature == 80
+
 
 # NOTE: this test should be rewritten when "semi" config is built
 # def test_semithermocycler_labware_accessor(loop):

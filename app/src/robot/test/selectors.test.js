@@ -2,6 +2,10 @@
 import { setIn } from '@thi.ng/paths'
 import { NAME, selectors, constants } from '../'
 
+import { getLabwareDefBySlot } from '../../protocol/selectors'
+
+jest.mock('../../protocol/selectors')
+
 const makeState = state => ({ [NAME]: state })
 
 const {
@@ -32,6 +36,13 @@ const {
 } = selectors
 
 describe('robot selectors', () => {
+  beforeEach(() => {
+    getLabwareDefBySlot.mockReturnValue({})
+  })
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   describe('robot list', () => {
     let state
 
@@ -344,12 +355,6 @@ describe('robot selectors', () => {
           },
         },
         calibration: {
-          calibrationRequest: {
-            type: 'PROBE_TIP',
-            mount: 'left',
-            inProgress: true,
-            error: null,
-          },
           probedByMount: {
             left: true,
           },
@@ -368,7 +373,6 @@ describe('robot selectors', () => {
           name: 'p200m',
           channels: 8,
           volume: 200,
-          calibration: constants.PROBING,
           probed: true,
           tipOn: false,
           modelSpecs: null,
@@ -378,7 +382,6 @@ describe('robot selectors', () => {
           name: 'p50s',
           channels: 1,
           volume: 50,
-          calibration: constants.UNPROBED,
           probed: false,
           tipOn: true,
           modelSpecs: null,
@@ -495,7 +498,6 @@ describe('robot selectors', () => {
     })
 
     test('get modules', () => {
-      state = setIn(state, 'config.devInternal.enableThermocycler', 'true')
       expect(getModules(state)).toEqual([
         {
           _id: 1,

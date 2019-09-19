@@ -114,7 +114,7 @@ lint: lint-py lint-js lint-json lint-css check-js
 
 .PHONY: format
 format:
-	prettier --ignore-path .eslintignore --write ".*.@(js|yml)" "**/*.@(js|json|md|yml)"
+	prettier --ignore-path .eslintignore $(if $(CI),--check,--write) ".*.@(js|yml)" "**/*.@(js|json|md|yml)"
 
 .PHONY: lint-py
 lint-py:
@@ -129,9 +129,11 @@ lint-js:
 lint-json:
 	eslint --max-warnings 0 --ext .json .
 
+# stylelint seems to close stdout before make can, causing spurious failures
+# with `write error: stdout`; pipe to tee which will hopefully paper over it
 .PHONY: lint-css
 lint-css:
-	stylelint '**/*.css'
+	stylelint '**/*.css' $(and $(CI),| tee /dev/null)
 
 .PHONY: check-js
 check-js:

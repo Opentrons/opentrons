@@ -1,22 +1,19 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import countBy from 'lodash/countBy'
 
-import { getModulesState, fetchModules } from '../../robot-api'
+import { getMissingModules, fetchModules } from '../../robot-api'
 import {
   selectors as robotSelectors,
   actions as robotActions,
 } from '../../robot'
 
-import { RefreshWrapper } from '../Page'
 import DeckMap from '../DeckMap'
 import Prompt from './Prompt'
 import styles from './styles.css'
 
 import type { State, Dispatch } from '../../types'
-import type { RobotService, SessionModule } from '../../robot'
-import type { Module } from '../../robot-api'
+import type { RobotService } from '../../robot/types'
 
 type OP = {| robot: RobotService |}
 
@@ -24,7 +21,7 @@ type SP = {| modulesRequired: boolean, modulesMissing: boolean |}
 
 type DP = {| setReviewed: () => mixed, fetchModules: () => mixed |}
 
-type Props = { ...OP, ...SP, ...DP }
+type Props = {| ...OP, ...SP, ...DP |}
 
 export default connect<Props, OP, SP, DP, State, Dispatch>(
   mapStateToProps,
@@ -38,24 +35,19 @@ function ConnectModules(props: Props) {
   const onPromptClick = modulesMissing ? fetchModules : setReviewed
 
   return (
-    <RefreshWrapper refresh={fetchModules}>
-      <div className={styles.page_content_dark}>
-        <Prompt modulesMissing={modulesMissing} onClick={onPromptClick} />
-        <div className={styles.deck_map_wrapper}>
-          <DeckMap className={styles.deck_map} modulesRequired />
-        </div>
+    <div className={styles.page_content_dark}>
+      <Prompt modulesMissing={modulesMissing} onClick={onPromptClick} />
+      <div className={styles.deck_map_wrapper}>
+        <DeckMap className={styles.deck_map} modulesRequired />
       </div>
-    </RefreshWrapper>
+    </div>
   )
 }
 
 function mapStateToProps(state: State, ownProps: OP): SP {
-  const sessionModules = robotSelectors.getModules(state)
-  const actualModules = getModulesState(state, ownProps.robot.name)
-
   return {
-    modulesRequired: sessionModules.length !== 0,
-    modulesMissing: checkModulesMissing(sessionModules, actualModules),
+    modulesRequired: robotSelectors.getModules(state).length > 0,
+    modulesMissing: getMissingModules(state).length > 0,
   }
 }
 
@@ -64,16 +56,4 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
     setReviewed: () => dispatch(robotActions.setModulesReviewed(true)),
     fetchModules: () => dispatch(fetchModules(ownProps.robot)),
   }
-}
-
-function checkModulesMissing(
-  required: Array<SessionModule>,
-  actual: ?Array<Module>
-): boolean {
-  const requiredNames = countBy(required, 'name')
-  const actualNames = countBy(actual, 'name')
-
-  return Object.keys(requiredNames).some(
-    n => requiredNames[n] !== actualNames[n]
-  )
 }

@@ -2,12 +2,16 @@
 // play pause run buttons for sidepanel
 import * as React from 'react'
 import { Link } from 'react-router-dom'
-import { OutlineButton } from '@opentrons/components'
+import { OutlineButton, HoverTooltip } from '@opentrons/components'
 
 import styles from './styles.css'
 
-type RunProps = {
+const MISSING_MODULES =
+  'Please attach all required modules before running this protocol'
+
+type RunProps = {|
   disabled: boolean,
+  modulesReady: boolean,
   isReadyToRun: boolean,
   isPaused: boolean,
   isRunning: boolean,
@@ -15,10 +19,12 @@ type RunProps = {
   onPauseClick: () => mixed,
   onResumeClick: () => mixed,
   onResetClick: () => mixed,
-}
+|}
+
 export default function RunControls(props: RunProps) {
   const {
     disabled,
+    modulesReady,
     isReadyToRun,
     isPaused,
     isRunning,
@@ -38,14 +44,24 @@ export default function RunControls(props: RunProps) {
   let resetButton
 
   if (isReadyToRun && !isRunning) {
+    // TODO(mc, 2019-09-03): add same check for pipettes
+    const runDisabled = disabled || !modulesReady
+    let tooltip = modulesReady ? null : MISSING_MODULES
+
     runButton = (
-      <OutlineButton
-        onClick={onRunClick}
-        className={styles.run_button}
-        disabled={disabled}
-      >
-        Start Run
-      </OutlineButton>
+      <HoverTooltip tooltipComponent={tooltip}>
+        {hoverTooltipHandlers => (
+          <div {...hoverTooltipHandlers}>
+            <OutlineButton
+              onClick={onRunClick}
+              className={styles.run_button}
+              disabled={runDisabled}
+            >
+              Start Run
+            </OutlineButton>
+          </div>
+        )}
+      </HoverTooltip>
     )
   } else if (isRunning) {
     pauseResumeButton = (
@@ -81,11 +97,11 @@ export default function RunControls(props: RunProps) {
   }
 
   return (
-    <div>
+    <>
       {runButton}
       {pauseResumeButton}
       {cancelButton}
       {resetButton}
-    </div>
+    </>
   )
 }

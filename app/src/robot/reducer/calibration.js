@@ -3,7 +3,7 @@
 // TODO(mc, 2018-01-10): refactor to use combineReducers
 import mapValues from 'lodash/mapValues'
 
-import type { Action } from '../../types'
+import type { Action, Error } from '../../types'
 import type { Mount, Slot } from '../types'
 import { actionTypes } from '../actions'
 import type {
@@ -30,15 +30,15 @@ type CalibrationRequestType =
   | 'UPDATE_OFFSET'
   | 'SET_MODULES_REVIEWED'
 
-type CalibrationRequest = {
+type CalibrationRequest = $ReadOnly<{|
   type: CalibrationRequestType,
   mount?: Mount,
   slot?: Slot,
   inProgress: boolean,
-  error: ?{ message: string },
-}
+  error: Error | null,
+|}>
 
-export type CalibrationState = $ReadOnly<{
+export type CalibrationState = $ReadOnly<{|
   deckPopulated: ?boolean,
   modulesReviewed: ?boolean,
 
@@ -48,7 +48,7 @@ export type CalibrationState = $ReadOnly<{
   confirmedBySlot: { [Slot]: boolean },
 
   calibrationRequest: CalibrationRequest,
-}>
+|}>
 
 // TODO(mc, 2018-01-11): replace actionType constants with Flow types
 const {
@@ -82,6 +82,13 @@ export default function calibrationReducer(
     case 'robot:REFRESH_SESSION':
     case 'protocol:UPLOAD':
       return INITIAL_STATE
+
+    // reset calibration state on robot home
+    case 'robot:CLEAR_CALIBRATION_REQUEST':
+      return {
+        ...state,
+        calibrationRequest: { type: '', inProgress: false, error: null },
+      }
 
     case 'robot:CONFIRM_PROBED':
       return handleConfirmProbed(state, action)

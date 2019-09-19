@@ -2,7 +2,7 @@
 // full-width labware details
 import * as React from 'react'
 
-import { getUniqueWellProperties } from '../../definitions'
+import { getUniqueWellProperties } from '../../labwareInference'
 import { getWellLabel, WellProperties, ManufacturerStats } from '../labware-ui'
 import { DetailsBox } from '../ui'
 import WellDimensions from './WellDimensions'

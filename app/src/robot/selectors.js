@@ -7,6 +7,7 @@ import { createSelector } from 'reselect'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { getLatestLabwareDef } from '../getLabware'
 import { PIPETTE_MOUNTS, DECK_SLOTS } from './constants'
+import { getLabwareDefBySlot } from '../protocol/selectors'
 
 import type { OutputSelector } from 'reselect'
 import type { State } from '../types'
@@ -15,7 +16,6 @@ import type {
   Mount,
   Slot,
   Pipette,
-  PipetteCalibrationStatus,
   Labware,
   LabwareCalibrationStatus,
   LabwareType,
@@ -229,32 +229,11 @@ export const getPipettes: OutputSelector<
     return PIPETTE_MOUNTS.filter(mount => pipettesByMount[mount] != null).map(
       mount => {
         const pipette = pipettesByMount[mount]
-
         const probed = probedByMount[mount] || false
         const tipOn = tipOnByMount[mount] || false
-        let calibration: PipetteCalibrationStatus = 'unprobed'
-
-        // TODO(mc: 2018-01-10): rethink pipette level "calibration" prop
-        // TODO(mc: 2018-01-23): handle probe error state better
-        if (calibrationRequest.mount === mount && !calibrationRequest.error) {
-          if (calibrationRequest.type === 'MOVE_TO_FRONT') {
-            calibration = calibrationRequest.inProgress
-              ? 'preparing-to-probe'
-              : 'ready-to-probe'
-          } else if (calibrationRequest.type === 'PROBE_TIP') {
-            if (calibrationRequest.inProgress) {
-              calibration = 'probing'
-            } else if (!probed) {
-              calibration = 'probed-tip-on'
-            } else {
-              calibration = 'probed'
-            }
-          }
-        }
 
         return {
           ...pipette,
-          calibration,
           probed,
           tipOn,
           modelSpecs: getPipetteModelSpecs(pipette.name) || null,
@@ -313,13 +292,8 @@ export const getModules: OutputSelector<
   getModulesBySlot,
   // TODO (ka 2019-3-26): can't import getConfig due to circular dependency
   state => state.config,
-  (modulesBySlot, config) => {
-    const tcEnabled = !!config.devInternal?.enableThermocycler
-
-    return Object.keys(modulesBySlot)
-      .map((slot: Slot) => modulesBySlot[slot])
-      .filter((m: SessionModule) => tcEnabled || m.name !== 'thermocycler')
-  }
+  (modulesBySlot, config) =>
+    Object.keys(modulesBySlot).map((slot: Slot) => modulesBySlot[slot])
 )
 
 export function getLabwareBySlot(state: State) {
@@ -336,12 +310,14 @@ export const getLabware: OutputSelector<
   (state: State) => calibration(state).confirmedBySlot,
   getModulesBySlot,
   getCalibrationRequest,
+  getLabwareDefBySlot,
   (
     instByMount,
     lwBySlot,
     confirmedBySlot,
     modulesBySlot,
-    calibrationRequest
+    calibrationRequest,
+    labwareDefsBySlot
   ): Labware[] => {
     return Object.keys(lwBySlot)
       .filter(isSlot)
@@ -349,7 +325,10 @@ export const getLabware: OutputSelector<
         const labware = lwBySlot[slot]
         const { type, isTiprack, isLegacy } = labware
 
-        const definition = isLegacy ? null : getLatestLabwareDef(type)
+        let definition = null
+        if (!isLegacy) {
+          definition = labwareDefsBySlot[slot] || getLatestLabwareDef(type)
+        }
 
         // labware is confirmed if:
         //   - tiprack: labware in slot is confirmed

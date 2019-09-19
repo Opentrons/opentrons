@@ -7,10 +7,15 @@ import { useEffect, useRef } from 'react'
  *
  * @template T (type of the input value)
  * @param {() => mixed} callback (function to call on an interval)
- * @param {number | null} callback (interval delay, or null to stop interval)
+ * @param {number | null} delay (interval delay, or null to stop interval)
+ * @param {boolean} [immediate=false] (trigger the callback immediately before starting the interval)
  * @returns {void}
  */
-export function useInterval(callback: () => mixed, delay: number | null): void {
+export function useInterval(
+  callback: () => mixed,
+  delay: number | null,
+  immediate: boolean = false
+): void {
   const savedCallback = useRef()
 
   // remember the latest callback
@@ -21,9 +26,10 @@ export function useInterval(callback: () => mixed, delay: number | null): void {
   // set up the interval
   useEffect(() => {
     const tick = () => savedCallback.current && savedCallback.current()
-    if (delay !== null) {
+    if (delay !== null && delay > 0) {
+      if (immediate) tick()
       const id = setInterval(tick, delay)
       return () => clearInterval(id)
     }
-  }, [delay])
+  }, [delay, immediate])
 }

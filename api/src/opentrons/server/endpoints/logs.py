@@ -18,7 +18,7 @@ def _get_options(params: Mapping[str, str],
     requests will just use defaults.
     """
     response = {
-        'format': 'json',
+        'format': 'text',
         'records': default_length
     }
 
@@ -62,7 +62,7 @@ async def get_logs_by_id(request: web.Request) -> web.Response:
 
     This endpoint accepts the following (optional) query parameters:
     - ``format``: ``json`` or ``text`` (default: text). Controls log format.
-    - ``records``: int. Count of records to limit the dump to. Default: 15000.
+    - ``records``: int. Count of records to limit the dump to. Default: 500000.
       Limit: 1000000
 
     The syslog identifier is an a string that something has logged to as the
@@ -83,7 +83,7 @@ async def get_logs_by_id(request: web.Request) -> web.Response:
         ident = 'opentrons-api'
     elif ident == 'serial.log':
         ident = 'opentrons-api-serial'
-    opts = _get_options(request.query, 15000)
+    opts = _get_options(request.query, 500000)
     return await _get_log_response(
         ident, opts['records'], opts['format'])
 

@@ -6,7 +6,7 @@
 
 .panel {
   flex-shrink: 0;
-  overflow: hidden;
+  overflow: visible;
   border-right: var(--bd-light);
   background-color: var(--c-bg-light);
   position: relative;

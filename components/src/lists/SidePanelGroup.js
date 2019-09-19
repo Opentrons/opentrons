@@ -6,7 +6,7 @@ import cx from 'classnames'
 import styles from './lists.css'
 import { type IconName, Icon } from '../icons'
 
-type GroupProps = {
+type GroupProps = {|
   /** text of title */
   title?: string,
   /** optional icon left of the title */
@@ -17,7 +17,7 @@ type GroupProps = {
   className?: string,
   /** disables the whole SidePanelGroup if true */
   disabled?: boolean,
-}
+|}
 
 /**
  * A component for grouping and titling multiple lists

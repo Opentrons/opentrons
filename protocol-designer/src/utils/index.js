@@ -1,5 +1,6 @@
 // @flow
 import uuidv1 from 'uuid/v1'
+import { makeWellSetHelpers } from '@opentrons/shared-data'
 import type { WellGroup } from '@opentrons/components'
 import type { BoundingRect, GenericRect } from '../collision-types'
 
@@ -70,3 +71,10 @@ export const getCollidingWells = (
 // TODO IMMEDIATELY use where appropriate
 export const arrayToWellGroup = (w: Array<string>): WellGroup =>
   w.reduce((acc, wellName) => ({ ...acc, [wellName]: null }), {})
+
+// cross-PD memoization of well set utils
+export const {
+  canPipetteUseLabware,
+  getAllWellSetsForLabware,
+  getWellSetForMultichannel,
+} = makeWellSetHelpers()
