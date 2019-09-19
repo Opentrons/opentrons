@@ -184,15 +184,30 @@ def execute(protocol_file: TextIO,
             exec(protocol.contents, {})
 
 
-def _print_runlog(command: Dict[str, Any]):
-    when = 'Begin:' if command['payload']['$'] == 'before' else 'End:'
-    print(' '.join([
-        '\t'*command['level'],
-        when,
-        command['payload']['text'].format(**command['payload']['text'])]))
+def make_runlog_cb():
+    level = 0
+    last_dollar = None
+
+    def _print_runlog(command: Dict[str, Any]):
+        nonlocal level
+        nonlocal last_dollar
+
+        if last_dollar == command['$']:
+            if command['$'] == 'before':
+                level += 1
+            else:
+                level -= 1
+        last_dollar = command['$']
+        if command['$'] == 'before':
+            print(' '.join([
+                '\t'*level,
+                command['payload'].get('text', '')
+                .format(**command['payload'])]))
+
+    return _print_runlog
 
 
-def _main(argv: List[str]) -> int:
+def main() -> int:
     """ Handler for command line invocation to run a protocol.
 
     :param argv: The arguments the program was invoked with; this is usually
@@ -211,22 +226,16 @@ def _main(argv: List[str]) -> int:
     parser.add_argument(
         '-n', '--no-print-runlog', action='store_true',
         help='Do not print the commands as they are executed')
-    args = parser.parse_args(argv)
-    protofile = args.protocol.read()
-    printer = None if args.no_print_runlog else _print_runlog
+    args = parser.parse_args()
+    printer = None if args.no_print_runlog else make_runlog_cb()
     if args.log_level != 'none':
         stack_logger = logging.getLogger('opentrons')
         stack_logger.addHandler(logging.StreamHandler(sys.stdout))
         log_level = args.log_level
     else:
         log_level = 'warning'
-    execute(protofile, log_level=log_level, emit_runlog=printer)
+    execute(args.protocol, log_level=log_level, emit_runlog=printer)
     return 0
-
-
-def main():
-    """ Entrypoint for the setup.py console_script """
-    return _main(sys.argv)
 
 
 if __name__ == '__main__':

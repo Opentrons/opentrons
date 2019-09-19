@@ -214,7 +214,7 @@ def get_arguments(
 # Note - this script is also set up as a setuptools entrypoint and thus does
 # an absolute minimum of work since setuptools does something odd generating
 # the scripts
-def main():
+def main() -> int:
     """ Run the simulation """
     parser = argparse.ArgumentParser(prog='opentrons_simulate',
                                      description='Simulate an OT-2 protocol')
