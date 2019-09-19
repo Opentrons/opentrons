@@ -16,7 +16,8 @@ if not config.feature_flags.use_protocol_api_v2():
 if os.environ.get('OT_UPDATE_SERVER') != 'true'\
    and not config.feature_flags.use_protocol_api_v2():
     database_migration.check_version_and_perform_full_migration()
-elif not config.feature_flags.use_protocol_api_v2():
+else:
+    # Need to minimally build the database for CI
     database_migration.check_version_and_perform_minimal_migrations()
 
 try:
