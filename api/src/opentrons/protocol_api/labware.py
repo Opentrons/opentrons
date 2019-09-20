@@ -1016,7 +1016,7 @@ def get_labware_definition(
 
     if bundled_labware:
         bundled_candidates = [
-            b for b in bundled_labware.values() 
+            b for b in bundled_labware.values()
             if b['parameters']['loadName'] == load_name]
         if namespace is not None:
             bundled_candidates = [
@@ -1024,10 +1024,11 @@ def get_labware_definition(
         if version is not None:
             bundled_candidates = [
                 b for b in bundled_candidates if b['version'] == version]
-        
+
         if len(bundled_candidates) > 1:
-            raise RuntimeError('Ambiguous labware access. Bundle contains multiple ' +
-                f'labware with load name {load_name}, ' + 
+            raise RuntimeError(
+                'Ambiguous labware access. Bundle contains multiple ' +
+                f'labware with load name {load_name}, ' +
                 f'namespace {namespace or "*"}, and version {version or "*"}.')
         elif len(bundled_candidates) == 1:
             return bundled_candidates[0]

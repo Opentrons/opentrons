@@ -18,7 +18,7 @@ from .labware import (Well, Labware, load, get_labware_definition,
 
 from . import geometry
 from . import transfers
-from ..protocols.types import Protocol
+from ..protocols.types import Protocol, PythonProtocol
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -114,7 +114,9 @@ class ProtocolContext(CommandPublisher):
         self._unsubscribe_commands = None
         self.clear_commands()
 
-        self._bundled_labware = protocol and protocol.bundled_labware
+        self._bundled_labware = (
+            protocol.bundled_labware if
+            isinstance(protocol, PythonProtocol) else None)
 
         if fflags.short_fixed_trash():
             trash_name = 'opentrons_1_trash_850ml_fixed'

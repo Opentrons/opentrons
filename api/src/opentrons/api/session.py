@@ -363,7 +363,8 @@ class Session(object):
             if ff.use_protocol_api_v2():
                 self._hardware.cache_instruments()
                 ctx = ProtocolContext(loop=self._loop,
-                                      broker=self._broker, protocol=self._protocol)
+                                      broker=self._broker,
+                                      protocol=self._protocol)
                 ctx.connect(self._hardware)
                 ctx.home()
                 run_protocol(self._protocol, context=ctx)

@@ -1,4 +1,4 @@
-from typing import Any, Dict, NamedTuple, Optional, Union, IO
+from typing import Any, Dict, NamedTuple, Optional, Union
 
 Metadata = Dict[str, Union[str, int]]
 
@@ -17,8 +17,8 @@ class PythonProtocol(NamedTuple):
     metadata: Metadata
     api_level: str  # For now, should be '1' or '2'
     bundled_labware: Dict[str, Dict[str, Any]]
-    bundled_datafiles: Dict[str, IO[bytes]]
-    bundled_python: Dict[str, IO[bytes]]
+    bundled_datafiles: Dict[str, bytes]
+    bundled_python: Dict[str, str]
 
 
 Protocol = Union[JsonProtocol, PythonProtocol]

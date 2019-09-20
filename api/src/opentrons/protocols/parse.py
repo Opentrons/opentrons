@@ -6,10 +6,9 @@ import ast
 import itertools
 import json
 import pkgutil
-import mimetypes
 from io import BytesIO
 from zipfile import ZipFile
-from typing import Any, Dict, IO, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 import jsonschema  # type: ignore
 
@@ -33,8 +32,8 @@ def _parse_python(
     protocol_contents: str,
     filename: str = None,
     bundled_labware: Dict[str, Dict[str, Any]] = {},
-    bundled_datafiles: Dict[str, IO[bytes]] = {},
-    bundled_python: Dict[str, IO[bytes]] = {}
+    bundled_datafiles: Dict[str, bytes] = {},
+    bundled_python: Dict[str, str] = {}
 ) -> PythonProtocol:
     """ Parse a protocol known or at least suspected to be python """
     filename_checked = filename or '<protocol>'
@@ -89,7 +88,7 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:
             elif name.startswith('data/'):
                 bundled_datafiles[name] = f.read()
             elif name.endswith('.py') and name != MAIN_PROTOCOL_FILENAME:
-                bundled_python[name] = f.read()
+                bundled_python[name] = f.read().decode('utf-8')
 
     return _parse_python(
         py_protocol, filename, bundled_labware, bundled_datafiles,
