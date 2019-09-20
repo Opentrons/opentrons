@@ -14,6 +14,7 @@ Opentrons API Version 2
     new_complex_commands
     new_protocol_api
     new_examples
+    new_advanced_running
 
 
 .. _protocol-api-robot:

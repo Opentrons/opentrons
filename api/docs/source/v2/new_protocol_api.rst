@@ -1,3 +1,4 @@
+.. _protocol-api-reference:
 
 API Version 2 Reference
 =======================

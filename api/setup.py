@@ -153,7 +153,8 @@ if __name__ == "__main__":
         },
         entry_points={
             'console_scripts': [
-                'opentrons_simulate = opentrons.simulate:main'
+                'opentrons_simulate = opentrons.simulate:main',
+                'opentrons_execute = opentrons.execute:main',
             ]
         },
         project_urls={
