@@ -8,7 +8,7 @@ import argparse
 import sys
 import logging
 import queue
-from typing import Any, List, Mapping
+from typing import Any, List, Mapping, TextIO
 
 import opentrons
 import opentrons.legacy_api.protocols
@@ -95,7 +95,7 @@ class CommandScraper:
             self._depth = max(self._depth-1, 0)
 
 
-def simulate(protocol_file,
+def simulate(protocol_file: TextIO,
              propagate_logs=False,
              log_level='warning') -> List[Mapping[str, Any]]:
     """
@@ -204,7 +204,7 @@ def get_arguments(
         'Log levels below warning can be chatty. If "none", do not show logs')
     parser.add_argument(
         'protocol', metavar='PROTOCOL',
-        type=argparse.FileType('r'),
+        type=argparse.FileType('rb'),
         help='The protocol file to simulate. If you pass \'-\', you can pipe '
         'the protocol via stdin; this could be useful if you want to use this '
         'utility as part of an automated workflow.')

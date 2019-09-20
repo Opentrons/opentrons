@@ -507,9 +507,9 @@ def hardware_api(loop):
 def get_labware_fixture():
     def _get_labware_fixture(fixture_name):
         with open((pathlib.Path(__file__).parent/'..'/'..'/'..'/'shared-data' /
-                   'labware' / 'fixtures'/'2'/f'{fixture_name}.json'), 'r'
+                   'labware' / 'fixtures'/'2'/f'{fixture_name}.json'), 'rb'
                   ) as f:
-            return json.load(f)
+            return json.load(f.decode('utf-8'))
 
     return _get_labware_fixture
 
@@ -519,8 +519,8 @@ def get_json_protocol_fixture():
     def _get_json_protocol_fixture(fixture_version, fixture_name, decode=True):
         with open(pathlib.Path(__file__).parent /
                   '..'/'..'/'..'/'shared-data'/'protocol'/'fixtures' /
-                  fixture_version/f'{fixture_name}.json', 'r') as f:
-            contents = f.read()
+                  fixture_version/f'{fixture_name}.json', 'rb') as f:
+            contents = f.read().decode('utf-8')
             if decode:
                 return json.loads(contents)
             else:

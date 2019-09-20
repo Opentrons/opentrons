@@ -89,7 +89,7 @@ def get_arguments(
         '\'none\', do not show logs')
     parser.add_argument(
         'protocol', metavar='PROTOCOL',
-        type=argparse.FileType('r'),
+        type=argparse.FileType('rb'),
         help='The protocol file to execute. If you pass \'-\', you can pipe '
         'the protocol via stdin; this could be useful if you want to use this '
         'utility as part of an automated workflow.')
