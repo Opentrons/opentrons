@@ -65,7 +65,7 @@ are project specific  */
 
   &:hover,
   &:active {
-    color: color(var(--c-blue) alpha(0.6));
+    color: color-mod(var(--c-blue) alpha(0.6));
   }
 }
 

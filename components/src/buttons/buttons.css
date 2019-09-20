@@ -32,7 +32,7 @@
 
     &:active {
       font-weight: var(--fw-regular);
-      background-color: color(var(--c-bg-light) shade(10%));
+      background-color: color-mod(var(--c-bg-light) shade(10%));
     }
 
     &:disabled,
@@ -44,7 +44,7 @@
     &:focus,
     &:hover,
     &.hover {
-      background-color: color(var(--c-med-gray) alpha(25%));
+      background-color: color-mod(var(--c-med-gray) alpha(25%));
     }
     /* stylelint-enable */
   }
@@ -55,7 +55,7 @@
 
     &:active {
       font-weight: var(--fw-regular);
-      background-color: color(var(--c-bg-dark) tint(10%));
+      background-color: color-mod(var(--c-bg-dark) tint(10%));
     }
 
     &:disabled,
@@ -67,7 +67,7 @@
     &:focus,
     &:hover,
     &.hover {
-      background-color: color(var(--c-bg-dark) tint(5%));
+      background-color: color-mod(var(--c-bg-dark) tint(5%));
     }
     /* stylelint-enable */
   }
@@ -90,12 +90,12 @@
   &:focus,
   &:hover,
   &.hover {
-    background-color: color(var(--c-bg-dark) shade(30%));
+    background-color: color-mod(var(--c-bg-dark) shade(30%));
   }
 
   &:active {
     font-weight: var(--fw-regular);
-    background-color: color(var(--c-bg-dark) tint(30%));
+    background-color: color-mod(var(--c-bg-dark) tint(30%));
 
     /* TODO(mc, 2017-12-07): pull shadows out to central file */
     box-shadow:
@@ -110,11 +110,11 @@
     &:focus,
     &:hover,
     &.hover {
-      background-color: color(var(--c-bg-light) shade(5%));
+      background-color: color-mod(var(--c-bg-light) shade(5%));
     }
 
     &:active {
-      background-color: color(var(--c-bg-light) shade(10%));
+      background-color: color-mod(var(--c-bg-light) shade(10%));
     }
   }
 
@@ -122,7 +122,7 @@
   &.disabled {
     @apply --button-disabled;
 
-    background-color: color(var(--c-bg-dark) tint(70%));
+    background-color: color-mod(var(--c-bg-dark) tint(70%));
     box-shadow: none;
     color: var(--c-font-disabled);
   }

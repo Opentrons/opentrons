@@ -42,7 +42,7 @@
 
 .select_group {
   &:not(:first-child) {
-    border-top: 1px solid color(var(--c-med-gray) alpha(0.4));
+    border-top: 1px solid color-mod(var(--c-med-gray) alpha(0.4));
   }
 }
 

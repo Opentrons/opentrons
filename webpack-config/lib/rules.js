@@ -13,9 +13,10 @@ const CSS_LOADER = {
 
 const CSS_MODULE_LOADER = Object.assign({}, CSS_LOADER, {
   options: Object.assign({}, CSS_LOADER.options, {
-    modules: true,
     sourceMap: true,
-    localIdentName: '[name]__[local]__[hash:base64:5]',
+    modules: {
+      localIdentName: '[name]__[local]__[hash:base64:5]',
+    },
   }),
 })
 
@@ -25,7 +26,9 @@ const POSTCSS_LOADER = {
     ident: 'postcss',
     plugins: loader => [
       require('postcss-import')({ root: loader.resourcePath }),
-      require('postcss-cssnext')(),
+      require('postcss-apply'),
+      require('postcss-color-mod-function'),
+      require('postcss-preset-env')({ stage: 0 }),
       require('lost'),
     ],
   },

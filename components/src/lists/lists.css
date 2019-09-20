@@ -88,7 +88,7 @@
   padding-top: 1rem;
 
   &:hover {
-    background-color: color(var(--c-black) alpha(5%));
+    background-color: color-mod(var(--c-black) alpha(5%));
   }
 }
 
