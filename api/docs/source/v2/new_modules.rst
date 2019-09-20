@@ -34,7 +34,7 @@ You can reference your module in a few different ways. The valid names can be fo
 +--------------------------+-----------------------------------------------+
 | ``Magnetic Module``      | ``'Magnetic Module'``, ``'magdeck'``          |
 +--------------------------+-----------------------------------------------+
-| ``Thermocycler Module``  | ``'Thermocycler Module'``, ``'Thermocycler Module'`` |
+| ``Thermocycler Module``  | ``'Thermocycler Module'``, ``'thermocycler'`` |
 +--------------------------+-----------------------------------------------+
 
 Loading Labware onto your Module
@@ -66,7 +66,7 @@ All modules have the ability to check what state they are currently in. To do th
 
 For the temperature module this will return a string stating whether it's ``'heating'``, ``'cooling'``, ``'holding at target'`` or ``'idle'``.
 For the magnetic module this will return a string stating whether it's ``'engaged'`` or ``'disengaged'``.
-For the Thermocycler Module module this will return ``'holding at target'`` or ``'idle'``. There are more detailed status checks which can be found in at :ref:`Thermocycler Module-section`
+For the Thermocycler Module module this will return ``'holding at target'`` or ``'idle'``. There are more detailed status checks which can be found in at :ref:`thermocycler-section`
 
 ******************
 Temperature Module
@@ -204,7 +204,7 @@ The magnetic modules will disengage on power cycle of the device. It will not au
 unless you specify in your protocol.
 
 
-.. _Thermocycler Module-section:
+.. _thermocycler-section:
 
 *******************
 Thermocycler Module
@@ -287,7 +287,7 @@ Lid Temperature Control
 ^^^^^^^^^^^^^^^^^^^^^^^
 As mentioned before, users have access to controlling when a lid temperature is set. It is recommended that you set
 the lid temperature before executing a Thermocycler Module profile, described later. The range of the Thermocycler Module lid is
-20°C to 105°C.
+37°C to 110°C.
 
 Set Lid Temperature
 +++++++++++++++++++
