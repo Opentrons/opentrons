@@ -12,6 +12,7 @@ from typing import Any, Dict, Optional, Union
 
 import jsonschema  # type: ignore
 
+from opentrons.config import feature_flags as ff
 from .types import Protocol, PythonProtocol, JsonProtocol, Metadata
 
 import logging
@@ -31,9 +32,9 @@ def _parse_json(
 def _parse_python(
     protocol_contents: str,
     filename: str = None,
-    bundled_labware: Dict[str, Dict[str, Any]] = {},
-    bundled_datafiles: Dict[str, bytes] = {},
-    bundled_python: Dict[str, str] = {}
+    bundled_labware: Dict[str, Dict[str, Any]] = None,
+    bundled_datafiles: Dict[str, bytes] = None,
+    bundled_python: Dict[str, str] = None
 ) -> PythonProtocol:
     """ Parse a protocol known or at least suspected to be python """
     filename_checked = filename or '<protocol>'
@@ -56,11 +57,30 @@ def _parse_python(
     return result
 
 
-def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:
+def _has_files_at_root(zipFile):
+    for zipInfo in zipFile.infolist():
+        if zipInfo.filename.count('/') == 0:
+            return True
+    return False
+
+
+def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # noqa: C901
     """ Parse a bundled Python protocol """
+    if not ff.use_protocol_api_v2():
+        raise RuntimeError(
+            'Uploading a bundled protocol requires the robot to be set to '
+            'Protocol API V2. Enable the \'Use Protocol API version 2\' '
+            'toggle in the robot\'s Advanced Settings and restart the robot')
+    if not _has_files_at_root(bundle):
+        raise RuntimeError(
+            'No files found in ZIP file\'s root directory. When selecting '
+            'files to zip, make sure to directly select the files '
+            'themselves. Do not select their parent directory, which would '
+            'result in nesting all files inside that directory in the ZIP.')
+
     MAIN_PROTOCOL_FILENAME = 'protocol.ot2.py'
     py_protocol: Optional[str] = None
-    bundled_labware = {}
+    bundled_labware: Dict[str, Dict[str, Any]] = {}
     bundled_datafiles = {}
     bundled_python = {}
 
@@ -74,25 +94,36 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:
 
     for zipInfo in bundle.infolist():
         name = zipInfo.filename
-        if zipInfo.is_dir():
+
+        # skip directories and weird OS cruft
+        if name.startswith('__MACOSX') or zipInfo.is_dir():
             continue
+
         with bundle.open(zipInfo) as f:
-            if (name.startswith('custom_labware/') or
-                    name.startswith('standard_labware/')):
+            if name.startswith('labware/') and name.endswith('.json'):
                 labware_def = json.load(f)
                 # TODO IMMEDIATELY: make a FN? Use arbitrary unique ID instead?
                 labware_key = '/'.join([labware_def['namespace'],
                                         labware_def['parameters']['loadName'],
                                         str(labware_def['version'])])
+                if labware_key in bundled_labware:
+                    raise RuntimeError(
+                        f'Conflicting labware in bundle. {labware_key}')
                 bundled_labware[labware_key] = labware_def
             elif name.startswith('data/'):
                 bundled_datafiles[name] = f.read()
             elif name.endswith('.py') and name != MAIN_PROTOCOL_FILENAME:
                 bundled_python[name] = f.read().decode('utf-8')
 
-    return _parse_python(
+    result = _parse_python(
         py_protocol, filename, bundled_labware, bundled_datafiles,
         bundled_python)
+
+    if result.api_level != '2':
+        raise RuntimeError('Bundled protocols must use Protocol API V2, ' +
+                           f'got {result.api_level}')
+
+    return result
 
 
 def parse(

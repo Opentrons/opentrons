@@ -14,7 +14,8 @@ from .labware import (Well, Labware, load, get_labware_definition,
                       load_from_definition, load_module,
                       ModuleGeometry, quirks_from_any_parent,
                       ThermocyclerGeometry, OutOfTipsError,
-                      select_tiprack_from_list, filter_tipracks_to_start)
+                      select_tiprack_from_list, filter_tipracks_to_start,
+                      get_labware_definition_from_bundle)
 
 from . import geometry
 from . import transfers
@@ -216,7 +217,7 @@ class ProtocolContext(CommandPublisher):
             location: types.DeckLocation,
             label: str = None,
             namespace: str = None,
-            version: int = 1
+            version: int = None
     ) -> Labware:
         """ Load a labware onto the deck given its name.
 
@@ -240,8 +241,14 @@ class ProtocolContext(CommandPublisher):
         :param int version: The version of the labware definition. If
             unspecified, will use version 1.
         """
-        labware_def = get_labware_definition(
-            load_name, namespace, version, self._bundled_labware)
+        if self._bundled_labware is not None:
+            labware_def = get_labware_definition_from_bundle(
+                self._bundled_labware, load_name, namespace, version)
+        else:
+            if version is None:
+                version = 1
+            labware_def = get_labware_definition(
+                load_name, namespace, version)
         return self.load_labware_from_definition(labware_def, location, label)
 
     def load_labware_by_name(

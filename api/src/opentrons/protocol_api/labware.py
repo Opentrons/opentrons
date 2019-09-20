@@ -995,11 +995,55 @@ def delete_all_custom_labware() -> None:
         shutil.rmtree(custom_def_dir)
 
 
-def get_labware_definition(
+def get_labware_definition_from_bundle(
+    bundled_labware: Dict[str, Dict[str, Any]],
     load_name: str,
     namespace: str = None,
     version: int = None,
-    bundled_labware: Optional[Dict[str, Dict[str, Any]]] = None,
+) -> Dict[str, Any]:
+    """
+    Look up and return a bundled definition by load_name + namespace + version
+        and return it or raise an exception.
+    Namespace and version are optional, they only have to be specified if
+        there is ambiguity (eg when multiple labware in the bundle share
+        the same load_name)
+
+    :param str load_name: corresponds to 'loadName' key in definition
+    :param str namespace: The namespace the labware definition belongs to
+    :param int version: The version of the labware definition
+    :param Dict bundled_labware: A dictionary of labware definitions to search
+    """
+    load_name = load_name.lower()
+    if namespace is not None:
+        namespace = namespace.lower()
+
+    bundled_candidates = [
+        b for b in bundled_labware.values()
+        if b['parameters']['loadName'] == load_name]
+    if namespace is not None:
+        bundled_candidates = [
+            b for b in bundled_candidates if b['namespace'] == namespace]
+    if version is not None:
+        bundled_candidates = [
+            b for b in bundled_candidates if b['version'] == version]
+
+    if len(bundled_candidates) == 1:
+        return bundled_candidates[0]
+    elif len(bundled_candidates) > 1:
+        raise RuntimeError(
+            f'Ambiguous labware access. Bundle contains multiple '
+            f'labware with load name {load_name}, '
+            f'namespace {namespace}, and version {version}.')
+    else:
+        raise RuntimeError(
+            f'No labware found in bundle with load name {load_name}, '
+            f'namespace {namespace}, and version {version}.')
+
+
+def get_labware_definition(
+    load_name: str,
+    namespace: str = None,
+    version: int = 1
 ) -> Dict[str, Any]:
     """
     Look up and return a definition by load_name + namespace + version and
@@ -1010,32 +1054,8 @@ def get_labware_definition(
         If unspecified, will search 'opentrons' then 'custom_beta'
     :param int version: The version of the labware definition. If unspecified,
         will use version 1.
-    :param Dict bundled_labware: A dictionary of labware definitions to search
     """
     load_name = load_name.lower()
-
-    if bundled_labware:
-        bundled_candidates = [
-            b for b in bundled_labware.values()
-            if b['parameters']['loadName'] == load_name]
-        if namespace is not None:
-            bundled_candidates = [
-                b for b in bundled_candidates if b['namespace'] == namespace]
-        if version is not None:
-            bundled_candidates = [
-                b for b in bundled_candidates if b['version'] == version]
-
-        if len(bundled_candidates) > 1:
-            raise RuntimeError(
-                'Ambiguous labware access. Bundle contains multiple ' +
-                f'labware with load name {load_name}, ' +
-                f'namespace {namespace or "*"}, and version {version or "*"}.')
-        elif len(bundled_candidates) == 1:
-            return bundled_candidates[0]
-
-    # for non-bundle labware access, default to version 1
-    if version is None:
-        version = 1
 
     if namespace is None:
         for fallback_namespace in [OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE]:
