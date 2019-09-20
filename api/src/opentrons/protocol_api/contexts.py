@@ -18,6 +18,8 @@ from .labware import (Well, Labware, load, get_labware_definition,
 
 from . import geometry
 from . import transfers
+from ..protocols.types import Protocol
+
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -90,7 +92,8 @@ class ProtocolContext(CommandPublisher):
     def __init__(self,
                  loop: asyncio.AbstractEventLoop = None,
                  hardware: hc.API = None,
-                 broker=None) -> None:
+                 broker=None,
+                 protocol: Optional[Protocol] = None) -> None:
         """ Build a :py:class:`.ProtocolContext`.
 
         :param loop: An event loop to use. If not specified, this ctor will
@@ -110,6 +113,8 @@ class ProtocolContext(CommandPublisher):
         self._commands: List[str] = []
         self._unsubscribe_commands = None
         self.clear_commands()
+
+        self._bundled_labware = protocol and protocol.bundled_labware
 
         if fflags.short_fixed_trash():
             trash_name = 'opentrons_1_trash_850ml_fixed'
@@ -233,7 +238,8 @@ class ProtocolContext(CommandPublisher):
         :param int version: The version of the labware definition. If
             unspecified, will use version 1.
         """
-        labware_def = get_labware_definition(load_name, namespace, version)
+        labware_def = get_labware_definition(
+            load_name, namespace, version, self._bundled_labware)
         return self.load_labware_from_definition(labware_def, location, label)
 
     def load_labware_by_name(

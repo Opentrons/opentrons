@@ -233,9 +233,10 @@ class Session(object):
                      for mod in self._hardware.attached_modules.values()],
                     strict_attached_instruments=False)
                 sim.home()
-                self._simulating_ctx = ProtocolContext(self._loop,
-                                                       sim,
-                                                       self._broker)
+                self._simulating_ctx = ProtocolContext(loop=self._loop,
+                                                       hardware=sim,
+                                                       broker=self._broker,
+                                                       protocol=self._protocol)
                 run_protocol(self._protocol,
                              simulate=True,
                              context=self._simulating_ctx)
@@ -361,8 +362,8 @@ class Session(object):
             self._pre_run_hooks()
             if ff.use_protocol_api_v2():
                 self._hardware.cache_instruments()
-                ctx = ProtocolContext(
-                    loop=self._loop, broker=self._broker)
+                ctx = ProtocolContext(loop=self._loop,
+                                      broker=self._broker, protocol=self._protocol)
                 ctx.connect(self._hardware)
                 ctx.home()
                 run_protocol(self._protocol, context=ctx)

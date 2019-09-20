@@ -998,7 +998,8 @@ def delete_all_custom_labware() -> None:
 def get_labware_definition(
     load_name: str,
     namespace: str = None,
-    version: int = 1
+    version: int = None,
+    bundled_labware: Optional[Dict[str, Dict[str, Any]]] = None,
 ) -> Dict[str, Any]:
     """
     Look up and return a definition by load_name + namespace + version and
@@ -1009,8 +1010,32 @@ def get_labware_definition(
         If unspecified, will search 'opentrons' then 'custom_beta'
     :param int version: The version of the labware definition. If unspecified,
         will use version 1.
+    :param Dict bundled_labware: A dictionary of labware definitions to search
     """
     load_name = load_name.lower()
+
+    if bundled_labware:
+        bundled_candidates = [
+            b for b in bundled_labware.values() 
+            if b['parameters']['loadName'] == load_name]
+        if namespace is not None:
+            bundled_candidates = [
+                b for b in bundled_candidates if b['namespace'] == namespace]
+        if version is not None:
+            bundled_candidates = [
+                b for b in bundled_candidates if b['version'] == version]
+        
+        if len(bundled_candidates) > 1:
+            raise RuntimeError('Ambiguous labware access. Bundle contains multiple ' +
+                f'labware with load name {load_name}, ' + 
+                f'namespace {namespace or "*"}, and version {version or "*"}.')
+        elif len(bundled_candidates) == 1:
+            return bundled_candidates[0]
+
+    # for non-bundle labware access, default to version 1
+    if version is None:
+        version = 1
+
     if namespace is None:
         for fallback_namespace in [OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE]:
             try:
