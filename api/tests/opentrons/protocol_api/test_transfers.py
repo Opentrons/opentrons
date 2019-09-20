@@ -394,28 +394,32 @@ def test_touchtip_mix(_instr_labware):
             {'method': 'touch_tip', 'args': [], 'kwargs': {}},
             {'method': 'dispense',
              'args': [100, lw2.rows()[0][1], 1.0], 'kwargs': {}},
-            {'method': 'mix', 'args': [], 'kwargs': {}},
+            {'method': 'mix', 'args': [], 'kwargs': {
+                'location': lw2.rows()[0][1]}},
             {'method': 'touch_tip', 'args': [], 'kwargs': {}},
             {'method': 'aspirate',
              'args': [100, lw1.columns()[0][2], 1.0], 'kwargs': {}},
             {'method': 'touch_tip', 'args': [], 'kwargs': {}},
             {'method': 'dispense',
              'args': [100, lw2.rows()[0][2], 1.0], 'kwargs': {}},
-            {'method': 'mix', 'args': [], 'kwargs': {}},
+            {'method': 'mix', 'args': [], 'kwargs': {
+                'location': lw2.rows()[0][2]}},
             {'method': 'touch_tip', 'args': [], 'kwargs': {}},
             {'method': 'aspirate',
              'args': [100, lw1.columns()[0][3], 1.0], 'kwargs': {}},
             {'method': 'touch_tip', 'args': [], 'kwargs': {}},
             {'method': 'dispense',
              'args': [100, lw2.rows()[0][3], 1.0], 'kwargs': {}},
-            {'method': 'mix', 'args': [], 'kwargs': {}},
+            {'method': 'mix', 'args': [], 'kwargs': {
+                'location': lw2.rows()[0][3]}},
             {'method': 'touch_tip', 'args': [], 'kwargs': {}},
             {'method': 'aspirate',
              'args': [100, lw1.columns()[0][4], 1.0], 'kwargs': {}},
             {'method': 'touch_tip', 'args': [], 'kwargs': {}},
             {'method': 'dispense',
              'args': [100, lw2.rows()[0][4], 1.0], 'kwargs': {}},
-            {'method': 'mix', 'args': [], 'kwargs': {}},
+            {'method': 'mix', 'args': [], 'kwargs': {
+                'location': lw2.rows()[0][4]}},
             {'method': 'touch_tip', 'args': [], 'kwargs': {}}]
     assert xfer_plan_list == exp1
 
@@ -445,7 +449,8 @@ def test_touchtip_mix(_instr_labware):
             {'method': 'touch_tip', 'args': [], 'kwargs': {}},
             {'method': 'dispense',
              'args': [60, lw2.rows()[1][5], 1.0], 'kwargs': {}},
-            {'method': 'mix', 'args': [], 'kwargs': {}},
+            {'method': 'mix', 'args': [], 'kwargs': {
+                'location': lw2.rows()[1][5]}},
             {'method': 'touch_tip', 'args': [], 'kwargs': {}}]
 
     assert dist_plan_list == exp2
@@ -476,7 +481,8 @@ def test_touchtip_mix(_instr_labware):
             {'method': 'touch_tip', 'args': [], 'kwargs': {}},
             {'method': 'dispense',
              'args': [300, lw2.rows()[1][1], 1.0], 'kwargs': {}},
-            {'method': 'mix', 'args': [], 'kwargs': {}},
+            {'method': 'mix', 'args': [], 'kwargs': {
+                'location': lw2.rows()[1][1]}},
             {'method': 'touch_tip', 'args': [], 'kwargs': {}},
             {'method': 'aspirate',
              'args': [60, lw1.columns()[1][5], 1.0], 'kwargs': {}},
@@ -489,7 +495,8 @@ def test_touchtip_mix(_instr_labware):
             {'method': 'touch_tip', 'args': [], 'kwargs': {}},
             {'method': 'dispense',
              'args': [180, lw2.rows()[1][1], 1.0], 'kwargs': {}},
-            {'method': 'mix', 'args': [], 'kwargs': {}},
+            {'method': 'mix', 'args': [], 'kwargs': {
+                'location': lw2.rows()[1][1]}},
             {'method': 'touch_tip', 'args': [], 'kwargs': {}}]
     assert consd_plan_list == exp3
 
@@ -534,21 +541,24 @@ def test_all_options(_instr_labware):
             {'method': 'touch_tip', 'args': [], 'kwargs': {'speed': 1.6}},
             {'method': 'dispense',
              'args': [100, lw2.rows()[0][1], 1.0], 'kwargs': {}},
-            {'method': 'mix', 'args': [], 'kwargs': {'repetitions': 2}},
+            {'method': 'mix', 'args': [], 'kwargs': {
+                'repetitions': 2, 'location': lw2.rows()[0][1]}},
             {'method': 'touch_tip', 'args': [], 'kwargs': {'speed': 1.6}},
             {'method': 'aspirate',
              'args': [100, lw1.columns()[0][2], 1.5], 'kwargs': {}},
             {'method': 'touch_tip', 'args': [], 'kwargs': {'speed': 1.6}},
             {'method': 'dispense',
              'args': [100, lw2.rows()[0][2], 1.0], 'kwargs': {}},
-            {'method': 'mix', 'args': [], 'kwargs': {'repetitions': 2}},
+            {'method': 'mix', 'args': [], 'kwargs': {
+                'repetitions': 2, 'location': lw2.rows()[0][2]}},
             {'method': 'touch_tip', 'args': [], 'kwargs': {'speed': 1.6}},
             {'method': 'aspirate',
              'args': [100, lw1.columns()[0][3], 1.5], 'kwargs': {}},
             {'method': 'touch_tip', 'args': [], 'kwargs': {'speed': 1.6}},
             {'method': 'dispense',
              'args': [100, lw2.rows()[0][3], 1.0], 'kwargs': {}},
-            {'method': 'mix', 'args': [], 'kwargs': {'repetitions': 2}},
+            {'method': 'mix', 'args': [], 'kwargs': {
+                'repetitions': 2, 'location': lw2.rows()[0][3]}},
             {'method': 'touch_tip', 'args': [], 'kwargs': {'speed': 1.6}},
             {'method': 'return_tip', 'args': [], 'kwargs': {}}]
     assert xfer_plan_list == exp1

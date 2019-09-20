@@ -1,5 +1,5 @@
 import enum
-from typing import (Any, List, Optional, Union, NamedTuple,
+from typing import (Any, Dict, List, Optional, Union, NamedTuple,
                     Callable, Generator, Iterator, Tuple,
                     TYPE_CHECKING)
 from .labware import Well
@@ -635,7 +635,7 @@ class TransferPlan:
         yield from self._new_tip_action()
 
     def _aspirate_actions(self, vol, loc):
-        yield from self._before_aspirate()
+        yield from self._before_aspirate(loc)
         yield self._format_dict('aspirate',
                                 [vol, loc, self._options.aspirate.rate])
         yield from self._after_aspirate()
@@ -646,11 +646,14 @@ class TransferPlan:
                                 [vol, loc, self._options.dispense.rate])
         yield from self._after_dispense(loc, is_disp_next)
 
-    def _before_aspirate(self):
+    def _before_aspirate(self, loc):
         if self._strategy.mix_strategy == MixStrategy.BEFORE or \
                 self._strategy.mix_strategy == MixStrategy.BOTH:
             if self._instr.current_volume == 0:
-                yield self._format_dict('mix', kwargs=self._mix_before_opts)
+                mix_before_opts = self._mix_before_opts._asdict()
+                mix_before_opts['location'] = loc
+                yield self._format_dict(
+                    'mix', kwargs=mix_before_opts)
 
     def _after_aspirate(self):
         if self._strategy.air_gap:
@@ -671,7 +674,9 @@ class TransferPlan:
                 # If we're empty, then this is when after mixes come into play
                 if self._strategy.mix_strategy == MixStrategy.AFTER or \
                         self._strategy.mix_strategy == MixStrategy.BOTH:
-                    yield self._format_dict('mix', kwargs=self._mix_after_opts)
+                    mix_after_opts = self._mix_after_opts._asdict()
+                    mix_after_opts['location'] = loc
+                    yield self._format_dict('mix', kwargs=mix_after_opts)
                 if self._strategy.blow_out_strategy \
                    == BlowOutStrategy.DEST_IF_EMPTY:
                     yield self._format_dict('blow_out', [loc])
@@ -701,9 +706,14 @@ class TransferPlan:
                 yield self._format_dict('drop_tip')
 
     def _format_dict(self, method: str,
-                     args: List = None, kwargs: Any = None):
+                     args: List = None,
+                     kwargs: Union[NamedTuple, Dict[str, Any]] = None):
         if kwargs:
-            params = {key: val for key, val in kwargs._asdict().items() if val}
+            if isinstance(kwargs, Dict):
+                params = {key: val for key, val in kwargs.items() if val}
+            else:
+                params = {key: val
+                          for key, val in kwargs._asdict().items() if val}
         else:
             params = {}
         if not args:
