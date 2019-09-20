@@ -7,12 +7,16 @@ import itertools
 import json
 import pkgutil
 import mimetypes
+from io import BytesIO
 from zipfile import ZipFile
-from typing import Any, Dict, IO, Optional
+from typing import Any, Dict, IO, Optional, Union
 
 import jsonschema  # type: ignore
 
 from .types import Protocol, PythonProtocol, JsonProtocol, Metadata
+
+import logging
+log = logging.getLogger(__name__)
 
 
 def _parse_json(
@@ -39,7 +43,8 @@ def _parse_python(
     metadata = extract_metadata(parsed)
     protocol = compile(parsed, filename=filename_checked, mode='exec')
     version = infer_version(metadata, parsed)
-    return PythonProtocol(
+
+    result = PythonProtocol(
         text=protocol_contents,
         filename=getattr(protocol, 'co_filename', '<protocol>'),
         contents=protocol,
@@ -49,32 +54,42 @@ def _parse_python(
         bundled_datafiles=bundled_datafiles,
         bundled_python=bundled_python)
 
+    return result
+
 
 def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:
     """ Parse a bundled Python protocol """
+    MAIN_PROTOCOL_FILENAME = 'protocol.ot2.py'
     py_protocol: Optional[str] = None
     bundled_labware = {}
     bundled_datafiles = {}
     bundled_python = {}
 
-    with bundle.open('protocol.ot2.py', 'r') as protocol_file:
+    with bundle.open(MAIN_PROTOCOL_FILENAME, 'r') as protocol_file:
         py_protocol = protocol_file.read().decode('utf-8')
 
     if py_protocol is None:
         raise RuntimeError(
-            'Bundled protocol should have a protocol.ot2.py ' +
+            f'Bundled protocol should have a {MAIN_PROTOCOL_FILENAME} ' +
             'file in the root directory')
 
     for zipInfo in bundle.infolist():
-        filename = zipInfo.filename
+        name = zipInfo.filename
+        if zipInfo.is_dir():
+            continue
         with bundle.open(zipInfo) as f:
-            if (filename.startswith('custom_labware/') or
-                    filename.startswith('standard_labware/')):
-                bundled_labware[filename] = json.load(f)
-            elif filename.startswith('data/'):
-                bundled_datafiles[filename] = f
-            elif filename.endswith('.py'):
-                bundled_python[filename] = f
+            if (name.startswith('custom_labware/') or
+                    name.startswith('standard_labware/')):
+                labware_def = json.load(f)
+                # TODO IMMEDIATELY: make a FN? Use arbitrary unique ID instead?
+                labware_key = '/'.join([labware_def['namespace'],
+                                        labware_def['parameters']['loadName'],
+                                        str(labware_def['version'])])
+                bundled_labware[labware_key] = labware_def
+            elif name.startswith('data/'):
+                bundled_datafiles[name] = f.read()
+            elif name.endswith('.py') and name != MAIN_PROTOCOL_FILENAME:
+                bundled_python[name] = f.read()
 
     return _parse_python(
         py_protocol, filename, bundled_labware, bundled_datafiles,
@@ -82,9 +97,8 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:
 
 
 def parse(
-        protocol_file: IO[bytes],
-        filename: str,
-        mime_type: str = None
+        protocol_file: Union[str, bytes],
+        filename: Optional[str]
 ) -> Protocol:
     """ Parse a protocol from text.
 
@@ -93,26 +107,28 @@ def parse(
     :param filename: The name of the protocol. Optional, but helps with
                         deducing the kind of protocol (e.g. if it ends with
                         '.json' we can treat it like json)
-    :param mime_type: Optional MIME type. If given, this is used instead of
-                        inferring from filename.
     :return types.Protocol: The protocol holder, a named tuple that stores the
                         data in the protocol for later simulation or
                         execution.
     """
-    if mime_type is None:
-        mime_type, _ = mimetypes.guess_type(filename)
+    if filename and filename.endswith('.zip'):
+        if not isinstance(protocol_file, bytes):
+            raise RuntimeError('File is a .zip, should be bytes not str')
 
-    if (mime_type == 'application/zip'):
-        with ZipFile(protocol_file, 'r') as bundle:
+        with ZipFile(BytesIO(protocol_file)) as bundle:
             result = _parse_bundle(bundle, filename)
         return result
     else:
-        protocol_str = protocol_file.read().decode('utf-8')
+        if isinstance(protocol_file, bytes):
+            protocol_str = protocol_file.decode('utf-8')
+        else:
+            protocol_str = protocol_file
 
-        if mime_type == 'application/json':
+        if filename and filename.endswith('.json'):
             return _parse_json(protocol_str, filename)
-        elif mime_type == 'text/x-python':
+        elif filename and filename.endswith('.py'):
             return _parse_python(protocol_str, filename)
+
         # our jsonschema says the top level json kind is object
         if protocol_str and protocol_str[0] in ('{', b'{'):
             return _parse_json(protocol_str, filename)

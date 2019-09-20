@@ -14,6 +14,7 @@ export type ProtocolFile = {
   name: string,
   type: ?string,
   lastModified: ?number,
+  isBinary: boolean,
 }
 
 export type ProtocolState = {

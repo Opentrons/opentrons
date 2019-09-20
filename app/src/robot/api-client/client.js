@@ -147,12 +147,12 @@ export default function client(dispatch) {
   }
 
   function uploadProtocol(state, action) {
-    const { name } = state.protocol.file
+    const { name, isBinary } = state.protocol.file
     const { contents } = action.payload
 
     freshUpload = true
     remote.session_manager
-      .create(name, contents)
+      .create(name, contents, isBinary)
       .then(apiSession => {
         remote.session_manager.session = apiSession
         // state change will trigger a session notification, which will

@@ -1,10 +1,10 @@
 import asyncio
+import base64
 from copy import copy
 from functools import reduce, wraps
 import logging
 from time import time
 from uuid import uuid4
-
 from opentrons.broker import Broker
 from opentrons.legacy_api.containers import get_container, location_to_list
 from opentrons.legacy_api.containers.placeable import (
@@ -61,20 +61,20 @@ class SessionManager(object):
                       adapters.SynchronousAdapter):
             self._hardware.join()
 
-    def create(self, name, contents, mime_type=None):
+    def create(self, name, contents, is_binary=False):
         if self._session_lock:
             raise Exception(
                 'Cannot create session while simulation in progress')
 
         self._session_lock = True
         try:
+            _contents = base64.b64decode(contents) if is_binary else contents
             session_short_id = hex(uuid4().fields[0])
             session_logger = self._command_logger.getChild(session_short_id)
             self._broker.set_logger(session_logger)
             self.session = Session.build_and_prep(
                 name=name,
-                contents=contents,
-                mime_type=mime_type,
+                contents=_contents,
                 hardware=self._hardware,
                 loop=self._loop,
                 broker=self._broker,
@@ -103,9 +103,9 @@ class Session(object):
 
     @classmethod
     def build_and_prep(
-        cls, name, contents, mime_type, hardware, loop, broker, motion_lock
+        cls, name, contents, hardware, loop, broker, motion_lock
     ):
-        protocol = parse(contents, filename=name, mime_type=mime_type)
+        protocol = parse(contents, filename=name)
         sess = cls(name, protocol, hardware, loop, broker, motion_lock)
         sess.prepare()
         return sess

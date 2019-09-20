@@ -16,6 +16,7 @@ export function fileToProtocolFile(file: File): ProtocolFile {
     name: file.name,
     type: file.type,
     lastModified: file.lastModified,
+    isBinary: file.name.endsWith('.zip'), // TODO IMMEDIATELY unify with mime type stuff in this file
   }
 }
 
