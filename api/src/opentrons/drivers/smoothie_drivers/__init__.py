@@ -13,8 +13,18 @@ class VirtualSmoothie(object):
 class SimulatingDriver:
     def __init__(self):
         self._steps_per_mm = {}
+        self.homed_position = {}
 
-    def home(self):
+    def home(self, axis):
+        pass
+
+    def _smoothie_reset(self):
+        pass
+
+    def turn_on_blue_button_light(self):
+        pass
+
+    def turn_on_red_button_light(self):
         pass
 
     def update_pipette_config(self, axis, data):

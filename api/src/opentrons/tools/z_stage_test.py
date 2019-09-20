@@ -16,14 +16,14 @@ import atexit
 import logging
 import optparse
 
-from opentrons import robot
+from opentrons.tools import driver
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieError
 
 
 def setup(motor_current, max_speed):
-    robot._driver.set_active_current({"Z": motor_current, "A": motor_current})
-    robot._driver.set_axis_max_speed({'Z': max_speed, 'A': max_speed})
-    robot._driver.set_speed(max_speed)
+    driver.set_active_current({"Z": motor_current, "A": motor_current})
+    driver.set_axis_max_speed({'Z': max_speed, 'A': max_speed})
+    driver.set_speed(max_speed)
 
 
 def pick_up_motion(max_dist, max_speed, low_speed):
@@ -32,19 +32,19 @@ def pick_up_motion(max_dist, max_speed, low_speed):
 
     # Descent Z z to 100mm
     setup(options.high_current, max_speed)
-    robot._driver.set_speed(max_speed)
-    robot._driver.move({'Z': zero, 'A': zero})
+    driver.set_speed(max_speed)
+    driver.move({'Z': zero, 'A': zero})
     # Press Action
     setup(options.low_current, max_speed)
-    robot._driver.set_speed(low_speed)
-    robot._driver.move({'Z': zero_1, 'A': zero_1})
+    driver.set_speed(low_speed)
+    driver.move({'Z': zero_1, 'A': zero_1})
     # Retract Action
     setup(options.high_current, max_speed)
-    robot._driver.set_speed(max_speed)
-    robot._driver.move({'Z': zero, 'A': zero})
+    driver.set_speed(max_speed)
+    driver.move({'Z': zero, 'A': zero})
     # Jog up
-    robot._driver.set_speed(max_speed)
-    robot._driver.move({'Z': max_dist, 'A': max_dist})
+    driver.set_speed(max_speed)
+    driver.move({'Z': max_dist, 'A': max_dist})
 
 
 def test_axis(axis, tolerance):
@@ -57,33 +57,33 @@ def test_axis(axis, tolerance):
         'C': 2
     }
     retract = retract_amounts[axis]
-    expected_point = robot._driver.homed_position[axis] + retract
+    expected_point = driver.homed_position[axis] + retract
     points = [expected_point - tolerance, expected_point + tolerance]
-    robot._driver.push_speed()
-    robot._driver.set_speed(8)
+    driver.push_speed()
+    driver.set_speed(8)
     try:
-        robot._driver.move({axis: points[0]})
+        driver.move({axis: points[0]})
     except SmoothieError:
         raise Exception('Test Failed: Pressing too soon')
     if axis == 'Y':
-        if robot._driver.switch_state[axis] is not False:
+        if driver.switch_state[axis] is not False:
             raise Exception('Test Failed: Pressing too soon')
-        robot._driver.move({axis: points[1]})
-        if robot._driver.switch_state[axis] is not True:
+        driver.move({axis: points[1]})
+        if driver.switch_state[axis] is not True:
             raise Exception('Test Failed: Not hitting switch')
     else:
         try:
-            robot._driver.move({axis: points[1]})
+            driver.move({axis: points[1]})
             raise Exception('Test Failed: Not hitting switch')
         except SmoothieError:
             pass
-    robot._driver.pop_speed()
+    driver.pop_speed()
 
 
 def _exit_test():
-    robot._driver._smoothie_reset()
-    robot._driver._setup()
-    robot._driver.disengage_axis('XYZABC')
+    driver._smoothie_reset()
+    driver._setup()
+    driver.disengage_axis('XYZABC')
 
 
 def get_options():
@@ -159,10 +159,9 @@ if __name__ == '__main__':
     options, args = get_options()
     logging.basicConfig(filename='z-stage-test.log')
     try:
-        robot.connect()
         print("In Progress.. ")
         setup(options.high_current, options.max_speed)
-        robot._driver.home("ZA")
+        driver.home("ZA")
         run_z_stage()
     except KeyboardInterrupt:
         print("Test Cancelled")
