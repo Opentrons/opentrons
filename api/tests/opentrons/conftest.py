@@ -509,7 +509,7 @@ def get_labware_fixture():
         with open((pathlib.Path(__file__).parent/'..'/'..'/'..'/'shared-data' /
                    'labware' / 'fixtures'/'2'/f'{fixture_name}.json'), 'rb'
                   ) as f:
-            return json.load(f.decode('utf-8'))
+            return json.loads(f.read().decode('utf-8'))
 
     return _get_labware_fixture
 
