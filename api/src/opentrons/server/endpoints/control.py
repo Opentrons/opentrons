@@ -6,7 +6,7 @@ import logging
 from aiohttp import web
 from threading import Thread
 
-from opentrons import instruments
+import opentrons
 from opentrons.config import pipette_config
 from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as ff
@@ -396,11 +396,11 @@ def _fetch_or_create_pipette(robot, mount, model=None):
             should_remove = False
     if pipette is None:
         if model is None:
-            pipette = instruments.Pipette(
+            pipette = opentrons.instruments.Pipette(
                 mount=mount, max_volume=1000, ul_per_mm=1000)
         else:
             config = pipette_config.load(model)
-            pipette = instruments._create_pipette_from_config(
+            pipette = opentrons.instruments._create_pipette_from_config(
                 config=config,
                 mount=mount,
                 name=model)

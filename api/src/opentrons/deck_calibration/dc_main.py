@@ -13,7 +13,7 @@ from typing import Tuple
 from numpy.linalg import inv  # type: ignore
 from numpy import dot, array  # type: ignore
 import opentrons
-from opentrons import robot, instruments, types
+from opentrons import types
 from opentrons.hardware_control import adapters
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.config import (robot_configs, feature_flags,
@@ -566,7 +566,7 @@ class CLITool:
         else:
             self.hardware.cache_instrument_models()
             cached = self.hardware.get_attached_pipettes()
-            pip_func = instruments.pipette_by_name
+            pip_func = opentrons.instruments.pipette_by_name
         for mount, attached in cached.items():
             if mount == 'left':
                 mount_key = left
@@ -726,7 +726,7 @@ def main(loop=None):
     args = parser.parse_args()
 
     if not feature_flags.use_protocol_api_v2():
-        hardware = robot
+        hardware = opentrons.robot
         hardware.connect()
         hardware.turn_on_rail_lights()
         atexit.register(hardware.turn_off_rail_lights)

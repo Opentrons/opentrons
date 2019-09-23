@@ -9,7 +9,7 @@ from aiohttp import web
 from threading import Thread
 from typing import Dict, Any
 
-from opentrons import robot, config
+from opentrons import config
 
 log = logging.getLogger(__name__)
 ignore_file = 'ignore.json'
@@ -18,6 +18,11 @@ if config.IS_ROBOT:
 else:
     filedir = os.path.abspath(os.path.dirname(__file__))
 filepath = os.path.join(filedir, ignore_file)
+
+
+def hw_from_req(req):
+    """ Utility function to get the hardware resource from requests """
+    return req.app['com.opentrons.hardware']
 
 
 async def _install(filename, loop):
@@ -52,7 +57,7 @@ async def install_py(data, loop):
     return {'message': msg, 'filename': filename}
 
 
-async def install_smoothie_firmware(data, loop):
+async def install_smoothie_firmware(data, loop, request):
     filename = data.filename
     log.info('Flashing image "{}", this will take about 1 minute'.format(
         filename))
@@ -61,7 +66,8 @@ async def install_smoothie_firmware(data, loop):
     with open(filename, 'wb') as wf:
         wf.write(content)
 
-    msg = await robot.update_firmware(filename, loop)
+    hardware = hw_from_req(request)
+    msg = await hardware.update_firmware(filename, loop)
     log.info('Firmware Update complete: {}'.format(msg))
     try:
         os.remove(filename)
@@ -160,7 +166,7 @@ async def update_api(request: web.Request) -> web.Response:
             reslist.append(res1)
         if 'fw' in data.keys():
             res2 = await install_smoothie_firmware(
-                data['fw'], request.loop)
+                data['fw'], request.loop, request)
             reslist.append(res2)
         res: Dict[str, Any] = {
             'message': [r['message'] for r in reslist],

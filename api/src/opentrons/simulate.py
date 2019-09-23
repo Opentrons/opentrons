@@ -15,14 +15,13 @@ from typing import Any, Dict, List, Mapping, TextIO, Tuple, BinaryIO, Optional
 
 
 import opentrons
-import opentrons.legacy_api.protocols
 import opentrons.commands
 import opentrons.broker
 from opentrons.protocols import parse, bundle
-from opentrons.protocols.types import (
-    JsonProtocol, PythonProtocol, BundleContents)
 from opentrons.protocol_api import execute
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
+from opentrons.protocols.types import (
+    JsonProtocol, PythonProtocol, BundleContents)
 
 
 class AccumulatingHandler(logging.Handler):
@@ -222,6 +221,7 @@ def simulate(protocol_file: TextIO,
         else:
             bundle_contents = None
     else:
+        import opentrons.legacy_api.protocols
         opentrons.robot.disconnect()
         scraper = CommandScraper(stack_logger, log_level,
                                  opentrons.robot.broker)

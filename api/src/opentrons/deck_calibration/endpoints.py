@@ -5,8 +5,9 @@ from typing import Dict, Tuple
 
 import logging
 import json
+import opentrons
 from opentrons.config import pipette_config, robot_configs, feature_flags
-from opentrons import instruments, hardware_control
+from opentrons import hardware_control
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.types import CriticalPoint
 from . import jog, position, dots_set, z_pos
@@ -132,9 +133,10 @@ def get_pipettes(sess):
         left = attached_pipettes.get('left')
         right = attached_pipettes.get('right')
         if left['model'] in pipette_config.config_models:
-            left_pipette = instruments.pipette_by_name('left', left['name'])
+            left_pipette = opentrons.instruments.pipette_by_name(
+                'left', left['name'])
         if right['model'] in pipette_config.config_models:
-            right_pipette = instruments.pipette_by_name(
+            right_pipette = opentrons.instruments.pipette_by_name(
                 'right', right['name'])
     else:
         attached_pipettes = sess.adapter.attached_instruments

@@ -300,4 +300,4 @@ def build_globals(hardware=None, loop=None):
     lw = BCLabware(ctx)
     mod = BCModules(ctx)
 
-    return rob, instr, lw, lw, mod
+    return {'robot': rob, 'instruments': instr, 'labware': lw, 'modules': mod}
