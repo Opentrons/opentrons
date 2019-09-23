@@ -5,7 +5,6 @@ import jsonschema
 import pytest
 
 from opentrons.protocols.parse import (extract_metadata,
-                                       infer_version,
                                        _get_protocol_schema_version,
                                        validate_json,
                                        parse)
@@ -118,6 +117,7 @@ from opentrons import instruments as instr
 p = instr.P300_Single('right')
     """, '1')
 ]
+
 
 @pytest.mark.parametrize('proto,version', infer_version_cases)
 def test_infer_version(proto, version):
