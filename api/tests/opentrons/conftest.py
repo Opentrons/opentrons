@@ -189,14 +189,12 @@ def using_api1(loop):
     oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
     if oldenv:
         os.environ.pop('OT_API_FF_useProtocolApi2')
-    opentrons.reset_globals()
     try:
-        yield opentrons.hardware
+        yield opentrons.robot
     finally:
-        opentrons.hardware.reset()
+        opentrons.robot.reset()
         if None is not oldenv:
             os.environ['OT_API_FF_useProtocolApi2'] = oldenv
-        opentrons.reset_globals()
         opentrons.robot.config = config.robot_configs.load()
 
 

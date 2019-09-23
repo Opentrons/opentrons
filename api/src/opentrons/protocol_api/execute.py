@@ -116,6 +116,21 @@ def _run_python(
         raise ExceptionInProtocolError(e, tb, str(e), frame.lineno)
 
 
+def _run_python_legacy(proto: PythonProtocol, context: ProtocolContext):
+    new_locs = locals()
+    new_globs = globals()
+    try:
+        exec(proto.contents, new_globs, new_locs)
+    except Exception as e:
+        exc_type, exc_value, tb = sys.exc_info()
+        try:
+            frame = _find_protocol_error(tb, proto.filename)
+        except KeyError:
+            # No pretty names, just raise it
+            raise e
+        raise ExceptionInProtocolError(e, tb, str(e), frame.lineno)
+
+
 def run_protocol(protocol: Protocol,
                  simulate: bool = False,
                  context: ProtocolContext = None):
@@ -146,7 +161,14 @@ def run_protocol(protocol: Protocol,
         raise RuntimeError(
             'Will not automatically generate hardware controller')
     if isinstance(protocol, PythonProtocol):
-        _run_python(protocol, true_context)
+        if protocol.api_level == '2':
+            _run_python(protocol, true_context)
+        elif protocol.api_level == '1':
+            _run_python_legacy(protocol, true_context)
+        else:
+            raise RuntimeError(
+                f'Unsupported python API version: {protocol.api_level}'
+            )
     else:
         if protocol.schema_version == 3:
             ins = execute_v3.load_pipettes_from_json(

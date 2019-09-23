@@ -301,32 +301,3 @@ def build_globals(hardware=None, loop=None):
     mod = BCModules(ctx)
 
     return rob, instr, lw, lw, mod
-
-
-def set_globals(rob, instr, lw, mod):
-    global robot
-    global instruments
-    global labware
-    global containers
-    global modules
-    robot = rob
-    instruments = instr
-    labware = lw
-    containers = lw
-    modules = mod
-
-
-def reset_globals(hardware=None, loop=None):
-    robot, instruments, containers, labware, modules = build_globals(hardware,
-                                                                     loop)
-    set_globals(robot, instruments, containers, modules)
-
-
-def reset():
-    global robot
-    robot.reset()
-
-
-robot, instruments, containers, labware, modules = build_globals()
-
-__all__ = ['robot', 'reset', 'instruments', 'containers', 'labware', 'modules']
