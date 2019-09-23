@@ -66,7 +66,7 @@ All modules have the ability to check what state they are currently in. To do th
 
 For the temperature module this will return a string stating whether it's ``'heating'``, ``'cooling'``, ``'holding at target'`` or ``'idle'``.
 For the magnetic module this will return a string stating whether it's ``'engaged'`` or ``'disengaged'``.
-For the Thermocycler Module module this will return ``'holding at target'`` or ``'idle'``. There are more detailed status checks which can be found in at :ref:`thermocycler-section`
+For the Thermocycler Module this will return ``'holding at target'`` or ``'idle'``. There are more detailed status checks which can be found in at :ref:`thermocycler-section`
 
 ******************
 Temperature Module
