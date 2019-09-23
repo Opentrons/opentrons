@@ -5,7 +5,6 @@ import jsonschema
 import pytest
 
 from opentrons.protocols.parse import (extract_metadata,
-                                       infer_version,
                                        _get_protocol_schema_version,
                                        validate_json,
                                        parse)
@@ -39,26 +38,23 @@ fakedata['what?'] = 'ham'
     assert metadata == expected
 
 
-def test_infer_version():
-    prot_api1_no_meta_a = """
+infer_version_cases = [
+    ("""
 from opentrons import instruments
 
 p = instruments.P10_Single(mount='right')
-"""
-
-    prot_api1_no_meta_b = """
+""", '1'),
+    ("""
 import opentrons.instruments
 
 p = instruments.P10_Single(mount='right')
-"""
-
-    prot_api1_no_meta_c = """
+""", '1'),
+    ("""
 from opentrons import instruments as instr
 
 p = instr.P10_Single(mount='right')
-"""
-
-    prot_api1_meta1 = """
+""", '1'),
+    ("""
 from opentrons import instruments
 
 metadata = {
@@ -66,9 +62,8 @@ metadata = {
   }
 
 p = instruments.P10_Single(mount='right')
-"""
-
-    prot_api1_meta2 = """
+""", '1'),
+    ("""
 from opentrons import instruments
 
 metadata = {
@@ -76,16 +71,14 @@ metadata = {
   }
 
 p = instruments.P10_Single(mount='right')
-"""
-
-    prot_api2_no_meta = """
+""", '2'),
+    ("""
 from opentrons import types
 
 def run(ctx):
     right = ctx.load_instrument('p300_single', types.Mount.RIGHT)
-"""
-
-    prot_api2_meta1 = """
+""", '2'),
+    ("""
 from opentrons import types
 
 metadata = {
@@ -94,9 +87,8 @@ metadata = {
 
 def run(ctx):
     right = ctx.load_instrument('p300_single', types.Mount.RIGHT)
-"""
-
-    prot_api2_meta2 = """
+""", '1'),
+    ("""
 from opentrons import types
 
 metadata = {
@@ -105,32 +97,32 @@ metadata = {
 
 def run(ctx):
     right = ctx.load_instrument('p300_single', types.Mount.RIGHT)
-"""
+""", '2'),
+    ("""
+from opentrons import labware, instruments
 
-    expected = {
-        prot_api1_no_meta_a: '1',
-        prot_api1_no_meta_b: '1',
-        prot_api1_no_meta_c: '1',
-        prot_api1_meta1: '1',
-        prot_api1_meta2: '2',
-        prot_api2_no_meta: '2',
-        prot_api2_meta1: '1',
-        prot_api2_meta2: '2'
-    }
+p = instruments.P10_Single(mount='right')
+    """, '1'),
+    ("""
+from opentrons import types, containers
+    """, '1'),
+    ("""
+from opentrons import types, instruments
 
-    def check(prot):
-        parsed = ast.parse(prot, filename='test', mode='exec')
-        metadata = extract_metadata(parsed)
-        return infer_version(metadata, parsed)
+p = instruments.P10_Single(mount='right')
+    """, '1'),
+    ("""
+from opentrons import instruments as instr
 
-    assert check(prot_api1_no_meta_a) == expected[prot_api1_no_meta_a]
-    assert check(prot_api1_no_meta_b) == expected[prot_api1_no_meta_b]
-    assert check(prot_api1_no_meta_c) == expected[prot_api1_no_meta_c]
-    assert check(prot_api1_meta1) == expected[prot_api1_meta1]
-    assert check(prot_api1_meta2) == expected[prot_api1_meta2]
-    assert check(prot_api2_no_meta) == expected[prot_api2_no_meta]
-    assert check(prot_api2_meta1) == expected[prot_api2_meta1]
-    assert check(prot_api2_meta2) == expected[prot_api2_meta2]
+p = instr.P300_Single('right')
+    """, '1')
+]
+
+
+@pytest.mark.parametrize('proto,version', infer_version_cases)
+def test_infer_version(proto, version):
+    parsed = parse(proto)
+    assert parsed.api_level == version
 
 
 def test_get_protocol_schema_version():

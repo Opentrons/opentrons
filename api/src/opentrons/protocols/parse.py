@@ -3,6 +3,7 @@ opentrons.protocols.parse: functions and state for parsing protocols
 """
 
 import ast
+import itertools
 import json
 import pkgutil
 from typing import Any, Dict, Union
@@ -89,26 +90,31 @@ def extract_metadata(parsed: ast.Module) -> Metadata:
 
 def infer_version_from_imports(parsed: ast.Module) -> str:
     # Imports in the form of `import opentrons.robot` will have an entry in
-    # parsed.body[i].names[0].name in the form "opentrons.robot"
-    ot_imports = list(filter(
-        lambda x: 'opentrons' in x,
-        [obj.names[0].name for obj in parsed.body
-         if isinstance(obj, ast.Import)]))
+    # parsed.body[i].names[j].name in the form "opentrons.robot". Find those
+    # imports and transform them to strip away the 'opentrons.' part.
+    ot_imports = ['.'.join(name.name.split('.')[1:]) for name in
+                  itertools.chain.from_iterable(
+                      [obj.names for obj in parsed.body
+                       if isinstance(obj, ast.Import)])
+                  if 'opentrons' in name.name]
 
     # Imports in the form of `from opentrons import robot` (with or without an
     # `as ___` statement) will have an entry in parsed.body[i].module
     # containing "opentrons"
     ot_from_imports = [
-        obj.names[0].name for obj in parsed.body
-        if isinstance(obj, ast.ImportFrom)
-        and obj.module
-        and 'opentrons' in obj.module]
+        name.name for name in
+        itertools.chain.from_iterable(
+            [obj.names for obj in parsed.body
+             if isinstance(obj, ast.ImportFrom)
+             and obj.module
+             and 'opentrons' in obj.module])
+    ]
 
     # If any of these are populated, filter for entries with v1-specific terms
-    opentrons_imports = ot_imports + ot_from_imports
-    v1evidence = ['robot' in i or 'instruments' in i or 'modules' in i
-                  for i in opentrons_imports]
-    if any(v1evidence):
+    opentrons_imports = set(ot_imports + ot_from_imports)
+    v1_markers = set(('robot', 'instruments', 'modules', 'containers'))
+    v1evidence = v1_markers.intersection(opentrons_imports)
+    if v1evidence:
         return '1'
     else:
         return '2'
