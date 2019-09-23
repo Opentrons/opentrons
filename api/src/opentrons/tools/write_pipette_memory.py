@@ -1,3 +1,5 @@
+from opentrons.tools import driver
+
 BAD_BARCODE_MESSAGE = 'Unexpected Serial -> {}'
 WRITE_FAIL_MESSAGE = 'Data not saved, HOLD BUTTON'
 
@@ -52,44 +54,22 @@ MODELS = {
 }
 
 
-def connect_to_robot():
-    '''
-    Connect over Serial to the Smoothieware motor driver
-    '''
-    print()
-    import optparse
-    from opentrons import robot
-    print('Connecting to robot...')
-    parser = optparse.OptionParser(usage='usage: %prog [options] ')
-    parser.add_option(
-        "-p", "--p", dest="port", default='',
-        type='str', help='serial port of the smoothie'
-    )
-
-    options, _ = parser.parse_args(args=None, values=None)
-    if options.port:
-        robot.connect(options.port)
-    else:
-        robot.connect()
-    return robot
-
-
-def write_identifiers(robot, mount, new_id, new_model):
+def write_identifiers(mount, new_id, new_model):
     '''
     Send a bytearray to the specified mount, so that Smoothieware can
     save the bytes to the pipette's memory
     '''
-    robot._driver.write_pipette_id(mount, new_id)
-    read_id = robot._driver.read_pipette_id(mount)
+    driver.write_pipette_id(mount, new_id)
+    read_id = driver.read_pipette_id(mount)
     _assert_the_same(new_id, read_id)
-    robot._driver.write_pipette_model(mount, new_model)
-    read_model = robot._driver.read_pipette_model(mount)
+    driver.write_pipette_model(mount, new_model)
+    read_model = driver.read_pipette_model(mount)
     _assert_the_same(new_model, read_model)
 
 
-def check_previous_data(robot, mount):
-    old_id = robot._driver.read_pipette_id(mount)
-    old_model = robot._driver.read_pipette_model(mount)
+def check_previous_data(mount):
+    old_id = driver.read_pipette_id(mount)
+    old_model = driver.read_pipette_model(mount)
     if old_id and old_model:
         print(
             'Overwriting old data: id={0}, model={1}'.format(
@@ -126,20 +106,18 @@ def _parse_model_from_barcode(barcode):
     raise Exception(BAD_BARCODE_MESSAGE.format(barcode))
 
 
-def main(robot):
+def main():
     try:
         barcode = _user_submitted_barcode(32)
         model = _parse_model_from_barcode(barcode)
-        check_previous_data(robot, 'right')
-        write_identifiers(robot, 'right', barcode, model)
+        check_previous_data('right')
+        write_identifiers('right', barcode, model)
         print('PASS: Saved -> {0} (model {1})'.format(barcode, model))
     except KeyboardInterrupt:
         exit()
     except Exception as e:
         print('FAIL: {}'.format(e))
-    main(robot)
 
 
 if __name__ == "__main__":
-    robot = connect_to_robot()
-    main(robot)
+    main()

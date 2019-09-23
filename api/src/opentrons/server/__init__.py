@@ -13,7 +13,6 @@ from opentrons.config import CONFIG
 from .rpc import RPCServer
 from .http import HTTPServer
 from opentrons.api.routers import MainRouter
-import opentrons
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.types import HardwareAPILike  # noqa(F501)
@@ -57,6 +56,7 @@ class ThreadedAsyncLock:
     This object can be used as either an asynchronous context manager using
     ``async with`` or a synchronous context manager using ``with``.
     """
+
     def __init__(self):
         self._thread_lock = threading.RLock()
 
@@ -84,7 +84,8 @@ class ThreadedAsyncLock:
 
 # Support for running using aiohttp CLI.
 # See: https://docs.aiohttp.org/en/stable/web.html#command-line-interface-cli
-def init(hardware: 'HardwareAPILike' = None):
+def init(hardware: 'HardwareAPILike' = None,
+         loop: asyncio.AbstractEventLoop = None):
     """
     Builds an application and sets up RPC and HTTP servers with it.
 
@@ -96,21 +97,21 @@ def init(hardware: 'HardwareAPILike' = None):
     """
 
     app = web.Application(middlewares=[error_middleware])
-    if hardware:
-        checked_hardware = hardware
-    else:
-        checked_hardware = opentrons.hardware
-    app['com.opentrons.hardware'] = checked_hardware
+    app['com.opentrons.hardware'] = hardware
     app['com.opentrons.motion_lock'] = ThreadedAsyncLock()
     app['com.opentrons.rpc'] = RPCServer(
         app, MainRouter(
-            checked_hardware, lock=app['com.opentrons.motion_lock']))
+            hardware, lock=app['com.opentrons.motion_lock']))
     app['com.opentrons.http'] = HTTPServer(app, CONFIG['log_dir'])
     app.on_shutdown.freeze()
     return app
 
 
-def run(hostname=None, port=None, path=None, loop=None):
+def run(hardware: 'HardwareAPILike',
+        hostname=None,
+        port=None,
+        path=None,
+        loop=None):
     """
     The arguments are not all optional. Either a path or hostname+port should
     be specified; you have to specify one.
@@ -124,4 +125,4 @@ def run(hostname=None, port=None, path=None, loop=None):
             hostname, port))
         path = None
 
-    web.run_app(init(), host=hostname, port=port, path=path)
+    web.run_app(init(hardware=hardware), host=hostname, port=port, path=path)

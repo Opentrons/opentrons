@@ -11,11 +11,10 @@ Example of calling this script:
 
 '''
 
-import optparse
 import time
 import logging
 
-from opentrons import robot
+from opentrons.tools import driver
 from opentrons.drivers.smoothie_drivers.driver_3_0 import \
     SmoothieError, DEFAULT_AXES_SPEED
 from opentrons.drivers.rpi_drivers import gpio
@@ -33,10 +32,10 @@ ZA_TOLERANCE = 10
 AXIS_TEST_SKIPPING_TOLERANCE = 0.5
 
 COORDS_MAX = {
-    'X': robot._driver.homed_position['X'] - XY_TOLERANCE,
-    'Y': robot._driver.homed_position['Y'] - XY_TOLERANCE,
-    'Z': robot._driver.homed_position['Z'] - ZA_TOLERANCE,
-    'A': robot._driver.homed_position['A'] - ZA_TOLERANCE,
+    'X': driver.homed_position['X'] - XY_TOLERANCE,
+    'Y': driver.homed_position['Y'] - XY_TOLERANCE,
+    'Z': driver.homed_position['Z'] - ZA_TOLERANCE,
+    'A': driver.homed_position['A'] - ZA_TOLERANCE,
 }
 
 COORDS_MIN = {
@@ -214,34 +213,18 @@ def test_axis(driver, logger, axis):
     driver.set_speed(DEFAULT_AXES_SPEED)
 
 
-def connect_to_port():
-    parser = optparse.OptionParser(usage='usage: %prog [options] ')
-    parser.add_option(
-        "-p", "--p", dest="port", default='',
-        type='str', help='serial port of the smoothie'
-    )
-
-    options, _ = parser.parse_args(args=None, values=None)
-    if options.port:
-        robot.connect(options.port)
-    else:
-        robot.connect()
-
-
 if __name__ == '__main__':
     logger = setup_logging()
     logger.info('Starting 24-hours Test')
     try:
-        connect_to_port()
-        driver = robot._driver
         button_green()
-        attempt_homing(robot._driver, logger)
-        test_all_axes(robot._driver, logger)
-        run_time_trial(robot._driver, logger)
+        attempt_homing(driver, logger)
+        test_all_axes(driver, logger)
+        run_time_trial(driver, logger)
     except Exception:
         button_red()
         logger.exception('Unexpected Error')
         exit()
     finally:
         logger.info('Exiting test')
-        robot._driver._smoothie_reset()
+        driver._smoothie_reset()

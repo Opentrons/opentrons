@@ -172,7 +172,7 @@ class API(HardwareAPILike):
 
     def set_loop(self, loop: asyncio.AbstractEventLoop):
         self._loop = loop
-        self._lock = asyncio.Lock(loop=loop)
+        self._motion_lock = asyncio.Lock(loop=loop)
 
     async def get_is_simulator(self) -> bool:
         """ `True` if this is a simulator; `False` otherwise. """

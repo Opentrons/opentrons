@@ -1,4 +1,5 @@
 import pytest
+from opentrons import tools, robot
 
 pipette_barcode_to_model = {
     'P10S20180101A01': 'p10_single_v1',
@@ -25,7 +26,12 @@ pipette_barcode_to_model = {
 }
 
 
-def test_parse_model_from_barcode():
+@pytest.fixture
+def driver_import(monkeypatch):
+    monkeypatch.setattr(tools, 'driver', robot._driver)
+
+
+def test_parse_model_from_barcode(driver_import):
     from opentrons.tools import write_pipette_memory as wpm
     for barcode, model in pipette_barcode_to_model.items():
         assert wpm._parse_model_from_barcode(barcode) == model
@@ -40,16 +46,14 @@ def test_parse_model_from_barcode():
         wpm._parse_model_from_barcode('aP300S20180101A01')
 
 
-def test_read_old_pipette_id_and_model():
+def test_read_old_pipette_id_and_model(driver_import):
     import io
     import types
     from contextlib import redirect_stdout
-    from opentrons import robot
-    from opentrons.tools import write_pipette_memory as wpm
+    from opentrons.tools import driver, write_pipette_memory as wpm
     from opentrons.drivers.smoothie_drivers.driver_3_0 import \
         GCODES, _byte_array_to_hex_string
 
-    driver = robot._driver
     driver.simulating = False
     _old_send_command = driver._send_command
 
@@ -65,7 +69,7 @@ def test_read_old_pipette_id_and_model():
 
     f = io.StringIO()
     with redirect_stdout(f):
-        wpm.check_previous_data(robot, 'right')
+        wpm.check_previous_data('right')
     out = f.getvalue()
     exp = 'No old data on this pipette'
     assert out.strip() == exp
@@ -84,7 +88,7 @@ def test_read_old_pipette_id_and_model():
 
         f = io.StringIO()
         with redirect_stdout(f):
-            wpm.check_previous_data(robot, 'right')
+            wpm.check_previous_data('right')
         out = f.getvalue()
         exp = 'Overwriting old data: id={0}, model={1}'.format(
             old_id, old_model)
@@ -93,14 +97,12 @@ def test_read_old_pipette_id_and_model():
     driver._send_command = _old_send_command
 
 
-def test_write_new_pipette_id_and_model():
+def test_write_new_pipette_id_and_model(driver_import):
     import types
-    from opentrons import robot
-    from opentrons.tools import write_pipette_memory as wpm
+    from opentrons.tools import driver, write_pipette_memory as wpm
     from opentrons.drivers.smoothie_drivers.driver_3_0 import \
         GCODES, _byte_array_to_hex_string
 
-    driver = robot._driver
     driver.simulating = False
     _old_send_command = driver._send_command
 
@@ -119,6 +121,6 @@ def test_write_new_pipette_id_and_model():
 
         # this will raise an error if the received id/model does not match
         # the id/model that was written
-        wpm.write_identifiers(robot, 'right', new_id, new_model)
+        wpm.write_identifiers('right', new_id, new_model)
 
     driver._send_command = _old_send_command

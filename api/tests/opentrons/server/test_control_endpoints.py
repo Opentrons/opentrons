@@ -380,10 +380,6 @@ async def test_home_pipette(async_client):
 
 async def test_instrument_reuse(async_server, async_client, monkeypatch):
     hw = async_server['com.opentrons.hardware']
-    if async_server['api_version'] == 1:
-        hw.reset()
-    else:
-        await hw.reset()
 
     # With no pipette connected before homing pipettes, we should a) not crash
     # and b) not have any instruments connected afterwards

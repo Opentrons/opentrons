@@ -2,13 +2,15 @@ import os
 import logging
 import asyncio
 import re
+import opentrons
 from opentrons import HERE
 from opentrons import server
+from opentrons.hardware_control import adapters
 from opentrons.server.main import build_arg_parser
 from argparse import ArgumentParser
-from opentrons import hardware, __version__
+from opentrons import __version__
 from opentrons.config import feature_flags as ff, name, robot_configs
-from opentrons.system import udev, resin
+from opentrons.system import udev
 from opentrons.util import logging_config
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
 
@@ -79,7 +81,7 @@ async def _do_fw_update(new_fw_path, new_fw_ver):
         os.environ['ENABLE_VIRTUAL_SMOOTHIE'] = 'true'
 
 
-def initialize_robot(loop):
+def initialize_robot(loop, hardware):
     packed_smoothie_fw_file, packed_smoothie_fw_ver = _find_smoothie_file()
     try:
         hardware.connect()
@@ -108,7 +110,7 @@ def initialize_robot(loop):
     log.info(f"Name: {name()}")
 
 
-def run(**kwargs):  # noqa(C901)
+def run(hardware, **kwargs):  # noqa(C901)
     """
     This function was necessary to separate from main() to accommodate for
     server startup path on system 3.0, which is server.main. In the case where
@@ -117,8 +119,9 @@ def run(**kwargs):  # noqa(C901)
     the use of different length args
     """
     loop = asyncio.get_event_loop()
+
     if ff.use_protocol_api_v2():
-        robot_conf = loop.run_until_complete(hardware.config)
+        robot_conf = loop.run_until_complete(hardware.get_config())
     else:
         robot_conf = hardware.config
 
@@ -126,7 +129,7 @@ def run(**kwargs):  # noqa(C901)
 
     log.info("API server version:  {}".format(__version__))
     if not os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
-        initialize_robot(loop)
+        initialize_robot(loop, hardware)
         if ff.use_protocol_api_v2():
             loop.run_until_complete(hardware.cache_instruments())
         if not ff.disable_home_on_boot():
@@ -140,8 +143,7 @@ def run(**kwargs):  # noqa(C901)
         except Exception:
             log.exception(
                 "Could not setup udev rules, modules may not be detected")
-    # Explicitly unlock resin updates in case a prior server left them locked
-    resin.unlock_updates()
+
     if kwargs.get('hardware_server'):
         if ff.use_protocol_api_v2():
             loop.run_until_complete(
@@ -150,8 +152,12 @@ def run(**kwargs):  # noqa(C901)
         else:
             log.warning(
                 "Hardware server requested but apiv1 selected, not starting")
-    server.run(kwargs.get('hostname'), kwargs.get('port'), kwargs.get('path'),
-               loop)
+    server.run(
+        hardware,
+        kwargs.get('hostname'),
+        kwargs.get('port'),
+        kwargs.get('path'),
+        loop)
 
 
 def main():
@@ -180,7 +186,12 @@ def main():
         default='/var/run/opentrons-hardware.sock',
         help='Override for the hardware server socket')
     args = arg_parser.parse_args()
-    run(**vars(args))
+
+    if ff.use_protocol_api_v2():
+        checked_hardware = adapters.SingletonAdapter(asyncio.get_event_loop())
+    else:
+        checked_hardware = opentrons.hardware
+    run(checked_hardware, **vars(args))
     arg_parser.exit(message="Stopped\n")
 
 

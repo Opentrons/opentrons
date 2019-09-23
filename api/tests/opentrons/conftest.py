@@ -23,6 +23,7 @@ from opentrons import config, types
 from opentrons.server import init
 from opentrons.deck_calibration import endpoints
 from opentrons import hardware_control as hc
+from opentrons.hardware_control import adapters, API
 from opentrons.protocol_api import ProtocolContext
 from opentrons.types import Mount
 
@@ -140,40 +141,33 @@ def old_aspiration(monkeypatch):
 def using_api2(loop):
     oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
     os.environ['OT_API_FF_useProtocolApi2'] = '1'
-    opentrons.reset_globals(version=2, loop=loop)
+    hw_manager = adapters.SingletonAdapter(loop)
     try:
-        yield opentrons.hardware
+        yield hw_manager
     finally:
-        try:
-            loop.run_until_complete(opentrons.hardware.reset())
-        except RuntimeError:
-            loop.create_task(opentrons.hardware.reset())
+        asyncio.ensure_future(hw_manager.reset())
         if None is oldenv:
             os.environ.pop('OT_API_FF_useProtocolApi2')
         else:
             os.environ['OT_API_FF_useProtocolApi2'] = oldenv
-        opentrons.reset_globals(loop=loop)
-        opentrons.hardware.set_config(config.robot_configs.load())
+        hw_manager.set_config(config.robot_configs.load())
 
 
 @contextlib.contextmanager
 def using_sync_api2(loop):
     oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
     os.environ['OT_API_FF_useProtocolApi2'] = '1'
-    opentrons.reset_globals(version=2, loop=loop)
+    hardware = adapters.SynchronousAdapter.build(
+        API.build_hardware_controller)
     try:
-        yield hc.adapters.SynchronousAdapter(opentrons.hardware)
+        yield hardware
     finally:
-        try:
-            loop.run_until_complete(opentrons.hardware.reset())
-        except RuntimeError:
-            loop.create_task(opentrons.hardware.reset())
+        hardware.reset()
         if None is oldenv:
             os.environ.pop('OT_API_FF_useProtocolApi2')
         else:
             os.environ['OT_API_FF_useProtocolApi2'] = oldenv
-        opentrons.reset_globals(loop=loop)
-        opentrons.hardware.set_config(config.robot_configs.load())
+        hardware.set_config(config.robot_configs.load())
 
 
 @pytest.fixture
@@ -187,14 +181,14 @@ def using_api1(loop):
     oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
     if oldenv:
         os.environ.pop('OT_API_FF_useProtocolApi2')
-    opentrons.reset_globals(version=1, loop=loop)
+    opentrons.reset_globals()
     try:
         yield opentrons.hardware
     finally:
         opentrons.hardware.reset()
         if None is not oldenv:
             os.environ['OT_API_FF_useProtocolApi2'] = oldenv
-        opentrons.reset_globals(loop=loop)
+        opentrons.reset_globals()
         opentrons.robot.config = config.robot_configs.load()
 
 
@@ -214,9 +208,13 @@ async def async_server(request, virtual_smoothie_env, loop):
         pytest.skip('requires api1 only')
     elif _should_skip_api2(request):
         pytest.skip('requires api2 only')
-    with request.param(loop):
-        app = init()
-        app['api_version'] = 1 if request.param == using_api1 else 2
+    with request.param(loop) as hw:
+        if request.param == using_api1:
+            app = init(hw)
+            app['api_version'] = 1
+        else:
+            app = init(hw)
+            app['api_version'] = 2
         yield app
         await app.shutdown()
 
@@ -299,7 +297,7 @@ def session(loop, aiohttp_client, request, main_router):
         if not root:
             root = main_router
         # Assume test fixture has init to attach test loop
-        root.init(loop)
+        root.init(loop=loop)
     except Exception:
         pass
 
@@ -422,7 +420,6 @@ def model(robot, hardware, loop, request):
         rob = hardware
         container = models.Container(plate, context=ctx)
     else:
-        print("hardware is {}".format(hardware))
         pipette = Pipette(robot,
                           ul_per_mm=18.5, max_volume=300, mount='right')
         plate = load(robot, lw_name or '96-flat', '1')
@@ -499,7 +496,7 @@ def cntrlr_mock_connect(monkeypatch):
 
 @pytest.fixture
 def hardware_api(loop):
-    hw_api = hc.API.build_hardware_simulator(loop=loop)
+    hw_api = API.build_hardware_simulator(loop=loop)
     return hw_api
 
 

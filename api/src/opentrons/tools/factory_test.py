@@ -1,15 +1,14 @@
 import asyncio
 import atexit
 import logging
-import optparse
 import os
 import subprocess
 
-from opentrons import robot
 from opentrons.config import infer_config_base_dir
 from opentrons.drivers.rpi_drivers import gpio
 from opentrons.drivers import serial_communication
 from opentrons.system import nmcli
+from opentrons.tools import driver
 
 log = logging.getLogger(__name__)
 
@@ -58,12 +57,12 @@ def _erase_data(filepath):
 
 
 def _reset_lights():
-    robot._driver.turn_off_rail_lights()
+    driver.turn_off_rail_lights()
     gpio.set_button_light(blue=True)
 
 
 def _get_state_of_inputs():
-    smoothie_switches = robot._driver.switch_state
+    smoothie_switches = driver.switch_state
     probe = smoothie_switches['Probe']
     endstops = {
         ax: val
@@ -71,8 +70,8 @@ def _get_state_of_inputs():
         if ax in 'XYZA'  # only test gantry axes
     }
     return {
-        'button': robot._driver.read_button(),
-        'windows': robot._driver.read_window_switches(),
+        'button': driver.read_button(),
+        'windows': driver.read_window_switches(),
         'probe': probe,
         'endstops': endstops
     }
@@ -80,9 +79,9 @@ def _get_state_of_inputs():
 
 def _set_lights(state):
     if state['windows']:
-        robot._driver.turn_off_rail_lights()
+        driver.turn_off_rail_lights()
     else:
-        robot._driver.turn_on_rail_lights()
+        driver.turn_on_rail_lights()
     red, green, blue = (False, False, False)
     if any(state['endstops'].values()):
         red = True
@@ -125,20 +124,15 @@ def _get_unique_smoothie_responses(responses):
     return true_uniques
 
 
-def test_smoothie_gpio(port_name=''):
+def test_smoothie_gpio():
     def _write_and_return(msg):
         return serial_communication.write_and_return(
             msg + '\r\n',
             'ok\r\n',
-            robot._driver._connection,
+            driver._connection,
             timeout=1)
 
     print('CONNECT')
-    if port_name:
-        robot.connect(port_name)
-    else:
-        robot.connect()
-    d = robot._driver
     # make sure the driver is currently working as expected
     version_response = _write_and_return('version')
     if 'version' in version_response:
@@ -159,24 +153,24 @@ def test_smoothie_gpio(port_name=''):
         print(RESULT_SPACE.format(FAIL))
 
     print('HALT')
-    d._connection.reset_input_buffer()
+    driver._connection.reset_input_buffer()
     # drop the HALT line LOW, and make sure there is an error state
-    d.hard_halt()
+    driver.hard_halt()
 
-    old_timeout = int(d._connection.timeout)
-    d._connection.timeout = 1  # 1 second
-    r = d._connection.readline().decode()
+    old_timeout = int(driver._connection.timeout)
+    driver._connection.timeout = 1  # 1 second
+    r = driver._connection.readline().decode()
     if 'ALARM' in r:
         print(RESULT_SPACE.format(PASS))
     else:
         print(RESULT_SPACE.format(FAIL))
 
-    d._reset_from_error()
-    d._connection.timeout = old_timeout
+    driver._reset_from_error()
+    driver._connection.timeout = old_timeout
 
     print('ISP')
     # drop the ISP line to LOW, and make sure it is dead
-    d._smoothie_programming_mode()
+    driver._smoothie_programming_mode()
     try:                                        # NOQA
         _write_and_return('M999')               # NOQA
         print(RESULT_SPACE.format(FAIL))        # NOQA
@@ -185,7 +179,7 @@ def test_smoothie_gpio(port_name=''):
 
     print('RESET')
     # toggle the RESET line to LOW, and make sure it is NOT dead
-    d._smoothie_reset()
+    driver._smoothie_reset()
     r = _write_and_return('M119')
     if 'X_max' in r:
         print(RESULT_SPACE.format(PASS))
@@ -193,7 +187,7 @@ def test_smoothie_gpio(port_name=''):
         print(RESULT_SPACE.format(FAIL))
 
 
-def test_switches_and_lights(port_name=''):
+def test_switches_and_lights():
     print('\n')
     print('* BUTTON\t--> BLUE')
     print('* PROBE\t\t--> GREEN')
@@ -203,10 +197,7 @@ def test_switches_and_lights(port_name=''):
     print('Next\t--> CTRL-C')
     print('')
     # enter button-read loop
-    if port_name:
-        robot.connect(port_name)
-    else:
-        robot.connect()
+
     try:
         while True:
             state = _get_state_of_inputs()
@@ -280,28 +271,17 @@ def start_server(folder, filepath):
         pass
 
 
-def get_optional_port_name():
-    parser = optparse.OptionParser(usage='usage: %prog [options] ')
-    parser.add_option(
-        "-p", "--p", dest="port", default='',
-        type='str', help='serial port of the smoothie'
-    )
-    options, _ = parser.parse_args(args=None, values=None)
-    return options.port
-
-
 if __name__ == '__main__':
     # put quotes around filepaths to allow whitespaces
     logging.basicConfig(filename='factory-test.log')
-    data_folder_quoted = '"{}"'.format(DATA_FOLDER)
-    video_filepath_quoted = '"{}"'.format(VIDEO_FILEPATH)
+    data_folder_quoted = '{}'.format(DATA_FOLDER)
+    video_filepath_quoted = '{}'.format(VIDEO_FILEPATH)
     atexit.register(_reset_lights)
     atexit.register(_erase_data, video_filepath_quoted)
     _reset_lights()
     _erase_data(video_filepath_quoted)
-    port_name = get_optional_port_name()
-    test_smoothie_gpio(port_name)
-    test_switches_and_lights(port_name)
+    test_smoothie_gpio()
+    test_switches_and_lights()
     test_speaker()
     record_camera(video_filepath_quoted)
     copy_to_usb_drive_and_back(video_filepath_quoted)
