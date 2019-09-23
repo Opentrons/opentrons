@@ -22,6 +22,7 @@ from opentrons.api import models
 from opentrons.data_storage import database
 from opentrons.server import rpc
 from opentrons import config, types
+from opentrons.config import feature_flags as ff
 from opentrons.server import init
 from opentrons.deck_calibration import endpoints
 from opentrons import hardware_control as hc
@@ -200,12 +201,12 @@ def using_api1(loop):
 
 def _should_skip_api1(request):
     return request.node.get_closest_marker('api1_only')\
-        and request.param != using_api1
+        and request.param != using_api1 or ff.use_protocol_api_v2()
 
 
 def _should_skip_api2(request):
     return request.node.get_closest_marker('api2_only')\
-        and request.param != using_api2
+        and request.param != using_api2 or not ff.use_protocol_api_v2()
 
 
 @pytest.fixture(params=[using_api1, using_api2])
