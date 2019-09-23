@@ -64,6 +64,12 @@ def _has_files_at_root(zipFile):
     return False
 
 
+def _get_labware_uri(labware_def: Dict[str, Any]) -> str:
+    return '/'.join([labware_def['namespace'],
+                     labware_def['parameters']['loadName'],
+                     str(labware_def['version'])])
+
+
 def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # noqa: C901
     """ Parse a bundled Python protocol """
     if not ff.use_protocol_api_v2():
@@ -102,10 +108,7 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # n
         with bundle.open(zipInfo) as f:
             if name.startswith('labware/') and name.endswith('.json'):
                 labware_def = json.load(f)
-                # TODO IMMEDIATELY: make a FN? Use arbitrary unique ID instead?
-                labware_key = '/'.join([labware_def['namespace'],
-                                        labware_def['parameters']['loadName'],
-                                        str(labware_def['version'])])
+                labware_key = _get_labware_uri(labware_def)
                 if labware_key in bundled_labware:
                     raise RuntimeError(
                         f'Conflicting labware in bundle. {labware_key}')
@@ -127,8 +130,8 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # n
 
 
 def parse(
-        protocol_file: Union[str, bytes],
-        filename: Optional[str]
+    protocol_file: Union[str, bytes],
+    filename: Optional[str]
 ) -> Protocol:
     """ Parse a protocol from text.
 
