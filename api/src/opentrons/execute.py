@@ -11,7 +11,7 @@ import asyncio
 import logging
 import sys
 import threading
-from typing import Any, Callable, Dict, List, Optional, TextIO
+from typing import Any, Callable, Dict, Optional, TextIO
 
 from opentrons import protocol_api, robot, legacy_api, __version__
 from opentrons.protocol_api import execute as execute_apiv2
