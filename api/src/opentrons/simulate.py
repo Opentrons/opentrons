@@ -146,7 +146,7 @@ def simulate(protocol_file: TextIO,
     contents = protocol_file.read()
     protocol = parse.parse(contents, protocol_file.name)
 
-    if opentrons.config.feature_flags.use_protocol_api_v2():
+    if protocol.api_level == 2:
         context = opentrons.protocol_api.contexts.ProtocolContext()
         context.home()
         scraper = CommandScraper(stack_logger, log_level, context.broker)
