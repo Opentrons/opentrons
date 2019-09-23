@@ -1,7 +1,7 @@
 // @flow
 // run task component
 import * as React from 'react'
-import { Route } from 'react-router'
+import { Route } from 'react-router-dom'
 import Page from '../components/Page'
 import SessionHeader from '../components/SessionHeader'
 import RunLog, { ConfirmCancelModal } from '../components/RunLog'

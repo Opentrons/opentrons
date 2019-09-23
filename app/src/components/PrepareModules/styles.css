@@ -37,7 +37,7 @@
   padding: 1rem;
   flex-direction: column;
   align-items: center;
-  background-color: color(var(--c-black) alpha(0.99));
+  background-color: color-mod(var(--c-black) alpha(0.99));
   height: 100%;
 }
 

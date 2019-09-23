@@ -12,6 +12,7 @@ elif not config.feature_flags.use_protocol_api_v2():
     # Need to minimally build the database for CI
     database_migration.check_version_and_perform_minimal_migrations()
 
+
 if not config.feature_flags.use_protocol_api_v2():
     from .legacy_api.api import (robot as robotv1,   # noqa(E402)
                                  reset as resetv1,

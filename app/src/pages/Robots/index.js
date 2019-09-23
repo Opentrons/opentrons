@@ -2,7 +2,7 @@
 // connect and configure robots page
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { withRouter, Route, Switch, Redirect } from 'react-router'
+import { withRouter, Route, Switch, Redirect } from 'react-router-dom'
 
 import createLogger from '../../logger'
 
@@ -19,7 +19,7 @@ import Page from '../../components/Page'
 import RobotSettings from './RobotSettings'
 import InstrumentSettings from './InstrumentSettings'
 
-import type { ContextRouter } from 'react-router'
+import type { ContextRouter } from 'react-router-dom'
 
 type Props = {| ...ContextRouter |}
 
@@ -63,7 +63,9 @@ export function Robots(props: Props) {
       {robot.status === CONNECTABLE && (
         <Route
           path={`${path}/instruments`}
-          render={props => <InstrumentSettings {...props} robot={robot} />}
+          render={props => (
+            <InstrumentSettings robot={robot} match={props.match} />
+          )}
         />
       )}
       <Route
@@ -74,4 +76,4 @@ export function Robots(props: Props) {
   )
 }
 
-export default withRouter<{||}>(Robots)
+export default withRouter<_, _>(Robots)

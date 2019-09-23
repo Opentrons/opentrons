@@ -1,18 +1,22 @@
-"""
-An easy entrypoint for simulating a protocol offline.
+""" opentrons.simulate: functions and entrypoints for simulating protocols
+
+This module has functions that provide a console entrypoint for simulating
+a protocol from the command line.
 """
 
 import argparse
-import json
 import sys
 import logging
 import queue
-from typing import Any, List, Mapping
+from typing import Any, List, Mapping, TextIO
 
 import opentrons
-import opentrons.protocols
+import opentrons.legacy_api.protocols
 import opentrons.commands
 import opentrons.broker
+from opentrons.protocols import parse
+from opentrons.protocols.types import JsonProtocol
+import opentrons.protocol_api.execute
 
 
 class AccumulatingHandler(logging.Handler):
@@ -53,12 +57,13 @@ class CommandScraper:
         self._logger = logger
         self._broker = broker
         self._queue = queue.Queue()  # type: ignore
-        level = getattr(logging, level.upper(), logging.WARNING)
-        self._logger.setLevel(level)
-        logger.addHandler(
-            AccumulatingHandler(
-                level,
-                self._queue))
+        if level != 'none':
+            level = getattr(logging, level.upper(), logging.WARNING)
+            self._logger.setLevel(level)
+            logger.addHandler(
+                AccumulatingHandler(
+                    level,
+                    self._queue))
         self._depth = 0
         self._commands: List[Mapping[str, Mapping[str, Any]]] = []
         self._unsub = self._broker.subscribe(
@@ -90,7 +95,7 @@ class CommandScraper:
             self._depth = max(self._depth-1, 0)
 
 
-def simulate(protocol_file,
+def simulate(protocol_file: TextIO,
              propagate_logs=False,
              log_level='warning') -> List[Mapping[str, Any]]:
     """
@@ -128,8 +133,10 @@ def simulate(protocol_file,
                            function in a larger application, but most logs that
                            occur during protocol simulation are best associated
                            with the actions in the protocol that cause them.
+                           Default: ``False``
     :type propagate_logs: bool
-    :param log_level: The level of logs to capture in the runlog
+    :param log_level: The level of logs to capture in the runlog. Default:
+                      ``'warning'``
     :type log_level: 'debug', 'info', 'warning', or 'error'
     :returns List[Dict[str, Dict[str, Any]]]: A run log for user output.
     """
@@ -137,30 +144,23 @@ def simulate(protocol_file,
     stack_logger.propagate = propagate_logs
 
     contents = protocol_file.read()
+    protocol = parse.parse(contents, protocol_file.name)
 
     if opentrons.config.feature_flags.use_protocol_api_v2():
-        try:
-            execute_args = {'protocol_json': json.loads(contents)}
-        except json.JSONDecodeError:
-            execute_args = {'protocol_code': contents}
         context = opentrons.protocol_api.contexts.ProtocolContext()
         context.home()
         scraper = CommandScraper(stack_logger, log_level, context.broker)
-        execute_args.update({'simulate': True,
-                             'context': context})
-        opentrons.protocol_api.execute.run_protocol(**execute_args)
+        opentrons.protocol_api.execute.run_protocol(protocol,
+                                                    simulate=True,
+                                                    context=context)
     else:
-        try:
-            proto = json.loads(contents)
-        except json.JSONDecodeError:
-            proto = contents
         opentrons.robot.disconnect()
         scraper = CommandScraper(stack_logger, log_level,
                                  opentrons.robot.broker)
-        if isinstance(proto, dict):
-            opentrons.protocols.execute_protocol(proto)
+        if isinstance(protocol, JsonProtocol):
+            opentrons.legacy_api.protocols.execute_protocol(protocol)
         else:
-            exec(proto, {})
+            exec(protocol.contents, {})
     return scraper.commands
 
 
@@ -185,17 +185,42 @@ def format_runlog(runlog: List[Mapping[str, Any]]) -> str:
     return '\n'.join(to_ret)
 
 
+def get_arguments(
+        parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
+    """ Get the argument parser for this module
+
+    Useful if you want to use this module as a component of another CLI program
+    and want to add its arguments.
+
+    :param parser: A parser to add arguments to. If not specified, one will be
+                   created.
+    :returns argparse.ArgumentParser: The parser with arguments added.
+    """
+    parser.add_argument(
+        '-l', '--log-level',
+        choices=['debug', 'info', 'warning', 'error', 'none'],
+        default='warning',
+        help='Specify the level filter for logs to show on the command line. '
+        'Log levels below warning can be chatty. If "none", do not show logs')
+    parser.add_argument(
+        'protocol', metavar='PROTOCOL',
+        type=argparse.FileType('rb'),
+        help='The protocol file to simulate. If you pass \'-\', you can pipe '
+        'the protocol via stdin; this could be useful if you want to use this '
+        'utility as part of an automated workflow.')
+    return parser
+
+
 # Note - this script is also set up as a setuptools entrypoint and thus does
 # an absolute minimum of work since setuptools does something odd generating
 # the scripts
-def main():
+def main() -> int:
     """ Run the simulation """
     parser = argparse.ArgumentParser(prog='opentrons_simulate',
-                                     description=__doc__)
-    parser.add_argument(
-        'protocol', metavar='PROTOCOL_FILE',
-        type=argparse.FileType('r'),
-        help='The protocol file to simulate (specify - to read from stdin).')
+                                     description='Simulate an OT-2 protocol')
+    parser = get_arguments(parser)
+    # don't want to add this in get_arguments because if somebody upstream is
+    # using that parser they probably want their own version
     parser.add_argument(
         '-v', '--version', action='version',
         version=f'%(prog)s {opentrons.__version__}',
@@ -205,13 +230,7 @@ def main():
         help='What to output during simulations',
         choices=['runlog', 'nothing'],
         default='runlog')
-    parser.add_argument(
-        '-l', '--log-level', action='store',
-        help=('Log level for the opentrons stack. Anything below warning '
-              'can be chatty'),
-        choices=['error', 'warning', 'info', 'debug'],
-        default='warning'
-    )
+
     args = parser.parse_args()
 
     runlog = simulate(args.protocol, log_level=args.log_level)

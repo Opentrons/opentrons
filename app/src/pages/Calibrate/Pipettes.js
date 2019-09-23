@@ -2,7 +2,7 @@
 // setup pipettes component
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { Redirect } from 'react-router'
+import { Redirect } from 'react-router-dom'
 
 import { selectors as robotSelectors } from '../../robot'
 import { getPipettesState, fetchPipettes } from '../../robot-api'
@@ -13,7 +13,7 @@ import TipProbe from '../../components/TipProbe'
 import { PipetteTabs, Pipettes } from '../../components/calibrate-pipettes'
 import SessionHeader from '../../components/SessionHeader'
 
-import type { ContextRouter } from 'react-router'
+import type { ContextRouter } from 'react-router-dom'
 import type { State, Dispatch } from '../../types'
 import type { Pipette, TiprackByMountMap } from '../../robot'
 import type { PipettesState } from '../../robot-api'

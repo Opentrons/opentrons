@@ -24,7 +24,7 @@
   width: 100%;
 
   &:focus {
-    box-shadow: 0 0.125rem 0.25rem 0 color(var(--c-black) alpha(0.5));
+    box-shadow: 0 0.125rem 0.25rem 0 color-mod(var(--c-black) alpha(0.5));
   }
 }
 
@@ -36,7 +36,7 @@
 
   &:hover,
   &:active {
-    background-color: color(var(--c-bg-light) shade(10%));
+    background-color: color-mod(var(--c-bg-light) shade(10%));
   }
 
   &:focus {

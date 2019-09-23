@@ -1,0 +1,18 @@
+# browser support for the purposes of JS polyfills and CSS prefixes
+# note: inclusion in this list does not imply QA of these browsers, but rather
+# a best-effort to ensure basic CSS and JS compatibility
+
+# explicitly support the latest version of every browser
+last 1 version
+
+# include all browsers with a global usage threshold
+> 0.5%
+
+# include popular institutional browsers that may not hit global thresholds
+Firefox ESR
+ie 11
+
+# explicitly don't support browsers that are too old
+not dead
+not ie < 11
+not ie_mob <= 11

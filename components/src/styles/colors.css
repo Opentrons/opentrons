@@ -2,7 +2,7 @@
   /* ot brand */
   --c-mustard: #ffd252;
   --c-blue: #006fff;
-  --c-light-blue: color(var(--c-blue) lightness(85%));
+  --c-light-blue: color-mod(var(--c-blue) lightness(85%));
 
   /*
    * grays
@@ -37,7 +37,7 @@
   --c-success: #60b120;
 
   /* Misc */
-  --c-selection-overlay: color(var(--c-highlight) alpha(0.3));
+  --c-selection-overlay: color-mod(var(--c-highlight) alpha(0.3));
   --c-plate-bg: #ccc;
   --c-white: #fff;
   --c-black: #000;

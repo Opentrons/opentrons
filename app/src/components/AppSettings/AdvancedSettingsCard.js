@@ -19,7 +19,7 @@ import { Card } from '@opentrons/components'
 import { LabeledToggle, LabeledSelect, LabeledButton } from '../controls'
 import AddManualIp from './AddManualIp'
 
-import type { ContextRouter } from 'react-router'
+import type { ContextRouter } from 'react-router-dom'
 import type { DropdownOption } from '@opentrons/components'
 import type { State, Dispatch } from '../../types'
 import type { UpdateChannel } from '../../config/types'

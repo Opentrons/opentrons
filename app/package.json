@@ -25,7 +25,8 @@
     "@opentrons/shared-data": "3.12.0",
     "@thi.ng/paths": "^1.6.5",
     "classnames": "^2.2.5",
-    "connected-react-router": "^6.4.0",
+    "connected-react-router": "^6.5.2",
+    "core-js": "^3.2.1",
     "events": "^3.0.0",
     "formik": "^1.3.1",
     "history": "^4.7.2",
@@ -37,8 +38,7 @@
     "react-dom": "^16.8.6",
     "react-hot-loader": "^3.0.0-beta.7",
     "react-redux": "^7.1.0",
-    "react-router": "^4.2.0",
-    "react-router-dom": "^4.2.2",
+    "react-router-dom": "^5.0.1",
     "redux": "^4.0.1",
     "redux-observable": "^1.1.0",
     "redux-thunk": "^2.3.0",
@@ -46,7 +46,6 @@
     "remark-react": "^4.0.3",
     "reselect": "^4.0.0",
     "rxjs": "^6.5.1",
-    "semver": "^5.5.0",
-    "winston": "^2.2.0"
+    "semver": "^5.5.0"
   }
 }

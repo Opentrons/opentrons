@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router'
+import { withRouter } from 'react-router-dom'
 
 import { TitledList } from '@opentrons/components'
 import LabwareListItem from './LabwareListItem'
@@ -11,8 +11,11 @@ import {
   actions as robotActions,
 } from '../../robot'
 
+import type { ContextRouter } from 'react-router-dom'
 import type { State, Dispatch } from '../../types'
 import type { Labware, Mount } from '../../robot'
+
+type OP = ContextRouter
 
 type SP = {|
   disabled: boolean,
@@ -23,14 +26,14 @@ type SP = {|
 
 type DP = {| dispatch: Dispatch |}
 
-type Props = {
+type Props = {|
   tipracks: Array<Labware>,
   disabled: boolean,
   setLabware: (labware: Labware) => mixed,
-}
+|}
 
-export default withRouter<{||}>(
-  connect<Props, _, SP, {||}, State, Dispatch>(
+export default withRouter<_, _>(
+  connect<Props, OP, SP, {||}, State, Dispatch>(
     mapStateToProps,
     null,
     mergeProps
@@ -64,7 +67,7 @@ function mapStateToProps(state: State): SP {
   }
 }
 
-function mergeProps(stateProps: SP, dispatchProps: DP): Props {
+function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
   const { tipracks, disabled, _calibrator, _deckPopulated } = stateProps
   const { dispatch } = dispatchProps
 

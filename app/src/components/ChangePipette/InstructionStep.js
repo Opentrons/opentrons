@@ -18,7 +18,7 @@ type DiagramProps = {
   mount: Mount,
   channels: PipetteChannels,
   diagram: Diagram,
-  displayCategory: PipetteDisplayCategory,
+  displayCategory: ?PipetteDisplayCategory,
 }
 
 type Props = DiagramProps & {

@@ -108,7 +108,7 @@
   text-transform: uppercase;
 
   &:hover {
-    background-color: color(var(--c-med-gray) alpha(25%));
+    background-color: color-mod(var(--c-med-gray) alpha(25%));
   }
 }
 

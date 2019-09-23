@@ -1,5 +1,8 @@
+import json
+
 from opentrons import robot, labware, instruments
-from opentrons.protocols import execute_v3
+from opentrons.legacy_api.protocols import execute_v3, execute_protocol
+from opentrons.protocols.types import JsonProtocol
 # TODO: Modify all calls to get a Well to use the `wells` method
 
 
@@ -213,3 +216,11 @@ def test_dispatch_commands(monkeypatch):
         (3.5, 3.5, 3.5),
         (7, 7, 7)
     ]
+
+
+def test_legacy_execute_json_v3(get_json_protocol_fixture):
+    robot.reset()
+    protocol_data = get_json_protocol_fixture('3', 'testAllAtomicSingleV3')
+    protocol = JsonProtocol(text=json.dumps(protocol_data), filename=None,
+                            contents=protocol_data, schema_version=3)
+    execute_protocol(protocol)

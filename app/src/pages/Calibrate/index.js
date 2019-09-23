@@ -2,7 +2,7 @@
 // calibrate page routes
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { Switch, Route, Redirect, type Match } from 'react-router'
+import { Switch, Route, Redirect, type Match } from 'react-router-dom'
 
 import type { State } from '../../types'
 import type { Pipette, Labware } from '../../robot'
