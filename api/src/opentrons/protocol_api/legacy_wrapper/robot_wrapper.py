@@ -247,8 +247,8 @@ class Robot(CommandPublisher):
     def add_container(self, name, slot, label=None, share=False):
         return None
 
-    @commands.publish.both(command=commands.pause)
     @log_call(log)
+    @commands.publish.both(command=commands.pause)
     def pause(self, msg=None):
         """
         Pauses execution of the protocol. Use :meth:`resume` to resume
@@ -264,8 +264,8 @@ class Robot(CommandPublisher):
         """
         return None
 
-    @commands.publish.both(command=commands.resume)
     @log_call(log)
+    @commands.publish.both(command=commands.resume)
     def resume(self):
         """
         Resume execution of the protocol after :meth:`pause`
@@ -280,8 +280,8 @@ class Robot(CommandPublisher):
     def is_simulating(self):
         return None
 
-    @commands.publish.both(command=commands.comment)
     @log_call(log)
+    @commands.publish.both(command=commands.comment)
     def comment(self, msg):
         return None
 
