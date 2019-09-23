@@ -300,7 +300,7 @@ once the lid temperature has been reached.
 
 Block Temperature Control
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-To set the aluminum block temperature inside the Thermocycler Module, you can use the method :py:meth:`.ThermocyclerContext.set_block_temperature`. It takes in three parameters
+To set the aluminum block temperature inside the Thermocycler Module, you can use the method :py:meth:`.ThermocyclerContext.set_block_temperature`. It takes in four parameters
 ``temperature``, ``hold_time_seconds``, ``hold_time_minutes`` and ``ramp_rate`` respectively. Only temperature is required, both the hold time parameters and ramp rate are not required.
 
 
