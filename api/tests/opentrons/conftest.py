@@ -142,34 +142,38 @@ def old_aspiration(monkeypatch):
 
 @contextlib.contextmanager
 def using_api2(loop):
-    oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
-    os.environ['OT_API_FF_useProtocolApi2'] = '1'
+    if not os.environ.get('OT_API_FF_useProtocolApi2'):
+        pytest.skip('Do not run api v1 tests here')
+    # oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
+    # os.environ['OT_API_FF_useProtocolApi2'] = '1'
     hw_manager = adapters.SingletonAdapter(loop)
     try:
         yield hw_manager
     finally:
         asyncio.ensure_future(hw_manager.reset())
-        if None is oldenv:
-            os.environ.pop('OT_API_FF_useProtocolApi2')
-        else:
-            os.environ['OT_API_FF_useProtocolApi2'] = oldenv
+        # if None is oldenv:
+        # os.environ.pop('OT_API_FF_useProtocolApi2')
+        # else:
+        #     os.environ['OT_API_FF_useProtocolApi2'] = oldenv
         hw_manager.set_config(config.robot_configs.load())
 
 
 @contextlib.contextmanager
 def using_sync_api2(loop):
-    oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
-    os.environ['OT_API_FF_useProtocolApi2'] = '1'
+    if not os.environ.get('OT_API_FF_useProtocolApi2'):
+        pytest.skip('Do not run api v2 tests here')
+    # oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
+    # os.environ['OT_API_FF_useProtocolApi2'] = '1'
     hardware = adapters.SynchronousAdapter.build(
         API.build_hardware_controller)
     try:
         yield hardware
     finally:
         hardware.reset()
-        if None is oldenv:
-            os.environ.pop('OT_API_FF_useProtocolApi2')
-        else:
-            os.environ['OT_API_FF_useProtocolApi2'] = oldenv
+        # if None is oldenv:
+        # os.environ.pop('OT_API_FF_useProtocolApi2')
+        # else:
+        #     os.environ['OT_API_FF_useProtocolApi2'] = oldenv
         hardware.set_config(config.robot_configs.load())
 
 
@@ -187,41 +191,48 @@ def ensure_api1(request, loop):
 
 @contextlib.contextmanager
 def using_api1(loop):
-    oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
-    if oldenv:
-        os.environ.pop('OT_API_FF_useProtocolApi2')
+    # print(f"{os.environ.get('OT_API_FF_useProtocolApi2')}")
+    # val = os.environ.get('OT_API_FF_useProtocolApi2') is True
+    # print(f"{val}")
+    if os.environ.get('OT_API_FF_useProtocolApi2'):
+        pytest.skip('Do not run api v1 tests here')
+    # if oldenv:
+    #     os.environ.pop('OT_API_FF_useProtocolApi2')
+    # import opentrons
     try:
         yield opentrons.robot
     finally:
         opentrons.robot.reset()
-        if None is not oldenv:
-            os.environ['OT_API_FF_useProtocolApi2'] = oldenv
+        # if None is not oldenv:
+        #     os.environ['OT_API_FF_useProtocolApi2'] = oldenv
         opentrons.robot.config = config.robot_configs.load()
 
 
 def _should_skip_api1(request):
     return request.node.get_closest_marker('api1_only')\
-        and request.param != using_api1 or ff.use_protocol_api_v2()
+        and request.param != using_api1
 
 
 def _should_skip_api2(request):
     return request.node.get_closest_marker('api2_only')\
-        and request.param != using_api2 or not ff.use_protocol_api_v2()
+        and request.param != using_api2
 
 
 @pytest.fixture(params=[using_api1, using_api2])
 async def async_server(request, virtual_smoothie_env, loop):
-    if _should_skip_api1(request):
-        pytest.skip('requires api1 only')
-    elif _should_skip_api2(request):
-        pytest.skip('requires api2 only')
+    # if _should_skip_api1(request):
+    #     pytest.skip('requires api1 only')
+    # elif _should_skip_api2(request):
+    #     pytest.skip('requires api2 only')
     with request.param(loop) as hw:
         if request.param == using_api1:
             app = init(hw)
             app['api_version'] = 1
-        else:
+        elif request.param == using_api2:
             app = init(hw)
             app['api_version'] = 2
+        else:
+            pytest.skip('Incorrect api version used')
         yield app
         await app.shutdown()
 
@@ -243,11 +254,13 @@ async def dc_session(request, async_server, monkeypatch, loop):
         await hw.cache_instruments({
             types.Mount.LEFT: None,
             types.Mount.RIGHT: 'p300_multi_v1'})
-
     ses = endpoints.SessionManager(hw)
     endpoints.session = ses
     monkeypatch.setattr(endpoints, 'session', ses)
-    yield ses
+    try:
+        yield ses
+    finally:
+        endpoints.session = None
 
 
 @pytest.fixture

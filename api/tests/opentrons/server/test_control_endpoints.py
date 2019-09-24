@@ -3,7 +3,7 @@ from copy import deepcopy
 
 import pytest
 
-from opentrons import robot, types
+from opentrons import types
 from opentrons.legacy_api import modules as legacy_modules
 
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
@@ -51,7 +51,8 @@ async def test_get_pipettes_uncommissioned(
         monkeypatch.setattr(
             async_server['com.opentrons.hardware']._driver,
             'update_steps_per_mm', fake_update_steps_per_mm)
-        robot._driver.simulating = False
+        hw = async_server['com.opentrons.hardware']
+        hw._driver.simulating = False
 
     else:
         hw = async_server['com.opentrons.hardware']._backend
@@ -60,7 +61,7 @@ async def test_get_pipettes_uncommissioned(
 
     resp = await async_client.get('/pipettes?refresh=true')
     if async_server['api_version'] == 1:
-        robot._driver.simulating = True
+        hw._driver.simulating = True
     text = await resp.text()
     assert resp.status == 200
     assert json.loads(text) == expected

@@ -2,7 +2,7 @@ import json
 
 import numpy as np
 
-from opentrons import robot, instruments
+import opentrons
 from opentrons import deck_calibration as dc
 from opentrons.deck_calibration import endpoints
 from opentrons.config import robot_configs
@@ -26,7 +26,7 @@ async def test_add_and_remove_tip(async_server, dc_session):
     version = async_server['api_version']
     if version == 1:
         hardware.reset()
-        pip = instruments.P10_Single(mount=mount)
+        pip = opentrons.instruments.P10_Single(mount=mount)
         dc_session.current_mount = mount
     else:
         hardware.reset()
@@ -92,7 +92,7 @@ async def test_save_xy(async_server, dc_session):
     if version == 1:
         mount = 'left'
         hardware.reset()
-        pip = instruments.P10_Single(mount=mount)
+        pip = opentrons.instruments.P10_Single(mount=mount)
     else:
         mount = types.Mount.LEFT
         hardware.reset()
@@ -128,8 +128,8 @@ async def test_save_xy(async_server, dc_session):
     actual = dc_session.points[point]
     if version == 1:
         expected = (
-            robot._driver.position['X'] + hardware.config.mount_offset[0],
-            robot._driver.position['Y']
+            hardware._driver.position['X'] + hardware.config.mount_offset[0],
+            hardware._driver.position['Y']
         )
     else:
         coordinates = hardware.gantry_position(types.Mount.LEFT)
@@ -152,7 +152,7 @@ async def test_save_z(async_server, dc_session, monkeypatch):
     if async_server['api_version'] == 1:
         mount = 'left'
         hardware.reset()
-        pip = instruments.P10_Single(mount=mount)
+        pip = opentrons.instruments.P10_Single(mount=mount)
     else:
         mount = types.Mount.LEFT
         hardware.reset()
@@ -342,13 +342,13 @@ async def test_release(async_client, async_server, monkeypatch, dc_session):
     """
     if async_server['api_version'] == 1:
         test_model = 'p300_multi_v1'
-
+        hardware = async_server['com.opentrons.hardware']
         def dummy_read_model(mount):
             return test_model
 
         monkeypatch.setattr(
-            robot._driver, 'read_pipette_model', dummy_read_model)
-        robot.reset()
+            hardware._driver, 'read_pipette_model', dummy_read_model)
+        hardware.reset()
 
     resp1 = await async_client.post('/calibration/deck/start')
     assert resp1.status == 409
@@ -380,13 +380,13 @@ async def test_forcing_new_session(
     """
     test_model = 'p300_multi_v1'
     if async_server['api_version'] == 1:
-
+        hardware = async_server['com.opentrons.hardware']
         def dummy_read_model(mount):
             return test_model
 
         monkeypatch.setattr(
-            robot._driver, 'read_pipette_model', dummy_read_model)
-        robot.reset()
+            hardware._driver, 'read_pipette_model', dummy_read_model)
+        hardware.reset()
 
     dummy_token = 'fake token'
 

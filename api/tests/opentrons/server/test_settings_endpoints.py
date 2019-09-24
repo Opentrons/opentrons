@@ -124,6 +124,7 @@ async def test_available_resets(async_client, async_server):
         == sorted(options, key=lambda el: el['id'])
 
 
+@pytest.mark.api1_only
 async def execute_reset_tests_v1(cli):
     # Make sure we actually delete the database
     resp = await cli.post('/settings/reset', json={'labwareCalibration': True})
