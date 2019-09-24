@@ -104,12 +104,7 @@ export function openProtocol(file: File): ThunkAction {
       const contents = protocolFile.isBinary
         ? arrayBufferToBase64(_contents)
         : _contents
-      console.log({
-        contents,
-        protocolFile,
-        _contents,
-        typeIs: typeof _contents,
-      })
+
       const uploadAction: UploadProtocolAction = {
         type: 'protocol:UPLOAD',
         payload: { contents, data: parseProtocolData(protocolFile, contents) },
