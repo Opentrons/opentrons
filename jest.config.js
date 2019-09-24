@@ -37,6 +37,6 @@ module.exports = {
     '!**/test-with-flow/**',
     '!**/flow-typed/**',
   ],
-  coverageReporters: ['lcov', 'text'],
+  coverageReporters: ['lcov', 'text-summary'],
   snapshotSerializers: ['enzyme-to-json/serializer'],
 }
