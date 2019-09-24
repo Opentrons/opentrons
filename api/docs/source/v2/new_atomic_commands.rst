@@ -169,7 +169,7 @@ Now our pipette's tip is holding 100uL.
 
     By default, the OT-2 will move to 1mm above the bottom of the target before aspirating.
     You can specify a well position function like :py:meth:`.Well.bottom` (see
-    :ref:`v2-location-within-wells`) every time you call ``aspirate``, or -  change
+    :ref:`v2-location-within-wells`) every time you call ``aspirate``, or change
     the default throughout your protocol by changing the default offset with
     :py:attr:`.InstrumentContext.well_bottom_clearance` (see :ref:`new-default-op-positions`).
 
