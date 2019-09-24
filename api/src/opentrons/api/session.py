@@ -44,8 +44,7 @@ def _motion_lock(func):
 
 class SessionManager(object):
     def __init__(
-            self, hardware, loop=None, broker=None, lock=None, mime_type=None
-    ):
+            self, hardware, loop=None, broker=None, lock=None):
         self._broker = broker or Broker()
         self._loop = loop or asyncio.get_event_loop()
         self.session = None
