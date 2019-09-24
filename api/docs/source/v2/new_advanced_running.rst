@@ -6,7 +6,7 @@ There are two ways to run a protocol on the robot without using the Opentrons ap
 Jupyter Notebook
 ----------------
 
-Using your web browers <i>(I'd suggest which are tested here for example 'we recommend Chrome or Firefox v10)</i>, you can acess the robots Jupyter notebook server. This is a convenient environment to execute and debug protocols and define different parts of your protocol in different notebook cells. By doing such you can specify which parts of the protocol at a given time should run.
+Using your web browers (I'd suggest which are tested here for example 'we recommend Chrome or Firefox v10), you can acess the robots Jupyter notebook server. This is a convenient environment to execute and debug protocols and define different parts of your protocol in different notebook cells. By doing such you can specify which parts of the protocol at a given time should run.
 
 To access the robot’s Jupyter notebook:
 
