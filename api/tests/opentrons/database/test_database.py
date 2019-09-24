@@ -4,13 +4,12 @@ from opentrons.legacy_api.containers import load as containers_load
 from opentrons.legacy_api.containers.placeable import Well, Container
 from opentrons.data_storage import database
 from opentrons.util.vector import Vector
-from opentrons import robot
 # TODO: Modify all calls to get a Well to use the `wells` method
 # TODO: Revise for new data (top-center) and add json-schema check
 
 
 @pytest.mark.xfail
-def test_container_from_container_load():
+def test_container_from_container_load(robot):
     robot.reset()
     plate = containers_load(robot, '96-flat', '1')
     actual = plate._coordinates
@@ -19,7 +18,8 @@ def test_container_from_container_load():
     assert actual == expected
 
 
-def test_well_from_container_load():
+@pytest.mark.api1_only
+def test_well_from_container_load(robot):
     robot.reset()
     plate = containers_load(robot, '96-flat', '1')
     assert plate[3].top()[1] == Vector(3.20, 3.20, 10.50)
@@ -32,7 +32,7 @@ def test_well_from_container_load():
 
 
 @pytest.mark.xfail
-def test_container_parse():
+def test_container_parse(robot):
     robot.reset()
     plate = containers_load(robot, '96-flat', '1')
     expected = {'x': 14.34, 'y': 11.24, 'z': 10.50}
@@ -40,7 +40,7 @@ def test_container_parse():
 
 
 @pytest.mark.xfail
-def test_load_persisted_container():
+def test_load_persisted_container(robot):
     plate = database.load_container("96-flat")
     assert isinstance(plate, Container)
     assert isinstance(plate, Container)
@@ -55,7 +55,8 @@ def test_load_persisted_container():
     assert plate['D6'].coordinates() == well_d6
 
 
-def test_invalid_container_name():
+@pytest.mark.api1_only
+def test_invalid_container_name(robot):
     error_type = ValueError
     with pytest.raises(error_type):
         database.load_container("fake_container")

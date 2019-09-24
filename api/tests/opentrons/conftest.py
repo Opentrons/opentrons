@@ -17,7 +17,11 @@ from uuid import uuid4 as uuid
 import zipfile
 
 import pytest
-import opentrons
+
+try:
+    from opentrons import robot as rb
+except ImportError:
+    pass
 from opentrons.api import models
 from opentrons.data_storage import database
 from opentrons.server import rpc
@@ -140,6 +144,7 @@ def old_aspiration(monkeypatch):
 # -----end feature flag fixtures-----------
 
 
+@pytest.mark.api2
 @contextlib.contextmanager
 def using_api2(loop):
     if not os.environ.get('OT_API_FF_useProtocolApi2'):
@@ -189,23 +194,14 @@ def ensure_api1(request, loop):
         yield
 
 
+@pytest.mark.apiv1
 @contextlib.contextmanager
 def using_api1(loop):
-    # print(f"{os.environ.get('OT_API_FF_useProtocolApi2')}")
-    # val = os.environ.get('OT_API_FF_useProtocolApi2') is True
-    # print(f"{val}")
-    if os.environ.get('OT_API_FF_useProtocolApi2'):
-        pytest.skip('Do not run api v1 tests here')
-    # if oldenv:
-    #     os.environ.pop('OT_API_FF_useProtocolApi2')
-    # import opentrons
     try:
-        yield opentrons.robot
+        yield rb
     finally:
-        opentrons.robot.reset()
-        # if None is not oldenv:
-        #     os.environ['OT_API_FF_useProtocolApi2'] = oldenv
-        opentrons.robot.config = config.robot_configs.load()
+        rb.reset()
+        rb.config = config.robot_configs.load()
 
 
 def _should_skip_api1(request):
@@ -218,12 +214,15 @@ def _should_skip_api2(request):
         and request.param != using_api2
 
 
-@pytest.fixture(params=[using_api1, using_api2])
+@pytest.fixture(
+    params=[
+        pytest.param(using_api1, marks=pytest.mark.apiv1),
+        pytest.param(using_api2, marks=pytest.mark.apiv2)])
 async def async_server(request, virtual_smoothie_env, loop):
-    # if _should_skip_api1(request):
-    #     pytest.skip('requires api1 only')
-    # elif _should_skip_api2(request):
-    #     pytest.skip('requires api2 only')
+    if _should_skip_api1(request):
+        pytest.skip('requires api1 only')
+    elif _should_skip_api2(request):
+        pytest.skip('requires api2 only')
     with request.param(loop) as hw:
         if request.param == using_api1:
             app = init(hw)
@@ -263,10 +262,66 @@ async def dc_session(request, async_server, monkeypatch, loop):
         endpoints.session = None
 
 
+@pytest.mark.apiv1
+def apiv1_singletons_factory(virtual_smoothie_env):
+    from opentrons.legacy_api import api
+    api.robot.connect()
+    api.robot.reset()
+    return {'robot': api.robot,
+            'instruments': api.instruments,
+            'labware': api.labware,
+            'modules': api.modules}
+
+
 @pytest.fixture
-def robot(dummy_db):
-    from opentrons.legacy_api.robot import Robot
-    return Robot()
+def apiv1_singletons(dummy_db, virtual_smoothie_env):
+    return apiv1_singletons_factory(virtual_smoothie_env)
+
+
+@pytest.mark.apiv2
+def apiv2_singletons_factory(virtual_smoothie_env):
+    from opentrons.protocol_api import back_compat
+    return {**back_compat.build_globals()}
+
+
+@pytest.fixture
+def apiv2_singletons():
+    return apiv2_singletons_factory()
+
+
+@pytest.fixture(
+    params=[
+        pytest.param(apiv1_singletons_factory, marks=pytest.mark.apiv1),
+        pytest.param(apiv2_singletons_factory, marks=pytest.mark.apiv2)])
+def singletons(dummy_db, request, virtual_smoothie_env):
+    markers = list(request.node.iter_markers())
+    if 'apiv1_only' in markers and 'apiv2' in markers:
+        pytest.skip('apiv2 but apiv1 only')
+    if 'apiv2_only' in markers and 'apiv1' in markers:
+        pytest.skip('apiv1 but apiv2 only')
+    return request.param(virtual_smoothie_env)
+
+
+@pytest.fixture
+def robot(singletons):
+    return singletons['robot']
+
+
+@pytest.fixture
+def instruments(singletons):
+    return singletons['instruments']
+
+
+@pytest.mark.apiv1
+@pytest.fixture
+def labware(singletons):
+    return singletons['labware']
+
+
+@pytest.mark.apiv1
+@pytest.fixture
+def modules(singletons):
+    return singletons['modules']
 
 
 @pytest.fixture(params=["dinosaur.py"])
@@ -371,7 +426,10 @@ def virtual_smoothie_env(monkeypatch):
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
 
 
-@pytest.fixture(params=[using_api1, using_api2])
+@pytest.fixture(
+    params=[
+        pytest.param(using_api1, marks=pytest.mark.apiv1),
+        pytest.param(using_api2, marks=pytest.mark.apiv2)])
 def hardware(request, loop, virtual_smoothie_env):
     if _should_skip_api1(request):
         pytest.skip('requires api1 only')
@@ -381,7 +439,10 @@ def hardware(request, loop, virtual_smoothie_env):
         yield hw
 
 
-@pytest.fixture(params=[using_api1, using_sync_api2])
+@pytest.fixture(
+    params=[
+        pytest.param(using_api1, marks=pytest.mark.apiv1),
+        pytest.param(using_sync_api2, marks=pytest.mark.apiv2)])
 def sync_hardware(request, loop, virtual_smoothie_env):
     if _should_skip_api1(request):
         pytest.skip('requires api1 only')
@@ -426,7 +487,7 @@ def model(robot, hardware, loop, request):
     from opentrons.legacy_api.instruments.pipette import Pipette
 
     try:
-        lw_name = request.getfixturevalue('labware')
+        lw_name = request.getfixturevalue('labware_name')
     except Exception:
         lw_name = None
 

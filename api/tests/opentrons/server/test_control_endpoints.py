@@ -8,7 +8,6 @@ from opentrons.legacy_api import modules as legacy_modules
 
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
 from opentrons.hardware_control import modules
-from opentrons import instruments
 from opentrons.config import pipette_config
 
 
@@ -401,6 +400,7 @@ async def test_instrument_reuse(async_server, async_client, monkeypatch):
     # connected afterwards
     test_model = 'p300_multi_v1'
     if async_server['api_version'] == 1:
+        from opentrons import instruments
 
         def dummy_read_model(mount):
             return test_model

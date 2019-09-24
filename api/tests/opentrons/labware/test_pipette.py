@@ -4,14 +4,13 @@ from numpy import isclose
 from unittest import mock
 import pytest
 
-from opentrons import instruments, robot
 from opentrons.legacy_api.containers import load as containers_load
 from opentrons.config import pipette_config
 from opentrons.trackers import pose_tracker
 
 
 @pytest.mark.api1_only
-def test_use_filter_tips():
+def test_use_filter_tips(instruments, robot):
     # test tips with lower working volume than max volume of pipette used to
     # ensure that the pipette never over-aspirates with a smaller pipette tip
     tipracks = [
@@ -42,7 +41,7 @@ def test_use_filter_tips():
 
 
 @pytest.mark.api1_only
-def test_shake_during_pick_up(monkeypatch):
+def test_shake_during_pick_up(monkeypatch, robot, instruments):
     robot.reset()
     pip = instruments._create_pipette_from_config(
             config=pipette_config.load('p1000_single_v2.0'),
@@ -76,7 +75,7 @@ def test_shake_during_pick_up(monkeypatch):
 
 
 @pytest.mark.api1_only
-def test_shake_during_drop(monkeypatch):
+def test_shake_during_drop(monkeypatch, robot, instruments):
     robot.reset()
     pip = instruments._create_pipette_from_config(
             config=pipette_config.load('p1000_single_v1.5'),
@@ -135,7 +134,8 @@ def test_shake_during_drop(monkeypatch):
     pip.tip_attached = False
 
 
-def test_pipette_version_1_0_and_1_3_extended_travel():
+@pytest.mark.api1_only
+def test_pipette_version_1_0_and_1_3_extended_travel(robot, instruments):
     models = [
         'p10_single', 'p10_multi', 'p50_single', 'p50_multi',
         'p300_single', 'p300_multi', 'p1000_single'
@@ -164,7 +164,8 @@ def test_pipette_version_1_0_and_1_3_extended_travel():
         assert right_diff > left_diff
 
 
-def test_all_pipette_models_can_transfer():
+@pytest.mark.api1_only
+def test_all_pipette_models_can_transfer(robot, instruments):
     from opentrons.config import pipette_config
 
     models = [
@@ -191,7 +192,8 @@ def test_all_pipette_models_can_transfer():
         right.aspirate().dispense()
 
 
-def test_pipette_models_reach_max_volume():
+@pytest.mark.api1_only
+def test_pipette_models_reach_max_volume(robot, instruments):
 
     for model in pipette_config.config_models:
         config = pipette_config.load(model)
@@ -209,7 +211,8 @@ def test_pipette_models_reach_max_volume():
         assert pos[0] < pipette.plunger_positions['top']
 
 
-def test_flow_rate():
+@pytest.mark.api1_only
+def test_flow_rate(robot, instruments):
     # Test new flow-rate functionality on all pipettes with different max vols
     robot.reset()
     p10 = instruments.P10_Single(mount='right')
@@ -264,7 +267,8 @@ def test_flow_rate():
     assert p1000.speeds['dispense'] == expected_mm_per_sec
 
 
-def test_pipette_max_deck_height():
+@pytest.mark.api1_only
+def test_pipette_max_deck_height(robot, instruments):
     robot.reset()
     tallest_point = robot._driver.homed_position['Z']
     p = instruments.P300_Single(mount='left')
@@ -277,8 +281,9 @@ def test_pipette_max_deck_height():
         p._remove_tip(length=tip_length)
 
 
-def test_retract():
-    robot.reset()
+@pytest.mark.api1_only
+def test_retract(robot, instruments):
+    # robot.reset()
     plate = containers_load(robot, '96-flat', '1')
     p300 = instruments.P300_Single(mount='left')
     from opentrons.drivers.smoothie_drivers.driver_3_0 import HOMED_POSITION
@@ -300,7 +305,8 @@ def test_retract():
     assert current_pos[2] == HOMED_POSITION['A']
 
 
-def test_aspirate_move_to(old_aspiration):
+@pytest.mark.api1_only
+def test_aspirate_move_to(old_aspiration, robot, instruments):
     # TODO: it seems like this test is checking that the aspirate point is
     # TODO: *fully* at the bottom of the well, which isn't the expected
     # TODO: behavior of aspirate when a location is not specified. This should
@@ -332,7 +338,8 @@ def test_aspirate_move_to(old_aspiration):
     assert isclose(current_pos, (161,  116.7,   10.5)).all()
 
 
-def test_dispense_move_to(old_aspiration):
+@pytest.mark.api1_only
+def test_dispense_move_to(old_aspiration, robot, instruments):
     # TODO: same as for aspirate
     robot.reset()
     tip_rack = containers_load(robot, 'tiprack-200ul', '3')
@@ -361,7 +368,8 @@ def test_dispense_move_to(old_aspiration):
     assert isclose(current_pos, (161,  116.7,   10.5)).all()
 
 
-def test_trough_move_to():
+@pytest.mark.api1_only
+def test_trough_move_to(robot, instruments):
     # TODO: new labware system should center multichannel pipettes within wells
     # TODO: (correct single-channel position currently corresponds to back-
     # TODO: most tip of multi-channel), so calculate against that
@@ -378,7 +386,8 @@ def test_trough_move_to():
     assert isclose(current_pos, (0, 0, 38)).all()
 
 
-def test_delay_calls(monkeypatch):
+@pytest.mark.api1_only
+def test_delay_calls(monkeypatch, instruments):
     from opentrons import robot
     from opentrons.legacy_api.instruments import pipette
     robot.reset()

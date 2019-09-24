@@ -40,3 +40,4 @@ if version < (3, 5):
 
 
 __all__ = ['__version__', 'HERE'] + names_list
+print(f"THIS IS ALL {__all__}")

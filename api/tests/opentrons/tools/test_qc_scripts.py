@@ -1,5 +1,6 @@
 import pytest
-from opentrons import tools, robot
+
+from opentrons.config import feature_flags as ff
 
 pipette_barcode_to_model = {
     'P10S20180101A01': 'p10_single_v1',
@@ -27,8 +28,12 @@ pipette_barcode_to_model = {
 
 
 @pytest.fixture
-def driver_import(monkeypatch):
-    monkeypatch.setattr(tools, 'driver', robot._driver)
+def driver_import(monkeypatch, robot):
+    from opentrons import tools
+    if ff.use_protocol_api_v2():
+        monkeypatch.setattr(tools, 'driver', robot._backend._smoothie_driver)
+    else:
+        monkeypatch.setattr(tools, 'driver', robot._driver)
 
 
 def test_parse_model_from_barcode(driver_import):

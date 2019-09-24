@@ -40,12 +40,14 @@ def local_test_pipette(robot):
     return trash, tiprack1, tiprack2, plate, p200
 
 
+@pytest.mark.api1_only
 def test_bad_volume_percentage(local_test_pipette):
     _, _1, _2, _3, p200 = local_test_pipette
     with pytest.raises(RuntimeError):
         p200._volume_percentage(-1)
 
 
+@pytest.mark.api1_only
 def test_add_instrument(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     robot.reset()
@@ -57,6 +59,7 @@ def test_add_instrument(local_test_pipette, robot):
                 ul_per_mm=10)
 
 
+@pytest.mark.api1_only
 def test_aspirate_zero_volume(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     assert robot.commands() == []
@@ -65,6 +68,7 @@ def test_aspirate_zero_volume(local_test_pipette, robot):
     assert robot.commands() == ['Aspirating 0 uL from ? at 1.0 speed']  # noqa
 
 
+@pytest.mark.api1_only
 def test_get_plunger_position(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     assert p200._get_plunger_position('top') == 0
@@ -80,6 +84,7 @@ def test_get_plunger_position(local_test_pipette, robot):
         p200._get_plunger_position('roll_out')
 
 
+@pytest.mark.api1_only
 def test_deprecated_axis_call(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     import warnings
@@ -96,6 +101,7 @@ def test_deprecated_axis_call(local_test_pipette, robot):
     warnings.filterwarnings('default')
 
 
+@pytest.mark.api1_only
 def test_get_instruments_by_name(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p1000 = Pipette(
@@ -115,6 +121,7 @@ def test_get_instruments_by_name(local_test_pipette, robot):
     assert result == [('right', p1000)]
 
 
+@pytest.mark.api1_only
 def test_placeables_reference(local_test_pipette):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.tip_attached = True
@@ -132,6 +139,7 @@ def test_placeables_reference(local_test_pipette):
     assert p200.placeables == expected
 
 
+@pytest.mark.api1_only
 def test_unpack_location(local_test_pipette):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     # TODO: remove when new labware system is promoted to production (it
@@ -144,6 +152,7 @@ def test_unpack_location(local_test_pipette):
     assert res == (plate[0], plate[0].from_center(x=0, y=0, z=1))
 
 
+@pytest.mark.api1_only
 def test_aspirate_invalid_max_volume(local_test_pipette):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.tip_attached = True
@@ -151,6 +160,7 @@ def test_aspirate_invalid_max_volume(local_test_pipette):
         p200.aspirate(500)
 
 
+@pytest.mark.api1_only
 def test_volume_percentage(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     with pytest.raises(RuntimeError):
@@ -163,6 +173,7 @@ def test_volume_percentage(local_test_pipette, robot):
     assert len(robot.get_warnings()) == 1
 
 
+@pytest.mark.api1_only
 def test_add_tip(local_test_pipette, robot):
     """
     This deals with z accrual behavior during tip add/remove, when +/- get
@@ -177,6 +188,7 @@ def test_add_tip(local_test_pipette, robot):
     assert (new_position == prior_position).all()
 
 
+@pytest.mark.api1_only
 def test_set_speed(local_test_pipette):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.set_speed(aspirate=100)
@@ -186,6 +198,7 @@ def test_set_speed(local_test_pipette):
     assert p200.speeds['dispense'] == 100
 
 
+@pytest.mark.api1_only
 def test_distribute(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.reset()
@@ -297,6 +310,7 @@ def test_distribute(local_test_pipette, robot):
     robot.clear_commands()
 
 
+@pytest.mark.api1_only
 def test_consolidate(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.reset()
@@ -401,6 +415,7 @@ def test_consolidate(local_test_pipette, robot):
     robot.clear_commands()
 
 
+@pytest.mark.api1_only
 def test_transfer(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.reset()
@@ -504,6 +519,7 @@ def test_transfer(local_test_pipette, robot):
     robot.clear_commands()
 
 
+@pytest.mark.api1_only
 def test_bad_transfer(local_test_pipette):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.reset()
@@ -521,6 +537,7 @@ def test_bad_transfer(local_test_pipette):
         p200.transfer(30, plate[0], plate[1], new_tip='sometimes')
 
 
+@pytest.mark.api1_only
 def test_divisible_locations(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.reset()
@@ -596,6 +613,7 @@ def test_divisible_locations(local_test_pipette, robot):
     robot.clear_commands()
 
 
+@pytest.mark.api1_only
 def test_transfer_mix(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.reset()
@@ -625,6 +643,7 @@ def test_transfer_mix(local_test_pipette, robot):
     robot.clear_commands()
 
 
+@pytest.mark.api1_only
 def test_transfer_air_gap(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.reset()
@@ -649,6 +668,7 @@ def test_transfer_air_gap(local_test_pipette, robot):
     robot.clear_commands()
 
 
+@pytest.mark.api1_only
 def test_consolidate_air_gap(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.reset()
@@ -672,6 +692,7 @@ def test_consolidate_air_gap(local_test_pipette, robot):
     robot.clear_commands()
 
 
+@pytest.mark.api1_only
 def test_distribute_air_gap(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.reset()
@@ -701,6 +722,7 @@ def test_distribute_air_gap(local_test_pipette, robot):
     robot.clear_commands()
 
 
+@pytest.mark.api1_only
 def test_distribute_air_gap_and_disposal_vol(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.reset()
@@ -733,6 +755,7 @@ def test_distribute_air_gap_and_disposal_vol(local_test_pipette, robot):
     robot.clear_commands()
 
 
+@pytest.mark.api1_only
 def test_consolidate_mix(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.reset()
@@ -765,6 +788,7 @@ def test_consolidate_mix(local_test_pipette, robot):
     robot.clear_commands()
 
 
+@pytest.mark.api1_only
 def test_distribute_mix(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.reset()
@@ -797,6 +821,7 @@ def test_distribute_mix(local_test_pipette, robot):
     robot.clear_commands()
 
 
+@pytest.mark.api1_only
 def test_transfer_multichannel(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.reset()
@@ -823,6 +848,7 @@ def test_transfer_multichannel(local_test_pipette, robot):
     robot.clear_commands()
 
 
+@pytest.mark.api1_only
 def test_transfer_single_channel(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.reset()
@@ -882,6 +908,7 @@ def test_transfer_single_channel(local_test_pipette, robot):
     robot.clear_commands()
 
 
+@pytest.mark.api1_only
 def test_touch_tip(local_test_pipette):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.pick_up_tip()
@@ -951,6 +978,7 @@ def test_touch_tip(local_test_pipette):
     assert expected == p200.robot.move_to.mock_calls
 
 
+@pytest.mark.api1_only
 def test_mix(local_test_pipette):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     # It is necessary to aspirate before it is mocked out
@@ -975,6 +1003,7 @@ def test_mix(local_test_pipette):
     assert p200.aspirate.mock_calls == aspirate_expected
 
 
+@pytest.mark.api1_only
 def test_air_gap(local_test_pipette):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.pick_up_tip()
@@ -998,12 +1027,14 @@ def test_air_gap(local_test_pipette):
     assert p200.current_volume == 50
 
 
+@pytest.mark.api1_only
 def test_pipette_home(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.home()
     assert len(robot.commands()) == 1
 
 
+@pytest.mark.api1_only
 def test_mix_with_named_args(local_test_pipette):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.current_volume = 100
@@ -1029,6 +1060,7 @@ def test_mix_with_named_args(local_test_pipette):
         ]
 
 
+@pytest.mark.api1_only
 def test_tip_tracking_simple(local_test_pipette):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.move_to = mock.Mock()
@@ -1041,6 +1073,7 @@ def test_tip_tracking_simple(local_test_pipette):
         build_pick_up_tip(p200, tiprack1[1])
 
 
+@pytest.mark.api1_only
 def test_simulate_plunger_while_enqueing(local_test_pipette):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
 
@@ -1065,6 +1098,7 @@ def test_simulate_plunger_while_enqueing(local_test_pipette):
     p200.drop_tip()
 
 
+@pytest.mark.api1_only
 def test_tip_tracking_chain(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     # TODO (ben 20171130): revise this test to make more sense in the
@@ -1115,6 +1149,7 @@ def test_tip_tracking_chain(local_test_pipette, robot):
         p200.pick_up_tip()
 
 
+@pytest.mark.api1_only
 def test_tip_tracking_chain_multi_channel(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     # TODO (ben 20171130): revise this test to make more sense in the
@@ -1150,6 +1185,7 @@ def test_tip_tracking_chain_multi_channel(local_test_pipette, robot):
     assert p200_multi.move_to.mock_calls == expected
 
 
+@pytest.mark.api1_only
 def test_tip_tracking_start_at_tip(local_test_pipette):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.start_at_tip(tiprack1['B2'])
@@ -1157,6 +1193,7 @@ def test_tip_tracking_start_at_tip(local_test_pipette):
     assert tiprack1['B2'] == p200.current_tip()
 
 
+@pytest.mark.api1_only
 def test_tip_tracking_return(local_test_pipette):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     # Note: because this test mocks out `drop_tip`, as a side-effect
@@ -1180,6 +1217,7 @@ def test_tip_tracking_return(local_test_pipette):
     assert p200.drop_tip.mock_calls == expected
 
 
+@pytest.mark.api1_only
 def test_direct_movement_within_well(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     robot.move_to = mock.Mock()
@@ -1207,6 +1245,7 @@ def test_direct_movement_within_well(local_test_pipette, robot):
     assert robot.move_to.mock_calls == expected
 
 
+@pytest.mark.api1_only
 def build_pick_up_tip(pipette, well):
     return [
         mock.call(well.top()),

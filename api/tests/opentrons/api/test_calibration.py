@@ -226,8 +226,8 @@ async def test_home_api1(main_router, model):
 
 
 @pytest.mark.api1_only
-@pytest.mark.parametrize('labware', ['trough-1row-25ml'])
-async def test_move_to_top_api1_1well(main_router, model, labware):
+@pytest.mark.parametrize('labware_name', ['trough-1row-25ml'])
+async def test_move_to_top_api1_1well(main_router, model, labware_name):
     with mock.patch.object(model.instrument._instrument, 'move_to') as move_to:
         main_router.calibration_manager.move_to(
             model.instrument,

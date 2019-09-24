@@ -4,20 +4,20 @@
 
 import pytest
 import asyncio
-from opentrons import robot, labware, modules
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 from opentrons.drivers import serial_communication
 
 
 @pytest.fixture
-def non_simulating():
+def non_simulating(robot):
     robot._driver.simulating = False
     yield
     robot._driver.simulating = True
 
 
-def test_load_container_onto_magdeck():
+@pytest.mark.api1_only
+def test_load_container_onto_magdeck(modules, robot, labware):
     module_name = 'magdeck'
     slot = '1'
 
@@ -28,7 +28,8 @@ def test_load_container_onto_magdeck():
     assert test_container.parent == md.labware
 
 
-def test_load_container_onto_tempdeck():
+@pytest.mark.api1_only
+def test_load_container_onto_tempdeck(modules, robot, labware):
     module_name = 'tempdeck'
     slot = '2'
 
@@ -39,7 +40,8 @@ def test_load_container_onto_tempdeck():
     assert test_container.parent == md.labware
 
 
-def test_simulating(virtual_smoothie_env, monkeypatch):
+@pytest.mark.api1_only
+def test_simulating(virtual_smoothie_env, monkeypatch, modules):
     connected = False
 
     def mock_connect(self, port):
@@ -51,8 +53,9 @@ def test_simulating(virtual_smoothie_env, monkeypatch):
     assert not connected
 
 
+@pytest.mark.api1_only
 def test_run_magdeck_connected(
-        non_simulating, virtual_smoothie_env, monkeypatch):
+        non_simulating, virtual_smoothie_env, monkeypatch, modules, robot):
     connected = False
 
     def mock_connect(self, port):
@@ -75,8 +78,9 @@ def test_run_magdeck_connected(
     assert connected
 
 
+@pytest.mark.api1_only
 def test_run_tempdeck_connected(
-        non_simulating, virtual_smoothie_env, monkeypatch):
+        non_simulating, virtual_smoothie_env, monkeypatch, modules, robot):
     connected = False
 
     def mock_connect(self, port):
@@ -100,7 +104,8 @@ def test_run_tempdeck_connected(
     tempdeck.disconnect()  # Necessary to kill the thread started by connect()
 
 
-def test_load_correct_engage_height():
+@pytest.mark.api1_only
+def test_load_correct_engage_height(robot, modules, labware):
     robot.reset()
     md = modules.load('magdeck', '1')
     test_container = labware.load('biorad_96_wellplate_200ul_pcr',
@@ -111,7 +116,7 @@ def test_load_correct_engage_height():
 
 
 @pytest.fixture
-def old_bootloader_module():
+def old_bootloader_module(modules):
     module = modules.TempDeck(port='/dev/modules/tty0_tempdeck')
     module._device_info = {'model': 'temp_deck_v1'}
     module._driver = TempDeckDriver()
@@ -119,15 +124,16 @@ def old_bootloader_module():
 
 
 @pytest.fixture
-def new_bootloader_module():
+def new_bootloader_module(modules):
     module = modules.TempDeck(port='/dev/modules/tty0_tempdeck')
     module._device_info = {'model': 'temp_deck_v1.1'}
     module._driver = TempDeckDriver()
     return module
 
 
+@pytest.mark.api1_only
 async def test_enter_bootloader(
-        new_bootloader_module, virtual_smoothie_env, monkeypatch):
+        new_bootloader_module, virtual_smoothie_env, monkeypatch, modules):
 
     async def mock_discover_ports_before_dfu_mode():
         return 'tty0_tempdeck'
@@ -148,13 +154,16 @@ async def test_enter_bootloader(
     assert bootloader_port == '/dev/modules/tty0_bootloader'
 
 
+@pytest.mark.api1_only
 def test_old_bootloader_check(
-        old_bootloader_module, new_bootloader_module, virtual_smoothie_env):
+        old_bootloader_module, new_bootloader_module, virtual_smoothie_env,
+        modules):
     assert modules._has_old_bootloader(old_bootloader_module)
     assert not modules._has_old_bootloader(new_bootloader_module)
 
 
-async def test_port_poll(virtual_smoothie_env, monkeypatch):
+@pytest.mark.api1_only
+async def test_port_poll(virtual_smoothie_env, monkeypatch, modules):
     has_old_bootloader = False
     timeout = 0.1
     monkeypatch.setattr(modules, 'PORT_SEARCH_TIMEOUT', timeout)
@@ -181,7 +190,13 @@ async def test_port_poll(virtual_smoothie_env, monkeypatch):
         assert not port_found
 
 
-async def test_old_bootloader_port_poll(virtual_smoothie_env, monkeypatch):
+@pytest.mark.api1_only
+async def test_old_bootloader_port_poll(
+        virtual_smoothie_env, monkeypatch, modules):
+
+    # TODO: Will need to write separate tests for backcompat to ensure that
+    # functionality for modules in v1 still works.
+
     ports_before_switch = ['tty0_magdeck', 'tty1_tempdeck']
     has_old_bootloader = True
     timeout = 0.1

@@ -1,12 +1,14 @@
 import json
 
-from opentrons import robot, labware, instruments
-from opentrons.legacy_api.protocols import execute_v3, execute_protocol
+import pytest
+
 from opentrons.protocols.types import JsonProtocol
 # TODO: Modify all calls to get a Well to use the `wells` method
 
 
-def test_load_pipettes():
+@pytest.mark.api1_only
+def test_load_pipettes(robot):
+    from opentrons.legacy_api.protocols import execute_v3
     data = {
         "pipettes": {
             "leftPipetteHere": {
@@ -15,8 +17,6 @@ def test_load_pipettes():
             }
         }
     }
-
-    robot.reset()
 
     loaded_pipettes = execute_v3.load_pipettes(data)
     robot_instruments = robot.get_instruments()
@@ -28,9 +28,9 @@ def test_load_pipettes():
     assert pipette == loaded_pipettes['leftPipetteHere']
 
 
-def test_get_location():
-    robot.reset()
-
+@pytest.mark.api1_only
+def test_get_location(labware):
+    from opentrons.legacy_api.protocols import execute_v3
     command_type = 'aspirate'
     plate = labware.load("96-flat", 1)
     well = "B2"
@@ -51,8 +51,9 @@ def test_get_location():
         assert result == plate.well(well).bottom(offset)
 
 
-def test_load_labware(get_labware_fixture):
-    robot.reset()
+@pytest.mark.api1_only
+def test_load_labware(get_labware_fixture, robot):
+    from opentrons.legacy_api.protocols import execute_v3
     fixture_96_plate = get_labware_fixture('fixture_96_plate')
     data = {
         "labwareDefinitions": {
@@ -78,7 +79,9 @@ def test_load_labware(get_labware_fixture):
     assert loaded_labware['destPlateId'] in robot.deck['11']
 
 
-def test_load_labware_trash():
+@pytest.mark.api1_only
+def test_load_labware_trash(robot):
+    from opentrons.legacy_api.protocols import execute_v3
     robot.reset()
     data = {
         "labwareDefinitions": {
@@ -86,6 +89,7 @@ def test_load_labware_trash():
                 "parameters": {
                     "quirks": ["fixedTrash"]
                 }
+
             }
         },
         "labware": {
@@ -100,8 +104,11 @@ def test_load_labware_trash():
     assert result['someTrashId'] == robot.fixed_trash
 
 
-def test_dispatch_commands(monkeypatch):
-    robot.reset()
+@pytest.mark.api1_only
+def test_dispatch_commands(monkeypatch, singletons):
+    from opentrons.legacy_api.protocols import execute_v3
+
+    singletons['robot'].reset()
     cmd = []
     flow_rates = []
 
@@ -120,14 +127,14 @@ def test_dispatch_commands(monkeypatch):
     def mock_set_flow_rate(aspirate, dispense, blow_out):
         flow_rates.append((aspirate, dispense, blow_out))
 
-    pipette = instruments.P10_Single('left')
+    pipette = singletons['instruments'].P10_Single('left')
 
     loaded_pipettes = {
         'pipetteId': pipette
     }
 
-    source_plate = labware.load('96-flat', '1')
-    dest_plate = labware.load('96-flat', '2')
+    source_plate = singletons['labware'].load('96-flat', '1')
+    dest_plate = singletons['labware'].load('96-flat', '2')
 
     loaded_labware = {
         'sourcePlateId': source_plate,
@@ -218,7 +225,9 @@ def test_dispatch_commands(monkeypatch):
     ]
 
 
-def test_legacy_execute_json_v3(get_json_protocol_fixture):
+@pytest.mark.api1_only
+def test_legacy_execute_json_v3(get_json_protocol_fixture, robot):
+    from opentrons.legacy_api.protocols import execute_protocol
     robot.reset()
     protocol_data = get_json_protocol_fixture('3', 'testAllAtomicSingleV3')
     protocol = JsonProtocol(text=json.dumps(protocol_data), filename=None,

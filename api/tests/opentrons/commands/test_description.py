@@ -13,6 +13,7 @@ def containers():
     }
 
 
+@pytest.mark.api1_only
 def test_all(containers):
     assert stringify_location(containers['1'][0]) == 'well A1 in "1"'
     assert stringify_location(containers['1'].rows(0)) == \

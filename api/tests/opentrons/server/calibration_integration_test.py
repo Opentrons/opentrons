@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 
 from opentrons import types
+
 from opentrons import deck_calibration as dc
 from opentrons.deck_calibration import endpoints
 from opentrons.trackers.pose_tracker import absolute
@@ -17,7 +18,6 @@ from opentrons.hardware_control.types import CriticalPoint
 # Smoothie board sees the position of itself--after a fashion). Simulating mode
 # should be replaced with something that accurately reflects actual robot
 # operation, and then these tests should be revised to match expected reality.
-
 
 @pytest.mark.api1_only
 async def test_transform_from_moves(async_server, async_client, monkeypatch):

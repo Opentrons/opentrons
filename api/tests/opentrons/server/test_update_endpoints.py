@@ -7,7 +7,6 @@ from aiohttp import web
 from opentrons.server import init
 from opentrons.server.endpoints import update
 from opentrons.server.endpoints import serverlib_fallback
-from opentrons import modules
 
 
 async def test_restart(
@@ -100,8 +99,9 @@ async def test_ignore_updates(
     assert json.loads(r3body) == {'version': '3.1.3'}
 
 
+@pytest.mark.api1_only
 @pytest.fixture
-def dummy_attached_modules():
+def dummy_attached_modules(modules):
     temp_module = modules.TempDeck()
     temp_port = 'tty1_tempdeck'
     temp_serial = 'tdYYYYMMDD987'
@@ -123,7 +123,8 @@ async def test_update_module_firmware(
         aiohttp_client,
         monkeypatch,
         async_client,
-        async_server):
+        async_server,
+        modules):
 
     client = async_client
     hw = async_server['com.opentrons.hardware']
@@ -173,7 +174,8 @@ async def test_fail_update_module_firmware(
         virtual_smoothie_env,
         monkeypatch,
         async_client,
-        async_server):
+        async_server,
+        modules):
 
     client = async_client
     hw = async_server['com.opentrons.hardware']

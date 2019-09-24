@@ -1,14 +1,13 @@
 import pytest
 
-from opentrons import robot
 from tests.opentrons.conftest import state, log_by_axis
 
 from numpy import isclose, subtract
 from opentrons.trackers import pose_tracker
 
-
+@pytest.mark.api1_only
 @pytest.fixture
-def smoke():
+def smoke(robot):
     robot.connect()
     robot.reset()
     robot.home()
@@ -16,7 +15,8 @@ def smoke():
     from tests.opentrons.data import smoke  # NOQA
 
 
-def test_smoke(virtual_smoothie_env, smoke):
+@pytest.mark.api1_only
+def test_smoke(virtual_smoothie_env, smoke, robot):
     by_axis = log_by_axis(robot._driver.log, 'XYA')
     coords = [
         (x, y, z)
@@ -28,7 +28,8 @@ def test_smoke(virtual_smoothie_env, smoke):
 
 @pytest.mark.api1_only
 @pytest.mark.parametrize('protocol_file', ['multi-single.py'])
-async def test_multi_single(main_router, protocol, protocol_file, dummy_db):
+async def test_multi_single(
+        main_router, protocol, protocol_file, dummy_db, robot):
     robot.connect()
     robot.home()
     session = main_router.session_manager.create(
@@ -44,7 +45,7 @@ async def test_multi_single(main_router, protocol, protocol_file, dummy_db):
 @pytest.mark.api1_only
 @pytest.mark.parametrize('protocol_file', ['multi-single.py'])
 async def test_load_jog_save_run(
-        main_router, protocol, protocol_file, dummy_db, monkeypatch):
+        main_router, protocol, protocol_file, dummy_db, monkeypatch, robot):
     import tempfile
     temp = tempfile.gettempdir()
     monkeypatch.setenv('USER_DEFN_ROOT', temp)

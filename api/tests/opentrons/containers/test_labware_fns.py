@@ -1,8 +1,9 @@
-from opentrons import labware
 # TODO: Revise to match new schemas and use json-schema validation in test
+import pytest
 
 
-def test_labware_create(dummy_db):
+@pytest.mark.api1_only
+def test_labware_create(labware):
     n_cols = 6
     n_rows = 4
     x_dist = 19.6

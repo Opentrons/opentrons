@@ -1,9 +1,12 @@
+import pytest
+
 from opentrons.legacy_api.containers import load as containers_load
 from opentrons.legacy_api.containers.placeable import Container, Deck
 from opentrons.legacy_api.instruments import pipette
 # TODO: Modify all calls to get a Well to use the `wells` method
 
 
+@pytest.mark.api1_only
 def test_protocol_container_setup(robot):
     plate = containers_load(robot, '96-flat', '1', 'myPlate')
     tiprack = containers_load(robot, 'tiprack-10ul', '5')
@@ -17,6 +20,7 @@ def test_protocol_container_setup(robot):
     assert tiprack in containers_list
 
 
+@pytest.mark.api1_only
 def test_protocol_head(robot):
     trash = containers_load(robot, 'point', '1', 'myTrash')
     tiprack = containers_load(robot, 'tiprack-10ul', '5')
@@ -38,6 +42,7 @@ def test_protocol_head(robot):
     assert instruments_list[0] == ('left', p200)
 
 
+@pytest.mark.api1_only
 def test_deck_setup(robot):
     deck = robot.deck
 
