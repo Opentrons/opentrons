@@ -131,7 +131,7 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # n
 
 def parse(
     protocol_file: Union[str, bytes],
-    filename: Optional[str]
+    filename: str = None
 ) -> Protocol:
     """ Parse a protocol from text.
 
