@@ -210,3 +210,19 @@ def test_parse_json_details(get_json_protocol_fixture,
     assert parsed.filename == fname
     assert parsed.contents == json.loads(protocol)
     parsed.schema_version == int(protocol_details[0])
+
+
+@pytest.mark.api2_only
+def test_parse_bundle_details(get_bundle_fixture):
+    fixture = get_bundle_fixture('simple_bundle')
+    filename = fixture['filename']
+
+    parsed = parse(fixture['binary_zipfile'], filename)
+
+    assert isinstance(parsed, PythonProtocol)
+    assert parsed.filename == filename
+    assert parsed.bundled_labware == fixture['bundled_labware']
+    assert parsed.bundled_python == fixture['bundled_python']
+    assert parsed.bundled_datafiles == fixture['bundled_datafiles']
+    assert parsed.metadata == fixture['metadata']
+    assert parsed.api_level == '2'
