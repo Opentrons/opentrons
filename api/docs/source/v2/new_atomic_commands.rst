@@ -149,7 +149,7 @@ This loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_we
 Aspirate
 ========
 
-When calling :py:meth:`.InstrumentContext.aspirate` on a pipette, we can specify how many microliters, and at which location, to draw liquid from, this aspiratation will pull liquid up into the pipette's tip:
+When calling :py:meth:`.InstrumentContext.aspirate` on a pipette, we can specify how many microliters, and at which location, to draw liquid from, this aspiration will pull liquid up into the pipette's tip:
 
 .. code-block:: python
 
