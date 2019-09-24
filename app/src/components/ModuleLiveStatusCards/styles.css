@@ -68,38 +68,3 @@ updated component library cards after redesign/refactor
   margin-right: 1rem;
   font-weight: var(--fw-semibold);
 }
-
-.temp_control_button {
-  width: 7rem;
-}
-
-.set_temp_field {
-  display: flex;
-  flex-direction: column;
-  width: 8rem;
-}
-
-.set_temp_label {
-  @apply --font-body-1-dark;
-
-  font-weight: var(--fw-semibold);
-  margin-bottom: 0.5rem;
-}
-
-.input_wrapper {
-  display: flex;
-}
-
-.lid_temp_field {
-  display: flex;
-  align-items: flex-end;
-  margin-left: 1rem;
-}
-
-.lid_temp_label {
-  @apply --font-body-1-dark;
-
-  margin: 0 0.5rem;
-  font-weight: var(--fw-semibold);
-  padding-bottom: 0.2rem;
-}
