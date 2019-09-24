@@ -14,7 +14,7 @@ export type ProtocolFile = {
   name: string,
   type: ?string,
   lastModified: ?number,
-  isBinary: boolean,
+  isBinary?: boolean,
 }
 
 export type ProtocolState = {
@@ -23,4 +23,4 @@ export type ProtocolState = {
   data: ?ProtocolData,
 }
 
-export type ProtocolType = 'json' | 'python'
+export type ProtocolType = 'json' | 'python' | 'zip'

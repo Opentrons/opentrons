@@ -10,13 +10,14 @@ const log = createLogger(__filename)
 
 export const MIME_TYPE_JSON = 'application/json'
 export const MIME_TYPE_PYTHON = 'text/x-python-script'
+export const MIME_TYPE_ZIP = 'application/zip'
 
 export function fileToProtocolFile(file: File): ProtocolFile {
   return {
     name: file.name,
     type: file.type,
     lastModified: file.lastModified,
-    isBinary: file.name.endsWith('.zip'), // TODO IMMEDIATELY unify with mime type stuff in this file
+    isBinary: fileIsBundle(file),
   }
 }
 
@@ -45,15 +46,21 @@ export function parseProtocolData(
 export function filenameToMimeType(name: string): string | null {
   if (name.endsWith('.json')) return MIME_TYPE_JSON
   if (name.endsWith('.py')) return MIME_TYPE_PYTHON
+  if (name.endsWith('.zip')) return MIME_TYPE_ZIP
   return null
 }
 
 export function fileToType(file: ?ProtocolFile): ProtocolType | null {
   if (file?.type === MIME_TYPE_JSON) return 'json'
   if (file?.type === MIME_TYPE_PYTHON) return 'python'
+  if (file?.type === MIME_TYPE_ZIP) return 'zip'
   return null
 }
 
 export function fileIsJson(file: ProtocolFile): boolean {
   return file.type === MIME_TYPE_JSON
+}
+
+export function fileIsBundle(file: File | ProtocolFile): boolean {
+  return file?.type === MIME_TYPE_ZIP
 }
