@@ -202,7 +202,7 @@ Blow Out
 
 In order to ensure that any remaining droplets are expelled, a blow out will push air through the pipette's tip.
 
-When calling :py:meth:`.InstrumentContext.blow_out`, we have the option to specify a location expell remaining liquid. If no location is specified, the pipette will blow out from its current position.
+When calling :py:meth:`.InstrumentContext.blow_out`, we have the option to specify where to expel remaining liquid. If no location is specified, the pipette will blow out from its current position.
 
 .. code-block:: python
 
