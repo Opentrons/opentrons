@@ -20,7 +20,7 @@ from opentrons.drivers.smoothie_drivers.driver_3_0 import \
 from opentrons.drivers.rpi_drivers import gpio
 
 
-test_time_minutes = 24 * 60
+test_time_minutes = 720 * 60
 start_time_minutes = int(time.time() / 60)
 
 attempts_to_home = 1
