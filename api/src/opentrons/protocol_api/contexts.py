@@ -119,6 +119,9 @@ class ProtocolContext(CommandPublisher):
             protocol.bundled_labware if
             isinstance(protocol, PythonProtocol) else None)
 
+        self.bundled_data = protocol.bundled_datafiles if \
+            isinstance(protocol, PythonProtocol) else None
+
         if fflags.short_fixed_trash():
             trash_name = 'opentrons_1_trash_850ml_fixed'
         else:

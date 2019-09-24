@@ -15,9 +15,6 @@ import jsonschema  # type: ignore
 from opentrons.config import feature_flags as ff
 from .types import Protocol, PythonProtocol, JsonProtocol, Metadata
 
-import logging
-log = logging.getLogger(__name__)
-
 
 def _parse_json(
         protocol_contents: str, filename: str = None) -> JsonProtocol:
@@ -85,6 +82,8 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # n
             'result in nesting all files inside that directory in the ZIP.')
 
     MAIN_PROTOCOL_FILENAME = 'protocol.ot2.py'
+    LABWARE_DIR = 'labware/'
+    DATA_DIR = 'data/'
     py_protocol: Optional[str] = None
     bundled_labware: Dict[str, Dict[str, Any]] = {}
     bundled_datafiles = {}
@@ -106,15 +105,16 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # n
             continue
 
         with bundle.open(zipInfo) as f:
-            if name.startswith('labware/') and name.endswith('.json'):
+            if name.startswith(LABWARE_DIR) and name.endswith('.json'):
                 labware_def = json.load(f)
                 labware_key = _get_labware_uri(labware_def)
                 if labware_key in bundled_labware:
                     raise RuntimeError(
                         f'Conflicting labware in bundle. {labware_key}')
                 bundled_labware[labware_key] = labware_def
-            elif name.startswith('data/'):
-                bundled_datafiles[name] = f.read()
+            elif name.startswith(DATA_DIR):
+                # note: data files are read as binary
+                bundled_datafiles[name[len(DATA_DIR):]] = f.read()
             elif name.endswith('.py') and name != MAIN_PROTOCOL_FILENAME:
                 bundled_python[name] = f.read().decode('utf-8')
 
