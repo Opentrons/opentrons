@@ -236,7 +236,7 @@ Mix
 
 Mixing performs ``aspirate()`` and ``dispense()`` on a single location. However, instead of having to write those commands out every time, the Opentrons API allows you to simply say :py:meth:`.InstrumentContext.mix`.
 
-Three arguements are possible utilizing the mix command: ``mix(repetitions, volume, location)``
+Three arguments are possible utilizing the mix command: ``mix(repetitions, volume, location)``
 
 .. code-block:: python
 
