@@ -5,9 +5,9 @@ Labware
 ########
 
 
-The labware section informs the protocol context what labware is present on the robot’s deck. In this section, you define the tip racks, well plates, troughs, tubes, or anything else you’ve put on the deck.
+The labware section informs the protocol context what labware is present on the robot’s deck: the tip racks, well plates, troughs, tubes, or anything else you’ve put on the deck.
 
-Each labware is given a name (e.g. ``'corning_96_wellplate_360ul_flat'``), and the slot on the robot it will be placed (e.g. ``'2'``). The first place to look for the names of labware should always be the `Opentrons Labware Library <https://labware.opentrons.com>`_, where Opentrons maintains a database of labwares, their load names, what they look like, manufacturer part numbers, and more. In this example, we’ll use ``'corning_96_wellplate_360ul_flat'`` (`an ANSI standard 96-well plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_) and ``'opentrons_96_tiprack_300ul'`` (`the Opentrons standard 300 µL tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_).
+Each labware is assigned a name (e.g. ``'corning_96_wellplate_360ul_flat'``), and the slot on the robot it will be placed (e.g. ``'2'``). The first place to look for the name of labware should always be the `Opentrons Labware Library <https://labware.opentrons.com>`_, where Opentrons maintains a database of labwares, their load names, what they look like, manufacturer part numbers, and more. In this example, we use ``'corning_96_wellplate_360ul_flat'`` (`an ANSI standard 96-well plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_) and ``'opentrons_96_tiprack_300ul'`` (`the Opentrons standard 300 µL tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_).
 
 From the example given on the home page, the "labware" section looked like:
 
@@ -20,8 +20,7 @@ From the example given on the home page, the "labware" section looked like:
 and informed the protocol context that the deck contains a 300 µL tiprack in slot 1 and a 96 well plate in slot 2.
 
 Labware is loaded into a protocol using :py:meth:`.ProtocolContext.load_labware`, which returns a
-:py:class:`opentrons.protocol_api.labware.Labware` object. You'll never create one of these objects
-directly, only store them in variables from the return value of :py:meth:`.ProtocolContext.load_labware`.
+:py:class:`opentrons.protocol_api.labware.Labware` object. These objects are assigned variables from the return value of :py:meth:`.ProtocolContext.load_labware`.
 
 .. _new-well-access:
 
@@ -49,7 +48,7 @@ The ending well will be in the bottom right, see the diagram below for further e
 .. code-block:: python
 
     '''
-    Examples in this section expect the following
+    Examples in this section assume the following
     '''
     def run(protocol):
 
@@ -58,10 +57,9 @@ The ending well will be in the bottom right, see the diagram below for further e
 
 Accessor Methods
 ^^^^^^^^^^^^^^^^
-As part of API Version 2, we wanted to allow users to utilize python's data structures more easily and as intended.
-That is why all of our labware accessor methods return either a dictionary, list or an individual Well object.
+As part of API Version 2, users can utilize python's data structures more easily, all labware accessor methods return either a dictionary, list or an individual well object.
 
-The table below lists out the different methods available to you and their differences.
+The table below list different methods accessible and their return values:
 
 +-------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 |   Method Name                       |         Returns                                                                                                   |
@@ -84,8 +82,8 @@ Accessing Individual Wells
 
 Dictionary Access
 -----------------
-Once a labware is loaded into your protocol, you can easily access the many
-wells within it by using dictionary indexing. If a well does not exist in this labware,
+Once a labware is loaded into your protocol, using indexing you can easily access the many
+wells within it. If a well does not exist,
 you will receive a ``KeyError``. This is equivalent to using the return value of
 :py:meth:`.Labware.wells_by_name`:
 
@@ -96,8 +94,7 @@ you will receive a ``KeyError``. This is equivalent to using the return value of
 
 List Access From ``wells``
 --------------------------
-Wells can be referenced by their "string" name, as demonstrated above.
-However, they can also be referenced with zero-indexing, with the first well in
+Wells can be referenced by their "string" name,or with zero-indexing, with the first well in
 a labware being at position 0.
 
 .. code-block:: python
@@ -111,20 +108,17 @@ a labware being at position 0.
     especially with irregular labware (e.g.
     ``opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical``
     (`Labware Library <https://labware.opentrons.com/opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical>`_).
-    Whichever well access method you use, your protocol will be most maintainable
-    if you pick one method and don't use the other one.
+  
+  Note: your protocol will be most maintainable if you pick one method and don't vary to others.
 
 Accessing Groups of Wells
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 If we had to reference each well one at a time, our protocols could get very
-long.
-
-When describing a liquid transfer, we can point to groups of wells for the
-liquid's source and/or destination. Or, we can get a group of wells and loop
+long. Instead, when describing a liquid transfer, we can point to groups of wells for the
+liquid's source and/or destination. Additonally, we can group wells and loop
 (or iterate) through them.
 
-A labware's wells are organized within a series of columns and rows, which are
-also labelled on standard labware. In the API, rows are given letter names
+A labware's wells are organized within a series of columns and rows, which are labelled on standard labware. In the API, rows are given letter names
 (``'A'`` through ``'D'`` for example) and go left to right, while columns are
 given numbered names (``'1'`` through ``'6'`` for example) and go from front to
 back.
@@ -151,8 +145,8 @@ will print out...
     Column "1" has 4 wells
     Row "A" has 6 wells
 
-So, since our methods return either lists or dictionaries, you can iterate through
-them as you would regular python data structures.
+Methods return either lists or dictionaries, iterate through
+them as regular python data structures.
 
 For example, if I wanted to access the individual wells of row 'A' in my well plate, I could simply do:
 
@@ -177,11 +171,9 @@ and it will return the individual well objects in row A.
 Specifying Position Within Wells
 ********************************
 
-The functions listed above (in the :ref:`new-well-access` section) return objects
-(or lists, lists of lists, dictionaries, or dictionaries of lists of objects)
-representing wells. These are :py:class:`opentrons.protocol_api.labware.Well`
-objects. Similar to the :py:class:`.Labware` objects, you'll never create one of
-these directly - only handle them as the return values of various methods.
+The functions above (in the :ref:`new-well-access` section) return objects
+or list representing wells. These are :py:class:`opentrons.protocol_api.labware.Well`
+objects. Similar to the :py:class:`.Labware` objects, handle them as the return values of various methods.
 :py:class:`.Well` objects have some useful methods on them, however, which allow
 you to more closely specify the location to which the robot should move *inside*
 a given well.
@@ -214,12 +206,10 @@ vertically (positive numbers move up, and negative numbers move down):
 Bottom
 ------
 
-The method :py:meth:`.Well.bottom` returns a position at the bottom center of the
-well. This could be a good position to start at when considering where to aspirate,
-or any other operation where you want to be contacting the liquid. In addition,
-:py:meth:`.Well.bottom` takes an optional argument ``z``, which is a distance in mm
-to move relative to the bottom vertically (positive numbers move up, and negative
-numbers move down):
+The method :py:meth:`.Well.bottom` declares a position at the bottom center of the
+well. This is the recommended position to start at when considering where to aspirate,
+or any operation where you want to be contacting the liquid. In addition,
+:py:meth:`.Well.bottom` takes an optional argument ``z``. ``z`` is  defined as a distance in mm relative to the bottom vertically (positive numbers move up, and negative numbers move down) in which to move:
 
 .. code-block:: python
 
@@ -249,7 +239,7 @@ Center
 ------
 
 The method :py:meth:`.Well.center` returns a position centered in the well both
-vertically and horizontally. This can be a good place to start for precise
+vertically and horizontally. This allows for precise
 control of positions within the well for unusual or custom labware.
 
 .. code-block:: python
@@ -261,17 +251,15 @@ Manipulating Positions
 
 The objects returned by the position modifier functions are all instances of
 :py:class:`opentrons.types.Location`, which are
-`named tuples <https://docs.python.org/3/library/collections.html#collections.namedtuple>`_
-representing the combination of a point in space (another named tuple) and
+`named tuples <https://docs.python.org/3/library/collections.html#collections.namedtuple>`_. These are combination of a point in space (another named tuple) and
 a reference to the associated :py:class:`.Well` (or :py:class:`.Labware`, or
 slot name, depending on context).
 
-To further change positions, you can use :py:meth:`.Location.move`, which
-lets you move the Location. This function takes a single argument, ``point``,
-which should be a :py:class:`opentrons.types.Point`. This is a named tuple
-with elements ``x``, ``y``, and ``z``, representing a 3 dimensional point.
+To further change positions, you can use :py:meth:`.Location.move`. This function takes a single argument, ``point``,
+which should be a :py:class:`opentrons.types.Point`. Named tuple
+with elements ``x``, ``y``, and ``z``, represent a 3 dimensional point.
 
-To move a location, you create a :py:class:`.types.Point` representing a
+To move location, you create a :py:class:`.types.Point` representing a
 3d offset and give it to :py:meth:`.Location.move`:
 
 .. code-block:: python
