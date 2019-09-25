@@ -249,7 +249,7 @@ Three arguements are possible utilizing the mix command: ``mix(repetitions, volu
 Air Gap
 =======
 
-Some liquids need an extra amount of air in the pipette's tip to prevent it from sliding out. By calling :py:meth:`.InstrumentContext.air_gap` and specifying a microliter amount, aspiratation of that much air will be released into pipette's tip.
+Some liquids need an extra amount of air in the pipette's tip to prevent it from sliding out. By calling :py:meth:`.InstrumentContext.air_gap` and specifying a microliter amount, aspiration of that much air will be released into pipette's tip.
 
 .. code-block:: python
 
