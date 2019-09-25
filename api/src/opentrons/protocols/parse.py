@@ -30,7 +30,7 @@ def _parse_python(
     protocol_contents: str,
     filename: str = None,
     bundled_labware: Dict[str, Dict[str, Any]] = None,
-    bundled_datafiles: Dict[str, bytes] = None,
+    bundled_data: Dict[str, bytes] = None,
     bundled_python: Dict[str, str] = None
 ) -> PythonProtocol:
     """ Parse a protocol known or at least suspected to be python """
@@ -48,7 +48,7 @@ def _parse_python(
         metadata=metadata,
         api_level=version,
         bundled_labware=bundled_labware,
-        bundled_datafiles=bundled_datafiles,
+        bundled_data=bundled_data,
         bundled_python=bundled_python)
 
     return result
@@ -86,7 +86,7 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # n
     DATA_DIR = 'data/'
     py_protocol: Optional[str] = None
     bundled_labware: Dict[str, Dict[str, Any]] = {}
-    bundled_datafiles = {}
+    bundled_data = {}
     bundled_python = {}
 
     with bundle.open(MAIN_PROTOCOL_FILENAME, 'r') as protocol_file:
@@ -114,12 +114,12 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # n
                 bundled_labware[labware_key] = labware_def
             elif name.startswith(DATA_DIR):
                 # note: data files are read as binary
-                bundled_datafiles[name[len(DATA_DIR):]] = f.read()
+                bundled_data[name[len(DATA_DIR):]] = f.read()
             elif name.endswith('.py') and name != MAIN_PROTOCOL_FILENAME:
                 bundled_python[name] = f.read().decode('utf-8')
 
     result = _parse_python(
-        py_protocol, filename, bundled_labware, bundled_datafiles,
+        py_protocol, filename, bundled_labware, bundled_data,
         bundled_python)
 
     if result.api_level != '2':

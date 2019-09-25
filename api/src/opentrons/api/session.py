@@ -232,10 +232,17 @@ class Session(object):
                      for mod in self._hardware.attached_modules.values()],
                     strict_attached_instruments=False)
                 sim.home()
-                self._simulating_ctx = ProtocolContext(loop=self._loop,
-                                                       hardware=sim,
-                                                       broker=self._broker,
-                                                       protocol=self._protocol)
+                bundled_data = None
+                bundled_labware = None
+                if isinstance(self._protocol, PythonProtocol):
+                    bundled_data = self._protocol.bundled_data
+                    bundled_labware = self._protocol.bundled_labware
+                self._simulating_ctx = ProtocolContext(
+                    loop=self._loop,
+                    hardware=sim,
+                    broker=self._broker,
+                    bundled_labware=bundled_labware,
+                    bundled_data=bundled_data)
                 run_protocol(self._protocol,
                              simulate=True,
                              context=self._simulating_ctx)
@@ -360,10 +367,16 @@ class Session(object):
             self.resume()
             self._pre_run_hooks()
             if ff.use_protocol_api_v2():
+                bundled_data = None
+                bundled_labware = None
+                if isinstance(self._protocol, PythonProtocol):
+                    bundled_data = self._protocol.bundled_data
+                    bundled_labware = self._protocol.bundled_labware
                 self._hardware.cache_instruments()
                 ctx = ProtocolContext(loop=self._loop,
                                       broker=self._broker,
-                                      protocol=self._protocol)
+                                      bundled_labware=bundled_labware,
+                                      bundled_data=bundled_data)
                 ctx.connect(self._hardware)
                 ctx.home()
                 run_protocol(self._protocol, context=ctx)

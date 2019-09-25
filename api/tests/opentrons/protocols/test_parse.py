@@ -223,6 +223,6 @@ def test_parse_bundle_details(get_bundle_fixture, ensure_api2):
     assert parsed.filename == filename
     assert parsed.bundled_labware == fixture['bundled_labware']
     assert parsed.bundled_python == fixture['bundled_python']
-    assert parsed.bundled_datafiles == fixture['bundled_datafiles']
+    assert parsed.bundled_data == fixture['bundled_data']
     assert parsed.metadata == fixture['metadata']
     assert parsed.api_level == '2'

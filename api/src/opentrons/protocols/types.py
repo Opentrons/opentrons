@@ -18,7 +18,7 @@ class PythonProtocol(NamedTuple):
     api_level: str  # For now, should be '1' or '2'
     # these 'bundled_' attrs should only be included when the protocol is a zip
     bundled_labware: Optional[Dict[str, Dict[str, Any]]]
-    bundled_datafiles: Optional[Dict[str, bytes]]
+    bundled_data: Optional[Dict[str, bytes]]
     bundled_python: Optional[Dict[str, str]]
 
 

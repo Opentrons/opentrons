@@ -19,8 +19,6 @@ from .labware import (Well, Labware, load, get_labware_definition,
 
 from . import geometry
 from . import transfers
-from ..protocols.types import Protocol, PythonProtocol
-
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -94,7 +92,9 @@ class ProtocolContext(CommandPublisher):
                  loop: asyncio.AbstractEventLoop = None,
                  hardware: hc.API = None,
                  broker=None,
-                 protocol: Optional[Protocol] = None) -> None:
+                 bundled_labware: Optional[Dict[str, Dict[str, Any]]] = None,
+                 bundled_data: Optional[Dict[str, bytes]] = None
+                 ) -> None:
         """ Build a :py:class:`.ProtocolContext`.
 
         :param loop: An event loop to use. If not specified, this ctor will
@@ -115,12 +115,8 @@ class ProtocolContext(CommandPublisher):
         self._unsubscribe_commands = None
         self.clear_commands()
 
-        self._bundled_labware = (
-            protocol.bundled_labware if
-            isinstance(protocol, PythonProtocol) else None)
-
-        self.bundled_data = protocol.bundled_datafiles if \
-            isinstance(protocol, PythonProtocol) else None
+        self._bundled_labware = bundled_labware
+        self.bundled_data = bundled_data
 
         if fflags.short_fixed_trash():
             trash_name = 'opentrons_1_trash_850ml_fixed'

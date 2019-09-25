@@ -544,7 +544,7 @@ def get_bundle_fixture():
         It's ugly to store bundles as .zip's, so we'll build the .zip
         from fixtures and return it as `bytes`.
         We also need to hard-code fixture data here (bundled_labware,
-        bundled_python, bundled_datafiles, metadata) for the tests to use in
+        bundled_python, bundled_data, metadata) for the tests to use in
         their assertions.
         """
         result = {}
@@ -559,7 +559,7 @@ def get_bundle_fixture():
 
         if fixture_name == 'simple_bundle':
             with open(fixture_dir / 'data.txt', 'rb') as f:
-                result['bundled_data'] = {'data/data.txt': f.read()}
+                result['bundled_data'] = {'data.txt': f.read()}
             with open(fixture_dir / 'custom_labware.json', 'r') as f:
                 custom_labware = json.load(f)
 
@@ -569,8 +569,6 @@ def get_bundle_fixture():
                 'custom_beta/custom_labware/1': custom_labware,
                 'opentrons/opentrons_96_tiprack_10ul/1': tiprack_def}
             result['bundled_python'] = {}
-            result['bundled_datafiles'] = {
-                'data.txt': result['bundled_data']['data/data.txt']}
             result['filename'] = 'simple_bundle.zip'
 
             # NOTE: this is copy-pasted from the .py fixture file
@@ -586,7 +584,7 @@ def get_bundle_fixture():
                            json.dumps(fixed_trash_def))
                 z.writestr('protocol.ot2.py', result['contents'])
                 z.writestr('data/data.txt',
-                           result['bundled_data']['data/data.txt'])
+                           result['bundled_data']['data.txt'])
             binary_zipfile.seek(0)
             result['binary_zipfile'] = binary_zipfile.read()
 
