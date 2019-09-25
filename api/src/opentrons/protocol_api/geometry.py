@@ -176,11 +176,15 @@ class Deck(UserDict):
                 if 'fixedTrash' in labware.parameters.get('quirks', []):
                     pass
                 else:
-                    raise ValueError('Deck location {} is for fixed trash only'
-                                     .format(key))
+                    raise ValueError(f'Deck location {key} '
+                                     'is for fixed trash only')
             else:
-                raise ValueError('Deck location {} already has an item: {}'
-                                 .format(key, self.data[key_int]))
+                raise ValueError(f'Deck location {key} already'
+                                 f'  has an item: {self.data[key_int]}')
+        elif key_int not in self.open_slot_keys:
+            raise ValueError(f'Deck location {key} '
+                             'is obscured by another item,'
+                             'maybe a Thermocycler Module?')
         self.data[key_int] = val
         self._highest_z = max(val.highest_z, self._highest_z)
 
@@ -244,7 +248,7 @@ class Deck(UserDict):
         return self._definition['locations']['orderedSlots']
 
     @property
-    def open_slots(self) -> List[Dict]:
+    def open_slot_keys(self) -> List[Dict]:
         """ The slot definitions of the currently unobscured
             lots on the loaded robot deck.
         """
@@ -255,6 +259,7 @@ class Deck(UserDict):
             else
                 obscured_slot_keys.append(slot_key)
 
-        self.slots
+        return [slot_key for slot_key in self.data
+                if slot_key not in obscured_slot_keys]
 
 
