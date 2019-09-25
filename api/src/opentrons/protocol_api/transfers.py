@@ -484,7 +484,7 @@ class TransferPlan:
     @staticmethod
     def _extend_source_target_lists(
             sources: List[Well],
-            targets: List[Well]) -> (List[Well], List[Well]):
+            targets: List[Well]):
         """Extend source or target list to match the length of the other
         """
         if len(sources) < len(targets):
