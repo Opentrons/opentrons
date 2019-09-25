@@ -157,7 +157,7 @@ When calling :py:meth:`.InstrumentContext.aspirate` on a pipette, we can specify
 
 Now our pipette's tip is holding 50uL.
 
-We can also simply specify how many microliters to aspirate, without specifiying a location. The pipette in this circumstance will aspirate from its current location (which we previously set as ``plate['A1'])``.
+We can also simply specify how many microliters to aspirate, without specifying a location. The pipette in this circumstance will aspirate from its current location (which we previously set as ``plate['A1']``).
 
 .. code-block:: python
 
