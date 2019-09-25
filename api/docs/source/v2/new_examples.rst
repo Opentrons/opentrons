@@ -46,7 +46,7 @@ This accomplishes the same thing as the following basic commands:
 Loops
 *****
 
-Loops in Python allow your protocol to perform many actions, or act upon many wells, all within just a few lines. The below example loops through the numbers ``0`` to ``11``, and uses that loop's current value to transfer from all wells in a trough to each row of a plate:
+Loops in Python allow your protocol to act upon many wells, all within just a few lines. The below example loops through the numbers ``0`` to ``11``, using that loop's current value to transfer from all wells in a trough to each row of a plate:
 
 .. code-block:: python
 
@@ -71,7 +71,7 @@ Loops in Python allow your protocol to perform many actions, or act upon many we
 Multiple Air Gaps
 *****************
 
-The OT-2 pipettes can do some things that a human cannot do with a pipette, like accurately alternate between aspirating and creating air gaps within the same tip. The below example will aspirate from five wells in the trough, while creating an air gap between each sample.
+The OT-2 pipettes can do some things that a human cannot do with a pipette, such as accurately alternate between aspirating and creating air gaps within the same tip. The below example will aspirate from five wells in the trough, while creating an air gap between each sample.
 
 .. code-block:: python
 
