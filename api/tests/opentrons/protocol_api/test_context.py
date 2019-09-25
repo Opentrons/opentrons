@@ -146,8 +146,9 @@ def test_pick_up_and_drop_tip(loop, get_labware_def):
 
     instr.pick_up_tip(target_location)
     assert not tiprack.wells()[0].has_tip
+    overlap = instr.hw_pipette['tip_overlap'][tiprack.uri]
     new_offset = model_offset - Point(0, 0,
-                                      tip_length)
+                                      tip_length-overlap)
     assert pipette.critical_point() == new_offset
 
     instr.drop_tip(target_location)
@@ -221,9 +222,9 @@ def test_pick_up_tip_no_location(loop, get_labware_def):
     assert 'picking up tip' in ','.join([cmd.lower()
                                          for cmd in ctx.commands()])
     assert not tiprack1.wells()[0].has_tip
-
+    overlap = instr.hw_pipette['tip_overlap'][tiprack1.uri]
     new_offset = model_offset - Point(0, 0,
-                                      tip_length1)
+                                      tip_length1-overlap)
     assert pipette.critical_point() == new_offset
 
     # TODO: remove argument and verify once trash container is added

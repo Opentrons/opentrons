@@ -1274,7 +1274,7 @@ class InstrumentContext(CommandPublisher):
         self._hw_manager.hardware.set_current_tiprack_diameter(
             self._mount, target.diameter)
         self._hw_manager.hardware.pick_up_tip(
-            self._mount, tiprack.tip_length, presses, increment)
+            self._mount, self._tip_length_for(tiprack), presses, increment)
         # Note that the hardware API pick_up_tip action includes homing z after
         cmds.do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
                         'after', self, None, instrument=self, location=target)
@@ -1304,14 +1304,14 @@ class InstrumentContext(CommandPublisher):
               a tip, `location` can be a :py:class:`.Well`. For instance,
               if you have a tip rack in a variable called `tiprack`, you can
               drop a tip into a specific well on that tiprack with the call
-              `instr.pick_up_tip(tiprack.wells()[0])`. This style of call can
+              `instr.drop_tip(tiprack.wells()[0])`. This style of call can
               be used to make the robot drop a tip into arbitrary labware.
             - If the position to drop the tip from as well as the
               :py:class:`.Well` to drop the tip into needs to be specified,
               for instance to tell the robot to drop a tip from an unusually
               large height above the tiprack, `location`
               can be a :py:class:`.types.Location`; for instance, you can call
-              `instr.pick_up_tip(tiprack.wells()[0].top())`.
+              `instr.drop_tip(tiprack.wells()[0].top())`.
 
         .. note::
 
@@ -1888,6 +1888,14 @@ class InstrumentContext(CommandPublisher):
     def __str__(self):
         return '{} on {} mount'.format(self.hw_pipette['display_name'],
                                        self._mount.name.lower())
+
+    def _tip_length_for(self, tiprack: Labware) -> float:
+        """ Get the tip length, including overlap, for a tip from this rack """
+        tip_overlap = self.hw_pipette['tip_overlap'].get(
+            tiprack.uri,
+            self.hw_pipette['tip_overlap']['default'])
+        tip_length = tiprack.tip_length
+        return tip_length - tip_overlap
 
 
 class ModuleContext(CommandPublisher):
