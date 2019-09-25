@@ -17,7 +17,6 @@ export function fileToProtocolFile(file: File): ProtocolFile {
     name: file.name,
     type: file.type,
     lastModified: file.lastModified,
-    isBinary: fileIsBundle(file),
   }
 }
 
@@ -61,6 +60,11 @@ export function fileIsJson(file: ProtocolFile): boolean {
   return file.type === MIME_TYPE_JSON
 }
 
-export function fileIsBundle(file: File | ProtocolFile): boolean {
-  return file?.type === MIME_TYPE_ZIP
+export function fileIsBundle(file: ProtocolFile): boolean {
+  return file.type === MIME_TYPE_ZIP
+}
+
+export function fileIsBinary(file: ProtocolFile): boolean {
+  // bundles are always binary files, and currently nothing else is binary
+  return fileIsBundle(file)
 }

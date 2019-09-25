@@ -15,6 +15,8 @@ import * as selectors from '../selectors'
 // bypass the robot entry point here to avoid shell module
 import { getConnectableRobots } from '../../discovery/selectors'
 
+import { fileIsBinary } from '../../protocol/protocol-data'
+
 const RUN_TIME_TICK_INTERVAL_MS = 1000
 const NO_INTERVAL = -1
 const RE_VOLUME = /.*?(\d+).*?/
@@ -147,12 +149,12 @@ export default function client(dispatch) {
   }
 
   function uploadProtocol(state, action) {
-    const { name, isBinary } = state.protocol.file
+    const { name } = state.protocol.file
     const { contents } = action.payload
 
     freshUpload = true
     remote.session_manager
-      .create(name, contents, isBinary)
+      .create(name, contents, fileIsBinary(state.protocol))
       .then(apiSession => {
         remote.session_manager.session = apiSession
         // state change will trigger a session notification, which will

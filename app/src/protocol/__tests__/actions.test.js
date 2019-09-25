@@ -30,14 +30,12 @@ describe('protocol actions', () => {
       name: 'foobar.py',
       type: 'application/x-python-code',
       lastModified: 123,
-      isBinary: false,
     }
 
     const bundleFile = {
       name: 'foobar.zip',
       type: 'application/zip',
       lastModified: 111,
-      isBinary: true,
     }
 
     const jsonFile = {
@@ -107,10 +105,14 @@ describe('protocol actions', () => {
       })
 
       test('dispatches protocol:UPLOAD on bundle read completion', () => {
-        const arrayBuff = new ArrayBuffer(8)
-        mockReader.readAsArrayBuffer.mockReturnValue(arrayBuff)
+        const arrayBuff = new ArrayBuffer(3)
+        const uint8array = new Uint8Array(arrayBuff)
+        uint8array[0] = 57
+        uint8array[1] = 54
+        uint8array[2] = 0
+
         store.dispatch(openProtocol(bundleFile))
-        mockReader.result = 'file contents'
+        mockReader.result = arrayBuff
         mockReader.onload()
 
         const actions = store.getActions()
@@ -118,7 +120,7 @@ describe('protocol actions', () => {
         expect(actions[1]).toEqual({
           type: 'protocol:UPLOAD',
           meta: { robot: true },
-          payload: { contents: '', data: null },
+          payload: { contents: 'OTYA', data: null },
         })
       })
     })

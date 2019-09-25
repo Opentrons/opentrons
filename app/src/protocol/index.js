@@ -4,6 +4,7 @@ import {
   fileToProtocolFile,
   parseProtocolData,
   filenameToMimeType,
+  fileIsBinary,
 } from './protocol-data'
 
 import type { Action, ThunkAction } from '../types'
@@ -48,7 +49,7 @@ export function openProtocol(file: File): ThunkAction {
       // when we use readAsText below, reader.result will be a string,
       // with readAsArrayBuffer, it will be an ArrayBuffer
       const _contents: any = reader.result
-      const contents = protocolFile.isBinary
+      const contents = fileIsBinary(protocolFile)
         ? arrayBufferToBase64(_contents)
         : _contents
 
@@ -61,7 +62,7 @@ export function openProtocol(file: File): ThunkAction {
       dispatch(uploadAction)
     }
 
-    if (protocolFile.isBinary) {
+    if (fileIsBinary(protocolFile)) {
       reader.readAsArrayBuffer(file)
     } else {
       reader.readAsText(file)
