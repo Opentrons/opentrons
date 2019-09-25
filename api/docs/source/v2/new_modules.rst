@@ -4,18 +4,18 @@
 Hardware Modules
 ################
 
-Modules are peripherals that attach to the OT-2 to extend its capabilities.
+Hardware modules are peripherals that attach to the OT-2 to extend its capabilities.
 
-Modules currently supported are the Temperature, Magnetic and Thermocycler Module.
+The modules currently supported are Temperature, Magnetic and Thermocycler Module.
 
 This is not an exhaustive list of functionality for modules. Check :ref:`protocol-api-modules` or on
-our github for full explanations of methods.
+our github ('link to public repo') for the most up to current methods.
 
 
 Loading your Module onto a deck
 ===============================
 Just like labware, you will also need to load in your module in order to use it
-within a protocol. To do this, you call the following *inside* the run function:
+within a protocol. To do this,  call the following *inside* the run function:
 
 .. code-block:: python
 
@@ -28,7 +28,7 @@ within a protocol. To do this, you call the following *inside* the run function:
 You can reference your module in a few different ways. The valid names can be found below. They are not case-sensitive.
 
 +--------------------------+-----------------------------------------------+
-|        Module Type       |               Nickname(s)                     |
+|        Module Name       |               Nickname(s)                     |
 +==========================+===============================================+
 | ``Temperature Module``   | ``'Temperature Module'``, ``'tempdeck'``      |
 +--------------------------+-----------------------------------------------+
@@ -52,8 +52,8 @@ onto the module. You can do this via:
 
 Where ``module`` is the variable name you saved your module to. You do not need to specify the slot.
 
-Checking the status of your Module
-==================================
+Status of your Module
+=====================
 All modules have the ability to check what state they are currently in. To do this run the following:
 
 .. code-block:: python
@@ -64,9 +64,11 @@ All modules have the ability to check what state they are currently in. To do th
          module = protocol.load_module('Module Name', slot)
          status = module.status
 
-For the temperature module this will return a string stating whether it's ``'heating'``, ``'cooling'``, ``'holding at target'`` or ``'idle'``.
-For the magnetic module this will return a string stating whether it's ``'engaged'`` or ``'disengaged'``.
-For the thermocycler module this will return ``'holding at target'`` or ``'idle'``. There are more detailed status checks which can be found in at :ref:`thermocycler-section`
+For the temperature module this will return a string stating ``'heating'``, ``'cooling'``, ``'holding at target'`` or ``'idle'``.
+For the magnetic module this will return a string stating ``'engaged'`` or ``'disengaged'``.
+For the thermocycler module this will return ``'holding at target'`` or ``'idle'``. 
+
+There are more detailed status checks which can be found in at :ref:`thermocycler-section`
 
 ******************
 Temperature Module
@@ -76,7 +78,7 @@ Our temperature module acts as both a cooling and heating device. The range
 of temperatures this module can reach goes from 4 to 95 degrees celsius with a resolution of 1 degree celcius.
 
 The temperature module has the following methods that can be accessed during a protocol. For the purposes of this
-section, assume we have the following already:
+section, assume the following already:
 
 .. code-block:: python
 
@@ -101,15 +103,11 @@ This function will pause your protocol until your target temperature is reached.
 
 .. code-block:: python
 
-    temp_mod.set_temperature(4)
-    temp_mod.wait_for_temp()
-
-Before using ``wait_for_temp()`` you must set a target temperature with ``set_temperature()``.
-Once the target temperature is set, when you want the protocol to wait until the module
-reaches the target you can call ``wait_for_temp().``
+    temp_mod.set_temperature(4) # set temperature to 4 degrees celsius
+    temp_mod.wait_for_temp() # protocol will wait until module reaches target temperature above
 
 If no target temperature is set via ``set_temperature()``, the protocol will be stuck in
-an indefinite loop.
+an indefinite hold loop.
 
 Read the Current Temperature
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -148,13 +146,12 @@ not deactivate automatically upon protocol end, cancel or re-setting a protocol.
 Magnetic Module
 ***************
 
-The magnetic module has two actions:
+The magnetic module has two modes:
 
 - ``engage``: The magnetic stage rises to a default height unless an *offset* or a custom *height* is specified
 - ``disengage``: The magnetic stage moves down to its home position
 
 You can also specify a custom engage height for the magnets so you can use a different labware with the magdeck.
-In the future, we will have adapters to support tuberacks as well as deep well plates.
 
 The magnetic module has the following methods that can be accessed during a protocol. For the purposes of this
 section, assume we have the following already:
@@ -192,7 +189,7 @@ ways, based on internally stored default heights for labware:
 **Note** Only certain labwares have defined engage heights for the Magnetic
 Module. If a labware that does not have a defined engage height is
 loaded on the Magnetic Module (or if no labware is loaded), then
-``height`` must be specified.
+``height`` MUST be specified.
 
 Disengage
 ^^^^^^^^^
@@ -200,8 +197,7 @@ Disengage
 
    mag_mod.disengage()
 
-The magnetic modules will disengage on power cycle of the device. It will not auto-disengage otherwise
-unless you specify in your protocol.
+The magnetic modules will disengage on the power cycle of the device. It will not auto-disengage unless you specify in your protocol.
 
 
 .. _thermocycler-section:
@@ -210,7 +206,7 @@ unless you specify in your protocol.
 Thermocycler Module
 *******************
 
-The thermocycler is still under active development. The commands are subject to change. A valid operational range has not been determined yet.
+The thermocycler is still under active development. The commands are subject to change, the most up to date commands can be found at ('git hub repo page link here'). At the time of publication, valid operational range has not yet been defined.
 
 The Thermocycler Module allows users to perform complete experiments that require temperature sensitive reactions
 such as PCR, restriction enzyme etc. Below is a description of a few ways you can control this module.
@@ -219,7 +215,7 @@ There are two heating mechanisms in the Thermocycler module which the user has a
 
 One is the bottom plate in which samples are located, the other is the lid heating pad.
 
-For the purposes of this section, assume we have the following already:
+For the purposes of this section, assume the following:
 
 .. code-block:: python
 
@@ -232,7 +228,7 @@ For the purposes of this section, assume we have the following already:
 .. note::
 
     When loading the Thermocycler Module, it is not necessary to specify a slot.
-    This is because the Thermocycler Module has a default position that covers Slots 7, 8, 10, and 11.
+    The Thermocycler Module has a default position that covers Slots 7, 8, 10, and 11.
     This is the only valid location for the Thermocycler Module on the OT2 deck.
 
 Set Temperature
@@ -251,16 +247,17 @@ If you only specify a temperature in celcius, the thermocycler will hold this te
 Hold Time
 +++++++++
 
-If you set a temperature and a hold time, the thermocycler will hold the temperature for the specified amount of time. Time is in seconds.
+If you set a temperature and a hold time, the thermocycler will hold the temperature for the specified amount of time.
+
 
 .. code-block:: python
 
-        tc_mod.set_temperature(4, hold_time=60)
+        tc_mod.set_temperature(4, hold_time=60) #time is defined in seconds, 60
 
 Ramp Rate
 +++++++++
 
-Lastly, you can modify the ramp rate in degC/sec for a given temperature.
+You can modify the ramp rate in degC/sec for a given temperature.
 
 .. code-block:: python
 
@@ -280,4 +277,4 @@ To set the temperature of the lid in celcius:
 
 Open Lid
 ^^^^^^^^
-If you want to perform liquid handling steps on the thermocycler you must ensure that the lid of the thermocycler is open.
+To perform liquid handling steps on the thermocycler you must ensure that the lid of the thermocycler is open.
