@@ -499,7 +499,6 @@ class TransferPlan:
                     'Source and destination lists must be divisible')
             targets = [target for target in targets
                        for i in range(int(len(sources)/len(targets)))]
-        print(sources, targets)
         return sources, targets
 
     def _plan_distribute(self):
