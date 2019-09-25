@@ -17,6 +17,11 @@ MODULE_LOG = logging.getLogger(__name__)
 def max_many(*args):
     return functools.reduce(max, args[1:], args[0])
 
+def get_obscured_slot_keys(slot_key, item):
+    if isinstance(item, ThermocyclerGeometry):
+        return([7, 8, 10, 11])
+    else:
+        return [slot_key]
 
 def plan_moves(
         from_loc: types.Location,
@@ -169,23 +174,24 @@ class Deck(UserDict):
             self.recalculate_high_z()
 
     def __setitem__(self, key: types.DeckLocation, val: DeckItem) -> None:
-        key_int = self._check_name(key)
-        labware = self.data.get(key_int)
-        if labware is not None:
-            if key_int == 12:
-                if 'fixedTrash' in labware.parameters.get('quirks', []):
+        slot_key_int = self._check_name(key)
+        item = self.data.get(slot_key_int)
+        item_obscured_slot_keys = set(get_obscured_slot_keys(slot_key_int, item))
+        if item is not None:
+            if slot_key_int == 12:
+                if 'fixedTrash' in item.parameters.get('quirks', []):
                     pass
                 else:
                     raise ValueError(f'Deck location {key} '
                                      'is for fixed trash only')
             else:
                 raise ValueError(f'Deck location {key} already'
-                                 f'  has an item: {self.data[key_int]}')
-        elif key_int not in self.open_slot_keys:
+                                 f'  has an item: {self.data[slot_key_int]}')
+        elif not item_obscured_slot_keys.issubset(set(self.open_slot_keys)):
             raise ValueError(f'Deck location {key} '
                              'is obscured by another item,'
                              'maybe a Thermocycler Module?')
-        self.data[key_int] = val
+        self.data[slot_key_int] = val
         self._highest_z = max(val.highest_z, self._highest_z)
 
     def __contains__(self, key: object) -> bool:
@@ -237,6 +243,7 @@ class Deck(UserDict):
                     f'module {module_name} does not have a default'
                     ' location, you must specify a slot')
 
+
     @property
     def highest_z(self) -> float:
         """ Return the tallest known point on the deck. """
@@ -248,16 +255,14 @@ class Deck(UserDict):
         return self._definition['locations']['orderedSlots']
 
     @property
-    def open_slot_keys(self) -> List[Dict]:
+    def open_slot_keys(self) -> List[int]:
         """ The slot definitions of the currently unobscured
             lots on the loaded robot deck.
         """
         obscured_slot_keys = []
-        for slot_key, item in self.data:
-            if isinstance(item, ThermocyclerGeometry):
-                obscured_slot_keys.extend(['7', '8', '10', '11'])
-            else
-                obscured_slot_keys.append(slot_key)
+        for slot_key, item in self.data.items():
+            obscured_slot_keys.extend(
+                    get_obscured_slot_keys(slot_key, item))
 
         return [slot_key for slot_key in self.data
                 if slot_key not in obscured_slot_keys]
