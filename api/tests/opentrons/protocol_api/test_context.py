@@ -197,21 +197,27 @@ def test_use_filter_tips(loop, get_labware_def):
     assert pipette.available_volume < pipette.config.max_volume
 
 
-def test_pick_up_tip_no_location(loop, get_labware_def):
+@pytest.mark.parametrize('pipette_model',
+                         ['p10_single', 'p20_single_gen2'])
+@pytest.mark.parametrize(
+    'tiprack_kind',
+    ['opentrons_96_tiprack_10ul', 'eppendorf_96_tiprack_10ul_eptips'])
+def test_pick_up_tip_no_location(loop, get_labware_def,
+                                 pipette_model, tiprack_kind):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
 
-    tiprack1 = ctx.load_labware('opentrons_96_tiprack_300ul', 1)
+    tiprack1 = ctx.load_labware(tiprack_kind, 1)
     tip_length1 = tiprack1.tip_length
 
-    tiprack2 = ctx.load_labware('opentrons_96_tiprack_300ul', 2)
+    tiprack2 = ctx.load_labware(tiprack_kind, 2)
     tip_length2 = tip_length1 + 1.0
     tiprack2.tip_length = tip_length2
 
     mount = Mount.LEFT
 
     instr = ctx.load_instrument(
-        'p300_single', mount, tip_racks=[tiprack1, tiprack2])
+        pipette_model, mount, tip_racks=[tiprack1, tiprack2])
 
     pipette: Pipette = ctx._hw_manager.hardware._attached_instruments[mount]
     model_offset = Point(*pipette.config.model_offset)
@@ -668,3 +674,13 @@ def test_loaded_modules(loop, monkeypatch):
     mod2 = ctx.load_module('thermocycler')
     assert ctx.loaded_modules[4] == mod1
     assert ctx.loaded_modules[7] == mod2
+
+
+def test_tip_length_for(loop, monkeypatch):
+    ctx = papi.ProtocolContext(loop)
+    instr = ctx.load_instrument('p20_single_gen2', 'left')
+    tiprack = ctx.load_labware('geb_96_tiprack_10ul', '1')
+    assert instr._tip_length_for(tiprack)\
+        == (tiprack._definition['parameters']['tipLength']
+            - instr.hw_pipette['tip_overlap']
+            ['opentrons/geb_96_tiprack_10ul/1'])

@@ -1105,7 +1105,9 @@
         "default": 8.25,
         "opentrons/opentrons_96_tiprack_10ul/1": 8.25,
         "opentrons/opentrons_96_filtertiprack_10ul/1": 8.25,
-        "opentrons/opentrons_96_tiprack_20ul/1": 8.25
+        "opentrons/opentrons_96_tiprack_20ul/1": 8.25,
+        "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 8.4,
+        "opentrons/geb_96_tiprack_10ul/1": 8.3
       },
       "tipLength": {
         "value": 31.15,
@@ -1240,7 +1242,9 @@
         "default": 8.25,
         "opentrons/opentrons_96_tiprack_10ul/1": 8.25,
         "opentrons/opentrons_96_filtertiprack_10ul/1": 8.25,
-        "opentrons/opentrons_96_tiprack_20ul/1": 8.25
+        "opentrons/opentrons_96_tiprack_20ul/1": 8.25,
+        "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 8.4,
+        "opentrons/geb_96_tiprack_10ul/1": 8.3
       },
       "tipLength": {
         "value": 31.7,
@@ -3983,7 +3987,8 @@
       "tipOverlap": {
         "default": 9.7,
         "opentrons/opentrons_96_tiprack_1000ul/1": 11.5,
-        "opentrons/opentrons_96_filtertiprack_1000ul/1": 11.5
+        "opentrons/opentrons_96_filtertiprack_1000ul/1": 11.5,
+        "opentrons/geb_96_tiprack_1000ul/1": 9.5
       },
       "tipLength": {
         "value": 78.3,
