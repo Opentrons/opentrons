@@ -8,7 +8,7 @@ import json
 import pkgutil
 from io import BytesIO
 from zipfile import ZipFile
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Union
 
 import jsonschema  # type: ignore
 
@@ -84,23 +84,22 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # n
     MAIN_PROTOCOL_FILENAME = 'protocol.ot2.py'
     LABWARE_DIR = 'labware/'
     DATA_DIR = 'data/'
-    py_protocol: Optional[str] = None
     bundled_labware: Dict[str, Dict[str, Any]] = {}
     bundled_data = {}
     bundled_python = {}
 
     with bundle.open(MAIN_PROTOCOL_FILENAME, 'r') as protocol_file:
-        py_protocol = protocol_file.read().decode('utf-8')
-
-    if py_protocol is None:
-        raise RuntimeError(
-            f'Bundled protocol should have a {MAIN_PROTOCOL_FILENAME} ' +
-            'file in the root directory')
+        try:
+            py_protocol = protocol_file.read().decode('utf-8')
+        except KeyError:
+            raise RuntimeError(
+                f'Bundled protocol should have a {MAIN_PROTOCOL_FILENAME} ' +
+                'file in the root directory')
 
     for zipInfo in bundle.infolist():
         name = zipInfo.filename
 
-        # skip directories and weird OS cruft
+        # skip directories and weird OS-added directories
         if name.startswith('__MACOSX') or zipInfo.is_dir():
             continue
 

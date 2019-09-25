@@ -240,7 +240,7 @@ class ProtocolContext(CommandPublisher):
         :param int version: The version of the labware definition. If
             unspecified, will use version 1.
         """
-        if self._bundled_labware is not None:
+        if self._bundled_labware:
             labware_def = get_labware_definition_from_bundle(
                 self._bundled_labware, load_name, namespace, version)
         else:

@@ -1002,11 +1002,11 @@ def get_labware_definition_from_bundle(
     version: int = None,
 ) -> Dict[str, Any]:
     """
-    Look up and return a bundled definition by load_name + namespace + version
-        and return it or raise an exception.
-    Namespace and version are optional, they only have to be specified if
-        there is ambiguity (eg when multiple labware in the bundle share
-        the same load_name)
+    Look up and return a bundled definition by ``load_name`` + ``namespace``
+    + ``version`` and return it or raise an exception. The``namespace`` and
+    ``version`` args are optional, they only have to be specified if there is
+    ambiguity (eg when multiple labware in the bundle share the same
+    ``load_name``)
 
     :param str load_name: corresponds to 'loadName' key in definition
     :param str namespace: The namespace the labware definition belongs to
@@ -1014,16 +1014,15 @@ def get_labware_definition_from_bundle(
     :param Dict bundled_labware: A dictionary of labware definitions to search
     """
     load_name = load_name.lower()
-    if namespace is not None:
-        namespace = namespace.lower()
 
     bundled_candidates = [
         b for b in bundled_labware.values()
         if b['parameters']['loadName'] == load_name]
-    if namespace is not None:
+    if namespace:
+        namespace = namespace.lower()
         bundled_candidates = [
             b for b in bundled_candidates if b['namespace'] == namespace]
-    if version is not None:
+    if version:
         bundled_candidates = [
             b for b in bundled_candidates if b['version'] == version]
 
