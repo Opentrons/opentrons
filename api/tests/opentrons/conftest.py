@@ -549,7 +549,7 @@ def get_bundle_fixture():
         """
         result = {}
         fixture_dir = (
-            pathlib.Path(__file__) / '..' / 'protocols' /
+            pathlib.Path(__file__).parent / 'protocols' /
             'fixtures' / 'bundled_protocols' / fixture_name)
 
         fixed_trash_def = get_std_labware('opentrons_1_trash_1100ml_fixed')

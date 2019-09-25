@@ -213,7 +213,7 @@ def test_parse_json_details(get_json_protocol_fixture,
 
 
 @pytest.mark.api2_only
-def test_parse_bundle_details(get_bundle_fixture):
+def test_parse_bundle_details(get_bundle_fixture, ensure_api2):
     fixture = get_bundle_fixture('simple_bundle')
     filename = fixture['filename']
 
