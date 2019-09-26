@@ -7,6 +7,7 @@ import itertools
 import json
 import pkgutil
 from io import BytesIO
+from pathlib import PurePosixPath
 from zipfile import ZipFile
 from typing import Any, Dict, Union
 
@@ -82,8 +83,8 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # n
             'result in nesting all files inside that directory in the ZIP.')
 
     MAIN_PROTOCOL_FILENAME = 'protocol.ot2.py'
-    LABWARE_DIR = 'labware/'
-    DATA_DIR = 'data/'
+    LABWARE_DIR = 'labware'
+    DATA_DIR = 'data'
     bundled_labware: Dict[str, Dict[str, Any]] = {}
     bundled_data = {}
     bundled_python = {}
@@ -97,25 +98,30 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # n
             'file in the root directory')
 
     for zipInfo in bundle.infolist():
-        name = zipInfo.filename
+        filepath = PurePosixPath(zipInfo.filename)
+        rootpath = filepath.parts[0]
 
         # skip directories and weird OS-added directories
-        if name.startswith('__MACOSX') or zipInfo.is_dir():
+        # (note: the __MACOSX dir would contain '__MACOSX/foo.py'
+        # and other files. This would break our inferences, so we need
+        # to exclude all contents of that directory)
+        if rootpath == '__MACOSX' or zipInfo.is_dir():
             continue
 
         with bundle.open(zipInfo) as f:
-            if name.startswith(LABWARE_DIR) and name.endswith('.json'):
+            if rootpath == LABWARE_DIR and filepath.suffix == '.json':
                 labware_def = json.load(f)
                 labware_key = _get_labware_uri(labware_def)
                 if labware_key in bundled_labware:
                     raise RuntimeError(
                         f'Conflicting labware in bundle. {labware_key}')
                 bundled_labware[labware_key] = labware_def
-            elif name.startswith(DATA_DIR):
+            elif rootpath == DATA_DIR:
                 # note: data files are read as binary
-                bundled_data[name[len(DATA_DIR):]] = f.read()
-            elif name.endswith('.py') and name != MAIN_PROTOCOL_FILENAME:
-                bundled_python[name] = f.read().decode('utf-8')
+                bundled_data[str(filepath.relative_to(DATA_DIR))] = f.read()
+            elif (filepath.suffix == '.py' and
+                  str(filepath) != MAIN_PROTOCOL_FILENAME):
+                bundled_python[str(filepath)] = f.read().decode('utf-8')
 
     result = _parse_python(
         py_protocol, filename, bundled_labware, bundled_data,
@@ -131,6 +137,8 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # n
 def parse(
     protocol_file: Union[str, bytes],
     filename: str = None
+
+
 ) -> Protocol:
     """ Parse a protocol from text.
 
