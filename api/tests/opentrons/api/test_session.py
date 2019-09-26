@@ -54,7 +54,7 @@ def labware_setup(hardware):
 
 @pytest.mark.api1_only
 async def test_load_from_text(session_manager, protocol):
-    session = session_manager.create(name='<blank>', text=protocol.text)
+    session = session_manager.create(name='<blank>', contents=protocol.text)
     assert session.name == '<blank>'
 
     acc = []
@@ -71,7 +71,7 @@ async def test_load_from_text(session_manager, protocol):
 @pytest.mark.api1_only
 async def test_clear_tips(session_manager, tip_clear_protocol):
     session = session_manager.create(
-        name='<blank>', text=tip_clear_protocol.text)
+        name='<blank>', contents=tip_clear_protocol.text)
 
     assert len(session._instruments) == 1
     for instrument in session._instruments:
@@ -90,7 +90,7 @@ async def test_async_notifications(main_router):
 
 def test_load_protocol_with_error(session_manager):
     with pytest.raises(Exception) as e:
-        session = session_manager.create(name='<blank>', text='blah')
+        session = session_manager.create(name='<blank>', contents='blah')
         assert session is None
 
     args, = e.value.args
@@ -100,14 +100,14 @@ def test_load_protocol_with_error(session_manager):
 @pytest.mark.api2_only
 @pytest.mark.parametrize('protocol_file', ['testosaur_v2.py'])
 async def test_load_and_run_v2(
-            main_router,
-            protocol,
-            protocol_file,
-            loop
-        ):
+    main_router,
+    protocol,
+    protocol_file,
+    loop
+):
     session = main_router.session_manager.create(
         name='<blank>',
-        text=protocol.text)
+        contents=protocol.text)
     assert main_router.notifications.queue.qsize() == 1
     assert session.state == 'loaded'
     assert session.command_log == {}
@@ -143,14 +143,14 @@ async def test_load_and_run_v2(
 @pytest.mark.api1_only
 @pytest.mark.parametrize('protocol_file', ['testosaur.py'])
 async def test_load_and_run(
-            main_router,
-            protocol,
-            protocol_file,
-            loop
-        ):
+    main_router,
+    protocol,
+    protocol_file,
+    loop
+):
     session = main_router.session_manager.create(
         name='<blank>',
-        text=protocol.text)
+        contents=protocol.text)
     assert main_router.notifications.queue.qsize() == 1
     assert session.state == 'loaded'
     assert session.command_log == {}
@@ -229,7 +229,7 @@ async def test_get_instruments_and_containers(labware_setup,
     instruments, containers, modules, interactions = \
         _accumulate([_get_labware(command) for command in commands])
 
-    session = session_manager.create(name='', text='')
+    session = session_manager.create(name='', contents='')
     # We are calling dedupe directly for testing purposes.
     # Normally it is called from within a session
     session._instruments.extend(_dedupe(instruments))
@@ -310,7 +310,7 @@ def test_get_labware(labware_setup):
 
 @pytest.mark.api1_only
 async def test_session_model_functional(session_manager, protocol):
-    session = session_manager.create(name='<blank>', text=protocol.text)
+    session = session_manager.create(name='<blank>', contents=protocol.text)
     assert [container.name for container in session.containers] == \
            ['tiprack', 'trough', 'plate', 'opentrons_1_trash_1100ml_fixed']
     names = [instrument.name for instrument in session.instruments]
@@ -328,7 +328,7 @@ async def test_drop_tip_with_trash(session_manager, protocol, protocol_file):
     is listed as a container for a protocol, as well as a container
     instruments are interacting with.
     """
-    session = session_manager.create(name='<blank>', text=protocol.text)
+    session = session_manager.create(name='<blank>', contents=protocol.text)
 
     assert 'opentrons_1_trash_1100ml_fixed' in [
         c.name for c in session.get_containers()]
@@ -341,7 +341,7 @@ async def test_session_create_error(main_router):
     with pytest.raises(SyntaxError):
         main_router.session_manager.create(
             name='<blank>',
-            text='syntax error ;(')
+            contents='syntax error ;(')
 
     with pytest.raises(TimeoutError):
         # No state change is expected
@@ -350,7 +350,7 @@ async def test_session_create_error(main_router):
     with pytest.raises(ZeroDivisionError):
         main_router.session_manager.create(
             name='<blank>',
-            text='1/0')
+            contents='1/0')
 
     with pytest.raises(TimeoutError):
         # No state change is expected
@@ -378,5 +378,5 @@ def run(ctx):
 
     session = main_router.session_manager.create(
         name='<blank>',
-        text=prot)
+        contents=prot)
     assert session.metadata == expected

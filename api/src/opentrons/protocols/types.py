@@ -16,6 +16,10 @@ class PythonProtocol(NamedTuple):
     contents: Any  # This is the output of compile() which we can't type
     metadata: Metadata
     api_level: str  # For now, should be '1' or '2'
+    # these 'bundled_' attrs should only be included when the protocol is a zip
+    bundled_labware: Optional[Dict[str, Dict[str, Any]]]
+    bundled_data: Optional[Dict[str, bytes]]
+    bundled_python: Optional[Dict[str, str]]
 
 
 Protocol = Union[JsonProtocol, PythonProtocol]

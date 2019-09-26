@@ -5,6 +5,7 @@
 import asyncio
 import contextlib
 import os
+import io
 import json
 import pathlib
 import re
@@ -13,6 +14,7 @@ import tempfile
 from collections import namedtuple
 from functools import partial
 from uuid import uuid4 as uuid
+import zipfile
 
 import pytest
 import opentrons
@@ -524,3 +526,107 @@ def get_json_protocol_fixture():
                 return contents
 
     return _get_json_protocol_fixture
+
+
+@pytest.fixture
+def get_bundle_fixture():
+    def get_std_labware(loadName, version=1):
+        with open(
+            pathlib.Path(__file__).parent / '..' / '..' / '..' /
+            'shared-data' / 'labware' / 'definitions' / '2' /
+            loadName / f'{version}.json', 'r'
+        ) as f:
+            labware_def = json.load(f)
+        return labware_def
+
+    def _get_bundle_protocol_fixture(fixture_name):
+        """
+        It's ugly to store bundles as .zip's, so we'll build the .zip
+        from fixtures and return it as `bytes`.
+        We also need to hard-code fixture data here (bundled_labware,
+        bundled_python, bundled_data, metadata) for the tests to use in
+        their assertions.
+        """
+        result = {'filename': f'{fixture_name}.zip'}
+        fixture_dir = (
+            pathlib.Path(__file__).parent / 'protocols' /
+            'fixtures' / 'bundled_protocols' / fixture_name)
+
+        fixed_trash_def = get_std_labware('opentrons_1_trash_1100ml_fixed')
+
+        empty_protocol = 'def run(context):\n    pass'
+
+        if fixture_name == 'simple_bundle':
+            with open(fixture_dir / 'protocol.py', 'r') as f:
+                result['contents'] = f.read()
+            with open(fixture_dir / 'data.txt', 'rb') as f:
+                result['bundled_data'] = {'data.txt': f.read()}
+            with open(fixture_dir / 'custom_labware.json', 'r') as f:
+                custom_labware = json.load(f)
+
+            tiprack_def = get_std_labware('opentrons_96_tiprack_10ul')
+            result['bundled_labware'] = {
+                'opentrons/opentrons_1_trash_1100ml_fixed/1': fixed_trash_def,
+                'custom_beta/custom_labware/1': custom_labware,
+                'opentrons/opentrons_96_tiprack_10ul/1': tiprack_def}
+            result['bundled_python'] = {}
+
+            # NOTE: this is copy-pasted from the .py fixture file
+            result['metadata'] = {'author': 'MISTER FIXTURE'}
+
+            # make binary zipfile
+            binary_zipfile = io.BytesIO()
+            with zipfile.ZipFile(binary_zipfile, 'w') as z:
+                z.writestr('labware/custom_labware.json',
+                           json.dumps(custom_labware))
+                z.writestr('labware/tiprack.json', json.dumps(tiprack_def))
+                z.writestr('labware/fixed_trash.json',
+                           json.dumps(fixed_trash_def))
+                z.writestr('protocol.ot2.py', result['contents'])
+                z.writestr('data/data.txt',
+                           result['bundled_data']['data.txt'])
+            binary_zipfile.seek(0)
+            result['binary_zipfile'] = binary_zipfile.read()
+
+        elif fixture_name == 'no_root_files_bundle':
+            binary_zipfile = io.BytesIO()
+            with zipfile.ZipFile(binary_zipfile, 'w') as z:
+                z.writestr('inner_dir/protocol.ot2.py', empty_protocol)
+            binary_zipfile.seek(0)
+            result['binary_zipfile'] = binary_zipfile.read()
+
+        elif fixture_name == 'no_entrypoint_protocol_bundle':
+            binary_zipfile = io.BytesIO()
+            with zipfile.ZipFile(binary_zipfile, 'w') as z:
+                z.writestr('rando_pyfile_name.py', empty_protocol)
+            binary_zipfile.seek(0)
+            result['binary_zipfile'] = binary_zipfile.read()
+
+        elif fixture_name == 'conflicting_labware_bundle':
+            binary_zipfile = io.BytesIO()
+            with zipfile.ZipFile(binary_zipfile, 'w') as z:
+                plate_def = get_std_labware('biorad_96_wellplate_200ul_pcr')
+                z.writestr('protocol.ot2.py', empty_protocol)
+                z.writestr(
+                    'labware/fixed_trash.json', json.dumps(fixed_trash_def))
+                z.writestr('labware/plate.json', json.dumps(plate_def))
+                z.writestr('labware/same_plate.json', json.dumps(plate_def))
+            binary_zipfile.seek(0)
+            result['binary_zipfile'] = binary_zipfile.read()
+
+        elif fixture_name == 'missing_labware_bundle':
+            # parsing should fail b/c this bundle lacks labware defs.
+            with open(fixture_dir / 'protocol.py', 'r') as f:
+                protocol_contents = f.read()
+            binary_zipfile = io.BytesIO()
+            with zipfile.ZipFile(binary_zipfile, 'w') as z:
+                z.writestr('protocol.ot2.py', protocol_contents)
+            binary_zipfile.seek(0)
+            result['binary_zipfile'] = binary_zipfile.read()
+
+        else:
+            raise ValueError(f'get_bundle_fixture has no case to handle '
+                             f'fixture "{fixture_name}"')
+        return result
+
+    return _get_bundle_protocol_fixture

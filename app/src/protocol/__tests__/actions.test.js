@@ -14,7 +14,7 @@ describe('protocol actions', () => {
 
   beforeEach(() => {
     _FileReader = global.FileReader
-    mockReader = { readAsText: jest.fn() }
+    mockReader = { readAsText: jest.fn(), readAsArrayBuffer: jest.fn() }
 
     store = mockStore({})
     global.FileReader = jest.fn(() => mockReader)
@@ -30,6 +30,12 @@ describe('protocol actions', () => {
       name: 'foobar.py',
       type: 'application/x-python-code',
       lastModified: 123,
+    }
+
+    const bundleFile = {
+      name: 'foobar.zip',
+      type: 'application/zip',
+      lastModified: 111,
     }
 
     const jsonFile = {
@@ -83,6 +89,39 @@ describe('protocol actions', () => {
           contents: mockReader.result,
           data: protocol,
         },
+      })
+    })
+
+    describe('bundle upload', () => {
+      test('dispatches a protocol:OPEN', () => {
+        const result = store.dispatch(openProtocol(bundleFile))
+        const expected = {
+          type: 'protocol:OPEN',
+          payload: { file: bundleFile },
+        }
+
+        expect(result).toEqual(expected)
+        expect(store.getActions()).toEqual([expected])
+      })
+
+      test('dispatches protocol:UPLOAD on bundle read completion', () => {
+        const arrayBuff = new ArrayBuffer(3)
+        const uint8array = new Uint8Array(arrayBuff)
+        uint8array[0] = 57
+        uint8array[1] = 54
+        uint8array[2] = 0
+
+        store.dispatch(openProtocol(bundleFile))
+        mockReader.result = arrayBuff
+        mockReader.onload()
+
+        const actions = store.getActions()
+        expect(actions).toHaveLength(2)
+        expect(actions[1]).toEqual({
+          type: 'protocol:UPLOAD',
+          meta: { robot: true },
+          payload: { contents: 'OTYA', data: null },
+        })
       })
     })
   })
