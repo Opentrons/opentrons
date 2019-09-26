@@ -613,6 +613,17 @@ def get_bundle_fixture():
                 z.writestr('labware/same_plate.json', json.dumps(plate_def))
             binary_zipfile.seek(0)
             result['binary_zipfile'] = binary_zipfile.read()
+
+        elif fixture_name == 'missing_labware_bundle':
+            # parsing should fail b/c this bundle lacks labware defs.
+            with open(fixture_dir / 'protocol.py', 'r') as f:
+                protocol_contents = f.read()
+            binary_zipfile = io.BytesIO()
+            with zipfile.ZipFile(binary_zipfile, 'w') as z:
+                z.writestr('protocol.ot2.py', protocol_contents)
+            binary_zipfile.seek(0)
+            result['binary_zipfile'] = binary_zipfile.read()
+
         else:
             raise ValueError(f'get_bundle_fixture has no case to handle '
                              f'fixture "{fixture_name}"')

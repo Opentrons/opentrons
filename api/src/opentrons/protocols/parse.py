@@ -123,6 +123,9 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # n
                   str(filepath) != MAIN_PROTOCOL_FILENAME):
                 bundled_python[str(filepath)] = f.read().decode('utf-8')
 
+    if not bundled_labware:
+        raise RuntimeError('No labware definitions found in bundle.')
+
     result = _parse_python(
         py_protocol, filename, bundled_labware, bundled_data,
         bundled_python)
@@ -137,8 +140,6 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # n
 def parse(
     protocol_file: Union[str, bytes],
     filename: str = None
-
-
 ) -> Protocol:
     """ Parse a protocol from text.
 
@@ -153,7 +154,8 @@ def parse(
     """
     if filename and filename.endswith('.zip'):
         if not isinstance(protocol_file, bytes):
-            raise RuntimeError('File is a .zip, should be bytes not str')
+            raise RuntimeError('Please update your Run App version to '
+                               'support uploading a .zip file')
 
         with ZipFile(BytesIO(protocol_file)) as bundle:
             result = _parse_bundle(bundle, filename)
