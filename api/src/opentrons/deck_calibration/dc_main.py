@@ -117,26 +117,19 @@ class CLITool:
         self._steps = [0.1, 0.25, 0.5, 1, 5, 10, 20, 40, 80]
         self._steps_index = 2
         self._current_point = 1
-        self._model_offset = self._pipettes[self._current_mount].model_offset
+        self.model_offset = self._pipettes[self._current_mount].model_offset
         deck_height = 0
-        if feature_flags.use_protocol_api_v2():
-            deck_height = 0
-        else:
+        if not feature_flags.use_protocol_api_v2():
             deck_height = self._tip_length
 
-        self._expected_points = {
-            key: (vX, vY, deck_height)
-            for key, (vX, vY) in point_set.items()}
         self.actual_points = {
             1: (0, 0),
             2: (0, 0),
             3: (0, 0)}
 
-        self._test_points = {
-            'slot5': (132.50, 90.50, deck_height),
-            'corner3': (332.13, 47.41, deck_height),
-            'corner8': (190.65, 227.57, deck_height),
-            'corner9': (330.14, 222.78, deck_height)}
+        self._expected_points = self.set_deck_height_expected_points(
+            deck_height, point_set)
+        self._test_points = self.set_deck_height_test_points(deck_height)
 
         slot5 = self._test_points['slot5']
         log_val = self.hardware.config.log_level
@@ -217,6 +210,23 @@ class CLITool:
     def current_step(self):
         return self._steps[self._steps_index]
 
+    def set_deck_height_test_points(self, height):
+        return {'slot5': (132.50, 90.50, height),
+                'corner3': (332.13, 47.41, height),
+                'corner8': (190.65, 227.57, height),
+                'corner9': (330.14, 222.78, height)}
+
+    def set_deck_height_expected_points(self, height, populated_points=None):
+        if populated_points:
+            expected_points = {
+                key: (vX, vY, height)
+                for key, (vX, vY) in populated_points.items()}
+        else:
+            expected_points = {
+                        key: (vX, vY, height)
+                        for key, (vX, vY, vZ) in self._expected_points.items()}
+        return expected_points
+
     def print_instructions(self):
         return '\n'.join([
             'A CLI application for performing factory calibration',
@@ -290,7 +300,7 @@ class CLITool:
         if not feature_flags.use_protocol_api_v2():
             px, py, pz = self._driver_to_deck_coords(
                 position(self._current_mount, self.hardware))
-            mox, moy, moz = self._model_offset
+            mox, moy, moz = self.model_offset
             res = (px + mox, py + moy, pz + moz)
         else:
             res = position(
@@ -331,6 +341,10 @@ class CLITool:
         # Check that pipette does not have tip attached, if it does remove it.
         self._clear_tips(pipette)
         if not feature_flags.use_protocol_api_v2():
+            self._expected_points = self.set_deck_height_expected_points(
+                self._tip_length)
+            self._test_points = self.set_deck_height_test_points(
+                self._tip_length)
             top = self._position()
             self._helper_pickup(pipette, top)
             pipette._add_tip(pipette._tip_length)
@@ -386,14 +400,15 @@ class CLITool:
     def save_mount_offset(self) -> str:
         cx, cy, cz = self._position()
         log.debug("save_mount_offset cxyz: {}".format((cx, cy, cz)))
-
+        targ = self._expected_points[1]
         if not feature_flags.use_protocol_api_v2():
+            moz_points = (targ[0], targ[1], self._tip_length)
             ex, ey, ez = apply_mount_offset(
-                self._expected_points[1], self.hardware)
+                moz_points, self.hardware)
             log.debug("save_mount_offset exyz: {}".format((ex, ey, ez)))
             dx, dy, dz = (cx - ex, cy - ey, cz - ez)
         else:
-            ex, ey, ez = self._expected_points[1]
+            ex, ey, ez = targ
             dx, dy, dz = (cx - ex, cy - ey, cz - ez)
         log.debug("save_mount_offset dxyz: {}".format((dx, dy, dz)))
 
@@ -473,8 +488,12 @@ class CLITool:
         if self._pipettes[self._current_mount]:
             self._tip_length =\
                 self._pipettes[self._current_mount]._fallback_tip_length
-            self._model_offset =\
+            self.model_offset =\
                 self._pipettes[self._current_mount].model_offset
+            self._expected_points = self.set_deck_height_expected_points(
+                self._tip_length)
+            self._test_points = self.set_deck_height_test_points(
+                self._tip_length)
             return f"Switched mount to {self._current_mount}"
         else:
             return ("Switched mount, but please add pipette\n"
@@ -494,8 +513,9 @@ class CLITool:
         self.validate(self._expected_points[1], 1, r_pipette)
         next_pip = self._pipettes[l_pipette]
         self.switch_mounts()
+        targ_l = (targ[0], targ[1], self._tip_length)
         if next_pip and next_pip.has_tip:
-            self.validate(targ, 0, l_pipette)
+            self.validate(targ_l, 0, l_pipette)
             return 'Mount offset complete'
         else:
             self.move_to_safe_height()
@@ -519,8 +539,9 @@ class CLITool:
             if cz < SAFE_HEIGHT:
                 self.move_to_safe_height()
             tx, ty, tz = self._deck_to_driver_coords(point)
+            _, _, moz = self.model_offset
             self.hardware._driver.move({'X': tx, 'Y': ty})
-            self.hardware._driver.move({self._current_mount: tz})
+            self.hardware._driver.move({self._current_mount: tz-moz})
         else:
             self._current_mount = pipette_mount
             self.move_to_safe_height()
@@ -604,9 +625,11 @@ class CLITool:
         hw = self.hardware
         mount = self._current_mount
         if not feature_flags.use_protocol_api_v2():
+            log.info(f"Current tiplength {self._tip_length}")
             probe_center = tuple(probe_instrument(
                 self._pipettes[mount],
-                hw))
+                hw,
+                tip_length=self._tip_length))
         else:
             probe_center = hw.locate_tip_probe_center(mount)
             _, _, cz = position(mount, hw, CriticalPoint.TIP)
@@ -696,7 +719,7 @@ def main(loop=None):
     parser.add_argument(
         '-t', '--pickupTip',
         help='What to output during simulations',
-        default=None)
+        default=None, action='store_true')
     parser.add_argument(
         '-l', '--log-level', action='store',
         help=('Log level for deck calibration.'),
