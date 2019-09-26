@@ -547,17 +547,18 @@ def get_bundle_fixture():
         bundled_python, bundled_data, metadata) for the tests to use in
         their assertions.
         """
-        result = {}
+        result = {'filename': f'{fixture_name}.zip'}
         fixture_dir = (
             pathlib.Path(__file__).parent / 'protocols' /
             'fixtures' / 'bundled_protocols' / fixture_name)
 
         fixed_trash_def = get_std_labware('opentrons_1_trash_1100ml_fixed')
 
-        with open(fixture_dir / 'protocol.py', 'r') as f:
-            result['contents'] = f.read()
+        empty_protocol = 'def run(context):\n    pass'
 
         if fixture_name == 'simple_bundle':
+            with open(fixture_dir / 'protocol.py', 'r') as f:
+                result['contents'] = f.read()
             with open(fixture_dir / 'data.txt', 'rb') as f:
                 result['bundled_data'] = {'data.txt': f.read()}
             with open(fixture_dir / 'custom_labware.json', 'r') as f:
@@ -569,7 +570,6 @@ def get_bundle_fixture():
                 'custom_beta/custom_labware/1': custom_labware,
                 'opentrons/opentrons_96_tiprack_10ul/1': tiprack_def}
             result['bundled_python'] = {}
-            result['filename'] = 'simple_bundle.zip'
 
             # NOTE: this is copy-pasted from the .py fixture file
             result['metadata'] = {'author': 'MISTER FIXTURE'}
@@ -588,6 +588,30 @@ def get_bundle_fixture():
             binary_zipfile.seek(0)
             result['binary_zipfile'] = binary_zipfile.read()
 
+        elif fixture_name == 'no_root_files_bundle':
+            binary_zipfile = io.BytesIO()
+            with zipfile.ZipFile(binary_zipfile, 'w') as z:
+                z.writestr('inner_dir/protocol.ot2.py', empty_protocol)
+            binary_zipfile.seek(0)
+            result['binary_zipfile'] = binary_zipfile.read()
+        
+        elif fixture_name == 'no_entrypoint_protocol_bundle':
+            binary_zipfile = io.BytesIO()
+            with zipfile.ZipFile(binary_zipfile, 'w') as z:
+                z.writestr('rando_pyfile_name.py', empty_protocol)
+            binary_zipfile.seek(0)
+            result['binary_zipfile'] = binary_zipfile.read()
+        
+        elif fixture_name == 'conflicting_labware_bundle':
+            binary_zipfile = io.BytesIO()
+            with zipfile.ZipFile(binary_zipfile, 'w') as z:
+                plate_def = get_std_labware('biorad_96_wellplate_200ul_pcr')
+                z.writestr('protocol.ot2.py', empty_protocol)
+                z.writestr('labware/fixed_trash.json', json.dumps(fixed_trash_def))
+                z.writestr('labware/plate.json', json.dumps(plate_def))
+                z.writestr('labware/same_plate.json', json.dumps(plate_def))
+            binary_zipfile.seek(0)
+            result['binary_zipfile'] = binary_zipfile.read()
         else:
             raise ValueError(f'get_bundle_fixture has no case to handle '
                              f'fixture "{fixture_name}"')

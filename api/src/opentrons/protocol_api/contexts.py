@@ -92,8 +92,8 @@ class ProtocolContext(CommandPublisher):
                  loop: asyncio.AbstractEventLoop = None,
                  hardware: hc.API = None,
                  broker=None,
-                 bundled_labware: Optional[Dict[str, Dict[str, Any]]] = None,
-                 bundled_data: Optional[Dict[str, bytes]] = None
+                 bundled_labware: Dict[str, Dict[str, Any]] = None,
+                 bundled_data: Dict[str, bytes] = None
                  ) -> None:
         """ Build a :py:class:`.ProtocolContext`.
 

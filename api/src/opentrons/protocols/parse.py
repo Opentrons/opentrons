@@ -88,13 +88,13 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # n
     bundled_data = {}
     bundled_python = {}
 
-    with bundle.open(MAIN_PROTOCOL_FILENAME, 'r') as protocol_file:
-        try:
+    try:
+        with bundle.open(MAIN_PROTOCOL_FILENAME, 'r') as protocol_file:
             py_protocol = protocol_file.read().decode('utf-8')
-        except KeyError:
-            raise RuntimeError(
-                f'Bundled protocol should have a {MAIN_PROTOCOL_FILENAME} ' +
-                'file in the root directory')
+    except KeyError:
+        raise RuntimeError(
+            f'Bundled protocol should have a {MAIN_PROTOCOL_FILENAME} ' +
+            'file in the root directory')
 
     for zipInfo in bundle.infolist():
         name = zipInfo.filename
