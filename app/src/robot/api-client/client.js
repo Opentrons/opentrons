@@ -154,7 +154,7 @@ export default function client(dispatch) {
 
     freshUpload = true
     remote.session_manager
-      .create(name, contents, fileIsBinary(state.protocol))
+      .create(name, contents, fileIsBinary(state.protocol.file))
       .then(apiSession => {
         remote.session_manager.session = apiSession
         // state change will trigger a session notification, which will

@@ -594,20 +594,21 @@ def get_bundle_fixture():
                 z.writestr('inner_dir/protocol.ot2.py', empty_protocol)
             binary_zipfile.seek(0)
             result['binary_zipfile'] = binary_zipfile.read()
-        
+
         elif fixture_name == 'no_entrypoint_protocol_bundle':
             binary_zipfile = io.BytesIO()
             with zipfile.ZipFile(binary_zipfile, 'w') as z:
                 z.writestr('rando_pyfile_name.py', empty_protocol)
             binary_zipfile.seek(0)
             result['binary_zipfile'] = binary_zipfile.read()
-        
+
         elif fixture_name == 'conflicting_labware_bundle':
             binary_zipfile = io.BytesIO()
             with zipfile.ZipFile(binary_zipfile, 'w') as z:
                 plate_def = get_std_labware('biorad_96_wellplate_200ul_pcr')
                 z.writestr('protocol.ot2.py', empty_protocol)
-                z.writestr('labware/fixed_trash.json', json.dumps(fixed_trash_def))
+                z.writestr(
+                    'labware/fixed_trash.json', json.dumps(fixed_trash_def))
                 z.writestr('labware/plate.json', json.dumps(plate_def))
                 z.writestr('labware/same_plate.json', json.dumps(plate_def))
             binary_zipfile.seek(0)
