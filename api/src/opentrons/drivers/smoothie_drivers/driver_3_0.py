@@ -500,11 +500,7 @@ class SmoothieDriver_3_0_0:
             if res is None:
                 raise ValueError(
                     f'{key} was not updated to {value} on {axis} axis')
-            # ensure smoothie received code and changed value through
-            # return message. Format of return message:
-            # <Axis> (or E for endstop) updated <Value>
-            arr_result = res.strip().split(' ')
-            res_msg[axis][str(arr_result[0])] = float(arr_result[2])
+            res_msg[axis][key] = value
 
         return res_msg
 
