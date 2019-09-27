@@ -14,11 +14,6 @@ state = partial(state, 'calibration')
 @pytest.mark.api2_only  # noqa(C901)
 async def test_tip_probe_v2(main_router, model, monkeypatch):
 
-    def fake_locate(mount, tip_length):
-        assert mount == Mount[model.instrument.mount.upper()]
-        assert tip_length is None
-        return Point(0, 0, 0)
-
     def fake_update(mount, new_offset=None, from_tip_probe=None):
         assert mount == Mount[model.instrument.mount.upper()]
         if new_offset:
@@ -31,21 +26,12 @@ async def test_tip_probe_v2(main_router, model, monkeypatch):
     def fake_move(instrument):
         assert instrument == model.instrument
 
-    def fake_add_tip(tip_length):
-        assert tip_length == 51.7
-
-    def fake_remove_tip():
-        pass
-
-    monkeypatch.setattr(main_router.calibration_manager._hardware._api,
-                        'locate_tip_probe_center', fake_locate)
     monkeypatch.setattr(main_router.calibration_manager._hardware._api,
                         'update_instrument_offset', fake_update)
     monkeypatch.setattr(main_router.calibration_manager,
                         'move_to_front', fake_move)
 
     tr = labware.load('opentrons_96_tiprack_300ul', Location(Point(), 'test'))
-    tr.tip_length = 2
 
     model.instrument.tip_racks = [
         models.Container(tr,
@@ -53,7 +39,7 @@ async def test_tip_probe_v2(main_router, model, monkeypatch):
                          model.instrument._context)]
 
     def new_fake_locate(mount, tip_length):
-        assert tip_length == pytest.approx(2)
+        assert tip_length == pytest.approx(59.3-7.47)
         return Point(0, 0, 0)
 
     monkeypatch.setattr(main_router.calibration_manager._hardware._api,
@@ -62,7 +48,7 @@ async def test_tip_probe_v2(main_router, model, monkeypatch):
     await main_router.wait_until(state('ready'))
 
     def new_fake_locate2(mount, tip_length):
-        assert tip_length == pytest.approx(2)
+        assert tip_length == pytest.approx(59.3-7.47)
         return Point(0, 0, 0)
 
     monkeypatch.setattr(main_router.calibration_manager._hardware._api,

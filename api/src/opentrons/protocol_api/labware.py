@@ -274,6 +274,14 @@ class Labware:
         return self.wells_by_name()[key]
 
     @property
+    def uri(self) -> str:
+        """ A string fully identifying the labware.
+
+        :returns: The uri, ``"namespace/loadname/version"``
+        """
+        return uri_from_definition(self._definition)
+
+    @property
     def parent(self) -> Union['Labware', 'Well', str, 'ModuleGeometry', None]:
         """ The parent of this labware. Usually a slot name.
         """
@@ -512,11 +520,11 @@ class Labware:
 
     @property
     def tip_length(self) -> float:
-        return self._parameters['tipLength'] - self._parameters['tipOverlap']
+        return self._parameters['tipLength']
 
     @tip_length.setter
     def tip_length(self, length: float):
-        self._parameters['tipLength'] = length + self._parameters['tipOverlap']
+        self._parameters['tipLength'] = length
 
     def next_tip(self,
                  num_tips: int = 1,
@@ -1236,3 +1244,35 @@ def filter_tipracks_to_start(
         tipracks: List[Labware]) -> List[Labware]:
     return list(dropwhile(
         lambda tr: starting_point.parent is not tr, tipracks))
+
+
+def uri_from_details(namespace: str, load_name: str, version: str) -> str:
+    """ Build a labware URI from its details.
+
+    A labware URI is a string that uniquely specifies a labware definition.
+
+    :returns str: The URI.
+    """
+    return f'{namespace}/{load_name}/{version}'
+
+
+def details_from_uri(uri: str) -> Tuple[str, str, str]:
+    """ Parse a labware URI and return the details.
+
+    :returns: A tuple of (namespace, load name, version)
+    """
+    namespace, loadname, version = uri.split('/')
+    return namespace, loadname, version
+
+
+def uri_from_definition(definition: Dict[str, Any]) -> str:
+    """ Build a labware URI from its definition.
+
+    A labware URI is a string that uniquely specifies a labware definition.
+
+    :returns str: The URI.
+    """
+    return '{namespace}/{loadname}/{version}'.format(
+        namespace=definition['namespace'],
+        loadname=definition['parameters']['loadName'],
+        version=definition['version'])

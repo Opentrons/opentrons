@@ -120,6 +120,13 @@ Object {
     "units": "mm",
     "value": 33,
   },
+  "tipOverlap": Object {
+    "default": 3.29,
+    "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 1,
+    "opentrons/geb_96_tiprack_10ul/1": 6.2,
+    "opentrons/opentrons_96_filtertiprack_10ul/1": 3.29,
+    "opentrons/opentrons_96_tiprack_10ul/1": 3.29,
+  },
   "top": Object {
     "max": 19.5,
     "min": 5,
@@ -319,6 +326,13 @@ Object {
     "units": "mm",
     "value": 33,
   },
+  "tipOverlap": Object {
+    "default": 3.29,
+    "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 1,
+    "opentrons/geb_96_tiprack_10ul/1": 6.2,
+    "opentrons/opentrons_96_filtertiprack_10ul/1": 3.29,
+    "opentrons/opentrons_96_tiprack_10ul/1": 3.29,
+  },
   "top": Object {
     "max": 19.5,
     "min": 5,
@@ -517,6 +531,13 @@ Object {
     "type": "float",
     "units": "mm",
     "value": 33,
+  },
+  "tipOverlap": Object {
+    "default": 3.29,
+    "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 1,
+    "opentrons/geb_96_tiprack_10ul/1": 6.2,
+    "opentrons/opentrons_96_filtertiprack_10ul/1": 3.29,
+    "opentrons/opentrons_96_tiprack_10ul/1": 3.29,
   },
   "top": Object {
     "max": 19.5,
@@ -718,6 +739,13 @@ Object {
     "units": "mm",
     "value": 33,
   },
+  "tipOverlap": Object {
+    "default": 3.29,
+    "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 1,
+    "opentrons/geb_96_tiprack_10ul/1": 6.2,
+    "opentrons/opentrons_96_filtertiprack_10ul/1": 3.29,
+    "opentrons/opentrons_96_tiprack_10ul/1": 3.29,
+  },
   "top": Object {
     "max": 19.5,
     "min": 5,
@@ -885,6 +913,13 @@ Object {
     "type": "float",
     "units": "mm",
     "value": 33,
+  },
+  "tipOverlap": Object {
+    "default": 3.29,
+    "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 1,
+    "opentrons/geb_96_tiprack_10ul/1": 6.2,
+    "opentrons/opentrons_96_filtertiprack_10ul/1": 3.29,
+    "opentrons/opentrons_96_tiprack_10ul/1": 3.29,
   },
   "top": Object {
     "max": 19.5,
@@ -1090,6 +1125,13 @@ Object {
     "units": "mm",
     "value": 33,
   },
+  "tipOverlap": Object {
+    "default": 3.29,
+    "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 1,
+    "opentrons/geb_96_tiprack_10ul/1": 6.2,
+    "opentrons/opentrons_96_filtertiprack_10ul/1": 3.29,
+    "opentrons/opentrons_96_tiprack_10ul/1": 3.29,
+  },
   "top": Object {
     "max": 19.5,
     "min": 5,
@@ -1293,6 +1335,13 @@ Object {
     "type": "float",
     "units": "mm",
     "value": 33,
+  },
+  "tipOverlap": Object {
+    "default": 3.29,
+    "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 1,
+    "opentrons/geb_96_tiprack_10ul/1": 6.2,
+    "opentrons/opentrons_96_filtertiprack_10ul/1": 3.29,
+    "opentrons/opentrons_96_tiprack_10ul/1": 3.29,
   },
   "top": Object {
     "max": 19.5,
@@ -1498,6 +1547,13 @@ Object {
     "units": "mm",
     "value": 33,
   },
+  "tipOverlap": Object {
+    "default": 3.29,
+    "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 1,
+    "opentrons/geb_96_tiprack_10ul/1": 6.2,
+    "opentrons/opentrons_96_filtertiprack_10ul/1": 3.29,
+    "opentrons/opentrons_96_tiprack_10ul/1": 3.29,
+  },
   "top": Object {
     "max": 19.5,
     "min": 5,
@@ -1665,6 +1721,12 @@ Object {
     "type": "float",
     "units": "mm",
     "value": 51.7,
+  },
+  "tipOverlap": Object {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
   },
   "top": Object {
     "max": 19.5,
@@ -1855,6 +1917,12 @@ Object {
     "units": "mm",
     "value": 51.7,
   },
+  "tipOverlap": Object {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
   "top": Object {
     "max": 19.5,
     "min": 5,
@@ -2043,6 +2111,12 @@ Object {
     "type": "float",
     "units": "mm",
     "value": 51.7,
+  },
+  "tipOverlap": Object {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
   },
   "top": Object {
     "max": 19.5,
@@ -2234,6 +2308,12 @@ Object {
     "units": "mm",
     "value": 51.7,
   },
+  "tipOverlap": Object {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
   "top": Object {
     "max": 19.5,
     "min": 5,
@@ -2401,6 +2481,12 @@ Object {
     "type": "float",
     "units": "mm",
     "value": 51.7,
+  },
+  "tipOverlap": Object {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
   },
   "top": Object {
     "max": 19.5,
@@ -2591,6 +2677,12 @@ Object {
     "units": "mm",
     "value": 51.7,
   },
+  "tipOverlap": Object {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
   "top": Object {
     "max": 19.5,
     "min": 5,
@@ -2779,6 +2871,12 @@ Object {
     "type": "float",
     "units": "mm",
     "value": 51.7,
+  },
+  "tipOverlap": Object {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
   },
   "top": Object {
     "max": 19.5,
@@ -2969,6 +3067,12 @@ Object {
     "units": "mm",
     "value": 51.7,
   },
+  "tipOverlap": Object {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
   "top": Object {
     "max": 19.5,
     "min": 5,
@@ -3122,6 +3226,12 @@ Object {
     "units": "mm",
     "value": 51.7,
   },
+  "tipOverlap": Object {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
   "top": Object {
     "max": 19.5,
     "min": 5,
@@ -3274,6 +3384,12 @@ Object {
     "type": "float",
     "units": "mm",
     "value": 51.7,
+  },
+  "tipOverlap": Object {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
   },
   "top": Object {
     "max": 19.5,
@@ -3429,6 +3545,12 @@ Object {
     "units": "mm",
     "value": 51.7,
   },
+  "tipOverlap": Object {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
   "top": Object {
     "max": 19.5,
     "min": 5,
@@ -3581,6 +3703,12 @@ Object {
     "type": "float",
     "units": "mm",
     "value": 51.7,
+  },
+  "tipOverlap": Object {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
   },
   "top": Object {
     "max": 19.5,
@@ -3791,6 +3919,12 @@ Object {
     "units": "mm",
     "value": 51.7,
   },
+  "tipOverlap": Object {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
   "top": Object {
     "max": 19.5,
     "min": 5,
@@ -3999,6 +4133,12 @@ Object {
     "type": "float",
     "units": "mm",
     "value": 51.7,
+  },
+  "tipOverlap": Object {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
   },
   "top": Object {
     "max": 19.5,
@@ -4209,6 +4349,12 @@ Object {
     "units": "mm",
     "value": 51.7,
   },
+  "tipOverlap": Object {
+    "default": 7.47,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 7.47,
+    "opentrons/opentrons_96_tiprack_300ul/1": 7.47,
+    "opentrons/tipone_96_tiprack_200ul/1": 6.1,
+  },
   "top": Object {
     "max": 19.5,
     "min": 5,
@@ -4382,6 +4528,13 @@ Object {
     "type": "float",
     "units": "mm",
     "value": 76.7,
+  },
+  "tipOverlap": Object {
+    "default": 7.95,
+    "opentrons/eppendorf_96_tiprack_1000ul_eptips/1": 0,
+    "opentrons/geb_96_tiprack_1000ul/1": 11.2,
+    "opentrons/opentrons_96_filtertiprack_1000ul/1": 7.95,
+    "opentrons/opentrons_96_tiprack_1000ul/1": 7.95,
   },
   "top": Object {
     "max": 19.5,
@@ -4557,6 +4710,13 @@ Object {
     "units": "mm",
     "value": 76.7,
   },
+  "tipOverlap": Object {
+    "default": 7.95,
+    "opentrons/eppendorf_96_tiprack_1000ul_eptips/1": 0,
+    "opentrons/geb_96_tiprack_1000ul/1": 11.2,
+    "opentrons/opentrons_96_filtertiprack_1000ul/1": 7.95,
+    "opentrons/opentrons_96_tiprack_1000ul/1": 7.95,
+  },
   "top": Object {
     "max": 19.5,
     "min": 5,
@@ -4731,6 +4891,13 @@ Object {
     "units": "mm",
     "value": 76.7,
   },
+  "tipOverlap": Object {
+    "default": 7.95,
+    "opentrons/eppendorf_96_tiprack_1000ul_eptips/1": 0,
+    "opentrons/geb_96_tiprack_1000ul/1": 11.2,
+    "opentrons/opentrons_96_filtertiprack_1000ul/1": 7.95,
+    "opentrons/opentrons_96_tiprack_1000ul/1": 7.95,
+  },
   "top": Object {
     "max": 19.5,
     "min": 5,
@@ -4904,6 +5071,13 @@ Object {
     "type": "float",
     "units": "mm",
     "value": 76.7,
+  },
+  "tipOverlap": Object {
+    "default": 7.95,
+    "opentrons/eppendorf_96_tiprack_1000ul_eptips/1": 0,
+    "opentrons/geb_96_tiprack_1000ul/1": 11.2,
+    "opentrons/opentrons_96_filtertiprack_1000ul/1": 7.95,
+    "opentrons/opentrons_96_tiprack_1000ul/1": 7.95,
   },
   "top": Object {
     "max": 19.5,

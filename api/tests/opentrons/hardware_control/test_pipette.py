@@ -85,3 +85,12 @@ def test_config_update():
 def test_smoothie_config_update(monkeypatch):
     for config in pipette_config.config_models:
         assert config == config
+
+
+@pytest.mark.parametrize('config_model', pipette_config.config_models)
+def test_tip_overlap(config_model):
+    pip = pipette.Pipette(config_model,
+                          {'single': [0, 0, 0], 'multi': [0, 0, 0]},
+                          'testId')
+    assert pip.config.tip_overlap\
+        == pipette_config.configs[config_model]['tipOverlap']

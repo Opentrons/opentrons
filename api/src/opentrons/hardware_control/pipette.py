@@ -33,6 +33,7 @@ class Pipette:
         self._current_tip_length = 0.0
         self._current_tiprack_diameter = 0.0
         self._fallback_tip_length = self._config.tip_length
+        self._tip_overlap_map = self._config.tip_overlap
         self._has_tip = False
         self._pipette_id = pipette_id
         pip_type = 'multi' if self._config.channels > 1 else 'single'
@@ -169,7 +170,8 @@ class Pipette:
     def ok_to_add_volume(self, volume_incr: float) -> bool:
         return self.current_volume + volume_incr <= self.working_volume
 
-    def add_tip(self, tip_length: float) -> None:
+    def add_tip(self,
+                tip_length: float) -> None:
         """
         Add a tip to the pipette for position tracking and validation
         (effectively updates the pipette's critical point)

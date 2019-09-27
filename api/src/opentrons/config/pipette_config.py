@@ -34,6 +34,7 @@ pipette_config = namedtuple(
         'ul_per_mm',
         'quirks',
         'tip_length',  # TODO (andy): remove from pipette, move to tip-rack
+        'tip_overlap',  # TODO: Replace entirely with tip length calibration
         'display_name',
         'name',
         'backcompat_name',
@@ -192,6 +193,7 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
         max_volume=ensure_value(cfg, 'maxVolume', MUTABLE_CONFIGS),
         ul_per_mm=ul_per_mm,
         quirks=validate_quirks(ensure_value(cfg, 'quirks', MUTABLE_CONFIGS)),
+        tip_overlap=cfg['tipOverlap'],
         tip_length=ensure_value(cfg, 'tipLength', MUTABLE_CONFIGS),
         display_name=ensure_value(cfg, 'displayName', MUTABLE_CONFIGS),
         name=cfg.get('name'),
