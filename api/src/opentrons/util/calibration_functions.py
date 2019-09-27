@@ -32,7 +32,6 @@ def probe_instrument(instrument, robot, tip_length=None) -> Point:
     safe_height = _calculate_safeheight(robot, tp.z_clearance.crossover)
 
     log.info("Moving to safe z: {}".format(safe_height))
-    log.info(f"Robot position info {robot.poses}")
     robot.poses = instrument._move(robot.poses, z=safe_height)
 
     for hs in hot_spots:

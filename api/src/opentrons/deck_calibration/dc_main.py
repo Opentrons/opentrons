@@ -490,10 +490,11 @@ class CLITool:
                 self._pipettes[self._current_mount]._fallback_tip_length
             self.model_offset =\
                 self._pipettes[self._current_mount].model_offset
-            self._expected_points = self.set_deck_height_expected_points(
-                self._tip_length)
-            self._test_points = self.set_deck_height_test_points(
-                self._tip_length)
+            if not feature_flags.use_protocol_api_v2():
+                self._expected_points = self.set_deck_height_expected_points(
+                    self._tip_length)
+                self._test_points = self.set_deck_height_test_points(
+                    self._tip_length)
             return f"Switched mount to {self._current_mount}"
         else:
             return ("Switched mount, but please add pipette\n"
@@ -737,6 +738,9 @@ def main(loop=None):
         hardware = adapters.SynchronousAdapter.build(
             api.build_hardware_controller)
         hardware.set_lights(rails=True)
+    # Register hook to reboot the robot after exiting this tool (regardless of
+    # whether this process exits normally or not)
+    atexit.register(notify_and_restart)
     backup_configuration_and_reload(hardware)
     cli = CLITool(
         point_set=get_calibration_points(),
@@ -765,7 +769,4 @@ def notify_and_restart():
 
 
 if __name__ == "__main__":
-    # Register hook to reboot the robot after exiting this tool (regardless of
-    # whether this process exits normally or not)
-    atexit.register(notify_and_restart)
     main()

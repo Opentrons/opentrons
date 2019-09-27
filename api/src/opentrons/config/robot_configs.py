@@ -413,8 +413,6 @@ def calculate_tip_probe_hotspots(
     nozzle_safe_z = round((size_z - tip_length)
                           + tip_probe_settings.z_clearance.normal, 3)
 
-    log.info(f"SIZE Z {size_z}")
-    log.info(f"NOZZLE SAFE Z {nozzle_safe_z}")
     z_start = max(tip_probe_settings.z_clearance.deck, nozzle_safe_z)
     switch_offset = tip_probe_settings.switch_offset
     # Each list item defines axis we are probing for, starting position vector
@@ -446,7 +444,6 @@ def calculate_tip_probe_hotspots(
         tip_probe_settings.center[2] + tip_probe_settings.z_clearance.start,
         -size_z)
 
-    log.info(f"Z HOTSPOT {z}")
     return [
         neg_x,
         pos_x,
