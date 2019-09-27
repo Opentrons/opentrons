@@ -291,7 +291,7 @@ To move the robot in a straight line to the target location, you can set the mov
 
 .. warning::
 
-    Note: Moving without an arc will run the risk of colliding with things on your deck. 
+    Moving without an arc will run the risk of colliding with things on your deck. 
 
 In the below sequence of movements, first the head is moved to a well, 'direct' movements inside that well, then move on to a different well:
 
