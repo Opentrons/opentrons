@@ -412,7 +412,8 @@ def _build_con_add_cmd(ssid: str, security_type: SECURITY_TYPES,
                      'ifname', 'wlan0',
                      'type', 'wifi',
                      'con-name', ssid,
-                     'wifi.ssid', ssid]
+                     'wifi.ssid', ssid,
+                     '802-11-wireless.cloned-mac-address', 'permanent']
     if hidden:
         configure_cmd += ['wifi.hidden', 'true']
     if security_type == SECURITY_TYPES.WPA_PSK:
