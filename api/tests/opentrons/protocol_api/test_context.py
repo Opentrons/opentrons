@@ -675,6 +675,7 @@ def test_loaded_modules(loop, monkeypatch):
     assert ctx.loaded_modules[4] == mod1
     assert ctx.loaded_modules[7] == mod2
 
+
 def test_tip_length_for(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     instr = ctx.load_instrument('p20_single_gen2', 'left')
@@ -683,6 +684,7 @@ def test_tip_length_for(loop, monkeypatch):
         == (tiprack._definition['parameters']['tipLength']
             - instr.hw_pipette['tip_overlap']
             ['opentrons/geb_96_tiprack_10ul/1'])
+
 
 def test_bundled_labware(loop, get_labware_fixture):
     fake_fixed_trash = get_labware_fixture('fixture_trash')
