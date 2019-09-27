@@ -14,7 +14,8 @@ from .labware import (Well, Labware, load, get_labware_definition,
                       load_from_definition, load_module,
                       ModuleGeometry, quirks_from_any_parent,
                       ThermocyclerGeometry, OutOfTipsError,
-                      select_tiprack_from_list, filter_tipracks_to_start)
+                      select_tiprack_from_list, filter_tipracks_to_start,
+                      get_labware_definition_from_bundle)
 
 from . import geometry
 from . import transfers
@@ -90,7 +91,10 @@ class ProtocolContext(CommandPublisher):
     def __init__(self,
                  loop: asyncio.AbstractEventLoop = None,
                  hardware: hc.API = None,
-                 broker=None) -> None:
+                 broker=None,
+                 bundled_labware: Dict[str, Dict[str, Any]] = None,
+                 bundled_data: Dict[str, bytes] = None
+                 ) -> None:
         """ Build a :py:class:`.ProtocolContext`.
 
         :param loop: An event loop to use. If not specified, this ctor will
@@ -110,6 +114,9 @@ class ProtocolContext(CommandPublisher):
         self._commands: List[str] = []
         self._unsubscribe_commands = None
         self.clear_commands()
+
+        self._bundled_labware = bundled_labware
+        self.bundled_data = bundled_data
 
         if fflags.short_fixed_trash():
             trash_name = 'opentrons_1_trash_850ml_fixed'
@@ -209,7 +216,7 @@ class ProtocolContext(CommandPublisher):
             location: types.DeckLocation,
             label: str = None,
             namespace: str = None,
-            version: int = 1
+            version: int = None
     ) -> Labware:
         """ Load a labware onto the deck given its name.
 
@@ -233,7 +240,14 @@ class ProtocolContext(CommandPublisher):
         :param int version: The version of the labware definition. If
             unspecified, will use version 1.
         """
-        labware_def = get_labware_definition(load_name, namespace, version)
+        if self._bundled_labware is not None:
+            labware_def = get_labware_definition_from_bundle(
+                self._bundled_labware, load_name, namespace, version)
+        else:
+            if version is None:
+                version = 1
+            labware_def = get_labware_definition(
+                load_name, namespace, version)
         return self.load_labware_from_definition(labware_def, location, label)
 
     def load_labware_by_name(

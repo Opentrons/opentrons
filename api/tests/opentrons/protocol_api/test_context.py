@@ -675,7 +675,6 @@ def test_loaded_modules(loop, monkeypatch):
     assert ctx.loaded_modules[4] == mod1
     assert ctx.loaded_modules[7] == mod2
 
-
 def test_tip_length_for(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     instr = ctx.load_instrument('p20_single_gen2', 'left')
@@ -684,3 +683,38 @@ def test_tip_length_for(loop, monkeypatch):
         == (tiprack._definition['parameters']['tipLength']
             - instr.hw_pipette['tip_overlap']
             ['opentrons/geb_96_tiprack_10ul/1'])
+
+def test_bundled_labware(loop, get_labware_fixture):
+    fake_fixed_trash = get_labware_fixture('fixture_trash')
+    fake_fixed_trash['namespace'] = 'opentrons'
+    fake_fixed_trash['parameters']['loadName'] = \
+        'opentrons_1_trash_1100ml_fixed'
+    fake_fixed_trash['version'] = 1
+
+    fixture_96_plate = get_labware_fixture('fixture_96_plate')
+    bundled_labware = {
+        'opentrons/opentrons_1_trash_1100ml_fixed/1': fake_fixed_trash,
+        'fixture/fixture_96_plate/1': fixture_96_plate
+    }
+
+    ctx = papi.ProtocolContext(loop, bundled_labware=bundled_labware)
+    lw1 = ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
+    assert ctx.loaded_labwares[12] == ctx.fixed_trash
+    assert ctx.loaded_labwares[12]._definition == fake_fixed_trash
+    assert ctx.loaded_labwares[3] == lw1
+    assert ctx.loaded_labwares[3]._definition == fixture_96_plate
+
+
+def test_bundled_labware_missing(loop, get_labware_fixture):
+    bundled_labware = {}
+    with pytest.raises(
+        RuntimeError,
+        match='No labware found in bundle with load name opentrons_1_trash_'
+    ):
+        papi.ProtocolContext(loop, bundled_labware=bundled_labware)
+
+
+def test_bundled_data(loop):
+    bundled_data = {'foo': b'1,2,3'}
+    ctx = papi.ProtocolContext(loop, bundled_data=bundled_data)
+    assert ctx.bundled_data == bundled_data

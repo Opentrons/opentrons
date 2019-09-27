@@ -1003,6 +1003,50 @@ def delete_all_custom_labware() -> None:
         shutil.rmtree(custom_def_dir)
 
 
+def get_labware_definition_from_bundle(
+    bundled_labware: Dict[str, Dict[str, Any]],
+    load_name: str,
+    namespace: str = None,
+    version: int = None,
+) -> Dict[str, Any]:
+    """
+    Look up and return a bundled definition by ``load_name`` + ``namespace``
+    + ``version`` and return it or raise an exception. The``namespace`` and
+    ``version`` args are optional, they only have to be specified if there is
+    ambiguity (eg when multiple labware in the bundle share the same
+    ``load_name``)
+
+    :param str load_name: corresponds to 'loadName' key in definition
+    :param str namespace: The namespace the labware definition belongs to
+    :param int version: The version of the labware definition
+    :param Dict bundled_labware: A dictionary of labware definitions to search
+    """
+    load_name = load_name.lower()
+
+    bundled_candidates = [
+        b for b in bundled_labware.values()
+        if b['parameters']['loadName'] == load_name]
+    if namespace:
+        namespace = namespace.lower()
+        bundled_candidates = [
+            b for b in bundled_candidates if b['namespace'] == namespace]
+    if version:
+        bundled_candidates = [
+            b for b in bundled_candidates if b['version'] == version]
+
+    if len(bundled_candidates) == 1:
+        return bundled_candidates[0]
+    elif len(bundled_candidates) > 1:
+        raise RuntimeError(
+            f'Ambiguous labware access. Bundle contains multiple '
+            f'labware with load name {load_name}, '
+            f'namespace {namespace}, and version {version}.')
+    else:
+        raise RuntimeError(
+            f'No labware found in bundle with load name {load_name}, '
+            f'namespace {namespace}, and version {version}.')
+
+
 def get_labware_definition(
     load_name: str,
     namespace: str = None,
@@ -1019,6 +1063,7 @@ def get_labware_definition(
         will use version 1.
     """
     load_name = load_name.lower()
+
     if namespace is None:
         for fallback_namespace in [OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE]:
             try:

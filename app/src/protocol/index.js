@@ -4,6 +4,7 @@ import {
   fileToProtocolFile,
   parseProtocolData,
   filenameToMimeType,
+  fileIsBinary,
 } from './protocol-data'
 
 import type { Action, ThunkAction } from '../types'
@@ -25,6 +26,16 @@ type UploadProtocolAction = {|
 
 export type ProtocolAction = OpenProtocolAction | UploadProtocolAction
 
+const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
+  let binary = ''
+  let bytes = new Uint8Array(buffer)
+  const len = bytes.byteLength
+  for (var i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i])
+  }
+  return global.btoa(binary)
+}
+
 export function openProtocol(file: File): ThunkAction {
   return dispatch => {
     const reader = new FileReader()
@@ -35,8 +46,13 @@ export function openProtocol(file: File): ThunkAction {
     }
 
     reader.onload = () => {
-      // because we use readAsText below, reader.result will be a string
-      const contents: string = (reader.result: any)
+      // when we use readAsText below, reader.result will be a string,
+      // with readAsArrayBuffer, it will be an ArrayBuffer
+      const _contents: any = reader.result
+      const contents = fileIsBinary(protocolFile)
+        ? arrayBufferToBase64(_contents)
+        : _contents
+
       const uploadAction: UploadProtocolAction = {
         type: 'protocol:UPLOAD',
         payload: { contents, data: parseProtocolData(protocolFile, contents) },
@@ -46,7 +62,11 @@ export function openProtocol(file: File): ThunkAction {
       dispatch(uploadAction)
     }
 
-    reader.readAsText(file)
+    if (fileIsBinary(protocolFile)) {
+      reader.readAsArrayBuffer(file)
+    } else {
+      reader.readAsText(file)
+    }
     return dispatch(openAction)
   }
 }

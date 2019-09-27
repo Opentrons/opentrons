@@ -458,8 +458,11 @@ class TransferPlan:
             -> Touch tip -> Dispense air gap -> Dispense -> Mix if empty ->
             -> Blow out -> Touch tip -> Drop tip*
         """
+        # reform source target lists
+        sources, dests = self._extend_source_target_lists(
+            self._sources, self._dests)
         plan_iter = self._expand_for_volume_constraints(
-            self._volumes, zip(self._sources, self._dests),
+            self._volumes, zip(sources, dests),
             self._instr.max_volume
             - self._strategy.disposal_volume
             - self._strategy.air_gap)
@@ -477,6 +480,26 @@ class TransferPlan:
                 yield from self._dispense_actions(vol, dest)
                 xferred_vol += vol
             yield from self._new_tip_action()
+
+    @staticmethod
+    def _extend_source_target_lists(
+            sources: List[Well],
+            targets: List[Well]):
+        """Extend source or target list to match the length of the other
+        """
+        if len(sources) < len(targets):
+            if len(targets) % len(sources) != 0:
+                raise ValueError(
+                    'Source and destination lists must be divisible')
+            sources = [source for source in sources
+                       for i in range(int(len(targets)/len(sources)))]
+        elif len(sources) > len(targets):
+            if len(sources) % len(targets) != 0:
+                raise ValueError(
+                    'Source and destination lists must be divisible')
+            targets = [target for target in targets
+                       for i in range(int(len(sources)/len(targets)))]
+        return sources, targets
 
     def _plan_distribute(self):
         """

@@ -1,10 +1,10 @@
 import asyncio
+import base64
 from copy import copy
 from functools import reduce, wraps
 import logging
 from time import time
 from uuid import uuid4
-
 from opentrons.broker import Broker
 from opentrons.legacy_api.containers import get_container, location_to_list
 from opentrons.legacy_api.containers.placeable import (
@@ -43,7 +43,8 @@ def _motion_lock(func):
 
 
 class SessionManager(object):
-    def __init__(self, hardware, loop=None, broker=None, lock=None):
+    def __init__(
+            self, hardware, loop=None, broker=None, lock=None):
         self._broker = broker or Broker()
         self._loop = loop or asyncio.get_event_loop()
         self.session = None
@@ -59,19 +60,20 @@ class SessionManager(object):
                       adapters.SynchronousAdapter):
             self._hardware.join()
 
-    def create(self, name, text):
+    def create(self, name, contents, is_binary=False):
         if self._session_lock:
             raise Exception(
                 'Cannot create session while simulation in progress')
 
         self._session_lock = True
         try:
+            _contents = base64.b64decode(contents) if is_binary else contents
             session_short_id = hex(uuid4().fields[0])
             session_logger = self._command_logger.getChild(session_short_id)
             self._broker.set_logger(session_logger)
             self.session = Session.build_and_prep(
                 name=name,
-                text=text,
+                contents=_contents,
                 hardware=self._hardware,
                 loop=self._loop,
                 broker=self._broker,
@@ -99,20 +101,22 @@ class Session(object):
     TOPIC = 'session'
 
     @classmethod
-    def build_and_prep(cls, name, text, hardware, loop, broker, motion_lock):
-        sess = cls(name, text, hardware, loop, broker, motion_lock)
+    def build_and_prep(
+        cls, name, contents, hardware, loop, broker, motion_lock
+    ):
+        protocol = parse(contents, filename=name)
+        sess = cls(name, protocol, hardware, loop, broker, motion_lock)
         sess.prepare()
         return sess
 
-    def __init__(self, name, text, hardware, loop, broker, motion_lock):
+    def __init__(self, name, protocol, hardware, loop, broker, motion_lock):
         self._broker = broker
         self._default_logger = self._broker.logger
         self._sim_logger = self._broker.logger.getChild('sim')
         self._run_logger = self._broker.logger.getChild('run')
         self._loop = loop
         self.name = name
-        self.protocol_text = text
-        self._protocol = None
+        self._protocol = protocol
         self._hardware = hardware
         self._simulating_ctx = ProtocolContext(
             loop=self._loop, broker=self._broker)
@@ -228,9 +232,17 @@ class Session(object):
                      for mod in self._hardware.attached_modules.values()],
                     strict_attached_instruments=False)
                 sim.home()
-                self._simulating_ctx = ProtocolContext(self._loop,
-                                                       sim,
-                                                       self._broker)
+                bundled_data = None
+                bundled_labware = None
+                if isinstance(self._protocol, PythonProtocol):
+                    bundled_data = self._protocol.bundled_data
+                    bundled_labware = self._protocol.bundled_labware
+                self._simulating_ctx = ProtocolContext(
+                    loop=self._loop,
+                    hardware=sim,
+                    broker=self._broker,
+                    bundled_labware=bundled_labware,
+                    bundled_data=bundled_data)
                 run_protocol(self._protocol,
                              simulate=True,
                              context=self._simulating_ctx)
@@ -269,7 +281,6 @@ class Session(object):
 
     def refresh(self):
         self._reset()
-        self._protocol = parse(self.protocol_text, self.name)
         self.api_level = 2 if ff.use_protocol_api_v2() else 1
         # self.metadata is exposed via jrpc
         if isinstance(self._protocol, PythonProtocol):
@@ -356,9 +367,16 @@ class Session(object):
             self.resume()
             self._pre_run_hooks()
             if ff.use_protocol_api_v2():
+                bundled_data = None
+                bundled_labware = None
+                if isinstance(self._protocol, PythonProtocol):
+                    bundled_data = self._protocol.bundled_data
+                    bundled_labware = self._protocol.bundled_labware
                 self._hardware.cache_instruments()
-                ctx = ProtocolContext(
-                    loop=self._loop, broker=self._broker)
+                ctx = ProtocolContext(loop=self._loop,
+                                      broker=self._broker,
+                                      bundled_labware=bundled_labware,
+                                      bundled_data=bundled_data)
                 ctx.connect(self._hardware)
                 ctx.home()
                 run_protocol(self._protocol, context=ctx)

@@ -177,7 +177,8 @@ The final volumes can also be read from a CSV, and opened by your protocol.
 Precision Pipetting
 *******************
 
-This example shows how to deposit liquid around the edge of a well.
+This example shows how to deposit liquid around the edge of a well using
+:py:meth:`.Placeable.from_center` to specify locations within a well.
 
 .. code-block:: python
 

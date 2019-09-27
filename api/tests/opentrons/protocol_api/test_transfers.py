@@ -134,6 +134,98 @@ def test_default_transfers(_instr_labware):
     assert consd_plan_list == exp3
 
 
+def test_uneven_transfers(_instr_labware):
+    _instr_labware['ctx'].home()
+    lw1 = _instr_labware['lw1']
+    lw2 = _instr_labware['lw2']
+
+    options = tx.TransferOptions()
+    options = options._replace(
+        transfer=options.transfer._replace(
+            new_tip=TransferTipPolicy.NEVER))
+
+    # ========== One-to-Many ==========
+    xfer_plan = tx.TransferPlan(
+        100, lw1.columns()[0][0], lw2.columns()[1][:4],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        mode='transfer', options=options)
+    one_to_many_plan_list = []
+    for step in xfer_plan:
+        one_to_many_plan_list.append(step)
+    exp1 = [{'method': 'aspirate', 'args': [100, lw1.columns()[0][0], 1.0],
+            'kwargs': {}},
+            {'method': 'dispense', 'args': [100, lw2.columns()[1][0], 1.0],
+            'kwargs': {}},
+            {'method': 'aspirate', 'args': [100, lw1.columns()[0][0], 1.0],
+            'kwargs': {}},
+            {'method': 'dispense', 'args': [100, lw2.columns()[1][1], 1.0],
+            'kwargs': {}},
+            {'method': 'aspirate', 'args': [100, lw1.columns()[0][0], 1.0],
+            'kwargs': {}},
+            {'method': 'dispense', 'args': [100, lw2.columns()[1][2], 1.0],
+            'kwargs': {}},
+            {'method': 'aspirate', 'args': [100, lw1.columns()[0][0], 1.0],
+            'kwargs': {}},
+            {'method': 'dispense', 'args': [100, lw2.columns()[1][3], 1.0],
+            'kwargs': {}}]
+    assert one_to_many_plan_list == exp1
+
+    # ========== Few-to-Many ==========
+    xfer_plan = tx.TransferPlan(
+        [100, 90, 80, 70], lw1.columns()[0][:2], lw2.columns()[1][:4],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        mode='transfer', options=options)
+    few_to_many_plan_list = []
+    for step in xfer_plan:
+        few_to_many_plan_list.append(step)
+    exp2 = [{'method': 'aspirate', 'args': [100, lw1.columns()[0][0], 1.0],
+            'kwargs': {}},
+            {'method': 'dispense', 'args': [100, lw2.columns()[1][0], 1.0],
+            'kwargs': {}},
+            {'method': 'aspirate', 'args': [90, lw1.columns()[0][0], 1.0],
+            'kwargs': {}},
+            {'method': 'dispense', 'args': [90, lw2.columns()[1][1], 1.0],
+            'kwargs': {}},
+            {'method': 'aspirate', 'args': [80, lw1.columns()[0][1], 1.0],
+            'kwargs': {}},
+            {'method': 'dispense', 'args': [80, lw2.columns()[1][2], 1.0],
+            'kwargs': {}},
+            {'method': 'aspirate', 'args': [70, lw1.columns()[0][1], 1.0],
+            'kwargs': {}},
+            {'method': 'dispense', 'args': [70, lw2.columns()[1][3], 1.0],
+            'kwargs': {}}]
+    assert few_to_many_plan_list == exp2
+
+    # ========== Many-to-One ==========
+    xfer_plan = tx.TransferPlan(
+        [100, 90, 80, 70], lw1.columns()[0][:4], lw2.columns()[1][0],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        mode='transfer', options=options)
+    many_to_one_plan_list = []
+    for step in xfer_plan:
+        many_to_one_plan_list.append(step)
+    exp3 = [{'method': 'aspirate', 'args': [100, lw1.columns()[0][0], 1.0],
+            'kwargs': {}},
+            {'method': 'dispense', 'args': [100, lw2.columns()[1][0], 1.0],
+            'kwargs': {}},
+            {'method': 'aspirate', 'args': [90, lw1.columns()[0][1], 1.0],
+            'kwargs': {}},
+            {'method': 'dispense', 'args': [90, lw2.columns()[1][0], 1.0],
+            'kwargs': {}},
+            {'method': 'aspirate', 'args': [80, lw1.columns()[0][2], 1.0],
+            'kwargs': {}},
+            {'method': 'dispense', 'args': [80, lw2.columns()[1][0], 1.0],
+            'kwargs': {}},
+            {'method': 'aspirate', 'args': [70, lw1.columns()[0][3], 1.0],
+            'kwargs': {}},
+            {'method': 'dispense', 'args': [70, lw2.columns()[1][0], 1.0],
+            'kwargs': {}}]
+    assert many_to_one_plan_list == exp3
+
+
 def test_no_new_tip(_instr_labware):
     _instr_labware['ctx'].home()
     lw1 = _instr_labware['lw1']

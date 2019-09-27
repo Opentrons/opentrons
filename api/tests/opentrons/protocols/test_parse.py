@@ -210,3 +210,46 @@ def test_parse_json_details(get_json_protocol_fixture,
     assert parsed.filename == fname
     assert parsed.contents == json.loads(protocol)
     parsed.schema_version == int(protocol_details[0])
+
+
+@pytest.mark.api2_only
+def test_parse_bundle_details(get_bundle_fixture, ensure_api2):
+    fixture = get_bundle_fixture('simple_bundle')
+    filename = fixture['filename']
+
+    parsed = parse(fixture['binary_zipfile'], filename)
+
+    assert isinstance(parsed, PythonProtocol)
+    assert parsed.filename == filename
+    assert parsed.bundled_labware == fixture['bundled_labware']
+    assert parsed.bundled_python == fixture['bundled_python']
+    assert parsed.bundled_data == fixture['bundled_data']
+    assert parsed.metadata == fixture['metadata']
+    assert parsed.api_level == '2'
+
+
+@pytest.mark.api2_only
+def test_parse_bundle_no_root_files(get_bundle_fixture, ensure_api2):
+    fixture = get_bundle_fixture('no_root_files_bundle')
+    filename = fixture['filename']
+    with pytest.raises(RuntimeError,
+                       match='No files found in ZIP file\'s root directory'):
+        parse(fixture['binary_zipfile'], filename)
+
+
+@pytest.mark.api2_only
+def test_parse_bundle_no_entrypoint_protocol(get_bundle_fixture, ensure_api2):
+    fixture = get_bundle_fixture('no_entrypoint_protocol_bundle')
+    filename = fixture['filename']
+    with pytest.raises(RuntimeError,
+                       match='Bundled protocol should have a'):
+        parse(fixture['binary_zipfile'], filename)
+
+
+@pytest.mark.api2_only
+def test_parse_bundle_conflicting_labware(get_bundle_fixture, ensure_api2):
+    fixture = get_bundle_fixture('conflicting_labware_bundle')
+    filename = fixture['filename']
+    with pytest.raises(RuntimeError,
+                       match='Conflicting labware in bundle'):
+        parse(fixture['binary_zipfile'], filename)

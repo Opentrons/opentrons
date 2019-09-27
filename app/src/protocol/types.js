@@ -22,4 +22,4 @@ export type ProtocolState = {
   data: ?ProtocolData,
 }
 
-export type ProtocolType = 'json' | 'python'
+export type ProtocolType = 'json' | 'python' | 'zip'

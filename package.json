@@ -116,8 +116,5 @@
     "webpack-merge": "^4.2.2",
     "worker-loader": "^2.0.0",
     "ws": "7.1.2"
-  },
-  "resolutions": {
-    "watchpack": "^2.0.0-beta.7"
   }
 }
