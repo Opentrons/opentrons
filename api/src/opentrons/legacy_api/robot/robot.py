@@ -5,7 +5,7 @@ from functools import lru_cache
 from threading import Lock
 from typing import Dict, Any
 
-from numpy import add, subtract  # type: ignore
+from numpy import add, subtract, array  # type: ignore
 
 from opentrons import commands, drivers
 from opentrons.commands import CommandPublisher
@@ -143,6 +143,7 @@ class Robot(CommandPublisher):
         self._commands = []
         self._unsubscribe_commands = None
         self._smoothie_lock = Lock()
+        self._gantry_cal_id = None
         self.reset()
 
     def __del__(self):
@@ -198,12 +199,13 @@ class Robot(CommandPublisher):
         >>> from opentrons import robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         """
+        self._gantry_cal_id = id(self.config.gantry_calibration)
         self._actuators = {
             'left': {
                 'carriage': Mover(
                     driver=self._driver,
                     src=pose_tracker.ROOT,
-                    dst=id(self.config.gantry_calibration),
+                    dst=self._gantry_cal_id,
                     axis_mapping={'z': 'Z'}),
                 'plunger': Mover(
                     driver=self._driver,
@@ -215,7 +217,7 @@ class Robot(CommandPublisher):
                 'carriage': Mover(
                     driver=self._driver,
                     src=pose_tracker.ROOT,
-                    dst=id(self.config.gantry_calibration),
+                    dst=self._gantry_cal_id,
                     axis_mapping={'z': 'A'}),
                 'plunger': Mover(
                     driver=self._driver,
@@ -362,7 +364,7 @@ class Robot(CommandPublisher):
             driver=driver,
             axis_mapping={'x': 'X', 'y': 'Y'},
             src=pose_tracker.ROOT,
-            dst=id(self.config.gantry_calibration)
+            dst=self._gantry_cal_id
         )
 
         # Extract only transformation component
@@ -371,9 +373,9 @@ class Robot(CommandPublisher):
 
         self.poses = pose_tracker.bind(self.poses) \
             .add(
-                obj=id(self.config.gantry_calibration),
+                obj=self._gantry_cal_id,
                 transform=self.config.gantry_calibration) \
-            .add(obj=self.gantry, parent=id(self.config.gantry_calibration)) \
+            .add(obj=self.gantry, parent=self._gantry_cal_id) \
             .add(obj=left_carriage, parent=self.gantry) \
             .add(obj=right_carriage, parent=self.gantry) \
             .add(
@@ -1084,6 +1086,16 @@ class Robot(CommandPublisher):
         `robot.update_config(name='Grace Hopper')` will update the `name` key
         of the configuration.
         """
+        # Deck CLI tool needs to update the pose_tracker in real time to
+        # successfully save tip probe center. Here, update the position
+        # with freshly determined deck transform.
+
+        if 'gantry_calibration' in kwargs:
+            self.poses = pose_tracker.update(
+                self.poses,
+                self._gantry_cal_id,
+                point=pose_tracker.Point(0, 0, 0),
+                transform=array(kwargs['gantry_calibration']))
         self.config = self.config._replace(**kwargs)
 
     def set_config(self, config):
