@@ -485,7 +485,7 @@ def thermocycler_close():
 
 
 def delay(seconds, minutes, msg=None):
-    text = "Delaying for {minutes}m {seconds}s"
+    text = f"Delaying for {minutes}m {seconds}s"
     if msg:
         text = f"{text}. {msg}"
     return make_command(

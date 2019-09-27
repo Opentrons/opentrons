@@ -692,7 +692,6 @@ def test_bundled_labware(loop, get_labware_fixture):
     fake_fixed_trash['parameters']['loadName'] = \
         'opentrons_1_trash_1100ml_fixed'
     fake_fixed_trash['version'] = 1
-
     fixture_96_plate = get_labware_fixture('fixture_96_plate')
     bundled_labware = {
         'opentrons/opentrons_1_trash_1100ml_fixed/1': fake_fixed_trash,
@@ -700,6 +699,15 @@ def test_bundled_labware(loop, get_labware_fixture):
     }
 
     ctx = papi.ProtocolContext(loop, bundled_labware=bundled_labware)
+    lw1 = ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
+    assert ctx.loaded_labwares[12] == ctx.fixed_trash
+    assert ctx.loaded_labwares[12]._definition == fake_fixed_trash
+    assert ctx.loaded_labwares[3] == lw1
+    assert ctx.loaded_labwares[3]._definition == fixture_96_plate
+
+    ctx = papi.ProtocolContext(loop)
+
+    ctx.set_bundle_contents(bundled_labware, None, None)
     lw1 = ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
     assert ctx.loaded_labwares[12] == ctx.fixed_trash
     assert ctx.loaded_labwares[12]._definition == fake_fixed_trash
@@ -714,9 +722,46 @@ def test_bundled_labware_missing(loop, get_labware_fixture):
         match='No labware found in bundle with load name opentrons_1_trash_'
     ):
         papi.ProtocolContext(loop, bundled_labware=bundled_labware)
+    ctx = papi.ProtocolContext(loop)
+    with pytest.raises(
+        RuntimeError,
+        match='No labware found in bundle with load name opentrons_1_trash_'
+    ):
+        ctx.set_bundle_contents({}, {}, {})
+
+    fake_fixed_trash = get_labware_fixture('fixture_trash')
+    fake_fixed_trash['namespace'] = 'opentrons'
+    fake_fixed_trash['parameters']['loadName'] = \
+        'opentrons_1_trash_1100ml_fixed'
+    fake_fixed_trash['version'] = 1
+    bundled_labware = {
+        'opentrons/opentrons_1_trash_1100ml_fixed/1': fake_fixed_trash,
+    }
+    with pytest.raises(
+        RuntimeError,
+        match='No labware found in bundle with load name opentrons_1_trash_'
+    ):
+        ctx.set_bundle_contents({}, None, bundled_labware)
 
 
 def test_bundled_data(loop):
     bundled_data = {'foo': b'1,2,3'}
     ctx = papi.ProtocolContext(loop, bundled_data=bundled_data)
     assert ctx.bundled_data == bundled_data
+    bundled_2 = {'bar': b'hey'}
+    ctx.set_bundle_contents(None, bundled_2, None)
+    assert ctx.bundled_data == bundled_2
+    ctx = papi.ProtocolContext(loop)
+    ctx.set_bundle_contents(None, bundled_data, None)
+    assert ctx.bundled_data == bundled_data
+
+
+def test_extra_labware(loop, get_labware_fixture):
+    fixture_96_plate = get_labware_fixture('fixture_96_plate')
+    bundled_labware = {
+        'fixture/fixture_96_plate/1': fixture_96_plate
+    }
+    ctx = papi.ProtocolContext(loop, extra_labware=bundled_labware)
+    ls1 = ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
+    assert ctx.loaded_labwares[3] == ls1
+    assert ctx.loaded_labwares[3]._definition == fixture_96_plate

@@ -233,17 +233,10 @@ class Session(object):
                      for mod in self._hardware.attached_modules.values()],
                     strict_attached_instruments=False)
                 sim.home()
-                bundled_data = None
-                bundled_labware = None
-                if isinstance(self._protocol, PythonProtocol):
-                    bundled_data = self._protocol.bundled_data
-                    bundled_labware = self._protocol.bundled_labware
                 self._simulating_ctx = ProtocolContext(
                     loop=self._loop,
                     hardware=sim,
-                    broker=self._broker,
-                    bundled_labware=bundled_labware,
-                    bundled_data=bundled_data)
+                    broker=self._broker)
                 run_protocol(self._protocol,
                              simulate=True,
                              context=self._simulating_ctx)

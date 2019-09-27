@@ -407,7 +407,6 @@ def test_uris():
     details = ('opentrons', 'opentrons_96_tiprack_300ul', '1')
     uri = 'opentrons/opentrons_96_tiprack_300ul/1'
     assert labware.uri_from_details(*details) == uri
-    assert labware.details_from_uri(uri) == details
     defn = labware.get_labware_definition(details[1], details[0], details[2])
     assert labware.uri_from_definition(defn) == uri
     lw = labware.Labware(defn, Location(Point(0, 0, 0), 'Test Slot'))

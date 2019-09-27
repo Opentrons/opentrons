@@ -36,7 +36,7 @@ Session = namedtuple(
 
 Protocol = namedtuple(
     'Protocol',
-    ['text', 'filename'])
+    ['text', 'filename', 'filelike'])
 
 
 @pytest.fixture(autouse=True)
@@ -178,6 +178,12 @@ def ensure_api2(request, loop):
         yield
 
 
+@pytest.fixture
+def ensure_api1(request, loop):
+    with using_api1(loop):
+        yield
+
+
 @contextlib.contextmanager
 def using_api1(loop):
     oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
@@ -260,9 +266,10 @@ def protocol(request):
 
     filename = os.path.join(os.path.dirname(__file__), 'data', root)
 
-    with open(filename) as file:
-        text = ''.join(list(file))
-        return Protocol(text=text, filename=filename)
+    file = open(filename)
+    text = ''.join(list(file))
+    file.seek(0)
+    return Protocol(text=text, filename=filename, filelike=file)
 
 
 @pytest.fixture(params=["no_clear_tips.py"])
@@ -274,9 +281,9 @@ def tip_clear_protocol(request):
 
     filename = os.path.join(os.path.dirname(__file__), 'data', root)
 
-    with open(filename) as file:
-        text = ''.join(list(file))
-        return Protocol(text=text, filename=filename)
+    file = open(filename)
+    text = ''.join(list(file))
+    return Protocol(text=text, filename=filename, filelike=file)
 
 
 @pytest.fixture
@@ -547,10 +554,12 @@ def get_bundle_fixture():
         bundled_python, bundled_data, metadata) for the tests to use in
         their assertions.
         """
-        result = {'filename': f'{fixture_name}.zip'}
         fixture_dir = (
             pathlib.Path(__file__).parent / 'protocols' /
             'fixtures' / 'bundled_protocols' / fixture_name)
+
+        result = {'filename': f'{fixture_name}.zip',
+                  'source_dir': fixture_dir}
 
         fixed_trash_def = get_std_labware('opentrons_1_trash_1100ml_fixed')
 
@@ -587,6 +596,8 @@ def get_bundle_fixture():
                            result['bundled_data']['data.txt'])
             binary_zipfile.seek(0)
             result['binary_zipfile'] = binary_zipfile.read()
+            binary_zipfile.seek(0)
+            result['filelike'] = binary_zipfile
 
         elif fixture_name == 'no_root_files_bundle':
             binary_zipfile = io.BytesIO()
@@ -594,14 +605,16 @@ def get_bundle_fixture():
                 z.writestr('inner_dir/protocol.ot2.py', empty_protocol)
             binary_zipfile.seek(0)
             result['binary_zipfile'] = binary_zipfile.read()
-
+            binary_zipfile.seek(0)
+            result['filelike'] = binary_zipfile
         elif fixture_name == 'no_entrypoint_protocol_bundle':
             binary_zipfile = io.BytesIO()
             with zipfile.ZipFile(binary_zipfile, 'w') as z:
                 z.writestr('rando_pyfile_name.py', empty_protocol)
             binary_zipfile.seek(0)
             result['binary_zipfile'] = binary_zipfile.read()
-
+            binary_zipfile.seek(0)
+            result['filelike'] = binary_zipfile
         elif fixture_name == 'conflicting_labware_bundle':
             binary_zipfile = io.BytesIO()
             with zipfile.ZipFile(binary_zipfile, 'w') as z:
@@ -613,7 +626,8 @@ def get_bundle_fixture():
                 z.writestr('labware/same_plate.json', json.dumps(plate_def))
             binary_zipfile.seek(0)
             result['binary_zipfile'] = binary_zipfile.read()
-
+            binary_zipfile.seek(0)
+            result['filelike'] = binary_zipfile
         elif fixture_name == 'missing_labware_bundle':
             # parsing should fail b/c this bundle lacks labware defs.
             with open(fixture_dir / 'protocol.py', 'r') as f:
@@ -623,7 +637,8 @@ def get_bundle_fixture():
                 z.writestr('protocol.ot2.py', protocol_contents)
             binary_zipfile.seek(0)
             result['binary_zipfile'] = binary_zipfile.read()
-
+            binary_zipfile.seek(0)
+            result['filelike'] = binary_zipfile
         else:
             raise ValueError(f'get_bundle_fixture has no case to handle '
                              f'fixture "{fixture_name}"')

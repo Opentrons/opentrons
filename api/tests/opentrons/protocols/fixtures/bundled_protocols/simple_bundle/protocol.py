@@ -13,4 +13,4 @@ def run(protocol_context):
 
     for volume in csv_data.split(','):
         v = float(volume.strip())
-        pipette.transfer(v, plate.wells('A1'), plate.wells('B1'))
+        pipette.transfer(v, plate.wells('A1'), plate.wells('A4'))

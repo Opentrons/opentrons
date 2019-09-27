@@ -87,6 +87,8 @@ def _find_protocol_error(tb, proto_name):
 
 def _run_python(
         proto: PythonProtocol, context: ProtocolContext):
+    context.set_bundle_contents(
+        proto.bundled_labware, proto.bundled_data, proto.extra_labware)
     new_locs = locals()
     new_globs = globals()
     exec(proto.contents, new_globs, new_locs)
@@ -122,9 +124,15 @@ def run_protocol(protocol: Protocol,
 
     :param protocol: The :py:class:`.protocols.types.Protocol` to execute
     :param simulate: True to simulate; False to execute. If this is not an
-    OT2, ``simulate`` will be forced ``True``.
+                     OT2, ``simulate`` will be forced ``True``.
     :param context: The context to use. If ``None``, create a new
-    ProtocolContext.
+                    :py:class:`.ProtocolContext`.
+
+    .. note ::
+
+        The :py:class:`.ProtocolContext` has the bundle contents (if any)
+        inserted in it by this method.
+
     """
     if not config.IS_ROBOT:
         simulate = True  # noqa - will be used later
