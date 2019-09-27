@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.13.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.12.0...v3.13.0-alpha.0) (2019-09-27)
+
+**Note:** Version bump only for package @opentrons/update-server
+
+
+
+
+
 # [3.12.0](https://github.com/Opentrons/opentrons/compare/v3.11.4...v3.12.0) (2019-09-13)
 
 ### Bug Fixes

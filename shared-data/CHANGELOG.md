@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.13.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.12.0...v3.13.0-alpha.0) (2019-09-27)
+
+
+### Bug Fixes
+
+* **api:** apiv2: Separate tip overlap per pipette ([#4106](https://github.com/Opentrons/opentrons/issues/4106)) ([1bac2a9](https://github.com/Opentrons/opentrons/commit/1bac2a9)), closes [#4103](https://github.com/Opentrons/opentrons/issues/4103)
+
+
+### Features
+
+* **api:** Explicit cmdline and jupyter entrypoints ([#4032](https://github.com/Opentrons/opentrons/issues/4032)) ([b534096](https://github.com/Opentrons/opentrons/commit/b534096))
+* **api:** replace format with quirks for rectangular well behavior ([#4027](https://github.com/Opentrons/opentrons/issues/4027)) ([42deac2](https://github.com/Opentrons/opentrons/commit/42deac2)), closes [#3894](https://github.com/Opentrons/opentrons/issues/3894)
+* **components, app:** add custom pipette select with category support ([#3996](https://github.com/Opentrons/opentrons/issues/3996)) ([47f0713](https://github.com/Opentrons/opentrons/commit/47f0713))
+* **protocol-designer:** avoid use of labware "format" ([#4070](https://github.com/Opentrons/opentrons/issues/4070)) ([f8603a6](https://github.com/Opentrons/opentrons/commit/f8603a6)), closes [#3894](https://github.com/Opentrons/opentrons/issues/3894)
+
+
+
+
+
 # [3.12.0](https://github.com/Opentrons/opentrons/compare/v3.11.4...v3.12.0) (2019-09-13)
 
 ### Bug Fixes

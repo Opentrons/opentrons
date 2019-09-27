@@ -1,4 +1,4 @@
-# Robot OS Changes from 3.11.4 to 3.12.0
+# Robot OS Changes from 3.12.0 to 3.13.0
 
 For more details about this release, please see the full [technical change log][changelog]
 
@@ -6,20 +6,13 @@ For more details about this release, please see the full [technical change log][
 
 ## New Features
 
-- We've added definitions for various labware and tubes from [NEST Biotechnology][nest]; check them out in the [Labware Library][labware-library-nest]
-
-[nest]: https://nestbiotechnology.en.ec21.com/
-[labware-library-nest]: https://labware.opentrons.com/?manufacturer=NEST
+- Load the magdeck engage height from labware definitions
 
 ## Bug Fixes
 
-- We fixed an issue with the tip probe algorithm to correct for some middle-switch misses
-- We removed some badly behaving code that was arbitrarily causing "large" (>4.5 MB) protocol uploads and simulations to fail
-- We fixed some problems with our Jupyter notebook configuration that were broken during our operating system update in 3.11.x
-  - File deletion has been fixed
-  - Migration of pre-3.11 Jupyter Notebooks to the new location `/var/lib/jupyter/notebooks` has also been fixed
-- Removed an incorrect Network Manager setting that was blocking auto-IP detection for _all_ Ethernet interfaces instead of only the built-in one
-  - Plugging in external USB-to-Ethernet adapters to connect your OT-2 to a wired network should work again
+- Some typos in our documentation were fixed
+- Problems with pipette height following deck calibration have been fixed
+- Fix was made to hash in SSH key upload response message
 
 ## Known Issues
 

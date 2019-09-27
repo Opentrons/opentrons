@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.13.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.12.0...v3.13.0-alpha.0) (2019-09-27)
+
+
+### Bug Fixes
+
+* **app:** Disable run start button if missing modules ([#3994](https://github.com/Opentrons/opentrons/issues/3994)) ([5c75152](https://github.com/Opentrons/opentrons/commit/5c75152)), closes [#2676](https://github.com/Opentrons/opentrons/issues/2676)
+* **app,labware-library:** Upgrade to react-router 5 and fix imports ([#4084](https://github.com/Opentrons/opentrons/issues/4084)) ([5595f8d](https://github.com/Opentrons/opentrons/commit/5595f8d))
+
+
+### Features
+
+* **components, app:** add custom pipette select with category support ([#3996](https://github.com/Opentrons/opentrons/issues/3996)) ([47f0713](https://github.com/Opentrons/opentrons/commit/47f0713))
+
+
+
+
+
 # [3.12.0](https://github.com/Opentrons/opentrons/compare/v3.11.4...v3.12.0) (2019-09-13)
 
 **Note:** Version bump only for package @opentrons/components

@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.13.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.12.0...v3.13.0-alpha.0) (2019-09-27)
+
+
+### Bug Fixes
+
+* **protocol-designer:** fix tip position bug with zero ([#4079](https://github.com/Opentrons/opentrons/issues/4079)) ([be82a73](https://github.com/Opentrons/opentrons/commit/be82a73)), closes [#4057](https://github.com/Opentrons/opentrons/issues/4057)
+* **protocol-designer:** show form error state in StepItems ([#4080](https://github.com/Opentrons/opentrons/issues/4080)) ([2aa1556](https://github.com/Opentrons/opentrons/commit/2aa1556)), closes [#3678](https://github.com/Opentrons/opentrons/issues/3678)
+
+
+### Features
+
+* **protocol-designer:** avoid use of labware "format" ([#4070](https://github.com/Opentrons/opentrons/issues/4070)) ([f8603a6](https://github.com/Opentrons/opentrons/commit/f8603a6)), closes [#3894](https://github.com/Opentrons/opentrons/issues/3894)
+* **protocol-designer:** disallow standard labware def upload ([#4077](https://github.com/Opentrons/opentrons/issues/4077)) ([5670823](https://github.com/Opentrons/opentrons/commit/5670823)), closes [#4009](https://github.com/Opentrons/opentrons/issues/4009)
+
+
+
+
+
 # [3.12.0](https://github.com/Opentrons/opentrons/compare/v3.11.4...v3.12.0) (2019-09-13)
 
 ### Features
