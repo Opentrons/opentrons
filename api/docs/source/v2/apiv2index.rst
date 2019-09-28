@@ -124,7 +124,7 @@ Labware
 ^^^^^^^
 Refer to `the python docs <https://docs.python.org/3/index.html>`_ for clarification on using variables and additional information about handling labware in the :ref:`new-labware` section.
 
-The next step is defining the labware required for your protocol. You tell the protocol context about labware by calling the method ``protocol.load_labware(name, slot)``. By implimenting this, the protocol receives context about what should be present on the deck, and where.
+The next step is defining the labware required for your protocol. You tell the protocol context about labware by calling the method ``protocol.load_labware(name, slot)``. By implementing this, the protocol receives context about what should be present on the deck, and where.
 
 The name of a labware is a string that is different for each kind of labware. You can reference all available labware by using the Opentrons `Labware Library <https://labware.opentrons.com>`_.
 
