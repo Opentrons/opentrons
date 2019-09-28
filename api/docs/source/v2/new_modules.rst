@@ -15,7 +15,7 @@ our github ('link to public repo') for the most up to date methods.
 Loading your Module onto a deck
 ===============================
 Just like labware, you will also need to load in your module in order to use it
-within a protocol. To do this,  call the following *inside* the run function:
+within a protocol. To do this, call the following *inside* the run function:
 
 .. code-block:: python
 
