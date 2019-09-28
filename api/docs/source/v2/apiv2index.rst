@@ -104,7 +104,7 @@ Opentrons API version 2 protocols are structured around a function called ``run(
    def run(protocol: protocol_api.ProtocolContext):
        pass
 
-The function must be named exactly ``run`` and must take exactly one mandatory argument (we recommend ``protocol`` since this argument represents the protocol that the robot will execute and is easy to parse if another editor needs to impliment or resuse your code).
+The function must be named exactly ``run`` and must take exactly one mandatory argument (we recommend ``protocol`` since this argument represents the protocol that the robot will execute and is easy to parse if another editor needs to implement or reuse your code).
 
 The function ``run`` is the container for the code that defines your protocol. Protocols are similar to interfaces, in that they define a collection of methods an object must support.
 
