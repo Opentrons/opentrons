@@ -5,7 +5,7 @@ Pipettes
 ########
 
 Pipettes are created and attached to a defined mount (``'left'`` or ``'right'``) using the function :py:meth:`.ProtocolContext.load_instrument`
-from the ``ProtocolContext`` class  on the OT-2. This will return an ``InstrumentContext`` object. Refer to the :ref:`v2-atomic-commands` and :ref:`v2-complex-commands`
+from the ``ProtocolContext`` class on the OT-2. This will return an ``InstrumentContext`` object. Refer to the :ref:`v2-atomic-commands` and :ref:`v2-complex-commands`
 for liquid handling commands from the ``InstrumentContext`` class.
 
 This section discusses the details of creating a pipette, and the behaviors of the pipette you can alter.
