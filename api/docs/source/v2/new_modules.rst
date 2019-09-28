@@ -9,7 +9,7 @@ Hardware modules are peripherals that attach to the OT-2 to extend its capabilit
 The modules currently supported are Temperature, Magnetic and Thermocycler Module.
 
 This is not an exhaustive list of functionality for modules. Check :ref:`protocol-api-modules` or on
-our github ('link to public repo') for the most up to current methods.
+our github ('link to public repo') for the most up to date methods.
 
 
 Loading your Module onto a deck
