@@ -128,7 +128,7 @@ The next step is defining the labware required for your protocol. You tell the p
 
 The name of a labware is a string that is different for each kind of labware. You can reference all available labware by using the Opentrons `Labware Library <https://labware.opentrons.com>`_.
 
-Note:the slot is the labelled location on the deck in which you've placed the labware. The available slots are numbered from 1-11.
+Note: the slot is the labelled location on the deck in which you've placed the labware. The available slots are numbered from 1-11.
 
 Our example protocol above loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 2 (``plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)``) and an `Opentrons 300ul Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slot 1 (``tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', 1)``). These can be referenced later in the protocol as ``plate`` and ``tiprack``. 
 
