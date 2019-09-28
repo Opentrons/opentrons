@@ -37,7 +37,7 @@ Using :py:class:`.ProtocolContext`, you call all its methods just as you would i
 How To Run A Previously-Written Protocol
 +++++++++++++++++++++++++++++++++++++
 
-Any protocol written that is defined in a ``run`` function, you impliment directly in Jupyter. Copy the protocol into a cell and execute it. This won't cause the robot to move, it just makes the function available. Call the ``run`` function you just defined, and give it a :py:class:`.ProtocolContext`:
+Any protocol written that is defined in a ``run`` function, you implement directly in Jupyter. Copy the protocol into a cell and execute it. This won't cause the robot to move, it just makes the function available. Call the ``run`` function you just defined, and give it a :py:class:`.ProtocolContext`:
 
 .. code-block:: python
 
