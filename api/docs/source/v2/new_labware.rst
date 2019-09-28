@@ -59,7 +59,7 @@ Accessor Methods
 ^^^^^^^^^^^^^^^^
 As part of API Version 2, users can utilize python's data structures more easily, all labware accessor methods return either a dictionary, list or an individual well object.
 
-The table below list different methods accessible and their return values:
+The table below lists different accessible methods and their return values:
 
 +-------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 |   Method Name                       |         Returns                                                                                                   |
