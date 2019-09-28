@@ -147,7 +147,7 @@ Each of these attributes can be altered without affecting the others.
         pipette.flow_rate.dispense = 50
         # flow remains at 50 ul/s
         pipette.aspirate(50, plate['A1'])
-        # This aspurates 50 ul/s 
+        # This aspirates 50 ul/s 
         pipette.dispense(50, plate['A1'])
         # Blow out flowrate from its default
         pipette.flow_rate.blow_out = 100
