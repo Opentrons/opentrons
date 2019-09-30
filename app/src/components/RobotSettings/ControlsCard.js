@@ -6,6 +6,7 @@ import { push } from 'connected-react-router'
 
 import {
   home,
+  restartRobotServer,
   fetchRobotLights,
   setRobotLights,
   makeGetRobotLights,
@@ -28,6 +29,7 @@ type OP = {|
 type SP = {|
   lightsOn: boolean,
   homeEnabled: boolean,
+  restartEnabled: boolean,
 |}
 
 type DP = {|
@@ -38,6 +40,7 @@ type Props = {
   ...OP,
   ...SP,
   homeAll: () => mixed,
+  restartRobot: () => mixed,
   fetchLights: () => mixed,
   toggleLights: () => mixed,
   start: () => mixed,
@@ -61,6 +64,8 @@ function ControlsCard(props: Props) {
     toggleLights,
     homeAll,
     homeEnabled,
+    restartRobot,
+    restartEnabled,
     start,
   } = props
   const { name, status } = props.robot
@@ -94,6 +99,16 @@ function ControlsCard(props: Props) {
       >
         <p>Return robot to starting position.</p>
       </LabeledButton>
+      <LabeledButton
+        label="Restart robot"
+        buttonProps={{
+          onClick: restartRobot,
+          disabled: disabled || !restartEnabled,
+          children: 'Restart',
+        }}
+      >
+        <p>Restart robot.</p>
+      </LabeledButton>
       <LabeledToggle label="Lights" toggledOn={lightsOn} onClick={toggleLights}>
         <p>Control lights on deck.</p>
       </LabeledToggle>
@@ -112,6 +127,7 @@ function makeMakeStateToProps(): (state: State, ownProps: OP) => SP {
     return {
       lightsOn: !!(lights && lights.response && lights.response.on),
       homeEnabled: robot.connected === true && !isRunning,
+      restartEnabled: robot.connected === true && !isRunning,
     }
   }
 }
@@ -125,6 +141,7 @@ function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
     ...ownProps,
     ...stateProps,
     homeAll: () => dispatch(home(robot)),
+    restartRobot: () => dispatch(restartRobotServer(robot)),
     fetchLights: () => dispatch(fetchRobotLights(robot)),
     toggleLights: () => dispatch(setRobotLights(robot, !lightsOn)),
     start: () =>
