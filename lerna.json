@@ -1,10 +1,7 @@
 {
   "command": {
     "version": {
-      "allowBranch": [
-        "release_*",
-        "hotfix_*"
-      ],
+      "allowBranch": ["release_*", "hotfix_*"],
       "conventionalCommits": true,
       "exact": true,
       "includeMergedTags": true,
