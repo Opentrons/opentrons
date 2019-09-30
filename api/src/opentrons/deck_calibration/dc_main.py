@@ -21,7 +21,6 @@ from opentrons.config import (robot_configs, feature_flags,
 from opentrons.util.calibration_functions import probe_instrument
 from opentrons.util.linal import (solve, add_z, apply_transform,
                                   identity_deck_transform)
-from opentrons.util.vector import Vector
 from opentrons.util import logging_config
 
 from . import (
