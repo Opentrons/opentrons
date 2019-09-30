@@ -1,7 +1,7 @@
 {
   "command": {
     "version": {
-      "allowBranch": ["release_*", "hotfix_*"],
+      "allowBranch": ["chore_bump-*"],
       "conventionalCommits": true,
       "exact": true,
       "includeMergedTags": true,
