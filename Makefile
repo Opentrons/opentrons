@@ -118,7 +118,7 @@ format:
 
 .PHONY: lint-py
 lint-py:
-	c -C $(API_DIR) lint
+	$(MAKE) -C $(API_DIR) lint
 	$(MAKE) -C $(UPDATE_SERVER_DIR) lint
 
 .PHONY: lint-js
@@ -148,4 +148,3 @@ coverage:
 bump:
 	@echo "Bumping versions"
 	lerna version $(or $(version),prerelease)
-	$(MAKE) format
