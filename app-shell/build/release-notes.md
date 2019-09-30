@@ -11,6 +11,7 @@ For more details about this release, please see the full [technical change log][
 
 ## Bug Fixes
 
+- The Opentrons App will now disable the Run Start Button if your protocol is missing required modules.
 
 [electron-6]: https://electronjs.org/releases/stable?version=6
 

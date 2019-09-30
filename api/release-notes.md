@@ -6,13 +6,15 @@ For more details about this release, please see the full [technical change log][
 
 ## New Features
 
-- Load the magdeck engage height from labware definitions
+- You can now load the Magnetic Module engage height from labware definitions instead of these values being hardcoded.
 
 ## Bug Fixes
 
-- Some typos in our documentation were fixed
-- Problems with pipette height following deck calibration have been fixed
-- Fix was made to hash in SSH key upload response message
+- Some typos in our documentation were fixed.
+- Problems with pipette height following deck calibration have been fixed. If you ran the command-line variant of deck calibration in 3.12.0, you should rerun it after installing this update.
+- Fix was made to SSH key upload response message.
+- Fixed issues that could result in the MAC addresses of the robot's network interfaces changing over time. Disconnect from and reconnect to your current wireless network to get this change. Note that on this first disconnect and reconnect, the MAC address may change.
+- Fixed a second issue that could result in errors during attach pipette, which would manifest as unexpected homes.
 
 ## Known Issues
 
