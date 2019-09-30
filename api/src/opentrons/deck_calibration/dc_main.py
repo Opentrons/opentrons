@@ -325,10 +325,8 @@ class CLITool:
             p.instrument_mover.set_active_current(p._pick_up_current)
             p.instrument_mover.set_speed(p._pick_up_speed)
             dist = (-1 * p._pick_up_distance) + (-1 * p._pick_up_increment * i)
-            location_pickup = Vector(top[0], top[1], dist + top[2])
-            self.hardware.move_to(
-                (self.hardware.deck, location_pickup), p, 'direct')
-            self.hardware.move_to((self.hardware.deck, top), p, 'direct')
+            self.hardware._driver.move({self._current_mount: dist + top[2]})
+            self.hardware._driver.move({self._current_mount: top[2]})
             # move nozzle back up
             p.instrument_mover.pop_active_current()
             p.instrument_mover.pop_speed()
