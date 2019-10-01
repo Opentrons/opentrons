@@ -17,14 +17,6 @@ MODULE_LOG = logging.getLogger(__name__)
 def max_many(*args):
     return functools.reduce(max, args[1:], args[0])
 
-def get_item_covered_slot_keys(slot_key, item):
-    if isinstance(item, ThermocyclerGeometry):
-        return([7, 8, 10, 11])
-    elif item is not None:
-        return [slot_key]
-    else:
-        return []
-
 def plan_moves(
         from_loc: types.Location,
         to_loc: types.Location,
@@ -179,7 +171,6 @@ class Deck(UserDict):
         slot_key_int = self._check_name(key)
         item = self.data.get(slot_key_int)
 
-        print(f'\n\nkeyval: {slot_key_int} .  {val}\n\n')
         overlapping_items = self.get_collisions_for_item(slot_key_int, val)
         if item is not None:
             if slot_key_int == 12:
@@ -259,18 +250,25 @@ class Deck(UserDict):
         """ Return the definition of the loaded robot deck. """
         return self._definition['locations']['orderedSlots']
 
-    def get_collisions_for_item(self, slot_key, item: DeckItem) -> List[int]:
+    def get_collisions_for_item(self, slot_key, item: DeckItem) -> Dict:
         """ Return the loaded deck items that collide
             with the given item.
         """
-        item_slot_keys = set(get_item_covered_slot_keys(slot_key, item))
+        def get_item_covered_slot_keys(sk, i):
+            if isinstance(i, ThermocyclerGeometry):
+                return(set([7, 8, 10, 11]))
+            elif i is not None:
+                return set([sk])
+            else:
+                return set([])
+
+        item_slot_keys = get_item_covered_slot_keys(slot_key, item)
 
         colliding_items = {}
         for sk, i in self.data.items():
-            covered_sks = set(get_item_covered_slot_keys(sk, i))
+            covered_sks = get_item_covered_slot_keys(sk, i)
             if item_slot_keys.issubset(covered_sks):
                 colliding_items.setdefault(sk, []).append(i)
-        print(f'\n\nCOL: {colliding_items}\n\n')
         return colliding_items
 
 
