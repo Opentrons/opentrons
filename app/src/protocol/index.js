@@ -91,7 +91,8 @@ export function protocolReducer(
           ? { name, type: filenameToType(name), lastModified: null }
           : state.file
       const data =
-        !state.data || contents !== state.contents
+        !state.data ||
+        (typeof contents === 'string' && contents !== state.contents)
           ? parseProtocolData(file, contents, metadata)
           : state.data
 
