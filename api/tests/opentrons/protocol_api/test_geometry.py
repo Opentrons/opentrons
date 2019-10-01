@@ -31,6 +31,27 @@ def test_slot_names():
     with pytest.raises(ValueError):
         d['ahgoasia'] = 'nope'
 
+def test_slot_collisions():
+    d = Deck()
+    mod_slot = '7'
+    mod = labware.load_module('thermocycler', d.position_for(mod_slot))
+    d[mod_slot] = mod
+    with pytest.raises(ValueError):
+        d['7'] = 'not this time boyo'
+    with pytest.raises(ValueError):
+        d['8'] = 'nor this time boyo'
+    with pytest.raises(ValueError):
+        d['10'] = 'or even this time boyo'
+    with pytest.raises(ValueError):
+        d['11'] = 'def not this time though'
+
+    lw_slot = '4'
+    lw = labware.load(labware_name, d.position_for(lw_slot))
+    d[lw_slot] = lw
+
+    assert lw_slot in d
+
+
 
 def test_highest_z():
     deck = Deck()
