@@ -72,7 +72,7 @@ export const NA = 'N/A'
 
 export const LABWARE_GUIDE = 'Labware Guide'
 export const WHAT_IS_A_LABWARE_DEFINITION = 'What is a labware definition?'
-export const USING_THE_LABWARE_LIBRARY = 'Using the labware library'
+export const USING_THE_LABWARE_LIBRARY = 'Using the Labware Library'
 export const CREATING_CUSTOM_LABWARE_DEFINITIONS =
   'Creating custom labware definitions'
 export const LABWARE_CREATOR = 'Custom Labware Creator'
