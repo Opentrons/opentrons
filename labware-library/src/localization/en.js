@@ -75,3 +75,4 @@ export const WHAT_IS_A_LABWARE_DEFINITION = 'What is a labware definition?'
 export const USING_THE_LABWARE_LIBRARY = 'Using the labware library'
 export const CREATING_CUSTOM_LABWARE_DEFINITIONS =
   'Creating custom labware definitions'
+export const LABWARE_CREATOR = 'Custom Labware Creator'

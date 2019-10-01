@@ -55,6 +55,14 @@ exports[`LabwareGuide component renders 1`] = `
           Creating custom labware definitions
         </a>
       </li>
+      <li>
+        <withRouter(WrappedLink)
+          className="labware_guide_link"
+          to="/create"
+        >
+          Custom Labware Creator
+        </withRouter(WrappedLink)>
+      </li>
     </ul>
   </div>
 </section>
