@@ -40,7 +40,7 @@ exports[`LabwareGuide component renders 1`] = `
           rel="noopener noreferrer"
           target="_blank"
         >
-          Using the labware library
+          Using the Labware Library
         </a>
       </li>
       <li
@@ -54,6 +54,14 @@ exports[`LabwareGuide component renders 1`] = `
         >
           Creating custom labware definitions
         </a>
+      </li>
+      <li>
+        <Link
+          className="labware_guide_link"
+          to="/create"
+        >
+          Custom Labware Creator
+        </Link>
       </li>
     </ul>
   </div>
