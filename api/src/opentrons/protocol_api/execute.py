@@ -5,7 +5,7 @@ import sys
 from typing import Any, Callable
 
 from .contexts import ProtocolContext
-from . import execute_v1, execute_v3
+from . import execute_v3
 from opentrons import config
 from opentrons.protocols.types import PythonProtocol, Protocol
 
@@ -136,15 +136,9 @@ def run_protocol(protocol: Protocol,
     if isinstance(protocol, PythonProtocol):
         _run_python(protocol, true_context)
     else:
-        if protocol.schema_version >= 3:
+        if protocol.schema_version == 3:
             ins = execute_v3.load_pipettes_from_json(
                 true_context, protocol.contents)
             lw = execute_v3.load_labware_from_json_defs(
                 true_context, protocol.contents)
             execute_v3.dispatch_json(true_context, protocol.contents, ins, lw)
-        else:
-            ins = execute_v1.load_pipettes_from_json(
-                true_context, protocol.contents)
-            lw = execute_v1.load_labware_from_json_loadnames(
-                true_context, protocol.contents)
-            execute_v1.dispatch_json(true_context, protocol.contents, ins, lw)

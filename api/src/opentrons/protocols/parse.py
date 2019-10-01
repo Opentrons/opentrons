@@ -294,6 +294,12 @@ def _get_schema_for_protocol(version_num: int) -> Dict[Any, Any]:
 def validate_json(protocol_json: Dict[Any, Any]) -> int:
     """ Validates a json protocol and returns its schema version """
     version_num = _get_protocol_schema_version(protocol_json)
+    if version_num <= 2:
+        raise RuntimeError(
+            f'JSON protocol version {version_num} is '
+            'deprecated. Please upload your protocol into Protocol '
+            'Designer and save it to migrate the protocol to a later '
+            'version.')
     protocol_schema = _get_schema_for_protocol(version_num)
     # instruct schema how to resolve all $ref's used in protocol schemas
     schema_body = pkgutil.get_data(  # type: ignore
