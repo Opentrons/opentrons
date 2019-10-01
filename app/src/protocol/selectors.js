@@ -4,7 +4,7 @@ import startCase from 'lodash/startCase'
 import { createSelector } from 'reselect'
 import { getter } from '@thi.ng/paths'
 import { getProtocolSchemaVersion } from '@opentrons/shared-data'
-import { fileIsJson, fileToType } from './protocol-data'
+import { fileIsJson } from './protocol-data'
 import createLogger from '../logger'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -166,7 +166,7 @@ export const getProtocolLastUpdated: NumberSelector = createSelector(
 
 export const getProtocolType: ProtocolTypeSelector = createSelector(
   getProtocolFile,
-  fileToType
+  file => file?.type || null
 )
 
 export const getProtocolCreatorApp: CreatorAppSelector = createSelector(

@@ -200,7 +200,7 @@ const SPECS = [
     selector: protocol.getProtocolMethod,
     state: {
       protocol: {
-        file: { name: 'proto.json', type: 'application/json' },
+        file: { name: 'proto.json', type: 'json' },
         contents: 'fizzbuzz',
         data: null,
       },
@@ -212,7 +212,7 @@ const SPECS = [
     selector: protocol.getProtocolMethod,
     state: {
       protocol: {
-        file: { name: 'proto.py', type: 'application/json' },
+        file: { name: 'proto.json', type: 'json' },
         contents: 'fizzbuzz',
         data: { metadata: {} },
       },
@@ -224,7 +224,7 @@ const SPECS = [
     selector: protocol.getProtocolMethod,
     state: {
       protocol: {
-        file: { name: 'proto.py', type: 'application/json' },
+        file: { name: 'proto.json', type: 'json' },
         contents: 'fizzbuzz',
         data: {
           metadata: {},
@@ -241,7 +241,7 @@ const SPECS = [
     selector: protocol.getProtocolMethod,
     state: {
       protocol: {
-        file: { name: 'proto.py', type: 'application/json' },
+        file: { name: 'proto.json', type: 'json' },
         contents: 'fizzbuzz',
         data: {
           metadata: {},
