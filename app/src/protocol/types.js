@@ -10,9 +10,11 @@ export type ProtocolData =
   | { metadata: $PropertyType<SchemaV1ProtocolFile<{}>, 'metadata'> }
 // NOTE: add union of additional versions after schema is bumped
 
+export type ProtocolType = 'json' | 'python' | 'zip'
+
 export type ProtocolFile = {
   name: string,
-  type: ?string,
+  type: ?ProtocolType,
   lastModified: ?number,
 }
 
@@ -21,5 +23,3 @@ export type ProtocolState = {
   contents: ?string,
   data: ?ProtocolData,
 }
-
-export type ProtocolType = 'json' | 'python' | 'zip'

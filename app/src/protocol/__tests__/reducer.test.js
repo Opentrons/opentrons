@@ -53,7 +53,7 @@ describe('protocolReducer', () => {
       expectedState: {
         file: {
           name: 'foo.json',
-          type: 'application/json',
+          type: 'json',
           lastModified: null,
         },
         contents: '{"metadata": {}}',
@@ -74,7 +74,7 @@ describe('protocolReducer', () => {
       expectedState: {
         file: {
           name: 'foo.py',
-          type: 'text/x-python-script',
+          type: 'python',
           lastModified: null,
         },
         contents: '# foo.py',

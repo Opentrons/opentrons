@@ -3,7 +3,7 @@
 import {
   fileToProtocolFile,
   parseProtocolData,
-  filenameToMimeType,
+  filenameToType,
   fileIsBinary,
 } from './protocol-data'
 
@@ -88,7 +88,7 @@ export function protocolReducer(
       const { name, metadata, protocolText: contents } = action.payload
       const file =
         !state.file || name !== state.file.name
-          ? { name, type: filenameToMimeType(name), lastModified: null }
+          ? { name, type: filenameToType(name), lastModified: null }
           : state.file
       const data =
         !state.data || contents !== state.contents
