@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.13.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v3.13.0-alpha.2...v3.13.0-alpha.3) (2019-10-01)
+
+
+### Bug Fixes
+
+* **api:** Do not run out of memory when dumping large logs ([#4157](https://github.com/Opentrons/opentrons/issues/4157)) ([56354f2](https://github.com/Opentrons/opentrons/commit/56354f2))
+* **api:** Fix sim and exec entrypoints for bundled protocols ([#4149](https://github.com/Opentrons/opentrons/issues/4149)) ([7163924](https://github.com/Opentrons/opentrons/commit/7163924))
+* **api:** reflect protocol text over rpc ([#4152](https://github.com/Opentrons/opentrons/issues/4152)) ([dae2de5](https://github.com/Opentrons/opentrons/commit/dae2de5))
+
+
+
+
+
 # [3.13.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.13.0-alpha.1...v3.13.0-alpha.2) (2019-09-30)
 
 **Note:** Version bump only for package @opentrons/api-server
