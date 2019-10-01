@@ -17,3 +17,4 @@ discovery-client/lib/**
 # prettier
 **/package.json
 **/CHANGELOG.md
+lerna.json
