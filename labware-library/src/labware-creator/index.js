@@ -6,7 +6,12 @@ import { Formik } from 'formik'
 import mapValues from 'lodash/mapValues'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
-import { AlertItem, AlertModal, PrimaryButton } from '@opentrons/components'
+import {
+  AlertItem,
+  AlertModal,
+  PrimaryButton,
+  Icon,
+} from '@opentrons/components'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
 import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
 import {
@@ -888,32 +893,8 @@ const App = () => {
                   </Section>
                   {/* PAGE 4 */}
 
-                  <Section
-                    label="File"
-                    fieldList={['loadName', 'displayName', 'pipetteName']}
-                  >
+                  <Section label="File" fieldList={['loadName', 'displayName']}>
                     <div className={styles.flex_row}>
-                      <div className={styles.instructions_column}>
-                        <p>
-                          Files are exported as a zipped file containing 1) the
-                          labware definition as a JSON file, and 2) a test
-                          python protocol referencing the labware to help
-                          troubleshoot the accuracy of the definition on your
-                          robot. The test protocol will require a single channel
-                          pipette on the
-                          <strong> right mount</strong> of your robot.{' '}
-                          <LinkOut href={PDF_URL}>Click here</LinkOut> for
-                          instructions on running the test protocol.
-                        </p>
-                        <p>
-                          Please Note: It’s important to create a labware
-                          definition that is precise, and does not rely on
-                          excessive calibration prior to each run to achieve
-                          accuracy. In this way you&apos;ll generate labware
-                          definitions that are reusable and shareable with
-                          others inside or outside your lab.
-                        </p>
-                      </div>
                       <div className={styles.export_form_fields}>
                         <TextField
                           name="displayName"
@@ -925,23 +906,65 @@ const App = () => {
                           caption="Only lower case letters, numbers, periods, and underscores may be used"
                           inputMasks={[maskLoadName]}
                         />
-                        <div className={styles.pipette_field_wrapper}>
-                          <Dropdown
-                            name="pipetteName"
-                            options={pipetteNameOptions}
-                          />
-                        </div>
-                        <PrimaryButton
-                          className={styles.export_button}
-                          onClick={() => {
-                            if (!isValid && !showExportErrorModal) {
-                              setShowExportErrorModal(true)
-                            }
-                            handleSubmit()
-                          }}
+                      </div>
+                    </div>
+                  </Section>
+                  <Section
+                    label="Labware Test Protocol"
+                    fieldList={['pipetteName']}
+                  >
+                    <div className={cx(styles.flex_row, styles.flex_row_start)}>
+                      <div className={styles.instructions_column}>
+                        <p>
+                          Your file will be exported with a protocol that will
+                          help you test and troubleshoot your labware definition
+                          on the robot. The protocol requires a Single Channel
+                          pipette on the right mount of your robot.
+                        </p>
+                      </div>
+                      <div className={styles.pipette_field_wrapper}>
+                        <Dropdown
+                          name="pipetteName"
+                          options={pipetteNameOptions}
+                        />
+                      </div>
+                    </div>
+                    <div className={styles.export_section}>
+                      <PrimaryButton
+                        className={styles.export_button}
+                        onClick={() => {
+                          if (!isValid && !showExportErrorModal) {
+                            setShowExportErrorModal(true)
+                          }
+                          handleSubmit()
+                        }}
+                      >
+                        EXPORT FILE
+                      </PrimaryButton>
+                      <div
+                        className={cx(styles.callout, styles.export_callout)}
+                      >
+                        <h4 className={styles.test_labware_heading}>
+                          <Icon name="flask-outline" className={styles.icon} />
+                          Please test your definition file!
+                        </h4>
+
+                        <p>
+                          Use the labware test protocol contained in the
+                          downloaded file to check the accuracy of your
+                          definition. It’s important to create definitions that
+                          are precise and do not rely on excessive calibration
+                          prior to each run to achieve accuracy.
+                        </p>
+                        <p>
+                          Use the test guide to troubleshoot your definition.
+                        </p>
+                        <LinkOut
+                          href={PDF_URL}
+                          className={styles.test_guide_button}
                         >
-                          EXPORT FILE
-                        </PrimaryButton>
+                          view test guide
+                        </LinkOut>
                       </div>
                     </div>
                   </Section>

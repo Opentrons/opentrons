@@ -2,6 +2,29 @@
 @import '../styles/breakpoints.css';
 @import '../styles/spacing.css';
 
+:root {
+  --link-btn-blue: {
+    display: inline-block;
+    width: auto;
+    margin: 1.5rem 0 0.5rem;
+    padding: 1rem 2rem;
+    border-radius: 3px;
+    background-color: var(--c-blue);
+    font-size: var(--fs-body-2);
+    color: white;
+    font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
+    text-transform: uppercase;
+
+    &:hover {
+      background-color: #00f;
+    }
+
+    &:visited {
+      color: white;
+    }
+  }
+}
+
 .labware_creator {
   @apply --font-body-2-dark;
 
@@ -31,8 +54,8 @@
   }
 }
 
-.labware_creator a,
-.labware_creator a:visited {
+a,
+a:visited {
   color: var(--c-blue);
 }
 
@@ -42,24 +65,7 @@ h2 {
 }
 
 .labware_creator .labware_guide_button {
-  display: inline-block;
-  width: auto;
-  margin: 1.5rem 0 0.5rem;
-  padding: 1rem 2rem;
-  border-radius: 3px;
-  background-color: var(--c-blue);
-  font-size: var(--fs-body-2);
-  color: white;
-  font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
-  text-transform: uppercase;
-
-  &:hover {
-    background-color: #00f;
-  }
-
-  &:visited {
-    color: white;
-  }
+  @apply --link-btn-blue;
 }
 
 .start_creating_btn:focus {
@@ -103,10 +109,18 @@ h2 {
   margin: 1rem 0 3rem;
 }
 
+.flex_row_start {
+  justify-content: flex-start;
+}
+
 .new_definition_section,
 .upload_existing_section {
   flex-basis: 100%;
   flex-shrink: 0;
+}
+
+.new_definition_section {
+  border-bottom: var(--bd-light);
 }
 
 .labware_type_fields {
@@ -140,11 +154,16 @@ h2 {
   display: none;
 }
 
+.pipette_field_wrapper {
+  width: 13rem;
+}
+
 @media (--medium) {
   .new_definition_section {
     flex-basis: 45%;
     flex-shrink: 1;
     padding-right: 2rem;
+    border-bottom: none;
     border-right: var(--bd-light);
   }
 
@@ -187,10 +206,6 @@ h2 {
   .help_text {
     max-width: var(--size-50p);
   }
-
-  .pipette_field_wrapper {
-    max-width: 13rem;
-  }
 }
 
 @media (--large) {
@@ -215,4 +230,40 @@ h2 {
 
 .disabled_section {
   color: var(--c-font-disabled);
+}
+
+.export_section {
+  margin: 2rem auto;
+
+  @media (--large) {
+    max-width: var(--size-75p);
+  }
+}
+
+.export_button {
+  margin-bottom: 2rem;
+}
+
+.export_callout {
+  padding: 2rem;
+  text-align: center;
+  font-size: var(--fs-body-1);
+}
+
+.test_labware_heading {
+  @apply --center-children;
+
+  font-size: var(--fs-body-2);
+
+  & .icon {
+    height: 1.5rem;
+    margin-right: 0.5rem;
+  }
+}
+
+.test_guide_button {
+  @apply --link-btn-blue;
+
+  margin-top: 0;
+  padding: 1rem 4rem;
 }
