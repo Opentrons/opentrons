@@ -44,15 +44,19 @@ def _get_options(params: Mapping[str, str],
 
 async def _get_log_response(syslog_selector: str, record_count: int,
                             record_format: str) -> web.Response:
-
     if record_format == 'json':
-        records = await log_control.get_records_serializable(
-            syslog_selector, record_count)
-        return web.json_response(data=records)
+        records = []
+        async for ser_record in log_control.get_records_serializable(
+                syslog_selector, record_count):
+            records.append(ser_record)
+        response = web.json_response(data=records)
     else:
-        text = await log_control.get_records_text(
-            syslog_selector, record_count)
-        return web.Response(text=text)
+        text = ''
+        async for text_record in log_control.get_records_text(
+                syslog_selector, record_count):
+            text += text_record + '\n'
+        response = web.Response(text=text)
+    return response
 
 
 async def get_logs_by_id(request: web.Request) -> web.Response:

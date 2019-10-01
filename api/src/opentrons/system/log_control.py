@@ -9,14 +9,15 @@ import collections
 import datetime
 import logging
 import syslog
-from typing import Any, Deque, Dict, List, Tuple
+import time
+from typing import Any, AsyncGenerator, Deque, Dict, Tuple
 
 import systemd.journal as journal  # type: ignore
 
 
 LOG = logging.getLogger(__name__)
 
-MAX_RECORDS = 1000000
+MAX_RECORDS = 100000
 
 _SYSLOG_PRIORITY_TO_NAME = {
     syslog.LOG_EMERG: 'emergency',
@@ -31,9 +32,9 @@ _SYSLOG_PRIORITY_TO_NAME = {
 
 
 async def get_records(selector: str, record_count: int)\
-          -> Deque[Dict[str, Any]]:
+          -> AsyncGenerator[Deque[Dict[str, Any]], None]:
     """
-    Get log records up to record count.
+    Generate log records up to record count.
 
     The records are dicts from string keys to the arbitrary data provided
     by journald's interface (see
@@ -41,18 +42,18 @@ async def get_records(selector: str, record_count: int)\
 
     :return: deque[dict[str, Any]]: A deque of records
     """
-    loop = asyncio.get_event_loop()
     log_deque: Deque[Dict[str, Any]] = collections.deque(maxlen=record_count)
     with journal.Reader(journal.SYSTEM_ONLY) as r:
         r.add_match(SYSLOG_IDENTIFIER=selector)
-        last_time = loop.time()
+        then = time.monotonic()
         for record in r:
             log_deque.append(record)
-            now = loop.time()
-            if (now-last_time) > 0.1:
-                last_time = now
-                await asyncio.sleep(0.01)
-    return log_deque
+            now = time.monotonic()
+            if (now-then) > 0.1:
+                yield log_deque
+                log_deque.clear()
+                then = time.monotonic()
+        yield log_deque
 
 
 def _format_record_text(record: Dict[str, Any]) -> str:
@@ -61,15 +62,17 @@ def _format_record_text(record: Dict[str, Any]) -> str:
         f'[{dict_rec["level_name"]}]: {dict_rec["message"]}'
 
 
-async def get_records_text(selector: str, record_count: int) -> str:
+async def get_records_text(selector: str, record_count: int)\
+          -> AsyncGenerator[str, None]:
     """ Get log records as a newline-separated string of log records.
 
     Each record is a string of
 
     ``isotime logger [levelname]: message``
     """
-    records = await get_records(selector, record_count)
-    return '\n'.join([_format_record_text(record) for record in records])
+    async for record_deque in get_records(selector, record_count):
+        for record in record_deque:
+            yield _format_record_text(record)
 
 
 def _format_record_dict(record: Dict[str, Any]) -> Dict[str, Any]:
@@ -90,7 +93,8 @@ def _format_record_dict(record: Dict[str, Any]) -> Dict[str, Any]:
 
 
 async def get_records_serializable(
-        selector: str, record_count: int) -> List[Dict[str, Any]]:
+        selector: str, record_count: int)\
+        -> AsyncGenerator[Dict[str, Any], None]:
     """ Get log records in a structured format that is json serializable.
 
     Retains the syslog fields
@@ -104,8 +108,9 @@ async def get_records_serializable(
     - 'boot': the boot id, an opaque string different per boot
     - 'message': the actual message
     """
-    records = await get_records(selector, record_count)
-    return [_format_record_dict(rec) for rec in records]
+    async for record_deque in get_records(selector, record_count):
+        for record in record_deque:
+            yield _format_record_dict(record)
 
 
 async def set_syslog_level(level: str) -> Tuple[int, str, str]:
