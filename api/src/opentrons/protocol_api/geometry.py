@@ -17,11 +17,13 @@ MODULE_LOG = logging.getLogger(__name__)
 def max_many(*args):
     return functools.reduce(max, args[1:], args[0])
 
-def get_obscured_slot_keys(slot_key, item):
+def get_item_covered_slot_keys(slot_key, item):
     if isinstance(item, ThermocyclerGeometry):
         return([7, 8, 10, 11])
-    else:
+    elif item is not None:
         return [slot_key]
+    else:
+        return []
 
 def plan_moves(
         from_loc: types.Location,
@@ -176,7 +178,9 @@ class Deck(UserDict):
     def __setitem__(self, key: types.DeckLocation, val: DeckItem) -> None:
         slot_key_int = self._check_name(key)
         item = self.data.get(slot_key_int)
-        item_obscured_slot_keys = set(get_obscured_slot_keys(slot_key_int, item))
+
+        print(f'\n\nkeyval: {slot_key_int} .  {val}\n\n')
+        overlapping_items = self.get_collisions_for_item(slot_key_int, val)
         if item is not None:
             if slot_key_int == 12:
                 if 'fixedTrash' in item.parameters.get('quirks', []):
@@ -187,10 +191,11 @@ class Deck(UserDict):
             else:
                 raise ValueError(f'Deck location {key} already'
                                  f'  has an item: {self.data[slot_key_int]}')
-        elif not item_obscured_slot_keys.issubset(set(self.open_slot_keys)):
-            raise ValueError(f'Deck location {key} '
-                             'is obscured by another item,'
-                             'maybe a Thermocycler Module?')
+        elif overlapping_items:
+            flattened_overlappers = [repr(item) for sublist in
+                    overlapping_items.values() for item in sublist]
+            raise ValueError(f'Could not load {val} as deck location {key} '
+                             f'is obscured by {", ".join(flattened_overlappers)}')
         self.data[slot_key_int] = val
         self._highest_z = max(val.highest_z, self._highest_z)
 
@@ -254,17 +259,19 @@ class Deck(UserDict):
         """ Return the definition of the loaded robot deck. """
         return self._definition['locations']['orderedSlots']
 
-    @property
-    def open_slot_keys(self) -> List[int]:
-        """ The slot definitions of the currently unobscured
-            lots on the loaded robot deck.
+    def get_collisions_for_item(self, slot_key, item: DeckItem) -> List[int]:
+        """ Return the loaded deck items that collide
+            with the given item.
         """
-        obscured_slot_keys = []
-        for slot_key, item in self.data.items():
-            obscured_slot_keys.extend(
-                    get_obscured_slot_keys(slot_key, item))
+        item_slot_keys = set(get_item_covered_slot_keys(slot_key, item))
 
-        return [slot_key for slot_key in self.data
-                if slot_key not in obscured_slot_keys]
+        colliding_items = {}
+        for sk, i in self.data.items():
+            covered_sks = set(get_item_covered_slot_keys(sk, i))
+            if item_slot_keys.issubset(covered_sks):
+                colliding_items.setdefault(sk, []).append(i)
+        print(f'\n\nCOL: {colliding_items}\n\n')
+        return colliding_items
+
 
 
