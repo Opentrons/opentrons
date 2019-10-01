@@ -52,6 +52,7 @@ async def get_records(selector: str, record_count: int)\
             if (now-then) > 0.1:
                 yield log_deque
                 log_deque.clear()
+                await asyncio.sleep(0.001)
                 then = time.monotonic()
         yield log_deque
 
