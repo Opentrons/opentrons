@@ -31,6 +31,7 @@ def test_slot_names():
     with pytest.raises(ValueError):
         d['ahgoasia'] = 'nope'
 
+
 def test_slot_collisions():
     d = Deck()
     mod_slot = '7'
@@ -50,7 +51,6 @@ def test_slot_collisions():
     d[lw_slot] = lw
 
     assert lw_slot in d
-
 
 
 def test_highest_z():

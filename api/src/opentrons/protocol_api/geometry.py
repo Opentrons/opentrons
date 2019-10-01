@@ -17,6 +17,7 @@ MODULE_LOG = logging.getLogger(__name__)
 def max_many(*args):
     return functools.reduce(max, args[1:], args[0])
 
+
 def plan_moves(
         from_loc: types.Location,
         to_loc: types.Location,
@@ -184,9 +185,11 @@ class Deck(UserDict):
                                  f'  has an item: {self.data[slot_key_int]}')
         elif overlapping_items:
             flattened_overlappers = [repr(item) for sublist in
-                    overlapping_items.values() for item in sublist]
+                                     overlapping_items.values()
+                                     for item in sublist]
             raise ValueError(f'Could not load {val} as deck location {key} '
-                             f'is obscured by {", ".join(flattened_overlappers)}')
+                             'is obscured by '
+                             f'{", ".join(flattened_overlappers)}')
         self.data[slot_key_int] = val
         self._highest_z = max(val.highest_z, self._highest_z)
 
@@ -239,7 +242,6 @@ class Deck(UserDict):
                     f'module {module_name} does not have a default'
                     ' location, you must specify a slot')
 
-
     @property
     def highest_z(self) -> float:
         """ Return the tallest known point on the deck. """
@@ -250,7 +252,10 @@ class Deck(UserDict):
         """ Return the definition of the loaded robot deck. """
         return self._definition['locations']['orderedSlots']
 
-    def get_collisions_for_item(self, slot_key, item: DeckItem) -> Dict:
+    def get_collisions_for_item(self,
+                                slot_key: types.DeckLocation,
+                                item: DeckItem) -> Dict[types.DeckLocation,
+                                                        List[DeckItem]]:
         """ Return the loaded deck items that collide
             with the given item.
         """
@@ -264,12 +269,9 @@ class Deck(UserDict):
 
         item_slot_keys = get_item_covered_slot_keys(slot_key, item)
 
-        colliding_items = {}
+        colliding_items: Dict[types.DeckLocation, List[DeckItem]] = {}
         for sk, i in self.data.items():
             covered_sks = get_item_covered_slot_keys(sk, i)
             if item_slot_keys.issubset(covered_sks):
                 colliding_items.setdefault(sk, []).append(i)
         return colliding_items
-
-
-
