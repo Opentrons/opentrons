@@ -2,6 +2,7 @@
 import type { Service } from '@opentrons/discovery-client'
 import type { Config } from '../config/types'
 import type { BuildrootState, BuildrootAction } from './buildroot/types'
+import type { RobotLogsState, RobotLogsAction } from './robot-logs/types'
 import type { ShellUpdateState, ShellUpdateAction } from './update'
 
 export type Remote = {|
@@ -15,15 +16,7 @@ export type Remote = {|
 export type ShellState = {|
   update: ShellUpdateState,
   buildroot: BuildrootState,
+  robotLogs: RobotLogsState,
 |}
 
-export type ShellLogsDownloadAction = {|
-  type: 'shell:DOWNLOAD_LOGS',
-  payload: {| logUrls: Array<string> |},
-  meta: {| shell: true |},
-|}
-
-export type ShellAction =
-  | ShellUpdateAction
-  | ShellLogsDownloadAction
-  | BuildrootAction
+export type ShellAction = ShellUpdateAction | BuildrootAction | RobotLogsAction

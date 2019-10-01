@@ -11,13 +11,15 @@ import {
 } from '../../robot-api'
 
 import { CONNECTABLE } from '../../discovery'
-import { downloadLogs } from '../../shell'
+import { downloadLogs } from '../../shell/robot-logs/actions'
+import { getRobotLogsDownloading } from '../../shell/robot-logs/selectors'
 import { Portal } from '../portal'
 import {
   AlertModal,
   Card,
   LabeledButton,
   LabeledToggle,
+  Icon,
 } from '@opentrons/components'
 
 import type { State, Dispatch } from '../../types'
@@ -53,6 +55,7 @@ export default function AdvancedSettingsCard(props: Props) {
   const settings = useSelector<State, RobotSettings>(state =>
     getRobotSettingsState(state, name)
   )
+  const robotLogsDownloading = useSelector(getRobotLogsDownloading)
   const dispatch = useDispatch<Dispatch>()
   const disabled = status !== CONNECTABLE
   const logsAvailable = health && health.logs
@@ -72,8 +75,12 @@ export default function AdvancedSettingsCard(props: Props) {
       <LabeledButton
         label="Download Logs"
         buttonProps={{
-          children: 'Download',
-          disabled: disabled || !logsAvailable,
+          children: robotLogsDownloading ? (
+            <Icon name="ot-spinner" height="1em" spin />
+          ) : (
+            'Download'
+          ),
+          disabled: disabled || !logsAvailable || robotLogsDownloading,
           onClick: () => dispatch(downloadLogs(robot)),
         }}
       >
