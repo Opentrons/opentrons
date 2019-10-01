@@ -44,6 +44,12 @@ export default {
     require('../../images/geb_96_tiprack_10ul_side_view.jpg'),
     require('../../images/geb_10ul_tip_side_view.jpg'),
   ],
+  nest_1_reservoir_195ml: [
+    require('../../images/nest_1_reservoir_195ml_three_quarters.jpg'),
+  ],
+  nest_12_reservoir_15ml: [
+    require('../../images/nest_12_reservoir_15ml_three_quarters.jpg'),
+  ],
   nest_96_wellplate_100ul_pcr_full_skirt: [
     require('../../images/nest_96_wellplate_100ul_pcr_full_skirt_three_quarters.jpg'),
   ],
