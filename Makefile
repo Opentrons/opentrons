@@ -133,7 +133,7 @@ lint-json:
 # with `write error: stdout`; pipe to tee which will hopefully paper over it
 .PHONY: lint-css
 lint-css:
-	stylelint '**/*.css' $(and $(CI),| tee /dev/null)
+	stylelint '**/*.css'
 
 .PHONY: check-js
 check-js:
