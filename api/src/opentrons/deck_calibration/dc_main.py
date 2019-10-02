@@ -564,9 +564,10 @@ class CLITool:
             cached = self.hardware.get_attached_instruments()
             pip_func = None
         else:
+            from opentrons import instruments
             self.hardware.cache_instrument_models()
             cached = self.hardware.get_attached_pipettes()
-            pip_func = opentrons.instruments.pipette_by_name
+            pip_func = instruments.pipette_by_name
         for mount, attached in cached.items():
             if mount == 'left':
                 mount_key = left

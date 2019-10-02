@@ -1,6 +1,5 @@
 import pytest
 
-from opentrons.protocol_api import back_compat, ProtocolContext
 from opentrons.types import Mount
 
 

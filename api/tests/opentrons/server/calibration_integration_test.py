@@ -19,6 +19,7 @@ from opentrons.hardware_control.types import CriticalPoint
 # should be replaced with something that accurately reflects actual robot
 # operation, and then these tests should be revised to match expected reality.
 
+
 @pytest.mark.api1_only
 async def test_transform_from_moves(async_server, async_client, monkeypatch):
     test_mount, test_model = ('left', 'p300_multi_v1')
@@ -75,6 +76,8 @@ async def test_transform_from_moves(async_server, async_client, monkeypatch):
     else:
         expected1 = pt1
 
+    print(absolute(hardware.poses, pipette))
+    print(expected1)
     assert np.isclose(absolute(hardware.poses, pipette), expected1).all()
 
     # Jog to calculated position for transform

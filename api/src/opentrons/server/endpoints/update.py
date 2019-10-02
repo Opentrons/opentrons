@@ -2,7 +2,11 @@ import logging
 import asyncio
 import tempfile
 from aiohttp import web
-import opentrons
+try:
+    from opentrons import modules
+except ImportError:
+    pass
+
 
 log = logging.getLogger(__name__)
 UPDATE_TIMEOUT = 15
@@ -67,12 +71,11 @@ async def _upload_to_module(hw, serialnum, fw_filename, loop):
 
     hw.discover_modules()
     hw_mods = hw.attached_modules.values()
-
     res = {}
     for module in hw_mods:
         if module.device_info.get('serial') == serialnum:
             log.info("Module with serial {} found".format(serialnum))
-            bootloader_port = await opentrons.modules.enter_bootloader(module)
+            bootloader_port = await modules.enter_bootloader(module)
             if bootloader_port:
                 module._port = bootloader_port
             # else assume old bootloader connection on existing module port
@@ -81,8 +84,7 @@ async def _upload_to_module(hw, serialnum, fw_filename, loop):
             log.info("Flashing firmware. This will take a few seconds")
             try:
                 res = await asyncio.wait_for(
-                    opentrons.modules.update_firmware(
-                        module, fw_filename, loop),
+                    modules.update_firmware(module, fw_filename, loop),
                     UPDATE_TIMEOUT)
             except asyncio.TimeoutError:
                 return {'message': 'AVRDUDE not responding'}

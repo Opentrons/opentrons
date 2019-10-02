@@ -6,7 +6,10 @@ import logging
 from aiohttp import web
 from threading import Thread
 
-import opentrons
+try:
+    from opentrons import instruments
+except ImportError:
+    pass
 from opentrons.config import pipette_config
 from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as ff
@@ -387,6 +390,8 @@ def _move_pipette(robot, mount, model, point):
 
 
 def _fetch_or_create_pipette(robot, mount, model=None):
+
+    print(f"GLOBALS IN FETCH/CREATE {globals()}")
     existing_pipettes = robot.get_instruments()
     pipette = None
     should_remove = True
@@ -396,11 +401,11 @@ def _fetch_or_create_pipette(robot, mount, model=None):
             should_remove = False
     if pipette is None:
         if model is None:
-            pipette = opentrons.instruments.Pipette(
+            pipette = instruments.Pipette(
                 mount=mount, max_volume=1000, ul_per_mm=1000)
         else:
             config = pipette_config.load(model)
-            pipette = opentrons.instruments._create_pipette_from_config(
+            pipette = instruments._create_pipette_from_config(
                 config=config,
                 mount=mount,
                 name=model)

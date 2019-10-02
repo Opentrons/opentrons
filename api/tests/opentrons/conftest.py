@@ -1,7 +1,6 @@
 # Uncomment to enable logging during tests
 # import logging
 # from logging.config import dictConfig
-
 import asyncio
 import contextlib
 import os
@@ -26,7 +25,6 @@ from opentrons.api import models
 from opentrons.data_storage import database
 from opentrons.server import rpc
 from opentrons import config, types
-from opentrons.config import feature_flags as ff
 from opentrons.server import init
 from opentrons.deck_calibration import endpoints
 from opentrons import hardware_control as hc
@@ -144,22 +142,15 @@ def old_aspiration(monkeypatch):
 # -----end feature flag fixtures-----------
 
 
-@pytest.mark.api2
 @contextlib.contextmanager
 def using_api2(loop):
     if not os.environ.get('OT_API_FF_useProtocolApi2'):
         pytest.skip('Do not run api v1 tests here')
-    # oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
-    # os.environ['OT_API_FF_useProtocolApi2'] = '1'
     hw_manager = adapters.SingletonAdapter(loop)
     try:
         yield hw_manager
     finally:
         asyncio.ensure_future(hw_manager.reset())
-        # if None is oldenv:
-        # os.environ.pop('OT_API_FF_useProtocolApi2')
-        # else:
-        #     os.environ['OT_API_FF_useProtocolApi2'] = oldenv
         hw_manager.set_config(config.robot_configs.load())
 
 
@@ -167,18 +158,12 @@ def using_api2(loop):
 def using_sync_api2(loop):
     if not os.environ.get('OT_API_FF_useProtocolApi2'):
         pytest.skip('Do not run api v2 tests here')
-    # oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
-    # os.environ['OT_API_FF_useProtocolApi2'] = '1'
     hardware = adapters.SynchronousAdapter.build(
         API.build_hardware_controller)
     try:
         yield hardware
     finally:
         hardware.reset()
-        # if None is oldenv:
-        # os.environ.pop('OT_API_FF_useProtocolApi2')
-        # else:
-        #     os.environ['OT_API_FF_useProtocolApi2'] = oldenv
         hardware.set_config(config.robot_configs.load())
 
 
@@ -256,10 +241,10 @@ async def dc_session(request, async_server, monkeypatch, loop):
     ses = endpoints.SessionManager(hw)
     endpoints.session = ses
     monkeypatch.setattr(endpoints, 'session', ses)
-    try:
-        yield ses
-    finally:
-        endpoints.session = None
+    # try:
+    yield ses
+    # finally:
+    #     endpoints.session = None
 
 
 @pytest.mark.apiv1
@@ -302,24 +287,24 @@ def singletons(dummy_db, request, virtual_smoothie_env):
     return request.param(virtual_smoothie_env)
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def robot(singletons):
     return singletons['robot']
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def instruments(singletons):
     return singletons['instruments']
 
 
 @pytest.mark.apiv1
-@pytest.fixture
+@pytest.fixture(scope='function')
 def labware(singletons):
     return singletons['labware']
 
 
 @pytest.mark.apiv1
-@pytest.fixture
+@pytest.fixture(scope='function')
 def modules(singletons):
     return singletons['modules']
 

@@ -31,9 +31,7 @@ def test_new_containers(robot, instruments):
 def test_fixed_trash(robot, instruments):
     robot.reset()
     p300 = instruments.P300_Single(mount='right')
-    print(pose_tracker.absolute(robot.poses, p300))
     p300.move_to(p300.trash_container)
-    print(pose_tracker.absolute(robot.poses, p300))
     assert isclose(
             pose_tracker.absolute(robot.poses, p300),
             (355.0, 361.43, 85.0)).all()

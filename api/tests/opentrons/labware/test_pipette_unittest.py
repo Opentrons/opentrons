@@ -912,6 +912,7 @@ def test_transfer_single_channel(local_test_pipette, robot):
 def test_touch_tip(local_test_pipette):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
     p200.pick_up_tip()
+    old_move = p200.robot.move_to
     p200.robot.move_to = mock.Mock()
     p200.touch_tip(plate[0])
     p200.touch_tip(v_offset=-3)
@@ -976,6 +977,7 @@ def test_touch_tip(local_test_pipette):
     ]
 
     assert expected == p200.robot.move_to.mock_calls
+    p200.robot.move_to = old_move
 
 
 @pytest.mark.api1_only
@@ -1220,6 +1222,7 @@ def test_tip_tracking_return(local_test_pipette):
 @pytest.mark.api1_only
 def test_direct_movement_within_well(local_test_pipette, robot):
     trash, tiprack1, tiprack2, plate, p200 = local_test_pipette
+    old_move = robot.move_to
     robot.move_to = mock.Mock()
     p200.move_to(plate[0])
     p200.move_to(plate[0].top())
@@ -1243,6 +1246,7 @@ def test_direct_movement_within_well(local_test_pipette, robot):
             plate[2].bottom(), instrument=p200, strategy='direct')
     ]
     assert robot.move_to.mock_calls == expected
+    robot.move_to = old_move
 
 
 @pytest.mark.api1_only

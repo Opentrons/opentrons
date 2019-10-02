@@ -5,6 +5,7 @@ from tests.opentrons.conftest import state, log_by_axis
 from numpy import isclose, subtract
 from opentrons.trackers import pose_tracker
 
+
 @pytest.mark.api1_only
 @pytest.fixture
 def smoke(robot):

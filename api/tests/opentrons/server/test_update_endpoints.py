@@ -4,6 +4,7 @@ import tempfile
 import asyncio
 import pytest
 from aiohttp import web
+# from opentrons import *
 from opentrons.server import init
 from opentrons.server.endpoints import update
 from opentrons.server.endpoints import serverlib_fallback
@@ -116,6 +117,7 @@ def dummy_attached_modules(modules):
     }
 
 
+@pytest.mark.api1_only
 async def test_update_module_firmware(
         dummy_attached_modules,
         virtual_smoothie_env,
@@ -169,6 +171,7 @@ async def test_update_module_firmware(
     assert res == expected_res
 
 
+@pytest.mark.api1_only
 async def test_fail_update_module_firmware(
         dummy_attached_modules,
         virtual_smoothie_env,

@@ -253,8 +253,6 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['M114.2'],
         ['M400'],
     ]
-    # from pprint import pprint
-    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
     command_log = []
 
@@ -263,8 +261,6 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 G0.+'],
         ['M400'],
     ]
-    # from pprint import pprint
-    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
     command_log = []
 
@@ -275,8 +271,6 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
         ['M400'],
     ]
-    # from pprint import pprint
-    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
     command_log = []
 
@@ -295,8 +289,6 @@ def test_plunger_commands(smoothie, monkeypatch):
         ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005'],
         ['M400'],
     ]
-    # from pprint import pprint
-    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
 
 
@@ -345,8 +337,6 @@ def test_set_active_current(smoothie, monkeypatch):
         ['M114.2'],  # update the position
         ['M400'],
     ]
-    # from pprint import pprint
-    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
 
 
@@ -408,8 +398,6 @@ def test_set_acceleration(smoothie, monkeypatch):
         ['M204 S10000 A4 B5 C6 X1 Y2 Z3'],
         ['M400'],
     ]
-    # from pprint import pprint
-    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
 
 
@@ -833,8 +821,6 @@ def test_speed_change(robot, instruments, monkeypatch):
         ['G0F2400'],  # pipette's default dispense speed in mm/min
         ['G0F24000'],
     ]
-    # from pprint import pprint
-    # pprint(command_log)
     fuzzy_assert(result=command_log, expected=expected)
 
 
@@ -990,8 +976,6 @@ def test_unstick_axes(robot, smoothie):
         'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',  # low current C
         'M203.1 A125 B40 C40 X600 Y400 Z125'  # reset max-speeds
     ]
-    # from pprint import pprint
-    # pprint(current_log)
     assert current_log == expected
 
     def send_command_mock(self, command, timeout=None):

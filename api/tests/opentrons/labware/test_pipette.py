@@ -422,7 +422,7 @@ def test_delay_calls(monkeypatch, instruments):
 
 
 @pytest.mark.xfail
-def test_drop_tip_in_trash(virtual_smoothie_env, monkeypatch):
+def test_drop_tip_in_trash(virtual_smoothie_env, monkeypatch, instruments):
     from opentrons import robot, labware
     from opentrons.legacy_api.instruments.pipette import Pipette
     robot.reset()
