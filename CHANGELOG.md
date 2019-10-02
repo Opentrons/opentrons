@@ -3,58 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.13.0-alpha.4](https://github.com/opentrons/opentrons/compare/v3.13.0-alpha.3...v3.13.0-alpha.4) (2019-10-02)
+# [3.13.0](https://github.com/opentrons/opentrons/compare/v3.12.0...v3.13.0) (2019-10-02)
 
 
 ### Bug Fixes
 
 * **api:** Only load labware for modules from bundles ([#4162](https://github.com/opentrons/opentrons/issues/4162)) ([f3eb988](https://github.com/opentrons/opentrons/commit/f3eb988))
 * **api:** Put camera images in tempdirs ([#4163](https://github.com/opentrons/opentrons/issues/4163)) ([1411da8](https://github.com/opentrons/opentrons/commit/1411da8)), closes [#4122](https://github.com/opentrons/opentrons/issues/4122)
-
-
-
-
-
-# [3.13.0-alpha.3](https://github.com/opentrons/opentrons/compare/v3.13.0-alpha.2...v3.13.0-alpha.3) (2019-10-01)
-
-
-### Bug Fixes
-
 * **api:** Do not run out of memory when dumping large logs ([#4157](https://github.com/opentrons/opentrons/issues/4157)) ([56354f2](https://github.com/opentrons/opentrons/commit/56354f2))
 * **api:** Fix sim and exec entrypoints for bundled protocols ([#4149](https://github.com/opentrons/opentrons/issues/4149)) ([7163924](https://github.com/opentrons/opentrons/commit/7163924))
 * **api:** reflect protocol text over rpc ([#4152](https://github.com/opentrons/opentrons/issues/4152)) ([dae2de5](https://github.com/opentrons/opentrons/commit/dae2de5))
 * **app:** fix zip mimetype bug ([#4150](https://github.com/opentrons/opentrons/issues/4150)) ([9f4c357](https://github.com/opentrons/opentrons/commit/9f4c357))
-
-
-### Features
-
-* **app:** show spinner while robot logs are downloading ([#4158](https://github.com/opentrons/opentrons/issues/4158)) ([cd50c42](https://github.com/opentrons/opentrons/commit/cd50c42))
-
-
-
-
-
-# [3.13.0-alpha.2](https://github.com/opentrons/opentrons/compare/v3.13.0-alpha.1...v3.13.0-alpha.2) (2019-09-30)
-
-**Note:** Version bump only for package opentrons
-
-
-
-
-
-# [3.13.0-alpha.1](https://github.com/opentrons/opentrons/compare/v3.13.0-alpha.0...v3.13.0-alpha.1) (2019-09-30)
-
-**Note:** Version bump only for package opentrons
-
-
-
-
-
-# [3.13.0-alpha.0](https://github.com/opentrons/opentrons/compare/v3.12.0...v3.13.0-alpha.0) (2019-09-27)
-
-
-### Bug Fixes
-
 * **api:** apiv2: allow pipette name or model in cache_instruments ([#4063](https://github.com/opentrons/opentrons/issues/4063)) ([f29ab14](https://github.com/opentrons/opentrons/commit/f29ab14)), closes [#4062](https://github.com/opentrons/opentrons/issues/4062)
 * **api:** apiv2: allow transfer with uneven sources and targets  ([#4107](https://github.com/opentrons/opentrons/issues/4107)) ([036eca1](https://github.com/opentrons/opentrons/commit/036eca1))
 * **api:** apiv2: pass correct locations for mix in TransferPlan ([#4076](https://github.com/opentrons/opentrons/issues/4076)) ([067098d](https://github.com/opentrons/opentrons/commit/067098d))
@@ -84,7 +43,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **labware-library:** add Labware Creator ([#4031](https://github.com/opentrons/opentrons/issues/4031)) ([0a4aa7c](https://github.com/opentrons/opentrons/commit/0a4aa7c))
 * **protocol-designer:** avoid use of labware "format" ([#4070](https://github.com/opentrons/opentrons/issues/4070)) ([f8603a6](https://github.com/opentrons/opentrons/commit/f8603a6)), closes [#3894](https://github.com/opentrons/opentrons/issues/3894)
 * **protocol-designer:** disallow standard labware def upload ([#4077](https://github.com/opentrons/opentrons/issues/4077)) ([5670823](https://github.com/opentrons/opentrons/commit/5670823)), closes [#4009](https://github.com/opentrons/opentrons/issues/4009)
-
+* **app:** show spinner while robot logs are downloading ([#4158](https://github.com/opentrons/opentrons/issues/4158)) ([cd50c42](https://github.com/opentrons/opentrons/commit/cd50c42))
 
 
 

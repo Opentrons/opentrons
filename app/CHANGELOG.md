@@ -3,51 +3,11 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.13.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v3.13.0-alpha.3...v3.13.0-alpha.4) (2019-10-02)
-
-**Note:** Version bump only for package @opentrons/app
-
-
-
-
-
-# [3.13.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v3.13.0-alpha.2...v3.13.0-alpha.3) (2019-10-01)
-
+# [3.13.0](https://github.com/Opentrons/opentrons/compare/v3.12.0...v3.13.0) (2019-10-02)
 
 ### Bug Fixes
 
 * **app:** fix zip mimetype bug ([#4150](https://github.com/Opentrons/opentrons/issues/4150)) ([9f4c357](https://github.com/Opentrons/opentrons/commit/9f4c357))
-
-
-### Features
-
-* **app:** show spinner while robot logs are downloading ([#4158](https://github.com/Opentrons/opentrons/issues/4158)) ([cd50c42](https://github.com/Opentrons/opentrons/commit/cd50c42))
-
-
-
-
-
-# [3.13.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.13.0-alpha.1...v3.13.0-alpha.2) (2019-09-30)
-
-**Note:** Version bump only for package @opentrons/app
-
-
-
-
-
-# [3.13.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.13.0-alpha.0...v3.13.0-alpha.1) (2019-09-30)
-
-**Note:** Version bump only for package @opentrons/app
-
-
-
-
-
-# [3.13.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.12.0...v3.13.0-alpha.0) (2019-09-27)
-
-
-### Bug Fixes
-
 * **app:** Disable run start button if missing modules ([#3994](https://github.com/Opentrons/opentrons/issues/3994)) ([5c75152](https://github.com/Opentrons/opentrons/commit/5c75152)), closes [#2676](https://github.com/Opentrons/opentrons/issues/2676)
 * **app:** ensure gantry not blocking pcr seal placement ([#4071](https://github.com/Opentrons/opentrons/issues/4071)) ([01d6858](https://github.com/Opentrons/opentrons/commit/01d6858)), closes [#4034](https://github.com/Opentrons/opentrons/issues/4034)
 * **app,labware-library:** Upgrade to react-router 5 and fix imports ([#4084](https://github.com/Opentrons/opentrons/issues/4084)) ([5595f8d](https://github.com/Opentrons/opentrons/commit/5595f8d))
@@ -55,6 +15,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
+* **app:** show spinner while robot logs are downloading ([#4158](https://github.com/Opentrons/opentrons/issues/4158)) ([cd50c42](https://github.com/Opentrons/opentrons/commit/cd50c42))
 * **api:** support experimental bundle execution ([#4099](https://github.com/Opentrons/opentrons/issues/4099)) ([1c503ed](https://github.com/Opentrons/opentrons/commit/1c503ed))
 * **components, app:** add custom pipette select with category support ([#3996](https://github.com/Opentrons/opentrons/issues/3996)) ([47f0713](https://github.com/Opentrons/opentrons/commit/47f0713))
 

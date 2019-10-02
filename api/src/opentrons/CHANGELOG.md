@@ -3,52 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.13.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v3.13.0-alpha.3...v3.13.0-alpha.4) (2019-10-02)
-
+# [3.13.0](https://github.com/Opentrons/opentrons/compare/v3.12.0...v3.13.0) (2019-10-02)
 
 ### Bug Fixes
 
 * **api:** Only load labware for modules from bundles ([#4162](https://github.com/Opentrons/opentrons/issues/4162)) ([f3eb988](https://github.com/Opentrons/opentrons/commit/f3eb988))
 * **api:** Put camera images in tempdirs ([#4163](https://github.com/Opentrons/opentrons/issues/4163)) ([1411da8](https://github.com/Opentrons/opentrons/commit/1411da8)), closes [#4122](https://github.com/Opentrons/opentrons/issues/4122)
-
-
-
-
-
-# [3.13.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v3.13.0-alpha.2...v3.13.0-alpha.3) (2019-10-01)
-
-
-### Bug Fixes
-
 * **api:** Do not run out of memory when dumping large logs ([#4157](https://github.com/Opentrons/opentrons/issues/4157)) ([56354f2](https://github.com/Opentrons/opentrons/commit/56354f2))
 * **api:** Fix sim and exec entrypoints for bundled protocols ([#4149](https://github.com/Opentrons/opentrons/issues/4149)) ([7163924](https://github.com/Opentrons/opentrons/commit/7163924))
 * **api:** reflect protocol text over rpc ([#4152](https://github.com/Opentrons/opentrons/issues/4152)) ([dae2de5](https://github.com/Opentrons/opentrons/commit/dae2de5))
-
-
-
-
-
-# [3.13.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.13.0-alpha.1...v3.13.0-alpha.2) (2019-09-30)
-
-**Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-# [3.13.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.13.0-alpha.0...v3.13.0-alpha.1) (2019-09-30)
-
-**Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-# [3.13.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.12.0...v3.13.0-alpha.0) (2019-09-27)
-
-
-### Bug Fixes
-
 * **api:** apiv2: allow pipette name or model in cache_instruments ([#4063](https://github.com/Opentrons/opentrons/issues/4063)) ([f29ab14](https://github.com/Opentrons/opentrons/commit/f29ab14)), closes [#4062](https://github.com/Opentrons/opentrons/issues/4062)
 * **api:** apiv2: allow transfer with uneven sources and targets  ([#4107](https://github.com/Opentrons/opentrons/issues/4107)) ([036eca1](https://github.com/Opentrons/opentrons/commit/036eca1))
 * **api:** apiv2: pass correct locations for mix in TransferPlan ([#4076](https://github.com/Opentrons/opentrons/issues/4076)) ([067098d](https://github.com/Opentrons/opentrons/commit/067098d))
