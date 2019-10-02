@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.13.0](https://github.com/Opentrons/opentrons/compare/v3.12.0...v3.13.0) (2019-10-02)
+
+### Bug Fixes
+
+* **api:** Only load labware for modules from bundles ([#4162](https://github.com/Opentrons/opentrons/issues/4162)) ([f3eb988](https://github.com/Opentrons/opentrons/commit/f3eb988))
+* **api:** Put camera images in tempdirs ([#4163](https://github.com/Opentrons/opentrons/issues/4163)) ([1411da8](https://github.com/Opentrons/opentrons/commit/1411da8)), closes [#4122](https://github.com/Opentrons/opentrons/issues/4122)
+* **api:** Do not run out of memory when dumping large logs ([#4157](https://github.com/Opentrons/opentrons/issues/4157)) ([56354f2](https://github.com/Opentrons/opentrons/commit/56354f2))
+* **api:** Fix sim and exec entrypoints for bundled protocols ([#4149](https://github.com/Opentrons/opentrons/issues/4149)) ([7163924](https://github.com/Opentrons/opentrons/commit/7163924))
+* **api:** reflect protocol text over rpc ([#4152](https://github.com/Opentrons/opentrons/issues/4152)) ([dae2de5](https://github.com/Opentrons/opentrons/commit/dae2de5))
+* **api:** apiv2: allow pipette name or model in cache_instruments ([#4063](https://github.com/Opentrons/opentrons/issues/4063)) ([f29ab14](https://github.com/Opentrons/opentrons/commit/f29ab14)), closes [#4062](https://github.com/Opentrons/opentrons/issues/4062)
+* **api:** apiv2: allow transfer with uneven sources and targets  ([#4107](https://github.com/Opentrons/opentrons/issues/4107)) ([036eca1](https://github.com/Opentrons/opentrons/commit/036eca1))
+* **api:** apiv2: pass correct locations for mix in TransferPlan ([#4076](https://github.com/Opentrons/opentrons/issues/4076)) ([067098d](https://github.com/Opentrons/opentrons/commit/067098d))
+* **api:** apiv2: Separate tip overlap per pipette ([#4106](https://github.com/Opentrons/opentrons/issues/4106)) ([1bac2a9](https://github.com/Opentrons/opentrons/commit/1bac2a9)), closes [#4103](https://github.com/Opentrons/opentrons/issues/4103)
+* **api:** cache location before pick up tip during labware calibration ([#4033](https://github.com/Opentrons/opentrons/issues/4033)) ([8dc8bb9](https://github.com/Opentrons/opentrons/commit/8dc8bb9))
+* **api:** dont parse the smoothie response to udpate_pipette_config ([#4112](https://github.com/Opentrons/opentrons/issues/4112)) ([109cdcc](https://github.com/Opentrons/opentrons/commit/109cdcc))
+* **api:** Expand infer_version_from_metadata to catch more ([#4094](https://github.com/Opentrons/opentrons/issues/4094)) ([1f7ad77](https://github.com/Opentrons/opentrons/commit/1f7ad77)), closes [#3949](https://github.com/Opentrons/opentrons/issues/3949)
+* **api:** fix format string in module slot assertion ([#4039](https://github.com/Opentrons/opentrons/issues/4039)) ([2a88233](https://github.com/Opentrons/opentrons/commit/2a88233))
+* **api:** Fix miscellaneous bugs in deck CLI ([#4119](https://github.com/Opentrons/opentrons/issues/4119)) ([7e7196a](https://github.com/Opentrons/opentrons/commit/7e7196a))
+* **api:** Fix usage of return tip height v1 ([#4040](https://github.com/Opentrons/opentrons/issues/4040)) ([3f4ace6](https://github.com/Opentrons/opentrons/commit/3f4ace6))
+* **api:** Force the permanent mac address for wifi connections ([#4121](https://github.com/Opentrons/opentrons/issues/4121)) ([7cfa929](https://github.com/Opentrons/opentrons/commit/7cfa929))
+
+
+### Features
+
+* **api:** apiv1: load magdeck engage height from labware definitions ([#4042](https://github.com/Opentrons/opentrons/issues/4042)) ([f232659](https://github.com/Opentrons/opentrons/commit/f232659)), closes [#3832](https://github.com/Opentrons/opentrons/issues/3832)
+* **api:** apiv2: improve accessors for loaded lw/mods/instrs ([#4068](https://github.com/Opentrons/opentrons/issues/4068)) ([fc289dd](https://github.com/Opentrons/opentrons/commit/fc289dd))
+* **api:** Explicit cmdline and jupyter entrypoints ([#4032](https://github.com/Opentrons/opentrons/issues/4032)) ([b534096](https://github.com/Opentrons/opentrons/commit/b534096))
+* **api:** replace format with quirks for rectangular well behavior ([#4027](https://github.com/Opentrons/opentrons/issues/4027)) ([42deac2](https://github.com/Opentrons/opentrons/commit/42deac2)), closes [#3894](https://github.com/Opentrons/opentrons/issues/3894)
+* **api:** support experimental bundle execution ([#4099](https://github.com/Opentrons/opentrons/issues/4099)) ([1c503ed](https://github.com/Opentrons/opentrons/commit/1c503ed))
+
+
+
+
+
 # [3.12.0](https://github.com/Opentrons/opentrons/compare/v3.11.4...v3.12.0) (2019-09-13)
 
 ### Bug Fixes

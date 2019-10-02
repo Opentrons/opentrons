@@ -135,6 +135,7 @@ class Session(object):
         self.modules = None
         self.metadata = {}
         self.api_level = None
+        self.protocol_text = protocol.text
 
         self.startTime = None
         self._motion_lock = motion_lock

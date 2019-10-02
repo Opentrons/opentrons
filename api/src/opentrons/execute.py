@@ -26,7 +26,10 @@ _HWCONTROL: Optional[API] = None
 #: :py:meth:`get_protocol_api` will share
 
 
-def get_protocol_api() -> protocol_api.ProtocolContext:
+def get_protocol_api(
+        bundled_labware: Dict[str, Dict[str, Any]] = None,
+        bundled_data: Dict[str, bytes] = None
+) -> protocol_api.ProtocolContext:
     """
     Build and return a :py:class:`ProtocolContext` connected to the robot.
 
@@ -41,6 +44,18 @@ def get_protocol_api() -> protocol_api.ProtocolContext:
         >>> instr.home()
 
     When this function is called, modules and instruments will be recached.
+
+    :param bundled_labware: If specified, a mapping from labware names to
+                            labware definitions for labware to consider in the
+                            protocol. Note that if you specify this, _only_
+                            labware in this argument will be allowed in the
+                            protocol. This is preparation for a beta feature
+                            and is best not used.
+    :param bundled_data: If specified, a mapping from filenames to contents
+                         for data to be available in the protocol from
+                         :py:attr:`.ProtocolContext.bundled_data`.
+
+    :returns opentrons.protocol_api.ProtocolContext: The protocol context.
     """
     if not _HWCONTROL:
         # Build a hardware controller in a worker thread, which is necessary
@@ -63,7 +78,9 @@ def get_protocol_api() -> protocol_api.ProtocolContext:
         thread.start()
         thread.join()
 
-    context = protocol_api.ProtocolContext(hardware=_HWCONTROL)
+    context = protocol_api.ProtocolContext(hardware=_HWCONTROL,
+                                           bundled_labware=bundled_labware,
+                                           bundled_data=bundled_data)
     context._hw_manager.hardware.cache_instruments()
     context._hw_manager.hardware.discover_modules()
     return context
@@ -162,7 +179,9 @@ def execute(protocol_file: TextIO,
     contents = protocol_file.read()
     protocol = parse(contents, protocol_file.name)
     if ff.use_protocol_api_v2():
-        context = get_protocol_api()
+        context = get_protocol_api(
+            bundled_labware=getattr(protocol, 'bundled_labware', None),
+            bundled_data=getattr(protocol, 'bundled_data', None))
         if emit_runlog:
             context.broker.subscribe(
                 commands.command_types.COMMAND, emit_runlog)

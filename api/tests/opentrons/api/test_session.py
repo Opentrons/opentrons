@@ -138,6 +138,7 @@ async def test_load_and_run_v2(
     session.run()
     assert len(session.command_log) == 4, \
         "Clears command log on the next run"
+    assert session.protocol_text == protocol.text
 
 
 @pytest.mark.api1_only
@@ -183,6 +184,7 @@ async def test_load_and_run(
     session.run()
     assert len(session.command_log) == 6, \
         "Clears command log on the next run"
+    assert session.protocol_text == protocol.text
 
 
 def test_init(run_session):

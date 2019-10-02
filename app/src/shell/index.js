@@ -9,19 +9,10 @@ import createLogger from '../logger'
 import remote from './remote'
 import { updateReducer } from './update'
 import { buildrootReducer, buildrootUpdateEpic } from './buildroot'
+import { robotLogsReducer } from './robot-logs/reducer'
 
 import type { Reducer } from 'redux'
-
-import type {
-  LooseEpic,
-  ThunkAction,
-  Action,
-  ActionLike,
-  Dispatch,
-  GetState,
-} from '../types'
-
-import type { ViewableRobot } from '../discovery'
+import type { LooseEpic, Action, ActionLike } from '../types'
 import type { ShellState } from './types'
 
 const { ipcRenderer, CURRENT_VERSION, CURRENT_RELEASE_NOTES } = remote
@@ -40,6 +31,7 @@ export const shellReducer: Reducer<ShellState, Action> = combineReducers<
 >({
   update: updateReducer,
   buildroot: buildrootReducer,
+  robotLogs: robotLogsReducer,
 })
 
 export const sendActionToShellEpic: LooseEpic = action$ =>
@@ -71,19 +63,3 @@ export const shellEpic = combineEpics(
   receiveActionFromShellEpic,
   buildrootUpdateEpic
 )
-
-export function downloadLogs(robot: ViewableRobot): ThunkAction {
-  return (dispatch: Dispatch, getState: GetState) => {
-    const logPaths = robot.health && robot.health.logs
-
-    if (logPaths) {
-      const logUrls = logPaths.map(p => `http://${robot.ip}:${robot.port}${p}`)
-
-      dispatch({
-        type: 'shell:DOWNLOAD_LOGS',
-        payload: { logUrls },
-        meta: { shell: true },
-      })
-    }
-  }
-}

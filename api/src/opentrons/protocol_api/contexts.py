@@ -1948,7 +1948,9 @@ class ModuleContext(CommandPublisher):
         :param name: The name of the labware object.
         :returns: The initialized and loaded labware object.
         """
-        lw = load(name, self._geometry.location)
+        lw = load(
+            name, self._geometry.location,
+            bundled_defs=self._ctx._bundled_labware)
         return self.load_labware_object(lw)
 
     def load_labware_by_name(self, name: str) -> Labware:

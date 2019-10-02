@@ -28,19 +28,19 @@ describe('protocol actions', () => {
   describe('openProtocol with python protocol', () => {
     const pythonFile = {
       name: 'foobar.py',
-      type: 'application/x-python-code',
+      type: 'python',
       lastModified: 123,
     }
 
     const bundleFile = {
       name: 'foobar.zip',
-      type: 'application/zip',
+      type: 'zip',
       lastModified: 111,
     }
 
     const jsonFile = {
       name: 'foobar.json',
-      type: 'application/json',
+      type: 'json',
       lastModified: 456,
     }
 

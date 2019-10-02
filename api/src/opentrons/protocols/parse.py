@@ -36,10 +36,15 @@ def _parse_python(
 ) -> PythonProtocol:
     """ Parse a protocol known or at least suspected to be python """
     filename_checked = filename or '<protocol>'
+    if filename_checked.endswith('.zip'):
+        ast_filename = 'protocol.ot2.py'
+    else:
+        ast_filename = filename_checked
+
     parsed = ast.parse(protocol_contents,
-                       filename=filename_checked)
+                       filename=ast_filename)
     metadata = extract_metadata(parsed)
-    protocol = compile(parsed, filename=filename_checked, mode='exec')
+    protocol = compile(parsed, filename=ast_filename, mode='exec')
     version = infer_version(metadata, parsed)
 
     result = PythonProtocol(

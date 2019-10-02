@@ -531,7 +531,8 @@ async def set_rail_lights(request):
 
 
 async def take_picture(request):
-    filename = './picture.jpg'
+    filename = os.path.join(
+        request.app['com.opentrons.response_file_tempdir'], 'picture.jpg')
     if os.path.exists(filename):
         try:
             os.remove(filename)

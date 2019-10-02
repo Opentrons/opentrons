@@ -147,7 +147,9 @@ def simulate(protocol_file: TextIO,
     protocol = parse.parse(contents, protocol_file.name)
 
     if opentrons.config.feature_flags.use_protocol_api_v2():
-        context = opentrons.protocol_api.contexts.ProtocolContext()
+        context = opentrons.protocol_api.contexts.ProtocolContext(
+            bundled_labware=getattr(protocol, 'bundled_labware', None),
+            bundled_data=getattr(protocol, 'bundled_data', None))
         context.home()
         scraper = CommandScraper(stack_logger, log_level, context.broker)
         opentrons.protocol_api.execute.run_protocol(protocol,
