@@ -2,6 +2,8 @@
 
 import asyncio
 import logging
+import shutil
+import tempfile
 import threading
 import time
 import traceback
@@ -102,7 +104,18 @@ def init(hardware: 'HardwareAPILike' = None,
     app['com.opentrons.rpc'] = RPCServer(
         app, MainRouter(
             hardware, lock=app['com.opentrons.motion_lock']))
+    app['com.opentrons.response_file_tempdir'] = tempfile.mkdtemp()
     app['com.opentrons.http'] = HTTPServer(app, CONFIG['log_dir'])
+
+    async def dispose_response_file_tempdir(app):
+        temppath = app.get('com.opentrons.response_file_tempdir')
+        if temppath:
+            try:
+                shutil.rmtree(temppath)
+            except Exception:
+                log.exception(f"failed to remove app temp path {temppath}")
+
+    app.on_shutdown.append(dispose_response_file_tempdir)
     app.on_shutdown.freeze()
     return app
 
