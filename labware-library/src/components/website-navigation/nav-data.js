@@ -2,7 +2,6 @@
 import type {
   Link,
   Submenu,
-  ProductLinks,
   ProtocolLinks,
   SupportLinks,
   SalesLinks,
@@ -29,71 +28,71 @@ export const aboutLinkProps: Submenu = {
   ],
 }
 
-export const hardwareLinkProps: ProductLinks = {
-  robot: {
+export const hardwareLinks: Array<Link> = [
+  {
     name: 'OT-2 Robot',
     url: 'https://opentrons.com/ot-2',
     gtm: { action: 'click', category: 'l-header', label: 'ot-2' },
   },
-  pipettes: {
+  {
     name: 'OT-2 Pipettes',
     url: 'https://opentrons.com/pipettes',
     gtm: { action: 'click', category: 'l-header', label: 'ot-2-pipettes' },
   },
-  thermocycler: {
+  {
     name: 'Thermocycler Module',
     url: 'https://opentrons.com/modules#thermocycler_module',
     gtm: { action: 'click', category: 'l-header', label: 'modules' },
   },
-  magdeck: {
+  {
     name: 'Magnetic Module',
     url: 'https://opentrons.com/modules#magnetic_module',
     gtm: { action: 'click', category: 'l-header', label: 'modules' },
   },
-  tempdeck: {
+  {
     name: 'Temperature Module',
     url: 'https://opentrons.com/modules#temperature_module',
     gtm: { action: 'click', category: 'l-header', label: 'modules' },
   },
-}
+]
 
-export const labwareLinkProps: ProductLinks = {
-  plates: {
+export const labwareLinks: Array<Link> = [
+  {
     name: 'Lab Plates',
     url: 'https://shop.opentrons.com/collections/lab-plates',
     gtm: { action: 'click', category: 'l-header', label: 'tube-racks' },
   },
-  reservoirs: {
+  {
     name: 'Reservoirs',
     url: 'https://shop.opentrons.com/collections/reservoirs',
     gtm: { action: 'click', category: 'l-header', label: 'reservoirs' },
   },
-  tubeRacks: {
+  {
     name: 'Tube Racks',
     url: 'https://shop.opentrons.com/collections/racks-and-adapters',
     gtm: { action: 'click', category: 'l-header', label: 'tube-racks' },
   },
-}
+]
 
-export const consumableLinkProps: ProductLinks = {
-  tips: {
+export const consumableLinks: Array<Link> = [
+  {
     name: 'Tips & Filter Tips',
     url: 'https://shop.opentrons.com/collections/opentrons-tips',
     gtm: { action: 'click', category: 'l-header', label: 'tips' },
   },
-  reagents: {
+  {
     name: 'Reagents',
     url: 'https://shop.opentrons.com/collections/verified-reagents',
     gtm: { action: 'click', category: 'l-header', label: 'reagents' },
   },
-  tubes: {
+  {
     name: 'Tubes & Vials',
     url: 'https://shop.opentrons.com/collections/tubes',
     gtm: { action: 'click', category: 'l-header', label: 'tubes' },
   },
-}
+]
 
-export const productCTAProps: Link = {
+export const productCTALink: Link = {
   name: 'Shop All Products',
   url: 'https://shop.opentrons.com',
   cta: true,

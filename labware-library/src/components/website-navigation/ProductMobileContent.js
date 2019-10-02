@@ -1,22 +1,18 @@
 // @flow
 import * as React from 'react'
-import map from 'lodash/map'
 import NavLink from './NavLink'
 import styles from './styles.css'
 
 import {
-  hardwareLinkProps,
-  labwareLinkProps,
-  consumableLinkProps,
-  productCTAProps,
+  hardwareLinks,
+  labwareLinks,
+  consumableLinks,
+  productCTALink,
 } from './nav-data'
 
 type Props = {||}
 
 export default function ProductMobileContent(props: Props) {
-  const hardwareLinks = map(hardwareLinkProps)
-  const labwareLinks = map(labwareLinkProps)
-  const consumableLinks = map(consumableLinkProps)
   return (
     <div className={styles.product_mobile_content}>
       <div className={styles.hardware_group}>
@@ -48,7 +44,7 @@ export default function ProductMobileContent(props: Props) {
             </li>
           ))}
           <li>
-            <NavLink {...productCTAProps} className={styles.product_nav_link} />
+            <NavLink {...productCTALink} className={styles.product_nav_link} />
           </li>
         </ul>
       </div>

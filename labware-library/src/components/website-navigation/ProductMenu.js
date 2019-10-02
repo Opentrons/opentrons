@@ -1,13 +1,12 @@
 // @flow
 import * as React from 'react'
-import map from 'lodash/map'
 import styles from './styles.css'
 import NavLink from './NavLink'
 import {
-  hardwareLinkProps,
-  labwareLinkProps,
-  consumableLinkProps,
-  productCTAProps,
+  hardwareLinks,
+  labwareLinks,
+  consumableLinks,
+  productCTALink,
 } from './nav-data'
 
 type Props = {|
@@ -16,9 +15,6 @@ type Props = {|
 
 export default function ProductMenu(props: Props) {
   const { active } = props
-  const hardwareLinks = map(hardwareLinkProps)
-  const labwareLinks = map(labwareLinkProps)
-  const consumableLinks = map(consumableLinkProps)
   return (
     <>
       <span>Products</span>
@@ -49,12 +45,12 @@ export default function ProductMenu(props: Props) {
             </div>
           </div>
           <a
-            href={productCTAProps.url}
+            href={productCTALink.url}
             className={styles.bottom_link_center}
             target="_blank"
             rel="noopener noreferrer"
           >
-            {productCTAProps.name} ›
+            {productCTALink.name} ›
           </a>
         </div>
       )}

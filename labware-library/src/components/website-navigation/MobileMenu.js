@@ -4,10 +4,8 @@ import cx from 'classnames'
 import { Icon } from '@opentrons/components'
 import styles from './styles.css'
 
-import type { Submenu } from './types'
-
 type Props = {|
-  ...Submenu,
+  name: string,
   active: boolean,
   children?: React.Node,
   onClick: () => mixed,
