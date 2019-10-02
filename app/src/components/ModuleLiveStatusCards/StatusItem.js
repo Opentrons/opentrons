@@ -6,7 +6,7 @@ type Props = { status: string }
 
 export default function StatusItem(props: Props) {
   return (
-    <div>
+    <div className={styles.status_item_wrapper}>
       <span className={styles.label}>Status: </span>
       <span className={styles.value}>{props.status}</span>
     </div>

@@ -1,0 +1,34 @@
+// @flow
+import * as React from 'react'
+import styles from './styles.css'
+
+type TemperatureDataProps = {|
+  title: string,
+  current: number,
+  target: ?number,
+  className: string,
+|}
+const TemperatureData = ({
+  title,
+  current,
+  target,
+  className,
+}: TemperatureDataProps) => (
+  <div className={className}>
+    <p className={styles.label}>{title}</p>
+    <div className={styles.data_row}>
+      <p className={styles.inline_labeled_value}>Current:</p>
+      <p className={styles.inline_labeled_value}>{`${
+        current != null ? current : '-'
+      } °C`}</p>
+    </div>
+    <div className={styles.data_row}>
+      <p className={styles.inline_labeled_value}>Target:</p>
+      <p className={styles.inline_labeled_value}>{`${
+        target != null ? target : '-'
+      } °C`}</p>
+    </div>
+  </div>
+)
+
+export default TemperatureData

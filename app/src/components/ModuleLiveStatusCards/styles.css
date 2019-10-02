@@ -23,16 +23,13 @@ updated component library cards after redesign/refactor
   padding: 1rem 0.5rem;
   text-align: justify;
   font-size: var(--fs-body-1);
+  display: flex;
+  align-items: center;
 }
 
 .card_row:not(:last-child) {
   border-bottom: var(--bd-light);
   border-bottom-width: 1px;
-}
-
-.card_row > div {
-  display: inline-block;
-  min-width: 50%;
 }
 
 .label {
@@ -48,6 +45,10 @@ updated component library cards after redesign/refactor
   display: flex;
   justify-content: space-between;
   max-width: 7rem;
+}
+
+.temp_data_item {
+  flex: 1 1 0;
 }
 
 .compact_labeled_value > p {
@@ -67,4 +68,8 @@ updated component library cards after redesign/refactor
 .time_remaining_label {
   margin-right: 1rem;
   font-weight: var(--fw-semibold);
+}
+
+.status_item_wrapper {
+  flex: 1 1 0;
 }

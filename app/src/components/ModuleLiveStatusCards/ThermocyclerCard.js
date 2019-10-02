@@ -7,29 +7,10 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import type { ThermocyclerModule, ModuleCommandRequest } from '../../robot-api'
 import StatusCard from './StatusCard'
-import CardContentRow from './CardContentRow'
 import StatusItem from './StatusItem'
 import styles from './styles.css'
 import TemperatureControl from '../ModuleControls/TemperatureControl'
-
-type TempsItemProps = {|
-  title: string,
-  current: number,
-  target: ?number,
-|}
-const TempsItem = ({ title, current, target }: TempsItemProps) => (
-  <div className={styles.temps_item}>
-    <p className={styles.label}>{title}</p>
-    <div className={styles.data_row}>
-      <p className={styles.inline_labeled_value}>Current:</p>
-      <p>{`${current != null ? current : '-'} °C`}</p>
-    </div>
-    <div className={styles.data_row}>
-      <p className={styles.inline_labeled_value}>Target:</p>
-      <p>{`${target != null ? target : '-'} °C`}</p>
-    </div>
-  </div>
-)
+import TemperatureData from '../ModuleControls/TemperatureData'
 
 const TimeRemaining = ({ holdTime }: {| holdTime: ?number |}) => (
   <span
@@ -70,7 +51,7 @@ const CycleInfo = ({
     return null
   }
   return (
-    <CardContentRow>
+    <div className={styles.card_row}>
       <LabeledValue
         label="Cycle #"
         className={styles.compact_labeled_value}
@@ -82,7 +63,7 @@ const CycleInfo = ({
         value={`${currentStepIndex} / ${totalStepCount}`}
       />
       <TimeRemaining holdTime={holdTime} />
-    </CardContentRow>
+    </div>
   )
 }
 
@@ -124,7 +105,7 @@ const ThermocyclerCard = ({
       isCardExpanded={isCardExpanded}
       toggleCard={toggleCard}
     >
-      <CardContentRow>
+      <div className={styles.card_row}>
         <StatusItem status={module.status} />
         {!isProtocolActive && (
           <TemperatureControl
@@ -132,15 +113,21 @@ const ThermocyclerCard = ({
             sendModuleCommand={sendModuleCommand}
           />
         )}
-      </CardContentRow>
-      <CardContentRow>
-        <TempsItem
+      </div>
+      <div className={styles.card_row}>
+        <TemperatureData
+          className={styles.temp_data_item}
           title="Base Temp"
           current={currentTemp}
           target={targetTemp}
         />
-        <TempsItem title="Lid Temp" current={lidTemp} target={lidTarget} />
-      </CardContentRow>
+        <TemperatureData
+          className={styles.temp_data_item}
+          title="Lid Temp"
+          current={lidTemp}
+          target={lidTarget}
+        />
+      </div>
       {executingProfile && (
         <CycleInfo
           holdTime={holdTime}
@@ -151,9 +138,9 @@ const ThermocyclerCard = ({
         />
       )}
       {holdTime != null && holdTime > 0 && !executingProfile && (
-        <CardContentRow>
+        <div className={styles.card_row}>
           <TimeRemaining holdTime={holdTime} />
-        </CardContentRow>
+        </div>
       )}
     </StatusCard>
   )

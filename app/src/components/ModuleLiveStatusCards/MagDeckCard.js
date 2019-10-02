@@ -4,8 +4,8 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import type { MagDeckModule } from '../../robot-api'
 import StatusCard from './StatusCard'
-import CardContentRow from './CardContentRow'
 import StatusItem from './StatusItem'
+import styles from './styles.css'
 
 type Props = {|
   module: MagDeckModule,
@@ -19,9 +19,9 @@ const MagDeckCard = ({ module, isCardExpanded, toggleCard }: Props) => (
     isCardExpanded={isCardExpanded}
     toggleCard={toggleCard}
   >
-    <CardContentRow>
+    <div className={styles.card_row}>
       <StatusItem status={module.status} />
-    </CardContentRow>
+    </div>
   </StatusCard>
 )
 

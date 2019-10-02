@@ -3,8 +3,6 @@
 /* TODO (ka 2019-4-9): Revist temporary styling once UX has given input */
 .module_data {
   display: flex;
-  padding-left: 25%;
-  padding-right: 20%;
   margin-bottom: 1rem;
 }
 
@@ -62,10 +60,6 @@
   }
 }
 
-.temp_control_button {
-  width: 7rem;
-}
-
 .set_temp_field {
   display: flex;
   flex-direction: column;
@@ -95,4 +89,45 @@
   margin: 0 0.5rem;
   font-weight: var(--fw-semibold);
   padding-bottom: 0.2rem;
+}
+
+.label {
+  @apply --font-body-1-dark;
+
+  padding-bottom: 0.2rem;
+  text-transform: capitalize;
+  font-weight: var(--fw-semibold);
+}
+
+.data_row {
+  display: flex;
+  justify-content: space-between;
+  max-width: 7rem;
+}
+
+.inline_labeled_value {
+  @apply --font-body-1-dark;
+
+  display: flex;
+}
+
+.temp_control_button {
+  width: 8rem;
+}
+
+.temp_data_wrapper {
+  flex-basis: 65%;
+  display: flex;
+}
+
+.temp_data_item {
+  flex: 1 1 0;
+
+  &:not(:first-child) {
+    margin-left: 1rem;
+  }
+}
+
+.temp_data_buffer {
+  flex-basis: 30%
 }
