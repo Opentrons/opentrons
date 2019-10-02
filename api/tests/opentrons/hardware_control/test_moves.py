@@ -324,7 +324,7 @@ async def test_shake_during_drop(hardware_api, monkeypatch):
     await hardware_api.home()
     hardware_api._backend._attached_instruments\
         = {types.Mount.LEFT: {'model': None, 'id': None},
-           types.Mount.RIGHT: {'model': 'p1000_single_v2.0',
+           types.Mount.RIGHT: {'model': 'p1000_single_v1.5',
                                'id': 'testyness'}}
     await hardware_api.cache_instruments()
     await hardware_api.add_tip(types.Mount.RIGHT, 50.0)
