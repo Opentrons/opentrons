@@ -213,6 +213,13 @@ export const supportLinkProps: SupportLinks = {
     url: 'http://opentrons.com/ot-app',
     gtm: { action: 'click', category: 'l-header', label: 'ot-app' },
   },
+  warranty: {
+    name: 'Warranty & Returns',
+    description: '100% risk free returns and a quality-backed warranty',
+    url:
+      'https://support.opentrons.com/shipping-and-handling-return-policy/what-is-your-return-warranty-policy',
+    gtm: { action: 'click', category: 'l-header', label: 'return-policy' },
+  },
   support: {
     name: 'Contact Support',
     url: 'https://opentrons.com/contact-support',

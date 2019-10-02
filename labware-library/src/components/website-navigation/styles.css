@@ -412,6 +412,14 @@
   display: flex;
 }
 
+.sales_number {
+  margin-top: var(--spacing-5);
+  font-size: var(--fs-body-2);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-copy);
+  color: #808080;
+}
+
 @media (--medium) {
   .logo {
     height: 2.5rem;

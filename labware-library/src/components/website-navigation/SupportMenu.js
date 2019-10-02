@@ -9,7 +9,15 @@ type Props = {|
 |}
 export default function SupportMenu(props: Props) {
   const { active } = props
-  const { start, help, github, labware, app, support } = supportLinkProps
+  const {
+    start,
+    help,
+    github,
+    labware,
+    app,
+    warranty,
+    support,
+  } = supportLinkProps
   const { order, sales, demo } = salesLinkProps
 
   return (
@@ -29,6 +37,7 @@ export default function SupportMenu(props: Props) {
               <div className={styles.dropdown_col}>
                 <NavLink {...labware} />
                 <NavLink {...app} />
+                <NavLink {...warranty} />
                 <NavLink {...support} cta />
               </div>
             </div>
@@ -38,6 +47,11 @@ export default function SupportMenu(props: Props) {
             <NavLink {...order} />
             <NavLink {...sales} cta />
             <NavButton {...demo} />
+            <div className={styles.sales_number}>
+              <p>Sales rep hours</p>
+              <p>9:00-17:00 EST</p>
+              <p>(469) 431-1201</p>
+            </div>
           </div>
         </div>
       )}
