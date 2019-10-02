@@ -74,9 +74,14 @@
 .subdomain_link {
   margin-left: var(--spacing-subdomain);
   font-size: var(--fs-body-1);
+  font-weight: var(--fw-semibold);
   color: var(--c-nav-gray);
   text-transform: capitalize;
   cursor: pointer;
+
+  &:hover {
+    color: var(--c-font-dark);
+  }
 }
 
 /* Main Nav (wrapper and container responsive styles in Nav/) */
