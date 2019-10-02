@@ -3,8 +3,9 @@ import * as React from 'react'
 import cx from 'classnames'
 import { ClickOutside } from '@opentrons/components'
 
-import { navLinkProps } from './nav-data'
+import { aboutLinkProps, applicationLinkProps } from './nav-data'
 import NavMenu from './NavMenu'
+import ProductMenu from './ProductMenu'
 import ProtocolMenu from './ProtocolMenu'
 import SupportMenu from './SupportMenu'
 import styles from './styles.css'
@@ -33,18 +34,39 @@ export class NavList extends React.Component<Props, State> {
       <ClickOutside onClickOutside={this.clear}>
         {({ ref }) => (
           <ul className={styles.nav_list} ref={ref}>
-            {navLinkProps.map(subnav => (
-              <li
-                key={subnav.name}
-                className={cx(styles.nav_link, {
-                  [styles.active]: !menu || menu === subnav.name,
-                })}
-                role="button"
-                onClick={() => this.toggle(subnav.name)}
-              >
-                <NavMenu {...subnav} active={menu === subnav.name} />
-              </li>
-            ))}
+            <li
+              className={cx(styles.nav_link, {
+                [styles.active]: !menu || menu === 'About',
+              })}
+              role="button"
+              onClick={() => this.toggle('About')}
+            >
+              <NavMenu {...aboutLinkProps} active={menu === 'About'} />
+            </li>
+
+            <li
+              className={cx(styles.nav_link, {
+                [styles.active]: !menu || menu === 'Products',
+              })}
+              role="button"
+              onClick={() => this.toggle('Products')}
+            >
+              <ProductMenu active={menu === 'Products'} />
+            </li>
+
+            <li
+              className={cx(styles.nav_link, {
+                [styles.active]: !menu || menu === 'Applications',
+              })}
+              role="button"
+              onClick={() => this.toggle('Applications')}
+            >
+              <NavMenu
+                {...applicationLinkProps}
+                active={menu === 'Applications'}
+              />
+            </li>
+
             <li
               className={cx(styles.nav_link, {
                 [styles.active]: !menu || menu === 'Protocols',

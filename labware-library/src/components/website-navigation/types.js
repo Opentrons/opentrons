@@ -26,6 +26,23 @@ export type Submenu = {|
   bottomLink?: Link,
 |}
 
+export type ProductSubmenuName =
+  | 'robot'
+  | 'pipettes'
+  | 'thermocycler'
+  | 'magdeck'
+  | 'tempdeck'
+  | 'tips'
+  | 'reagents'
+  | 'tubes'
+  | 'plates'
+  | 'reservoirs'
+  | 'tubeRacks'
+
+export type ProductLinks = {
+  [ProductSubmenuName]: Link,
+}
+
 export type ProtocolSubmenuName =
   | 'options'
   | 'designer'

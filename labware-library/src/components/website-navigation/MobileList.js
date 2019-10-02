@@ -3,11 +3,16 @@ import * as React from 'react'
 import styles from './styles.css'
 import MobileMenu from './MobileMenu'
 import MobileContent from './MobileContent'
+import ProductMobileContent from './ProductMobileContent'
 import ProtocolMobileContent from './ProtocolMobileContent'
 import SupportMobileContent from './SupportMobileContent'
 
 import {
-  navLinkProps,
+  aboutLinkProps,
+  hardwareLinkProps,
+  labwareLinkProps,
+  consumableLinkProps,
+  applicationLinkProps,
   protocolLinkProps,
   supportLinkProps,
   salesLinkProps,
@@ -34,21 +39,41 @@ export default class MobileList extends React.Component<Props, State> {
     const { menu } = this.state
     return (
       <ul className={styles.mobile_nav}>
-        {navLinkProps.map(subnav => (
-          <li
-            className={styles.mobile_nav_item}
-            key={subnav.name}
-            role="button"
+        <li className={styles.mobile_nav_item} role="button">
+          <MobileMenu
+            {...aboutLinkProps}
+            name="About"
+            active={menu === 'About'}
+            onClick={() => this.toggle('About')}
           >
-            <MobileMenu
-              {...subnav}
-              active={menu === subnav.name}
-              onClick={() => this.toggle(subnav.name)}
-            >
-              <MobileContent {...subnav} />
-            </MobileMenu>
-          </li>
-        ))}
+            <MobileContent {...aboutLinkProps} />
+          </MobileMenu>
+        </li>
+
+        <li className={styles.mobile_nav_item} role="button">
+          <MobileMenu
+            {...hardwareLinkProps}
+            {...labwareLinkProps}
+            {...consumableLinkProps}
+            name="Products"
+            active={menu === 'Products'}
+            onClick={() => this.toggle('Products')}
+          >
+            <ProductMobileContent />
+          </MobileMenu>
+        </li>
+
+        <li className={styles.mobile_nav_item} role="button">
+          <MobileMenu
+            {...applicationLinkProps}
+            name="Applications"
+            active={menu === 'Applications'}
+            onClick={() => this.toggle('Applications')}
+          >
+            <MobileContent {...applicationLinkProps} />
+          </MobileMenu>
+        </li>
+
         <li className={styles.mobile_nav_item} role="button">
           <MobileMenu
             {...protocolLinkProps}

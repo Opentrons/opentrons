@@ -143,13 +143,13 @@
   &::after {
     @apply --dropdown-caret-after;
 
-    left: 47.75%;
+    left: 47%;
   }
 
   &::before {
     @apply --dropdown-caret-before;
 
-    left: 48%;
+    left: 47.5%;
   }
 }
 
@@ -189,7 +189,8 @@
   @apply --font-menu-title;
 
   line-height: 1.25rem;
-  flex: 0 0 6rem;
+  flex: none;
+  width: 7rem;
   padding: 0 var(--spacing-5);
   text-transform: uppercase;
 }
@@ -218,10 +219,18 @@
   padding-bottom: var(--spacing-link);
   padding-left: 5rem;
 
-  &.support_nav_link {
+  &.support_nav_link,
+  &.product_nav_link {
     padding-bottom: var(--spacing-5);
     text-align: left;
+  }
+
+  &.support_nav_link {
     padding-left: 0;
+  }
+
+  &.product_nav_link {
+    padding-left: var(--spacing-5);
   }
 }
 
@@ -360,6 +369,25 @@
   padding-bottom: 0;
 }
 
+/*  Product Submenu Mobile */
+.product_mobile_content {
+  display: flex;
+  flex-direction: column;
+}
+
+.hardware_group,
+.labware_group,
+.consumable_group {
+  display: flex;
+  flex-basis: 100%;
+  padding-top: var(--spacing-5);
+
+  & ul {
+    flex-grow: 1;
+    padding-right: 8rem;
+  }
+}
+
 /*  Support & Sales Submenu Mobile */
 
 .support_mobile_content {
@@ -427,7 +455,7 @@
 
   .submenu_title {
     flex: none;
-    width: 8rem;
+    max-width: 8rem;
   }
 
   .support_group {
