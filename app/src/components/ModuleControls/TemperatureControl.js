@@ -13,7 +13,6 @@ import type {
   ModuleCommandRequest,
 } from '../../robot-api'
 import { Portal } from '../portal'
-import { ModuleControlModal } from '../modals'
 import styles from './styles.css'
 
 type Props = {|

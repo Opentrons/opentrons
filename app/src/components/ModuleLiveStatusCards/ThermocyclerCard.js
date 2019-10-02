@@ -43,9 +43,9 @@ const CycleInfo = ({
   holdTime,
 }: CycleInfoProps) => {
   if (
-    totalCycleCount == null &&
-    currentCycleIndex == null &&
-    totalStepCount == null &&
+    totalCycleCount == null ||
+    currentCycleIndex == null ||
+    totalStepCount == null ||
     currentStepIndex == null
   ) {
     return null

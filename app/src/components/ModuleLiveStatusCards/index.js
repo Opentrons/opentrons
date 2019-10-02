@@ -1,18 +1,11 @@
 // @flow
 import * as React from 'react'
-import { useSelector, useDispatch, connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import { getConnectedRobot } from '../../discovery'
-import {
-  getModulesState,
-  sendModuleCommand as sendModuleCommandAction,
-  type ModuleCommandRequest,
-  type Module,
-} from '../../robot-api'
+import { getModulesState, type Module } from '../../robot-api'
 import { selectors as robotSelectors } from '../../robot'
-import { getConfig } from '../../config'
 
-import type { State, Dispatch } from '../../types'
 import type { Robot } from '../../discovery'
 
 import useSendModuleCommand from '../ModuleControls/useSendModuleCommand'
@@ -25,7 +18,6 @@ const ModuleLiveStatusCards = () => {
   const modules: Array<Module> = useSelector(state =>
     robot ? getModulesState(state, robot.name) : []
   )
-  const dispatch = useDispatch<Dispatch>()
   const sendModuleCommand = useSendModuleCommand()
   const isProtocolActive: boolean = useSelector(robotSelectors.getIsActive)
   const [expandedCard, setExpandedCard] = React.useState(
@@ -33,7 +25,7 @@ const ModuleLiveStatusCards = () => {
   )
   const prevModuleCountRef = React.useRef<number>(modules.length)
   React.useEffect(() => {
-    if (prevModuleCountRef === 0 && modules.length > 0) {
+    if (prevModuleCountRef.current === 0 && modules.length > 0) {
       setExpandedCard(modules[0].serial)
     }
     prevModuleCountRef.current = modules.length

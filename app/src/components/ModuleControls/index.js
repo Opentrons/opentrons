@@ -18,8 +18,6 @@ function ModuleControls(props: Props) {
   const { currentTemp, targetTemp, lidTemp, lidTarget } = module.data
   const sendModuleCommand = useSendModuleCommand()
 
-  const hasLid = Boolean(lidTemp)
-
   return (
     <div className={styles.module_data}>
       <div className={styles.temp_data_buffer}></div>
@@ -28,9 +26,9 @@ function ModuleControls(props: Props) {
           className={styles.temp_data_item}
           current={currentTemp}
           target={targetTemp}
-          title={hasLid ? 'Base Temperature:' : 'Temperature:'}
+          title={lidTemp && lidTarget ? 'Base Temperature:' : 'Temperature:'}
         />
-        {hasLid && (
+        {lidTemp && lidTarget && (
           <TemperatureData
             className={styles.temp_data_item}
             current={lidTemp}

@@ -40,6 +40,8 @@ export type MagDeckModule = {|
 export type TempDeckData = {|
   currentTemp: number,
   targetTemp: number,
+  lidTarget: typeof undefined,
+  lidTemp: typeof undefined,
 |}
 
 export type MagDeckData = {|
