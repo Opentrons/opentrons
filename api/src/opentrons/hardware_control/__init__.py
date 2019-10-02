@@ -504,12 +504,27 @@ class API(HardwareAPILike):
         smoothie_pos = {}
         plungers = [ax for ax in checked_axes
                     if ax not in Axis.gantry_axes()]
-        smoothie_plungers = [ax.name.upper() for ax in plungers]
+
+        def _current_with_fallback(mount: top_types.Mount) -> float:
+            attached = self._attached_instruments[mount]
+            if attached:
+                return attached.config.plunger_current
+            else:
+                return self._config.high_current[Axis.of_plunger(mount).name]
+
+        smoothie_plungers = {
+            ax: _current_with_fallback(Axis.to_mount(ax))
+            for ax in plungers
+        }
         async with self._motion_lock:
             if smoothie_gantry:
                 smoothie_pos.update(self._backend.home(smoothie_gantry))
             if smoothie_plungers:
-                smoothie_pos.update(self._backend.home(smoothie_plungers))
+                for smoothie_plunger, current in smoothie_plungers.items():
+                    self._backend.set_active_current(
+                        smoothie_plunger, current)
+                    smoothie_pos.update(
+                        self._backend.home([smoothie_plunger.name.upper()]))
             self._current_position = self._deck_from_smoothie(smoothie_pos)
 
     async def add_tip(

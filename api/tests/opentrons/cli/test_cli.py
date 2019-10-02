@@ -32,8 +32,16 @@ def hardware(monkeypatch, async_server, model1, model2):
     hardware = async_server['com.opentrons.hardware']
     if model1:
         monkeypatch.setattr(hardware, 'model_by_mount', {
-            'left': {'model': model1[0], 'id': 'fakeid', 'name': model1[1]},
-            'right': {'model': model1[0], 'id': 'fakeid2', 'name': model1[1]}})
+            'left': {
+                'model': model1[0],
+                'id': 'fakeid',
+                'name': model1[1],
+                'home_current': 0.1},
+            'right': {
+                'model': model1[0],
+                'id': 'fakeid2',
+                'name': model1[1],
+                'home_current': 0.1}})
     elif model2:
         monkeypatch.setattr(hardware, 'model_by_mount', {
             'left': {'model': model2[0], 'id': 'fakeid', 'name': model2[1]},
