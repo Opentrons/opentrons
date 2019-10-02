@@ -306,17 +306,20 @@ const App = () => {
     null
   )
   const setImportError = React.useMemo(
-    () => (value: ImportError | null) => {
-      if (value != null) {
+    () => (v: ImportError | null, def?: LabwareDefinition2) => {
+      if (v != null) {
         reportEvent({
           name: 'labwareCreatorFileImport',
           properties: {
+            labwareDisplayName: def?.metadata.displayName,
+            labwareAPIName: def?.parameters.loadName,
+            labwareBrand: def?.brand.brand,
             importSuccess: false,
-            importError: value,
+            importError: v.key,
           },
         })
       }
-      _setImportError(value)
+      _setImportError(v)
     },
     [_setImportError]
   )
@@ -325,22 +328,23 @@ const App = () => {
     null
   )
   const setLastUploaded = React.useMemo(
-    () => (value: LabwareFields | null) => {
-      if (value != null) {
+    () => (v: LabwareFields | null, def?: LabwareDefinition2) => {
+      if (v != null) {
+        assert(def, "setLastUploaded expected `def` if `v` isn't null")
         reportEvent({
           name: 'labwareCreatorFileImport',
           properties: {
-            labwareType: value.labwareType,
-            labwareDisplayName: value.displayName,
-            labwareAPIName: value.loadName,
-            labwareBrand: value.brand,
-            labwareManufacturerID: value.brandId,
+            labwareType: v.labwareType,
+            labwareDisplayName: def?.metadata.displayName,
+            labwareAPIName: def?.parameters.loadName,
+            labwareBrand: def?.brand.brand,
+            labwareManufacturerID: v.brandId,
             importSuccess: true,
             importError: null,
           },
         })
       }
-      _setLastUploaded(value)
+      _setLastUploaded(v)
     },
     [_setLastUploaded]
   )
@@ -412,10 +416,13 @@ const App = () => {
           }
           const fields = labwareDefToFields(parsedLabwareDef)
           if (!fields) {
-            setImportError({ key: 'UNSUPPORTED_LABWARE_PROPERTIES' })
+            setImportError(
+              { key: 'UNSUPPORTED_LABWARE_PROPERTIES' },
+              parsedLabwareDef
+            )
             return
           }
-          setLastUploaded(fields)
+          setLastUploaded(fields, parsedLabwareDef)
           if (
             fields.labwareType === 'wellPlate' ||
             fields.labwareType === 'reservoir'
