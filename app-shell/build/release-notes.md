@@ -6,7 +6,9 @@ For more details about this release, please see the full [technical change log][
 
 [changelog]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
 
-## New Features
+## Changes
+
+- When downloading logs, you will no longer get a pop up to select the filenames to save; instead, the logs will automatically download to your Downloads folder. 
 
 
 ## Bug Fixes

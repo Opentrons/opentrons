@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.13.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v3.13.0-alpha.3...v3.13.0-alpha.4) (2019-10-02)
+
+
+### Bug Fixes
+
+* **api:** Only load labware for modules from bundles ([#4162](https://github.com/Opentrons/opentrons/issues/4162)) ([f3eb988](https://github.com/Opentrons/opentrons/commit/f3eb988))
+* **api:** Put camera images in tempdirs ([#4163](https://github.com/Opentrons/opentrons/issues/4163)) ([1411da8](https://github.com/Opentrons/opentrons/commit/1411da8)), closes [#4122](https://github.com/Opentrons/opentrons/issues/4122)
+
+
+
+
+
 # [3.13.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v3.13.0-alpha.2...v3.13.0-alpha.3) (2019-10-01)
 
 
