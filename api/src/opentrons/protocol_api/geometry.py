@@ -169,19 +169,28 @@ class Deck(UserDict):
             self.recalculate_high_z()
 
     def __setitem__(self, key: types.DeckLocation, val: DeckItem) -> None:
-        key_int = self._check_name(key)
-        labware = self.data.get(key_int)
-        if labware is not None:
-            if key_int == 12:
-                if 'fixedTrash' in labware.parameters.get('quirks', []):
+        slot_key_int = self._check_name(key)
+        item = self.data.get(slot_key_int)
+
+        overlapping_items = self.get_collisions_for_item(slot_key_int, val)
+        if item is not None:
+            if slot_key_int == 12:
+                if 'fixedTrash' in item.parameters.get('quirks', []):
                     pass
                 else:
-                    raise ValueError('Deck location {} is for fixed trash only'
-                                     .format(key))
+                    raise ValueError(f'Deck location {key} '
+                                     'is for fixed trash only')
             else:
-                raise ValueError('Deck location {} already has an item: {}'
-                                 .format(key, self.data[key_int]))
-        self.data[key_int] = val
+                raise ValueError(f'Deck location {key} already'
+                                 f'  has an item: {self.data[slot_key_int]}')
+        elif overlapping_items:
+            flattened_overlappers = [repr(item) for sublist in
+                                     overlapping_items.values()
+                                     for item in sublist]
+            raise ValueError(f'Could not load {val} as deck location {key} '
+                             'is obscured by '
+                             f'{", ".join(flattened_overlappers)}')
+        self.data[slot_key_int] = val
         self._highest_z = max(val.highest_z, self._highest_z)
 
     def __contains__(self, key: object) -> bool:
@@ -242,3 +251,27 @@ class Deck(UserDict):
     def slots(self) -> List[Dict]:
         """ Return the definition of the loaded robot deck. """
         return self._definition['locations']['orderedSlots']
+
+    def get_collisions_for_item(self,
+                                slot_key: types.DeckLocation,
+                                item: DeckItem) -> Dict[types.DeckLocation,
+                                                        List[DeckItem]]:
+        """ Return the loaded deck items that collide
+            with the given item.
+        """
+        def get_item_covered_slot_keys(sk, i):
+            if isinstance(i, ThermocyclerGeometry):
+                return(set([7, 8, 10, 11]))
+            elif i is not None:
+                return set([sk])
+            else:
+                return set([])
+
+        item_slot_keys = get_item_covered_slot_keys(slot_key, item)
+
+        colliding_items: Dict[types.DeckLocation, List[DeckItem]] = {}
+        for sk, i in self.data.items():
+            covered_sks = get_item_covered_slot_keys(sk, i)
+            if item_slot_keys.issubset(covered_sks):
+                colliding_items.setdefault(sk, []).append(i)
+        return colliding_items
