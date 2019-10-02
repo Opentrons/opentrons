@@ -6,12 +6,7 @@ import { Formik } from 'formik'
 import mapValues from 'lodash/mapValues'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
-import {
-  AlertItem,
-  AlertModal,
-  PrimaryButton,
-  Icon,
-} from '@opentrons/components'
+import { AlertItem, AlertModal, PrimaryButton } from '@opentrons/components'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
 import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
 import {
@@ -945,7 +940,6 @@ const App = () => {
                         className={cx(styles.callout, styles.export_callout)}
                       >
                         <h4 className={styles.test_labware_heading}>
-                          <Icon name="flask-outline" className={styles.icon} />
                           Please test your definition file!
                         </h4>
 

@@ -251,14 +251,7 @@ h2 {
 }
 
 .test_labware_heading {
-  @apply --center-children;
-
   font-size: var(--fs-body-2);
-
-  & .icon {
-    height: 1.5rem;
-    margin-right: 0.5rem;
-  }
 }
 
 .test_guide_button {
