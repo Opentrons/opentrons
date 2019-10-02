@@ -1096,7 +1096,8 @@ def load(
     parent: Location,
     label: str = None,
     namespace: str = None,
-    version: int = 1
+    version: int = 1,
+    bundled_defs: Dict[str, Dict[str, Any]] = None,
 ) -> Labware:
     """
     Return a labware object constructed from a labware definition dict looked
@@ -1115,8 +1116,14 @@ def load(
         If unspecified, will search 'opentrons' then 'custom_beta'
     :param int version: The version of the labware definition. If unspecified,
         will use version 1.
+    :param bundled_defs: If specified, a mapping of labware names to labware
+        definitions. Only the bundle will be searched for definitions.
     """
-    definition = get_labware_definition(load_name, namespace, version)
+    if bundled_defs is not None:
+        definition = get_labware_definition_from_bundle(
+            bundled_defs, load_name, namespace, version)
+    else:
+        definition = get_labware_definition(load_name, namespace, version)
     return load_from_definition(definition, parent, label)
 
 

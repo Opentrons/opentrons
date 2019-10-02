@@ -220,7 +220,7 @@ def test_parse_bundle_details(get_bundle_fixture, ensure_api2):
     parsed = parse(fixture['binary_zipfile'], filename)
 
     assert isinstance(parsed, PythonProtocol)
-    assert parsed.filename == filename
+    assert parsed.filename == 'protocol.ot2.py'
     assert parsed.bundled_labware == fixture['bundled_labware']
     assert parsed.bundled_python == fixture['bundled_python']
     assert parsed.bundled_data == fixture['bundled_data']
