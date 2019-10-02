@@ -145,12 +145,10 @@ def test_get_protocol_schema_version():
 
 def test_validate_json(get_json_protocol_fixture):
     # valid data that has no schema should fail
-    with pytest.raises(jsonschema.ValidationError):
+    with pytest.raises(RuntimeError, match='deprecated'):
         validate_json({'protocol-schema': '1.0.0'})
     with pytest.raises(jsonschema.ValidationError):
         validate_json({'schemaVersion': '3'})
-    v1 = get_json_protocol_fixture('1', 'simple')
-    assert validate_json(v1) == 1
     v3 = get_json_protocol_fixture('3', 'testAllAtomicSingleV3')
     assert validate_json(v3) == 3
 
@@ -190,7 +188,7 @@ def test_parse_python_details(
 
 
 @pytest.mark.parametrize('protocol_details',
-                         [('1', 'simple'), ('3', 'testAllAtomicSingleV3')])
+                         [('3', 'simple'), ('3', 'testAllAtomicSingleV3')])
 @pytest.mark.parametrize('protocol_text_kind', ['str', 'bytes'])
 @pytest.mark.parametrize('filename', ['real', 'none'])
 def test_parse_json_details(get_json_protocol_fixture,

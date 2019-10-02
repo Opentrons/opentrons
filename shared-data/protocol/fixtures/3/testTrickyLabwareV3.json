@@ -2538,7 +2538,7 @@
         "pipette": "singlePipetteId",
         "volume": 50,
         "labware": "trashId",
-        "well": "A12",
+        "well": "A1",
         "offsetFromBottomMm": 1,
         "flowRate": 300
       }
@@ -2560,7 +2560,7 @@
         "pipette": "multiPipetteId",
         "volume": 50,
         "labware": "trashId",
-        "well": "A12",
+        "well": "A1",
         "offsetFromBottomMm": 1,
         "flowRate": 300
       }
