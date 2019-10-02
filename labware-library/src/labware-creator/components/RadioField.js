@@ -24,8 +24,15 @@ const RadioField = (props: Props) => (
             labelTextClassName={props.labelTextClassName}
             onChange={e => {
               field.onChange(e)
-              // do not wait until blur to make radio field 'dirty'
-              field.onBlur(e)
+              // do not wait until blur to make radio field 'dirty', so that alerts show up immediately.
+              // NOTE: Ian 2019-10-02 this setTimeout seems necessary to avoid a race condition where
+              // Formik blurs the field before setting its value, surfacing a transient error
+              // (eg "this field is required") which messes up error analytics
+              const blurTarget = e.currentTarget
+              setTimeout(() => {
+                blurTarget.blur()
+              }, 0)
+
               reportFieldEdit({ value: field.value, name: field.name })
             }}
             options={props.options}

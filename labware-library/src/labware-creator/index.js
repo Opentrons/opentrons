@@ -8,6 +8,7 @@ import mapValues from 'lodash/mapValues'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
 import { reportEvent } from '../analytics'
+import { reportErrors } from './analyticsUtils'
 import { AlertItem, AlertModal, PrimaryButton } from '@opentrons/components'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
 import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
@@ -509,6 +510,7 @@ const App = () => {
           setTouched,
           setValues,
         }) => {
+          reportErrors({ values, errors, touched })
           // TODO (ka 2019-8-27): factor out this as sub-schema from Yup schema and use it to validate instead of repeating the logic
           const canProceedToForm = Boolean(
             values.labwareType === 'wellPlate' ||
