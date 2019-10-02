@@ -93,10 +93,10 @@ def _run_python(
     # If the protocol is written correctly, it will have defined a function
     # like run(context: ProtocolContext). If so, that function is now in the
     # current scope.
-    if proto.filename.endswith('zip'):
+    if proto.filename and proto.filename.endswith('zip'):
         filename = 'protocol.ot2.py'
     else:
-        filename = proto.filename
+        filename = proto.filename or '<protocol>'
     try:
         _runfunc_ok(new_locs.get('run'))
     except SyntaxError as se:
