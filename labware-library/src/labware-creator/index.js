@@ -1,4 +1,5 @@
 // @flow
+import assert from 'assert'
 import Ajv from 'ajv'
 import cx from 'classnames'
 import * as React from 'react'
@@ -6,6 +7,7 @@ import { Formik } from 'formik'
 import mapValues from 'lodash/mapValues'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
+import { reportEvent } from '../analytics'
 import { AlertItem, AlertModal, PrimaryButton } from '@opentrons/components'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
 import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
@@ -269,14 +271,77 @@ const getXYDimensionAlerts = (
 const App = () => {
   const [
     showExportErrorModal,
-    setShowExportErrorModal,
+    _setShowExportErrorModal,
   ] = React.useState<boolean>(false)
+  const setShowExportErrorModal = React.useMemo(
+    () => (v: boolean, fieldValues?: LabwareFields) => {
+      // NOTE: values that take a default will remain null in this event
+      if (v === true) {
+        assert(
+          fieldValues,
+          'expected `fieldValues` when setting showExportErrorModal to true'
+        )
+        reportEvent({
+          name: 'labwareCreatorFileExport',
+          properties: {
+            labwareType: fieldValues?.labwareType,
+            labwareDisplayName: fieldValues?.displayName,
+            labwareAPIName: fieldValues?.loadName,
+            labwareBrand: fieldValues?.brand,
+            labwareManufacturerID: fieldValues?.brandId,
+            exportSuccess: false,
+            exportError: true,
+          },
+        })
+      }
+      _setShowExportErrorModal(v)
+    },
+    [_setShowExportErrorModal]
+  )
 
   const [showCreatorForm, setShowCreatorForm] = React.useState<boolean>(false)
-  const [importError, setImportError] = React.useState<ImportError | null>(null)
 
-  const [lastUploaded, setLastUploaded] = React.useState<LabwareFields | null>(
+  const [importError, _setImportError] = React.useState<ImportError | null>(
     null
+  )
+  const setImportError = React.useMemo(
+    () => (value: ImportError | null) => {
+      if (value != null) {
+        reportEvent({
+          name: 'labwareCreatorFileImport',
+          properties: {
+            importSuccess: false,
+            importError: value,
+          },
+        })
+      }
+      _setImportError(value)
+    },
+    [_setImportError]
+  )
+
+  const [lastUploaded, _setLastUploaded] = React.useState<LabwareFields | null>(
+    null
+  )
+  const setLastUploaded = React.useMemo(
+    () => (value: LabwareFields | null) => {
+      if (value != null) {
+        reportEvent({
+          name: 'labwareCreatorFileImport',
+          properties: {
+            labwareType: value.labwareType,
+            labwareDisplayName: value.displayName,
+            labwareAPIName: value.loadName,
+            labwareBrand: value.brand,
+            labwareManufacturerID: value.brandId,
+            importSuccess: true,
+            importError: null,
+          },
+        })
+      }
+      _setLastUploaded(value)
+    },
+    [_setLastUploaded]
   )
 
   const scrollRef = React.useRef<HTMLDivElement | null>(null)
@@ -361,7 +426,7 @@ const App = () => {
         reader.readAsText(file)
       }
     },
-    [scrollToForm]
+    [scrollToForm, setLastUploaded, setImportError]
   )
 
   React.useEffect(() => {
@@ -420,6 +485,19 @@ const App = () => {
           zip
             .generateAsync({ type: 'blob' })
             .then(blob => saveAs(blob, `${displayName}.zip`))
+
+          reportEvent({
+            name: 'labwareCreatorFileExport',
+            properties: {
+              labwareType: castValues.labwareType,
+              labwareDisplayName: displayName,
+              labwareAPIName: castValues.loadName,
+              labwareBrand: castValues.brand,
+              labwareManufacturerID: castValues.brandId,
+              exportSuccess: true,
+              exportError: null,
+            },
+          })
         }}
       >
         {({
@@ -929,7 +1007,7 @@ const App = () => {
                         className={styles.export_button}
                         onClick={() => {
                           if (!isValid && !showExportErrorModal) {
-                            setShowExportErrorModal(true)
+                            setShowExportErrorModal(true, values)
                           }
                           handleSubmit()
                         }}
@@ -954,6 +1032,11 @@ const App = () => {
                           Use the test guide to troubleshoot your definition.
                         </p>
                         <LinkOut
+                          onClick={() =>
+                            reportEvent({
+                              name: 'labwareCreatorClickTestLabware',
+                            })
+                          }
                           href={PDF_URL}
                           className={styles.test_guide_button}
                         >

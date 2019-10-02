@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { Field } from 'formik'
 import { InputField } from '@opentrons/components'
+import { reportFieldEdit } from '../analyticsUtils'
 import { getIsHidden } from '../formSelectors'
 import { LABELS, type LabwareFields } from '../fields'
 import fieldStyles from './fieldStyles.css'
@@ -44,6 +45,10 @@ const TextField = (props: Props) => {
               caption={caption}
               placeholder={placeholder}
               onChange={makeHandleChange({ field, form })}
+              onBlur={(e: SyntheticEvent<HTMLInputElement>) => {
+                reportFieldEdit({ value: field.value, name: field.name })
+                field.onBlur(e)
+              }}
               units={units}
             />
           </div>

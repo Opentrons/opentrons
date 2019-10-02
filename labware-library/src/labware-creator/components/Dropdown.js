@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { SelectField } from '@opentrons/components'
 import { Field } from 'formik'
+import { reportFieldEdit } from '../analyticsUtils'
 import { LABELS } from '../fields'
 import type { LabwareFields, Options } from '../fields'
 import fieldStyles from './fieldStyles.css'
@@ -44,7 +45,10 @@ const Dropdown = (props: Props) => {
             name={field.name}
             caption={props.caption}
             value={field.value}
-            onLoseFocus={() => field.onBlur()}
+            onLoseFocus={() => {
+              reportFieldEdit({ value: field.value, name: field.name })
+              field.onBlur()
+            }}
             onValueChange={
               props.onValueChange ||
               ((name, value) => form.setFieldValue(name, value))

@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { Field } from 'formik'
 import { RadioGroup } from '@opentrons/components'
+import { reportFieldEdit } from '../analyticsUtils'
 import { getIsHidden } from '../formSelectors'
 import { LABELS, type LabwareFields } from '../fields'
 import fieldStyles from './fieldStyles.css'
@@ -25,6 +26,7 @@ const RadioField = (props: Props) => (
               field.onChange(e)
               // do not wait until blur to make radio field 'dirty'
               field.onBlur(e)
+              reportFieldEdit({ value: field.value, name: field.name })
             }}
             options={props.options}
           />
