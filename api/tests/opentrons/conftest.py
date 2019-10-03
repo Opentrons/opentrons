@@ -541,9 +541,9 @@ def get_bundle_fixture():
         with open(
             pathlib.Path(__file__).parent / '..' / '..' / '..' /
             'shared-data' / 'labware' / 'definitions' / '2' /
-            loadName / f'{version}.json', 'r'
+            loadName / f'{version}.json', 'rb'
         ) as f:
-            labware_def = json.load(f)
+            labware_def = json.loads(f.read().decode('utf-8'))
         return labware_def
 
     def _get_bundle_protocol_fixture(fixture_name):
