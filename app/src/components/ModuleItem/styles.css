@@ -9,7 +9,6 @@
 
 .module_item {
   padding: 1.5rem 1rem 0;
-
   border-bottom: 1px solid var(--c-light-gray);
 
   &:last-child {
