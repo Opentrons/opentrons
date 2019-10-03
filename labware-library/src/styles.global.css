@@ -11,3 +11,8 @@ body,
 #root {
   height: 100%;
 }
+
+/* disable scroll when mobile nav open */
+body.no_scroll {
+  overflow: hidden;
+}

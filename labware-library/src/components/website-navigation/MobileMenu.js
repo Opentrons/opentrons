@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { RemoveScroll } from 'react-remove-scroll'
 import { Icon } from '@opentrons/components'
 import styles from './styles.css'
 
@@ -14,9 +13,8 @@ type Props = {|
 
 export default function MobileMenu(props: Props) {
   const { name, active, onClick } = props
-  const Wrapper = active ? RemoveScroll : React.Fragment
   return (
-    <Wrapper>
+    <>
       <span onClick={onClick}>{name}</span>
       <div className={cx(styles.mobile_menu, { [styles.active]: active })}>
         <div className={styles.mobile_menu_heading} onClick={onClick}>
@@ -25,6 +23,6 @@ export default function MobileMenu(props: Props) {
         </div>
         <div className={styles.scrollable_contents}>{props.children}</div>
       </div>
-    </Wrapper>
+    </>
   )
 }

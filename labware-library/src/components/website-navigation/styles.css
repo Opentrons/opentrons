@@ -335,6 +335,7 @@
   top: var(--size-mobile-nav);
   right: 0;
   width: 100%;
+  height: calc(100% - var(--size-mobile-nav));
   max-height: calc(100% - var(--size-mobile-nav));
   margin: 0 -105% 0 0;
   background-color: var(--c-white);
@@ -371,6 +372,7 @@
 }
 
 .mobile_content {
+  height: 100%;
   padding: var(--spacing-5);
   padding-bottom: 0;
 }
@@ -468,6 +470,7 @@
 
   .mobile_menu {
     top: var(--size-main-nav);
+    height: auto;
     min-height: 29.5rem;
   }
 
