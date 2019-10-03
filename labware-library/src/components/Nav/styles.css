@@ -95,7 +95,8 @@ are project specific  */
     display: block;
     width: 100%;
     height: var(--size-subdomain-nav);
-    background-color: var(--c-lightest-gray);
+    background-color: var(--c-white);
+    border-bottom: var(--bd-light);
   }
 
   .main_nav_wrapper {

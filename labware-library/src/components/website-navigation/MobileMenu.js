@@ -4,10 +4,8 @@ import cx from 'classnames'
 import { Icon } from '@opentrons/components'
 import styles from './styles.css'
 
-import type { Submenu } from './types'
-
 type Props = {|
-  ...Submenu,
+  name: string,
   active: boolean,
   children?: React.Node,
   onClick: () => mixed,
@@ -23,7 +21,7 @@ export default function MobileMenu(props: Props) {
           <Icon className={styles.mobile_menu_icon} name="arrow-left" />
           <h3 className={styles.mobile_menu_title}>{name}</h3>
         </div>
-        {props.children}
+        <div className={styles.scrollable_contents}>{props.children}</div>
       </div>
     </>
   )

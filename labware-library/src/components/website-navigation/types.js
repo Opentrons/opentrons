@@ -44,6 +44,7 @@ export type SupportSubmenuName =
   | 'github'
   | 'labware'
   | 'app'
+  | 'warranty'
   | 'protocol'
   | 'support'
 

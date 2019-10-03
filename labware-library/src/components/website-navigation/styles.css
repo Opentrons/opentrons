@@ -10,6 +10,7 @@
   --spacing-nav: 1.75rem;
   --spacing-submenu: 1.75rem;
   --spacing-link: 1.75rem;
+  --spacing-mobile-heading: 4.5rem;
 
   --font-menu-title: {
     font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
@@ -74,9 +75,14 @@
 .subdomain_link {
   margin-left: var(--spacing-subdomain);
   font-size: var(--fs-body-1);
+  font-weight: var(--fw-semibold);
   color: var(--c-nav-gray);
   text-transform: capitalize;
   cursor: pointer;
+
+  &:hover {
+    color: var(--c-font-dark);
+  }
 }
 
 /* Main Nav (wrapper and container responsive styles in Nav/) */
@@ -143,13 +149,13 @@
   &::after {
     @apply --dropdown-caret-after;
 
-    left: 47.75%;
+    left: 47%;
   }
 
   &::before {
     @apply --dropdown-caret-before;
 
-    left: 48%;
+    left: 47.5%;
   }
 }
 
@@ -189,7 +195,8 @@
   @apply --font-menu-title;
 
   line-height: 1.25rem;
-  flex: 0 0 6rem;
+  flex: none;
+  width: 7rem;
   padding: 0 var(--spacing-5);
   text-transform: uppercase;
 }
@@ -218,10 +225,18 @@
   padding-bottom: var(--spacing-link);
   padding-left: 5rem;
 
-  &.support_nav_link {
+  &.support_nav_link,
+  &.product_nav_link {
     padding-bottom: var(--spacing-5);
     text-align: left;
+  }
+
+  &.support_nav_link {
     padding-left: 0;
+  }
+
+  &.product_nav_link {
+    padding-left: var(--spacing-5);
   }
 }
 
@@ -320,7 +335,8 @@
   top: var(--size-mobile-nav);
   right: 0;
   width: 100%;
-  min-height: calc(100vh - var(--size-mobile-nav));
+  height: calc(100% - var(--size-mobile-nav));
+  max-height: calc(100% - var(--size-mobile-nav));
   margin: 0 -105% 0 0;
   background-color: var(--c-white);
   box-shadow: var(--shadow-1);
@@ -336,7 +352,7 @@
 .mobile_menu_heading {
   @apply --flex-start;
 
-  height: 4.5rem;
+  height: var(--spacing-mobile-heading);
   border-bottom: var(--bd-light);
 }
 
@@ -356,8 +372,36 @@
 }
 
 .mobile_content {
+  height: 100%;
   padding: var(--spacing-5);
   padding-bottom: 0;
+}
+
+.scrollable_contents {
+  max-height:
+    calc(
+      100vh - var(--size-mobile-nav) - var(--spacing-mobile-heading)
+    );
+  overflow-y: auto;
+}
+
+/*  Product Submenu Mobile */
+.product_mobile_content {
+  display: flex;
+  flex-direction: column;
+}
+
+.hardware_group,
+.labware_group,
+.consumable_group {
+  display: flex;
+  flex-basis: 100%;
+  padding-top: var(--spacing-5);
+
+  & ul {
+    flex-grow: 1;
+    padding-right: 8rem;
+  }
 }
 
 /*  Support & Sales Submenu Mobile */
@@ -382,6 +426,14 @@
 
 .support_submenu {
   display: flex;
+}
+
+.sales_number {
+  margin-top: var(--spacing-5);
+  font-size: var(--fs-body-2);
+  font-weight: var(--fw-semibold);
+  line-height: var(--lh-copy);
+  color: #808080;
 }
 
 @media (--medium) {
@@ -418,6 +470,7 @@
 
   .mobile_menu {
     top: var(--size-main-nav);
+    height: auto;
     min-height: 29.5rem;
   }
 
@@ -427,7 +480,7 @@
 
   .submenu_title {
     flex: none;
-    width: 8rem;
+    max-width: 8rem;
   }
 
   .support_group {
