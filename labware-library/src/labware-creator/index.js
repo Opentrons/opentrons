@@ -1,4 +1,5 @@
 // @flow
+import assert from 'assert'
 import Ajv from 'ajv'
 import cx from 'classnames'
 import * as React from 'react'
@@ -6,6 +7,8 @@ import { Formik } from 'formik'
 import mapValues from 'lodash/mapValues'
 import { saveAs } from 'file-saver'
 import JSZip from 'jszip'
+import { reportEvent } from '../analytics'
+import { reportErrors } from './analyticsUtils'
 import { AlertItem, AlertModal, PrimaryButton } from '@opentrons/components'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
 import { makeMaskToDecimal, maskToInteger, maskLoadName } from './fieldMasks'
@@ -269,14 +272,81 @@ const getXYDimensionAlerts = (
 const App = () => {
   const [
     showExportErrorModal,
-    setShowExportErrorModal,
+    _setShowExportErrorModal,
   ] = React.useState<boolean>(false)
+  const setShowExportErrorModal = React.useMemo(
+    () => (v: boolean, fieldValues?: LabwareFields) => {
+      // NOTE: values that take a default will remain null in this event
+      if (v === true) {
+        assert(
+          fieldValues,
+          'expected `fieldValues` when setting showExportErrorModal to true'
+        )
+        reportEvent({
+          name: 'labwareCreatorFileExport',
+          properties: {
+            labwareType: fieldValues?.labwareType,
+            labwareDisplayName: fieldValues?.displayName,
+            labwareAPIName: fieldValues?.loadName,
+            labwareBrand: fieldValues?.brand,
+            labwareManufacturerID: fieldValues?.brandId,
+            exportSuccess: false,
+            exportError: true,
+          },
+        })
+      }
+      _setShowExportErrorModal(v)
+    },
+    [_setShowExportErrorModal]
+  )
 
   const [showCreatorForm, setShowCreatorForm] = React.useState<boolean>(false)
-  const [importError, setImportError] = React.useState<ImportError | null>(null)
 
-  const [lastUploaded, setLastUploaded] = React.useState<LabwareFields | null>(
+  const [importError, _setImportError] = React.useState<ImportError | null>(
     null
+  )
+  const setImportError = React.useMemo(
+    () => (v: ImportError | null, def?: LabwareDefinition2) => {
+      if (v != null) {
+        reportEvent({
+          name: 'labwareCreatorFileImport',
+          properties: {
+            labwareDisplayName: def?.metadata.displayName,
+            labwareAPIName: def?.parameters.loadName,
+            labwareBrand: def?.brand.brand,
+            importSuccess: false,
+            importError: v.key,
+          },
+        })
+      }
+      _setImportError(v)
+    },
+    [_setImportError]
+  )
+
+  const [lastUploaded, _setLastUploaded] = React.useState<LabwareFields | null>(
+    null
+  )
+  const setLastUploaded = React.useMemo(
+    () => (v: LabwareFields | null, def?: LabwareDefinition2) => {
+      if (v != null) {
+        assert(def, "setLastUploaded expected `def` if `v` isn't null")
+        reportEvent({
+          name: 'labwareCreatorFileImport',
+          properties: {
+            labwareType: v.labwareType,
+            labwareDisplayName: def?.metadata.displayName,
+            labwareAPIName: def?.parameters.loadName,
+            labwareBrand: def?.brand.brand,
+            labwareManufacturerID: v.brandId,
+            importSuccess: true,
+            importError: null,
+          },
+        })
+      }
+      _setLastUploaded(v)
+    },
+    [_setLastUploaded]
   )
 
   const scrollRef = React.useRef<HTMLDivElement | null>(null)
@@ -346,10 +416,13 @@ const App = () => {
           }
           const fields = labwareDefToFields(parsedLabwareDef)
           if (!fields) {
-            setImportError({ key: 'UNSUPPORTED_LABWARE_PROPERTIES' })
+            setImportError(
+              { key: 'UNSUPPORTED_LABWARE_PROPERTIES' },
+              parsedLabwareDef
+            )
             return
           }
-          setLastUploaded(fields)
+          setLastUploaded(fields, parsedLabwareDef)
           if (
             fields.labwareType === 'wellPlate' ||
             fields.labwareType === 'reservoir'
@@ -361,7 +434,7 @@ const App = () => {
         reader.readAsText(file)
       }
     },
-    [scrollToForm]
+    [scrollToForm, setLastUploaded, setImportError]
   )
 
   React.useEffect(() => {
@@ -420,6 +493,19 @@ const App = () => {
           zip
             .generateAsync({ type: 'blob' })
             .then(blob => saveAs(blob, `${displayName}.zip`))
+
+          reportEvent({
+            name: 'labwareCreatorFileExport',
+            properties: {
+              labwareType: castValues.labwareType,
+              labwareDisplayName: displayName,
+              labwareAPIName: castValues.loadName,
+              labwareBrand: castValues.brand,
+              labwareManufacturerID: castValues.brandId,
+              exportSuccess: true,
+              exportError: null,
+            },
+          })
         }}
       >
         {({
@@ -431,6 +517,7 @@ const App = () => {
           setTouched,
           setValues,
         }) => {
+          reportErrors({ values, errors, touched })
           // TODO (ka 2019-8-27): factor out this as sub-schema from Yup schema and use it to validate instead of repeating the logic
           const canProceedToForm = Boolean(
             values.labwareType === 'wellPlate' ||
@@ -929,7 +1016,7 @@ const App = () => {
                         className={styles.export_button}
                         onClick={() => {
                           if (!isValid && !showExportErrorModal) {
-                            setShowExportErrorModal(true)
+                            setShowExportErrorModal(true, values)
                           }
                           handleSubmit()
                         }}
@@ -954,6 +1041,11 @@ const App = () => {
                           Use the test guide to troubleshoot your definition.
                         </p>
                         <LinkOut
+                          onClick={() =>
+                            reportEvent({
+                              name: 'labwareCreatorClickTestLabware',
+                            })
+                          }
                           href={PDF_URL}
                           className={styles.test_guide_button}
                         >

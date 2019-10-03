@@ -6,9 +6,11 @@ type Props = {|
   href: string,
   className?: ?string,
   children?: React.Node,
+  onClick?: () => mixed,
 |}
 const LinkOut = (props: Props) => (
   <a
+    onClick={props.onClick}
     className={props.className}
     href={props.href}
     target="_blank"

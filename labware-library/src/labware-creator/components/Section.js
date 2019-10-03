@@ -7,7 +7,11 @@ import { AlertItem } from '@opentrons/components'
 import { getIsHidden } from '../formSelectors'
 import LinkOut from './LinkOut'
 import styles from './Section.css'
-import { IRREGULAR_LABWARE_ERROR, type LabwareFields } from '../fields'
+import {
+  IRREGULAR_LABWARE_ERROR,
+  LINK_CUSTOM_LABWARE_FORM,
+  type LabwareFields,
+} from '../fields'
 
 // TODO: Make this DRY, don't require fields (in children) and also fieldList.
 type Props = {|
@@ -38,9 +42,9 @@ const Section = connect((props: Props) => {
   const allErrors: Array<string> = uniq(
     compact(dirtyFieldNames.map(name => props.formik.errors[name]))
   )
+
   const allErrorAlerts = allErrors.map(error => {
     if (error === IRREGULAR_LABWARE_ERROR) {
-      // TODO IMMEDIATELY get real link to labware request form
       return (
         <AlertItem
           key={error}
@@ -49,10 +53,8 @@ const Section = connect((props: Props) => {
             <>
               Your labware is not compatible with the Labware Creator. Please
               fill out{' '}
-              <LinkOut href="https://opentrons-ux.typeform.com/to/xi8h0W">
-                this form
-              </LinkOut>{' '}
-              to request a custom labware definition.
+              <LinkOut href={LINK_CUSTOM_LABWARE_FORM}>this form</LinkOut> to
+              request a custom labware definition.
             </>
           }
         />
