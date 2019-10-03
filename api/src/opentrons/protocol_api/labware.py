@@ -1254,7 +1254,8 @@ def load_module(name: str, parent: Location) -> ModuleGeometry:
     """
     def_path = 'shared_data/module/definitions/1.json'
     module_def = json.loads(
-        pkgutil.get_data('opentrons', def_path))  # type: ignore
+        pkgutil.get_data(  # type: ignore
+            'opentrons', def_path).decode('utf-8'))  # type: ignore
     return load_module_from_definition(module_def[name], parent)
 
 
