@@ -6,6 +6,7 @@ import {
   type ModuleCommandRequest,
 } from '../../robot-api'
 import { getConnectedRobot } from '../../discovery'
+import { useLogger } from '../../logger'
 
 import type { Dispatch } from '../../types'
 import type { Robot } from '../../discovery'
@@ -17,17 +18,18 @@ import type { Robot } from '../../discovery'
 const useSendModuleCommand = () => {
   const robot: ?Robot = useSelector(getConnectedRobot)
   const dispatch = useDispatch<Dispatch>()
+  const log = useLogger(__dirname)
   const sendModuleCommand = useCallback(
     (serial: string, request: ModuleCommandRequest) => {
       if (!robot) {
-        console.warn(
+        log.warn(
           'attempted to send module command with no connected robot present'
         )
       } else {
         dispatch(sendModuleCommandAction(robot, serial, request))
       }
     },
-    [robot, dispatch]
+    [robot, dispatch, log]
   )
   return sendModuleCommand
 }

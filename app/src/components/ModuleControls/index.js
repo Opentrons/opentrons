@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import TemperatureControl from './TemperatureControl'
 
 import type { TempDeckModule, ThermocyclerModule } from '../../robot-api'
@@ -8,15 +9,20 @@ import useSendModuleCommand from './useSendModuleCommand'
 import styles from './styles.css'
 import TemperatureData from './TemperatureData'
 
+import { getConnectedRobot } from '../../discovery'
+
 type Props = {|
   robot: Robot,
   module: TempDeckModule | ThermocyclerModule,
 |}
 
 function ModuleControls(props: Props) {
-  const { module } = props
+  const { module, robot } = props
   const { currentTemp, targetTemp, lidTemp, lidTarget } = module.data
   const sendModuleCommand = useSendModuleCommand()
+  const connectedRobot: ?Robot = useSelector(getConnectedRobot)
+
+  const canControl = connectedRobot && robot.name === connectedRobot.name
 
   return (
     <div className={styles.module_data}>
@@ -40,6 +46,7 @@ function ModuleControls(props: Props) {
       <div className={styles.control_wrapper}>
         <TemperatureControl
           module={module}
+          disabled={!canControl}
           sendModuleCommand={sendModuleCommand}
         />
       </div>

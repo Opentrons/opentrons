@@ -5,6 +5,7 @@ import {
   AlertModal,
   InputField,
   CheckboxField,
+  HoverTooltip,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import type {
@@ -15,11 +16,13 @@ import type {
 import { Portal } from '../portal'
 import styles from './styles.css'
 
+const CONNECT_FOR_CONTROL = 'Connect to robot to control modules'
 type Props = {|
   module: ThermocyclerModule | TempDeckModule,
   sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
+  disabled?: boolean,
 |}
-const TemperatureControl = ({ module, sendModuleCommand }: Props) => {
+const TemperatureControl = ({ module, sendModuleCommand, disabled }: Props) => {
   const [primaryTempValue, setPrimaryTempValue] = useState(null)
   const [secondaryTempValue, setSecondaryTempValue] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -35,10 +38,12 @@ const TemperatureControl = ({ module, sendModuleCommand }: Props) => {
   }
 
   const handleSubmitTemp = () => {
-    sendModuleCommand(module.serial, {
-      command_type: 'set_temperature',
-      args: [Number(primaryTempValue)],
-    })
+    if (primaryTempValue != null) {
+      sendModuleCommand(module.serial, {
+        command_type: 'set_temperature',
+        args: [Number(primaryTempValue)],
+      })
+    }
     if (secondaryTempValue != null) {
       sendModuleCommand(module.serial, {
         command_type: 'set_lid_temperature',
@@ -68,7 +73,7 @@ const TemperatureControl = ({ module, sendModuleCommand }: Props) => {
               },
               {
                 children: 'Save',
-                disabled: !primaryTempValue,
+                disabled: primaryTempValue == null,
                 onClick: handleSubmitTemp,
               },
             ]}
@@ -108,12 +113,19 @@ const TemperatureControl = ({ module, sendModuleCommand }: Props) => {
           </AlertModal>
         </Portal>
       )}
-      <OutlineButton
-        onClick={handleClick}
-        className={styles.temp_control_button}
-      >
-        {hasTarget === true ? 'Deactivate' : 'Set Temp'}
-      </OutlineButton>
+      <HoverTooltip tooltipComponent={disabled ? CONNECT_FOR_CONTROL : null}>
+        {hoverTooltipHandlers => (
+          <div {...hoverTooltipHandlers}>
+            <OutlineButton
+              onClick={handleClick}
+              disabled={disabled}
+              className={styles.temp_control_button}
+            >
+              {hasTarget === true ? 'Deactivate' : 'Set Temp'}
+            </OutlineButton>
+          </div>
+        )}
+      </HoverTooltip>
     </>
   )
 }

@@ -1,5 +1,6 @@
 // @flow
 // logger
+import { useRef } from 'react'
 import remote from './shell/remote'
 
 // TODO(mc, 2018-05-17): put this type somewhere common to app and app-shell
@@ -56,4 +57,9 @@ function log(level: LogLevel, message: string, label: string, meta?: {}) {
 
   // send to main process for log file collection
   remote.ipcRenderer.send('log', { level, message, label, ...meta })
+}
+
+export function useLogger(filename: string): Logger {
+  const loggerRef = useRef(createLogger(filename))
+  return loggerRef.current
 }
