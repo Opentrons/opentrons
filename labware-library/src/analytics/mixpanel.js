@@ -36,15 +36,10 @@ export function mixpanelOptOut() {
   }
 }
 
-export function initializeMixpanel(config: MixpanelConfig) {
+export function initializeMixpanel() {
   if (MIXPANEL_ID) {
     console.debug('Initializing Mixpanel')
     mixpanel.init(MIXPANEL_ID, MIXPANEL_OPTS)
-    if (config.optedIn) {
-      mixpanelOptIn(config.trackingUUID)
-    } else {
-      mixpanelOptOut()
-    }
   } else {
     console.warn('MIXPANEL_ID not found; this is a bug if build is production')
   }

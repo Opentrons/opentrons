@@ -2,6 +2,11 @@
 @import '../../styles/breakpoints.css';
 @import '../../styles/spacing.css';
 
+.analytics_modal {
+  /* NOTE: this z-index must beat the Nav z-index! */
+  z-index: 9999;
+}
+
 .page_wrapper {
   height: 100%;
 
