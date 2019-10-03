@@ -17,11 +17,6 @@ export default class MobileNav extends React.Component<Props, State> {
 
   toggle = () => {
     this.setState({ isOpen: !this.state.isOpen })
-    document.body && document.body.classList.toggle('no_scroll')
-  }
-
-  componentWillUnmount() {
-    document.body && document.body.classList.remove('no_scroll')
   }
 
   render() {

@@ -10,6 +10,7 @@
   --spacing-nav: 1.75rem;
   --spacing-submenu: 1.75rem;
   --spacing-link: 1.75rem;
+  --spacing-mobile-heading: 4.5rem;
 
   --font-menu-title: {
     font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
@@ -334,7 +335,7 @@
   top: var(--size-mobile-nav);
   right: 0;
   width: 100%;
-  min-height: calc(100vh - var(--size-mobile-nav));
+  max-height: calc(100% - var(--size-mobile-nav));
   margin: 0 -105% 0 0;
   background-color: var(--c-white);
   box-shadow: var(--shadow-1);
@@ -350,7 +351,7 @@
 .mobile_menu_heading {
   @apply --flex-start;
 
-  height: 4.5rem;
+  height: var(--spacing-mobile-heading);
   border-bottom: var(--bd-light);
 }
 
@@ -372,6 +373,14 @@
 .mobile_content {
   padding: var(--spacing-5);
   padding-bottom: 0;
+}
+
+.scrollable_contents {
+  max-height:
+    calc(
+      100vh - var(--size-mobile-nav) - var(--spacing-mobile-heading)
+    );
+  overflow-y: auto;
 }
 
 /*  Product Submenu Mobile */
