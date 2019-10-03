@@ -369,11 +369,11 @@ class Thermocycler:
         if self.lid_target is None or self.lid_temp is None:
             _status = 'idle'
         else:
-            const diff = self.lid_target - self.lid_temp
+            diff = self.lid_target - self.lid_temp
             if abs(diff) < TEMP_THRESHOLD:
                 _status = 'holding at target'
             elif diff < 0:
-                _status = 'idle' # TC lid can't actively cool
+                _status = 'idle'  # TC lid can't actively cool
             else:
                 _status = 'heating'
         return _status
