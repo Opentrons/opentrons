@@ -1116,7 +1116,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["dropTipShake"]
+      "quirks": []
     },
     "p20_multi_v2.0": {
       "name": "p20_multi_gen2",
@@ -1253,7 +1253,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["dropTipShake"]
+      "quirks": []
     },
     "p50_single_v1": {
       "name": "p50_single",
@@ -2833,7 +2833,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["dropTipShake"]
+      "quirks": []
     },
     "p300_multi_v1": {
       "name": "p300_multi",
@@ -3404,7 +3404,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["dropTipShake"]
+      "quirks": []
     },
     "p1000_single_v1": {
       "name": "p1000_single",
@@ -3997,7 +3997,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["dropTipShake", "pickupTipShake"],
+      "quirks": ["pickupTipShake"],
       "returnTipHeight": 0.83
     }
   },

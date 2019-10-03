@@ -79,7 +79,7 @@ def test_shake_during_pick_up(monkeypatch):
 def test_shake_during_drop(monkeypatch):
     robot.reset()
     pip = instruments._create_pipette_from_config(
-            config=pipette_config.load('p1000_single_v2.0'),
+            config=pipette_config.load('p1000_single_v1.5'),
             mount='left',
             name='p1000_single_v2.0')
     tiprack = containers_load(robot, 'opentrons_96_tiprack_1000ul', '1')
