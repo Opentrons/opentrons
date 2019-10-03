@@ -29,7 +29,7 @@ const ModuleLiveStatusCards = () => {
       setExpandedCard(modules[0].serial)
     }
     prevModuleCountRef.current = modules.length
-  })
+  }, [modules])
 
   const makeToggleCard = (serial: string) => () => {
     setExpandedCard(serial === expandedCard ? '' : serial)

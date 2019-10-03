@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Card, useInterval } from '@opentrons/components'
 import { fetchModules, getModulesState } from '../../robot-api'
 import ModulesCardContents from './ModulesCardContents'
-import { getConfig } from '../../config'
 
 import type { State, Dispatch } from '../../types'
 import type { Robot } from '../../discovery'

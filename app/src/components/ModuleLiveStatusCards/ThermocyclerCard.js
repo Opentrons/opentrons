@@ -12,7 +12,13 @@ import styles from './styles.css'
 import TemperatureControl from '../ModuleControls/TemperatureControl'
 import TemperatureData from '../ModuleControls/TemperatureData'
 
-const TimeRemaining = ({ holdTime }: {| holdTime: ?number |}) => (
+const TimeRemaining = ({
+  holdTime,
+  title,
+}: {|
+  holdTime: ?number,
+  title: string,
+|}) => (
   <span
     className={cx(styles.inline_labeled_value, styles.time_remaining_wrapper)}
   >
@@ -62,7 +68,7 @@ const CycleInfo = ({
         className={styles.compact_labeled_value}
         value={`${currentStepIndex} / ${totalStepCount}`}
       />
-      <TimeRemaining holdTime={holdTime} />
+      <TimeRemaining holdTime={holdTime} title="Time remaining for step:" />
     </div>
   )
 }
@@ -139,7 +145,7 @@ const ThermocyclerCard = ({
       )}
       {holdTime != null && holdTime > 0 && !executingProfile && (
         <div className={styles.card_row}>
-          <TimeRemaining holdTime={holdTime} />
+          <TimeRemaining holdTime={holdTime} title="Hold time remaining:" />
         </div>
       )}
     </StatusCard>

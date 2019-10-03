@@ -68,7 +68,7 @@ const TemperatureControl = ({ module, sendModuleCommand }: Props) => {
               },
               {
                 children: 'Save',
-                disabled: !Boolean(primaryTempValue),
+                disabled: !primaryTempValue,
                 onClick: handleSubmitTemp,
               },
             ]}

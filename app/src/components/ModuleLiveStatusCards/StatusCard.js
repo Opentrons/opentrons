@@ -1,8 +1,7 @@
 // @flow
 import * as React from 'react'
-import cx from 'classnames'
 import styles from './styles.css'
-import { MIXED_WELL_COLOR, CollapsibleItem } from '@opentrons/components'
+import { CollapsibleItem } from '@opentrons/components'
 
 type Props = {|
   /** Title for the card */

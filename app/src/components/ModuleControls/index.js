@@ -26,9 +26,9 @@ function ModuleControls(props: Props) {
           className={styles.temp_data_item}
           current={currentTemp}
           target={targetTemp}
-          title={lidTemp && lidTarget ? 'Base Temperature:' : 'Temperature:'}
+          title={lidTemp ? 'Base Temperature:' : 'Temperature:'}
         />
-        {lidTemp && lidTarget && (
+        {lidTemp && (
           <TemperatureData
             className={styles.temp_data_item}
             current={lidTemp}
