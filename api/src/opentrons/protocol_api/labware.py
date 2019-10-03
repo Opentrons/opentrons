@@ -1253,8 +1253,8 @@ def load_module(name: str, parent: Location) -> ModuleGeometry:
                    is (often the front-left corner of a slot on the deck).
     """
     def_path = 'shared_data/module/definitions/1.json'
-    module_def = json.loads(  # type: ignore
-        pkgutil.get_data('opentrons', def_path))
+    module_def = json.loads(
+        pkgutil.get_data('opentrons', def_path))  # type: ignore
     return load_module_from_definition(module_def[name], parent)
 
 
