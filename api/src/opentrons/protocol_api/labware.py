@@ -1064,7 +1064,7 @@ def _get_standard_labware_definition(
     if namespace is None:
         for fallback_namespace in [OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE]:
             try:
-                return get_labware_definition(
+                return _get_standard_labware_definition(
                     load_name, fallback_namespace, checked_version)
             except (FileNotFoundError):
                 pass
@@ -1077,8 +1077,8 @@ def _get_standard_labware_definition(
     def_path = _get_path_to_labware(load_name, namespace, checked_version)
 
     try:
-        with open(def_path, 'r') as f:
-            labware_def = json.load(f)
+        with open(def_path, 'rb') as f:
+            labware_def = json.loads(f.read().decode('utf-8'))
     except FileNotFoundError:
         raise FileNotFoundError(
             f'Labware "{load_name}" not found with version {version} ' +
