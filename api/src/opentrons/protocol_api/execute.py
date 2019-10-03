@@ -6,7 +6,8 @@ from typing import Any, Callable
 
 import opentrons
 from .contexts import ProtocolContext
-from . import execute_v3
+from . import execute_v3, back_compat
+
 from opentrons import config
 from opentrons.protocols.types import PythonProtocol, Protocol
 
