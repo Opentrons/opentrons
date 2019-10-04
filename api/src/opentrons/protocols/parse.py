@@ -96,11 +96,11 @@ def parse(
     :param protocol_file: The protocol file, or for single-file protocols, a
                         string of the protocol contents.
     :param filename: The name of the protocol. Optional, but helps with
-                        deducing the kind of protocol (e.g. if it ends with
-                        '.json' we can treat it like json)
-    :param extra_defs: Any extra labware defs that should be given to the
-                       protocol. Ignored if the protocol is json or zipped
-                       python.
+                     deducing the kind of protocol (e.g. if it ends with
+                     '.json' we can treat it like json)
+    :param extra_labware: Any extra labware defs that should be given to the
+                          protocol. Ignored if the protocol is json or zipped
+                          python.
     :param extra_data: Any extra data files that should be provided to the
                        protocol. Ignored if the protocol is json or zipped
                        python.
