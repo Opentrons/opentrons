@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { ContinueModal } from '@opentrons/components'
+import { AlertModal } from '@opentrons/components'
 import useAnalytics from './useAnalytics'
 
 type Props = {|
@@ -13,13 +13,15 @@ const AnalyticsOptIn = (props: Props) => {
 
   return (
     !analyticsState.seenOptIn && (
-      <ContinueModal
+      <AlertModal
         className={props.className}
-        onCancelClick={optOutOfAnalytics}
-        onContinueClick={optInToAnalytics}
+        buttons={[
+          { onClick: optOutOfAnalytics, children: 'NO' },
+          { onClick: optInToAnalytics, children: 'YES' },
+        ]}
       >
         {props.children}
-      </ContinueModal>
+      </AlertModal>
     )
   )
 }

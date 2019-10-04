@@ -3,8 +3,17 @@
 @import '../../styles/spacing.css';
 
 .analytics_modal {
+  @apply --font-body-2-dark;
+
   /* NOTE: this z-index must beat the Nav z-index! */
   z-index: 9999;
+
+  & h2 {
+    @apply --font-default-dark;
+
+    font-weight: var(--fw-semibold);
+    padding-bottom: 1rem;
+  }
 }
 
 .page_wrapper {
