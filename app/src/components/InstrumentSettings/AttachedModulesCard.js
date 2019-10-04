@@ -6,7 +6,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Card, useInterval } from '@opentrons/components'
 import { fetchModules, getModulesState } from '../../robot-api'
 import ModulesCardContents from './ModulesCardContents'
-import { getConfig } from '../../config'
 
 import type { State, Dispatch } from '../../types'
 import type { Robot } from '../../discovery'
@@ -23,9 +22,6 @@ export default function AttachedModulesCard(props: Props) {
   const modules = useSelector((state: State) =>
     getModulesState(state, robot.name)
   )
-  const __tempControlsEnabled = Boolean(
-    useSelector(getConfig).devInternal?.tempdeckControls
-  )
 
   // this component may be mounted if the robot is not currently connected, so
   // GET /modules ourselves instead of relying on the poll while connected epic
@@ -37,11 +33,7 @@ export default function AttachedModulesCard(props: Props) {
 
   return (
     <Card title={TITLE} column>
-      <ModulesCardContents
-        robot={robot}
-        modules={modules}
-        showControls={__tempControlsEnabled}
-      />
+      <ModulesCardContents robot={robot} modules={modules} />
     </Card>
   )
 }

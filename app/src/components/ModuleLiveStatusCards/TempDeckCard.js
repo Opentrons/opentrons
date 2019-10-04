@@ -5,43 +5,51 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import type { TempDeckModule, ModuleCommandRequest } from '../../robot-api'
 import StatusCard from './StatusCard'
-import CardContentRow from './CardContentRow'
 import StatusItem from './StatusItem'
-import TemperatureControl from './TemperatureControl'
+import TemperatureControl from '../ModuleControls/TemperatureControl'
+import styles from './styles.css'
 
 type Props = {|
   module: TempDeckModule,
   sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
   isProtocolActive: boolean,
-  __tempdeckControlsEnabled: boolean,
+  isCardExpanded: boolean,
+  toggleCard: boolean => mixed,
 |}
 
 const TempDeckCard = ({
   module,
   sendModuleCommand,
   isProtocolActive,
-  __tempdeckControlsEnabled,
+  isCardExpanded,
+  toggleCard,
 }: Props) => (
-  <StatusCard title={getModuleDisplayName(module.name)}>
-    <CardContentRow>
+  <StatusCard
+    title={getModuleDisplayName(module.name)}
+    isCardExpanded={isCardExpanded}
+    toggleCard={toggleCard}
+  >
+    <div className={styles.card_row}>
       <StatusItem status={module.status} />
-      {__tempdeckControlsEnabled && !isProtocolActive && (
+      {!isProtocolActive && (
         <TemperatureControl
           module={module}
           sendModuleCommand={sendModuleCommand}
         />
       )}
-    </CardContentRow>
-    <CardContentRow>
+    </div>
+    <div className={styles.card_row}>
       <LabeledValue
         label="Current Temp"
+        className={styles.temp_data_item}
         value={`${module.data.currentTemp} °C`}
       />
       <LabeledValue
         label="Target Temp"
+        className={styles.temp_data_item}
         value={module.data.targetTemp ? `${module.data.targetTemp} °C` : 'None'}
       />
-    </CardContentRow>
+    </div>
   </StatusCard>
 )
 

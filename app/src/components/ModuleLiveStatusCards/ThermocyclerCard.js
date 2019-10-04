@@ -7,101 +7,149 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import type { ThermocyclerModule, ModuleCommandRequest } from '../../robot-api'
 import StatusCard from './StatusCard'
-import CardContentRow from './CardContentRow'
 import StatusItem from './StatusItem'
 import styles from './styles.css'
-import TemperatureControl from './TemperatureControl'
+import TemperatureControl from '../ModuleControls/TemperatureControl'
+import TemperatureData from '../ModuleControls/TemperatureData'
 
-type TempsItemProps = {|
+const TimeRemaining = ({
+  holdTime,
+  title,
+}: {|
+  holdTime: ?number,
   title: string,
-  current: number,
-  target: ?number,
-|}
-const TempsItem = ({ title, current, target }: TempsItemProps) => (
-  <div className={styles.temps_item}>
-    <p className={styles.label}>{title}</p>
-    <div className={styles.data_row}>
-      <p className={styles.inline_labeled_value}>Current:</p>
-      <p>{`${current} °C`}</p>
-    </div>
-    <div className={styles.data_row}>
-      <p className={styles.inline_labeled_value}>Target:</p>
-      <p>{target ? `${target} °C` : 'None'}</p>
-    </div>
-  </div>
+|}) => (
+  <span
+    className={cx(styles.inline_labeled_value, styles.time_remaining_wrapper)}
+  >
+    <p className={styles.time_remaining_label}>Time remaining for step:</p>
+    <p>
+      {`${moment
+        .utc(
+          // NOTE: moment still doesn't allow duration formatting, hence fake moment creation
+          moment.duration(holdTime || 0, 'seconds').asMilliseconds()
+        )
+        .format('HH:mm:ss')}`}
+    </p>
+  </span>
 )
+
+type CycleInfoProps = {|
+  totalCycleCount: ?number,
+  currentCycleIndex: ?number,
+  totalStepCount: ?number,
+  currentStepIndex: ?number,
+  holdTime: ?number,
+|}
+const CycleInfo = ({
+  totalCycleCount,
+  currentCycleIndex,
+  totalStepCount,
+  currentStepIndex,
+  holdTime,
+}: CycleInfoProps) => {
+  if (
+    totalCycleCount == null ||
+    currentCycleIndex == null ||
+    totalStepCount == null ||
+    currentStepIndex == null
+  ) {
+    return null
+  }
+  return (
+    <div className={styles.card_row}>
+      <LabeledValue
+        label="Cycle #"
+        className={styles.compact_labeled_value}
+        value={`${currentCycleIndex} / ${totalCycleCount}`}
+      />
+      <LabeledValue
+        label="Step #"
+        className={styles.compact_labeled_value}
+        value={`${currentStepIndex} / ${totalStepCount}`}
+      />
+      <TimeRemaining holdTime={holdTime} title="Time remaining for step:" />
+    </div>
+  )
+}
 
 type Props = {|
   module: ThermocyclerModule,
   sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
   isProtocolActive: boolean,
+  isCardExpanded: boolean,
+  toggleCard: boolean => mixed,
 |}
 
 const ThermocyclerCard = ({
   module,
   sendModuleCommand,
   isProtocolActive,
-}: Props) => (
-  <StatusCard title={getModuleDisplayName(module.name)}>
-    <CardContentRow>
-      <StatusItem status={module.status} />
-      {!isProtocolActive && (
-        <TemperatureControl
-          module={module}
-          sendModuleCommand={sendModuleCommand}
+  isCardExpanded,
+  toggleCard,
+}: Props) => {
+  const {
+    currentTemp,
+    targetTemp,
+    lidTemp,
+    lidTarget,
+    holdTime,
+    totalCycleCount,
+    currentCycleIndex,
+    totalStepCount,
+    currentStepIndex,
+  } = module.data
+
+  const executingProfile =
+    totalCycleCount != null &&
+    currentCycleIndex != null &&
+    totalStepCount != null &&
+    currentStepIndex != null
+  return (
+    <StatusCard
+      title={getModuleDisplayName(module.name)}
+      isCardExpanded={isCardExpanded}
+      toggleCard={toggleCard}
+    >
+      <div className={styles.card_row}>
+        <StatusItem status={module.status} />
+        {!isProtocolActive && (
+          <TemperatureControl
+            module={module}
+            sendModuleCommand={sendModuleCommand}
+          />
+        )}
+      </div>
+      <div className={styles.card_row}>
+        <TemperatureData
+          className={styles.temp_data_item}
+          title="Base Temp"
+          current={currentTemp}
+          target={targetTemp}
+        />
+        <TemperatureData
+          className={styles.temp_data_item}
+          title="Lid Temp"
+          current={lidTemp}
+          target={lidTarget}
+        />
+      </div>
+      {executingProfile && (
+        <CycleInfo
+          holdTime={holdTime}
+          totalCycleCount={totalCycleCount}
+          currentCycleIndex={currentCycleIndex}
+          totalStepCount={totalStepCount}
+          currentStepIndex={currentStepIndex}
         />
       )}
-    </CardContentRow>
-    <CardContentRow>
-      <TempsItem
-        title="Base Temp"
-        current={module.data.currentTemp}
-        target={module.data.targetTemp}
-      />
-      <TempsItem
-        title="Lid Temp"
-        current={module.data.lidTemp}
-        target={module.data.lidTarget}
-      />
-    </CardContentRow>
-    {module.data.totalCycleCount != null &&
-      module.data.currentCycleIndex != null &&
-      module.data.totalStepCount != null &&
-      module.data.currentStepIndex != null && (
-        <CardContentRow>
-          <LabeledValue
-            label="Cycle #"
-            className={styles.compact_labeled_value}
-            value={`${module.data.currentCycleIndex} / ${module.data.totalCycleCount}`}
-          />
-          <LabeledValue
-            label="Step #"
-            className={styles.compact_labeled_value}
-            value={`${module.data.currentStepIndex} / ${module.data.totalStepCount}`}
-          />
-          <span
-            className={cx(
-              styles.inline_labeled_value,
-              styles.time_remaining_wrapper
-            )}
-          >
-            <p className={styles.time_remaining_label}>
-              Time remaining for step:
-            </p>
-            <p>
-              {`${moment
-                .utc(
-                  // NOTE: moment still doesn't allow duration formatting, hence fake moment creation
-                  moment
-                    .duration(module.data.holdTime || 0, 'seconds')
-                    .asMilliseconds()
-                )
-                .format('HH:mm:ss')}`}
-            </p>
-          </span>
-        </CardContentRow>
+      {holdTime != null && holdTime > 0 && !executingProfile && (
+        <div className={styles.card_row}>
+          <TimeRemaining holdTime={holdTime} title="Hold time remaining:" />
+        </div>
       )}
-  </StatusCard>
-)
+    </StatusCard>
+  )
+}
 
 export default ThermocyclerCard

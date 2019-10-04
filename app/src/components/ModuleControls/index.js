@@ -1,49 +1,57 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
-import ModuleData from './ModuleData'
-import TemperatureControls from './TemperatureControls'
+import { useSelector } from 'react-redux'
+import TemperatureControl from './TemperatureControl'
 
-import { sendModuleCommand } from '../../robot-api'
-
-import type { State, Dispatch } from '../../types'
-import type { TempDeckModule, ModuleCommandRequest } from '../../robot-api'
+import type { TempDeckModule, ThermocyclerModule } from '../../robot-api'
 import type { Robot } from '../../discovery'
+import useSendModuleCommand from './useSendModuleCommand'
+import styles from './styles.css'
+import TemperatureData from './TemperatureData'
 
-type OP = {|
+import { getConnectedRobot } from '../../discovery'
+
+type Props = {|
   robot: Robot,
-  module: TempDeckModule,
+  module: TempDeckModule | ThermocyclerModule,
 |}
-
-type DP = {|
-  sendModuleCommand: (request: ModuleCommandRequest) => mixed,
-|}
-
-type Props = { ...OP, ...DP }
-
-export default connect<Props, OP, {||}, DP, State, Dispatch>(
-  null,
-  mapDispatchToProps
-)(ModuleControls)
 
 function ModuleControls(props: Props) {
-  const { module, sendModuleCommand } = props
-  const { currentTemp, targetTemp } = module.data
+  const { module, robot } = props
+  const { currentTemp, targetTemp, lidTemp, lidTarget } = module.data
+  const sendModuleCommand = useSendModuleCommand()
+  const connectedRobot: ?Robot = useSelector(getConnectedRobot)
+
+  const canControl = connectedRobot && robot.name === connectedRobot.name
 
   return (
-    <>
-      <ModuleData currentTemp={currentTemp} targetTemp={targetTemp} />
-      <TemperatureControls setTemp={sendModuleCommand} />
-    </>
+    <div className={styles.module_data}>
+      <div className={styles.temp_data_buffer}></div>
+      <div className={styles.temp_data_wrapper}>
+        <TemperatureData
+          className={styles.temp_data_item}
+          current={currentTemp}
+          target={targetTemp}
+          title={lidTemp ? 'Base Temperature:' : 'Temperature:'}
+        />
+        {lidTemp && (
+          <TemperatureData
+            className={styles.temp_data_item}
+            current={lidTemp}
+            target={lidTarget}
+            title="Lid Temperature:"
+          />
+        )}
+      </div>
+      <div className={styles.control_wrapper}>
+        <TemperatureControl
+          module={module}
+          disabled={!canControl}
+          sendModuleCommand={sendModuleCommand}
+        />
+      </div>
+    </div>
   )
 }
 
-function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
-  const { robot, module } = ownProps
-  const { serial } = module
-
-  return {
-    sendModuleCommand: request =>
-      dispatch(sendModuleCommand(robot, serial, request)),
-  }
-}
+export default ModuleControls
