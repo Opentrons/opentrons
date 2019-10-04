@@ -390,8 +390,6 @@ def _move_pipette(robot, mount, model, point):
 
 
 def _fetch_or_create_pipette(robot, mount, model=None):
-
-    print(f"GLOBALS IN FETCH/CREATE {globals()}")
     existing_pipettes = robot.get_instruments()
     pipette = None
     should_remove = True

@@ -236,10 +236,7 @@ async def dc_session(request, async_server, monkeypatch, loop):
     ses = endpoints.SessionManager(hw)
     endpoints.session = ses
     monkeypatch.setattr(endpoints, 'session', ses)
-    # try:
     yield ses
-    # finally:
-    #     endpoints.session = None
 
 
 @pytest.mark.apiv1
@@ -458,17 +455,11 @@ async def wait_until(matcher, notifications, timeout=1, loop=None):
             return result
 
 
-@pytest.fixture(
-    params=[
-        pytest.param(using_api1, marks=pytest.mark.apiv1),
-        pytest.param(using_sync_api2, marks=pytest.mark.apiv2)])
+@pytest.fixture
 def model(robot, hardware, loop, request):
     # Use with pytest.mark.parametrize(’labware’, [some-labware-name])
     # to have a different labware loaded as .container. If not passed,
     # defaults to the version-appropriate way to do 96 flat
-    from opentrons.legacy_api.containers import load
-    from opentrons.legacy_api.instruments.pipette import Pipette
-
     try:
         lw_name = request.getfixturevalue('labware_name')
     except Exception:
@@ -485,6 +476,8 @@ def model(robot, hardware, loop, request):
         rob = hardware
         container = models.Container(plate, context=ctx)
     else:
+        from opentrons.legacy_api.containers import load
+        from opentrons.legacy_api.instruments.pipette import Pipette
         pipette = Pipette(robot,
                           ul_per_mm=18.5, max_volume=300, mount='right')
         plate = load(robot, lw_name or '96-flat', '1')
