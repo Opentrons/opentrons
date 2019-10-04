@@ -7,7 +7,6 @@ import tempfile
 import pytest
 
 from opentrons.server import init
-from opentrons.data_storage import database as db
 from opentrons.config import pipette_config
 from opentrons import config, types
 
