@@ -46,5 +46,6 @@ export function initializeMixpanel() {
 }
 
 export const trackWithMixpanel = (name: string, properties: Object) => {
+  // NOTE: make sure user has opted in before calling this fn
   mixpanel.track(name, properties)
 }

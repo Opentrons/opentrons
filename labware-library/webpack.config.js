@@ -39,6 +39,12 @@ module.exports = merge(baseConfig, {
         .concat(['NODE_ENV'])
     ),
 
+    // vars for analytics reporting
+    new webpack.DefinePlugin({
+      'process.env.OT_LL_VERSION': JSON.stringify(pkg.version),
+      'process.env.OT_LL_BUILD_DATE': JSON.stringify(new Date().toUTCString()),
+    }),
+
     new FaviconsWebpackPlugin({
       logo: './src/images/favicon-logo.png',
       prefix: 'icons-[hash]/',

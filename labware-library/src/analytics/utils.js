@@ -3,6 +3,7 @@ import cookie from 'cookie'
 import uuid from 'uuid/v4'
 
 import { initializeMixpanel, mixpanelOptIn, mixpanelOptOut } from './mixpanel'
+import { initializeFullstory, shutdownFullstory } from './fullstory'
 import type { AnalyticsState } from './types'
 
 const COOKIE_PREFIX = 'ot_lc_' // NOTE: cookies are in LC b/c we don't have a plan for LL yet
@@ -64,10 +65,14 @@ export const _getInitialAnalyticsState = (): AnalyticsState => {
   }
 }
 
+// NOTE: Fullstory has no opt-in/out, control by adding/removing it completely
+
 export const performOptIn = (s: AnalyticsState) => {
   mixpanelOptIn(s.trackingUUID)
+  initializeFullstory(s.trackingUUID)
 }
 
 export const performOptOut = (s: AnalyticsState) => {
   mixpanelOptOut()
+  shutdownFullstory()
 }
