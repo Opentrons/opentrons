@@ -7,7 +7,6 @@ import itertools
 import json
 import pkgutil
 from io import BytesIO
-from pathlib import PurePosixPath
 from zipfile import ZipFile
 from typing import Any, Dict, Union
 
@@ -15,6 +14,7 @@ import jsonschema  # type: ignore
 
 from opentrons.config import feature_flags as ff
 from .types import Protocol, PythonProtocol, JsonProtocol, Metadata
+from .bundle import extract_bundle
 
 
 def _parse_json(
@@ -32,7 +32,8 @@ def _parse_python(
     filename: str = None,
     bundled_labware: Dict[str, Dict[str, Any]] = None,
     bundled_data: Dict[str, bytes] = None,
-    bundled_python: Dict[str, str] = None
+    bundled_python: Dict[str, str] = None,
+    extra_labware: Dict[str, Dict[str, Any]] = None,
 ) -> PythonProtocol:
     """ Parse a protocol known or at least suspected to be python """
     filename_checked = filename or '<protocol>'
@@ -55,22 +56,10 @@ def _parse_python(
         api_level=version,
         bundled_labware=bundled_labware,
         bundled_data=bundled_data,
-        bundled_python=bundled_python)
+        bundled_python=bundled_python,
+        extra_labware=extra_labware)
 
     return result
-
-
-def _has_files_at_root(zipFile):
-    for zipInfo in zipFile.infolist():
-        if zipInfo.filename.count('/') == 0:
-            return True
-    return False
-
-
-def _get_labware_uri(labware_def: Dict[str, Any]) -> str:
-    return '/'.join([labware_def['namespace'],
-                     labware_def['parameters']['loadName'],
-                     str(labware_def['version'])])
 
 
 def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # noqa: C901
@@ -80,60 +69,14 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # n
             'Uploading a bundled protocol requires the robot to be set to '
             'Protocol API V2. Enable the \'Use Protocol API version 2\' '
             'toggle in the robot\'s Advanced Settings and restart the robot')
-    if not _has_files_at_root(bundle):
-        raise RuntimeError(
-            'No files found in ZIP file\'s root directory. When selecting '
-            'files to zip, make sure to directly select the files '
-            'themselves. Do not select their parent directory, which would '
-            'result in nesting all files inside that directory in the ZIP.')
 
-    MAIN_PROTOCOL_FILENAME = 'protocol.ot2.py'
-    LABWARE_DIR = 'labware'
-    DATA_DIR = 'data'
-    bundled_labware: Dict[str, Dict[str, Any]] = {}
-    bundled_data = {}
-    bundled_python = {}
-
-    try:
-        with bundle.open(MAIN_PROTOCOL_FILENAME, 'r') as protocol_file:
-            py_protocol = protocol_file.read().decode('utf-8')
-    except KeyError:
-        raise RuntimeError(
-            f'Bundled protocol should have a {MAIN_PROTOCOL_FILENAME} ' +
-            'file in the root directory')
-
-    for zipInfo in bundle.infolist():
-        filepath = PurePosixPath(zipInfo.filename)
-        rootpath = filepath.parts[0]
-
-        # skip directories and weird OS-added directories
-        # (note: the __MACOSX dir would contain '__MACOSX/foo.py'
-        # and other files. This would break our inferences, so we need
-        # to exclude all contents of that directory)
-        if rootpath == '__MACOSX' or zipInfo.is_dir():
-            continue
-
-        with bundle.open(zipInfo) as f:
-            if rootpath == LABWARE_DIR and filepath.suffix == '.json':
-                labware_def = json.load(f)
-                labware_key = _get_labware_uri(labware_def)
-                if labware_key in bundled_labware:
-                    raise RuntimeError(
-                        f'Conflicting labware in bundle. {labware_key}')
-                bundled_labware[labware_key] = labware_def
-            elif rootpath == DATA_DIR:
-                # note: data files are read as binary
-                bundled_data[str(filepath.relative_to(DATA_DIR))] = f.read()
-            elif (filepath.suffix == '.py' and
-                  str(filepath) != MAIN_PROTOCOL_FILENAME):
-                bundled_python[str(filepath)] = f.read().decode('utf-8')
-
-    if not bundled_labware:
-        raise RuntimeError('No labware definitions found in bundle.')
+    contents = extract_bundle(bundle)
 
     result = _parse_python(
-        py_protocol, filename, bundled_labware, bundled_data,
-        bundled_python)
+        contents.protocol, filename,
+        contents.bundled_labware,
+        contents.bundled_data,
+        contents.bundled_python)
 
     if result.api_level != '2':
         raise RuntimeError('Bundled protocols must use Protocol API V2, ' +
@@ -144,15 +87,23 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # n
 
 def parse(
     protocol_file: Union[str, bytes],
-    filename: str = None
+    filename: str = None,
+    extra_labware: Dict[str, Dict[str, Any]] = None,
+    extra_data: Dict[str, bytes] = None
 ) -> Protocol:
     """ Parse a protocol from text.
 
     :param protocol_file: The protocol file, or for single-file protocols, a
                         string of the protocol contents.
     :param filename: The name of the protocol. Optional, but helps with
-                        deducing the kind of protocol (e.g. if it ends with
-                        '.json' we can treat it like json)
+                     deducing the kind of protocol (e.g. if it ends with
+                     '.json' we can treat it like json)
+    :param extra_labware: Any extra labware defs that should be given to the
+                          protocol. Ignored if the protocol is json or zipped
+                          python.
+    :param extra_data: Any extra data files that should be provided to the
+                       protocol. Ignored if the protocol is json or zipped
+                       python.
     :return types.Protocol: The protocol holder, a named tuple that stores the
                         data in the protocol for later simulation or
                         execution.
@@ -174,13 +125,17 @@ def parse(
         if filename and filename.endswith('.json'):
             return _parse_json(protocol_str, filename)
         elif filename and filename.endswith('.py'):
-            return _parse_python(protocol_str, filename)
+            return _parse_python(
+                protocol_str, filename, extra_labware=extra_labware,
+                bundled_data=extra_data)
 
         # our jsonschema says the top level json kind is object
         if protocol_str and protocol_str[0] in ('{', b'{'):
             return _parse_json(protocol_str, filename)
         else:
-            return _parse_python(protocol_str, filename)
+            return _parse_python(
+                protocol_str, filename, extra_labware=extra_labware,
+                bundled_data=extra_data)
 
 
 def extract_metadata(parsed: ast.Module) -> Metadata:

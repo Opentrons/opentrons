@@ -20,6 +20,15 @@ class PythonProtocol(NamedTuple):
     bundled_labware: Optional[Dict[str, Dict[str, Any]]]
     bundled_data: Optional[Dict[str, bytes]]
     bundled_python: Optional[Dict[str, str]]
+    # this should only be included when the protocol is not a zip
+    extra_labware: Optional[Dict[str, Dict[str, Any]]]
 
 
 Protocol = Union[JsonProtocol, PythonProtocol]
+
+
+class BundleContents(NamedTuple):
+    protocol: str
+    bundled_labware: Dict[str, Dict[str, Any]]
+    bundled_data: Dict[str, bytes]
+    bundled_python: Dict[str, str]

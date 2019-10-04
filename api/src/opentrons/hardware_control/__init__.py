@@ -779,8 +779,8 @@ class API(HardwareAPILike):
         # target_position.items() is (rightly) Tuple[float, ...] with unbounded
         # size; unfortunately, mypy can’t quite figure out the length check
         # above that makes this OK
-        transformed = linal.apply_transform(  # type: ignore
-            self._config.gantry_calibration, to_transform)
+        transformed = linal.apply_transform(
+            self._config.gantry_calibration, to_transform)  # type: ignore
 
         # Since target_position is an OrderedDict with the axes ordered by
         # (x, y, z, a, b, c), and we’ll only have one of a or z (as checked
