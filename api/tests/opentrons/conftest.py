@@ -85,7 +85,7 @@ def config_tempdir(tmpdir):
 
 
 @pytest.fixture(autouse=True)
-def clear_feature_flags(config_tempdir):
+def clear_feature_flags():
     ff_file = config.CONFIG['feature_flags_file']
     if os.path.exists(ff_file):
         os.remove(ff_file)
@@ -95,7 +95,7 @@ def clear_feature_flags(config_tempdir):
 
 
 @pytest.fixture
-def wifi_keys_tempdir(config_tempdir):
+def wifi_keys_tempdir():
     old_wifi_keys = config.CONFIG['wifi_keys_dir']
     with tempfile.TemporaryDirectory() as td:
         config.CONFIG['wifi_keys_dir'] = pathlib.Path(td)
