@@ -1,7 +1,7 @@
 # Releasing Software (for Opentrons developers)
 
 Below you will find instructions for release processes for projects within our monorepo. The main goal of our process is to
-neatly document any changes that may happen during QA, such as bug fixes, and separate production concerns from our development branch. 
+neatly document any changes that may happen during QA, such as bug fixes, and separate production concerns from our development branch.
 
 ## Releasing Robot Software Stack
 
@@ -19,18 +19,22 @@ git push --set-upstream origin release_${version}
 
 3. Open a PR into `master` for your empty release branch.
 4. Create a new branch for your initial version bump:
+
 ```shell
 git checkout -b chore_bump-${version}
 ```
+
 5. In the bump branch, bump the version to the appropriate alpha (read [the section below](#make-bump-usage) carefully)
 6. Inspect version bumps and changelogs
 7. Edit the user-facing changelog at `app-shell/build/release-notes.md` to add the new notes for the app
 8. Edit the user-facing changelog at `api/release-notes.md` to add the new notes for the robot software
 9. `git add --all`
 10. `git cz`
-   - Type: `chore`
-   - Scope: `release`
-   - Message: `${version}`
+
+- Type: `chore`
+- Scope: `release`
+- Message: `${version}`
+
 11. Gather reviews on changelogs and release notes until everybody is satisfied
 12. Once your chore bump branch is ready, squash merge the `chore_bump-${version}` into the `release_${version}` branch.
 13. Tag the release branch as the version you just bumped to; this is a release candidate that will undergo QA:
@@ -88,6 +92,7 @@ git push --set-upstream origin hotfix_${version}
 
 3. Target the hotfix PRs on this branch.
 4. Once the fixes have been merged into the original hotfix branch, create a new branch for your initial version bump:
+
 ```shell
 git checkout -b chore_bump-${version}
 ```
@@ -98,9 +103,11 @@ git checkout -b chore_bump-${version}
 8. Edit the user-facing changelog at `api/release-notes.md` to add the new notes for the robot software
 9. `git add --all`
 10. `git cz`
-   - Type: `chore`
-   - Scope: `release`
-   - Message: `${version}`
+
+- Type: `chore`
+- Scope: `release`
+- Message: `${version}`
+
 11. Push this commit
 12. Once your chore bump branch is ready, squash merge the `chore_bump-${version}` into the `hotfix_${version}` branch.
 13. Tag the release branch as the version you just bumped to; this is a release candidate that will undergo QA:
