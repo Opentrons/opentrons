@@ -72,13 +72,7 @@ def log_by_axis(log, axis):
     return reduce(reducer, log, {axis: [] for axis in axis})
 
 
-def print_db_path(db):
-    cursor = database.db_conn.cursor()
-    cursor.execute("PRAGMA database_list")
-    db_info = cursor.fetchone()
-    print("Database: ", db_info[2])
-
-
+@pytest.mark.apiv1
 @pytest.fixture
 def config_tempdir(tmpdir):
     os.environ['OT_API_CONFIG_DIR'] = str(tmpdir)
@@ -110,6 +104,7 @@ def wifi_keys_tempdir(config_tempdir):
 
 
 # Builds a temp db to allow mutations during testing
+@pytest.mark.apiv1
 @pytest.fixture(autouse=True)
 def dummy_db(config_tempdir):
     _, old_db_path = config_tempdir
