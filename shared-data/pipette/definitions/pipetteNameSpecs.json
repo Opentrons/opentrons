@@ -57,17 +57,17 @@
     "displayName": "P20 Single-Channel GEN2",
     "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
-      "value": 5,
+      "value": 3.78,
       "min": 0.08,
       "max": 24
     },
     "defaultDispenseFlowRate": {
-      "value": 10,
+      "value": 3.78,
       "min": 0.08,
       "max": 24
     },
     "defaultBlowOutFlowRate": {
-      "value": 24,
+      "value": 3.78,
       "min": 0.08,
       "max": 24
     },
@@ -84,17 +84,17 @@
     "displayName": "P20 8-Channel GEN2",
     "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
-      "value": 5,
+      "value": 3.82,
       "min": 0.08,
       "max": 24
     },
     "defaultDispenseFlowRate": {
-      "value": 10,
+      "value": 3.82,
       "min": 0.08,
       "max": 24
     },
     "defaultBlowOutFlowRate": {
-      "value": 24,
+      "value": 3.82,
       "min": 0.08,
       "max": 24
     },
@@ -192,17 +192,17 @@
     "displayName": "P300 Single-Channel GEN2",
     "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
-      "value": 150,
+      "value": 46.43,
       "min": 1,
       "max": 275
     },
     "defaultDispenseFlowRate": {
-      "value": 275,
+      "value": 46.43,
       "min": 1,
       "max": 275.31
     },
     "defaultBlowOutFlowRate": {
-      "value": 275,
+      "value": 46.43,
       "min": 1,
       "max": 275
     },
@@ -219,17 +219,17 @@
     "displayName": "P300 8-Channel GEN2",
     "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
-      "value": 150,
+      "value": 46.71,
       "min": 1,
       "max": 275
     },
     "defaultDispenseFlowRate": {
-      "value": 275,
+      "value": 46.71,
       "min": 1,
       "max": 275
     },
     "defaultBlowOutFlowRate": {
-      "value": 275,
+      "value": 46.71,
       "min": 1,
       "max": 275
     },
@@ -300,17 +300,17 @@
     "displayName": "P1000 Single-Channel GEN2",
     "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
-      "value": 500,
+      "value": 137.35,
       "min": 3,
       "max": 812
     },
     "defaultDispenseFlowRate": {
-      "value": 800,
+      "value": 137.35,
       "min": 3,
       "max": 812
     },
     "defaultBlowOutFlowRate": {
-      "value": 800,
+      "value": 137.35,
       "min": 3,
       "max": 812
     },
