@@ -32,7 +32,7 @@ export default function ErrorModal(props: Props) {
   }
 
   return (
-    <Portal>
+    <Portal level="modal">
       <AlertModal heading={heading} buttons={[closeButtonProps]} alertOverlay>
         <p className={styles.error_modal_message}>{error.message}</p>
         <p>{description}</p>

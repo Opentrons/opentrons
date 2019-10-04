@@ -17,7 +17,7 @@ export default function ExitAlertModal(props: Props) {
   const { back, exit } = props
 
   return (
-    <Portal>
+    <Portal level="modal">
       <AlertModal
         heading={HEADING}
         buttons={[

@@ -6,6 +6,7 @@ import classnames from 'classnames'
 import styles from './navbar.css'
 import { Button } from '../buttons'
 import { NotificationIcon, type IconName } from '../icons'
+import { HoverTooltip } from '../tooltips'
 
 type NavButtonProps = {
   /** optional click event for nav button */
@@ -26,10 +27,14 @@ type NavButtonProps = {
   notification?: boolean,
   /** selected styling (can also use react-router & `activeClassName`) */
   selected?: boolean,
+  /** contents of the tooltip targetting this button */
+  tooltipComponent?: React.Node,
+  /** optional portal to place the tooltipComponent inside */
+  tooltipPortal?: React.ComponentType<*>,
 }
 
 export default function NavButton(props: NavButtonProps) {
-  const { url } = props
+  const { url, tooltipComponent, tooltipPortal } = props
   const className = classnames(props.className, styles.button, {
     [styles.disabled]: props.disabled,
     [styles.bottom]: props.isBottom,
@@ -52,14 +57,18 @@ export default function NavButton(props: NavButtonProps) {
   }
 
   return (
-    <Button {...buttonProps}>
-      <NotificationIcon
-        name={props.iconName}
-        childName={props.notification ? 'circle' : null}
-        className={styles.icon}
-        childClassName={styles.notification}
-      />
-      {props.title && <span className={styles.title}>{props.title}</span>}
-    </Button>
+    <HoverTooltip tooltipComponent={tooltipComponent} portal={tooltipPortal}>
+      {hoverTooltipHandlers => (
+        <Button {...buttonProps} {...hoverTooltipHandlers}>
+          <NotificationIcon
+            name={props.iconName}
+            childName={props.notification ? 'circle' : null}
+            className={styles.icon}
+            childClassName={styles.notification}
+          />
+          {props.title && <span className={styles.title}>{props.title}</span>}
+        </Button>
+      )}
+    </HoverTooltip>
   )
 }

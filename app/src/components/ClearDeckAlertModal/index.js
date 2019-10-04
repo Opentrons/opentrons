@@ -30,7 +30,7 @@ export default function ClearDeckAlertModal(props: Props) {
   } = props
 
   return (
-    <Portal>
+    <Portal level="modal">
       <AlertModal
         heading={HEADING}
         buttons={[

@@ -62,7 +62,7 @@ const TemperatureControl = ({ module, sendModuleCommand, disabled }: Props) => {
   return (
     <>
       {!hasTarget && isModalOpen && (
-        <Portal>
+        <Portal level="modal">
           <AlertModal
             heading={alertHeading}
             iconName={null}

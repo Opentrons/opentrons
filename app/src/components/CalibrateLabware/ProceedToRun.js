@@ -45,7 +45,7 @@ function InfoBoxButton(props: Props) {
         return tip and proceed to run
       </PrimaryButton>
       {runPrepModalOpen && (
-        <Portal>
+        <Portal level="modal">
           <AlertModal
             alertOverlay
             iconName={null}

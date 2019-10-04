@@ -20,7 +20,7 @@ export default function ConnectAlertModal(props: Props) {
   const { onCloseClick } = props
 
   return (
-    <Portal>
+    <Portal level="modal">
       <AlertModal
         heading={HEADING}
         onCloseClick={onCloseClick}

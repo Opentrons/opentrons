@@ -81,7 +81,7 @@ export default class CommandList extends React.Component<CommandListProps> {
     return (
       <div className={styles.run_page}>
         {showSpinner && (
-          <Portal>
+          <Portal level="modal">
             <SpinnerModal />
           </Portal>
         )}

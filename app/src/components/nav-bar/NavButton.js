@@ -15,6 +15,7 @@ import { NavButton } from '@opentrons/components'
 
 import type { ContextRouter } from 'react-router-dom'
 import type { State } from '../../types'
+import { Portal } from '../portal'
 
 type OP = {| ...ContextRouter, name: string |}
 
@@ -35,6 +36,9 @@ function mapStateToProps(state: State, ownProps: OP): $Exact<Props> {
     getBuildrootUpdateAvailable(state, connectedRobot) === 'upgrade'
   const moreNotification = getAvailableShellUpdate(state) != null
 
+  // TODO: IMMEDIATELY make selector
+  const incompatiblePipettes = true
+
   switch (name) {
     case 'connect':
       return {
@@ -52,14 +56,26 @@ function mapStateToProps(state: State, ownProps: OP): $Exact<Props> {
       }
     case 'setup':
       return {
-        disabled: !isProtocolLoaded || isProtocolRunning || isProtocolDone,
+        disabled:
+          !isProtocolLoaded ||
+          isProtocolRunning ||
+          isProtocolDone ||
+          incompatiblePipettes,
+        tooltipComponent: incompatiblePipettes
+          ? 'Attached pipettes do not match pipettes specified in loaded protocol'
+          : null,
+        tooltipPortal: Portal,
         iconName: 'ot-calibrate',
         title: 'calibrate',
         url: '/calibrate',
       }
     case 'run':
       return {
-        disabled: !isProtocolLoaded,
+        disabled: !isProtocolLoaded || incompatiblePipettes,
+        tooltipComponent: incompatiblePipettes
+          ? 'Attached pipettes do not match pipettes specified in loaded protocol'
+          : null,
+        tooltipPortal: Portal,
         iconName: 'ot-run',
         title: 'run',
         url: '/run',
