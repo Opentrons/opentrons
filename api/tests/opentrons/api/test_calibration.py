@@ -360,7 +360,6 @@ async def test_jog_calibrate_bottom_v2(
 
 @pytest.mark.api1_only
 async def test_jog_calibrate_bottom_v1(
-        dummy_db,
         main_router,
         model,
         calibrate_bottom_flag):
@@ -413,7 +412,6 @@ async def test_jog_calibrate_bottom_v1(
 
 @pytest.mark.api2_only
 async def test_jog_calibrate_top_v2(
-        dummy_db,
         main_router,
         model):
 
@@ -437,7 +435,6 @@ async def test_jog_calibrate_top_v2(
 
 @pytest.mark.api1_only
 async def test_jog_calibrate_top(
-        dummy_db,
         main_router,
         model,
         monkeypatch):

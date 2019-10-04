@@ -30,7 +30,7 @@ def test_smoke(virtual_smoothie_env, smoke, robot):
 @pytest.mark.api1_only
 @pytest.mark.parametrize('protocol_file', ['multi-single.py'])
 async def test_multi_single(
-        main_router, protocol, protocol_file, dummy_db, robot):
+        main_router, protocol, protocol_file, robot):
     robot.connect()
     robot.home()
     session = main_router.session_manager.create(
@@ -46,7 +46,7 @@ async def test_multi_single(
 @pytest.mark.api1_only
 @pytest.mark.parametrize('protocol_file', ['multi-single.py'])
 async def test_load_jog_save_run(
-        main_router, protocol, protocol_file, dummy_db, monkeypatch, robot):
+        main_router, protocol, protocol_file, monkeypatch, robot):
     import tempfile
     temp = tempfile.gettempdir()
     monkeypatch.setenv('USER_DEFN_ROOT', temp)

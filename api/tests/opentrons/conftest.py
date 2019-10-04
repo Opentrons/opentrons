@@ -22,7 +22,7 @@ try:
 except ImportError:
     pass
 from opentrons.api import models
-from opentrons.data_storage import database
+from opentrons.data_storage import database_migration
 from opentrons.server import rpc
 from opentrons import config, types
 from opentrons.server import init
@@ -73,15 +73,23 @@ def log_by_axis(log, axis):
 
 
 @pytest.mark.apiv1
-@pytest.fixture
-def config_tempdir(tmpdir):
+@pytest.fixture(scope='session')
+def template_db(tmpdir_factory):
+    template_db = tmpdir_factory.mktemp('template_db.sqlite')\
+                                .join('opentrons.db')
+    config.CONFIG['labware_database_file'] = str(template_db)
+    database_migration.check_version_and_perform_full_migration()
+    return template_db
+
+
+@pytest.mark.apiv1
+@pytest.fixture(autouse=True)
+def config_tempdir(tmpdir, template_db):
     os.environ['OT_API_CONFIG_DIR'] = str(tmpdir)
     config.reload()
-    old_db_path = database.database_path
     shutil.copyfile(
-        database.database_path, config.CONFIG['labware_database_file'])
-    database.change_database(str(config.CONFIG['labware_database_file']))
-    yield tmpdir, old_db_path
+        template_db, config.CONFIG['labware_database_file'])
+    yield tmpdir, template_db
 
 
 @pytest.fixture(autouse=True)
@@ -101,15 +109,6 @@ def wifi_keys_tempdir():
         config.CONFIG['wifi_keys_dir'] = pathlib.Path(td)
         yield td
         config.CONFIG['wifi_keys_dir'] = old_wifi_keys
-
-
-# Builds a temp db to allow mutations during testing
-@pytest.mark.apiv1
-@pytest.fixture(autouse=True)
-def dummy_db(config_tempdir):
-    _, old_db_path = config_tempdir
-    yield None
-    database.change_database(old_db_path)
 
 
 # -------feature flag fixtures-------------
@@ -251,7 +250,7 @@ def apiv1_singletons_factory(virtual_smoothie_env):
 
 
 @pytest.fixture
-def apiv1_singletons(dummy_db, virtual_smoothie_env):
+def apiv1_singletons(config_tempdir, virtual_smoothie_env):
     return apiv1_singletons_factory(virtual_smoothie_env)
 
 
@@ -270,7 +269,7 @@ def apiv2_singletons():
     params=[
         pytest.param(apiv1_singletons_factory, marks=pytest.mark.apiv1),
         pytest.param(apiv2_singletons_factory, marks=pytest.mark.apiv2)])
-def singletons(dummy_db, request, virtual_smoothie_env):
+def singletons(config_tempdir, request, virtual_smoothie_env):
     markers = list(request.node.iter_markers())
     if 'apiv1_only' in markers and 'apiv2' in markers:
         pytest.skip('apiv2 but apiv1 only')

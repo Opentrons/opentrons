@@ -11,7 +11,7 @@ file_dir = os.path.abspath(os.path.dirname(__file__))
 
 
 @pytest.mark.api1_only
-def test_labware_create(dummy_db):
+def test_labware_create():
     from opentrons import labware
     lw_name = '15-well-plate'
     if lw_name in labware.list():
