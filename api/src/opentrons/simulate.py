@@ -17,6 +17,7 @@ from typing import Any, Dict, List, Mapping, TextIO, Tuple, BinaryIO, Optional
 import opentrons
 import opentrons.commands
 import opentrons.broker
+import opentrons.config
 from opentrons.protocols import parse, bundle
 from opentrons.protocol_api import execute
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
@@ -221,14 +222,19 @@ def simulate(protocol_file: TextIO,
         else:
             bundle_contents = None
     else:
-        import opentrons.legacy_api.protocols
-        opentrons.robot.disconnect()
-        scraper = CommandScraper(stack_logger, log_level,
-                                 opentrons.robot.broker)
-        if isinstance(protocol, JsonProtocol):
-            opentrons.legacy_api.protocols.execute_protocol(protocol)
-        else:
-            exec(protocol.contents, {})
+
+        def _simulate_v1():
+            import opentrons.legacy_api.protocols
+            opentrons.robot.disconnect()
+            scraper = CommandScraper(stack_logger, log_level,
+                                     opentrons.robot.broker)
+            if isinstance(protocol, JsonProtocol):
+                opentrons.legacy_api.protocols.execute_protocol(protocol)
+            else:
+                exec(protocol.contents, {})
+            return scraper
+
+        scraper = _simulate_v1()
         bundle_contents = None
 
     return scraper.commands, bundle_contents
