@@ -2,6 +2,7 @@
 cache:
   pip: true
   yarn: true
+  npm: false
 
 stages:
   - test
