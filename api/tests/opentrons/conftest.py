@@ -458,7 +458,10 @@ async def wait_until(matcher, notifications, timeout=1, loop=None):
             return result
 
 
-@pytest.fixture
+@pytest.fixture(
+    params=[
+        pytest.param(using_api1, marks=pytest.mark.apiv1),
+        pytest.param(using_sync_api2, marks=pytest.mark.apiv2)])
 def model(robot, hardware, loop, request):
     # Use with pytest.mark.parametrize(’labware’, [some-labware-name])
     # to have a different labware loaded as .container. If not passed,
