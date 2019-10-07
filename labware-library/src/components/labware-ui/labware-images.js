@@ -157,6 +157,10 @@ export default {
     require('../../images/opentrons_96_aluminumblock_side_view.jpg'),
     require('../../images/generic_pcr_strip_200ul_tubes.jpg'),
   ],
+  opentrons_96_aluminumblock_nest_wellplate_100ul: [
+    require('../../images/opentrons_96_aluminumblock_side_view.jpg'),
+    require('../../images/nest_96_wellplate_100ul_pcr_full_skirt_three_quarters.jpg'),
+  ],
   opentrons_96_tiprack_1000ul: [
     require('../../images/opentrons_96_tiprack_1000ul_side_view.jpg'),
   ],
