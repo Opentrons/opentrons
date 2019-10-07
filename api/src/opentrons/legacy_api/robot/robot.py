@@ -136,8 +136,10 @@ class Robot(CommandPublisher):
         self.INSTRUMENT_DRIVERS_CACHE = {}
         self._instruments = {}
         self.model_by_mount = {
-            'left': {'model': None, 'id': None, 'name': None},
-            'right': {'model': None, 'id': None, 'name': None}
+            'left': {'model': None, 'id': None, 'name': None,
+                     'home_current': self.config.high_current['B']},
+            'right': {'model': None, 'id': None, 'name': None,
+                      'home_current': self.config.high_current['C']}
         }
 
         self._commands = []
@@ -283,13 +285,17 @@ class Robot(CommandPublisher):
         """
         log.debug("Updating instrument model cache")
         for mount in self.model_by_mount.keys():
+            plunger_axis = 'B' if mount == 'left' else 'C'
+            mount_axis = 'Z' if mount == 'left' else 'A'
             model_value = self._driver.read_pipette_model(mount)
             if model_value:
                 name_value = pipette_config.name_for_model(model_value)
+                pc = pipette_config.load(model_value)
+                home_current = pc.plunger_current
             else:
                 name_value = None
-            plunger_axis = 'B' if mount == 'left' else 'C'
-            mount_axis = 'Z' if mount == 'left' else 'A'
+                home_current = self.config.high_current[plunger_axis]
+
             if model_value:
                 cfg = pipette_config.load(model_value)
                 home_pos = cfg.home_position
@@ -312,7 +318,8 @@ class Robot(CommandPublisher):
             self.model_by_mount[mount] = {
                 'model': model_value,
                 'id': id_response,
-                'name': name_value
+                'name': name_value,
+                'home_current': home_current
             }
             log.debug("{}: {} [{}]".format(
                 mount,
@@ -531,9 +538,14 @@ class Robot(CommandPublisher):
         # and to make sure tips are not in the liquid while
         # homing plungers. Z/A axis will automatically home before X/Y
         self.poses = self.gantry.home(self.poses)
-        # Then plungers
-        self.poses = self._actuators['left']['plunger'].home(self.poses)
-        self.poses = self._actuators['right']['plunger'].home(self.poses)
+
+        # Then plungers. If we have a loaded instrument, use it to home since
+        # that will use the correct current.
+        for mount in ['left', 'right']:
+            actuator = self._actuators[mount]['plunger']
+            actuator.set_active_current(
+                self.model_by_mount[mount]['home_current'])
+            self.poses = actuator.home(self.poses)
 
         # next move should not use any previously used instrument or labware
         # to prevent robot.move_to() from using risky path optimization

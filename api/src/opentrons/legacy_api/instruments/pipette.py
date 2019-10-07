@@ -1239,6 +1239,15 @@ class Pipette(CommandPublisher):
             x=self._get_plunger_position('bottom')
         )
 
+    def _home(self, mount, plunger_only=False):
+        self.current_volume = 0
+        self.instrument_actuator.set_active_current(self._plunger_current)
+        self.robot.poses = self.instrument_actuator.home(
+            self.robot.poses)
+        if not plunger_only:
+            self.robot.poses = self.instrument_mover.home(self.robot.poses)
+        self.previous_placeable = None  # no longer inside a placeable
+
     def home(self):
         """
         Home the pipette's plunger axis during a protocol run
@@ -1260,18 +1269,12 @@ class Pipette(CommandPublisher):
         >>> p300 = instruments.P300_Single(mount='right') # doctest: +SKIP
         >>> p300.home() # doctest: +SKIP
         """
-        def _home(mount):
-            self.current_volume = 0
-            self.instrument_actuator.set_active_current(self._plunger_current)
-            self.robot.poses = self.instrument_actuator.home(
-                self.robot.poses)
-            self.robot.poses = self.instrument_mover.home(self.robot.poses)
-            self.previous_placeable = None  # no longer inside a placeable
-        do_publish(self.broker, commands.home, _home,
-                   'before', None, None, self.mount)
-        _home(self.mount)
-        do_publish(self.broker, commands.home, _home,
-                   'after', self, None, self.mount)
+
+        do_publish(self.broker, commands.home, self._home,
+                   'before', None, None, self, self.mount)
+        self._home(self.mount, False)
+        do_publish(self.broker, commands.home, self._home,
+                   'after', self, None, self, self.mount)
         return self
 
     @commands.publish.both(command=commands.distribute)

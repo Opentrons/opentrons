@@ -31,6 +31,15 @@ class Axis(enum.Enum):
               opentrons.types.Mount.RIGHT: cls.C}
         return pm[mount]
 
+    @classmethod
+    def to_mount(cls, inst: 'Axis'):
+        return {
+            cls.Z: opentrons.types.Mount.LEFT,
+            cls.A: opentrons.types.Mount.RIGHT,
+            cls.B: opentrons.types.Mount.LEFT,
+            cls.C: opentrons.types.Mount.RIGHT
+        }[inst]
+
     def __str__(self):
         return self.name
 
