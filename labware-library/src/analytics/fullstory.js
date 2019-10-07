@@ -66,7 +66,7 @@ export const fullstoryEvent = (name: string, parameters: Object) => {
   }
 }
 
-const _setAnalyticsTags = (trackingUUID: string) => {
+const _setAnalyticsTags = () => {
   const fs = _getFullstory()
   // NOTE: fullstory expects the keys 'displayName' and 'email' verbatim
   // though all other key names must be fit the schema described here
@@ -76,7 +76,6 @@ const _setAnalyticsTags = (trackingUUID: string) => {
     const buildDate_date = LL_BUILD_DATE
 
     fs.setUserVars({
-      tracking_uuid_str: trackingUUID,
       ot_application_name_str: 'labware-library', // NOTE: to distinguish from other apps using the FULLSTORY_ORG
       version_str,
       buildDate_date,
@@ -84,7 +83,7 @@ const _setAnalyticsTags = (trackingUUID: string) => {
   }
 }
 
-export const initializeFullstory = (trackingUUID: string) => {
+export const initializeFullstory = () => {
   console.debug('initializing Fullstory')
   // NOTE: this code snippet is distributed by Fullstory, last updated 2019-10-04
   global['_fs_debug'] = false
@@ -143,5 +142,5 @@ export const initializeFullstory = (trackingUUID: string) => {
     g.clearUserCookie = function() {}
   })(global, global.document, global['_fs_namespace'], 'script', 'user')
 
-  _setAnalyticsTags(trackingUUID)
+  _setAnalyticsTags()
 }

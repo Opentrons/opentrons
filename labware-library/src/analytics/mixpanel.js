@@ -19,12 +19,11 @@ export type MixpanelConfig = {|
   trackingUUID: string,
 |}
 
-export function mixpanelOptIn(trackingUUID: string) {
+export function mixpanelOptIn() {
   if (MIXPANEL_ID) {
     console.debug('User has opted into analytics; tracking with Mixpanel')
-    mixpanel.identify(trackingUUID)
+    mixpanel.identify()
     mixpanel.opt_in_tracking()
-    mixpanel.register({ trackingUUID })
   }
 }
 

@@ -1,38 +1,31 @@
 // @flow
 import cookie from 'cookie'
-import uuid from 'uuid/v4'
 
 import { initializeMixpanel, mixpanelOptIn, mixpanelOptOut } from './mixpanel'
 import { initializeFullstory, shutdownFullstory } from './fullstory'
 import type { AnalyticsState } from './types'
 
-const COOKIE_PREFIX = 'ot_lc_' // NOTE: cookies are in LC b/c we don't have a plan for LL yet
+const COOKIE_KEY_NAME = 'ot_ll_analytics' // NOTE: cookie is named "LL" but only LC uses it now
 const COOKIE_DOMAIN =
   process.env.NODE_ENV === 'production' ? 'opentrons.com' : undefined
 
-export const persistCookies = (cookies: { [key: string]: any }) => {
+export const persistAnalyticsCookie = (cookies: { [key: string]: any }) => {
   const maxAge = 10 * 365 * 24 * 60 * 60 // 10 years
   const options = { COOKIE_DOMAIN, maxAge }
 
-  const cookiesList = Object.keys(cookies)
-
-  cookiesList.forEach(key => {
-    console.log('saving cookie', `${COOKIE_PREFIX}${key}`, cookies[key])
-    global.document.cookie = cookie.serialize(
-      `${COOKIE_PREFIX}${key}`,
-      cookies[key],
-      options
-    )
-  })
+  global.document.cookie = cookie.serialize(
+    COOKIE_KEY_NAME,
+    JSON.stringify(cookies),
+    options
+  )
 }
 
-export const getAnalyticsCookies = (): $Shape<AnalyticsState> => {
-  const cookies = cookie.parse(global.document.cookie, { decode: JSON.parse })
-  const relevantKeys = ['trackingUUID', 'optedIn', 'seenOptIn']
-  return relevantKeys.reduce((acc, key) => {
-    const value = cookies[`${COOKIE_PREFIX}${key}`]
-    return value === undefined ? acc : { ...acc, [key]: value }
-  }, {})
+export const getAnalyticsCookie = (): $Shape<AnalyticsState> => {
+  const cookies = cookie.parse(global.document.cookie)
+  const analyticsCookie = cookies[COOKIE_KEY_NAME]
+    ? JSON.parse(cookies[COOKIE_KEY_NAME])
+    : {}
+  return analyticsCookie
 }
 
 export const initializeAnalytics = () => {
@@ -44,23 +37,24 @@ export const initializeAnalytics = () => {
 
 export const _getInitialAnalyticsState = (): AnalyticsState => {
   // NOTE: this writes analytics cookies if none exist
-  const parsedCookies = getAnalyticsCookies()
+  const parsedCookies = getAnalyticsCookie()
 
   if (
     parsedCookies.seenOptIn === true &&
-    typeof parsedCookies.trackingUUID === 'string' &&
+    // verify cookie properties
     typeof parsedCookies.seenOptIn === 'boolean'
   ) {
     return parsedCookies
   } else {
-    // missing (or perhaps unexpected) cookie state
-    console.debug('no analytics cookie found, creating cookie', parsedCookies)
+    // reset
+    console.debug(
+      'never seen opt in, or invalid analytics state. Resetting analytics state'
+    )
     const initialState = {
       optedIn: false,
       seenOptIn: false,
-      trackingUUID: uuid(),
     }
-    persistCookies(initialState)
+    persistAnalyticsCookie(initialState)
     return initialState
   }
 }
@@ -68,8 +62,8 @@ export const _getInitialAnalyticsState = (): AnalyticsState => {
 // NOTE: Fullstory has no opt-in/out, control by adding/removing it completely
 
 export const performOptIn = (s: AnalyticsState) => {
-  mixpanelOptIn(s.trackingUUID)
-  initializeFullstory(s.trackingUUID)
+  mixpanelOptIn()
+  initializeFullstory()
 }
 
 export const performOptOut = (s: AnalyticsState) => {

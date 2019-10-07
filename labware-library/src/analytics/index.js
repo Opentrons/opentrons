@@ -1,5 +1,5 @@
 // @flow
-import { getAnalyticsCookies } from './utils'
+import { getAnalyticsCookie } from './utils'
 import { trackWithMixpanel } from './mixpanel'
 import { fullstoryEvent } from './fullstory'
 import type { AnalyticsEvent } from './types'
@@ -9,7 +9,7 @@ import type { AnalyticsEvent } from './types'
 export const reportEvent = (event: AnalyticsEvent) => {
   // NOTE: this cookie parsing is not very performant, but this implementation
   // uses cookies as the source of truth (not `analyticsState` of the hook)
-  const { optedIn } = getAnalyticsCookies()
+  const { optedIn } = getAnalyticsCookie()
 
   console.debug('Trackable event', { event, optedIn })
   if (optedIn) {

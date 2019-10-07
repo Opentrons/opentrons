@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
-import useAnalytics from './useAnalytics'
+import useAnalyticsOptInOrOut from './useAnalyticsOptInOrOut'
 
 type Props = {|
   className?: string,
@@ -9,7 +9,11 @@ type Props = {|
 |}
 
 const AnalyticsOptIn = (props: Props) => {
-  const { optInToAnalytics, optOutOfAnalytics, analyticsState } = useAnalytics()
+  const {
+    optInToAnalytics,
+    optOutOfAnalytics,
+    analyticsState,
+  } = useAnalyticsOptInOrOut()
 
   return (
     !analyticsState.seenOptIn && (
