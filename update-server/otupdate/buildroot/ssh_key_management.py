@@ -152,6 +152,7 @@ async def add(request: web.Request) -> web.Response:
                   'key_md5': hashval},
             status=201)
 
+
 @require_linklocal
 async def clear(request: web.Request) -> web.Response:
     """ Clear all public keys from authorized_keys
