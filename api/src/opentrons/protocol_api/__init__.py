@@ -4,7 +4,7 @@ This package defines classes and functions for access through a protocol to
 control the OT2.
 
 """
-from . import back_compat, labware
+from . import labware
 from .contexts import (ProtocolContext,
                        InstrumentContext,
                        TemperatureModuleContext,
@@ -17,5 +17,4 @@ __all__ = ['ProtocolContext',
            'TemperatureModuleContext',
            'MagneticModuleContext',
            'ThermocyclerContext',
-           'back_compat',
            'labware']

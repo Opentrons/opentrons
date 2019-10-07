@@ -11,8 +11,8 @@ from typing import Any, List
 import opentrons.hardware_control as hc
 from opentrons.config.pipette_config import config_models
 from opentrons.types import Mount
-from .labware import Labware
-from .contexts import ProtocolContext, InstrumentContext
+from ..labware import Labware
+from ..contexts import ProtocolContext, InstrumentContext
 
 
 def run(protocol_bytes: bytes, context: ProtocolContext):

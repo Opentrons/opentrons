@@ -256,8 +256,8 @@ def apiv1_singletons(config_tempdir, virtual_smoothie_env):
 
 @pytest.mark.apiv2
 def apiv2_singletons_factory(virtual_smoothie_env):
-    from opentrons.protocol_api import back_compat
-    return {**back_compat.build_globals()}
+    from opentrons.protocol_api.legacy_wrapper import api
+    return {**api.build_globals()}
 
 
 @pytest.fixture

@@ -41,7 +41,7 @@ class ProtocolContext(CommandPublisher):
     Unlike the old robot class, it is designed to be ephemeral. The lifetime
     of a particular instance should be about the same as the lifetime of a
     protocol. The only exception is the one stored in
-    :py:attr:`.back_compat.robot`, which is provided only for back
+    :py:attr:`.legacy_api.api.robot`, which is provided only for back
     compatibility and should be used less and less as time goes by.
     """
 
