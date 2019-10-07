@@ -125,3 +125,23 @@ async def test_delete_key(test_cli, dummy_authorized_keys):
     body = await resp.json()
     assert body['error'] == 'invalid-key-hash'
     assert 'message' in body
+
+
+async def test_clear_keys(test_cli, dummy_authorized_keys):
+    dummy_keys = (
+        "ssh-rsa ahaubsfalsijdbalsjdhbfajsdbfafasdk test@opentrons.com",
+        "ssh-rsa ivnisjndfiushdfiughsdiofjaojsdhkaj test@opentrons.com")
+    for key in dummy_keys:
+        resp = await test_cli.post('/server/ssh_keys',
+                                   json={'key': key},
+                                   headers={'X-Host-IP': '169.254.1.1'})
+        assert resp.status == 201
+    assert open(dummy_authorized_keys).read() == '\n'.join(dummy_keys) + '\n'
+    resp = await test_cli.delete('/server/ssh_keys',
+                                 headers={'X-Host-IP': '169.254.1.1'})
+    assert resp.status == 200
+    body = await resp.json()
+    assert 'message' in body
+    assert 'restart_url' in body
+
+    assert open(dummy_authorized_keys).read() == '\n'
