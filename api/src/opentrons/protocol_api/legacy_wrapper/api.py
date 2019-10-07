@@ -4,77 +4,22 @@ This should not be imported directly; it is used to provide backwards
 compatible singletons in opentrons/__init__.py.
 """
 
-import asyncio
 import importlib.util
-from typing import Any, List
+from typing import List, TYPE_CHECKING
 
-import opentrons.hardware_control as hc
 from opentrons.config.pipette_config import config_models
 from opentrons.types import Mount
 from ..labware import Labware
-from ..contexts import ProtocolContext, InstrumentContext
+from .robot_wrapper import Robot
+from .instrument_wrapper import Pipette
+
+if TYPE_CHECKING:
+    from ..contexts import ProtocolContext
 
 
-def run(protocol_bytes: bytes, context: ProtocolContext):
+def run(protocol_bytes: bytes, context: 'ProtocolContext'):
     source = importlib.util.decode_source(protocol_bytes)
     exec(source)
-
-
-class BCRobot:
-    """ A backwards-compatibility shim for the `New Protocol API`_.
-
-    This class is for providing a global instance of a
-    :py:class:`.ProtocolContext` in an object called :py:attr:`.robot`. It
-    should not be instantiated by user code, and use of its methods should
-    be replaced with methods of :py:class:`.ProtocolContext`. For more
-    information on how to replace its methods, see the method documentation.
-
-    Attribute accesses to attributes not defined here will fall back to the
-    global :py:class:`.ProtocolContext`; for instance, calling `robot.reset()`
-    will fall back to calling :py:meth:`.ProtocolContext.reset`.
-
-    For more information see :py:class:`.ProtocolContext`.
-    """
-
-    def __init__(self,
-                 hardware: hc.adapters.SingletonAdapter,
-                 protocol_ctx: ProtocolContext,
-                 loop: asyncio.AbstractEventLoop = None) -> None:
-        self._hardware = hardware
-        self._ctx = protocol_ctx
-        self._loop = loop or asyncio.get_event_loop()
-
-    def connect(self, port: str = None,
-                options: Any = None):
-        """ Connect to the robot hardware.
-
-        This function is provided for backwards compatibility. In most cases
-        it need not be called.
-
-        Calls to this method should be replaced with calls to
-        :py:meth:`.ProtocolContext.connect` (notice the difference in
-        arguments) if necessary; however, since the context of protocols
-        executed by an OT2 is automatically connected to either the hardware or
-        a simulator (depending on whether the protocol is being simulated or
-        run) this should be unnecessary.
-
-        :param port: The port to connect to the smoothie board or the magic
-                     string ``"Virtual Smoothie"``, which will initialize and
-                     connect to a simulator
-        :param options: Ignored.
-        """
-        self._hardware.connect(port)
-
-    @property
-    def fw_version(self):
-        try:
-            return self._loop.run_until_complete(self._hardware.fw_version)
-        except RuntimeError:  # If this was called from an async context
-            return 'unknown'  # return a default
-
-    def __getattr__(self, name):
-        """ Provide transparent access to the protocol context """
-        return getattr(self._ctx, name)
 
 
 class AddInstrumentCtors(type):
@@ -95,10 +40,10 @@ class AddInstrumentCtors(type):
                 aspirate_flow_rate: float = None,
                 dispense_flow_rate: float = None,
                 min_volume: float = None,
-                max_volume: float = None) -> InstrumentContext:
-            return AddInstrumentCtors._load_instr(self._ctx,
-                                                  model,
-                                                  mount)
+                max_volume: float = None) -> Pipette:
+            return self._load_instr(model,
+                                    mount)
+
         initializer.__name__ = proper_name
         initializer.__qualname__ = '.'.join([AddInstrumentCtors.__qualname__,
                                              proper_name])
@@ -130,20 +75,6 @@ class AddInstrumentCtors(type):
                       the newly-loaded pipette.
             """.format(' '.join(proper_name.split('_')))
         return initializer
-
-    @staticmethod
-    def _load_instr(ctx,
-                    name: str,
-                    mount: str,
-                    *args, **kwargs) -> InstrumentContext:
-        """ Build an instrument in a backwards-compatible way.
-
-        You should almost certainly not be calling this function from a
-        protocol; if you want to create a pipette on a lower level, use
-        :py:meth:`.ProtocolContext.load_instrument` directly, and if you
-        want to create an instrument easily use one of the partials below.
-        """
-        return ctx.load_instrument(name, Mount[mount.upper()])
 
     def __new__(cls, name, bases, namespace, **kwds):
         """ Add the pipette initializer functions to the class. """
@@ -181,8 +112,21 @@ class BCInstruments(metaclass=AddInstrumentCtors):
     methods of this class, see the method documentation.
     """
 
-    def __init__(self, ctx: ProtocolContext) -> None:
-        self._ctx = ctx
+    def __init__(
+            self,
+            robot: Robot) -> None:
+        self._robot_wrapper = robot
+
+    def _load_instr(self,
+                    name: str,
+                    mount: str) -> Pipette:
+        """ Build an instrument in a backwards-compatible way.
+        """
+        instr_ctx = self._robot_wrapper._ctx.load_instrument(
+            name, Mount[mount.upper()])
+        instr = Pipette(instr_ctx)
+        self._robot_wrapper._add_instrument(mount, instr)
+        return instr
 
 
 class BCLabware:
@@ -197,7 +141,7 @@ class BCLabware:
     methods of this class, see the method documentation.
     """
 
-    def __init__(self, ctx: ProtocolContext) -> None:
+    def __init__(self, ctx: 'ProtocolContext') -> None:
         self._ctx = ctx
 
     LW_NO_EQUIVALENT = {'24-vial-rack', '48-vial-plate', '5ml-3x4',
@@ -285,19 +229,17 @@ class BCLabware:
 
 
 class BCModules:
-    def __init__(self, ctx: ProtocolContext) -> None:
+    def __init__(self, ctx: 'ProtocolContext') -> None:
         self._ctx = ctx
 
     def load(self, *args, **wargs):
         pass
 
 
-def build_globals(hardware=None, loop=None):
-    hw = hardware or hc.adapters.SingletonAdapter(loop)
-    ctx = ProtocolContext(loop)
-    rob = BCRobot(hw, ctx, loop)
-    instr = BCInstruments(ctx)
-    lw = BCLabware(ctx)
-    mod = BCModules(ctx)
+def build_globals(context: 'ProtocolContext'):
+    rob = Robot(context)
+    instr = BCInstruments(rob)
+    lw = BCLabware(context)
+    mod = BCModules(context)
 
     return {'robot': rob, 'instruments': instr, 'labware': lw, 'modules': mod}

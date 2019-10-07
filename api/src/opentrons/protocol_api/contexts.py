@@ -228,6 +228,9 @@ class ProtocolContext(CommandPublisher):
         """
         self._hw_manager.reset_hw()
 
+    def is_simulating(self) -> bool:
+        return self._hw_manager.hardware.get_is_simulator()
+
     def load_labware_from_definition(
             self,
             labware_def: LabwareDefinition,

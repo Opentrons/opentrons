@@ -121,7 +121,7 @@ def _run_python(
 def _run_python_legacy(proto: PythonProtocol, context: ProtocolContext):
     new_locs = locals()
     new_globs = globals()
-    namespace_mapping = legacy_wrapper.api.build_globals()
+    namespace_mapping = legacy_wrapper.api.build_globals(context)
     for key, value in namespace_mapping.items():
         setattr(opentrons, key, value)
     try:
