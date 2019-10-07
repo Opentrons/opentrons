@@ -69,7 +69,8 @@ settings = [
         description='Use the older pipette calibrations for P10S, P10M, P50S,'
                     ' P50M, and P300S pipettes. Note this will cause the '
                     ' default aspirate behavior (ul to mm conversion) to '
-                    ' function as it did prior to version 3.7.0.'
+                    ' function as it did prior to version 3.7.0. '
+                    ' NOTE: this does not impact GEN2 pipettes'
     ),
 ]
 
