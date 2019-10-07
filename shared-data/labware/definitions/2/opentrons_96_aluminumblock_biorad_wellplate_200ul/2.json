@@ -14,7 +14,7 @@
     ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
   ],
   "schemaVersion": 2,
-  "version": 1,
+  "version": 2,
   "namespace": "opentrons",
   "metadata": {
     "displayName": "Opentrons 96 Well Aluminum Block with Bio-Rad Well Plate 200 µL",
