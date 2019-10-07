@@ -58,21 +58,22 @@ export default function NavButton(props: NavButtonProps) {
 
   return (
     <HoverTooltip
-      // tooltipComponent={tooltipComponent}
-      tooltipComponent="TOUHOIUHTIORUH"
-      portal={tooltipPortal}
+      tooltipComponent={tooltipComponent}
+      // portal={tooltipPortal}
       placement="bottom"
     >
       {hoverTooltipHandlers => (
-        <Button {...buttonProps} {...hoverTooltipHandlers}>
-          <NotificationIcon
-            name={props.iconName}
-            childName={props.notification ? 'circle' : null}
-            className={styles.icon}
-            childClassName={styles.notification}
-          />
-          {props.title && <span className={styles.title}>{props.title}</span>}
-        </Button>
+        <div {...hoverTooltipHandlers}>
+          <Button {...buttonProps}>
+            <NotificationIcon
+              name={props.iconName}
+              childName={props.notification ? 'circle' : null}
+              className={styles.icon}
+              childClassName={styles.notification}
+            />
+            {props.title && <span className={styles.title}>{props.title}</span>}
+          </Button>
+        </div>
       )}
     </HoverTooltip>
   )
