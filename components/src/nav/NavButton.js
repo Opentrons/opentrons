@@ -57,7 +57,12 @@ export default function NavButton(props: NavButtonProps) {
   }
 
   return (
-    <HoverTooltip tooltipComponent={tooltipComponent} portal={tooltipPortal}>
+    <HoverTooltip
+      // tooltipComponent={tooltipComponent}
+      tooltipComponent="TOUHOIUHTIORUH"
+      portal={tooltipPortal}
+      placement="bottom"
+    >
       {hoverTooltipHandlers => (
         <Button {...buttonProps} {...hoverTooltipHandlers}>
           <NotificationIcon

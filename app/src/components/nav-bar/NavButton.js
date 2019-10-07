@@ -39,6 +39,8 @@ function mapStateToProps(state: State, ownProps: OP): $Exact<Props> {
   // TODO: IMMEDIATELY make selector
   const incompatiblePipettes = true
 
+  const TooltipPortal = props => <Portal level="global" {...props} />
+
   switch (name) {
     case 'connect':
       return {
@@ -64,7 +66,7 @@ function mapStateToProps(state: State, ownProps: OP): $Exact<Props> {
         tooltipComponent: incompatiblePipettes
           ? 'Attached pipettes do not match pipettes specified in loaded protocol'
           : null,
-        tooltipPortal: Portal,
+        tooltipPortal: TooltipPortal,
         iconName: 'ot-calibrate',
         title: 'calibrate',
         url: '/calibrate',
@@ -75,7 +77,7 @@ function mapStateToProps(state: State, ownProps: OP): $Exact<Props> {
         tooltipComponent: incompatiblePipettes
           ? 'Attached pipettes do not match pipettes specified in loaded protocol'
           : null,
-        tooltipPortal: Portal,
+        tooltipPortal: TooltipPortal,
         iconName: 'ot-run',
         title: 'run',
         url: '/run',
