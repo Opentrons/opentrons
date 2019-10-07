@@ -141,7 +141,7 @@ export const initializeFullstory = (trackingUUID: string) => {
       g(o, v)
     }
     g.clearUserCookie = function() {}
-  })(global, document, global['_fs_namespace'], 'script', 'user')
+  })(global, global.document, global['_fs_namespace'], 'script', 'user')
 
   _setAnalyticsTags(trackingUUID)
 }
