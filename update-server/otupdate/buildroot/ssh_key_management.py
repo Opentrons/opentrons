@@ -154,6 +154,26 @@ async def add(request: web.Request) -> web.Response:
 
 
 @require_linklocal
+async def clear(request: web.Request) -> web.Response:
+    """ Clear all public keys from authorized_keys
+
+    DELETE /server/ssh_keys
+    -> 200 OK if successful
+
+    (or 403 if not from the link-local connection)
+    """
+    with authorized_keys('w') as ak:
+        ak.write('\n'.join([]) + '\n')
+
+    return web.json_response(
+        data={
+            'message': f'Keys cleared. '
+            'Restart robot to take effect',
+            'restart_url': '/server/restart'},
+        status=200)
+
+
+@require_linklocal
 async def remove(request: web.Request) -> web.Response:
     """ Remove a public key from authorized_keys
 
