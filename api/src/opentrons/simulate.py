@@ -19,10 +19,10 @@ import opentrons.commands
 import opentrons.broker
 import opentrons.config
 from opentrons.protocols import parse, bundle
-from opentrons.protocol_api import execute
-from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 from opentrons.protocols.types import (
     JsonProtocol, PythonProtocol, BundleContents)
+from opentrons.protocol_api import execute
+from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
 
 class AccumulatingHandler(logging.Handler):

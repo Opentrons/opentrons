@@ -76,8 +76,6 @@ async def test_transform_from_moves(async_server, async_client, monkeypatch):
     else:
         expected1 = pt1
 
-    print(absolute(hardware.poses, pipette))
-    print(expected1)
     assert np.isclose(absolute(hardware.poses, pipette), expected1).all()
 
     # Jog to calculated position for transform
