@@ -103,7 +103,8 @@ class Simulator:
         return self._position
 
     def move(self, target_position: Dict[str, float],
-             home_flagged_axes: bool = True, speed: float = None):
+             home_flagged_axes: bool = True, speed: float = None,
+             axis_max_speeds: Dict[str, float] = None):
         if self._run_flag.is_set():
             self._log.warning("Move to {} would be blocked by pause"
                               .format(target_position))

@@ -1,4 +1,5 @@
 import asyncio
+import contextlib
 from os import environ
 import logging
 from time import sleep
@@ -642,9 +643,18 @@ class SmoothieDriver_3_0_0:
     def steps_per_mm(self):
         return self._steps_per_mm
 
-    def set_speed(self, value):
+    @contextlib.contextmanager
+    def restore_speed(self, value):
+        self.set_speed(value, update=False)
+        try:
+            yield
+        finally:
+            self.set_speed(self._combined_speed)
+
+    def set_speed(self, value, update=True):
         ''' set total axes movement speed in mm/second'''
-        self._combined_speed = float(value)
+        if update:
+            self._combined_speed = float(value)
         speed_per_min = int(self._combined_speed * SEC_PER_MIN)
         command = GCODES['SET_SPEED'] + str(speed_per_min)
         log.debug("set_speed: {}".format(command))
@@ -656,15 +666,26 @@ class SmoothieDriver_3_0_0:
     def pop_speed(self):
         self.set_speed(self._saved_axes_speed)
 
-    def set_axis_max_speed(self, settings):
+    @contextlib.contextmanager
+    def restore_axis_max_speed(self, new_max_speeds):
+        self.set_axis_max_speed(new_max_speeds, update=False)
+        try:
+            yield
+        finally:
+            self.set_axis_max_speed(self._max_speed_settings)
+
+    def set_axis_max_speed(self, settings, update=True):
         '''
         Sets the maximum speed (mm/sec) that a given axis will move
 
         settings
             Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
             and floating point number for millimeters per second (mm/sec)
+        update
+            bool, True to save the settings for future use
         '''
-        self._max_speed_settings.update(settings)
+        if update:
+            self._max_speed_settings.update(settings)
         values = ['{}{}'.format(axis.upper(), value)
                   for axis, value in sorted(settings.items())]
         command = '{} {}'.format(

@@ -657,7 +657,8 @@ class API(HardwareAPILike):
     async def move_to(
             self, mount: top_types.Mount, abs_position: top_types.Point,
             speed: float = None,
-            critical_point: CriticalPoint = None):
+            critical_point: CriticalPoint = None,
+            max_speeds: Dict[Axis, float] = None):
         """ Move the critical point of the specified mount to a location
         relative to the deck, at the specified speed. 'speed' sets the speed
         of all robot axes to the given value. So, if multiple axes are to be
@@ -688,6 +689,12 @@ class API(HardwareAPILike):
                                :py:attr:`.CriticalPoint.NOZZLE` when no pipette
                                is attached or :py:attr:`.CriticalPoint.TIP`
                                when no tip is applied will result in an error.
+        :param max_speeds: An optional override for per-axis maximum speeds. If
+                           an axis is specified, it will not move faster than
+                           the given speed. Note that this does not make that
+                           axis move precisely at the given speed; it only
+                           it if it was going to go faster. Direct speed
+                           is still set by ``speed``.
         """
         if not self._current_position:
             await self.home()
@@ -706,11 +713,12 @@ class API(HardwareAPILike):
              (z_axis, abs_position.z - offset.z - cp.z))
         )
 
-        await self._move(target_position, speed=speed)
+        await self._move(target_position, speed=speed, max_speeds=max_speeds)
 
     @_log_call
     async def move_rel(self, mount: top_types.Mount, delta: top_types.Point,
-                       speed: float = None):
+                       speed: float = None,
+                       max_speeds: Dict[Axis, float] = None):
         """ Move the critical point of the specified mount by a specified
         displacement in a specified direction, at the specified speed.
         'speed' sets the speed of all axes to the given value. So, if multiple
@@ -730,7 +738,7 @@ class API(HardwareAPILike):
              (z_axis,
               self._current_position[z_axis] + delta.z))
         )
-        await self._move(target_position, speed=speed)
+        await self._move(target_position, speed=speed, max_speeds=max_speeds)
 
     async def _cache_and_maybe_retract_mount(self, mount: top_types.Mount):
         """ Retract the 'other' mount if necessary
@@ -760,7 +768,8 @@ class API(HardwareAPILike):
         await self._move(all_axes_pos, speed, False)
 
     async def _move(self, target_position: 'OrderedDict[Axis, float]',
-                    speed: float = None, home_flagged_axes: bool = True):
+                    speed: float = None, home_flagged_axes: bool = True,
+                    max_speeds: Dict[Axis, float] = None):
         """ Worker function to apply robot motion.
 
         Robot motion means the kind of motions that are relevant to the robot,
@@ -822,10 +831,13 @@ class API(HardwareAPILike):
                                 smoothie_pos[ax.name],
                                 deck_mins[ax], deck_max[ax],
                                 bounds[ax.name][0], bounds[ax.name][1]))
+        checked_maxes = max_speeds or {}
+        str_maxes = {ax.name: val for ax, val in checked_maxes.items()}
         async with self._motion_lock:
             try:
                 self._backend.move(smoothie_pos, speed=speed,
-                                   home_flagged_axes=home_flagged_axes)
+                                   home_flagged_axes=home_flagged_axes,
+                                   axis_max_speeds=str_maxes)
             except Exception:
                 self._log.exception('Move failed')
                 self._current_position.clear()
@@ -904,11 +916,6 @@ class API(HardwareAPILike):
         self._config = self._config._replace(**kwargs)
 
     async def update_deck_calibration(self, new_transform):
-        pass
-
-    @_log_call
-    async def head_speed(self, combined_speed=None,
-                         x=None, y=None, z=None, a=None, b=None, c=None):
         pass
 
     # Pipette action API
