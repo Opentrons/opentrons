@@ -1,8 +1,15 @@
-# Robot OS Changes from 3.12.0 to 3.13.0
+# Robot OS Changes from 3.13.0 to 3.13.1
 
 For more details about this release, please see the full [technical change log][changelog]
 
 [changelog]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
+
+## Bug Fixes
+
+- Fixed an issue caused by an unexpected interaction between a hardware and software change that lead to head crashes when dropping tips in the trash
+
+# Robot OS Changes from 3.12.0 to 3.13.1
+
 
 ## New Features
 
