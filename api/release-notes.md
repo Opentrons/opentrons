@@ -8,7 +8,7 @@ For more details about this release, please see the full [technical change log][
 
 - Fixed an issue caused by an unexpected interaction between a hardware and software change that lead to head crashes when dropping tips in the trash
 
-# Robot OS Changes from 3.12.0 to 3.13.1
+# Robot OS Changes from 3.12.0 to 3.13.0
 
 
 ## New Features
