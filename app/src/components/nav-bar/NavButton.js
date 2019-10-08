@@ -14,13 +14,12 @@ import { getConnectedRobot } from '../../discovery'
 import { NavButton as GenericNavButton } from '@opentrons/components'
 
 import type { ContextRouter } from 'react-router-dom'
-import type { State } from '../../types'
 import usePipetteInfo from '../FileInfo/usePipetteInfo'
 import styles from './styles.css'
 
 type Props = {| ...ContextRouter, name: string |}
 
-export default function NavButton(props: Props) {
+function NavButton(props: Props) {
   const { name } = props
   const isProtocolLoaded = useSelector(robotSelectors.getSessionIsLoaded)
   const isProtocolRunning = useSelector(robotSelectors.getIsRunning)
@@ -104,3 +103,5 @@ export default function NavButton(props: Props) {
     />
   )
 }
+
+export default withRouter(NavButton)

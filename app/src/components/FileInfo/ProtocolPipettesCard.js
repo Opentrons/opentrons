@@ -3,18 +3,14 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 
-import { selectors as robotSelectors } from '../../robot'
-import { fetchPipettes, getPipettesState } from '../../robot-api'
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import { fetchPipettes } from '../../robot-api'
 import InstrumentItem from './InstrumentItem'
 import { RefreshWrapper } from '../Page'
 import { SectionContentHalf } from '../layout'
 import InfoSection from './InfoSection'
 import InstrumentWarning from './InstrumentWarning'
 
-import type { State, Dispatch } from '../../types'
-import type { Pipette } from '../../robot'
-import type { PipettesState } from '../../robot-api'
+import type { Dispatch } from '../../types'
 import type { Robot } from '../../discovery'
 import usePipetteInfo from './usePipetteInfo'
 
