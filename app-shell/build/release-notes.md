@@ -1,4 +1,4 @@
-# Opentrons App Changes from 3.12.0 to 3.13.0
+# Opentrons App Changes from 3.12.0 to 3.13.1
 
 **Note for macOS users**: The Opentrons App is no longer compatible with macOS 10.9 Mavericks. If you are using 10.9, please upgrade to a later version of macOS (available for free from Apple) to continue to receive Opentrons updates.
 
