@@ -29,12 +29,10 @@ type NavButtonProps = {
   selected?: boolean,
   /** contents of the tooltip targetting this button */
   tooltipComponent?: React.Node,
-  /** optional portal to place the tooltipComponent inside */
-  tooltipPortal?: React.ComponentType<*>,
 }
 
 export default function NavButton(props: NavButtonProps) {
-  const { url, tooltipComponent, tooltipPortal } = props
+  const { url, tooltipComponent } = props
   const className = classnames(props.className, styles.button, {
     [styles.disabled]: props.disabled,
     [styles.bottom]: props.isBottom,
@@ -57,11 +55,7 @@ export default function NavButton(props: NavButtonProps) {
   }
 
   return (
-    <HoverTooltip
-      tooltipComponent={tooltipComponent}
-      // portal={tooltipPortal}
-      placement="bottom"
-    >
+    <HoverTooltip tooltipComponent={tooltipComponent} placement="bottom">
       {hoverTooltipHandlers => (
         <div {...hoverTooltipHandlers}>
           <Button {...buttonProps}>

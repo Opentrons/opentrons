@@ -1,7 +1,7 @@
 // @flow
 // nav button container
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
 import { selectors as robotSelectors } from '../../robot'
@@ -11,85 +11,96 @@ import {
   getBuildrootUpdateAvailable,
 } from '../../shell'
 import { getConnectedRobot } from '../../discovery'
-import { NavButton } from '@opentrons/components'
+import { NavButton as GenericNavButton } from '@opentrons/components'
 
 import type { ContextRouter } from 'react-router-dom'
 import type { State } from '../../types'
-import { Portal } from '../portal'
+import usePipetteInfo from '../FileInfo/usePipetteInfo'
+import styles from './styles.css'
 
-type OP = {| ...ContextRouter, name: string |}
+type Props = {| ...ContextRouter, name: string |}
 
-type Props = React.ElementProps<typeof NavButton>
+export default function NavButton(props: Props) {
+  const { name } = props
+  const isProtocolLoaded = useSelector(robotSelectors.getSessionIsLoaded)
+  const isProtocolRunning = useSelector(robotSelectors.getIsRunning)
+  const isProtocolDone = useSelector(robotSelectors.getIsDone)
+  const connectedRobot = useSelector(getConnectedRobot)
+  const buildrootUpdateAvailable = useSelector(
+    state =>
+      connectedRobot != null &&
+      getBuildrootUpdateAvailable(state, connectedRobot)
+  )
+  const robotNotification = buildrootUpdateAvailable === 'upgrade'
+  const moreNotification = useSelector(getAvailableShellUpdate) != null
+  const pipetteInfo = usePipetteInfo(
+    connectedRobot != null ? connectedRobot.name : ''
+  )
 
-export default withRouter<_, _>(
-  connect<Props, OP, _, _, _, _>(mapStateToProps)(NavButton)
-)
-
-function mapStateToProps(state: State, ownProps: OP): $Exact<Props> {
-  const { name } = ownProps
-  const isProtocolLoaded = robotSelectors.getSessionIsLoaded(state)
-  const isProtocolRunning = robotSelectors.getIsRunning(state)
-  const isProtocolDone = robotSelectors.getIsDone(state)
-  const connectedRobot = getConnectedRobot(state)
-  const robotNotification =
-    connectedRobot != null &&
-    getBuildrootUpdateAvailable(state, connectedRobot) === 'upgrade'
-  const moreNotification = getAvailableShellUpdate(state) != null
-
-  // TODO: IMMEDIATELY make selector
-  const incompatiblePipettes = true
-
-  const TooltipPortal = props => <Portal level="global" {...props} />
-
+  const incompatiblePipettes = !pipetteInfo.every(p => p.pipettesMatch)
+  const incompatPipetteTooltip = (
+    <div className={styles.nav_button_tooltip}>
+      Attached pipettes do not match pipettes specified in loaded protocol
+    </div>
+  )
   switch (name) {
     case 'connect':
-      return {
-        iconName: 'ot-connect',
-        title: 'robot',
-        url: '/robots',
-        notification: robotNotification,
-      }
+      return (
+        <GenericNavButton
+          iconName="ot-connect"
+          title="robot"
+          url="/robots"
+          notification={robotNotification}
+        />
+      )
     case 'upload':
-      return {
-        disabled: connectedRobot == null || isProtocolRunning,
-        iconName: 'ot-file',
-        title: 'protocol',
-        url: '/upload',
-      }
+      return (
+        <GenericNavButton
+          disabled={connectedRobot == null || isProtocolRunning}
+          iconName="ot-file"
+          title="protocol"
+          url="/upload"
+        />
+      )
     case 'setup':
-      return {
-        disabled:
-          !isProtocolLoaded ||
-          isProtocolRunning ||
-          isProtocolDone ||
-          incompatiblePipettes,
-        tooltipComponent: incompatiblePipettes
-          ? 'Attached pipettes do not match pipettes specified in loaded protocol'
-          : null,
-        tooltipPortal: TooltipPortal,
-        iconName: 'ot-calibrate',
-        title: 'calibrate',
-        url: '/calibrate',
-      }
+      return (
+        <GenericNavButton
+          disabled={
+            !isProtocolLoaded ||
+            isProtocolRunning ||
+            isProtocolDone ||
+            incompatiblePipettes
+          }
+          tooltipComponent={
+            incompatiblePipettes ? incompatPipetteTooltip : null
+          }
+          iconName="ot-calibrate"
+          title="calibrate"
+          url="/calibrate"
+        />
+      )
     case 'run':
-      return {
-        disabled: !isProtocolLoaded || incompatiblePipettes,
-        tooltipComponent: incompatiblePipettes
-          ? 'Attached pipettes do not match pipettes specified in loaded protocol'
-          : null,
-        tooltipPortal: TooltipPortal,
-        iconName: 'ot-run',
-        title: 'run',
-        url: '/run',
-      }
+      return (
+        <GenericNavButton
+          disabled={!isProtocolLoaded || incompatiblePipettes}
+          tooltipComponent={
+            incompatiblePipettes ? incompatPipetteTooltip : null
+          }
+          iconName="ot-run"
+          title="run"
+          url="/run"
+        />
+      )
   }
 
   // case 'more':
-  return {
-    iconName: 'dots-horizontal',
-    isBottom: true,
-    title: 'more',
-    url: '/menu',
-    notification: moreNotification,
-  }
+  return (
+    <GenericNavButton
+      iconName="dots-horizontal"
+      isBottom={true}
+      title="more"
+      url="/menu"
+      notification={moreNotification}
+    />
+  )
 }
