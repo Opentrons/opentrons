@@ -103,7 +103,7 @@ def test_load_new_trough(robot):
 def test_load_fixed_trash(robot):
     from opentrons.config.pipette_config import Y_OFFSET_MULTI
     assert robot.fixed_trash[0]._coordinates == (
-        82.84, 53.56 + Y_OFFSET_MULTI, 82)
+        82.84, 80, 82)
 
 
 def test_containers_list(robot):
