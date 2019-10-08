@@ -19,7 +19,7 @@
     "isTiprack": false,
     "loadName": "opentrons_1_trash_850ml_fixed",
     "isMagneticModuleCompatible": false,
-    "quirks": ["fixedTrash", "centerMultichannelOnWells"]
+    "quirks": ["fixedTrash"]
   },
   "wells": {
     "A1": {
@@ -29,7 +29,7 @@
       "totalLiquidVolume": 850000,
       "depth": 0,
       "x": 82.84,
-      "y": 53.56,
+      "y": 80,
       "z": 58
     }
   },

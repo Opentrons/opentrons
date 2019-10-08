@@ -3,7 +3,6 @@ import itertools
 import logging
 import json
 from opentrons.config import CONFIG
-from opentrons.config.pipette_config import Y_OFFSET_MULTI
 from opentrons.data_storage import database
 from opentrons.util.vector import Vector
 from opentrons.types import Point
@@ -189,7 +188,7 @@ def _load_new_well(well_data, saved_offset, lw_quirks):
     if "fixedTrash" in lw_quirks:
         well_tuple = (
             well_data['x'] + saved_offset.x,
-            well_data['y'] + Y_OFFSET_MULTI + saved_offset.y,
+            well_data['y'] + saved_offset.y,
             well_data['z'] + saved_offset.z)
     elif "centerMultichannelOnWells" in lw_quirks:
         well_tuple = (
