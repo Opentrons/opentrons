@@ -48,8 +48,8 @@ export const getAnalyticsState = (): AnalyticsState => {
   let state = getAnalyticsCookie()
 
   if (
-    typeof state.optedIn !== 'boolean' ||
     // verify cookie properties
+    typeof state.optedIn !== 'boolean' ||
     typeof state.seenOptIn !== 'boolean'
   ) {
     // reset

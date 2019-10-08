@@ -9,20 +9,12 @@ const MIXPANEL_ID = process.env.OT_LL_MIXPANEL_ID
 const MIXPANEL_OPTS = {
   // opt out by default
   opt_out_tracking_by_default: true,
-  // user details are persisted in our own config store
-  disable_persistence: true,
   track_pageview: true,
 }
-
-export type MixpanelConfig = {|
-  optedIn: boolean,
-  trackingUUID: string,
-|}
 
 export function mixpanelOptIn() {
   if (MIXPANEL_ID) {
     console.debug('User has opted into analytics; tracking with Mixpanel')
-    mixpanel.identify()
     mixpanel.opt_in_tracking()
   }
 }
@@ -31,7 +23,6 @@ export function mixpanelOptOut() {
   if (MIXPANEL_ID) {
     console.debug('User has opted out of analytics; stopping tracking')
     mixpanel.opt_out_tracking()
-    mixpanel.reset()
   }
 }
 
@@ -45,6 +36,5 @@ export function initializeMixpanel() {
 }
 
 export const trackWithMixpanel = (name: string, properties: Object) => {
-  // NOTE: make sure user has opted in before calling this fn
   mixpanel.track(name, properties)
 }
