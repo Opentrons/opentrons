@@ -14,6 +14,7 @@ const AnalyticsOptInModal = (props: Props) => {
   return (
     !analyticsState.seenOptIn && (
       <AlertModal
+        restrictOuterScroll={false}
         className={props.className}
         buttons={[
           { onClick: () => setAnalyticsOptIn(false), children: 'NO' },

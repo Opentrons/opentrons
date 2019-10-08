@@ -44,7 +44,6 @@ export const initializeAnalytics = (state: AnalyticsState) => {
 }
 
 export const getAnalyticsState = (): AnalyticsState => {
-  // NOTE: this writes analytics cookies if none exist
   let state = getAnalyticsCookie()
 
   if (

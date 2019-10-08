@@ -16,6 +16,20 @@ const OUT_PATH = path.join(__dirname, 'dist')
 
 const LABWARE_LIBRARY_ENV_VAR_PREFIX = 'OT_LL'
 
+const passThruEnvVars = Object.keys(process.env)
+  .filter(v => v.startsWith(LABWARE_LIBRARY_ENV_VAR_PREFIX))
+  .concat(['NODE_ENV'])
+
+const envVarsWithDefaults = {
+  OT_LL_VERSION: pkg.version,
+  OT_LL_BUILD_DATE: new Date().toUTCString(),
+}
+
+const envVars = passThruEnvVars.reduce(
+  (acc, envVar) => ({ [envVar]: '', ...acc }),
+  { ...envVarsWithDefaults }
+)
+
 module.exports = merge(baseConfig, {
   entry: JS_ENTRY,
 
@@ -25,24 +39,14 @@ module.exports = merge(baseConfig, {
   },
 
   plugins: [
+    new webpack.EnvironmentPlugin(envVars),
+
     new HtmlWebpackPlugin({
       template: HTML_ENTRY,
       title: pkg.productName,
       description: pkg.description,
       author: pkg.author.name,
       gtmId: process.env.GTM_ID,
-    }),
-
-    new webpack.EnvironmentPlugin(
-      Object.keys(process.env)
-        .filter(v => v.startsWith(LABWARE_LIBRARY_ENV_VAR_PREFIX))
-        .concat(['NODE_ENV'])
-    ),
-
-    // vars for analytics reporting
-    new webpack.DefinePlugin({
-      'process.env.OT_LL_VERSION': JSON.stringify(pkg.version),
-      'process.env.OT_LL_BUILD_DATE': JSON.stringify(new Date().toUTCString()),
     }),
 
     new FaviconsWebpackPlugin({
