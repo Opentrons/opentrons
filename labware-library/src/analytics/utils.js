@@ -9,7 +9,7 @@ const COOKIE_KEY_NAME = 'ot_ll_analytics' // NOTE: cookie is named "LL" but only
 const COOKIE_DOMAIN =
   process.env.NODE_ENV === 'production' ? 'opentrons.com' : undefined
 
-export const persistAnalyticsCookie = (cookies: { [key: string]: any }) => {
+const persistAnalyticsCookie = (cookies: { [key: string]: any }) => {
   const maxAge = 10 * 365 * 24 * 60 * 60 // 10 years
   const options = { COOKIE_DOMAIN, maxAge }
 
@@ -20,7 +20,7 @@ export const persistAnalyticsCookie = (cookies: { [key: string]: any }) => {
   )
 }
 
-export const getAnalyticsCookie = (): $Shape<AnalyticsState> => {
+const getAnalyticsCookie = (): $Shape<AnalyticsState> => {
   const cookies = cookie.parse(global.document.cookie)
   const analyticsCookie = cookies[COOKIE_KEY_NAME]
     ? JSON.parse(cookies[COOKIE_KEY_NAME])
@@ -28,45 +28,51 @@ export const getAnalyticsCookie = (): $Shape<AnalyticsState> => {
   return analyticsCookie
 }
 
-export const initializeAnalytics = () => {
+// default initial value
+export const getDefaultAnalyticsState = (): AnalyticsState => ({
+  optedIn: false,
+  seenOptIn: false,
+})
+
+export const initializeAnalytics = (state: AnalyticsState) => {
   // Intended to run only once, to init all analytics.
   // This should NOT depend on opt in/out state.
   console.debug('initializing analytics')
+
   initializeMixpanel()
+  persistAnalyticsState(state)
 }
 
-export const _getInitialAnalyticsState = (): AnalyticsState => {
+export const getAnalyticsState = (): AnalyticsState => {
   // NOTE: this writes analytics cookies if none exist
-  const parsedCookies = getAnalyticsCookie()
+  let state = getAnalyticsCookie()
 
   if (
-    parsedCookies.seenOptIn === true &&
+    typeof state.optedIn !== 'boolean' ||
     // verify cookie properties
-    typeof parsedCookies.seenOptIn === 'boolean'
+    typeof state.seenOptIn !== 'boolean'
   ) {
-    return parsedCookies
-  } else {
     // reset
     console.debug(
       'never seen opt in, or invalid analytics state. Resetting analytics state'
     )
-    const initialState = {
-      optedIn: false,
-      seenOptIn: false,
-    }
-    persistAnalyticsCookie(initialState)
-    return initialState
+
+    return getDefaultAnalyticsState()
   }
+
+  return state
 }
 
 // NOTE: Fullstory has no opt-in/out, control by adding/removing it completely
 
-export const performOptIn = (s: AnalyticsState) => {
-  mixpanelOptIn()
-  initializeFullstory()
-}
+export const persistAnalyticsState = (state: AnalyticsState) => {
+  persistAnalyticsCookie(state)
 
-export const performOptOut = (s: AnalyticsState) => {
-  mixpanelOptOut()
-  shutdownFullstory()
+  if (state.optedIn) {
+    mixpanelOptIn()
+    initializeFullstory()
+  } else {
+    mixpanelOptOut()
+    shutdownFullstory()
+  }
 }

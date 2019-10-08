@@ -8,20 +8,16 @@ type Props = {|
   children: React.Node,
 |}
 
-const AnalyticsOptIn = (props: Props) => {
-  const {
-    optInToAnalytics,
-    optOutOfAnalytics,
-    analyticsState,
-  } = useAnalyticsOptInOrOut()
+const AnalyticsOptInModal = (props: Props) => {
+  const { setAnalyticsOptIn, analyticsState } = useAnalyticsOptInOrOut()
 
   return (
     !analyticsState.seenOptIn && (
       <AlertModal
         className={props.className}
         buttons={[
-          { onClick: optOutOfAnalytics, children: 'NO' },
-          { onClick: optInToAnalytics, children: 'YES' },
+          { onClick: () => setAnalyticsOptIn(false), children: 'NO' },
+          { onClick: () => setAnalyticsOptIn(true), children: 'YES' },
         ]}
       >
         {props.children}
@@ -30,4 +26,4 @@ const AnalyticsOptIn = (props: Props) => {
   )
 }
 
-export default AnalyticsOptIn
+export default AnalyticsOptInModal
