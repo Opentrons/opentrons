@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.13.1](https://github.com/Opentrons/opentrons/compare/v3.13.0...v3.13.1) (2019-10-09)
+
+
+### Bug Fixes
+
+* **api:** change trash definitions to avoid y head crash ([#4188](https://github.com/Opentrons/opentrons/issues/4188)) ([68b6201](https://github.com/Opentrons/opentrons/commit/68b6201))
+
+
+
+
+
 # [3.13.0](https://github.com/Opentrons/opentrons/compare/v3.12.0...v3.13.0) (2019-10-02)
 
 ### Bug Fixes

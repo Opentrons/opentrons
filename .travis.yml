@@ -1,8 +1,5 @@
 # opentrons platform travis config
-cache:
-  pip: true
-  yarn: true
-  npm: false
+cache: false
 
 stages:
   - test
