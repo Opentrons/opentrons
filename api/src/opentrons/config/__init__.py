@@ -239,17 +239,12 @@ def _load_with_overrides(base) -> Dict[str, str]:
     overrides = _get_environ_overrides()
     try:
         index = json.load((base/_CONFIG_FILENAME).open())
-    except (OSError, json.JSONDecodeError) as e:
-        sys.stderr.write("Error loading config from {}: {}\nRewriting...\n"
-                         .format(str(base), e))
+    except (OSError, json.JSONDecodeError):
         should_write = True
         index = generate_config_index(overrides)
 
     for key in CONFIG_ELEMENTS:
         if key.name not in index:
-            sys.stderr.write(
-                f"New config index key {key.name}={key.default}"
-                "\nRewriting...\n")
             if key.kind in (ConfigElementType.DIR, ConfigElementType.FILE):
                 index[key.name] = base/key.default
             else:

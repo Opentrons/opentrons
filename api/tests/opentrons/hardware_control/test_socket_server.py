@@ -237,7 +237,7 @@ async def test_complex_method(hc_stream_server, loop, monkeypatch):
         (Optional[CriticalPoint], CriticalPoint.NOZZLE, 'NOZZLE'),
     ]
 )
-def test_serializers(paramtype, native, serializable, config_tempdir):
+def test_serializers(paramtype, native, serializable):
     assert paramtype in sockserv._SERDES
     serdes = sockserv._SERDES[paramtype]
     assert serdes.serializer(native) == serializable

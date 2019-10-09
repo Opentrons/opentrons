@@ -1,17 +1,21 @@
-from opentrons.legacy_api.containers import load as containers_load
-from opentrons import robot, instruments, labware
-from opentrons.trackers import pose_tracker
-from opentrons.util import vector
+import pytest
+
 from numpy import isclose
 from unittest import mock
-import pytest
+
+from opentrons.legacy_api.containers import load as containers_load
+from opentrons.trackers import pose_tracker
+from opentrons.util import vector
+
+
 # TODO: Modify all calls to get a Well to use the `wells` method
 # TODO: Modify calls as needed to check absolute position with refactor of
 # TODO: pose_tracker
 # TODO: Get rid of Vector
 
 
-def test_reset(virtual_smoothie_env):
+@pytest.mark.api1_only
+def test_reset(robot, instruments, labware):
     """
     This test may need to be expanded to include various other conditions that
     should be reset.
@@ -21,7 +25,6 @@ def test_reset(virtual_smoothie_env):
     # Not testing this one--this is needed to clean the robot singleton from
     # other tests. This is an inherent problem with the use of the singleton--
     # it entangles both runtime code and tests in unpredictable ways.
-    robot.reset()
 
     lw = labware.load('opentrons-tiprack-300ul', '1')
     p = instruments.P300_Single(mount='right', tip_racks=[lw])
@@ -31,11 +34,12 @@ def test_reset(virtual_smoothie_env):
     assert not p.tip_attached
 
 
-def test_configurable_mount_offsets():
+@pytest.mark.api1_only
+def test_configurable_mount_offsets(robot, instruments):
     def _test_offset(x, y, z):
-        robot.reset()
         robot.config = robot.config._replace(
             mount_offset=(x, y, z))
+        robot.reset()
         left = instruments.P300_Single(mount='left')
         right = instruments.P300_Single(mount='right')
         robot.home()
@@ -64,8 +68,8 @@ def test_configurable_mount_offsets():
     robot.config = old_config
 
 
-def test_pos_tracker_persistance(virtual_smoothie_env):
-    robot.reset()
+@pytest.mark.api1_only
+def test_pos_tracker_persistance(robot, instruments):
     p300 = instruments.P300_Single(mount='left')
     plate = containers_load(robot, 'trough-12row', '5')
     assert robot.max_placeable_height_on_deck(plate) == \
@@ -77,23 +81,22 @@ def test_pos_tracker_persistance(virtual_smoothie_env):
     assert robot.max_placeable_height_on_deck(plate) == 10.0
 
 
-def test_calibrated_max_z(virtual_smoothie_env):
-    robot.reset()
-
+@pytest.mark.api1_only
+def test_calibrated_max_z(robot, instruments):
     instruments.P300_Single(mount='left')
     assert robot.max_deck_height() == 82
 
 
-def test_get_serial_ports_list(monkeypatch):
-    robot.reset()
+@pytest.mark.api1_only
+def test_get_serial_ports_list(robot, monkeypatch):
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
     assert 'Virtual Smoothie' not in robot.get_serial_ports_list()
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'true')
     assert 'Virtual Smoothie' in robot.get_serial_ports_list()
 
 
-def test_add_container(virtual_smoothie_env):
-    robot.reset()
+@pytest.mark.api1_only
+def test_add_container(robot):
     c1 = robot.add_container('96-flat', '1')
     trash = robot.fixed_trash
     res = robot.get_containers()
@@ -106,17 +109,16 @@ def test_add_container(virtual_smoothie_env):
     assert set(res) == set(expected)
 
 
-def test_comment(virtual_smoothie_env):
-    robot.reset()
-    robot.clear_commands()
+@pytest.mark.api1_only
+def test_comment(robot):
     robot.comment('hello')
     assert robot.commands() == ['hello']
 
 
-def test_create_arc(virtual_smoothie_env):
+@pytest.mark.api1_only
+def test_create_arc(robot, instruments):
     from opentrons.legacy_api.robot.robot import (TIP_CLEARANCE_DECK,
                                                   TIP_CLEARANCE_LABWARE)
-    robot.reset()
 
     p300 = instruments.P300_Single(mount='left')
     plate = containers_load(robot, '96-flat', '1')
@@ -163,7 +165,8 @@ def test_create_arc(virtual_smoothie_env):
     assert res == expected
 
 
-def test_robot_move_to(virtual_smoothie_env):
+@pytest.mark.api1_only
+def test_robot_move_to(robot, instruments):
     robot.reset()
     robot.home()
     p300 = instruments.P300_Single(mount='right')
@@ -176,8 +179,8 @@ def test_robot_move_to(virtual_smoothie_env):
     ).all()
 
 
-def test_move_head(virtual_smoothie_env):
-    robot.reset()
+@pytest.mark.api1_only
+def test_move_head(robot):
     robot.move_head(x=100, y=0)
     assert isclose(
         pose_tracker.absolute(
@@ -188,8 +191,7 @@ def test_move_head(virtual_smoothie_env):
 
 
 @pytest.mark.xfail
-def test_drop_tip_default_trash(virtual_smoothie_env):
-    robot.reset()
+def test_drop_tip_default_trash(robot, instruments):
     tiprack = containers_load(robot, 'tiprack-200ul', '1')
     pip = instruments.P300_Single(mount='right', tip_racks=[tiprack])
 
@@ -206,11 +208,11 @@ def test_drop_tip_default_trash(virtual_smoothie_env):
             strategy='arc')
 
 
-def test_calibrate_labware(virtual_smoothie_env, monkeypatch):
+@pytest.mark.api1_only
+def test_calibrate_labware(robot, instruments, labware, monkeypatch):
     import tempfile
     temp = tempfile.mkdtemp()
     monkeypatch.setenv('USER_DEFN_ROOT', temp)
-    robot.reset()
 
     plate = labware.load('96-flat', '1')
     pip = instruments.P300_Single(mount='right')
@@ -227,10 +229,10 @@ def test_calibrate_labware(virtual_smoothie_env, monkeypatch):
     assert isclose(new_pose, (old_x + 1, old_y + 2, old_z - 3)).all()
 
 
-def test_cache_instruments(monkeypatch):
+@pytest.mark.api1_only
+def test_cache_instruments(robot, monkeypatch):
     # Test that smoothie runtime configs are set at run when
     # cache_instrument_models is called
-    robot.reset()
     fake_pip = {'left': {
                     'model': 'p10_single_v1.3',
                     'id': 'FakePip2',

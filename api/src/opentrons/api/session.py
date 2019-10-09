@@ -6,22 +6,24 @@ import logging
 from time import time
 from uuid import uuid4
 from opentrons.broker import Broker
-from opentrons.legacy_api.containers import get_container, location_to_list
-from opentrons.legacy_api.containers.placeable import (
-    Module as ModulePlaceable, Placeable)
 from opentrons.commands import tree, types as command_types
 from opentrons.commands.commands import is_new_loc, listify
-from opentrons.legacy_api.protocols import execute_protocol
 from opentrons.config import feature_flags as ff
 from opentrons.protocols.types import JsonProtocol, PythonProtocol
 from opentrons.protocols.parse import parse
+from opentrons.types import Location, Point
 from opentrons.protocol_api import (ProtocolContext,
                                     labware)
 from opentrons.protocol_api.execute import run_protocol
 from opentrons.hardware_control import adapters, API
-from opentrons.types import Location, Point
-
 from .models import Container, Instrument, Module
+
+from opentrons.legacy_api.containers.placeable import (
+    Module as ModulePlaceable, Placeable)
+if not ff.use_protocol_api_v2():
+    from opentrons.legacy_api.containers import get_container, location_to_list
+
+    from opentrons.legacy_api.protocols import execute_protocol
 
 log = logging.getLogger(__name__)
 

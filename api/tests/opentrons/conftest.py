@@ -1,7 +1,6 @@
 # Uncomment to enable logging during tests
 # import logging
 # from logging.config import dictConfig
-
 import asyncio
 import contextlib
 import os
@@ -17,9 +16,13 @@ from uuid import uuid4 as uuid
 import zipfile
 
 import pytest
-import opentrons
+
+try:
+    from opentrons import robot as rb
+except ImportError:
+    pass
 from opentrons.api import models
-from opentrons.data_storage import database
+from opentrons.data_storage import database_migration
 from opentrons.server import rpc
 from opentrons import config, types
 from opentrons.server import init
@@ -69,26 +72,28 @@ def log_by_axis(log, axis):
     return reduce(reducer, log, {axis: [] for axis in axis})
 
 
-def print_db_path(db):
-    cursor = database.db_conn.cursor()
-    cursor.execute("PRAGMA database_list")
-    db_info = cursor.fetchone()
-    print("Database: ", db_info[2])
+@pytest.mark.apiv1
+@pytest.fixture(scope='session')
+def template_db(tmpdir_factory):
+    template_db = tmpdir_factory.mktemp('template_db.sqlite')\
+                                .join('opentrons.db')
+    config.CONFIG['labware_database_file'] = str(template_db)
+    database_migration.check_version_and_perform_full_migration()
+    return template_db
 
 
-@pytest.fixture
-def config_tempdir(tmpdir):
+@pytest.mark.apiv1
+@pytest.fixture(autouse=True)
+def config_tempdir(tmpdir, template_db):
     os.environ['OT_API_CONFIG_DIR'] = str(tmpdir)
     config.reload()
-    old_db_path = database.database_path
     shutil.copyfile(
-        database.database_path, config.CONFIG['labware_database_file'])
-    database.change_database(str(config.CONFIG['labware_database_file']))
-    yield tmpdir, old_db_path
+        template_db, config.CONFIG['labware_database_file'])
+    yield tmpdir, template_db
 
 
 @pytest.fixture(autouse=True)
-def clear_feature_flags(config_tempdir):
+def clear_feature_flags():
     ff_file = config.CONFIG['feature_flags_file']
     if os.path.exists(ff_file):
         os.remove(ff_file)
@@ -98,20 +103,12 @@ def clear_feature_flags(config_tempdir):
 
 
 @pytest.fixture
-def wifi_keys_tempdir(config_tempdir):
+def wifi_keys_tempdir():
     old_wifi_keys = config.CONFIG['wifi_keys_dir']
     with tempfile.TemporaryDirectory() as td:
         config.CONFIG['wifi_keys_dir'] = pathlib.Path(td)
         yield td
         config.CONFIG['wifi_keys_dir'] = old_wifi_keys
-
-
-# Builds a temp db to allow mutations during testing
-@pytest.fixture(autouse=True)
-def dummy_db(config_tempdir):
-    _, old_db_path = config_tempdir
-    yield None
-    database.change_database(old_db_path)
 
 
 # -------feature flag fixtures-------------
@@ -141,34 +138,26 @@ def old_aspiration(monkeypatch):
 
 @contextlib.contextmanager
 def using_api2(loop):
-    oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
-    os.environ['OT_API_FF_useProtocolApi2'] = '1'
+    if not os.environ.get('OT_API_FF_useProtocolApi2'):
+        pytest.skip('Do not run api v1 tests here')
     hw_manager = adapters.SingletonAdapter(loop)
     try:
         yield hw_manager
     finally:
         asyncio.ensure_future(hw_manager.reset())
-        if None is oldenv:
-            os.environ.pop('OT_API_FF_useProtocolApi2')
-        else:
-            os.environ['OT_API_FF_useProtocolApi2'] = oldenv
         hw_manager.set_config(config.robot_configs.load())
 
 
 @contextlib.contextmanager
 def using_sync_api2(loop):
-    oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
-    os.environ['OT_API_FF_useProtocolApi2'] = '1'
+    if not os.environ.get('OT_API_FF_useProtocolApi2'):
+        pytest.skip('Do not run api v2 tests here')
     hardware = adapters.SynchronousAdapter.build(
         API.build_hardware_controller)
     try:
         yield hardware
     finally:
         hardware.reset()
-        if None is oldenv:
-            os.environ.pop('OT_API_FF_useProtocolApi2')
-        else:
-            os.environ['OT_API_FF_useProtocolApi2'] = oldenv
         hardware.set_config(config.robot_configs.load())
 
 
@@ -184,20 +173,14 @@ def ensure_api1(request, loop):
         yield
 
 
+@pytest.mark.apiv1
 @contextlib.contextmanager
 def using_api1(loop):
-    oldenv = os.environ.get('OT_API_FF_useProtocolApi2')
-    if oldenv:
-        os.environ.pop('OT_API_FF_useProtocolApi2')
-    opentrons.reset_globals()
     try:
-        yield opentrons.hardware
+        yield rb
     finally:
-        opentrons.hardware.reset()
-        if None is not oldenv:
-            os.environ['OT_API_FF_useProtocolApi2'] = oldenv
-        opentrons.reset_globals()
-        opentrons.robot.config = config.robot_configs.load()
+        rb.reset()
+        rb.config = config.robot_configs.load()
 
 
 def _should_skip_api1(request):
@@ -210,7 +193,10 @@ def _should_skip_api2(request):
         and request.param != using_api2
 
 
-@pytest.fixture(params=[using_api1, using_api2])
+@pytest.fixture(
+    params=[
+        pytest.param(using_api1, marks=pytest.mark.apiv1),
+        pytest.param(using_api2, marks=pytest.mark.apiv2)])
 async def async_server(request, virtual_smoothie_env, loop):
     if _should_skip_api1(request):
         pytest.skip('requires api1 only')
@@ -220,9 +206,11 @@ async def async_server(request, virtual_smoothie_env, loop):
         if request.param == using_api1:
             app = init(hw)
             app['api_version'] = 1
-        else:
+        elif request.param == using_api2:
             app = init(hw)
             app['api_version'] = 2
+        else:
+            pytest.skip('Incorrect api version used')
         yield app
         await app.shutdown()
 
@@ -244,17 +232,72 @@ async def dc_session(request, async_server, monkeypatch, loop):
         await hw.cache_instruments({
             types.Mount.LEFT: None,
             types.Mount.RIGHT: 'p300_multi_v1'})
-
     ses = endpoints.SessionManager(hw)
     endpoints.session = ses
     monkeypatch.setattr(endpoints, 'session', ses)
     yield ses
 
 
+@pytest.mark.apiv1
+def apiv1_singletons_factory(virtual_smoothie_env):
+    from opentrons.legacy_api import api
+    api.robot.connect()
+    api.robot.reset()
+    return {'robot': api.robot,
+            'instruments': api.instruments,
+            'labware': api.labware,
+            'modules': api.modules}
+
+
 @pytest.fixture
-def robot(dummy_db):
-    from opentrons.legacy_api.robot import Robot
-    return Robot()
+def apiv1_singletons(config_tempdir, virtual_smoothie_env):
+    return apiv1_singletons_factory(virtual_smoothie_env)
+
+
+@pytest.mark.apiv2
+def apiv2_singletons_factory(virtual_smoothie_env):
+    from opentrons.protocol_api import back_compat
+    return {**back_compat.build_globals()}
+
+
+@pytest.fixture
+def apiv2_singletons():
+    return apiv2_singletons_factory()
+
+
+@pytest.fixture(
+    params=[
+        pytest.param(apiv1_singletons_factory, marks=pytest.mark.apiv1),
+        pytest.param(apiv2_singletons_factory, marks=pytest.mark.apiv2)])
+def singletons(config_tempdir, request, virtual_smoothie_env):
+    markers = list(request.node.iter_markers())
+    if 'apiv1_only' in markers and 'apiv2' in markers:
+        pytest.skip('apiv2 but apiv1 only')
+    if 'apiv2_only' in markers and 'apiv1' in markers:
+        pytest.skip('apiv1 but apiv2 only')
+    return request.param(virtual_smoothie_env)
+
+
+@pytest.fixture(scope='function')
+def robot(singletons):
+    return singletons['robot']
+
+
+@pytest.fixture(scope='function')
+def instruments(singletons):
+    return singletons['instruments']
+
+
+@pytest.mark.apiv1
+@pytest.fixture(scope='function')
+def labware(singletons):
+    return singletons['labware']
+
+
+@pytest.mark.apiv1
+@pytest.fixture(scope='function')
+def modules(singletons):
+    return singletons['modules']
 
 
 @pytest.fixture(params=["dinosaur.py"])
@@ -359,7 +402,10 @@ def virtual_smoothie_env(monkeypatch):
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
 
 
-@pytest.fixture(params=[using_api1, using_api2])
+@pytest.fixture(
+    params=[
+        pytest.param(using_api1, marks=pytest.mark.apiv1),
+        pytest.param(using_api2, marks=pytest.mark.apiv2)])
 def hardware(request, loop, virtual_smoothie_env):
     if _should_skip_api1(request):
         pytest.skip('requires api1 only')
@@ -369,7 +415,10 @@ def hardware(request, loop, virtual_smoothie_env):
         yield hw
 
 
-@pytest.fixture(params=[using_api1, using_sync_api2])
+@pytest.fixture(
+    params=[
+        pytest.param(using_api1, marks=pytest.mark.apiv1),
+        pytest.param(using_sync_api2, marks=pytest.mark.apiv2)])
 def sync_hardware(request, loop, virtual_smoothie_env):
     if _should_skip_api1(request):
         pytest.skip('requires api1 only')
@@ -410,11 +459,8 @@ def model(robot, hardware, loop, request):
     # Use with pytest.mark.parametrize(’labware’, [some-labware-name])
     # to have a different labware loaded as .container. If not passed,
     # defaults to the version-appropriate way to do 96 flat
-    from opentrons.legacy_api.containers import load
-    from opentrons.legacy_api.instruments.pipette import Pipette
-
     try:
-        lw_name = request.getfixturevalue('labware')
+        lw_name = request.getfixturevalue('labware_name')
     except Exception:
         lw_name = None
 
@@ -429,6 +475,8 @@ def model(robot, hardware, loop, request):
         rob = hardware
         container = models.Container(plate, context=ctx)
     else:
+        from opentrons.legacy_api.containers import load
+        from opentrons.legacy_api.instruments.pipette import Pipette
         pipette = Pipette(robot,
                           ul_per_mm=18.5, max_volume=300, mount='right')
         plate = load(robot, lw_name or '96-flat', '1')

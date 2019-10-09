@@ -21,6 +21,21 @@ class SimulatingDriver:
     def _smoothie_reset(self):
         pass
 
+    def read_pipette_id(self, mount):
+        pass
+
+    def read_pipette_model(self, mount):
+        pass
+
+    def write_pipette_id(self, mount, id):
+        pass
+
+    def write_pipette_model(self, mount, model):
+        pass
+
+    def _send_command(self, command, timeout=None):
+        pass
+
     def turn_on_blue_button_light(self):
         pass
 

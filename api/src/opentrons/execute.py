@@ -13,7 +13,7 @@ import sys
 import threading
 from typing import Any, Callable, Dict, Optional, TextIO
 
-from opentrons import protocol_api, robot, legacy_api, __version__
+from opentrons import protocol_api, __version__
 from opentrons.protocol_api import execute as execute_apiv2
 from opentrons import commands
 from opentrons.config import feature_flags as ff
@@ -190,6 +190,8 @@ def execute(protocol_file: TextIO,
                                    simulate=False,
                                    context=context)
     else:
+        from opentrons import robot
+        from opentrons.legacy_api import protocols
         robot.connect()
         robot.cache_instrument_models()
         robot.discover_modules()
@@ -198,7 +200,7 @@ def execute(protocol_file: TextIO,
             robot.broker.subscribe(
                 commands.command_types.COMMAND, emit_runlog)
         if isinstance(protocol, JsonProtocol):
-            legacy_api.protocols.execute_protocol(protocol)
+            protocols.execute_protocol(protocol)
         else:
             exec(protocol.contents, {})
 

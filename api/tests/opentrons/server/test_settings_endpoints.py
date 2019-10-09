@@ -7,7 +7,6 @@ import tempfile
 import pytest
 
 from opentrons.server import init
-from opentrons.data_storage import database as db
 from opentrons.config import pipette_config
 from opentrons import config, types
 
@@ -124,11 +123,12 @@ async def test_available_resets(async_client, async_server):
         == sorted(options, key=lambda el: el['id'])
 
 
+@pytest.mark.api1_only
 async def execute_reset_tests_v1(cli):
     # Make sure we actually delete the database
     resp = await cli.post('/settings/reset', json={'labwareCalibration': True})
     body = await resp.json()
-    assert not os.path.exists(db.database_path)
+    assert not os.path.exists(config.CONFIG['labware_database_file'])
     assert resp.status == 200
     assert body == {}
 
@@ -210,8 +210,8 @@ async def test_reset_v1(virtual_smoothie_env, loop, async_client):
     # work locally) and checks the error handling
 
     # precondition
-    assert os.path.exists(db.database_path)
-    with restore_db(db.database_path):
+    assert os.path.exists(config.CONFIG['labware_database_file'])
+    with restore_db(config.CONFIG['labware_database_file']):
         await execute_reset_tests_v1(async_client)
 
 
@@ -284,7 +284,6 @@ async def test_modify_pipette_settings(
     assert resp.status == 200
     check = await async_client.get('/settings/pipettes/{}'.format(test_id))
     body = await check.json()
-    print(patch_body)
     assert body['fields'] == patch_body['fields']
 
     # Check that None reverts a setting to default

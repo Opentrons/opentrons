@@ -6,7 +6,10 @@ import logging
 from aiohttp import web
 from threading import Thread
 
-from opentrons import instruments
+try:
+    from opentrons import instruments
+except ImportError:
+    pass
 from opentrons.config import pipette_config
 from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as ff

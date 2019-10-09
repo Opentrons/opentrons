@@ -190,7 +190,7 @@ def main():
     if ff.use_protocol_api_v2():
         checked_hardware = adapters.SingletonAdapter(asyncio.get_event_loop())
     else:
-        checked_hardware = opentrons.hardware
+        checked_hardware = opentrons.robot
     run(checked_hardware, **vars(args))
     arg_parser.exit(message="Stopped\n")
 

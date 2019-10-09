@@ -37,7 +37,7 @@ simfile ?=
 # make test tests=tests/opentrons/tools/test_qc_scripts.py would run only the
 # specified test
 tests ?= tests
-test_opts ?= --cov --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
+test_opts ?=  --cov --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
 
 # These variables must be overridden when make deploy or make deploy-staging is run
 # to set the auth details for pypi
@@ -94,10 +94,15 @@ $(wheel_pattern): setup.py $(ot_sources)
 
 wheel: $(wheel_file)
 
-.PHONY: test
-test: local-install
+.PHONY: test, test-apiv1, test-apiv2
+test: local-install test-apiv2 test-apiv1
 	$(python)	-m twine check $(wheel_file)
-	$(pytest) $(tests) $(test_opts)
+
+test-apiv2: local-install
+	OT_API_FF_useProtocolApi2=1 $(pytest) $(tests) $(test_opts) -m "not apiv1 and not api1_only"
+
+test-apiv1: local-install
+	OT_API_FF_useProtocolApi2=0 $(pytest) $(tests) $(test_opts) -m "not apiv2 and not api2_only"
 
 .PHONY: lint
 lint: $(ot_py_sources)

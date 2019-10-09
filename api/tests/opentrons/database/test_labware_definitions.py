@@ -3,12 +3,15 @@
 # TODO: Modify calibration file shape to fit new design
 import os
 
+import pytest
+
 from opentrons.data_storage import database
 
 file_dir = os.path.abspath(os.path.dirname(__file__))
 
 
-def test_labware_create(dummy_db):
+@pytest.mark.api1_only
+def test_labware_create():
     from opentrons import labware
     lw_name = '15-well-plate'
     if lw_name in labware.list():

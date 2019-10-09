@@ -1,4 +1,6 @@
+import pytest
 from numpy import array, isclose
+
 from opentrons.legacy_api.instruments import Pipette
 from opentrons.legacy_api.robot.mover import Mover
 from opentrons.trackers.pose_tracker import (
@@ -8,6 +10,7 @@ from opentrons.trackers.pose_tracker import (
 # TODO: the pose_tracker
 
 
+@pytest.mark.api1_only
 def test_functional(smoothie):
     scale = array([
         [2, 0, 0, -1],
@@ -65,6 +68,7 @@ def test_functional(smoothie):
     assert isclose(change_base(state, src='right'), (3, 2, 4)).all()
 
 
+@pytest.mark.api1_only
 def test_integration(robot):
     left = Pipette(robot, mount='left', ul_per_mm=1000, max_volume=1000)
     robot.home()

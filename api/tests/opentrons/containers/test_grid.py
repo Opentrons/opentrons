@@ -10,6 +10,7 @@ def plate(robot):
     return load(robot, '96-flat', '4')
 
 
+@pytest.mark.api1_only
 def test_rows_cols(plate):
     wells = [
         plate.rows[1]['2'],
@@ -27,6 +28,7 @@ def test_rows_cols(plate):
         assert well == next_well
 
 
+@pytest.mark.api1_only
 def test_serial_dilution(robot):
     plate = load(
         robot,

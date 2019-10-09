@@ -6,6 +6,7 @@ import pytest
 from opentrons import simulate, protocols
 
 
+@pytest.mark.api2_only
 @pytest.mark.parametrize('protocol_file', ['testosaur_v2.py'])
 def test_simulate_function_apiv2(ensure_api2,
                                  protocol,
@@ -21,6 +22,7 @@ def test_simulate_function_apiv2(ensure_api2,
         ]
 
 
+@pytest.mark.api2_only
 def test_simulate_function_json_apiv2(ensure_api2,
                                       get_json_protocol_fixture):
     jp = get_json_protocol_fixture('3', 'simple', False)
@@ -38,6 +40,7 @@ def test_simulate_function_json_apiv2(ensure_api2,
     ]
 
 
+@pytest.mark.api2_only
 def test_simulate_function_bundle_apiv2(ensure_api2,
                                         get_bundle_fixture):
     bundle = get_bundle_fixture('simple_bundle')
@@ -63,6 +66,7 @@ def test_simulate_function_bundle_apiv2(ensure_api2,
         ]
 
 
+@pytest.mark.api1_only
 @pytest.mark.parametrize('protocol_file', ['testosaur.py'])
 def test_simulate_function_apiv1(ensure_api1, protocol, protocol_file):
     runlog, bundle = simulate.simulate(protocol.filelike, 'testosaur.py')
@@ -77,6 +81,7 @@ def test_simulate_function_apiv1(ensure_api1, protocol, protocol_file):
     ]
 
 
+@pytest.mark.api1_only
 def test_simulate_function_json_apiv1(ensure_api1,
                                       get_json_protocol_fixture):
     jp = get_json_protocol_fixture('3', 'simple', False)

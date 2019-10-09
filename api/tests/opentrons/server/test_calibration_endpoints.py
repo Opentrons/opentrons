@@ -2,7 +2,6 @@ import json
 
 import numpy as np
 
-from opentrons import robot, instruments
 from opentrons import deck_calibration as dc
 from opentrons.deck_calibration import endpoints
 from opentrons.config import robot_configs
@@ -20,7 +19,7 @@ from opentrons import types
 # operation, and then these tests should be revised to match expected reality.
 
 # ------------ Function tests (unit) ----------------------
-async def test_add_and_remove_tip(async_server, dc_session):
+async def test_add_and_remove_tip(async_server, dc_session, instruments):
     hardware = dc_session.adapter
     mount = 'left'
     version = async_server['api_version']
@@ -85,7 +84,7 @@ async def test_add_and_remove_tip(async_server, dc_session):
         assert hardware.attached_instruments[mount]['has_tip'] is False
 
 
-async def test_save_xy(async_server, dc_session):
+async def test_save_xy(async_server, dc_session, instruments):
     hardware = dc_session.adapter
     version = async_server['api_version']
 
@@ -128,8 +127,8 @@ async def test_save_xy(async_server, dc_session):
     actual = dc_session.points[point]
     if version == 1:
         expected = (
-            robot._driver.position['X'] + hardware.config.mount_offset[0],
-            robot._driver.position['Y']
+            hardware._driver.position['X'] + hardware.config.mount_offset[0],
+            hardware._driver.position['Y']
         )
     else:
         coordinates = hardware.gantry_position(types.Mount.LEFT)
@@ -140,10 +139,10 @@ async def test_save_xy(async_server, dc_session):
     assert actual == expected
 
 
-async def test_save_z(async_server, dc_session, monkeypatch):
+async def test_save_z(async_server, dc_session, monkeypatch, instruments):
+    dc_session.adapter.reset()
     hardware = dc_session.adapter
     model = 'p10_single_v1'
-
     # Z values were bleeding in from other tests, mock robot configs
     # to encapsulate this test
     fake_config = robot_configs.load()
@@ -172,7 +171,7 @@ async def test_save_z(async_server, dc_session, monkeypatch):
 
     z_target = 80.0
     if async_server['api_version'] == 1:
-        hardware.home()
+        # hardware.home()
         dc_session.pipettes.get(mount).move_to(
             (hardware.deck, (0, 0, z_target)))
     else:
@@ -342,13 +341,14 @@ async def test_release(async_client, async_server, monkeypatch, dc_session):
     """
     if async_server['api_version'] == 1:
         test_model = 'p300_multi_v1'
+        hardware = async_server['com.opentrons.hardware']
 
         def dummy_read_model(mount):
             return test_model
 
         monkeypatch.setattr(
-            robot._driver, 'read_pipette_model', dummy_read_model)
-        robot.reset()
+            hardware._driver, 'read_pipette_model', dummy_read_model)
+        hardware.reset()
 
     resp1 = await async_client.post('/calibration/deck/start')
     assert resp1.status == 409
@@ -380,13 +380,14 @@ async def test_forcing_new_session(
     """
     test_model = 'p300_multi_v1'
     if async_server['api_version'] == 1:
+        hardware = async_server['com.opentrons.hardware']
 
         def dummy_read_model(mount):
             return test_model
 
         monkeypatch.setattr(
-            robot._driver, 'read_pipette_model', dummy_read_model)
-        robot.reset()
+            hardware._driver, 'read_pipette_model', dummy_read_model)
+        hardware.reset()
 
     dummy_token = 'fake token'
 

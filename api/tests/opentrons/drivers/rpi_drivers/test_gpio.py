@@ -35,9 +35,7 @@ def test_init_sequence(monkeypatch):
         (gpio.INPUT_PINS['WINDOW_INPUT'], "{}/export".format(gpio._path_prefix)),                           # NOQA
         (gpio.IN, "{0}/gpio{1}/direction".format(gpio._path_prefix, gpio.INPUT_PINS['WINDOW_INPUT']))       # NOQA
     ]
-    # from pprint import pprint
-    # pprint(init_log)
-    # pprint(expected_log)
+
     assert init_log == expected_log
 
 

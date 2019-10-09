@@ -3,7 +3,6 @@ import pytest
 
 from collections import OrderedDict
 from opentrons.server import serialize
-from opentrons import robot, instruments, containers
 
 
 @pytest.fixture
@@ -37,8 +36,13 @@ def type_id(instance):
     return id(type(instance))
 
 
-def test_robot():
+@pytest.mark.api1_only
+def test_robot(singletons):
+    robot = singletons['robot']
+    containers = singletons['labware']
+    instruments = singletons['instruments']
     robot.reset()
+
     containers.load('trough-12row', '3', 'trough')
     containers.load('96-PCR-flat', '1', 'plate')
 

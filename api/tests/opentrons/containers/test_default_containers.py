@@ -1,12 +1,14 @@
+import pytest
+
 from opentrons.legacy_api.containers import load as containers_load
-from opentrons import instruments, robot
 from opentrons.trackers import pose_tracker
 from numpy import isclose
-import pytest
+
 # TODO: Remove in favor of a minimum membership test on `labware.list`
 
 
-def test_new_containers():
+@pytest.mark.api1_only
+def test_new_containers(robot, instruments):
     robot.reset()
     trash_box = containers_load(robot, 'trash-box', '1')
     tip_rack = containers_load(robot, 'tiprack-200ul', '3')
@@ -26,12 +28,10 @@ def test_new_containers():
 
 
 @pytest.mark.xfail
-def test_fixed_trash():
+def test_fixed_trash(robot, instruments):
     robot.reset()
     p300 = instruments.P300_Single(mount='right')
-    print(pose_tracker.absolute(robot.poses, p300))
     p300.move_to(p300.trash_container)
-    print(pose_tracker.absolute(robot.poses, p300))
     assert isclose(
             pose_tracker.absolute(robot.poses, p300),
             (355.0, 361.43, 85.0)).all()

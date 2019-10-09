@@ -14,12 +14,16 @@ elif not config.feature_flags.use_protocol_api_v2():
 
 
 if not config.feature_flags.use_protocol_api_v2():
-    from .legacy_api.api import (robot as robotv1,   # noqa(E402)
-                                 reset as resetv1,
-                                 instruments as instrumentsv1,
-                                 containers as containersv1,
-                                 labware as labwarev1,
-                                 modules as modulesv1)
+    from .legacy_api.api import (robot,   # noqa(E402)
+                                 reset,
+                                 instruments,
+                                 containers,
+                                 labware,
+                                 modules)
+    names_list = [
+        'containers', 'instruments', 'robot', 'reset', 'modules', 'labware']
+else:
+    names_list = []
 
 try:
     with open(os.path.join(HERE, 'package.json')) as pkg:
@@ -35,35 +39,4 @@ if version < (3, 5):
             version[0], version[1]))
 
 
-def build_globals():
-    if config.feature_flags.use_protocol_api_v2():
-        return None, None, None, None, None, None, None
-    else:
-        return robotv1, resetv1, instrumentsv1, containersv1,\
-            labwarev1, modulesv1, robotv1
-
-
-def reset_globals():
-    """ Reinitialize the global singletons with a given API version.
-
-    :param version: 1 or 2. If `None`, pulled from the `useProtocolApiV2`
-                    advanced setting.
-    """
-    global containers
-    global instruments
-    global labware
-    global robot
-    global reset
-    global modules
-    global hardware
-
-    robot, reset, instruments, containers, labware, modules, hardware\
-        = build_globals()
-
-
-robot, reset, instruments, containers, labware, modules, hardware\
-        = build_globals()
-
-
-__all__ = ['containers', 'instruments', 'labware', 'robot', 'reset',
-           '__version__', 'modules', 'hardware', 'HERE']
+__all__ = ['__version__', 'HERE'] + names_list

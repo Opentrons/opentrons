@@ -4,8 +4,10 @@ import traceback
 import sys
 from typing import Any, Callable
 
+import opentrons
 from .contexts import ProtocolContext
-from . import execute_v3
+from . import execute_v3, back_compat
+
 from opentrons import config
 from opentrons.protocols.types import PythonProtocol, Protocol
 
@@ -116,6 +118,27 @@ def _run_python(
         raise ExceptionInProtocolError(e, tb, str(e), frame.lineno)
 
 
+def _run_python_legacy(proto: PythonProtocol, context: ProtocolContext):
+    new_locs = locals()
+    new_globs = globals()
+    namespace_mapping = back_compat.build_globals()
+    for key, value in namespace_mapping.items():
+        setattr(opentrons, key, value)
+    try:
+        exec(proto.contents, new_globs, new_locs)
+    except Exception as e:
+        exc_type, exc_value, tb = sys.exc_info()
+        try:
+            frame = _find_protocol_error(tb, proto.filename)
+        except KeyError:
+            # No pretty names, just raise it
+            raise e
+        raise ExceptionInProtocolError(e, tb, str(e), frame.lineno)
+    finally:
+        for key in namespace_mapping.keys():
+            delattr(opentrons, key)
+
+
 def run_protocol(protocol: Protocol,
                  simulate: bool = False,
                  context: ProtocolContext = None):
@@ -146,7 +169,14 @@ def run_protocol(protocol: Protocol,
         raise RuntimeError(
             'Will not automatically generate hardware controller')
     if isinstance(protocol, PythonProtocol):
-        _run_python(protocol, true_context)
+        if protocol.api_level == '2':
+            _run_python(protocol, true_context)
+        elif protocol.api_level == '1':
+            _run_python_legacy(protocol, true_context)
+        else:
+            raise RuntimeError(
+                f'Unsupported python API version: {protocol.api_level}'
+            )
     else:
         if protocol.schema_version == 3:
             ins = execute_v3.load_pipettes_from_json(

@@ -13,8 +13,6 @@ import os
 SUPPORTED_MODULES = ['magdeck', 'tempdeck']
 
 log = logging.getLogger(__file__)
-database_path = str(CONFIG['labware_database_file'])
-log.debug("Database path: {}".format(database_path))
 
 # ======================== Private Functions ======================== #
 
@@ -147,14 +145,14 @@ def _get_db_version(db):
 
 # ======================== Public Functions ======================== #
 def save_new_container(container: Container, container_name: str) -> bool:
-    db_conn = sqlite3.connect(database_path)
+    db_conn = sqlite3.connect(str(CONFIG['labware_database_file']))
     _create_container_obj_in_db(db_conn, container, container_name)
     res = True  # old create fn does not return anything
     return res
 
 
 def load_container(container_name: str) -> Container:
-    db_conn = sqlite3.connect(database_path)
+    db_conn = sqlite3.connect(str(CONFIG['labware_database_file']))
     res = _load_container_object_from_db(db_conn, container_name)
     return res
 
@@ -162,53 +160,48 @@ def load_container(container_name: str) -> Container:
 def overwrite_container(container: Container) -> bool:
     log.debug("Overwriting container definition: {}".format(
         container.get_type()))
-    db_conn = sqlite3.connect(database_path)
+    db_conn = sqlite3.connect(str(CONFIG['labware_database_file']))
     _update_container_object_in_db(db_conn, container)
     res = True  # old overwrite fn does not return anything
     return res
 
 
 def delete_container(container_name) -> bool:
-    db_conn = sqlite3.connect(database_path)
+    db_conn = sqlite3.connect(str(CONFIG['labware_database_file']))
     _delete_container_object_in_db(db_conn, container_name)
     res = True  # old delete fn does not return anything
     return res
 
 
 def list_all_containers() -> List[str]:
-    db_conn = sqlite3.connect(database_path)
+    db_conn = sqlite3.connect(str(CONFIG['labware_database_file']))
     res = _list_all_containers_by_name(db_conn)
     return res
 
 
 def load_module(module_name: str) -> Container:
-    db_conn = sqlite3.connect(database_path)
+    db_conn = sqlite3.connect(str(CONFIG['labware_database_file']))
     res = _load_module_dict_from_db(db_conn, module_name)
     return res
 
 
-def change_database(db_path: str):
-    global database_path
-    database_path = db_path
-
-
 def get_version():
     '''Get the Opentrons-defined database version'''
-    db_conn = sqlite3.connect(database_path)
+    db_conn = sqlite3.connect(str(CONFIG['labware_database_file']))
     return _get_db_version(db_conn)
 
 
 def set_version(version):
-    db_conn = sqlite3.connect(database_path)
+    db_conn = sqlite3.connect(str(CONFIG['labware_database_file']))
     db_queries.set_user_version(db_conn, version)
 
 
 def reset():
     """ Unmount and remove the sqlite database (used in robot reset) """
-    if os.path.exists(database_path):
-        os.remove(database_path)
+    if os.path.exists(str(CONFIG['labware_database_file'])):
+        os.remove(str(CONFIG['labware_database_file']))
     # Not an os.path.join because it is a suffix to the full filename
-    journal_path = database_path + '-journal'
+    journal_path = str(CONFIG['labware_database_file']) + '-journal'
     if os.path.exists(journal_path):
         os.remove(journal_path)
 

@@ -2,6 +2,16 @@ import pytest
 from opentrons.protocol_api import execute, ProtocolContext
 from opentrons.protocols.parse import parse
 
+v1_protocol_testcases = [
+    ("""from opentrons import labware, instruments, robot"""),
+    ("""
+metadata = {
+    "apiLevel": '1'
+}
+import opentrons
+opentrons.robot
+    """)]
+
 
 def test_api2_runfunc():
     def noargs():
@@ -37,6 +47,12 @@ def test_execute_ok(protocol, protocol_file, ensure_api2, loop):
     proto = parse(protocol.text, protocol.filename)
     ctx = ProtocolContext(loop)
     execute.run_protocol(proto, context=ctx)
+
+
+@pytest.mark.parametrize('protocol', v1_protocol_testcases)
+def test_execute_v1_imports(protocol, ensure_api2):
+    proto = parse(protocol)
+    execute.run_protocol(proto)
 
 
 def test_bad_protocol(ensure_api2, loop):

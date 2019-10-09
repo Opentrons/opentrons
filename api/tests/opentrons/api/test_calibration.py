@@ -226,8 +226,8 @@ async def test_home_api1(main_router, model):
 
 
 @pytest.mark.api1_only
-@pytest.mark.parametrize('labware', ['trough-1row-25ml'])
-async def test_move_to_top_api1_1well(main_router, model, labware):
+@pytest.mark.parametrize('labware_name', ['trough-1row-25ml'])
+async def test_move_to_top_api1_1well(main_router, model, labware_name):
     with mock.patch.object(model.instrument._instrument, 'move_to') as move_to:
         main_router.calibration_manager.move_to(
             model.instrument,
@@ -360,7 +360,6 @@ async def test_jog_calibrate_bottom_v2(
 
 @pytest.mark.api1_only
 async def test_jog_calibrate_bottom_v1(
-        dummy_db,
         main_router,
         model,
         calibrate_bottom_flag):
@@ -413,7 +412,6 @@ async def test_jog_calibrate_bottom_v1(
 
 @pytest.mark.api2_only
 async def test_jog_calibrate_top_v2(
-        dummy_db,
         main_router,
         model):
 
@@ -437,7 +435,6 @@ async def test_jog_calibrate_top_v2(
 
 @pytest.mark.api1_only
 async def test_jog_calibrate_top(
-        dummy_db,
         main_router,
         model,
         monkeypatch):

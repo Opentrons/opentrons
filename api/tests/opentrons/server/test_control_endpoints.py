@@ -3,15 +3,15 @@ from copy import deepcopy
 
 import pytest
 
-from opentrons import robot, types
+from opentrons import types
 from opentrons.legacy_api import modules as legacy_modules
 
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
 from opentrons.hardware_control import modules
-from opentrons import instruments
 from opentrons.config import pipette_config
 
 
+@pytest.mark.api1_only
 async def test_get_pipettes_uncommissioned(
         async_server, loop, async_client, monkeypatch):
 
@@ -51,7 +51,8 @@ async def test_get_pipettes_uncommissioned(
         monkeypatch.setattr(
             async_server['com.opentrons.hardware']._driver,
             'update_steps_per_mm', fake_update_steps_per_mm)
-        robot._driver.simulating = False
+        hw = async_server['com.opentrons.hardware']
+        hw._driver.simulating = False
 
     else:
         hw = async_server['com.opentrons.hardware']._backend
@@ -60,12 +61,13 @@ async def test_get_pipettes_uncommissioned(
 
     resp = await async_client.get('/pipettes?refresh=true')
     if async_server['api_version'] == 1:
-        robot._driver.simulating = True
+        hw._driver.simulating = True
     text = await resp.text()
     assert resp.status == 200
     assert json.loads(text) == expected
 
 
+@pytest.mark.api1_only
 async def test_get_pipettes(async_server, async_client, monkeypatch):
     test_model = 'p300_multi_v1'
     test_name = 'p300_multi'
@@ -210,6 +212,7 @@ async def test_execute_module_command_v1(
     assert body['message'] == 'Success'
 
 
+@pytest.mark.api1_only
 async def test_get_cached_pipettes(async_server, async_client, monkeypatch):
     test_model = 'p300_multi_v1'
     test_name = 'p300_multi'
@@ -313,6 +316,7 @@ async def test_get_cached_pipettes(async_server, async_client, monkeypatch):
     assert json.loads(text2) == expected2
 
 
+@pytest.mark.api1_only
 async def test_disengage_axes(async_client, monkeypatch):
     def mock_send(self, command, timeout=None):
         pass
@@ -353,6 +357,7 @@ async def test_disengage_axes(async_client, monkeypatch):
     assert json.loads(result2) == alltrue
 
 
+@pytest.mark.api1_only
 async def test_robot_info(async_client):
     res = await async_client.get('/robot/positions')
     assert res.status == 200
@@ -366,6 +371,7 @@ async def test_robot_info(async_client):
     assert len(body['positions']['attach_tip']['point']) == 3
 
 
+@pytest.mark.api1_only
 async def test_home_pipette(async_client):
     test_data = {
         'target': 'pipette',
@@ -378,7 +384,9 @@ async def test_home_pipette(async_client):
     assert res2.status == 200
 
 
-async def test_instrument_reuse(async_server, async_client, monkeypatch):
+@pytest.mark.api1_only
+async def test_instrument_reuse(
+        async_server, async_client, monkeypatch, instruments):
     hw = async_server['com.opentrons.hardware']
 
     # With no pipette connected before homing pipettes, we should a) not crash
@@ -426,6 +434,7 @@ async def test_instrument_reuse(async_server, async_client, monkeypatch):
     assert data['left']['model'] == test_model
 
 
+@pytest.mark.api1_only
 async def test_home_robot(async_client):
     test_data = {
         'target': 'robot'}
@@ -435,6 +444,7 @@ async def test_home_robot(async_client):
     assert res.status == 200
 
 
+@pytest.mark.api1_only
 async def test_home_pipette_bad_request(async_client):
     test_data = {}
     res = await async_client.post('/robot/home', json=test_data)
@@ -464,6 +474,7 @@ async def test_home_pipette_bad_request(async_client):
     assert res4.status == 400
 
 
+@pytest.mark.api1_only
 async def test_move_bad_request(async_client):
     data0 = {
         'target': 'other'
@@ -496,6 +507,7 @@ async def test_move_bad_request(async_client):
     assert res.status == 400
 
 
+@pytest.mark.api1_only
 async def test_move_mount(async_client):
     resp = await async_client.post('/robot/home',
                                    json={'target': 'robot'})
@@ -509,6 +521,7 @@ async def test_move_mount(async_client):
     assert res.status == 200
 
 
+@pytest.mark.api1_only
 async def test_move_pipette(async_client):
     resp = await async_client.post('/robot/home',
                                    json={'target': 'robot'})
@@ -523,7 +536,9 @@ async def test_move_pipette(async_client):
     assert res.status == 200
 
 
-async def test_move_and_home_existing_pipette(async_server, async_client):
+@pytest.mark.api1_only
+async def test_move_and_home_existing_pipette(
+        async_server, async_client, instruments):
     hw = async_server['com.opentrons.hardware']
     if async_server['api_version'] == 1:
         hw.reset()
@@ -532,7 +547,6 @@ async def test_move_and_home_existing_pipette(async_server, async_client):
     resp = await async_client.post('/robot/home', json={'target': 'robot'})
     assert resp.status == 200
     if async_server['api_version'] == 1:
-        from opentrons import instruments
         instruments.P300_Single(mount='right')
     move_data = {
         'target': 'pipette',
