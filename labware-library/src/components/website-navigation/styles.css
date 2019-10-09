@@ -72,7 +72,7 @@
   height: 100%;
 }
 
-.subdomain_link {
+a.subdomain_link {
   margin-left: var(--spacing-subdomain);
   font-size: var(--fs-body-1);
   font-weight: var(--fw-semibold);
@@ -82,6 +82,10 @@
 
   &:hover {
     color: var(--c-font-dark);
+  }
+
+  &:visited {
+    color: var(--c-nav-gray);
   }
 }
 
