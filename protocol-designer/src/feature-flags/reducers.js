@@ -10,7 +10,7 @@ import type { Action } from '../types'
 // whenever the browser has seen the feature flag before and persisted it.
 // Only "never before seen" flags will take on the default values from `initialFlags`.
 const initialFlags: Flags = {
-  OT_PD_SHOW_UPLOAD_CUSTOM_LABWARE_BUTTON: false,
+  // OT_PD_SHOW_UPLOAD_CUSTOM_LABWARE_BUTTON: false, // NOTE: Ian 2019-10-09 this FF was removed, leaving comment as placeholder
 }
 
 const flags = handleActions<Flags, *>(

@@ -6,8 +6,9 @@
 // Deprecated types should never be reused (unless there's a really good reason).
 //
 // LIST OF DEPRECATED FLAG TYPES:
-// - (none yet)
-export type FlagTypes = 'OT_PD_SHOW_UPLOAD_CUSTOM_LABWARE_BUTTON' // NOTE: any additional flag types should be added here with | (Union)
+// - OT_PD_SHOW_UPLOAD_CUSTOM_LABWARE_BUTTON
+//
+export type FlagTypes = '(add flags here)' // NOTE: any additional flag types should be added here with | (Union)
 
 export type Flags = {
   [FlagTypes]: ?boolean,

@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import LabwareSelectionModal from './LabwareSelectionModal'
-import { selectors as featureFlagSelectors } from '../../feature-flags'
+// import { selectors as featureFlagSelectors } from '../../feature-flags'
 import {
   closeLabwareSelector,
   createContainer,
@@ -21,10 +21,6 @@ type SP = {|
   customLabwareDefs: $PropertyType<Props, 'customLabwareDefs'>,
   slot: $PropertyType<Props, 'slot'>,
   permittedTipracks: $PropertyType<Props, 'permittedTipracks'>,
-  showUploadCustomLabwareButton: $PropertyType<
-    Props,
-    'showUploadCustomLabwareButton'
-  >,
 |}
 
 function mapStateToProps(state: BaseState): SP {
@@ -32,9 +28,6 @@ function mapStateToProps(state: BaseState): SP {
     customLabwareDefs: labwareDefSelectors.getCustomLabwareDefsByURI(state),
     slot: labwareIngredSelectors.selectedAddLabwareSlot(state) || null,
     permittedTipracks: stepFormSelectors.getPermittedTipracks(state),
-    showUploadCustomLabwareButton: featureFlagSelectors.getShowUploadCustomLabwareButton(
-      state
-    ),
   }
 }
 
