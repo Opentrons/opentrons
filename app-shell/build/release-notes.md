@@ -1,3 +1,9 @@
+# Opentrons App Changes from 3.13.1 to 3.13.2
+
+## Bug Fixes
+
+- The app should now allow you to upload protocols to robots that are at version 3.12.x or earlier ([#4202][4202])
+
 # Opentrons App Changes from 3.12.0 to 3.13.1
 
 **Note for macOS users**: The Opentrons App is no longer compatible with macOS 10.9 Mavericks. If you are using 10.9, please upgrade to a later version of macOS (available for free from Apple) to continue to receive Opentrons updates.
@@ -8,8 +14,7 @@ For more details about this release, please see the full [technical change log][
 
 ## Changes
 
-- When downloading logs, you will no longer get a pop up to select the filenames to save; instead, the logs will automatically download to your Downloads folder. 
-
+- When downloading logs, you will no longer get a pop up to select the filenames to save; instead, the logs will automatically download to your Downloads folder.
 
 ## Bug Fixes
 
@@ -29,3 +34,4 @@ For more details about this release, please see the full [technical change log][
 [2676]: https://github.com/Opentrons/opentrons/issues/2676
 [3121]: https://github.com/Opentrons/opentrons/issues/3121
 [3872]: https://github.com/Opentrons/opentrons/issues/3872
+[4202]: https://github.com/Opentrons/opentrons/issues/4202
