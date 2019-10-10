@@ -152,13 +152,29 @@ export default function client(dispatch) {
     const { name } = state.protocol.file
     const { contents } = action.payload
 
+    const updateSession = apiSession => {
+      remote.session_manager.session = apiSession
+      // state change will trigger a session notification, which will
+      // dispatch a successful sessionResponse
+    }
+
     freshUpload = true
     remote.session_manager
       .create(name, contents, fileIsBinary(state.protocol.file))
-      .then(apiSession => {
-        remote.session_manager.session = apiSession
-        // state change will trigger a session notification, which will
-        // dispatch a successful sessionResponse
+      .then(updateSession)
+      .catch(error => {
+        // back compat: for robot versions before 3.13, Session.create takes 2 args not 3
+        if (
+          error.name === 'RemoteError' &&
+          error.methodName === 'create' &&
+          /takes 3 positional arguments/.test(error.message)
+        ) {
+          return remote.session_manager
+            .create(name, contents)
+            .then(updateSession)
+        } else {
+          throw error
+        }
       })
       .catch(error => {
         dispatch(actions.sessionResponse(error, null, freshUpload))
