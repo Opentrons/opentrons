@@ -1,7 +1,10 @@
 {
   "command": {
     "version": {
-      "allowBranch": ["release_*", "hotfix_*"],
+      "allowBranch": [
+        "release_*",
+        "hotfix_*"
+      ],
       "conventionalCommits": true,
       "exact": true,
       "includeMergedTags": true,
@@ -13,5 +16,5 @@
   },
   "npmClient": "yarn",
   "useWorkspaces": true,
-  "version": "3.13.1"
+  "version": "3.13.2"
 }
