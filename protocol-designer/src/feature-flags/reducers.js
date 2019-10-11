@@ -1,8 +1,9 @@
 // @flow
+import omit from 'lodash/omit'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import { rehydrate, type RehydratePersistedAction } from '../persist'
-import type { Flags } from './types'
+import { DEPRECATED_FLAGS, type Flags } from './types'
 import type { SetFeatureFlagAction } from './actions'
 import type { Action } from '../types'
 
@@ -19,10 +20,11 @@ const flags = handleActions<Flags, *>(
       ...state,
       ...action.payload,
     }),
-    // feature flags that are new (to browser storage) should take on default values
+    // Feature flags that are new (not yet in browser storage) should take on default values.
+    // Deprecated flags should not be retrieved from browser storage
     REHYDRATE_PERSISTED: (state, action: RehydratePersistedAction) => ({
       ...state,
-      ...rehydrate('featureFlags.flags', initialFlags),
+      ...omit(rehydrate('featureFlags.flags', initialFlags), DEPRECATED_FLAGS),
     }),
   },
   initialFlags
