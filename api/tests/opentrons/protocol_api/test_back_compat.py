@@ -143,7 +143,7 @@ def test_connect_simulating(singletons, monkeypatch):
 
 
 @pytest.mark.api2_only
-def test_robot_move(singletons):
-    instr_mock = mock.MagicMock()
+def test_robot_move(singletons, monkeypatch):
+    instr_mock = mock.Mock()
     singletons['robot'].move_to('hi', instr_mock)
-    assert instr_mock.call_args_list[0] == (('hi', 'arc'), {})
+    assert instr_mock.move_to.call_args_list[0] == (('hi', 'arc'), {})
