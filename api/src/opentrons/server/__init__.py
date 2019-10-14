@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+import os
 import shutil
 import tempfile
 import threading
@@ -15,6 +16,7 @@ from opentrons.config import CONFIG
 from .rpc import RPCServer
 from .http import HTTPServer
 from opentrons.api.routers import MainRouter
+from opentrons.protocol_api import back_compat
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.types import HardwareAPILike  # noqa(F501)
@@ -97,6 +99,19 @@ def init(hardware: 'HardwareAPILike' = None,
                      If not specified, the server will use
                      :py:attr:`opentrons.hardware`
     """
+
+    if os.environ.get('MIGRATE_V1_LABWARE') and\
+            os.path.exists(CONFIG['labware_database_file']):
+        try:
+            back_compat.perform_migration()
+        except RuntimeError:
+            delete_dir = CONFIG['labware_user_definitions_dir_v2']/'legacy_api'
+            if os.path.exists(delete_dir):
+                shutil.rmtree(delete_dir)
+            raise RuntimeError('Failed to perform database migration,',
+                               'any custom labware from API V1 is lost.')
+        finally:
+            shutil.rmtree(CONFIG['labware_database_file'])
 
     app = web.Application(middlewares=[error_middleware])
     app['com.opentrons.hardware'] = hardware

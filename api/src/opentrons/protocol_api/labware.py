@@ -953,19 +953,22 @@ def _read_file(filepath: str) -> dict:
     return calibration_data
 
 
-def _get_path_to_labware(load_name: str, namespace: str, version: int) -> Path:
+def _get_path_to_labware(
+        load_name: str, namespace: str, version: int, base_path: Path = None
+        ) -> Path:
     if namespace == OPENTRONS_NAMESPACE:
         # all labware in OPENTRONS_NAMESPACE is bundled in wheel
         return STANDARD_DEFS_PATH / load_name / f'{version}.json'
-
-    base_path = CONFIG['labware_user_definitions_dir_v2']
+    if not base_path:
+        base_path = CONFIG['labware_user_definitions_dir_v2']
     def_path = base_path / namespace / load_name / f'{version}.json'
     return def_path
 
 
 def save_definition(
     labware_def: LabwareDefinition,
-    force: bool = False
+    force: bool = False,
+    location: Path = None
 ) -> None:
     """
     Save a labware definition
@@ -990,7 +993,7 @@ def save_definition(
             f'Saving definitions to the "{OPENTRONS_NAMESPACE}" namespace ' +
             'is not permitted')
 
-    def_path = _get_path_to_labware(load_name, namespace, version)
+    def_path = _get_path_to_labware(load_name, namespace, version, location)
 
     if not force and def_path.is_file():
         raise RuntimeError(

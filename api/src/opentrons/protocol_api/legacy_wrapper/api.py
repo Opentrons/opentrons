@@ -156,6 +156,8 @@ class BCLabware:
                         'tube-rack-80well', 'wheaton_vial_rack'}
     """ Labwares that are no longer supported in this version """
 
+    MODULE_BLACKLIST = ['tempdeck', 'magdeck', 'temperature-plate']
+
     LW_TRANSLATION = {
         '6-well-plate': 'corning_6_wellplate_16.8ml_flat',
         '12-well-plate': 'corning_12_wellplate_6.9_ml',
@@ -191,6 +193,76 @@ class BCLabware:
     }
 
     """ A table mapping old labware names to new labware names"""
+
+    def format_labware_definition(self, labware: Container, lw_name: str):
+        lw_dict = {}
+        is_tiprack = True if 'tip' in lw_name else False
+
+        # Definition Metadata
+        lw_dict['brand'] = {'brand': 'opentrons'}
+        lw_dict['schemaVersion'] = 2
+        lw_dict['version'] = 1
+        lw_dict['namespace'] = 'legacy_api'
+        lw_dict['metadata'] = {
+            'displayName': lw_name,
+            'displayCategory': 'tipRack' if is_tiprack else 'other',
+            'displayVolumeUnits': 'uL'}
+
+        # Labware Information
+        lw_dict['groups'] = {
+            'wells': [well.get_name() for well in labware.wells()],
+            'metadata': {}}
+        lw_dict['parameters'] = {
+            'format': 'irregular',
+            'isMagneticModuleCompatible': False,
+            'loadName': lw_name,
+            'isTiprack': is_tiprack}
+        if is_tiprack:
+            lw_dict['parameters']['tipLength'] = labware._coordinates['z']
+            lw_dict['parameters']['tipOverlap'] = 0
+        lw_dict['ordering'] = [
+            list(g) for _, g in groupby(
+                lw_dict['groups']['wells'], lambda w: w[1::])]
+        lw_dict['cornerOffsetFromSlot'] = {
+            'x': labware._coordinates['x'],
+            'y': labware._coordinates['y'],
+            'z': 0
+        }
+        height = labware.wells()[0].properties['depth'] +\
+            labware.wells()[0]._coordinates['z']
+        lw_dict['dimensions'] = {
+            'xDimension': 127.76,
+            'yDimension': 85.48,
+            'zDimension': height
+        }
+
+        return lw_dict
+
+    def create_new_labware_definition(self, labware: Container, lw_name: str):
+        lw_dict = self.format_labware_definition(labware, lw_name)
+        # Well Information
+        lw_dict['wells'] = {}
+        for well in labware.wells():
+            well_props = well.properties
+            well_coords = well._coordinates
+            well_name = well.get_name()
+            lw_dict['wells'][well_name] = {
+                'x': well_coords['x'],
+                'y': well_coords['y'],
+                'z': well_coords['z'],
+                'totalLiquidVolume': well_props.get('total-liquid-volume', 0),
+                'depth': well_props.get('depth', 0)}
+            if well_props.get('diameter'):
+                lw_dict['wells'][well_name]['diameter'] =\
+                    well.properties.get('diameter')
+                lw_dict['wells'][well_name]['shape'] = 'circular'
+            else:
+                lw_dict['wells'][well_name]['xDimension'] =\
+                    well.properties.get('length')
+                lw_dict['wells'][well_name]['yDimension'] =\
+                    well.properties.get('width')
+                lw_dict['wells'][well_name]['shape'] = 'rectangular'
+        return lw_dict
 
     def load(self, container_name, slot, label=None, share=False):
         """ Load a piece of labware by specifying its name and position.
@@ -244,3 +316,25 @@ def build_globals(context: 'ProtocolContext'):
     rob._set_globals(instr, lw, mod)
 
     return {'robot': rob, 'instruments': instr, 'labware': lw, 'modules': mod}
+
+
+def perform_migration():
+    check_db_exists = str(CONFIG['labware_database_file'])
+    labware_obj = build_globals()['labware']
+    path_to_save_defs = CONFIG['labware_user_definitions_dir_v2']
+
+    all_containers = filter(
+        lambda lw: lw not in labware_obj.MODULE_BLACKLIST,
+        db_cmds.list_all_containers())
+    labware_to_create = filter(
+        lambda x: x not in labware_obj.LW_TRANSLATION.keys(),
+        all_containers)
+
+    for lw_name in labware_to_create:
+        labware = db_cmds.load_container(lw_name)
+        if labware.wells():
+            log.debug(f"Migrating {lw_name} to API V2 format.")
+            labware_def = labware_obj.create_new_labware_definition(
+                labware, lw_name)
+            save_definition(labware_def, location=path_to_save_defs)
+    log.info("Migration of API V1 labware complete.")
