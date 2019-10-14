@@ -24,13 +24,16 @@ const RadioField = (props: Props) => (
             labelTextClassName={props.labelTextClassName}
             onChange={e => {
               field.onChange(e)
-              // do not wait until blur to make radio field 'dirty', so that alerts show up immediately.
-              // NOTE: Ian 2019-10-02 this setTimeout seems necessary to avoid a race condition where
-              // Formik blurs the field before setting its value, surfacing a transient error
-              // (eg "this field is required") which messes up error analytics
-              const blurTarget = e.currentTarget
+              // do not wait until blur to make radio field 'touched', so that alerts show up immediately.
               setTimeout(() => {
-                blurTarget.blur()
+                // NOTE: Ian 2019-10-02 this setTimeout seems necessary to avoid a race condition where
+                // Formik blurs the field before setting its value, surfacing a transient error
+                // (eg "this field is required") which messes up error analytics.
+                // See https://github.com/jaredpalmer/formik/issues/1863
+                //
+                // NOTE: onBlur doesn't work on Firefox on Mac for radio fields,
+                // so we can't do `e.currentTarget.blur()`. See https://bugzilla.mozilla.org/show_bug.cgi?id=756028
+                form.setTouched({ [props.name]: true })
               }, 0)
 
               reportFieldEdit({ value: field.value, name: field.name })
