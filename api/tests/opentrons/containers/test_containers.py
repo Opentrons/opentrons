@@ -1,6 +1,9 @@
 import math
+from unittest import mock
 
 import pytest
+
+import opentrons.protocol_api.labware as labware
 
 from opentrons.legacy_api.containers import (
     load as containers_load,
@@ -102,6 +105,21 @@ def test_load_new_trough(robot):
     assert cont.size() == (0, 0, 0)
     assert cont.wells('A1')._coordinates \
         == (13.94, 42.9 + 31.4475, 2.29)
+
+
+@pytest.mark.api1_only
+def test_new_container_versioning(
+        singletons, get_labware_fixture, monkeypatch):
+    fixt = get_labware_fixture('fixture_12_trough_v2')
+    get_def_mock = mock.Mock()
+    get_def_mock.return_value = fixt
+    monkeypatch.setattr(
+        labware, 'get_labware_definition', get_def_mock)
+    loaded = singletons['labware'].load('fixture_12_trough_v2', 2, version=2)
+    assert loaded.get_name() == fixt['parameters']['loadName']
+
+    with pytest.raises(RuntimeError):
+        singletons['labware'].load('fixture_12_trough_v2', 3, version=1)
 
 
 @pytest.mark.api1_only

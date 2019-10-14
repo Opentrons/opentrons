@@ -46,7 +46,7 @@ def _load_weird_container(container_name):
     return container
 
 
-def _load_container_by_name(container_name):
+def _load_container_by_name(container_name, version=None):
     """ Try and find a container in a variety of methods.
 
     Returns the container or raises a KeyError if it could not be found
@@ -57,7 +57,10 @@ def _load_container_by_name(container_name):
         log.debug(
             f"Trying to load container {container_name} via {meth.__name__}")
         try:
-            container = meth(container_name)
+            if meth == load_new_labware:
+                container = meth(container_name, version=version)
+            else:
+                container = meth(container_name)
             if meth == _load_weird_container:
                 container.properties['type'] = container_name
             log.info(f"Loaded {container_name} from {meth.__name__}")
@@ -840,8 +843,8 @@ class Robot(CommandPublisher):
             container_patched, container_patched.properties['type'],
             slot, label, share)
 
-    def add_container(self, name, slot, label=None, share=False):
-        container = _load_container_by_name(name)
+    def add_container(self, name, slot, label=None, share=False, version=None):
+        container = _load_container_by_name(name, version=version)
         container_patched = _setup_container(container)
         if not container_patched:
             return None
