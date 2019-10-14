@@ -110,7 +110,7 @@ def test_resume(singletons, monkeypatch):
     resume_mock.assert_called_once()
 
 
-@pytest.mark.api2_ony
+@pytest.mark.api2_only
 def test_comment(singletons, monkeypatch):
     comment_mock = mock.Mock()
     monkeypatch.setattr(singletons['robot']._ctx,
