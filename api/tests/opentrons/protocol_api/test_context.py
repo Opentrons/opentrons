@@ -6,7 +6,7 @@ from unittest import mock
 
 import opentrons.protocol_api as papi
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
-from opentrons.hardware_control import API, adapters
+from opentrons.hardware_control import API
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.config.pipette_config import config_models, name_for_model
@@ -54,6 +54,34 @@ async def test_motion(loop):
     old_pos[Axis.A] = 0
     old_pos[Axis.C] = 2
     assert await hardware.current_position(instr._mount) == old_pos
+
+
+async def test_max_speeds(loop, monkeypatch):
+    hardware = API.build_hardware_simulator(loop=loop)
+    ctx = papi.ProtocolContext(loop)
+    ctx.connect(hardware)
+    ctx.home()
+    mock_move = mock.Mock()
+    monkeypatch.setattr(ctx._hw_manager.hardware, 'move_to', mock_move)
+    instr = ctx.load_instrument('p10_single', Mount.RIGHT)
+    instr.move_to(Location(Point(0, 0, 0), None))
+    assert all(
+        kwargs['max_speeds'] == {}
+        for args, kwargs in mock_move.call_args_list)
+
+    mock_move.reset_mock()
+    ctx.max_speeds['x'] = 10
+    instr.move_to(Location(Point(0, 0, 1), None))
+    assert all(
+        kwargs['max_speeds'] == {Axis.X: 10}
+        for args, kwargs in mock_move.call_args_list)
+
+    mock_move.reset_mock()
+    ctx.max_speeds['x'] = None
+    instr.move_to(Location(Point(1, 0, 1), None))
+    assert all(
+        kwargs['max_speeds'] == {}
+        for args, kwargs in mock_move.call_args_list)
 
 
 def test_location_cache(loop, monkeypatch, get_labware_def):
@@ -282,10 +310,10 @@ def test_aspirate(loop, get_labware_def, monkeypatch):
     fake_hw_aspirate.assert_called_once_with(Mount.RIGHT, 2.0, 1.0)
     assert fake_move.call_args_list[-2] ==\
         mock.call(Mount.RIGHT, lw.wells()[0].top().point,
-                  critical_point=None, speed=400)
+                  critical_point=None, speed=400, max_speeds={})
     assert fake_move.call_args_list[-1] ==\
         mock.call(Mount.RIGHT, lw.wells()[0].bottom().point,
-                  critical_point=None, speed=400)
+                  critical_point=None, speed=400, max_speeds={})
     fake_move.reset_mock()
     fake_hw_aspirate.reset_mock()
     instr.well_bottom_clearance.aspirate = 1.0
@@ -294,9 +322,11 @@ def test_aspirate(loop, get_labware_def, monkeypatch):
     dest_point = dest_point._replace(z=dest_point.z + 1.0)
     assert fake_move.call_args_list[-2] ==\
         mock.call(Mount.RIGHT, lw.wells()[0].top().point,
-                  critical_point=None, speed=400)
+                  critical_point=None, speed=400, max_speeds={})
     assert fake_move.call_args_list[-1] ==\
-        mock.call(Mount.RIGHT, dest_point, critical_point=None, speed=400)
+        mock.call(
+            Mount.RIGHT, dest_point, critical_point=None, speed=400,
+            max_speeds={})
     assert len(fake_move.call_args_list) == 2
     fake_move.reset_mock()
     ctx._hw_manager.hardware._api\
@@ -334,7 +364,8 @@ def test_dispense(loop, get_labware_def, monkeypatch):
     assert disp_called_with == (Mount.RIGHT, 2.0, 1.0)
     assert move_called_with == (Mount.RIGHT, lw.wells()[0].bottom().point,
                                 {'critical_point': None,
-                                 'speed': 400})
+                                 'speed': 400,
+                                 'max_speeds': {}})
 
     instr.well_bottom_clearance.dispense = 2.0
     instr.dispense(2.0, lw.wells()[0])
@@ -342,7 +373,8 @@ def test_dispense(loop, get_labware_def, monkeypatch):
     dest_point = dest_point._replace(z=dest_point.z + 2.0)
     assert move_called_with == (Mount.RIGHT, dest_point,
                                 {'critical_point': None,
-                                 'speed': 400})
+                                 'speed': 400,
+                                 'max_speeds': {}})
 
     move_called_with = None
     instr.dispense(2.0)
@@ -378,42 +410,6 @@ def test_starting_tip_and_reset_tipracks(loop, get_labware_def, monkeypatch):
     pipL.reset_tipracks()
     assert tr.wells()[2].has_tip
     assert tr.wells()[3].has_tip
-
-
-def test_hw_manager(loop):
-    # When built without an input it should build its own adapter
-    mgr = papi.ProtocolContext.HardwareManager(None)
-    assert mgr._is_orig
-    adapter = mgr.hardware
-    # When "disconnecting" from its own simulator, the adapter should
-    # be stopped and a new one created
-    assert adapter.is_alive()
-    new = mgr.reset_hw()
-    assert new is not adapter
-    assert not adapter.is_alive()
-    # When deleted, the self-created adapter should be stopped
-    del mgr
-    assert not new.is_alive()
-    # When built with a hardware API input it should wrap it but not
-    # build its own
-    mgr = papi.ProtocolContext.HardwareManager(
-        API.build_hardware_simulator(loop=loop))
-    assert isinstance(mgr.hardware, adapters.SynchronousAdapter)
-    assert not mgr._is_orig
-    passed = mgr.hardware
-    # When disconnecting from a real external adapter, it should create
-    # its own simulator and should _not_ stop the old hardware thread
-    new = mgr.reset_hw()
-    assert new is not passed
-    assert mgr._is_orig
-    assert passed.is_alive()
-    # When connecting to an adapter it shouldn’t rewrap it
-    assert mgr.set_hw(passed) is passed
-    # And should kill its old one
-    assert not new.is_alive()
-    del mgr
-    # but not its new one, even if deleted
-    assert passed.is_alive()
 
 
 def test_mix(loop, monkeypatch):
@@ -471,7 +467,7 @@ def test_touch_tip_default_args(loop, monkeypatch):
     total_hw_moves = []
 
     async def fake_hw_move(mount, abs_position, speed=None,
-                           critical_point=None):
+                           critical_point=None, max_speeds=None):
         nonlocal total_hw_moves
         total_hw_moves.append((abs_position, speed))
 

@@ -111,6 +111,30 @@ async def test_move(hardware_api):
     assert hardware_api._current_position == target_position2
 
 
+async def test_move_extras_passed_through(hardware_api, monkeypatch):
+    mock_be_move = mock.Mock()
+    monkeypatch.setattr(hardware_api._backend, 'move', mock_be_move)
+    await hardware_api.home()
+    await hardware_api.move_to(types.Mount.RIGHT,
+                               types.Point(0, 0, 0))
+    assert mock_be_move.call_args_list[0][1]['speed'] is None
+    assert mock_be_move.call_args_list[0][1]['axis_max_speeds'] == {}
+    mock_be_move.reset_mock()
+    await hardware_api.move_to(types.Mount.RIGHT,
+                               types.Point(1, 1, 1),
+                               speed=30,
+                               max_speeds={Axis.X: 10})
+    assert mock_be_move.call_args_list[0][1]['speed'] == 30
+    assert mock_be_move.call_args_list[0][1]['axis_max_speeds'] == {'X': 10}
+    mock_be_move.reset_mock()
+    await hardware_api.move_rel(types.Mount.LEFT,
+                                types.Point(1, 1, 1),
+                                speed=40,
+                                max_speeds={Axis.Y: 20})
+    assert mock_be_move.call_args_list[0][1]['speed'] == 40
+    assert mock_be_move.call_args_list[0][1]['axis_max_speeds'] == {'Y': 20}
+
+
 async def test_mount_offset_applied(hardware_api):
     await hardware_api.home()
     abs_position = types.Point(30, 20, 10)
@@ -197,7 +221,8 @@ async def test_deck_cal_applied(monkeypatch, loop):
                       [0, 0, 0, 1]]
     called_with = None
 
-    def mock_move(position, speed=None, home_flagged_axes=True):
+    def mock_move(position, speed=None, home_flagged_axes=True,
+                  axis_max_speeds=None):
         nonlocal called_with
         called_with = position
 

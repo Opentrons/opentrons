@@ -1,5 +1,5 @@
 import asyncio
-from contextlib import contextmanager
+from contextlib import contextmanager, ExitStack
 import logging
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -44,8 +44,16 @@ class Controller:
         return self._smoothie_driver.position
 
     def move(self, target_position: Dict[str, float],
-             home_flagged_axes: bool = True, speed: float = None):
-        with self._set_temp_speed(speed):
+             home_flagged_axes: bool = True, speed: float = None,
+             axis_max_speeds: Dict[str, float] = None):
+        with ExitStack() as cmstack:
+            if speed:
+                cmstack.enter_context(
+                    self._smoothie_driver.restore_speed(speed))
+            if axis_max_speeds:
+                cmstack.enter_context(
+                    self._smoothie_driver.restore_axis_max_speed(
+                        axis_max_speeds))
             self._smoothie_driver.move(
                 target_position, home_flagged_axes=home_flagged_axes)
 
@@ -127,18 +135,6 @@ class Controller:
     async def connect(self, port: str = None):
         self._smoothie_driver.connect(port)
         await self.update_fw_version()
-
-    @contextmanager
-    def _set_temp_speed(self, speed):
-        if not speed:
-            yield
-        else:
-            self._smoothie_driver.push_speed()
-            self._smoothie_driver.set_speed(speed)
-            try:
-                yield
-            finally:
-                self._smoothie_driver.pop_speed()
 
     @property
     def axis_bounds(self) -> Dict[str, Tuple[float, float]]:

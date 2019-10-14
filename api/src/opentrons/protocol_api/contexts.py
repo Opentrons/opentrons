@@ -16,6 +16,8 @@ from .labware import (Well, Labware, load, get_labware_definition,
                       ThermocyclerGeometry, OutOfTipsError,
                       select_tiprack_from_list, filter_tipracks_to_start,
                       LabwareDefinition)
+from .util import (FlowRates, PlungerSpeeds, Clearances, AxisMaxSpeeds,
+                   HardwareManager)
 
 from . import geometry
 from . import transfers
@@ -42,51 +44,6 @@ class ProtocolContext(CommandPublisher):
     :py:attr:`.back_compat.robot`, which is provided only for back
     compatibility and should be used less and less as time goes by.
     """
-
-    class HardwareManager:
-        def __init__(self, hardware):
-            if None is hardware:
-                self._is_orig = True
-                self._current = adapters.SynchronousAdapter.build(
-                    hc.API.build_hardware_simulator)
-            elif isinstance(hardware, adapters.SynchronousAdapter):
-                self._is_orig = False
-                self._current = hardware
-            else:
-                self._is_orig = False
-                self._current = adapters.SynchronousAdapter(hardware)
-
-        @property
-        def hardware(self):
-            return self._current
-
-        def set_hw(self, hardware):
-            if self._is_orig:
-                self._is_orig = False
-                self._current.join()
-            if isinstance(hardware, adapters.SynchronousAdapter):
-                self._current = hardware
-            elif isinstance(hardware, hc.HardwareAPILike):
-                self._current = adapters.SynchronousAdapter(hardware)
-            else:
-                raise TypeError(
-                    "hardware should be API or synch adapter but is {}"
-                    .format(hardware))
-            return self._current
-
-        def reset_hw(self):
-            if self._is_orig:
-                self._current.join()
-            self._current = adapters.SynchronousAdapter.build(
-                    hc.API.build_hardware_simulator)
-            self._is_orig = True
-            return self._current
-
-        def __del__(self):
-            orig = getattr(self, '_is_orig', False)
-            cur = getattr(self, '_current', None)
-            if orig and cur:
-                cur.join()
 
     def __init__(self,
                  loop: asyncio.AbstractEventLoop = None,
@@ -129,7 +86,7 @@ class ProtocolContext(CommandPublisher):
         self._last_moved_instrument: Optional[types.Mount] = None
         self._location_cache: Optional[types.Location] = None
 
-        self._hw_manager = ProtocolContext.HardwareManager(hardware)
+        self._hw_manager = HardwareManager(hardware)
         self._log = MODULE_LOG.getChild(self.__class__.__name__)
         self._commands: List[str] = []
         self._unsubscribe_commands = None
@@ -139,7 +96,7 @@ class ProtocolContext(CommandPublisher):
         self._extra_labware = extra_labware or {}
 
         self._bundled_data: Dict[str, bytes] = bundled_data or {}
-
+        self._default_max_speeds = AxisMaxSpeeds()
         self._load_trash()
 
     def _load_trash(self):
@@ -178,6 +135,38 @@ class ProtocolContext(CommandPublisher):
     def __del__(self):
         if getattr(self, '_unsubscribe_commands', None):
             self._unsubscribe_commands()
+
+    @property
+    def max_speeds(self) -> AxisMaxSpeeds:
+        """ Per-axis speed limits when moving this instrument.
+
+        Changing this value changes the speed limit for each non-plunger
+        axis of the robot, when moving this pipette. Note that this does
+        only sets a limit on how fast movements can be; movements can
+        still be slower than this. However, it is useful if you require
+        the robot to move much more slowly than normal when using this
+        pipette.
+
+        This is a dictionary mapping string names of axes to float values
+        limiting speeds. To change a speed, set that axis's value. To
+        reset an axis's speed to default, delete the entry for that axis
+        or assign it to ``None``.
+
+        For instance,
+
+        .. code-block:: py
+
+            def run(protocol):
+                protocol.comment(str(right.max_speeds))  # '{}' - all default
+                protocol.max_speeds['A'] = 10  # limit max speed of
+                                               # right pipette Z to 10mm/s
+                del protocol.max_speeds['A']  # reset to default
+                protocol.max_speeds['X'] = 10  # limit max speed of x to
+                                               # 10 mm/s
+                protocol.max_speeds['X'] = None  # reset to default
+
+        """
+        return self._default_max_speeds
 
     def commands(self):
         return self._commands
@@ -634,122 +623,9 @@ class InstrumentContext(CommandPublisher):
     instances are returned from :py:meth:`ProtcolContext.load_instrument`.
     """
 
-    class FlowRates:
-        def __init__(self,
-                     instr: 'InstrumentContext') -> None:
-            self._instr = instr
-
-        @staticmethod
-        def _assert_gzero(val: Any) -> float:
-            try:
-                new_val = float(val)
-                assert new_val > 0.0
-                return new_val
-            except (TypeError, ValueError, AssertionError):
-                raise AssertionError(
-                    'flow rate should be a numerical value in ul/s')
-
-        @property
-        def aspirate(self) -> float:
-            return self._instr.hw_pipette['aspirate_flow_rate']
-
-        @aspirate.setter
-        def aspirate(self, new_val: float):
-            self._instr._hw_manager.hardware.set_flow_rate(
-                mount=self._instr._mount,
-                aspirate=self._assert_gzero(new_val))
-
-        @property
-        def dispense(self) -> float:
-            return self._instr.hw_pipette['dispense_flow_rate']
-
-        @dispense.setter
-        def dispense(self, new_val: float):
-            self._instr._hw_manager.hardware.set_flow_rate(
-                mount=self._instr._mount,
-                dispense=self._assert_gzero(new_val))
-
-        @property
-        def blow_out(self) -> float:
-            return self._instr.hw_pipette['blow_out_flow_rate']
-
-        @blow_out.setter
-        def blow_out(self, new_val: float):
-            self._instr._hw_manager.hardware.set_flow_rate(
-                mount=self._instr._mount,
-                blow_out=self._assert_gzero(new_val))
-
-    class PlungerSpeeds:
-        def __init__(self,
-                     instr: 'InstrumentContext') -> None:
-            self._instr = instr
-
-        @staticmethod
-        def _assert_gzero(val: Any) -> float:
-            try:
-                new_val = float(val)
-                assert new_val > 0.0
-                return new_val
-            except (TypeError, ValueError, AssertionError):
-                raise AssertionError(
-                    'speed should be a numerical value in ul/s')
-
-        @property
-        def aspirate(self) -> float:
-            return self._instr.hw_pipette['aspirate_speed']
-
-        @aspirate.setter
-        def aspirate(self, new_val: float):
-            self._instr._hw_manager.hardware.set_pipette_speed(
-                mount=self._instr._mount,
-                aspirate=self._assert_gzero(new_val))
-
-        @property
-        def dispense(self) -> float:
-            return self._instr.hw_pipette['dispense_speed']
-
-        @dispense.setter
-        def dispense(self, new_val: float):
-            self._instr._hw_manager.hardware.set_pipette_speed(
-                mount=self._instr._mount,
-                dispense=self._assert_gzero(new_val))
-
-        @property
-        def blow_out(self) -> float:
-            return self._instr.hw_pipette['blow_out_speed']
-
-        @blow_out.setter
-        def blow_out(self, new_val: float):
-            self._instr._hw_manager.hardware.set_pipette_speed(
-                mount=self._instr._mount,
-                blow_out=self._assert_gzero(new_val))
-
-    class Clearances:
-        def __init__(self,
-                     default_aspirate: float,
-                     default_dispense: float) -> None:
-            self._aspirate = default_aspirate
-            self._dispense = default_dispense
-
-        @property
-        def aspirate(self) -> float:
-            return self._aspirate
-
-        @aspirate.setter
-        def aspirate(self, new_val: float):
-            self._aspirate = float(new_val)
-
-        @property
-        def dispense(self) -> float:
-            return self._dispense
-
-        @dispense.setter
-        def dispense(self, new_val: float):
-            self._dispense = float(new_val)
-
     def __init__(self,
                  ctx: ProtocolContext,
-                 hardware_mgr: ProtocolContext.HardwareManager,
+                 hardware_mgr: HardwareManager,
                  mount: types.Mount,
                  log_parent: logging.Logger,
                  tip_racks: List[Labware] = None,
@@ -776,10 +652,10 @@ class InstrumentContext(CommandPublisher):
         self._last_tip_picked_up_from: Union[Well, None] = None
         self._log = log_parent.getChild(repr(self))
         self._log.info("attached")
-        self._well_bottom_clearance = InstrumentContext.Clearances(
+        self._well_bottom_clearance = Clearances(
             default_aspirate=1.0, default_dispense=1.0)
-        self._flow_rates = InstrumentContext.FlowRates(self)
-        self._speeds = InstrumentContext.PlungerSpeeds(self)
+        self._flow_rates = FlowRates(self)
+        self._speeds = PlungerSpeeds(self)
         self._starting_tip: Union[Well, None] = None
 
     @property
@@ -1722,7 +1598,10 @@ class InstrumentContext(CommandPublisher):
         :param minimum_z_height: When specified, this Z margin is able to raise
                                  (but never lower) the mid-arc height.
         :param speed: The speed at which to move. By default,
-                      :py:attr:`InstrumentContext.default_speed`
+                      :py:attr:`InstrumentContext.default_speed`. This controls
+                      the straight linear speed of the motion; to limit
+                      individual axis speeds, you can use
+                      :py:attr:`.ProtocolContext.max_speeds`.
         """
         if self._ctx.location_cache:
             from_lw = self._ctx.location_cache.labware
@@ -1748,7 +1627,8 @@ class InstrumentContext(CommandPublisher):
         try:
             for move in moves:
                 self._hw_manager.hardware.move_to(
-                    self._mount, move[0], critical_point=move[1], speed=speed)
+                    self._mount, move[0], critical_point=move[1], speed=speed,
+                    max_speeds=self._ctx.max_speeds.data)
         except Exception:
             self._ctx.location_cache = None
             raise
@@ -1762,7 +1642,7 @@ class InstrumentContext(CommandPublisher):
         return self._mount.name.lower()
 
     @property
-    def speed(self) -> 'InstrumentContext.PlungerSpeeds':
+    def speed(self) -> 'PlungerSpeeds':
         """ The speeds (in mm/s) configured for the pipette plunger.
 
         This is an object with attributes ``aspirate``, ``dispense``, and
@@ -1788,7 +1668,7 @@ class InstrumentContext(CommandPublisher):
         return self._speeds
 
     @property
-    def flow_rate(self) -> 'InstrumentContext.FlowRates':
+    def flow_rate(self) -> 'FlowRates':
         """ The speeds (in uL/s) configured for the pipette.
 
         This is an object with attributes ``aspirate``, ``dispense``, and
@@ -1919,7 +1799,7 @@ class InstrumentContext(CommandPublisher):
         return self.hw_pipette['channels']
 
     @property
-    def well_bottom_clearance(self) -> 'InstrumentContext.Clearances':
+    def well_bottom_clearance(self) -> 'Clearances':
         """ The distance above the bottom of a well to aspirate or dispense.
 
         This is an object with attributes ``aspirate`` and ``dispense``,
