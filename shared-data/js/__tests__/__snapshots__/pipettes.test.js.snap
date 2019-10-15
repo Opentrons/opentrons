@@ -57,6 +57,7 @@ Object {
   },
   "maxVolume": 10,
   "minVolume": 1,
+  "model": "p10_multi_v1",
   "modelOffset": Array [
     0,
     31.5,
@@ -263,6 +264,7 @@ Object {
   },
   "maxVolume": 10,
   "minVolume": 1,
+  "model": "p10_multi_v1.3",
   "modelOffset": Array [
     0,
     31.5,
@@ -469,6 +471,7 @@ Object {
   },
   "maxVolume": 10,
   "minVolume": 1,
+  "model": "p10_multi_v1.4",
   "modelOffset": Array [
     0,
     31.5,
@@ -675,6 +678,7 @@ Object {
   },
   "maxVolume": 10,
   "minVolume": 1,
+  "model": "p10_multi_v1.5",
   "modelOffset": Array [
     0,
     31.5,
@@ -851,6 +855,7 @@ Object {
   },
   "maxVolume": 10,
   "minVolume": 1,
+  "model": "p10_single_v1",
   "modelOffset": Array [
     0,
     0,
@@ -1062,6 +1067,7 @@ Object {
   },
   "maxVolume": 10,
   "minVolume": 1,
+  "model": "p10_single_v1.3",
   "modelOffset": Array [
     0,
     0,
@@ -1273,6 +1279,7 @@ Object {
   },
   "maxVolume": 10,
   "minVolume": 1,
+  "model": "p10_single_v1.4",
   "modelOffset": Array [
     0,
     0,
@@ -1484,6 +1491,7 @@ Object {
   },
   "maxVolume": 10,
   "minVolume": 1,
+  "model": "p10_single_v1.5",
   "modelOffset": Array [
     0,
     0,
@@ -1659,6 +1667,7 @@ Object {
   },
   "maxVolume": 50,
   "minVolume": 5,
+  "model": "p50_multi_v1",
   "modelOffset": Array [
     0,
     31.5,
@@ -1854,6 +1863,7 @@ Object {
   },
   "maxVolume": 50,
   "minVolume": 5,
+  "model": "p50_multi_v1.3",
   "modelOffset": Array [
     0,
     31.5,
@@ -2049,6 +2059,7 @@ Object {
   },
   "maxVolume": 50,
   "minVolume": 5,
+  "model": "p50_multi_v1.4",
   "modelOffset": Array [
     0,
     31.5,
@@ -2244,6 +2255,7 @@ Object {
   },
   "maxVolume": 50,
   "minVolume": 5,
+  "model": "p50_multi_v1.5",
   "modelOffset": Array [
     0,
     31.5,
@@ -2419,6 +2431,7 @@ Object {
   },
   "maxVolume": 50,
   "minVolume": 5,
+  "model": "p50_single_v1",
   "modelOffset": Array [
     0,
     0,
@@ -2614,6 +2627,7 @@ Object {
   },
   "maxVolume": 50,
   "minVolume": 5,
+  "model": "p50_single_v1.3",
   "modelOffset": Array [
     0,
     0,
@@ -2809,6 +2823,7 @@ Object {
   },
   "maxVolume": 50,
   "minVolume": 5,
+  "model": "p50_single_v1.4",
   "modelOffset": Array [
     0,
     0,
@@ -3004,6 +3019,7 @@ Object {
   },
   "maxVolume": 300,
   "minVolume": 30,
+  "model": "p300_multi_v1",
   "modelOffset": Array [
     0,
     31.5,
@@ -3163,6 +3179,7 @@ Object {
   },
   "maxVolume": 300,
   "minVolume": 30,
+  "model": "p300_multi_v1.3",
   "modelOffset": Array [
     0,
     31.5,
@@ -3322,6 +3339,7 @@ Object {
   },
   "maxVolume": 300,
   "minVolume": 30,
+  "model": "p300_multi_v1.4",
   "modelOffset": Array [
     0,
     31.5,
@@ -3481,6 +3499,7 @@ Object {
   },
   "maxVolume": 300,
   "minVolume": 30,
+  "model": "p300_multi_v1.5",
   "modelOffset": Array [
     0,
     31.5,
@@ -3641,6 +3660,7 @@ Object {
   },
   "maxVolume": 300,
   "minVolume": 30,
+  "model": "p300_single_v1",
   "modelOffset": Array [
     0,
     0,
@@ -3856,6 +3876,7 @@ Object {
   },
   "maxVolume": 300,
   "minVolume": 30,
+  "model": "p300_single_v1.3",
   "modelOffset": Array [
     0,
     0,
@@ -4071,6 +4092,7 @@ Object {
   },
   "maxVolume": 300,
   "minVolume": 30,
+  "model": "p300_single_v1.4",
   "modelOffset": Array [
     0,
     0,
@@ -4286,6 +4308,7 @@ Object {
   },
   "maxVolume": 300,
   "minVolume": 30,
+  "model": "p300_single_v1.5",
   "modelOffset": Array [
     0,
     0,
@@ -4465,6 +4488,7 @@ Object {
   },
   "maxVolume": 1000,
   "minVolume": 100,
+  "model": "p1000_single_v1",
   "modelOffset": Array [
     0,
     0,
@@ -4646,6 +4670,7 @@ Object {
   },
   "maxVolume": 1000,
   "minVolume": 100,
+  "model": "p1000_single_v1.3",
   "modelOffset": Array [
     0,
     0,
@@ -4827,6 +4852,7 @@ Object {
   },
   "maxVolume": 1000,
   "minVolume": 100,
+  "model": "p1000_single_v1.4",
   "modelOffset": Array [
     0,
     0,
@@ -5008,6 +5034,7 @@ Object {
   },
   "maxVolume": 1000,
   "minVolume": 100,
+  "model": "p1000_single_v1.5",
   "modelOffset": Array [
     0,
     0,
