@@ -10,7 +10,6 @@ import startCase from 'lodash/startCase'
 import reduce from 'lodash/reduce'
 import i18n from '../../localization'
 import { getOnlyLatestDefs } from '../../labware-defs/utils'
-import KnowledgeBaseLink from '../KnowledgeBaseLink'
 import { Portal } from '../portals/TopPortal'
 import { PDTitledList } from '../lists'
 import LabwareItem from './LabwareItem'
@@ -27,6 +26,7 @@ type Props = {
   permittedTipracks: Array<string>,
 }
 
+const LABWARE_CREATOR_URL = 'https://labware.opentrons.com/create'
 const CUSTOM_CATEGORY = 'custom'
 
 const orderedCategories: Array<string> = [
@@ -151,9 +151,15 @@ const LabwareDropdown = (props: Props) => {
         </OutlineButton>
         <div className={styles.upload_helper_copy}>
           {i18n.t('modal.labware_selection.creating_labware_defs')}{' '}
-          <KnowledgeBaseLink className={styles.link} to="customLabware">
+          {/* TODO: Ian 2019-10-15 use LinkOut component once it's in components library, see Opentrons/opentrons#4229 */}
+          <a
+            className={styles.link}
+            href={LABWARE_CREATOR_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             here
-          </KnowledgeBaseLink>
+          </a>
           .
         </div>
 
