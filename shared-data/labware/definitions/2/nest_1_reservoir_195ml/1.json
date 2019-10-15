@@ -18,7 +18,7 @@
   },
   "wells": {
     "A1": {
-      "depth": 26.85,
+      "depth": 25,
       "shape": "rectangular",
       "xDimension": 106.8,
       "yDimension": 71.2,
