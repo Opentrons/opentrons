@@ -1,25 +1,7 @@
 // @flow
 import pipetteNameSpecs from '../pipette/definitions/pipetteNameSpecs.json'
 import pipetteModelSpecs from '../pipette/definitions/pipetteModelSpecs.json'
-
-export type PipetteChannels = 1 | 8
-export type PipetteDisplayCategory = 'OG' | 'GEN2'
-
-export type PipetteNameSpecs = {
-  name: string,
-  displayName: string,
-  displayCategory?: PipetteDisplayCategory,
-  minVolume: number,
-  maxVolume: number,
-  defaultAspirateFlowRate: { value: number },
-  defaultDispenseFlowRate: { value: number },
-  channels: PipetteChannels,
-}
-
-export type PipetteModelSpecs = {
-  model: string,
-  tipLength: { value: number },
-} & PipetteNameSpecs
+import type { PipetteNameSpecs, PipetteModelSpecs } from './types'
 
 type SortableProps = 'maxVolume' | 'channels'
 
@@ -29,9 +11,9 @@ const ALL_PIPETTE_NAMES: Array<string> = Object.keys(pipetteNameSpecs).sort(
 )
 
 // use a name like 'p10_single' to get specs true for all models under that name
-export function getPipetteNameSpecs(name: string): ?PipetteNameSpecs {
+export function getPipetteNameSpecs(name: string): PipetteNameSpecs | null {
   const config = pipetteNameSpecs[name]
-  return config && { ...config, name }
+  return config != null ? { ...config, name } : null
 }
 
 // specify a model, eg 'p10_single_v1.3' to get
@@ -41,7 +23,8 @@ export function getPipetteModelSpecs(model: string): ?PipetteModelSpecs {
   const modelSpecificFields = pipetteModelSpecs.config[model]
   const modelFields =
     modelSpecificFields && getPipetteNameSpecs(modelSpecificFields.name)
-  return modelFields && { ...modelFields, ...modelSpecificFields }
+
+  return modelFields && { ...modelFields, ...modelSpecificFields, model }
 }
 
 export function getAllPipetteNames(

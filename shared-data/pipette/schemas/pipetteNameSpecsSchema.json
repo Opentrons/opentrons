@@ -11,7 +11,7 @@
     },
     "displayCategory": {
       "type": "string",
-      "enum": ["OG", "GEN2"]
+      "enum": ["GEN1", "GEN2"]
     }
   },
 

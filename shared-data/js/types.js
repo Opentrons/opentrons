@@ -234,23 +234,36 @@ export type ModuleDefinition = {|
   quirks: Array<string>,
 |}
 
+export type PipetteChannels = 1 | 8
+
+export type PipetteDisplayCategory = 'GEN1' | 'GEN2'
+
 export type FlowRateSpec = {|
   value: number,
   min: number,
   max: number,
 |}
-export type PipetteNameSpec = {|
+
+export type PipetteNameSpecs = {|
+  name: string,
   displayName: string,
-  displayCategory?: string,
+  displayCategory: PipetteDisplayCategory,
   minVolume: number,
   maxVolume: number,
-  channels: number,
+  channels: PipetteChannels,
   defaultAspirateFlowRate: FlowRateSpec,
   defaultDispenseFlowRate: FlowRateSpec,
   defaultBlowOutFlowRate: FlowRateSpec,
-  smoothieConfigs?: {
+  smoothieConfigs?: {|
     stepsPerMM: number,
     homePosition: number,
     travelDistance: number,
-  },
+  |},
 |}
+
+// TODO(mc, 2019-10-14): update this type according to the schema
+export type PipetteModelSpecs = {
+  ...PipetteNameSpecs,
+  model: string,
+  tipLength: { value: number },
+}

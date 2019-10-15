@@ -3,7 +3,7 @@
   left={{
     mount: 'left',
     description: 'p300 8-Channel',
-    pipetteSpecs: { channels: 8, displayCategory: 'OG' },
+    pipetteSpecs: { channels: 8, displayCategory: 'GEN1' },
   }}
   right={{
     mount: 'right',

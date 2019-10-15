@@ -6,8 +6,9 @@
 // Deprecated types should never be reused (unless there's a really good reason).
 export const DEPRECATED_FLAGS = ['OT_PD_SHOW_UPLOAD_CUSTOM_LABWARE_BUTTON']
 
-export type FlagTypes = '(add flags here)' // NOTE: any additional flag types should be added here with | (Union)
+// union of feature flag string constant IDs
+export type FlagTypes = 'OT_PD_ENABLE_GEN2_PIPETTES'
 
-export type Flags = {
-  [FlagTypes]: ?boolean,
-}
+export type Flags = $Shape<{|
+  [flag: FlagTypes]: ?boolean,
+|}>

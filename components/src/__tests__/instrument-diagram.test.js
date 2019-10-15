@@ -6,7 +6,7 @@ import { InstrumentDiagram, InstrumentGroup } from '..'
 describe('InstrumentDiagram', () => {
   test('Single-channel renders correctly', () => {
     const tree = Renderer.create(
-      <InstrumentDiagram channels={1} displayCategory="OG" />
+      <InstrumentDiagram channels={1} displayCategory="GEN1" />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -14,7 +14,7 @@ describe('InstrumentDiagram', () => {
 
   test('Multi-channel renders correctly', () => {
     const tree = Renderer.create(
-      <InstrumentDiagram channels={8} displayCategory="OG" />
+      <InstrumentDiagram channels={8} displayCategory="GEN1" />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -45,14 +45,14 @@ describe('InstrumentGroup', () => {
           mount: 'left',
           description: 'p300 8-Channel',
           tipType: '150',
-          pipetteSpecs: { channels: 8, displayCategory: 'OG' },
+          pipetteSpecs: { channels: 8, displayCategory: 'GEN1' },
           className: 'foo',
         }}
         right={{
           mount: 'right',
           description: 'p10 Single',
           tipType: '10',
-          pipetteSpecs: { channels: 1, displayCategory: 'OG' },
+          pipetteSpecs: { channels: 1, displayCategory: 'GEN1' },
           isDisabled: true,
           className: 'blah',
         }}

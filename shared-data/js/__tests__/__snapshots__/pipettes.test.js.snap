@@ -32,7 +32,7 @@ Object {
     "min": 0.001,
     "value": 10,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P10 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -238,7 +238,7 @@ Object {
     "min": 0.001,
     "value": 10,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P10 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -444,7 +444,7 @@ Object {
     "min": 0.001,
     "value": 10,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P10 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -650,7 +650,7 @@ Object {
     "min": 0.001,
     "value": 10,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P10 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -826,7 +826,7 @@ Object {
     "min": 0.001,
     "value": 10,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P10 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -1037,7 +1037,7 @@ Object {
     "min": 0.001,
     "value": 10,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P10 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -1248,7 +1248,7 @@ Object {
     "min": 0.001,
     "value": 10,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P10 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -1459,7 +1459,7 @@ Object {
     "min": 0.001,
     "value": 10,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P10 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -1634,7 +1634,7 @@ Object {
     "min": 0.001,
     "value": 50,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P50 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -1829,7 +1829,7 @@ Object {
     "min": 0.001,
     "value": 50,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P50 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -2024,7 +2024,7 @@ Object {
     "min": 0.001,
     "value": 50,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P50 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -2219,7 +2219,7 @@ Object {
     "min": 0.001,
     "value": 50,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P50 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -2394,7 +2394,7 @@ Object {
     "min": 0.001,
     "value": 50,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P50 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -2589,7 +2589,7 @@ Object {
     "min": 0.001,
     "value": 50,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P50 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -2784,7 +2784,7 @@ Object {
     "min": 0.001,
     "value": 50,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P50 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -2979,7 +2979,7 @@ Object {
     "min": 0.001,
     "value": 300,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P300 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -3138,7 +3138,7 @@ Object {
     "min": 0.001,
     "value": 300,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P300 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -3297,7 +3297,7 @@ Object {
     "min": 0.001,
     "value": 300,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P300 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -3456,7 +3456,7 @@ Object {
     "min": 0.001,
     "value": 300,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P300 8-Channel",
   "dropTip": Object {
     "max": 2,
@@ -3616,7 +3616,7 @@ Object {
     "min": 0.001,
     "value": 300,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P300 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -3831,7 +3831,7 @@ Object {
     "min": 0.001,
     "value": 300,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P300 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -4046,7 +4046,7 @@ Object {
     "min": 0.001,
     "value": 300,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P300 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -4261,7 +4261,7 @@ Object {
     "min": 0.001,
     "value": 300,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P300 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -4440,7 +4440,7 @@ Object {
     "min": 50,
     "value": 1000,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P1000 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -4621,7 +4621,7 @@ Object {
     "min": 50,
     "value": 1000,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P1000 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -4802,7 +4802,7 @@ Object {
     "min": 50,
     "value": 1000,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P1000 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -4983,7 +4983,7 @@ Object {
     "min": 50,
     "value": 1000,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P1000 Single-Channel",
   "dropTip": Object {
     "max": 2,
@@ -5150,7 +5150,7 @@ Object {
     "min": 0.001,
     "value": 10,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P10 8-Channel",
   "maxVolume": 10,
   "minVolume": 1,
@@ -5181,7 +5181,7 @@ Object {
     "min": 0.001,
     "value": 10,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P10 Single-Channel",
   "maxVolume": 10,
   "minVolume": 1,
@@ -5212,7 +5212,7 @@ Object {
     "min": 0.001,
     "value": 50,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P50 8-Channel",
   "maxVolume": 50,
   "minVolume": 5,
@@ -5243,7 +5243,7 @@ Object {
     "min": 0.001,
     "value": 50,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P50 Single-Channel",
   "maxVolume": 50,
   "minVolume": 5,
@@ -5274,7 +5274,7 @@ Object {
     "min": 0.001,
     "value": 300,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P300 8-Channel",
   "maxVolume": 300,
   "minVolume": 30,
@@ -5305,7 +5305,7 @@ Object {
     "min": 0.001,
     "value": 300,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P300 Single-Channel",
   "maxVolume": 300,
   "minVolume": 30,
@@ -5336,7 +5336,7 @@ Object {
     "min": 50,
     "value": 1000,
   },
-  "displayCategory": "OG",
+  "displayCategory": "GEN1",
   "displayName": "P1000 Single-Channel",
   "maxVolume": 1000,
   "minVolume": 100,

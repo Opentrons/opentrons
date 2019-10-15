@@ -157,24 +157,25 @@ const makeUpdatePipettes = (
 
 const mergeProps = (
   stateProps: SP,
-  dispatchProps: { dispatch: ThunkDispatch<*> },
+  dispatchProps: {| dispatch: ThunkDispatch<*> |},
   ownProps: OP
 ): Props => {
-  const { dispatch } = dispatchProps
   const { _prevPipettes, _orderedStepIds, ...passThruStateProps } = stateProps
+  const { dispatch } = dispatchProps
+  const { closeModal } = ownProps
+
   const updatePipettes = makeUpdatePipettes(
     _prevPipettes,
     _orderedStepIds,
     dispatch,
-    ownProps.closeModal
+    closeModal
   )
 
   return {
-    ...ownProps,
-    useProtocolFields: false,
     ...passThruStateProps,
+    useProtocolFields: false,
     onSave: updatePipettes,
-    onCancel: ownProps.closeModal,
+    onCancel: closeModal,
   }
 }
 

@@ -3,5 +3,9 @@
     "TODO": "TODO: IL 2019-10-09 delete this, leaving as placeholder b/c no FFs remain",
     "title": "Upload custom labware",
     "description": "Show the \"Upload Custom Labware\" button to enable adding custom labware to protocol"
+  },
+  "OT_PD_ENABLE_GEN2_PIPETTES": {
+    "title": "Enable GEN2 pipettes",
+    "description": "Enable the selection of Opentrons GEN2 pipettes when creating protocols"
   }
 }

@@ -60,10 +60,6 @@
   font-size: var(--fs-caption);
 }
 
-.pipette_select {
-  max-width: 15rem;
-}
-
 .pipette_option {
   display: flex;
   padding: 0.25rem 0.75rem;

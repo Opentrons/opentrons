@@ -7,13 +7,29 @@ initialState = { selectedValue: null }
 ;<div style={{ paddingBottom: '10rem' }}>
   {/* Add some space because options menu does not behave well when overlapping with styleguidist's code blocks! */}
   <PipetteSelect
-    onPipetteChange={option => {
-      console.log(option)
-      const { value } = option
-      setState({ selectedValue: value })
+    onPipetteChange={selectedValue => {
+      console.log(selectedValue)
+      setState({ selectedValue })
     }}
     value={state.selectedValue}
     nameBlacklist={['p20_multi_gen2', 'p300_multi_gen2']}
+  />
+</div>
+```
+
+Allow "None" as the default option
+
+```js
+initialState = { selectedValue: null }
+;<div style={{ paddingBottom: '10rem' }}>
+  {/* Add some space because options menu does not behave well when overlapping with styleguidist's code blocks! */}
+  <PipetteSelect
+    onPipetteChange={selectedValue => {
+      console.log(selectedValue)
+      setState({ selectedValue })
+    }}
+    value={state.selectedValue}
+    allowNone
   />
 </div>
 ```
