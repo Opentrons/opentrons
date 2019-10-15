@@ -85,9 +85,6 @@ describe('test schemas of all v2 labware fixtures', () => {
       expect(validationErrors).toBe(null)
       expect(valid).toBe(true)
     })
-    test(`version is 1 for all fixtures: ${labwarePath}`, () => {
-      expect(labwareDef.version).toEqual(1)
-    })
     test(`fixture file name matches loadName: ${labwarePath}`, () => {
       expect(labwareDef.parameters.loadName).toEqual(
         path.basename(filename, '.json')

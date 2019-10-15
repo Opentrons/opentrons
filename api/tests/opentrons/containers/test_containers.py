@@ -118,9 +118,6 @@ def test_new_container_versioning(
     loaded = singletons['labware'].load('fixture_12_trough_v2', 2, version=2)
     assert loaded.get_name() == fixt['parameters']['loadName']
 
-    with pytest.raises(RuntimeError):
-        singletons['labware'].load('fixture_12_trough_v2', 3, version=1)
-
 
 @pytest.mark.api1_only
 def test_load_fixed_trash(robot):

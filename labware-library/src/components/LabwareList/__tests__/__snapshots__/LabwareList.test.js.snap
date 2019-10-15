@@ -100,6 +100,235 @@ exports[`LabwareList component renders 1`] = `
           "format": "trough",
           "isMagneticModuleCompatible": false,
           "isTiprack": false,
+          "loadName": "fixture_12_trough_v2",
+          "quirks": Array [
+            "centerMultichannelOnWells",
+          ],
+        },
+        "schemaVersion": 2,
+        "version": 2,
+        "wells": Object {
+          "A1": Object {
+            "depth": 42.16,
+            "shape": "rectangular",
+            "totalLiquidVolume": 22000,
+            "x": 13.94,
+            "xDimension": 8.33,
+            "y": 42.9,
+            "yDimension": 71.88,
+            "z": 2.29,
+          },
+          "A10": Object {
+            "depth": 42.16,
+            "shape": "rectangular",
+            "totalLiquidVolume": 22000,
+            "x": 95.75,
+            "xDimension": 8.33,
+            "y": 42.9,
+            "yDimension": 71.88,
+            "z": 2.29,
+          },
+          "A11": Object {
+            "depth": 42.16,
+            "shape": "rectangular",
+            "totalLiquidVolume": 22000,
+            "x": 104.84,
+            "xDimension": 8.33,
+            "y": 42.9,
+            "yDimension": 71.88,
+            "z": 2.29,
+          },
+          "A12": Object {
+            "depth": 42.16,
+            "shape": "rectangular",
+            "totalLiquidVolume": 22000,
+            "x": 113.93,
+            "xDimension": 8.33,
+            "y": 42.9,
+            "yDimension": 71.88,
+            "z": 2.29,
+          },
+          "A2": Object {
+            "depth": 42.16,
+            "shape": "rectangular",
+            "totalLiquidVolume": 22000,
+            "x": 23.03,
+            "xDimension": 8.33,
+            "y": 42.9,
+            "yDimension": 71.88,
+            "z": 2.29,
+          },
+          "A3": Object {
+            "depth": 42.16,
+            "shape": "rectangular",
+            "totalLiquidVolume": 22000,
+            "x": 32.12,
+            "xDimension": 8.33,
+            "y": 42.9,
+            "yDimension": 71.88,
+            "z": 2.29,
+          },
+          "A4": Object {
+            "depth": 42.16,
+            "shape": "rectangular",
+            "totalLiquidVolume": 22000,
+            "x": 41.21,
+            "xDimension": 8.33,
+            "y": 42.9,
+            "yDimension": 71.88,
+            "z": 2.29,
+          },
+          "A5": Object {
+            "depth": 42.16,
+            "shape": "rectangular",
+            "totalLiquidVolume": 22000,
+            "x": 50.3,
+            "xDimension": 8.33,
+            "y": 42.9,
+            "yDimension": 71.88,
+            "z": 2.29,
+          },
+          "A6": Object {
+            "depth": 42.16,
+            "shape": "rectangular",
+            "totalLiquidVolume": 22000,
+            "x": 59.39,
+            "xDimension": 8.33,
+            "y": 42.9,
+            "yDimension": 71.88,
+            "z": 2.29,
+          },
+          "A7": Object {
+            "depth": 42.16,
+            "shape": "rectangular",
+            "totalLiquidVolume": 22000,
+            "x": 68.48,
+            "xDimension": 8.33,
+            "y": 42.9,
+            "yDimension": 71.88,
+            "z": 2.29,
+          },
+          "A8": Object {
+            "depth": 42.16,
+            "shape": "rectangular",
+            "totalLiquidVolume": 22000,
+            "x": 77.57,
+            "xDimension": 8.33,
+            "y": 42.9,
+            "yDimension": 71.88,
+            "z": 2.29,
+          },
+          "A9": Object {
+            "depth": 42.16,
+            "shape": "rectangular",
+            "totalLiquidVolume": 22000,
+            "x": 86.66,
+            "xDimension": 8.33,
+            "y": 42.9,
+            "yDimension": 71.88,
+            "z": 2.29,
+          },
+        },
+      }
+    }
+    key="fixture/fixture_12_trough_v2/2"
+  />
+  <LabwareCard
+    definition={
+      Object {
+        "brand": Object {
+          "brand": "USA Scientific",
+          "brandId": Array [
+            "1061-8150",
+          ],
+        },
+        "cornerOffsetFromSlot": Object {
+          "x": 0,
+          "y": 0,
+          "z": 0,
+        },
+        "dimensions": Object {
+          "xDimension": 127.76,
+          "yDimension": 85.8,
+          "zDimension": 44.45,
+        },
+        "groups": Array [
+          Object {
+            "brand": Object {
+              "brand": "USA Scientific",
+              "brandId": Array [
+                "1061-8150",
+              ],
+            },
+            "metadata": Object {
+              "displayCategory": "reservoir",
+              "displayName": "12 Channel Trough",
+              "wellBottomShape": "v",
+            },
+            "wells": Array [
+              "A1",
+              "A2",
+              "A3",
+              "A4",
+              "A5",
+              "A6",
+              "A7",
+              "A8",
+              "A9",
+              "A10",
+              "A11",
+              "A12",
+            ],
+          },
+        ],
+        "metadata": Object {
+          "displayCategory": "reservoir",
+          "displayName": "12 Channel Trough",
+          "displayVolumeUnits": "mL",
+        },
+        "namespace": "fixture",
+        "ordering": Array [
+          Array [
+            "A1",
+          ],
+          Array [
+            "A2",
+          ],
+          Array [
+            "A3",
+          ],
+          Array [
+            "A4",
+          ],
+          Array [
+            "A5",
+          ],
+          Array [
+            "A6",
+          ],
+          Array [
+            "A7",
+          ],
+          Array [
+            "A8",
+          ],
+          Array [
+            "A9",
+          ],
+          Array [
+            "A10",
+          ],
+          Array [
+            "A11",
+          ],
+          Array [
+            "A12",
+          ],
+        ],
+        "parameters": Object {
+          "format": "trough",
+          "isMagneticModuleCompatible": false,
+          "isTiprack": false,
           "loadName": "fixture_12_trough",
           "quirks": Array [
             "centerMultichannelOnWells",
