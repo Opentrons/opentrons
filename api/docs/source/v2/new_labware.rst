@@ -23,6 +23,24 @@ Labware is loaded into a protocol using :py:meth:`.ProtocolContext.load_labware`
 :py:class:`opentrons.protocol_api.labware.Labware` object. You'll never create one of these objects
 directly, only store them in variables from the return value of :py:meth:`.ProtocolContext.load_labware`.
 
+
+.. tip::
+
+    Copy and paste load names directly from the Labware Library to ensure your ``protocol.load_labware``
+    statements get the correct definitions.
+
+
+Labware Versions
+================
+
+Some labware on the Opentrons Labware Library have multiple versions of their
+definitions available. Opentrons publishes new versions of a labware definition
+when we find an issue with a labware definition. In general, you should use the
+newest version of a labware definition; however, the older definitions remain
+available for use with previously-written protocols that may have been customized
+to work with the older definition.
+
+
 .. _new-well-access:
 
 **************************
