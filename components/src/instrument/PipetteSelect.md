@@ -29,7 +29,7 @@ initialState = { selectedValue: null }
       setState({ selectedValue })
     }}
     value={state.selectedValue}
-    allowNone
+    enableNoneOption
   />
 </div>
 ```
