@@ -179,6 +179,15 @@ def execute(protocol_file: TextIO,
     contents = protocol_file.read()
     protocol = parse(contents, protocol_file.name)
     if ff.use_protocol_api_v2():
+        if protocol.api_level == '1'\
+           and not ff.enable_backcompat():
+            raise RuntimeError(
+                'This protocol targets Protocol API V1, but the robot is '
+                'set to Protocol API V2. If this is actually a V2 '
+                'protocol, please set the \'apiLevel\' to \'2\' in the '
+                'metadata. If you do not want to be on API V2, please '
+                'disable the \'Use Protocol API version 2\' toggle in the '
+                'robot\'s Advanced Settings and restart the robot.')
         context = get_protocol_api(
             bundled_labware=getattr(protocol, 'bundled_labware', None),
             bundled_data=getattr(protocol, 'bundled_data', None))

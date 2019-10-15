@@ -18,7 +18,8 @@ log = logging.getLogger(__name__)
 class Setting:
     def __init__(self, _id: str, title: str, description: str,
                  old_id: str = None,
-                 restart_required: bool = False):
+                 restart_required: bool = False,
+                 show_if: Tuple[str, bool] = None):
         self.id = _id
         #: The id of the setting for programmatic access through
         #: get_adv_setting
@@ -30,6 +31,9 @@ class Setting:
         #: User facing description
         self.restart_required = restart_required
         #: True if the user must restart
+        self.show_if = show_if
+        #: A tuple of (other setting id, setting value) that must match reality
+        #: to show this setting in http endpoints
 
     def __repr__(self):
         return '{}: {}'.format(self.__class__, self.id)
@@ -82,6 +86,15 @@ settings = [
                     ' function as it did prior to version 3.7.0. '
                     ' NOTE: this does not impact GEN2 pipettes'
     ),
+    Setting(
+        _id='enableApi1BackCompat',
+        title='Enable APIv1 Back-Compat Execution',
+        description='Use the under-development capability to execute APIv1 '
+                    'protocols using the APIv2 server. Do not set this unless '
+                    'you are a developer or testing; it is not yet feature '
+                    'complete.',
+        show_if=('useProtocolApi2', True)
+    )
 ]
 
 if ARCHITECTURE == SystemArchitecture.BUILDROOT:
@@ -108,7 +121,7 @@ def get_all_adv_settings() -> Dict[str, Dict[str, Union[str, bool, None]]]:
     """
     :return: a dict of settings keyed by setting ID, where each value is a
         dict with keys "id", "title", "description", "value",
-        "restart_required"
+        "restart_required", and "show_if"
     """
     settings_file = CONFIG['feature_flags_file']
 
@@ -214,7 +227,17 @@ def _migrate1to2(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
-_MIGRATIONS = [_migrate0to1, _migrate1to2]
+def _migrate2to3(previous: SettingsMap) -> SettingsMap:
+    """
+    Migration to version 3 of the feature flags file. Adds the
+    enableApi1BackCompat config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap['enableApi1BackCompat'] = None
+    return newmap
+
+
+_MIGRATIONS = [_migrate0to1, _migrate1to2, _migrate2to3]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
 for how the migration functions are applied. Each migration function should
@@ -242,3 +265,11 @@ def _migrate(data: Mapping[str, Any]) -> SettingsData:
         next = m(next)
 
     return next, target_version
+
+
+def get_setting_with_env_overload(setting_name):
+    env_name = 'OT_API_FF_' + setting_name
+    if env_name in os.environ:
+        return os.environ[env_name].lower() in ('1', 'true', 'on')
+    else:
+        return get_adv_setting(setting_name) is True

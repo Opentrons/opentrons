@@ -66,14 +66,16 @@ def validate_response_body(body):
         assert 'restart_required' in obj
 
 
-async def test_get(virtual_smoothie_env, loop, aiohttp_client):
-    app = init()
-    cli = await loop.create_task(aiohttp_client(app))
-
-    resp = await cli.get('/settings')
+async def test_get(async_client, async_server):
+    resp = await async_client.get('/settings')
     body = await resp.json()
     assert resp.status == 200
     validate_response_body(body)
+    if async_server['api_version'] == 2:
+        assert 'enableApi1BackCompat' in [s['id'] for s in body['settings']]
+    else:
+        assert 'enableApi1BackCompat' not in [
+            s['id'] for s in body['settings']]
 
 
 async def test_set(virtual_smoothie_env, loop, aiohttp_client):

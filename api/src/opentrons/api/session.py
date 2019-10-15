@@ -282,7 +282,8 @@ class Session(object):
         if isinstance(self._protocol, PythonProtocol):
             self.metadata = self._protocol.metadata
             if ff.use_protocol_api_v2()\
-               and self._protocol.api_level == '1':
+               and self._protocol.api_level == '1'\
+               and not ff.enable_backcompat():
                 raise RuntimeError(
                     'This protocol targets Protocol API V1, but the robot is '
                     'set to Protocol API V2. If this is actually a V2 '
