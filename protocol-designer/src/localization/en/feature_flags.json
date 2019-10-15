@@ -1,5 +1,6 @@
 {
   "OT_PD_SHOW_UPLOAD_CUSTOM_LABWARE_BUTTON": {
+    "TODO": "TODO: IL 2019-10-09 delete this, leaving as placeholder b/c no FFs remain",
     "title": "Upload custom labware",
     "description": "Show the \"Upload Custom Labware\" button to enable adding custom labware to protocol"
   }

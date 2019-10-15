@@ -25,7 +25,6 @@ type Props = {
   customLabwareDefs: LabwareDefByDefURI,
   slot: ?DeckSlotId,
   permittedTipracks: Array<string>,
-  showUploadCustomLabwareButton: ?boolean,
 }
 
 const CUSTOM_CATEGORY = 'custom'
@@ -139,27 +138,25 @@ const LabwareDropdown = (props: Props) => {
             </PDTitledList>
           ))}
         </ul>
-        {props.showUploadCustomLabwareButton && (
-          <>
-            <OutlineButton Component="label" className={styles.upload_button}>
-              {i18n.t('button.upload_custom_labware')}
-              <input
-                type="file"
-                onChange={e => {
-                  onUploadLabware(e)
-                  selectCategory(CUSTOM_CATEGORY)
-                }}
-              />
-            </OutlineButton>
-            <div className={styles.upload_helper_copy}>
-              {i18n.t('modal.labware_selection.creating_labware_defs')}{' '}
-              <KnowledgeBaseLink className={styles.link} to="customLabware">
-                here
-              </KnowledgeBaseLink>
-              .
-            </div>
-          </>
-        )}
+
+        <OutlineButton Component="label" className={styles.upload_button}>
+          {i18n.t('button.upload_custom_labware')}
+          <input
+            type="file"
+            onChange={e => {
+              onUploadLabware(e)
+              selectCategory(CUSTOM_CATEGORY)
+            }}
+          />
+        </OutlineButton>
+        <div className={styles.upload_helper_copy}>
+          {i18n.t('modal.labware_selection.creating_labware_defs')}{' '}
+          <KnowledgeBaseLink className={styles.link} to="customLabware">
+            here
+          </KnowledgeBaseLink>
+          .
+        </div>
+
         <OutlineButton onClick={onClose}>
           {i18n.t('button.close')}
         </OutlineButton>

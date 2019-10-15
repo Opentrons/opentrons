@@ -34,9 +34,18 @@ const FeatureFlagCard = (props: Props) => {
         </p>
       </div>
     ))
+
+  const noFlagsFallback = (
+    <p className={styles.setting_row}>
+      No experimental settings are available in this version of Protocol
+      Designer.
+    </p>
+  )
   return (
     <Card title={i18n.t('card.title.feature_flags')}>
-      <div>{featureFlagRows}</div>
+      <div>
+        {featureFlagRows.length > 0 ? featureFlagRows : noFlagsFallback}
+      </div>
     </Card>
   )
 }
