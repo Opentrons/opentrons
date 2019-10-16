@@ -44,6 +44,12 @@ export default {
     require('../../images/geb_96_tiprack_10ul_side_view.jpg'),
     require('../../images/geb_10ul_tip_side_view.jpg'),
   ],
+  nest_1_reservoir_195ml: [
+    require('../../images/nest_1_reservoir_195ml_three_quarters.jpg'),
+  ],
+  nest_12_reservoir_15ml: [
+    require('../../images/nest_12_reservoir_15ml_three_quarters.jpg'),
+  ],
   nest_96_wellplate_100ul_pcr_full_skirt: [
     require('../../images/nest_96_wellplate_100ul_pcr_full_skirt_three_quarters.jpg'),
   ],
@@ -150,6 +156,10 @@ export default {
   opentrons_96_aluminumblock_generic_pcr_strip_200ul: [
     require('../../images/opentrons_96_aluminumblock_side_view.jpg'),
     require('../../images/generic_pcr_strip_200ul_tubes.jpg'),
+  ],
+  opentrons_96_aluminumblock_nest_wellplate_100ul: [
+    require('../../images/opentrons_96_aluminumblock_side_view.jpg'),
+    require('../../images/nest_96_wellplate_100ul_pcr_full_skirt_three_quarters.jpg'),
   ],
   opentrons_96_tiprack_1000ul: [
     require('../../images/opentrons_96_tiprack_1000ul_side_view.jpg'),
