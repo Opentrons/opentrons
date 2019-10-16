@@ -207,7 +207,8 @@ def simulate(protocol_file: TextIO,
                            extra_data=extra_data)
 
     if opentrons.config.feature_flags.use_protocol_api_v2():
-        if protocol.api_level == '1'\
+        if isinstance(protocol, PythonProtocol)\
+           and protocol.api_level == '1'\
            and not opentrons.config.feature_flags.enable_backcompat():
             raise RuntimeError(
                 'This protocol targets Protocol API V1, but the robot is '

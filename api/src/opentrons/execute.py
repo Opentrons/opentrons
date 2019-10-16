@@ -18,7 +18,7 @@ from opentrons.protocol_api import execute as execute_apiv2
 from opentrons import commands
 from opentrons.config import feature_flags as ff
 from opentrons.protocols.parse import parse
-from opentrons.protocols.types import JsonProtocol
+from opentrons.protocols.types import JsonProtocol, PythonProtocol
 from opentrons.hardware_control import API
 
 _HWCONTROL: Optional[API] = None
@@ -179,7 +179,8 @@ def execute(protocol_file: TextIO,
     contents = protocol_file.read()
     protocol = parse(contents, protocol_file.name)
     if ff.use_protocol_api_v2():
-        if protocol.api_level == '1'\
+        if isinstance(protocol, PythonProtocol)\
+           and protocol.api_level == '1'\
            and not ff.enable_backcompat():
             raise RuntimeError(
                 'This protocol targets Protocol API V1, but the robot is '
