@@ -34,7 +34,7 @@ def driver_import(monkeypatch, robot):
         monkeypatch.setattr(
             tools,
             'driver',
-            robot._hw_manager._current._backend._smoothie_driver)
+            robot._ctx._hw_manager._current._backend._smoothie_driver)
     else:
         monkeypatch.setattr(tools, 'driver', robot._driver)
 

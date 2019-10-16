@@ -1,19 +1,19 @@
 # pylama:ignore=E731
 
 import logging
+from typing import Optional, TYPE_CHECKING
 from opentrons import commands
-from opentrons.commands import CommandPublisher
 from .util import log_call
+
+if TYPE_CHECKING:
+    from ..contexts import InstrumentContext
 
 log = logging.getLogger(__name__)
 
 
-class Pipette(CommandPublisher):
+class Pipette():
     """
-    DIRECT USE OF THIS CLASS IS DEPRECATED -- this class should not be used
-    directly. Its parameters, defaults, methods, and behaviors are subject to
-    change without a major version release. Use the model-specific constructors
-    available through ``from opentrons import instruments``.
+    This class should not be used directly.
 
     All model-specific instrument constructors are inheritors of this class.
     With any of those instances you can can:
@@ -32,46 +32,13 @@ class Pipette(CommandPublisher):
     Methods in this class include assertions where needed to ensure that any
     action that requires a tip must be preceeded by `pick_up_tip`. For example:
     `mix`, `transfer`, `aspirate`, `blow_out`, and `drop_tip`.
-
-    Parameters
-    ----------
-    mount : str
-        The mount of the pipette's actuator on the Opentrons robot
-        ('left' or 'right')
-    trash_container : Container
-        Sets the default location :meth:`drop_tip()` will put tips
-        (Default: `fixed-trash`)
-    tip_racks : list
-        A list of Containers for this Pipette to track tips when calling
-        :meth:`pick_up_tip` (Default: [])
-    aspirate_flow_rate : int
-        The speed (in ul/sec) the plunger will move while aspirating
-        (Default: See Model Type)
-    dispense_flow_rate : int
-        The speed (in ul/sec) the plunger will move while dispensing
-        (Default: See Model Type)
-
-    Returns
-    -------
-
-    A new instance of :class:`Pipette`.
-
-    Examples
-    --------
-    >>> from opentrons import instruments, labware, robot # doctest: +SKIP
-    >>> robot.reset() # doctest: +SKIP
-    >>> tip_rack_300ul = labware.load(
-    ...     'GEB-tiprack-300ul', '1') # doctest: +SKIP
-    >>> p300 = instruments.P300_Single(mount='left',
-    ...     tip_racks=[tip_rack_300ul]) # doctest: +SKIP
     """
 
     def __init__(  # noqa(C901)
             self,
-            robot):
-
-        super().__init__(robot.broker)
-        self.robot = robot
+            instrument_context: 'InstrumentContext'):
+        self._ctx = instrument_context
+        self._max_plunger_speed: Optional[float] = None
 
     @log_call(log)
     def reset(self):
@@ -198,6 +165,7 @@ class Pipette(CommandPublisher):
         >>> # aspirate the pipette's remaining volume (80uL) from a Well
         >>> p300.aspirate(plate[2]) # doctest: +SKIP
         """
+        # TODO: When implementing this, cap rate to self._max_plunger_speed
         return self
 
     @log_call(log)
@@ -256,6 +224,7 @@ class Pipette(CommandPublisher):
         # dispense the pipette's remaining volume (80uL) to a Well
         >>> p300.dispense(plate[2]) # doctest: +SKIP
         """
+        # TODO: When implementing this, cap rate to self._max_plunger_speed
         return self
 
     @log_call(log)
@@ -355,6 +324,7 @@ class Pipette(CommandPublisher):
         >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
         >>> p300.aspirate(50).dispense().blow_out() # doctest: +SKIP
         """
+        # TODO: When implementing this, cap rate to self._max_plunger_speed
         return self
 
     @log_call(log)
@@ -793,6 +763,7 @@ class Pipette(CommandPublisher):
             The speed in millimeters-per-second, at which the plunger will
             move while performing an dispense
         """
+        # TODO: When implementing this, cap it to self._max_plunger_speed
         return self
 
     @log_call(log)
@@ -811,6 +782,7 @@ class Pipette(CommandPublisher):
             The speed in microliters-per-second, at which the plunger will
             move while performing an dispense
         """
+        # TODO: When implementing this, cap it to self._max_plunger_speed
         return self
 
     @log_call(log)
@@ -830,3 +802,6 @@ class Pipette(CommandPublisher):
     def type(self):
         log.info('instrument.type')
         return 'single'
+
+    def _set_plunger_max_speed_override(self, speed: float):
+        self._max_plunger_speed = speed

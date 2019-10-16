@@ -1,15 +1,23 @@
 import logging
+from typing import Any, Dict, Optional, TYPE_CHECKING
 
-from opentrons.commands import CommandPublisher, commands
-
-from opentrons.config.robot_configs import load
+from opentrons.hardware_control import adapters, API
 from .util import log_call
+
+
+if TYPE_CHECKING:
+    from .instrument_wrapper import Pipette
+    from ..contexts import ProtocolContext
+    from ..geometry import Deck
+    from ..labware import Labware
+    from .api import BCInstruments, BCLabware, BCModules
+    from opentrons import types
 
 
 log = logging.getLogger(__name__)
 
 
-class Robot(CommandPublisher):
+class Robot():
     """
     This class is the main legacy interface to the robot.
 
@@ -41,7 +49,18 @@ class Robot(CommandPublisher):
     See :class:`Pipette` for the list of supported instructions.
     """
 
-    def __init__(self, config=None, broker=None):
+    def _add_instrument(self, mount: str, instr: 'Pipette'):
+        """ Internal. Register intrument with this wrapper """
+        self._instrs[mount] = instr
+        if self._head_speed_override:
+            instr._ctx.default_speed = self._head_speed_override
+        plunger_max = self._plunger_max_speed_overrides.get(mount)
+        if plunger_max is not None:
+            instr._set_plunger_max_speed_override(plunger_max)
+
+    def __init__(
+            self,
+            protocol_ctx: 'ProtocolContext'):
         """
         Initializes a robot instance.
 
@@ -51,21 +70,20 @@ class Robot(CommandPublisher):
         :func:`__init__` the same instance will be returned. There's
         only once instance of a robot.
         """
-        super().__init__(broker)
-        self.config = config or load()
+        self.config = protocol_ctx.config
+        self._ctx = protocol_ctx
+        self._head_speed_override: Optional[float] = None
+        self._plunger_max_speed_overrides: Dict[str, float] = {}
+        self._instrs: Dict[str, 'Pipette'] = {}
+        self._bc_instr: Optional['BCInstruments'] = None
+        self._bc_lw: Optional['BCLabware'] = None
+        self._bc_mods: Optional['BCModules'] = None
 
-    @log_call(log)
-    def clear_tips(self):
-        """
-        If reset is called with a tip attached, the tip must be removed
-        before the poses and _instruments members are cleared. If the tip is
-        not removed, the effective length of the pipette remains increased by
-        the length of the tip, and subsequent `_add_tip` calls will increase
-        the length in addition to this. This should be fixed by changing pose
-        tracking to that it tracks the tip as a separate node rather than
-        adding and subtracting the tip length to the pipette length.
-        """
-        return None
+    def _set_globals(
+            self, instr: 'BCInstruments', lw: 'BCLabware', mod: 'BCModules'):
+        self._bc_instr = instr
+        self._bc_lw = lw
+        self._bc_mods = mod
 
     @log_call(log)
     def reset(self):
@@ -76,228 +94,180 @@ class Robot(CommandPublisher):
             * Command queue
             * Runtime warnings
 
-        Examples
-        --------
-
-        >>> from opentrons import robot # doctest: +SKIP
-        >>> robot.reset() # doctest: +SKIP
+        This is necessary only when you are using this object interactively
+        from Jupyter or a Python session. It does not need to be used in
+        protocols.
         """
-        return None
+        self._head_speed_override = None
+        self._plunger_max_speed_overrides = {}
+        self._instrs = {}
+        for ax in list(self._ctx.max_speeds.keys()):
+            self._ctx.max_speeds[ax] = None
+        assert self._bc_instr and self._bc_mods and self._bc_lw,\
+            'Backcompat layer not properly initialized'
+        self._bc_instr._robot_wrapper = self
+        self._bc_mods._ctx = self._ctx
+        self._bc_lw._ctx = self._ctx
 
     @log_call(log)
-    def cache_instrument_models(self):
+    def connect(self, port: str = None, options: Any = None) -> bool:
         """
-        Queries Smoothie for the model and ID strings of attached pipettes, and
-        saves them so they can be reported without querying Smoothie again (as
-        this could interrupt a command if done during a run or other movement).
+        Connects the robot to a serial port. In most cases, this does not need
+        to be called; for instance, it does not need to be called in a protocol
+        uploaded through the Opentrons App, executed with opentrons_execute,
+        or simulated with opentrons_simulate. It only needs to be called when
+        you use a robot object from the Jupyter notebook.
 
-        Shape of return dict should be:
+        :param port: The port to connect to. If not specified, autodetected. If
+                     set to ``'Virtual Smoothie'``, connects to a virtual port.
+        :param options: Unused argument provided for backwards compatibility
 
-        ```
-        {
-          "left": {
-            "model": "<model_string>" or None,
-            "id": "<pipette_id_string>" or None
-          },
-          "right": {
-            "model": "<model_string>" or None,
-            "id": "<pipette_id_string>" or None
-          }
-        }
-        ```
-
-        :return: a dict with pipette data (shape described above)
+        :returns bool: ``True`` for success, ``False`` for failure.
         """
-        return None
-
-    @log_call(log)
-    def connect(self, port=None, options=None):
-        """
-        Connects the robot to a serial port.
-
-        Parameters
-        ----------
-        port : str
-            OS-specific port name or ``'Virtual Smoothie'``
-        options : dict
-            if :attr:`port` is set to ``'Virtual Smoothie'``, provide
-            the list of options to be passed to :func:`get_virtual_device`
-
-        Returns
-        -------
-        ``True`` for success, ``False`` for failure.
-
-        Note
-        ----
-        If you wish to connect to the robot without using the OT App, you will
-        need to use this function.
-
-        Examples
-        --------
-
-        >>> from opentrons import robot # doctest: +SKIP
-        >>> robot.connect() # doctest: +SKIP
-        """
-        return None
+        hw = adapters.SynchronousAdapter.build(
+            API.build_hardware_controller,
+            port=port)
+        self._ctx.connect(hw)
+        return True
 
     @log_call(log)
     def home(self, *args, **kwargs):
         """
         Home robot's head and plunger motors.
         """
-        return None
-
-    @log_call(log)
-    def home_z(self):
-        return None
+        self._ctx.home()
 
     @log_call(log)
     def head_speed(
-            self, combined_speed=None,
-            x=None, y=None, z=None, a=None, b=None, c=None):
+            self, combined_speed: float = None,
+            x: float = None,
+            y: float = None,
+            z: float = None,
+            a: float = None,
+            b: float = None,
+            c: float = None):
         """
         Set the speeds (mm/sec) of the robot
 
-        Parameters
-        ----------
-        combined_speed : number specifying a combined-axes speed
-        <axis> : key/value pair, specifying the maximum speed of that axis
-
-        Examples
-        ---------
-
-        >>> from opentrons import robot # doctest: +SKIP
-        >>> robot.reset() # doctest: +SKIP
-        >>> robot.head_speed(combined_speed=400) # doctest: +SKIP
-        #  sets the head speed to 400 mm/sec or the axis max per axis
-        >>> robot.head_speed(x=400, y=200) # doctest: +SKIP
-        # sets max speeds of X and Y
+        :param combined_speed: If specified, a positive number setting the
+                               straight-line speed at which to move.
+        :param x, y, z, a, b, c: If specified by axis, sets the maximum speed
+                                 at which that axis will move.
         """
-        return None
+        if combined_speed:
+            self._head_speed_override = combined_speed
+            for instr in self._instrs.values():
+                instr._ctx.default_speed = combined_speed
+
+        maxes = {'x': x, 'y': y, 'z': z, 'a': a}
+        for ax, m in maxes.items():
+            if m:
+                self._ctx.max_speeds[ax] = m
+        plunger_maxes = {'left': b, 'right': c}
+        for mount, maxval in plunger_maxes.items():
+            if maxval is None:
+                continue
+            instr = self._instrs.get(mount)  # type: ignore
+            self._plunger_max_speed_overrides[mount] = maxval
+            if instr:
+                instr._set_plunger_max_speed_override(maxval)
 
     @log_call(log)
     def move_to(
             self,
-            location,
-            instrument,
-            strategy='arc',
+            location: 'types.Location',
+            instrument: 'Pipette',
+            strategy: str = 'arc',
             **kwargs):
         """
         Move an instrument to a coordinate, container or a coordinate within
         a container.
 
-        Parameters
-        ----------
-        location : one of the following:
-            1. :class:`Placeable` (i.e. Container, Deck, Slot, Well) — will
-            move to the origin of a container.
-            2. :class:`Vector` move to the given coordinate in Deck coordinate
-            system.
-            3. (:class:`Placeable`, :class:`Vector`) move to a given coordinate
-            within object's coordinate system.
+        Most of the time, you should just call
+        :py:meth:`.instrument_wrapper.Pipette.move_to`.
 
-        instrument :
-            Instrument to move relative to. If ``None``, move relative to the
-            center of a gantry.
+        :param location: A location derived from some other method. For
+                         instance, you can pass a well here, or the result of
+                         ``well.top()``. Fundamentally, this is a tuple of
+                         a labware reference and a point.
+        :param instrument: The instrument object to move.
+        :param strategy: ``'arc'`` or ``'direct'``. Forces the robot to either
+                         move up and over to the destination, or move in a
+                         straight line.
 
-        strategy : {'arc', 'direct'}
-            ``arc`` : move to the point using arc trajectory
-            avoiding obstacles.
-
-            ``direct`` : move to the point in a straight line.
+        :return Robot: This instance.
         """
-        return None
+        instrument.move_to(location, strategy)
+        return self
 
     @log_call(log)
     def disconnect(self):
         """
         Disconnects from the robot.
         """
-        return None
+        return self._ctx.disconnect()
+
+    @property
+    def deck(self) -> 'Deck':
+        return self._ctx.deck
+
+    @property
+    def fixed_trash(self) -> 'Labware':
+        return self._ctx.fixed_trash
 
     @log_call(log)
-    def deck(self):
-        log.info('robot.deck')
-        return None
-
-    @log_call(log)
-    def fixed_trash(self):
-        log.info('robot.fixed_trash')
-        return None
-
-    @log_call(log)
-    def get_instruments_by_name(self, name):
-        return None
-
-    @log_call(log)
-    def get_instruments(self, name=None):
-        """
-        :returns: sorted list of (mount, instrument)
-        """
-        return None
-
-    @log_call(log)
-    def get_containers(self):
-        """
-        Returns all containers currently on the deck.
-        """
-        return None
-
-    @log_call(log)
-    def add_container(self, name, slot, label=None, share=False):
-        return None
-
-    @log_call(log)
-    @commands.publish.both(command=commands.pause)
-    def pause(self, msg=None):
+    def pause(self, msg: str = None):
         """
         Pauses execution of the protocol. Use :meth:`resume` to resume
         """
-        return None
+        return self._ctx.pause(msg)
 
     @log_call(log)
-    def execute_pause(self):
-        """ Pause the driver
-
-        This method should not be called inside a protocol. Use
-        :py:meth:`pause` instead
-        """
-        return None
-
-    @log_call(log)
-    @commands.publish.both(command=commands.resume)
     def resume(self):
         """
         Resume execution of the protocol after :meth:`pause`
         """
-        return None
+        return self._ctx.resume()
 
     @log_call(log)
     def is_connected(self):
-        return None
+        """ Check if this robot is connected.
+
+        This is the inverse of :py:meth:`.is_simulating`.
+        """
+        return not self._ctx.is_simulating()
 
     @log_call(log)
     def is_simulating(self):
-        return None
+        """ Check if the robot is simulating or running.
+
+        If this is a simulation, returns ``True``; if calls will cause the
+        robot to move, return ``False``.
+        """
+        return self._ctx.is_simulating()
 
     @log_call(log)
-    @commands.publish.both(command=commands.comment)
     def comment(self, msg):
-        return None
+        """ Publish a message into the run log.
+
+        For instance, if you do
+
+        .. code-block:: python
+
+            from opentrons import robot
+            robot.comment("Hello, world!")
+
+        The runlog will display "Hello, world!".
+        """
+        return self._ctx.comment(msg)
 
     @log_call(log)
     def commands(self):
-        return None
+        return self._ctx.commands()
 
     @log_call(log)
     def clear_commands(self):
-        return None
-
-    @property  # type: ignore
-    @log_call(log)
-    def engaged_axes(self):
-        """ Which axes are engaged and holding. """
-        return None
+        return self._ctx.clear_commands()
 
     def discover_modules(self):
         pass
