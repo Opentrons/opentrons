@@ -80,7 +80,6 @@ def test_tempdeck(loop):
     mod.set_temperature(20)
     assert 'setting temperature' in ','.join([cmd.lower()
                                               for cmd in ctx.commands()])
-    mod.wait_for_temp()
 
     assert mod.target == 20
     assert mod.temperature == 20

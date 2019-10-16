@@ -1,5 +1,6 @@
 from os import environ
 import logging
+import asyncio
 from threading import Event, Thread
 from time import sleep
 from typing import Optional, Mapping
@@ -92,7 +93,7 @@ class TempDeck:
             return str(e)
         return ''
 
-    def set_temperature(self, celsius) -> str:
+    async def set_temperature(self, celsius) -> str:
         self.run_flag.wait()
         celsius = round(float(celsius),
                         utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
@@ -102,7 +103,8 @@ class TempDeck:
         except (TempDeckError, SerialException, SerialNoResponse) as e:
             return str(e)
         self._temperature.update({'target': celsius})
-        return ''
+        while self.status != 'holding at target':
+            await asyncio.sleep(0.1)
 
     def update_temperature(self, default=None) -> str:
         if self._update_thread and self._update_thread.is_alive():
