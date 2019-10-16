@@ -43,6 +43,8 @@ newest version of a labware definition; however, the older definitions remain
 available for use with previously-written protocols that may have been customized
 to work with the older definition.
 
+If you do not specify a version when loading labware, version 1 will be used by default.
+
 
 **********************
 
@@ -118,15 +120,16 @@ parameter:
 
    from opentrons import labware
    block1 = labware.load(
-                'opentrons_96_aluminumblock_biorad_wellplate_200ul', 1,
+                'opentrons_96_aluminumblock_biorad_wellplate_200ul',
+                slot='1',
                 version=2)  # version 2 of the aluminum block definition
    block2 = labware.load(
                 'opentrons_96_aluminumblock_biorad_wellplate_200ul',
-                 2,
+                 slot='2',
                  version=1)  # version 1 of the aluminum block definition
    block3 = labware.load(
                 'opentrons_96_aluminumblock_biorad_wellplate_200ul',
-                2)  # if you don't specify version, version 1 is used
+                slot='2')  # if you don't specify version, version 1 is used
 
 
 Create
