@@ -63,6 +63,7 @@ def validate_response_body(body):
         assert 'description' in obj, '"description" not found for {}'.format(
             obj['id'])
         assert 'value' in obj, '"value" not found for {}'.format(obj['id'])
+        assert 'restart_required' in obj
 
 
 async def test_get(virtual_smoothie_env, loop, aiohttp_client):

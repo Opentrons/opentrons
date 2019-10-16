@@ -16,11 +16,20 @@ log = logging.getLogger(__name__)
 
 
 class Setting:
-    def __init__(self, _id, title, description, old_id=None):
+    def __init__(self, _id: str, title: str, description: str,
+                 old_id: str = None,
+                 restart_required: bool = False):
         self.id = _id
+        #: The id of the setting for programmatic access through
+        #: get_adv_setting
         self.old_id = old_id
+        #: the old id before migration, if any
         self.title = title
+        #: User facing title
         self.description = description
+        #: User facing description
+        self.restart_required = restart_required
+        #: True if the user must restart
 
     def __repr__(self):
         return '{}: {}'.format(self.__class__, self.id)
@@ -59,9 +68,10 @@ settings = [
     Setting(
         _id='useProtocolApi2',
         title='Use Protocol API version 2',
-        description='Use new implementation of protocol API. This should not'
-                    ' be activated except by developers or testers. Please'
-                    ' power cycle the robot after changing this setting.'
+        description='Enable to use the Protocol API V2 Beta. With this flag '
+                    'set, only Protocol API v2 protocols can be executed by '
+                    'the robot. A restart of the robot is required.',
+        restart_required=True
     ),
     Setting(
         _id='useOldAspirationFunctions',
@@ -97,7 +107,8 @@ def get_adv_setting(setting: str) -> Optional[bool]:
 def get_all_adv_settings() -> Dict[str, Dict[str, Union[str, bool, None]]]:
     """
     :return: a dict of settings keyed by setting ID, where each value is a
-        dict with keys "id", "title", "description", and "value"
+        dict with keys "id", "title", "description", "value",
+        "restart_required"
     """
     settings_file = CONFIG['feature_flags_file']
 
@@ -185,7 +196,7 @@ def _migrate0to1(previous: Mapping[str, Any]) -> SettingsMap:
 
         if previous.get(id) is True:
             next[id] = True
-        elif previous.get(old_id) is True:
+        elif old_id and previous.get(old_id) is True:
             next[id] = True
         else:
             next[id] = None
