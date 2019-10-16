@@ -106,7 +106,7 @@ class ResetRobotModal extends React.Component<Props, ResetRobotRequest> {
     }
 
     return (
-      <Portal level="modal">
+      <Portal>
         <AlertModal heading={TITLE} buttons={buttons} alertOverlay>
           {message}
         </AlertModal>

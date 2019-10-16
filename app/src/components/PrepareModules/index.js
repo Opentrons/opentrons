@@ -37,7 +37,7 @@ function PrepareModules(props: Props) {
       <div className={styles.deck_map_wrapper}>
         <DeckMap className={styles.deck_map} modulesRequired />
       </div>
-      <Portal level="modal">
+      <Portal>
         <AlertModal
           iconName={null}
           heading="Open Thermocycler Module lid for calibration"

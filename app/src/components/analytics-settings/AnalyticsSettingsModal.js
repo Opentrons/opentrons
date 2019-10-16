@@ -32,7 +32,7 @@ function AnalyticsSettingsModal(props: Props) {
   const { setSeen } = props
 
   return (
-    <Portal level="modal">
+    <Portal>
       <Modal onCloseClick={setSeen} heading={TITLE} alertOverlay>
         <AnalyticsToggle />
         <ModalButton onClick={setSeen}>{CONTINUE}</ModalButton>

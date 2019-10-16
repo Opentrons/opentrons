@@ -11,7 +11,7 @@ type Props = {
 
 export default function ConfirmUploadModal(props: Props) {
   return (
-    <Portal level="modal">
+    <Portal>
       <AlertModal
         heading={'Are you sure you want to open a new protocol?'}
         buttons={[

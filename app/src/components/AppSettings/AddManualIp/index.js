@@ -13,7 +13,7 @@ export type AddManualIpProps = {
 
 export default function AddManualIp(props: AddManualIpProps) {
   return (
-    <Portal level="modal">
+    <Portal>
       <AlertModal
         alertOverlay
         iconName="wifi"

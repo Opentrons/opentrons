@@ -133,7 +133,7 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
           disabled={connectingTo != null}
           onValueChange={this.setCurrentSsid}
         />
-        <Portal level="modal">
+        <Portal>
           {connectingTo && (
             <SpinnerModal
               message={`Attempting to connect to network ${connectingTo}`}

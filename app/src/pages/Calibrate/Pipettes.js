@@ -8,7 +8,7 @@ import { selectors as robotSelectors } from '../../robot'
 import { getPipettesState, fetchPipettes } from '../../robot-api'
 import { getConnectedRobot } from '../../discovery'
 
-import Page, { RefreshWrapper } from '../../components/Page'
+import Page from '../../components/Page'
 import TipProbe from '../../components/TipProbe'
 import { PipetteTabs, Pipettes } from '../../components/calibrate-pipettes'
 import SessionHeader from '../../components/SessionHeader'
@@ -55,27 +55,26 @@ function CalibratePipettesPage(props: Props) {
     changePipetteUrl,
   } = props
 
+  React.useEffect(fetchPipettes, [fetchPipettes])
   // redirect back to mountless route if mount doesn't exist
   if (params.mount && !currentPipette) {
     return <Redirect to={url.replace(`/${params.mount}`, '')} />
   }
 
   return (
-    <RefreshWrapper refresh={fetchPipettes}>
-      <Page titleBarProps={{ title: <SessionHeader /> }}>
-        <PipetteTabs {...{ pipettes, currentPipette }} />
-        <Pipettes
-          {...{
-            pipettes,
-            tipracksByMount,
-            currentPipette,
-            actualPipettes,
-            changePipetteUrl,
-          }}
-        />
-        {!!currentPipette && <TipProbe {...currentPipette} />}
-      </Page>
-    </RefreshWrapper>
+    <Page titleBarProps={{ title: <SessionHeader /> }}>
+      <PipetteTabs {...{ pipettes, currentPipette }} />
+      <Pipettes
+        {...{
+          pipettes,
+          tipracksByMount,
+          currentPipette,
+          actualPipettes,
+          changePipetteUrl,
+        }}
+      />
+      {!!currentPipette && <TipProbe {...currentPipette} />}
+    </Page>
   )
 }
 

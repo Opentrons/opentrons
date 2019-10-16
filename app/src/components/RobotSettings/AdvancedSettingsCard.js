@@ -109,7 +109,7 @@ export default function AdvancedSettingsCard(props: Props) {
       ))}
       <UploadRobotUpdate robotName={robot.name} />
       {showLogOptoutModal && (
-        <Portal level="modal">
+        <Portal>
           <AlertModal
             alertOverlay
             heading={ROBOT_LOGS_OUTOUT_HEADING}

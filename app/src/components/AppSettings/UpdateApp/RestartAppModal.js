@@ -13,7 +13,7 @@ type Props = {
 export default function RestartAppModal(props: Props) {
   const { availableVersion, applyUpdate, closeModal } = props
   return (
-    <Portal level="modal">
+    <Portal>
       <ScrollableAlertModal
         heading={`App Version ${availableVersion || ''} Downloaded`}
         buttons={[

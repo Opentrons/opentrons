@@ -61,7 +61,7 @@ export default class UpdateAppModal extends React.Component<
     }
 
     return (
-      <Portal level="modal">
+      <Portal>
         <ScrollableAlertModal
           heading={`App Version ${availableVersion || ''} Available`}
           buttons={[{ onClick: closeModal, children: 'not now' }, button]}

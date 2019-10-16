@@ -57,7 +57,7 @@ function ReviewDeck(props: Props) {
         <DeckMap className={styles.deck_map} />
       </div>
       {isPrepNestedLabwareOpen && (
-        <Portal level="modal">
+        <Portal>
           <AlertModal
             iconName={null}
             heading="Position latch to hold down plate"

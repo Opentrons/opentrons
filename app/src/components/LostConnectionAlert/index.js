@@ -34,7 +34,7 @@ function LostConnectionAlert(props: Props) {
 
   return (
     ok === false && (
-      <Portal level="modal">
+      <Portal>
         <AlertModal
           onCloseClick={disconnect}
           heading={'Connection to robot lost'}
