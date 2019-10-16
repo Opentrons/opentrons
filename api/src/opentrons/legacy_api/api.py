@@ -35,8 +35,7 @@ class ContainersWrapper(object):
                 self.robot, container_name, slot, label, share, version)
         except FileNotFoundError:
             LOG.exception(f"Exception opening labware {container_name}")
-            raise RuntimeError(
-                f"Could not load labware {container_name}")
+            raise
 
 
 class InstrumentsWrapper(object):
