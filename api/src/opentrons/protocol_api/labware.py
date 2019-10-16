@@ -1069,8 +1069,8 @@ def _get_standard_labware_definition(
             except (FileNotFoundError):
                 pass
         raise FileNotFoundError(
-            f'Labware "{load_name}" not found with version {version}. If ' +
-            f'you are using a namespace besides {OPENTRONS_NAMESPACE} or ' +
+            f'Labware "{load_name}" not found with version {checked_version}. '
+            f'If you are using a namespace besides {OPENTRONS_NAMESPACE} or '
             f'{CUSTOM_NAMESPACE}, please specify it')
 
     namespace = namespace.lower()
@@ -1081,7 +1081,7 @@ def _get_standard_labware_definition(
             labware_def = json.loads(f.read().decode('utf-8'))
     except FileNotFoundError:
         raise FileNotFoundError(
-            f'Labware "{load_name}" not found with version {version} ' +
+            f'Labware "{load_name}" not found with version {checked_version} '
             f'in namespace "{namespace}".'
         )
 

@@ -46,13 +46,12 @@ def _load_weird_container(container_name):
     return container
 
 
-def _load_container_by_name(container_name):
+def _load_container_by_name(container_name, version=None):
     """ Try and find a container in a variety of methods.
 
     Returns the container or raises a KeyError if it could not be found
     """
     for meth in (database.load_container,  # From the labware database
-                 load_new_labware,         # Fallback to built in v2 labware
                  _load_weird_container):   # honestly don't know
         log.debug(
             f"Trying to load container {container_name} via {meth.__name__}")
@@ -65,7 +64,10 @@ def _load_container_by_name(container_name):
         except (ValueError, KeyError) as e:
             log.debug(f"{container_name} not in {meth.__name__} ({repr(e)})")
     else:
-        raise KeyError(f"Unknown labware {container_name}")
+        log.debug(
+            f"Trying to load container {container_name} version {version}"
+            f"from v2 labware store")
+        container = load_new_labware(container_name, version=version)
     return container
 
 
@@ -840,8 +842,8 @@ class Robot(CommandPublisher):
             container_patched, container_patched.properties['type'],
             slot, label, share)
 
-    def add_container(self, name, slot, label=None, share=False):
-        container = _load_container_by_name(name)
+    def add_container(self, name, slot, label=None, share=False, version=None):
+        container = _load_container_by_name(name, version=version)
         container_patched = _setup_container(container)
         if not container_patched:
             return None

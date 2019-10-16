@@ -11,9 +11,9 @@ wells and groups of wells.
 
 ************************************
 
-******************
+***************
 Labware Library
-******************
+***************
 
 The Opentrons API comes with many common labware built in. These can be loaded
 into your Python protocol by using the ``labware.load()`` method with the
@@ -33,10 +33,24 @@ If you are interested in using your own labware that is not included in the
 API, please take a look at how to create custom labware definitions using
 ``labware.create()``, or contact Opentrons Support.
 
+Labware Versions
+================
+
+Some labware on the Opentrons Labware Library have multiple versions of their
+definitions available. Opentrons publishes new versions of a labware definition
+when we find an issue with a labware definition. In general, you should use the
+newest version of a labware definition; however, the older definitions remain
+available for use with previously-written protocols that may have been customized
+to work with the older definition.
+
+If you do not specify a version when loading labware, version 1 will be used by default.
+
+
 **********************
 
+*********************************
 Placing labware on the robot deck
-=================================
+*********************************
 
 The robot deck is made up of slots labeled 1, 2, 3, 4, and so on.
 
@@ -98,6 +112,25 @@ deck, like modules. For this, you should use the ``share`` parameter.
     plate = labware.load('opentrons_96_aluminumblock_biorad_wellplate_200ul',
                          slot='1',
                          share=True)
+
+To specify the version of the labware definition to use, you can use the ``version``
+parameter:
+
+.. code-block:: python
+
+   from opentrons import labware
+   block1 = labware.load(
+                'opentrons_96_aluminumblock_biorad_wellplate_200ul',
+                slot='1',
+                version=2)  # version 2 of the aluminum block definition
+   block2 = labware.load(
+                'opentrons_96_aluminumblock_biorad_wellplate_200ul',
+                 slot='2',
+                 version=1)  # version 1 of the aluminum block definition
+   block3 = labware.load(
+                'opentrons_96_aluminumblock_biorad_wellplate_200ul',
+                slot='2')  # if you don't specify version, version 1 is used
+
 
 Create
 ======

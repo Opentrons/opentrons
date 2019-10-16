@@ -33,7 +33,7 @@ __all__ = [
 log = logging.getLogger(__name__)
 
 
-def load(robot, container_name, slot, label=None, share=False):
+def load(robot, container_name, slot, label=None, share=False, version=None):
     """
     Examples
     --------
@@ -73,7 +73,7 @@ def load(robot, container_name, slot, label=None, share=False):
             raise ValueError('Unknown slot: {}'.format(slot))
         slot = str(slot)
 
-    return robot.add_container(container_name, slot, label, share)
+    return robot.add_container(container_name, slot, label, share, version)
 
 
 def list():
@@ -227,12 +227,16 @@ def save_new_offsets(labware_hash, delta):
         json.dump(calibration_data, f)
 
 
-def load_new_labware(container_name):
-    """ Load a labware in the new schema into a placeable, by name
+def load_new_labware(container_name, version=None):
+    """ Load a labware in the new schema into a placeable, by name and version
+
+    :param container_name: The load name of the container
+    :param version: the version to load.
 
     :raises KeyError: If the labware name is not found
     """
-    defn = new_labware.get_labware_definition(load_name=container_name)
+    defn = new_labware.get_labware_definition(load_name=container_name,
+                                              version=version)
     return load_new_labware_def(defn)
 
 

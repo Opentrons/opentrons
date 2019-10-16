@@ -28,13 +28,14 @@ class ContainersWrapper(object):
     def list(self, *args, **kwargs):
         return cnt.list(*args, **kwargs)
 
-    def load(self, container_name, slot, label=None, share=False):
+    def load(
+            self, container_name, slot, label=None, share=False, version=None):
         try:
-            return cnt.load(self.robot, container_name, slot, label, share)
+            return cnt.load(
+                self.robot, container_name, slot, label, share, version)
         except FileNotFoundError:
             LOG.exception(f"Exception opening labware {container_name}")
-            raise RuntimeError(
-                f"Could not load labware {container_name}")
+            raise
 
 
 class InstrumentsWrapper(object):
