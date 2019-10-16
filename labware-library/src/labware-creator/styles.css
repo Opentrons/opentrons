@@ -15,12 +15,12 @@
     font-family: 'AkkoPro-Regular', 'Ropa Sans', 'Open Sans', sans-serif;
     text-transform: uppercase;
 
-    &:hover {
-      background-color: #00f;
-    }
-
     &:visited {
       color: white;
+    }
+
+    &:hover {
+      background-color: #00f;
     }
   }
 }
@@ -52,6 +52,11 @@
   & strong {
     font-weight: var(--fw-semibold);
   }
+}
+
+.link,
+.link:visited {
+  color: var(--c-blue);
 }
 
 .labware_creator .labware_guide_button {

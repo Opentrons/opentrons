@@ -11,8 +11,13 @@
   & h2 {
     @apply --font-default-dark;
 
+    line-height: var(--lh-title);
     font-weight: var(--fw-semibold);
     padding-bottom: 1rem;
+  }
+
+  & p {
+    line-height: var(--lh-copy);
   }
 }
 
@@ -21,11 +26,6 @@
 
   /* nav height plus breadcrumbs */
   padding-top: calc(var(--size-mobile-nav) + var(--size-breadcrumb-nav));
-
-  & a,
-  & a:visited {
-    color: var(--c-blue);
-  }
 
   & h2 {
     @apply --font-header-dark;
