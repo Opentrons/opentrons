@@ -51,6 +51,9 @@ class Robot():
         self._instrs[mount] = instr
         if self._head_speed_override:
             instr._ctx.default_speed = self._head_speed_override
+        plunger_max = self._plunger_max_speed_overrides.get(mount)
+        if plunger_max is not None:
+            instr._set_plunger_max_speed_override(plunger_max)
 
     def __init__(
             self,
@@ -67,6 +70,7 @@ class Robot():
         self.config = protocol_ctx.config
         self._ctx = protocol_ctx
         self._head_speed_override: Optional[float] = None
+        self._plunger_max_speed_overrides: Dict[str, float] = {}
         self._instrs: Dict[str, 'Pipette'] = {}
 
     def _set_globals(
@@ -131,8 +135,8 @@ class Robot():
 
         :param combined_speed: If specified, a positive number setting the
                                straight-line speed at which to move.
-        :param x, y, z, a: If specified by axis, sets the maximum speed at
-                           which that axis will move.
+        :param x, y, z, a, b, c: If specified by axis, sets the maximum speed
+                                 at which that axis will move.
         """
         if combined_speed:
             self._head_speed_override = combined_speed
@@ -143,6 +147,14 @@ class Robot():
         for ax, m in maxes.items():
             if m:
                 self._ctx.max_speeds[ax] = m
+        plunger_maxes = {'left': b, 'right': c}
+        for mount, maxval in plunger_maxes.items():
+            if maxval is None:
+                continue
+            instr = self._instrs.get(mount)
+            self._plunger_max_speed_overrides[mount] = maxval
+            if instr:
+                instr._set_plunger_max_speed_override(maxval)
 
     @log_call(log)
     def move_to(

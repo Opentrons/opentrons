@@ -1,7 +1,7 @@
 # pylama:ignore=E731
 
 import logging
-from typing import TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 from opentrons import commands
 from .util import log_call
 
@@ -38,6 +38,7 @@ class Pipette():
             self,
             instrument_context: 'InstrumentContext'):
         self._ctx = instrument_context
+        self._max_plunger_speed: Optional[float] = None
 
     @log_call(log)
     def reset(self):
@@ -164,6 +165,7 @@ class Pipette():
         >>> # aspirate the pipette's remaining volume (80uL) from a Well
         >>> p300.aspirate(plate[2]) # doctest: +SKIP
         """
+        # TODO: When implementing this, cap rate to self._max_plunger_speed
         return self
 
     @log_call(log)
@@ -222,6 +224,7 @@ class Pipette():
         # dispense the pipette's remaining volume (80uL) to a Well
         >>> p300.dispense(plate[2]) # doctest: +SKIP
         """
+        # TODO: When implementing this, cap rate to self._max_plunger_speed
         return self
 
     @log_call(log)
@@ -321,6 +324,7 @@ class Pipette():
         >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
         >>> p300.aspirate(50).dispense().blow_out() # doctest: +SKIP
         """
+        # TODO: When implementing this, cap rate to self._max_plunger_speed
         return self
 
     @log_call(log)
@@ -759,6 +763,7 @@ class Pipette():
             The speed in millimeters-per-second, at which the plunger will
             move while performing an dispense
         """
+        # TODO: When implementing this, cap it to self._max_plunger_speed
         return self
 
     @log_call(log)
@@ -777,6 +782,7 @@ class Pipette():
             The speed in microliters-per-second, at which the plunger will
             move while performing an dispense
         """
+        # TODO: When implementing this, cap it to self._max_plunger_speed
         return self
 
     @log_call(log)
@@ -796,3 +802,6 @@ class Pipette():
     def type(self):
         log.info('instrument.type')
         return 'single'
+
+    def _set_plunger_max_speed_override(self, speed: float):
+        self._max_plunger_speed = speed

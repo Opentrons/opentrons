@@ -63,7 +63,7 @@ def test_labware_mappings(loop, monkeypatch, singletons):
 @pytest.mark.api2_only
 def test_head_speed(singletons):
     # Setting axis speeds should set max speeds
-    singletons['robot'].head_speed(x=2, y=3, z=5)
+    singletons['robot'].head_speed(x=2, y=3, z=5, b=3)
     assert singletons['robot']._ctx.max_speeds['X'] == 2
     assert singletons['robot']._ctx.max_speeds['Y'] == 3
     assert singletons['robot']._ctx.max_speeds['Z'] == 5
@@ -82,9 +82,12 @@ def test_head_speed(singletons):
     # Default speed should be provisioned on pipette create from the cache
     left = singletons['instruments'].P50_Single('left')
     assert left._ctx._default_speed == 10
+    # and so should plunger max
+    assert left._max_plunger_speed == 3
     # And setting it with already-created instruments should work
-    singletons['robot'].head_speed(combined_speed=20)
+    singletons['robot'].head_speed(combined_speed=20, b=4)
     assert left._ctx._default_speed == 20
+    assert left._max_plunger_speed == 4
 
 
 @pytest.mark.api2_only
