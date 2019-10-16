@@ -380,10 +380,10 @@ def fuzzy_assert(result, expected):
     assert len(result) == len(expected_re), \
         'result and expected have different length'
 
-    for res, exp in zip(result, expected_re):
+    for idx, (res, exp) in enumerate(zip(result, expected_re)):
         assert re.compile(
-            exp.lower()).match(res.lower()), "{} didn't match {}" \
-            .format(res, exp)
+            exp.lower()).match(res.lower()), "element {}: {} didn't match {}" \
+            .format(idx, res, exp)
 
 
 @pytest.fixture
