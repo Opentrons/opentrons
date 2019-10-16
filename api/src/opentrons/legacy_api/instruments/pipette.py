@@ -683,12 +683,13 @@ class Pipette(CommandPublisher):
         if not self.tip_attached:
             log.warning("Cannot mix without a tip attached.")
 
-        if volume is None:
-            volume = self._working_volume
+        if not helpers.is_number(volume):
+            if isinstance(volume, Placeable) and not location:
+                location = volume
+            volume = self._working_volume - self.current_volume
 
         if not location and self.previous_placeable:
             location = self.previous_placeable
-            volume = self._working_volume
 
         do_publish(self.broker, commands.mix, self.mix, 'before',
                    self, None, None, repetitions, volume, location, rate)

@@ -988,21 +988,72 @@ def test_mix(local_test_pipette):
     p200.pick_up_tip()
     p200.aspirate = mock.Mock()
     p200.dispense = mock.Mock()
+
+    # scenario I: 3 arguments - repetitions, volume, location
     p200.mix(3, 100, plate[1])
 
-    dispense_expected = [
+    dispense_expected_1 = [
         mock.call.dispense(100, rate=1.0),
         mock.call.dispense(100, rate=1.0),
         mock.call.dispense(100, rate=1.0)
     ]
-    assert p200.dispense.mock_calls == dispense_expected
+    assert p200.dispense.mock_calls == dispense_expected_1
 
-    aspirate_expected = [
+    aspirate_expected_1 = [
         mock.call.aspirate(volume=100, location=plate[1], rate=1.0),
         mock.call.aspirate(100, rate=1.0),
         mock.call.aspirate(100, rate=1.0)
     ]
-    assert p200.aspirate.mock_calls == aspirate_expected
+    assert p200.aspirate.mock_calls == aspirate_expected_1
+
+    # scenario II: 2 arguments - repetitions, volume
+    p200.aspirate.reset_mock()
+    p200.dispense.reset_mock()
+    p200.mix(2, 100)
+
+    dispense_expected_2 = [
+        mock.call.dispense(100, rate=1.0),
+        mock.call.dispense(100, rate=1.0)
+    ]
+    assert p200.dispense.mock_calls == dispense_expected_2
+
+    aspirate_expected_2 = [
+        mock.call.aspirate(volume=100, location=None, rate=1.0),
+        mock.call.aspirate(100, rate=1.0)
+    ]
+    assert p200.aspirate.mock_calls == aspirate_expected_2
+
+    # scenario III: 2 arguments - repetitions, location
+    p200.aspirate.reset_mock()
+    p200.dispense.reset_mock()
+    p200.mix(2, plate[2])
+
+    dispense_expected_3 = [
+        mock.call.dispense(200, rate=1.0),
+        mock.call.dispense(200, rate=1.0)
+    ]
+    assert p200.dispense.mock_calls == dispense_expected_3
+
+    aspirate_expected_3 = [
+        mock.call.aspirate(volume=200, location=plate[2], rate=1.0),
+        mock.call.aspirate(200, rate=1.0)
+    ]
+    assert p200.aspirate.mock_calls == aspirate_expected_3
+
+    # scenario IV: 0 arguments
+    p200.aspirate.reset_mock()
+    p200.dispense.reset_mock()
+    p200.mix()
+
+    dispense_expected_3 = [
+        mock.call.dispense(200, rate=1.0)
+    ]
+    assert p200.dispense.mock_calls == dispense_expected_3
+
+    aspirate_expected_3 = [
+        mock.call.aspirate(volume=200, location=None, rate=1.0),
+    ]
+    assert p200.aspirate.mock_calls == aspirate_expected_3
 
 
 @pytest.mark.api1_only
