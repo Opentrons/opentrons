@@ -70,7 +70,7 @@ settings = [
         title='Use Protocol API version 2',
         description='Enable to use the Protocol API V2 Beta. With this flag '
                     'set, only Protocol API v2 protocols can be executed by '
-                    'the robot.',
+                    'the robot. A restart of the robot is required.',
         restart_required=True
     ),
     Setting(
