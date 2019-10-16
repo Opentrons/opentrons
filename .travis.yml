@@ -66,7 +66,7 @@ jobs:
           local-dir: api/docs/dist
           github-token: $GITHUB_TOKEN
           on:
-            branch: edge
+            branch: master
             repo: Opentrons/opentrons
 
         # push to real pypi on tag
