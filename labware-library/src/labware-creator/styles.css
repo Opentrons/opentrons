@@ -54,16 +54,6 @@
   }
 }
 
-a,
-a:visited {
-  color: var(--c-blue);
-}
-
-/* TODO (ka 2019-8-23): Removed nesting here to allow for easier style overrides/reduce specificity */
-h2 {
-  @apply --font-header-dark;
-}
-
 .labware_creator .labware_guide_button {
   @apply --link-btn-blue;
 }
