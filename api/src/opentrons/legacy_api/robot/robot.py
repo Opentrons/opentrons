@@ -52,15 +52,11 @@ def _load_container_by_name(container_name, version=None):
     Returns the container or raises a KeyError if it could not be found
     """
     for meth in (database.load_container,  # From the labware database
-                 load_new_labware,         # Fallback to built in v2 labware
                  _load_weird_container):   # honestly don't know
         log.debug(
             f"Trying to load container {container_name} via {meth.__name__}")
         try:
-            if meth == load_new_labware:
-                container = meth(container_name, version=version)
-            else:
-                container = meth(container_name)
+            container = meth(container_name)
             if meth == _load_weird_container:
                 container.properties['type'] = container_name
             log.info(f"Loaded {container_name} from {meth.__name__}")
@@ -68,7 +64,10 @@ def _load_container_by_name(container_name, version=None):
         except (ValueError, KeyError) as e:
             log.debug(f"{container_name} not in {meth.__name__} ({repr(e)})")
     else:
-        raise KeyError(f"Unknown labware {container_name}")
+        log.debug(
+            f"Trying to load container {container_name} version {version}"
+            f"from v2 labware store")
+        container = load_new_labware(container_name, version=version)
     return container
 
 
