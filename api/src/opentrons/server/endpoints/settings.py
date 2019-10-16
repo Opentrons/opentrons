@@ -2,7 +2,7 @@ from json import JSONDecodeError
 import logging
 import os
 import shutil
-from typing import Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
 from aiohttp import web
 from opentrons.config import (advanced_settings as advs,
                               robot_configs as rc,
@@ -71,9 +71,19 @@ async def get_advanced_settings(request: web.Request) -> web.Response:
     return web.json_response(res)
 
 
-def _get_adv_settings() -> dict:
+def _get_adv_settings() -> Dict[str, List[Dict[str, Union[str, bool, None]]]]:
     data = advs.get_all_adv_settings()
-    return {"settings": list(data.values())}
+
+    def _should_show(setting_dict):
+        if not setting_dict['show_if']:
+            return True
+        return advs.get_setting_with_env_overload(setting_dict['show_if'][0])\
+            == setting_dict['show_if'][1]
+
+    return {"settings": [
+        {k: v for k, v in setting.items() if k != 'show_if'}
+        for setting in data.values()
+        if _should_show(setting)]}
 
 
 async def set_advanced_setting(request: web.Request) -> web.Response:
@@ -89,7 +99,7 @@ async def set_advanced_setting(request: web.Request) -> web.Response:
     log.info(f'set_advanced_setting: {key} -> {value}')
     if key and key in advs.settings_by_id.keys():
         advs.set_adv_setting(key, value)
-        res = _get_adv_settings()
+        res: Dict[str, Any] = _get_adv_settings()
         status = 200
         if key == 'disableLogAggregation'\
            and ARCHITECTURE == SystemArchitecture.BUILDROOT:

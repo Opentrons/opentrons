@@ -1,19 +1,24 @@
 from opentrons.config.advanced_settings import _migrate
 
 
+good_file_version = 3
+good_file_settings = {
+    'shortFixedTrash': None,
+    'calibrateToBottom': None,
+    'deckCalibrationDots': None,
+    'disableHomeOnBoot': None,
+    'useProtocolApi2': None,
+    'useOldAspirationFunctions': None,
+    'disableLogAggregation': None,
+    'enableApi1BackCompat': None
+}
+
+
 def test_migrates_empty_object():
     settings, version = _migrate({})
 
-    assert(version == 2)
-    assert(settings == {
-      'shortFixedTrash': None,
-      'calibrateToBottom': None,
-      'deckCalibrationDots': None,
-      'disableHomeOnBoot': None,
-      'useProtocolApi2': None,
-      'useOldAspirationFunctions': None,
-      'disableLogAggregation': None
-    })
+    assert version == good_file_version
+    assert settings == good_file_settings
 
 
 def test_migrates_versionless_new_config():
@@ -26,8 +31,8 @@ def test_migrates_versionless_new_config():
       'useOldAspirationFunctions': True,
     })
 
-    assert(version == 2)
-    assert(settings == {
+    assert version == good_file_version
+    assert settings == {
       'shortFixedTrash': True,
       'calibrateToBottom': True,
       'deckCalibrationDots': None,
@@ -35,7 +40,8 @@ def test_migrates_versionless_new_config():
       'useProtocolApi2': None,
       'useOldAspirationFunctions': True,
       'disableLogAggregation': None,
-    })
+      'enableApi1BackCompat': None
+    }
 
 
 def test_migrates_versionless_old_config():
@@ -46,16 +52,17 @@ def test_migrates_versionless_old_config():
       'disable-home-on-boot': False,
     })
 
-    assert(version == 2)
-    assert(settings == {
+    assert version == good_file_version
+    assert settings == {
       'shortFixedTrash': None,
       'calibrateToBottom': None,
       'deckCalibrationDots': True,
       'disableHomeOnBoot': None,
       'useProtocolApi2': None,
       'useOldAspirationFunctions': None,
-      'disableLogAggregation': None
-    })
+      'disableLogAggregation': None,
+      'enableApi1BackCompat': None
+    }
 
 
 def test_ignores_invalid_keys():
@@ -64,8 +71,8 @@ def test_ignores_invalid_keys():
       'splitLabwareDefinitions': True
     })
 
-    assert(version == 2)
-    assert(settings == {
+    assert version == good_file_version
+    assert settings == {
       'shortFixedTrash': None,
       'calibrateToBottom': None,
       'deckCalibrationDots': None,
@@ -73,7 +80,8 @@ def test_ignores_invalid_keys():
       'useProtocolApi2': None,
       'useOldAspirationFunctions': None,
       'disableLogAggregation': None,
-    })
+      'enableApi1BackCompat': None
+    }
 
 
 def test_migrates_v1_config():
@@ -86,7 +94,7 @@ def test_migrates_v1_config():
       'useProtocolApi2': False,
       'useOldAspirationFunctions': True,
     })
-    assert version == 2
+    assert version == 3
     assert settings == {
         'shortFixedTrash': True,
         'calibrateToBottom': True,
@@ -94,5 +102,31 @@ def test_migrates_v1_config():
         'disableHomeOnBoot': True,
         'useProtocolApi2': False,
         'useOldAspirationFunctions': True,
-        'disableLogAggregation': None
+        'disableLogAggregation': None,
+        'enableApi1BackCompat': None
+    }
+
+
+def test_migrates_v2_config():
+    settings, version = _migrate({
+        '_version': 2,
+        'shortFixedTrash': True,
+        'calibrateToBottom': True,
+        'deckCalibrationDots': False,
+        'disableHomeOnBoot': True,
+        'useProtocolApi2': False,
+        'useOldAspirationFunctions': True,
+        'disableLogAggregation': False,
+    })
+
+    assert version == 3
+    assert settings == {
+        'shortFixedTrash': True,
+        'calibrateToBottom': True,
+        'deckCalibrationDots': False,
+        'disableHomeOnBoot': True,
+        'useProtocolApi2': False,
+        'useOldAspirationFunctions': True,
+        'disableLogAggregation': False,
+        'enableApi1BackCompat': None
     }
