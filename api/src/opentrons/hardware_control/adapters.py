@@ -33,7 +33,6 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
         :param args: Args to forward to the builder method
         :param kwargs: Kwargs to forward to the builder method
         """
-        print("called ")
         loop = asyncio.new_event_loop()
         kwargs['loop'] = loop
         args = [arg for arg in args
@@ -43,7 +42,6 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
             api = checked_loop.run_until_complete(builder(*args, **kwargs))
         else:
             api = builder(*args, **kwargs)
-        print("called")
         return cls(api, loop)
 
     def __init__(self,
@@ -68,7 +66,6 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
         super().__init__(
             target=self._event_loop_in_thread,
             name='SynchAdapter thread for {}'.format(repr(api)))
-        print(f"Building {id(self)}, self is {str(self)}")
         super().start()
 
     def __repr__(self):
