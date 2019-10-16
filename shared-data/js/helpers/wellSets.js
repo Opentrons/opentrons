@@ -15,8 +15,7 @@
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import uniq from 'lodash/uniq'
 import { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
-import type { LabwareDefinition2 } from '../types'
-import type { PipetteNameSpecs } from '../pipettes'
+import type { LabwareDefinition2, PipetteNameSpecs } from '../types'
 
 type WellSetByPrimaryWell = Array<Array<string>>
 

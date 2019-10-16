@@ -30,7 +30,7 @@ export default function InstrumentDiagram(props: Props) {
       break
     }
     default:
-    case 'OG': {
+    case 'GEN1': {
       imgSrc = channels === 1 ? singleSrc : multiSrc
     }
   }

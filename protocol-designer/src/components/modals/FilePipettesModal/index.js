@@ -26,25 +26,25 @@ import type {
 
 type PipetteFieldsData = $Diff<
   PipetteOnDeck,
-  { id: *, spec: *, tiprackLabwareDef: * }
+  {| id: mixed, spec: mixed, tiprackLabwareDef: mixed |}
 >
 
-type State = {
+type State = {|
   fields: NewProtocolFields,
   pipettesByMount: FormPipettesByMount,
   showEditPipetteConfirmation: boolean,
-}
+|}
 
-type Props = {
+type Props = {|
   useProtocolFields?: ?boolean,
   hideModal?: boolean,
   onCancel: () => mixed,
   initialPipetteValues?: $PropertyType<State, 'pipettesByMount'>,
-  onSave: ({
+  onSave: ({|
     newProtocolFields: NewProtocolFields,
     pipettes: Array<PipetteFieldsData>,
-  }) => mixed,
-}
+  |}) => mixed,
+|}
 
 const initialState: State = {
   fields: { name: '' },
@@ -74,21 +74,16 @@ export default class FilePipettesModal extends React.Component<Props, State> {
       this.setState(initialState)
   }
 
-  handlePipetteFieldsChange = (e: SyntheticInputEvent<*>) => {
-    const value: string = e.currentTarget.value
-    if (!e.currentTarget.name) {
-      console.error(
-        'handlePipetteFieldsChange expected nested field name, got no name with value:',
-        e.currentTarget.value
-      )
-      return
+  handlePipetteFieldsChange = (
+    mount: Mount,
+    fieldName: $Keys<FormPipette>,
+    value: string | null
+  ) => {
+    let nextMountState: $Shape<FormPipette> = { [fieldName]: value }
+    if (fieldName === 'pipetteName') {
+      nextMountState = { ...nextMountState, tiprackDefURI: null }
     }
-    const splitFieldName: [Mount, string] = e.currentTarget.name.split('.')
-    const mount = splitFieldName[0]
-    const fieldName = splitFieldName[1]
-    let nextMountState = { [fieldName]: value }
-    if (fieldName === 'pipetteName')
-      nextMountState = { ...nextMountState, tiprackModel: null }
+
     this.setState({
       pipettesByMount: {
         ...this.state.pipettesByMount,
@@ -186,7 +181,7 @@ export default class FilePipettesModal extends React.Component<Props, State> {
             <PipetteFields
               initialTabIndex={1}
               values={this.state.pipettesByMount}
-              handleChange={this.handlePipetteFieldsChange}
+              onFieldChange={this.handlePipetteFieldsChange}
             />
           </form>
           <div className={styles.button_row}>

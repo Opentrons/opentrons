@@ -33,7 +33,7 @@ export function getDiagramsSrc(props: DiagramProps) {
   switch (displayCategory) {
     case 'GEN2':
       return require(`./images/${direction}-${mount}-${channelsKey}-GEN2-${diagram}@3x.png`)
-    case 'OG':
+    case 'GEN1':
     default:
       return require(`./images/${direction}-${mount}-${channelsKey}-${diagram}@3x.png`)
   }

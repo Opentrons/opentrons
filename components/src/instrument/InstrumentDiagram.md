@@ -1,17 +1,17 @@
-Single channel OG:
+Single channel GEN1:
 
 ````js
 <InstrumentDiagram
   mount="left"
-  pipetteSpecs={{ channels: 1, displayCategory: 'OG' }}
+  pipetteSpecs={{ channels: 1, displayCategory: 'GEN1' }}
 />```
 
-Multi channel OG:
+Multi channel GEN1:
 
 ```js
 <InstrumentDiagram
   mount="right"
-  pipetteSpecs={{ channels: 8, displayCategory: 'OG' }}
+  pipetteSpecs={{ channels: 8, displayCategory: 'GEN1' }}
 />```
 
 Single channel GEN2:

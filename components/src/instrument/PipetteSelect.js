@@ -8,7 +8,7 @@ import without from 'lodash/without'
 import Select, { components } from 'react-select'
 
 import {
-  type PipetteNameSpec,
+  type PipetteNameSpecs,
   getAllPipetteNames,
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
@@ -25,12 +25,23 @@ import styles from './PipetteSelect.css'
 
 type Props = {|
   /** currently selected value, optional in case selecting triggers immediate action */
-  value?: string,
+  value?: PipetteNameSpecs | null,
   /** react-select change handler */
-  onPipetteChange: (option: any) => mixed,
+  onPipetteChange: (option: PipetteNameSpecs | null) => mixed,
   /** list of pipette names to omit */
   nameBlacklist?: Array<string>,
+  /** whether or not "None" shows up as the default option */
+  enableNoneOption?: boolean,
+  /** input tabIndex */
+  tabIndex?: string,
+  /** classes to apply to the top-level component */
+  className?: string,
 |}
+
+type NoneOption = {| value: null |}
+const OPTION_NONE: NoneOption = { value: null }
+// TODO(mc, 2019-10-14): i18n
+const OPTION_NONE_LABEL = 'None'
 
 const SELECT_STYLES = {
   input: () => ({ padding: 0 }),
@@ -42,6 +53,7 @@ const SELECT_STYLES = {
     padding: '0 0.75rem',
   }),
 }
+
 const clearStyles = () => null
 
 const PipetteSelect = (props: Props) => {
@@ -51,13 +63,24 @@ const PipetteSelect = (props: Props) => {
   )
   const allPipetteNameSpecs = map(filteredNames, getPipetteNameSpecs)
   const nameSpecsByCategory = groupBy(allPipetteNameSpecs, 'displayCategory')
-  const groupedOptions = map(nameSpecsByCategory, nameSpecs => ({
+  let groupedOptions = map(nameSpecsByCategory, nameSpecs => ({
     options: nameSpecs,
   })).reverse()
+
+  if (props.enableNoneOption === true) {
+    groupedOptions = [{ options: [OPTION_NONE] }, ...groupedOptions]
+  }
+
+  const handleChange = (option: PipetteNameSpecs | NoneOption) => {
+    const value = option.value === null ? null : option
+    props.onPipetteChange(value)
+  }
+
   return (
     <Select
       isSearchable={false}
-      className={styles.pipette_select}
+      menuPosition="fixed"
+      className={props.className}
       styles={SELECT_STYLES}
       components={{
         Control,
@@ -65,12 +88,15 @@ const PipetteSelect = (props: Props) => {
         Menu,
         Group,
         Option,
-        ValueContainer,
+        SingleValue,
+        Placeholder: props.enableNoneOption
+          ? NonePlaceholder
+          : components.Placeholder,
         IndicatorSeparator: null,
       }}
       options={groupedOptions}
-      onChange={props.onPipetteChange}
-      {...props}
+      onChange={handleChange}
+      value={props.value}
     />
   )
 }
@@ -122,7 +148,7 @@ function Group(props: any) {
   )
 }
 
-function PipetteNameItem(props: PipetteNameSpec) {
+function PipetteNameItem(props: PipetteNameSpecs) {
   const { channels, displayName, displayCategory } = props
   const volumeClassMaybeMatch = displayName && displayName.match(/P\d+/)
   const volumeClass = volumeClassMaybeMatch ? volumeClassMaybeMatch[0] : ''
@@ -134,13 +160,11 @@ function PipetteNameItem(props: PipetteNameSpec) {
     displayChannels = '8-Channel'
   }
 
-  const cleanDisplayCategory = displayCategory === 'OG' ? '' : displayCategory
-
   return (
     <>
       <div className={styles.pipette_volume_class}>{volumeClass}</div>
       <div className={styles.pipette_channels}>{displayChannels}</div>
-      <div className={styles.pipette_category}>{cleanDisplayCategory}</div>
+      <div className={styles.pipette_category}>{displayCategory}</div>
     </>
   )
 }
@@ -150,21 +174,26 @@ function Option(props: any) {
 
   return (
     <div ref={innerRef} className={styles.pipette_option} {...innerProps}>
-      <PipetteNameItem {...data} />
+      {data.value === null ? (
+        <NonePlaceholder />
+      ) : (
+        <PipetteNameItem {...data} />
+      )}
     </div>
   )
 }
 
-function ValueContainer(props: any) {
-  if (!props.hasValue) {
-    return <components.ValueContainer {...props} />
-  }
-  const value = props.getValue()
+function NonePlaceholder() {
+  return OPTION_NONE_LABEL
+}
+
+function SingleValue(props: any) {
+  const { data } = props
 
   return (
-    <components.ValueContainer {...props}>
-      <PipetteNameItem {...value[0]} />
-    </components.ValueContainer>
+    <components.SingleValue {...props}>
+      {data.value === null ? <NonePlaceholder /> : data.displayName}
+    </components.SingleValue>
   )
 }
 
