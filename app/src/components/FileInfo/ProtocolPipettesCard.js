@@ -20,11 +20,9 @@ const TITLE = 'Required Pipettes'
 function ProtocolPipettes(props: Props) {
   const dispatch: Dispatch = useDispatch()
   const pipetteInfo = usePipetteInfo(props.robot.name)
-  React.useEffect(() => dispatch(fetchPipettes(props.robot)), [
-    dispatch,
-    props.robot,
-  ])
-
+  React.useEffect(() => {
+    dispatch(fetchPipettes(props.robot))
+  }, [dispatch, props.robot])
   if (pipetteInfo.length === 0) return null
 
   const changePipetteUrl = `/robots/${props.robot.name}/instruments`

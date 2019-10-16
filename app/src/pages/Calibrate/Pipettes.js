@@ -55,7 +55,9 @@ function CalibratePipettesPage(props: Props) {
     changePipetteUrl,
   } = props
 
-  React.useEffect(fetchPipettes, [fetchPipettes])
+  React.useEffect(() => {
+    fetchPipettes()
+  }, [fetchPipettes])
   // redirect back to mountless route if mount doesn't exist
   if (params.mount && !currentPipette) {
     return <Redirect to={url.replace(`/${params.mount}`, '')} />
