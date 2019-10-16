@@ -150,3 +150,13 @@ def test_robot_move(singletons, monkeypatch):
     instr_mock = mock.Mock()
     singletons['robot'].move_to('hi', instr_mock)
     assert instr_mock.move_to.call_args_list[0] == (('hi', 'arc'), {})
+
+
+@pytest.mark.api2_only
+def test_robot_reset(singletons):
+    singletons['instruments'].P300_Single('right')
+    singletons['robot'].head_speed(204, x=2)
+    singletons['robot'].reset()
+    assert singletons['robot']._instrs == {}
+    assert singletons['robot']._head_speed_override is None
+    assert singletons['robot']._ctx.max_speeds == {}

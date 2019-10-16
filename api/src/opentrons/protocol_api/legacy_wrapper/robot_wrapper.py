@@ -8,7 +8,10 @@ from .util import log_call
 if TYPE_CHECKING:
     from .instrument_wrapper import Pipette
     from ..contexts import ProtocolContext
+    from ..geometry import Deck
+    from ..labware import Labware
     from .api import BCInstruments, BCLabware, BCModules
+    from opentrons import types
 
 
 log = logging.getLogger(__name__)
@@ -72,6 +75,9 @@ class Robot():
         self._head_speed_override: Optional[float] = None
         self._plunger_max_speed_overrides: Dict[str, float] = {}
         self._instrs: Dict[str, 'Pipette'] = {}
+        self._bc_instr: Optional['BCInstruments'] = None
+        self._bc_lw: Optional['BCLabware'] = None
+        self._bc_mods: Optional['BCModules'] = None
 
     def _set_globals(
             self, instr: 'BCInstruments', lw: 'BCLabware', mod: 'BCModules'):
@@ -93,13 +99,18 @@ class Robot():
         protocols.
         """
         self._head_speed_override = None
-        self._intrs = {}
-        self._bc_instruments._robot_wrapper = self
+        self._plunger_max_speed_overrides = {}
+        self._instrs = {}
+        for ax in list(self._ctx.max_speeds.keys()):
+            self._ctx.max_speeds[ax] = None
+        assert self._bc_instr and self._bc_mods and self._bc_lw,\
+            'Backcompat layer not properly initialized'
+        self._bc_instr._robot_wrapper = self
         self._bc_mods._ctx = self._ctx
         self._bc_lw._ctx = self._ctx
 
     @log_call(log)
-    def connect(self, port: str = None, options: Any = None):
+    def connect(self, port: str = None, options: Any = None) -> bool:
         """
         Connects the robot to a serial port. In most cases, this does not need
         to be called; for instance, it does not need to be called in a protocol
@@ -128,8 +139,13 @@ class Robot():
 
     @log_call(log)
     def head_speed(
-            self, combined_speed=None,
-            x=None, y=None, z=None, a=None, b=None, c=None):
+            self, combined_speed: float = None,
+            x: float = None,
+            y: float = None,
+            z: float = None,
+            a: float = None,
+            b: float = None,
+            c: float = None):
         """
         Set the speeds (mm/sec) of the robot
 
@@ -151,7 +167,7 @@ class Robot():
         for mount, maxval in plunger_maxes.items():
             if maxval is None:
                 continue
-            instr = self._instrs.get(mount)
+            instr = self._instrs.get(mount)  # type: ignore
             self._plunger_max_speed_overrides[mount] = maxval
             if instr:
                 instr._set_plunger_max_speed_override(maxval)
@@ -159,9 +175,9 @@ class Robot():
     @log_call(log)
     def move_to(
             self,
-            location,
-            instrument,
-            strategy='arc',
+            location: 'types.Location',
+            instrument: 'Pipette',
+            strategy: str = 'arc',
             **kwargs):
         """
         Move an instrument to a coordinate, container or a coordinate within
@@ -191,16 +207,16 @@ class Robot():
         """
         return self._ctx.disconnect()
 
-    @log_call(log)
-    def deck(self):
+    @property
+    def deck(self) -> 'Deck':
         return self._ctx.deck
 
-    @log_call(log)
-    def fixed_trash(self):
+    @property
+    def fixed_trash(self) -> 'Labware':
         return self._ctx.fixed_trash
 
     @log_call(log)
-    def pause(self, msg=None):
+    def pause(self, msg: str = None):
         """
         Pauses execution of the protocol. Use :meth:`resume` to resume
         """

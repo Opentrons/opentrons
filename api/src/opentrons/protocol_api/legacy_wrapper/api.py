@@ -241,5 +241,6 @@ def build_globals(context: 'ProtocolContext'):
     instr = BCInstruments(rob)
     lw = BCLabware(context)
     mod = BCModules(context)
+    rob._set_globals(instr, lw, mod)
 
     return {'robot': rob, 'instruments': instr, 'labware': lw, 'modules': mod}
