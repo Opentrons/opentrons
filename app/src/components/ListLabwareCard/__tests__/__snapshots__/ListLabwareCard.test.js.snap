@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ListLabwareCard component renders 1`] = `
+<Card
+  title="Custom Labware Listing"
+/>
+`;

@@ -1,19 +1,21 @@
 // @flow
 // refreshable card component
+// DO NOT USE THIS COMPONENT; prefer useInterval hook
 import * as React from 'react'
 
 import { IconButton } from '../buttons'
 import Card from './Card'
 import styles from './structure.css'
 
-type Props = React.ElementProps<typeof Card> & {
+type Props = {|
+  ...React.ElementProps<typeof Card>,
   /** a change in the watch prop will trigger a refresh */
   watch?: string,
   /** refreshing flag */
   refreshing?: boolean,
   /** refresh function */
   refresh: () => mixed,
-}
+|}
 
 /**
  * Card variant for displaying refreshable data. `props.refresh` will be called
@@ -22,10 +24,10 @@ type Props = React.ElementProps<typeof Card> & {
  */
 export default class RefreshCard extends React.Component<Props> {
   render() {
-    const { refresh, refreshing, children } = this.props
+    const { watch, refresh, refreshing, children, ...cardProps } = this.props
 
     return (
-      <Card {...this.props}>
+      <Card {...cardProps}>
         {refreshing != null && (
           <IconButton
             name={refreshing ? 'ot-spinner' : 'refresh'}

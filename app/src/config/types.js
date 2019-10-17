@@ -11,6 +11,11 @@ export type DevInternalFlag =
   | 'allPipetteConfig'
   | 'tempdeckControls'
   | 'enablePipettePlus'
+  | 'customLabware'
+
+export type FeatureFlags = $Shape<{|
+  [DevInternalFlag]: boolean | void,
+|}>
 
 export type Config = {
   devtools: boolean,
@@ -69,9 +74,7 @@ export type Config = {
   },
 
   // internal development flags
-  devInternal?: {
-    [DevInternalFlag]: boolean,
-  },
+  devInternal?: FeatureFlags,
 }
 
 export type UpdateConfigAction = {|

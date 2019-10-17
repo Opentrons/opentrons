@@ -71,7 +71,7 @@ export default function AdvancedSettingsCard(props: Props) {
   }, [dispatch, robot])
 
   return (
-    <Card title={TITLE} disabled={disabled} column>
+    <Card title={TITLE} disabled={disabled}>
       <LabeledButton
         label="Download Logs"
         buttonProps={{

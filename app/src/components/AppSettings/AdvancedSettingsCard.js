@@ -99,7 +99,7 @@ function AdvancedSettingsCard(props: Props) {
             <LabeledToggle
               key={flag}
               label={`__DEV__ ${startCase(flag)}`}
-              toggledOn={props.devInternal ? props.devInternal[flag] : false}
+              toggledOn={Boolean(props.devInternal?.[flag])}
               onClick={() => props.toggleDevInternalFlag(flag)}
             />
           ))}
