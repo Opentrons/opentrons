@@ -1,101 +1,48 @@
 // @flow
 // setup pipettes component
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
-import { selectors as robotSelectors } from '../../robot'
-import { fetchPipettes, getPipettesState } from '../../robot-api'
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import { fetchPipettes } from '../../robot-api'
 import InstrumentItem from './InstrumentItem'
-import { RefreshWrapper } from '../Page'
 import { SectionContentHalf } from '../layout'
 import InfoSection from './InfoSection'
 import InstrumentWarning from './InstrumentWarning'
 
-import type { State, Dispatch } from '../../types'
-import type { Pipette } from '../../robot'
-import type { PipettesState } from '../../robot-api'
+import type { Dispatch } from '../../types'
 import type { Robot } from '../../discovery'
+import usePipetteInfo from './usePipetteInfo'
 
-type OP = {| robot: Robot |}
-
-type SP = {|
-  pipettes: Array<Pipette>,
-  actualPipettes: PipettesState,
-  changePipetteUrl: string,
-|}
-
-type DP = {| fetchPipettes: () => mixed |}
-
-type Props = { ...OP, ...SP, ...DP }
+type Props = {| robot: Robot |}
 
 const TITLE = 'Required Pipettes'
 
-export default connect<Props, OP, SP, DP, State, Dispatch>(
-  mapStateToProps,
-  mapDispatchToProps
-)(ProtocolPipettes)
-
 function ProtocolPipettes(props: Props) {
-  const { pipettes, actualPipettes, fetchPipettes, changePipetteUrl } = props
+  const dispatch: Dispatch = useDispatch()
+  const pipetteInfo = usePipetteInfo(props.robot.name)
+  React.useEffect(() => {
+    dispatch(fetchPipettes(props.robot))
+  }, [dispatch, props.robot])
+  if (pipetteInfo.length === 0) return null
 
-  if (pipettes.length === 0) return null
-
-  const pipetteInfo = pipettes.map(p => {
-    const pipetteConfig = p.modelSpecs
-    const actualPipetteConfig = getPipetteModelSpecs(
-      actualPipettes[p.mount]?.model || ''
-    )
-    const displayName = pipetteConfig?.displayName || 'N/A'
-
-    let pipettesMatch = true
-
-    if (pipetteConfig && pipetteConfig.name !== actualPipetteConfig?.name) {
-      pipettesMatch = false
-    }
-
-    return {
-      ...p,
-      displayName,
-      pipettesMatch,
-    }
-  })
+  const changePipetteUrl = `/robots/${props.robot.name}/instruments`
 
   const pipettesMatch = pipetteInfo.every(p => p.pipettesMatch)
 
   return (
-    <RefreshWrapper refresh={fetchPipettes}>
-      <InfoSection title={TITLE}>
-        <SectionContentHalf>
-          {pipetteInfo.map(p => (
-            <InstrumentItem
-              key={p.mount}
-              match={p.pipettesMatch}
-              mount={p.mount}
-            >
-              {p.displayName}
-            </InstrumentItem>
-          ))}
-        </SectionContentHalf>
-        {!pipettesMatch && (
-          <InstrumentWarning instrumentType="pipette" url={changePipetteUrl} />
-        )}
-      </InfoSection>
-    </RefreshWrapper>
+    <InfoSection title={TITLE}>
+      <SectionContentHalf>
+        {pipetteInfo.map(p => (
+          <InstrumentItem key={p.mount} match={p.pipettesMatch} mount={p.mount}>
+            {p.displayName}
+          </InstrumentItem>
+        ))}
+      </SectionContentHalf>
+      {!pipettesMatch && (
+        <InstrumentWarning instrumentType="pipette" url={changePipetteUrl} />
+      )}
+    </InfoSection>
   )
 }
 
-function mapStateToProps(state: State, ownProps: OP): SP {
-  return {
-    pipettes: robotSelectors.getPipettes(state),
-    actualPipettes: getPipettesState(state, ownProps.robot.name),
-    // TODO(mc, 2018-10-10): pass this prop down from page
-    changePipetteUrl: `/robots/${ownProps.robot.name}/instruments`,
-  }
-}
-
-function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
-  return {
-    fetchPipettes: () => dispatch(fetchPipettes(ownProps.robot)),
-  }
-}
+export default ProtocolPipettes
