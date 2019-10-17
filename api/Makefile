@@ -53,9 +53,6 @@ ssh_opts ?= -o stricthostkeychecking=no -o userknownhostsfile=/dev/null
 
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 
-# PDF builds must succeed on ci, not necessary for local builds
-which_pdf := $(if $(CI),docs-pdf-ci,docs-pdf-local)
-
 # Source discovery
 # For the python sources
 ot_py_sources := $(filter %.py,$(shell $(SHX) find src/opentrons/))
@@ -79,7 +76,7 @@ install:
 	$(pipenv_envvars) pipenv run pip freeze
 
 .PHONY: clean
-clean:
+clean: docs-clean
 	$(clean_cmd)
 
 .PHONY: uninstall
@@ -109,41 +106,32 @@ lint: $(ot_py_sources)
 	$(python) -m mypy src/opentrons
 	$(python) -m pylama src/opentrons tests
 
-.PHONY: docs-html docs-doctest docs-pdf-prep docs-pdf-local docs-pdf-ci docs-pdf docs
+docs/build/html/v%: docs/v% local-install
+	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
 
-docs-html: local-install
-	$(SHX) rm -rf docs/build/html
-	$(sphinx_build) -b html -d docs/build/doctrees docs/source docs/build/html
-	$(SHX) mkdir -p docs/dist
-	$(SHX) cp -R docs/build/html/. docs/public/. docs/dist
+docs/build/pdf/OpentronsPythonAPIV%.pdf: docs/v% local-install
+	$(sphinx_build) -b latex -d docs/build/doctrees $< $(@D)
+	$(MAKE) -C $(@D) all-pdf $(if $(CI),>/dev/null,|| $(SHX) echo "latex build failed (pdflatex not installed?)")
+	$(SHX) ls $(@D)/*.pdf $(if $(CI),,|| $(SHX) echo "no pdf produced")
 
-docs-doctest: local-install
-	$(SHX) rm -rf docs/build/doctest
-	$(sphinx_build) -b doctest -d docs/build/doctrees docs/source docs/build/doctest
+docs/dist/v%: docs/build/html/v% docs/build/pdf/OpentronsPythonAPIV%.pdf
+	$(SHX) mkdir -p $@
+	$(SHX) cp -R $^ $(@D) $(if $(CI),,|| true)
 
-docs-pdf-prep: local-install
-	$(SHX) rm -rf docs/build/pdf
-	$(SHX) mkdir -p docs/dist
+docs/dist/ot1: docs/ot1
+	$(SHX) mkdir -p $@
+	$(SHX) cp -R $< $(@D)
 
-docs-pdf-local: docs-pdf-prep
-	-$(sphinx_build) -b latex -d docs/build/doctrees docs/source docs/build/pdf
-	-$(MAKE) -C docs/build/pdf all-pdf
-	$(SHX) ls docs/build/pdf/*.pdf
-	$(SHX) cp docs/build/pdf/*.pdf docs/dist/
+docs/dist/%: docs/root/%
+	$(SHX) mkdir -p $(@D)
+	$(SHX) cp -R docs/root/* docs/dist/
 
-docs-pdf-ci: docs-pdf-prep
-	$(sphinx_build) -b latex -d docs/build/doctrees docs/source docs/build/pdf
-	$(MAKE) -C docs/build/pdf all-pdf >/dev/null
-	$(SHX) ls docs/build/pdf/*.pdf
-	$(SHX) cp docs/build/pdf/*.pdf docs/dist/
+.PHONY: docs
+docs: docs/dist/index.html docs/dist/v1 docs/dist/v2 docs/dist/ot1
 
-docs-pdf: $(which_pdf)
-
-docs: docs-html docs-pdf
-
-.PHONY: publish
-publish:
-	cd scripts && publish.sh && doc-deploy.sh
+.PHONY: docs-clean
+docs-clean:
+	$(SHX) rm -rf docs/dist docs/build
 
 .PHONY: dev
 dev: export ENABLE_VIRTUAL_SMOOTHIE := true
