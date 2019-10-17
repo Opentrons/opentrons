@@ -8,3 +8,13 @@ export const getEnableGen2Pipettes: Selector<?boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_GEN2_PIPETTES
 )
+
+export const getEnabledPrereleaseMode: Selector<?boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.PRERELEASE_MODE
+)
+
+export const getEnableModules: Selector<?boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_MODULES
+)

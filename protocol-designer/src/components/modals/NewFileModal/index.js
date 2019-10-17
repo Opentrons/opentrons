@@ -7,6 +7,7 @@ import uniq from 'lodash/uniq'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { uuid } from '../../../utils'
 import i18n from '../../../localization'
+import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { selectors, actions as navigationActions } from '../../../navigation'
 import {
   actions as fileActions,
@@ -22,12 +23,13 @@ import type { PipetteOnDeck, NormalizedPipette } from '../../../step-forms'
 type Props = ElementProps<typeof FilePipettesModal>
 
 type OP = {|
-  useProtocolFields: $PropertyType<Props, 'useProtocolFields'>,
+  showProtocolFields: $PropertyType<Props, 'showProtocolFields'>,
 |}
 
 type SP = {|
   hideModal: $PropertyType<Props, 'hideModal'>,
   _hasUnsavedChanges: ?boolean,
+  modulesEnabled: ?boolean,
 |}
 
 type DP = {|
@@ -45,6 +47,7 @@ function mapStateToProps(state: BaseState): SP {
   return {
     hideModal: !selectors.getNewProtocolModal(state),
     _hasUnsavedChanges: loadFileSelectors.getHasUnsavedChanges(state),
+    modulesEnabled: featureFlagSelectors.getEnableModules(state),
   }
 }
 
@@ -101,6 +104,8 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
 function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
   return {
     ...ownProps,
+    modulesEnabled: stateProps.modulesEnabled,
+    showModulesFields: true,
     hideModal: stateProps.hideModal,
     onCancel: dispatchProps.onCancel,
     onSave: fields => {

@@ -9,6 +9,7 @@
   "title": {
     "information": "Information",
     "feature_flags": "Experimental Settings",
+    "prerelease_mode_flags": "Prerelease Mode Flags (INTERNAL USE ONLY)",
     "hints": "Hints",
     "privacy": "Privacy"
   },

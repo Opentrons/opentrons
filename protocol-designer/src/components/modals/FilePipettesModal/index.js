@@ -36,7 +36,8 @@ type State = {|
 |}
 
 type Props = {|
-  useProtocolFields?: ?boolean,
+  showProtocolFields?: ?boolean,
+  showModulesFields?: ?boolean,
   hideModal?: boolean,
   onCancel: () => mixed,
   initialPipetteValues?: $PropertyType<State, 'pipettesByMount'>,
@@ -44,6 +45,7 @@ type Props = {|
     newProtocolFields: NewProtocolFields,
     pipettes: Array<PipetteFieldsData>,
   |}) => mixed,
+  modulesEnabled: ?boolean,
 |}
 
 const initialState: State = {
@@ -133,7 +135,7 @@ export default class FilePipettesModal extends React.Component<Props, State> {
 
   render() {
     if (this.props.hideModal) return null
-    const { useProtocolFields } = this.props
+    const { showProtocolFields } = this.props
 
     const { name } = this.state.fields
     const { left, right } = this.state.pipettesByMount
@@ -161,12 +163,12 @@ export default class FilePipettesModal extends React.Component<Props, State> {
             }}
           >
             <h2 className={styles.new_file_modal_title}>
-              {useProtocolFields
+              {showProtocolFields
                 ? i18n.t('modal.new_protocol.title')
                 : i18n.t('modal.edit_pipettes.title')}
             </h2>
 
-            {useProtocolFields && (
+            {showProtocolFields && (
               <FormGroup className={formStyles.stacked_row} label="Name">
                 <InputField
                   autoFocus
@@ -184,6 +186,9 @@ export default class FilePipettesModal extends React.Component<Props, State> {
               onFieldChange={this.handlePipetteFieldsChange}
             />
           </form>
+          {this.props.modulesEnabled && this.props.showModulesFields && (
+            <div>TODO modules here!</div>
+          )}
           <div className={styles.button_row}>
             <OutlineButton
               onClick={this.props.onCancel}
@@ -194,7 +199,7 @@ export default class FilePipettesModal extends React.Component<Props, State> {
             </OutlineButton>
             <OutlineButton
               onClick={
-                useProtocolFields
+                showProtocolFields
                   ? this.handleSubmit
                   : this.showEditPipetteConfirmationModal
               }
