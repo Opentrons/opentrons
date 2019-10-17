@@ -3,7 +3,7 @@
 import i18n from './localization'
 import { selectors as loadFileSelectors } from './load-file'
 import { selectors as analyticsSelectors } from './analytics'
-import { initializeAnalytics } from './analytics/integrations'
+import { initializeFullstory } from './analytics/fullstory'
 
 const initialize = (store: Object) => {
   if (process.env.NODE_ENV === 'production') {
@@ -16,7 +16,7 @@ const initialize = (store: Object) => {
 
     // Initialize analytics if user has already opted in
     if (analyticsSelectors.getHasOptedIn(store.getState())) {
-      initializeAnalytics()
+      initializeFullstory()
     }
   }
 }

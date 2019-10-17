@@ -1,17 +1,17 @@
 // @flow
-import { initializeAnalytics, shutdownAnalytics } from './integrations'
+import { initializeFullstory, shutdownFullstory } from './fullstory'
 
-export type SetOptIn = {
+export type SetOptIn = {|
   type: 'SET_OPT_IN',
   payload: boolean,
-}
+|}
 
 const _setOptIn = (payload: $PropertyType<SetOptIn, 'payload'>): SetOptIn => {
   // side effects
   if (payload) {
-    initializeAnalytics()
+    initializeFullstory()
   } else {
-    shutdownAnalytics()
+    shutdownFullstory()
   }
 
   return {
