@@ -7,5 +7,13 @@
   "OT_PD_ENABLE_GEN2_PIPETTES": {
     "title": "Enable GEN2 pipettes",
     "description": "Enable the selection of Opentrons GEN2 pipettes when creating protocols"
+  },
+  "PRERELEASE_MODE": {
+    "title": "Use prerelease mode",
+    "description": "Show in-progress features for testing & internal use"
+  },
+  "OT_PD_ENABLE_MODULES": {
+    "title": "Enable modules in PD",
+    "description": "!"
   }
 }

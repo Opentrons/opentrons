@@ -7,7 +7,13 @@
 export const DEPRECATED_FLAGS = ['OT_PD_SHOW_UPLOAD_CUSTOM_LABWARE_BUTTON']
 
 // union of feature flag string constant IDs
-export type FlagTypes = 'OT_PD_ENABLE_GEN2_PIPETTES'
+export type FlagTypes =
+  | 'OT_PD_ENABLE_GEN2_PIPETTES'
+  | 'PRERELEASE_MODE'
+  | 'OT_PD_ENABLE_MODULES'
+
+// flags that are not in this list only show in prerelease mode
+export const userFacingFlags: Array<FlagTypes> = []
 
 export type Flags = $Shape<{|
   [flag: FlagTypes]: ?boolean,

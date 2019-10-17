@@ -3,6 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import { DragDropContext } from 'react-dnd'
 import MouseBackEnd from 'react-dnd-mouse-backend'
+import PrereleaseModeIndicator from './PrereleaseModeIndicator'
 import ConnectedNav from '../containers/ConnectedNav'
 import ConnectedSidebar from '../containers/ConnectedSidebar'
 import ConnectedTitleBar from '../containers/ConnectedTitleBar'
@@ -24,6 +25,7 @@ function ProtocolEditor() {
     <div>
       <TopPortalRoot />
       {showGateModal ? <GateModal /> : null}
+      <PrereleaseModeIndicator />
       <div className={styles.wrapper}>
         <ConnectedNav />
         <ConnectedSidebar />
@@ -36,7 +38,7 @@ function ProtocolEditor() {
               MAIN_CONTENT_FORCED_SCROLL_CLASSNAME
             )}
           >
-            <NewFileModal useProtocolFields />
+            <NewFileModal showProtocolFields />
             <FileUploadMessageModal />
             <LabwareUploadMessageModal />
             {/* TODO: Ian 2018-06-28 All main page modals will go here */}

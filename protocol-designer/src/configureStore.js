@@ -77,6 +77,13 @@ export default function configureStore() {
   store.dispatch(rehydratePersistedAction())
   store.subscribe(makePersistSubscriber(store))
 
+  global.enablePrereleaseMode = () => {
+    store.dispatch({
+      type: 'SET_FEATURE_FLAGS',
+      payload: { PRERELEASE_MODE: true },
+    })
+  }
+
   function replaceReducers() {
     const nextRootReducer = getRootReducer()
     store.replaceReducer(nextRootReducer)
