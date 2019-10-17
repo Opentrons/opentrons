@@ -368,7 +368,7 @@ Returns the current status of the lid position. It can be one of the strings ``'
 
 Heated Lid Temperature Status
 ++++++++++++++++++++++
-Returns the current status of the heated lid temperature. It can be one of the strings ``'holding at target'`` or ``'idle'``.
+Returns the current status of the heated lid temperature. It can be one of the strings ``'holding at target'``, ``'heating'``, ``'idle'``,  or ``'error'``.
 
 .. code-block:: python
 
@@ -376,7 +376,7 @@ Returns the current status of the heated lid temperature. It can be one of the s
 
 Block Temperature Status
 ++++++++++++++++++++++++
-Returns the current status of the well block temperature controller. It can be one of the strings ``'holding at target'``, ``'cooling'``, or ``'heating'``.
+Returns the current status of the well block temperature controller. It can be one of the strings ``'holding at target'``, ``'cooling'``, ``'heating'``, ``'idle'``, or ``'error'``.
 
 .. code-block:: python
 

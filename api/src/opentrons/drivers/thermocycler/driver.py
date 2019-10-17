@@ -366,7 +366,9 @@ class Thermocycler:
 
     @property
     def lid_temp_status(self):
-        if self.lid_target is None or self.lid_temp is None:
+        if self.lid_temp is None:
+            _status = 'error'
+        if self.lid_target is None:
             _status = 'idle'
         else:
             diff = self.lid_target - self.lid_temp
@@ -380,7 +382,9 @@ class Thermocycler:
 
     @property
     def status(self):
-        if self.target is None or self.temperature is None:
+        if self.temperature is None:
+            _status = 'error'
+        elif self.target is None:
             _status = 'idle'
         else:
             diff = self.target - self.temperature
