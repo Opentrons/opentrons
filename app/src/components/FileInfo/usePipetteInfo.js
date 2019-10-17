@@ -20,11 +20,8 @@ function usePipetteInfo(robotName: string) {
     )
     const displayName = pipetteConfig?.displayName || 'N/A'
 
-    let pipettesMatch = true
-
-    if (pipetteConfig && pipetteConfig.name !== actualPipetteConfig?.name) {
-      pipettesMatch = false
-    }
+    const pipettesMatch =
+      pipetteConfig && pipetteConfig.name === actualPipetteConfig?.name
 
     return {
       ...p,
