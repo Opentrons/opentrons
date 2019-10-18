@@ -23,7 +23,10 @@ const IntroCopy = () => (
       This tool will allow you to create definitions for well plates,
       reservoirs, tubes in Opentrons tube racks, and plates/tubes in Opentrons
       aluminum blocks that do not already exist on the{' '}
-      <Link to={LINK_LABWARE_LIBRARY}>Labware Library</Link>.
+      <Link to={LINK_LABWARE_LIBRARY} className={styles.link}>
+        Labware Library
+      </Link>
+      .
     </p>
     <p>
       Use this tool only if your labware meets the following{' '}
@@ -39,7 +42,10 @@ const IntroCopy = () => (
     </ol>
     <p>
       For all other custom labware, please use this{' '}
-      <LinkOut href={LINK_CUSTOM_LABWARE_FORM}>request form</LinkOut>.
+      <LinkOut href={LINK_CUSTOM_LABWARE_FORM} className={styles.link}>
+        request form
+      </LinkOut>
+      .
     </p>
 
     <div className={styles.callout}>
@@ -48,8 +54,11 @@ const IntroCopy = () => (
         mechanical drawings directly from your supplier/manufacturer and only
         rely on manual measurements (using calipers when possible) to supplement
         missing information. Refer to the bottom of{' '}
-        <LinkOut href={LINK_CUSTOM_LABWARE_GUIDE}>this guide </LinkOut> for some
-        tips on how to get the most accuracy with your manual measurements.
+        <LinkOut href={LINK_CUSTOM_LABWARE_GUIDE} className={styles.link}>
+          this guide
+        </LinkOut>{' '}
+        for some tips on how to get the most accuracy with your manual
+        measurements.
       </p>
     </div>
   </>
