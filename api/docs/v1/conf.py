@@ -64,7 +64,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'OT-2 Python API V1'
+project = 'OT-2 APIv1'
 copyright = '2019, Opentrons'
 author = _package_json['author']['name']
 
