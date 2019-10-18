@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 from typing import Any, Dict, Optional, Tuple
+from opentrons.config import feature_flags as ff
 from opentrons import HERE as package_root
 
 log = logging.getLogger(__name__)
@@ -29,7 +30,10 @@ async def enter_bootloader(driver, model):
     # Required for old bootloader
     ports_before_dfu_mode = await _discover_ports()
 
-    driver.enter_programming_mode()
+    if not ff.use_protocol_api_v2():
+        driver.enter_programming_mode()
+    else:
+        await driver.enter_programming_mode()
     driver.disconnect()
     new_port = ''
     try:
@@ -43,10 +47,11 @@ async def enter_bootloader(driver, model):
 
 async def update_firmware(port: str,
                           firmware_file_path: str,
+                          bootloader_type: str,
                           loop: Optional[asyncio.AbstractEventLoop])\
-                          -> Tuple[str, Tuple[bool, str]]:
+        -> Tuple[str, Tuple[bool, str]]:
     """
-    Run avrdude firmware upload command. Switch back to normal module port
+    Run firmware upload command. Switch back to normal module port
 
     Note: For modules with old bootloader, the kernel could assign the module
     a new port after the update (since the board is automatically reset).
@@ -57,14 +62,33 @@ async def update_firmware(port: str,
     """
 
     ports_before_update = await _discover_ports()
-    config_file_path = os.path.join(package_root,
-                                    'config', 'modules', 'avrdude.conf')
+
     kwargs: Dict[str, Any] = {
         'stdout': asyncio.subprocess.PIPE,
         'stderr': asyncio.subprocess.PIPE
     }
     if loop:
         kwargs['loop'] = loop
+
+    res = None
+    if bootloader_type == 'avrdude':
+        res = await _upload_via_avrdude(port, firmware_file_path, kwargs)
+    elif bootloader_type == 'bossa':
+        res = await _upload_via_bossa(port, firmware_file_path, kwargs)
+    else:
+        raise ValueError(
+            f"cannot handle specified bootloader type: {bootloader_type}")
+
+    new_port = await _port_on_mode_switch(ports_before_update)
+    log.info("Res: {}".format(res))
+    log.info("New port: {}".format(new_port))
+    return new_port, res
+
+
+async def _upload_via_avrdude(port, firmware_file_path, kwargs):
+    config_file_path = os.path.join(package_root,
+                                    'config', 'modules', 'avrdude.conf')
+
     proc = await asyncio.create_subprocess_exec(
         'avrdude', '-C{}'.format(config_file_path), '-v',
         '-p{}'.format(PART_NO),
@@ -83,9 +107,7 @@ async def update_firmware(port: str,
     else:
         log.error("Failed to update module firmware for {}: {}"
                   .format(port, avrdude_res[1]))
-    new_port = await _port_on_mode_switch(ports_before_update)
-    log.info("New port: {}".format(new_port))
-    return new_port, avrdude_res
+    return avrdude_res
 
 
 def _format_avrdude_response(raw_response: str) -> Tuple[bool, str]:
@@ -96,6 +118,25 @@ def _format_avrdude_response(raw_response: str) -> Tuple[bool, str]:
             if 'flash verified' in line:
                 return True, line.lstrip('avrdude: ')
     return False, avrdude_log
+
+
+async def _upload_via_bossa(port, firmware_file_path, kwargs):
+    # bossac -p/dev/cu.usbmodem14101 -e -w -v -R --offset=0x2000 modules/thermo-cycler/production/firmware/thermo-cycler-arduino.ino.bin
+    bossa_args = ['bossac', f'-p{port}',
+                  '-e', '-w', '-v', '-R',
+                  '--offset=0x2000', f'{firmware_file_path}']
+
+    proc = await asyncio.create_subprocess_exec(*bossa_args, **kwargs)
+    stdout, stderr = await proc.communicate()
+    res = stdout.decode()
+    if "Verify successful" in res:
+        log.debug(res)
+        return True, res
+    elif stderr:
+        log.error(f"Failed to update module firmware for {port}: {res}")
+        log.error(f"Error given: {stderr.decode()}")
+        return False, res
+    return False, None
 
 
 async def _port_on_mode_switch(ports_before_switch):

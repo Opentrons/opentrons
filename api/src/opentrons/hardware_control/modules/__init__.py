@@ -85,9 +85,10 @@ async def update_firmware(
     flash_port = await module.prep_for_update()
     callback = module.interrupt_callback
     del module
-    after_port, results = await update.update_firmware(flash_port,
-                                                       firmware_file,
-                                                       loop)
+    after_port, results = await update.update_firmware(port=flash_port,
+                                                       firmware_file_path=firmware_file,
+                                                       bootloader_type=cls.bootloader_type(),
+                                                       loop=loop)
     await asyncio.sleep(1.0)
     new_port = after_port or old_port
     if not results[0]:

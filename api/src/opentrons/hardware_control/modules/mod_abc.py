@@ -84,3 +84,9 @@ class AbstractModule(abc.ABC):
     def display_name(cls) -> str:
         """ A user-facing name for this kind of module. """
         pass
+
+    @classmethod
+    @abc.abstractmethod
+    def bootloader_type(cls) -> str:
+        """ The type of bootloader this module uses. """
+        pass

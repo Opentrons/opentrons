@@ -2,8 +2,10 @@ import logging
 import asyncio
 import tempfile
 from aiohttp import web
+from opentrons.config import feature_flags as ff
+from opentrons.hardware_control import modules
 try:
-    from opentrons import modules
+    from opentrons import modules as legacy_modules
 except ImportError:
     pass
 
@@ -65,26 +67,33 @@ async def _upload_to_module(hw, serialnum, fw_filename, loop):
     moving the drivers themselves to the serverlib)
     """
 
-    # ensure there is a reference to the port
-    if not hw.is_connected():
-        hw.connect()
+    if ff.use_protocol_api_v2():
+        update_firmware = modules.update_firmware
+    else:
+        update_firmware = legacy_modules.update_firmware
+        # ensure there is a reference to the port
+        if not hw.is_connected():
+            hw.connect()
 
     hw.discover_modules()
     hw_mods = hw.attached_modules.values()
     res = {}
     for module in hw_mods:
         if module.device_info.get('serial') == serialnum:
-            log.info("Module with serial {} found".format(serialnum))
-            bootloader_port = await modules.enter_bootloader(module)
-            if bootloader_port:
-                module._port = bootloader_port
-            # else assume old bootloader connection on existing module port
-            log.info("Uploading file to port: {}".format(
-                module.port))
-            log.info("Flashing firmware. This will take a few seconds")
+
+            if not ff.use_protocol_api_v2():
+                log.info("Module with serial {} found".format(serialnum))
+                bootloader_port = await legacy_modules.enter_bootloader(module)
+                if bootloader_port:
+                    module._port = bootloader_port
+                # else assume old bootloader connection on existing module port
+                log.info("Uploading file to port: {}".format(
+                    module.port))
+                log.info("Flashing firmware. This will take a few seconds")
+
             try:
                 res = await asyncio.wait_for(
-                    modules.update_firmware(module, fw_filename, loop),
+                    update_firmware(module, fw_filename, loop),
                     UPDATE_TIMEOUT)
             except asyncio.TimeoutError:
                 return {'message': 'AVRDUDE not responding'}

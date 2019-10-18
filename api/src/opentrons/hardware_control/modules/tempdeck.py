@@ -97,6 +97,10 @@ class TempDeck(mod_abc.AbstractModule):
     def display_name(cls) -> str:
         return 'Temperature Deck'
 
+    @classmethod
+    def bootloader_type(cls) -> str:
+        return 'avrdude'
+
     @staticmethod
     def _build_driver(
             simulating: bool) -> Union['SimulatingDriver', 'TempDeckDriver']:

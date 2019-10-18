@@ -1,5 +1,5 @@
 import asyncio
-from . import mod_abc, types
+from . import mod_abc, types, update
 from typing import Union, Optional, List, Callable
 from opentrons.drivers.thermocycler.driver import (
     Thermocycler as ThermocyclerDriver)
@@ -133,6 +133,10 @@ class Thermocycler(mod_abc.AbstractModule):
     def display_name(cls):
         return 'Thermocycler'
 
+    @classmethod
+    def bootloader_type(cls):
+        return 'bossa'
+
     @staticmethod
     def _build_driver(
             simulating: bool,
@@ -158,7 +162,6 @@ class Thermocycler(mod_abc.AbstractModule):
 
         self._port = port
         self._device_info = None
-        self._poller = None
 
         self._running_flag = asyncio.Event(loop=self._loop)
         self._current_cycle_task: Optional[asyncio.Task] = None
@@ -370,4 +373,6 @@ class Thermocycler(mod_abc.AbstractModule):
         return self._port
 
     async def prep_for_update(self):
-        pass
+        new_port = await update.enter_bootloader(self._driver,
+                                                 self.name())
+        return new_port or self.port

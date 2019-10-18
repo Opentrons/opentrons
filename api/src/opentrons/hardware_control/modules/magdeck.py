@@ -68,6 +68,10 @@ class MagDeck(mod_abc.AbstractModule):
     def display_name(cls) -> str:
         return 'Magnetic Deck'
 
+    @classmethod
+    def bootloader_type(cls) -> str:
+        return 'avrdude'
+
     @staticmethod
     def _build_driver(
             simulating: bool) -> Union['SimulatingDriver', 'MagDeckDriver']:

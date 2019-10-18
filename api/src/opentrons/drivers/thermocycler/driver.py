@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import threading
+import serial
 from queue import Queue
 try:
     import select
@@ -48,6 +49,7 @@ def _build_temp_code(temp, hold_time=None):
 
 
 TC_BAUDRATE = 115200
+TC_BOOTLOADER_BAUDRATE = 1200
 # TODO (Laura 20190327) increased the thermocycler command timeout
 # temporarily until we can change the firmware to asynchronously handle
 # the lid being open and closed
@@ -171,7 +173,7 @@ class TCPoller(threading.Thread):
             command_line, timeout, DEFAULT_COMMAND_RETRIES)
         if ERROR_KEYWORD in ret_code.lower():
             log.error('Received error message from Thermocycler: {}'.format(
-                    ret_code))
+                ret_code))
             raise ThermocyclerError(ret_code)
         return ret_code.strip()
 
@@ -244,7 +246,7 @@ class Thermocycler:
         _lid_status_res = await self._write_and_wait(GCODES['GET_LID_STATUS'])
         if _lid_status_res:
             self._lid_status = utils.parse_string_value_from_substring(
-                                    _lid_status_res.split()[-1])
+                _lid_status_res.split()[-1])
         return self
 
     def disconnect(self) -> 'Thermocycler':
@@ -322,7 +324,7 @@ class Thermocycler:
         for substr in data_substrs:
             key = utils.parse_key_from_substring(substr)
             value = utils.parse_number_from_substring(
-                    substr, utils.TC_GCODE_ROUNDING_PRECISION)
+                substr, utils.TC_GCODE_ROUNDING_PRECISION)
             val_dict[key] = value
 
         self._current_temp = val_dict['C']
@@ -338,7 +340,7 @@ class Thermocycler:
         for substr in data_substrs:
             key = utils.parse_key_from_substring(substr)
             value = utils.parse_number_from_substring(
-                    substr, utils.TC_GCODE_ROUNDING_PRECISION)
+                substr, utils.TC_GCODE_ROUNDING_PRECISION)
             val_dict[key] = value
         self._lid_temp = val_dict['C']
         self._lid_target = val_dict['T']
@@ -428,6 +430,12 @@ class Thermocycler:
             await asyncio.sleep(0.05)
             pass
         return ret
+
+    async def enter_programming_mode(self) -> str:
+        trigger_connection = serial.Serial(
+            self._poller.port, TC_BOOTLOADER_BAUDRATE, timeout=1)
+        await asyncio.sleep(0.005)
+        trigger_connection.close()
 
     def __del__(self):
         try:
