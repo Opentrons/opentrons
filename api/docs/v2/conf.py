@@ -293,15 +293,17 @@ latex_elements = {
      # The font size ('10pt', '11pt' or '12pt').
      #
      # 'pointsize': '10pt',
-
      # Additional stuff for the LaTeX preamble.
      #
      # 'preamble': '',
 
+     # Enable Greek symbol encoding for our sweet mus
+     #
+     'fontenc': r'\usepackage[LGR,T1]{fontenc}',
+
      # Latex figure (float) alignment
      #
-    'inputenc': 'utf8x',
-    'figure_align': 'H',
+     'figure_align': 'H',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
