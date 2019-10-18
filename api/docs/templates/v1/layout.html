@@ -1,5 +1,5 @@
 {%- extends "basic/layout.html" %}
-{% set css_files = css_files +  ['_static/new-nav.css'] + ['_static/nav.css'] + ['_static/override_sphinx.css'] + ['_static/override_master.css']  %}
+{% set css_files = css_files +  ['_static/new-nav.css'] + ['_static/nav.css'] + ['_static/override_sphinx.css'] + ['_static/banners.css'] %}
 {%- block extrahead %}
 {{ super() }}
 <link rel="stylesheet" href="{{ pathto('_static/custom.css', 1) }}" type="text/css" /> {% if theme_touch_icon %}
@@ -983,7 +983,18 @@ window.intercomSettings = {
         <div class="bodywrapper">
             {%- endif %}
             <div class="body" role="main">
-                {% block body %} {% endblock %}
+                {% if pagename == 'index' %}
+                  <div class="banner_wrapper banner_v1">
+                    <div class="bulb">
+                    <img src="../../img/lightbulb.jpg" />
+                    </div>
+                    <div class="heading_group">
+                      <h2 id="heading_2">We thought you’d like to know…</h2>
+                      <h4 id="heading_4">We’ve just released the <a href="../v2/index.html">Opentrons OT-2 APIv2</a> <span class="beta">BETA</span>. Check it out and let us know what you think!</h4>
+                    </div>
+                  </div>
+                {%- endif %}
+                {% block body %}{% endblock %}
             </div>
             {%- if render_sidebar %}
         </div>

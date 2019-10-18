@@ -48,7 +48,7 @@ extensions = [
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['../templates']
+templates_path = ['../templates', '../templates/v1']
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -227,7 +227,7 @@ html_sidebars = {
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
 #
-# html_additional_pages = {}
+# html_additional_pages = {'index': 'indexV1.html'}
 
 # If false, no module index is generated.
 #
