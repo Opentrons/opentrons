@@ -62,8 +62,8 @@ jobs:
         - # push docs
           <<: *deploy_s3
           local-dir: api/docs/dist
-          bucket: $OT_DOCS_SANDBOX_BUCKET
-          upload-dir: $OT_DOCS_SANDBOX_FOLDER
+          bucket: $OT_DOCS_DEPLOY_BUCKET
+          upload-dir: $TRAVIS_BRANCH
 
         # push to real pypi on tag
         - provider: script
@@ -169,9 +169,6 @@ env:
     # TODO(mc, 2019-03-13): move to Travis settings
     - OT_APP_DEPLOY_BUCKET: opentrons-app
     - OT_APP_DEPLOY_FOLDER: builds
-
-    - OT_DOCS_SANDBOX_BUCKET: sandbox.docs.opentrons.com
-    - OT_DOCS_SANDBOX_FOLDER: $OT_BRANCH
 
     # GITHUB_TOKEN
     # TODO(mc, 2019-03-13): move to Travis settings
