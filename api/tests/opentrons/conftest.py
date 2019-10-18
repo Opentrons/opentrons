@@ -90,6 +90,7 @@ def config_tempdir(tmpdir, template_db):
     shutil.copyfile(
         template_db, config.CONFIG['labware_database_file'])
     yield tmpdir, template_db
+    shutil.rmtree(tmpdir)
 
 
 @pytest.fixture(autouse=True)

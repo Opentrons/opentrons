@@ -23,7 +23,8 @@ from opentrons.protocols import parse, bundle
 from opentrons.config import CONFIG
 from opentrons.protocols.types import (
     JsonProtocol, PythonProtocol, BundleContents)
-from opentrons.protocol_api import execute, back_compat
+from opentrons.protocol_api import execute
+from opentrons.protocol_api.legacy_wrapper import api
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
 
@@ -397,7 +398,7 @@ def main() -> int:
     if os.environ.get('MIGRATE_V1_LABWARE') and\
             os.path.exists(CONFIG['labware_database_file']):
         try:
-            back_compat.perform_migration()
+            api.perform_migration()
         except RuntimeError:
             delete_dir = CONFIG['labware_user_definitions_dir_v2']/'legacy_api'
             if os.path.exists(delete_dir):
@@ -405,7 +406,7 @@ def main() -> int:
             raise RuntimeError('Failed to perform database migration,',
                                'any custom labware from API V1 is lost.')
         finally:
-            shutil.rmtree(CONFIG['labware_database_file'])
+            os.remove(CONFIG['labware_database_file'])
     runlog, maybe_bundle = simulate(
         args.protocol,
         args.protocol.name,

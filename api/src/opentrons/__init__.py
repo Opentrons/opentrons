@@ -1,5 +1,4 @@
 import os
-import shutil
 import sys
 import json
 HERE = os.path.abspath(os.path.dirname(__file__))
