@@ -246,7 +246,7 @@ class JsonRpcProtocol(asyncio.Protocol):
         self._log.debug('resume writing')
 
     def data_received(self, data: bytes):  # noqa(C901)
-        self._log.debug(f'data received: {data}')
+        self._log.debug(f'data received: {data!r}')
         self._buffer += data.decode()  # hope this isn't incomplete
         try:
             _, pos = self._decoder.raw_decode(self._buffer)

@@ -63,7 +63,7 @@ def _get_location(loaded_labware, command_type, params):
     lw = loaded_labware.get(labwareId)
     if not lw:
         raise ValueError(
-            'Command tried to use labware "{}", but that ID does not exist ' +
+            'Command tried to use labware "{}", but that ID does not exist '
             'in protocol\'s "labware" section'.format(labwareId))
 
     offset_from_bottom = params.get('offsetFromBottomMm')
