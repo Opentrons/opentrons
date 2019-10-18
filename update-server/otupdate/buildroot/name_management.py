@@ -152,7 +152,7 @@ async def setup_hostname() -> str:
     if ret != 0:
         LOG.error(
             f'Error starting hostname: {ret} '
-            f'stdout: {stdout} stderr: {stderr}')
+            f'stdout: {stdout!r} stderr: {stderr!r}')
         raise RuntimeError("Couldn't run hostname")
 
     # Then, with the hostname set, we can restart avahi
@@ -165,7 +165,7 @@ async def setup_hostname() -> str:
     if ret != 0:
         LOG.error(
             f'Error restarting avahi-daemon: {ret} '
-            f'stdout: {stdout} stderr: {stderr}')
+            f'stdout: {stdout!r} stderr: {stderr!r}')
         raise RuntimeError("Error restarting avahi")
     LOG.debug("Updated hostname and restarted avahi OK")
     return hostname

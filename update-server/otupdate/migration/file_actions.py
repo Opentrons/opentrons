@@ -48,8 +48,8 @@ def validate_update(
     assert rootfs_hashfile
     rootfs_packaged_hash = open(rootfs_hashfile, 'rb').read().strip()
     if rootfs_calc_hash != rootfs_packaged_hash:
-        msg = f"Hash mismatch (rootfs): calculated {rootfs_calc_hash} != "\
-            f"packaged {rootfs_packaged_hash}"
+        msg = f"Hash mismatch (rootfs): calculated {rootfs_calc_hash!r} != "\
+            f"packaged {rootfs_packaged_hash!r}"
         LOG.error(msg)
         raise HashMismatch(msg)
 
@@ -64,8 +64,8 @@ def validate_update(
     assert bootfs_hashfile
     bootfs_packaged_hash = open(bootfs_hashfile, 'rb').read().strip()
     if bootfs_calc_hash != bootfs_packaged_hash:
-        msg = f"Hash mismatch (bootfs): calculated {bootfs_calc_hash} != "\
-            f"packged {bootfs_packaged_hash}"
+        msg = f"Hash mismatch (bootfs): calculated {bootfs_calc_hash!r} != "\
+            f"packged {bootfs_packaged_hash!r}"
         LOG.error(msg)
         raise HashMismatch(msg)
 
@@ -82,7 +82,7 @@ def find_active_sysroot() -> str:
     cmdline = _get_proc_cmdline()
     match = re.search(b'root=([/a-zA-Z0-9.]+)', cmdline)
     if not match:
-        raise RuntimeError(f"Couldn't find bootpart from {cmdline}")
+        raise RuntimeError(f"Couldn't find bootpart from {cmdline!r}")
     return match.group(1).decode()
 
 

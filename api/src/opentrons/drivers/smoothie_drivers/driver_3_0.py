@@ -1653,9 +1653,10 @@ class SmoothieDriver_3_0_0:
         out_b, err_b = await proc.communicate()
         if proc.returncode != 0:
             log.error(
-                f"Smoothie update failed: {proc.returncode} {out_b} {err_b}")
+                f"Smoothie update failed: {proc.returncode}"
+                f" {out_b!r} {err_b!r}")
             raise RuntimeError(
-                f"Failed to program smoothie: {proc.returncode}: {err_b}")
+                f"Failed to program smoothie: {proc.returncode}: {err_b!r}")
         else:
             log.info("Smoothie update complete")
         try:

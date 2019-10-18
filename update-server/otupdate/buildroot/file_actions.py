@@ -229,7 +229,7 @@ def verify_signature(message_path: str,
         LOG.info(f"Verification passed from cert {cert_path}")
     else:
         LOG.error(
-            f"Verification failed with cert {cert_path}: {verification}")
+            f"Verification failed with cert {cert_path}: {verification!r}")
         raise SignatureMismatch(f'Signature check failed')
 
 
@@ -273,8 +273,8 @@ def validate_update(filepath: str,
     assert hashfile
     packaged_hash = open(hashfile, 'rb').read().strip()
     if packaged_hash != rootfs_hash:
-        msg = f"Hash mismatch: calculated {rootfs_hash} != "\
-            f"packaged {packaged_hash}"
+        msg = f"Hash mismatch: calculated {rootfs_hash!r} != "\
+            f"packaged {packaged_hash!r}"
         LOG.error(msg)
         raise HashMismatch(msg)
 
@@ -404,7 +404,7 @@ def _switch_partition() -> RootPartitions:
             return {b'2': RootPartitions.TWO,
                     b'3': RootPartitions.THREE}[matches.group(2)]
     else:
-        raise RuntimeError(f'Bad output from ot-switch-partitions: {res}')
+        raise RuntimeError(f'Bad output from ot-switch-partitions: {res!r}')
 
 
 def commit_update():

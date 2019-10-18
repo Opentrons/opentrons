@@ -22,7 +22,7 @@ twine = ">=1.12.0"
 wheel = "==0.30.0"
 coverage = "==4.4.2"
 colorama = "*"
-mypy = "*"
+mypy = "==0.740"
 
 [requires]
 

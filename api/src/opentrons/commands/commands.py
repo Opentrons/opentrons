@@ -131,8 +131,7 @@ def aspirate(instrument, volume, location, rate):
 def dispense(instrument, volume, location, rate):
     location_text = stringify_location(location)
     text = 'Dispensing {volume} uL into {location}'.format(
-        volume=volume, location=location_text, rate=rate
-    )
+        volume=volume, location=location_text)
 
     return make_command(
         name=command_types.DISPENSE,
