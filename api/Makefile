@@ -108,10 +108,11 @@ lint: $(ot_py_sources)
 
 docs/build/html/v%: docs/v% local-install
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
+	$(SHX) cp docs/img/lightbulb.jpg $@/_images/ # sphinx wont automatically do this because it's only in a template
 
 docs/build/pdf/OpentronsPythonAPIV%.pdf: docs/v% local-install
 	$(sphinx_build) -b latex -d docs/build/doctrees $< $(@D)
-	$(MAKE) -C $(@D) all-pdf $(if $(CI),,|| $(SHX) echo "latex build failed (pdflatex not installed?)")
+	$(MAKE) -C $(@D) all-pdf $(if $(CI),>/dev/null,|| $(SHX) echo "latex build failed (pdflatex not installed?)")
 	$(SHX) ls $(@D)/*.pdf $(if $(CI),,|| $(SHX) echo "no pdf produced")
 
 docs/dist/v%: docs/build/html/v% docs/build/pdf/OpentronsPythonAPIV%.pdf
