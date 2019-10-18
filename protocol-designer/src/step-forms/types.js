@@ -35,6 +35,12 @@ export type PipetteEntities = {
   [pipetteId: string]: PipetteEntity,
 }
 
+// =========== MODULES ========
+export type FormModule = { onDeck: boolean, model: string }
+export type FormModulesByType = {
+  [type: string]: FormModule,
+}
+
 // =========== LABWARE ========
 
 export type NormalizedLabwareById = {
