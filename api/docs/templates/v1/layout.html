@@ -983,7 +983,7 @@ window.intercomSettings = {
         <div class="bodywrapper">
             {%- endif %}
             <div class="body" role="main">
-                {% if pagename == 'index' %}
+
                   <div class="banner_wrapper banner_v1">
                     <div class="bulb">
                     <img src="../../img/lightbulb.jpg" />
@@ -993,7 +993,7 @@ window.intercomSettings = {
                       <h4 id="heading_4">We’ve just released the <a href="../v2/index.html">Opentrons OT-2 APIv2</a> <span class="beta">BETA</span>. Check it out and let us know what you think!</h4>
                     </div>
                   </div>
-                {%- endif %}
+                
                 {% block body %}{% endblock %}
             </div>
             {%- if render_sidebar %}

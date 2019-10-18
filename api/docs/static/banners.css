@@ -5,6 +5,10 @@
   width: auto;
 }
 
+.banner_wrapper a {
+  text-decoration: none;
+}
+
 .banner_v1 {
   display: flex;
   justify-content: space-between;
@@ -53,7 +57,7 @@
   border-radius: 5px;
   padding: 0.1rem 0.25rem;
   font-size: 0.625rem;
-  margin-top: -0.25rem;
+  margin: -0.25rem 0.25rem 0.25rem 0.25rem;
 }
 
 .beta_large {

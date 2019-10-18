@@ -987,7 +987,7 @@ window.intercomSettings = {
                 <div class="banner_wrapper">
                   <h2 id="heading_v2">
                     Welcome to the Opentrons OT-2 APIv2
-                    <span class="beta beta_large">BETA</span>Docs
+                    <span class="beta beta_large">BETA</span> Docs
                   </h2>
                   <p>
                     This is the new API for controlling the Opentrons OT-2. It is currently in
@@ -1037,6 +1037,13 @@ window.intercomSettings = {
                     -Team Opentrons
                   </p>
                 </div>
+                {% else %}
+                  <div class="banner_wrapper">
+                    <p>
+                      Please note you are currently viewing the <a href="./index.html">Opentrons OT-2 APIv2 documentation</a>. This version is not stable and should only
+be used by advanced users interested in beta testing this new API. To view the existing stable API <a href="../v1/index.html">click here</a>.
+                    </p>
+                  </div>
                 {%- endif %}
                 {% block body %}{% endblock %}
             </div>
