@@ -35,7 +35,7 @@ git checkout -b chore_bump-${version}
 - Scope: `release`
 - Message: `${version}`
 
-11. Gather reviews on changelogs and release notes until everybody is satisfied. Check the docs at sandbox.docs.opentrons.com/release_${version}
+11. Gather reviews on changelogs and release notes until everybody is satisfied. Check the docs at sandbox.docs.opentrons.com/release\_\${version}
 12. Once your chore bump branch is ready, squash merge the `chore_bump-${version}` into the `release_${version}` branch.
 13. Tag the release branch as the version you just bumped to; this is a release candidate that will undergo QA:
 
@@ -211,4 +211,3 @@ The following web projects are versioned and released independently from the app
   - docs.opentrons.com
 
 See [scripts/deploy/README.md](./scripts/deploy/README.md) for the release process of these projects.
-
