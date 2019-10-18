@@ -300,6 +300,7 @@ latex_elements = {
 
      # Latex figure (float) alignment
      #
+    'inputenc': 'utf8x',
     'figure_align': 'H',
 }
 
