@@ -6,6 +6,8 @@ The Opentrons API is a simple Python framework designed to make writing automate
 
 We’ve designed it in a way we hope is accessible to anyone with basic Python and wetlab skills. As a bench scientist, you should be able to code your automated protocols in a way that reads like a lab notebook.
 
+Version 2 of the OT-2 API is a new way to write Python protocols. It is more reliable, simpler, and better able to be supported. It is where support for new modules like the Thermocycler will be added, and where improvements and bugfixes will be focused. For more about why we developed version 2 of the OT-2 API, see ARTICLE LINK TO INTRO. For a guide on transitioning your protocols from API V1 to API V2, see ARTICLE LINK TO MIGRATION GUIDE. For a more in-depth discussion of why API V2 was developed and what is different about it, see ARTICLE ON DETAILS.
+
 **********************
 
 Getting Started

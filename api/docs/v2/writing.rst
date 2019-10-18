@@ -76,7 +76,7 @@ Once python is installed, install the `opentrons package <https://pypi.org/proje
 
    pip install opentrons
 
-You should see some output that ends with ``Successfully installed opentrons-3.6.5`` (the version number may be different).
+You should see some output that ends with ``Successfully installed opentrons-3.13.1`` (the version number may be different).
 
 Jupyter Installation
 ^^^^^^^^^^^^^^^^^^^^
@@ -144,13 +144,13 @@ Here, you can select a notebook and develop protocols that will be saved on the 
 
 .. note::
 
-   When running protocol code in a Jupyter notebook, before executing protocol steps you must call :py:meth:`robot.connect`:
+   When running protocol code in a Jupyter notebook, before executing protocol steps you must get an API instance with  :py:meth:`opentrons.execute.get_protocol_api()`:
 
    .. code-block:: python
 
-      from opentrons import robot
-      robot.connect()
+      from opentrons import execute
+      api = execute.get_protocol_api()
 
-   This tells the notebook to connect to the robot’s hardware so the commands you enter actually cause the robot to move.
+   This provides you with an API object (the same thing that is passed in to your protocol's ``run`` function) that is connected to the robot’s hardware so the commands you enter actually cause the robot to move.
 
-   However, this happens automatically when you upload a protocol through the Opentrons app, and connecting twice will cause errors. To avoid this, **remove the call to robot.connect()** before uploading the protocol through the Opentrons app.
+   However, this happens automatically when you upload a protocol through the Opentrons app. When writing a protocol you intend to run via the Opentrons app, just define your ``run`` function - no need for anything else.
