@@ -9,7 +9,7 @@ const TITLE = 'Privacy Settings'
 
 export default function AnalyticsSettingsCard() {
   return (
-    <Card title={TITLE} column>
+    <Card title={TITLE}>
       <AnalyticsToggle />
     </Card>
   )

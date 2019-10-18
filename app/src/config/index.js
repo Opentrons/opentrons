@@ -16,6 +16,7 @@ export const DEV_INTERNAL_FLAGS: Array<DevInternalFlag> = [
   'allPipetteConfig',
   'tempdeckControls',
   'enablePipettePlus',
+  'customLabware',
 ]
 
 // trigger a config value update to the app-shell via shell middleware

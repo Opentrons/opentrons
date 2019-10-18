@@ -77,7 +77,6 @@ function ControlsCard(props: Props) {
       watch={name}
       refresh={fetchLights}
       disabled={disabled}
-      column
     >
       <LabeledButton
         label="Calibrate deck"

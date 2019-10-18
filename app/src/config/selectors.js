@@ -1,9 +1,12 @@
 // @flow
 import type { DropdownOption } from '@opentrons/components'
 import type { State } from '../types'
-import type { Config, UpdateChannel } from './types'
+import type { Config, FeatureFlags, UpdateChannel } from './types'
 
 export const getConfig = (state: State): Config => state.config
+
+export const getFeatureFlags = (state: State): FeatureFlags =>
+  getConfig(state).devInternal || {}
 
 const UPDATE_CHANNEL_OPTS = [
   { name: 'Stable', value: (('latest': UpdateChannel): string) },

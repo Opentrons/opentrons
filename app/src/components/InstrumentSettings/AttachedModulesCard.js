@@ -32,7 +32,7 @@ export default function AttachedModulesCard(props: Props) {
   )
 
   return (
-    <Card title={TITLE} column>
+    <Card title={TITLE}>
       <ModulesCardContents robot={robot} modules={modules} />
     </Card>
   )

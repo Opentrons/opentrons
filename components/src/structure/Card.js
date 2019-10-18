@@ -6,16 +6,16 @@ import cx from 'classnames'
 
 import styles from './structure.css'
 
-type Props = {
+type Props = {|
   /** Title for card, all cards should receive a title. */
   title?: React.Node,
   /** Card contents */
-  children: React.Node,
+  children?: React.Node,
   /** If card can not be used, gray it out and remove pointer events */
   disabled?: boolean,
   /** Additional class names */
   className?: string,
-}
+|}
 
 /**
  * Renders a basic card element with a white background, dropshadow, and zero padding.
