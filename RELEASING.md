@@ -35,7 +35,7 @@ git checkout -b chore_bump-${version}
 - Scope: `release`
 - Message: `${version}`
 
-11. Gather reviews on changelogs and release notes until everybody is satisfied
+11. Gather reviews on changelogs and release notes until everybody is satisfied. Check the docs at sandbox.docs.opentrons.com/release_${version}
 12. Once your chore bump branch is ready, squash merge the `chore_bump-${version}` into the `release_${version}` branch.
 13. Tag the release branch as the version you just bumped to; this is a release candidate that will undergo QA:
 
@@ -77,6 +77,7 @@ git merge --no-ff master
 ```
 
 20. Use the PR title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the PR is approved and status checks pass.
+21. Release the docs for this version (see below under Releasing Web Projects)
 
 ## Releasing Robot Software Stack Hotfixes
 
@@ -150,6 +151,7 @@ git merge --no-ff master
 ```
 
 20. Use the PR title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the PR is approved and status checks pass.
+21. Release the docs for this version (see below under Releasing Web Projects)
 
 ### make bump usage
 
@@ -202,6 +204,11 @@ yarn run lerna [opts]
 The following web projects are versioned and released independently from the app and API:
 
 - `protocol-designer`
+  - designer.opentrons.com
 - `labware-library`
+  - labware.opentrons.com
+- API documentation
+  - docs.opentrons.com
 
 See [scripts/deploy/README.md](./scripts/deploy/README.md) for the release process of these projects.
+
