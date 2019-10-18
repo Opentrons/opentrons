@@ -53,11 +53,12 @@ header#nav .docs-navbar {
 
 @media only screen and (min-width: 1024px) {
   header#nav .docs-navbar {
-    height: 2rem;
+    height: 2.5rem;
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    background-color: #ededed;
+    background-color: white;
+    border-bottom: 1px solid #e3e3e3;
   }
 
   header#nav .docs-navbar ul {
@@ -77,7 +78,8 @@ header#nav .docs-navbar {
   }
 
   header#nav .docs-navbar ul li a {
-    color: #707070;
+    color: #919191;
+font-weight: 600;
     text-decoration: none;
   }
 
