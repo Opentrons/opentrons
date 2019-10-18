@@ -59,15 +59,11 @@ jobs:
         - make coverage
         - aws s3 sync ./api/dist $OT_CI_TEMP_S3_PATH/api/dist
       deploy:
-        # push docs on tag
-        - provider: pages
-          skip_cleanup: true
-          keep-history: false
+        - # push docs
+          <<: *deploy_s3
           local-dir: api/docs/dist
-          github-token: $GITHUB_TOKEN
-          on:
-            branch: master
-            repo: Opentrons/opentrons
+          bucket: $OT_DOCS_DEPLOY_BUCKET
+          upload-dir: $TRAVIS_BRANCH
 
         # push to real pypi on tag
         - provider: script
