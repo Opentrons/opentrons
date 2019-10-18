@@ -45,7 +45,7 @@ jobs:
       language: python
       python: 3.6
       before_install:
-        - sudo apt-get install -y --no-install-recommends texlive-fonts-recommended texlive-latex-extra texlive-fonts-extra dvipng texlive-latex-recommended libsystemd-dev
+        - sudo apt-get install -y --no-install-recommends texlive-fonts-recommended texlive-latex-extra texlive-fonts-extra dvipng texlive-latex-recommended libsystemd-dev latexmk
       install:
         - pip install awscli
         - nvm install
