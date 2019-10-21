@@ -8,16 +8,9 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 # dev server port
 PORT ?= 8090
 
-# source and output directories for main process code
-src_dir := src
-lib_dir := lib
-src_ignore := "**/__tests__/**","**/__mocks__/**","**/__fixtures__/**"
-babel := babel $(src_dir) --root-mode upward --out-dir $(lib_dir) --ignore $(src_ignore)
-
 # dep directories for production build
 # TODO(mc, 2018-08-07): figure out a better way to do this
 ui_dir := ../app
-discovery_client_dir := ../discovery-client
 
 # cross-platform noop command
 noop := cd .
@@ -67,13 +60,13 @@ clean:
 #####################################################################
 
 .PHONY: lib
+lib: export NODE_ENV := production
 lib:
-	$(babel)
+	webpack --profile
 
 .PHONY: deps
 deps:
 	$(MAKE) -C $(ui_dir)
-	$(MAKE) -C $(discovery_client_dir)
 
 .PHONY: package-deps
 package-deps: clean lib deps
@@ -118,5 +111,6 @@ _dist-collect-artifacts:
 
 .PHONY: dev
 dev: export NODE_ENV := development
-dev: lib
+dev:
+	webpack
 	$(electron)

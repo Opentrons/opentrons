@@ -40,7 +40,7 @@ dist:
 .PHONY: dev
 dev: export NODE_ENV := development
 dev: export PORT := $(PORT)
-dev: dev-deps
+dev:
 	concurrently --no-color --kill-others --names "server,shell" \
 		"$(MAKE) dev-server" \
 		"$(MAKE) dev-shell"
@@ -54,7 +54,3 @@ dev-shell:
 	wait-on http-get://localhost:$(PORT)
 	$(MAKE) -C $(shell_dir) dev
 
-.PHONY: dev-deps
-dev-deps:
-	$(MAKE) -C $(discovery_client_dir)
-	$(MAKE) -C $(shell_dir) clean lib

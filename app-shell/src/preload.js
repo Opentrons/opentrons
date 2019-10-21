@@ -5,9 +5,12 @@
 import { ipcRenderer, remote } from 'electron'
 import cloneDeep from 'lodash/cloneDeep'
 
-const { getConfig } = remote.require('./config')
-const { getRobots } = remote.require('./discovery')
-const { CURRENT_VERSION, CURRENT_RELEASE_NOTES } = remote.require('./update')
+const {
+  getConfig,
+  getRobots,
+  CURRENT_VERSION,
+  CURRENT_RELEASE_NOTES,
+} = remote.require('./exports')
 
 global.APP_SHELL_REMOTE = {
   ipcRenderer,
