@@ -705,6 +705,10 @@ class TransferPlan:
                     yield self._format_dict('blow_out', [loc])
             # If we're not empty but we're about to aspirate, we need a
             # blowout.
+            if self._strategy.touch_tip_strategy == TouchTipStrategy.ALWAYS:
+                yield self._format_dict('touch_tip',
+                                        kwargs=self._touch_tip_opts)
+
             if self._strategy.blow_out_strategy == BlowOutStrategy.TRASH:
                 yield self._format_dict('blow_out', [
                     self._instr.trash_container.wells()[0]])
@@ -718,8 +722,9 @@ class TransferPlan:
             # Used by distribute
             if self._strategy.air_gap:
                 yield self._format_dict('air_gap', [self._strategy.air_gap])
-        if self._strategy.touch_tip_strategy == TouchTipStrategy.ALWAYS:
-            yield self._format_dict('touch_tip', kwargs=self._touch_tip_opts)
+            if self._strategy.touch_tip_strategy == TouchTipStrategy.ALWAYS:
+                yield self._format_dict('touch_tip',
+                                        kwargs=self._touch_tip_opts)
 
     def _new_tip_action(self):
         if self._strategy.new_tip == types.TransferTipPolicy.ALWAYS:

@@ -318,6 +318,90 @@ def test_new_tip_always(_instr_labware, monkeypatch):
     assert tiprack.next_tip() == tiprack.columns()[0][4]
 
 
+def test_transfer_w_touchtip_blowout(_instr_labware):
+    _instr_labware['ctx'].home()
+    lw1 = _instr_labware['lw1']
+    lw2 = _instr_labware['lw2']
+
+    # ========== Transfer ==========
+    options = tx.TransferOptions()
+    options = options._replace(
+        transfer=options.transfer._replace(
+            touch_tip_strategy=tx.TouchTipStrategy.ALWAYS,
+            blow_out_strategy=tx.BlowOutStrategy.TRASH,
+            new_tip=TransferTipPolicy.NEVER))
+
+    xfer_plan = tx.TransferPlan(
+        100, lw1.columns()[0][:3], lw2.rows()[0][:3],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        options=options)
+    xfer_plan_list = []
+    for step in xfer_plan:
+        xfer_plan_list.append(step)
+    exp1 = [{'method': 'aspirate',
+             'args': [100, lw1.columns()[0][0], 1.0], 'kwargs': {}},
+            {'method': 'touch_tip', 'args': [], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [100, lw2.rows()[0][0], 1.0], 'kwargs': {}},
+            {'method': 'touch_tip', 'args': [], 'kwargs': {}},
+            {'method': 'blow_out',
+             'args': [_instr_labware['instr'].trash_container.wells()[0]],
+             'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [100, lw1.columns()[0][1], 1.0], 'kwargs': {}},
+            {'method': 'touch_tip', 'args': [], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [100, lw2.rows()[0][1], 1.0], 'kwargs': {}},
+            {'method': 'touch_tip', 'args': [], 'kwargs': {}},
+            {'method': 'blow_out',
+             'args': [_instr_labware['instr'].trash_container.wells()[0]],
+             'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [100, lw1.columns()[0][2], 1.0], 'kwargs': {}},
+            {'method': 'touch_tip', 'args': [], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [100, lw2.rows()[0][2], 1.0], 'kwargs': {}},
+            {'method': 'touch_tip', 'args': [], 'kwargs': {}},
+            {'method': 'blow_out',
+             'args': [_instr_labware['instr'].trash_container.wells()[0]],
+             'kwargs': {}}]
+    assert xfer_plan_list == exp1
+
+    # ========== Distribute ==========
+    options = tx.TransferOptions()
+    options = options._replace(
+        transfer=options.transfer._replace(
+            disposal_volume=_instr_labware['instr'].min_volume,
+            touch_tip_strategy=tx.TouchTipStrategy.ALWAYS,
+            new_tip=TransferTipPolicy.NEVER))
+
+    dist_plan = tx.TransferPlan(
+        30, lw1.columns()[0][0], lw2.rows()[0][:3],
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        options=options)
+    dist_plan_list = []
+    for step in dist_plan:
+        dist_plan_list.append(step)
+    exp2 = [{'method': 'aspirate',
+             'args': [120, lw1.columns()[0][0], 1.0], 'kwargs': {}},
+            {'method': 'touch_tip', 'args': [], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [30, lw2.rows()[0][0], 1.0], 'kwargs': {}},
+            {'method': 'touch_tip', 'args': [], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [30, lw2.rows()[0][1], 1.0], 'kwargs': {}},
+            {'method': 'touch_tip', 'args': [], 'kwargs': {}},
+            {'method': 'dispense',
+             'args': [30, lw2.rows()[0][2], 1.0], 'kwargs': {}},
+            {'method': 'touch_tip', 'args': [], 'kwargs': {}},
+            {'method': 'blow_out',
+             'args': [_instr_labware['instr'].trash_container.wells()[0]],
+             'kwargs': {}}]
+    assert dist_plan_list == exp2
+
+
 def test_transfer_w_airgap_blowout(_instr_labware):
     _instr_labware['ctx'].home()
     lw1 = _instr_labware['lw1']
