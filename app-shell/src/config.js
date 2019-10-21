@@ -1,5 +1,7 @@
 // @flow
 // app configuration and settings
+import path from 'path'
+import { app } from 'electron'
 import Store from 'electron-store'
 import mergeOptions from 'merge-options'
 import { getIn } from '@thi.ng/paths'
@@ -83,6 +85,11 @@ const DEFAULTS: Config = {
   discovery: {
     candidates: [],
   },
+
+  // custom labware files
+  labware: {
+    directory: path.join(app.getPath('userData'), 'labware'),
+  },
 }
 
 // lazy load store, overrides, and log because of config/log interdependency
@@ -135,6 +142,10 @@ export function getConfig(path?: string) {
   }
 
   return result
+}
+
+export function getFullConfig(): Config {
+  return getConfig()
 }
 
 export function handleConfigChange(

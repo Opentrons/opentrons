@@ -1,0 +1,47 @@
+@import '@opentrons/components';
+
+.card {
+  @apply --font-body-2-dark;
+
+  line-height: 1.5;
+}
+
+.list_column_titles {
+  padding: var(--spacing-3) var(--spacing-3) var(--spacing-2);
+  text-transform: uppercase;
+}
+
+.item {
+  border-top: var(--bd-light);
+  padding: var(--spacing-3);
+}
+
+.item_category_column,
+.item_name_column,
+.item_date_column {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.item_category_column {
+  text-align: right;
+  width: 6rem;
+}
+
+.item_name_column {
+  width: calc(100% - 14rem);
+  padding-left: var(--spacing-3);
+}
+
+.item_date_column {
+  width: 8rem;
+}
+
+.item_display_name,
+.item_load_name {
+  @apply --truncate;
+}
+
+.item_display_name {
+  font-weight: var(--fw-semibold);
+}

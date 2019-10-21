@@ -12,6 +12,10 @@ import type { ShellState, ShellAction } from './shell'
 import type { Config, ConfigAction } from './config'
 import type { DiscoveryState, DiscoveryAction } from './discovery'
 import type { ProtocolState, ProtocolAction } from './protocol'
+import type {
+  CustomLabwareState,
+  CustomLabwareAction,
+} from './custom-labware/types'
 
 export type State = $ReadOnly<{|
   robot: RobotState,
@@ -19,6 +23,7 @@ export type State = $ReadOnly<{|
   robotApi: RobotApiState,
   config: Config,
   discovery: DiscoveryState,
+  labware: CustomLabwareState,
   protocol: ProtocolState,
   shell: ShellState,
   router: RouterState,
@@ -33,6 +38,7 @@ export type Action =
   | RouterAction
   | DiscoveryAction
   | ProtocolAction
+  | CustomLabwareAction
 
 export type ActionLike = {| type: string, payload: any, meta: any |}
 

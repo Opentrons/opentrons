@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LabwareItem component renders 1`] = `
+<li
+  className="item"
+>
+  <div
+    className="item_category_column"
+  >
+    <p>
+      Well Plate
+    </p>
+    <p>
+      v2
+    </p>
+  </div>
+  <div
+    className="item_name_column"
+  >
+    <p
+      className="item_display_name"
+    >
+      Foo Bar
+    </p>
+    <p
+      className="item_load_name"
+    >
+      foo_bar
+    </p>
+  </div>
+  <p
+    className="item_date_column"
+  >
+    2019-10-21
+  </p>
+</li>
+`;

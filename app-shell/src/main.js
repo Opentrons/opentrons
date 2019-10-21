@@ -6,6 +6,7 @@ import initializeMenu from './menu'
 import createLogger from './log'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
 import { registerDiscovery } from './discovery'
+import { registerLabware } from './labware'
 import { registerRobotLogs } from './robot-logs'
 import { registerUpdate } from './update'
 import { registerBuildrootUpdate } from './buildroot'
@@ -48,6 +49,7 @@ function startUp() {
 
   const configHandler = registerConfig(dispatch)
   const discoveryHandler = registerDiscovery(dispatch)
+  const labwareHandler = registerLabware(dispatch)
   const robotLogsHandler = registerRobotLogs(dispatch, mainWindow)
   const updateHandler = registerUpdate(dispatch)
   const buildrootUpdateHandler = registerBuildrootUpdate(dispatch)
@@ -56,6 +58,7 @@ function startUp() {
     log.debug('Received action via IPC from renderer', { action })
     configHandler(action)
     discoveryHandler(action)
+    labwareHandler(action)
     robotLogsHandler(action)
     updateHandler(action)
     buildrootUpdateHandler(action)
