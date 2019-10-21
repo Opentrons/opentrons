@@ -243,6 +243,10 @@ The mix command takes three arguments: ``mix(repetitions, volume, location)``
     pipette.mix(3, 50)                  # mix 3 times, 50uL, in current location
     pipette.mix(2)                      # mix 2 times, pipette's max volume, in current location
 
+.. note::
+
+    Mixes consist of aspirates and then immediate dispenses. In between these actions, the pipette moves up and out of the target well. This is normal, and is done to avoid incorrect aspirate and dispense actions when the plunger does small motions necessary to set it up for its next action.
+
 .. _air-gap:
 
 Air Gap
