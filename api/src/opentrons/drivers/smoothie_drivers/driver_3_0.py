@@ -655,7 +655,7 @@ class SmoothieDriver_3_0_0:
         ''' set total axes movement speed in mm/second'''
         if update:
             self._combined_speed = float(value)
-        speed_per_min = int(self._combined_speed * SEC_PER_MIN)
+        speed_per_min = int(float(value) * SEC_PER_MIN)
         command = GCODES['SET_SPEED'] + str(speed_per_min)
         log.debug("set_speed: {}".format(command))
         self._send_command(command)
