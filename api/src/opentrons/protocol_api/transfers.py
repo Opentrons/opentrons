@@ -664,7 +664,8 @@ class TransferPlan:
         yield from self._after_aspirate()
 
     def _dispense_actions(self, vol, loc, is_disp_next=False):
-        yield from self._before_dispense()
+        if self._strategy.air_gap:
+            vol += self._strategy.air_gap
         yield self._format_dict('dispense',
                                 [vol, loc, self._options.dispense.rate])
         yield from self._after_dispense(loc, is_disp_next)
@@ -683,10 +684,6 @@ class TransferPlan:
             yield self._format_dict('air_gap', [self._strategy.air_gap])
         if self._strategy.touch_tip_strategy == TouchTipStrategy.ALWAYS:
             yield self._format_dict('touch_tip', kwargs=self._touch_tip_opts)
-
-    def _before_dispense(self):
-        if self._strategy.air_gap:
-            yield self._format_dict('dispense', [self._strategy.air_gap])
 
     def _after_dispense(self, loc, is_disp_next=False):  # noqa(C901)
         # This sequence of actions is subject to change
