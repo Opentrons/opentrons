@@ -103,7 +103,7 @@ def init(hardware: 'HardwareAPILike' = None,
     app['com.opentrons.motion_lock'] = ThreadedAsyncLock()
     app['com.opentrons.rpc'] = RPCServer(
         app, MainRouter(
-            hardware, lock=app['com.opentrons.motion_lock']))
+            hardware, lock=app['com.opentrons.motion_lock'], loop=loop))
     app['com.opentrons.response_file_tempdir'] = tempfile.mkdtemp()
     app['com.opentrons.http'] = HTTPServer(app, CONFIG['log_dir'])
 
