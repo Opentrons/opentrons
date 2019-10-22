@@ -19,7 +19,7 @@ describe('labware directory utilities', () => {
   })
 
   describe('readLabwareDirectory', () => {
-    test('resolved empty array for empty directory', () => {
+    test('resolves empty array for empty directory', () => {
       const dir = makeEmptyDir()
       return expect(readLabwareDirectory(dir)).resolves.toEqual([])
     })

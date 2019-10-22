@@ -26,8 +26,8 @@ const sameIdentity = (a: LabwareIdentity, b: LabwareIdentity) =>
   a.name === b.name && a.version === b.version && a.namespace === b.namespace
 
 // TODO(mc, 2019-10-21): this code is somewhat duplicated with stuff in
-// shared-data, the the shared-data validation function isn't geared towards
-// this use case because it either throws or passes invalid files
+// shared-data, but the shared-data validation function isn't geared towards
+// this use case because it either throws or passes invalid files; align them
 const validateLabwareDefinition = (data: any): LabwareDefinition2 | null =>
   validateDefinition(data) ? data : null
 
