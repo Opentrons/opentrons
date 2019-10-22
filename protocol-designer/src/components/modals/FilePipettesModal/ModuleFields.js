@@ -5,34 +5,49 @@ import { CheckboxField, DropdownField, FormGroup } from '@opentrons/components'
 
 import styles from './FilePipettesModal.css'
 
+import type { ModuleType } from '@opentrons/shared-data'
 import type { FormModulesByType } from '../../../step-forms'
 
-type Props = {
+type Props = {|
   values: FormModulesByType,
-  onFieldChange: (type: string, value: boolean) => mixed,
+  onFieldChange: (type: ModuleType, value: boolean) => mixed,
+|}
+
+const MODULE_IMG_BY_NAME = {
+  magdeck: require('../../../images/modules/magdeck.jpg'),
+  tempdeck: require('../../../images/modules/tempdeck.jpg'),
+  thermocycler: require('../../../images/modules/thermocycler.jpg'),
 }
+
 export default function ModuleFields(props: Props) {
   const { onFieldChange, values } = props
   const modules = Object.keys(values)
-  const handleOnDeckChange = (type: string) => (
+  const handleOnDeckChange = (type: ModuleType) => (
     e: SyntheticInputEvent<HTMLInputElement>
   ) => onFieldChange(type, e.currentTarget.checked || false)
 
   return (
     <div className={styles.modules_row}>
-      {modules.map((m, i) => {
-        const label = i18n.t(`modal.new_protocol.module_display_names.${m}`)
+      {modules.map((moduleType, i) => {
+        const label = i18n.t(
+          `modal.new_protocol.module_display_names.${moduleType}`
+        )
         return (
-          <div className={styles.module_form_group} key={`${m}`}>
+          <div className={styles.module_form_group} key={`${moduleType}`}>
             <CheckboxField
               label={label}
-              value={values[`${m}`].onDeck}
-              onChange={handleOnDeckChange(m)}
+              value={values[moduleType].onDeck}
+              onChange={handleOnDeckChange(moduleType)}
               tabIndex={i}
             />
-            <img src={MODULE_IMG_BY_NAME[m]} alt={`${m}`} />
+            <img src={MODULE_IMG_BY_NAME[moduleType]} alt={`${moduleType}`} />
+            {/*
+              TODO (ka 2019-10-22): This field is disabled until Gen 2 Modules are available
+              - Until then, 'GEN1' is hardcoded
+              - onChange returns null because onChange is required by DropdownFields
+            */}
             <div className={styles.module_model}>
-              {values[m].onDeck && (
+              {values[moduleType].onDeck && (
                 <FormGroup label="Model">
                   <DropdownField
                     tabIndex={i}
@@ -49,10 +64,4 @@ export default function ModuleFields(props: Props) {
       })}
     </div>
   )
-}
-
-const MODULE_IMG_BY_NAME = {
-  magdeck: require('../../../images/modules/magdeck.jpg'),
-  tempdeck: require('../../../images/modules/tempdeck.jpg'),
-  thermocycler: require('../../../images/modules/thermocycler.jpg'),
 }

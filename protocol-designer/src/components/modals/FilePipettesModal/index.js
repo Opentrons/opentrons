@@ -17,7 +17,7 @@ import modalStyles from '../modal.css'
 import StepChangesConfirmModal from '../EditPipettesModal/StepChangesConfirmModal'
 import PipetteFields from './PipetteFields'
 import ModuleFields from './ModuleFields'
-
+import type { ModuleType } from '@opentrons/shared-data'
 import type { NewProtocolFields } from '../../../load-file'
 import type {
   PipetteOnDeck,
@@ -111,7 +111,7 @@ export default class FilePipettesModal extends React.Component<Props, State> {
     })
   }
 
-  handleModuleOnDeckChange = (type: string, value: boolean) => {
+  handleModuleOnDeckChange = (type: ModuleType, value: boolean) => {
     let nextMountState: $Shape<FormModule> = { onDeck: value }
     this.setState({
       modulesByType: {
@@ -166,7 +166,6 @@ export default class FilePipettesModal extends React.Component<Props, State> {
 
     const { name } = this.state.fields
     const { left, right } = this.state.pipettesByMount
-    // const { tempdeck, magdeck, thermocycler } = this.state.modulesByType
 
     const pipetteSelectionIsValid =
       // at least one must not be none (empty string)
