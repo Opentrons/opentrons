@@ -3,7 +3,6 @@ import React, { useState, useMemo } from 'react'
 import { useOnClickOutside, OutlineButton } from '@opentrons/components'
 import {
   getLabwareDefURI,
-  type DeckSlotId,
   type LabwareDefinition2,
 } from '@opentrons/shared-data'
 import startCase from 'lodash/startCase'
@@ -15,16 +14,17 @@ import { PDTitledList } from '../lists'
 import LabwareItem from './LabwareItem'
 import LabwarePreview from './LabwarePreview'
 import styles from './styles.css'
+import type { DeckSlot } from '../../types'
 import type { LabwareDefByDefURI } from '../../labware-defs'
 
-type Props = {
-  onClose: (e?: *) => mixed,
+type Props = {|
+  onClose: (e?: any) => mixed,
   onUploadLabware: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
   selectLabware: (containerType: string) => mixed,
   customLabwareDefs: LabwareDefByDefURI,
-  slot: ?DeckSlotId,
+  slot: ?DeckSlot,
   permittedTipracks: Array<string>,
-}
+|}
 
 const LABWARE_CREATOR_URL = 'https://labware.opentrons.com/create'
 const CUSTOM_CATEGORY = 'custom'

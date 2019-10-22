@@ -1,6 +1,6 @@
 // @flow
 import React, { type Node } from 'react'
-import type { DeckSlotId, DeckSlot } from '@opentrons/shared-data'
+import type { DeckSlot as DeckSlotDefinition } from '@opentrons/shared-data'
 import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
 import cx from 'classnames'
 import { connect } from 'react-redux'
@@ -11,7 +11,7 @@ import {
   swapSlotContents,
 } from '../../../labware-ingred/actions'
 import i18n from '../../../localization'
-import type { ThunkDispatch } from '../../../types'
+import type { DeckSlot, ThunkDispatch } from '../../../types'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../../steplist'
 
 import { DND_TYPES } from './constants'
@@ -22,12 +22,12 @@ type DNDP = {|
   connectDropTarget: Node => mixed,
 |}
 type OP = {|
-  slot: DeckSlot,
+  slot: {| ...DeckSlotDefinition, id: DeckSlot |}, // NOTE: Ian 2019-10-22 make slot `id` more restrictive when used in PD
   selectedTerminalItemId: ?TerminalItemId,
 |}
 type DP = {|
   addLabware: (e: SyntheticEvent<*>) => mixed,
-  swapSlotContents: (DeckSlotId, DeckSlotId) => mixed,
+  swapSlotContents: (DeckSlot, DeckSlot) => mixed,
 |}
 type Props = {| ...OP, ...DP, ...DNDP |}
 

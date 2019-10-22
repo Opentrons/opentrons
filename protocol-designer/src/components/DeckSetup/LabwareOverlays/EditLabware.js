@@ -3,10 +3,10 @@ import React, { type Node } from 'react'
 import { connect } from 'react-redux'
 import cx from 'classnames'
 import { Icon } from '@opentrons/components'
-import { getLabwareDisplayName, type DeckSlotId } from '@opentrons/shared-data'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { DragSource, DropTarget } from 'react-dnd'
 import { DND_TYPES } from './constants'
-import type { BaseState, ThunkDispatch } from '../../../types'
+import type { BaseState, ThunkDispatch, DeckSlot } from '../../../types'
 import {
   openIngredientSelector,
   deleteContainer,
@@ -29,7 +29,7 @@ type DP = {|
   editLiquids: () => mixed,
   duplicateLabware: () => mixed,
   deleteLabware: () => mixed,
-  swapSlotContents: (DeckSlotId, DeckSlotId) => mixed,
+  swapSlotContents: (DeckSlot, DeckSlot) => mixed,
 |}
 
 type DNDP = {|

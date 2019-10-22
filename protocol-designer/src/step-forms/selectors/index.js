@@ -1,6 +1,5 @@
 // @flow
 import type { ElementProps } from 'react'
-import type { DeckSlotId } from '@opentrons/shared-data'
 import type {
   DropdownOption,
   Mount,
@@ -34,7 +33,7 @@ import {
 } from '../../labware-defs'
 
 import type { FormWarning } from '../../steplist/formLevel'
-import type { BaseState, Selector } from '../../types'
+import type { BaseState, Selector, DeckSlot } from '../../types'
 import type { FormData, StepIdType, StepType } from '../../form-types'
 import type {
   StepArgsAndErrors,
@@ -154,7 +153,7 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
     return {
       labware: mapValues(
         labwareLocations,
-        (slot: DeckSlotId, labwareId: string): LabwareOnDeck => {
+        (slot: DeckSlot, labwareId: string): LabwareOnDeck => {
           return { slot, ...labwareEntities[labwareId] }
         }
       ),
