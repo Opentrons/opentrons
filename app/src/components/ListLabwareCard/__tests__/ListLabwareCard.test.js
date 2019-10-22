@@ -110,15 +110,16 @@ describe('ListLabwareCard', () => {
     })
   })
 
-  test('dispatches FETCH_CUSTOM_LABWARE on an interval', () => {
+  test('dispatches FETCH_CUSTOM_LABWARE on mount and an interval', () => {
     const expected = LabwareActions.fetchCustomLabware()
 
     render()
     jest.advanceTimersByTime(5000 * 3)
 
-    expect(mockStore.dispatch).toHaveBeenCalledTimes(3)
+    expect(mockStore.dispatch).toHaveBeenCalledTimes(4)
     expect(mockStore.dispatch).toHaveBeenNthCalledWith(1, expected)
     expect(mockStore.dispatch).toHaveBeenNthCalledWith(2, expected)
     expect(mockStore.dispatch).toHaveBeenNthCalledWith(3, expected)
+    expect(mockStore.dispatch).toHaveBeenNthCalledWith(4, expected)
   })
 })

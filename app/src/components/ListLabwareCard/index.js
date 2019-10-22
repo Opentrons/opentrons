@@ -19,7 +19,7 @@ function ListLabwareCard() {
     dispatch,
   ])
 
-  useInterval(fetchLabware, LABWARE_REFRESH_INTERVAL_MS)
+  useInterval(fetchLabware, LABWARE_REFRESH_INTERVAL_MS, true)
 
   return (
     <ListCard>

@@ -20,11 +20,10 @@
     "url": "https://github.com/Opentrons/opentrons/issues"
   },
   "homepage": "https://github.com/Opentrons/opentrons",
-  "devDependencies": {
-    "@opentrons/app": "3.13.2"
-  },
   "dependencies": {
+    "@opentrons/app": "3.13.2",
     "@opentrons/discovery-client": "3.13.2",
+    "@opentrons/shared-data": "3.13.2",
     "@thi.ng/paths": "^1.6.5",
     "ajv": "^6.10.2",
     "dateformat": "^3.0.3",

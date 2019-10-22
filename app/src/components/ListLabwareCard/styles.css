@@ -1,17 +1,20 @@
 @import '@opentrons/components';
 
 .card {
-  @apply --font-body-2-dark;
-
   line-height: 1.5;
+  padding-bottom: var(--spacing-2);
 }
 
 .list_column_titles {
+  @apply --font-body-1-dark;
+
   padding: var(--spacing-3) var(--spacing-3) var(--spacing-2);
   text-transform: uppercase;
 }
 
 .item {
+  @apply --font-body-2-dark;
+
   border-top: var(--bd-light);
   padding: var(--spacing-3);
 }
