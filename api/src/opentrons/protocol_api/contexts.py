@@ -30,6 +30,12 @@ ModuleTypes = Union[
     'ThermocyclerContext'
 ]
 
+AdvancedLiquidHandling = Union[
+    Well,
+    types.Location,
+    List[Union[Well, types.Location]],
+    List[List[Well]]]
+
 
 class ProtocolContext(CommandPublisher):
     """ The Context class is a container for the state of a protocol.
@@ -1391,8 +1397,8 @@ class InstrumentContext(CommandPublisher):
     @cmds.publish.both(command=cmds.transfer)
     def transfer(self,
                  volume: Union[float, Sequence[float]],
-                 source,
-                 dest,
+                 source: AdvancedLiquidHandling,
+                 dest: AdvancedLiquidHandling,
                  trash=True,
                  **kwargs) -> 'InstrumentContext':
         # source: Union[Well, List[Well], List[List[Well]]],
