@@ -50,7 +50,7 @@ export default function fieldsToLabware(
         ? fields.wellDiameter
         : fields.wellYDimension
     if (fields.gridRows === 1 && heightOrDiameter >= MULTI_CHANNEL_WIDTH_MM) {
-      quirks = [...quirks, 'centerMultichannelOnWells']
+      quirks = [...quirks, 'centerMultichannelOnWells', 'touchTipDisabled']
 
       // Legacy API (v1) uses `lw_format == 'trough'` instead of centerMultichannelOnWells quirk.
       // HOWEVER, setting format to 'trough' also makes the well size zero, so you can't
