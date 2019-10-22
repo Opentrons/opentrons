@@ -53,7 +53,7 @@ export type VolumeJson = {
   },
 }
 
-// TODO IMMEDIATELY move up, possibly to shared-data?
+// TODO: Ian 2019-10-22 move up, possibly to shared-data?
 export type DeckSlot =
   | '1'
   | '2'

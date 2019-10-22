@@ -8,7 +8,7 @@ import { DropTarget } from 'react-dnd'
 import noop from 'lodash/noop'
 import {
   openAddLabwareModal,
-  swapSlotContents,
+  moveDeckItem,
 } from '../../../labware-ingred/actions'
 import i18n from '../../../localization'
 import type { DeckSlot, ThunkDispatch } from '../../../types'
@@ -27,7 +27,7 @@ type OP = {|
 |}
 type DP = {|
   addLabware: (e: SyntheticEvent<*>) => mixed,
-  swapSlotContents: (DeckSlot, DeckSlot) => mixed,
+  moveDeckItem: (DeckSlot, DeckSlot) => mixed,
 |}
 type Props = {| ...OP, ...DP, ...DNDP |}
 
@@ -64,15 +64,15 @@ const SlotControls = ({
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   addLabware: () => dispatch(openAddLabwareModal({ slot: ownProps.slot.id })),
-  swapSlotContents: (sourceSlot, destSlot) =>
-    dispatch(swapSlotContents(sourceSlot, destSlot)),
+  moveDeckItem: (sourceSlot, destSlot) =>
+    dispatch(moveDeckItem(sourceSlot, destSlot)),
 })
 
 const slotTarget = {
   drop: (props, monitor) => {
     const draggedItem = monitor.getItem()
     if (draggedItem) {
-      props.swapSlotContents(draggedItem.labwareOnDeck.slot, props.slot.id)
+      props.moveDeckItem(draggedItem.labwareOnDeck.slot, props.slot.id)
     }
   },
 }

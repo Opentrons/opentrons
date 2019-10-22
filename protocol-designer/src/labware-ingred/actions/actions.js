@@ -81,8 +81,7 @@ export type SwapSlotContentsAction = {
 
 // TODO: Ian 2019-01-24 later, this should work on stepId or a range of steps.
 // We could follow the pattern of SubstituteStepFormPipettesAction.
-export const swapSlotContents = (
-  // TODO IMMEDIATELY RENAME
+export const moveDeckItem = (
   sourceSlot: DeckSlot,
   destSlot: DeckSlot
 ): SwapSlotContentsAction => ({
