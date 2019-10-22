@@ -105,6 +105,7 @@ class TempDeck:
         self._temperature.update({'target': celsius})
         while self.status != 'holding at target':
             await asyncio.sleep(0.1)
+        return ''
 
     # NOTE: this is only present to support apiV1 non-blocking by default behavior
     def legacy_set_temperature(self, celsius) -> str:
