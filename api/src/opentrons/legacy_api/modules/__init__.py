@@ -166,17 +166,17 @@ async def update_firmware(module, firmware_file_path, loop):
 
 
 def _format_avrdude_response(raw_response):
-    response = {'message': '', 'avrdudeResponse': ''}
+    response = {'message': '', 'bootloaderResponse': ''}
     avrdude_log = ''
     for line in raw_response.splitlines():
         if 'avrdude:' in line and line != raw_response.splitlines()[1]:
             avrdude_log += line.lstrip('avrdude:') + '..'
             if 'flash verified' in line:
                 response['message'] = 'Firmware update successful'
-                response['avrdudeResponse'] = line.lstrip('avrdude: ')
+                response['bootloaderResponse'] = line.lstrip('avrdude: ')
     if not response['message']:
         response['message'] = 'Firmware update failed'
-        response['avrdudeResponse'] = avrdude_log
+        response['bootloaderResponse'] = avrdude_log
     return response
 
 

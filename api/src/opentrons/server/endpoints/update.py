@@ -31,8 +31,8 @@ async def update_module_firmware(request):
                                         data['module_firmware'],
                                         request.loop)
     if 'successful' not in res['message']:
-        if 'avrdudeResponse' in res and \
-           'checksum mismatch' in res['avrdudeResponse']:
+        if 'bootloaderResponse' in res and \
+           'checksum mismatch' in res['bootloaderResponse']:
             status = 400
         elif 'not found' in res['message']:
             status = 404
@@ -52,7 +52,7 @@ async def _update_module_firmware(hw, module_serial, data, loop=None):
 
     with tempfile.NamedTemporaryFile(suffix=fw_filename) as fp:
         fp.write(content)
-        # returns a dict of 'message' & 'avrdudeResponse'
+        # returns a dict of 'message' & 'bootloaderResponse' or
         res = await _upload_to_module(hw, module_serial, fp.name, loop=loop)
     log.info('Firmware update complete')
     res['filename'] = fw_filename
@@ -67,10 +67,7 @@ async def _upload_to_module(hw, serialnum, fw_filename, loop):
     moving the drivers themselves to the serverlib)
     """
 
-    if ff.use_protocol_api_v2():
-        update_firmware = modules.update_firmware
-    else:
-        update_firmware = legacy_modules.update_firmware
+    if not ff.use_protocol_api_v2():
         # ensure there is a reference to the port
         if not hw.is_connected():
             hw.connect()
@@ -81,6 +78,8 @@ async def _upload_to_module(hw, serialnum, fw_filename, loop):
     for module in hw_mods:
         if module.device_info.get('serial') == serialnum:
 
+            # NOTE: legacy block, api_v2 enter bootloader is nested in
+            # modules.update_firmware
             if not ff.use_protocol_api_v2():
                 log.info("Module with serial {} found".format(serialnum))
                 bootloader_port = await legacy_modules.enter_bootloader(module)
@@ -91,13 +90,26 @@ async def _upload_to_module(hw, serialnum, fw_filename, loop):
                     module.port))
                 log.info("Flashing firmware. This will take a few seconds")
 
-            try:
-                res = await asyncio.wait_for(
-                    update_firmware(module, fw_filename, loop),
-                    UPDATE_TIMEOUT)
-            except asyncio.TimeoutError:
-                return {'message': 'AVRDUDE not responding'}
-            break
-    if not res:
-        res = {'message': 'Module {} not found'.format(serialnum)}
+                try:
+                    res = await asyncio.wait_for(
+                        legacy_modules.update_firmware(
+                            module, fw_filename, loop),
+                        UPDATE_TIMEOUT)
+                except asyncio.TimeoutError:
+                    return {'message': 'AVRDUDE not responding'}
+                break
+            else:
+                try:
+                    updated_instance = await asyncio.wait_for(
+                        modules.update_firmware(module, fw_filename, loop),
+                        UPDATE_TIMEOUT)
+                    if updated_instance:
+                        res['message'] = f'Sucessfully updated firmware for module {serialnum}'
+
+                except asyncio.TimeoutError:
+                    return {'message': 'AVRDUDE not responding'}
+                break
+        if not res:
+            res = {'message': 'Module {} not found'.format(serialnum)}
+
     return res

@@ -75,7 +75,7 @@ async def update_firmware(
         loop: Optional[asyncio.AbstractEventLoop]) -> AbstractModule:
     """ Update a module.
 
-    If the update succeeds, an Module instance will be returned.
+    If the update succeeds, a Module instance will be returned.
 
     Otherwise, raises an UpdateError with the reason for the failure.
     """

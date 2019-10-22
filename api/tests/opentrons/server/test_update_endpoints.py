@@ -151,7 +151,7 @@ async def test_update_module_firmware(
 
     # ========= Happy path ==========
     res_msg = {'message': 'Firmware update successful',
-               'avrdudeResponse': '1234 bytes of flash verified',
+               'bootloaderResponse': '1234 bytes of flash verified',
                'filename': fw_filename}
 
     async def mock_successful_upload_to_module(
@@ -203,7 +203,7 @@ async def test_fail_update_module_firmware(
 
     # ========= Case 1: Port not accessible =========
     res_msg1 = {'message': 'Firmware update failed',
-                'avrdudeResponse': 'ser_open(): can\'t open device',
+                'bootloaderResponse': 'ser_open(): can\'t open device',
                 'filename': fw_filename}
 
     async def mock_failed_upload_to_module1(
@@ -224,7 +224,7 @@ async def test_fail_update_module_firmware(
 
     # ========= Case 2: Corrupted file =========
     res_msg2 = {'message': 'Firmware update failed',
-                'avrdudeResponse': 'checksum mismatch in line 1234',
+                'bootloaderResponse': 'checksum mismatch in line 1234',
                 'filename': fw_filename}
 
     async def mock_failed_upload_to_module2(

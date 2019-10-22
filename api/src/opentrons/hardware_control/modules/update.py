@@ -79,9 +79,8 @@ async def update_firmware(port: str,
         raise ValueError(
             f"cannot handle specified bootloader type: {bootloader_type}")
 
+    await asyncio.sleep(2)  # wait for com port to reappear
     new_port = await _port_on_mode_switch(ports_before_update)
-    log.info("Res: {}".format(res))
-    log.info("New port: {}".format(new_port))
     return new_port, res
 
 

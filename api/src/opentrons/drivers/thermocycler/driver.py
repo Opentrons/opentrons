@@ -433,7 +433,7 @@ class Thermocycler:
 
     async def enter_programming_mode(self) -> str:
         trigger_connection = serial.Serial(
-            self._poller.port, TC_BOOTLOADER_BAUDRATE, timeout=1)
+            self.port, TC_BOOTLOADER_BAUDRATE, timeout=1)
         await asyncio.sleep(0.005)
         trigger_connection.close()
 
