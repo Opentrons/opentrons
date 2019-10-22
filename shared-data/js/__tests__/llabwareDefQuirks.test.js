@@ -7,9 +7,9 @@ const definitionsGlobPath = path.join(
 )
 
 const validQuirks = [
-  "centerMultichannelOnWells",
-  "touchTipDisabled",
-  "fixedTrash"
+  'centerMultichannelOnWells',
+  'touchTipDisabled',
+  'fixedTrash',
 ]
 
 describe('check quirks for all labware defs', () => {
@@ -21,12 +21,14 @@ describe('check quirks for all labware defs', () => {
   labwarePaths.forEach(labwarePath => {
     const filename = path.parse(labwarePath).base
     const labwareDef = require(labwarePath)
-    if(labwareDef.parameters.quirks) {
+    if (labwareDef.parameters.quirks) {
       test(`${filename} has valid quirks`, () => {
         // we want to test that the quirks in the def are a subset of validQuirks,
         // whereas arrayContaining tests that the expected value is a subset of
         // the value under test. Unfortunately that means we have to do it backwards
-        expect(validQuirks).toEqual(expect.arrayContaining(labwareDef.parameters.quirks))
+        expect(validQuirks).toEqual(
+          expect.arrayContaining(labwareDef.parameters.quirks)
+        )
       })
     }
   })
