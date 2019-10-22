@@ -28,6 +28,7 @@ export default function ModuleFields(props: Props) {
               label={label}
               value={values[`${m}`].onDeck}
               onChange={handleOnDeckChange(m)}
+              tabIndex={i}
             />
             <img src={MODULE_IMG_BY_NAME[m]} alt={`${m}`} />
             <div className={styles.module_model}>
