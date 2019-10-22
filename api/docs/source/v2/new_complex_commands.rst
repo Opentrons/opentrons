@@ -650,7 +650,7 @@ will have the steps...
 air_gap
 -------
 
-An :ref:`air-gap` can be performed after every aspirate by setting ``air_gap=int``, where the value is the volume of air in microliters to aspirate after aspirating the liquid.
+An :ref:`air-gap` can be performed after every aspirate by setting ``air_gap=int``, where the value is the volume of air in microliters to aspirate after aspirating the liquid. The entire volume in the tip, air gap and the liquid volume, will be dispensed all at once at the destination specified in the complex command.
 
 .. code-block:: python
 
@@ -670,8 +670,7 @@ will have the steps...
     Aspirating 100.0 uL from well A1 in "1" at 1 speed
     Air gap
     Aspirating 20 uL from well A1 in "1" at 1.0 speed
-    Dispensing 20 uL into well A2 in "1"
-    Dispensing 100.0 uL into well A2 in "1"
+    Dispensing 120.0 uL into well A2 in "1"
     Dropping tip well A1 in "12"
 
 disposal_volume
