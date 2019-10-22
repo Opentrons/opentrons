@@ -91,7 +91,6 @@ def config_tempdir(tmpdir, template_db):
         shutil.copyfile(
             template_db, config.CONFIG['labware_database_file'])
     yield tmpdir, template_db
-    # shutil.rmtree(tmpdir)
 
 
 @pytest.fixture(autouse=True)
@@ -226,7 +225,6 @@ async def async_client(async_server, loop, aiohttp_client):
         yield cli
     finally:
         if cli.app.on_shutdown.frozen:
-            # cli.freeze()
             await cli.close()
         else:
             await async_server.shutdown()
@@ -437,7 +435,6 @@ def sync_hardware(request, loop, virtual_smoothie_env):
         pytest.skip('requires api2 only')
     with request.param(loop) as hw:
         yield hw
-        del hw
 
 
 @pytest.fixture
