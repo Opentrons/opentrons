@@ -1,18 +1,14 @@
-import contextlib
 import json
 import os
-import shutil
-import tempfile
 
 import pytest
 
-from opentrons.server import init
 from opentrons.config import pipette_config
 from opentrons import config, types
 
 
 @pytest.fixture
-async def attached_pipettes(async_server, request):
+async def attached_pipettes(async_client, request):
     """ Fixture the robot to have attached pipettes
 
     Mark the node with
@@ -32,8 +28,8 @@ async def attached_pipettes(async_server, request):
     right_name = right_mod.split('_v')[0]
     left_id = marker_with_default('attach_left_id', 'abc123')
     right_id = marker_with_default('attach_right_id', 'abcd123')
-    hw = async_server['com.opentrons.hardware']
-    if async_server['api_version'] == 1:
+    hw = async_client.app['com.opentrons.hardware']
+    if async_client.app['api_version'] == 1:
         hw.model_by_mount = {
             'left': {'model': left_mod, 'id': left_id, 'name': left_name},
             'right': {'model': right_mod, 'id': right_id, 'name': right_name}
@@ -66,24 +62,23 @@ def validate_response_body(body):
         assert 'restart_required' in obj
 
 
-async def test_get(async_client, async_server):
+async def test_get(async_client):
     resp = await async_client.get('/settings')
     body = await resp.json()
     assert resp.status == 200
     validate_response_body(body)
-    if async_server['api_version'] == 2:
+    if async_client.app['api_version'] == 2:
         assert 'enableApi1BackCompat' in [s['id'] for s in body['settings']]
     else:
         assert 'enableApi1BackCompat' not in [
             s['id'] for s in body['settings']]
 
 
-async def test_set(virtual_smoothie_env, loop, aiohttp_client):
-    app = init()
-    cli = await loop.create_task(aiohttp_client(app))
+async def test_set(virtual_smoothie_env, loop, async_client):
     test_id = 'disableHomeOnBoot'
 
-    resp = await cli.post('/settings', json={"id": test_id, "value": True})
+    resp = await async_client.post(
+        '/settings', json={"id": test_id, "value": True})
     body = await resp.json()
     assert resp.status == 200
     validate_response_body(body)
@@ -92,12 +87,12 @@ async def test_set(virtual_smoothie_env, loop, aiohttp_client):
     assert test_setting.get('value')
 
 
-async def test_available_resets(async_client, async_server):
+async def test_available_resets(async_client):
     resp = await async_client.get('/settings/reset/options')
     body = await resp.json()
     options_list = body.get('options')
     assert resp.status == 200
-    if async_server['api_version'] == 1:
+    if async_client.app['api_version'] == 1:
         options = [{'id': 'tipProbe',
                     'name': 'Tip Length',
                     'description': 'Clear tip probe data'},
@@ -127,8 +122,9 @@ async def test_available_resets(async_client, async_server):
 
 
 @pytest.mark.api1_only
-async def execute_reset_tests_v1(cli):
+async def execute_reset_tests_v1(async_client):
     # Make sure we actually delete the database
+    cli = async_client
     resp = await cli.post('/settings/reset', json={'labwareCalibration': True})
     body = await resp.json()
     assert not os.path.exists(config.CONFIG['labware_database_file'])
@@ -160,7 +156,8 @@ async def execute_reset_tests_v1(cli):
     assert 'aksgjajhadjasl' in body['message']
 
 
-async def execute_reset_tests_v2(cli):
+async def execute_reset_tests_v2(async_client):
+    cli = async_client
     # Make sure we actually delete the database
     resp = await cli.post('/settings/reset', json={'labwareCalibration': True})
     body = await resp.json()
@@ -194,42 +191,7 @@ async def execute_reset_tests_v2(cli):
     assert 'aksgjajhadjasl' in body['message']
 
 
-@contextlib.contextmanager
-def restore_db(db_path):
-    db_name = os.path.basename(db_path)
-    with tempfile.TemporaryDirectory() as tempdir:
-        shutil.copy(db_path,
-                    os.path.join(tempdir, db_name))
-        try:
-            yield
-        finally:
-            shutil.copy(os.path.join(tempdir, db_name),
-                        db_path)
-
-
-@pytest.mark.api1_only
-async def test_reset_v1(virtual_smoothie_env, loop, async_client):
-    # This test runs each reset individually (except /data/boot.d which won’t
-    # work locally) and checks the error handling
-
-    # precondition
-    assert os.path.exists(config.CONFIG['labware_database_file'])
-    with restore_db(config.CONFIG['labware_database_file']):
-        await execute_reset_tests_v1(async_client)
-
-
-@pytest.mark.api2_only
-async def test_reset_v2(virtual_smoothie_env, loop, async_client):
-
-    # This test runs each reset individually (except /data/boot.d which won’t
-    # work locally) and checks the error handling
-
-    # precondition
-    await execute_reset_tests_v2(async_client)
-
-
-async def test_receive_pipette_settings(
-        async_server, loop, async_client, attached_pipettes):
+async def test_receive_pipette_settings(async_client, attached_pipettes):
 
     test_id = attached_pipettes['left']['id']
     resp = await async_client.get('/settings/pipettes')
@@ -240,7 +202,7 @@ async def test_receive_pipette_settings(
 
 
 async def test_receive_pipette_settings_one_pipette(
-        async_server, loop, async_client, attached_pipettes):
+        async_client, attached_pipettes):
     # This will check that sending a known pipette id works,
     # and sending an unknown one does not
     test_id = attached_pipettes['left']['id']
@@ -255,8 +217,7 @@ async def test_receive_pipette_settings_one_pipette(
     assert resp.status == 404
 
 
-async def test_modify_pipette_settings(
-        async_server, loop, async_client, attached_pipettes):
+async def test_modify_pipette_settings(async_client, attached_pipettes):
     # This test will check that setting modified pipette configs
     # works as expected
     changes = {
@@ -315,7 +276,7 @@ async def test_modify_pipette_settings(
 
 
 async def test_incorrect_modify_pipette_settings(
-        async_server, loop, async_client, attached_pipettes):
+        async_client, attached_pipettes):
     out_of_range = {
             'fields': {
                 'pickUpCurrent': {'value': 1000}
@@ -328,10 +289,9 @@ async def test_incorrect_modify_pipette_settings(
     assert resp.status == 412
 
 
-async def test_set_log_level(
-        async_server, loop, async_client):
+async def test_set_log_level(async_client):
     # Check input sanitization
-    hardware = async_server['com.opentrons.hardware']
+    hardware = async_client.app['com.opentrons.hardware']
     resp = await async_client.post('/settings/log_level/local', json={})
     assert resp.status == 400
     body = await resp.json()
@@ -341,7 +301,7 @@ async def test_set_log_level(
     assert resp.status == 400
     body = await resp.json()
     assert 'message'in body
-    if async_server['api_version'] == 1:
+    if async_client.app['api_version'] == 1:
         conf = hardware.config
     else:
         conf = await hardware.config
@@ -351,7 +311,7 @@ async def test_set_log_level(
     assert resp.status == 200
     body = await resp.json()
     assert 'message' in body
-    if async_server['api_version'] == 1:
+    if async_client.app['api_version'] == 1:
         conf = hardware.config
     else:
         conf = await hardware.config

@@ -222,9 +222,14 @@ async def async_server(request, virtual_smoothie_env, loop):
 async def async_client(async_server, loop, aiohttp_client):
     cli = await loop.create_task(aiohttp_client(async_server))
     endpoints.session = None
-    yield cli
-    if not cli.app:
-        cli.close()
+    try:
+        yield cli
+    finally:
+        if cli.app.on_shutdown.frozen:
+            # cli.freeze()
+            await cli.close()
+        else:
+            await async_server.shutdown()
 
 
 @pytest.fixture
