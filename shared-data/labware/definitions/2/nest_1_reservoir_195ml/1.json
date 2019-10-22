@@ -40,7 +40,7 @@
     "format": "trough",
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
-    "quirks": ["centerMultichannelOnWells"],
+    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"],
     "loadName": "nest_1_reservoir_195ml"
   },
   "namespace": "opentrons",
