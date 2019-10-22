@@ -17,7 +17,7 @@ class SimulatingDriver:
         self._active = False
         self._port = None
 
-    def set_temperature(self, celsius):
+    async def set_temperature(self, celsius):
         self._target_temp = celsius
         self._active = True
 

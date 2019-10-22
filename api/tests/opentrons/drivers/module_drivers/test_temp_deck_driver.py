@@ -99,12 +99,22 @@ async def test_set_temp_deck_temperature(monkeypatch):
         command_log += [command]
         return ''
 
-    temp_deck._send_command = types.MethodType(_mock_send_command, temp_deck)
+    def _mock_update_temp(self):
+        return 'holding at target'
 
-    await asyncio.wait_for(temp_deck.set_temperature(99), 0.2)
+    temp_deck._send_command = types.MethodType(_mock_send_command, temp_deck)
+    temp_deck._update_temp = types.MethodType(_mock_send_command, temp_deck)
+
+    try:
+        await asyncio.wait_for(temp_deck.set_temperature(99), timeout=0.2)
+    except asyncio.TimeoutError:
+        pass
     assert command_log[-1] == 'M104 S99.0'
 
-    await asyncio.wait_for(temp_deck.set_temperature(-9), 0.2)
+    try:
+        await asyncio.wait_for(temp_deck.set_temperature(-9), timeout=0.2)
+    except asyncio.TimeoutError:
+        pass
     assert command_log[-1] == 'M104 S-9.0'
 
 
@@ -126,7 +136,10 @@ async def test_fail_set_temp_deck_temperature(monkeypatch):
     temp_deck = TempDeck()
     temp_deck.simulating = False
 
-    res = await asyncio.wait_for(temp_deck.set_temperature(-9), 0.2)
+    try:
+        res = await asyncio.wait_for(temp_deck.set_temperature(-9), timeout=0.2)
+    except asyncio.TimeoutError:
+        pass
     assert res == error_msg
 
     error_msg = 'Alarm: something alarming happened here'
@@ -139,7 +152,10 @@ async def test_fail_set_temp_deck_temperature(monkeypatch):
     serial_communication.write_and_return = types.MethodType(
         _raise_error, serial_communication)
 
-    res = await asyncio.wait_for(temp_deck.set_temperature(-9), 0.2)
+    try:
+        res = await asyncio.wait_for(temp_deck.set_temperature(-9), timeout=0.2)
+    except asyncio.TimeoutError:
+        pass
     assert res == error_msg
 
 
