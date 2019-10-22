@@ -273,7 +273,10 @@ For example, we can move to the first tip in our tip rack:
 
 .. code-block:: python
 
-    pipette.move_to(tiprack['A1'])
+    pipette.move_to(tiprack['A1'].top())
+
+
+Unlike commands that require labware, like :ref:`new-aspirate` or :ref:`new-dispense`, :py:meth:`.InstrumentContext.move_to` deals with :py:class:`.types.Location` instances, which combine positions in :ref:`protocol-api-deck-coords` and associated :py:class:`.Labware` instances. You don't have to create them yourself; this is what is returned from methods such as :py:meth:`.Well.top` and :py:meth:`.Well.bottom`. It does mean, however, that you can't move to a well directly; you must use :py:meth:`.Well.top` or build a :py:class:`.types.Location` yourself.
 
 You can also specify at what height you would like the robot to move to inside of a location using :py:meth:`.Well.top` and :py:meth:`.Well.bottom` methods on that location (more on these methods and others like them in the :ref:`v2-location-within-wells` section):
 
@@ -289,7 +292,7 @@ If instead you would like the robot to move in a straight line to the target loc
 
 .. code-block:: python
 
-    pipette.move_to(plate['A1'], force_direct=True)
+    pipette.move_to(plate['A1'].top(), force_direct=True)
 
 .. warning::
 
@@ -299,10 +302,10 @@ Usually the above option is useful when moving inside of a well. Take a look at 
 
 .. code-block:: python
 
-    pipette.move_to(plate['A1'])
+    pipette.move_to(plate['A1'].top())
     pipette.move_to(plate['A1'].bottom(1), force_direct=True)
     pipette.move_to(plate['A1'].top(-2), force_direct=True)
-    pipette.move_to(plate['A2'])
+    pipette.move_to(plate['A2'].top())
 
 ****************
 Utility Commands
