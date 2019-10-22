@@ -68,7 +68,7 @@
     "express": "^4.16.4",
     "favicons-webpack-plugin": "^1.0.2",
     "file-loader": "^4.2.0",
-    "flow-bin": "^0.106.2",
+    "flow-bin": "^0.110.0",
     "flow-typed": "^2.6.1",
     "fs-extra": "^6.0.1",
     "glob": "^7.1.2",
