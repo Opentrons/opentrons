@@ -29,18 +29,11 @@ module.exports = {
   overrides: [
     {
       test: 'app-shell/**/*',
-      presets: [
-        [
-          '@babel/preset-env',
-          { modules: 'commonjs', targets: { electron: '6' } },
-        ],
-      ],
+      presets: [['@babel/preset-env', { targets: { electron: '6' } }]],
     },
     {
       test: ['discovery-client/**/*'],
-      presets: [
-        ['@babel/preset-env', { modules: 'commonjs', targets: { node: '8' } }],
-      ],
+      presets: [['@babel/preset-env', { targets: { node: '8' } }]],
     },
     // app that should be polyfilled
     // these projects require `core-js` in their package.json `dependencies`

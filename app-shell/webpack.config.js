@@ -1,0 +1,26 @@
+'use strict'
+
+const path = require('path')
+const webpackMerge = require('webpack-merge')
+const { nodeBaseConfig } = require('@opentrons/webpack-config')
+
+const ENTRY_MAIN = path.join(__dirname, 'src/main.js')
+const ENTRY_EXPORTS = path.join(__dirname, 'src/exports.js')
+const ENTRY_PRELOAD = path.join(__dirname, 'src/preload.js')
+const OUTPUT_PATH = path.join(__dirname, 'lib')
+
+const COMMON_CONFIG = { output: { path: OUTPUT_PATH } }
+
+module.exports = [
+  // main process (runs in electron)
+  webpackMerge(nodeBaseConfig, COMMON_CONFIG, {
+    target: 'electron-main',
+    entry: { main: ENTRY_MAIN, exports: ENTRY_EXPORTS },
+  }),
+
+  // preload script (runs in the browser window)
+  webpackMerge(nodeBaseConfig, COMMON_CONFIG, {
+    target: 'web',
+    entry: { preload: ENTRY_PRELOAD },
+  }),
+]
