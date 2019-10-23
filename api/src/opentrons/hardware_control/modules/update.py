@@ -45,7 +45,7 @@ async def enter_bootloader(driver, model):
     return new_port
 
 
-async def update_firmware(port: str,
+async def upload_firmware(port: str,
                           firmware_file_path: str,
                           bootloader_type: str,
                           loop: Optional[asyncio.AbstractEventLoop])\
@@ -58,7 +58,7 @@ async def update_firmware(port: str,
     Scan for such a port change and use the appropriate port.
 
     Returns a tuple of the new port to communicate on (or None if it was not
-    found) and a tuple of success and message from avrdude.
+    found) and a tuple of success and message from bootloader.
     """
 
     ports_before_update = await _discover_ports()
@@ -120,9 +120,8 @@ def _format_avrdude_response(raw_response: str) -> Tuple[bool, str]:
 
 
 async def _upload_via_bossa(port, firmware_file_path, kwargs):
-    # bossac -p/dev/cu.usbmodem14101 -e -w -v -R --offset=0x2000 modules/thermo-cycler/production/firmware/thermo-cycler-arduino.ino.bin
-
-    log.debug(f'\n\nsymlink origin {os.path.realpath(port)}\n\n')
+    # bossac -p/dev/ttyACM1 -e -w -v -R --offset=0x2000 modules/thermo-cycler/production/firmware/thermo-cycler-arduino.ino.bin
+    # NOTE: bossac cannot traverse symlinks to udev port, so we resolve to real path
     bossa_args = ['bossac', f'-p{os.path.realpath(port)}',
                   '-e', '-w', '-v', '-R',
                   '--offset=0x2000', f'{firmware_file_path}']
