@@ -6,6 +6,7 @@ import {
   moduleInvariantProperties,
   savedStepForms,
 } from '../reducers'
+import { moveDeckItem } from '../../labware-ingred/actions'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 
 jest.mock('../../labware-defs/utils')
@@ -225,32 +226,34 @@ describe('moduleInvariantProperties reducer', () => {
   })
 })
 
-describe('savedStepForms reducer', () => {
-  const existingLabwareId = 'existingLabwareId'
-  let prevRootState: any = {
-    // TODO IMMEDIATELY create prevRootState in beforeEach or a fn
-    savedStepForms: {
-      [INITIAL_DECK_SETUP_STEP_ID]: {
-        labwareLocationUpdate: { [existingLabwareId]: '1' },
-        /* TODO IMMEDIATELY: moduleLocationUpdate */
-      },
-    },
-  }
+type MakeDeckSetupStepArgs = {
+  // TODO IMMEDIATELY: type properly
+  labwareLocationUpdate?: Object,
+  pipetteLocationUpdate?: Object,
+  moduleLocationUpdate?: Object,
+}
+
+const makeDeckSetupStep = (args: MakeDeckSetupStepArgs) => ({
+  stepType: 'manualIntervention',
+  id: '__INITIAL_DECK_SETUP_STEP__',
+  labwareLocationUpdate: args.labwareLocationUpdate || {},
+  pipetteLocationUpdate: args.pipetteLocationUpdate || {},
+  /* TODO IMMEDIATELY: moduleLocationUpdate */
+})
+
+const makePrevRootState = (args: MakeDeckSetupStepArgs): any => ({
+  savedStepForms: {
+    [INITIAL_DECK_SETUP_STEP_ID]: makeDeckSetupStep(args),
+  },
+})
+
+describe('savedStepForms reducer: initial deck setup step', () => {
+  const existingLabwareId = '_existingLabwareId'
+  const otherLabwareId = '_otherLabwareId'
+  const newLabwareId = '_newLabwareId'
 
   describe('create (or duplicate) new labware', () => {
-    const newLabwareId = 'newLabwareId'
     const newSlot = '8'
-    const prevDeckSetupStep =
-      prevRootState.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
-    const expected = {
-      [INITIAL_DECK_SETUP_STEP_ID]: {
-        ...prevDeckSetupStep,
-        labwareLocationUpdate: {
-          ...prevDeckSetupStep.labwareLocationUpdate,
-          [newLabwareId]: newSlot,
-        },
-      },
-    }
     const testCases = [
       {
         testName: 'duplicate labware',
@@ -265,7 +268,7 @@ describe('savedStepForms reducer', () => {
         },
       },
       {
-        testName: `create container in slot ${newSlot}`,
+        testName: `create labware in slot ${newSlot}`,
         action: {
           type: 'CREATE_CONTAINER',
           payload: {
@@ -279,8 +282,119 @@ describe('savedStepForms reducer', () => {
 
     testCases.forEach(({ testName, action }) => {
       test(testName, () => {
+        const prevRootState = makePrevRootState({
+          labwareLocationUpdate: {
+            [existingLabwareId]: '1',
+          },
+        })
         const result = savedStepForms(prevRootState, action)
-        expect(result).toEqual(expected)
+        expect(
+          result[INITIAL_DECK_SETUP_STEP_ID].labwareLocationUpdate
+        ).toEqual({
+          [existingLabwareId]: '1',
+          [newLabwareId]: newSlot,
+        })
+      })
+    })
+  })
+
+  describe('move deck item', () => {
+    test('move labware to empty slot -> simple move', () => {
+      const sourceSlot = '1'
+      const destSlot = '2'
+      const prevRootState = makePrevRootState({
+        labwareLocationUpdate: {
+          [existingLabwareId]: sourceSlot,
+        },
+      })
+      const action = moveDeckItem(sourceSlot, destSlot)
+      const result = savedStepForms(prevRootState, action)
+      expect(result[INITIAL_DECK_SETUP_STEP_ID].labwareLocationUpdate).toEqual({
+        [existingLabwareId]: destSlot,
+      })
+    })
+    test('move labware to slot with labware -> swap labware', () => {
+      const sourceSlot = '1'
+      const destSlot = '12'
+      const prevRootState = makePrevRootState({
+        labwareLocationUpdate: {
+          [existingLabwareId]: sourceSlot,
+          [otherLabwareId]: destSlot,
+        },
+      })
+      const action = moveDeckItem(sourceSlot, destSlot)
+      const result = savedStepForms(prevRootState, action)
+      expect(result[INITIAL_DECK_SETUP_STEP_ID].labwareLocationUpdate).toEqual({
+        [existingLabwareId]: destSlot,
+        [otherLabwareId]: sourceSlot,
+      })
+    })
+    test('move labware to slot with empty module -> labware added to module', () => {
+      // NOTE: if labware is incompatible, it's up to the UI to block this.
+    })
+    test('move labware to slot with occupied module -> swap labware', () => {
+      // NOTE: if labware is incompatible, it's up to the UI to block this.
+    })
+    test('move empty module to empty slot -> simple move', () => {
+      // TODO LAST (NEW MODULE STUFF)
+    })
+    test('move occupied module to empty slot -> its labware moves with it', () => {
+      // TODO LAST (NEW MODULE STUFF)
+    })
+    test('move empty module to slot with labware -> swap slots, do not add labware to module', () => {
+      // TODO LAST (NEW MODULE STUFF)
+    })
+    test('move occupied module to slot with labware -> swap slots, do not change labware on module', () => {
+      // TODO LAST (NEW MODULE STUFF)
+    })
+  })
+
+  describe('delete labware', () => {
+    test('removes labware from initial deck setup step', () => {
+      const labwareToDeleteId = '__labwareToDelete'
+      const prevRootState = makePrevRootState({
+        labwareLocationUpdate: {
+          [existingLabwareId]: '1',
+          [labwareToDeleteId]: '2',
+        },
+      })
+      const action = {
+        type: 'DELETE_CONTAINER',
+        payload: { labwareId: labwareToDeleteId },
+      }
+      const result = savedStepForms(prevRootState, action)
+      expect(result[INITIAL_DECK_SETUP_STEP_ID].labwareLocationUpdate).toEqual({
+        [existingLabwareId]: '1',
+      })
+    })
+  })
+
+  describe('delete pipettes', () => {
+    test('removes pipette(s) from initial deck setup step', () => {
+      const leftPipetteId = '__leftPipette'
+      const rightPipetteId = '__rightPipette'
+      const prevRootState = makePrevRootState({
+        pipetteLocationUpdate: {
+          [leftPipetteId]: 'left',
+          [rightPipetteId]: 'right',
+        },
+      })
+      const testCases = [
+        {
+          pipettesToDelete: [leftPipetteId],
+          expected: { [rightPipetteId]: 'right' },
+        },
+        { pipettesToDelete: [leftPipetteId, rightPipetteId], expected: {} },
+      ]
+      testCases.forEach(({ pipettesToDelete, expected }) => {
+        const action = {
+          type: 'DELETE_PIPETTES',
+          payload: pipettesToDelete,
+        }
+        const result = savedStepForms(prevRootState, action)
+        expect(
+          result[INITIAL_DECK_SETUP_STEP_ID].pipetteLocationUpdate
+        ).toEqual(expected)
       })
     })
   })
