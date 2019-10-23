@@ -23,7 +23,7 @@ import {
   _getPipetteEntitiesRootState,
   _getLabwareEntitiesRootState,
 } from '../selectors'
-import { getIdsInRange, getLabwareIdInSlot } from '../utils'
+import { getIdsInRange, getDeckItemIdInSlot } from '../utils'
 
 import type { LoadFileAction } from '../../load-file'
 import type {
@@ -227,14 +227,33 @@ export const savedStepForms = (
       return mapValues(savedStepForms, (savedForm: FormData) => {
         if (savedForm.stepType === 'manualIntervention') {
           // swap labware slots from all manualIntervention steps
-          const sourceLabwareId = getLabwareIdInSlot(
+          const sourceLabwareId = getDeckItemIdInSlot(
             savedForm.labwareLocationUpdate,
             sourceSlot
           )
-          const destLabwareId = getLabwareIdInSlot(
+          const destLabwareId = getDeckItemIdInSlot(
             savedForm.labwareLocationUpdate,
             destSlot
           )
+
+          const sourceModuleId = getDeckItemIdInSlot(
+            savedForm.moduleLocationUpdate,
+            sourceSlot
+          )
+          const destModuleId = getDeckItemIdInSlot(
+            savedForm.moduleLocationUpdate,
+            destSlot
+          )
+
+          const moduleInitiallyOccupied =
+            sourceLabwareId != null && sourceModuleId != null
+          const movingLabwareOffModule =
+            moduleInitiallyOccupied &&
+            destLabwareId == null &&
+            destModuleId == null
+          const moveLabwareOnModule =
+            sourceLabwareId != null && destModuleId != null
+          const moduleShouldStay = movingLabwareOffModule || moveLabwareOnModule
 
           return {
             ...savedForm,
@@ -243,6 +262,13 @@ export const savedStepForms = (
               ...(sourceLabwareId ? { [sourceLabwareId]: destSlot } : {}),
               ...(destLabwareId ? { [destLabwareId]: sourceSlot } : {}),
             },
+            moduleLocationUpdate: moduleShouldStay
+              ? savedForm.moduleLocationUpdate
+              : {
+                  ...savedForm.moduleLocationUpdate,
+                  ...(sourceModuleId ? { [sourceModuleId]: destSlot } : {}),
+                  ...(destModuleId ? { [destModuleId]: sourceSlot } : {}),
+                },
           }
         }
         return savedForm

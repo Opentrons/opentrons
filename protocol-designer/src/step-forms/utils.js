@@ -32,18 +32,19 @@ export function getIdsInRange<T: string | number>(
   return orderedIds.slice(startIdx, endIdx + 1)
 }
 
-export function getLabwareIdInSlot(
-  labwareIdToSlot: { [labwareId: string]: DeckSlotId },
+// NOTE: deck items include labware and modules
+export function getDeckItemIdInSlot(
+  itemIdToSlot: { [itemId: string]: DeckSlotId },
   slot: DeckSlotId
 ): ?string {
-  const labwareIdsForSourceSlot = Object.entries(labwareIdToSlot)
+  const idsForSourceSlot = Object.entries(itemIdToSlot)
     .filter(([id, labwareSlot]) => labwareSlot === slot)
     .map(([id, labwareSlot]) => id)
   assert(
-    labwareIdsForSourceSlot.length < 2,
-    `multiple labware in slot ${slot}, expected none or one`
+    idsForSourceSlot.length < 2,
+    `multiple deck items in slot ${slot}, expected none or one`
   )
-  return labwareIdsForSourceSlot[0]
+  return idsForSourceSlot[0]
 }
 
 export function denormalizePipetteEntities(
