@@ -1,12 +1,40 @@
 // @flow
 import * as React from 'react'
-import { Card } from '@opentrons/components'
+import { useDispatch, useSelector } from 'react-redux'
+import { useInterval } from '@opentrons/components'
 
-// TODO(mc, 2019-10-17): i18n
-const LIST_LABWARE_CARD_TITLE = 'Custom Labware Listing'
+import ListCard from './ListCard'
+import LabwareItem from './LabwareItem'
+import { fetchCustomLabware } from '../../custom-labware/actions'
+import { getValidCustomLabware } from '../../custom-labware/selectors'
+
+import type { Dispatch } from '../../types'
+
+const LABWARE_REFRESH_INTERVAL_MS = 5000
 
 function ListLabwareCard() {
-  return <Card title={LIST_LABWARE_CARD_TITLE}></Card>
+  const dispatch = useDispatch<Dispatch>()
+  const validLabware = useSelector(getValidCustomLabware)
+  const fetchLabware = React.useCallback(() => dispatch(fetchCustomLabware()), [
+    dispatch,
+  ])
+
+  useInterval(fetchLabware, LABWARE_REFRESH_INTERVAL_MS, true)
+
+  return (
+    <ListCard>
+      {validLabware.map(f => (
+        <LabwareItem
+          key={f.filename}
+          name={f.identity.name}
+          version={f.identity.version}
+          displayName={f.metadata.displayName}
+          displayCategory={f.metadata.displayCategory}
+          dateAdded={f.created}
+        />
+      ))}
+    </ListCard>
+  )
 }
 
 export default ListLabwareCard

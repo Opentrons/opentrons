@@ -26,6 +26,9 @@ import { discoveryReducer } from './discovery'
 // protocol state
 import { protocolReducer } from './protocol'
 
+// custom labware state
+import { customLabwareReducer } from './custom-labware/reducer'
+
 import type { Reducer } from 'redux'
 import type { State, Action } from './types'
 
@@ -37,6 +40,7 @@ const rootReducer: Reducer<State, Action> = combineReducers<_, Action>({
   robotApi: robotApiReducer,
   config: configReducer,
   discovery: discoveryReducer,
+  labware: customLabwareReducer,
   protocol: protocolReducer,
   shell: shellReducer,
   router: connectRouter<_, Action>(history),

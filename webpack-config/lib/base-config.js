@@ -74,5 +74,6 @@ module.exports = {
     historyApiFallback: true,
     port: DEFAULT_PORT,
     host: '0.0.0.0',
+    hotOnly: true,
   },
 }

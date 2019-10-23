@@ -73,6 +73,11 @@ export type Config = {
     candidates: DiscoveryCandidates,
   },
 
+  // custom labware files
+  labware: {
+    directory: string,
+  },
+
   // internal development flags
   devInternal?: FeatureFlags,
 }
