@@ -1226,7 +1226,8 @@ class InstrumentContext(CommandPublisher):
 
     def drop_tip(  # noqa(C901)
             self,
-            location: Union[types.Location, Well] = None)\
+            location: Union[types.Location, Well] = None,
+            home_after: bool = True)\
             -> 'InstrumentContext':
         """
         Drop the current tip.
@@ -1294,7 +1295,7 @@ class InstrumentContext(CommandPublisher):
         cmds.do_publish(self.broker, cmds.drop_tip, self.drop_tip,
                         'before', None, None, instrument=self, location=target)
         self.move_to(target)
-        self._hw_manager.hardware.drop_tip(self._mount)
+        self._hw_manager.hardware.drop_tip(self._mount, home_after=home_after)
         cmds.do_publish(self.broker, cmds.drop_tip, self.drop_tip,
                         'after', self, None, instrument=self, location=target)
         if isinstance(target.labware, Well)\
