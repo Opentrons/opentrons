@@ -16,12 +16,15 @@ import formStyles from '../../forms/forms.css'
 import modalStyles from '../modal.css'
 import StepChangesConfirmModal from '../EditPipettesModal/StepChangesConfirmModal'
 import PipetteFields from './PipetteFields'
-
+import ModuleFields from './ModuleFields'
+import type { ModuleType } from '@opentrons/shared-data'
 import type { NewProtocolFields } from '../../../load-file'
 import type {
   PipetteOnDeck,
   FormPipette,
   FormPipettesByMount,
+  FormModule,
+  FormModulesByType,
 } from '../../../step-forms'
 
 type PipetteFieldsData = $Diff<
@@ -33,6 +36,7 @@ type State = {|
   fields: NewProtocolFields,
   pipettesByMount: FormPipettesByMount,
   showEditPipetteConfirmation: boolean,
+  modulesByType: FormModulesByType,
 |}
 
 type Props = {|
@@ -41,6 +45,7 @@ type Props = {|
   hideModal?: boolean,
   onCancel: () => mixed,
   initialPipetteValues?: $PropertyType<State, 'pipettesByMount'>,
+  initialModuleValues?: $PropertyType<State, 'modulesByType'>,
   onSave: ({|
     newProtocolFields: NewProtocolFields,
     pipettes: Array<PipetteFieldsData>,
@@ -55,6 +60,11 @@ const initialState: State = {
     left: { pipetteName: '', tiprackDefURI: null },
     right: { pipetteName: '', tiprackDefURI: null },
   },
+  modulesByType: {
+    magdeck: { onDeck: false, model: 'GEN1' },
+    tempdeck: { onDeck: false, model: 'GEN1' },
+    thermocycler: { onDeck: false, model: 'GEN1' },
+  },
 }
 
 // TODO: Ian 2019-03-15 use i18n for labels
@@ -66,6 +76,10 @@ export default class FilePipettesModal extends React.Component<Props, State> {
       pipettesByMount: {
         ...initialState.pipettesByMount,
         ...(props.initialPipetteValues || {}),
+      },
+      modulesByType: {
+        ...initialState.modulesByType,
+        ...(props.initialModuleValues || {}),
       },
     }
   }
@@ -91,6 +105,19 @@ export default class FilePipettesModal extends React.Component<Props, State> {
         ...this.state.pipettesByMount,
         [mount]: {
           ...this.state.pipettesByMount[mount],
+          ...nextMountState,
+        },
+      },
+    })
+  }
+
+  handleModuleOnDeckChange = (type: ModuleType, value: boolean) => {
+    let nextMountState: $Shape<FormModule> = { onDeck: value }
+    this.setState({
+      modulesByType: {
+        ...this.state.modulesByType,
+        [type]: {
+          ...this.state.modulesByType[type],
           ...nextMountState,
         },
       },
@@ -154,61 +181,84 @@ export default class FilePipettesModal extends React.Component<Props, State> {
     return (
       <React.Fragment>
         <Modal
-          contentsClassName={styles.new_file_modal_contents}
+          contentsClassName={cx(
+            styles.new_file_modal_contents,
+            modalStyles.scrollable_modal_wrapper
+          )}
           className={cx(modalStyles.modal, styles.new_file_modal)}
         >
-          <form
-            onSubmit={() => {
-              canSubmit && this.handleSubmit()
-            }}
-          >
-            <h2 className={styles.new_file_modal_title}>
-              {showProtocolFields
-                ? i18n.t('modal.new_protocol.title')
-                : i18n.t('modal.edit_pipettes.title')}
-            </h2>
+          <div className={modalStyles.scrollable_modal_wrapper}>
+            <div className={modalStyles.scrollable_modal_scroll}>
+              <form
+                onSubmit={() => {
+                  canSubmit && this.handleSubmit()
+                }}
+              >
+                {showProtocolFields && (
+                  <div className={styles.protocol_file_group}>
+                    <h2 className={styles.new_file_modal_title}>
+                      {i18n.t('modal.new_protocol.title.PROTOCOL_FILE')}
+                    </h2>
+                    <FormGroup className={formStyles.stacked_row} label="Name">
+                      <InputField
+                        autoFocus
+                        tabIndex={1}
+                        placeholder={i18n.t(
+                          'form.generic.default_protocol_name'
+                        )}
+                        value={name}
+                        onChange={this.handleNameChange}
+                      />
+                    </FormGroup>
+                  </div>
+                )}
 
-            {showProtocolFields && (
-              <FormGroup className={formStyles.stacked_row} label="Name">
-                <InputField
-                  autoFocus
-                  tabIndex={1}
-                  placeholder={i18n.t('form.generic.default_protocol_name')}
-                  value={name}
-                  onChange={this.handleNameChange}
+                <h2 className={styles.new_file_modal_title}>
+                  {showProtocolFields
+                    ? i18n.t('modal.new_protocol.title.PROTOCOL_PIPETTES')
+                    : i18n.t('modal.edit_pipettes.title')}
+                </h2>
+
+                <PipetteFields
+                  initialTabIndex={1}
+                  values={this.state.pipettesByMount}
+                  onFieldChange={this.handlePipetteFieldsChange}
                 />
-              </FormGroup>
-            )}
 
-            <PipetteFields
-              initialTabIndex={1}
-              values={this.state.pipettesByMount}
-              onFieldChange={this.handlePipetteFieldsChange}
-            />
-          </form>
-          {this.props.modulesEnabled && this.props.showModulesFields && (
-            <div>TODO modules here!</div>
-          )}
-          <div className={styles.button_row}>
-            <OutlineButton
-              onClick={this.props.onCancel}
-              tabIndex={7}
-              className={styles.button}
-            >
-              {i18n.t('button.cancel')}
-            </OutlineButton>
-            <OutlineButton
-              onClick={
-                showProtocolFields
-                  ? this.handleSubmit
-                  : this.showEditPipetteConfirmationModal
-              }
-              disabled={!canSubmit}
-              tabIndex={6}
-              className={styles.button}
-            >
-              {i18n.t('button.save')}
-            </OutlineButton>
+                {this.props.modulesEnabled && this.props.showModulesFields && (
+                  <div className={styles.protocol_modules_group}>
+                    <h2 className={styles.new_file_modal_title}>
+                      {i18n.t('modal.new_protocol.title.PROTOCOL_MODULES')}
+                    </h2>
+                    <ModuleFields
+                      values={this.state.modulesByType}
+                      onFieldChange={this.handleModuleOnDeckChange}
+                    />
+                  </div>
+                )}
+              </form>
+              <div className={styles.button_row}>
+                <OutlineButton
+                  onClick={this.props.onCancel}
+                  tabIndex={7}
+                  className={styles.button}
+                >
+                  {i18n.t('button.cancel')}
+                </OutlineButton>
+                <OutlineButton
+                  onClick={
+                    showProtocolFields
+                      ? this.handleSubmit
+                      : this.showEditPipetteConfirmationModal
+                  }
+                  disabled={!canSubmit}
+                  tabIndex={6}
+                  className={styles.button}
+                >
+                  {i18n.t('button.save')}
+                </OutlineButton>
+              </div>
+            </div>
           </div>
         </Modal>
         {this.state.showEditPipetteConfirmation && (

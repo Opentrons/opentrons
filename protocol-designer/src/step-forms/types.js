@@ -4,6 +4,7 @@ import type {
   LabwareDefinition2,
   PipetteNameSpecs,
   DeckSlotId,
+  ModuleType,
 } from '@opentrons/shared-data'
 
 export type FormPipette = { pipetteName: ?string, tiprackDefURI: ?string }
@@ -33,6 +34,12 @@ export type PipetteEntity = {|
 
 export type PipetteEntities = {
   [pipetteId: string]: PipetteEntity,
+}
+
+// =========== MODULES ========
+export type FormModule = { onDeck: boolean, model: string }
+export type FormModulesByType = {
+  [type: ModuleType]: FormModule,
 }
 
 // =========== LABWARE ========

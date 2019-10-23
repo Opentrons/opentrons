@@ -53,12 +53,17 @@
 }
 
 .button_row {
+  margin-top: 1rem;
   display: flex;
   justify-content: flex-end;
 }
 
 .button {
   margin: 0 0 0 1rem;
+}
+
+.protocol_file_group {
+  margin-bottom: 2rem;
 }
 
 .mount_fields_row {
@@ -73,4 +78,28 @@
 
 .mount_column:first-child {
   margin-right: 0.5rem;
+}
+
+.protocol_modules_group {
+  margin-top: 2rem;
+}
+
+.modules_row {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+.module_form_group {
+  width: 30%;
+
+  & img {
+    max-width: 6rem;
+    width: 100%;
+    height: auto;
+  }
+}
+
+.module_model {
+  height: 3rem;
 }

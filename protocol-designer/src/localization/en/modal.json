@@ -33,7 +33,16 @@
     }
   },
   "new_protocol": {
-    "title": "Create New Protocol"
+    "title": {
+      "PROTOCOL_FILE": "Create New Protocol",
+      "PROTOCOL_PIPETTES": "Pipette & Tip Setup",
+      "PROTOCOL_MODULES": "Add Modules"
+    },
+    "module_display_names": {
+      "tempdeck": "Temperature",
+      "magdeck": "Magnetic",
+      "thermocycler": "Thermocycler"
+    }
   },
   "well_order": {
     "title": "Well Order",
