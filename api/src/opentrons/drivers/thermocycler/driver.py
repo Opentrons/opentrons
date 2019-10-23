@@ -2,7 +2,7 @@ import asyncio
 import logging
 import os
 import threading
-import serial
+import serial  # type: ignore
 from queue import Queue
 try:
     import select
@@ -431,7 +431,7 @@ class Thermocycler:
             pass
         return ret
 
-    async def enter_programming_mode(self) -> str:
+    async def enter_programming_mode(self):
         trigger_connection = serial.Serial(
             self.port, TC_BOOTLOADER_BAUDRATE, timeout=1)
         await asyncio.sleep(0.005)

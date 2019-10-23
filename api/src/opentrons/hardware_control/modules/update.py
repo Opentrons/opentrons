@@ -120,8 +120,10 @@ def _format_avrdude_response(raw_response: str) -> Tuple[bool, str]:
 
 
 async def _upload_via_bossa(port, firmware_file_path, kwargs):
-    # bossac -p/dev/ttyACM1 -e -w -v -R --offset=0x2000 modules/thermo-cycler/production/firmware/thermo-cycler-arduino.ino.bin
-    # NOTE: bossac cannot traverse symlinks to udev port, so we resolve to real path
+    # bossac -p/dev/ttyACM1 -e -w -v -R --offset=0x2000
+    #   modules/thermo-cycler/production/firmware/thermo-cycler-arduino.ino.bin
+    # NOTE: bossac cannot traverse symlinks to port,
+    # so we resolve to real path
     bossa_args = ['bossac', f'-p{os.path.realpath(port)}',
                   '-e', '-w', '-v', '-R',
                   '--offset=0x2000', f'{firmware_file_path}']

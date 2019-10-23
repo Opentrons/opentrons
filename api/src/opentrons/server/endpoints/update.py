@@ -67,8 +67,36 @@ async def _upload_to_module(hw, serialnum, fw_filename, loop):
     moving the drivers themselves to the serverlib)
     """
 
+    if not ff.use_protocol_api_v2():
+        return _upload_to_module_legacy(hw, serialnum, fw_filename, loop)
+
+    hw.discover_modules()
+    hw_mods = hw.attached_modules.values()
+    res = {}
+    for module in hw_mods:
+        if module.device_info.get('serial') == serialnum:
+            log.info("Module with serial {} found".format(serialnum))
+            try:
+                updated_instance = await asyncio.wait_for(
+                    modules.update_firmware(module, fw_filename, loop),
+                    UPDATE_TIMEOUT)
+                if updated_instance:
+                    res['message'] = f'Sucessfully updated module {serialnum}'
+
+            except asyncio.TimeoutError:
+                return {'message': 'Bootloader not responding'}
+            break
+        if not res:
+            res = {'message': 'Module {} not found'.format(serialnum)}
+
+    return res
+
+# TODO: BC(2019-10-23) remove this legacy update pathway, unused
+
+
+async def _upload_to_module_legacy(hw, serialnum, fw_filename, loop):
     # ensure there is a reference to the port
-    if not ff.use_protocol_api_v2() and not hw.is_connected():
+    if not hw.is_connected():
         hw.connect()
 
     hw.discover_modules()
@@ -76,38 +104,24 @@ async def _upload_to_module(hw, serialnum, fw_filename, loop):
     res = {}
     for module in hw_mods:
         if module.device_info.get('serial') == serialnum:
+            log.info("Module with serial {} found".format(serialnum))
 
-            # NOTE: legacy block, api_v2 enter bootloader is nested in
-            # modules.update_firmware
-            if not ff.use_protocol_api_v2():
-                log.info("Module with serial {} found".format(serialnum))
-                bootloader_port = await legacy_modules.enter_bootloader(module)
-                if bootloader_port:
-                    module._port = bootloader_port
-                # else assume old bootloader connection on existing module port
-                log.info("Uploading file to port: {}".format(
-                    module.port))
-                log.info("Flashing firmware. This will take a few seconds")
+            bootloader_port = await legacy_modules.enter_bootloader(module)
+            if bootloader_port:
+                module._port = bootloader_port
+            # else assume old bootloader connection on existing module port
+            log.info("Uploading file to port: {}".format(
+                module.port))
+            log.info("Flashing firmware. This will take a few seconds")
 
-                try:
-                    res = await asyncio.wait_for(
-                        legacy_modules.update_firmware(
-                            module, fw_filename, loop),
-                        UPDATE_TIMEOUT)
-                except asyncio.TimeoutError:
-                    return {'message': 'AVRDUDE not responding'}
-                break
-            else:
-                try:
-                    updated_instance = await asyncio.wait_for(
-                        modules.update_firmware(module, fw_filename, loop),
-                        UPDATE_TIMEOUT)
-                    if updated_instance:
-                        res['message'] = f'Sucessfully updated firmware for module {serialnum}'
-
-                except asyncio.TimeoutError:
-                    return {'message': 'AVRDUDE not responding'}
-                break
+            try:
+                res = await asyncio.wait_for(
+                    legacy_modules.update_firmware(
+                        module, fw_filename, loop),
+                    UPDATE_TIMEOUT)
+            except asyncio.TimeoutError:
+                res = {'message': 'AVRDUDE not responding'}
+            break
         if not res:
             res = {'message': 'Module {} not found'.format(serialnum)}
 
