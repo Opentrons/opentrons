@@ -30,10 +30,11 @@ async def enter_bootloader(driver, model):
     # Required for old bootloader
     ports_before_dfu_mode = await _discover_ports()
 
-    if not ff.use_protocol_api_v2():
-        driver.enter_programming_mode()
-    else:
+    if model == 'thermocycler':
         await driver.enter_programming_mode()
+    else:
+        driver.enter_programming_mode()
+
     driver.disconnect()
     new_port = ''
     try:

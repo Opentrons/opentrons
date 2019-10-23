@@ -68,11 +68,10 @@ async def _upload_to_module(hw, serialnum, fw_filename, loop):
     """
 
     if not ff.use_protocol_api_v2():
-        return _upload_to_module_legacy(hw, serialnum, fw_filename, loop)
+        return await _upload_to_module_legacy(hw, serialnum, fw_filename, loop)
 
     hw.discover_modules()
     hw_mods = hw.attached_modules.values()
-    res = {}
     for module in hw_mods:
         if module.device_info.get('serial') == serialnum:
             log.info("Module with serial {} found".format(serialnum))
@@ -81,15 +80,15 @@ async def _upload_to_module(hw, serialnum, fw_filename, loop):
                     modules.update_firmware(module, fw_filename, loop),
                     UPDATE_TIMEOUT)
                 if updated_instance:
-                    res['message'] = f'Sucessfully updated module {serialnum}'
+                    return {'message': f'Sucessfully updated module {serialnum}'}
 
             except asyncio.TimeoutError:
                 return {'message': 'Bootloader not responding'}
             break
         if not res:
-            res = {'message': 'Module {} not found'.format(serialnum)}
+            return {'message': 'Module {} not found'.format(serialnum)}
 
-    return res
+    return {}
 
 # TODO: BC(2019-10-23) remove this legacy update pathway, unused
 
