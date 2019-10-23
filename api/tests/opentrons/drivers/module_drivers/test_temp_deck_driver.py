@@ -137,7 +137,8 @@ async def test_fail_set_temp_deck_temperature(monkeypatch):
     temp_deck.simulating = False
 
     try:
-        res = await asyncio.wait_for(temp_deck.set_temperature(-9), timeout=0.2)
+        res = await asyncio.wait_for(temp_deck.set_temperature(-9),
+                                     timeout=0.2)
     except asyncio.TimeoutError:
         pass
     assert res == error_msg
@@ -153,7 +154,8 @@ async def test_fail_set_temp_deck_temperature(monkeypatch):
         _raise_error, serial_communication)
 
     try:
-        res = await asyncio.wait_for(temp_deck.set_temperature(-9), timeout=0.2)
+        res = await asyncio.wait_for(temp_deck.set_temperature(-9),
+                                     timeout=0.2)
     except asyncio.TimeoutError:
         pass
     assert res == error_msg

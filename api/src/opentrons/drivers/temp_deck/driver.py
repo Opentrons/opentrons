@@ -107,7 +107,7 @@ class TempDeck:
             await asyncio.sleep(0.1)
         return ''
 
-    # NOTE: this is only present to support apiV1 non-blocking by default behavior
+    # NOTE: only present to support apiV1 non-blocking by default behavior
     def legacy_set_temperature(self, celsius) -> str:
         self.run_flag.wait()
         celsius = round(float(celsius),
