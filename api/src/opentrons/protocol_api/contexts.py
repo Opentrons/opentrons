@@ -1107,7 +1107,7 @@ class InstrumentContext(CommandPublisher):
         return self
 
     @cmds.publish.both(command=cmds.return_tip)
-    def return_tip(self) -> 'InstrumentContext':
+    def return_tip(self, home_after: bool = True) -> 'InstrumentContext':
         """
         If a tip is currently attached to the pipette, then it will return the
         tip to it's location in the tiprack.
@@ -1124,7 +1124,7 @@ class InstrumentContext(CommandPublisher):
                             '{}'.format(loc))
         bot = loc.bottom()
         bot = bot._replace(point=bot.point._replace(z=bot.point.z + 10))
-        self.drop_tip(bot)
+        self.drop_tip(bot, home_after=home_after)
         try:
             loc.parent.return_tips(loc, self.channels)
         except AssertionError:
@@ -1232,7 +1232,8 @@ class InstrumentContext(CommandPublisher):
 
     def drop_tip(  # noqa(C901)
             self,
-            location: Union[types.Location, Well] = None)\
+            location: Union[types.Location, Well] = None,
+            home_after: bool = True)\
             -> 'InstrumentContext':
         """
         Drop the current tip.
@@ -1300,7 +1301,7 @@ class InstrumentContext(CommandPublisher):
         cmds.do_publish(self.broker, cmds.drop_tip, self.drop_tip,
                         'before', None, None, instrument=self, location=target)
         self.move_to(target)
-        self._hw_manager.hardware.drop_tip(self._mount)
+        self._hw_manager.hardware.drop_tip(self._mount, home_after=home_after)
         cmds.do_publish(self.broker, cmds.drop_tip, self.drop_tip,
                         'after', self, None, instrument=self, location=target)
         if isinstance(target.labware, Well)\
