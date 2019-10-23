@@ -3,7 +3,10 @@ import {
   legacySteps as steps,
   orderedStepIds,
   labwareInvariantProperties,
+  moduleInvariantProperties,
+  savedStepForms,
 } from '../reducers'
+import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 
 jest.mock('../../labware-defs/utils')
 
@@ -171,6 +174,114 @@ describe('labwareInvariantProperties reducer', () => {
       labwareIdA2: { labwareDefURI: 'foo/a/2' },
       // unchanged
       labwareIdB: { labwareDefURI: 'foo/b/1' },
+    })
+  })
+})
+
+describe('moduleInvariantProperties reducer', () => {
+  let prevState
+  const existingModuleId = 'existingModuleId'
+  const newId = 'newModuleId'
+  beforeEach(() => {
+    prevState = {
+      [existingModuleId]: { slot: '1', type: 'magdeck', model: 'GEN1' },
+    }
+  })
+
+  test('create module', () => {
+    const newModuleData = {
+      id: newId,
+      slot: '3',
+      type: 'tempdeck',
+      model: 'GEN1',
+    }
+    const result = moduleInvariantProperties(prevState, {
+      type: 'CREATE_MODULE',
+      payload: newModuleData,
+    })
+    expect(result).toEqual({
+      ...prevState,
+      [newId]: { type: newModuleData.type, model: newModuleData.model },
+    })
+  })
+
+  test('edit module (change its model)', () => {
+    const newModel = 'GEN2'
+    const result = moduleInvariantProperties(prevState, {
+      type: 'EDIT_MODULE',
+      payload: { id: existingModuleId, model: newModel },
+    })
+    expect(result).toEqual({
+      [existingModuleId]: { ...prevState.existingModuleId, model: newModel },
+    })
+  })
+
+  test('delete module', () => {
+    const result = moduleInvariantProperties(prevState, {
+      type: 'DELETE_MODULE',
+      payload: { id: existingModuleId },
+    })
+    expect(result).toEqual({})
+  })
+})
+
+describe('savedStepForms reducer', () => {
+  const existingLabwareId = 'existingLabwareId'
+  let prevRootState: any = {
+    // TODO IMMEDIATELY create prevRootState in beforeEach or a fn
+    savedStepForms: {
+      [INITIAL_DECK_SETUP_STEP_ID]: {
+        labwareLocationUpdate: { [existingLabwareId]: '1' },
+        /* TODO IMMEDIATELY: moduleLocationUpdate */
+      },
+    },
+  }
+
+  describe('create (or duplicate) new labware', () => {
+    const newLabwareId = 'newLabwareId'
+    const newSlot = '8'
+    const prevDeckSetupStep =
+      prevRootState.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+    const expected = {
+      [INITIAL_DECK_SETUP_STEP_ID]: {
+        ...prevDeckSetupStep,
+        labwareLocationUpdate: {
+          ...prevDeckSetupStep.labwareLocationUpdate,
+          [newLabwareId]: newSlot,
+        },
+      },
+    }
+    const testCases = [
+      {
+        testName: 'duplicate labware',
+        action: {
+          type: 'DUPLICATE_LABWARE',
+          payload: {
+            templateLabwareId: existingLabwareId,
+            duplicateLabwareId: newLabwareId,
+            duplicateLabwareNickname: 'new labware nickname',
+            slot: newSlot,
+          },
+        },
+      },
+      {
+        testName: `create container in slot ${newSlot}`,
+        action: {
+          type: 'CREATE_CONTAINER',
+          payload: {
+            slot: newSlot,
+            labwareDefURI: 'fixtures/foo/1',
+            id: newLabwareId,
+          },
+        },
+      },
+    ]
+
+    testCases.forEach(({ testName, action }) => {
+      test(testName, () => {
+        const result = savedStepForms(prevRootState, action)
+        expect(result).toEqual(expected)
+      })
     })
   })
 })

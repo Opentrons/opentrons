@@ -53,6 +53,7 @@ export type CreateContainerAction = {
   type: 'CREATE_CONTAINER',
   payload: {
     ...CreateContainerArgs,
+    slot: DeckSlot,
     id: string,
   },
 }

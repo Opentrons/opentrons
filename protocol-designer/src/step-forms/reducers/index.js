@@ -59,6 +59,9 @@ import type {
   CreatePipettesAction,
   DeletePipettesAction,
   SubstituteStepFormPipettesAction,
+  CreateModuleAction,
+  EditModuleAction,
+  DeleteModuleAction,
 } from '../actions'
 
 type FormState = FormData | null
@@ -147,7 +150,7 @@ export const initialDeckSetupStepForm: FormData = {
   pipetteLocationUpdate: {},
 }
 
-const initialSavedStepFormsState: SavedStepFormState = {
+export const initialSavedStepFormsState: SavedStepFormState = {
   [INITIAL_DECK_SETUP_STEP_ID]: initialDeckSetupStepForm,
 }
 type SavedStepFormsActions =
@@ -526,6 +529,40 @@ export const labwareInvariantProperties = handleActions<
       ),
   },
   initialLabwareState
+)
+
+type InvariantModulesTodoType = Object // TODO IMMEDIATELY import from types.js
+export const moduleInvariantProperties = handleActions<
+  InvariantModulesTodoType,
+  *
+>(
+  {
+    CREATE_MODULE: (
+      state: InvariantModulesTodoType,
+      action: CreateModuleAction
+    ): InvariantModulesTodoType => ({
+      ...state,
+      [action.payload.id]: {
+        type: action.payload.type,
+        model: action.payload.model,
+      },
+    }),
+    EDIT_MODULE: (
+      state: InvariantModulesTodoType,
+      action: EditModuleAction
+    ): InvariantModulesTodoType => ({
+      ...state,
+      [action.payload.id]: {
+        ...state[action.payload.id],
+        model: action.payload.model,
+      },
+    }),
+    DELETE_MODULE: (
+      state: InvariantModulesTodoType,
+      action: DeleteModuleAction
+    ): InvariantModulesTodoType => omit(state, action.payload.id),
+  },
+  {}
 )
 
 const initialPipetteState = {}
