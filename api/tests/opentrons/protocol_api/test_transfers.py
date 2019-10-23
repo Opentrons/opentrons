@@ -226,6 +226,30 @@ def test_uneven_transfers(_instr_labware):
     assert many_to_one_plan_list == exp3
 
 
+def test_location_wells(_instr_labware):
+    _instr_labware['ctx'].home()
+    lw1 = _instr_labware['lw1']
+    lw2 = _instr_labware['lw2']
+    aspirate_loc = lw1.wells()[0].top()
+    list_of_locs = [
+        well.bottom(5) for col in lw2.columns()[0:11] for well in col]
+    xfer_plan = tx.TransferPlan(
+        30,
+        aspirate_loc,
+        list_of_locs,
+        _instr_labware['instr'],
+        max_volume=_instr_labware['instr'].hw_pipette['working_volume'],
+        mode='transfer')
+    idx_dest = 0
+    for step in xfer_plan:
+        if step['method'] == 'aspirate':
+            assert step['args'][1].point == aspirate_loc.point
+        elif step['method'] == 'dispense':
+            assert step['args'][1].point\
+                    == list_of_locs[idx_dest].point
+            idx_dest += 1
+
+
 def test_no_new_tip(_instr_labware):
     _instr_labware['ctx'].home()
     lw1 = _instr_labware['lw1']

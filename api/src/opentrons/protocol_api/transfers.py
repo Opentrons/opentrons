@@ -383,12 +383,13 @@ class TransferPlan:
             if isinstance(sources, List) and isinstance(sources[0], List):
                 # Source is a List[List[Well]]
                 sources = [well for well_list in sources for well in well_list]
-            elif isinstance(sources, Well):
+            elif isinstance(sources, Well)\
+                    or isinstance(sources, types.Location):
                 sources = [sources]
             if isinstance(dests, List) and isinstance(dests[0], List):
                 # Dest is a List[List[Well]]
                 dests = [well for well_list in dests for well in well_list]
-            elif isinstance(dests, Well):
+            elif isinstance(dests, Well) or isinstance(dests, types.Location):
                 dests = [dests]
 
         total_xfers = max(len(sources), len(dests))
@@ -483,8 +484,8 @@ class TransferPlan:
 
     @staticmethod
     def _extend_source_target_lists(
-            sources: List[Well],
-            targets: List[Well]):
+            sources: List[Union[Well, types.Location]],
+            targets: List[Union[Well, types.Location]]):
         """Extend source or target list to match the length of the other
         """
         if len(sources) < len(targets):
@@ -791,7 +792,7 @@ class TransferPlan:
         if isinstance(s, List) and isinstance(s[0], List):
             # s is a List[List]]; flatten to 1D list
             s = [well for list_elem in s for well in list_elem]
-        elif isinstance(s, Well):
+        elif isinstance(s, Well) or isinstance(s, types.Location):
             s = [s]
         new_src = []
         for well in s:
@@ -802,7 +803,7 @@ class TransferPlan:
         if isinstance(d, List) and isinstance(d[0], List):
             # s is a List[List]]; flatten to 1D list
             d = [well for list_elem in d for well in list_elem]
-        elif isinstance(d, Well):
+        elif isinstance(d, Well) or isinstance(d, types.Location):
             d = [d]
         new_dst = []
         for well in d:
