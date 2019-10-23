@@ -81,7 +81,7 @@ async def test_module_update_integration(monkeypatch, loop,
     monkeypatch.setattr(hardware_control.modules.update,
                         '_discover_ports', mock_discover_ports)
 
-    async def mock_upload(port, fname, loop):
+    async def mock_upload(port, firmware_file_path, bootloader_type, loop):
         return (port, (True, 'it all worked'))
 
     monkeypatch.setattr(hardware_control.modules.update,

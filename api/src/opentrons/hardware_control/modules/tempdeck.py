@@ -34,7 +34,7 @@ class SimulatingDriver:
     def disconnect(self):
         pass
 
-    def enter_programming_mode(self):
+    async def enter_programming_mode(self):
         pass
 
     @property

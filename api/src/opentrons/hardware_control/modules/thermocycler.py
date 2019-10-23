@@ -20,12 +20,6 @@ class SimulatingDriver:
         self._lid_heating_active = False
 
     async def open(self):
-        # TODO: BC 2019-07-11 once safe threshold is established in
-        # firmware, handle UI level warning responsibly here
-
-        # if self._active:
-        #     raise ThermocyclerError(
-        #         'Cannot open Thermocycler while it is active')
         self._lid_status = 'open'
         return self._lid_status
 
@@ -106,6 +100,9 @@ class SimulatingDriver:
         return {'serial': 'dummySerial',
                 'model': 'dummyModel',
                 'version': 'dummyVersion'}
+
+    async def enter_programming_mode(self):
+        pass
 
 
 class Thermocycler(mod_abc.AbstractModule):
