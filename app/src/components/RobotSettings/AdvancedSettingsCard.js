@@ -6,11 +6,14 @@ import { Link } from 'react-router-dom'
 
 import {
   fetchSettings,
-  setSettings,
-  getRobotSettingsState,
-} from '../../robot-api'
+  updateSetting,
+  clearRestartRequired,
+  getRobotSettings,
+  getRobotRestartRequired,
+} from '../../robot-settings'
 
 import { CONNECTABLE } from '../../discovery'
+import { restartRobot } from '../../robot-admin'
 import { downloadLogs } from '../../shell/robot-logs/actions'
 import { getRobotLogsDownloading } from '../../shell/robot-logs/selectors'
 import { Portal } from '../portal'
@@ -23,8 +26,9 @@ import {
 } from '@opentrons/components'
 
 import type { State, Dispatch } from '../../types'
-import type { ViewableRobot } from '../../discovery'
-import type { RobotSettings } from '../../robot-api'
+import type { ViewableRobot } from '../../discovery/types'
+import type { RobotSettings } from '../../robot-settings/types'
+
 import UploadRobotUpdate from './UploadRobotUpdate'
 
 type Props = {|
@@ -49,11 +53,22 @@ const ROBOT_LOGS_OPTOUT_MESSAGE = (
   </>
 )
 
+const RESTART_REQUIRED_HEADING = 'Robot Restart Required'
+const RESTART_REQUIRED_MESSAGE = (
+  <p>
+    You must restart your robot for this setting change to take effect. Would
+    you like to restart now?
+  </p>
+)
+
 export default function AdvancedSettingsCard(props: Props) {
   const { robot, resetUrl } = props
   const { name, health, status } = robot
   const settings = useSelector<State, RobotSettings>(state =>
-    getRobotSettingsState(state, name)
+    getRobotSettings(state, name)
+  )
+  const restartRequired = useSelector<State, boolean>(state =>
+    getRobotRestartRequired(state, name)
   )
   const robotLogsDownloading = useSelector(getRobotLogsDownloading)
   const dispatch = useDispatch<Dispatch>()
@@ -64,7 +79,10 @@ export default function AdvancedSettingsCard(props: Props) {
     s => s.id === ROBOT_LOGS_OPTOUT_ID && s.value === null
   )
   const setLogOptout = (value: boolean) =>
-    dispatch(setSettings(robot, { id: ROBOT_LOGS_OPTOUT_ID, value }))
+    dispatch(updateSetting(robot, ROBOT_LOGS_OPTOUT_ID, value))
+
+  const clearRestartAlert = () => dispatch(clearRestartRequired(name))
+  const restart = () => dispatch(restartRobot(robot))
 
   React.useEffect(() => {
     dispatch(fetchSettings(robot))
@@ -102,7 +120,7 @@ export default function AdvancedSettingsCard(props: Props) {
           key={id}
           label={title}
           toggledOn={value === true}
-          onClick={() => dispatch(setSettings(robot, { id, value: !value }))}
+          onClick={() => dispatch(updateSetting(robot, id, !value))}
         >
           <p>{description}</p>
         </LabeledToggle>
@@ -119,6 +137,20 @@ export default function AdvancedSettingsCard(props: Props) {
             ]}
           >
             {ROBOT_LOGS_OPTOUT_MESSAGE}
+          </AlertModal>
+        </Portal>
+      )}
+      {restartRequired && (
+        <Portal>
+          <AlertModal
+            alertOverlay
+            heading={RESTART_REQUIRED_HEADING}
+            buttons={[
+              { children: 'Now now', onClick: () => clearRestartAlert() },
+              { children: 'Restart', onClick: restart },
+            ]}
+          >
+            {RESTART_REQUIRED_MESSAGE}
           </AlertModal>
         </Portal>
       )}

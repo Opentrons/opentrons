@@ -97,27 +97,12 @@ export type MotorAxis = 'a' | 'b' | 'c' | 'x' | 'y' | 'z'
 
 // settings
 export type SettingsState = {|
-  robot: RobotSettings,
   pipettesById: {| [id: string]: PipetteSettings |},
 |}
-
-export type RobotSettings = Array<RobotSettingsField>
 
 export type PipetteSettings = {|
   info: {| name: ?string, model: ?string |},
   fields: PipetteSettingsFieldsMap,
-|}
-
-export type RobotSettingsField = {|
-  id: string,
-  title: string,
-  description: string,
-  value: boolean | null,
-|}
-
-export type RobotSettingsFieldUpdate = {|
-  id: $PropertyType<RobotSettingsField, 'id'>,
-  value: $PropertyType<RobotSettingsField, 'value'>,
 |}
 
 export type PipetteSettingsFieldsMap = {|
