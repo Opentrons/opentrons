@@ -1,0 +1,52 @@
+@import '@opentrons/components';
+
+:root {
+  --size-20p: 20%;
+}
+
+.module_diagram {
+  max-width: 6rem;
+  width: 100%;
+  height: auto;
+}
+
+.modules_card_content {
+  padding: 1rem;
+}
+
+.module_row {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.module_diagram_container {
+  margin-right: 2rem;
+}
+
+.module_col {
+  flex: 1 0 20%;
+  padding-top: 0.5rem; /* TODO remove padding above once images are cropped properly */
+}
+
+.row_title {
+  @apply --font-body-2-dark;
+
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: var(--fw-semibold);
+}
+
+.modules_button_group {
+  flex: 1 0 40%;
+  padding-top: 0.5rem; /* TODO remove padding above once images are cropped properly */
+  text-align: right;
+}
+
+.module_button {
+  display: inline-block;
+  width: 6.75rem;
+  margin-left: 1rem;
+}

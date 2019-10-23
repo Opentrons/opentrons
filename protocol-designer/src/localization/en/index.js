@@ -9,6 +9,7 @@ import deck from './deck.json'
 import feature_flags from './feature_flags.json'
 import form from './form.json'
 import modal from './modal.json'
+import modules from './modules.json'
 import nav from './nav.json'
 import tooltip from './tooltip.json'
 import well_selection from './well_selection.json'
@@ -24,6 +25,7 @@ export default {
     feature_flags,
     form,
     modal,
+    modules,
     nav,
     tooltip,
     well_selection,
