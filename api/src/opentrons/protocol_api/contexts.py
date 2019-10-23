@@ -1101,7 +1101,7 @@ class InstrumentContext(CommandPublisher):
         return self
 
     @cmds.publish.both(command=cmds.return_tip)
-    def return_tip(self) -> 'InstrumentContext':
+    def return_tip(self, home_after: bool = True) -> 'InstrumentContext':
         """
         If a tip is currently attached to the pipette, then it will return the
         tip to it's location in the tiprack.
@@ -1118,7 +1118,7 @@ class InstrumentContext(CommandPublisher):
                             '{}'.format(loc))
         bot = loc.bottom()
         bot = bot._replace(point=bot.point._replace(z=bot.point.z + 10))
-        self.drop_tip(bot)
+        self.drop_tip(bot, home_after=home_after)
         try:
             loc.parent.return_tips(loc, self.channels)
         except AssertionError:
