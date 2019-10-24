@@ -83,12 +83,13 @@ def template_db(tmpdir_factory):
 
 
 @pytest.mark.apiv1
-@pytest.fixture(autouse=True)
+@pytest.fixture(scope='function')
 def config_tempdir(tmpdir, template_db):
     os.environ['OT_API_CONFIG_DIR'] = str(tmpdir)
     config.reload()
-    shutil.copyfile(
-        template_db, config.CONFIG['labware_database_file'])
+    if not os.path.exists(config.CONFIG['labware_database_file']):
+        shutil.copyfile(
+            template_db, config.CONFIG['labware_database_file'])
     yield tmpdir, template_db
 
 
@@ -141,11 +142,12 @@ def using_api2(loop):
     if not os.environ.get('OT_API_FF_useProtocolApi2'):
         pytest.skip('Do not run api v1 tests here')
     hw_manager = adapters.SingletonAdapter(loop)
+    old_config = config.robot_configs.load()
     try:
         yield hw_manager
     finally:
         asyncio.ensure_future(hw_manager.reset())
-        hw_manager.set_config(config.robot_configs.load())
+        hw_manager.set_config(old_config)
 
 
 @contextlib.contextmanager
@@ -204,10 +206,10 @@ async def async_server(request, virtual_smoothie_env, loop):
         pytest.skip('requires api2 only')
     with request.param(loop) as hw:
         if request.param == using_api1:
-            app = init(hw)
+            app = init(hw, loop=loop)
             app['api_version'] = 1
         elif request.param == using_api2:
-            app = init(hw)
+            app = init(hw, loop=loop)
             app['api_version'] = 2
         else:
             pytest.skip('Incorrect api version used')
@@ -219,7 +221,13 @@ async def async_server(request, virtual_smoothie_env, loop):
 async def async_client(async_server, loop, aiohttp_client):
     cli = await loop.create_task(aiohttp_client(async_server))
     endpoints.session = None
-    yield cli
+    try:
+        yield cli
+    finally:
+        if cli.app.on_shutdown.frozen:
+            await cli.close()
+        else:
+            await async_server.shutdown()
 
 
 @pytest.fixture
