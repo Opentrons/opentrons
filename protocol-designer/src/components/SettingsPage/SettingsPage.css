@@ -37,10 +37,12 @@
 }
 
 .feature_flag_description {
-  @apply --font-body-1-dark;
+  @apply --font-body-2-dark;
 
   padding: 0 1rem 1rem 1rem;
   margin: -1rem 0 0 0;
+  max-width: 60%;
+  line-height: 1.5;
 }
 
 .toggle_label {

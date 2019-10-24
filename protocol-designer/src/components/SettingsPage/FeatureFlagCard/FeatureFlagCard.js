@@ -24,6 +24,22 @@ const FeatureFlagCard = (props: Props) => {
     flagName => !userFacingFlags.includes(flagName)
   )
 
+  const getDescription = flag => {
+    const RICH_DESCRIPTIONS = {
+      OT_PD_DISABLE_MODULE_RESTRICTIONS: (
+        <>
+          <p>{i18n.t(`feature_flags.${flag}.description_1`)} </p>
+          <br />
+          <p>{i18n.t(`feature_flags.${flag}.description_2`)} </p>
+        </>
+      ),
+    }
+    return (
+      RICH_DESCRIPTIONS[`${flag}`] ||
+      i18n.t(`feature_flags.${flag}.description`)
+    )
+  }
+
   const toFlagRow = flagName => (
     <div key={flagName}>
       <div className={styles.setting_row}>
@@ -41,7 +57,7 @@ const FeatureFlagCard = (props: Props) => {
         />
       </div>
       <p className={styles.feature_flag_description}>
-        {i18n.t(`feature_flags.${flagName}.description`)}
+        {getDescription(flagName)}
       </p>
     </div>
   )

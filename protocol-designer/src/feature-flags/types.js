@@ -11,6 +11,7 @@ export type FlagTypes =
   | 'OT_PD_ENABLE_GEN2_PIPETTES'
   | 'PRERELEASE_MODE'
   | 'OT_PD_ENABLE_MODULES'
+  | 'OT_PD_DISABLE_MODULE_RESTRICTIONS'
 
 // flags that are not in this list only show in prerelease mode
 export const userFacingFlags: Array<FlagTypes> = []
