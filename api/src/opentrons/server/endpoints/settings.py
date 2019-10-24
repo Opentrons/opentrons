@@ -54,6 +54,14 @@ _apiv1_settings_reset_options = [
 ] + _common_settings_reset_options
 
 
+_SETTINGS_RESTART_REQUIRED = False
+# This is a bit of global state that indicates whether a setting has changed
+# that requires a restart. It's OK for this to be global because the behavior
+# it's catching is global - changing the kind of setting that requires a
+# a restart anywhere, even if you theoretically have two servers running in
+# the same process, will require _all_ of them to be restarted.
+
+
 def reset_options() -> List[Dict[str, str]]:
     if ff.use_protocol_api_v2():
         return _apiv2_settings_reset_options
@@ -68,11 +76,13 @@ async def get_advanced_settings(request: web.Request) -> web.Response:
     "description", and "value"
     There is also an (empty) 'links' subobject
     """
-    return web.json_response({'settings': _get_adv_settings(),
-                              'links': {}})
+    return web.json_response(_get_adv_settings_response(),
+                             status=200)
 
 
-def _get_adv_settings() -> List[Dict[str, Union[str, bool, None]]]:
+def _get_adv_settings_response() -> Dict[
+        str, Union[Dict[str, str],
+                   List[Dict[str, Union[str, bool, None]]]]]:
     data = advs.get_all_adv_settings()
 
     def _should_show(setting_dict):
@@ -81,10 +91,17 @@ def _get_adv_settings() -> List[Dict[str, Union[str, bool, None]]]:
         return advs.get_setting_with_env_overload(setting_dict['show_if'][0])\
             == setting_dict['show_if'][1]
 
-    return [
-        {k: v for k, v in setting.items() if k != 'show_if'}
-        for setting in data.values()
-        if _should_show(setting)]
+    if _SETTINGS_RESTART_REQUIRED:
+        links = {'restart': '/server/restart'}
+    else:
+        links = {}
+
+    return {
+        'links': links,
+        'settings': [
+            {k: v for k, v in setting.items() if k != 'show_if'}
+            for setting in data.values()
+            if _should_show(setting)]}
 
 
 async def set_advanced_setting(request: web.Request) -> web.Response:
@@ -106,6 +123,7 @@ async def set_advanced_setting(request: web.Request) -> web.Response:
     -> 200 OK {"settings": (as GET /settings),
                "links": {"restart": uri if restart required}}
     """
+    global _SETTINGS_RESTART_REQUIRED
     data = await request.json()
     key = data.get('id')
     value = data.get('value')
@@ -135,13 +153,10 @@ async def set_advanced_setting(request: web.Request) -> web.Response:
                  'message': 'Failed to set log upstreaming: {code}'},
                 status=500)
 
-    if setting.restart_required and old_val != value:
-        links = {'restart': '/server/restart'}
-    else:
-        links = {}
+    _SETTINGS_RESTART_REQUIRED = _SETTINGS_RESTART_REQUIRED or (
+        setting.restart_required and old_val != value)
     return web.json_response(
-        {'settings': _get_adv_settings(),
-         'links': links},
+        _get_adv_settings_response(),
         status=200,
     )
 
@@ -194,8 +209,7 @@ async def reset(request: web.Request) -> web.Response:  # noqa(C901)
                 shutil.rmtree('/data/boot.d')
         else:
             log.debug('Not on pi, not removing /data/boot.d')
-    return web.json_response(
-        {'links': {'restart': '/server/restart'}}, status=200)
+    return web.json_response({}, status=200)
 
 
 async def available_resets(request: web.Request) -> web.Response:

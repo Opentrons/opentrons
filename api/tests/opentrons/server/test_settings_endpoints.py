@@ -3,8 +3,15 @@ import os
 
 import pytest
 
+from opentrons.server import endpoints
 from opentrons.config import pipette_config
 from opentrons import config, types
+
+
+@pytest.fixture
+def restore_restart_required():
+    yield
+    endpoints.settings._SETTINGS_RESTART_REQUIRED = False
 
 
 @pytest.fixture
@@ -89,6 +96,49 @@ async def test_set(virtual_smoothie_env, loop, async_client):
     assert test_setting.get('value')
 
 
+async def test_restart_required_persistence(
+        virtual_smoothie_env, loop, async_client,
+        restore_restart_required):
+    current = await async_client.get('/settings')
+    current_body = await current.json()
+    assert not current_body['links']
+
+    # Changing the state sets restart required
+    cur_apiv2_state = [s['value'] for s in current_body['settings']
+                       if s['id'] == 'useProtocolApi2'][0]
+    new_apiv2_state = not bool(cur_apiv2_state)
+    resp = await async_client.post('/settings',
+                                   json={'id': 'useProtocolApi2',
+                                         'value': new_apiv2_state})
+    assert resp.status == 200
+    body = await resp.json()
+    assert body['links']['restart'] == '/server/restart'
+
+    # Setting the state to the same value again doesn't clear it
+    new = await async_client.get('/settings')
+    new_body = await new.json()
+    assert new_body['links']['restart'] == '/server/restart'
+
+    resp = await async_client.post('/settings',
+                                   json={'id': 'useProtocolApi2',
+                                         'value': new_apiv2_state})
+    assert resp.status == 200
+    body = await resp.json()
+    assert body['links']['restart'] == '/server/restart'
+
+    # Neither does changing the state back
+    new = await async_client.get('/settings')
+    new_body = await new.json()
+    assert new_body['links']['restart'] == '/server/restart'
+
+    resp = await async_client.post('/settings',
+                                   json={'id': 'useProtocolApi2',
+                                         'value': cur_apiv2_state})
+    assert resp.status == 200
+    body = await resp.json()
+    assert body['links']['restart'] == '/server/restart'
+
+
 async def test_available_resets(async_client):
     resp = await async_client.get('/settings/reset/options')
     body = await resp.json()
@@ -131,19 +181,19 @@ async def execute_reset_tests_v1(async_client):
     body = await resp.json()
     assert not os.path.exists(config.CONFIG['labware_database_file'])
     assert resp.status == 200
-    assert body == {'links': {'restart': '/server/restart'}}
+    assert body == {}
 
     # Make sure this one is idempotent
     resp = await cli.post('/settings/reset', json={'labwareCalibration': True})
     body = await resp.json()
     assert resp.status == 200
-    assert body == {'links': {'restart': '/server/restart'}}
+    assert body == {}
 
     # Check that we properly delete only the tip length key
     resp = await cli.post('/settings/reset', json={'tipProbe': True})
     body = await resp.json()
     assert resp.status == 200
-    assert body == {'links': {'restart': '/server/restart'}}
+    assert body == {}
 
     robot_settings = config.CONFIG['robot_settings_file']
     with open(robot_settings, 'r') as f:
@@ -165,19 +215,19 @@ async def execute_reset_tests_v2(async_client):
     body = await resp.json()
     assert not os.listdir(config.CONFIG['labware_calibration_offsets_dir_v2'])
     assert resp.status == 200
-    assert body == {'links': {'restart': '/server/restart'}}
+    assert body == {}
 
     # Make sure this one is idempotent
     resp = await cli.post('/settings/reset', json={'labwareCalibration': True})
     body = await resp.json()
     assert resp.status == 200
-    assert body == {'links': {'restart': '/server/restart'}}
+    assert body == {}
 
     # Check that we properly delete only the tip length key
     resp = await cli.post('/settings/reset', json={'tipProbe': True})
     body = await resp.json()
     assert resp.status == 200
-    assert body == {'links': {'restart': '/server/restart'}}
+    assert body == {}
 
     robot_settings = config.CONFIG['robot_settings_file']
     with open(robot_settings, 'r') as f:
