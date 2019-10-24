@@ -26,9 +26,9 @@ class SimulatingDriver:
         self._height = location
 
     def get_device_info(self):
-        return {'serial': 'dummySerial',
-                'model': 'dummyModel',
-                'version': 'dummyVersion'}
+        return {'serial': 'dummySerialMD',
+                'model': 'dummyModelMD',
+                'version': 'dummyVersionMD'}
 
     def connect(self, port):
         pass

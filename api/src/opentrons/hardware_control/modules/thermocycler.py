@@ -97,9 +97,9 @@ class SimulatingDriver:
         self._lid_target = None
 
     async def get_device_info(self):
-        return {'serial': 'dummySerial',
-                'model': 'dummyModel',
-                'version': 'dummyVersion'}
+        return {'serial': 'dummySerialTC',
+                'model': 'dummyModelTC',
+                'version': 'dummyVersionTC'}
 
     async def enter_programming_mode(self):
         pass

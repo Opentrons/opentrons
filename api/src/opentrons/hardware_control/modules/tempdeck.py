@@ -50,9 +50,9 @@ class SimulatingDriver:
         return 'holding at target' if self._active else 'idle'
 
     def get_device_info(self):
-        return {'serial': 'dummySerial',
-                'model': 'dummyModel',
-                'version': 'dummyVersion'}
+        return {'serial': 'dummySerialTD',
+                'model': 'dummyModelTD',
+                'version': 'dummyVersionTD'}
 
 
 class Poller(Thread):

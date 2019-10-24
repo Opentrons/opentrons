@@ -44,7 +44,7 @@ Protocol = namedtuple(
 
 @pytest.fixture(autouse=True)
 def asyncio_loop_exception_handler(loop):
-    def exception_handler(loop, context):
+    def exception_handler(loop, iontext):
         pytest.fail(str(context))
     loop.set_exception_handler(exception_handler)
     yield
@@ -554,7 +554,10 @@ def cntrlr_mock_connect(monkeypatch):
 
 @pytest.fixture
 def hardware_api(loop):
-    hw_api = API.build_hardware_simulator(loop=loop)
+    hw_api = API.build_hardware_simulator(loop=loop,
+                                          attached_modules=['magdeck',
+                                                            'tempdeck',
+                                                            'thermocycler'])
     return hw_api
 
 

@@ -41,6 +41,7 @@ class Simulator:
     hardware actions. It is suitable for use on a dev machine or on
     a robot with no smoothie connected.
     """
+
     def __init__(
             self,
             attached_instruments: Dict[types.Mount, Dict[str, Optional[str]]],
@@ -65,7 +66,7 @@ class Simulator:
                                  `'tempdeck'` or `'magdeck'`) representing
                                  modules the simulator should assume are
                                  attached. Like `attached_instruments`, used
-                                 to make the simnulator match the setup of the
+                                 to make the simulator match the setup of the
                                  real hardware.
         :param config: The robot config to use
         :param loop: The asyncio event loop to use.
@@ -219,7 +220,7 @@ class Simulator:
     @property
     def axis_bounds(self) -> Dict[str, Tuple[float, float]]:
         """ The (minimum, maximum) bounds for each axis. """
-        return {ax: (0, pos+0.5) for ax, pos in _HOME_POSITION.items()
+        return {ax: (0, pos + 0.5) for ax, pos in _HOME_POSITION.items()
                 if ax not in 'BC'}
 
     @property

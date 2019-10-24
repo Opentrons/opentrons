@@ -124,7 +124,10 @@ async def _upload_via_bossa(port, firmware_file_path, kwargs):
     #   modules/thermo-cycler/production/firmware/thermo-cycler-arduino.ino.bin
     # NOTE: bossac cannot traverse symlinks to port,
     # so we resolve to real path
-    bossa_args = ['bossac', f'-p{os.path.realpath(port)}',
+    resolved_symlink = os.path.realpath(port)
+    log.info(
+        f"device at symlinked port: {port} resolved to path: {resolved_symlink}")
+    bossa_args = ['bossac', f'-p{resolved_symlink}',
                   '-e', '-w', '-v', '-R',
                   '--offset=0x2000', f'{firmware_file_path}']
 
