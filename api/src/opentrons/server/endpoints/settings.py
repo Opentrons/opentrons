@@ -2,7 +2,7 @@ from json import JSONDecodeError
 import logging
 import os
 import shutil
-from typing import Any, Dict, List, Tuple, Union
+from typing import Dict, List, Tuple, Union
 from aiohttp import web
 from opentrons.config import (advanced_settings as advs,
                               robot_configs as rc,
@@ -67,11 +67,10 @@ async def get_advanced_settings(request: web.Request) -> web.Response:
     value that is a list of objects where each object has keys "id", "title",
     "description", and "value"
     """
-    res = _get_adv_settings()
-    return web.json_response(res)
+    return web.json_response({'settings': _get_adv_settings()})
 
 
-def _get_adv_settings() -> Dict[str, List[Dict[str, Union[str, bool, None]]]]:
+def _get_adv_settings() -> List[Dict[str, Union[str, bool, None]]]:
     data = advs.get_all_adv_settings()
 
     def _should_show(setting_dict):
@@ -80,43 +79,69 @@ def _get_adv_settings() -> Dict[str, List[Dict[str, Union[str, bool, None]]]]:
         return advs.get_setting_with_env_overload(setting_dict['show_if'][0])\
             == setting_dict['show_if'][1]
 
-    return {"settings": [
+    return [
         {k: v for k, v in setting.items() if k != 'show_if'}
         for setting in data.values()
-        if _should_show(setting)]}
+        if _should_show(setting)]
 
 
 async def set_advanced_setting(request: web.Request) -> web.Response:
-    """
-    Handles a POST request with a json body that has keys "id" and "value",
-    where the value of "id" must correspond to an id field of a setting in
-    `opentrons.config.advanced_settings.settings`. Saves the value of "value"
-    for the setting that matches the supplied id.
+    """ Set a specific advanced setting.
+
+    The "id" field must correspond to an id field of a setting in
+    `opentrons.config.advanced_settings.settings`. Saves the value of
+    "value" for the setting that matches the supplied id.
+
+    The response body includes the new settings in the same format as
+    GET /settings, and a "links" object that may contain a "restart"
+    key. If the "restart" key is present, the client should restart
+    the robot, and the value is a URI that will do so.
+
+    POST /settings {"id": short-id, "value": tristate new-value}
+
+    -> 400 Bad Request {"error": error-shortname, "message": str}
+    -> 500 Internal Server Error {"error": "error-shortname", "message": str}
+    -> 200 OK {"settings": (as GET /settings),
+               "links": {"restart": uri if restart required}}
     """
     data = await request.json()
     key = data.get('id')
     value = data.get('value')
     log.info(f'set_advanced_setting: {key} -> {value}')
-    if key and key in advs.settings_by_id.keys():
-        advs.set_adv_setting(key, value)
-        res: Dict[str, Any] = _get_adv_settings()
-        status = 200
-        if key == 'disableLogAggregation'\
-           and ARCHITECTURE == SystemArchitecture.BUILDROOT:
-            code, stdout, stderr = await log_control.set_syslog_level(
-                'emerg' if value else 'info')
-            if code != 0:
-                log.error(
-                    f"Could not set log control: {code}: stdout={stdout}"
-                    f" stderr={stderr}")
-                res = {'message': 'Failed to set log upstreaming: {code}'}
-                status = 500
-                log.error(res)
+    setting = advs.settings_by_id.get(key)
+    if not setting:
+        log.warning(f'set_advanced_setting: bad request: {key} invalid')
+        return web.json_response(
+            {'error': 'no-such-advanced-setting',
+             'message': f'ID {key} not found in settings list',
+             'links': {}},
+            status=400)
+
+    old_val = advs.get_adv_setting(key)
+    advs.set_adv_setting(key, value)
+
+    if key == 'disableLogAggregation'\
+       and ARCHITECTURE == SystemArchitecture.BUILDROOT:
+        code, stdout, stderr = await log_control.set_syslog_level(
+            'emerg' if value else 'info')
+        if code != 0:
+            log.error(
+                f"Could not set log control: {code}: stdout={stdout}"
+                f" stderr={stderr}")
+            return web.json_response(
+                {'error': 'log-config-failure',
+                 'message': 'Failed to set log upstreaming: {code}'},
+                status=500)
+
+    if setting.restart_required and old_val != value:
+        links = {'restart': '/server/restart'}
     else:
-        res = {'message': 'ID {} not found in settings list'.format(key)}
-        status = 400
-        log.info(f'set_advanced_setting: bad request: {key} invalid')
-    return web.json_response(res, status=status)
+        links = {}
+    return web.json_response(
+        {'settings': _get_adv_settings(),
+         'links': links},
+        status=200,
+    )
 
 
 def _check_reset(reset_req: Dict[str, str]) -> Tuple[bool, str]:
@@ -131,13 +156,18 @@ def _check_reset(reset_req: Dict[str, str]) -> Tuple[bool, str]:
 
 async def reset(request: web.Request) -> web.Response:  # noqa(C901)
     """ Execute a reset of the requested parts of the user configuration.
+
+    POST /settings/reset {resetOption: Any}
+
+    -> 200 OK, {"links": {"restart": uri}}
+    -> 400 Bad Request, {"error": error-shortmessage, "message": str}
     """
     data = await request.json()
     ok, bad_key = _check_reset(data)
     if not ok:
         return web.json_response(
-            {'message': '{} is not a valid reset option'
-             .format(bad_key)},
+            {'error': 'bad-reset-option',
+             'message': f'{bad_key} is not a valid reset option'},
             status=400)
     log.info("Reset requested for {}".format(', '.join(data.keys())))
     if data.get('tipProbe'):
@@ -162,7 +192,8 @@ async def reset(request: web.Request) -> web.Response:  # noqa(C901)
                 shutil.rmtree('/data/boot.d')
         else:
             log.debug('Not on pi, not removing /data/boot.d')
-    return web.json_response({}, status=200)
+    return web.json_response(
+        {'links': {'restart': '/server/restart'}}, status=200)
 
 
 async def available_resets(request: web.Request) -> web.Response:

@@ -129,19 +129,19 @@ async def execute_reset_tests_v1(async_client):
     body = await resp.json()
     assert not os.path.exists(config.CONFIG['labware_database_file'])
     assert resp.status == 200
-    assert body == {}
+    assert body == {'links': {'restart': '/server/restart'}}
 
     # Make sure this one is idempotent
     resp = await cli.post('/settings/reset', json={'labwareCalibration': True})
     body = await resp.json()
     assert resp.status == 200
-    assert body == {}
+    assert body == {'links': {'restart': '/server/restart'}}
 
     # Check that we properly delete only the tip length key
     resp = await cli.post('/settings/reset', json={'tipProbe': True})
     body = await resp.json()
     assert resp.status == 200
-    assert body == {}
+    assert body == {'links': {'restart': '/server/restart'}}
 
     robot_settings = config.CONFIG['robot_settings_file']
     with open(robot_settings, 'r') as f:
@@ -163,19 +163,19 @@ async def execute_reset_tests_v2(async_client):
     body = await resp.json()
     assert not os.listdir(config.CONFIG['labware_calibration_offsets_dir_v2'])
     assert resp.status == 200
-    assert body == {}
+    assert body == {'links': {'restart': '/server/restart'}}
 
     # Make sure this one is idempotent
     resp = await cli.post('/settings/reset', json={'labwareCalibration': True})
     body = await resp.json()
     assert resp.status == 200
-    assert body == {}
+    assert body == {'links': {'restart': '/server/restart'}}
 
     # Check that we properly delete only the tip length key
     resp = await cli.post('/settings/reset', json={'tipProbe': True})
     body = await resp.json()
     assert resp.status == 200
-    assert body == {}
+    assert body == {'links': {'restart': '/server/restart'}}
 
     robot_settings = config.CONFIG['robot_settings_file']
     with open(robot_settings, 'r') as f:
