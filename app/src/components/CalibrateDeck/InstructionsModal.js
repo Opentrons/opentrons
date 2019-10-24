@@ -5,10 +5,8 @@ import { push } from 'connected-react-router'
 import { Link } from 'react-router-dom'
 import capitalize from 'lodash/capitalize'
 
-import {
-  restartRobotServer,
-  deckCalibrationCommand as dcCommand,
-} from '../../http-api-client'
+import { deckCalibrationCommand as dcCommand } from '../../http-api-client'
+import { restartRobot } from '../../robot-admin'
 
 import { chainActions } from '../../util'
 import { ModalPage, SpinnerModalPage } from '@opentrons/components'
@@ -161,7 +159,7 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   } else {
     actions = [
       dcCommand(robot, { command: 'save transform' }),
-      restartRobotServer(robot),
+      restartRobot(robot),
       push(ownProps.parentUrl),
     ]
   }

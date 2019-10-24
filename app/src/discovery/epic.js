@@ -33,7 +33,7 @@ export const startDiscoveryOnRestartEpic: Epic = action$ =>
     )
   )
 
-export const discoveryEpic = combineEpics(
+export const discoveryEpic: Epic = combineEpics(
   startDiscoveryEpic,
   startDiscoveryOnRestartEpic
 )

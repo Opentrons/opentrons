@@ -6,15 +6,16 @@ import { push } from 'connected-react-router'
 
 import {
   home,
-  restartRobotServer,
   fetchRobotLights,
   setRobotLights,
   makeGetRobotLights,
   startDeckCalibration,
 } from '../../http-api-client'
 
+import { restartRobot } from '../../robot-admin'
 import { selectors as robotSelectors } from '../../robot'
 import { CONNECTABLE } from '../../discovery'
+
 import { RefreshCard } from '@opentrons/components'
 import { LabeledToggle, LabeledButton } from '../controls'
 
@@ -140,7 +141,7 @@ function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
     ...ownProps,
     ...stateProps,
     homeAll: () => dispatch(home(robot)),
-    restartRobot: () => dispatch(restartRobotServer(robot)),
+    restartRobot: () => dispatch(restartRobot(robot)),
     fetchLights: () => dispatch(fetchRobotLights(robot)),
     toggleLights: () => dispatch(setRobotLights(robot, !lightsOn)),
     start: () =>

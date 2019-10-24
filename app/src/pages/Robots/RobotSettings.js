@@ -17,6 +17,7 @@ import {
 } from '../../shell'
 
 import { makeGetRobotHome, clearHomeResponse } from '../../http-api-client'
+import { getRobotRestarting } from '../../robot-admin'
 
 import { SpinnerModalPage } from '@opentrons/components'
 import { ErrorModal } from '../../components/modals'
@@ -47,6 +48,7 @@ type SP = {|
   homeInProgress: ?boolean,
   homeError: ?Error,
   updateInProgress: boolean,
+  restarting: boolean,
 |}
 
 type DP = {| dispatch: Dispatch |}
@@ -80,6 +82,7 @@ function RobotSettingsPage(props: Props) {
     closeConnectAlert,
     showUpdateModal,
     updateInProgress,
+    restarting,
     match: { path, url },
   } = props
 
@@ -128,7 +131,12 @@ function RobotSettingsPage(props: Props) {
 
         <Route
           path={`${path}/${RESET_FRAGMENT}`}
-          render={props => <ResetRobotModal robot={robot} />}
+          render={routeProps => (
+            <ResetRobotModal
+              robot={robot}
+              closeModal={() => routeProps.history.push(url)}
+            />
+          )}
         />
 
         <Route
@@ -140,11 +148,18 @@ function RobotSettingsPage(props: Props) {
             // only show homing spinner and error on main page
             // otherwise, it will show up during homes in pipette swap
             return (
-              <React.Fragment>
+              <>
                 {homeInProgress && (
                   <SpinnerModalPage
                     titleBar={titleBarProps}
                     message="Robot is homing."
+                  />
+                )}
+
+                {restarting && (
+                  <SpinnerModalPage
+                    titleBar={titleBarProps}
+                    message="Robot is restarting."
                   />
                 )}
 
@@ -156,7 +171,7 @@ function RobotSettingsPage(props: Props) {
                     close={closeHomeAlert}
                   />
                 )}
-              </React.Fragment>
+              </>
             )
           }}
         />
@@ -180,6 +195,7 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
     const buildrootUpdateType = getBuildrootUpdateAvailable(state, robot)
     const updateInProgress = getBuildrootUpdateInProgress(state, robot)
     const currentBrRobot = getBuildrootRobot(state)
+    const restarting = getRobotRestarting(state, robot.name)
 
     const showUpdateModal =
       updateInProgress ||
@@ -189,6 +205,7 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
 
     return {
       updateInProgress,
+      restarting,
       showUpdateModal: !!showUpdateModal,
       homeInProgress: homeRequest && homeRequest.inProgress,
       homeError: homeRequest && homeRequest.error,

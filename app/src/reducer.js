@@ -14,6 +14,9 @@ import { reducer as apiReducer } from './http-api-client'
 // api state
 import { robotApiReducer } from './robot-api'
 
+// robot administration state
+import { robotAdminReducer } from './robot-admin/reducer'
+
 // app shell state
 import { shellReducer } from './shell'
 
@@ -21,7 +24,7 @@ import { shellReducer } from './shell'
 import { configReducer } from './config'
 
 // discovery state
-import { discoveryReducer } from './discovery'
+import { discoveryReducer } from './discovery/reducer'
 
 // protocol state
 import { protocolReducer } from './protocol'
@@ -38,6 +41,7 @@ const rootReducer: Reducer<State, Action> = combineReducers<_, Action>({
   robot: robotReducer,
   api: apiReducer,
   robotApi: robotApiReducer,
+  robotAdmin: robotAdminReducer,
   config: configReducer,
   discovery: discoveryReducer,
   labware: customLabwareReducer,
