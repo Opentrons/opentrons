@@ -1,0 +1,18 @@
+@import '@opentrons/components';
+
+.module_info_tag {
+  width: 100%;
+  background-color: #d4d4d4;
+  color: var(--c-font-dark);
+  padding: 0.3rem 0.3rem 0 0.3rem;
+}
+
+.module_info_line {
+  font-size: 0.5rem;
+  font-weight: var(--fw-semibold);
+  padding-bottom: 0.3rem;
+}
+
+.module_info_type {
+  text-transform: uppercase;
+}

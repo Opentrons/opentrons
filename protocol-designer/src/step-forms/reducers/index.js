@@ -149,6 +149,7 @@ export const initialDeckSetupStepForm: FormData = {
     [FIXED_TRASH_ID]: '12',
   },
   pipetteLocationUpdate: {},
+  moduleLocationUpdate: {},
 }
 
 export const initialSavedStepFormsState: SavedStepFormState = {
@@ -162,6 +163,7 @@ type SavedStepFormsActions =
   | DeleteContainerAction
   | SubstituteStepFormPipettesAction
   | DeletePipettesAction
+  | CreateModuleAction // TODO IMMEDIATELY: add unit tests
   | DeleteModuleAction
   | DuplicateStepAction
   | ChangeSavedStepFormAction
@@ -220,6 +222,20 @@ export const savedStepForms = (
           labwareLocationUpdate: {
             ...prevInitialDeckSetupStep.labwareLocationUpdate,
             [labwareId]: slot,
+          },
+        },
+      }
+    }
+    case 'CREATE_MODULE': {
+      const prevInitialDeckSetupStep =
+        savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+      return {
+        ...savedStepForms,
+        [INITIAL_DECK_SETUP_STEP_ID]: {
+          ...prevInitialDeckSetupStep,
+          moduleLocationUpdate: {
+            ...prevInitialDeckSetupStep.moduleLocationUpdate,
+            [action.payload.id]: action.payload.slot,
           },
         },
       }
@@ -767,6 +783,7 @@ export type RootState = {
   labwareDefs: LabwareDefsRootState,
   labwareInvariantProperties: NormalizedLabwareById,
   pipetteInvariantProperties: NormalizedPipetteById,
+  moduleInvariantProperties: ModuleEntities,
   legacySteps: LegacyStepsState,
   savedStepForms: SavedStepFormState,
   unsavedForm: FormState,
@@ -785,6 +802,10 @@ const rootReducer = (state: RootState, action: any) => {
     ),
     pipetteInvariantProperties: pipetteInvariantProperties(
       prevStateFallback.pipetteInvariantProperties,
+      action
+    ),
+    moduleInvariantProperties: moduleInvariantProperties(
+      prevStateFallback.moduleInvariantProperties,
       action
     ),
     labwareDefs: labwareDefsRootReducer(prevStateFallback.labwareDefs, action),
