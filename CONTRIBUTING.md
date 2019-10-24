@@ -344,9 +344,9 @@ Be sure to check out the [API `README`][api-readme] for additional instructions.
 
 ```shell
 # run API with virtual robot
-make -C api dev
+make -C api dev ENABLE_VIRTUAL_SMOOTHIE=true
 # run API with robot's motor driver connected via USB to UART cable
-make -C api dev ENABLE_VIRTUAL_SMOOTHIE=false
+make -C api dev
 ```
 
 To put the API on a test robot, if it's on balena do:
