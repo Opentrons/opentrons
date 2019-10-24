@@ -10,8 +10,8 @@
   "license": "Apache-2.0",
   "main": "js/index.js",
   "devDependencies": {
-    "flow-bin": "^0.110.0",
-    "flow-typed": "^2.6.1"
+    "flow-bin": "^0.110.1",
+    "flow-typed": "^2.6.2"
   },
   "dependencies": {
     "uuid": "3.3.2"
