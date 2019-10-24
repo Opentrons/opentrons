@@ -484,6 +484,21 @@ def test_touch_tip_default_args(loop, monkeypatch):
         assert total_hw_moves[i] == (edges[i - 1], speed)
 
 
+def test_touch_tip_disabled(loop, monkeypatch, get_labware_fixture):
+    ctx = papi.ProtocolContext(loop)
+    ctx.home()
+    trough1 = get_labware_fixture('fixture_12_trough')
+    trough_lw = ctx.load_labware_from_definition(trough1, '1')
+    tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 3)
+    instr = ctx.load_instrument('p300_single', Mount.RIGHT,
+                                tip_racks=[tiprack])
+    instr.pick_up_tip()
+    move_mock = mock.Mock()
+    monkeypatch.setattr(ctx._hw_manager.hardware._api, 'move_to', move_mock)
+    instr.touch_tip(trough_lw['A1'])
+    move_mock.assert_not_called()
+
+
 def test_blow_out(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()

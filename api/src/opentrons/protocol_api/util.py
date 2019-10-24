@@ -1,11 +1,14 @@
 """ Utility functions and classes for the protocol api """
 from collections import UserDict
+import logging
 from typing import Any, Optional, TYPE_CHECKING, Union
 
 from opentrons.hardware_control import types, adapters, API, HardwareAPILike
 
 if TYPE_CHECKING:
     from .contexts import InstrumentContext
+
+MODULE_LOG = logging.getLogger(__name__)
 
 
 def _assert_gzero(val: Any, message: str) -> float:
@@ -216,3 +219,17 @@ class HardwareManager:
         cur = getattr(self, '_current', None)
         if orig and cur:
             cur.join()
+
+
+def clamp_value(
+        input_value: float, max_value: float, min_value: float,
+        log_tag: str = '') -> float:
+    if input_value > max_value:
+        MODULE_LOG.info(
+            f'{log_tag} clamped input {input_value} to {max_value}')
+        return max_value
+    if input_value < min_value:
+        MODULE_LOG.info(
+            f'{log_tag} calmped input {input_value} to {min_value}')
+        return min_value
+    return input_value

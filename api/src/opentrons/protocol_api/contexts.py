@@ -17,7 +17,7 @@ from .labware import (Well, Labware, load, get_labware_definition,
                       select_tiprack_from_list, filter_tipracks_to_start,
                       LabwareDefinition)
 from .util import (FlowRates, PlungerSpeeds, Clearances, AxisMaxSpeeds,
-                   HardwareManager)
+                   HardwareManager, clamp_value)
 
 from . import geometry
 from . import transfers
@@ -1018,12 +1018,21 @@ class InstrumentContext(CommandPublisher):
         if not self.hw_pipette['has_tip']:
             raise hc.NoTipAttachedError('Pipette has no tip to touch_tip()')
 
-        if speed > 80.0:
-            self._log.warning('Touch tip speed above limit. Setting to 80mm/s')
-            speed = 80.0
-        elif speed < 20.0:
-            self._log.warning('Touch tip speed below min. Setting to 20mm/s')
-            speed = 20.0
+        def _build_edges(where: Well, offset: float) -> List[types.Point]:
+            # Determine the touch_tip edges/points
+            offset_pt = types.Point(0, 0, offset)
+            return [
+                # right edge
+                where._from_center_cartesian(x=radius, y=0, z=1) + offset_pt,
+                # left edge
+                where._from_center_cartesian(x=-radius, y=0, z=1) + offset_pt,
+                # back edge
+                where._from_center_cartesian(x=0, y=radius, z=1) + offset_pt,
+                # front edge
+                where._from_center_cartesian(x=0, y=-radius, z=1) + offset_pt
+            ]
+
+        checked_speed = clamp_value(speed, 80, 20, 'touch_tip:')
 
         # If location is a valid well, move to the well first
         if location is None:
@@ -1034,6 +1043,9 @@ class InstrumentContext(CommandPublisher):
                 # type checked below
 
         if isinstance(location, Well):
+            if 'touchTipDisabled' in quirks_from_any_parent(location):
+                self._log.info(f"Ignoring touch tip on labware {location}")
+                return self
             if location.parent.is_tiprack:
                 self._log.warning('Touch_tip being performed on a tiprack. '
                                   'Please re-check your code')
@@ -1042,20 +1054,8 @@ class InstrumentContext(CommandPublisher):
             raise TypeError(
                 'location should be a Well, but it is {}'.format(location))
 
-        # Determine the touch_tip edges/points
-        offset_pt = types.Point(0, 0, v_offset)
-        well_edges = [
-            # right edge
-            location._from_center_cartesian(x=radius, y=0, z=1) + offset_pt,
-            # left edge
-            location._from_center_cartesian(x=-radius, y=0, z=1) + offset_pt,
-            # back edge
-            location._from_center_cartesian(x=0, y=radius, z=1) + offset_pt,
-            # front edge
-            location._from_center_cartesian(x=0, y=-radius, z=1) + offset_pt
-        ]
-        for edge in well_edges:
-            self._hw_manager.hardware.move_to(self._mount, edge, speed)
+        for edge in _build_edges(location, v_offset):
+            self._hw_manager.hardware.move_to(self._mount, edge, checked_speed)
         return self
 
     @cmds.publish.both(command=cmds.air_gap)

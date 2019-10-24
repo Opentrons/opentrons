@@ -6272,6 +6272,7 @@ Object {
           "quirks": Array [
             "fixedTrash",
             "centerMultichannelOnWells",
+            "touchTipDisabled",
           ],
         },
         "schemaVersion": 2,
@@ -6390,6 +6391,7 @@ Object {
           "loadName": "fixture_12_trough",
           "quirks": Array [
             "centerMultichannelOnWells",
+            "touchTipDisabled",
           ],
         },
         "schemaVersion": 2,

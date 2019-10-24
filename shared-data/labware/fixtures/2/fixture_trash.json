@@ -19,7 +19,7 @@
     "isTiprack": false,
     "loadName": "fixture_trash",
     "isMagneticModuleCompatible": false,
-    "quirks": ["fixedTrash", "centerMultichannelOnWells"]
+    "quirks": ["fixedTrash", "centerMultichannelOnWells", "touchTipDisabled"]
   },
   "wells": {
     "A1": {

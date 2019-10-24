@@ -31,7 +31,7 @@
     "isTiprack": false,
     "isMagneticModuleCompatible": false,
     "loadName": "fixture_12_trough_v2",
-    "quirks": ["centerMultichannelOnWells"]
+    "quirks": ["centerMultichannelOnWells", "touchTipDisabled"]
   },
   "wells": {
     "A1": {

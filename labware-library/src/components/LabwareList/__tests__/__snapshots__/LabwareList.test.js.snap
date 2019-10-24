@@ -103,6 +103,7 @@ exports[`LabwareList component renders 1`] = `
           "loadName": "fixture_12_trough_v2",
           "quirks": Array [
             "centerMultichannelOnWells",
+            "touchTipDisabled",
           ],
         },
         "schemaVersion": 2,
@@ -332,6 +333,7 @@ exports[`LabwareList component renders 1`] = `
           "loadName": "fixture_12_trough",
           "quirks": Array [
             "centerMultichannelOnWells",
+            "touchTipDisabled",
           ],
         },
         "schemaVersion": 2,
