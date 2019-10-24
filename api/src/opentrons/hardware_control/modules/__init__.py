@@ -93,6 +93,7 @@ async def update_firmware(
     await asyncio.sleep(1.0)
     new_port = after_port or old_port
     if not results[0]:
+        log.debug(f'Bootloader reponse: {results[1]}')
         raise UpdateError(results[1])
     return await cls.build(
         port=new_port,

@@ -63,11 +63,13 @@ async def _upload_to_module(hw, serialnum, fw_filename, loop):
         if module.device_info.get('serial') == serialnum:
             log.info("Module with serial {} found".format(serialnum))
             try:
-                _new_port, res = await asyncio.wait_for(
+                new_instance = await asyncio.wait_for(
                     modules.update_firmware(module, fw_filename, loop),
                     UPDATE_TIMEOUT)
-                successful, message = res
-                return message, 200 if successful else 400
+                print(f'\n\n\ninstance {new_instance}\n')
+                return f'Successully updated module {serialnum}', 200
+            except modules.UpdateError as e:
+                return f'Bootloader error: {e}', 400
             except asyncio.TimeoutError:
                 return 'Bootloader not responding', 500
             break
