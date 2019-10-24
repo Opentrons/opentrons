@@ -3,8 +3,7 @@ import { createAction } from 'redux-actions'
 import type { Dispatch } from 'redux'
 
 import { selectors } from '../selectors'
-import type { DeckSlotId } from '@opentrons/shared-data'
-import type { GetState } from '../../types'
+import type { DeckSlot, GetState } from '../../types'
 import type { IngredInputs } from '../types'
 
 type IngredInputsExact = $Exact<IngredInputs>
@@ -13,7 +12,7 @@ type IngredInputsExact = $Exact<IngredInputs>
 
 export const openAddLabwareModal = createAction<
   'OPEN_ADD_LABWARE_MODAL',
-  { slot: DeckSlotId }
+  { slot: DeckSlot }
 >('OPEN_ADD_LABWARE_MODAL')
 
 export const closeLabwareSelector = createAction<
@@ -46,7 +45,7 @@ export const drillUpFromLabware = createAction<'DRILL_UP_FROM_LABWARE', void>(
 // ==== Create/delete/modify labware =====
 
 export type CreateContainerArgs = {|
-  slot?: DeckSlotId, // NOTE: if slot is omitted, next available slot will be used.
+  slot?: DeckSlot, // NOTE: if slot is omitted, next available slot will be used.
   labwareDefURI: string,
 |}
 
@@ -73,20 +72,20 @@ export const deleteContainer = createAction<
 // ===========
 
 export type SwapSlotContentsAction = {
-  type: 'SWAP_SLOT_CONTENTS',
+  type: 'MOVE_DECK_ITEM',
   payload: {
-    sourceSlot: DeckSlotId,
-    destSlot: DeckSlotId,
+    sourceSlot: DeckSlot,
+    destSlot: DeckSlot,
   },
 }
 
 // TODO: Ian 2019-01-24 later, this should work on stepId or a range of steps.
 // We could follow the pattern of SubstituteStepFormPipettesAction.
-export const swapSlotContents = (
-  sourceSlot: DeckSlotId,
-  destSlot: DeckSlotId
+export const moveDeckItem = (
+  sourceSlot: DeckSlot,
+  destSlot: DeckSlot
 ): SwapSlotContentsAction => ({
-  type: 'SWAP_SLOT_CONTENTS',
+  type: 'MOVE_DECK_ITEM',
   payload: { sourceSlot, destSlot },
 })
 
@@ -96,7 +95,7 @@ export type DuplicateLabwareAction = {
     templateLabwareId: string,
     duplicateLabwareId: string,
     duplicateLabwareNickname: string,
-    slot: DeckSlotId,
+    slot: DeckSlot,
   },
 }
 

@@ -5,11 +5,10 @@ import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
 import pickBy from 'lodash/pickBy'
 
-import type { DeckSlotId } from '@opentrons/shared-data'
 import * as actions from '../actions'
 import { FIXED_TRASH_ID } from '../../constants'
 import { getPDMetadata } from '../../file-types'
-import type { Action } from '../../types'
+import type { Action, DeckSlot } from '../../types'
 import type {
   SingleLabwareLiquidState,
   LabwareLiquidState,
@@ -325,7 +324,7 @@ export const ingredLocations = handleActions<LocationsState, *>(
 )
 
 export type RootState = {|
-  modeLabwareSelection: ?DeckSlotId,
+  modeLabwareSelection: ?DeckSlot,
   selectedContainerId: SelectedContainerId,
   drillDownLabwareId: DrillDownLabwareId,
   containers: ContainersState,

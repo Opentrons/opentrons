@@ -45,7 +45,7 @@ const unsavedChanges = (
     case 'DELETE_CONTAINER':
     case 'CHANGE_SAVED_STEP_FORM':
     case 'DUPLICATE_LABWARE':
-    case 'SWAP_SLOT_CONTENTS':
+    case 'MOVE_DECK_ITEM':
     case 'RENAME_LABWARE':
     case 'DELETE_LIQUID_GROUP':
     case 'EDIT_LIQUID_GROUP':
@@ -57,6 +57,9 @@ const unsavedChanges = (
     case 'SAVE_FILE_METADATA':
     case 'CREATE_CUSTOM_LABWARE_DEF':
     case 'REPLACE_CUSTOM_LABWARE_DEF':
+    case 'CREATE_MODULE':
+    case 'DELETE_MODULE':
+    case 'EDIT_MODULE':
       return true
     default:
       return state

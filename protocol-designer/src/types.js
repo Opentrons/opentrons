@@ -52,3 +52,19 @@ export type VolumeJson = {
     [wellName: string]: JsonWellData,
   },
 }
+
+// TODO: Ian 2019-10-22 move up, possibly to shared-data?
+export type DeckSlot =
+  | '1'
+  | '2'
+  | '3'
+  | '4'
+  | '5'
+  | '6'
+  | '7'
+  | '8'
+  | '9'
+  | '10'
+  | '11'
+  | '12'
+  | 'span7_8_10_11' // special spanning slot eg for thermocycler

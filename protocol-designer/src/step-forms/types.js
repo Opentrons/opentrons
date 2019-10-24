@@ -3,9 +3,9 @@ import type { Mount } from '@opentrons/components'
 import type {
   LabwareDefinition2,
   PipetteNameSpecs,
-  DeckSlotId,
   ModuleType,
 } from '@opentrons/shared-data'
+import type { DeckSlot } from '../types'
 
 export type FormPipette = { pipetteName: ?string, tiprackDefURI: ?string }
 export type FormPipettesByMount = {
@@ -65,7 +65,7 @@ export type LabwareEntities = {
 // Temporal properties (eg location) that are time-variant
 
 export type LabwareTemporalProperties = {|
-  slot: DeckSlotId,
+  slot: DeckSlot,
 |}
 
 export type PipetteTemporalProperties = {|

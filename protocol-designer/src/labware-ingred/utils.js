@@ -1,10 +1,10 @@
 // @flow
-import type { DeckSlotId } from '@opentrons/shared-data'
 import { sortedSlotnames } from '@opentrons/components'
+import type { DeckSlot } from '../types'
 
 export function getNextAvailableSlot(labwareLocations: {
-  [labwareId: string]: DeckSlotId,
-}): ?DeckSlotId {
+  [labwareId: string]: DeckSlot,
+}): ?DeckSlot {
   const filledLocations = Object.values(labwareLocations)
   return sortedSlotnames.find(
     slot => !filledLocations.some(filledSlot => filledSlot === slot)

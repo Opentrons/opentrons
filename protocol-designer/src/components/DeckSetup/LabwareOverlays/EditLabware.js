@@ -3,15 +3,15 @@ import React, { type Node } from 'react'
 import { connect } from 'react-redux'
 import cx from 'classnames'
 import { Icon } from '@opentrons/components'
-import { getLabwareDisplayName, type DeckSlotId } from '@opentrons/shared-data'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { DragSource, DropTarget } from 'react-dnd'
 import { DND_TYPES } from './constants'
-import type { BaseState, ThunkDispatch } from '../../../types'
+import type { BaseState, ThunkDispatch, DeckSlot } from '../../../types'
 import {
   openIngredientSelector,
   deleteContainer,
   duplicateLabware,
-  swapSlotContents,
+  moveDeckItem,
 } from '../../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
 import i18n from '../../../localization'
@@ -29,7 +29,7 @@ type DP = {|
   editLiquids: () => mixed,
   duplicateLabware: () => mixed,
   deleteLabware: () => mixed,
-  swapSlotContents: (DeckSlotId, DeckSlotId) => mixed,
+  moveDeckItem: (DeckSlot, DeckSlot) => mixed,
 |}
 
 type DNDP = {|
@@ -140,7 +140,7 @@ const labwareTarget = {
   drop: (props, monitor) => {
     const draggedItem = monitor.getItem()
     if (draggedItem) {
-      props.swapSlotContents(
+      props.moveDeckItem(
         draggedItem.labwareOnDeck.slot,
         props.labwareOnDeck.slot
       )
@@ -176,8 +176,8 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
       )}?`
     ) && dispatch(deleteContainer({ labwareId: ownProps.labwareOnDeck.id }))
   },
-  swapSlotContents: (sourceSlot, destSlot) =>
-    dispatch(swapSlotContents(sourceSlot, destSlot)),
+  moveDeckItem: (sourceSlot, destSlot) =>
+    dispatch(moveDeckItem(sourceSlot, destSlot)),
 })
 
 export default connect<

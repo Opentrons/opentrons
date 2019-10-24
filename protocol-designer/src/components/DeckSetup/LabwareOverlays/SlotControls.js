@@ -1,6 +1,6 @@
 // @flow
 import React, { type Node } from 'react'
-import type { DeckSlotId, DeckSlot } from '@opentrons/shared-data'
+import type { DeckSlot as DeckSlotDefinition } from '@opentrons/shared-data'
 import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
 import cx from 'classnames'
 import { connect } from 'react-redux'
@@ -8,10 +8,10 @@ import { DropTarget } from 'react-dnd'
 import noop from 'lodash/noop'
 import {
   openAddLabwareModal,
-  swapSlotContents,
+  moveDeckItem,
 } from '../../../labware-ingred/actions'
 import i18n from '../../../localization'
-import type { ThunkDispatch } from '../../../types'
+import type { DeckSlot, ThunkDispatch } from '../../../types'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../../steplist'
 
 import { DND_TYPES } from './constants'
@@ -22,12 +22,12 @@ type DNDP = {|
   connectDropTarget: Node => mixed,
 |}
 type OP = {|
-  slot: DeckSlot,
+  slot: {| ...DeckSlotDefinition, id: DeckSlot |}, // NOTE: Ian 2019-10-22 make slot `id` more restrictive when used in PD
   selectedTerminalItemId: ?TerminalItemId,
 |}
 type DP = {|
   addLabware: (e: SyntheticEvent<*>) => mixed,
-  swapSlotContents: (DeckSlotId, DeckSlotId) => mixed,
+  moveDeckItem: (DeckSlot, DeckSlot) => mixed,
 |}
 type Props = {| ...OP, ...DP, ...DNDP |}
 
@@ -64,15 +64,15 @@ const SlotControls = ({
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   addLabware: () => dispatch(openAddLabwareModal({ slot: ownProps.slot.id })),
-  swapSlotContents: (sourceSlot, destSlot) =>
-    dispatch(swapSlotContents(sourceSlot, destSlot)),
+  moveDeckItem: (sourceSlot, destSlot) =>
+    dispatch(moveDeckItem(sourceSlot, destSlot)),
 })
 
 const slotTarget = {
   drop: (props, monitor) => {
     const draggedItem = monitor.getItem()
     if (draggedItem) {
-      props.swapSlotContents(draggedItem.labwareOnDeck.slot, props.slot.id)
+      props.moveDeckItem(draggedItem.labwareOnDeck.slot, props.slot.id)
     }
   },
 }

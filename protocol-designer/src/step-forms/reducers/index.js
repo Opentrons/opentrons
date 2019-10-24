@@ -219,7 +219,7 @@ export const savedStepForms = (
         },
       }
     }
-    case 'SWAP_SLOT_CONTENTS': {
+    case 'MOVE_DECK_ITEM': {
       const { sourceSlot, destSlot } = action.payload
       return mapValues(savedStepForms, (savedForm: FormData) => {
         if (savedForm.stepType === 'manualIntervention') {
