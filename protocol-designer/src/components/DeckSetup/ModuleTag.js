@@ -12,16 +12,14 @@ type Props = {|
   module: ModuleOnDeck,
 |}
 
-// ModuleRender + ModuleTag consts. TODO IMMEDIATELY: this is duplicated in ModuleRender.js!!
-const MODULE_EXCESS_X_LEFT = 4
-const MODULE_EXCESS_X_RIGHT = 4
-const MODULE_HEIGHT = 86
-const MODULE_WIDTH = 128
-
-// ModuleTag consts
+// eyeballed width/height to match designs
 const TAG_HEIGHT = 45
 const TAG_WIDTH = 60
 
+const SLOT_WIDTH_TODO = 128 // TODO IMMEDIATELY get this from somewhere
+const SLOT_HEIGHT_TODO = 86 // TODO IMMEDIATELY get this from somewhere
+
+// TODO IMMEDIATELY use i18n
 const MODULE_SHORT_DISPLAY_NAMES = {
   magdeck: 'magnetic',
   tempdeck: 'temperature',
@@ -33,11 +31,9 @@ const ModuleTag = (props: Props) => {
     <RobotCoordsForeignDiv
       x={
         props.x +
-        (props.orientation === 'left'
-          ? -1 * (TAG_WIDTH + MODULE_EXCESS_X_LEFT)
-          : MODULE_WIDTH + MODULE_EXCESS_X_RIGHT)
+        (props.orientation === 'left' ? -1 * TAG_WIDTH : SLOT_WIDTH_TODO)
       }
-      y={props.y + (MODULE_HEIGHT - TAG_HEIGHT) / 2}
+      y={props.y + (SLOT_HEIGHT_TODO - TAG_HEIGHT) / 2}
       height={TAG_HEIGHT}
       width={TAG_WIDTH}
       innerDivProps={{
