@@ -50,12 +50,14 @@ async def update_module_firmware(request):
             loop=request.loop)
         log.info('Firmware update complete')
 
+    print(f'message: {message} \n')
+    print(f'status: {status} \n')
     res = {'filename': fw_filename, 'message': message}
     return web.json_response(res, status=status)
 
 
 async def _upload_to_module(hw, serialnum, fw_filename, loop):
-    hw.discover_modules()
+    await hw.discover_modules()
     hw_mods = hw.attached_modules.values()
     for module in hw_mods:
         if module.device_info.get('serial') == serialnum:
