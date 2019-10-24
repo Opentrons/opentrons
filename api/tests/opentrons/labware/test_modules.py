@@ -131,94 +131,94 @@ def new_bootloader_module(modules):
     return module
 
 
-@pytest.mark.api1_only
-async def test_enter_bootloader(
-        new_bootloader_module, virtual_smoothie_env, monkeypatch, modules):
+# @pytest.mark.api2_only
+# async def test_enter_bootloader(
+#         new_bootloader_module, virtual_smoothie_env, monkeypatch, modules):
 
-    async def mock_discover_ports_before_dfu_mode():
-        return 'tty0_tempdeck'
+#     async def mock_discover_ports_before_dfu_mode():
+#         return 'tty0_tempdeck'
 
-    def mock_enter_programming_mode(self):
-        return 'ok\n\rok\n\r'
+#     def mock_enter_programming_mode(self):
+#         return 'ok\n\rok\n\r'
 
-    async def mock_port_poll(_has_old_bootloader, ports_before_dfu_mode):
-        return '/dev/modules/tty0_bootloader'
+#     async def mock_port_poll(_has_old_bootloader, ports_before_dfu_mode):
+#         return '/dev/modules/tty0_bootloader'
 
-    monkeypatch.setattr(
-        TempDeckDriver, 'enter_programming_mode', mock_enter_programming_mode)
-    monkeypatch.setattr(
-        modules, '_discover_ports', mock_discover_ports_before_dfu_mode)
-    monkeypatch.setattr(modules, '_port_poll', mock_port_poll)
+#     monkeypatch.setattr(
+#         TempDeckDriver, 'enter_programming_mode', mock_enter_programming_mode)
+#     monkeypatch.setattr(
+#         modules, '_discover_ports', mock_discover_ports_before_dfu_mode)
+#     monkeypatch.setattr(modules, '_port_poll', mock_port_poll)
 
-    bootloader_port = await modules.enter_bootloader(new_bootloader_module)
-    assert bootloader_port == '/dev/modules/tty0_bootloader'
-
-
-@pytest.mark.api1_only
-def test_old_bootloader_check(
-        old_bootloader_module, new_bootloader_module, virtual_smoothie_env,
-        modules):
-    assert modules._has_old_bootloader(old_bootloader_module)
-    assert not modules._has_old_bootloader(new_bootloader_module)
+#     bootloader_port = await modules.enter_bootloader(new_bootloader_module)
+#     assert bootloader_port == '/dev/modules/tty0_bootloader'
 
 
-@pytest.mark.api1_only
-async def test_port_poll(virtual_smoothie_env, monkeypatch, modules):
-    has_old_bootloader = False
-    timeout = 0.1
-    monkeypatch.setattr(modules, 'PORT_SEARCH_TIMEOUT', timeout)
-
-    # Case 1: Bootloader port is successfully opened on the module
-    async def mock_discover_ports1():
-        return ['tty0_magdeck', 'tty1_bootloader']
-    monkeypatch.setattr(modules, '_discover_ports', mock_discover_ports1)
-
-    port_found = await asyncio.wait_for(
-        modules._port_poll(has_old_bootloader, None),
-        modules.PORT_SEARCH_TIMEOUT)
-    assert port_found == '/dev/modules/tty1_bootloader'
-
-    # Case 2: Switching to bootloader mode failed
-    async def mock_discover_ports2():
-        return ['tty0_magdeck', 'tty1_tempdeck']
-    monkeypatch.setattr(modules, '_discover_ports', mock_discover_ports2)
-
-    with pytest.raises(asyncio.TimeoutError):
-        port_found = await asyncio.wait_for(
-            modules._port_poll(has_old_bootloader, None),
-            modules.PORT_SEARCH_TIMEOUT)
-        assert not port_found
+# @pytest.mark.api1_only
+# def test_old_bootloader_check(
+#         old_bootloader_module, new_bootloader_module, virtual_smoothie_env,
+#         modules):
+#     assert modules._has_old_bootloader(old_bootloader_module)
+#     assert not modules._has_old_bootloader(new_bootloader_module)
 
 
-@pytest.mark.api1_only
-async def test_old_bootloader_port_poll(
-        virtual_smoothie_env, monkeypatch, modules):
+# @pytest.mark.api1_only
+# async def test_port_poll(virtual_smoothie_env, monkeypatch, modules):
+#     has_old_bootloader = False
+#     timeout = 0.1
+#     monkeypatch.setattr(modules, 'PORT_SEARCH_TIMEOUT', timeout)
 
-    # TODO: Will need to write separate tests for backcompat to ensure that
-    # functionality for modules in v1 still works.
+#     # Case 1: Bootloader port is successfully opened on the module
+#     async def mock_discover_ports1():
+#         return ['tty0_magdeck', 'tty1_bootloader']
+#     monkeypatch.setattr(modules, '_discover_ports', mock_discover_ports1)
 
-    ports_before_switch = ['tty0_magdeck', 'tty1_tempdeck']
-    has_old_bootloader = True
-    timeout = 0.1
-    monkeypatch.setattr(modules, 'PORT_SEARCH_TIMEOUT', timeout)
+#     port_found = await asyncio.wait_for(
+#         modules._port_poll(has_old_bootloader, None),
+#         modules.PORT_SEARCH_TIMEOUT)
+#     assert port_found == '/dev/modules/tty1_bootloader'
 
-    # Case 1: Bootloader is opened on same port
-    async def mock_discover_ports():
-        return ['tty0_magdeck', 'tty1_tempdeck']
-    monkeypatch.setattr(modules, '_discover_ports', mock_discover_ports)
+#     # Case 2: Switching to bootloader mode failed
+#     async def mock_discover_ports2():
+#         return ['tty0_magdeck', 'tty1_tempdeck']
+#     monkeypatch.setattr(modules, '_discover_ports', mock_discover_ports2)
 
-    with pytest.raises(asyncio.TimeoutError):
-        port_found = await asyncio.wait_for(
-            modules._port_poll(has_old_bootloader, ports_before_switch),
-            modules.PORT_SEARCH_TIMEOUT)
-        assert not port_found
+#     with pytest.raises(asyncio.TimeoutError):
+#         port_found = await asyncio.wait_for(
+#             modules._port_poll(has_old_bootloader, None),
+#             modules.PORT_SEARCH_TIMEOUT)
+#         assert not port_found
 
-    # Case 2: Bootloader is opened on a different port
-    async def mock_discover_ports():
-        return ['tty2_magdeck', 'tty1_tempdeck']
-    monkeypatch.setattr(modules, '_discover_ports', mock_discover_ports)
 
-    port_found = await asyncio.wait_for(
-        modules._port_poll(has_old_bootloader, ports_before_switch),
-        modules.PORT_SEARCH_TIMEOUT)
-    assert port_found == '/dev/modules/tty2_magdeck'
+# @pytest.mark.api1_only
+# async def test_old_bootloader_port_poll(
+#         virtual_smoothie_env, monkeypatch, modules):
+
+#     # TODO: Will need to write separate tests for backcompat to ensure that
+#     # functionality for modules in v1 still works.
+
+#     ports_before_switch = ['tty0_magdeck', 'tty1_tempdeck']
+#     has_old_bootloader = True
+#     timeout = 0.1
+#     monkeypatch.setattr(modules, 'PORT_SEARCH_TIMEOUT', timeout)
+
+#     # Case 1: Bootloader is opened on same port
+#     async def mock_discover_ports():
+#         return ['tty0_magdeck', 'tty1_tempdeck']
+#     monkeypatch.setattr(modules, '_discover_ports', mock_discover_ports)
+
+#     with pytest.raises(asyncio.TimeoutError):
+#         port_found = await asyncio.wait_for(
+#             modules._port_poll(has_old_bootloader, ports_before_switch),
+#             modules.PORT_SEARCH_TIMEOUT)
+#         assert not port_found
+
+#     # Case 2: Bootloader is opened on a different port
+#     async def mock_discover_ports():
+#         return ['tty2_magdeck', 'tty1_tempdeck']
+#     monkeypatch.setattr(modules, '_discover_ports', mock_discover_ports)
+
+#     port_found = await asyncio.wait_for(
+#         modules._port_poll(has_old_bootloader, ports_before_switch),
+#         modules.PORT_SEARCH_TIMEOUT)
+#     assert port_found == '/dev/modules/tty2_magdeck'
