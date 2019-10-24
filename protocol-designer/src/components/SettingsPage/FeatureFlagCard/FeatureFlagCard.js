@@ -29,14 +29,14 @@ const FeatureFlagCard = (props: Props) => {
       OT_PD_DISABLE_MODULE_RESTRICTIONS: (
         <>
           <p>{i18n.t(`feature_flags.${flag}.description_1`)} </p>
-          <br />
           <p>{i18n.t(`feature_flags.${flag}.description_2`)} </p>
         </>
       ),
     }
     return (
-      RICH_DESCRIPTIONS[`${flag}`] ||
-      i18n.t(`feature_flags.${flag}.description`)
+      RICH_DESCRIPTIONS[`${flag}`] || (
+        <p>{i18n.t(`feature_flags.${flag}.description`)}</p>
+      )
     )
   }
 
@@ -56,9 +56,9 @@ const FeatureFlagCard = (props: Props) => {
           }
         />
       </div>
-      <p className={styles.feature_flag_description}>
+      <div className={styles.feature_flag_description}>
         {getDescription(flagName)}
-      </p>
+      </div>
     </div>
   )
 
@@ -75,13 +75,13 @@ const FeatureFlagCard = (props: Props) => {
   return (
     <>
       <Card title={i18n.t('card.title.feature_flags')}>
-        <div>
+        <div className={styles.card_content}>
           {userFacingFlagRows.length > 0 ? userFacingFlagRows : noFlagsFallback}
         </div>
       </Card>
       {prereleaseModeEnabled && (
         <Card title={i18n.t('card.title.prerelease_mode_flags')}>
-          <div>{prereleaseFlagRows}</div>
+          <div className={styles.card_content}>{prereleaseFlagRows}</div>
         </Card>
       )}
     </>

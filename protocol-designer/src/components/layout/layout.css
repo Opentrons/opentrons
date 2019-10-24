@@ -1,0 +1,5 @@
+@import '@opentrons/components';
+
+.row {
+  margin: 1rem;
+}
