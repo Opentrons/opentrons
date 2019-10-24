@@ -167,6 +167,9 @@ export default {
   opentrons_96_tiprack_10ul: [
     require('../../images/opentrons_96_tiprack_10ul_side_view.jpg'),
   ],
+  opentrons_96_tiprack_20ul: [
+    require('../../images/opentrons_96_tiprack_10ul_side_view.jpg'),
+  ],
   opentrons_96_tiprack_300ul: [
     require('../../images/opentrons_96_tiprack_300ul_side_view.jpg'),
   ],
