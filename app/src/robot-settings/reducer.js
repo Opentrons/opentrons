@@ -1,10 +1,9 @@
 // @flow
-import { passRobotApiResponseAction, POST } from '../robot-api/utils'
-import { RESTART } from '../robot-admin'
-import { CLEAR_RESTART_REQUIRED, SETTINGS_PATH } from './constants'
+import { passRobotApiResponseAction } from '../robot-api/utils'
+import { SETTINGS_PATH } from './constants'
 
 import type { Action, ActionLike } from '../types'
-import type { RobotSettings, RobotSettingsState } from './types'
+import type { RobotSettingsResponse, RobotSettingsState } from './types'
 
 export const INITIAL_STATE: RobotSettingsState = {}
 
@@ -15,45 +14,18 @@ export function robotSettingsReducer(
   const resAction = passRobotApiResponseAction(action)
 
   if (resAction) {
-    const { payload, meta } = resAction
-    const { host, method, path, body } = payload
+    const { payload } = resAction
+    const { host, path, body } = payload
     const { name: robotName } = host
 
     // grabs responses from GET /settings and POST /settings
     // settings in body check is a guard against an old version of GET /settings
     if (path === SETTINGS_PATH && 'settings' in body) {
-      const robotState = state[robotName]
-      const settings: RobotSettings = body.settings
-      // restart is required if the setting we just updated (meta.settingId)
-      // is a restart_required setting, or if restart was already required
-      const restartRequired =
-        Boolean(robotState?.restartRequired) ||
-        (method === POST &&
-          settings.some(
-            s => s.id === meta.settingId && s.restart_required === true
-          ))
+      const { settings, links } = (body: RobotSettingsResponse)
+      // restart is required if `links` comes back with a `restart` field
+      const restartPath = links?.restart || null
 
-      return { ...state, [robotName]: { settings, restartRequired } }
-    }
-  }
-
-  switch (action.type) {
-    case CLEAR_RESTART_REQUIRED: {
-      const { robotName } = action.payload
-
-      return {
-        ...state,
-        [robotName]: { ...state[robotName], restartRequired: false },
-      }
-    }
-
-    case RESTART: {
-      const { name: robotName } = action.payload.host
-
-      return {
-        ...state,
-        [robotName]: { ...state[robotName], restartRequired: false },
-      }
+      return { ...state, [robotName]: { settings, restartPath } }
     }
   }
 

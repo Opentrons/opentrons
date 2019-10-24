@@ -11,9 +11,16 @@ export function getRobotSettings(
   return robotState(state, robotName)?.settings || []
 }
 
+export function getRobotRestartPath(
+  state: State,
+  robotName: string
+): string | null {
+  return robotState(state, robotName)?.restartPath || null
+}
+
 export function getRobotRestartRequired(
   state: State,
   robotName: string
 ): boolean {
-  return robotState(state, robotName)?.restartRequired || false
+  return getRobotRestartPath(state, robotName) !== null
 }

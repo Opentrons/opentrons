@@ -18,7 +18,7 @@ describe('robot settings selectors', () => {
       state: {
         robotSettings: {
           robotName: {
-            restartRequired: false,
+            restartPath: null,
             settings: [
               { id: 'foo', title: 'Foo', description: 'Foo', value: true },
             ],
@@ -29,18 +29,31 @@ describe('robot settings selectors', () => {
       expected: [{ id: 'foo', title: 'Foo', description: 'Foo', value: true }],
     },
     {
-      name: 'getRobotRestartRequired',
+      name: 'getRobotRestartPath',
+      selector: Selectors.getRobotRestartPath,
+      state: {
+        robotSettings: { robotName: { restartPath: '/restart', settings: [] } },
+      },
+      args: ['robotName'],
+      expected: '/restart',
+    },
+    {
+      name: 'getRobotRestartRequired when required',
       selector: Selectors.getRobotRestartRequired,
       state: {
-        robotSettings: {
-          robotName: {
-            restartRequired: true,
-            settings: [],
-          },
-        },
+        robotSettings: { robotName: { restartPath: '/restart', settings: [] } },
       },
       args: ['robotName'],
       expected: true,
+    },
+    {
+      name: 'getRobotRestartRequired when not required',
+      selector: Selectors.getRobotRestartRequired,
+      state: {
+        robotSettings: { robotName: { restartPath: null, settings: [] } },
+      },
+      args: ['robotName'],
+      expected: false,
     },
   ]
 

@@ -1,27 +1,35 @@
 // @flow
 import { of } from 'rxjs'
 import { ofType, combineEpics } from 'redux-observable'
-import { filter, switchMap } from 'rxjs/operators'
+import { filter, switchMap, withLatestFrom } from 'rxjs/operators'
 
 import {
   makeRobotApiRequest,
   passRobotApiResponseAction,
 } from '../robot-api/utils'
-import { startDiscovery } from '../discovery/actions'
+import { startDiscovery } from '../discovery'
+import { getRobotRestartPath } from '../robot-settings'
 import { RESTART, RESTART_PATH } from './constants'
 
-import type { Epic, LooseEpic } from '../types'
-import type { RequestMeta, RobotApiResponseAction } from '../robot-api/types'
+import type { State, Epic, LooseEpic } from '../types'
+import type { RobotApiResponseAction } from '../robot-api/types'
 import type { RobotAdminAction } from './types'
 
 export const RESTART_DISCOVERY_TIMEOUT_MS = 60000
 
-const robotAdminApiEpic: Epic = action$ => {
+const robotAdminApiEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType(RESTART),
-    switchMap<RobotAdminAction, _, _>(a => {
-      const meta: RequestMeta = {}
-      return makeRobotApiRequest(a.payload, meta)
+    withLatestFrom(state$),
+    switchMap<[RobotAdminAction, State], _, _>(([action, state]) => {
+      const { name: robotName } = action.payload.host
+      const restartPath = getRobotRestartPath(state, robotName)
+      const payload =
+        restartPath !== null
+          ? { ...action.payload, path: restartPath }
+          : action.payload
+
+      return makeRobotApiRequest(payload, {})
     })
   )
 }

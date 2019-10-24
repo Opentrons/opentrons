@@ -11,43 +11,31 @@ type ActionSpec = {|
   expected: RobotSettingsAction,
 |}
 
+const mockRobot = { name: 'robotName', ip: 'localhost', port: 31950 }
+
 describe('robot settings actions', () => {
   const SPECS: Array<ActionSpec> = [
     {
       name: 'robotSettings:FETCH_SETTINGS',
       creator: Actions.fetchSettings,
-      args: [{ name: 'robotName', ip: 'localhost', port: 31950 }],
+      args: [mockRobot],
       expected: {
         type: 'robotSettings:FETCH_SETTINGS',
-        payload: {
-          host: { name: 'robotName', ip: 'localhost', port: 31950 },
-          method: 'GET',
-          path: '/settings',
-        },
+        payload: { host: mockRobot, method: 'GET', path: '/settings' },
       },
     },
     {
       name: 'robotSettings:UPDATE_SETTING',
       creator: Actions.updateSetting,
-      args: [{ name: 'robotName', ip: 'localhost', port: 31950 }, 'foo', true],
+      args: [mockRobot, 'foo', true],
       expected: {
         type: 'robotSettings:UPDATE_SETTING',
-        meta: { settingId: 'foo' },
         payload: {
-          host: { name: 'robotName', ip: 'localhost', port: 31950 },
+          host: mockRobot,
           method: 'POST',
           path: '/settings',
           body: { id: 'foo', value: true },
         },
-      },
-    },
-    {
-      name: 'robotSettings:CLEAR_RESTART_REQUIRED',
-      creator: Actions.clearRestartRequired,
-      args: ['robotName'],
-      expected: {
-        type: 'robotSettings:CLEAR_RESTART_REQUIRED',
-        payload: { robotName: 'robotName' },
       },
     },
   ]

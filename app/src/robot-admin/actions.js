@@ -7,6 +7,6 @@ import type { RobotAdminAction } from './types'
 
 export const restartRobot = (host: RobotHost): RobotAdminAction => ({
   type: RESTART,
-  payload: { host, method: POST, path: RESTART_PATH },
+  payload: { host, path: RESTART_PATH, method: POST },
   meta: { robot: true },
 })

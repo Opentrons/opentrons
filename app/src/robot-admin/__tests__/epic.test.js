@@ -2,6 +2,7 @@
 import { TestScheduler } from 'rxjs/testing'
 
 import * as ApiUtils from '../../robot-api/utils'
+import * as SettingsSelectors from '../../robot-settings/selectors'
 import * as DiscoveryActions from '../../discovery/actions'
 import * as Actions from '../actions'
 import { robotAdminEpic } from '../epic'
@@ -14,6 +15,7 @@ import type {
 } from '../../robot-api/types'
 
 jest.mock('../../robot-api/utils')
+jest.mock('../../robot-settings/selectors')
 
 const mockMakeApiRequest: JestMockFn<[RobotApiRequest, RequestMeta], mixed> =
   ApiUtils.makeRobotApiRequest
@@ -23,7 +25,11 @@ const mockPassRobotApiResponseAction: JestMockFn<
   RobotApiResponseAction | null
 > = ApiUtils.passRobotApiResponseAction
 
+const mockGetRestartPath: JestMockFn<Array<any>, string | null> =
+  SettingsSelectors.getRobotRestartPath
+
 const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
+const mockState = { mock: true }
 
 const setupMockMakeApiRequest = cold => {
   mockMakeApiRequest.mockImplementation((req, meta) =>
@@ -49,14 +55,35 @@ describe('robotAdminEpic', () => {
 
     testScheduler.run(({ hot, cold, expectObservable }) => {
       setupMockMakeApiRequest(cold)
+      mockGetRestartPath.mockReturnValue(null)
 
       const action$ = hot('-a', { a: action })
-      const state$: any = null
+      const state$ = hot('a-', { a: mockState })
       const output$ = robotAdminEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
         a: {
           req: { host: mockRobot, method: 'POST', path: '/server/restart' },
+          meta: {},
+        },
+      })
+    })
+  })
+
+  test('makes a POST to the settings restart path on RESTART is applicable', () => {
+    const action = Actions.restartRobot(mockRobot)
+
+    testScheduler.run(({ hot, cold, expectObservable }) => {
+      setupMockMakeApiRequest(cold)
+      mockGetRestartPath.mockReturnValue('/restart')
+
+      const action$ = hot('-a', { a: action })
+      const state$ = hot('a-', { a: mockState })
+      const output$ = robotAdminEpic(action$, state$)
+
+      expectObservable(output$).toBe('--a', {
+        a: {
+          req: { host: mockRobot, method: 'POST', path: '/restart' },
           meta: {},
         },
       })
@@ -81,7 +108,7 @@ describe('robotAdminEpic', () => {
       mockPassRobotApiResponseAction.mockReturnValue(serverSuccessAction)
 
       const action$ = hot('-a', { a: serverSuccessAction })
-      const state$: any = null
+      const state$ = hot('a-', { a: mockState })
       const output$ = robotAdminEpic(action$, state$)
 
       expectObservable(output$).toBe('-a', {

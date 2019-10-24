@@ -38,12 +38,12 @@ describe('robotSettingsReducer', () => {
             { id: 'foo', title: 'Foo', description: 'foobar', value: true },
             { id: 'bar', title: 'Bar', description: 'bazqux', value: false },
           ],
-          restartRequired: false,
+          restartPath: null,
         },
       },
     },
     {
-      name: 'handles subsequent robotApi:RESPONSE for GET /settings',
+      name: 'handles robotApi:RESPONSE for GET /settings with restart required',
       action: {
         type: 'robotApi:RESPONSE__GET__/settings',
         meta: {},
@@ -55,6 +55,7 @@ describe('robotSettingsReducer', () => {
             settings: [
               { id: 'foo', title: 'Foo', description: 'foobar', value: true },
             ],
+            links: { restart: '/server/restart' },
           },
         },
       },
@@ -64,7 +65,7 @@ describe('robotSettingsReducer', () => {
             { id: 'foo', title: 'Foo', description: 'foobar', value: true },
             { id: 'bar', title: 'Bar', description: 'bazqux', value: false },
           ],
-          restartRequired: true,
+          restartPath: null,
         },
       },
       expected: {
@@ -72,7 +73,7 @@ describe('robotSettingsReducer', () => {
           settings: [
             { id: 'foo', title: 'Foo', description: 'foobar', value: true },
           ],
-          restartRequired: true,
+          restartPath: '/server/restart',
         },
       },
     },
@@ -96,7 +97,7 @@ describe('robotSettingsReducer', () => {
       state: {
         robotName: {
           settings: [],
-          restartRequired: false,
+          restartPath: null,
         },
       },
       expected: {
@@ -105,43 +106,7 @@ describe('robotSettingsReducer', () => {
             { id: 'foo', title: 'Foo', description: 'foobar', value: true },
             { id: 'bar', title: 'Bar', description: 'bazqux', value: false },
           ],
-          restartRequired: false,
-        },
-      },
-    },
-    {
-      name: 'handles robotApi:RESPONSE for POST /settings',
-      action: {
-        type: 'robotApi:RESPONSE__POST__/settings',
-        meta: { settingId: 'bar' },
-        payload: {
-          host: { name: 'robotName' },
-          method: 'POST',
-          path: '/settings',
-          body: {
-            settings: [
-              { id: 'foo', title: 'Foo', description: 'foobar', value: true },
-              { id: 'bar', title: 'Bar', description: 'bazqux', value: true },
-            ],
-          },
-        },
-      },
-      state: {
-        robotName: {
-          settings: [
-            { id: 'foo', title: 'Foo', description: 'foobar', value: true },
-            { id: 'bar', title: 'Bar', description: 'bazqux', value: false },
-          ],
-          restartRequired: false,
-        },
-      },
-      expected: {
-        robotName: {
-          settings: [
-            { id: 'foo', title: 'Foo', description: 'foobar', value: true },
-            { id: 'bar', title: 'Bar', description: 'bazqux', value: true },
-          ],
-          restartRequired: false,
+          restartPath: null,
         },
       },
     },
@@ -165,6 +130,7 @@ describe('robotSettingsReducer', () => {
                 restart_required: true,
               },
             ],
+            links: { restart: '/server/restart' },
           },
         },
       },
@@ -179,7 +145,7 @@ describe('robotSettingsReducer', () => {
               restart_required: true,
             },
           ],
-          restartRequired: false,
+          restartPath: null,
         },
       },
       expected: {
@@ -193,28 +159,9 @@ describe('robotSettingsReducer', () => {
               restart_required: true,
             },
           ],
-          restartRequired: true,
+          restartPath: '/server/restart',
         },
       },
-    },
-    {
-      name: 'handles CLEAR_RESTART_REQUIRED',
-      action: {
-        type: 'robotSettings:CLEAR_RESTART_REQUIRED',
-        payload: { robotName: 'robotName' },
-      },
-      state: { robotName: { settings: [], restartRequired: true } },
-      expected: { robotName: { settings: [], restartRequired: false } },
-    },
-    {
-      name: 'handles robotAdmin:RESTART',
-      action: {
-        type: 'robotAdmin:RESTART',
-        meta: { robot: true },
-        payload: { host: { name: 'robotName', ip: 'localhost', port: 31950 } },
-      },
-      state: { robotName: { settings: [], restartRequired: true } },
-      expected: { robotName: { settings: [], restartRequired: false } },
     },
   ]
 

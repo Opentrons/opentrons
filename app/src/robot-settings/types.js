@@ -12,9 +12,14 @@ export type RobotSettingsField = {|
 
 export type RobotSettings = Array<RobotSettingsField>
 
+export type RobotSettingsResponse = {|
+  settings: RobotSettings,
+  links?: {| restart?: string |},
+|}
+
 export type PerRobotRobotSettingsState = {|
   settings: RobotSettings,
-  restartRequired: boolean,
+  restartPath: string | null,
 |}
 
 export type RobotSettingsState = $Shape<{|
@@ -26,17 +31,6 @@ export type RobotSettingsFieldUpdate = {|
   value: $PropertyType<RobotSettingsField, 'value'>,
 |}
 
-export type RobotSettingsApiAction =
-  | {| type: 'robotSettings:FETCH_SETTINGS', payload: RobotApiRequest |}
-  | {|
-      type: 'robotSettings:UPDATE_SETTING',
-      payload: RobotApiRequest,
-      meta: {| settingId: string |},
-    |}
-
 export type RobotSettingsAction =
-  | RobotSettingsApiAction
-  | {|
-      type: 'robotSettings:CLEAR_RESTART_REQUIRED',
-      payload: {| robotName: string |},
-    |}
+  | {| type: 'robotSettings:FETCH_SETTINGS', payload: RobotApiRequest |}
+  | {| type: 'robotSettings:UPDATE_SETTING', payload: RobotApiRequest |}

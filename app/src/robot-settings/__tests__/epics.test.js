@@ -70,7 +70,7 @@ describe('robotSettingsEpic', () => {
             path: '/settings',
             body: { id: 'settingId', value: true },
           },
-          meta: { settingId: 'settingId' },
+          meta: {},
         },
       })
     })
