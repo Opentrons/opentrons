@@ -366,24 +366,34 @@ class Thermocycler:
 
     @property
     def lid_temp_status(self):
+        if self.lid_temp is None:
+            _status = 'error'
         if self.lid_target is None:
             _status = 'idle'
-        elif self.lid_temp and (abs(self.lid_target - self.lid_temp) <
-                                TEMP_THRESHOLD):
-            _status = 'holding at target'
         else:
-            _status = 'ramping'
+            diff = self.lid_target - self.lid_temp
+            if abs(diff) < TEMP_THRESHOLD:
+                _status = 'holding at target'
+            elif diff < 0:
+                _status = 'idle'  # TC lid can't actively cool
+            else:
+                _status = 'heating'
         return _status
 
     @property
     def status(self):
-        if self.target is None:
+        if self.temperature is None:
+            _status = 'error'
+        elif self.target is None:
             _status = 'idle'
-        elif self.temperature and (abs(self.target - self.temperature) <
-                                   TEMP_THRESHOLD):
-            _status = 'holding at target'
         else:
-            _status = 'ramping'
+            diff = self.target - self.temperature
+            if abs(diff) < TEMP_THRESHOLD:
+                _status = 'holding at target'
+            elif diff < 0:
+                _status = 'cooling'
+            else:
+                _status = 'heating'
         return _status
 
     @property
