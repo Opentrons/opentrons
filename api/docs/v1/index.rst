@@ -19,13 +19,13 @@ Our API requires Python version 3.6.4 or later. Once this is set up on your comp
 
     pip install opentrons
 
-To simulate protocols on your laptop, check out :ref:`simulate-block`. When you're ready to run your script on a robot, download our latest `desktop app<https://www.opentrons.com/ot-app>`_
+To simulate protocols on your laptop, check out :ref:`simulate-block`. When you're ready to run your script on a robot, download our latest `desktop app <https://www.opentrons.com/ot-app>`_
 
 
 Troubleshooting
 ---------------
 
-If you encounter problems using our products please take a look at our `support docs<https://support.opentrons.com/en/>`_ or contact our team via intercom on our website at `opentrons.com<https://opentrons.com>`_.
+If you encounter problems using our products please take a look at our `support docs <https://support.opentrons.com/en/>`_ or contact our team via intercom on our website at `opentrons.com <https://opentrons.com>`_.
 
 
 **********************
