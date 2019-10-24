@@ -60,6 +60,8 @@ def validate_response_body(body):
             obj['id'])
         assert 'value' in obj, '"value" not found for {}'.format(obj['id'])
         assert 'restart_required' in obj
+    assert 'links' in body
+    assert isinstance(body['links'], dict)
 
 
 async def test_get(async_client):

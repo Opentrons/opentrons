@@ -66,8 +66,10 @@ async def get_advanced_settings(request: web.Request) -> web.Response:
     Handles a GET request and returns a json body with the key "settings" and a
     value that is a list of objects where each object has keys "id", "title",
     "description", and "value"
+    There is also an (empty) 'links' subobject
     """
-    return web.json_response({'settings': _get_adv_settings()})
+    return web.json_response({'settings': _get_adv_settings(),
+                              'links': {}})
 
 
 def _get_adv_settings() -> List[Dict[str, Union[str, bool, None]]]:
