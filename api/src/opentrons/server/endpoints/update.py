@@ -80,15 +80,13 @@ async def _upload_to_module(hw, serialnum, fw_filename, loop):
                     modules.update_firmware(module, fw_filename, loop),
                     UPDATE_TIMEOUT)
                 if updated_instance:
-                    return {'message': f'Sucessfully updated module {serialnum}'}
+                    return {'message':
+                            f'Sucessfully updated module {serialnum}'}
 
             except asyncio.TimeoutError:
                 return {'message': 'Bootloader not responding'}
             break
-        if not res:
-            return {'message': 'Module {} not found'.format(serialnum)}
-
-    return {}
+    return {'message': 'Module {} not found'.format(serialnum)}
 
 # TODO: BC(2019-10-23) remove this legacy update pathway, unused
 

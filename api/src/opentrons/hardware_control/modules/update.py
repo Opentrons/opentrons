@@ -2,7 +2,6 @@ import asyncio
 import logging
 import os
 from typing import Any, Dict, Optional, Tuple
-from opentrons.config import feature_flags as ff
 from opentrons import HERE as package_root
 
 log = logging.getLogger(__name__)
