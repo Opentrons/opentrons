@@ -7,10 +7,11 @@ import ModuleDiagram from './ModuleDiagram'
 import styles from './styles.css'
 
 import type { ModuleType } from '@opentrons/shared-data'
+import type { DeckSlot } from '../../types'
 
 type Props = {
   moduleId?: string,
-  slot?: string, // TODO make this PD specific slot type with spans
+  slot?: DeckSlot,
   model?: string,
   type: ModuleType,
 }

@@ -11,6 +11,8 @@ type Props = {
   modules: ModulesForEditModulesCard,
 }
 
+// TODO (ka 2019-10-24): This will likely be resused a lot,
+// Possble candidate for modules/module-data
 const MODULE_TYPES: Array<ModuleType> = ['magdeck', 'tempdeck', 'thermocycler']
 
 export default function EditModulesCard(props: Props) {
@@ -19,12 +21,12 @@ export default function EditModulesCard(props: Props) {
   return (
     <Card title="Modules">
       <div className={styles.modules_card_content}>
-        {MODULE_TYPES.map((type, i) => {
-          const moduleData = modules[type]
+        {MODULE_TYPES.map((moduleType, i) => {
+          const moduleData = modules[moduleType]
           if (moduleData) {
-            return <ModuleRow {...moduleData} type={type} key={i} />
+            return <ModuleRow {...moduleData} type={moduleType} key={i} />
           } else {
-            return <ModuleRow type={type} key={i} />
+            return <ModuleRow type={moduleType} key={i} />
           }
         })}
       </div>

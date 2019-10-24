@@ -18,8 +18,8 @@ export default function ModuleDiagram(props: Props) {
   return (
     <img
       className={styles.module_diagram}
-      src={MODULE_IMG_BY_TYPE[`${props.type}`]}
-      alt={`${props.type}`}
+      src={MODULE_IMG_BY_TYPE[props.type]}
+      alt={props.type}
     />
   )
 }
