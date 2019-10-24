@@ -23,7 +23,7 @@ import {
   _getPipetteEntitiesRootState,
   _getLabwareEntitiesRootState,
 } from '../selectors'
-import { getIdsInRange, getLabwareIdInSlot } from '../utils'
+import { getIdsInRange, getDeckItemIdInSlot } from '../utils'
 
 import type { LoadFileAction } from '../../load-file'
 import type {
@@ -54,11 +54,15 @@ import type {
   NormalizedPipetteById,
   NormalizedLabware,
   NormalizedLabwareById,
+  ModuleEntities,
 } from '../types'
 import type {
   CreatePipettesAction,
   DeletePipettesAction,
   SubstituteStepFormPipettesAction,
+  CreateModuleAction,
+  EditModuleAction,
+  DeleteModuleAction,
 } from '../actions'
 
 type FormState = FormData | null
@@ -147,7 +151,7 @@ export const initialDeckSetupStepForm: FormData = {
   pipetteLocationUpdate: {},
 }
 
-const initialSavedStepFormsState: SavedStepFormState = {
+export const initialSavedStepFormsState: SavedStepFormState = {
   [INITIAL_DECK_SETUP_STEP_ID]: initialDeckSetupStepForm,
 }
 type SavedStepFormsActions =
@@ -158,6 +162,7 @@ type SavedStepFormsActions =
   | DeleteContainerAction
   | SubstituteStepFormPipettesAction
   | DeletePipettesAction
+  | DeleteModuleAction
   | DuplicateStepAction
   | ChangeSavedStepFormAction
   | DuplicateLabwareAction
@@ -224,14 +229,34 @@ export const savedStepForms = (
       return mapValues(savedStepForms, (savedForm: FormData) => {
         if (savedForm.stepType === 'manualIntervention') {
           // swap labware slots from all manualIntervention steps
-          const sourceLabwareId = getLabwareIdInSlot(
+          const sourceLabwareId = getDeckItemIdInSlot(
             savedForm.labwareLocationUpdate,
             sourceSlot
           )
-          const destLabwareId = getLabwareIdInSlot(
+          const destLabwareId = getDeckItemIdInSlot(
             savedForm.labwareLocationUpdate,
             destSlot
           )
+
+          const sourceModuleId = getDeckItemIdInSlot(
+            savedForm.moduleLocationUpdate,
+            sourceSlot
+          )
+          const destModuleId = getDeckItemIdInSlot(
+            savedForm.moduleLocationUpdate,
+            destSlot
+          )
+
+          const movingLabwareOffModule =
+            sourceLabwareId != null &&
+            sourceModuleId != null &&
+            destLabwareId == null &&
+            destModuleId == null
+          const moveLabwareOnModule =
+            sourceModuleId == null &&
+            sourceLabwareId != null &&
+            destModuleId != null
+          const moduleShouldStay = movingLabwareOffModule || moveLabwareOnModule
 
           return {
             ...savedForm,
@@ -240,6 +265,13 @@ export const savedStepForms = (
               ...(sourceLabwareId ? { [sourceLabwareId]: destSlot } : {}),
               ...(destLabwareId ? { [destLabwareId]: sourceSlot } : {}),
             },
+            moduleLocationUpdate: moduleShouldStay
+              ? savedForm.moduleLocationUpdate
+              : {
+                  ...savedForm.moduleLocationUpdate,
+                  ...(sourceModuleId ? { [sourceModuleId]: destSlot } : {}),
+                  ...(destModuleId ? { [destModuleId]: sourceSlot } : {}),
+                },
           }
         }
         return savedForm
@@ -307,6 +339,21 @@ export const savedStepForms = (
           }
         }
         return form
+      })
+    }
+    case 'DELETE_MODULE': {
+      const moduleId = action.payload.id
+      return mapValues(savedStepForms, (form: FormData) => {
+        if (form.stepType === 'manualIntervention') {
+          return {
+            ...form,
+            moduleLocationUpdate: omit(form.moduleLocationUpdate, moduleId),
+          }
+        } else {
+          // TODO: Ian 2019-10-24 remove modules from forms that may reference them
+          // via handleFormChange
+          return form
+        }
       })
     }
     case 'SUBSTITUTE_STEP_FORM_PIPETTES': {
@@ -526,6 +573,36 @@ export const labwareInvariantProperties = handleActions<
       ),
   },
   initialLabwareState
+)
+
+export const moduleInvariantProperties = handleActions<ModuleEntities, *>(
+  {
+    CREATE_MODULE: (
+      state: ModuleEntities,
+      action: CreateModuleAction
+    ): ModuleEntities => ({
+      ...state,
+      [action.payload.id]: {
+        type: action.payload.type,
+        model: action.payload.model,
+      },
+    }),
+    EDIT_MODULE: (
+      state: ModuleEntities,
+      action: EditModuleAction
+    ): ModuleEntities => ({
+      ...state,
+      [action.payload.id]: {
+        ...state[action.payload.id],
+        model: action.payload.model,
+      },
+    }),
+    DELETE_MODULE: (
+      state: ModuleEntities,
+      action: DeleteModuleAction
+    ): ModuleEntities => omit(state, action.payload.id),
+  },
+  {}
 )
 
 const initialPipetteState = {}

@@ -37,10 +37,14 @@ export type PipetteEntities = {
 }
 
 // =========== MODULES ========
+// Note: 'model' is like 'GEN1'/'GEN2' etc
 export type FormModule = { onDeck: boolean, model: string }
 export type FormModulesByType = {
   [type: ModuleType]: FormModule,
 }
+
+export type ModuleEntity = {| id: string, type: ModuleType, model: string |}
+export type ModuleEntities = { [moduleId: string]: ModuleEntity }
 
 // =========== LABWARE ========
 

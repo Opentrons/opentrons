@@ -3,7 +3,7 @@ import { uuid } from '../../utils'
 import type { ModuleType } from '@opentrons/shared-data'
 import type { DeckSlot } from '../../types'
 
-type CreateModuleAction = {|
+export type CreateModuleAction = {|
   type: 'CREATE_MODULE',
   payload: {|
     slot: DeckSlot,
@@ -19,7 +19,7 @@ export const createModule = (
   payload: { ...args, id: `${uuid()}:${args.type}` },
 })
 
-type EditModuleAction = {|
+export type EditModuleAction = {|
   type: 'EDIT_MODULE',
   payload: {| id: string, model: string |},
 |}
@@ -30,7 +30,7 @@ export const editModule = (
   payload: args,
 })
 
-type DeleteModuleAction = {|
+export type DeleteModuleAction = {|
   type: 'DELETE_MODULE',
   payload: {| id: string |},
 |}
