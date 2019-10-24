@@ -74,7 +74,9 @@ async def get_advanced_settings(request: web.Request) -> web.Response:
     Handles a GET request and returns a json body with the key "settings" and a
     value that is a list of objects where each object has keys "id", "title",
     "description", and "value"
-    There is also an (empty) 'links' subobject
+    There is also a 'links' subobject that reflects whether an advanced setting
+    has been changed that requires a subsequent restart. If one is required,
+    then the "restart" key of links will hold a URI to the restart link.
     """
     return web.json_response(_get_adv_settings_response(),
                              status=200)
