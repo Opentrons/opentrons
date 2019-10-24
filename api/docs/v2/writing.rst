@@ -1,8 +1,8 @@
 .. _writing:
 
-####################
-Design with Python
-####################
+##########################
+Using Python For Protocols
+##########################
 
 Writing protocols in Python requires some up-front design before seeing your liquid handling automation in action. At a high-level, writing protocols with the Opentrons API looks like:
 
@@ -133,24 +133,4 @@ The module uses a folder in your user directory as a place to store and read con
 Robot’s Jupyter Notebook
 ************************
 
-For a more interactive environment to write and debug using some of our API tools, we recommend using the Jupyter notebook which is installed on the robot. Using this notebook, you can develop a protocol by running its commands line-by-line, ensuring they do exactly what you want, before saving the protocol for later execution.
-
-You can access the robot’s Jupyter notebook by following these steps:
-
-1. Open your Opentrons App and look for the IP address of your robot on the robot information page.
-2. Type in ``(Your Robot's IP Address):48888`` into any browser on your computer.
-
-Here, you can select a notebook and develop protocols that will be saved on the robot itself. Note that these protocols will only be on the robot unless specifically downloaded to your computer using the ``File / Download As`` buttons in the notebook.
-
-.. note::
-
-   When running protocol code in a Jupyter notebook, before executing protocol steps you must get an API instance with  :py:meth:`opentrons.execute.get_protocol_api()`:
-
-   .. code-block:: python
-
-      from opentrons import execute
-      api = execute.get_protocol_api()
-
-   This provides you with an API object (the same thing that is passed in to your protocol's ``run`` function) that is connected to the robot’s hardware so the commands you enter actually cause the robot to move.
-
-   However, this happens automatically when you upload a protocol through the Opentrons app. When writing a protocol you intend to run via the Opentrons app, just define your ``run`` function - no need for anything else.
+Your OT-2 also has a Jupyter notebook, which you can use to develop and execute protocols. For more information on how to use the robot's Jupyter notebook, please see :ref:`advanced-control`.

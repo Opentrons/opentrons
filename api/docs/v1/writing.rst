@@ -1,8 +1,8 @@
 .. _writing:
 
-####################
-Design with Python
-####################
+#########################
+Using Python In Protocols
+#########################
 
 Writing protocols in Python requires some up-front design before seeing your liquid handling automation in action. At a high-level, writing protocols with the Opentrons API looks like:
 

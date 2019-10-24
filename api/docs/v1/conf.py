@@ -157,11 +157,6 @@ html_theme_options = {
     'link_hover': '#05C1B3',
     'sidebar_list': '#05C1B3',
     'sidebar_link_underscore': '#DDDDDD',
-    'extra_nav_links': {
-        'Download As PDF': '../OpentronsPythonAPIV1.pdf',
-        'OT-2 Python API Version 2': '../v2/index.html',
-        'OT-One API': '../ot1/index.html'
-    }
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -217,7 +212,7 @@ html_static_path = ['../static']
 html_sidebars = {
     '*': [
         'about.html',
-        'toc-with-nav-force-no-hidden.html',
+        'toc-with-nav.html',
         'relations.html',
         'searchbox.html'
     ],

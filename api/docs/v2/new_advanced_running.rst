@@ -1,5 +1,7 @@
-Running Protocols Directly On The Robot
-=======================================
+.. _advanced-control:
+
+Advanced Control
+================
 
 Sometimes, you may write a protocol that is not suitable for execution through the Opentrons App. Perhaps it requires user input; perhaps it needs to do a lot of things it cannot do when being simulated. There are two ways to run a protocol on the robot without using the Opentrons app.
 

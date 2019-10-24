@@ -241,8 +241,8 @@ executed as part of a transfer.
         pipette.dispense(50, plate['A1'])
 
 
-Head Speed
-==========
+Gantry Speed
+============
 
 The OT-2's gantry usually moves as fast as it can given its construction; this makes
 protocol execution faster and saves time. However, some experiments or liquids may

@@ -61,6 +61,10 @@ div.toctree-wrapper.compound {
     display: none;
 }
 
+li.toctree-l1 {
+    margin-bottom: 0.25rem;
+}
+
 /* div.sphinxsidebar h3 a,
 div.sphinxsidebar h3 a:hover,
 /*div.body h2 {
