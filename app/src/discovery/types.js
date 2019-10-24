@@ -2,11 +2,18 @@
 
 import type { Service } from '@opentrons/discovery-client'
 
+export type { Service }
+
+export type RobotsMap = $Shape<{| [name: string]: Array<Service> |}>
+
+export type DiscoveryState = {|
+  scanning: boolean,
+  robotsByName: RobotsMap,
+|}
+
 export type ConnectableStatus = 'connectable'
 export type ReachableStatus = 'reachable'
 export type UnreachableStatus = 'unreachable'
-
-export type RestartStatus = 'pending' | 'down'
 
 // service with a known IP address
 export type ResolvedRobot = {
@@ -16,7 +23,6 @@ export type ResolvedRobot = {
   ok: $NonMaybeType<$PropertyType<Service, 'ok'>>,
   serverOk: $NonMaybeType<$PropertyType<Service, 'serverOk'>>,
   displayName: string,
-  restartStatus: ?RestartStatus,
 }
 
 // fully connectable robot

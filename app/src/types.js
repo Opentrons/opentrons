@@ -6,11 +6,12 @@ import type { RouterState, RouterAction } from 'connected-react-router'
 import type { Observable } from 'rxjs'
 
 import type { RobotApiState, RobotApiAction } from './robot-api'
+import type { RobotAdminState, RobotAdminAction } from './robot-admin/types'
 import type { State as HttpApiState, HttpApiAction } from './http-api-client'
 import type { RobotState, Action as RobotAction } from './robot'
 import type { ShellState, ShellAction } from './shell'
 import type { Config, ConfigAction } from './config'
-import type { DiscoveryState, DiscoveryAction } from './discovery'
+import type { DiscoveryState, DiscoveryAction } from './discovery/types'
 import type { ProtocolState, ProtocolAction } from './protocol'
 import type {
   CustomLabwareState,
@@ -21,6 +22,7 @@ export type State = $ReadOnly<{|
   robot: RobotState,
   api: HttpApiState,
   robotApi: RobotApiState,
+  robotAdmin: RobotAdminState,
   config: Config,
   discovery: DiscoveryState,
   labware: CustomLabwareState,
@@ -33,6 +35,7 @@ export type Action =
   | RobotAction
   | HttpApiAction
   | RobotApiAction
+  | RobotAdminAction
   | ShellAction
   | ConfigAction
   | RouterAction

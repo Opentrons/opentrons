@@ -7,14 +7,12 @@ import type { HealthAction } from './health'
 import type { MotorsAction } from './motors'
 import type { ResetAction } from './reset'
 import { robotReducer, type RobotAction } from './robot'
-import { serverReducer, type ServerAction } from './server'
 import type { NetworkingAction } from './networking'
 import type { Action } from '../types'
 
 export const reducer = combineReducers<_, Action>({
   calibration: calibrationReducer,
   robot: robotReducer,
-  server: serverReducer,
   // TODO(mc, 2018-07-09): api subreducer will become the sole reducer
   api: apiReducer,
 })
@@ -48,7 +46,6 @@ export type HttpApiAction =
   | NetworkingAction
   | ResetAction
   | RobotAction
-  | ServerAction
 
 export { getRobotApiState } from './reducer'
 
@@ -67,8 +64,6 @@ export * from './reset'
 export * from './motors'
 
 export * from './networking'
-
-export * from './server'
 
 export {
   home,

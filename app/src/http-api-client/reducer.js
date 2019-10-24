@@ -2,7 +2,7 @@
 // generic api reducer
 import isEmpty from 'lodash/isEmpty'
 import reduce from 'lodash/reduce'
-import { normalizeRobots } from '../discovery'
+import { normalizeRobots } from '../discovery/reducer'
 
 import type { Service } from '@opentrons/discovery-client'
 import type { State, Action } from '../types'

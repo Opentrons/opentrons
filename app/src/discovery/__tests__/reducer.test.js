@@ -1,5 +1,5 @@
 // discovery reducer test
-import { discoveryReducer } from '..'
+import { discoveryReducer } from '../reducer'
 
 jest.mock('../../shell/remote', () => ({
   INITIAL_ROBOTS: [
@@ -20,7 +20,6 @@ describe('discoveryReducer', () => {
       initialState: undefined,
       expectedState: {
         scanning: false,
-        restartsByName: {},
         robotsByName: {
           foo: [{ name: 'foo', ip: '192.168.1.1', port: 31950 }],
           bar: [{ name: 'bar', ip: '192.168.1.2', port: 31950 }],
@@ -50,54 +49,12 @@ describe('discoveryReducer', () => {
           ],
         },
       },
-      initialState: { robotsByName: {}, restartsByName: {} },
+      initialState: { robotsByName: {} },
       expectedState: {
         robotsByName: {
           foo: [{ name: 'foo', ip: '192.168.1.1', port: 31950 }],
           bar: [{ name: 'bar', ip: '192.168.1.2', port: 31950 }],
         },
-        restartsByName: {},
-      },
-    },
-    {
-      name: 'api:SERVER_SUCCESS sets restart pending',
-      action: {
-        type: 'api:SERVER_SUCCESS',
-        payload: { path: 'restart', robot: { name: 'name' } },
-      },
-      initialState: { restartsByName: {} },
-      expectedState: { restartsByName: { name: 'pending' } },
-    },
-    {
-      name: 'discovery:UPDATE_LIST sets restart down if pending robot not ok',
-      action: {
-        type: 'discovery:UPDATE_LIST',
-        payload: {
-          robots: [{ name: 'name', ip: '192.168.1.1', port: 31950, ok: false }],
-        },
-      },
-      initialState: { restartsByName: { name: 'pending' } },
-      expectedState: {
-        robotsByName: {
-          name: [{ name: 'name', ip: '192.168.1.1', port: 31950, ok: false }],
-        },
-        restartsByName: { name: 'down' },
-      },
-    },
-    {
-      name: 'discovery:UPDATE_LIST clears restart if down robot ok',
-      action: {
-        type: 'discovery:UPDATE_LIST',
-        payload: {
-          robots: [{ name: 'name', ip: '192.168.1.1', port: 31950, ok: true }],
-        },
-      },
-      initialState: { restartsByName: { name: 'down' } },
-      expectedState: {
-        robotsByName: {
-          name: [{ name: 'name', ip: '192.168.1.1', port: 31950, ok: true }],
-        },
-        restartsByName: { name: null },
       },
     },
   ]

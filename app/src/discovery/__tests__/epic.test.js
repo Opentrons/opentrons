@@ -1,7 +1,7 @@
 import { TestScheduler } from 'rxjs/testing'
 
 import * as actions from '../actions'
-import * as epics from '../epics'
+import { discoveryEpic } from '../epic'
 
 describe('discovery actions', () => {
   let testScheduler
@@ -15,7 +15,7 @@ describe('discovery actions', () => {
   test('startDiscoveryEpic with default timeout', () => {
     testScheduler.run(({ hot, expectObservable }) => {
       const action$ = hot('-a', { a: actions.startDiscovery() })
-      const output$ = epics.startDiscoveryEpic(action$)
+      const output$ = discoveryEpic(action$)
 
       expectObservable(output$).toBe('- 30000ms a ', {
         a: actions.finishDiscovery(),
@@ -26,7 +26,7 @@ describe('discovery actions', () => {
   test('startDiscoveryEpic with specified timeout', () => {
     testScheduler.run(({ hot, expectObservable }) => {
       const action$ = hot('-a', { a: actions.startDiscovery(42) })
-      const output$ = epics.startDiscoveryEpic(action$)
+      const output$ = discoveryEpic(action$)
 
       expectObservable(output$).toBe('- 42ms a ', {
         a: actions.finishDiscovery(),
@@ -42,7 +42,7 @@ describe('discovery actions', () => {
       }
 
       const action$ = hot('-a', { a: serverSuccessAction })
-      const output$ = epics.startDiscoveryOnRestartEpic(action$)
+      const output$ = discoveryEpic(action$)
 
       expectObservable(output$).toBe('-a ', {
         a: actions.startDiscovery(60000),

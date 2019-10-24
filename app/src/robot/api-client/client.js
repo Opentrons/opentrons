@@ -13,6 +13,7 @@ import * as constants from '../constants'
 import * as selectors from '../selectors'
 
 // bypass the robot entry point here to avoid shell module
+import { RESTART as ROBOT_RESTART_ACTION } from '../../robot-admin'
 import { getConnectableRobots } from '../../discovery/selectors'
 
 import { fileIsBinary } from '../../protocol/protocol-data'
@@ -76,11 +77,10 @@ export default function client(dispatch) {
         return refreshSession(state, action)
 
       // disconnect RPC prior to robot restart
-      // TODO(mc, 2018-11-06): switch to api:RESPONSE when server.js switches
-      case 'api:SERVER_SUCCESS': {
+      case ROBOT_RESTART_ACTION: {
         const connectedName = selectors.getConnectedRobotName(state)
-        const { path, robot } = action.payload
-        if (path === 'restart' && connectedName === robot.name) disconnect()
+        const { name: restartingName } = action.payload.host
+        if (connectedName === restartingName) disconnect()
         break
       }
     }

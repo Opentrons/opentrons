@@ -6,8 +6,7 @@ const makeFullyUp = (
   ip,
   status = null,
   connected = null,
-  displayName = null,
-  restartStatus = null
+  displayName = null
 ) => ({
   name,
   ip,
@@ -20,7 +19,6 @@ const makeFullyUp = (
   status,
   connected,
   displayName,
-  restartStatus,
 })
 
 const makeConnectable = (
@@ -28,8 +26,7 @@ const makeConnectable = (
   ip,
   status = null,
   connected = null,
-  displayName = null,
-  restartStatus = null
+  displayName = null
 ) => ({
   name,
   ip,
@@ -40,16 +37,9 @@ const makeConnectable = (
   status,
   connected,
   displayName,
-  restartStatus,
 })
 
-const makeAdvertising = (
-  name,
-  ip,
-  status = null,
-  displayName = null,
-  restartStatus = null
-) => ({
+const makeAdvertising = (name, ip, status = null, displayName = null) => ({
   name,
   ip,
   local: false,
@@ -58,7 +48,6 @@ const makeAdvertising = (
   advertising: true,
   status,
   displayName,
-  restartStatus,
 })
 
 const makeServerUp = (
@@ -66,8 +55,7 @@ const makeServerUp = (
   ip,
   advertising,
   status = null,
-  displayName = null,
-  restartStatus = null
+  displayName = null
 ) => ({
   name,
   ip,
@@ -78,16 +66,9 @@ const makeServerUp = (
   serverHealth: {},
   status,
   displayName,
-  restartStatus,
 })
 
-const makeUnreachable = (
-  name,
-  ip,
-  status = null,
-  displayName = null,
-  restartStatus = null
-) => ({
+const makeUnreachable = (name, ip, status = null, displayName = null) => ({
   name,
   ip,
   local: false,
@@ -96,7 +77,6 @@ const makeUnreachable = (
   advertising: false,
   status,
   displayName,
-  restartStatus,
 })
 
 describe('discovery selectors', () => {
@@ -148,20 +128,6 @@ describe('discovery selectors', () => {
       },
       expected: [
         makeConnectable('foo', '10.0.0.1', 'connectable', true, 'foo'),
-      ],
-    },
-    {
-      name: 'getConnectableRobots adds restartStatus if it exists',
-      state: {
-        discovery: {
-          robotsByName: { foo: [makeFullyUp('foo', '10.0.0.2')] },
-          restartsByName: { foo: 'pending' },
-        },
-        robot: { connection: { connectedTo: 'foo' } },
-      },
-      selector: discovery.getConnectableRobots,
-      expected: [
-        makeFullyUp('foo', '10.0.0.2', 'connectable', true, 'foo', 'pending'),
       ],
     },
     {
@@ -221,19 +187,6 @@ describe('discovery selectors', () => {
       expected: [],
     },
     {
-      name: 'getReachableRobots adds restartStatus if it exists',
-      state: {
-        discovery: {
-          robotsByName: { foo: [makeServerUp('foo', '10.0.0.1', false)] },
-          restartsByName: { foo: 'down' },
-        },
-      },
-      selector: discovery.getReachableRobots,
-      expected: [
-        makeServerUp('foo', '10.0.0.1', false, 'reachable', 'foo', 'down'),
-      ],
-    },
-    {
       name: 'getUnreachableRobots grabs robots with no ip',
       selector: discovery.getUnreachableRobots,
       state: {
@@ -247,7 +200,6 @@ describe('discovery selectors', () => {
           ip: null,
           status: 'unreachable',
           displayName: 'foo',
-          restartStatus: null,
         },
       ],
     },
@@ -289,19 +241,6 @@ describe('discovery selectors', () => {
         },
       },
       expected: [],
-    },
-    {
-      name: 'getUnreachableRobots adds restartStatus if it exists',
-      state: {
-        discovery: {
-          robotsByName: { foo: [makeUnreachable('foo', '10.0.0.1')] },
-          restartsByName: { foo: 'down' },
-        },
-      },
-      selector: discovery.getUnreachableRobots,
-      expected: [
-        makeUnreachable('foo', '10.0.0.1', 'unreachable', 'foo', 'down'),
-      ],
     },
     {
       name: 'display name removes opentrons- from connectable robot names',

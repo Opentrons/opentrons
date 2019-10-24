@@ -1,47 +1,40 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
 import type { State, Dispatch } from '../../types'
 import type { RobotService } from '../../robot'
-import type {
-  ResetOption,
-  ResetRobotRequest,
-  RobotServerRestart,
-} from '../../http-api-client'
+import type { ResetOption, ResetRobotRequest } from '../../http-api-client'
+
 import {
   fetchResetOptions,
   makeGetRobotResetOptions,
   resetRobotData,
   makeGetRobotResetRequest,
-  makeGetRobotRestartRequest,
-  restartRobotServer,
   clearResetResponse,
-  clearRestartResponse,
 } from '../../http-api-client'
-import { chainActions } from '../../util'
+import { restartRobot } from '../../robot-admin'
 
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../portal'
 import { LabeledCheckbox } from '../controls'
 
-type OP = {| robot: RobotService |}
+type OP = {|
+  robot: RobotService,
+  closeModal: () => mixed,
+|}
 
 type SP = {|
   options: ?Array<ResetOption>,
   resetRequest: ResetRobotRequest,
-  restartRequest: RobotServerRestart,
 |}
 
-type DP = {| dispatch: Dispatch |}
-
-type Props = {
-  ...SP,
+type DP = {|
   fetchOptions: () => mixed,
-  closeModal: () => mixed,
   reset: (options: ResetRobotRequest) => mixed,
   restart: () => mixed,
-}
+|}
+
+type Props = {| ...OP, ...SP, ...DP |}
 
 const TITLE = 'Robot Factory Reset'
 
@@ -66,20 +59,17 @@ class ResetRobotModal extends React.Component<Props, ResetRobotRequest> {
   }
 
   render() {
-    const { resetRequest, restartRequest } = this.props
+    const { resetRequest } = this.props
     let message
     let buttons
-    if (restartRequest.response) {
-      message =
-        'Your robot has been updated. Please wait for your robot to fully restart, which may take several minutes.'
-      buttons = [{ onClick: this.props.closeModal, children: 'close' }]
-    } else if (resetRequest.response) {
+
+    if (resetRequest.response) {
       message =
         'Restart your robot to finish the reset. It may take several minutes for your robot to restart'
       buttons = [{ onClick: this.props.restart, children: 'restart' }]
     } else {
       message = (
-        <React.Fragment>
+        <>
           <p>
             Warning! Clicking <strong>reset</strong> will erase your selected
             configurations and restore your robot to factory settings. This
@@ -97,7 +87,7 @@ class ResetRobotModal extends React.Component<Props, ResetRobotRequest> {
                 <p>{o.description}</p>
               </LabeledCheckbox>
             ))}
-        </React.Fragment>
+        </>
       )
       buttons = [
         { onClick: this.props.closeModal, children: 'close' },
@@ -115,60 +105,38 @@ class ResetRobotModal extends React.Component<Props, ResetRobotRequest> {
   }
 }
 
-export default connect<Props, OP, SP, {||}, State, Dispatch>(
+export default connect<Props, OP, SP, DP, State, Dispatch>(
   makeMapStateToProps,
-  null,
-  mergeProps
+  mapDispatchToProps
 )(ResetRobotModal)
 
 function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
   const getResetOptions = makeGetRobotResetOptions()
   const getResetRequest = makeGetRobotResetRequest()
-  const getRobotRestartRequest = makeGetRobotRestartRequest()
 
   return (state, ownProps) => {
     const { robot } = ownProps
     const optionsRequest = getResetOptions(state, robot)
     const optionsResponse = optionsRequest.response
+
     return {
       options: optionsResponse && optionsResponse.options,
       resetRequest: getResetRequest(state, robot),
-      restartRequest: getRobotRestartRequest(state, robot),
     }
   }
 }
 
-function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
-  const { restartRequest } = stateProps
-  const { robot } = ownProps
-  const { dispatch } = dispatchProps
-
-  const close = () => dispatch(push(`/robots/${robot.name}`))
-  let closeModal = restartRequest
-    ? () =>
-        dispatch(
-          chainActions(
-            clearRestartResponse(robot),
-            push(`/robots/${robot.name}`)
-          )
-        )
-    : close
-
-  let fetchOptions = restartRequest
-    ? () =>
-        dispatch(
-          chainActions(clearRestartResponse(robot), fetchResetOptions(robot))
-        )
-    : () => dispatch(fetchResetOptions(robot))
+function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
+  const { robot, closeModal } = ownProps
+  const fetchOptions = () => dispatch(fetchResetOptions(robot))
 
   return {
-    ...stateProps,
-    closeModal,
     fetchOptions,
     reset: options => dispatch(resetRobotData(robot, options)),
-    restart: () =>
-      dispatch(
-        chainActions(restartRobotServer(robot), clearResetResponse(robot))
-      ),
+    restart: () => {
+      closeModal()
+      dispatch(restartRobot(robot))
+      dispatch(clearResetResponse(robot))
+    },
   }
 }
