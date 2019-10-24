@@ -54,6 +54,7 @@ import type {
   NormalizedPipetteById,
   NormalizedLabware,
   NormalizedLabwareById,
+  ModuleEntities,
 } from '../types'
 import type {
   CreatePipettesAction,
@@ -161,6 +162,7 @@ type SavedStepFormsActions =
   | DeleteContainerAction
   | SubstituteStepFormPipettesAction
   | DeletePipettesAction
+  | DeleteModuleAction
   | DuplicateStepAction
   | ChangeSavedStepFormAction
   | DuplicateLabwareAction
@@ -245,14 +247,15 @@ export const savedStepForms = (
             destSlot
           )
 
-          const moduleInitiallyOccupied =
-            sourceLabwareId != null && sourceModuleId != null
           const movingLabwareOffModule =
-            moduleInitiallyOccupied &&
+            sourceLabwareId != null &&
+            sourceModuleId != null &&
             destLabwareId == null &&
             destModuleId == null
           const moveLabwareOnModule =
-            sourceLabwareId != null && destModuleId != null
+            sourceModuleId == null &&
+            sourceLabwareId != null &&
+            destModuleId != null
           const moduleShouldStay = movingLabwareOffModule || moveLabwareOnModule
 
           return {
@@ -336,6 +339,21 @@ export const savedStepForms = (
           }
         }
         return form
+      })
+    }
+    case 'DELETE_MODULE': {
+      const moduleId = action.payload.id
+      return mapValues(savedStepForms, (form: FormData) => {
+        if (form.stepType === 'manualIntervention') {
+          return {
+            ...form,
+            moduleLocationUpdate: omit(form.moduleLocationUpdate, moduleId),
+          }
+        } else {
+          // TODO: Ian 2019-10-24 remove modules from forms that may reference them
+          // via handleFormChange
+          return form
+        }
       })
     }
     case 'SUBSTITUTE_STEP_FORM_PIPETTES': {
@@ -557,16 +575,12 @@ export const labwareInvariantProperties = handleActions<
   initialLabwareState
 )
 
-type InvariantModulesTodoType = Object // TODO IMMEDIATELY import from types.js
-export const moduleInvariantProperties = handleActions<
-  InvariantModulesTodoType,
-  *
->(
+export const moduleInvariantProperties = handleActions<ModuleEntities, *>(
   {
     CREATE_MODULE: (
-      state: InvariantModulesTodoType,
+      state: ModuleEntities,
       action: CreateModuleAction
-    ): InvariantModulesTodoType => ({
+    ): ModuleEntities => ({
       ...state,
       [action.payload.id]: {
         type: action.payload.type,
@@ -574,9 +588,9 @@ export const moduleInvariantProperties = handleActions<
       },
     }),
     EDIT_MODULE: (
-      state: InvariantModulesTodoType,
+      state: ModuleEntities,
       action: EditModuleAction
-    ): InvariantModulesTodoType => ({
+    ): ModuleEntities => ({
       ...state,
       [action.payload.id]: {
         ...state[action.payload.id],
@@ -584,9 +598,9 @@ export const moduleInvariantProperties = handleActions<
       },
     }),
     DELETE_MODULE: (
-      state: InvariantModulesTodoType,
+      state: ModuleEntities,
       action: DeleteModuleAction
-    ): InvariantModulesTodoType => omit(state, action.payload.id),
+    ): ModuleEntities => omit(state, action.payload.id),
   },
   {}
 )

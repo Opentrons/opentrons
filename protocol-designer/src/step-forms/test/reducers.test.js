@@ -8,6 +8,7 @@ import {
 } from '../reducers'
 import { moveDeckItem } from '../../labware-ingred/actions'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import type { DeckSlot } from '../../types'
 
 jest.mock('../../labware-defs/utils')
 
@@ -227,10 +228,9 @@ describe('moduleInvariantProperties reducer', () => {
 })
 
 type MakeDeckSetupStepArgs = {
-  // TODO IMMEDIATELY: type properly
-  labwareLocationUpdate?: Object,
-  pipetteLocationUpdate?: Object,
-  moduleLocationUpdate?: Object,
+  labwareLocationUpdate?: { [id: string]: DeckSlot },
+  pipetteLocationUpdate?: { [id: string]: DeckSlot },
+  moduleLocationUpdate?: { [id: string]: DeckSlot },
 }
 
 const makeDeckSetupStep = (args: MakeDeckSetupStepArgs) => ({
@@ -252,6 +252,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
   const otherLabwareId = '_otherLabwareId'
   const newLabwareId = '_newLabwareId'
   const moduleId = '_moduleId'
+  const otherModuleId = '_otherModuleId'
   const labwareOnModuleId = '_labwareOnModuleId'
 
   describe('create (or duplicate) new labware', () => {
@@ -420,12 +421,80 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         expectedLabwareLocations: { [labwareOnModuleId]: destSlot },
         expectedModuleLocations: { [moduleId]: sourceSlot },
       },
-      // TODO IMMEDIATELY: add cases for:
-      // - empty module to occupied module
-      // - empty module to empty module
-      // - occupied module to occupied module
-      // - occupied module to empty module
-      // NOTE. None of these cases change the pairings, all just swap with no pairing change
+      {
+        testName: 'move empty module to occupied module -> swap, keep pairings',
+        makeStateArgs: {
+          labwareLocationUpdate: {
+            [labwareOnModuleId]: destSlot,
+          },
+          moduleLocationUpdate: {
+            [moduleId]: sourceSlot,
+            [otherModuleId]: destSlot,
+          },
+        },
+        expectedLabwareLocations: {
+          [labwareOnModuleId]: sourceSlot,
+        },
+        expectedModuleLocations: {
+          [moduleId]: destSlot,
+          [otherModuleId]: sourceSlot,
+        },
+      },
+      {
+        testName: 'empty module to empty module -> swap',
+        makeStateArgs: {
+          labwareLocationUpdate: {},
+          moduleLocationUpdate: {
+            [moduleId]: sourceSlot,
+            [otherModuleId]: destSlot,
+          },
+        },
+        expectedLabwareLocations: {},
+        expectedModuleLocations: {
+          [moduleId]: destSlot,
+          [otherModuleId]: sourceSlot,
+        },
+      },
+      {
+        testName: 'occupied module to occupied module -> swap, keep pairings',
+        makeStateArgs: {
+          labwareLocationUpdate: {
+            [labwareOnModuleId]: sourceSlot,
+            [otherLabwareId]: destSlot,
+          },
+          moduleLocationUpdate: {
+            [moduleId]: sourceSlot,
+            [otherModuleId]: destSlot,
+          },
+        },
+        expectedLabwareLocations: {
+          [labwareOnModuleId]: destSlot,
+          [otherLabwareId]: sourceSlot,
+        },
+        expectedModuleLocations: {
+          [moduleId]: destSlot,
+          [otherModuleId]: sourceSlot,
+        },
+      },
+      {
+        testName: 'occupied module to empty module -> swap, keep pairings',
+        makeStateArgs: {
+          labwareLocationUpdate: {
+            [moduleId]: sourceSlot,
+            [otherModuleId]: destSlot,
+          },
+          moduleLocationUpdate: {
+            [labwareOnModuleId]: sourceSlot,
+          },
+        },
+        expectedLabwareLocations: {
+          [moduleId]: destSlot,
+          [otherModuleId]: sourceSlot,
+        },
+        expectedModuleLocations: {
+          [labwareOnModuleId]: destSlot,
+        },
+      },
     ]
     testCases.forEach(
       ({
@@ -501,6 +570,16 @@ describe('savedStepForms reducer: initial deck setup step', () => {
   })
 
   test('delete module -> removes module from initial deck setup step', () => {
-    // TODO IMMEDIATELY
+    const action = { type: 'DELETE_MODULE', payload: { id: moduleId } }
+    const prevRootState = makePrevRootState({
+      moduleLocationUpdate: {
+        [moduleId]: '1',
+        [otherModuleId]: '2',
+      },
+    })
+    const result = savedStepForms(prevRootState, action)
+    expect(result[INITIAL_DECK_SETUP_STEP_ID].moduleLocationUpdate).toEqual({
+      [otherModuleId]: '2',
+    })
   })
 })
