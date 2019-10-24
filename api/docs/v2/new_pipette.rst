@@ -35,35 +35,59 @@ a list of associated tipracks:
 .. _new-pipette-models:
 
 Pipette Model(s)
-===================
-Currently in our API there are 7 pipette models to correspond with the offered pipette models on our website.
+================
+Currently in our API there are 10 pipette models to correspond with the offered pipette models on our website.
 
 They are as follows:
 
-+----------------------------------+--------------------+
-|          Pipette Type            |     Model Name     |
-+==================================+====================+
-| ``P10 Single``   (1 - 10 ul)     | ``'p10_single'``   |
-+----------------------------------+--------------------+
-| ``P10 Multi``    (1 - 10 ul)     | ``'p10_multi'``    |
-+----------------------------------+--------------------+
-| ``P50 Single``   (5 - 50 ul)     | ``'p50_single'``   |
-+----------------------------------+--------------------+
-| ``P50 Multi``    (5 - 50 ul)     | ``'p50_multi'``    |
-+----------------------------------+--------------------+
-| ``P300 Single``  (30 - 300 ul)   | ``'p300_single'``  |
-+----------------------------------+--------------------+
-| ``P300 Multi``   (30 - 300 ul)   | ``'p300_multi'``   |
-+----------------------------------+--------------------+
-| ``P1000 Single`` (100 - 1000 ul) | ``'p1000_single'`` |
-+----------------------------------+--------------------+
++---------------------------------------+-------------------------+
+|          Pipette Type                 |     Model Name          |
++=======================================+=========================+
+| ``P10 Single``   (1 - 10 ul)          | ``'p10_single'``        |
++---------------------------------------+-------------------------+
+| ``P10 Multi``    (1 - 10 ul)          | ``'p10_multi'``         |
++---------------------------------------+-------------------------+
+| ``P50 Single``   (5 - 50 ul)          | ``'p50_single'``        |
++---------------------------------------+-------------------------+
+| ``P50 Multi``    (5 - 50 ul)          | ``'p50_multi'``         |
++---------------------------------------+-------------------------+
+| ``P300 Single``  (30 - 300 ul)        | ``'p300_single'``       |
++---------------------------------------+-------------------------+
+| ``P300 Multi``   (30 - 300 ul)        | ``'p300_multi'``        |
++---------------------------------------+-------------------------+
+| ``P1000 Single`` (100 - 1000 ul)      | ``'p1000_single'``      |
++---------------------------------------+-------------------------+
+| ``P300 Single Gen2`` (20 - 300 ul)    | ``'p300_single_gen2'``  |
++---------------------------------------+-------------------------+
+| ``P20 Single Gen2`` (1 - 20 ul)       | ``'p20_single_gen2'``   |
++---------------------------------------+-------------------------+
+| ``P1000 Single Gen2`` (100 - 1000 ul) | ``'p1000_single_gen2'`` |
++---------------------------------------+-------------------------+
 
 
 For every pipette type you are using in a protocol, you must use one of the
 model names specified above.
 
+Pipette Back Compatibility
+==========================
 
-Adding Tip Racks
+Because the Gen 2 pipette behave similarly to the Gen 1 pipettes, if you specify a Gen 1 pipette
+in your protocol (for instance, ``'p300_single'`` but have a Gen 2 pipette attached (for instance,
+``'p300_single_gen2'``), you can still run your protocol. The robot will consider the Gen 2
+pipette to have the same minimum volume as the Gen 1 pipette, so any advanced commands have the
+same behavior as before.
+
+The P20 Single Gen2 is back-compatible with the P10 Single in this regard. If your protocol
+specifies a ``'p10_single'`` and your robot has a ``'p20_single_gen2'`` attached, you can run
+your protocol, and the robot will act as if the maximum volume of the P20 Single Gen2 is 10 μl.
+
+If you have a P50 Single specified in your protocol, there is no automatic backwards compatibility.
+If you want to use a Gen2 Pipette, you must change your protocol to load either a P300 Single Gen2
+(if you are using volumes between 20 and 50 μl) or a P20 Single Gen2 (if you are using volumes
+below 20 μl).
+
+
+ADDING Tip Racks
 ================
 :py:meth:`.ProtocolContext.load_instrument` has one important optional parameter: ``tipracks``.
 This parameter accepts a *list* of tiprack labware objects, allowing you to specify as many
@@ -313,5 +337,29 @@ Defaults
 - Aspirate Default: 500 μl/s
 - Dispense Default: 1000 μl/s
 - Blow Out Default: 1000 μl/s
+- Minimum Volume: 100 μl
+- Maximum Volume: 1000 μl
+
+**p20_single_gen2**
+
+- Aspirate Default: 3.78 μl/s
+- Dispense Default: 3.78 μl/s
+- Blow Out Default: 3.78 μl/s
+- Minimum Volume: 1 μl
+- Maximum Volume: 20 μl
+
+**p300_single_gen2**
+
+- Aspirate Default: 46.43 μl/s
+- Dispense Default: 46.43 μl/s
+- Blow Out Default: 46.43 μl/s
+- Minimum Volume: 20 μl
+- Maximum Volume: 300 μl
+
+**p1000_single_gen2**
+
+- Aspirate Default: 137.35 μl/s
+- Dispense Default: 137.35 μl/s
+- Blow Out Default: 137.35 μl/s
 - Minimum Volume: 100 μl
 - Maximum Volume: 1000 μl
