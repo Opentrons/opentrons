@@ -19,8 +19,8 @@
   background-color: var(--c-bg-selected);
 }
 
-.card_wrapper {
-  padding: 1.5rem;
+.page_row {
+  padding: 0.5rem;
 }
 
 .card_point_list {
@@ -28,19 +28,34 @@
   margin-left: 4rem;
 }
 
+.card_content {
+  padding: 1rem;
+
+  @apply --font-body-2-dark;
+
+  line-height: 1.5;
+
+  & p {
+    margin-bottom: 1rem;
+    max-width: 70%;
+    min-width: 20rem;
+    line-height: 1.5;
+  }
+}
+
 .setting_row {
   width: 100%;
-  padding: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .feature_flag_description {
-  @apply --font-body-1-dark;
+  @apply --font-body-2-dark;
 
-  padding: 0 1rem 1rem 1rem;
-  margin: -1rem 0 0 0;
+  & p {
+    margin-bottom: 1rem;
+  }
 }
 
 .toggle_label {
@@ -49,6 +64,7 @@
   max-width: var(--mw-labeled-toggle);
   display: inline-block;
   font-weight: var(--fw-semibold);
+  margin-top: 1rem;
 }
 
 .toggle_wrapper {
@@ -77,6 +93,7 @@
   padding: 2rem 1rem;
 }
 
-.labeled_value {
+.labeled_value p {
   font-size: var(--fs-body-2);
+  max-width: 100%;
 }

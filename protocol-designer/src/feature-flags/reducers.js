@@ -15,6 +15,7 @@ const initialFlags: Flags = {
   PRERELEASE_MODE: false,
   OT_PD_ENABLE_GEN2_PIPETTES: false,
   OT_PD_ENABLE_MODULES: false,
+  OT_PD_DISABLE_MODULE_RESTRICTIONS: false,
 }
 
 const flags = handleActions<Flags, any>(

@@ -15,5 +15,10 @@
   "OT_PD_ENABLE_MODULES": {
     "title": "Enable modules in PD",
     "description": "!"
+  },
+  "OT_PD_DISABLE_MODULE_RESTRICTIONS": {
+    "title": "Disable module restrictions",
+    "description_1": "Turn off all restrictions on module placement, labware placement on modules, and related pipette crash guidance.",
+    "description_2": "NOT recommended! Switching from default positions may cause crashes and the Protocol Designer cannot yet give guidance on what to expect. Use at your own discretion. "
   }
 }
