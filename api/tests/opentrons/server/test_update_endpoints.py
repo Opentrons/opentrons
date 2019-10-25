@@ -134,7 +134,7 @@ async def test_update_module_firmware(
                'filename': fw_filename}
 
     async def mock_successful_upload_to_module(
-            port, firmware_file_path, bootloader_type, loop):
+            port, firmware_file_path, upload_function, loop):
         return True, res_msg['message']
 
     expected_res = res_msg
@@ -184,7 +184,7 @@ async def test_fail_update_module_firmware(
                 'filename': fw_filename}
 
     async def mock_failed_upload_to_module1(
-            port, firmware_file_path, bootloader_type, loop):
+            port, firmware_file_path, upload_function, loop):
         return ('mod1', (False, bootloader_error))
 
     expected_res1 = res_msg1
@@ -205,7 +205,7 @@ async def test_fail_update_module_firmware(
                      'filename': fw_filename}
 
     async def mock_failed_upload_to_module2(
-            port, firmware_file_path, bootloader_type, loop):
+            port, firmware_file_path, upload_function, loop):
         await asyncio.sleep(2)
 
     monkeypatch.setattr(hw_modules.update,

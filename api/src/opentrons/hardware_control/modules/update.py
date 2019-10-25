@@ -3,6 +3,7 @@ import logging
 import os
 from typing import Any, Dict, Optional, Tuple
 from opentrons import HERE as package_root
+from .mod_abc import UploadFunction
 
 log = logging.getLogger(__name__)
 
@@ -47,7 +48,7 @@ async def enter_bootloader(driver, model):
 
 async def upload_firmware(port: str,
                           firmware_file_path: str,
-                          bootloader_type: str,
+                          upload_function: UploadFunction,
                           loop: Optional[asyncio.AbstractEventLoop])\
         -> Tuple[str, Tuple[bool, str]]:
     """
@@ -70,21 +71,16 @@ async def upload_firmware(port: str,
     if loop:
         kwargs['loop'] = loop
 
-    res = None
-    if bootloader_type == 'avrdude':
-        res = await _upload_via_avrdude(port, firmware_file_path, kwargs)
-    elif bootloader_type == 'bossa':
-        res = await _upload_via_bossa(port, firmware_file_path, kwargs)
-    else:
-        raise ValueError(
-            f"cannot handle specified bootloader type: {bootloader_type}")
+    res = await upload_function(port, firmware_file_path, kwargs)
 
     await asyncio.sleep(2)  # wait for com port to reappear
     new_port = await _port_on_mode_switch(ports_before_update)
     return new_port, res
 
 
-async def _upload_via_avrdude(port, firmware_file_path, kwargs):
+async def upload_via_avrdude(port: str,
+                             firmware_file_path: str,
+                             kwargs: Dict[str, Any]) -> Tuple[bool, str]:
     config_file_path = os.path.join(package_root,
                                     'config', 'modules', 'avrdude.conf')
 
@@ -119,7 +115,9 @@ def _format_avrdude_response(raw_response: str) -> Tuple[bool, str]:
     return False, avrdude_log
 
 
-async def _upload_via_bossa(port, firmware_file_path, kwargs):
+async def upload_via_bossa(port: str,
+                           firmware_file_path: str,
+                           kwargs: Dict[str, Any]) -> Tuple[bool, str]:
     # bossac -p/dev/ttyACM1 -e -w -v -R --offset=0x2000
     #   modules/thermo-cycler/production/firmware/thermo-cycler-arduino.ino.bin
     # NOTE: bossac cannot traverse symlinks to port,

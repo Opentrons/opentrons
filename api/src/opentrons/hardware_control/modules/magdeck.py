@@ -69,8 +69,8 @@ class MagDeck(mod_abc.AbstractModule):
         return 'Magnetic Deck'
 
     @classmethod
-    def bootloader_type(cls) -> str:
-        return 'avrdude'
+    def bootloader(cls) -> mod_abc.UploadFunction:
+        return update.upload_via_avrdude
 
     @staticmethod
     def _build_driver(

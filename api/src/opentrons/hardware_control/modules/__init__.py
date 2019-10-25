@@ -88,7 +88,7 @@ async def update_firmware(
     after_port, results = await update.upload_firmware(
         port=flash_port,
         firmware_file_path=firmware_file,
-        bootloader_type=cls.bootloader_type(),
+        upload_function=cls.bootloader(),
         loop=loop)
     await asyncio.sleep(1.0)
     new_port = after_port or old_port

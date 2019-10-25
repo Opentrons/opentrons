@@ -1,7 +1,8 @@
 import abc
-from typing import Dict, Callable
+from typing import Dict, Callable, Any, Tuple
 
 InterruptCallback = Callable[[str], None]
+UploadFunction = Callable[[str, str, Dict[str, Any]], Tuple[bool, str]]
 
 
 class AbstractModule(abc.ABC):
@@ -87,6 +88,6 @@ class AbstractModule(abc.ABC):
 
     @classmethod
     @abc.abstractmethod
-    def bootloader_type(cls) -> str:
-        """ The type of bootloader this module uses. """
+    def bootloader(cls) -> UploadFunction:
+        """ Method used to upload file to this module's bootloader. """
         pass

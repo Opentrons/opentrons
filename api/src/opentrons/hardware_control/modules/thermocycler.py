@@ -131,8 +131,8 @@ class Thermocycler(mod_abc.AbstractModule):
         return 'Thermocycler'
 
     @classmethod
-    def bootloader_type(cls):
-        return 'bossa'
+    def bootloader(cls) -> mod_abc.UploadFunction:
+        return update.upload_via_bossa
 
     @staticmethod
     def _build_driver(
