@@ -212,6 +212,6 @@ class TempDeck(mod_abc.AbstractModule):
             self._poller.join()
         del self._poller
         self._poller = None
-        model = self._device_info.get('model')
+        model = self._device_info and self._device_info.get('model')
         new_port = await update.enter_bootloader(self._driver, model)
         return new_port or self.port
