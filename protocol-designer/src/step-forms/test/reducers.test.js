@@ -186,7 +186,12 @@ describe('moduleInvariantProperties reducer', () => {
   const newId = 'newModuleId'
   beforeEach(() => {
     prevState = {
-      [existingModuleId]: { slot: '1', type: 'magdeck', model: 'GEN1' },
+      [existingModuleId]: {
+        id: existingModuleId,
+        slot: '1',
+        type: 'magdeck',
+        model: 'GEN1',
+      },
     }
   })
 
@@ -201,9 +206,14 @@ describe('moduleInvariantProperties reducer', () => {
       type: 'CREATE_MODULE',
       payload: newModuleData,
     })
+    // TODO IMMEDIATELY: if module is created in slot that labware exists, put labware on module
     expect(result).toEqual({
       ...prevState,
-      [newId]: { type: newModuleData.type, model: newModuleData.model },
+      [newId]: {
+        id: newId,
+        type: newModuleData.type,
+        model: newModuleData.model,
+      },
     })
   })
 
@@ -219,6 +229,7 @@ describe('moduleInvariantProperties reducer', () => {
   })
 
   test('delete module', () => {
+    // TODO IMMEDIATELY: if module has labware, move labware to the deck slot the module is in (or for thermocycler, slot 7)
     const result = moduleInvariantProperties(prevState, {
       type: 'DELETE_MODULE',
       payload: { id: existingModuleId },
@@ -302,6 +313,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
   })
 
   describe('move deck item', () => {
+    // TODO IMMEDIATELY: never share slots, labware goes on module slot!
     const sourceSlot = '1'
     const destSlot = '3'
     const testCases: Array<{|

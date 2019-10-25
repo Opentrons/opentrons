@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
-import moduleRenderSizes from './moduleRenderSizes'
-import styles from './ModuleRender.css'
+import moduleVizDims from './moduleVizDims'
+import styles from './ModuleViz.css'
 import type { ModuleOnDeck } from '../../step-forms'
 
 type Props = {|
@@ -11,14 +11,18 @@ type Props = {|
   module: ModuleOnDeck,
 |}
 
-const ModuleRender = (props: Props) => {
+const ModuleViz = (props: Props) => {
   const moduleType = props.module.type
-  const { xOffset, yOffset, xDimension, yDimension } = moduleRenderSizes[
-    moduleType
-  ]
+  const {
+    xOffsetLeft,
+    xOffsetRight,
+    yOffset,
+    xDimension,
+    yDimension,
+  } = moduleVizDims[moduleType]
   return (
     <rect
-      x={props.x + (props.orientation === 'left' ? 1 : -1) * xOffset}
+      x={props.x + (props.orientation === 'left' ? xOffsetLeft : xOffsetRight)}
       y={props.y + yOffset}
       height={yDimension}
       width={xDimension}
@@ -27,4 +31,4 @@ const ModuleRender = (props: Props) => {
   )
 }
 
-export default ModuleRender
+export default ModuleViz

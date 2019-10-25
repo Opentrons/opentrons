@@ -29,10 +29,12 @@ const MODULE_SHORT_DISPLAY_NAMES = {
 const ModuleTag = (props: Props) => {
   return (
     <RobotCoordsForeignDiv
+      // TODO IMMEDIATELY: need to use child offset to place in X, see design
       x={
         props.x +
         (props.orientation === 'left' ? -1 * TAG_WIDTH : SLOT_WIDTH_TODO)
       }
+      // TODO IMMEDIATELY: need to use child offset to place in Y, see design
       y={props.y + (SLOT_HEIGHT_TODO - TAG_HEIGHT) / 2}
       height={TAG_HEIGHT}
       width={TAG_WIDTH}

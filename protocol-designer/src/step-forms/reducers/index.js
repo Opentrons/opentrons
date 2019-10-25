@@ -599,6 +599,7 @@ export const moduleInvariantProperties = handleActions<ModuleEntities, *>(
     ): ModuleEntities => ({
       ...state,
       [action.payload.id]: {
+        id: action.payload.id,
         type: action.payload.type,
         model: action.payload.model,
       },
