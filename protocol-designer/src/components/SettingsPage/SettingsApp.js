@@ -17,7 +17,6 @@ import {
   selectors as tutorialSelectors,
 } from '../../tutorial'
 import { OLDEST_MIGRATEABLE_VERSION } from '../../load-file/migration'
-import { CardRow } from '../layout'
 import FeatureFlagCard from './FeatureFlagCard'
 import styles from './SettingsPage.css'
 import type { BaseState, ThunkDispatch } from '../../types'
@@ -43,7 +42,7 @@ function SettingsApp(props: Props) {
   } = props
   return (
     <>
-      <CardRow>
+      <div className={styles.page_row}>
         <Card title={i18n.t('card.title.information')}>
           <div className={styles.card_content}>
             <div className={styles.setting_row}>
@@ -56,8 +55,8 @@ function SettingsApp(props: Props) {
             </div>
           </div>
         </Card>
-      </CardRow>
-      <CardRow>
+      </div>
+      <div className={styles.page_row}>
         <Card title={i18n.t('card.title.hints')}>
           <div className={styles.card_content}>
             <div className={styles.setting_row}>
@@ -74,8 +73,8 @@ function SettingsApp(props: Props) {
             </div>
           </div>
         </Card>
-      </CardRow>
-      <CardRow>
+      </div>
+      <div className={styles.page_row}>
         <Card title={i18n.t('card.title.privacy')}>
           <div className={styles.card_content}>
             <div className={styles.setting_row}>
@@ -99,10 +98,10 @@ function SettingsApp(props: Props) {
             </ul>
           </div>
         </Card>
-      </CardRow>
-      <CardRow>
+      </div>
+      <div className={styles.page_row}>
         <FeatureFlagCard />
-      </CardRow>
+      </div>
     </>
   )
 }

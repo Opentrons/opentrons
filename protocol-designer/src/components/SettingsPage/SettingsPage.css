@@ -19,6 +19,10 @@
   background-color: var(--c-bg-selected);
 }
 
+.page_row {
+  padding: 0.5rem;
+}
+
 .card_point_list {
   margin-top: 1rem;
   margin-left: 4rem;

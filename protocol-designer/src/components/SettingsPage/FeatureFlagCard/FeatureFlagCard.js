@@ -4,7 +4,11 @@ import * as React from 'react'
 import i18n from '../../../localization'
 import { Card, ToggleButton } from '@opentrons/components'
 import styles from '../SettingsPage.css'
-import { userFacingFlags, type Flags } from '../../../feature-flags'
+import {
+  userFacingFlags,
+  type Flags,
+  type FlagTypes,
+} from '../../../feature-flags'
 
 type Props = {|
   flags: Flags,
@@ -24,8 +28,8 @@ const FeatureFlagCard = (props: Props) => {
     flagName => !userFacingFlags.includes(flagName)
   )
 
-  const getDescription = flag => {
-    const RICH_DESCRIPTIONS = {
+  const getDescription = (flag: FlagTypes): React.Node => {
+    const RICH_DESCRIPTIONS: { [FlagTypes]: React.Node } = {
       OT_PD_DISABLE_MODULE_RESTRICTIONS: (
         <>
           <p>{i18n.t(`feature_flags.${flag}.description_1`)} </p>
@@ -34,7 +38,7 @@ const FeatureFlagCard = (props: Props) => {
       ),
     }
     return (
-      RICH_DESCRIPTIONS[`${flag}`] || (
+      RICH_DESCRIPTIONS[flag] || (
         <p>{i18n.t(`feature_flags.${flag}.description`)}</p>
       )
     )
