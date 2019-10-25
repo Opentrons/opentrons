@@ -10,6 +10,8 @@ from opentrons.legacy_api.containers.placeable import Container, Well
 
 from .util import log_call
 
+from ..labware import get_all_labware_definitions
+
 log = logging.getLogger(__name__)
 
 MODULE_BLACKLIST = ['tempdeck', 'magdeck', 'temperature-plate']
@@ -210,7 +212,7 @@ def load(robot, container_name, slot, label=None, share=False):
 
 @log_call(log)
 def list():
-    return []
+    return get_all_labware_definitions()
 
 
 @log_call(log)

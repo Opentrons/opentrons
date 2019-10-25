@@ -1157,19 +1157,25 @@ def get_labware_definition(
         load_name, namespace, version)
 
 
-def get_all_labware_definitions():
+def get_all_labware_definitions() -> list[str]:
     """
     Return a list of standard and custom labware definitions with load_name +
         name_space + version existing on the robot
     """
     labware_list = []
-    for dir in os.scandir(STANDARD_DEFS_PATH):
-        labware_list.append(dir.name) if dir.is_dir() else None
 
-    for subdir in os.scandir(CONFIG['labware_user_definitions_dir_v2']):
-        if subdir.is_dir():
-            for dir in os.scandir(subdir):
-                labware_list.append(dir.name) if dir.is_dir() else None
+    def _check_for_subdirectories(path):
+        with os.scandir(path) as top_path:
+            for sub_dir in top_path:
+                labware_list.append(sub_dir.name) if sub_dir.is_dir() else None
+
+    # check for standard labware
+    _check_for_subdirectories(STANDARD_DEFS_PATH)
+
+    # check for custom labware
+    for namespace in os.scandir(CONFIG['labware_user_definitions_dir_v2']):
+        _check_for_subdirectories(namespace)
+
     return labware_list
 
 
