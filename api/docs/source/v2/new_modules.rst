@@ -97,9 +97,6 @@ To set the temperature module to 4 degrees celsius do the following:
 
 This function will pause your protocol until your target temperature is reached.
 
-If no target temperature is set via ``set_temperature()``, the protocol will be stuck in
-an indefinite loop.
-
 Read the Current Temperature
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 You can read the current real-time temperature of the module by the following:
