@@ -58,8 +58,8 @@ async def upload_firmware(port: str,
     a new port after the update (since the board is automatically reset).
     Scan for such a port change and use the appropriate port.
 
-    Returns a tuple of the new port to communicate on (or None if it was not
-    found) and a tuple of success and message from bootloader.
+    Returns a tuple of the new port to communicate on (or empty string
+    if it was not found) and a tuple of success and message from bootloader.
     """
 
     ports_before_update = await _discover_ports()
@@ -140,7 +140,7 @@ async def upload_via_bossa(port: str,
         log.error(f"Failed to update module firmware for {port}: {res}")
         log.error(f"Error given: {stderr.decode()}")
         return False, res
-    return False, None
+    return False, ''
 
 
 async def _port_on_mode_switch(ports_before_switch):

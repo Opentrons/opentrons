@@ -1,8 +1,9 @@
 import abc
-from typing import Dict, Callable, Any, Tuple
+from typing import Dict, Callable, Any, Tuple, Awaitable
 
 InterruptCallback = Callable[[str], None]
-UploadFunction = Callable[[str, str, Dict[str, Any]], Tuple[bool, str]]
+UploadFunction = Callable[[str, str, Dict[str, Any]],
+                          Awaitable[Tuple[bool, str]]]
 
 
 class AbstractModule(abc.ABC):
