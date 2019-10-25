@@ -251,10 +251,10 @@ class Simulator:
         pass
 
     def pause(self):
-        self._run_flag.clear()
+        self._run_flag.set()
 
     def resume(self):
-        self._run_flag.set()
+        self._run_flag.clear()
 
     def halt(self):
         self._run_flag.set()
