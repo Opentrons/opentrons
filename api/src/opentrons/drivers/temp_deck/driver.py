@@ -1,5 +1,6 @@
 from os import environ
 import logging
+import asyncio
 from threading import Event, Thread
 from time import sleep
 from typing import Optional, Mapping
@@ -92,7 +93,22 @@ class TempDeck:
             return str(e)
         return ''
 
-    def set_temperature(self, celsius) -> str:
+    async def set_temperature(self, celsius) -> str:
+        self.run_flag.wait()
+        celsius = round(float(celsius),
+                        utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
+        try:
+            self._send_command(
+                '{0} S{1}'.format(GCODES['SET_TEMP'], celsius))
+        except (TempDeckError, SerialException, SerialNoResponse) as e:
+            return str(e)
+        self._temperature.update({'target': celsius})
+        while self.status != 'holding at target':
+            await asyncio.sleep(0.1)
+        return ''
+
+    # NOTE: only present to support apiV1 non-blocking by default behavior
+    def legacy_set_temperature(self, celsius) -> str:
         self.run_flag.wait()
         celsius = round(float(celsius),
                         utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
@@ -248,7 +264,7 @@ class TempDeck:
                 GCODES['GET_TEMP'],
                 tag=f'tempdeck {id(self)} rut')
             res = utils.parse_temperature_response(
-                  res, utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
+                res, utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
             self._temperature.update(res)
             return None
         except utils.ParseError as e:

@@ -17,7 +17,7 @@ class SimulatingDriver:
         self._active = False
         self._port = None
 
-    def set_temperature(self, celsius):
+    async def set_temperature(self, celsius):
         self._target_temp = celsius
         self._active = True
 
@@ -120,7 +120,7 @@ class TempDeck(mod_abc.AbstractModule):
         self._device_info = None
         self._poller = None
 
-    def set_temperature(self, celsius):
+    async def set_temperature(self, celsius):
         """
         Set temperature in degree Celsius
         Range: 4 to 95 degree Celsius (QA tested).
@@ -128,18 +128,11 @@ class TempDeck(mod_abc.AbstractModule):
         temperature display. Any input outside of this range will be clipped
         to the nearest limit
         """
-        return self._driver.set_temperature(celsius)
+        return await self._driver.set_temperature(celsius)
 
     def deactivate(self):
         """ Stop heating/cooling and turn off the fan """
         self._driver.deactivate()
-
-    async def wait_for_temp(self):
-        """
-        This method exits only if set temperature has reached.Subject to change
-        """
-        while self.status != 'holding at target':
-            await asyncio.sleep(0.1)
 
     @property
     def device_info(self):

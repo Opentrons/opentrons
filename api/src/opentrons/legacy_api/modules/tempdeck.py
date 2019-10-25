@@ -16,6 +16,7 @@ class TempDeck(commands.CommandPublisher):
     """
     Under development. API subject to change without a version bump
     """
+
     def __init__(self, lw=None, port=None, broker=None):
         super().__init__(broker)
         self.labware = lw
@@ -34,7 +35,7 @@ class TempDeck(commands.CommandPublisher):
         to the nearest limit
         """
         if self._driver and self._driver.is_connected():
-            self._driver.set_temperature(celsius)
+            self._driver.legacy_set_temperature(celsius)
 
     @commands.publish.both(command=commands.tempdeck_deactivate)
     def deactivate(self):
