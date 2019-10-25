@@ -2,6 +2,7 @@
 import * as React from 'react'
 import i18n from '../../../localization'
 import { CheckboxField, DropdownField, FormGroup } from '@opentrons/components'
+import { ModuleDiagram } from '../../modules'
 
 import styles from './FilePipettesModal.css'
 
@@ -13,12 +14,6 @@ type Props = {|
   onFieldChange: (type: ModuleType, value: boolean) => mixed,
 |}
 
-const MODULE_IMG_BY_NAME = {
-  magdeck: require('../../../images/modules/magdeck.jpg'),
-  tempdeck: require('../../../images/modules/tempdeck.jpg'),
-  thermocycler: require('../../../images/modules/thermocycler.jpg'),
-}
-
 export default function ModuleFields(props: Props) {
   const { onFieldChange, values } = props
   const modules = Object.keys(values)
@@ -29,9 +24,7 @@ export default function ModuleFields(props: Props) {
   return (
     <div className={styles.modules_row}>
       {modules.map((moduleType, i) => {
-        const label = i18n.t(
-          `modal.new_protocol.module_display_names.${moduleType}`
-        )
+        const label = i18n.t(`modules.module_display_names.${moduleType}`)
         return (
           <div className={styles.module_form_group} key={`${moduleType}`}>
             <CheckboxField
@@ -40,7 +33,7 @@ export default function ModuleFields(props: Props) {
               onChange={handleOnDeckChange(moduleType)}
               tabIndex={i}
             />
-            <img src={MODULE_IMG_BY_NAME[moduleType]} alt={`${moduleType}`} />
+            <ModuleDiagram type={moduleType} />
             {/*
               TODO (ka 2019-10-22): This field is disabled until Gen 2 Modules are available
               - Until then, 'GEN1' is hardcoded
