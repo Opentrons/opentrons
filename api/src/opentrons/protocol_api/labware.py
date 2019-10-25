@@ -11,6 +11,7 @@ import logging
 import json
 import re
 import time
+import os
 import pkgutil
 import shutil
 import sys
@@ -1154,6 +1155,22 @@ def get_labware_definition(
 
     return _get_standard_labware_definition(
         load_name, namespace, version)
+
+
+def get_all_labware_definitions():
+    """
+    Return a list of standard and custom labware definitions with load_name +
+        name_space + version existing on the robot
+    """
+    labware_list = []
+    for dir in os.scandir(STANDARD_DEFS_PATH):
+        labware_list.append(dir.name) if dir.is_dir() else None
+
+    for subdir in os.scandir(CONFIG['labware_user_definitions_dir_v2']):
+        if subdir.is_dir():
+            for dir in os.scandir(subdir):
+                labware_list.append(dir.name) if dir.is_dir() else None
+    return labware_list
 
 
 def load(
