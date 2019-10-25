@@ -3,19 +3,18 @@
 This should not be imported directly; it is used to provide backwards
 compatible singletons in opentrons/__init__.py.
 """
+import os
+import shutil
 import logging
 import importlib.util
 from typing import List, TYPE_CHECKING
 
-from opentrons.data_storage import database as db_cmds
-from opentrons.config import CONFIG
 from opentrons.protocol_api.legacy_wrapper.containers_wrapper import (
     LW_TRANSLATION,
-    MODULE_BLACKLIST,
     LW_NO_EQUIVALENT,
-    create_new_labware_definition)
-from opentrons.protocol_api.labware import save_definition
-from opentrons.config.pipette_config import config_models
+    perform_migration)
+
+from opentrons.config import pipette_config, CONFIG
 from opentrons.types import Mount
 from ..labware import Labware
 from .robot_wrapper import Robot
@@ -89,7 +88,7 @@ class AddInstrumentCtors(type):
     def __new__(cls, name, bases, namespace, **kwds):
         """ Add the pipette initializer functions to the class. """
         res = type.__new__(cls, name, bases, namespace)
-        for config in config_models:
+        for config in pipette_config.config_models:
             # Split the long name with the version
             comps = config.split('_')
             # To get the name without the version
@@ -208,20 +207,18 @@ def build_globals(context: 'ProtocolContext'):
     return {'robot': rob, 'instruments': instr, 'labware': lw, 'modules': mod}
 
 
-def perform_migration():
-    path_to_save_defs = CONFIG['labware_user_definitions_dir_v2']
-
-    all_containers = filter(
-        lambda lw: lw not in MODULE_BLACKLIST,
-        db_cmds.list_all_containers())
-    labware_to_create = filter(
-        lambda x: x not in LW_TRANSLATION.keys(),
-        all_containers)
-
-    for lw_name in labware_to_create:
-        log.debug(f"Migrating {lw_name} to API v2 format")
-        labware = db_cmds.load_container(lw_name)
-        if labware.wells():
-            labware_def = create_new_labware_definition(labware, lw_name)
-            save_definition(labware_def, location=path_to_save_defs)
-    log.info("Migration of API V1 labware complete.")
+def maybe_migrate_containers():
+    result = False
+    if os.environ.get('MIGRATE_V1_LABWARE') and\
+            os.path.exists(CONFIG['labware_database_file']):
+        print("we in it")
+        try:
+            result = perform_migration()
+        except (IndexError, ValueError, KeyError):
+            delete_dir = CONFIG['labware_user_definitions_dir_v2']/'legacy_api'
+            if os.path.exists(delete_dir):
+                shutil.rmtree(delete_dir)
+            log.warning('Failed to perform database migration,',
+                        'please try again.')
+    if result:
+        os.remove(CONFIG['labware_database_file'])

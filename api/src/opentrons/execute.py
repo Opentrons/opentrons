@@ -10,8 +10,6 @@ import argparse
 import asyncio
 import logging
 import sys
-import os
-import shutil
 import threading
 from typing import Any, Callable, Dict, Optional, TextIO
 
@@ -19,7 +17,7 @@ from opentrons import protocol_api, __version__
 from opentrons.protocol_api import execute as execute_apiv2
 from opentrons.protocol_api.legacy_wrapper import api
 from opentrons import commands
-from opentrons.config import CONFIG, feature_flags as ff
+from opentrons.config import feature_flags as ff
 from opentrons.protocols.parse import parse
 from opentrons.protocols.types import JsonProtocol, PythonProtocol
 from opentrons.hardware_control import API
@@ -268,19 +266,8 @@ def main() -> int:
         log_level = args.log_level
     else:
         log_level = 'warning'
-
-    if os.environ.get('MIGRATE_V1_LABWARE') and\
-            os.path.exists(CONFIG['labware_database_file']):
-        try:
-            api.perform_migration()
-        except RuntimeError:
-            delete_dir = CONFIG['labware_user_definitions_dir_v2']/'legacy_api'
-            if os.path.exists(delete_dir):
-                shutil.rmtree(delete_dir)
-            raise RuntimeError('Failed to perform database migration,',
-                               'any custom labware from API V1 is lost.')
-        finally:
-            os.remove(CONFIG['labware_database_file'])
+    # Try to migrate containers from database to v2 format
+    api.maybe_migrate_containers()
     execute(args.protocol, log_level=log_level, emit_runlog=printer)
     return 0
 

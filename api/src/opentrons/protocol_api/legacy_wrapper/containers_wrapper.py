@@ -1,6 +1,9 @@
 import logging
 from typing import Any, Dict
 
+from opentrons.data_storage import database as db_cmds
+from opentrons.protocol_api.labware import save_definition
+from opentrons.config import CONFIG
 from opentrons.legacy_api.containers.placeable import Container, Well
 
 from .util import log_call
@@ -73,7 +76,8 @@ def _determine_well_names(labware: Container):
 def _format_labware_definition(labware: Container, labware_name: str)\
         -> Dict[str, Any]:
     lw_dict: Dict[str, Any] = {}
-    is_tiprack = True if 'tip' in labware_name else False
+    converted_labware_name = labware_name.replace("-", "_")
+    is_tiprack = True if 'tip' in converted_labware_name else False
 
     # Definition Metadata
     lw_dict['brand'] = {'brand': 'opentrons'}
@@ -81,20 +85,20 @@ def _format_labware_definition(labware: Container, labware_name: str)\
     lw_dict['version'] = 1
     lw_dict['namespace'] = 'legacy_api'
     lw_dict['metadata'] = {
-        'displayName': labware_name,
+        'displayName': converted_labware_name,
         'displayCategory': 'tipRack' if is_tiprack else 'other',
-        'displayVolumeUnits': 'uL'}
+        'displayVolumeUnits': 'µL'}
 
     wells, first_well = _determine_well_names(labware)
 
     # Labware Information
-    lw_dict['groups'] = {
+    lw_dict['groups'] = [{
         'wells': wells,
-        'metadata': {}}
+        'metadata': {}}]
     lw_dict['parameters'] = {
         'format': 'irregular',
         'isMagneticModuleCompatible': False,
-        'loadName': labware_name,
+        'loadName': converted_labware_name,
         'isTiprack': is_tiprack}
     if is_tiprack:
         lw_dict['parameters']['tipLength'] = labware._coordinates['z']
@@ -152,6 +156,26 @@ def create_new_labware_definition(labware: Container, labware_name: str):
                 well.properties.get('width')
             lw_dict['wells'][well_name]['shape'] = 'rectangular'
     return lw_dict
+
+
+def perform_migration():
+    path_to_save_defs = CONFIG['labware_user_definitions_dir_v2']
+
+    all_containers = filter(
+        lambda lw: lw not in MODULE_BLACKLIST,
+        db_cmds.list_all_containers())
+    labware_to_create = filter(
+        lambda x: x not in LW_TRANSLATION.keys(),
+        all_containers)
+
+    for lw_name in labware_to_create:
+        log.debug(f"Migrating {lw_name} to API v2 format")
+        labware = db_cmds.load_container(lw_name)
+        if labware.wells():
+            labware_def = create_new_labware_definition(labware, lw_name)
+            save_definition(labware_def, location=path_to_save_defs)
+    log.info("Migration of API V1 labware complete.")
+    return True
 
 
 @log_call(log)

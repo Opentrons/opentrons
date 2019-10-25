@@ -2,7 +2,6 @@
 
 import asyncio
 import logging
-import os
 import shutil
 import tempfile
 import threading
@@ -99,20 +98,8 @@ def init(hardware: 'HardwareAPILike' = None,
                      If not specified, the server will use
                      :py:attr:`opentrons.hardware`
     """
-
-    if os.environ.get('MIGRATE_V1_LABWARE') and\
-            os.path.exists(CONFIG['labware_database_file']):
-        try:
-            api.perform_migration()
-        except RuntimeError:
-            delete_dir = CONFIG['labware_user_definitions_dir_v2']/'legacy_api'
-            if os.path.exists(delete_dir):
-                shutil.rmtree(delete_dir)
-            raise RuntimeError('Failed to perform database migration,',
-                               'any custom labware from API V1 is lost.')
-        finally:
-            os.remove(CONFIG['labware_database_file'])
-
+    # Try to migrate containers from database to v2 format
+    api.maybe_migrate_containers()
     app = web.Application(middlewares=[error_middleware])
     app['com.opentrons.hardware'] = hardware
     app['com.opentrons.motion_lock'] = ThreadedAsyncLock()
