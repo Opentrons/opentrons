@@ -79,21 +79,3 @@ def test_simulate_function_apiv1(ensure_api1, protocol, protocol_file):
         'Dispensing 10 uL into well H12 in "11"',
         'Dropping tip well A1 in "12"'
     ]
-
-
-@pytest.mark.api1_only
-def test_simulate_function_json_apiv1(ensure_api1,
-                                      get_json_protocol_fixture):
-    jp = get_json_protocol_fixture('3', 'simple', False)
-    filelike = io.StringIO(jp)
-    runlog, bundle = simulate.simulate(filelike, 'simple.json')
-    assert bundle is None
-    assert [item['payload']['text'] for item in runlog] == [
-        'Picking up tip well B1 in "1"',
-        'Aspirating 5 uL from well A1 in "2" at 1.0 speed',
-        'Delaying for 0:00:42',
-        'Dispensing 4.5 uL into well B1 in "3"',
-        'Touching tip',
-        'Blowing out at well B1 in "3"',
-        'Dropping tip well A1 in "12"'
-    ]

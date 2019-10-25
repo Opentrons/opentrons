@@ -18,6 +18,7 @@ import opentrons
 import opentrons.commands
 import opentrons.broker
 import opentrons.config
+from opentrons import protocol_api
 from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import (
     JsonProtocol, PythonProtocol, BundleContents)
@@ -99,6 +100,46 @@ class CommandScraper:
             while not self._queue.empty():
                 self._commands[-1]['logs'].append(self._queue.get())
             self._depth = max(self._depth-1, 0)
+
+
+def get_protocol_api(
+        protocol=None,
+        bundled_labware: Dict[str, Dict[str, Any]] = None,
+        bundled_data: Dict[str, bytes] = None) -> protocol_api.ProtocolContext:
+    """
+    Build and return a :py:class:`ProtocolContext`connected to
+    Virtual Smoothie.
+
+    This can be used to run protocols from interactive Python sessions
+    such as Jupyter or an interpreter on the command line:
+
+    .. code-block:: python
+
+        >>> from opentrons.simulate import get_protocol_api
+        >>> protocol = get_protocol_api()
+        >>> instr = protocol.load_instrument('p300_single', 'right')
+        >>> instr.home()
+
+    :param bundled_labware: If specified, a mapping from labware names to
+                            labware definitions for labware to consider in the
+                            protocol. Note that if you specify this, _only_
+                            labware in this argument will be allowed in the
+                            protocol. This is preparation for a beta feature
+                            and is best not used.
+    :param bundled_data: If specified, a mapping from filenames to contents
+                         for data to be available in the protocol from
+                         :py:attr:`.ProtocolContext.bundled_data`.
+
+    :returns opentrons.protocol_api.ProtocolContext: The protocol context.
+    """
+    if protocol:
+        bundled_labware = getattr(protocol, 'bundled_labware', None)
+        bundled_data = getattr(protocol, 'bundled_data', None)
+    context = protocol_api.contexts.ProtocolContext(
+        bundled_labware=bundled_labware,
+        bundled_data=bundled_data)
+    context.home()
+    return context
 
 
 def bundle_from_sim(
@@ -206,21 +247,8 @@ def simulate(protocol_file: TextIO,
                            extra_labware=extra_labware,
                            extra_data=extra_data)
 
-    if opentrons.config.feature_flags.use_protocol_api_v2():
-        if isinstance(protocol, PythonProtocol)\
-           and protocol.api_level == '1'\
-           and not opentrons.config.feature_flags.enable_backcompat():
-            raise RuntimeError(
-                'This protocol targets Protocol API V1, but the robot is '
-                'set to Protocol API V2. If this is actually a V2 '
-                'protocol, please set the \'apiLevel\' to \'2\' in the '
-                'metadata. If you do not want to be on API V2, please '
-                'disable the \'Use Protocol API version 2\' toggle in the '
-                'robot\'s Advanced Settings and restart the robot.')
-        context = opentrons.protocol_api.contexts.ProtocolContext(
-            bundled_labware=getattr(protocol, 'bundled_labware', None),
-            bundled_data=getattr(protocol, 'bundled_data', None))
-        context.home()
+    if isinstance(protocol, JsonProtocol) or protocol.api_level == '2':
+        context = get_protocol_api(protocol)
         scraper = CommandScraper(stack_logger, log_level, context.broker)
         execute.run_protocol(protocol,
                              simulate=True,
