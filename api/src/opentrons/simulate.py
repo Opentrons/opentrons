@@ -17,7 +17,7 @@ from typing import Any, Dict, List, Mapping, TextIO, Tuple, BinaryIO, Optional
 import opentrons
 import opentrons.commands
 import opentrons.broker
-import opentrons.config
+from opentrons.config import feature_flags as ff
 from opentrons import protocol_api
 from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import (
@@ -247,7 +247,9 @@ def simulate(protocol_file: TextIO,
                            extra_labware=extra_labware,
                            extra_data=extra_data)
 
-    if isinstance(protocol, JsonProtocol) or protocol.api_level == '2':
+    if isinstance(protocol, JsonProtocol)\
+            or protocol.api_level == '2'\
+            or (ff.enable_backcompat() and ff.use_protocol_api_v2()):
         context = get_protocol_api(protocol)
         scraper = CommandScraper(stack_logger, log_level, context.broker)
         execute.run_protocol(protocol,
@@ -368,7 +370,7 @@ def get_arguments(
         help='Specify the level filter for logs to show on the command line. '
         'Log levels below warning can be chatty. If "none", do not show logs')
 
-    if opentrons.config.feature_flags.use_protocol_api_v2():
+    if ff.use_protocol_api_v2():
         parser = _get_bundle_args(parser)
 
     parser.add_argument(
