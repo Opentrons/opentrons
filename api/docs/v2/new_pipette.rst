@@ -71,23 +71,23 @@ model names specified above.
 Pipette Back Compatibility
 ==========================
 
-Because the Gen 2 pipette behave similarly to the Gen 1 pipettes, if you specify a Gen 1 pipette
-in your protocol (for instance, ``'p300_single'`` but have a Gen 2 pipette attached (for instance,
+Because the Gen 2 pipettes behave similarly to the Gen 1 pipettes, if you specify a Gen 1 pipette
+in your protocol (for instance, ``'p300_single'``) but have a Gen 2 pipette attached (for instance,
 ``'p300_single_gen2'``), you can still run your protocol. The robot will consider the Gen 2
 pipette to have the same minimum volume as the Gen 1 pipette, so any advanced commands have the
 same behavior as before.
 
-The P20 Single Gen2 is back-compatible with the P10 Single in this regard. If your protocol
+The P20 Single GEN2 is back-compatible with the P10 Single in this regard. If your protocol
 specifies a ``'p10_single'`` and your robot has a ``'p20_single_gen2'`` attached, you can run
 your protocol, and the robot will act as if the maximum volume of the P20 Single Gen2 is 10 μl.
 
 If you have a P50 Single specified in your protocol, there is no automatic backwards compatibility.
-If you want to use a Gen2 Pipette, you must change your protocol to load either a P300 Single Gen2
-(if you are using volumes between 20 and 50 μl) or a P20 Single Gen2 (if you are using volumes
+If you want to use a Gen2 Pipette, you must change your protocol to load either a P300 Single GEN2
+(if you are using volumes between 20 and 50 μl) or a P20 Single GEN2 (if you are using volumes
 below 20 μl).
 
 
-ADDING Tip Racks
+Adding Tip Racks
 ================
 :py:meth:`.ProtocolContext.load_instrument` has one important optional parameter: ``tipracks``.
 This parameter accepts a *list* of tiprack labware objects, allowing you to specify as many

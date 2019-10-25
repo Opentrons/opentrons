@@ -31,23 +31,38 @@ They are as follows:
 - ``P300_Single`` (30 - 300ul)
 - ``P300_Mutli`` (30 - 300ul)
 - ``P1000_Single`` (100 - 1000ul)
-- ``P20_Single`` (1 - 20ul)
-- ``P300_Single_Gen2`` (20 - 300ul)
-- ``P1000_Single_Gen2`` (100 - 1000ul)
+- ``P20_Single_GEN2`` (1 - 20ul)
+- ``P300_Single_GEN2`` (20 - 300ul)
+- ``P1000_Single_GEN2`` (100 - 1000ul)
 
 
 For every pipette type you are using in a protocol, you must use one of the
 model names specified above and call it out as ``instruments.(Model Name)``.
-
-Mount
-===================
-
-To create a pipette object, you must give it a mount. The mount can be either ``'left'`` or ``'right'``.
+You must also specify a mount. The mount can be either ``'left'`` or ``'right'``.
 In this example, we are using a Single-Channel 300uL pipette.
 
 .. code-block:: python
 
     pipette = instruments.P300_Single(mount='left')
+
+Pipette GEN2 Backwards Compatibility
+====================================
+
+Because the Gen 2 pipettes behave similarly to the Gen 1 pipettes, if you specify a Gen 1 pipette
+in your protocol (for instance, ``instruments.P300_Single``) but have a Gen 2 pipette attached (for instance,
+``instruments.P300_Single_GEN2``), you can still run your protocol. The robot will consider the Gen 2
+pipette to have the same minimum volume as the Gen 1 pipette, so any advanced commands have the
+same behavior as before.
+
+The P20 Single GEN2 is back-compatible with the P10 Single in this regard. If your protocol
+specifies an ``instruments.P10_Single`` and your robot has an ``instruments.P20_Single_GEN2``
+attached, you can run your protocol, and the robot will act as if the maximum volume of the P20
+Single GEN2 is 10 μl.
+
+If you have a P50 Single specified in your protocol, there is no automatic backwards compatibility.
+If you want to use a Gen2 Pipette, you must change your protocol to load either a P300 Single GEN2
+(if you are using volumes between 20 and 50 μl) or a P20 Single GEN2 (if you are using volumes
+below 20 μl).
 
 
 Plunger Flow Rates
@@ -146,7 +161,7 @@ P1000_Single
 - Minimum Volume: 100 μl
 - Maximum Volume: 1000 μl
 
-P20_Single_Gen2
+P20_Single_GEN2
 ---------------
 
 - Aspirate Default: 3.78 μl/s
@@ -155,7 +170,7 @@ P20_Single_Gen2
 - Minimum Volume: 1 μl
 - Maximum Volume: 20 μl
 
-P300_Single_Gen2
+P300_Single_GEN2
 ----------------
 
 - Aspirate Default: 46.43 μl/s
@@ -164,7 +179,7 @@ P300_Single_Gen2
 - Minimum Volume: 20 μl
 - Maximum Volume: 300 μl
 
-P1000_Single_Gen2
+P1000_Single_GEN2
 -----------------
 
 - Aspirate Default: 137.35 μl/s
