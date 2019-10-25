@@ -10,7 +10,7 @@ export * from './resources/types'
 
 export type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE'
 
-export type RequestMeta = { [string]: mixed }
+export type RequestMeta = $Shape<{| [string]: mixed |}>
 
 // api call + response types
 
@@ -53,9 +53,7 @@ export type RobotApiAction =
       meta: {| id: string |},
     |}
   | {| type: 'robotApi:FETCH_PIPETTES', payload: RobotApiRequest |}
-  | {| type: 'robotApi:FETCH_SETTINGS', payload: RobotApiRequest |}
   | {| type: 'robotApi:FETCH_PIPETTE_SETTINGS', payload: RobotApiRequest |}
-  | {| type: 'robotApi:SET_SETTINGS', payload: RobotApiRequest |}
   | {|
       type: 'robotApi:SET_PIPETTE_SETTINGS',
       payload: RobotApiRequest,

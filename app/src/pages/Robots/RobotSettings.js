@@ -18,6 +18,7 @@ import {
 
 import { makeGetRobotHome, clearHomeResponse } from '../../http-api-client'
 import { getRobotRestarting } from '../../robot-admin'
+import { getRobotRestartRequired } from '../../robot-settings'
 
 import { SpinnerModalPage } from '@opentrons/components'
 import { ErrorModal } from '../../components/modals'
@@ -29,6 +30,7 @@ import UpdateBuildroot from '../../components/RobotSettings/UpdateBuildroot'
 import CalibrateDeck from '../../components/CalibrateDeck'
 import ConnectBanner from '../../components/RobotSettings/ConnectBanner'
 import ReachableRobotBanner from '../../components/RobotSettings/ReachableRobotBanner'
+import RestartRequiredBanner from '../../components/RobotSettings/RestartRequiredBanner'
 import ResetRobotModal from '../../components/RobotSettings/ResetRobotModal'
 
 import type { ContextRouter } from 'react-router-dom'
@@ -48,6 +50,7 @@ type SP = {|
   homeInProgress: ?boolean,
   homeError: ?Error,
   updateInProgress: boolean,
+  restartRequired: boolean,
   restarting: boolean,
 |}
 
@@ -82,6 +85,7 @@ function RobotSettingsPage(props: Props) {
     closeConnectAlert,
     showUpdateModal,
     updateInProgress,
+    restartRequired,
     restarting,
     match: { path, url },
   } = props
@@ -102,6 +106,9 @@ function RobotSettingsPage(props: Props) {
         )}
         {robot.status === CONNECTABLE && (
           <ConnectBanner {...robot} key={Number(robot.connected)} />
+        )}
+        {restartRequired && !restarting && (
+          <RestartRequiredBanner robot={robot} />
         )}
 
         <RobotSettings
@@ -195,7 +202,6 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
     const buildrootUpdateType = getBuildrootUpdateAvailable(state, robot)
     const updateInProgress = getBuildrootUpdateInProgress(state, robot)
     const currentBrRobot = getBuildrootRobot(state)
-    const restarting = getRobotRestarting(state, robot.name)
 
     const showUpdateModal =
       updateInProgress ||
@@ -205,7 +211,8 @@ function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
 
     return {
       updateInProgress,
-      restarting,
+      restarting: getRobotRestarting(state, robot.name),
+      restartRequired: getRobotRestartRequired(state, robot.name),
       showUpdateModal: !!showUpdateModal,
       homeInProgress: homeRequest && homeRequest.inProgress,
       homeError: homeRequest && homeRequest.error,

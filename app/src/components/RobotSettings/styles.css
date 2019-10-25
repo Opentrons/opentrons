@@ -85,3 +85,12 @@
   position: fixed;
   clip: rect(1px 1px 1px 1px);
 }
+
+.restart_banner_message {
+  display: flex;
+
+  & > p {
+    max-width: 24rem;
+    margin-right: auto;
+  }
+}
