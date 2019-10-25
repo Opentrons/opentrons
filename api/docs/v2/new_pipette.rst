@@ -139,6 +139,8 @@ Modifying Pipette Behaviors
 The OT-2 has many default behaviors that are occasionally appropriate to change for
 a particular experiment or liquid. This section details those behaviors.
 
+.. _new-plunger-flow-rates:
+
 Plunger Flow Rates
 ==================
 
@@ -271,6 +273,30 @@ the overall speed of the gantry. Its default is 400 mm/s.
         # Move to 50mm above the front left of slot 9, much more slowly
         pipette.move_to(protocol.deck.position_for('9').move(types.Point(z=50)))
 
+
+Per-Axis Speed Limits
+=====================
+
+In addition to controlling the overall speed of motions, you can set per-axis speed limits
+for the OT-2's axes. Unlike the overall speed, which is controlled per-instrument, axis
+speed limits take effect for both pipettes and all motions. These can be set for the
+``X`` (left-and-right gantry motion), ``Y`` (forward-and-back gantry motion), ``Z``
+(left pipette up-and-down motion), and ``A`` (right pipette up-and-down motion) using
+:py:attr:`.ProtocolContext.max_speeds`. This works like a dictionary, where the keys are
+axes, assigning to a key sets a max speed, and deleting a key or setting it to ``None``
+resets that axis's limit to the default:
+
+.. code-block:: python
+
+    def run(protocol):
+        protocol.max_speeds['X'] = 50  # limit x axis to 50 mm/s
+        del protocol.max_speeds['X']  # reset x axis limit
+        protocol.max_speeds['A'] = 10  # limit a axis to 10 mm/s
+        protocol.max_speeds['A'] = None  # reset a axis limit
+
+
+You cannot set limits for the pipette plunger axes with this mechanism; instead, set the
+flow rates or plunger speeds as described in :ref:`new-plunger-flow-rates`.
 
 .. _defaults:
 
