@@ -29,7 +29,7 @@ They are as follows:
 - ``P50_Single`` (5 - 50ul)
 - ``P50_Multi`` (5 - 50ul)
 - ``P300_Single`` (30 - 300ul)
-- ``P300_Mutli`` (30 - 300ul)
+- ``P300_Multi`` (30 - 300ul)
 - ``P1000_Single`` (100 - 1000ul)
 - ``P20_Single_GEN2`` (1 - 20ul)
 - ``P300_Single_GEN2`` (20 - 300ul)
