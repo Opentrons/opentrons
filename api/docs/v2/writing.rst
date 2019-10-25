@@ -93,6 +93,9 @@ You must make sure that you install the `opentrons` package for whichever kernel
 Simulating Your Scripts
 =======================
 
+From the Command Line
++++++++++++++++++++++
+
 Once the Opentrons Python package is installed, you can simulate protocols in your terminal using the ``opentrons_simulate`` command:
 
 .. code-block:: shell
@@ -109,6 +112,9 @@ The simulator will print out a log of the actions the protocol will cause, simil
 
 The simulation script can also be invoked through python with ``python -m opentrons.simulate /path/to/protocol``.
 
+In Python
++++++++++
+
 This also provides an entrypoint to use the Opentrons simulation package from other Python contexts such as an interactive prompt or Jupyter. To simulate a protocol in python, open a file containing a protocol and pass it to ``opentrons.simulate.simulate``:
 
 .. code-block:: python
@@ -119,6 +125,24 @@ This also provides an entrypoint to use the Opentrons simulation package from ot
    print(format_runlog(runlog))
 
 The :py:meth:`opentrons.simulate.simulate` method does the work of simulating the protocol and returns the run log, which is a list of structured dictionaries. :py:meth:`opentrons.simulate.format_runlog` turns that list of dictionaries into a human readable string, which is then printed out. For more information on the protocol simulator, see :ref:`simulate-block`.
+
+Using Jupyter
++++++++++++++
+
+In your Jupyter notebook, you can use the Opentrons Protocol API simulator by doing
+
+.. code-block:: python
+
+    from opentrons import simulate
+    protocol = simulate.get_protocol_api()
+    left = protocol.load_instrument('p300_single', 'right')
+    ...
+
+The ``protocol`` object, which is an instance of :py:class:`.ProtocolContext`, is the same thing that gets passed to your protocol's ``run`` function, but set to simulate rather than control a robot. You can call all your protocol's functions on that object.
+
+If you have a full protocol, wrapped inside a ``run`` function, defined in a Jupyter cell you can also use :py:meth:`opentrons.simulate.simulate` as described above to simulate the protocol.
+
+These instructions also work on the robot's Jupyter notebook.
 
 
 Configuration and Local Storage
@@ -133,4 +157,4 @@ The module uses a folder in your user directory as a place to store and read con
 Robot’s Jupyter Notebook
 ************************
 
-Your OT-2 also has a Jupyter notebook, which you can use to develop and execute protocols. For more information on how to use the robot's Jupyter notebook, please see :ref:`advanced-control`.
+Your OT-2 also has a Jupyter notebook, which you can use to develop and execute protocols. For more information on how to execute protocols using the robot's Jupyter notebook, please see :ref:`advanced-control`. To simulate protocols on the robot's jupyter notebook, use the instructions above.
