@@ -111,7 +111,6 @@ async def test_update_module_firmware(
         async_server):
 
     client = async_client
-    hw = async_server['com.opentrons.hardware']._api
     serial_num = 'dummySerialTC'
     fw_filename = 'dummyFirmware.hex'
     tmpdir = tempfile.mkdtemp("files")
@@ -161,7 +160,6 @@ async def test_fail_update_module_firmware(
         async_server):
 
     client = async_client
-    hw = async_server['com.opentrons.hardware']._api
     serial_num = 'dummySerialTC'
     fw_filename = 'dummyFirmware.hex'
     tmpdir = tempfile.mkdtemp("files")

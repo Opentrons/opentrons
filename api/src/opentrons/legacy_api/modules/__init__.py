@@ -1,11 +1,10 @@
 import os
 import logging
 import re
-import asyncio
 from typing import List, Tuple, Any
 from .magdeck import MagDeck
 from .tempdeck import TempDeck
-from opentrons import HERE as package_root, config
+from opentrons import config
 
 log = logging.getLogger(__name__)
 

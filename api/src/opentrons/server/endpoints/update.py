@@ -2,7 +2,6 @@ import logging
 import asyncio
 import tempfile
 from aiohttp import web
-from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import modules
 
 
@@ -28,9 +27,9 @@ async def update_module_firmware(request):
     """
      This handler accepts a POST request with Content-Type: multipart/form-data
      and a file field in the body named "module_firmware". The file should
-     be a valid HEX/binary image to be flashed to the module. The received file is
-     sent via USB to the board and flashed by the bootloader. The file
-     is then deleted and a success code is returned
+     be a valid HEX/binary image to be flashed to the module. The received
+     file is sent via USB to the board and flashed by the bootloader.
+     The file is then deleted and a success code is returned
     """
     log.debug('Update Firmware request received')
     data = await request.post()

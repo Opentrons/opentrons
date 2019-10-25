@@ -156,7 +156,9 @@ async def test_enter_bootloader(
     monkeypatch.setattr(
         TempDeckDriver, 'enter_programming_mode', mock_enter_programming_mode)
     monkeypatch.setattr(
-        hw_modules.update, '_discover_ports', mock_discover_ports_before_dfu_mode)
+        hw_modules.update,
+        '_discover_ports',
+        mock_discover_ports_before_dfu_mode)
     monkeypatch.setattr(hw_modules.update, '_port_poll', mock_port_poll)
 
     bootloader_port = await hw_modules.update.enter_bootloader(
