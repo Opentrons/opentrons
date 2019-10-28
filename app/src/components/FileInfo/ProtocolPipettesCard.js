@@ -3,7 +3,6 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import every from 'lodash/every'
-import map from 'lodash/map'
 import some from 'lodash/some'
 
 import { Icon } from '@opentrons/components'
@@ -62,7 +61,7 @@ function ProtocolPipettes(props: Props) {
               {protocol.displayName}
             </InstrumentItem>
           )
-        })}
+        }).filter(Boolean)}
       </SectionContentHalf>
       {!allPipettesMatch && (
         <MissingItemWarning
