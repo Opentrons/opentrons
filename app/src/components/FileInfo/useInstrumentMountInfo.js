@@ -6,18 +6,27 @@ import {
   selectors as robotSelectors,
   constants as robotConstants,
   type Pipette,
+  type Mount,
 } from '../../robot'
 import { getPipettesState, type PipettesState } from '../../robot-api'
 import {
   getPipetteModelSpecs,
   getPipetteNameSpecs,
+  type PipetteModelSpecs,
 } from '@opentrons/shared-data'
 
 export type PipetteCompatibility = 'match' | 'inexact_match' | 'incompatible'
 
 type InstrumentMountInfo = {
-  actual: Pipette,
-  protocol: Pipette,
+  actual: {
+    ...PipettesState,
+    displayName: string,
+  },
+  protocol: {
+    ...Pipette,
+    displayName: string,
+    modelSpecs: PipetteModelSpecs,
+  },
   compatibility: PipetteCompatibility,
 }
 const { PIPETTE_MOUNTS } = robotConstants
@@ -35,7 +44,9 @@ function pipettesAreInexactMatch(protocolInstrName, actualInstrName) {
   }
 }
 
-function useInstrumentMountInfo(robotName: string): InstrumentMountInfo {
+function useInstrumentMountInfo(
+  robotName: string
+): { [Mount]: InstrumentMountInfo } {
   const protocolInstruments = useSelector(robotSelectors.getPipettes)
   const actualInstruments = useSelector(state =>
     getPipettesState(state, robotName)
