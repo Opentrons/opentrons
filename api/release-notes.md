@@ -1,29 +1,38 @@
-# Robot OS Changes from 3.13.0 to 3.13.2
+# Robot OS Changes from 3.13.2 to 3.14.0
 
 For more details about this release, please see the full [technical change log][changelog]
 
 [changelog]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
 
+## Python Protocol API V2 Beta
+
+We're happy to announce the public beta of version 2 of our Python protocol API! You can set your robot to use this API with the "Use Protocol API version 2" advanced setting when connected to a robot.
+
+NOTE ADD LINKS TO THE INTERCOM DOCS HERE
+
+Documentation for the new API is available on [docs.opentrons.com][docs-v2-root]
+
+
+## Other Changes
+
+- You can now control your Temperature Module and Thermocycler from the Pipettes & Modules page in the Opentrons App
+- Switching between API v2 and API v1 will now prompt you to restart your robot
+- The robot software now supports our new generation of pipettes, coming soon.
+- You can specify the version of a labware definition to load in `labware.load`. Currently there is only one version of each labware definition, but that may change in the future. See [the documentation][labware-versioning-docs] for more details.
+
+
 ## Bug Fixes
-
-- Fixed an issue caused by an unexpected interaction between a hardware and software change that lead to head crashes when dropping tips in the trash
-
-# Robot OS Changes from 3.12.0 to 3.13.0
-
-## New Features
-
-- You can now load the Magnetic Module engage height from labware definitions instead of these values being hardcoded.
-
-## Bug Fixes
-
-- Some typos in our documentation were fixed.
-- Problems with pipette height following deck calibration have been fixed. If you ran the command-line variant of deck calibration in 3.12.0, you should rerun it after installing this update.
-- Fix was made to SSH key upload response message.
-- Fixed issues that could result in the MAC addresses of the robot's network interfaces changing over time. Disconnect from and reconnect to your current wireless network to get this change. Note that on this first disconnect and reconnect, the MAC address may change.
-- Fixed a second issue that could result in errors during attach pipette, which would manifest as unexpected homes.
-- Fixed an issue preventing the OT-2 from taking pictures
+- Fixed an issue where `mix` arguments were not being parsed correctly. All different optional arguments described in the docs now work
+- Fixed the definitions for the NEST tuberacks:  `opentrons_24_tuberack_nest_0.5ml_screwcap`, `opentrons_24_tuberack_nest_1.5ml_screwcap`, `opentrons_24_tuberack_nest_1.5ml_snapcap`, `opentrons_24_tuberack_nest_2ml_screwcap`, and `opentrons_24_tuberack_nest_2ml_snapcap`
+- If you specify both `touch_tip` and `blow_out` in a `transfer`, `consolidate`, or `distribute` the robot will now touch tip in a well and then blow out in the trash, rather than the reverse ([#419][419])
+- Fixed an issue where picking up tips in CLI deck calibration would lead to offsets when using pipettes other than P300 single Gen1 or P50 Single Gen1
+- Fixed an issue where the robot's Jupyter notebook would not start if you had previously created notebooks with spaces in their names
 
 ## Known Issues
 
 - While the underlying definition is correct, there is a known API bug that is causing the robot to think a "50 mL" tube in a "15 / 50 mL" tube rack is the same height as the "15 mL" tube
 - When attaching or detaching a pipette from the left mount, the robot homes twice in the X direction
+
+[419]: https://github.com/Opentrons/opentrons/issues/419
+[labware-versioning-docs]: https://docs.opentrons.com/v1/labware.html#labware-versions
+[docs-v2-root]: https://docs.opentrons.com//v2/index.html.

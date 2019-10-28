@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.14.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.13.2...v3.14.0-alpha.0) (2019-10-28)
+
+
+### Bug Fixes
+
+* **api,shared-data,labware-creator:** do not touch tip on troughs ([#4271](https://github.com/Opentrons/opentrons/issues/4271)) ([d7e76cd](https://github.com/Opentrons/opentrons/commit/d7e76cd)), closes [#4258](https://github.com/Opentrons/opentrons/issues/4258)
+* **shared-data:** swap X/Y spacing for 24-well nest tuberacks ([#4240](https://github.com/Opentrons/opentrons/issues/4240)) ([34330ed](https://github.com/Opentrons/opentrons/commit/34330ed))
+
+
+### Features
+
+* **api:** deprecate api support for JSON v1/2 ([#4155](https://github.com/Opentrons/opentrons/issues/4155)) ([61361a8](https://github.com/Opentrons/opentrons/commit/61361a8)), closes [#4128](https://github.com/Opentrons/opentrons/issues/4128)
+* **api:** v1: Add version specification to labware.load ([#4218](https://github.com/Opentrons/opentrons/issues/4218)) ([37060ce](https://github.com/Opentrons/opentrons/commit/37060ce)), closes [#4216](https://github.com/Opentrons/opentrons/issues/4216)
+* **shared-data:** add NEST labware ([#4156](https://github.com/Opentrons/opentrons/issues/4156)) ([0d2491d](https://github.com/Opentrons/opentrons/commit/0d2491d))
+
+
+
+
+
 ## [3.13.2](https://github.com/Opentrons/opentrons/compare/v3.13.1...v3.13.2) (2019-10-10)
 
 **Note:** Version bump only for package @opentrons/shared-data
