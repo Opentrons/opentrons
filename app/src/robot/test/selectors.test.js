@@ -376,6 +376,7 @@ describe('robot selectors', () => {
           probed: true,
           tipOn: false,
           modelSpecs: null,
+          requestedAs: null,
         },
         {
           mount: 'right',
@@ -385,6 +386,7 @@ describe('robot selectors', () => {
           probed: false,
           tipOn: true,
           modelSpecs: null,
+          requestedAs: null,
         },
       ])
     })
