@@ -2,6 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
+import i18n from '../../localization'
 import { STD_SLOT_X_DIM, STD_SLOT_Y_DIM } from '../../constants'
 import { getModuleVizDims } from './getModuleVizDims'
 import styles from './ModuleTag.css'
@@ -18,13 +19,6 @@ type Props = {|
 // eyeballed width/height to match designs
 const TAG_HEIGHT = 45
 const TAG_WIDTH = 60
-
-// TODO IMMEDIATELY use i18n
-const MODULE_SHORT_DISPLAY_NAMES = {
-  magdeck: 'magnetic',
-  tempdeck: 'temperature',
-  thermocycler: 'thermocycler',
-}
 
 const ModuleTag = (props: Props) => {
   const { childXOffset, childYOffset } = getModuleVizDims(
@@ -47,7 +41,7 @@ const ModuleTag = (props: Props) => {
       }}
     >
       <div className={cx(styles.module_info_type, styles.module_info_line)}>
-        {MODULE_SHORT_DISPLAY_NAMES[props.module.type]}
+        {i18n.t(`modules.module_display_names.${props.module.type}`)}
       </div>
 
       <div className={styles.module_info_line}>Placeholder Status</div>
