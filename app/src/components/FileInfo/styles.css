@@ -54,6 +54,10 @@
   color: var(--c-warning);
 }
 
+.instrument_warning.blocking {
+  color: var(--c-error);
+}
+
 .status_icon {
   width: 1.5rem;
   margin-right: 1rem;

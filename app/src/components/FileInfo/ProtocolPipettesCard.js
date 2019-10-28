@@ -6,7 +6,7 @@ import every from 'lodash/every'
 import map from 'lodash/map'
 import some from 'lodash/some'
 
-import { InstrumentGroup, Icon } from '@opentrons/components'
+import { Icon } from '@opentrons/components'
 import { constants as robotConstants } from '../../robot'
 import { fetchPipettes } from '../../robot-api'
 import InstrumentItem from './InstrumentItem'
@@ -20,8 +20,6 @@ import type { Dispatch } from '../../types'
 import type { Robot } from '../../discovery'
 
 type Props = {| robot: Robot |}
-
-const { PIPETTE_MOUNTS } = robotConstants
 
 const inexactPipetteSupportArticle = 'https://support.opentrons.com/ot-2'
 const TITLE = 'Required Pipettes'
@@ -60,7 +58,11 @@ function ProtocolPipettes(props: Props) {
         ))}
       </SectionContentHalf>
       {!allPipettesMatch && (
-        <MissingItemWarning instrumentType="pipette" url={changePipetteUrl} />
+        <MissingItemWarning
+          isBlocking
+          instrumentType="pipette"
+          url={changePipetteUrl}
+        />
       )}
       {allPipettesMatch && someInexactMatches && (
         <SectionContentHalf className={styles.soft_warning}>
