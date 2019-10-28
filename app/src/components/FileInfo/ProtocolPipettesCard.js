@@ -7,7 +7,6 @@ import map from 'lodash/map'
 import some from 'lodash/some'
 
 import { Icon } from '@opentrons/components'
-import { constants as robotConstants } from '../../robot'
 import { fetchPipettes } from '../../robot-api'
 import InstrumentItem from './InstrumentItem'
 import { SectionContentHalf } from '../layout'
