@@ -7,7 +7,7 @@ import {
   savedStepForms,
 } from '../reducers'
 import { moveDeckItem } from '../../labware-ingred/actions'
-import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import { INITIAL_DECK_SETUP_STEP_ID, SPAN7_8_10_11_SLOT } from '../../constants'
 import type { DeckSlot } from '../../types'
 
 jest.mock('../../labware-defs/utils')
@@ -206,7 +206,6 @@ describe('moduleInvariantProperties reducer', () => {
       type: 'CREATE_MODULE',
       payload: newModuleData,
     })
-    // TODO IMMEDIATELY: if module is created in slot that labware exists, put labware on module
     expect(result).toEqual({
       ...prevState,
       [newId]: {
@@ -229,7 +228,6 @@ describe('moduleInvariantProperties reducer', () => {
   })
 
   test('delete module', () => {
-    // TODO IMMEDIATELY: if module has labware, move labware to the deck slot the module is in (or for thermocycler, slot 7)
     const result = moduleInvariantProperties(prevState, {
       type: 'DELETE_MODULE',
       payload: { id: existingModuleId },
@@ -313,204 +311,228 @@ describe('savedStepForms reducer: initial deck setup step', () => {
   })
 
   describe('move deck item', () => {
-    // TODO IMMEDIATELY: never share slots, labware goes on module slot!
-    const sourceSlot = '1'
-    const destSlot = '3'
     const testCases: Array<{|
       testName: string,
+      sourceSlot: DeckSlot,
+      destSlot: DeckSlot,
       makeStateArgs: MakeDeckSetupStepArgs,
       expectedLabwareLocations?: Object,
       expectedModuleLocations?: Object,
     |}> = [
       {
         testName: 'move labware to empty slot -> simple move',
+        sourceSlot: '1',
+        destSlot: '3',
         makeStateArgs: {
           labwareLocationUpdate: {
-            [existingLabwareId]: sourceSlot,
+            [existingLabwareId]: '1',
           },
         },
         expectedLabwareLocations: {
-          [existingLabwareId]: destSlot,
+          [existingLabwareId]: '3',
         },
       },
       {
         testName: 'move labware to slot with labware -> swap labware',
+        sourceSlot: '1',
+        destSlot: '3',
         makeStateArgs: {
           labwareLocationUpdate: {
-            [existingLabwareId]: sourceSlot,
-            [otherLabwareId]: destSlot,
+            [existingLabwareId]: '1',
+            [otherLabwareId]: '3',
           },
         },
         expectedLabwareLocations: {
-          [existingLabwareId]: destSlot,
-          [otherLabwareId]: sourceSlot,
+          [existingLabwareId]: '3',
+          [otherLabwareId]: '1',
         },
       },
       {
-        testName:
-          'move labware to slot with empty module -> labware added to module',
+        testName: 'move labware empty module -> labware added to module',
+        sourceSlot: '1',
+        destSlot: moduleId,
         makeStateArgs: {
           labwareLocationUpdate: {
-            [existingLabwareId]: sourceSlot,
+            [existingLabwareId]: '1',
           },
           moduleLocationUpdate: {
-            [moduleId]: destSlot,
+            [moduleId]: '3',
           },
         },
         expectedLabwareLocations: {
-          [existingLabwareId]: destSlot,
+          [existingLabwareId]: moduleId,
         },
         expectedModuleLocations: {
-          [moduleId]: destSlot,
+          [moduleId]: '3',
         },
       },
       {
         // NOTE: if labware is incompatible, it's up to the UI to block this.
         testName:
           'move labware to slot with occupied module -> swap labware, module stays',
+        sourceSlot: '1',
+        destSlot: moduleId,
         makeStateArgs: {
           labwareLocationUpdate: {
-            [existingLabwareId]: sourceSlot,
-            [labwareOnModuleId]: destSlot,
+            [existingLabwareId]: '1',
+            [labwareOnModuleId]: moduleId,
           },
           moduleLocationUpdate: {
-            [moduleId]: destSlot,
+            [moduleId]: '3',
           },
         },
         expectedLabwareLocations: {
-          [existingLabwareId]: destSlot,
-          [labwareOnModuleId]: sourceSlot,
+          [existingLabwareId]: moduleId,
+          [labwareOnModuleId]: '1',
         },
         expectedModuleLocations: {
-          [moduleId]: destSlot,
+          [moduleId]: '3',
         },
       },
       {
         testName: 'move empty module to empty slot -> simple move',
+        sourceSlot: '1',
+        destSlot: '3',
         makeStateArgs: {
           labwareLocationUpdate: {},
           moduleLocationUpdate: {
-            [moduleId]: sourceSlot,
+            [moduleId]: '1',
           },
         },
         expectedLabwareLocations: {},
-        expectedModuleLocations: { [moduleId]: destSlot },
+        expectedModuleLocations: { [moduleId]: '3' },
       },
       {
         testName:
           'move empty module to slot with labware -> swap slots, do not add labware to module',
+        sourceSlot: '1',
+        destSlot: '3',
         makeStateArgs: {
-          labwareLocationUpdate: { [existingLabwareId]: destSlot },
-          moduleLocationUpdate: { [moduleId]: sourceSlot },
+          labwareLocationUpdate: { [existingLabwareId]: '3' },
+          moduleLocationUpdate: { [moduleId]: '1' },
         },
-        expectedLabwareLocations: { [existingLabwareId]: sourceSlot },
-        expectedModuleLocations: { [moduleId]: destSlot },
+        expectedLabwareLocations: { [existingLabwareId]: '1' },
+        expectedModuleLocations: { [moduleId]: '3' },
       },
       {
         testName:
           'move occupied module to slot with labware -> swap slots, do not change labware on module',
+        sourceSlot: '1',
+        destSlot: '3',
         makeStateArgs: {
           labwareLocationUpdate: {
-            [existingLabwareId]: destSlot,
-            [labwareOnModuleId]: sourceSlot,
+            [existingLabwareId]: '3',
+            [labwareOnModuleId]: moduleId,
           },
-          moduleLocationUpdate: { [moduleId]: sourceSlot },
+          moduleLocationUpdate: { [moduleId]: '1' },
         },
         expectedLabwareLocations: {
-          [existingLabwareId]: sourceSlot,
-          [labwareOnModuleId]: destSlot,
+          [existingLabwareId]: '1',
+          [labwareOnModuleId]: moduleId,
         },
-        expectedModuleLocations: { [moduleId]: destSlot },
+        expectedModuleLocations: { [moduleId]: '3' },
       },
       {
         testName: 'move labware off of module to empty slot',
+        sourceSlot: moduleId,
+        destSlot: '3',
         makeStateArgs: {
           labwareLocationUpdate: {
-            [labwareOnModuleId]: sourceSlot,
+            [labwareOnModuleId]: moduleId,
           },
-          moduleLocationUpdate: { [moduleId]: sourceSlot },
+          moduleLocationUpdate: { [moduleId]: '1' },
         },
-        expectedLabwareLocations: { [labwareOnModuleId]: destSlot },
-        expectedModuleLocations: { [moduleId]: sourceSlot },
+        expectedLabwareLocations: { [labwareOnModuleId]: '3' },
+        expectedModuleLocations: { [moduleId]: '1' },
       },
       {
         testName: 'move empty module to occupied module -> swap, keep pairings',
+        sourceSlot: '1',
+        destSlot: '3',
         makeStateArgs: {
           labwareLocationUpdate: {
-            [labwareOnModuleId]: destSlot,
+            [labwareOnModuleId]: moduleId,
           },
           moduleLocationUpdate: {
-            [moduleId]: sourceSlot,
-            [otherModuleId]: destSlot,
+            [moduleId]: '1',
+            [otherModuleId]: '3',
           },
         },
         expectedLabwareLocations: {
-          [labwareOnModuleId]: sourceSlot,
+          [labwareOnModuleId]: moduleId,
         },
         expectedModuleLocations: {
-          [moduleId]: destSlot,
-          [otherModuleId]: sourceSlot,
+          [moduleId]: '3',
+          [otherModuleId]: '1',
         },
       },
       {
         testName: 'empty module to empty module -> swap',
+        sourceSlot: '1',
+        destSlot: '3',
         makeStateArgs: {
           labwareLocationUpdate: {},
           moduleLocationUpdate: {
-            [moduleId]: sourceSlot,
-            [otherModuleId]: destSlot,
+            [moduleId]: '1',
+            [otherModuleId]: '3',
           },
         },
         expectedLabwareLocations: {},
         expectedModuleLocations: {
-          [moduleId]: destSlot,
-          [otherModuleId]: sourceSlot,
+          [moduleId]: '3',
+          [otherModuleId]: '1',
         },
       },
       {
         testName: 'occupied module to occupied module -> swap, keep pairings',
+        sourceSlot: '1',
+        destSlot: '3',
         makeStateArgs: {
           labwareLocationUpdate: {
-            [labwareOnModuleId]: sourceSlot,
-            [otherLabwareId]: destSlot,
+            [labwareOnModuleId]: moduleId,
+            [otherLabwareId]: otherModuleId,
           },
           moduleLocationUpdate: {
-            [moduleId]: sourceSlot,
-            [otherModuleId]: destSlot,
+            [moduleId]: '1',
+            [otherModuleId]: '3',
           },
         },
         expectedLabwareLocations: {
-          [labwareOnModuleId]: destSlot,
-          [otherLabwareId]: sourceSlot,
+          [labwareOnModuleId]: moduleId,
+          [otherLabwareId]: otherModuleId,
         },
         expectedModuleLocations: {
-          [moduleId]: destSlot,
-          [otherModuleId]: sourceSlot,
+          [moduleId]: '3',
+          [otherModuleId]: '1',
         },
       },
       {
         testName: 'occupied module to empty module -> swap, keep pairings',
+        sourceSlot: '1',
+        destSlot: '3',
         makeStateArgs: {
           labwareLocationUpdate: {
-            [moduleId]: sourceSlot,
-            [otherModuleId]: destSlot,
+            [labwareOnModuleId]: moduleId,
           },
           moduleLocationUpdate: {
-            [labwareOnModuleId]: sourceSlot,
+            [moduleId]: '1',
+            [otherModuleId]: '3',
           },
         },
         expectedLabwareLocations: {
-          [moduleId]: destSlot,
-          [otherModuleId]: sourceSlot,
+          [labwareOnModuleId]: moduleId,
         },
         expectedModuleLocations: {
-          [labwareOnModuleId]: destSlot,
+          [moduleId]: '3',
+          [otherModuleId]: '1',
         },
       },
     ]
     testCases.forEach(
       ({
         testName,
+        sourceSlot,
+        destSlot,
         makeStateArgs,
         expectedLabwareLocations,
         expectedModuleLocations,
@@ -581,17 +603,114 @@ describe('savedStepForms reducer: initial deck setup step', () => {
     })
   })
 
-  test('delete module -> removes module from initial deck setup step', () => {
-    const action = { type: 'DELETE_MODULE', payload: { id: moduleId } }
-    const prevRootState = makePrevRootState({
-      moduleLocationUpdate: {
-        [moduleId]: '1',
-        [otherModuleId]: '2',
+  describe('create module', () => {
+    const destSlot = '3'
+    const testCases = [
+      {
+        testName:
+          'create module in empty deck slot (labware in unrelated slot unaffected)',
+        makeStateArgs: { labwareLocationUpdate: { [existingLabwareId]: '6' } },
+        expectedLabwareLocations: { [existingLabwareId]: '6' },
+        expectedModuleLocations: { [moduleId]: destSlot },
       },
-    })
-    const result = savedStepForms(prevRootState, action)
-    expect(result[INITIAL_DECK_SETUP_STEP_ID].moduleLocationUpdate).toEqual({
-      [otherModuleId]: '2',
-    })
+      {
+        testName:
+          'create module in deck slot occupied with labware -> move that labware to the new module',
+        makeStateArgs: {
+          labwareLocationUpdate: { [existingLabwareId]: destSlot },
+        },
+        expectedLabwareLocations: { [existingLabwareId]: moduleId },
+        expectedModuleLocations: { [moduleId]: destSlot },
+      },
+    ]
+    testCases.forEach(
+      ({
+        testName,
+        makeStateArgs,
+        expectedLabwareLocations,
+        expectedModuleLocations,
+      }) => {
+        test(testName, () => {
+          const action = {
+            type: 'CREATE_MODULE',
+            payload: {
+              id: moduleId,
+              slot: destSlot,
+              type: 'tempdeck',
+              model: 'GEN1',
+            },
+          }
+          const prevRootState = makePrevRootState(makeStateArgs)
+          const result = savedStepForms(prevRootState, action)
+          expect(
+            result[INITIAL_DECK_SETUP_STEP_ID].labwareLocationUpdate
+          ).toEqual(expectedLabwareLocations)
+          expect(
+            result[INITIAL_DECK_SETUP_STEP_ID].moduleLocationUpdate
+          ).toEqual(expectedModuleLocations)
+        })
+      }
+    )
+  })
+
+  describe('delete module -> removes module from initial deck setup step', () => {
+    const testCases = [
+      {
+        testName: 'delete unoccupied module',
+        makeStateArgs: {
+          moduleLocationUpdate: {
+            [moduleId]: '1',
+            [otherModuleId]: '2',
+          },
+        },
+        expectedLabwareLocations: {},
+        expectedModuleLocations: {
+          [otherModuleId]: '2',
+        },
+      },
+      {
+        testName: 'delete occupied module -> labware goes into its slot',
+        makeStateArgs: {
+          labwareLocationUpdate: { [labwareOnModuleId]: moduleId },
+          moduleLocationUpdate: {
+            [moduleId]: '3',
+          },
+        },
+        expectedLabwareLocations: { [labwareOnModuleId]: '3' },
+        expectedModuleLocations: {},
+      },
+      {
+        testName:
+          'delete occupied module in span7_8_10_11 slot -> labware goes into slot 7',
+        makeStateArgs: {
+          labwareLocationUpdate: { [labwareOnModuleId]: moduleId },
+          moduleLocationUpdate: {
+            [moduleId]: SPAN7_8_10_11_SLOT,
+          },
+        },
+        expectedLabwareLocations: { [labwareOnModuleId]: '7' },
+        expectedModuleLocations: {},
+      },
+    ]
+    testCases.forEach(
+      ({
+        testName,
+        makeStateArgs,
+        expectedLabwareLocations,
+        expectedModuleLocations,
+      }) => {
+        test(testName, () => {
+          const action = { type: 'DELETE_MODULE', payload: { id: moduleId } }
+          const prevRootState = makePrevRootState(makeStateArgs)
+          const result = savedStepForms(prevRootState, action)
+          expect(
+            result[INITIAL_DECK_SETUP_STEP_ID].moduleLocationUpdate
+          ).toEqual(expectedModuleLocations)
+          expect(
+            result[INITIAL_DECK_SETUP_STEP_ID].labwareLocationUpdate
+          ).toEqual(expectedLabwareLocations)
+        })
+      }
+    )
   })
 })

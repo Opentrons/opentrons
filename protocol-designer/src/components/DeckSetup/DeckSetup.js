@@ -12,6 +12,7 @@ import {
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import i18n from '../../localization'
+import { LEFT_SIDE_SLOTS, SPAN7_8_10_11_SLOT } from '../../constants'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../steplist'
 import ModuleViz from './ModuleViz'
 import ModuleTag from './ModuleTag'
@@ -53,9 +54,9 @@ const VIEWBOX_HEIGHT = 414
 // These shouldn't be rendered on deck when empty, but TODO TODO TODO
 // TODO IMMEDIATELY import from somewhere else
 const PSEUDO_DECK_SLOTS: { [DeckSlot]: DeckDefSlot } = {
-  span7_8_10_11: {
+  [SPAN7_8_10_11_SLOT]: {
     displayName: 'Spanning slot',
-    id: 'span7_8_10_11',
+    id: SPAN7_8_10_11_SLOT,
     position: [0.0, 181.0, 0.0],
     matingSurfaceUnitVector: [-1, 1, -1],
     boundingBox: {
@@ -66,8 +67,6 @@ const PSEUDO_DECK_SLOTS: { [DeckSlot]: DeckDefSlot } = {
     compatibleModules: ['thermocycler'],
   },
 }
-// TODO IMMEDIATELY import from somewhere else
-const LEFT_SIDE_SLOTS: Array<DeckSlot> = ['1', '4', '7', '10', 'span7_8_10_11']
 
 const getSlotsBlockedBySpanning = (
   initialDeckSetup: InitialDeckSetup
@@ -76,7 +75,7 @@ const getSlotsBlockedBySpanning = (
   if (
     values(initialDeckSetup.modules).some(
       (module: ModuleOnDeck) =>
-        module.type === 'thermocycler' && module.slot === 'span7_8_10_11'
+        module.type === 'thermocycler' && module.slot === SPAN7_8_10_11_SLOT
     )
   ) {
     return ['7', '8', '10', '11']
@@ -257,7 +256,6 @@ const DeckSetup = (props: Props) => {
                         getSlotIsEmpty(props.initialDeckSetup, slot.id)
                     )
                     .map(slot => {
-                      console.log('empty slot', slot)
                       return (
                         <SlotControls
                           key={slot.id}

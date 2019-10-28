@@ -2,7 +2,7 @@
 import mapValues from 'lodash/mapValues'
 import * as componentLib from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { WellVolumes } from './types'
+import type { DeckSlot, WellVolumes } from './types'
 // TODO Ian 2018-11-27: import these from components lib, not from this contants file
 export const {
   // OT2 DECK CONSTANTS
@@ -25,6 +25,15 @@ export function getAllWellsForLabware(def: LabwareDefinition2): Array<string> {
 }
 
 export const FIXED_TRASH_ID: 'trashId' = 'trashId'
+
+export const SPAN7_8_10_11_SLOT: 'span7_8_10_11' = 'span7_8_10_11'
+export const LEFT_SIDE_SLOTS: Array<DeckSlot> = [
+  '1',
+  '4',
+  '7',
+  '10',
+  SPAN7_8_10_11_SLOT,
+]
 
 export const START_TERMINAL_TITLE = 'STARTING DECK STATE'
 export const END_TERMINAL_TITLE = 'FINAL DECK STATE'
