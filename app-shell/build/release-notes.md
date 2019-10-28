@@ -6,7 +6,7 @@ For more details about this release, please see the full [technical change log][
 
 ## Changes
 
-- GEN2 Pipettes now appear in the change pipettes dialog. These are new pipettes that will be shipping before our next major software release, so we added them now.
+- Our new generation of pipettes, labeled GEN2 Pipettes, now appear in the change pipettes dialog box. These pipettes will be coming soon.
 - You can control your Temperature Module and Thermocycler from the Pipettes and Modules page outside of a protocol
 - Changing certain advanced settings will prompt you to restart your robot
 

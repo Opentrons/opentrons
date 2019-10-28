@@ -17,13 +17,13 @@ Documentation for the new API is available on [docs.opentrons.com][docs-v2-root]
 
 - You can now control your Temperature Module and Thermocycler from the Pipettes & Modules page in the Opentrons App
 - Switching between API v2 and API v1 will now prompt you to restart your robot
-- The robot software now supports Gen 2 pipettes. These are new pipettes that will be shipping before our next major software release, but are not yet available.
+- The robot software now supports our new generation of pipettes, coming soon.
 - You can specify the version of a labware definition to load in `labware.load`. Currently there is only one version of each labware definition, but that may change in the future. See [the documentation][labware-versioning-docs] for more details.
 
 
 ## Bug Fixes
-- Fixed an issue where `mix` arguments were not being parsed correctly. All different optional arguments described in the docs now work.
-- Fixed the definitions for `opentrons_24_tuberack_nest_0.5ml_screwcap` and `opentrons_24_tuberack_nest_1.5ml_snapcap`
+- Fixed an issue where `mix` arguments were not being parsed correctly. All different optional arguments described in the docs now work
+- Fixed the definitions for the NEST tuberacks:  `opentrons_24_tuberack_nest_0.5ml_screwcap`, `opentrons_24_tuberack_nest_1.5ml_screwcap`, `opentrons_24_tuberack_nest_1.5ml_snapcap`, `opentrons_24_tuberack_nest_2ml_screwcap`, and `opentrons_24_tuberack_nest_2ml_snapcap`
 - If you specify both `touch_tip` and `blow_out` in a `transfer`, `consolidate`, or `distribute` the robot will now touch tip in a well and then blow out in the trash, rather than the reverse ([#419][419])
 - Fixed an issue where picking up tips in CLI deck calibration would lead to offsets when using pipettes other than P300 single Gen1 or P50 Single Gen1
 - Fixed an issue where the robot's Jupyter notebook would not start if you had previously created notebooks with spaces in their names
