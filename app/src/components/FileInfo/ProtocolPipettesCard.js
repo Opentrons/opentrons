@@ -49,7 +49,9 @@ function ProtocolPipettes(props: Props) {
     <InfoSection title={TITLE}>
       <SectionContentHalf>
         {PIPETTE_MOUNTS.map(mount => {
-          const { protocol, compatibility } = infoByMount[mount]
+          const info = infoByMount[mount]
+          if (!info) return null
+          const { protocol, compatibility } = info
           return (
             <InstrumentItem
               key={protocol.mount}

@@ -5,14 +5,29 @@ import isEmpty from 'lodash/isEmpty'
 import {
   selectors as robotSelectors,
   constants as robotConstants,
+<<<<<<< Updated upstream
 } from '../../robot'
 import { getPipettesState } from '../../robot-api'
+=======
+  type Pipette,
+} from '../../robot'
+import { getPipettesState, type PipettesState } from '../../robot-api'
+>>>>>>> Stashed changes
 import {
   getPipetteModelSpecs,
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
 
 export type PipetteCompatibility = 'match' | 'inexact_match' | 'incompatible'
+<<<<<<< Updated upstream
+=======
+
+type InstrumentMountInfo = {
+  actual: Pipette,
+  protocol: Pipette,
+  compatibility: PipetteCompatibility,
+}
+>>>>>>> Stashed changes
 const { PIPETTE_MOUNTS } = robotConstants
 
 function pipettesAreInexactMatch(protocolInstrName, actualInstrName) {
@@ -28,14 +43,21 @@ function pipettesAreInexactMatch(protocolInstrName, actualInstrName) {
   }
 }
 
+<<<<<<< Updated upstream
 function useInstrumentMountInfo(robotName: string) {
+=======
+function useInstrumentMountInfo(robotName: string): InstrumentMountInfo {
+>>>>>>> Stashed changes
   const protocolInstruments = useSelector(robotSelectors.getPipettes)
   const actualInstruments = useSelector(state =>
     getPipettesState(state, robotName)
   )
 
+<<<<<<< Updated upstream
   if (protocolInstruments.length === 0) return []
 
+=======
+>>>>>>> Stashed changes
   const instrumentInfoByMount = PIPETTE_MOUNTS.reduce((acc, mount) => {
     const protocolInstrument = protocolInstruments.find(i => i.mount === mount)
     const actualInstrument = actualInstruments[mount]
