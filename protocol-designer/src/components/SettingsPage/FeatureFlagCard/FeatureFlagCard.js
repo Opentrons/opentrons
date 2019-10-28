@@ -4,7 +4,11 @@ import * as React from 'react'
 import i18n from '../../../localization'
 import { Card, ToggleButton } from '@opentrons/components'
 import styles from '../SettingsPage.css'
-import { userFacingFlags, type Flags } from '../../../feature-flags'
+import {
+  userFacingFlags,
+  type Flags,
+  type FlagTypes,
+} from '../../../feature-flags'
 
 type Props = {|
   flags: Flags,
@@ -24,6 +28,22 @@ const FeatureFlagCard = (props: Props) => {
     flagName => !userFacingFlags.includes(flagName)
   )
 
+  const getDescription = (flag: FlagTypes): React.Node => {
+    const RICH_DESCRIPTIONS: { [FlagTypes]: React.Node } = {
+      OT_PD_DISABLE_MODULE_RESTRICTIONS: (
+        <>
+          <p>{i18n.t(`feature_flags.${flag}.description_1`)} </p>
+          <p>{i18n.t(`feature_flags.${flag}.description_2`)} </p>
+        </>
+      ),
+    }
+    return (
+      RICH_DESCRIPTIONS[flag] || (
+        <p>{i18n.t(`feature_flags.${flag}.description`)}</p>
+      )
+    )
+  }
+
   const toFlagRow = flagName => (
     <div key={flagName}>
       <div className={styles.setting_row}>
@@ -40,9 +60,9 @@ const FeatureFlagCard = (props: Props) => {
           }
         />
       </div>
-      <p className={styles.feature_flag_description}>
-        {i18n.t(`feature_flags.${flagName}.description`)}
-      </p>
+      <div className={styles.feature_flag_description}>
+        {getDescription(flagName)}
+      </div>
     </div>
   )
 
@@ -59,13 +79,13 @@ const FeatureFlagCard = (props: Props) => {
   return (
     <>
       <Card title={i18n.t('card.title.feature_flags')}>
-        <div>
+        <div className={styles.card_content}>
           {userFacingFlagRows.length > 0 ? userFacingFlagRows : noFlagsFallback}
         </div>
       </Card>
       {prereleaseModeEnabled && (
         <Card title={i18n.t('card.title.prerelease_mode_flags')}>
-          <div>{prereleaseFlagRows}</div>
+          <div className={styles.card_content}>{prereleaseFlagRows}</div>
         </Card>
       )}
     </>

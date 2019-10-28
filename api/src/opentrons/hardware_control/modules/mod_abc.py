@@ -1,7 +1,9 @@
 import abc
-from typing import Dict, Callable
+from typing import Dict, Callable, Any, Tuple, Awaitable
 
 InterruptCallback = Callable[[str], None]
+UploadFunction = Callable[[str, str, Dict[str, Any]],
+                          Awaitable[Tuple[bool, str]]]
 
 
 class AbstractModule(abc.ABC):
@@ -83,4 +85,10 @@ class AbstractModule(abc.ABC):
     @abc.abstractmethod
     def display_name(cls) -> str:
         """ A user-facing name for this kind of module. """
+        pass
+
+    @classmethod
+    @abc.abstractmethod
+    def bootloader(cls) -> UploadFunction:
+        """ Method used to upload file to this module's bootloader. """
         pass

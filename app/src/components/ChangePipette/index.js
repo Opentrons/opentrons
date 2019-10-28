@@ -9,7 +9,6 @@ import {
   type PipetteDisplayCategory,
 } from '@opentrons/shared-data'
 
-import { getConfig } from '../../config'
 import { fetchPipettes, getPipettesState } from '../../robot-api'
 import {
   home,
@@ -65,7 +64,6 @@ type SP = {|
   direction: Direction,
   success: boolean,
   attachedWrong: boolean,
-  __pipettePlusEnabled: boolean,
 |}
 
 type DP = {|
@@ -144,9 +142,6 @@ function makeMapStateToProps(): (State, OP) => SP {
       displayCategory,
       moveRequest: getRobotMove(state, robot),
       homeRequest: getRobotHome(state, robot),
-      __pipettePlusEnabled: Boolean(
-        getConfig(state).devInternal?.enablePipettePlus
-      ),
     }
   }
 }

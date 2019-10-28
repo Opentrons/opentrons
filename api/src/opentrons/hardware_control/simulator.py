@@ -41,6 +41,7 @@ class Simulator:
     hardware actions. It is suitable for use on a dev machine or on
     a robot with no smoothie connected.
     """
+
     def __init__(
             self,
             attached_instruments: Dict[types.Mount, Dict[str, Optional[str]]],
@@ -65,7 +66,7 @@ class Simulator:
                                  `'tempdeck'` or `'magdeck'`) representing
                                  modules the simulator should assume are
                                  attached. Like `attached_instruments`, used
-                                 to make the simnulator match the setup of the
+                                 to make the simulator match the setup of the
                                  real hardware.
         :param config: The robot config to use
         :param loop: The asyncio event loop to use.
@@ -105,7 +106,7 @@ class Simulator:
     def move(self, target_position: Dict[str, float],
              home_flagged_axes: bool = True, speed: float = None,
              axis_max_speeds: Dict[str, float] = None):
-        if self._run_flag.is_set():
+        if not self._run_flag.is_set():
             self._log.warning("Move to {} would be blocked by pause"
                               .format(target_position))
         self._position.update(target_position)
@@ -113,7 +114,7 @@ class Simulator:
                                    for ax in target_position})
 
     def home(self, axes: List[str] = None) -> Dict[str, float]:
-        if self._run_flag.is_set():
+        if not self._run_flag.is_set():
             self._log.warning("Home would be blocked by pause")
         # driver_3_0-> HOMED_POSITION
         checked_axes = axes or 'XYZABC'
@@ -219,7 +220,7 @@ class Simulator:
     @property
     def axis_bounds(self) -> Dict[str, Tuple[float, float]]:
         """ The (minimum, maximum) bounds for each axis. """
-        return {ax: (0, pos+0.5) for ax, pos in _HOME_POSITION.items()
+        return {ax: (0, pos + 0.5) for ax, pos in _HOME_POSITION.items()
                 if ax not in 'BC'}
 
     @property

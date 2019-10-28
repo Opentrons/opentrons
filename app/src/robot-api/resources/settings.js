@@ -10,7 +10,6 @@ import {
   createBaseRobotApiEpic,
   passRobotApiResponseAction,
   GET,
-  POST,
   PATCH,
 } from '../utils'
 
@@ -20,22 +19,14 @@ import type { State as AppState, Action, ActionLike, Epic } from '../../types'
 import type { RobotHost, RobotApiAction, RobotApiRequestState } from '../types'
 import type {
   SettingsState as State,
-  RobotSettings,
   PipetteSettings,
-  RobotSettingsFieldUpdate,
   PipetteSettingsUpdate,
 } from './types'
 
-const INITIAL_STATE: State = { robot: [], pipettesById: {} }
+const INITIAL_STATE: State = { pipettesById: {} }
 
-export const SETTINGS_PATH = '/settings'
 export const PIPETTE_SETTINGS_PATH = '/settings/pipettes'
 const makePipetteSettingsPath = (id: string) => `${PIPETTE_SETTINGS_PATH}/${id}`
-
-export const FETCH_SETTINGS: 'robotApi:FETCH_SETTINGS' =
-  'robotApi:FETCH_SETTINGS'
-
-export const SET_SETTINGS: 'robotApi:SET_SETTINGS' = 'robotApi:SET_SETTINGS'
 
 export const FETCH_PIPETTE_SETTINGS: 'robotApi:FETCH_PIPETTE_SETTINGS' =
   'robotApi:FETCH_PIPETTE_SETTINGS'
@@ -43,22 +34,9 @@ export const FETCH_PIPETTE_SETTINGS: 'robotApi:FETCH_PIPETTE_SETTINGS' =
 export const SET_PIPETTE_SETTINGS: 'robotApi:SET_PIPETTE_SETTINGS' =
   'robotApi:SET_PIPETTE_SETTINGS'
 
-export const fetchSettings = (host: RobotHost): RobotApiAction => ({
-  type: FETCH_SETTINGS,
-  payload: { host, method: GET, path: SETTINGS_PATH },
-})
-
 export const fetchPipetteSettings = (host: RobotHost): RobotApiAction => ({
   type: FETCH_PIPETTE_SETTINGS,
   payload: { host, method: GET, path: PIPETTE_SETTINGS_PATH },
-})
-
-export const setSettings = (
-  host: RobotHost,
-  body: RobotSettingsFieldUpdate
-): RobotApiAction => ({
-  type: SET_SETTINGS,
-  payload: { host, body, method: POST, path: SETTINGS_PATH },
 })
 
 export const setPipetteSettings = (
@@ -72,8 +50,6 @@ export const setPipetteSettings = (
   meta: { id },
 })
 
-const fetchSettingsEpic = createBaseRobotApiEpic(FETCH_SETTINGS)
-const setSettingsEpic = createBaseRobotApiEpic(SET_SETTINGS)
 const fetchPipetteSettingsEpic = createBaseRobotApiEpic(FETCH_PIPETTE_SETTINGS)
 const setPipetteSettingsEpic = createBaseRobotApiEpic(SET_PIPETTE_SETTINGS)
 
@@ -88,8 +64,6 @@ const fetchPipettesForSettingsEpic: Epic = action$ =>
   )
 
 export const settingsEpic = combineEpics(
-  fetchSettingsEpic,
-  setSettingsEpic,
   fetchPipetteSettingsEpic,
   setPipetteSettingsEpic,
   fetchPipettesForSettingsEpic
@@ -104,12 +78,6 @@ export function settingsReducer(
   if (resAction) {
     const { payload, meta } = resAction
     const { method, path, body } = payload
-
-    // grabs responses from GET /settings and POST /settings
-    // settings in body check is a guard against an old version of GET /settings
-    if (path === SETTINGS_PATH && 'settings' in body) {
-      return { ...state, robot: body.settings }
-    }
 
     // grabs responses from GET /settings/pipettes
     if (path === PIPETTE_SETTINGS_PATH) {
@@ -133,15 +101,6 @@ export function settingsReducer(
   }
 
   return state
-}
-
-export function getRobotSettingsState(
-  state: AppState,
-  robotName: string
-): RobotSettings {
-  const robotState = getRobotApiState(state, robotName)
-
-  return robotState?.resources.settings.robot || []
 }
 
 export function getPipetteSettingsState(

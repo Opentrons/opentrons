@@ -81,11 +81,11 @@ async def test_module_update_integration(monkeypatch, loop,
     monkeypatch.setattr(hardware_control.modules.update,
                         '_discover_ports', mock_discover_ports)
 
-    async def mock_update(port, fname, loop):
+    async def mock_upload(port, firmware_file_path, upload_function, loop):
         return (port, (True, 'it all worked'))
 
     monkeypatch.setattr(hardware_control.modules.update,
-                        'update_firmware', mock_update)
+                        'upload_firmware', mock_upload)
 
     modules = await api.discover_modules()
     ok, msg = await api.update_module(modules[0], 'some-fake-file', loop)

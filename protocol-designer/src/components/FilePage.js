@@ -15,8 +15,10 @@ import i18n from '../localization'
 import { Portal } from './portals/MainPageModalPortal'
 import styles from './FilePage.css'
 import EditPipettesModal from './modals/EditPipettesModal'
+import { EditModulesCard } from './modules'
 import formStyles from '../components/forms/forms.css'
 import type { FileMetadataFields } from '../file-data'
+import type { ModulesForEditModulesCard } from '../step-forms'
 
 export type Props = {
   formValues: FileMetadataFields,
@@ -24,16 +26,25 @@ export type Props = {
   goToNextPage: () => mixed,
   saveFileMetadata: FileMetadataFields => mixed,
   swapPipettes: () => mixed,
+  modulesEnabled: ?boolean,
 }
 
-type State = { isEditPipetteModalOpen: boolean }
+type State = { isEditPipetteModalOpen: boolean, isEditModuleModalOpen: boolean }
 
 const DATE_ONLY_FORMAT = 'MMM DD, YYYY'
 const DATETIME_FORMAT = 'MMM DD, YYYY | h:mm A'
 
+const _mockModulesByType: ModulesForEditModulesCard = {
+  magdeck: {
+    moduleId: 'module1234',
+    slot: '1',
+    model: 'GEN1',
+  },
+}
+
 // TODO: Ian 2019-03-15 use i18n for labels
 class FilePage extends React.Component<Props, State> {
-  state = { isEditPipetteModalOpen: false }
+  state = { isEditPipetteModalOpen: false, isEditModuleModalOpen: false }
 
   openEditPipetteModal = () => this.setState({ isEditPipetteModalOpen: true })
   closeEditPipetteModal = () => this.setState({ isEditPipetteModalOpen: false })
@@ -156,6 +167,10 @@ class FilePage extends React.Component<Props, State> {
             </div>
           </div>
         </Card>
+
+        {this.props.modulesEnabled && (
+          <EditModulesCard modules={_mockModulesByType} />
+        )}
 
         <div className={styles.button_row}>
           <PrimaryButton

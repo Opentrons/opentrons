@@ -18,11 +18,17 @@ import type {
   CustomLabwareAction,
 } from './custom-labware/types'
 
+import type {
+  RobotSettingsState,
+  RobotSettingsAction,
+} from './robot-settings/types'
+
 export type State = $ReadOnly<{|
   robot: RobotState,
   api: HttpApiState,
   robotApi: RobotApiState,
   robotAdmin: RobotAdminState,
+  robotSettings: RobotSettingsState,
   config: Config,
   discovery: DiscoveryState,
   labware: CustomLabwareState,
@@ -36,6 +42,7 @@ export type Action =
   | HttpApiAction
   | RobotApiAction
   | RobotAdminAction
+  | RobotSettingsAction
   | ShellAction
   | ConfigAction
   | RouterAction

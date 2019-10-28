@@ -1,0 +1,7 @@
+{
+  "module_display_names": {
+    "tempdeck": "Temperature",
+    "magdeck": "Magnet",
+    "thermocycler": "Thermocycler"
+  }
+}

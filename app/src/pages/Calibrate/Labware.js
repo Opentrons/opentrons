@@ -7,7 +7,7 @@ import { push } from 'connected-react-router'
 
 import { selectors as robotSelectors } from '../../robot'
 import { getConnectedRobot } from '../../discovery'
-import { getRobotSettingsState, type Module } from '../../robot-api'
+import { getRobotSettings } from '../../robot-settings'
 import { getUnpreparedModules } from '../../robot-api/resources/modules'
 
 import Page from '../../components/Page'
@@ -22,6 +22,7 @@ import type { ContextRouter } from 'react-router-dom'
 import type { State, Dispatch } from '../../types'
 import type { Labware } from '../../robot'
 import type { Robot } from '../../discovery'
+import type { Module } from '../../robot-api'
 
 type OP = ContextRouter
 
@@ -106,7 +107,7 @@ function mapStateToProps(state: State, ownProps: OP): SP {
   const hasModulesLeftToReview =
     modules.length > 0 && !robotSelectors.getModulesReviewed(state)
   const robot = getConnectedRobot(state)
-  const settings = robot && getRobotSettingsState(state, robot.name)
+  const settings = robot && getRobotSettings(state, robot.name)
 
   // TODO(mc, 2018-07-23): make diagram component a container
   const calToBottomFlag =

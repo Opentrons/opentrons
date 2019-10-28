@@ -2,93 +2,74 @@ import logging
 import asyncio
 import tempfile
 from aiohttp import web
-try:
-    from opentrons import modules
-except ImportError:
-    pass
+from opentrons.hardware_control import modules
 
 
 log = logging.getLogger(__name__)
 UPDATE_TIMEOUT = 15
 
 
+# TODO: (BC, 2019-10-24): once APIv1 server ff toggle is gone,
+#  this should be removed
+async def cannot_update_firmware(request):
+    """
+     This handler refuses a module firmware update request
+     in the case that the API server isn't equipped to handle it.
+    """
+    log.debug('Cannot update module firmware on this server version')
+    status = 501
+    res = {'message': 'Cannot update module firmware \
+                        via APIv1 server, please update server to APIv2'}
+    return web.json_response(res, status=status)
+
+
 async def update_module_firmware(request):
     """
      This handler accepts a POST request with Content-Type: multipart/form-data
      and a file field in the body named "module_firmware". The file should
-     be a valid HEX image to be flashed to the atmega32u4. The received file is
-     sent via USB to the board and flashed by the avr109 bootloader. The file
-     is then deleted and a success code is returned
+     be a valid HEX/binary image to be flashed to the module. The received
+     file is sent via USB to the board and flashed by the bootloader.
+     The file is then deleted and a success code is returned
     """
     log.debug('Update Firmware request received')
     data = await request.post()
     module_serial = request.match_info['serial']
+    fw_filename = data['module_firmware'].filename
+    message = 'Server failed to update module firmware'
+    status = 500
 
-    res = await _update_module_firmware(request.app['com.opentrons.hardware'],
-                                        module_serial,
-                                        data['module_firmware'],
-                                        request.loop)
-    if 'successful' not in res['message']:
-        if 'avrdudeResponse' in res and \
-           'checksum mismatch' in res['avrdudeResponse']:
-            status = 400
-        elif 'not found' in res['message']:
-            status = 404
-        else:
-            status = 500
-        log.error(res)
-    else:
-        status = 200
-        log.info(res)
+    log.info('Preparing to flash firmware image {}'.format(fw_filename))
+    content = data['module_firmware'].file.read()
+    with tempfile.NamedTemporaryFile(suffix=fw_filename) as fp:
+        fp.write(content)
+        message, status = await _upload_to_module(
+            request.app['com.opentrons.hardware'],
+            module_serial,
+            fp.name,
+            loop=request.loop)
+        log.info('Firmware update complete')
+
+    print(f'message: {message} \n')
+    print(f'status: {status} \n')
+    res = {'filename': fw_filename, 'message': message}
     return web.json_response(res, status=status)
 
 
-async def _update_module_firmware(hw, module_serial, data, loop=None):
-    fw_filename = data.filename
-    content = data.file.read()
-    log.info('Preparing to flash firmware image {}'.format(fw_filename))
-
-    with tempfile.NamedTemporaryFile(suffix=fw_filename) as fp:
-        fp.write(content)
-        # returns a dict of 'message' & 'avrdudeResponse'
-        res = await _upload_to_module(hw, module_serial, fp.name, loop=loop)
-    log.info('Firmware update complete')
-    res['filename'] = fw_filename
-    return res
-
-
 async def _upload_to_module(hw, serialnum, fw_filename, loop):
-    """
-    This method remains in the API currently because of its use of the robot
-    singleton's copy of the api object & driver. This should move to the server
-    lib project eventually and use its own driver object (preferably involving
-    moving the drivers themselves to the serverlib)
-    """
-
-    # ensure there is a reference to the port
-    if not hw.is_connected():
-        hw.connect()
-
-    hw.discover_modules()
+    await hw.discover_modules()
     hw_mods = hw.attached_modules.values()
-    res = {}
     for module in hw_mods:
         if module.device_info.get('serial') == serialnum:
             log.info("Module with serial {} found".format(serialnum))
-            bootloader_port = await modules.enter_bootloader(module)
-            if bootloader_port:
-                module._port = bootloader_port
-            # else assume old bootloader connection on existing module port
-            log.info("Uploading file to port: {}".format(
-                module.port))
-            log.info("Flashing firmware. This will take a few seconds")
             try:
-                res = await asyncio.wait_for(
+                new_instance = await asyncio.wait_for(
                     modules.update_firmware(module, fw_filename, loop),
                     UPDATE_TIMEOUT)
+                print(f'\n\n\ninstance {new_instance}\n')
+                return f'Successully updated module {serialnum}', 200
+            except modules.UpdateError as e:
+                return f'Bootloader error: {e}', 400
             except asyncio.TimeoutError:
-                return {'message': 'AVRDUDE not responding'}
+                return 'Bootloader not responding', 500
             break
-    if not res:
-        res = {'message': 'Module {} not found'.format(serialnum)}
-    return res
+    return f'Module {serialnum} not found', 404

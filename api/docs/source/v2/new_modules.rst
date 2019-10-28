@@ -95,21 +95,7 @@ To set the temperature module to 4 degrees celsius do the following:
 
     temp_mod.set_temperature(4)
 
-Wait Until Setpoint Reached
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
 This function will pause your protocol until your target temperature is reached.
-
-.. code-block:: python
-
-    temp_mod.set_temperature(4)
-    temp_mod.wait_for_temp()
-
-Before using ``wait_for_temp()`` you must set a target temperature with ``set_temperature()``.
-Once the target temperature is set, when you want the protocol to wait until the module
-reaches the target you can call ``wait_for_temp().``
-
-If no target temperature is set via ``set_temperature()``, the protocol will be stuck in
-an indefinite loop.
 
 Read the Current Temperature
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^

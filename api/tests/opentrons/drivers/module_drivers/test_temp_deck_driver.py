@@ -9,6 +9,7 @@
 # expected ACK, then it'll eventually time out and return an error
 
 import time
+import asyncio
 
 
 def test_get_temp_deck_temperature():
@@ -84,7 +85,7 @@ def test_fail_get_temp_deck_temperature():
     assert temp_deck._temperature == {'current': 90, 'target': None}
 
 
-def test_set_temp_deck_temperature(monkeypatch):
+async def test_set_temp_deck_temperature(monkeypatch):
     # Set target temperature
     import types
     from opentrons.drivers.temp_deck import TempDeck
@@ -98,16 +99,26 @@ def test_set_temp_deck_temperature(monkeypatch):
         command_log += [command]
         return ''
 
-    temp_deck._send_command = types.MethodType(_mock_send_command, temp_deck)
+    def _mock_update_temp(self):
+        return 'holding at target'
 
-    temp_deck.set_temperature(99)
+    temp_deck._send_command = types.MethodType(_mock_send_command, temp_deck)
+    temp_deck._update_temp = types.MethodType(_mock_send_command, temp_deck)
+
+    try:
+        await asyncio.wait_for(temp_deck.set_temperature(99), timeout=0.2)
+    except asyncio.TimeoutError:
+        pass
     assert command_log[-1] == 'M104 S99.0'
 
-    temp_deck.set_temperature(-9)
+    try:
+        await asyncio.wait_for(temp_deck.set_temperature(-9), timeout=0.2)
+    except asyncio.TimeoutError:
+        pass
     assert command_log[-1] == 'M104 S-9.0'
 
 
-def test_fail_set_temp_deck_temperature(monkeypatch):
+async def test_fail_set_temp_deck_temperature(monkeypatch):
     import types
     from opentrons.drivers import serial_communication
 
@@ -125,7 +136,11 @@ def test_fail_set_temp_deck_temperature(monkeypatch):
     temp_deck = TempDeck()
     temp_deck.simulating = False
 
-    res = temp_deck.set_temperature(-9)
+    try:
+        res = await asyncio.wait_for(temp_deck.set_temperature(-9),
+                                     timeout=0.2)
+    except asyncio.TimeoutError:
+        pass
     assert res == error_msg
 
     error_msg = 'Alarm: something alarming happened here'
@@ -138,7 +153,11 @@ def test_fail_set_temp_deck_temperature(monkeypatch):
     serial_communication.write_and_return = types.MethodType(
         _raise_error, serial_communication)
 
-    res = temp_deck.set_temperature(-9)
+    try:
+        res = await asyncio.wait_for(temp_deck.set_temperature(-9),
+                                     timeout=0.2)
+    except asyncio.TimeoutError:
+        pass
     assert res == error_msg
 
 

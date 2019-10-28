@@ -26,9 +26,9 @@ class SimulatingDriver:
         self._height = location
 
     def get_device_info(self):
-        return {'serial': 'dummySerial',
-                'model': 'dummyModel',
-                'version': 'dummyVersion'}
+        return {'serial': 'dummySerialMD',
+                'model': 'dummyModelMD',
+                'version': 'dummyVersionMD'}
 
     def connect(self, port):
         pass
@@ -67,6 +67,10 @@ class MagDeck(mod_abc.AbstractModule):
     @classmethod
     def display_name(cls) -> str:
         return 'Magnetic Deck'
+
+    @classmethod
+    def bootloader(cls) -> mod_abc.UploadFunction:
+        return update.upload_via_avrdude
 
     @staticmethod
     def _build_driver(

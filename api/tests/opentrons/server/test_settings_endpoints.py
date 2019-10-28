@@ -3,8 +3,15 @@ import os
 
 import pytest
 
+from opentrons.server import endpoints
 from opentrons.config import pipette_config
 from opentrons import config, types
+
+
+@pytest.fixture
+def restore_restart_required():
+    yield
+    endpoints.settings._SETTINGS_RESTART_REQUIRED = False
 
 
 @pytest.fixture
@@ -60,6 +67,8 @@ def validate_response_body(body):
             obj['id'])
         assert 'value' in obj, '"value" not found for {}'.format(obj['id'])
         assert 'restart_required' in obj
+    assert 'links' in body
+    assert isinstance(body['links'], dict)
 
 
 async def test_get(async_client):
@@ -85,6 +94,49 @@ async def test_set(virtual_smoothie_env, loop, async_client):
     test_setting = list(
         filter(lambda x: x.get('id') == test_id, body.get('settings')))[0]
     assert test_setting.get('value')
+
+
+async def test_restart_required_persistence(
+        virtual_smoothie_env, loop, async_client,
+        restore_restart_required):
+    current = await async_client.get('/settings')
+    current_body = await current.json()
+    assert not current_body['links']
+
+    # Changing the state sets restart required
+    cur_apiv2_state = [s['value'] for s in current_body['settings']
+                       if s['id'] == 'useProtocolApi2'][0]
+    new_apiv2_state = not bool(cur_apiv2_state)
+    resp = await async_client.post('/settings',
+                                   json={'id': 'useProtocolApi2',
+                                         'value': new_apiv2_state})
+    assert resp.status == 200
+    body = await resp.json()
+    assert body['links']['restart'] == '/server/restart'
+
+    # Setting the state to the same value again doesn't clear it
+    new = await async_client.get('/settings')
+    new_body = await new.json()
+    assert new_body['links']['restart'] == '/server/restart'
+
+    resp = await async_client.post('/settings',
+                                   json={'id': 'useProtocolApi2',
+                                         'value': new_apiv2_state})
+    assert resp.status == 200
+    body = await resp.json()
+    assert body['links']['restart'] == '/server/restart'
+
+    # Neither does changing the state back
+    new = await async_client.get('/settings')
+    new_body = await new.json()
+    assert new_body['links']['restart'] == '/server/restart'
+
+    resp = await async_client.post('/settings',
+                                   json={'id': 'useProtocolApi2',
+                                         'value': cur_apiv2_state})
+    assert resp.status == 200
+    body = await resp.json()
+    assert body['links']['restart'] == '/server/restart'
 
 
 async def test_available_resets(async_client):

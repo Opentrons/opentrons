@@ -18,7 +18,7 @@ from opentrons.protocol_api import execute as execute_apiv2
 from opentrons import commands
 from opentrons.config import feature_flags as ff
 from opentrons.protocols.parse import parse
-from opentrons.protocols.types import JsonProtocol, PythonProtocol
+from opentrons.protocols.types import JsonProtocol
 from opentrons.hardware_control import API
 
 _HWCONTROL: Optional[API] = None
@@ -178,17 +178,9 @@ def execute(protocol_file: TextIO,
     stack_logger.setLevel(getattr(logging, log_level.upper(), logging.WARNING))
     contents = protocol_file.read()
     protocol = parse(contents, protocol_file.name)
-    if ff.use_protocol_api_v2():
-        if isinstance(protocol, PythonProtocol)\
-           and protocol.api_level == '1'\
-           and not ff.enable_backcompat():
-            raise RuntimeError(
-                'This protocol targets Protocol API V1, but the robot is '
-                'set to Protocol API V2. If this is actually a V2 '
-                'protocol, please set the \'apiLevel\' to \'2\' in the '
-                'metadata. If you do not want to be on API V2, please '
-                'disable the \'Use Protocol API version 2\' toggle in the '
-                'robot\'s Advanced Settings and restart the robot.')
+    if isinstance(protocol, JsonProtocol)\
+            or protocol.api_level == '2'\
+            or (ff.enable_backcompat() and ff.use_protocol_api_v2()):
         context = get_protocol_api(
             bundled_labware=getattr(protocol, 'bundled_labware', None),
             bundled_data=getattr(protocol, 'bundled_data', None))

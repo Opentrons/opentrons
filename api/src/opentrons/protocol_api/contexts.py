@@ -1932,7 +1932,6 @@ class TemperatureModuleContext(ModuleContext):
                 'biorad_96_wellplate_200ul_pcr')
 
             temp_mod.set_temperature(45.5)
-            temp_mod.wait_for_temp()
             temp_mod.deactivate()
 
     .. note::
@@ -1966,11 +1965,6 @@ class TemperatureModuleContext(ModuleContext):
         """ Stop heating (or cooling) and turn off the fan.
         """
         return self._module.deactivate()
-
-    def wait_for_temp(self):
-        """ Block until the module reaches its setpoint.
-        """
-        self._module.wait_for_temp()
 
     @property
     def temperature(self):
