@@ -26,6 +26,7 @@ Documentation for the new API is available on [docs.opentrons.com][docs-v2-root]
 - Fixed the definitions for `opentrons_24_tuberack_nest_0.5ml_screwcap` and `opentrons_24_tuberack_nest_1.5ml_snapcap`
 - If you specify both `touch_tip` and `blow_out` in a `transfer`, `consolidate`, or `distribute` the robot will now touch tip in a well and then blow out in the trash, rather than the reverse ([#419][419])
 - Fixed an issue where picking up tips in CLI deck calibration would lead to offsets when using pipettes other than P300 single Gen1 or P50 Single Gen1
+- Fixed an issue where the robot's Jupyter notebook would not start if you had previously created notebooks with spaces in their names
 
 ## Known Issues
 
