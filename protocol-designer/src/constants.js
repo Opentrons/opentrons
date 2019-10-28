@@ -34,17 +34,10 @@ export const STD_SLOT_X_DIM = 128
 export const STD_SLOT_Y_DIM = 86
 export const STD_SLOT_DIVIDER_WIDTH = 4
 
-export const SPAN7_8_10_11_SLOT: 'span7_8_10_11' = 'span7_8_10_11'
-export const LEFT_SIDE_SLOTS: Array<DeckSlot> = [
-  '1',
-  '4',
-  '7',
-  '10',
-  SPAN7_8_10_11_SLOT,
-]
 // PD-specific slots that don't exist in deck definition.
 // These have no visual representation on the deck themselves,
 // but may contain certain specific items that span (eg thermocycler)
+export const SPAN7_8_10_11_SLOT: 'span7_8_10_11' = 'span7_8_10_11'
 export const PSEUDO_DECK_SLOTS: { [DeckSlot]: DeckDefSlot } = {
   [SPAN7_8_10_11_SLOT]: {
     displayName: 'Spanning slot',

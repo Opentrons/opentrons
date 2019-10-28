@@ -53,7 +53,9 @@ export type VolumeJson = {
   },
 }
 
-export type DeckSlot = string
 // NOTE: string expected to be '1', '2', ... '12' for normal deck slots,
 // or special PD-specific 'span7_8_10_11' slot (for thermocycler)
 // or a module ID.
+export type DeckSlot = string
+
+export type ModuleOrientation = 'left' | 'right'

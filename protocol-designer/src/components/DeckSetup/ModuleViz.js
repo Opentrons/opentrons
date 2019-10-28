@@ -1,28 +1,27 @@
 // @flow
 import * as React from 'react'
-import moduleVizDims from './moduleVizDims'
+import { getModuleVizDims } from './getModuleVizDims'
 import styles from './ModuleViz.css'
 import type { ModuleOnDeck } from '../../step-forms'
+import type { ModuleOrientation } from '../../types'
 
 type Props = {|
   x: number,
   y: number,
-  orientation: 'left' | 'right',
+  orientation: ModuleOrientation,
   module: ModuleOnDeck,
 |}
 
 const ModuleViz = (props: Props) => {
   const moduleType = props.module.type
-  const {
-    xOffsetLeft,
-    xOffsetRight,
-    yOffset,
-    xDimension,
-    yDimension,
-  } = moduleVizDims[moduleType]
+  const { xOffset, yOffset, xDimension, yDimension } = getModuleVizDims(
+    props.orientation,
+    moduleType
+  )
+  console.log({ props, xOffset, yOffset, xDimension, yDimension })
   return (
     <rect
-      x={props.x + (props.orientation === 'left' ? xOffsetLeft : xOffsetRight)}
+      x={props.x + xOffset}
       y={props.y + yOffset}
       height={yDimension}
       width={xDimension}

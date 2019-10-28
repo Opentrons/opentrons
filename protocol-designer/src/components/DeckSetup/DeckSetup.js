@@ -12,15 +12,14 @@ import {
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import i18n from '../../localization'
-import {
-  PSEUDO_DECK_SLOTS,
-  LEFT_SIDE_SLOTS,
-  SPAN7_8_10_11_SLOT,
-} from '../../constants'
+import { PSEUDO_DECK_SLOTS, SPAN7_8_10_11_SLOT } from '../../constants'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../steplist'
 import ModuleViz from './ModuleViz'
 import ModuleTag from './ModuleTag'
-import moduleVizDims from './moduleVizDims'
+import {
+  getModuleVizDims,
+  inferModuleOrientationFromSlot,
+} from './getModuleVizDims'
 import type {
   InitialDeckSetup,
   LabwareOnDeck as LabwareOnDeckType,
@@ -91,13 +90,15 @@ const getSlotDefForModuleSlot = (
   deckSlots: { [slotId: string]: DeckDefSlot }
 ): DeckDefSlot => {
   const parentSlotDef = deckSlots[module.slot] || PSEUDO_DECK_SLOTS[module.slot]
-  const moduleData = moduleVizDims[module.type]
+  const moduleOrientation = inferModuleOrientationFromSlot(module.slot)
+  const moduleData = getModuleVizDims(moduleOrientation, module.type)
+  console.log({ module, moduleData })
   return {
     ...parentSlotDef,
     id: module.id,
     position: [
-      parentSlotDef.position[0] + moduleData.childOffsetX,
-      parentSlotDef.position[1] + moduleData.childOffsetY,
+      parentSlotDef.position[0] + moduleData.childXOffset,
+      parentSlotDef.position[1] + moduleData.childYOffset,
       0,
     ],
     boundingBox: {
@@ -208,9 +209,7 @@ const DeckSetup = (props: Props) => {
                     }
 
                     const [moduleX, moduleY] = slot.position
-                    const orientation = LEFT_SIDE_SLOTS.includes(slot.id)
-                      ? 'left'
-                      : 'right'
+                    const orientation = inferModuleOrientationFromSlot(slot.id)
 
                     return (
                       <React.Fragment key={slot.id}>

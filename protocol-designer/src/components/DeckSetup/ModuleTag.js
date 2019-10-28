@@ -3,13 +3,15 @@ import * as React from 'react'
 import cx from 'classnames'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
 import { STD_SLOT_X_DIM, STD_SLOT_Y_DIM } from '../../constants'
+import { getModuleVizDims } from './getModuleVizDims'
 import styles from './ModuleTag.css'
 import type { ModuleOnDeck } from '../../step-forms'
+import type { ModuleOrientation } from '../../types'
 
 type Props = {|
   x: number,
   y: number,
-  orientation: 'left' | 'right',
+  orientation: ModuleOrientation,
   module: ModuleOnDeck,
 |}
 
@@ -25,15 +27,19 @@ const MODULE_SHORT_DISPLAY_NAMES = {
 }
 
 const ModuleTag = (props: Props) => {
+  const { childXOffset, childYOffset } = getModuleVizDims(
+    props.orientation,
+    props.module.type
+  )
   return (
     <RobotCoordsForeignDiv
-      // TODO IMMEDIATELY: need to use child offset to place in X, see design
       x={
         props.x +
-        (props.orientation === 'left' ? -1 * TAG_WIDTH : STD_SLOT_X_DIM)
+        (props.orientation === 'left'
+          ? childXOffset - TAG_WIDTH
+          : STD_SLOT_X_DIM + childXOffset)
       }
-      // TODO IMMEDIATELY: need to use child offset to place in Y, see design
-      y={props.y + (STD_SLOT_Y_DIM - TAG_HEIGHT) / 2}
+      y={props.y + childYOffset + (STD_SLOT_Y_DIM - TAG_HEIGHT) / 2}
       height={TAG_HEIGHT}
       width={TAG_WIDTH}
       innerDivProps={{
