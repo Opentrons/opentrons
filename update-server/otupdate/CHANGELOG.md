@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.14.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.13.2...v3.14.0-alpha.0) (2019-10-28)
+
+
+### Features
+
+* **update-server:** add clear all keys endpoint link local ([#4182](https://github.com/Opentrons/opentrons/issues/4182)) ([5b04918](https://github.com/Opentrons/opentrons/commit/5b04918))
+
+
+
+
+
 ## [3.13.2](https://github.com/Opentrons/opentrons/compare/v3.13.1...v3.13.2) (2019-10-10)
 
 **Note:** Version bump only for package @opentrons/update-server

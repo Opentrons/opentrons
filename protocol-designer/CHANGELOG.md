@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.14.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.13.2...v3.14.0-alpha.0) (2019-10-28)
+
+
+### Bug Fixes
+
+* **api,shared-data,labware-creator:** do not touch tip on troughs ([#4271](https://github.com/Opentrons/opentrons/issues/4271)) ([d7e76cd](https://github.com/Opentrons/opentrons/commit/d7e76cd)), closes [#4258](https://github.com/Opentrons/opentrons/issues/4258)
+* **protocol-designer:** fix copy & link for custom labware ([#4232](https://github.com/Opentrons/opentrons/issues/4232)) ([1490f65](https://github.com/Opentrons/opentrons/commit/1490f65))
+
+
+### Features
+
+* **protocol-designer:** add new actions for module interactions ([#4275](https://github.com/Opentrons/opentrons/issues/4275)) ([5e9fa80](https://github.com/Opentrons/opentrons/commit/5e9fa80))
+* **protocol-designer:** add reducers for module placement ([#4287](https://github.com/Opentrons/opentrons/issues/4287)) ([7973d2a](https://github.com/Opentrons/opentrons/commit/7973d2a))
+* **protocol-designer:** Add unrestricted module placement FF ([#4289](https://github.com/Opentrons/opentrons/issues/4289)) ([4c59d4d](https://github.com/Opentrons/opentrons/commit/4c59d4d)), closes [#4134](https://github.com/Opentrons/opentrons/issues/4134)
+* **protocol-designer:** promote custom labware upload to full feature ([#4207](https://github.com/Opentrons/opentrons/issues/4207)) ([c19634e](https://github.com/Opentrons/opentrons/commit/c19634e))
+
+
+
+
+
 ## [3.13.2](https://github.com/Opentrons/opentrons/compare/v3.13.1...v3.13.2) (2019-10-10)
 
 **Note:** Version bump only for package protocol-designer

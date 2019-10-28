@@ -3,6 +3,57 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.14.0-alpha.0](https://github.com/opentrons/opentrons/compare/v3.13.2...v3.14.0-alpha.0) (2019-10-28)
+
+
+### Bug Fixes
+
+* **api:** Allow Location types in advanced liquid handling functions ([#4276](https://github.com/opentrons/opentrons/issues/4276)) ([8f015b8](https://github.com/opentrons/opentrons/commit/8f015b8))
+* **api:** always touch tip before blow out ([#4265](https://github.com/opentrons/opentrons/issues/4265)) ([1e54098](https://github.com/opentrons/opentrons/commit/1e54098))
+* **api:** api1: consider model offset in cli deck cal tip pickup ([#4253](https://github.com/opentrons/opentrons/issues/4253)) ([e1963ae](https://github.com/opentrons/opentrons/commit/e1963ae)), closes [#4250](https://github.com/opentrons/opentrons/issues/4250)
+* **api:** apiv1: touch tip before blowing out during transfers ([#4231](https://github.com/opentrons/opentrons/issues/4231)) ([294aa8f](https://github.com/opentrons/opentrons/commit/294aa8f)), closes [#419](https://github.com/opentrons/opentrons/issues/419)
+* **api:** apiv2: correctly set smoothie speed ([#4263](https://github.com/opentrons/opentrons/issues/4263)) ([3e6d26d](https://github.com/opentrons/opentrons/commit/3e6d26d))
+* **api:** apiv2: fix air gap in complex commands ([#4259](https://github.com/opentrons/opentrons/issues/4259)) ([e4ba931](https://github.com/opentrons/opentrons/commit/e4ba931))
+* **api:** correctly handle mix optional arguments ([#4237](https://github.com/opentrons/opentrons/issues/4237)) ([e5fa621](https://github.com/opentrons/opentrons/commit/e5fa621))
+* **api:** Do not throw warning if run flag is set ([#4294](https://github.com/opentrons/opentrons/issues/4294)) ([150c784](https://github.com/opentrons/opentrons/commit/150c784))
+* **api:** Use proper currents for plunger home ([#4167](https://github.com/opentrons/opentrons/issues/4167)) ([b17eaff](https://github.com/opentrons/opentrons/commit/b17eaff)), closes [#3572](https://github.com/opentrons/opentrons/issues/3572)
+* **api,shared-data,labware-creator:** do not touch tip on troughs ([#4271](https://github.com/opentrons/opentrons/issues/4271)) ([d7e76cd](https://github.com/opentrons/opentrons/commit/d7e76cd)), closes [#4258](https://github.com/opentrons/opentrons/issues/4258)
+* **labware-creator:** fix radio group touched on change in Mac FF ([#4210](https://github.com/opentrons/opentrons/issues/4210)) ([8c89022](https://github.com/opentrons/opentrons/commit/8c89022)), closes [#4209](https://github.com/opentrons/opentrons/issues/4209)
+* **labware-library:** Remove global CSS that's breaking filter link styling ([#4239](https://github.com/opentrons/opentrons/issues/4239)) ([11bdec4](https://github.com/opentrons/opentrons/commit/11bdec4))
+* **protocol-designer:** fix copy & link for custom labware ([#4232](https://github.com/opentrons/opentrons/issues/4232)) ([1490f65](https://github.com/opentrons/opentrons/commit/1490f65))
+* **shared-data:** swap X/Y spacing for 24-well nest tuberacks ([#4240](https://github.com/opentrons/opentrons/issues/4240)) ([34330ed](https://github.com/opentrons/opentrons/commit/34330ed))
+
+
+### Features
+
+* **api:** Add bundle creation to opentrons_simulate ([#4125](https://github.com/opentrons/opentrons/issues/4125)) ([b1d9d66](https://github.com/opentrons/opentrons/commit/b1d9d66))
+* **api:** apiv2: add max speed control ([#4187](https://github.com/opentrons/opentrons/issues/4187)) ([ed48382](https://github.com/opentrons/opentrons/commit/ed48382))
+* **api:** apiv2: conditionally enable backcompat ([#4234](https://github.com/opentrons/opentrons/issues/4234)) ([806af2c](https://github.com/opentrons/opentrons/commit/806af2c))
+* **api:** apiv2: implement robot methods backcompat ([#4201](https://github.com/opentrons/opentrons/issues/4201)) ([685599f](https://github.com/opentrons/opentrons/commit/685599f)), closes [#3539](https://github.com/opentrons/opentrons/issues/3539)
+* **api:** deprecate api support for JSON v1/2 ([#4155](https://github.com/opentrons/opentrons/issues/4155)) ([61361a8](https://github.com/opentrons/opentrons/commit/61361a8)), closes [#4128](https://github.com/opentrons/opentrons/issues/4128)
+* **api:** implement deck item spanning first pass ([#4160](https://github.com/opentrons/opentrons/issues/4160)) ([1b621a4](https://github.com/opentrons/opentrons/commit/1b621a4)), closes [#3107](https://github.com/opentrons/opentrons/issues/3107)
+* **api:** Specify if a restart is required after changing some ffs ([#4233](https://github.com/opentrons/opentrons/issues/4233)) ([9452ffa](https://github.com/opentrons/opentrons/commit/9452ffa))
+* **api:** v1: Add version specification to labware.load ([#4218](https://github.com/opentrons/opentrons/issues/4218)) ([37060ce](https://github.com/opentrons/opentrons/commit/37060ce)), closes [#4216](https://github.com/opentrons/opentrons/issues/4216)
+* **app:** add robot restart alert for FF changes that require restart ([#4285](https://github.com/opentrons/opentrons/issues/4285)) ([96408a1](https://github.com/opentrons/opentrons/commit/96408a1))
+* **app:** Enable GEN2 pipettes ([#4297](https://github.com/opentrons/opentrons/issues/4297)) ([f9d2c3b](https://github.com/opentrons/opentrons/commit/f9d2c3b)), closes [#3601](https://github.com/opentrons/opentrons/issues/3601)
+* **app:** improve modules on run tab, enable module temp control for tc and td ([#4172](https://github.com/opentrons/opentrons/issues/4172)) ([c11de69](https://github.com/opentrons/opentrons/commit/c11de69)), closes [#4021](https://github.com/opentrons/opentrons/issues/4021)
+* **app:** restrict calibrate and run on incompatible pipettes ([#4185](https://github.com/opentrons/opentrons/issues/4185)) ([02fcd4c](https://github.com/opentrons/opentrons/commit/02fcd4c))
+* **labware-creator:** add analytics events skeleton ([#4168](https://github.com/opentrons/opentrons/issues/4168)) ([3593171](https://github.com/opentrons/opentrons/commit/3593171))
+* **labware-creator:** Guide user to labware test ([#4153](https://github.com/opentrons/opentrons/issues/4153)) ([4bc00c4](https://github.com/opentrons/opentrons/commit/4bc00c4)), closes [#4118](https://github.com/opentrons/opentrons/issues/4118)
+* **labware-library:** Add link for LC to LL sidebar ([#4154](https://github.com/opentrons/opentrons/issues/4154)) ([4117e8e](https://github.com/opentrons/opentrons/commit/4117e8e)), closes [#4147](https://github.com/opentrons/opentrons/issues/4147)
+* **labware-library:** add P20 tip rack image to library ([#4280](https://github.com/opentrons/opentrons/issues/4280)) ([63032fb](https://github.com/opentrons/opentrons/commit/63032fb))
+* **labware-library:** hook up LC analytics and opt-in ([#4177](https://github.com/opentrons/opentrons/issues/4177)) ([bad03e1](https://github.com/opentrons/opentrons/commit/bad03e1)), closes [#4115](https://github.com/opentrons/opentrons/issues/4115) [#4116](https://github.com/opentrons/opentrons/issues/4116) [#4117](https://github.com/opentrons/opentrons/issues/4117)
+* **protocol-designer:** add new actions for module interactions ([#4275](https://github.com/opentrons/opentrons/issues/4275)) ([5e9fa80](https://github.com/opentrons/opentrons/commit/5e9fa80))
+* **protocol-designer:** add reducers for module placement ([#4287](https://github.com/opentrons/opentrons/issues/4287)) ([7973d2a](https://github.com/opentrons/opentrons/commit/7973d2a))
+* **protocol-designer:** Add unrestricted module placement FF ([#4289](https://github.com/opentrons/opentrons/issues/4289)) ([4c59d4d](https://github.com/opentrons/opentrons/commit/4c59d4d)), closes [#4134](https://github.com/opentrons/opentrons/issues/4134)
+* **protocol-designer:** promote custom labware upload to full feature ([#4207](https://github.com/opentrons/opentrons/issues/4207)) ([c19634e](https://github.com/opentrons/opentrons/commit/c19634e))
+* **shared-data:** add NEST labware ([#4156](https://github.com/opentrons/opentrons/issues/4156)) ([0d2491d](https://github.com/opentrons/opentrons/commit/0d2491d))
+* **update-server:** add clear all keys endpoint link local ([#4182](https://github.com/opentrons/opentrons/issues/4182)) ([5b04918](https://github.com/opentrons/opentrons/commit/5b04918))
+
+
+
+
+
 ## [3.13.2](https://github.com/Opentrons/opentrons/compare/v3.13.1...v3.13.2) (2019-10-10)
 
 
