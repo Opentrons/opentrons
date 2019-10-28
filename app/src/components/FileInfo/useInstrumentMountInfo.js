@@ -1,5 +1,6 @@
 // @flow
 import { useSelector } from 'react-redux'
+import isEmpty from 'lodash/isEmpty'
 
 import {
   selectors as robotSelectors,
@@ -8,7 +9,21 @@ import {
 import { getPipettesState } from '../../robot-api'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
+export type PipetteCompatibility = 'match' | 'inexact_match' | 'incompatible'
 const { PIPETTE_MOUNTS } = robotConstants
+
+function pipettesAreInexactMatch(protocolInstrument, actualInstrument) {
+  switch (protocolInstrument?.modelSpecs?.name) {
+    case 'p300_single':
+    case 'p300_single_gen1':
+      return actualInstrument?.name === 'p300_single_gen2'
+    case 'p10_single':
+    case 'p10_single_gen1':
+      return actualInstrument?.name === 'p20_single_gen2'
+    default:
+      return false
+  }
+}
 
 function useInstrumentMountInfo(robotName: string) {
   const protocolInstruments = useSelector(robotSelectors.getPipettes)
@@ -23,16 +38,16 @@ function useInstrumentMountInfo(robotName: string) {
     const actualInstrument = actualInstruments[mount]
 
     const actualPipetteConfig = getPipetteModelSpecs(
-      actualInstruments?.model || ''
+      actualInstrument?.model || ''
     )
 
     const perfectMatch =
-      protocolInstrument.modelSpecs?.name === actualPipetteConfig?.name
+      protocolInstrument?.modelSpecs?.name === actualPipetteConfig?.name
 
-    let compatibility = 'incompatible'
-    if (perfectMatch) {
+    let compatibility: PipetteCompatibility = 'incompatible'
+    if (perfectMatch || isEmpty(protocolInstrument)) {
       compatibility = 'match'
-    } else if (pipettesAreInexactMatch(protocolInstrument, actualInstruments)) {
+    } else if (pipettesAreInexactMatch(protocolInstrument, actualInstrument)) {
       compatibility = 'inexact_match'
     }
 
@@ -41,19 +56,19 @@ function useInstrumentMountInfo(robotName: string) {
       [mount]: {
         protocol: {
           ...protocolInstrument,
-          displayName: protocolInstrument.modelSpecs?.displayName || 'N/A',
+          displayName: protocolInstrument?.modelSpecs?.displayName || 'N/A',
         },
         actual: {
-          ...actualInstruments,
-          modelSpecs: getPipetteModelSpecs(actualInstruments?.model || ''),
-          displayName: actualInstruments?.model || 'N/A',
+          ...actualInstrument,
+          modelSpecs: actualPipetteConfig,
+          displayName: actualPipetteConfig?.displayName || 'N/A',
         },
         compatibility,
       },
     }
-  })
+  }, {})
 
   return instrumentInfoByMount
 }
 
-export default usePipetteInfo
+export default useInstrumentMountInfo

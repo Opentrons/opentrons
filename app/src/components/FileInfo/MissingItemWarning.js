@@ -11,7 +11,7 @@ type Props = {
   url: string,
 }
 
-export default function InstrumentWarning(props: Props) {
+export default function MissingItemWarning(props: Props) {
   const { instrumentType, url } = props
   return (
     <SectionContentHalf className={styles.align_center}>
