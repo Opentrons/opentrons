@@ -167,7 +167,7 @@ type SavedStepFormsActions =
   | DeleteContainerAction
   | SubstituteStepFormPipettesAction
   | DeletePipettesAction
-  | CreateModuleAction // TODO IMMEDIATELY: add unit tests
+  | CreateModuleAction
   | DeleteModuleAction
   | DuplicateStepAction
   | ChangeSavedStepFormAction

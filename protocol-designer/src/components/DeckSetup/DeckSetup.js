@@ -12,7 +12,11 @@ import {
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import i18n from '../../localization'
-import { LEFT_SIDE_SLOTS, SPAN7_8_10_11_SLOT } from '../../constants'
+import {
+  PSEUDO_DECK_SLOTS,
+  LEFT_SIDE_SLOTS,
+  SPAN7_8_10_11_SLOT,
+} from '../../constants'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../steplist'
 import ModuleViz from './ModuleViz'
 import ModuleTag from './ModuleTag'
@@ -49,24 +53,6 @@ const VIEWBOX_MIN_X = -64
 const VIEWBOX_MIN_Y = -10
 const VIEWBOX_WIDTH = 520
 const VIEWBOX_HEIGHT = 414
-
-// PD-specific slots that don't exist in deck definition.
-// These shouldn't be rendered on deck when empty, but TODO TODO TODO
-// TODO IMMEDIATELY import from somewhere else
-const PSEUDO_DECK_SLOTS: { [DeckSlot]: DeckDefSlot } = {
-  [SPAN7_8_10_11_SLOT]: {
-    displayName: 'Spanning slot',
-    id: SPAN7_8_10_11_SLOT,
-    position: [0.0, 181.0, 0.0],
-    matingSurfaceUnitVector: [-1, 1, -1],
-    boundingBox: {
-      xDimension: 128 * 2 + 4,
-      yDimension: 86 * 2 + 4,
-      zDimension: 0,
-    },
-    compatibleModules: ['thermocycler'],
-  },
-}
 
 const getSlotsBlockedBySpanning = (
   initialDeckSetup: InitialDeckSetup
@@ -211,10 +197,6 @@ const DeckSetup = (props: Props) => {
                 <>
                   {/* all modules */}
                   {allModules.map(module => {
-                    // TODO IMMEDIATELY: deal with user having module feature flag off...
-                    // but maybe it doesn't matter b/c it'd always be upstream of this render?
-                    // If you can't import and can't add modules,
-                    // there will never be any modules to render here so no action needed here?
                     const slot = moduleParentSlots.find(
                       slot => slot.id === module.slot
                     )
