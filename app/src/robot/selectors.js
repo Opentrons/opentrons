@@ -232,7 +232,6 @@ export const getPipettes: OutputSelector<
         const probed = probedByMount[mount] || false
         const tipOn = tipOnByMount[mount] || false
 
-        console.log('TTTTT', pipette)
         return {
           ...pipette,
           probed,

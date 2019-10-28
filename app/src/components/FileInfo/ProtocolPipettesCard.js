@@ -7,6 +7,7 @@ import map from 'lodash/map'
 import some from 'lodash/some'
 
 import { Icon } from '@opentrons/components'
+import { constants as robotConstants } from '../../robot'
 import { fetchPipettes } from '../../robot-api'
 import InstrumentItem from './InstrumentItem'
 import { SectionContentHalf } from '../layout'
@@ -20,7 +21,10 @@ import type { Robot } from '../../discovery'
 
 type Props = {| robot: Robot |}
 
-const inexactPipetteSupportArticle = 'https://support.opentrons.com/ot-2'
+const { PIPETTE_MOUNTS } = robotConstants
+
+const inexactPipetteSupportArticle =
+  'https://support.opentrons.com/en/articles/3450143-gen2-pipette-compatibility'
 const TITLE = 'Required Pipettes'
 
 function ProtocolPipettes(props: Props) {
@@ -41,20 +45,22 @@ function ProtocolPipettes(props: Props) {
     ({ compatibility }) => compatibility === 'inexact_match'
   )
 
-  console.log(infoByMount)
   return (
     <InfoSection title={TITLE}>
       <SectionContentHalf>
-        {map(infoByMount, ({ protocol, compatibility }) => (
-          <InstrumentItem
-            key={protocol.mount}
-            compatibility={compatibility}
-            mount={protocol.mount}
-            hidden={!protocol.name}
-          >
-            {protocol.displayName}
-          </InstrumentItem>
-        ))}
+        {PIPETTE_MOUNTS.map(mount => {
+          const { protocol, compatibility } = infoByMount[mount]
+          return (
+            <InstrumentItem
+              key={protocol.mount}
+              compatibility={compatibility}
+              mount={protocol.mount}
+              hidden={!protocol.name}
+            >
+              {protocol.displayName}
+            </InstrumentItem>
+          )
+        })}
       </SectionContentHalf>
       {!allPipettesMatch && (
         <MissingItemWarning
