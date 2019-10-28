@@ -8,7 +8,10 @@ import {
   type Pipette,
   type Mount,
 } from '../../robot'
-import { getPipettesState, type PipettesState } from '../../robot-api'
+import {
+  getPipettesState,
+  type Pipette as ActualPipette,
+} from '../../robot-api'
 import {
   getPipetteModelSpecs,
   getPipetteNameSpecs,
@@ -17,18 +20,18 @@ import {
 
 export type PipetteCompatibility = 'match' | 'inexact_match' | 'incompatible'
 
-type InstrumentMountInfo = {
-  actual: {
-    ...PipettesState,
+type InstrumentMountInfo = {|
+  actual: {|
+    ...ActualPipette,
     displayName: string,
-  },
-  protocol: {
-    ...Pipette,
+    modelSpecs: ?PipetteModelSpecs,
+  |},
+  protocol: {|
+    ...$Exact<Pipette>,
     displayName: string,
-    modelSpecs: PipetteModelSpecs,
-  },
+  |},
   compatibility: PipetteCompatibility,
-}
+|}
 const { PIPETTE_MOUNTS } = robotConstants
 
 function pipettesAreInexactMatch(protocolInstrName, actualInstrName) {
