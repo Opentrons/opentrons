@@ -50,9 +50,9 @@ class SimulatingDriver:
         return 'holding at target' if self._active else 'idle'
 
     def get_device_info(self):
-        return {'serial': 'dummySerial',
-                'model': 'dummyModel',
-                'version': 'dummyVersion'}
+        return {'serial': 'dummySerialTD',
+                'model': 'dummyModelTD',
+                'version': 'dummyVersionTD'}
 
 
 class Poller(Thread):
@@ -96,6 +96,10 @@ class TempDeck(mod_abc.AbstractModule):
     @classmethod
     def display_name(cls) -> str:
         return 'Temperature Deck'
+
+    @classmethod
+    def bootloader(cls) -> mod_abc.UploadFunction:
+        return update.upload_via_avrdude
 
     @staticmethod
     def _build_driver(
@@ -201,6 +205,6 @@ class TempDeck(mod_abc.AbstractModule):
             self._poller.join()
         del self._poller
         self._poller = None
-        new_port = await update.enter_bootloader(self._driver,
-                                                 self.name())
+        model = self._device_info and self._device_info.get('model')
+        new_port = await update.enter_bootloader(self._driver, model)
         return new_port or self.port

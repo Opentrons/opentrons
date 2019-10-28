@@ -172,12 +172,12 @@ def dummy_attached_leg_modules():
 
 @pytest.mark.api2_only
 async def test_execute_module_command_v2(
-          dummy_discover_modules,
-          virtual_smoothie_env,
-          loop,
-          async_server,
-          async_client,
-          monkeypatch):
+        dummy_discover_modules,
+        virtual_smoothie_env,
+        loop,
+        async_server,
+        async_client,
+        monkeypatch):
     hw = async_server['com.opentrons.hardware']
 
     def dummy_get_attached_modules():
@@ -185,7 +185,7 @@ async def test_execute_module_command_v2(
 
     monkeypatch.setattr(hw, 'discover_modules', dummy_discover_modules)
 
-    resp = await async_client.post('/modules/dummySerial',
+    resp = await async_client.post('/modules/dummySerialMD',
                                    json={'command_type': 'deactivate'})
     body = await resp.json()
     assert resp.status == 200
@@ -195,12 +195,12 @@ async def test_execute_module_command_v2(
 
 @pytest.mark.api1_only
 async def test_execute_module_command_v1(
-          dummy_attached_leg_modules,
-          virtual_smoothie_env,
-          loop,
-          async_server,
-          async_client,
-          monkeypatch):
+        dummy_attached_leg_modules,
+        virtual_smoothie_env,
+        loop,
+        async_server,
+        async_client,
+        monkeypatch):
     hw = async_server['com.opentrons.hardware']
     monkeypatch.setattr(hw, '_attached_modules', dummy_attached_leg_modules)
 

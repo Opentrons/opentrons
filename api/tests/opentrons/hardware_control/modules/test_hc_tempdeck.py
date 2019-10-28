@@ -17,9 +17,9 @@ async def test_sim_state():
     assert temp.live_data['data']['currentTemp'] == temp.temperature
     assert temp.live_data['data']['targetTemp'] == temp.target
     status = temp.device_info
-    assert status['serial'] == 'dummySerial'
-    assert status['model'] == 'dummyModel'
-    assert status['version'] == 'dummyVersion'
+    assert status['serial'] == 'dummySerialTD'
+    assert status['model'] == 'dummyModelTD'
+    assert status['version'] == 'dummyVersionTD'
 
 
 async def test_sim_update():

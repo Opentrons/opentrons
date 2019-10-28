@@ -4,7 +4,6 @@ from opentrons import config
 from .endpoints import (networking, control, settings, update)
 from opentrons.deck_calibration import endpoints as dc_endp
 
-
 from .endpoints import serverlib_fallback as endpoints
 log = logging.getLogger(__name__)
 
@@ -37,14 +36,18 @@ class HTTPServer(object):
             '/modules/{serial}/data', control.get_module_data)
         self.app.router.add_post(
             '/modules/{serial}', control.execute_module_command)
+        if config.feature_flags.use_protocol_api_v2():
+            self.app.router.add_post(
+                '/modules/{serial}/update', update.update_module_firmware)
+        else:
+            self.app.router.add_post(
+                '/modules/{serial}/update', update.cannot_update_firmware)
         self.app.router.add_post(
             '/camera/picture', control.take_picture)
         self.app.router.add_post(
             '/server/update', endpoints.update_api)
         self.app.router.add_post(
             '/server/update/firmware', endpoints.update_firmware)
-        self.app.router.add_post(
-            '/modules/{serial}/update', update.update_module_firmware)
         self.app.router.add_get(
             '/update/ignore', endpoints.get_ignore_version)
         self.app.router.add_post(

@@ -1,5 +1,5 @@
 import asyncio
-from . import mod_abc, types
+from . import mod_abc, types, update
 from typing import Union, Optional, List, Callable
 from opentrons.drivers.thermocycler.driver import (
     Thermocycler as ThermocyclerDriver)
@@ -20,12 +20,6 @@ class SimulatingDriver:
         self._lid_heating_active = False
 
     async def open(self):
-        # TODO: BC 2019-07-11 once safe threshold is established in
-        # firmware, handle UI level warning responsibly here
-
-        # if self._active:
-        #     raise ThermocyclerError(
-        #         'Cannot open Thermocycler while it is active')
         self._lid_status = 'open'
         return self._lid_status
 
@@ -103,9 +97,12 @@ class SimulatingDriver:
         self._lid_target = None
 
     async def get_device_info(self):
-        return {'serial': 'dummySerial',
-                'model': 'dummyModel',
-                'version': 'dummyVersion'}
+        return {'serial': 'dummySerialTC',
+                'model': 'dummyModelTC',
+                'version': 'dummyVersionTC'}
+
+    async def enter_programming_mode(self):
+        pass
 
 
 class Thermocycler(mod_abc.AbstractModule):
@@ -133,6 +130,10 @@ class Thermocycler(mod_abc.AbstractModule):
     def display_name(cls):
         return 'Thermocycler'
 
+    @classmethod
+    def bootloader(cls) -> mod_abc.UploadFunction:
+        return update.upload_via_bossa
+
     @staticmethod
     def _build_driver(
             simulating: bool,
@@ -158,7 +159,6 @@ class Thermocycler(mod_abc.AbstractModule):
 
         self._port = port
         self._device_info = None
-        self._poller = None
 
         self._running_flag = asyncio.Event(loop=self._loop)
         self._current_cycle_task: Optional[asyncio.Task] = None
@@ -370,4 +370,6 @@ class Thermocycler(mod_abc.AbstractModule):
         return self._port
 
     async def prep_for_update(self):
-        pass
+        new_port = await update.enter_bootloader(self._driver,
+                                                 self.name())
+        return new_port or self.port

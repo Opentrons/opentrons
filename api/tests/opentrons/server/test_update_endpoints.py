@@ -8,6 +8,7 @@ from aiohttp import web
 from opentrons.server import init
 from opentrons.server.endpoints import update
 from opentrons.server.endpoints import serverlib_fallback
+from opentrons.hardware_control import modules as hw_modules, simulator
 
 
 async def test_restart(
@@ -72,7 +73,7 @@ async def test_update(
 
 
 async def test_ignore_updates(
-        virtual_smoothie_env, loop, aiohttp_client, async_client):
+        virtual_smoothie_env, loop, async_client):
     tmpdir = tempfile.mkdtemp("files")
     ignore_name = "testy_ignore.json"
     serverlib_fallback.filepath = os.path.join(tmpdir, ignore_name)
@@ -100,68 +101,46 @@ async def test_ignore_updates(
     assert json.loads(r3body) == {'version': '3.1.3'}
 
 
-@pytest.mark.api1_only
-@pytest.fixture
-def dummy_attached_modules(modules):
-    temp_module = modules.TempDeck()
-    temp_port = 'tty1_tempdeck'
-    temp_serial = 'tdYYYYMMDD987'
-    temp_module._device_info = {'serial': temp_serial}
-    mag_module = modules.MagDeck()
-    mag_port = 'tty1_magdeck'
-    mag_serial = 'mdYYYYMMDD123'
-    mag_module._device_info = {'serial': mag_serial}
-    return {
-        temp_port + 'tempdeck': temp_module,
-        mag_port + 'magdeck': mag_module
-    }
-
-
-@pytest.mark.api1_only
+@pytest.mark.api2_only
 async def test_update_module_firmware(
-        dummy_attached_modules,
         virtual_smoothie_env,
         loop,
         aiohttp_client,
         monkeypatch,
         async_client,
-        async_server,
-        modules):
+        async_server):
 
     client = async_client
-    hw = async_server['com.opentrons.hardware']
-    if async_server['api_version'] == 2:
-        hw = hw._api
-    serial_num = 'mdYYYYMMDD123'
+    serial_num = 'dummySerialTC'
     fw_filename = 'dummyFirmware.hex'
     tmpdir = tempfile.mkdtemp("files")
 
     with open(os.path.join(tmpdir, fw_filename), 'wb') as fd:
         fd.write(bytes(0x1234))
 
-    def dummy_discover_modules():
-        return
+    def mock_get_attached_modules(module):
+        return [('mod1', 'thermocycler')]
 
-    async def mock_enter_bootloader(module):
+    async def mock_enter_bootloader(driver, module):
         return '/dev/modules/tty0_bootloader'
 
-    monkeypatch.setattr(hw, 'discover_modules', dummy_discover_modules)
-    monkeypatch.setattr(hw, '_attached_modules', dummy_attached_modules)
-    monkeypatch.setattr(modules, 'enter_bootloader', mock_enter_bootloader)
+    monkeypatch.setattr(hw_modules.update, 'enter_bootloader',
+                        mock_enter_bootloader)
+    monkeypatch.setattr(simulator.Simulator, 'get_attached_modules',
+                        mock_get_attached_modules)
 
     # ========= Happy path ==========
-    res_msg = {'message': 'Firmware update successful',
-               'avrdudeResponse': '1234 bytes of flash verified',
+    res_msg = {'message': f'Successully updated module {serial_num}',
                'filename': fw_filename}
 
     async def mock_successful_upload_to_module(
-            module, fw_file, loop):
-        return res_msg
+            port, firmware_file_path, upload_function, loop):
+        return True, res_msg['message']
 
     expected_res = res_msg
 
-    monkeypatch.setattr(modules,
-                        'update_firmware', mock_successful_upload_to_module)
+    monkeypatch.setattr(hw_modules.update,
+                        'upload_firmware', mock_successful_upload_to_module)
     resp = await client.post(
         '/modules/{}/update'.format(serial_num),
         data={'module_firmware': open(os.path.join(tmpdir, fw_filename))})
@@ -171,107 +150,85 @@ async def test_update_module_firmware(
     assert res == expected_res
 
 
-@pytest.mark.api1_only
+@pytest.mark.api2_only
 async def test_fail_update_module_firmware(
-        dummy_attached_modules,
         virtual_smoothie_env,
+        loop,
+        aiohttp_client,
         monkeypatch,
         async_client,
-        async_server,
-        modules):
+        async_server):
 
     client = async_client
-    hw = async_server['com.opentrons.hardware']
-    if async_server['api_version'] == 2:
-        hw = hw._api
-    serial_num = 'mdYYYYMMDD123'
+    serial_num = 'dummySerialTC'
     fw_filename = 'dummyFirmware.hex'
     tmpdir = tempfile.mkdtemp("files")
 
     with open(os.path.join(tmpdir, fw_filename), 'wb') as fd:
         fd.write(bytes(0x1234))
 
-    def dummy_discover_modules():
-        return
-
-    async def mock_enter_bootloader(module):
+    async def mock_enter_bootloader(driver, module):
         return '/dev/modules/tty0_bootloader'
 
-    monkeypatch.setattr(hw, 'discover_modules', dummy_discover_modules)
-    monkeypatch.setattr(hw, '_attached_modules', dummy_attached_modules)
-    monkeypatch.setattr(modules, 'enter_bootloader', mock_enter_bootloader)
+    def mock_get_attached_modules(module):
+        return [('mod1', 'thermocycler')]
+
+    monkeypatch.setattr(simulator.Simulator, 'get_attached_modules',
+                        mock_get_attached_modules)
+    monkeypatch.setattr(hw_modules.update, 'enter_bootloader',
+                        mock_enter_bootloader)
 
     # ========= Case 1: Port not accessible =========
-    res_msg1 = {'message': 'Firmware update failed',
-                'avrdudeResponse': 'ser_open(): can\'t open device',
+    bootloader_error = 'BOSSA FAILED'
+    res_msg1 = {'message': f'Bootloader error: {bootloader_error}',
                 'filename': fw_filename}
 
     async def mock_failed_upload_to_module1(
-            serialnum, fw_file, loop):
-        return res_msg1
+            port, firmware_file_path, upload_function, loop):
+        return ('mod1', (False, bootloader_error))
 
     expected_res1 = res_msg1
 
-    monkeypatch.setattr(modules,
-                        'update_firmware', mock_failed_upload_to_module1)
+    monkeypatch.setattr(hw_modules.update,
+                        'upload_firmware', mock_failed_upload_to_module1)
+
     resp1 = await client.post(
         '/modules/{}/update'.format(serial_num),
         data={'module_firmware': open(os.path.join(tmpdir, fw_filename))})
 
-    assert resp1.status == 500
+    assert resp1.status == 400
     j1 = await resp1.json()
     assert j1 == expected_res1
 
-    # ========= Case 2: Corrupted file =========
-    res_msg2 = {'message': 'Firmware update failed',
-                'avrdudeResponse': 'checksum mismatch in line 1234',
-                'filename': fw_filename}
+    # ========= Case 2: Bootloader not responding =========
+    expected_res2 = {'message': 'Bootloader not responding',
+                     'filename': fw_filename}
 
     async def mock_failed_upload_to_module2(
-            serialnum, fw_file, loop):
-        return res_msg2
+            port, firmware_file_path, upload_function, loop):
+        await asyncio.sleep(2)
 
-    expected_res2 = res_msg2
+    monkeypatch.setattr(hw_modules.update,
+                        'upload_firmware', mock_failed_upload_to_module2)
+    update.UPDATE_TIMEOUT = 0.1
 
-    monkeypatch.setattr(modules,
-                        'update_firmware', mock_failed_upload_to_module2)
     resp2 = await client.post(
         '/modules/{}/update'.format(serial_num),
         data={'module_firmware': open(os.path.join(tmpdir, fw_filename))})
 
-    assert resp2.status == 400
+    assert resp2.status == 500
     j2 = await resp2.json()
     assert j2 == expected_res2
 
-    # ========= Case 3: AVRDUDE not responding =========
-    expected_res3 = {'message': 'AVRDUDE not responding',
+    # ========= Case 3: No module/ incorrect serial =========
+    wrong_serial = 'abcdef'
+    expected_res3 = {'message': 'Module {} not found'.format(wrong_serial),
                      'filename': fw_filename}
-
-    async def mock_failed_upload_to_module3(
-            serialnum, fw_file, loop):
-        await asyncio.sleep(2)
-
-    monkeypatch.setattr(modules,
-                        'update_firmware', mock_failed_upload_to_module3)
-    update.UPDATE_TIMEOUT = 0.1
 
     resp3 = await client.post(
-        '/modules/{}/update'.format(serial_num),
-        data={'module_firmware': open(os.path.join(tmpdir, fw_filename))})
-
-    assert resp3.status == 500
-    j3 = await resp3.json()
-    assert j3 == expected_res3
-
-    # ========= Case 4: No module/ incorrect serial =========
-    wrong_serial = 'abcdef'
-    expected_res4 = {'message': 'Module {} not found'.format(wrong_serial),
-                     'filename': fw_filename}
-
-    resp4 = await client.post(
         '/modules/{}/update'.format(wrong_serial),
         data={'module_firmware': open(os.path.join(tmpdir, fw_filename))})
 
-    assert resp4.status == 404
-    j4 = await resp4.json()
-    assert j4 == expected_res4
+    assert resp3.status == 404
+    j3 = await resp3.json()
+    assert j3 == expected_res3
