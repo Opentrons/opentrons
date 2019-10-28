@@ -10,7 +10,6 @@ export type DiscoveryCandidates = string | Array<string>
 export type DevInternalFlag =
   | 'allPipetteConfig'
   | 'tempdeckControls'
-  | 'enablePipettePlus'
   | 'customLabware'
 
 export type FeatureFlags = $Shape<{|

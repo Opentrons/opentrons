@@ -37,5 +37,4 @@ export type ChangePipetteProps = {|
   onPipetteSelect: $PropertyType<PipetteSelectionProps, 'onPipetteChange'>,
   checkPipette: () => mixed,
   goToConfirmUrl: () => mixed,
-  __pipettePlusEnabled: boolean,
 |}
