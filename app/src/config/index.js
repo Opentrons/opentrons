@@ -15,7 +15,6 @@ export * from './types'
 export const DEV_INTERNAL_FLAGS: Array<DevInternalFlag> = [
   'allPipetteConfig',
   'tempdeckControls',
-  'enablePipettePlus',
   'customLabware',
 ]
 
