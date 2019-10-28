@@ -105,7 +105,7 @@ class Simulator:
     def move(self, target_position: Dict[str, float],
              home_flagged_axes: bool = True, speed: float = None,
              axis_max_speeds: Dict[str, float] = None):
-        if self._run_flag.is_set():
+        if not self._run_flag.is_set():
             self._log.warning("Move to {} would be blocked by pause"
                               .format(target_position))
         self._position.update(target_position)
@@ -113,7 +113,7 @@ class Simulator:
                                    for ax in target_position})
 
     def home(self, axes: List[str] = None) -> Dict[str, float]:
-        if self._run_flag.is_set():
+        if not self._run_flag.is_set():
             self._log.warning("Home would be blocked by pause")
         # driver_3_0-> HOMED_POSITION
         checked_axes = axes or 'XYZABC'
@@ -251,10 +251,10 @@ class Simulator:
         pass
 
     def pause(self):
-        self._run_flag.set()
+        self._run_flag.clear()
 
     def resume(self):
-        self._run_flag.clear()
+        self._run_flag.set()
 
     def halt(self):
         self._run_flag.set()
