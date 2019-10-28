@@ -33,6 +33,7 @@ function ProtocolEditor() {
           <ConnectedTitleBar />
 
           <div
+            id="main-page"
             className={cx(
               styles.main_page_content,
               MAIN_CONTENT_FORCED_SCROLL_CLASSNAME

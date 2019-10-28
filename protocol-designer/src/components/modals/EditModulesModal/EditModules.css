@@ -1,0 +1,17 @@
+@import '@opentrons/components';
+
+.edit_module_modal {
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+}
+
+.button_row {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+
+  & button {
+    margin-left: 1rem;
+  }
+}

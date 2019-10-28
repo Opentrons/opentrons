@@ -9,6 +9,7 @@ import type { ModulesForEditModulesCard } from '../../step-forms'
 
 type Props = {
   modules: ModulesForEditModulesCard,
+  editModule: (type: ModuleType) => mixed,
 }
 
 // TODO (ka 2019-10-24): This will likely be resused a lot,
@@ -16,7 +17,7 @@ type Props = {
 const MODULE_TYPES: Array<ModuleType> = ['magdeck', 'tempdeck', 'thermocycler']
 
 export default function EditModulesCard(props: Props) {
-  const { modules } = props
+  const { modules, editModule } = props
 
   return (
     <Card title="Modules">
@@ -24,9 +25,18 @@ export default function EditModulesCard(props: Props) {
         {MODULE_TYPES.map((moduleType, i) => {
           const moduleData = modules[moduleType]
           if (moduleData) {
-            return <ModuleRow {...moduleData} type={moduleType} key={i} />
+            return (
+              <ModuleRow
+                {...moduleData}
+                type={moduleType}
+                key={i}
+                editModule={editModule}
+              />
+            )
           } else {
-            return <ModuleRow type={moduleType} key={i} />
+            return (
+              <ModuleRow type={moduleType} key={i} editModule={editModule} />
+            )
           }
         })}
       </div>

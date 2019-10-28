@@ -14,11 +14,16 @@ type Props = {
   slot?: DeckSlot,
   model?: string,
   type: ModuleType,
+  editModule: (moduleType: ModuleType) => mixed,
 }
 
 export default function ModuleRow(props: Props) {
-  const { type, moduleId, slot, model } = props
+  const { type, moduleId, slot, model, editModule } = props
+  const setModuleType = (type: ModuleType) => () => editModule(type)
   const addRemoveText = moduleId ? 'remove' : 'add'
+  const addRemoveAction = moduleId
+    ? () => console.log('remove ' + moduleId)
+    : setModuleType(type)
   return (
     <div>
       <h4 className={styles.row_title}>
@@ -45,7 +50,10 @@ export default function ModuleRow(props: Props) {
 
           {/* TODO (ka 2019-10-23): onClick needs to set edit modal open
           + pass moduleId for deleting */}
-          <OutlineButton className={styles.module_button}>
+          <OutlineButton
+            className={styles.module_button}
+            onClick={addRemoveAction}
+          >
             {addRemoveText}
           </OutlineButton>
         </div>
