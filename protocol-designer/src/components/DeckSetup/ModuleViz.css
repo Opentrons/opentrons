@@ -1,9 +1,8 @@
 @import '@opentrons/components';
 
-/* TODO IMMEDIATELY: colors.css equivalents ??? */
-.module_render {
+.module_viz {
   rx: 6;
-  stroke: #d4d4d4;
+  stroke: var(--c-plate-bg);
   stroke-width: 1;
-  fill: #ededed;
+  fill: var(--c-lightest-gray);
 }

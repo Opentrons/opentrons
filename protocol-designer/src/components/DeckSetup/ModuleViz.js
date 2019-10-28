@@ -25,7 +25,7 @@ const ModuleViz = (props: Props) => {
       y={props.y + yOffset}
       height={yDimension}
       width={xDimension}
-      className={styles.module_render}
+      className={styles.module_viz}
     />
   )
 }

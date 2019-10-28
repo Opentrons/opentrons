@@ -2,7 +2,7 @@
 
 .module_info_tag {
   width: 100%;
-  background-color: #d4d4d4;
+  background-color: var(--c-plate-bg);
   color: var(--c-font-dark);
   padding: 0.3rem 0.3rem 0 0.3rem;
 }
