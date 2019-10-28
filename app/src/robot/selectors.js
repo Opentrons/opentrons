@@ -232,11 +232,13 @@ export const getPipettes: OutputSelector<
         const probed = probedByMount[mount] || false
         const tipOn = tipOnByMount[mount] || false
 
+        console.log('TTTTT', pipette)
         return {
           ...pipette,
           probed,
           tipOn,
           modelSpecs: getPipetteModelSpecs(pipette.name) || null,
+          requestedAs: pipette.requestedAs || null,
         }
       }
     )

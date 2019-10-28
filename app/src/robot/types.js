@@ -87,6 +87,8 @@ export type StatePipette = {
   // TODO(mc, 2018-01-17): this is used to drive tip probe setup
   // instructions which is incorrect and needs to be rethought
   volume: number,
+  // string specified in protocol to load pipette
+  requestedAs?: ?string,
 }
 
 export type Pipette = {

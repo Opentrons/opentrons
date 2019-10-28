@@ -67,7 +67,7 @@ function ProtocolPipettes(props: Props) {
         <SectionContentHalf className={styles.soft_warning}>
           <div className={styles.warning_info_wrapper}>
             <Icon name="information" className={styles.info_icon} />
-            <span>Inexact pipette match</span>
+            <span>Inexact pipette match,</span>
             <a
               href={inexactPipetteSupportArticle}
               target="_blank"
@@ -75,6 +75,7 @@ function ProtocolPipettes(props: Props) {
             >
               &nbsp; learn more
             </a>
+            <span>.</span>
           </div>
         </SectionContentHalf>
       )}

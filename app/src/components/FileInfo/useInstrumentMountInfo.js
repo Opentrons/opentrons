@@ -7,19 +7,22 @@ import {
   constants as robotConstants,
 } from '../../robot'
 import { getPipettesState } from '../../robot-api'
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import {
+  getPipetteModelSpecs,
+  getPipetteNameSpecs,
+} from '@opentrons/shared-data'
 
 export type PipetteCompatibility = 'match' | 'inexact_match' | 'incompatible'
 const { PIPETTE_MOUNTS } = robotConstants
 
-function pipettesAreInexactMatch(protocolInstrument, actualInstrument) {
-  switch (protocolInstrument?.modelSpecs?.name) {
+function pipettesAreInexactMatch(protocolInstrName, actualInstrName) {
+  switch (protocolInstrName) {
     case 'p300_single':
     case 'p300_single_gen1':
-      return actualInstrument?.name === 'p300_single_gen2'
+      return actualInstrName === 'p300_single_gen2'
     case 'p10_single':
     case 'p10_single_gen1':
-      return actualInstrument?.name === 'p20_single_gen2'
+      return actualInstrName === 'p20_single_gen2'
     default:
       return false
   }
@@ -40,14 +43,20 @@ function useInstrumentMountInfo(robotName: string) {
     const actualPipetteConfig = getPipetteModelSpecs(
       actualInstrument?.model || ''
     )
+    const requestedDisplayName = protocolInstrument?.requestedAs
+      ? getPipetteNameSpecs(protocolInstrument?.requestedAs)?.displayName
+      : protocolInstrument?.modelSpecs?.displayName
 
-    const perfectMatch =
-      protocolInstrument?.modelSpecs?.name === actualPipetteConfig?.name
+    const protocolInstrName =
+      protocolInstrument?.requestedAs || protocolInstrument?.modelSpecs?.name
+    const actualInstrName = actualPipetteConfig?.name
+
+    const perfectMatch = protocolInstrName === actualInstrName
 
     let compatibility: PipetteCompatibility = 'incompatible'
     if (perfectMatch || isEmpty(protocolInstrument)) {
       compatibility = 'match'
-    } else if (pipettesAreInexactMatch(protocolInstrument, actualInstrument)) {
+    } else if (pipettesAreInexactMatch(protocolInstrName, actualInstrName)) {
       compatibility = 'inexact_match'
     }
 
@@ -56,7 +65,7 @@ function useInstrumentMountInfo(robotName: string) {
       [mount]: {
         protocol: {
           ...protocolInstrument,
-          displayName: protocolInstrument?.modelSpecs?.displayName || 'N/A',
+          displayName: requestedDisplayName || 'N/A',
         },
         actual: {
           ...actualInstrument,
