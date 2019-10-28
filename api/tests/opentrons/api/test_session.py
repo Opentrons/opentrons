@@ -319,6 +319,20 @@ async def test_session_model_functional(session_manager, protocol):
     assert names == ['p300_single_v1']
 
 
+@pytest.mark.parametrize('protocol_file', ['testosaur-gen2.py'])
+@pytest.mark.api1_only
+async def test_requested_as_v1(session_manager, protocol, protocol_file):
+    session = session_manager.create(name='<blank>', contents=protocol.text)
+    assert session.get_instruments()[0].requested_as == 'p300_single_gen2'
+
+
+@pytest.mark.parametrize('protocol_file', ['testosaur-gen2-v2.py'])
+@pytest.mark.api2_only
+async def test_requested_as_v2(session_manager, protocol, protocol_file):
+    session = session_manager.create(name='<blank>', contents=protocol.text)
+    assert session.get_instruments()[0].requested_as == 'p300_single_gen2'
+
+
 # TODO(artyom 20171018): design a small protocol specifically for the test
 @pytest.mark.api1_only
 @pytest.mark.parametrize('protocol_file', ['bradford_assay.py'])
