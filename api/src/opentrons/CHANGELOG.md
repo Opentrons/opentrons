@@ -22,6 +22,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
+* **api:** add ability to update TC firmware from robot ([#4277](https://github.com/Opentrons/opentrons/pull/4277))
 * **api:** Add bundle creation to opentrons_simulate ([#4125](https://github.com/Opentrons/opentrons/issues/4125)) ([b1d9d66](https://github.com/Opentrons/opentrons/commit/b1d9d66))
 * **api:** apiv2: add max speed control ([#4187](https://github.com/Opentrons/opentrons/issues/4187)) ([ed48382](https://github.com/Opentrons/opentrons/commit/ed48382))
 * **api:** apiv2: conditionally enable backcompat ([#4234](https://github.com/Opentrons/opentrons/issues/4234)) ([806af2c](https://github.com/Opentrons/opentrons/commit/806af2c))
