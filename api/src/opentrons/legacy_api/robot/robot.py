@@ -1056,13 +1056,31 @@ class Robot(CommandPublisher):
 
         delta = pose_tracker.Point(delta_x, delta_y, delta_z)
 
-        new_coordinates = pose_tracker.change_base(
-            pose_tree,
-            src=container,
-            dst=container.parent) + delta
 
-        pose_tree = pose_tracker.update(pose_tree, container, new_coordinates)
-        container._coordinates = container._coordinates + delta
+        # Note: pose tree is updated here, in order to update in-memory state.
+        # Separately from that, on-disk state is updated. This is a point of
+        # possible dis-unity. Would probably work better to un-load the labware
+        # after calibration, and then reload it (would have to figure out where
+        # in the call-stack this could be done without raising exceptions due
+        # to trying to access old references).
+
+        # Have to update all of the things in the pose tree that have the same
+        # load name, otherwise you end up getting the calibration values
+        # added together in the on-disk representation
+        target_name = container.get_name()
+        matching_entries = [
+            x for x in list(pose_tree.keys())
+            if type(x) == Container and x.get_name() == target_name]
+        for entry in matching_entries:
+            old_coordinates = pose_tracker.change_base(
+                pose_tree,
+                src=entry,
+                dst=entry.parent)
+            new_coordinates = old_coordinates + delta
+
+            pose_tree = pose_tracker.update(
+                pose_tree, entry, new_coordinates)
+            entry._coordinates = entry._coordinates + delta
 
         if save and container.properties.get('labware_hash'):
             save_new_offsets(container.properties['labware_hash'], delta)
