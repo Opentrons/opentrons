@@ -5,7 +5,7 @@ import { getConfig } from './config'
 import createLogger from './log'
 
 const config = getConfig('ui')
-const log = createLogger(__filename)
+const log = createLogger('ui')
 
 const urlPath =
   config.url.protocol === 'file:'
@@ -22,6 +22,7 @@ const WINDOW_OPTS = {
   // allow webPreferences to be set at launchtime from config
   webPreferences: Object.assign(
     {
+      // NOTE: __dirname refers to output directory
       preload: path.join(__dirname, './preload.js'),
       nodeIntegration: false,
     },

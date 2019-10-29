@@ -18,7 +18,7 @@ import type {
   BuildrootAction,
 } from '@opentrons/app/src/shell'
 
-const log = createLogger(__filename)
+const log = createLogger('buildroot/index')
 
 const DIRECTORY = path.join(app.getPath('userData'), '__ot_buildroot__')
 

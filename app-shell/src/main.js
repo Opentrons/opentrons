@@ -12,7 +12,7 @@ import { registerUpdate } from './update'
 import { registerBuildrootUpdate } from './buildroot'
 
 const config = getConfig()
-const log = createLogger(__filename)
+const log = createLogger('main')
 
 log.debug('App config', {
   config,
@@ -76,7 +76,7 @@ function startUp() {
 function createRendererLogger() {
   log.info('Creating renderer logger')
 
-  const logger = createLogger()
+  const logger = createLogger('renderer')
   ipcMain.on('log', (_, info) => logger.log(info))
 
   return logger

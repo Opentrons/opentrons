@@ -44,7 +44,7 @@ function initializeTransports() {
   }
 
   transports = createTransports()
-  log = createLogger(__filename)
+  log = createLogger('log')
 
   if (error) log.error('Could not create log directory', { error })
   log.info(`Level "error" and higher logging to ${ERROR_LOG}`)
@@ -97,22 +97,17 @@ function createTransports() {
   ]
 }
 
-function createLogger(filename) {
-  log && log.debug(`Creating logger for ${filename}`)
+function createLogger(label) {
+  log && log.debug(`Creating logger for ${label}`)
 
   const formats = [
+    winston.format.label({ label }),
     winston.format.timestamp(),
     winston.format.metadata({
       key: 'meta',
       fillExcept: ['level', 'message', 'timestamp', 'label'],
     }),
   ]
-
-  if (filename) {
-    const label = path.relative(path.join(__dirname, '../..'), filename)
-
-    formats.unshift(winston.format.label({ label }))
-  }
 
   return winston.createLogger({
     transports,
