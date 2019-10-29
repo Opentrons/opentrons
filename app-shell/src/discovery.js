@@ -16,7 +16,7 @@ import type { Service } from '@opentrons/discovery-client'
 
 import type { Action, Dispatch } from './types'
 
-const log = createLogger(__filename)
+const log = createLogger('discovery')
 
 // TODO(mc, 2018-08-09): values picked arbitrarily and should be researched
 const FAST_POLL_INTERVAL_MS = 3000

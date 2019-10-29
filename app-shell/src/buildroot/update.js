@@ -8,8 +8,9 @@ import { fetch, postFile } from '../http'
 import type { RobotHost } from '@opentrons/app/src/robot-api'
 
 const PREMIGRATION_WHL_DIR = path.join(
+  // NOTE: __dirname refers to output directory
   __dirname,
-  '../../build/br-premigration-wheels'
+  '../build/br-premigration-wheels'
 )
 
 const PREMIGRATION_API_WHL = path.join(

@@ -10,11 +10,12 @@ import { getConfig } from './config'
 import type { UpdateInfo } from '@opentrons/app/src/shell'
 import type { Action, Dispatch, PlainError } from './types'
 
-updater.logger = createLogger(__filename)
+updater.logger = createLogger('update')
 updater.autoDownload = false
 
 export const CURRENT_VERSION: string = updater.currentVersion.version
 export const CURRENT_RELEASE_NOTES: string = fs.readFileSync(
+  // NOTE: __dirname refers to output directory
   path.join(__dirname, '../build/release-notes.md'),
   'utf8'
 )
