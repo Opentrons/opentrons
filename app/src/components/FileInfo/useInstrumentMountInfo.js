@@ -34,20 +34,12 @@ type InstrumentMountInfo = {|
 |}
 const { PIPETTE_MOUNTS } = robotConstants
 
-function pipettesAreInexactMatch(protocolInstrName, actualInstrName) {
-  switch (protocolInstrName) {
-    case 'p1000_single':
-    case 'p1000_single_gen1':
-      return actualInstrName === 'p1000_single_gen2'
-    case 'p300_single':
-    case 'p300_single_gen1':
-      return actualInstrName === 'p300_single_gen2'
-    case 'p10_single':
-    case 'p10_single_gen1':
-      return actualInstrName === 'p20_single_gen2'
-    default:
-      return false
-  }
+function pipettesAreInexactMatch(
+  protocolInstrName,
+  actualModelSpecs: ?PipetteModelSpecs
+) {
+  const { backcompatName } = actualModelSpecs || {}
+  return protocolInstrName === backcompatName
 }
 
 function useInstrumentMountInfo(
@@ -78,7 +70,9 @@ function useInstrumentMountInfo(
     let compatibility: PipetteCompatibility = 'incompatible'
     if (perfectMatch || isEmpty(protocolInstrument)) {
       compatibility = 'match'
-    } else if (pipettesAreInexactMatch(protocolInstrName, actualInstrName)) {
+    } else if (
+      pipettesAreInexactMatch(protocolInstrName, actualPipetteConfig)
+    ) {
       compatibility = 'inexact_match'
     }
 
