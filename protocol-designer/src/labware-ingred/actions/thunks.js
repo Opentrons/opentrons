@@ -9,21 +9,15 @@ import type {
   DuplicateLabwareAction,
 } from './actions'
 import type { GetState, ThunkDispatch } from '../../types'
-import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
-import { getNextAvailableSlot, getNextNickname } from '../utils'
+import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
 
 export const createContainer = (args: CreateContainerArgs) => (
   dispatch: ThunkDispatch<CreateContainerAction>,
   getState: GetState
 ) => {
   const state = getState()
-  const initialSetupStep = stepFormSelectors.getSavedStepForms(state)[
-    INITIAL_DECK_SETUP_STEP_ID
-  ]
-  const labwareLocations =
-    (initialSetupStep && initialSetupStep.labwareLocationUpdate) || {}
-
-  const slot = args.slot || getNextAvailableSlot(labwareLocations)
+  const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
+  const slot = args.slot || getNextAvailableDeckSlot(initialDeckSetup)
   if (slot) {
     dispatch({
       type: 'CREATE_CONTAINER',
@@ -51,12 +45,8 @@ export const duplicateLabware = (templateLabwareId: string) => (
     `no labwareDefURI for labware ${templateLabwareId}, cannot run duplicateLabware thunk`
   )
 
-  const initialSetupStep = stepFormSelectors.getSavedStepForms(state)[
-    INITIAL_DECK_SETUP_STEP_ID
-  ]
-  const labwareLocations =
-    (initialSetupStep && initialSetupStep.labwareLocationUpdate) || {}
-  const duplicateSlot = getNextAvailableSlot(labwareLocations)
+  const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
+  const duplicateSlot = getNextAvailableDeckSlot(initialDeckSetup)
 
   if (!duplicateSlot)
     console.warn('no slots available, cannot duplicate labware')

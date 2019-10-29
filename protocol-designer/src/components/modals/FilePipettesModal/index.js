@@ -1,7 +1,8 @@
 // @flow
+import assert from 'assert'
+import reduce from 'lodash/reduce'
 import * as React from 'react'
 import cx from 'classnames'
-import assert from 'assert'
 import {
   Modal,
   FormGroup,
@@ -9,15 +10,16 @@ import {
   OutlineButton,
   type Mount,
 } from '@opentrons/components'
-import reduce from 'lodash/reduce'
 import i18n from '../../../localization'
+import { SPAN7_8_10_11_SLOT } from '../../../constants'
+import StepChangesConfirmModal from '../EditPipettesModal/StepChangesConfirmModal'
+import ModuleFields from './ModuleFields'
+import PipetteFields from './PipetteFields'
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 import modalStyles from '../modal.css'
-import StepChangesConfirmModal from '../EditPipettesModal/StepChangesConfirmModal'
-import PipetteFields from './PipetteFields'
-import ModuleFields from './ModuleFields'
 import type { ModuleType } from '@opentrons/shared-data'
+import type { DeckSlot } from '../../../types'
 import type { NewProtocolFields } from '../../../load-file'
 import type {
   PipetteOnDeck,
@@ -31,6 +33,8 @@ type PipetteFieldsData = $Diff<
   PipetteOnDeck,
   {| id: mixed, spec: mixed, tiprackLabwareDef: mixed |}
 >
+
+type ModuleCreationArgs = {| type: ModuleType, model: string, slot: DeckSlot |}
 
 type State = {|
   fields: NewProtocolFields,
@@ -49,6 +53,7 @@ type Props = {|
   onSave: ({|
     newProtocolFields: NewProtocolFields,
     pipettes: Array<PipetteFieldsData>,
+    modules: Array<ModuleCreationArgs>,
   |}) => mixed,
   modulesEnabled: ?boolean,
 |}
@@ -61,9 +66,9 @@ const initialState: State = {
     right: { pipetteName: '', tiprackDefURI: null },
   },
   modulesByType: {
-    magdeck: { onDeck: false, model: 'GEN1' },
-    tempdeck: { onDeck: false, model: 'GEN1' },
-    thermocycler: { onDeck: false, model: 'GEN1' },
+    magdeck: { onDeck: false, model: 'GEN1', slot: '1' },
+    tempdeck: { onDeck: false, model: 'GEN1', slot: '3' },
+    thermocycler: { onDeck: false, model: 'GEN1', slot: SPAN7_8_10_11_SLOT },
   },
 }
 
@@ -149,7 +154,23 @@ export default class FilePipettesModal extends React.Component<Props, State> {
       },
       []
     )
-    this.props.onSave({ pipettes, newProtocolFields })
+
+    // NOTE: this is extra-explicit for flow. Reduce fns won't cooperate
+    // with enum-typed key like `{[ModuleType]: ___}`
+    const moduleTypes: Array<ModuleType> = Object.keys(this.state.modulesByType)
+    const modules: Array<ModuleCreationArgs> = moduleTypes.reduce(
+      (acc, moduleType) => {
+        const module = this.state.modulesByType[moduleType]
+        return module?.onDeck
+          ? [
+              ...acc,
+              { type: moduleType, model: module.model, slot: module.slot },
+            ]
+          : acc
+      },
+      []
+    )
+    this.props.onSave({ modules, newProtocolFields, pipettes })
   }
 
   showEditPipetteConfirmationModal = () => {

@@ -38,7 +38,7 @@ export type PipetteEntities = {
 
 // =========== MODULES ========
 // Note: 'model' is like 'GEN1'/'GEN2' etc
-export type FormModule = { onDeck: boolean, model: string }
+export type FormModule = {| onDeck: boolean, model: string, slot: DeckSlot |}
 export type FormModulesByType = {
   [type: ModuleType]: FormModule,
 }
