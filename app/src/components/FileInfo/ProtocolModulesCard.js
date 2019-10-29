@@ -10,7 +10,7 @@ import { getModulesState } from '../../robot-api'
 import InfoSection from './InfoSection'
 import { SectionContentHalf } from '../layout'
 import InstrumentItem from './InstrumentItem'
-import InstrumentWarning from './InstrumentWarning'
+import MissingItemWarning from './MissingItemWarning'
 
 import type { State, Dispatch } from '../../types'
 import type { SessionModule } from '../../robot'
@@ -53,13 +53,16 @@ function ProtocolModulesCard(props: Props) {
     <InfoSection title={TITLE}>
       <SectionContentHalf>
         {moduleInfo.map(m => (
-          <InstrumentItem key={m.slot} match={m.modulesMatch}>
+          <InstrumentItem
+            key={m.slot}
+            compatibility={m.modulesMatch ? 'match' : 'incompatible'}
+          >
             {m.displayName}{' '}
           </InstrumentItem>
         ))}
       </SectionContentHalf>
       {!modulesMatch && (
-        <InstrumentWarning instrumentType="module" url={attachModulesUrl} />
+        <MissingItemWarning instrumentType="module" url={attachModulesUrl} />
       )}
     </InfoSection>
   )
