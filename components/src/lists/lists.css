@@ -17,11 +17,6 @@
 }
 
 .disabled {
-  /*
-   * TODO(mc, 2019-07-11): pointer-events: none should probably be delegated
-   * to the component user (causes hovertooltip problems)
-   */
-  pointer-events: none;
   background-color: transparent;
 
   & * {
@@ -64,10 +59,18 @@
 }
 
 .title {
-  @apply --font-body-2-dark;
-
+  font-size: var(--fs-body-2);
+  font-weight: var(--fw-regular);
   margin: 0;
   text-transform: uppercase;
+}
+
+.title_enabled {
+  color: var(--c-font-dark);
+}
+
+.title_disabled {
+  color: var(--c-font-disabled);
 }
 
 .title_bar_icon {

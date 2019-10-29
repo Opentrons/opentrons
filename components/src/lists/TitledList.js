@@ -6,7 +6,7 @@ import cx from 'classnames'
 import styles from './lists.css'
 import { type IconName, Icon } from '../icons'
 
-type ListProps = {
+type ListProps = {|
   /** text of title */
   title: string,
   /** optional icon left of the title */
@@ -38,7 +38,9 @@ type ListProps = {
   hovered?: boolean,
   /** disables the whole TitledList if true */
   disabled?: boolean,
-}
+  /** appear disabled, but preserve collapsibility */
+  inert?: boolean,
+|}
 
 /**
  * An ordered list with optional title, icon, and description.
@@ -47,6 +49,7 @@ export default function TitledList(props: ListProps) {
   const {
     iconName,
     disabled,
+    inert,
     onCollapseToggle,
     iconProps,
     onMouseEnter,
@@ -71,7 +74,7 @@ export default function TitledList(props: ListProps) {
   )
 
   const className = cx(styles.titled_list, props.className, {
-    [styles.disabled]: disabled,
+    [styles.disabled]: disabled || inert,
     [styles.titled_list_selected]: !disabled && props.selected,
     [styles.hover_border]: !disabled && props.hovered,
   })
@@ -95,7 +98,14 @@ export default function TitledList(props: ListProps) {
         {iconName && (
           <Icon {...iconProps} className={iconClass} name={iconName} />
         )}
-        <h3 className={styles.title}>{props.title}</h3>
+        <h3
+          className={cx(styles.title, {
+            [styles.title_enabled]: !(disabled || inert),
+            [styles.title_disabled]: disabled || inert,
+          })}
+        >
+          {props.title}
+        </h3>
         {collapsible && (
           <div
             onClick={handleCollapseToggle}

@@ -131,3 +131,40 @@
   text-decoration: none;
   cursor: pointer;
 }
+
+.labware_item_icon {
+  flex: 0 1 auto;
+  margin-left: 0.5rem;
+}
+
+.icon,
+.labware_item_icon {
+  height: 1.25rem;
+  fill: var(--c-near-black);
+}
+
+.filters_heading {
+  @apply --font-body-2-dark;
+
+  font-weight: var(--fw-semibold);
+}
+
+.filter_checkbox {
+  display: inline-block;
+}
+
+.filters_section {
+  display: flex;
+  align-items: center;
+  margin: 0.25rem 0;
+}
+
+.filters_section_copy {
+  @apply --font-body-1-dark;
+
+  padding-left: 0.15rem;
+}
+
+.disabled {
+  color: var(--c-font-disabled);
+}
