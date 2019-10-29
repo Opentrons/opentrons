@@ -144,6 +144,8 @@ export type LabwareDefinition2 = {|
   groups: Array<LabwareWellGroup>,
 |}
 
+export type ModuleType = 'magdeck' | 'tempdeck' | 'thermocycler'
+
 export type DeckOffset = {|
   x: number,
   y: number,
@@ -180,6 +182,7 @@ export type DeckSlot = {|
   matingSurfaceUnitVector?: UnitVectorTuple,
   boundingBox: Dimensions,
   displayName: string,
+  compatibleModules: Array<ModuleType>,
 |}
 export type DeckCalibrationPoint = {|
   id: string,

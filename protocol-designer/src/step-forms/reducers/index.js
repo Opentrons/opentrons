@@ -12,7 +12,11 @@ import {
   rootReducer as labwareDefsRootReducer,
   type RootState as LabwareDefsRootState,
 } from '../../labware-defs'
-import { INITIAL_DECK_SETUP_STEP_ID, FIXED_TRASH_ID } from '../../constants.js'
+import {
+  INITIAL_DECK_SETUP_STEP_ID,
+  FIXED_TRASH_ID,
+  SPAN7_8_10_11_SLOT,
+} from '../../constants.js'
 import { getPDMetadata } from '../../file-types'
 import {
   getDefaultsForStepType,
@@ -149,6 +153,7 @@ export const initialDeckSetupStepForm: FormData = {
     [FIXED_TRASH_ID]: '12',
   },
   pipetteLocationUpdate: {},
+  moduleLocationUpdate: {},
 }
 
 export const initialSavedStepFormsState: SavedStepFormState = {
@@ -162,6 +167,7 @@ type SavedStepFormsActions =
   | DeleteContainerAction
   | SubstituteStepFormPipettesAction
   | DeletePipettesAction
+  | CreateModuleAction
   | DeleteModuleAction
   | DuplicateStepAction
   | ChangeSavedStepFormAction
@@ -224,6 +230,35 @@ export const savedStepForms = (
         },
       }
     }
+    case 'CREATE_MODULE': {
+      const prevInitialDeckSetupStep =
+        savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+      const labwareOccupyingDestination = getDeckItemIdInSlot(
+        prevInitialDeckSetupStep.labwareLocationUpdate,
+        action.payload.slot
+      )
+      const moduleId = action.payload.id
+      // If module is going into a slot occupied by a labware,
+      // move the labware on top of the new module
+      const labwareLocationUpdate =
+        labwareOccupyingDestination == null
+          ? prevInitialDeckSetupStep.labwareLocationUpdate
+          : {
+              ...prevInitialDeckSetupStep.labwareLocationUpdate,
+              [labwareOccupyingDestination]: moduleId,
+            }
+      return {
+        ...savedStepForms,
+        [INITIAL_DECK_SETUP_STEP_ID]: {
+          ...prevInitialDeckSetupStep,
+          labwareLocationUpdate,
+          moduleLocationUpdate: {
+            ...prevInitialDeckSetupStep.moduleLocationUpdate,
+            [action.payload.id]: action.payload.slot,
+          },
+        },
+      }
+    }
     case 'MOVE_DECK_ITEM': {
       const { sourceSlot, destSlot } = action.payload
       return mapValues(savedStepForms, (savedForm: FormData) => {
@@ -247,17 +282,6 @@ export const savedStepForms = (
             destSlot
           )
 
-          const movingLabwareOffModule =
-            sourceLabwareId != null &&
-            sourceModuleId != null &&
-            destLabwareId == null &&
-            destModuleId == null
-          const moveLabwareOnModule =
-            sourceModuleId == null &&
-            sourceLabwareId != null &&
-            destModuleId != null
-          const moduleShouldStay = movingLabwareOffModule || moveLabwareOnModule
-
           return {
             ...savedForm,
             labwareLocationUpdate: {
@@ -265,13 +289,11 @@ export const savedStepForms = (
               ...(sourceLabwareId ? { [sourceLabwareId]: destSlot } : {}),
               ...(destLabwareId ? { [destLabwareId]: sourceSlot } : {}),
             },
-            moduleLocationUpdate: moduleShouldStay
-              ? savedForm.moduleLocationUpdate
-              : {
-                  ...savedForm.moduleLocationUpdate,
-                  ...(sourceModuleId ? { [sourceModuleId]: destSlot } : {}),
-                  ...(destModuleId ? { [destModuleId]: sourceSlot } : {}),
-                },
+            moduleLocationUpdate: {
+              ...savedForm.moduleLocationUpdate,
+              ...(sourceModuleId ? { [sourceModuleId]: destSlot } : {}),
+              ...(destModuleId ? { [destModuleId]: sourceSlot } : {}),
+            },
           }
         }
         return savedForm
@@ -345,9 +367,23 @@ export const savedStepForms = (
       const moduleId = action.payload.id
       return mapValues(savedStepForms, (form: FormData) => {
         if (form.stepType === 'manualIntervention') {
+          // TODO: Ian 2019-10-28 when we have multiple manualIntervention steps, this should look backwards
+          // for the latest location update for the module, not just the initial deck setup
+          const _deletedModuleSlot =
+            savedStepForms[INITIAL_DECK_SETUP_STEP_ID].moduleLocationUpdate[
+              moduleId
+            ]
+          // handle special spanning slots that are intended for modules & not for labware
+          const labwareFallbackSlot =
+            _deletedModuleSlot === SPAN7_8_10_11_SLOT ? '7' : _deletedModuleSlot
           return {
             ...form,
             moduleLocationUpdate: omit(form.moduleLocationUpdate, moduleId),
+            labwareLocationUpdate: mapValues(
+              form.labwareLocationUpdate,
+              labwareSlot =>
+                labwareSlot === moduleId ? labwareFallbackSlot : labwareSlot
+            ),
           }
         } else {
           // TODO: Ian 2019-10-24 remove modules from forms that may reference them
@@ -583,6 +619,7 @@ export const moduleInvariantProperties = handleActions<ModuleEntities, *>(
     ): ModuleEntities => ({
       ...state,
       [action.payload.id]: {
+        id: action.payload.id,
         type: action.payload.type,
         model: action.payload.model,
       },
@@ -767,6 +804,7 @@ export type RootState = {
   labwareDefs: LabwareDefsRootState,
   labwareInvariantProperties: NormalizedLabwareById,
   pipetteInvariantProperties: NormalizedPipetteById,
+  moduleInvariantProperties: ModuleEntities,
   legacySteps: LegacyStepsState,
   savedStepForms: SavedStepFormState,
   unsavedForm: FormState,
@@ -785,6 +823,10 @@ const rootReducer = (state: RootState, action: any) => {
     ),
     pipetteInvariantProperties: pipetteInvariantProperties(
       prevStateFallback.pipetteInvariantProperties,
+      action
+    ),
+    moduleInvariantProperties: moduleInvariantProperties(
+      prevStateFallback.moduleInvariantProperties,
       action
     ),
     labwareDefs: labwareDefsRootReducer(prevStateFallback.labwareDefs, action),

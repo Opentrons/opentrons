@@ -46,6 +46,11 @@ export type FormModulesByType = {
 export type ModuleEntity = {| id: string, type: ModuleType, model: string |}
 export type ModuleEntities = { [moduleId: string]: ModuleEntity }
 
+export type ModuleTemporalProperties = {| slot: DeckSlot |}
+export type ModuleOnDeck = {| ...ModuleEntity, ...ModuleTemporalProperties |}
+
+// TODO IMMEDIATELY: repace ModulesForEditModulesCard with ModuleOnDeck, oops!
+// They're the same except id instead of moduleId.
 export type ModulesForEditModulesCard = {
   [type: ModuleType]: {
     moduleId: string,
@@ -105,5 +110,8 @@ export type InitialDeckSetup = {
   },
   pipettes: {
     [pipetteId: string]: PipetteOnDeck,
+  },
+  modules: {
+    [moduleId: string]: ModuleOnDeck,
   },
 }

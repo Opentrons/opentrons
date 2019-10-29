@@ -1,9 +1,12 @@
 // @flow
 import mapValues from 'lodash/mapValues'
 import * as componentLib from '@opentrons/components'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { WellVolumes } from './types'
-// TODO Ian 2018-11-27: import these from components lib, not from this contants file
+import type {
+  LabwareDefinition2,
+  DeckSlot as DeckDefSlot,
+} from '@opentrons/shared-data'
+import type { DeckSlot, WellVolumes } from './types'
+// TODO Ian 2018-11-27: import these from components lib, not from this constants file
 export const {
   // OT2 DECK CONSTANTS
   SLOTNAME_MATRIX,
@@ -25,6 +28,30 @@ export function getAllWellsForLabware(def: LabwareDefinition2): Array<string> {
 }
 
 export const FIXED_TRASH_ID: 'trashId' = 'trashId'
+
+// Standard slot dims FOR VISUALIZATION ONLY
+export const STD_SLOT_X_DIM = 128
+export const STD_SLOT_Y_DIM = 86
+export const STD_SLOT_DIVIDER_WIDTH = 4
+
+// PD-specific slots that don't exist in deck definition.
+// These have no visual representation on the deck themselves,
+// but may contain certain specific items that span (eg thermocycler)
+export const SPAN7_8_10_11_SLOT: 'span7_8_10_11' = 'span7_8_10_11'
+export const PSEUDO_DECK_SLOTS: { [DeckSlot]: DeckDefSlot } = {
+  [SPAN7_8_10_11_SLOT]: {
+    displayName: 'Spanning slot',
+    id: SPAN7_8_10_11_SLOT,
+    position: [0.0, 181.0, 0.0], // shares origin with OT2 standard slot 7
+    matingSurfaceUnitVector: [-1, 1, -1],
+    boundingBox: {
+      xDimension: STD_SLOT_X_DIM * 2 + STD_SLOT_DIVIDER_WIDTH,
+      yDimension: STD_SLOT_Y_DIM * 2 + STD_SLOT_DIVIDER_WIDTH,
+      zDimension: 0,
+    },
+    compatibleModules: ['thermocycler'],
+  },
+}
 
 export const START_TERMINAL_TITLE = 'STARTING DECK STATE'
 export const END_TERMINAL_TITLE = 'FINAL DECK STATE'

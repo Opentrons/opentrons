@@ -48,6 +48,8 @@ import type {
   LabwareOnDeck,
   LabwareEntity,
   LabwareEntities,
+  ModuleOnDeck,
+  ModuleEntities,
   PipetteEntities,
   PipetteOnDeck,
   FormPipettesByMount,
@@ -102,6 +104,11 @@ export const _getLabwareEntitiesRootState: RootState => LabwareEntities = create
     )
 )
 
+export const getModuleEntities: Selector<ModuleEntities> = createSelector(
+  rootSelector,
+  rs => rs.moduleInvariantProperties
+)
+
 export const getPipetteEntities: Selector<PipetteEntities> = createSelector(
   state => rootSelector(state).pipetteInvariantProperties,
   labwareDefSelectors.getLabwareDefsByURI,
@@ -141,13 +148,16 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
   getInitialDeckSetupStepForm,
   getLabwareEntities,
   getPipetteEntities,
-  (initialSetupStep, labwareEntities, pipetteEntities) => {
+  getModuleEntities,
+  (initialSetupStep, labwareEntities, pipetteEntities, moduleEntities) => {
     assert(
       initialSetupStep && initialSetupStep.stepType === 'manualIntervention',
       'expected initial deck setup step to be "manualIntervention" step'
     )
     const labwareLocations =
       (initialSetupStep && initialSetupStep.labwareLocationUpdate) || {}
+    const moduleLocations =
+      (initialSetupStep && initialSetupStep.moduleLocationUpdate) || {}
     const pipetteLocations =
       (initialSetupStep && initialSetupStep.pipetteLocationUpdate) || {}
     return {
@@ -155,6 +165,12 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
         labwareLocations,
         (slot: DeckSlot, labwareId: string): LabwareOnDeck => {
           return { slot, ...labwareEntities[labwareId] }
+        }
+      ),
+      modules: mapValues(
+        moduleLocations,
+        (slot: DeckSlot, moduleId: string): ModuleOnDeck => {
+          return { slot, ...moduleEntities[moduleId] }
         }
       ),
       pipettes: mapValues(

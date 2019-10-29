@@ -53,18 +53,9 @@ export type VolumeJson = {
   },
 }
 
-// TODO: Ian 2019-10-22 move up, possibly to shared-data?
-export type DeckSlot =
-  | '1'
-  | '2'
-  | '3'
-  | '4'
-  | '5'
-  | '6'
-  | '7'
-  | '8'
-  | '9'
-  | '10'
-  | '11'
-  | '12'
-  | 'span7_8_10_11' // special spanning slot eg for thermocycler
+// NOTE: string expected to be '1', '2', ... '12' for normal deck slots,
+// or special PD-specific 'span7_8_10_11' slot (for thermocycler)
+// or a module ID.
+export type DeckSlot = string
+
+export type ModuleOrientation = 'left' | 'right'

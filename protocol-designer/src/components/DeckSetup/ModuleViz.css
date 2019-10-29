@@ -1,0 +1,8 @@
+@import '@opentrons/components';
+
+.module_viz {
+  rx: 6;
+  stroke: var(--c-plate-bg);
+  stroke-width: 1;
+  fill: var(--c-lightest-gray);
+}
