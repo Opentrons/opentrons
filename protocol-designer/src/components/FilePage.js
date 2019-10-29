@@ -75,7 +75,6 @@ class FilePage extends React.Component<Props, State> {
   }
 
   closeEditModulesModal = () => {
-    console.log('closing')
     this.setState({ isEditModulesModalOpen: false, currentModule: null })
   }
 
