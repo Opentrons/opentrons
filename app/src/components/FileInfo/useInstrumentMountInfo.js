@@ -36,6 +36,9 @@ const { PIPETTE_MOUNTS } = robotConstants
 
 function pipettesAreInexactMatch(protocolInstrName, actualInstrName) {
   switch (protocolInstrName) {
+    case 'p1000_single':
+    case 'p1000_single_gen1':
+      return actualInstrName === 'p1000_single_gen2'
     case 'p300_single':
     case 'p300_single_gen1':
       return actualInstrName === 'p300_single_gen2'
