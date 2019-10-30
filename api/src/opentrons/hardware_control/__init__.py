@@ -290,7 +290,6 @@ class API(HardwareAPILike):
                 if req_instr and req_instr in back_compat:
                     bc_conf = pipette_config.name_config()[req_instr]
                     p.working_volume = bc_conf['maxVolume']
-                    p._model = req_instr
                     p.update_config_item('min_volume', bc_conf['minVolume'])
                     p.update_config_item('max_volume', bc_conf['maxVolume'])
 
