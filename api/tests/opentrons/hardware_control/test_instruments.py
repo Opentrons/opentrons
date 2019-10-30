@@ -91,7 +91,6 @@ async def test_backwards_compatibility(dummy_backwards_compatibility, loop):
     for mount, name in requested_instr.items():
         assert attached[mount]['name']\
             == dummy_backwards_compatibility[mount]['name']
-        assert attached[mount]['model'] == name
         assert attached[mount]['min_volume'] == volumes[mount]['min']
         assert attached[mount]['max_volume'] == volumes[mount]['max']
 
