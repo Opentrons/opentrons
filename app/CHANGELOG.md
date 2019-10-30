@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.14.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.14.0-alpha.0...v3.14.0-alpha.1) (2019-10-30)
+
+
+### Features
+
+* **app:** allow inexact cross-generational pipette compatibility ([#4311](https://github.com/Opentrons/opentrons/issues/4311)) ([95dae6a](https://github.com/Opentrons/opentrons/commit/95dae6a)), closes [#3598](https://github.com/Opentrons/opentrons/issues/3598)
+* **app:** allow p1000 gen2 to fallback to specced p1000 gen1 ([#4316](https://github.com/Opentrons/opentrons/issues/4316)) ([0e33f65](https://github.com/Opentrons/opentrons/commit/0e33f65)), closes [#3598](https://github.com/Opentrons/opentrons/issues/3598)
+
+
+
+
+
 # [3.14.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.13.2...v3.14.0-alpha.0) (2019-10-28)
 
 

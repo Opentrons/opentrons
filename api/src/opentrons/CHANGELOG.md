@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.14.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.14.0-alpha.0...v3.14.0-alpha.1) (2019-10-30)
+
+
+### Bug Fixes
+
+* **api:** apiv2: initialize simulator runflag ([#4330](https://github.com/Opentrons/opentrons/issues/4330)) ([9405695](https://github.com/Opentrons/opentrons/commit/9405695))
+* **api:** Modify list check to return first item of source and dest ([#4331](https://github.com/Opentrons/opentrons/issues/4331)) ([4802beb](https://github.com/Opentrons/opentrons/commit/4802beb))
+* **api:** update all pose tree state when calibrating labware ([#4322](https://github.com/Opentrons/opentrons/issues/4322)) ([24841ab](https://github.com/Opentrons/opentrons/commit/24841ab)), closes [#4288](https://github.com/Opentrons/opentrons/issues/4288)
+
+
+### Features
+
+* **api:** Allow backwards compatibility with gen2 pipettes in apiv2 ([#4326](https://github.com/Opentrons/opentrons/issues/4326)) ([4609172](https://github.com/Opentrons/opentrons/commit/4609172))
+* **api:** reflect original instrument name via rpc ([#4312](https://github.com/Opentrons/opentrons/issues/4312)) ([8bf0c85](https://github.com/Opentrons/opentrons/commit/8bf0c85))
+
+
+
+
+
 # [3.14.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.13.2...v3.14.0-alpha.0) (2019-10-28)
 
 

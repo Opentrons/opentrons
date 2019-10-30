@@ -23,6 +23,9 @@ We're happy to announce the public beta of version 2 of our Python protocol API!
 - If you specify both `touch_tip` and `blow_out` in a `transfer`, `consolidate`, or `distribute` the robot will now touch tip in a well and then blow out in the trash, rather than the reverse ([#419][419])
 - Fixed an issue where picking up tips in CLI deck calibration would lead to offsets when using pipettes other than P300 single Gen1 or P50 Single Gen1
 - Fixed an issue where the robot's Jupyter notebook would not start if you had previously created notebooks with spaces in their names
+- Fixed an issue where calibrating multiple tipracks would cause their calibrations to drift and behave incorrectly when running the protocol [#4288][4288]
+
+
 
 ## Known Issues
 
@@ -33,3 +36,4 @@ We're happy to announce the public beta of version 2 of our Python protocol API!
 [labware-versioning-docs]: https://docs.opentrons.com/v1/labware.html#labware-versions
 [docs-v2-root]: https://docs.opentrons.com//v2/index.html
 [apiv2-form]: https://opentrons-ux.typeform.com/to/jhccYV
+[4288]: https://github.com/Opentrons/opentrons/issues/4288

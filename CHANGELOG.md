@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.14.0-alpha.1](https://github.com/opentrons/opentrons/compare/v3.14.0-alpha.0...v3.14.0-alpha.1) (2019-10-30)
+
+
+### Bug Fixes
+
+* **api:** apiv2: initialize simulator runflag ([#4330](https://github.com/opentrons/opentrons/issues/4330)) ([9405695](https://github.com/opentrons/opentrons/commit/9405695))
+* **api:** Modify list check to return first item of source and dest ([#4331](https://github.com/opentrons/opentrons/issues/4331)) ([4802beb](https://github.com/opentrons/opentrons/commit/4802beb))
+* **api:** update all pose tree state when calibrating labware ([#4322](https://github.com/opentrons/opentrons/issues/4322)) ([24841ab](https://github.com/opentrons/opentrons/commit/24841ab)), closes [#4288](https://github.com/opentrons/opentrons/issues/4288)
+
+
+### Features
+
+* **api:** Allow backwards compatibility with gen2 pipettes in apiv2 ([#4326](https://github.com/opentrons/opentrons/issues/4326)) ([4609172](https://github.com/opentrons/opentrons/commit/4609172))
+* **api:** reflect original instrument name via rpc ([#4312](https://github.com/opentrons/opentrons/issues/4312)) ([8bf0c85](https://github.com/opentrons/opentrons/commit/8bf0c85))
+* **app:** allow inexact cross-generational pipette compatibility ([#4311](https://github.com/opentrons/opentrons/issues/4311)) ([95dae6a](https://github.com/opentrons/opentrons/commit/95dae6a)), closes [#3598](https://github.com/opentrons/opentrons/issues/3598)
+* **app:** allow p1000 gen2 to fallback to specced p1000 gen1 ([#4316](https://github.com/opentrons/opentrons/issues/4316)) ([0e33f65](https://github.com/opentrons/opentrons/commit/0e33f65)), closes [#3598](https://github.com/opentrons/opentrons/issues/3598)
+* **shared-data:** add "GEN1" to gen 1 pipette display names ([#4313](https://github.com/opentrons/opentrons/issues/4313)) ([cbdc814](https://github.com/opentrons/opentrons/commit/cbdc814))
+
+
+
+
+
 #
 [3.14.0-alpha.0](https://github.com/opentrons/opentrons/compare/v3.13.2...v3.14.0-alpha.0) (2019-10-28)
 
