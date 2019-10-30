@@ -97,6 +97,7 @@ class Simulator:
         self._engaged_axes = {ax: True for ax in _HOME_POSITION}
         self._lights = {'button': False, 'rails': False}
         self._run_flag = Event()
+        self._run_flag.set()
         self._log = MODULE_LOG.getChild(repr(self))
         self._strict_attached = bool(strict_attached_instruments)
 
@@ -106,16 +107,11 @@ class Simulator:
     def move(self, target_position: Dict[str, float],
              home_flagged_axes: bool = True, speed: float = None,
              axis_max_speeds: Dict[str, float] = None):
-        if not self._run_flag.is_set():
-            self._log.warning("Move to {} would be blocked by pause"
-                              .format(target_position))
         self._position.update(target_position)
         self._engaged_axes.update({ax: True
                                    for ax in target_position})
 
     def home(self, axes: List[str] = None) -> Dict[str, float]:
-        if not self._run_flag.is_set():
-            self._log.warning("Home would be blocked by pause")
         # driver_3_0-> HOMED_POSITION
         checked_axes = axes or 'XYZABC'
         self._position.update({ax: _HOME_POSITION[ax]
