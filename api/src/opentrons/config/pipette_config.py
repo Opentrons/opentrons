@@ -197,7 +197,7 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
         tip_length=ensure_value(cfg, 'tipLength', MUTABLE_CONFIGS),
         display_name=ensure_value(cfg, 'displayName', MUTABLE_CONFIGS),
         name=cfg.get('name'),
-        backcompat_name=cfg.get('backCompatName', []),
+        backcompat_name=cfg.get('backCompatNames', []),
         return_tip_height=cfg.get('returnTipHeight'),
         blow_out_flow_rate=ensure_value(
             cfg, 'defaultBlowOutFlowRate', MUTABLE_CONFIGS),

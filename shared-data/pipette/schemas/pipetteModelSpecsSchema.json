@@ -87,7 +87,7 @@
               "description": "reference to name of this version, should match a key in corresponding pipetteNameSpecs.json file",
               "type": "string"
             },
-            "backCompatName": {
+            "backCompatNames": {
               "description": "Optional reference for name of backcompat pipette corresponding to a key in pipetteNameSpecs.json, only relevant to gen2 pipettes",
               "type": "array"
             },

@@ -163,7 +163,7 @@ class Simulator:
             found_model = init_instr.get('model', '')
             backcompat: List[str] = []
             if found_model:
-                backcompat = configs[found_model].get('backCompatName', [])
+                backcompat = configs[found_model].get('backCompatNames', [])
             if expected_instr and found_model\
                     and (not found_model.startswith(expected_instr)
                          and expected_instr not in backcompat):

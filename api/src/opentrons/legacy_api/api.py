@@ -357,7 +357,7 @@ class InstrumentsWrapper(object):
         if attached_model_config.get('name') == expected_model_substring:
             return attached_model
         elif expected_model_substring\
-                in attached_model_config.get('backCompatName'):
+                in attached_model_config.get('backCompatNames'):
             return attached_model
         else:
             # In the case that the expected model substring does not equal
