@@ -200,7 +200,7 @@ class FilePage extends React.Component<Props, State> {
         {this.props.modulesEnabled && (
           <EditModulesCard
             modules={_mockModulesByType}
-            editModule={this.handleEditModule}
+            openEditModuleModal={this.handleEditModule}
           />
         )}
 

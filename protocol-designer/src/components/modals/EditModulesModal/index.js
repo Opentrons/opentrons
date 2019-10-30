@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
+import i18n from '../../../localization'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import {
   Modal,
@@ -38,8 +39,7 @@ export default function EditModulesModal(props: EditModulesProps) {
 
   const slotOptionTooltip = (
     <div className={styles.slot_tooltip}>
-      To enable non-default/unrestricted positioning, go to Settings &gt; App
-      &gt; Experimental settings.
+      {i18n.t('tooltip.edit_module_modal.slot_selection')}
     </div>
   )
   return (

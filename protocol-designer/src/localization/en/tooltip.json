@@ -37,5 +37,8 @@
         "blowout_checkbox": "Redundant with disposal volume"
       }
     }
+  },
+  "edit_module_modal": {
+    "slot_selection": "To enable non-default/unrestricted positioning, go to Settings > App > Experimental settings."
   }
 }

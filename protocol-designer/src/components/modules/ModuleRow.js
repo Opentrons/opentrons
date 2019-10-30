@@ -14,14 +14,14 @@ type Props = {
   slot?: DeckSlot,
   model?: string,
   type: ModuleType,
-  editModule: (moduleType: ModuleType) => mixed,
+  openEditModuleModal: (moduleType: ModuleType) => mixed,
 }
 
 export default function ModuleRow(props: Props) {
-  const { type, moduleId, slot, model, editModule } = props
-  const setModuleType = (type: ModuleType) => () => editModule(type)
+  const { type, moduleId, slot, model, openEditModuleModal } = props
+  const setModuleType = (type: ModuleType) => () => openEditModuleModal(type)
   const addRemoveText = moduleId ? 'remove' : 'add'
-  const addRemoveAction = moduleId
+  const handleAddOrRemove = moduleId
     ? () => console.log('remove ' + moduleId)
     : setModuleType(type)
   return (
@@ -52,7 +52,7 @@ export default function ModuleRow(props: Props) {
           + pass moduleId for deleting */}
           <OutlineButton
             className={styles.module_button}
-            onClick={addRemoveAction}
+            onClick={handleAddOrRemove}
           >
             {addRemoveText}
           </OutlineButton>
