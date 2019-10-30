@@ -23,7 +23,10 @@ def is_new_loc(location: Union[Location, Well, None,
 
 def listify(location: Any) -> List:
     if isinstance(location, list):
-        return sum([listify(loc) for loc in location], [])
+        try:
+            return listify(location[0])
+        except IndexError:
+            return [location]
     else:
         return [location]
 
