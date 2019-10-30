@@ -31,7 +31,7 @@ exports[`LabwareItem component renders 1`] = `
   <p
     className="item_date_column"
   >
-    yyyy-10-Mo
+    2019-10-21
   </p>
 </li>
 `;
