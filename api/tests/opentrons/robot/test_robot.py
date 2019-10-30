@@ -286,7 +286,6 @@ def test_calibrate_multiple(robot, instruments, labware, offsets_tempdir):
     assert isclose(new_offset2, expected2).all()
 
 
-
 @pytest.mark.api1_only
 def test_cache_instruments(robot, monkeypatch):
     # Test that smoothie runtime configs are set at run when

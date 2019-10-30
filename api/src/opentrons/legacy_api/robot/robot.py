@@ -1056,7 +1056,6 @@ class Robot(CommandPublisher):
 
         delta = pose_tracker.Point(delta_x, delta_y, delta_z)
 
-
         # Note: pose tree is updated here, in order to update in-memory state.
         # Separately from that, on-disk state is updated. This is a point of
         # possible dis-unity. Would probably work better to un-load the labware
