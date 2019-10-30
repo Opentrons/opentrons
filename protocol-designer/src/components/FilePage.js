@@ -15,11 +15,12 @@ import i18n from '../localization'
 import { Portal } from './portals/MainPageModalPortal'
 import styles from './FilePage.css'
 import EditPipettesModal from './modals/EditPipettesModal'
+import EditModulesModal from './modals/EditModulesModal'
 import { EditModulesCard } from './modules'
 import formStyles from '../components/forms/forms.css'
 import type { FileMetadataFields } from '../file-data'
 import type { ModulesForEditModulesCard } from '../step-forms'
-
+import type { ModuleType } from '@opentrons/shared-data'
 export type Props = {
   formValues: FileMetadataFields,
   instruments: React.ElementProps<typeof InstrumentGroup>,
@@ -29,7 +30,11 @@ export type Props = {
   modulesEnabled: ?boolean,
 }
 
-type State = { isEditPipetteModalOpen: boolean, isEditModuleModalOpen: boolean }
+type State = {
+  isEditPipetteModalOpen: boolean,
+  isEditModulesModalOpen: boolean,
+  currentModule: ?ModuleType,
+}
 
 const DATE_ONLY_FORMAT = 'MMM DD, YYYY'
 const DATETIME_FORMAT = 'MMM DD, YYYY | h:mm A'
@@ -44,10 +49,34 @@ const _mockModulesByType: ModulesForEditModulesCard = {
 
 // TODO: Ian 2019-03-15 use i18n for labels
 class FilePage extends React.Component<Props, State> {
-  state = { isEditPipetteModalOpen: false, isEditModuleModalOpen: false }
+  state = {
+    isEditPipetteModalOpen: false,
+    isEditModulesModalOpen: false,
+    currentModule: null,
+  }
 
-  openEditPipetteModal = () => this.setState({ isEditPipetteModalOpen: true })
+  // TODO (ka 2019-10-28): This is a workaround,
+  // but it solves the modal positioning problem caused by main page wrapper
+  // being positioned absolute until we can figure out something better
+  scrollToTop = () => {
+    const editPage = document.getElementById('main-page')
+    if (editPage) editPage.scrollTop = 0
+  }
+
+  openEditPipetteModal = () => {
+    this.scrollToTop()
+    this.setState({ isEditPipetteModalOpen: true })
+  }
   closeEditPipetteModal = () => this.setState({ isEditPipetteModalOpen: false })
+
+  handleEditModule = (type: ModuleType) => {
+    this.scrollToTop()
+    this.setState({ isEditModulesModalOpen: true, currentModule: type })
+  }
+
+  closeEditModulesModal = () => {
+    this.setState({ isEditModulesModalOpen: false, currentModule: null })
+  }
 
   render() {
     const {
@@ -169,7 +198,10 @@ class FilePage extends React.Component<Props, State> {
         </Card>
 
         {this.props.modulesEnabled && (
-          <EditModulesCard modules={_mockModulesByType} />
+          <EditModulesCard
+            modules={_mockModulesByType}
+            openEditModuleModal={this.handleEditModule}
+          />
         )}
 
         <div className={styles.button_row}>
@@ -187,6 +219,14 @@ class FilePage extends React.Component<Props, State> {
             <EditPipettesModal
               key={String(this.state.isEditPipetteModalOpen)}
               closeModal={this.closeEditPipetteModal}
+            />
+          )}
+
+          {this.state.isEditModulesModalOpen && this.state.currentModule && (
+            <EditModulesModal
+              moduleType={this.state.currentModule}
+              key={String(this.state.isEditModulesModalOpen)}
+              onCloseClick={this.closeEditModulesModal}
             />
           )}
         </Portal>
