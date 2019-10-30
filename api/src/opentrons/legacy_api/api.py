@@ -358,14 +358,15 @@ class InstrumentsWrapper(object):
             return list(filter(
                 lambda m: m.split('_v')[0] in expected_model_substring,
                 pipette_config.config_models))[0]
+        back_compat_names = attached_model_config.get('backCompatNames')
         if attached_model_config.get('name') == expected_model_substring:
             return attached_model
-        elif expected_model_substring\
-                in attached_model_config.get('backCompatNames'):
+        elif back_compat_names and \
+                expected_model_substring in back_compat_names:
             return attached_model
         else:
             # In the case that the expected model substring does not equal
-            # attached model name or back_compat name, then take the expected
+            # attached model name or back_compat_names, then take the expected
             # model substring and create a fallback model name.
             if 'gen2' in expected_model_substring:
                 return expected_model_substring.split('_gen2')[0] + '_v2.0'

@@ -87,7 +87,7 @@ async def test_backwards_compatibility(dummy_backwards_compatibility, loop):
     }
     await hw_api.cache_instruments(requested_instr)
     attached = await hw_api.attached_instruments
-    print(attached)
+
     for mount, name in requested_instr.items():
         assert attached[mount]['name']\
             == dummy_backwards_compatibility[mount]['name']
