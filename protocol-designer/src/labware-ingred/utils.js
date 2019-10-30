@@ -1,11 +1,28 @@
 // @flow
 import { sortedSlotnames } from '@opentrons/components'
+import { PSEUDO_DECK_SLOTS } from '../constants'
+import type {
+  InitialDeckSetup,
+  LabwareOnDeck,
+  ModuleOnDeck,
+} from '../step-forms/types'
 import type { DeckSlot } from '../types'
 
-export function getNextAvailableSlot(labwareLocations: {
-  [labwareId: string]: DeckSlot,
-}): ?DeckSlot {
-  const filledLocations = Object.values(labwareLocations)
+export function getNextAvailableDeckSlot(
+  initialDeckSetup: InitialDeckSetup
+): ?DeckSlot {
+  const moduleIds = Object.keys(initialDeckSetup.modules)
+  const pseudoSlots = Object.keys(PSEUDO_DECK_SLOTS)
+  // deck slots only, exclude moduleId-keyed slots & pseudo-slots
+  const filledLocations = [
+    ...(Object.values(initialDeckSetup.labware): Array<any>).map(
+      (labware: LabwareOnDeck) => labware.slot
+    ),
+    ...(Object.values(initialDeckSetup.modules): Array<any>).map(
+      (module: ModuleOnDeck) => module.slot
+    ),
+  ].filter(slot => !moduleIds.includes(slot) && !pseudoSlots.includes(slot))
+
   return sortedSlotnames.find(
     slot => !filledLocations.some(filledSlot => filledSlot === slot)
   )

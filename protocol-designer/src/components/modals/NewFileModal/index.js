@@ -54,7 +54,7 @@ function mapStateToProps(state: BaseState): SP {
 function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   return {
     onCancel: () => dispatch(navigationActions.toggleNewProtocolModal(false)),
-    _createNewProtocol: ({ newProtocolFields, pipettes }) => {
+    _createNewProtocol: ({ modules, newProtocolFields, pipettes }) => {
       dispatch(fileActions.createNewProtocol(newProtocolFields))
 
       const pipettesById: {
@@ -86,6 +86,9 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
           },
         })
       )
+
+      // create modules
+      modules.forEach(module => dispatch(stepFormActions.createModule(module)))
 
       // auto-generate tipracks for pipettes
       const newTiprackModels: Array<string> = uniq(
