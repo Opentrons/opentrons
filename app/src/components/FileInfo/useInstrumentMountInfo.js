@@ -34,17 +34,12 @@ type InstrumentMountInfo = {|
 |}
 const { PIPETTE_MOUNTS } = robotConstants
 
-function pipettesAreInexactMatch(protocolInstrName, actualInstrName) {
-  switch (protocolInstrName) {
-    case 'p300_single':
-    case 'p300_single_gen1':
-      return actualInstrName === 'p300_single_gen2'
-    case 'p10_single':
-    case 'p10_single_gen1':
-      return actualInstrName === 'p20_single_gen2'
-    default:
-      return false
-  }
+function pipettesAreInexactMatch(
+  protocolInstrName: ?string,
+  actualModelSpecs: ?PipetteModelSpecs
+) {
+  const { backCompatNames } = actualModelSpecs || {}
+  return backCompatNames && backCompatNames.includes(protocolInstrName)
 }
 
 function useInstrumentMountInfo(
@@ -59,23 +54,21 @@ function useInstrumentMountInfo(
     const protocolInstrument = protocolInstruments.find(i => i.mount === mount)
     const actualInstrument = actualInstruments[mount]
 
-    const actualPipetteConfig = getPipetteModelSpecs(
-      actualInstrument?.model || ''
-    )
+    const actualModelSpecs = getPipetteModelSpecs(actualInstrument?.model || '')
     const requestedDisplayName = protocolInstrument?.requestedAs
       ? getPipetteNameSpecs(protocolInstrument?.requestedAs)?.displayName
       : protocolInstrument?.modelSpecs?.displayName
 
     const protocolInstrName =
       protocolInstrument?.requestedAs || protocolInstrument?.modelSpecs?.name
-    const actualInstrName = actualPipetteConfig?.name
+    const actualInstrName = actualModelSpecs?.name
 
     const perfectMatch = protocolInstrName === actualInstrName
 
     let compatibility: PipetteCompatibility = 'incompatible'
     if (perfectMatch || isEmpty(protocolInstrument)) {
       compatibility = 'match'
-    } else if (pipettesAreInexactMatch(protocolInstrName, actualInstrName)) {
+    } else if (pipettesAreInexactMatch(protocolInstrName, actualModelSpecs)) {
       compatibility = 'inexact_match'
     }
 
@@ -88,8 +81,8 @@ function useInstrumentMountInfo(
         },
         actual: {
           ...actualInstrument,
-          modelSpecs: actualPipetteConfig,
-          displayName: actualPipetteConfig?.displayName || 'N/A',
+          modelSpecs: actualModelSpecs,
+          displayName: actualModelSpecs?.displayName || 'N/A',
         },
         compatibility,
       },

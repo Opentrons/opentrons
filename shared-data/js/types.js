@@ -265,5 +265,6 @@ export type PipetteNameSpecs = {|
 export type PipetteModelSpecs = {
   ...PipetteNameSpecs,
   model: string,
+  backCompatNames?: Array<string>,
   tipLength: { value: number },
 }
