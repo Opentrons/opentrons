@@ -161,12 +161,12 @@ class Simulator:
                     f' {expected_instr}')
             init_instr = self._attached_instruments.get(mount, {})
             found_model = init_instr.get('model', '')
-            backcompat: List[str] = []
+            back_compat: List[str] = []
             if found_model:
-                backcompat = configs[found_model].get('backCompatNames', [])
+                back_compat = configs[found_model].get('backCompatNames', [])
             if expected_instr and found_model\
                     and (not found_model.startswith(expected_instr)
-                         and expected_instr not in backcompat):
+                         and expected_instr not in back_compat):
                 if self._strict_attached:
                     raise RuntimeError(
                         'mount {}: expected instrument {} but got {}'

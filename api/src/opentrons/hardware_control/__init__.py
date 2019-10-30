@@ -280,14 +280,14 @@ class API(HardwareAPILike):
         for mount, instrument_data in found.items():
             model = instrument_data.get('model')
             req_instr = require.get(mount, None)
-            backcompat: List[str] = []
+            back_compat: List[str] = []
             if model:
                 p = Pipette(
                     model,
                     self._config.instrument_offset[mount.name.lower()],
                     instrument_data['id'])
-                backcompat = p.config.back_compat_names
-                if req_instr and req_instr in backcompat:
+                back_compat = p.config.back_compat_names
+                if req_instr and req_instr in back_compat:
                     bc_conf = pipette_config.name_config()[req_instr]
                     p.working_volume = bc_conf['maxVolume']
                     p._model = req_instr
@@ -306,7 +306,7 @@ class API(HardwareAPILike):
                         f' requested, but no instrument is present')
                 name = pipette_config.name_for_model(model)
                 if req_instr not in (name, model)\
-                        and req_instr not in backcompat:
+                        and req_instr not in back_compat:
                     raise RuntimeError(f'mount {mount}: instrument'
                                        f' {req_instr} was requested'
                                        f' but {model} is present')

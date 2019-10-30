@@ -361,7 +361,7 @@ class InstrumentsWrapper(object):
             return attached_model
         else:
             # In the case that the expected model substring does not equal
-            # attached model name or backcompat name, then take the expected
+            # attached model name or back_compat name, then take the expected
             # model substring and create a fallback model name.
             if 'gen2' in expected_model_substring:
                 return expected_model_substring.split('_gen2')[0] + '_v2.0'

@@ -88,7 +88,7 @@
               "type": "string"
             },
             "backCompatNames": {
-              "description": "Optional reference for name of backcompat pipette corresponding to a key in pipetteNameSpecs.json, only relevant to gen2 pipettes",
+              "description": "Optional reference for name of backwards compatible pipette corresponding to a key in pipetteNameSpecs.json, only relevant to gen2 pipettes",
               "type": "array"
             },
             "top": { "$ref": "#/definitions/editConfigurations" },

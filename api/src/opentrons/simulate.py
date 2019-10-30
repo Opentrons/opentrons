@@ -51,6 +51,7 @@ class CommandScraper:
     and log messages integrated together. Each element of the list is
     a dict following the pattern in the docs of :py:meth:`simulate`.
     """
+
     def __init__(self,
                  logger: logging.Logger,
                  level: str,
@@ -99,7 +100,7 @@ class CommandScraper:
         else:
             while not self._queue.empty():
                 self._commands[-1]['logs'].append(self._queue.get())
-            self._depth = max(self._depth-1, 0)
+            self._depth = max(self._depth - 1, 0)
 
 
 def get_protocol_api(
@@ -249,7 +250,7 @@ def simulate(protocol_file: TextIO,
 
     if isinstance(protocol, JsonProtocol)\
             or protocol.api_level == '2'\
-            or (ff.enable_backcompat() and ff.use_protocol_api_v2()):
+            or (ff.enable_back_compat() and ff.use_protocol_api_v2()):
         context = get_protocol_api(protocol)
         scraper = CommandScraper(stack_logger, log_level, context.broker)
         execute.run_protocol(protocol,
