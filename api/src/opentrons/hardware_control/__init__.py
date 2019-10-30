@@ -276,32 +276,41 @@ class API(HardwareAPILike):
         """
         self._log.info("Updating instrument model cache")
         found = self._backend.get_attached_instruments(require or {})
+
         for mount, instrument_data in found.items():
             model = instrument_data.get('model')
-
             req_instr = require.get(mount, None)
+            back_compat: List[str] = []
+            if model:
+                p = Pipette(
+                    model,
+                    self._config.instrument_offset[mount.name.lower()],
+                    instrument_data['id'])
+                back_compat = p.config.back_compat_names
+                if req_instr and req_instr in back_compat:
+                    bc_conf = pipette_config.name_config()[req_instr]
+                    p.working_volume = bc_conf['maxVolume']
+                    p.update_config_item('min_volume', bc_conf['minVolume'])
+                    p.update_config_item('max_volume', bc_conf['maxVolume'])
+
+                self._attached_instruments[mount] = p
+                home_pos = p.config.home_position
+                max_travel = p.config.max_travel
+                steps_mm = p.config.steps_per_mm
+
             if req_instr and not self.is_simulator_sync:
                 if not model:
                     raise RuntimeError(
                         f'mount {mount}: instrument {req_instr} was'
                         f' requested, but no instrument is present')
                 name = pipette_config.name_for_model(model)
-                if req_instr not in (name, model):
+                if req_instr not in (name, model)\
+                        and req_instr not in back_compat:
                     raise RuntimeError(f'mount {mount}: instrument'
                                        f' {req_instr} was requested'
-                                       f' but {name} is present')
+                                       f' but {model} is present')
 
-            if model:
-                p = Pipette(
-                    model,
-                    self._config.instrument_offset[mount.name.lower()],
-                    instrument_data['id'])
-
-                self._attached_instruments[mount] = p
-                home_pos = p.config.home_position
-                max_travel = p.config.max_travel
-                steps_mm = p.config.steps_per_mm
-            else:
+            if not model:
                 self._attached_instruments[mount] = None
                 home_pos = self._config.default_pipette_configs['homePosition']
                 max_travel = self._config.default_pipette_configs['maxTravel']

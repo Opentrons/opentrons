@@ -25,5 +25,5 @@ def use_old_aspiration_functions():
     return advs.get_setting_with_env_overload('useOldAspirationFunctions')
 
 
-def enable_backcompat():
+def enable_back_compat():
     return advs.get_setting_with_env_overload('enableApi1BackCompat')

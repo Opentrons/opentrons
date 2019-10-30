@@ -180,7 +180,7 @@ def execute(protocol_file: TextIO,
     protocol = parse(contents, protocol_file.name)
     if isinstance(protocol, JsonProtocol)\
             or protocol.api_level == '2'\
-            or (ff.enable_backcompat() and ff.use_protocol_api_v2()):
+            or (ff.enable_back_compat() and ff.use_protocol_api_v2()):
         context = get_protocol_api(
             bundled_labware=getattr(protocol, 'bundled_labware', None),
             bundled_data=getattr(protocol, 'bundled_data', None))

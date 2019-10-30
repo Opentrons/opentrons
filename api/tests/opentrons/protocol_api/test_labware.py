@@ -114,7 +114,7 @@ def test_from_center_cartesian():
     assert point2.z == expected_z
 
 
-def test_backcompat():
+def test_back_compat():
     labware_name = 'corning_96_wellplate_360ul_flat'
     labware_def = labware.get_labware_definition(labware_name)
     lw = labware.Labware(labware_def, Location(Point(0, 0, 0), 'Test Slot'))
