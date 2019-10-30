@@ -38,8 +38,8 @@ function pipettesAreInexactMatch(
   protocolInstrName,
   actualModelSpecs: ?PipetteModelSpecs
 ) {
-  const { backcompatName } = actualModelSpecs || {}
-  return protocolInstrName === backcompatName
+  const { backCompatNames } = actualModelSpecs || {}
+  return backCompatNames && backCompatNames.includes(protocolInstrName)
 }
 
 function useInstrumentMountInfo(
@@ -54,25 +54,21 @@ function useInstrumentMountInfo(
     const protocolInstrument = protocolInstruments.find(i => i.mount === mount)
     const actualInstrument = actualInstruments[mount]
 
-    const actualPipetteConfig = getPipetteModelSpecs(
-      actualInstrument?.model || ''
-    )
+    const actualModelSpecs = getPipetteModelSpecs(actualInstrument?.model || '')
     const requestedDisplayName = protocolInstrument?.requestedAs
       ? getPipetteNameSpecs(protocolInstrument?.requestedAs)?.displayName
       : protocolInstrument?.modelSpecs?.displayName
 
     const protocolInstrName =
       protocolInstrument?.requestedAs || protocolInstrument?.modelSpecs?.name
-    const actualInstrName = actualPipetteConfig?.name
+    const actualInstrName = actualModelSpecs?.name
 
     const perfectMatch = protocolInstrName === actualInstrName
 
     let compatibility: PipetteCompatibility = 'incompatible'
     if (perfectMatch || isEmpty(protocolInstrument)) {
       compatibility = 'match'
-    } else if (
-      pipettesAreInexactMatch(protocolInstrName, actualPipetteConfig)
-    ) {
+    } else if (pipettesAreInexactMatch(protocolInstrName, actualModelSpecs)) {
       compatibility = 'inexact_match'
     }
 
@@ -85,8 +81,8 @@ function useInstrumentMountInfo(
         },
         actual: {
           ...actualInstrument,
-          modelSpecs: actualPipetteConfig,
-          displayName: actualPipetteConfig?.displayName || 'N/A',
+          modelSpecs: actualModelSpecs,
+          displayName: actualModelSpecs?.displayName || 'N/A',
         },
         compatibility,
       },
