@@ -265,6 +265,7 @@ class InstrumentsWrapper(object):
         pipette_model_version, pip_id = self._pipette_details(
             mount, name_or_model)
         config = pipette_config.load(pipette_model_version, pip_id)
+        original_name = name_or_model
         if pip_id and name_or_model in config.back_compat_names:
             log.warning(
                 f"Using a deprecated constructor for {pipette_model_version}")
@@ -284,7 +285,8 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=dispense_flow_rate,
             min_volume=min_volume,
             max_volume=max_volume,
-            blow_out_flow_rate=blow_out_flow_rate)
+            blow_out_flow_rate=blow_out_flow_rate,
+            requested_as=original_name)
 
     def _create_pipette_from_config(
             self,
@@ -298,7 +300,8 @@ class InstrumentsWrapper(object):
             dispense_flow_rate=None,
             min_volume=None,
             max_volume=None,
-            blow_out_flow_rate=None):
+            blow_out_flow_rate=None,
+            requested_as=None):
 
         if aspirate_flow_rate is not None:
             config = config._replace(aspirate_flow_rate=aspirate_flow_rate)
@@ -342,7 +345,8 @@ class InstrumentsWrapper(object):
             return_tip_height=config.return_tip_height,
             quirks=config.quirks,
             fallback_tip_length=config.tip_length,  # TODO move to labware
-            blow_out_flow_rate=config.blow_out_flow_rate)
+            blow_out_flow_rate=config.blow_out_flow_rate,
+            requested_as=requested_as)
 
         return p
 

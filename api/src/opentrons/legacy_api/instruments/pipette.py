@@ -143,7 +143,8 @@ class Pipette(CommandPublisher):
             pick_up_speed=DEFAULT_TIP_PICK_UP_SPEED,
             quirks=[],
             fallback_tip_length=51.7,
-            blow_out_flow_rate=None):
+            blow_out_flow_rate=None,
+            requested_as=None):
 
         super().__init__(robot.broker)
         self.robot = robot
@@ -246,6 +247,7 @@ class Pipette(CommandPublisher):
             self.robot.config.tip_length.get(self.model, fallback_tip_length)
 
         self.quirks = quirks if isinstance(quirks, list) else []
+        self.requested_as = requested_as or self.name
 
     def reset(self):
         """
