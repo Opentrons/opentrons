@@ -6,11 +6,7 @@ For more details about this release, please see the full [technical change log][
 
 ## Python Protocol API V2 Beta
 
-We're happy to announce the public beta of version 2 of our Python protocol API! You can set your robot to use this API with the "Use Protocol API version 2" advanced setting when connected to a robot.
-
-NOTE ADD LINKS TO THE INTERCOM DOCS HERE
-
-Documentation for the new API is available on [docs.opentrons.com][docs-v2-root]
+We're happy to announce the public beta of version 2 of our Python protocol API! To learn more about APIv2 or to participate in the beta, please complete [this short form][apiv2-form]. 
 
 
 ## Other Changes
@@ -35,4 +31,5 @@ Documentation for the new API is available on [docs.opentrons.com][docs-v2-root]
 
 [419]: https://github.com/Opentrons/opentrons/issues/419
 [labware-versioning-docs]: https://docs.opentrons.com/v1/labware.html#labware-versions
-[docs-v2-root]: https://docs.opentrons.com//v2/index.html.
+[docs-v2-root]: https://docs.opentrons.com//v2/index.html
+[apiv2-form]: https://opentrons-ux.typeform.com/to/jhccYV
