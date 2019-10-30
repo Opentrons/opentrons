@@ -37,7 +37,7 @@ pipette_config = namedtuple(
         'tip_overlap',  # TODO: Replace entirely with tip length calibration
         'display_name',
         'name',
-        'backcompat_name',
+        'back_compat_names',
         'return_tip_height',
         'blow_out_flow_rate',
         'max_travel',
@@ -197,7 +197,7 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
         tip_length=ensure_value(cfg, 'tipLength', MUTABLE_CONFIGS),
         display_name=ensure_value(cfg, 'displayName', MUTABLE_CONFIGS),
         name=cfg.get('name'),
-        backcompat_name=cfg.get('backCompatNames', []),
+        back_compat_names=cfg.get('backCompatNames', []),
         return_tip_height=cfg.get('returnTipHeight'),
         blow_out_flow_rate=ensure_value(
             cfg, 'defaultBlowOutFlowRate', MUTABLE_CONFIGS),

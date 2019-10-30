@@ -286,7 +286,7 @@ class API(HardwareAPILike):
                     model,
                     self._config.instrument_offset[mount.name.lower()],
                     instrument_data['id'])
-                backcompat = p.config.backcompat_name
+                backcompat = p.config.back_compat_names
                 if req_instr and req_instr in backcompat:
                     bc_conf = pipette_config.name_config()[req_instr]
                     p.working_volume = bc_conf['maxVolume']
