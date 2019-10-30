@@ -335,4 +335,4 @@ async def get_robot_settings(request: web.Request) -> web.Response:
     """
 
     config = rc.load()
-    return web.json_response(config, status=200)
+    return web.json_response(config._asdict, status=200)

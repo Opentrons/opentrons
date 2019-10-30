@@ -89,10 +89,10 @@ DEFAULT_CURRENT_STRING = ' '.join(
     ['{}{}'.format(key, value) for key, value in DEFAULT_CURRENT.items()])
 
 DEFAULT_DECK_CALIBRATION: List[List[float]] = [
-    [1.00, 0.00, 0.00,  0.00],
-    [0.00, 1.00, 0.00,  0.00],
-    [0.00, 0.00, 1.00,  0.00],
-    [0.00, 0.00, 0.00,  1.00]]
+    [1.00, 0.00, 0.00, 0.00],
+    [0.00, 1.00, 0.00, 0.00],
+    [0.00, 0.00, 1.00, 0.00],
+    [0.00, 0.00, 0.00, 1.00]]
 
 X_ACCELERATION = 3000
 Y_ACCELERATION = 2000
