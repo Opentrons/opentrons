@@ -214,7 +214,6 @@ const LabwareSelectionModal = (props: Props) => {
               collapsed={selectedCategory !== CUSTOM_CATEGORY}
               onCollapseToggle={makeToggleCategory(CUSTOM_CATEGORY)}
               onClick={makeToggleCategory(CUSTOM_CATEGORY)}
-              className={styles.labware_selection_modal}
               inert={filterRecommended}
             >
               {customLabwareURIs.map((labwareURI, index) => (
@@ -238,7 +237,6 @@ const LabwareSelectionModal = (props: Props) => {
               collapsed={selectedCategory !== category}
               onCollapseToggle={makeToggleCategory(category)}
               onClick={makeToggleCategory(category)}
-              className={styles.labware_selection_modal}
               inert={!populatedCategories[category]}
             >
               {labwareByCategory[category] &&
