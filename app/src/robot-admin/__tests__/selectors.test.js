@@ -13,6 +13,20 @@ type SelectorSpec = {|
 describe('robot admin selectors', () => {
   const SPECS: Array<SelectorSpec> = [
     {
+      name: 'getRobotAdminStatus returns null by default',
+      selector: Selectors.getRobotAdminStatus,
+      state: { robotAdmin: {} },
+      args: ['robotName'],
+      expected: null,
+    },
+    {
+      name: 'getRobotAdminStatus',
+      selector: Selectors.getRobotAdminStatus,
+      state: { robotAdmin: { robotName: { status: 'up' } } },
+      args: ['robotName'],
+      expected: 'up',
+    },
+    {
       name: 'getRobotRestarting with status up',
       selector: Selectors.getRobotRestarting,
       state: { robotAdmin: { robotName: { status: 'up' } } },

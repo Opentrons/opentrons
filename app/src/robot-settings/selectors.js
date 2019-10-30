@@ -24,3 +24,9 @@ export function getRobotRestartRequired(
 ): boolean {
   return getRobotRestartPath(state, robotName) !== null
 }
+
+export function getAllRestartRequiredRobots(state: State): Array<string> {
+  return Object.keys(state.robotSettings).filter(name => {
+    return getRobotRestartRequired(state, name)
+  })
+}
