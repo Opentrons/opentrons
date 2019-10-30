@@ -109,7 +109,9 @@ function RobotSettingsPage(props: Props) {
             {robot.status === CONNECTABLE && (
               <ConnectBanner {...robot} key={Number(robot.connected)} />
             )}
-            {restartRequired && <RestartRequiredBanner robot={robot} />}
+            {restartRequired && (
+              <RestartRequiredBanner robotName={robot.name} />
+            )}
           </>
         )}
 
@@ -142,7 +144,7 @@ function RobotSettingsPage(props: Props) {
           path={`${path}/${RESET_FRAGMENT}`}
           render={routeProps => (
             <ResetRobotModal
-              robot={robot}
+              robotName={robot.name}
               closeModal={() => routeProps.history.push(url)}
             />
           )}

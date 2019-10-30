@@ -7,9 +7,9 @@ import { usePrevious } from '@opentrons/components'
 
 import type { RobotApiResponse, RobotApiRequestState } from './types'
 
-export type Handlers = $Shape<{
+export type Handlers = $Shape<{|
   onFinish: (response: RobotApiResponse) => mixed,
-}>
+|}>
 
 /**
  * DEPRECATED - do not use

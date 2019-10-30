@@ -141,7 +141,7 @@ function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
     ...ownProps,
     ...stateProps,
     homeAll: () => dispatch(home(robot)),
-    restartRobot: () => dispatch(restartRobot(robot)),
+    restartRobot: () => dispatch(restartRobot(robot.name)),
     fetchLights: () => dispatch(fetchRobotLights(robot)),
     toggleLights: () => dispatch(setRobotLights(robot, !lightsOn)),
     start: () =>
