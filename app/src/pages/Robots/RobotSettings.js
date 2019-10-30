@@ -101,14 +101,16 @@ function RobotSettingsPage(props: Props) {
   return (
     <>
       <Page titleBarProps={titleBarProps}>
-        {robot.status === REACHABLE && !updateInProgress && (
-          <ReachableRobotBanner key={robot.name} {...robot} />
-        )}
-        {robot.status === CONNECTABLE && (
-          <ConnectBanner {...robot} key={Number(robot.connected)} />
-        )}
-        {restartRequired && !restarting && (
-          <RestartRequiredBanner robot={robot} />
+        {!restarting && !updateInProgress && (
+          <>
+            {robot.status === REACHABLE && (
+              <ReachableRobotBanner key={robot.name} {...robot} />
+            )}
+            {robot.status === CONNECTABLE && (
+              <ConnectBanner {...robot} key={Number(robot.connected)} />
+            )}
+            {restartRequired && <RestartRequiredBanner robot={robot} />}
+          </>
         )}
 
         <RobotSettings

@@ -89,6 +89,22 @@ describe('robotAdminReducer', () => {
       },
       expected: { a: { status: 'restarting' } },
     },
+    {
+      name:
+        'discovery:UPDATE_LIST leaves restarting alone if restarting and ok: false',
+      action: {
+        type: 'discovery:UPDATE_LIST',
+        payload: {
+          robots: [
+            ({ name: 'a', ip: '192.168.1.1', port: 31950, ok: false }: any),
+          ],
+        },
+      },
+      state: {
+        a: { status: 'restarting' },
+      },
+      expected: { a: { status: 'restarting' } },
+    },
   ]
 
   SPECS.forEach(spec => {

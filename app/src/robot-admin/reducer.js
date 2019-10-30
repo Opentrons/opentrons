@@ -60,7 +60,7 @@ export function robotAdminReducer(
             status = UP_STATUS
           } else if (!up && status === RESTART_PENDING_STATUS) {
             status = RESTARTING_STATUS
-          } else if (!up) {
+          } else if (!up && status !== RESTARTING_STATUS) {
             status = DOWN_STATUS
           }
 
