@@ -8,6 +8,7 @@ import {
   createContainer,
 } from '../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
+import { selectors as featureFlagSelectors } from '../../feature-flags'
 import {
   actions as labwareDefActions,
   selectors as labwareDefSelectors,
@@ -26,6 +27,10 @@ type SP = {|
   parentSlot: $PropertyType<Props, 'parentSlot'>,
   moduleType: $PropertyType<Props, 'moduleType'>,
   permittedTipracks: $PropertyType<Props, 'permittedTipracks'>,
+  moduleRestrictionsDisabled: $PropertyType<
+    Props,
+    'moduleRestrictionsDisabled'
+  >,
 |}
 
 function mapStateToProps(state: BaseState): SP {
@@ -37,6 +42,9 @@ function mapStateToProps(state: BaseState): SP {
   )
   const parentModule =
     (slot != null && initialModules.find(module => module.id === slot)) || null
+  const moduleRestrictionsDisabled = featureFlagSelectors.getDisableModuleRestrictions(
+    state
+  )
 
   return {
     customLabwareDefs: labwareDefSelectors.getCustomLabwareDefsByURI(state),
@@ -44,6 +52,7 @@ function mapStateToProps(state: BaseState): SP {
     parentSlot: parentModule != null ? parentModule.slot : null,
     moduleType: parentModule != null ? parentModule.type : null,
     permittedTipracks: stepFormSelectors.getPermittedTipracks(state),
+    moduleRestrictionsDisabled,
   }
 }
 

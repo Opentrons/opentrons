@@ -39,6 +39,8 @@ type Props = {|
   moduleType: ?ModuleType,
   /** tipracks that may be added to deck (depends on pipette<>tiprack assignment) */
   permittedTipracks: Array<string>,
+  /** user has opted out of module restriction guidance */
+  moduleRestrictionsDisabled?: ?boolean,
 |}
 
 const LABWARE_CREATOR_URL = 'https://labware.opentrons.com/create'
@@ -78,6 +80,7 @@ const LabwareSelectionModal = (props: Props) => {
     parentSlot,
     moduleType,
     selectLabware,
+    moduleRestrictionsDisabled,
   } = props
 
   const [selectedCategory, selectCategory] = useState<?string>(null)
@@ -112,10 +115,23 @@ const LabwareSelectionModal = (props: Props) => {
   )
 
   const getLabwareDisabled = useCallback(
-    (labwareDef: LabwareDefinition2) =>
-      (filterRecommended && !getLabwareRecommended(labwareDef)) ||
-      !getLabwareCompatible(labwareDef),
-    [filterRecommended, getLabwareCompatible, getLabwareRecommended]
+    (labwareDef: LabwareDefinition2) => {
+      if (moduleRestrictionsDisabled) {
+        // if you disable module restrictions, all labware is enabled
+        // no matter what filterRecommended is set to
+        return false
+      }
+      return (
+        (filterRecommended && !getLabwareRecommended(labwareDef)) ||
+        !getLabwareCompatible(labwareDef)
+      )
+    },
+    [
+      filterRecommended,
+      getLabwareCompatible,
+      getLabwareRecommended,
+      moduleRestrictionsDisabled,
+    ]
   )
 
   const customLabwareURIs: Array<string> = useMemo(
