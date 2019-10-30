@@ -35,7 +35,7 @@ type InstrumentMountInfo = {|
 const { PIPETTE_MOUNTS } = robotConstants
 
 function pipettesAreInexactMatch(
-  protocolInstrName,
+  protocolInstrName: ?string,
   actualModelSpecs: ?PipetteModelSpecs
 ) {
   const { backCompatNames } = actualModelSpecs || {}
