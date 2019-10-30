@@ -91,18 +91,28 @@ How it's Organized
 
 When writing protocols using the Opentrons API, there are generally five sections:
 
-1) Metadata
+1) Metadata and Version Selection
 2) Run function
 3) Labware
 4) Pipettes
 5) Commands
 
-Metadata
-^^^^^^^^
+Metadata and Version Selection
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Metadata is a dictionary of data that is read by the server and returned to client applications (such as the Opentrons Run App). It is not needed to run a protocol (and is entirely optional), but if present can help the client application display additional data about the protocol currently being executed.
+Metadata is a dictionary of data that is read by the server and returned to client applications (such as the Opentrons Run App). Most metadata is not needed to run a protocol, but if present can help the client application display additional data about the protocol currently being executed. These optional (but recommended) fields are (``"protocolName"``, ``"author"``, and ``"description"``).
 
-The fields above (``"protocolName"``, ``"author"``, and ``"description"``) are the recommended fields, but the metadata dictionary can contain fewer fields, or additional fields as desired (though non-standard fields are not displayed by the Opentrons app).
+The required element of the metadata is ``"apiLevel"``. This must contain a string specifying the major and minor version of the Python Protocol API that your protocol is designed for. For instance, a protocol written for the launch version of Protocol API v2 should have in its metadata ``"apiLevel": "2.0"``.
+
+The number before the dot is the **major version**. This is always ``2`` for protocol API version 2.
+
+The number after the dot is the **minor version**. At launch (and during the beta) only minor version ``0`` exists.
+
+As the Protocol API is developed, whenever Opentrons adds a new feature or makes a small behavior change, we will increase the minor version. When you specify a major and minor version in your protocol, it ensures that the protocol will run as you intended on any robot software version that supports your selected protocol version. For instance, a protocol written for API Version 2.0 will work on any robot software version that supports at least API version 2.0.
+
+.. note::
+
+    In the API V2 beta, the only available version is 2.0. It is not yet required to specify versions. However, when we fully release API V2, the version will be required.
 
 The Run Function and the Protocol Context
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
