@@ -92,7 +92,7 @@ const getSlotDefForModuleSlot = (
   const parentSlotDef = deckSlots[module.slot] || PSEUDO_DECK_SLOTS[module.slot]
   const moduleOrientation = inferModuleOrientationFromSlot(module.slot)
   const moduleData = getModuleVizDims(moduleOrientation, module.type)
-  console.log({ module, moduleData })
+
   return {
     ...parentSlotDef,
     id: module.id,
@@ -218,6 +218,7 @@ const DeckSetup = (props: Props) => {
                           y={moduleY}
                           orientation={orientation}
                           module={module}
+                          slotName={slot.id}
                         />
                         <ModuleTag
                           x={moduleX}

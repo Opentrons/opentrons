@@ -24,20 +24,20 @@ export type ModuleVizDims = {|
 
 const MODULE_VIZ_DIMS: { [ModuleType]: ModuleVizDims } = {
   magdeck: {
-    xOffset: -1 * DIVIDER,
-    yOffset: 0,
-    xDimension: SLOT_X + DIVIDER * 2,
-    yDimension: SLOT_Y,
+    xOffset: -1 * (SLOT_X * 0.25 + DIVIDER),
+    yOffset: -1 * DIVIDER,
+    xDimension: SLOT_X * 1.25 + DIVIDER * 2,
+    yDimension: SLOT_Y + DIVIDER * 2,
     childXOffset: 0,
     childYOffset: 0,
     childXDimension: SLOT_X,
     childYDimension: SLOT_Y,
   },
   tempdeck: {
-    xOffset: -1 * (SLOT_X * 0.5 + 4),
-    yOffset: 0,
+    xOffset: -1 * (SLOT_X * 0.5 + DIVIDER),
+    yOffset: -1 * DIVIDER,
     xDimension: SLOT_X * 1.5 + DIVIDER * 2,
-    yDimension: SLOT_Y,
+    yDimension: SLOT_Y + DIVIDER * 2,
     childXOffset: 0,
     childYOffset: 0,
     childXDimension: SLOT_X,

@@ -6,3 +6,11 @@
   stroke-width: 1;
   fill: var(--c-lightest-gray);
 }
+
+.module_slot_area {
+  fill: var(--c-white);
+}
+
+.module_slot_text {
+  fill: var(--c-plate-bg);
+}
