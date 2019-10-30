@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.14.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.14.0-alpha.0...v3.14.0-alpha.1) (2019-10-30)
+
+**Note:** Version bump only for package @opentrons/discovery-client
+
+
+
+
+
 # [3.14.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.13.2...v3.14.0-alpha.0) (2019-10-28)
 
 **Note:** Version bump only for package @opentrons/discovery-client
