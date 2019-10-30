@@ -53,7 +53,7 @@ export default function EditModulesModal(props: EditModulesProps) {
       TODO (ka 2019-10-29): This field is enabled, but only GEN1 available for now
       - onChange returns null because onChange is required by DropdownFields
       */}
-        <FormGroup label="Model" className={styles.form_option}>
+        <FormGroup label="Model" className={styles.option_model}>
           <DropdownField
             tabIndex={0}
             options={[{ name: 'GEN1', value: 'GEN1' }]}
@@ -61,14 +61,16 @@ export default function EditModulesModal(props: EditModulesProps) {
             onChange={() => null}
           />
         </FormGroup>
+        {/*
+      TODO (ka 2019-10-30):
+      - Remove tooltip when endabled by feature flag, enable dropdown with all slots
+      - onChange returns null because onChange is required by DropdownFields
+      */}
         {showSlotOption && (
-          <FormGroup label="Position" className={styles.form_option}>
-            <HoverTooltip
-              placement="bottom"
-              tooltipComponent={slotOptionTooltip}
-            >
-              {hoverTooltipHandlers => (
-                <div {...hoverTooltipHandlers}>
+          <HoverTooltip placement="bottom" tooltipComponent={slotOptionTooltip}>
+            {hoverTooltipHandlers => (
+              <div {...hoverTooltipHandlers} className={styles.option_slot}>
+                <FormGroup label="Position">
                   <DropdownField
                     tabIndex={1}
                     options={SUPPORTED_MODULE_SLOTS[moduleType]}
@@ -76,10 +78,10 @@ export default function EditModulesModal(props: EditModulesProps) {
                     disabled
                     onChange={() => null}
                   />
-                </div>
-              )}
-            </HoverTooltip>
-          </FormGroup>
+                </FormGroup>
+              </div>
+            )}
+          </HoverTooltip>
         )}
       </div>
 
