@@ -4,7 +4,9 @@ from numpy import isclose
 from unittest import mock
 
 from opentrons.legacy_api.containers import load as containers_load
+from opentrons.legacy_api.containers import _look_up_offsets
 from opentrons.trackers import pose_tracker
+from opentrons.types import Point
 from opentrons.util import vector
 
 
@@ -227,6 +229,61 @@ def test_calibrate_labware(robot, instruments, labware, monkeypatch):
     new_pose = pose_tracker.absolute(robot.poses, plate[0])
 
     assert isclose(new_pose, (old_x + 1, old_y + 2, old_z - 3)).all()
+
+
+@pytest.mark.api1_only
+def test_calibrate_multiple(robot, instruments, labware, offsets_tempdir):
+    # Note: labware_name must be a v2 labware definition
+    labware_name = 'agilent_1_reservoir_290ml'
+
+    reservoir1 = labware.load(labware_name, '1')
+    reservoir2 = labware.load(labware_name, '2')
+
+    pip = instruments.P300_Single(mount='right')
+
+    old_x1, old_y1, old_z1 = pose_tracker.absolute(robot.poses, reservoir1[0])
+    old_x2, old_y2, old_z2 = pose_tracker.absolute(robot.poses, reservoir2[0])
+
+    pip.move_to(reservoir1[0])
+    delta_x1, delta_y1, delta_z1 = (1, 2, -3)
+    robot.poses = pip._jog(robot.poses, 'x', delta_x1)
+    robot.poses = pip._jog(robot.poses, 'y', delta_y1)
+    robot.poses = pip._jog(robot.poses, 'z', delta_z1)
+    robot.calibrate_container_with_instrument(reservoir1, pip, save=True)
+
+    # Check pose tree, also check data on disk
+    new_pose1 = pose_tracker.absolute(robot.poses, reservoir1[0])
+    new_pose2 = pose_tracker.absolute(robot.poses, reservoir2[0])
+
+    assert isclose(new_pose1, (
+        old_x1 + delta_x1, old_y1 + delta_y1, old_z1 + delta_z1)).all()
+    assert isclose(new_pose2, (
+        old_x2 + delta_x1, old_y2 + delta_y1, old_z2 + delta_z1)).all()
+
+    lw_hash = reservoir1.properties.get('labware_hash')
+    new_offset1 = _look_up_offsets(lw_hash)
+    expected1 = Point(delta_x1, delta_y1, delta_z1)
+    assert isclose(new_offset1, expected1).all()
+
+    pip.move_to(reservoir2[0])
+    robot.poses = pip._jog(robot.poses, 'x', -1 * delta_x1)
+    robot.poses = pip._jog(robot.poses, 'y', -1 * delta_y1)
+    robot.poses = pip._jog(robot.poses, 'z', -1 * delta_z1)
+    robot.calibrate_container_with_instrument(reservoir2, pip, save=True)
+
+    # Check pose tree, also check data on disk
+    new_pose1 = pose_tracker.absolute(robot.poses, reservoir1[0])
+    new_pose2 = pose_tracker.absolute(robot.poses, reservoir2[0])
+
+    assert isclose(new_pose1, (
+        old_x1, old_y1, old_z1)).all()
+    assert isclose(new_pose2, (
+        old_x2, old_y2, old_z2)).all()
+
+    lw_hash = reservoir1.properties.get('labware_hash')
+    new_offset2 = _look_up_offsets(lw_hash)
+    expected2 = Point(0, 0, 0)
+    assert isclose(new_offset2, expected2).all()
 
 
 @pytest.mark.api1_only

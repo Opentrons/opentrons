@@ -93,6 +93,14 @@ def config_tempdir(tmpdir, template_db):
     yield tmpdir, template_db
 
 
+@pytest.mark.apiv1
+@pytest.fixture(scope='function')
+def offsets_tempdir(tmpdir, template_db):
+    config.CONFIG['labware_calibration_offsets_dir_v2'] = str(tmpdir)
+    config.reload()
+    yield tmpdir
+
+
 @pytest.fixture(autouse=True)
 def clear_feature_flags():
     ff_file = config.CONFIG['feature_flags_file']
