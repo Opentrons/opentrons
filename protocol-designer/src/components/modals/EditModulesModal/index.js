@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
+import { useSelector } from 'react-redux'
+import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import i18n from '../../../localization'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import {
@@ -17,11 +19,42 @@ import type { ModuleType } from '@opentrons/shared-data'
 
 type EditModulesProps = {
   moduleType: ModuleType,
-  moduleId?: string,
+  moduleId: ?string,
   onCloseClick: () => mixed,
 }
+// TODO (ka 2019-10-29): Move this to modules/moduleData?
+const SUPPORTED_MODULE_SLOTS = {
+  magdeck: [{ name: 'Slot 1 (supported)', value: '1' }],
+  tempdeck: [{ name: 'Slot 3 (supported)', value: '3' }],
+  thermocycler: [],
+}
+
+const ALL_MODULE_SLOTS = [
+  { name: 'Slot 1', value: '1' },
+  { name: 'Slot 3', value: '3' },
+  { name: 'Slot 4', value: '4' },
+  { name: 'Slot 6', value: '6' },
+  { name: 'Slot 7', value: '7' },
+  { name: 'Slot 9', value: '9' },
+  { name: 'Slot 10', value: '10' },
+]
+
+function getAllModuleSlotsByType(moduleType: ModuleType) {
+  const supportedSlotOption = SUPPORTED_MODULE_SLOTS[moduleType]
+  const allOtherSlots = ALL_MODULE_SLOTS.filter(
+    s => s.value !== supportedSlotOption[0].value
+  )
+  return supportedSlotOption.concat(allOtherSlots)
+}
+
 export default function EditModulesModal(props: EditModulesProps) {
   const { moduleType, moduleId, onCloseClick } = props
+  const [selectedSlot, setSelectedSlot] = React.useState<string | null>(
+    SUPPORTED_MODULE_SLOTS[moduleType][0].value
+  )
+
+  const handleSlotChange = (e: SyntheticInputEvent<*>) =>
+    setSelectedSlot(e.target.value)
 
   let onSaveClick = () => {
     moduleType && console.log('add module ' + moduleType)
@@ -36,6 +69,10 @@ export default function EditModulesModal(props: EditModulesProps) {
 
   const heading = getModuleDisplayName(moduleType)
   const showSlotOption = moduleType !== 'thermocycler'
+
+  const enableSlotSelection = useSelector(
+    featureFlagSelectors.getDisableModuleRestrictions
+  )
 
   const slotOptionTooltip = (
     <div className={styles.slot_tooltip}>
@@ -63,20 +100,23 @@ export default function EditModulesModal(props: EditModulesProps) {
         </FormGroup>
         {/*
       TODO (ka 2019-10-30):
-      - Remove tooltip when endabled by feature flag, enable dropdown with all slots
-      - onChange returns null because onChange is required by DropdownFields
+      - This is an initial first pass, since nothings coming from state yet,
+      the slot will always default to the supported slot
       */}
         {showSlotOption && (
-          <HoverTooltip placement="bottom" tooltipComponent={slotOptionTooltip}>
+          <HoverTooltip
+            placement="bottom"
+            tooltipComponent={enableSlotSelection ? null : slotOptionTooltip}
+          >
             {hoverTooltipHandlers => (
               <div {...hoverTooltipHandlers} className={styles.option_slot}>
                 <FormGroup label="Position">
                   <DropdownField
                     tabIndex={1}
-                    options={SUPPORTED_MODULE_SLOTS[moduleType]}
-                    value={'GEN1'}
-                    disabled
-                    onChange={() => null}
+                    options={getAllModuleSlotsByType(moduleType)}
+                    value={selectedSlot}
+                    disabled={!enableSlotSelection}
+                    onChange={handleSlotChange}
                   />
                 </FormGroup>
               </div>
@@ -91,13 +131,4 @@ export default function EditModulesModal(props: EditModulesProps) {
       </div>
     </Modal>
   )
-}
-
-// TODO (ka 2019-10-29): Not sure where this should ultimately live,
-// but hardcoding here for now since this is the only place it will be used
-// Will update with all slots when implementing FF in next PR
-const SUPPORTED_MODULE_SLOTS = {
-  magdeck: [{ name: 'Slot 1 (supported)', value: '1' }],
-  tempdeck: [{ name: 'Slot 3 (supported)', value: '3' }],
-  thermocycler: [],
 }

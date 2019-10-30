@@ -9,7 +9,7 @@ import type { ModulesForEditModulesCard } from '../../step-forms'
 
 type Props = {
   modules: ModulesForEditModulesCard,
-  openEditModuleModal: (type: ModuleType) => mixed,
+  openEditModuleModal: (type: ModuleType, moduleId?: string) => mixed,
 }
 
 // TODO (ka 2019-10-24): This will likely be resused a lot,
