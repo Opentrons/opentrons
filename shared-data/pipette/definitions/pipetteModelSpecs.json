@@ -979,7 +979,7 @@
     },
     "p20_single_v2.0": {
       "name": "p20_single_gen2",
-      "backcompatName": "p10_single",
+      "backCompatName": ["p10_single"],
       "top": {
         "value": 19.5,
         "min": -45,
@@ -1148,7 +1148,7 @@
     },
     "p20_multi_v2.0": {
       "name": "p20_multi_gen2",
-      "backcompatName": "p10_multi",
+      "backCompatName": ["p10_multi"],
       "top": {
         "value": 19.5,
         "min": -45,
@@ -2733,7 +2733,7 @@
     },
     "p300_single_v2.0": {
       "name": "p300_single_gen2",
-      "backcompatName": "p300_single",
+      "backCompatName": ["p300_single"],
       "top": {
         "value": 19.5,
         "min": 5,
@@ -3346,7 +3346,7 @@
     },
     "p300_multi_v2.0": {
       "name": "p300_multi_gen2",
-      "backcompatName": "p300_multi",
+      "backCompatName": ["p300_multi"],
       "top": {
         "value": 19.5,
         "min": 5,
@@ -3936,7 +3936,7 @@
     },
     "p1000_single_v2.0": {
       "name": "p1000_single_gen2",
-      "backcompatName": "p1000_single",
+      "backCompatName": ["p1000_single"],
       "top": {
         "value": 19.5,
         "min": 5,

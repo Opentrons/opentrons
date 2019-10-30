@@ -152,6 +152,7 @@ class Simulator:
         """
         to_return: Dict[types.Mount, Dict[str, Optional[str]]] = {}
         for mount in types.Mount:
+
             expected_instr = expected.get(mount, None)
             if expected_instr and expected_instr not in\
                config_models + config_names:
@@ -160,12 +161,16 @@ class Simulator:
                     f' {expected_instr}')
             init_instr = self._attached_instruments.get(mount, {})
             found_model = init_instr.get('model', '')
+            backcompat: List[str] = []
+            if found_model:
+                backcompat = configs[found_model].get('backCompatName', [])
             if expected_instr and found_model\
-                    and not found_model.startswith(expected_instr):
+                    and (not found_model.startswith(expected_instr)
+                         and expected_instr not in backcompat):
                 if self._strict_attached:
                     raise RuntimeError(
                         'mount {}: expected instrument {} but got {}'
-                        .format(mount.name, expected_instr, init_instr))
+                        .format(mount.name, expected_instr, found_model))
                 else:
                     to_return[mount] = {
                         'model': find_config(expected_instr),
