@@ -18,6 +18,8 @@ Moving 100uL from one well to another:
 
     from opentrons import protocol_api
 
+    metadata = {'apiLevel': '2.0'}
+
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
         tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
@@ -31,6 +33,8 @@ This accomplishes the same thing as the following basic commands:
 .. code-block:: python
 
     from opentrons import protocol_api
+
+    metadata = {'apiLevel': '2.0'}
 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
@@ -53,6 +57,8 @@ Loops in Python allow your protocol to perform many actions, or act upon many we
 .. code-block:: python
 
     from opentrons import protocol_api
+
+    metadata = {'apiLevel': '2.0'}
 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
@@ -79,6 +85,8 @@ The OT-2 pipettes can do some things that a human cannot do with a pipette, like
 
     from opentrons import protocol_api
 
+    metadata = {'apiLevel': '2.0'}
+
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
         tiprack_1 = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
@@ -104,6 +112,8 @@ This example first spreads a dilutent to all wells of a plate. It then dilutes 8
 .. code-block:: python
 
     from opentrons import protocol_api
+
+    metadata = {'apiLevel': '2.0'}
 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
@@ -139,6 +149,8 @@ Deposit various volumes of liquids into the same plate of wells, and automatical
 .. code-block:: python
 
     from opentrons import protocol_api
+
+    metadata = {'apiLevel': '2.0'}
 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)

@@ -19,6 +19,8 @@ The examples in this section will use the following set-up:
 
     from opentrons import protocol_api
 
+    metadata = {'apiLevel': '2.0'}
+
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
         tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', 2)

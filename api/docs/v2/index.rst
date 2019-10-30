@@ -42,7 +42,7 @@ The design goal of the Opentrons API is to make code readable and easy to unders
 
 .. code-block:: none
 
-    This protocol is by me; it’s called Opentrons Protocol Tutorial and is used for demonstrating the Opentrons API
+    This protocol is by me; it’s called Opentrons Protocol Tutorial and is used for demonstrating the Opentrons API. It uses Protocol API Version 2.0.
 
     Begin the protocol
 
@@ -63,7 +63,8 @@ If we were to rewrite this with the Opentrons API, it would look like the follow
     metadata = {
         'protocolName': 'My Protocol',
         'author': 'Name <email@address.com>',
-        'description': 'Simple protocol to get started using OT2'
+        'description': 'Simple protocol to get started using OT2',
+        'apiLevel': '2.0'
     }
 
     # protocol run function. the part after the colon lets your editor know
@@ -111,6 +112,8 @@ Opentrons API version 2 protocols are structured around a function called ``run(
 .. code-block:: python
 
    from opentrons import protocol_api
+
+   metadata = {'apiLevel': '2.0'}
 
    def run(protocol: protocol_api.ProtocolContext):
        pass

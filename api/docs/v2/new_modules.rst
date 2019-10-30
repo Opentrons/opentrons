@@ -21,6 +21,8 @@ within a protocol. To do this, you call the following *inside* the run function:
 
     from opentrons import protocol_api
 
+    metadata = {'apiLevel': '2.0'}
+
     def run(protocol: protocol_api.ProtocolContext):
          module = protocol.load_module('Module Name', slot)
 
@@ -46,6 +48,8 @@ onto the module. You can do this via:
 
     from opentrons import protocol_api
 
+    metadata = {'apiLevel': '2.0'}
+
     def run(protocol: protocol_api.ProtocolContext):
          module = protocol.load_module('Module Name', slot)
          my_labware = module.load_labware('labware_definition_name')
@@ -59,6 +63,8 @@ All modules have the ability to check what state they are currently in. To do th
 .. code-block:: python
 
     from opentrons import protocol_api
+
+    metadata = {'apiLevel': '2.0'}
 
     def run(protocol: protocol_api.ProtocolContext):
          module = protocol.load_module('Module Name', slot)
@@ -81,6 +87,8 @@ section, assume we have the following already:
 .. code-block:: python
 
     from opentrons import protocol_api
+
+    metadata = {'apiLevel': '2.0'}
 
     def run(protocol: protocol_api.ProtocolContext):
         temp_mod = protocol.load_module('temperature module', '1')
@@ -149,6 +157,8 @@ section, assume we have the following already:
 
     from opentrons import protocol_api
 
+    metadata = {'apiLevel': '2.0'}
+
     def run(protocol: protocol_api.ProtocolContext):
         mag_mod = protocol.load_module('magnetic module', '1')
         plate = mag_mod.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
@@ -209,6 +219,8 @@ For the purposes of this section, assume we have the following already:
 .. code-block:: python
 
     from opentrons import protocol_api
+
+    metadata = {'apiLevel': '2.0'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tc_mod = protocol.load_module('Thermocycler Module')

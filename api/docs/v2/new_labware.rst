@@ -69,6 +69,8 @@ The ending well will be in the bottom right, see the diagram below for further e
     '''
     Examples in this section expect the following
     '''
+    metadata = {'apiLevel': '2.0'}
+
     def run(protocol):
 
         plate = protocol.load_labware('corning_24_wellplate_3.4ml_flat', slot='1')
@@ -295,6 +297,8 @@ To move a location, you create a :py:class:`.types.Point` representing a
 .. code-block:: python
 
    from opentrons import types
+
+   metadata = {'apiLevel': '2.0'}
 
    def run(protocol):
         plate = protocol.load_labware(

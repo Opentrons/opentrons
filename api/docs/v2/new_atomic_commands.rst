@@ -13,6 +13,8 @@ For the purposes of this section we can assume that we already have the followin
 
     from opentrons import protocol_api
 
+    metadata = {'apiLevel': '2.0'}
+
     def run(protocol: protocol_api.ProtocolContext):
         tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
         plate = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
@@ -83,6 +85,8 @@ For the purposes of this section we can assume that we already have the followin
 
     from opentrons import protocol_api
 
+    metadata = {'apiLevel': '2.0'}
+
     def run(protocol: protocol_api.ProtocolContext):
         tiprack = protocol.load_labware(
             'corning_96_wellplate_360ul_flat', 2)
@@ -132,6 +136,8 @@ Please note that the default now for pipette aspirate and dispense location is a
 **********************
 
 .. code-block:: python
+
+    metadata = {'apiLevel': '2.0'}
 
     def run(protocol):
         tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
@@ -333,6 +339,8 @@ will be displayed in the Opentrons app when protocol execution pauses.
 
     from opentrons import protocol_api
 
+    metadata = {'apiLevel': '2.0'}
+
     def run(protocol: protocol_api.ProtocolContext):
         # The start of your protocol goes here...
 
@@ -361,6 +369,8 @@ None of these functions take any arguments:
 
     from opentrons import protocol_api, types
 
+    metadata = {'apiLevel': '2.0'}
+
     def run(protocol: protocol_api.ProtocolContext):
         pipette = protocol.load_instrument('p300_single', 'right')
         protocol.home() # Homes the gantry, z axes, and plungers
@@ -377,6 +387,8 @@ during protocol execution:
 .. code-block:: python
 
     from opentrons import protocol_api, types
+
+    metadata = {'apiLevel': '2.0'}
 
     def run(protocol: protocol_api.ProtocolContext):
         protocol.comment('Hello, world!')
