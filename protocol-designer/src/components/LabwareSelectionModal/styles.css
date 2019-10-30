@@ -147,6 +147,7 @@
 
 .filter_checkbox {
   display: inline-block;
+  padding-right: 0.75rem;
 }
 
 .filters_section {
