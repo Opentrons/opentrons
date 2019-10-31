@@ -24,6 +24,8 @@ For more details about this release, please see the full [technical change log][
 - The app should warn you if you try to simulate a protocol without any valid steps, but it does not ([#3121][3121])
 - When disconnecting and reconnecting to a running OT-2 that doesn't know what time it is, the app's displayed run time will be subtly wrong ([#3872][3872])
 
+Happy Halloween! 🎃
+
 
 [changelog]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
 

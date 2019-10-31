@@ -3,23 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.14.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.14.0-alpha.0...v3.14.0-alpha.1) (2019-10-30)
-
+# [3.14.0](https://github.com/Opentrons/opentrons/compare/v3.13.2...v3.14.0) (2019-10-31)
 
 ### Features
 
 * **app:** allow inexact cross-generational pipette compatibility ([#4311](https://github.com/Opentrons/opentrons/issues/4311)) ([95dae6a](https://github.com/Opentrons/opentrons/commit/95dae6a)), closes [#3598](https://github.com/Opentrons/opentrons/issues/3598)
 * **app:** allow p1000 gen2 to fallback to specced p1000 gen1 ([#4316](https://github.com/Opentrons/opentrons/issues/4316)) ([0e33f65](https://github.com/Opentrons/opentrons/commit/0e33f65)), closes [#3598](https://github.com/Opentrons/opentrons/issues/3598)
-
-
-
-
-
-# [3.14.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.13.2...v3.14.0-alpha.0) (2019-10-28)
-
-
-### Features
-
 * **app:** add robot restart alert for FF changes that require restart ([#4285](https://github.com/Opentrons/opentrons/issues/4285)) ([96408a1](https://github.com/Opentrons/opentrons/commit/96408a1))
 * **app:** Enable GEN2 pipettes ([#4297](https://github.com/Opentrons/opentrons/issues/4297)) ([f9d2c3b](https://github.com/Opentrons/opentrons/commit/f9d2c3b)), closes [#3601](https://github.com/Opentrons/opentrons/issues/3601)
 * **app:** improve modules on run tab, enable module temp control for tc and td ([#4172](https://github.com/Opentrons/opentrons/issues/4172)) ([c11de69](https://github.com/Opentrons/opentrons/commit/c11de69)), closes [#4021](https://github.com/Opentrons/opentrons/issues/4021)

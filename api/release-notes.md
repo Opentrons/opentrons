@@ -32,6 +32,8 @@ We're happy to announce the public beta of version 2 of our Python protocol API!
 - While the underlying definition is correct, there is a known API bug that is causing the robot to think a "50 mL" tube in a "15 / 50 mL" tube rack is the same height as the "15 mL" tube
 - When attaching or detaching a pipette from the left mount, the robot homes twice in the X direction
 
+Happy Halloween! 🎃
+
 [419]: https://github.com/Opentrons/opentrons/issues/419
 [labware-versioning-docs]: https://docs.opentrons.com/v1/labware.html#labware-versions
 [docs-v2-root]: https://docs.opentrons.com//v2/index.html
