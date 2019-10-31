@@ -173,9 +173,6 @@ function PipetteNameItem(props: PipetteNameSpecs) {
 function Option(props: any) {
   const { innerRef, innerProps, data } = props
 
-  if (props.isFocused) {
-    console.log(props)
-  }
   return (
     <div
       ref={innerRef}
