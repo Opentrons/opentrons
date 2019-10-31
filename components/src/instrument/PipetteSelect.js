@@ -173,8 +173,17 @@ function PipetteNameItem(props: PipetteNameSpecs) {
 function Option(props: any) {
   const { innerRef, innerProps, data } = props
 
+  if (props.isFocused) {
+    console.log(props)
+  }
   return (
-    <div ref={innerRef} className={styles.pipette_option} {...innerProps}>
+    <div
+      ref={innerRef}
+      className={cx(styles.pipette_option, {
+        [styles.focused]: props.isFocused,
+      })}
+      {...innerProps}
+    >
       {data.value === null ? (
         <NonePlaceholder />
       ) : (

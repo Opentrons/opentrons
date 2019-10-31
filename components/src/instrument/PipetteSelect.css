@@ -65,10 +65,11 @@
   padding: 0.25rem 0.75rem;
   cursor: default;
 
-  &:hover {
+  &.focused {
     background-color: var(--c-light-gray);
   }
 }
+
 
 .pipette_volume_class {
   cursor: default;

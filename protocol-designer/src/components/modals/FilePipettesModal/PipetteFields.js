@@ -72,7 +72,6 @@ export default function ChangePipetteFields(props: Props) {
     const { tabIndex, mount } = props
     const pipetteName = values[mount].pipetteName
     const fieldName = `${mount}.pipetteName`
-    console.table({ tabIndex })
     return (
       <PipetteSelect
         enableNoneOption
