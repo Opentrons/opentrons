@@ -88,14 +88,16 @@ For the purposes of this section we can assume that we already have the followin
     metadata = {'apiLevel': '2.0'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        tiprack = protocol.load_labware(
-            'corning_96_wellplate_360ul_flat', 2)
         plate = protocol.load_labware(
+            'corning_96_wellplate_360ul_flat', 2)
+        tip_rack_1 = protocol.load_labware(
             'opentrons_96_tiprack_300ul', 3)
+        tip_rack_2 = protocol.load_labware(
+            'opentrons_96_tiprack_300ul', 4)
         pipette = protocol.load_instrument(
-            'p300_single', mount='left', tip_racks=[tiprack])
+            'p300_single', mount='left', tip_racks=[tip_rack_1, tip_rack_2])
 
-This loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 2 and a `Opentrons 300ul Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slot 3, and uses a P300 Single pipette.
+This loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 2 and two `Opentrons 300ul Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slots 3 and 4 respectively, and uses a P300 Single pipette.
 
 Iterating Through Tips
 ----------------------
