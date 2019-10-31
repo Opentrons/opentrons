@@ -8,15 +8,22 @@ import ModuleDiagram from './ModuleDiagram'
 import styles from './styles.css'
 
 import type { ModuleType } from '@opentrons/shared-data'
-import type { MaybeModuleOnDeck } from '../../step-forms'
+import type { ModuleOnDeck } from '../../step-forms'
 
 type Props = {
-  ...MaybeModuleOnDeck,
+  module?: ModuleOnDeck,
+  type: ModuleType,
   openEditModuleModal: (moduleType: ModuleType, id?: string) => mixed,
 }
 
 export default function ModuleRow(props: Props) {
-  const { type, id, slot, model, openEditModuleModal } = props
+  const { module, openEditModuleModal } = props
+  const type = module?.type || props.type
+
+  const model = module?.model
+  const id = module?.id
+  const slot = module?.slot
+
   const setCurrentModule = (type: ModuleType, id?: string) => () =>
     openEditModuleModal(type, id)
   const addRemoveText = id ? 'remove' : 'add'

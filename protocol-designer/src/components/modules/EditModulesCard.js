@@ -23,8 +23,8 @@ export default function EditModulesCard(props: Props) {
           if (moduleData) {
             return (
               <ModuleRow
-                {...moduleData}
                 type={moduleType}
+                module={moduleData}
                 key={i}
                 openEditModuleModal={openEditModuleModal}
               />

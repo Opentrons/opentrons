@@ -308,11 +308,9 @@ export const getModulesForEditModulesCard: Selector<ModulesForEditModulesCard> =
         }
       },
       {
-        magdeck: { type: 'magdeck' },
-        tempdeck: { type: 'tempdeck' },
-        thermocycler: {
-          type: 'thermocycler',
-        },
+        magdeck: null,
+        tempdeck: null,
+        thermocycler: null,
       }
     )
 )
