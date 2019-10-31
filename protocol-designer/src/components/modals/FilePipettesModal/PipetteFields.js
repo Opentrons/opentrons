@@ -43,7 +43,6 @@ type PipetteSelectProps = {| mount: Mount, tabIndex: number |}
 
 export default function ChangePipetteFields(props: Props) {
   const { values, onFieldChange } = props
-  const enableGen2Pipettes = useSelector(ffSelectors.getEnableGen2Pipettes)
 
   const tiprackOptions = useMemo(() => {
     const defs = getOnlyLatestDefs()
@@ -73,24 +72,17 @@ export default function ChangePipetteFields(props: Props) {
     const { tabIndex, mount } = props
     const pipetteName = values[mount].pipetteName
     const fieldName = `${mount}.pipetteName`
-
-    return enableGen2Pipettes === true ? (
+    console.table({ tabIndex })
+    return (
       <PipetteSelect
         enableNoneOption
-        tabIndex={`${tabIndex}`}
+        tabIndex={tabIndex}
+        nameBlacklist={['p20_multi_gen2', 'p300_multi_gen2']}
         value={pipetteName != null ? getPipetteNameSpecs(pipetteName) : null}
         onPipetteChange={value => {
           const name = value !== null ? value.name : null
           onFieldChange(mount, 'pipetteName', name)
         }}
-      />
-    ) : (
-      <DropdownField
-        tabIndex={tabIndex}
-        options={pipetteOptionsWithNone}
-        value={pipetteName}
-        name={fieldName}
-        onChange={makeHandleChange(mount, 'pipetteName')}
       />
     )
   }
