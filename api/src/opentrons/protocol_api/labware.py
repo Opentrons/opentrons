@@ -147,8 +147,8 @@ class Well:
     def center(self) -> Location:
         """
         :return: a Point corresponding to the absolute position of the center
-        of the well relative to the deck (with the front-left corner of slot 1
-        as (0,0,0))
+                 of the well relative to the deck (with the front-left corner
+                 of slot 1 as (0,0,0))
         """
         top = self.top()
         center_z = top.point.z - (self._depth / 2.0)

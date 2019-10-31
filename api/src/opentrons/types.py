@@ -38,10 +38,10 @@ class Point(NamedTuple):
 
 
 class Location(NamedTuple):
-    """ A location to target as a motion in the :ref:`protocol-api`.
+    """ A location to target as a motion.
 
     The location contains a :py:class:`.Point` (in
-    :ref:`protocol-api-deck-coordinates`) and possibly an associated
+    :ref:`protocol-api-deck-coords`) and possibly an associated
     :py:class:`.Labware` or :py:class:`.Well` instance.
 
     It should rarely be constructed directly by the user; rather, it is the
