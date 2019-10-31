@@ -133,7 +133,7 @@ export type SessionResponseAction = {|
     name: string,
     protocolText: string,
     metadata?: ?$PropertyType<ProtocolData, 'metadata'>,
-    apiLevel: number,
+    apiLevel: [number, number],
   |},
   meta: {| freshUpload: boolean |},
 |}

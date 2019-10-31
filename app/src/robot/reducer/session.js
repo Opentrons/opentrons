@@ -46,7 +46,7 @@ export type SessionState = {
   remoteTimeCompensation: number | null,
   startTime: ?number,
   runTime: number,
-  apiLevel: number,
+  apiLevel: [number, number],
 }
 
 // TODO(mc, 2018-01-11): replace actionType constants with Flow types
@@ -83,7 +83,7 @@ const INITIAL_STATE: SessionState = {
   remoteTimeCompensation: null,
   startTime: null,
   runTime: 0,
-  apiLevel: 1,
+  apiLevel: [1, 0],
 }
 
 export default function sessionReducer(

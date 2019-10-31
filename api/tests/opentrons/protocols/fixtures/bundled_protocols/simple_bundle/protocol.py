@@ -1,4 +1,5 @@
-metadata = {'author': 'MISTER FIXTURE'}
+metadata = {'author': 'MISTER FIXTURE',
+            'apiLevel': '2.0'}
 
 
 def run(protocol_context):

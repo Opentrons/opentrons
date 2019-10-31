@@ -88,9 +88,22 @@ async def test_async_notifications(main_router):
     assert res == {'name': 'foo', 'payload': {'bar': 'baz'}}
 
 
-def test_load_protocol_with_error(session_manager):
+@pytest.mark.api2_only
+def test_load_protocol_with_error_v2(session_manager, hardware):
     with pytest.raises(Exception) as e:
-        session = session_manager.create(name='<blank>', contents='blah')
+        session = session_manager.create(
+            name='<blank>', contents='metadata={"apiLevel": "2.0"}; blah')
+        assert session is None
+
+    args, = e.value.args
+    assert args == "name 'blah' is not defined"
+
+
+@pytest.mark.api1_only
+def test_load_protocol_with_error_v1(session_manager, hardware):
+    with pytest.raises(Exception) as e:
+        session = session_manager.create(
+            name='<blank>', contents='metadata={"apiLevel": "1.0"}; blah')
         assert session is None
 
     args, = e.value.args
@@ -231,7 +244,8 @@ async def test_get_instruments_and_containers(labware_setup,
     instruments, containers, modules, interactions = \
         _accumulate([_get_labware(command) for command in commands])
 
-    session = session_manager.create(name='', contents='')
+    session = session_manager.create(
+        name='', contents='from opentrons import instruments')
     # We are calling dedupe directly for testing purposes.
     # Normally it is called from within a session
     session._instruments.extend(_dedupe(instruments))
@@ -357,7 +371,7 @@ async def test_session_create_error(main_router):
     with pytest.raises(SyntaxError):
         main_router.session_manager.create(
             name='<blank>',
-            contents='syntax error ;(')
+            contents='from opentrons import instruments; syntax error ;(')
 
     with pytest.raises(TimeoutError):
         # No state change is expected
@@ -366,17 +380,43 @@ async def test_session_create_error(main_router):
     with pytest.raises(ZeroDivisionError):
         main_router.session_manager.create(
             name='<blank>',
-            contents='1/0')
+            contents='from opentrons import instruments; 1/0')
 
     with pytest.raises(TimeoutError):
         # No state change is expected
         await main_router.wait_until(lambda _: True)
 
 
-async def test_session_metadata(main_router):
+@pytest.mark.api1_only
+async def test_session_metadata_v1(main_router):
     expected = {
         'hello': 'world',
         'what?': 'no'
+    }
+
+    prot = """
+from opentrons import instruments
+this = 0
+that = 1
+metadata = {
+'what?': 'no',
+'hello': 'world'
+}
+print('wat?')
+"""
+
+    session = main_router.session_manager.create(
+        name='<blank>',
+        contents=prot)
+    assert session.metadata == expected
+
+
+@pytest.mark.api2_only
+async def test_session_metadata_v2(main_router):
+    expected = {
+        'hello': 'world',
+        'what?': 'no',
+        'apiLevel': '2.0'
     }
 
     prot = """
@@ -384,7 +424,8 @@ this = 0
 that = 1
 metadata = {
 'what?': 'no',
-'hello': 'world'
+'hello': 'world',
+'apiLevel': '2.0'
 }
 print('wat?')
 

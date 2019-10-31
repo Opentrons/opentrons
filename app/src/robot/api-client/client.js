@@ -471,7 +471,13 @@ export default function client(dispatch) {
         )
       }
 
-      update.apiLevel = apiSession.api_level || 1
+      if (Array.isArray(apiSession.api_level)) {
+        update.apiLevel = apiSession.api_level
+      } else if (apiSession.api_level) {
+        update.apiLevel = [apiSession.api_level, 0]
+      } else {
+        update.apiLevel = [1, 0]
+      }
 
       dispatch(actions.sessionResponse(null, update, freshUpload))
     } catch (error) {

@@ -6,6 +6,7 @@ import ast
 import itertools
 import json
 import pkgutil
+import re
 from io import BytesIO
 from zipfile import ZipFile
 from typing import Any, Dict, Union
@@ -13,8 +14,11 @@ from typing import Any, Dict, Union
 import jsonschema  # type: ignore
 
 from opentrons.config import feature_flags as ff
-from .types import Protocol, PythonProtocol, JsonProtocol, Metadata
+from .types import Protocol, PythonProtocol, JsonProtocol, Metadata, APIVersion
 from .bundle import extract_bundle
+
+# match e.g. "2.0" but not "hi", "2", "2.0.1"
+API_VERSION_RE = re.compile(r'^(\d+)\.(\d+)$')
 
 
 def _parse_json(
@@ -46,7 +50,7 @@ def _parse_python(
                        filename=ast_filename)
     metadata = extract_metadata(parsed)
     protocol = compile(parsed, filename=ast_filename, mode='exec')
-    version = infer_version(metadata, parsed)
+    version = get_version(metadata, parsed)
 
     result = PythonProtocol(
         text=protocol_contents,
@@ -78,7 +82,7 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # n
         contents.bundled_data,
         contents.bundled_python)
 
-    if result.api_level != '2':
+    if result.api_level < APIVersion(2, 0):
         raise RuntimeError('Bundled protocols must use Protocol API V2, ' +
                            f'got {result.api_level}')
 
@@ -155,7 +159,7 @@ def extract_metadata(parsed: ast.Module) -> Metadata:
     return metadata
 
 
-def infer_version_from_imports(parsed: ast.Module) -> str:
+def infer_version_from_imports(parsed: ast.Module) -> APIVersion:
     # Imports in the form of `import opentrons.robot` will have an entry in
     # parsed.body[i].names[j].name in the form "opentrons.robot". Find those
     # imports and transform them to strip away the 'opentrons.' part.
@@ -182,12 +186,31 @@ def infer_version_from_imports(parsed: ast.Module) -> str:
     v1_markers = set(('robot', 'instruments', 'modules', 'containers'))
     v1evidence = v1_markers.intersection(opentrons_imports)
     if v1evidence:
-        return '1'
+        return APIVersion(1, 0)
     else:
-        return '2'
+        raise RuntimeError('Cannot infer API level')
 
 
-def infer_version(metadata: Metadata, parsed: ast.Module) -> str:
+def version_from_metadata(metadata: Metadata) -> APIVersion:
+    """ Build an API version from metadata, if we can.
+
+    If there is no apiLevel key, raise a KeyError.
+    If the apiLevel value is malformed, raise a ValueError.
+    """
+    if 'apiLevel' not in metadata:
+        raise KeyError('apiLevel')
+    requested_level = str(metadata['apiLevel'])
+    if requested_level == '1':
+        return APIVersion(1, 0)
+    matches = API_VERSION_RE.match(requested_level)
+    if not matches:
+        raise ValueError(
+            f'apiLevel {requested_level} is incorrectly formatted. It should '
+            'major.minor, where both major and minor are numbers.')
+    return APIVersion(major=int(matches.group(1)), minor=int(matches.group(2)))
+
+
+def get_version(metadata: Metadata, parsed: ast.Module) -> APIVersion:
     """
     Infer protocol API version based on a combination of metadata and imports.
 
@@ -203,10 +226,17 @@ def infer_version(metadata: Metadata, parsed: ast.Module) -> str:
     APIv2 protocol (note that 'labware' is not in this list, as there is a
     valid APIv2 import named 'labware').
     """
-    level = str(metadata.get('apiLevel'))
-    if level in ('1', '2'):
-        return level
-    return infer_version_from_imports(parsed)
+    try:
+        return version_from_metadata(metadata)
+    except KeyError:  # No apiLevel key, may be apiv1
+        pass
+    try:
+        return infer_version_from_imports(parsed)
+    except RuntimeError:
+        raise RuntimeError(
+            'If this is not an API v1 protocol, you must specify the target '
+            'api level in the apiLevel key of the metadata. For instance, '
+            'metadata={"apiLevel": "2.0"}')
 
 
 def _get_protocol_schema_version(protocol_json: Dict[Any, Any]) -> int:
