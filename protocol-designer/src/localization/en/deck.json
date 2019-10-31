@@ -1,4 +1,7 @@
 {
+  "warning": {
+    "gen1multichannel": "No 8-Channel GEN1 access"
+  },
   "header": {
     "start": "Tell the robot where labware and liquids start on the deck",
     "end": "Click on labware to inspect the result of your protocol"

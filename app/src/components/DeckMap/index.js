@@ -74,8 +74,8 @@ function DeckMap(props: Props) {
       viewBox={`-46 -10 ${488} ${390}`} // TODO: put these in variables
       className={className}
     >
-      {({ slots }) =>
-        map(slots, (slot: $Values<typeof slots>, slotId) => {
+      {({ deckSlotsById }) =>
+        map(deckSlotsById, (slot: $Values<typeof deckSlotsById>, slotId) => {
           if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
           const moduleInSlot = modulesBySlot && modulesBySlot[slotId]
           const allLabwareInSlot = labwareBySlot && labwareBySlot[slotId]
