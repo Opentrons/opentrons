@@ -3,6 +3,10 @@ import * as React from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
+import {
+  SUPPORTED_MODULE_SLOTS,
+  getAllModuleSlotsByType,
+} from '../../../modules'
 import i18n from '../../../localization'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import {
@@ -22,35 +26,14 @@ type EditModulesProps = {
   moduleId: ?string,
   onCloseClick: () => mixed,
 }
-// TODO (ka 2019-10-29): Move this to modules/moduleData?
-const SUPPORTED_MODULE_SLOTS = {
-  magdeck: [{ name: 'Slot 1 (supported)', value: '1' }],
-  tempdeck: [{ name: 'Slot 3 (supported)', value: '3' }],
-  thermocycler: [],
-}
-
-const ALL_MODULE_SLOTS = [
-  { name: 'Slot 1', value: '1' },
-  { name: 'Slot 3', value: '3' },
-  { name: 'Slot 4', value: '4' },
-  { name: 'Slot 6', value: '6' },
-  { name: 'Slot 7', value: '7' },
-  { name: 'Slot 9', value: '9' },
-  { name: 'Slot 10', value: '10' },
-]
-
-function getAllModuleSlotsByType(moduleType: ModuleType) {
-  const supportedSlotOption = SUPPORTED_MODULE_SLOTS[moduleType]
-  const allOtherSlots = ALL_MODULE_SLOTS.filter(
-    s => s.value !== supportedSlotOption[0].value
-  )
-  return supportedSlotOption.concat(allOtherSlots)
-}
 
 export default function EditModulesModal(props: EditModulesProps) {
   const { moduleType, moduleId, onCloseClick } = props
+  /* TODO (ka 2019-10-31): This is a temporary hook workaround so the slot selection 'works'
+  Once selectors are in place for modules we can get the previously assigned slot from state
+  and have supported slot as fallback for new modules or failure to get slot from module by id */
   const [selectedSlot, setSelectedSlot] = React.useState<string | null>(
-    SUPPORTED_MODULE_SLOTS[moduleType][0].value
+    SUPPORTED_MODULE_SLOTS[moduleType][0].value || null
   )
 
   const handleSlotChange = (e: SyntheticInputEvent<*>) =>

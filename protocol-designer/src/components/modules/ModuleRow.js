@@ -48,8 +48,6 @@ export default function ModuleRow(props: Props) {
           {slot && <LabeledValue label="Slot" value={`Slot ${slot}`} />}
         </div>
         <div className={styles.modules_button_group}>
-          {/* TODO (ka 2019-10-23): Hide/Show based on anySlot FF when in place
-          onClick needs to set edit modal open + pass moduleId for deleting */}
           {moduleId && (
             <OutlineButton
               className={styles.module_button}
@@ -59,9 +57,6 @@ export default function ModuleRow(props: Props) {
               Edit
             </OutlineButton>
           )}
-
-          {/* TODO (ka 2019-10-23): onClick needs to set edit modal open
-          + pass moduleId for deleting */}
           <OutlineButton
             className={styles.module_button}
             onClick={handleAddOrRemove}
