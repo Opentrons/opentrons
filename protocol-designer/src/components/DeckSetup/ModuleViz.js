@@ -10,23 +10,39 @@ type Props = {|
   y: number,
   orientation: ModuleOrientation,
   module: ModuleOnDeck,
+  slotName: string,
 |}
 
 const ModuleViz = (props: Props) => {
   const moduleType = props.module.type
-  const { xOffset, yOffset, xDimension, yDimension } = getModuleVizDims(
-    props.orientation,
-    moduleType
-  )
-  console.log({ props, xOffset, yOffset, xDimension, yDimension })
+  const {
+    xOffset,
+    yOffset,
+    xDimension,
+    yDimension,
+    childXOffset,
+    childYOffset,
+    childXDimension,
+    childYDimension,
+  } = getModuleVizDims(props.orientation, moduleType)
+
   return (
-    <rect
-      x={props.x + xOffset}
-      y={props.y + yOffset}
-      height={yDimension}
-      width={xDimension}
-      className={styles.module_viz}
-    />
+    <g>
+      <rect
+        x={props.x + xOffset}
+        y={props.y + yOffset}
+        height={yDimension}
+        width={xDimension}
+        className={styles.module_viz}
+      />
+      <rect
+        x={props.x + childXOffset}
+        y={props.y + childYOffset}
+        height={childYDimension}
+        width={childXDimension}
+        className={styles.module_slot_area}
+      />
+    </g>
   )
 }
 
