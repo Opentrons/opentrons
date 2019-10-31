@@ -281,8 +281,8 @@ async def test_modify_pipette_settings(async_client, attached_pipettes):
     no_changes = {
         'fields': {
             'pickUpCurrent': {'value': 1}
-            }
         }
+    }
 
     test_id = attached_pipettes['left']['id']
     # Check data has not been changed yet
@@ -306,8 +306,8 @@ async def test_modify_pipette_settings(async_client, attached_pipettes):
     changes2 = {
         'fields': {
             'pickUpCurrent': None
-            }
         }
+    }
     resp = await async_client.patch(
         '/settings/pipettes/{}'.format(test_id),
         json=changes2)
@@ -330,10 +330,10 @@ async def test_modify_pipette_settings(async_client, attached_pipettes):
 async def test_incorrect_modify_pipette_settings(
         async_client, attached_pipettes):
     out_of_range = {
-            'fields': {
-                'pickUpCurrent': {'value': 1000}
-                }
-            }
+        'fields': {
+            'pickUpCurrent': {'value': 1000}
+        }
+    }
     # check over max fails
     resp = await async_client.patch(
         '/settings/pipettes/{}'.format(attached_pipettes['left']['id']),
@@ -368,3 +368,15 @@ async def test_set_log_level(async_client):
     else:
         conf = await hardware.config
     assert conf.log_level == 'ERROR'
+
+
+async def test_get(async_client):
+    resp = await async_client.get('/settings/robot')
+    body = await resp.json()
+    assert resp.status == 200
+    hardware = async_client.app['com.opentrons.hardware']
+    if async_client.app['api_version'] == 1:
+        conf = hardware.config
+    else:
+        conf = await hardware.config
+    assert json.dumps(conf._asdict()) == json.dumps(body)
