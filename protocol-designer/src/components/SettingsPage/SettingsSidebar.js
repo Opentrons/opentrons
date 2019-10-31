@@ -22,7 +22,6 @@ const SettingsSidebar = (props: Props) => (
       title={i18n.t('nav.settings.app')}
     />
     {/* <PDTitledList
-      disabled
       className={styles.sidebar_item}
       onClick={props.makeNavigateToPage('settings-features')}
       selected={props.currentPage === 'settings-features'}

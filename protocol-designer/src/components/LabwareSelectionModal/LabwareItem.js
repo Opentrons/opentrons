@@ -1,6 +1,8 @@
 // @flow
-import i18n from '../../localization'
 import * as React from 'react'
+import cx from 'classnames'
+import i18n from '../../localization'
+import { Icon, type IconName } from '@opentrons/components'
 import { PDListItem } from '../lists'
 import styles from './styles.css'
 import {
@@ -11,16 +13,25 @@ import {
 } from '@opentrons/shared-data'
 
 type Props = {|
-  selectLabware: (labwareLoadName: string) => mixed,
+  disabled?: ?boolean,
+  icon?: ?IconName,
   labwareDef: LabwareDefinition2,
   onMouseEnter: () => any,
   onMouseLeave: () => any,
+  selectLabware: (labwareLoadName: string) => mixed,
 |}
 
 const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'
 
 export default function LabwareItem(props: Props) {
-  const { selectLabware, onMouseLeave, onMouseEnter, labwareDef } = props
+  const {
+    disabled,
+    icon,
+    labwareDef,
+    onMouseLeave,
+    onMouseEnter,
+    selectLabware,
+  } = props
 
   const displayName = getLabwareDisplayName(labwareDef)
   const labwareURI = getLabwareDefURI(labwareDef)
@@ -31,11 +42,18 @@ export default function LabwareItem(props: Props) {
       border
       hoverable
       className={styles.labware_list_item}
-      onClick={() => selectLabware(labwareURI)}
+      onClick={() => {
+        if (!disabled) {
+          selectLabware(labwareURI)
+        }
+      }}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <div className={styles.labware_name}>{displayName}</div>
+      {icon ? <Icon name={icon} className={styles.labware_item_icon} /> : null}
+      <div className={cx(styles.labware_name, { [styles.disabled]: disabled })}>
+        {displayName}
+      </div>
       {getLabwareDefIsStandard(labwareDef) ? (
         <a
           className={styles.view_measurements_link}

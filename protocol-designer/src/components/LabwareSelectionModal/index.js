@@ -8,11 +8,15 @@ import {
   createContainer,
 } from '../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
+import { selectors as featureFlagSelectors } from '../../feature-flags'
 import {
   actions as labwareDefActions,
   selectors as labwareDefSelectors,
 } from '../../labware-defs'
-import { selectors as stepFormSelectors } from '../../step-forms'
+import {
+  selectors as stepFormSelectors,
+  type ModuleOnDeck,
+} from '../../step-forms'
 import type { BaseState, ThunkDispatch } from '../../types'
 
 type Props = React.ElementProps<typeof LabwareSelectionModal>
@@ -20,14 +24,35 @@ type Props = React.ElementProps<typeof LabwareSelectionModal>
 type SP = {|
   customLabwareDefs: $PropertyType<Props, 'customLabwareDefs'>,
   slot: $PropertyType<Props, 'slot'>,
+  parentSlot: $PropertyType<Props, 'parentSlot'>,
+  moduleType: $PropertyType<Props, 'moduleType'>,
   permittedTipracks: $PropertyType<Props, 'permittedTipracks'>,
+  moduleRestrictionsDisabled: $PropertyType<
+    Props,
+    'moduleRestrictionsDisabled'
+  >,
 |}
 
 function mapStateToProps(state: BaseState): SP {
+  const slot = labwareIngredSelectors.selectedAddLabwareSlot(state) || null
+  // TODO: Ian 2019-10-29 needs revisit to support multiple manualIntervention steps
+  const modulesById = stepFormSelectors.getInitialDeckSetup(state).modules
+  const initialModules: Array<ModuleOnDeck> = Object.keys(modulesById).map(
+    moduleId => modulesById[moduleId]
+  )
+  const parentModule =
+    (slot != null && initialModules.find(module => module.id === slot)) || null
+  const moduleRestrictionsDisabled = featureFlagSelectors.getDisableModuleRestrictions(
+    state
+  )
+
   return {
     customLabwareDefs: labwareDefSelectors.getCustomLabwareDefsByURI(state),
-    slot: labwareIngredSelectors.selectedAddLabwareSlot(state) || null,
+    slot,
+    parentSlot: parentModule != null ? parentModule.slot : null,
+    moduleType: parentModule != null ? parentModule.type : null,
     permittedTipracks: stepFormSelectors.getPermittedTipracks(state),
+    moduleRestrictionsDisabled,
   }
 }
 

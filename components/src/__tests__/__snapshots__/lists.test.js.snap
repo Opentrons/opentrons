@@ -99,7 +99,7 @@ exports[`TitledList renders TitledList with children correctly 1`] = `
     className="title_bar"
   >
     <h3
-      className="title"
+      className="title title_enabled"
     >
       foo
     </h3>
@@ -124,7 +124,7 @@ exports[`TitledList renders TitledList with onMouseEnter & onMouseLeave correctl
     className="title_bar"
   >
     <h3
-      className="title"
+      className="title title_enabled"
     >
       foo
     </h3>
@@ -140,7 +140,7 @@ exports[`TitledList renders TitledList with optional icon correctly 1`] = `
     className="title_bar"
   >
     <h3
-      className="title"
+      className="title title_enabled"
     >
       foo
     </h3>
@@ -156,7 +156,7 @@ exports[`TitledList renders TitledList without icon correctly 1`] = `
     className="title_bar"
   >
     <h3
-      className="title"
+      className="title title_enabled"
     >
       foo
     </h3>
@@ -172,7 +172,7 @@ exports[`TitledList renders collapsed TitledList correctly 1`] = `
     className="title_bar"
   >
     <h3
-      className="title"
+      className="title title_enabled"
     />
     <div
       className="title_bar_carat"
@@ -203,7 +203,7 @@ exports[`TitledList renders expanded TitledList correctly 1`] = `
     className="title_bar"
   >
     <h3
-      className="title"
+      className="title title_enabled"
     />
     <div
       className="title_bar_carat"
