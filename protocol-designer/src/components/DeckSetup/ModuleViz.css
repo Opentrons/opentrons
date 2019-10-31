@@ -8,7 +8,10 @@
 }
 
 .module_slot_area {
-  fill: var(--c-white);
+  fill: transparent;
+  stroke: var(--c-plate-bg);
+  stroke-width: 2;
+  stroke-dasharray: 8 4;
 }
 
 .module_slot_text {

@@ -24,9 +24,9 @@ export type ModuleVizDims = {|
 
 const MODULE_VIZ_DIMS: { [ModuleType]: ModuleVizDims } = {
   magdeck: {
-    xOffset: -1 * (SLOT_X * 0.25 + DIVIDER),
+    xOffset: -1 * (SLOT_X * 0.2 + DIVIDER),
     yOffset: -1 * DIVIDER,
-    xDimension: SLOT_X * 1.25 + DIVIDER * 2,
+    xDimension: SLOT_X * 1.2 + DIVIDER * 2,
     yDimension: SLOT_Y + DIVIDER * 2,
     childXOffset: 0,
     childYOffset: 0,
@@ -34,9 +34,9 @@ const MODULE_VIZ_DIMS: { [ModuleType]: ModuleVizDims } = {
     childYDimension: SLOT_Y,
   },
   tempdeck: {
-    xOffset: -1 * (SLOT_X * 0.5 + DIVIDER),
+    xOffset: -1 * (SLOT_X * 0.4 + DIVIDER),
     yOffset: -1 * DIVIDER,
-    xDimension: SLOT_X * 1.5 + DIVIDER * 2,
+    xDimension: SLOT_X * 1.4 + DIVIDER * 2,
     yDimension: SLOT_Y + DIVIDER * 2,
     childXOffset: 0,
     childYOffset: 0,
@@ -44,7 +44,7 @@ const MODULE_VIZ_DIMS: { [ModuleType]: ModuleVizDims } = {
     childYDimension: SLOT_Y,
   },
   thermocycler: {
-    xOffset: -1 * DIVIDER,
+    xOffset: -8,
     yOffset: 0,
     xDimension: SLOT_X + DIVIDER + 32,
     yDimension: SLOT_Y * 2.4,
