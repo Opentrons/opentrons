@@ -65,7 +65,7 @@ You can access help on the usage of ``opentrons_execute`` by calling ``opentrons
 
 
 Bundling Protocols
-==================
+------------------
 
 .. warning::
 
@@ -84,7 +84,7 @@ The advantage to using bundled protocols is that you can pack in custom labware 
 
 
 Writing A Bundled Protocol
---------------------------
+++++++++++++++++++++++++++
 
 When you write a bundled protocol, you write a normal APIv2 Python protocol. It may or may not include custom labware or data files. It is written in Python using the same API as any other APIv2 Python protocol.
 
@@ -122,7 +122,7 @@ To make a custom data file available to ``opentrons_simulate``, use the ``-d`` o
 
 
 Executing A Bundled Protocol
-----------------------------
+++++++++++++++++++++++++++++
 
 Once you have a bundled protocol file (by default, its file extension will be ``.ot2.zip``) you can use it without any further specification of labware or data files - they are all bundled inside the file. For instance,
 

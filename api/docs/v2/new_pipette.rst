@@ -150,9 +150,7 @@ Plunger Flow Rates
 ==================
 
 Opentrons pipettes have different rates of aspiration and dispense, depending on internal
-mechanical details. In general, you should not increase aspiration and dispense flow rates
-above their defaults; however, some experiments and protocols require slower rates of
-aspiration and dispense. These flow rates can be changed on a created
+mechanical details.  These flow rates can be changed on a created
 :py:class:`.InstrumentContext` at any time, in units of microliters/sec by altering
 :py:attr:`.InstrumentContext.flow_rate`. This has the following attributes:
 
