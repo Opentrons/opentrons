@@ -228,10 +228,7 @@ class FilePage extends React.Component<Props, State> {
 
         <Portal>
           {this.state.isEditPipetteModalOpen && (
-            <EditPipettesModal
-              key={String(this.state.isEditPipetteModalOpen)}
-              closeModal={this.closeEditPipetteModal}
-            />
+            <EditPipettesModal closeModal={this.closeEditPipetteModal} />
           )}
 
           {this.state.isEditModulesModalOpen &&
@@ -239,7 +236,6 @@ class FilePage extends React.Component<Props, State> {
               <EditModulesModal
                 moduleType={this.state.currentModule.moduleType}
                 moduleId={this.state.currentModule.moduleId}
-                key={String(this.state.isEditModulesModalOpen)}
                 onCloseClick={this.closeEditModulesModal}
               />
             )}
