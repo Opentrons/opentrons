@@ -72,6 +72,12 @@ export default function getDefaultsForStepType(
         pauseSecond: null,
         pauseMessage: '',
       }
+    case 'manualIntervention':
+      return {
+        labwareLocationUpdate: {},
+        pipetteLocationUpdate: {},
+        moduleLocationUpdate: {},
+      }
     default:
       return {}
   }
