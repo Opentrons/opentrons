@@ -15,7 +15,6 @@ type Props = {
 
 export default function EditModulesCard(props: Props) {
   const { modules, openEditModuleModal } = props
-
   return (
     <Card title="Modules">
       <div className={styles.modules_card_content}>

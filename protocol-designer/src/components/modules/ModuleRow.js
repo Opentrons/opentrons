@@ -8,29 +8,26 @@ import ModuleDiagram from './ModuleDiagram'
 import styles from './styles.css'
 
 import type { ModuleType } from '@opentrons/shared-data'
-import type { DeckSlot } from '../../types'
+import type { MaybeModuleOnDeck } from '../../step-forms'
 
 type Props = {
-  moduleId?: string,
-  slot?: DeckSlot,
-  model?: string,
-  type: ModuleType,
-  openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => mixed,
+  ...MaybeModuleOnDeck,
+  openEditModuleModal: (moduleType: ModuleType, id?: string) => mixed,
 }
 
 export default function ModuleRow(props: Props) {
-  const { type, moduleId, slot, model, openEditModuleModal } = props
-  const setCurrentModule = (type: ModuleType, moduleId?: string) => () =>
-    openEditModuleModal(type, moduleId)
-  const addRemoveText = moduleId ? 'remove' : 'add'
-  const handleAddOrRemove = moduleId
-    ? () => console.log('remove ' + moduleId)
+  const { type, id, slot, model, openEditModuleModal } = props
+  const setCurrentModule = (type: ModuleType, id?: string) => () =>
+    openEditModuleModal(type, id)
+  const addRemoveText = id ? 'remove' : 'add'
+  const handleAddOrRemove = id
+    ? () => console.log('remove ' + id)
     : setCurrentModule(type)
 
   const enableEditModules = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
-  const handleEditModule = setCurrentModule(type, moduleId)
+  const handleEditModule = setCurrentModule(type, id)
 
   return (
     <div>
@@ -48,7 +45,7 @@ export default function ModuleRow(props: Props) {
           {slot && <LabeledValue label="Slot" value={`Slot ${slot}`} />}
         </div>
         <div className={styles.modules_button_group}>
-          {moduleId && (
+          {id && (
             <OutlineButton
               className={styles.module_button}
               onClick={handleEditModule}
