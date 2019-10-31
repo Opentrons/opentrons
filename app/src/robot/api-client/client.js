@@ -502,12 +502,19 @@ export default function client(dispatch) {
     }
 
     function addApiInstrumentToPipettes(apiInstrument) {
-      const { _id, mount, name, channels } = apiInstrument
+      const { _id, mount, name, channels, requested_as } = apiInstrument
       // TODO(mc, 2018-01-17): pull this somehow from tiprack the instrument
       //  interacts with
       const volume = Number(name.match(RE_VOLUME)[1])
 
-      update.pipettesByMount[mount] = { _id, mount, name, channels, volume }
+      update.pipettesByMount[mount] = {
+        _id,
+        mount,
+        name,
+        channels,
+        volume,
+        requestedAs: requested_as,
+      }
     }
 
     function addApiContainerToLabware(apiContainer) {

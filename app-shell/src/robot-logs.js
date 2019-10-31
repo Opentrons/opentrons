@@ -3,7 +3,7 @@
 import { download } from 'electron-dl'
 import createLogger from './log'
 
-const log = createLogger(__dirname)
+const log = createLogger('robot-logs')
 
 export function registerRobotLogs(dispatch, mainWindow) {
   return function handleIncomingAction(action) {

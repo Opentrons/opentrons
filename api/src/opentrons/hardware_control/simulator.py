@@ -97,6 +97,7 @@ class Simulator:
         self._engaged_axes = {ax: True for ax in _HOME_POSITION}
         self._lights = {'button': False, 'rails': False}
         self._run_flag = Event()
+        self._run_flag.set()
         self._log = MODULE_LOG.getChild(repr(self))
         self._strict_attached = bool(strict_attached_instruments)
 
@@ -106,16 +107,11 @@ class Simulator:
     def move(self, target_position: Dict[str, float],
              home_flagged_axes: bool = True, speed: float = None,
              axis_max_speeds: Dict[str, float] = None):
-        if not self._run_flag.is_set():
-            self._log.warning("Move to {} would be blocked by pause"
-                              .format(target_position))
         self._position.update(target_position)
         self._engaged_axes.update({ax: True
                                    for ax in target_position})
 
     def home(self, axes: List[str] = None) -> Dict[str, float]:
-        if not self._run_flag.is_set():
-            self._log.warning("Home would be blocked by pause")
         # driver_3_0-> HOMED_POSITION
         checked_axes = axes or 'XYZABC'
         self._position.update({ax: _HOME_POSITION[ax]
@@ -152,6 +148,7 @@ class Simulator:
         """
         to_return: Dict[types.Mount, Dict[str, Optional[str]]] = {}
         for mount in types.Mount:
+
             expected_instr = expected.get(mount, None)
             if expected_instr and expected_instr not in\
                config_models + config_names:
@@ -160,12 +157,16 @@ class Simulator:
                     f' {expected_instr}')
             init_instr = self._attached_instruments.get(mount, {})
             found_model = init_instr.get('model', '')
+            back_compat: List[str] = []
+            if found_model:
+                back_compat = configs[found_model].get('backCompatNames', [])
             if expected_instr and found_model\
-                    and not found_model.startswith(expected_instr):
+                    and (not found_model.startswith(expected_instr)
+                         and expected_instr not in back_compat):
                 if self._strict_attached:
                     raise RuntimeError(
                         'mount {}: expected instrument {} but got {}'
-                        .format(mount.name, expected_instr, init_instr))
+                        .format(mount.name, expected_instr, found_model))
                 else:
                     to_return[mount] = {
                         'model': find_config(expected_instr),

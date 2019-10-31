@@ -485,7 +485,8 @@ class ProtocolContext(CommandPublisher):
             hardware_mgr=self._hw_manager,
             mount=checked_mount,
             tip_racks=tip_racks,
-            log_parent=self._log)
+            log_parent=self._log,
+            requested_as=instrument_name)
         self._instruments[checked_mount] = new_instr
         self._log.info("Instrument {} loaded".format(new_instr))
         return new_instr
@@ -640,6 +641,7 @@ class InstrumentContext(CommandPublisher):
                  tip_racks: List[Labware] = None,
                  trash: Labware = None,
                  default_speed: float = 400.0,
+                 requested_as: str = None,
                  **config_kwargs) -> None:
 
         super().__init__(ctx.broker)
@@ -666,6 +668,7 @@ class InstrumentContext(CommandPublisher):
         self._flow_rates = FlowRates(self)
         self._speeds = PlungerSpeeds(self)
         self._starting_tip: Union[Well, None] = None
+        self.requested_as = requested_as
 
     @property
     def starting_tip(self) -> Union[Well, None]:

@@ -1,6 +1,6 @@
 // @flow
 // fetch wrapper to throw if response is not ok
-import { createReadStream, createWriteStream } from 'fs'
+import fs from 'fs'
 import { Transform, Readable } from 'stream'
 import pump from 'pump'
 import _fetch from 'node-fetch'
@@ -47,7 +47,7 @@ export function fetchToFile(
     // with node-fetch, response.body will be a Node.js readable stream
     // rather than a browser-land ReadableStream
     const inputStream: Readable = (response.body: any)
-    const outputStream = createWriteStream(destination)
+    const outputStream = fs.createWriteStream(destination)
 
     // pass-through stream to report read progress
     const onProgress = options?.onProgress
@@ -77,8 +77,29 @@ export function postFile(
   name: string,
   source: string
 ): Promise<Response> {
-  const body = new FormData()
-  body.append(name, createReadStream(source))
+  return createReadStream(source).then(readStream => {
+    const body = new FormData()
+    body.append(name, readStream)
+    return fetch(input, { body, method: 'POST' })
+  })
+}
 
-  return fetch(input, { body, method: 'POST' })
+// create a read stream, handling errors that `fetch` is unable to catch
+function createReadStream(source: string): Promise<Readable> {
+  return new Promise((resolve, reject) => {
+    const readStream = fs.createReadStream(source)
+    const scheduledResolve = setTimeout(handleSuccess, 0)
+
+    readStream.once('error', handleError)
+
+    function handleSuccess() {
+      readStream.removeListener('error', handleError)
+      resolve(readStream)
+    }
+
+    function handleError(error: Error) {
+      clearTimeout(scheduledResolve)
+      reject(error)
+    }
+  })
 }

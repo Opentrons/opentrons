@@ -3,6 +3,43 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.14.0](https://github.com/Opentrons/opentrons/compare/v3.13.2...v3.14.0) (2019-10-31)
+
+### Bug Fixes
+
+* **api:** apiv2: initialize simulator runflag ([#4330](https://github.com/Opentrons/opentrons/issues/4330)) ([9405695](https://github.com/Opentrons/opentrons/commit/9405695))
+* **api:** Modify list check to return first item of source and dest ([#4331](https://github.com/Opentrons/opentrons/issues/4331)) ([4802beb](https://github.com/Opentrons/opentrons/commit/4802beb))
+* **api:** update all pose tree state when calibrating labware ([#4322](https://github.com/Opentrons/opentrons/issues/4322)) ([24841ab](https://github.com/Opentrons/opentrons/commit/24841ab)), closes [#4288](https://github.com/Opentrons/opentrons/issues/4288)
+* **api:** Allow Location types in advanced liquid handling functions ([#4276](https://github.com/Opentrons/opentrons/issues/4276)) ([8f015b8](https://github.com/Opentrons/opentrons/commit/8f015b8))
+* **api:** always touch tip before blow out ([#4265](https://github.com/Opentrons/opentrons/issues/4265)) ([1e54098](https://github.com/Opentrons/opentrons/commit/1e54098))
+* **api:** api1: consider model offset in cli deck cal tip pickup ([#4253](https://github.com/Opentrons/opentrons/issues/4253)) ([e1963ae](https://github.com/Opentrons/opentrons/commit/e1963ae)), closes [#4250](https://github.com/Opentrons/opentrons/issues/4250)
+* **api:** apiv1: touch tip before blowing out during transfers ([#4231](https://github.com/Opentrons/opentrons/issues/4231)) ([294aa8f](https://github.com/Opentrons/opentrons/commit/294aa8f)), closes [#419](https://github.com/Opentrons/opentrons/issues/419)
+* **api:** apiv2: correctly set smoothie speed ([#4263](https://github.com/Opentrons/opentrons/issues/4263)) ([3e6d26d](https://github.com/Opentrons/opentrons/commit/3e6d26d))
+* **api:** apiv2: fix air gap in complex commands ([#4259](https://github.com/Opentrons/opentrons/issues/4259)) ([e4ba931](https://github.com/Opentrons/opentrons/commit/e4ba931))
+* **api:** correctly handle mix optional arguments ([#4237](https://github.com/Opentrons/opentrons/issues/4237)) ([e5fa621](https://github.com/Opentrons/opentrons/commit/e5fa621))
+* **api:** Do not throw warning if run flag is set ([#4294](https://github.com/Opentrons/opentrons/issues/4294)) ([150c784](https://github.com/Opentrons/opentrons/commit/150c784))
+* **api:** Use proper currents for plunger home ([#4167](https://github.com/Opentrons/opentrons/issues/4167)) ([b17eaff](https://github.com/Opentrons/opentrons/commit/b17eaff)), closes [#3572](https://github.com/Opentrons/opentrons/issues/3572)
+* **api,shared-data,labware-creator:** do not touch tip on troughs ([#4271](https://github.com/Opentrons/opentrons/issues/4271)) ([d7e76cd](https://github.com/Opentrons/opentrons/commit/d7e76cd)), closes [#4258](https://github.com/Opentrons/opentrons/issues/4258)
+
+
+### Features
+
+* **api:** Allow backwards compatibility with gen2 pipettes in apiv2 ([#4326](https://github.com/Opentrons/opentrons/issues/4326)) ([4609172](https://github.com/Opentrons/opentrons/commit/4609172))
+* **api:** reflect original instrument name via rpc ([#4312](https://github.com/Opentrons/opentrons/issues/4312)) ([8bf0c85](https://github.com/Opentrons/opentrons/commit/8bf0c85))
+* **api:** add ability to update TC firmware from robot ([#4277](https://github.com/Opentrons/opentrons/pull/4277))
+* **api:** Add bundle creation to opentrons_simulate ([#4125](https://github.com/Opentrons/opentrons/issues/4125)) ([b1d9d66](https://github.com/Opentrons/opentrons/commit/b1d9d66))
+* **api:** apiv2: add max speed control ([#4187](https://github.com/Opentrons/opentrons/issues/4187)) ([ed48382](https://github.com/Opentrons/opentrons/commit/ed48382))
+* **api:** apiv2: conditionally enable backcompat ([#4234](https://github.com/Opentrons/opentrons/issues/4234)) ([806af2c](https://github.com/Opentrons/opentrons/commit/806af2c))
+* **api:** apiv2: implement robot methods backcompat ([#4201](https://github.com/Opentrons/opentrons/issues/4201)) ([685599f](https://github.com/Opentrons/opentrons/commit/685599f)), closes [#3539](https://github.com/Opentrons/opentrons/issues/3539)
+* **api:** deprecate api support for JSON v1/2 ([#4155](https://github.com/Opentrons/opentrons/issues/4155)) ([61361a8](https://github.com/Opentrons/opentrons/commit/61361a8)), closes [#4128](https://github.com/Opentrons/opentrons/issues/4128)
+* **api:** implement deck item spanning first pass ([#4160](https://github.com/Opentrons/opentrons/issues/4160)) ([1b621a4](https://github.com/Opentrons/opentrons/commit/1b621a4)), closes [#3107](https://github.com/Opentrons/opentrons/issues/3107)
+* **api:** Specify if a restart is required after changing some ffs ([#4233](https://github.com/Opentrons/opentrons/issues/4233)) ([9452ffa](https://github.com/Opentrons/opentrons/commit/9452ffa))
+* **api:** v1: Add version specification to labware.load ([#4218](https://github.com/Opentrons/opentrons/issues/4218)) ([37060ce](https://github.com/Opentrons/opentrons/commit/37060ce)), closes [#4216](https://github.com/Opentrons/opentrons/issues/4216)
+
+
+
+
+
 ## [3.13.2](https://github.com/Opentrons/opentrons/compare/v3.13.1...v3.13.2) (2019-10-10)
 
 **Note:** Version bump only for package @opentrons/api-server

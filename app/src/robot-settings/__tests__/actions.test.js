@@ -38,6 +38,15 @@ describe('robot settings actions', () => {
         },
       },
     },
+    {
+      name: 'clearRestartPath',
+      creator: Actions.clearRestartPath,
+      args: [mockRobot.name],
+      expected: {
+        type: 'robotSettings:CLEAR_RESTART_PATH',
+        payload: { robotName: mockRobot.name },
+      },
+    },
   ]
 
   SPECS.forEach(spec => {

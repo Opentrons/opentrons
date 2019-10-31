@@ -55,6 +55,19 @@ describe('robot settings selectors', () => {
       args: ['robotName'],
       expected: false,
     },
+    {
+      name: 'getAllRestartRequiredRobots',
+      selector: Selectors.getAllRestartRequiredRobots,
+      state: {
+        robotSettings: {
+          a: { restartPath: '/restart', settings: [] },
+          b: { restartPath: null, settings: [] },
+          c: { restartPath: '/restart', settings: [] },
+        },
+      },
+      args: [],
+      expected: ['a', 'c'],
+    },
   ]
 
   SPECS.forEach(spec => {

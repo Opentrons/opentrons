@@ -67,6 +67,7 @@ class Instrument:
         if ff.use_protocol_api_v2():
             self.tip_racks.extend([
                 c for c in self.containers if c._container.is_tiprack])
+        self.requested_as = instrument.requested_as
 
 
 class Module:

@@ -98,7 +98,7 @@ let _over
 let _log
 const store = () => _store || (_store = new Store({ defaults: DEFAULTS }))
 const overrides = () => _over || (_over = yargsParser(argv, PARSE_ARGS_OPTS))
-const log = () => _log || (_log = createLogger(__filename))
+const log = () => _log || (_log = createLogger('config'))
 
 // initialize and register the config module with dispatches from the UI
 export function registerConfig(dispatch: Dispatch) {

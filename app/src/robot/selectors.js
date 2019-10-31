@@ -237,6 +237,7 @@ export const getPipettes: OutputSelector<
           probed,
           tipOn,
           modelSpecs: getPipetteModelSpecs(pipette.name) || null,
+          requestedAs: pipette.requestedAs || null,
         }
       }
     )

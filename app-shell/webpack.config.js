@@ -20,7 +20,7 @@ module.exports = [
 
   // preload script (runs in the browser window)
   webpackMerge(nodeBaseConfig, COMMON_CONFIG, {
-    target: 'web',
+    target: 'electron-preload',
     entry: { preload: ENTRY_PRELOAD },
   }),
 ]

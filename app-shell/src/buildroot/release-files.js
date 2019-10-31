@@ -16,7 +16,7 @@ import type { ReleaseSetUrls, ReleaseSetFilepaths, UserFileInfo } from './types'
 
 const VERSION_FILENAME = 'VERSION.json'
 
-const log = createLogger(__filename)
+const log = createLogger('buildroot/release-files')
 const outPath = (dir: string, url: string) => path.join(dir, path.basename(url))
 
 // checks `directory` for buildroot files matching the given `urls`, and

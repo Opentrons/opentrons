@@ -31,6 +31,15 @@ export type RobotSettingsFieldUpdate = {|
   value: $PropertyType<RobotSettingsField, 'value'>,
 |}
 
-export type RobotSettingsAction =
+export type ClearRestartPathAction = {|
+  type: 'robotSettings:CLEAR_RESTART_PATH',
+  payload: { robotName: string },
+|}
+
+export type RobotSettingsApiAction =
   | {| type: 'robotSettings:FETCH_SETTINGS', payload: RobotApiRequest |}
   | {| type: 'robotSettings:UPDATE_SETTING', payload: RobotApiRequest |}
+
+export type RobotSettingsAction =
+  | ClearRestartPathAction
+  | RobotSettingsApiAction

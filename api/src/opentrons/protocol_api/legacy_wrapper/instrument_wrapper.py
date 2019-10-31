@@ -51,8 +51,8 @@ class Pipette():
     @property
     def has_tip(self):
         """
-        Returns whether a pipette has a tip attached. Added in for backcompat
-        purposes in deck calibration CLI tool.
+        Returns whether a pipette has a tip attached. Added in for backwards
+        compatibility purposes in deck calibration CLI tool.
         """
         log.info('instrument.has_tip')
         return None

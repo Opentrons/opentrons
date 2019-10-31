@@ -1,6 +1,6 @@
 {
   "p10_single": {
-    "displayName": "P10 Single-Channel",
+    "displayName": "P10 Single-Channel GEN1",
     "displayCategory": "GEN1",
     "minVolume": 1,
     "maxVolume": 10,
@@ -27,7 +27,7 @@
     }
   },
   "p10_multi": {
-    "displayName": "P10 8-Channel",
+    "displayName": "P10 8-Channel GEN1",
     "displayCategory": "GEN1",
     "minVolume": 1,
     "maxVolume": 10,
@@ -108,7 +108,7 @@
     }
   },
   "p50_single": {
-    "displayName": "P50 Single-Channel",
+    "displayName": "P50 Single-Channel GEN1",
     "displayCategory": "GEN1",
     "defaultAspirateFlowRate": {
       "value": 25,
@@ -135,7 +135,7 @@
     }
   },
   "p50_multi": {
-    "displayName": "P50 8-Channel",
+    "displayName": "P50 8-Channel GEN1",
     "displayCategory": "GEN1",
     "defaultAspirateFlowRate": {
       "value": 25,
@@ -162,7 +162,7 @@
     }
   },
   "p300_single": {
-    "displayName": "P300 Single-Channel",
+    "displayName": "P300 Single-Channel GEN1",
     "displayCategory": "GEN1",
     "defaultAspirateFlowRate": {
       "value": 150,
@@ -243,7 +243,7 @@
     }
   },
   "p300_multi": {
-    "displayName": "P300 8-Channel",
+    "displayName": "P300 8-Channel GEN1",
     "displayCategory": "GEN1",
     "defaultAspirateFlowRate": {
       "value": 150,
@@ -270,7 +270,7 @@
     }
   },
   "p1000_single": {
-    "displayName": "P1000 Single-Channel",
+    "displayName": "P1000 Single-Channel GEN1",
     "displayCategory": "GEN1",
     "defaultAspirateFlowRate": {
       "value": 500,

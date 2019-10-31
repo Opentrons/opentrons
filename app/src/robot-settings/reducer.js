@@ -1,6 +1,6 @@
 // @flow
 import { passRobotApiResponseAction } from '../robot-api/utils'
-import { SETTINGS_PATH } from './constants'
+import { CLEAR_RESTART_PATH, SETTINGS_PATH } from './constants'
 
 import type { Action, ActionLike } from '../types'
 import type { RobotSettingsResponse, RobotSettingsState } from './types'
@@ -26,6 +26,17 @@ export function robotSettingsReducer(
       const restartPath = links?.restart || null
 
       return { ...state, [robotName]: { settings, restartPath } }
+    }
+  }
+
+  const strictAction: Action = (action: any)
+
+  switch (strictAction.type) {
+    case CLEAR_RESTART_PATH: {
+      const { robotName } = strictAction.payload
+      const robotState = state[robotName]
+
+      return { ...state, [robotName]: { ...robotState, restartPath: null } }
     }
   }
 

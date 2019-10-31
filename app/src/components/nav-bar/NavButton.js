@@ -3,6 +3,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { withRouter } from 'react-router-dom'
+import some from 'lodash/some'
 
 import { selectors as robotSelectors } from '../../robot'
 
@@ -14,7 +15,7 @@ import { getConnectedRobot } from '../../discovery'
 import { NavButton as GenericNavButton } from '@opentrons/components'
 
 import type { ContextRouter } from 'react-router-dom'
-import usePipetteInfo from '../FileInfo/usePipetteInfo'
+import useInstrumentMountInfo from '../FileInfo/useInstrumentMountInfo'
 import styles from './styles.css'
 
 type Props = {| ...ContextRouter, name: string |}
@@ -32,11 +33,14 @@ function NavButton(props: Props) {
   )
   const robotNotification = buildrootUpdateAvailable === 'upgrade'
   const moreNotification = useSelector(getAvailableShellUpdate) != null
-  const pipetteInfo = usePipetteInfo(
+  const pipetteInfo = useInstrumentMountInfo(
     connectedRobot != null ? connectedRobot.name : ''
   )
 
-  const incompatiblePipettes = !pipetteInfo.every(p => p.pipettesMatch)
+  const incompatiblePipettes = some(
+    pipetteInfo,
+    p => p.compatibility === 'incompatible'
+  )
   const incompatPipetteTooltip = (
     <div className={styles.nav_button_tooltip}>
       Attached pipettes do not match pipettes specified in loaded protocol

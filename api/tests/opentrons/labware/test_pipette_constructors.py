@@ -18,7 +18,7 @@ factories = [
     ('p1000_single_v2.0', 'p1000_single_gen2', 'P1000_Single_GEN2'),
 ]
 
-backcompat_pips = [
+back_compat_pips = [
     ('p20_single_gen2', 'p10_single', 'P10_Single'),
     ('p300_single_gen2', 'p300_single', 'P300_Single'),
     ('p20_multi_gen2', 'p10_multi', 'P10_Multi'),
@@ -27,7 +27,7 @@ backcompat_pips = [
 ]
 
 
-# TODO: This should work on apiv2 backcompat also
+# TODO: This should work on apiv2 back-compat also
 @pytest.mark.api1_only
 @pytest.mark.parametrize('factory', factories)
 def test_pipette_contructors(factory, monkeypatch, singletons):
@@ -79,11 +79,11 @@ def test_pipette_contructors(factory, monkeypatch, singletons):
     assert pipette.max_volume == 8
 
 
-# TODO: This should work on apiv2 backcompat also
+# TODO: This should work on apiv2 back-compat also
 @pytest.mark.api1_only
-@pytest.mark.parametrize('backcompat', backcompat_pips)
-def test_backwards_compatibility(backcompat, monkeypatch, singletons):
-    expected_name, old_name, old_constructor = backcompat
+@pytest.mark.parametrize('back_compat', back_compat_pips)
+def test_backwards_compatibility(back_compat, monkeypatch, singletons):
+    expected_name, old_name, old_constructor = back_compat
     robot = singletons['robot']
     instruments = singletons['instruments']
 

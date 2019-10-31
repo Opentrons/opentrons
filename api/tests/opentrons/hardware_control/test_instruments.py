@@ -29,6 +29,23 @@ def dummy_instruments():
     return dummy_instruments_attached
 
 
+@pytest.fixture
+def dummy_backwards_compatibility():
+    dummy_instruments_attached = {
+        types.Mount.LEFT: {
+            'model': 'p20_single_v2.0',
+            'id': LEFT_PIPETTE_ID,
+            'name': 'p20_single_gen2'
+        },
+        types.Mount.RIGHT: {
+            'model': 'p300_single_v2.0',
+            'id': LEFT_PIPETTE_ID + '2',
+            'name': 'p300_single_gen2',
+        }
+    }
+    return dummy_instruments_attached
+
+
 instrument_keys = sorted([
     'name', 'min_volume', 'max_volume', 'aspirate_flow_rate', 'channels',
     'dispense_flow_rate', 'pipette_id', 'current_volume', 'display_name',
@@ -45,6 +62,37 @@ async def test_cache_instruments(dummy_instruments, loop):
     attached = await hw_api.attached_instruments
     assert sorted(attached[types.Mount.LEFT].keys()) == \
         instrument_keys
+
+
+async def test_mismatch_fails(dummy_instruments, loop):
+    hw_api = hc.API.build_hardware_simulator(
+        attached_instruments=dummy_instruments,
+        loop=loop)
+    requested_instr = {
+        types.Mount.LEFT: 'p20_single_gen2', types.Mount.RIGHT: 'p300_single'}
+    with pytest.raises(RuntimeError):
+        await hw_api.cache_instruments(requested_instr)
+
+
+async def test_backwards_compatibility(dummy_backwards_compatibility, loop):
+    hw_api = hc.API.build_hardware_simulator(
+        attached_instruments=dummy_backwards_compatibility,
+        loop=loop)
+    requested_instr = {
+        types.Mount.LEFT: 'p10_single',
+        types.Mount.RIGHT: 'p300_single'}
+    volumes = {
+        types.Mount.LEFT: {'min': 1, 'max': 10},
+        types.Mount.RIGHT: {'min': 30, 'max': 300}
+    }
+    await hw_api.cache_instruments(requested_instr)
+    attached = await hw_api.attached_instruments
+
+    for mount, name in requested_instr.items():
+        assert attached[mount]['name']\
+            == dummy_backwards_compatibility[mount]['name']
+        assert attached[mount]['min_volume'] == volumes[mount]['min']
+        assert attached[mount]['max_volume'] == volumes[mount]['max']
 
 
 @pytest.mark.skipif(not hc.Controller,

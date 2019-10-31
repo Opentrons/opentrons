@@ -163,6 +163,15 @@ describe('robotSettingsReducer', () => {
         },
       },
     },
+    {
+      name: 'handles robotSettings:CLEAR_RESTART_PATH',
+      action: {
+        type: 'robotSettings:CLEAR_RESTART_PATH',
+        payload: { robotName: 'robotName' },
+      },
+      state: { robotName: { settings: [], restartPath: '/restart' } },
+      expected: { robotName: { settings: [], restartPath: null } },
+    },
   ]
 
   SPECS.forEach(spec => {

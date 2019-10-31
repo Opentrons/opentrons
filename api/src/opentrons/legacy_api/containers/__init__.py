@@ -219,7 +219,22 @@ def save_new_offsets(labware_hash, delta):
     if not calibration_path.exists():
         calibration_path.mkdir(parents=True, exist_ok=True)
     old_delta = _look_up_offsets(labware_hash)
+
+    # Note that the next line looks incorrect (like it's letting the prior
+    # value leak into the new one). That's sort of correct, but this actually
+    # functions properly as is--the old labware system was designed to not go
+    # back to an offset of (0,0,0) as a factory default, so once you have
+    # calibrated once, you can't get the original back without deleting the
+    # entire database. Instead of modifying the database to allow resetting a
+    # single labware, we're replacing the old data representation with a new
+    # one that does have (0,0,0) as its base offset. Once the old data is
+    # removed from the system, it will be possible to modify this so that it
+    # replaces the coordinates with the exact offset calibrated, instead of the
+    # delta between the old and new offests, but for now this is necessary to
+    # make both v1 and v2 labware work. This function only handles v2, but that
+    # is why the delta is passed here instead of an absolute.
     new_delta = old_delta + Point(x=delta[0], y=delta[1], z=delta[2])
+
     labware_offset_path = calibration_path / '{}.json'.format(labware_hash)
     calibration_data = new_labware._helper_offset_data_format(
         str(labware_offset_path), new_delta)

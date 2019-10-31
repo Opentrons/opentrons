@@ -2,44 +2,89 @@
 // setup pipettes component
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
+import every from 'lodash/every'
+import some from 'lodash/some'
 
+import { Icon } from '@opentrons/components'
+import { constants as robotConstants } from '../../robot'
 import { fetchPipettes } from '../../robot-api'
 import InstrumentItem from './InstrumentItem'
 import { SectionContentHalf } from '../layout'
 import InfoSection from './InfoSection'
-import InstrumentWarning from './InstrumentWarning'
+import MissingItemWarning from './MissingItemWarning'
+import useInstrumentMountInfo from './useInstrumentMountInfo'
+import styles from './styles.css'
 
 import type { Dispatch } from '../../types'
 import type { Robot } from '../../discovery'
-import usePipetteInfo from './usePipetteInfo'
 
 type Props = {| robot: Robot |}
 
+const { PIPETTE_MOUNTS } = robotConstants
+
+const inexactPipetteSupportArticle =
+  'https://support.opentrons.com/en/articles/3450143-gen2-pipette-compatibility'
 const TITLE = 'Required Pipettes'
 
 function ProtocolPipettes(props: Props) {
   const dispatch: Dispatch = useDispatch()
-  const pipetteInfo = usePipetteInfo(props.robot.name)
+  const infoByMount = useInstrumentMountInfo(props.robot.name)
   React.useEffect(() => {
     dispatch(fetchPipettes(props.robot))
   }, [dispatch, props.robot])
-  if (pipetteInfo.length === 0) return null
 
   const changePipetteUrl = `/robots/${props.robot.name}/instruments`
 
-  const pipettesMatch = pipetteInfo.every(p => p.pipettesMatch)
+  const allPipettesMatch = every(infoByMount, ({ compatibility }) =>
+    ['match', 'inexact_match'].includes(compatibility)
+  )
+
+  const someInexactMatches = some(
+    infoByMount,
+    ({ compatibility }) => compatibility === 'inexact_match'
+  )
 
   return (
     <InfoSection title={TITLE}>
       <SectionContentHalf>
-        {pipetteInfo.map(p => (
-          <InstrumentItem key={p.mount} match={p.pipettesMatch} mount={p.mount}>
-            {p.displayName}
-          </InstrumentItem>
-        ))}
+        {PIPETTE_MOUNTS.map(mount => {
+          const info = infoByMount[mount]
+          if (!info) return null
+          const { protocol, compatibility } = info
+          return (
+            <InstrumentItem
+              key={protocol.mount}
+              compatibility={compatibility}
+              mount={protocol.mount}
+              hidden={!protocol.name}
+            >
+              {protocol.displayName}
+            </InstrumentItem>
+          )
+        }).filter(Boolean)}
       </SectionContentHalf>
-      {!pipettesMatch && (
-        <InstrumentWarning instrumentType="pipette" url={changePipetteUrl} />
+      {!allPipettesMatch && (
+        <MissingItemWarning
+          isBlocking
+          instrumentType="pipette"
+          url={changePipetteUrl}
+        />
+      )}
+      {allPipettesMatch && someInexactMatches && (
+        <SectionContentHalf className={styles.soft_warning}>
+          <div className={styles.warning_info_wrapper}>
+            <Icon name="information" className={styles.info_icon} />
+            <span>Inexact pipette match,</span>
+            <a
+              href={inexactPipetteSupportArticle}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              &nbsp; learn more
+            </a>
+            <span>.</span>
+          </div>
+        </SectionContentHalf>
       )}
     </InfoSection>
   )

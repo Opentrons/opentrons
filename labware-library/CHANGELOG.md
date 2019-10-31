@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.14.0](https://github.com/Opentrons/opentrons/compare/v3.13.2...v3.14.0) (2019-10-31)
+
+### Bug Fixes
+
+* **api,shared-data,labware-creator:** do not touch tip on troughs ([#4271](https://github.com/Opentrons/opentrons/issues/4271)) ([d7e76cd](https://github.com/Opentrons/opentrons/commit/d7e76cd)), closes [#4258](https://github.com/Opentrons/opentrons/issues/4258)
+* **labware-creator:** fix radio group touched on change in Mac FF ([#4210](https://github.com/Opentrons/opentrons/issues/4210)) ([8c89022](https://github.com/Opentrons/opentrons/commit/8c89022)), closes [#4209](https://github.com/Opentrons/opentrons/issues/4209)
+* **labware-library:** Remove global CSS that's breaking filter link styling ([#4239](https://github.com/Opentrons/opentrons/issues/4239)) ([11bdec4](https://github.com/Opentrons/opentrons/commit/11bdec4))
+
+
+### Features
+
+* **api:** v1: Add version specification to labware.load ([#4218](https://github.com/Opentrons/opentrons/issues/4218)) ([37060ce](https://github.com/Opentrons/opentrons/commit/37060ce)), closes [#4216](https://github.com/Opentrons/opentrons/issues/4216)
+* **labware-creator:** add analytics events skeleton ([#4168](https://github.com/Opentrons/opentrons/issues/4168)) ([3593171](https://github.com/Opentrons/opentrons/commit/3593171))
+* **labware-creator:** Guide user to labware test ([#4153](https://github.com/Opentrons/opentrons/issues/4153)) ([4bc00c4](https://github.com/Opentrons/opentrons/commit/4bc00c4)), closes [#4118](https://github.com/Opentrons/opentrons/issues/4118)
+* **labware-library:** Add link for LC to LL sidebar ([#4154](https://github.com/Opentrons/opentrons/issues/4154)) ([4117e8e](https://github.com/Opentrons/opentrons/commit/4117e8e)), closes [#4147](https://github.com/Opentrons/opentrons/issues/4147)
+* **labware-library:** add P20 tip rack image to library ([#4280](https://github.com/Opentrons/opentrons/issues/4280)) ([63032fb](https://github.com/Opentrons/opentrons/commit/63032fb))
+* **labware-library:** hook up LC analytics and opt-in ([#4177](https://github.com/Opentrons/opentrons/issues/4177)) ([bad03e1](https://github.com/Opentrons/opentrons/commit/bad03e1)), closes [#4115](https://github.com/Opentrons/opentrons/issues/4115) [#4116](https://github.com/Opentrons/opentrons/issues/4116) [#4117](https://github.com/Opentrons/opentrons/issues/4117)
+* **shared-data:** add NEST labware ([#4156](https://github.com/Opentrons/opentrons/issues/4156)) ([0d2491d](https://github.com/Opentrons/opentrons/commit/0d2491d))
+
+
+
+
+
 ## [3.13.2](https://github.com/Opentrons/opentrons/compare/v3.13.1...v3.13.2) (2019-10-10)
 
 **Note:** Version bump only for package @opentrons/labware-library
