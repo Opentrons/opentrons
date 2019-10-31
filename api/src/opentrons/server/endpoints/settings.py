@@ -334,5 +334,10 @@ async def get_robot_settings(request: web.Request) -> web.Response:
     representation of all internal robot settings and gantry calibration
     """
 
-    config = rc.load()
-    return web.json_response(config._asdict(), status=200)
+    hw = request.app['com.opentrons.hardware']
+
+    if ff.use_protocol_api_v2():
+        conf = await hw.config
+    else:
+        conf = hw.config
+    return web.json_response(conf._asdict(), status=200)
