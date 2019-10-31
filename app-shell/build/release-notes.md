@@ -2,16 +2,13 @@
 
 For more details about this release, please see the full [technical change log][changelog]
 
-*Note for macOS users*: The Opentrons App is no longer compatible with macOS 10.9 Mavericks. If you are using 10.9, please upgrade to a later version of macOS (available for free from Apple) to continue to receive Opentrons updates.
+**Note for macOS users**: The Opentrons App is no longer compatible with macOS 10.9 Mavericks. If you are using 10.9, please upgrade to a later version of macOS (available for free from Apple) to continue to receive Opentrons updates.
 
 ## Changes
 
 - Our new generation of pipettes, labeled GEN2 Pipettes, now appear in the change pipettes dialog box. These pipettes will be coming soon.
 - You can control your Temperature Module and Thermocycler from the Pipettes and Modules page outside of a protocol
 - Changing certain advanced settings will prompt you to restart your robot
-
-**Note for macOS users**: The Opentrons App is no longer compatible with macOS 10.9 Mavericks. If you are using 10.9, please upgrade to a later version of macOS (available for free from Apple) to continue to receive Opentrons updates.
-
 
 
 ## Bug Fixes
