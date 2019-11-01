@@ -14,8 +14,8 @@ export * from './types'
 
 export const DEV_INTERNAL_FLAGS: Array<DevInternalFlag> = [
   'allPipetteConfig',
-  'tempdeckControls',
   'customLabware',
+  'enableMultiGEN2',
 ]
 
 // trigger a config value update to the app-shell via shell middleware
