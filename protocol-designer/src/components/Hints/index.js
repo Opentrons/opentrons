@@ -13,7 +13,7 @@ import EXAMPLE_WATCH_LIQUIDS_MOVE_IMAGE from '../../images/example_watch_liquids
 import type { HintKey } from '../../tutorial'
 import type { BaseState, ThunkDispatch } from '../../types'
 
-type SP = {| hint: ?HintKey |}
+type SP = {| hintKey: ?HintKey |}
 type DP = {|
   removeHint: (HintKey, boolean) => mixed,
   selectTerminalItem: TerminalItemId => mixed,
@@ -32,13 +32,15 @@ class Hints extends React.Component<Props, State> {
     this.setState({ rememberDismissal: !this.state.rememberDismissal })
   }
 
-  makeHandleCloseClick = (hint: HintKey) => {
+  makeHandleCloseClick = (hintKey: HintKey) => {
     const { rememberDismissal } = this.state
-    return () => this.props.removeHint(hint, rememberDismissal)
+    return () => this.props.removeHint(hintKey, rememberDismissal)
   }
 
-  renderHintContents = (hint: HintKey) => {
-    switch (hint) {
+  renderHintContents = (hintKey: HintKey) => {
+    // Only hints that have no outside effects should go here.
+    // For hints that have an effect, use BlockingHint.
+    switch (hintKey) {
       case 'add_liquids_and_labware':
         return (
           <React.Fragment>
@@ -75,15 +77,15 @@ class Hints extends React.Component<Props, State> {
   }
 
   render() {
-    const { hint } = this.props
-    return hint ? (
+    const { hintKey } = this.props
+    return hintKey ? (
       <Portal>
         <AlertModal
           type="warning"
           alertOverlay
-          heading={i18n.t(`alert.hint.${hint}.title`)}
+          heading={i18n.t(`alert.hint.${hintKey}.title`)}
         >
-          {this.renderHintContents(hint)}
+          {this.renderHintContents(hintKey)}
           <div>
             <CheckboxField
               className={styles.dont_show_again}
@@ -93,7 +95,7 @@ class Hints extends React.Component<Props, State> {
             />
             <OutlineButton
               className={styles.ok_button}
-              onClick={this.makeHandleCloseClick(hint)}
+              onClick={this.makeHandleCloseClick(hintKey)}
             >
               {i18n.t('button.ok')}
             </OutlineButton>
@@ -105,11 +107,11 @@ class Hints extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state: BaseState): SP => ({
-  hint: selectors.getHint(state),
+  hintKey: selectors.getHint(state),
 })
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
-  removeHint: (hint, rememberDismissal) =>
-    dispatch(actions.removeHint(hint, rememberDismissal)),
+  removeHint: (hintKey, rememberDismissal) =>
+    dispatch(actions.removeHint(hintKey, rememberDismissal)),
   selectTerminalItem: terminalId =>
     dispatch(stepsActions.selectTerminalItem(terminalId)),
 })

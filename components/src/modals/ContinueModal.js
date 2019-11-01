@@ -3,16 +3,12 @@ import * as React from 'react'
 
 import AlertModal from './AlertModal'
 
-type ContinueModalProps = {
-  /** optional classes to apply */
-  className?: string,
-  /** cancellation handler (also passed to `Modal`'s `onCloseClick`) */
+type AlertModalProps = React.ElementProps<typeof AlertModal>
+type ContinueModalProps = {|
+  ...$Diff<$Exact<AlertModalProps>, { buttons: any }>,
   onCancelClick: () => mixed,
-  /** continuation handler */
   onContinueClick: () => mixed,
-  /** modal contents */
-  children: React.Node,
-}
+|}
 
 const CANCEL = 'Cancel'
 const CONTINUE = 'Continue'
@@ -21,7 +17,7 @@ const CONTINUE = 'Continue'
  * AlertModal variant to prompt user to "Cancel" or "Continue" a given action
  */
 export default function ContinueModal(props: ContinueModalProps) {
-  const { className, onCancelClick, onContinueClick } = props
+  const { onCancelClick, onContinueClick, ...passThruProps } = props
   const buttons = [
     { title: CANCEL, children: CANCEL, onClick: onCancelClick },
     { title: CONTINUE, children: CONTINUE, onClick: onContinueClick },
@@ -29,12 +25,9 @@ export default function ContinueModal(props: ContinueModalProps) {
 
   return (
     <AlertModal
-      className={className}
-      buttons={buttons}
-      onCloseClick={onCancelClick}
       restrictOuterScroll={false}
-    >
-      {props.children}
-    </AlertModal>
+      {...passThruProps}
+      buttons={buttons}
+    />
   )
 }

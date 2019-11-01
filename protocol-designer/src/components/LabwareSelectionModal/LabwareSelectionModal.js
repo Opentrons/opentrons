@@ -19,6 +19,7 @@ import { getLabwareIsCompatible as _getLabwareIsCompatible } from '../../utils/l
 import { getOnlyLatestDefs } from '../../labware-defs/utils'
 import { Portal } from '../portals/TopPortal'
 import { PDTitledList } from '../lists'
+import useBlockingHint from '../Hints/useBlockingHint'
 import KnowledgeBaseLink from '../KnowledgeBaseLink'
 import LabwareItem from './LabwareItem'
 import LabwarePreview from './LabwarePreview'
@@ -83,9 +84,42 @@ const LabwareSelectionModal = (props: Props) => {
     moduleRestrictionsDisabled,
   } = props
 
-  const [selectedCategory, selectCategory] = useState<?string>(null)
-  const [previewedLabware, previewLabware] = useState<?LabwareDefinition2>(null)
+  const [selectedCategory, setSelectedCategory] = useState<?string>(null)
+  const [previewedLabware, setPreviewedLabware] = useState<?LabwareDefinition2>(
+    null
+  )
   const [filterRecommended, setFilterRecommended] = useState<boolean>(false)
+  const [enqueuedLabwareType, setEnqueuedLabwareType] = useState<?string>(null)
+  const blockingCustomLabwareHint = useBlockingHint({
+    disable: enqueuedLabwareType == null,
+    skipWithAutoContinue: true,
+    // moduleType == null || !enqueuedLabwareType || moduleRestrictionsDisabled,
+    hintKey: 'custom_labware_with_modules',
+    handleCancel: () => setEnqueuedLabwareType(null),
+    handleContinue: () => {
+      if (enqueuedLabwareType) {
+        setEnqueuedLabwareType(null)
+        selectLabware(enqueuedLabwareType)
+      }
+    },
+  })
+
+  const handleSelectCustomLabware = useCallback(
+    (containerType: string) => {
+      if (moduleType == null || moduleRestrictionsDisabled) {
+        selectLabware(containerType)
+      } else {
+        // show the BlockingHint
+        setEnqueuedLabwareType(containerType)
+      }
+    },
+    [
+      moduleType,
+      moduleRestrictionsDisabled,
+      selectLabware,
+      setEnqueuedLabwareType,
+    ]
+  )
 
   // if you're adding labware to a module, check the recommended filter by default
   useEffect(() => {
@@ -179,13 +213,16 @@ const LabwareSelectionModal = (props: Props) => {
     [labwareByCategory, getLabwareDisabled]
   )
 
-  const wrapperRef = useOnClickOutside({ onClickOutside: onClose })
+  const wrapperRef = useOnClickOutside({
+    onClickOutside: () =>
+      console.log('clicked outside') /* onClose TODO IMMEDIATELY */,
+  })
 
   // do not render without a slot
   if (!slot) return null
 
   const makeToggleCategory = (category: string) => () => {
-    selectCategory(selectedCategory === category ? null : category)
+    setSelectedCategory(selectedCategory === category ? null : category)
   }
 
   const recommendedFilterCheckbox = moduleType ? (
@@ -214,6 +251,7 @@ const LabwareSelectionModal = (props: Props) => {
       <Portal>
         <LabwarePreview labwareDef={previewedLabware} />
       </Portal>
+      {blockingCustomLabwareHint}
       <div ref={wrapperRef} className={styles.labware_dropdown}>
         <div className={styles.title}>
           {parentSlot != null && moduleType != null
@@ -236,11 +274,11 @@ const LabwareSelectionModal = (props: Props) => {
                 <LabwareItem
                   key={index}
                   labwareDef={customLabwareDefs[labwareURI]}
-                  selectLabware={selectLabware}
+                  selectLabware={handleSelectCustomLabware}
                   onMouseEnter={() =>
-                    previewLabware(customLabwareDefs[labwareURI])
+                    setPreviewedLabware(customLabwareDefs[labwareURI])
                   }
-                  onMouseLeave={() => previewLabware()}
+                  onMouseLeave={() => setPreviewedLabware()}
                   disabled={filterRecommended}
                 />
               ))}
@@ -267,8 +305,8 @@ const LabwareSelectionModal = (props: Props) => {
                     disabled={getLabwareDisabled(labwareDef)}
                     labwareDef={labwareDef}
                     selectLabware={selectLabware}
-                    onMouseEnter={() => previewLabware(labwareDef)}
-                    onMouseLeave={() => previewLabware()}
+                    onMouseEnter={() => setPreviewedLabware(labwareDef)}
+                    onMouseLeave={() => setPreviewedLabware()}
                   />
                 ))}
             </PDTitledList>
@@ -281,7 +319,7 @@ const LabwareSelectionModal = (props: Props) => {
             type="file"
             onChange={e => {
               onUploadLabware(e)
-              selectCategory(CUSTOM_CATEGORY)
+              setSelectedCategory(CUSTOM_CATEGORY)
             }}
           />
         </OutlineButton>
