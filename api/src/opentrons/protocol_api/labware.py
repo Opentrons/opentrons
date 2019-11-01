@@ -65,7 +65,8 @@ class Well:
     def __init__(self, well_props: dict,
                  parent: Location,
                  display_name: str,
-                 has_tip: bool) -> None:
+                 has_tip: bool,
+                 labware_height: float = None) -> None:
         """
         Create a well, and track the Point corresponding to the top-center of
         the well (this Point is in absolute deck coordinates)
@@ -106,6 +107,41 @@ class Well:
                     well_props['shape']))
         self.max_volume = well_props['totalLiquidVolume']
         self._depth = well_props['depth']
+        self._parent_height = labware_height
+
+    @property
+    def properties(self) -> Dict:
+        return {
+            'depth': self.depth,
+            'total-liquid-volume': self.max_volume,
+            'diameter': self.diameter,
+            'width': self.width,
+            'length': self.length,
+            'height': self._parent_height,
+            'has_tip': self.has_tip,
+            'shape': self.shape,
+            'parent': self.parent
+            }
+
+    @property
+    def depth(self) -> float:
+        return self._depth
+
+    @property
+    def width(self) -> float:
+        return self._width
+
+    @property
+    def length(self) -> float:
+        return self._length
+
+    @property
+    def shape(self) -> float:
+        return self._shape
+
+    @property
+    def height(self) -> float:
+        return self._height
 
     @property
     def parent(self) -> 'Labware':
@@ -280,6 +316,14 @@ class Labware:
         return self.wells_by_name()[key]
 
     @property
+    def display_name(self) -> str:
+        return self._display_name
+
+    @property
+    def dimensions(self) -> Dict:
+        return self._dimensions
+
+    @property
     def uri(self) -> str:
         """ A string fully identifying the labware.
 
@@ -326,7 +370,8 @@ class Labware:
                 self._well_definition[well],
                 Location(self._calibrated_offset, self),
                 "{} of {}".format(well, self._display_name),
-                self.is_tiprack)
+                self.is_tiprack,
+                self.dimensions['zDimension'])
             for well in self._ordering]
 
     def _create_indexed_dictionary(self, group=0):
@@ -366,7 +411,7 @@ class Labware:
             res = NotImplemented
         return res
 
-    def wells(self, *args) -> List[Well]:
+    def wells(self, *args, **kwargs) -> List[Well]:
         """
         Accessor function used to generate a list of wells in top -> down,
         left -> right order. This is representative of moving down `rows` and
@@ -1157,7 +1202,7 @@ def get_labware_definition(
         load_name, namespace, version)
 
 
-def get_all_labware_definitions() -> list[str]:
+def get_all_labware_definitions() -> List[str]:
     """
     Return a list of standard and custom labware definitions with load_name +
         name_space + version existing on the robot
@@ -1179,65 +1224,7 @@ def get_all_labware_definitions() -> list[str]:
     return labware_list
 
 
-def load(
-    load_name: str,
-    parent: Location,
-    label: str = None,
-    namespace: str = None,
-    version: int = 1,
-    bundled_defs: Dict[str, LabwareDefinition] = None,
-    extra_defs: Dict[str, LabwareDefinition] = None
-) -> Labware:
-    """
-    Return a labware object constructed from a labware definition dict looked
-    up by name (definition must have been previously stored locally on the
-    robot)
 
-    :param load_name: A string to use for looking up a labware definition
-        previously saved to disc. The definition file must have been saved in a
-        known location
-    :param parent: A :py:class:`.Location` representing the location where
-                   the front and left most point of the outside of labware is
-                   (often the front-left corner of a slot on the deck).
-    :param str label: An optional label that will override the labware's
-                      display name from its definition
-    :param str namespace: The namespace the labware definition belongs to.
-        If unspecified, will search 'opentrons' then 'custom_beta'
-    :param int version: The version of the labware definition. If unspecified,
-        will use version 1.
-    :param bundled_defs: If specified, a mapping of labware names to labware
-        definitions. Only the bundle will be searched for definitions.
-    :param extra_defs: If specified, a mapping of labware names to labware
-        definitions. If no bundle is passed, these definitions will also be
-        searched.
-    """
-    definition = get_labware_definition(
-        load_name, namespace, version,
-        bundled_defs=bundled_defs,
-        extra_defs=extra_defs)
-    return load_from_definition(definition, parent, label)
-
-
-def load_from_definition(
-        definition: dict, parent: Location, label: str = None) -> Labware:
-    """
-    Return a labware object constructed from a provided labware definition dict
-
-    :param definition: A dict representing all required data for a labware,
-        including metadata such as the display name of the labware, a
-        definition of the order to iterate over wells, the shape of wells
-        (shape, physical dimensions, etc), and so on. The correct shape of
-        this definition is governed by the "labware-designer" project in
-        the Opentrons/opentrons repo.
-    :param parent: A :py:class:`.Location` representing the location where
-                   the front and left most point of the outside of labware is
-                   (often the front-left corner of a slot on the deck).
-    :param str label: An optional label that will override the labware's
-                      display name from its definition
-    """
-    labware = Labware(definition, parent, label)
-    load_calibration(labware)
-    return labware
 
 
 def clear_calibrations():
