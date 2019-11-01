@@ -24,11 +24,20 @@ export default function ModuleRow(props: Props) {
   const id = module?.id
   const slot = module?.slot
 
+  let slotDisplayName = null
+  if (slot) {
+    slotDisplayName = `Slot ${slot}`
+  } else if (slot === 'span7_8_10_11') {
+    slotDisplayName = 'Slot 7'
+  }
+
   const setCurrentModule = (type: ModuleType, id?: string) => () =>
     openEditModuleModal(type, id)
-  const addRemoveText = id ? 'remove' : 'add'
-  const handleAddOrRemove = id
-    ? () => console.log('remove ' + id)
+
+  const addRemoveText = module ? 'remove' : 'add'
+
+  const handleAddOrRemove = module
+    ? () => console.log('remove ' + module.id)
     : setCurrentModule(type)
 
   const enableEditModules = useSelector(
@@ -49,7 +58,7 @@ export default function ModuleRow(props: Props) {
           {model && <LabeledValue label="Model" value={model} />}
         </div>
         <div className={styles.module_col}>
-          {slot && <LabeledValue label="Slot" value={`Slot ${slot}`} />}
+          {slot && <LabeledValue label="Slot" value={slotDisplayName} />}
         </div>
         <div className={styles.modules_button_group}>
           {id && (

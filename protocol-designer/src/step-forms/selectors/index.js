@@ -297,14 +297,9 @@ export const getModulesForEditModulesCard: Selector<ModulesForEditModulesCard> =
         moduleOnDeck: ModuleOnDeck,
         id
       ): ModulesForEditModulesCard => {
-        const moduleId = moduleOnDeck.id
-        const moduleSlot = moduleOnDeck.slot
-
-        if (!moduleId || !moduleSlot) return acc
-
         return {
           ...acc,
-          [moduleOnDeck.type]: { ...moduleOnDeck },
+          [moduleOnDeck.type]: moduleOnDeck,
         }
       },
       {
