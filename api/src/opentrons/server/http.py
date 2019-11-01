@@ -104,3 +104,5 @@ class HTTPServer(object):
         self.app.router.add_patch(
             '/settings/pipettes/{id}', settings.modify_pipette_settings
         )
+        self.app.router.add_get(
+            '/settings/robot', settings.get_robot_settings)

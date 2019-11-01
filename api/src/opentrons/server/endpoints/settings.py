@@ -247,7 +247,7 @@ async def pipette_settings_id(request: web.Request) -> web.Response:
             'model': whole_config.get('model')
         },
         'fields': pc.list_mutable_configs(pipette_id)
-        }
+    }
     return web.json_response(res, status=200)
 
 
@@ -326,3 +326,18 @@ async def set_log_level(request: web.Request) -> web.Response:
     return web.json_response(
         status=200,
         data={'message': f'log_level set to {log_level}'})
+
+
+async def get_robot_settings(request: web.Request) -> web.Response:
+    """
+    Handles a GET request and returns a body that is the JSON
+    representation of all internal robot settings and gantry calibration
+    """
+
+    hw = request.app['com.opentrons.hardware']
+
+    if ff.use_protocol_api_v2():
+        conf = await hw.config
+    else:
+        conf = hw.config
+    return web.json_response(conf._asdict(), status=200)
