@@ -10,6 +10,10 @@ from .contexts import (ProtocolContext,
                        TemperatureModuleContext,
                        MagneticModuleContext,
                        ThermocyclerContext)
+from ..protocols import types
+
+MAX_SUPPORTED_VERSION = types.APIVersion(2, 0)
+#: The maximum supported protocol API version in this release
 
 
 __all__ = ['ProtocolContext',
