@@ -370,7 +370,7 @@ async def test_set_log_level(async_client):
     assert conf.log_level == 'ERROR'
 
 
-async def test_get(async_client):
+async def test_get_robot_settings(async_client):
     resp = await async_client.get('/settings/robot')
     body = await resp.json()
     assert resp.status == 200
