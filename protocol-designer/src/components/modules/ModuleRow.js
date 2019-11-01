@@ -1,7 +1,8 @@
 // @flow
 import * as React from 'react'
 import i18n from '../../localization'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { actions as stepFormActions } from '../../step-forms'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { LabeledValue, OutlineButton } from '@opentrons/components'
 import ModuleDiagram from './ModuleDiagram'
@@ -36,8 +37,10 @@ export default function ModuleRow(props: Props) {
 
   const addRemoveText = module ? 'remove' : 'add'
 
+  const dispatch = useDispatch()
+
   const handleAddOrRemove = module
-    ? () => console.log('remove ' + module.id)
+    ? () => dispatch(stepFormActions.deleteModule(module.id))
     : setCurrentModule(type)
 
   const enableEditModules = useSelector(
