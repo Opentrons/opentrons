@@ -6,6 +6,7 @@ import { actions as stepFormActions } from '../../step-forms'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { LabeledValue, OutlineButton } from '@opentrons/components'
 import ModuleDiagram from './ModuleDiagram'
+import { SPAN7_8_10_11_SLOT } from '../../constants'
 import styles from './styles.css'
 
 import type { ModuleType } from '@opentrons/shared-data'
@@ -14,7 +15,7 @@ import type { ModuleOnDeck } from '../../step-forms'
 type Props = {
   module?: ModuleOnDeck,
   type: ModuleType,
-  openEditModuleModal: (moduleType: ModuleType, id?: string) => mixed,
+  openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => mixed,
 }
 
 export default function ModuleRow(props: Props) {
@@ -22,18 +23,18 @@ export default function ModuleRow(props: Props) {
   const type = module?.type || props.type
 
   const model = module?.model
-  const id = module?.id
   const slot = module?.slot
 
   let slotDisplayName = null
   if (slot) {
     slotDisplayName = `Slot ${slot}`
-  } else if (slot === 'span7_8_10_11') {
+  }
+  if (slot === SPAN7_8_10_11_SLOT) {
     slotDisplayName = 'Slot 7'
   }
 
-  const setCurrentModule = (type: ModuleType, id?: string) => () =>
-    openEditModuleModal(type, id)
+  const setCurrentModule = (moduleType: ModuleType, moduleId?: string) => () =>
+    openEditModuleModal(moduleType, moduleId)
 
   const addRemoveText = module ? 'remove' : 'add'
 
@@ -46,7 +47,7 @@ export default function ModuleRow(props: Props) {
   const enableEditModules = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
-  const handleEditModule = setCurrentModule(type, id)
+  const handleEditModule = module && setCurrentModule(type, module.id)
 
   return (
     <div>
@@ -64,7 +65,7 @@ export default function ModuleRow(props: Props) {
           {slot && <LabeledValue label="Slot" value={slotDisplayName} />}
         </div>
         <div className={styles.modules_button_group}>
-          {id && (
+          {module && (
             <OutlineButton
               className={styles.module_button}
               onClick={handleEditModule}

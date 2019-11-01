@@ -68,11 +68,11 @@ class FilePage extends React.Component<Props, State> {
   }
   closeEditPipetteModal = () => this.setState({ isEditPipetteModalOpen: false })
 
-  handleEditModule = (type: ModuleType, moduleId?: string) => {
+  handleEditModule = (moduleType: ModuleType, moduleId?: string) => {
     this.scrollToTop()
     this.setState({
       isEditModulesModalOpen: true,
-      currentModule: { moduleType: type, moduleId: moduleId },
+      currentModule: { moduleType: moduleType, moduleId: moduleId },
     })
   }
 
