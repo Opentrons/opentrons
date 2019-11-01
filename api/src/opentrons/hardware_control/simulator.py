@@ -197,6 +197,9 @@ class Simulator:
     def get_attached_modules(self) -> List[Tuple[str, str]]:
         return self._attached_modules
 
+    async def watch_modules(self, loop: asyncio.AbstractEventLoop):
+        pass
+
     @contextmanager
     def save_current(self):
         yield

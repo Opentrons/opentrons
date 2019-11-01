@@ -2,6 +2,7 @@ import asyncio
 from contextlib import contextmanager, ExitStack
 import logging
 from typing import Any, Dict, List, Optional, Tuple
+import aionotify
 
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.drivers.rpi_drivers import gpio
@@ -38,6 +39,10 @@ class Controller:
         self._smoothie_driver = driver_3_0.SmoothieDriver_3_0_0(
             config=self.config, handle_locks=False)
         self._cached_fw_version: Optional[str] = None
+        self._module_watcher = aionotify.Watcher()
+        self._module_watcher.watch(alias='modules',
+                                   path='/dev/modules',
+                                   flags=(aionotify.Flags.CREATE | aionotify.Flags.DELETE))
 
     def update_position(self) -> Dict[str, float]:
         self._smoothie_driver.update_position()
@@ -112,6 +117,29 @@ class Controller:
 
     def get_attached_modules(self) -> List[Tuple[str, str]]:
         return modules.discover()
+
+    async def watch_modules(self, loop: asyncio.AbstractEventLoop):
+        await self._module_watcher.setup(loop)
+        while not self._module_watcher.closed():
+            event = await self._module_watcher.get_event()
+            MODULE_LOG.warning(f'EVENT CAUGHT: {event}')
+
+            # discovered = {port + model: (port, model)
+            #             for port, model in self._backend.get_attached_modules()}
+            # these = set(discovered.keys())
+            # known = set(self._attached_modules.keys())
+            # new = these - known
+            # gone = known - these
+            # for mod in gone:
+            #     self._attached_modules.pop(mod)
+            #     self._log.info(f"Module {mod} disconnected")
+            # for mod in new:
+            #     self._attached_modules[mod]\
+            #         = await self._backend.build_module(discovered[mod][0],
+            #                                         discovered[mod][1],
+            #                                         self.pause_with_message)
+            #     self._log.info(f"Module {mod} discovered and attached")
+            # return list(self._attached_modules.values())
 
     async def build_module(self,
                            port: str,
@@ -201,3 +229,6 @@ class Controller:
         self.pause()
         await asyncio.sleep(duration_s)
         self.resume()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self._module_watcher.close()

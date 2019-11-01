@@ -134,6 +134,7 @@ class API(HardwareAPILike):
         checked_loop = loop or asyncio.get_event_loop()
         backend = Controller(config)
         await backend.connect(port)
+        checked_loop.create_task(backend.watch_modules(checked_loop))
         return cls(backend, config=config, loop=checked_loop)
 
     @classmethod
