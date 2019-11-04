@@ -18,7 +18,7 @@ from .labware import (Well, Labware, load, get_labware_definition,
                       LabwareDefinition)
 from opentrons.protocols.types import APIVersion, Protocol
 from .util import (FlowRates, PlungerSpeeds, Clearances, AxisMaxSpeeds,
-                   HardwareManager, clamp_value)
+                   HardwareManager, clamp_value, requires_version)
 
 from . import geometry
 from . import transfers
@@ -39,6 +39,7 @@ AdvancedLiquidHandling = Union[
     List[List[Well]]]
 
 
+@requires_version(2, 0)
 class ProtocolContext(CommandPublisher):
     """ The Context class is a container for the state of a protocol.
 
@@ -123,6 +124,7 @@ class ProtocolContext(CommandPublisher):
             del self.deck['12']
         self.load_labware(trash_name, '12')
 
+    @requires_version(2, 0)
     @classmethod
     def build_using(cls,
                     protocol: Protocol,
@@ -138,7 +140,8 @@ class ProtocolContext(CommandPublisher):
             protocol, 'api_level', MAX_SUPPORTED_VERSION)
         return cls(*args, **kwargs)
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def api_version(self) -> APIVersion:
         """ Return the API version supported by this protoocl context.
 
@@ -149,7 +152,8 @@ class ProtocolContext(CommandPublisher):
         """
         return self._api_version
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def bundled_data(self) -> Dict[str, bytes]:
         """ Accessor for data files bundled with this protocol, if any.
 
@@ -164,7 +168,8 @@ class ProtocolContext(CommandPublisher):
         if getattr(self, '_unsubscribe_commands', None):
             self._unsubscribe_commands()
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def max_speeds(self) -> AxisMaxSpeeds:
         """ Per-axis speed limits when moving this instrument.
 
@@ -196,9 +201,11 @@ class ProtocolContext(CommandPublisher):
         """
         return self._default_max_speeds
 
+    @requires_version(2, 0)
     def commands(self):
         return self._commands
 
+    @requires_version(2, 0)
     def clear_commands(self):
         self._commands.clear()
         if self._unsubscribe_commands:
@@ -239,6 +246,7 @@ class ProtocolContext(CommandPublisher):
         finally:
             self._hw_manager.set_hw(old_hw)
 
+    @requires_version(2, 0)
     def connect(self, hardware: hc.API):
         """ Connect to a running hardware API.
 
@@ -251,14 +259,17 @@ class ProtocolContext(CommandPublisher):
         self._hw_manager.set_hw(hardware)
         self._hw_manager.hardware.cache_instruments()
 
+    @requires_version(2, 0)
     def disconnect(self):
         """ Disconnect from currently-connected hardware and simulate instead
         """
         self._hw_manager.reset_hw()
 
+    @requires_version(2, 0)
     def is_simulating(self) -> bool:
         return self._hw_manager.hardware.get_is_simulator()
 
+    @requires_version(2, 0)
     def load_labware_from_definition(
             self,
             labware_def: LabwareDefinition,
@@ -280,6 +291,7 @@ class ProtocolContext(CommandPublisher):
         self._deck_layout[location] = labware_obj
         return labware_obj
 
+    @requires_version(2, 0)
     def load_labware(
             self,
             load_name: str,
@@ -316,6 +328,7 @@ class ProtocolContext(CommandPublisher):
             extra_defs=self._extra_labware)
         return self.load_labware_from_definition(labware_def, location, label)
 
+    @requires_version(2, 0)
     def load_labware_by_name(
             self,
             load_name: str,
@@ -330,7 +343,8 @@ class ProtocolContext(CommandPublisher):
         return self.load_labware(
             load_name, location, label, namespace, version)
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def loaded_labwares(self) -> Dict[int, Union[Labware, ModuleGeometry]]:
         """ Get the labwares that have been loaded into the protocol context.
 
@@ -360,6 +374,7 @@ class ProtocolContext(CommandPublisher):
 
         return dict(_only_labwares())
 
+    @requires_version(2, 0)
     def load_module(
             self, module_name: str,
             location: Optional[types.DeckLocation] = None) -> ModuleTypes:
@@ -423,7 +438,8 @@ class ProtocolContext(CommandPublisher):
         self._deck_layout[resolved_location] = geometry
         return mod_ctx
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def loaded_modules(self) -> Dict[int, 'ModuleContext']:
         """ Get the modules loaded into the protocol context.
 
@@ -444,6 +460,7 @@ class ProtocolContext(CommandPublisher):
 
         return dict(_modules())
 
+    @requires_version(2, 0)
     def load_instrument(
             self,
             instrument_name: str,
@@ -513,7 +530,8 @@ class ProtocolContext(CommandPublisher):
         self._log.info("Instrument {} loaded".format(new_instr))
         return new_instr
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def loaded_instruments(self) -> Dict[str, Optional['InstrumentContext']]:
         """ Get the instruments that have been loaded into the protocol.
 
@@ -546,6 +564,7 @@ class ProtocolContext(CommandPublisher):
         raise NotImplementedError
 
     @cmds.publish.both(command=cmds.pause)
+    @requires_version(2, 0)
     def pause(self, msg=None):
         """ Pause execution of the protocol until resume is called.
 
@@ -558,17 +577,20 @@ class ProtocolContext(CommandPublisher):
         self._hw_manager.hardware.pause()
 
     @cmds.publish.both(command=cmds.resume)
+    @requires_version(2, 0)
     def resume(self):
         """ Resume a previously-paused protocol """
         self._hw_manager.hardware.resume()
 
     @cmds.publish.both(command=cmds.comment)
+    @requires_version(2, 0)
     def comment(self, msg):
         """ Add a user-readable comment string that will be echoed to the
         Opentrons app. """
         pass
 
     @cmds.publish.both(command=cmds.delay)
+    @requires_version(2, 0)
     def delay(self, seconds=0, minutes=0, msg=None):
         """ Delay protocol execution for a specific amount of time.
 
@@ -580,7 +602,8 @@ class ProtocolContext(CommandPublisher):
         delay_time = seconds + minutes * 60
         self._hw_manager.hardware.delay(delay_time)
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def config(self) -> rc.robot_config:
         """ Get the robot's configuration object.
 
@@ -588,6 +611,7 @@ class ProtocolContext(CommandPublisher):
         """
         return self._hw_manager.hardware.config
 
+    @requires_version(2, 0)
     def update_config(self, **kwargs):
         """ Update values of the robot's configuration.
 
@@ -599,6 +623,7 @@ class ProtocolContext(CommandPublisher):
         """
         self._hw_manager.hardware.update_config(**kwargs)
 
+    @requires_version(2, 0)
     def home(self):
         """ Homes the robot.
         """
@@ -616,7 +641,8 @@ class ProtocolContext(CommandPublisher):
     def location_cache(self, loc: Optional[types.Location]):
         self._location_cache = loc
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def deck(self) -> geometry.Deck:
         """ The object holding the deck layout of the robot.
 
@@ -631,7 +657,8 @@ class ProtocolContext(CommandPublisher):
         """
         return self._deck_layout
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def fixed_trash(self) -> Labware:
         """ The trash fixed to slot 12 of the robot deck. """
         trash = self._deck_layout['12']
@@ -640,6 +667,7 @@ class ProtocolContext(CommandPublisher):
         return trash  # type: ignore
 
 
+@requires_version(2, 0)
 class InstrumentContext(CommandPublisher):
     """ A context for a specific pipette or instrument.
 
@@ -692,7 +720,8 @@ class InstrumentContext(CommandPublisher):
         self._starting_tip: Union[Well, None] = None
         self.requested_as = requested_as
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def starting_tip(self) -> Union[Well, None]:
         """ The starting tip from which the pipette pick up
         """
@@ -702,6 +731,7 @@ class InstrumentContext(CommandPublisher):
     def starting_tip(self, location: Union[Well, None]):
         self._starting_tip = location
 
+    @requires_version(2, 0)
     def reset_tipracks(self):
         """ Reload all tips in each tip rack and reset starting tip
         """
@@ -709,7 +739,8 @@ class InstrumentContext(CommandPublisher):
             tiprack.reset()
         self.starting_tip = None
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def default_speed(self) -> float:
         """ The speed at which the robot's gantry moves.
 
@@ -724,6 +755,7 @@ class InstrumentContext(CommandPublisher):
     def default_speed(self, speed: float):
         self._default_speed = speed
 
+    @requires_version(2, 0)
     def aspirate(self,
                  volume: float = None,
                  location: Union[types.Location, Well] = None,
@@ -816,6 +848,7 @@ class InstrumentContext(CommandPublisher):
                         'after', self, None, self, volume, dest, rate)
         return self
 
+    @requires_version(2, 0)
     def dispense(self,
                  volume: float = None,
                  location: Union[types.Location, Well] = None,
@@ -897,6 +930,7 @@ class InstrumentContext(CommandPublisher):
         return self
 
     @cmds.publish.both(command=cmds.mix)
+    @requires_version(2, 0)
     def mix(self,
             repetitions: int = 1,
             volume: float = None,
@@ -950,6 +984,7 @@ class InstrumentContext(CommandPublisher):
         return self
 
     @cmds.publish.both(command=cmds.blow_out)
+    @requires_version(2, 0)
     def blow_out(self,
                  location: Union[types.Location, Well] = None
                  ) -> 'InstrumentContext':
@@ -1002,6 +1037,7 @@ class InstrumentContext(CommandPublisher):
         return self
 
     @cmds.publish.both(command=cmds.touch_tip)
+    @requires_version(2, 0)
     def touch_tip(self,
                   location: Well = None,
                   radius: float = 1.0,
@@ -1085,6 +1121,7 @@ class InstrumentContext(CommandPublisher):
         return self
 
     @cmds.publish.both(command=cmds.air_gap)
+    @requires_version(2, 0)
     def air_gap(self,
                 volume: float = None,
                 height: float = None) -> 'InstrumentContext':
@@ -1133,6 +1170,7 @@ class InstrumentContext(CommandPublisher):
         return self
 
     @cmds.publish.both(command=cmds.return_tip)
+    @requires_version(2, 0)
     def return_tip(self, home_after: bool = True) -> 'InstrumentContext':
         """
         If a tip is currently attached to the pipette, then it will return the
@@ -1172,6 +1210,7 @@ class InstrumentContext(CommandPublisher):
                 filter_tipracks_to_start(start, self.tip_racks),
                 self.channels, start)
 
+    @requires_version(2, 0)
     def pick_up_tip(  # noqa(C901)
             self, location: Union[types.Location, Well] = None,
             presses: int = None,
@@ -1256,6 +1295,7 @@ class InstrumentContext(CommandPublisher):
 
         return self
 
+    @requires_version(2, 0)
     def drop_tip(  # noqa(C901)
             self,
             location: Union[types.Location, Well] = None,
@@ -1345,6 +1385,7 @@ class InstrumentContext(CommandPublisher):
         self._last_tip_picked_up_from = None
         return self
 
+    @requires_version(2, 0)
     def home(self) -> 'InstrumentContext':
         """ Home the robot.
 
@@ -1359,6 +1400,7 @@ class InstrumentContext(CommandPublisher):
                         'after', self, None, self._mount.name.lower())
         return self
 
+    @requires_version(2, 0)
     def home_plunger(self) -> 'InstrumentContext':
         """ Home the plunger associated with this mount
 
@@ -1368,6 +1410,7 @@ class InstrumentContext(CommandPublisher):
         return self
 
     @cmds.publish.both(command=cmds.distribute)
+    @requires_version(2, 0)
     def distribute(self,
                    volume: float,
                    source: Well,
@@ -1395,6 +1438,7 @@ class InstrumentContext(CommandPublisher):
         return self.transfer(volume, source, dest, **kwargs)
 
     @cmds.publish.both(command=cmds.consolidate)
+    @requires_version(2, 0)
     def consolidate(self,
                     volume: float,
                     source: List[Well],
@@ -1420,6 +1464,7 @@ class InstrumentContext(CommandPublisher):
         return self.transfer(volume, source, dest, **kwargs)
 
     @cmds.publish.both(command=cmds.transfer)
+    @requires_version(2, 0)
     def transfer(self,
                  volume: Union[float, Sequence[float]],
                  source: AdvancedLiquidHandling,
@@ -1616,9 +1661,11 @@ class InstrumentContext(CommandPublisher):
             mix_strategy = transfers.MixStrategy.NEVER
         return mix_strategy, mix_opts
 
+    @requires_version(2, 0)
     def delay(self):
         return self._ctx.delay()
 
+    @requires_version(2, 0)
     def move_to(self, location: types.Location, force_direct: bool = False,
                 minimum_z_height: float = None,
                 speed: float = None
@@ -1670,12 +1717,14 @@ class InstrumentContext(CommandPublisher):
             self._ctx.location_cache = location
         return self
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def mount(self) -> str:
         """ Return the name of the mount this pipette is attached to """
         return self._mount.name.lower()
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def speed(self) -> 'PlungerSpeeds':
         """ The speeds (in mm/s) configured for the pipette plunger.
 
@@ -1701,7 +1750,8 @@ class InstrumentContext(CommandPublisher):
         """
         return self._speeds
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def flow_rate(self) -> 'FlowRates':
         """ The speeds (in uL/s) configured for the pipette.
 
@@ -1743,7 +1793,8 @@ class InstrumentContext(CommandPublisher):
         """
         raise NotImplementedError
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def type(self) -> str:
         """ One of `'single'` or `'multi'`.
         """
@@ -1755,7 +1806,8 @@ class InstrumentContext(CommandPublisher):
         else:
             raise RuntimeError("Bad pipette name: {}".format(model))
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def tip_racks(self) -> List[Labware]:
         """
         The tip racks that have been linked to this pipette.
@@ -1769,7 +1821,8 @@ class InstrumentContext(CommandPublisher):
     def tip_racks(self, racks: List[Labware]):
         self._tip_racks = racks
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def trash_container(self) -> Labware:
         """ The trash container associated with this pipette.
 
@@ -1783,39 +1836,45 @@ class InstrumentContext(CommandPublisher):
     def trash_container(self, trash: Labware):
         self._trash = trash
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def name(self) -> str:
         """
         The name string for the pipette (e.g. 'p300_single')
         """
         return self.hw_pipette['name']
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def model(self) -> str:
         """
         The model string for the pipette (e.g. 'p300_single_v1.3')
         """
         return self.hw_pipette['model']
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def min_volume(self) -> float:
         return self.hw_pipette['min_volume']
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def max_volume(self) -> float:
         """
         The maximum volume, in microliters, this pipette can hold.
         """
         return self.hw_pipette['max_volume']
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def current_volume(self) -> float:
         """
         The current amount of liquid, in microliters, held in the pipette.
         """
         return self.hw_pipette['current_volume']
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def hw_pipette(self) -> Dict[str, Any]:
         """ View the information returned by the hardware API directly.
 
@@ -1827,12 +1886,14 @@ class InstrumentContext(CommandPublisher):
             raise types.PipetteNotAttachedError
         return pipette
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def channels(self) -> int:
         """ The number of channels on the pipette. """
         return self.hw_pipette['channels']
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def well_bottom_clearance(self) -> 'Clearances':
         """ The distance above the bottom of a well to aspirate or dispense.
 
@@ -1872,6 +1933,7 @@ class InstrumentContext(CommandPublisher):
         return tip_length - tip_overlap
 
 
+@requires_version(2, 0)
 class ModuleContext(CommandPublisher):
     """ An object representing a connected module. """
 
@@ -1888,6 +1950,7 @@ class ModuleContext(CommandPublisher):
         self._geometry = geometry
         self._ctx = ctx
 
+    @requires_version(2, 0)
     def load_labware_object(self, labware: Labware) -> Labware:
         """ Specify the presence of a piece of labware on the module.
 
@@ -1902,6 +1965,7 @@ class ModuleContext(CommandPublisher):
         self._ctx.deck.recalculate_high_z()
         return mod_labware
 
+    @requires_version(2, 0)
     def load_labware(self, name: str) -> Labware:
         """ Specify the presence of a piece of labware on the module.
 
@@ -1913,18 +1977,21 @@ class ModuleContext(CommandPublisher):
             bundled_defs=self._ctx._bundled_labware)
         return self.load_labware_object(lw)
 
+    @requires_version(2, 0)
     def load_labware_by_name(self, name: str) -> Labware:
         MODULE_LOG.warning(
             'load_labware_by_name is deprecated and will be removed in '
             'version 3.12.0. please use load_labware')
         return self.load_labware(name)
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def labware(self) -> Optional[Labware]:
         """ The labware (if any) present on this module. """
         return self._geometry.labware
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def geometry(self) -> ModuleGeometry:
         """ The object representing the module as an item on the deck
 
@@ -1938,6 +2005,7 @@ class ModuleContext(CommandPublisher):
                                        self.labware)
 
 
+@requires_version(2, 0)
 class TemperatureModuleContext(ModuleContext):
     """ An object representing a connected Temperature Module.
 
@@ -1975,6 +2043,7 @@ class TemperatureModuleContext(ModuleContext):
         super().__init__(ctx, geometry)
 
     @cmds.publish.both(command=cmds.tempdeck_set_temp)
+    @requires_version(2, 0)
     def set_temperature(self, celsius: float):
         """ Set the target temperature, in C.
 
@@ -1985,22 +2054,26 @@ class TemperatureModuleContext(ModuleContext):
         return self._module.set_temperature(celsius)
 
     @cmds.publish.both(command=cmds.tempdeck_deactivate)
+    @requires_version(2, 0)
     def deactivate(self):
         """ Stop heating (or cooling) and turn off the fan.
         """
         return self._module.deactivate()
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def temperature(self):
         """ Current temperature in C"""
         return self._module.temperature
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def target(self):
         """ Current target temperature in C"""
         return self._module.target
 
 
+@requires_version(2, 0)
 class MagneticModuleContext(ModuleContext):
     """ An object representing a connected Temperature Module.
 
@@ -2017,6 +2090,7 @@ class MagneticModuleContext(ModuleContext):
         super().__init__(ctx, geometry)
 
     @cmds.publish.both(command=cmds.magdeck_calibrate)
+    @requires_version(2, 0)
     def calibrate(self):
         """ Calibrate the Magnetic Module.
 
@@ -2025,6 +2099,7 @@ class MagneticModuleContext(ModuleContext):
         """
         self._module.calibrate()
 
+    @requires_version(2, 0)
     def load_labware_object(self, labware: Labware) -> Labware:
         """
         Load labware onto a Magnetic Module, checking if it is compatible
@@ -2037,6 +2112,7 @@ class MagneticModuleContext(ModuleContext):
         return super().load_labware_object(labware)
 
     @cmds.publish.both(command=cmds.magdeck_engage)
+    @requires_version(2, 0)
     def engage(self, height: float = None, offset: float = None):
         """ Raise the Magnetic Module's magnets.
 
@@ -2075,17 +2151,20 @@ class MagneticModuleContext(ModuleContext):
         self._module.engage(dist)
 
     @cmds.publish.both(command=cmds.magdeck_disengage)
+    @requires_version(2, 0)
     def disengage(self):
         """ Lower the magnets back into the Magnetic Module.
         """
         self._module.deactivate()
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def status(self):
         """ The status of the module. either 'engaged' or 'disengaged' """
         return self._module.status
 
 
+@requires_version(2, 0)
 class ThermocyclerContext(ModuleContext):
     """ An object representing a connected Temperature Module.
 
@@ -2121,6 +2200,7 @@ class ThermocyclerContext(ModuleContext):
             instr.move_to(types.Location(safe_point, None), force_direct=True)
 
     @cmds.publish.both(command=cmds.thermocycler_open)
+    @requires_version(2, 0)
     def open_lid(self):
         """ Opens the lid"""
         self._prepare_for_lid_move()
@@ -2128,6 +2208,7 @@ class ThermocyclerContext(ModuleContext):
         return self._geometry.lid_status
 
     @cmds.publish.both(command=cmds.thermocycler_close)
+    @requires_version(2, 0)
     def close_lid(self):
         """ Closes the lid"""
         self._prepare_for_lid_move()
@@ -2135,6 +2216,7 @@ class ThermocyclerContext(ModuleContext):
         return self._geometry.lid_status
 
     @cmds.publish.both(command=cmds.thermocycler_set_block_temp)
+    @requires_version(2, 0)
     def set_block_temperature(self,
                               temperature: float,
                               hold_time_seconds: float = None,
@@ -2172,6 +2254,7 @@ class ThermocyclerContext(ModuleContext):
                 ramp_rate=ramp_rate)
 
     @cmds.publish.both(command=cmds.thermocycler_set_lid_temperature)
+    @requires_version(2, 0)
     def set_lid_temperature(self, temperature: float):
         """ Set the target temperature for the heated lid, in °C.
 
@@ -2187,6 +2270,7 @@ class ThermocyclerContext(ModuleContext):
         self._module.set_lid_temperature(temperature)
 
     @cmds.publish.both(command=cmds.thermocycler_execute_profile)
+    @requires_version(2, 0)
     def execute_profile(self,
                         steps: List[modules.types.ThermocyclerStep],
                         repetitions: int):
@@ -2223,80 +2307,96 @@ class ThermocyclerContext(ModuleContext):
             steps=steps, repetitions=repetitions)
 
     @cmds.publish.both(command=cmds.thermocycler_deactivate_lid)
+    @requires_version(2, 0)
     def deactivate_lid(self):
         """ Turn off the heated lid """
         self._module.stop_lid_heating()
 
     @cmds.publish.both(command=cmds.thermocycler_deactivate_block)
+    @requires_version(2, 0)
     def deactivate_block(self):
         """ Turn off the well block """
         self._module.deactivate()
 
     @cmds.publish.both(command=cmds.thermocycler_deactivate)
+    @requires_version(2, 0)
     def deactivate(self):
         """ Turn off the well block, and heated lid """
         self.deactivate_lid()
         self.deactivate_block()
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def lid_position(self):
         """ Lid open/close status string"""
         return self._module.lid_status
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def block_temperature_status(self):
         return self._module.status
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def lid_temperature_status(self):
         return self._module.lid_temp_status
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def block_temperature(self):
         """ Current temperature in degrees C """
         return self._module.temperature
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def block_target_temperature(self):
         """ Target temperature in degrees C """
         return self._module.target
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def lid_temperature(self):
         """ Current temperature in degrees C """
         return self._module.lid_temp
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def lid_target_temperature(self):
         """ Target temperature in degrees C """
         return self._module.lid_target
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def ramp_rate(self):
         """ Current ramp rate in degrees C/sec"""
         return self._module.ramp_rate
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def hold_time(self):
         """ Remaining hold time in sec"""
         return self._module.hold_time
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def total_cycle_count(self):
         """ Number of repetitions for current set cycle"""
         return self._module.total_cycle_count
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def current_cycle_index(self):
         """ Index of the current set cycle repetition"""
         return self._module.current_cycle_index
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def total_step_count(self):
         """ Number of steps within the current cycle"""
         return self._module.total_step_count
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def current_step_index(self):
         """ Index of the current step within the current cycle"""
         return self._module.current_step_index
