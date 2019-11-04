@@ -1,6 +1,5 @@
 // @flow
 import React, { useMemo } from 'react'
-import { useSelector } from 'react-redux'
 import {
   DropdownField,
   FormGroup,
@@ -16,17 +15,13 @@ import isEmpty from 'lodash/isEmpty'
 import reduce from 'lodash/reduce'
 
 import i18n from '../../../localization'
-import { pipetteOptions } from '../../../pipettes/pipetteData'
 import PipetteDiagram from './PipetteDiagram'
 import TiprackDiagram from './TiprackDiagram'
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 import { getOnlyLatestDefs } from '../../../labware-defs/utils'
-import { selectors as ffSelectors } from '../../../feature-flags'
 
 import type { FormPipette, FormPipettesByMount } from '../../../step-forms'
-
-const pipetteOptionsWithNone = [{ name: 'None', value: '' }, ...pipetteOptions]
 
 type Props = {|
   initialTabIndex?: number,
@@ -71,7 +66,6 @@ export default function ChangePipetteFields(props: Props) {
   const renderPipetteSelect = (props: PipetteSelectProps) => {
     const { tabIndex, mount } = props
     const pipetteName = values[mount].pipetteName
-    const fieldName = `${mount}.pipetteName`
     return (
       <PipetteSelect
         enableNoneOption
