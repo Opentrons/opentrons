@@ -33,7 +33,7 @@ type Props = {|
   /** whether or not "None" shows up as the default option */
   enableNoneOption?: boolean,
   /** input tabIndex */
-  tabIndex?: string,
+  tabIndex?: number,
   /** classes to apply to the top-level component */
   className?: string,
 |}
@@ -97,6 +97,7 @@ const PipetteSelect = (props: Props) => {
       options={groupedOptions}
       onChange={handleChange}
       value={props.value}
+      tabIndex={props.tabIndex}
     />
   )
 }
@@ -173,7 +174,13 @@ function Option(props: any) {
   const { innerRef, innerProps, data } = props
 
   return (
-    <div ref={innerRef} className={styles.pipette_option} {...innerProps}>
+    <div
+      ref={innerRef}
+      className={cx(styles.pipette_option, {
+        [styles.focused]: props.isFocused,
+      })}
+      {...innerProps}
+    >
       {data.value === null ? (
         <NonePlaceholder />
       ) : (
