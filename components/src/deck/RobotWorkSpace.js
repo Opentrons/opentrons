@@ -14,6 +14,11 @@ type Props = {
   deckLayerBlacklist?: Array<string>,
 }
 
+type GetRobotCoordsFromDOMCoords = $PropertyType<
+  RobotWorkSpaceRenderProps,
+  'getRobotCoordsFromDOMCoords'
+>
+
 function RobotWorkSpace(props: Props) {
   const { children, deckDef, deckLayerBlacklist = [], viewBox } = props
   const wrapperRef: ElementRef<*> = useRef(null)
@@ -23,10 +28,7 @@ function RobotWorkSpace(props: Props) {
   // Until Firefox fixes this and conforms to SVG2 draft,
   // it will suffer from inverted y behavior (ignores css transform)
   // $FlowFixMe(bc, 2019-05-31): flow type svg ref
-  const getRobotCoordsFromDOMCoords = (
-    x: number,
-    y: number
-  ): { x: number, y: number } => {
+  const getRobotCoordsFromDOMCoords: GetRobotCoordsFromDOMCoords = (x, y) => {
     if (!wrapperRef.current) return { x: 0, y: 0 }
     const cursorPoint = wrapperRef.current.createSVGPoint()
 
@@ -40,12 +42,12 @@ function RobotWorkSpace(props: Props) {
   if (!deckDef && !viewBox) return null
 
   let wholeDeckViewBox = null
-  let slots = {}
+  let deckSlotsById = {}
   if (deckDef) {
     const [viewBoxOriginX, viewBoxOriginY] = deckDef.cornerOffsetFromOrigin
     const [deckXDimension, deckYDimension] = deckDef.dimensions
 
-    slots = deckDef.locations.orderedSlots.reduce(
+    deckSlotsById = deckDef.locations.orderedSlots.reduce(
       (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
       {}
     )
@@ -61,7 +63,7 @@ function RobotWorkSpace(props: Props) {
       {deckDef && (
         <DeckFromData def={deckDef} layerBlacklist={deckLayerBlacklist} />
       )}
-      {children && children({ slots, getRobotCoordsFromDOMCoords })}
+      {children && children({ deckSlotsById, getRobotCoordsFromDOMCoords })}
     </svg>
   )
 }
