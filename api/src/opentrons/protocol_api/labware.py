@@ -117,7 +117,7 @@ class Well:
             'diameter': self.diameter,
             'width': self.width,
             'length': self.length,
-            'height': self._parent_height,
+            'height': self.height,
             'has_tip': self.has_tip,
             'shape': self.shape,
             'parent': self.parent
@@ -136,12 +136,12 @@ class Well:
         return self._length
 
     @property
-    def shape(self) -> float:
+    def shape(self) -> Optional[WellShape]:
         return self._shape
 
     @property
-    def height(self) -> float:
-        return self._height
+    def height(self) -> Optional[float]:
+        return self._parent_height
 
     @property
     def parent(self) -> 'Labware':
@@ -1222,9 +1222,6 @@ def get_all_labware_definitions() -> List[str]:
         _check_for_subdirectories(namespace)
 
     return labware_list
-
-
-
 
 
 def clear_calibrations():
