@@ -7,6 +7,8 @@ from opentrons.api.session import (
 from tests.opentrons.conftest import state
 from opentrons.legacy_api.robot.robot import Robot
 from functools import partial
+from opentrons.protocols.types import APIVersion
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 
 state = partial(state, 'session')
 
@@ -437,3 +439,19 @@ def run(ctx):
         name='<blank>',
         contents=prot)
     assert session.metadata == expected
+
+
+@pytest.mark.api2_only
+async def test_too_high_version(main_router):
+    minor_over = APIVersion(MAX_SUPPORTED_VERSION.major,
+                            MAX_SUPPORTED_VERSION.minor + 1)
+    minor_over_mdata = {'apiLevel': str(minor_over)}
+    proto = 'metadata=' + str(minor_over_mdata) + """
+
+def run(ctx):
+    pass
+"""
+    with pytest.raises(RuntimeError):
+        main_router.session_manager.create(
+            name='<blank>',
+            contents=proto)

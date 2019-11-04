@@ -21,6 +21,22 @@ from .bundle import extract_bundle
 API_VERSION_RE = re.compile(r'^(\d+)\.(\d+)$')
 
 
+def version_from_string(vstr: str) -> APIVersion:
+    """ Parse an API version from a string
+
+    :param str vstr: The version string to parse
+    :returns APIVersion: The parsed version
+    :raises ValueError: if the version string is the wrong format
+    """
+    matches = API_VERSION_RE.match(vstr)
+    if not matches:
+        raise ValueError(
+            f'apiLevel {vstr} is incorrectly formatted. It should '
+            'major.minor, where both major and minor are numbers.')
+    return APIVersion(
+        major=int(matches.group(1)), minor=int(matches.group(2)))
+
+
 def _parse_json(
         protocol_contents: str, filename: str = None) -> JsonProtocol:
     """ Parse a protocol known or at least suspected to be json """
@@ -202,12 +218,8 @@ def version_from_metadata(metadata: Metadata) -> APIVersion:
     requested_level = str(metadata['apiLevel'])
     if requested_level == '1':
         return APIVersion(1, 0)
-    matches = API_VERSION_RE.match(requested_level)
-    if not matches:
-        raise ValueError(
-            f'apiLevel {requested_level} is incorrectly formatted. It should '
-            'major.minor, where both major and minor are numbers.')
-    return APIVersion(major=int(matches.group(1)), minor=int(matches.group(2)))
+
+    return version_from_string(requested_level)
 
 
 def get_version(metadata: Metadata, parsed: ast.Module) -> APIVersion:

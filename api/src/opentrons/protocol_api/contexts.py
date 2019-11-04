@@ -16,11 +16,13 @@ from .labware import (Well, Labware, load, get_labware_definition,
                       ThermocyclerGeometry, OutOfTipsError,
                       select_tiprack_from_list, filter_tipracks_to_start,
                       LabwareDefinition)
+from opentrons.protocols.types import APIVersion, Protocol
 from .util import (FlowRates, PlungerSpeeds, Clearances, AxisMaxSpeeds,
                    HardwareManager, clamp_value)
 
 from . import geometry
 from . import transfers
+from . import MAX_SUPPORTED_VERSION
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -57,7 +59,8 @@ class ProtocolContext(CommandPublisher):
                  broker=None,
                  bundled_labware: Dict[str, LabwareDefinition] = None,
                  bundled_data: Dict[str, bytes] = None,
-                 extra_labware: Dict[str, LabwareDefinition] = None
+                 extra_labware: Dict[str, LabwareDefinition] = None,
+                 api_version: APIVersion = None,
                  ) -> None:
         """ Build a :py:class:`.ProtocolContext`.
 
@@ -82,8 +85,17 @@ class ProtocolContext(CommandPublisher):
                               in addition to the system definitions (if
                               ``bundled_labware`` was not specified). Used to
                               provide custom labware definitions.
+        :param api_version: The API version to use. If this is ``None``, uses
+                            the max supported version.
         """
         super().__init__(broker)
+
+        self._api_version = api_version or MAX_SUPPORTED_VERSION
+        if self._api_version > MAX_SUPPORTED_VERSION:
+            raise RuntimeError(
+                f'API version {self._api_version} is not supported by this '
+                f'robot software. Please either reduce your requested API '
+                f'version or update your robot.')
         self._loop = loop or asyncio.get_event_loop()
         self._deck_layout = geometry.Deck()
         self._instruments: Dict[types.Mount, Optional[InstrumentContext]]\
@@ -103,9 +115,6 @@ class ProtocolContext(CommandPublisher):
 
         self._bundled_data: Dict[str, bytes] = bundled_data or {}
         self._default_max_speeds = AxisMaxSpeeds()
-        self._load_trash()
-
-    def _load_trash(self):
         if fflags.short_fixed_trash():
             trash_name = 'opentrons_1_trash_850ml_fixed'
         else:
@@ -113,6 +122,32 @@ class ProtocolContext(CommandPublisher):
         if self.deck['12']:
             del self.deck['12']
         self.load_labware(trash_name, '12')
+
+    @classmethod
+    def build_using(cls,
+                    protocol: Protocol,
+                    *args, **kwargs):
+        """ Build an API instance for the specified parsed protocol
+
+        This is used internally to provision the context with bundle
+        contents or api levels.
+        """
+        kwargs['bundled_data'] = getattr(protocol, 'bundled_data', None)
+        kwargs['bundled_labware'] = getattr(protocol, 'bundled_labware', None)
+        kwargs['api_version'] = getattr(
+            protocol, 'api_level', MAX_SUPPORTED_VERSION)
+        return cls(*args, **kwargs)
+
+    @property
+    def api_version(self) -> APIVersion:
+        """ Return the API version supported by this protoocl context.
+
+        The supported API version was specified when the protocol context
+        was initialized. It may be lower than the highest version supported
+        by the robot software. For the highest version supported by the
+        robot software, see :py:attr:`.protocol_api.MAX_SUPPORTED_VERSION`.
+        """
+        return self._api_version
 
     @property
     def bundled_data(self) -> Dict[str, bytes]:
@@ -124,19 +159,6 @@ class ProtocolContext(CommandPublisher):
         ``'aspirations.csv'``) to the bytes contents of the files.
         """
         return self._bundled_data
-
-    def set_bundle_contents(
-            self,
-            bundled_labware: Dict[str, LabwareDefinition] = None,
-            bundled_data: Dict[str, bytes] = None,
-            extra_labware: Dict[str, LabwareDefinition] = None):
-        """ Specify bundle contents after the context is created. Replaces the
-        old values.
-        """
-        self._bundled_labware = bundled_labware
-        self._extra_labware = extra_labware or {}
-        self._bundled_data = bundled_data or {}
-        self._load_trash()
 
     def __del__(self):
         if getattr(self, '_unsubscribe_commands', None):

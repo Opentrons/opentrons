@@ -716,15 +716,6 @@ def test_bundled_labware(loop, get_labware_fixture):
     assert ctx.loaded_labwares[3] == lw1
     assert ctx.loaded_labwares[3]._definition == fixture_96_plate
 
-    ctx = papi.ProtocolContext(loop)
-
-    ctx.set_bundle_contents(bundled_labware, None, None)
-    lw1 = ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
-    assert ctx.loaded_labwares[12] == ctx.fixed_trash
-    assert ctx.loaded_labwares[12]._definition == fake_fixed_trash
-    assert ctx.loaded_labwares[3] == lw1
-    assert ctx.loaded_labwares[3]._definition == fixture_96_plate
-
 
 def test_bundled_labware_missing(loop, get_labware_fixture):
     bundled_labware = {}
@@ -733,12 +724,6 @@ def test_bundled_labware_missing(loop, get_labware_fixture):
         match='No labware found in bundle with load name opentrons_1_trash_'
     ):
         papi.ProtocolContext(loop, bundled_labware=bundled_labware)
-    ctx = papi.ProtocolContext(loop)
-    with pytest.raises(
-        RuntimeError,
-        match='No labware found in bundle with load name opentrons_1_trash_'
-    ):
-        ctx.set_bundle_contents({}, {}, {})
 
     fake_fixed_trash = get_labware_fixture('fixture_trash')
     fake_fixed_trash['namespace'] = 'opentrons'
@@ -752,18 +737,13 @@ def test_bundled_labware_missing(loop, get_labware_fixture):
         RuntimeError,
         match='No labware found in bundle with load name opentrons_1_trash_'
     ):
-        ctx.set_bundle_contents({}, None, bundled_labware)
+        papi.ProtocolContext(loop, bundled_labware={},
+                             extra_labware=bundled_labware)
 
 
 def test_bundled_data(loop):
     bundled_data = {'foo': b'1,2,3'}
     ctx = papi.ProtocolContext(loop, bundled_data=bundled_data)
-    assert ctx.bundled_data == bundled_data
-    bundled_2 = {'bar': b'hey'}
-    ctx.set_bundle_contents(None, bundled_2, None)
-    assert ctx.bundled_data == bundled_2
-    ctx = papi.ProtocolContext(loop)
-    ctx.set_bundle_contents(None, bundled_data, None)
     assert ctx.bundled_data == bundled_data
 
 
@@ -776,3 +756,15 @@ def test_extra_labware(loop, get_labware_fixture):
     ls1 = ctx.load_labware('fixture_96_plate', 3, namespace='fixture')
     assert ctx.loaded_labwares[3] == ls1
     assert ctx.loaded_labwares[3]._definition == fixture_96_plate
+
+
+def test_api_version_checking():
+    minor_over = (papi.MAX_SUPPORTED_VERSION.major,
+                  papi.MAX_SUPPORTED_VERSION.minor + 1)
+    with pytest.raises(RuntimeError):
+        papi.ProtocolContext(api_version=minor_over)
+
+    major_over = (papi.MAX_SUPPORTED_VERSION.major + 1,
+                  papi.MAX_SUPPORTED_VERSION.minor)
+    with pytest.raises(RuntimeError):
+        papi.ProtocolContext(api_version=major_over)

@@ -120,8 +120,8 @@ class Session(object):
         self.name = name
         self._protocol = protocol
         self._hardware = hardware
-        self._simulating_ctx = ProtocolContext(
-            loop=self._loop, broker=self._broker)
+        self._simulating_ctx = ProtocolContext.build_using(
+            self._protocol, loop=self._loop, broker=self._broker)
         self.state = None
         self.commands = []
         self.command_log = {}
@@ -240,7 +240,6 @@ class Session(object):
                     hardware=sim,
                     broker=self._broker)
                 run_protocol(self._protocol,
-                             simulate=True,
                              context=self._simulating_ctx)
             else:
                 self._hardware.broker = self._broker
@@ -368,16 +367,11 @@ class Session(object):
             self.resume()
             self._pre_run_hooks()
             if ff.use_protocol_api_v2():
-                bundled_data = None
-                bundled_labware = None
-                if isinstance(self._protocol, PythonProtocol):
-                    bundled_data = self._protocol.bundled_data
-                    bundled_labware = self._protocol.bundled_labware
                 self._hardware.cache_instruments()
-                ctx = ProtocolContext(loop=self._loop,
-                                      broker=self._broker,
-                                      bundled_labware=bundled_labware,
-                                      bundled_data=bundled_data)
+                ctx = ProtocolContext.build_using(
+                    self._protocol,
+                    loop=self._loop,
+                    broker=self._broker)
                 ctx.connect(self._hardware)
                 ctx.home()
                 run_protocol(self._protocol, context=ctx)

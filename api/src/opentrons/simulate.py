@@ -11,7 +11,8 @@ import logging
 import os
 import pathlib
 import queue
-from typing import Any, Dict, List, Mapping, TextIO, Tuple, BinaryIO, Optional
+from typing import (Any, Dict, List, Mapping, TextIO, Tuple, BinaryIO,
+                    Optional, Union)
 
 
 import opentrons
@@ -22,8 +23,8 @@ from opentrons import protocol_api
 from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import (
     JsonProtocol, PythonProtocol, BundleContents, APIVersion)
-from opentrons.protocol_api import execute
 from opentrons.protocol_api.legacy_wrapper import api
+from opentrons.protocol_api import execute, MAX_SUPPORTED_VERSION
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
 
@@ -105,7 +106,7 @@ class CommandScraper:
 
 
 def get_protocol_api(
-        protocol=None,
+        version: Union[str, APIVersion],
         bundled_labware: Dict[str, Dict[str, Any]] = None,
         bundled_data: Dict[str, bytes] = None) -> protocol_api.ProtocolContext:
     """
@@ -122,6 +123,11 @@ def get_protocol_api(
         >>> instr = protocol.load_instrument('p300_single', 'right')
         >>> instr.home()
 
+    :param version: The API version to use. This must be lower than
+                    :py:attr:`opentrons.protocol_api.MAX_SUPPORTED_VERSION`.
+                    It may be specified either as a string (``'2.0'``) or
+                    as a :py:class:`.protocols.types.APIVersion`
+                    (``APIVersion(2, 0)``).
     :param bundled_labware: If specified, a mapping from labware names to
                             labware definitions for labware to consider in the
                             protocol. Note that if you specify this, _only_
@@ -134,12 +140,28 @@ def get_protocol_api(
 
     :returns opentrons.protocol_api.ProtocolContext: The protocol context.
     """
-    if protocol:
-        bundled_labware = getattr(protocol, 'bundled_labware', None)
-        bundled_data = getattr(protocol, 'bundled_data', None)
+    if isinstance(version, str):
+        checked_version = parse.version_from_string(version)
+    elif not isinstance(version, APIVersion):
+        raise TypeError('version must be either a string or an APIVersion')
+    else:
+        checked_version = version
+    return _build_protocol_context(
+        checked_version, bundled_labware, bundled_data)
+
+
+def _build_protocol_context(
+        version: APIVersion = None,
+        bundled_labware: Dict[str, Dict[str, Any]] = None,
+        bundled_data: Dict[str, bytes] = None) -> protocol_api.ProtocolContext:
+    """ Internal version of :py:meth:`get_protocol_api` that allows deferring
+    version specification for use with
+    :py:meth:`.protocol_api.execute.run_protocol`
+    """
     context = protocol_api.contexts.ProtocolContext(
         bundled_labware=bundled_labware,
-        bundled_data=bundled_data)
+        bundled_data=bundled_data,
+        api_version=version)
     context.home()
     return context
 
@@ -252,11 +274,12 @@ def simulate(protocol_file: TextIO,
     if isinstance(protocol, JsonProtocol)\
             or protocol.api_level >= APIVersion(2, 0)\
             or (ff.enable_back_compat() and ff.use_protocol_api_v2()):
-        context = get_protocol_api(protocol)
+        context = get_protocol_api(
+            getattr(protocol, 'api_level', MAX_SUPPORTED_VERSION),
+            bundled_labware=getattr(protocol, 'bundled_labware', None),
+            bundled_data=getattr(protocol, 'bundled_data', None))
         scraper = CommandScraper(stack_logger, log_level, context.broker)
-        execute.run_protocol(protocol,
-                             simulate=True,
-                             context=context)
+        execute.run_protocol(protocol, context)
         if isinstance(protocol, PythonProtocol)\
            and protocol.bundled_labware is None:
             bundle_contents: Optional[BundleContents] = bundle_from_sim(

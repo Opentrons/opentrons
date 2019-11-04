@@ -157,4 +157,4 @@ def test_papi_execute_json_v3(monkeypatch, loop, get_json_protocol_fixture):
     ctx = ProtocolContext(loop=loop)
     ctx.home()
     # Check that we end up executing the protocol ok
-    execute.run_protocol(protocol, True, ctx)
+    execute.run_protocol(protocol, ctx)
