@@ -211,9 +211,10 @@ def maybe_migrate_containers():
     result = False
     if os.environ.get('MIGRATE_V1_LABWARE') and\
             os.path.exists(CONFIG['labware_database_file']):
-        print("we in it")
         try:
-            result = perform_migration()
+            result, validation_failure = perform_migration()
+            log.debug("The following labwares failed labware migration",
+                      f"{validation_failure}")
         except (IndexError, ValueError, KeyError):
             delete_dir = CONFIG['labware_user_definitions_dir_v2']/'legacy_api'
             if os.path.exists(delete_dir):
@@ -222,3 +223,4 @@ def maybe_migrate_containers():
                         'please try again.')
     if result:
         os.remove(CONFIG['labware_database_file'])
+    return result

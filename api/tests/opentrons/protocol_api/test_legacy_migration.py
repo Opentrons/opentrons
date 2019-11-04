@@ -2,89 +2,114 @@ import pytest
 import os
 import json
 import shutil
-from unittest import mock
 
 from opentrons.data_storage import database as db_cmds
+from opentrons.legacy_api import containers
 from opentrons.protocol_api.legacy_wrapper import api, containers_wrapper as cw
 from opentrons.protocol_api import labware
-from opentrons.server import init
 from opentrons.config import CONFIG
 
 
 @pytest.fixture
-def labware_fixture():
-    return {
-        'trough_12row_short': db_cmds.load_container('trough-12row-short'),
-        '48_vial_plate': db_cmds.load_container('48-vial-plate'),
-        '24_vial_rack': db_cmds.load_container('24-vial-rack')}
-
-@pytest.fixture
-def unique_labwares(config_tempdir):
-    labware.create(
-        '3x8-chip',
-        grid=(8, 3),
-        spacing=(9, 7.75),
-        diameter=5,
-        depth=0,
-        volume=20)
-    frame_slides = ['fast-frame-slide-'+str(i) for i in range(1, 5)]
+def unique_labwares():
+    to_return = {}
+    frame_slides = ['fast_frame_slide_'+str(i) for i in range(1, 5)]
     for slide in frame_slides:
-        labware.create(
-            slide,
-            grid=(2, 8),
-            spacing=(9, 9),
-            diameter=7,
-            depth=10.5)
-    return [{
-        'name': '3x8_chip',
-        'spacing': (9, 7.75),
-        'grid': (8, 3),
-        'diameter': 5,
-        'volume': 20},
-        {'name': frame_slides,
-         'grid': (2, 8),
-         'spacing': (9, 9),
-         'diameter': 7,
-         'depth': 10.5}
-        ]
+        to_return[slide] = {
+                 'grid': (2, 8),
+                 'spacing': (9, 9),
+                 'diameter': 7,
+                 'depth': 10.5,
+                 'volume': 0}
+    to_return['3x8_chip'] = {
+            'spacing': (9, 7.75),
+            'grid': (8, 3),
+            'diameter': 5,
+            'volume': 20,
+            'depth': 0}
+    return to_return
+
 
 @pytest.mark.api2_only
-def test_migrated_labware_shape(monkeypatch, config_tempdir, labware_fixture):
-    td, tempdb = config_tempdir
+def test_migrated_labware_shape(monkeypatch, config_tempdir):
 
-    def list_containers():
-        return [
-            'trough-12row-short',
-            '48-vial-plate',
-            '24-vial-rack',
-            'temperature-plate']
-    monkeypatch.setattr(db_cmds, 'list_all_containers', list_containers)
+    def check_name(name):
+        for db_name in db_cmds.list_all_containers():
+            if db_name.replace("-", "_").lower() == name:
+                return db_name
+        return ''
     legacy_path = CONFIG['labware_user_definitions_dir_v2']/'legacy_api'
-    cw.perform_migration()
+    _, unmigrated_labware = cw.perform_migration()
     dir_contents = os.listdir(str(legacy_path))
+    # Do not add any labwares that don't have wells
     assert 'temperature-plate' not in dir_contents
     for lw in dir_contents:
         format_path = legacy_path/lw/'1.json'
         with open(format_path, 'rb') as f:
             strcontents = f.read().decode('utf-8')
             temp_dict = json.loads(strcontents)
+        # Have to do this ugly thing because of weird capitalization(s)
+        db_load_name = check_name(lw)
+        # check loaded definition against json schema
         labware.verify_definition(strcontents)
+        temp_cont = db_cmds.load_container(db_load_name)
         assert temp_dict['namespace'] == 'legacy_api'
-        assert len(temp_dict['wells']) == len(labware_fixture[lw].wells())
-        if labware_fixture[lw].wells() == labware_fixture[lw].rows():
+        assert len(temp_dict['wells']) == len(temp_cont.wells())
+        if temp_cont.wells() == temp_cont.rows():
             assert temp_dict['ordering'] ==\
                 [[well.get_name() for well in row]
-                 for row in labware_fixture[lw].rows()]
+                 for row in temp_cont.rows()]
         else:
             assert temp_dict['ordering'] ==\
                 [[well.get_name() for well in col]
-                 for col in labware_fixture[lw].columns()]
+                 for col in temp_cont.columns()]
     shutil.rmtree(legacy_path)
+    print(f"The following labware was not migrated {unmigrated_labware}")
 
 
 @pytest.mark.api2_only
-def test_weird_labware(config_tempdir):
-    return None
+def test_custom_labware_shape(monkeypatch, unique_labwares, config_tempdir):
+    td, tempdb = config_tempdir
+    fake_db = td.join('fakeopentrons.db')
+    dest = shutil.copyfile(tempdb, fake_db)
+    CONFIG['labware_database_file'] = dest
+    for lw, params in unique_labwares.items():
+        containers.create(
+            lw,
+            grid=params['grid'],
+            spacing=params['spacing'],
+            diameter=params['diameter'],
+            depth=params['depth'],
+            volume=params['volume'])
+
+    def list_containers():
+        return unique_labwares.keys()
+    monkeypatch.setattr(db_cmds, 'list_all_containers', list_containers)
+    legacy_path = CONFIG['labware_user_definitions_dir_v2']/'legacy_api'
+
+    cw.perform_migration()
+    dir_contents = os.listdir(str(legacy_path))
+
+    for lw in dir_contents:
+        format_path = legacy_path/lw/'1.json'
+        with open(format_path, 'rb') as f:
+            temp_dict = json.loads(f.read().decode('utf-8'))
+        params_to_verify = unique_labwares[lw]
+        first_well = temp_dict['wells']['A1']
+        well_x = temp_dict['wells']['A2']['x']
+        well_y = temp_dict['wells']['B1']['y']
+        # Verify no. columns and rows is the same
+        assert params_to_verify['grid'][0] == len(temp_dict['ordering'])
+        assert params_to_verify['grid'][1] == len(temp_dict['ordering'][0])
+        assert params_to_verify['diameter'] == first_well['diameter']
+        assert params_to_verify['volume'] == first_well['totalLiquidVolume']
+        # Verify spacing is as expected
+        assert first_well['x'] + params_to_verify['spacing'][0] == well_x
+        assert first_well['y'] - params_to_verify['spacing'][1] == well_y
+
+    shutil.rmtree(legacy_path)
+    CONFIG['labware_database_file'] = tempdb
+
 
 @pytest.mark.api2_only
 def test_directory_save(config_tempdir):
@@ -95,19 +120,22 @@ def test_directory_save(config_tempdir):
 
 
 @pytest.mark.api2_only
-async def test_env_variable(monkeypatch, config_tempdir):
+def test_env_variable(monkeypatch, config_tempdir):
     td, tempdb = config_tempdir
     fake_db = td.join('fakeopentrons.db')
     dest = shutil.copyfile(tempdb, fake_db)
     CONFIG['labware_database_file'] = dest
-    migration_mock = mock.Mock()
-    monkeypatch.setattr(cw, 'perform_migration', migration_mock)
+
+    def fake_migration():
+        return True
+    monkeypatch.setattr(cw, 'perform_migration', fake_migration)
 
     monkeypatch.setenv('MIGRATE_V1_LABWARE', '1')
     assert os.environ.get('MIGRATE_V1_LABWARE')
     assert os.path.exists(CONFIG['labware_database_file'])
-    api.maybe_migrate_containers()
-    assert migration_mock.called
+
+    result = api.maybe_migrate_containers()
+    assert result is True
+
     monkeypatch.delenv('MIGRATE_V1_LABWARE')
-    # await app.shutdown()
-    CONFIG['labware_database_file'] = str(tempdb)
+    CONFIG['labware_database_file'] = tempdb

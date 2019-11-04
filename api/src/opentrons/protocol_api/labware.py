@@ -981,7 +981,7 @@ def save_definition(
     load_name = labware_def['parameters']['loadName']
     version = labware_def['version']
 
-    # TODO: Ian 2019-05-23 validate labware def schema before saving
+    verify_definition(labware_def)
 
     if not namespace or not load_name or not version:
         raise RuntimeError(
@@ -1091,7 +1091,7 @@ def _get_standard_labware_definition(
     return labware_def
 
 
-def verify_definition(contents: AnyStr) -> LabwareDefinition:
+def verify_definition(contents: Union[AnyStr, Dict]) -> LabwareDefinition:
     """ Verify that an input string is a labware definition and return it.
 
     If the definition is invalid, an exception is raised; otherwise parse the
@@ -1101,12 +1101,17 @@ def verify_definition(contents: AnyStr) -> LabwareDefinition:
     :raises jsonschema.ValidationError: If the definition is not valid.
     :returns: The parsed definition
     """
-    loaded = json.loads(contents)
+    if isinstance(contents, dict):
+        convert_dict = json.dumps(contents)
+        loaded = json.loads(convert_dict)
+    else:
+        loaded = json.loads(contents)
     schema_body = pkgutil.get_data(  # type: ignore
         'opentrons',
         'shared_data/labware/schemas/2.json').decode('utf-8')
     labware_schema_v2 = json.loads(schema_body)
     # do the validation
+
     jsonschema.validate(loaded, labware_schema_v2)
     return loaded
 

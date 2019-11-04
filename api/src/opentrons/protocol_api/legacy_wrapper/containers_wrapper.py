@@ -1,6 +1,8 @@
 import logging
 from typing import Any, Dict
 
+import jsonschema  # type: ignore
+
 from opentrons.data_storage import database as db_cmds
 from opentrons.protocol_api.labware import save_definition
 from opentrons.config import CONFIG
@@ -73,21 +75,8 @@ def _determine_well_names(labware: Container):
     return [well.get_name() for well in labware.wells()], labware.wells()[0]
 
 
-def _format_labware_definition(labware: Container, labware_name: str)\
-        -> Dict[str, Any]:
-    lw_dict: Dict[str, Any] = {}
-    converted_labware_name = labware_name.replace("-", "_")
-    is_tiprack = True if 'tip' in converted_labware_name else False
-
-    # Definition Metadata
-    lw_dict['brand'] = {'brand': 'opentrons'}
-    lw_dict['schemaVersion'] = 2
-    lw_dict['version'] = 1
-    lw_dict['namespace'] = 'legacy_api'
-    lw_dict['metadata'] = {
-        'displayName': converted_labware_name,
-        'displayCategory': 'tipRack' if is_tiprack else 'other',
-        'displayVolumeUnits': 'µL'}
+def _add_metadata_from_v1(
+        labware: Container, lw_dict: Dict[str, Any], is_tiprack: bool):
 
     wells, first_well = _determine_well_names(labware)
 
@@ -95,11 +84,6 @@ def _format_labware_definition(labware: Container, labware_name: str)\
     lw_dict['groups'] = [{
         'wells': wells,
         'metadata': {}}]
-    lw_dict['parameters'] = {
-        'format': 'irregular',
-        'isMagneticModuleCompatible': False,
-        'loadName': converted_labware_name,
-        'isTiprack': is_tiprack}
     if is_tiprack:
         lw_dict['parameters']['tipLength'] = labware._coordinates['z']
         lw_dict['parameters']['tipOverlap'] = 0
@@ -128,54 +112,87 @@ def _format_labware_definition(labware: Container, labware_name: str)\
         'zDimension': height
     }
 
+
+def _format_labware_definition(labware_name: str, labware: Container = None):
+    lw_dict: Dict[str, Any] = {}
+    lw_dict['wells'] = {}
+    converted_labware_name = labware_name.replace("-", "_").lower()
+    is_tiprack = True if 'tip' in converted_labware_name else False
+
+    # Definition Metadata
+    lw_dict['brand'] = {'brand': 'opentrons'}
+    lw_dict['schemaVersion'] = 2
+    lw_dict['version'] = 1
+    lw_dict['namespace'] = 'legacy_api'
+    lw_dict['metadata'] = {
+        'displayName': converted_labware_name,
+        'displayCategory': 'tipRack' if is_tiprack else 'other',
+        'displayVolumeUnits': 'µL'}
+    lw_dict['parameters'] = {
+        'format': 'irregular',
+        'isMagneticModuleCompatible': False,
+        'loadName': converted_labware_name,
+        'isTiprack': is_tiprack}
+
+    if labware:
+        _add_metadata_from_v1(labware, lw_dict, is_tiprack)
     return lw_dict
 
 
+def _add_well(
+        lw_dict: Dict[str, Any],
+        well_name: str,
+        well_props: Dict[str, Any],
+        well_coordinates):
+    lw_dict['wells'][well_name] = {
+        'x': well_coordinates['x'],
+        'y': well_coordinates['y'],
+        'z': well_coordinates['z'],
+        'totalLiquidVolume': well_props.get('total-liquid-volume', 0),
+        'depth': well_props.get('depth', 0)}
+    if well_props.get('diameter'):
+        lw_dict['wells'][well_name]['diameter'] = well_props.get('diameter')
+        lw_dict['wells'][well_name]['shape'] = 'circular'
+    else:
+        lw_dict['wells'][well_name]['xDimension'] = well_props.get('length')
+        lw_dict['wells'][well_name]['yDimension'] = well_props.get('width')
+        lw_dict['wells'][well_name]['shape'] = 'rectangular'
+
+
 def create_new_labware_definition(labware: Container, labware_name: str):
-    lw_dict = _format_labware_definition(labware, labware_name)
+    lw_dict = _format_labware_definition(labware_name, labware)
     # Well Information
-    lw_dict['wells'] = {}
     for well in labware.wells():
         well_props = well.properties
         well_coords = well._coordinates
         well_name = well.get_name()
-        lw_dict['wells'][well_name] = {
-            'x': well_coords['x'],
-            'y': well_coords['y'],
-            'z': well_coords['z'],
-            'totalLiquidVolume': well_props.get('total-liquid-volume', 0),
-            'depth': well_props.get('depth', 0)}
-        if well_props.get('diameter'):
-            lw_dict['wells'][well_name]['diameter'] =\
-                well.properties.get('diameter')
-            lw_dict['wells'][well_name]['shape'] = 'circular'
-        else:
-            lw_dict['wells'][well_name]['xDimension'] =\
-                well.properties.get('length')
-            lw_dict['wells'][well_name]['yDimension'] =\
-                well.properties.get('width')
-            lw_dict['wells'][well_name]['shape'] = 'rectangular'
+        _add_well(lw_dict, well_name, well_props, well_coords)
     return lw_dict
 
 
 def perform_migration():
     path_to_save_defs = CONFIG['labware_user_definitions_dir_v2']
-
     all_containers = filter(
         lambda lw: lw not in MODULE_BLACKLIST,
         db_cmds.list_all_containers())
     labware_to_create = filter(
         lambda x: x not in LW_TRANSLATION.keys(),
         all_containers)
-
+    validation_failure = []
     for lw_name in labware_to_create:
-        log.debug(f"Migrating {lw_name} to API v2 format")
         labware = db_cmds.load_container(lw_name)
         if labware.wells():
+            log.debug(f"Migrating {lw_name} to API v2 format")
             labware_def = create_new_labware_definition(labware, lw_name)
-            save_definition(labware_def, location=path_to_save_defs)
+            try:
+                save_definition(labware_def, location=path_to_save_defs)
+            except jsonschema.exceptions.ValidationError:
+                validation_failure.append(lw_name)
+        else:
+            log.info(f"Skipping migration of {lw_name} because there are no",
+                     "wells associated with this labware.")
     log.info("Migration of API V1 labware complete.")
-    return True
+    return True, validation_failure
 
 
 @log_call(log)
