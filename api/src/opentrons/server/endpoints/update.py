@@ -49,8 +49,6 @@ async def update_module_firmware(request):
             loop=request.loop)
         log.info('Firmware update complete')
 
-    print(f'message: {message} \n')
-    print(f'status: {status} \n')
     res = {'filename': fw_filename, 'message': message}
     return web.json_response(res, status=status)
 
