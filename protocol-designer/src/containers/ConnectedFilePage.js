@@ -20,12 +20,14 @@ type SP = {|
   formValues: $PropertyType<Props, 'formValues'>,
   _initialDeckSetup: InitialDeckSetup,
   modulesEnabled: ?boolean,
+  modules: $PropertyType<Props, 'modules'>,
 |}
 
 const mapStateToProps = (state: BaseState): SP => {
   return {
     formValues: fileSelectors.getFileMetadata(state),
     instruments: stepFormSelectors.getPipettesForInstrumentGroup(state),
+    modules: stepFormSelectors.getModulesForEditModulesCard(state),
     _initialDeckSetup: stepFormSelectors.getInitialDeckSetup(state),
     modulesEnabled: featureFlagSelectors.getEnableModules(state),
   }

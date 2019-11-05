@@ -49,14 +49,8 @@ export type ModuleEntities = { [moduleId: string]: ModuleEntity }
 export type ModuleTemporalProperties = {| slot: DeckSlot |}
 export type ModuleOnDeck = {| ...ModuleEntity, ...ModuleTemporalProperties |}
 
-// TODO IMMEDIATELY: repace ModulesForEditModulesCard with ModuleOnDeck, oops!
-// They're the same except id instead of moduleId.
 export type ModulesForEditModulesCard = {
-  [type: ModuleType]: {
-    moduleId: string,
-    slot: DeckSlot,
-    model: string,
-  },
+  [type: ModuleType]: ?ModuleOnDeck,
 }
 
 // =========== LABWARE ========

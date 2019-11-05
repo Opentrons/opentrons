@@ -50,6 +50,7 @@ import type {
   LabwareEntities,
   ModuleOnDeck,
   ModuleEntities,
+  ModulesForEditModulesCard,
   PipetteEntities,
   PipetteOnDeck,
   FormPipettesByMount,
@@ -282,6 +283,29 @@ export const getPipettesForEditPipetteForm: Selector<FormPipettesByMount> = crea
       {
         left: { pipetteName: null, tiprackDefURI: null },
         right: { pipetteName: null, tiprackDefURI: null },
+      }
+    )
+)
+
+export const getModulesForEditModulesCard: Selector<ModulesForEditModulesCard> = createSelector(
+  getInitialDeckSetup,
+  initialDeckSetup =>
+    reduce(
+      initialDeckSetup.modules,
+      (
+        acc: ModulesForEditModulesCard,
+        moduleOnDeck: ModuleOnDeck,
+        id
+      ): ModulesForEditModulesCard => {
+        return {
+          ...acc,
+          [moduleOnDeck.type]: moduleOnDeck,
+        }
+      },
+      {
+        magdeck: null,
+        tempdeck: null,
+        thermocycler: null,
       }
     )
 )

@@ -10,12 +10,11 @@ import type { ModulesForEditModulesCard } from '../../step-forms'
 
 type Props = {
   modules: ModulesForEditModulesCard,
-  openEditModuleModal: (type: ModuleType, moduleId?: string) => mixed,
+  openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => mixed,
 }
 
 export default function EditModulesCard(props: Props) {
   const { modules, openEditModuleModal } = props
-
   return (
     <Card title="Modules">
       <div className={styles.modules_card_content}>
@@ -24,8 +23,8 @@ export default function EditModulesCard(props: Props) {
           if (moduleData) {
             return (
               <ModuleRow
-                {...moduleData}
                 type={moduleType}
+                module={moduleData}
                 key={i}
                 openEditModuleModal={openEditModuleModal}
               />

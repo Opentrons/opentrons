@@ -28,6 +28,7 @@ export type Props = {
   saveFileMetadata: FileMetadataFields => mixed,
   swapPipettes: () => mixed,
   modulesEnabled: ?boolean,
+  modules: ModulesForEditModulesCard,
 }
 
 type State = {
@@ -41,14 +42,6 @@ type State = {
 
 const DATE_ONLY_FORMAT = 'MMM DD, YYYY'
 const DATETIME_FORMAT = 'MMM DD, YYYY | h:mm A'
-
-const _mockModulesByType: ModulesForEditModulesCard = {
-  magdeck: {
-    moduleId: 'module1234',
-    slot: '1',
-    model: 'GEN1',
-  },
-}
 
 // TODO: Ian 2019-03-15 use i18n for labels
 class FilePage extends React.Component<Props, State> {
@@ -75,11 +68,11 @@ class FilePage extends React.Component<Props, State> {
   }
   closeEditPipetteModal = () => this.setState({ isEditPipetteModalOpen: false })
 
-  handleEditModule = (type: ModuleType, moduleId?: string) => {
+  handleEditModule = (moduleType: ModuleType, moduleId?: string) => {
     this.scrollToTop()
     this.setState({
       isEditModulesModalOpen: true,
-      currentModule: { moduleType: type, moduleId: moduleId },
+      currentModule: { moduleType: moduleType, moduleId: moduleId },
     })
   }
 
@@ -97,6 +90,7 @@ class FilePage extends React.Component<Props, State> {
       goToNextPage,
       saveFileMetadata,
       swapPipettes,
+      modules,
     } = this.props
 
     return (
@@ -211,7 +205,7 @@ class FilePage extends React.Component<Props, State> {
 
         {this.props.modulesEnabled && (
           <EditModulesCard
-            modules={_mockModulesByType}
+            modules={modules}
             openEditModuleModal={this.handleEditModule}
           />
         )}

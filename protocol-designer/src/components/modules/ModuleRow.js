@@ -1,36 +1,53 @@
 // @flow
 import * as React from 'react'
 import i18n from '../../localization'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { actions as stepFormActions } from '../../step-forms'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { LabeledValue, OutlineButton } from '@opentrons/components'
 import ModuleDiagram from './ModuleDiagram'
+import { SPAN7_8_10_11_SLOT } from '../../constants'
 import styles from './styles.css'
 
 import type { ModuleType } from '@opentrons/shared-data'
-import type { DeckSlot } from '../../types'
+import type { ModuleOnDeck } from '../../step-forms'
 
 type Props = {
-  moduleId?: string,
-  slot?: DeckSlot,
-  model?: string,
+  module?: ModuleOnDeck,
   type: ModuleType,
   openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => mixed,
 }
 
 export default function ModuleRow(props: Props) {
-  const { type, moduleId, slot, model, openEditModuleModal } = props
-  const setCurrentModule = (type: ModuleType, moduleId?: string) => () =>
-    openEditModuleModal(type, moduleId)
-  const addRemoveText = moduleId ? 'remove' : 'add'
-  const handleAddOrRemove = moduleId
-    ? () => console.log('remove ' + moduleId)
+  const { module, openEditModuleModal } = props
+  const type = module?.type || props.type
+
+  const model = module?.model
+  const slot = module?.slot
+
+  let slotDisplayName = null
+  if (slot) {
+    slotDisplayName = `Slot ${slot}`
+  }
+  if (slot === SPAN7_8_10_11_SLOT) {
+    slotDisplayName = 'Slot 7'
+  }
+
+  const setCurrentModule = (moduleType: ModuleType, moduleId?: string) => () =>
+    openEditModuleModal(moduleType, moduleId)
+
+  const addRemoveText = module ? 'remove' : 'add'
+
+  const dispatch = useDispatch()
+
+  const handleAddOrRemove = module
+    ? () => dispatch(stepFormActions.deleteModule(module.id))
     : setCurrentModule(type)
 
   const enableEditModules = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
-  const handleEditModule = setCurrentModule(type, moduleId)
+  const handleEditModule = module && setCurrentModule(type, module.id)
 
   return (
     <div>
@@ -45,10 +62,10 @@ export default function ModuleRow(props: Props) {
           {model && <LabeledValue label="Model" value={model} />}
         </div>
         <div className={styles.module_col}>
-          {slot && <LabeledValue label="Slot" value={`Slot ${slot}`} />}
+          {slot && <LabeledValue label="Slot" value={slotDisplayName} />}
         </div>
         <div className={styles.modules_button_group}>
-          {moduleId && (
+          {module && (
             <OutlineButton
               className={styles.module_button}
               onClick={handleEditModule}
