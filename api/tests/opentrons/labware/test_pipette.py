@@ -306,6 +306,7 @@ def test_retract(robot, instruments):
 
 
 @pytest.mark.api1_only
+@pytest.mark.xfail
 def test_aspirate_move_to(old_aspiration, robot, instruments):
     # TODO: it seems like this test is checking that the aspirate point is
     # TODO: *fully* at the bottom of the well, which isn't the expected

@@ -11,7 +11,7 @@ from typing import List, TYPE_CHECKING
 
 from opentrons.protocol_api.legacy_wrapper.containers_wrapper import (
     LW_TRANSLATION,
-    LW_NO_EQUIVALENT,
+    MODULE_BLACKLIST,
     perform_migration)
 
 from opentrons.config import pipette_config, CONFIG
@@ -170,10 +170,7 @@ class BCLabware:
         try:
             name = LW_TRANSLATION[container_name]
         except KeyError:
-            if container_name in LW_NO_EQUIVALENT:
-                raise NotImplementedError("Labware {} is not supported"
-                                          .format(container_name))
-            elif container_name in ('magdeck', 'tempdeck'):
+            if container_name in MODULE_BLACKLIST:
                 # TODO(mc, 2019-06-28): when modules BC implemented, change
                 # error type and message to point user to modules.load
                 raise NotImplementedError("Module load not yet implemented")
@@ -209,12 +206,16 @@ def build_globals(context: 'ProtocolContext'):
 
 def maybe_migrate_containers():
     result = False
+    if not os.environ.get('MIGRATE_V1_LABWARE'):
+        return result
+    if not os.path.exists(CONFIG['labware_database_file']):
+        return result
     if os.environ.get('MIGRATE_V1_LABWARE') and\
             os.path.exists(CONFIG['labware_database_file']):
         try:
             result, validation_failure = perform_migration()
-            log.debug("The following labwares failed labware migration",
-                      f"{validation_failure}")
+            log.warning("The following labwares failed labware migration",
+                        f"{validation_failure}")
         except (IndexError, ValueError, KeyError):
             delete_dir = CONFIG['labware_user_definitions_dir_v2']/'legacy_api'
             if os.path.exists(delete_dir):

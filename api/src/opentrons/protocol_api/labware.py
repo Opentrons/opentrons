@@ -1091,7 +1091,8 @@ def _get_standard_labware_definition(
     return labware_def
 
 
-def verify_definition(contents: Union[AnyStr, Dict]) -> LabwareDefinition:
+def verify_definition(contents: Union[AnyStr, LabwareDefinition])\
+        -> LabwareDefinition:
     """ Verify that an input string is a labware definition and return it.
 
     If the definition is invalid, an exception is raised; otherwise parse the
@@ -1101,19 +1102,19 @@ def verify_definition(contents: Union[AnyStr, Dict]) -> LabwareDefinition:
     :raises jsonschema.ValidationError: If the definition is not valid.
     :returns: The parsed definition
     """
-    if isinstance(contents, dict):
-        convert_dict = json.dumps(contents)
-        loaded = json.loads(convert_dict)
-    else:
-        loaded = json.loads(contents)
     schema_body = pkgutil.get_data(  # type: ignore
         'opentrons',
         'shared_data/labware/schemas/2.json').decode('utf-8')
     labware_schema_v2 = json.loads(schema_body)
-    # do the validation
 
-    jsonschema.validate(loaded, labware_schema_v2)
-    return loaded
+    if isinstance(contents, dict):
+        to_return = contents
+        jsonschema.validate(to_return, labware_schema_v2)
+
+    else:
+        to_return = json.loads(contents)
+        jsonschema.validate(to_return, labware_schema_v2)
+    return to_return
 
 
 def get_labware_definition(

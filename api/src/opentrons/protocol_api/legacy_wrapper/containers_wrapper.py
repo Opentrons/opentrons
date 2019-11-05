@@ -12,19 +12,6 @@ from .util import log_call
 
 log = logging.getLogger(__name__)
 
-
-LW_NO_EQUIVALENT = {'24-vial-rack', '48-vial-plate', '5ml-3x4',
-                    '96-well-plate-20mm', 'MALDI-plate',
-                    'T25-flask', 'T75-flask', 'e-gelgol',
-                    'hampton-1ml-deep-block', 'point',
-                    'rigaku-compact-crystallization-plate',
-                    'small_vial_rack_16x45', 'temperature-plate',
-                    'tiprack-10ul-H', 'trough-12row-short',
-                    'trough-1row-25ml', 'trough-1row-test',
-                    'tube-rack-2ml-9x9', 'tube-rack-5ml-96',
-                    'tube-rack-80well', 'wheaton_vial_rack'}
-""" Labwares that are no longer supported in this version """
-
 MODULE_BLACKLIST = ['tempdeck', 'magdeck', 'temperature-plate']
 
 LW_TRANSLATION = {
@@ -113,10 +100,14 @@ def _add_metadata_from_v1(
     }
 
 
+def _convert_labware_name(labware_name: str) -> str:
+    return labware_name.replace("-", "_").lower()
+
+
 def _format_labware_definition(labware_name: str, labware: Container = None):
     lw_dict: Dict[str, Any] = {}
     lw_dict['wells'] = {}
-    converted_labware_name = labware_name.replace("-", "_").lower()
+    converted_labware_name = _convert_labware_name(labware_name)
     is_tiprack = True if 'tip' in converted_labware_name else False
 
     # Definition Metadata
@@ -134,6 +125,8 @@ def _format_labware_definition(labware_name: str, labware: Container = None):
         'loadName': converted_labware_name,
         'isTiprack': is_tiprack}
 
+    # If this method is being called with a placeable labware,
+    # format metadata based off that labware info.
     if labware:
         _add_metadata_from_v1(labware, lw_dict, is_tiprack)
     return lw_dict
@@ -144,6 +137,7 @@ def _add_well(
         well_name: str,
         well_props: Dict[str, Any],
         well_coordinates):
+    # Format one API v2 well entry
     lw_dict['wells'][well_name] = {
         'x': well_coordinates['x'],
         'y': well_coordinates['y'],
@@ -160,6 +154,7 @@ def _add_well(
 
 
 def create_new_labware_definition(labware: Container, labware_name: str):
+    # shape metadata/parameter keys for labwares in v2 schema format
     lw_dict = _format_labware_definition(labware_name, labware)
     # Well Information
     for well in labware.wells():
@@ -175,6 +170,7 @@ def perform_migration():
     all_containers = filter(
         lambda lw: lw not in MODULE_BLACKLIST,
         db_cmds.list_all_containers())
+    # filter out all module and standard labwares from the database
     labware_to_create = filter(
         lambda x: x not in LW_TRANSLATION.keys(),
         all_containers)
@@ -182,12 +178,13 @@ def perform_migration():
     for lw_name in labware_to_create:
         labware = db_cmds.load_container(lw_name)
         if labware.wells():
-            log.debug(f"Migrating {lw_name} to API v2 format")
+            log.info(f"Migrating {lw_name} to API v2 format")
             labware_def = create_new_labware_definition(labware, lw_name)
             try:
                 save_definition(labware_def, location=path_to_save_defs)
             except jsonschema.exceptions.ValidationError:
                 validation_failure.append(lw_name)
+                print(f"validation failure on {lw_name}")
         else:
             log.info(f"Skipping migration of {lw_name} because there are no",
                      "wells associated with this labware.")
