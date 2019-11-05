@@ -5,7 +5,6 @@ from typing import (Any, Dict, Iterator, List,
                     Optional, Sequence, Set, Tuple, Union)
 from opentrons import types, hardware_control as hc, commands as cmds
 from opentrons.commands import CommandPublisher
-import opentrons.config.robot_configs as rc
 from opentrons.config import feature_flags as fflags
 from opentrons.hardware_control import adapters, modules
 from opentrons.hardware_control.simulator import Simulator
@@ -550,19 +549,6 @@ class ProtocolContext(CommandPublisher):
                 in self._instruments.items()
                 if instr}
 
-    def reset(self):
-        """ Reset the state of the context and the hardware.
-
-        For instance, this call will
-        - reset all cached knowledge about attached tips
-        - unload all labware
-        - unload all instruments
-        - clear all location and instrument caches
-
-        The only state that will be kept is the position of the robot.
-        """
-        raise NotImplementedError
-
     @cmds.publish.both(command=cmds.pause)
     @requires_version(2, 0)
     def pause(self, msg=None):
@@ -585,8 +571,10 @@ class ProtocolContext(CommandPublisher):
     @cmds.publish.both(command=cmds.comment)
     @requires_version(2, 0)
     def comment(self, msg):
-        """ Add a user-readable comment string that will be echoed to the
-        Opentrons app. """
+        """
+        Add a user-readable comment string that will be echoed to the Opentrons
+        app.
+        """
         pass
 
     @cmds.publish.both(command=cmds.delay)
@@ -601,27 +589,6 @@ class ProtocolContext(CommandPublisher):
         """
         delay_time = seconds + minutes * 60
         self._hw_manager.hardware.delay(delay_time)
-
-    @property  # type: ignore
-    @requires_version(2, 0)
-    def config(self) -> rc.robot_config:
-        """ Get the robot's configuration object.
-
-        :returns .robot_config: The loaded configuration.
-        """
-        return self._hw_manager.hardware.config
-
-    @requires_version(2, 0)
-    def update_config(self, **kwargs):
-        """ Update values of the robot's configuration.
-
-        `kwargs` should contain keys of the robot's configuration. For instace,
-        `update_config(name='Grace Hopper')` would change the name of the robot
-
-        Documentation on keys can be found in the documentation for
-        :py:class:`.robot_config`.
-        """
-        self._hw_manager.hardware.update_config(**kwargs)
 
     @requires_version(2, 0)
     def home(self):

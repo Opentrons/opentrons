@@ -70,7 +70,7 @@ class Robot():
         :func:`__init__` the same instance will be returned. There's
         only once instance of a robot.
         """
-        self.config = protocol_ctx.config
+        self.config = protocol_ctx._hw_manager.hardware.config
         self._ctx = protocol_ctx
         self._head_speed_override: Optional[float] = None
         self._plunger_max_speed_overrides: Dict[str, float] = {}
