@@ -7,14 +7,16 @@ from opentrons.data_storage import database as db_cmds
 from opentrons.protocol_api.labware import save_definition
 from opentrons.config import CONFIG
 from opentrons.legacy_api.containers.placeable import Container, Well
+import re
 
 from .util import log_call
 from opentrons import types
 from opentrons.config import CONFIG
 from opentrons.legacy_api.containers.placeable import Container, Well
-# from opentrons.protocol_api.labware_helpers import load
+from opentrons.protocol_api.labware_helpers import load_from_definition
 from opentrons.protocol_api import labware as lw
 # from opentrons.protocol_api.contexts import ProtocolContext
+from opentrons.types import Point, Location
 from typing import Any, Dict, List, Optional, Tuple, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -292,9 +294,10 @@ class Containers():
             lw_dict['ordering'].append([])
             for r in range(rows):
                 well_name = chr(r + ord('A')) + str(1 + c)
-                coordinates = (c * col_spacing,
-                               (rows - r - 1) * row_spacing,
-                               depth)
+                x_coord = c * col_spacing
+                y_coord = (rows - r - 1) * row_spacing
+                z_coord = depth
+
                 lw_dict['groups'][0]['wells'].append(well_name)
                 lw_dict['ordering'][-1].append(well_name)
                 lw_dict['wells'][well_name] = {
@@ -302,9 +305,9 @@ class Containers():
                      "shape": "circular",
                      "diameter": diameter,
                      "totalLiquidVolume": volume,
-                     "x": coordinates[0],
-                     "y": coordinates[1],
-                     "z": coordinates[2]
+                     "x": x_coord,
+                     "y": y_coord,
+                     "z": z_coord
                      }
 
         lw_dict['cornerOffsetFromSlot'] = {'x': 0, 'y': 0, 'z': 0}
@@ -317,14 +320,9 @@ class Containers():
         path_to_save_defs = CONFIG['labware_user_definitions_dir_v2']
         lw.save_definition(lw_dict, location=path_to_save_defs)
 
-        # return load(name,
-        #             label: str = None,
-        #             namespace: str = None,
-        #             version: int = 1,
-        #             bundled_defs: Dict[str, LabwareDefinition] = None,
-        #             extra_defs: Dict[str, LabwareDefinition] = None)
-
-
+        return load_from_definition(labware_name,
+                                    Location(Point(0, 0, 0), 'deck'),
+                                    legacy=True)
 
 
 def _format_labware_definition(labware_name: str, labware: Container = None):
@@ -354,34 +352,49 @@ def _format_labware_definition(labware_name: str, labware: Container = None):
     return lw_dict, converted_labware_name, is_tiprack
 
 
-def _add_well(
-        lw_dict: Dict[str, Any],
-        well_name: str,
-        well_props: Dict[str, Any],
-        well_coordinates):
-    lw_dict['wells'][well_name] = {
-        'x': well_coordinates['x'],
-        'y': well_coordinates['y'],
-        'z': well_coordinates['z'],
-        'totalLiquidVolume': well_props.get('total-liquid-volume', 0),
-        'depth': well_props.get('depth', 0)}
-    if well_props.get('diameter'):
-        lw_dict['wells'][well_name]['diameter'] = well_props.get('diameter')
-        lw_dict['wells'][well_name]['shape'] = 'circular'
-    else:
-        lw_dict['wells'][well_name]['xDimension'] = well_props.get('length')
-        lw_dict['wells'][well_name]['yDimension'] = well_props.get('width')
-        lw_dict['wells'][well_name]['shape'] = 'rectangular'
+# class LegacyLabware(lw.Labware):
+#     def __init__(self, definition: dict,
+#                  parent: types.Location, label: str = None) -> None:
+#         super().__init__(definition, parent)
+#         self._wells_by_index = super().wells()
+#         self._wells_by_name = super().wells_by_name()
+#         self._columns = super().columns()
+#         self._rows = super().rows()
+#         self._properties = {
+#             'length': self.dimensions['xDimension'],
+#             'width': self.dimensions['yDimension'],
+#             'height': self.dimensions['zDimension'],
+#             'type': self.display_name,
+#             'magdeck_engage_height': self.magdeck_engage_height
+#             }
 
+class LegacyLabware:
+    def __init__(
+            self, definition: dict,
+            parent: lw.Location, label: str = None) -> None:
+        if label:
+            dn = label
+        else:
+            dn = definition['metadata']['displayName']
+        self._display_name = f"{dn} on {parent.labware}"
+        self._calibrated_offset: Point = Point(0, 0, 0)
+        self._wells: List[Well] = []
 
-class LegacyLabware(lw.Labware):
-    def __init__(self, definition: dict,
-                 parent: types.Location, label: str = None) -> None:
-        super().__init__(definition, parent)
-        self._wells_by_index = super().wells()
-        self._wells_by_name = super().wells_by_name()
-        self._columns = super().columns()
-        self._rows = super().rows()
+        self._well_definition = definition['wells']
+        self._paraemters = definition['parameters']
+        offset = definition['cornerOffsetFromSlot']
+        self._dimension = definition['dimensions']
+        self._ordering = [well
+                          for col in definition['ordering']
+                          for well in col]
+        self._offset = \
+            Point(offset['x'], offset['y'], offset['z'] + parent.point)
+        self._parent = parent.labware
+        # Applied properties
+        self.set_calibration(self._calibrated_offset)
+
+        self._pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
+        self._definition = definition
         self._properties = {
             'length': self.dimensions['xDimension'],
             'width': self.dimensions['yDimension'],
@@ -389,6 +402,10 @@ class LegacyLabware(lw.Labware):
             'type': self.display_name,
             'magdeck_engage_height': self.magdeck_engage_height
             }
+
+    @property
+    def properties(self) -> Dict:
+        return self._properties
 
     def get_index_by_name(self, name):
         """
@@ -442,10 +459,6 @@ class LegacyLabware(lw.Labware):
             return new_wells[0]
         else:
             return new_wells
-
-    @property
-    def properties(self) -> Dict:
-        return self._properties
 
     def get_well_by_type(
             self,
@@ -502,6 +515,6 @@ class LegacyLabware(lw.Labware):
 
     def rows(self, *args):
         if len(args) == 1:
-            return super().rows(args)[0]
+            return super().rows(*args)[0]
         else:
-            return super().rows(args)
+            return super().rows(*args)
