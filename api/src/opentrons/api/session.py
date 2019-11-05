@@ -452,6 +452,7 @@ class Session(object):
             payload = {
                 'state': self.state,
                 'startTime': self.startTime,
+                'errors': self.errors,
                 'lastCommand': last_command
             }
         return {
