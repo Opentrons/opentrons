@@ -17,7 +17,6 @@ type MixStepArgs = MixArgs
 const mixFormToArgs = (
   hydratedFormData: HydratedMixFormDataLegacy
 ): MixStepArgs => {
-  console.log('mixFormToArgs', { hydratedFormData })
   const { labware, pipette } = hydratedFormData
 
   let unorderedWells = hydratedFormData.wells || []
