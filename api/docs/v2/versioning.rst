@@ -60,7 +60,7 @@ The version you specify determines the features and behaviors available to your 
 
 would cause an error, because the ``units`` argument is not present in API version 2.0. This protects you from accidentally using features not present in your specified API version, and keeps your protocol portable between API versions.
 
-In general, you should closely consider what features you need in your protocol, and keep your specified API level as low as possible. This makes your protocol work on more robot software versions.
+In general, you should closely consider what features you need in your protocol, and keep your specified API level as low as possible. This makes your protocol work on a wider range of robot software versions.
 
 
 Determining What Version Is Available
