@@ -281,7 +281,7 @@ class Containers():
         col_spacing, row_spacing = spacing
 
         lw_dict, labware_name, is_tiprack = \
-            _format_labware_definition(name, labware=None)
+            _format_labware_definition(name)
 
         if is_tiprack:
             lw_dict['parameters']['tipLength'] = depth
