@@ -948,7 +948,7 @@ class SmoothieDriver_3_0_0:
             # is locking at a higher level like in APIv2.
             self._reset_from_error()
             error_axis = se.ret_code.strip()[-1]
-            log.warning(
+            log.debug(
                     f"alarm/error: command={command}, resp={se.ret_code}")
             if GCODES['MOVE'] in command or GCODES['PROBE'] in command:
                 if error_axis not in 'XYZABC':
