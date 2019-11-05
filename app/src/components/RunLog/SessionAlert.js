@@ -1,6 +1,8 @@
 // @flow
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { AlertItem } from '@opentrons/components'
+import { getSessionError } from '../../robot/selectors'
 import type { SessionStatus } from '../../robot'
 
 type Props = {
@@ -11,6 +13,7 @@ type Props = {
 
 export default function SessionAlert(props: Props) {
   const { sessionStatus, className, onResetClick } = props
+  const sessionError = useSelector(getSessionError)
 
   switch (sessionStatus) {
     case 'finished':
@@ -63,7 +66,9 @@ export default function SessionAlert(props: Props) {
               resolving this issue.
             </p>
           }
-        />
+        >
+          {sessionError !== null && <p>{sessionError}</p>}
+        </AlertItem>
       )
 
     default:

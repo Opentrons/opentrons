@@ -409,6 +409,15 @@ export default function client(dispatch) {
       clearRunTimerInterval()
     }
 
+    // both light and full updates may have the errors list
+    if (apiSession.errors) {
+      update.errors = apiSession.errors.map(e => ({
+        timestamp: e.timestamp,
+        message: e.error.message,
+        line: e.error.line,
+      }))
+    }
+
     // if lastCommand key is present, we're dealing with a light update
     if ('lastCommand' in apiSession) {
       const lastCommand = apiSession.lastCommand && {
