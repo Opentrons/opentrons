@@ -1,8 +1,7 @@
 import asyncio
 import logging
 import os
-import pkgutil
-import tempfile
+import sys
 from typing import Any, Dict, Optional, Tuple
 
 from .mod_abc import UploadFunction
@@ -83,21 +82,17 @@ async def upload_firmware(port: str,
 async def upload_via_avrdude(port: str,
                              firmware_file_path: str,
                              kwargs: Dict[str, Any]) -> Tuple[bool, str]:
-    config_file = pkgutil.get_data('opentrons',
-                                   'config/modules/avrdude.conf')
-    assert config_file, 'Could not get avrdude config file'
-    with tempfile.TemporaryDirectory() as config_dir:
-        config_file_path = os.path.join(config_dir, 'avrdude.conf')
-        with open(config_file_path, 'wb') as cf:
-            cf.write(config_file)
-        proc = await asyncio.create_subprocess_exec(
-            'avrdude', '-C{}'.format(config_file_path), '-v',
-            '-p{}'.format(PART_NO),
-            '-c{}'.format(PROGRAMMER_ID),
-            '-P{}'.format(port),
-            '-b{}'.format(BAUDRATE), '-D',
-            '-Uflash:w:{}:i'.format(firmware_file_path),
-            **kwargs)
+    config_file_path = os.path.join(
+        os.path.dirname(sys.modules['opentrons'].__file__),
+        'config', 'modules', 'avrdude.conf')
+    proc = await asyncio.create_subprocess_exec(
+        'avrdude', '-C{}'.format(config_file_path), '-v',
+        '-p{}'.format(PART_NO),
+        '-c{}'.format(PROGRAMMER_ID),
+        '-P{}'.format(port),
+        '-b{}'.format(BAUDRATE), '-D',
+        '-Uflash:w:{}:i'.format(firmware_file_path),
+        **kwargs)
     await proc.wait()
 
     _result = await proc.communicate()
