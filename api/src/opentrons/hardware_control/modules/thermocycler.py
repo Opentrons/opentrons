@@ -1,5 +1,5 @@
 import asyncio
-from . import mod_abc, types, update
+from . import types, update, mod_abc
 from typing import Union, Optional, List, Callable
 from opentrons.drivers.thermocycler.driver import (
     Thermocycler as ThermocyclerDriver)

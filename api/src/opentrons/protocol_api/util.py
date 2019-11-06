@@ -1,8 +1,9 @@
 """ Utility functions and classes for the protocol api """
 from collections import UserDict
 import logging
-from typing import Any, Optional, TYPE_CHECKING, Union
+from typing import Any, Callable, Optional, TYPE_CHECKING, TypeVar, Union
 
+from opentrons.protocols.types import APIVersion
 from opentrons.hardware_control import types, adapters, API, HardwareAPILike
 
 if TYPE_CHECKING:
@@ -233,3 +234,19 @@ def clamp_value(
             f'{log_tag} calmped input {input_value} to {min_value}')
         return min_value
     return input_value
+
+
+DecoratedObj = TypeVar('DecoratedObj')
+
+
+def requires_version(
+        major: int, minor: int) -> Callable[[DecoratedObj], DecoratedObj]:
+    """ Decorator. Apply to Protocol API methods or attributes to indicate
+    the first version in which the method or attribute was present.
+    """
+    def _set_version(decorated_obj: DecoratedObj) -> DecoratedObj:
+        setattr(decorated_obj, '__opentrons_version_added',
+                APIVersion(major, minor))
+        return decorated_obj
+
+    return _set_version

@@ -27,6 +27,8 @@ from opentrons.types import Location
 from opentrons.types import Point
 from opentrons.config import CONFIG
 
+from .util import requires_version
+
 MODULE_LOG = logging.getLogger(__name__)
 
 # TODO: Ian 2019-05-23 where to store these constants?
@@ -54,6 +56,7 @@ well_shapes = {
 }
 
 
+@requires_version(2, 0)
 class Well:
     """
     The Well class represents a  single well in a :py:class:`Labware`
@@ -106,11 +109,13 @@ class Well:
         self.max_volume = well_props['totalLiquidVolume']
         self._depth = well_props['depth']
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def parent(self) -> 'Labware':
         return self._parent  # type: ignore
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def has_tip(self) -> bool:
         return self._has_tip
 
@@ -118,10 +123,12 @@ class Well:
     def has_tip(self, value: bool):
         self._has_tip = value
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def diameter(self) -> Optional[float]:
         return self._diameter
 
+    @requires_version(2, 0)
     def top(self, z: float = 0.0) -> Location:
         """
         :param z: the z distance in mm
@@ -132,6 +139,7 @@ class Well:
         """
         return Location(self._position + Point(0, 0, z), self)
 
+    @requires_version(2, 0)
     def bottom(self, z: float = 0.0) -> Location:
         """
         :param z: the z distance in mm
@@ -144,6 +152,7 @@ class Well:
         bottom_z = top.point.z - self._depth + z
         return Location(Point(x=top.point.x, y=top.point.y, z=bottom_z), self)
 
+    @requires_version(2, 0)
     def center(self) -> Location:
         """
         :return: a Point corresponding to the absolute position of the center
@@ -205,6 +214,7 @@ class Well:
         return hash(self.top().point)
 
 
+@requires_version(2, 0)
 class Labware:
     """
     This class represents a labware, such as a PCR plate, a tube rack, trough,
@@ -278,7 +288,8 @@ class Labware:
     def __getitem__(self, key: str) -> Well:
         return self.wells_by_name()[key]
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def uri(self) -> str:
         """ A string fully identifying the labware.
 
@@ -286,28 +297,33 @@ class Labware:
         """
         return uri_from_definition(self._definition)
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def parent(self) -> Union['Labware', 'Well', str, 'ModuleGeometry', None]:
         """ The parent of this labware. Usually a slot name.
         """
         return self._parent
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def name(self) -> str:
         """ The canonical name of the labware, which is used to load it """
         return self._definition['parameters']['loadName']
 
-    @property
-    def parameters(self) -> dict:
+    @property  # type: ignore
+    @requires_version(2, 0)
+    def parameters(self) -> Dict[str, Any]:
         """Internal properties of a labware including type and quirks"""
         return self._parameters
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def quirks(self) -> List[str]:
         """ Quirks specific to this labware. """
         return self.parameters.get('quirks', [])
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def magdeck_engage_height(self) -> Optional[float]:
         if not self._parameters['isMagneticModuleCompatible']:
             return None
@@ -351,10 +367,12 @@ class Labware:
                                         z=self._offset.z + delta.z)
         self._wells = self._build_wells()
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def calibrated_offset(self) -> Point:
         return self._calibrated_offset
 
+    @requires_version(2, 0)
     def well(self, idx) -> Well:
         """Deprecated---use result of `wells` or `wells_by_name`"""
         if isinstance(idx, int):
@@ -365,6 +383,7 @@ class Labware:
             res = NotImplemented
         return res
 
+    @requires_version(2, 0)
     def wells(self, *args) -> List[Well]:
         """
         Accessor function used to generate a list of wells in top -> down,
@@ -392,6 +411,7 @@ class Labware:
             raise TypeError
         return res
 
+    @requires_version(2, 0)
     def wells_by_name(self) -> Dict[str, Well]:
         """
         Accessor function used to create a look-up table of Wells by name.
@@ -405,12 +425,14 @@ class Labware:
         return {well: wellObj
                 for well, wellObj in zip(self._ordering, self._wells)}
 
+    @requires_version(2, 0)
     def wells_by_index(self) -> Dict[str, Well]:
         MODULE_LOG.warning(
             'wells_by_index is deprecated and will be deleted in version '
             '3.12.0. please wells_by_name or dict access')
         return self.wells_by_name()
 
+    @requires_version(2, 0)
     def rows(self, *args) -> List[List[Well]]:
         """
         Accessor function used to navigate through a labware by row.
@@ -440,6 +462,7 @@ class Labware:
             raise TypeError
         return res
 
+    @requires_version(2, 0)
     def rows_by_name(self) -> Dict[str, List[Well]]:
         """
         Accessor function used to navigate through a labware by row name.
@@ -453,12 +476,14 @@ class Labware:
         row_dict = self._create_indexed_dictionary(group=1)
         return row_dict
 
+    @requires_version(2, 0)
     def rows_by_index(self) -> Dict[str, List[Well]]:
         MODULE_LOG.warning(
             'rows_by_index is deprecated and will be deleted in version '
             '3.12.0. please use rows_by_name')
         return self.rows_by_name()
 
+    @requires_version(2, 0)
     def columns(self, *args) -> List[List[Well]]:
         """
         Accessor function used to navigate through a labware by column.
@@ -489,6 +514,7 @@ class Labware:
             raise TypeError
         return res
 
+    @requires_version(2, 0)
     def columns_by_name(self) -> Dict[str, List[Well]]:
         """
         Accessor function used to navigate through a labware by column name.
@@ -503,13 +529,15 @@ class Labware:
         col_dict = self._create_indexed_dictionary(group=2)
         return col_dict
 
+    @requires_version(2, 0)
     def columns_by_index(self) -> Dict[str, List[Well]]:
         MODULE_LOG.warning(
             'columns_by_index is deprecated and will be deleted in version '
             '3.12.0. please use columns_by_name')
         return self.columns_by_name()
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def highest_z(self) -> float:
         """
         The z-coordinate of the tallest single point anywhere on the labware.
@@ -519,11 +547,13 @@ class Labware:
         """
         return self._dimensions['zDimension'] + self._calibrated_offset.z
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def is_tiprack(self) -> bool:
         return self._parameters['isTiprack']
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def tip_length(self) -> float:
         return self._parameters['tipLength']
 
@@ -681,6 +711,7 @@ class Labware:
         for well in drop_targets:
             well.has_tip = True
 
+    @requires_version(2, 0)
     def reset(self):
         """Reset all tips in a tiprack
         """
