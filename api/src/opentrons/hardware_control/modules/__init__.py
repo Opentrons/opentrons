@@ -3,6 +3,7 @@ import logging
 import os
 import re
 from typing import List, Optional, Tuple
+from collections import namedtuple
 
 from opentrons.config import IS_ROBOT
 from .mod_abc import AbstractModule
@@ -11,6 +12,8 @@ from .mod_abc import AbstractModule
 from . import update, tempdeck, magdeck, thermocycler  # noqa(W0611)
 
 log = logging.getLogger(__name__)
+
+ModuleAtPort = namedtuple('ModuleAtPort', ('absolute_port', 'name'))
 
 
 class UnsupportedModuleError(Exception):
@@ -38,8 +41,22 @@ async def build(
         port, interrupt_callback=interrupt_callback, simulating=simulating)
 
 
-def discover() -> List[Tuple[str, str]]:
-    """ Scan for connected modules and instantiate handler classes
+def get_module_at_port(port: str) -> Optional[ModuleAtPort]:
+    """ Given a port, returns either a ModuleAtPort
+        if it is a recognized module, or None if not recognized.
+    """
+    module_port_regex = re.compile('|'.join(MODULE_TYPES.keys()), re.I)
+    match = module_port_regex.search(port)
+    log.debug(f'\n\n\nGET MODULE AT PORT: {match}, port: {port}\n\n\n')
+    if match:
+        name = match.group().lower()
+        return ModuleAtPort(absolute_port=f'/dev/modules/{port}', name=name)
+    return None
+
+
+def discover() -> List[ModuleAtPort]:
+    """ Scan for connected modules and return list of
+        tuples of serial ports and device names
     """
     if IS_ROBOT and os.path.isdir('/dev/modules'):
         devices = os.listdir('/dev/modules')
@@ -57,8 +74,9 @@ def discover() -> List[Tuple[str, str]]:
                 log.warning("Unexpected module connected: {} on {}"
                             .format(name, port))
                 continue
-            absolute_port = '/dev/modules/{}'.format(port)
-            discovered_modules.append((absolute_port, name))
+            new_mod = ModuleAtPort(absolute_port=f'/dev/modules/{port}',
+                                   name=name)
+            discovered_modules.append(new_mod)
     log.debug('Discovered modules: {}'.format(discovered_modules))
 
     return discovered_modules

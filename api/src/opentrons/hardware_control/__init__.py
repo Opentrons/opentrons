@@ -22,11 +22,7 @@ from opentrons.util import linal
 from .simulator import Simulator
 from opentrons.config import robot_configs, pipette_config
 from .pipette import Pipette
-try:
-    from .controller import Controller
-except ModuleNotFoundError:
-    # implies windows
-    Controller = None  # type: ignore
+from .controller import Controller
 from . import modules
 from .types import Axis, HardwareAPILike, CriticalPoint
 
@@ -128,14 +124,15 @@ class API(HardwareAPILike):
         :param loop: An event loop to use. If not specified, use the result of
                      :py:meth:`asyncio.get_event_loop`.
         """
-        if None is Controller:
-            raise RuntimeError(
-                'The hardware controller may only be instantiated on a robot')
         checked_loop = loop or asyncio.get_event_loop()
         backend = Controller(config)
         await backend.connect(port)
-        checked_loop.create_task(backend.watch_modules(checked_loop))
-        return cls(backend, config=config, loop=checked_loop)
+        instance = cls(backend, config=config, loop=checked_loop)
+        await checked_loop.create_task(backend.watch_modules(
+                loop=checked_loop,
+                update_attached_modules=instance._update_attached_modules,
+                ))
+        return instance
 
     @classmethod
     def build_hardware_simulator(
@@ -400,7 +397,7 @@ class API(HardwareAPILike):
                                                    explicit_modeset)
 
     def _call_on_attached_modules(self, method):
-        for module in self.attached_modules.values():
+        for module in self.attached_modules:
             maybe_module_method = getattr(module, method, None)
             if callable(maybe_module_method):
                 maybe_module_method()
@@ -1353,24 +1350,41 @@ class API(HardwareAPILike):
                 'blow_out_flow_rate',
                 self._plunger_flowrate(this_pipette, blow_out, 'dispense'))
 
-    @_log_call
-    async def discover_modules(self):
-        discovered = {port + model: (port, model)
-                      for port, model in self._backend.get_attached_modules()}
-        these = set(discovered.keys())
-        known = set(self._attached_modules.keys())
-        new = these - known
-        gone = known - these
-        for mod in gone:
-            self._attached_modules.pop(mod)
-            self._log.info(f"Module {mod} disconnected")
-        for mod in new:
-            self._attached_modules[mod]\
-                = await self._backend.build_module(discovered[mod][0],
-                                                   discovered[mod][1],
-                                                   self.pause_with_message)
-            self._log.info(f"Module {mod} discovered and attached")
-        return list(self._attached_modules.values())
+    async def _update_attached_modules(self,
+                                       new_modules = [],
+                                       removed_modules = []):
+        for absolute_port, name in removed_modules:
+            self._attached_modules = [mod for mod in self._attached_modules
+                                      if mod.port != absolute_port]
+            self._log.info(f"Module {name} disconnected " \
+                           f" from port {absolute_port}")
+
+        for absolute_port, name in new_modules:
+            new_instance = await self._backend.build_module(absolute_port,
+                    name,
+                    self.pause_with_message)
+            self._attached_modules.append(new_instance)
+            self._log.info(f"Module {name} discovered and attached " \
+                           f" at port {absolute_port}")
+
+    # @_log_call
+    # async def discover_modules(self):
+    #     discovered = {port + model: (port, model)
+    #                   for port, model in self._backend.get_attached_modules()}
+    #     these = set(discovered.keys())
+    #     known = set(self._attached_modules.keys())
+    #     new = these - known
+    #     gone = known - these
+    #     for mod in gone:
+    #         self._attached_modules.pop(mod)
+    #         self._log.info(f"Module {mod} disconnected")
+    #     for mod in new:
+    #         self._attached_modules[mod]\
+    #             = await self._backend.build_module(discovered[mod][0],
+    #                                                discovered[mod][1],
+    #                                                self.pause_with_message)
+    #         self._log.info(f"Module {mod} discovered and attached")
+    #     return list(self._attached_modules)
 
     @_log_call
     async def update_module(
@@ -1382,16 +1396,12 @@ class API(HardwareAPILike):
         Returns (ok, message) where ok is True if the update succeeded and
         message is a human readable message.
         """
-        details = (module.port, module.name())
-        mod = self._attached_modules.pop(details[0] + details[1])
         try:
             new_mod = await self._backend.update_module(
                 mod, firmware_file, loop)
         except modules.UpdateError as e:
             return False, e.msg
         else:
-            new_details = new_mod.port + new_mod.device_info['model']
-            self._attached_modules[new_details] = new_mod
             return True, 'firmware update successful'
 
     async def _do_tp(self, pip, mount) -> top_types.Point:

@@ -85,7 +85,7 @@ class Simulator:
         self._config = config
         self._loop = loop
         self._attached_instruments = attached_instruments
-        self._attached_modules = [('mod' + str(idx), mod)
+        self._attached_modules = [ModuleAtPort(absolute_port=f'mod{str(idx)}', name=mod)
                                   for idx, mod
                                   in enumerate(attached_modules)]
         self._position = copy.copy(_HOME_POSITION)
@@ -194,7 +194,7 @@ class Simulator:
     def set_active_current(self, axis, amp):
         pass
 
-    def get_attached_modules(self) -> List[Tuple[str, str]]:
+    def get_attached_modules(self) -> List[modules.ModuleAtPort]:
         return self._attached_modules
 
     async def watch_modules(self, loop: asyncio.AbstractEventLoop):

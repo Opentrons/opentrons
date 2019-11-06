@@ -115,31 +115,41 @@ class Controller:
     def set_pipette_speed(self, val: float):
         self._smoothie_driver.set_speed(val)
 
-    def get_attached_modules(self) -> List[Tuple[str, str]]:
+    def get_attached_modules(self) -> List[modules.ModuleAtPort]:
         return modules.discover()
 
-    async def watch_modules(self, loop: asyncio.AbstractEventLoop):
+    async def watch_modules(self, loop: asyncio.AbstractEventLoop, update_attached_modules):
         await self._module_watcher.setup(loop)
-        while not self._module_watcher.closed():
+        update_attached_modules(new_modules=modules.discover())
+        while not self._module_watcher.closed:
             event = await self._module_watcher.get_event()
-            MODULE_LOG.warning(f'EVENT CAUGHT: {event}')
+            MODULE_LOG.info(f'\n\nEVENT CAUGHT: {event}\n\n')
+            flags = aionotify.Flags.parse(event.flags)
+            MODULE_LOG.info(f'\n\nFLAGS: {flags}\n\n')
+            maybe_module_at_port = modules.get_module_at_port(event.name)
+            if maybe_module_at_port is not None and aionotify.Flags.DELETE in flags:
+                update_attached_modules(removed_modules=[maybe_module_at_port])
+                MODULE_LOG.info(f'Module Removed: {maybe_module_at_port}')
+            if maybe_module_at_port is not None and aionotify.Flags.CREATE in flags:
+                update_attached_modules(new_modules=[maybe_module_at_port])
+                MODULE_LOG.info(f'Module Added: {maybe_module_at_port}')
 
-            # discovered = {port + model: (port, model)
-            #             for port, model in self._backend.get_attached_modules()}
-            # these = set(discovered.keys())
-            # known = set(self._attached_modules.keys())
-            # new = these - known
-            # gone = known - these
-            # for mod in gone:
-            #     self._attached_modules.pop(mod)
-            #     self._log.info(f"Module {mod} disconnected")
-            # for mod in new:
-            #     self._attached_modules[mod]\
-            #         = await self._backend.build_module(discovered[mod][0],
-            #                                         discovered[mod][1],
-            #                                         self.pause_with_message)
-            #     self._log.info(f"Module {mod} discovered and attached")
-            # return list(self._attached_modules.values())
+                # discovered = {port + model: (port, model)
+                #             for port, model in self._backend.get_attached_modules()}
+                # these = set(discovered.keys())
+                # known = set(self._attached_modules.keys())
+                # new = these - known
+                # gone = known - these
+                # for mod in gone:
+                #     self._attached_modules.pop(mod)
+                #     self._log.info(f"Module {mod} disconnected")
+                # for mod in new:
+                #     self._attached_modules[mod]\
+                #         = await self._backend.build_module(discovered[mod][0],
+                #                                         discovered[mod][1],
+                #                                         self.pause_with_message)
+                #     self._log.info(f"Module {mod} discovered and attached")
+                # return list(self._attached_modules.values())
 
     async def build_module(self,
                            port: str,
