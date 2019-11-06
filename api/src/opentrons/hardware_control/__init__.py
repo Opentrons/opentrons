@@ -98,7 +98,7 @@ class API(HardwareAPILike):
             top_types.Mount.LEFT: None,
             top_types.Mount.RIGHT: None
         }
-        self._attached_modules: Dict[str, Any] = {}
+        self._attached_modules: List[Any] = []
         self._last_moved_mount: Optional[top_types.Mount] = None
         # The motion lock synchronizes calls to long-running physical tasks
         # involved in motion. This fixes issue where for instance a move()
