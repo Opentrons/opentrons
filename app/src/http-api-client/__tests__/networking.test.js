@@ -22,13 +22,15 @@ describe('networking', () => {
           api: {
             api: {
               someName: {
-                'networking/status': { response: { status: 'full' } },
+                'networking/status': {
+                  response: { status: 'full', interfaces: {} },
+                },
               },
             },
           },
         },
         props: { name: 'someName' },
-        expected: { response: { status: 'full' } },
+        expected: { response: { status: 'full', interfaces: {} } },
       },
       {
         name: 'makeGetRobotWifiList',
