@@ -1,14 +1,20 @@
 // @flow
 import assert from 'assert'
 import reduce from 'lodash/reduce'
+import values from 'lodash/values'
 import { getPipetteNameSpecs, type DeckSlotId } from '@opentrons/shared-data'
+import { SPAN7_8_10_11_SLOT } from '../constants'
 import type { LabwareDefByDefURI } from '../labware-defs'
 import type {
   NormalizedPipette,
   NormalizedPipetteById,
   PipetteEntity,
   PipetteEntities,
+  InitialDeckSetup,
+  ModuleOnDeck,
+  LabwareOnDeck as LabwareOnDeckType,
 } from './types'
+import type { DeckSlot } from '../types'
 
 export function getIdsInRange<T: string | number>(
   orderedIds: Array<T>,
@@ -70,5 +76,37 @@ export function denormalizePipetteEntities(
       return { ...acc, [pipetteId]: pipetteEntity }
     },
     {}
+  )
+}
+
+export const getSlotsBlockedBySpanning = (
+  initialDeckSetup: InitialDeckSetup
+): Array<DeckSlot> => {
+  // NOTE: Ian 2019-10-25 dumb heuristic since there's only one case this can happen now
+  if (
+    values(initialDeckSetup.modules).some(
+      (module: ModuleOnDeck) =>
+        module.type === 'thermocycler' && module.slot === SPAN7_8_10_11_SLOT
+    )
+  ) {
+    return ['7', '8', '10', '11']
+  }
+  return []
+}
+
+export const getSlotIsEmpty = (
+  initialDeckSetup: InitialDeckSetup,
+  slot: string
+): boolean => {
+  // NOTE: should work for both deck slots and module slots
+  return (
+    [
+      ...values(initialDeckSetup.modules).filter(
+        (module: ModuleOnDeck) => module.slot === slot
+      ),
+      ...values(initialDeckSetup.labware).filter(
+        (labware: LabwareOnDeckType) => labware.slot === slot
+      ),
+    ].length === 0
   )
 }

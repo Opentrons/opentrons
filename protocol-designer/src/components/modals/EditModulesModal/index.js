@@ -2,10 +2,11 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { useSelector, useDispatch } from 'react-redux'
-import values from 'lodash/values'
 import {
   selectors as stepFormSelectors,
   actions as stepFormActions,
+  getSlotIsEmpty,
+  getSlotsBlockedBySpanning,
 } from '../../../step-forms'
 import { moveDeckItem } from '../../../labware-ingred/actions'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
@@ -27,11 +28,7 @@ import styles from './EditModules.css'
 import modalStyles from '../modal.css'
 
 import type { ModuleType } from '@opentrons/shared-data'
-import type {
-  InitialDeckSetup,
-  LabwareOnDeck as LabwareOnDeckType,
-  ModuleOnDeck,
-} from '../../../step-forms'
+
 type EditModulesProps = {
   moduleType: ModuleType,
   moduleId: ?string,
@@ -56,30 +53,13 @@ export default function EditModulesModal(props: EditModulesProps) {
     (module && module.model) || 'GEN1'
   )
 
-  const getSlotIsEmpty = (
-    initialDeckSetup: InitialDeckSetup,
-    slot: string,
-    moduleType: ModuleType
-  ): boolean => {
-    // NOTE: should work for both deck slots and module slots
-    return (
-      [
-        ...values(initialDeckSetup.modules).filter(
-          (module: ModuleOnDeck) =>
-            module.type !== moduleType && module.slot === slot
-        ),
-        ...values(initialDeckSetup.labware).filter(
-          (labware: LabwareOnDeckType) => labware.slot === slot
-        ),
-      ].length === 0
-    )
-  }
+  const slotsBlockedBySpanning = getSlotsBlockedBySpanning(_initialDeckSetup)
+  const previousModuleSlot = module && module.slot
+  const slotIsEmpty =
+    !slotsBlockedBySpanning.includes(selectedSlot) &&
+    (getSlotIsEmpty(_initialDeckSetup, selectedSlot) ||
+      previousModuleSlot === selectedSlot)
 
-  const slotIsEmpty = getSlotIsEmpty(
-    _initialDeckSetup,
-    selectedSlot,
-    moduleType
-  )
   const dispatch = useDispatch()
 
   const handleSlotChange = (e: SyntheticInputEvent<*>) =>
