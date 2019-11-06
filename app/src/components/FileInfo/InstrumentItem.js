@@ -4,14 +4,14 @@ import { Icon } from '@opentrons/components'
 import styles from './styles.css'
 import type { PipetteCompatibility } from './useInstrumentMountInfo'
 
-type Props = {
+type Props = {|
   compatibility?: PipetteCompatibility,
   mount?: string,
   children: React.Node,
   hidden?: boolean,
-}
+|}
 
-export default function ModuleItem(props: Props) {
+export default function InstrumentItem(props: Props) {
   if (props.hidden) return null
   return (
     <div className={styles.instrument_item}>
@@ -26,7 +26,7 @@ export default function ModuleItem(props: Props) {
   )
 }
 
-function StatusIcon(props: { match: boolean }) {
+function StatusIcon(props: {| match: boolean |}) {
   const { match } = props
 
   const iconName = match ? 'check-circle' : 'checkbox-blank-circle-outline'

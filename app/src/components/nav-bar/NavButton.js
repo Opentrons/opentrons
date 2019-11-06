@@ -23,6 +23,7 @@ type Props = {| ...ContextRouter, name: string |}
 function NavButton(props: Props) {
   const { name } = props
   const isProtocolLoaded = useSelector(robotSelectors.getSessionIsLoaded)
+  const isProtocolRunnable = useSelector(robotSelectors.getCommands).length > 0
   const isProtocolRunning = useSelector(robotSelectors.getIsRunning)
   const isProtocolDone = useSelector(robotSelectors.getIsDone)
   const connectedRobot = useSelector(getConnectedRobot)
@@ -70,6 +71,7 @@ function NavButton(props: Props) {
         <GenericNavButton
           disabled={
             !isProtocolLoaded ||
+            !isProtocolRunnable ||
             isProtocolRunning ||
             isProtocolDone ||
             incompatiblePipettes
@@ -85,7 +87,9 @@ function NavButton(props: Props) {
     case 'run':
       return (
         <GenericNavButton
-          disabled={!isProtocolLoaded || incompatiblePipettes}
+          disabled={
+            !isProtocolLoaded || !isProtocolRunnable || incompatiblePipettes
+          }
           tooltipComponent={
             incompatiblePipettes ? incompatPipetteTooltip : null
           }

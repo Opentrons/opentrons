@@ -12,14 +12,20 @@ import styles from './styles.css'
 
 import type { Robot } from '../../discovery'
 
-type Props = {
+const NO_STEPS_MESSAGE = `This protocol has no steps in it - there's nothing for your robot to do! Your protocol needs at least one aspirate/dispense to import properly`
+
+type Props = {|
   robot: Robot,
-  sessionLoaded: ?boolean,
+  sessionLoaded: boolean,
+  sessionHasSteps: boolean,
   uploadError: ?{ message: string },
-}
+|}
 
 export default function FileInfo(props: Props) {
-  const { robot, sessionLoaded, uploadError } = props
+  const { robot, sessionLoaded, sessionHasSteps } = props
+  const uploadError = sessionHasSteps
+    ? props.uploadError
+    : { message: NO_STEPS_MESSAGE }
 
   return (
     <div className={styles.file_info_container}>
@@ -27,8 +33,10 @@ export default function FileInfo(props: Props) {
       <ProtocolPipettesCard robot={robot} />
       <ProtocolModulesCard robot={robot} />
       <ProtocolLabwareCard />
-      {uploadError && <UploadError uploadError={uploadError} />}
-      {sessionLoaded && <Continue />}
+      {sessionLoaded && uploadError && (
+        <UploadError uploadError={uploadError} />
+      )}
+      {sessionLoaded && !uploadError && <Continue />}
     </div>
   )
 }
