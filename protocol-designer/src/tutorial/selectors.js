@@ -20,6 +20,14 @@ export const getHint: Selector<?HintKey> = createSelector(
   }
 )
 
+export const getDismissedHints: Selector<Array<HintKey>> = createSelector(
+  rootSelector,
+  tutorial => {
+    const dismissedKeys = Object.keys(tutorial.dismissedHints)
+    return dismissedKeys
+  }
+)
+
 export const getCanClearHintDismissals: Selector<boolean> = createSelector(
   rootSelector,
   tutorial => !isEmpty(tutorial.dismissedHints)

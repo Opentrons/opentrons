@@ -2,7 +2,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Splash } from '@opentrons/components'
-
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../steplist'
 import { Portal as MainPageModalPortal } from '../components/portals/MainPageModalPortal'
 import DeckSetup from '../components/DeckSetup'
