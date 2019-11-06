@@ -3,7 +3,7 @@ import assert from 'assert'
 import reduce from 'lodash/reduce'
 import values from 'lodash/values'
 import { getPipetteNameSpecs, type DeckSlotId } from '@opentrons/shared-data'
-import { SPAN7_8_10_11_SLOT } from '../constants'
+import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../constants'
 import type { LabwareDefByDefURI } from '../labware-defs'
 import type {
   NormalizedPipette,
@@ -98,13 +98,8 @@ export const getSlotIsEmpty = (
   initialDeckSetup: InitialDeckSetup,
   slot: string
 ): boolean => {
-  if (
-    slot === SPAN7_8_10_11_SLOT &&
-    getSlotsBlockedBySpanning(initialDeckSetup).every(slot =>
-      getSlotIsEmpty(initialDeckSetup, slot)
-    )
-  ) {
-    return false
+  if (slot === SPAN7_8_10_11_SLOT) {
+    return TC_SPAN_SLOTS.every(slot => getSlotIsEmpty(initialDeckSetup, slot))
   }
 
   // NOTE: should work for both deck slots and module slots
