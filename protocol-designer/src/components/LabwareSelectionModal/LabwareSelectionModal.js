@@ -1,5 +1,11 @@
 // @flow
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ElementProps,
+} from 'react'
 import startCase from 'lodash/startCase'
 import reduce from 'lodash/reduce'
 import {
@@ -10,6 +16,7 @@ import {
 } from '@opentrons/components'
 import {
   getLabwareDefURI,
+  getLabwareDefIsStandard,
   type LabwareDefinition2,
   type ModuleType,
 } from '@opentrons/shared-data'
@@ -140,7 +147,8 @@ const LabwareSelectionModal = (props: Props) => {
 
   const getLabwareCompatible = useCallback(
     (def: LabwareDefinition2) => {
-      if (moduleType == null) {
+      // assume that custom (non-standard) labware is (potentially) compatible
+      if (moduleType == null || !getLabwareDefIsStandard(def)) {
         return true
       }
       return _getLabwareIsCompatible(def, moduleType)
@@ -214,8 +222,12 @@ const LabwareSelectionModal = (props: Props) => {
   )
 
   const wrapperRef = useOnClickOutside({
-    onClickOutside: () =>
-      console.log('clicked outside') /* onClose TODO IMMEDIATELY */,
+    onClickOutside: () => {
+      // don't close when clicking on the custom labware hint
+      if (!enqueuedLabwareType) {
+        onClose()
+      }
+    },
   })
 
   // do not render without a slot
@@ -246,10 +258,27 @@ const LabwareSelectionModal = (props: Props) => {
     </div>
   ) : null
 
+  let moduleCompatibility: $PropertyType<
+    ElementProps<typeof LabwarePreview>,
+    'moduleCompatibility'
+  > = null
+  if (previewedLabware && moduleType) {
+    if (getLabwareRecommended(previewedLabware)) {
+      moduleCompatibility = 'recommended'
+    } else if (getLabwareCompatible(previewedLabware)) {
+      moduleCompatibility = 'potentiallyCompatible'
+    } else {
+      moduleCompatibility = 'notCompatible'
+    }
+  }
+
   return (
     <>
       <Portal>
-        <LabwarePreview labwareDef={previewedLabware} />
+        <LabwarePreview
+          labwareDef={previewedLabware}
+          moduleCompatibility={moduleCompatibility}
+        />
       </Portal>
       {blockingCustomLabwareHint}
       <div ref={wrapperRef} className={styles.labware_dropdown}>

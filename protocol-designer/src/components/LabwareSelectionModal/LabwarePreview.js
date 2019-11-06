@@ -2,6 +2,7 @@
 import * as React from 'react'
 import reduce from 'lodash/reduce'
 import {
+  Icon,
   LabwareRender,
   LabeledValue,
   RobotWorkSpace,
@@ -16,10 +17,15 @@ import styles from './styles.css'
 
 type Props = {
   labwareDef: ?LabwareDefinition2,
+  moduleCompatibility?:
+    | 'recommended'
+    | 'potentiallyCompatible'
+    | 'notCompatible'
+    | null,
 }
 
 const LabwarePreview = (props: Props) => {
-  const { labwareDef } = props
+  const { labwareDef, moduleCompatibility } = props
   if (!labwareDef) return null
   const maxVolumes = reduce(
     labwareDef.wells,
@@ -41,6 +47,16 @@ const LabwarePreview = (props: Props) => {
         <h3 className={styles.labware_preview_header}>
           {props.labwareDef ? getLabwareDisplayName(props.labwareDef) : ''}
         </h3>
+        {moduleCompatibility != null ? (
+          <div className={styles.labware_preview_module_compat}>
+            {moduleCompatibility === 'recommended' ? (
+              <Icon className={styles.icon} name="check-decagram" />
+            ) : null}
+            {i18n.t(
+              `modal.labware_selection.module_compatibility.${moduleCompatibility}`
+            )}
+          </div>
+        ) : null}
         <div className={styles.labware_detail_row}>
           <div className={styles.labware_render_wrapper}>
             <RobotWorkSpace
