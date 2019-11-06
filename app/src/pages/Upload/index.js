@@ -24,6 +24,7 @@ type SP = {|
   uploadInProgress: boolean,
   uploadError: ?{ message: string },
   sessionLoaded: boolean,
+  sessionHasSteps: boolean,
 |}
 
 type Props = {| ...OP, ...SP, dispatch: Dispatch |}
@@ -39,6 +40,7 @@ function mapStateToProps(state: State): SP {
     uploadInProgress: robotSelectors.getSessionLoadInProgress(state),
     uploadError: robotSelectors.getUploadError(state),
     sessionLoaded: robotSelectors.getSessionIsLoaded(state),
+    sessionHasSteps: robotSelectors.getCommands(state).length > 0,
   }
 }
 
@@ -49,6 +51,7 @@ function UploadPage(props: Props) {
     uploadInProgress,
     uploadError,
     sessionLoaded,
+    sessionHasSteps,
     match: { path },
   } = props
 
@@ -75,6 +78,7 @@ function UploadPage(props: Props) {
             uploadInProgress={uploadInProgress}
             uploadError={uploadError}
             sessionLoaded={sessionLoaded}
+            sessionHasSteps={sessionHasSteps}
           />
         )}
       />

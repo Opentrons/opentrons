@@ -7,13 +7,14 @@ import FileInfo from '../../components/FileInfo'
 
 import type { Robot } from '../../discovery'
 
-type Props = {
+type Props = {|
   robot: Robot,
   filename: string,
   uploadInProgress: boolean,
   uploadError: ?{ message: string },
   sessionLoaded: boolean,
-}
+  sessionHasSteps: boolean,
+|}
 
 export default function FileInfoPage(props: Props) {
   const {
@@ -22,6 +23,7 @@ export default function FileInfoPage(props: Props) {
     uploadInProgress,
     uploadError,
     sessionLoaded,
+    sessionHasSteps,
   } = props
 
   return (
@@ -34,6 +36,7 @@ export default function FileInfoPage(props: Props) {
       <FileInfo
         robot={robot}
         sessionLoaded={sessionLoaded}
+        sessionHasSteps={sessionHasSteps}
         uploadError={uploadError}
       />
       {uploadInProgress && <SpinnerModal message="Upload in Progress" />}

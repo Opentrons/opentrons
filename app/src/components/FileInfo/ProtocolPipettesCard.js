@@ -12,11 +12,15 @@ import InstrumentItem from './InstrumentItem'
 import { SectionContentHalf } from '../layout'
 import InfoSection from './InfoSection'
 import MissingItemWarning from './MissingItemWarning'
-import useInstrumentMountInfo from './useInstrumentMountInfo'
+import useInstrumentMountInfo, {
+  MATCH,
+  INEXACT_MATCH,
+} from './useInstrumentMountInfo'
+
 import styles from './styles.css'
 
 import type { Dispatch } from '../../types'
-import type { Robot } from '../../discovery'
+import type { Robot } from '../../discovery/types'
 
 type Props = {| robot: Robot |}
 
@@ -27,8 +31,9 @@ const inexactPipetteSupportArticle =
 const TITLE = 'Required Pipettes'
 
 function ProtocolPipettes(props: Props) {
-  const dispatch: Dispatch = useDispatch()
+  const dispatch = useDispatch<Dispatch>()
   const infoByMount = useInstrumentMountInfo(props.robot.name)
+
   React.useEffect(() => {
     dispatch(fetchPipettes(props.robot))
   }, [dispatch, props.robot])
@@ -36,32 +41,42 @@ function ProtocolPipettes(props: Props) {
   const changePipetteUrl = `/robots/${props.robot.name}/instruments`
 
   const allPipettesMatch = every(infoByMount, ({ compatibility }) =>
-    ['match', 'inexact_match'].includes(compatibility)
+    [MATCH, INEXACT_MATCH].includes(compatibility)
   )
 
   const someInexactMatches = some(
     infoByMount,
-    ({ compatibility }) => compatibility === 'inexact_match'
+    ({ compatibility }) => compatibility === INEXACT_MATCH
   )
+
+  const pipetteItemProps = PIPETTE_MOUNTS.map(mount => {
+    const info = infoByMount[mount]
+
+    return info.protocol
+      ? {
+          compatibility: info.compatibility,
+          mount: info.protocol.mount,
+          hidden: !info.protocol.name,
+          displayName: info.protocol.displayName,
+        }
+      : null
+  }).filter(Boolean)
+
+  if (pipetteItemProps.length === 0) return null
 
   return (
     <InfoSection title={TITLE}>
       <SectionContentHalf>
-        {PIPETTE_MOUNTS.map(mount => {
-          const info = infoByMount[mount]
-          if (!info) return null
-          const { protocol, compatibility } = info
-          return (
-            <InstrumentItem
-              key={protocol.mount}
-              compatibility={compatibility}
-              mount={protocol.mount}
-              hidden={!protocol.name}
-            >
-              {protocol.displayName}
-            </InstrumentItem>
-          )
-        }).filter(Boolean)}
+        {pipetteItemProps.map(itemProps => (
+          <InstrumentItem
+            key={itemProps.mount}
+            compatibility={itemProps.compatibility}
+            mount={itemProps.mount}
+            hidden={itemProps.hidden}
+          >
+            {itemProps.displayName}
+          </InstrumentItem>
+        ))}
       </SectionContentHalf>
       {!allPipettesMatch && (
         <MissingItemWarning

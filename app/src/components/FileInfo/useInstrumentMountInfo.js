@@ -5,34 +5,38 @@ import isEmpty from 'lodash/isEmpty'
 import {
   selectors as robotSelectors,
   constants as robotConstants,
-  type Pipette,
-  type Mount,
 } from '../../robot'
-import {
-  getPipettesState,
-  type Pipette as ActualPipette,
-} from '../../robot-api'
+import { getPipettesState } from '../../robot-api'
 import {
   getPipetteModelSpecs,
   getPipetteNameSpecs,
-  type PipetteModelSpecs,
 } from '@opentrons/shared-data'
+
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import type { State } from '../../types'
+import type { Pipette, Mount } from '../../robot/types'
+import type { Pipette as ActualPipette } from '../../robot-api/types'
 
 export type PipetteCompatibility = 'match' | 'inexact_match' | 'incompatible'
 
-type InstrumentMountInfo = {|
-  actual: {|
+export type InstrumentMountInfo = {|
+  actual: null | {|
     ...ActualPipette,
     displayName: string,
     modelSpecs: ?PipetteModelSpecs,
   |},
-  protocol: {|
-    ...$Exact<Pipette>,
+  protocol: null | {|
+    ...$Shape<$Exact<Pipette>>,
     displayName: string,
   |},
   compatibility: PipetteCompatibility,
 |}
+
 const { PIPETTE_MOUNTS } = robotConstants
+
+export const MATCH: 'match' = 'match'
+export const INCOMPATIBLE: 'incompatible' = 'incompatible'
+export const INEXACT_MATCH: 'inexact_match' = 'inexact_match'
 
 function pipettesAreInexactMatch(
   protocolInstrName: ?string,
@@ -45,7 +49,9 @@ function pipettesAreInexactMatch(
 function useInstrumentMountInfo(
   robotName: string
 ): { [Mount]: InstrumentMountInfo } {
-  const protocolInstruments = useSelector(robotSelectors.getPipettes)
+  const protocolInstruments = useSelector<State, Array<Pipette>>(
+    robotSelectors.getPipettes
+  )
   const actualInstruments = useSelector(state =>
     getPipettesState(state, robotName)
   )
@@ -53,10 +59,11 @@ function useInstrumentMountInfo(
   const instrumentInfoByMount = PIPETTE_MOUNTS.reduce((acc, mount) => {
     const protocolInstrument = protocolInstruments.find(i => i.mount === mount)
     const actualInstrument = actualInstruments[mount]
+    const requestedAs = protocolInstrument?.requestedAs
 
     const actualModelSpecs = getPipetteModelSpecs(actualInstrument?.model || '')
-    const requestedDisplayName = protocolInstrument?.requestedAs
-      ? getPipetteNameSpecs(protocolInstrument?.requestedAs)?.displayName
+    const requestedDisplayName = requestedAs
+      ? getPipetteNameSpecs(requestedAs)?.displayName
       : protocolInstrument?.modelSpecs?.displayName
 
     const protocolInstrName =
@@ -65,25 +72,30 @@ function useInstrumentMountInfo(
 
     const perfectMatch = protocolInstrName === actualInstrName
 
-    let compatibility: PipetteCompatibility = 'incompatible'
+    let compatibility: PipetteCompatibility = INCOMPATIBLE
     if (perfectMatch || isEmpty(protocolInstrument)) {
-      compatibility = 'match'
+      compatibility = MATCH
     } else if (pipettesAreInexactMatch(protocolInstrName, actualModelSpecs)) {
-      compatibility = 'inexact_match'
+      compatibility = INEXACT_MATCH
     }
 
     return {
       ...acc,
       [mount]: {
-        protocol: {
-          ...protocolInstrument,
-          displayName: requestedDisplayName || 'N/A',
-        },
-        actual: {
-          ...actualInstrument,
-          modelSpecs: actualModelSpecs,
-          displayName: actualModelSpecs?.displayName || 'N/A',
-        },
+        protocol: protocolInstrument
+          ? {
+              ...protocolInstrument,
+              displayName: requestedDisplayName || protocolInstrument.name,
+            }
+          : null,
+        actual:
+          actualInstrument && actualModelSpecs
+            ? {
+                ...actualInstrument,
+                modelSpecs: actualModelSpecs,
+                displayName: actualModelSpecs.displayName,
+              }
+            : null,
         compatibility,
       },
     }
