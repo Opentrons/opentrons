@@ -36,7 +36,7 @@ Overview
 --------
 
 How it Looks
-+++++++++++
+++++++++++++
 
 The design goal of the Opentrons API is to make code readable and easy to understand. For example, below is a short set of instructions to transfer from well ``'A1'`` to well ``'B1'`` that even a computer could understand:
 
@@ -104,15 +104,11 @@ Metadata is a dictionary of data that is read by the server and returned to clie
 
 The required element of the metadata is ``"apiLevel"``. This must contain a string specifying the major and minor version of the Python Protocol API that your protocol is designed for. For instance, a protocol written for the launch version of Protocol API v2 should have in its metadata ``"apiLevel": "2.0"``.
 
-The number before the dot is the **major version**. This is always ``2`` for protocol API version 2.
-
-The number after the dot is the **minor version**. At launch (and during the beta) only minor version ``0`` exists.
-
-As the Protocol API is developed, whenever Opentrons adds a new feature or makes a small behavior change, we will increase the minor version. When you specify a major and minor version in your protocol, it ensures that the protocol will run as you intended on any robot software version that supports your selected protocol version. For instance, a protocol written for API Version 2.0 will work on any robot software version that supports at least API version 2.0.
-
 .. note::
 
     In the API V2 beta, the only available version is 2.0. It is not yet required to specify versions. However, when we fully release API V2, the version will be required.
+
+For more information on Protocol API versioning, see :ref:`v2-versioning`.
 
 The Run Function and the Protocol Context
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -200,6 +196,7 @@ __ https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md
 .. toctree::
 
     writing
+    versioning
     new_pipette
     new_labware
     new_modules
