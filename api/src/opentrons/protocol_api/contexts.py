@@ -1659,8 +1659,12 @@ class InstrumentContext(CommandPublisher):
         self._log.debug(f"ctx modules: {self._ctx._modules}")
 
         to_lw, to_well = geometry.split_loc_labware(location)
-        if isinstance(to_lw, Labware) and \
-                isinstance(to_lw.parent, ThermocyclerGeometry):
+        from_lw, from_well = geometry.split_loc_labware(from_loc)
+
+        if (isinstance(to_lw, Labware) and \
+                isinstance(to_lw.parent, ThermocyclerGeometry)) or \
+                (isinstance(from_lw, Labware) and \
+                isinstance(from_lw.parent, ThermocyclerGeometry)):
             tc_context = next(m for m in self._ctx._modules \
                               if isinstance(m._module, modules.thermocycler.Thermocycler))
             if tc_context and tc_context.lid_position == 'closed':
