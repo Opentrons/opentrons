@@ -19,7 +19,7 @@ from opentrons.protocol_api.legacy_wrapper import api
 from opentrons import commands
 from opentrons.config import feature_flags as ff
 from opentrons.protocols.parse import parse
-from opentrons.protocols.types import JsonProtocol
+from opentrons.protocols.types import JsonProtocol, APIVersion
 from opentrons.hardware_control import API
 
 _HWCONTROL: Optional[API] = None
@@ -180,7 +180,7 @@ def execute(protocol_file: TextIO,
     contents = protocol_file.read()
     protocol = parse(contents, protocol_file.name)
     if isinstance(protocol, JsonProtocol)\
-            or protocol.api_level == '2'\
+            or protocol.api_level >= APIVersion(2, 0)\
             or (ff.enable_back_compat() and ff.use_protocol_api_v2()):
         context = get_protocol_api(
             bundled_labware=getattr(protocol, 'bundled_labware', None),

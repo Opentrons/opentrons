@@ -9,7 +9,7 @@ from .contexts import ProtocolContext
 from . import execute_v3, legacy_wrapper
 
 from opentrons import config
-from opentrons.protocols.types import PythonProtocol, Protocol
+from opentrons.protocols.types import PythonProtocol, Protocol, APIVersion
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -169,9 +169,9 @@ def run_protocol(protocol: Protocol,
         raise RuntimeError(
             'Will not automatically generate hardware controller')
     if isinstance(protocol, PythonProtocol):
-        if protocol.api_level == '2':
+        if protocol.api_level >= APIVersion(2, 0):
             _run_python(protocol, true_context)
-        elif protocol.api_level == '1':
+        elif protocol.api_level == APIVersion(1, 0):
             _run_python_legacy(protocol, true_context)
         else:
             raise RuntimeError(

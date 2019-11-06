@@ -4,7 +4,8 @@ metadata = {
     'protocolName': 'Testosaur',
     'author': 'Opentrons <engineering@opentrons.com>',
     'description': 'A variant on "Dinosaur" for testing',
-    'source': 'Opentrons Repository'
+    'source': 'Opentrons Repository',
+    'apiLevel': '2.0',
 }
 
 

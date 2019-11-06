@@ -21,7 +21,7 @@ from opentrons.config import feature_flags as ff
 from opentrons import protocol_api
 from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import (
-    JsonProtocol, PythonProtocol, BundleContents)
+    JsonProtocol, PythonProtocol, BundleContents, APIVersion)
 from opentrons.protocol_api import execute
 from opentrons.protocol_api.legacy_wrapper import api
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
@@ -250,7 +250,7 @@ def simulate(protocol_file: TextIO,
                            extra_data=extra_data)
 
     if isinstance(protocol, JsonProtocol)\
-            or protocol.api_level == '2'\
+            or protocol.api_level >= APIVersion(2, 0)\
             or (ff.enable_back_compat() and ff.use_protocol_api_v2()):
         context = get_protocol_api(protocol)
         scraper = CommandScraper(stack_logger, log_level, context.broker)

@@ -9,7 +9,7 @@ from opentrons.broker import Broker
 from opentrons.commands import tree, types as command_types
 from opentrons.commands.commands import is_new_loc, listify
 from opentrons.config import feature_flags as ff
-from opentrons.protocols.types import JsonProtocol, PythonProtocol
+from opentrons.protocols.types import JsonProtocol, PythonProtocol, APIVersion
 from opentrons.protocols.parse import parse
 from opentrons.types import Location, Point
 from opentrons.protocol_api import (ProtocolContext,
@@ -277,12 +277,12 @@ class Session(object):
 
     def refresh(self):
         self._reset()
-        self.api_level = 2 if ff.use_protocol_api_v2() else 1
         # self.metadata is exposed via jrpc
         if isinstance(self._protocol, PythonProtocol):
+            self.api_level = self._protocol.api_level
             self.metadata = self._protocol.metadata
             if ff.use_protocol_api_v2()\
-               and self._protocol.api_level == '1'\
+               and self._protocol.api_level == APIVersion(1, 0)\
                and not ff.enable_back_compat():
                 raise RuntimeError(
                     'This protocol targets Protocol API V1, but the robot is '
@@ -294,6 +294,10 @@ class Session(object):
 
             log.info(f"Protocol API version: {self._protocol.api_level}")
         else:
+            if ff.use_protocol_api_v2():
+                self.api_level = APIVersion(2, 0)
+            else:
+                self.api_level = APIVersion(1, 0)
             self.metadata = {}
             log.info(f"JSON protocol")
 
