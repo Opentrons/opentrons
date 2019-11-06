@@ -23,6 +23,7 @@ from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import (
     JsonProtocol, PythonProtocol, BundleContents)
 from opentrons.protocol_api import execute
+from opentrons.protocol_api.legacy_wrapper import api
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
 
@@ -423,6 +424,9 @@ def main() -> int:
     parser = get_arguments(parser)
 
     args = parser.parse_args()
+    # Try to migrate api v1 containers if needed
+    api.maybe_migrate_containers()
+
     runlog, maybe_bundle = simulate(
         args.protocol,
         args.protocol.name,

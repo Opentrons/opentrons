@@ -15,6 +15,7 @@ from opentrons.config import CONFIG
 from .rpc import RPCServer
 from .http import HTTPServer
 from opentrons.api.routers import MainRouter
+from opentrons.protocol_api.legacy_wrapper import api
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.types import HardwareAPILike  # noqa(F501)
@@ -97,7 +98,8 @@ def init(hardware: 'HardwareAPILike' = None,
                      If not specified, the server will use
                      :py:attr:`opentrons.hardware`
     """
-
+    # Try to migrate containers from database to v2 format
+    api.maybe_migrate_containers()
     app = web.Application(middlewares=[error_middleware])
     app['com.opentrons.hardware'] = hardware
     app['com.opentrons.motion_lock'] = ThreadedAsyncLock()

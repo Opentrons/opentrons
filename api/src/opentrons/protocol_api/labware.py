@@ -953,19 +953,22 @@ def _read_file(filepath: str) -> dict:
     return calibration_data
 
 
-def _get_path_to_labware(load_name: str, namespace: str, version: int) -> Path:
+def _get_path_to_labware(
+        load_name: str, namespace: str, version: int, base_path: Path = None
+        ) -> Path:
     if namespace == OPENTRONS_NAMESPACE:
         # all labware in OPENTRONS_NAMESPACE is bundled in wheel
         return STANDARD_DEFS_PATH / load_name / f'{version}.json'
-
-    base_path = CONFIG['labware_user_definitions_dir_v2']
+    if not base_path:
+        base_path = CONFIG['labware_user_definitions_dir_v2']
     def_path = base_path / namespace / load_name / f'{version}.json'
     return def_path
 
 
 def save_definition(
     labware_def: LabwareDefinition,
-    force: bool = False
+    force: bool = False,
+    location: Path = None
 ) -> None:
     """
     Save a labware definition
@@ -978,7 +981,7 @@ def save_definition(
     load_name = labware_def['parameters']['loadName']
     version = labware_def['version']
 
-    # TODO: Ian 2019-05-23 validate labware def schema before saving
+    verify_definition(labware_def)
 
     if not namespace or not load_name or not version:
         raise RuntimeError(
@@ -990,7 +993,7 @@ def save_definition(
             f'Saving definitions to the "{OPENTRONS_NAMESPACE}" namespace ' +
             'is not permitted')
 
-    def_path = _get_path_to_labware(load_name, namespace, version)
+    def_path = _get_path_to_labware(load_name, namespace, version, location)
 
     if not force and def_path.is_file():
         raise RuntimeError(
@@ -1088,7 +1091,8 @@ def _get_standard_labware_definition(
     return labware_def
 
 
-def verify_definition(contents: AnyStr) -> LabwareDefinition:
+def verify_definition(contents: Union[AnyStr, LabwareDefinition])\
+        -> LabwareDefinition:
     """ Verify that an input string is a labware definition and return it.
 
     If the definition is invalid, an exception is raised; otherwise parse the
@@ -1098,14 +1102,19 @@ def verify_definition(contents: AnyStr) -> LabwareDefinition:
     :raises jsonschema.ValidationError: If the definition is not valid.
     :returns: The parsed definition
     """
-    loaded = json.loads(contents)
     schema_body = pkgutil.get_data(  # type: ignore
         'opentrons',
         'shared_data/labware/schemas/2.json').decode('utf-8')
     labware_schema_v2 = json.loads(schema_body)
-    # do the validation
-    jsonschema.validate(loaded, labware_schema_v2)
-    return loaded
+
+    if isinstance(contents, dict):
+        to_return = contents
+        jsonschema.validate(to_return, labware_schema_v2)
+
+    else:
+        to_return = json.loads(contents)
+        jsonschema.validate(to_return, labware_schema_v2)
+    return to_return
 
 
 def get_labware_definition(

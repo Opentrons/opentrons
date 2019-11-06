@@ -34,33 +34,6 @@ def test_add_instrument(loop, monkeypatch, singletons):
 
 
 @pytest.mark.api2_only
-def test_labware_mappings(loop, monkeypatch, singletons):
-    lw_name, lw_label = None, None
-
-    def fake_ctx_load(labware_name, location, label=None):
-        nonlocal lw_name
-        nonlocal lw_label
-        lw_name = labware_name
-        lw_label = label
-        return 'heres a fake labware'
-
-    labware = singletons['labware']
-    monkeypatch.setattr(labware._ctx, 'load_labware', fake_ctx_load)
-    obj = labware.load('384-plate', 2, 'hey there')
-    assert obj == 'heres a fake labware'
-    assert lw_name == 'corning_384_wellplate_112ul_flat'
-    assert lw_label == 'hey there'
-
-    with pytest.raises(NotImplementedError,
-                       match='Labware 24-vial-rack is not supported'):
-        labware.load('24-vial-rack', 2)
-
-    with pytest.raises(NotImplementedError,
-                       match='Module load not yet implemented'):
-        labware.load('magdeck', 3)
-
-
-@pytest.mark.api2_only
 def test_head_speed(singletons):
     # Setting axis speeds should set max speeds
     singletons['robot'].head_speed(x=2, y=3, z=5, b=3)
