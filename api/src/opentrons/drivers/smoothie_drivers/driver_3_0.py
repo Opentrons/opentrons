@@ -916,7 +916,11 @@ class SmoothieDriver_3_0_0:
         self.update_homed_flags()
 
     # Potential place for command optimization (buffering, flushing, etc)
-    def _send_command(self, command, timeout=DEFAULT_SMOOTHIE_TIMEOUT):
+    def _send_command(
+            self,
+            command,
+            timeout=DEFAULT_SMOOTHIE_TIMEOUT,
+            suppress_error_msg=False):
         """
         Submit a GCODE command to the robot, followed by M400 to block until
         done. This method also ensures that any command on the B or C axis
@@ -932,9 +936,16 @@ class SmoothieDriver_3_0_0:
         switch was hit unexpectedly. This is usually due to an undetected
         collision in a previous move command.
 
+        SmoothieErrors are also raised when a command is sent to a pipette that
+        is not present, such as when identifying which pipettes are on a robot.
+        In this case, the message should not be logged, so the caller of this
+        function should specify `supress_error_msg=True`.
+
         :param command: the GCODE to submit to the robot
         :param timeout: the time to wait before returning (indefinite wait if
             this is set to none
+        :param suppress_error_msg: flag for indicating that smoothie errors
+            should not be logged
         """
         if self.simulating:
             return
@@ -948,8 +959,9 @@ class SmoothieDriver_3_0_0:
             # is locking at a higher level like in APIv2.
             self._reset_from_error()
             error_axis = se.ret_code.strip()[-1]
-            log.warning(
-                    f"alarm/error: command={command}, resp={se.ret_code}")
+            if not suppress_error_msg:
+                log.warning(
+                        f"alarm/error: command={command}, resp={se.ret_code}")
             if GCODES['MOVE'] in command or GCODES['PROBE'] in command:
                 if error_axis not in 'XYZABC':
                     error_axis = AXES
@@ -1183,7 +1195,7 @@ class SmoothieDriver_3_0_0:
             self.disengage_axis('ZABC')
             self.delay(PIPETTE_READ_DELAY)
             # request from Smoothieware the information from that pipette
-            res = self._send_command(gcode + mount)
+            res = self._send_command(gcode + mount, suppress_error_msg=True)
             if res:
                 res = _parse_instrument_data(res)
                 assert mount in res
