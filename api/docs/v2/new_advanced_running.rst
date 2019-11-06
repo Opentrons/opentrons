@@ -20,12 +20,12 @@ Here, you can select a notebook and develop protocols that will be saved on the 
 Protocol Structure
 ++++++++++++++++++
 
-To take advantage of Jupyter's ability to run only parts of your protocol, you have to restructure it slightly - turn it inside out. Rather than writing a single ``run`` function that contains all your protocol logic, you can use the function :py:meth:`opentrons.execute.get_protocol_api`:
+To take advantage of Jupyter's ability to run only parts of your protocol, you have to restructure it slightly - turn it inside out. Rather than writing a single ``run`` function that contains all your protocol logic, you can use the function :py:meth:`opentrons.execute.get_protocol_api`, into which you pass the same API version (see :ref:`v2-versioning`) that you would specify in your protocol's metadata:
 
 .. code-block:: python
 
    >>> import opentrons.execute
-   >>> protocol = opentrons.execute.get_protocol_api()
+   >>> protocol = opentrons.execute.get_protocol_api('2.0')
 
 
 This returns the same kind of object - a :py:class:`.ProtocolContext` - that is passed into your protocol's ``run`` function when you upload your protocol in the Opentrons App. Full documentation on the capabilities and use of the :py:class:`.ProtocolContext` object is available in the other sections of this guide - :ref:`protocol-api-robot`, :ref:`new-pipette`, :ref:`v2-atomic-commands`, :ref:`v2-complex-commands`, :ref:`new-labware`, and :ref:`new_modules`; a full list of all available attributes and methods is available in :ref:`protocol-api-reference`.
@@ -46,7 +46,7 @@ If you have a protocol that you have already written, that is defined in a ``run
    >>> def run(protocol: protocol_api.ProtocolContext):
    ...     # the contents of your protocol are here...
    ...
-   >>> protocol = opentrons.execute.get_protocol_api()
+   >>> protocol = opentrons.execute.get_protocol_api('2.0')
    >>> run(protocol)  # your protocol will now run
 
 

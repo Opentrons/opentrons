@@ -1,6 +1,7 @@
 import pytest
 from opentrons.protocol_api import execute, ProtocolContext
 from opentrons.protocols.parse import parse
+from opentrons.protocols.types import APIVersion
 
 v1_protocol_testcases = [
     ("""from opentrons import labware, instruments, robot"""),
@@ -55,7 +56,8 @@ def test_execute_ok(protocol, protocol_file, ensure_api2, loop):
 @pytest.mark.parametrize('protocol', v1_protocol_testcases)
 def test_execute_v1_imports(protocol, ensure_api2):
     proto = parse(protocol)
-    execute.run_protocol(proto)
+    ctx = ProtocolContext(api_version=APIVersion(1, 0))
+    execute.run_protocol(proto, ctx)
 
 
 def test_bad_protocol(ensure_api2, loop):
