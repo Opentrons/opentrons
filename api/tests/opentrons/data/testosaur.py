@@ -14,7 +14,7 @@ p300 = instruments.P300_Single(
     mount="right",
     tip_racks=[p200rack])
 
-p300.pick_up_tip()
+#p300.pick_up_tip()
 
 containers = [
     containers.load('96-PCR-flat', slot)
@@ -23,10 +23,10 @@ containers = [
 ]
 
 # Uncomment these to test precision
-p300.move_to(robot.deck['11'])
-p300.move_to(robot.deck['6'])
+# p300.move_to(robot.deck['11'])
+# p300.move_to(robot.deck['6'])
 
-for container in containers:
-    p300.aspirate(10, container[0]).dispense(10, container[-1].top(5))
+# for container in containers:
+#     p300.aspirate(10, container[0]).dispense(10, container[-1].top(5))
 
-p300.drop_tip()
+# p300.drop_tip()

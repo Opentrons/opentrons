@@ -98,6 +98,15 @@ export const getSlotIsEmpty = (
   initialDeckSetup: InitialDeckSetup,
   slot: string
 ): boolean => {
+  if (
+    slot === SPAN7_8_10_11_SLOT &&
+    getSlotsBlockedBySpanning(initialDeckSetup).every(slot =>
+      getSlotIsEmpty(initialDeckSetup, slot)
+    )
+  ) {
+    return false
+  }
+
   // NOTE: should work for both deck slots and module slots
   return (
     [

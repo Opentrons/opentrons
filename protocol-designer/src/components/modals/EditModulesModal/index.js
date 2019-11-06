@@ -55,7 +55,8 @@ export default function EditModulesModal(props: EditModulesProps) {
 
   const slotsBlockedBySpanning = getSlotsBlockedBySpanning(_initialDeckSetup)
   const previousModuleSlot = module && module.slot
-  const slotIsEmpty =
+
+  let slotIsEmpty =
     !slotsBlockedBySpanning.includes(selectedSlot) &&
     (getSlotIsEmpty(_initialDeckSetup, selectedSlot) ||
       previousModuleSlot === selectedSlot)
