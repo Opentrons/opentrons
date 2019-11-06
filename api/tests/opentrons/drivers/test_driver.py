@@ -545,7 +545,8 @@ def test_read_and_write_pipettes(smoothie):
     written_model = ''
     mount = 'L'
 
-    def _new_send_message(self, command, timeout=None):
+    def _new_send_message(
+            self, command, timeout=None, suppress_error_msg=True):
         nonlocal written_id, written_model, mount
         if GCODES['READ_INSTRUMENT_ID'] in command:
             return mount + ': ' + written_id
@@ -584,7 +585,8 @@ def test_read_pipette_v13(smoothie):
     _old_send_command = driver._send_command
     driver.simulating = False
 
-    def _new_send_message(self, command, timeout=None):
+    def _new_send_message(
+            self, command, timeout=None, suppress_error_msg=True):
         return 'L:' + _byte_array_to_hex_string(b'p300_single_v13')
 
     driver._send_command = types.MethodType(_new_send_message, driver)
