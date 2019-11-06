@@ -16,6 +16,7 @@ from opentrons.data_storage import database as db_cmds
 from opentrons.config import CONFIG
 from opentrons.legacy_api.containers.placeable import (
     Container, Well as oldWell)
+from opentrons.protocols.types import APIVersion
 
 if TYPE_CHECKING:
     from ..contexts import ProtocolContext
@@ -213,13 +214,15 @@ class LegacyWell(Well):
     """
     def __init__(
             self,
-            well_props: dict,
+            well_props: Dict[str, Any],
             parent: Location,
             display_name: str,
             has_tip: bool,
+            api_version: APIVersion,
             labware_height: float = None,
             well_name: str = None):
-        super().__init__(well_props, parent, display_name, has_tip)
+        super().__init__(
+            well_props, parent, display_name, has_tip, api_version)
         self._well_name = well_name
         self._parent_height = labware_height
 
@@ -608,6 +611,7 @@ class LegacyLabware():
                 Location(self.lw_obj._calibrated_offset, self.lw_obj),
                 "{} of {}".format(well, self.lw_obj._display_name),
                 self.lw_obj.is_tiprack,
+                self.lw_obj.api_version,
                 self.lw_obj._dimensions['zDimension'],
                 well_name=well)
             for well in self.lw_obj._ordering]
