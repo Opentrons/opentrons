@@ -1,7 +1,8 @@
 """ Utility functions and classes for the protocol api """
 from collections import UserDict
+import functools
 import logging
-from typing import Any, Callable, Optional, TYPE_CHECKING, TypeVar, Union
+from typing import Any, Callable, Optional, TYPE_CHECKING, Union
 
 from opentrons.protocols.types import APIVersion
 from opentrons.hardware_control import types, adapters, API, HardwareAPILike
@@ -10,6 +11,13 @@ if TYPE_CHECKING:
     from .contexts import InstrumentContext
 
 MODULE_LOG = logging.getLogger(__name__)
+
+
+class APIVersionError(Exception):
+    """
+    Error raised when a protocol attempts to access behavior not implemented
+    """
+    pass
 
 
 def _assert_gzero(val: Any, message: str) -> float:
@@ -236,28 +244,39 @@ def clamp_value(
     return input_value
 
 
-DecoratedObj = TypeVar('DecoratedObj')
-
-
 def requires_version(
-        major: int, minor: int) -> Callable[[DecoratedObj], DecoratedObj]:
+        major: int, minor: int) -> Callable[[Callable], Callable]:
     """ Decorator. Apply to Protocol API methods or attributes to indicate
     the first version in which the method or attribute was present.
     """
-    def _set_version(decorated_obj: DecoratedObj) -> DecoratedObj:
-        version = APIVersion(major, minor)
+    def _set_version(decorated_obj: Callable) -> Callable:
+        added_version = APIVersion(major, minor)
         setattr(decorated_obj, '__opentrons_version_added',
-                version)
+                added_version)
         if hasattr(decorated_obj, '__doc__'):
             # Add the versionadded stanza to everything decorated if we can
             docstr = decorated_obj.__doc__ or ''
             # this newline and initial space has to be there for sphinx to
             # parse this correctly and not add it into for instance a
             # previous code-block
-            docstr += f'\n\n    .. versionadded:: {version}\n\n'
+            docstr += f'\n\n    .. versionadded:: {added_version}\n\n'
             decorated_obj.__doc__ = docstr
 
-        return decorated_obj
+        @functools.wraps(decorated_obj)
+        def _check_version_wrapper(*args, **kwargs):
+            slf = args[0]
+            added_in = decorated_obj.__opentrons_version_added
+            current_version = slf._api_version
+            if current_version >= APIVersion(2, 0)\
+               and current_version < added_in:
+                raise APIVersionError(
+                    f'{decorated_obj} was added in {added_in}, but your '
+                    f'protocol requested version {current_version}. You '
+                    f'must increase your API version to {added_in} to '
+                    'use this functionality.')
+            return decorated_obj(*args, **kwargs)
+
+        return _check_version_wrapper
 
     return _set_version
 

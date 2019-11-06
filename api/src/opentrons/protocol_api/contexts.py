@@ -120,11 +120,10 @@ class ProtocolContext(CommandPublisher):
             trash_name = 'opentrons_1_trash_850ml_fixed'
         else:
             trash_name = 'opentrons_1_trash_1100ml_fixed'
-        if self.deck['12']:
-            del self.deck['12']
+        if self._deck_layout['12']:
+            del self._deck_layout['12']
         self.load_labware(trash_name, '12')
 
-    @requires_version(2, 0)
     @classmethod
     def build_using(cls,
                     protocol: Protocol,

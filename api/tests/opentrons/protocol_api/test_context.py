@@ -11,8 +11,30 @@ from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.config.pipette_config import config_models, name_for_model
 from opentrons.protocol_api import transfers as tf
+from opentrons.protocols.types import APIVersion
 
 import pytest
+
+
+def set_version_added(attr, mp, version):
+    """ helper to mock versionadded for an attr
+
+    attr is the attr
+    mp is a monkeypatch fixture
+    version is an APIVersion
+    """
+    def get_wrapped(attr):
+        if hasattr(attr, '__wrapped__'):
+            return get_wrapped(attr.__wrapped__)
+        return attr
+
+    if hasattr(attr, 'fget'):
+        # this is a property probably
+        orig = get_wrapped(attr.fget)
+    else:
+        orig = get_wrapped(attr)
+    mp.setattr(orig, '__opentrons_version_added', version)
+    return attr
 
 
 @pytest.fixture
@@ -768,3 +790,20 @@ def test_api_version_checking():
                   papi.MAX_SUPPORTED_VERSION.minor)
     with pytest.raises(RuntimeError):
         papi.ProtocolContext(api_version=major_over)
+
+
+def test_api_per_call_checking(monkeypatch):
+    ctx = papi.ProtocolContext(api_version=APIVersion(1, 9))
+    assert ctx.deck  # 1.9 < 2.0, but api version 1 is excepted from checking
+    monkeypatch.setattr(
+        papi.contexts, 'MAX_SUPPORTED_VERSION',
+        APIVersion(2, 1))
+    ctx = papi.ProtocolContext(api_version=APIVersion(2, 1))
+    # versions > 2.0 are ok
+    assert ctx.deck
+    # pretend disconnect() was only added in 2.1
+    set_version_added(
+        papi.ProtocolContext.disconnect, monkeypatch, APIVersion(2, 1))
+    ctx = papi.ProtocolContext(api_version=APIVersion(2, 0))
+    with pytest.raises(papi.util.APIVersionError):
+        ctx.disconnect()
