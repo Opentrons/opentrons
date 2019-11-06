@@ -1653,6 +1653,21 @@ class InstrumentContext(CommandPublisher):
                 self._mount, critical_point=cp_override),
             from_lw)
 
+        self._log.debug(f"\n\n\n\nlocation.labware: {location.labware}")
+        if location.labware:
+            self._log.debug(f"location.labware.parent: {location.labware.parent}")
+        self._log.debug(f"ctx modules: {self._ctx._modules}")
+
+        to_lw, to_well = geometry.split_loc_labware(location)
+        if isinstance(to_lw, Labware) and \
+                isinstance(to_lw.parent, ThermocyclerGeometry):
+            tc_context = next(m for m in self._ctx._modules \
+                              if isinstance(m._module, modules.thermocycler.Thermocycler))
+            if tc_context and tc_context.lid_position == 'closed':
+                raise RuntimeError(
+                    "Cannot move to labware loaded in Thermocycler"\
+                    " when lid is closed")
+
         moves = geometry.plan_moves(from_loc, location, self._ctx.deck,
                                     force_direct=force_direct,
                                     minimum_z_height=minimum_z_height)
