@@ -17,6 +17,7 @@ type Props = {|
   handleContinue: () => mixed,
 |}
 
+// This component handles the checkbox and dispatching `removeHint` action on continue/cancel
 const BlockingHint = (props: Props) => {
   const { hintKey, handleCancel, handleContinue } = props
   const dispatch = useDispatch()
@@ -27,15 +28,15 @@ const BlockingHint = (props: Props) => {
     setRememberDismissal(prevDismissal => !prevDismissal)
   }, [])
 
-  const onCancelClick = useCallback(() => {
+  const onCancelClick = () => {
     dispatch(actions.removeHint(hintKey, rememberDismissal))
     handleCancel()
-  }, [rememberDismissal, handleCancel, dispatch, hintKey])
+  }
 
-  const onContinueClick = useCallback(() => {
+  const onContinueClick = () => {
     dispatch(actions.removeHint(hintKey, rememberDismissal))
     handleContinue()
-  }, [rememberDismissal, handleContinue, dispatch, hintKey])
+  }
 
   return (
     <Portal>
@@ -60,32 +61,22 @@ const BlockingHint = (props: Props) => {
 }
 
 export const useBlockingHint = (args: {|
-  /** Do nothing, return `null`. Useful when a hint is not relevant under certain conditions */
-  disable: boolean,
-  /** Block BlockingHints from calling handleContinue when dismissed.
-   ** Unlike `disable`, this will show non-dismissed hints normally.
-   **/
-  skipWithAutoContinue: boolean,
+  /** `enabled` should be a condition that the parent uses to toggle whether the hint should be active or not.
+   * If the hint is enabled but has been dismissed, it will automatically call `handleContinue` when enabled.
+   * useBlockingHint expects the parent to disable the hint on cancel/continue */
+  enabled: boolean,
   hintKey: HintKey,
   handleCancel: () => mixed,
   handleContinue: () => mixed,
 |}): ?Node => {
-  const {
-    disable,
-    skipWithAutoContinue,
-    hintKey,
-    handleCancel,
-    handleContinue,
-  } = args
+  const { enabled, hintKey, handleCancel, handleContinue } = args
   const isDismissed = useSelector(selectors.getDismissedHints).includes(hintKey)
 
-  if (disable) return null
-
-  if (skipWithAutoContinue && isDismissed) {
-    // continue automatically (as if there is no modal)
-    console.log('leeeroooy', { skipWithAutoContinue, isDismissed })
+  if (isDismissed) {
     handleContinue()
   }
+
+  if (!enabled || isDismissed) return null
 
   return (
     <BlockingHint

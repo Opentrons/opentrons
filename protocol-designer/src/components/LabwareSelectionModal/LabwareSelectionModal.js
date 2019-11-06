@@ -84,16 +84,16 @@ const LabwareSelectionModal = (props: Props) => {
     moduleRestrictionsDisabled,
   } = props
 
-  const [selectedCategory, setSelectedCategory] = useState<?string>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [previewedLabware, setPreviewedLabware] = useState<?LabwareDefinition2>(
     null
   )
   const [filterRecommended, setFilterRecommended] = useState<boolean>(false)
-  const [enqueuedLabwareType, setEnqueuedLabwareType] = useState<?string>(null)
+  const [enqueuedLabwareType, setEnqueuedLabwareType] = useState<string | null>(
+    null
+  )
   const blockingCustomLabwareHint = useBlockingHint({
-    disable: enqueuedLabwareType == null,
-    skipWithAutoContinue: true,
-    // moduleType == null || !enqueuedLabwareType || moduleRestrictionsDisabled,
+    enabled: enqueuedLabwareType !== null,
     hintKey: 'custom_labware_with_modules',
     handleCancel: () => setEnqueuedLabwareType(null),
     handleContinue: () => {
@@ -268,7 +268,6 @@ const LabwareSelectionModal = (props: Props) => {
               collapsed={selectedCategory !== CUSTOM_CATEGORY}
               onCollapseToggle={makeToggleCategory(CUSTOM_CATEGORY)}
               onClick={makeToggleCategory(CUSTOM_CATEGORY)}
-              inert={filterRecommended}
             >
               {customLabwareURIs.map((labwareURI, index) => (
                 <LabwareItem
@@ -279,7 +278,6 @@ const LabwareSelectionModal = (props: Props) => {
                     setPreviewedLabware(customLabwareDefs[labwareURI])
                   }
                   onMouseLeave={() => setPreviewedLabware()}
-                  disabled={filterRecommended}
                 />
               ))}
             </PDTitledList>
