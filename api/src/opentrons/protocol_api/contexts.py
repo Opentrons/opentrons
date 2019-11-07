@@ -1656,7 +1656,7 @@ class InstrumentContext(CommandPublisher):
         tc = next(m for m in self._ctx._modules
                   if isinstance(m, ThermocyclerContext))
         if tc:
-            tc._flag_unsafe_move(to_loc=location, from_loc=from_loc)
+            tc.flag_unsafe_move(to_loc=location, from_loc=from_loc)
 
         moves = geometry.plan_moves(from_loc, location, self._ctx.deck,
                                     force_direct=force_direct,
@@ -2125,7 +2125,7 @@ class ThermocyclerContext(ModuleContext):
                     z=high_point[Axis.by_mount(instr._mount)])
             instr.move_to(types.Location(safe_point, None), force_direct=True)
 
-    def _flag_unsafe_move(self,
+    def flag_unsafe_move(self,
                           to_loc: types.Location,
                           from_loc: types.Location):
         to_lw, to_well = geometry.split_loc_labware(to_loc)
