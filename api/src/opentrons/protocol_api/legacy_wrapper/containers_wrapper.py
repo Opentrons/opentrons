@@ -1,23 +1,15 @@
 import logging
-from typing import Any, Dict
+
+from ..labware import Labware, get_all_labware_definitions, save_definition, Well as newWell
+from .util import log_call
+from typing import Dict, List, Any, Tuple, Union, TYPE_CHECKING
 
 import jsonschema  # type: ignore
 
+from opentrons.types import Location
 from opentrons.data_storage import database as db_cmds
-from opentrons.protocol_api.labware import save_definition
 from opentrons.config import CONFIG
 from opentrons.legacy_api.containers.placeable import Container, Well
-import re
-
-from .util import log_call
-from opentrons import types
-from opentrons.config import CONFIG
-from opentrons.legacy_api.containers.placeable import Container, Well
-from opentrons.protocol_api.labware_helpers import load_from_definition
-from opentrons.protocol_api import labware as lw
-# from opentrons.protocol_api.contexts import ProtocolContext
-from opentrons.types import Point, Location
-from typing import Any, Dict, List, Optional, Tuple, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from ..contexts import ProtocolContext
@@ -62,6 +54,8 @@ LW_TRANSLATION = {
 
 """ A table mapping old labware names to new labware names"""
 
+def _convert_labware_name(labware_name: str) -> str:
+    return labware_name.replace("-", "_").lower()
 
 def _determine_well_names(labware: Container):
     # In the instance that the labware only contains one well, we must
@@ -110,10 +104,6 @@ def _add_metadata_from_v1(
         'yDimension': 85.48,
         'zDimension': height
     }
-
-
-def _convert_labware_name(labware_name: str) -> str:
-    return labware_name.replace("-", "_").lower()
 
 
 def _format_labware_definition(labware_name: str, labware: Container = None):
@@ -202,81 +192,72 @@ def perform_migration():
                      "wells associated with this labware.")
     log.info("Migration of API V1 labware complete.")
     return True, validation_failure
+# class LegacyLabware(lw.Labware):
+#     def __init__(self, definition: dict,
+#                  parent: types.Location, label: str = None) -> None:
+#         super().__init__(definition, parent)
+#         self._wells_by_index = super().wells()
+#         self._wells_by_name = super().wells_by_name()
+#         self._columns = super().columns()
+#         self._rows = super().rows()
+#         self._properties = {
+#             'length': self.dimensions['xDimension'],
+#             'width': self.dimensions['yDimension'],
+#             'height': self.dimensions['zDimension'],
+#             'type': self.display_name,
+#             'magdeck_engage_height': self.magdeck_engage_height
+#             }
 
+class Containers:
+    """ A backwards-compatibility shim for the `New Protocol API`_.
 
-class Containers():
-    def __init__(self,
-                 protocol_ctx: 'ProtocolContext'):
-        self._ctx = protocol_ctx
+    This class provides a replacement for the `opentrons.labware` and
+    `opentrons.containers` global instances. Like those global instances,
+    this class shims labware load functions for ease of use. This class should
+    not be instantiated by user code, and use of its methods should be
+    replaced with use of the corresponding functions of
+    :py:class:`.ProtocolContext`. For information on how to replace calls to
+    methods of this class, see the method documentation.
+    """
 
-    @log_call(log)
-    def load(self,
-             container_name: str,
-             slot: types.DeckLocation,
-             label: str = None,
-             share: bool = False):
+    def __init__(self, ctx: 'ProtocolContext') -> None:
+        self._ctx = ctx
+
+    def load(self, container_name, slot, label=None, share=False):
+        """ Load a piece of labware by specifying its name and position.
+
+        This method calls :py:meth:`.ProtocolContext.load_labware`;
+        see that documentation for more information on arguments and return
+        values. Calls to this function should be replaced with calls to
+        :py:meth:`.Protocolcontext.load_labware`.
+
+        In addition, this function contains translations between old
+        labware names and new labware names.
         """
-        Examples
-        --------
-        >>> from opentrons import containers
-        >>> containers.load('96-flat', '1')
-        <Deck>/<Slot 1>/<Container 96-flat>
-        >>> containers.load('96-flat', '4', 'plate')
-        <Deck>/<Slot 4>/<Container plate>
-        >>> containers.load('non-existent-type', '4') # doctest: +ELLIPSIS
-        Exception: Container type "non-existent-type" not found in file ...
-        """
-        container_name = container_name.lower().replace('-', '_')
-
         if self._ctx._deck_layout[slot] and not share:
             raise RuntimeWarning(
                 f'Slot {slot} has child. Use "containers.load(\''
                 f'{container_name}\', \'{slot}\', share=True)"')
-
+        elif container_name in MODULE_BLACKLIST:
+            raise NotImplementedError(
+                "Module load not yet implemented")
         try:
             return self._ctx.load_labware(
                 container_name, slot, label, legacy=True)
         except FileNotFoundError:
-            container_name = container_name.replace('-', '_')
-            return self._ctx.load_labware(
-                container_name,
-                slot,
-                label,
-                namespace='legacy_api',
-                legacy=True)
+            try:
+                container_name = LW_TRANSLATION[container_name]
+                return self._ctx.load_labware(
+                    container_name, slot, label, legacy=True)
+            except KeyError:
+                return self._ctx.load_labware(
+                    _convert_labware_name(container_name),
+                    slot,
+                    label,
+                    namespace='legacy_api',
+                    legacy=True)
 
-    @log_call(log)
-    def list(self):
-        return lw.get_all_labware_definitions()
-
-    @log_call(log)
-    def create(
-               name: str,
-               grid: Tuple[int, int],
-               spacing: Tuple[Union[int, float], Union[int, float]],
-               diameter: Union[int, float],
-               depth: Union[int, float],
-               volume: Optional[Union[int, float]] = 0):
-        """
-        Creates a labware definition based on a rectangular gird, depth,
-        diameter, and spacing. Note that this function can only create labware
-        with regularly spaced wells in a rectangular format, of equal height,
-        depth, and radius. Irregular labware defintions will have to be made in
-        other ways or modified using a regular definition as a starting point.
-        Also, upon creation a definition always has its lower-left well at
-        (0, 0, 0), such that this labware _must_ be calibrated before use.
-
-        :param name: the name of the labware to be used with `labware.load`
-        :param grid: a 2-tuple of integers representing (<n_columns>, <n_rows>)
-        :param spacing: a 2-tuple of floats representing
-            (<col_spacing, <row_spacing)
-        :param diameter: a float representing the internal diameter of each
-            well
-        :param depth: a float representing the distance from the top of each
-            well to the internal bottom of the same well
-        :param volume: [optional] the maximum volume of each well
-        :return: the labware object created by this function
-        """
+    def create(self, name, grid, spacing, diameter, depth, volume=0):
         columns, rows = grid
         col_spacing, row_spacing = spacing
 
@@ -318,104 +299,89 @@ class Containers():
             'zDimension': depth}
 
         path_to_save_defs = CONFIG['labware_user_definitions_dir_v2']
-        lw.save_definition(lw_dict, location=path_to_save_defs)
+        save_definition(lw_dict, location=path_to_save_defs)
 
         return load_from_definition(labware_name,
                                     Location(Point(0, 0, 0), 'deck'),
                                     legacy=True)
 
-
-def _format_labware_definition(labware_name: str, labware: Container = None):
-    lw_dict: Dict[str, Any] = {}
-    lw_dict['wells'] = {}
-    converted_labware_name = labware_name.replace("-", "_").lower()
-    is_tiprack = True if 'tip' in converted_labware_name else False
-
-    # Definition Metadata
-    lw_dict['brand'] = {'brand': 'opentrons'}
-    lw_dict['schemaVersion'] = 2
-    lw_dict['version'] = 1
-    lw_dict['namespace'] = 'legacy_api'
-    lw_dict['metadata'] = {
-        'displayName': converted_labware_name,
-        'displayCategory': 'tipRack' if is_tiprack else 'other',
-        'displayVolumeUnits': 'µL'}
-    lw_dict['parameters'] = {
-        'format': 'irregular',
-        'isMagneticModuleCompatible': False,
-        'loadName': converted_labware_name,
-        'isTiprack': is_tiprack}
-
-    if labware:
-        pass
-
-    return lw_dict, converted_labware_name, is_tiprack
+    def list(self, *args, **kwargs):
+        return get_all_labware_definitions()
 
 
-# class LegacyLabware(lw.Labware):
-#     def __init__(self, definition: dict,
-#                  parent: types.Location, label: str = None) -> None:
-#         super().__init__(definition, parent)
-#         self._wells_by_index = super().wells()
-#         self._wells_by_name = super().wells_by_name()
-#         self._columns = super().columns()
-#         self._rows = super().rows()
-#         self._properties = {
-#             'length': self.dimensions['xDimension'],
-#             'width': self.dimensions['yDimension'],
-#             'height': self.dimensions['zDimension'],
-#             'type': self.display_name,
-#             'magdeck_engage_height': self.magdeck_engage_height
-#             }
-
-class LegacyLabware:
+class LegacyLabware():
     def __init__(
             self, definition: dict,
-            parent: lw.Location, label: str = None) -> None:
-        if label:
-            dn = label
-        else:
-            dn = definition['metadata']['displayName']
-        self._display_name = f"{dn} on {parent.labware}"
-        self._calibrated_offset: Point = Point(0, 0, 0)
-        self._wells: List[Well] = []
-
-        self._well_definition = definition['wells']
-        self._paraemters = definition['parameters']
-        offset = definition['cornerOffsetFromSlot']
-        self._dimension = definition['dimensions']
-        self._ordering = [well
-                          for col in definition['ordering']
-                          for well in col]
-        self._offset = \
-            Point(offset['x'], offset['y'], offset['z'] + parent.point)
-        self._parent = parent.labware
-        # Applied properties
-        self.set_calibration(self._calibrated_offset)
-
-        self._pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
-        self._definition = definition
+            parent: Location, label: str = None) -> None:
+        self.lw_obj = Labware(definition, parent)
+        self._wells_by_index = self.lw_obj.wells()
+        self._wells_by_name = self.lw_obj.wells_by_name()
+        self._columns = self.lw_obj.columns()
+        self._columns_by_name = self.lw_obj.columns_by_name()
+        self._rows = self.lw_obj.rows()
+        self._rows_by_name = self.lw_obj.rows_by_name()
         self._properties = {
-            'length': self.dimensions['xDimension'],
-            'width': self.dimensions['yDimension'],
-            'height': self.dimensions['zDimension'],
-            'type': self.display_name,
-            'magdeck_engage_height': self.magdeck_engage_height
+            'length': self.lw_obj.dimensions['xDimension'],
+            'width': self.lw_obj.dimensions['yDimension'],
+            'height': self.lw_obj.dimensions['zDimension'],
+            'type': self.lw_obj.display_name,
+            'magdeck_engage_height': self.lw_obj.magdeck_engage_height
             }
+        self._accessor_methods = {
+            'well': self.wells,
+            'cols': self.columns
+        }
+
+        self._map_list_and_dict = {
+            'wells': {
+                'list': self._wells_by_index,'dict': self._wells_by_name},
+            'columns': {
+                'list': self._columns,'dict': self._columns_by_name},
+            'rows': {
+                'list': self._rows, 'dict': self._rows_by_name}
+            }
+
+
+    def __getattr__(self, attr):
+        # For the use-case of methods `well` or `cols`
+        return self._accessor_methods[attr]
+
+    def __getitem__(self, name) -> Well:
+        # For the use-case of labware[0] or labware['A1']
+        if isinstance(name, int) or isinstance(name, slice):
+            return self._map_list_and_dict['wells']['list'][name]
+        elif isinstance(name, str):
+            return self._map_list_and_dict['wells']['dict'][name]
+        else:
+            raise TypeError('Expected int, slice or string')
 
     @property
     def properties(self) -> Dict:
         return self._properties
 
-    def get_index_by_name(self, name):
-        """
-        Retrieves child's name by index
-        """
-        return self._wells_by_index.index(self._wells_by_name[name])
+    @property
+    def columns(self):
+        return WellSeries(
+            wells_dict=self._columns_by_name,
+            wells_list=self._columns,
+            labware_object=self,
+            method_flag='columns')
 
-    def get_wells_by_xy(self, **kwargs) -> Union[lw.Well, List[lw.Well]]:
+    @property
+    def rows(self):
+        return WellSeries(
+            wells_dict=self._rows_by_name,
+            wells_list=self._rows,
+            labware_object=self,
+            method_flag='rows')
+
+    def _get_wells_by_xy(
+            self, method_name=None, **kwargs) -> Union[newWell, List[newWell]]:
         x = kwargs.get('x', None)
         y = kwargs.get('y', None)
+        if method_name != 'wells':
+            raise ValueError(
+                f'You cannot use X and Y with {method_name} method')
         if x is None and isinstance(y, int):
             return self._rows[y]
         elif y is None and isinstance(x, int):
@@ -425,22 +391,24 @@ class LegacyLabware:
         else:
             raise ValueError('Labware.wells(x=, y=) expects ints')
 
-    def get_wells_by_to_and_length(self, *args, **kwargs):
+    def _get_wells_by_to_and_length(self, *args, method_name=None, **kwargs):
         start = args[0] if len(args) else 0
         stop = kwargs.get('to', None)
         step = kwargs.get('step', 1)
         length = kwargs.get('length', 1)
 
+        wells_list = self._map_list_and_dict[method_name]['list']
+        wells_dict = self._map_list_and_dict[method_name]['dict']
         wrapped_wells = [w
                          for i in range(3)
-                         for w in self._wells_by_index]
-        total_wells = len(self._wells_by_index)
+                         for w in wells_list]
+        total_wells = len(wells_list)
 
         if isinstance(start, str):
-            start = self.get_index_by_name(start)
+            start = wells_list.index(wells_dict[start])
         if stop:
             if isinstance(stop, str):
-                stop = self.get_index_by_name(stop)
+                stop = wells_list.index(wells_dict[start])
             if stop > start:
                 stop += 1
                 step = step * -1 if step < 0 else step
@@ -460,61 +428,126 @@ class LegacyLabware:
         else:
             return new_wells
 
-    def get_well_by_type(
+    def _get_well_by_type(
             self,
-            well: Union[int, str, slice]) -> Union[List[lw.Well], lw.Well]:
+            well: Union[int, str, slice],
+            method_name) -> Union[List[newWell], newWell]:
         if isinstance(well, int):
-            return self._wells_by_index[well]
+            return self._map_list_and_dict[method_name]['list'][well]
         elif isinstance(well, str):
-            return self._wells_by_name[well]
+            return self._map_list_and_dict[method_name]['dict'][well]
         else:
             raise TypeError(f"Type {type(well)} is not compatible.")
 
-    def _flatten_well_list(self, lis):
-        new_list = []
-        for item in lis:
-            if isinstance(item, list):
-                new_list.extend(self._flatten_well_list(item))
-            else:
-                new_list.append(self.get_well_by_type(item))
-        return new_list
+    # def _flatten_well_list(self, lis):
+    #     new_list = []
+    #     for item in lis:
+    #         if isinstance(item, list):
+    #             new_list.extend(self._flatten_well_list(item))
+    #         else:
+    #             new_list.append(self._get_well_by_type(item))
+    #     return new_list
 
-    def wells(self,  # type: ignore
+    def wells(self,
               *args,
-              **kwargs) -> Union[List[lw.Well], lw.Well]:
+              **kwargs) -> Union[List[newWell], newWell]:  # type: ignore
         """
         Returns child Well or list of child Wells
         """
         if not args and not kwargs:
-            return self._wells_by_index
-        elif len(args) and isinstance(args[0], list):
-            return self._flatten_well_list(args[0])
-        elif 'x' in kwargs or 'y' in kwargs:
-            return self.get_wells_by_xy(**kwargs)
+            return WellSeries(self._wells_by_name, self._wells_by_index, self)
+
+        if args and isinstance(args[0], list):
+            args = args[0]
+
+        if len(args) > 1:
+            print("In length thing")
+            return [self._get_well_by_type(n, 'wells') for n in args]
+        else:
+            return self.handle_args('wells', *args, **kwargs)
+
+
+    def handle_args(self, method_name: str, *args, **kwargs):
+
+        if 'x' in kwargs or 'y' in kwargs:
+            return self._get_wells_by_xy(method_name=method_name, **kwargs)
         elif 'to' in kwargs or 'length' in kwargs or 'step' in kwargs:
-            return self.get_wells_by_to_and_length(*args, **kwargs)
+            return self._get_wells_by_to_and_length(
+                *args, method_name=method_name, **kwargs)
         elif len(args) == 1:
-            return self.get_well_by_type(args[0])
-        else:
-            return self._flatten_well_list(args)
+            return self._get_well_by_type(
+                args[0],
+                method_name)
 
-    def well(self, name: str) -> lw.Well:
-        """
-        Returns well by :name:
-        """
-        return super().__getitem__(name)
-
-    def columns(self, *args):
+    def method_columns(self, *args, **kwargs):
+        if not args:
+            return WellSeries(self._columns_by_name, self._columns, self)
         if len(args) == 1:
-            return super().columns(args)[0]
+            return self.lw_obj.columns(args)[0]
+        elif len(args) > 1:
+            return [self._get_well_by_type(n, 'columns') for n in args]
         else:
-            return super().columns(args)
+            return self.handle_args('columns', *args, **kwargs)
 
-    def cols(self, *args):
-        return self.columns(*args)
-
-    def rows(self, *args):
+    def method_rows(self, *args, **kwargs):
+        if not args:
+            return WellSeries(self._rows_by_name, self._rows, self)
         if len(args) == 1:
-            return super().rows(*args)[0]
+            return self.lw_obj.rows(*args)[0]
+        elif len(args) > 1:
+            return [self._get_well_by_type(n, 'rows') for n in args]
         else:
-            return super().rows(*args)
+            return self.handle_args('rows', *args, **kwargs)
+
+
+class WellSeries(LegacyLabware):
+    """
+    :WellSeries: represents a series of wells to make
+    accessing rows and columns easier. You can access
+    wells using index, providing name, index or slice
+
+    :WellSeries: mimics :Placeable:'s behaviour, delegating
+    all :Placeable: calls to the 0th well by default.
+
+    Default well index can be overriden using :set_offset:
+    """
+
+    def __init__(
+        self,
+        wells_dict: Dict,
+        wells_list: List,
+        labware_object: LegacyLabware,
+        method_flag: str=None,
+        name: str=None):
+
+        self.lw_object = labware_object
+        self.items = wells_dict
+        self.values = wells_list
+        self.method_flag = method_flag
+
+        self.offset = 0
+        # self.name = name
+
+    def set_offset(self, offset):
+        """
+        Set index of a well that will be used to mimic :Placeable:
+        """
+        self.offset = offset
+
+    def __getitem__(self, name):
+        if isinstance(name, slice):
+            return 'Slice'
+        elif isinstance(name, int):
+            return self.values[name]
+        elif isinstance(name, str):
+            return self.items[name]
+        else:
+            raise TypeError('Expected int, slice or string')
+
+    def __call__(self, *args, **kwargs):
+        if self.method_flag == 'columns':
+            return self.lw_object.method_columns(*args)
+        elif self.method_flag == 'rows':
+            return self.lw_object.method_rows(*args)
+        else:
+            raise TypeError(f'You cannot call {self.__name__}')

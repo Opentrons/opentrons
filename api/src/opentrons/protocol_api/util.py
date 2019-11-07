@@ -233,3 +233,11 @@ def clamp_value(
             f'{log_tag} calmped input {input_value} to {min_value}')
         return min_value
     return input_value
+
+
+class ModifiedList(list):
+    def __contains__(self, item):
+        for name in self:
+            if name == item.replace("-", "_").lower():
+                return True
+        return False

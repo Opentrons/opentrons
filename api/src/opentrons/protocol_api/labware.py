@@ -24,8 +24,8 @@ from typing import Any, AnyStr, List, Dict, Optional, Union, Tuple
 
 import jsonschema  # type: ignore
 
-from opentrons.types import Location
-from opentrons.types import Point
+from .util import ModifiedList
+from opentrons.types import Location, Point
 from opentrons.config import CONFIG
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -158,6 +158,10 @@ class Well:
     @property
     def diameter(self) -> Optional[float]:
         return self._diameter
+
+    @property
+    def display_name(self):
+        return self._display_name
 
     def top(self, z: float = 0.0) -> Location:
         """
@@ -1207,7 +1211,7 @@ def get_all_labware_definitions() -> List[str]:
     Return a list of standard and custom labware definitions with load_name +
         name_space + version existing on the robot
     """
-    labware_list = []
+    labware_list = ModifiedList()
 
     def _check_for_subdirectories(path):
         with os.scandir(path) as top_path:

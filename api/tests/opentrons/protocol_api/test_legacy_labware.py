@@ -1,8 +1,12 @@
 import pytest
+import shutil
 
-
-from opentrons.protocol_api.legacy_wrapper.containers_wrapper import LegacyLabware
-from opentrons.protocol_api import labware
+from opentrons.legacy_api import containers
+from opentrons.config import CONFIG
+from opentrons.data_storage import database as db_cmds
+from opentrons.protocol_api.legacy_wrapper.containers_wrapper import\
+    LegacyLabware, perform_migration
+# from opentrons.protocol_api import labware
 from opentrons.types import Point, Location
 
 minimalLabwareDef = {
@@ -65,63 +69,139 @@ minimalLabwareDef = {
 }
 
 
-# def test_lw_create():
-#     return None
-#
-#
+@pytest.fixture
+def minimal_labware():
+    deck = Location(Point(0, 0, 0), 'deck')
+    plate = LegacyLabware(minimalLabwareDef, deck)
+
+    return plate
 
 @pytest.fixture
-def test_load_func():
-    return None
+def container_create(monkeypatch, config_tempdir):
+    td, tempdb = config_tempdir
+    fake_db = td.join('fakeopentrons.db')
+    dest = shutil.copyfile(tempdb, fake_db)
+    CONFIG['labware_database_file'] = dest
+    containers.create(
+        '3x8-chip',
+        grid=(8, 3),
+        spacing=(9, 7.75),
+        diameter=5,
+        depth=0,
+        volume=20)
+
+    def list_containers():
+        return ['3x8-chip']
+    monkeypatch.setattr(db_cmds, 'list_all_containers', list_containers)
+    perform_migration()
+    yield
+    shutil.rmtree(CONFIG['labware_user_definitions_dir_v2']/'legacy_api')
+    CONFIG['labware_database_file'] = tempdb
+
+@pytest.mark.api2_only
+def test_load_func(labware):
+    with pytest.raises(FileNotFoundError):
+        labware.load('fake_labware', slot=1)
+
+    with pytest.raises(RuntimeError):
+        labware.load('96-flat', slot=1, label='plate 1')
+        labware.load('96-flat', slot=1, label='plate 2')
 
 
-def test_well_accessor():
-    deck = Location(Point(0, 0, 0), 'deck')
-    plate = LegacyLabware(minimalLabwareDef, deck)
+@pytest.mark.api2_only
+def test_well_accessor(minimal_labware):
+    # Access well by __getitem__ from LegacyLabware
+    assert minimal_labware[0] == minimal_labware._wells_by_index[0]
+    assert minimal_labware['A1'] == minimal_labware._wells_by_index[0]
 
-    # well_1 = plate._wells_by_index[0]
-    # well_2 = plate._wells_by_index[1]
-    #
-    # assert plate.wells == [well_1, well_2]
-    # assert plate.well['A1'] == well_1
-    #
-    # assert plate.wells() == [well_1, well_2]
-    # assert plate.wells(0) == well_1
-    # assert plate.wells('A2') == well_2
-    # assert plate.wells(0, 'A2') == [well_1, well_2]
-    # assert plate.wells(['A1', 1]) == [well_1, well_2]
+    # Access individual wells within a labware using wells method
+    assert minimal_labware.wells()[0] == minimal_labware._wells_by_index[0]
+    assert minimal_labware.wells()['A1'] == minimal_labware._wells_by_index[0]
+    assert minimal_labware.wells(0) == minimal_labware._wells_by_index[0]
+    assert minimal_labware.wells('A2') == minimal_labware._wells_by_name['A2']
 
+    assert minimal_labware.well(1) == minimal_labware._wells_by_index[1]
+    assert minimal_labware.well('A2') == minimal_labware._wells_by_name['A2']
 
-def test_row_accessor():
-    deck = Location(Point(0, 0, 0), 'deck')
-    plate = LegacyLabware(minimalLabwareDef, deck)
+    well_1 = minimal_labware._wells_by_index[0]
+    well_2 = minimal_labware._wells_by_index[1]
+    well_3 = minimal_labware._wells_by_name['A2']
+    well_4 = minimal_labware._wells_by_name['B2']
 
-    row_1 = [plate._wells_by_index[0], plate._wells_by_index[2]]
-    row_2 = [plate._wells_by_index[1], plate._wells_by_index[3]]
+    # Generate lists using `wells()` method
+    assert minimal_labware.wells(0, 'A2') == [well_1, well_3]
+    assert minimal_labware.wells(['A1', 2]) == [well_1, well_3]
+    assert minimal_labware.wells(['A1', 'A2']) == [well_1, well_3]
 
-    # assert plate.rows == [row_1, row_2]
-    # assert plate.rows[0] == row_1
-    # assert plate.rows['B'] == row_2
+    assert minimal_labware.wells(0, length=-2) == [well_1, well_4]
+    assert minimal_labware.wells('A1', length=4, step=2)\
+        == [well_1, well_3, well_1, well_3]
 
-    assert plate.rows() == [row_1, row_2]
-    assert plate.rows(0) == row_1
-    assert plate.rows('A') == row_1
-    assert plate.rows('A', 1) == [row_1, row_2]
-
-
-def test_column_accessor():
-    return None
+    assert minimal_labware.wells(x=1, y=1) == well_4
+    assert minimal_labware.wells(x=-1) == [well_3, well_4]
+    assert minimal_labware.wells(y=1) == [well_2, well_4]
 
 
+@pytest.mark.api2_only
+def test_row_accessor(minimal_labware):
+    row_1 = [minimal_labware._wells_by_index[0], minimal_labware._wells_by_index[2]]
+    row_2 = [minimal_labware._wells_by_index[1], minimal_labware._wells_by_index[3]]
+
+    assert minimal_labware.rows[0] == row_1
+    assert minimal_labware.rows['B'] == row_2
+
+    assert minimal_labware.rows(0) == row_1
+    assert minimal_labware.rows('A') == row_1
+    assert minimal_labware.rows('A', 1) == [row_1, row_2]
 
 
-def test_list_labware():
-    return None
+@pytest.mark.api2_only
+def test_column_accessor(minimal_labware):
+    col_1 = [
+        minimal_labware._wells_by_name['A1'],
+        minimal_labware._wells_by_name['B1']]
+    col_2 = [
+        minimal_labware._wells_by_name['A2'],
+        minimal_labware._wells_by_name['B2']]
+
+    assert minimal_labware.columns[0] == col_1
+    assert minimal_labware.cols[0] == col_1
+    assert minimal_labware.columns['2'] == col_2
+    assert minimal_labware.cols['2'] == col_2
+
+    assert minimal_labware.columns(0) == col_1
+    assert minimal_labware.columns('A') == col_1
+    assert minimal_labware.columns('A', 1) == [col_1, col_2]
+
+    assert minimal_labware.columns(0) == col_1
+    assert minimal_labware.columns('A') == col_1
+    assert minimal_labware.columns('A', 1) == [col_1, col_2]
 
 
-def test_properties():
-    return None
+@pytest.mark.api2_only
+def test_list_labware(labware, container_create):
+    # Although the API v2 name adheres to schema standards, backcompat
+    # labware list should handle checking the old name against the list
+    # of new labwares; this is why labware list uses a modified list class
+    assert '3x8-chip' in labware.list()
 
 
-def test_inheritance_methods():
+
+@pytest.mark.api2_only
+def test_properties(minimal_labware):
+    dims = minimalLabwareDef['dimensions']
+    first_well = minimalLabwareDef['wells']['A1']
+    # Check labware properties
+    assert minimal_labware.properties['length'] == dims['xDimension']
+    assert minimal_labware.properties['width'] == dims['yDimension']
+    assert minimal_labware.properties['height'] == dims['zDimension']
+
+    # Check well properties
+    assert minimal_labware[0].properties['total-liquid-volume']\
+        == first_well['totalLiquidVolume']
+    assert minimal_labware[0].properties['depth'] == first_well['depth']
+
+
+@pytest.mark.api2_only
+def test_labware_create(labware, container_create):
     return None

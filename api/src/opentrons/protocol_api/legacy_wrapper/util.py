@@ -2,7 +2,7 @@
 import functools
 import inspect
 import logging
-from typing import Callable
+from typing import Callable, Dict, Any
 
 
 def log_call(

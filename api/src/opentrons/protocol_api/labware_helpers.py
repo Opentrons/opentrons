@@ -43,7 +43,7 @@ def load(
     version: int = 1,
     bundled_defs: Dict[str, LabwareDefinition] = None,
     extra_defs: Dict[str, LabwareDefinition] = None
-) -> Labware:
+) -> Union[Labware, LegacyLabware]:
     """
     Return a labware object constructed from a labware definition dict looked
     up by name (definition must have been previously stored locally on the

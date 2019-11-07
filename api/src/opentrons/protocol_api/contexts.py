@@ -16,6 +16,7 @@ from .labware import (Well, Labware, get_labware_definition, load_module,
                       select_tiprack_from_list, filter_tipracks_to_start,
                       LabwareDefinition)
 from .labware_helpers import load_from_definition, load
+from opentrons.protocol_api.legacy_wrapper.containers_wrapper import LegacyLabware
 from .util import (FlowRates, PlungerSpeeds, Clearances, AxisMaxSpeeds,
                    HardwareManager, clamp_value)
 
@@ -243,7 +244,7 @@ class ProtocolContext(CommandPublisher):
             location: types.DeckLocation,
             label: str = None,
             legacy: bool = False,
-    ) -> Labware:
+    ) -> Union[Labware, LegacyLabware]:
         """ Specify the presence of a piece of labware on the OT2 deck.
 
         This function loads the labware definition specified by `labware_def`
