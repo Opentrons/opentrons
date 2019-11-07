@@ -694,7 +694,7 @@ class Pipette(CommandPublisher):
             location = self.previous_placeable
 
         do_publish(self.broker, commands.mix, self.mix, 'before',
-                   self, None, None, repetitions, volume, location, rate)
+                   None, None, self, repetitions, volume, location, rate)
 
         self.aspirate(location=location, volume=volume, rate=rate)
         for i in range(repetitions - 1):

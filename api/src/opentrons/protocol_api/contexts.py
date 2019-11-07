@@ -1258,7 +1258,7 @@ class InstrumentContext(CommandPublisher):
 
         assert tiprack.is_tiprack, "{} is not a tiprack".format(str(tiprack))
         cmds.do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
-                        'before', None, None, instrument=self, location=target)
+                        'before', None, None, self, location=target)
         self.move_to(target.top())
 
         self._hw_manager.hardware.set_current_tiprack_diameter(
@@ -1267,7 +1267,7 @@ class InstrumentContext(CommandPublisher):
             self._mount, self._tip_length_for(tiprack), presses, increment)
         # Note that the hardware API pick_up_tip action includes homing z after
         cmds.do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
-                        'after', self, None, instrument=self, location=target)
+                        'after', self, None, self, location=target)
         self._hw_manager.hardware.set_working_volume(
             self._mount, target.max_volume)
         tiprack.use_tips(target, self.channels)
@@ -1345,11 +1345,11 @@ class InstrumentContext(CommandPublisher):
                 "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
                 " However, it is a {}".format(location))
         cmds.do_publish(self.broker, cmds.drop_tip, self.drop_tip,
-                        'before', None, None, instrument=self, location=target)
+                        'before', None, None, self, location=target)
         self.move_to(target)
         self._hw_manager.hardware.drop_tip(self._mount, home_after=home_after)
         cmds.do_publish(self.broker, cmds.drop_tip, self.drop_tip,
-                        'after', self, None, instrument=self, location=target)
+                        'after', self, None, self, location=target)
         if isinstance(target.labware, Well)\
            and target.labware.parent.is_tiprack:
             # If this is a tiprack we can try and add the tip back to the
