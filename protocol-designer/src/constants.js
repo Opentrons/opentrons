@@ -38,6 +38,7 @@ export const STD_SLOT_DIVIDER_WIDTH = 4
 // These have no visual representation on the deck themselves,
 // but may contain certain specific items that span (eg thermocycler)
 export const SPAN7_8_10_11_SLOT: 'span7_8_10_11' = 'span7_8_10_11'
+export const TC_SPAN_SLOTS: Array<DeckSlot> = ['7', '8', '10', '11']
 export const PSEUDO_DECK_SLOTS: { [DeckSlot]: DeckDefSlot } = {
   [SPAN7_8_10_11_SLOT]: {
     displayName: 'Spanning slot',

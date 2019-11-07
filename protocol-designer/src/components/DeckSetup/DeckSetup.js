@@ -15,7 +15,7 @@ import {
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import i18n from '../../localization'
-import { PSEUDO_DECK_SLOTS, SPAN7_8_10_11_SLOT } from '../../constants'
+import { PSEUDO_DECK_SLOTS } from '../../constants'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../steplist'
 import {
   getModuleVizDims,
@@ -23,7 +23,7 @@ import {
 } from './getModuleVizDims'
 
 import { selectors as featureFlagSelectors } from '../../feature-flags'
-
+import { getSlotsBlockedBySpanning, getSlotIsEmpty } from '../../step-forms'
 import { BrowseLabwareModal } from '../labware'
 import ModuleViz from './ModuleViz'
 import ModuleTag from './ModuleTag'
@@ -36,7 +36,6 @@ import type {
   LabwareOnDeck as LabwareOnDeckType,
   ModuleOnDeck,
 } from '../../step-forms'
-import type { DeckSlot } from '../../types'
 
 import styles from './DeckSetup.css'
 
@@ -68,38 +67,6 @@ const VIEWBOX_MIN_X = -64
 const VIEWBOX_MIN_Y = -10
 const VIEWBOX_WIDTH = 520
 const VIEWBOX_HEIGHT = 414
-
-const getSlotsBlockedBySpanning = (
-  initialDeckSetup: InitialDeckSetup
-): Array<DeckSlot> => {
-  // NOTE: Ian 2019-10-25 dumb heuristic since there's only one case this can happen now
-  if (
-    values(initialDeckSetup.modules).some(
-      (module: ModuleOnDeck) =>
-        module.type === 'thermocycler' && module.slot === SPAN7_8_10_11_SLOT
-    )
-  ) {
-    return ['7', '8', '10', '11']
-  }
-  return []
-}
-
-const getSlotIsEmpty = (
-  initialDeckSetup: InitialDeckSetup,
-  slot: string
-): boolean => {
-  // NOTE: should work for both deck slots and module slots
-  return (
-    [
-      ...values(initialDeckSetup.modules).filter(
-        (module: ModuleOnDeck) => module.slot === slot
-      ),
-      ...values(initialDeckSetup.labware).filter(
-        (labware: LabwareOnDeckType) => labware.slot === slot
-      ),
-    ].length === 0
-  )
-}
 
 const getSlotDefForModuleSlot = (
   module: ModuleOnDeck,
