@@ -1653,21 +1653,13 @@ class InstrumentContext(CommandPublisher):
                 self._mount, critical_point=cp_override),
             from_lw)
 
-        to_lw, to_well = geometry.split_loc_labware(location)
-        from_lw, from_well = geometry.split_loc_labware(from_loc)
+        tc = next(m for m in in self._ctx._modules if isinstance(m, ThermocyclerContext))
+        if tc and not tc._is_safe_move(to_loc=location, from_loc=from_lw):
+            raise RuntimeError(
+                "Cannot move to labware loaded in Thermocycler"
+                " when lid is closed")
 
-        if (isinstance(to_lw, Labware) and
-                isinstance(to_lw.parent, ThermocyclerGeometry)) or \
-                (isinstance(from_lw, Labware) and
-                    isinstance(from_lw.parent, ThermocyclerGeometry)):
-            tc_context = next(m for m in self._ctx._modules
-                              if isinstance(m, ThermocyclerContext))
-            if tc_context and tc_context.lid_position == 'closed':
-                raise RuntimeError(
-                    "Cannot move to labware loaded in Thermocycler"
-                    " when lid is closed")
-
-        moves = geometry.plan_moves(from_loc, location, self._ctx.deck,
+       moves = geometry.plan_moves(from_loc, location, self._ctx.deck,
                                     force_direct=force_direct,
                                     minimum_z_height=minimum_z_height)
         self._log.debug("move_to: {}->{} via:\n\t{}"
@@ -2133,6 +2125,12 @@ class ThermocyclerContext(ModuleContext):
             safe_point = trash_top.point._replace(
                     z=high_point[Axis.by_mount(instr._mount)])
             instr.move_to(types.Location(safe_point, None), force_direct=True)
+
+    def _is_safe_move(self, to_loc: Location, from_loc: Location):
+        to_lw, to_well = geometry.split_loc_labware(to_loc)
+        from_lw, from_well = geometry.split_loc_labware(from_loc)
+        return (self.labware is to_lw or self.labware is from_lw) and \
+                self.lid_position == 'open'
 
     @cmds.publish.both(command=cmds.thermocycler_open)
     def open_lid(self):
