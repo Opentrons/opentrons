@@ -68,8 +68,8 @@ export default function ChangePipetteFields(props: Props) {
   const renderPipetteSelect = (props: PipetteSelectProps) => {
     const { tabIndex, mount } = props
     const pipetteName = values[mount].pipetteName
-
-    const nameBlacklist = useSelector(getEnableMultiGEN2Pipettes)
+    const enableMultiGEN2 = useSelector(getEnableMultiGEN2Pipettes)
+    const nameBlacklist = enableMultiGEN2
       ? []
       : ['p20_multi_gen2', 'p300_multi_gen2']
     return (
