@@ -18,3 +18,8 @@ export const getDisableModuleRestrictions: Selector<?boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_DISABLE_MODULE_RESTRICTIONS
 )
+
+export const getEnableMultiGEN2Pipettes: Selector<?boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_MULTI_GEN2_PIPETTES
+)
