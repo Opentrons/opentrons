@@ -74,7 +74,12 @@ This maximum supported API level is the highest API level you can specify in a p
 Determining What Features Are In What Version
 ---------------------------------------------
 
-As you read the documentation on this site, you will notice that all documentation on features, function calls, available properties, and everything else about the Protocol API notes which API version it was introduced in. Keep this information in mind when specifying your protocol's API version.
+As you read the documentation on this site, you will notice that all documentation on features, function calls, available properties, and everything else about the Protocol API notes which API version it was introduced in. Keep this information in mind when specifying your protocol's API version. The version statement will look like this:
+
+.. versionadded:: 2.0
+
+
+If a behavior or function is annotated with a version, then it is available if your protocol specifies that version or a higher minor version.
 
 
 .. _version-table:

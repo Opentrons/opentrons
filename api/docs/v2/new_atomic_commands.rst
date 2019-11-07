@@ -48,6 +48,9 @@ If you have associated a tiprack with your pipette such as in the :ref:`new-pipe
 
     pipette.pick_up_tip()
 
+
+.. versionadded:: 2.0
+
 Drop Tip
 ========
 
@@ -65,6 +68,9 @@ Instead of returning a tip to the tip rack, we can also drop it in an alternativ
     trash = protocol.load_labware('trash-box', 4)
     pipette.pick_up_tip()
     pipette.drop_tip(trash)
+
+
+.. versionadded:: 2.0
 
 Return Tip
 ===========
@@ -99,6 +105,10 @@ For the purposes of this section we can assume that we already have the followin
 
 This loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 2 and two `Opentrons 300ul Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slots 3 and 4 respectively, and uses a P300 Single pipette.
 
+
+.. versionadded:: 2.0
+
+
 Iterating Through Tips
 ----------------------
 
@@ -127,6 +137,9 @@ If we try to :py:meth:`.InstrumentContext.pick_up_tip()` again when all the tips
 
     # this will raise an exception if run after the previous code block
     # pipette.pick_up_tip()
+
+
+.. versionadded:: 2.0
 
 ****************
 Liquid Control
@@ -180,6 +193,8 @@ Now our pipette's tip is holding 100uL.
     the default throughout your protocol - you can change the default offset with
     :py:attr:`.InstrumentContext.well_bottom_clearance` (see :ref:`new-default-op-positions`).
 
+.. versionadded:: 2.0
+
 .. _new-dispense:
 
 Dispense
@@ -200,6 +215,8 @@ To dispense is to push out liquid from the pipette's tip. The usage of :py:meth:
     the default throughout your protocol - you can change the default offset with
     :py:attr:`.InstrumentContext.well_bottom_clearance` (see :ref:`new-default-op-positions`).
 
+.. versionadded:: 2.0
+
 .. _new-blow-out:
 
 .. _blow-out:
@@ -215,6 +232,9 @@ When calling :py:meth:`.InstrumentContext.blow_out`, we have the option to speci
 
     pipette.blow_out()            # blow out in current location
     pipette.blow_out(plate['B3']) # blow out in current plate:B3
+
+
+.. versionadded:: 2.0
 
 .. _touch-tip:
 
@@ -236,6 +256,9 @@ Touch tip can take up to 4 arguments: ``touch_tip(location, radius, v_offset, sp
                       radius=0.75,
                       v_offset=-2)
 
+
+.. versionadded:: 2.0
+
 .. _mix:
 
 Mix
@@ -255,6 +278,9 @@ The mix command takes three arguments: ``mix(repetitions, volume, location)``
 
     Mixes consist of aspirates and then immediate dispenses. In between these actions, the pipette moves up and out of the target well. This is normal, and is done to avoid incorrect aspirate and dispense actions when the plunger does small motions necessary to set it up for its next action.
 
+
+.. versionadded:: 2.0
+
 .. _air-gap:
 
 Air Gap
@@ -267,6 +293,8 @@ Some liquids need an extra amount of air in the pipette's tip to prevent it from
     pipette.aspirate(100, plate['B4'])
     pipette.air_gap(20)
     pipette.drop_tip()
+
+.. versionadded:: 2.0
 
 ******
 Moving
@@ -315,6 +343,8 @@ Usually the above option is useful when moving inside of a well. Take a look at 
     pipette.move_to(plate['A1'].top(-2), force_direct=True)
     pipette.move_to(plate['A2'].top())
 
+.. versionadded:: 2.0
+
 ****************
 Utility Commands
 ****************
@@ -351,6 +381,8 @@ will be displayed in the Opentrons app when protocol execution pauses.
         # more clear.
         protocol.pause('Time to take a break')
 
+.. versionadded:: 2.0
+
 Homing
 ======
 
@@ -379,6 +411,8 @@ None of these functions take any arguments:
         pipette.home()  # Homes the right z axis and plunger
         pipette.home_plunger() # Homes the right plunger
 
+.. versionadded:: 2.0
+
 Comment
 =======
 
@@ -395,4 +429,4 @@ during protocol execution:
     def run(protocol: protocol_api.ProtocolContext):
         protocol.comment('Hello, world!')
 
-
+.. versionadded:: 2.0
