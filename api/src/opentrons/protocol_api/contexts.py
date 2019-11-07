@@ -1653,13 +1653,12 @@ class InstrumentContext(CommandPublisher):
                 self._mount, critical_point=cp_override),
             from_lw)
 
-        tc = next(m for m in in self._ctx._modules if isinstance(m, ThermocyclerContext))
-        if tc and not tc._is_safe_move(to_loc=location, from_loc=from_lw):
-            raise RuntimeError(
-                "Cannot move to labware loaded in Thermocycler"
-                " when lid is closed")
+        tc = next(m for m in self._ctx._modules
+                  if isinstance(m, ThermocyclerContext))
+        if tc:
+            tc._flag_unsafe_move(to_loc=location, from_loc=from_loc)
 
-       moves = geometry.plan_moves(from_loc, location, self._ctx.deck,
+        moves = geometry.plan_moves(from_loc, location, self._ctx.deck,
                                     force_direct=force_direct,
                                     minimum_z_height=minimum_z_height)
         self._log.debug("move_to: {}->{} via:\n\t{}"
@@ -2126,11 +2125,16 @@ class ThermocyclerContext(ModuleContext):
                     z=high_point[Axis.by_mount(instr._mount)])
             instr.move_to(types.Location(safe_point, None), force_direct=True)
 
-    def _is_safe_move(self, to_loc: Location, from_loc: Location):
+    def _flag_unsafe_move(self,
+                          to_loc: types.Location,
+                          from_loc: types.Location):
         to_lw, to_well = geometry.split_loc_labware(to_loc)
         from_lw, from_well = geometry.split_loc_labware(from_loc)
-        return (self.labware is to_lw or self.labware is from_lw) and \
-                self.lid_position == 'open'
+        if (self.labware is to_lw or self.labware is from_lw) and \
+                self.lid_position == 'closed':
+            raise RuntimeError(
+                "Cannot move to labware loaded in Thermocycler"
+                " when lid is closed")
 
     @cmds.publish.both(command=cmds.thermocycler_open)
     def open_lid(self):
