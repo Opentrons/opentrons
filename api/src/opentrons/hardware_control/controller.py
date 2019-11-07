@@ -39,6 +39,8 @@ class Controller:
             config=self.config, handle_locks=False)
         self._cached_fw_version: Optional[str] = None
         self._module_watcher = aionotify.Watcher()
+        if not os.path.isdir('/dev/modules'):
+            os.mkdir('/dev/modules')
         self._module_watcher.watch(alias='modules',
                                    path='/dev/modules',
                                    flags=(aionotify.Flags.CREATE | aionotify.Flags.DELETE))
