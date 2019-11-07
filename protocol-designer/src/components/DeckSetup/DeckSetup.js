@@ -202,6 +202,8 @@ const DeckSetupContents = (props: ContentsProps) => {
               key={slot.id}
               slot={slot}
               selectedTerminalItemId={props.selectedTerminalItemId}
+              // Module slots' ids reference their parent module
+              moduleType={initialDeckSetup.modules[slot.id]?.type || null}
             />
           )
         })}
@@ -230,6 +232,7 @@ const DeckSetupContents = (props: ContentsProps) => {
           </React.Fragment>
         )
       })}
+
       <DragPreview getRobotCoordsFromDOMCoords={getRobotCoordsFromDOMCoords} />
     </>
   )

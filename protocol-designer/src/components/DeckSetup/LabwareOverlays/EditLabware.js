@@ -74,11 +74,7 @@ const EditLabware = (props: Props) => {
           [styles.drag_text]: isBeingDragged,
         })}
       >
-        {i18n.t(
-          `deck.overlay.slot.${
-            isBeingDragged ? 'drag_to_new_slot' : 'place_here'
-          }`
-        )}
+        {isBeingDragged ? 'NEEEEW SLOT!' : 'PLAC HERRR'}
       </div>
     ) : (
       <>

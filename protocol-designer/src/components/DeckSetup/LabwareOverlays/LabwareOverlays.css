@@ -98,3 +98,9 @@
   border-style: solid;
   border-radius: 0.5rem;
 }
+
+.blocked_slot_box {
+  /* TODO IMMEDIATELY */
+  fill: rgba(255, 160, 50, 0.75);
+  stroke: red;
+}
