@@ -11,7 +11,6 @@ from opentrons.types import Mount
 
 from . import modules
 
-
 MODULE_LOG = logging.getLogger(__name__)
 
 
@@ -121,7 +120,8 @@ class Controller:
     async def watch_modules(self, loop: asyncio.AbstractEventLoop, update_attached_modules):
         await self._module_watcher.setup(loop)
 
-        await update_attached_modules(new_modules=modules.discover())
+        initial_modules = modules.discover()
+        await update_attached_modules(new_modules=initial_modules)
         while not self._module_watcher.closed:
             event = await self._module_watcher.get_event()
             MODULE_LOG.info(f'\n\nEVENT CAUGHT: {event}\n\n')
