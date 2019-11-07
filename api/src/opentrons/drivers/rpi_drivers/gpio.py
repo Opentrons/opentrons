@@ -22,7 +22,7 @@ to set up all pins correctly, and then providing `set_low` and `set_high`
 functions that accept a pin number. The OUTPUT_PINS and INPUT_PINS dicts
 provide pin-mappings so calling code does not need to use raw integers.
 """
-
+import time
 
 IN = "in"
 OUT = "out"
@@ -153,6 +153,24 @@ def initialize():
     for pin in sorted(INPUT_PINS.values()):
         _enable_pin(pin, IN)
 
+  def activate_robot():
+    """
+    Gets the robot ready for operation by initializing GPIO pins, resetting
+    the Smoothie and enabling the audio pin.
+    """
+    initialize()
+
+    # audio-enable pin can stay HIGH always, unless there is noise coming
+    # from the amplifier, then we can set to LOW to disable the amplifier
+    set_high(OUTPUT_PINS['AUDIO_ENABLE'])
+
+    # smoothieware programming pins, must be in a known state (HIGH)
+    set_high(OUTPUT_PINS['HALT'])
+    set_high(OUTPUT_PINS['ISP'])
+    set_low(OUTPUT_PINS['RESET'])
+    time.sleep(0.25)
+    set_high(OUTPUT_PINS['RESET'])
+    time.sleep(0.25)
 
 def turn_on_blue_button_light():
     set_button_light(blue=True)
