@@ -127,9 +127,9 @@ class Controller:
             MODULE_LOG.info(f'\n\nEVENT CAUGHT: {event}\n\n')
             flags = aionotify.Flags.parse(event.flags)
             MODULE_LOG.info(f'\n\nFLAGS: {flags}\n\n')
-            if 'ot_module' in event.name
-              maybe_module_at_port = modules.get_module_at_port(event.name)
-               if maybe_module_at_port is not None and aionotify.Flags.DELETE in flags:
+            if 'ot_module' in event.name:
+                maybe_module_at_port = modules.get_module_at_port(event.name)
+                if maybe_module_at_port is not None and aionotify.Flags.DELETE in flags:
                     update_attached_modules(
                         removed_modules=[maybe_module_at_port])
                     MODULE_LOG.info(f'Module Removed: {maybe_module_at_port}')
