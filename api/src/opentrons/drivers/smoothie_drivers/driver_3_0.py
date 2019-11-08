@@ -528,7 +528,7 @@ class SmoothieDriver_3_0_0:
 
     def _connect_to_port(self, port=None):
         try:
-            smoothie_id = environ.get('OT_SMOOTHIE_ID', 'FT232R')
+            smoothie_id = environ.get('OT_SMOOTHIE_ID', 'AMA')
             self._connection = serial_communication.connect(
                 device_name=smoothie_id,
                 port=port,
