@@ -118,6 +118,7 @@ Transfer
 The most versatile of the complex liquid handling functions is :py:meth:`.InstrumentContext.transfer`. For a majority of use-cases you will most likely want to use this complex command.
 Below you will find a few scenarios utilizing the :py:meth:`.InstrumentContext.transfer` command.
 
+.. versionadded:: 2.0
 
 Basic
 -----
@@ -188,6 +189,8 @@ will have the steps...
     Dispensing 100.0 uL into well H2 in "1"
     Dropping tip well A1 in "12"
 
+.. versionadded:: 2.0
+
 One to Many
 ------------
 
@@ -222,6 +225,8 @@ will have the steps...
     Dispensing 100.0 uL into well H2 in "1"
     Dropping tip well A1 in "12"
 
+.. versionadded:: 2.0
+
 List of Volumes
 ---------------
 
@@ -248,6 +253,10 @@ will have the steps...
     Aspirating 60.0 uL from well A1 in "1" at 1 speed
     Dispensing 60.0 uL into well B3 in "1"
     Dropping tip well A1 in "12"
+
+
+
+.. versionadded:: 2.0
 
 **********************
 
@@ -311,6 +320,9 @@ will have the steps...
     Aspirating 30.0 uL from well H1 in "1" at 1 speed
     Dispensing 120.0 uL into well A2 in "1"
     Dropping tip well A1 in "12"
+
+
+.. versionadded:: 2.0
 
 Distribute
 -----------
@@ -383,6 +395,8 @@ will have the steps...
     Dispensing 30.0 uL into well A12 in "1"
     Blowing out at well A1 in "12"
     Dropping tip well A1 in "12"
+
+.. versionadded:: 2.0
 
 Re-Visiting Order of Operations
 ===============================
@@ -470,6 +484,8 @@ This parameter handles tip logic. You have options of ``always``, ``once`` and `
 
 If you want to avoid cross-contamination and increase accuracy, you should set this parameter to ``always``.
 
+.. versionadded:: 2.0
+
 Always Get a New Tip
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -503,6 +519,7 @@ will have the steps...
     Aspirating 100.0 uL from well A3 in "1" at 1 speed
     Dispensing 100.0 uL into well B3 in "1"
     Dropping tip well A1 in "12"
+
 
 Never Get a New Tip
 ^^^^^^^^^^^^^^^^^^^
@@ -563,6 +580,8 @@ will have the steps...
     Returning tip
     Dropping tip well A1 in "2"
 
+.. versionadded:: 2.0
+
 touch_tip
 ---------
 
@@ -589,6 +608,8 @@ will have the steps...
     Touching tip
     Dropping tip well A1 in "12"
 
+.. versionadded:: 2.0
+
 blow_out
 --------
 
@@ -613,6 +634,8 @@ will have the steps...
     Dispensing 100.0 uL into well A2 in "1"
     Blowing out
     Dropping tip well A1 in "12"
+
+.. versionadded:: 2.0
 
 mix_before, mix_after
 ---------------------
@@ -651,6 +674,8 @@ will have the steps...
     Dispensing 75.0 uL into well A2 in "1"
     Dropping tip well A1 in "12"
 
+.. versionadded:: 2.0
+
 air_gap
 -------
 
@@ -676,6 +701,8 @@ will have the steps...
     Aspirating 20 uL from well A1 in "1" at 1.0 speed
     Dispensing 120.0 uL into well A2 in "1"
     Dropping tip well A1 in "12"
+
+.. versionadded:: 2.0
 
 disposal_volume
 ---------------
@@ -720,3 +747,5 @@ See this image for example,
 .. image:: ../img/complex_commands/distribute_illustration_tip.png
    :scale: 50 %
    :align: center
+
+.. versionadded:: 2.0

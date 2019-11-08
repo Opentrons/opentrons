@@ -172,6 +172,16 @@ export const getRunProgress = createSelector(
   }
 )
 
+export const getSessionError: State => string | null = createSelector(
+  (state: State) => session(state).runRequest.error,
+  (state: State) => session(state).errors,
+  (runError, sessionErrors) => {
+    if (runError) return runError.message
+    if (sessionErrors.length > 0) return sessionErrors[0].message
+    return null
+  }
+)
+
 export function getStartTime(state: State): number | null {
   const { startTime, remoteTimeCompensation } = session(state)
 

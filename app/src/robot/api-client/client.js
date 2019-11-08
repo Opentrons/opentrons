@@ -409,6 +409,15 @@ export default function client(dispatch) {
       clearRunTimerInterval()
     }
 
+    // both light and full updates may have the errors list
+    if (apiSession.errors) {
+      update.errors = apiSession.errors.map(e => ({
+        timestamp: e.timestamp,
+        message: e.error.message,
+        line: e.error.line,
+      }))
+    }
+
     // if lastCommand key is present, we're dealing with a light update
     if ('lastCommand' in apiSession) {
       const lastCommand = apiSession.lastCommand && {
@@ -471,7 +480,17 @@ export default function client(dispatch) {
         )
       }
 
-      update.apiLevel = apiSession.api_level || 1
+      if (Array.isArray(apiSession.api_level)) {
+        update.apiLevel = apiSession.api_level
+      } else if (apiSession.api_level) {
+        // if we're connected to a robot on older software that still expresses
+        // its api level as a single int, it's the major version
+        update.apiLevel = [apiSession.api_level, 0]
+      } else {
+        // if we're connected to a robot on software sufficiently old that it
+        // doesn't send us its api level at all, it's on API v1
+        update.apiLevel = [1, 0]
+      }
 
       dispatch(actions.sessionResponse(null, update, freshUpload))
     } catch (error) {

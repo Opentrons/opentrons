@@ -1,8 +1,9 @@
 import asyncio
 import logging
 import os
+import sys
 from typing import Any, Dict, Optional, Tuple
-from opentrons import HERE as package_root
+
 from .mod_abc import UploadFunction
 
 log = logging.getLogger(__name__)
@@ -81,9 +82,9 @@ async def upload_firmware(port: str,
 async def upload_via_avrdude(port: str,
                              firmware_file_path: str,
                              kwargs: Dict[str, Any]) -> Tuple[bool, str]:
-    config_file_path = os.path.join(package_root,
-                                    'config', 'modules', 'avrdude.conf')
-
+    config_file_path = os.path.join(
+        os.path.dirname(sys.modules['opentrons'].__file__),
+        'config', 'modules', 'avrdude.conf')
     proc = await asyncio.create_subprocess_exec(
         'avrdude', '-C{}'.format(config_file_path), '-v',
         '-p{}'.format(PART_NO),

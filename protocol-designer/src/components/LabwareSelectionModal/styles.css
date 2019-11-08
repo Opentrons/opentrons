@@ -83,6 +83,13 @@
   @apply --font-header-dark;
 }
 
+.labware_preview_module_compat {
+  @apply --font-body-2-dark;
+
+  display: flex;
+  align-items: center;
+}
+
 .labware_render_wrapper {
   height: 7.125rem;
   width: 10.75rem;

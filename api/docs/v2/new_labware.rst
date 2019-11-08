@@ -76,6 +76,9 @@ The ending well will be in the bottom right, see the diagram below for further e
         plate = protocol.load_labware('corning_24_wellplate_3.4ml_flat', slot='1')
 
 
+.. versionadded:: 2.0
+
+
 Accessor Methods
 ^^^^^^^^^^^^^^^^
 As part of API Version 2, we wanted to allow users to utilize python's data structures more easily and as intended.
@@ -114,6 +117,8 @@ you will receive a ``KeyError``. This is equivalent to using the return value of
     a1 = plate['A1']
     d6 = plate.wells_by_name()['D6']
 
+.. versionadded:: 2.0
+
 List Access From ``wells``
 --------------------------
 Wells can be referenced by their "string" name, as demonstrated above.
@@ -133,6 +138,8 @@ a labware being at position 0.
     (`Labware Library <https://labware.opentrons.com/opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical>`_).
     Whichever well access method you use, your protocol will be most maintainable
     if you pick one method and don't use the other one.
+
+.. versionadded:: 2.0
 
 Accessing Groups of Wells
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -190,6 +197,8 @@ or,
 
 and it will return the individual well objects in row A.
 
+.. versionadded:: 2.0
+
 
 .. _v2-location-within-wells:
 
@@ -231,6 +240,8 @@ vertically (positive numbers move up, and negative numbers move down):
    plate['A1'].top(z=1)  # This is 1mm above the top center of the well
    plate['A1'].top(z=-1) # This is 1mm below the top center of the well
 
+.. versionadded:: 2.0
+
 Bottom
 ------
 
@@ -265,6 +276,8 @@ numbers move down):
    :py:attr:`.InstrumentContext.well_bottom_clearance`
    (see :ref:`new-default-op-positions`).
 
+.. versionadded:: 2.0
+
 Center
 ------
 
@@ -275,6 +288,8 @@ control of positions within the well for unusual or custom labware.
 .. code-block:: python
 
    plate['A1'].center() # This is the vertical and horizontal center of the well
+
+.. versionadded:: 2.0
 
 Manipulating Positions
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -307,3 +322,4 @@ To move a location, you create a :py:class:`.types.Point` representing a
            types.Point(x=1, y=1, z=1)) # 1mm up, to the right, and towards the
                                        # back of the robot
 
+.. versionadded:: 2.0

@@ -34,6 +34,7 @@ a list of associated tipracks:
         right = protocol.load_instrument('p1000_single', 'right',
                                          tip_racks=[tiprack1, tiprack2])
 
+.. versionadded:: 2.0
 .. _new-pipette-models:
 
 Pipette Model(s)
@@ -138,6 +139,8 @@ For instance, in this protocol you can see the effects of specifying tipracks:
 This is further discussed in :ref:`v2-atomic-commands`
 and :ref:`v2-complex-commands`.
 
+.. versionadded:: 2.0
+
 Modifying Pipette Behaviors
 ---------------------------
 
@@ -200,6 +203,7 @@ Each of these attributes can be altered without affecting the others.
 units of mm/s of plunger speed. This does not have a linear transfer to flow rate and
 should only be used if you have a specific need.
 
+.. versionadded:: 2.0
 
 .. _new-default-op-positions:
 
@@ -249,6 +253,7 @@ executed as part of a transfer.
         pipette.well_bottom_clearance.dispense = 10
         pipette.dispense(50, plate['A1'])
 
+.. versionadded:: 2.0
 
 Gantry Speed
 ============
@@ -282,6 +287,7 @@ the overall speed of the gantry. Its default is 400 mm/s.
         # Move to 50mm above the front left of slot 9, much more slowly
         pipette.move_to(protocol.deck.position_for('9').move(types.Point(z=50)))
 
+.. versionadded:: 2.0
 
 Per-Axis Speed Limits
 =====================
@@ -308,6 +314,8 @@ resets that axis's limit to the default:
 
 You cannot set limits for the pipette plunger axes with this mechanism; instead, set the
 flow rates or plunger speeds as described in :ref:`new-plunger-flow-rates`.
+
+.. versionadded:: 2.0
 
 .. _defaults:
 

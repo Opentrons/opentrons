@@ -207,6 +207,7 @@ html_static_path = ['../static']
 
 # Custom sidebar templates, maps document names to template names.
 # Use separate sidebar nav overrides to force (for apiv2) or ignore
+
 # (apiv1) the apiv2 hidden toctree elements (our sphinx overrides css
 # forces the body toctrees hidden using css)
 html_sidebars = {
@@ -290,7 +291,7 @@ latex_elements = {
      # 'pointsize': '10pt',
      # Additional stuff for the LaTeX preamble.
      #
-     # 'preamble': '',
+     # 'preamble': r'\setlistdepth{15}',
 
      # Enable Greek symbol encoding for our sweet mus
      #
@@ -299,6 +300,7 @@ latex_elements = {
      # Latex figure (float) alignment
      #
      'figure_align': 'H',
+    'maxlistdepth': '10',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples

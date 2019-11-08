@@ -11,15 +11,16 @@ import asyncio
 import logging
 import sys
 import threading
-from typing import Any, Callable, Dict, Optional, TextIO
+from typing import Any, Callable, Dict, Optional, TextIO, Union
 
 from opentrons import protocol_api, __version__
-from opentrons.protocol_api import execute as execute_apiv2
 from opentrons.protocol_api.legacy_wrapper import api
+from opentrons.protocol_api import (execute as execute_apiv2,
+                                    MAX_SUPPORTED_VERSION)
 from opentrons import commands
 from opentrons.config import feature_flags as ff
-from opentrons.protocols.parse import parse
-from opentrons.protocols.types import JsonProtocol
+from opentrons.protocols.parse import parse, version_from_string
+from opentrons.protocols.types import JsonProtocol, APIVersion
 from opentrons.hardware_control import API
 
 _HWCONTROL: Optional[API] = None
@@ -28,6 +29,7 @@ _HWCONTROL: Optional[API] = None
 
 
 def get_protocol_api(
+        version: Union[str, APIVersion],
         bundled_labware: Dict[str, Dict[str, Any]] = None,
         bundled_data: Dict[str, bytes] = None
 ) -> protocol_api.ProtocolContext:
@@ -45,7 +47,11 @@ def get_protocol_api(
         >>> instr.home()
 
     When this function is called, modules and instruments will be recached.
-
+    :param version: The API version to use. This must be lower than
+                    :py:attr:`opentrons.protocol_api.MAX_SUPPORTED_VERSION`.
+                    It may be specified either as a string (``'2.0'``) or
+                    as a :py:class:`.protocols.types.APIVersion`
+                    (``APIVersion(2, 0)``).
     :param bundled_labware: If specified, a mapping from labware names to
                             labware definitions for labware to consider in the
                             protocol. Note that if you specify this, _only_
@@ -78,10 +84,16 @@ def get_protocol_api(
             name='Hardware-controller-builder')
         thread.start()
         thread.join()
-
+    if isinstance(version, str):
+        checked_version = version_from_string(version)
+    elif not isinstance(version, APIVersion):
+        raise TypeError('version must be either a string or an APIVersion')
+    else:
+        checked_version = version
     context = protocol_api.ProtocolContext(hardware=_HWCONTROL,
                                            bundled_labware=bundled_labware,
-                                           bundled_data=bundled_data)
+                                           bundled_data=bundled_data,
+                                           api_version=checked_version)
     context._hw_manager.hardware.cache_instruments()
     context._hw_manager.hardware.discover_modules()
     return context
@@ -180,18 +192,17 @@ def execute(protocol_file: TextIO,
     contents = protocol_file.read()
     protocol = parse(contents, protocol_file.name)
     if isinstance(protocol, JsonProtocol)\
-            or protocol.api_level == '2'\
+            or protocol.api_level >= APIVersion(2, 0)\
             or (ff.enable_back_compat() and ff.use_protocol_api_v2()):
         context = get_protocol_api(
+            getattr(protocol, 'api_level', MAX_SUPPORTED_VERSION),
             bundled_labware=getattr(protocol, 'bundled_labware', None),
             bundled_data=getattr(protocol, 'bundled_data', None))
         if emit_runlog:
             context.broker.subscribe(
                 commands.command_types.COMMAND, emit_runlog)
         context.home()
-        execute_apiv2.run_protocol(protocol,
-                                   simulate=False,
-                                   context=context)
+        execute_apiv2.run_protocol(protocol, context)
     else:
         from opentrons import robot
         from opentrons.legacy_api import protocols

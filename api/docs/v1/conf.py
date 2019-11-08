@@ -300,6 +300,8 @@ latex_elements = {
      # Latex figure (float) alignment
      #
      'figure_align': 'H',
+
+     'maxlistdepth': '10',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples

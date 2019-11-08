@@ -8,8 +8,7 @@ import opentrons
 from .contexts import ProtocolContext
 from . import execute_v3, legacy_wrapper
 
-from opentrons import config
-from opentrons.protocols.types import PythonProtocol, Protocol
+from opentrons.protocols.types import PythonProtocol, Protocol, APIVersion
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -89,8 +88,6 @@ def _find_protocol_error(tb, proto_name):
 
 def _run_python(
         proto: PythonProtocol, context: ProtocolContext):
-    context.set_bundle_contents(
-        proto.bundled_labware, proto.bundled_data, proto.extra_labware)
     new_locs = locals()
     new_globs = globals()
     exec(proto.contents, new_globs, new_locs)
@@ -140,39 +137,17 @@ def _run_python_legacy(proto: PythonProtocol, context: ProtocolContext):
 
 
 def run_protocol(protocol: Protocol,
-                 simulate: bool = False,
-                 context: ProtocolContext = None):
-    """ Create a ProtocolRunner instance from one of a variety of protocol
-    sources.
+                 context: ProtocolContext):
+    """ Run a protocol.
 
     :param protocol: The :py:class:`.protocols.types.Protocol` to execute
-    :param simulate: True to simulate; False to execute. If this is not an
-                     OT2, ``simulate`` will be forced ``True``.
-    :param context: The context to use. If ``None``, create a new
-                    :py:class:`.ProtocolContext`.
-
-    .. note ::
-
-        The :py:class:`.ProtocolContext` has the bundle contents (if any)
-        inserted in it by this method.
-
+    :param context: The context to use.
     """
-    if not config.IS_ROBOT:
-        simulate = True  # noqa - will be used later
-    if None is context and simulate:
-        true_context = ProtocolContext()
-        true_context.home()
-        MODULE_LOG.info("Generating blank protocol context for simulate")
-    elif context:
-        true_context = context
-    else:
-        raise RuntimeError(
-            'Will not automatically generate hardware controller')
     if isinstance(protocol, PythonProtocol):
-        if protocol.api_level == '2':
-            _run_python(protocol, true_context)
-        elif protocol.api_level == '1':
-            _run_python_legacy(protocol, true_context)
+        if protocol.api_level >= APIVersion(2, 0):
+            _run_python(protocol, context)
+        elif protocol.api_level == APIVersion(1, 0):
+            _run_python_legacy(protocol, context)
         else:
             raise RuntimeError(
                 f'Unsupported python API version: {protocol.api_level}'
@@ -180,7 +155,10 @@ def run_protocol(protocol: Protocol,
     else:
         if protocol.schema_version == 3:
             ins = execute_v3.load_pipettes_from_json(
-                true_context, protocol.contents)
+                context, protocol.contents)
             lw = execute_v3.load_labware_from_json_defs(
-                true_context, protocol.contents)
-            execute_v3.dispatch_json(true_context, protocol.contents, ins, lw)
+                context, protocol.contents)
+            execute_v3.dispatch_json(context, protocol.contents, ins, lw)
+        else:
+            raise RuntimeError(
+                f'Unsupported JSON protocol schema: {protocol.schema_version}')

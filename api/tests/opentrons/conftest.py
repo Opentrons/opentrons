@@ -646,7 +646,8 @@ def get_bundle_fixture():
             result['bundled_python'] = {}
 
             # NOTE: this is copy-pasted from the .py fixture file
-            result['metadata'] = {'author': 'MISTER FIXTURE'}
+            result['metadata'] = {'author': 'MISTER FIXTURE',
+                                  'apiLevel': '2.0'}
 
             # make binary zipfile
             binary_zipfile = io.BytesIO()

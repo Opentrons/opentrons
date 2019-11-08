@@ -1,7 +1,14 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import {
+  selectors as stepFormSelectors,
+  actions as stepFormActions,
+  getSlotIsEmpty,
+  getSlotsBlockedBySpanning,
+} from '../../../step-forms'
+import { moveDeckItem } from '../../../labware-ingred/actions'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import {
   SUPPORTED_MODULE_SLOTS,
@@ -15,6 +22,7 @@ import {
   FormGroup,
   DropdownField,
   HoverTooltip,
+  AlertItem,
 } from '@opentrons/components'
 import styles from './EditModules.css'
 import modalStyles from '../modal.css'
@@ -27,25 +35,63 @@ type EditModulesProps = {
   onCloseClick: () => mixed,
 }
 
+// TODO (ka 2019-11-6): Move this to i18n
+const MODULE_PLACEMENT_ERROR =
+  'Modules can only be placed in slots that are (a) empty or (b) occupied by compatible labware.'
+
 export default function EditModulesModal(props: EditModulesProps) {
-  const { moduleType, moduleId, onCloseClick } = props
-  /* TODO (ka 2019-10-31): This is a temporary hook workaround so the slot selection 'works'
-  Once selectors are in place for modules we can get the previously assigned slot from state
-  and have supported slot as fallback for new modules or failure to get slot from module by id */
-  const [selectedSlot, setSelectedSlot] = React.useState<string | null>(
-    SUPPORTED_MODULE_SLOTS[moduleType][0].value || null
+  const { moduleType, onCloseClick } = props
+  const _initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
+
+  const module = props.moduleId && _initialDeckSetup.modules[props.moduleId]
+
+  const [selectedSlot, setSelectedSlot] = React.useState<string>(
+    (module && module.slot) || SUPPORTED_MODULE_SLOTS[moduleType][0].value
   )
+
+  const [selectedModel, setSelectedModel] = React.useState<string>(
+    (module && module.model) || 'GEN1'
+  )
+
+  const slotsBlockedBySpanning = getSlotsBlockedBySpanning(_initialDeckSetup)
+  const previousModuleSlot = module && module.slot
+
+  const slotIsEmpty =
+    !slotsBlockedBySpanning.includes(selectedSlot) &&
+    (getSlotIsEmpty(_initialDeckSetup, selectedSlot) ||
+      previousModuleSlot === selectedSlot)
+
+  const dispatch = useDispatch()
 
   const handleSlotChange = (e: SyntheticInputEvent<*>) =>
     setSelectedSlot(e.target.value)
+  const handleModelChange = (e: SyntheticInputEvent<*>) =>
+    setSelectedModel(e.target.value)
 
   let onSaveClick = () => {
-    moduleType && console.log('add module ' + moduleType)
+    dispatch(
+      stepFormActions.createModule({
+        slot: selectedSlot,
+        type: moduleType,
+        model: selectedModel,
+      })
+    )
     onCloseClick()
   }
-  if (moduleId) {
+  if (module) {
     onSaveClick = () => {
-      console.log('update module ' + moduleId)
+      // disabled if something lives in the slot selected in local state
+      // if previous module.model is different, edit module
+      if (module.model !== selectedModel) {
+        module.id &&
+          dispatch(
+            stepFormActions.editModule({ id: module.id, model: selectedModel })
+          )
+      }
+      // if previous module.slot is different than satate, move deck item
+      if (selectedSlot && module.slot !== selectedSlot) {
+        module.slot && dispatch(moveDeckItem(module.slot, selectedSlot))
+      }
       onCloseClick()
     }
   }
@@ -68,24 +114,20 @@ export default function EditModulesModal(props: EditModulesProps) {
       className={cx(modalStyles.modal, styles.edit_module_modal)}
       contentsClassName={styles.modal_contents}
     >
+      {!slotIsEmpty && (
+        <AlertItem type="error" title={`Cannot place ${heading}`}>
+          <p>{MODULE_PLACEMENT_ERROR}</p>
+        </AlertItem>
+      )}
       <div className={styles.form_row}>
-        {/*
-      TODO (ka 2019-10-29): This field is enabled, but only GEN1 available for now
-      - onChange returns null because onChange is required by DropdownFields
-      */}
         <FormGroup label="Model" className={styles.option_model}>
           <DropdownField
             tabIndex={0}
             options={[{ name: 'GEN1', value: 'GEN1' }]}
-            value={'GEN1'}
-            onChange={() => null}
+            value={selectedModel}
+            onChange={handleModelChange}
           />
         </FormGroup>
-        {/*
-      TODO (ka 2019-10-30):
-      - This is an initial first pass, since nothings coming from state yet,
-      the slot will always default to the supported slot
-      */}
         {showSlotOption && (
           <HoverTooltip
             placement="bottom"
@@ -110,7 +152,9 @@ export default function EditModulesModal(props: EditModulesProps) {
 
       <div className={styles.button_row}>
         <OutlineButton onClick={onCloseClick}>Cancel</OutlineButton>
-        <OutlineButton onClick={onSaveClick}>Save</OutlineButton>
+        <OutlineButton disabled={!slotIsEmpty} onClick={onSaveClick}>
+          Save
+        </OutlineButton>
       </div>
     </Modal>
   )

@@ -77,8 +77,9 @@ type NetworkAddressProps = {
 
 function NetworkAddresses(props: NetworkAddressProps) {
   const type = props.wired ? 'Wired' : 'Wireless'
-  const ip = (props.connection && props.connection.ipAddress) || 'Unknown'
-  const mac = (props.connection && props.connection.macAddress) || 'Unknown'
+  const ip = props.connection?.ipAddress || 'Unknown'
+  const subnet = props.connection?.subnetMask || 'Unknown'
+  const mac = props.connection?.macAddress || 'Unknown'
   const labelStyles = cx(styles.connection_label, {
     [styles.disabled]: props.disabled,
   })
@@ -90,7 +91,11 @@ function NetworkAddresses(props: NetworkAddressProps) {
         {ip}
       </p>
       <p>
-        <span className={labelStyles}>{type} MAC address: </span>
+        <span className={labelStyles}>{type} Subnet Mask: </span>
+        {subnet}
+      </p>
+      <p>
+        <span className={labelStyles}>{type} MAC Address: </span>
         {mac}
       </p>
     </div>

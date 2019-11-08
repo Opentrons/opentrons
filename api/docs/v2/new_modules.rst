@@ -8,10 +8,6 @@ Modules are peripherals that attach to the OT-2 to extend its capabilities.
 
 Modules currently supported are the Temperature, Magnetic and Thermocycler Module.
 
-This is not an exhaustive list of functionality for modules. Check :ref:`protocol-api-modules` or on
-our github for full explanations of methods.
-
-
 Loading your Module onto a deck
 ===============================
 Just like labware, you will also need to load in your module in order to use it
@@ -39,6 +35,8 @@ You can reference your module in a few different ways. The valid names can be fo
 | ``Thermocycler Module``  | ``'Thermocycler Module'``, ``'thermocycler'`` |
 +--------------------------+-----------------------------------------------+
 
+.. versionadded:: 2.0
+
 Loading Labware onto your Module
 ================================
 If you want to interact with labware on top of your Module, you must load labware
@@ -55,6 +53,8 @@ onto the module. You can do this via:
          my_labware = module.load_labware('labware_definition_name')
 
 Where ``module`` is the variable name you saved your module to. You do not need to specify the slot.
+
+.. versionadded:: 2.0
 
 Checking the status of your Module
 ==================================
@@ -73,6 +73,8 @@ All modules have the ability to check what state they are currently in. To do th
 For the temperature module this will return a string stating whether it's ``'heating'``, ``'cooling'``, ``'holding at target'`` or ``'idle'``.
 For the magnetic module this will return a string stating whether it's ``'engaged'`` or ``'disengaged'``.
 For the Thermocycler Module this will return ``'holding at target'`` or ``'idle'``. There are more detailed status checks which can be found in at :ref:`thermocycler-section`
+
+.. versionadded:: 2.0
 
 ******************
 Temperature Module
@@ -95,6 +97,8 @@ section, assume we have the following already:
         plate = temp_mod.load_labware('corning_96_wellplate_360ul_flat')
         # The code from the rest of the examples in this section goes here
 
+.. versionadded:: 2.0
+
 Set Temperature
 ^^^^^^^^^^^^^^^
 To set the temperature module to 4 degrees celsius do the following:
@@ -105,6 +109,8 @@ To set the temperature module to 4 degrees celsius do the following:
 
 This function will pause your protocol until your target temperature is reached.
 
+.. versionadded:: 2.0
+
 Read the Current Temperature
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 You can read the current real-time temperature of the module by the following:
@@ -113,6 +119,8 @@ You can read the current real-time temperature of the module by the following:
 
     temp_mod.temperature
 
+.. versionadded:: 2.0
+
 Read the Target Temperature
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 We can read the target temperature of the module by the following:
@@ -120,6 +128,8 @@ We can read the target temperature of the module by the following:
 .. code-block:: python
 
     temp_mod.target
+
+.. versionadded:: 2.0
 
 Deactivate
 ^^^^^^^^^^
@@ -131,12 +141,14 @@ or cooling phase again.
 
     temp_mod.deactivate()
 
-** Note**
-You can also deactivate your temperature module through our Run App by
-clicking on the ``Pipettes & Modules`` tab. Your temperature module will automatically
-deactivate if another protocol is uploaded to the app. Your temperature module will
-not deactivate automatically upon protocol end, cancel or re-setting a protocol.
+.. note::
 
+    You can also deactivate your temperature module through our Run App by
+    clicking on the ``Pipettes & Modules`` tab. Your temperature module will automatically
+    deactivate if another protocol is uploaded to the app. Your temperature module will
+    not deactivate automatically upon protocol end, cancel or re-setting a protocol.
+
+.. versionadded:: 2.0
 
 ***************
 Magnetic Module
@@ -164,6 +176,8 @@ section, assume we have the following already:
         plate = mag_mod.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
         # The code from the rest of the examples in this section goes here
 
+.. versionadded:: 2.0
+
 Engage
 ^^^^^^
 
@@ -185,10 +199,14 @@ ways, based on internally stored default heights for labware:
 
         mag_mod.engage(height=18.5)
 
-**Note** Only certain labwares have defined engage heights for the Magnetic
-Module. If a labware that does not have a defined engage height is
-loaded on the Magnetic Module (or if no labware is loaded), then
-``height`` must be specified.
+.. note::
+
+    Only certain labwares have defined engage heights for the Magnetic
+    Module. If a labware that does not have a defined engage height is
+    loaded on the Magnetic Module (or if no labware is loaded), then
+    ``height`` must be specified.
+
+.. versionadded:: 2.0
 
 Disengage
 ^^^^^^^^^
@@ -199,6 +217,7 @@ Disengage
 The magnetic modules will disengage on power cycle of the device. It will not auto-disengage otherwise
 unless you specify in your protocol.
 
+.. versionadded:: 2.0
 
 .. _thermocycler-section:
 
@@ -231,6 +250,8 @@ For the purposes of this section, assume we have the following already:
     When loading the Thermocycler Module, it is not necessary to specify a slot.
     This is because the Thermocycler Module has a default position that covers Slots 7, 8, 10, and 11.
     This is the only valid location for the Thermocycler Module on the OT2 deck.
+
+.. versionadded:: 2.0
 
 Run App Control
 ^^^^^^^^^^^^^^^
@@ -274,12 +295,17 @@ Open Lid
 
     tc_mod.open_lid()
 
+
+.. versionadded:: 2.0
+
 Close Lid
 +++++++++
 
 .. code-block:: python
 
     tc_mod.close_lid()
+
+.. versionadded:: 2.0
 
 Lid Temperature Control
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -296,6 +322,8 @@ once the lid temperature has been reached.
 
     tc_mod.set_lid_temperature(temperature)
 
+.. versionadded:: 2.0
+
 Block Temperature Control
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 To set the aluminum block temperature inside the Thermocycler Module, you can use the method :py:meth:`.ThermocyclerContext.set_block_temperature`. It takes in four parameters
@@ -311,6 +339,8 @@ If you only specify a temperature in celsius, the Thermocycler Module will hold 
 
         tc_mod.set_block_temperature(4)
 
+.. versionadded:: 2.0
+
 Hold Time
 +++++++++
 
@@ -321,6 +351,8 @@ proceed once the temperature specified is reached.
 .. code-block:: python
 
         tc_mod.set_block_temperature(4, hold_time_seconds=15, hold_time_minutes=45)
+
+.. versionadded:: 2.0
 
 Ramp Rate
 +++++++++
@@ -334,6 +366,8 @@ Lastly, you can modify the ramp rate in degC/sec for a given temperature.
 .. warning::
 
   Do not change this parameter unless you know what you're doing.
+
+.. versionadded:: 2.0
 
 Thermocycler Module Profiles
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -351,6 +385,9 @@ minutes with ``hold_time_seconds`` and ``hold_time_minutes``. **Note** This is *
 
         tc_mod.execute_profile(steps=profile, repetitions=30)
 
+
+.. versionadded:: 2.0
+
 Thermocycler Module Status
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 Throughout your protocol, you may want particular information on the current status of your Thermocycler Module. Below are
@@ -364,6 +401,8 @@ Returns the current status of the lid position. It can be one of the strings ``'
 
     tc_mod.lid_position
 
+.. versionadded:: 2.0
+
 Heated Lid Temperature Status
 +++++++++++++++++++++++++++++
 Returns the current status of the heated lid temperature. It can be one of the strings ``'holding at target'``, ``'heating'``, ``'idle'``,  or ``'error'``.
@@ -372,6 +411,8 @@ Returns the current status of the heated lid temperature. It can be one of the s
 
     tc_mod.lid_temperature_status
 
+.. versionadded:: 2.0
+
 Block Temperature Status
 ++++++++++++++++++++++++
 Returns the current status of the well block temperature controller. It can be one of the strings ``'holding at target'``, ``'cooling'``, ``'heating'``, ``'idle'``, or ``'error'``.
@@ -379,6 +420,8 @@ Returns the current status of the well block temperature controller. It can be o
 .. code-block:: python
 
     tc_mod.block_temperature_status
+
+.. versionadded:: 2.0
 
 Thermocycler Module Deactivate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -402,6 +445,8 @@ This deactivates only the heated lid of the Thermocycler Module.
 
   tc_mod.deactivate_lid()
 
+.. versionadded:: 2.0
+
 Deactivate Block
 ++++++++++++++++
 This deactivates only the well block of the Thermocycler Module.
@@ -409,3 +454,5 @@ This deactivates only the well block of the Thermocycler Module.
 .. code-block:: python
 
   tc_mod.deactivate_block()
+
+.. versionadded:: 2.0

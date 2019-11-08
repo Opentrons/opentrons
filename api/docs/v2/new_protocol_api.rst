@@ -11,6 +11,7 @@ Protocols and Instruments
 
 .. autoclass:: opentrons.protocol_api.contexts.ProtocolContext
    :members:
+   :exclude-members: location_cache
 
 .. autoclass:: opentrons.protocol_api.contexts.InstrumentContext
    :members:

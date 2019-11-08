@@ -3,6 +3,14 @@ from typing import Any, Dict, NamedTuple, Optional, Union
 Metadata = Dict[str, Union[str, int]]
 
 
+class APIVersion(NamedTuple):
+    major: int
+    minor: int
+
+    def __str__(self):
+        return f'{self.major}.{self.minor}'
+
+
 class JsonProtocol(NamedTuple):
     text: str
     filename: Optional[str]
@@ -15,7 +23,7 @@ class PythonProtocol(NamedTuple):
     filename: Optional[str]
     contents: Any  # This is the output of compile() which we can't type
     metadata: Metadata
-    api_level: str  # For now, should be '1' or '2'
+    api_level: APIVersion
     # these 'bundled_' attrs should only be included when the protocol is a zip
     bundled_labware: Optional[Dict[str, Dict[str, Any]]]
     bundled_data: Optional[Dict[str, bytes]]

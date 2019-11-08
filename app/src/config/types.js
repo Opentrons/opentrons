@@ -9,8 +9,8 @@ export type DiscoveryCandidates = string | Array<string>
 
 export type DevInternalFlag =
   | 'allPipetteConfig'
-  | 'tempdeckControls'
   | 'customLabware'
+  | 'enableMultiGEN2'
 
 export type FeatureFlags = $Shape<{|
   [DevInternalFlag]: boolean | void,

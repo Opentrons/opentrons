@@ -7,8 +7,11 @@ import pytest
 from opentrons.protocols.parse import (extract_metadata,
                                        _get_protocol_schema_version,
                                        validate_json,
-                                       parse)
-from opentrons.protocols.types import (JsonProtocol, PythonProtocol)
+                                       parse,
+                                       version_from_metadata)
+from opentrons.protocols.types import (JsonProtocol,
+                                       PythonProtocol,
+                                       APIVersion)
 
 
 def test_extract_metadata():
@@ -43,17 +46,17 @@ infer_version_cases = [
 from opentrons import instruments
 
 p = instruments.P10_Single(mount='right')
-""", '1'),
+""", APIVersion(1, 0)),
     ("""
 import opentrons.instruments
 
 p = instruments.P10_Single(mount='right')
-""", '1'),
+""", APIVersion(1, 0)),
     ("""
 from opentrons import instruments as instr
 
 p = instr.P10_Single(mount='right')
-""", '1'),
+""", APIVersion(1, 0)),
     ("""
 from opentrons import instruments
 
@@ -62,22 +65,26 @@ metadata = {
   }
 
 p = instruments.P10_Single(mount='right')
-""", '1'),
+""", APIVersion(1, 0)),
     ("""
 from opentrons import instruments
 
 metadata = {
-  'apiLevel': '2'
+  'apiLevel': '2.0'
   }
 
 p = instruments.P10_Single(mount='right')
-""", '2'),
+""", APIVersion(2, 0)),
     ("""
 from opentrons import types
 
+metadata = {
+    'apiLevel': '2.0'
+}
+
 def run(ctx):
     right = ctx.load_instrument('p300_single', types.Mount.RIGHT)
-""", '2'),
+""", APIVersion(2, 0)),
     ("""
 from opentrons import types
 
@@ -87,42 +94,72 @@ metadata = {
 
 def run(ctx):
     right = ctx.load_instrument('p300_single', types.Mount.RIGHT)
-""", '1'),
+""", APIVersion(1, 0)),
     ("""
 from opentrons import types
 
 metadata = {
-  'apiLevel': '2'
+  'apiLevel': '2.0'
   }
 
 def run(ctx):
     right = ctx.load_instrument('p300_single', types.Mount.RIGHT)
-""", '2'),
+""", APIVersion(2, 0)),
     ("""
 from opentrons import labware, instruments
 
 p = instruments.P10_Single(mount='right')
-    """, '1'),
+    """, APIVersion(1, 0)),
     ("""
 from opentrons import types, containers
-    """, '1'),
+    """, APIVersion(1, 0)),
     ("""
 from opentrons import types, instruments
 
 p = instruments.P10_Single(mount='right')
-    """, '1'),
+    """, APIVersion(1, 0)),
     ("""
 from opentrons import instruments as instr
 
 p = instr.P300_Single('right')
-    """, '1')
+    """, APIVersion(1, 0))
 ]
 
 
 @pytest.mark.parametrize('proto,version', infer_version_cases)
-def test_infer_version(proto, version):
+def test_get_version(proto, version):
     parsed = parse(proto)
     assert parsed.api_level == version
+
+
+test_valid_metadata = [
+    ({'apiLevel': '1'}, APIVersion(1, 0)),
+    ({'apiLevel': '1.0'}, APIVersion(1, 0)),
+    ({'apiLevel': '1.2'}, APIVersion(1, 2)),
+    ({'apiLevel': '2.0'}, APIVersion(2, 0)),
+    ({'apiLevel': '2.6'}, APIVersion(2, 6)),
+    ({'apiLevel': '10.23123151'}, APIVersion(10, 23123151))
+]
+
+
+test_invalid_metadata = [
+    ({}, KeyError),
+    ({'sasdaf': 'asdaf'}, KeyError),
+    ({'apiLevel': '2'}, ValueError),
+    ({'apiLevel': '2.0.0'}, ValueError),
+    ({'apiLevel': 'asda'}, ValueError)
+]
+
+
+@pytest.mark.parametrize('metadata,version', test_valid_metadata)
+def test_valid_version_from_metadata(metadata, version):
+    assert version_from_metadata(metadata) == version
+
+
+@pytest.mark.parametrize('metadata,exc', test_invalid_metadata)
+def test_invalid_version_from_metadata(metadata, exc):
+    with pytest.raises(exc):
+        version_from_metadata(metadata)
 
 
 def test_get_protocol_schema_version():
@@ -171,16 +208,25 @@ def test_parse_python_details(
     assert isinstance(parsed, PythonProtocol)
     assert parsed.text == protocol.text
     assert isinstance(parsed.text, str)
-    version = '2' if '2' in protocol.filename else '1'
-    assert parsed.api_level == version
     fname = fake_fname if fake_fname else '<protocol>'
     assert parsed.filename == fname
-    assert parsed.metadata == {
-        'protocolName': 'Testosaur',
-        'author': 'Opentrons <engineering@opentrons.com>',
-        'description': 'A variant on "Dinosaur" for testing',
-        'source': 'Opentrons Repository'
-    }
+    if '2' in protocol.filename:
+        assert parsed.api_level == APIVersion(2, 0)
+        assert parsed.metadata == {
+            'protocolName': 'Testosaur',
+            'author': 'Opentrons <engineering@opentrons.com>',
+            'description': 'A variant on "Dinosaur" for testing',
+            'source': 'Opentrons Repository',
+            'apiLevel': '2.0'
+        }
+    else:
+        assert parsed.api_level == APIVersion(1, 0)
+        assert parsed.metadata == {
+            'protocolName': 'Testosaur',
+            'author': 'Opentrons <engineering@opentrons.com>',
+            'description': 'A variant on "Dinosaur" for testing',
+            'source': 'Opentrons Repository',
+        }
     assert parsed.contents == compile(
         protocol.text,
         filename=fname,
@@ -223,7 +269,7 @@ def test_parse_bundle_details(get_bundle_fixture, ensure_api2):
     assert parsed.bundled_python == fixture['bundled_python']
     assert parsed.bundled_data == fixture['bundled_data']
     assert parsed.metadata == fixture['metadata']
-    assert parsed.api_level == '2'
+    assert parsed.api_level == APIVersion(2, 0)
 
 
 @pytest.mark.parametrize('protocol_file',

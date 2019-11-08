@@ -9,7 +9,7 @@ from opentrons.broker import Broker
 from opentrons.commands import tree, types as command_types
 from opentrons.commands.commands import is_new_loc, listify
 from opentrons.config import feature_flags as ff
-from opentrons.protocols.types import JsonProtocol, PythonProtocol
+from opentrons.protocols.types import JsonProtocol, PythonProtocol, APIVersion
 from opentrons.protocols.parse import parse
 from opentrons.types import Location, Point
 from opentrons.protocol_api import (ProtocolContext,
@@ -120,8 +120,8 @@ class Session(object):
         self.name = name
         self._protocol = protocol
         self._hardware = hardware
-        self._simulating_ctx = ProtocolContext(
-            loop=self._loop, broker=self._broker)
+        self._simulating_ctx = ProtocolContext.build_using(
+            self._protocol, loop=self._loop, broker=self._broker)
         self.state = None
         self.commands = []
         self.command_log = {}
@@ -240,7 +240,6 @@ class Session(object):
                     hardware=sim,
                     broker=self._broker)
                 run_protocol(self._protocol,
-                             simulate=True,
                              context=self._simulating_ctx)
             else:
                 self._hardware.broker = self._broker
@@ -277,12 +276,12 @@ class Session(object):
 
     def refresh(self):
         self._reset()
-        self.api_level = 2 if ff.use_protocol_api_v2() else 1
         # self.metadata is exposed via jrpc
         if isinstance(self._protocol, PythonProtocol):
+            self.api_level = self._protocol.api_level
             self.metadata = self._protocol.metadata
             if ff.use_protocol_api_v2()\
-               and self._protocol.api_level == '1'\
+               and self._protocol.api_level == APIVersion(1, 0)\
                and not ff.enable_back_compat():
                 raise RuntimeError(
                     'This protocol targets Protocol API V1, but the robot is '
@@ -294,6 +293,10 @@ class Session(object):
 
             log.info(f"Protocol API version: {self._protocol.api_level}")
         else:
+            if ff.use_protocol_api_v2():
+                self.api_level = APIVersion(2, 0)
+            else:
+                self.api_level = APIVersion(1, 0)
             self.metadata = {}
             log.info(f"JSON protocol")
 
@@ -364,16 +367,11 @@ class Session(object):
             self.resume()
             self._pre_run_hooks()
             if ff.use_protocol_api_v2():
-                bundled_data = None
-                bundled_labware = None
-                if isinstance(self._protocol, PythonProtocol):
-                    bundled_data = self._protocol.bundled_data
-                    bundled_labware = self._protocol.bundled_labware
                 self._hardware.cache_instruments()
-                ctx = ProtocolContext(loop=self._loop,
-                                      broker=self._broker,
-                                      bundled_labware=bundled_labware,
-                                      bundled_data=bundled_data)
+                ctx = ProtocolContext.build_using(
+                    self._protocol,
+                    loop=self._loop,
+                    broker=self._broker)
                 ctx.connect(self._hardware)
                 ctx.home()
                 run_protocol(self._protocol, context=ctx)
@@ -452,6 +450,7 @@ class Session(object):
             payload = {
                 'state': self.state,
                 'startTime': self.startTime,
+                'errors': self.errors,
                 'lastCommand': last_command
             }
         return {

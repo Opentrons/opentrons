@@ -1,9 +1,11 @@
 // @flow
 // networking http api module
 import { createSelector } from 'reselect'
+import mapValues from 'lodash/mapValues'
 import orderBy from 'lodash/orderBy'
 import partition from 'lodash/partition'
 import uniqBy from 'lodash/uniqBy'
+import { Netmask } from 'netmask'
 
 import {
   apiRequest,
@@ -32,13 +34,17 @@ export type InternetStatus = 'none' | 'portal' | 'limited' | 'full' | 'unknown'
 
 export type WifiSecurityType = 'none' | 'wpa-psk' | 'wpa-eap'
 
-export type NetworkInterface = {
+// TODO(mc, 2019-11-5): this does not match the response shape
+// the shape change happens in the selector, but should be happening
+// in the reducer. THis will be fixed when http-api-client is gone
+export type NetworkInterface = {|
   ipAddress: ?string,
+  subnetMask: ?string,
   macAddress: string,
   gatewayAddress: ?string,
   state: string,
   type: 'wifi' | 'ethernet',
-}
+|}
 
 export type WifiNetwork = {
   ssid: string,
@@ -198,8 +204,34 @@ type GetConfigureWifiCall = Sel<State, BaseRobot, ConfigureWifiCall>
 export const makeGetRobotNetworkingStatus = (): GetNetworkingStatusCall =>
   createSelector(
     getRobotApiState,
-    // $FlowFixMe: (mc, 2019-04-18) http-api-client types need to be redone
-    state => state[STATUS] || { inProgress: false }
+    state => {
+      // $FlowFixMe: (mc, 2019-04-18) http-api-client types need to be redone
+      const statusCall = state[STATUS] || { inProgress: false }
+      if (!statusCall.response) return statusCall
+
+      return {
+        ...statusCall,
+        response: {
+          ...statusCall.response,
+          interfaces: mapValues(statusCall.response.interfaces, iface => {
+            let ipAddress = null
+            let subnetMask = null
+            if (iface.ipAddress != null) {
+              try {
+                const block = new Netmask(iface.ipAddress)
+                ipAddress = block.base
+                subnetMask = block.mask
+              } catch (e) {
+                // just use what was passed if unable to parse
+                ipAddress = iface.ipAddress
+              }
+            }
+
+            return { ...iface, ipAddress, subnetMask }
+          }),
+        },
+      }
+    }
   )
 
 export const makeGetRobotWifiList = (): GetWifiListCall =>

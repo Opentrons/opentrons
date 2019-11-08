@@ -9,7 +9,12 @@
     "see_details": "See detail page",
     "view_measurements": "view measurements",
     "creating_labware_defs": "Access the Labware Creator",
-    "recommended_labware_filter": "Show only recommended labware. Read more"
+    "recommended_labware_filter": "Show only recommended labware. Read more",
+    "module_compatibility": {
+      "recommended": "Recommended for use on this module",
+      "potentiallyCompatible": "Potentially compatible with this module",
+      "notCompatible": "Not compatible with this module"
+    }
   },
   "tip_position": {
     "title": "Tip Positioning",

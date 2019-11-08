@@ -1,16 +1,20 @@
 import pytest
 from opentrons.protocol_api import execute, ProtocolContext
 from opentrons.protocols.parse import parse
+from opentrons.protocols.types import APIVersion
 
 v1_protocol_testcases = [
     ("""from opentrons import labware, instruments, robot"""),
     ("""
 metadata = {
-    "apiLevel": '1'
+    "apiLevel": '1.0'
 }
 import opentrons
 opentrons.robot
-    """)]
+    """),
+    ("""
+metadata = {"apiLevel": '1'}
+""")]
 
 
 def test_api2_runfunc():
@@ -52,22 +56,34 @@ def test_execute_ok(protocol, protocol_file, ensure_api2, loop):
 @pytest.mark.parametrize('protocol', v1_protocol_testcases)
 def test_execute_v1_imports(protocol, ensure_api2):
     proto = parse(protocol)
-    execute.run_protocol(proto)
+    ctx = ProtocolContext(api_version=APIVersion(1, 0))
+    execute.run_protocol(proto, ctx)
 
 
 def test_bad_protocol(ensure_api2, loop):
     ctx = ProtocolContext(loop)
-    no_run = parse('print("hi")')
+    no_run = parse('''
+metadata={"apiLevel": "2.0"}
+print("hi")
+''')
     with pytest.raises(execute.MalformedProtocolError) as e:
         execute.run_protocol(no_run, context=ctx)
         assert "No function 'run" in str(e.value)
 
-    no_args = parse('def run(): pass')
+    no_args = parse('''
+metadata={"apiLevel": "2.0"}
+def run():
+    pass
+''')
     with pytest.raises(execute.MalformedProtocolError) as e:
         execute.run_protocol(no_args, context=ctx)
         assert "Function 'run()' does not take any parameters" in str(e.value)
 
-    many_args = parse('def run(a, b): pass')
+    many_args = parse('''
+metadata={"apiLevel": "2.0"}
+def run(a, b):
+    pass
+''')
     with pytest.raises(execute.MalformedProtocolError) as e:
         execute.run_protocol(many_args, context=ctx)
         assert "must be called with more than one argument" in str(e.value)
@@ -75,7 +91,8 @@ def test_bad_protocol(ensure_api2, loop):
 
 def test_proto_with_exception(ensure_api2, loop):
     ctx = ProtocolContext(loop)
-    exc_in_root = '''
+    exc_in_root = '''metadata={"apiLevel": "2.0"}
+
 def run(ctx):
     raise Exception("hi")
 '''
@@ -84,7 +101,7 @@ def run(ctx):
         execute.run_protocol(
             protocol,
             context=ctx)
-    assert 'Exception [line 3]: hi' in str(e.value)
+    assert 'Exception [line 4]: hi' in str(e.value)
 
     nested_exc = '''
 import ast
@@ -94,6 +111,8 @@ def this_throws():
 
 def run(ctx):
     this_throws()
+
+metadata={"apiLevel": "2.0"};
 '''
     protocol = parse(nested_exc)
     with pytest.raises(execute.ExceptionInProtocolError) as e:
