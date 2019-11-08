@@ -1,4 +1,4 @@
-# Robot OS Changes from 3.13.2 to 3.14.0
+# Robot OS Changes from 3.13.2 to 3.14.1
 
 For more details about this release, please see the full [technical change log][changelog]
 
@@ -18,6 +18,7 @@ We're happy to announce the public beta of version 2 of our Python protocol API!
 
 
 ## Bug Fixes
+- Fixed an issue that might cause pipette damage when updating to 3.14.0.
 - Fixed an issue where `mix` arguments were not being parsed correctly. All different optional arguments described in the docs now work
 - Fixed the definitions for the NEST tuberacks:  `opentrons_24_tuberack_nest_0.5ml_screwcap`, `opentrons_24_tuberack_nest_1.5ml_screwcap`, `opentrons_24_tuberack_nest_1.5ml_snapcap`, `opentrons_24_tuberack_nest_2ml_screwcap`, and `opentrons_24_tuberack_nest_2ml_snapcap`
 - If you specify both `touch_tip` and `blow_out` in a `transfer`, `consolidate`, or `distribute` the robot will now touch tip in a well and then blow out in the trash, rather than the reverse ([#419][419])
