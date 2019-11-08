@@ -14,9 +14,12 @@ export type FlagTypes =
   | 'PRERELEASE_MODE'
   | 'OT_PD_ENABLE_MODULES'
   | 'OT_PD_DISABLE_MODULE_RESTRICTIONS'
+  | 'OT_PD_ENABLE_MULTI_GEN2_PIPETTES'
 
 // flags that are not in this list only show in prerelease mode
-export const userFacingFlags: Array<FlagTypes> = []
+export const userFacingFlags: Array<FlagTypes> = [
+  'OT_PD_ENABLE_MULTI_GEN2_PIPETTES',
+]
 
 export type Flags = $Shape<{|
   [flag: FlagTypes]: ?boolean,
