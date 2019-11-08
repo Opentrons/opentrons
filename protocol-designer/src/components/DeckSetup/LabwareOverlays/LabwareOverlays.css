@@ -17,7 +17,6 @@
   @apply --absolute-fill;
 
   z-index: 1;
-  padding: 0.5rem;
   background-color: color-mod(var(--c-black) alpha(0.75));
   display: flex;
   flex-direction: column;
@@ -26,6 +25,10 @@
   color: white;
   font-size: var(--fs-body-1);
   border-radius: 0.5rem;
+}
+
+.padded_slot_overlay {
+  padding: 0.5rem;
 }
 
 .slot_overlay.with_form {
@@ -105,11 +108,23 @@
   rx: 6;
 }
 
+.blocked_slot_underlay_div {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(200, 115, 0, 0.75);
+  border: 2px solid var(--c-red);
+  border-radius: 6px;
+  padding: 0.75rem 0.5rem;
+}
+
+.blocked_slot_foreignelement {
+  margin: -1.75rem 0.5rem;
+}
+
 .blocked_slot_content {
   height: 100%;
   color: var(--c-white);
   font-size: var(--fs-caption);
   text-align: center;
-  margin: -1.75rem 0.5rem;
   line-height: 1.5;
 }

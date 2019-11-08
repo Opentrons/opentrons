@@ -24,7 +24,13 @@ type Props = {| ...OP, ...DP |}
 function BrowseLabwareOverlay(props: Props) {
   if (props.labwareOnDeck.def.parameters.isTiprack) return null
   return (
-    <div className={cx(styles.slot_overlay, styles.appear_on_mouseover)}>
+    <div
+      className={cx(
+        styles.slot_overlay,
+        styles.padded_slot_overlay,
+        styles.appear_on_mouseover
+      )}
+    >
       <a className={styles.overlay_button} onClick={props.drillDown}>
         <Icon className={styles.overlay_icon} name="water" />
         {i18n.t('deck.overlay.browse.view_liquids')}

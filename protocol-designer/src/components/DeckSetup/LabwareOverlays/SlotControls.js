@@ -81,9 +81,14 @@ const SlotControls = (props: Props) => {
           width={slot.boundingBox.xDimension}
           height={slot.boundingBox.yDimension}
           innerDivProps={{
-            className: cx(styles.slot_overlay, styles.appear_on_mouseover, {
-              [styles.appear]: isOver,
-            }),
+            className: cx(
+              styles.slot_overlay,
+              styles.padded_slot_overlay,
+              styles.appear_on_mouseover,
+              {
+                [styles.appear]: isOver,
+              }
+            ),
             onClick: isOver ? noop : addLabware,
           }}
         >
@@ -115,16 +120,12 @@ const slotTarget = {
   canDrop: (props, monitor) => {
     const draggedItem = monitor.getItem()
     const draggedDef = draggedItem?.labwareOnDeck?.def
-    // const sourceSlotId = draggedItem?.labwareOnDeck?.slot
-    // const destSlotId = props.slot?.id
     const moduleType = props.moduleType
-    console.log('canDrop!?!?!?', props)
     assert(draggedDef, 'no labware def of dragged item, expected it on drop')
 
     if (moduleType != null && draggedDef != null) {
       // this is a module slot, prevent drop if the dragged labware is not compatible
       return getLabwareIsCompatible(draggedDef, moduleType)
-      // TODO: handle labware<->labware swap case where both labwares are on a module
     }
     return true
   },

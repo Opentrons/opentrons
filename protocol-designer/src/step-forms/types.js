@@ -98,6 +98,7 @@ export type PipetteOnDeck = {|
   ...PipetteTemporalProperties,
 |}
 
+// TODO: Ian 2019-11-08 make all values Maybe typed
 export type InitialDeckSetup = {
   labware: {
     [labwareId: string]: LabwareOnDeck,

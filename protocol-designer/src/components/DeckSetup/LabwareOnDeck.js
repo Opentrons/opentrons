@@ -12,6 +12,7 @@ import type { BaseState } from '../../types'
 import { wellFillFromWellContents } from '../labware/utils'
 
 type OP = {|
+  className?: string,
   labwareOnDeck: LabwareOnDeckType,
   x: number,
   y: number,
@@ -26,7 +27,10 @@ type SP = {|
 type Props = { ...OP, ...SP }
 
 const LabwareOnDeck = (props: Props) => (
-  <g transform={`translate(${props.x}, ${props.y})`}>
+  <g
+    transform={`translate(${props.x}, ${props.y})`}
+    className={props.className}
+  >
     <LabwareRender
       definition={props.labwareOnDeck.def}
       wellFill={wellFillFromWellContents(props.wellContents)}
