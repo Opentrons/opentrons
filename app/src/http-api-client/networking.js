@@ -219,7 +219,7 @@ export const makeGetRobotNetworkingStatus = (): GetNetworkingStatusCall =>
             if (iface.ipAddress != null) {
               try {
                 const block = new Netmask(iface.ipAddress)
-                ipAddress = iface.ipAddress.split("/")[0]
+                ipAddress = iface.ipAddress.split('/')[0]
                 subnetMask = block.mask
               } catch (e) {
                 // just use what was passed if unable to parse
