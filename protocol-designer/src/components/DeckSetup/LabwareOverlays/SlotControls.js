@@ -61,8 +61,6 @@ const SlotControls = (props: Props) => {
   ) {
     slotBlocked = 'Labware incompatible with this module'
   }
-  // TODO IMMEDIATELY handle case where draggedDef is compatible, but we have a labware
-  // in the destination slot (this one here) that is incompatible
 
   return connectDropTarget(
     <g>
@@ -81,14 +79,9 @@ const SlotControls = (props: Props) => {
           width={slot.boundingBox.xDimension}
           height={slot.boundingBox.yDimension}
           innerDivProps={{
-            className: cx(
-              styles.slot_overlay,
-              styles.padded_slot_overlay,
-              styles.appear_on_mouseover,
-              {
-                [styles.appear]: isOver,
-              }
-            ),
+            className: cx(styles.slot_overlay, styles.appear_on_mouseover, {
+              [styles.appear]: isOver,
+            }),
             onClick: isOver ? noop : addLabware,
           }}
         >

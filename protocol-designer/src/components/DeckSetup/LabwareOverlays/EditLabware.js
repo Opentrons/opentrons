@@ -3,11 +3,10 @@ import React, { type Node } from 'react'
 import { connect } from 'react-redux'
 import cx from 'classnames'
 import { Icon } from '@opentrons/components'
-import { getLabwareDisplayName, type ModuleType } from '@opentrons/shared-data'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { DragSource, DropTarget } from 'react-dnd'
 import i18n from '../../../localization'
 import NameThisLabware from './NameThisLabware'
-import { BlockedSlotDiv } from './BlockedSlot'
 import { DND_TYPES } from './constants'
 import {
   openIngredientSelector,
@@ -15,20 +14,19 @@ import {
   duplicateLabware,
   moveDeckItem,
 } from '../../../labware-ingred/actions'
-import { getLabwareIsCompatible } from '../../../utils/labwareModuleCompatibility'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
-import { selectors as stepFormSelectors } from '../../../step-forms'
 import type { BaseState, ThunkDispatch, DeckSlot } from '../../../types'
-import type { LabwareOnDeck, ModuleOnDeck } from '../../../step-forms'
+import type { LabwareOnDeck } from '../../../step-forms'
 import styles from './LabwareOverlays.css'
 
-type ModulesById = { [id: string]: ModuleOnDeck }
 type OP = {|
   labwareOnDeck: LabwareOnDeck,
+  setHoveredLabware: (?LabwareOnDeck) => mixed,
+  setDraggedLabware: (?LabwareOnDeck) => mixed,
+  swapBlocked: boolean,
 |}
 type SP = {|
   isYetUnnamed: boolean,
-  modulesById: ModulesById,
 |}
 type DP = {|
   editLiquids: () => mixed,
@@ -46,28 +44,6 @@ type DNDP = {|
 
 type Props = {| ...OP, ...SP, ...DP, ...DNDP |}
 
-const getBlocked = (args: {
-  labwareOnDeck: LabwareOnDeck,
-  draggedLabware: ?LabwareOnDeck,
-  modulesById: ModulesById,
-}): {| labwareMoveBlocked: boolean, labwareSwapBlocked: boolean |} => {
-  const { labwareOnDeck, draggedLabware, modulesById } = args
-
-  const destModuleType: ?ModuleType = modulesById[labwareOnDeck.slot]?.type
-  const sourceModuleType: ?ModuleType =
-    (draggedLabware && modulesById[(draggedLabware?.slot)]?.type) || null
-  const draggedDef = draggedLabware?.def
-  const labwareMoveBlocked =
-    draggedDef && destModuleType
-      ? !getLabwareIsCompatible(draggedDef, destModuleType)
-      : false
-  const labwareSwapBlocked = sourceModuleType
-    ? !getLabwareIsCompatible(labwareOnDeck.def, sourceModuleType)
-    : false
-
-  return { labwareMoveBlocked, labwareSwapBlocked }
-}
-
 const EditLabware = (props: Props) => {
   const {
     labwareOnDeck,
@@ -79,7 +55,7 @@ const EditLabware = (props: Props) => {
     isOver,
     connectDragSource,
     connectDropTarget,
-    modulesById,
+    swapBlocked,
   } = props
 
   const { isTiprack } = labwareOnDeck.def.parameters
@@ -95,22 +71,8 @@ const EditLabware = (props: Props) => {
 
     let contents: ?Node = null
 
-    const { labwareMoveBlocked, labwareSwapBlocked } = getBlocked({
-      labwareOnDeck,
-      draggedLabware,
-      modulesById,
-    })
-
-    if (labwareMoveBlocked || labwareSwapBlocked) {
-      contents = (
-        <BlockedSlotDiv
-          message={
-            labwareMoveBlocked
-              ? 'MODULE_INCOMPATIBLE_SINGLE_LABWARE'
-              : 'MODULE_INCOMPATIBLE_LABWARE_SWAP'
-          }
-        />
-      )
+    if (swapBlocked) {
+      contents = null
     } else if (draggedLabware) {
       contents = (
         <div
@@ -152,9 +114,6 @@ const EditLabware = (props: Props) => {
       connectDropTarget(
         <div
           className={cx(styles.slot_overlay, {
-            [styles.padded_slot_overlay]: !(
-              labwareMoveBlocked || labwareSwapBlocked
-            ),
             [styles.appear_on_mouseover]: !isBeingDragged && !isYetUnnamed,
             [styles.appear]: isOver,
             [styles.disabled]: isBeingDragged,
@@ -168,7 +127,15 @@ const EditLabware = (props: Props) => {
 }
 
 const labwareSource = {
-  beginDrag: props => ({ labwareOnDeck: props.labwareOnDeck }),
+  beginDrag: (props, monitor, component) => {
+    const { labwareOnDeck } = props
+    props.setDraggedLabware(labwareOnDeck)
+    return { labwareOnDeck }
+  },
+  endDrag: (props, monitor, component) => {
+    props.setHoveredLabware(null)
+    props.setDraggedLabware(null)
+  },
 }
 const collectLabwareSource = (connect, monitor) => ({
   connectDragSource: connect.dragSource(),
@@ -181,19 +148,18 @@ const DragEditLabware = DragSource(
   collectLabwareSource
 )(EditLabware)
 
-const labwareTarget = {
+const labwareDropTarget = {
   canDrop: (props: { ...OP, ...SP, ...DP }, monitor) => {
     const draggedItem = monitor.getItem()
     const draggedLabware = draggedItem?.labwareOnDeck
-    const { labwareOnDeck, modulesById } = props
     const isDifferentSlot =
       draggedLabware && draggedLabware.slot !== props.labwareOnDeck.slot
-    const { labwareMoveBlocked, labwareSwapBlocked } = getBlocked({
-      labwareOnDeck,
-      draggedLabware,
-      modulesById,
-    })
-    return isDifferentSlot && !labwareMoveBlocked && !labwareSwapBlocked
+    return isDifferentSlot && !props.swapBlocked
+  },
+  hover: (props, monitor, component) => {
+    if (monitor.canDrop) {
+      props.setHoveredLabware(component.props.labwareOnDeck)
+    }
   },
   drop: (props, monitor) => {
     const draggedItem = monitor.getItem()
@@ -205,15 +171,15 @@ const labwareTarget = {
     }
   },
 }
-const collectLabwareTarget = (connect, monitor) => ({
+const collectLabwareDropTarget = (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
   draggedLabware: monitor.getItem()?.labwareOnDeck || null,
 })
 export const DragDropEditLabware = DropTarget(
   DND_TYPES.LABWARE,
-  labwareTarget,
-  collectLabwareTarget
+  labwareDropTarget,
+  collectLabwareDropTarget
 )(DragEditLabware)
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
@@ -221,7 +187,6 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const hasName = labwareIngredSelectors.getSavedLabware(state)[id]
   return {
     isYetUnnamed: !ownProps.labwareOnDeck.def.parameters.isTiprack && !hasName,
-    modulesById: stepFormSelectors.getInitialDeckSetup(state).modules,
   }
 }
 

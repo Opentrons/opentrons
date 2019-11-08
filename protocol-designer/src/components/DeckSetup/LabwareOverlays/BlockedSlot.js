@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import cx from 'classnames'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
 import i18n from '../../../localization'
 import styles from './LabwareOverlays.css'
@@ -26,7 +25,7 @@ export const BlockedSlot = (props: Props) => {
         y={y}
         width={width}
         height={height}
-        className={styles.blocked_slot_underlay}
+        className={styles.blocked_slot_background}
       />
       <RobotCoordsForeignDiv
         x={x}
@@ -34,29 +33,11 @@ export const BlockedSlot = (props: Props) => {
         width={width}
         height={height}
         innerDivProps={{
-          className: cx(
-            styles.blocked_slot_content,
-            styles.blocked_slot_foreignelement
-          ),
+          className: styles.blocked_slot_content,
         }}
       >
         {i18n.t(`deck.blocked_slot.${message}`)}
       </RobotCoordsForeignDiv>
     </g>
-  )
-}
-
-// Standalone div if you're already inside a RobotCoordsForeignDiv
-type DivProps = {| message: BlockedSlotMessage |}
-export const BlockedSlotDiv = (props: DivProps) => {
-  return (
-    <div
-      className={cx(
-        styles.blocked_slot_underlay_div,
-        styles.blocked_slot_content
-      )}
-    >
-      {i18n.t(`deck.blocked_slot.${props.message}`)}
-    </div>
   )
 }

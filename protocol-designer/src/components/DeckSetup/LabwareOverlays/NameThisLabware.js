@@ -45,14 +45,7 @@ const NameThisLabware = (props: Props) => {
   }
 
   return (
-    <div
-      className={cx(
-        styles.slot_overlay,
-        styles.padded_slot_overlay,
-        styles.with_form
-      )}
-      ref={wrapperRef}
-    >
+    <div className={cx(styles.slot_overlay, styles.with_form)} ref={wrapperRef}>
       <div className={styles.name_input_wrapper}>
         <input
           className={styles.name_input}
