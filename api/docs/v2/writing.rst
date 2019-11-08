@@ -135,7 +135,7 @@ In your Jupyter notebook, you can use the Opentrons Protocol API simulator by do
 
     from opentrons import simulate
     protocol = simulate.get_protocol_api()
-    left = protocol.load_instrument('p300_single', 'right')
+    p300 = protocol.load_instrument('p300_single', 'right')
     ...
 
 The ``protocol`` object, which is an instance of :py:class:`.ProtocolContext`, is the same thing that gets passed to your protocol's ``run`` function, but set to simulate rather than control a robot. You can call all your protocol's functions on that object.
