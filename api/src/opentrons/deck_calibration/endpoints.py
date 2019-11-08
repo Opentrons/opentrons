@@ -51,7 +51,7 @@ def safe_points() -> Dict[str, Tuple[float, float, float]]:
         slot_3_lower_right[0] - 5, slot_3_lower_right[1] + 5, 10)
     slot_7_safe_point = (
         slot_7_upper_left[0] + 5, slot_7_upper_left[1] - 5, 10)
-    attach_tip_point = (200, 90, 150)
+    attach_tip_point = (200, 90, 130)
 
     return {
         '1': slot_1_safe_point,
