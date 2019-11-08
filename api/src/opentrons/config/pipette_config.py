@@ -158,10 +158,9 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
     # future, we’ll have to change this code to select items more
     # intelligently
     if ff.use_old_aspiration_functions():
-        log.info("Using old aspiration functions")
+        log.debug("Using old aspiration functions")
         ul_per_mm = cfg['ulPerMm'][0]
     else:
-        log.info("Using new aspiration functions")
         ul_per_mm = cfg['ulPerMm'][-1]
 
     smoothie_configs = cfg['smoothieConfigs']
