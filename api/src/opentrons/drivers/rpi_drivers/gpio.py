@@ -51,7 +51,6 @@ INPUT_PINS = {
 
 _path_prefix = "/sys/class/gpio"
 
-
 def _enable_pin(pin, direction):
     """
     In order to enable a GPIO pin, the pin number must be written into
@@ -153,10 +152,11 @@ def initialize():
     for pin in sorted(INPUT_PINS.values()):
         _enable_pin(pin, IN)
 
-  def activate_robot():
+def robot_startup_sequence():
     """
     Gets the robot ready for operation by initializing GPIO pins, resetting
-    the Smoothie and enabling the audio pin.
+    the Smoothie and enabling the audio pin. This only needs to be done
+    after power cycling the machine.
     """
     initialize()
 
