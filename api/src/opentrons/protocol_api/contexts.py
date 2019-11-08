@@ -1667,6 +1667,10 @@ class InstrumentContext(CommandPublisher):
                 self._mount, critical_point=cp_override),
             from_lw)
 
+        for mod in self._ctx._modules:
+            if isinstance(mod, ThermocyclerContext):
+                mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
+
         moves = geometry.plan_moves(from_loc, location, self._ctx.deck,
                                     force_direct=force_direct,
                                     minimum_z_height=minimum_z_height)
@@ -2165,6 +2169,17 @@ class ThermocyclerContext(ModuleContext):
             safe_point = trash_top.point._replace(
                     z=high_point[Axis.by_mount(instr._mount)])
             instr.move_to(types.Location(safe_point, None), force_direct=True)
+
+    def flag_unsafe_move(self,
+                         to_loc: types.Location,
+                         from_loc: types.Location):
+        to_lw, to_well = geometry.split_loc_labware(to_loc)
+        from_lw, from_well = geometry.split_loc_labware(from_loc)
+        if (self.labware is to_lw or self.labware is from_lw) and \
+                self.lid_position == 'closed':
+            raise RuntimeError(
+                "Cannot move to labware loaded in Thermocycler"
+                " when lid is closed")
 
     @cmds.publish.both(command=cmds.thermocycler_open)
     @requires_version(2, 0)

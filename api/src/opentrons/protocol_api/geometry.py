@@ -18,6 +18,16 @@ def max_many(*args):
     return functools.reduce(max, args[1:], args[0])
 
 
+def split_loc_labware(
+        loc: types.Location) -> Tuple[Optional[Labware], Optional[Well]]:
+    if isinstance(loc.labware, Labware):
+        return loc.labware, None
+    elif isinstance(loc.labware, Well):
+        return loc.labware.parent, loc.labware
+    else:
+        return None, None
+
+
 def plan_moves(
         from_loc: types.Location,
         to_loc: types.Location,
@@ -54,19 +64,10 @@ def plan_moves(
 
     assert minimum_z_height is None or minimum_z_height >= 0.0
 
-    def _split_loc_labware(
-            loc: types.Location) -> Tuple[Optional[Labware], Optional[Well]]:
-        if isinstance(loc.labware, Labware):
-            return loc.labware, None
-        elif isinstance(loc.labware, Well):
-            return loc.labware.parent, loc.labware
-        else:
-            return None, None
-
     to_point = to_loc.point
-    to_lw, to_well = _split_loc_labware(to_loc)
+    to_lw, to_well = split_loc_labware(to_loc)
     from_point = from_loc.point
-    from_lw, from_well = _split_loc_labware(from_loc)
+    from_lw, from_well = split_loc_labware(from_loc)
     dest_quirks = quirks_from_any_parent(to_lw)
     from_quirks = quirks_from_any_parent(from_lw)
     from_center = 'centerMultichannelOnWells' in from_quirks
