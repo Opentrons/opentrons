@@ -51,6 +51,7 @@ INPUT_PINS = {
 
 _path_prefix = "/sys/class/gpio"
 
+
 def _enable_pin(pin, direction):
     """
     In order to enable a GPIO pin, the pin number must be written into
@@ -152,6 +153,7 @@ def initialize():
     for pin in sorted(INPUT_PINS.values()):
         _enable_pin(pin, IN)
 
+
 def robot_startup_sequence():
     """
     Gets the robot ready for operation by initializing GPIO pins, resetting
@@ -171,6 +173,7 @@ def robot_startup_sequence():
     time.sleep(0.25)
     set_high(OUTPUT_PINS['RESET'])
     time.sleep(0.25)
+
 
 def turn_on_blue_button_light():
     set_button_light(blue=True)
