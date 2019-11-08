@@ -48,10 +48,9 @@ def get_module_at_port(port: str) -> Optional[ModuleAtPort]:
     """
     module_port_regex = re.compile('|'.join(MODULE_TYPES.keys()), re.I)
     match = module_port_regex.search(port)
-    log.debug(f'\n\n\nGET MODULE AT PORT: {match}, port: {port}\n\n\n')
     if match:
         name = match.group().lower()
-        return ModuleAtPort(port=port, name=name)
+        return ModuleAtPort(port=f'/dev/{port}', name=name)
     return None
 
 
