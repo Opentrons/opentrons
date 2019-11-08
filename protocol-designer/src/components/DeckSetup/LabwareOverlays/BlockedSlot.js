@@ -25,11 +25,30 @@ export const BlockedSlot = (props: Props) => {
         y={y}
         width={width}
         height={height}
-        className={styles.blocked_slot_box}
+        className={styles.blocked_slot_underlay}
       />
-      <RobotCoordsForeignDiv x={x} y={y} width={width} height={height}>
+      <RobotCoordsForeignDiv
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        innerDivProps={{ className: styles.blocked_slot_content }}
+      >
         {i18n.t(`deck.blocked_slot.${message}`)}
       </RobotCoordsForeignDiv>
     </g>
+  )
+}
+
+// Standalone div if you're already inside a RobotCoordsForeignDiv
+type DivProps = {| message: BlockedSlotMessage |}
+export const BlockedSlotDiv = (props: DivProps) => {
+  return (
+    <div
+      className={styles.blocked_slot_content}
+      style={{ backgroundColor: 'orange' }} // TODO IMMEDATELY
+    >
+      {i18n.t(`deck.blocked_slot.${props.message}`)}
+    </div>
   )
 }

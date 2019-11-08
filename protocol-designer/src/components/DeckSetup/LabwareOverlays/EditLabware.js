@@ -3,20 +3,22 @@ import React, { type Node } from 'react'
 import { connect } from 'react-redux'
 import cx from 'classnames'
 import { Icon } from '@opentrons/components'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
+import { getLabwareDisplayName, type ModuleType } from '@opentrons/shared-data'
 import { DragSource, DropTarget } from 'react-dnd'
+import i18n from '../../../localization'
+import NameThisLabware from './NameThisLabware'
+import { BlockedSlotDiv } from './BlockedSlot'
 import { DND_TYPES } from './constants'
-import type { BaseState, ThunkDispatch, DeckSlot } from '../../../types'
 import {
   openIngredientSelector,
   deleteContainer,
   duplicateLabware,
   moveDeckItem,
 } from '../../../labware-ingred/actions'
+import { getLabwareIsCompatible } from '../../../utils/labwareModuleCompatibility'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
-import i18n from '../../../localization'
+import type { BaseState, ThunkDispatch, DeckSlot } from '../../../types'
 import type { LabwareOnDeck } from '../../../step-forms'
-import NameThisLabware from './NameThisLabware'
 import styles from './LabwareOverlays.css'
 
 type OP = {|
@@ -33,7 +35,8 @@ type DP = {|
 |}
 
 type DNDP = {|
-  draggedItem: any,
+  // draggedItem: any,
+  draggedLabware: ?LabwareOnDeck,
   isOver: boolean,
   connectDragSource: Node => Node,
   connectDropTarget: Node => Node,
@@ -48,7 +51,7 @@ const EditLabware = (props: Props) => {
     editLiquids,
     deleteLabware,
     duplicateLabware,
-    draggedItem,
+    draggedLabware,
     isOver,
     connectDragSource,
     connectDropTarget,
@@ -63,45 +66,63 @@ const EditLabware = (props: Props) => {
       />
     )
   } else {
-    const isBeingDragged =
-      draggedItem &&
-      draggedItem.labwareOnDeck &&
-      draggedItem.labwareOnDeck.slot === labwareOnDeck.slot
+    const isBeingDragged = draggedLabware?.slot === labwareOnDeck.slot
 
-    const contents = draggedItem ? (
-      <div
-        className={cx(styles.overlay_button, {
-          [styles.drag_text]: isBeingDragged,
-        })}
-      >
-        {isBeingDragged ? 'NEEEEW SLOT!' : 'PLAC HERRR'}
-      </div>
-    ) : (
-      <>
-        {!isTiprack ? (
-          <a className={styles.overlay_button} onClick={editLiquids}>
-            <Icon className={styles.overlay_icon} name="pencil" />
-            {i18n.t('deck.overlay.edit.name_and_liquids')}
+    let contents: ?Node = null
+
+    console.log({ draggedLabware, slot: labwareOnDeck.slot })
+    const moduleType: ?ModuleType = 'thermocycler' // TODO: = moduleTypeByModuleId[slot] || null
+    const draggedDef = draggedLabware?.def
+    const slotBlocked =
+      draggedDef && moduleType
+        ? !getLabwareIsCompatible(draggedDef, moduleType)
+        : false
+
+    if (slotBlocked && draggedLabware) {
+      contents = <BlockedSlotDiv message="MODULE_INCOMPATIBLE_LABWARE_SWAP" />
+    } else if (draggedLabware) {
+      contents = (
+        <div
+          className={cx(styles.overlay_button, {
+            [styles.drag_text]: isBeingDragged,
+          })}
+        >
+          {i18n.t(
+            `deck.overlay.slot.${
+              isBeingDragged ? 'drag_to_new_slot' : 'place_here'
+            }`
+          )}
+        </div>
+      )
+    } else {
+      contents = (
+        <>
+          {!isTiprack ? (
+            <a className={styles.overlay_button} onClick={editLiquids}>
+              <Icon className={styles.overlay_icon} name="pencil" />
+              {i18n.t('deck.overlay.edit.name_and_liquids')}
+            </a>
+          ) : (
+            <div className={styles.button_spacer} />
+          )}
+          <a className={styles.overlay_button} onClick={duplicateLabware}>
+            <Icon className={styles.overlay_icon} name="content-copy" />
+            {i18n.t('deck.overlay.edit.duplicate')}
           </a>
-        ) : (
-          <div className={styles.button_spacer} />
-        )}
-        <a className={styles.overlay_button} onClick={duplicateLabware}>
-          <Icon className={styles.overlay_icon} name="content-copy" />
-          {i18n.t('deck.overlay.edit.duplicate')}
-        </a>
-        <a className={styles.overlay_button} onClick={deleteLabware}>
-          <Icon className={styles.overlay_icon} name="close" />
-          {i18n.t('deck.overlay.edit.delete')}
-        </a>
-      </>
-    )
+          <a className={styles.overlay_button} onClick={deleteLabware}>
+            <Icon className={styles.overlay_icon} name="close" />
+            {i18n.t('deck.overlay.edit.delete')}
+          </a>
+        </>
+      )
+    }
+
     return connectDragSource(
       connectDropTarget(
         <div
           className={cx(styles.slot_overlay, {
             [styles.appear_on_mouseover]: !isBeingDragged && !isYetUnnamed,
-            [styles.appear]: isOver,
+            [styles.appear]: isOver || (slotBlocked && isBeingDragged),
             [styles.disabled]: isBeingDragged,
           })}
         >
@@ -146,6 +167,7 @@ const labwareTarget = {
 const collectLabwareTarget = (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
+  draggedLabware: monitor.getItem()?.labwareOnDeck || null,
 })
 export const DragDropEditLabware = DropTarget(
   DND_TYPES.LABWARE,

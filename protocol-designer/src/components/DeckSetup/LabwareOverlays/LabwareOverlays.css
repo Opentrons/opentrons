@@ -99,8 +99,17 @@
   border-radius: 0.5rem;
 }
 
-.blocked_slot_box {
-  /* TODO IMMEDIATELY */
-  fill: rgba(255, 160, 50, 0.75);
-  stroke: red;
+.blocked_slot_underlay {
+  fill: rgba(200, 115, 0, 0.75);
+  stroke: var(--c-red);
+  rx: 6;
+}
+
+.blocked_slot_content {
+  height: 100%;
+  color: var(--c-white);
+  font-size: var(--fs-caption);
+  text-align: center;
+  margin: -1.75rem 0.5rem;
+  line-height: 1.5;
 }

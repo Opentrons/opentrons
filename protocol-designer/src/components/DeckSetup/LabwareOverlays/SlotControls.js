@@ -66,24 +66,7 @@ const SlotControls = (props: Props) => {
 
   return connectDropTarget(
     <g>
-      <RobotCoordsForeignDiv
-        x={slot.position[0]}
-        y={slot.position[1]}
-        width={slot.boundingBox.xDimension}
-        height={slot.boundingBox.yDimension}
-        innerDivProps={{
-          className: cx(styles.slot_overlay, styles.appear_on_mouseover, {
-            [styles.appear]: isOver,
-          }),
-          onClick: isOver ? noop : addLabware,
-        }}
-      >
-        <a className={styles.overlay_button} onClick={addLabware}>
-          {!isOver && <Icon className={styles.overlay_icon} name="plus" />}
-          {i18n.t(`deck.overlay.slot.${isOver ? 'place_here' : 'add_labware'}`)}
-        </a>
-      </RobotCoordsForeignDiv>
-      {slotBlocked && (
+      {slotBlocked ? (
         <BlockedSlot
           x={slot.position[0]}
           y={slot.position[1]}
@@ -91,6 +74,26 @@ const SlotControls = (props: Props) => {
           height={slot.boundingBox.yDimension}
           message="MODULE_INCOMPATIBLE_SINGLE_LABWARE"
         />
+      ) : (
+        <RobotCoordsForeignDiv
+          x={slot.position[0]}
+          y={slot.position[1]}
+          width={slot.boundingBox.xDimension}
+          height={slot.boundingBox.yDimension}
+          innerDivProps={{
+            className: cx(styles.slot_overlay, styles.appear_on_mouseover, {
+              [styles.appear]: isOver,
+            }),
+            onClick: isOver ? noop : addLabware,
+          }}
+        >
+          <a className={styles.overlay_button} onClick={addLabware}>
+            {!isOver && <Icon className={styles.overlay_icon} name="plus" />}
+            {i18n.t(
+              `deck.overlay.slot.${isOver ? 'place_here' : 'add_labware'}`
+            )}
+          </a>
+        </RobotCoordsForeignDiv>
       )}
     </g>
   )
