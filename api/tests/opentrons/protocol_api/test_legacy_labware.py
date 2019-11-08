@@ -101,13 +101,30 @@ def container_create(monkeypatch, config_tempdir):
 
 
 @pytest.mark.api2_only
-def test_load_func(labware):
+def test_load_func(labware, container_create):
     with pytest.raises(FileNotFoundError):
         labware.load('fake_labware', slot=1)
 
     with pytest.raises(RuntimeWarning):
         labware.load('96-flat', slot=1, label='plate 1')
         labware.load('96-flat', slot=1, label='plate 2')
+
+    with pytest.raises(NotImplementedError):
+        labware.load('tempdeck', slot=3)
+
+    lw1 = labware.load('3x8-chip', slot=2)
+    print(lw1.wells()[0].properties)
+    assert lw1.wells()[0].properties ==\
+        {
+        'depth': 0,
+        'total-liquid-volume': 20,
+        'diameter': 5,
+        'length': None,
+        'width': None,
+        'height': 0,
+        'has_tip': False,
+        'shape': lw1.wells()[0].shape,
+        'parent': lw1.wells()[0].parent}
 
 
 @pytest.mark.api2_only
@@ -176,12 +193,12 @@ def test_column_accessor(minimal_labware):
     assert minimal_labware.cols['2'] == col_2
 
     assert minimal_labware.columns(0) == col_1
-    assert minimal_labware.columns('A') == col_1
-    assert minimal_labware.columns('A', 1) == [col_1, col_2]
+    assert minimal_labware.columns('1') == col_1
+    assert minimal_labware.columns('1', 1) == [col_1, col_2]
 
-    assert minimal_labware.columns(0) == col_1
-    assert minimal_labware.columns('A') == col_1
-    assert minimal_labware.columns('A', 1) == [col_1, col_2]
+    assert minimal_labware.cols(0) == col_1
+    assert minimal_labware.cols('1') == col_1
+    assert minimal_labware.cols('1', 1) == [col_1, col_2]
 
 
 @pytest.mark.api2_only

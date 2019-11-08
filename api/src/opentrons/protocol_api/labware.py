@@ -66,7 +66,8 @@ class Well:
                  parent: Location,
                  display_name: str,
                  has_tip: bool,
-                 labware_height: float = None) -> None:
+                 labware_height: float = None,
+                 well_name: str = None) -> None:
         """
         Create a well, and track the Point corresponding to the top-center of
         the well (this Point is in absolute deck coordinates)
@@ -83,6 +84,7 @@ class Well:
                        front-left corner of a labware)
         """
         self._display_name = display_name
+        self._well_name = well_name
         self._position\
             = Point(well_props['x'],
                     well_props['y'],
@@ -122,6 +124,10 @@ class Well:
             'shape': self.shape,
             'parent': self.parent
             }
+
+    @property
+    def get_well_name(self) -> Optional[str]:
+        return self._well_name
 
     @property
     def depth(self) -> float:
@@ -375,7 +381,8 @@ class Labware:
                 Location(self._calibrated_offset, self),
                 "{} of {}".format(well, self._display_name),
                 self.is_tiprack,
-                self.dimensions['zDimension'])
+                self.dimensions['zDimension'],
+                well_name=well)
             for well in self._ordering]
 
     def _create_indexed_dictionary(self, group=0):

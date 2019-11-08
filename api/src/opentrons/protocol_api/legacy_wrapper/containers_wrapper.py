@@ -145,8 +145,6 @@ def _add_well(
         well_props: Dict[str, Any],
         well_coordinates):
     # Format one API v2 well entry
-    print(f"well name {type(well_name)}")
-    print(f"well properties {well_props}")
     lw_dict['wells'][well_name] = {
         'x': well_coordinates['x'],
         'y': well_coordinates['y'],
@@ -164,9 +162,8 @@ def _add_well(
 
 def create_new_labware_definition(labware: Container, labware_name: str):
     # shape metadata/parameter keys for labwares in v2 schema format
-    lw_dict = _format_labware_definition(labware_name, labware)
+    lw_dict, _ = _format_labware_definition(labware_name, labware)
     # Well Information
-    print(f"labware name {labware_name}")
     for well in labware.wells():
         well_props = well.properties
         well_coords = well._coordinates
@@ -187,7 +184,6 @@ def perform_migration():
     validation_failure = []
     for lw_name in labware_to_create:
         labware = db_cmds.load_container(lw_name)
-        print(f"{lw_name} is of type {type(labware)}")
         if labware.wells():
             log.info(f"Migrating {lw_name} to API v2 format")
             labware_def = create_new_labware_definition(labware, lw_name)
@@ -242,11 +238,9 @@ class Containers:
                 container_name, slot, label, legacy=True)
         except FileNotFoundError:
             try:
-                print("In file not found")
-                load_name = LW_TRANSLATION[container_name]
-                print(f"new_container name {load_name}")
+                container_name = LW_TRANSLATION[container_name]
                 return self._ctx.load_labware(
-                    load_name, slot, label, legacy=True)
+                    container_name, slot, label, legacy=True)
             except KeyError:
                 return self._ctx.load_labware(
                     _convert_labware_name(container_name),
@@ -261,7 +255,6 @@ class Containers:
         col_spacing, row_spacing = spacing
 
         lw_dict, is_tiprack = _format_labware_definition(name)
-        labware_name = _convert_labware_name(name)
 
         lw_dict['namespace'] = 'custom_beta'
         if is_tiprack:
@@ -327,11 +320,16 @@ class LegacyLabware():
             'type': self.lw_obj.display_name,
             'magdeck_engage_height': self.lw_obj.magdeck_engage_height
             }
+
+        # Lookup table used specifically for the weird `well` and `cols`
+        # method(s) in placeable that people used
         self._accessor_methods: Dict[str, object] = {
             'well': self.wells,
             'cols': self.columns
         }
 
+        # Lookup table for methods that either return a dict or lists
+        # to describe rows/cols/wells
         self._map_list_and_dict: typeDict = {  # typing: ignore
             'wells': {
                 'list': self._wells_by_index, 'dict': self._wells_by_name},
@@ -528,6 +526,9 @@ class LegacyLabware():
             raise ValueError('Labware.wells(x=, y=) expects ints')
 
     def _get_wells_by_to_and_length(self, *args, method_name=None, **kwargs):
+        # Method used specifically for length/to/step kwargs allowed in apiv1
+        # Strangely, it keeps 3 instances of a given labware's wells
+        # so that it can do a "wrapping" behavior.
         start = args[0] if len(args) else 0
         stop = kwargs.get('to', None)
         step = kwargs.get('step', 1)
@@ -611,7 +612,7 @@ class LegacyLabware():
         if not args:
             return WellSeries(self._columns_by_name, self._columns, self)
         if len(args) == 1:
-            return self.lw_obj.columns(args)[0]
+            return self._get_well_by_type(*args, 'columns')
         elif len(args) > 1:
             return [self._get_well_by_type(n, 'columns') for n in args]
         else:
@@ -621,7 +622,7 @@ class LegacyLabware():
         if not args:
             return WellSeries(self._rows_by_name, self._rows, self)
         if len(args) == 1:
-            return self.lw_obj.rows(*args)[0]
+            return self._get_well_by_type(*args, 'rows')
         elif len(args) > 1:
             return [self._get_well_by_type(n, 'rows') for n in args]
         else:
@@ -630,14 +631,10 @@ class LegacyLabware():
 
 class WellSeries(LegacyLabware):
     """
-    :WellSeries: represents a series of wells to make
-    accessing rows and columns easier. You can access
-    wells using index, providing name, index or slice
-
-    :WellSeries: mimics :Placeable:'s behaviour, delegating
-    all :Placeable: calls to the 0th well by default.
-
-    Default well index can be overriden using :set_offset:
+    This is a greatly cut down version of WellSeries found in placeable.py
+    The main purpose of this class is to allow behavior which switches
+    the method signature of columns/rows when someone wants to
+    call a well like `plate.rows('A')`
     """
 
     def __init__(

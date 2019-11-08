@@ -3,7 +3,7 @@ from unittest import mock
 from functools import partial
 from tests.opentrons.conftest import state
 from opentrons.config import robot_configs
-from opentrons.protocol_api import labware, labware_helpers as lh
+from opentrons.protocol_api import labware_helpers as lh
 from opentrons.api import models
 from opentrons.types import Point, Location, Mount
 from opentrons.hardware_control import CriticalPoint
