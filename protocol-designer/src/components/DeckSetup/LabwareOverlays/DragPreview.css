@@ -1,5 +1,5 @@
 @import '@opentrons/components';
 
 .labware_drag_preview {
-  opacity: 50%;
+  opacity: 0.5;
 }
