@@ -103,7 +103,7 @@
     "channels": 8,
     "smoothieConfigs": {
       "stepsPerMM": 3200,
-      "homePosition": 152.25,
+      "homePosition": 155.75,
       "travelDistance": 60
     }
   },
@@ -238,7 +238,7 @@
     "maxVolume": 300,
     "smoothieConfigs": {
       "stepsPerMM": 3200,
-      "homePosition": 152.25,
+      "homePosition": 155.75,
       "travelDistance": 60
     }
   },
