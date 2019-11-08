@@ -16,7 +16,8 @@ from .labware import (Well, Labware, get_labware_definition, load_module,
                       select_tiprack_from_list, filter_tipracks_to_start,
                       LabwareDefinition)
 from .labware_helpers import load_from_definition, load
-from opentrons.protocol_api.legacy_wrapper.containers_wrapper import LegacyLabware
+from opentrons.protocol_api.legacy_wrapper.containers_wrapper import\
+    LegacyLabware
 from .util import (FlowRates, PlungerSpeeds, Clearances, AxisMaxSpeeds,
                    HardwareManager, clamp_value)
 
@@ -257,7 +258,7 @@ class ProtocolContext(CommandPublisher):
         """
         parent = self.deck.position_for(location)
         labware_obj = load_from_definition(labware_def, parent, label, legacy)
-        self._deck_layout[location] = labware_obj
+        self._deck_layout[location] = labware_obj  # type: ignore
         return labware_obj
 
     def load_labware(
@@ -268,7 +269,7 @@ class ProtocolContext(CommandPublisher):
             namespace: str = None,
             version: int = None,
             legacy: bool = False
-    ) -> Labware:
+    ) -> Union[Labware, LegacyLabware]:
         """ Load a labware onto the deck given its name.
 
         For labware already defined by Opentrons, this is a convenient way
@@ -305,7 +306,7 @@ class ProtocolContext(CommandPublisher):
             label: str = None,
             namespace: str = None,
             version: int = 1
-    ) -> Labware:
+    ) -> Union[Labware, LegacyLabware]:
         MODULE_LOG.warning(
             'load_labware_by_name is deprecated and will be removed in '
             'version 3.12.0. please use load_labware')
@@ -1870,7 +1871,8 @@ class ModuleContext(CommandPublisher):
         self._geometry = geometry
         self._ctx = ctx
 
-    def load_labware_object(self, labware: Labware) -> Labware:
+    def load_labware_object(self, labware: Union[Labware, LegacyLabware])\
+            -> Union[Labware, LegacyLabware]:
         """ Specify the presence of a piece of labware on the module.
 
         :param labware: The labware object. This object should be already
@@ -1880,11 +1882,11 @@ class ModuleContext(CommandPublisher):
                         :py:meth:`load_labware`.
         :returns: The properly-linked labware object
         """
-        mod_labware = self._geometry.add_labware(labware)
+        mod_labware = self._geometry.add_labware(labware)  # type: ignore
         self._ctx.deck.recalculate_high_z()
         return mod_labware
 
-    def load_labware(self, name: str) -> Labware:
+    def load_labware(self, name: str) -> Union[Labware, LegacyLabware]:
         """ Specify the presence of a piece of labware on the module.
 
         :param name: The name of the labware object.
@@ -1895,14 +1897,14 @@ class ModuleContext(CommandPublisher):
             bundled_defs=self._ctx._bundled_labware)
         return self.load_labware_object(lw)
 
-    def load_labware_by_name(self, name: str) -> Labware:
+    def load_labware_by_name(self, name: str) -> Union[Labware, LegacyLabware]:
         MODULE_LOG.warning(
             'load_labware_by_name is deprecated and will be removed in '
             'version 3.12.0. please use load_labware')
         return self.load_labware(name)
 
     @property
-    def labware(self) -> Optional[Labware]:
+    def labware(self) -> Optional[Union[Labware, LegacyLabware]]:
         """ The labware (if any) present on this module. """
         return self._geometry.labware
 
@@ -2007,7 +2009,8 @@ class MagneticModuleContext(ModuleContext):
         """
         self._module.calibrate()
 
-    def load_labware_object(self, labware: Labware) -> Labware:
+    def load_labware_object(self, labware: Union[Labware, LegacyLabware])\
+            -> Union[Labware, LegacyLabware]:
         """
         Load labware onto a Magnetic Module, checking if it is compatible
         """

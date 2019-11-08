@@ -3,7 +3,7 @@ from unittest import mock
 from functools import partial
 from tests.opentrons.conftest import state
 from opentrons.config import robot_configs
-from opentrons.protocol_api import labware
+from opentrons.protocol_api import labware, labware_helpers as lh
 from opentrons.api import models
 from opentrons.types import Point, Location, Mount
 from opentrons.hardware_control import CriticalPoint
@@ -31,7 +31,7 @@ async def test_tip_probe_v2(main_router, model, monkeypatch):
     monkeypatch.setattr(main_router.calibration_manager,
                         'move_to_front', fake_move)
 
-    tr = labware.load('opentrons_96_tiprack_300ul', Location(Point(), 'test'))
+    tr = lh.load('opentrons_96_tiprack_300ul', Location(Point(), 'test'))
 
     model.instrument.tip_racks = [
         models.Container(tr,

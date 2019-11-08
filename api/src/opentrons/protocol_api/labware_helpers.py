@@ -10,7 +10,7 @@ def load_from_definition(
         definition: dict,
         parent: Location,
         label: str = None,
-        legacy: bool = False) -> Union[Labware, LegacyLabware]:
+        legacy: bool = False) -> Union[Labware, LegacyLabware]:  # type: ignore
     """
     Return a labware object constructed from a provided labware definition dict
 
@@ -31,7 +31,7 @@ def load_from_definition(
         labware = LegacyLabware(definition, parent, label)
     else:
         labware = Labware(definition, parent, label)
-    load_calibration(labware)
+    load_calibration(labware)  # type: ignore
     return labware
 
 
@@ -43,7 +43,7 @@ def load(
     version: int = 1,
     bundled_defs: Dict[str, LabwareDefinition] = None,
     extra_defs: Dict[str, LabwareDefinition] = None
-) -> Union[Labware, LegacyLabware]:
+) -> Union[Labware, LegacyLabware]:  # type: ignore
     """
     Return a labware object constructed from a labware definition dict looked
     up by name (definition must have been previously stored locally on the

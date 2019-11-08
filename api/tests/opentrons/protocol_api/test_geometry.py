@@ -2,7 +2,7 @@ import pytest
 
 from opentrons.types import Location, Point
 from opentrons.protocol_api.geometry import Deck, plan_moves
-from opentrons.protocol_api import labware
+from opentrons.protocol_api import labware, labware_helpers as lh
 from opentrons.hardware_control.types import CriticalPoint
 
 labware_name = 'corning_96_wellplate_360ul_flat'
@@ -15,7 +15,7 @@ def test_slot_names():
     for method in (slots_by_int, slots_by_str):
         d = Deck()
         for idx, slot in enumerate(method):
-            lw = labware.load(labware_name, d.position_for(slot))
+            lw = lh.load(labware_name, d.position_for(slot))
             assert slot in d
             d[slot] = lw
             with pytest.raises(ValueError):
@@ -47,7 +47,7 @@ def test_slot_collisions():
         d['11'] = 'def not this time though'
 
     lw_slot = '4'
-    lw = labware.load(labware_name, d.position_for(lw_slot))
+    lw = lh.load(labware_name, d.position_for(lw_slot))
     d[lw_slot] = lw
 
     assert lw_slot in d
@@ -56,7 +56,7 @@ def test_slot_collisions():
 def test_highest_z():
     deck = Deck()
     assert deck.highest_z == 0
-    lw = labware.load(labware_name, deck.position_for(1))
+    lw = lh.load(labware_name, deck.position_for(1))
     deck[1] = lw
     assert deck.highest_z == pytest.approx(lw.wells()[0].top().point.z)
     del deck[1]
@@ -64,7 +64,7 @@ def test_highest_z():
     mod = labware.load_module('tempdeck', deck.position_for(8))
     deck[8] = mod
     assert deck.highest_z == mod.highest_z
-    lw = labware.load(labware_name, mod.location)
+    lw = lh.load(labware_name, mod.location)
     mod.add_labware(lw)
     deck.recalculate_high_z()
     assert deck.highest_z == mod.highest_z
@@ -86,7 +86,7 @@ def check_arc_basic(arc, from_loc, to_loc):
 
 def test_direct_movs():
     deck = Deck()
-    lw1 = labware.load(labware_name, deck.position_for(1))
+    lw1 = lh.load(labware_name, deck.position_for(1))
 
     same_place = plan_moves(lw1.wells()[0].top(), lw1.wells()[0].top(), deck)
     assert same_place == [(lw1.wells()[0].top().point, None)]
@@ -97,8 +97,8 @@ def test_direct_movs():
 
 def test_basic_arc():
     deck = Deck()
-    lw1 = labware.load(labware_name, deck.position_for(1))
-    lw2 = labware.load(labware_name, deck.position_for(2))
+    lw1 = lh.load(labware_name, deck.position_for(1))
+    lw2 = lh.load(labware_name, deck.position_for(2))
     # same-labware moves should use the smaller safe z
     same_lw = plan_moves(lw1.wells()[0].top(),
                          lw1.wells()[8].bottom(),
@@ -120,8 +120,8 @@ def test_basic_arc():
 
 def test_force_direct():
     deck = Deck()
-    lw1 = labware.load(labware_name, deck.position_for(1))
-    lw2 = labware.load(labware_name, deck.position_for(2))
+    lw1 = lh.load(labware_name, deck.position_for(1))
+    lw2 = lh.load(labware_name, deck.position_for(2))
     # same-labware moves should move direct
     same_lw = plan_moves(lw1.wells()[0].top(),
                          lw1.wells()[8].bottom(),
@@ -141,8 +141,8 @@ def test_no_labware_loc():
     labware_def = labware.get_labware_definition(labware_name)
 
     deck = Deck()
-    lw1 = labware.load(labware_name, deck.position_for(1))
-    lw2 = labware.load(labware_name, deck.position_for(2))
+    lw1 = lh.load(labware_name, deck.position_for(1))
+    lw2 = lh.load(labware_name, deck.position_for(2))
     # Various flavors of locations without labware should work
     no_lw = lw1.wells()[0].top()._replace(labware=None)
 
@@ -169,7 +169,7 @@ def test_no_labware_loc():
 
 def test_arc_tall_point():
     deck = Deck()
-    lw1 = labware.load(labware_name, deck.position_for(1))
+    lw1 = lh.load(labware_name, deck.position_for(1))
     tall_z = 100
     old_top = lw1.wells()[0].top()
     tall_point = old_top.point._replace(z=tall_z)
@@ -190,7 +190,7 @@ def test_arc_tall_point():
 
 def test_arc_lower_minimum_z_height():
     deck = Deck()
-    lw1 = labware.load(labware_name, deck.position_for(1))
+    lw1 = lh.load(labware_name, deck.position_for(1))
     tall_z = 100
     minimum_z_height = 42
     old_top = lw1.wells()[0].top()
@@ -216,7 +216,7 @@ def test_arc_lower_minimum_z_height():
 
 def test_direct_minimum_z_height():
     deck = Deck()
-    lw1 = labware.load(labware_name, deck.position_for(1))
+    lw1 = lh.load(labware_name, deck.position_for(1))
     from_loc = lw1.wells()[0].bottom().move(Point(x=-2))
     to_loc = lw1.wells()[0].bottom().move(Point(x=2))
     zmo = 150
@@ -230,8 +230,8 @@ def test_direct_minimum_z_height():
 
 def test_direct_cp():
     deck = Deck()
-    trough = labware.load(trough_name, deck.position_for(1))
-    lw1 = labware.load(labware_name, deck.position_for(2))
+    trough = lh.load(trough_name, deck.position_for(1))
+    lw1 = lh.load(labware_name, deck.position_for(2))
     # when moving from no origin location to a centered labware we should
     # start in default cp
     from_nothing = plan_moves(Location(Point(50, 50, 50), None),

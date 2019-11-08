@@ -6,8 +6,9 @@ from opentrons.config import CONFIG
 from opentrons.data_storage import database as db_cmds
 from opentrons.protocol_api.legacy_wrapper.containers_wrapper import\
     LegacyLabware, perform_migration
-# from opentrons.protocol_api import labware
+from opentrons.protocol_api.labware import get_labware_definition
 from opentrons.types import Point, Location
+
 
 minimalLabwareDef = {
     "metadata": {
@@ -73,8 +74,8 @@ minimalLabwareDef = {
 def minimal_labware():
     deck = Location(Point(0, 0, 0), 'deck')
     plate = LegacyLabware(minimalLabwareDef, deck)
-
     return plate
+
 
 @pytest.fixture
 def container_create(monkeypatch, config_tempdir):
@@ -98,12 +99,13 @@ def container_create(monkeypatch, config_tempdir):
     shutil.rmtree(CONFIG['labware_user_definitions_dir_v2']/'legacy_api')
     CONFIG['labware_database_file'] = tempdb
 
+
 @pytest.mark.api2_only
 def test_load_func(labware):
     with pytest.raises(FileNotFoundError):
         labware.load('fake_labware', slot=1)
 
-    with pytest.raises(RuntimeError):
+    with pytest.raises(RuntimeWarning):
         labware.load('96-flat', slot=1, label='plate 1')
         labware.load('96-flat', slot=1, label='plate 2')
 
@@ -144,8 +146,12 @@ def test_well_accessor(minimal_labware):
 
 @pytest.mark.api2_only
 def test_row_accessor(minimal_labware):
-    row_1 = [minimal_labware._wells_by_index[0], minimal_labware._wells_by_index[2]]
-    row_2 = [minimal_labware._wells_by_index[1], minimal_labware._wells_by_index[3]]
+    row_1 = [
+        minimal_labware._wells_by_index[0],
+        minimal_labware._wells_by_index[2]]
+    row_2 = [
+        minimal_labware._wells_by_index[1],
+        minimal_labware._wells_by_index[3]]
 
     assert minimal_labware.rows[0] == row_1
     assert minimal_labware.rows['B'] == row_2
@@ -186,7 +192,6 @@ def test_list_labware(labware, container_create):
     assert '3x8-chip' in labware.list()
 
 
-
 @pytest.mark.api2_only
 def test_properties(minimal_labware):
     dims = minimalLabwareDef['dimensions']
@@ -204,4 +209,22 @@ def test_properties(minimal_labware):
 
 @pytest.mark.api2_only
 def test_labware_create(labware, container_create):
-    return None
+    migrated_json_def = get_labware_definition(
+        '3x8_chip',
+        namespace='legacy_api',
+        version=1)
+
+    labware.create(
+        '3x8-chip-new',
+        grid=(8, 3),
+        spacing=(9, 7.75),
+        diameter=5,
+        depth=0,
+        volume=20)
+
+    new_created_def = get_labware_definition(
+        '3x8_chip_new',
+        namespace='custom_beta',
+        version=1)
+
+    assert migrated_json_def['wells'] == new_created_def['wells']

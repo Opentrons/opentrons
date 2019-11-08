@@ -7,13 +7,13 @@ import os
 import shutil
 import logging
 import importlib.util
-from typing import List, Any, TYPE_CHECKING
+from typing import List, Any, Union, TYPE_CHECKING
 
 from opentrons.config import pipette_config, CONFIG
-from opentrons.types import Mount, Location, Point
-# from opentrons.protocol_api.labware_helpers import load_from_definition
-#
-from .containers_wrapper import Containers, perform_migration
+from opentrons.types import Mount
+
+from ..labware import Labware
+from .containers_wrapper import Containers, perform_migration, LegacyLabware
 from .robot_wrapper import Robot
 from .instrument_wrapper import Pipette
 
@@ -41,7 +41,7 @@ class AddInstrumentCtors(type):
         def initializer(
                 self,
                 mount: str,
-                trash_container = None,
+                trash_container: Union[Labware, LegacyLabware] = None,
                 tip_racks: List[Any] = None,
                 aspirate_flow_rate: float = None,
                 dispense_flow_rate: float = None,
@@ -133,41 +133,6 @@ class BCInstruments(metaclass=AddInstrumentCtors):
         instr = Pipette(instr_ctx)
         self._robot_wrapper._add_instrument(mount, instr)
         return instr
-#
-#
-# class BCLabware:
-#     """ A backwards-compatibility shim for the `New Protocol API`_.
-#
-#     This class provides a replacement for the `opentrons.labware` and
-#     `opentrons.containers` global instances. Like those global instances,
-#     this class shims labware load functions for ease of use. This class should
-#     not be instantiated by user code, and use of its methods should be
-#     replaced with use of the corresponding functions of
-#     :py:class:`.ProtocolContext`. For information on how to replace calls to
-#     methods of this class, see the method documentation.
-#     """
-#
-#     def __init__(self, ctx: 'ProtocolContext') -> None:
-#         self._ctx = ctx
-#
-#     def load(self, container_name, slot, label=None, share=False):
-#         """ Load a piece of labware by specifying its name and position.
-#
-#         This method calls :py:meth:`.ProtocolContext.load_labware`;
-#         see that documentation for more information on arguments and return
-#         values. Calls to this function should be replaced with calls to
-#         :py:meth:`.Protocolcontext.load_labware`.
-#
-#         In addition, this function contains translations between old
-#         labware names and new labware names.
-#         """
-#         return ctn.load(container_name, slot, label, share)
-#
-#     def create(self, *args, **kwargs):
-#         return ctn.create(*args, **kwargs)
-#
-#     def list(self, *args, **kwargs):
-#         return ctn.list(*args, **kwargs)
 
 
 class BCModules:

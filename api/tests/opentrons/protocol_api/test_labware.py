@@ -3,7 +3,7 @@ import pkgutil
 
 import pytest
 
-from opentrons.protocol_api import labware, util
+from opentrons.protocol_api import labware, labware_helpers as lh
 from opentrons.types import Point, Location
 
 test_data = {
@@ -360,7 +360,7 @@ def test_module_load_labware():
     for name in module_names:
         mod = labware.load_module(name, Location(Point(0, 0, 0), 'test'))
         old_z = mod.highest_z
-        lw = util.load_from_definition(labware_def, mod.location)
+        lw = lh.load_from_definition(labware_def, mod.location)
         mod.add_labware(lw)
         assert mod.labware == lw
         assert mod.highest_z ==\

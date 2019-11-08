@@ -1,12 +1,13 @@
 import logging
 
-from ..labware import Labware, get_all_labware_definitions, save_definition, Well as newWell
+from ..labware import (
+    Labware, get_all_labware_definitions, save_definition, Well as newWell)
 from .util import log_call
-from typing import Dict, List, Any, Tuple, Union, TYPE_CHECKING
+from typing import Dict, List, Any, Union, Optional, TYPE_CHECKING
 
 import jsonschema  # type: ignore
 
-from opentrons.types import Location
+from opentrons.types import Location, Point
 from opentrons.data_storage import database as db_cmds
 from opentrons.config import CONFIG
 from opentrons.legacy_api.containers.placeable import Container, Well
@@ -15,6 +16,8 @@ if TYPE_CHECKING:
     from ..contexts import ProtocolContext
 
 log = logging.getLogger(__name__)
+# Dict[str, Union[List[newWell], Dict[str, newWell]]]
+typeDict = Dict[str, Any]
 
 MODULE_BLACKLIST = ['tempdeck', 'magdeck', 'temperature-plate']
 
@@ -54,8 +57,10 @@ LW_TRANSLATION = {
 
 """ A table mapping old labware names to new labware names"""
 
+
 def _convert_labware_name(labware_name: str) -> str:
     return labware_name.replace("-", "_").lower()
+
 
 def _determine_well_names(labware: Container):
     # In the instance that the labware only contains one well, we must
@@ -131,7 +136,7 @@ def _format_labware_definition(labware_name: str, labware: Container = None):
     # format metadata based off that labware info.
     if labware:
         _add_metadata_from_v1(labware, lw_dict, is_tiprack)
-    return lw_dict
+    return lw_dict, is_tiprack
 
 
 def _add_well(
@@ -140,6 +145,8 @@ def _add_well(
         well_props: Dict[str, Any],
         well_coordinates):
     # Format one API v2 well entry
+    print(f"well name {type(well_name)}")
+    print(f"well properties {well_props}")
     lw_dict['wells'][well_name] = {
         'x': well_coordinates['x'],
         'y': well_coordinates['y'],
@@ -159,6 +166,7 @@ def create_new_labware_definition(labware: Container, labware_name: str):
     # shape metadata/parameter keys for labwares in v2 schema format
     lw_dict = _format_labware_definition(labware_name, labware)
     # Well Information
+    print(f"labware name {labware_name}")
     for well in labware.wells():
         well_props = well.properties
         well_coords = well._coordinates
@@ -179,6 +187,7 @@ def perform_migration():
     validation_failure = []
     for lw_name in labware_to_create:
         labware = db_cmds.load_container(lw_name)
+        print(f"{lw_name} is of type {type(labware)}")
         if labware.wells():
             log.info(f"Migrating {lw_name} to API v2 format")
             labware_def = create_new_labware_definition(labware, lw_name)
@@ -192,21 +201,7 @@ def perform_migration():
                      "wells associated with this labware.")
     log.info("Migration of API V1 labware complete.")
     return True, validation_failure
-# class LegacyLabware(lw.Labware):
-#     def __init__(self, definition: dict,
-#                  parent: types.Location, label: str = None) -> None:
-#         super().__init__(definition, parent)
-#         self._wells_by_index = super().wells()
-#         self._wells_by_name = super().wells_by_name()
-#         self._columns = super().columns()
-#         self._rows = super().rows()
-#         self._properties = {
-#             'length': self.dimensions['xDimension'],
-#             'width': self.dimensions['yDimension'],
-#             'height': self.dimensions['zDimension'],
-#             'type': self.display_name,
-#             'magdeck_engage_height': self.magdeck_engage_height
-#             }
+
 
 class Containers:
     """ A backwards-compatibility shim for the `New Protocol API`_.
@@ -223,6 +218,7 @@ class Containers:
     def __init__(self, ctx: 'ProtocolContext') -> None:
         self._ctx = ctx
 
+    @log_call(log)
     def load(self, container_name, slot, label=None, share=False):
         """ Load a piece of labware by specifying its name and position.
 
@@ -246,9 +242,11 @@ class Containers:
                 container_name, slot, label, legacy=True)
         except FileNotFoundError:
             try:
-                container_name = LW_TRANSLATION[container_name]
+                print("In file not found")
+                load_name = LW_TRANSLATION[container_name]
+                print(f"new_container name {load_name}")
                 return self._ctx.load_labware(
-                    container_name, slot, label, legacy=True)
+                    load_name, slot, label, legacy=True)
             except KeyError:
                 return self._ctx.load_labware(
                     _convert_labware_name(container_name),
@@ -257,13 +255,15 @@ class Containers:
                     namespace='legacy_api',
                     legacy=True)
 
+    @log_call(log)
     def create(self, name, grid, spacing, diameter, depth, volume=0):
         columns, rows = grid
         col_spacing, row_spacing = spacing
 
-        lw_dict, labware_name, is_tiprack = \
-            _format_labware_definition(name)
+        lw_dict, is_tiprack = _format_labware_definition(name)
+        labware_name = _convert_labware_name(name)
 
+        lw_dict['namespace'] = 'custom_beta'
         if is_tiprack:
             lw_dict['parameters']['tipLength'] = depth
             lw_dict['parameters']['tipOverlap'] = 0
@@ -301,10 +301,9 @@ class Containers:
         path_to_save_defs = CONFIG['labware_user_definitions_dir_v2']
         save_definition(lw_dict, location=path_to_save_defs)
 
-        return load_from_definition(labware_name,
-                                    Location(Point(0, 0, 0), 'deck'),
-                                    legacy=True)
+        return LegacyLabware(lw_dict, Location(Point(0, 0, 0), 'deck'))
 
+    @log_call(log)
     def list(self, *args, **kwargs):
         return get_all_labware_definitions()
 
@@ -314,6 +313,7 @@ class LegacyLabware():
             self, definition: dict,
             parent: Location, label: str = None) -> None:
         self.lw_obj = Labware(definition, parent)
+        self._definition = definition
         self._wells_by_index = self.lw_obj.wells()
         self._wells_by_name = self.lw_obj.wells_by_name()
         self._columns = self.lw_obj.columns()
@@ -327,26 +327,25 @@ class LegacyLabware():
             'type': self.lw_obj.display_name,
             'magdeck_engage_height': self.lw_obj.magdeck_engage_height
             }
-        self._accessor_methods = {
+        self._accessor_methods: Dict[str, object] = {
             'well': self.wells,
             'cols': self.columns
         }
 
-        self._map_list_and_dict = {
+        self._map_list_and_dict: typeDict = {  # typing: ignore
             'wells': {
-                'list': self._wells_by_index,'dict': self._wells_by_name},
+                'list': self._wells_by_index, 'dict': self._wells_by_name},
             'columns': {
-                'list': self._columns,'dict': self._columns_by_name},
+                'list': self._columns, 'dict': self._columns_by_name},
             'rows': {
                 'list': self._rows, 'dict': self._rows_by_name}
             }
-
 
     def __getattr__(self, attr):
         # For the use-case of methods `well` or `cols`
         return self._accessor_methods[attr]
 
-    def __getitem__(self, name) -> Well:
+    def __getitem__(self, name) -> newWell:
         # For the use-case of labware[0] or labware['A1']
         if isinstance(name, int) or isinstance(name, slice):
             return self._map_list_and_dict['wells']['list'][name]
@@ -358,6 +357,27 @@ class LegacyLabware():
     @property
     def properties(self) -> Dict:
         return self._properties
+
+    @property
+    def parent(self):
+        return self.lw_obj.parent
+
+    @property
+    def uri(self) -> str:
+        """ A string fully identifying the labware.
+
+        :returns: The uri, ``"namespace/loadname/version"``
+        """
+        return self.lw_obj.uri
+
+    @property
+    def quirks(self) -> List[str]:
+        """ Quirks specific to this labware. """
+        return self.lw_obj.quirks
+
+    @property
+    def magdeck_engage_height(self) -> Optional[float]:
+        return self.lw_obj.magdeck_engage_height
 
     @property
     def columns(self):
@@ -374,6 +394,122 @@ class LegacyLabware():
             wells_list=self._rows,
             labware_object=self,
             method_flag='rows')
+
+    @property
+    def highest_z(self) -> float:
+        """
+        The z-coordinate of the tallest single point anywhere on the labware.
+
+        This is drawn from the 'dimensions'/'zDimension' elements of the
+        labware definition and takes into account the calibration offset.
+        """
+        return self.lw_obj.highest_z
+
+    @property
+    def is_tiprack(self) -> bool:
+        return self.lw_obj.is_tiprack
+
+    @property
+    def tip_length(self) -> float:
+        return self.lw_obj.is_tiprack
+
+    @tip_length.setter
+    def tip_length(self, length: float):
+        self.lw_obj._parameters['tipLength'] = length
+
+    def set_calibration(self, delta: Point):
+        """
+        Called by save calibration in order to update the offset on the object.
+        """
+        self.lw_obj.set_calibration(delta)
+
+    @property
+    def calibrated_offset(self) -> Point:
+        return self.lw_obj._calibrated_offset
+
+    def next_tip(self,
+                 num_tips: int = 1,
+                 starting_tip: newWell = None) -> Optional[newWell]:
+        """
+        Find the next valid well for pick-up.
+
+        Determines the next valid start tip from which to retrieve the
+        specified number of tips. There must be at least `num_tips` sequential
+        wells for which all wells have tips, in the same column.
+
+        :param num_tips: target number of sequential tips in the same column
+        :type num_tips: int
+        :return: the :py:class:`.Well` meeting the target criteria, or None
+        """
+        return self.lw_obj.next_tip(num_tips, starting_tip)
+
+    def use_tips(self, start_well: newWell, num_channels: int = 1):
+        """
+        Removes tips from the tip tracker.
+
+        This method should be called when a tip is picked up. Generally, it
+        will be called with `num_channels=1` or `num_channels=8` for single-
+        and multi-channel respectively. If picking up with more than one
+        channel, this method will automatically determine which tips are used
+        based on the start well, the number of channels, and the geometry of
+        the tiprack.
+
+        :param start_well: The :py:class:`.Well` from which to pick up a tip.
+                           For a single-channel pipette, this is the well to
+                           send the pipette to. For a multi-channel pipette,
+                           this is the well to send the back-most nozzle of the
+                           pipette to.
+        :type start_well: :py:class:`.Well`
+        :param num_channels: The number of channels for the current pipette
+        :type num_channels: int
+        """
+        self.lw_obj.use_tips(start_well, num_channels)
+
+    def __repr__(self):
+        return self.lw_obj._display_name
+
+    def previous_tip(self, num_tips: int = 1) -> Optional[newWell]:
+        """
+        Find the best well to drop a tip in.
+
+        This is the well from which the last tip was picked up, if there's
+        room. It can be used to return tips to the tip tracker.
+
+        :param num_tips: target number of tips to return, sequential in a
+                         column
+        :type num_tips: int
+        :return: The :py:class:`.Well` meeting the target criteria, or ``None``
+        """
+        return self.lw_obj.previous_tip(num_tips)
+
+    def return_tips(self, start_well: newWell, num_channels: int = 1):
+        """
+        Re-adds tips to the tip tracker
+
+        This method should be called when a tip is dropped in a tiprack. It
+        should be called with `num_channels=1` or `num_channels=8` for single-
+        and multi-channel respectively. If returning more than one channel,
+        this method will automatically determine which tips are returned based
+        on the start well, the number of channels, and the tiprack geometry.
+
+        Note that unlike :py:meth:`use_tips`, calling this method in a way
+        that would drop tips into wells with tips in them will raise an
+        exception; this should only be called on a valid return of
+        :py:meth:`previous_tip`.
+
+        :param start_well: The :py:class:`.Well` into which to return a tip.
+        :type start_well: :py:class:`.Well`
+        :param num_channels: The number of channels for the current pipette
+        :type num_channels: int
+        """
+        return self.lw_obj.return_tips(start_well, num_channels)
+
+    def reset(self):
+        """Reset all tips in a tiprack
+        """
+        if self.lw_obj.is_tiprack:
+            for well in self.lw_obj.wells():
+                well.has_tip = True
 
     def _get_wells_by_xy(
             self, method_name=None, **kwargs) -> Union[newWell, List[newWell]]:
@@ -439,18 +575,9 @@ class LegacyLabware():
         else:
             raise TypeError(f"Type {type(well)} is not compatible.")
 
-    # def _flatten_well_list(self, lis):
-    #     new_list = []
-    #     for item in lis:
-    #         if isinstance(item, list):
-    #             new_list.extend(self._flatten_well_list(item))
-    #         else:
-    #             new_list.append(self._get_well_by_type(item))
-    #     return new_list
-
     def wells(self,
               *args,
-              **kwargs) -> Union[List[newWell], newWell]:  # type: ignore
+              **kwargs):  # type: ignore
         """
         Returns child Well or list of child Wells
         """
@@ -458,16 +585,15 @@ class LegacyLabware():
             return WellSeries(self._wells_by_name, self._wells_by_index, self)
 
         if args and isinstance(args[0], list):
-            args = args[0]
+            args = args[0]  # type: ignore
 
         if len(args) > 1:
-            print("In length thing")
             return [self._get_well_by_type(n, 'wells') for n in args]
         else:
             return self.handle_args('wells', *args, **kwargs)
 
-
-    def handle_args(self, method_name: str, *args, **kwargs):
+    def handle_args(self, method_name: str, *args, **kwargs)\
+            -> Union[List[newWell], newWell]:
 
         if 'x' in kwargs or 'y' in kwargs:
             return self._get_wells_by_xy(method_name=method_name, **kwargs)
@@ -478,6 +604,8 @@ class LegacyLabware():
             return self._get_well_by_type(
                 args[0],
                 method_name)
+        else:
+            raise IndexError('Unable to parse through well list.')
 
     def method_columns(self, *args, **kwargs):
         if not args:
@@ -513,30 +641,21 @@ class WellSeries(LegacyLabware):
     """
 
     def __init__(
-        self,
-        wells_dict: Dict,
-        wells_list: List,
-        labware_object: LegacyLabware,
-        method_flag: str=None,
-        name: str=None):
+            self,
+            wells_dict: Dict,
+            wells_list: List,
+            labware_object: LegacyLabware,
+            method_flag: str = None,
+            name: str = None):
 
         self.lw_object = labware_object
         self.items = wells_dict
         self.values = wells_list
         self.method_flag = method_flag
 
-        self.offset = 0
-        # self.name = name
-
-    def set_offset(self, offset):
-        """
-        Set index of a well that will be used to mimic :Placeable:
-        """
-        self.offset = offset
-
     def __getitem__(self, name):
         if isinstance(name, slice):
-            return 'Slice'
+            return self.values[name]
         elif isinstance(name, int):
             return self.values[name]
         elif isinstance(name, str):
