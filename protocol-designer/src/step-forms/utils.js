@@ -3,7 +3,11 @@ import assert from 'assert'
 import reduce from 'lodash/reduce'
 import values from 'lodash/values'
 import { getPipetteNameSpecs, type DeckSlotId } from '@opentrons/shared-data'
-import { SPAN7_8_10_11_SLOT, TC_SPAN_SLOTS } from '../constants'
+import {
+  SPAN7_8_10_11_SLOT,
+  TC_SPAN_SLOTS,
+  GEN_ONE_MULTI_PIPETTES,
+} from '../constants'
 import type { LabwareDefByDefURI } from '../labware-defs'
 import type {
   NormalizedPipette,
@@ -12,6 +16,7 @@ import type {
   PipetteEntities,
   InitialDeckSetup,
   ModuleOnDeck,
+  FormPipettesByMount,
   LabwareOnDeck as LabwareOnDeckType,
 } from './types'
 import type { DeckSlot } from '../types'
@@ -112,5 +117,25 @@ export const getSlotIsEmpty = (
         (labware: LabwareOnDeckType) => labware.slot === slot
       ),
     ].length === 0
+  )
+}
+
+export const getCrashablePipetteSelected = (
+  pipettesByMount: FormPipettesByMount
+) => {
+  const { left, right } = pipettesByMount
+  let match = 0
+  GEN_ONE_MULTI_PIPETTES.forEach(name => {
+    match += values(left).includes(name) || values(right).includes(name)
+  })
+  return match === 1
+}
+
+export const getHasGen1MultiChannelPipette = (
+  pipettes: $PropertyType<InitialDeckSetup, 'pipettes'>
+) => {
+  const pipetteIds = Object.keys(pipettes)
+  return pipetteIds.some(pipetteId =>
+    GEN_ONE_MULTI_PIPETTES.includes(pipettes[pipetteId]?.name)
   )
 }

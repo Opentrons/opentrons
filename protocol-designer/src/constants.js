@@ -29,6 +29,8 @@ export function getAllWellsForLabware(def: LabwareDefinition2): Array<string> {
 
 export const FIXED_TRASH_ID: 'trashId' = 'trashId'
 
+export const GEN_ONE_MULTI_PIPETTES = ['p10_multi', 'p50_multi', 'p300_multi']
+
 // Standard slot dims FOR VISUALIZATION ONLY
 export const STD_SLOT_X_DIM = 128
 export const STD_SLOT_Y_DIM = 86
