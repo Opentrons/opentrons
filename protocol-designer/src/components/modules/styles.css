@@ -50,3 +50,41 @@
   width: 6.75rem;
   margin-left: 1rem;
 }
+
+.crash_info_container {
+  display: flex;
+  margin: 1rem 0;
+  justify-content: flex-start;
+}
+
+.crash_info_diagram {
+  width: auto;
+  height: 100%;
+  max-height: 8.875rem;
+}
+
+.crash_info_box {
+  @apply --font-body-1-dark;
+
+  padding: 1rem;
+  background-color: var(--c-light-gray);
+
+  & strong {
+    font-weight: var(--fw-semibold);
+  }
+
+  & p {
+    margin: 0.5rem 0;
+  }
+}
+
+.alert_icon {
+  width: 1rem;
+  margin-right: 0.5rem;
+  color: var(--c-med-gray);
+  vertical-align: top;
+}
+
+.link {
+  @apply --font-body-1-dark;
+}

@@ -1,6 +1,7 @@
 // @flow
 import assert from 'assert'
 import reduce from 'lodash/reduce'
+import values from 'lodash/values'
 import * as React from 'react'
 import cx from 'classnames'
 import {
@@ -15,6 +16,7 @@ import { SPAN7_8_10_11_SLOT } from '../../../constants'
 import StepChangesConfirmModal from '../EditPipettesModal/StepChangesConfirmModal'
 import ModuleFields from './ModuleFields'
 import PipetteFields from './PipetteFields'
+import { CrashInfoBox } from '../../modules'
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 import modalStyles from '../modal.css'
@@ -93,6 +95,21 @@ export default class FilePipettesModal extends React.Component<Props, State> {
     // reset form state when modal is hidden
     if (!prevProps.hideModal && this.props.hideModal)
       this.setState(initialState)
+  }
+
+  // TODO (ka 2019-11-8): Promote this to utils once finalized
+  getCrashablePipetteSelected = (pipettesByMount: FormPipettesByMount) => {
+    const { left, right } = pipettesByMount
+    const pipetteNamesToCheck = ['p10_multi', 'p50_multi', 'p300_multi']
+    let match = 0
+    pipetteNamesToCheck.forEach(name => {
+      match += values(left).includes(name) || values(right).includes(name)
+    })
+    return match === 1
+  }
+
+  getCrashableModuleSelected = (modules: FormModulesByType) => {
+    return modules.magdeck.onDeck || modules.tempdeck.onDeck
   }
 
   handlePipetteFieldsChange = (
@@ -199,6 +216,10 @@ export default class FilePipettesModal extends React.Component<Props, State> {
 
     const canSubmit = pipetteSelectionIsValid && tiprackSelectionIsValid
 
+    const showCrashInfoBox =
+      this.getCrashablePipetteSelected(this.state.pipettesByMount) &&
+      this.getCrashableModuleSelected(this.state.modulesByType)
+
     return (
       <React.Fragment>
         <Modal
@@ -258,6 +279,9 @@ export default class FilePipettesModal extends React.Component<Props, State> {
                   </div>
                 )}
               </form>
+
+              {showCrashInfoBox && <CrashInfoBox />}
+
               <div className={styles.button_row}>
                 <OutlineButton
                   onClick={this.props.onCancel}
