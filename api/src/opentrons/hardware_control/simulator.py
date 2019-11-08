@@ -85,9 +85,11 @@ class Simulator:
         self._config = config
         self._loop = loop
         self._attached_instruments = attached_instruments
-        self._attached_modules = [ModuleAtPort(absolute_port=f'mod{str(idx)}', name=mod)
-                                  for idx, mod
-                                  in enumerate(attached_modules)]
+        self._attached_modules = [
+            ModuleAtPort(
+                port=f'/dev/ot_module_simulated_mod{str(idx)}', name=mod)
+            for idx, mod
+            in enumerate(attached_modules)]
         self._position = copy.copy(_HOME_POSITION)
         # Engaged axes start all true in smoothie for some reason so we
         # imitate that here

@@ -39,10 +39,8 @@ class Controller:
             config=self.config, handle_locks=False)
         self._cached_fw_version: Optional[str] = None
         self._module_watcher = aionotify.Watcher()
-        if not os.path.isdir('/dev/modules'):
-            os.mkdir('/dev/modules')
         self._module_watcher.watch(alias='modules',
-                                   path='/dev/modules',
+                                   path='/dev',
                                    flags=(aionotify.Flags.CREATE | aionotify.Flags.DELETE))
 
     def update_position(self) -> Dict[str, float]:
@@ -129,13 +127,15 @@ class Controller:
             MODULE_LOG.info(f'\n\nEVENT CAUGHT: {event}\n\n')
             flags = aionotify.Flags.parse(event.flags)
             MODULE_LOG.info(f'\n\nFLAGS: {flags}\n\n')
-            maybe_module_at_port = modules.get_module_at_port(event.name)
-            if maybe_module_at_port is not None and aionotify.Flags.DELETE in flags:
-                update_attached_modules(removed_modules=[maybe_module_at_port])
-                MODULE_LOG.info(f'Module Removed: {maybe_module_at_port}')
-            if maybe_module_at_port is not None and aionotify.Flags.CREATE in flags:
-                update_attached_modules(new_modules=[maybe_module_at_port])
-                MODULE_LOG.info(f'Module Added: {maybe_module_at_port}')
+            if 'ot_module' in event.name
+              maybe_module_at_port = modules.get_module_at_port(event.name)
+               if maybe_module_at_port is not None and aionotify.Flags.DELETE in flags:
+                    update_attached_modules(
+                        removed_modules=[maybe_module_at_port])
+                    MODULE_LOG.info(f'Module Removed: {maybe_module_at_port}')
+                if maybe_module_at_port is not None and aionotify.Flags.CREATE in flags:
+                    update_attached_modules(new_modules=[maybe_module_at_port])
+                    MODULE_LOG.info(f'Module Added: {maybe_module_at_port}')
 
                 # discovered = {port + model: (port, model)
                 #             for port, model in self._backend.get_attached_modules()}

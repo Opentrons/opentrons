@@ -123,7 +123,7 @@ async def test_get_modules_v2(
     hw = async_server['com.opentrons.hardware']
     monkeypatch.setattr(hw._backend,
                         '_attached_modules',
-                        [('/dev/modules/tty1_magdeck', 'magdeck')])
+                        [('/dev/ot_module_magdeck1', 'magdeck')])
     await check_modules_response(async_client)
 
 

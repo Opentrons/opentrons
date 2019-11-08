@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import sys
+from glob import glob
 from typing import Any, Dict, Optional, Tuple
 
 from .mod_abc import UploadFunction
@@ -155,7 +156,7 @@ async def _port_on_mode_switch(ports_before_switch):
             ports_after_switch))
         if len(new_ports) > 1:
             raise OSError('Multiple new ports found on mode switch')
-        new_port = '/dev/modules/{}'.format(new_ports[0])
+        new_port = new_ports[0]
     return new_port
 
 
@@ -173,7 +174,7 @@ async def _port_poll(is_old_bootloader, ports_before_switch=None):
                 discovered_ports = list(filter(
                     lambda x: x.endswith('bootloader'), ports))
                 if len(discovered_ports) == 1:
-                    new_port = '/dev/modules/{}'.format(discovered_ports[0])
+                    new_port = discovered_ports[0]
         await asyncio.sleep(0.05)
     return new_port
 
@@ -186,9 +187,8 @@ async def _discover_ports():
     for attempt in range(2):
         # Measure for race condition where port is being switched in
         # between calls to isdir() and listdir()
-        try:
-            return os.listdir('/dev/modules')
-        except (FileNotFoundError, OSError):
-            pass
+        module_ports = glob('/dev/ot_module*')
+        if module_ports:
+            return module_ports
         await asyncio.sleep(2)
-    raise Exception("No /dev/modules found. Try again")
+    raise Exception("No ot_modules found in /dev. Try again")

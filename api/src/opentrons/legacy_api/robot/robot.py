@@ -1173,9 +1173,9 @@ class Robot(CommandPublisher):
             self._attached_modules.pop(mod)
         for mod in new:
             module_class = modules.SUPPORTED_MODULES[discovered[mod][1]]
-            absolute_port = '/dev/modules/{}'.format(discovered[mod][0])
+            port = discovered[mod][1]
             self._attached_modules[mod]\
-                = module_class(port=absolute_port, broker=self.broker)
+                = module_class(port=port, broker=self.broker)
 
             try:
                 self._attached_modules[mod].connect()

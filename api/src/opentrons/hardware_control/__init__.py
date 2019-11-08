@@ -1353,19 +1353,19 @@ class API(HardwareAPILike):
     async def _update_attached_modules(self,
                                        new_modules = [],
                                        removed_modules = []):
-        for absolute_port, name in removed_modules:
+        for port, name in removed_modules:
             self._attached_modules = [mod for mod in self._attached_modules
-                                      if mod.port != absolute_port]
+                                      if mod.port != port]
             self._log.info(f"Module {name} disconnected " \
-                           f" from port {absolute_port}")
+                           f" from port {port}")
 
-        for absolute_port, name in new_modules:
-            new_instance = await self._backend.build_module(absolute_port,
+        for port, name in new_modules:
+            new_instance = await self._backend.build_module(port,
                     name,
                     self.pause_with_message)
             self._attached_modules.append(new_instance)
             self._log.info(f"Module {name} discovered and attached " \
-                           f" at port {absolute_port}")
+                           f" at port {port}")
 
     # @_log_call
     # async def discover_modules(self):

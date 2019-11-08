@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import os
+from glob import glob
 import re
 from typing import List, Optional, Tuple
 from collections import namedtuple
@@ -13,7 +14,7 @@ from . import update, tempdeck, magdeck, thermocycler  # noqa(W0611)
 
 log = logging.getLogger(__name__)
 
-ModuleAtPort = namedtuple('ModuleAtPort', ('absolute_port', 'name'))
+ModuleAtPort = namedtuple('ModuleAtPort', ('port', 'name'))
 
 
 class UnsupportedModuleError(Exception):
@@ -50,7 +51,7 @@ def get_module_at_port(port: str) -> Optional[ModuleAtPort]:
     log.debug(f'\n\n\nGET MODULE AT PORT: {match}, port: {port}\n\n\n')
     if match:
         name = match.group().lower()
-        return ModuleAtPort(absolute_port=f'/dev/modules/{port}', name=name)
+        return ModuleAtPort(port=port, name=name)
     return None
 
 
@@ -58,8 +59,8 @@ def discover() -> List[ModuleAtPort]:
     """ Scan for connected modules and return list of
         tuples of serial ports and device names
     """
-    if IS_ROBOT and os.path.isdir('/dev/modules'):
-        devices = os.listdir('/dev/modules')
+    if IS_ROBOT:
+        devices = glob('/dev/ot_module*')
     else:
         devices = []
 
@@ -74,9 +75,7 @@ def discover() -> List[ModuleAtPort]:
                 log.warning("Unexpected module connected: {} on {}"
                             .format(name, port))
                 continue
-            new_mod = ModuleAtPort(absolute_port=f'/dev/modules/{port}',
-                                   name=name)
-            discovered_modules.append(new_mod)
+            discovered_modules.append(ModuleAtPort(port=port, name=name))
     log.debug('Discovered modules: {}'.format(discovered_modules))
 
     return discovered_modules

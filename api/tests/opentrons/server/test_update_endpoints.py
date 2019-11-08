@@ -122,7 +122,7 @@ async def test_update_module_firmware(
         return [('mod1', 'thermocycler')]
 
     async def mock_enter_bootloader(driver, module):
-        return '/dev/modules/tty0_bootloader'
+        return '/dev/ot_module_avrdude_bootloader0'
 
     monkeypatch.setattr(hw_modules.update, 'enter_bootloader',
                         mock_enter_bootloader)
@@ -168,7 +168,7 @@ async def test_fail_update_module_firmware(
         fd.write(bytes(0x1234))
 
     async def mock_enter_bootloader(driver, module):
-        return '/dev/modules/tty0_bootloader'
+        return '/dev/ot_module_avrdude_bootloader0'
 
     def mock_get_attached_modules(module):
         return [('mod1', 'thermocycler')]
