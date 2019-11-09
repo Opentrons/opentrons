@@ -63,8 +63,6 @@ export default function EditModulesModal(props: EditModulesProps) {
     getCrashablePipetteSelected(pipettesByMount) &&
     (moduleType === 'magdeck' || moduleType === 'tempdeck')
 
-  console.log(showCrashInfoBox)
-
   const slotsBlockedBySpanning = getSlotsBlockedBySpanning(_initialDeckSetup)
   const previousModuleSlot = module && module.slot
 

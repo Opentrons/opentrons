@@ -15,7 +15,7 @@ import {
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import i18n from '../../localization'
-import { PSEUDO_DECK_SLOTS } from '../../constants'
+import { PSEUDO_DECK_SLOTS, GEN_ONE_MULTI_PIPETTES } from '../../constants'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../steplist'
 import {
   getModuleVizDims,
@@ -254,7 +254,7 @@ const getHasGen1MultiChannelPipette = (
 ) => {
   const pipetteIds = Object.keys(pipettes)
   return pipetteIds.some(pipetteId =>
-    ['p10_multi', 'p50_multi', 'p300_multi'].includes(pipettes[pipetteId]?.name)
+    GEN_ONE_MULTI_PIPETTES.includes(pipettes[pipetteId]?.name)
   )
 }
 

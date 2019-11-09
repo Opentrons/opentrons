@@ -17,6 +17,7 @@ import type {
   InitialDeckSetup,
   ModuleOnDeck,
   FormPipettesByMount,
+  FormPipette,
   LabwareOnDeck as LabwareOnDeckType,
 } from './types'
 import type { DeckSlot } from '../types'
@@ -124,11 +125,10 @@ export const getCrashablePipetteSelected = (
   pipettesByMount: FormPipettesByMount
 ) => {
   const { left, right } = pipettesByMount
-  let match = 0
-  GEN_ONE_MULTI_PIPETTES.forEach(name => {
-    match += values(left).includes(name) || values(right).includes(name)
-  })
-  return match === 1
+  return [left, right].some(
+    (formPipette: ?FormPipette) =>
+      formPipette && GEN_ONE_MULTI_PIPETTES.includes(formPipette?.pipetteName)
+  )
 }
 
 export const getHasGen1MultiChannelPipette = (
