@@ -23,9 +23,11 @@ type Props = {|
 
 export default function FileInfo(props: Props) {
   const { robot, sessionLoaded, sessionHasSteps } = props
-  const uploadError = sessionHasSteps
-    ? props.uploadError
-    : { message: NO_STEPS_MESSAGE }
+  let uploadError = props.uploadError
+
+  if (sessionLoaded && !uploadError && !sessionHasSteps) {
+    uploadError = { message: NO_STEPS_MESSAGE }
+  }
 
   return (
     <div className={styles.file_info_container}>
@@ -33,9 +35,7 @@ export default function FileInfo(props: Props) {
       <ProtocolPipettesCard robot={robot} />
       <ProtocolModulesCard robot={robot} />
       <ProtocolLabwareCard />
-      {sessionLoaded && uploadError && (
-        <UploadError uploadError={uploadError} />
-      )}
+      {uploadError && <UploadError uploadError={uploadError} />}
       {sessionLoaded && !uploadError && <Continue />}
     </div>
   )
