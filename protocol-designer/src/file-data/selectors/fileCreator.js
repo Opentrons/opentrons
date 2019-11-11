@@ -7,6 +7,7 @@ import uniq from 'lodash/uniq'
 import { getFileMetadata } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
 import { selectors as dismissSelectors } from '../../dismiss'
+import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
@@ -18,15 +19,19 @@ import {
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
 } from '../../constants'
 
+import type { ModuleType } from '@opentrons/shared-data'
 import type {
   FilePipette,
   FileLabware,
+  FileModule,
   Command,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+import type { ModuleEntity } from '../../step-forms'
 import type { BaseState } from '../../types'
 import type { PDProtocolFile } from '../../file-types'
 
-const protocolSchemaVersion = 3
+// TODO: Ian 2019-11-11 remove the `any` and bump to 4 when v4 is released
+const protocolSchemaVersion: any = 3
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
@@ -39,6 +44,13 @@ const applicationVersion: string = process.env.OT_PD_VERSION || ''
 // when we look at saved protocols (without requiring us to trace thru git logs)
 const _internalAppBuildDate = process.env.OT_PD_BUILD_DATE
 
+// TODO IMMEDIATELY should live next to `FILE_MODULE_TYPE_TO_MODULE_TYPE`
+const MODULE_TYPE_TO_FILE_MODULE_TYPE: { [ModuleType]: string } = {
+  tempdeck: 'temperature module',
+  magdeck: 'magnetic module',
+  thermocycler: 'thermocycler',
+}
+
 export const createFile: BaseState => PDProtocolFile = createSelector(
   getFileMetadata,
   getInitialRobotState,
@@ -49,9 +61,11 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
   stepFormSelectors.getSavedStepForms,
   stepFormSelectors.getOrderedStepIds,
   stepFormSelectors.getLabwareEntities,
+  stepFormSelectors.getModuleEntities,
   stepFormSelectors.getPipetteEntities,
   uiLabwareSelectors.getLabwareNicknamesById,
   labwareDefSelectors.getLabwareDefsByURI,
+  featureFlagSelectors.getEnableModules,
   (
     fileMetadata,
     initialRobotState,
@@ -62,9 +76,11 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
     savedStepForms,
     orderedStepIds,
     labwareEntities,
+    moduleEntities,
     pipetteEntities,
     labwareNicknamesById,
-    labwareDefsByURI
+    labwareDefsByURI,
+    modulesEnabled
   ) => {
     const { author, description, created } = fileMetadata
     const name = fileMetadata.protocolName || 'untitled'
@@ -90,6 +106,15 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
         slot: l.slot,
         displayName: labwareNicknamesById[labwareId],
         definitionId: labwareEntities[labwareId].labwareDefURI,
+      })
+    )
+
+    const modules: { [moduleId: string]: FileModule } = mapValues(
+      moduleEntities,
+      (module: ModuleEntity, moduleId: string): FileModule => ({
+        slot: initialRobotState.modules[moduleId].slot,
+        moduleType: MODULE_TYPE_TO_FILE_MODULE_TYPE[module.type],
+        model: module.model,
       })
     )
 
@@ -167,6 +192,8 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
       commands: flatten<Command, Command>(
         robotStateTimeline.timeline.map(timelineFrame => timelineFrame.commands)
       ),
+
+      ...(modulesEnabled ? { modules } : {}),
     }
   }
 )

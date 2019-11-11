@@ -1,5 +1,6 @@
 // @flow
 import migrateFile from './migration'
+import { selectors as featureFlagSelectors } from '../feature-flags'
 import type { PDProtocolFile } from '../file-types'
 import type { GetState, ThunkAction, ThunkDispatch } from '../types'
 import type {
@@ -8,7 +9,6 @@ import type {
   LoadFileAction,
   NewProtocolFields,
 } from './types'
-
 export type FileUploadMessageAction = {
   type: 'FILE_UPLOAD_MESSAGE',
   payload: FileUploadMessage,
@@ -51,10 +51,22 @@ export const loadProtocolFile = (
       const result = ((readEvent.currentTarget: any): FileReader).result
       let parsedProtocol: ?PDProtocolFile
 
+      const modulesEnabled = featureFlagSelectors.getEnableModules(getState())
+
       try {
         parsedProtocol = JSON.parse(((result: any): string))
-        // TODO LATER Ian 2018-05-18 validate file with JSON Schema here
-        dispatch(loadFileAction(parsedProtocol))
+        // Protect production PD from weird states you could get from loading a JSON ~v4 protocol with modules
+        if ('modules' in parsedProtocol && !modulesEnabled) {
+          dispatch(
+            fileError(
+              'INVALID_JSON_FILE',
+              'This protocol appears to contain modules. This is not yet supported in PD.'
+            )
+          )
+        } else {
+          // TODO LATER Ian 2018-05-18 validate file with JSON Schema here
+          dispatch(loadFileAction(parsedProtocol))
+        }
       } catch (error) {
         console.error(error)
         fileError('INVALID_JSON_FILE', error.message)

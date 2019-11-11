@@ -2,8 +2,10 @@
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type {
   LabwareTemporalProperties,
+  ModuleTemporalProperties,
   PipetteTemporalProperties,
   LabwareEntities,
+  ModuleEntities,
   PipetteEntities,
 } from '../step-forms'
 
@@ -188,6 +190,7 @@ export type SourceAndDest = {|
 // Data that never changes across time
 export type InvariantContext = {|
   labwareEntities: LabwareEntities,
+  moduleEntities: ModuleEntities,
   pipetteEntities: PipetteEntities,
 |}
 
@@ -198,6 +201,9 @@ export type RobotState = {|
   },
   labware: {
     [labwareId: string]: LabwareTemporalProperties,
+  },
+  modules: {
+    [moduleId: string]: ModuleTemporalProperties,
   },
   tipState: {
     tipracks: {

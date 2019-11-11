@@ -361,11 +361,18 @@ export function createTipLiquidState<T>(
 export function makeInitialRobotState(args: {|
   invariantContext: InvariantContext,
   labwareLocations: $PropertyType<RobotState, 'labware'>,
+  moduleLocations: $PropertyType<RobotState, 'modules'>,
   pipetteLocations: $PropertyType<RobotState, 'pipettes'>,
 |}): RobotState {
-  const { invariantContext, labwareLocations, pipetteLocations } = args
+  const {
+    invariantContext,
+    labwareLocations,
+    moduleLocations,
+    pipetteLocations,
+  } = args
   return {
     labware: labwareLocations,
+    modules: moduleLocations,
     pipettes: pipetteLocations,
     liquidState: createEmptyLiquidState(invariantContext),
     tipState: {

@@ -6523,6 +6523,7 @@ Object {
       "labwareDefURI": "fixture/fixture_12_trough/1",
     },
   },
+  "moduleEntities": Object {},
   "pipetteEntities": Object {
     "p10MultiId": Object {
       "id": "p10MultiId",
@@ -11683,6 +11684,7 @@ Object {
       },
     },
   },
+  "modules": Object {},
   "pipettes": Object {
     "p300SingleId": Object {
       "mount": "left",

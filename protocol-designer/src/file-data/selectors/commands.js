@@ -12,15 +12,22 @@ import type { BaseState, Selector } from '../../types'
 import type { StepIdType } from '../../form-types'
 import type {
   LabwareOnDeck,
+  ModuleOnDeck,
   PipetteOnDeck,
   LabwareTemporalProperties,
+  ModuleTemporalProperties,
   PipetteTemporalProperties,
 } from '../../step-forms'
 
 const getInvariantContext: Selector<StepGeneration.InvariantContext> = createSelector(
   stepFormSelectors.getLabwareEntities,
+  stepFormSelectors.getModuleEntities,
   stepFormSelectors.getPipetteEntities,
-  (labwareEntities, pipetteEntities) => ({ labwareEntities, pipetteEntities })
+  (labwareEntities, moduleEntities, pipetteEntities) => ({
+    labwareEntities,
+    moduleEntities,
+    pipetteEntities,
+  })
 )
 
 // NOTE this just adds missing well keys to the labware-ingred 'deck setup' liquid state
@@ -79,9 +86,19 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
       })
     )
 
+    const modules: {
+      [moduleId: string]: ModuleTemporalProperties,
+    } = mapValues(
+      initialDeckSetup.modules,
+      (m: ModuleOnDeck): ModuleTemporalProperties => ({
+        slot: m.slot,
+      })
+    )
+
     const robotState = StepGeneration.makeInitialRobotState({
       invariantContext,
       labwareLocations: labware,
+      moduleLocations: modules,
       pipetteLocations: pipettes,
     })
     robotState.liquidState.labware = labwareLiquidState
