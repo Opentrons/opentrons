@@ -1,11 +1,11 @@
 // @flow
 import * as React from 'react'
 import { DragLayer } from 'react-dnd'
-import { type RobotWorkSpaceRenderProps } from '@opentrons/components'
-import type { LabwareOnDeck as LabwareOnDeckType } from '../../../step-forms'
 import LabwareOnDeck from '../LabwareOnDeck'
-
 import { DND_TYPES } from './constants'
+import type { LabwareOnDeck as LabwareOnDeckType } from '../../../step-forms'
+import type { RobotWorkSpaceRenderProps } from '@opentrons/components'
+import styles from './DragPreview.css'
 
 type DragPreviewProps = {
   isDragging: boolean,
@@ -34,6 +34,7 @@ const LabwareDragPreview = (props: DragPreviewProps) => {
 
   return (
     <LabwareOnDeck
+      className={styles.labware_drag_preview}
       x={cursor.x}
       y={cursor.y - item.labwareOnDeck.def.dimensions.yDimension}
       labwareOnDeck={item.labwareOnDeck}

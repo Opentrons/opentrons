@@ -1,5 +1,5 @@
 // @flow
-import * as React from 'react'
+import React, { useState, type Node } from 'react'
 import { useSelector } from 'react-redux'
 import compact from 'lodash/compact'
 import values from 'lodash/values'
@@ -12,11 +12,13 @@ import {
 import {
   getLabwareHasQuirk,
   type DeckSlot as DeckDefSlot,
+  type ModuleType,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import i18n from '../../localization'
 import { PSEUDO_DECK_SLOTS, GEN_ONE_MULTI_PIPETTES } from '../../constants'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../steplist'
+import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import {
   getModuleVizDims,
   inferModuleOrientationFromSlot,
@@ -102,6 +104,32 @@ const getModuleSlotDefs = (
   )
 }
 
+const getSwapBlocked = (args: {
+  hoveredLabware: ?LabwareOnDeckType,
+  draggedLabware: ?LabwareOnDeckType,
+  modulesById: $PropertyType<InitialDeckSetup, 'modules'>,
+}): boolean => {
+  const { hoveredLabware, draggedLabware, modulesById } = args
+
+  if (!hoveredLabware || !draggedLabware) {
+    return false
+  }
+
+  const sourceModuleType: ?ModuleType =
+    modulesById[draggedLabware.slot]?.type || null
+  const destModuleType: ?ModuleType =
+    modulesById[hoveredLabware.slot]?.type || null
+
+  const labwareSourceToDestBlocked = sourceModuleType
+    ? !getLabwareIsCompatible(hoveredLabware.def, sourceModuleType)
+    : false
+  const labwareDestToSourceBlocked = destModuleType
+    ? !getLabwareIsCompatible(draggedLabware.def, destModuleType)
+    : false
+
+  return labwareSourceToDestBlocked || labwareDestToSourceBlocked
+}
+
 const DeckSetupContents = (props: ContentsProps) => {
   const {
     initialDeckSetup,
@@ -109,6 +137,21 @@ const DeckSetupContents = (props: ContentsProps) => {
     getRobotCoordsFromDOMCoords,
     showGen1MultichannelCollisionWarnings,
   } = props
+
+  // NOTE: handling module<>labware compat when moving labware to empty module
+  // is handled by SlotControls.
+  // But when swapping labware when at least one is on a module, we need to be aware
+  // of not only what labware is being dragged, but also what labware is **being
+  // hovered over**. The intrinsic state of `react-dnd` is not designed to handle that.
+  // So we need to use our own state here to determine
+  // whether swapping will be blocked due to labware<>module compat:
+  const [hoveredLabware, setHoveredLabware] = useState<?LabwareOnDeckType>(null)
+  const [draggedLabware, setDraggedLabware] = useState<?LabwareOnDeckType>(null)
+  const swapBlocked = getSwapBlocked({
+    hoveredLabware,
+    draggedLabware,
+    modulesById: initialDeckSetup.modules,
+  })
 
   const slotsBlockedBySpanning = getSlotsBlockedBySpanning(
     props.initialDeckSetup
@@ -202,6 +245,8 @@ const DeckSetupContents = (props: ContentsProps) => {
               key={slot.id}
               slot={slot}
               selectedTerminalItemId={props.selectedTerminalItemId}
+              // Module slots' ids reference their parent module
+              moduleType={initialDeckSetup.modules[slot.id]?.type || null}
             />
           )
         })}
@@ -223,6 +268,13 @@ const DeckSetupContents = (props: ContentsProps) => {
             <g>
               <LabwareControls
                 slot={slot}
+                setHoveredLabware={setHoveredLabware}
+                setDraggedLabware={setDraggedLabware}
+                swapBlocked={
+                  swapBlocked &&
+                  (labware.id === hoveredLabware?.id ||
+                    labware.id === draggedLabware?.id)
+                }
                 labwareOnDeck={labware}
                 selectedTerminalItemId={props.selectedTerminalItemId}
               />
@@ -230,12 +282,13 @@ const DeckSetupContents = (props: ContentsProps) => {
           </React.Fragment>
         )
       })}
+
       <DragPreview getRobotCoordsFromDOMCoords={getRobotCoordsFromDOMCoords} />
     </>
   )
 }
 
-const DeckInstructions = (props: {| children: React.Node |}) => (
+const DeckInstructions = (props: {| children: Node |}) => (
   <RobotCoordsForeignDiv
     x={0}
     y={364}

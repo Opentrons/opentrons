@@ -98,3 +98,18 @@
   border-style: solid;
   border-radius: 0.5rem;
 }
+
+.blocked_slot_background {
+  fill: rgba(200, 115, 0, 0.75);
+  stroke: var(--c-red);
+  rx: 6;
+}
+
+.blocked_slot_content {
+  height: 100%;
+  margin: -1.5rem 0.5rem;
+  color: var(--c-white);
+  font-size: var(--fs-caption);
+  text-align: center;
+  line-height: 1.5;
+}
