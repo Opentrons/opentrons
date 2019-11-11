@@ -249,7 +249,8 @@ class CalibrationManager:
             # Reset calibration so we don’t actually calibrate the offset
             # relative to the old calibration
             container._container.set_calibration(Point(0, 0, 0))
-            if ff.calibrate_to_bottom() and not container._container.is_tiprack:
+            if ff.calibrate_to_bottom() and not (
+                                            container._container.is_tiprack):
                 orig = _well0(container._container).bottom().point
             else:
                 orig = _well0(container._container).top().point
