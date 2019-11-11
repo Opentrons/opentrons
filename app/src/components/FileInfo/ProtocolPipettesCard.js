@@ -7,7 +7,7 @@ import some from 'lodash/some'
 
 import { Icon } from '@opentrons/components'
 import { constants as robotConstants } from '../../robot'
-import { fetchPipettes } from '../../robot-api'
+import { fetchPipettes } from '../../pipettes'
 import InstrumentItem from './InstrumentItem'
 import { SectionContentHalf } from '../layout'
 import InfoSection from './InfoSection'
@@ -20,9 +20,8 @@ import useInstrumentMountInfo, {
 import styles from './styles.css'
 
 import type { Dispatch } from '../../types'
-import type { Robot } from '../../discovery/types'
 
-type Props = {| robot: Robot |}
+type Props = {| robotName: string |}
 
 const { PIPETTE_MOUNTS } = robotConstants
 
@@ -31,14 +30,15 @@ const inexactPipetteSupportArticle =
 const TITLE = 'Required Pipettes'
 
 function ProtocolPipettes(props: Props) {
+  const { robotName } = props
   const dispatch = useDispatch<Dispatch>()
-  const infoByMount = useInstrumentMountInfo(props.robot.name)
+  const infoByMount = useInstrumentMountInfo(robotName)
 
   React.useEffect(() => {
-    dispatch(fetchPipettes(props.robot))
-  }, [dispatch, props.robot])
+    dispatch(fetchPipettes(robotName))
+  }, [dispatch, robotName])
 
-  const changePipetteUrl = `/robots/${props.robot.name}/instruments`
+  const changePipetteUrl = `/robots/${robotName}/instruments`
 
   const allPipettesMatch = every(infoByMount, ({ compatibility }) =>
     [MATCH, INEXACT_MATCH].includes(compatibility)

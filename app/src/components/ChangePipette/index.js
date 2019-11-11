@@ -9,7 +9,7 @@ import {
   type PipetteDisplayCategory,
 } from '@opentrons/shared-data'
 
-import { fetchPipettes, getPipettesState } from '../../robot-api'
+import { getAttachedPipettes } from '../../pipettes'
 import {
   home,
   moveRobotTo,
@@ -71,7 +71,6 @@ type DP = {|
   back: () => mixed,
   onPipetteSelect: $PropertyType<PipetteSelectionProps, 'onPipetteChange'>,
   moveToFront: () => mixed,
-  checkPipette: () => mixed,
   goToConfirmUrl: () => mixed,
 |}
 
@@ -117,7 +116,7 @@ function makeMapStateToProps(): (State, OP) => SP {
 
   return (state, ownProps) => {
     const { mount, wantedPipette, robot } = ownProps
-    const pipettes = getPipettesState(state, robot.name)
+    const pipettes = getAttachedPipettes(state, robot.name)
     const actualPipette = getPipetteModelSpecs(pipettes[mount]?.model || '')
     const direction = actualPipette ? 'detach' : 'attach'
 
@@ -149,11 +148,8 @@ function makeMapStateToProps(): (State, OP) => SP {
 function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   const { confirmUrl, parentUrl, robot, mount } = ownProps
   const disengage = () => dispatch(disengagePipetteMotors(robot))
-  const checkPipette = () =>
-    disengage().then(() => dispatch(fetchPipettes(robot, true)))
 
   return {
-    checkPipette,
     exit: () =>
       dispatch(home(robot, mount)).then(() => dispatch(push(parentUrl))),
     back: () => dispatch(goBack()),

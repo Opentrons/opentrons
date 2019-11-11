@@ -1,5 +1,5 @@
 // @flow
-import { POST } from '../robot-api/utils'
+import { POST } from '../robot-api/constants'
 import { RESTART, RESTART_PATH } from './constants'
 
 import type { RobotHost } from '../robot-api/types'

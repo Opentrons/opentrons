@@ -136,6 +136,13 @@ export const getConnectedRobot: GetConnectedRobot = createSelector(
   robots => find(robots, 'connected')
 )
 
+export const getRobotByName = (
+  state: State,
+  robotName: string
+): ViewableRobot | null => {
+  return getViewableRobots(state).find(r => r.name === robotName) || null
+}
+
 export const getRobotApiVersion = (robot: AnyRobot): ?string =>
   (robot.health && semver.valid(robot.health.api_version)) ||
   (robot.serverHealth && semver.valid(robot.serverHealth.apiServerVersion))

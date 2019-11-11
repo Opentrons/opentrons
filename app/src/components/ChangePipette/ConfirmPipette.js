@@ -7,6 +7,7 @@ import { Icon, PrimaryButton, ModalPage } from '@opentrons/components'
 
 import type { ChangePipetteProps } from './types'
 import { getDiagramsSrc } from './InstructionStep'
+import { CheckPipettesButton } from './CheckPipettesButton'
 import styles from './styles.css'
 
 const EXIT_BUTTON_MESSAGE = 'exit pipette setup'
@@ -124,35 +125,30 @@ function AttachAnotherButton(props: ChangePipetteProps) {
 }
 
 function TryAgainButton(props: ChangePipetteProps) {
-  const {
-    baseUrl,
-    checkPipette,
-    attachedWrong,
-    wantedPipette,
-    actualPipette,
-  } = props
-
-  let buttonProps
+  const { robot, baseUrl, attachedWrong, wantedPipette, actualPipette } = props
 
   if (wantedPipette && attachedWrong) {
-    buttonProps = {
-      Component: Link,
-      to: baseUrl.replace(`/${wantedPipette.name}`, ''),
-      children: 'detach and try again',
-    }
-  } else if (actualPipette) {
-    buttonProps = {
-      onClick: checkPipette,
-      children: 'confirm pipette is detached',
-    }
-  } else {
-    buttonProps = {
-      onClick: checkPipette,
-      children: 'have robot check connection again',
-    }
+    return (
+      <PrimaryButton
+        className={styles.confirm_button}
+        Component={Link}
+        to={baseUrl.replace(`/${wantedPipette.name}`, '')}
+      >
+        detach and try again
+      </PrimaryButton>
+    )
   }
 
-  return <PrimaryButton {...buttonProps} className={styles.confirm_button} />
+  return (
+    <CheckPipettesButton
+      className={styles.confirm_button}
+      robotName={robot.name}
+    >
+      {actualPipette
+        ? 'confirm pipette is detached'
+        : 'have robot check connection again'}
+    </CheckPipettesButton>
+  )
 }
 
 function ExitButton(props: ChangePipetteProps) {

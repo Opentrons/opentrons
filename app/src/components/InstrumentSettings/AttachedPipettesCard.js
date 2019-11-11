@@ -4,12 +4,8 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 
 import { clearMoveResponse } from '../../http-api-client'
-
-import {
-  fetchPipetteSettings,
-  getPipettesState,
-  getPipetteSettingsState,
-} from '../../robot-api'
+import { fetchPipetteSettings, getPipetteSettingsState } from '../../robot-api'
+import { getAttachedPipettes } from '../../pipettes'
 
 import InstrumentInfo from './InstrumentInfo'
 import { CardContentFlex } from '../layout'
@@ -17,15 +13,15 @@ import { Card, IntervalWrapper } from '@opentrons/components'
 
 import type { State, Dispatch } from '../../types'
 import type { Robot } from '../../discovery/types'
-import type { Pipette } from '../../robot-api/types'
+import type { AttachedPipette } from '../../pipettes/types'
 
 type OP = {|
   robot: Robot,
 |}
 
 type SP = {|
-  left: Pipette | null,
-  right: Pipette | null,
+  left: AttachedPipette | null,
+  right: AttachedPipette | null,
   showLeftSettings: boolean,
   showRightSettings: boolean,
 |}
@@ -71,17 +67,15 @@ function AttachedPipettesCard(props: Props) {
 
 function mapStateToProps(state: State, ownProps: OP): SP {
   const { robot } = ownProps
-  const { left, right } = getPipettesState(state, robot.name)
+  const { left, right } = getAttachedPipettes(state, robot.name)
 
-  const showLeftSettings =
-    left && left.id
-      ? Boolean(getPipetteSettingsState(state, robot.name, left.id))
-      : false
+  const showLeftSettings = left
+    ? Boolean(getPipetteSettingsState(state, robot.name, left.id))
+    : false
 
-  const showRightSettings =
-    right && right.id
-      ? Boolean(getPipetteSettingsState(state, robot.name, right.id))
-      : false
+  const showRightSettings = right
+    ? Boolean(getPipetteSettingsState(state, robot.name, right.id))
+    : false
 
   return {
     left,

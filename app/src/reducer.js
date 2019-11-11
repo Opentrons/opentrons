@@ -12,13 +12,16 @@ import { robotReducer } from './robot'
 import { superDeprecatedRobotApiReducer } from './http-api-client'
 
 // api state
-import { deprecatedRobotApiReducer } from './robot-api/reducer'
+import { robotApiReducer, deprecatedRobotApiReducer } from './robot-api/reducer'
 
 // robot administration state
 import { robotAdminReducer } from './robot-admin/reducer'
 
 // robot settings state
 import { robotSettingsReducer } from './robot-settings/reducer'
+
+// pipettes state
+import { pipettesReducer } from './pipettes/reducer'
 
 // app shell state
 import { shellReducer } from './shell'
@@ -44,8 +47,10 @@ const rootReducer: Reducer<State, Action> = combineReducers<_, Action>({
   robot: robotReducer,
   superDeprecatedRobotApi: superDeprecatedRobotApiReducer,
   deprecatedRobotApi: deprecatedRobotApiReducer,
+  robotApi: robotApiReducer,
   robotAdmin: robotAdminReducer,
   robotSettings: robotSettingsReducer,
+  pipettes: pipettesReducer,
   config: configReducer,
   discovery: discoveryReducer,
   labware: customLabwareReducer,

@@ -7,6 +7,7 @@ import { discoveryEpic } from './discovery/epic'
 import { robotApiEpic } from './robot-api'
 import { robotAdminEpic } from './robot-admin/epic'
 import { robotSettingsEpic } from './robot-settings/epic'
+import { pipettesEpic } from './pipettes/epic'
 import { shellEpic } from './shell'
 
 export default combineEpics(
@@ -15,5 +16,6 @@ export default combineEpics(
   robotApiEpic,
   robotAdminEpic,
   robotSettingsEpic,
+  pipettesEpic,
   shellEpic
 )

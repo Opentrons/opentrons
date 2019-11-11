@@ -1,14 +1,12 @@
 // @flow
-import type {
-  ModulesState,
-  PipettesState,
-  SettingsState,
-} from './resources/types'
+import type { ModulesState, SettingsState } from './resources/types'
 
+// TODO(mc, 2019-11-12): deprecated, remove when able
 export * from './resources/types'
 
 export type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE'
 
+// TODO(mc, 2019-11-12): deprecated, remove when able
 export type RequestMeta = $Shape<{| [string]: mixed |}>
 
 // api call + response types
@@ -19,6 +17,7 @@ export type RobotHost = {
   port: number,
 }
 
+// TODO(mc, 2019-11-12): deprecated, to be replaced by HostlessRobotApiRequest
 export type RobotApiRequest = {|
   host: RobotHost,
   method: Method,
@@ -36,6 +35,24 @@ export type RobotApiResponse = {|
   ok: boolean,
 |}
 
+// TODO(mc, 2019-11-12): rename to RobotApiRequest
+export type HostlessRobotApiRequest = {|
+  method: Method,
+  path: string,
+  body?: mixed,
+  query?: { [param: string]: string | boolean | number },
+|}
+
+export type RobotApiRequestMeta = $Shape<{|
+  requestId: string,
+  response: {|
+    method: Method,
+    path: string,
+    status: number,
+    ok: boolean,
+  |},
+|}>
+
 // action types
 
 export type DeprecatedRobotApiAction =
@@ -50,7 +67,6 @@ export type DeprecatedRobotApiAction =
       payload: RobotApiRequest,
       meta: {| id: string |},
     |}
-  | {| type: 'robotApi:FETCH_PIPETTES', payload: RobotApiRequest |}
   | {| type: 'robotApi:FETCH_PIPETTE_SETTINGS', payload: RobotApiRequest |}
   | {|
       type: 'robotApi:SET_PIPETTE_SETTINGS',
@@ -60,6 +76,7 @@ export type DeprecatedRobotApiAction =
 
 export type RobotApiActionType = $PropertyType<DeprecatedRobotApiAction, 'type'>
 
+// TODO(mc, 2019-11-12): deprecated, remove when able
 // internal, request lifecycle types
 // only for use inside observables
 export type RobotApiRequestAction = {|
@@ -68,12 +85,14 @@ export type RobotApiRequestAction = {|
   meta: RequestMeta,
 |}
 
+// TODO(mc, 2019-11-12): deprecated, remove when able
 export type RobotApiResponseAction = {|
   type: string,
   payload: RobotApiResponse,
   meta: RequestMeta,
 |}
 
+// TODO(mc, 2019-11-12): deprecated, remove when able
 export type RobotApiActionLike = {|
   type: string,
   payload: RobotApiRequest | RobotApiResponse,
@@ -82,27 +101,42 @@ export type RobotApiActionLike = {|
 
 // instance state shapes
 
+// TODO(mc, 2019-11-12): deprecated, remove when able
 export type RobotApiRequestState = {|
   response: RobotApiResponse | null,
 |}
 
+// TODO(mc, 2019-11-12): deprecated, remove when able
 export type RobotInstanceNetworkingState = {
   [path: string]: ?RobotApiRequestState,
 }
 
+// TODO(mc, 2019-11-12): deprecated, remove when able
 export type RobotInstanceResourcesState = {|
   modules: ModulesState,
-  pipettes: PipettesState,
   settings: SettingsState,
 |}
 
+// TODO(mc, 2019-11-12): deprecated, remove when able
 export type RobotInstanceApiState = {|
   networking: RobotInstanceNetworkingState,
   resources: RobotInstanceResourcesState,
 |}
 
+export type RequestState =
+  | $ReadOnly<{| status: 'pending' |}>
+  | $ReadOnly<{| status: 'success', response: RobotApiResponse |}>
+  | $ReadOnly<{| status: 'failure', response: RobotApiResponse |}>
+
 // overall API state
 
+// TODO(mc, 2019-11-12): deprecated, remove when able
 export type DeprecatedRobotApiState = {
   [robotName: string]: ?RobotInstanceApiState,
 }
+
+export type RobotApiState = $Shape<
+  $ReadOnly<{|
+    [requestId: string]: void | RequestState,
+  |}>
+>

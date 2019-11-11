@@ -25,7 +25,7 @@ import {
 } from '../shell'
 
 import { getRobotSettings } from '../robot-settings'
-import { getPipettesState } from '../robot-api'
+import { getAttachedPipettes } from '../pipettes'
 
 import hash from './hash'
 
@@ -77,7 +77,7 @@ export function getRobotAnalyticsData(state: State): RobotAnalyticsData | null {
   const robot = getConnectedRobot(state)
 
   if (robot) {
-    const pipettes = getPipettesState(state, robot.name)
+    const pipettes = getAttachedPipettes(state, robot.name)
     const settings = getRobotSettings(state, robot.name)
 
     return settings.reduce(

@@ -5,11 +5,11 @@ import { push } from 'connected-react-router'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
-  getPipettesState,
   getPipetteSettingsState,
   setPipetteSettings,
   getSetPipetteSettingsRequestState,
 } from '../../robot-api'
+import { getAttachedPipettes } from '../../pipettes'
 import { getConfig } from '../../config'
 
 import { ScrollableAlertModal } from '../modals'
@@ -104,7 +104,7 @@ function ConfigurePipette(props: Props) {
 
 function mapStateToProps(state: State, ownProps: OP): SP {
   const { robot, mount } = ownProps
-  const pipette = getPipettesState(state, robot.name)[mount]
+  const pipette = getAttachedPipettes(state, robot.name)[mount]
   const pipetteId = pipette?.id
   const pipetteConfig = pipetteId
     ? getPipetteSettingsState(state, robot.name, pipetteId)
