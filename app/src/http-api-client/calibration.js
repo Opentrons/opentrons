@@ -262,7 +262,7 @@ export function makeGetDeckCalibrationCommandState() {
 }
 
 function getRobotCalState(state: State, props: BaseRobot): RobotCalState {
-  return state.api.calibration[props.name] || {}
+  return state.superDeprecatedRobotApi.calibration[props.name] || {}
 }
 
 function getStartStateFromCalState(state: RobotCalState): DeckCalStartState {

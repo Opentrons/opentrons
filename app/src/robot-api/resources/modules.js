@@ -28,7 +28,11 @@ import type { ConnectResponseAction } from '../../robot/actions'
 import type { SessionModule } from '../../robot/types'
 
 import type { State as AppState, ActionLike, Epic } from '../../types'
-import type { RobotHost, RobotApiAction } from '../types'
+import type {
+  RobotHost,
+  DeprecatedRobotApiAction as RobotApiAction,
+} from '../types'
+
 import type {
   Module,
   ModuleCommandRequest,

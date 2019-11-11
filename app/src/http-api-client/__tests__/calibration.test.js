@@ -4,7 +4,7 @@ import thunk from 'redux-thunk'
 
 import client from '../client'
 import {
-  reducer,
+  superDeprecatedRobotApiReducer as reducer,
   startDeckCalibration,
   deckCalibrationCommand,
   makeGetDeckCalibrationStartState,
@@ -27,7 +27,7 @@ describe('/calibration/**', () => {
     client.__clearMock()
 
     robot = { name: NAME, ip: '1.2.3.4', port: '1234' }
-    state = { api: { calibration: {} } }
+    state = { superDeprecatedRobotApi: { calibration: {} } }
     store = mockStore(state)
   })
 
@@ -109,7 +109,7 @@ describe('/calibration/**', () => {
     const response = { message: 'mock-response' }
 
     beforeEach(() => {
-      state.api.calibration[NAME] = {
+      state.superDeprecatedRobotApi.calibration[NAME] = {
         'calibration/deck/start': { response: { token } },
       }
     })
@@ -177,7 +177,7 @@ describe('/calibration/**', () => {
 
   describe('reducer with api-call actions', () => {
     beforeEach(() => {
-      state = state.api
+      state = state.superDeprecatedRobotApi
     })
 
     const REDUCER_REQUEST_RESPONSE_TESTS = [
@@ -279,7 +279,7 @@ describe('/calibration/**', () => {
   })
 
   test('reducer with api:CLEAR_RESPONSE', () => {
-    state = state.api
+    state = state.superDeprecatedRobotApi
 
     const path = 'calibration/deck/start'
     const action = { type: 'api:CLEAR_RESPONSE', payload: { robot, path } }
@@ -303,7 +303,7 @@ describe('/calibration/**', () => {
 
   describe('selectors', () => {
     beforeEach(() => {
-      state.api.calibration[NAME] = {
+      state.superDeprecatedRobotApi.calibration[NAME] = {
         'calibration/deck': { inProgress: true },
         'calibration/deck/start': { inProgress: true },
       }
@@ -313,7 +313,9 @@ describe('/calibration/**', () => {
       const getStartState = makeGetDeckCalibrationStartState()
 
       expect(getStartState(state, robot)).toEqual(
-        state.api.calibration[NAME]['calibration/deck/start']
+        state.superDeprecatedRobotApi.calibration[NAME][
+          'calibration/deck/start'
+        ]
       )
 
       expect(getStartState(state, { name: 'foo' })).toEqual({
@@ -325,7 +327,7 @@ describe('/calibration/**', () => {
       const getCommandState = makeGetDeckCalibrationCommandState()
 
       expect(getCommandState(state, robot)).toEqual(
-        state.api.calibration[NAME]['calibration/deck']
+        state.superDeprecatedRobotApi.calibration[NAME]['calibration/deck']
       )
 
       expect(getCommandState(state, { name: 'foo' })).toEqual({

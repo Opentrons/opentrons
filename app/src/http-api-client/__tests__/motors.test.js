@@ -22,17 +22,7 @@ describe('/motors/**', () => {
 
     robot = { name: NAME, ip: '1.2.3.4', port: '1234' }
     state = {
-      robotApi: {
-        [NAME]: {
-          resources: {
-            pipettes: {
-              left: { mount_axis: 'z', plunger_axis: 'b' },
-              right: { mount_axis: 'a', plunger_axis: 'c' },
-            },
-          },
-        },
-      },
-      api: {
+      superDeprecatedRobotApi: {
         api: {
           [NAME]: {
             motors: {},
@@ -48,14 +38,14 @@ describe('/motors/**', () => {
     const path = 'motors/disengage'
     const response = { message: 'we did it' }
 
-    test('adds pipette axes to request body', () => {
-      const expected = { axes: ['z', 'b'] }
+    test('adds all pipette motor axes to request body', () => {
+      const expected = { axes: ['a', 'b', 'c', 'z'] }
 
       client.__setMockResponse(response)
 
       // use mock.calls to verify call order
       return store
-        .dispatch(disengagePipetteMotors(robot, 'left'))
+        .dispatch(disengagePipetteMotors(robot))
         .then(() =>
           expect(client.mock.calls).toEqual([
             [robot, 'POST', 'motors/disengage', expected],
@@ -64,7 +54,7 @@ describe('/motors/**', () => {
     })
 
     test('dispatches MOTORS_REQUEST and MOTORS_SUCCESS', () => {
-      const request = { mounts: ['left', 'right'] }
+      const request = { axes: ['a', 'b', 'c', 'z'] }
 
       const expectedActions = [
         { type: 'api:REQUEST', payload: { robot, request, path } },
@@ -79,7 +69,7 @@ describe('/motors/**', () => {
     })
 
     test('dispatches MOTORS_REQUEST and MOTORS_FAILURE', () => {
-      const request = { mounts: ['left', 'right'] }
+      const request = { axes: ['a', 'b', 'c', 'z'] }
       const error = { name: 'ResponseError', status: '400' }
       const expectedActions = [
         { type: 'api:REQUEST', payload: { robot, request, path } },

@@ -8,11 +8,11 @@ import { combineReducers } from 'redux'
 // oldest robot api state
 import { robotReducer } from './robot'
 
-// old api state
-import { reducer as apiReducer } from './http-api-client'
+// oldest api state
+import { superDeprecatedRobotApiReducer } from './http-api-client'
 
 // api state
-import { robotApiReducer } from './robot-api'
+import { deprecatedRobotApiReducer } from './robot-api/reducer'
 
 // robot administration state
 import { robotAdminReducer } from './robot-admin/reducer'
@@ -42,8 +42,8 @@ export const history = createHistory()
 
 const rootReducer: Reducer<State, Action> = combineReducers<_, Action>({
   robot: robotReducer,
-  api: apiReducer,
-  robotApi: robotApiReducer,
+  superDeprecatedRobotApi: superDeprecatedRobotApiReducer,
+  deprecatedRobotApi: deprecatedRobotApiReducer,
   robotAdmin: robotAdminReducer,
   robotSettings: robotSettingsReducer,
   config: configReducer,
