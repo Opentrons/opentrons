@@ -33,6 +33,7 @@ type OP = {|
   slot: {| ...DeckSlotDefinition, id: DeckSlot |}, // NOTE: Ian 2019-10-22 make slot `id` more restrictive when used in PD
   moduleType: ModuleType | null,
   selectedTerminalItemId: ?TerminalItemId,
+  handleDragHover?: () => mixed,
 |}
 type DP = {|
   addLabware: (e: SyntheticEvent<*>) => mixed,
@@ -108,6 +109,11 @@ const slotTarget = {
     const draggedItem = monitor.getItem()
     if (draggedItem) {
       props.moveDeckItem(draggedItem.labwareOnDeck.slot, props.slot.id)
+    }
+  },
+  hover: (props, monitor) => {
+    if (props.handleDragHover) {
+      props.handleDragHover()
     }
   },
   canDrop: (props, monitor) => {

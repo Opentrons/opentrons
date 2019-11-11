@@ -1,5 +1,5 @@
 // @flow
-import React, { useState, type Node } from 'react'
+import React, { useCallback, useState, type Node } from 'react'
 import { useSelector } from 'react-redux'
 import compact from 'lodash/compact'
 import values from 'lodash/values'
@@ -152,6 +152,7 @@ const DeckSetupContents = (props: ContentsProps) => {
     draggedLabware,
     modulesById: initialDeckSetup.modules,
   })
+  const handleHoverEmptySlot = useCallback(() => setHoveredLabware(null), [])
 
   const slotsBlockedBySpanning = getSlotsBlockedBySpanning(
     props.initialDeckSetup
@@ -247,6 +248,7 @@ const DeckSetupContents = (props: ContentsProps) => {
               selectedTerminalItemId={props.selectedTerminalItemId}
               // Module slots' ids reference their parent module
               moduleType={initialDeckSetup.modules[slot.id]?.type || null}
+              handleDragHover={handleHoverEmptySlot}
             />
           )
         })}
