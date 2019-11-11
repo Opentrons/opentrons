@@ -8,7 +8,7 @@ import {
 } from '../../discovery/selectors'
 
 import type { State } from '../../types'
-import type { ViewableRobot } from '../../discovery'
+import type { ViewableRobot } from '../../discovery/types'
 import type {
   BuildrootUpdateInfo,
   BuildrootUpdateSession,

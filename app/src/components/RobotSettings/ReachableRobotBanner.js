@@ -3,7 +3,7 @@ import * as React from 'react'
 import { AlertItem } from '@opentrons/components'
 import styles from './styles.css'
 
-import type { ReachableRobot } from '../../discovery'
+import type { ReachableRobot } from '../../discovery/types'
 
 type State = { dismissed: boolean }
 

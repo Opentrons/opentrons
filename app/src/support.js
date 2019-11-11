@@ -6,8 +6,8 @@ import { getConnectedRobot } from './discovery'
 import createLogger from './logger'
 
 import type { Action, ThunkAction, Middleware } from './types'
-import type { BaseRobot } from './robot'
-import type { Config } from './config'
+import type { BaseRobot } from './robot/types'
+import type { Config } from './config/types'
 
 type SupportConfig = $PropertyType<Config, 'support'>
 

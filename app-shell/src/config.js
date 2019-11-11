@@ -12,7 +12,7 @@ import pkg from '../package.json'
 import createLogger from './log'
 
 // TODO(mc, 2018-08-08): figure out type exports from app
-import type { Config } from '@opentrons/app/src/config'
+import type { Config } from '@opentrons/app/src/config/types'
 import type { Action, Dispatch } from './types'
 
 export type { Config }

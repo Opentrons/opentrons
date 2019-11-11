@@ -14,7 +14,7 @@ import FileInfo from './FileInfo'
 
 import type { ContextRouter } from 'react-router-dom'
 import type { State, Dispatch } from '../../types'
-import type { Robot } from '../../discovery'
+import type { Robot } from '../../discovery/types'
 
 type OP = ContextRouter
 

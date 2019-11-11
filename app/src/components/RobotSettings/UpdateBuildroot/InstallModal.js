@@ -4,7 +4,7 @@ import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
 import InstallModalContents from './InstallModalContents'
 
-import type { ViewableRobot } from '../../../discovery'
+import type { ViewableRobot } from '../../../discovery/types'
 import type { BuildrootUpdateSession, RobotSystemType } from '../../../shell'
 
 type Props = {|

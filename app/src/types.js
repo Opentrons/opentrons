@@ -8,15 +8,15 @@ import type { Observable } from 'rxjs'
 import type {
   DeprecatedRobotApiState,
   DeprecatedRobotApiAction,
-} from './robot-api'
+} from './robot-api/types'
 import type { RobotAdminState, RobotAdminAction } from './robot-admin/types'
 import type {
   State as SuperDeprecatedRobotApiState,
   HttpApiAction as SuperDeprecatedRobotApiAction,
 } from './http-api-client'
 import type { RobotState, Action as RobotAction } from './robot'
-import type { ShellState, ShellAction } from './shell'
-import type { Config, ConfigAction } from './config'
+import type { ShellState, ShellAction } from './shell/types'
+import type { Config, ConfigAction } from './config/types'
 import type { DiscoveryState, DiscoveryAction } from './discovery/types'
 import type { ProtocolState, ProtocolAction } from './protocol'
 import type {

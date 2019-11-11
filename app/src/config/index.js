@@ -10,7 +10,6 @@ import type { Action, ThunkAction } from '../types'
 import type { Config, UpdateConfigAction, DevInternalFlag } from './types'
 
 export * from './selectors'
-export * from './types'
 
 export const DEV_INTERNAL_FLAGS: Array<DevInternalFlag> = [
   'allPipetteConfig',

@@ -10,7 +10,7 @@ import ConnectionCard from './ConnectionCard'
 import AdvancedSettingsCard from './AdvancedSettingsCard'
 import ConnectAlertModal from './ConnectAlertModal'
 
-import type { ViewableRobot } from '../../discovery'
+import type { ViewableRobot } from '../../discovery/types'
 
 type Props = {
   robot: ViewableRobot,

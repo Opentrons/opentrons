@@ -23,7 +23,7 @@ import {
   makeRobotApiRequest,
   passRobotApiResponseAction,
   passRobotApiErrorAction,
-} from '../../robot-api'
+} from '../../robot-api/utils'
 
 import { actions as robotActions } from '../../robot'
 
@@ -46,8 +46,8 @@ import {
 } from './actions'
 
 import type { State, Epic, LooseEpic } from '../../types'
-import type { ViewableRobot } from '../../discovery'
-import type { RobotApiResponseAction } from '../../robot-api'
+import type { ViewableRobot } from '../../discovery/types'
+import type { RobotApiResponseAction } from '../../robot-api/types'
 
 import type {
   BuildrootAction,

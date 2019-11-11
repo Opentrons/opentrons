@@ -1,9 +1,10 @@
 // @flow
 import * as React from 'react'
-import type { Module } from '../../robot-api'
+
 import ModuleItem, { NoModulesMessage } from '../ModuleItem'
 
-import type { Robot } from '../../discovery'
+import type { Robot } from '../../discovery/types'
+import type { Module } from '../../robot-api/types'
 
 type Props = {
   robot: Robot,

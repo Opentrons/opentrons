@@ -8,7 +8,7 @@ import { Formik, Form, Field } from 'formik'
 import IpField from './IpField'
 
 import type { State, Dispatch } from '../../../types'
-import type { DiscoveryCandidates } from '../../../config'
+import type { DiscoveryCandidates } from '../../../config/types'
 
 type OP = {||}
 

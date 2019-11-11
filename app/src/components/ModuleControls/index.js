@@ -3,13 +3,13 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import TemperatureControl from './TemperatureControl'
 
-import type { TempDeckModule, ThermocyclerModule } from '../../robot-api'
-import type { Robot } from '../../discovery'
 import useSendModuleCommand from './useSendModuleCommand'
-import styles from './styles.css'
-import TemperatureData from './TemperatureData'
-
 import { getConnectedRobot } from '../../discovery'
+import TemperatureData from './TemperatureData'
+import styles from './styles.css'
+
+import type { TempDeckModule, ThermocyclerModule } from '../../robot-api/types'
+import type { Robot } from '../../discovery/types'
 
 type Props = {|
   robot: Robot,

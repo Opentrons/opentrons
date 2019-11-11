@@ -10,7 +10,7 @@ import { Card, OutlineButton } from '@opentrons/components'
 import { CardContentFlex, CardContentFull } from '../layout'
 
 import type { Dispatch } from '../../types'
-import type { ViewableRobot } from '../../discovery'
+import type { ViewableRobot } from '../../discovery/types'
 
 type OP = {|
   robot: ViewableRobot,

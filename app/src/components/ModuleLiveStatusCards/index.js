@@ -3,15 +3,16 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 
 import { getConnectedRobot } from '../../discovery'
-import { getModulesState, type Module } from '../../robot-api'
+import { getModulesState } from '../../robot-api'
 import { selectors as robotSelectors } from '../../robot'
-
-import type { Robot } from '../../discovery'
 
 import useSendModuleCommand from '../ModuleControls/useSendModuleCommand'
 import TempDeckCard from './TempDeckCard'
 import MagDeckCard from './MagDeckCard'
 import ThermocyclerCard from './ThermocyclerCard'
+
+import type { Robot } from '../../discovery/types'
+import type { Module } from '../../robot-api/types'
 
 const ModuleLiveStatusCards = () => {
   const robot: ?Robot = useSelector(getConnectedRobot)

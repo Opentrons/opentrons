@@ -11,7 +11,7 @@ import SelectNetwork from './SelectNetwork'
 import { ConnectionStatusMessage, ConnectionInfo } from './connection'
 
 import type { State } from '../../types'
-import type { ViewableRobot } from '../../discovery'
+import type { ViewableRobot } from '../../discovery/types'
 import type { InternetStatus, NetworkInterface } from '../../http-api-client'
 
 type OP = {| robot: ViewableRobot |}

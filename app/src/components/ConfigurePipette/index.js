@@ -18,14 +18,14 @@ import ConfigForm from './ConfigForm'
 import ConfigErrorBanner from './ConfigErrorBanner'
 
 import type { State, Dispatch } from '../../types'
-import type { Mount } from '../../robot'
-import type { Robot } from '../../discovery'
+import type { Mount } from '../../robot/types'
+import type { Robot } from '../../discovery/types'
 
 import type {
   RobotApiRequestState,
   PipetteSettings,
   PipetteSettingsUpdate,
-} from '../../robot-api'
+} from '../../robot-api/types'
 
 type OP = {|
   robot: Robot,

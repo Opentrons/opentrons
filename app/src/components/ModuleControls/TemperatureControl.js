@@ -8,13 +8,14 @@ import {
   HoverTooltip,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
+import { Portal } from '../portal'
+import styles from './styles.css'
+
 import type {
   ThermocyclerModule,
   TempDeckModule,
   ModuleCommandRequest,
-} from '../../robot-api'
-import { Portal } from '../portal'
-import styles from './styles.css'
+} from '../../robot-api/types'
 
 const CONNECT_FOR_CONTROL = 'Connect to robot to control modules'
 type Props = {|

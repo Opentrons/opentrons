@@ -16,8 +16,8 @@ import { CardContentFlex } from '../layout'
 import { Card, IntervalWrapper } from '@opentrons/components'
 
 import type { State, Dispatch } from '../../types'
-import type { Robot } from '../../discovery'
-import type { Pipette } from '../../robot-api'
+import type { Robot } from '../../discovery/types'
+import type { Pipette } from '../../robot-api/types'
 
 type OP = {|
   robot: Robot,

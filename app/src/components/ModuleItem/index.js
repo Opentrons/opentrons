@@ -1,16 +1,15 @@
 // @flow
 import * as React from 'react'
 
-import type { Module } from '../../robot-api'
-import type { Robot } from '../../discovery'
-
 import ModuleImage from './ModuleImage'
 import ModuleInfo from './ModuleInfo'
 import ModuleUpdate from './ModuleUpdate'
 import NoModulesMessage from './NoModulesMessage'
-
 import ModuleControls from '../ModuleControls'
 import styles from './styles.css'
+
+import type { Module } from '../../robot-api/types'
+import type { Robot } from '../../discovery/types'
 
 type Props = {
   robot: Robot,

@@ -1,4 +1,7 @@
 // @flow
+// DEPRECATED
+// do not add to this file
+// do not import from this file if you can avoid it
 import { of, concat } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'

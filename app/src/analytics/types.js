@@ -1,6 +1,6 @@
 // @flow
 
-import type { Config } from '../config'
+import type { Config } from '../config/types'
 
 export type AnalyticsConfig = $PropertyType<Config, 'analytics'>
 
@@ -20,7 +20,7 @@ export type RobotAnalyticsData = {|
   robotLeftPipette: string,
   robotRightPipette: string,
 
-  // feaure flags
+  // feature flags
   // e.g. robotFF_settingName
   [ffName: string]: boolean,
 |}

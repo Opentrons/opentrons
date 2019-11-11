@@ -20,9 +20,9 @@ import PrepareModules from '../../components/PrepareModules'
 
 import type { ContextRouter } from 'react-router-dom'
 import type { State, Dispatch } from '../../types'
-import type { Labware } from '../../robot'
-import type { Robot } from '../../discovery'
-import type { Module } from '../../robot-api'
+import type { Labware } from '../../robot/types'
+import type { Robot } from '../../discovery/types'
+import type { Module } from '../../robot-api/types'
 
 type OP = ContextRouter
 

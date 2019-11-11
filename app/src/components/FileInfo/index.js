@@ -10,7 +10,7 @@ import Continue from './Continue'
 import UploadError from '../UploadError'
 import styles from './styles.css'
 
-import type { Robot } from '../../discovery'
+import type { Robot } from '../../discovery/types'
 
 const NO_STEPS_MESSAGE = `This protocol has no steps in it - there's nothing for your robot to do! Your protocol needs at least one aspirate/dispense to import properly`
 

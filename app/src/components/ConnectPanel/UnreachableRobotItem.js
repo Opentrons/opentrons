@@ -1,10 +1,12 @@
 // @flow
 // list of robots
 import * as React from 'react'
-import type { UnreachableRobot } from '../../discovery'
+
 import { Icon, HoverTooltip } from '@opentrons/components'
 import RobotLink from './RobotLink'
 import styles from './styles.css'
+
+import type { UnreachableRobot } from '../../discovery/types'
 
 export default function UnreachableRobotItem(props: UnreachableRobot) {
   const { displayName } = props

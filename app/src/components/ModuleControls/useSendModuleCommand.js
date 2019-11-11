@@ -1,15 +1,13 @@
 // @flow
 import { useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import {
-  sendModuleCommand as sendModuleCommandAction,
-  type ModuleCommandRequest,
-} from '../../robot-api'
+import { sendModuleCommand as sendModuleCommandAction } from '../../robot-api'
 import { getConnectedRobot } from '../../discovery'
 import { useLogger } from '../../logger'
 
 import type { Dispatch } from '../../types'
-import type { Robot } from '../../discovery'
+import type { Robot } from '../../discovery/types'
+import type { ModuleCommandRequest } from '../../robot-api/types'
 
 /**
  * React hook to get a function bound to the current robot

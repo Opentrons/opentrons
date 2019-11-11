@@ -8,8 +8,8 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { InstrumentGroup, AlertItem } from '@opentrons/components'
 import styles from './styles.css'
 
-import type { PipettesState } from '../../robot-api'
-import type { Pipette, TiprackByMountMap } from '../../robot'
+import type { PipettesState } from '../../robot-api/types'
+import type { Pipette, TiprackByMountMap } from '../../robot/types'
 
 type Props = {|
   pipettes: Array<Pipette>,

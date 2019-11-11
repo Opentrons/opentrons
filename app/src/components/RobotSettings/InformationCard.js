@@ -23,7 +23,7 @@ import {
 import { CardContentQuarter } from '../layout'
 
 import type { Dispatch } from '../../types'
-import type { ViewableRobot } from '../../discovery'
+import type { ViewableRobot } from '../../discovery/types'
 
 type Props = {|
   robot: ViewableRobot,
