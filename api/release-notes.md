@@ -8,9 +8,12 @@ For more details about this release, please see the full [technical change log][
 
 We're happy to announce the public beta of version 2 of our Python protocol API! To learn more about APIv2 or to participate in the beta, please complete [this short form][apiv2-form].
 
-### Limitations
+### APIv2 Beta Limitations and Known Issues
+Please note the APIv2 Beta is in early release. We're excited to make it available for you to preview as we prepare it for a full release later this year.
 
-Currently, API V2 Beta does not support custom labware. When API V2 is officially released, you can expect full support
+Known issues and limitations include:
+
+- Currently, API V2 Beta does not support custom labware. When API V2 is officially released, you can expect full support
 of custom labware.
 
 ## Other Changes
