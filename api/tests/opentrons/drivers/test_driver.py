@@ -153,9 +153,9 @@ def test_dwell_and_activate_axes(smoothie, monkeypatch):
         ['M400'],
         ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
         ['M400'],
-        ['M907 A0.1 B0.5 C0.5 X1.25 Y1.25 Z0.1 G4P0.005'],
+        ['M907 A0.1 B0.05 C0.05 X1.25 Y1.25 Z0.1 G4P0.005'],
         ['M400'],
-        ['M907 A0.1 B0.5 C0.05 X0.3 Y1.25 Z0.1 G4P0.005'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y1.25 Z0.1 G4P0.005'],
         ['M400'],
         ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
         ['M400'],
@@ -218,7 +218,7 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.home()
     expected = [
-        ['M907 A0.8 B0.5 C0.5 X0.3 Y0.3 Z0.8 G4P0.005 G28.2.+[ABCZ].+'],
+        ['M907 A0.8 B0.05 C0.05 X0.3 Y0.3 Z0.8 G4P0.005 G28.2.+[ABCZ].+'],
         ['M400'],
         ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
         ['M400'],
@@ -266,7 +266,7 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.move({'B': 2})
     expected = [
-        ['M907 A0.1 B0.5 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0B2'],
+        ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0B2'],
         ['M400'],
         ['M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005'],
         ['M400'],
@@ -283,7 +283,7 @@ def test_plunger_commands(smoothie, monkeypatch):
         'C': 5})
     expected = [
         # Set active axes high
-        ['M907 A0.8 B0.5 C0.5 X1.25 Y1.25 Z0.8 G4P0.005 G0.+[BC].+'],
+        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 G0.+[BC].+'],
         ['M400'],
         # Set plunger current low
         ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005'],
@@ -726,12 +726,12 @@ def test_clear_limit_switch(smoothie, monkeypatch):
 
     assert [c.strip() for c in cmd_list] == [
         # attempt to move and fail
-        'M907 A0.1 B0.05 C0.5 X0.3 Y0.3 Z0.1 G4P0.005 G0C100.3 G0C100',
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0C100.3 G0C100',
         # recover from failure
         'M999',
         'M400',
         # set current for homing the failed axis (C)
-        'M907 A0.1 B0.05 C0.5 X0.3 Y0.3 Z0.1 G4P0.005 G28.2C',
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G28.2C',
         'M400',
         # set current back to idling after home
         'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',
@@ -934,7 +934,7 @@ def test_unstick_axes(robot, smoothie):
     expected = [
         'M203.1 B1 C1',  # slow them down
         'M119',  # get the switch status
-        'M907 A0.1 B0.5 C0.5 X0.3 Y0.3 Z0.1 G4P0.005 G0B-1C-1',  # move
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0B-1C-1',  # move
         'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',  # set plunger current
         'M203.1 A125 B40 C40 X600 Y400 Z125'  # return to normal speed
     ]
@@ -972,9 +972,9 @@ def test_unstick_axes(robot, smoothie):
     expected = [
         'M203.1 B1 C1',  # set max-speeds
         'M119',  # get switch status
-        'M907 A0.1 B0.5 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0B-2',  # MOVE B
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0B-2',  # MOVE B
         'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',  # low current B
-        'M907 A0.1 B0.05 C0.5 X0.3 Y0.3 Z0.1 G4P0.005 G28.2C',  # HOME C
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G28.2C',  # HOME C
         'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',  # low current C
         'M203.1 A125 B40 C40 X600 Y400 Z125'  # reset max-speeds
     ]
@@ -999,7 +999,7 @@ def test_unstick_axes(robot, smoothie):
     expected = [
         'M203.1 B1 C1',  # set max-speeds
         'M119',  # get switch status
-        'M907 A0.1 B0.5 C0.5 X0.3 Y0.3 Z0.1 G4P0.005 G28.2BC',  # HOME BC
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G28.2BC',  # HOME BC
         'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',  # low current BC
         'M203.1 A125 B40 C40 X600 Y400 Z125'  # reset max-speeds
     ]
