@@ -62,7 +62,6 @@ async def _upload_to_module(hw, serialnum, fw_filename, loop):
                 new_instance = await asyncio.wait_for(
                     modules.update_firmware(module, fw_filename, loop),
                     UPDATE_TIMEOUT)
-                print(f'\n\n\ninstance {new_instance}\n')
                 return f'Successully updated module {serialnum}', 200
             except modules.UpdateError as e:
                 return f'Bootloader error: {e}', 400

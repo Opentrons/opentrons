@@ -128,7 +128,7 @@ class API(HardwareAPILike):
         backend = Controller(config)
         await backend.connect(port)
         instance = cls(backend, config=config, loop=checked_loop)
-        await checked_loop.create_task(backend.watch_modules(
+        checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
                 update_attached_modules=instance._update_attached_modules,
                 ))
@@ -1367,24 +1367,9 @@ class API(HardwareAPILike):
             self._log.info(f"Module {name} discovered and attached " \
                            f" at port {port}")
 
-    # @_log_call
-    # async def discover_modules(self):
-    #     discovered = {port + model: (port, model)
-    #                   for port, model in self._backend.get_attached_modules()}
-    #     these = set(discovered.keys())
-    #     known = set(self._attached_modules.keys())
-    #     new = these - known
-    #     gone = known - these
-    #     for mod in gone:
-    #         self._attached_modules.pop(mod)
-    #         self._log.info(f"Module {mod} disconnected")
-    #     for mod in new:
-    #         self._attached_modules[mod]\
-    #             = await self._backend.build_module(discovered[mod][0],
-    #                                                discovered[mod][1],
-    #                                                self.pause_with_message)
-    #         self._log.info(f"Module {mod} discovered and attached")
-    #     return list(self._attached_modules)
+    # TODO: remove this function once APIv1 is sunset
+    async def discover_modules(self):
+        pass
 
     @_log_call
     async def update_module(

@@ -143,7 +143,6 @@ class Session(object):
         self._motion_lock = motion_lock
 
     def prepare(self):
-        self._hardware.discover_modules()
         self.refresh()
 
     def get_instruments(self):

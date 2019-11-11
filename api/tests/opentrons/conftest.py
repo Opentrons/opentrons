@@ -1,6 +1,12 @@
 # Uncomment to enable logging during tests
 # import logging
 # from logging.config import dictConfig
+try:
+    import aionotify
+except OSError:
+    aionotify = None
+    pass
+import sys
 import asyncio
 import contextlib
 import os
@@ -203,6 +209,8 @@ def _should_skip_api2(request):
         and request.param != using_api2
 
 
+@pytest.mark.skipif(not aionotify,
+                    reason="requires inotify (linux only)")
 @pytest.fixture(
     params=[
         pytest.param(using_api1, marks=pytest.mark.apiv1),

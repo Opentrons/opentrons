@@ -2,7 +2,10 @@ import asyncio
 from contextlib import contextmanager, ExitStack
 import logging
 from typing import Any, Dict, List, Optional, Tuple
-import aionotify
+try:
+    import aionotify
+except OSError:
+    pass
 
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.drivers.rpi_drivers import gpio
@@ -122,6 +125,7 @@ class Controller:
 
         initial_modules = modules.discover()
         await update_attached_modules(new_modules=initial_modules)
+        MODULE_LOG.info(f'\n\nINIT MODULES: {initial_modules}\n\n')
         while not self._module_watcher.closed:
             event = await self._module_watcher.get_event()
             flags = aionotify.Flags.parse(event.flags)
@@ -135,27 +139,11 @@ class Controller:
                     await update_attached_modules(new_modules=[maybe_module_at_port])
                     MODULE_LOG.info(f'Module Added: {maybe_module_at_port}')
 
-                # discovered = {port + model: (port, model)
-                #             for port, model in self._backend.get_attached_modules()}
-                # these = set(discovered.keys())
-                # known = set(self._attached_modules.keys())
-                # new = these - known
-                # gone = known - these
-                # for mod in gone:
-                #     self._attached_modules.pop(mod)
-                #     self._log.info(f"Module {mod} disconnected")
-                # for mod in new:
-                #     self._attached_modules[mod]\
-                #         = await self._backend.build_module(discovered[mod][0],
-                #                                         discovered[mod][1],
-                #                                         self.pause_with_message)
-                #     self._log.info(f"Module {mod} discovered and attached")
-                # return list(self._attached_modules.values())
-
     async def build_module(self,
                            port: str,
                            model: str,
                            interrupt_callback) -> modules.AbstractModule:
+        MODULE_LOG.info(f'\n\nBUILD Module {port}{model}')
         return await modules.build(
             port=port,
             which=model,

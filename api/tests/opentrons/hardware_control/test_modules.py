@@ -5,7 +5,7 @@ import opentrons.hardware_control as hardware_control
 async def test_get_modules_simulating():
     mods = ['tempdeck', 'magdeck', 'thermocycler']
     api = hardware_control.API.build_hardware_simulator(attached_modules=mods)
-    from_api = await api.discover_modules()
+    from_api = api.attached_modules
     assert sorted([mod.name() for mod in from_api]) == sorted(mods)
 
 
@@ -15,22 +15,22 @@ async def test_module_caching():
         attached_modules=mod_names)
 
     # Check that we can add and remove modules and the caching keeps up
-    found_mods = await api.discover_modules()
+    found_mods = api.attached_modules
     assert found_mods[0].name() == 'tempdeck'
-    new_mods = await api.discover_modules()
+    new_mods = api.attached_modules
     assert new_mods[0] is found_mods[0]
     api._backend._attached_modules.append(('mod2', 'magdeck'))
-    with_magdeck = await api.discover_modules()
+    with_magdeck = api.attached_modules
     assert len(with_magdeck) == 2
     assert with_magdeck[0] is found_mods[0]
     api._backend._attached_modules = api._backend._attached_modules[1:]
-    only_magdeck = await api.discover_modules()
+    only_magdeck = api.attached_modules
     assert only_magdeck[0] is with_magdeck[1]
 
     # Check that two modules of the same kind on different ports are
     # distinct
     api._backend._attached_modules.append(('mod3', 'magdeck'))
-    two_magdecks = await api.discover_modules()
+    two_magdecks = api.attached_modules
     assert len(two_magdecks) == 2
     assert two_magdecks[0] is with_magdeck[1]
     assert two_magdecks[1] is not two_magdecks[0]
@@ -40,7 +40,7 @@ async def test_module_update_logic(monkeypatch):
     mod_names = ['tempdeck']
     api = hardware_control.API.build_hardware_simulator(
         attached_modules=mod_names)
-    mods = await api.discover_modules()
+    mods = api.attached_modules
     old = mods[0]
 
     async def new_update_module(mod, ff, loop=None):
@@ -50,7 +50,7 @@ async def test_module_update_logic(monkeypatch):
     monkeypatch.setattr(api._backend, 'update_module', new_update_module)
     ok, msg = await api.update_module(mods[0], 'some_file')
 
-    mods = await api.discover_modules()
+    mods = api.attached_modules
     assert len(mods) == 1
 
     assert mods[0] is not old
@@ -87,8 +87,8 @@ async def test_module_update_integration(monkeypatch, loop,
     monkeypatch.setattr(hardware_control.modules.update,
                         'upload_firmware', mock_upload)
 
-    modules = await api.discover_modules()
+    modules = api.attached_modules
     ok, msg = await api.update_module(modules[0], 'some-fake-file', loop)
     assert ok
-    new_modules = await api.discover_modules()
+    new_modules = api.attached_modules
     assert new_modules[0] is not modules[0]
