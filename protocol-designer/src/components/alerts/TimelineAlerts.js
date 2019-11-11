@@ -13,9 +13,7 @@ import { selectors as stepsSelectors } from '../../ui/steps'
 import { selectors as fileDataSelectors } from '../../file-data'
 import type { BaseState } from '../../types'
 import type { StepIdType } from '../../form-types'
-import Alerts from './Alerts'
-
-type Props = React.ElementProps<typeof Alerts>
+import Alerts, { type Props } from './Alerts'
 
 type SP = {|
   errors: $PropertyType<Props, 'errors'>,
