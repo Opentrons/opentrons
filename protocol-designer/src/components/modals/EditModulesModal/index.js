@@ -7,6 +7,7 @@ import {
   actions as stepFormActions,
   getSlotIsEmpty,
   getSlotsBlockedBySpanning,
+  getCrashablePipetteSelected,
 } from '../../../step-forms'
 import { moveDeckItem } from '../../../labware-ingred/actions'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
@@ -24,6 +25,7 @@ import {
   HoverTooltip,
   AlertItem,
 } from '@opentrons/components'
+import { CrashInfoBox } from '../../modules'
 import styles from './EditModules.css'
 import modalStyles from '../modal.css'
 
@@ -52,6 +54,14 @@ export default function EditModulesModal(props: EditModulesProps) {
   const [selectedModel, setSelectedModel] = React.useState<string>(
     (module && module.model) || 'GEN1'
   )
+
+  const pipettesByMount = useSelector(
+    stepFormSelectors.getPipettesForEditPipetteForm
+  )
+
+  const showCrashInfoBox =
+    getCrashablePipetteSelected(pipettesByMount) &&
+    (moduleType === 'magdeck' || moduleType === 'tempdeck')
 
   const slotsBlockedBySpanning = getSlotsBlockedBySpanning(_initialDeckSetup)
   const previousModuleSlot = module && module.slot
@@ -119,36 +129,39 @@ export default function EditModulesModal(props: EditModulesProps) {
           <p>{MODULE_PLACEMENT_ERROR}</p>
         </AlertItem>
       )}
-      <div className={styles.form_row}>
-        <FormGroup label="Model" className={styles.option_model}>
-          <DropdownField
-            tabIndex={0}
-            options={[{ name: 'GEN1', value: 'GEN1' }]}
-            value={selectedModel}
-            onChange={handleModelChange}
-          />
-        </FormGroup>
-        {showSlotOption && (
-          <HoverTooltip
-            placement="bottom"
-            tooltipComponent={enableSlotSelection ? null : slotOptionTooltip}
-          >
-            {hoverTooltipHandlers => (
-              <div {...hoverTooltipHandlers} className={styles.option_slot}>
-                <FormGroup label="Position">
-                  <DropdownField
-                    tabIndex={1}
-                    options={getAllModuleSlotsByType(moduleType)}
-                    value={selectedSlot}
-                    disabled={!enableSlotSelection}
-                    onChange={handleSlotChange}
-                  />
-                </FormGroup>
-              </div>
-            )}
-          </HoverTooltip>
-        )}
-      </div>
+      <form>
+        <div className={styles.form_row}>
+          <FormGroup label="Model" className={styles.option_model}>
+            <DropdownField
+              tabIndex={0}
+              options={[{ name: 'GEN1', value: 'GEN1' }]}
+              value={selectedModel}
+              onChange={handleModelChange}
+            />
+          </FormGroup>
+          {showSlotOption && (
+            <HoverTooltip
+              placement="bottom"
+              tooltipComponent={enableSlotSelection ? null : slotOptionTooltip}
+            >
+              {hoverTooltipHandlers => (
+                <div {...hoverTooltipHandlers} className={styles.option_slot}>
+                  <FormGroup label="Position">
+                    <DropdownField
+                      tabIndex={1}
+                      options={getAllModuleSlotsByType(moduleType)}
+                      value={selectedSlot}
+                      disabled={!enableSlotSelection}
+                      onChange={handleSlotChange}
+                    />
+                  </FormGroup>
+                </div>
+              )}
+            </HoverTooltip>
+          )}
+        </div>
+      </form>
+      {showCrashInfoBox && <CrashInfoBox />}
 
       <div className={styles.button_row}>
         <OutlineButton onClick={onCloseClick}>Cancel</OutlineButton>
