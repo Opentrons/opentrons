@@ -1,9 +1,13 @@
 # pylama:ignore=E731
-
+from numbers import Number
 import logging
-from typing import Optional, TYPE_CHECKING
-from opentrons import commands
+from typing import Optional, TYPE_CHECKING, Union
+
+from opentrons import commands as cmds, hardware_control as hc
+from ..labware import Well, Location
+
 from .util import log_call
+from ..util import Clearances
 
 if TYPE_CHECKING:
     from ..contexts import InstrumentContext
@@ -37,16 +41,37 @@ class Pipette():
     def __init__(  # noqa(C901)
             self,
             instrument_context: 'InstrumentContext'):
-        self._ctx = instrument_context
+        self._instr_ctx = instrument_context
+        self._ctx = instrument_context._ctx
+        self._mount = self._instr_ctx._mount
+        self._hw_manager = instrument_context._hw_manager
+        self._hw = self._hw_manager.hardware
+        self._config = self._hw._attached_instruments[self._mount].config
+
+        self._log = self._instr_ctx._log
+        self._default_speed = self._instr_ctx.default_speed
         self._max_plunger_speed: Optional[float] = None
 
-    @log_call(log)
-    def reset(self):
-        """
-        Resets the state of this pipette, removing associated placeables,
-        setting current volume to zero, and resetting tip tracking
-        """
-        return None
+        self._trash_container = self._instr_ctx.trash_container
+        self._tip_racks = self._instr_ctx.tip_racks\
+            if self._instr_ctx.tip_racks else None
+
+        self.reset_tip_tracking()
+
+        self._instr_ctx._well_bottom_clearance = Clearances(
+            default_aspirate=1.0, default_dispense=0.5)
+
+    @property
+    def _working_volume(self):
+        return self._hw.attached_instruments[self._mount]['working_volume']
+
+    @property
+    def _hw_pipette(self):
+        return self._hw.attached_instruments[self._mount]
+
+    @property
+    def current_volume(self):
+        return self._hw_pipette['current_volume']
 
     @property
     def has_tip(self):
@@ -54,37 +79,115 @@ class Pipette():
         Returns whether a pipette has a tip attached. Added in for backwards
         compatibility purposes in deck calibration CLI tool.
         """
-        log.info('instrument.has_tip')
-        return None
+        return self._hw_pipette['has_tip']
+
+    @property
+    def mount(self):
+        return self._instr_ctx.mount
+
+    @property
+    def max_volume(self):
+        return self._hw_pipette['max_volume']
+
+    @property
+    def min_volume(self):
+        return self._hw_pipette['min_volume']
+
+    @property
+    def previous_placeable(self):
+        return self._ctx.location_cache
+
+    @property
+    def speeds(self):
+        return {'aspirate': self._instr_ctx._speeds.aspirate,
+                'dispense': self._instr_ctx._speeds.dispense,
+                'blow_out': self._instr_ctx._speeds.blow_out}
+
+    @property
+    def starting_tip(self):
+        return self._instr_ctx.starting_tip
+
+    @property
+    def tip_racks(self):
+        return self._tip_racks
+
+    @property
+    def trash_container(self):
+        return self._trash_container
+
+    @property
+    def type(self):
+        log.info('instrument.type')
+        return self._instr_ctx.type
+
+    @log_call(log)
+    def reset(self):
+        """
+        Resets the state of this pipette, removing associated placeables,
+        setting current volume to zero, and resetting tip tracking
+        """
+        instr = self._hw._attached_instruments[self._mount]
+        instr.set_current_volume(0)
+        instr.current_tiprack_diamater = 0.0
+        instr._has_tip = False
+        instr._current_tip_length = 0.0
+
+        self._ctx.location_cache = None
+        self.reset_tip_tracking()
 
     @log_call(log)
     def has_tip_rack(self):
         """
         Returns True of this :any:`Pipette` was instantiated with tip_racks
         """
-        return None
+        return (self.tip_racks is not None
+                and isinstance(self.tip_racks, list)
+                and len(self.tip_racks) > 0)
 
     @log_call(log)
     def reset_tip_tracking(self):
         """
         Resets the :any:`Pipette` tip tracking, "refilling" the tip racks
         """
-        return None
+        self.current_tip(None)
+        self._instr_ctx.reset_tipracks()
 
     @log_call(log)
     def current_tip(self, *args):
-        return None
+        # TODO(ahmed): revisit
+        if len(args) and (isinstance(args[0], Well) or args[0] is None):
+            self.current_tip_home_well = args[0]
+        return self.current_tip_home_well
 
     @log_call(log)
-    def start_at_tip(self, _tip):
-        return None
+    def start_at_tip(self, _tip: Well = None):
+        self._instr_ctx.starting_tip = _tip
 
     @log_call(log)
     def get_next_tip(self):
-        return None
+        # Use a tip here
+        _, tip = self._instr_ctx._next_available_tip()
+        return tip
 
     @log_call(log)
-    def move_to(self, location, strategy=None):
+    def retract(self, safety_margin: float = 10) -> 'InstrumentContext':
+        '''
+        Move the pipette's mount upwards and away from the deck
+
+        Parameters
+        ----------
+        safety_margin: int
+            Distance in millimeters awey from the limit switch,
+            used during the mount's `fast_home()` method
+        '''
+        self._ctx.location_cache = None
+        self._hw.retract(self._mount)
+        return self._instr_ctx
+
+    @log_call(log)
+    def move_to(self,
+                location: Union[Location, Well],
+                strategy: str = None):
         """
         Move this :any:`Pipette` to a :any:`Placeable` on the :any:`Deck`
 
@@ -110,10 +213,25 @@ class Pipette():
 
         This instance of :class:`Pipette`.
         """
-        return self
+        if not location:
+            return self._instr_ctx
+
+        if isinstance(location, Well):
+            location = location.top()
+
+        force_direct = False
+        if self._ctx.location_cache == location.labware or \
+                strategy == 'direct':
+            force_direct = True
+
+        return self._instr_ctx.move_to(location=location,
+                                       force_direct=force_direct)
 
     @log_call(log)
-    def aspirate(self, volume=None, location=None, rate=1.0):
+    def aspirate(self,
+                 volume: float = None,
+                 location: Union[Location, Well] = None,
+                 rate: float = 1.0) -> 'InstrumentContext':
         """
         Aspirate a volume of liquid (in microliters/uL) using this pipette
         from the specified location
@@ -166,13 +284,46 @@ class Pipette():
         >>> p300.aspirate(plate[2]) # doctest: +SKIP
         """
         # TODO: When implementing this, cap rate to self._max_plunger_speed
-        return self
+
+        self._log.debug("aspirate {} from {} at {}"
+                        .format(volume,
+                                location if location else 'current position',
+                                rate))
+
+        if not isinstance(volume, Number):
+            if (isinstance(volume, Well) or isinstance(volume, Location)) \
+                    and not location:
+                location = volume
+            volume = self._working_volume - self.current_volume
+
+        if not location and self.previous_placeable:
+            location = self.previous_placeable
+
+        if volume != 0:
+            self._position_for_aspirate(location)
+
+            cmds.do_publish(
+                self._instr_ctx.broker, cmds.aspirate, self.aspirate,
+                'before', None, None, self, volume, location, rate)
+            self._hw.aspirate(self._mount, volume, rate)
+            cmds.do_publish(
+                self._instr_ctx.broker, cmds.aspirate, self.aspirate,
+                'after', self, None, self, volume, location, rate)
+        return self._instr_ctx
+
+    def _position_for_aspirate(self, location: Union[Location, Well] = None):
+        if location != self.previous_placeable:
+            self._instr_ctx.move_to(location.top())  # go to top of source
+
+        if self.current_volume == 0:
+            self._hw.prepare_for_aspirate(self._mount)
+            self._instr_ctx.move_to(location)
 
     @log_call(log)
     def dispense(self,
-                 volume=None,
-                 location=None,
-                 rate=1.0):
+                 volume: float = None,
+                 location: Union[Location, Well] = None,
+                 rate: float = 1.0) -> 'InstrumentContext':
         """
         Dispense a volume of liquid (in microliters/uL) using this pipette
 
@@ -225,27 +376,28 @@ class Pipette():
         >>> p300.dispense(plate[2]) # doctest: +SKIP
         """
         # TODO: When implementing this, cap rate to self._max_plunger_speed
-        return self
+        if not isinstance(volume, Number):
+            if (isinstance(volume, Well) or isinstance(volume, Location)) \
+                    and not location:
+                location = volume
+            volume = self.current_volume
 
-    @log_call(log)
-    def retract(self, safety_margin=10):
-        '''
-        Move the pipette's mount upwards and away from the deck
+        volume = min(self.current_volume, volume)
 
-        Parameters
-        ----------
-        safety_margin: int
-            Distance in millimeters awey from the limit switch,
-            used during the mount's `fast_home()` method
-        '''
-        return self
+        if not location and self.previous_placeable:
+            location = self.previous_placeable
+
+        if volume != 0:
+            return self._instr_ctx.dispense(
+                volume=volume, location=location, rate=rate)
+        return self._instr_ctx
 
     @log_call(log)
     def mix(self,
-            repetitions=1,
-            volume=None,
-            location=None,
-            rate=1.0):
+            repetitions: int = 1,
+            volume: float = None,
+            location: Union[Location, Well] = None,
+            rate: float = 1.0) -> 'InstrumentContext':
         """
         Mix a volume of liquid (in microliters/uL) using this pipette
 
@@ -290,11 +442,32 @@ class Pipette():
         # mix 3x with the pipette's max volume, from current position
         >>> p300.mix(3) # doctest: +SKIP
         """
-        return self
+        if not self._hw_pipette['has_tip']:
+            raise hc.NoTipAttachedError('Pipette has no tip. Aborting mix()')
+
+        if not isinstance(volume, Number):
+            if (isinstance(volume, Well) or isinstance(volume, Location)) \
+                    and not location:
+                location = volume
+            volume = self._working_volume - self.current_volume
+
+        if not location and self.previous_placeable:
+            location = self.previous_placeable
+
+        self._instr_ctx.aspirate(volume, location, rate)
+        while repetitions - 1 > 0:
+            self._instr_ctx.dispense(volume, rate=rate)
+            self._instr_ctx.aspirate(volume, rate=rate)
+            repetitions -= 1
+        self._instr_ctx.dispense(volume, rate=rate)
+
+        return self._instr_ctx
 
     @log_call(log)
-    @commands.publish.both(command=commands.blow_out)
-    def blow_out(self, location=None):
+    @cmds.publish.both(command=cmds.blow_out)
+    def blow_out(self,
+                 location: Union[Location, Well] = None
+                 ) -> 'InstrumentContext':
         """
         Force any remaining liquid to dispense, by moving
         this pipette's plunger to the calibrated `blow_out` position
@@ -325,10 +498,14 @@ class Pipette():
         >>> p300.aspirate(50).dispense().blow_out() # doctest: +SKIP
         """
         # TODO: When implementing this, cap rate to self._max_plunger_speed
-        return self
+        return self._instr_ctx.blow_out(location=location)
 
     @log_call(log)
-    def touch_tip(self, location=None, radius=1.0, v_offset=-1.0, speed=60.0):
+    def touch_tip(self,
+                  location: Well = None,
+                  radius: float = 1.0,
+                  v_offset: float = -1.0,
+                  speed: float = 60.0) -> 'InstrumentContext':
         """
         Touch the :any:`Pipette` tip to the sides of a well,
         with the intent of removing left-over droplets
@@ -375,10 +552,14 @@ class Pipette():
         >>> p300.aspirate(50, plate[0]) # doctest: +SKIP
         >>> p300.dispense(plate[1]).touch_tip() # doctest: +SKIP
         """
-        return self
+        return self._instr_ctx.touch_tip(
+                location=location, radius=radius, v_offset=v_offset,
+                speed=speed)
 
     @log_call(log)
-    def air_gap(self, volume=None, height=None):
+    def air_gap(self,
+                volume: float = None,
+                height: float = None) -> 'InstrumentContext':
         """
         Pull air into the :any:`Pipette` current tip
 
@@ -412,11 +593,11 @@ class Pipette():
         >>> p300.aspirate(50, plate[0]) # doctest: +SKIP
         >>> p300.air_gap(50) # doctest: +SKIP
         """
-        return self
+        return self._instr_ctx.air_gap(volume=volume, height=height)
 
     @log_call(log)
-    @commands.publish.both(command=commands.return_tip)
-    def return_tip(self, home_after=True):
+    @cmds.publish.both(command=cmds.return_tip)
+    def return_tip(self, home_after: bool = True) -> 'InstrumentContext':
         """
         Drop the pipette's current tip to it's originating tip rack
 
@@ -443,12 +624,15 @@ class Pipette():
         >>> p300.dispense(plate[1]) # doctest: +SKIP
         >>> p300.return_tip() # doctest: +SKIP
         """
-        return self
+        return self._instr_ctx
 
     @log_call(log)
-    def pick_up_tip(self, location=None, presses=None, increment=None):
+    def pick_up_tip(
+            self, location: Union[Location, Well] = None,
+            presses: int = None, increment: float = 1.0)\
+            -> 'InstrumentContext':
         """
-        Pick up a tip for the Pipette to run liquid-handling commands with
+        Pick up a tip for the Pipette to run liquid-handling cmds with
 
         Notes
         -----
@@ -492,10 +676,13 @@ class Pipette():
         >>> p300.pick_up_tip() # doctest: +SKIP
         >>> p300.return_tip() # doctest: +SKIP
         """
-        return self
+        return self._instr_ctx.pick_up_tip(
+                location=location, presses=presses, increment=increment)
 
     @log_call(log)
-    def drop_tip(self, location=None, home_after=True):
+    def drop_tip(
+            self, location: Union[Location, Well] = None,
+            home_after: bool = True) -> 'InstrumentContext':
         """
         Drop the pipette's current tip
 
@@ -531,10 +718,11 @@ class Pipette():
         # drops the tip back at its tip rack
         >>> p300.drop_tip(tiprack[1]) # doctest: +SKIP
         """
-        return self
+        return self._instr_ctx.drop_tip(
+                location=location, home_after=home_after)
 
     @log_call(log)
-    def home(self):
+    def home(self) -> 'InstrumentContext':
         """
         Home the pipette's plunger axis during a protocol run
 
@@ -555,10 +743,10 @@ class Pipette():
         >>> p300 = instruments.P300_Single(mount='right') # doctest: +SKIP
         >>> p300.home() # doctest: +SKIP
         """
-        return self
+        return self._instr_ctx.home()
 
     @log_call(log)
-    @commands.publish.both(command=commands.distribute)
+    @cmds.publish.both(command=cmds.distribute)
     def distribute(self, volume, source, dest, *args, **kwargs):
         """
         Distribute will move a volume of liquid from a single of source
@@ -582,7 +770,7 @@ class Pipette():
         return self.transfer(*args, **kwargs)
 
     @log_call(log)
-    @commands.publish.both(command=commands.consolidate)
+    @cmds.publish.both(command=cmds.consolidate)
     def consolidate(self, volume, source, dest, *args, **kwargs):
         """
         Consolidate will move a volume of liquid from a list of sources
@@ -606,7 +794,7 @@ class Pipette():
         return self.transfer(*args, **kwargs)
 
     @log_call(log)
-    @commands.publish.both(command=commands.transfer)
+    @cmds.publish.both(command=cmds.transfer)
     def transfer(self, volume, source, dest, **kwargs):
         """
         Transfer will move a volume of liquid from a source location(s)
@@ -704,8 +892,10 @@ class Pipette():
         return self
 
     @log_call(log)
-    @commands.publish.both(command=commands.delay)
-    def delay(self, seconds=0, minutes=0):
+    @cmds.publish.both(command=cmds.delay)
+    def delay(self,
+              seconds: float = 0,
+              minutes: float = 0) -> 'InstrumentContext':
         """
         Parameters
         ----------
@@ -713,42 +903,13 @@ class Pipette():
         seconds: float
             The number of seconds to freeze in place.
         """
-        return self
+        return self._ctx.delay(seconds=seconds, minutes=minutes)
 
     @log_call(log)
-    def calibrate_plunger(
-            self,
-            top=None,
-            bottom=None,
-            blow_out=None,
-            drop_tip=None):
-        """Set calibration values for the pipette plunger.
-
-        This can be called multiple times as the user sets each value,
-        or you can set them all at once.
-
-        Parameters
-        ----------
-
-        top : int
-           Touching but not engaging the plunger.
-
-        bottom: int
-            Must be above the pipette's physical hard-stop, while still
-            leaving enough room for 'blow_out'
-
-        blow_out : int
-            Plunger has been pushed down enough to expell all liquids.
-
-        drop_tip : int
-            This position that causes the tip to be released from the
-            pipette.
-
-        """
-        return self
-
-    @log_call(log)
-    def set_speed(self, aspirate=None, dispense=None, blow_out=None):
+    def set_speed(self,
+                  aspirate: float = None,
+                  dispense: float = None,
+                  blow_out: float = None) -> 'InstrumentContext':
         """
         Set the speed (mm/second) the :any:`Pipette` plunger will move
         during :meth:`aspirate` and :meth:`dispense`
@@ -764,10 +925,19 @@ class Pipette():
             move while performing an dispense
         """
         # TODO: When implementing this, cap it to self._max_plunger_speed
-        return self
+        if aspirate:
+            self._instr_ctx._speeds.aspirate = aspirate
+        if dispense:
+            self._instr_ctx._speeds.dispense = dispense
+        if blow_out:
+            self._instr_ctx._speeds.blow_out = blow_out
+        return self._instr_ctx
 
     @log_call(log)
-    def set_flow_rate(self, aspirate=None, dispense=None, blow_out=None):
+    def set_flow_rate(self,
+                      aspirate: float = None,
+                      dispense: float = None,
+                      blow_out: float = None) -> 'InstrumentContext':
         """
         Set the speed (uL/second) the :any:`Pipette` plunger will move
         during :meth:`aspirate` and :meth:`dispense`. The speed is set using
@@ -783,7 +953,25 @@ class Pipette():
             move while performing an dispense
         """
         # TODO: When implementing this, cap it to self._max_plunger_speed
-        return self
+        ul = self.max_volume
+        if aspirate:
+            ul_per_mm = self._piecewise_volume_conversion(ul, 'aspirate')
+            self.set_speed(aspirate=round(aspirate / ul_per_mm, 6))
+        if dispense:
+            ul_per_mm = self._piecewise_volume_conversion(ul, 'dispense')
+            self.set_speed(dispense=round(dispense / ul_per_mm, 6))
+        if blow_out:
+            ul_per_mm = self._piecewise_volume_conversion(ul, 'dispense')
+            self.set_speed(blow_out=round(blow_out / ul_per_mm, 6))
+        return self._instr_ctx
+
+    def _piecewise_volume_conversion(
+            self,
+            ul: float,
+            function: str) -> float:
+        sequence = self._config.ul_per_mm[function]
+        i = list(filter(lambda x: ul <= x[0], sequence))[0]
+        return i[1]*ul + i[2]
 
     @log_call(log)
     def set_pick_up_current(self, amperes):
@@ -797,11 +985,6 @@ class Pipette():
             The amperage of the motor while creating a seal with tips.
         """
         return self
-
-    @property
-    def type(self):
-        log.info('instrument.type')
-        return 'single'
 
     def _set_plunger_max_speed_override(self, speed: float):
         self._max_plunger_speed = speed
