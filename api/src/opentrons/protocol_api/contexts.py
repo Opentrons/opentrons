@@ -273,7 +273,8 @@ class ProtocolContext(CommandPublisher):
             self,
             labware_def: LabwareDefinition,
             location: types.DeckLocation,
-            label: str = None
+            label: str = None,
+            stacking: bool = False,
     ) -> Labware:
         """ Specify the presence of a piece of labware on the OT2 deck.
 
@@ -287,7 +288,10 @@ class ProtocolContext(CommandPublisher):
         """
         parent = self.deck.position_for(location)
         labware_obj = load_from_definition(labware_def, parent, label)
-        self._deck_layout[location] = labware_obj
+        if stacking:
+            self._deck_layout.resolve_stacking_labware(labware_obj, location)
+        else:
+            self._deck_layout[location] = labware_obj
         return labware_obj
 
     @requires_version(2, 0)
@@ -297,7 +301,8 @@ class ProtocolContext(CommandPublisher):
             location: types.DeckLocation,
             label: str = None,
             namespace: str = None,
-            version: int = None
+            version: int = None,
+            stacking: bool = False,
     ) -> Labware:
         """ Load a labware onto the deck given its name.
 
@@ -325,7 +330,11 @@ class ProtocolContext(CommandPublisher):
             load_name, namespace, version,
             bundled_defs=self._bundled_labware,
             extra_defs=self._extra_labware)
-        return self.load_labware_from_definition(labware_def, location, label)
+        return self.load_labware_from_definition(
+            labware_def,
+            location,
+            label,
+            stacking)
 
     @requires_version(2, 0)
     def load_labware_by_name(

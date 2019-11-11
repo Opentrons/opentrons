@@ -284,6 +284,7 @@ class Labware:
 
         self._pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
         self._definition = definition
+        self._highest_z = self._dimensions['zDimension']
 
     def __getitem__(self, key: str) -> Well:
         return self.wells_by_name()[key]
@@ -545,7 +546,17 @@ class Labware:
         This is drawn from the 'dimensions'/'zDimension' elements of the
         labware definition and takes into account the calibration offset.
         """
-        return self._dimensions['zDimension'] + self._calibrated_offset.z
+        return self._highest_z + self._calibrated_offset.z
+
+    @highest_z.setter
+    def highest_z(self, new_height: float):
+        """
+        The z-coordinate of the tallest single point anywhere on the labware.
+
+        This is drawn from the 'dimensions'/'zDimension' elements of the
+        labware definition and takes into account the calibration offset.
+        """
+        self._highest_z = new_height
 
     @property  # type: ignore
     @requires_version(2, 0)

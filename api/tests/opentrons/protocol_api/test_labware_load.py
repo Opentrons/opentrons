@@ -13,6 +13,18 @@ def test_load_to_slot(loop):
     assert other._offset == types.Point(132.5, 0, 0)
 
 
+def test_stacking(loop):
+    ctx = papi.ProtocolContext(loop=loop)
+    with pytest.raises(ValueError):
+        ctx.load_labware(labware_name, '1', stacking=True)
+    older_labware = ctx.load_labware(labware_name, '1')
+    stacked_labware = ctx.load_labware(labware_name, '1', stacking=True)
+    assert stacked_labware.highest_z == older_labware.highest_z * 2
+    del ctx._deck_layout['12']
+    assert ctx._deck_layout.highest_z == stacked_labware.highest_z
+    assert ctx._deck_layout['1'] == stacked_labware
+
+
 def test_loaded(loop):
     ctx = papi.ProtocolContext(loop=loop)
     labware = ctx.load_labware(labware_name, '1')

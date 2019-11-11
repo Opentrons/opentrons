@@ -243,6 +243,20 @@ class Deck(UserDict):
                     f'module {module_name} does not have a default'
                     ' location, you must specify a slot')
 
+    def resolve_stacking_labware(self, labware, location: types.DeckLocation):
+        slot_key_int = self._check_name(location)
+        item = self.data.get(slot_key_int)
+        print(f"Current item {item}")
+        if not item:
+            raise ValueError(f'There is no other labware in slot {location}',
+                             'please add a labware, then specify the labware',
+                             'to stack.')
+
+        labware.highest_z = labware.highest_z + item.highest_z
+        del self.data[slot_key_int]
+        self.data[slot_key_int] = labware
+        self.recalculate_high_z()
+
     @property
     def highest_z(self) -> float:
         """ Return the tallest known point on the deck. """
