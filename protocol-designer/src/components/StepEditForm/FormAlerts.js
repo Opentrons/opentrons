@@ -1,7 +1,6 @@
 // @flow
-import * as React from 'react'
 import { connect } from 'react-redux'
-import Alerts from '../alerts/Alerts'
+import Alerts, { type Props } from '../alerts/Alerts'
 import {
   actions as dismissActions,
   selectors as dismissSelectors,
@@ -17,8 +16,6 @@ import type { BaseState } from '../../types'
 /* TODO:  BC 2018-09-13 move to src/components/alerts and adapt and use src/components/alerts/Alerts
  * see #1814 for reference
  */
-
-type Props = React.ElementProps<typeof Alerts>
 
 type SP = {|
   errors: $PropertyType<Props, 'errors'>,
