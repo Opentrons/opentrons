@@ -66,6 +66,9 @@
 .crash_info_box {
   @apply --font-body-1-dark;
 
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
   padding: 1rem;
   background-color: var(--c-light-gray);
 

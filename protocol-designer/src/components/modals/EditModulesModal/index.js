@@ -23,8 +23,8 @@ import {
   FormGroup,
   DropdownField,
   HoverTooltip,
-  AlertItem,
 } from '@opentrons/components'
+import { PDAlert } from '../../alerts/PDAlert'
 import { CrashInfoBox } from '../../modules'
 import styles from './EditModules.css'
 import modalStyles from '../modal.css'
@@ -36,10 +36,6 @@ type EditModulesProps = {
   moduleId: ?string,
   onCloseClick: () => mixed,
 }
-
-// TODO (ka 2019-11-6): Move this to i18n
-const MODULE_PLACEMENT_ERROR =
-  'Modules can only be placed in slots that are (a) empty or (b) occupied by compatible labware.'
 
 export default function EditModulesModal(props: EditModulesProps) {
   const { moduleType, onCloseClick } = props
@@ -70,6 +66,15 @@ export default function EditModulesModal(props: EditModulesProps) {
     !slotsBlockedBySpanning.includes(selectedSlot) &&
     (getSlotIsEmpty(_initialDeckSetup, selectedSlot) ||
       previousModuleSlot === selectedSlot)
+
+  const showSlotOption = moduleType !== 'thermocycler'
+
+  const enableSlotSelection = useSelector(
+    featureFlagSelectors.getDisableModuleRestrictions
+  )
+
+  const occupiedSlotError =
+    !slotIsEmpty && enableSlotSelection ? 'Selected slot is occupied' : null
 
   const dispatch = useDispatch()
 
@@ -107,11 +112,6 @@ export default function EditModulesModal(props: EditModulesProps) {
   }
 
   const heading = getModuleDisplayName(moduleType)
-  const showSlotOption = moduleType !== 'thermocycler'
-
-  const enableSlotSelection = useSelector(
-    featureFlagSelectors.getDisableModuleRestrictions
-  )
 
   const slotOptionTooltip = (
     <div className={styles.slot_tooltip}>
@@ -125,9 +125,11 @@ export default function EditModulesModal(props: EditModulesProps) {
       contentsClassName={styles.modal_contents}
     >
       {!slotIsEmpty && (
-        <AlertItem type="error" title={`Cannot place ${heading}`}>
-          <p>{MODULE_PLACEMENT_ERROR}</p>
-        </AlertItem>
+        <PDAlert
+          alertType="warning"
+          title={i18n.t('alert.module_placement.SLOT_OCCUPIED.title')}
+          description={i18n.t('alert.module_placement.SLOT_OCCUPIED.body')}
+        />
       )}
       <form>
         <div className={styles.form_row}>
@@ -153,6 +155,7 @@ export default function EditModulesModal(props: EditModulesProps) {
                       value={selectedSlot}
                       disabled={!enableSlotSelection}
                       onChange={handleSlotChange}
+                      error={occupiedSlotError}
                     />
                   </FormGroup>
                 </div>
