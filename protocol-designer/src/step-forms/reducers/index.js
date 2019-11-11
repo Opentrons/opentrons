@@ -38,10 +38,12 @@ import type {
 } from '../../labware-ingred/actions'
 import type { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
 import type { FormData, StepIdType } from '../../form-types'
+import type { ModuleType } from '@opentrons/shared-data'
 import type {
   FileLabware,
   FilePipette,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+  FileModule,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type {
   AddStepAction,
   ChangeFormInputAction,
@@ -638,6 +640,26 @@ export const moduleInvariantProperties = handleActions<ModuleEntities, *>(
       state: ModuleEntities,
       action: DeleteModuleAction
     ): ModuleEntities => omit(state, action.payload.id),
+    LOAD_FILE: (
+      state: ModuleEntities,
+      action: LoadFileAction
+    ): ModuleEntities => {
+      const { file } = action.payload
+      // NOTE: fallback for JSONv3
+      const FILE_MODULE_TYPE_TO_MODULE_TYPE: { [string]: ModuleType } = {
+        'temperature module': 'tempdeck',
+        'magnetic module': 'magdeck',
+        thermocycler: 'thermocycler',
+      }
+      return mapValues(
+        file.modules || {}, // TODO: Ian 2019-11-11 remive this fallback to empty object once JSONv4 is migrated & released
+        (fileModule: FileModule, id: string) => ({
+          id,
+          type: FILE_MODULE_TYPE_TO_MODULE_TYPE[fileModule.moduleType],
+          model: fileModule.model,
+        })
+      )
+    },
   },
   {}
 )

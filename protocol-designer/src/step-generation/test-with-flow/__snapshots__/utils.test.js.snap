@@ -10,7 +10,7 @@ Object {
       "slot": "2",
     },
     "tiprack300Id": Object {
-      "slot": "3",
+      "slot": "4",
     },
     "trashId": Object {
       "slot": "12",
@@ -330,6 +330,11 @@ Object {
         "6": Object {},
         "7": Object {},
       },
+    },
+  },
+  "modules": Object {
+    "someTempModuleId": Object {
+      "slot": "3",
     },
   },
   "pipettes": Object {

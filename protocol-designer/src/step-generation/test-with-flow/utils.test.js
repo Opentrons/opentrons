@@ -81,7 +81,11 @@ const divideCreator: any = (num: number) => (
 }
 
 beforeEach(() => {
-  invariantContext = { pipetteEntities: {}, labwareEntities: {} }
+  invariantContext = {
+    labwareEntities: {},
+    moduleEntities: {},
+    pipetteEntities: {},
+  }
 })
 
 describe('reduceCommandCreators', () => {
@@ -424,6 +428,13 @@ describe('makeInitialRobotState', () => {
             tiprackLabwareDef: fixture_tiprack_300_ul,
           },
         },
+        moduleEntities: {
+          someTempModuleId: {
+            id: 'someTempModuleId',
+            model: 'GEN1',
+            type: 'tempdeck',
+          },
+        },
         labwareEntities: {
           somePlateId: {
             id: 'somePlateId',
@@ -450,8 +461,11 @@ describe('makeInitialRobotState', () => {
       labwareLocations: {
         somePlateId: { slot: '1' },
         tiprack10Id: { slot: '2' },
-        tiprack300Id: { slot: '3' },
+        tiprack300Id: { slot: '4' },
         trashId: { slot: '12' },
+      },
+      moduleLocations: {
+        someTempModuleId: { slot: '3' },
       },
       pipetteLocations: {
         p10SingleId: { mount: 'left' },

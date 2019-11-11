@@ -374,8 +374,13 @@ const _getFormAndFieldErrorsFromHydratedForm = (
 
 export const getInvariantContext: Selector<InvariantContext> = createSelector(
   getLabwareEntities,
+  getModuleEntities,
   getPipetteEntities,
-  (labwareEntities, pipetteEntities) => ({ labwareEntities, pipetteEntities })
+  (labwareEntities, moduleEntities, pipetteEntities) => ({
+    labwareEntities,
+    moduleEntities,
+    pipetteEntities,
+  })
 )
 
 export const getUnsavedFormErrors: Selector<?StepFormAndFieldErrors> = createSelector(

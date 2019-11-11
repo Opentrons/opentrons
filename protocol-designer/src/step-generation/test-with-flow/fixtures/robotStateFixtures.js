@@ -90,6 +90,8 @@ export function makeContext(): InvariantContext {
     },
   }
 
+  const moduleEntities = {}
+
   const pipetteEntities = {
     p10SingleId: {
       name: 'p10_single',
@@ -120,24 +122,27 @@ export function makeContext(): InvariantContext {
       spec: fixtureP300Multi,
     },
   }
-  return { labwareEntities, pipetteEntities }
+  return { labwareEntities, moduleEntities, pipetteEntities }
 }
 
 export const makeState = (args: {|
   invariantContext: InvariantContext,
   labwareLocations: $PropertyType<RobotState, 'labware'>,
+  moduleLocations?: $PropertyType<RobotState, 'modules'>,
   pipetteLocations: $PropertyType<RobotState, 'pipettes'>,
   tiprackSetting: { [labwareId: string]: boolean },
 |}) => {
   const {
     invariantContext,
     labwareLocations,
+    moduleLocations,
     pipetteLocations,
     tiprackSetting,
   } = args
   let robotState = makeInitialRobotState({
     invariantContext,
     labwareLocations,
+    moduleLocations: moduleLocations || {},
     pipetteLocations,
   })
   // overwrite tiprack tip state using tiprackSetting arg
@@ -160,6 +165,7 @@ export const makeStateArgsStandard = () => ({
     destPlateId: { slot: '3' },
     trashId: { slot: '12' },
   },
+  moduleLocations: {},
 })
 export const getInitialRobotStateStandard = (
   invariantContext: InvariantContext
