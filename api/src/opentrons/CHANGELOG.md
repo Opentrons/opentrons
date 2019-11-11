@@ -3,28 +3,9 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [3.14.1-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.14.1-alpha.1...v3.14.1-alpha.2) (2019-11-08)
+## [3.14.1](https://github.com/Opentrons/opentrons/compare/v3.13.2...v3.14.1) (2019-11-11)
 
 **Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-# [3.14.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.14.1-alpha.0...v3.14.0-alpha.1) (2019-11-08)
-
-**Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-## [3.14.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.14.0...v3.14.1-alpha.0) (2019-11-08)
-
-
-### Bug Fixes
-
-* **api:** use lower currents for plunger homing to prevent transients ([5ae2473](https://github.com/Opentrons/opentrons/commit/5ae2473))
 
 
 
