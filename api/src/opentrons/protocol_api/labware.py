@@ -293,7 +293,8 @@ class Labware:
     def __getitem__(self, key: str) -> Well:
         return self.wells_by_name()[key]
 
-    @property
+    @property  # type: ignore
+    @requires_version(2, 0)
     def uri(self) -> str:
         """ A string fully identifying the labware.
 
@@ -1192,6 +1193,7 @@ def get_labware_definition(
         load_name, namespace, version)
 
 
+@requires_version(2, 0)
 def get_all_labware_definitions() -> List[str]:
     """
     Return a list of standard and custom labware definitions with load_name +
