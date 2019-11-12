@@ -20,6 +20,16 @@ describe('mergeWhen', () => {
     })
   })
 
+  test('single array uses alternative when predicate is false', () => {
+    const result = mergeWhen(
+      ['a'],
+      (current, next) => false,
+      (current, next) => null,
+      current => current.toUpperCase()
+    )
+    expect(result).toEqual(['A'])
+  })
+
   test('always merge', () => {
     const result = mergeWhen(['1', '2', '3'], (current, next) => true, concat)
     expect(result).toEqual(['12', '3'])
