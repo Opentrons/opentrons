@@ -6,8 +6,9 @@ import takeWhile from 'lodash/takeWhile'
 import uniqBy from 'lodash/uniqBy'
 import { getAllWellsForLabware } from '../../constants'
 import * as StepGeneration from '../../step-generation'
-import { selectors as stepFormSelectors } from '../../step-forms'
+import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import type { BaseState, Selector } from '../../types'
 import type { StepIdType } from '../../form-types'
 import type {
@@ -143,11 +144,16 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
   stepFormSelectors.getOrderedStepIds,
   getInitialRobotState,
   getInvariantContext,
+  featureFlagSelectors.getFeatureFlagData,
   (
     allStepArgsAndErrors,
     orderedStepIds,
     initialRobotState,
-    invariantContext
+    invariantContext,
+    featureFlagMemoizationBust // HACK Ian 2019-11-12: this isn't used directly,
+    // it's only included to bust this selector's memoization. Required b/c step-generation's `getFeatureFlag` util
+    // must read directly from localStorage. Once getDisableModuleRestrictions aka "rogue mode"
+    // is removed, we can remove this arg to this selector.
   ) => {
     const allStepArgs: Array<StepGeneration.CommandCreatorArgs | null> = orderedStepIds.map(
       stepId => {
