@@ -16,7 +16,7 @@ import {
   type FormWarning,
   type FormWarningType,
 } from './warnings'
-import type { StepType } from '../../form-types'
+import type { HydratedFormData, StepType } from '../../form-types'
 
 export { default as handleFormChange } from './handleFormChange'
 export { default as generateNewForm } from './generateNewForm'
@@ -26,8 +26,8 @@ export { default as getNextDefaultPipetteId } from './getNextDefaultPipetteId'
 export { default as stepFormToArgs } from './stepFormToArgs'
 
 type FormHelpers = {
-  getErrors?: mixed => Array<FormError>,
-  getWarnings?: mixed => Array<FormWarning>,
+  getErrors?: HydratedFormData => Array<FormError>,
+  getWarnings?: HydratedFormData => Array<FormWarning>,
 }
 const stepFormHelperMap: { [StepType]: FormHelpers } = {
   mix: {
@@ -53,8 +53,9 @@ export type { FormError, FormWarning, FormWarningType }
 
 export const getFormErrors = (
   stepType: StepType,
-  formData: mixed
+  formData: HydratedFormData
 ): Array<FormError> => {
+  console.log({ stepType, formData })
   const formErrorGetter =
     stepFormHelperMap[stepType] && stepFormHelperMap[stepType].getErrors
   const errors = formErrorGetter ? formErrorGetter(formData) : []
@@ -63,7 +64,7 @@ export const getFormErrors = (
 
 export const getFormWarnings = (
   stepType: StepType,
-  formData: mixed
+  formData: HydratedFormData
 ): Array<FormWarning> => {
   const formWarningGetter =
     stepFormHelperMap[stepType] && stepFormHelperMap[stepType].getWarnings

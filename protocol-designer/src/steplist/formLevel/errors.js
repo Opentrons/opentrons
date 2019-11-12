@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { getWellRatio } from '../utils'
 import { canPipetteUseLabware } from '../../utils'
-import type { StepFieldName } from '../../form-types'
+import type { HydratedFormData, StepFieldName } from '../../form-types'
 
 /*******************
  ** Error Messages **
@@ -11,6 +11,7 @@ export type FormErrorKey =
   | 'INCOMPATIBLE_ASPIRATE_LABWARE'
   | 'INCOMPATIBLE_DISPENSE_LABWARE'
   | 'INCOMPATIBLE_LABWARE'
+  | 'MODULE_PIPETTE_COLLISION_DANGER'
   | 'WELL_RATIO_MOVE_LIQUID'
   | 'PAUSE_TYPE_REQUIRED'
   | 'TIME_PARAM_REQUIRED'
@@ -52,15 +53,12 @@ const FORM_ERRORS: { [FormErrorKey]: FormError } = {
     dependentFields: ['aspirate_wells', 'dispense_wells'],
   },
 }
-export type FormErrorChecker = mixed => ?FormError
+export type FormErrorChecker = HydratedFormData => ?FormError
 
 // TODO: test these
 /*******************
  ** Error Checkers **
  ********************/
-
-// TODO: real HydratedFormData type
-type HydratedFormData = any
 
 export const incompatibleLabware = (fields: HydratedFormData): ?FormError => {
   const { labware, pipette } = fields
@@ -123,7 +121,7 @@ export const wellRatioMoveLiquid = (fields: HydratedFormData): ?FormError => {
  ********************/
 
 export const composeErrors = (...errorCheckers: Array<FormErrorChecker>) => (
-  value: mixed
+  value: HydratedFormData
 ): Array<FormError> =>
   errorCheckers.reduce((acc, errorChecker) => {
     const possibleError = errorChecker(value)

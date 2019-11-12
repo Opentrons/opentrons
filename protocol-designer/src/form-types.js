@@ -211,6 +211,24 @@ export type HydratedMixFormDataLegacy = {
   blowout_location: ?string, // labwareId or 'SOURCE_WELL' or 'DEST_WELL'
 }
 
+// TODO: real HydratedFormData type
+// NOTE: Ian 2019-11-12 these are NOT strictly typed. Depending on the form,
+// certain fields will be missing; each form type has a subset of these fields.
+export type HydratedFormData = {|
+  id: string,
+  stepType: string,
+  labware: ?LabwareEntity,
+  aspirate_labware: ?LabwareEntity,
+  dispense_labware: ?LabwareEntity,
+  pipette: ?PipetteEntity,
+  pauseForAmountOfTime: ?boolean,
+  pauseHour: ?string,
+  pauseMinute: ?string,
+  pauseSecond: ?string,
+  aspirate_wells: ?Array<string>,
+  dispense_wells: ?Array<string>,
+|} // TODO IMMEDIATELY DO NOT MERGE -- confirm type guesses!
+
 // TODO: Ian 2019-01-17 Moving away from this and towards nesting all form fields
 // inside `fields` key, but deprecating transfer/consolidate/distribute is a pre-req
 export type HydratedMoveLiquidFormDataLegacy = {

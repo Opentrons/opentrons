@@ -34,7 +34,12 @@ import {
 
 import type { FormWarning } from '../../steplist/formLevel'
 import type { BaseState, Selector, DeckSlot } from '../../types'
-import type { FormData, StepIdType, StepType } from '../../form-types'
+import type {
+  FormData,
+  HydratedFormData,
+  StepIdType,
+  StepType,
+} from '../../form-types'
 import type {
   StepArgsAndErrors,
   StepFormAndFieldErrors,
@@ -348,7 +353,7 @@ function _getHydratedForm(
 
 // TODO type with hydrated form type
 const _getFormAndFieldErrorsFromHydratedForm = (
-  hydratedForm: FormData
+  hydratedForm: HydratedFormData
 ): StepFormAndFieldErrors => {
   let errors: StepFormAndFieldErrors = {}
 
