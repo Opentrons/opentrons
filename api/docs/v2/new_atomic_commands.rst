@@ -187,6 +187,13 @@ Now our pipette's tip is holding 100uL.
 
 .. note::
 
+    In previous versions of this API, ``aspirate`` (and ``dispense``) would attempt to guess your meaning if you
+    specified only a location or specified location and volume out of order. This is no longer true. Like any
+    other Python function, if you are specifying arguments by position without using their names, you must
+    always specify them in order.
+
+.. note::
+
     By default, the OT-2 will move to 1mm above the bottom of the target well before aspirating.
     You can change this by using a well position function like :py:meth:`.Well.bottom` (see
     :ref:`v2-location-within-wells`) every time you call ``aspirate``, or - if you want to change
@@ -214,6 +221,13 @@ To dispense is to push out liquid from the pipette's tip. The usage of :py:meth:
     :ref:`v2-location-within-wells`) every time you call ``dispense``, or - if you want to change
     the default throughout your protocol - you can change the default offset with
     :py:attr:`.InstrumentContext.well_bottom_clearance` (see :ref:`new-default-op-positions`).
+
+.. note::
+
+    In previous versions of this API, ``dispense`` (and ``aspirate``) would attempt to guess your meaning if you
+    specified only a location or specified location and volume out of order. This is no longer true. Like any
+    other Python function, if you are specifying arguments by position without using their names, you must
+    always specify them in order.
 
 .. versionadded:: 2.0
 
