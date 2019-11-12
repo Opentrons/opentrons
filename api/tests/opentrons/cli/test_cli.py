@@ -2,7 +2,10 @@ import copy
 import pytest
 import sys
 import numpy as np
-
+try:
+    import aionotify
+except OSError:
+    aionotify = None
 from opentrons.config import (CONFIG,
                               robot_configs,
                               advanced_settings as advs)
@@ -65,6 +68,8 @@ def test_clear_config(mock_config, async_server):
     assert hardware.config == robot_configs.build_config({}, {})
 
 
+@pytest.mark.skipif(aionotify is None,
+                    reason="requires inotify (linux only)")
 def test_save_and_clear_config(mock_config, sync_hardware, loop):
     # Clear should happen automatically after the following import, resetting
     # the deck cal to the default value
@@ -202,10 +207,10 @@ def test_gantry_matrix_output(
         get_calibration_points(), hardware, loop=loop)
 
     expected = [
-        [1.00, 0.00, 0.00,  0.00],
-        [0.00, 0.99852725, 0.00,  0.5132547],
-        [0.00, 0.00, 1.00,  0.00],
-        [0.00, 0.00, 0.00,  1.00]]
+        [1.00, 0.00, 0.00, 0.00],
+        [0.00, 0.99852725, 0.00, 0.5132547],
+        [0.00, 0.00, 1.00, 0.00],
+        [0.00, 0.00, 0.00, 1.00]]
 
     actual_points = {
         1: (12.13, 9.5),

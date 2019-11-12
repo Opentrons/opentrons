@@ -121,9 +121,10 @@ async def test_get_pipettes(async_server, async_client, monkeypatch):
 async def test_get_modules_v2(
         async_server, loop, async_client, monkeypatch):
     hw = async_server['com.opentrons.hardware']
-    monkeypatch.setattr(hw._backend,
-                        '_attached_modules',
-                        [('/dev/ot_module_magdeck1', 'magdeck')])
+    magdeck = await hw._backend.build_module('/dev/ot_module_magdeck1',
+                                             'magdeck',
+                                             lambda x: None)
+    monkeypatch.setattr(hw, 'attached_modules', [magdeck])
     await check_modules_response(async_client)
 
 
@@ -183,7 +184,10 @@ async def test_execute_module_command_v2(
     def dummy_get_attached_modules():
         return []
 
-    monkeypatch.setattr(hw, 'discover_modules', dummy_discover_modules)
+    magdeck = await hw._backend.build_module('/dev/ot_module_magdeck1',
+                                             'magdeck',
+                                             lambda x: None)
+    monkeypatch.setattr(hw, 'attached_modules', [magdeck])
 
     resp = await async_client.post('/modules/dummySerialMD',
                                    json={'command_type': 'deactivate'})

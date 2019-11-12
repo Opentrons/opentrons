@@ -172,7 +172,7 @@ async def _port_poll(is_old_bootloader, ports_before_switch=None):
             ports = await _discover_ports()
             if ports:
                 discovered_ports = list(filter(
-                    lambda x: x.endswith('bootloader'), ports))
+                    lambda x: 'bootloader' in x, ports))
                 if len(discovered_ports) == 1:
                     new_port = discovered_ports[0]
         await asyncio.sleep(0.05)

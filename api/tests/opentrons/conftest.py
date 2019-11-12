@@ -163,6 +163,8 @@ def using_api2(loop):
         hw_manager.set_config(old_config)
 
 
+@pytest.mark.skipif(aionotify is None,
+                    reason="requires inotify (linux only)")
 @contextlib.contextmanager
 def using_sync_api2(loop):
     if not os.environ.get('OT_API_FF_useProtocolApi2'):
@@ -426,6 +428,8 @@ def virtual_smoothie_env(monkeypatch):
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
 
 
+@pytest.mark.skipif(aionotify is None,
+                    reason="requires inotify (linux only)")
 @pytest.fixture(
     params=[
         pytest.param(using_api1, marks=pytest.mark.apiv1),
