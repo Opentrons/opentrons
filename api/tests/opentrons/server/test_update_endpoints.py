@@ -119,7 +119,7 @@ async def test_update_module_firmware(
         fd.write(bytes(0x1234))
 
     def mock_get_attached_modules(module):
-        return [('mod1', 'thermocycler')]
+        return [hw_modules.ModuleAtPort(port='mod1', name='thermocycler')]
 
     async def mock_enter_bootloader(driver, module):
         return '/dev/ot_module_avrdude_bootloader0'

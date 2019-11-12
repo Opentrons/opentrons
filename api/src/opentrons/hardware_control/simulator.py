@@ -85,11 +85,7 @@ class Simulator:
         self._config = config
         self._loop = loop
         self._attached_instruments = attached_instruments
-        self._attached_modules = [
-            ModuleAtPort(
-                port=f'/dev/ot_module_simulated_mod{str(idx)}', name=mod)
-            for idx, mod
-            in enumerate(attached_modules)]
+        self._stubbed_attached_modules = attached_modules
         self._position = copy.copy(_HOME_POSITION)
         # Engaged axes start all true in smoothie for some reason so we
         # imitate that here
@@ -196,11 +192,13 @@ class Simulator:
     def set_active_current(self, axis, amp):
         pass
 
-    def get_attached_modules(self) -> List[modules.ModuleAtPort]:
-        return self._attached_modules
-
-    async def watch_modules(self, loop: asyncio.AbstractEventLoop):
-        pass
+    async def watch_modules(self, register_modules):
+        new_modules = [
+            modules.ModuleAtPort(
+                port=f'/dev/ot_module_sim_{mod}{str(idx)}', name=mod)
+            for idx, mod
+            in enumerate(self._stubbed_attached_modules)]
+        await register_modules(new_modules=new_modules)
 
     @contextmanager
     def save_current(self):
@@ -215,13 +213,6 @@ class Simulator:
             which=model,
             simulating=True,
             interrupt_callback=interrupt_callback)
-
-    async def update_module(
-            self, module: modules.AbstractModule,
-            firmware_file: str,
-            loop: Optional[asyncio.AbstractEventLoop])\
-            -> modules.AbstractModule:
-        return module
 
     @property
     def axis_bounds(self) -> Dict[str, Tuple[float, float]]:

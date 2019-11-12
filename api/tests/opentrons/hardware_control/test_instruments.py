@@ -1,6 +1,9 @@
 import asyncio
 from unittest import mock
-
+try:
+    import aionotify
+except OSError:
+    aionotify = None
 import pytest
 from opentrons import types
 from opentrons import hardware_control as hc
@@ -95,9 +98,8 @@ async def test_backwards_compatibility(dummy_backwards_compatibility, loop):
         assert attached[mount]['max_volume'] == volumes[mount]['max']
 
 
-@pytest.mark.skipif(not hc.Controller,
-                    reason='hardware controller not available '
-                           '(probably windows)')
+@pytest.mark.skipif(aionotify is None,
+                    reason='inotify not available')
 async def test_cache_instruments_hc(monkeypatch, dummy_instruments,
                                     hardware_controller_lockfile,
                                     running_on_pi, cntrlr_mock_connect, loop):

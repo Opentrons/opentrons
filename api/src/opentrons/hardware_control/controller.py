@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Tuple
 try:
     import aionotify
 except OSError:
-    pass
+    aionotify = None
 
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.drivers.rpi_drivers import gpio
@@ -117,14 +117,11 @@ class Controller:
     def set_pipette_speed(self, val: float):
         self._smoothie_driver.set_speed(val)
 
-    def get_attached_modules(self) -> List[modules.ModuleAtPort]:
-        return modules.discover()
-
-    async def watch_modules(self, loop: asyncio.AbstractEventLoop, update_attached_modules):
+    async def watch_modules(self, loop: asyncio.AbstractEventLoop, register_modules):
         await self._module_watcher.setup(loop)
 
         initial_modules = modules.discover()
-        await update_attached_modules(new_modules=initial_modules)
+        await register_modules(new_modules=initial_modules)
         MODULE_LOG.info(f'\n\nINIT MODULES: {initial_modules}\n\n')
         while not self._module_watcher.closed:
             event = await self._module_watcher.get_event()
@@ -132,32 +129,22 @@ class Controller:
             if 'ot_module' in event.name:
                 maybe_module_at_port = modules.get_module_at_port(event.name)
                 if maybe_module_at_port is not None and aionotify.Flags.DELETE in flags:
-                    await update_attached_modules(
+                    await register_modules(
                         removed_modules=[maybe_module_at_port])
                     MODULE_LOG.info(f'Module Removed: {maybe_module_at_port}')
                 if maybe_module_at_port is not None and aionotify.Flags.CREATE in flags:
-                    await update_attached_modules(new_modules=[maybe_module_at_port])
+                    await register_modules(new_modules=[maybe_module_at_port])
                     MODULE_LOG.info(f'Module Added: {maybe_module_at_port}')
 
     async def build_module(self,
                            port: str,
                            model: str,
                            interrupt_callback) -> modules.AbstractModule:
-        MODULE_LOG.info(f'\n\nBUILD Module {port}{model}')
         return await modules.build(
             port=port,
             which=model,
             simulating=False,
             interrupt_callback=interrupt_callback)
-
-    async def update_module(
-            self,
-            module: modules.AbstractModule,
-            firmware_file: str,
-            loop: Optional[asyncio.AbstractEventLoop])\
-            -> modules.AbstractModule:
-        return await modules.update_firmware(
-            module, firmware_file, loop)
 
     async def connect(self, port: str = None):
         self._smoothie_driver.connect(port)

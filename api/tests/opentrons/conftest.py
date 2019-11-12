@@ -5,7 +5,6 @@ try:
     import aionotify
 except OSError:
     aionotify = None
-    pass
 import sys
 import asyncio
 import contextlib
@@ -209,7 +208,7 @@ def _should_skip_api2(request):
         and request.param != using_api2
 
 
-@pytest.mark.skipif(not aionotify,
+@pytest.mark.skipif(aionotify is None,
                     reason="requires inotify (linux only)")
 @pytest.fixture(
     params=[
@@ -440,6 +439,8 @@ def hardware(request, loop, virtual_smoothie_env):
         yield hw
 
 
+@pytest.mark.skipif(aionotify is None,
+                    reason="requires inotify (linux only)")
 @pytest.fixture(
     params=[
         pytest.param(using_api1, marks=pytest.mark.apiv1),

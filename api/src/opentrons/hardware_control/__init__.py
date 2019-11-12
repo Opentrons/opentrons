@@ -98,7 +98,7 @@ class API(HardwareAPILike):
             top_types.Mount.LEFT: None,
             top_types.Mount.RIGHT: None
         }
-        self._attached_modules: List[Any] = []
+        self._attached_modules: List[modules.AbstractModule] = []
         self._last_moved_mount: Optional[top_types.Mount] = None
         # The motion lock synchronizes calls to long-running physical tasks
         # involved in motion. This fixes issue where for instance a move()
@@ -127,12 +127,12 @@ class API(HardwareAPILike):
         checked_loop = loop or asyncio.get_event_loop()
         backend = Controller(config)
         await backend.connect(port)
-        instance = cls(backend, config=config, loop=checked_loop)
+        api_instance = cls(backend, config=config, loop=checked_loop)
         checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
-                update_attached_modules=instance._update_attached_modules,
+                register_modules=api_instance.register_modules,
                 ))
-        return instance
+        return api_instance
 
     @classmethod
     def build_hardware_simulator(
@@ -153,11 +153,16 @@ class API(HardwareAPILike):
 
         if None is attached_modules:
             attached_modules = []
-        return cls(Simulator(attached_instruments,
-                             attached_modules,
-                             config, loop,
-                             strict_attached_instruments),
-                   config=config, loop=loop)
+        checked_loop = loop or asyncio.get_event_loop()
+        backend = Simulator(attached_instruments,
+                            attached_modules,
+                            config, checked_loop,
+                            strict_attached_instruments)
+        api_instance = cls(backend, config=config, loop=checked_loop)
+        checked_loop.create_task(backend.watch_modules(
+            register_modules=api_instance.register_modules))
+        return api_instance
+
 
     def __repr__(self):
         return '<{} using backend {}>'.format(type(self),
@@ -1350,9 +1355,7 @@ class API(HardwareAPILike):
                 'blow_out_flow_rate',
                 self._plunger_flowrate(this_pipette, blow_out, 'dispense'))
 
-    async def _update_attached_modules(self,
-                                       new_modules = [],
-                                       removed_modules = []):
+    async def register_modules(self, new_modules = [], removed_modules = []):
         for port, name in removed_modules:
             self._attached_modules = [mod for mod in self._attached_modules
                                       if mod.port != port]
@@ -1370,24 +1373,6 @@ class API(HardwareAPILike):
     # TODO: remove this function once APIv1 is sunset
     async def discover_modules(self):
         pass
-
-    @_log_call
-    async def update_module(
-            self, module: modules.AbstractModule,
-            firmware_file: str,
-            loop: asyncio.AbstractEventLoop = None) -> Tuple[bool, str]:
-        """ Update a module's firmware.
-
-        Returns (ok, message) where ok is True if the update succeeded and
-        message is a human readable message.
-        """
-        try:
-            new_mod = await self._backend.update_module(
-                mod, firmware_file, loop)
-        except modules.UpdateError as e:
-            return False, e.msg
-        else:
-            return True, 'firmware update successful'
 
     async def _do_tp(self, pip, mount) -> top_types.Point:
         """ Execute the work of tip probe.
