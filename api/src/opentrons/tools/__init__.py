@@ -18,7 +18,7 @@ def connect_to_port(hardware):
 
 driver = opentrons.drivers.smoothie_drivers.SimulatingDriver()
 
-if opentrons.config.IS_ROBOT:
+try:
     if opentrons.config.feature_flags.use_protocol_api_v2():
         api = opentrons.hardware_control.API
         adapter = opentrons.hardware_control.adapters
@@ -29,3 +29,5 @@ if opentrons.config.IS_ROBOT:
         hardware = opentrons.robot
         connect_to_port(hardware)
         driver = hardware._driver
+except AttributeError:
+    hardware = None

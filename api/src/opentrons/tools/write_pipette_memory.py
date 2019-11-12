@@ -111,7 +111,7 @@ def _parse_model_from_barcode(barcode):
     raise Exception(BAD_BARCODE_MESSAGE.format(barcode))
 
 
-def main():
+def _do_wpm():
     try:
         barcode = _user_submitted_barcode(32)
         model = _parse_model_from_barcode(barcode)
@@ -122,6 +122,11 @@ def main():
         exit()
     except Exception as e:
         print('FAIL: {}'.format(e))
+
+
+def main():
+    while True:
+        _do_wpm()
 
 
 if __name__ == "__main__":
