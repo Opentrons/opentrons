@@ -398,14 +398,15 @@ export function makeInitialRobotState(args: {|
 }
 
 export const modulePipetteCollision = (args: {|
-  pipette: string,
-  labware: string,
+  pipette: ?string,
+  labware: ?string,
   invariantContext: InvariantContext,
   prevRobotState: RobotState,
 |}): boolean => {
   const { pipette, labware, invariantContext, prevRobotState } = args
-  const pipetteEntity = invariantContext.pipetteEntities[pipette]
-  const labwareSlot = prevRobotState.labware[labware].slot
+  const pipetteEntity: ?* = pipette && invariantContext.pipetteEntities[pipette]
+  const labwareSlot: ?* = labware && prevRobotState.labware[labware]?.slot
+  if (!pipette || !labware || !pipetteEntity || !labwareSlot) return false
 
   // NOTE: does not handle thermocycler-adjacent slots.
   // Only handles labware is NORTH of mag/temp in slot 1 or 3

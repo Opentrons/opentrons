@@ -8,7 +8,8 @@ export const links = {
   multiDispense: `${KNOWLEDGEBASE_ROOT_URL}/building-a-protocol/steps/paths`,
   protocolSteps: `${KNOWLEDGEBASE_ROOT_URL}/en/collections/1606688-building-a-protocol#steps`,
   customLabware: `https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions`,
-  recommendedLabware: '#', // TODO IMMEDIATELY!
+  recommendedLabware: '#', // TODO
+  pipetteGen1MultiModuleCollision: '#', // TODO
 }
 
 type Link = $Keys<typeof links>

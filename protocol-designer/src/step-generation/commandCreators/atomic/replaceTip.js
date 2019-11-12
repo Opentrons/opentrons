@@ -24,9 +24,7 @@ const replaceTip = (pipetteId: string): CommandCreator => (
     return {
       errors: [errorCreators.insufficientTips()],
     }
-  }
-  if (
-    nextTiprack &&
+  } else if (
     modulePipetteCollision({
       pipette: pipetteId,
       labware: nextTiprack.tiprackId,

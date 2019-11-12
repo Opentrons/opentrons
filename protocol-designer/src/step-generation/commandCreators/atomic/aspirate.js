@@ -27,6 +27,10 @@ const aspirate = (args: AspirateParams): CommandCreator => (
     errors.push(errorCreators.pipetteDoesNotExist({ actionName, pipette }))
   }
 
+  if (!labware || !prevRobotState.labware[labware]) {
+    errors.push(errorCreators.labwareDoesNotExist({ actionName, labware }))
+  }
+
   if (
     modulePipetteCollision({
       pipette,
@@ -69,10 +73,6 @@ const aspirate = (args: AspirateParams): CommandCreator => (
         })
       )
     }
-  }
-
-  if (!labware || !prevRobotState.labware[labware]) {
-    errors.push(errorCreators.labwareDoesNotExist({ actionName, labware }))
   }
 
   if (errors.length > 0) {

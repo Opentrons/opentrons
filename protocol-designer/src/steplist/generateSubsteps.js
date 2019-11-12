@@ -137,6 +137,11 @@ function transferLikeSubsteps(args: {|
       },
       // Merge each channel row together when predicate true
       (currentMultiRow, nextMultiRow) => {
+        console.log('predicate is true, we are doing the merge', {
+          substepRows,
+          currentMultiRow,
+          nextMultiRow,
+        })
         return range(pipetteSpec.channels).map(channelIndex => {
           const sourceChannelWell =
             currentMultiRow.source && currentMultiRow.source.wells[channelIndex]
@@ -166,8 +171,8 @@ function transferLikeSubsteps(args: {|
           }
         })
       },
-      currentMultiRow =>
-        range(pipetteSpec.channels).map(channelIndex => {
+      currentMultiRow => {
+        const result = range(pipetteSpec.channels).map(channelIndex => {
           const source = currentMultiRow.source && {
             well: currentMultiRow.source.wells[channelIndex],
             preIngreds:
@@ -193,7 +198,16 @@ function transferLikeSubsteps(args: {|
           const activeTips = currentMultiRow.activeTips
           return { activeTips, source, dest, volume: currentMultiRow.volume }
         })
+        console.log('mergeWhen alternative', { currentMultiRow, result })
+        return result
+      }
     )
+    console.log('making multichannel substeps', {
+      substepCommandCreators,
+      pipetteSpec,
+      substepRows,
+      mergedMultiRows,
+    })
     return {
       multichannel: true,
       commandCreatorFnName: stepArgs.commandCreatorFnName,

@@ -7,7 +7,10 @@ export default function mergeWhen<T>(
   merge: (current: T, next: T) => *,
   alternative: (current: T) => * = c => c
 ): Array<*> {
-  if (array.length <= 1) {
+  // if (array.length <= 1) {
+  //   return array
+  // }
+  if (array.length === 0) {
     return array
   }
 

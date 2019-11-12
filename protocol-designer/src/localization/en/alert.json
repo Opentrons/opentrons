@@ -28,6 +28,10 @@
       "NO_TIP_ON_PIPETTE": {
         "title": "No tip on pipette",
         "body": "The setting \"Get new tip\" cannot be \"Never\" the first time a pipette is used in a protocol"
+      },
+      "MODULE_PIPETTE_COLLISION_DANGER": {
+        "title": "Pipette cannot access labware",
+        "body": "Gen 1 8-Channel pipettes cannot access labware or tip racks in slot 4 or 6 because they are adjacent to modules. Read more "
       }
     },
     "warning": {

@@ -27,6 +27,7 @@ export default function SourceDestSubstep(props: SourceDestSubstepProps) {
   const { substeps, selectSubstep, hoveredSubstep } = props
   if (substeps.multichannel) {
     // multi-channel row item (collapsible)
+    console.log('multiRows', substeps.multiRows)
     return (
       <li>
         {substeps.multiRows.map((rowGroup, groupKey) => (

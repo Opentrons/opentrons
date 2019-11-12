@@ -77,10 +77,9 @@ export function pipetteVolumeExceeded(args: {|
 }
 
 export const modulePipetteCollisionDanger = (): CommandCreatorError => {
-  // TODO IMMEDIATELY rich text
+  // TODO IMMEDIATELY rich text and i18n vs non
   return {
     type: 'MODULE_PIPETTE_COLLISION_DANGER',
-    message:
-      'Gen 1 8-Channel pipettes cannot access labware or tip racks in slot 4 or 6 because they are adjacent to Gen 1 modules. Read more here',
+    message: 'TODO IMMEDIATELY',
   }
 }
