@@ -9,12 +9,12 @@ export function insufficientTips(): CommandCreatorError {
   }
 }
 
-export function noTipOnPipette(args: {
+export function noTipOnPipette(args: {|
   actionName: string,
   pipette: string,
   labware: string,
   well: string,
-}): CommandCreatorError {
+|}): CommandCreatorError {
   const { actionName, pipette, labware, well } = args
   return {
     message: `Attempted to ${actionName} with no tip on pipette: ${pipette} from ${labware}'s well ${well}`,
@@ -22,10 +22,10 @@ export function noTipOnPipette(args: {
   }
 }
 
-export function pipetteDoesNotExist(args: {
+export function pipetteDoesNotExist(args: {|
   actionName: string,
   pipette: string,
-}): CommandCreatorError {
+|}): CommandCreatorError {
   const { actionName, pipette } = args
   return {
     message: `Attempted to ${actionName} with pipette id "${pipette}", this pipette was not found under "pipettes"`,
@@ -33,10 +33,10 @@ export function pipetteDoesNotExist(args: {
   }
 }
 
-export function labwareDoesNotExist(args: {
+export function labwareDoesNotExist(args: {|
   actionName: string,
   labware: string,
-}): CommandCreatorError {
+|}): CommandCreatorError {
   const { actionName, labware } = args
   console.warn(
     `Attempted to ${actionName} with labware id "${labware}", this labware was not found under "labware"`
@@ -47,11 +47,11 @@ export function labwareDoesNotExist(args: {
   }
 }
 
-export function tipVolumeExceeded(args: {
+export function tipVolumeExceeded(args: {|
   actionName: string,
   volume: string | number,
   maxVolume: string | number,
-}): CommandCreatorError {
+|}): CommandCreatorError {
   const { actionName, volume, maxVolume } = args
   return {
     message: `Attempted to ${actionName} volume greater than tip max volume (${volume} > ${maxVolume})`,
@@ -59,12 +59,12 @@ export function tipVolumeExceeded(args: {
   }
 }
 
-export function pipetteVolumeExceeded(args: {
+export function pipetteVolumeExceeded(args: {|
   actionName: string,
   volume: string | number,
   maxVolume: string | number,
   disposalVolume?: string | number,
-}): CommandCreatorError {
+|}): CommandCreatorError {
   const { actionName, volume, maxVolume, disposalVolume } = args
   const message =
     disposalVolume != null
@@ -73,5 +73,14 @@ export function pipetteVolumeExceeded(args: {
   return {
     message,
     type: 'PIPETTE_VOLUME_EXCEEDED',
+  }
+}
+
+export const modulePipetteCollisionDanger = (): CommandCreatorError => {
+  // TODO IMMEDIATELY rich text
+  return {
+    type: 'MODULE_PIPETTE_COLLISION_DANGER',
+    message:
+      'Gen 1 8-Channel pipettes cannot access labware or tip racks in slot 4 or 6 because they are adjacent to Gen 1 modules. Read more here',
   }
 }

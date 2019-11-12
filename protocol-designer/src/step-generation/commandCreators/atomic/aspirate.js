@@ -2,6 +2,7 @@
 import getNextRobotStateAndWarnings from '../../getNextRobotStateAndWarnings'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
+import { modulePipetteCollision } from '../../utils'
 import type { AspirateParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type {
   InvariantContext,
@@ -26,12 +27,21 @@ const aspirate = (args: AspirateParams): CommandCreator => (
     errors.push(errorCreators.pipetteDoesNotExist({ actionName, pipette }))
   }
 
+  if (
+    modulePipetteCollision({
+      pipette,
+      labware,
+      invariantContext,
+      prevRobotState,
+    })
+  ) {
+    errors.push(errorCreators.modulePipetteCollisionDanger())
+  }
   if (!prevRobotState.tipState.pipettes[pipette]) {
     errors.push(
       errorCreators.noTipOnPipette({
         actionName,
         pipette,
-        volume,
         labware,
         well,
       })
