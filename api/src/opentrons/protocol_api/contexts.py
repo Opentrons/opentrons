@@ -1974,6 +1974,20 @@ class ModuleContext(CommandPublisher):
         return self.load_labware_object(lw)
 
     @requires_version(2, 0)
+    def load_labware_from_definition(
+            self, definition: Dict[str, Any]) -> Labware:
+        """
+        Specify the presence of a labware on the module, using an
+        inline definition.
+
+        :param definition: The labware definition.
+        :returns: The initialized and loaded labware object.
+        """
+        lw = load_from_definition(
+            definition, self._geometry.location)
+        return self.load_labware_object(lw)
+
+    @requires_version(2, 0)
     def load_labware_by_name(self, name: str) -> Labware:
         MODULE_LOG.warning(
             'load_labware_by_name is deprecated and will be removed in '

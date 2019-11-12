@@ -21,6 +21,10 @@ class SimulatingDriver:
         self._target_temp = celsius
         self._active = True
 
+    def legacy_set_temperature(self, celsius):
+        self._target_temp = celsius
+        self._active = True
+
     def deactivate(self):
         self._target_temp = 0
         self._active = False

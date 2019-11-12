@@ -3,9 +3,11 @@ import logging
 from ..labware import (
     Labware,
     get_all_labware_definitions,
+    get_labware_definition,
     save_definition,
     Well,
-    WellShape)
+    WellShape,
+    ModuleGeometry)
 from .util import log_call
 from typing import Dict, List, Any, Union, Optional, TYPE_CHECKING
 
@@ -694,22 +696,33 @@ class Containers:
                 f'Slot {slot} has child. Use "containers.load(\''
                 f'{container_name}\', \'{slot}\', share=True)"')
         elif container_name in MODULE_BLACKLIST:
-            raise NotImplementedError(
-                "Module load not yet implemented")
+            raise RuntimeError(
+                "load modules using modules.load()")
+        defn = self._get_labware_def_with_fallback(container_name)
+        if slot in self._ctx._deck_layout\
+           and isinstance(self._ctx._deck_layout[slot], ModuleGeometry):
+            geom = self._ctx._deck_layout[slot]
+            mod = [mod
+                   for mod in self._ctx.loaded_modules.values()
+                   if mod.geometry is geom][0]
+            lw_obj = mod.load_labware_from_definition(defn)
+        else:
+            lw_obj = self._ctx.load_labware_from_definition(
+                defn, slot)
+        return LegacyLabware(lw_obj)
+
+    def _get_labware_def_with_fallback(
+            self, container_name: str) -> Dict[str, Any]:
         try:
-            return LegacyLabware(self._ctx.load_labware(
-                container_name, slot, label))
+            return get_labware_definition(container_name)
         except FileNotFoundError:
             try:
                 container_name = LW_TRANSLATION[container_name]
-                return LegacyLabware(self._ctx.load_labware(
-                    container_name, slot, label))
+                return get_labware_definition(container_name)
             except KeyError:
-                return LegacyLabware(self._ctx.load_labware(
+                return get_labware_definition(
                     _convert_labware_name(container_name),
-                    slot,
-                    label,
-                    namespace='legacy_api'))
+                    namespace='legacy_api')
 
     @log_call(log)
     def create(
