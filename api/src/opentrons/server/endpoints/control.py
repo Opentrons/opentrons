@@ -128,7 +128,6 @@ async def get_attached_modules(request):
     }
     """
     hw = hw_from_req(request)
-    print(f'\n\nhw: {hw}\n\n')
     if ff.use_protocol_api_v2():
         hw_mods = hw.attached_modules
         module_data = [
