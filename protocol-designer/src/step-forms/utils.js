@@ -104,8 +104,16 @@ export const getSlotIsEmpty = (
   initialDeckSetup: InitialDeckSetup,
   slot: string
 ): boolean => {
-  if (slot === SPAN7_8_10_11_SLOT) {
-    return TC_SPAN_SLOTS.every(slot => getSlotIsEmpty(initialDeckSetup, slot))
+  if (
+    slot === SPAN7_8_10_11_SLOT &&
+    TC_SPAN_SLOTS.some(slot => !getSlotIsEmpty(initialDeckSetup, slot))
+  ) {
+    // special "spanning slot" is not empty if there's anything in the slots that it spans,
+    // even when there's no spanning labware/module (eg thermocycler) on the deck
+    return false
+  } else if (getSlotsBlockedBySpanning(initialDeckSetup).includes(slot)) {
+    // if a slot is being blocked by a spanning labware/module (eg thermocycler), it's not empty
+    return false
   }
 
   // NOTE: should work for both deck slots and module slots
