@@ -113,7 +113,6 @@ def test_load_func(labware, container_create):
         labware.load('tempdeck', slot=3)
 
     lw1 = labware.load('3x8-chip', slot=2)
-    print(lw1.wells()[0].properties)
     assert lw1.wells()[0].properties ==\
         {
         'depth': 0,
@@ -245,3 +244,21 @@ def test_labware_create(labware, container_create):
         version=1)
 
     assert migrated_json_def['wells'] == new_created_def['wells']
+    lw_obj = labware.load('3x8_chip_new', slot=2)
+    assert lw_obj.wells()[0].properties ==\
+        {'depth': 0, 'total-liquid-volume': 20, 'diameter': 5,
+         'width': None, 'length': None, 'height': 0, 'has_tip': False,
+         'shape': lw_obj.wells()[0].shape,
+         'parent': lw_obj.wells()[0].parent}
+
+
+@pytest.mark.api2_only
+def test_legacy_wells(minimal_labware):
+    well = minimal_labware.wells()[2]
+    well_def = minimalLabwareDef['wells']['A2']
+    assert well.top().point ==\
+        Point(well_def['x'], well_def['y'], well_def['depth'])
+    assert well.center().point ==\
+        Point(well_def['x'], well_def['y'], well_def['depth']/2)
+    assert well.bottom().point ==\
+        Point(well_def['x'], well_def['y'], 0)

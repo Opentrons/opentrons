@@ -1,7 +1,11 @@
 import logging
 
 from ..labware import (
-    Labware, get_all_labware_definitions, save_definition, Well as newWell)
+    Labware,
+    get_all_labware_definitions,
+    save_definition,
+    Well,
+    WellShape)
 from .util import log_call
 from typing import Dict, List, Any, Union, Optional, TYPE_CHECKING
 
@@ -10,13 +14,14 @@ import jsonschema  # type: ignore
 from opentrons.types import Location, Point
 from opentrons.data_storage import database as db_cmds
 from opentrons.config import CONFIG
-from opentrons.legacy_api.containers.placeable import Container, Well
+from opentrons.legacy_api.containers.placeable import (
+    Container, Well as oldWell)
 
 if TYPE_CHECKING:
     from ..contexts import ProtocolContext
 
 log = logging.getLogger(__name__)
-# Dict[str, Union[List[newWell], Dict[str, newWell]]]
+# Dict[str, Union[List[Well], Dict[str, Well]]]
 AccessorMethodDict = Dict[str, Any]
 
 MODULE_BLACKLIST = ['tempdeck', 'magdeck', 'temperature-plate']
@@ -65,7 +70,7 @@ def _convert_labware_name(labware_name: str) -> str:
 def _determine_well_names(labware: Container):
     # In the instance that the labware only contains one well, we must
     # not index labware.wells() as it is not contained inside a WellSeries
-    if isinstance(labware.wells(), Well):
+    if isinstance(labware.wells(), oldWell):
         wells = [labware.wells().get_name()]
         first_well = labware.wells()
         return wells, first_well
@@ -199,9 +204,68 @@ def perform_migration():
     return True, validation_failure
 
 
+class LegacyWell(Well):
+    """
+    Class that inherits from :py:class:`opentrons.protocol_api.labware.Well`.
+    In addition to all the properties found on a regular well,
+    :py:class:`.LegacyWell` allows the user to look at special properties
+    about the wells for a given labware.
+    """
+    def __init__(
+            self,
+            well_props: dict,
+            parent: Location,
+            display_name: str,
+            has_tip: bool,
+            labware_height: float = None,
+            well_name: str = None):
+        super().__init__(well_props, parent, display_name, has_tip)
+        self._well_name = well_name
+        self._parent_height = labware_height
+
+    @property
+    def properties(self) -> Dict:
+        return {
+            'depth': self.depth,
+            'total-liquid-volume': self.max_volume,
+            'diameter': self.diameter,
+            'width': self.width,
+            'length': self.length,
+            'height': self.height,
+            'has_tip': self.has_tip,
+            'shape': self.shape,
+            'parent': self.parent
+            }
+
+    @property
+    def get_name(self) -> Optional[str]:
+        return self._well_name
+
+    @property
+    def depth(self) -> float:
+        return self._depth
+
+    @property
+    def width(self) -> float:
+        return self._width
+
+    @property
+    def length(self) -> float:
+        return self._length
+
+    @property
+    def shape(self) -> Optional[WellShape]:
+        return self._shape
+
+    @property
+    def height(self) -> Optional[float]:
+        return self._parent_height
+
+
 class LegacyLabware():
     def __init__(self, labware: Labware) -> None:
         self.lw_obj = labware
+        self.set_calibration(Point(0, 0, 0))
         self._definition = self.lw_obj._definition
         self._wells_by_index = self.lw_obj.wells()
         self._wells_by_name = self.lw_obj.wells_by_name()
@@ -210,10 +274,10 @@ class LegacyLabware():
         self._rows = self.lw_obj.rows()
         self._rows_by_name = self.lw_obj.rows_by_name()
         self._properties = {
-            'length': self.lw_obj.dimensions['xDimension'],
-            'width': self.lw_obj.dimensions['yDimension'],
-            'height': self.lw_obj.dimensions['zDimension'],
-            'type': self.lw_obj.display_name,
+            'length': self.lw_obj._dimensions['xDimension'],
+            'width': self.lw_obj._dimensions['yDimension'],
+            'height': self.lw_obj._dimensions['zDimension'],
+            'type': self.lw_obj._display_name,
             'magdeck_engage_height': self.lw_obj.magdeck_engage_height
             }
 
@@ -242,7 +306,7 @@ class LegacyLabware():
         except KeyError:
             return AttributeError
 
-    def __getitem__(self, name) -> newWell:
+    def __getitem__(self, name) -> Well:
         # For the use-case of labware[0] or labware['A1']
         if isinstance(name, int) or isinstance(name, slice):
             return self._map_list_and_dict['wells']['list'][name]
@@ -318,7 +382,11 @@ class LegacyLabware():
         """
         Called by save calibration in order to update the offset on the object.
         """
-        self.lw_obj.set_calibration(delta)
+        offset = self.lw_obj._offset
+        self.lw_obj._calibrated_offset = Point(x=offset.x + delta.x,
+                                               y=offset.y + delta.y,
+                                               z=offset.z + delta.z)
+        self.lw_obj._wells = self._build_wells()
 
     @property
     def calibrated_offset(self) -> Point:
@@ -326,7 +394,7 @@ class LegacyLabware():
 
     def next_tip(self,
                  num_tips: int = 1,
-                 starting_tip: newWell = None) -> Optional[newWell]:
+                 starting_tip: Well = None) -> Optional[Well]:
         """
         Find the next valid well for pick-up.
 
@@ -340,7 +408,7 @@ class LegacyLabware():
         """
         return self.lw_obj.next_tip(num_tips, starting_tip)
 
-    def use_tips(self, start_well: newWell, num_channels: int = 1):
+    def use_tips(self, start_well: Well, num_channels: int = 1):
         """
         Removes tips from the tip tracker.
 
@@ -365,7 +433,7 @@ class LegacyLabware():
     def __repr__(self):
         return self.lw_obj._display_name
 
-    def previous_tip(self, num_tips: int = 1) -> Optional[newWell]:
+    def previous_tip(self, num_tips: int = 1) -> Optional[Well]:
         """
         Find the best well to drop a tip in.
 
@@ -379,7 +447,7 @@ class LegacyLabware():
         """
         return self.lw_obj.previous_tip(num_tips)
 
-    def return_tips(self, start_well: newWell, num_channels: int = 1):
+    def return_tips(self, start_well: Well, num_channels: int = 1):
         """
         Re-adds tips to the tip tracker
 
@@ -410,7 +478,7 @@ class LegacyLabware():
                 well.has_tip = True
 
     def _get_wells_by_xy(
-            self, method_name=None, **kwargs) -> Union[newWell, List[newWell]]:
+            self, method_name=None, **kwargs) -> Union[Well, List[Well]]:
         x = kwargs.get('x', None)
         y = kwargs.get('y', None)
         if method_name != 'wells':
@@ -468,7 +536,7 @@ class LegacyLabware():
     def _get_well_by_type(
             self,
             well: Union[int, str, slice],
-            method_name) -> Union[List[newWell], newWell]:
+            method_name) -> Union[List[Well], Well]:
         if isinstance(well, int):
             return self._map_list_and_dict[method_name]['list'][well]
         elif isinstance(well, str):
@@ -494,7 +562,7 @@ class LegacyLabware():
             return self.handle_args('wells', *args, **kwargs)
 
     def handle_args(self, method_name: str, *args, **kwargs)\
-            -> Union[List[newWell], newWell]:
+            -> Union[List[Well], Well]:
 
         if 'x' in kwargs or 'y' in kwargs:
             return self._get_wells_by_xy(method_name=method_name, **kwargs)
@@ -527,6 +595,22 @@ class LegacyLabware():
             return [self._get_well_by_type(n, 'rows') for n in args]
         else:
             return self.handle_args('rows', *args, **kwargs)
+
+    def _build_wells(self) -> List[Well]:
+        """
+        This function is used to create one instance of wells to be used by all
+        accessor functions. It is only called again if a new offset needs
+        to be applied.
+        """
+        return [
+            LegacyWell(
+                self.lw_obj._well_definition[well],
+                Location(self.lw_obj._calibrated_offset, self.lw_obj),
+                "{} of {}".format(well, self.lw_obj._display_name),
+                self.lw_obj.is_tiprack,
+                self.lw_obj._dimensions['zDimension'],
+                well_name=well)
+            for well in self.lw_obj._ordering]
 
 
 class WellSeries(LegacyLabware):
@@ -610,19 +694,18 @@ class Containers:
                 "Module load not yet implemented")
         try:
             return LegacyLabware(self._ctx.load_labware(
-                container_name, slot, label, legacy=True))
+                container_name, slot, label))
         except FileNotFoundError:
             try:
                 container_name = LW_TRANSLATION[container_name]
                 return LegacyLabware(self._ctx.load_labware(
-                    container_name, slot, label, legacy=True))
+                    container_name, slot, label))
             except KeyError:
                 return LegacyLabware(self._ctx.load_labware(
                     _convert_labware_name(container_name),
                     slot,
                     label,
-                    namespace='legacy_api',
-                    legacy=True))
+                    namespace='legacy_api'))
 
     @log_call(log)
     def create(

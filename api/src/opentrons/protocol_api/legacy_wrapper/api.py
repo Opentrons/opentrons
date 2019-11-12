@@ -7,7 +7,7 @@ import os
 import shutil
 import logging
 import importlib.util
-from typing import List, Any, TYPE_CHECKING
+from typing import List, TYPE_CHECKING
 
 from opentrons.config import pipette_config, CONFIG
 from opentrons.types import Mount
@@ -41,7 +41,7 @@ class AddInstrumentCtors(type):
                 self,
                 mount: str,
                 trash_container: LegacyLabware = None,
-                tip_racks: List[Any] = None,
+                tip_racks: List[LegacyLabware] = None,
                 aspirate_flow_rate: float = None,
                 dispense_flow_rate: float = None,
                 min_volume: float = None,

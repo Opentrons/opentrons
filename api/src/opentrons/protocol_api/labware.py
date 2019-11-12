@@ -68,9 +68,7 @@ class Well:
     def __init__(self, well_props: dict,
                  parent: Location,
                  display_name: str,
-                 has_tip: bool,
-                 labware_height: float = None,
-                 well_name: str = None) -> None:
+                 has_tip: bool) -> None:
         """
         Create a well, and track the Point corresponding to the top-center of
         the well (this Point is in absolute deck coordinates)
@@ -87,7 +85,6 @@ class Well:
                        front-left corner of a labware)
         """
         self._display_name = display_name
-        self._well_name = well_name
         self._position\
             = Point(well_props['x'],
                     well_props['y'],
@@ -112,45 +109,6 @@ class Well:
                     well_props['shape']))
         self.max_volume = well_props['totalLiquidVolume']
         self._depth = well_props['depth']
-        self._parent_height = labware_height
-
-    @property
-    def properties(self) -> Dict:
-        return {
-            'depth': self.depth,
-            'total-liquid-volume': self.max_volume,
-            'diameter': self.diameter,
-            'width': self.width,
-            'length': self.length,
-            'height': self.height,
-            'has_tip': self.has_tip,
-            'shape': self.shape,
-            'parent': self.parent
-            }
-
-    @property
-    def get_well_name(self) -> Optional[str]:
-        return self._well_name
-
-    @property
-    def depth(self) -> float:
-        return self._depth
-
-    @property
-    def width(self) -> float:
-        return self._width
-
-    @property
-    def length(self) -> float:
-        return self._length
-
-    @property
-    def shape(self) -> Optional[WellShape]:
-        return self._shape
-
-    @property
-    def height(self) -> Optional[float]:
-        return self._parent_height
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -336,14 +294,6 @@ class Labware:
         return self.wells_by_name()[key]
 
     @property
-    def display_name(self) -> str:
-        return self._display_name
-
-    @property
-    def dimensions(self) -> Dict:
-        return self._dimensions
-
-    @property
     def uri(self) -> str:
         """ A string fully identifying the labware.
 
@@ -395,9 +345,7 @@ class Labware:
                 self._well_definition[well],
                 Location(self._calibrated_offset, self),
                 "{} of {}".format(well, self._display_name),
-                self.is_tiprack,
-                self.dimensions['zDimension'],
-                well_name=well)
+                self.is_tiprack)
             for well in self._ordering]
 
     def _create_indexed_dictionary(self, group=0):

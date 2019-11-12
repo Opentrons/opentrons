@@ -273,7 +273,6 @@ class ProtocolContext(CommandPublisher):
             labware_def: LabwareDefinition,
             location: types.DeckLocation,
             label: str = None,
-            legacy: bool = False,
     ) -> Labware:
         """ Specify the presence of a piece of labware on the OT2 deck.
 
@@ -286,7 +285,7 @@ class ProtocolContext(CommandPublisher):
         :type location: int or str
         """
         parent = self.deck.position_for(location)
-        labware_obj = load_from_definition(labware_def, parent, label, legacy)
+        labware_obj = load_from_definition(labware_def, parent, label)
         self._deck_layout[location] = labware_obj
         return labware_obj
 
@@ -298,7 +297,6 @@ class ProtocolContext(CommandPublisher):
             label: str = None,
             namespace: str = None,
             version: int = None,
-            legacy: bool = False
     ) -> Labware:
         """ Load a labware onto the deck given its name.
 
@@ -327,7 +325,7 @@ class ProtocolContext(CommandPublisher):
             bundled_defs=self._bundled_labware,
             extra_defs=self._extra_labware)
         return self.load_labware_from_definition(
-            labware_def, location, label, legacy)
+            labware_def, location, label)
 
     @requires_version(2, 0)
     def load_labware_by_name(
@@ -1920,8 +1918,7 @@ class ModuleContext(CommandPublisher):
         self._ctx = ctx
 
     @requires_version(2, 0)
-    def load_labware_object(self, labware: Labware)\
-            -> Labware:
+    def load_labware_object(self, labware: Labware) -> Labware:
         """ Specify the presence of a piece of labware on the module.
 
         :param labware: The labware object. This object should be already
@@ -2070,8 +2067,7 @@ class MagneticModuleContext(ModuleContext):
         self._module.calibrate()
 
     @requires_version(2, 0)
-    def load_labware_object(self, labware: Labware)\
-            -> Labware:
+    def load_labware_object(self, labware: Labware) -> Labware:
         """
         Load labware onto a Magnetic Module, checking if it is compatible
         """
