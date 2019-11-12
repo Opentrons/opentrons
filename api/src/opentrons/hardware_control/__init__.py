@@ -1120,10 +1120,10 @@ class API(HardwareAPILike):
                           increment: float = None):
         """
         Pick up tip from current location.
-        
+
         This is achieved by attempting to move the instrument down by its 
         `pick_up_distance`, in a series of presses. This distance is larger
-        than the space available in the tip, so the stepper motor will 
+        than the space available in the tip, so the stepper motor will
         eventually skip steps, which is resolved by homing afterwards.
 
         If ``presses`` or ``increment`` is not specified (or is ``None``),
