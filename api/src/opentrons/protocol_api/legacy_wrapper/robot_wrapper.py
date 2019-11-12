@@ -54,7 +54,7 @@ class Robot():
         """ Internal. Register intrument with this wrapper """
         self._instrs[mount] = instr
         if self._head_speed_override:
-            instr._ctx.default_speed = self._head_speed_override
+            instr._instr_ctx.default_speed = self._head_speed_override
         plunger_max = self._plunger_max_speed_overrides.get(mount)
         if plunger_max is not None:
             instr._set_plunger_max_speed_override(plunger_max)
@@ -158,7 +158,7 @@ class Robot():
         if combined_speed:
             self._head_speed_override = combined_speed
             for instr in self._instrs.values():
-                instr._ctx.default_speed = combined_speed
+                instr._instr_ctx.default_speed = combined_speed
 
         maxes = {'x': x, 'y': y, 'z': z, 'a': a}
         for ax, m in maxes.items():

@@ -1,10 +1,11 @@
 # pylama:ignore=E731
 from numbers import Number
 import logging
-from typing import Optional, TYPE_CHECKING, Union
+from typing import List, Optional, Sequence, TYPE_CHECKING, Union
 
 from opentrons import commands as cmds, hardware_control as hc
-from ..labware import Well, Location
+from ..labware import Well
+from opentrons.types import Location, Point
 
 from .util import log_call
 from ..util import Clearances
@@ -13,6 +14,12 @@ if TYPE_CHECKING:
     from ..contexts import InstrumentContext
 
 log = logging.getLogger(__name__)
+
+AdvancedLiquidHandling = Union[
+    Well,
+    Location,
+    List[Union[Well, Location]],
+    List[List[Well]]]
 
 
 class Pipette():
@@ -42,11 +49,10 @@ class Pipette():
             self,
             instrument_context: 'InstrumentContext'):
         self._instr_ctx = instrument_context
-        self._ctx = instrument_context._ctx
+        self._ctx = self._instr_ctx._ctx
         self._mount = self._instr_ctx._mount
-        self._hw_manager = instrument_context._hw_manager
-        self._hw = self._hw_manager.hardware
-        self._config = self._hw._attached_instruments[self._mount].config
+        self._hw = self._instr_ctx._hw_manager.hardware
+        self._hw_pipette = self._hw._attached_instruments[self._mount]
 
         self._log = self._instr_ctx._log
         self._default_speed = self._instr_ctx.default_speed
@@ -61,17 +67,23 @@ class Pipette():
         self._instr_ctx._well_bottom_clearance = Clearances(
             default_aspirate=1.0, default_dispense=0.5)
 
-    @property
-    def _working_volume(self):
-        return self._hw.attached_instruments[self._mount]['working_volume']
+        self._placeables = []
 
     @property
-    def _hw_pipette(self):
+    def _config(self):
+        return self._hw_pipette.config
+
+    @property
+    def _pipette_status(self):
         return self._hw.attached_instruments[self._mount]
 
     @property
+    def _working_volume(self):
+        return self._pipette_status['working_volume']
+
+    @property
     def current_volume(self):
-        return self._hw_pipette['current_volume']
+        return self._pipette_status['current_volume']
 
     @property
     def has_tip(self):
@@ -79,7 +91,7 @@ class Pipette():
         Returns whether a pipette has a tip attached. Added in for backwards
         compatibility purposes in deck calibration CLI tool.
         """
-        return self._hw_pipette['has_tip']
+        return self._pipette_status['has_tip']
 
     @property
     def mount(self):
@@ -87,15 +99,19 @@ class Pipette():
 
     @property
     def max_volume(self):
-        return self._hw_pipette['max_volume']
+        return self._pipette_status['max_volume']
 
     @property
     def min_volume(self):
-        return self._hw_pipette['min_volume']
+        return self._pipette_status['min_volume']
 
     @property
     def previous_placeable(self):
-        return self._ctx.location_cache
+        return self._ctx.location_cache.labware
+
+    @property
+    def placeables(self):
+        return self._placeables
 
     @property
     def speeds(self):
@@ -134,6 +150,7 @@ class Pipette():
 
         self._ctx.location_cache = None
         self.reset_tip_tracking()
+        self._placeables = []
 
     @log_call(log)
     def has_tip_rack(self):
@@ -213,21 +230,25 @@ class Pipette():
 
         This instance of :class:`Pipette`.
         """
-        if not location:
-            return self._instr_ctx
+
+        placeable = location\
+            if isinstance(location, Well) else location.labware
+
+        force_direct = False
+        if strategy == 'direct' or (
+                not strategy and self.previous_placeable == placeable):
+            force_direct = True
+
+        if not self.placeables or (placeable != self.placeables[-1]):
+            self.placeables.append(placeable)
 
         if isinstance(location, Well):
             location = location.top()
 
-        force_direct = False
-        if self._ctx.location_cache == location.labware or \
-                strategy == 'direct':
-            force_direct = True
-
         return self._instr_ctx.move_to(location=location,
                                        force_direct=force_direct)
 
-    @log_call(log)
+    # @log_call(log)
     def aspirate(self,
                  volume: float = None,
                  location: Union[Location, Well] = None,
@@ -300,24 +321,37 @@ class Pipette():
             location = self.previous_placeable
 
         if volume != 0:
+            print('doing something')
             self._position_for_aspirate(location)
 
             cmds.do_publish(
                 self._instr_ctx.broker, cmds.aspirate, self.aspirate,
-                'before', None, None, self, volume, location, rate)
+                'before', None, None, self._instr_ctx, volume, location, rate)
             self._hw.aspirate(self._mount, volume, rate)
             cmds.do_publish(
                 self._instr_ctx.broker, cmds.aspirate, self.aspirate,
-                'after', self, None, self, volume, location, rate)
+                'after', self, None,  self._instr_ctx, volume, location, rate)
         return self._instr_ctx
 
-    def _position_for_aspirate(self, location: Union[Location, Well] = None):
-        if location != self.previous_placeable:
-            self._instr_ctx.move_to(location.top())  # go to top of source
+    def _position_for_aspirate(self, location: Union[Location, Well]):
+        placeable = location if isinstance(location, Well)\
+            else location.labware
+        # go to top of source if not already there
+        if placeable != self.previous_placeable:
+            print('Move to well top bc not already there')
+            self.move_to(placeable.top())
 
         if self.current_volume == 0:
             self._hw.prepare_for_aspirate(self._mount)
-            self._instr_ctx.move_to(location)
+            print('Now actually move to location for aspirate')
+        if location:
+            if isinstance(location, Well):
+                point, well = location.bottom()
+                location = Location(
+                    point + Point(
+                        0, 0, self._instr_ctx.well_bottom_clearance.aspirate),
+                    well)
+            self.move_to(location)
 
     @log_call(log)
     def dispense(self,
@@ -442,7 +476,7 @@ class Pipette():
         # mix 3x with the pipette's max volume, from current position
         >>> p300.mix(3) # doctest: +SKIP
         """
-        if not self._hw_pipette['has_tip']:
+        if not self.has_tip:
             raise hc.NoTipAttachedError('Pipette has no tip. Aborting mix()')
 
         if not isinstance(volume, Number):
@@ -454,12 +488,12 @@ class Pipette():
         if not location and self.previous_placeable:
             location = self.previous_placeable
 
-        self._instr_ctx.aspirate(volume, location, rate)
+        self.aspirate(volume, location, rate)
         while repetitions - 1 > 0:
-            self._instr_ctx.dispense(volume, rate=rate)
-            self._instr_ctx.aspirate(volume, rate=rate)
+            self.dispense(volume, rate=rate)
+            self.aspirate(volume, rate=rate)
             repetitions -= 1
-        self._instr_ctx.dispense(volume, rate=rate)
+        self.dispense(volume, rate=rate)
 
         return self._instr_ctx
 
@@ -747,7 +781,11 @@ class Pipette():
 
     @log_call(log)
     @cmds.publish.both(command=cmds.distribute)
-    def distribute(self, volume, source, dest, *args, **kwargs):
+    def distribute(self,
+                   volume: float,
+                   source: Well,
+                   dest: List[Well],
+                   *args, **kwargs) -> 'InstrumentContext':
         """
         Distribute will move a volume of liquid from a single of source
         to a list of target locations. See :any:`Transfer` for details
@@ -767,11 +805,16 @@ class Pipette():
         >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
         >>> p300.distribute(50, plate[1], plate.cols[0]) # doctest: +SKIP
         """
-        return self.transfer(*args, **kwargs)
+        return self._instr_ctx.distribute(
+            volume=volume, source=source, dest=dest, *args, **kwargs)
 
     @log_call(log)
     @cmds.publish.both(command=cmds.consolidate)
-    def consolidate(self, volume, source, dest, *args, **kwargs):
+    def consolidate(self,
+                    volume: float,
+                    source: List[Well],
+                    dest: Well,
+                    *args, **kwargs) -> 'InstrumentContext':
         """
         Consolidate will move a volume of liquid from a list of sources
         to a single target location. See :any:`Transfer` for details
@@ -791,11 +834,16 @@ class Pipette():
         >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
         >>> p300.consolidate(50, plate.cols[0], plate[1]) # doctest: +SKIP
         """
-        return self.transfer(*args, **kwargs)
+        return self._instr_ctx.consolidate(
+            volume=volume, source=source, dest=dest, *args, **kwargs)
 
     @log_call(log)
     @cmds.publish.both(command=cmds.transfer)
-    def transfer(self, volume, source, dest, **kwargs):
+    def transfer(self,
+                 volume: Union[float, Sequence[float]],
+                 source: AdvancedLiquidHandling,
+                 dest: AdvancedLiquidHandling,
+                 **kwargs):
         """
         Transfer will move a volume of liquid from a source location(s)
         to a dest location(s). It is a higher-level command, incorporating
@@ -889,7 +937,8 @@ class Pipette():
         # Note: currently it varies whether the pipette should have a tip on
         # or not depending on the parameters for this call, so we cannot
         # create a very reliable assertion on tip status
-        return self
+        return self._instr_ctx.transfer(
+            volume=volume, source=source, dest=dest, **kwargs)
 
     @log_call(log)
     @cmds.publish.both(command=cmds.delay)
@@ -955,26 +1004,18 @@ class Pipette():
         # TODO: When implementing this, cap it to self._max_plunger_speed
         ul = self.max_volume
         if aspirate:
-            ul_per_mm = self._piecewise_volume_conversion(ul, 'aspirate')
+            ul_per_mm = self._hw_pipette.ul_per_mm(ul, 'aspirate')
             self.set_speed(aspirate=round(aspirate / ul_per_mm, 6))
         if dispense:
-            ul_per_mm = self._piecewise_volume_conversion(ul, 'dispense')
+            ul_per_mm = self._hw_pipette.ul_per_mm(ul, 'dispense')
             self.set_speed(dispense=round(dispense / ul_per_mm, 6))
         if blow_out:
-            ul_per_mm = self._piecewise_volume_conversion(ul, 'dispense')
+            ul_per_mm = self._hw_pipette.ul_per_mm(ul, 'dispense')
             self.set_speed(blow_out=round(blow_out / ul_per_mm, 6))
         return self._instr_ctx
 
-    def _piecewise_volume_conversion(
-            self,
-            ul: float,
-            function: str) -> float:
-        sequence = self._config.ul_per_mm[function]
-        i = list(filter(lambda x: ul <= x[0], sequence))[0]
-        return i[1]*ul + i[2]
-
     @log_call(log)
-    def set_pick_up_current(self, amperes):
+    def set_pick_up_current(self, amperes: float) -> 'InstrumentContext':
         """
         Set the current (amperes) the pipette mount's motor will use while
         picking up a tip.
@@ -984,7 +1025,12 @@ class Pipette():
         amperes: float (0.0 - 2.0)
             The amperage of the motor while creating a seal with tips.
         """
-        return self
+        if amperes >= 0 and amperes <= 2.0:
+            self._hw_pipette.update_config_item('pick_up_current', amperes)
+        else:
+            raise ValueError(
+                'Amperes must be a floating point between 0.0 and 2.0')
+        return self._instr_ctx
 
     def _set_plunger_max_speed_override(self, speed: float):
         self._max_plunger_speed = speed

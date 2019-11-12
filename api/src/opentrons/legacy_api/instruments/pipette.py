@@ -583,6 +583,7 @@ class Pipette(CommandPublisher):
             placeable, _ = unpack_location(location)
             # go to top of source, if not already there
             if placeable != self.previous_placeable:
+                print('Move to top of well bc not already there')
                 self.move_to(placeable.top())
         else:
             placeable = self.previous_placeable
@@ -594,6 +595,7 @@ class Pipette(CommandPublisher):
             if pos != self._get_plunger_position('bottom'):
                 # move to top of well to avoid touching liquid
                 if placeable:
+                    print('If plunger not at bottom, move to top to reset')
                     self.move_to(placeable.top())
                 self.instrument_actuator.set_active_current(
                     self._plunger_current)
@@ -606,6 +608,7 @@ class Pipette(CommandPublisher):
         if location:
             if isinstance(location, Placeable):
                 location = location.bottom(min(location.z_size(), clearance))
+            print('Now move to the location directly for aspirate')
             self.move_to(location, strategy='direct')
 
     def _position_for_dispense(self, location=None, clearance=0.5):
