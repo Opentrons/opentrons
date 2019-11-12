@@ -6,7 +6,7 @@ from opentrons.config import CONFIG
 from opentrons.data_storage import database as db_cmds
 from opentrons.protocol_api.legacy_wrapper.containers_wrapper import\
     LegacyLabware, perform_migration
-from opentrons.protocol_api.labware import get_labware_definition
+from opentrons.protocol_api.labware import get_labware_definition, Labware
 from opentrons.types import Point, Location
 
 
@@ -73,7 +73,7 @@ minimalLabwareDef = {
 @pytest.fixture
 def minimal_labware():
     deck = Location(Point(0, 0, 0), 'deck')
-    plate = LegacyLabware(minimalLabwareDef, deck)
+    plate = LegacyLabware(Labware(minimalLabwareDef, deck))
     return plate
 
 

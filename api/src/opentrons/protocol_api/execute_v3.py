@@ -1,9 +1,8 @@
 import logging
-from typing import Any, Dict, Union
+from typing import Any, Dict
 
 from .contexts import ProtocolContext, InstrumentContext
 from . import labware
-from .legacy_wrapper.containers_wrapper import LegacyLabware
 from opentrons.types import Point, Location
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -23,7 +22,7 @@ def load_pipettes_from_json(
     return pipettes_by_id
 
 
-def _get_well(loaded_labware: Dict[Any, Union[labware.Labware, LegacyLabware]],
+def _get_well(loaded_labware: Dict[Any, labware.Labware],
               params: Dict[str, Any]) -> labware.Well:
     labwareId = params['labware']
     well = params['well']
@@ -51,7 +50,7 @@ def _set_flow_rate(pipette, params) -> None:
 def load_labware_from_json_defs(
         ctx: ProtocolContext,
         protocol: Dict[Any, Any])\
-            -> Dict[Any, Union[labware.Labware, LegacyLabware]]:
+            -> Dict[Any, labware.Labware]:
     protocol_labware = protocol['labware']
     definitions = protocol['labwareDefinitions']
     loaded_labware = {}
@@ -66,7 +65,7 @@ def load_labware_from_json_defs(
     return loaded_labware
 
 
-def _get_location_with_offset(loaded_labware: Dict[Any, Union[labware.Labware, LegacyLabware]],  # noqa(E501)
+def _get_location_with_offset(loaded_labware: Dict[Any, labware.Labware],  # noqa(E501)
                               params: Dict[str, Any]) -> Location:
     well = _get_well(loaded_labware, params)
 
@@ -173,7 +172,7 @@ def _move_to_slot(
 def dispatch_json(context: ProtocolContext,
                   protocol_data: Dict[Any, Any],
                   instruments: Dict[str, InstrumentContext],
-                  loaded_labware: Dict[Any, Union[labware.Labware, LegacyLabware]]) -> None:  # noqa(E501)
+                  loaded_labware: Dict[Any, labware.Labware]) -> None:  # noqa(E501)
     commands = protocol_data['commands']
     dispatcher_map = {
         "delay": _delay,

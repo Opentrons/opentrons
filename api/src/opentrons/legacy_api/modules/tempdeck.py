@@ -26,7 +26,7 @@ class TempDeck(commands.CommandPublisher):
         self._device_info = None
         self._poll_stop_event = None
 
-    @commands.publish.both(command=commands.tempdeck_set_temp)  # type: ignore
+    @commands.publish.both(command=commands.tempdeck_set_temp)
     def set_temperature(self, celsius):
         """
         Set temperature in degree Celsius
@@ -38,7 +38,7 @@ class TempDeck(commands.CommandPublisher):
         if self._driver and self._driver.is_connected():
             self._driver.legacy_set_temperature(celsius)
 
-    @commands.publish.both(command=commands.tempdeck_deactivate)  # type: ignore # noqa(E501)
+    @commands.publish.both(command=commands.tempdeck_deactivate)
     def deactivate(self):
         """ Stop heating/cooling and turn off the fan """
         if self._driver and self._driver.is_connected():

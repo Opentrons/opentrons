@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 # Dict[str, Union[List[newWell], Dict[str, newWell]]]
-typeDict = Dict[str, Any]
+AccessorMethodDict = Dict[str, Any]
 
 MODULE_BLACKLIST = ['tempdeck', 'magdeck', 'temperature-plate']
 
@@ -199,114 +199,10 @@ def perform_migration():
     return True, validation_failure
 
 
-class Containers:
-    """ A backwards-compatibility shim for the `New Protocol API`_.
-
-    This class provides a replacement for the `opentrons.labware` and
-    `opentrons.containers` global instances. Like those global instances,
-    this class shims labware load functions for ease of use. This class should
-    not be instantiated by user code, and use of its methods should be
-    replaced with use of the corresponding functions of
-    :py:class:`.ProtocolContext`. For information on how to replace calls to
-    methods of this class, see the method documentation.
-    """
-
-    def __init__(self, ctx: 'ProtocolContext') -> None:
-        self._ctx = ctx
-
-    @log_call(log)
-    def load(self, container_name, slot, label=None, share=False):
-        """ Load a piece of labware by specifying its name and position.
-
-        This method calls :py:meth:`.ProtocolContext.load_labware`;
-        see that documentation for more information on arguments and return
-        values. Calls to this function should be replaced with calls to
-        :py:meth:`.Protocolcontext.load_labware`.
-
-        In addition, this function contains translations between old
-        labware names and new labware names.
-        """
-        if self._ctx._deck_layout[slot] and not share:
-            raise RuntimeWarning(
-                f'Slot {slot} has child. Use "containers.load(\''
-                f'{container_name}\', \'{slot}\', share=True)"')
-        elif container_name in MODULE_BLACKLIST:
-            raise NotImplementedError(
-                "Module load not yet implemented")
-        try:
-            return self._ctx.load_labware(
-                container_name, slot, label, legacy=True)
-        except FileNotFoundError:
-            try:
-                container_name = LW_TRANSLATION[container_name]
-                return self._ctx.load_labware(
-                    container_name, slot, label, legacy=True)
-            except KeyError:
-                return self._ctx.load_labware(
-                    _convert_labware_name(container_name),
-                    slot,
-                    label,
-                    namespace='legacy_api',
-                    legacy=True)
-
-    @log_call(log)
-    def create(self, name, grid, spacing, diameter, depth, volume=0):
-        columns, rows = grid
-        col_spacing, row_spacing = spacing
-
-        lw_dict, is_tiprack = _format_labware_definition(name)
-
-        lw_dict['namespace'] = 'custom_beta'
-        if is_tiprack:
-            lw_dict['parameters']['tipLength'] = depth
-            lw_dict['parameters']['tipOverlap'] = 0
-
-        lw_dict['groups'] = [{'wells': [], 'metadata': {}}]
-        lw_dict['ordering'] = []
-
-        for c in range(columns):
-            lw_dict['ordering'].append([])
-            for r in range(rows):
-                well_name = chr(r + ord('A')) + str(1 + c)
-                x_coord = c * col_spacing
-                y_coord = (rows - r - 1) * row_spacing
-                z_coord = depth
-
-                lw_dict['groups'][0]['wells'].append(well_name)
-                lw_dict['ordering'][-1].append(well_name)
-                lw_dict['wells'][well_name] = {
-                     "depth": depth,
-                     "shape": "circular",
-                     "diameter": diameter,
-                     "totalLiquidVolume": volume,
-                     "x": x_coord,
-                     "y": y_coord,
-                     "z": z_coord
-                     }
-
-        lw_dict['cornerOffsetFromSlot'] = {'x': 0, 'y': 0, 'z': 0}
-
-        lw_dict['dimensions'] = {
-            'xDimension': 127.76,
-            'yDimension': 85.48,
-            'zDimension': depth}
-
-        path_to_save_defs = CONFIG['labware_user_definitions_dir_v2']
-        save_definition(lw_dict, location=path_to_save_defs)
-
-        return LegacyLabware(lw_dict, Location(Point(0, 0, 0), 'deck'))
-
-    @log_call(log)
-    def list(self, *args, **kwargs):
-        return get_all_labware_definitions()
-
-
 class LegacyLabware():
-    def __init__(
-            self, definition: dict,
-            parent: Location, label: str = None) -> None:
-        self.lw_obj = Labware(definition, parent)
-        self._definition = definition
+    def __init__(self, labware: Labware) -> None:
+        self.lw_obj = labware
+        self._definition = self.lw_obj._definition
         self._wells_by_index = self.lw_obj.wells()
         self._wells_by_name = self.lw_obj.wells_by_name()
         self._columns = self.lw_obj.columns()
@@ -330,7 +226,7 @@ class LegacyLabware():
 
         # Lookup table for methods that either return a dict or lists
         # to describe rows/cols/wells
-        self._map_list_and_dict: typeDict = {  # typing: ignore
+        self._map_list_and_dict: AccessorMethodDict = {  # typing: ignore
             'wells': {
                 'list': self._wells_by_index, 'dict': self._wells_by_name},
             'columns': {
@@ -341,7 +237,10 @@ class LegacyLabware():
 
     def __getattr__(self, attr):
         # For the use-case of methods `well` or `cols`
-        return self._accessor_methods[attr]
+        try:
+            return self._accessor_methods[attr]
+        except KeyError:
+            return AttributeError
 
     def __getitem__(self, name) -> newWell:
         # For the use-case of labware[0] or labware['A1']
@@ -667,3 +566,118 @@ class WellSeries(LegacyLabware):
             return self.lw_object.method_rows(*args)
         else:
             raise TypeError(f'You cannot call {self.__name__}')
+
+
+class Containers:
+    """ A backwards-compatibility shim for the `New Protocol API`_.
+
+    This class provides a replacement for the `opentrons.labware` and
+    `opentrons.containers` global instances. Like those global instances,
+    this class shims labware load functions for ease of use. This class should
+    not be instantiated by user code, and use of its methods should be
+    replaced with use of the corresponding functions of
+    :py:class:`.ProtocolContext`. For information on how to replace calls to
+    methods of this class, see the method documentation.
+    """
+
+    def __init__(self, ctx: 'ProtocolContext') -> None:
+        self._ctx = ctx
+
+    @log_call(log)
+    def load(
+            self,
+            container_name: str,
+            slot: Union[int, str],
+            label: str = None,
+            share: bool = False) -> LegacyLabware:
+        """ Load a piece of labware by specifying its name and position.
+
+        This method calls :py:meth:`.ProtocolContext.load_labware`;
+        see that documentation for more information on arguments and return
+        values. Calls to this function should be replaced with calls to
+        :py:meth:`.Protocolcontext.load_labware`.
+
+        In addition, this function contains translations between old
+        labware names and new labware names.
+        """
+        if self._ctx._deck_layout[slot] and not share:
+            raise RuntimeWarning(
+                f'Slot {slot} has child. Use "containers.load(\''
+                f'{container_name}\', \'{slot}\', share=True)"')
+        elif container_name in MODULE_BLACKLIST:
+            raise NotImplementedError(
+                "Module load not yet implemented")
+        try:
+            return LegacyLabware(self._ctx.load_labware(
+                container_name, slot, label, legacy=True))
+        except FileNotFoundError:
+            try:
+                container_name = LW_TRANSLATION[container_name]
+                return LegacyLabware(self._ctx.load_labware(
+                    container_name, slot, label, legacy=True))
+            except KeyError:
+                return LegacyLabware(self._ctx.load_labware(
+                    _convert_labware_name(container_name),
+                    slot,
+                    label,
+                    namespace='legacy_api',
+                    legacy=True))
+
+    @log_call(log)
+    def create(
+            self,
+            name,
+            grid,
+            spacing,
+            diameter,
+            depth,
+            volume=0) -> LegacyLabware:
+        columns, rows = grid
+        col_spacing, row_spacing = spacing
+
+        lw_dict, is_tiprack = _format_labware_definition(name)
+
+        lw_dict['namespace'] = 'custom_beta'
+        if is_tiprack:
+            lw_dict['parameters']['tipLength'] = depth
+            lw_dict['parameters']['tipOverlap'] = 0
+
+        lw_dict['groups'] = [{'wells': [], 'metadata': {}}]
+        lw_dict['ordering'] = []
+
+        for c in range(columns):
+            lw_dict['ordering'].append([])
+            for r in range(rows):
+                well_name = chr(r + ord('A')) + str(1 + c)
+                x_coord = c * col_spacing
+                y_coord = (rows - r - 1) * row_spacing
+                z_coord = depth
+
+                lw_dict['groups'][0]['wells'].append(well_name)
+                lw_dict['ordering'][-1].append(well_name)
+                lw_dict['wells'][well_name] = {
+                     "depth": depth,
+                     "shape": "circular",
+                     "diameter": diameter,
+                     "totalLiquidVolume": volume,
+                     "x": x_coord,
+                     "y": y_coord,
+                     "z": z_coord
+                     }
+
+        lw_dict['cornerOffsetFromSlot'] = {'x': 0, 'y': 0, 'z': 0}
+
+        lw_dict['dimensions'] = {
+            'xDimension': 127.76,
+            'yDimension': 85.48,
+            'zDimension': depth}
+
+        path_to_save_defs = CONFIG['labware_user_definitions_dir_v2']
+        save_definition(lw_dict, location=path_to_save_defs)
+
+        return LegacyLabware(
+            Labware(lw_dict, Location(Point(0, 0, 0), 'deck')))
+
+    @log_call(log)
+    def list(self, *args, **kwargs):
+        return get_all_labware_definitions()
