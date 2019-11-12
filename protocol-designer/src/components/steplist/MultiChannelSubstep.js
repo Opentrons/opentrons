@@ -50,7 +50,6 @@ export default class MultiChannelSubstep extends React.PureComponent<
     const { collapsed } = this.state
 
     // NOTE: need verbose null check for flow to be happy
-    console.log('MultiChannelSubstep', this.props)
     const firstChannelSource = rowGroup[0].source
     const lastChannelSource = rowGroup[rowGroup.length - 1].source
     const sourceWellRange = `${
