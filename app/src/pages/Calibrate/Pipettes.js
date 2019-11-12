@@ -15,9 +15,9 @@ import SessionHeader from '../../components/SessionHeader'
 
 import type { ContextRouter } from 'react-router-dom'
 import type { State, Dispatch } from '../../types'
-import type { Pipette, TiprackByMountMap } from '../../robot'
-import type { PipettesState } from '../../robot-api'
-import type { Robot } from '../../discovery'
+import type { Pipette, TiprackByMountMap } from '../../robot/types'
+import type { PipettesState } from '../../robot-api/types'
+import type { Robot } from '../../discovery/types'
 
 type OP = ContextRouter
 

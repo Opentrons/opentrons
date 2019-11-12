@@ -6,7 +6,7 @@ import AttachedPipettesCard from './AttachedPipettesCard'
 import AttachedModulesCard from './AttachedModulesCard'
 import { CardContainer, CardRow } from '../layout'
 
-import type { Robot } from '../../discovery'
+import type { Robot } from '../../discovery/types'
 
 type Props = {| robot: Robot |}
 

@@ -8,7 +8,7 @@ import { fetchModules, getModulesState } from '../../robot-api'
 import ModulesCardContents from './ModulesCardContents'
 
 import type { State, Dispatch } from '../../types'
-import type { Robot } from '../../discovery'
+import type { Robot } from '../../discovery/types'
 
 type Props = {| robot: Robot |}
 

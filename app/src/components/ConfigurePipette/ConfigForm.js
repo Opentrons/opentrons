@@ -23,7 +23,7 @@ import type {
   PipetteSettingsField,
   PipetteSettingsFieldsMap,
   PipetteSettingsUpdate,
-} from '../../robot-api'
+} from '../../robot-api/types'
 import type { FormValues } from './ConfigFormGroup'
 
 export type DisplayFieldProps = {|

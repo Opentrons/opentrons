@@ -339,5 +339,5 @@ export const makeGetRobotLights = () => {
 }
 
 function selectRobotState(state: State, props: BaseRobot): RobotByNameState {
-  return state.api.robot[props.name] || {}
+  return state.superDeprecatedRobotApi.robot[props.name] || {}
 }

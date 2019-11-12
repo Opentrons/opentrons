@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { AlertItem } from '@opentrons/components'
 
-import { type Robot } from '../../discovery'
+import type { Robot } from '../../discovery/types'
 
 type State = { dismissed: boolean }
 

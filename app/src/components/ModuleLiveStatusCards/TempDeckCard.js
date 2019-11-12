@@ -3,11 +3,15 @@ import * as React from 'react'
 import { LabeledValue } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import type { TempDeckModule, ModuleCommandRequest } from '../../robot-api'
 import StatusCard from './StatusCard'
 import StatusItem from './StatusItem'
 import TemperatureControl from '../ModuleControls/TemperatureControl'
 import styles from './styles.css'
+
+import type {
+  TempDeckModule,
+  ModuleCommandRequest,
+} from '../../robot-api/types'
 
 type Props = {|
   module: TempDeckModule,

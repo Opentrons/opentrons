@@ -35,7 +35,7 @@ import ResetRobotModal from '../../components/RobotSettings/ResetRobotModal'
 
 import type { ContextRouter } from 'react-router-dom'
 import type { State, Dispatch, Error } from '../../types'
-import type { ViewableRobot } from '../../discovery'
+import type { ViewableRobot } from '../../discovery/types'
 import type { ShellUpdateState } from '../../shell'
 
 type OP = {|

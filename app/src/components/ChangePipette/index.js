@@ -24,8 +24,8 @@ import type {
   PipetteModelSpecs,
 } from '@opentrons/shared-data'
 import type { State, Dispatch } from '../../types'
-import type { Mount } from '../../robot'
-import type { Robot } from '../../discovery'
+import type { Mount } from '../../robot/types'
+import type { Robot } from '../../discovery/types'
 import type { Direction, ChangePipetteProps } from './types'
 import type { RobotHome, RobotMove } from '../../http-api-client'
 
@@ -148,7 +148,7 @@ function makeMapStateToProps(): (State, OP) => SP {
 
 function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   const { confirmUrl, parentUrl, robot, mount } = ownProps
-  const disengage = () => dispatch(disengagePipetteMotors(robot, mount))
+  const disengage = () => dispatch(disengagePipetteMotors(robot))
   const checkPipette = () =>
     disengage().then(() => dispatch(fetchPipettes(robot, true)))
 

@@ -11,7 +11,7 @@ import { resourcesReducer } from './resources'
 
 import type { Action } from '../types'
 import type {
-  RobotApiState,
+  DeprecatedRobotApiState,
   RobotInstanceNetworkingState,
   RobotApiActionLike,
 } from './types'
@@ -40,10 +40,10 @@ function networkingReducer(
   return state
 }
 
-function robotApiReducer(
-  state: RobotApiState = {},
+export function deprecatedRobotApiReducer(
+  state: DeprecatedRobotApiState = {},
   action: Action
-): RobotApiState {
+): DeprecatedRobotApiState {
   const apiAction = passRobotApiAction(action)
 
   if (apiAction) {
@@ -61,5 +61,3 @@ function robotApiReducer(
 
   return state
 }
-
-export { robotApiReducer }

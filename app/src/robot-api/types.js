@@ -1,6 +1,5 @@
 // @flow
 import type {
-  HealthState,
   ModulesState,
   PipettesState,
   SettingsState,
@@ -39,8 +38,7 @@ export type RobotApiResponse = {|
 
 // action types
 
-export type RobotApiAction =
-  | {| type: 'robotApi:FETCH_HEALTH', payload: RobotApiRequest |}
+export type DeprecatedRobotApiAction =
   | {| type: 'robotApi:FETCH_MODULES', payload: RobotApiRequest |}
   | {|
       type: 'robotApi:FETCH_MODULE_DATA',
@@ -60,7 +58,7 @@ export type RobotApiAction =
       meta: {| id: string |},
     |}
 
-export type RobotApiActionType = $PropertyType<RobotApiAction, 'type'>
+export type RobotApiActionType = $PropertyType<DeprecatedRobotApiAction, 'type'>
 
 // internal, request lifecycle types
 // only for use inside observables
@@ -93,7 +91,6 @@ export type RobotInstanceNetworkingState = {
 }
 
 export type RobotInstanceResourcesState = {|
-  health: HealthState,
   modules: ModulesState,
   pipettes: PipettesState,
   settings: SettingsState,
@@ -106,6 +103,6 @@ export type RobotInstanceApiState = {|
 
 // overall API state
 
-export type RobotApiState = {
+export type DeprecatedRobotApiState = {
   [robotName: string]: ?RobotInstanceApiState,
 }

@@ -8,7 +8,7 @@ import ConfigurePipette from '../../components/ConfigurePipette'
 import Page from '../../components/Page'
 
 import type { Match } from 'react-router-dom'
-import type { Robot } from '../../discovery'
+import type { Robot } from '../../discovery/types'
 
 type Props = {|
   robot: Robot,

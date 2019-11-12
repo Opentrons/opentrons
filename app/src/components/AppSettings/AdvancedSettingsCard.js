@@ -12,8 +12,6 @@ import {
   toggleDevTools,
   toggleDevInternalFlag,
   DEV_INTERNAL_FLAGS,
-  type Config,
-  type DevInternalFlag,
 } from '../../config'
 import { Card } from '@opentrons/components'
 import { LabeledToggle, LabeledSelect, LabeledButton } from '../controls'
@@ -22,7 +20,7 @@ import AddManualIp from './AddManualIp'
 import type { ContextRouter } from 'react-router-dom'
 import type { DropdownOption } from '@opentrons/components'
 import type { State, Dispatch } from '../../types'
-import type { UpdateChannel } from '../../config/types'
+import type { Config, DevInternalFlag, UpdateChannel } from '../../config/types'
 
 type OP = {|
   ...ContextRouter,

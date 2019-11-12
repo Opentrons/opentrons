@@ -13,9 +13,9 @@ import InstrumentItem from './InstrumentItem'
 import MissingItemWarning from './MissingItemWarning'
 
 import type { State, Dispatch } from '../../types'
-import type { SessionModule } from '../../robot'
-import type { Robot } from '../../discovery'
-import type { Module } from '../../robot-api'
+import type { SessionModule } from '../../robot/types'
+import type { Robot } from '../../discovery/types'
+import type { Module } from '../../robot-api/types'
 
 type OP = {| robot: Robot |}
 

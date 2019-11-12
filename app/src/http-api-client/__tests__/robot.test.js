@@ -10,7 +10,7 @@ import {
   setRobotLights,
   clearHomeResponse,
   clearMoveResponse,
-  reducer,
+  superDeprecatedRobotApiReducer as reducer,
   makeGetRobotMove,
   makeGetRobotHome,
   makeGetRobotLights,
@@ -30,7 +30,7 @@ describe('robot/*', () => {
 
   beforeEach(() => {
     robot = { name: NAME, ip: '1.2.3.4', port: '1234' }
-    state = { api: { robot: {} } }
+    state = { superDeprecatedRobotApi: { robot: {} } }
     store = mockStore(state)
   })
 
@@ -298,7 +298,7 @@ describe('robot/*', () => {
 
     describe(`reducer with ${path}`, () => {
       beforeEach(() => {
-        state = state.api
+        state = state.superDeprecatedRobotApi
       })
 
       test('handles api:REQUEST', () => {
@@ -380,7 +380,7 @@ describe('robot/*', () => {
     const PATHS = ['robot/move', 'robot/home']
 
     beforeEach(() => {
-      state = state.api
+      state = state.superDeprecatedRobotApi
     })
 
     PATHS.forEach(path =>
@@ -411,7 +411,7 @@ describe('robot/*', () => {
 
   describe('selectors', () => {
     beforeEach(() => {
-      state.api.robot[NAME] = {
+      state.superDeprecatedRobotApi.robot[NAME] = {
         'robot/home': { inProgress: true },
         'robot/move': { inProgress: true },
         'robot/lights': { inProgress: true },
@@ -421,14 +421,18 @@ describe('robot/*', () => {
     test('makeGetRobotMove', () => {
       const getMove = makeGetRobotMove()
 
-      expect(getMove(state, robot)).toEqual(state.api.robot[NAME]['robot/move'])
+      expect(getMove(state, robot)).toEqual(
+        state.superDeprecatedRobotApi.robot[NAME]['robot/move']
+      )
       expect(getMove(state, { name: 'foo' })).toEqual({ inProgress: false })
     })
 
     test('makeGetRobotHome', () => {
       const getHome = makeGetRobotHome()
 
-      expect(getHome(state, robot)).toEqual(state.api.robot[NAME]['robot/home'])
+      expect(getHome(state, robot)).toEqual(
+        state.superDeprecatedRobotApi.robot[NAME]['robot/home']
+      )
       expect(getHome(state, { name: 'foo' })).toEqual({ inProgress: false })
     })
 
@@ -436,7 +440,7 @@ describe('robot/*', () => {
       const getLights = makeGetRobotLights()
 
       expect(getLights(state, robot)).toEqual(
-        state.api.robot[NAME]['robot/lights']
+        state.superDeprecatedRobotApi.robot[NAME]['robot/lights']
       )
       expect(getLights(state, { name: 'foo' })).toEqual({ inProgress: false })
     })

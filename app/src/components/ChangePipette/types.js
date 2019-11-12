@@ -5,8 +5,8 @@ import type {
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
 
-import type { Mount } from '../../robot'
-import type { Robot } from '../../discovery'
+import type { Mount } from '../../robot/types'
+import type { Robot } from '../../discovery/types'
 import type { RobotMove, RobotHome } from '../../http-api-client'
 import type { PipetteSelectionProps } from './PipetteSelection'
 

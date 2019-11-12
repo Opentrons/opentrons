@@ -14,7 +14,7 @@ import SyncRobotMessage from './SyncRobotMessage'
 import styles from './styles.css'
 
 import type { BuildrootUpdateType } from '../../../shell'
-import type { ViewableRobot } from '../../../discovery'
+import type { ViewableRobot } from '../../../discovery/types'
 
 type Props = {|
   robot: ViewableRobot,

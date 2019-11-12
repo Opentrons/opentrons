@@ -8,7 +8,7 @@ import { getBuildrootUpdateAvailable } from '../../shell'
 import { RobotListItem } from './RobotListItem.js'
 
 import type { State, Dispatch } from '../../types'
-import type { ViewableRobot } from '../../discovery'
+import type { ViewableRobot } from '../../discovery/types'
 
 type OP = {| ...ContextRouter, robot: ViewableRobot |}
 

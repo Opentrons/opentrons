@@ -8,7 +8,7 @@ import { getConnectedRobot } from '../../discovery'
 import type { ConnectResponseAction } from '../../robot/actions'
 import type { ActionLike, State as AppState, Epic } from '../../types'
 import type {
-  RobotApiAction,
+  DeprecatedRobotApiAction as RobotApiAction,
   RobotHost,
   RobotApiRequestState,
   PipettesState as State,

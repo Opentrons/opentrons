@@ -19,7 +19,11 @@ import RobotItem from './RobotItem'
 import ScanStatus from './ScanStatus'
 import UnreachableRobotItem from './UnreachableRobotItem'
 
-import type { Robot, ReachableRobot, UnreachableRobot } from '../../discovery'
+import type {
+  Robot,
+  ReachableRobot,
+  UnreachableRobot,
+} from '../../discovery/types'
 
 type SP = {|
   robots: Array<Robot>,

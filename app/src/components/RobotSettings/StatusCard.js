@@ -14,7 +14,7 @@ import { CONNECTABLE } from '../../discovery'
 import { CardContentHalf } from '../layout'
 
 import type { State, Dispatch } from '../../types'
-import type { ViewableRobot } from '../../discovery'
+import type { ViewableRobot } from '../../discovery/types'
 
 type OP = {| robot: ViewableRobot |}
 

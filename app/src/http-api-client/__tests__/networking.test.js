@@ -19,7 +19,7 @@ describe('networking', () => {
         name: 'makeGetRobotNetworkingStatus',
         selector: networking.makeGetRobotNetworkingStatus,
         state: {
-          api: {
+          superDeprecatedRobotApi: {
             api: {
               someName: {
                 'networking/status': {
@@ -36,7 +36,7 @@ describe('networking', () => {
         name: 'makeGetRobotWifiList',
         selector: networking.makeGetRobotWifiList,
         state: {
-          api: {
+          superDeprecatedRobotApi: {
             api: {
               someName: {
                 'wifi/list': {
@@ -71,7 +71,7 @@ describe('networking', () => {
         name: 'makeGetRobotWifiConfigure',
         selector: networking.makeGetRobotWifiConfigure,
         state: {
-          api: {
+          superDeprecatedRobotApi: {
             api: {
               someName: {
                 'wifi/configure': { response: { ssid: 'some-ssid' } },

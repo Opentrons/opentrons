@@ -30,7 +30,7 @@ import SelectSsid from './SelectSsid'
 import WifiConnectModal from './WifiConnectModal'
 
 import type { State, Dispatch } from '../../../types'
-import type { ViewableRobot } from '../../../discovery'
+import type { ViewableRobot } from '../../../discovery/types'
 import type {
   WifiNetworkList,
   WifiSecurityType,

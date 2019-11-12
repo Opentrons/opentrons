@@ -19,8 +19,8 @@ import client from './client'
 
 import type { OutputSelector as Sel } from 'reselect'
 import type { State, ThunkPromiseAction } from '../types'
-import type { BaseRobot } from '../robot'
-import type { ViewableRobot } from '../discovery'
+import type { BaseRobot } from '../robot/types'
+import type { ViewableRobot } from '../discovery/types'
 import type { ApiCall } from './types'
 import type { ApiAction } from './actions'
 

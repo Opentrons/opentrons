@@ -1,4 +1,7 @@
 // @flow
+// DEPRECATED
+// do not add to this file
+// do not import from this file if you can avoid it
 import { of, concat } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
@@ -12,7 +15,7 @@ import type {
   RequestMeta,
   RobotApiRequest,
   RobotApiResponse,
-  RobotApiAction,
+  DeprecatedRobotApiAction as RobotApiAction,
   RobotApiActionLike,
   RobotApiRequestAction,
   RobotApiResponseAction,
@@ -107,7 +110,7 @@ export const createBaseRobotApiEpic = (
 export const getRobotApiState = (
   state: State,
   robotName: string
-): RobotInstanceApiState | null => state.robotApi[robotName] || null
+): RobotInstanceApiState | null => state.deprecatedRobotApi[robotName] || null
 
 export const getRobotApiRequestState = (
   state: State,

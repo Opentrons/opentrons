@@ -5,12 +5,16 @@ import cx from 'classnames'
 import { LabeledValue } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import type { ThermocyclerModule, ModuleCommandRequest } from '../../robot-api'
 import StatusCard from './StatusCard'
 import StatusItem from './StatusItem'
 import styles from './styles.css'
 import TemperatureControl from '../ModuleControls/TemperatureControl'
 import TemperatureData from '../ModuleControls/TemperatureData'
+
+import type {
+  ThermocyclerModule,
+  ModuleCommandRequest,
+} from '../../robot-api/types'
 
 const TimeRemaining = ({
   holdTime,

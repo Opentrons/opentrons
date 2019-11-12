@@ -16,7 +16,12 @@ import {
 import { fetchPipettes } from './pipettes'
 
 import type { State as AppState, Action, ActionLike, Epic } from '../../types'
-import type { RobotHost, RobotApiAction, RobotApiRequestState } from '../types'
+import type {
+  RobotHost,
+  DeprecatedRobotApiAction as RobotApiAction,
+  RobotApiRequestState,
+} from '../types'
+
 import type {
   SettingsState as State,
   PipetteSettings,

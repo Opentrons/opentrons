@@ -20,7 +20,7 @@ import { RefreshCard } from '@opentrons/components'
 import { LabeledToggle, LabeledButton } from '../controls'
 
 import type { State, Dispatch } from '../../types'
-import type { ViewableRobot } from '../../discovery'
+import type { ViewableRobot } from '../../discovery/types'
 
 type OP = {|
   robot: ViewableRobot,

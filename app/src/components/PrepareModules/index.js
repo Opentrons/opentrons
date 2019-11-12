@@ -4,11 +4,13 @@ import { useDispatch } from 'react-redux'
 import some from 'lodash/some'
 import { PrimaryButton, AlertModal, Icon } from '@opentrons/components'
 
-import { sendModuleCommand, type Module, type RobotHost } from '../../robot-api'
-import type { Dispatch } from '../../types'
+import { sendModuleCommand } from '../../robot-api'
 import DeckMap from '../DeckMap'
 import styles from './styles.css'
 import { Portal } from '../portal'
+
+import type { Dispatch } from '../../types'
+import type { Module, RobotHost } from '../../robot-api/types'
 
 type Props = {| robot: RobotHost, modules: Array<Module> |}
 

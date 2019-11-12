@@ -5,8 +5,8 @@ import { getConfig, removeManualIp } from '../../../config'
 import { getViewableRobots } from '../../../discovery'
 
 import type { State, Dispatch } from '../../../types'
-import type { DiscoveryCandidates } from '../../../config'
-import type { Robot, ReachableRobot } from '../../../discovery'
+import type { DiscoveryCandidates } from '../../../config/types'
+import type { Robot, ReachableRobot } from '../../../discovery/types'
 
 import IpItem from './IpItem'
 

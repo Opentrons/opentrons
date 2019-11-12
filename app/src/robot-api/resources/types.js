@@ -2,14 +2,6 @@
 // @flow
 // resource model types
 
-// health
-export type HealthState = {|
-  name: string,
-  api_version: string,
-  fw_version: string,
-  logs: ?Array<string>,
-|} | null
-
 // modules
 // TODO(mc, 2019-04-25): normalize?
 export type ModulesState = Array<Module>
