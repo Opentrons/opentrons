@@ -287,7 +287,7 @@ class ProtocolContext(CommandPublisher):
         """
         parent = self.deck.position_for(location)
         labware_obj = load_from_definition(labware_def, parent, label, legacy)
-        self._deck_layout[location] = labware_obj  # type: ignore
+        self._deck_layout[location] = labware_obj
         return labware_obj
 
     @requires_version(2, 0)
@@ -1931,7 +1931,7 @@ class ModuleContext(CommandPublisher):
                         :py:meth:`load_labware`.
         :returns: The properly-linked labware object
         """
-        mod_labware = self._geometry.add_labware(labware)  # type: ignore
+        mod_labware = self._geometry.add_labware(labware)
         self._ctx.deck.recalculate_high_z()
         return mod_labware
 

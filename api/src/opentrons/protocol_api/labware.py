@@ -739,10 +739,11 @@ class Labware:
         Re-adds tips to the tip tracker
 
         This method should be called when a tip is dropped in a tiprack. It
-        should be called with `num_channels=1` or `num_channels=8` for single-
-        and multi-channel respectively. If returning more than one channel,
-        this method will automatically determine which tips are returned based
-        on the start well, the number of channels, and the tiprack geometry.
+        should be called with ``num_channels=1`` or ``num_channels=8`` for
+        single- and multi-channel respectively. If returning more than one
+        channel, this method will automatically determine which tips are
+        returned based on the start well, the number of channels,
+        and the tiprack geometry.
 
         Note that unlike :py:meth:`use_tips`, calling this method in a way
         that would drop tips into wells with tips in them will raise an
