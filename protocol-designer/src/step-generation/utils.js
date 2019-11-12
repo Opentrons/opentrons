@@ -12,6 +12,7 @@ import {
   getWellsDepth,
   getWellNamePerMultiTip,
 } from '@opentrons/shared-data'
+import { GEN_ONE_MULTI_PIPETTES } from '../constants'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
@@ -394,4 +395,35 @@ export function makeInitialRobotState(args: {|
       ),
     },
   }
+}
+
+export const modulePipetteCollision = (args: {|
+  pipette: ?string,
+  labware: ?string,
+  invariantContext: InvariantContext,
+  prevRobotState: RobotState,
+|}): boolean => {
+  const { pipette, labware, invariantContext, prevRobotState } = args
+  const pipetteEntity: ?* = pipette && invariantContext.pipetteEntities[pipette]
+  const labwareSlot: ?* = labware && prevRobotState.labware[labware]?.slot
+  if (!pipette || !labware || !pipetteEntity || !labwareSlot) return false
+
+  // NOTE: does not handle thermocycler-adjacent slots.
+  // Only handles labware is NORTH of mag/temp in slot 1 or 3
+  // Does not care about GEN1/GEN2 module, just GEN1 multi-ch pipette
+  const labwareInDangerZone = Object.keys(invariantContext.moduleEntities).some(
+    moduleId => {
+      const moduleSlot: ?* = prevRobotState.modules[moduleId]?.slot
+      const moduleType: ?* = invariantContext.moduleEntities[moduleId]?.type
+      const hasNorthSouthProblem = ['tempdeck', 'magdeck'].includes(moduleType)
+      const labwareInNorthSlot =
+        (moduleSlot === '1' && labwareSlot === '4') ||
+        (moduleSlot === '3' && labwareSlot === '6')
+      return hasNorthSouthProblem && labwareInNorthSlot
+    }
+  )
+
+  return (
+    GEN_ONE_MULTI_PIPETTES.includes(pipetteEntity.name) && labwareInDangerZone
+  )
 }

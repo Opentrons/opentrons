@@ -1,13 +1,10 @@
 // @flow
 import cloneDeep from 'lodash/cloneDeep'
 import { getNextTiprack } from '../../robotStateSelectors'
-import {
-  insufficientTips,
-  labwareDoesNotExist,
-  pipetteDoesNotExist,
-} from '../../errorCreators'
-import type { CommandCreator, InvariantContext, RobotState } from '../../types'
+import * as errorCreators from '../../errorCreators'
 import dropTip from './dropTip'
+import { modulePipetteCollision } from '../../utils'
+import type { CommandCreator, InvariantContext, RobotState } from '../../types'
 
 const replaceTip = (pipetteId: string): CommandCreator => (
   invariantContext: InvariantContext,
@@ -25,8 +22,17 @@ const replaceTip = (pipetteId: string): CommandCreator => (
   if (!nextTiprack) {
     // no valid next tip / tiprack, bail out
     return {
-      errors: [insufficientTips()],
+      errors: [errorCreators.insufficientTips()],
     }
+  } else if (
+    modulePipetteCollision({
+      pipette: pipetteId,
+      labware: nextTiprack.tiprackId,
+      invariantContext,
+      prevRobotState,
+    })
+  ) {
+    return { errors: [errorCreators.modulePipetteCollisionDanger()] }
   }
 
   // drop tip if you have one
@@ -58,7 +64,10 @@ const replaceTip = (pipetteId: string): CommandCreator => (
   if (!pipetteSpec)
     return {
       errors: [
-        pipetteDoesNotExist({ actionName: 'replaceTip', pipette: pipetteId }),
+        errorCreators.pipetteDoesNotExist({
+          actionName: 'replaceTip',
+          pipette: pipetteId,
+        }),
       ],
     }
 
@@ -67,7 +76,7 @@ const replaceTip = (pipetteId: string): CommandCreator => (
   if (!labwareDef) {
     return {
       errors: [
-        labwareDoesNotExist({
+        errorCreators.labwareDoesNotExist({
           actionName: 'replaceTip',
           labware: nextTiprack.tiprackId,
         }),

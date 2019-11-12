@@ -194,6 +194,7 @@ function transferLikeSubsteps(args: {|
           return { activeTips, source, dest, volume: currentMultiRow.volume }
         })
     )
+
     return {
       multichannel: true,
       commandCreatorFnName: stepArgs.commandCreatorFnName,
