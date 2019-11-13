@@ -15,6 +15,7 @@ from opentrons.types import Mount
 from .containers_wrapper import Containers, perform_migration, LegacyLabware
 from .robot_wrapper import Robot
 from .instrument_wrapper import Pipette
+from . import modules_wrapper
 
 if TYPE_CHECKING:
     from ..contexts import ProtocolContext
@@ -138,8 +139,8 @@ class BCModules:
     def __init__(self, ctx: 'ProtocolContext') -> None:
         self._ctx = ctx
 
-    def load(self, *args, **wargs):
-        pass
+    def load(self, name: str, slot: str):
+        return modules_wrapper.load(self._ctx, name, slot)
 
 
 def build_globals(context: 'ProtocolContext'):

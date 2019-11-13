@@ -1,26 +1,38 @@
 import logging
+import time
+from typing import Optional
 
-from opentrons import commands
 from .util import log_call
+from .. import contexts
+from opentrons import commands
+
 
 log = logging.getLogger(__name__)
 
 
 @log_call(log)
-def load(name, slot):
-    return None
+def load(ctx: contexts.ProtocolContext,
+         name: str,
+         slot: str):
+    new_mod = ctx.load_module(name, slot)
+    if isinstance(new_mod, contexts.TemperatureModuleContext):
+        return TempDeckV1(new_mod)
+    elif isinstance(new_mod, contexts.MagneticModuleContext):
+        return MagDeckV1(new_mod)
+    else:
+        raise RuntimeError(f'Module {name} is not compatible with API V1')
 
 
-class TempDeck(commands.CommandPublisher):
+class TempDeckV1(commands.CommandPublisher):
     """
     Legacy wrapper for the temperature module
     """
-    def __init__(self, lw=None, port=None, broker=None):
-        super().__init__(broker)
+    def __init__(self, td: contexts.TemperatureModuleContext):
+        self._ctx = td
+        super().__init__(self._ctx.broker)
 
-    @log_call(log)
     @commands.publish.both(command=commands.tempdeck_set_temp)
-    def set_temperature(self, celsius):
+    def set_temperature(self, celsius: float):
         """
         Set temperature in degree Celsius
         Range: 4 to 95 degree Celsius (QA tested).
@@ -28,54 +40,49 @@ class TempDeck(commands.CommandPublisher):
         temperature display. Any input outside of this range will be clipped
         to the nearest limit
         """
-        return None
+        # need to reach all the way down to the driver to make this return
+        # immediately
+        return self._ctx._module._driver.legacy_set_temperature(celsius)
 
-    @log_call(log)
-    @commands.publish.both(command=commands.tempdeck_deactivate)
     def deactivate(self):
         """ Stop heating/cooling and turn off the fan """
-        return None
+        return self._ctx.deactivate()
 
-    @log_call(log)
     def wait_for_temp(self):
         """
-        This method exits only if set temperature has reached.Subject to change
+        This method exits only if set temperature has reached.
         """
-        return None
-
-    @classmethod
-    def name(cls):
-        return 'tempdeck'
-
-    @classmethod
-    def display_name(cls):
-        return 'Temperature Deck'
+        while self._ctx._module.status != 'holding at target':
+            time.sleep(0.1)
 
     @property
-    def temperature(self):
-        """ Current temperature in degree celsius """
-        log.info('TempDeck.temperature()')
-        return None
+    def status(self) -> str:
+        """
+        Returns a string: 'heating'/'cooling'/'holding at target'/'idle'.
+        """
+        return self._ctx._module.status
 
     @property
-    def target(self):
+    def temperature(self) -> float:
+        """ Current temperature in degrees celsius """
+        return self._ctx.temperature
+
+    @property
+    def target(self) -> Optional[float]:
         """
         Target temperature in degree celsius.
         Returns None if no target set
         """
-        log.info('TempDeck.target()')
-        return None
+        return self._ctx.target
 
 
-class MagDeck(commands.CommandPublisher):
+class MagDeckV1:
     '''
     Legacy wrapper for the magdeck module
     '''
-    def __init__(self, lw=None, port=None, broker=None):
-        super().__init__(broker)
+    def __init__(self, md: contexts.MagneticModuleContext):
+        self._ctx = md
 
-    @log_call(log)
-    @commands.publish.both(command=commands.magdeck_engage)
     def engage(self, **kwargs):
         '''
         Move the magnet to either:
@@ -86,12 +93,14 @@ class MagDeck(commands.CommandPublisher):
         or  a 'height' value specified as mm from magdeck home position
             [engage(height=20)]
         '''
-        return None
+        return self._ctx.engage(**kwargs)
 
-    @log_call(log)
-    @commands.publish.both(command=commands.magdeck_disengage)
     def disengage(self):
         '''
         Home the magnet
         '''
-        return None
+        return self._ctx.disengage()
+
+    @property
+    def status(self):
+        return self._ctx.status

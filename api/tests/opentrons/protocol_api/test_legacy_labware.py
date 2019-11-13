@@ -109,7 +109,7 @@ def test_load_func(labware, container_create):
         labware.load('96-flat', slot=1, label='plate 1')
         labware.load('96-flat', slot=1, label='plate 2')
 
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(RuntimeError):
         labware.load('tempdeck', slot=3)
 
     lw1 = labware.load('3x8-chip', slot=2)
@@ -262,3 +262,14 @@ def test_legacy_wells(minimal_labware):
         Point(well_def['x'], well_def['y'], well_def['depth']/2)
     assert well.bottom().point ==\
         Point(well_def['x'], well_def['y'], 0)
+
+
+@pytest.mark.api2_only
+def test_load_labware_on_module(labware, modules):
+    td = modules.load('tempdeck', 1)
+    plate = labware.load('96-flat', 1, share=True)
+    assert td._ctx.labware is plate.lw_obj
+
+    md = modules.load('magdeck', 2)
+    plate2 = labware.load('96-flat', 2, share=True)
+    assert md._ctx.labware is plate2.lw_obj
