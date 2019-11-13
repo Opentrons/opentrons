@@ -260,3 +260,11 @@ def requires_version(
         return decorated_obj
 
     return _set_version
+
+
+class ModifiedList(list):
+    def __contains__(self, item):
+        for name in self:
+            if name == item.replace("-", "_").lower():
+                return True
+        return False

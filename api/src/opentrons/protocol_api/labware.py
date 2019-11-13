@@ -11,6 +11,7 @@ import logging
 import json
 import re
 import time
+import os
 import pkgutil
 import shutil
 import sys
@@ -23,8 +24,8 @@ from typing import Any, AnyStr, List, Dict, Optional, Union, Tuple
 
 import jsonschema  # type: ignore
 
-from opentrons.types import Location
-from opentrons.types import Point
+from .util import ModifiedList
+from opentrons.types import Location, Point
 from opentrons.config import CONFIG
 
 from .util import requires_version
@@ -127,6 +128,10 @@ class Well:
     @requires_version(2, 0)
     def diameter(self) -> Optional[float]:
         return self._diameter
+
+    @property
+    def display_name(self):
+        return self._display_name
 
     @requires_version(2, 0)
     def top(self, z: float = 0.0) -> Location:
@@ -683,10 +688,11 @@ class Labware:
         Re-adds tips to the tip tracker
 
         This method should be called when a tip is dropped in a tiprack. It
-        should be called with `num_channels=1` or `num_channels=8` for single-
-        and multi-channel respectively. If returning more than one channel,
-        this method will automatically determine which tips are returned based
-        on the start well, the number of channels, and the tiprack geometry.
+        should be called with ``num_channels=1`` or ``num_channels=8`` for
+        single- and multi-channel respectively. If returning more than one
+        channel, this method will automatically determine which tips are
+        returned based on the start well, the number of channels,
+        and the tiprack geometry.
 
         Note that unlike :py:meth:`use_tips`, calling this method in a way
         that would drop tips into wells with tips in them will raise an
@@ -1187,65 +1193,27 @@ def get_labware_definition(
         load_name, namespace, version)
 
 
-def load(
-    load_name: str,
-    parent: Location,
-    label: str = None,
-    namespace: str = None,
-    version: int = 1,
-    bundled_defs: Dict[str, LabwareDefinition] = None,
-    extra_defs: Dict[str, LabwareDefinition] = None
-) -> Labware:
+@requires_version(2, 0)
+def get_all_labware_definitions() -> List[str]:
     """
-    Return a labware object constructed from a labware definition dict looked
-    up by name (definition must have been previously stored locally on the
-    robot)
-
-    :param load_name: A string to use for looking up a labware definition
-        previously saved to disc. The definition file must have been saved in a
-        known location
-    :param parent: A :py:class:`.Location` representing the location where
-                   the front and left most point of the outside of labware is
-                   (often the front-left corner of a slot on the deck).
-    :param str label: An optional label that will override the labware's
-                      display name from its definition
-    :param str namespace: The namespace the labware definition belongs to.
-        If unspecified, will search 'opentrons' then 'custom_beta'
-    :param int version: The version of the labware definition. If unspecified,
-        will use version 1.
-    :param bundled_defs: If specified, a mapping of labware names to labware
-        definitions. Only the bundle will be searched for definitions.
-    :param extra_defs: If specified, a mapping of labware names to labware
-        definitions. If no bundle is passed, these definitions will also be
-        searched.
+    Return a list of standard and custom labware definitions with load_name +
+        name_space + version existing on the robot
     """
-    definition = get_labware_definition(
-        load_name, namespace, version,
-        bundled_defs=bundled_defs,
-        extra_defs=extra_defs)
-    return load_from_definition(definition, parent, label)
+    labware_list = ModifiedList()
 
+    def _check_for_subdirectories(path):
+        with os.scandir(path) as top_path:
+            for sub_dir in top_path:
+                labware_list.append(sub_dir.name) if sub_dir.is_dir() else None
 
-def load_from_definition(
-        definition: dict, parent: Location, label: str = None) -> Labware:
-    """
-    Return a labware object constructed from a provided labware definition dict
+    # check for standard labware
+    _check_for_subdirectories(STANDARD_DEFS_PATH)
 
-    :param definition: A dict representing all required data for a labware,
-        including metadata such as the display name of the labware, a
-        definition of the order to iterate over wells, the shape of wells
-        (shape, physical dimensions, etc), and so on. The correct shape of
-        this definition is governed by the "labware-designer" project in
-        the Opentrons/opentrons repo.
-    :param parent: A :py:class:`.Location` representing the location where
-                   the front and left most point of the outside of labware is
-                   (often the front-left corner of a slot on the deck).
-    :param str label: An optional label that will override the labware's
-                      display name from its definition
-    """
-    labware = Labware(definition, parent, label)
-    load_calibration(labware)
-    return labware
+    # check for custom labware
+    for namespace in os.scandir(CONFIG['labware_user_definitions_dir_v2']):
+        _check_for_subdirectories(namespace)
+
+    return labware_list
 
 
 def clear_calibrations():
@@ -1374,3 +1342,67 @@ def uri_from_definition(definition: LabwareDefinition, delimiter='/') -> str:
     return uri_from_details(definition['namespace'],
                             definition['parameters']['loadName'],
                             definition['version'])
+
+
+def load_from_definition(
+        definition: dict,
+        parent: Location,
+        label: str = None,
+        legacy: bool = False) -> Labware:
+    """
+    Return a labware object constructed from a provided labware definition dict
+
+    :param definition: A dict representing all required data for a labware,
+        including metadata such as the display name of the labware, a
+        definition of the order to iterate over wells, the shape of wells
+        (shape, physical dimensions, etc), and so on. The correct shape of
+        this definition is governed by the "labware-designer" project in
+        the Opentrons/opentrons repo.
+    :param parent: A :py:class:`.Location` representing the location where
+                   the front and left most point of the outside of labware is
+                   (often the front-left corner of a slot on the deck).
+    :param str label: An optional label that will override the labware's
+                      display name from its definition
+    """
+    labware = Labware(definition, parent, label)
+    load_calibration(labware)  # type: ignore
+    return labware
+
+
+def load(
+    load_name: str,
+    parent: Location,
+    label: str = None,
+    namespace: str = None,
+    version: int = 1,
+    bundled_defs: Dict[str, LabwareDefinition] = None,
+    extra_defs: Dict[str, LabwareDefinition] = None
+) -> Labware:  # type: ignore
+    """
+    Return a labware object constructed from a labware definition dict looked
+    up by name (definition must have been previously stored locally on the
+    robot)
+
+    :param load_name: A string to use for looking up a labware definition
+        previously saved to disc. The definition file must have been saved in a
+        known location
+    :param parent: A :py:class:`.Location` representing the location where
+                   the front and left most point of the outside of labware is
+                   (often the front-left corner of a slot on the deck).
+    :param str label: An optional label that will override the labware's
+                      display name from its definition
+    :param str namespace: The namespace the labware definition belongs to.
+        If unspecified, will search 'opentrons' then 'custom_beta'
+    :param int version: The version of the labware definition. If unspecified,
+        will use version 1.
+    :param bundled_defs: If specified, a mapping of labware names to labware
+        definitions. Only the bundle will be searched for definitions.
+    :param extra_defs: If specified, a mapping of labware names to labware
+        definitions. If no bundle is passed, these definitions will also be
+        searched.
+    """
+    definition = get_labware_definition(
+        load_name, namespace, version,
+        bundled_defs=bundled_defs,
+        extra_defs=extra_defs)
+    return load_from_definition(definition, parent, label)

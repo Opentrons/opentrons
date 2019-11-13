@@ -9,12 +9,11 @@ from opentrons.config import feature_flags as fflags
 from opentrons.hardware_control import adapters, modules
 from opentrons.hardware_control.simulator import Simulator
 from opentrons.hardware_control.types import CriticalPoint, Axis
-from .labware import (Well, Labware, load, get_labware_definition,
-                      load_from_definition, load_module,
+from .labware import (Well, Labware, get_labware_definition, load_module,
                       ModuleGeometry, quirks_from_any_parent,
                       ThermocyclerGeometry, OutOfTipsError,
                       select_tiprack_from_list, filter_tipracks_to_start,
-                      LabwareDefinition)
+                      LabwareDefinition, load_from_definition, load)
 from opentrons.protocols.types import APIVersion, Protocol
 from .util import (FlowRates, PlungerSpeeds, Clearances, AxisMaxSpeeds,
                    HardwareManager, clamp_value, requires_version)
@@ -273,7 +272,7 @@ class ProtocolContext(CommandPublisher):
             self,
             labware_def: LabwareDefinition,
             location: types.DeckLocation,
-            label: str = None
+            label: str = None,
     ) -> Labware:
         """ Specify the presence of a piece of labware on the OT2 deck.
 
@@ -297,7 +296,7 @@ class ProtocolContext(CommandPublisher):
             location: types.DeckLocation,
             label: str = None,
             namespace: str = None,
-            version: int = None
+            version: int = None,
     ) -> Labware:
         """ Load a labware onto the deck given its name.
 
@@ -325,7 +324,8 @@ class ProtocolContext(CommandPublisher):
             load_name, namespace, version,
             bundled_defs=self._bundled_labware,
             extra_defs=self._extra_labware)
-        return self.load_labware_from_definition(labware_def, location, label)
+        return self.load_labware_from_definition(
+            labware_def, location, label)
 
     @requires_version(2, 0)
     def load_labware_by_name(

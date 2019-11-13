@@ -10,7 +10,8 @@ if TYPE_CHECKING:
     from ..contexts import ProtocolContext
     from ..geometry import Deck
     from ..labware import Labware
-    from .api import BCInstruments, BCLabware, BCModules
+    from .api import BCInstruments, BCModules
+    from .containers_wrapper import Containers
     from opentrons import types
 
 
@@ -76,11 +77,11 @@ class Robot():
         self._plunger_max_speed_overrides: Dict[str, float] = {}
         self._instrs: Dict[str, 'Pipette'] = {}
         self._bc_instr: Optional['BCInstruments'] = None
-        self._bc_lw: Optional['BCLabware'] = None
+        self._bc_lw: Optional['Containers'] = None
         self._bc_mods: Optional['BCModules'] = None
 
     def _set_globals(
-            self, instr: 'BCInstruments', lw: 'BCLabware', mod: 'BCModules'):
+            self, instr: 'BCInstruments', lw: 'Containers', mod: 'BCModules'):
         self._bc_instr = instr
         self._bc_lw = lw
         self._bc_mods = mod
