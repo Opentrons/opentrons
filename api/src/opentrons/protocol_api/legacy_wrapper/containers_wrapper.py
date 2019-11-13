@@ -879,6 +879,35 @@ class Containers:
 
     def __init__(self, ctx: 'ProtocolContext') -> None:
         self._ctx = ctx
+        self._sharing = {}
+
+    def _determine_share_logic(self, labware_name, location, label):
+        slot_key_int = self._ctx._deck_layout._check_name(location)
+        item = self._ctx._deck_layout.get(slot_key_int)
+        if not item:
+            raise ValueError(f'There is no other labware in slot {location}',
+                             'please add a labware, then specify share=True')
+        parent = self.deck.position_for(location)
+        labware_definition = get_labware_definition(labware_name)
+        labware_object = load_from_definition(labware_definition, parent, label)
+        _size_of_slot(labware_object)
+        return labware_object
+
+    def _share_slot(self, labware_object):
+
+        return None
+
+    def _stack_labware(self, labware_object):
+
+
+        labware.highest_z = labware.highest_z + item.highest_z
+        del self._ctx._deck_layout[slot_key_int]
+        return LegacyLabware(
+            self._ctx.load_labware(container_name, slot, label, legacy=True))
+
+
+    def _size_of_slot():
+        return None
 
     @log_call(log)
     def load(
@@ -902,6 +931,7 @@ class Containers:
                 f'Slot {slot} has child. Use "containers.load(\''
                 f'{container_name}\', \'{slot}\', share=True)"')
         elif container_name in MODULE_BLACKLIST:
+<<<<<<< HEAD
             raise RuntimeError(
                 "load modules using modules.load()")
         defn = self._get_labware_def_with_fallback(container_name)
@@ -919,6 +949,14 @@ class Containers:
 
     def _get_labware_def_with_fallback(
             self, container_name: str) -> Dict[str, Any]:
+=======
+            raise NotImplementedError(
+                "Module load not yet implemented")
+        # if self._sharing[str(slot)] and not share:
+        #     raise ValueError(f'Cannot place')
+        if share:
+            return self._determine_share_logic(container_name, slot, label)
+>>>>>>> Add stacking support
         try:
             return get_labware_definition(container_name)
         except FileNotFoundError:

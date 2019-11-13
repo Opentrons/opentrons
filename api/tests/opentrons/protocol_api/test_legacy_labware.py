@@ -103,6 +103,18 @@ def container_create(monkeypatch, config_tempdir):
     shutil.rmtree(CONFIG['labware_user_definitions_dir_v2']/'legacy_api')
     CONFIG['labware_database_file'] = tempdb
 
+# @pytest.mark.api2_only
+# def test_stacking(loop):
+#     ctx = papi.ProtocolContext(loop=loop)
+#     with pytest.raises(ValueError):
+#         ctx.load_labware(labware_name, '1', stacking=True)
+#     older_labware = ctx.load_labware(labware_name, '1')
+#     stacked_labware = ctx.load_labware(labware_name, '1', stacking=True)
+#     assert stacked_labware.highest_z == older_labware.highest_z * 2
+#     del ctx._deck_layout['12']
+#     assert ctx._deck_layout.highest_z == stacked_labware.highest_z
+#     assert ctx._deck_layout['1'] == stacked_labware
+
 
 @pytest.mark.api2_only
 def test_load_func(labware, container_create):
