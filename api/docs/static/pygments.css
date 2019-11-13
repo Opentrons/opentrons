@@ -7,7 +7,12 @@ table {
     padding-top: 20px;
     padding-bottom: 20px;
     border-left: 10px solid #006FFF;
-    width: 65vw;
+    margin-bottom: 2rem;
+}
+
+table.align-default {
+    margin-left: 0;
+    margin-right: 0;
 }
 
 td.linenos {

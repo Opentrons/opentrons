@@ -20,7 +20,7 @@ from .util import (FlowRates, PlungerSpeeds, Clearances, AxisMaxSpeeds,
 
 from . import geometry
 from . import transfers
-from . import MAX_SUPPORTED_VERSION
+from .definitions import MAX_SUPPORTED_VERSION
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -37,7 +37,6 @@ AdvancedLiquidHandling = Union[
     List[List[Well]]]
 
 
-@requires_version(2, 0)
 class ProtocolContext(CommandPublisher):
     """ The Context class is a container for the state of a protocol.
 
@@ -50,6 +49,9 @@ class ProtocolContext(CommandPublisher):
     protocol. The only exception is the one stored in
     :py:attr:`.legacy_api.api.robot`, which is provided only for back
     compatibility and should be used less and less as time goes by.
+
+    .. versionadded:: 2.0
+
     """
 
     def __init__(self,
@@ -118,11 +120,10 @@ class ProtocolContext(CommandPublisher):
             trash_name = 'opentrons_1_trash_850ml_fixed'
         else:
             trash_name = 'opentrons_1_trash_1100ml_fixed'
-        if self.deck['12']:
-            del self.deck['12']
+        if self._deck_layout['12']:
+            del self._deck_layout['12']
         self.load_labware(trash_name, '12')
 
-    @requires_version(2, 0)
     @classmethod
     def build_using(cls,
                     protocol: Protocol,
@@ -429,6 +430,7 @@ class ProtocolContext(CommandPublisher):
             mod_ctx = mod_class(self,
                                 hc_mod_instance,
                                 geometry,
+                                self.api_version,
                                 self._loop)
         else:
             raise RuntimeError(
@@ -522,6 +524,7 @@ class ProtocolContext(CommandPublisher):
             ctx=self,
             hardware_mgr=self._hw_manager,
             mount=checked_mount,
+            at_version=self._api_version,
             tip_racks=tip_racks,
             log_parent=self._log,
             requested_as=instrument_name)
@@ -634,7 +637,6 @@ class ProtocolContext(CommandPublisher):
         return trash  # type: ignore
 
 
-@requires_version(2, 0)
 class InstrumentContext(CommandPublisher):
     """ A context for a specific pipette or instrument.
 
@@ -648,6 +650,9 @@ class InstrumentContext(CommandPublisher):
 
     In general, this class should not be instantiated directly; rather,
     instances are returned from :py:meth:`ProtcolContext.load_instrument`.
+
+    .. versionadded:: 2.0
+
     """
 
     def __init__(self,
@@ -655,6 +660,7 @@ class InstrumentContext(CommandPublisher):
                  hardware_mgr: HardwareManager,
                  mount: types.Mount,
                  log_parent: logging.Logger,
+                 at_version: APIVersion,
                  tip_racks: List[Labware] = None,
                  trash: Labware = None,
                  default_speed: float = 400.0,
@@ -662,6 +668,7 @@ class InstrumentContext(CommandPublisher):
                  **config_kwargs) -> None:
 
         super().__init__(ctx.broker)
+        self._api_version = at_version
         self._hw_manager = hardware_mgr
         self._ctx = ctx
         self._mount = mount
@@ -686,6 +693,11 @@ class InstrumentContext(CommandPublisher):
         self._speeds = PlungerSpeeds(self)
         self._starting_tip: Union[Well, None] = None
         self.requested_as = requested_as
+
+    @property  # type: ignore
+    @requires_version(2, 0)
+    def api_version(self) -> APIVersion:
+        return self._api_version
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -1245,7 +1257,7 @@ class InstrumentContext(CommandPublisher):
 
         assert tiprack.is_tiprack, "{} is not a tiprack".format(str(tiprack))
         cmds.do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
-                        'before', None, None, instrument=self, location=target)
+                        'before', None, None, self, location=target)
         self.move_to(target.top())
 
         self._hw_manager.hardware.set_current_tiprack_diameter(
@@ -1254,7 +1266,7 @@ class InstrumentContext(CommandPublisher):
             self._mount, self._tip_length_for(tiprack), presses, increment)
         # Note that the hardware API pick_up_tip action includes homing z after
         cmds.do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
-                        'after', self, None, instrument=self, location=target)
+                        'after', self, None, self, location=target)
         self._hw_manager.hardware.set_working_volume(
             self._mount, target.max_volume)
         tiprack.use_tips(target, self.channels)
@@ -1332,11 +1344,11 @@ class InstrumentContext(CommandPublisher):
                 "tiprack.wells()[0].top()) or a Well (e.g. tiprack.wells()[0]."
                 " However, it is a {}".format(location))
         cmds.do_publish(self.broker, cmds.drop_tip, self.drop_tip,
-                        'before', None, None, instrument=self, location=target)
+                        'before', None, None, self, location=target)
         self.move_to(target)
         self._hw_manager.hardware.drop_tip(self._mount, home_after=home_after)
         cmds.do_publish(self.broker, cmds.drop_tip, self.drop_tip,
-                        'after', self, None, instrument=self, location=target)
+                        'after', self, None, self, location=target)
         if isinstance(target.labware, Well)\
            and target.labware.parent.is_tiprack:
             # If this is a tiprack we can try and add the tip back to the
@@ -1904,11 +1916,18 @@ class InstrumentContext(CommandPublisher):
         return tip_length - tip_overlap
 
 
-@requires_version(2, 0)
 class ModuleContext(CommandPublisher):
-    """ An object representing a connected module. """
+    """ An object representing a connected module.
 
-    def __init__(self, ctx: ProtocolContext, geometry: ModuleGeometry) -> None:
+
+    .. versionadded:: 2.0
+
+    """
+
+    def __init__(self,
+                 ctx: ProtocolContext,
+                 geometry: ModuleGeometry,
+                 at_version: APIVersion) -> None:
         """ Build the ModuleContext.
 
         This usually should not be instantiated directly; instead, modules
@@ -1920,6 +1939,12 @@ class ModuleContext(CommandPublisher):
         super().__init__(ctx.broker)
         self._geometry = geometry
         self._ctx = ctx
+        self._api_version = at_version
+
+    @property  # type: ignore
+    @requires_version(2, 0)
+    def api_version(self) -> APIVersion:
+        return self._api_version
 
     @requires_version(2, 0)
     def load_labware_object(self, labware: Labware) -> Labware:
@@ -1976,7 +2001,6 @@ class ModuleContext(CommandPublisher):
                                        self.labware)
 
 
-@requires_version(2, 0)
 class TemperatureModuleContext(ModuleContext):
     """ An object representing a connected Temperature Module.
 
@@ -2004,14 +2028,18 @@ class TemperatureModuleContext(ModuleContext):
         as 1, 4, 7, or 10 on the left or 3, 6, or 7 on the right), with the USB
         cable and power cord pointing away from the deck.
 
+
+    .. versionadded:: 2.0
+
     """
     def __init__(self, ctx: ProtocolContext,
                  hw_module: modules.tempdeck.TempDeck,
                  geometry: ModuleGeometry,
+                 at_version: APIVersion,
                  loop: asyncio.AbstractEventLoop) -> None:
         self._module = hw_module
         self._loop = loop
-        super().__init__(ctx, geometry)
+        super().__init__(ctx, geometry, at_version)
 
     @cmds.publish.both(command=cmds.tempdeck_set_temp)
     @requires_version(2, 0)
@@ -2044,21 +2072,24 @@ class TemperatureModuleContext(ModuleContext):
         return self._module.target
 
 
-@requires_version(2, 0)
 class MagneticModuleContext(ModuleContext):
     """ An object representing a connected Temperature Module.
 
     It should not be instantiated directly; instead, it should be
     created through :py:meth:`.ProtocolContext.load_module`.
+
+    .. versionadded:: 2.0
+
     """
     def __init__(self,
                  ctx: ProtocolContext,
                  hw_module: modules.magdeck.MagDeck,
                  geometry: ModuleGeometry,
+                 at_version: APIVersion,
                  loop: asyncio.AbstractEventLoop) -> None:
         self._module = hw_module
         self._loop = loop
-        super().__init__(ctx, geometry)
+        super().__init__(ctx, geometry, at_version)
 
     @cmds.publish.both(command=cmds.magdeck_calibrate)
     @requires_version(2, 0)
@@ -2135,21 +2166,23 @@ class MagneticModuleContext(ModuleContext):
         return self._module.status
 
 
-@requires_version(2, 0)
 class ThermocyclerContext(ModuleContext):
     """ An object representing a connected Temperature Module.
 
     It should not be instantiated directly; instead, it should be
     created through :py:meth:`.ProtocolContext.load_module`.
+
+    .. versionadded:: 2.0
     """
     def __init__(self,
                  ctx: ProtocolContext,
                  hw_module: modules.thermocycler.Thermocycler,
                  geometry: ThermocyclerGeometry,
+                 at_version: APIVersion,
                  loop: asyncio.AbstractEventLoop) -> None:
         self._module = hw_module
         self._loop = loop
-        super().__init__(ctx, geometry)
+        super().__init__(ctx, geometry, at_version)
 
     def _prepare_for_lid_move(self):
         loaded_instruments = [instr for mount, instr in

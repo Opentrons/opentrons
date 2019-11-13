@@ -546,7 +546,7 @@ def do_publish(broker, cmd, f, when, res, meta, *args, **kwargs):
         # We are also checking if call arguments have 'self' and
         # don't have instruments specified, in which case
         # instruments should take precedence.
-        if 'self' in call_args and 'instrument' not in call_args:
+        if 'instrument' not in call_args and 'self' in call_args:
             call_args['instrument'] = call_args['self']
 
     command_args.update({
@@ -611,16 +611,13 @@ class publish:
 def _get_args(f, args, kwargs):
     # Create the initial dictionary with args that have defaults
     res = {}
+    sig = inspect.signature(f)
+    if inspect.ismethod(f) and args[0] is f.__self__:
+        args = args[1:]
+    if inspect.ismethod(f):
+        res['self'] = f.__self__
 
-    if inspect.getfullargspec(f).defaults:
-        res = dict(
-            zip(
-                reversed(inspect.getfullargspec(f).args),
-                reversed(inspect.getfullargspec(f).defaults)))
-
-    # Update / insert values for positional args
-    res.update(dict(zip(inspect.getfullargspec(f).args, args)))
-
-    # Update it with values for named args
-    res.update(kwargs)
+    bound = sig.bind(*args, **kwargs)
+    bound.apply_defaults()
+    res.update(bound.arguments)
     return res

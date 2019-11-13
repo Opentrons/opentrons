@@ -4,11 +4,7 @@ This package defines classes and functions for access through a protocol to
 control the OT2.
 
 """
-from ..protocols import types
-
-MAX_SUPPORTED_VERSION = types.APIVersion(2, 0)
-#: The maximum supported protocol API version in this release
-
+from .definitions import MAX_SUPPORTED_VERSION  # noqa(F401)
 from . import labware  # noqa(E402)
 from .contexts import (ProtocolContext,  # noqa(E402)
                        InstrumentContext,
