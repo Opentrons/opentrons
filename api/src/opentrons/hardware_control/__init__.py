@@ -1128,8 +1128,8 @@ class API(HardwareAPILike):
         pick up operation is done at a current specified in the pipette config,
         which is experimentally determined to skip steps at a level of force
         sufficient to provide a good seal between the pipette nozzle and tip
-        while also avoiding attaching the tip so firmly that it can't be dropped
-        later.
+        while also avoiding attaching the tip so firmly that it can't be
+        dropped later.
 
         If ``presses`` or ``increment`` is not specified (or is ``None``),
         their value is taken from the pipette configuration.
