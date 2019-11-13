@@ -1124,7 +1124,12 @@ class API(HardwareAPILike):
         This is achieved by attempting to move the instrument down by its
         `pick_up_distance`, in a series of presses. This distance is larger
         than the space available in the tip, so the stepper motor will
-        eventually skip steps, which is resolved by homing afterwards.
+        eventually skip steps, which is resolved by homing afterwards. The
+        pick up operation is done at a current specified in the pipette config,
+        which is experimentally determined to skip steps at a level of force
+        sufficient to provide a good seal between the pipette nozzle and tip
+        while also avoiding attaching the tip so firmly that it can't be dropped
+        later.
 
         If ``presses`` or ``increment`` is not specified (or is ``None``),
         their value is taken from the pipette configuration.
