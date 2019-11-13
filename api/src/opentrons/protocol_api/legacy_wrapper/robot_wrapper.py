@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional, TYPE_CHECKING
 
 from opentrons.hardware_control import adapters, API
 from .util import log_call
+from .types import LegacyLocation
 
 
 if TYPE_CHECKING:
@@ -12,7 +13,6 @@ if TYPE_CHECKING:
     from ..labware import Labware
     from .api import BCInstruments, BCModules
     from .containers_wrapper import Containers
-    from opentrons import types
 
 
 log = logging.getLogger(__name__)
@@ -176,7 +176,7 @@ class Robot():
     @log_call(log)
     def move_to(
             self,
-            location: 'types.Location',
+            location: LegacyLocation,
             instrument: 'Pipette',
             strategy: str = 'arc',
             **kwargs):

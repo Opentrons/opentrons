@@ -2,8 +2,6 @@ from unittest import mock
 
 import pytest
 
-import opentrons.protocol_api as papi
-
 
 @pytest.fixture
 def load_v1_instrument(virtual_smoothie_env):

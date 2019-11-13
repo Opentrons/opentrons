@@ -3,13 +3,14 @@ from numbers import Number
 import logging
 from typing import Dict, List, Optional, Sequence, TYPE_CHECKING, Union
 from opentrons import commands as cmds, hardware_control as hc
-from ..labware import Well
-from opentrons.types import Location, Point
+from opentrons.types import Point, Location
 
 from .util import log_call
 from ..util import Clearances, clamp_value
 
-from .containers_wrapper import LegacyLabware
+from .types import LegacyLocation
+
+from .containers_wrapper import LegacyLabware, LegacyWell
 
 if TYPE_CHECKING:
     from ..contexts import InstrumentContext
@@ -17,10 +18,37 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 AdvancedLiquidHandling = Union[
-    Well,
-    Location,
-    List[Union[Well, Location]],
-    List[List[Well]]]
+    LegacyWell,
+    LegacyLocation,
+    List[Union[LegacyWell, LegacyLocation]],
+    List[List[LegacyWell]]]
+
+MotionTarget = Union[LegacyLocation, LegacyWell]
+
+
+def _unpack_motion_target(
+        motiontarget: MotionTarget) -> LegacyLocation:
+    """ Make sure we have a full LegacyLocation """
+    if isinstance(motiontarget, LegacyLocation):
+        target_loc = motiontarget
+    elif isinstance(motiontarget, LegacyWell):
+        target_loc = motiontarget.top()
+    else:
+        raise TypeError('A Well or tuple(well, point) is needed')
+    return target_loc
+
+
+def _absolute_motion_target(motiontarget: MotionTarget) -> Location:
+    """ Get absolute coords out of our old offset + labware ref system """
+    target_loc = _unpack_motion_target(motiontarget)
+    if isinstance(target_loc.labware, LegacyLabware):
+        real_loc: Union['Labware', 'Well'] = target_loc.labware.lw_obj
+    else:
+        real_loc = target_loc.labware
+    return Location(
+        labware=real_loc,
+        point=(target_loc.labware.from_center(-1, -1, -1).offset
+               + target_loc.offset))
 
 
 class Pipette:
@@ -51,7 +79,7 @@ class Pipette:
         self._instr_ctx._well_bottom_clearance = Clearances(
             default_aspirate=1.0, default_dispense=0.5)
 
-        self._placeables: List[LegacyLabware] = []
+        self._placeables: List[Union[LegacyLabware, LegacyWell]] = []
 
     @property
     def _config(self):
@@ -99,7 +127,7 @@ class Pipette:
         return self._ctx.location_cache.labware
 
     @property
-    def placeables(self) -> List[LegacyLabware]:
+    def placeables(self) -> List[Union[LegacyLabware, LegacyWell]]:
         return self._placeables
 
     @property
@@ -172,12 +200,12 @@ class Pipette:
         the tip is returned using :py:meth:`.return_tip` and the next tip
         that will be picked up.
         """
-        if len(args) and (isinstance(args[0], Well) or args[0] is None):
+        if len(args) and (isinstance(args[0], LegacyWell) or args[0] is None):
             self.current_tip_home_well = args[0]
         return self.current_tip_home_well
 
     @log_call(log)
-    def start_at_tip(self, _tip: Well = None):
+    def start_at_tip(self, _tip: LegacyWell = None):
         """ Change the first tip that will be picked up """
         self._instr_ctx.starting_tip = _tip
 
@@ -202,13 +230,14 @@ class Pipette:
         return self
 
     def move_to(self,
-                location: Union[Location, Well],
+                location: MotionTarget,
                 strategy: str = None):
         """
         Move this :any:`Pipette` to a location.
 
-        :param location: A :class:`Location` (named tuple of a labware or well
-                         and offset) or a Well. The destination to move to
+        :param location: A :class:`.LegacyLocation` (named tuple of a labware
+                         or well and offset) or a Well. The destination to
+                         move to
         :param str strategy: "arc" or "direct". "arc" strategies (default)
                              will pick the head up on Z axis, then over to the
                              XY destination, then finally down to the Z
@@ -218,7 +247,7 @@ class Pipette:
         """
 
         placeable = location\
-            if isinstance(location, Well) else location.labware
+            if isinstance(location, LegacyWell) else location.labware
 
         force_direct = False
         if strategy == 'direct' or (
@@ -228,7 +257,7 @@ class Pipette:
         if not self.placeables or (placeable != self.placeables[-1]):
             self.placeables.append(placeable)
 
-        if isinstance(location, Well):
+        if isinstance(location, LegacyWell):
             location = location.top()
 
         return self._instr_ctx.move_to(location=location,
@@ -236,7 +265,7 @@ class Pipette:
 
     def aspirate(self,
                  volume: float = None,
-                 location: Union[Location, Well] = None,
+                 location: MotionTarget = None,
                  rate: float = 1.0) -> 'Pipette':
         """
         Aspirate a volume of liquid (in uL) using this pipette from the
@@ -291,8 +320,8 @@ class Pipette:
                                 rate))
 
         if not isinstance(volume, Number):
-            if (isinstance(volume, Well) or isinstance(volume, Location)) \
-                    and not location:
+            if isinstance(volume, (LegacyWell, LegacyLocation)) \
+               and not location:
                 location = volume
             volume = self._working_volume - self.current_volume
 
@@ -314,11 +343,10 @@ class Pipette:
 
         return self
 
-    def _position_for_aspirate(self, location: Union[Location, Well] = None):
-        placeable = None
+    def _position_for_aspirate(self, location: MotionTarget = None):
+
         if location:
-            placeable = location if isinstance(location, Well)\
-                else location.labware
+            placeable, _ = _unpack_motion_target(location)
             # go to top of source if not already there
             if placeable != self.previous_placeable:
                 self.move_to(placeable.top())
@@ -329,18 +357,18 @@ class Pipette:
             self._hw.prepare_for_aspirate(self._mount)
 
         if location:
-            if isinstance(location, Well):
-                point, well = location.bottom()
-                location = Location(
-                    point + Point(
-                        0, 0, self._instr_ctx.well_bottom_clearance.aspirate),
-                    well)
+            if isinstance(location, LegacyWell):
+                well, offset = location.bottom()
+                location = LegacyLocation(
+                    labware=well,
+                    offset=offset + Point(
+                        0, 0, self._instr_ctx.well_bottom_clearance.aspirate))
             self.move_to(location)
 
     @log_call(log)
     def dispense(self,
                  volume: float = None,
-                 location: Union[Location, Well] = None,
+                 location: MotionTarget = None,
                  rate: float = 1.0) -> 'Pipette':
         """
         Dispense a volume of liquid (in uL) using this pipette
@@ -390,8 +418,8 @@ class Pipette:
         rate = new_speed / self.speeds['dispense']
 
         if not isinstance(volume, Number):
-            if (isinstance(volume, Well) or isinstance(volume, Location)) \
-                    and not location:
+            if isinstance(volume, (LegacyWell, LegacyLocation)) \
+               and not location:
                 location = volume
             volume = self.current_volume
 
@@ -409,7 +437,7 @@ class Pipette:
     def mix(self,
             repetitions: int = 1,
             volume: float = None,
-            location: Union[Location, Well] = None,
+            location: MotionTarget = None,
             rate: float = 1.0) -> 'Pipette':
         """
         Mix a volume of liquid (in uL) using this pipette
@@ -446,8 +474,8 @@ class Pipette:
             raise hc.NoTipAttachedError('Pipette has no tip. Aborting mix()')
 
         if not isinstance(volume, Number):
-            if (isinstance(volume, Well) or isinstance(volume, Location)) \
-                    and not location:
+            if isinstance(volume, (LegacyWell, LegacyLocation)) \
+               and not location:
                 location = volume
             volume = self._working_volume - self.current_volume
 
@@ -465,7 +493,7 @@ class Pipette:
 
     @log_call(log)
     def blow_out(self,
-                 location: Union[Location, Well] = None
+                 location: MotionTarget = None
                  ) -> 'Pipette':
         """
         Force any remaining liquid to dispense, by moving
@@ -492,7 +520,7 @@ class Pipette:
 
     @log_call(log)
     def touch_tip(self,
-                  location: Well = None,
+                  location: LegacyWell = None,
                   radius: float = 1.0,
                   v_offset: float = -1.0,
                   speed: float = 60.0) -> 'Pipette':
@@ -590,7 +618,7 @@ class Pipette:
 
     @log_call(log)
     def pick_up_tip(
-            self, location: Union[Location, Well] = None,
+            self, location: MotionTarget = None,
             presses: int = None, increment: float = 1.0)\
             -> 'Pipette':
         """
@@ -639,7 +667,7 @@ class Pipette:
 
     @log_call(log)
     def drop_tip(
-            self, location: Union[Location, Well] = None,
+            self, location: MotionTarget = None,
             home_after: bool = True) -> 'Pipette':
         """
         Drop the pipette's current tip
@@ -684,8 +712,8 @@ class Pipette:
     @log_call(log)
     def distribute(self,
                    volume: float,
-                   source: Well,
-                   dest: List[Well],
+                   source: LegacyWell,
+                   dest: List[LegacyWell],
                    *args, **kwargs) -> 'Pipette':
         """
         Distribute will move a volume of liquid from a single source
@@ -711,8 +739,8 @@ class Pipette:
     @log_call(log)
     def consolidate(self,
                     volume: float,
-                    source: List[Well],
-                    dest: Well,
+                    source: List[LegacyWell],
+                    dest: LegacyWell,
                     *args, **kwargs) -> 'Pipette':
         """
         Consolidate will move a volume of liquid from a list of sources
@@ -868,8 +896,8 @@ class Pipette:
     def _clamp_to_max_plunger_speed(self,
                                     speed: float,
                                     log_tag: str = '') -> float:
-        if self._max_plunger_speed:
-            return clamp_value(speed, self._max_plunger_speed, 0, log_tag)
+        maxval = self._max_plunger_speed or float('inf')
+        return clamp_value(speed, maxval, 0, log_tag)
 
     @log_call(log)
     def set_flow_rate(self,
