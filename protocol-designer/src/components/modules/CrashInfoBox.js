@@ -1,11 +1,10 @@
 // @flow
 import * as React from 'react'
 import { Icon } from '@opentrons/components'
+import KnowledgeBaseLink from '../KnowledgeBaseLink'
 import styles from './styles.css'
 
 const CRASH_DIAGRAM_SRC = require('../../images/modules/crash_warning_illustration.png')
-const CRASH_INFO_ARTICLE =
-  'https://docs.google.com/document/d/1kE8qwlx6jVoPmWe0AwNmHVbnDNa4RHnoLCcDTt0SA1s/edit?usp=sharing'
 
 export default function CrashInfoBox() {
   return (
@@ -20,14 +19,9 @@ export default function CrashInfoBox() {
           8-Channel GEN1 pipettes cannot access slots adjacent to Temperature or
           Magnetic modules.
         </p>
-        <a
-          className={styles.link}
-          href={CRASH_INFO_ARTICLE}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <KnowledgeBaseLink to="pipetteGen1MultiModuleCollision">
           Read more here
-        </a>
+        </KnowledgeBaseLink>
       </div>
     </div>
   )
