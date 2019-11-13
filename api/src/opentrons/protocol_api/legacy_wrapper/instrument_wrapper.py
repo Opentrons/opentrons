@@ -2,13 +2,12 @@
 from numbers import Number
 import logging
 from typing import List, Optional, Sequence, TYPE_CHECKING, Union
-
 from opentrons import commands as cmds, hardware_control as hc
 from ..labware import Well
 from opentrons.types import Location, Point
 
 from .util import log_call
-from ..util import Clearances
+from ..util import Clearances, clamp_value
 
 if TYPE_CHECKING:
     from ..contexts import InstrumentContext
@@ -171,7 +170,6 @@ class Pipette():
 
     @log_call(log)
     def current_tip(self, *args):
-        # TODO(ahmed): revisit
         if len(args) and (isinstance(args[0], Well) or args[0] is None):
             self.current_tip_home_well = args[0]
         return self.current_tip_home_well
@@ -304,7 +302,9 @@ class Pipette():
         >>> # aspirate the pipette's remaining volume (80uL) from a Well
         >>> p300.aspirate(plate[2]) # doctest: +SKIP
         """
-        # TODO: When implementing this, cap rate to self._max_plunger_speed
+        new_speed = self._clamp_to_max_plunger_speed(
+            self.speeds['aspirate'] * rate, 'aspirate rate')
+        rate = new_speed / self.speeds['aspirate']
 
         self._log.debug("aspirate {} from {} at {}"
                         .format(volume,
@@ -318,32 +318,37 @@ class Pipette():
             volume = self._working_volume - self.current_volume
 
         if not location and self.previous_placeable:
-            location = self.previous_placeable
+            display_location = self.previous_placeable
 
         if volume != 0:
-            print('doing something')
             self._position_for_aspirate(location)
 
             cmds.do_publish(
                 self._instr_ctx.broker, cmds.aspirate, self.aspirate,
-                'before', None, None, self._instr_ctx, volume, location, rate)
+                'before', None, None, self._instr_ctx, volume,
+                display_location, rate)
             self._hw.aspirate(self._mount, volume, rate)
             cmds.do_publish(
                 self._instr_ctx.broker, cmds.aspirate, self.aspirate,
-                'after', self, None,  self._instr_ctx, volume, location, rate)
+                'after', self, None,  self._instr_ctx, volume,
+                display_location, rate)
         return self._instr_ctx
 
-    def _position_for_aspirate(self, location: Union[Location, Well]):
-        placeable = location if isinstance(location, Well)\
-            else location.labware
-        # go to top of source if not already there
-        if placeable != self.previous_placeable:
-            print('Move to well top bc not already there')
-            self.move_to(placeable.top())
+    def _position_for_aspirate(self, location: Union[Location, Well]=None):
+        placeable = None
+        if location:
+            placeable = location if isinstance(location, Well)\
+                else location.labware
+            # go to top of source if not already there
+            if placeable != self.previous_placeable:
+                print('Move to well top bc not already there')
+                self.move_to(placeable.top())
+        else:
+            placeable = self.previous_placeable
 
         if self.current_volume == 0:
             self._hw.prepare_for_aspirate(self._mount)
-            print('Now actually move to location for aspirate')
+
         if location:
             if isinstance(location, Well):
                 point, well = location.bottom()
@@ -351,6 +356,7 @@ class Pipette():
                     point + Point(
                         0, 0, self._instr_ctx.well_bottom_clearance.aspirate),
                     well)
+            print('Now actually move to location for aspirate')
             self.move_to(location)
 
     @log_call(log)
@@ -409,7 +415,10 @@ class Pipette():
         # dispense the pipette's remaining volume (80uL) to a Well
         >>> p300.dispense(plate[2]) # doctest: +SKIP
         """
-        # TODO: When implementing this, cap rate to self._max_plunger_speed
+        new_speed = self._clamp_to_max_plunger_speed(
+            self.speeds['dispense'] * rate, 'dispense rate')
+        rate = new_speed / self.speeds['dispense']
+
         if not isinstance(volume, Number):
             if (isinstance(volume, Well) or isinstance(volume, Location)) \
                     and not location:
@@ -531,7 +540,6 @@ class Pipette():
         >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
         >>> p300.aspirate(50).dispense().blow_out() # doctest: +SKIP
         """
-        # TODO: When implementing this, cap rate to self._max_plunger_speed
         return self._instr_ctx.blow_out(location=location)
 
     @log_call(log)
@@ -710,6 +718,7 @@ class Pipette():
         >>> p300.pick_up_tip() # doctest: +SKIP
         >>> p300.return_tip() # doctest: +SKIP
         """
+        self.current_tip(location)
         return self._instr_ctx.pick_up_tip(
                 location=location, presses=presses, increment=increment)
 
@@ -934,9 +943,6 @@ class Pipette():
         >>> p300 = instruments.P300_Single(mount='right') # doctest: +SKIP
         >>> p300.transfer(50, plate[0], plate[1]) # doctest: +SKIP
         """
-        # Note: currently it varies whether the pipette should have a tip on
-        # or not depending on the parameters for this call, so we cannot
-        # create a very reliable assertion on tip status
         return self._instr_ctx.transfer(
             volume=volume, source=source, dest=dest, **kwargs)
 
@@ -973,14 +979,25 @@ class Pipette():
             The speed in millimeters-per-second, at which the plunger will
             move while performing an dispense
         """
-        # TODO: When implementing this, cap it to self._max_plunger_speed
         if aspirate:
-            self._instr_ctx._speeds.aspirate = aspirate
+            self._instr_ctx._speeds.aspirate = \
+                self._clamp_to_max_plunger_speed(
+                    aspirate, 'set aspirate speed')
         if dispense:
-            self._instr_ctx._speeds.dispense = dispense
+            self._instr_ctx._speeds.dispense = \
+                self._clamp_to_max_plunger_speed(
+                    dispense, 'set dispense speed')
         if blow_out:
-            self._instr_ctx._speeds.blow_out = blow_out
+            self._instr_ctx._speeds.blow_out = \
+                self._clamp_to_max_plunger_speed(
+                    blow_out, 'set blow_out speed')
         return self._instr_ctx
+
+    def _clamp_to_max_plunger_speed(self,
+                                    speed: float,
+                                    log_tag: str='') -> float:
+        if self._max_plunger_speed:
+            return clamp_value(speed, self._max_plunger_speed, 0, log_tag)
 
     @log_call(log)
     def set_flow_rate(self,
@@ -1001,18 +1018,25 @@ class Pipette():
             The speed in microliters-per-second, at which the plunger will
             move while performing an dispense
         """
-        # TODO: When implementing this, cap it to self._max_plunger_speed
-        ul = self.max_volume
         if aspirate:
-            ul_per_mm = self._hw_pipette.ul_per_mm(ul, 'aspirate')
-            self.set_speed(aspirate=round(aspirate / ul_per_mm, 6))
+            set_speed = self._determine_speed(aspirate, 'aspirate')
+            self.set_speed(aspirate=set_speed)
         if dispense:
-            ul_per_mm = self._hw_pipette.ul_per_mm(ul, 'dispense')
-            self.set_speed(dispense=round(dispense / ul_per_mm, 6))
+            set_speed = self._determine_speed(dispense, 'dispense')
+            self.set_speed(dispense=set_speed)
         if blow_out:
-            ul_per_mm = self._hw_pipette.ul_per_mm(ul, 'dispense')
-            self.set_speed(blow_out=round(blow_out / ul_per_mm, 6))
+            set_speed = self._determine_speed(blow_out, 'blow_out')
+            self.set_speed(blow_out=set_speed)
         return self._instr_ctx
+
+    def _determine_speed(self, flow_rate: float, function: str) -> float:
+        ul = self.max_volume
+        ul_per_mm = self._hw_pipette.ul_per_mm(ul, function)
+        max_plunger_flow_rate = self._max_plunger_speed * ul_per_mm
+
+        valid_flow_rate = clamp_value(
+            flow_rate, max_plunger_flow_rate, 0, f'set {function} flow rate')
+        return round(valid_flow_rate / ul_per_mm, 6)
 
     @log_call(log)
     def set_pick_up_current(self, amperes: float) -> 'InstrumentContext':
