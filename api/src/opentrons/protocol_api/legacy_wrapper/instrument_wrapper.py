@@ -1,13 +1,15 @@
 # pylama:ignore=E731
 from numbers import Number
 import logging
-from typing import List, Optional, Sequence, TYPE_CHECKING, Union
+from typing import Dict, List, Optional, Sequence, TYPE_CHECKING, Union
 from opentrons import commands as cmds, hardware_control as hc
 from ..labware import Well
 from opentrons.types import Location, Point
 
 from .util import log_call
 from ..util import Clearances, clamp_value
+
+from .containers_wrapper import LegacyLabware
 
 if TYPE_CHECKING:
     from ..contexts import InstrumentContext
@@ -21,30 +23,13 @@ AdvancedLiquidHandling = Union[
     List[List[Well]]]
 
 
-class Pipette():
+class Pipette:
     """
-    This class should not be used directly.
-
-    All model-specific instrument constructors are inheritors of this class.
-    With any of those instances you can can:
-        * Handle liquids with :meth:`aspirate`, :meth:`dispense`,
-          :meth:`mix`, and :meth:`blow_out`
-        * Handle tips with :meth:`pick_up_tip`, :meth:`drop_tip`,
-          and :meth:`return_tip`
-        * Calibrate this pipette's plunger positions
-        * Calibrate the position of each :any:`Container` on deck
-
-    Here are the typical steps of using the Pipette:
-        * Instantiate a pipette with a maximum volume (uL)
-        and a mount (`left` or `right`)
-        * Design your protocol through the pipette's liquid-handling commands
-
-    Methods in this class include assertions where needed to ensure that any
-    action that requires a tip must be preceeded by `pick_up_tip`. For example:
-    `mix`, `transfer`, `aspirate`, `blow_out`, and `drop_tip`.
+    This class should not be used directly, and is only created by using
+    an instrument constructor (like :py:meth:`P300_Single`).
     """
 
-    def __init__(  # noqa(C901)
+    def __init__(
             self,
             instrument_context: 'InstrumentContext'):
         self._instr_ctx = instrument_context
@@ -59,14 +44,14 @@ class Pipette():
 
         self._trash_container = self._instr_ctx.trash_container
         self._tip_racks = self._instr_ctx.tip_racks\
-            if self._instr_ctx.tip_racks else None
+            if self._instr_ctx.tip_racks else []
 
         self.reset_tip_tracking()
 
         self._instr_ctx._well_bottom_clearance = Clearances(
             default_aspirate=1.0, default_dispense=0.5)
 
-        self._placeables = []
+        self._placeables: List[LegacyLabware] = []
 
     @property
     def _config(self):
@@ -77,15 +62,16 @@ class Pipette():
         return self._hw.attached_instruments[self._mount]
 
     @property
-    def _working_volume(self):
+    def _working_volume(self) -> float:
         return self._pipette_status['working_volume']
 
     @property
-    def current_volume(self):
+    def current_volume(self) -> float:
+        """ The amount of liquid currently held in the pipette (in uL) """
         return self._pipette_status['current_volume']
 
     @property
-    def has_tip(self):
+    def has_tip(self) -> bool:
         """
         Returns whether a pipette has a tip attached. Added in for backwards
         compatibility purposes in deck calibration CLI tool.
@@ -93,46 +79,57 @@ class Pipette():
         return self._pipette_status['has_tip']
 
     @property
-    def mount(self):
+    def mount(self) -> str:
+        """ Which mount the pipette is attached to, 'left' or 'right' """
         return self._instr_ctx.mount
 
     @property
-    def max_volume(self):
+    def max_volume(self) -> float:
+        """ The maximum amount of liquid that may be aspirated (in uL) """
         return self._pipette_status['max_volume']
 
     @property
-    def min_volume(self):
+    def min_volume(self) -> float:
+        """ The minimum amount of liquid that may be aspirated (in uL) """
         return self._pipette_status['min_volume']
 
     @property
     def previous_placeable(self):
+        # this probably needs to return a legacy labware
         return self._ctx.location_cache.labware
 
     @property
-    def placeables(self):
+    def placeables(self) -> List[LegacyLabware]:
         return self._placeables
 
     @property
-    def speeds(self):
+    def speeds(self) -> Dict[str, float]:
+        """
+        The speeds at which the plunger will move. A dict with the keys
+        ``'aspirate'``, ``'blow_out'``, and ``'dispense'``.
+        """
         return {'aspirate': self._instr_ctx._speeds.aspirate,
                 'dispense': self._instr_ctx._speeds.dispense,
                 'blow_out': self._instr_ctx._speeds.blow_out}
 
     @property
     def starting_tip(self):
+        """ The first place the pipette will pick up a tip. """
+        # this needs to return a LegacyWell
         return self._instr_ctx.starting_tip
 
     @property
-    def tip_racks(self):
+    def tip_racks(self) -> List[LegacyLabware]:
+        """ A list of the tipracks associated with this pipette. """
         return self._tip_racks
 
     @property
-    def trash_container(self):
+    def trash_container(self) -> LegacyLabware:
         return self._trash_container
 
     @property
-    def type(self):
-        log.info('instrument.type')
+    def type(self) -> str:
+        """ The type of the pipette (``'single'`` or ``'multi'``)"""
         return self._instr_ctx.type
 
     @log_call(log)
@@ -152,9 +149,9 @@ class Pipette():
         self._placeables = []
 
     @log_call(log)
-    def has_tip_rack(self):
+    def has_tip_rack(self) -> bool:
         """
-        Returns True of this :any:`Pipette` was instantiated with tip_racks
+        Returns ``True`` of this :any:`Pipette` was instantiated with tipracks
         """
         return (self.tip_racks is not None
                 and isinstance(self.tip_racks, list)
@@ -170,63 +167,54 @@ class Pipette():
 
     @log_call(log)
     def current_tip(self, *args):
+        """ The location from which the current tip was picked up. May be
+        called to change that location, which will affect the place where
+        the tip is returned using :py:meth:`.return_tip` and the next tip
+        that will be picked up.
+        """
         if len(args) and (isinstance(args[0], Well) or args[0] is None):
             self.current_tip_home_well = args[0]
         return self.current_tip_home_well
 
     @log_call(log)
     def start_at_tip(self, _tip: Well = None):
+        """ Change the first tip that will be picked up """
         self._instr_ctx.starting_tip = _tip
 
     @log_call(log)
     def get_next_tip(self):
+        """ Find the next tip to pick up"""
         # Use a tip here
         _, tip = self._instr_ctx._next_available_tip()
         return tip
 
     @log_call(log)
-    def retract(self, safety_margin: float = 10) -> 'InstrumentContext':
+    def retract(self, safety_margin: float = 10) -> 'Pipette':
         '''
         Move the pipette's mount upwards and away from the deck
 
-        Parameters
-        ----------
-        safety_margin: int
-            Distance in millimeters awey from the limit switch,
-            used during the mount's `fast_home()` method
+        :param float safety_margin: Distance in millimeters away
+                                    from the limit switch
+        :returns Pipette: This instance
         '''
         self._ctx.location_cache = None
         self._hw.retract(self._mount)
-        return self._instr_ctx
+        return self
 
-    @log_call(log)
     def move_to(self,
                 location: Union[Location, Well],
                 strategy: str = None):
         """
-        Move this :any:`Pipette` to a :any:`Placeable` on the :any:`Deck`
+        Move this :any:`Pipette` to a location.
 
-        Notes
-        -----
-        Until obstacle-avoidance algorithms are in place,
-        :any:`Robot` and :any:`Pipette` :meth:`move_to` use either an
-        "arc" or "direct"
-
-        Parameters
-        ----------
-        location : :any:`Placeable` or tuple(:any:`Placeable`, :any:`Vector`)
-            The destination to arrive at
-
-        strategy : "arc" or "direct"
-            "arc" strategies (default) will pick the head up on Z axis, then
-            over to the XY destination, then finally down to the Z destination.
-            "direct" strategies will simply move in a straight line from
-            the current position
-
-        Returns
-        -------
-
-        This instance of :class:`Pipette`.
+        :param location: A :class:`Location` (named tuple of a labware or well
+                         and offset) or a Well. The destination to move to
+        :param str strategy: "arc" or "direct". "arc" strategies (default)
+                             will pick the head up on Z axis, then over to the
+                             XY destination, then finally down to the Z
+                             destination. "direct" strategies will simply move
+                             in a straight line from the current position
+        :returns Pipette: This instance.
         """
 
         placeable = location\
@@ -246,61 +234,52 @@ class Pipette():
         return self._instr_ctx.move_to(location=location,
                                        force_direct=force_direct)
 
-    # @log_call(log)
     def aspirate(self,
                  volume: float = None,
                  location: Union[Location, Well] = None,
-                 rate: float = 1.0) -> 'InstrumentContext':
+                 rate: float = 1.0) -> 'Pipette':
         """
-        Aspirate a volume of liquid (in microliters/uL) using this pipette
-        from the specified location
+        Aspirate a volume of liquid (in uL) using this pipette from the
+        specified location
 
-        Notes
-        -----
+
         If only a volume is passed, the pipette will aspirate
-        from it's current position. If only a location is passed,
-        `aspirate` will default to it's `max_volume`.
+        from its current position. If only a location is passed,
+        ``aspirate`` will default to the pipette's :py:attr:`.max_volume`.
 
         The location may be a Well, or a specific position in relation to a
         Well, such as `Well.top()`. If a Well is specified without calling a
         a position method (such as .top or .bottom), this method will default
-        to the bottom of the well.
+        to 1.0 mm above the bottom of the well.
 
-        Parameters
-        ----------
-        volume : int or float
-            The number of microliters to aspirate (Default: self.max_volume)
+        :param float volume: The number of uL to aspirate (if not specified,
+                             :py:attr:`.max_volume`)
+        :param location: A :py:class:`.Location` or a :py:class`.Well` from
+                         which to aspirate.
+        :param float rate: Set plunger speed for this aspirate, where
+                           ``speed = rate * aspirate_speed`` (see
+                           :meth:`set_speed`)
 
-        location : :any:`Placeable` or tuple(:any:`Placeable`, :any:`Vector`)
-            The :any:`Placeable` (:any:`Well`) to perform the aspirate.
-            Can also be a tuple with first item :any:`Placeable`,
-            second item relative :any:`Vector`
+        :returns Pipette: This instance.
 
-        rate : float
-            Set plunger speed for this aspirate, where
-            speed = rate * aspirate_speed (see :meth:`set_speed`)
 
-        Returns
-        -------
+        For example,
 
-        This instance of :class:`Pipette`.
+        .. code-block:: python
 
-        Examples
-        --------
-        ..
-        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
-        >>> robot.reset() # doctest: +SKIP
-        >>> plate = labware.load('96-flat', '2') # doctest: +SKIP
-        >>> p300 = instruments.P300_Single(mount='right') # doctest: +SKIP
-        >>> p300.pick_up_tip() # doctest: +SKIP
-        # aspirate 50uL from a Well
-        >>> p300.aspirate(50, plate[0]) # doctest: +SKIP
-        # aspirate 50uL from the center of a well
-        >>> p300.aspirate(50, plate[1].bottom()) # doctest: +SKIP
-        >>> # aspirate 20uL in place, twice as fast
-        >>> p300.aspirate(20, rate=2.0) # doctest: +SKIP
-        >>> # aspirate the pipette's remaining volume (80uL) from a Well
-        >>> p300.aspirate(plate[2]) # doctest: +SKIP
+            from opentrons import instruments, labware, robot
+            plate = labware.load('96-flat', '2')
+            p300 = instruments.P300_Single(mount='right')
+            p300.pick_up_tip()
+            # aspirate 50uL from a Well
+            p300.aspirate(50, plate[0])
+            # aspirate 50uL from the center of a well
+            p300.aspirate(50, plate[1].bottom())
+            # aspirate 20uL in place, twice as fast
+            p300.aspirate(20, rate=2.0)
+            # aspirate the pipette's remaining volume (80uL) from a Well
+            p300.aspirate(plate[2])
+
         """
         new_speed = self._clamp_to_max_plunger_speed(
             self.speeds['aspirate'] * rate, 'aspirate rate')
@@ -332,16 +311,16 @@ class Pipette():
                 self._instr_ctx.broker, cmds.aspirate, self.aspirate,
                 'after', self, None,  self._instr_ctx, volume,
                 display_location, rate)
-        return self._instr_ctx
 
-    def _position_for_aspirate(self, location: Union[Location, Well]=None):
+        return self
+
+    def _position_for_aspirate(self, location: Union[Location, Well] = None):
         placeable = None
         if location:
             placeable = location if isinstance(location, Well)\
                 else location.labware
             # go to top of source if not already there
             if placeable != self.previous_placeable:
-                print('Move to well top bc not already there')
                 self.move_to(placeable.top())
         else:
             placeable = self.previous_placeable
@@ -356,64 +335,55 @@ class Pipette():
                     point + Point(
                         0, 0, self._instr_ctx.well_bottom_clearance.aspirate),
                     well)
-            print('Now actually move to location for aspirate')
             self.move_to(location)
 
     @log_call(log)
     def dispense(self,
                  volume: float = None,
                  location: Union[Location, Well] = None,
-                 rate: float = 1.0) -> 'InstrumentContext':
+                 rate: float = 1.0) -> 'Pipette':
         """
-        Dispense a volume of liquid (in microliters/uL) using this pipette
+        Dispense a volume of liquid (in uL) using this pipette
 
-        Notes
-        -----
+
         If only a volume is passed, the pipette will dispense
-        from it's current position. If only a location is passed,
-        `dispense` will default to it's `current_volume`
+        from its current position. If only a location is passed,
+        `dispense` will default to its :attr:`.current_volume`
 
         The location may be a Well, or a specific position in relation to a
         Well, such as `Well.top()`. If a Well is specified without calling a
         a position method (such as .top or .bottom), this method will default
-        to the bottom of the well.
+        to the 0.5mm above the bottom of the well.
 
-        Parameters
-        ----------
-        volume : int or float
-            The number of microliters to dispense
-            (Default: self.current_volume)
-        location : :any:`Placeable` or tuple(:any:`Placeable`, :any:`Vector`)
-            The :any:`Placeable` (:any:`Well`) to perform the dispense.
-            Can also be a tuple with first item :any:`Placeable`,
-            second item relative :any:`Vector`
-        rate : float
-            Set plunger speed for this dispense, where
-            speed = rate * dispense_speed (see :meth:`set_speed`)
+        :param float volume: The volume (in uL) to dispense (default:
+                             :attr:`.current_volume`)
+        :param location: :class:`.Location` or Well into which to perform the
+                         dispense.
+        :param float rate: Set plunger speed for this dispense, where
+                           ``speed = rate * dispense_speed`` (see
+                           :meth:`.set_speed`)
+        :returns Pipette: This instance.
 
-        Returns
-        -------
 
-        This instance of :class:`Pipette`.
+        For example,
+        .. code-block:: python
 
-        Examples
-        --------
-        ..
-        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
-        >>> robot.reset() # doctest: +SKIP
-        >>> plate = labware.load('96-flat', '3') # doctest: +SKIP
-        >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
-        # fill the pipette with liquid (200uL)
-        >>> p300.aspirate(plate[0]) # doctest: +SKIP
-        # dispense 50uL to a Well
-        >>> p300.dispense(50, plate[0]) # doctest: +SKIP
-        # dispense 50uL to the center of a well
-        >>> relative_vector = plate[1].center() # doctest: +SKIP
-        >>> p300.dispense(50, (plate[1], relative_vector)) # doctest: +SKIP
-        # dispense 20uL in place, at half the speed
-        >>> p300.dispense(20, rate=0.5) # doctest: +SKIP
-        # dispense the pipette's remaining volume (80uL) to a Well
-        >>> p300.dispense(plate[2]) # doctest: +SKIP
+            from opentrons import instruments, labware, robot
+            robot.reset()
+            plate = labware.load('96-flat', '3')
+            p300 = instruments.P300_Single(mount='left')
+            # fill the pipette with liquid (200uL)
+            p300.aspirate(plate[0])
+            # dispense 50uL to a Well
+            p300.dispense(50, plate[0])
+            # dispense 50uL to the center of a well
+            relative_vector = plate[1].center()
+            p300.dispense(50, (plate[1], relative_vector))
+            # dispense 20uL in place, at half the speed
+            p300.dispense(20, rate=0.5)
+            # dispense the pipette's remaining volume (80uL) to a Well
+            p300.dispense(plate[2])
+
         """
         new_speed = self._clamp_to_max_plunger_speed(
             self.speeds['dispense'] * rate, 'dispense rate')
@@ -431,59 +401,46 @@ class Pipette():
             location = self.previous_placeable
 
         if volume != 0:
-            return self._instr_ctx.dispense(
+            self._instr_ctx.dispense(
                 volume=volume, location=location, rate=rate)
-        return self._instr_ctx
+        return self
 
     @log_call(log)
     def mix(self,
             repetitions: int = 1,
             volume: float = None,
             location: Union[Location, Well] = None,
-            rate: float = 1.0) -> 'InstrumentContext':
+            rate: float = 1.0) -> 'Pipette':
         """
-        Mix a volume of liquid (in microliters/uL) using this pipette
+        Mix a volume of liquid (in uL) using this pipette
 
-        Notes
-        -----
-        If no `location` is passed, the pipette will mix
-        from it's current position. If no `volume` is passed,
-        `mix` will default to it's `max_volume`
+        If no ``location`` is passed, the pipette will mix
+        from its current position. If no ``volume`` is passed,
+        ``mix`` will default to the pipette's :attr:`.max_volume`.
 
-        Parameters
-        ----------
-        repetitions: int
-            How many times the pipette should mix (Default: 1)
+        :param int repetitions: How many times the pipette should mix
+        :param float volume: The volume (in uL) of liquid to mix
+                             (Default: :attr:`.max_volume`)
+        :param location: :class:`.Location` or Well in which to
+                         perform the mix.
+        :param float rate: Set plunger speed for this mix, where
+                           ``speed = rate * (aspirate_speed or
+                            dispense_speed)`` (see :meth:`.set_speed`)
+        :returns pipette: This instance
 
-        volume : int or float
-            The number of microliters to mix (Default: self.max_volume)
+        For example,
 
-        location : :any:`Placeable` or tuple(:any:`Placeable`, :any:`Vector`)
-            The :any:`Placeable` (:any:`Well`) to perform the mix.
-            Can also be a tuple with first item :any:`Placeable`,
-            second item relative :any:`Vector`
+        .. code-block:: python
 
-        rate : float
-            Set plunger speed for this mix, where
-            speed = rate * (aspirate_speed or dispense_speed)
-            (see :meth:`set_speed`)
+            from opentrons import instruments, labware, robot
+            robot.reset()
+            plate = labware.load('96-flat', '4')
+            p300 = instruments.P300_Single(mount='left')
+            # mix 50uL in a Well, three times
+            p300.mix(3, 50, plate[0])
+            # mix 3x with the pipette's max volume, from current position
+            p300.mix(3)
 
-        Returns
-        -------
-
-        This instance of :class:`Pipette`.
-
-        Examples
-        --------
-        ..
-        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
-        >>> robot.reset() # doctest: +SKIP
-        >>> plate = labware.load('96-flat', '4') # doctest: +SKIP
-        >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
-        # mix 50uL in a Well, three times
-        >>> p300.mix(3, 50, plate[0]) # doctest: +SKIP
-        # mix 3x with the pipette's max volume, from current position
-        >>> p300.mix(3) # doctest: +SKIP
         """
         if not self.has_tip:
             raise hc.NoTipAttachedError('Pipette has no tip. Aborting mix()')
@@ -504,480 +461,395 @@ class Pipette():
             repetitions -= 1
         self.dispense(volume, rate=rate)
 
-        return self._instr_ctx
+        return self
 
     @log_call(log)
-    @cmds.publish.both(command=cmds.blow_out)
     def blow_out(self,
                  location: Union[Location, Well] = None
-                 ) -> 'InstrumentContext':
+                 ) -> 'Pipette':
         """
         Force any remaining liquid to dispense, by moving
-        this pipette's plunger to the calibrated `blow_out` position
+        this pipette's plunger past its normal empty position.
 
-        Notes
-        -----
-        If no `location` is passed, the pipette will blow_out
-        from it's current position.
 
-        Parameters
-        ----------
-        location : :any:`Placeable` or tuple(:any:`Placeable`, :any:`Vector`)
-            The :any:`Placeable` (:any:`Well`) to perform the blow_out.
-            Can also be a tuple with first item :any:`Placeable`,
-            second item relative :any:`Vector`
+        If no ``location`` is passed, the pipette will blow out
+        from its current position.
 
-        Returns
-        -------
+        :param location: :class:`.Location` or Well into which to
+                         to blow_out.
+        :returns Pipette: This instance.
 
-        This instance of :class:`Pipette`.
+        For example,
+        .. code-block:: python
 
-        Examples
-        --------
-        ..
-        >>> from opentrons import instruments, robot # doctest: +SKIP
-        >>> robot.reset() # doctest: +SKIP
-        >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
-        >>> p300.aspirate(50).dispense().blow_out() # doctest: +SKIP
+            from opentrons import instruments, robot
+            robot.reset()
+            p300 = instruments.P300_Single(mount='left')
+            p300.aspirate(50).dispense().blow_out()
         """
-        return self._instr_ctx.blow_out(location=location)
+        self._instr_ctx.blow_out(location=location)
+        return self
 
     @log_call(log)
     def touch_tip(self,
                   location: Well = None,
                   radius: float = 1.0,
                   v_offset: float = -1.0,
-                  speed: float = 60.0) -> 'InstrumentContext':
+                  speed: float = 60.0) -> 'Pipette':
         """
-        Touch the :any:`Pipette` tip to the sides of a well,
-        with the intent of removing left-over droplets
+        Touch the  tip to the sides of a well to remove left-over droplets
 
-        Notes
-        -----
-        If no `location` is passed, the pipette will touch_tip
-        from it's current position.
+        If no ``location`` is passed, the pipette will touch tip
+        from its current position.
 
-        Parameters
-        ----------
-        location : :any:`Placeable` or tuple(:any:`Placeable`, :any:`Vector`)
-            The :any:`Placeable` (:any:`Well`) to perform the touch_tip.
-            Can also be a tuple with first item :any:`Placeable`,
-            second item relative :any:`Vector`
+        :param location: :class:`.Location` or Well in which to touch tip.
+        :param float radius: A number describing the percentage of a well's
+                             radius to move to when to touch the tip.
+                             When ``radius=1.0``, touch tip will move to 100%
+                             of the well's radius - in theory, with the center
+                             of the tip on the wall of the well. When
+                             ``radius=0.5``, touch tip will move to 50% of the
+                             well's radius. Default: 1.0 (100%)
+        :param float speed: The speed for the touch tip motion, in mm/s.
+                            Default: 60.0 mm/s, Max: 80.0 mm/s, Min: 20.0 mm/s
+        :param float v_offset: The offset in mm from the top of the well to
+                               touch tip. Default: -1.0 mm
+        :returns Pipette: This instance.
 
-        radius : float
-            Radius is a floating point describing the percentage of a well's
-            radius. When radius=1.0, :any:`touch_tip()` will move to 100% of
-            the wells radius. When radius=0.5, :any:`touch_tip()` will move to
-            50% of the wells radius.
-            Default: 1.0 (100%)
+        For example,
 
-        speed: float
-            The speed for touch tip motion, in mm/s.
-            Default: 60.0 mm/s, Max: 80.0 mm/s, Min: 20.0 mm/s
+        .. code-block:: python
 
-        v_offset: float
-            The offset in mm from the top of the well to touch tip.
-            Default: -1.0 mm
-
-        Returns
-        -------
-
-        This instance of :class:`Pipette`.
-
-        Examples
-        --------
-        ..
-        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
-        >>> robot.reset() # doctest: +SKIP
-        >>> plate = labware.load('96-flat', '8') # doctest: +SKIP
-        >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
-        >>> p300.aspirate(50, plate[0]) # doctest: +SKIP
-        >>> p300.dispense(plate[1]).touch_tip() # doctest: +SKIP
+            from opentrons import instruments, labware, robot
+            robot.reset()
+            plate = labware.load('96-flat', '8')
+            p300 = instruments.P300_Single(mount='left')
+            p300.aspirate(50, plate[0])
+            p300.dispense(plate[1]).touch_tip()
         """
-        return self._instr_ctx.touch_tip(
+        self._instr_ctx.touch_tip(
                 location=location, radius=radius, v_offset=v_offset,
                 speed=speed)
+        return self
 
     @log_call(log)
     def air_gap(self,
                 volume: float = None,
-                height: float = None) -> 'InstrumentContext':
+                height: float = None) -> 'Pipette':
         """
-        Pull air into the :any:`Pipette` current tip
+        Pull air into the pipette, usually under previously-aspirated
+        liquid.
 
-        Notes
-        -----
-        If no `location` is passed, the pipette will touch_tip
-        from it's current position.
+        If no ``location`` is passed, the pipette will aspirate air above
+        its current position.
 
-        Parameters
-        ----------
-        volume : number
-            The amount in uL to aspirate air into the tube.
-            (Default will use all remaining volume in tip)
+        :param float volume: The volume of air to aspirate, in uL.
+                             (Default will use all remaining volume in tip)
+        :param float height: The height, in mm, to move above the current well.
+                             (Default will be 10mm above current Placeable)
+        :returns Pipette: This instance
 
-        height : number
-            The number of millimiters to move above the current Placeable
-            to perform and air-gap aspirate
-            (Default will be 10mm above current Placeable)
+        For example,
 
-        Returns
-        -------
+        .. code-block:: python
 
-        This instance of :class:`Pipette`.
-
-        Examples
-        --------
-        ..
-        >>> from opentrons import instruments, robot # doctest: +SKIP
-        >>> robot.reset() # doctest: +SKIP
-        >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
-        >>> p300.aspirate(50, plate[0]) # doctest: +SKIP
-        >>> p300.air_gap(50) # doctest: +SKIP
+            from opentrons import instruments, robot
+            robot.reset()
+            p300 = instruments.P300_Single(mount='left')
+            p300.aspirate(50, plate[0])
+            p300.air_gap(50)
         """
-        return self._instr_ctx.air_gap(volume=volume, height=height)
+        self._instr_ctx.air_gap(volume=volume, height=height)
+        return self
 
     @log_call(log)
-    @cmds.publish.both(command=cmds.return_tip)
-    def return_tip(self, home_after: bool = True) -> 'InstrumentContext':
+    def return_tip(self, home_after: bool = True) -> 'Pipette':
         """
-        Drop the pipette's current tip to it's originating tip rack
+        Drop the pipette's current tip to its originating tip rack
 
-        Notes
-        -----
-        This method requires one or more tip-rack :any:`Container`
-        to be in this Pipette's `tip_racks` list (see :any:`Pipette`)
+        This method requires one or more tip racks to be in this
+        Pipette's :attr:`.tip_racks` list.
 
-        Returns
-        -------
+        :returns Pipette: This instance.
 
-        This instance of :class:`Pipette`.
+        For example,
 
-        Examples
-        --------
-        ..
-        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
-        >>> robot.reset() # doctest: +SKIP
-        >>> tiprack = labware.load('GEB-tiprack-300', '2') # doctest: +SKIP
-        >>> p300 = instruments.P300_Single(mount='left',
-        ...     tip_racks=[tiprack, tiprack2]) # doctest: +SKIP
-        >>> p300.pick_up_tip() # doctest: +SKIP
-        >>> p300.aspirate(50, plate[0]) # doctest: +SKIP
-        >>> p300.dispense(plate[1]) # doctest: +SKIP
-        >>> p300.return_tip() # doctest: +SKIP
+        .. code-block:: python
+
+            from opentrons import instruments, labware, robot
+            robot.reset()
+            tiprack = labware.load('GEB-tiprack-300', '2')
+            p300 = instruments.P300_Single(mount='left',
+                                           tip_racks=[tiprack, tiprack2])
+            p300.pick_up_tip()
+            p300.aspirate(50, plate[0])
+            p300.dispense(plate[1])
+            p300.return_tip()  # returns to tip a1
         """
-        return self._instr_ctx
+        return self
 
     @log_call(log)
     def pick_up_tip(
             self, location: Union[Location, Well] = None,
             presses: int = None, increment: float = 1.0)\
-            -> 'InstrumentContext':
+            -> 'Pipette':
         """
-        Pick up a tip for the Pipette to run liquid-handling cmds with
+        Pick up a tip for the Pipette to handle liquids with
 
-        Notes
-        -----
-        A tip can be manually set by passing a `location`. If no location
-        is passed, the Pipette will pick up the next available tip in
-        it's `tip_racks` list (see :any:`Pipette`)
+        A tip can be manually specified by passing a ``location``.
+        If no ``location`` is passed, the Pipette will pick up the next
+        available tip from :attr:`.tip_racks`.
 
-        Parameters
-        ----------
-        location : :any:`Placeable` or tuple(:any:`Placeable`, :any:`Vector`)
-            The :any:`Placeable` (:any:`Well`) to perform the pick_up_tip.
-            Can also be a tuple with first item :any:`Placeable`,
-            second item relative :any:`Vector`
-        presses : :any:int
-            The number of times to lower and then raise the pipette when
-            picking up a tip, to ensure a good seal (0 [zero] will result in
-            the pipette hovering over the tip but not picking it up--generally
-            not desireable, but could be used for dry-run). Default: 3 presses
-        increment: :int
-            The additional distance to travel on each successive press (e.g.:
-            if presses=3 and increment=1, then the first press will travel down
-            into the tip by 3.5mm, the second by 4.5mm, and the third by 5.5mm.
-            Default: 1mm
+        :param location: :class:`.Location` or Well from which to pick up a
+                         tip.
+        :param int presses: The number of times to lower and then raise the
+                            pipette when picking up a tip, to ensure a good
+                            seal (0 will result in the pipette hovering over
+                            the tip but not picking it up - generally not
+                            desireable, but could be used for dry-run).
+                            Default: Different per pipette, may be customized
+        :param float increment: The additional distance to travel on each
+                                successive press (e.g.: if ``presses=3`` and
+                                ``increment=1``, then the first press will
+                                travel down into the tip by 3.5mm, the second
+                                by 4.5mm, and the third by 5.5mm)
+                                Default: Different per pipette, may be
+                                customized.
+        :returns Pipette: This instance.
 
-        Returns
-        -------
+        For example,
 
-        This instance of :class:`Pipette`.
+        .. code-block:: python
 
-        Examples
-        --------
-        ..
-        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
-        >>> robot.reset() # doctest: +SKIP
-        >>> tiprack = labware.load('GEB-tiprack-300', '2') # doctest: +SKIP
-        >>> p300 = instruments.P300_Single(mount='left',
-        ...     tip_racks=[tiprack]) # doctest: +SKIP
-        >>> p300.pick_up_tip(tiprack[0]) # doctest: +SKIP
-        >>> p300.return_tip() # doctest: +SKIP
-        # `pick_up_tip` will automatically go to tiprack[1]
-        >>> p300.pick_up_tip() # doctest: +SKIP
-        >>> p300.return_tip() # doctest: +SKIP
+            from opentrons import instruments, labware, robot
+            robot.reset()
+            tiprack = labware.load('GEB-tiprack-300', '2')
+            p300 = instruments.P300_Single(mount='left',
+                                           tip_racks=[tiprack])
+            p300.pick_up_tip(tiprack[0])
+            p300.return_tip()
+            # `pick_up_tip` will automatically go to tiprack[1]
+            p300.pick_up_tip()
+            p300.return_tip()
         """
         self.current_tip(location)
-        return self._instr_ctx.pick_up_tip(
+        self._instr_ctx.pick_up_tip(
                 location=location, presses=presses, increment=increment)
+        return self
 
     @log_call(log)
     def drop_tip(
             self, location: Union[Location, Well] = None,
-            home_after: bool = True) -> 'InstrumentContext':
+            home_after: bool = True) -> 'Pipette':
         """
         Drop the pipette's current tip
 
-        Notes
-        -----
-        If no location is passed, the pipette defaults to its `trash_container`
-        (see :any:`Pipette`)
+        If no location is passed, the pipette defaults to its
+        :attr:`.trash_container`
 
-        Parameters
-        ----------
-        location : :any:`Placeable` or tuple(:any:`Placeable`, :any:`Vector`)
-            The :any:`Placeable` (:any:`Well`) to perform the drop_tip.
-            Can also be a tuple with first item :any:`Placeable`,
-            second item relative :any:`Vector`
+        :param location: :class:`.Location` or Well in which to drop the
+                         tip.
+        :returns Pipette: This instance
 
-        Returns
-        -------
+        For example,
 
-        This instance of :class:`Pipette`.
+        .. code-block:: python
 
-        Examples
-        --------
-        ..
-        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
-        >>> robot.reset() # doctest: +SKIP
-        >>> tiprack = labware.load('tiprack-200ul', 'C2') # doctest: +SKIP
-        >>> trash = labware.load('point', 'A3') # doctest: +SKIP
-        >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
-        >>> p300.pick_up_tip(tiprack[0]) # doctest: +SKIP
-        # drops the tip in the fixed trash
-        >>> p300.drop_tip() # doctest: +SKIP
-        >>> p300.pick_up_tip(tiprack[1]) # doctest: +SKIP
-        # drops the tip back at its tip rack
-        >>> p300.drop_tip(tiprack[1]) # doctest: +SKIP
+            from opentrons import instruments, labware, robot
+            robot.reset()
+            tiprack = labware.load('tiprack-200ul', 'C2')
+            trash = labware.load('point', 'A3')
+            p300 = instruments.P300_Single(mount='left')
+            p300.pick_up_tip(tiprack[0])
+            # drops the tip in the fixed trash
+            p300.drop_tip()
+            p300.pick_up_tip(tiprack[1])
+            # drops the tip back at its tip rack
+            p300.drop_tip(tiprack[1])
         """
-        return self._instr_ctx.drop_tip(
-                location=location, home_after=home_after)
+        self._instr_ctx.drop_tip(
+            location=location, home_after=home_after)
+        return self
 
     @log_call(log)
-    def home(self) -> 'InstrumentContext':
+    def home(self) -> 'Pipette':
         """
         Home the pipette's plunger axis during a protocol run
 
-        Notes
-        -----
-        `Pipette.home()` homes the `Robot`
-
-        Returns
-        -------
-
-        This instance of :class:`Pipette`.
-
-        Examples
-        --------
-        ..
-        >>> from opentrons import instruments, robot # doctest: +SKIP
-        >>> robot.reset() # doctest: +SKIP
-        >>> p300 = instruments.P300_Single(mount='right') # doctest: +SKIP
-        >>> p300.home() # doctest: +SKIP
+        :returns Pipette: This instance
         """
-        return self._instr_ctx.home()
+        self._instr_ctx.home()
+        return self
 
     @log_call(log)
-    @cmds.publish.both(command=cmds.distribute)
     def distribute(self,
                    volume: float,
                    source: Well,
                    dest: List[Well],
-                   *args, **kwargs) -> 'InstrumentContext':
+                   *args, **kwargs) -> 'Pipette':
         """
-        Distribute will move a volume of liquid from a single of source
+        Distribute will move a volume of liquid from a single source
         to a list of target locations. See :any:`Transfer` for details
         and a full list of optional arguments.
 
-        Returns
-        -------
+        :returns Pipette: This instance
 
-        This instance of :class:`Pipette`.
+        For example,
 
-        Examples
-        --------
-        ..
-        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
-        >>> robot.reset() # doctest: +SKIP
-        >>> plate = labware.load('96-flat', '3') # doctest: +SKIP
-        >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
-        >>> p300.distribute(50, plate[1], plate.cols[0]) # doctest: +SKIP
+        .. code-block:: python
+
+            from opentrons import instruments, labware, robot
+            robot.reset()
+            plate = labware.load('96-flat', '3')
+            p300 = instruments.P300_Single(mount='left')
+            p300.distribute(50, plate[1], plate.cols[0])
         """
-        return self._instr_ctx.distribute(
+        self._instr_ctx.distribute(
             volume=volume, source=source, dest=dest, *args, **kwargs)
+        return self
 
     @log_call(log)
-    @cmds.publish.both(command=cmds.consolidate)
     def consolidate(self,
                     volume: float,
                     source: List[Well],
                     dest: Well,
-                    *args, **kwargs) -> 'InstrumentContext':
+                    *args, **kwargs) -> 'Pipette':
         """
         Consolidate will move a volume of liquid from a list of sources
         to a single target location. See :any:`Transfer` for details
         and a full list of optional arguments.
 
-        Returns
-        -------
+        :returns Pipette: This instance.
 
-        This instance of :class:`Pipette`.
+        For example,
+        .. code-block:: python
 
-        Examples
-        --------
-        ..
-        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
-        >>> robot.reset() # doctest: +SKIP
-        >>> plate = labware.load('96-flat', 'A3') # doctest: +SKIP
-        >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
-        >>> p300.consolidate(50, plate.cols[0], plate[1]) # doctest: +SKIP
+            from opentrons import instruments, labware, robot
+            robot.reset()
+            plate = labware.load('96-flat', 'A3')
+            p300 = instruments.P300_Single(mount='left')
+            p300.consolidate(50, plate.cols[0], plate[1])
         """
-        return self._instr_ctx.consolidate(
+        self._instr_ctx.consolidate(
             volume=volume, source=source, dest=dest, *args, **kwargs)
+        return self
 
     @log_call(log)
-    @cmds.publish.both(command=cmds.transfer)
     def transfer(self,
                  volume: Union[float, Sequence[float]],
                  source: AdvancedLiquidHandling,
                  dest: AdvancedLiquidHandling,
-                 **kwargs):
+                 **kwargs) -> 'Pipette':
         """
         Transfer will move a volume of liquid from a source location(s)
         to a dest location(s). It is a higher-level command, incorporating
-        other :any:`Pipette` commands, like :any:`aspirate` and
-        :any:`dispense`, designed to make protocol writing easier at the
-        cost of specificity.
+        other actions like :meth:`.aspirate` and :meth:`.dispense`
 
-        Parameters
-        ----------
-        volumes : number, list, or tuple
-            The amount of volume to remove from each `sources` :any:`Placeable`
-            and add to each `targets` :any:`Placeable`. If `volumes` is a list,
-            each volume will be used for the sources/targets at the
-            matching index. If `volumes` is a tuple with two elements,
-            like `(20, 100)`, then a list of volumes will be generated with
-            a linear gradient between the two volumes in the tuple.
+        :param volume: The amount of volume to remove from each
+                       ``sources``  and add to each ``dest``. If a list, the
+                       list should be the same length as the longer of
+                       ``source`` and ``dest``; the elements of the list will
+                       be used for the equivalent source and target.
+                       If a tuple with two elements, like ``volume=(20, 100)``,
+                       then a list of volumes will be generated with
+                       a linear gradient between the two volumes in the tuple.
+                       If just a single value, the same volume will be
+                       transferred between each source and dest.
+        :type volume: float or List[float] or Tuple[float, float]
+        :param source: A well or list of wells from which liquid should be
+                       transferred.
+        :param dest: A well or list of wells into which liquid should be
+                     transferred.
+        :param str new_tip: The strategy for automatically picking up tips
+                            during the transfer; one of ``'once'``,
+                            ``'never'``, or ``'always'``. If ``'never'``,
+                           no tips will be picked up or dropped (so you must
+                           call :meth:`.pick_up_tip` before calling
+                           ``transfer``, and :meth:`.drop_tip` after). If
+                           ``'once'``, a single tip will be used for all
+                           actions. If ``'always'``, a new tip will be used
+                           for each transfer. Default is 'once'.
+        :param bool trash: If ``True`` (default behavior) and trash container
+                           has been attached to this `Pipette`, then used tips
+                           will be dropped into the trash. If ``False``,
+                           used tips will be returned to their associated
+                           tiprack.
+        :param bool touch_tip: If ``True``, a :meth:`touch_tip` will occur
+                               following each :meth:`aspirate` and
+                               :meth:`dispense`. If set to ``False`` (default),
+                               no :meth:``touch_tip`` will occur.
+        :param bool blow_out: If ``True``, a :meth:`blow_out` will occur
+                              following each :meth:`dispense` if the dispense
+                              leaves the pipette empty. If set to ``False``
+                              (default), no :meth:`blow_out` will occur.
+        :param mix_before: Specify how to mix before each :meth:`.aspirate` in
+                           the transfer. This should be a tuple of
+                           ``(repetitions, volume)``.
+        :type mix_before: Tuple[int, float]
+        :param mix_after: Specify how to mix after each :meth:`.dispense` in
+                           the transfer. This should be a tuple of
+                           ``(repetitions, volume)``.
+        :type mix_after: Tuple[int, float]
+        :param bool carryover: If ``True`` (default), any individual transfers
+                               that exceed :attr:`.max_volume` will be split
+                               into multiple smaller volumes.
+        :param bool repeat: (Only applicable to :meth:`distribute` and
+                            :meth:`consolidate`) If ``True`` (default),
+                            sequential :meth:`aspirate` volumes will be
+                            combined into one tip for the purpose of saving
+                            time. If `False`, all volumes will be transferred
+                            separately.
+        :param gradient: A function to calculated the curve used for
+                         gradient volumes. When `volumes` is a tuple of length
+                         2, its values are used to create a list of gradient
+                         volumes. The default curve for this gradient is
+                         linear (lambda x: x), however a method can be passed
+                         with the `gradient` keyword argument to create a
+                         non-linear gradient.
+        :type gradient: Callable[[float], float]
 
-        source : Placeable or list
-            Single :any:`Placeable` or list of :any:`Placeable`s, from where
-            liquid will be :any:`aspirate`ed from.
+        :returns Pipette: This instance.
 
-        dest : Placeable or list
-            Single :any:`Placeable` or list of :any:`Placeable`s, where
-            liquid will be :any:`dispense`ed to.
+        For example,
+        .. code-block:: python
 
-        new_tip : str
-            The number of clean tips this transfer command will use. If
-            'never', no tips will be picked up nor dropped. If 'once', a
-            single tip will be used for all commands. If 'always', a new tip
-            will be used for each transfer. Default is 'once'.
-
-        trash : boolean
-            If `True` (default behavior) and trash container has been attached
-            to this `Pipette`, then the tip will be sent to the trash
-            container.
-            If `False`, then tips will be returned to their associated tiprack.
-
-        touch_tip : boolean
-            If `True`, a :any:`touch_tip` will occur following each
-            :any:`aspirate` and :any:`dispense`. If set to `False` (default),
-            no :any:`touch_tip` will occur.
-
-        blow_out : boolean
-            If `True`, a :any:`blow_out` will occur following each
-            :any:`dispense`, but only if the pipette has no liquid left in it.
-            If set to `False` (default), no :any:`blow_out` will occur.
-
-        mix_before : tuple
-            Specify the number of repetitions volume to mix, and a :any:`mix`
-            will proceed each :any:`aspirate` during the transfer and dispense.
-            The tuple's values is interpreted as (repetitions, volume).
-
-        mix_after : tuple
-            Specify the number of repetitions volume to mix, and a :any:`mix`
-            will following each :any:`dispense` during the transfer or
-            consolidate. The tuple's values is interpreted as
-            (repetitions, volume).
-
-        carryover : boolean
-            If `True` (default), any `volumes` that exceed the maximum volume
-            of this `Pipette` will be split into multiple smaller volumes.
-
-        repeat : boolean
-            (Only applicable to :any:`distribute` and :any:`consolidate`)If
-            `True` (default), sequential :any:`aspirate` volumes will be
-            combined into one tip for the purpose of saving time. If `False`,
-            all volumes will be transferred seperately.
-
-        gradient : lambda
-            Function for calculated the curve used for gradient volumes.
-            When `volumes` is a tuple of length 2, it's values are used
-            to create a list of gradient volumes. The default curve for
-            this gradient is linear (lambda x: x), however a method can
-            be passed with the `gradient` keyword argument to create a
-            custom curve.
-
-        Returns
-        -------
-
-        This instance of :class:`Pipette`.
-
-        Examples
-        --------
-        ...
-        >>> from opentrons import instruments, labware, robot # doctest: +SKIP
-        >>> robot.reset() # doctest: +SKIP
-        >>> plate = labware.load('96-flat', '5') # doctest: +SKIP
-        >>> p300 = instruments.P300_Single(mount='right') # doctest: +SKIP
-        >>> p300.transfer(50, plate[0], plate[1]) # doctest: +SKIP
+            from opentrons import instruments, labware, robot
+            robot.reset()
+            plate = labware.load('96-flat', '5')
+            p300 = instruments.P300_Single(mount='right')
+            p300.transfer(50, plate[0], plate[1])
         """
-        return self._instr_ctx.transfer(
+        self._instr_ctx.transfer(
             volume=volume, source=source, dest=dest, **kwargs)
+        return self
 
     @log_call(log)
-    @cmds.publish.both(command=cmds.delay)
     def delay(self,
               seconds: float = 0,
-              minutes: float = 0) -> 'InstrumentContext':
+              minutes: float = 0) -> 'Pipette':
         """
-        Parameters
-        ----------
+        :param float seconds: The number of seconds to pause
+        :param float minutes; The number of minutes to pause
 
-        seconds: float
-            The number of seconds to freeze in place.
+        :returns Pipette: This instance
         """
-        return self._ctx.delay(seconds=seconds, minutes=minutes)
+        self._ctx.delay(seconds=seconds, minutes=minutes)
+        return self
 
     @log_call(log)
     def set_speed(self,
                   aspirate: float = None,
                   dispense: float = None,
-                  blow_out: float = None) -> 'InstrumentContext':
+                  blow_out: float = None) -> 'Pipette':
         """
         Set the speed (mm/second) the :any:`Pipette` plunger will move
-        during :meth:`aspirate` and :meth:`dispense`
+        during :meth:`aspirate`, :meth:`dispense`, and :meth:`blow_out`
 
-        Parameters
-        ----------
-        aspirate: int
-            The speed in millimeters-per-second, at which the plunger will
-            move while performing an aspirate
-
-        dispense: int
-            The speed in millimeters-per-second, at which the plunger will
-            move while performing an dispense
+        :param float aspirate: The speed, in mm/s, at which the plunger will
+                               move while performing an aspirate
+        :param float dispense: The speed, in mm/s, at which the plunger will
+                               move while performing an dispense
+        :returns Pipette: This instance
         """
         if aspirate:
             self._instr_ctx._speeds.aspirate = \
@@ -991,11 +863,11 @@ class Pipette():
             self._instr_ctx._speeds.blow_out = \
                 self._clamp_to_max_plunger_speed(
                     blow_out, 'set blow_out speed')
-        return self._instr_ctx
+        return self
 
     def _clamp_to_max_plunger_speed(self,
                                     speed: float,
-                                    log_tag: str='') -> float:
+                                    log_tag: str = '') -> float:
         if self._max_plunger_speed:
             return clamp_value(speed, self._max_plunger_speed, 0, log_tag)
 
@@ -1003,20 +875,19 @@ class Pipette():
     def set_flow_rate(self,
                       aspirate: float = None,
                       dispense: float = None,
-                      blow_out: float = None) -> 'InstrumentContext':
+                      blow_out: float = None) -> 'Pipette':
         """
-        Set the speed (uL/second) the :any:`Pipette` plunger will move
-        during :meth:`aspirate` and :meth:`dispense`. The speed is set using
-        nominal max volumes for any given pipette model.
-        Parameters
-        ----------
-        aspirate: int
-            The speed in microliters-per-second, at which the plunger will
-            move while performing an aspirate
+        Set the volumetric flow rate (uL/second) at which the plunger will
+        :meth:`aspirate`, :meth:`dispense`, and :meth:`blow_out`.
 
-        dispense: int
-            The speed in microliters-per-second, at which the plunger will
-            move while performing an dispense
+        The speed is set using nominal max volumes for any given pipette model.
+
+        :param float aspirate: The flow rate, in uL/s, at which the
+                               pipette will aspirate
+        :param float dispense: The flow rate, in uL/s, at which the pipette
+                               will dispense
+        :param float blow_out: The flow rate, in uL/s, at which the plunger
+                               will blow out.
         """
         if aspirate:
             set_speed = self._determine_speed(aspirate, 'aspirate')
@@ -1027,7 +898,7 @@ class Pipette():
         if blow_out:
             set_speed = self._determine_speed(blow_out, 'blow_out')
             self.set_speed(blow_out=set_speed)
-        return self._instr_ctx
+        return self
 
     def _determine_speed(self, flow_rate: float, function: str) -> float:
         ul = self.max_volume
@@ -1039,22 +910,23 @@ class Pipette():
         return round(valid_flow_rate / ul_per_mm, 6)
 
     @log_call(log)
-    def set_pick_up_current(self, amperes: float) -> 'InstrumentContext':
+    def set_pick_up_current(self, amperes: float) -> 'Pipette':
         """
         Set the current (amperes) the pipette mount's motor will use while
         picking up a tip.
 
-        Parameters
-        ----------
-        amperes: float (0.0 - 2.0)
-            The amperage of the motor while creating a seal with tips.
+        This can be useful to attach tips more firmly or less firmly than
+        default
+
+        :param float amperes: The peak winding current of the z motor
+                              while creating a seal with tips.
         """
         if amperes >= 0 and amperes <= 2.0:
             self._hw_pipette.update_config_item('pick_up_current', amperes)
         else:
             raise ValueError(
                 'Amperes must be a floating point between 0.0 and 2.0')
-        return self._instr_ctx
+        return self
 
     def _set_plunger_max_speed_override(self, speed: float):
         self._max_plunger_speed = speed
