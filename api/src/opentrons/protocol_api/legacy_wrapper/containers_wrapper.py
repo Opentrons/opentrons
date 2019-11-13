@@ -931,7 +931,6 @@ class Containers:
                 f'Slot {slot} has child. Use "containers.load(\''
                 f'{container_name}\', \'{slot}\', share=True)"')
         elif container_name in MODULE_BLACKLIST:
-<<<<<<< HEAD
             raise RuntimeError(
                 "load modules using modules.load()")
         defn = self._get_labware_def_with_fallback(container_name)
@@ -949,14 +948,6 @@ class Containers:
 
     def _get_labware_def_with_fallback(
             self, container_name: str) -> Dict[str, Any]:
-=======
-            raise NotImplementedError(
-                "Module load not yet implemented")
-        # if self._sharing[str(slot)] and not share:
-        #     raise ValueError(f'Cannot place')
-        if share:
-            return self._determine_share_logic(container_name, slot, label)
->>>>>>> Add stacking support
         try:
             return get_labware_definition(container_name)
         except FileNotFoundError:

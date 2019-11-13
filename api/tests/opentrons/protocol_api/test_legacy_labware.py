@@ -103,17 +103,33 @@ def container_create(monkeypatch, config_tempdir):
     shutil.rmtree(CONFIG['labware_user_definitions_dir_v2']/'legacy_api')
     CONFIG['labware_database_file'] = tempdb
 
-# @pytest.mark.api2_only
-# def test_stacking(loop):
-#     ctx = papi.ProtocolContext(loop=loop)
-#     with pytest.raises(ValueError):
-#         ctx.load_labware(labware_name, '1', stacking=True)
-#     older_labware = ctx.load_labware(labware_name, '1')
-#     stacked_labware = ctx.load_labware(labware_name, '1', stacking=True)
-#     assert stacked_labware.highest_z == older_labware.highest_z * 2
-#     del ctx._deck_layout['12']
-#     assert ctx._deck_layout.highest_z == stacked_labware.highest_z
-#     assert ctx._deck_layout['1'] == stacked_labware
+@pytest.mark.api2_only
+def test_stacking(labware):
+    labware_name = 'corning_96_wellplate_360ul_flat'
+    with pytest.raises(ValueError):
+        labware.load(labware_name, '1', share=True)
+    older_labware = labware.load(labware_name, '1')
+    stacked_labware = labware.load(labware_name, '1', share=True)
+    assert stacked_labware.highest_z == older_labware.highest_z * 2
+    del labware._ctx._deck_layout['12']
+    assert labware._ctx._deck_layout.highest_z == stacked_labware.highest_z
+    assert labware._ctx._deck_layout['1'] == stacked_labware
+
+
+@pytest.mark.api2_only
+def test_sharing(labware, container_create):
+    labware_name = '3x8-chip'
+    older_labware = labware.load(labware_name, '1')
+    stacked_labware_1 = labware.load(labware_name, '1', share=True)
+    stacked_labware_2 = labware.load(labware_name, '1', share=True)
+    stacked_labware_3 = labware.load(labware_name, '1', share=True)
+    assert older_labware.parent == slot
+    assert stacked_labware_1.parent == slot
+    assert stacked_labware_2.parent == slot
+    assert stacked_labware_3.parent == slot
+    del labware._ctx._deck_layout['12']
+    # sharing a slot shouldn't combine labwares
+    assert labware._ctx._deck_layout.highest_z == older_labware.highest_z
 
 
 @pytest.mark.api2_only

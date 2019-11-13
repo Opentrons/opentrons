@@ -235,7 +235,8 @@ class Well:
         return hash(self.top().point)
 
 
-class Labware:
+@requires_version(2, 0)
+class Labware(DeckItem):
     """
     This class represents a labware, such as a PCR plate, a tube rack, trough,
     tip rack, etc. It defines the physical geometry of the labware, and
@@ -776,7 +777,7 @@ class Labware:
                 well.has_tip = True
 
 
-class ModuleGeometry:
+class ModuleGeometry(DeckItem):
     """
     This class represents an active peripheral, such as an Opentrons Magnetic
     Module, Temperature Module or Thermocycler Module. It defines the physical

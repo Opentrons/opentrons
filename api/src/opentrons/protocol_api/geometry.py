@@ -1,5 +1,6 @@
-from collections import UserDict
+from collections import UserDict, UserList
 import functools
+import abc
 import logging
 import pkgutil
 import json
@@ -117,7 +118,15 @@ def plan_moves(
             (to_point, dest_cp_override)]
 
 
-DeckItem = Union[Labware, ModuleGeometry, ThermocyclerGeometry]
+# DeckItem = Union[Labware, ModuleGeometry, ThermocyclerGeometry]
+
+class DeckItem(abc.ABC):
+
+    @property
+    @abc.abstractmethod
+    def highest_z(self):
+        pass
+
 
 
 class Deck(UserDict):
