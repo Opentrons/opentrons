@@ -12,7 +12,7 @@ from opentrons.drivers.rpi_drivers import gpio
 import opentrons.config
 from opentrons.types import Mount
 
-from . import modules
+from . import modules, types
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -41,10 +41,16 @@ class Controller:
         self._smoothie_driver = driver_3_0.SmoothieDriver_3_0_0(
             config=self.config, handle_locks=False)
         self._cached_fw_version: Optional[str] = None
-        self._module_watcher = aionotify.Watcher()
-        self._module_watcher.watch(alias='modules',
-                                   path='/dev',
-                                   flags=(aionotify.Flags.CREATE | aionotify.Flags.DELETE))
+        try:
+            self._module_watcher = aionotify.Watcher()
+            self._module_watcher.watch(
+                alias='modules',
+                path='/dev',
+                flags=(aionotify.Flags.CREATE | aionotify.Flags.DELETE))
+        except NameError:
+            MODULE_LOG.info(
+                'Failed to initiate aionotify,'
+                'likely because not running on linux')
 
     def update_position(self) -> Dict[str, float]:
         self._smoothie_driver.update_position()
@@ -117,12 +123,12 @@ class Controller:
     def set_pipette_speed(self, val: float):
         self._smoothie_driver.set_speed(val)
 
-    async def watch_modules(self, loop: asyncio.AbstractEventLoop, register_modules):
+    async def watch_modules(self, loop: asyncio.AbstractEventLoop,
+                            register_modules: types.RegisterModules):
         await self._module_watcher.setup(loop)
 
         initial_modules = modules.discover()
         await register_modules(new_modules=initial_modules)
-        MODULE_LOG.info(f'\n\nINIT MODULES: {initial_modules}\n\n')
         while not self._module_watcher.closed:
             event = await self._module_watcher.get_event()
             flags = aionotify.Flags.parse(event.flags)

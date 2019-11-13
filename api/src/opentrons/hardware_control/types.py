@@ -2,6 +2,7 @@ import enum
 from typing import Tuple
 
 import opentrons.types
+from .modules import ModuleAtPort
 
 
 class Axis(enum.Enum):
@@ -91,3 +92,8 @@ class CriticalPoint(enum.Enum):
     The end of the front-most nozzle of a multipipette with a tip attached.
     Only relevant when a multichannel pipette is present.
     """
+
+
+RegisterModules = Callable[[List[ModuleAtPort],
+                            List[ModuleAtPort]],
+                           Coroutine[None, None, None]]

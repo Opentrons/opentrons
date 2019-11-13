@@ -400,7 +400,7 @@ class API(HardwareAPILike):
         return await self._backend.update_firmware(firmware_file,
                                                    checked_loop,
                                                    explicit_modeset)
-
+Callable[[AbstractModule], None]
     def _call_on_attached_modules(self, method):
         for module in self.attached_modules:
             maybe_module_method = getattr(module, method, None)
@@ -476,7 +476,6 @@ class API(HardwareAPILike):
         information about their presence or state.
         """
         await self.cache_instruments()
-        await self.discover_modules()
 
     # Gantry/frame (i.e. not pipette) action API
     @_log_call
@@ -1355,7 +1354,11 @@ class API(HardwareAPILike):
                 'blow_out_flow_rate',
                 self._plunger_flowrate(this_pipette, blow_out, 'dispense'))
 
-    async def register_modules(self, new_modules = [], removed_modules = []):
+    async def register_modules(self, new_modules = None, removed_modules = None):
+        if new_modules is None:
+            new_modules = []
+        if removed_modules is None:
+            removed_modules = []
         for port, name in removed_modules:
             self._attached_modules = [mod for mod in self._attached_modules
                                       if mod.port != port]
@@ -1369,10 +1372,6 @@ class API(HardwareAPILike):
             self._attached_modules.append(new_instance)
             self._log.info(f"Module {name} discovered and attached " \
                            f" at port {port}")
-
-    # TODO: remove this function once APIv1 is sunset
-    async def discover_modules(self):
-        pass
 
     async def _do_tp(self, pip, mount) -> top_types.Point:
         """ Execute the work of tip probe.

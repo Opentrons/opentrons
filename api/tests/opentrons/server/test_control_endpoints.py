@@ -152,15 +152,6 @@ async def check_modules_response(async_client):
 
 
 @pytest.fixture
-async def dummy_discover_modules():
-    mag_module = await modules.build('', 'magdeck', True, lambda x: None)
-
-    async def stub():
-        return [mag_module]
-    return stub
-
-
-@pytest.fixture
 def dummy_attached_leg_modules():
     mag_module = legacy_modules.MagDeck()
     mag_port = 'tty1_magdeck'
@@ -173,7 +164,6 @@ def dummy_attached_leg_modules():
 
 @pytest.mark.api2_only
 async def test_execute_module_command_v2(
-        dummy_discover_modules,
         virtual_smoothie_env,
         loop,
         async_server,
