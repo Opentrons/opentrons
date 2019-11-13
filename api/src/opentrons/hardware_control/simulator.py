@@ -10,6 +10,7 @@ from opentrons.config.pipette_config import (config_models,
                                              configs)
 from opentrons.drivers.smoothie_drivers import SimulatingDriver
 from . import modules
+from .types import RegisterModules
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -192,7 +193,7 @@ class Simulator:
     def set_active_current(self, axis, amp):
         pass
 
-    async def watch_modules(self, register_modules):
+    async def watch_modules(self, register_modules: RegisterModules):
         new_modules = [
             modules.ModuleAtPort(
                 port=f'/dev/ot_module_sim_{mod}{str(idx)}', name=mod)

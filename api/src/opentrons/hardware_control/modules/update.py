@@ -175,6 +175,10 @@ async def _port_poll(is_old_bootloader, ports_before_switch=None):
                     lambda x: 'bootloader' in x, ports))
                 if len(discovered_ports) == 1:
                     new_port = discovered_ports[0]
+                elif len(discovered_ports) > 1:
+                    raise OSError('Multiple new bootloader ports'
+                                  'found on mode switch')
+
         await asyncio.sleep(0.05)
     return new_port
 

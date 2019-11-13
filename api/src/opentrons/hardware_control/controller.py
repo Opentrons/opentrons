@@ -12,7 +12,8 @@ from opentrons.drivers.rpi_drivers import gpio
 import opentrons.config
 from opentrons.types import Mount
 
-from . import modules, types
+from . import modules
+from .types import RegisterModules
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -47,9 +48,9 @@ class Controller:
                 alias='modules',
                 path='/dev',
                 flags=(aionotify.Flags.CREATE | aionotify.Flags.DELETE))
-        except NameError:
+        except AttributeError:
             MODULE_LOG.info(
-                'Failed to initiate aionotify,'
+                'Failed to initiate aionotify, cannot watch modules,'
                 'likely because not running on linux')
 
     def update_position(self) -> Dict[str, float]:
@@ -124,12 +125,12 @@ class Controller:
         self._smoothie_driver.set_speed(val)
 
     async def watch_modules(self, loop: asyncio.AbstractEventLoop,
-                            register_modules: types.RegisterModules):
+                            register_modules: RegisterModules):
         await self._module_watcher.setup(loop)
 
         initial_modules = modules.discover()
         await register_modules(new_modules=initial_modules)
-        while not self._module_watcher.closed:
+        while (aionotify is not None) and (not self._module_watcher.closed):
             event = await self._module_watcher.get_event()
             flags = aionotify.Flags.parse(event.flags)
             if 'ot_module' in event.name:
