@@ -1246,7 +1246,6 @@ def get_labware_definition(
         load_name, namespace, version)
 
 
-@requires_version(2, 0)
 def get_all_labware_definitions() -> List[str]:
     """
     Return a list of standard and custom labware definitions with load_name +
