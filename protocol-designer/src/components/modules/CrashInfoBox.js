@@ -16,7 +16,7 @@ export default function CrashInfoBox() {
         </div>
         <p>
           8-Channel GEN1 pipettes cannot access slots adjacent to Temperature or
-          Magnetic GEN1 modules.
+          Magnetic modules.
         </p>
         <a
           className={styles.link}
