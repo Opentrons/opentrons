@@ -1,4 +1,5 @@
 import logging
+from math import sin, cos, pi
 
 from ..labware import (
     Labware,
@@ -9,11 +10,12 @@ from ..labware import (
     WellShape,
     ModuleGeometry)
 from .util import log_call
+from .types import LegacyLocation
 from typing import Dict, List, Any, Union, Optional, TYPE_CHECKING
 
 import jsonschema  # type: ignore
 
-from opentrons.types import Location, Point
+from opentrons.types import Point, Location
 from opentrons.data_storage import database as db_cmds
 from opentrons.config import CONFIG
 from opentrons.legacy_api.containers.placeable import (
@@ -229,7 +231,7 @@ class LegacyWell(Well):
         self._parent_height = labware_height
 
     @property
-    def properties(self) -> Dict:
+    def properties(self) -> Dict[str, Any]:
         return {
             'depth': self.depth,
             'total-liquid-volume': self.max_volume,
@@ -241,6 +243,10 @@ class LegacyWell(Well):
             'shape': self.shape,
             'parent': self.parent
             }
+
+    @property
+    def parent(self) -> 'LegacyLabware':
+        return self._parent  # type: ignore
 
     @property
     def get_name(self) -> Optional[str]:
@@ -265,6 +271,206 @@ class LegacyWell(Well):
     @property
     def height(self) -> Optional[float]:
         return self._parent_height
+
+    def top(self,
+            z: float = 0.0,
+            radius: float = 0.0,
+            degrees: float = 0,
+            reference=None) -> LegacyLocation:
+        """
+        Returns :py:class:`.LegacyLocation` ( a NamedTuple of
+        :py:class:`.LegacyWell`, :py:class:`.Point`) where
+        the vector points to the top of the placeable. This can be passed
+        into any :py:class:`.Robot` or :py:class:`.Pipette` method
+        ``location`` argument.
+
+        If ``reference`` (a :py:class:`.Placeable`) is provided, the return
+        value will be in that placeable's coordinate system.
+
+        The ``radius`` and ``degrees`` arguments are interpreted as
+        in :py:meth:`.from_center` (except that ``degrees`` is in degrees, not
+        radians). They can be used to specify a further distance from the top
+        center of the well; for instance, calling
+        ``top(radius=0.5, degrees=180)`` will move half the radius in the 180
+        degree direction from the center of the well.
+
+        The ``z`` argument is a distance in mm to move in z from the top, and
+        can be used to hover above or below the top. For instance, calling
+        ``top(z=-1)`` will move 1mm below the top.
+
+        :param z: Absolute distance in mm to move  in ``z`` from the top. Note
+                  that unlike the other arguments, this is a distance, not a
+                  ratio.
+        :param degrees: Direction in which to move ``radius`` from the top
+                        center.
+        :param radius: Ratio of the placeable's radius to move in the direction
+                       specified by ``degrees`` from the top center.
+        :returns: A tuple of the placeable and the offset. This can be passed
+                  into any :py:class:`.Robot` or :py:class:`.Pipette` method
+                  ``location`` argument.
+        """
+        coordinates = self.from_center(
+            r=radius,
+            theta=(degrees / 180) * pi,
+            h=1,
+            reference=reference)
+        return LegacyLocation(labware=self,
+                              offset=coordinates.offset + Point(0, 0, z))
+
+    def bottom(self, z: float = 0.0, radius: float = 0.0,
+               degrees: float = 0.0,
+               reference=None) -> LegacyLocation:
+        """
+        Returns :py:class:`.LegacyLocation` ( a NamedTuple of
+        :py:class:`.LegacyWell`, :py:class:`.Point`) where
+        the vector points to the bottom of the placeable. This can be passed
+        into any :py:class:`.Robot` or :py:class:`.Pipette` method
+        ``location`` argument.
+
+        If ``reference`` (a :py:class:`.Placeable`) is provided, the return
+        value will be in that placeable's coordinate system.
+
+        The ``radius`` and ``degrees`` arguments are interpreted as
+        in :py:meth:`.from_center` (except that ``degrees`` is in degrees, not
+        radians). They can be used to specify a further distance from the
+        bottom center of the well; for instance, calling
+        ``bottom(radius=0.5, degrees=180)`` will move half the radius in the
+        180 degree direction from the center of the well.
+
+        The ``z`` argument is a distance in mm to move in z from the bottom,
+        and can be used to hover above the bottom. For instance, calling
+        ``bottom(z=1)`` will move 1mm above the bottom.
+
+        :param z: Absolute distance in mm to move  in ``z`` from the bottom.
+                  Note that unlike the other arguments, this is a distance, not
+                  a ratio.
+        :param degrees: Direction in which to move ``radius`` from the bottom
+                        center.
+        :param radius: Ratio of the placeable's radius to move in the direction
+                       specified by ``degrees`` from the bottom center.
+        :param reference: An optional placeable for the vector to be relative
+                          to.
+        :returns: A tuple of the placeable and the offset. This can be passed
+                  into any :py:class:`.Robot` or :py:class:`.Pipette` method
+                  ``location`` argument.
+        """
+        coordinates = self.from_center(r=radius,
+                                       theta=(degrees / 180) * pi,
+                                       h=-1,
+                                       reference=reference)
+        return LegacyLocation(labware=self,
+                              offset=coordinates.offset + Point(0, 0, z))
+
+    def center(
+            self,
+            reference: Union['LegacyLabware', 'LegacyWell'] = None)\
+            -> LegacyLocation:
+        """
+        Returns :py:class:`.LegacyLocation` ( a NamedTuple of
+        :py:class:`.LegacyWell`, :py:class:`.Point`) where
+        the vector points to the center of the well, in ``x``, ``y``,
+        and ``z``. This can be passed into any :py:class:`.Robot` or
+        :py:class:`.Pipette` method ``location`` argument.
+
+        If ``reference`` (a :py:class:`.Placeable`) is provided, the return
+        value will be in that placeable's coordinate system.
+
+        :param reference: An optional placeable for the vector to be relative
+                          to.
+        :returns: A tuple of the placeable and the offset. This can be passed
+                  into any :py:class:`.Robot` or :py:class:`.Pipette` method
+                  ``location`` argument.
+        """
+        return self.from_center(reference=reference)
+
+    def _from_center_polar(
+            self, r: float = None, theta: float = None, h: float = None)\
+            -> Point:
+        center = self._center()
+        if self._shape is WellShape.RECTANGULAR:
+            radius = self._length / 2  # to match placeable
+        else:
+            radius = self._diameter / 2  # type: ignore
+
+        z_size = self._depth
+        checked_r = r or 0.0
+        checked_theta = theta or 0.0
+        checked_h = h or 0.0
+        scaled_r = radius * checked_r
+        return Point(
+            x=center.point.x + (scaled_r*cos(checked_theta)),
+            y=center.point.y + (scaled_r*sin(checked_theta)),
+            z=center.point.z + checked_h * (z_size/2)
+        )
+
+    def from_center(
+            self,
+            x: float = None, y: float = None, z: float = None,
+            r: float = None, theta: float = None, h: float = None,
+            reference: Union['LegacyLabware', 'LegacyWell'] = None)\
+            -> LegacyLocation:
+        """
+        Accepts a set of ratios for Cartesian or ratios/angle for Polar
+        and returns :py:class:`.Vector` using ``reference`` as origin.
+
+        Though both polar and cartesian arguments are accepted, only one
+        set should be used at the same time, and the set selected should be
+        entirely used. In addition, all variables in the set should be used.
+
+        For instance, if you want to use cartesian coordinates, you must
+        specify all of ``x``, ``y``, and ``z`` as numbers; if you want to
+        use polar coordinates, you must specify all of ``theta``, ``r`` and
+        ``h`` as numbers.
+
+        While ``theta`` is an absolute angle in radians, the other values are
+        actually ratios which are multiplied by the relevant dimensions of the
+        placeable on which ``from_center`` is called. For instance, calling
+        ``from_center(x=0.5, y=0.5, z=0.5)`` does not mean "500 micromenters
+        from the center in each dimension", but "half the x size, half the y
+        size, and half the z size from the center". Similarly,
+        ``from_center(r=0.5, theta=3.14, h=0.5)`` means "half the radius
+        dimension at 180 degrees, and half the height upwards".
+
+        :param x: Ratio of the x dimension of the placeable to move from the
+                  center.
+        :param y: Ratio of the y dimension of the placeable to move from the
+                  center.
+        :param z: Ratio of the z dimension of the placeable to move from the
+                  center.
+        :param r: Ratio of the radius to move from the center.
+        :param theta: Angle in radians at which to move the percentage of the
+                      radius specified by ``r`` from the center.
+        :param h: Percentage of the height to move up in z from the center.
+        :param reference: If specified, an origin to add to the offset vector
+                          specified by the other arguments.
+        :returns: A vector from either the origin or the specified reference.
+                  This can be passed into any :py:class:`.Robot` or
+                  :py:class:`.Pipette` method ``location`` argument.
+        """
+        if reference not in (self, None):
+            raise NotImplementedError('external references not supported')
+
+        if x is not None or y is not None or z is not None:
+            from_center_absolute = self._from_center_cartesian(
+                x or 0.0, y or 0.0, z or 0.0)
+        elif r is not None or theta is not None or h is not None:
+            from_center_absolute = self._from_center_polar(r, theta, h)
+        else:
+            from_center_absolute = super().center().point
+
+        offset = from_center_absolute\
+            - self._from_center_cartesian(-1, -1, -1)
+        return LegacyLocation(
+                labware=self,
+                offset=offset)
+        return LegacyLocation(labware=self, offset=Point(0, 0, 0))
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, (LegacyWell, Well)):
+            return NotImplemented
+        if isinstance(other, Well) and not isinstance(other, LegacyWell):
+            return False
+        return super().top().point == super(LegacyWell, other).top().point
 
 
 class LegacyLabware():
@@ -309,7 +515,7 @@ class LegacyLabware():
         try:
             return self._accessor_methods[attr]
         except KeyError:
-            return AttributeError
+            raise AttributeError()
 
     def __getitem__(self, name) -> Well:
         # For the use-case of labware[0] or labware['A1']
