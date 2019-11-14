@@ -1,8 +1,7 @@
-# pylama:ignore=E731
 from numbers import Number
 import logging
 from typing import Dict, List, Optional, Sequence, TYPE_CHECKING, Union
-from opentrons import commands as cmds, hardware_control as hc
+from opentrons import commands as cmds
 from opentrons.types import Point, Location
 
 from .util import log_call
@@ -13,7 +12,8 @@ from .types import LegacyLocation
 from .containers_wrapper import LegacyLabware, LegacyWell
 
 if TYPE_CHECKING:
-    from ..contexts import InstrumentContext
+    from ..contexts import InstrumentContext # noqa(F401)
+    from ..labware import Labware, Well  # noqa(F401)
 
 log = logging.getLogger(__name__)
 
@@ -263,11 +263,8 @@ class Pipette:
         if not self.placeables or (placeable != self.placeables[-1]):
             self.placeables.append(placeable)
 
-        if isinstance(location, LegacyWell):
-            location = location.top()
-        print(f'Wrapper: Move to: {self.previous_placeable}')
-
-        return self._instr_ctx.move_to(location=location,
+        absolute_location = _absolute_motion_target(location)
+        return self._instr_ctx.move_to(location=absolute_location,
                                        force_direct=force_direct)
 
     def aspirate(self,
