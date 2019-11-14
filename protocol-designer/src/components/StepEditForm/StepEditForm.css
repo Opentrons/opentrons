@@ -208,3 +208,7 @@
   display: flex;
   justify-content: space-between;
 }
+
+.magnet_form_group {
+  margin: 1rem 4.25rem 2rem 0;
+}

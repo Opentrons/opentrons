@@ -73,6 +73,9 @@ export const stepIconsByType: { [string]: IconName } = {
   mix: 'ot-mix',
   pause: 'pause',
   manualIntervention: 'pause', // TODO Ian 2018-12-13 pause icon for this is a placeholder
+  magnet: 'ot-magnet',
+  temperature: 'ot-temperature',
+  thermocycler: 'ot-thermocycler',
 }
 
 export type StepType = $Keys<typeof stepIconsByType>

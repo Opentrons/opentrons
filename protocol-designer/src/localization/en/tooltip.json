@@ -5,7 +5,8 @@
   "step_description": {
     "mix": "Mix content of wells",
     "pause": "OT-2 will pause before proceeding",
-    "moveLiquid": "Move liquid"
+    "moveLiquid": "Move liquid",
+    "magnet": "Engage or disengage magnetic module"
   },
 
   "step_fields": {

@@ -2,7 +2,8 @@
   "stepType": {
     "mix": "mix",
     "moveLiquid": "transfer",
-    "pause": "pause"
+    "pause": "pause",
+    "magnet": "magnetic module"
   },
   "units": {
     "millimeter": "mm",
