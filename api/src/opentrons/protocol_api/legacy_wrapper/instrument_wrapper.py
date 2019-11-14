@@ -59,7 +59,9 @@ class Pipette:
 
     def __init__(
             self,
-            instrument_context: 'InstrumentContext'):
+            instrument_context: 'InstrumentContext',
+            labware_mappings: Dict['Labware', LegacyLabware]):
+        self._lw_mappings = labware_mappings
         self._instr_ctx = instrument_context
         self._ctx = self._instr_ctx._ctx
         self._mount = self._instr_ctx._mount
@@ -122,11 +124,13 @@ class Pipette:
         return self._pipette_status['min_volume']
 
     @property
-    def previous_placeable(self) -> Optional[LegacyWell]:
-        if self._ctx.location_cache:
-            return self._ctx.location_cache.labware
-        else:
+    def previous_placeable(self) -> Optional[Union[LegacyWell, LegacyLabware]]:
+        if not self._ctx.location_cache:
             return None
+        if isinstance(self._ctx.location_cache.labware, LegacyWell):
+            return self._ctx.location_cache.labware
+        return self._lw_mappings.get(
+            self._ctx.location_cache.labware)  # type: ignore
 
     @property
     def placeables(self) -> List[Union[LegacyLabware, LegacyWell]]:
@@ -329,7 +333,6 @@ class Pipette:
             volume = self._working_volume - self.current_volume
 
         display_location = location if location else self.previous_placeable
-        print(f'display_location: {display_location}')
 
         if volume != 0:
             self._position_for_aspirate(location)
@@ -347,7 +350,7 @@ class Pipette:
         return self
 
     def _position_for_aspirate(self, location: MotionTarget = None):
-
+        placeable: Optional[Union[LegacyLabware, LegacyWell]] = None
         if location:
             placeable, _ = _unpack_motion_target(location)
             # go to top of source if not already there
@@ -431,6 +434,8 @@ class Pipette:
         volume = min(self.current_volume, volume)
 
         if not location and self.previous_placeable:
+            if isinstance(self.previous_placeable, LegacyLabware):
+                raise RuntimeError('Dispense must be into a well')
             location = self.previous_placeable
 
         if volume != 0:
@@ -475,7 +480,6 @@ class Pipette:
             p300.mix(3)
 
         """
-        print(f"Rep: {repetitions}, vol: {volume}, location: {location}, rate: {rate}")
         if not self.has_tip:
             self._log.warning("Cannot mix without a tip attached.")
 
@@ -486,6 +490,8 @@ class Pipette:
             volume = self._working_volume - self.current_volume
 
         if not location and self.previous_placeable:
+            if isinstance(self.previous_placeable, LegacyLabware):
+                raise RuntimeError('Dispense must be into a well')
             location = self.previous_placeable
 
         cmds.do_publish(self._instr_ctx.broker, cmds.mix, self.mix, 'before',

@@ -120,8 +120,10 @@ class BCInstruments(metaclass=AddInstrumentCtors):
 
     def __init__(
             self,
-            robot: Robot) -> None:
+            robot: Robot,
+            containers: Containers) -> None:
         self._robot_wrapper = robot
+        self._containers = containers
 
     def _load_instr(self,
                     name: str,
@@ -130,7 +132,7 @@ class BCInstruments(metaclass=AddInstrumentCtors):
         """
         instr_ctx = self._robot_wrapper._ctx.load_instrument(
             name, Mount[mount.upper()])
-        instr = Pipette(instr_ctx)
+        instr = Pipette(instr_ctx, self._containers.labware_mappings)
         self._robot_wrapper._add_instrument(mount, instr)
         return instr
 
@@ -144,10 +146,10 @@ class BCModules:
 
 
 def build_globals(context: 'ProtocolContext'):
-    rob = Robot(context)
-    instr = BCInstruments(rob)
     lw = Containers(context)
     mod = BCModules(context)
+    rob = Robot(context)
+    instr = BCInstruments(rob, lw)
     rob._set_globals(instr, lw, mod)
 
     return {'robot': rob, 'instruments': instr, 'labware': lw, 'modules': mod}

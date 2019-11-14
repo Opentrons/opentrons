@@ -926,6 +926,12 @@ class Containers:
 
     def __init__(self, ctx: 'ProtocolContext') -> None:
         self._ctx = ctx
+        self._labware_mappings: Dict[Labware, LegacyLabware] = {}
+
+    @property
+    def labware_mappings(self) -> Dict[Labware, LegacyLabware]:
+        """ Reverse of LegacyLabware.lw_obj """
+        return self._labware_mappings
 
     def _determine_share_logic(
             self,
@@ -973,7 +979,9 @@ class Containers:
             lw_obj = mod.load_labware_from_definition(defn)
         else:
             lw_obj = self._add_labware_to_deck(defn, slot_int, label, share)
-        return LegacyLabware(lw_obj)
+        legacy = LegacyLabware(lw_obj)
+        self.labware_mappings[lw_obj] = legacy
+        return legacy
 
     def _get_labware_def_with_fallback(
             self, container_name: str) -> Dict[str, Any]:
@@ -1063,8 +1071,10 @@ class Containers:
         path_to_save_defs = CONFIG['labware_user_definitions_dir_v2']
         save_definition(lw_dict, location=path_to_save_defs)
 
-        return LegacyLabware(
-            Labware(lw_dict, Location(Point(0, 0, 0), 'deck')))
+        lw = Labware(lw_dict, Location(Point(0, 0, 0), 'deck'))
+        legacy = LegacyLabware(lw)
+        self.labware_mappings[lw] = legacy
+        return legacy
 
     @log_call(log)
     def list(self, *args, **kwargs):

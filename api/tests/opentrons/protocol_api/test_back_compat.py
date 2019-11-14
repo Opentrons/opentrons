@@ -8,7 +8,7 @@ from opentrons.hardware_control import API
 
 @pytest.mark.api2_only
 def test_add_instrument(loop, monkeypatch, singletons):
-    fake_load = mock.Mock()
+    fake_load = mock.MagicMock()
     instruments = singletons['instruments']
     monkeypatch.setattr(instruments._robot_wrapper._ctx,
                         'load_instrument', fake_load)
@@ -54,12 +54,12 @@ def test_head_speed(singletons):
     assert singletons['robot']._head_speed_override == 10
     # Default speed should be provisioned on pipette create from the cache
     left = singletons['instruments'].P50_Single('left')
-    assert left._ctx._default_speed == 10
+    assert left._instr_ctx._default_speed == 10
     # and so should plunger max
     assert left._max_plunger_speed == 3
     # And setting it with already-created instruments should work
     singletons['robot'].head_speed(combined_speed=20, b=4)
-    assert left._ctx._default_speed == 20
+    assert left._instr_ctx._default_speed == 20
     assert left._max_plunger_speed == 4
 
 
