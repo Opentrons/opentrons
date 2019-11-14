@@ -7,7 +7,7 @@ import os
 import shutil
 import logging
 import importlib.util
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Optional
 
 from opentrons.config import pipette_config, CONFIG
 from opentrons.types import Mount
@@ -48,7 +48,8 @@ class AddInstrumentCtors(type):
                 min_volume: float = None,
                 max_volume: float = None) -> Pipette:
             return self._load_instr(model,
-                                    mount)
+                                    mount,
+                                    tip_racks)
 
         initializer.__name__ = proper_name
         initializer.__qualname__ = '.'.join([AddInstrumentCtors.__qualname__,
@@ -127,11 +128,14 @@ class BCInstruments(metaclass=AddInstrumentCtors):
 
     def _load_instr(self,
                     name: str,
-                    mount: str) -> Pipette:
+                    mount: str,
+                    tipracks: Optional[List[LegacyLabware]]) -> Pipette:
         """ Build an instrument in a backwards-compatible way.
         """
+        new_tr = tipracks or []
         instr_ctx = self._robot_wrapper._ctx.load_instrument(
-            name, Mount[mount.upper()])
+            name, Mount[mount.upper()],
+            tip_racks=[tr.lw_obj for tr in new_tr])
         instr = Pipette(instr_ctx, self._containers.labware_mappings)
         self._robot_wrapper._add_instrument(mount, instr)
         return instr

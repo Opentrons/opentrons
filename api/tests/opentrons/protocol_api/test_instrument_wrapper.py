@@ -293,6 +293,20 @@ def test_mix_locations(monkeypatch, instruments, labware, load_v1_instrument,
             assert expected_args[0] == call_args[0]
 
 
+def get_common_axes(legacy_axes, new_axes):
+    # API.move_to doesn't supply axis commands that haven't changed, so
+    # we have to check only the common axes.
+    common_axes = set(legacy_axes.keys())\
+        .intersection(set(new_axes.keys()))
+    common_lpos = {k: v
+                   for k, v in legacy_axes.items()
+                   if k in common_axes}
+    common_npos = {k: v
+                   for k, v in new_axes.items()
+                   if k in common_axes}
+    return common_lpos, common_npos
+
+
 @pytest.mark.api2_only
 def test_move_to(monkeypatch, instruments, labware, load_v1_instrument):
     robot, legacy_instr, legacy_lw = load_v1_instrument
@@ -320,19 +334,6 @@ def test_move_to(monkeypatch, instruments, labware, load_v1_instrument):
     legacy_move.side_effect = legacy_passthru
     monkeypatch.setattr(robot._driver, 'move', legacy_move)
 
-    def _get_common_axes(legacy_axes, new_axes):
-        # API.move_to doesn't supply axis commands that haven't changed, so
-        # we have to check only the common axes.
-        common_axes = set(legacy_axes.keys())\
-            .intersection(set(new_axes.keys()))
-        common_lpos = {k: v
-                       for k, v in legacy_axes.items()
-                       if k in common_axes}
-        common_npos = {k: v
-                       for k, v in new_axes.items()
-                       if k in common_axes}
-        return common_lpos, common_npos
-
     # home position -> well should be three moves
 
     legacy_instr.move_to(legacy_lw['A1'].top())
@@ -343,7 +344,7 @@ def test_move_to(monkeypatch, instruments, labware, load_v1_instrument):
             legacy_move.call_args_list, new_move.call_args_list):
         largs, lkwargs = legacy_call
         nargs, nkwargs = new_call
-        common_lpos, common_npos = _get_common_axes(largs[0], nargs[0])
+        common_lpos, common_npos = get_common_axes(largs[0], nargs[0])
         assert common_lpos == common_npos
 
     legacy_move.reset_mock()
@@ -364,8 +365,8 @@ def test_move_to(monkeypatch, instruments, labware, load_v1_instrument):
     # should not be moving
     fused_move = legacy_move.call_args_list[0][0][0]
     fused_move.update(legacy_move.call_args_list[1][0][0])
-    common_lpos, common_npos = _get_common_axes(fused_move,
-                                                new_move.call_args[0][0])
+    common_lpos, common_npos = get_common_axes(fused_move,
+                                               new_move.call_args[0][0])
     assert common_lpos == common_npos
 
     # same deal when using a well alone (should go to top, should be direct,
@@ -382,6 +383,126 @@ def test_move_to(monkeypatch, instruments, labware, load_v1_instrument):
 
     fused_move = legacy_move.call_args_list[0][0][0]
     fused_move.update(legacy_move.call_args_list[1][0][0])
-    common_lpos, common_npos = _get_common_axes(fused_move,
-                                                new_move.call_args[0][0])
+    common_lpos, common_npos = get_common_axes(fused_move,
+                                               new_move.call_args[0][0])
     assert common_lpos == common_npos
+
+
+def split_new_moves(call_list):
+    split_moves = []
+    for call in call_list:
+        split_moves.append({k: v for k, v in call[0][0].items() if k in 'XY'})
+        split_moves.append({'Z': call[0][0]['Z']})
+    return split_moves
+
+
+@pytest.mark.api2_only
+def test_pick_up_tip(
+        loop, monkeypatch, instruments, labware, load_v1_instrument):
+    robot, legacy_instr, legacy_lw = load_v1_instrument
+    tr = labware.load('opentrons_96_tiprack_10ul', '1')
+    pip = instruments.P10_Single(mount='left', tip_racks=[tr])
+
+    instruments._robot_wrapper.home()
+    robot.home()
+
+    new_actual_move = pip._ctx._hw_manager.hardware._api._backend.move
+
+    def new_passthru(*args, **kwargs):
+        new_actual_move(*args, **kwargs)
+    new_move = mock.Mock()
+    new_move.side_effect = new_passthru
+    monkeypatch.setattr(
+        pip._ctx._hw_manager.hardware._api._backend, 'move', new_move)
+
+    legacy_actual_move = robot._driver.move
+
+    def legacy_passthru(*args, **kwargs):
+        legacy_actual_move(*args, **kwargs)
+    legacy_move = mock.Mock()
+    legacy_move.side_effect = legacy_passthru
+    monkeypatch.setattr(robot._driver, 'move', legacy_move)
+
+    legacy_instr.pick_up_tip()
+    pip.pick_up_tip()
+
+    # check move to tip
+    # ignore moving the pluger to the bottom first
+    legacy_call_args = legacy_move.call_args_list[1:4]
+    new_call_args = new_move.call_args_list[:3]
+    for legacy_call, new_call in zip(
+            legacy_call_args, new_call_args):
+        largs, lkwargs = legacy_call
+        nargs, nkwargs = new_call
+        common_lpos, common_npos = get_common_axes(largs[0], nargs[0])
+        assert common_lpos == common_npos
+
+    # check move to bottom
+    legacy_move_to_b_args = legacy_move.call_args_list[0]
+    new_move_to_b_args = new_move.call_args_list[3]
+    common_lpos, common_npos = get_common_axes(legacy_move_to_b_args[0][0],
+                                               new_move_to_b_args[0][0])
+    assert common_lpos == common_npos
+
+    # check pick up tip
+    legacy_pick_up_args = legacy_move.call_args_list[4:-1]
+    new_pick_up_args = new_move.call_args_list[4:]
+    new_moves = split_new_moves(new_pick_up_args)
+    legacy_moves = [call[0][0] for call in legacy_pick_up_args]
+    assert new_moves == legacy_moves
+
+
+@pytest.mark.api2_only
+def test_drop_tip(
+        loop, monkeypatch, instruments, labware, load_v1_instrument):
+    robot, legacy_instr, legacy_lw = load_v1_instrument
+    tr = labware.load('opentrons_96_tiprack_10ul', '1')
+    pip = instruments.P10_Single(mount='left', tip_racks=[tr])
+
+    instruments._robot_wrapper.home()
+    robot.home()
+
+    legacy_instr.pick_up_tip()
+    pip.pick_up_tip()
+
+    new_actual_move = pip._ctx._hw_manager.hardware._api._backend.move
+
+    def new_passthru(*args, **kwargs):
+        new_actual_move(*args, **kwargs)
+    new_move = mock.Mock()
+    new_move.side_effect = new_passthru
+    monkeypatch.setattr(
+        pip._ctx._hw_manager.hardware._api._backend, 'move', new_move)
+
+    legacy_actual_move = robot._driver.move
+
+    def legacy_passthru(*args, **kwargs):
+        legacy_actual_move(*args, **kwargs)
+    legacy_move = mock.Mock()
+    legacy_move.side_effect = legacy_passthru
+    monkeypatch.setattr(robot._driver, 'move', legacy_move)
+
+    legacy_instr.drop_tip()
+    pip.drop_tip()
+
+    # check retract pipette
+    assert legacy_move.call_args_list[0][0][0]['Z'] == \
+        new_move.call_args_list[0][0][0]['Z']
+
+    # check trash location
+    for legacy_call, new_call in zip(legacy_move.call_args_list[1:3],
+                                     new_move.call_args_list[1:3]):
+        common_lpos, common_npos = get_common_axes(legacy_call[0][0],
+                                                   new_call[0][0])
+        assert common_lpos == common_npos
+
+    # check drop actual tip
+    assert legacy_move.call_args_list[4][0][0]['B'] == \
+        new_move.call_args_list[4][0][0]['B']
+
+    # check recovery action
+    for legacy_call, new_call in zip(legacy_move.call_args_list[6:],
+                                     new_move.call_args_list[5:]):
+        common_lpos, common_npos = get_common_axes(legacy_call[0][0],
+                                                   new_call[0][0])
+        assert common_lpos == common_npos

@@ -3,6 +3,7 @@ import logging
 from typing import Dict, List, Optional, Sequence, TYPE_CHECKING, Union
 from opentrons import commands as cmds
 from opentrons.types import Point, Location
+from opentrons.config import pipette_config
 
 from .util import log_call
 from ..util import Clearances, clamp_value
@@ -87,6 +88,7 @@ class Pipette:
             default_aspirate=1.0, default_dispense=0.5)
 
         self._placeables: List[Union[LegacyLabware, LegacyWell]] = []
+        self._pipette_config = pipette_config.load(self._instr_ctx.model)
 
     @property
     def _config(self):
@@ -227,8 +229,8 @@ class Pipette:
     @log_call(log)
     def get_next_tip(self):
         """ Find the next tip to pick up"""
-        # Use a tip here
-        _, tip = self._instr_ctx._next_available_tip()
+        tiprack, tip = self._instr_ctx._next_available_tip()
+        tiprack.use_tips(tip, self._instr_ctx.channels)
         return tip
 
     @log_call(log)
@@ -706,9 +708,35 @@ class Pipette:
             p300.pick_up_tip()
             p300.return_tip()
         """
-        self.current_tip(location)
-        self._instr_ctx.pick_up_tip(
-                location=location, presses=presses, increment=increment)
+        if location:
+            new_loc = _unpack_motion_target(location, 'top')
+        else:
+            tiprack, new_tip = self._instr_ctx._next_available_tip()
+            legacy_labware = self._lw_mappings[tiprack]
+            tip = legacy_labware[new_tip._display_name.split(' of')[0]]
+            new_loc = tip.top()
+
+        self.current_tip(new_loc.labware)
+
+        cmds.do_publish(self._instr_ctx.broker, cmds.pick_up_tip,
+                        self.pick_up_tip, 'before', None, None, self,
+                        location=new_loc)
+        self.move_to(new_loc)
+        self._hw.set_current_tiprack_diameter(self._mount,
+                                              new_loc.labware.diameter)
+        self._hw.pick_up_tip(
+            self._mount,
+            self._pipette_config.tip_length,
+            presses, increment)
+        cmds.do_publish(self._instr_ctx.broker, cmds.pick_up_tip,
+                        self.pick_up_tip, 'after', self, None, self,
+                        location=new_loc)
+        self._hw.set_working_volume(self._mount, new_loc.labware.max_volume)
+        new_loc.labware.parent.use_tips(new_loc.labware,  # type: ignore
+                                        self._instr_ctx.channels)
+        self._instr_ctx._last_tip_picked_up_from = \
+            new_loc.labware  # type: ignore
+
         return self
 
     @log_call(log)
