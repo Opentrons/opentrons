@@ -105,22 +105,15 @@ def container_create(monkeypatch, config_tempdir):
     CONFIG['labware_database_file'] = tempdb
 
 
-@pytest.mark.api2_only
-def test_stacking(labware):
-    labware_name = 'corning_96_wellplate_360ul_flat'
-    with pytest.raises(ValueError):
-        labware.load(labware_name, '1', share=True)
-    older_labware = labware.load(labware_name, '1')
-    labware.load(labware_name, '1', share=True)
-    item = labware._ctx._deck_layout.get(1)
-    assert item.highest_z == older_labware.highest_z * 2
-    del labware._ctx._deck_layout['12']
-    assert labware._ctx._deck_layout.highest_z == item.highest_z
-    assert labware._ctx._deck_layout['1'] == item
+@pytest.fixture
+def full_migration(config_tempdir):
+    perform_migration()
+    yield
+    shutil.rmtree(CONFIG['labware_user_definitions_dir_v2']/'legacy_api')
 
 
 @pytest.mark.api2_only
-def test_sharing(labware, container_create):
+def test_sharing_chip(labware, container_create):
     labware_name = '3x8-chip'
     slot = labware._ctx.deck.position_for(1)
     older_labware = labware.load(labware_name, '1')
@@ -134,6 +127,45 @@ def test_sharing(labware, container_create):
     del labware._ctx._deck_layout['12']
     # sharing a slot shouldn't combine labware heights
     assert labware._ctx._deck_layout.highest_z == older_labware.highest_z
+    del labware._ctx._deck_layout['1']
+
+
+@pytest.mark.api2_only
+def test_sharing_full_lw(labware, full_migration):
+    for labware_name in labware.list():
+        slot = labware._ctx.deck.position_for(1)
+        older_labware = labware.load(labware_name, '1')
+        stacked_labware_1 = labware.load(labware_name, '1', share=True)
+        stacked_labware_2 = labware.load(labware_name, '1', share=True)
+        stacked_labware_3 = labware.load(labware_name, '1', share=True)
+        assert older_labware.parent == slot.labware
+        assert stacked_labware_1.parent == slot.labware
+        assert stacked_labware_2.parent == slot.labware
+        assert stacked_labware_3.parent == slot.labware
+        del labware._ctx._deck_layout['12']
+        # sharing a slot shouldn't combine labware heights
+        assert labware._ctx._deck_layout.highest_z == older_labware.highest_z
+        del labware._ctx._deck_layout['1']
+
+
+@pytest.mark.api2_only
+def test_sharing_different_things(labware):
+    slot = labware._ctx.deck.position_for(1)
+    older_labware = labware.load('corning_96_wellplate_360ul_flat', '1')
+    stacked_labware_1 = labware.load(
+        'corning_96_wellplate_360ul_flat', '1', share=True)
+    stacked_labware_2 = labware.load(
+        'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap',
+        '1', share=True)
+    stacked_labware_3 = labware.load(
+        'corning_96_wellplate_360ul_flat', '1', share=True)
+    assert older_labware.parent == slot.labware
+    assert stacked_labware_1.parent == slot.labware
+    assert stacked_labware_2.parent == slot.labware
+    assert stacked_labware_3.parent == slot.labware
+    del labware._ctx._deck_layout['12']
+    # sharing a slot shouldn't combine labware heights
+    assert labware._ctx._deck_layout.highest_z == stacked_labware_2.highest_z
 
 
 @pytest.mark.api2_only

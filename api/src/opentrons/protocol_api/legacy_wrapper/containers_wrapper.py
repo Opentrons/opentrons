@@ -15,7 +15,7 @@ from ..labware import (
     DeckItem)
 from .util import log_call
 from .types import LegacyLocation
-from typing import Dict, List, Any, Union, Optional, TYPE_CHECKING
+from typing import Dict, List, Any, Union, Optional, TYPE_CHECKING, Deque
 
 import jsonschema  # type: ignore
 
@@ -33,8 +33,6 @@ log = logging.getLogger(__name__)
 # Dict[str, Union[List[Well], Dict[str, Well]]]
 AccessorMethodDict = Dict[str, Any]
 
-DIM_X = 127.76  # along X axis in robot coordinate system
-DIM_Y = 85.48  # along Y axis in robot coordinate system
 MODULE_BLACKLIST = ['tempdeck', 'magdeck', 'temperature-plate']
 
 LW_TRANSLATION = {
@@ -550,12 +548,13 @@ class LegacyLabware():
 
     @property
     def name(self) -> str:
-        """ The canonical name of the labware, which is used to load it """
+        """ Can either be the canonical name of the labware, which is used to
+        load it, or the label of the labware specified by a user. """
         return self.lw_obj.name
 
     @name.setter
     def name(self, new_name):
-        """ The canonical name of the labware, which is used to load it """
+        """ Set the labware name"""
         self.lw_obj.name = new_name
 
     @property
@@ -884,7 +883,7 @@ class WellSeries(LegacyLabware):
 class LegacyDeckItem(DeckItem):
     def __init__(self, share_type: str):
         self._highest_z = 0.0
-        self._labware: deque = deque()
+        self._labware: Deque = deque()
         self._type = share_type
 
     @property
@@ -908,10 +907,8 @@ class LegacyDeckItem(DeckItem):
         self.recalculate_z_for_slot()
 
     def recalculate_z_for_slot(self):
-        if self.share_type == 'stack':
-            self.highest_z += self._labware[0].highest_z
-        elif self.share_type == 'share':
-            self.highest_z = max(self.highest_z, self._labware[0].highest_z)
+        if self.share_type == 'share':
+            self.highest_z = max([lw.highest_z for lw in self._labware])
         else:
             self.highest_z = self._labware[0].highest_z
 
@@ -933,22 +930,14 @@ class Containers:
 
     def _determine_share_logic(
             self,
-            new_labware: Labware, old_labware: LegacyDeckItem):
-
-        leg_deck_item = self._size_of_slot(old_labware)
-        leg_deck_item.add_item(new_labware)
-
-    def _size_of_slot(
-            self,
+            new_labware: Labware,
             old_labware: LegacyDeckItem):
-        old_x = old_labware._labware[-1]._dimensions['xDimension']
-        old_y = old_labware._labware[-1]._dimensions['yDimension']
-        if math.isclose(old_x, DIM_X, rel_tol=0.1) and\
-                math.isclose(old_y, DIM_Y, rel_tol=0.1):
-            old_labware.share_type = 'stack'
-        else:
+        # In order for the z height to be calculated correctly,
+        # we need to be sure that the share type is set correctly.
+        if old_labware.share_type == 'normal':
             old_labware.share_type = 'share'
-        return old_labware
+
+        old_labware.add_item(new_labware)
 
     @log_call(log)
     def load(
@@ -956,7 +945,7 @@ class Containers:
             container_name: str,
             slot: Union[int, str],
             label: str = None,
-            share: bool = False) -> LegacyLabware:
+            share: bool = False) -> 'LegacyLabware':
         """ Load a piece of labware by specifying its name and position.
 
         This method calls :py:meth:`.ProtocolContext.load_labware`;
@@ -1014,6 +1003,8 @@ class Containers:
                              'share=True')
         elif share and item:
             self._determine_share_logic(labware_object, item)
+            self._ctx._deck_layout.recalculate_high_z()
+
         else:
             deck_item = LegacyDeckItem('normal')
             deck_item.add_item(labware_object)

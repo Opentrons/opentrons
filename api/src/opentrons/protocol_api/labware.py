@@ -363,12 +363,13 @@ class Labware(DeckItem):
     @property  # type: ignore
     @requires_version(2, 0)
     def name(self) -> str:
-        """ The canonical name of the labware, which is used to load it """
+        """ Can either be the canonical name of the labware, which is used to
+        load it, or the label of the labware specified by a user. """
         return self._name
 
     @name.setter  # type: ignore
     def name(self, new_name):
-        """ The canonical name of the labware, which is used to load it """
+        """ Set the labware name"""
         self._name = new_name
 
     @property  # type: ignore
