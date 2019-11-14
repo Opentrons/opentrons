@@ -13,7 +13,6 @@ from ..labware import (
     ModuleGeometry,
     LabwareDefinition,
     DeckItem)
-# from ..util import DeckItem
 from .util import log_call
 from .types import LegacyLocation
 from typing import Dict, List, Any, Union, Optional, TYPE_CHECKING
@@ -937,20 +936,7 @@ class Containers:
             new_labware: Labware, old_labware: LegacyDeckItem):
 
         leg_deck_item = self._size_of_slot(old_labware)
-        # leg_deck_item.add_item(old_labware)
         leg_deck_item.add_item(new_labware)
-
-    # def _share_slot(self, labware_object):
-    #
-    #     return None
-    #
-    # def _stack_labware(self, labware_object):
-    #
-    #
-    #     labware.highest_z = labware.highest_z + item.highest_z
-    #     del self._ctx._deck_layout[slot_key_int]
-    #     return LegacyLabware(
-    #         self._ctx.load_labware(container_name, slot, label, legacy=True))
 
     def _size_of_slot(
             self,

@@ -8,7 +8,6 @@ from typing import Any, List, Optional, Tuple, Dict
 from opentrons import types
 from .labware import (Labware, Well,
                       quirks_from_any_parent, ThermocyclerGeometry, DeckItem)
-# from .util import DeckItem
 from opentrons.hardware_control.types import CriticalPoint
 
 
@@ -118,7 +117,6 @@ def plan_moves(
             (to_point, dest_cp_override)]
 
 
-# DeckItem = Union[Labware, ModuleGeometry, ThermocyclerGeometry]
 class Deck(UserDict):
     def __init__(self):
         super().__init__()
