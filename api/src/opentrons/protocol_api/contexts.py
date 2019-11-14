@@ -1711,6 +1711,7 @@ class InstrumentContext(CommandPublisher):
             raise
         else:
             self._ctx.location_cache = location
+        print(f'Location cache: {self._ctx.location_cache}')
         return self
 
     @property  # type: ignore

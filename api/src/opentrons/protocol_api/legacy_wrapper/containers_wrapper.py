@@ -252,7 +252,6 @@ class LegacyWell(Well):
     def parent(self) -> 'LegacyLabware':
         return self._parent  # type: ignore
 
-    @property
     def get_name(self) -> Optional[str]:
         return self._well_name
 

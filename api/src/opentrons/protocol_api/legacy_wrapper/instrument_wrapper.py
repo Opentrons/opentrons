@@ -122,9 +122,11 @@ class Pipette:
         return self._pipette_status['min_volume']
 
     @property
-    def previous_placeable(self):
-        # this probably needs to return a legacy labware
-        return self._ctx.location_cache.labware
+    def previous_placeable(self) -> Optional[LegacyWell]:
+        if self._ctx.location_cache:
+            return self._ctx.location_cache.labware
+        else:
+            return None
 
     @property
     def placeables(self) -> List[Union[LegacyLabware, LegacyWell]]:
@@ -259,6 +261,7 @@ class Pipette:
 
         if isinstance(location, LegacyWell):
             location = location.top()
+        print(f'Wrapper: Move to: {self.previous_placeable}')
 
         return self._instr_ctx.move_to(location=location,
                                        force_direct=force_direct)
@@ -325,20 +328,20 @@ class Pipette:
                 location = volume
             volume = self._working_volume - self.current_volume
 
-        if not location and self.previous_placeable:
-            display_location = self.previous_placeable
+        display_location = location if location else self.previous_placeable
+        print(f'display_location: {display_location}')
 
         if volume != 0:
             self._position_for_aspirate(location)
 
             cmds.do_publish(
-                self._instr_ctx.broker, cmds.aspirate, self.aspirate,
+                self._instr_ctx.broker, cmds.aspirate, self._instr_ctx.aspirate,
                 'before', None, None, self._instr_ctx, volume,
                 display_location, rate)
             self._hw.aspirate(self._mount, volume, rate)
             cmds.do_publish(
-                self._instr_ctx.broker, cmds.aspirate, self.aspirate,
-                'after', self, None,  self._instr_ctx, volume,
+                self._instr_ctx.broker, cmds.aspirate, self._instr_ctx.aspirate,
+                'after', self._instr_ctx, None,  self._instr_ctx, volume,
                 display_location, rate)
 
         return self
@@ -354,6 +357,8 @@ class Pipette:
             placeable = self.previous_placeable
 
         if self.current_volume == 0:
+            if placeable:
+                self.move_to(placeable.top())
             self._hw.prepare_for_aspirate(self._mount)
 
         if location:
@@ -363,7 +368,7 @@ class Pipette:
                     labware=well,
                     offset=offset + Point(
                         0, 0, self._instr_ctx.well_bottom_clearance.aspirate))
-            self.move_to(location)
+            self.move_to(location, strategy='direct')
 
     @log_call(log)
     def dispense(self,
@@ -470,8 +475,9 @@ class Pipette:
             p300.mix(3)
 
         """
+        print(f"Rep: {repetitions}, vol: {volume}, location: {location}, rate: {rate}")
         if not self.has_tip:
-            raise hc.NoTipAttachedError('Pipette has no tip. Aborting mix()')
+            self._log.warning("Cannot mix without a tip attached.")
 
         if not isinstance(volume, Number):
             if isinstance(volume, (LegacyWell, LegacyLocation)) \
@@ -482,12 +488,17 @@ class Pipette:
         if not location and self.previous_placeable:
             location = self.previous_placeable
 
-        self.aspirate(volume, location, rate)
-        while repetitions - 1 > 0:
+        cmds.do_publish(self._instr_ctx.broker, cmds.mix, self.mix, 'before',
+                        None, None, self, repetitions, volume, location, rate)
+
+        self.aspirate(volume=volume, location=location, rate=rate)
+        for i in range(repetitions - 1):
             self.dispense(volume, rate=rate)
             self.aspirate(volume, rate=rate)
-            repetitions -= 1
         self.dispense(volume, rate=rate)
+
+        cmds.do_publish(self._instr_ctx.broker, cmds.mix, self.mix, 'after',
+                        self, None, self, repetitions, volume, location, rate)
 
         return self
 
