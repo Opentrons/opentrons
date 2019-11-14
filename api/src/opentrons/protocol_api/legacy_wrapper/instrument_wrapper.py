@@ -47,7 +47,7 @@ def _absolute_motion_target(motiontarget: MotionTarget) -> Location:
         real_loc = target_loc.labware
     return Location(
         labware=real_loc,
-        point=(target_loc.labware.from_center(-1, -1, -1).offset
+        point=(target_loc.labware._from_center_cartesian(-1, -1, -1)
                + target_loc.offset))
 
 

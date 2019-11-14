@@ -7,6 +7,8 @@ from numpy import add, subtract, isclose
 # from opentrons.legacy_api.containers import unpack_location, Placeable
 from opentrons.legacy_api.containers.placeable import Placeable
 from opentrons.protocol_api.legacy_wrapper.containers_wrapper import LegacyWell
+from opentrons import types
+from opentrons.hardware_control import types as hwtypes
 
 
 @pytest.fixture
@@ -227,3 +229,96 @@ def test_mix_locations(monkeypatch, instruments, labware, load_v1_instrument,
         if expected_args:
             assert len(expected_args) == len(call_args)
             assert expected_args[0] == call_args[0]
+
+
+def test_move_to(monkeypatch, instruments, labware, load_v1_instrument):
+    robot, legacy_instr, legacy_lw = load_v1_instrument
+    tr = labware.load('opentrons_96_tiprack_10ul', '1')
+    pip = instruments.P10_Single(mount='left', tip_racks=[tr])
+    lw = labware.load('corning_96_wellplate_360ul_flat', '2')
+
+    instruments._robot_wrapper.home()
+    robot.home()
+
+    new_actual_move = pip._ctx._hw_manager.hardware._api._backend.move
+
+    def new_passthru(*args, **kwargs):
+        new_actual_move(*args, **kwargs)
+    new_move = mock.Mock()
+    new_move.side_effect = new_passthru
+    monkeypatch.setattr(
+        pip._ctx._hw_manager.hardware._api._backend, 'move', new_move)
+
+    legacy_actual_move = robot._driver.move
+
+    def legacy_passthru(*args, **kwargs):
+        legacy_actual_move(*args, **kwargs)
+    legacy_move = mock.Mock()
+    legacy_move.side_effect = legacy_passthru
+    monkeypatch.setattr(robot._driver, 'move', legacy_move)
+
+    def _get_common_axes(legacy_axes, new_axes):
+        # API.move_to doesn't supply axis commands that haven't changed, so
+        # we have to check only the common axes.
+        common_axes = set(legacy_axes.keys())\
+            .intersection(set(new_axes.keys()))
+        common_lpos = {k: v
+                       for k, v in legacy_axes.items()
+                       if k in common_axes}
+        common_npos = {k: v
+                       for k, v in new_axes.items()
+                       if k in common_axes}
+        return common_lpos, common_npos
+
+    # home position -> well should be three moves
+
+    legacy_instr.move_to(legacy_lw['A1'].top())
+    pip.move_to(lw['A1'].top())
+    assert len(new_move.call_args_list) == 3
+    assert len(legacy_move.call_args_list) == len(new_move.call_args_list)
+    for legacy_call, new_call in zip(
+            legacy_move.call_args_list, new_move.call_args_list):
+        largs, lkwargs = legacy_call
+        nargs, nkwargs = new_call
+        common_lpos, common_npos = _get_common_axes(largs[0], nargs[0])
+        assert common_lpos == common_npos
+
+    legacy_move.reset_mock()
+    new_move.reset_mock()
+
+    # well -> higher in the well should be one move
+
+    old_pos = pip._ctx._hw_manager.hardware.gantry_position(types.Mount.LEFT)
+    legacy_instr.move_to(legacy_lw['A1'].top(z=10))
+    pip.move_to(lw['A1'].top(z=10))
+    new_pos = pip._ctx._hw_manager.hardware.gantry_position(types.Mount.LEFT)
+    assert old_pos[:2] == new_pos[:2]
+
+    assert len(new_move.call_args_list) == 1
+    # the robot always calls driver.move separately for xy and for z, even if
+    # one of those doesn't have motion. the gantry_position assertions above
+    # make sure we're not being too generous, and that the x and y in fact
+    # should not be moving
+    fused_move = legacy_move.call_args_list[0][0][0]
+    fused_move.update(legacy_move.call_args_list[1][0][0])
+    common_lpos, common_npos = _get_common_axes(fused_move,
+                                                new_move.call_args[0][0])
+    assert common_lpos == common_npos
+
+    # same deal when using a well alone (should go to top, should be direct,
+    # robot singleton still calls move() twice)
+
+    new_move.reset_mock()
+    legacy_move.reset_mock()
+
+    old_pos = pip._ctx._hw_manager.hardware.gantry_position(types.Mount.LEFT)
+    legacy_instr.move_to(legacy_lw['A1'])
+    pip.move_to(lw['A1'])
+    new_pos = pip._ctx._hw_manager.hardware.gantry_position(types.Mount.LEFT)
+    assert old_pos[:2] == new_pos[:2]
+
+    fused_move = legacy_move.call_args_list[0][0][0]
+    fused_move.update(legacy_move.call_args_list[1][0][0])
+    common_lpos, common_npos = _get_common_axes(fused_move,
+                                                new_move.call_args[0][0])
+    assert common_lpos == common_npos
