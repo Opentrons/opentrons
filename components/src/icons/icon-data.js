@@ -333,6 +333,21 @@ const ICON_DATA_BY_NAME = {
     path:
       'M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z',
   },
+  'ot-magnet': {
+    viewBox: '0 0 24 24',
+    path:
+      'M17 3h-6c-5 0-9 4-9 9s4 9 9 9h6v-4h-6c-2.8 0-5-2.2-5-5s2.2-5 5-5h6m2 10v4h3v-4M19 3v4h3V3',
+  },
+  'ot-temperature': {
+    viewBox: '0 0 24 24',
+    path:
+      'M15 13V5a3 3 0 00-6 0v8a5 5 0 106 0m-3-9a1 1 0 011 1v3h-2V5a1 1 0 011-1z',
+  },
+  'ot-thermocycler': {
+    viewBox: '0 0 24 24',
+    path:
+      'M12 6v3l4-4-4-4v3a8 8 0 00-8 8c0 1.57.46 3.03 1.24 4.26L6.7 14.8A5.9 5.9 0 016 12a6 6 0 016-6m6.76 1.74L17.3 9.2c.44.84.7 1.8.7 2.8a6 6 0 01-6 6v-3l-4 4 4 4v-3a8 8 0 008-8c0-1.57-.46-3.03-1.24-4.26z',
+  },
 }
 
 export type IconName = $Keys<typeof ICON_DATA_BY_NAME>
