@@ -25,7 +25,8 @@ minimalLabwareDef = {
     },
     "parameters": {
         "isTiprack": False,
-        "isMagneticModuleCompatible": False
+        "isMagneticModuleCompatible": False,
+        "loadName": "minimal_labware_def"
     },
     "ordering": [["A1", "B1"], ["A2", "B2"]],
     "wells": {
@@ -103,32 +104,35 @@ def container_create(monkeypatch, config_tempdir):
     shutil.rmtree(CONFIG['labware_user_definitions_dir_v2']/'legacy_api')
     CONFIG['labware_database_file'] = tempdb
 
+
 @pytest.mark.api2_only
 def test_stacking(labware):
     labware_name = 'corning_96_wellplate_360ul_flat'
     with pytest.raises(ValueError):
         labware.load(labware_name, '1', share=True)
     older_labware = labware.load(labware_name, '1')
-    stacked_labware = labware.load(labware_name, '1', share=True)
-    assert stacked_labware.highest_z == older_labware.highest_z * 2
+    labware.load(labware_name, '1', share=True)
+    item = labware._ctx._deck_layout.get(1)
+    assert item.highest_z == older_labware.highest_z * 2
     del labware._ctx._deck_layout['12']
-    assert labware._ctx._deck_layout.highest_z == stacked_labware.highest_z
-    assert labware._ctx._deck_layout['1'] == stacked_labware
+    assert labware._ctx._deck_layout.highest_z == item.highest_z
+    assert labware._ctx._deck_layout['1'] == item
 
 
 @pytest.mark.api2_only
 def test_sharing(labware, container_create):
     labware_name = '3x8-chip'
+    slot = labware._ctx.deck.position_for(1)
     older_labware = labware.load(labware_name, '1')
     stacked_labware_1 = labware.load(labware_name, '1', share=True)
     stacked_labware_2 = labware.load(labware_name, '1', share=True)
     stacked_labware_3 = labware.load(labware_name, '1', share=True)
-    assert older_labware.parent == slot
-    assert stacked_labware_1.parent == slot
-    assert stacked_labware_2.parent == slot
-    assert stacked_labware_3.parent == slot
+    assert older_labware.parent == slot.labware
+    assert stacked_labware_1.parent == slot.labware
+    assert stacked_labware_2.parent == slot.labware
+    assert stacked_labware_3.parent == slot.labware
     del labware._ctx._deck_layout['12']
-    # sharing a slot shouldn't combine labwares
+    # sharing a slot shouldn't combine labware heights
     assert labware._ctx._deck_layout.highest_z == older_labware.highest_z
 
 
@@ -343,3 +347,10 @@ def test_legacy_well_position(labware):
     # this too
     assert isclose(wp[0].top(radius=1, degrees=225).offset,
                    Point(1, 1, 10.67), atol=0.005).all()
+
+
+def check_label_for_labware(labware):
+    plate1 = labware.load('96-flat', slot=1, label='plate 1')
+    plate2 = labware.load('96-flat', slot=2, label='plate 2')
+    assert plate1.name == 'plate 1'
+    assert plate2.name == 'plate 2'

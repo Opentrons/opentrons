@@ -1,14 +1,14 @@
-from collections import UserDict, UserList
+from collections import UserDict
 import functools
-import abc
 import logging
 import pkgutil
 import json
-from typing import Any, List, Optional, Tuple, Union, Dict
+from typing import Any, List, Optional, Tuple, Dict
 
 from opentrons import types
-from .labware import (Labware, Well, ModuleGeometry,
-                      quirks_from_any_parent, ThermocyclerGeometry)
+from .labware import (Labware, Well,
+                      quirks_from_any_parent, ThermocyclerGeometry, DeckItem)
+# from .util import DeckItem
 from opentrons.hardware_control.types import CriticalPoint
 
 
@@ -119,16 +119,6 @@ def plan_moves(
 
 
 # DeckItem = Union[Labware, ModuleGeometry, ThermocyclerGeometry]
-
-class DeckItem(abc.ABC):
-
-    @property
-    @abc.abstractmethod
-    def highest_z(self):
-        pass
-
-
-
 class Deck(UserDict):
     def __init__(self):
         super().__init__()

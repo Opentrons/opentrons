@@ -12,6 +12,7 @@ minimalLabwareDef = {
     },
     "parameters": {
         "isTiprack": False,
+        "loadName": "minimal_labware_def"
     },
     "ordering": [["A1"], ["A2"]],
     "wells": {
@@ -52,6 +53,7 @@ minimalLabwareDef2 = {
     },
     "parameters": {
         "isTiprack": False,
+        "loadName": "minimal_labware_def"
     },
     "ordering": [["A1", "B1", "C1"], ["A2", "B2", "C2"]],
     "wells": {

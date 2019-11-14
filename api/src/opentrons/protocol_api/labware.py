@@ -15,6 +15,7 @@ import os
 import pkgutil
 import shutil
 import sys
+import abc
 from pathlib import Path
 from collections import defaultdict
 from enum import Enum, auto
@@ -57,6 +58,19 @@ well_shapes = {
     'rectangular': WellShape.RECTANGULAR,
     'circular': WellShape.CIRCULAR
 }
+
+
+class DeckItem(abc.ABC):
+
+    @property  # type: ignore
+    @abc.abstractmethod
+    def highest_z(self):
+        pass
+
+    @highest_z.setter  # type: ignore
+    @abc.abstractmethod
+    def highest_z(self, new_z: float):
+        pass
 
 
 class Well:
@@ -235,7 +249,6 @@ class Well:
         return hash(self.top().point)
 
 
-@requires_version(2, 0)
 class Labware(DeckItem):
     """
     This class represents a labware, such as a PCR plate, a tube rack, trough,
@@ -297,8 +310,10 @@ class Labware(DeckItem):
         self._api_version = api_level
         if label:
             dn = label
+            self._name = dn
         else:
             dn = definition['metadata']['displayName']
+            self._name = definition['parameters']['loadName']
         self._display_name = "{} on {}".format(dn, str(parent.labware))
         self._calibrated_offset: Point = Point(0, 0, 0)
         self._wells: List[Well] = []
@@ -349,7 +364,12 @@ class Labware(DeckItem):
     @requires_version(2, 0)
     def name(self) -> str:
         """ The canonical name of the labware, which is used to load it """
-        return self._definition['parameters']['loadName']
+        return self._name
+
+    @name.setter  # type: ignore
+    def name(self, new_name):
+        """ The canonical name of the labware, which is used to load it """
+        self._name = new_name
 
     @property  # type: ignore
     @requires_version(2, 0)

@@ -22,7 +22,8 @@ minimalLabwareDef = {
     "parameters": {
         "isTiprack": True,
         "tipLength": 55.3,
-        "tipOverlap": 2.8
+        "tipOverlap": 2.8,
+        "loadName": "minimal_labware_def"
     },
     "ordering": [["A1"], ["A2"]],
     "wells": {

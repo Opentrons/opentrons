@@ -1,14 +1,19 @@
 import logging
 from math import sin, cos, pi
+from collections import deque
 
 from ..labware import (
     Labware,
     get_all_labware_definitions,
+    load_from_definition,
     get_labware_definition,
     save_definition,
     Well,
     WellShape,
-    ModuleGeometry)
+    ModuleGeometry,
+    LabwareDefinition,
+    DeckItem)
+# from ..util import DeckItem
 from .util import log_call
 from .types import LegacyLocation
 from typing import Dict, List, Any, Union, Optional, TYPE_CHECKING
@@ -29,6 +34,8 @@ log = logging.getLogger(__name__)
 # Dict[str, Union[List[Well], Dict[str, Well]]]
 AccessorMethodDict = Dict[str, Any]
 
+DIM_X = 127.76  # along X axis in robot coordinate system
+DIM_Y = 85.48  # along Y axis in robot coordinate system
 MODULE_BLACKLIST = ['tempdeck', 'magdeck', 'temperature-plate']
 
 LW_TRANSLATION = {
@@ -543,6 +550,16 @@ class LegacyLabware():
         return self.lw_obj.uri
 
     @property
+    def name(self) -> str:
+        """ The canonical name of the labware, which is used to load it """
+        return self.lw_obj.name
+
+    @name.setter
+    def name(self, new_name):
+        """ The canonical name of the labware, which is used to load it """
+        self.lw_obj.name = new_name
+
+    @property
     def quirks(self) -> List[str]:
         """ Quirks specific to this labware. """
         return self.lw_obj.quirks
@@ -865,6 +882,41 @@ class WellSeries(LegacyLabware):
             raise TypeError(f'You cannot call {self.__name__}')
 
 
+class LegacyDeckItem(DeckItem):
+    def __init__(self, share_type: str):
+        self._highest_z = 0.0
+        self._labware: deque = deque()
+        self._type = share_type
+
+    @property
+    def highest_z(self):
+        return self._highest_z
+
+    @highest_z.setter
+    def highest_z(self, new_z):
+        self._highest_z = new_z
+
+    @property
+    def share_type(self):
+        return self._type
+
+    @share_type.setter
+    def share_type(self, type: str):
+        self._type = type
+
+    def add_item(self, item: Labware):
+        self._labware.appendleft(item)
+        self.recalculate_z_for_slot()
+
+    def recalculate_z_for_slot(self):
+        if self.share_type == 'stack':
+            self.highest_z += self._labware[0].highest_z
+        elif self.share_type == 'share':
+            self.highest_z = max(self.highest_z, self._labware[0].highest_z)
+        else:
+            self.highest_z = self._labware[0].highest_z
+
+
 class Containers:
     """ A backwards-compatibility shim for the `New Protocol API`_.
 
@@ -879,35 +931,38 @@ class Containers:
 
     def __init__(self, ctx: 'ProtocolContext') -> None:
         self._ctx = ctx
-        self._sharing = {}
 
-    def _determine_share_logic(self, labware_name, location, label):
-        slot_key_int = self._ctx._deck_layout._check_name(location)
-        item = self._ctx._deck_layout.get(slot_key_int)
-        if not item:
-            raise ValueError(f'There is no other labware in slot {location}',
-                             'please add a labware, then specify share=True')
-        parent = self.deck.position_for(location)
-        labware_definition = get_labware_definition(labware_name)
-        labware_object = load_from_definition(labware_definition, parent, label)
-        _size_of_slot(labware_object)
-        return labware_object
+    def _determine_share_logic(
+            self,
+            new_labware: Labware, old_labware: LegacyDeckItem):
 
-    def _share_slot(self, labware_object):
+        leg_deck_item = self._size_of_slot(old_labware)
+        # leg_deck_item.add_item(old_labware)
+        leg_deck_item.add_item(new_labware)
 
-        return None
+    # def _share_slot(self, labware_object):
+    #
+    #     return None
+    #
+    # def _stack_labware(self, labware_object):
+    #
+    #
+    #     labware.highest_z = labware.highest_z + item.highest_z
+    #     del self._ctx._deck_layout[slot_key_int]
+    #     return LegacyLabware(
+    #         self._ctx.load_labware(container_name, slot, label, legacy=True))
 
-    def _stack_labware(self, labware_object):
-
-
-        labware.highest_z = labware.highest_z + item.highest_z
-        del self._ctx._deck_layout[slot_key_int]
-        return LegacyLabware(
-            self._ctx.load_labware(container_name, slot, label, legacy=True))
-
-
-    def _size_of_slot():
-        return None
+    def _size_of_slot(
+            self,
+            old_labware: LegacyDeckItem):
+        old_x = old_labware._labware[-1]._dimensions['xDimension']
+        old_y = old_labware._labware[-1]._dimensions['yDimension']
+        if math.isclose(old_x, DIM_X, rel_tol=0.1) and\
+                math.isclose(old_y, DIM_Y, rel_tol=0.1):
+            old_labware.share_type = 'stack'
+        else:
+            old_labware.share_type = 'share'
+        return old_labware
 
     @log_call(log)
     def load(
@@ -926,7 +981,8 @@ class Containers:
         In addition, this function contains translations between old
         labware names and new labware names.
         """
-        if self._ctx._deck_layout[slot] and not share:
+        slot_int = self._ctx._deck_layout._check_name(slot)
+        if self._ctx._deck_layout[slot_int] and not share:
             raise RuntimeWarning(
                 f'Slot {slot} has child. Use "containers.load(\''
                 f'{container_name}\', \'{slot}\', share=True)"')
@@ -934,16 +990,15 @@ class Containers:
             raise RuntimeError(
                 "load modules using modules.load()")
         defn = self._get_labware_def_with_fallback(container_name)
-        if slot in self._ctx._deck_layout\
-           and isinstance(self._ctx._deck_layout[slot], ModuleGeometry):
-            geom = self._ctx._deck_layout[slot]
+        if slot_int in self._ctx._deck_layout and\
+                isinstance(self._ctx._deck_layout[slot_int], ModuleGeometry):
+            geom = self._ctx._deck_layout[slot_int]
             mod = [mod
                    for mod in self._ctx.loaded_modules.values()
                    if mod.geometry is geom][0]
             lw_obj = mod.load_labware_from_definition(defn)
         else:
-            lw_obj = self._ctx.load_labware_from_definition(
-                defn, slot)
+            lw_obj = self._add_labware_to_deck(defn, slot_int, label, share)
         return LegacyLabware(lw_obj)
 
     def _get_labware_def_with_fallback(
@@ -958,6 +1013,27 @@ class Containers:
                 return get_labware_definition(
                     _convert_labware_name(container_name),
                     namespace='legacy_api')
+
+    def _add_labware_to_deck(self, defn: LabwareDefinition,
+                             slot: int, label: Optional[str],
+                             share: bool) -> Labware:
+        # Manually add LegacyDeckItem to deck if not a module
+        parent = self._ctx.deck.position_for(slot)
+        labware_object = load_from_definition(
+            defn, parent, label, self._ctx.api_version)
+        item = self._ctx._deck_layout.get(slot)
+        if share and not item:
+            raise ValueError(f'There is no other labware in slot {slot}',
+                             'please add a labware, then specify,',
+                             'share=True')
+        elif share and item:
+            self._determine_share_logic(labware_object, item)
+        else:
+            deck_item = LegacyDeckItem('normal')
+            deck_item.add_item(labware_object)
+            self._ctx._deck_layout[slot] = deck_item
+
+        return labware_object
 
     @log_call(log)
     def create(
