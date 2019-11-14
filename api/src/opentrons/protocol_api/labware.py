@@ -15,6 +15,7 @@ import os
 import pkgutil
 import shutil
 import sys
+import abc
 from pathlib import Path
 from collections import defaultdict
 from enum import Enum, auto
@@ -57,6 +58,19 @@ well_shapes = {
     'rectangular': WellShape.RECTANGULAR,
     'circular': WellShape.CIRCULAR
 }
+
+
+class DeckItem(abc.ABC):
+
+    @property  # type: ignore
+    @abc.abstractmethod
+    def highest_z(self):
+        pass
+
+    @highest_z.setter  # type: ignore
+    @abc.abstractmethod
+    def highest_z(self, new_z: float):
+        pass
 
 
 class Well:
@@ -235,7 +249,7 @@ class Well:
         return hash(self.top().point)
 
 
-class Labware:
+class Labware(DeckItem):
     """
     This class represents a labware, such as a PCR plate, a tube rack, trough,
     tip rack, etc. It defines the physical geometry of the labware, and
@@ -296,8 +310,10 @@ class Labware:
         self._api_version = api_level
         if label:
             dn = label
+            self._name = dn
         else:
             dn = definition['metadata']['displayName']
+            self._name = definition['parameters']['loadName']
         self._display_name = "{} on {}".format(dn, str(parent.labware))
         self._calibrated_offset: Point = Point(0, 0, 0)
         self._wells: List[Well] = []
@@ -318,6 +334,7 @@ class Labware:
 
         self._pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
         self._definition = definition
+        self._highest_z = self._dimensions['zDimension']
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -346,8 +363,14 @@ class Labware:
     @property  # type: ignore
     @requires_version(2, 0)
     def name(self) -> str:
-        """ The canonical name of the labware, which is used to load it """
-        return self._definition['parameters']['loadName']
+        """ Can either be the canonical name of the labware, which is used to
+        load it, or the label of the labware specified by a user. """
+        return self._name
+
+    @name.setter  # type: ignore
+    def name(self, new_name):
+        """ Set the labware name"""
+        self._name = new_name
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -585,7 +608,16 @@ class Labware:
         This is drawn from the 'dimensions'/'zDimension' elements of the
         labware definition and takes into account the calibration offset.
         """
-        return self._dimensions['zDimension'] + self._calibrated_offset.z
+        return self._highest_z + self._calibrated_offset.z
+
+    @highest_z.setter
+    def highest_z(self, new_height: float):
+        """
+        The z-coordinate of the tallest single point anywhere on the labware.
+        This is drawn from the 'dimensions'/'zDimension' elements of the
+        labware definition and takes into account the calibration offset.
+        """
+        self._highest_z = new_height
 
     @property
     def _is_tiprack(self) -> bool:
@@ -766,7 +798,7 @@ class Labware:
                 well.has_tip = True
 
 
-class ModuleGeometry:
+class ModuleGeometry(DeckItem):
     """
     This class represents an active peripheral, such as an Opentrons Magnetic
     Module, Temperature Module or Thermocycler Module. It defines the physical

@@ -3,11 +3,11 @@ import functools
 import logging
 import pkgutil
 import json
-from typing import Any, List, Optional, Tuple, Union, Dict
+from typing import Any, List, Optional, Tuple, Dict
 
 from opentrons import types
-from .labware import (Labware, Well, ModuleGeometry,
-                      quirks_from_any_parent, ThermocyclerGeometry)
+from .labware import (Labware, Well,
+                      quirks_from_any_parent, ThermocyclerGeometry, DeckItem)
 from opentrons.hardware_control.types import CriticalPoint
 
 
@@ -115,9 +115,6 @@ def plan_moves(
     return [(from_point._replace(z=safe), origin_cp_override),
             (to_point._replace(z=safe), dest_cp_override),
             (to_point, dest_cp_override)]
-
-
-DeckItem = Union[Labware, ModuleGeometry, ThermocyclerGeometry]
 
 
 class Deck(UserDict):
