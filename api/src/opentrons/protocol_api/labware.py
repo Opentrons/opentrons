@@ -150,6 +150,10 @@ class Well:
                  front-left corner of slot 1 as (0,0,0)). If z is specified,
                  returns a point offset by z mm from top-center
         """
+        return self._top(z)
+
+    def _top(self, z: float = 0.0) -> Location:
+        # fairly hacky workaround for inheritance issues with LegacyWell
         return Location(self._position + Point(0, 0, z), self)
 
     @requires_version(2, 0)
@@ -161,7 +165,7 @@ class Well:
                  slot 1 as (0,0,0)). If z is specified, returns a point
                  offset by z mm from bottom-center
         """
-        top = self.top()
+        top = self._top()
         bottom_z = top.point.z - self._depth + z
         return Location(Point(x=top.point.x, y=top.point.y, z=bottom_z), self)
 
@@ -172,14 +176,18 @@ class Well:
                  of the well relative to the deck (with the front-left corner
                  of slot 1 as (0,0,0))
         """
-        top = self.top()
+        return self._center()
+
+    def _center(self) -> Location:
+        # fairly hacky workaround for inheritance issues with LegacyWell
+        top = self._top()
         center_z = top.point.z - (self._depth / 2.0)
         return Location(Point(x=top.point.x, y=top.point.y, z=center_z), self)
 
     def _from_center_cartesian(
             self, x: float, y: float, z: float) -> Point:
         """
-        Specifies an arbitrary point relative to the center of the well based
+        Specifies an arbitrary point in deck coordinates based
         on percentages of the radius in each axis. For example, to specify the
         back-right corner of a well at 1/4 of the well depth from the bottom,
         the call would be `_from_center_cartesian(1, 1, -0.5)`.
@@ -197,7 +205,7 @@ class Well:
         :return: a Point representing the specified location in absolute deck
         coordinates
         """
-        center = self.center()
+        center = self._center()
         if self._shape is WellShape.RECTANGULAR:
             x_size = self._length
             y_size = self._width

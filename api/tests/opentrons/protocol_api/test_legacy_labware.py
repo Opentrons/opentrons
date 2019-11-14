@@ -1,11 +1,15 @@
+import math
 import pytest
 import shutil
+
+from numpy import isclose
 
 from opentrons.legacy_api import containers
 from opentrons.config import CONFIG
 from opentrons.data_storage import database as db_cmds
 from opentrons.protocol_api.legacy_wrapper.containers_wrapper import\
-    LegacyLabware, perform_migration
+    LegacyLabware, perform_migration, LegacyWell
+from opentrons.protocol_api.legacy_wrapper.types import LegacyLocation
 from opentrons.protocol_api.labware import get_labware_definition, Labware
 from opentrons.types import Point, Location
 
@@ -256,11 +260,11 @@ def test_labware_create(labware, container_create):
 def test_legacy_wells(minimal_labware):
     well = minimal_labware.wells()[2]
     well_def = minimalLabwareDef['wells']['A2']
-    assert well.top().point ==\
+    assert super(LegacyWell, well)._top().point ==\
         Point(well_def['x'], well_def['y'], well_def['depth'])
-    assert well.center().point ==\
+    assert super(LegacyWell, well)._center().point ==\
         Point(well_def['x'], well_def['y'], well_def['depth']/2)
-    assert well.bottom().point ==\
+    assert super(LegacyWell, well).bottom().point ==\
         Point(well_def['x'], well_def['y'], 0)
 
 
@@ -273,3 +277,41 @@ def test_load_labware_on_module(labware, modules):
     md = modules.load('magdeck', 2)
     plate2 = labware.load('96-flat', 2, share=True)
     assert md._ctx.labware is plate2.lw_obj
+
+
+@pytest.mark.api2_only
+def test_legacy_well_position(labware):
+    wp = labware.load('corning_96_wellplate_360ul_flat', '2')
+    # These numeric literals are taken from experimentation with loading this
+    # labware into v1
+    assert isinstance(wp[0].center(), LegacyLocation)
+    assert wp[0].center().labware is wp[0]
+    assert isclose(wp[0].center().offset,
+                   Point(3.43, 3.43, 5.33),
+                   atol=.005).all()
+
+    assert isinstance(wp[0].top(), LegacyLocation)
+    assert wp[0].top().labware is wp[0]
+    assert isclose(wp[0].top().offset,
+                   Point(3.43, 3.43, 10.67)).all()
+
+    assert isinstance(wp[0].bottom(), LegacyLocation)
+    assert wp[0].bottom().labware is wp[0]
+    assert isclose(wp[0].bottom().offset,
+                   Point(3.43, 3.43, 0)).all()
+    # should be origin
+    assert isclose(wp[0].from_center(-1, -1, -1).offset,
+                   Point(0, 0, 0)).all()
+
+    # should be another way to spell origin, but actually it's not because
+    # the polar coordinates used in Placeable.from_polar are actually based
+    # on an inscribed circle
+    assert isclose(wp[0].from_center(r=1, theta=5*math.pi/4, h=-1).offset,
+                   Point(1, 1, 0), atol=0.005).all()
+    # this too
+    assert isclose(wp[0].bottom(radius=1, degrees=225).offset,
+                   Point(1, 1, 0), atol=0.005).all()
+
+    # this too
+    assert isclose(wp[0].top(radius=1, degrees=225).offset,
+                   Point(1, 1, 10.67), atol=0.005).all()
