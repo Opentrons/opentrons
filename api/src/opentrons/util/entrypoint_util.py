@@ -29,7 +29,6 @@ def labware_from_paths(paths: List[str]) -> Dict[str, Dict[str, Any]]:
                 try:
                     defn = labware.verify_definition(child.read_bytes())
                 except (ValidationError, JSONDecodeError) as e:
-                    print(f'{child}: invalid ({str(e)})')
                     log.info(f"{child}: invalid ({str(e)})")
                 else:
                     uri = labware.uri_from_definition(defn)

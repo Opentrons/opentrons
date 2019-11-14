@@ -27,20 +27,25 @@ MotionTarget = Union[LegacyLocation, LegacyWell]
 
 
 def _unpack_motion_target(
-        motiontarget: MotionTarget) -> LegacyLocation:
+        motiontarget: MotionTarget, position: str = 'top') -> LegacyLocation:
     """ Make sure we have a full LegacyLocation """
     if isinstance(motiontarget, LegacyLocation):
         target_loc = motiontarget
     elif isinstance(motiontarget, LegacyWell):
-        target_loc = motiontarget.top()
+        if position == 'top':
+            target_loc = motiontarget.top()
+        else:
+            target_loc = motiontarget.bottom()
     else:
         raise TypeError('A Well or tuple(well, point) is needed')
     return target_loc
 
 
-def _absolute_motion_target(motiontarget: MotionTarget) -> Location:
+def _absolute_motion_target(
+        motiontarget: MotionTarget,
+        position: str = 'top') -> Location:
     """ Get absolute coords out of our old offset + labware ref system """
-    target_loc = _unpack_motion_target(motiontarget)
+    target_loc = _unpack_motion_target(motiontarget, position)
     if isinstance(target_loc.labware, LegacyLabware):
         real_loc: Union['Labware', 'Well'] = target_loc.labware.lw_obj
     else:
@@ -153,6 +158,10 @@ class Pipette:
         return self._instr_ctx.starting_tip
 
     @property
+    def tip_attached(self) -> bool:
+        return self.has_tip
+
+    @property
     def tip_racks(self) -> List[LegacyLabware]:
         """ A list of the tipracks associated with this pipette. """
         return self._tip_racks
@@ -263,7 +272,7 @@ class Pipette:
         if not self.placeables or (placeable != self.placeables[-1]):
             self.placeables.append(placeable)
 
-        absolute_location = _absolute_motion_target(location)
+        absolute_location = _absolute_motion_target(location, 'top')
         return self._instr_ctx.move_to(location=absolute_location,
                                        force_direct=force_direct)
 
@@ -335,13 +344,13 @@ class Pipette:
             self._position_for_aspirate(location)
 
             cmds.do_publish(
-                self._instr_ctx.broker, cmds.aspirate, self._instr_ctx.aspirate,
-                'before', None, None, self._instr_ctx, volume,
+                self._instr_ctx.broker, cmds.aspirate, self.aspirate,
+                'before', None, None, self, volume,
                 display_location, rate)
             self._hw.aspirate(self._mount, volume, rate)
             cmds.do_publish(
-                self._instr_ctx.broker, cmds.aspirate, self._instr_ctx.aspirate,
-                'after', self._instr_ctx, None,  self._instr_ctx, volume,
+                self._instr_ctx.broker, cmds.aspirate, self.aspirate,
+                'after', self, None,  self, volume,
                 display_location, rate)
 
         return self
@@ -349,7 +358,7 @@ class Pipette:
     def _position_for_aspirate(self, location: MotionTarget = None):
         placeable: Optional[Union[LegacyLabware, LegacyWell]] = None
         if location:
-            placeable, _ = _unpack_motion_target(location)
+            placeable, _ = _unpack_motion_target(location, 'top')
             # go to top of source if not already there
             if placeable != self.previous_placeable:
                 self.move_to(placeable.top())
@@ -430,15 +439,34 @@ class Pipette:
 
         volume = min(self.current_volume, volume)
 
-        if not location and self.previous_placeable:
-            if isinstance(self.previous_placeable, LegacyLabware):
-                raise RuntimeError('Dispense must be into a well')
-            location = self.previous_placeable
+        display_location = location if location else self.previous_placeable
+
+        # if not location and self.previous_placeable:
+        #     if isinstance(self.previous_placeable, LegacyLabware):
+        #         raise RuntimeError('Dispense must be into a well')
+        #     display = self.previous_placeable
+
+        cmds.do_publish(self._instr_ctx.broker, cmds.dispense, self.dispense,
+                        'before', None, None, self, volume, display_location,
+                        rate)
 
         if volume != 0:
-            self._instr_ctx.dispense(
-                volume=volume, location=location, rate=rate)
+            self._position_for_dispense(location)
+
+            self._hw.dispense(self._mount, volume, rate)
+
+        cmds.do_publish(self._instr_ctx.broker, cmds.dispense, self.dispense,
+                        'after', self, None, self, volume, display_location,
+                        rate)
         return self
+
+    def _position_for_dispense(self, location: MotionTarget = None):
+        if location:
+            if isinstance(location, LegacyWell):
+                location = location.bottom(
+                    min(location.depth,
+                        self._instr_ctx.well_bottom_clearance.dispense))
+            self.move_to(location)
 
     @log_call(log)
     def mix(self,
@@ -628,6 +656,10 @@ class Pipette:
             p300.dispense(plate[1])
             p300.return_tip()  # returns to tip a1
         """
+        if not self.tip_attached:
+            self._log.warning("Cannot return tip without tip attached.")
+
+        self.drop_tip(self.current_tip(), home_after=home_after)
         return self
 
     @log_call(log)

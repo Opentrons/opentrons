@@ -606,7 +606,6 @@ class Pipette(CommandPublisher):
         if location:
             if isinstance(location, Placeable):
                 location = location.bottom(min(location.z_size(), clearance))
-            print('Now move to the location directly for aspirate')
             self.move_to(location, strategy='direct')
 
     def _position_for_dispense(self, location=None, clearance=0.5):

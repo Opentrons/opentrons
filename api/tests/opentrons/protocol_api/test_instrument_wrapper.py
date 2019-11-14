@@ -8,7 +8,6 @@ from numpy import add, subtract, isclose
 from opentrons.legacy_api.containers.placeable import Placeable
 from opentrons.protocol_api.legacy_wrapper.containers_wrapper import LegacyWell
 from opentrons import types
-from opentrons.hardware_control import types as hwtypes
 
 
 @pytest.fixture
@@ -62,17 +61,18 @@ def convert_to_deck_coordinates(robot, location, version):
                offset.coordinates)
 
 
-@pytest.mark.parametrize('volume,loc,rate', [
-    (10, 0, 1.0),
-    (10, None, 1.0),
-    (None, 0, 1.0),
-    (None, None, 1.0),
-    (10, 0, 1000.0),
-    (10, 0, None)])
+@pytest.mark.parametrize('volume,loc,pos,rate', [
+    (10, 0, None, 1.0),
+    (10, None, None, 1.0),
+    (None, 0, None, 1.0),
+    (None, None, None, 1.0),
+    (10, 0, None, 1000.0),
+    (10, 0, None, None),
+    (10, 0, 'top', 1.0)])
 @pytest.mark.api2_only
 def test_aspirate_locations(
-        monkeypatch, instruments, labware, load_v1_instrument,
-        volume, loc, rate):
+        loop, monkeypatch, instruments, labware, load_v1_instrument,
+        volume, loc, pos, rate):
     robot, legacy_instr, legacy_lw = load_v1_instrument
 
     tr = labware.load('opentrons_96_tiprack_10ul', '1')
@@ -83,8 +83,14 @@ def test_aspirate_locations(
 
     legacy_move_to, move_to = get_v1_v2_mock_calls(
         monkeypatch, legacy_instr, pip, 'move_to')
-    # import pdb; pdb.set_trace()
+
+    hw_aspirate_effect = pip._hw._api.aspirate
+
+    def run_aspirate(*args, **kwargs):
+        return loop.run_until_complete(hw_aspirate_effect(*args, **kwargs))
+
     hw_aspirate = mock.Mock()
+    hw_aspirate.side_effect = run_aspirate
     monkeypatch.setattr(pip._hw._api, 'aspirate', hw_aspirate)
 
     legacy_call = {}
@@ -97,20 +103,24 @@ def test_aspirate_locations(
             kw = 'volume'
         else:
             kw = 'location'
-        legacy_call[kw] = legacy_lw.wells(loc)
-        new_call[kw] = lw.wells(loc)
+        if pos is not None:
+            legacy_call[kw] = getattr(legacy_lw.wells(loc), pos)()
+            new_call[kw] = getattr(lw.wells(loc), pos)()
+        else:
+            legacy_call[kw] = legacy_lw.wells(loc)
+            new_call[kw] = lw.wells(loc)
+
     if rate is not None:
         legacy_call['rate'] = rate
         new_call['rate'] = rate
 
     pip._set_plunger_max_speed_override(10)
-
-    legacy_instr.aspirate(**legacy_call)
-    pip.aspirate(**new_call)
-    
     max_speed = pip._clamp_to_max_plunger_speed(
         pip.speeds['aspirate'] * 1000, 'aspirate rate')
     max_rate = max_speed / pip.speeds['aspirate']
+
+    legacy_instr.aspirate(**legacy_call)
+    pip.aspirate(**new_call)
 
     assert pip.current_volume == volume or pip.max_volume
     assert len(legacy_move_to.call_args_list) == len(move_to.call_args_list)
@@ -126,9 +136,19 @@ def test_aspirate_locations(
         min(max_rate, rate or 1.0))
 
 
+@pytest.mark.parametrize('volume,loc,pos,rate', [
+    (10, 0, None, 1.0),
+    (10, None, None, 1.0),
+    (None, 0, None, 1.0),
+    (None, None, None, 1.0),
+    (10, 0, None, 1000.0),
+    (10, 0, None, None),
+    (10, 0, 'top', 1.0)])
 @pytest.mark.api2_only
 def test_dispense_locations(
-        monkeypatch, instruments, labware, load_v1_instrument):
+        loop, monkeypatch, instruments, labware, load_v1_instrument,
+        volume, loc, pos, rate):
+
     robot, legacy_instr, legacy_lw = load_v1_instrument
 
     tr = labware.load('opentrons_96_tiprack_10ul', '1')
@@ -137,19 +157,61 @@ def test_dispense_locations(
 
     instruments._robot_wrapper.home()
 
+    pip._set_plunger_max_speed_override(10)
+    max_speed = pip._clamp_to_max_plunger_speed(
+        pip.speeds['dispense'] * 1000, 'dispense rate')
+    max_rate = max_speed / pip.speeds['dispense']
+
+    legacy_instr.aspirate(10, legacy_lw.wells(1))
+    pip.aspirate(10, lw.wells(1))
+
     legacy_move_to, move_to = get_v1_v2_mock_calls(
         monkeypatch, legacy_instr, pip, 'move_to')
 
-    legacy_instr.dispense(legacy_lw.wells(1))
-    pip.dispense(lw.wells(1))
+    hw_dispense_effect = pip._hw._api.dispense
+
+    def run_dispense(*args, **kwargs):
+        return loop.run_until_complete(hw_dispense_effect(*args, **kwargs))
+
+    hw_dispense = mock.Mock()
+    hw_dispense.side_effect = run_dispense
+    monkeypatch.setattr(pip._hw._api, 'dispense', hw_dispense)
+
+    legacy_call = {}
+    new_call = {}
+    if volume is not None:
+        legacy_call['volume'] = volume
+        new_call['volume'] = volume
+    if loc is not None:
+        if volume is None:
+            kw = 'volume'
+        else:
+            kw = 'location'
+        if pos is not None:
+            legacy_call[kw] = getattr(legacy_lw.wells(loc), pos)()
+            new_call[kw] = getattr(lw.wells(loc), pos)()
+        else:
+            legacy_call[kw] = legacy_lw.wells(loc)
+            new_call[kw] = lw.wells(loc)
+    if rate is not None:
+        legacy_call['rate'] = rate
+        new_call['rate'] = rate
+
+    legacy_instr.dispense(**legacy_call)
+    pip.dispense(**new_call)
 
     assert pip.current_volume == 0
     assert len(legacy_move_to.call_args_list) == len(move_to.call_args_list)
     for expected_call, call in zip(
             legacy_move_to.call_args_list, move_to.call_args_list):
+
         expected_args, _ = expected_call
         call_args, _ = call
         assert all(isclose(list(expected_args[0][1]), list(call_args[0][1])))
+    hw_dispense.assert_called_once_with(
+        pip._mount,
+        volume if volume is not None else 10,
+        min(max_rate, rate or 1.0))
 
 
 def convert_well_to_name(item):
@@ -231,6 +293,7 @@ def test_mix_locations(monkeypatch, instruments, labware, load_v1_instrument,
             assert expected_args[0] == call_args[0]
 
 
+@pytest.mark.api2_only
 def test_move_to(monkeypatch, instruments, labware, load_v1_instrument):
     robot, legacy_instr, legacy_lw = load_v1_instrument
     tr = labware.load('opentrons_96_tiprack_10ul', '1')

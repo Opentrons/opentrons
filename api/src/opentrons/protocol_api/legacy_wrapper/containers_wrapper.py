@@ -205,7 +205,6 @@ def perform_migration():
                 save_definition(labware_def, location=path_to_save_defs)
             except jsonschema.exceptions.ValidationError:
                 validation_failure.append(lw_name)
-                print(f"validation failure on {lw_name}")
         else:
             log.info(f"Skipping migration of {lw_name} because there are no",
                      "wells associated with this labware.")
@@ -229,7 +228,7 @@ class LegacyWell(Well):
             api_version: APIVersion,
             labware_height: float = None,
             well_name: str = None):
-        super().__init__(
+        self._well = super().__init__(
             well_props, parent, display_name, has_tip, api_version)
         self._well_name = well_name
         self._parent_height = labware_height
@@ -258,6 +257,12 @@ class LegacyWell(Well):
     @property
     def depth(self) -> float:
         return self._depth
+
+    def get_trace(self):
+        current_obj = self.parent
+        while current_obj:
+            yield current_obj
+            current_obj = getattr(current_obj, 'parent')
 
     @property
     def width(self) -> float:

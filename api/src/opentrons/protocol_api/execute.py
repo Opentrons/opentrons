@@ -6,7 +6,8 @@ from typing import Any, Callable
 
 import opentrons
 from .contexts import ProtocolContext
-from . import execute_v3, legacy_wrapper
+from . import execute_v3
+from .legacy_wrapper import api
 
 from opentrons.protocols.types import PythonProtocol, Protocol, APIVersion
 
@@ -119,7 +120,7 @@ def _run_python_legacy(proto: PythonProtocol, context: ProtocolContext):
     new_locs = locals()
     new_globs = globals()
     context._api_version = APIVersion(2, 0)
-    namespace_mapping = legacy_wrapper.api.build_globals(context)
+    namespace_mapping = api.build_globals(context)
     for key, value in namespace_mapping.items():
         setattr(opentrons, key, value)
     try:
