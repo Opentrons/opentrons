@@ -8,6 +8,7 @@ import { rehydrate } from '../persist'
 import type { Action } from '../types'
 import type { HintKey } from './index'
 import type { AddHintAction, RemoveHintAction } from './actions'
+import type { NavigateToPageAction } from '../navigation/actions'
 
 type HintReducerState = Array<HintKey>
 const hints = handleActions(
@@ -16,6 +17,15 @@ const hints = handleActions(
       state: HintReducerState,
       action: AddHintAction
     ): HintReducerState => uniq([...state, action.payload.hintKey]),
+
+    // going to the steplist page triggers 'deck_setup_explanation' hint
+    NAVIGATE_TO_PAGE: (
+      state: HintReducerState,
+      action: NavigateToPageAction
+    ): HintReducerState =>
+      action.payload === 'steplist'
+        ? uniq([...state, 'deck_setup_explanation'])
+        : state,
   },
   []
 )

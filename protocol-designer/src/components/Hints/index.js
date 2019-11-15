@@ -22,6 +22,10 @@ type Props = {| ...SP, ...DP |}
 
 type State = { rememberDismissal: boolean }
 
+// List of hints that should have /!\ gray AlertModal header
+// (versus calmer non-alert header)
+const HINT_IS_ALERT: Array<HintKey> = ['add_liquids_and_labware']
+
 class Hints extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
@@ -43,7 +47,7 @@ class Hints extends React.Component<Props, State> {
     switch (hintKey) {
       case 'add_liquids_and_labware':
         return (
-          <React.Fragment>
+          <>
             <div className={styles.summary}>
               {i18n.t('alert.hint.add_liquids_and_labware.summary', {
                 deck_setup_step: i18n.t('nav.terminal_item.__initial_setup__'),
@@ -69,7 +73,15 @@ class Hints extends React.Component<Props, State> {
               </div>
               <img src={EXAMPLE_WATCH_LIQUIDS_MOVE_IMAGE} />
             </span>
-          </React.Fragment>
+          </>
+        )
+      case 'deck_setup_explanation':
+        return (
+          <>
+            <p>{i18n.t(`alert.hint.${hintKey}.body1`)}</p>
+            <p>{i18n.t(`alert.hint.${hintKey}.body2`)}</p>
+            <p>{i18n.t(`alert.hint.${hintKey}.body3`)}</p>
+          </>
         )
       default:
         return null
@@ -78,14 +90,19 @@ class Hints extends React.Component<Props, State> {
 
   render() {
     const { hintKey } = this.props
-    return hintKey ? (
+    if (!hintKey) return null
+
+    const headingText = i18n.t(`alert.hint.${hintKey}.title`)
+    const hintIsAlert = HINT_IS_ALERT.includes(hintKey)
+    return (
       <Portal>
-        <AlertModal
-          type="warning"
-          alertOverlay
-          heading={i18n.t(`alert.hint.${hintKey}.title`)}
-        >
-          {this.renderHintContents(hintKey)}
+        <AlertModal alertOverlay heading={hintIsAlert ? headingText : null}>
+          {!hintIsAlert ? (
+            <div className={styles.heading}>{headingText}</div>
+          ) : null}
+          <div className={styles.hint_contents}>
+            {this.renderHintContents(hintKey)}
+          </div>
           <div>
             <CheckboxField
               className={styles.dont_show_again}
@@ -102,7 +119,7 @@ class Hints extends React.Component<Props, State> {
           </div>
         </AlertModal>
       </Portal>
-    ) : null
+    )
   }
 }
 

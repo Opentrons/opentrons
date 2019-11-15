@@ -7,7 +7,7 @@ import { Icon, type IconName } from '../icons'
 import Modal from './Modal'
 import styles from './modals.css'
 
-type Props = {
+type Props = {|
   /** optional handler for overlay click */
   onCloseClick?: () => mixed,
   /** optional modal heading */
@@ -26,7 +26,7 @@ type Props = {
   iconName?: ?IconName,
   /** restricts scroll outside of Modal when open, true by default */
   restrictOuterScroll?: boolean,
-}
+|}
 
 /**
  * Generic alert modal with a heading and a set of buttons at the bottom
