@@ -6,6 +6,8 @@ The `step-generation/` directory is intended to be treated as an independent lib
 
 ## Creating a new step form (without clicking "Save")
 
+TODO: re-write this section after `legacySteps` reducer and the "saved but pristine" form concept is removed.
+
 TODO
 
 - `selectStep` thunk
@@ -20,15 +22,31 @@ TODO
 
 **Dependent/Codependent field value updates**: sometimes making a change to one field should update other fields. One complex example: changing the pipette or labware fields may need to reset or clear fields that relate to pipette or labware properties. This logic lives in `steplist/formLevel/handleFormChange`. For each stepType that needs it, there is a `dependentFieldsUpdate{formName}` function. This function, given a set of changed values from a user action (called a "patch"), returns an augmented patch that should capture dependent/codependent behaviors required of the form.
 
-## Form "Hydration"
+**Casting values**: `steplist/fieldLevel` allows you to specify `castValue` functions for each field. These simply take the "raw" form field value and return a cast value. (Only the `{formName}ToArgs` functions receive cast values. All functions dealing with form and field level get "raw" values that have not been cast.)
+
+**Masking values**: Masking is a behavior where a field rejects updates when they fail to meet a certain condition -- for example, a field only intended for integers will reject changes to add a decimal point. Maskers are used in the presentational layer (specifically, in the `FieldConnector` component) where they should be applied to all updates.
+
+**Field-level errors**: `steplist/fieldLevel` allows you to specify a `getErrors` function for each field. A field can have multiple "error checker" functions that can be composed together; the final result is an array of strings where each represents an error in the field. (NOTE: if there are multiple field-level errors, `FieldConnector` will just join them with `', '`.)
+
+**Form-level errors & warnings**: When an error is related to the value of more than one field, it should be specified in `steplist/formLevel` under `getErrors` for that form's `stepType`. Also, there's no such thing as field-level warnings in PD; if need a warning in a form, go to `formLevel` and specify a `getWarnings` function. Form-level errors have a `dependentFields` array associated with them, which is used to ensure that all fields have been touched (are not pristine) before showing the error.
+
+## Effects of field/form errors
+
+- **Blocking Form Save:** Forms with field-level or form-level errors cannot be saved. The "Save" button will be disabled.
+
+- **Timeline truncation:** If a saved step form has field/form errors, it will not be passed to `{formName}ToArgs` and when the timeline is built it will stop before the error-containing step form.
+
+Unlike errors, **warnings** don't have behavioral side-effects; they are purely presentational. They can optionally be dismissed by the user.
+
+## Pristine vs dirty fields and error/warning display
 
 TODO
 
-## Field/Form Validation
+## Form "Hydration"
 
-TODO. `steplist/fieldLevel` and `steplist/formLevel`
+Motivation: Entities like pipettes, labware, and modules are specified by ID in forms, and when we're dealing with the form as data, those IDs alone don't tell us anything. It's helpful to denormalize the form data by replacing things like `pipette: "some pipette ID here"` with `pipette: PipetteEntity`.
 
-- `getFieldErrors` and `getFormErrors` in `step-forms/selectors`
+In `steplist/formLevel` the `hydrate` key allows you to hook up a function that hydrates a field.
 
 ### Form data to command creator args
 
@@ -86,14 +104,16 @@ Substeps are the visual elements on the Step List that are displayed when a Step
 
 TODO use of CC args, eg via `getArgsAndErrorsById`, by substeps. This ties substeps to command creator args, it's not just command creators.
 
-## Step forms in PD (well before step-generation concerns)
+# Hooking up step field components with `FieldConnector`
 
-### Form "Hydration"
+Form state of a step form that is being edited lives in Redux at `stepForms.unsavedForm` and all changes require dispatching a `CHANGE_FORM_INPUT` action. It may or may not make sense to keep unsaved form state in Redux, depending on PD's evolving requirements. So the best we can do is to preserve optionality by separating concerns. When we're dealing with the form field components, any form updates should be hooked up into some general function `updateValue`, and any form values should be provided without being tied to implementation details of where that value is from.
 
-TODO
+We also want to avoid boilerplate. Most field components in step forms need the same things:
 
-### Saving a step form: form to commands
+- a `value`
+- an `updateValue` function
+- current errors to display, and functionality about field pristinity & focus state
+- tooltip on mouse hover
+- disabled/enabled status
 
-### Editing an existing step
-
-TODO
+We use the `FieldConnector` component in PD to pass in these props to step form field components. Given the `name` of the field, it contains all the machinery to pick out the correct props, and in general to interface the presentational field component(s) with all the relevant business logic that it should be associated with.
