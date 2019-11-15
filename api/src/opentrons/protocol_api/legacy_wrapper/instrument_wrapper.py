@@ -4,13 +4,14 @@ from typing import Dict, List, Optional, Sequence, TYPE_CHECKING, Union
 from opentrons import commands as cmds
 from opentrons.types import Point, Location
 from opentrons.config import pipette_config
+from opentrons.helpers import helpers
 
 from .util import log_call
 from ..util import Clearances, clamp_value
 
 from .types import LegacyLocation
 
-from .containers_wrapper import LegacyLabware, LegacyWell
+from .containers_wrapper import LegacyLabware, LegacyWell, WellSeries
 
 if TYPE_CHECKING:
     from ..contexts import InstrumentContext # noqa(F401)
@@ -787,20 +788,21 @@ class Pipette:
         """
         if location:
             lw, coords = _unpack_motion_target(location, 'top')
-            if 'rack' in str(location.parent).lower():
+            if 'rack' in str(lw.parent).lower():
                 half_tip_length = self._pipette_config.tip_length * \
                     (self._pipette_config.return_tip_height or 0.5)
                 new_loc = lw.top(-half_tip_length)
-                print(f'v2: {new_loc}')
-            elif 'trash' in str(location.parent).lower():
+            elif 'trash' in str(lw.parent).lower():
                 new_loc = (lw, coords +
-                           (0, self._pipette_config.modelOffset[1], 0))
+                           (0, self._pipette_config.model_offset[1], 0))
             else:
                 new_loc = lw.top()
-            location = _absolute_motion_target(new_loc)
+            checked_location = _absolute_motion_target(new_loc)
+        else:
+            checked_location = location  # type: ignore
 
         self._instr_ctx.drop_tip(
-            location=location, home_after=home_after)
+            location=checked_location, home_after=home_after)
         return self
 
     @log_call(log)
@@ -951,9 +953,203 @@ class Pipette:
             p300 = instruments.P300_Single(mount='right')
             p300.transfer(50, plate[0], plate[1])
         """
+        kwargs['mode'] = kwargs.get('mode', 'transfer')
+
+        touch_tip = kwargs.get('touch_tip', False)
+        if touch_tip is True:
+            touch_tip = -1
+        kwargs['touch_tip'] = touch_tip
+
+        tip_options = {
+            'once': 1,
+            'never': 0,
+            'always': float('inf')
+        }
+        tip_option = kwargs.get('new_tip', 'once')
+        tips = tip_options.get(tip_option)
+        if tips is None:
+            raise ValueError('Unknown "new_tip" option: {}'.format(tip_option))
+
+        plan = self._create_transfer_plan(volume, source, dest, **kwargs)
+        self._run_transfer_plan(tips, plan, **kwargs)
+
+        return self
         self._instr_ctx.transfer(
             volume=volume, source=source, dest=dest, **kwargs)
         return self
+
+    def _multichannel_transfer(self, s, d):
+        # Helper function for multi-channel use-case
+        # There is also a separate use-case for troughs in which the WellSeries
+        # is only 1 Dimensional but could be formatted as
+        # <WellSeries: <A1>,<A2>
+        # or as <WellSeries: <WellSeries <A1>, <A2> ...
+        if isinstance(s, WellSeries) and not isinstance(s[0], WellSeries):
+            if 'trough' in repr(s[0]):
+                s = s.get_children_list()
+            else:
+                s = [s]
+        if isinstance(s, WellSeries)\
+                and isinstance(s[0], WellSeries) and 'trough' in repr(s[0][0]):
+            s = [well for series in s for well in series]
+        if isinstance(d, WellSeries) and not isinstance(d[0], WellSeries):
+            if 'trough' in repr(d[0]):
+                d = d.get_children_list()
+            else:
+                d = [d]
+        if isinstance(d, WellSeries)\
+                and isinstance(d[0], WellSeries) and 'trough' in repr(d[0][0]):
+            d = [well for series in d for well in series]
+
+        return s, d
+
+    def _create_transfer_plan(self, v, s, t, **kwargs):
+        # SPECIAL CASE: if using multi-channel pipette,
+        # and the source or target is a WellSeries
+        # then avoid iterating through it's Wells.
+        # Else, single channel pipettes will flatten a multi-dimensional
+        # WellSeries into a 1 dimensional list of wells
+        if self.channels > 1:
+            s, t = self._multichannel_transfer(s, t)
+        else:
+            if isinstance(s, WellSeries) and isinstance(s[0], WellSeries):
+                s = [well for series in s for well in series]
+            if isinstance(t, WellSeries) and isinstance(t[0], WellSeries):
+                t = [well for series in t for well in series]
+
+        # create list of volumes, sources, and targets of equal length
+        s, t = helpers._create_source_target_lists(s, t, **kwargs)
+        total_transfers = len(t)
+        v = helpers._create_volume_list(v, total_transfers, **kwargs)
+
+        transfer_plan = []
+        for i in range(total_transfers):
+            transfer_plan.append({
+                'aspirate': {'location': s[i], 'volume': v[i]},
+                'dispense': {'location': t[i], 'volume': v[i]}
+            })
+
+        if not self.tip_attached and self.tip_racks and \
+           self._lw_mappings[self.tip_racks[0]]['A1'].max_volume:
+            max_vol = min(
+                self._lw_mappings[self.tip_racks[0]]['A1'].max_volume,
+                self._working_volume)
+        else:
+            max_vol = self._working_volume
+        max_vol -= kwargs.get('air_gap', 0)  # air
+
+        if kwargs.get('divide', True):
+            transfer_plan = helpers._expand_for_carryover(
+                max_vol, transfer_plan, **kwargs)
+
+        transfer_plan = helpers._compress_for_repeater(
+            max_vol, transfer_plan, **kwargs)
+
+        return transfer_plan
+
+    def _run_transfer_plan(self, tips, plan, **kwargs):
+        air_gap = kwargs.get('air_gap', 0)
+        touch_tip = kwargs.get('touch_tip', False)
+
+        total_transfers = len(plan)
+        for i, step in enumerate(plan):
+
+            aspirate = step.get('aspirate')
+            dispense = step.get('dispense')
+
+            if aspirate:
+                self._add_tip_during_transfer(tips, **kwargs)
+                self._aspirate_during_transfer(
+                    aspirate['volume'], aspirate['location'], **kwargs)
+
+            if dispense:
+                self._dispense_during_transfer(
+                    dispense['volume'], dispense['location'], **kwargs)
+                if step is plan[-1] or plan[i + 1].get('aspirate'):
+                    if touch_tip or touch_tip is 0:  # noqa(pyflakes)
+                        self.touch_tip(touch_tip)
+                    self._blowout_during_transfer(
+                        dispense['location'], **kwargs)
+                    tips = self._drop_tip_during_transfer(
+                        tips, i, total_transfers, **kwargs)
+                else:
+                    if air_gap:
+                        self.air_gap(air_gap)
+                    if touch_tip or touch_tip is 0:  # noqa(pyflakes)
+                        self.touch_tip(touch_tip)
+
+    def _add_tip_during_transfer(self, tips, **kwargs):
+        """
+        Performs a :any:`pick_up_tip` when running a :any:`transfer`,
+        :any:`distribute`, or :any:`consolidate`.
+        """
+        if self.has_tip_rack() and tips > 0 and not self.current_tip():
+            self.pick_up_tip()
+
+    def _aspirate_during_transfer(self, vol, loc, **kwargs):
+        """
+        Performs an :any:`aspirate` when running a :any:`transfer`, and
+        optionally a :any:`touch_tip` afterwards.
+        """
+        rate = kwargs.get('rate', 1)
+        mix_before = kwargs.get('mix', kwargs.get('mix_before', (0, 0)))
+        air_gap = kwargs.get('air_gap', 0)
+        touch_tip = kwargs.get('touch_tip', False)
+
+        well, _ = _unpack_motion_target(loc)
+
+        if self.current_volume == 0:
+            self._mix_during_transfer(mix_before, well, **kwargs)
+        self.aspirate(vol, loc, rate=rate)
+        if air_gap:
+            self.air_gap(air_gap)
+        if touch_tip or touch_tip is 0:  # noqa(pyflakes)
+            self.touch_tip(touch_tip)
+
+    def _dispense_during_transfer(self, vol, loc, **kwargs):
+        """
+        Performs a :any:`dispense` when running a :any:`transfer`, and
+        optionally a :any:`mix`, :any:`touch_tip`, and/or
+        :any:`blow_out` afterwards.
+        """
+        mix_after = kwargs.get('mix_after', (0, 0))
+        rate = kwargs.get('rate', 1)
+        air_gap = kwargs.get('air_gap', 0)
+
+        well, _ = _unpack_motion_target(loc)
+
+        if air_gap:
+            self.dispense(air_gap, well.top(5), rate=rate)
+        self.dispense(vol, loc, rate=rate)
+        self._mix_during_transfer(mix_after, well, **kwargs)
+
+    def _mix_during_transfer(self, mix, loc, **kwargs):
+        if self.current_volume == 0 and isinstance(mix, (tuple, list)):
+            if len(mix) == 2 and 0 not in mix:
+                self.mix(mix[0], mix[1], loc)
+
+    def _blowout_during_transfer(self, loc, **kwargs):
+        blow_out = kwargs.get('blow_out', False)
+        if self.current_volume > 0 or blow_out:
+            if not isinstance(blow_out, LegacyWell):
+                blow_out = self.trash_container
+                if self.current_volume == 0:
+                    blow_out = None
+            self.blow_out(blow_out)
+
+    def _drop_tip_during_transfer(self, tips, i, total, **kwargs):
+        """
+        Performs a :any:`drop_tip` or :any:`return_tip` when
+        running a :any:`transfer`, :any:`distribute`, or :any:`consolidate`.
+        """
+        trash = kwargs.get('trash', True)
+        if tips > 1 or (i + 1 == total and tips > 0):
+            if trash and self.trash_container:
+                self.drop_tip()
+            else:
+                self.return_tip()
+            tips -= 1
+        return tips
 
     @log_call(log)
     def delay(self,

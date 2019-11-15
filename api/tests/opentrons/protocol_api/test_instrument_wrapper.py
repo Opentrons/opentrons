@@ -9,19 +9,95 @@ from opentrons.legacy_api.containers.placeable import Placeable
 from opentrons.protocol_api.legacy_wrapper.containers_wrapper import LegacyWell
 from opentrons import types
 
+PIPETTES = [
+    'P1000_Single',
+    'P1000_Single_GEN2',
+    'P300_Single',
+    'P300_Single_GEN2',
+    'P300_Multi',
+    'P300_Multi_GEN2',
+    'P50_Single',
+    'P50_Multi',
+    'P20_Single_GEN2',
+    'P20_Multi_GEN2',
+    'P10_Single',
+    'P10_Multi']
+
+TIPRACKS = {
+    'P1000_Single': 'opentrons_96_tiprack_1000ul',
+    'P1000_Single_GEN2': 'opentrons_96_tiprack_1000ul',
+    'P300_Single': 'opentrons_96_tiprack_300ul',
+    'P300_Single_GEN2': 'opentrons_96_tiprack_300ul',
+    'P300_Multi': 'opentrons_96_tiprack_300ul',
+    'P300_Multi_GEN2': 'opentrons_96_tiprack_300ul',
+    'P50_Single': 'opentrons_96_tiprack_300ul',
+    'P50_Multi': 'opentrons_96_tiprack_300ul',
+    'P20_Single_GEN2': 'opentrons_96_tiprack_20ul',
+    'P20_Multi_GEN2': 'opentrons_96_tiprack_20ul',
+    'P10_Single': 'opentrons_96_tiprack_10ul',
+    'P10_Multi': 'opentrons_96_tiprack_10ul'
+}
+
+
+def bind_parameters_to_instruments(additional_args):
+    """ If you have a test you want to parametrize with some args, and
+    also you want to parametrize it across all the instrument constructors,
+    call this with your args and it will add all the instruments. For instance,
+
+    bind_parameters_to_instruments([(None, 1), (2, None)]) -> [
+    ('P1000_Single', None, 1),
+    ('P1000_Single'), 2, None),
+    ('P1000_Single_GEN2'), None, 1),
+    ('P1000_Single_GEN2'), 2, None),
+    ...]
+    """
+    params = []
+    for pipname in PIPETTES:
+        for arg in additional_args:
+            params.append((pipname, *arg))
+    return params
+
 
 @pytest.fixture
-def load_v1_instrument(virtual_smoothie_env):
+def load_bc_instrument(robot, instruments, labware, request):
+    try:
+        which = request.node.getfixturevalue('instrument_ctor')
+    except Exception:
+        which = 'P10_Single'
+
+    try:
+        tr_name = request.node.getfixturevalue('tiprack_name')
+    except Exception:
+        tr_name = TIPRACKS[which]
+
+    legacy_tr = labware.load(tr_name, '1')
+    legacy_instr = getattr(instruments, which)(
+        mount='left', tip_racks=[legacy_tr])
+    legacy_lw = labware.load('corning_96_wellplate_360ul_flat', '2')
+    return robot, legacy_instr, legacy_lw
+
+
+@pytest.fixture
+def load_v1_instrument(virtual_smoothie_env, request):
     from opentrons.legacy_api import api
     robot = api.robot
     robot.connect()
     robot.reset()
+    try:
+        which = request.node.getfixturevalue('instrument_ctor')
+    except Exception:
+        which = 'P10_Single'
+
+    try:
+        tr_name = request.node.getfixturevalue('tiprack_name')
+    except Exception:
+        tr_name = TIPRACKS[which]
 
     instr = api.InstrumentsWrapper(robot)
     lw = api.ContainersWrapper(robot)
 
-    legacy_tr = lw.load('opentrons_96_tiprack_10ul', '1')
-    legacy_instr = instr.P10_Single(mount='left', tip_racks=[legacy_tr])
+    legacy_tr = lw.load(tr_name, '1')
+    legacy_instr = getattr(instr, which)(mount='left', tip_racks=[legacy_tr])
     legacy_lw = lw.load('corning_96_wellplate_360ul_flat', '2')
     return robot, legacy_instr, legacy_lw
 
@@ -472,7 +548,7 @@ def test_pick_up_tip(
     assert new_moves == legacy_moves
 
 
-@pytest.mark.parametrize('loc,home_after', [
+@pytest.mark.parametrize('loc,home_after', [  # noqa(C901)
     (None, None),
     (None, False),
     (0, None),
@@ -510,7 +586,6 @@ def test_drop_tip(
     monkeypatch.setattr(robot._driver, 'move', legacy_move)
 
     legacy_tr = legacy_instr.tip_racks[0]
-
     legacy_kwargs = {}
     new_kwargs = {}
     if loc is not None:
@@ -576,3 +651,58 @@ def test_drop_tip(
             common_lpos, common_npos = get_common_axes(legacy_call[0][0],
                                                        new_call[0][0])
             assert common_lpos == common_npos
+
+
+def mock_atomics(instr, monkeypatch):
+    top_mock = mock.Mock()
+    monkeypatch.setattr(instr, 'aspirate', top_mock.aspirate)
+    monkeypatch.setattr(instr, 'dispense', top_mock.dispense)
+    monkeypatch.setattr(instr, 'air_gap', top_mock.air_gap)
+    monkeypatch.setattr(instr, 'blow_out', top_mock.blow_out)
+    monkeypatch.setattr(instr, 'pick_up_tip', top_mock.pick_up_tip)
+    monkeypatch.setattr(instr, 'drop_tip', top_mock.drop_tip)
+    monkeypatch.setattr(instr, 'return_tip', top_mock.return_tip)
+    return instr, top_mock
+
+
+def method_names(call_list):
+    return [
+        str(call).split('(')[0] for call in call_list
+    ]
+
+
+@pytest.mark.parametrize(
+    'instrument_ctor',
+    [
+        ('P1000_Single',),
+        ('P1000_Single_GEN2',),
+        ('P300_Single',),
+        ('P300_Single_GEN2',),
+        ('P300_Multi',),
+        ('P300_Multi_GEN2',),
+        ('P50_Single',),
+        ('P50_Multi',),
+        ('P20_Single_GEN2',),
+        ('P20_Multi_GEN2',),
+        ('P10_Single',),
+        ('P10_Multi',),
+    ]
+)
+@pytest.mark.api2_only
+def test_basic_transfer(
+        monkeypatch, instruments, labware, load_v1_instrument,
+        load_bc_instrument,
+        instrument_ctor):
+    robot, legacy_instr, legacy_lw = load_v1_instrument
+    new_robot, new_instr, new_lw = load_bc_instrument
+    legacy_instr, legacy_mock = mock_atomics(legacy_instr, monkeypatch)
+    new_instr, new_mock = mock_atomics(new_instr, monkeypatch)
+
+    legacy_instr.transfer(legacy_instr.max_volume / 2,
+                          legacy_lw.well('A1'),
+                          legacy_lw.well('A2'))
+    new_instr.transfer(new_instr.max_volume / 2,
+                       new_lw.well('A1'),
+                       new_lw.well('A2'))
+    assert method_names(new_mock.method_calls)\
+        == method_names(legacy_mock.method_calls)
