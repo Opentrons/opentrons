@@ -1,18 +1,29 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
+import without from 'lodash/without'
 import i18n from '../localization'
 import { HoverTooltip, PrimaryButton } from '@opentrons/components'
 import { actions as steplistActions } from '../steplist'
+import { selectors as featureFlagSelectors } from '../feature-flags'
 import { stepIconsByType, type StepType } from '../form-types'
-import type { ThunkDispatch } from '../types'
+import type { BaseState, ThunkDispatch } from '../types'
 import styles from './listButtons.css'
 
-type Props = { makeAddStep: StepType => (SyntheticEvent<>) => mixed }
+type SP = {|
+  modulesEnabled: ?boolean,
+|}
+
+type DP = {|
+  makeAddStep: StepType => (SyntheticEvent<>) => mixed,
+|}
+
+type Props = {|
+  ...SP,
+  ...DP,
+|}
 
 type State = { expanded?: boolean }
-
-type DP = $Exact<Props>
 
 class StepCreationButton extends React.Component<Props, State> {
   state = { expanded: false }
@@ -27,7 +38,21 @@ class StepCreationButton extends React.Component<Props, State> {
 
   render() {
     // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
-    const supportedSteps = ['moveLiquid', 'mix', 'pause']
+    const supportedSteps = [
+      'moveLiquid',
+      'mix',
+      'pause',
+      'magnet',
+      'temperature',
+      'thermocycler',
+    ]
+    const moduleSteps = ['magnet', 'temperature', 'thermocycler']
+    // TODO (ka 11-15-2019): Move module specific steps into thier own group to
+    // conditionally render below and add the disabled logic for steps related
+    // to modules not present on deck
+    const filteredSteps = this.props.modulesEnabled
+      ? supportedSteps
+      : without(supportedSteps, ...moduleSteps)
 
     return (
       <div
@@ -40,7 +65,7 @@ class StepCreationButton extends React.Component<Props, State> {
 
         <div className={styles.buttons_popover}>
           {this.state.expanded &&
-            supportedSteps.map(stepType => (
+            filteredSteps.map(stepType => (
               <HoverTooltip
                 key={stepType}
                 placement="right"
@@ -67,12 +92,18 @@ class StepCreationButton extends React.Component<Props, State> {
   }
 }
 
+const mapSTP = (state: BaseState): SP => {
+  return {
+    modulesEnabled: featureFlagSelectors.getEnableModules(state),
+  }
+}
+
 const mapDTP = (dispatch: ThunkDispatch<*>): DP => ({
   makeAddStep: (stepType: StepType) => (e: SyntheticEvent<>) =>
     dispatch(steplistActions.addStep({ stepType })),
 })
 
-export default connect<Props, {||}, {||}, DP, _, _>(
-  null,
+export default connect<Props, {||}, SP, DP, _, _>(
+  mapSTP,
   mapDTP
 )(StepCreationButton)
