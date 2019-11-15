@@ -909,18 +909,18 @@ def test_transfer_tips_manipulations(
 
 
 @pytest.mark.parametrize(
-    'instrument_ctor,volume,source,dest,touch_tip,blow_out,mix_after,gradient',  # noqa(E501)
+    'instrument_ctor,volume,source,dest,touch_tip,blow_out,mix_after,gradient,new_tip',  # noqa(E501)
     bind_parameters_to_instruments([
-        ('half_max_volume', ('list', 16), ('single', 'A1'), None, None, None, None),  # noqa(E501)
-        ('gradient', ('list', 8), ('single', 'A1'), None, None, None, None),  # noqa(E501)
+        ('half_max_volume', ('list', 16), ('single', 'A1'), None, None, None, None, None),  # noqa(E501)
+        ('gradient', ('list', 8), ('single', 'A1'), None, None, None, None, None),  # noqa(E501)
         # mix after
-        ('max_volume', ('list', 8), ('single', 'A2'), None, None, (5, 'half_max_volume'), None),  # noqa(E501)
+        ('max_volume', ('list', 8), ('single', 'A2'), None, None, (5, 'half_max_volume'), None, None),  # noqa(E501)
         # touch tip
-        ('max_volume', ('list', 8), ('single', 'A3'), True, None, None, None),  # noqa(E501)
+        ('max_volume', ('list', 8), ('single', 'A3'), True, None, None, None, None),  # noqa(E501)
         # blow out
-        ('max_volume', ('list', 8), ('single', 'A3'), None, True, None, None),  # noqa(E501)
+        ('max_volume', ('list', 8), ('single', 'A3'), None, True, None, None, None),  # noqa(E501)
         # free for all
-        ('max_volume', ('list', 8), ('single', 'A4'), True, True, (5, 'half_max_volume'), None),  # noqa(E501)
+        ('max_volume', ('list', 8), ('single', 'A4'), True, True, (5, 'half_max_volume'), None, None),  # noqa(E501)
     ], instrs=['P300_Single', 'P20_Multi_GEN2'])
 )
 @pytest.mark.api2_only
@@ -928,7 +928,7 @@ def test_consolidate(
         monkeypatch, instruments, labware, load_v1_instrument,
         load_bc_instrument,
         instrument_ctor, volume, source, dest,
-        touch_tip, blow_out, mix_after, gradient):
+        touch_tip, blow_out, mix_after, gradient, new_tip):
     robot, legacy_instr, legacy_lw = load_v1_instrument
     new_robot, new_instr, new_lw = load_bc_instrument
     legacy_instr, legacy_mock = mock_atomics(legacy_instr, monkeypatch)
@@ -940,7 +940,7 @@ def test_consolidate(
     legacy_kwargs, new_kwargs = build_kwargs(
         legacy_instr, new_instr, legacy_lw, new_lw,
         volume, source, dest, touch_tip, blow_out,
-        None, mix_after, gradient, None, None, None)
+        None, mix_after, gradient, None, new_tip, None)
     new_instr._ctx._hw_manager.hardware.home()
     legacy_instr.consolidate(**legacy_kwargs)
     new_instr.consolidate(**new_kwargs)
@@ -951,21 +951,21 @@ def test_consolidate(
 
 
 @pytest.mark.parametrize(
-    'instrument_ctor,volume,source,dest,touch_tip,blow_out,mix_before,gradient,air_gap,disposal_vol',  # noqa(E501)
+    'instrument_ctor,volume,source,dest,touch_tip,blow_out,mix_before,gradient,air_gap,disposal_vol,new_tip',  # noqa(E501)
     bind_parameters_to_instruments([
-        ('half_max_volume', ('single', 'A1'), ('list', 16), None, None, None, None, None, None),  # noqa(E501)
+        ('half_max_volume', ('single', 'A1'), ('list', 16), None, None, None, None, None, None, None),  # noqa(E501)
         # mix after
-        ('max_volume', ('single', 'A2'), ('list', 8), None, None, (5, 'half_max_volume'), None, None, None),  # noqa(E501)
+        ('max_volume', ('single', 'A2'), ('list', 8), None, None, (5, 'half_max_volume'), None, None, None, None),  # noqa(E501)
         # touch tip
-        ('max_volume', ('single', 'A3'), ('list', 8), True, None, None, None, None, None),  # noqa(E501)
+        ('max_volume', ('single', 'A3'), ('list', 8), True, None, None, None, None, None, None),  # noqa(E501)
         # blow out
-        ('max_volume', ('single', 'A3'), ('list', 8), None, True, None, None, None, None),  # noqa(E501)
+        ('max_volume', ('single', 'A3'), ('list', 8), None, True, None, None, None, None, None),  # noqa(E501)
         # air gap
-        ('max_volume', ('single', 'A4'), ('list', 8), True, True, (5, 'half_max_volume'), None, 'min_volume', None),  # noqa(E501),
+        ('max_volume', ('single', 'A4'), ('list', 8), True, True, (5, 'half_max_volume'), None, 'min_volume', None, None),  # noqa(E501),
         # disposal vol
-        ('max_volume', ('single', 'A4'), ('list', 8), True, True, (5, 'half_max_volume'), None, None, 'twice_min_volume'),  # noqa(E501),
+        ('max_volume', ('single', 'A4'), ('list', 8), True, True, (5, 'half_max_volume'), None, None, 'twice_min_volume', None),  # noqa(E501),
         # free for all
-        ('max_volume', ('single', 'A4'), ('list', 8), True, True, (5, 'half_max_volume'), None, 'min_volume', 'twice_min_volume'),  # noqa(E501),
+        ('max_volume', ('single', 'A4'), ('list', 8), True, True, (5, 'half_max_volume'), None, 'min_volume', 'twice_min_volume', 'always'),  # noqa(E501),
 
     ], instrs=['P300_Single', 'P20_Multi_GEN2'])
 )
@@ -974,7 +974,8 @@ def test_distribute(
         monkeypatch, instruments, labware, load_v1_instrument,
         load_bc_instrument,
         instrument_ctor, volume, source, dest,
-        touch_tip, blow_out, mix_before, gradient, air_gap, disposal_vol):
+        touch_tip, blow_out, mix_before, gradient, air_gap, disposal_vol,
+        new_tip):
     robot, legacy_instr, legacy_lw = load_v1_instrument
     new_robot, new_instr, new_lw = load_bc_instrument
     legacy_instr, legacy_mock = mock_atomics(legacy_instr, monkeypatch)
@@ -986,7 +987,7 @@ def test_distribute(
     legacy_kwargs, new_kwargs = build_kwargs(
         legacy_instr, new_instr, legacy_lw, new_lw,
         volume, source, dest, touch_tip, blow_out,
-        mix_before, None, gradient, air_gap, None, disposal_vol)
+        mix_before, None, gradient, air_gap, new_tip, disposal_vol)
     new_instr._ctx._hw_manager.hardware.home()
     legacy_instr.distribute(**legacy_kwargs)
     new_instr.distribute(**new_kwargs)
