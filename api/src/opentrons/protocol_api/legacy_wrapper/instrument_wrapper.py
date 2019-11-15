@@ -91,7 +91,7 @@ class Pipette:
         self._pipette_config = pipette_config.load(self._instr_ctx.model)
 
     @property
-    def requested_as(self) -> str:
+    def requested_as(self) -> Optional[str]:
         return self._instr_ctx.requested_as
 
     @property
@@ -107,7 +107,7 @@ class Pipette:
         return self._instr_ctx.channels
 
     @property
-    def _config(self) -> pipette_config:
+    def _config(self) -> pipette_config.pipette_config:
         return self._hw_pipette.config
 
     @property

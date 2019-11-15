@@ -86,23 +86,24 @@ class AddInstrumentCtors(type):
     def __new__(cls, name, bases, namespace, **kwds):
         """ Add the pipette initializer functions to the class. """
         res = type.__new__(cls, name, bases, namespace)
-        for config in pipette_config.config_models:
-            # Split the long name with the version
-            comps = config.split('_')
-            # To get the name without the version
-            generic_model = '_'.join(comps[:2])
-            number = comps[0].upper()
-            ptype_0 = comps[1][0].upper()
+        for name in pipette_config.config_names:
+            split = name.split('_')
+            number = split[0].upper()
+            ptype_0 = split[1][0].upper()
             # And a nicely formatted version to name the function
-            ptype = ptype_0 + comps[1][1:]
+            ptype = ptype_0 + split[1][1:]
             proper_name = number + '_' + ptype
+            # if this is a GEN2, it will have another element in the split.
+            # this one needs to be all uppercase
+            if len(split) > 2:
+                proper_name += '_' + split[2].upper()
             if hasattr(res, proper_name):
                 # Only build one initializer function for each versionless
                 # model (i.e. don’t make a P10_Single for both p10_single_v1
                 # and p10_single_v1.3)
                 continue
 
-            initializer = cls._build_initializer(generic_model, proper_name)
+            initializer = cls._build_initializer(name, proper_name)
             setattr(res, proper_name, initializer)
 
         return res
