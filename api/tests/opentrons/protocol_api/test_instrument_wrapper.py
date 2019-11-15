@@ -475,8 +475,8 @@ def test_pick_up_tip(
 @pytest.mark.parametrize('loc,home_after', [
     (None, None),
     (None, False),
-    # (0, None),
-    # (0, False)
+    (0, None),
+    (0, False)
     ])
 @pytest.mark.api2_only
 def test_drop_tip(
@@ -491,7 +491,6 @@ def test_drop_tip(
 
     legacy_instr.pick_up_tip()
     pip.pick_up_tip()
-    pip.move_to(tr.well(0).top(z=10))
 
     new_actual_move = pip._ctx._hw_manager.hardware._api._backend.move
 
@@ -524,34 +523,56 @@ def test_drop_tip(
     legacy_instr.drop_tip(**legacy_kwargs)
     pip.drop_tip(**new_kwargs)
 
-    print(legacy_move.call_args_list)
-    print(new_move.call_args_list)
-    print("")
-    # check retract pipette
-    assert legacy_move.call_args_list[0][0][0]['Z'] == \
-        new_move.call_args_list[0][0][0]['Z']
+    if loc is None:
+        # check retract pipette
+        assert legacy_move.call_args_list[0][0][0]['Z'] == \
+            new_move.call_args_list[0][0][0]['Z']
 
-    # check trash location
-    for legacy_call, new_call in zip(legacy_move.call_args_list[1:3],
-                                     new_move.call_args_list[1:3]):
-        common_lpos, common_npos = get_common_axes(legacy_call[0][0],
-                                                   new_call[0][0])
-        assert common_lpos == common_npos
+        # check trash location
+        for legacy_call, new_call in zip(legacy_move.call_args_list[1:3],
+                                         new_move.call_args_list[1:3]):
+            common_lpos, common_npos = get_common_axes(legacy_call[0][0],
+                                                       new_call[0][0])
+            assert common_lpos == common_npos
 
-    # check drop actual tip
-    assert legacy_move.call_args_list[4][0][0]['B'] == \
-        new_move.call_args_list[4][0][0]['B']
+        # check drop actual tip
+        assert legacy_move.call_args_list[4][0][0]['B'] == \
+            new_move.call_args_list[4][0][0]['B']
 
-    # check recovery action
-    if home_after is not None:
-        legacy_calls = legacy_move.call_args_list[5:]
-        new_calls = new_move.call_args_list[5:]
+        # check recovery action
+        if home_after is not None:
+            legacy_calls = legacy_move.call_args_list[5:]
+            new_calls = new_move.call_args_list[5:]
+        else:
+            legacy_calls = legacy_move.call_args_list[6:]
+            new_calls = new_move.call_args_list[5:]
+        for legacy_call, new_call in zip(legacy_calls, new_calls):
+            common_lpos, common_npos = get_common_axes(legacy_call[0][0],
+                                                       new_call[0][0])
+            assert common_lpos == common_npos
     else:
-        legacy_calls = legacy_move.call_args_list[6:]
-        new_calls = new_move.call_args_list[5:]
-    for legacy_call, new_call in zip(legacy_calls, new_calls):
-        common_lpos, common_npos = get_common_axes(legacy_call[0][0],
-                                                   new_call[0][0])
-        # print(common_lpos)
-        # print(common_npos)
-        assert common_lpos == common_npos
+        legacy_move.call_args_list = legacy_move.call_args_list[1:]
+        new_move.call_args_list = new_move.call_args_list
+
+        # check return tip location
+        for legacy_call, new_call in zip(legacy_move.call_args_list[:2],
+                                         new_move.call_args_list[:2]):
+            common_lpos, common_npos = get_common_axes(legacy_call[0][0],
+                                                       new_call[0][0])
+            assert common_lpos == common_npos
+
+        # check drop actual tip
+        assert legacy_move.call_args_list[3][0][0]['B'] == \
+            new_move.call_args_list[2][0][0]['B']
+
+        # check recovery action
+        if home_after is not None:
+            legacy_calls = legacy_move.call_args_list[4:]
+            new_calls = new_move.call_args_list[3:]
+        else:
+            legacy_calls = legacy_move.call_args_list[5:]
+            new_calls = new_move.call_args_list[3:]
+        for legacy_call, new_call in zip(legacy_calls, new_calls):
+            common_lpos, common_npos = get_common_axes(legacy_call[0][0],
+                                                       new_call[0][0])
+            assert common_lpos == common_npos

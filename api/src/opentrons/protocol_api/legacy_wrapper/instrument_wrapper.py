@@ -787,17 +787,17 @@ class Pipette:
         """
         if location:
             lw, coords = _unpack_motion_target(location, 'top')
-            if 'rack' in str(location.parent):
+            if 'rack' in str(location.parent).lower():
                 half_tip_length = self._pipette_config.tip_length * \
-                    (self._pipette_config.return_tip_height)
+                    (self._pipette_config.return_tip_height or 0.5)
                 new_loc = lw.top(-half_tip_length)
-                print(f'v2 location: {new_loc}')
-            elif 'trash' in str(location.parent):
+                print(f'v2: {new_loc}')
+            elif 'trash' in str(location.parent).lower():
                 new_loc = (lw, coords +
                            (0, self._pipette_config.modelOffset[1], 0))
             else:
                 new_loc = lw.top()
-            new_loc = _absolute_motion_target(new_loc, 'top')
+            location = _absolute_motion_target(new_loc)
 
         self._instr_ctx.drop_tip(
             location=location, home_after=home_after)
