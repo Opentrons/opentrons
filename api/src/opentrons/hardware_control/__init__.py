@@ -450,8 +450,6 @@ class API(HardwareAPILike):
         """
         self._log.info("Halting")
         self._backend.hard_halt()
-        # call on attached modules "halt" func that cancels any waits etc.
-        # and probably cancels any ongoing actions, hold onto the task in tc hwc and cancel it
 
     async def stop(self):
         """
