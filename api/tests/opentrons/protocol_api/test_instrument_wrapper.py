@@ -601,7 +601,7 @@ def test_drop_tip(
 
     legacy_instr.drop_tip(**legacy_kwargs)
     pip.drop_tip(**new_kwargs)
-
+    assert not pip.current_tip()
     if loc is None:
         # check retract pipette
         assert legacy_move.call_args_list[0][0][0]['Z'] == \

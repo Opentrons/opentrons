@@ -800,9 +800,9 @@ class Pipette:
             checked_location = _absolute_motion_target(new_loc)
         else:
             checked_location = location  # type: ignore
-
         self._instr_ctx.drop_tip(
             location=checked_location, home_after=home_after)
+        self.current_tip(None)
         return self
 
     @log_call(log)
