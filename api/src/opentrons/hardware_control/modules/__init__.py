@@ -1,9 +1,8 @@
 import asyncio
 import logging
-import os
 from glob import glob
 import re
-from typing import List, Optional, Tuple
+from typing import List, Optional
 from collections import namedtuple
 
 from opentrons.config import IS_ROBOT, IS_LINUX

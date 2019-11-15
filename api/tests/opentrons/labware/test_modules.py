@@ -186,7 +186,8 @@ async def test_port_poll(virtual_smoothie_env, monkeypatch):
 
     # Case 1: Bootloader port is successfully opened on the module
     async def mock_discover_ports1():
-        return ['/dev/ot_module_magdeck0', '/dev/ot_module_avrdude_bootloader1']
+        return ['/dev/ot_module_magdeck0',
+                '/dev/ot_module_avrdude_bootloader1']
     monkeypatch.setattr(hw_modules.update,
                         '_discover_ports', mock_discover_ports1)
 

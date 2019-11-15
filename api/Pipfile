@@ -20,6 +20,7 @@ wheel = "==0.30.0"
 coverage = "==4.4.2"
 mypy = "==0.740"
 colorama = "*"
+typing-extensions = "*"
 
 [packages]
 numpy = "==1.15.1"

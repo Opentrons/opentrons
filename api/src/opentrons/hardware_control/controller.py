@@ -1,11 +1,11 @@
 import asyncio
 from contextlib import contextmanager, ExitStack
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 try:
-    import aionotify
+    import aionotify  # type: ignore
 except OSError:
-    aionotify = None
+    aionotify = None  # type: ignore
 
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.drivers.rpi_drivers import gpio
@@ -13,7 +13,9 @@ import opentrons.config
 from opentrons.types import Mount
 
 from . import modules
-from .types import RegisterModules
+
+if TYPE_CHECKING:
+    from .types import RegisterModules  # noqa (F501)
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -125,7 +127,7 @@ class Controller:
         self._smoothie_driver.set_speed(val)
 
     async def watch_modules(self, loop: asyncio.AbstractEventLoop,
-                            register_modules: RegisterModules):
+                            register_modules: 'RegisterModules'):
         can_watch = aionotify is not None
         if can_watch:
             await self._module_watcher.setup(loop)
@@ -137,11 +139,13 @@ class Controller:
             flags = aionotify.Flags.parse(event.flags)
             if 'ot_module' in event.name:
                 maybe_module_at_port = modules.get_module_at_port(event.name)
-                if maybe_module_at_port is not None and aionotify.Flags.DELETE in flags:
+                if maybe_module_at_port is not None and \
+                        aionotify.Flags.DELETE in flags:
                     await register_modules(
                         removed_modules=[maybe_module_at_port])
                     MODULE_LOG.info(f'Module Removed: {maybe_module_at_port}')
-                if maybe_module_at_port is not None and aionotify.Flags.CREATE in flags:
+                if maybe_module_at_port is not None and \
+                        aionotify.Flags.CREATE in flags:
                     await register_modules(new_modules=[maybe_module_at_port])
                     MODULE_LOG.info(f'Module Added: {maybe_module_at_port}')
 

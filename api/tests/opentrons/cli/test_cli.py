@@ -5,7 +5,7 @@ import numpy as np
 try:
     import aionotify
 except OSError:
-    aionotify = None
+    aionotify = None  # type: ignore
 from opentrons.config import (CONFIG,
                               robot_configs,
                               advanced_settings as advs)

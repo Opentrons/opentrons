@@ -1,5 +1,6 @@
 import enum
-from typing import Tuple, Awaitable, Callable, Optional, List
+from typing import Tuple, List
+from typing_extensions import Protocol
 
 import opentrons.types
 from .modules import ModuleAtPort
@@ -94,6 +95,9 @@ class CriticalPoint(enum.Enum):
     """
 
 
-RegisterModules = Callable[[Optional[List[ModuleAtPort]],
-                            Optional[List[ModuleAtPort]]],
-                           Awaitable[None]]
+class RegisterModules(Protocol):
+    async def __call__(
+        self,
+        new_modules: List[ModuleAtPort] = None,
+        removed_modules: List[ModuleAtPort] = None
+    ) -> None: ...

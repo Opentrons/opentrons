@@ -8,7 +8,7 @@ from aiohttp import web
 from opentrons.server import init
 from opentrons.server.endpoints import update
 from opentrons.server.endpoints import serverlib_fallback
-from opentrons.hardware_control import modules as hw_modules, simulator
+from opentrons.hardware_control import modules as hw_modules
 
 
 async def test_restart(

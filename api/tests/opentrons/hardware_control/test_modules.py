@@ -3,7 +3,7 @@ import asyncio
 try:
     import aionotify
 except OSError:
-    aionotify = None
+    aionotify = None  # type: ignore
 import opentrons.hardware_control as hardware_control
 from opentrons.hardware_control.modules import ModuleAtPort
 

@@ -16,7 +16,7 @@ import contextlib
 import functools
 import inspect
 import logging
-from typing import Any, Dict, Union, List, Optional, Tuple
+from typing import Dict, Union, List, Optional, TYPE_CHECKING
 from opentrons import types as top_types
 from opentrons.util import linal
 from .simulator import Simulator
@@ -25,6 +25,8 @@ from .pipette import Pipette
 from .controller import Controller
 from . import modules
 from .types import Axis, HardwareAPILike, CriticalPoint
+if TYPE_CHECKING:
+    from .types import RegisterModules  # noqa (F501)
 
 
 mod_log = logging.getLogger(__name__)
@@ -162,7 +164,6 @@ class API(HardwareAPILike):
         checked_loop.create_task(backend.watch_modules(
             register_modules=api_instance.register_modules))
         return api_instance
-
 
     def __repr__(self):
         return '<{} using backend {}>'.format(type(self),
@@ -400,6 +401,7 @@ class API(HardwareAPILike):
         return await self._backend.update_firmware(firmware_file,
                                                    checked_loop,
                                                    explicit_modeset)
+
     def _call_on_attached_modules(self, method: str):
         for module in self.attached_modules:
             maybe_module_method = getattr(module, method, None)
@@ -1353,7 +1355,11 @@ class API(HardwareAPILike):
                 'blow_out_flow_rate',
                 self._plunger_flowrate(this_pipette, blow_out, 'dispense'))
 
-    async def register_modules(self, new_modules = None, removed_modules = None):
+    async def register_modules(
+            self,
+            new_modules: List[modules.ModuleAtPort] = None,
+            removed_modules: List[modules.ModuleAtPort] = None
+            ) -> None:
         if new_modules is None:
             new_modules = []
         if removed_modules is None:
@@ -1361,15 +1367,16 @@ class API(HardwareAPILike):
         for port, name in removed_modules:
             self._attached_modules = [mod for mod in self._attached_modules
                                       if mod.port != port]
-            self._log.info(f"Module {name} disconnected " \
+            self._log.info(f"Module {name} disconnected "
                            f" from port {port}")
 
         for port, name in new_modules:
-            new_instance = await self._backend.build_module(port,
+            new_instance = await self._backend.build_module(
+                    port,
                     name,
                     self.pause_with_message)
             self._attached_modules.append(new_instance)
-            self._log.info(f"Module {name} discovered and attached " \
+            self._log.info(f"Module {name} discovered and attached "
                            f" at port {port}")
 
     async def _do_tp(self, pip, mount) -> top_types.Point:

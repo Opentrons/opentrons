@@ -4,8 +4,7 @@
 try:
     import aionotify
 except OSError:
-    aionotify = None
-import sys
+    aionotify = None  # type: ignore
 import asyncio
 import contextlib
 import os

@@ -3,7 +3,7 @@ from unittest import mock
 try:
     import aionotify
 except OSError:
-    aionotify = None
+    aionotify = None  # type: ignore
 import pytest
 from opentrons import types
 from opentrons import hardware_control as hc

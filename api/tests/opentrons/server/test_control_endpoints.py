@@ -7,7 +7,6 @@ from opentrons import types
 from opentrons.legacy_api import modules as legacy_modules
 
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
-from opentrons.hardware_control import modules
 from opentrons.config import pipette_config
 
 
