@@ -785,6 +785,20 @@ class Pipette:
             # drops the tip back at its tip rack
             p300.drop_tip(tiprack[1])
         """
+        if location:
+            lw, coords = _unpack_motion_target(location, 'top')
+            if 'rack' in str(location.parent):
+                half_tip_length = self._pipette_config.tip_length * \
+                    (self._pipette_config.return_tip_height)
+                new_loc = lw.top(-half_tip_length)
+                print(f'v2 location: {new_loc}')
+            elif 'trash' in str(location.parent):
+                new_loc = (lw, coords +
+                           (0, self._pipette_config.modelOffset[1], 0))
+            else:
+                new_loc = lw.top()
+            new_loc = _absolute_motion_target(new_loc, 'top')
+
         self._instr_ctx.drop_tip(
             location=location, home_after=home_after)
         return self

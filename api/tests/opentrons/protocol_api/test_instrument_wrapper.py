@@ -396,9 +396,15 @@ def split_new_moves(call_list):
     return split_moves
 
 
+@pytest.mark.parametrize('loc,presses,increment', [
+    (None, None, None),
+    (1, None, None),
+    (None, 1, None),
+    (None, None, 1)])
 @pytest.mark.api2_only
 def test_pick_up_tip(
-        loop, monkeypatch, instruments, labware, load_v1_instrument):
+        loop, monkeypatch, instruments, labware, load_v1_instrument,
+        loc, presses, increment):
     robot, legacy_instr, legacy_lw = load_v1_instrument
     tr = labware.load('opentrons_96_tiprack_10ul', '1')
     pip = instruments.P10_Single(mount='left', tip_racks=[tr])
@@ -423,8 +429,22 @@ def test_pick_up_tip(
     legacy_move.side_effect = legacy_passthru
     monkeypatch.setattr(robot._driver, 'move', legacy_move)
 
-    legacy_instr.pick_up_tip()
-    pip.pick_up_tip()
+    legacy_tr = legacy_instr.tip_racks[0]
+
+    legacy_kwargs = {}
+    new_kwargs = {}
+    if loc is not None:
+        legacy_kwargs['location'] = legacy_tr.wells(loc)
+        new_kwargs['location'] = tr.wells(loc)
+    if presses is not None:
+        legacy_kwargs['presses'] = presses
+        new_kwargs['presses'] = presses
+    if increment is not None:
+        legacy_kwargs['increment'] = increment
+        new_kwargs['increment'] = increment
+
+    legacy_instr.pick_up_tip(**legacy_kwargs)
+    pip.pick_up_tip(**new_kwargs)
 
     # check move to tip
     # ignore moving the pluger to the bottom first
@@ -452,9 +472,16 @@ def test_pick_up_tip(
     assert new_moves == legacy_moves
 
 
+@pytest.mark.parametrize('loc,home_after', [
+    (None, None),
+    (None, False),
+    # (0, None),
+    # (0, False)
+    ])
 @pytest.mark.api2_only
 def test_drop_tip(
-        loop, monkeypatch, instruments, labware, load_v1_instrument):
+        loop, monkeypatch, instruments, labware, load_v1_instrument,
+        loc, home_after):
     robot, legacy_instr, legacy_lw = load_v1_instrument
     tr = labware.load('opentrons_96_tiprack_10ul', '1')
     pip = instruments.P10_Single(mount='left', tip_racks=[tr])
@@ -464,6 +491,7 @@ def test_drop_tip(
 
     legacy_instr.pick_up_tip()
     pip.pick_up_tip()
+    pip.move_to(tr.well(0).top(z=10))
 
     new_actual_move = pip._ctx._hw_manager.hardware._api._backend.move
 
@@ -482,9 +510,23 @@ def test_drop_tip(
     legacy_move.side_effect = legacy_passthru
     monkeypatch.setattr(robot._driver, 'move', legacy_move)
 
-    legacy_instr.drop_tip()
-    pip.drop_tip()
+    legacy_tr = legacy_instr.tip_racks[0]
 
+    legacy_kwargs = {}
+    new_kwargs = {}
+    if loc is not None:
+        legacy_kwargs['location'] = legacy_tr.wells(loc)
+        new_kwargs['location'] = tr.wells(loc)
+    if home_after is not None:
+        legacy_kwargs['home_after'] = home_after
+        new_kwargs['home_after'] = home_after
+
+    legacy_instr.drop_tip(**legacy_kwargs)
+    pip.drop_tip(**new_kwargs)
+
+    print(legacy_move.call_args_list)
+    print(new_move.call_args_list)
+    print("")
     # check retract pipette
     assert legacy_move.call_args_list[0][0][0]['Z'] == \
         new_move.call_args_list[0][0][0]['Z']
@@ -501,8 +543,15 @@ def test_drop_tip(
         new_move.call_args_list[4][0][0]['B']
 
     # check recovery action
-    for legacy_call, new_call in zip(legacy_move.call_args_list[6:],
-                                     new_move.call_args_list[5:]):
+    if home_after is not None:
+        legacy_calls = legacy_move.call_args_list[5:]
+        new_calls = new_move.call_args_list[5:]
+    else:
+        legacy_calls = legacy_move.call_args_list[6:]
+        new_calls = new_move.call_args_list[5:]
+    for legacy_call, new_call in zip(legacy_calls, new_calls):
         common_lpos, common_npos = get_common_axes(legacy_call[0][0],
                                                    new_call[0][0])
+        # print(common_lpos)
+        # print(common_npos)
         assert common_lpos == common_npos
