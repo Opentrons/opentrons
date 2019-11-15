@@ -7,6 +7,7 @@ from numpy import add, subtract, isclose
 # from opentrons.legacy_api.containers import unpack_location, Placeable
 from opentrons.legacy_api.containers.placeable import Placeable
 from opentrons.protocol_api.legacy_wrapper.containers_wrapper import LegacyWell
+from opentrons.protocol_api.legacy_wrapper.types import LegacyLocation
 from opentrons import types
 
 PIPETTES = [
@@ -665,10 +666,25 @@ def mock_atomics(instr, monkeypatch):
     return instr, top_mock
 
 
-def method_names(call_list):
-    return [
-        str(call).split('(')[0] for call in call_list
-    ]
+def common_method_call(call):
+    def transform_arg(arg):
+        if isinstance(arg, LegacyLocation):
+            return (arg.labware.get_name(), tuple(*arg.offset))
+        elif isinstance(arg, LegacyWell):
+            return arg.get_name()
+        elif isinstance(arg, Placeable):
+            return arg.get_name()
+        elif isinstance(arg, tuple):
+            return (arg[0].get_name(), arg[1])
+        else:
+            return arg
+
+    return [(call[0], [transform_arg(arg) for arg in call[1]],
+             {k: transform_arg(v) for k, v in call[2].items()})]
+
+
+def common_method_calls(call_list):
+    return [common_method_call(call) for call in call_list]
 
 
 @pytest.mark.parametrize(
@@ -704,8 +720,12 @@ def test_basic_transfer(
     new_instr.transfer(new_instr.max_volume / 2,
                        new_lw.well('A1'),
                        new_lw.well('A2'))
-    assert method_names(new_mock.method_calls)\
-        == method_names(legacy_mock.method_calls)
+
+    assert common_method_calls(new_mock.method_calls)\
+        == common_method_calls(legacy_mock.method_calls)
+
+    new_mock.reset_mock()
+    legacy_mock.reset_mock()
 
     legacy_instr.transfer(legacy_instr.max_volume / 2,
                           legacy_lw[:16],
@@ -713,8 +733,12 @@ def test_basic_transfer(
     new_instr.transfer(new_instr.max_volume / 2,
                        new_lw[:16],
                        new_lw[16:32])
-    assert method_names(new_mock.method_calls)\
-        == method_names(legacy_mock.method_calls)
+
+    assert common_method_calls(new_mock.method_calls)\
+        == common_method_calls(legacy_mock.method_calls)
+
+    new_mock.reset_mock()
+    legacy_mock.reset_mock()
 
     legacy_instr.transfer(legacy_instr.max_volume * 2,
                           legacy_lw[:16],
@@ -722,8 +746,11 @@ def test_basic_transfer(
     new_instr.transfer(new_instr.max_volume * 2,
                        new_lw[:16],
                        new_lw[16:32])
-    assert method_names(new_mock.method_calls)\
-        == method_names(legacy_mock.method_calls)
+    assert common_method_calls(new_mock.method_calls)\
+        == common_method_calls(legacy_mock.method_calls)
+
+    new_mock.reset_mock()
+    legacy_mock.reset_mock()
 
     legacy_instr.transfer(legacy_instr.max_volume,
                           legacy_lw[:16],
@@ -731,5 +758,6 @@ def test_basic_transfer(
     new_instr.transfer(new_instr.max_volume,
                        new_lw[:16],
                        new_lw[16:32])
-    assert method_names(new_mock.method_calls)\
-        == method_names(legacy_mock.method_calls)
+    assert common_method_calls(new_mock.method_calls)\
+        == common_method_calls(legacy_mock.method_calls)
+
