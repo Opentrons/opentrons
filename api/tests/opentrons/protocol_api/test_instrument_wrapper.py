@@ -1,4 +1,5 @@
 from unittest import mock
+import math
 
 import pytest
 
@@ -9,6 +10,7 @@ from opentrons.legacy_api.containers.placeable import Placeable
 from opentrons.protocol_api.legacy_wrapper.containers_wrapper import LegacyWell
 from opentrons.protocol_api.legacy_wrapper.types import LegacyLocation
 from opentrons import types
+
 
 PIPETTES = [
     'P1000_Single',
@@ -40,7 +42,7 @@ TIPRACKS = {
 }
 
 
-def bind_parameters_to_instruments(additional_args):
+def bind_parameters_to_instruments(additional_args, instrs=None):
     """ If you have a test you want to parametrize with some args, and
     also you want to parametrize it across all the instrument constructors,
     call this with your args and it will add all the instruments. For instance,
@@ -52,8 +54,10 @@ def bind_parameters_to_instruments(additional_args):
     ('P1000_Single_GEN2'), 2, None),
     ...]
     """
+    if not instrs:
+        instrs = PIPETTES
     params = []
-    for pipname in PIPETTES:
+    for pipname in instrs:
         for arg in additional_args:
             params.append((pipname, *arg))
     return params
@@ -655,21 +659,30 @@ def test_drop_tip(
 
 
 def mock_atomics(instr, monkeypatch):
-    top_mock = mock.Mock()
+    top_mock = mock.MagicMock()
+    top_mock.aspirate.side_effect = instr.aspirate
     monkeypatch.setattr(instr, 'aspirate', top_mock.aspirate)
+    top_mock.dispense.side_effect = instr.dispense
     monkeypatch.setattr(instr, 'dispense', top_mock.dispense)
+    #top_mock.air_gap.side_effect = instr.air_gap
     monkeypatch.setattr(instr, 'air_gap', top_mock.air_gap)
+    #top_mock.blow_out.side_effect = instr.blow_out
     monkeypatch.setattr(instr, 'blow_out', top_mock.blow_out)
+    top_mock.pick_up_tip.side_effect = instr.pick_up_tip
     monkeypatch.setattr(instr, 'pick_up_tip', top_mock.pick_up_tip)
+    top_mock.drop_tip.side_effect = instr.drop_tip
     monkeypatch.setattr(instr, 'drop_tip', top_mock.drop_tip)
+    top_mock.return_tip.side_effect = instr.return_tip
     monkeypatch.setattr(instr, 'return_tip', top_mock.return_tip)
+    #top_mock.touch_tip.side_effect = instr.touch_tip
+    monkeypatch.setattr(instr, 'touch_tip', top_mock.touch_tip)
     return instr, top_mock
 
 
 def common_method_call(call):
     def transform_arg(arg):
         if isinstance(arg, LegacyLocation):
-            return (arg.labware.get_name(), tuple(*arg.offset))
+            return (arg.labware.get_name(), tuple(arg.offset))
         elif isinstance(arg, LegacyWell):
             return arg.get_name()
         elif isinstance(arg, Placeable):
@@ -688,76 +701,133 @@ def common_method_calls(call_list):
 
 
 @pytest.mark.parametrize(
-    'instrument_ctor',
-    [
-        ('P1000_Single',),
-        ('P1000_Single_GEN2',),
-        ('P300_Single',),
-        ('P300_Single_GEN2',),
-        ('P300_Multi',),
-        ('P300_Multi_GEN2',),
-        ('P50_Single',),
-        ('P50_Multi',),
-        ('P20_Single_GEN2',),
-        ('P20_Multi_GEN2',),
-        ('P10_Single',),
-        ('P10_Multi',),
-    ]
+    'instrument_ctor,volume,source,dest,touch_tip,blow_out,mix_before,mix_after,gradient,air_gap',
+    bind_parameters_to_instruments([
+        ('half_max_volume', ('single', 'A1'), ('single', 'A2'), None, None, None, None, None, None),
+        ('half_max_volume', ('wellseries', 16), ('wellseries', 16), None, None, None, None, None, None),
+        ('max_volume', ('single', 'A1'), ('single', 'A2'), None, None, None, None, None, None),
+        ('twice_max_volume', ('wellseries', 16), ('wellseries', 16), None, None, None, None, None, None),
+        ('max_volume', ('wellseries', 16), ('wellseries', 16), None, None, None, None, None, None),
+        ('max_volume', ('list', 8), ('list', 8), None, None, None, None, None, None),
+        ('list of max', ('list', 8), ('list', 8), None, None, None, None, None, None),
+        ('gradient', ('list', 8), ('list', 8), None, None, None, None, None, None),
+        ('gradient', ('list', 8), ('list', 8), None, None, None, None, lambda x: x, None),
+        # mix before
+        ('max_volume', ('list', 8), ('list', 8), None, None, (5, 'half_max_volume'), None, None, None),
+        # mix after
+        ('max_volume', ('list', 8), ('list', 8), None, None, None, (5, 'half_max_volume'), None, None),
+        # mix after and mix before
+        ('max_volume', ('list', 8), ('list', 8), None, None, (7, 'half_max_volume'), (5, 'half_max_volume'), None, None),
+        # air gap
+        ('max_volume', ('list', 8), ('list', 8), None, None, None, None, None, 'min_volume'),
+        # touch tip
+        ('max_volume', ('list', 8), ('list', 8), True, None, None, None, None, None),
+        # blow out
+        ('max_volume', ('list', 8), ('list', 8), None, True, None, None, None, None),
+        # free for all
+        ('max_volume', ('list', 8), ('list', 8), True, True, (7, 'half_max_volume'), (5, 'half_max_volume'), None, 'min_volume'),
+    ], instrs=['P300_Single', 'P20_Multi_GEN2'])
 )
 @pytest.mark.api2_only
 def test_basic_transfer(
         monkeypatch, instruments, labware, load_v1_instrument,
         load_bc_instrument,
-        instrument_ctor):
+        instrument_ctor, volume, source, dest, touch_tip, blow_out, mix_before, mix_after, gradient, air_gap):
     robot, legacy_instr, legacy_lw = load_v1_instrument
     new_robot, new_instr, new_lw = load_bc_instrument
     legacy_instr, legacy_mock = mock_atomics(legacy_instr, monkeypatch)
     new_instr, new_mock = mock_atomics(new_instr, monkeypatch)
+    from opentrons.legacy_api.instruments import pipette
+    monkeypatch.setattr(pipette, 'do_publish', mock.Mock())
+    from opentrons.protocol_api.legacy_wrapper import instrument_wrapper
+    monkeypatch.setattr(instrument_wrapper.cmds, 'do_publish', mock.Mock())
+    if dest[0] == 'single':
+        legacy_dest = legacy_lw[dest[1]]
+        new_dest = new_lw[dest[1]]
+    elif dest[0] == 'wellseries':
+        legacy_dest = legacy_lw[dest[1]:2*dest[1]]
+        new_dest = new_lw[dest[1]:2*dest[1]]
+    elif dest[0] == 'list':
+        legacy_dest = [legacy_lw[well] for well in range(dest[1], 2*dest[1])]
+        new_dest = [new_lw[well] for well in range(dest[1], 2*dest[1])]
+    else:
+        raise Exception(f"bad dest spec {dest}")
 
-    legacy_instr.transfer(legacy_instr.max_volume / 2,
-                          legacy_lw.well('A1'),
-                          legacy_lw.well('A2'))
-    new_instr.transfer(new_instr.max_volume / 2,
-                       new_lw.well('A1'),
-                       new_lw.well('A2'))
+    # Test many interesting transfer cases, such as
+
+    if source[0] == 'single':
+        legacy_source = legacy_lw[source[1]]
+        new_source = new_lw[source[1]]
+    elif source[0] == 'wellseries':
+        legacy_source = legacy_lw[:source[1]]
+        new_source = new_lw[:source[1]]
+    elif source[0] == 'list':
+        legacy_source = [legacy_lw[well] for well in range(source[1])]
+        new_source = [new_lw[well] for well in range(source[1])]
+    else:
+        raise Exception(f"bad source spec {source}")
+
+    if volume == 'half_max_volume':
+        volume_val_new = new_instr.max_volume/2
+        volume_val_legacy = legacy_instr.max_volume/2
+    elif volume == 'max_volume':
+        volume_val_new = new_instr.max_volume
+        volume_val_legacy = legacy_instr.max_volume
+    elif volume == 'twice_max_volume':
+        volume_val_new = new_instr.max_volume * 2
+        volume_val_legacy = legacy_instr.max_volume * 2
+    elif volume == 'gradient':
+        volume_val_new = (new_instr.min_volume, new_instr.max_volume)
+        volume_val_legacy = (legacy_instr.min_volume, legacy_instr.max_volume)
+    elif volume == 'list of max':
+        volume_val_new = [new_instr.max_volume] * min(len(new_dest),
+                                                      len(new_source))
+        volume_val_legacy = [legacy_instr.max_volume] * min(len(legacy_dest),
+                                                            len(legacy_source))
+    else:
+        raise Exception(f"Bad volume spec {volume}")
+
+    legacy_kwargs = {}
+    new_kwargs = {}
+    if air_gap == 'min_volume':
+        legacy_kwargs['air_gap'] = legacy_instr.min_volume
+        new_kwargs['air_gap'] = new_instr.min_volume
+    elif air_gap is not None:
+        raise Exception(f"bad air gap spec {air_gap}")
+
+    if blow_out is not None:
+        legacy_kwargs['blow_out'] = blow_out
+        new_kwargs['blow_out'] = blow_out
+
+    if mix_before is not None:
+        if mix_before[1] == 'half_max_volume':
+            legacy_kwargs['mix_before'] = (
+                mix_before[0], legacy_instr.max_volume / 2)
+            new_kwargs['mix_before'] = (
+                mix_before[0], new_instr.max_volume / 2)
+        else:
+            raise Exception(f"bad mix before spec {mix_before}")
+
+    if mix_after is not None:
+        if mix_after[1] == 'half_max_volume':
+            legacy_kwargs['mix_after'] = (
+                mix_after[0], legacy_instr.max_volume / 2)
+            new_kwargs['mix_after'] = (mix_after[0], new_instr.max_volume / 2)
+        else:
+            raise Exception(f"bad mix after spec {mix_after}")
+
+    if touch_tip is not None:
+        legacy_kwargs['touch_tip'] = touch_tip
+        new_kwargs['touch_tip'] = touch_tip
+
+    if gradient is not None:
+        legacy_kwargs['gradient'] = gradient
+        new_kwargs['gradient'] = gradient
+    new_instr._ctx._hw_manager.hardware.home()
+    legacy_instr.transfer(volume_val_legacy, legacy_source, legacy_dest,
+                          **legacy_kwargs)
+    new_instr.transfer(volume_val_new, new_source, new_dest,
+                       **new_kwargs)
 
     assert common_method_calls(new_mock.method_calls)\
         == common_method_calls(legacy_mock.method_calls)
-
-    new_mock.reset_mock()
-    legacy_mock.reset_mock()
-
-    legacy_instr.transfer(legacy_instr.max_volume / 2,
-                          legacy_lw[:16],
-                          legacy_lw[16:32])
-    new_instr.transfer(new_instr.max_volume / 2,
-                       new_lw[:16],
-                       new_lw[16:32])
-
-    assert common_method_calls(new_mock.method_calls)\
-        == common_method_calls(legacy_mock.method_calls)
-
-    new_mock.reset_mock()
-    legacy_mock.reset_mock()
-
-    legacy_instr.transfer(legacy_instr.max_volume * 2,
-                          legacy_lw[:16],
-                          legacy_lw[16:32])
-    new_instr.transfer(new_instr.max_volume * 2,
-                       new_lw[:16],
-                       new_lw[16:32])
-    assert common_method_calls(new_mock.method_calls)\
-        == common_method_calls(legacy_mock.method_calls)
-
-    new_mock.reset_mock()
-    legacy_mock.reset_mock()
-
-    legacy_instr.transfer(legacy_instr.max_volume,
-                          legacy_lw[:16],
-                          legacy_lw[16:32])
-    new_instr.transfer(new_instr.max_volume,
-                       new_lw[:16],
-                       new_lw[16:32])
-    assert common_method_calls(new_mock.method_calls)\
-        == common_method_calls(legacy_mock.method_calls)
-

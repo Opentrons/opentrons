@@ -89,12 +89,14 @@ def plan_moves(
     if to_lw and to_lw == from_lw:
         # If we know the labwares we’re moving from and to, we can calculate
         # a safe z based on their heights
+        # TODO: Remove these awful Well.top() calls when we eliminate the back
+        #       compat wrapper
         if to_well:
-            to_safety = to_well.top().point.z + well_z_margin
+            to_safety = Well.top(to_well).point.z + well_z_margin
         else:
             to_safety = to_lw.highest_z + well_z_margin
         if from_well:
-            from_safety = from_well.top().point.z + well_z_margin
+            from_safety = Well.top(from_well).point.z + well_z_margin
         else:
             from_safety = from_lw.highest_z + well_z_margin
     else:
