@@ -193,7 +193,7 @@ class Simulator:
     def set_active_current(self, axis, amp):
         pass
 
-    async def watch_modules(self, register_modules: RegisterModules):
+    async def watch_modules(self, register_modules: 'RegisterModules'):
         new_modules = [
             modules.ModuleAtPort(
                 port=f'/dev/ot_module_sim_{mod}{str(idx)}', name=mod)
