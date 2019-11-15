@@ -91,7 +91,23 @@ class Pipette:
         self._pipette_config = pipette_config.load(self._instr_ctx.model)
 
     @property
-    def _config(self):
+    def requested_as(self) -> str:
+        return self._instr_ctx.requested_as
+
+    @property
+    def model(self) -> str:
+        return self._instr_ctx.model
+
+    @property
+    def name(self) -> str:
+        return self._instr_ctx.name
+
+    @property
+    def channels(self) -> int:
+        return self._instr_ctx.channels
+
+    @property
+    def _config(self) -> pipette_config:
         return self._hw_pipette.config
 
     @property
@@ -230,7 +246,7 @@ class Pipette:
     def get_next_tip(self):
         """ Find the next tip to pick up"""
         tiprack, tip = self._instr_ctx._next_available_tip()
-        tiprack.use_tips(tip, self._instr_ctx.channels)
+        tiprack.use_tips(tip, self.channels)
         return tip
 
     @log_call(log)
@@ -733,7 +749,7 @@ class Pipette:
                         location=new_loc)
         self._hw.set_working_volume(self._mount, new_loc.labware.max_volume)
         new_loc.labware.parent.use_tips(new_loc.labware,  # type: ignore
-                                        self._instr_ctx.channels)
+                                        self.channels)
         self._instr_ctx._last_tip_picked_up_from = \
             new_loc.labware  # type: ignore
 
