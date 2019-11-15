@@ -99,8 +99,8 @@
       "magnetAction": {
         "label": "Magnet action",
         "options": {
-          "engage": "engage",
-          "disengage": "disengage"
+          "engage": "Engage",
+          "disengage": "Disengage"
         }
       },
       "engageHeight": {
