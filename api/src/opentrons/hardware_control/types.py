@@ -1,6 +1,9 @@
 import enum
 from typing import Tuple, List
-from typing_extensions import Protocol
+try:
+    from typing_extensions import Protocol
+except ModuleNotFoundError:
+    Protocol = None
 
 import opentrons.types
 from .modules import ModuleAtPort
@@ -95,9 +98,10 @@ class CriticalPoint(enum.Enum):
     """
 
 
-class RegisterModules(Protocol):
-    async def __call__(
-        self,
-        new_modules: List[ModuleAtPort] = None,
-        removed_modules: List[ModuleAtPort] = None
-    ) -> None: ...
+if Protocol is not None:
+    class RegisterModules(Protocol):
+        async def __call__(
+            self,
+            new_modules: List[ModuleAtPort] = None,
+            removed_modules: List[ModuleAtPort] = None
+        ) -> None: ...

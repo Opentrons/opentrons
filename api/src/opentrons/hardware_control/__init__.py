@@ -1367,7 +1367,7 @@ class API(HardwareAPILike):
         for port, name in removed_modules:
             self._attached_modules = [mod for mod in self._attached_modules
                                       if mod.port != port]
-            self._log.info(f"Module {name} disconnected "
+            self._log.info(f"Module {name} disconnected"
                            f" from port {port}")
 
         for port, name in new_modules:
@@ -1376,7 +1376,7 @@ class API(HardwareAPILike):
                     name,
                     self.pause_with_message)
             self._attached_modules.append(new_instance)
-            self._log.info(f"Module {name} discovered and attached "
+            self._log.info(f"Module {name} discovered and attached"
                            f" at port {port}")
 
     async def _do_tp(self, pip, mount) -> top_types.Point:
