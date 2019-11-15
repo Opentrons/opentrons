@@ -29,3 +29,4 @@ aiohttp = "==3.4.4"
 jsonschema = "==3.0.2"
 jsonrpcserver = "==4.0.3"
 systemd-python = {version="==234", sys_platform="== 'linux'"}
+aionotify = "==0.2.0"

@@ -126,11 +126,13 @@ class Controller:
 
     async def watch_modules(self, loop: asyncio.AbstractEventLoop,
                             register_modules: RegisterModules):
-        await self._module_watcher.setup(loop)
+        can_watch = aionotify is not None
+        if can_watch:
+            await self._module_watcher.setup(loop)
 
         initial_modules = modules.discover()
         await register_modules(new_modules=initial_modules)
-        while (aionotify is not None) and (not self._module_watcher.closed):
+        while can_watch and (not self._module_watcher.closed):
             event = await self._module_watcher.get_event()
             flags = aionotify.Flags.parse(event.flags)
             if 'ot_module' in event.name:

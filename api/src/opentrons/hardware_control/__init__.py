@@ -401,7 +401,7 @@ class API(HardwareAPILike):
                                                    checked_loop,
                                                    explicit_modeset)
 Callable[[AbstractModule], None]
-    def _call_on_attached_modules(self, method):
+    def _call_on_attached_modules(self, method: str):
         for module in self.attached_modules:
             maybe_module_method = getattr(module, method, None)
             if callable(maybe_module_method):
