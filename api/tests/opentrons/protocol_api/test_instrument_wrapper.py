@@ -1,5 +1,4 @@
 from unittest import mock
-import math
 
 import pytest
 
@@ -664,9 +663,11 @@ def mock_atomics(instr, monkeypatch):
     monkeypatch.setattr(instr, 'aspirate', top_mock.aspirate)
     top_mock.dispense.side_effect = instr.dispense
     monkeypatch.setattr(instr, 'dispense', top_mock.dispense)
-    #top_mock.air_gap.side_effect = instr.air_gap
+    # TODO: uncomment when air gap works
+    # top_mock.air_gap.side_effect = instr.air_gap
     monkeypatch.setattr(instr, 'air_gap', top_mock.air_gap)
-    #top_mock.blow_out.side_effect = instr.blow_out
+    # TODO: uncomment when blow out works
+    # top_mock.blow_out.side_effect = instr.blow_out
     monkeypatch.setattr(instr, 'blow_out', top_mock.blow_out)
     top_mock.pick_up_tip.side_effect = instr.pick_up_tip
     monkeypatch.setattr(instr, 'pick_up_tip', top_mock.pick_up_tip)
@@ -674,7 +675,8 @@ def mock_atomics(instr, monkeypatch):
     monkeypatch.setattr(instr, 'drop_tip', top_mock.drop_tip)
     top_mock.return_tip.side_effect = instr.return_tip
     monkeypatch.setattr(instr, 'return_tip', top_mock.return_tip)
-    #top_mock.touch_tip.side_effect = instr.touch_tip
+    # TODO: uncomment when touch tip works
+    # top_mock.touch_tip.side_effect = instr.touch_tip
     monkeypatch.setattr(instr, 'touch_tip', top_mock.touch_tip)
     return instr, top_mock
 
@@ -700,39 +702,40 @@ def common_method_calls(call_list):
     return [common_method_call(call) for call in call_list]
 
 
-@pytest.mark.parametrize(
-    'instrument_ctor,volume,source,dest,touch_tip,blow_out,mix_before,mix_after,gradient,air_gap',
+@pytest.mark.parametrize(  # noqa(E501,C901)
+    'instrument_ctor,volume,source,dest,touch_tip,blow_out,mix_before,mix_after,gradient,air_gap',  # noqa(E501)
     bind_parameters_to_instruments([
-        ('half_max_volume', ('single', 'A1'), ('single', 'A2'), None, None, None, None, None, None),
-        ('half_max_volume', ('wellseries', 16), ('wellseries', 16), None, None, None, None, None, None),
-        ('max_volume', ('single', 'A1'), ('single', 'A2'), None, None, None, None, None, None),
-        ('twice_max_volume', ('wellseries', 16), ('wellseries', 16), None, None, None, None, None, None),
-        ('max_volume', ('wellseries', 16), ('wellseries', 16), None, None, None, None, None, None),
-        ('max_volume', ('list', 8), ('list', 8), None, None, None, None, None, None),
-        ('list of max', ('list', 8), ('list', 8), None, None, None, None, None, None),
-        ('gradient', ('list', 8), ('list', 8), None, None, None, None, None, None),
-        ('gradient', ('list', 8), ('list', 8), None, None, None, None, lambda x: x, None),
+        ('half_max_volume', ('single', 'A1'), ('single', 'A2'), None, None, None, None, None, None),  # noqa(E501)
+        ('half_max_volume', ('wellseries', 16), ('wellseries', 16), None, None, None, None, None, None),  # noqa(E501)
+        ('max_volume', ('single', 'A1'), ('single', 'A2'), None, None, None, None, None, None),  # noqa(E501)
+        ('twice_max_volume', ('wellseries', 16), ('wellseries', 16), None, None, None, None, None, None),  # noqa(E501)
+        ('max_volume', ('wellseries', 16), ('wellseries', 16), None, None, None, None, None, None),  # noqa(E501)
+        ('max_volume', ('list', 8), ('list', 8), None, None, None, None, None, None),  # noqa(E501)
+        ('list of max', ('list', 8), ('list', 8), None, None, None, None, None, None),  # noqa(E501)
+        ('gradient', ('list', 8), ('list', 8), None, None, None, None, None, None),  # noqa(E501)
+        ('gradient', ('list', 8), ('list', 8), None, None, None, None, lambda x: x, None),  # noqa(E501)
         # mix before
-        ('max_volume', ('list', 8), ('list', 8), None, None, (5, 'half_max_volume'), None, None, None),
+        ('max_volume', ('list', 8), ('list', 8), None, None, (5, 'half_max_volume'), None, None, None),  # noqa(E501)
         # mix after
-        ('max_volume', ('list', 8), ('list', 8), None, None, None, (5, 'half_max_volume'), None, None),
+        ('max_volume', ('list', 8), ('list', 8), None, None, None, (5, 'half_max_volume'), None, None),  # noqa(E501)
         # mix after and mix before
-        ('max_volume', ('list', 8), ('list', 8), None, None, (7, 'half_max_volume'), (5, 'half_max_volume'), None, None),
+        ('max_volume', ('list', 8), ('list', 8), None, None, (7, 'half_max_volume'), (5, 'half_max_volume'), None, None),  # noqa(E501)
         # air gap
-        ('max_volume', ('list', 8), ('list', 8), None, None, None, None, None, 'min_volume'),
+        ('max_volume', ('list', 8), ('list', 8), None, None, None, None, None, 'min_volume'),  # noqa(E501)
         # touch tip
-        ('max_volume', ('list', 8), ('list', 8), True, None, None, None, None, None),
+        ('max_volume', ('list', 8), ('list', 8), True, None, None, None, None, None),  # noqa(E501)
         # blow out
-        ('max_volume', ('list', 8), ('list', 8), None, True, None, None, None, None),
+        ('max_volume', ('list', 8), ('list', 8), None, True, None, None, None, None),  # noqa(E501)
         # free for all
-        ('max_volume', ('list', 8), ('list', 8), True, True, (7, 'half_max_volume'), (5, 'half_max_volume'), None, 'min_volume'),
+        ('max_volume', ('list', 8), ('list', 8), True, True, (7, 'half_max_volume'), (5, 'half_max_volume'), None, 'min_volume'),  # noqa(E501)
     ], instrs=['P300_Single', 'P20_Multi_GEN2'])
 )
 @pytest.mark.api2_only
 def test_basic_transfer(
         monkeypatch, instruments, labware, load_v1_instrument,
         load_bc_instrument,
-        instrument_ctor, volume, source, dest, touch_tip, blow_out, mix_before, mix_after, gradient, air_gap):
+        instrument_ctor, volume, source, dest,
+        touch_tip, blow_out, mix_before, mix_after, gradient, air_gap):
     robot, legacy_instr, legacy_lw = load_v1_instrument
     new_robot, new_instr, new_lw = load_bc_instrument
     legacy_instr, legacy_mock = mock_atomics(legacy_instr, monkeypatch)
