@@ -452,6 +452,8 @@ class API(HardwareAPILike):
         """
         self._log.info("Halting")
         self._backend.hard_halt()
+        # call on attached modules "halt" func that cancels any waits etc.
+        # and probably cancels any ongoing actions
 
     async def stop(self):
         """
