@@ -815,7 +815,6 @@ class Pipette:
         self._instr_ctx.home()
         return self
 
-    @log_call(log)
     def distribute(self,
                    volume: float,
                    source: LegacyWell,
@@ -838,11 +837,20 @@ class Pipette:
             p300 = instruments.P300_Single(mount='left')
             p300.distribute(50, plate[1], plate.cols[0])
         """
-        self._instr_ctx.distribute(
-            volume=volume, source=source, dest=dest, *args, **kwargs)
+        args = [volume, source, dest, *args]
+        kwargs['mode'] = 'distribute'
+        kwargs['mix_after'] = (0, 0)
+        if 'disposal_vol' not in kwargs:
+            kwargs['disposal_vol'] = self.min_volume
+        cmds.do_publish(self._ctx.broker, cmds.distribute, self.distribute,
+                        'before', None, None,
+                        self, volume, source, dest)
+        self.transfer(*args, **kwargs)
+        cmds.do_publish(self._ctx.broker, cmds.distribute, self.distribute,
+                        'after', self, None,
+                        self, volume, source, dest)
         return self
 
-    @log_call(log)
     def consolidate(self,
                     volume: float,
                     source: List[LegacyWell],
@@ -864,11 +872,20 @@ class Pipette:
             p300 = instruments.P300_Single(mount='left')
             p300.consolidate(50, plate.cols[0], plate[1])
         """
-        self._instr_ctx.consolidate(
-            volume=volume, source=source, dest=dest, *args, **kwargs)
+        kwargs['mode'] = 'consolidate'
+        kwargs['mix_before'] = (0, 0)
+        kwargs['air_gap'] = 0
+        kwargs['disposal_vol'] = 0
+        args = [volume, source, dest, *args]
+        cmds.do_publish(self._ctx.broker, cmds.consolidate, self.consolidate,
+                        'before', None, None,
+                        self, volume, source, dest)
+        self.transfer(*args, **kwargs)
+        cmds.do_publish(self._ctx.broker, cmds.consolidate, self.consolidate,
+                        'after', self, None,
+                        self, volume, source, dest)
         return self
 
-    @log_call(log)
     def transfer(self,
                  volume: Union[float, Sequence[float]],
                  source: AdvancedLiquidHandling,
@@ -970,12 +987,14 @@ class Pipette:
         if tips is None:
             raise ValueError('Unknown "new_tip" option: {}'.format(tip_option))
 
+        cmds.do_publish(self._ctx.broker, cmds.transfer, self.transfer,
+                        'before', None, None,
+                        self, volume, source, dest)
         plan = self._create_transfer_plan(volume, source, dest, **kwargs)
         self._run_transfer_plan(tips, plan, **kwargs)
-
-        return self
-        self._instr_ctx.transfer(
-            volume=volume, source=source, dest=dest, **kwargs)
+        cmds.do_publish(self._ctx.broker, cmds.transfer, self.transfer,
+                        'after', self, None,
+                        self, volume, source, dest)
         return self
 
     def _multichannel_transfer(self, s, d):
