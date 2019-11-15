@@ -706,3 +706,30 @@ def test_basic_transfer(
                        new_lw.well('A2'))
     assert method_names(new_mock.method_calls)\
         == method_names(legacy_mock.method_calls)
+
+    legacy_instr.transfer(legacy_instr.max_volume / 2,
+                          legacy_lw[:16],
+                          legacy_lw[16:32])
+    new_instr.transfer(new_instr.max_volume / 2,
+                       new_lw[:16],
+                       new_lw[16:32])
+    assert method_names(new_mock.method_calls)\
+        == method_names(legacy_mock.method_calls)
+
+    legacy_instr.transfer(legacy_instr.max_volume * 2,
+                          legacy_lw[:16],
+                          legacy_lw[16:32])
+    new_instr.transfer(new_instr.max_volume * 2,
+                       new_lw[:16],
+                       new_lw[16:32])
+    assert method_names(new_mock.method_calls)\
+        == method_names(legacy_mock.method_calls)
+
+    legacy_instr.transfer(legacy_instr.max_volume,
+                          legacy_lw[:16],
+                          legacy_lw[16:32])
+    new_instr.transfer(new_instr.max_volume,
+                       new_lw[:16],
+                       new_lw[16:32])
+    assert method_names(new_mock.method_calls)\
+        == method_names(legacy_mock.method_calls)
