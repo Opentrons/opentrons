@@ -43,6 +43,10 @@ export function mapToRobotApiRequest<A, B>(
   return pipe(
     withRobotHost(state$, getRobotName),
     map(([a, s, host]) => [host, ...mapActionToRequest(a, s)]),
+    // TODO(mc, 2019-11-15): this is a mergeMap rather than switchMap because:
+    // - Our vanilla fetch usage means switchMap won't cancel inflight requests
+    // - Our request lifecycle state can't handle a cancelled request
+    // Change this to a switchMap once one or both of these are addressed
     mergeMap(([host, request, meta]) => {
       return fetchRobotApi(host, request).pipe(
         withLatestFrom(state$),
