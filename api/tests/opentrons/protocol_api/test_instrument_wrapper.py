@@ -704,7 +704,7 @@ def common_method_calls(call_list):
 
 def build_kwargs(legacy_instr, new_instr, legacy_lw, new_lw,  # noqa(C901)
                  volume, source, dest, touch_tip, blow_out,
-                 mix_before, mix_after, gradient, air_gap):
+                 mix_before, mix_after, gradient, air_gap, new_tip):
     new_kwargs = {}
     legacy_kwargs = {}
     if dest[0] == 'single':
@@ -795,6 +795,10 @@ def build_kwargs(legacy_instr, new_instr, legacy_lw, new_lw,  # noqa(C901)
         legacy_kwargs['gradient'] = gradient
         new_kwargs['gradient'] = gradient
 
+    if new_tip is not None:
+        legacy_kwargs['new_tip'] = new_tip
+        new_kwargs['new_tip'] = new_tip
+
     return legacy_kwargs, new_kwargs
 
 @pytest.mark.parametrize(  # noqa(E501,C901)
@@ -844,10 +848,51 @@ def test_basic_transfer(
     legacy_kwargs, new_kwargs = build_kwargs(
         legacy_instr, new_instr, legacy_lw, new_lw,
         volume, source, dest, touch_tip, blow_out,
-        mix_before, mix_after, gradient, air_gap)
+        mix_before, mix_after, gradient, air_gap, None)
     new_instr._ctx._hw_manager.hardware.home()
     legacy_instr.transfer(**legacy_kwargs)
     new_instr.transfer(**new_kwargs)
+    assert new_mock.method_calls
+    assert legacy_mock.method_calls
+    assert common_method_calls(new_mock.method_calls)\
+        == common_method_calls(legacy_mock.method_calls)
+
+
+@pytest.mark.parametrize(
+    'instrument_ctor,volume,source,dest,new_tip',
+    bind_parameters_to_instruments([
+        ('max_volume', ('single', 'A1'), ('single', 'A2'), None),  # noqa(E501)
+        ('max_volume', ('wellseries', 16), ('wellseries', 16), 'always'),  # noqa(E501)
+        ('max_volume', ('wellseries', 16), ('wellseries', 16), 'never'),  # noqa(E501)
+        ('max_volume', ('wellseries', 16), ('wellseries', 16), 'once'),  # noqa(E501)
+    ], instrs=['P300_Single', 'P20_Multi_GEN2']))
+@pytest.mark.api2_only
+def test_transfer_tips_manipulations(
+        monkeypatch, instruments, labware, load_v1_instrument,
+        load_bc_instrument,
+        instrument_ctor, volume, source, dest, new_tip):
+    robot, legacy_instr, legacy_lw = load_v1_instrument
+    new_robot, new_instr, new_lw = load_bc_instrument
+    legacy_instr, legacy_mock = mock_atomics(legacy_instr, monkeypatch)
+    new_instr, new_mock = mock_atomics(new_instr, monkeypatch)
+    from opentrons.legacy_api.instruments import pipette
+    monkeypatch.setattr(pipette, 'do_publish', mock.Mock())
+    from opentrons.protocol_api.legacy_wrapper import instrument_wrapper
+    monkeypatch.setattr(instrument_wrapper.cmds, 'do_publish', mock.Mock())
+
+    legacy_kwargs, new_kwargs = build_kwargs(
+        legacy_instr, new_instr, legacy_lw, new_lw,
+        volume, source, dest, None, None, None, None, None, None, new_tip)
+
+    new_instr._ctx._hw_manager.hardware.home()
+
+    if new_tip == 'never':
+        legacy_instr.pick_up_tip()
+        new_instr.pick_up_tip()
+
+    legacy_instr.transfer(**legacy_kwargs)
+    new_instr.transfer(**new_kwargs)
+
     assert new_mock.method_calls
     assert legacy_mock.method_calls
     assert common_method_calls(new_mock.method_calls)\
