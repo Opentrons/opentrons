@@ -1,6 +1,6 @@
 import asyncio
 from threading import Thread, Event
-from typing import Union
+from typing import Union, Optional
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 from . import update, mod_abc
 
@@ -124,6 +124,7 @@ class TempDeck(mod_abc.AbstractModule):
         else:
             self._loop = loop
 
+        self._current_task: Optional[asyncio.Task] = None
         self._port = port
         self._device_info = None
         self._poller = None
@@ -136,7 +137,10 @@ class TempDeck(mod_abc.AbstractModule):
         temperature display. Any input outside of this range will be clipped
         to the nearest limit
         """
-        return await self._driver.set_temperature(celsius)
+        self._current_task = self._loop.create_task(
+            self._driver.set_temperature(celsius)
+        )
+        return await self._current_task
 
     def deactivate(self):
         """ Stop heating/cooling and turn off the fan """
@@ -186,6 +190,11 @@ class TempDeck(mod_abc.AbstractModule):
 
     def set_loop(self, loop):
         self._loop = loop
+
+    def cancel(self):
+        if self._current_task:
+            self._current_task.cancel()
+            self._current_task = None
 
     async def _connect(self):
         """
