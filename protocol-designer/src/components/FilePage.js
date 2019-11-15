@@ -54,7 +54,7 @@ class FilePage extends React.Component<Props, State> {
     },
   }
 
-  // TODO (ka 2019-10-28): This is a workaround,
+  // TODO (ka 2019-10-28): This is a workaround, see #4446
   // but it solves the modal positioning problem caused by main page wrapper
   // being positioned absolute until we can figure out something better
   scrollToTop = () => {

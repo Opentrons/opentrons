@@ -1,9 +1,11 @@
 // @flow
 import sortBy from 'lodash/sortBy'
-import * as React from 'react'
+import React, { type Node, useState } from 'react'
 import i18n from '../../../localization'
-import { Card, ToggleButton } from '@opentrons/components'
+import { ContinueModal, Card, ToggleButton } from '@opentrons/components'
+import { Portal } from '../../portals/MainPageModalPortal'
 import styles from '../SettingsPage.css'
+import modalStyles from '../../modals/modal.css'
 import {
   userFacingFlags,
   type Flags,
@@ -15,7 +17,17 @@ type Props = {|
   setFeatureFlags: (flags: Flags) => mixed,
 |}
 
+// TODO (ka 2019-10-28): This is a workaround, see #4446
+// but it solves the modal positioning problem caused by main page wrapper
+// being positioned absolute until we can figure out something better
+const scrollToTop = () => {
+  const editPage = document.getElementById('main-page')
+  if (editPage) editPage.scrollTop = 0
+}
+
 const FeatureFlagCard = (props: Props) => {
+  const [modalFlagName, setModalFlagName] = useState<FlagTypes | null>(null)
+
   const prereleaseModeEnabled = props.flags.PRERELEASE_MODE === true
 
   const allFlags = sortBy(Object.keys(props.flags))
@@ -28,8 +40,8 @@ const FeatureFlagCard = (props: Props) => {
     flagName => !userFacingFlags.includes(flagName)
   )
 
-  const getDescription = (flag: FlagTypes): React.Node => {
-    const RICH_DESCRIPTIONS: { [FlagTypes]: React.Node } = {
+  const getDescription = (flag: FlagTypes): Node => {
+    const RICH_DESCRIPTIONS: { [FlagTypes]: Node } = {
       OT_PD_DISABLE_MODULE_RESTRICTIONS: (
         <>
           <p>{i18n.t(`feature_flags.${flag}.description_1`)} </p>
@@ -53,11 +65,10 @@ const FeatureFlagCard = (props: Props) => {
         <ToggleButton
           className={styles.toggle_button}
           toggledOn={Boolean(props.flags[flagName])}
-          onClick={() =>
-            props.setFeatureFlags({
-              [flagName]: !props.flags[flagName],
-            })
-          }
+          onClick={() => {
+            scrollToTop()
+            setModalFlagName(flagName)
+          }}
         />
       </div>
       <div className={styles.feature_flag_description}>
@@ -78,6 +89,25 @@ const FeatureFlagCard = (props: Props) => {
 
   return (
     <>
+      {modalFlagName && (
+        <Portal>
+          <ContinueModal
+            alertOverlay
+            className={modalStyles.modal}
+            heading={i18n.t('modal.experimental_feature_warning.title')}
+            onCancelClick={() => setModalFlagName(null)}
+            onContinueClick={() => {
+              props.setFeatureFlags({
+                [modalFlagName]: !props.flags[modalFlagName],
+              })
+              setModalFlagName(null)
+            }}
+          >
+            <p>{i18n.t('modal.experimental_feature_warning.body1')}</p>
+            <p>{i18n.t('modal.experimental_feature_warning.body2')}</p>
+          </ContinueModal>
+        </Portal>
+      )}
       <Card title={i18n.t('card.title.feature_flags')}>
         <div className={styles.card_content}>
           {userFacingFlagRows.length > 0 ? userFacingFlagRows : noFlagsFallback}
