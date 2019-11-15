@@ -51,6 +51,7 @@ async def test_module_caching():
     assert two_magdecks[1] is not two_magdecks[0]
 
 
+@pytest.mark.skip('update module endpoint is unused for now')
 @pytest.mark.skipif(aionotify is None,
                     reason="requires inotify (linux only)")
 @pytest.mark.skipif(not hardware_control.Controller,

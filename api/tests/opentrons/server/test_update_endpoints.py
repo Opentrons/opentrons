@@ -101,6 +101,7 @@ async def test_ignore_updates(
     assert json.loads(r3body) == {'version': '3.1.3'}
 
 
+@pytest.mark.skip('update module endpoint is unused for now')
 @pytest.mark.api2_only
 async def test_update_module_firmware(
         virtual_smoothie_env,
@@ -151,6 +152,7 @@ async def test_update_module_firmware(
     assert res == expected_res
 
 
+@pytest.mark.skip('update module endpoint is unused for now')
 @pytest.mark.api2_only
 async def test_fail_update_module_firmware(
         virtual_smoothie_env,
