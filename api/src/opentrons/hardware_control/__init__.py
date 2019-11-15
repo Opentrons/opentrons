@@ -400,7 +400,6 @@ class API(HardwareAPILike):
         return await self._backend.update_firmware(firmware_file,
                                                    checked_loop,
                                                    explicit_modeset)
-Callable[[AbstractModule], None]
     def _call_on_attached_modules(self, method: str):
         for module in self.attached_modules:
             maybe_module_method = getattr(module, method, None)
