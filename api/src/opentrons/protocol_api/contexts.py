@@ -239,11 +239,24 @@ class ProtocolContext(CommandPublisher):
 
         """
         old_hw = self._hw_manager.hardware
+        old_tc = None
+        tc_context = None
         try:
             self._hw_manager.set_hw(hardware)
+            for mod_ctx in self._modules:
+                if isinstance(mod_ctx, ThermocyclerContext):
+                    tc_context = mod_ctx
+                    hw_tc = next(hw_mod for hw_mod in
+                                 hardware.attached_modules.values()
+                                 if hw_mod.name() == 'thermocycler')
+                    if hw_tc:
+                        old_tc = mod_ctx._module
+                        mod_ctx._module = hw_tc
             yield self
         finally:
             self._hw_manager.set_hw(old_hw)
+            if tc_context is not None and old_tc is not None:
+                tc_context._module = old_tc
 
     @requires_version(2, 0)
     def connect(self, hardware: hc.API):
