@@ -34,6 +34,11 @@ export default function ExitAlertModal() {
       alertOverlay
     >
       <p>Doing so will terminate this run and home your robot.</p>
+      <p>
+        Your modules will remain in their current states. They can be controlled
+        via their card on the "Run" page, or the "Pipettes &amp; Modules" page
+        for this robot.
+      </p>
     </AlertModal>
   )
 }
