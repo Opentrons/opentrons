@@ -11,7 +11,7 @@ from opentrons.protocols.parse import (extract_metadata,
                                        version_from_metadata)
 from opentrons.protocols.types import (JsonProtocol,
                                        PythonProtocol,
-                                       APIVersion)
+                                       APIVersion, VersionSource)
 
 
 def test_extract_metadata():
@@ -46,17 +46,17 @@ infer_version_cases = [
 from opentrons import instruments
 
 p = instruments.P10_Single(mount='right')
-""", APIVersion(1, 0)),
+""", APIVersion(1, 0), VersionSource.INFERRED_FROM_IMPORTS),
     ("""
 import opentrons.instruments
 
 p = instruments.P10_Single(mount='right')
-""", APIVersion(1, 0)),
+""", APIVersion(1, 0), VersionSource.INFERRED_FROM_IMPORTS),
     ("""
 from opentrons import instruments as instr
 
 p = instr.P10_Single(mount='right')
-""", APIVersion(1, 0)),
+""", APIVersion(1, 0), VersionSource.INFERRED_FROM_IMPORTS),
     ("""
 from opentrons import instruments
 
@@ -65,7 +65,7 @@ metadata = {
   }
 
 p = instruments.P10_Single(mount='right')
-""", APIVersion(1, 0)),
+""", APIVersion(1, 0), VersionSource.METADATA),
     ("""
 from opentrons import instruments
 
@@ -74,7 +74,7 @@ metadata = {
   }
 
 p = instruments.P10_Single(mount='right')
-""", APIVersion(2, 0)),
+""", APIVersion(2, 0), VersionSource.METADATA),
     ("""
 from opentrons import types
 
@@ -84,7 +84,7 @@ metadata = {
 
 def run(ctx):
     right = ctx.load_instrument('p300_single', types.Mount.RIGHT)
-""", APIVersion(2, 0)),
+""", APIVersion(2, 0), VersionSource.METADATA),
     ("""
 from opentrons import types
 
@@ -94,7 +94,7 @@ metadata = {
 
 def run(ctx):
     right = ctx.load_instrument('p300_single', types.Mount.RIGHT)
-""", APIVersion(1, 0)),
+""", APIVersion(1, 0), VersionSource.METADATA),
     ("""
 from opentrons import types
 
@@ -104,32 +104,33 @@ metadata = {
 
 def run(ctx):
     right = ctx.load_instrument('p300_single', types.Mount.RIGHT)
-""", APIVersion(2, 0)),
+""", APIVersion(2, 0), VersionSource.METADATA),
     ("""
 from opentrons import labware, instruments
 
 p = instruments.P10_Single(mount='right')
-    """, APIVersion(1, 0)),
+    """, APIVersion(1, 0), VersionSource.INFERRED_FROM_IMPORTS),
     ("""
 from opentrons import types, containers
-    """, APIVersion(1, 0)),
+    """, APIVersion(1, 0), VersionSource.INFERRED_FROM_IMPORTS),
     ("""
 from opentrons import types, instruments
 
 p = instruments.P10_Single(mount='right')
-    """, APIVersion(1, 0)),
+    """, APIVersion(1, 0), VersionSource.INFERRED_FROM_IMPORTS),
     ("""
 from opentrons import instruments as instr
 
 p = instr.P300_Single('right')
-    """, APIVersion(1, 0))
+    """, APIVersion(1, 0), VersionSource.INFERRED_FROM_IMPORTS)
 ]
 
 
-@pytest.mark.parametrize('proto,version', infer_version_cases)
-def test_get_version(proto, version):
+@pytest.mark.parametrize('proto,version,source', infer_version_cases)
+def test_get_version(proto, version, source):
     parsed = parse(proto)
     assert parsed.api_level == version
+    assert parsed.version_from == source
 
 
 test_valid_metadata = [
@@ -219,6 +220,7 @@ def test_parse_python_details(
             'source': 'Opentrons Repository',
             'apiLevel': '2.0'
         }
+        assert parsed.version_from == VersionSource.METADATA
     else:
         assert parsed.api_level == APIVersion(1, 0)
         assert parsed.metadata == {
@@ -227,6 +229,7 @@ def test_parse_python_details(
             'description': 'A variant on "Dinosaur" for testing',
             'source': 'Opentrons Repository',
         }
+        assert parsed.version_from == VersionSource.INFERRED_FROM_IMPORTS
     assert parsed.contents == compile(
         protocol.text,
         filename=fname,
@@ -270,6 +273,7 @@ def test_parse_bundle_details(get_bundle_fixture, ensure_api2):
     assert parsed.bundled_data == fixture['bundled_data']
     assert parsed.metadata == fixture['metadata']
     assert parsed.api_level == APIVersion(2, 0)
+    assert parsed.version_from == VersionSource.METADATA
 
 
 @pytest.mark.parametrize('protocol_file',

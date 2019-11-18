@@ -10,7 +10,8 @@ from opentrons.broker import Broker
 from opentrons.commands import tree, types as command_types
 from opentrons.commands.commands import is_new_loc, listify
 from opentrons.config import feature_flags as ff
-from opentrons.protocols.types import JsonProtocol, PythonProtocol, APIVersion
+from opentrons.protocols.types import (JsonProtocol, PythonProtocol,
+                                       APIVersion, VersionSource)
 from opentrons.protocols.parse import parse
 from opentrons.types import Location, Point
 from opentrons.protocol_api import (ProtocolContext,
@@ -281,6 +282,19 @@ class Session(object):
         self._reset()
         # self.metadata is exposed via jrpc
         if isinstance(self._protocol, PythonProtocol):
+            if not ff.use_protocol_api_v2()\
+               and self._protocol.api_level >= APIVersion(2, 0)\
+               and self._protocol.version_from == VersionSource.METADATA:
+                raise RuntimeError(
+                    f'This protocol targets Protocol API '
+                    f'V{self._protocol.api_level}, but the robot is set to '
+                    'Protocol API V1. If this is actually a V1 protocol, '
+                    'remove the \'apiLevel\' key from your metadata or set '
+                    'it to \'1\'. If this is intended to be a '
+                    f'V{self._protocol.api_level}, disable the "Downgrade '
+                    ' to Version 1 Server" toggle in the robot\'s Advanced '
+                    'Settings and restart the robot.'
+                )
             self.api_level = self._protocol.api_level
             self.metadata = self._protocol.metadata
             log.info(f"Protocol API version: {self._protocol.api_level}")

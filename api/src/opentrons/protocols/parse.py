@@ -9,12 +9,13 @@ import pkgutil
 import re
 from io import BytesIO
 from zipfile import ZipFile
-from typing import Any, Dict, Union
+from typing import Any, Dict, Tuple, Union
 
 import jsonschema  # type: ignore
 
 from opentrons.config import feature_flags as ff
-from .types import Protocol, PythonProtocol, JsonProtocol, Metadata, APIVersion
+from .types import (Protocol, PythonProtocol, JsonProtocol,
+                    Metadata, APIVersion, VersionSource)
 from .bundle import extract_bundle
 
 # match e.g. "2.0" but not "hi", "2", "2.0.1"
@@ -66,7 +67,7 @@ def _parse_python(
                        filename=ast_filename)
     metadata = extract_metadata(parsed)
     protocol = compile(parsed, filename=ast_filename, mode='exec')
-    version = get_version(metadata, parsed)
+    version, source = get_version(metadata, parsed)
 
     result = PythonProtocol(
         text=protocol_contents,
@@ -74,6 +75,7 @@ def _parse_python(
         contents=protocol,
         metadata=metadata,
         api_level=version,
+        version_from=source,
         bundled_labware=bundled_labware,
         bundled_data=bundled_data,
         bundled_python=bundled_python,
@@ -101,7 +103,6 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # n
     if result.api_level < APIVersion(2, 0):
         raise RuntimeError('Bundled protocols must use Protocol API V2, ' +
                            f'got {result.api_level}')
-
     return result
 
 
@@ -222,7 +223,9 @@ def version_from_metadata(metadata: Metadata) -> APIVersion:
     return version_from_string(requested_level)
 
 
-def get_version(metadata: Metadata, parsed: ast.Module) -> APIVersion:
+def get_version(
+        metadata: Metadata,
+        parsed: ast.Module) -> Tuple[APIVersion, VersionSource]:
     """
     Infer protocol API version based on a combination of metadata and imports.
 
@@ -237,13 +240,16 @@ def get_version(metadata: Metadata, parsed: ast.Module) -> APIVersion:
     be an APIv1 protocol. If none of these are present, it is assumed to be an
     APIv2 protocol (note that 'labware' is not in this list, as there is a
     valid APIv2 import named 'labware').
+
+    The return value is a tuple of the detected API version and its source
     """
     try:
-        return version_from_metadata(metadata)
+        return (version_from_metadata(metadata), VersionSource.METADATA)
     except KeyError:  # No apiLevel key, may be apiv1
         pass
     try:
-        return infer_version_from_imports(parsed)
+        return (infer_version_from_imports(parsed),
+                VersionSource.INFERRED_FROM_IMPORTS)
     except RuntimeError:
         raise RuntimeError(
             'If this is not an API v1 protocol, you must specify the target '

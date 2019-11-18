@@ -1,6 +1,12 @@
+import enum
 from typing import Any, Dict, NamedTuple, Optional, Union
 
 Metadata = Dict[str, Union[str, int]]
+
+
+class VersionSource(enum.Enum):
+    METADATA = enum.auto()
+    INFERRED_FROM_IMPORTS = enum.auto()
 
 
 class APIVersion(NamedTuple):
@@ -24,6 +30,7 @@ class PythonProtocol(NamedTuple):
     contents: Any  # This is the output of compile() which we can't type
     metadata: Metadata
     api_level: APIVersion
+    version_from: VersionSource
     # these 'bundled_' attrs should only be included when the protocol is a zip
     bundled_labware: Optional[Dict[str, Dict[str, Any]]]
     bundled_data: Optional[Dict[str, bytes]]

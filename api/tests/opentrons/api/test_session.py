@@ -204,6 +204,20 @@ async def test_load_and_run(
     assert session.protocol_text == protocol.text
 
 
+@pytest.mark.api1_only
+@pytest.mark.parametrize('protocol_file', ['testosaur_v2.py'])
+async def test_v2_in_v1_error(
+        main_router,
+        protocol,
+        protocol_file,
+        loop):
+    with pytest.raises(
+            RuntimeError, match='protocol targets Protocol API V2.0'):
+        main_router.session_manager.create(
+            name='<blank>',
+            contents=protocol.text)
+
+
 def test_init(run_session):
     assert run_session.state == 'loaded'
     assert run_session.name == 'dino'
