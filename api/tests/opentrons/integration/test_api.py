@@ -46,7 +46,8 @@ async def test_multi_single(
 @pytest.mark.api1_only
 @pytest.mark.parametrize('protocol_file', ['multi-single.py'])
 async def test_load_jog_save_run(
-        main_router, protocol, protocol_file, monkeypatch, robot):
+        main_router, protocol, protocol_file, monkeypatch, robot,
+        enable_apiv1_backcompat):
     import tempfile
     temp = tempfile.gettempdir()
     monkeypatch.setenv('USER_DEFN_ROOT', temp)

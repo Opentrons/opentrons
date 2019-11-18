@@ -157,7 +157,12 @@ def build_globals(context: 'ProtocolContext'):
     instr = BCInstruments(rob, lw)
     rob._set_globals(instr, lw, mod)
 
-    return {'robot': rob, 'instruments': instr, 'labware': lw, 'modules': mod}
+    return {
+        'robot': rob,
+        'instruments': instr,
+        'labware': lw,
+        'containers': lw,
+        'modules': mod}
 
 
 def maybe_migrate_containers():

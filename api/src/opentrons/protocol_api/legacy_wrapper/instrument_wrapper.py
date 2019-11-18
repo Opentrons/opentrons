@@ -33,6 +33,9 @@ def _unpack_motion_target(
     """ Make sure we have a full LegacyLocation """
     if isinstance(motiontarget, LegacyLocation):
         target_loc = motiontarget
+    elif isinstance(motiontarget, (WellSeries, List)):
+        target_loc = [_unpack_motion_target(well, position)
+                      for well in motiontarget]
     elif isinstance(motiontarget, LegacyWell):
         if position == 'top':
             target_loc = motiontarget.top()
@@ -361,7 +364,6 @@ class Pipette:
 
         if volume != 0:
             self._position_for_aspirate(location)
-
             cmds.do_publish(
                 self._instr_ctx.broker, cmds.aspirate, self.aspirate,
                 'before', None, None, self, volume,
@@ -377,6 +379,10 @@ class Pipette:
     def _position_for_aspirate(self, location: MotionTarget = None):
         placeable: Optional[Union[LegacyLabware, LegacyWell]] = None
         if location:
+            if isinstance(location, (List, WellSeries)):
+                location = self._flatten_well_list(location)
+            if isinstance(location, (List)):
+                location = location[0]
             placeable, _ = _unpack_motion_target(location, 'top')
             # go to top of source if not already there
             if placeable != self.previous_placeable:
@@ -480,6 +486,10 @@ class Pipette:
 
     def _position_for_dispense(self, location: MotionTarget = None):
         if location:
+            if isinstance(location, (List, WellSeries)):
+                location = self._flatten_well_list(location)
+            if isinstance(location, (List)):
+                location = location[0]
             if isinstance(location, LegacyWell):
                 location = location.bottom(
                     min(location.depth,
@@ -576,6 +586,10 @@ class Pipette:
             p300.aspirate(50).dispense().blow_out()
         """
         if location:
+            if isinstance(location, (List, WellSeries)):
+                location = self._flatten_well_list(location)
+            if isinstance(location, (List)):
+                location = location[0]
             self.move_to(location)
         # In API v1, a pipette will blow out at any location as long as there
         # is a tip attached
@@ -736,35 +750,45 @@ class Pipette:
             p300.return_tip()
         """
         if location:
+            display_loc = location
+            if isinstance(location, (List, WellSeries)):
+                location = self._flatten_well_list(location)
+            if isinstance(location, (List)):
+                location = location[0]
             new_loc = _unpack_motion_target(location, 'top')
         else:
             tiprack, new_tip = self._instr_ctx._next_available_tip()
             legacy_labware = self._lw_mappings[tiprack]
             tip = legacy_labware[new_tip._display_name.split(' of')[0]]
             new_loc = tip.top()
+            display_loc = new_tip
 
-        self.current_tip(new_loc.labware)
+        self.current_tip(display_loc)
 
         cmds.do_publish(self._instr_ctx.broker, cmds.pick_up_tip,
                         self.pick_up_tip, 'before', None, None, self,
                         location=new_loc)
         self.move_to(new_loc)
-        self._hw.set_current_tiprack_diameter(self._mount,
-                                              new_loc.labware.diameter)
+        self._hw.set_current_tiprack_diameter(
+            self._mount, new_loc.labware.diameter)
         self._hw.pick_up_tip(
             self._mount,
             self._pipette_config.tip_length,
             presses, increment)
         cmds.do_publish(self._instr_ctx.broker, cmds.pick_up_tip,
                         self.pick_up_tip, 'after', self, None, self,
-                        location=new_loc)
+                        location=display_loc)
         self._hw.set_working_volume(self._mount, new_loc.labware.max_volume)
-        new_loc.labware.parent.use_tips(new_loc.labware,  # type: ignore
-                                        self.channels)
         self._instr_ctx._last_tip_picked_up_from = \
-            new_loc.labware  # type: ignore
+            self.current_tip()  # type: ignore
 
         return self
+
+    def _flatten_well_list(self, well_list: Union[List, WellSeries]):
+        if isinstance(well_list[0], (List, WellSeries)):
+            return [self._flatten_well_list(i) for i in well_list]
+        else:
+            return well_list
 
     @log_call(log)
     def drop_tip(
@@ -797,6 +821,10 @@ class Pipette:
             p300.drop_tip(tiprack[1])
         """
         if location:
+            if isinstance(location, (List, WellSeries)):
+                location = self._flatten_well_list(location)
+            if isinstance(location, (List)):
+                location = location[0]
             lw, coords = _unpack_motion_target(location, 'top')
             if 'rack' in str(lw.parent).lower():
                 half_tip_length = self._pipette_config.tip_length * \

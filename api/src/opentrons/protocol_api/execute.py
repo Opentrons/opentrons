@@ -117,14 +117,13 @@ def _run_python(
 
 
 def _run_python_legacy(proto: PythonProtocol, context: ProtocolContext):
-    new_locs = locals()
     new_globs = globals()
     context._api_version = APIVersion(2, 0)
     namespace_mapping = api.build_globals(context)
     for key, value in namespace_mapping.items():
         setattr(opentrons, key, value)
     try:
-        exec(proto.contents, new_globs, new_locs)
+        exec(proto.contents, new_globs)
     except Exception as e:
         exc_type, exc_value, tb = sys.exc_info()
         try:
