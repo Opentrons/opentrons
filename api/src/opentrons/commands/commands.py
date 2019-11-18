@@ -11,6 +11,8 @@ from opentrons.legacy_api.containers import (Well as OldWell,
                                              Slot as OldSlot,
                                              location_to_list)
 from opentrons.protocol_api.labware import Well, Labware, ModuleGeometry
+from opentrons.protocol_api.legacy_wrapper.containers_wrapper import (
+    LegacyWell, LegacyLabware)
 from opentrons.types import Location
 from opentrons.drivers import utils
 
@@ -59,17 +61,23 @@ def _stringify_new_loc(loc: Union[Location, Well]) -> str:
 
 
 def _stringify_legacy_loc(loc: Union[OldWell, OldContainer,
-                                     OldSlot, None]) -> str:
+                                     OldSlot, LegacyLabware, LegacyWell,
+                                     None]) -> str:
     def get_slot(location):
         trace = location.get_trace()
         for item in trace:
             if isinstance(item, OldSlot):
+                return item.get_name()
+            elif isinstance(item, str):
                 return item
+        return '?'
 
     type_to_text = {
         OldSlot: 'slot',
         OldContainer: 'container',
         OldWell: 'well',
+        LegacyLabware: 'container',
+        LegacyWell: 'well'
     }
 
     # Coordinates only
@@ -84,7 +92,7 @@ def _stringify_legacy_loc(loc: Union[OldWell, OldContainer,
             suffix='s' if multiple else '',
             first=location[0].get_name(),
             last='...'+location[-1].get_name() if multiple else '',
-            slot_text=get_slot(location[0]).get_name()
+            slot_text=get_slot(location[0])
         )
 
 

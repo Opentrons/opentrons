@@ -1,6 +1,6 @@
 import logging
 import time
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 from .util import log_call
 from .. import contexts
@@ -9,9 +9,12 @@ from opentrons import commands
 
 log = logging.getLogger(__name__)
 
+if TYPE_CHECKING:
+    from ..contexts import ProtocolContext
+
 
 @log_call(log)
-def load(ctx: contexts.ProtocolContext,
+def load(ctx: 'ProtocolContext',
          name: str,
          slot: str):
     new_mod = ctx.load_module(name, slot)

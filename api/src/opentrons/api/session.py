@@ -4,6 +4,7 @@ from copy import copy
 from functools import reduce, wraps
 import logging
 from time import time
+from typing import List
 from uuid import uuid4
 from opentrons.broker import Broker
 from opentrons.commands import tree, types as command_types
@@ -492,6 +493,8 @@ def _get_parent_module(placeable):
     elif isinstance(placeable,
                     (ModulePlaceable, labware.ModuleGeometry)):
         res = placeable
+    elif isinstance(placeable, List):
+        res = _get_parent_module(placeable[0].parent)
     else:
         res = _get_parent_module(placeable.parent)
     return res

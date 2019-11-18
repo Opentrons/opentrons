@@ -6,7 +6,8 @@ from typing import Any, Callable
 
 import opentrons
 from .contexts import ProtocolContext
-from . import execute_v3, legacy_wrapper
+from . import execute_v3
+from .legacy_wrapper import api
 
 from opentrons.protocols.types import PythonProtocol, Protocol, APIVersion
 
@@ -116,14 +117,13 @@ def _run_python(
 
 
 def _run_python_legacy(proto: PythonProtocol, context: ProtocolContext):
-    new_locs = locals()
     new_globs = globals()
     context._api_version = APIVersion(2, 0)
-    namespace_mapping = legacy_wrapper.api.build_globals(context)
+    namespace_mapping = api.build_globals(context)
     for key, value in namespace_mapping.items():
         setattr(opentrons, key, value)
     try:
-        exec(proto.contents, new_globs, new_locs)
+        exec(proto.contents, new_globs)
     except Exception as e:
         exc_type, exc_value, tb = sys.exc_info()
         try:

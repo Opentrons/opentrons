@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional, TYPE_CHECKING
 
 from opentrons.hardware_control import adapters, API
 from .util import log_call
+from .types import LegacyLocation
 
 
 if TYPE_CHECKING:
@@ -12,7 +13,6 @@ if TYPE_CHECKING:
     from ..labware import Labware
     from .api import BCInstruments, BCModules
     from .containers_wrapper import Containers
-    from opentrons import types
 
 
 log = logging.getLogger(__name__)
@@ -54,7 +54,7 @@ class Robot():
         """ Internal. Register intrument with this wrapper """
         self._instrs[mount] = instr
         if self._head_speed_override:
-            instr._ctx.default_speed = self._head_speed_override
+            instr._instr_ctx.default_speed = self._head_speed_override
         plunger_max = self._plunger_max_speed_overrides.get(mount)
         if plunger_max is not None:
             instr._set_plunger_max_speed_override(plunger_max)
@@ -158,7 +158,7 @@ class Robot():
         if combined_speed:
             self._head_speed_override = combined_speed
             for instr in self._instrs.values():
-                instr._ctx.default_speed = combined_speed
+                instr._instr_ctx.default_speed = combined_speed
 
         maxes = {'x': x, 'y': y, 'z': z, 'a': a}
         for ax, m in maxes.items():
@@ -176,7 +176,7 @@ class Robot():
     @log_call(log)
     def move_to(
             self,
-            location: 'types.Location',
+            location: LegacyLocation,
             instrument: 'Pipette',
             strategy: str = 'arc',
             **kwargs):

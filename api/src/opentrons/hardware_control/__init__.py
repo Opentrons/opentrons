@@ -627,7 +627,7 @@ class API(HardwareAPILike):
             if refresh:
                 self._current_position = self._deck_from_smoothie(
                     self._backend.update_position())
-            if mount == mount.RIGHT:
+            if mount == top_types.Mount.RIGHT:
                 offset = top_types.Point(0, 0, 0)
             else:
                 offset = top_types.Point(*self._config.mount_offset)

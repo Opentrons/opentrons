@@ -2,35 +2,27 @@ from unittest import mock
 
 import pytest
 
-from opentrons.types import Mount
 from opentrons.hardware_control import API
 
 
+@pytest.mark.parametrize('ctorname,modelname', [
+    ('P1000_Single', 'p1000_single'),
+    ('P1000_Single_GEN2', 'p1000_single_gen2'),
+    ('P300_Single', 'p300_single'),
+    ('P300_Single_GEN2', 'p300_single_gen2'),
+    ('P300_Multi', 'p300_multi'),
+    ('P300_Multi_GEN2', 'p300_multi_gen2'),
+    ('P20_Single_GEN2', 'p20_single_gen2'),
+    ('P20_Multi_GEN2', 'p20_multi_gen2'),
+    ('P10_Single', 'p10_single'),
+    ('P10_Multi', 'p10_multi')
+])
 @pytest.mark.api2_only
-def test_add_instrument(loop, monkeypatch, singletons):
-    fake_load = mock.Mock()
+def test_add_instrument(loop, monkeypatch, singletons,
+                        ctorname, modelname):
     instruments = singletons['instruments']
-    monkeypatch.setattr(instruments._robot_wrapper._ctx,
-                        'load_instrument', fake_load)
-
-    instruments.P1000_Single('left')
-    instruments.P10_Single('right')
-    instruments.P10_Multi('left')
-    instruments.P50_Single('right')
-    instruments.P50_Multi('left')
-    instruments.P300_Single('right')
-    instruments.P300_Multi('left')
-    instruments.P1000_Single('right')
-    assert fake_load.call_args_list == [
-        (('p1000_single', Mount.LEFT), {}),
-        (('p10_single', Mount.RIGHT), {}),
-        (('p10_multi', Mount.LEFT), {}),
-        (('p50_single', Mount.RIGHT), {}),
-        (('p50_multi', Mount.LEFT), {}),
-        (('p300_single', Mount.RIGHT), {}),
-        (('p300_multi', Mount.LEFT), {}),
-        (('p1000_single', Mount.RIGHT), {})
-    ]
+    pip = getattr(instruments, ctorname)('left')
+    assert pip.name == modelname
 
 
 @pytest.mark.api2_only
@@ -54,12 +46,12 @@ def test_head_speed(singletons):
     assert singletons['robot']._head_speed_override == 10
     # Default speed should be provisioned on pipette create from the cache
     left = singletons['instruments'].P50_Single('left')
-    assert left._ctx._default_speed == 10
+    assert left._instr_ctx._default_speed == 10
     # and so should plunger max
     assert left._max_plunger_speed == 3
     # And setting it with already-created instruments should work
     singletons['robot'].head_speed(combined_speed=20, b=4)
-    assert left._ctx._default_speed == 20
+    assert left._instr_ctx._default_speed == 20
     assert left._max_plunger_speed == 4
 
 

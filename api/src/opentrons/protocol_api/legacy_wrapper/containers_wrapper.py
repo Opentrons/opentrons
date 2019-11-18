@@ -205,7 +205,6 @@ def perform_migration():
                 save_definition(labware_def, location=path_to_save_defs)
             except jsonschema.exceptions.ValidationError:
                 validation_failure.append(lw_name)
-                print(f"validation failure on {lw_name}")
         else:
             log.info(f"Skipping migration of {lw_name} because there are no",
                      "wells associated with this labware.")
@@ -229,7 +228,7 @@ class LegacyWell(Well):
             api_version: APIVersion,
             labware_height: float = None,
             well_name: str = None):
-        super().__init__(
+        self._well = super().__init__(
             well_props, parent, display_name, has_tip, api_version)
         self._well_name = well_name
         self._parent_height = labware_height
@@ -252,13 +251,18 @@ class LegacyWell(Well):
     def parent(self) -> 'LegacyLabware':
         return self._parent  # type: ignore
 
-    @property
     def get_name(self) -> Optional[str]:
         return self._well_name
 
     @property
     def depth(self) -> float:
         return self._depth
+
+    def get_trace(self):
+        current_obj = self.parent
+        while current_obj:
+            yield current_obj
+            current_obj = getattr(current_obj, 'parent')
 
     @property
     def width(self) -> float:
@@ -467,7 +471,6 @@ class LegacyWell(Well):
         return LegacyLocation(
                 labware=self,
                 offset=offset)
-        return LegacyLocation(labware=self, offset=Point(0, 0, 0))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, (LegacyWell, Well)):
@@ -879,6 +882,9 @@ class WellSeries(LegacyLabware):
         else:
             raise TypeError(f'You cannot call {self.__name__}')
 
+    def __iter__(self):
+        return iter(self.values)
+
 
 class LegacyDeckItem(DeckItem):
     def __init__(self, share_type: str):
@@ -927,6 +933,12 @@ class Containers:
 
     def __init__(self, ctx: 'ProtocolContext') -> None:
         self._ctx = ctx
+        self._labware_mappings: Dict[Labware, LegacyLabware] = {}
+
+    @property
+    def labware_mappings(self) -> Dict[Labware, LegacyLabware]:
+        """ Reverse of LegacyLabware.lw_obj """
+        return self._labware_mappings
 
     def _determine_share_logic(
             self,
@@ -974,7 +986,9 @@ class Containers:
             lw_obj = mod.load_labware_from_definition(defn)
         else:
             lw_obj = self._add_labware_to_deck(defn, slot_int, label, share)
-        return LegacyLabware(lw_obj)
+        legacy = LegacyLabware(lw_obj)
+        self.labware_mappings[lw_obj] = legacy
+        return legacy
 
     def _get_labware_def_with_fallback(
             self, container_name: str) -> Dict[str, Any]:
@@ -1064,8 +1078,10 @@ class Containers:
         path_to_save_defs = CONFIG['labware_user_definitions_dir_v2']
         save_definition(lw_dict, location=path_to_save_defs)
 
-        return LegacyLabware(
-            Labware(lw_dict, Location(Point(0, 0, 0), 'deck')))
+        lw = Labware(lw_dict, Location(Point(0, 0, 0), 'deck'))
+        legacy = LegacyLabware(lw)
+        self.labware_mappings[lw] = legacy
+        return legacy
 
     @log_call(log)
     def list(self, *args, **kwargs):

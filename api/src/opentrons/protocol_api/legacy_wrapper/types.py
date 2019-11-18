@@ -6,5 +6,5 @@ if TYPE_CHECKING:
 
 
 class LegacyLocation(NamedTuple):
-    labware: Union['LegacyLabware', 'LegacyWell', str]
+    labware: Union['LegacyLabware', 'LegacyWell']
     offset: types.Point

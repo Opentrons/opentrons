@@ -1,5 +1,5 @@
 import itertools
-
+import copy
 import pytest
 
 from opentrons.api.session import (
@@ -113,12 +113,15 @@ def test_load_protocol_with_error_v1(session_manager, hardware):
 
 
 @pytest.mark.api2_only
-@pytest.mark.parametrize('protocol_file', ['testosaur_v2.py'])
+@pytest.mark.parametrize(
+    'protocol_file',
+    ['testosaur_v2.py', 'testosaur.py', 'multi-single.py'])
 async def test_load_and_run_v2(
     main_router,
     protocol,
     protocol_file,
-    loop
+    loop,
+    enable_apiv1_backcompat
 ):
     session = main_router.session_manager.create(
         name='<blank>',
@@ -131,7 +134,9 @@ async def test_load_and_run_v2(
         session.run()
 
     await loop.run_in_executor(executor=None, func=run)
-    assert len(session.command_log) == 4
+    assert session.command_log
+
+    old_log = copy.deepcopy(session.command_log)
 
     res = []
     index = 0
@@ -151,8 +156,7 @@ async def test_load_and_run_v2(
     assert main_router.notifications.queue.qsize() == 0,\
         'Notification should be empty after receiving "finished" event'
     session.run()
-    assert len(session.command_log) == 4, \
-        "Clears command log on the next run"
+    assert len(session.command_log) == len(old_log)
     assert session.protocol_text == protocol.text
 
 
