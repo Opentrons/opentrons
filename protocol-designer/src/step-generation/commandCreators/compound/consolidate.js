@@ -5,18 +5,21 @@ import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import type {
   ConsolidateArgs,
-  InvariantContext,
-  RobotState,
-  CommandCreator,
-  CompoundCommandCreator,
+  NextCommandCreator,
+  CurriedCommandCreator,
 } from '../../types'
-import { blowoutUtil } from '../../utils'
+import {
+  blowoutUtil,
+  curryCommandCreator,
+  reduceCommandCreatorsNext,
+} from '../../utils'
 import { aspirate, dispense, replaceTip, touchTip } from '../atomic'
 import { mixUtil } from './mix'
 
-const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
-  invariantContext: InvariantContext,
-  prevRobotState: RobotState
+const consolidate: NextCommandCreator<ConsolidateArgs> = (
+  args,
+  invariantContext,
+  prevRobotState
 ) => {
   /**
     Consolidate will aspirate several times in sequence from multiple source wells,
@@ -39,16 +42,14 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
   const pipetteData = prevRobotState.pipettes[args.pipette]
   if (!pipetteData) {
     // bail out before doing anything else
-    return [
-      _robotState => ({
-        errors: [
-          errorCreators.pipetteDoesNotExist({
-            actionName,
-            pipette: args.pipette,
-          }),
-        ],
-      }),
-    ]
+    return {
+      errors: [
+        errorCreators.pipetteDoesNotExist({
+          actionName,
+          pipette: args.pipette,
+        }),
+      ],
+    }
   }
 
   // TODO: BC 2019-07-08 these argument names are a bit misleading, instead of being values bound
@@ -74,14 +75,17 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
     (
       sourceWellChunk: Array<string>,
       chunkIndex: number
-    ): Array<CommandCreator> => {
+    ): Array<CurriedCommandCreator> => {
       // Aspirate commands for all source wells in the chunk
       const aspirateCommands = flatMap(
         sourceWellChunk,
-        (sourceWell: string, wellIndex: number): Array<CommandCreator> => {
+        (
+          sourceWell: string,
+          wellIndex: number
+        ): Array<CurriedCommandCreator> => {
           const touchTipAfterAspirateCommand = args.touchTipAfterAspirate
             ? [
-                touchTip({
+                curryCommandCreator(touchTip, {
                   pipette: args.pipette,
                   labware: args.sourceLabware,
                   well: sourceWell,
@@ -92,7 +96,7 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
             : []
 
           return [
-            aspirate({
+            curryCommandCreator(aspirate, {
               pipette: args.pipette,
               volume: args.volume,
               labware: args.sourceLabware,
@@ -105,18 +109,20 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
         }
       )
 
-      let tipCommands: Array<CommandCreator> = []
+      let tipCommands: Array<CurriedCommandCreator> = []
 
       if (
         args.changeTip === 'always' ||
         (args.changeTip === 'once' && chunkIndex === 0)
       ) {
-        tipCommands = [replaceTip(args.pipette)]
+        tipCommands = [
+          curryCommandCreator(replaceTip, { pipette: args.pipette }),
+        ]
       }
 
-      const touchTipAfterDispenseCommands = args.touchTipAfterDispense
+      const touchTipAfterDispenseCommands: Array<CurriedCommandCreator> = args.touchTipAfterDispense
         ? [
-            touchTip({
+            curryCommandCreator(touchTip, {
               pipette: args.pipette,
               labware: args.destLabware,
               well: args.destWell,
@@ -185,7 +191,7 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
         ...mixBeforeCommands,
         ...preWetTipCommands, // NOTE when you both mix-before and pre-wet tip, it's kinda redundant. Prewet is like mixing once.
         ...aspirateCommands,
-        dispense({
+        curryCommandCreator(dispense, {
           pipette: args.pipette,
           volume: args.volume * sourceWellChunk.length,
           labware: args.destLabware,
@@ -200,7 +206,11 @@ const consolidate = (args: ConsolidateArgs): CompoundCommandCreator => (
     }
   )
 
-  return commandCreators
+  return reduceCommandCreatorsNext(
+    commandCreators,
+    invariantContext,
+    prevRobotState
+  )
 }
 
 export default consolidate

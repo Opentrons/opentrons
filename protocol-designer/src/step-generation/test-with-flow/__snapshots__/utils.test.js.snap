@@ -334,6 +334,7 @@ Object {
   },
   "modules": Object {
     "someTempModuleId": Object {
+      "moduleState": Object {},
       "slot": "3",
     },
   },

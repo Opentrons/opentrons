@@ -48,12 +48,15 @@ import type {
   LabwareOnDeck,
   LabwareEntity,
   LabwareEntities,
+  MagneticModuleState,
   ModuleOnDeck,
   ModuleEntities,
   ModulesForEditModulesCard,
   PipetteEntities,
   PipetteOnDeck,
   FormPipettesByMount,
+  TemperatureModuleState,
+  ThermocyclerModuleState,
 } from '../types'
 import type { RootState } from '../reducers'
 import type { InvariantContext } from '../../step-generation'
@@ -145,6 +148,16 @@ export const getLabwareLocationsForStep = (
   }, {})
 }
 
+const MAGNETIC_MODULE_INITIAL_STATE: MagneticModuleState = {
+  type: 'magdeck',
+  engaged: false,
+}
+const TEMPERATURE_MODULE_INITIAL_STATE: TemperatureModuleState = {
+  type: 'tempdeck',
+}
+const THERMOCYCLER_MODULE_INITIAL_STATE: ThermocyclerModuleState = {
+  type: 'thermocycler',
+}
 export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
   getInitialDeckSetupStepForm,
   getLabwareEntities,
@@ -171,7 +184,32 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
       modules: mapValues(
         moduleLocations,
         (slot: DeckSlot, moduleId: string): ModuleOnDeck => {
-          return { slot, ...moduleEntities[moduleId] }
+          const module = moduleEntities[moduleId]
+          if (module.type === 'magdeck') {
+            return {
+              id: module.id,
+              model: module.model,
+              type: 'magdeck',
+              slot,
+              moduleState: MAGNETIC_MODULE_INITIAL_STATE,
+            }
+          } else if (module.type === 'tempdeck') {
+            return {
+              id: module.id,
+              model: module.model,
+              type: 'tempdeck',
+              slot,
+              moduleState: TEMPERATURE_MODULE_INITIAL_STATE,
+            }
+          } else {
+            return {
+              id: module.id,
+              model: module.model,
+              type: 'thermocycler',
+              slot,
+              moduleState: THERMOCYCLER_MODULE_INITIAL_STATE,
+            }
+          }
         }
       ),
       pipettes: mapValues(

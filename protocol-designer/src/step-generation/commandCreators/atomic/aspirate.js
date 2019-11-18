@@ -1,20 +1,15 @@
 // @flow
-import getNextRobotStateAndWarnings from '../../getNextRobotStateAndWarnings'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import { modulePipetteCollision } from '../../utils'
 import type { AspirateParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
-import type {
-  InvariantContext,
-  RobotState,
-  CommandCreator,
-  CommandCreatorError,
-} from '../../types'
+import type { NextCommandCreator, CommandCreatorError } from '../../types'
 
 /** Aspirate with given args. Requires tip. */
-const aspirate = (args: AspirateParams): CommandCreator => (
-  invariantContext: InvariantContext,
-  prevRobotState: RobotState
+const aspirate: NextCommandCreator<AspirateParams> = (
+  args,
+  invariantContext,
+  prevRobotState
 ) => {
   const { pipette, volume, labware, well, offsetFromBottomMm, flowRate } = args
 
@@ -95,11 +90,6 @@ const aspirate = (args: AspirateParams): CommandCreator => (
 
   return {
     commands,
-    ...getNextRobotStateAndWarnings(
-      commands[0],
-      invariantContext,
-      prevRobotState
-    ),
   }
 }
 

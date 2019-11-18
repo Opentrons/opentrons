@@ -15,7 +15,10 @@ import {
 import { GEN_ONE_MULTI_PIPETTES } from '../constants'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { BlowoutParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+import type {
+  Command,
+  BlowoutParams,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type { PipetteEntity, LabwareEntity } from '../step-forms'
 import type {
   CommandCreator,
@@ -24,6 +27,11 @@ import type {
   RobotState,
   SourceAndDest,
   Timeline,
+  CommandCreatorError,
+  CommandCreatorWarning,
+  NextCommandCreator,
+  NextCommandCreatorResult,
+  CurriedCommandCreator,
 } from './types'
 import blowout from './commandCreators/atomic/blowout'
 
@@ -36,6 +44,14 @@ export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
 export function repeatArray<T>(array: Array<T>, repeats: number): Array<T> {
   return flatMap(range(repeats), (i: number): Array<T> => array)
 }
+
+/** Curry a command creator so its args are baked-in,
+ * but it is still open to receiving different input states */
+export const curryCommandCreator = <Args>(
+  commandCreator: NextCommandCreator<Args>,
+  args: Args
+): CurriedCommandCreator => (_invariantContext, _prevRobotState) =>
+  commandCreator(args, _invariantContext, _prevRobotState)
 
 /**
  * Take an array of CommandCreators, streaming robotState through them in order,
@@ -73,6 +89,64 @@ export const reduceCommandCreators = (
     // TODO: should I clone here (for safety) or is it safe enough?
     // Should I avoid cloning in the CommandCreators themselves and just do it pre-emptively in here?
   )
+}
+
+type CCReducerAcc = {|
+  robotState: RobotState,
+  commands: Array<Command>,
+  errors: Array<CommandCreatorError>,
+  errorStep: ?number,
+  warnings: Array<CommandCreatorWarning>,
+|}
+export const reduceCommandCreatorsNext = (
+  commandCreators: Array<CurriedCommandCreator>,
+  invariantContext: InvariantContext,
+  initialRobotState: RobotState
+): NextCommandCreatorResult => {
+  const result = commandCreators.reduce(
+    (
+      prev: CCReducerAcc,
+      reducerFn: CurriedCommandCreator,
+      stepIdx
+    ): CCReducerAcc => {
+      if (prev.errors.length > 1) {
+        // if there are errors, short-circuit the reduce
+        return prev
+      }
+      const next = reducerFn(invariantContext, prev.robotState)
+      if (next.errors) {
+        return {
+          robotState: prev.robotState,
+          commands: prev.commands,
+          errors: next.errors,
+          errorStep: stepIdx,
+          warnings: prev.warnings,
+        }
+      }
+
+      const allCommands = [...prev.commands, ...next.commands]
+      // TODO IMMEDIATELY use getNextRobotState things
+      // const nextRobotState = getNextRobotStateForCommands(initialRobotState, allCommands)
+      const nextRobotState = prev.robotState // TODO IMMEDIATELY: HACK! barely functional
+      return {
+        ...prev,
+        robotState: nextRobotState,
+        commands: allCommands,
+        warnings: [...(prev.warnings || []), ...(next.warnings || [])],
+      }
+    },
+    {
+      robotState: cloneDeep(initialRobotState),
+      commands: [],
+      errors: [],
+      errorStep: null,
+      warnings: [],
+    }
+  )
+  if (result.errors.length > 1) {
+    return { errors: result.errors }
+  }
+  return { commands: result.commands, warnings: result.warnings }
 }
 
 export const commandCreatorsTimeline = (
@@ -272,7 +346,7 @@ export const blowoutUtil = (args: {
   flowRate: number,
   offsetFromTopMm: number,
   invariantContext: InvariantContext,
-}): Array<CommandCreator> => {
+}): Array<CurriedCommandCreator> => {
   const {
     pipette,
     sourceLabwareId,
@@ -310,7 +384,7 @@ export const blowoutUtil = (args: {
   const offsetFromBottomMm =
     getWellsDepth(labware.def, [well]) + offsetFromTopMm
   return [
-    blowout({
+    curryCommandCreator(blowout, {
       pipette: pipette,
       labware: labware.id,
       well,

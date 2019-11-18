@@ -8,7 +8,7 @@ import type {
   Command,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type {
-  CommandsAndRobotState,
+  CommandsAndWarnings,
   CommandCreatorErrorResponse,
 } from '../../types'
 
@@ -16,8 +16,8 @@ import type {
  **  to normal response or error response
  **/
 export function getSuccessResult(
-  result: CommandsAndRobotState | CommandCreatorErrorResponse
-): CommandsAndRobotState {
+  result: CommandsAndWarnings | CommandCreatorErrorResponse
+): CommandsAndWarnings {
   if (result.errors) {
     throw new Error(
       `Expected a successful command creator call but got errors: ${JSON.stringify(
@@ -29,7 +29,7 @@ export function getSuccessResult(
 }
 
 export function getErrorResult(
-  result: CommandsAndRobotState | CommandCreatorErrorResponse
+  result: CommandsAndWarnings | CommandCreatorErrorResponse
 ): CommandCreatorErrorResponse {
   if (!result.errors) {
     throw new Error(

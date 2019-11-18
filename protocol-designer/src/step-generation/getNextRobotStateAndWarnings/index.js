@@ -1,7 +1,8 @@
 // @flow
 import assert from 'assert'
 import forAspirateDispense from './forAspirateDispense'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+import { forEngageMagnet, forDisengageMagnet } from './magnetUpdates'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type {
   InvariantContext,
   RobotState,
@@ -15,8 +16,8 @@ export default function getNextRobotStateAndWarnings(
 ): RobotStateAndWarnings {
   assert(command, 'undefined command passed to getNextRobotStateAndWarning')
   switch (command.command) {
-    case 'dispense':
     case 'aspirate':
+    case 'dispense':
       // TODO: BC 2018-11-29 handle dispense
       return forAspirateDispense(
         command.params,
@@ -37,6 +38,14 @@ export default function getNextRobotStateAndWarnings(
     case 'airGap':
       // TODO: BC 2018-11-29 handle air-gap
       return { robotState: prevRobotState, warnings: [] }
+    case 'magneticModule/engageMagnet':
+      return forEngageMagnet(command.params, invariantContext, prevRobotState)
+    case 'magneticModule/disengageMagnet':
+      return forDisengageMagnet(
+        command.params,
+        invariantContext,
+        prevRobotState
+      )
     default:
       assert(
         false,

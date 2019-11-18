@@ -465,7 +465,7 @@ describe('makeInitialRobotState', () => {
         trashId: { slot: '12' },
       },
       moduleLocations: {
-        someTempModuleId: { slot: '3' },
+        someTempModuleId: { slot: '3', moduleState: { type: 'tempdeck' } },
       },
       pipetteLocations: {
         p10SingleId: { mount: 'left' },

@@ -1,5 +1,5 @@
 // @flow
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type {
   LabwareTemporalProperties,
   ModuleTemporalProperties,
@@ -272,6 +272,23 @@ export type CompoundCommandCreator = (
   invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => Array<CommandCreator>
+
+export type CommandsAndWarnings = {|
+  commands: Array<Command>,
+  warnings?: Array<CommandCreatorWarning>,
+|}
+export type NextCommandCreatorResult =
+  | CommandsAndWarnings
+  | CommandCreatorErrorResponse
+export type NextCommandCreator<Args> = (
+  args: Args,
+  invariantContext: InvariantContext,
+  prevRobotState: RobotState
+) => NextCommandCreatorResult
+export type CurriedCommandCreator = (
+  invariantContext: InvariantContext,
+  prevRobotState: RobotState
+) => NextCommandCreatorResult
 
 export type Timeline = {|
   timeline: Array<CommandsAndRobotState>, // TODO: Ian 2018-06-14 avoid timeline.timeline shape, better names

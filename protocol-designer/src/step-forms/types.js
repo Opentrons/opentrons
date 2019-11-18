@@ -46,7 +46,18 @@ export type FormModulesByType = {
 export type ModuleEntity = {| id: string, type: ModuleType, model: string |}
 export type ModuleEntities = { [moduleId: string]: ModuleEntity }
 
-export type ModuleTemporalProperties = {| slot: DeckSlot |}
+// NOTE: semi-redundant 'type' key in FooModuleState types is required for Flow to disambiguate 'moduleState'
+export type MagneticModuleState = {| type: 'magdeck', engaged: boolean |}
+export type TemperatureModuleState = {| type: 'tempdeck' |} // TODO IL 2019-11-18 create this state
+export type ThermocyclerModuleState = {| type: 'thermocycler' |} // TODO IL 2019-11-18 create this state
+export type ModuleTemporalProperties = {|
+  slot: DeckSlot,
+  moduleState:
+    | MagneticModuleState
+    | TemperatureModuleState
+    | ThermocyclerModuleState,
+|}
+
 export type ModuleOnDeck = {| ...ModuleEntity, ...ModuleTemporalProperties |}
 
 export type ModulesForEditModulesCard = {
