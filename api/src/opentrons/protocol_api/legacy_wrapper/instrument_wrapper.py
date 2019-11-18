@@ -151,7 +151,7 @@ class Pipette:
         return self._pipette_status['min_volume']
 
     @property
-    def previous_placeable(self) -> Optional[Union[LegacyWell, LegacyLabware]]:
+    def previous_placeable(self) -> Optional[Union[LegacyLabware, LegacyWell]]:
         if not self._ctx.location_cache:
             return None
         if isinstance(self._ctx.location_cache.labware, LegacyWell):
@@ -633,9 +633,61 @@ class Pipette:
             p300.aspirate(50, plate[0])
             p300.dispense(plate[1]).touch_tip()
         """
-        self._instr_ctx.touch_tip(
-                location=location, radius=radius, v_offset=v_offset,
-                speed=speed)
+        if not self.tip_attached:
+            self._log.warning("Cannot touch tip without a tip attached.")
+        if speed > 80.0:
+            self._log.warning(
+                "Touch tip speeds greater than 80mm/s not allowed")
+            speed = 80.0
+        if speed < 20.0:
+            self._log.warning(
+                "Touch tip speeds greater than 80mm/s not allowed")
+            speed = 20.0
+
+        if isinstance(location, Number):
+            # Deprecated syntax
+            self._log.warning("Please use the `v_offset` named parameter")
+            v_offset = location
+            location = None
+
+        # if no location specified, use the previously
+        # associated placeable to get Well dimensions
+        if location is None and\
+                isinstance(self.previous_placeable, LegacyWell):
+            location = self.previous_placeable  # type: ignore
+
+        if location is None:
+            raise ValueError("No valid location to touch tip on.")
+
+        cmds.do_publish(
+            self._instr_ctx.broker, cmds.touch_tip, self.touch_tip, 'before',
+            None, None, self, location, radius, v_offset, speed)
+
+        # move to location if we're not already there
+        if location != self.previous_placeable:
+            self.move_to(location, strategy='arc')
+
+        new_v_offset = Point(0.0, 0.0, v_offset)
+
+        well_edges = [
+            location.from_center(x=radius, y=0, z=1),       # right edge
+            location.from_center(x=radius * -1, y=0, z=1),  # left edge
+            location.from_center(x=0, y=radius, z=1),       # back edge
+            location.from_center(x=0, y=radius * -1, z=1)   # front edge
+        ]
+
+        # Apply vertical offset to well edges
+        v_well_edges = [
+            LegacyLocation(ll.labware, ll.offset + new_v_offset)
+            for ll in well_edges]
+        self.set_speed(speed)
+        [self.move_to(loc, strategy='direct')
+         for loc in v_well_edges]
+
+        cmds.do_publish(
+            self._instr_ctx.broker, cmds.touch_tip, self.touch_tip, 'after',
+            self, None, self, location, radius, v_offset, speed)
+
         return self
 
     @log_call(log)
@@ -668,7 +720,10 @@ class Pipette:
 
         if volume and volume != 0:
             z_height = 0 if not height else height
-            location = self.previous_placeable.top(z=z_height)
+            # this is a bug in v1 intentionally reproduced here: if you haven't
+            # previously moved to a placeable, airgap will give you an
+            # attributeerror with "NoneType" object has no attribute "top".
+            location = self.previous_placeable.top(z=z_height)  # type: ignore
             # "move_to" separate from aspirate command
             # so "_position_for_aspirate" isn't executed
             self.move_to(location)
@@ -875,7 +930,7 @@ class Pipette:
             p300 = instruments.P300_Single(mount='left')
             p300.distribute(50, plate[1], plate.cols[0])
         """
-        args = [volume, source, dest, *args]
+        args = (volume, source, dest, *args)
         kwargs['mode'] = 'distribute'
         kwargs['mix_after'] = (0, 0)
         if 'disposal_vol' not in kwargs:
@@ -914,7 +969,7 @@ class Pipette:
         kwargs['mix_before'] = (0, 0)
         kwargs['air_gap'] = 0
         kwargs['disposal_vol'] = 0
-        args = [volume, source, dest, *args]
+        args = (volume, source, dest, *args)
         cmds.do_publish(self._ctx.broker, cmds.consolidate, self.consolidate,
                         'before', None, None,
                         self, volume, source, dest)

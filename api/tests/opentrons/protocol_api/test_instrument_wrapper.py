@@ -649,10 +649,8 @@ def mock_atomics(instr, monkeypatch):
     monkeypatch.setattr(instr, 'aspirate', top_mock.aspirate)
     top_mock.dispense.side_effect = instr.dispense
     monkeypatch.setattr(instr, 'dispense', top_mock.dispense)
-    # TODO: uncomment when air gap works
     top_mock.air_gap.side_effect = instr.air_gap
     monkeypatch.setattr(instr, 'air_gap', top_mock.air_gap)
-    # TODO: uncomment when blow out works
     top_mock.blow_out.side_effect = instr.blow_out
     monkeypatch.setattr(instr, 'blow_out', top_mock.blow_out)
     top_mock.pick_up_tip.side_effect = instr.pick_up_tip
@@ -883,6 +881,114 @@ def test_air_gap(
     assert pip.current_volume == 2 + volume
     assert legacy_instr.current_volume == pip.current_volume
     assert isclose(old_aspirate_z + z_height, z_height + aspirate_z)
+
+
+@pytest.mark.api2_only
+def test_touch_tip(monkeypatch, instruments, labware, load_v1_instrument):
+    robot, legacy_instr, legacy_lw = load_v1_instrument
+
+    def calculate_expected_well_edge(location, radius, offset):
+        well_edges = [
+            location.from_center(x=radius, y=0, z=1),
+            location.from_center(x=radius * -1, y=0, z=1),
+            location.from_center(x=0, y=radius, z=1),
+            location.from_center(x=0, y=radius * -1, z=1)
+        ]
+        if isinstance(location, LegacyWell):
+            new_well = [
+                LegacyLocation(
+                    ll.labware, ll.offset + types.Point(0, 0, offset))
+                for ll in well_edges]
+        else:
+            new_well = map(lambda x: x + (0, 0, offset), well_edges)
+        return new_well
+
+    tr = labware.load('opentrons_96_tiprack_10ul', '1')
+    pip = instruments.P10_Single(mount='left', tip_racks=[tr])
+    lw = labware.load('corning_96_wellplate_360ul_flat', '2')
+
+    instruments._robot_wrapper.home()
+
+    new_actual_move = pip.move_to
+
+    def new_passthru(*args, **kwargs):
+        new_actual_move(*args, **kwargs)
+    new_move = mock.Mock()
+    new_move.side_effect = new_passthru
+    monkeypatch.setattr(
+        pip, 'move_to', new_move)
+
+    pip.pick_up_tip()
+    pip.move_to.reset_mock()
+    wells_call1 = calculate_expected_well_edge(lw[0], 1, -1)
+    legacy_wells1 = calculate_expected_well_edge(legacy_lw[0], 1, -1)
+    expected1 = [
+        mock.call(lw[0], strategy='arc'),
+        mock.call(
+            wells_call1[0],
+            strategy='direct'),
+        mock.call(
+            wells_call1[1],
+            strategy='direct'),
+        mock.call(
+            wells_call1[2],
+            strategy='direct'),
+        mock.call(
+            wells_call1[3],
+            strategy='direct')]
+    pip.touch_tip(lw[0])
+
+    assert expected1 == pip.move_to.mock_calls
+    for new_well, old_well in zip(wells_call1, legacy_wells1):
+        assert isclose(old_well[0], new_well.offset[0])
+        assert isclose(old_well[1], new_well.offset[1])
+        assert isclose(old_well[2], new_well.offset[2])
+    pip.move_to.reset_mock()
+    wells_call2 = calculate_expected_well_edge(lw[0], 1, -3)
+    legacy_wells2 = calculate_expected_well_edge(legacy_lw[0], 1, -3)
+    pip.touch_tip(v_offset=-3)
+    expected2 = [
+            mock.call(
+                wells_call2[0],
+                strategy='direct'),
+            mock.call(
+                wells_call2[1],
+                strategy='direct'),
+            mock.call(
+                wells_call2[2],
+                strategy='direct'),
+            mock.call(
+                wells_call2[3],
+                strategy='direct')]
+    assert expected2 == pip.move_to.mock_calls
+    for new_well, old_well in zip(wells_call2, legacy_wells2):
+        assert isclose(old_well[0], new_well.offset[0])
+        assert isclose(old_well[1], new_well.offset[1])
+        assert isclose(old_well[2], new_well.offset[2])
+    pip.move_to.reset_mock()
+
+    wells_call3 = calculate_expected_well_edge(lw[1], 0.5, -1)
+    legacy_wells3 = calculate_expected_well_edge(legacy_lw[1], 0.5, -1)
+    pip.touch_tip(lw[1], radius=0.5)
+    expected3 = [
+        mock.call(lw[1], strategy='arc'),
+        mock.call(
+            wells_call3[0],
+            strategy='direct'),
+        mock.call(
+            wells_call3[1],
+            strategy='direct'),
+        mock.call(
+            wells_call3[2],
+            strategy='direct'),
+        mock.call(
+            wells_call3[3],
+            strategy='direct')]
+    assert expected3 == pip.move_to.mock_calls
+    for new_well, old_well in zip(wells_call3, legacy_wells3):
+        assert isclose(old_well[0], new_well.offset[0])
+        assert isclose(old_well[1], new_well.offset[1])
+        assert isclose(old_well[2], new_well.offset[2])
 
 
 @pytest.mark.parametrize(  # noqa(E501,C901)
