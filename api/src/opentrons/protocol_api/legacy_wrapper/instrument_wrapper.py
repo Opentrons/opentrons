@@ -804,6 +804,7 @@ class Pipette:
             p300.pick_up_tip()
             p300.return_tip()
         """
+        display_loc: Union[LegacyLocation, LegacyWell, Well]
         if location:
             display_loc = location
             if isinstance(location, (List, WellSeries)):

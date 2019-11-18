@@ -882,6 +882,9 @@ class WellSeries(LegacyLabware):
         else:
             raise TypeError(f'You cannot call {self.__name__}')
 
+    def __iter__(self):
+        return iter(self.values)
+
 
 class LegacyDeckItem(DeckItem):
     def __init__(self, share_type: str):
