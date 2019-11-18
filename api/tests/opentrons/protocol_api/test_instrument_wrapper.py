@@ -649,10 +649,8 @@ def mock_atomics(instr, monkeypatch):
     monkeypatch.setattr(instr, 'aspirate', top_mock.aspirate)
     top_mock.dispense.side_effect = instr.dispense
     monkeypatch.setattr(instr, 'dispense', top_mock.dispense)
-    # TODO: uncomment when air gap works
     top_mock.air_gap.side_effect = instr.air_gap
     monkeypatch.setattr(instr, 'air_gap', top_mock.air_gap)
-    # TODO: uncomment when blow out works
     top_mock.blow_out.side_effect = instr.blow_out
     monkeypatch.setattr(instr, 'blow_out', top_mock.blow_out)
     top_mock.pick_up_tip.side_effect = instr.pick_up_tip
