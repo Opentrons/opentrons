@@ -106,18 +106,6 @@ def load_v1_instrument(virtual_smoothie_env, request):
     return robot, legacy_instr, legacy_lw
 
 
-# @pytest.mark.api2_only
-# def test_pick_up_tip(instruments, labware):
-#     lw = labware.load('opentrons_96_tiprack_10ul', '1')
-#     pip = instruments.P10_Single(mount='left')
-#
-#     instruments._robot_wrapper.home()
-#
-#     pip.pick_up_tip(lw.wells(0))
-#     assert pip.has_tip
-#     assert pip.current_tip() == lw.wells(0)
-
-
 def get_v1_v2_mock_calls(monkeypatch, v1_api, v2_api, function):
     v1 = mock.Mock()
     v2 = mock.Mock()
@@ -721,7 +709,6 @@ def build_kwargs(legacy_instr, new_instr, legacy_lw, new_lw,  # noqa(C901)
         raise Exception(f"bad dest spec {dest}")
 
     # Test many interesting transfer cases, such as
-
     if source[0] == 'single':
         legacy_kwargs['source'] = legacy_lw[source[1]]
         new_kwargs['source'] = new_lw[source[1]]
@@ -739,6 +726,9 @@ def build_kwargs(legacy_instr, new_instr, legacy_lw, new_lw,  # noqa(C901)
     if volume == 'half_max_volume':
         new_kwargs['volume'] = new_instr.max_volume/2
         legacy_kwargs['volume'] = legacy_instr.max_volume/2
+    elif volume == 'quarter_max_volume':
+        new_kwargs['volume'] = new_instr.max_volume/4
+        legacy_kwargs['volume'] = legacy_instr.max_volume/4
     elif volume == 'max_volume':
         new_kwargs['volume'] = new_instr.max_volume
         legacy_kwargs['volume'] = legacy_instr.max_volume
@@ -766,8 +756,12 @@ def build_kwargs(legacy_instr, new_instr, legacy_lw, new_lw,  # noqa(C901)
         raise Exception(f"bad air gap spec {air_gap}")
 
     if blow_out is not None:
-        legacy_kwargs['blow_out'] = blow_out
-        new_kwargs['blow_out'] = blow_out
+        if isinstance(blow_out, bool):
+            legacy_kwargs['blow_out'] = blow_out
+            new_kwargs['blow_out'] = blow_out
+        elif isinstance(blow_out, str):
+            legacy_kwargs['blow_out'] = legacy_lw[blow_out]
+            new_kwargs['blow_out'] = new_lw[blow_out]
 
     if mix_before is not None:
         if mix_before[1] == 'half_max_volume':
@@ -805,14 +799,8 @@ def build_kwargs(legacy_instr, new_instr, legacy_lw, new_lw,  # noqa(C901)
         else:
             raise Exception(f"invalid disposal vol spec {disposal_vol}")
 
-    # check recovery action
-    for legacy_call, new_call in zip(legacy_move.call_args_list[6:],
-                                     new_move.call_args_list[5:]):
-        common_lpos, common_npos = get_common_axes(legacy_call[0][0],
-                                                   new_call[0][0])
-        assert common_lpos == common_npos
-
     return legacy_kwargs, new_kwargs
+
 
 @pytest.mark.api2_only
 def test_blow_out(instruments, labware, load_v1_instrument, monkeypatch):
@@ -1048,6 +1036,8 @@ def test_consolidate(
         ('max_volume', ('single', 'A3'), ('list', 8), True, None, None, None, None, None, None),  # noqa(E501)
         # blow out
         ('max_volume', ('single', 'A3'), ('list', 8), None, True, None, None, None, None, None),  # noqa(E501)
+        # blow out at specific location
+        ('quarter_max_volume', ('single', 'A3'), ('list', 8), None, 'A12', None, None, None, None, None),  # noqa(E501)
         # air gap
         ('max_volume', ('single', 'A4'), ('list', 8), True, True, (5, 'half_max_volume'), None, 'min_volume', None, None),  # noqa(E501),
         # disposal vol
