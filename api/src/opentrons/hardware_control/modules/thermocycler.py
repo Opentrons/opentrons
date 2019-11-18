@@ -161,7 +161,7 @@ class Thermocycler(mod_abc.AbstractModule):
         self._device_info = None
 
         self._running_flag = asyncio.Event(loop=self._loop)
-        self._current_cycle_task: Optional[asyncio.Task] = None
+        self._current_task: Optional[asyncio.Task] = None
 
         self._total_cycle_count: Optional[int] = None
         self._current_cycle_index: Optional[int] = None
@@ -175,9 +175,9 @@ class Thermocycler(mod_abc.AbstractModule):
         self._loop.call_soon_threadsafe(self._running_flag.set)
 
     def cancel(self):
-        if self._current_cycle_task:
-            self._current_cycle_task.cancel()
-            self._current_cycle_task = None
+        if self._current_task:
+            self._current_task.cancel()
+            self._current_task = None
             self._loop.call_soon_threadsafe(self._running_flag.clear)
 
     async def deactivate(self):
@@ -206,9 +206,10 @@ class Thermocycler(mod_abc.AbstractModule):
         await self._driver.set_temperature(
             temp=temperature, hold_time=hold_time, ramp_rate=ramp_rate)
         if hold_time:
-            await self.wait_for_hold()
+            self._current_task = self._loop.create_task(self.wait_for_hold())
         else:
-            await self.wait_for_temp()
+            self._current_task = self._loop.create_task(self.wait_for_temp())
+        await self._current_task
 
     async def _execute_cycles(self,
                               steps: List[types.ThermocyclerStep],
@@ -229,13 +230,15 @@ class Thermocycler(mod_abc.AbstractModule):
         self._total_step_count = len(steps)
         cycle_task = self._loop.create_task(self._execute_cycles(steps,
                                                                  repetitions))
-        self._current_cycle_task = cycle_task
+        self._current_task = cycle_task
         await cycle_task
 
     async def set_lid_temperature(self, temp: float):
         """ Set the lid temperature in deg Celsius """
         await self._driver.set_lid_temperature(temp=temp)
-        await self.wait_for_lid_temp()
+        wait_for_lid_task = self._loop.create_task(self.wait_for_lid_temp())
+        self._current_task = wait_for_lid_task
+        await wait_for_lid_task
 
     async def stop_lid_heating(self):
         return await self._driver.stop_lid_heating()
