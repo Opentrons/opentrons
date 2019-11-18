@@ -35,9 +35,8 @@ export default function ExitAlertModal() {
     >
       <p>Doing so will terminate this run and home your robot.</p>
       <p>
-        Your modules will remain in their current states. They can be controlled
-        via their card on the "Run" page, or the "Pipettes &amp; Modules" page
-        for this robot.
+        Additionally, any hardware modules used within the protocol will remain
+        active and maintain their current states until deactivated
       </p>
     </AlertModal>
   )
