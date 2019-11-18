@@ -619,9 +619,61 @@ class Pipette:
             p300.aspirate(50, plate[0])
             p300.dispense(plate[1]).touch_tip()
         """
-        self._instr_ctx.touch_tip(
-                location=location, radius=radius, v_offset=v_offset,
-                speed=speed)
+        if not self.tip_attached:
+            self._log.warning("Cannot touch tip without a tip attached.")
+        if speed > 80.0:
+            self._log.warning(
+                "Touch tip speeds greater than 80mm/s not allowed")
+            speed = 80.0
+        if speed < 20.0:
+            self._log.warning(
+                "Touch tip speeds greater than 80mm/s not allowed")
+            speed = 20.0
+
+        if isinstance(location, Number):
+            # Deprecated syntax
+            self._log.warning("Please use the `v_offset` named parameter")
+            v_offset = location
+            location = None
+
+        # if no location specified, use the previously
+        # associated placeable to get Well dimensions
+        if location is None and\
+                isinstance(self.previous_placeable, LegacyWell):
+            location = self.previous_placeable  # type: ignore
+
+        if location is None:
+            raise ValueError("No valid location to touch tip on.")
+
+        cmds.do_publish(
+            self._instr_ctx.broker, cmds.touch_tip, self.touch_tip, 'before',
+            None, None, self, location, radius, v_offset, speed)
+
+        # move to location if we're not already there
+        if location != self.previous_placeable:
+            self.move_to(location, strategy='arc')
+
+        new_v_offset = Point(0.0, 0.0, v_offset)
+
+        well_edges = [
+            location.from_center(x=radius, y=0, z=1),       # right edge
+            location.from_center(x=radius * -1, y=0, z=1),  # left edge
+            location.from_center(x=0, y=radius, z=1),       # back edge
+            location.from_center(x=0, y=radius * -1, z=1)   # front edge
+        ]
+
+        # Apply vertical offset to well edges
+        v_well_edges = [
+            LegacyLocation(ll.labware, ll.offset + new_v_offset)
+            for ll in well_edges]
+        self.set_speed(speed)
+        [self.move_to(loc, strategy='direct')
+         for loc in v_well_edges]
+
+        cmds.do_publish(
+            self._instr_ctx.broker, cmds.touch_tip, self.touch_tip, 'after',
+            self, None, self, location, radius, v_offset, speed)
+
         return self
 
     @log_call(log)
