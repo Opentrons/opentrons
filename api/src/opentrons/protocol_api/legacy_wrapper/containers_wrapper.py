@@ -471,7 +471,6 @@ class LegacyWell(Well):
         return LegacyLocation(
                 labware=self,
                 offset=offset)
-        return LegacyLocation(labware=self, offset=Point(0, 0, 0))
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, (LegacyWell, Well)):

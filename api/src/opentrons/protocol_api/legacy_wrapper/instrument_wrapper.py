@@ -383,7 +383,6 @@ class Pipette:
                 self.move_to(placeable.top())
         else:
             placeable = self.previous_placeable
-
         if self.current_volume == 0:
             if placeable:
                 self.move_to(placeable.top())
@@ -576,7 +575,11 @@ class Pipette:
             p300 = instruments.P300_Single(mount='left')
             p300.aspirate(50).dispense().blow_out()
         """
-        self._instr_ctx.blow_out(location=location)
+        if location:
+            self.move_to(location)
+        # In API v1, a pipette will blow out at any location as long as there
+        # is a tip attached
+        self._hw.blow_out(self._mount)
         return self
 
     @log_call(log)
@@ -648,7 +651,14 @@ class Pipette:
             p300.aspirate(50, plate[0])
             p300.air_gap(50)
         """
-        self._instr_ctx.air_gap(volume=volume, height=height)
+
+        if volume and volume != 0:
+            z_height = 0 if not height else height
+            location = self.previous_placeable.top(z=z_height)
+            # "move_to" separate from aspirate command
+            # so "_position_for_aspirate" isn't executed
+            self.move_to(location)
+            self.aspirate(volume)
         return self
 
     @log_call(log)

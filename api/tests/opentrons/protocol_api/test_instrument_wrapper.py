@@ -135,8 +135,6 @@ def convert_to_deck_coordinates(robot, location, version):
         offset = subtract(coordinates, placeable.top()[1])
     else:
         offset = subtract(coordinates, placeable.top())
-    print("OFFSET")
-    print(offset)
     return add(pose_tracker.absolute(robot.poses, placeable),
                offset.coordinates)
 
@@ -664,10 +662,10 @@ def mock_atomics(instr, monkeypatch):
     top_mock.dispense.side_effect = instr.dispense
     monkeypatch.setattr(instr, 'dispense', top_mock.dispense)
     # TODO: uncomment when air gap works
-    # top_mock.air_gap.side_effect = instr.air_gap
+    top_mock.air_gap.side_effect = instr.air_gap
     monkeypatch.setattr(instr, 'air_gap', top_mock.air_gap)
     # TODO: uncomment when blow out works
-    # top_mock.blow_out.side_effect = instr.blow_out
+    top_mock.blow_out.side_effect = instr.blow_out
     monkeypatch.setattr(instr, 'blow_out', top_mock.blow_out)
     top_mock.pick_up_tip.side_effect = instr.pick_up_tip
     monkeypatch.setattr(instr, 'pick_up_tip', top_mock.pick_up_tip)
@@ -807,7 +805,97 @@ def build_kwargs(legacy_instr, new_instr, legacy_lw, new_lw,  # noqa(C901)
         else:
             raise Exception(f"invalid disposal vol spec {disposal_vol}")
 
+    # check recovery action
+    for legacy_call, new_call in zip(legacy_move.call_args_list[6:],
+                                     new_move.call_args_list[5:]):
+        common_lpos, common_npos = get_common_axes(legacy_call[0][0],
+                                                   new_call[0][0])
+        assert common_lpos == common_npos
+
     return legacy_kwargs, new_kwargs
+
+@pytest.mark.api2_only
+def test_blow_out(instruments, labware, load_v1_instrument, monkeypatch):
+    robot, legacy_instr, legacy_lw = load_v1_instrument
+
+    tr = labware.load('opentrons_96_tiprack_10ul', '1')
+    pip = instruments.P10_Single(mount='left', tip_racks=[tr])
+    lw = labware.load('corning_96_wellplate_360ul_flat', '2')
+
+    instruments._robot_wrapper.home()
+
+    new_actual_move = pip._ctx._hw_manager.hardware._api._backend.move
+
+    def new_passthru(*args, **kwargs):
+        new_actual_move(*args, **kwargs)
+    new_move = mock.Mock()
+    new_move.side_effect = new_passthru
+    monkeypatch.setattr(
+        pip._ctx._hw_manager.hardware._api._backend, 'move', new_move)
+
+    legacy_actual_move = robot._driver.move
+
+    def legacy_passthru(*args, **kwargs):
+        legacy_actual_move(*args, **kwargs)
+    legacy_move = mock.Mock()
+    legacy_move.side_effect = legacy_passthru
+    monkeypatch.setattr(robot._driver, 'move', legacy_move)
+
+    pip.pick_up_tip()
+    pip.aspirate(volume=2, location=lw.wells(1))
+    pip.blow_out()
+    for expected_call, call in zip(
+            legacy_move.call_args_list, new_move.call_args_list):
+        expected_args, expected_kwargs = expected_call
+        call_args, call_kwargs = call
+        assert all(isclose(list(expected_args[0][1]), list(call_args[0][1])))
+        assert expected_kwargs == call_kwargs
+    pip.aspirate(volume=2, location=lw.wells(1))
+    pip.blow_out(lw.wells(2))
+    for expected_call, call in zip(
+            legacy_move.call_args_list, new_move.call_args_list):
+        expected_args, expected_kwargs = expected_call
+        call_args, call_kwargs = call
+        assert all(isclose(list(expected_args[0][1]), list(call_args[0][1])))
+        assert expected_kwargs == call_kwargs
+
+
+@pytest.mark.parametrize('volume,height', [
+    (0, None),
+    (5, None),
+    (1, 10)])
+@pytest.mark.api2_only
+def test_air_gap(
+        monkeypatch, instruments, labware, load_v1_instrument, volume, height):
+
+    robot, legacy_instr, legacy_lw = load_v1_instrument
+    tr = labware.load('opentrons_96_tiprack_10ul', '1')
+    pip = instruments.P10_Single(mount='left', tip_racks=[tr])
+    lw = labware.load('corning_96_wellplate_360ul_flat', '2')
+
+    instruments._robot_wrapper.home()
+    robot.home()
+
+    z_height = 0 if not height else height
+
+    legacy_instr.pick_up_tip()
+    legacy_instr.aspirate(volume=2, location=legacy_lw.wells(1))
+    old_aspirate_z = legacy_instr.previous_placeable.top()[1][2]
+    legacy_instr.air_gap(volume=volume, height=height)
+    assert legacy_instr.current_volume == 2 + volume
+
+    pip.pick_up_tip()
+    pip.aspirate(volume=2, location=lw.wells(1))
+    aspirate_z = pip.previous_placeable.top().offset.z
+
+    pip.air_gap(volume=volume, height=height)
+
+    # TODO: Discrepency between instrument z height and z height tracker in
+    # instrument wrapper
+    assert pip.current_volume == 2 + volume
+    assert legacy_instr.current_volume == pip.current_volume
+    assert isclose(old_aspirate_z + z_height, z_height + aspirate_z)
+
 
 @pytest.mark.parametrize(  # noqa(E501,C901)
     'instrument_ctor,volume,source,dest,touch_tip,blow_out,mix_before,mix_after,gradient,air_gap',  # noqa(E501)
