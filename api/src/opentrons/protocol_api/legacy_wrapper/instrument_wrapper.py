@@ -148,7 +148,7 @@ class Pipette:
         return self._pipette_status['min_volume']
 
     @property
-    def previous_placeable(self) -> Optional[Union[LegacyWell, LegacyLabware]]:
+    def previous_placeable(self) -> Optional[Union[LegacyLabware, LegacyWell]]:
         if not self._ctx.location_cache:
             return None
         if isinstance(self._ctx.location_cache.labware, LegacyWell):
@@ -654,7 +654,10 @@ class Pipette:
 
         if volume and volume != 0:
             z_height = 0 if not height else height
-            location = self.previous_placeable.top(z=z_height)
+            # this is a bug in v1 intentionally reproduced here: if you haven't
+            # previously moved to a placeable, airgap will give you an
+            # attributeerror with "NoneType" object has no attribute "top".
+            location = self.previous_placeable.top(z=z_height)  # type: ignore
             # "move_to" separate from aspirate command
             # so "_position_for_aspirate" isn't executed
             self.move_to(location)
@@ -847,7 +850,7 @@ class Pipette:
             p300 = instruments.P300_Single(mount='left')
             p300.distribute(50, plate[1], plate.cols[0])
         """
-        args = [volume, source, dest, *args]
+        args = (volume, source, dest, *args)
         kwargs['mode'] = 'distribute'
         kwargs['mix_after'] = (0, 0)
         if 'disposal_vol' not in kwargs:
@@ -886,7 +889,7 @@ class Pipette:
         kwargs['mix_before'] = (0, 0)
         kwargs['air_gap'] = 0
         kwargs['disposal_vol'] = 0
-        args = [volume, source, dest, *args]
+        args = (volume, source, dest, *args)
         cmds.do_publish(self._ctx.broker, cmds.consolidate, self.consolidate,
                         'before', None, None,
                         self, volume, source, dest)
