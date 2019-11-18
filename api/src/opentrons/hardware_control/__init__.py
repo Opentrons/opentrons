@@ -25,8 +25,6 @@ from .pipette import Pipette
 from .controller import Controller
 from . import modules
 from .types import Axis, HardwareAPILike, CriticalPoint
-if TYPE_CHECKING:
-    from .types import RegisterModules  # noqa (F501)
 
 
 mod_log = logging.getLogger(__name__)

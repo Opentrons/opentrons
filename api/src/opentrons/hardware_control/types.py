@@ -1,9 +1,5 @@
 import enum
 from typing import Tuple, List
-try:
-    from typing_extensions import Protocol
-except ModuleNotFoundError:
-    Protocol = None  # type: ignore
 
 import opentrons.types
 from .modules import ModuleAtPort
@@ -96,12 +92,3 @@ class CriticalPoint(enum.Enum):
     The end of the front-most nozzle of a multipipette with a tip attached.
     Only relevant when a multichannel pipette is present.
     """
-
-
-if Protocol is not None:
-    class RegisterModules(Protocol):
-        async def __call__(
-            self,
-            new_modules: List[ModuleAtPort] = None,
-            removed_modules: List[ModuleAtPort] = None
-        ) -> None: ...

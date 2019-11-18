@@ -3,7 +3,7 @@ from contextlib import contextmanager, ExitStack
 import logging
 from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 try:
-    import aionotify  # type: ignore
+    import aionotify
 except OSError:
     aionotify = None  # type: ignore
 
@@ -15,7 +15,7 @@ from opentrons.types import Mount
 from . import modules
 
 if TYPE_CHECKING:
-    from .types import RegisterModules  # noqa (F501)
+    from .dev_types import RegisterModules  # noqa (F501)
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -51,7 +51,7 @@ class Controller:
                 path='/dev',
                 flags=(aionotify.Flags.CREATE | aionotify.Flags.DELETE))
         except AttributeError:
-            MODULE_LOG.info(
+            MODULE_LOG.warning(
                 'Failed to initiate aionotify, cannot watch modules,'
                 'likely because not running on linux')
 
@@ -137,17 +137,23 @@ class Controller:
         while can_watch and (not self._module_watcher.closed):
             event = await self._module_watcher.get_event()
             flags = aionotify.Flags.parse(event.flags)
-            if 'ot_module' in event.name:
+            if event is not None and 'ot_module' in event.name:
                 maybe_module_at_port = modules.get_module_at_port(event.name)
-                if maybe_module_at_port is not None and \
-                        aionotify.Flags.DELETE in flags:
+                new_modules = None
+                removed_modules = None
+                if maybe_module_at_port is not None:
+                    if aionotify.Flags.DELETE in flags:
+                        removed_modules = [maybe_module_at_port]
+                        MODULE_LOG.info(
+                            f'Module Removed: {maybe_module_at_port}')
+                    elif aionotify.Flags.CREATE in flags:
+                        new_modules = [maybe_module_at_port]
+                        MODULE_LOG.info(
+                            f'Module Added: {maybe_module_at_port}')
                     await register_modules(
-                        removed_modules=[maybe_module_at_port])
-                    MODULE_LOG.info(f'Module Removed: {maybe_module_at_port}')
-                if maybe_module_at_port is not None and \
-                        aionotify.Flags.CREATE in flags:
-                    await register_modules(new_modules=[maybe_module_at_port])
-                    MODULE_LOG.info(f'Module Added: {maybe_module_at_port}')
+                        removed_modules=removed_modules,
+                        new_modules=new_modules,
+                    )
 
     async def build_module(self,
                            port: str,
@@ -229,5 +235,5 @@ class Controller:
         await asyncio.sleep(duration_s)
         self.resume()
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __del__(self, exc_type, exc_value, traceback):
         self._module_watcher.close()

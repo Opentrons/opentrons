@@ -10,7 +10,7 @@ from opentrons.config.pipette_config import (config_models,
 from opentrons.drivers.smoothie_drivers import SimulatingDriver
 from . import modules
 if TYPE_CHECKING:
-    from .types import RegisterModules  # noqa (F501)
+    from .dev_types import RegisterModules  # noqa (F501)
 
 
 MODULE_LOG = logging.getLogger(__name__)
