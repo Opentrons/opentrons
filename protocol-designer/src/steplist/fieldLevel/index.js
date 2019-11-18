@@ -4,6 +4,8 @@ import {
   minimumWellCount,
   nonZero,
   composeErrors,
+  minFieldValue,
+  maxFieldValue,
 } from './errors'
 import {
   maskToNumber,
@@ -133,6 +135,13 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   wells: {
     getErrors: composeErrors(requiredField, minimumWellCount(1)),
     maskValue: defaultTo([]),
+  },
+  engageHeight: {
+    getErrors: composeErrors(
+      requiredField,
+      minFieldValue(-4.0),
+      maxFieldValue(16)
+    ),
   },
 }
 

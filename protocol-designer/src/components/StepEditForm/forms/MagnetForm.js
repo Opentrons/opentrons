@@ -73,6 +73,9 @@ function MagnetForm(props: MagnetFormProps): React.Element<'div'> {
               >
                 <TextField
                   name="engageHeight"
+                  caption={i18n.t(
+                    'form.step_edit_form.field.engageHeight.caption'
+                  )}
                   className={styles.small_field}
                   units={i18n.t('application.units.millimeter')}
                   {...focusHandlers}

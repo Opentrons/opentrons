@@ -104,7 +104,8 @@
         }
       },
       "engageHeight": {
-        "label": "Distance from labware bottom"
+        "label": "Distance from labware bottom",
+        "caption": "Recommended: 4mm"
       }
     }
   }
