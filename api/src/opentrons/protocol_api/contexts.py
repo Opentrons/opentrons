@@ -1154,13 +1154,9 @@ class InstrumentContext(CommandPublisher):
         if height is None:
             height = 5
         loc = self._ctx.location_cache
-        print("location in context air gap")
-        print(loc)
         if not loc or not isinstance(loc.labware, Well):
             raise RuntimeError('No previous Well cached to perform air gap')
         target = loc.labware.top(height)
-        print("new target")
-        print(target)
         self.move_to(target)
         self.aspirate(volume)
         return self
