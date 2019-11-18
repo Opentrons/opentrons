@@ -3,7 +3,7 @@ from typing import Tuple, List
 try:
     from typing_extensions import Protocol
 except ModuleNotFoundError:
-    Protocol = None
+    Protocol = None  # type: ignore
 
 import opentrons.types
 from .modules import ModuleAtPort
