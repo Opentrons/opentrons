@@ -3,7 +3,9 @@
     "mix": "mix",
     "moveLiquid": "transfer",
     "pause": "pause",
-    "magnet": "magnetic module"
+    "magnet": "magnet",
+    "temperature": "temperature",
+    "thermocycler": "thermocycler profile"
   },
   "units": {
     "millimeter": "mm",

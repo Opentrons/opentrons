@@ -2,7 +2,11 @@
 import assert from 'assert'
 import reduce from 'lodash/reduce'
 import values from 'lodash/values'
-import { getPipetteNameSpecs, type DeckSlotId } from '@opentrons/shared-data'
+import {
+  getPipetteNameSpecs,
+  type DeckSlotId,
+  type ModuleType,
+} from '@opentrons/shared-data'
 import {
   SPAN7_8_10_11_SLOT,
   TC_SPAN_SLOTS,
@@ -146,4 +150,12 @@ export const getHasGen1MultiChannelPipette = (
   return pipetteIds.some(pipetteId =>
     GEN_ONE_MULTI_PIPETTES.includes(pipettes[pipetteId]?.name)
   )
+}
+
+export const getIsModuleOnDeck = (
+  modules: $PropertyType<InitialDeckSetup, 'modules'>,
+  moduleType: ModuleType
+) => {
+  const moduleIds = Object.keys(modules)
+  return moduleIds.some(moduleId => modules[moduleId]?.type === moduleType)
 }
