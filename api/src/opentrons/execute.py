@@ -95,7 +95,6 @@ def get_protocol_api(
                                            bundled_data=bundled_data,
                                            api_version=checked_version)
     context._hw_manager.hardware.cache_instruments()
-    context._hw_manager.hardware.discover_modules()
     return context
 
 

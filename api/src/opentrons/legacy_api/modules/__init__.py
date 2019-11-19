@@ -1,4 +1,4 @@
-import os
+from glob import glob
 import logging
 import re
 from typing import List, Tuple, Any
@@ -76,8 +76,8 @@ def load(name, slot):
 # Note: this function should be called outside the robot class, because
 # of the circular dependency that it would create if imported into robot.py
 def discover() -> List[Tuple[str, Any]]:
-    if config.IS_ROBOT and os.path.isdir('/dev/modules'):
-        devices = os.listdir('/dev/modules')
+    if config.IS_ROBOT:
+        devices = glob('/dev/ot_module*')
     else:
         devices = []
 

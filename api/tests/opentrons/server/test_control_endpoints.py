@@ -7,7 +7,6 @@ from opentrons import types
 from opentrons.legacy_api import modules as legacy_modules
 
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
-from opentrons.hardware_control import modules
 from opentrons.config import pipette_config
 
 
@@ -121,9 +120,10 @@ async def test_get_pipettes(async_server, async_client, monkeypatch):
 async def test_get_modules_v2(
         async_server, loop, async_client, monkeypatch):
     hw = async_server['com.opentrons.hardware']
-    monkeypatch.setattr(hw._backend,
-                        '_attached_modules',
-                        [('/dev/modules/tty1_magdeck', 'magdeck')])
+    magdeck = await hw._backend.build_module('/dev/ot_module_magdeck1',
+                                             'magdeck',
+                                             lambda x: None)
+    monkeypatch.setattr(hw, 'attached_modules', [magdeck])
     await check_modules_response(async_client)
 
 
@@ -151,15 +151,6 @@ async def check_modules_response(async_client):
 
 
 @pytest.fixture
-async def dummy_discover_modules():
-    mag_module = await modules.build('', 'magdeck', True, lambda x: None)
-
-    async def stub():
-        return [mag_module]
-    return stub
-
-
-@pytest.fixture
 def dummy_attached_leg_modules():
     mag_module = legacy_modules.MagDeck()
     mag_port = 'tty1_magdeck'
@@ -172,7 +163,6 @@ def dummy_attached_leg_modules():
 
 @pytest.mark.api2_only
 async def test_execute_module_command_v2(
-        dummy_discover_modules,
         virtual_smoothie_env,
         loop,
         async_server,
@@ -183,7 +173,10 @@ async def test_execute_module_command_v2(
     def dummy_get_attached_modules():
         return []
 
-    monkeypatch.setattr(hw, 'discover_modules', dummy_discover_modules)
+    magdeck = await hw._backend.build_module('/dev/ot_module_magdeck1',
+                                             'magdeck',
+                                             lambda x: None)
+    monkeypatch.setattr(hw, 'attached_modules', [magdeck])
 
     resp = await async_client.post('/modules/dummySerialMD',
                                    json={'command_type': 'deactivate'})

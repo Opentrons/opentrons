@@ -115,6 +115,7 @@ INSTALL_REQUIRES = [
     'numpy>=1.15.1',
     'urwid==1.3.1',
     'jsonschema>=2.5.1',
+    'aionotify==0.2.0',
 ]
 
 

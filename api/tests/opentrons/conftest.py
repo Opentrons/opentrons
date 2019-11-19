@@ -1,6 +1,10 @@
 # Uncomment to enable logging during tests
 # import logging
 # from logging.config import dictConfig
+try:
+    import aionotify
+except OSError:
+    aionotify = None  # type: ignore
 import asyncio
 import contextlib
 import os
@@ -165,6 +169,8 @@ def using_api2(loop):
         hw_manager.set_config(old_config)
 
 
+@pytest.mark.skipif(aionotify is None,
+                    reason="requires inotify (linux only)")
 @contextlib.contextmanager
 def using_sync_api2(loop):
     if not os.environ.get('OT_API_FF_useProtocolApi2'):
@@ -210,6 +216,8 @@ def _should_skip_api2(request):
         and request.param != using_api2
 
 
+@pytest.mark.skipif(aionotify is None,
+                    reason="requires inotify (linux only)")
 @pytest.fixture(
     params=[
         pytest.param(using_api1, marks=pytest.mark.apiv1),
@@ -426,6 +434,8 @@ def virtual_smoothie_env(monkeypatch):
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
 
 
+@pytest.mark.skipif(aionotify is None,
+                    reason="requires inotify (linux only)")
 @pytest.fixture(
     params=[
         pytest.param(using_api1, marks=pytest.mark.apiv1),
@@ -439,6 +449,8 @@ def hardware(request, loop, virtual_smoothie_env):
         yield hw
 
 
+@pytest.mark.skipif(aionotify is None,
+                    reason="requires inotify (linux only)")
 @pytest.fixture(
     params=[
         pytest.param(using_api1, marks=pytest.mark.apiv1),

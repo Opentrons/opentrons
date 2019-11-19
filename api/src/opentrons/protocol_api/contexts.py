@@ -426,7 +426,7 @@ class ProtocolContext(CommandPublisher):
             'magdeck': MagneticModuleContext,
             'tempdeck': TemperatureModuleContext,
             'thermocycler': ThermocyclerContext}[resolved_name]
-        for mod in self._hw_manager.hardware.discover_modules():
+        for mod in self._hw_manager.hardware.attached_modules:
             if mod.name() == resolved_name:
                 hc_mod_instance = mod
                 break

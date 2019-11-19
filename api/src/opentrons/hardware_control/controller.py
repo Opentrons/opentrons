@@ -1,7 +1,11 @@
 import asyncio
 from contextlib import contextmanager, ExitStack
 import logging
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
+try:
+    import aionotify  # type: ignore
+except OSError:
+    aionotify = None  # type: ignore
 
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.drivers.rpi_drivers import gpio
@@ -10,6 +14,8 @@ from opentrons.types import Mount
 
 from . import modules
 
+if TYPE_CHECKING:
+    from .dev_types import RegisterModules  # noqa (F501)
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -38,6 +44,16 @@ class Controller:
         self._smoothie_driver = driver_3_0.SmoothieDriver_3_0_0(
             config=self.config, handle_locks=False)
         self._cached_fw_version: Optional[str] = None
+        try:
+            self._module_watcher = aionotify.Watcher()
+            self._module_watcher.watch(
+                alias='modules',
+                path='/dev',
+                flags=(aionotify.Flags.CREATE | aionotify.Flags.DELETE))
+        except AttributeError:
+            MODULE_LOG.warning(
+                'Failed to initiate aionotify, cannot watch modules,'
+                'likely because not running on linux')
 
     def update_position(self) -> Dict[str, float]:
         self._smoothie_driver.update_position()
@@ -110,8 +126,34 @@ class Controller:
     def set_pipette_speed(self, val: float):
         self._smoothie_driver.set_speed(val)
 
-    def get_attached_modules(self) -> List[Tuple[str, str]]:
-        return modules.discover()
+    async def watch_modules(self, loop: asyncio.AbstractEventLoop,
+                            register_modules: 'RegisterModules'):
+        can_watch = aionotify is not None
+        if can_watch:
+            await self._module_watcher.setup(loop)
+
+        initial_modules = modules.discover()
+        await register_modules(new_modules=initial_modules)
+        while can_watch and (not self._module_watcher.closed):
+            event = await self._module_watcher.get_event()
+            flags = aionotify.Flags.parse(event.flags)
+            if event is not None and 'ot_module' in event.name:
+                maybe_module_at_port = modules.get_module_at_port(event.name)
+                new_modules = None
+                removed_modules = None
+                if maybe_module_at_port is not None:
+                    if aionotify.Flags.DELETE in flags:
+                        removed_modules = [maybe_module_at_port]
+                        MODULE_LOG.info(
+                            f'Module Removed: {maybe_module_at_port}')
+                    elif aionotify.Flags.CREATE in flags:
+                        new_modules = [maybe_module_at_port]
+                        MODULE_LOG.info(
+                            f'Module Added: {maybe_module_at_port}')
+                    await register_modules(
+                        removed_modules=removed_modules,
+                        new_modules=new_modules,
+                    )
 
     async def build_module(self,
                            port: str,
@@ -122,15 +164,6 @@ class Controller:
             which=model,
             simulating=False,
             interrupt_callback=interrupt_callback)
-
-    async def update_module(
-            self,
-            module: modules.AbstractModule,
-            firmware_file: str,
-            loop: Optional[asyncio.AbstractEventLoop])\
-            -> modules.AbstractModule:
-        return await modules.update_firmware(
-            module, firmware_file, loop)
 
     async def connect(self, port: str = None):
         self._smoothie_driver.connect(port)
@@ -201,3 +234,6 @@ class Controller:
         self.pause()
         await asyncio.sleep(duration_s)
         self.resume()
+
+    def __del__(self):
+        self._module_watcher.close()

@@ -129,7 +129,7 @@ async def get_attached_modules(request):
     """
     hw = hw_from_req(request)
     if ff.use_protocol_api_v2():
-        hw_mods = await hw.discover_modules()
+        hw_mods = hw.attached_modules
         module_data = [
             {
                 'name': mod.name(),
@@ -171,7 +171,7 @@ async def get_module_data(request):
     res = None
 
     if ff.use_protocol_api_v2():
-        hw_mods = await hw.discover_modules()
+        hw_mods = hw.attached_modules
     else:
         hw_mods = hw.attached_modules.values()
 
@@ -197,7 +197,7 @@ async def execute_module_command(request):
     args = data.get('args')
 
     if ff.use_protocol_api_v2():
-        hw_mods = await hw.discover_modules()
+        hw_mods = hw.attached_modules
     else:
         hw_mods = hw.attached_modules.values()
 

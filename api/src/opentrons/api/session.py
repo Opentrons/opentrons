@@ -147,7 +147,6 @@ class Session(object):
         self._motion_lock = motion_lock
 
     def prepare(self):
-        self._hardware.discover_modules()
         self.refresh()
 
     def get_instruments(self):
@@ -236,7 +235,7 @@ class Session(object):
                     API.build_hardware_simulator,
                     instrs,
                     [mod.name()
-                     for mod in self._hardware.attached_modules.values()],
+                     for mod in self._hardware.attached_modules],
                     strict_attached_instruments=False)
                 sim.home()
                 self._simulating_ctx = ProtocolContext(

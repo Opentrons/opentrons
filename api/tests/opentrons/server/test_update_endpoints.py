@@ -8,7 +8,7 @@ from aiohttp import web
 from opentrons.server import init
 from opentrons.server.endpoints import update
 from opentrons.server.endpoints import serverlib_fallback
-from opentrons.hardware_control import modules as hw_modules, simulator
+from opentrons.hardware_control import modules as hw_modules
 
 
 async def test_restart(
@@ -101,6 +101,7 @@ async def test_ignore_updates(
     assert json.loads(r3body) == {'version': '3.1.3'}
 
 
+@pytest.mark.skip('update module endpoint is unused for now')
 @pytest.mark.api2_only
 async def test_update_module_firmware(
         virtual_smoothie_env,
@@ -110,6 +111,7 @@ async def test_update_module_firmware(
         async_client,
         async_server):
 
+    hw = async_server['com.opentrons.hardware']
     client = async_client
     serial_num = 'dummySerialTC'
     fw_filename = 'dummyFirmware.hex'
@@ -118,16 +120,16 @@ async def test_update_module_firmware(
     with open(os.path.join(tmpdir, fw_filename), 'wb') as fd:
         fd.write(bytes(0x1234))
 
-    def mock_get_attached_modules(module):
-        return [('mod1', 'thermocycler')]
+    tc_module_at_port = hw_modules.ModuleAtPort(
+        port='/dev/ot_module_thermocycler1',
+        name='thermocycler')
 
     async def mock_enter_bootloader(driver, module):
-        return '/dev/modules/tty0_bootloader'
+        return '/dev/ot_module_avrdude_bootloader0'
 
     monkeypatch.setattr(hw_modules.update, 'enter_bootloader',
                         mock_enter_bootloader)
-    monkeypatch.setattr(simulator.Simulator, 'get_attached_modules',
-                        mock_get_attached_modules)
+    await hw.register_modules(new_modules=[tc_module_at_port])
 
     # ========= Happy path ==========
     res_msg = {'message': f'Successully updated module {serial_num}',
@@ -150,6 +152,7 @@ async def test_update_module_firmware(
     assert res == expected_res
 
 
+@pytest.mark.skip('update module endpoint is unused for now')
 @pytest.mark.api2_only
 async def test_fail_update_module_firmware(
         virtual_smoothie_env,
@@ -159,6 +162,7 @@ async def test_fail_update_module_firmware(
         async_client,
         async_server):
 
+    hw = async_server['com.opentrons.hardware']
     client = async_client
     serial_num = 'dummySerialTC'
     fw_filename = 'dummyFirmware.hex'
@@ -168,13 +172,14 @@ async def test_fail_update_module_firmware(
         fd.write(bytes(0x1234))
 
     async def mock_enter_bootloader(driver, module):
-        return '/dev/modules/tty0_bootloader'
+        return '/dev/ot_module_samba_bootloader0'
 
-    def mock_get_attached_modules(module):
-        return [('mod1', 'thermocycler')]
+    tc_module_at_port = hw_modules.ModuleAtPort(
+        port='/dev/ot_module_thermocycler1',
+        name='thermocycler')
 
-    monkeypatch.setattr(simulator.Simulator, 'get_attached_modules',
-                        mock_get_attached_modules)
+    await hw.register_modules(new_modules=[tc_module_at_port])
+
     monkeypatch.setattr(hw_modules.update, 'enter_bootloader',
                         mock_enter_bootloader)
 
@@ -185,7 +190,7 @@ async def test_fail_update_module_firmware(
 
     async def mock_failed_upload_to_module1(
             port, firmware_file_path, upload_function, loop):
-        return ('mod1', (False, bootloader_error))
+        return ('/dev/ot_module_thermocycler1', (False, bootloader_error))
 
     expected_res1 = res_msg1
 

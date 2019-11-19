@@ -54,16 +54,14 @@ async def update_module_firmware(request):
 
 
 async def _upload_to_module(hw, serialnum, fw_filename, loop):
-    await hw.discover_modules()
-    hw_mods = hw.attached_modules.values()
+    hw_mods = hw.attached_modules
     for module in hw_mods:
         if module.device_info.get('serial') == serialnum:
             log.info("Module with serial {} found".format(serialnum))
             try:
-                new_instance = await asyncio.wait_for(
+                await asyncio.wait_for(
                     modules.update_firmware(module, fw_filename, loop),
                     UPDATE_TIMEOUT)
-                print(f'\n\n\ninstance {new_instance}\n')
                 return f'Successully updated module {serialnum}', 200
             except modules.UpdateError as e:
                 return f'Bootloader error: {e}', 400

@@ -1,16 +1,19 @@
 import asyncio
 import logging
-import os
+from glob import glob
 import re
-from typing import List, Optional, Tuple
+from typing import List, Optional
+from collections import namedtuple
 
-from opentrons.config import IS_ROBOT
+from opentrons.config import IS_ROBOT, IS_LINUX
 from .mod_abc import AbstractModule
 # Must import tempdeck and magdeck (and other modules going forward) so they
 # actually create the subclasses
 from . import update, tempdeck, magdeck, thermocycler  # noqa(W0611)
 
 log = logging.getLogger(__name__)
+
+ModuleAtPort = namedtuple('ModuleAtPort', ('port', 'name'))
 
 
 class UnsupportedModuleError(Exception):
@@ -28,6 +31,8 @@ class AbsentModuleError(Exception):
 MODULE_TYPES = {cls.name(): cls
                 for cls in AbstractModule.__subclasses__()}  # type: ignore
 
+MODULE_PORT_REGEX = re.compile('|'.join(MODULE_TYPES.keys()), re.I)
+
 
 async def build(
         port: str,
@@ -38,27 +43,37 @@ async def build(
         port, interrupt_callback=interrupt_callback, simulating=simulating)
 
 
-def discover() -> List[Tuple[str, str]]:
-    """ Scan for connected modules and instantiate handler classes
+def get_module_at_port(port: str) -> Optional[ModuleAtPort]:
+    """ Given a port, returns either a ModuleAtPort
+        if it is a recognized module, or None if not recognized.
     """
-    if IS_ROBOT and os.path.isdir('/dev/modules'):
-        devices = os.listdir('/dev/modules')
+    match = MODULE_PORT_REGEX.search(port)
+    if match:
+        name = match.group().lower()
+        return ModuleAtPort(port=f'/dev/{port}', name=name)
+    return None
+
+
+def discover() -> List[ModuleAtPort]:
+    """ Scan for connected modules and return list of
+        tuples of serial ports and device names
+    """
+    if IS_ROBOT and IS_LINUX:
+        devices = glob('/dev/ot_module*')
     else:
         devices = []
 
     discovered_modules = []
 
-    module_port_regex = re.compile('|'.join(MODULE_TYPES.keys()), re.I)
     for port in devices:
-        match = module_port_regex.search(port)
+        match = MODULE_PORT_REGEX.search(port)
         if match:
             name = match.group().lower()
             if name not in MODULE_TYPES:
                 log.warning("Unexpected module connected: {} on {}"
                             .format(name, port))
                 continue
-            absolute_port = '/dev/modules/{}'.format(port)
-            discovered_modules.append((absolute_port, name))
+            discovered_modules.append(ModuleAtPort(port=port, name=name))
     log.debug('Discovered modules: {}'.format(discovered_modules))
 
     return discovered_modules

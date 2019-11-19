@@ -20,6 +20,7 @@ wheel = "==0.30.0"
 coverage = "==4.4.2"
 mypy = "==0.740"
 colorama = "*"
+typing-extensions = "*"
 
 [packages]
 numpy = "==1.15.1"
@@ -29,3 +30,4 @@ aiohttp = "==3.4.4"
 jsonschema = "==3.0.2"
 jsonrpcserver = "==4.0.3"
 systemd-python = {version="==234", sys_platform="== 'linux'"}
+aionotify = "==0.2.0"

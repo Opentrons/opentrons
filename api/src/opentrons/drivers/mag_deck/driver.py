@@ -159,7 +159,7 @@ class MagDeck:
 
     def connect(self, port=None) -> str:
         '''
-        :param port: '/dev/modules/ttyn_magdeck'
+        :param port: '/dev/ot_module_magdeck[#]'
         NOTE: Using the symlink above to connect makes sure that the robot
         connects/reconnects to the module even after a device
         reset/reconnection

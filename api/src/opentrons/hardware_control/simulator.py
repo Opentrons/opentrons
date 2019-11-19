@@ -1,8 +1,7 @@
-import asyncio
 import copy
 import logging
 from threading import Event
-from typing import Dict, Optional, List, Tuple
+from typing import Dict, Optional, List, Tuple, TYPE_CHECKING
 from contextlib import contextmanager
 from opentrons import types
 from opentrons.config.pipette_config import (config_models,
@@ -10,6 +9,8 @@ from opentrons.config.pipette_config import (config_models,
                                              configs)
 from opentrons.drivers.smoothie_drivers import SimulatingDriver
 from . import modules
+if TYPE_CHECKING:
+    from .dev_types import RegisterModules  # noqa (F501)
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -85,9 +86,7 @@ class Simulator:
         self._config = config
         self._loop = loop
         self._attached_instruments = attached_instruments
-        self._attached_modules = [('mod' + str(idx), mod)
-                                  for idx, mod
-                                  in enumerate(attached_modules)]
+        self._stubbed_attached_modules = attached_modules
         self._position = copy.copy(_HOME_POSITION)
         # Engaged axes start all true in smoothie for some reason so we
         # imitate that here
@@ -194,8 +193,13 @@ class Simulator:
     def set_active_current(self, axis, amp):
         pass
 
-    def get_attached_modules(self) -> List[Tuple[str, str]]:
-        return self._attached_modules
+    async def watch_modules(self, register_modules: 'RegisterModules'):
+        new_modules = [
+            modules.ModuleAtPort(
+                port=f'/dev/ot_module_sim_{mod}{str(idx)}', name=mod)
+            for idx, mod
+            in enumerate(self._stubbed_attached_modules)]
+        await register_modules(new_modules=new_modules)
 
     @contextmanager
     def save_current(self):
@@ -210,13 +214,6 @@ class Simulator:
             which=model,
             simulating=True,
             interrupt_callback=interrupt_callback)
-
-    async def update_module(
-            self, module: modules.AbstractModule,
-            firmware_file: str,
-            loop: Optional[asyncio.AbstractEventLoop])\
-            -> modules.AbstractModule:
-        return module
 
     @property
     def axis_bounds(self) -> Dict[str, Tuple[float, float]]:

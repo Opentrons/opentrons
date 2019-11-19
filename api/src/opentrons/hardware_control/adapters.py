@@ -91,25 +91,6 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
             if thread_loop.is_running():
                 thread_loop.call_soon_threadsafe(lambda: thread_loop.stop())
 
-    def discover_modules(self):
-        loop = object.__getattribute__(self, '_loop')
-        api = object.__getattribute__(self, '_api')
-        discovered_mods = self.call_coroutine_sync(loop, api.discover_modules)
-        async_mods = {mod.port: mod for mod in discovered_mods}
-
-        these = set(async_mods.keys())
-        known = set(self._cached_sync_mods.keys())
-        new = these - known
-        gone = known - these
-
-        for mod_port in gone:
-            self._cached_sync_mods.pop(mod_port)
-        for mod_port in new:
-            self._cached_sync_mods[mod_port] \
-                = SynchronousAdapter(async_mods[mod_port])
-
-        return list(self._cached_sync_mods.values())
-
     @staticmethod
     def call_coroutine_sync(loop, to_call, *args, **kwargs):
         fut = asyncio.run_coroutine_threadsafe(to_call(*args, **kwargs), loop)
