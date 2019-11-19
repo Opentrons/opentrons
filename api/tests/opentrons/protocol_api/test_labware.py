@@ -38,6 +38,7 @@ def test_well_init():
                          display_name=well_name,
                          has_tip=has_tip,
                          starting_volume=0,
+                         well_id=well_name,
                          api_level=MAX_SUPPORTED_VERSION)
     assert well1._diameter == test_data[well_name]['diameter']
     assert well1._length is None
@@ -49,6 +50,7 @@ def test_well_init():
                          display_name=well2_name,
                          has_tip=has_tip,
                          starting_volume=0,
+                         well_id=well_name,
                          api_level=MAX_SUPPORTED_VERSION)
     assert well2._diameter is None
     assert well2._length == test_data[well2_name]['xDimension']
@@ -64,6 +66,7 @@ def test_top():
                         display_name=well_name,
                         has_tip=has_tip,
                         starting_volume=0,
+                        well_id=well_name,
                         api_level=MAX_SUPPORTED_VERSION)
     well_data = test_data[well_name]
     expected_x = well_data['x'] + slot.point.x
@@ -82,6 +85,7 @@ def test_bottom():
                         display_name=well_name,
                         has_tip=has_tip,
                         starting_volume=0,
+                        well_id=well_name,
                         api_level=MAX_SUPPORTED_VERSION)
     well_data = test_data[well_name]
     expected_x = well_data['x'] + slot.point.x
@@ -100,6 +104,7 @@ def test_from_center_cartesian():
                          display_name=well_name,
                          has_tip=has_tip,
                          starting_volume=0,
+                         well_id=well_name,
                          api_level=MAX_SUPPORTED_VERSION)
 
     percent1_x = 1
@@ -123,6 +128,7 @@ def test_from_center_cartesian():
     has_tip = False
     well2 = labware.Well(test_data[well2_name], slot2, well2_name, has_tip,
                          starting_volume=0,
+                         well_id=well_name,
                          api_level=MAX_SUPPORTED_VERSION)
     percent2_x = -0.25
     percent2_y = 0.1
@@ -198,6 +204,7 @@ def test_well_parent():
                         display_name=well_name,
                         has_tip=has_tip,
                         starting_volume=0,
+                        well_id=well_name,
                         api_level=MAX_SUPPORTED_VERSION)
     assert well.parent is lw
     assert well.top().labware is well
