@@ -1,4 +1,4 @@
-from opentrons import instruments, containers
+from opentrons import instruments, containers, robot
 
 metadata = {
     'protocolName': 'Testosaur',
@@ -23,8 +23,8 @@ conts = [
 ]
 
 # Uncomment these to test precision
-# p300.move_to(robot.deck['11'])
-# p300.move_to(robot.deck['6'])
+p300.move_to(robot.deck['11'])
+p300.move_to(robot.deck['6'])
 
 for container in conts:
     p300.aspirate(10, container[0]).dispense(10, container[-1].top(5))
