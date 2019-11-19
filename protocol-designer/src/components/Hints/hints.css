@@ -20,6 +20,22 @@
   }
 }
 
+.hint_contents {
+  @apply --font-body-2-dark;
+
+  line-height: var(--lh-copy);
+
+  & p {
+    margin-bottom: 1rem;
+  }
+}
+
+.heading {
+  @apply --font-header-dark;
+
+  margin-bottom: 1rem;
+}
+
 .column_left {
   width: 35%;
 }

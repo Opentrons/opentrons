@@ -14,7 +14,6 @@ const StepChangesConfirmModal = (props: Props) => {
 
   return (
     <AlertModal
-      type="warning"
       alertOverlay
       className={modalStyles.modal}
       heading={i18n.t('modal.global_step_changes.heading')}

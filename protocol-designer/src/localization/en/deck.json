@@ -7,7 +7,6 @@
     "MODULE_INCOMPATIBLE_LABWARE_SWAP": "Swapping labware not possible due to module incompatibility"
   },
   "header": {
-    "start": "Tell the robot where labware and liquids start on the deck",
     "end": "Click on labware to inspect the result of your protocol"
   },
   "overlay": {

@@ -1,12 +1,11 @@
 // @flow
-import React, { useCallback, useState, type Node } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useSelector } from 'react-redux'
 import compact from 'lodash/compact'
 import values from 'lodash/values'
 import {
   useOnClickOutside,
   RobotWorkSpace,
-  RobotCoordsForeignDiv,
   type RobotWorkSpaceRenderProps,
 } from '@opentrons/components'
 import {
@@ -15,9 +14,8 @@ import {
   type ModuleType,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
-import i18n from '../../localization'
 import { PSEUDO_DECK_SLOTS, GEN_ONE_MULTI_PIPETTES } from '../../constants'
-import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../steplist'
+import type { TerminalItemId } from '../../steplist'
 import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import {
   getModuleVizDims,
@@ -290,20 +288,6 @@ const DeckSetupContents = (props: ContentsProps) => {
   )
 }
 
-const DeckInstructions = (props: {| children: Node |}) => (
-  <RobotCoordsForeignDiv
-    x={0}
-    y={364}
-    height={36}
-    width={200}
-    innerDivProps={{
-      className: styles.deck_instructions,
-    }}
-  >
-    {props.children}
-  </RobotCoordsForeignDiv>
-)
-
 const getHasGen1MultiChannelPipette = (
   pipettes: $PropertyType<InitialDeckSetup, 'pipettes'>
 ) => {
@@ -328,15 +312,6 @@ const DeckSetup = (props: Props) => {
   const wrapperRef = useOnClickOutside({
     onClickOutside: props.handleClickOutside,
   })
-  const headerMessage = props.selectedTerminalItemId
-    ? i18n.t(
-        `deck.header.${
-          props.selectedTerminalItemId === START_TERMINAL_ITEM_ID
-            ? 'start'
-            : 'end'
-        }`
-      )
-    : null
 
   return (
     <React.Fragment>
@@ -351,7 +326,6 @@ const DeckSetup = (props: Props) => {
           >
             {({ deckSlotsById, getRobotCoordsFromDOMCoords }) => (
               <>
-                <DeckInstructions>{headerMessage}</DeckInstructions>
                 <DeckSetupContents
                   initialDeckSetup={props.initialDeckSetup}
                   selectedTerminalItemId={props.selectedTerminalItemId}
