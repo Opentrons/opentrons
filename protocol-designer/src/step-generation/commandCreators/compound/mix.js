@@ -9,7 +9,7 @@ import {
 import * as errorCreators from '../../errorCreators'
 import type {
   MixArgs,
-  NextCommandCreator,
+  CommandCreator,
   CurriedCommandCreator,
 } from '../../types'
 import { aspirate, dispense, replaceTip, touchTip } from '../atomic'
@@ -60,7 +60,7 @@ export function mixUtil(args: {
   )
 }
 
-const mix: NextCommandCreator<MixArgs> = (
+const mix: CommandCreator<MixArgs> = (
   data,
   invariantContext,
   prevRobotState

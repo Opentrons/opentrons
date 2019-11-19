@@ -1,7 +1,7 @@
 // @flow
-import type { PauseArgs, NextCommandCreator } from '../../types'
+import type { PauseArgs, CommandCreator } from '../../types'
 
-const delay: NextCommandCreator<PauseArgs> = (
+const delay: CommandCreator<PauseArgs> = (
   args,
   invariantContext,
   prevRobotState

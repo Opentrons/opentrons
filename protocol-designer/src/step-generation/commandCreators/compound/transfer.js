@@ -13,10 +13,10 @@ import { mixUtil } from './mix'
 import type {
   TransferArgs,
   CurriedCommandCreator,
-  NextCommandCreator,
+  CommandCreator,
 } from '../../types'
 
-const transfer: NextCommandCreator<TransferArgs> = (
+const transfer: CommandCreator<TransferArgs> = (
   args,
   invariantContext,
   prevRobotState

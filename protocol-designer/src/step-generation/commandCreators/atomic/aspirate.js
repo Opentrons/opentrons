@@ -3,10 +3,10 @@ import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import { modulePipetteCollision } from '../../utils'
 import type { AspirateParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
-import type { NextCommandCreator, CommandCreatorError } from '../../types'
+import type { CommandCreator, CommandCreatorError } from '../../types'
 
 /** Aspirate with given args. Requires tip. */
-const aspirate: NextCommandCreator<AspirateParams> = (
+const aspirate: CommandCreator<AspirateParams> = (
   args,
   invariantContext,
   prevRobotState

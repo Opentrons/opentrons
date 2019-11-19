@@ -1,9 +1,9 @@
 // @flow
 import * as errorCreators from '../../errorCreators'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
-import type { CommandCreatorError, NextCommandCreator } from '../../types'
+import type { CommandCreatorError, CommandCreator } from '../../types'
 
-const blowout: NextCommandCreator<BlowoutParams> = (
+const blowout: CommandCreator<BlowoutParams> = (
   args,
   invariantContext,
   prevRobotState

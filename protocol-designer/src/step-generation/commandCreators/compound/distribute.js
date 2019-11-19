@@ -9,11 +9,11 @@ import { mixUtil } from './mix'
 import { curryCommandCreator, reduceCommandCreators } from '../../utils'
 import type {
   DistributeArgs,
-  NextCommandCreator,
+  CommandCreator,
   CurriedCommandCreator,
 } from '../../types'
 
-const distribute: NextCommandCreator<DistributeArgs> = (
+const distribute: CommandCreator<DistributeArgs> = (
   args,
   invariantContext,
   prevRobotState

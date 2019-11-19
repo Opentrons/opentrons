@@ -7,10 +7,10 @@ import {
   reduceCommandCreators,
   modulePipetteCollision,
 } from '../../utils'
-import type { CurriedCommandCreator, NextCommandCreator } from '../../types'
+import type { CurriedCommandCreator, CommandCreator } from '../../types'
 
 type PickUpTipArgs = {| pipette: string, tiprack: string, well: string |}
-const _pickUpTip: NextCommandCreator<PickUpTipArgs> = (
+const _pickUpTip: CommandCreator<PickUpTipArgs> = (
   args,
   invariantContext,
   prevRobotState
@@ -35,7 +35,7 @@ type ReplaceTipArgs = {| pipette: string |}
   Expects 96-well format tip naming system on the tiprack.
   If there's already a tip on the pipette, this will drop it before getting a new one
 */
-const replaceTip: NextCommandCreator<ReplaceTipArgs> = (
+const replaceTip: CommandCreator<ReplaceTipArgs> = (
   args,
   invariantContext,
   prevRobotState

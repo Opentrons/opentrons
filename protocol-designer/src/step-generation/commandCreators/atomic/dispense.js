@@ -2,10 +2,10 @@
 import * as errorCreators from '../../errorCreators'
 import { modulePipetteCollision } from '../../utils'
 import type { DispenseParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
-import type { NextCommandCreator, CommandCreatorError } from '../../types'
+import type { CommandCreator, CommandCreatorError } from '../../types'
 
 /** Dispense with given args. Requires tip. */
-const dispense: NextCommandCreator<DispenseParams> = (
+const dispense: CommandCreator<DispenseParams> = (
   args,
   invariantContext,
   prevRobotState

@@ -1,9 +1,9 @@
 // @flow
 import { noTipOnPipette, pipetteDoesNotExist } from '../../errorCreators'
-import type { NextCommandCreator, CommandCreatorError } from '../../types'
+import type { CommandCreator, CommandCreatorError } from '../../types'
 import type { TouchTipParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 
-const touchTip: NextCommandCreator<TouchTipParams> = (
+const touchTip: CommandCreator<TouchTipParams> = (
   args,
   invariantContext,
   prevRobotState

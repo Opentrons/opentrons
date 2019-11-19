@@ -271,7 +271,7 @@ export type CommandsAndWarnings = {|
 export type CommandCreatorResult =
   | CommandsAndWarnings
   | CommandCreatorErrorResponse
-export type NextCommandCreator<Args> = (
+export type CommandCreator<Args> = (
   args: Args,
   invariantContext: InvariantContext,
   prevRobotState: RobotState

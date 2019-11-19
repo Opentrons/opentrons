@@ -1,10 +1,10 @@
 // @flow
 import { FIXED_TRASH_ID } from '../../../constants'
-import type { NextCommandCreator } from '../../types'
+import type { CommandCreator } from '../../types'
 
 type DropTipArgs = {| pipette: string |}
 /** Drop tip if given pipette has a tip. If it has no tip, do nothing. */
-const dropTip: NextCommandCreator<DropTipArgs> = (
+const dropTip: CommandCreator<DropTipArgs> = (
   args,
   invariantContext,
   prevRobotState

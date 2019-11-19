@@ -5,7 +5,7 @@ import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import type {
   ConsolidateArgs,
-  NextCommandCreator,
+  CommandCreator,
   CurriedCommandCreator,
 } from '../../types'
 import {
@@ -16,7 +16,7 @@ import {
 import { aspirate, dispense, replaceTip, touchTip } from '../atomic'
 import { mixUtil } from './mix'
 
-const consolidate: NextCommandCreator<ConsolidateArgs> = (
+const consolidate: CommandCreator<ConsolidateArgs> = (
   args,
   invariantContext,
   prevRobotState
