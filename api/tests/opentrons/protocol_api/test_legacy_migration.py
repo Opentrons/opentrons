@@ -64,7 +64,6 @@ def test_migrated_labware_shape(monkeypatch, config_tempdir):
                 [[well.get_name() for well in col]
                  for col in temp_cont.columns()]
     shutil.rmtree(legacy_path)
-    print(f"The following labware was not migrated {unmigrated_labware}")
 
 
 @pytest.mark.api2_only
@@ -87,10 +86,12 @@ def test_custom_labware_shape(monkeypatch, unique_labwares, config_tempdir):
     monkeypatch.setattr(db_cmds, 'list_all_containers', list_containers)
     legacy_path = CONFIG['labware_user_definitions_dir_v2']/'legacy_api'
 
-    cw.perform_migration()
+    result, failures = cw.perform_migration()
+    assert not failures
     dir_contents = os.listdir(str(legacy_path))
 
     for lw in dir_contents:
+        assert lw in result
         format_path = legacy_path/lw/'1.json'
         with open(format_path, 'rb') as f:
             temp_dict = json.loads(f.read().decode('utf-8'))
@@ -120,22 +121,19 @@ def test_directory_save(config_tempdir):
 
 
 @pytest.mark.api2_only
-def test_env_variable(monkeypatch, config_tempdir):
+def test_lw_migration(monkeypatch, config_tempdir):
     td, tempdb = config_tempdir
     fake_db = td.join('fakeopentrons.db')
     dest = shutil.copyfile(tempdb, fake_db)
     CONFIG['labware_database_file'] = dest
 
-    def fake_migration():
-        return True
-    monkeypatch.setattr(cw, 'perform_migration', fake_migration)
-
-    monkeypatch.setenv('MIGRATE_V1_LABWARE', '1')
-    assert os.environ.get('MIGRATE_V1_LABWARE')
     assert os.path.exists(CONFIG['labware_database_file'])
 
     result = api.maybe_migrate_containers()
-    assert result is True
+    assert result
+    print(list(result.keys()))
 
-    monkeypatch.delenv('MIGRATE_V1_LABWARE')
+    second_result = api.maybe_migrate_containers()
+    assert not second_result
+
     CONFIG['labware_database_file'] = tempdb

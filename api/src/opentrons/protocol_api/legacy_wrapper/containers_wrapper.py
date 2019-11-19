@@ -15,7 +15,8 @@ from ..labware import (
     DeckItem)
 from .util import log_call
 from .types import LegacyLocation
-from typing import Dict, List, Any, Union, Optional, TYPE_CHECKING, Deque
+from typing import (
+    Dict, List, Any, Union, Optional, Tuple, TYPE_CHECKING, Deque)
 
 import jsonschema  # type: ignore
 
@@ -68,8 +69,19 @@ LW_TRANSLATION = {
     'tube-rack-2ml': 'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap_acrylic',  # noqa(E501)
     'tube-rack-15_50ml': 'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic',  # noqa(E501)
 }
-
 """ A table mapping old labware names to new labware names"""
+
+
+LW_UNMIGRATEABLE = [
+    'rigaku-compact-crystallization-plate',
+    'small_vial_rack_16x45',
+    'tiprack-1000ul-chem',
+    'tube-rack-2ml-9x9',
+    'tube-rack-5ml-96',
+    'tube-rack-80well',
+    'wheaton_vial_rack'
+]
+""" A list of labware we cannot automatically migrate from v1 to v2 """
 
 
 def _convert_labware_name(labware_name: str) -> str:
@@ -186,30 +198,39 @@ def create_new_labware_definition(labware: Container, labware_name: str):
     return lw_dict
 
 
-def perform_migration():
+def perform_migration() -> Tuple[Dict[str, str], List[str]]:
     path_to_save_defs = CONFIG['labware_user_definitions_dir_v2']
     all_containers = filter(
         lambda lw: lw not in MODULE_BLACKLIST,
         db_cmds.list_all_containers())
+    already_migrated = get_all_labware_definitions()
     # filter out all module and standard labwares from the database
     labware_to_create = filter(
-        lambda x: x not in LW_TRANSLATION.keys(),
+        lambda x: x not in list(LW_TRANSLATION.keys()) + LW_UNMIGRATEABLE,
         all_containers)
-    validation_failure = []
+    failures = []
+    migrated: Dict[str, str] = {}
     for lw_name in labware_to_create:
         labware = db_cmds.load_container(lw_name)
         if labware.wells():
-            log.info(f"Migrating {lw_name} to API v2 format")
             labware_def = create_new_labware_definition(labware, lw_name)
+            if labware_def['parameters']['loadName'] in already_migrated:
+                log.debug(
+                    f"Skipping migration of {lw_name} because it has already "
+                    "been migrated as "
+                    f"{labware_def['parameters']['loadName']}")
+                continue
             try:
+                log.info(f"Migrating {lw_name} to API v2 format")
                 save_definition(labware_def, location=path_to_save_defs)
+                migrated[lw_name] = labware_def['parameters']['loadName']
             except jsonschema.exceptions.ValidationError:
-                validation_failure.append(lw_name)
+                failures.append(lw_name)
         else:
-            log.info(f"Skipping migration of {lw_name} because there are no",
-                     "wells associated with this labware.")
+            log.debug(f"Skipping migration of {lw_name} because there are no",
+                      "wells associated with this labware.")
     log.info("Migration of API V1 labware complete.")
-    return True, validation_failure
+    return migrated, failures
 
 
 class LegacyWell(Well):
