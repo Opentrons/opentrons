@@ -96,7 +96,7 @@
       "pipette": { "label": "pipette" },
       "preWetTip": { "label": "pre-wet tip" },
       "touchTip": { "label": "touch tip" },
-      "magnetActionLabware":{ "label": "labware" },
+      "magnetActionLabware": { "label": "labware" },
       "magnetAction": {
         "label": "Magnet action",
         "options": {

@@ -6,6 +6,8 @@ import {
   incompatibleLabware,
   pauseForTimeOrUntilTold,
   wellRatioMoveLiquid,
+  magnetActionRequired,
+  engageHeight,
   type FormError,
 } from './errors'
 import {
@@ -47,6 +49,7 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
       minDisposalVolume
     ),
   },
+  magnet: { getErrors: composeErrors(magnetActionRequired, engageHeight) },
 }
 
 export type { FormError, FormWarning, FormWarningType }

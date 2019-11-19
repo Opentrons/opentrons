@@ -23,7 +23,8 @@ function MagnetForm(props: MagnetFormProps): React.Element<'div'> {
 
       <div className={styles.section_wrapper}>
         <div className={styles.section_column}>
-          <FormGroup
+          {/*
+            <FormGroup
             label={i18n.t(
               'form.step_edit_form.field.magnetActionLabware.label'
             )}
@@ -31,6 +32,7 @@ function MagnetForm(props: MagnetFormProps): React.Element<'div'> {
           >
             TODO: labware dropdown
           </FormGroup>
+        */}
         </div>
         <div className={styles.section_column}>
           <FormGroup
