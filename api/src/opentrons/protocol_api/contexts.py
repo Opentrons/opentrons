@@ -16,9 +16,7 @@ from .labware import (Well, Labware, get_labware_definition, load_module,
                       LabwareDefinition, load_from_definition, load)
 from opentrons.protocols.types import APIVersion, Protocol
 from .util import (FlowRates, PlungerSpeeds, Clearances, AxisMaxSpeeds,
-                   HardwareManager, clamp_value, requires_version,
-                   BlockWellVolume)
-
+                   HardwareManager, clamp_value, requires_version)
 from . import geometry
 from . import transfers
 from .definitions import MAX_SUPPORTED_VERSION
@@ -288,6 +286,7 @@ class ProtocolContext(CommandPublisher):
             labware_def: LabwareDefinition,
             location: types.DeckLocation,
             label: str = None,
+            volume_by_well: Dict[str, float] = None,
     ) -> Labware:
         """ Specify the presence of a piece of labware on the OT2 deck.
 
@@ -300,7 +299,10 @@ class ProtocolContext(CommandPublisher):
         :type location: int or str
         """
         parent = self.deck.position_for(location)
-        labware_obj = load_from_definition(labware_def, parent, label)
+        labware_obj = load_from_definition(labware_def,
+                                           parent,
+                                           label,
+                                           volume_by_well=volume_by_well)
         self._deck_layout[location] = labware_obj
         return labware_obj
 
@@ -312,6 +314,7 @@ class ProtocolContext(CommandPublisher):
             label: str = None,
             namespace: str = None,
             version: int = None,
+            volume_by_well: Dict[str, float] = None,
     ) -> Labware:
         """ Load a labware onto the deck given its name.
 
@@ -340,7 +343,7 @@ class ProtocolContext(CommandPublisher):
             bundled_defs=self._bundled_labware,
             extra_defs=self._extra_labware)
         return self.load_labware_from_definition(
-            labware_def, location, label)
+            labware_def, location, label, volume_by_well)
 
     @requires_version(2, 0)
     def load_labware_by_name(
@@ -2297,7 +2300,7 @@ class ThermocyclerContext(ModuleContext):
             specified, the Thermocycler will proceed to the next command
             after ``temperature`` is reached.
         """
-        if self.labware.volume_by_well:
+        if self.labware and self.labware.volume_by_well:
             block_volume = max(self.labware.volume_by_well.values())
         else:
             block_volume = None
