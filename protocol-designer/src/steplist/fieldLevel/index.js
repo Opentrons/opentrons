@@ -136,13 +136,14 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     getErrors: composeErrors(requiredField, minimumWellCount(1)),
     maskValue: defaultTo([]),
   },
+  magnetAction: { getErrors: composeErrors(requiredField) },
   engageHeight: {
     getErrors: composeErrors(
       requiredField,
       minFieldValue(-4.0),
       maxFieldValue(16)
     ),
-    maskValue: composeMaskers(maskToFloat, defaultTo(4)),
+    maskValue: composeMaskers(maskToFloat),
     castValue: Number,
   },
 }
