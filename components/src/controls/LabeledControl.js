@@ -7,7 +7,7 @@ import styles from './styles.css'
 type Props = {
   label: string,
   control: React.Node,
-  children: React.Node,
+  children?: React.Node,
 }
 
 export default function LabeledControl(props: Props) {
@@ -19,7 +19,7 @@ export default function LabeledControl(props: Props) {
         <p className={styles.labeled_control_label}>{label}</p>
         {control}
       </div>
-      <ControlInfo>{children}</ControlInfo>
+      {children && <ControlInfo>{children}</ControlInfo>}
     </div>
   )
 }

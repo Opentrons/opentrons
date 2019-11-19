@@ -68,3 +68,4 @@ export type CustomLabwareAction =
       type: 'labware:CHANGE_CUSTOM_LABWARE_DIRECTORY',
       meta: {| shell: true |},
     |}
+  | {| type: 'labware:ADD_CUSTOM_LABWARE', meta: {| shell: true |} |}

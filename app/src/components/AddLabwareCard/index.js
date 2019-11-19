@@ -4,10 +4,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Card } from '@opentrons/components'
 
 import { getConfig } from '../../config'
-import { changeCustomLabwareDirectory } from '../../custom-labware'
-import { CardContentFlex } from '../layout'
-import { PathDetail } from './PathDetail'
-import { ChangePathButton } from './ChangePathButton'
+import {
+  changeCustomLabwareDirectory,
+  addCustomLabware,
+} from '../../custom-labware'
+
+import { ManagePath } from './ManagePath'
+import { AddLabware } from './AddLabware'
 
 import type { Dispatch } from '../../types'
 
@@ -19,13 +22,12 @@ export function AddLabwareCard() {
   const config = useSelector(getConfig)
   const labwarePath = config.labware.directory
   const handleChangePath = () => dispatch(changeCustomLabwareDirectory())
+  const handleAddLabware = () => dispatch(addCustomLabware())
 
   return (
     <Card title={ADD_LABWARE_CARD_TITLE}>
-      <CardContentFlex>
-        <PathDetail path={labwarePath} />
-        <ChangePathButton onChangePath={handleChangePath} />
-      </CardContentFlex>
+      <ManagePath path={labwarePath} onChangePath={handleChangePath} />
+      <AddLabware onAddLabware={handleAddLabware} />
     </Card>
   )
 }

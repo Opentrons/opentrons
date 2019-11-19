@@ -1,10 +1,11 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
+import { LabeledToggle } from '@opentrons/components'
+
+import { toggleAnalyticsOptedIn, getAnalyticsOptedIn } from '../../analytics'
 
 import type { State, Dispatch } from '../../types'
-import { toggleAnalyticsOptedIn, getAnalyticsOptedIn } from '../../analytics'
-import { LabeledToggle } from '../controls'
 
 type OP = {||}
 

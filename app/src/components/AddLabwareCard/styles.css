@@ -1,18 +1,6 @@
 @import '@opentrons/components';
 
-.path_detail {
-  width: 100%;
-}
-
-.path_detail_title {
-  @apply --font-body-2-dark;
-
-  font-weight: var(--fw-semibold);
-  margin-bottom: 0.25rem;
-}
-
-.change_path_button {
-  flex: none;
-  align-self: flex-end;
-  margin-left: 2rem;
+.labeled_value {
+  margin-top: 0.25rem;
+  margin-bottom: 0;
 }

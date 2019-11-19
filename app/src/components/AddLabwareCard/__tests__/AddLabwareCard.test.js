@@ -5,10 +5,10 @@ import { mount } from 'enzyme'
 
 import * as Cfg from '../../../config'
 
-import { changeCustomLabwareDirectory } from '../../../custom-labware'
+import * as CustomLabware from '../../../custom-labware'
 import { AddLabwareCard } from '..'
-import { PathDetail } from '../PathDetail'
-import { ChangePathButton } from '../ChangePathButton'
+import { ManagePath } from '../ManagePath'
+import { AddLabware } from '../AddLabware'
 
 import type { State } from '../../../types'
 import type { Config } from '../../../config/types'
@@ -44,21 +44,31 @@ describe('AddLabwareCard', () => {
     jest.resetAllMocks()
   })
 
-  test('passes labware directory to PathDetail', () => {
+  test('passes labware directory to ManagePath', () => {
     const wrapper = render()
-    const detail = wrapper.find(PathDetail)
+    const detail = wrapper.find(ManagePath)
 
     expect(mockGetConfig).toHaveBeenCalledWith({ state: true })
     expect(detail.prop('path')).toEqual(mockLabwarePath)
   })
 
-  test('passes dispatch function to ChangePathButton', () => {
+  test('passes dispatch function to ManagePath', () => {
     const wrapper = render()
-    const button = wrapper.find(ChangePathButton)
-    const expectedAction = changeCustomLabwareDirectory()
+    const control = wrapper.find(ManagePath)
+    const expectedAction = CustomLabware.changeCustomLabwareDirectory()
 
     expect(mockStore.dispatch).toHaveBeenCalledTimes(0)
-    button.invoke('onChangePath')()
+    control.invoke('onChangePath')()
+    expect(mockStore.dispatch).toHaveBeenCalledWith(expectedAction)
+  })
+
+  test('passes dispatch function to AddLabware', () => {
+    const wrapper = render()
+    const control = wrapper.find(AddLabware)
+    const expectedAction = CustomLabware.addCustomLabware()
+
+    expect(mockStore.dispatch).toHaveBeenCalledTimes(0)
+    control.invoke('onAddLabware')()
     expect(mockStore.dispatch).toHaveBeenCalledWith(expectedAction)
   })
 })

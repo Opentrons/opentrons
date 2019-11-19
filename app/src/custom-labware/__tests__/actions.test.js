@@ -42,6 +42,15 @@ describe('custom labware actions', () => {
         meta: { shell: true },
       },
     },
+    {
+      name: 'addCustomLabware',
+      creator: actions.addCustomLabware,
+      args: [],
+      expected: {
+        type: 'labware:ADD_CUSTOM_LABWARE',
+        meta: { shell: true },
+      },
+    },
   ]
 
   SPECS.forEach(spec => {

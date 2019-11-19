@@ -16,8 +16,11 @@ import { restartRobot } from '../../robot-admin'
 import { selectors as robotSelectors } from '../../robot'
 import { CONNECTABLE } from '../../discovery'
 
-import { RefreshCard } from '@opentrons/components'
-import { LabeledToggle, LabeledButton } from '../controls'
+import {
+  RefreshCard,
+  LabeledToggle,
+  LabeledButton,
+} from '@opentrons/components'
 
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
