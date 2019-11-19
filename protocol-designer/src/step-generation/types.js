@@ -264,31 +264,22 @@ export type CommandCreatorErrorResponse = {
   warnings?: Array<CommandCreatorWarning>,
 }
 
-export type CommandCreator = (
-  invariantContext: InvariantContext,
-  prevRobotState: RobotState
-) => CommandsAndRobotState | CommandCreatorErrorResponse
-export type CompoundCommandCreator = (
-  invariantContext: InvariantContext,
-  prevRobotState: RobotState
-) => Array<CommandCreator>
-
 export type CommandsAndWarnings = {|
   commands: Array<Command>,
   warnings?: Array<CommandCreatorWarning>,
 |}
-export type NextCommandCreatorResult =
+export type CommandCreatorResult =
   | CommandsAndWarnings
   | CommandCreatorErrorResponse
 export type NextCommandCreator<Args> = (
   args: Args,
   invariantContext: InvariantContext,
   prevRobotState: RobotState
-) => NextCommandCreatorResult
+) => CommandCreatorResult
 export type CurriedCommandCreator = (
   invariantContext: InvariantContext,
   prevRobotState: RobotState
-) => NextCommandCreatorResult
+) => CommandCreatorResult
 
 export type Timeline = {|
   timeline: Array<CommandsAndRobotState>, // TODO: Ian 2018-06-14 avoid timeline.timeline shape, better names

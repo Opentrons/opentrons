@@ -4,7 +4,7 @@ import {
   repeatArray,
   blowoutUtil,
   curryCommandCreator,
-  reduceCommandCreatorsNext,
+  reduceCommandCreators,
 } from '../../utils'
 import * as errorCreators from '../../errorCreators'
 import type {
@@ -163,7 +163,7 @@ const mix: NextCommandCreator<MixArgs> = (
     }
   )
 
-  return reduceCommandCreatorsNext(
+  return reduceCommandCreators(
     commandCreators,
     invariantContext,
     prevRobotState

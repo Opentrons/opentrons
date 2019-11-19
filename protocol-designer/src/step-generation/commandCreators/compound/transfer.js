@@ -6,7 +6,7 @@ import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import {
   blowoutUtil,
   curryCommandCreator,
-  reduceCommandCreatorsNext,
+  reduceCommandCreators,
 } from '../../utils'
 import { aspirate, dispense, replaceTip, touchTip } from '../atomic'
 import { mixUtil } from './mix'
@@ -255,7 +255,7 @@ const transfer: NextCommandCreator<TransferArgs> = (
     },
     []
   )
-  return reduceCommandCreatorsNext(
+  return reduceCommandCreators(
     commandCreators,
     invariantContext,
     prevRobotState

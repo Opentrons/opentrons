@@ -5,8 +5,8 @@ import {
 } from '../getNextRobotStateAndWarnings'
 import {
   curryCommandCreator,
-  reduceCommandCreatorsNext,
-  commandCreatorsTimelineNext,
+  reduceCommandCreators,
+  commandCreatorsTimeline,
 } from '../utils'
 import type { InvariantContext } from '../types'
 
@@ -146,7 +146,7 @@ beforeEach(() => {
 describe('reduceCommandCreators', () => {
   test('basic command creators', () => {
     const initialState: any = { count: 0 }
-    const result: any = reduceCommandCreatorsNext(
+    const result: any = reduceCommandCreators(
       [
         curryCommandCreator(addCreator, { value: 1 }),
         curryCommandCreator(multiplyCreator, { value: 2 }),
@@ -166,7 +166,7 @@ describe('reduceCommandCreators', () => {
 
   test('error in a command short-circuits the command creation pipeline', () => {
     const initialState: any = { count: 5 }
-    const result = reduceCommandCreatorsNext(
+    const result = reduceCommandCreators(
       [
         curryCommandCreator(addCreator, { value: 4 }),
         curryCommandCreator(divideCreator, { value: 0 }),
@@ -188,7 +188,7 @@ describe('reduceCommandCreators', () => {
 
   test('warnings accumulate in a flat array across the command chain', () => {
     const initialState: any = { count: 5 }
-    const result = reduceCommandCreatorsNext(
+    const result = reduceCommandCreators(
       [
         curryCommandCreator(addCreatorWithWarning, { value: 3 }),
         curryCommandCreator(multiplyCreator, { value: 2 }),
@@ -215,7 +215,7 @@ describe('reduceCommandCreators', () => {
 describe('commandCreatorsTimeline', () => {
   test('any errors short-circuit the timeline chain', () => {
     const initialState: any = { count: 5 }
-    const result = commandCreatorsTimelineNext(
+    const result = commandCreatorsTimeline(
       [
         curryCommandCreator(addCreatorWithWarning, { value: 4 }),
         curryCommandCreator(divideCreator, { value: 0 }),
@@ -248,7 +248,7 @@ describe('commandCreatorsTimeline', () => {
 
   test('warnings are indexed in an indexed command chain', () => {
     const initialState: any = { count: 5 }
-    const result = commandCreatorsTimelineNext(
+    const result = commandCreatorsTimeline(
       [
         curryCommandCreator(addCreatorWithWarning, { value: 3 }),
         curryCommandCreator(multiplyCreator, { value: 2 }),

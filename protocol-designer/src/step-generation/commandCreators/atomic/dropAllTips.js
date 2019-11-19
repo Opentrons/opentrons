@@ -1,6 +1,6 @@
 // @flow
 import type { NextCommandCreator } from '../../types'
-import { curryCommandCreator, reduceCommandCreatorsNext } from '../../utils'
+import { curryCommandCreator, reduceCommandCreators } from '../../utils'
 import dropTip from './dropTip'
 
 /** Drop all tips from equipped pipettes.
@@ -15,7 +15,7 @@ const dropAllTips: NextCommandCreator<null> = (
   const commandCreators = pipetteIds.map(pipette =>
     curryCommandCreator(dropTip, { pipette })
   )
-  return reduceCommandCreatorsNext(
+  return reduceCommandCreators(
     commandCreators,
     invariantContext,
     prevRobotState

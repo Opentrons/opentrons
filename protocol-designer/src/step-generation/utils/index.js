@@ -21,18 +21,18 @@ import type {
   SourceAndDest,
   CurriedCommandCreator,
 } from '../types'
-import { commandCreatorsTimelineNext } from './commandCreatorsTimelineNext'
+import { commandCreatorsTimeline } from './commandCreatorsTimeline'
 import { curryCommandCreator } from './curryCommandCreator'
-import { reduceCommandCreatorsNext } from './reduceCommandCreators'
+import { reduceCommandCreators } from './reduceCommandCreators'
 import { modulePipetteCollision } from './modulePipetteCollision'
 import blowout from '../commandCreators/atomic/blowout'
 
 import { AIR } from '@opentrons/components'
 export { AIR }
 export {
-  commandCreatorsTimelineNext,
+  commandCreatorsTimeline,
   curryCommandCreator,
-  reduceCommandCreatorsNext,
+  reduceCommandCreators,
   modulePipetteCollision,
 }
 

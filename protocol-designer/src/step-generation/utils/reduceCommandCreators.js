@@ -7,7 +7,7 @@ import type {
   RobotState,
   CommandCreatorError,
   CommandCreatorWarning,
-  NextCommandCreatorResult,
+  CommandCreatorResult,
   CurriedCommandCreator,
 } from '../types'
 
@@ -15,22 +15,16 @@ type CCReducerAcc = {|
   robotState: RobotState,
   commands: Array<Command>,
   errors: Array<CommandCreatorError>,
-  errorStep: ?number, // TODO IMMEDIATELY is this used anywhere??
   warnings: Array<CommandCreatorWarning>,
 |}
 
-// TODO IMMEDIATELY: test this!!!
-export const reduceCommandCreatorsNext = (
+export const reduceCommandCreators = (
   commandCreators: Array<CurriedCommandCreator>,
   invariantContext: InvariantContext,
   initialRobotState: RobotState
-): NextCommandCreatorResult => {
+): CommandCreatorResult => {
   const result = commandCreators.reduce(
-    (
-      prev: CCReducerAcc,
-      reducerFn: CurriedCommandCreator,
-      stepIdx
-    ): CCReducerAcc => {
+    (prev: CCReducerAcc, reducerFn: CurriedCommandCreator): CCReducerAcc => {
       if (prev.errors.length > 0) {
         // if there are errors, short-circuit the reduce
         return prev
@@ -41,7 +35,6 @@ export const reduceCommandCreatorsNext = (
           robotState: prev.robotState,
           commands: prev.commands,
           errors: next.errors,
-          errorStep: stepIdx,
           warnings: prev.warnings,
         }
       }
@@ -67,7 +60,6 @@ export const reduceCommandCreatorsNext = (
       robotState: cloneDeep(initialRobotState),
       commands: [],
       errors: [],
-      errorStep: null,
       warnings: [],
     }
   )

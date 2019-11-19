@@ -11,7 +11,7 @@ import type {
 import {
   blowoutUtil,
   curryCommandCreator,
-  reduceCommandCreatorsNext,
+  reduceCommandCreators,
 } from '../../utils'
 import { aspirate, dispense, replaceTip, touchTip } from '../atomic'
 import { mixUtil } from './mix'
@@ -206,7 +206,7 @@ const consolidate: NextCommandCreator<ConsolidateArgs> = (
     }
   )
 
-  return reduceCommandCreatorsNext(
+  return reduceCommandCreators(
     commandCreators,
     invariantContext,
     prevRobotState

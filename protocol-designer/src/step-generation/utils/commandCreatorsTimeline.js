@@ -8,7 +8,7 @@ import type {
   CurriedCommandCreator,
   RobotStateAndWarnings,
 } from '../types'
-export const commandCreatorsTimelineNext = (
+export const commandCreatorsTimeline = (
   commandCreators: Array<CurriedCommandCreator>,
   invariantContext: InvariantContext,
   initialRobotState: RobotState

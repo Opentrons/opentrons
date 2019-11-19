@@ -227,7 +227,7 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
     //   []
     // )
 
-    // TODO IMMEDIATELY add pack in the auto-tip functionality commented out above
+    // TODO IMMEDIATELY add back in the auto-tip functionality commented out above
 
     const curriedCommandCreators = continuousStepArgs.reduce(
       (
@@ -241,7 +241,7 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
       []
     )
 
-    const timeline = StepGeneration.commandCreatorsTimelineNext(
+    const timeline = StepGeneration.commandCreatorsTimeline(
       curriedCommandCreators,
       invariantContext,
       initialRobotState

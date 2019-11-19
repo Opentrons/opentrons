@@ -4,7 +4,7 @@ import * as errorCreators from '../../errorCreators'
 import dropTip from './dropTip'
 import {
   curryCommandCreator,
-  reduceCommandCreatorsNext,
+  reduceCommandCreators,
   modulePipetteCollision,
 } from '../../utils'
 import type { CurriedCommandCreator, NextCommandCreator } from '../../types'
@@ -92,7 +92,7 @@ const replaceTip: NextCommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  return reduceCommandCreatorsNext(
+  return reduceCommandCreators(
     commandCreators,
     invariantContext,
     prevRobotState

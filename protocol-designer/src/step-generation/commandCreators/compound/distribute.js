@@ -6,7 +6,7 @@ import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
 import { aspirate, dispense, blowout, replaceTip, touchTip } from '../atomic'
 import { mixUtil } from './mix'
-import { curryCommandCreator, reduceCommandCreatorsNext } from '../../utils'
+import { curryCommandCreator, reduceCommandCreators } from '../../utils'
 import type {
   DistributeArgs,
   NextCommandCreator,
@@ -201,7 +201,7 @@ const distribute: NextCommandCreator<DistributeArgs> = (
     }
   )
 
-  return reduceCommandCreatorsNext(
+  return reduceCommandCreators(
     commandCreators,
     invariantContext,
     prevRobotState
