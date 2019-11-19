@@ -1,5 +1,5 @@
 """ Utility functions and classes for the protocol api """
-from collections import UserDict
+from collections import UserDict, namedtuple
 import functools
 import logging
 from typing import Any, Callable, Optional, TYPE_CHECKING, Union
@@ -31,6 +31,7 @@ def _assert_gzero(val: Any, message: str) -> float:
 
 class FlowRates:
     """ Utility class for rich setters/getters for flow rates """
+
     def __init__(self,
                  instr: 'InstrumentContext') -> None:
         self._instr = instr
@@ -71,6 +72,7 @@ class FlowRates:
 
 class PlungerSpeeds:
     """ Utility class for rich setters/getters for speeds """
+
     def __init__(self,
                  instr: 'InstrumentContext') -> None:
         self._instr = instr

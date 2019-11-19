@@ -16,7 +16,8 @@ from .labware import (Well, Labware, get_labware_definition, load_module,
                       LabwareDefinition, load_from_definition, load)
 from opentrons.protocols.types import APIVersion, Protocol
 from .util import (FlowRates, PlungerSpeeds, Clearances, AxisMaxSpeeds,
-                   HardwareManager, clamp_value, requires_version)
+                   HardwareManager, clamp_value, requires_version,
+                   BlockWellVolume)
 
 from . import geometry
 from . import transfers
@@ -914,6 +915,11 @@ class InstrumentContext(CommandPublisher):
                 " method that moves to a location (such as move_to or "
                 "aspirate) must previously have been called so the robot "
                 "knows where it is.")
+
+        for mod in self._ctx._modules:
+            if isinstance(mod, ThermocyclerContext):
+                mod.track_block_well_volume(loc=location)
+
         cmds.do_publish(self.broker, cmds.dispense, self.dispense,
                         'before', None, None, self, volume, loc, rate)
         self._hw_manager.hardware.dispense(self._mount, volume, rate)
@@ -2230,6 +2236,17 @@ class ThermocyclerContext(ModuleContext):
                     z=high_point[Axis.by_mount(instr._mount)])
             instr.move_to(types.Location(safe_point, None), force_direct=True)
 
+    def track_block_well_volume(self, loc: types.Location, volume: float):
+        lw, well = geometry.split_loc_labware(loc)
+        if self.labware is lw:
+            existing_wells = [bw.well for bw in self.block_wells
+                                if bw.well == well]
+            if existing_wells:
+                block_well_volume = BlockWellVolume(well=well, volume=volume)
+            else:
+                self.block_wells.append(
+                        BlockWellVolume(well=well, volume=volume))
+
     def flag_unsafe_move(self,
                          to_loc: types.Location,
                          from_loc: types.Location):
@@ -2289,11 +2306,16 @@ class ThermocyclerContext(ModuleContext):
             specified, the Thermocycler will proceed to the next command
             after ``temperature`` is reached.
         """
+        if self.labware.:
+            block_volume =
+        else:
+            block_volume = None
         return self._module.set_temperature(
                 temperature=temperature,
                 hold_time_seconds=hold_time_seconds,
                 hold_time_minutes=hold_time_minutes,
-                ramp_rate=ramp_rate)
+                ramp_rate=ramp_rate,
+                volume=block_volume)
 
     @cmds.publish.both(command=cmds.thermocycler_set_lid_temperature)
     @requires_version(2, 0)
