@@ -73,7 +73,8 @@ class SimulatingDriver:
     async def set_temperature(self,
                               temp: float,
                               hold_time: float,
-                              ramp_rate: float) -> None:
+                              ramp_rate: float,
+                              volume: float) -> None:
         self._target_temp = temp
         self._hold_time = hold_time
         self._ramp_rate = ramp_rate
@@ -198,13 +199,16 @@ class Thermocycler(mod_abc.AbstractModule):
     async def set_temperature(self, temperature,
                               hold_time_seconds: float = None,
                               hold_time_minutes: float = None,
-                              ramp_rate=None):
+                              ramp_rate=None,
+                              volume: float = None):
         seconds = hold_time_seconds if hold_time_seconds is not None else 0
         minutes = hold_time_minutes if hold_time_minutes is not None else 0
         total_seconds = seconds + (minutes * 60)
         hold_time = total_seconds if total_seconds > 0 else 0
-        await self._driver.set_temperature(
-            temp=temperature, hold_time=hold_time, ramp_rate=ramp_rate)
+        await self._driver.set_temperature(temp=temperature,
+                                           hold_time=hold_time,
+                                           ramp_rate=ramp_rate,
+                                           volume=volume)
         if hold_time:
             self._current_task = self._loop.create_task(self.wait_for_hold())
         else:

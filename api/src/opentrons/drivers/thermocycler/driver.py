@@ -37,14 +37,18 @@ LID_TARGET_MAX = 110
 TEMP_UPDATE_RETRIES = 15
 
 
-def _build_temp_code(temp, hold_time=None):
+def _build_temp_code(temp: float,
+                     hold_time: Optional[float],
+                     volume: Optional[float]):
     if temp < 0:
         temp = 0
     if temp > 99:
         temp = 99
-    cmd = '{} S{}'.format(GCODES['SET_PLATE_TEMP'], temp)
+    cmd = f'{GCODES['SET_PLATE_TEMP']} S{temp}'
     if hold_time:
-        cmd += ' H{}'.format(hold_time)
+        cmd += f' H{hold_time}'
+    if volume:
+        cmd += f' V{volume}'
     return cmd, temp
 
 
@@ -277,11 +281,14 @@ class Thermocycler:
     async def set_temperature(self,
                               temp: float,
                               hold_time: float = None,
-                              ramp_rate: float = None) -> None:
+                              ramp_rate: float = None,
+                              volume: float = None) -> None:
         if ramp_rate:
-            ramp_cmd = '{} S{}'.format(GCODES['SET_RAMP_RATE'], ramp_rate)
+            ramp_cmd = f'{GCODES['SET_RAMP_RATE']} S{ramp_rate}'
             await self._write_and_wait(ramp_cmd)
-        temp_cmd, temp = _build_temp_code(temp, hold_time)
+        temp_cmd, temp = _build_temp_code(temp=temp,
+                                          hold_time=hold_time,
+                                          volume=volume)
         await self._write_and_wait(temp_cmd)
         retries = 0
         while (self._target_temp != temp) or (self._hold_time != hold_time):
