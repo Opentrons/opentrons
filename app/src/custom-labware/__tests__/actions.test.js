@@ -33,6 +33,15 @@ describe('custom labware actions', () => {
         ],
       },
     },
+    {
+      name: 'changeLabwareDirectory',
+      creator: actions.changeCustomLabwareDirectory,
+      args: [],
+      expected: {
+        type: 'labware:CHANGE_CUSTOM_LABWARE_DIRECTORY',
+        meta: { shell: true },
+      },
+    },
   ]
 
   SPECS.forEach(spec => {

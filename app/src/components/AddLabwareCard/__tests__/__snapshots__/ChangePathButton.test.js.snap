@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AddLabwareCard component renders 1`] = `
+<OutlineButton
+  className="change_path_button"
+  onClick={[MockFunction]}
+>
+  Change Source
+</OutlineButton>
+`;

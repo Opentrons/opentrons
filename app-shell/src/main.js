@@ -47,21 +47,18 @@ function startUp() {
     mainWindow.webContents.send('dispatch', action)
   }
 
-  const configHandler = registerConfig(dispatch)
-  const discoveryHandler = registerDiscovery(dispatch)
-  const labwareHandler = registerLabware(dispatch)
-  const robotLogsHandler = registerRobotLogs(dispatch, mainWindow)
-  const updateHandler = registerUpdate(dispatch)
-  const buildrootUpdateHandler = registerBuildrootUpdate(dispatch)
+  const actionHandlers = [
+    registerConfig(dispatch),
+    registerDiscovery(dispatch),
+    registerLabware(dispatch, mainWindow),
+    registerRobotLogs(dispatch, mainWindow),
+    registerUpdate(dispatch),
+    registerBuildrootUpdate(dispatch),
+  ]
 
   ipcMain.on('dispatch', (_, action) => {
     log.debug('Received action via IPC from renderer', { action })
-    configHandler(action)
-    discoveryHandler(action)
-    labwareHandler(action)
-    robotLogsHandler(action)
-    updateHandler(action)
-    buildrootUpdateHandler(action)
+    actionHandlers.forEach(handler => handler(action))
   })
 
   if (config.devtools) {
@@ -90,16 +87,20 @@ function installAndOpenExtensions() {
 
   return Promise.all(
     extensions.map(name => install(devtools[name], forceDownload))
-  ).then(() =>
-    mainWindow.webContents.on('context-menu', (_, props) => {
-      const { x, y } = props
-
-      Menu.buildFromTemplate([
-        {
-          label: 'Inspect element',
-          click: () => mainWindow.inspectElement(x, y),
-        },
-      ]).popup(mainWindow)
-    })
   )
+    .then(() => {
+      mainWindow.webContents.on('context-menu', (_, props) => {
+        const { x, y } = props
+
+        Menu.buildFromTemplate([
+          {
+            label: 'Inspect element',
+            click: () => mainWindow.inspectElement(x, y),
+          },
+        ]).popup(mainWindow)
+      })
+    })
+    .catch(error => {
+      log.warn('Unable to install devtools', { error })
+    })
 }

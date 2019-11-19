@@ -1,7 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`AddLabwareCard component renders 1`] = `
-<Card
-  title="Labware Management"
-/>
-`;
