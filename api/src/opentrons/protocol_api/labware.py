@@ -21,7 +21,7 @@ from collections import defaultdict
 from enum import Enum, auto
 from hashlib import sha256
 from itertools import takewhile, dropwhile
-from typing import Any, AnyStr, List, Dict, Optional, Union, Tuple
+from typing import Any, AnyStr, List, Dict, Optional, Union, Sequence, Tuple
 
 import jsonschema  # type: ignore
 
@@ -179,6 +179,10 @@ class Well:
                  slot 1 as (0,0,0)). If z is specified, returns a point
                  offset by z mm from bottom-center
         """
+        return self._bottom(z)
+
+    def _bottom(self, z: float = 0.0) -> Location:
+        # inheritance and version check workaround
         top = self._top()
         bottom_z = top.point.z - self._depth + z
         return Location(Point(x=top.point.x, y=top.point.y, z=bottom_z), self)
@@ -316,7 +320,7 @@ class Labware(DeckItem):
             self._name = definition['parameters']['loadName']
         self._display_name = "{} on {}".format(dn, str(parent.labware))
         self._calibrated_offset: Point = Point(0, 0, 0)
-        self._wells: List[Well] = []
+        self._wells: Sequence[Well] = []
         # Directly from definition
         self._well_definition = definition['wells']
         self._parameters = definition['parameters']
@@ -392,7 +396,7 @@ class Labware(DeckItem):
         else:
             return self._parameters['magneticModuleEngageHeight']
 
-    def _build_wells(self) -> List[Well]:
+    def _build_wells(self) -> Sequence[Well]:
         """
         This function is used to create one instance of wells to be used by all
         accessor functions. It is only called again if a new offset needs
@@ -472,7 +476,7 @@ class Labware(DeckItem):
             res = [self.wells_by_name()[idx] for idx in args]
         else:
             raise TypeError
-        return res
+        return list(res)
 
     @requires_version(2, 0)
     def wells_by_name(self) -> Dict[str, Well]:
