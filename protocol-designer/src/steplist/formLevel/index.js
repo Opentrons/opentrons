@@ -7,7 +7,7 @@ import {
   pauseForTimeOrUntilTold,
   wellRatioMoveLiquid,
   magnetActionRequired,
-  engageHeight,
+  engageHeightRequired,
   type FormError,
 } from './errors'
 import {
@@ -15,6 +15,7 @@ import {
   belowPipetteMinimumVolume,
   maxDispenseWellVolume,
   minDisposalVolume,
+  engageHeightRangeExceeded,
   type FormWarning,
   type FormWarningType,
 } from './warnings'
@@ -49,7 +50,10 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
       minDisposalVolume
     ),
   },
-  magnet: { getErrors: composeErrors(magnetActionRequired, engageHeight) },
+  magnet: {
+    getErrors: composeErrors(magnetActionRequired, engageHeightRequired),
+    getWarnings: composeWarnings(engageHeightRangeExceeded),
+  },
 }
 
 export type { FormError, FormWarning, FormWarningType }

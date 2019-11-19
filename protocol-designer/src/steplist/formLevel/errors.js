@@ -16,8 +16,6 @@ export type FormErrorKey =
   | 'TIME_PARAM_REQUIRED'
   | 'MAGNET_ACTION_TYPE_REQUIRED'
   | 'ENGAGE_HEIGHT_REQUIRED'
-  | 'ENGAGE_HEIGHT_MIN_EXCEEDED'
-  | 'ENGAGE_HEIGHT_MAX_EXCEEDED'
 
 export type FormError = {
   title: string,
@@ -61,14 +59,6 @@ const FORM_ERRORS: { [FormErrorKey]: FormError } = {
   },
   ENGAGE_HEIGHT_REQUIRED: {
     title: 'Engage height is required',
-    dependentFields: ['magnetAction', 'engageHeight'],
-  },
-  ENGAGE_HEIGHT_MIN_EXCEEDED: {
-    title: 'Specified distance is below module minimum',
-    dependentFields: ['magnetAction', 'engageHeight'],
-  },
-  ENGAGE_HEIGHT_MAX_EXCEEDED: {
-    title: 'Specified distance is above module maximum',
     dependentFields: ['magnetAction', 'engageHeight'],
   },
 }
@@ -141,22 +131,14 @@ export const wellRatioMoveLiquid = (fields: HydratedFormData): ?FormError => {
 export const magnetActionRequired = (fields: HydratedFormData): ?FormError => {
   const { magnetAction } = fields
   if (!magnetAction) return FORM_ERRORS.MAGNET_ACTION_TYPE_REQUIRED
+  return null
 }
 
-// TODO (ka 2019-11-19): Should Min/Max be blocking for save?
-// Investigate changing to form level warning
-export const engageHeight = (fields: HydratedFormData): ?FormError => {
+export const engageHeightRequired = (fields: HydratedFormData): ?FormError => {
   const { magnetAction, engageHeight } = fields
-  if (magnetAction === 'engage') {
-    if (!engageHeight) {
-      return FORM_ERRORS.ENGAGE_HEIGHT_REQUIRED
-    } else if (engageHeight < -4.0) {
-      return FORM_ERRORS.ENGAGE_HEIGHT_MIN_EXCEEDED
-    } else if (engageHeight > 16) {
-      return FORM_ERRORS.ENGAGE_HEIGHT_MAX_EXCEEDED
-    }
-  }
-  return null
+  return magnetAction === 'engage' && !engageHeight
+    ? FORM_ERRORS.ENGAGE_HEIGHT_REQUIRED
+    : null
 }
 
 /*******************
