@@ -15,6 +15,9 @@ from opentrons.protocols.parse import parse
 from opentrons.types import Location, Point
 from opentrons.protocol_api import (ProtocolContext,
                                     labware)
+from opentrons.protocol_api.legacy_wrapper import (
+    containers_wrapper,
+    types as legacy_wrapper_types)
 from opentrons.protocol_api.execute import run_protocol
 from opentrons.hardware_control import adapters, API
 from .models import Container, Instrument, Module
@@ -511,7 +514,20 @@ def _get_new_labware(loc):
         raise TypeError(loc)
 
 
-def _get_labware(command):
+def _get_legacy_labware(loc):
+    if isinstance(loc, legacy_wrapper_types.LegacyLocation):
+        return _get_legacy_labware(loc.labware)
+    elif isinstance(loc, containers_wrapper.LegacyWell):
+        return loc.parent
+    elif isinstance(loc, containers_wrapper.WellSeries):
+        return loc.lw_obj
+    elif isinstance(loc, containers_wrapper.LegacyLabware):
+        return loc
+    else:
+        raise TypeError(loc)
+
+
+def _get_labware(command):  # noqa(C901)
     containers = []
     instruments = []
     modules = []
@@ -539,6 +555,15 @@ def _get_labware(command):
             containers.append(get_container(location))
         elif isinstance(location, (Location, labware.Well, labware.Labware)):
             containers.append(_get_new_labware(location))
+        elif isinstance(
+                location, (
+                    legacy_wrapper_types.LegacyLocation,
+                    containers_wrapper.LegacyWell,
+                    containers_wrapper.LegacyLabware,
+                    containers_wrapper.WellSeries)):
+            containers.append(_get_legacy_labware(location))
+        else:
+            log.error(f'Cant handle location {location!r}')
 
     if locations:
         if is_new_loc(locations):
