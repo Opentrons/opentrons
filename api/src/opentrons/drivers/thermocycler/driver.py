@@ -44,7 +44,7 @@ def _build_temp_code(temp: float,
         temp = 0
     if temp > 99:
         temp = 99
-    cmd = f'{GCODES['SET_PLATE_TEMP']} S{temp}'
+    cmd = f"{GCODES['SET_PLATE_TEMP']} S{temp}"
     if hold_time:
         cmd += f' H{hold_time}'
     if volume:
@@ -284,7 +284,7 @@ class Thermocycler:
                               ramp_rate: float = None,
                               volume: float = None) -> None:
         if ramp_rate:
-            ramp_cmd = f'{GCODES['SET_RAMP_RATE']} S{ramp_rate}'
+            ramp_cmd = f"{GCODES['SET_RAMP_RATE']} S{ramp_rate}"
             await self._write_and_wait(ramp_cmd)
         temp_cmd, temp = _build_temp_code(temp=temp,
                                           hold_time=hold_time,

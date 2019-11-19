@@ -84,7 +84,7 @@ class Well:
                  parent: Location,
                  display_name: str,
                  has_tip: bool,
-                 starting_volume: float = None,
+                 starting_volume: float,
                  api_level: APIVersion) -> None:
         """
         Create a well, and track the Point corresponding to the top-center of
@@ -347,7 +347,8 @@ class Labware(DeckItem):
             = Point(offset['x'], offset['y'], offset['z']) + parent.point
         self._parent = parent.labware
         # Applied properties
-        self.set_calibration(self._calibrated_offset)
+        self._update_calibrated_offset(self._calibrated_offset)
+        self._build_wells(volume_by_well)
 
         self._pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
         self._definition = definition
@@ -409,20 +410,21 @@ class Labware(DeckItem):
         else:
             return self._parameters['magneticModuleEngageHeight']
 
-    def _build_wells(self) -> Sequence[Well]:
+    def _build_wells(self, volume_by_well: Dict[str, float] = None) -> Sequence[Well]:
         """
         This function is used to create one instance of wells to be used by all
         accessor functions. It is only called again if a new offset needs
         to be applied.
         """
-
+        if volume_by_well is None:
+            volume_by_well = {}
         return [
             Well(
                 well_props=self._well_definition[well],
                 parent=Location(self._calibrated_offset, self),
                 display_name="{} of {}".format(well, self._display_name),
                 has_tip=self._is_tiprack,
-                starting_volume=self._volume_by_well[well]
+                starting_volume=volume_by_well.get(well) or 0,
                 api_level=self._api_version)
             for well in self._ordering]
 
@@ -440,13 +442,16 @@ class Labware(DeckItem):
             dict_list[self._pattern.match(index).group(group)].append(well_obj)
         return dict_list
 
+    def _update_calibrated_offset(self, delta: Point):
+        self._calibrated_offset = Point(x=self._offset.x + delta.x,
+                                        y=self._offset.y + delta.y,
+                                        z=self._offset.z + delta.z)
+
     def set_calibration(self, delta: Point):
         """
         Called by save calibration in order to update the offset on the object.
         """
-        self._calibrated_offset = Point(x=self._offset.x + delta.x,
-                                        y=self._offset.y + delta.y,
-                                        z=self._offset.z + delta.z)
+        self._update_calibrated_offset(delta)
         self._wells = self._build_wells()
 
     @property  # type: ignore
@@ -1479,6 +1484,7 @@ def load_from_definition(
         definition: Dict[str, Any],
         parent: Location,
         label: str = None,
+        volume_by_well: Dict[str, float] = None,
         api_level: APIVersion = None) -> Labware:
     """
     Return a labware object constructed from a provided labware definition dict
@@ -1494,12 +1500,15 @@ def load_from_definition(
                    (often the front-left corner of a slot on the deck).
     :param str label: An optional label that will override the labware's
                       display name from its definition
+    :param volume_by_well: If specified, a mapping of well names to well
+        starting volume. If no map is passed, all wells initialize to 0µL.
     :param APIVersion api_level: the API version to set for the loaded labware
                                  instance. The :py:class:`.Labware` will
                                  conform to this level. If not specified,
                                  defaults to :py:attr:`.MAX_SUPPORTED_VERSION`.
     """
-    labware = Labware(definition, parent, label, api_level)
+    labware = Labware(definition, parent, label,
+                      volume_by_well=volume_by_well, api_level=api_level)
     load_calibration(labware)
     return labware
 
@@ -1512,6 +1521,7 @@ def load(
     version: int = 1,
     bundled_defs: Dict[str, LabwareDefinition] = None,
     extra_defs: Dict[str, LabwareDefinition] = None,
+    volume_by_well: Dict[str, float] = None,
     api_level: APIVersion = None
 ) -> Labware:
     """
@@ -1536,6 +1546,8 @@ def load(
     :param extra_defs: If specified, a mapping of labware names to labware
         definitions. If no bundle is passed, these definitions will also be
         searched.
+    :param volume_by_well: If specified, a mapping of well names to well
+        starting volume. If no map is passed, all wells initialize to 0µL.
     :param APIVersion api_level: the API version to set for the loaded labware
                                  instance. The :py:class:`.Labware` will
                                  conform to this level. If not specified,
@@ -1545,4 +1557,4 @@ def load(
         load_name, namespace, version,
         bundled_defs=bundled_defs,
         extra_defs=extra_defs)
-    return load_from_definition(definition, parent, label, api_level)
+    return load_from_definition(definition, parent, label, volume_by_well, api_level)
