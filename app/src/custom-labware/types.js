@@ -64,3 +64,7 @@ export type CustomLabwareState = $ReadOnly<{|
 export type CustomLabwareAction =
   | {| type: 'labware:FETCH_CUSTOM_LABWARE', meta: {| shell: true |} |}
   | {| type: 'labware:CUSTOM_LABWARE', payload: Array<CheckedLabwareFile> |}
+  | {|
+      type: 'labware:CHANGE_CUSTOM_LABWARE_DIRECTORY',
+      meta: {| shell: true |},
+    |}

@@ -11,4 +11,9 @@ module.exports = {
     on: jest.fn(),
     send: jest.fn(),
   },
+
+  dialog: {
+    // https://electronjs.org/docs/api/dialog#dialogshowopendialogbrowserwindow-options
+    showOpenDialog: jest.fn(),
+  },
 }

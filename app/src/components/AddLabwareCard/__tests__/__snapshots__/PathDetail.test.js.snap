@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AddLabwareCard component renders 1`] = `
+<div
+  className="path_detail"
+>
+  <h4
+    className="path_detail_title"
+  >
+    Custom Labware Definitions Folder
+  </h4>
+  <InputField
+    onFocus={[Function]}
+    readOnly={true}
+    type="text"
+    value="/path/to/a/place"
+  />
+</div>
+`;

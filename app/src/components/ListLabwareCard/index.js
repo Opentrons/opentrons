@@ -5,14 +5,13 @@ import { useInterval } from '@opentrons/components'
 
 import ListCard from './ListCard'
 import LabwareItem from './LabwareItem'
-import { fetchCustomLabware } from '../../custom-labware/actions'
-import { getValidCustomLabware } from '../../custom-labware/selectors'
+import { fetchCustomLabware, getValidCustomLabware } from '../../custom-labware'
 
 import type { Dispatch } from '../../types'
 
 const LABWARE_REFRESH_INTERVAL_MS = 5000
 
-function ListLabwareCard() {
+export function ListLabwareCard() {
   const dispatch = useDispatch<Dispatch>()
   const validLabware = useSelector(getValidCustomLabware)
   const fetchLabware = React.useCallback(() => dispatch(fetchCustomLabware()), [
@@ -36,5 +35,3 @@ function ListLabwareCard() {
     </ListCard>
   )
 }
-
-export default ListLabwareCard

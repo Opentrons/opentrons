@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 
-import ListLabwareCard from '..'
+import { ListLabwareCard } from '..'
 import ListCard from '../ListCard'
 import LabwareItem from '../LabwareItem'
 import * as LabwareSelectors from '../../../custom-labware/selectors'
