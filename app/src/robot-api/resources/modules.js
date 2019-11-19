@@ -18,9 +18,9 @@ import {
   getRobotApiState,
   createBaseRobotApiEpic,
   passRobotApiResponseAction,
-  GET,
-  POST,
 } from '../utils'
+
+import { GET, POST } from '../constants'
 
 import { getConnectedRobot } from '../../discovery'
 import { selectors as robotSelectors } from '../../robot'

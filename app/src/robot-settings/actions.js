@@ -1,5 +1,5 @@
 // @flow
-import { GET, POST } from '../robot-api/utils'
+import { GET, POST } from '../robot-api/constants'
 
 import {
   FETCH_SETTINGS,

@@ -1,7 +1,6 @@
 // @flow
 // settings endpoints and client state
-import { of } from 'rxjs'
-import { switchMap } from 'rxjs/operators'
+import { map } from 'rxjs/operators'
 import { combineEpics, ofType } from 'redux-observable'
 
 import {
@@ -9,11 +8,11 @@ import {
   getRobotApiRequestState,
   createBaseRobotApiEpic,
   passRobotApiResponseAction,
-  GET,
-  PATCH,
 } from '../utils'
 
-import { fetchPipettes } from './pipettes'
+import { GET, PATCH } from '../constants'
+
+import { fetchPipettes } from '../../pipettes'
 
 import type { State as AppState, Action, ActionLike, Epic } from '../../types'
 import type {
@@ -63,9 +62,7 @@ const setPipetteSettingsEpic = createBaseRobotApiEpic(SET_PIPETTE_SETTINGS)
 const fetchPipettesForSettingsEpic: Epic = action$ =>
   action$.pipe(
     ofType(FETCH_PIPETTE_SETTINGS),
-    switchMap<RobotApiAction, _, RobotApiAction>(a =>
-      of(fetchPipettes(a.payload.host))
-    )
+    map<RobotApiAction, _, mixed>(a => fetchPipettes(a.payload.host.name))
   )
 
 export const settingsEpic = combineEpics(

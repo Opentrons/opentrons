@@ -1,6 +1,8 @@
 // @flow
 // hooks for components that depend on API state
-import { useRef, useEffect } from 'react'
+import { useReducer, useRef, useEffect, useCallback } from 'react'
+import { useDispatch } from 'react-redux'
+import uniqueId from 'lodash/uniqueId'
 import { usePrevious } from '@opentrons/components'
 
 import type { RobotApiResponse, RobotApiRequestState } from './types'
@@ -10,38 +12,7 @@ export type Handlers = $Shape<{
 }>
 
 /**
- * React hook to trigger a Robot API action dispatch and call handlers through
- * the lifecycle of the triggered request
- *
- * @param {() => mixed} trigger (function that dispatches robot API request action)
- * @param {RobotApiRequestState | null} requestState (lifecycle state subtree for given robot and request)
- * @param {Handlers} [handlers={}] (lifecycle handlers)
- * @returns {() => void} (function that will call `trigger`)
- *
- * @example
- * import {useDispatch, useSelector} from 'react-redux'
- * import type {State} from '../../types'
- * import {fetchPipettes, getPipettesRequestState} from '../../robot-api'
- *
- * type Props = { robot: Robot, goToNextScreen: () => mixed }
- *
- * function FetchPipettesButton(props: Props) {
- *   const { robot, goToNextScreen } = props
- *   const dispatch = useDispatch()
- *   const dispatchFetch = useCallback(() => {
- *     dispatch(fetchPipettes(props.robot))
- *   }, [robot])
- *   const requestState = useSelector(
- *    (state: State) => getPipettesRequestState(state, robot.name)
- *   )
- *   const triggerFetch = useTriggerRobotApiAction(
- *     dispatchFetch,
- *     requestState,
- *     { onFinish: props.proceed }
- *   )
- *
- *   return <button onClick={triggerFetch}>Check Pipettes</button>
- * }
+ * DEPRECATED - do not use
  */
 export function useTriggerRobotApiAction(
   trigger: () => mixed,
@@ -73,4 +44,53 @@ export function useTriggerRobotApiAction(
     hasFiredRef.current = true
     trigger()
   }
+}
+
+/**
+ * React hook to attach a unique request ID to and dispatch an API action
+ * Note: dispatching will trigger a re-render of the component
+ *
+ * @returns {[action => mixed, Array<string>]} tuple of dispatch function and dispatched request IDs
+ *
+ * @example
+ * import { useDispatchApiRequest } from '../../robot-api'
+ * import { fetchPipettes } from '../../pipettes'
+ *
+ * type Props = {| robotName: string |}
+ *
+ * export function FetchPipettesButton(props: Props) {
+ *   const { robotName } = props
+ *   const [dispatch, requestIds] = useDispatchApiRequest()
+ *
+ *   return (
+ *     <button onClick={() => dispatch(fetchPipettes(robotName))}>
+ *       Check Pipettes
+ *     </button>
+ *   )
+ * }
+ */
+export function useDispatchApiRequest<A: { meta: { requestId: string } }>(): [
+  (A) => void,
+  Array<string>
+] {
+  const dispatch = useDispatch<(A) => void>()
+
+  // TODO(mc, 2019-11-06): evaluate whether or not this can be a ref
+  const [requestIds, addRequestId] = useReducer<Array<string>, string>(
+    (ids, next) => [...ids, next],
+    []
+  )
+
+  const dispatchApiRequest = useCallback(
+    (a: A) => {
+      const requestId = uniqueId('robotApi_request_')
+      const action = { ...a, meta: { ...a.meta, requestId } }
+
+      addRequestId(requestId)
+      dispatch(action)
+    },
+    [dispatch]
+  )
+
+  return [dispatchApiRequest, requestIds]
 }

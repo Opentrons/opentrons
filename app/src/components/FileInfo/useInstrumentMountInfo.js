@@ -6,7 +6,7 @@ import {
   selectors as robotSelectors,
   constants as robotConstants,
 } from '../../robot'
-import { getPipettesState } from '../../robot-api'
+import { getAttachedPipettes } from '../../pipettes'
 import {
   getPipetteModelSpecs,
   getPipetteNameSpecs,
@@ -15,13 +15,16 @@ import {
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { State } from '../../types'
 import type { Pipette, Mount } from '../../robot/types'
-import type { Pipette as ActualPipette } from '../../robot-api/types'
+import type {
+  AttachedPipette,
+  AttachedPipettesByMount,
+} from '../../pipettes/types'
 
 export type PipetteCompatibility = 'match' | 'inexact_match' | 'incompatible'
 
 export type InstrumentMountInfo = {|
   actual: null | {|
-    ...ActualPipette,
+    ...AttachedPipette,
     displayName: string,
     modelSpecs: ?PipetteModelSpecs,
   |},
@@ -52,8 +55,8 @@ function useInstrumentMountInfo(
   const protocolInstruments = useSelector<State, Array<Pipette>>(
     robotSelectors.getPipettes
   )
-  const actualInstruments = useSelector(state =>
-    getPipettesState(state, robotName)
+  const actualInstruments = useSelector<State, AttachedPipettesByMount>(state =>
+    getAttachedPipettes(state, robotName)
   )
 
   const instrumentInfoByMount = PIPETTE_MOUNTS.reduce((acc, mount) => {

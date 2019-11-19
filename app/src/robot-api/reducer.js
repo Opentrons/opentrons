@@ -8,9 +8,11 @@ import {
   passRobotApiErrorAction,
 } from './utils'
 import { resourcesReducer } from './resources'
+import { PENDING, SUCCESS, FAILURE } from './constants'
 
 import type { Action } from '../types'
 import type {
+  RobotApiState,
   DeprecatedRobotApiState,
   RobotInstanceNetworkingState,
   RobotApiActionLike,
@@ -18,6 +20,7 @@ import type {
 
 const INITIAL_INSTANCE_STATE = { networking: {}, resources: {} }
 
+// TODO(mc, 2019-11-12): deprecated, remove when able
 function networkingReducer(
   state: RobotInstanceNetworkingState = INITIAL_INSTANCE_STATE.networking,
   action: RobotApiActionLike
@@ -40,6 +43,7 @@ function networkingReducer(
   return state
 }
 
+// TODO(mc, 2019-11-12): deprecated, remove when able
 export function deprecatedRobotApiReducer(
   state: DeprecatedRobotApiState = {},
   action: Action
@@ -56,6 +60,35 @@ export function deprecatedRobotApiReducer(
         networking: networkingReducer(stateByName.networking, apiAction),
         resources: resourcesReducer(stateByName.resources, apiAction),
       },
+    }
+  }
+
+  return state
+}
+
+export function robotApiReducer(
+  state: RobotApiState = {},
+  action: Action
+): RobotApiState {
+  const meta = action.meta ? action.meta : {}
+
+  if (meta.requestId != null) {
+    if (!meta.response) {
+      return { ...state, [meta.requestId]: { status: PENDING } }
+    }
+
+    if (meta.response.ok) {
+      return {
+        ...state,
+        [meta.requestId]: { status: SUCCESS, response: meta.response },
+      }
+    }
+
+    if (meta.response.ok === false) {
+      return {
+        ...state,
+        [meta.requestId]: { status: FAILURE, response: meta.response },
+      }
     }
   }
 

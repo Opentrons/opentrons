@@ -1,19 +1,14 @@
 // @flow
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import capitalize from 'lodash/capitalize'
 
-import { ModalPage, PrimaryButton } from '@opentrons/components'
-import {
-  getPipettesRequestState,
-  useTriggerRobotApiAction,
-} from '../../robot-api'
+import { ModalPage } from '@opentrons/components'
 import PipetteSelection from './PipetteSelection'
 import InstructionStep from './InstructionStep'
+import { CheckPipettesButton } from './CheckPipettesButton'
 import styles from './styles.css'
 
-import type { ButtonProps } from '@opentrons/components'
 import type { ChangePipetteProps } from './types'
 
 const ATTACH_CONFIRM = 'have robot check connection'
@@ -29,16 +24,6 @@ export default function Instructions(props: ChangePipetteProps) {
     displayName,
     goToConfirmUrl,
   } = props
-
-  // TODO(mc, 2019-06-19): move these up when parent uses hooks
-  const requestState = useSelector(state =>
-    getPipettesRequestState(state, robot.name)
-  )
-  const checkPipette = useTriggerRobotApiAction(
-    props.checkPipette,
-    requestState,
-    { onFinish: goToConfirmUrl }
-  )
 
   const heading = `${capitalize(direction)} ${displayName} Pipette`
   const titleBar = {
@@ -62,9 +47,13 @@ export default function Instructions(props: ChangePipetteProps) {
       {(actualPipette || wantedPipette) && (
         <div>
           <Steps {...props} />
-          <CheckButton onClick={checkPipette}>
+          <CheckPipettesButton
+            className={styles.check_pipette_button}
+            robotName={robot.name}
+            onDone={goToConfirmUrl}
+          >
             {actualPipette ? DETACH_CONFIRM : ATTACH_CONFIRM}
-          </CheckButton>
+          </CheckPipettesButton>
         </div>
       )}
     </ModalPage>
@@ -125,8 +114,4 @@ function Steps(props: ChangePipetteProps) {
       </InstructionStep>
     </div>
   )
-}
-
-function CheckButton(props: ButtonProps) {
-  return <PrimaryButton {...props} className={styles.check_pipette_button} />
 }

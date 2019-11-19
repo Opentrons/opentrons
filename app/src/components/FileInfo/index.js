@@ -32,7 +32,7 @@ export default function FileInfo(props: Props) {
   return (
     <div className={styles.file_info_container}>
       <InformationCard />
-      <ProtocolPipettesCard robot={robot} />
+      <ProtocolPipettesCard robotName={robot.name} />
       <ProtocolModulesCard robot={robot} />
       <ProtocolLabwareCard />
       {uploadError && <UploadError uploadError={uploadError} />}

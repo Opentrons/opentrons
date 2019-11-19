@@ -1,0 +1,168 @@
+// @flow
+import { TestScheduler } from 'rxjs/testing'
+
+import * as RobotApiHttp from '../../robot-api/http'
+import * as DiscoverySelectors from '../../discovery/selectors'
+import * as RobotSelectors from '../../robot/selectors'
+import * as Fixtures from '../__fixtures__'
+
+import * as Actions from '../actions'
+import * as Types from '../types'
+import { pipettesEpic } from '../epic'
+
+import type { Observable } from 'rxjs'
+import type {
+  RobotHost,
+  HostlessRobotApiRequest,
+  RobotApiResponse,
+} from '../../robot-api/types'
+
+jest.mock('../../robot-api/http')
+jest.mock('../../discovery/selectors')
+jest.mock('../../robot/selectors')
+
+const mockState = { state: true }
+const { mockRobot } = Fixtures
+
+const mockFetchRobotApi: JestMockFn<
+  [RobotHost, HostlessRobotApiRequest],
+  Observable<RobotApiResponse>
+> = RobotApiHttp.fetchRobotApi
+
+const mockGetRobotByName: JestMockFn<[any, string], mixed> =
+  DiscoverySelectors.getRobotByName
+
+const mockGetConnectedRobotName: JestMockFn<[any], ?string> =
+  RobotSelectors.getConnectedRobotName
+
+describe('pipettesEpic', () => {
+  let testScheduler
+
+  beforeEach(() => {
+    mockGetRobotByName.mockReturnValue(mockRobot)
+
+    testScheduler = new TestScheduler((actual, expected) => {
+      expect(actual).toEqual(expected)
+    })
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
+  describe('handles FETCH_PIPETTES', () => {
+    const meta = { requestId: '1234' }
+    const action: Types.FetchPipettesAction = {
+      ...Actions.fetchPipettes(mockRobot.name, true),
+      meta,
+    }
+
+    const expectedRequest = {
+      method: 'GET',
+      path: '/pipettes',
+      query: { refresh: true },
+    }
+
+    test('calls GET /pipettes', () => {
+      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
+        mockFetchRobotApi.mockReturnValue(
+          cold('r', { r: Fixtures.mockFetchPipettesSuccess })
+        )
+
+        const action$ = hot('--a', { a: action })
+        const state$ = hot('a-a', { a: mockState })
+        const output$ = pipettesEpic(action$, state$)
+
+        expectObservable(output$)
+        flush()
+
+        expect(mockGetRobotByName).toHaveBeenCalledWith(
+          mockState,
+          mockRobot.name
+        )
+        expect(mockFetchRobotApi).toHaveBeenCalledWith(
+          mockRobot,
+          expectedRequest
+        )
+      })
+    })
+
+    test('maps successful response to FETCH_PIPETTES_SUCCESS', () => {
+      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
+        mockFetchRobotApi.mockReturnValue(
+          cold('r', { r: Fixtures.mockFetchPipettesSuccess })
+        )
+
+        const action$ = hot('--a', { a: action })
+        const state$ = hot('a-a', { a: {} })
+        const output$ = pipettesEpic(action$, state$)
+
+        expectObservable(output$).toBe('--a', {
+          a: Actions.fetchPipettesSuccess(
+            mockRobot.name,
+            { left: null, right: Fixtures.mockAttachedPipette },
+            { ...meta, response: Fixtures.mockFetchPipettesSuccessMeta }
+          ),
+        })
+      })
+    })
+
+    test('maps failed response to FETCH_PIPETTES_FAILURE', () => {
+      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
+        mockFetchRobotApi.mockReturnValue(
+          cold('r', { r: Fixtures.mockFetchPipettesFailure })
+        )
+
+        const action$ = hot('--a', { a: action })
+        const state$ = hot('a-a', { a: {} })
+        const output$ = pipettesEpic(action$, state$)
+
+        expectObservable(output$).toBe('--a', {
+          a: Actions.fetchPipettesFailure(
+            mockRobot.name,
+            { message: 'AH' },
+            { ...meta, response: Fixtures.mockFetchPipettesFailureMeta }
+          ),
+        })
+      })
+    })
+  })
+
+  describe('handles robot:CONNECT_RESPONSE', () => {
+    test('dispatches nothing robot:CONNECT_RESPONSE failure', () => {
+      const action = {
+        type: 'robot:CONNECT_RESPONSE',
+        payload: { error: { message: 'AH' } },
+      }
+
+      mockGetConnectedRobotName.mockReturnValue(null)
+
+      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
+        const action$ = hot('--a', { a: action })
+        const state$ = hot('a--', { a: mockState })
+        const output$ = pipettesEpic(action$, state$)
+
+        expectObservable(output$).toBe('---')
+      })
+    })
+
+    test('dispatches FETCH_PIPETTES on robot:CONNECT_RESPONSE success', () => {
+      const action = {
+        type: 'robot:CONNECT_RESPONSE',
+        payload: {},
+      }
+
+      mockGetConnectedRobotName.mockReturnValue(mockRobot.name)
+
+      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
+        const action$ = hot('--a', { a: action })
+        const state$ = hot('a--', { a: mockState })
+        const output$ = pipettesEpic(action$, state$)
+
+        expectObservable(output$).toBe('--a', {
+          a: Actions.fetchPipettes(mockRobot.name),
+        })
+      })
+    })
+  })
+})

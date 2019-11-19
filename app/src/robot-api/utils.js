@@ -11,7 +11,6 @@ import { robotApiFetch } from './http'
 import type { Observable } from 'rxjs'
 import type { State, Epic, Action, ActionLike } from '../types'
 import type {
-  Method,
   RequestMeta,
   RobotApiRequest,
   RobotApiResponse,
@@ -24,15 +23,12 @@ import type {
   RobotApiRequestState,
 } from './types'
 
-export const GET: Method = 'GET'
-export const POST: Method = 'POST'
-export const PATCH: Method = 'PATCH'
-export const DELETE: Method = 'DELETE'
-
-export const ROBOT_API_ACTION_PREFIX = 'robotApi'
-export const ROBOT_API_REQUEST_PREFIX = `${ROBOT_API_ACTION_PREFIX}:REQUEST`
-export const ROBOT_API_RESPONSE_PREFIX = `${ROBOT_API_ACTION_PREFIX}:RESPONSE`
-export const ROBOT_API_ERROR_PREFIX = `${ROBOT_API_ACTION_PREFIX}:ERROR`
+import {
+  ROBOT_API_ACTION_PREFIX,
+  ROBOT_API_REQUEST_PREFIX,
+  ROBOT_API_RESPONSE_PREFIX,
+  ROBOT_API_ERROR_PREFIX,
+} from './constants'
 
 const robotApiRequest = (
   payload: RobotApiRequest,

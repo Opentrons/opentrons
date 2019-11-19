@@ -6,10 +6,12 @@ import type { RouterState, RouterAction } from 'connected-react-router'
 import type { Observable } from 'rxjs'
 
 import type {
-  DeprecatedRobotApiState,
+  RobotApiState,
   DeprecatedRobotApiAction,
+  DeprecatedRobotApiState,
 } from './robot-api/types'
 import type { RobotAdminState, RobotAdminAction } from './robot-admin/types'
+import type { PipettesState, PipettesAction } from './pipettes/types'
 import type {
   State as SuperDeprecatedRobotApiState,
   HttpApiAction as SuperDeprecatedRobotApiAction,
@@ -33,8 +35,10 @@ export type State = $ReadOnly<{|
   robot: RobotState,
   superDeprecatedRobotApi: SuperDeprecatedRobotApiState,
   deprecatedRobotApi: DeprecatedRobotApiState,
+  robotApi: RobotApiState,
   robotAdmin: RobotAdminState,
   robotSettings: RobotSettingsState,
+  pipettes: PipettesState,
   config: Config,
   discovery: DiscoveryState,
   labware: CustomLabwareState,
@@ -49,6 +53,7 @@ export type Action =
   | DeprecatedRobotApiAction
   | RobotAdminAction
   | RobotSettingsAction
+  | PipettesAction
   | ShellAction
   | ConfigAction
   | RouterAction
@@ -83,10 +88,17 @@ type ThunkDispatch = (thunk: ThunkAction) => ?Action
 
 type ThunkPromiseDispatch = (thunk: ThunkPromiseAction) => Promise<?Action>
 
+// regular, medium strict epic type
 export type Epic = (
   action$: Observable<Action>,
   state$: Observable<State>
 ) => Observable<mixed>
+
+// for when you need more strict epic typing
+export type StrictEpic<R: Action> = (
+  action$: Observable<Action>,
+  state$: Observable<State>
+) => Observable<R>
 
 // for when the strict typing of Action is too much
 export type LooseEpic = (
