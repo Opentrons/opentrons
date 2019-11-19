@@ -6,9 +6,9 @@
     "mix": "Mix content of wells",
     "pause": "OT-2 will pause before proceeding",
     "moveLiquid": "Move liquid",
-    "magnet": "Engage or disengage magnetic module",
-    "temperature": "TODO",
-    "thermocycler": "TODO"
+    "magnet": "Engage or disengage the magnetic module",
+    "temperature": "Set a temperature on a temperature module or a thermocycler",
+    "thermocycler": "Begin running a thermocycler profile"
   },
 
   "disabled_module_step": "Add a relevant module to use this step",
