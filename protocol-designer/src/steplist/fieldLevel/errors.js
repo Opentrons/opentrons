@@ -40,8 +40,6 @@ export const maxFieldValue = (maximum: number): ErrorChecker => (
 ): ?string =>
   value && Number(value) > maximum ? `Must be greater than ${maximum}` : null
 
-// ^ like above... && Number(value)
-
 /*******************
  **     Helpers    **
  ********************/

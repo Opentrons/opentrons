@@ -142,6 +142,8 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
       minFieldValue(-4.0),
       maxFieldValue(16)
     ),
+    maskValue: composeMaskers(maskToFloat, defaultTo(4)),
+    castValue: Number,
   },
 }
 

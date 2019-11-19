@@ -23,7 +23,7 @@ export const maskToFloat = (rawValue: mixed): ?mixed => {
   if (!rawValue) return Number(rawValue)
   const rawNumericValue =
     typeof rawValue === 'string'
-      ? rawValue.replace(/[^.0-9]/, '')
+      ? rawValue.replace(/[^-/.0-9]/, '')
       : String(rawValue)
   const trimRegex = new RegExp(
     `(\\d*[.]{1}\\d{${DEFAULT_DECIMAL_PLACES}})(\\d*)`
