@@ -24,10 +24,30 @@ Configuration values will be determined by:
 4.  If no value in `config.json`, default value from code will be used
     - Default value will also be written to `config.json`
 
+#### format
+
+Configuration values may be specified via:
+
+- A CLI argument of the format `--configName.nestedValue`
+- An environment variable of the format `OT_APP_CONFIG_NAME__NESTed_VALUE`
+- The configuration JSON file with the path `configName.nestedValue`
+
 **If overriding boolean values**:
 
 - For CLI arguments, use `--value` for true, and `--disable_value` for false
 - For environment variables, use `OT_APP_VALUE=1` for true, and `OT_APP_VALUE=0` for false
+
+#### feature flags
+
+During development, we develop new features behind "feature flags", so that we can continue to release software while keeping anything that's still a work-in-progress safely disabled.
+
+The feature flags are part of the configuration under the path `devInternal`. To enable a feature flag, set the configuration value to true:
+
+- CLI: `--devInternal.nameOfFlag`
+- Environment variable: `OT_APP_DEV_INTERNAL__NAME_OF_FLAG`
+- Configuration JSON: `devInteral.nameOfFlag`
+
+The app also presents UI for enabling these flags when the [`devtools`](#devtools) setting is enabled.
 
 #### overriding config for end-users
 
@@ -69,30 +89,39 @@ The easiest way to override config on Windows is to modify the Opentrons desktop
 
 ##### devtools
 
-- CLI argument: `--devtools` or `--disable_devtools`
+- CLI argument: `--devtools`
 - Environment variable: `OT_APP_DEVTOOLS`
 - JSON path: `devtools`
 - Default: `false`
 
-Enables and opens the Chrome devtools.
+Enables and opens the Chrome devtools with the React and Redux devtools extensions installed.
 
-##### modules
+##### reinstallDevtools
 
-- CLI argument: `--modules` or `--disable_modules`
-- Environment variable: `OT_APP_MODULES`
-- JSON path: `modules`
+- CLI argument: `--reinstallDevtools`
+- Environment variable: `OT_APP_REINSTALL_DEVTOOLS`
+- JSON path: `reinstallDevtools`
 - Default: `false`
 
-Enables experimental support for [Opentrons Modules](http://opentrons.com/modules).
+Forces the devtools extensions to be re-installed. Make sure you enable **both** `-devtools` and `--reinstallDevtools`
 
 ##### update.channel
 
-- CLI argument: `--channel`
+- CLI argument: `--update.channel`
 - Environment variable: `OT_APP_UPDATE__CHANNEL`
 - JSON path: `update.channel`
 - Default: `"latest"`
 
 Sets the app's self-update channel. Options are `alpha`, `beta`, or `latest`. `alpha` is the least tested/stable, followed by `beta`, followed by `latest`. `alpha` and `beta` get new features earlier than `latest`.
+
+##### buildroot.manifestUrl
+
+- CLI argument: `--buildroot.manifestUrl`
+- Environment variable: `OT_APP_BUILDROOT__MANIFEST_URL`
+- JSON path: `buildroot.manifestUrl`
+- Default: `"https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json"`
+
+Sets the file that the app checks for its corresponding robot update.
 
 ##### log.level.file
 
@@ -224,10 +253,22 @@ Email of app user to populate "Email" in support conversations.
 
 - CLI argument: `--discovery.candidates`
 - Environment variable: `OT_APP_DISCOVERY__CANDIDATES`
-- JSON path: `--discovery.candidates`
+- JSON path: `discovery.candidates`
 - Default: `[]`
 
 `string` or `Array<string>` of extra IP address(es)/hosts for the discovery client to track. For example, to get the discovery client to find an instance of the API server running on your own computer, you could do `--discovery.candidates=localhost`.
+
+##### labware.directory
+
+- CLI argument: `--labware.directory`
+- Environment variable: `OT_APP_LABWARE__DIRECTORY`
+- JSON path: `labware.directory`
+- Default:
+  - `%APPDATA%\Opentrons\labware` on Windows
+  - `~/.config/Opentrons/labware` on Linux
+  - `~/Library/Application Support/Opentrons/labware` on macOS
+
+Folder that the app stores and retrieves custom labware definitions from
 
 ### logging
 
@@ -323,29 +364,29 @@ There are a series of tasks designed to be run in CI to create distributable ver
 
 ```shell
 # Create a macOS distributable of the app
-make dist-osx OT_BUCKET_APP=opentrons-app OT_FOLDER_APP=builds
+make dist-osx OT_APP_DEPLOY_BUCKET=opentrons-app OT_APP_DEPLOY_FOLDER=builds
 
 # Create a Linux distributable of the app
-make dist-linux OT_BUCKET_APP=opentrons-app OT_FOLDER_APP=builds
+make dist-linux OT_APP_DEPLOY_BUCKET=opentrons-app OT_APP_DEPLOY_FOLDER=builds
 
 # Create macOS and Linux apps simultaneously
-make dist-posix OT_BUCKET_APP=opentrons-app OT_FOLDER_APP=builds
+make dist-posix OT_APP_DEPLOY_BUCKET=opentrons-app OT_APP_DEPLOY_FOLDER=builds
 
 # Create a Windows distributable of the app
-make dist-win OT_BUCKET_APP=opentrons-app OT_FOLDER_APP=builds
+make dist-win OT_APP_DEPLOY_BUCKET=opentrons-app OT_APP_DEPLOY_FOLDER=builds
 ```
 
 These tasks use the following environment variables defined:
 
 <!-- TODO(mc, 2018-05-16): update bucket / folder vars to use config prefix -->
 
-| name          | description   | required | description                            |
-| ------------- | ------------- | -------- | -------------------------------------- |
-| OT_BUCKET_APP | AWS S3 bucket | yes      | Artifact deploy bucket                 |
-| OT_FOLDER_APP | AWS S3 folder | yes      | Artifact deploy folder in bucket       |
-| OT_BRANCH     | Branch name   | no       | Sometimes added to the artifact name   |
-| OT_BUILD      | Build number  | no       | Appended to the artifact name          |
-| OT_TAG        | Tag name      | no       | Flags autoupdate files to be published |
+| name                 | description   | required | description                            |
+| -------------------- | ------------- | -------- | -------------------------------------- |
+| OT_APP_DEPLOY_BUCKET | AWS S3 bucket | yes      | Artifact deploy bucket                 |
+| OT_APP_DEPLOY_FOLDER | AWS S3 folder | yes      | Artifact deploy folder in bucket       |
+| OT_BRANCH            | Branch name   | no       | Sometimes added to the artifact name   |
+| OT_BUILD             | Build number  | no       | Appended to the artifact name          |
+| OT_TAG               | Tag name      | no       | Flags autoupdate files to be published |
 
 The release channel is set according to the version string:
 

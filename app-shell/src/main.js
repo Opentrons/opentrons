@@ -1,5 +1,6 @@
 // electron main entry point
-import { app, dialog, ipcMain, Menu } from 'electron'
+import { app, ipcMain } from 'electron'
+import contextMenu from 'electron-context-menu'
 
 import createUi from './ui'
 import initializeMenu from './menu'
@@ -39,6 +40,9 @@ function startUp() {
   rendererLogger = createRendererLogger()
 
   mainWindow.once('closed', () => (mainWindow = null))
+
+  if (config.devtools) installDevtools()
+  contextMenu({ showInspectElement: config.devtools })
   initializeMenu()
 
   // wire modules to UI dispatches
@@ -61,12 +65,6 @@ function startUp() {
     actionHandlers.forEach(handler => handler(action))
   })
 
-  if (config.devtools) {
-    installAndOpenExtensions().catch(error =>
-      dialog.showErrorBox('Error opening dev tools', error)
-    )
-  }
-
   log.silly('Global references', { mainWindow, rendererLogger })
 }
 
@@ -79,28 +77,22 @@ function createRendererLogger() {
   return logger
 }
 
-function installAndOpenExtensions() {
+function installDevtools() {
   const devtools = require('electron-devtools-installer')
-  const forceDownload = !!process.env.UPGRADE_EXTENSIONS
-  const install = devtools.default
   const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS']
+  const install = devtools.default
+  const forceReinstall = config.reinstallDevtools
 
   return Promise.all(
-    extensions.map(name => install(devtools[name], forceDownload))
+    extensions.map(name => {
+      return install(devtools[name], forceReinstall)
+        .then(() => log.debug('Devtools extension installed', { name }))
+        .catch(e =>
+          log.warn('Failed to install devtools extension', {
+            name,
+            forceReinstall,
+          })
+        )
+    })
   )
-    .then(() => {
-      mainWindow.webContents.on('context-menu', (_, props) => {
-        const { x, y } = props
-
-        Menu.buildFromTemplate([
-          {
-            label: 'Inspect element',
-            click: () => mainWindow.inspectElement(x, y),
-          },
-        ]).popup(mainWindow)
-      })
-    })
-    .catch(error => {
-      log.warn('Unable to install devtools', { error })
-    })
 }

@@ -27,6 +27,7 @@
     "@thi.ng/paths": "^1.6.5",
     "ajv": "^6.10.2",
     "dateformat": "^3.0.3",
+    "electron-context-menu": "^0.15.1",
     "electron-debug": "^3.0.1",
     "electron-devtools-installer": "^2.2.4",
     "electron-dl": "^1.14.0",

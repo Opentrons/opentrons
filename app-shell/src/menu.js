@@ -2,6 +2,7 @@
 import { Menu } from 'electron'
 
 import pkg from '../package.json'
+import { LOG_DIR } from './log'
 
 // file or application menu
 const firstMenu = {
@@ -21,6 +22,12 @@ const helpMenu = {
       label: 'Learn More',
       click: () => {
         require('electron').shell.openExternal('https://opentrons.com/')
+      },
+    },
+    {
+      label: `View ${pkg.productName} App logs`,
+      click: () => {
+        require('electron').shell.openItem(LOG_DIR)
       },
     },
     {

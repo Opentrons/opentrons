@@ -31,6 +31,7 @@ const PARSE_ARGS_OPTS = {
 // TODO(mc, 2018-05-25): future config changes may require migration strategy
 const DEFAULTS: Config = {
   devtools: false,
+  reinstallDevtools: false,
 
   // app update config
   update: {
@@ -109,9 +110,9 @@ export function registerConfig(dispatch: Dispatch) {
       log().debug('Handling config:UPDATE', payload)
 
       if (getIn(overrides(), payload.path) != null) {
-        log().info(`${payload.path} in overrides; not updating`)
+        log().debug(`${payload.path} in overrides; not updating`)
       } else {
-        log().info(`Updating "${payload.path}" to ${payload.value}`)
+        log().debug(`Updating "${payload.path}" to ${payload.value}`)
         store().set(payload.path, payload.value)
         dispatch({ type: 'config:SET', payload })
       }
