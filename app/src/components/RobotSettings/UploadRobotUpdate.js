@@ -2,8 +2,8 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 
+import { LabeledButton } from '@opentrons/components'
 import { startBuildrootUpdate } from '../../shell'
-import { LabeledButton } from '../controls'
 import styles from './styles.css'
 
 import type { Dispatch } from '../../types'

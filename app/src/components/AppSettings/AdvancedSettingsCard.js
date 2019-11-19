@@ -13,8 +13,14 @@ import {
   toggleDevInternalFlag,
   DEV_INTERNAL_FLAGS,
 } from '../../config'
-import { Card } from '@opentrons/components'
-import { LabeledToggle, LabeledSelect, LabeledButton } from '../controls'
+
+import {
+  Card,
+  LabeledToggle,
+  LabeledSelect,
+  LabeledButton,
+} from '@opentrons/components'
+
 import AddManualIp from './AddManualIp'
 
 import type { ContextRouter } from 'react-router-dom'

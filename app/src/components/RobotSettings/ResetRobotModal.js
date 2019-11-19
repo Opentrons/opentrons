@@ -14,9 +14,8 @@ import {
 } from '../../http-api-client'
 import { restartRobot } from '../../robot-admin'
 
-import { AlertModal } from '@opentrons/components'
+import { AlertModal, LabeledCheckbox } from '@opentrons/components'
 import { Portal } from '../portal'
-import { LabeledCheckbox } from '../controls'
 
 type OP = {|
   robot: RobotService,
