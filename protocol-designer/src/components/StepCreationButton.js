@@ -13,7 +13,6 @@ import {
 } from '../step-forms'
 import { stepIconsByType, type StepType } from '../form-types'
 import type { BaseState, ThunkDispatch } from '../types'
-// import type { InitialDeckSetup } from '../step-forms'
 import styles from './listButtons.css'
 
 type SP = {|
