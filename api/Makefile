@@ -96,10 +96,10 @@ test: local-install test-apiv2 test-apiv1
 	$(python)	-m twine check $(wheel_file)
 
 test-apiv2: local-install
-	OT_API_FF_useProtocolApi2=1 $(pytest) $(tests) $(test_opts) -m "not apiv1 and not api1_only"
+	OT_API_FF_useLegacyInternals=0 $(pytest) $(tests) $(test_opts) -m "not apiv1 and not api1_only"
 
 test-apiv1: local-install
-	OT_API_FF_useProtocolApi2=0 $(pytest) $(tests) $(test_opts) -m "not apiv2 and not api2_only"
+	OT_API_FF_useLegacyInternals=1 $(pytest) $(tests) $(test_opts) -m "not apiv2 and not api2_only"
 
 .PHONY: lint
 lint: $(ot_py_sources)

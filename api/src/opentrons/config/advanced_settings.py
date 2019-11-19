@@ -70,14 +70,6 @@ settings = [
         description='Prevent robot from homing motors on boot'
     ),
     Setting(
-        _id='useProtocolApi2',
-        title='Use Protocol API version 2',
-        description='Enable to use the Protocol API V2 Beta. With this flag '
-                    'set, only Protocol API v2 protocols can be executed by '
-                    'the robot. A restart of the robot is required.',
-        restart_required=True
-    ),
-    Setting(
         _id='useOldAspirationFunctions',
         title='Use older pipette calibrations',
         description='Use the older pipette calibrations for P10S, P10M, P50S,'
@@ -85,6 +77,14 @@ settings = [
                     ' default aspirate behavior (ul to mm conversion) to '
                     ' function as it did prior to version 3.7.0. '
                     ' NOTE: this does not impact GEN2 pipettes'
+    ),
+    Setting(
+        _id='useLegacyInternals',
+        title='Use Protocol API V1 Internals',
+        description='Enable to go back to the Protocol API V1 internals in '
+        'the robot server. This allows protocols that relied on those '
+        'internals to work properly.',
+        restart_required=True
     )
 ]
 
@@ -228,7 +228,21 @@ def _migrate2to3(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
-_MIGRATIONS = [_migrate0to1, _migrate1to2, _migrate2to3]
+def _migrate3to4(previous: SettingsMap) -> SettingsMap:
+    """
+    Migration to version 4 of the feature flags file. Removes
+    the enableApi1BackCompat and useProtocolApi2 config elements
+    and adds a useLegacyInternals config element, which has the
+    opposite sense to useProtocolApi2.
+    """
+    newmap = {k: v for k, v in previous.items()
+              if k not in [
+                      'enableApi1BackCompat', 'useProtocolApi2']}
+    newmap['useLegacyInternals'] = None
+    return newmap
+
+
+_MIGRATIONS = [_migrate0to1, _migrate1to2, _migrate2to3, _migrate3to4]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
 for how the migration functions are applied. Each migration function should

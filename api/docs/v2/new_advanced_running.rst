@@ -92,7 +92,7 @@ Bundled protocols have all their labware definitions available to them inside th
 
 Bundled protocols also have any data files they may need available to them inside the bundle. Similarly to labware, if you change what data files you read inside the protocol you should rebundle it.
 
-Bundled protocols are created using ``opentrons_simulate``. The protocol must be an APIv2 protocol, and ``opentrons_simulate`` must be running in APIv2 mode. The easiest way to do this is to specify it with the environment variable ``OT_API_FF_useProtocolApi2=1``. You can specify this every time you run ``opentrons_simulate`` on Linux or Mac, or put it in your shell rc file; on Windows, you can set it in the environment variables dialog.
+Bundled protocols are created using ``opentrons_simulate``. The protocol must be an APIv2 protocol, and ``opentrons_simulate`` must be running in APIv2 mode. This is now the default (unless you have passed ``-i v1``).
 
 To bundle, use the ``-b`` option to ``opentrons_simulate``. **If the ``-b`` option is not available, it is because you have not set the APIv2 feature flag**. This will simulate the protocol, then (if successful) bundle the protocol file, all required labware definitions, and any specified data file into a zip suitable for use with the Opentrons app or the ``opentrons_execute`` script. If you are using custom data files or custom labware definitions, you must ensure that these files and definitions are available to ``opentrons_simulate``.
 
