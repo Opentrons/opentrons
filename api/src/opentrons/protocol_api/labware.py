@@ -84,6 +84,7 @@ class Well:
                  parent: Location,
                  display_name: str,
                  has_tip: bool,
+                 starting_volume: float = None,
                  api_level: APIVersion) -> None:
         """
         Create a well, and track the Point corresponding to the top-center of
@@ -111,6 +112,7 @@ class Well:
             raise ValueError("Wells must have a parent")
         self._parent = parent.labware
         self._has_tip = has_tip
+        self._volume = starting_volume if starting_volume else 0
         self._shape = well_shapes.get(well_props['shape'])
         if self._shape is WellShape.RECTANGULAR:
             self._length = well_props['xDimension']
@@ -154,6 +156,14 @@ class Well:
     @property
     def display_name(self):
         return self._display_name
+
+    @property
+    def volume(self):
+        return self._volume
+
+    @volume.setter
+    def volume(self, value: float):
+        self._volume = value
 
     @requires_version(2, 0)
     def top(self, z: float = 0.0) -> Location:
@@ -279,6 +289,7 @@ class Labware(DeckItem):
     def __init__(
             self, definition: dict,
             parent: Location, label: str = None,
+            volume_by_well: Dict[str, float] = None,
             api_level: APIVersion = None) -> None:
         """
         :param definition: A dict representing all required data for a labware,
@@ -317,6 +328,8 @@ class Labware(DeckItem):
         self._display_name = "{} on {}".format(dn, str(parent.labware))
         self._calibrated_offset: Point = Point(0, 0, 0)
         self._wells: List[Well] = []
+        self._volume_by_well: Dict[str, float] = \
+                volume_by_well if volume_by_well is not None else {}
         # Directly from definition
         self._well_definition = definition['wells']
         self._parameters = definition['parameters']
@@ -398,13 +411,15 @@ class Labware(DeckItem):
         accessor functions. It is only called again if a new offset needs
         to be applied.
         """
+
         return [
             Well(
-                self._well_definition[well],
-                Location(self._calibrated_offset, self),
-                "{} of {}".format(well, self._display_name),
-                self._is_tiprack,
-                self._api_version)
+                well_props=self._well_definition[well],
+                parent=Location(self._calibrated_offset, self),
+                display_name="{} of {}".format(well, self._display_name),
+                has_tip=self._is_tiprack,
+                starting_volume=self._volume_by_well[well]
+                api_level=self._api_version)
             for well in self._ordering]
 
     def _create_indexed_dictionary(self, group=0):
@@ -598,6 +613,11 @@ class Labware(DeckItem):
             'columns_by_index is deprecated and will be deleted in version '
             '3.12.0. please use columns_by_name')
         return self.columns_by_name()
+
+    @property
+    def volume_by_well(self) -> Dict[str, float]:
+        """ as is_tiprack but not subject to version checking for speed """
+        return {well.display_name: well.volume for well in self.wells}
 
     @property  # type: ignore
     @requires_version(2, 0)
