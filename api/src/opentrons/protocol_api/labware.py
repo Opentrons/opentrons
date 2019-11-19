@@ -349,7 +349,7 @@ class Labware(DeckItem):
         self._parent = parent.labware
         # Applied properties
         self._update_calibrated_offset(self._calibrated_offset)
-        self._build_wells(volume_by_well)
+        self._wells = self._build_wells(volume_by_well)
 
         self._pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
         self._definition = definition

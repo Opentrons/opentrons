@@ -2239,6 +2239,7 @@ class ThermocyclerContext(ModuleContext):
             self._ctx._hw_manager.hardware.retract(instr._mount)
             high_point = self._ctx._hw_manager.hardware.current_position(
                     instr._mount)
+            MODULE_LOG.info(f'\nself._ctx.fixed_trash:  {self._ctx.fixed_trash.wells()}')
             trash_top = self._ctx.fixed_trash.wells()[0].top()
             safe_point = trash_top.point._replace(
                     z=high_point[Axis.by_mount(instr._mount)])
@@ -2305,6 +2306,9 @@ class ThermocyclerContext(ModuleContext):
         """
         if self.labware and self.labware.volume_by_well:
             block_volume = max(self.labware.volume_by_well.values())
+
+            MODULE_LOG.info(f'\n vbw{self.labware.volume_by_well}')
+            MODULE_LOG.info(f'\nblock vol: {block_volume}')
         else:
             block_volume = None
         return self._module.set_temperature(
