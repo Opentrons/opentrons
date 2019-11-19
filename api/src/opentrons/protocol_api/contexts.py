@@ -837,6 +837,8 @@ class InstrumentContext(CommandPublisher):
         cmds.do_publish(self.broker, cmds.aspirate, self.aspirate,
                         'before', None, None, self, volume, dest, rate)
         self._hw_manager.hardware.aspirate(self._mount, volume, rate)
+        if isinstance(location, Well):
+            location.volume = location.volume - volume
         cmds.do_publish(self.broker, cmds.aspirate, self.aspirate,
                         'after', self, None, self, volume, dest, rate)
         return self
@@ -916,13 +918,11 @@ class InstrumentContext(CommandPublisher):
                 "aspirate) must previously have been called so the robot "
                 "knows where it is.")
 
-        for mod in self._ctx._modules:
-            if isinstance(mod, ThermocyclerContext):
-                mod.track_block_well_volume(loc=location)
-
         cmds.do_publish(self.broker, cmds.dispense, self.dispense,
                         'before', None, None, self, volume, loc, rate)
         self._hw_manager.hardware.dispense(self._mount, volume, rate)
+        if isinstance(location, Well):
+            location.volume = location.volume + volume
         cmds.do_publish(self.broker, cmds.dispense, self.dispense,
                         'after', self, None, self, volume, loc, rate)
         return self
@@ -1032,6 +1032,8 @@ class InstrumentContext(CommandPublisher):
                 "dispense) must previously have been called so the robot "
                 "knows where it is.")
         self._hw_manager.hardware.blow_out(self._mount)
+        if isinstance(location, Well):
+            location.volume = location.volume + self.current_volume
         return self
 
     @cmds.publish.both(command=cmds.touch_tip)
@@ -2236,17 +2238,6 @@ class ThermocyclerContext(ModuleContext):
                     z=high_point[Axis.by_mount(instr._mount)])
             instr.move_to(types.Location(safe_point, None), force_direct=True)
 
-    def track_block_well_volume(self, loc: types.Location, volume: float):
-        lw, well = geometry.split_loc_labware(loc)
-        if self.labware is lw:
-            existing_wells = [bw.well for bw in self.block_wells
-                                if bw.well == well]
-            if existing_wells:
-                block_well_volume = BlockWellVolume(well=well, volume=volume)
-            else:
-                self.block_wells.append(
-                        BlockWellVolume(well=well, volume=volume))
-
     def flag_unsafe_move(self,
                          to_loc: types.Location,
                          from_loc: types.Location):
@@ -2306,8 +2297,8 @@ class ThermocyclerContext(ModuleContext):
             specified, the Thermocycler will proceed to the next command
             after ``temperature`` is reached.
         """
-        if self.labware.:
-            block_volume =
+        if self.labware.volume_by_well:
+            block_volume = max(self.labware.volume_by_well.values())
         else:
             block_volume = None
         return self._module.set_temperature(
