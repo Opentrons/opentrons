@@ -25,7 +25,7 @@ const helpMenu = {
       },
     },
     {
-      label: `View ${pkg.productName} App logs`,
+      label: `View ${pkg.productName} App Logs`,
       click: () => {
         require('electron').shell.openItem(LOG_DIR)
       },
