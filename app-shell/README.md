@@ -29,7 +29,7 @@ Configuration values will be determined by:
 Configuration values may be specified via:
 
 - A CLI argument of the format `--configName.nestedValue`
-- An environment variable of the format `OT_APP_CONFIG_NAME__NESTed_VALUE`
+- An environment variable of the format `OT_APP_CONFIG_NAME__NESTED_VALUE`
 - The configuration JSON file with the path `configName.nestedValue`
 
 **If overriding boolean values**:
