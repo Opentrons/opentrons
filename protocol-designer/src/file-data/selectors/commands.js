@@ -121,37 +121,29 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
   }
 )
 
-// TODO IMMEDIATELY: remove
-// function compoundCommandCreatorFromStepArgs(
-//   stepArgs: StepGeneration.CommandCreatorArgs
-// ): ?StepGeneration.CompoundCommandCreator {
-//   switch (stepArgs.commandCreatorFnName) {
-//     case 'consolidate':
-//       return StepGeneration.consolidate(stepArgs)
-//     case 'delay': {
-//       // TODO(Ian 2019-01-29): homogenize compound vs non-compound command
-//       // creator type, maybe flow will get un-confused here
-//       // TODO(mc, 2019-04-09): these typedefs should probably be exact objects
-//       // (like redux actions) to have this switch block behave
-//       return prevRobotState => [
-//         // TODO: Ian 2019-04-18 this is a HACK the make delay work here, until compound vs non-compound cc types are merged
-//         (invariantContext, prevRobotState) =>
-//           // $FlowFixMe: TODOs above ^^^
-//           StepGeneration.delay(stepArgs)(invariantContext, prevRobotState),
-//       ]
-//     }
-//     case 'distribute':
-//       return StepGeneration.distribute(stepArgs)
-//     case 'transfer':
-//       return StepGeneration.transfer(stepArgs)
-//     case 'mix':
-//       return StepGeneration.mix(stepArgs)
-//   }
-//   console.warn(
-//     `unhandled commandCreatorFnName: ${stepArgs.commandCreatorFnName}`
-//   )
-//   return null
-// }
+const commandCreatorFromStepArgs = (
+  args: StepGeneration.CommandCreatorArgs
+): StepGeneration.CurriedCommandCreator | null => {
+  switch (args.commandCreatorFnName) {
+    case 'consolidate': {
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.consolidate,
+        args
+      )
+    }
+    case 'delay': {
+      return StepGeneration.curryCommandCreator(StepGeneration.delay, args)
+    }
+    case 'distribute':
+      return StepGeneration.curryCommandCreator(StepGeneration.distribute, args)
+    case 'transfer':
+      return StepGeneration.curryCommandCreator(StepGeneration.transfer, args)
+    case 'mix':
+      return StepGeneration.curryCommandCreator(StepGeneration.mix, args)
+  }
+  console.warn(`unhandled commandCreatorFnName: ${args.commandCreatorFnName}`)
+  return null
+}
 
 // exposes errors and last valid robotState
 export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSelector(
@@ -235,30 +227,21 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
     //   []
     // )
 
-    const curriedCommandCreators = allStepArgs.reduce(
+    // TODO IMMEDIATELY add pack in the auto-tip functionality commented out above
+
+    const curriedCommandCreators = continuousStepArgs.reduce(
       (
         acc: Array<StepGeneration.CurriedCommandCreator>,
         args: StepGeneration.CommandCreatorArgs,
         idx
       ): Array<StepGeneration.CurriedCommandCreator> => {
-        switch (args.commandCreatorFnName) {
-          case 'consolidate': {
-            return [
-              ...acc,
-              StepGeneration.curryCommandCreator(
-                StepGeneration.consolidate,
-                args
-              ),
-            ]
-          }
-        }
-        return acc
+        const c = commandCreatorFromStepArgs(args)
+        return c === null ? acc : [...acc, c]
       },
       []
     )
 
     const timeline = StepGeneration.commandCreatorsTimelineNext(
-      // TODO IMMEDIATELY write this fn
       curriedCommandCreators
     )(invariantContext, initialRobotState)
 

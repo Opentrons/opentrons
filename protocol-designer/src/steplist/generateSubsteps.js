@@ -1,4 +1,5 @@
 // @flow
+import assert from 'assert'
 import cloneDeep from 'lodash/cloneDeep'
 import range from 'lodash/range'
 import mapValues from 'lodash/mapValues'
@@ -18,7 +19,13 @@ import type {
   StepItemSourceDestRow,
 } from './types'
 
-import { consolidate, distribute, transfer, mix } from '../step-generation'
+import {
+  consolidate,
+  distribute,
+  transfer,
+  mix,
+  curryCommandCreator,
+} from '../step-generation'
 
 import type { StepIdType } from '../form-types'
 import type { InvariantContext, RobotState } from '../step-generation'
@@ -54,7 +61,8 @@ function transferLikeSubsteps(args: {|
 
   // TODO Ian 2018-04-06 use assert here
   if (!pipetteSpec) {
-    console.warn(
+    assert(
+      false,
       `Pipette "${pipetteId}" does not exist, step ${stepId} can't determine channels`
     )
     return null
@@ -75,10 +83,7 @@ function transferLikeSubsteps(args: {|
       preWetTip: false,
     }
 
-    substepCommandCreators = transfer(commandCallArgs)(
-      invariantContext,
-      robotState
-    )
+    substepCommandCreators = curryCommandCreator(transfer, commandCallArgs)
   } else if (stepArgs.commandCreatorFnName === 'distribute') {
     const commandCallArgs = {
       ...stepArgs,
@@ -86,10 +91,7 @@ function transferLikeSubsteps(args: {|
       preWetTip: false,
     }
 
-    substepCommandCreators = distribute(commandCallArgs)(
-      invariantContext,
-      robotState
-    )
+    substepCommandCreators = curryCommandCreator(distribute, commandCallArgs)
   } else if (stepArgs.commandCreatorFnName === 'consolidate') {
     const commandCallArgs = {
       ...stepArgs,
@@ -98,12 +100,9 @@ function transferLikeSubsteps(args: {|
       preWetTip: false,
     }
 
-    substepCommandCreators = consolidate(commandCallArgs)(
-      invariantContext,
-      robotState
-    )
+    substepCommandCreators = curryCommandCreator(consolidate, commandCallArgs)
   } else if (stepArgs.commandCreatorFnName === 'mix') {
-    substepCommandCreators = mix(stepArgs)(invariantContext, robotState)
+    substepCommandCreators = curryCommandCreator(mix, stepArgs)
   } else {
     // TODO Ian 2018-05-21 Use assert here. Should be unreachable
     console.warn(
@@ -116,8 +115,11 @@ function transferLikeSubsteps(args: {|
   if (pipetteSpec.channels > 1) {
     const substepRows: Array<SubstepTimelineFrame> = substepTimeline(
       substepCommandCreators,
+      invariantContext,
+      robotState,
       pipetteSpec.channels
-    )(invariantContext, robotState)
+    )
+
     const mergedMultiRows: Array<
       Array<StepItemSourceDestRow>
     > = steplistUtils.mergeWhen(

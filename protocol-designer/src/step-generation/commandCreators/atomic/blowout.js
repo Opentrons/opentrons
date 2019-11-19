@@ -52,21 +52,6 @@ const blowout: NextCommandCreator<BlowoutParams> = (
 
   return {
     commands,
-    // TODO IMMEDIATELY: do this is forBlowout state updater!
-    // import updateLiquidState from '../../dispenseUpdateLiquidState'
-    //   robotState: {
-    //     ...prevRobotState,
-    //     liquidState: updateLiquidState(
-    //       {
-    //         invariantContext,
-    //         pipetteId: pipette,
-    //         labwareId: labware,
-    //         useFullVolume: true,
-    //         well,
-    //       },
-    //       prevRobotState.liquidState
-    //     ),
-    //   },
   }
 }
 

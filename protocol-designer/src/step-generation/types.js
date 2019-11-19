@@ -150,17 +150,17 @@ export type MixArgs = {
   dispenseFlowRateUlSec: number,
 }
 
-export type PauseArgs = {
+export type PauseArgs = {|
   ...$Exact<CommonArgs>,
   commandCreatorFnName: 'delay',
   message?: string,
   wait: number | true,
-  meta: ?{
+  meta: ?{|
     hours?: number,
     minutes?: number,
     seconds?: number,
-  },
-}
+  |},
+|}
 
 export type CommandCreatorArgs =
   | ConsolidateArgs

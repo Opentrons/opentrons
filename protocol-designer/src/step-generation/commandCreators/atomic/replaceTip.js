@@ -1,5 +1,4 @@
 // @flow
-import cloneDeep from 'lodash/cloneDeep'
 import { getNextTiprack } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
 import dropTip from './dropTip'
@@ -42,9 +41,7 @@ const replaceTip: NextCommandCreator<ReplaceTipArgs> = (
   prevRobotState
 ) => {
   const { pipette } = args
-  let robotState = cloneDeep(prevRobotState)
-
-  const nextTiprack = getNextTiprack(pipette, invariantContext, robotState)
+  const nextTiprack = getNextTiprack(pipette, invariantContext, prevRobotState)
 
   if (!nextTiprack) {
     // no valid next tip / tiprack, bail out
@@ -63,23 +60,14 @@ const replaceTip: NextCommandCreator<ReplaceTipArgs> = (
   }
 
   const commandCreators: Array<CurriedCommandCreator> = [
-    ...curryCommandCreator(dropTip, { pipette }),
-    ...curryCommandCreator(_pickUpTip, {
+    curryCommandCreator(dropTip, { pipette }),
+    curryCommandCreator(_pickUpTip, {
       pipette,
       tiprack: nextTiprack.tiprackId,
       well: nextTiprack.well,
     }),
   ]
 
-  // TODO IMMEDIATELY: handle robot state updates via getNextRobotState
-
-  // robotState = dropTipResult.robotState
-
-  // pipette now has tip
-  // robotState.tipState.pipettes[pipette] = true
-
-  // TODO: Ian 2019-04-18 make this robotState tipState mutation a result of
-  // processing JSON commands, not done inside a command creator
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
   if (!pipetteSpec)
     return {
@@ -103,29 +91,11 @@ const replaceTip: NextCommandCreator<ReplaceTipArgs> = (
       ],
     }
   }
-  // remove tips from tiprack
-  if (pipetteSpec.channels === 1 && nextTiprack.well) {
-    robotState.tipState.tipracks[nextTiprack.tiprackId][
-      nextTiprack.well
-    ] = false
-  }
-  if (pipetteSpec.channels === 8) {
-    const allWells = labwareDef.ordering.find(
-      col => col[0] === nextTiprack.well
-    )
-    if (!allWells) {
-      // TODO Ian 2018-04-30 return {errors}, don't throw
-      throw new Error('Invalid well: ' + nextTiprack.well) // TODO: test
-    }
-    allWells.forEach(function(well) {
-      robotState.tipState.tipracks[nextTiprack.tiprackId][well] = false
-    })
-  }
 
   return reduceCommandCreatorsNext(
     commandCreators,
     invariantContext,
-    robotState
+    prevRobotState
   )
 }
 

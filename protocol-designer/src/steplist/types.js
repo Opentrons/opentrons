@@ -37,6 +37,7 @@ export type SourceDestData = {
   postIngreds: WellIngredientVolumeData,
 }
 
+// TODO IMMEDIATELY: remove this, it's duplicated in ui/steps/types.js
 export type SubstepTimelineFrame = {
   substepIndex?: number,
   activeTips: ?TipLocation,

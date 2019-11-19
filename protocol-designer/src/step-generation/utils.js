@@ -12,6 +12,7 @@ import {
   getWellsDepth,
   getWellNamePerMultiTip,
 } from '@opentrons/shared-data'
+import { getNextRobotStateAndWarnings } from './getNextRobotStateAndWarnings'
 import { GEN_ONE_MULTI_PIPETTES } from '../constants'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -32,6 +33,7 @@ import type {
   NextCommandCreator,
   NextCommandCreatorResult,
   CurriedCommandCreator,
+  RobotStateAndWarnings,
 } from './types'
 import blowout from './commandCreators/atomic/blowout'
 
@@ -149,14 +151,56 @@ export const reduceCommandCreatorsNext = (
   return { commands: result.commands, warnings: result.warnings }
 }
 
-export const commandCreatorsTimeline = (
-  commandCreators: Array<CommandCreator>
+// TODO IMMEDIATELY remove this & rename commandCreatorsTimelineNext to commandCreatorsTimeline
+// export const commandCreatorsTimeline = (
+//   commandCreators: Array<CommandCreator>
+// ) => (
+//   invariantContext: InvariantContext,
+//   initialRobotState: RobotState
+// ): Timeline => {
+//   const timeline = commandCreators.reduce(
+//     (acc: Timeline, commandCreator: CommandCreator, index: number) => {
+//       const prevRobotState =
+//         acc.timeline.length === 0
+//           ? initialRobotState
+//           : last(acc.timeline).robotState
+
+//       if (acc.errors) {
+//         // error short-circuit
+//         return acc
+//       }
+
+//       const nextResult = commandCreator(invariantContext, prevRobotState)
+
+//       if (nextResult.errors) {
+//         return {
+//           timeline: acc.timeline,
+//           errors: nextResult.errors,
+//         }
+//       }
+
+//       return {
+//         timeline: [...acc.timeline, nextResult],
+//         errors: null,
+//       }
+//     },
+//     { timeline: [], errors: null }
+//   )
+
+//   return {
+//     timeline: timeline.timeline,
+//     errors: timeline.errors,
+//   }
+// }
+
+export const commandCreatorsTimelineNext = (
+  commandCreators: Array<CurriedCommandCreator>
 ) => (
   invariantContext: InvariantContext,
   initialRobotState: RobotState
 ): Timeline => {
   const timeline = commandCreators.reduce(
-    (acc: Timeline, commandCreator: CommandCreator, index: number) => {
+    (acc: Timeline, commandCreator: CurriedCommandCreator, index: number) => {
       const prevRobotState =
         acc.timeline.length === 0
           ? initialRobotState
@@ -167,15 +211,34 @@ export const commandCreatorsTimeline = (
         return acc
       }
 
-      const nextResult = commandCreator(invariantContext, prevRobotState)
+      const commandCreatorResult = commandCreator(
+        invariantContext,
+        prevRobotState
+      )
 
-      if (nextResult.errors) {
+      if (commandCreatorResult.errors) {
         return {
           timeline: acc.timeline,
-          errors: nextResult.errors,
+          errors: commandCreatorResult.errors,
         }
       }
 
+      const commands = commandCreatorResult.commands
+      const nextRobotStateAndWarnings = commands.reduce(
+        (acc: RobotStateAndWarnings, command) =>
+          getNextRobotStateAndWarnings(
+            command,
+            invariantContext,
+            acc.robotState
+          ),
+        { robotState: prevRobotState, warnings: [] }
+      )
+      const nextResult = {
+        commands: commandCreatorResult.commands,
+        robotState: nextRobotStateAndWarnings.robotState,
+      }
+
+      // TODO IMMEDIATELY allow warnings in timeline frames
       return {
         timeline: [...acc.timeline, nextResult],
         errors: null,
