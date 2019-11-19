@@ -35,8 +35,8 @@ export const maskToFloat = (rawValue: mixed): ?mixed => {
  **  Value Limiters  **
  **********************/
 // NOTE: these are often preceded by a Value Caster when composed via composeMaskers
-// in practive they will always take parameters of one type (e.g. `(value: number)`)
-// For the sake of simplicity and flow happiness, they are equiped to deal with parameters of type `mixed`
+// in practice they will always take parameters of one type (e.g. `(value: string)`)
+// For the sake of simplicity and flow happiness, they are equipped to deal with parameters of type `mixed`
 
 export const onlyPositiveNumbers = (value: mixed) =>
   value && Number(value) >= 0 ? value : null
