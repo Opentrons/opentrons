@@ -4,6 +4,7 @@ from typing import Any, Dict, Optional, TYPE_CHECKING
 from opentrons.hardware_control import adapters, API
 from .util import log_call
 from .types import LegacyLocation
+from .containers_wrapper import LegacyDeckItem
 
 
 if TYPE_CHECKING:
@@ -79,6 +80,9 @@ class Robot():
         self._bc_instr: Optional['BCInstruments'] = None
         self._bc_lw: Optional['Containers'] = None
         self._bc_mods: Optional['BCModules'] = None
+
+        self._deck = {
+            str(k): LegacyDeckItem('normal') for k in self._ctx.deck.keys()}
 
     def _set_globals(
             self, instr: 'BCInstruments', lw: 'Containers', mod: 'BCModules'):
@@ -209,8 +213,14 @@ class Robot():
         return self._ctx.disconnect()
 
     @property
-    def deck(self) -> 'Deck':
-        return self._ctx.deck
+    def deck(self) -> Dict[str, LegacyDeckItem]:
+        for k, v in self._ctx.deck.items():
+            if v is not None:
+                self._deck[str(k)].add_item(v)
+            if not self._deck[str(k)].origins:
+                self._deck[str(k)].update_origins(
+                    self._ctx.deck.position_for(k))
+        return self._deck
 
     @property
     def fixed_trash(self) -> 'Labware':

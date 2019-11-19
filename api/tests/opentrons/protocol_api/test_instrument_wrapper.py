@@ -1179,3 +1179,63 @@ def test_distribute(
     assert legacy_mock.method_calls
     assert common_method_calls(new_mock.method_calls)\
         == common_method_calls(legacy_mock.method_calls)
+
+
+@pytest.mark.api2_only
+def test_move_to_deck(
+        monkeypatch, instruments, labware, load_v1_instrument,
+        load_bc_instrument):
+    robot, legacy_instr, legacy_lw = load_v1_instrument
+    new_robot, new_instr, new_lw = load_bc_instrument
+
+    robot.home()
+    new_robot.home()
+
+    new_actual_move = new_instr._ctx._hw_manager.hardware._api._backend.move
+
+    def new_passthru(*args, **kwargs):
+        new_actual_move(*args, **kwargs)
+    new_move = mock.Mock()
+    new_move.side_effect = new_passthru
+    monkeypatch.setattr(
+        new_instr._ctx._hw_manager.hardware._api._backend, 'move', new_move)
+
+    legacy_actual_move = robot._driver.move
+
+    def legacy_passthru(*args, **kwargs):
+        legacy_actual_move(*args, **kwargs)
+    legacy_move = mock.Mock()
+    legacy_move.side_effect = legacy_passthru
+    monkeypatch.setattr(robot._driver, 'move', legacy_move)
+
+    # home position -> deck should be three moves
+    legacy_instr.move_to(robot.deck['11'])
+    new_instr.move_to(new_robot.deck['11'])
+
+    assert len(new_move.call_args_list) == 3
+    assert len(legacy_move.call_args_list) == len(new_move.call_args_list)
+    for legacy_call, new_call in zip(
+            legacy_move.call_args_list, new_move.call_args_list):
+        largs, lkwargs = legacy_call
+        nargs, nkwargs = new_call
+        common_lpos, common_npos = get_common_axes(largs[0], nargs[0])
+        assert common_lpos == common_npos
+
+    legacy_move.reset_mock()
+    new_move.reset_mock()
+
+    # home position -> deck should be three moves
+    legacy_instr.move_to(robot.deck['3'])
+    new_instr.move_to(new_robot.deck['3'])
+
+    assert len(new_move.call_args_list) == 3
+    assert len(legacy_move.call_args_list) == len(new_move.call_args_list)
+    # ignore the first position. The z safe height in v1 is 20 mm while that
+    # of v2 is 10 mm, we are keeping this to accommodate the thermocycler and
+    # pipett GEN2 comboination
+    for legacy_call, new_call in zip(
+            legacy_move.call_args_list[1:], new_move.call_args_list[1:]):
+        largs, lkwargs = legacy_call
+        nargs, nkwargs = new_call
+        common_lpos, common_npos = get_common_axes(largs[0], nargs[0])
+        assert common_lpos == common_npos

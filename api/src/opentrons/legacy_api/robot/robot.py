@@ -628,7 +628,6 @@ class Robot(CommandPublisher):
 
             ``direct`` : move to the point in a straight line.
         """
-
         placeable, coordinates = containers.unpack_location(location)
 
         # because the top position is what is tracked,

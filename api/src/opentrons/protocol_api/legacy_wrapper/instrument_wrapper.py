@@ -11,7 +11,8 @@ from ..util import Clearances, clamp_value
 
 from .types import LegacyLocation
 
-from .containers_wrapper import LegacyLabware, LegacyWell, WellSeries
+from .containers_wrapper import (LegacyLabware, LegacyWell,
+                                 WellSeries, LegacyDeckItem)
 
 if TYPE_CHECKING:
     from ..contexts import InstrumentContext # noqa(F401)
@@ -267,7 +268,7 @@ class Pipette:
         return self
 
     def move_to(self,
-                location: MotionTarget,
+                location: Union[MotionTarget, LegacyDeckItem],
                 strategy: str = None):
         """
         Move this :any:`Pipette` to a location.
@@ -282,9 +283,13 @@ class Pipette:
                              in a straight line from the current position
         :returns Pipette: This instance.
         """
-
-        placeable = location\
-            if isinstance(location, LegacyWell) else location.labware
+        if not isinstance(location, LegacyDeckItem):
+            placeable = location\
+                if isinstance(location, LegacyWell) else location.labware
+            absolute_location = _absolute_motion_target(location, 'top')
+        else:
+            placeable = location.origins.labware
+            absolute_location = location.origins
 
         force_direct = False
         if strategy == 'direct' or (
@@ -294,7 +299,6 @@ class Pipette:
         if not self.placeables or (placeable != self.placeables[-1]):
             self.placeables.append(placeable)
 
-        absolute_location = _absolute_motion_target(location, 'top')
         return self._instr_ctx.move_to(location=absolute_location,
                                        force_direct=force_direct)
 
