@@ -143,12 +143,6 @@ def old_aspiration(monkeypatch):
         'useOldAspirationFunctions', False)
 
 
-@pytest.fixture
-def enable_apiv1_backcompat(monkeypatch):
-    config.advanced_settings.set_adv_setting('enableApi1BackCompat', True)
-    yield
-    config.advanced_settings.set_adv_setting('enableApi1BackCompat', False)
-
 # -----end feature flag fixtures-----------
 
 

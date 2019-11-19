@@ -76,11 +76,6 @@ async def test_get(async_client):
     body = await resp.json()
     assert resp.status == 200
     validate_response_body(body)
-    if async_client.app['api_version'] == 2:
-        assert 'enableApi1BackCompat' in [s['id'] for s in body['settings']]
-    else:
-        assert 'enableApi1BackCompat' not in [
-            s['id'] for s in body['settings']]
 
 
 async def test_set(virtual_smoothie_env, loop, async_client):

@@ -6,9 +6,8 @@ import pytest
 from opentrons import simulate, protocols
 
 
-@pytest.mark.api2_only
 @pytest.mark.parametrize('protocol_file', ['testosaur_v2.py'])
-def test_simulate_function_apiv2(ensure_api2,
+def test_simulate_function_apiv2(singletons,
                                  protocol,
                                  protocol_file):
     runlog, bundle = simulate.simulate(
@@ -22,9 +21,7 @@ def test_simulate_function_apiv2(ensure_api2,
         ]
 
 
-@pytest.mark.api2_only
-def test_simulate_function_json_apiv2(ensure_api2,
-                                      get_json_protocol_fixture):
+def test_simulate_function_json_apiv2(singletons, get_json_protocol_fixture):
     jp = get_json_protocol_fixture('3', 'simple', False)
     filelike = io.StringIO(jp)
     runlog, bundle = simulate.simulate(filelike, 'simple.json')
@@ -41,8 +38,7 @@ def test_simulate_function_json_apiv2(ensure_api2,
 
 
 @pytest.mark.api2_only
-def test_simulate_function_bundle_apiv2(ensure_api2,
-                                        get_bundle_fixture):
+def test_simulate_function_bundle_apiv2(singletons, get_bundle_fixture):
     bundle = get_bundle_fixture('simple_bundle')
     runlog, bundle = simulate.simulate(
         bundle['filelike'], 'simple_bundle.zip')
@@ -66,10 +62,29 @@ def test_simulate_function_bundle_apiv2(ensure_api2,
         ]
 
 
-@pytest.mark.api1_only
 @pytest.mark.parametrize('protocol_file', ['testosaur.py'])
-def test_simulate_function_apiv1(ensure_api1, protocol, protocol_file):
+def test_simulate_function_apiv1(singletons, protocol, protocol_file):
     runlog, bundle = simulate.simulate(protocol.filelike, 'testosaur.py')
+    assert bundle is None
+    assert runlog[0]['payload']['text'].startswith('Picking up tip')
+    assert 'A1' in runlog[0]['payload']['text']
+    assert runlog[1]['payload']['text'].startswith('Aspirating 10 uL')
+    assert 'A1' in runlog[1]['payload']['text']
+    assert runlog[2]['payload']['text'].startswith('Dispensing 10 uL')
+    assert 'H12' in runlog[2]['payload']['text']
+    assert runlog[3]['payload']['text'].startswith('Aspirating 10 uL')
+    assert 'A1' in runlog[3]['payload']['text']
+    assert runlog[4]['payload']['text'].startswith('Dispensing 10 uL')
+    assert 'H12' in runlog[4]['payload']['text']
+    assert runlog[5]['payload']['text'].startswith('Dropping tip')
+    assert 'A1' in runlog[5]['payload']['text']
+    assert len(runlog) == 6
+
+
+@pytest.mark.parametrize('protocol_file', ['testosaur.py'])
+def test_simulate_function_force_v1(singletons, protocol, protocol_file):
+    runlog, bundle = simulate.simulate(protocol.filelike, 'testosaur.py',
+                                       force_v1=True)
     assert bundle is None
     assert [item['payload']['text'] for item in runlog] == [
         'Picking up tip well A1 in "5"',

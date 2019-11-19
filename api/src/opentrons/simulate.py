@@ -188,11 +188,12 @@ def bundle_from_sim(
 
 def simulate(protocol_file: TextIO,
              file_name: str,
-             custom_labware_paths=None,
-             custom_data_paths=None,
-             propagate_logs=False,
-             log_level='warning') -> Tuple[List[Mapping[str, Any]],
-                                           Optional[BundleContents]]:
+             custom_labware_paths: List[str] = None,
+             custom_data_paths: List[str] = None,
+             propagate_logs: bool = False,
+             log_level: str = 'warning',
+             force_v1: bool = False) -> Tuple[List[Mapping[str, Any]],
+                                              Optional[BundleContents]]:
     """
     Simulate the protocol itself.
 
@@ -249,6 +250,11 @@ def simulate(protocol_file: TextIO,
     :param log_level: The level of logs to capture in the runlog. Default:
                       ``'warning'``
     :type log_level: 'debug', 'info', 'warning', or 'error'
+    :param bool force_v1: If ``True``, use API V1 internals. This prevents
+                          simulation of V2 protocols, but allows the use of
+                          undocumented, private, or internal API V1
+                          interactions. This parameter may be specified on
+                          the command line as ``-i v1``.
     :returns: A tuple of a run log for user output, and possibly the required
               data to write to a bundle to bundle this protocol. The bundle is
               only emitted if the API v2 feature flag is set and this is an
@@ -270,26 +276,23 @@ def simulate(protocol_file: TextIO,
     protocol = parse.parse(contents, file_name,
                            extra_labware=extra_labware,
                            extra_data=extra_data)
+    bundle_contents:  Optional[BundleContents] = None
 
-    if isinstance(protocol, JsonProtocol)\
-            or protocol.api_level >= APIVersion(2, 0)\
-            or (ff.enable_back_compat() and ff.use_protocol_api_v2()):
-        context = get_protocol_api(
-            getattr(protocol, 'api_level', MAX_SUPPORTED_VERSION),
-            bundled_labware=getattr(protocol, 'bundled_labware', None),
-            bundled_data=getattr(protocol, 'bundled_data', None))
-        scraper = CommandScraper(stack_logger, log_level, context.broker)
-        execute.run_protocol(protocol, context)
-        if isinstance(protocol, PythonProtocol)\
-           and protocol.bundled_labware is None:
-            bundle_contents: Optional[BundleContents] = bundle_from_sim(
-                protocol, context)
-        else:
-            bundle_contents = None
-    else:
-
+    if force_v1:
         def _simulate_v1():
-            import opentrons.legacy_api.protocols
+            import opentrons.legacy_api
+            import opentrons.legacy_api.api
+            if not hasattr(opentrons, 'robot'):
+                setattr(opentrons, 'instruments',
+                        opentrons.legacy_api.api.instruments)
+                setattr(opentrons, 'containers',
+                        opentrons.legacy_api.api.containers)
+                setattr(opentrons, 'labware',
+                        opentrons.legacy_api.api.containers)
+                setattr(opentrons, 'robot',
+                        opentrons.legacy_api.api.robot)
+                setattr(opentrons, 'modules',
+                        opentrons.legacy_api.api.modules)
             opentrons.robot.disconnect()
             scraper = CommandScraper(stack_logger, log_level,
                                      opentrons.robot.broker)
@@ -300,7 +303,18 @@ def simulate(protocol_file: TextIO,
             return scraper
 
         scraper = _simulate_v1()
-        bundle_contents = None
+    else:
+        context = get_protocol_api(
+            getattr(protocol, 'api_level', MAX_SUPPORTED_VERSION),
+            bundled_labware=getattr(protocol, 'bundled_labware', None),
+            bundled_data=getattr(protocol, 'bundled_data', None))
+        scraper = CommandScraper(stack_logger, log_level, context.broker)
+        execute.run_protocol(protocol, context)
+        if isinstance(protocol, PythonProtocol)\
+           and protocol.api_level >= APIVersion(2, 0)\
+           and protocol.bundled_labware is None:
+            bundle_contents = bundle_from_sim(
+                protocol, context)
 
     return scraper.commands, bundle_contents
 
@@ -413,6 +427,17 @@ def get_arguments(
         help='What to output during simulations',
         choices=['runlog', 'nothing'],
         default='runlog')
+    parser.add_argument(
+        '-i', '--internals',
+        choices=['v1', 'v2'],
+        default='v2',
+        help='Specify the internals to use when executing the protocol. v2 '
+        'means execute protocols that request API V2 using V2, and protocols '
+        'that request API V1 using the V1 back-compat shim. If you have a '
+        'protocol that uses undocumented, private, or internal capabilities '
+        'that are not present in the backcompat layer, you can specify v1 to '
+        'use the old internals.'
+    )
     return parser
 
 
@@ -456,7 +481,8 @@ def main() -> int:
         getattr(args, 'custom_labware_path', []),
         getattr(args, 'custom_data_path', [])
         + getattr(args, 'custom_data_file', []),
-        log_level=args.log_level)
+        log_level=args.log_level,
+        force_v1=(args.internals == 'v1'))
 
     if maybe_bundle:
         bundle_name = getattr(args, 'bundle', None)

@@ -85,15 +85,6 @@ settings = [
                     ' default aspirate behavior (ul to mm conversion) to '
                     ' function as it did prior to version 3.7.0. '
                     ' NOTE: this does not impact GEN2 pipettes'
-    ),
-    Setting(
-        _id='enableApi1BackCompat',
-        title='Enable APIv1 Back-Compat Execution',
-        description='Use the under-development capability to execute APIv1 '
-                    'protocols using the APIv2 server. Do not set this unless '
-                    'you are a developer or testing; it is not yet feature '
-                    'complete.',
-        show_if=('useProtocolApi2', True)
     )
 ]
 
