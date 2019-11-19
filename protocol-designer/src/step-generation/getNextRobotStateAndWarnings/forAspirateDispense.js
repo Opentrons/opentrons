@@ -31,11 +31,11 @@ type PipetteLiquidStateAcc = {
 }
 
 export default function getNextRobotStateAndWarningsForAspDisp(
-  args: AspirateParams | DispenseParams,
+  params: AspirateParams | DispenseParams,
   invariantContext: InvariantContext,
   prevRobotState: RobotState
 ): RobotStateAndWarnings {
-  const { pipette: pipetteId, volume, labware: labwareId } = args
+  const { pipette: pipetteId, volume, labware: labwareId } = params
 
   const { liquidState: prevLiquidState } = prevRobotState
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
@@ -44,7 +44,7 @@ export default function getNextRobotStateAndWarningsForAspDisp(
   const { allWellsShared, wellsForTips } = getWellsForTips(
     pipetteSpec.channels,
     labwareDef,
-    args.well
+    params.well
   )
 
   // helper to avoid writing this twice

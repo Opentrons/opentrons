@@ -114,7 +114,7 @@ function transferLikeSubsteps(args: {|
   // Multichannel substeps
   if (pipetteSpec.channels > 1) {
     const substepRows: Array<SubstepTimelineFrame> = substepTimeline(
-      substepCommandCreators,
+      [substepCommandCreators], // TODO IMMEDIATELY remove substepTimeline's array feature?
       invariantContext,
       robotState,
       pipetteSpec.channels
@@ -205,9 +205,11 @@ function transferLikeSubsteps(args: {|
     }
   } else {
     // single channel
-    const substepRows = substepTimeline(substepCommandCreators, 1)(
+    const substepRows = substepTimeline(
+      [substepCommandCreators],
       invariantContext,
-      robotState
+      robotState,
+      1
     )
 
     const mergedRows: Array<StepItemSourceDestRow> = steplistUtils.mergeWhen(

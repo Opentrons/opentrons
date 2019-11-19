@@ -242,8 +242,10 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
     )
 
     const timeline = StepGeneration.commandCreatorsTimelineNext(
-      curriedCommandCreators
-    )(invariantContext, initialRobotState)
+      curriedCommandCreators,
+      invariantContext,
+      initialRobotState
+    )
 
     return timeline
   }

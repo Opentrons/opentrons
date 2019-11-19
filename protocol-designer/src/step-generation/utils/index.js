@@ -1,44 +1,40 @@
 // @flow
 import assert from 'assert'
-import cloneDeep from 'lodash/cloneDeep'
 import flatMap from 'lodash/flatMap'
 import mapValues from 'lodash/mapValues'
 import range from 'lodash/range'
 import reduce from 'lodash/reduce'
-import last from 'lodash/last'
 import {
   getIsTiprack,
   getLabwareDefURI,
   getWellsDepth,
   getWellNamePerMultiTip,
 } from '@opentrons/shared-data'
-import { getNextRobotStateAndWarnings } from './getNextRobotStateAndWarnings'
-import { GEN_ONE_MULTI_PIPETTES } from '../constants'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { BlowoutParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+import type { PipetteEntity, LabwareEntity } from '../../step-forms'
 import type {
-  Command,
-  BlowoutParams,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type { PipetteEntity, LabwareEntity } from '../step-forms'
-import type {
-  CommandCreator,
   LocationLiquidState,
   InvariantContext,
   RobotState,
   SourceAndDest,
-  Timeline,
-  CommandCreatorError,
-  CommandCreatorWarning,
-  NextCommandCreator,
-  NextCommandCreatorResult,
   CurriedCommandCreator,
-  RobotStateAndWarnings,
-} from './types'
-import blowout from './commandCreators/atomic/blowout'
+} from '../types'
+import { commandCreatorsTimelineNext } from './commandCreatorsTimelineNext'
+import { curryCommandCreator } from './curryCommandCreator'
+import { reduceCommandCreatorsNext } from './reduceCommandCreators'
+import { modulePipetteCollision } from './modulePipetteCollision'
+import blowout from '../commandCreators/atomic/blowout'
 
 import { AIR } from '@opentrons/components'
 export { AIR }
+export {
+  commandCreatorsTimelineNext,
+  curryCommandCreator,
+  reduceCommandCreatorsNext,
+  modulePipetteCollision,
+}
 
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
 export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
@@ -47,109 +43,44 @@ export function repeatArray<T>(array: Array<T>, repeats: number): Array<T> {
   return flatMap(range(repeats), (i: number): Array<T> => array)
 }
 
-/** Curry a command creator so its args are baked-in,
- * but it is still open to receiving different input states */
-export const curryCommandCreator = <Args>(
-  commandCreator: NextCommandCreator<Args>,
-  args: Args
-): CurriedCommandCreator => (_invariantContext, _prevRobotState) =>
-  commandCreator(args, _invariantContext, _prevRobotState)
-
+// TODO IMMEDIATELY: DELETE!
 /**
  * Take an array of CommandCreators, streaming robotState through them in order,
  * and adding each CommandCreator's commands to a single commands array.
  */
-export const reduceCommandCreators = (
-  commandCreators: Array<CommandCreator>
-): CommandCreator => (
-  invariantContext: InvariantContext,
-  prevRobotState: RobotState
-) => {
-  return commandCreators.reduce(
-    (prev: $Call<CommandCreator, *, *>, reducerFn: CommandCreator, stepIdx) => {
-      if (prev.errors) {
-        // if there are errors, short-circuit the reduce
-        return prev
-      }
-      const next = reducerFn(invariantContext, prev.robotState)
-      if (next.errors) {
-        return {
-          robotState: prev.robotState,
-          commands: prev.commands,
-          errors: next.errors,
-          errorStep: stepIdx,
-          warnings: prev.warnings,
-        }
-      }
-      return {
-        robotState: next.robotState,
-        commands: [...prev.commands, ...next.commands],
-        warnings: [...(prev.warnings || []), ...(next.warnings || [])],
-      }
-    },
-    { robotState: cloneDeep(prevRobotState), commands: [] }
-    // TODO: should I clone here (for safety) or is it safe enough?
-    // Should I avoid cloning in the CommandCreators themselves and just do it pre-emptively in here?
-  )
-}
-
-type CCReducerAcc = {|
-  robotState: RobotState,
-  commands: Array<Command>,
-  errors: Array<CommandCreatorError>,
-  errorStep: ?number,
-  warnings: Array<CommandCreatorWarning>,
-|}
-export const reduceCommandCreatorsNext = (
-  commandCreators: Array<CurriedCommandCreator>,
-  invariantContext: InvariantContext,
-  initialRobotState: RobotState
-): NextCommandCreatorResult => {
-  const result = commandCreators.reduce(
-    (
-      prev: CCReducerAcc,
-      reducerFn: CurriedCommandCreator,
-      stepIdx
-    ): CCReducerAcc => {
-      if (prev.errors.length > 1) {
-        // if there are errors, short-circuit the reduce
-        return prev
-      }
-      const next = reducerFn(invariantContext, prev.robotState)
-      if (next.errors) {
-        return {
-          robotState: prev.robotState,
-          commands: prev.commands,
-          errors: next.errors,
-          errorStep: stepIdx,
-          warnings: prev.warnings,
-        }
-      }
-
-      const allCommands = [...prev.commands, ...next.commands]
-      // TODO IMMEDIATELY use getNextRobotState things
-      // const nextRobotState = getNextRobotStateForCommands(initialRobotState, allCommands)
-      const nextRobotState = prev.robotState // TODO IMMEDIATELY: HACK! barely functional
-      return {
-        ...prev,
-        robotState: nextRobotState,
-        commands: allCommands,
-        warnings: [...(prev.warnings || []), ...(next.warnings || [])],
-      }
-    },
-    {
-      robotState: cloneDeep(initialRobotState),
-      commands: [],
-      errors: [],
-      errorStep: null,
-      warnings: [],
-    }
-  )
-  if (result.errors.length > 1) {
-    return { errors: result.errors }
-  }
-  return { commands: result.commands, warnings: result.warnings }
-}
+// export const reduceCommandCreators = (
+//   commandCreators: Array<CommandCreator>
+// ): CommandCreator => (
+//   invariantContext: InvariantContext,
+//   prevRobotState: RobotState
+// ) => {
+//   return commandCreators.reduce(
+//     (prev: $Call<CommandCreator, *, *>, reducerFn: CommandCreator, stepIdx) => {
+//       if (prev.errors) {
+//         // if there are errors, short-circuit the reduce
+//         return prev
+//       }
+//       const next = reducerFn(invariantContext, prev.robotState)
+//       if (next.errors) {
+//         return {
+//           robotState: prev.robotState,
+//           commands: prev.commands,
+//           errors: next.errors,
+//           errorStep: stepIdx,
+//           warnings: prev.warnings,
+//         }
+//       }
+//       return {
+//         robotState: next.robotState,
+//         commands: [...prev.commands, ...next.commands],
+//         warnings: [...(prev.warnings || []), ...(next.warnings || [])],
+//       }
+//     },
+//     { robotState: cloneDeep(prevRobotState), commands: [] }
+//     // TODO: should I clone here (for safety) or is it safe enough?
+//     // Should I avoid cloning in the CommandCreators themselves and just do it pre-emptively in here?
+//   )
+// }
 
 // TODO IMMEDIATELY remove this & rename commandCreatorsTimelineNext to commandCreatorsTimeline
 // export const commandCreatorsTimeline = (
@@ -192,66 +123,6 @@ export const reduceCommandCreatorsNext = (
 //     errors: timeline.errors,
 //   }
 // }
-
-export const commandCreatorsTimelineNext = (
-  commandCreators: Array<CurriedCommandCreator>
-) => (
-  invariantContext: InvariantContext,
-  initialRobotState: RobotState
-): Timeline => {
-  const timeline = commandCreators.reduce(
-    (acc: Timeline, commandCreator: CurriedCommandCreator, index: number) => {
-      const prevRobotState =
-        acc.timeline.length === 0
-          ? initialRobotState
-          : last(acc.timeline).robotState
-
-      if (acc.errors) {
-        // error short-circuit
-        return acc
-      }
-
-      const commandCreatorResult = commandCreator(
-        invariantContext,
-        prevRobotState
-      )
-
-      if (commandCreatorResult.errors) {
-        return {
-          timeline: acc.timeline,
-          errors: commandCreatorResult.errors,
-        }
-      }
-
-      const commands = commandCreatorResult.commands
-      const nextRobotStateAndWarnings = commands.reduce(
-        (acc: RobotStateAndWarnings, command) =>
-          getNextRobotStateAndWarnings(
-            command,
-            invariantContext,
-            acc.robotState
-          ),
-        { robotState: prevRobotState, warnings: [] }
-      )
-      const nextResult = {
-        commands: commandCreatorResult.commands,
-        robotState: nextRobotStateAndWarnings.robotState,
-      }
-
-      // TODO IMMEDIATELY allow warnings in timeline frames
-      return {
-        timeline: [...acc.timeline, nextResult],
-        errors: null,
-      }
-    },
-    { timeline: [], errors: null }
-  )
-
-  return {
-    timeline: timeline.timeline,
-    errors: timeline.errors,
-  }
-}
 
 type Vol = { volume: number }
 
@@ -532,65 +403,4 @@ export function makeInitialRobotState(args: {|
       ),
     },
   }
-}
-
-// HACK Ian 2019-11-12: this is a temporary solution to pass PD runtime feature flags
-// down into step-generation, which is meant to be relatively independent of PD.
-// WARNING: Unless you're careful to bust any caches (eg of selectors that use step-generation),
-// there could be delayed-sync issues when toggling a flag with this solution, because
-// we're directly accessing localStorage without an ability to.
-// A long-term solution might be to either restart PD upon setting flags that are used here,
-// or pass flags as "config options" into step-generation via a factory that stands in front of all step-generation imports,
-// or just avoid this complexity for non-experimental features.
-const getFeatureFlag = (flagName: string): boolean => {
-  if (!global.localStorage) {
-    let value = false
-    try {
-      value = process.env[flagName] === 'true'
-    } catch (e) {
-      console.error(
-        `appear to be in node environment, but cannot access ${flagName} in process.env. ${e}`
-      )
-    }
-    return value
-  }
-  const allFlags = JSON.parse(
-    global.localStorage.getItem('root.featureFlags.flags') || '{}'
-  )
-  return (allFlags && allFlags[flagName]) || false
-}
-
-export const modulePipetteCollision = (args: {|
-  pipette: ?string,
-  labware: ?string,
-  invariantContext: InvariantContext,
-  prevRobotState: RobotState,
-|}): boolean => {
-  if (getFeatureFlag('OT_PD_DISABLE_MODULE_RESTRICTIONS')) {
-    // always ignore collision hazard
-    return false
-  }
-  const { pipette, labware, invariantContext, prevRobotState } = args
-  const pipetteEntity: ?* = pipette && invariantContext.pipetteEntities[pipette]
-  const labwareSlot: ?* = labware && prevRobotState.labware[labware]?.slot
-  if (!pipette || !labware || !pipetteEntity || !labwareSlot) return false
-
-  // NOTE: does not handle thermocycler-adjacent slots.
-  // Only handles labware is NORTH of mag/temp in slot 1 or 3
-  // Does not care about GEN1/GEN2 module, just GEN1 multi-ch pipette
-  const labwareInDangerZone = Object.keys(invariantContext.moduleEntities).some(
-    moduleId => {
-      const moduleSlot: ?* = prevRobotState.modules[moduleId]?.slot
-      const moduleType: ?* = invariantContext.moduleEntities[moduleId]?.type
-      const hasNorthSouthProblem = ['tempdeck', 'magdeck'].includes(moduleType)
-      const labwareInNorthSlot =
-        (moduleSlot === '1' && labwareSlot === '4') ||
-        (moduleSlot === '3' && labwareSlot === '6')
-      return hasNorthSouthProblem && labwareInNorthSlot
-    }
-  )
-
-  return (
-    GEN_ONE_MULTI_PIPETTES.includes(pipetteEntity.name) && labwareInDangerZone
-  )
 }

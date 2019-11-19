@@ -1,6 +1,6 @@
 // @flow
 import flatMap from 'lodash/flatMap'
-import _mix from '../commandCreators/compound/mix'
+import mix from '../commandCreators/compound/mix'
 import {
   getRobotStateWithTipStandard,
   makeContext,
@@ -16,7 +16,6 @@ import {
   blowoutHelper,
   makeTouchTipHelper,
 } from './fixtures'
-import { reduceCommandCreators } from '../utils'
 import type { MixArgs } from '../types'
 
 const aspirateHelper = makeAspirateHelper()
@@ -24,13 +23,6 @@ const dispenseHelper = makeDispenseHelper({ labware: SOURCE_LABWARE })
 const touchTipHelper = makeTouchTipHelper()
 // TODO: Ian 2019-06-14 more elegant way to test the blowout offset calculation
 const BLOWOUT_OFFSET_ANY: any = expect.any(Number)
-
-// collapse this compound command creator into the signature of an atomic command creator
-const mix = (args: MixArgs) => (invariantContext, initialRobotState) =>
-  reduceCommandCreators(_mix(args)(invariantContext, initialRobotState))(
-    invariantContext,
-    initialRobotState
-  )
 
 let invariantContext
 let robotStateWithTip
@@ -66,7 +58,7 @@ describe('mix: change tip', () => {
   })
   test('changeTip="always"', () => {
     const args = makeArgs('always')
-    const result = mix(args)(invariantContext, robotStateWithTip)
+    const result = mix(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual(
@@ -83,7 +75,7 @@ describe('mix: change tip', () => {
 
   test('changeTip="once"', () => {
     const args = makeArgs('once')
-    const result = mix(args)(invariantContext, robotStateWithTip)
+    const result = mix(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual([
@@ -99,7 +91,7 @@ describe('mix: change tip', () => {
 
   test('changeTip="never"', () => {
     const args = makeArgs('never')
-    const result = mix(args)(invariantContext, robotStateWithTip)
+    const result = mix(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual(
@@ -128,7 +120,7 @@ describe('mix: advanced options', () => {
       ...getFlowRateAndOffsetParams(),
     }
 
-    const result = mix(args)(invariantContext, robotStateWithTip)
+    const result = mix(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       ...replaceTipCommands(0),
@@ -149,7 +141,7 @@ describe('mix: advanced options', () => {
       wells: ['A1', 'B1', 'C1'],
     }
 
-    const result = mix(args)(invariantContext, robotStateWithTip)
+    const result = mix(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual(
@@ -175,7 +167,7 @@ describe('mix: advanced options', () => {
       wells: ['A1', 'B1', 'C1'],
     }
 
-    const result = mix(args)(invariantContext, robotStateWithTip)
+    const result = mix(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual(
@@ -204,7 +196,7 @@ describe('mix: advanced options', () => {
       wells: ['A1', 'B1', 'C1'],
     }
 
-    const result = mix(args)(invariantContext, robotStateWithTip)
+    const result = mix(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
 
     expect(res.commands).toEqual(
@@ -240,7 +232,7 @@ describe('mix: errors', () => {
       ...errorArgs,
       labware: 'invalidLabwareId',
     }
-    const result = mix(args)(invariantContext, robotStateWithTip)
+    const result = mix(args, invariantContext, robotStateWithTip)
     const res = getErrorResult(result)
     expect(res.errors).toHaveLength(1)
     expect(res.errors[0]).toMatchObject({
@@ -253,7 +245,7 @@ describe('mix: errors', () => {
       ...errorArgs,
       pipette: 'invalidPipetteId',
     }
-    const result = mix(args)(invariantContext, robotStateWithTip)
+    const result = mix(args, invariantContext, robotStateWithTip)
     const res = getErrorResult(result)
     expect(res.errors).toHaveLength(1)
     expect(res.errors[0]).toMatchObject({

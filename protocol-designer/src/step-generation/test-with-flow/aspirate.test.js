@@ -14,8 +14,6 @@ import {
   SOURCE_LABWARE,
 } from './fixtures'
 
-jest.mock('../../labware-defs/utils') // TODO IMMEDIATELY move to somewhere more general
-
 describe('aspirate', () => {
   let initialRobotState
   let robotStateWithTip
@@ -158,30 +156,4 @@ describe('aspirate', () => {
       type: 'LABWARE_DOES_NOT_EXIST',
     })
   })
-
-  // TODO IMMEDIATELY: cover in getNextRobotStateAndWarnings??
-  // describe('liquid tracking', () => {
-  //   test('aspirate calls getNextRobotStateAndWarnings with correct args and puts result into robotState', () => {
-  //     const args = {
-  //       ...flowRateAndOffsets,
-  //       pipette: DEFAULT_PIPETTE,
-  //       labware: SOURCE_LABWARE,
-  //       well: 'A1',
-  //       volume: 152,
-  //     }
-  //     const result = aspirate(args, invariantContext, robotStateWithTip)
-
-  //     expect(getNextRobotStateAndWarnings).toHaveBeenCalledWith(
-  //       getSuccessResult(result).commands[0],
-  //       invariantContext,
-  //       robotStateWithTip
-  //     )
-  //     expect(getSuccessResult(result).robotState).toBe(
-  //       mockRobotStateAndWarningsReturnValue.robotState
-  //     )
-  //     expect(getSuccessResult(result).warnings).toBe(
-  //       mockRobotStateAndWarningsReturnValue.warnings
-  //     )
-  //   })
-  // })
 })
