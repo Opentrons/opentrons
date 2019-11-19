@@ -16,7 +16,7 @@ from ..labware import (
 from .util import log_call
 from .types import LegacyLocation
 from typing import (
-    Dict, List, Any, Union, Optional, Tuple, TYPE_CHECKING, Deque)
+    Dict, List, Any, Union, Optional, Sequence, TYPE_CHECKING, Deque)
 
 import jsonschema  # type: ignore
 
@@ -247,12 +247,14 @@ class LegacyWell(Well):
             display_name: str,
             has_tip: bool,
             api_version: APIVersion,
+            parent_legacy: 'LegacyLabware',
             labware_height: float = None,
             well_name: str = None):
         self._well = super().__init__(
             well_props, parent, display_name, has_tip, api_version)
         self._well_name = well_name
         self._parent_height = labware_height
+        self._parent_legacy = parent_legacy
 
     @property
     def properties(self) -> Dict[str, Any]:
@@ -270,7 +272,7 @@ class LegacyWell(Well):
 
     @property
     def parent(self) -> 'LegacyLabware':
-        return self._parent  # type: ignore
+        return self._parent_legacy  # type: ignore
 
     def get_name(self) -> Optional[str]:
         return self._well_name
@@ -504,6 +506,7 @@ class LegacyWell(Well):
 class LegacyLabware():
     def __init__(self, labware: Labware) -> None:
         self.lw_obj = labware
+        setattr(labware, '_build_wells', self._build_wells)
         self.set_calibration(Point(0, 0, 0))
         self._definition = self.lw_obj._definition
         self._wells_by_index = self.lw_obj.wells()
@@ -846,7 +849,7 @@ class LegacyLabware():
         else:
             return self.handle_args('rows', *args, **kwargs)
 
-    def _build_wells(self) -> List[Well]:
+    def _build_wells(self) -> Sequence[LegacyWell]:
         """
         This function is used to create one instance of wells to be used by all
         accessor functions. It is only called again if a new offset needs
@@ -859,6 +862,7 @@ class LegacyLabware():
                 "{} of {}".format(well, self.lw_obj._display_name),
                 self.lw_obj.is_tiprack,
                 self.lw_obj.api_version,
+                self,
                 self.lw_obj._dimensions['zDimension'],
                 well_name=well)
             for well in self.lw_obj._ordering]

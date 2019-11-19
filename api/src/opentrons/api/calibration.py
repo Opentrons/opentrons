@@ -7,6 +7,7 @@ from opentrons.config import feature_flags as ff
 from opentrons.broker import Broker
 from opentrons.types import Point, Mount, Location
 from opentrons.protocol_api import labware
+from opentrons.protocol_api.legacy_wrapper import containers_wrapper
 from opentrons.hardware_control import CriticalPoint
 
 from .models import Container
@@ -20,7 +21,7 @@ VALID_STATES = {'probing', 'moving', 'ready'}
 # just one well, Placeable.wells() returns the Well rather than [Well].
 # Passing the well as an argument, though, will always return the well.
 def _well0(cont):
-    if isinstance(cont, labware.Labware):
+    if isinstance(cont, (labware.Labware, containers_wrapper.LegacyLabware)):
         return cont.wells()[0]
     else:
         return cont.wells(0)
@@ -40,6 +41,20 @@ def _require_lock(func):
     return decorated
 
 
+def _home_if_first_call(func):
+    """ Decorator to make a function home if it is the first one called in
+    this session."""
+    @functools.wraps(func)
+    def decorated(*args, **kwargs):
+        self = args[0]
+        if not self._has_homed:
+            log.info("this is the first calibration action, homing")
+            self._hardware.home()
+            self._has_homed = True
+        return func(*args, **kwargs)
+    return decorated
+
+
 class CalibrationManager:
     """
     Serves endpoints that are primarily used in
@@ -53,6 +68,7 @@ class CalibrationManager:
         self._loop = loop
         self.state = None
         self._lock = lock
+        self._has_homed = False
 
     def _set_state(self, state):
         if state not in VALID_STATES:
@@ -62,6 +78,7 @@ class CalibrationManager:
         self._on_state_changed()
 
     @_require_lock
+    @_home_if_first_call
     def tip_probe(self, instrument):
         inst = instrument._instrument
         log.info('Probing tip with {}'.format(instrument.name))
@@ -101,6 +118,7 @@ class CalibrationManager:
         self._set_state('ready')
 
     @_require_lock
+    @_home_if_first_call
     def pick_up_tip(self, instrument, container):
         if not isinstance(container, Container):
             raise ValueError(
@@ -120,12 +138,14 @@ class CalibrationManager:
                                 critical_point=CriticalPoint.NOZZLE,
                                 refresh=True),
                              loc)
-                inst.pick_up_tip(loc)
+                loc_leg = _well0(container._container)
+                inst.pick_up_tip(loc_leg)
         else:
             inst.pick_up_tip(_well0(container._container))
         self._set_state('ready')
 
     @_require_lock
+    @_home_if_first_call
     def drop_tip(self, instrument, container):
         if not isinstance(container, Container):
             raise ValueError(
@@ -145,6 +165,7 @@ class CalibrationManager:
         self._set_state('ready')
 
     @_require_lock
+    @_home_if_first_call
     def return_tip(self, instrument):
         inst = instrument._instrument
         log.info('Returning tip from {}'.format(instrument.name))
@@ -158,6 +179,7 @@ class CalibrationManager:
         self._set_state('ready')
 
     @_require_lock
+    @_home_if_first_call
     def move_to_front(self, instrument):
         inst = instrument._instrument
         log.info('Moving {}'.format(instrument.name))
@@ -182,6 +204,7 @@ class CalibrationManager:
         self._set_state('ready')
 
     @_require_lock
+    @_home_if_first_call
     def move_to(self, instrument, container):
         if not isinstance(container, Container):
             raise ValueError(
@@ -206,6 +229,7 @@ class CalibrationManager:
         self._set_state('ready')
 
     @_require_lock
+    @_home_if_first_call
     def jog(self, instrument, distance, axis):
         inst = instrument._instrument
         log.info('Jogging {} by {} in {}'.format(
@@ -223,6 +247,7 @@ class CalibrationManager:
         self._set_state('ready')
 
     @_require_lock
+    @_home_if_first_call
     def home(self, instrument):
         inst = instrument._instrument
         log.info('Homing {}'.format(instrument.name))
@@ -251,9 +276,9 @@ class CalibrationManager:
             container._container.set_calibration(Point(0, 0, 0))
             if ff.calibrate_to_bottom() and not (
                                             container._container.is_tiprack):
-                orig = _well0(container._container).bottom().point
+                orig = _well0(container._container)._bottom().point
             else:
-                orig = _well0(container._container).top().point
+                orig = _well0(container._container)._top().point
             delta = here - orig
             labware.save_calibration(container._container, delta)
         else:
