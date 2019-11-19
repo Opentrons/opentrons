@@ -3,7 +3,7 @@ from contextlib import contextmanager, ExitStack
 import logging
 from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 try:
-    import aionotify
+    import aionotify  # type: ignore
 except OSError:
     aionotify = None  # type: ignore
 
@@ -235,5 +235,5 @@ class Controller:
         await asyncio.sleep(duration_s)
         self.resume()
 
-    def __del__(self, exc_type, exc_value, traceback):
+    def __del__(self):
         self._module_watcher.close()

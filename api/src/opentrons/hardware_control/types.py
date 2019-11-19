@@ -1,8 +1,7 @@
 import enum
-from typing import Tuple, List
+from typing import Tuple
 
 import opentrons.types
-from .modules import ModuleAtPort
 
 
 class Axis(enum.Enum):
