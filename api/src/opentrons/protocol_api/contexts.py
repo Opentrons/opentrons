@@ -1986,7 +1986,7 @@ class ModuleContext(CommandPublisher):
         return mod_labware
 
     @requires_version(2, 0)
-    def load_labware(self, name: str) -> Labware:
+    def load_labware(self, name: str, volume_by_well: Dict[str, float] = None) -> Labware:
         """ Specify the presence of a piece of labware on the module.
 
         :param name: The name of the labware object.
@@ -1994,12 +1994,15 @@ class ModuleContext(CommandPublisher):
         """
         lw = load(
             name, self._geometry.location,
-            bundled_defs=self._ctx._bundled_labware)
+            bundled_defs=self._ctx._bundled_labware,
+            volume_by_well=volume_by_well)
         return self.load_labware_object(lw)
 
     @requires_version(2, 0)
     def load_labware_from_definition(
-            self, definition: Dict[str, Any]) -> Labware:
+            self, definition: Dict[str, Any],
+            volume_by_well: Dict[str, float] = None,
+            ) -> Labware:
         """
         Specify the presence of a labware on the module, using an
         inline definition.

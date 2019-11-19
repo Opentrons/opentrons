@@ -85,6 +85,7 @@ class Well:
                  display_name: str,
                  has_tip: bool,
                  starting_volume: float,
+                 well_id: str,
                  api_level: APIVersion) -> None:
         """
         Create a well, and track the Point corresponding to the top-center of
@@ -107,6 +108,7 @@ class Well:
             = Point(well_props['x'],
                     well_props['y'],
                     well_props['z'] + well_props['depth']) + parent.point
+        self._well_id = well_id
 
         if not parent.labware:
             raise ValueError("Wells must have a parent")
@@ -138,6 +140,11 @@ class Well:
     @requires_version(2, 0)
     def parent(self) -> 'Labware':
         return self._parent  # type: ignore
+
+    @property  # type: ignore
+    @requires_version(2, 0)
+    def well_id(self) -> str:
+        return self._well_id
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -419,6 +426,7 @@ class Labware(DeckItem):
                 display_name="{} of {}".format(well, self._display_name),
                 has_tip=self._is_tiprack,
                 starting_volume=volume_by_well.get(well) or 0,
+                well_id=well,
                 api_level=self._api_version)
             for well in self._ordering]
 
@@ -620,7 +628,7 @@ class Labware(DeckItem):
     @property
     def volume_by_well(self) -> Dict[str, float]:
         """ as is_tiprack but not subject to version checking for speed """
-        return {well.display_name: well.volume for well in self.wells}
+        return {well.well_id: well.volume for well in self.wells()}
 
     @property  # type: ignore
     @requires_version(2, 0)
