@@ -288,8 +288,8 @@ class Pipette:
                 if isinstance(location, LegacyWell) else location.labware
             absolute_location = _absolute_motion_target(location, 'top')
         else:
-            placeable = location.origins.labware
-            absolute_location = location.origins
+            placeable = location.origin.labware
+            absolute_location = location.origin
 
         force_direct = False
         if strategy == 'direct' or (

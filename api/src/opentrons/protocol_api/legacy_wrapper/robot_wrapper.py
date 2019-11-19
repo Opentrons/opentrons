@@ -217,8 +217,8 @@ class Robot():
         for k, v in self._ctx.deck.items():
             if v is not None:
                 self._deck[str(k)].add_item(v)
-            if not self._deck[str(k)].origins:
-                self._deck[str(k)].update_origins(
+            if not self._deck[str(k)].origin:
+                self._deck[str(k)].update_origin(
                     self._ctx.deck.position_for(k))
         return self._deck
 
