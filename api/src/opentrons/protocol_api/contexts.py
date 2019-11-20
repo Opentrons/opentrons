@@ -843,7 +843,7 @@ class InstrumentContext(CommandPublisher):
         if isinstance(location, Well):
             if self.type == 'multi':
                 for well_set in location.parent.well_sets:
-                    if well_set[0] = location:
+                    if well_set[0] == location:
                         for well in well_set:
                             well.volume = well.volume - volume
             else:
@@ -933,7 +933,7 @@ class InstrumentContext(CommandPublisher):
         if isinstance(location, Well):
             if self.type == 'multi':
                 for well_set in location.parent.well_sets:
-                    if well_set[0] = location:
+                    if well_set[0] == location:
                         for well in well_set:
                             well.volume = well.volume + volume
                         break
@@ -1051,7 +1051,7 @@ class InstrumentContext(CommandPublisher):
         if isinstance(location, Well):
             if self.type == 'multi':
                 for well_set in location.parent.well_sets:
-                    if well_set[0] = location:
+                    if well_set[0] == location:
                         for well in well_set:
                             well.volume = well.volume + self.current_volume
             else:
