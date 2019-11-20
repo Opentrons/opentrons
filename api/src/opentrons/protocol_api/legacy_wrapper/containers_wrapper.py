@@ -288,11 +288,11 @@ class LegacyWell(Well):
 
     @property
     def width(self) -> float:
-        return self._width
+        return self._y_dimension
 
     @property
     def length(self) -> float:
-        return self._length
+        return self._x_dimension
 
     @property
     def shape(self) -> Optional[WellShape]:
@@ -418,7 +418,7 @@ class LegacyWell(Well):
             -> Point:
         center = self._center()
         if self._shape is WellShape.RECTANGULAR:
-            radius = self._length / 2  # to match placeable
+            radius = self._x_dimension / 2  # to match placeable
         else:
             radius = self._diameter / 2  # type: ignore
 
