@@ -2323,7 +2323,6 @@ class ThermocyclerContext(ModuleContext):
             after ``temperature`` is reached.
         """
 
-        MODULE_LOG.info(f'\n\n\nctx: temp: {temperature} , vol: {self._get_block_max_volume()}')
         return self._module.set_temperature(
                 temperature=temperature,
                 hold_time_seconds=hold_time_seconds,
