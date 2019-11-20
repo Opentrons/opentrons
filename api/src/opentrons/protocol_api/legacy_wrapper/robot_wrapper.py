@@ -10,7 +10,6 @@ from .containers_wrapper import LegacyDeckItem
 if TYPE_CHECKING:
     from .instrument_wrapper import Pipette
     from ..contexts import ProtocolContext
-    from ..geometry import Deck
     from ..labware import Labware
     from .api import BCInstruments, BCModules
     from .containers_wrapper import Containers

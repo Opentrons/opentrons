@@ -125,3 +125,8 @@ def test_robot_reset(singletons):
     assert singletons['robot']._instrs == {}
     assert singletons['robot']._head_speed_override is None
     assert singletons['robot']._ctx.max_speeds == {}
+
+
+@pytest.mark.api2_only
+def test_robot_deck_wrapper(singletons):
+    assert singletons['robot'].deck['12'] == singletons['robot'].deck['12']
