@@ -359,11 +359,11 @@ class Labware(DeckItem):
         # Applied properties
         self._update_calibrated_offset(self._calibrated_offset)
         self._wells = self._build_wells(volume_by_well)
-        self._well_sets: Sequence[Sequence[Well]] = []
+        self._multi_well_sets: Sequence[Sequence[Well]] = []
         for well in self.wells():
             well_set = self._get_multi_well_set(well)
             if well_set:
-                self._well_sets.append(well_set)
+                self._multi_well_sets.append(well_set)
 
         self._pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
         self._definition = definition
@@ -834,7 +834,7 @@ class Labware(DeckItem):
         for well in drop_targets:
             well.has_tip = True
 
-    def _get_multi_well_set(self, back_well):
+    def _get_multi_well_set(self, back_well: Well):
         back_x = back_well.top().point.x
         back_y= back_well.top().point.y
         tip_positions = [{'x': back_x, 'y': back_y - (tip_no * OFFSET_8_CHANNEL)}
@@ -845,22 +845,19 @@ class Labware(DeckItem):
                              for pos in tip_positions]
         wells_accessed = []
         for position in tip_positions:
-            x = position['x']
-            y = position['y']
-
             found = False
             for well in self.wells():
-                x_diff = x - well.top().point.x
-                y_diff = y - well.top().point.y
+                x_diff = position['x'] - well.top().point.x
+                y_diff = position['y'] - well.top().point.y
                 if well._diameter is not None and \
                         sqrt(x_diff**2 + y_diff**2) <= well.diameter / 2:
-                    # circular well
+                    # circular well where tip lies within well radius
                     found = True
                     break
                 elif well._diameter is None and \
                         abs(x_diff) <= well._x_dimension and \
                         abs(y_diff) <= well._y_dimension:
-                    # rectangular well
+                    # rectangular well where tip lies within well dimensions
                     found = True
                     break
                     wells_accessed.append(well)
@@ -872,16 +869,8 @@ class Labware(DeckItem):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def well_sets(self):
-        if self._well_sets is None:
-            well_sets = []
-            for well in self.wells():
-                well_set = self._get_multi_well_set(well)
-                if well_set:
-                    well_sets.append(well_set)
-            self._well_sets = well_sets
-        return self._well_sets
-
+    def multi_well_sets(self):
+        return self._multi_well_sets
 
     @requires_version(2, 0)
     def reset(self):
