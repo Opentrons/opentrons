@@ -1,6 +1,7 @@
 import itertools
 import copy
 import pytest
+import base64
 
 from opentrons.api.session import (
     _accumulate, _dedupe)
@@ -8,6 +9,7 @@ from tests.opentrons.conftest import state
 from functools import partial
 from opentrons.protocols.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api.execute import ExceptionInProtocolError
 
 state = partial(state, 'session')
 
@@ -276,3 +278,51 @@ def run(ctx):
         main_router.session_manager.create(
             name='<blank>',
             contents=proto)
+
+
+@pytest.mark.api2_only
+async def test_session_extra_labware(main_router, get_labware_fixture,
+                                     virtual_smoothie_env):
+    proto = '''
+metadata = {"apiLevel": "2.0"}
+
+def run(ctx):
+    tr = ctx.load_labware("fixture_12_trough", "1")
+    tiprack = ctx.load_labware("opentrons_96_tiprack_300ul", "2")
+    instr = ctx.load_instrument("p300_single", "right",
+                                tip_racks=[tiprack])
+    instr.pick_up_tip()
+    instr.aspirate(300, tr["A1"])
+'''
+    extra_labware = [
+        get_labware_fixture('fixture_12_trough')
+    ]
+    session = main_router.session_manager.create_with_extra_labware(
+        name='<blank>',
+        contents=proto,
+        extra_labware=extra_labware)
+    assert not session.errors
+    session_conts = session.get_containers()
+    for lw in extra_labware:
+        assert lw['parameters']['loadName'] in [
+            c.name for c in session_conts]
+    session.run()
+    assert not session.errors
+    with pytest.raises(ExceptionInProtocolError):
+        main_router.session_manager.create(
+            name='<blank>',
+            contents=proto)
+
+
+@pytest.mark.api2_only
+async def test_session_bundle(main_router, get_bundle_fixture,
+                              virtual_smoothie_env):
+    bundle = get_bundle_fixture('simple_bundle')
+    b64d = base64.b64encode(bundle['binary_zipfile'])
+    session1 = main_router.session_manager.create(name='bundle.zip',
+                                                  contents=b64d,
+                                                  is_binary=True)
+    session2 = main_router.session_manager.create_from_bundle(
+        name='bundle.zip',
+        contents=b64d)
+    assert session1._protocol == session2._protocol
