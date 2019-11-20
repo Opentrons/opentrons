@@ -167,22 +167,18 @@ def build_globals(context: 'ProtocolContext'):
 
 def maybe_migrate_containers():
     result = False
-    if not os.environ.get('MIGRATE_V1_LABWARE'):
-        return result
-    if not os.path.exists(CONFIG['labware_database_file']):
-        return result
-    if os.environ.get('MIGRATE_V1_LABWARE') and\
-            os.path.exists(CONFIG['labware_database_file']):
+    if os.path.exists(CONFIG['labware_database_file']):
+        log.info("Checking for labware to migrate from database")
         try:
             result, validation_failure = perform_migration()
-            log.warning("The following labwares failed labware migration",
-                        f"{validation_failure}")
+            if validation_failure:
+                log.warning(
+                    "The following labwares failed labware migration: "
+                    f"{validation_failure}")
         except (IndexError, ValueError, KeyError):
             delete_dir = CONFIG['labware_user_definitions_dir_v2']/'legacy_api'
             if os.path.exists(delete_dir):
                 shutil.rmtree(delete_dir)
-            log.warning('Failed to perform database migration,',
+            log.warning('Failed to perform database migration,  '
                         'please try again.')
-    if result:
-        os.remove(CONFIG['labware_database_file'])
     return result
