@@ -1773,22 +1773,6 @@ class InstrumentContext(CommandPublisher):
         """
         return self._flow_rates
 
-    @property
-    def pick_up_current(self) -> float:
-        """
-        The current (amperes) the pipette mount's motor will use
-        while picking up a tip. Specified in amps.
-        """
-        raise NotImplementedError
-
-    @pick_up_current.setter
-    def pick_up_current(self, amps: float):
-        """ Set the current used when picking up a tip.
-
-        :param amps: The current, in amperes. Acceptable values: (0.0, 2.0)
-        """
-        raise NotImplementedError
-
     @property  # type: ignore
     @requires_version(2, 0)
     def type(self) -> str:

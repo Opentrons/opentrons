@@ -983,17 +983,19 @@ window.intercomSettings = {
         <div class="bodywrapper">
             {%- endif %}
             <div class="body" role="main">
-
+                {% if pagename == 'index' %}
                   <div class="banner_wrapper banner_v1">
-                    <div class="bulb">
-                    <img src="_images/lightbulb.jpg" />
-                    </div>
                     <div class="heading_group">
                       <h2 id="heading_2">We thought you’d like to know…</h2>
-                      <h4 id="heading_4">We’ve just released the <a href="../v2/index.html">Opentrons OT-2 APIv2</a> <span class="beta">BETA</span>. Check it out and let us know what you think!</h4>
+                      <h4 id="heading_4">The documentation you are viewing is for version 1 of the OT-2 Python Protocol API. While this older version will still be supported, we encourage you to use <a href="../v2/index.html">version 2</a> of the API to ensure you are leveraging all of the most up to date capabilities.</h4>
                     </div>
                   </div>
-                
+                  {% else %}
+                  <div class="banner_wrapper banner_v1" >
+                      <p> You are currently viewing the documentation for version 1 of the Opentrons OT-2 Python Protocol API. To view documentation for version 2 of the API, <a href="../v2/index.html">click here</a>.
+                      </p>
+                  </div>
+                  {%- endif %}
                 {% block body %}{% endblock %}
             </div>
             {%- if render_sidebar %}

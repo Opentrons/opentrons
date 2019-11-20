@@ -181,3 +181,7 @@ table.docutils.field-list {
     max-width: 595px;
     background-color: white;
 }
+
+.pull-quote {
+    background-color: #EEE
+}
