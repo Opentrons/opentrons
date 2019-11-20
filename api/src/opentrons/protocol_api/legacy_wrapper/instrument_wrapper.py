@@ -11,8 +11,7 @@ from ..util import Clearances, clamp_value
 
 from .types import LegacyLocation
 
-from .containers_wrapper import (LegacyLabware, LegacyWell,
-                                 WellSeries, LegacyDeckItem)
+from .containers_wrapper import LegacyLabware, LegacyWell, WellSeries
 
 if TYPE_CHECKING:
     from ..contexts import InstrumentContext # noqa(F401)

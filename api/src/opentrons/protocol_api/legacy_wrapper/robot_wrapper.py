@@ -4,8 +4,6 @@ from typing import Any, Dict, Optional, TYPE_CHECKING
 from opentrons.hardware_control import adapters, API
 from .util import log_call
 from .types import LegacyLocation
-from .containers_wrapper import LegacyDeckItem
-
 
 if TYPE_CHECKING:
     from .instrument_wrapper import Pipette
