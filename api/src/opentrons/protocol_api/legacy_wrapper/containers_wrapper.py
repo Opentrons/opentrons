@@ -233,6 +233,21 @@ class LegacyWell(Well):
         self._well_name = well_name
         self._parent_height = labware_height
 
+    def __repr__(self):
+        """
+        Return full path to the :Placeable: for debugging
+        """
+
+        return ''.join(
+            [str(i) for i in reversed(
+                [*list(self.get_trace()), self.get_name()])])
+
+    def __str__(self):
+        if not self.parent:
+            return '<{}>'.format('Well')
+        return '<{} {}>'.format(
+            'Well', self.get_name())
+
     @property
     def properties(self) -> Dict[str, Any]:
         return {
@@ -262,6 +277,8 @@ class LegacyWell(Well):
         current_obj = self.parent
         while current_obj:
             yield current_obj
+            if isinstance(current_obj, str):
+                return
             current_obj = getattr(current_obj, 'parent')
 
     @property
@@ -323,7 +340,7 @@ class LegacyWell(Well):
             h=1,
             reference=reference)
         return LegacyLocation(labware=self,
-                              offset=coordinates.offset + Point(0, 0, z))
+                              offset=coordinates + Point(0, 0, z))
 
     def bottom(self, z: float = 0.0, radius: float = 0.0,
                degrees: float = 0.0,
@@ -367,12 +384,12 @@ class LegacyWell(Well):
                                        h=-1,
                                        reference=reference)
         return LegacyLocation(labware=self,
-                              offset=coordinates.offset + Point(0, 0, z))
+                              offset=coordinates + Point(0, 0, z))
 
     def center(
             self,
             reference: Union['LegacyLabware', 'LegacyWell'] = None)\
-            -> LegacyLocation:
+            -> Point:
         """
         Returns :py:class:`.LegacyLocation` ( a NamedTuple of
         :py:class:`.LegacyWell`, :py:class:`.Point`) where
@@ -416,7 +433,7 @@ class LegacyWell(Well):
             x: float = None, y: float = None, z: float = None,
             r: float = None, theta: float = None, h: float = None,
             reference: Union['LegacyLabware', 'LegacyWell'] = None)\
-            -> LegacyLocation:
+            -> Point:
         """
         Accepts a set of ratios for Cartesian or ratios/angle for Polar
         and returns :py:class:`.Vector` using ``reference`` as origin.
@@ -468,9 +485,7 @@ class LegacyWell(Well):
 
         offset = from_center_absolute\
             - self._from_center_cartesian(-1, -1, -1)
-        return LegacyLocation(
-                labware=self,
-                offset=offset)
+        return offset
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, (LegacyWell, Well)):
@@ -499,39 +514,66 @@ class LegacyLabware():
             'magdeck_engage_height': self.lw_obj.magdeck_engage_height
             }
 
-        # Lookup table used specifically for the weird `well` and `cols`
-        # method(s) in placeable that people used
-        self._accessor_methods: Dict[str, object] = {
-            'well': self.wells,
-            'cols': self.columns
-        }
-
         # Lookup table for methods that either return a dict or lists
         # to describe rows/cols/wells
+        cols_dict = {}
+        cols_list = []
+        for idx, column in enumerate(self._columns_by_name.keys()):
+            new_well_series = WellSeries(
+                wells_dict=self._columns_by_name[column],
+                wells_list=self._columns[idx],
+                labware_object=self,
+                method_flag='wells')
+            cols_dict[column] = new_well_series
+            cols_list.append(new_well_series)
+
+        rows_dict = {}
+        rows_list = []
+        for idx, row in enumerate(self._rows_by_name.keys()):
+            new_well_series = WellSeries(
+                wells_dict=self._rows_by_name[row],
+                wells_list=self._rows[idx],
+                labware_object=self,
+                method_flag='wells')
+            rows_dict[row] = new_well_series
+            rows_list.append(new_well_series)
+
         self._map_list_and_dict: AccessorMethodDict = {  # typing: ignore
-            'wells': {
-                'list': self._wells_by_index, 'dict': self._wells_by_name},
-            'columns': {
-                'list': self._columns, 'dict': self._columns_by_name},
-            'rows': {
-                'list': self._rows, 'dict': self._rows_by_name}
+            'wells': WellSeries(
+                wells_dict=self._wells_by_name,
+                wells_list=self._wells_by_index,
+                labware_object=self,
+                method_flag='wells'),
+            'columns': WellSeries(
+                wells_dict=cols_dict,
+                wells_list=cols_list,
+                labware_object=self,
+                method_flag='columns'),
+            'rows': WellSeries(
+                wells_dict=rows_dict,
+                wells_list=rows_list,
+                labware_object=self,
+                method_flag='rows')
             }
 
     def __getattr__(self, attr):
         # For the use-case of methods `well` or `cols`
-        try:
-            return self._accessor_methods[attr]
-        except KeyError:
-            raise AttributeError()
+        if attr == 'well':
+            return self.wells
+        elif attr == 'cols':
+            return self.columns
 
-    def __getitem__(self, name) -> Well:
+    def __getitem__(self, name) -> 'WellSeries':
         # For the use-case of labware[0] or labware['A1']
-        if isinstance(name, int) or isinstance(name, slice):
-            return self._map_list_and_dict['wells']['list'][name]
-        elif isinstance(name, str):
-            return self._map_list_and_dict['wells']['dict'][name]
-        else:
+        if not isinstance(name, (int, slice, str)):
             raise TypeError('Expected int, slice or string')
+        if isinstance(name, slice):
+            old_wellseries = self._map_list_and_dict['wells']
+            build_list = old_wellseries[name]
+            build_dict = {well.get_name(): well for well in build_list}
+            return WellSeries(build_dict, build_list, self)
+        else:
+            return self._map_list_and_dict['wells'][name]
 
     @property
     def properties(self) -> Dict:
@@ -571,19 +613,11 @@ class LegacyLabware():
 
     @property
     def columns(self):
-        return WellSeries(
-            wells_dict=self._columns_by_name,
-            wells_list=self._columns,
-            labware_object=self,
-            method_flag='columns')
+        return self._map_list_and_dict['columns']
 
     @property
     def rows(self):
-        return WellSeries(
-            wells_dict=self._rows_by_name,
-            wells_list=self._rows,
-            labware_object=self,
-            method_flag='rows')
+        return self._map_list_and_dict['rows']
 
     @property
     def highest_z(self) -> float:
@@ -707,18 +741,19 @@ class LegacyLabware():
                 well.has_tip = True
 
     def _get_wells_by_xy(
-            self, method_name=None, **kwargs) -> Union[Well, List[Well]]:
+            self, method_name=None, **kwargs)\
+            -> Union[LegacyWell, 'WellSeries']:
         x = kwargs.get('x', None)
         y = kwargs.get('y', None)
         if method_name != 'wells':
             raise ValueError(
                 f'You cannot use X and Y with {method_name} method')
         if x is None and isinstance(y, int):
-            return self._rows[y]
+            return self.rows[y]
         elif y is None and isinstance(x, int):
-            return self._columns[x]
+            return self.columns[x]
         elif isinstance(x, int) and isinstance(y, int):
-            return self._columns[x][y]
+            return self.columns[x][y]
         else:
             raise ValueError('Labware.wells(x=, y=) expects ints')
 
@@ -731,18 +766,19 @@ class LegacyLabware():
         step = kwargs.get('step', 1)
         length = kwargs.get('length', 1)
 
-        wells_list = self._map_list_and_dict[method_name]['list']
-        wells_dict = self._map_list_and_dict[method_name]['dict']
+        wells_list = kwargs.get(
+            'updated_list',
+            self._map_list_and_dict[method_name])
         wrapped_wells = [w
                          for i in range(3)
                          for w in wells_list]
         total_wells = len(wells_list)
 
         if isinstance(start, str):
-            start = wells_list.index(wells_dict[start])
+            start = wells_list.get_index(wells_list[start])
         if stop:
             if isinstance(stop, str):
-                stop = wells_list.index(wells_dict[start])
+                stop = wells_list.get_index(wells_list[start])
             if stop > start:
                 stop += 1
                 step = step * -1 if step < 0 else step
@@ -760,18 +796,16 @@ class LegacyLabware():
         if len(new_wells) == 1:
             return new_wells[0]
         else:
-            return new_wells
+            build_dict = {well.get_name(): well for well in new_wells}
+            return WellSeries(build_dict, new_wells, self, 'wells')
 
     def _get_well_by_type(
             self,
             well: Union[int, str, slice],
-            method_name) -> Union[List[Well], Well]:
-        if isinstance(well, int):
-            return self._map_list_and_dict[method_name]['list'][well]
-        elif isinstance(well, str):
-            return self._map_list_and_dict[method_name]['dict'][well]
-        else:
+            method_name) -> Union['WellSeries', LegacyWell]:
+        if not isinstance(well, (int, str, slice)):
             raise TypeError(f"Type {type(well)} is not compatible.")
+        return self._map_list_and_dict[method_name][well]
 
     def wells(self,
               *args,
@@ -779,20 +813,29 @@ class LegacyLabware():
         """
         Returns child Well or list of child Wells
         """
+        updated_list = kwargs.get('updated_list', None)
         if not args and not kwargs:
-            return WellSeries(self._wells_by_name, self._wells_by_index, self)
+            return self._map_list_and_dict['wells']
 
         if args and isinstance(args[0], list):
             args = args[0]  # type: ignore
 
         if len(args) > 1:
-            return [self._get_well_by_type(n, 'wells') for n in args]
+            if updated_list:
+                build_list = [updated_list[n] for n in args]
+            else:
+                build_list = [self[n] for n in args]
+            build_dict = {well.get_name(): well for well in build_list}
+            return WellSeries(
+                build_dict,
+                build_list,
+                self)
         else:
-            return self.handle_args('wells', *args, **kwargs)
+            return self.handle_args(
+                'wells', *args, **kwargs)
 
     def handle_args(self, method_name: str, *args, **kwargs)\
-            -> Union[List[Well], Well]:
-
+            -> Union[LegacyWell, 'WellSeries']:
         if 'x' in kwargs or 'y' in kwargs:
             return self._get_wells_by_xy(method_name=method_name, **kwargs)
         elif 'to' in kwargs or 'length' in kwargs or 'step' in kwargs:
@@ -807,21 +850,26 @@ class LegacyLabware():
 
     def method_columns(self, *args, **kwargs):
         if not args:
-            return WellSeries(self._columns_by_name, self._columns, self)
+            return self.columns
         if len(args) == 1:
             return self._get_well_by_type(*args, 'columns')
         elif len(args) > 1:
-            return [self._get_well_by_type(n, 'columns') for n in args]
+            build_list = [self._get_well_by_type(n, 'columns') for n in args]
+            build_dict = {
+                column[0].get_name()[1::]: column for column in build_list}
+            return WellSeries(build_dict, build_list, self, 'columns')
         else:
             return self.handle_args('columns', *args, **kwargs)
 
     def method_rows(self, *args, **kwargs):
         if not args:
-            return WellSeries(self._rows_by_name, self._rows, self)
+            return self.rows
         if len(args) == 1:
             return self._get_well_by_type(*args, 'rows')
         elif len(args) > 1:
-            return [self._get_well_by_type(n, 'rows') for n in args]
+            build_list = [self._get_well_by_type(n, 'rows') for n in args]
+            build_dict = {row[0].get_name()[0]: row for row in build_list}
+            return WellSeries(build_dict, build_list, self, 'rows')
         else:
             return self.handle_args('rows', *args, **kwargs)
 
@@ -843,7 +891,7 @@ class LegacyLabware():
             for well in self.lw_obj._ordering]
 
 
-class WellSeries(LegacyLabware):
+class WellSeries:
     """
     This is a greatly cut down version of WellSeries found in placeable.py
     The main purpose of this class is to allow behavior which switches
@@ -859,14 +907,15 @@ class WellSeries(LegacyLabware):
             method_flag: str = None,
             name: str = None):
 
-        self.lw_object = labware_object
+        self.legacy_object = labware_object
         self.items = wells_dict
         self.values = wells_list
         self.method_flag = method_flag
+        self.name = name
 
     def __getitem__(self, name):
         if isinstance(name, slice):
-            return self.values[name]
+            return self._splice_wellseries(name)
         elif isinstance(name, int):
             return self.values[name]
         elif isinstance(name, str):
@@ -876,14 +925,99 @@ class WellSeries(LegacyLabware):
 
     def __call__(self, *args, **kwargs):
         if self.method_flag == 'columns':
-            return self.lw_object.method_columns(*args)
+            return self.legacy_object.method_columns(*args)
         elif self.method_flag == 'rows':
-            return self.lw_object.method_rows(*args)
+            return self.legacy_object.method_rows(*args)
         else:
             raise TypeError(f'You cannot call {self.__name__}')
 
     def __iter__(self):
         return iter(self.values)
+
+    def __len__(self):
+        return len(self.values)
+
+    def __repr__(self):
+        """
+        Return full path to the :Placeable: for debugging
+        """
+        return str(self)
+
+    def __str__(self):
+        return '<{0}: {1}>'.format(
+            self.__class__.__name__,
+            ''.join([str(well) for well in self.values]))
+
+    def _splice_wellseries(self, s):
+        build_list = self.values[s]
+        if self.method_flag == 'columns':
+            mt_flag = 'columns'
+            build_dict = {well[0].get_name()[1::]: well for well in build_list}
+        elif self.method_flag == 'rows':
+            mt_flag = 'rows'
+            build_dict = {well[0].get_name()[0]: well for well in build_list}
+        else:
+            mt_flag = 'wells'
+            build_dict = {well.get_name(): well for well in build_list}
+        return WellSeries(build_dict, build_list, self.legacy_object, mt_flag)
+
+    def get_index(self, idx):
+        return self.values.index(idx)
+
+    def get_name(self):
+        return str(self)
+
+    def get_trace(self):
+        if isinstance(self.values[0], WellSeries):
+            return self.values[0][0].get_trace()
+        else:
+            return self.values[0].get_trace()
+
+    def wells(self, *args, **kwargs):
+        # Extremely ugly hack to allow for
+        # WellSeries.wells(0, length) usecase
+        return self.legacy_object.wells(
+            *args, updated_list=self.values, **kwargs)
+
+    def top(self,
+            z: float = 0.0,
+            radius: float = 0.0,
+            degrees: float = 0,
+            reference=None) -> LegacyLocation:
+        if isinstance(self.values[0], WellSeries):
+            loc = self.values[0][0].top(z, radius, degrees)
+        else:
+            loc = self.values[0].top(z, radius, degrees)
+        return LegacyLocation(self, loc.offset)  # type: ignore
+
+    def bottom(self, z: float = 0.0, radius: float = 0.0,
+               degrees: float = 0.0,
+               reference=None) -> LegacyLocation:
+        if isinstance(self.values[0], WellSeries):
+            loc = self.values[0][0].bottom(z, radius, degrees)
+        else:
+            loc = self.values[0].bottom(z, radius, degrees)
+        return LegacyLocation(self, loc.offset)  # type: ignore
+
+    def from_center(
+            self, x: float = None, y: float = None, z: float = None,
+            r: float = None, theta: float = None, h: float = None,
+            reference: Union['LegacyLabware', 'LegacyWell'] = None) -> Point:
+        if isinstance(self.values[0], WellSeries):
+            return self.values[0][0].from_center(
+                x, y, z, r, theta, h, reference)
+        else:
+            return self.values[0].from_center(x, y, z, r, theta, h, reference)
+
+    def get_children_list(self):
+        return [well_group for well_group in self.values]
+
+    @property
+    def parent(self):
+        if isinstance(self.values[0], WellSeries):
+            return self.values[0][0].parent
+        else:
+            return self.values[0].parent
 
 
 class LegacyDeckItem(DeckItem):
@@ -983,11 +1117,12 @@ class Containers:
             mod = [mod
                    for mod in self._ctx.loaded_modules.values()
                    if mod.geometry is geom][0]
-            lw_obj = mod.load_labware_from_definition(defn)
+            labware_obj = mod.load_labware_from_definition(defn)
         else:
-            lw_obj = self._add_labware_to_deck(defn, slot_int, label, share)
-        legacy = LegacyLabware(lw_obj)
-        self.labware_mappings[lw_obj] = legacy
+            labware_obj = self._add_labware_to_deck(
+                defn, slot_int, label, share)
+        legacy = LegacyLabware(labware_obj)
+        self.labware_mappings[labware_obj] = legacy
         return legacy
 
     def _get_labware_def_with_fallback(

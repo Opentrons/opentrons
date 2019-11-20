@@ -8,7 +8,7 @@ from opentrons.legacy_api import containers
 from opentrons.config import CONFIG
 from opentrons.data_storage import database as db_cmds
 from opentrons.protocol_api.legacy_wrapper.containers_wrapper import\
-    LegacyLabware, perform_migration, LegacyWell
+    LegacyLabware, perform_migration, LegacyWell, WellSeries
 from opentrons.protocol_api.legacy_wrapper.types import LegacyLocation
 from opentrons.protocol_api.labware import get_labware_definition, Labware
 from opentrons.types import Point, Location
@@ -200,7 +200,7 @@ def test_well_accessor(minimal_labware):
     assert minimal_labware[0] == minimal_labware._wells_by_index[0]
     assert minimal_labware['A1'] == minimal_labware._wells_by_index[0]
 
-    # Access individual wells within a labware using wells method
+    # # Access individual wells within a labware using wells method
     assert minimal_labware.wells()[0] == minimal_labware._wells_by_index[0]
     assert minimal_labware.wells()['A1'] == minimal_labware._wells_by_index[0]
     assert minimal_labware.wells(0) == minimal_labware._wells_by_index[0]
@@ -215,17 +215,22 @@ def test_well_accessor(minimal_labware):
     well_4 = minimal_labware._wells_by_name['B2']
 
     # Generate lists using `wells()` method
-    assert minimal_labware.wells(0, 'A2') == [well_1, well_3]
-    assert minimal_labware.wells(['A1', 2]) == [well_1, well_3]
-    assert minimal_labware.wells(['A1', 'A2']) == [well_1, well_3]
+    assert len(minimal_labware.wells()) == 4
+    assert [well for well in minimal_labware.wells(0, 'A2')] ==\
+        [well_1, well_3]
+    assert [well for well in minimal_labware.wells(['A1', 2])] ==\
+        [well_1, well_3]
+    assert [well for well in minimal_labware.wells(['A1', 'A2'])] ==\
+        [well_1, well_3]
 
-    assert minimal_labware.wells(0, length=-2) == [well_1, well_4]
-    assert minimal_labware.wells('A1', length=4, step=2)\
+    assert [well for well in minimal_labware.wells(0, length=-2)] ==\
+        [well_1, well_4]
+    assert [well for well in minimal_labware.wells('A1', length=4, step=2)]\
         == [well_1, well_3, well_1, well_3]
 
     assert minimal_labware.wells(x=1, y=1) == well_4
-    assert minimal_labware.wells(x=-1) == [well_3, well_4]
-    assert minimal_labware.wells(y=1) == [well_2, well_4]
+    assert [well for well in minimal_labware.wells(x=-1)] == [well_3, well_4]
+    assert [well for well in minimal_labware.wells(y=1)] == [well_2, well_4]
 
 
 @pytest.mark.api2_only
@@ -237,12 +242,17 @@ def test_row_accessor(minimal_labware):
         minimal_labware._wells_by_index[1],
         minimal_labware._wells_by_index[3]]
 
-    assert minimal_labware.rows[0] == row_1
-    assert minimal_labware.rows['B'] == row_2
+    assert len(minimal_labware.rows()) == 2
+    assert isinstance(minimal_labware.rows[0], WellSeries)
+    assert [well for well in minimal_labware.rows[0]] == row_1
+    assert [well for well in minimal_labware.rows['B']] == row_2
 
-    assert minimal_labware.rows(0) == row_1
-    assert minimal_labware.rows('A') == row_1
-    assert minimal_labware.rows('A', 1) == [row_1, row_2]
+    assert [well for well in minimal_labware.rows(0)] == row_1
+    assert [well for well in minimal_labware.rows('A')] == row_1
+    assert [[well for well in row] for row in minimal_labware.rows('A', 1)]\
+        == [row_1, row_2]
+    assert [well for well in minimal_labware.rows['B'].wells(0, length=2)]\
+        == row_2
 
 
 @pytest.mark.api2_only
@@ -254,18 +264,24 @@ def test_column_accessor(minimal_labware):
         minimal_labware._wells_by_name['A2'],
         minimal_labware._wells_by_name['B2']]
 
-    assert minimal_labware.columns[0] == col_1
-    assert minimal_labware.cols[0] == col_1
-    assert minimal_labware.columns['2'] == col_2
-    assert minimal_labware.cols['2'] == col_2
+    assert len(minimal_labware.columns()) == 2
+    assert isinstance(minimal_labware.columns[0], WellSeries)
+    assert [well for well in minimal_labware.columns[0]] == col_1
+    assert [well for well in minimal_labware.cols[0]] == col_1
+    assert [well for well in minimal_labware.columns['2']] == col_2
+    assert [well for well in minimal_labware.cols['2']] == col_2
 
-    assert minimal_labware.columns(0) == col_1
-    assert minimal_labware.columns('1') == col_1
-    assert minimal_labware.columns('1', 1) == [col_1, col_2]
+    assert [well for well in minimal_labware.columns(0)] == col_1
+    assert [well for well in minimal_labware.columns('1')] == col_1
+    assert [[well for well in col] for col in minimal_labware.columns('1', 1)]\
+        == [col_1, col_2]
 
-    assert minimal_labware.cols(0) == col_1
-    assert minimal_labware.cols('1') == col_1
-    assert minimal_labware.cols('1', 1) == [col_1, col_2]
+    assert [well for well in minimal_labware.cols(0)] == col_1
+    assert [well for well in minimal_labware.cols('1')] == col_1
+    assert [[well for well in col] for col in minimal_labware.cols('1', 1)]\
+        == [col_1, col_2]
+    assert [well for well in minimal_labware.cols[1].wells(0, length=2)]\
+        == col_2
 
 
 @pytest.mark.api2_only
@@ -348,9 +364,8 @@ def test_legacy_well_position(labware):
     wp = labware.load('corning_96_wellplate_360ul_flat', '2')
     # These numeric literals are taken from experimentation with loading this
     # labware into v1
-    assert isinstance(wp[0].center(), LegacyLocation)
-    assert wp[0].center().labware is wp[0]
-    assert isclose(wp[0].center().offset,
+    assert isinstance(wp[0].center(), Point)
+    assert isclose(wp[0].center(),
                    Point(3.43, 3.43, 5.33),
                    atol=.005).all()
 
@@ -363,14 +378,14 @@ def test_legacy_well_position(labware):
     assert wp[0].bottom().labware is wp[0]
     assert isclose(wp[0].bottom().offset,
                    Point(3.43, 3.43, 0)).all()
-    # should be origin
-    assert isclose(wp[0].from_center(-1, -1, -1).offset,
+    # should be origin, also from_center only returns a point
+    assert isclose(wp[0].from_center(-1, -1, -1),
                    Point(0, 0, 0)).all()
 
     # should be another way to spell origin, but actually it's not because
     # the polar coordinates used in Placeable.from_polar are actually based
     # on an inscribed circle
-    assert isclose(wp[0].from_center(r=1, theta=5*math.pi/4, h=-1).offset,
+    assert isclose(wp[0].from_center(r=1, theta=5*math.pi/4, h=-1),
                    Point(1, 1, 0), atol=0.005).all()
     # this too
     assert isclose(wp[0].bottom(radius=1, degrees=225).offset,
@@ -381,8 +396,30 @@ def test_legacy_well_position(labware):
                    Point(1, 1, 10.67), atol=0.005).all()
 
 
-def check_label_for_labware(labware):
+@pytest.mark.api2_only
+def test_check_label_for_labware(labware):
     plate1 = labware.load('96-flat', slot=1, label='plate 1')
     plate2 = labware.load('96-flat', slot=2, label='plate 2')
     assert plate1.name == 'plate 1'
     assert plate2.name == 'plate 2'
+
+
+@pytest.mark.api2_only
+def test_get_children_list(labware):
+    plate1 = labware.load('96-flat', slot=1)
+    assert plate1.rows().get_children_list() == [row for row in plate1.rows()]
+    assert plate1.rows()[0].get_children_list() ==\
+        [well for well in plate1.rows()[0]]
+    assert plate1.wells().get_children_list() ==\
+        [well for well in plate1.wells()]
+
+
+@pytest.mark.api2_only
+def test_legacy_wellseries_position(labware):
+    plate1 = labware.load('96-flat', slot=1)
+    assert plate1.rows().top() ==\
+        LegacyLocation(plate1.rows(), plate1.wells()[0].top()[1])
+    assert plate1.columns()[0].bottom() ==\
+        LegacyLocation(plate1.columns()[0], plate1.wells()[0].bottom()[1])
+    assert plate1.columns().from_center(x=1, y=1, z=0) ==\
+        plate1.wells()[0].from_center(x=1, y=1, z=0)

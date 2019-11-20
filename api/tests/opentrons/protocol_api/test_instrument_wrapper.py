@@ -5,8 +5,9 @@ import pytest
 # import opentrons.protocol_api as papi
 from numpy import add, subtract, isclose
 # from opentrons.legacy_api.containers import unpack_location, Placeable
-from opentrons.legacy_api.containers.placeable import Placeable
-from opentrons.protocol_api.legacy_wrapper.containers_wrapper import LegacyWell
+from opentrons.legacy_api.containers.placeable import Placeable, WellSeries
+from opentrons.protocol_api.legacy_wrapper.containers_wrapper import (
+    LegacyWell, WellSeries as newWellSeries)
 from opentrons.protocol_api.legacy_wrapper.types import LegacyLocation
 from opentrons import types
 
@@ -65,12 +66,12 @@ def bind_parameters_to_instruments(additional_args, instrs=None):
 @pytest.fixture
 def load_bc_instrument(robot, instruments, labware, request):
     try:
-        which = request.node.getfixturevalue('instrument_ctor')
+        which = request.getfixturevalue('instrument_ctor')
     except Exception:
         which = 'P10_Single'
 
     try:
-        tr_name = request.node.getfixturevalue('tiprack_name')
+        tr_name = request.getfixturevalue('tiprack_name')
     except Exception:
         tr_name = TIPRACKS[which]
 
@@ -88,12 +89,12 @@ def load_v1_instrument(virtual_smoothie_env, request):
     robot.connect()
     robot.reset()
     try:
-        which = request.node.getfixturevalue('instrument_ctor')
+        which = request.getfixturevalue('instrument_ctor')
     except Exception:
         which = 'P10_Single'
 
     try:
-        tr_name = request.node.getfixturevalue('tiprack_name')
+        tr_name = request.getfixturevalue('tiprack_name')
     except Exception:
         tr_name = TIPRACKS[which]
 
@@ -433,6 +434,7 @@ def test_move_to(monkeypatch, instruments, labware, load_v1_instrument):
     fused_move.update(legacy_move.call_args_list[1][0][0])
     common_lpos, common_npos = get_common_axes(fused_move,
                                                new_move.call_args[0][0])
+
     assert common_lpos == common_npos
 
     # same deal when using a well alone (should go to top, should be direct,
@@ -451,7 +453,18 @@ def test_move_to(monkeypatch, instruments, labware, load_v1_instrument):
     fused_move.update(legacy_move.call_args_list[1][0][0])
     common_lpos, common_npos = get_common_axes(fused_move,
                                                new_move.call_args[0][0])
+
     assert common_lpos == common_npos
+
+    new_move.reset_mock()
+    legacy_move.reset_mock()
+
+    # Test WellSeries MoveTos
+    old_pos = pip._ctx._hw_manager.hardware.gantry_position(types.Mount.LEFT)
+    legacy_instr.move_to(legacy_lw.rows()[0])
+    pip.move_to(lw.rows()[0])
+    new_pos = pip._ctx._hw_manager.hardware.gantry_position(types.Mount.LEFT)
+    assert old_pos[:2] == new_pos[:2]
 
 
 def split_new_moves(call_list):
@@ -671,6 +684,9 @@ def common_method_call(call):
             return (arg.labware.get_name(), tuple(arg.offset))
         elif isinstance(arg, LegacyWell):
             return arg.get_name()
+        elif isinstance(arg, (WellSeries, newWellSeries)):
+            arg.name = None
+            return arg.get_name()
         elif isinstance(arg, Placeable):
             return arg.get_name()
         elif isinstance(arg, tuple):
@@ -703,6 +719,9 @@ def build_kwargs(legacy_instr, new_instr, legacy_lw, new_lw,  # noqa(C901)
             legacy_lw[well] for well in range(dest[1], 2*dest[1])]
         new_kwargs['dest'] = [
             new_lw[well] for well in range(dest[1], 2*dest[1])]
+    elif dest[0] == 'columns':
+        legacy_kwargs['dest'] = legacy_lw.columns()[:dest[1]]
+        new_kwargs['dest'] = new_lw.columns()[:dest[1]]
     else:
         raise Exception(f"bad dest spec {dest}")
 
@@ -718,6 +737,9 @@ def build_kwargs(legacy_instr, new_instr, legacy_lw, new_lw,  # noqa(C901)
             legacy_lw[well] for well in range(source[1])]
         new_kwargs['source'] = [
             new_lw[well] for well in range(source[1])]
+    elif source[0] == 'columns':
+        legacy_kwargs['source'] = legacy_lw.columns()[:source[1]]
+        new_kwargs['source'] = new_lw.columns()[:source[1]]
     else:
         raise Exception(f"bad source spec {source}")
 
@@ -887,7 +909,7 @@ def test_air_gap(
 def test_touch_tip(monkeypatch, instruments, labware, load_v1_instrument):
     robot, legacy_instr, legacy_lw = load_v1_instrument
 
-    def calculate_expected_well_edge(location, radius, offset):
+    def calculate_expected_well_edge(location, radius, v_offset):
         well_edges = [
             location.from_center(x=radius, y=0, z=1),
             location.from_center(x=radius * -1, y=0, z=1),
@@ -897,10 +919,10 @@ def test_touch_tip(monkeypatch, instruments, labware, load_v1_instrument):
         if isinstance(location, LegacyWell):
             new_well = [
                 LegacyLocation(
-                    ll.labware, ll.offset + types.Point(0, 0, offset))
-                for ll in well_edges]
+                    location, offset + types.Point(0, 0, v_offset))
+                for offset in well_edges]
         else:
-            new_well = map(lambda x: x + (0, 0, offset), well_edges)
+            new_well = map(lambda x: x + (0, 0, v_offset), well_edges)
         return new_well
 
     tr = labware.load('opentrons_96_tiprack_10ul', '1')
@@ -1055,6 +1077,8 @@ def test_basic_transfer(
         ('max_volume', ('wellseries', 16), ('wellseries', 16), 'always'),  # noqa(E501)
         ('max_volume', ('wellseries', 16), ('wellseries', 16), 'never'),  # noqa(E501)
         ('max_volume', ('wellseries', 16), ('wellseries', 16), 'once'),  # noqa(E501)
+        ('max_volume', ('columns', 1), ('columns', 2), 'once'),
+        ('max_volume', ('columns', 1), ('columns', 12), 'once')
     ], instrs=['P300_Single', 'P20_Multi_GEN2']))
 @pytest.mark.api2_only
 def test_transfer_tips_manipulations(
@@ -1086,6 +1110,11 @@ def test_transfer_tips_manipulations(
 
     assert new_mock.method_calls
     assert legacy_mock.method_calls
+    # print("new mocks")
+    # print(new_mock.method_calls)
+    # print("old mocks")
+    # print(legacy_mock.method_calls)
+
     assert common_method_calls(new_mock.method_calls)\
         == common_method_calls(legacy_mock.method_calls)
 
@@ -1149,7 +1178,7 @@ def test_consolidate(
         # disposal vol
         ('max_volume', ('single', 'A4'), ('list', 8), True, True, (5, 'half_max_volume'), None, None, 'twice_min_volume', None),  # noqa(E501),
         # free for all
-        ('max_volume', ('single', 'A4'), ('list', 8), True, True, (5, 'half_max_volume'), None, 'min_volume', 'twice_min_volume', 'always'),  # noqa(E501),
+        ('max_volume', ('single', 'A4'), ('list', 8), True, True, (5, 'half_max_volume'), None, 'min_volume', 'twice_min_volume', 'once'),  # noqa(E501),
 
     ], instrs=['P300_Single', 'P20_Multi_GEN2'])
 )

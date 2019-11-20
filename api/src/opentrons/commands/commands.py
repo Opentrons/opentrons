@@ -12,7 +12,7 @@ from opentrons.legacy_api.containers import (Well as OldWell,
                                              location_to_list)
 from opentrons.protocol_api.labware import Well, Labware, ModuleGeometry
 from opentrons.protocol_api.legacy_wrapper.containers_wrapper import (
-    LegacyWell, LegacyLabware)
+    LegacyWell, LegacyLabware, WellSeries as LegacyWellSeries)
 from opentrons.types import Location
 from opentrons.drivers import utils
 
@@ -77,7 +77,8 @@ def _stringify_legacy_loc(loc: Union[OldWell, OldContainer,
         OldContainer: 'container',
         OldWell: 'well',
         LegacyLabware: 'container',
-        LegacyWell: 'well'
+        LegacyWell: 'well',
+        LegacyWellSeries: 'well'
     }
 
     # Coordinates only

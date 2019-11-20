@@ -32,18 +32,16 @@ def _unpack_motion_target(
         motiontarget: MotionTarget, position: str = 'top') -> LegacyLocation:
     """ Make sure we have a full LegacyLocation """
     if isinstance(motiontarget, LegacyLocation):
-        target_loc = motiontarget
+        return motiontarget
     elif isinstance(motiontarget, (WellSeries, List)):
-        target_loc = [_unpack_motion_target(well, position)
-                      for well in motiontarget]
+        return _unpack_motion_target(motiontarget[0])
     elif isinstance(motiontarget, LegacyWell):
         if position == 'top':
-            target_loc = motiontarget.top()
+            return motiontarget.top()
         else:
-            target_loc = motiontarget.bottom()
+            return motiontarget.bottom()
     else:
         raise TypeError('A Well or tuple(well, point) is needed')
-    return target_loc
 
 
 def _absolute_motion_target(
@@ -282,6 +280,17 @@ class Pipette:
                              in a straight line from the current position
         :returns Pipette: This instance.
         """
+        if isinstance(location, tuple):
+            # For the use-case of someone formatting a tuple
+            # like (well, point) directly
+            location = LegacyLocation(location[0], location[1])
+        elif isinstance(location, LegacyLocation)\
+                and isinstance(location.labware, WellSeries):
+            # In the format (WellSeries: A1, B1.. , (x, y, z))
+            # Get the first well of a WellSeries
+            location.labware = location[0][0]
+        elif isinstance(location, WellSeries):
+            location = location[0]
 
         placeable = location\
             if isinstance(location, LegacyWell) else location.labware
@@ -464,11 +473,6 @@ class Pipette:
         volume = min(self.current_volume, volume)
 
         display_location = location if location else self.previous_placeable
-
-        # if not location and self.previous_placeable:
-        #     if isinstance(self.previous_placeable, LegacyLabware):
-        #         raise RuntimeError('Dispense must be into a well')
-        #     display = self.previous_placeable
 
         cmds.do_publish(self._instr_ctx.broker, cmds.dispense, self.dispense,
                         'before', None, None, self, volume, display_location,
@@ -678,8 +682,8 @@ class Pipette:
 
         # Apply vertical offset to well edges
         v_well_edges = [
-            LegacyLocation(ll.labware, ll.offset + new_v_offset)
-            for ll in well_edges]
+            LegacyLocation(location, offset + new_v_offset)
+            for offset in well_edges]
         self.set_speed(speed)
         [self.move_to(loc, strategy='direct')
          for loc in v_well_edges]
@@ -1132,6 +1136,7 @@ class Pipette:
 
         # create list of volumes, sources, and targets of equal length
         s, t = helpers._create_source_target_lists(s, t, **kwargs)
+
         total_transfers = len(t)
         v = helpers._create_volume_list(v, total_transfers, **kwargs)
 

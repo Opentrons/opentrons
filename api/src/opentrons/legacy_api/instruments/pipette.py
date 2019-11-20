@@ -1118,7 +1118,6 @@ class Pipette(CommandPublisher):
             if 'rack' in location.get_parent().get_type():
                 half_tip_length = self._tip_length * self._return_tip_height
                 location = location.top(-half_tip_length)
-                print(f'v1 location: {location}')
             elif 'trash' in location.get_parent().get_type():
                 loc, coords = location.top()
                 location = (loc, coords + (0, self.model_offset[1], 0))
@@ -1437,7 +1436,6 @@ class Pipette(CommandPublisher):
         # Note: currently it varies whether the pipette should have a tip on
         # or not depending on the parameters for this call, so we cannot
         # create a very reliable assertion on tip status
-
         kwargs['mode'] = kwargs.get('mode', 'transfer')
 
         touch_tip = kwargs.get('touch_tip', False)
