@@ -8,7 +8,7 @@ import omit from 'lodash/omit'
 import { createEmptyLiquidState, createTipLiquidState } from '../utils'
 import { makeContext, DEFAULT_PIPETTE, SOURCE_LABWARE } from './fixtures'
 
-import _updateLiquidState from '../dispenseUpdateLiquidState'
+import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
 
 let dispenseSingleCh150ToA1Args
 let invariantContext
@@ -17,9 +17,10 @@ beforeEach(() => {
   invariantContext = makeContext()
   dispenseSingleCh150ToA1Args = {
     invariantContext,
-    pipetteId: DEFAULT_PIPETTE,
+    pipette: DEFAULT_PIPETTE,
     volume: 150,
-    labwareId: SOURCE_LABWARE,
+    useFullVolume: false,
+    labware: SOURCE_LABWARE,
     well: 'A1',
   }
 })
@@ -40,10 +41,10 @@ describe('...single-channel pipette', () => {
       }
     )
 
-    const result = _updateLiquidState(
-      dispenseSingleCh150ToA1Args,
-      initialLiquidState
-    )
+    const result = dispenseUpdateLiquidState({
+      ...dispenseSingleCh150ToA1Args,
+      prevLiquidState: initialLiquidState,
+    })
 
     expect(result).toMatchObject({
       pipettes: {
@@ -78,13 +79,11 @@ describe('...single-channel pipette', () => {
       }
     )
 
-    const result = _updateLiquidState(
-      {
-        ...omit(dispenseSingleCh150ToA1Args, 'volume'),
-        useFullVolume: true,
-      },
-      initialLiquidState
-    )
+    const result = dispenseUpdateLiquidState({
+      ...omit(dispenseSingleCh150ToA1Args, 'volume'),
+      useFullVolume: true,
+      prevLiquidState: initialLiquidState,
+    })
 
     expect(result).toMatchObject({
       pipettes: {
@@ -127,10 +126,10 @@ describe('...single-channel pipette', () => {
       }
     )
 
-    const result = _updateLiquidState(
-      dispenseSingleCh150ToA1Args,
-      initialLiquidState
-    )
+    const result = dispenseUpdateLiquidState({
+      ...dispenseSingleCh150ToA1Args,
+      prevLiquidState: initialLiquidState,
+    })
 
     expect(result).toMatchObject({
       pipettes: {
@@ -177,10 +176,10 @@ describe('...single-channel pipette', () => {
       }
     )
 
-    const result = _updateLiquidState(
-      dispenseSingleCh150ToA1Args,
-      initialLiquidState
-    )
+    const result = dispenseUpdateLiquidState({
+      ...dispenseSingleCh150ToA1Args,
+      prevLiquidState: initialLiquidState,
+    })
 
     expect(result).toMatchObject({
       pipettes: {
@@ -229,10 +228,10 @@ describe('...single-channel pipette', () => {
       }
     )
 
-    const result = _updateLiquidState(
-      dispenseSingleCh150ToA1Args,
-      initialLiquidState
-    )
+    const result = dispenseUpdateLiquidState({
+      ...dispenseSingleCh150ToA1Args,
+      prevLiquidState: initialLiquidState,
+    })
 
     expect(result).toMatchObject({
       pipettes: {
@@ -360,16 +359,15 @@ describe('...8-channel pipette', () => {
           },
         })
 
-        const result = _updateLiquidState(
-          {
-            invariantContext: customInvariantContext,
-            pipetteId: 'p300MultiId',
-            volume: 150,
-            labwareId: SOURCE_LABWARE,
-            well: 'A1',
-          },
-          initialLiquidState
-        )
+        const result = dispenseUpdateLiquidState({
+          invariantContext: customInvariantContext,
+          labware: SOURCE_LABWARE,
+          pipette: 'p300MultiId',
+          prevLiquidState: initialLiquidState,
+          useFullVolume: false,
+          volume: 150,
+          well: 'A1',
+        })
 
         expect(result).toMatchObject({
           pipettes: {

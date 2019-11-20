@@ -11,9 +11,9 @@ import {
 } from './fixtures'
 import dropTip from '../commandCreators/atomic/dropTip'
 
-import updateLiquidState from '../dispenseUpdateLiquidState'
+import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
 
-jest.mock('../dispenseUpdateLiquidState')
+jest.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 
 describe('dropTip', () => {
   let invariantContext
@@ -27,9 +27,9 @@ describe('dropTip', () => {
 
     // TODO IMMEDIATELY handle in tip pickup state updaters
     // $FlowFixMe: mock methods
-    updateLiquidState.mockClear()
+    dispenseUpdateLiquidState.mockClear()
     // $FlowFixMe: mock methods
-    updateLiquidState.mockReturnValue(initialRobotState.liquidState)
+    dispenseUpdateLiquidState.mockReturnValue(initialRobotState.liquidState)
   })
 
   // TODO Ian 2019-04-19: this is a ONE-OFF fixture
@@ -138,7 +138,7 @@ describe('dropTip', () => {
   //   const mockLiquidReturnValue = 'expected liquid state'
   //   beforeEach(() => {
   //     // $FlowFixMe
-  //     updateLiquidState.mockReturnValue(mockLiquidReturnValue)
+  //     dispenseUpdateLiquidState.mockReturnValue(mockLiquidReturnValue)
   //   })
 
   //   test('dropTip calls dispenseUpdateLiquidState with useFullVolume: true', () => {
@@ -153,7 +153,7 @@ describe('dropTip', () => {
   //       initialRobotState
   //     )
   //     const res = getSuccessResult(result)
-  //     expect(updateLiquidState).toHaveBeenCalledWith(
+  //     expect(dispenseUpdateLiquidState).toHaveBeenCalledWith(
   //       {
   //         invariantContext,
   //         pipetteId: 'p300MultiId',

@@ -1,5 +1,5 @@
 // @flow
-import updateLiquidState from '../dispenseUpdateLiquidState'
+import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
 import type { PipetteAccessParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type {
   InvariantContext,
@@ -17,16 +17,14 @@ export function forDropTip(
     warnings: [],
     robotState: {
       ...prevRobotState,
-      liquidState: updateLiquidState(
-        {
-          invariantContext,
-          pipetteId: pipette,
-          labwareId: labware,
-          useFullVolume: true,
-          well,
-        },
-        prevRobotState.liquidState
-      ),
+      liquidState: dispenseUpdateLiquidState({
+        invariantContext,
+        prevLiquidState: prevRobotState.liquidState,
+        pipette,
+        labware,
+        useFullVolume: true,
+        well,
+      }),
       tipState: {
         ...prevRobotState.tipState,
         pipettes: {

@@ -8,38 +8,41 @@ import {
   mergeLiquid,
   getWellsForTips,
   getLocationTotalVolume,
-} from './utils'
+} from '../utils'
 import type {
-  InvariantContext,
   RobotState,
+  InvariantContext,
   LocationLiquidState,
   SourceAndDest,
-} from './types'
+} from '../types'
 
 type LiquidState = $PropertyType<RobotState, 'liquidState'>
+type DispenseUpdateLiquidStateArgs = {|
+  invariantContext: InvariantContext,
+  prevLiquidState: LiquidState,
+  labware: string,
+  pipette: string,
+  well: string,
+  volume?: number, // volume value is required when useFullVolume is false
+  useFullVolume: boolean,
+|}
 
-export default function updateLiquidState(
-  args: {|
-    invariantContext: InvariantContext,
-    pipetteId: string,
-    volume?: number,
-    useFullVolume?: boolean,
-    labwareId: string,
-    well: string,
-  |},
-  prevLiquidState: LiquidState
+/** This is a helper to do dispense/blowout liquid state updates. */
+export function dispenseUpdateLiquidState(
+  args: DispenseUpdateLiquidStateArgs
 ): LiquidState {
-  // TODO: Ian 2018-06-14 return same shape as aspirateUpdateLiquidState fn: {liquidState, warnings}.
   const {
     invariantContext,
-    pipetteId,
-    volume,
+    labware,
+    pipette,
+    prevLiquidState,
     useFullVolume,
-    labwareId,
+    volume,
     well,
   } = args
-  const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
-  const labwareDef = invariantContext.labwareEntities[labwareId].def
+  const pipetteSpec = invariantContext.pipetteEntities[pipette].spec
+  const labwareDef = invariantContext.labwareEntities[labware].def
+
   assert(
     !(useFullVolume && typeof volume === 'number'),
     'dispenseUpdateLiquidState takes either `volume` or `useFullVolume`, but got both'
@@ -59,7 +62,7 @@ export default function updateLiquidState(
   // create intermediate object where sources are updated tip liquid states
   // and dests are "droplets" that need to be merged to dest well contents
   const splitLiquidStates: { [tipId: string]: SourceAndDest } = mapValues(
-    prevLiquidState.pipettes[pipetteId],
+    prevLiquidState.pipettes[pipette],
     (prevTipLiquidState: LocationLiquidState): SourceAndDest => {
       if (useFullVolume) {
         const totalTipVolume = getLocationTotalVolume(prevTipLiquidState)
@@ -84,7 +87,7 @@ export default function updateLiquidState(
             )
             return res
           },
-          cloneDeep(prevLiquidState.labware[labwareId][well])
+          cloneDeep(prevLiquidState.labware[labware][well])
         ),
       }
     : // merge each tip's liquid into that tip's respective well
@@ -93,20 +96,21 @@ export default function updateLiquidState(
           ...acc,
           [wellForTip]: mergeLiquid(
             splitLiquidStates[`${tipIdx}`].dest,
-            prevLiquidState.labware[labwareId][wellForTip] || {} // TODO Ian 2018-04-02 use robotState selector. (Liquid state falls back to {} for empty well)
+            prevLiquidState.labware[labware][wellForTip] || {} // TODO Ian 2018-04-02 use robotState selector. (Liquid state falls back to {} for empty well)
           ),
         }
       }, {})
 
   return {
+    ...prevLiquidState,
     pipettes: {
       ...prevLiquidState.pipettes,
-      [pipetteId]: mapValues(splitLiquidStates, 'source'),
+      [pipette]: mapValues(splitLiquidStates, 'source'),
     },
     labware: {
       ...prevLiquidState.labware,
-      [labwareId]: {
-        ...prevLiquidState.labware[labwareId],
+      [labware]: {
+        ...prevLiquidState.labware[labware],
         ...labwareLiquidState,
       },
     },

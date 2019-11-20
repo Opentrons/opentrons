@@ -11,9 +11,10 @@ import {
   DEFAULT_PIPETTE,
 } from './fixtures'
 import replaceTip from '../commandCreators/atomic/replaceTip'
-import updateLiquidState from '../dispenseUpdateLiquidState'
+import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
 
-jest.mock('../dispenseUpdateLiquidState')
+jest.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
+// TODO IMMEDIATELY like forBlowout.test.js, check that mock was called with correct args
 
 // TODO: Ian 2019-06-13 move these strings into commandFixtures
 const tiprack1Id = 'tiprack1Id'
@@ -29,9 +30,9 @@ describe('replaceTip', () => {
     initialRobotState = getInitialRobotStateStandard(invariantContext)
 
     // $FlowFixMe: mock methods
-    updateLiquidState.mockClear()
+    dispenseUpdateLiquidState.mockClear()
     // $FlowFixMe: mock methods
-    updateLiquidState.mockReturnValue(initialRobotState.liquidState)
+    dispenseUpdateLiquidState.mockReturnValue(initialRobotState.liquidState)
   })
 
   describe('replaceTip: single channel', () => {

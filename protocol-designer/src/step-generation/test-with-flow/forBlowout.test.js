@@ -8,9 +8,9 @@ import {
   SOURCE_LABWARE,
 } from './fixtures'
 
-import updateLiquidState from '../dispenseUpdateLiquidState'
+import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
 
-jest.mock('../dispenseUpdateLiquidState')
+jest.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 
 let invariantContext
 let initialRobotState
@@ -23,9 +23,9 @@ beforeEach(() => {
   robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
 
   // $FlowFixMe: mock methods
-  updateLiquidState.mockClear()
+  dispenseUpdateLiquidState.mockClear()
   // $FlowFixMe: mock methods
-  updateLiquidState.mockReturnValue(initialRobotState.liquidState)
+  dispenseUpdateLiquidState.mockReturnValue(initialRobotState.liquidState)
 
   params = {
     pipette: DEFAULT_PIPETTE,
@@ -41,22 +41,20 @@ describe('Blowout command', () => {
     const mockLiquidReturnValue = 'expected liquid state'
     beforeEach(() => {
       // $FlowFixMe
-      updateLiquidState.mockReturnValue(mockLiquidReturnValue)
+      dispenseUpdateLiquidState.mockReturnValue(mockLiquidReturnValue)
     })
 
     test('blowout calls dispenseUpdateLiquidState with max volume of pipette', () => {
       const result = forBlowout(params, invariantContext, robotStateWithTip)
 
-      expect(updateLiquidState).toHaveBeenCalledWith(
-        {
-          invariantContext,
-          pipetteId: DEFAULT_PIPETTE,
-          labwareId: SOURCE_LABWARE,
-          useFullVolume: true,
-          well: 'A1',
-        },
-        robotStateWithTip.liquidState
-      )
+      expect(dispenseUpdateLiquidState).toHaveBeenCalledWith({
+        invariantContext,
+        labware: SOURCE_LABWARE,
+        pipette: DEFAULT_PIPETTE,
+        prevLiquidState: robotStateWithTip.liquidState,
+        useFullVolume: true,
+        well: 'A1',
+      })
 
       expect(result.robotState.liquidState).toBe(mockLiquidReturnValue)
     })

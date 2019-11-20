@@ -1,6 +1,7 @@
 // @flow
 import assert from 'assert'
-import forAspirateDispense from './forAspirateDispense'
+import { forAspirate } from './forAspirate'
+import { forDispense } from './forDispense'
 import { forBlowout } from './forBlowout'
 import { forDropTip } from './forDropTip'
 import { forPickUpTip } from './forPickUpTip'
@@ -20,13 +21,9 @@ export function getNextRobotStateAndWarnings(
   assert(command, 'undefined command passed to getNextRobotStateAndWarning')
   switch (command.command) {
     case 'aspirate':
+      return forAspirate(command.params, invariantContext, prevRobotState)
     case 'dispense':
-      // TODO: BC 2018-11-29 handle dispense -- TODO IMMEDIATELY check this
-      return forAspirateDispense(
-        command.params,
-        invariantContext,
-        prevRobotState
-      )
+      return forDispense(command.params, invariantContext, prevRobotState)
     case 'blowout':
       return forBlowout(command.params, invariantContext, prevRobotState)
     case 'dropTip':

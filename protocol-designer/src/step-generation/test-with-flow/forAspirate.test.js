@@ -8,7 +8,7 @@ import {
   TROUGH_LABWARE,
 } from './fixtures'
 
-import forAspirateDispense from '../getNextRobotStateAndWarnings/forAspirateDispense'
+import { forAspirate } from '../getNextRobotStateAndWarnings/forAspirate'
 import * as warningCreators from '../warningCreators'
 
 let invariantContext
@@ -46,7 +46,7 @@ describe('...single-channel pipette', () => {
         },
       }
 
-      const result = forAspirateDispense(
+      const result = forAspirate(
         aspirateSingleCh50FromA1Args,
         invariantContext,
         initialRobotState
@@ -81,11 +81,7 @@ describe('...single-channel pipette', () => {
         volume: 300,
       }
 
-      const result = forAspirateDispense(
-        args,
-        invariantContext,
-        initialRobotState
-      )
+      const result = forAspirate(args, invariantContext, initialRobotState)
 
       expect(result.warnings).toEqual([
         warningCreators.aspirateMoreThanWellContents(),
@@ -116,11 +112,7 @@ describe('...single-channel pipette', () => {
         volume: 60,
       }
 
-      const result = forAspirateDispense(
-        args,
-        invariantContext,
-        initialRobotState
-      )
+      const result = forAspirate(args, invariantContext, initialRobotState)
 
       expect(result.warnings).toEqual([])
       expect(result.robotState.liquidState).toMatchObject({
@@ -151,11 +143,7 @@ describe('...single-channel pipette', () => {
         volume: 150,
       }
 
-      const result = forAspirateDispense(
-        args,
-        invariantContext,
-        initialRobotState
-      )
+      const result = forAspirate(args, invariantContext, initialRobotState)
 
       expect(result.warnings).toEqual([
         warningCreators.aspirateMoreThanWellContents(),
@@ -188,7 +176,7 @@ describe('...single-channel pipette', () => {
         ingred1: { volume: 30 },
       }
 
-      const result = forAspirateDispense(
+      const result = forAspirate(
         aspirateSingleCh50FromA1Args,
         invariantContext,
         initialRobotState
@@ -240,7 +228,7 @@ describe('...8-channel pipette', () => {
       }
     )
 
-    const result = forAspirateDispense(
+    const result = forAspirate(
       aspirate8Ch50FromA1Args,
       invariantContext,
       initialRobotState
@@ -284,11 +272,7 @@ describe('...8-channel pipette', () => {
       volume: 250,
     }
 
-    const result = forAspirateDispense(
-      args,
-      invariantContext,
-      initialRobotState
-    )
+    const result = forAspirate(args, invariantContext, initialRobotState)
 
     // A1 and B1 over-aspirated, remaining 6 pristine
     expect(result.warnings).toEqual([
@@ -367,11 +351,7 @@ describe('8-channel trough', () => {
           volume: aspirateVolume,
         }
 
-        const result = forAspirateDispense(
-          args,
-          invariantContext,
-          initialRobotState
-        )
+        const result = forAspirate(args, invariantContext, initialRobotState)
 
         expect(result.warnings).toEqual(expectedWarnings)
         expect(result.robotState.liquidState).toMatchObject({
