@@ -837,7 +837,7 @@ class Labware(DeckItem):
                          for tip_no in list(range(8))]
 
         if 'centerMultichannelOnWells' in self.quirks:
-            tip_positions = [{**pos, 'y': pos.y + (MULTICHANNEL_TIP_SPAN / 2)}
+            tip_positions = [{**pos, 'y': pos['y'] + (MULTICHANNEL_TIP_SPAN / 2)}
                              for pos in tip_positions]
         wells_accessed = []
         for position in tip_positions:
@@ -850,13 +850,13 @@ class Labware(DeckItem):
                 y_diff = y - well.top().point.y
                 if well._diameter is not None and \
                         sqrt(x_diff**2 + y_diff**2) <= well.diameter:
-                    # assume circular
+                    # circular well
                     found = True
                     break
                 elif well._diameter is None and \
                         abs(x_diff) <= well._x_dimension and \
-                        abs(y_diff) <= well.y_dimension:
-                    # assume rectangular
+                        abs(y_diff) <= well._y_dimension:
+                    # rectangular well
                     found = True
                     break
                     wells_accessed.append(well)
