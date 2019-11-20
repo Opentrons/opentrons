@@ -841,7 +841,13 @@ class InstrumentContext(CommandPublisher):
                         'before', None, None, self, volume, dest, rate)
         self._hw_manager.hardware.aspirate(self._mount, volume, rate)
         if isinstance(location, Well):
-            location.volume = location.volume - volume
+            if self.type == 'multi':
+                for well_set in location.parent.well_sets:
+                    if well_set[0] = location:
+                        for well in well_set:
+                            well.volume = well.volume - volume
+            else:
+                location.volume = location.volume - volume
         cmds.do_publish(self.broker, cmds.aspirate, self.aspirate,
                         'after', self, None, self, volume, dest, rate)
         return self
@@ -925,7 +931,14 @@ class InstrumentContext(CommandPublisher):
                         'before', None, None, self, volume, loc, rate)
         self._hw_manager.hardware.dispense(self._mount, volume, rate)
         if isinstance(location, Well):
-            location.volume = location.volume + volume
+            if self.type == 'multi':
+                for well_set in location.parent.well_sets:
+                    if well_set[0] = location:
+                        for well in well_set:
+                            well.volume = well.volume + volume
+                        break
+            else:
+                location.volume = location.volume + volume
         cmds.do_publish(self.broker, cmds.dispense, self.dispense,
                         'after', self, None, self, volume, loc, rate)
         return self
@@ -1036,7 +1049,13 @@ class InstrumentContext(CommandPublisher):
                 "knows where it is.")
         self._hw_manager.hardware.blow_out(self._mount)
         if isinstance(location, Well):
-            location.volume = location.volume + self.current_volume
+            if self.type == 'multi':
+                for well_set in location.parent.well_sets:
+                    if well_set[0] = location:
+                        for well in well_set:
+                            well.volume = well.volume + self.current_volume
+            else:
+                location.volume = location.volume + self.current_volume
         return self
 
     @cmds.publish.both(command=cmds.touch_tip)
@@ -2309,6 +2328,7 @@ class ThermocyclerContext(ModuleContext):
 
             MODULE_LOG.info(f'\n vbw{self.labware.volume_by_well}')
             MODULE_LOG.info(f'\nblock vol: {block_volume}')
+            MODULE_LOG.info(f'\n well_sets: {self.labware.well_sets}')
         else:
             block_volume = None
         return self._module.set_temperature(

@@ -301,8 +301,8 @@ class ModifiedList(list):
 
 # type WellSetByPrimaryWell = Array<Array<string>>
 
-# Compute all well sets for a labware def (non-memoized)
-def _getAllWellSetsForLabware(labwareDef)
+
+# def _get_all_well_sets_for_labware(labware_def)
 #   const allWells: Array<string> = Object.keys(labwareDef.wells)
 #   return allWells.reduce(
 #     (acc: WellSetByPrimaryWell, well: string): WellSetByPrimaryWell => {
@@ -314,7 +314,7 @@ def _getAllWellSetsForLabware(labwareDef)
 
 # TODO: think on caching
 # creates memoized getAllWellSetsForLabware + getWellSetForMultichannel fns.
-def makeWellSetHelpers()
+# def make_well_set_helpers()
 #   let cache: {
 #     [labwareDefURI: string]: ?{|
 #       labwareDef: LabwareDefinition2,
@@ -322,22 +322,21 @@ def makeWellSetHelpers()
 #     |},
 #   } = {}
 
-#   const getAllWellSetsForLabware = (
-#     labwareDef: LabwareDefinition2
-#   ): WellSetByPrimaryWell => {
-#     const labwareDefURI = getLabwareDefURI(labwareDef)
-#     const c = cache[labwareDefURI]
-#     // use cached version only if labwareDef is shallowly equal, in case
-#     // custom labware defs are changed without giving them a new URI
-#     if (c && c.labwareDef === labwareDef) {
-#       return c.wellSetByPrimaryWell
-#     }
-#     const wellSetByPrimaryWell = _getAllWellSetsForLabware(labwareDef)
-#     cache[labwareDefURI] = { labwareDef, wellSetByPrimaryWell }
-#     return wellSetByPrimaryWell
+
+# def get_all_well_sets_for_labware(labware_def):
+    #     const labwareDefURI = getLabwareDefURI(labwareDef)
+    #     const c = cache[labwareDefURI]
+    #     // use cached version only if labwareDef is shallowly equal, in case
+    #     // custom labware defs are changed without giving them a new URI
+    #     if (c && c.labwareDef === labwareDef) {
+    #       return c.wellSetByPrimaryWell
+    #     }
+    #     const wellSetByPrimaryWell = _getAllWellSetsForLabware(labwareDef)
+    #     cache[labwareDefURI] = { labwareDef, wellSetByPrimaryWell }
+    #     return wellSetByPrimaryWell
 
 
-def get_well_set_for_multichannel(labwareDef, well: str):
+# def get_well_set_for_multichannel(labware_def, well: str):
     # /** Given a well for a labware, returns the well set it belongs to (or null)
     #  * for 8-channel access.
     #  * Ie: C2 for 96-flat => ['A2', 'B2', 'C2', ... 'H2']
@@ -345,22 +344,3 @@ def get_well_set_for_multichannel(labwareDef, well: str):
     #  **/
     # const allWellSets = getAllWellSetsForLabware(labwareDef)
     # return allWellSets.find((wellSet: Array<string>) => wellSet.includes(well))
-
-
-def can_pipette_use_labware(pipetteSpec, labwareDef)
-# if (pipetteSpec.channels === 1) {
-#   // assume all labware can be used by single-channel
-#   return true
-# }
-
-# const allWellSets = getAllWellSetsForLabware(labwareDef)
-# return allWellSets.some(wellSet => {
-#   const uniqueWells = uniq(wellSet)
-#   // if all wells are non-null, and there are either 1 (reservoir-like)
-#   // or 8 (well plate-like) unique wells in the set,
-#   // then assume multi-channel will work
-#   return (
-#     uniqueWells.every(well => well != null) &&
-#     [1, 8].includes(uniqueWells.length)
-#   )
-# })

@@ -16,6 +16,7 @@ import pkgutil
 import shutil
 import sys
 import abc
+from math import sqrt
 from pathlib import Path
 from collections import defaultdict
 from enum import Enum, auto
@@ -40,6 +41,10 @@ OPENTRONS_NAMESPACE = 'opentrons'
 CUSTOM_NAMESPACE = 'custom_beta'
 STANDARD_DEFS_PATH = Path(sys.modules['opentrons'].__file__).parent /\
     'shared_data' / 'labware' / 'definitions' / '2'
+
+# TODO BC 2019-11-19 pull pipette offsets/positions from some pipette definitions data
+OFFSET_8_CHANNEL = 9 # offset in mm between tips
+MULTICHANNEL_TIP_SPAN = OFFSET_8_CHANNEL * (8 - 1) # length in mm from first to last tip of multichannel
 
 
 LabwareDefinition = Dict[str, Any]
@@ -117,12 +122,12 @@ class Well:
         self._volume = starting_volume if starting_volume else 0
         self._shape = well_shapes.get(well_props['shape'])
         if self._shape is WellShape.RECTANGULAR:
-            self._length = well_props['xDimension']
-            self._width = well_props['yDimension']
+            self._x_dimension = well_props['xDimension']
+            self._y_dimension = well_props['yDimension']
             self._diameter = None
         elif self._shape is WellShape.CIRCULAR:
-            self._length = None
-            self._width = None
+            self._x_dimension = None
+            self._y_dimension = None
             self._diameter = well_props['diameter']
         else:
             raise ValueError(
@@ -238,8 +243,8 @@ class Well:
         """
         center = self._center()
         if self._shape is WellShape.RECTANGULAR:
-            x_size = self._length
-            y_size = self._width
+            x_size = self._x_dimension
+            y_size = self._y_dimension
         else:
             x_size = self._diameter
             y_size = self._diameter
@@ -335,6 +340,7 @@ class Labware(DeckItem):
         self._display_name = "{} on {}".format(dn, str(parent.labware))
         self._calibrated_offset: Point = Point(0, 0, 0)
         self._wells: List[Well] = []
+        self._well_sets: List[List[Well]] = None
         # Directly from definition
         self._well_definition = definition['wells']
         self._parameters = definition['parameters']
@@ -820,6 +826,55 @@ class Labware(DeckItem):
         for well in drop_targets:
             well.has_tip = True
 
+    def _get_multi_well_set(self, back_well):
+        back_x = back_well.top().point.x
+        back_y= back_well.top().point.y
+        tip_positions = [{'x': back_x, 'y': back_y - (tip_no * OFFSET_8_CHANNEL)}
+                         for tip_no in list(range(8))]
+
+        if 'centerMultichannelOnWells' in self.quirks:
+            tip_positions = [{**pos, 'y': pos.y + (MULTICHANNEL_TIP_SPAN / 2)}
+                             for pos in tip_positions]
+        wells_accessed = []
+        for position in tip_positions:
+            x = position['x']
+            y = position['y']
+
+            found = False
+            for well in self.wells():
+                x_diff = x - well.top().point.x
+                y_diff = y - well.top().point.y
+                if well._diameter is not None and \
+                        sqrt(x_diff**2 + y_diff**2) <= well.diameter:
+                    # assume circular
+                    found = True
+                    break
+                elif well._diameter is None and \
+                        abs(x_diff) <= well._x_dimension and \
+                        abs(y_diff) <= well.y_dimension:
+                    # assume rectangular
+                    found = True
+                    break
+                    wells_accessed.append(well)
+            if found:
+                wells_accessed.append(well)
+            else:
+                return []
+        return wells_accessed
+
+    @property  # type: ignore
+    @requires_version(2, 0)
+    def well_sets(self):
+        if self._well_sets is None:
+            well_sets = []
+            for well in self.wells():
+                well_set = self._get_multi_well_set(well)
+                if well_set:
+                    well_sets.append(well_set)
+            self._well_sets = well_sets
+        return self._well_sets
+
+
     @requires_version(2, 0)
     def reset(self):
         """Reset all tips in a tiprack
@@ -827,6 +882,8 @@ class Labware(DeckItem):
         if self._is_tiprack:
             for well in self.wells():
                 well.has_tip = True
+
+
 
 
 class ModuleGeometry(DeckItem):
