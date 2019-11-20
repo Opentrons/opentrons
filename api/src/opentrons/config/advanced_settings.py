@@ -80,10 +80,12 @@ settings = [
     ),
     Setting(
         _id='useLegacyInternals',
-        title='Use Protocol API V1 Internals',
-        description='Enable to go back to the Protocol API V1 internals in '
-        'the robot server. This allows protocols that relied on those '
-        'internals to work properly.',
+        title='Downgrade to Version 1 Server',
+        description='Turning on this feature flag will allow you to run APIv1 '
+        'protocols on the original Version 1 Server and Protocol API. This '
+        'downgrade option should only be used if your APIv1 protocols do not '
+        'function as expected on the Version 2 Server. If you notice this '
+        'happening, please contact us at support@opentrons.com.',
         restart_required=True
     )
 ]
