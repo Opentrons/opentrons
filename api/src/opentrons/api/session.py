@@ -283,17 +283,6 @@ class Session(object):
         if isinstance(self._protocol, PythonProtocol):
             self.api_level = self._protocol.api_level
             self.metadata = self._protocol.metadata
-            if ff.use_protocol_api_v2()\
-               and self._protocol.api_level == APIVersion(1, 0)\
-               and not ff.enable_back_compat():
-                raise RuntimeError(
-                    'This protocol targets Protocol API V1, but the robot is '
-                    'set to Protocol API V2. If this is actually a V2 '
-                    'protocol, please set the \'apiLevel\' to \'2\' in the '
-                    'metadata. If you do not want to be on API V2, please '
-                    'disable the \'Use Protocol API version 2\' toggle in the '
-                    'robot\'s Advanced Settings and restart the robot.')
-
             log.info(f"Protocol API version: {self._protocol.api_level}")
         else:
             if ff.use_protocol_api_v2():

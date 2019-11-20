@@ -117,12 +117,10 @@ def test_load_protocol_with_error_v1(session_manager, hardware):
     'protocol_file',
     ['testosaur_v2.py', 'testosaur.py', 'multi-single.py'])
 async def test_load_and_run_v2(
-    main_router,
-    protocol,
-    protocol_file,
-    loop,
-    enable_apiv1_backcompat
-):
+        main_router,
+        protocol,
+        protocol_file,
+        loop):
     session = main_router.session_manager.create(
         name='<blank>',
         contents=protocol.text)

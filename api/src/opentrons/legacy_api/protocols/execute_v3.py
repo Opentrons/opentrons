@@ -3,7 +3,7 @@ import datetime
 
 from numpy import add  # type: ignore
 
-from opentrons import instruments, robot
+from ..api import instruments, robot
 
 
 def _sleep(seconds):
