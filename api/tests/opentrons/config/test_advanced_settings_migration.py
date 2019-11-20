@@ -23,52 +23,52 @@ def test_migrates_empty_object():
 
 def test_migrates_versionless_new_config():
     settings, version = _migrate({
-      'shortFixedTrash': True,
-      'calibrateToBottom': True,
-      'deckCalibrationDots': False,
-      'disableHomeOnBoot': True,
-      'useProtocolApi2': False,
-      'useOldAspirationFunctions': True,
+        'shortFixedTrash': True,
+        'calibrateToBottom': True,
+        'deckCalibrationDots': False,
+        'disableHomeOnBoot': True,
+        'useProtocolApi2': False,
+        'useOldAspirationFunctions': True,
     })
 
     assert version == good_file_version
     assert settings == {
-      'shortFixedTrash': True,
-      'calibrateToBottom': True,
-      'deckCalibrationDots': None,
-      'disableHomeOnBoot': True,
-      'useOldAspirationFunctions': True,
-      'disableLogAggregation': None,
-      'useLegacyInternals': None,
-      'enableApi1BackCompat': None,
+        'shortFixedTrash': True,
+        'calibrateToBottom': True,
+        'deckCalibrationDots': None,
+        'disableHomeOnBoot': True,
+        'useOldAspirationFunctions': True,
+        'disableLogAggregation': None,
+        'useLegacyInternals': None,
+        'enableApi1BackCompat': None,
     }
 
 
 def test_migrates_versionless_old_config():
     settings, version = _migrate({
-      'short-fixed-trash': False,
-      'calibrate-to-bottom': False,
-      'dots-deck-type': True,
-      'disable-home-on-boot': False,
+        'short-fixed-trash': False,
+        'calibrate-to-bottom': False,
+        'dots-deck-type': True,
+        'disable-home-on-boot': False,
     })
 
     assert version == good_file_version
     assert settings == {
-      'shortFixedTrash': None,
-      'calibrateToBottom': None,
-      'deckCalibrationDots': True,
-      'disableHomeOnBoot': None,
-      'useOldAspirationFunctions': None,
-      'disableLogAggregation': None,
-      'useLegacyInternals': None,
-      'enableApi1BackCompat': None,
+        'shortFixedTrash': None,
+        'calibrateToBottom': None,
+        'deckCalibrationDots': True,
+        'disableHomeOnBoot': None,
+        'useOldAspirationFunctions': None,
+        'disableLogAggregation': None,
+        'useLegacyInternals': None,
+        'enableApi1BackCompat': None,
     }
 
 
 def test_ignores_invalid_keys():
     settings, version = _migrate({
-      'split-labware-def': True,
-      'splitLabwareDefinitions': True
+        'split-labware-def': True,
+        'splitLabwareDefinitions': True
     })
 
     assert version == good_file_version
@@ -77,13 +77,13 @@ def test_ignores_invalid_keys():
 
 def test_migrates_v1_config():
     settings, version = _migrate({
-      '_version': 1,
-      'shortFixedTrash': True,
-      'calibrateToBottom': True,
-      'deckCalibrationDots': False,
-      'disableHomeOnBoot': True,
-      'useProtocolApi2': False,
-      'useOldAspirationFunctions': True,
+        '_version': 1,
+        'shortFixedTrash': True,
+        'calibrateToBottom': True,
+        'deckCalibrationDots': False,
+        'disableHomeOnBoot': True,
+        'useProtocolApi2': False,
+        'useOldAspirationFunctions': True,
     })
     assert version == good_file_version
     assert settings == {
@@ -95,7 +95,10 @@ def test_migrates_v1_config():
         'disableLogAggregation': None,
         'useLegacyInternals': None,
         'useProtocolApi2': False,
+        << << << < HEAD
         'enableApi1BackCompat': None,
+        == == == =
+        >>>>>> > fix(api): prevent crashes after downgrade from adv settings changes
     }
 
 
@@ -156,13 +159,13 @@ def test_ensures_config():
         {'_version': 3,
          'shortFixedTrash': False,
          'disableLogAggregation': True})\
-         == {
-             '_version': 3,
-             'shortFixedTrash': False,
-             'calibrateToBottom': None,
-             'deckCalibrationDots': None,
-             'disableHomeOnBoot': None,
-             'useOldAspirationFunctions': None,
-             'disableLogAggregation': True,
-             'useLegacyInternals': None,
-         }
+        == {
+        '_version': 3,
+        'shortFixedTrash': False,
+        'calibrateToBottom': None,
+        'deckCalibrationDots': None,
+        'disableHomeOnBoot': None,
+        'useOldAspirationFunctions': None,
+        'disableLogAggregation': True,
+        'useLegacyInternals': None,
+    }
