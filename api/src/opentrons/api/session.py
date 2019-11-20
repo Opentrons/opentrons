@@ -32,6 +32,22 @@ log = logging.getLogger(__name__)
 VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused', 'error'}
 
 
+def rpc_invisible(cond):
+    """ Decorate a function with this to hide it from rpc
+
+    cond is a callable that returns bool that is assigned to the added
+    attribute. The callable is called when evaluated for rpc reflection,
+    not when this function is interpreted
+
+    This shouldn't be defined here but it's a bit of a hack anyway and
+    rpc will be gone soon and it avoids a circular import problem
+    """
+    def _make_invisible(func):
+        setattr(func, '__ot_rpc_invisible', cond)
+        return func
+    return _make_invisible
+
+
 def _motion_lock(func):
     """ Decorator to make a function require a lock. Only works for instance
     methods of Session (or SessionManager) """
@@ -120,6 +136,7 @@ class SessionManager(object):
         finally:
             self._session_lock = False
 
+    @rpc_invisible(lambda: ff.use_protocol_api_v2())
     def create_from_bundle(self, name: str, contents: str) -> 'Session':
         """ Create a protocol session from a base64'd zip file.
 
@@ -155,6 +172,7 @@ class SessionManager(object):
         finally:
             self._session_lock = False
 
+    @rpc_invisible(lambda: ff.use_protocol_api_v2())
     def create_with_extra_labware(
             self,
             name: str,

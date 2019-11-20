@@ -24,6 +24,10 @@ def _get_object_tree(max_depth, path, refs, depth, obj):  # noqa C901
     object_tree = functools.partial(
         _get_object_tree, max_depth, path, refs, depth + 1)
 
+    def hide(check):
+        return hasattr(check, '__ot_rpc_invisible')\
+            and getattr(check, '__ot_rpc_invisible')()
+
     path += [id(obj)]
 
     # Cut-off at max_depth
@@ -34,7 +38,9 @@ def _get_object_tree(max_depth, path, refs, depth, obj):  # noqa C901
     if isinstance(obj, (list, tuple)):
         return [object_tree(o) for o in obj]
 
-    def iterate(kv): return {str(k): object_tree(v) for k, v in kv.items()}
+    def iterate(kv):
+        return {str(k): object_tree(v) for k, v in kv.items()
+                if not hide(v)}
 
     if isinstance(obj, dict):
         return object_container(iterate(obj))
@@ -44,14 +50,15 @@ def _get_object_tree(max_depth, path, refs, depth, obj):  # noqa C901
         # If Type is iterable we will iterate generating numeric keys and
         # and merge with the output
         try:
-            items = [object_tree(o) for o in obj]
+            items = [object_tree(o) for o in obj if not hide(o)]
         except TypeError:
             pass
-        tail = {i: v for i, v in enumerate(items)}
+        tail = {i: v for i, v in enumerate(items) if not hide(v)}
 
         # Filter out private attributes
         attributes = {
-            k: v for k, v in obj.__dict__.items() if not k.startswith('_')}
+            k: v for k, v in obj.__dict__.items()
+            if not k.startswith('_') and not hide(obj)}
         return object_container({**iterate(attributes), **tail})
     else:
         return object_container({})

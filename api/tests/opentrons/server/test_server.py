@@ -5,6 +5,7 @@ import time
 
 from opentrons.server import rpc
 from opentrons.protocol_api.execute import ExceptionInProtocolError
+from opentrons.api.session import rpc_invisible
 from threading import Event
 
 from uuid import uuid4 as uuid
@@ -39,6 +40,10 @@ class Foo(object):
         raise ExceptionInProtocolError(v, b,
                                        'This is a test',
                                        10)
+
+    @rpc_invisible(lambda: True)
+    def should_be_hidden(self):
+        raise Exception("This shouldn't be exposed!")
 
 
 class Notifications(object):
