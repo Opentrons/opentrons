@@ -79,7 +79,6 @@ class SimulatingDriver:
         self._hold_time = hold_time
         self._ramp_rate = ramp_rate
         self._active = True
-        MODULE_LOG.info(f'\n\nSIM DRIVER: vol: {volume}\n')
 
     async def set_lid_temperature(self, temp: Optional[float]):
         """ Set the lid temperature in deg Celsius """
@@ -206,7 +205,6 @@ class Thermocycler(mod_abc.AbstractModule):
         minutes = hold_time_minutes if hold_time_minutes is not None else 0
         total_seconds = seconds + (minutes * 60)
         hold_time = total_seconds if total_seconds > 0 else 0
-        MODULE_LOG.info(f'\n\nHC: vol: {volume}\n')
         await self._driver.set_temperature(temp=temperature,
                                            hold_time=hold_time,
                                            ramp_rate=ramp_rate,
@@ -216,7 +214,6 @@ class Thermocycler(mod_abc.AbstractModule):
         else:
             self._current_task = self._loop.create_task(self.wait_for_temp())
         await self._current_task
-        MODULE_LOG.info(f'\n\nTC: after task {temperature}{volume}\n')
 
     async def _execute_cycles(self,
                               steps: List[types.ThermocyclerStep],
