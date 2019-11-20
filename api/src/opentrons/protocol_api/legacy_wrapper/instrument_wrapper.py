@@ -812,6 +812,9 @@ class Pipette:
             if isinstance(location, (List)):
                 location = location[0]
             new_loc = _unpack_motion_target(location, 'top')
+            # always allow pick up tip if location is passed
+            tip = new_loc.labware
+            tip.has_tip = True
         else:
             tiprack, new_tip = self._instr_ctx._next_available_tip()
             legacy_labware = self._lw_mappings[tiprack]
@@ -837,6 +840,7 @@ class Pipette:
         self._hw.set_working_volume(self._mount, new_loc.labware.max_volume)
         self._instr_ctx._last_tip_picked_up_from = \
             self.current_tip()  # type: ignore
+        tip.parent.use_tips(tip, self.channels)
 
         return self
 
