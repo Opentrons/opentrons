@@ -344,7 +344,6 @@ class Labware(DeckItem):
         self._display_name = "{} on {}".format(dn, str(parent.labware))
         self._calibrated_offset: Point = Point(0, 0, 0)
         self._wells: Sequence[Well] = []
-        self._well_sets: List[List[Well]] = None
         # Directly from definition
         self._well_definition = definition['wells']
         self._parameters = definition['parameters']
@@ -360,6 +359,11 @@ class Labware(DeckItem):
         # Applied properties
         self._update_calibrated_offset(self._calibrated_offset)
         self._wells = self._build_wells(volume_by_well)
+        self._well_sets: Sequence[Sequence[Well]] = []
+        for well in self.wells():
+            well_set = self._get_multi_well_set(well)
+            if well_set:
+                self._well_sets.append(well_set)
 
         self._pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
         self._definition = definition
@@ -849,7 +853,7 @@ class Labware(DeckItem):
                 x_diff = x - well.top().point.x
                 y_diff = y - well.top().point.y
                 if well._diameter is not None and \
-                        sqrt(x_diff**2 + y_diff**2) <= well.diameter:
+                        sqrt(x_diff**2 + y_diff**2) <= well.diameter / 2:
                     # circular well
                     found = True
                     break
