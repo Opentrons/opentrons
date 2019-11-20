@@ -11,12 +11,7 @@ import {
   DEFAULT_PIPETTE,
 } from './fixtures'
 import replaceTip from '../commandCreators/atomic/replaceTip'
-import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
 
-jest.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
-// TODO IMMEDIATELY like forBlowout.test.js, check that mock was called with correct args
-
-// TODO: Ian 2019-06-13 move these strings into commandFixtures
 const tiprack1Id = 'tiprack1Id'
 const tiprack2Id = 'tiprack2Id'
 const p300SingleId = DEFAULT_PIPETTE
@@ -28,11 +23,6 @@ describe('replaceTip', () => {
   beforeEach(() => {
     invariantContext = makeContext()
     initialRobotState = getInitialRobotStateStandard(invariantContext)
-
-    // $FlowFixMe: mock methods
-    dispenseUpdateLiquidState.mockClear()
-    // $FlowFixMe: mock methods
-    dispenseUpdateLiquidState.mockReturnValue(initialRobotState.liquidState)
   })
 
   describe('replaceTip: single channel', () => {
@@ -45,22 +35,6 @@ describe('replaceTip', () => {
       const res = getSuccessResult(result)
 
       expect(res.commands).toEqual([pickUpTipHelper(0)])
-
-      // TODO IMMEDIATELY handle in tip pickup state updaters
-      // expect(res.robotState).toMatchObject(
-      //   merge({}, initialRobotState, {
-      //     tipState: {
-      //       tipracks: {
-      //         [tiprack1Id]: {
-      //           A1: false,
-      //         },
-      //       },
-      //       pipettes: {
-      //         p300SingleId: true,
-      //       },
-      //     },
-      //   })
-      // )
     })
 
     test('Single-channel: second tip B1', () => {
@@ -83,23 +57,6 @@ describe('replaceTip', () => {
       const res = getSuccessResult(result)
 
       expect(res.commands).toEqual([pickUpTipHelper(1)])
-
-      // TODO IMMEDIATELY handle in tip pickup state updaters
-      // expect(res.robotState).toMatchObject(
-      //   merge({}, initialRobotState, {
-      //     tipState: {
-      //       tipracks: {
-      //         [tiprack1Id]: {
-      //           A1: false,
-      //           B1: false,
-      //         },
-      //       },
-      //       pipettes: {
-      //         p300SingleId: true,
-      //       },
-      //     },
-      //   })
-      // )
     })
 
     test('Single-channel: ninth tip (next column)', () => {
@@ -122,21 +79,6 @@ describe('replaceTip', () => {
       const res = getSuccessResult(result)
 
       expect(res.commands).toEqual([pickUpTipHelper('A2')])
-      // TODO IMMEDIATELY handle in tip pickup state updaters
-      // expect(res.robotState).toMatchObject(
-      //   merge({}, initialTestRobotState, {
-      //     tipState: {
-      //       tipracks: {
-      //         [tiprack1Id]: {
-      //           A2: false,
-      //         },
-      //       },
-      //       pipettes: {
-      //         p300SingleId: true,
-      //       },
-      //     },
-      //   })
-      // )
     })
 
     test('Single-channel: pipette already has tip, so tip will be replaced.', () => {
@@ -161,18 +103,6 @@ describe('replaceTip', () => {
       const res = getSuccessResult(result)
 
       expect(res.commands).toEqual([dropTipHelper('A1'), pickUpTipHelper('B1')])
-      // TODO IMMEDIATELY handle in tip pickup state updaters
-      // expect(res.robotState).toMatchObject(
-      //   merge({}, initialTestRobotState, {
-      //     tipState: {
-      //       tipracks: {
-      //         [tiprack1Id]: {
-      //           B1: false,
-      //         },
-      //       },
-      //     },
-      //   })
-      // )
     })
 
     test('Single-channel: used all tips in first rack, move to second rack', () => {
@@ -196,21 +126,6 @@ describe('replaceTip', () => {
       expect(res.commands).toEqual([
         pickUpTipHelper('A1', { labware: tiprack2Id }),
       ])
-      // TODO IMMEDIATELY handle in tip pickup state updaters
-      // expect(res.robotState).toMatchObject(
-      //   merge({}, initialTestRobotState, {
-      //     tipState: {
-      //       tipracks: {
-      //         [tiprack2Id]: {
-      //           A1: false,
-      //         },
-      //       },
-      //       pipettes: {
-      //         p300SingleId: true,
-      //       },
-      //     },
-      //   })
-      // )
     })
   })
 
@@ -226,20 +141,6 @@ describe('replaceTip', () => {
       expect(res.commands).toEqual([
         pickUpTipHelper('A1', { pipette: p300MultiId }),
       ])
-
-      // TODO IMMEDIATELY handle in tip pickup state updaters
-      // expect(res.robotState).toMatchObject(
-      //   merge({}, initialRobotState, {
-      //     tipState: {
-      //       tipracks: {
-      //         [tiprack1Id]: getTipColumn(1, false),
-      //       },
-      //       pipettes: {
-      //         p300MultiId: true,
-      //       },
-      //     },
-      //   })
-      // )
     })
 
     test('multi-channel, missing tip in first row', () => {
@@ -263,30 +164,6 @@ describe('replaceTip', () => {
       expect(res.commands).toEqual([
         pickUpTipHelper('A2', { pipette: p300MultiId }),
       ])
-
-      // TODO IMMEDIATELY handle in tip pickup state updaters
-      // expect(res.robotState).toMatchObject(
-      //   merge({}, robotStateWithTipA1Missing, {
-      //     tipState: {
-      //       tipracks: {
-      //         [tiprack1Id]: {
-      //           // Column 2 now empty
-      //           A2: false,
-      //           B2: false,
-      //           C2: false,
-      //           D2: false,
-      //           E2: false,
-      //           F2: false,
-      //           G2: false,
-      //           H2: false,
-      //         },
-      //       },
-      //       pipettes: {
-      //         p300MultiId: true,
-      //       },
-      //     },
-      //   })
-      // )
     })
 
     test('Multi-channel: pipette already has tip, so tip will be replaced.', () => {
@@ -309,24 +186,6 @@ describe('replaceTip', () => {
         dropTipHelper('A1', { pipette: p300MultiId }),
         pickUpTipHelper('A1', { pipette: p300MultiId }),
       ])
-
-      // TODO IMMEDIATELY handle in tip pickup state updaters
-      // expect(res.robotState).toMatchObject(
-      //   merge({}, robotStateWithTipsOnMulti, {
-      //     tipState: {
-      //       tipracks: {
-      //         [tiprack1Id]: {
-      //           ...getTiprackTipstate(true),
-      //           ...getTipColumn(1, false),
-      //         },
-      //         [tiprack2Id]: getTiprackTipstate(true),
-      //       },
-      //       pipettes: {
-      //         p300MultiId: true,
-      //       },
-      //     },
-      //   })
-      // )
     })
   })
 })

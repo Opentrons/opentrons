@@ -52,7 +52,7 @@ export const commandCreatorsTimeline = (
         robotState: nextRobotStateAndWarnings.robotState,
       }
 
-      // TODO IMMEDIATELY allow warnings in timeline frames
+      // TODO: Ian 2019-11-20 allow warnings in timeline frames?
       return {
         timeline: [...acc.timeline, nextResult],
         errors: null,
