@@ -2325,9 +2325,6 @@ class ThermocyclerContext(ModuleContext):
         if self.labware and self.labware.volume_by_well:
             max_vol = max(self.labware.volume_by_well.values())
             block_volume = max_vol if max_vol > 0 else None
-
-            MODULE_LOG.info(f'\n vbw{self.labware.volume_by_well}')
-            MODULE_LOG.info(f'\nblock vol: {block_volume}')
         else:
             block_volume = None
         return self._module.set_temperature(
