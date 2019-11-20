@@ -837,8 +837,10 @@ class Pipette:
         cmds.do_publish(self._instr_ctx.broker, cmds.pick_up_tip,
                         self.pick_up_tip, 'after', self, None, self,
                         location=new_loc)
+        working_volume = new_loc.labware.max_volume or \
+            self.max_volume
         self._hw_manager.hardware.set_working_volume(
-            self._mount, new_loc.labware.max_volume)
+            self._mount, working_volume)
         self._instr_ctx._last_tip_picked_up_from = \
             self.current_tip()  # type: ignore
 
