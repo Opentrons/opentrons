@@ -80,9 +80,6 @@ class Robot():
         self._bc_lw: Optional['Containers'] = None
         self._bc_mods: Optional['BCModules'] = None
 
-        self._deck = {
-            str(k): LegacyDeckItem('normal') for k in self._ctx.deck.keys()}
-
     def _set_globals(
             self, instr: 'BCInstruments', lw: 'Containers', mod: 'BCModules'):
         self._bc_instr = instr
@@ -212,14 +209,14 @@ class Robot():
         return self._ctx.disconnect()
 
     @property
-    def deck(self) -> Dict[str, LegacyDeckItem]:
-        for k, v in self._ctx.deck.items():
-            if v is not None:
-                self._deck[str(k)].add_item(v)
-            if not self._deck[str(k)].origin:
-                self._deck[str(k)].update_origin(
-                    self._ctx.deck.position_for(k))
-        return self._deck
+    def deck(self) -> Dict[str, LegacyLocation]:
+        deck_dict = {}
+        for slot in range(1, 13):
+            point, lw = self._ctx.deck.position_for(slot)
+            legacy_loc = LegacyLocation(
+                labware=lw, offset=point)
+            deck_dict[str(slot)] = legacy_loc
+        return deck_dict
 
     @property
     def fixed_trash(self) -> 'Labware':

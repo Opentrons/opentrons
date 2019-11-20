@@ -891,7 +891,6 @@ class LegacyDeckItem(DeckItem):
         self._highest_z = 0.0
         self._labware: Deque = deque()
         self._type = share_type
-        self._origin = None
 
     @property
     def highest_z(self):
@@ -918,17 +917,6 @@ class LegacyDeckItem(DeckItem):
             self.highest_z = max([lw.highest_z for lw in self._labware])
         else:
             self.highest_z = self._labware[0].highest_z
-
-    @property
-    def origin(self):
-        return self._origin
-
-    def update_origin(self, location):
-        self._origin = location
-
-    def top(self, z: float = 0.0) -> Location:
-        return Location(
-            self.origin.point + Point(0, 0, z), self.origin.labware)
 
 
 class Containers:

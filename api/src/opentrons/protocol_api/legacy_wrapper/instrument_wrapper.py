@@ -56,10 +56,13 @@ def _absolute_motion_target(
         real_loc: Union['Labware', 'Well'] = target_loc.labware.lw_obj
     else:
         real_loc = target_loc.labware
-    return Location(
-        labware=real_loc,
-        point=(target_loc.labware._from_center_cartesian(-1, -1, -1)
-               + target_loc.offset))
+    if isinstance(target_loc.labware, str):  # for deck objects
+        return Location(labware=real_loc, point=target_loc.offset)
+    else:
+        return Location(
+            labware=real_loc,
+            point=(target_loc.labware._from_center_cartesian(-1, -1, -1)
+                   + target_loc.offset))
 
 
 class Pipette:
@@ -268,7 +271,7 @@ class Pipette:
         return self
 
     def move_to(self,
-                location: Union[MotionTarget, LegacyDeckItem],
+                location: MotionTarget,
                 strategy: str = None):
         """
         Move this :any:`Pipette` to a location.
@@ -283,13 +286,9 @@ class Pipette:
                              in a straight line from the current position
         :returns Pipette: This instance.
         """
-        if not isinstance(location, LegacyDeckItem):
-            placeable = location\
-                if isinstance(location, LegacyWell) else location.labware
-            absolute_location = _absolute_motion_target(location, 'top')
-        else:
-            placeable = location.origin.labware
-            absolute_location = location.origin
+        placeable = location\
+            if isinstance(location, LegacyWell) else location.labware
+        absolute_location = _absolute_motion_target(location, 'top')
 
         force_direct = False
         if strategy == 'direct' or (
