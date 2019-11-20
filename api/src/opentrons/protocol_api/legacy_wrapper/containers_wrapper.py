@@ -15,7 +15,7 @@ from ..labware import (
     DeckItem)
 from .types import LegacyLocation
 from typing import (
-    Dict, List, Any, Union, Optional, Sequence, TYPE_CHECKING, Deque)
+    Dict, List, Any, Union, Optional, Sequence, TYPE_CHECKING, Deque, Tuple)
 
 import jsonschema  # type: ignore
 
