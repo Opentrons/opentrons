@@ -842,7 +842,7 @@ class InstrumentContext(CommandPublisher):
         self._hw_manager.hardware.aspirate(self._mount, volume, rate)
         if isinstance(location, Well):
             if self.type == 'multi':
-                for well_set in location.parent.well_sets:
+                for well_set in location.parent.multi_well_sets:
                     if well_set[0] == location:
                         for well in well_set:
                             well.volume = well.volume - volume
@@ -932,7 +932,7 @@ class InstrumentContext(CommandPublisher):
         self._hw_manager.hardware.dispense(self._mount, volume, rate)
         if isinstance(location, Well):
             if self.type == 'multi':
-                for well_set in location.parent.well_sets:
+                for well_set in location.parent.multi_well_sets:
                     if well_set[0] == location:
                         for well in well_set:
                             well.volume = well.volume + volume
@@ -1050,7 +1050,7 @@ class InstrumentContext(CommandPublisher):
         self._hw_manager.hardware.blow_out(self._mount)
         if isinstance(location, Well):
             if self.type == 'multi':
-                for well_set in location.parent.well_sets:
+                for well_set in location.parent.multi_well_sets:
                     if well_set[0] == location:
                         for well in well_set:
                             well.volume = well.volume + self.current_volume
