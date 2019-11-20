@@ -152,7 +152,8 @@ def old_aspiration(monkeypatch):
 
 @contextlib.contextmanager
 def using_api2(loop):
-    if not os.environ.get('OT_API_FF_useProtocolApi2'):
+    flag = os.environ.get('OT_API_FF_useLegacyInternals')
+    if flag is not None and flag.lower() in ('1', 'true'):
         pytest.skip('Do not run api v1 tests here')
     hw_manager = adapters.SingletonAdapter(loop)
     old_config = config.robot_configs.load()
@@ -167,8 +168,9 @@ def using_api2(loop):
                     reason="requires inotify (linux only)")
 @contextlib.contextmanager
 def using_sync_api2(loop):
-    if not os.environ.get('OT_API_FF_useProtocolApi2'):
-        pytest.skip('Do not run api v2 tests here')
+    flag = os.environ.get('OT_API_FF_useLegacyInternals')
+    if flag is not None and flag.lower() in ('1', 'true'):
+        pytest.skip('Do not run api v1 tests here')
     hardware = adapters.SynchronousAdapter.build(
         API.build_hardware_controller)
     try:
@@ -193,6 +195,9 @@ def ensure_api1(request, loop):
 @pytest.mark.apiv1
 @contextlib.contextmanager
 def using_api1(loop):
+    flag = os.environ.get('OT_API_FF_useLegacyInternals')
+    if flag is None or flag.lower() not in ('1', 'true'):
+        pytest.skip('Do not run API v2 tests here')
     try:
         yield rb
     finally:

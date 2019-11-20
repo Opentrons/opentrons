@@ -1,5 +1,8 @@
 import pytest
+from unittest import mock
+import sys
 
+import opentrons
 from opentrons.config import feature_flags as ff
 
 pipette_barcode_to_model = {
@@ -29,13 +32,19 @@ pipette_barcode_to_model = {
 
 @pytest.fixture
 def driver_import(monkeypatch, robot):
-    from opentrons import tools
     if ff.use_protocol_api_v2():
+        from opentrons import tools
         monkeypatch.setattr(
             tools,
             'driver',
             robot._ctx._hw_manager._current._backend._smoothie_driver)
     else:
+        monkeypatch.setattr(opentrons.robot, 'connect', mock.Mock())
+        # tools.__init__ builds an OptParse and parses it on init, and
+        # if we don't do this it will see the args passed to pytest
+        # and choke
+        monkeypatch.setattr(sys.modules['sys'], 'argv', [])
+        from opentrons import tools
         monkeypatch.setattr(tools, 'driver', robot._driver)
 
 

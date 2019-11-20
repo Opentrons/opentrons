@@ -18,7 +18,7 @@ def disable_home_on_boot():
 
 
 def use_protocol_api_v2():
-    return advs.get_setting_with_env_overload('useProtocolApi2')
+    return not advs.get_setting_with_env_overload('useLegacyInternals')
 
 
 def use_old_aspiration_functions():

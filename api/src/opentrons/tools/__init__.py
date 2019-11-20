@@ -1,5 +1,6 @@
 import opentrons
 import optparse
+import sys
 
 
 def connect_to_port(hardware):
@@ -9,7 +10,7 @@ def connect_to_port(hardware):
         type='str', help='serial port of the smoothie'
     )
 
-    options, _ = parser.parse_args(args=None, values=None)
+    options, _ = parser.parse_args(args=sys.argv, values=None)
     if options.port:
         hardware.connect(options.port)
     else:

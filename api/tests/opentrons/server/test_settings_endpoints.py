@@ -100,10 +100,10 @@ async def test_restart_required_persistence(
 
     # Changing the state sets restart required
     cur_apiv2_state = [s['value'] for s in current_body['settings']
-                       if s['id'] == 'useProtocolApi2'][0]
+                       if s['id'] == 'useLegacyInternals'][0]
     new_apiv2_state = not bool(cur_apiv2_state)
     resp = await async_client.post('/settings',
-                                   json={'id': 'useProtocolApi2',
+                                   json={'id': 'useLegacyInternals',
                                          'value': new_apiv2_state})
     assert resp.status == 200
     body = await resp.json()
@@ -115,7 +115,7 @@ async def test_restart_required_persistence(
     assert new_body['links']['restart'] == '/server/restart'
 
     resp = await async_client.post('/settings',
-                                   json={'id': 'useProtocolApi2',
+                                   json={'id': 'useLegacyInternals',
                                          'value': new_apiv2_state})
     assert resp.status == 200
     body = await resp.json()
@@ -127,7 +127,7 @@ async def test_restart_required_persistence(
     assert new_body['links']['restart'] == '/server/restart'
 
     resp = await async_client.post('/settings',
-                                   json={'id': 'useProtocolApi2',
+                                   json={'id': 'useLegacyInternals',
                                          'value': cur_apiv2_state})
     assert resp.status == 200
     body = await resp.json()
