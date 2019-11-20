@@ -34,6 +34,10 @@ export default function ExitAlertModal() {
       alertOverlay
     >
       <p>Doing so will terminate this run and home your robot.</p>
+      <p>
+        Additionally, any hardware modules used within the protocol will remain
+        active and maintain their current states until deactivated.
+      </p>
     </AlertModal>
   )
 }
