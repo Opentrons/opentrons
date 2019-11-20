@@ -41,8 +41,8 @@ def test_well_init():
                          well_id=well_name,
                          api_level=MAX_SUPPORTED_VERSION)
     assert well1._diameter == test_data[well_name]['diameter']
-    assert well1._length is None
-    assert well1._width is None
+    assert well1._x_dimension is None
+    assert well1._y_dimension is None
 
     well2_name = 'rectangular_well_json'
     well2 = labware.Well(well_props=test_data[well2_name],
@@ -53,8 +53,8 @@ def test_well_init():
                          well_id=well_name,
                          api_level=MAX_SUPPORTED_VERSION)
     assert well2._diameter is None
-    assert well2._length == test_data[well2_name]['xDimension']
-    assert well2._width == test_data[well2_name]['yDimension']
+    assert well2._x_dimension == test_data[well2_name]['xDimension']
+    assert well2._y_dimension == test_data[well2_name]['yDimension']
 
 
 def test_top():
