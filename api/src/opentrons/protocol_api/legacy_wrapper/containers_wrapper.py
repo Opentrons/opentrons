@@ -506,7 +506,6 @@ class LegacyLabware():
     def __init__(self, labware: Labware) -> None:
         self.lw_obj = labware
         setattr(labware, '_build_wells', self._build_wells)
-        self.set_calibration(Point(0, 0, 0))
         self._definition = self.lw_obj._definition
         self._wells_by_index = self.lw_obj.wells
         self._wells_by_name = self.lw_obj.wells_by_name
@@ -539,6 +538,7 @@ class LegacyLabware():
             'rows': {
                 'list': self._rows, 'dict': self._rows_by_name}
             }
+        self.lw_obj._wells = self.lw_obj._build_wells()
 
     def __getattr__(self, attr):
         # For the use-case of methods `well` or `cols`
