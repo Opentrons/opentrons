@@ -154,7 +154,7 @@ def test_back_compat():
 
     # Note that this test uses the display name of wells to test for equality,
     # because dimensional parameters could be subject to modification through
-    # calibration, whereas here we are testing for "identity" in a way that is
+    # calibration, whereas here we are testing for 'identity' in a way that is
     # related to the combination of well name, labware name, and slot name
     well_a1_name = repr(lw.wells_by_name()['A1'])
     well_b2_name = repr(lw.wells_by_name()['B2'])
@@ -449,47 +449,120 @@ def test_uris():
     assert lw.uri == uri
 
 
+def test_initialize_volume():
+    def_96 = labware.get_labware_definition('corning_96_wellplate_360ul_flat')
+    a_one_vol = 200
+    h_twelve_vol = 30
+
+    # load labware with initial volumes by well
+    lw_96 = labware.Labware(definition=def_96,
+                            parent=Location(Point(0, 0, 0), 'Test Slot'),
+                            volume_by_well={'A1': a_one_vol,
+                                            'H12': h_twelve_vol})
+    assert lw_96.volume_by_well.get('A1') == a_one_vol
+    assert lw_96.volume_by_well.get('H12') == h_twelve_vol
+
+    # mutate labware well volumes after loading
+    extra = 20
+    for well in lw_96.wells():
+        well.volume = well.volume + extra
+    assert lw_96.volume_by_well.get('A1') == a_one_vol + extra
+    assert lw_96.volume_by_well.get('H12') == h_twelve_vol + extra
+    assert lw_96.volume_by_well.get('B1') == extra
+
+
 def test_multi_well_set():
+    # well sets for 96 well plate
     def_96 = labware.get_labware_definition('corning_96_wellplate_360ul_flat')
     lw_96 = labware.Labware(def_96, Location(Point(0, 0, 0), 'Test Slot'))
-    well_set_96 = [["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
-                   ["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
-                   ["A3", "B3", "C3", "D3", "E3", "F3", "G3", "H3"],
-                   ["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
-                   ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"],
-                   ["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
-                   ["A7", "B7", "C7", "D7", "E7", "F7", "G7", "H7"],
-                   ["A8", "B8", "C8", "D8", "E8", "F8", "G8", "H8"],
-                   ["A9", "B9", "C9", "D9", "E9", "F9", "G9", "H9"],
-                   ["A10", "B10", "C10", "D10", "E10", "F10", "G10", "H10"],
-                   ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
-                   ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]]
-    well_id_sets = [[w.well_id for w in ws] for ws in lw_96.multi_well_sets]
-    assert well_id_sets == well_set_96
+    well_sets_96 = [['A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'],
+                    ['A2', 'B2', 'C2', 'D2', 'E2', 'F2', 'G2', 'H2'],
+                    ['A3', 'B3', 'C3', 'D3', 'E3', 'F3', 'G3', 'H3'],
+                    ['A4', 'B4', 'C4', 'D4', 'E4', 'F4', 'G4', 'H4'],
+                    ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5', 'H5'],
+                    ['A6', 'B6', 'C6', 'D6', 'E6', 'F6', 'G6', 'H6'],
+                    ['A7', 'B7', 'C7', 'D7', 'E7', 'F7', 'G7', 'H7'],
+                    ['A8', 'B8', 'C8', 'D8', 'E8', 'F8', 'G8', 'H8'],
+                    ['A9', 'B9', 'C9', 'D9', 'E9', 'F9', 'G9', 'H9'],
+                    ['A10', 'B10', 'C10', 'D10', 'E10', 'F10', 'G10', 'H10'],
+                    ['A11', 'B11', 'C11', 'D11', 'E11', 'F11', 'G11', 'H11'],
+                    ['A12', 'B12', 'C12', 'D12', 'E12', 'F12', 'G12', 'H12']]
+    id_sets_96 = [[w.well_id for w in ws] for ws in lw_96.multi_well_sets]
+    assert id_sets_96 == well_sets_96
 
-    def_trough = labware.get_labware_definition(
-            'usascientific_12_reservoir_22ml')
-    lw_trough = labware.Labware(
-            def_trough, Location(Point(0, 0, 0), 'Test Slot'))
-    well_set_trough = [["A1", "A1", "A1", "A1", "A1", "A1", "A1", "A1"],
-                   ["A2", "A2", "A2", "A2", "A2", "A2", "A2", "A2"],
-                   ["A3", "A3", "A3", "A3", "A3", "A3", "A3", "A3"],
-                   ["A4", "A4", "A4", "A4", "A4", "A4", "A4", "A4"],
-                   ["A5", "A5", "A5", "A5", "A5", "A5", "A5", "A5"],
-                   ["A6", "A6", "A6", "A6", "A6", "A6", "A6", "A6"],
-                   ["A7", "A7", "A7", "A7", "A7", "A7", "A7", "A7"],
-                   ["A8", "A8", "A8", "A8", "A8", "A8", "A8", "A8"],
-                   ["A9", "A9", "A9", "A9", "A9", "A9", "A9", "A9"],
-                   ["A10", "A10", "A10", "A10", "A10", "A10", "A10", "A10"],
-                   ["A11", "A11", "A11", "A11", "A11", "A11", "A11", "A11"],
-                   ["A12", "A12", "A12", "A12", "A12", "A12", "A12", "A12"]]
+    # well sets for 12 column trough
+    def_tr = labware.get_labware_definition(
+        'usascientific_12_reservoir_22ml')
+    lw_tr = labware.Labware(
+        def_tr, Location(Point(0, 0, 0), 'Test Slot'))
+    well_sets_tr = [['A1', 'A1', 'A1', 'A1', 'A1', 'A1', 'A1', 'A1'],
+                    ['A2', 'A2', 'A2', 'A2', 'A2', 'A2', 'A2', 'A2'],
+                    ['A3', 'A3', 'A3', 'A3', 'A3', 'A3', 'A3', 'A3'],
+                    ['A4', 'A4', 'A4', 'A4', 'A4', 'A4', 'A4', 'A4'],
+                    ['A5', 'A5', 'A5', 'A5', 'A5', 'A5', 'A5', 'A5'],
+                    ['A6', 'A6', 'A6', 'A6', 'A6', 'A6', 'A6', 'A6'],
+                    ['A7', 'A7', 'A7', 'A7', 'A7', 'A7', 'A7', 'A7'],
+                    ['A8', 'A8', 'A8', 'A8', 'A8', 'A8', 'A8', 'A8'],
+                    ['A9', 'A9', 'A9', 'A9', 'A9', 'A9', 'A9', 'A9'],
+                    ['A10', 'A10', 'A10', 'A10', 'A10', 'A10', 'A10', 'A10'],
+                    ['A11', 'A11', 'A11', 'A11', 'A11', 'A11', 'A11', 'A11'],
+                    ['A12', 'A12', 'A12', 'A12', 'A12', 'A12', 'A12', 'A12']]
 
-    well_id_sets = [[w.well_id for w in ws] for ws in lw_trough.multi_well_sets]
-    assert well_id_sets == well_set_trough
+    id_sets_tr = [[w.well_id for w in ws] for ws in lw_tr.multi_well_sets]
+    assert id_sets_tr == well_sets_tr
 
-    def_no_multi = labware.get_labware_definition(
-            'corning_12_wellplate_6.9ml_flat')
-    lw_no_multi = labware.Labware(
-            def_no_multi, Location(Point(0, 0, 0), 'Test Slot'))
+    # well sets for 384 well plate
+    def_384 = labware.get_labware_definition(
+        'corning_384_wellplate_112ul_flat')
+    lw_384 = labware.Labware(def_384, Location(Point(0, 0, 0), 'Test Slot'))
+    well_sets_384 = [['A1', 'C1', 'E1', 'G1', 'I1', 'K1', 'M1', 'O1'],
+                     ['B1', 'D1', 'F1', 'H1', 'J1', 'L1', 'N1', 'P1'],
+                     ['A2', 'C2', 'E2', 'G2', 'I2', 'K2', 'M2', 'O2'],
+                     ['B2', 'D2', 'F2', 'H2', 'J2', 'L2', 'N2', 'P2'],
+                     ['A3', 'C3', 'E3', 'G3', 'I3', 'K3', 'M3', 'O3'],
+                     ['B3', 'D3', 'F3', 'H3', 'J3', 'L3', 'N3', 'P3'],
+                     ['A4', 'C4', 'E4', 'G4', 'I4', 'K4', 'M4', 'O4'],
+                     ['B4', 'D4', 'F4', 'H4', 'J4', 'L4', 'N4', 'P4'],
+                     ['A5', 'C5', 'E5', 'G5', 'I5', 'K5', 'M5', 'O5'],
+                     ['B5', 'D5', 'F5', 'H5', 'J5', 'L5', 'N5', 'P5'],
+                     ['A6', 'C6', 'E6', 'G6', 'I6', 'K6', 'M6', 'O6'],
+                     ['B6', 'D6', 'F6', 'H6', 'J6', 'L6', 'N6', 'P6'],
+                     ['A7', 'C7', 'E7', 'G7', 'I7', 'K7', 'M7', 'O7'],
+                     ['B7', 'D7', 'F7', 'H7', 'J7', 'L7', 'N7', 'P7'],
+                     ['A8', 'C8', 'E8', 'G8', 'I8', 'K8', 'M8', 'O8'],
+                     ['B8', 'D8', 'F8', 'H8', 'J8', 'L8', 'N8', 'P8'],
+                     ['A9', 'C9', 'E9', 'G9', 'I9', 'K9', 'M9', 'O9'],
+                     ['B9', 'D9', 'F9', 'H9', 'J9', 'L9', 'N9', 'P9'],
+                     ['A10', 'C10', 'E10', 'G10', 'I10', 'K10', 'M10', 'O10'],
+                     ['B10', 'D10', 'F10', 'H10', 'J10', 'L10', 'N10', 'P10'],
+                     ['A11', 'C11', 'E11', 'G11', 'I11', 'K11', 'M11', 'O11'],
+                     ['B11', 'D11', 'F11', 'H11', 'J11', 'L11', 'N11', 'P11'],
+                     ['A12', 'C12', 'E12', 'G12', 'I12', 'K12', 'M12', 'O12'],
+                     ['B12', 'D12', 'F12', 'H12', 'J12', 'L12', 'N12', 'P12'],
+                     ['A13', 'C13', 'E13', 'G13', 'I13', 'K13', 'M13', 'O13'],
+                     ['B13', 'D13', 'F13', 'H13', 'J13', 'L13', 'N13', 'P13'],
+                     ['A14', 'C14', 'E14', 'G14', 'I14', 'K14', 'M14', 'O14'],
+                     ['B14', 'D14', 'F14', 'H14', 'J14', 'L14', 'N14', 'P14'],
+                     ['A15', 'C15', 'E15', 'G15', 'I15', 'K15', 'M15', 'O15'],
+                     ['B15', 'D15', 'F15', 'H15', 'J15', 'L15', 'N15', 'P15'],
+                     ['A16', 'C16', 'E16', 'G16', 'I16', 'K16', 'M16', 'O16'],
+                     ['B16', 'D16', 'F16', 'H16', 'J16', 'L16', 'N16', 'P16'],
+                     ['A17', 'C17', 'E17', 'G17', 'I17', 'K17', 'M17', 'O17'],
+                     ['B17', 'D17', 'F17', 'H17', 'J17', 'L17', 'N17', 'P17'],
+                     ['A18', 'C18', 'E18', 'G18', 'I18', 'K18', 'M18', 'O18'],
+                     ['B18', 'D18', 'F18', 'H18', 'J18', 'L18', 'N18', 'P18'],
+                     ['A19', 'C19', 'E19', 'G19', 'I19', 'K19', 'M19', 'O19'],
+                     ['B19', 'D19', 'F19', 'H19', 'J19', 'L19', 'N19', 'P19'],
+                     ['A20', 'C20', 'E20', 'G20', 'I20', 'K20', 'M20', 'O20'],
+                     ['B20', 'D20', 'F20', 'H20', 'J20', 'L20', 'N20', 'P20'],
+                     ['A21', 'C21', 'E21', 'G21', 'I21', 'K21', 'M21', 'O21'],
+                     ['B21', 'D21', 'F21', 'H21', 'J21', 'L21', 'N21', 'P21'],
+                     ['A22', 'C22', 'E22', 'G22', 'I22', 'K22', 'M22', 'O22'],
+                     ['B22', 'D22', 'F22', 'H22', 'J22', 'L22', 'N22', 'P22'],
+                     ['A23', 'C23', 'E23', 'G23', 'I23', 'K23', 'M23', 'O23'],
+                     ['B23', 'D23', 'F23', 'H23', 'J23', 'L23', 'N23', 'P23'],
+                     ['A24', 'C24', 'E24', 'G24', 'I24', 'K24', 'M24', 'O24'],
+                     ['B24', 'D24', 'F24', 'H24', 'J24', 'L24', 'N24', 'P24']]
 
-    assert lw_no_multi.multi_well_sets == []
+    id_sets = [[w.well_id for w in ws] for ws in lw_384.multi_well_sets]
+    assert id_sets == well_sets_384
