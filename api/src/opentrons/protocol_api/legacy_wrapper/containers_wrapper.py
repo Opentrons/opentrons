@@ -13,10 +13,9 @@ from ..labware import (
     ModuleGeometry,
     LabwareDefinition,
     DeckItem)
-from .util import log_call
 from .types import LegacyLocation
 from typing import (
-    Dict, List, Any, Union, Optional, Tuple, TYPE_CHECKING, Deque)
+    Dict, List, Any, Union, Optional, Sequence, TYPE_CHECKING, Deque, Tuple)
 
 import jsonschema  # type: ignore
 
@@ -247,12 +246,14 @@ class LegacyWell(Well):
             display_name: str,
             has_tip: bool,
             api_version: APIVersion,
+            parent_legacy: 'LegacyLabware',
             labware_height: float = None,
             well_name: str = None):
         self._well = super().__init__(
             well_props, parent, display_name, has_tip, api_version)
         self._well_name = well_name
         self._parent_height = labware_height
+        self._parent_legacy = parent_legacy
 
     @property
     def properties(self) -> Dict[str, Any]:
@@ -270,7 +271,7 @@ class LegacyWell(Well):
 
     @property
     def parent(self) -> 'LegacyLabware':
-        return self._parent  # type: ignore
+        return self._parent_legacy  # type: ignore
 
     def get_name(self) -> Optional[str]:
         return self._well_name
@@ -504,14 +505,15 @@ class LegacyWell(Well):
 class LegacyLabware():
     def __init__(self, labware: Labware) -> None:
         self.lw_obj = labware
-        self.set_calibration(Point(0, 0, 0))
+        setattr(labware, '_build_wells', self._build_wells)
+        self.lw_obj._wells = self.lw_obj._build_wells()
         self._definition = self.lw_obj._definition
-        self._wells_by_index = self.lw_obj.wells()
-        self._wells_by_name = self.lw_obj.wells_by_name()
-        self._columns = self.lw_obj.columns()
-        self._columns_by_name = self.lw_obj.columns_by_name()
-        self._rows = self.lw_obj.rows()
-        self._rows_by_name = self.lw_obj.rows_by_name()
+        self._wells_by_index = self.lw_obj.wells
+        self._wells_by_name = self.lw_obj.wells_by_name
+        self._columns = self.lw_obj.columns
+        self._columns_by_name = self.lw_obj.columns_by_name
+        self._rows = self.lw_obj.rows
+        self._rows_by_name = self.lw_obj.rows_by_name
         self._properties = {
             'length': self.lw_obj._dimensions['xDimension'],
             'width': self.lw_obj._dimensions['yDimension'],
@@ -548,9 +550,9 @@ class LegacyLabware():
     def __getitem__(self, name) -> Well:
         # For the use-case of labware[0] or labware['A1']
         if isinstance(name, int) or isinstance(name, slice):
-            return self._map_list_and_dict['wells']['list'][name]
+            return self._map_list_and_dict['wells']['list']()[name]
         elif isinstance(name, str):
-            return self._map_list_and_dict['wells']['dict'][name]
+            return self._map_list_and_dict['wells']['dict']()[name]
         else:
             raise TypeError('Expected int, slice or string')
 
@@ -593,16 +595,16 @@ class LegacyLabware():
     @property
     def columns(self):
         return WellSeries(
-            wells_dict=self._columns_by_name,
-            wells_list=self._columns,
+            wells_dict=self._columns_by_name(),
+            wells_list=self._columns(),
             labware_object=self,
             method_flag='columns')
 
     @property
     def rows(self):
         return WellSeries(
-            wells_dict=self._rows_by_name,
-            wells_list=self._rows,
+            wells_dict=self._rows_by_name(),
+            wells_list=self._rows(),
             labware_object=self,
             method_flag='rows')
 
@@ -632,11 +634,7 @@ class LegacyLabware():
         """
         Called by save calibration in order to update the offset on the object.
         """
-        offset = self.lw_obj._offset
-        self.lw_obj._calibrated_offset = Point(x=offset.x + delta.x,
-                                               y=offset.y + delta.y,
-                                               z=offset.z + delta.z)
-        self.lw_obj._wells = self._build_wells()
+        self.lw_obj.set_calibration(delta)
 
     @property
     def calibrated_offset(self) -> Point:
@@ -735,11 +733,11 @@ class LegacyLabware():
             raise ValueError(
                 f'You cannot use X and Y with {method_name} method')
         if x is None and isinstance(y, int):
-            return self._rows[y]
+            return self._rows()[y]
         elif y is None and isinstance(x, int):
-            return self._columns[x]
+            return self._columns()[x]
         elif isinstance(x, int) and isinstance(y, int):
-            return self._columns[x][y]
+            return self._columns()[x][y]
         else:
             raise ValueError('Labware.wells(x=, y=) expects ints')
 
@@ -752,8 +750,10 @@ class LegacyLabware():
         step = kwargs.get('step', 1)
         length = kwargs.get('length', 1)
 
-        wells_list = self._map_list_and_dict[method_name]['list']
-        wells_dict = self._map_list_and_dict[method_name]['dict']
+        wells_list_fn = self._map_list_and_dict[method_name]['list']
+        wells_dict_fn = self._map_list_and_dict[method_name]['dict']
+        wells_list = wells_list_fn()
+        wells_dict = wells_dict_fn()
         wrapped_wells = [w
                          for i in range(3)
                          for w in wells_list]
@@ -788,9 +788,9 @@ class LegacyLabware():
             well: Union[int, str, slice],
             method_name) -> Union[List[Well], Well]:
         if isinstance(well, int):
-            return self._map_list_and_dict[method_name]['list'][well]
+            return self._map_list_and_dict[method_name]['list']()[well]
         elif isinstance(well, str):
-            return self._map_list_and_dict[method_name]['dict'][well]
+            return self._map_list_and_dict[method_name]['dict']()[well]
         else:
             raise TypeError(f"Type {type(well)} is not compatible.")
 
@@ -801,7 +801,8 @@ class LegacyLabware():
         Returns child Well or list of child Wells
         """
         if not args and not kwargs:
-            return WellSeries(self._wells_by_name, self._wells_by_index, self)
+            return WellSeries(
+                self._wells_by_name(), self._wells_by_index(), self)
 
         if args and isinstance(args[0], list):
             args = args[0]  # type: ignore
@@ -828,7 +829,7 @@ class LegacyLabware():
 
     def method_columns(self, *args, **kwargs):
         if not args:
-            return WellSeries(self._columns_by_name, self._columns, self)
+            return WellSeries(self._columns_by_name(), self._columns(), self)
         if len(args) == 1:
             return self._get_well_by_type(*args, 'columns')
         elif len(args) > 1:
@@ -838,7 +839,7 @@ class LegacyLabware():
 
     def method_rows(self, *args, **kwargs):
         if not args:
-            return WellSeries(self._rows_by_name, self._rows, self)
+            return WellSeries(self._rows_by_name(), self._rows(), self)
         if len(args) == 1:
             return self._get_well_by_type(*args, 'rows')
         elif len(args) > 1:
@@ -846,7 +847,7 @@ class LegacyLabware():
         else:
             return self.handle_args('rows', *args, **kwargs)
 
-    def _build_wells(self) -> List[Well]:
+    def _build_wells(self) -> Sequence[LegacyWell]:
         """
         This function is used to create one instance of wells to be used by all
         accessor functions. It is only called again if a new offset needs
@@ -859,6 +860,7 @@ class LegacyLabware():
                 "{} of {}".format(well, self.lw_obj._display_name),
                 self.lw_obj.is_tiprack,
                 self.lw_obj.api_version,
+                self,
                 self.lw_obj._dimensions['zDimension'],
                 well_name=well)
             for well in self.lw_obj._ordering]
@@ -972,7 +974,6 @@ class Containers:
 
         old_labware.add_item(new_labware)
 
-    @log_call(log)
     def load(
             self,
             container_name: str,
@@ -1047,7 +1048,6 @@ class Containers:
 
         return labware_object
 
-    @log_call(log)
     def create(
             self,
             name,
@@ -1104,6 +1104,5 @@ class Containers:
         self.labware_mappings[lw] = legacy
         return legacy
 
-    @log_call(log)
     def list(self, *args, **kwargs):
         return get_all_labware_definitions()

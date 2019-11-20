@@ -150,14 +150,14 @@ def test_aspirate_locations(
     legacy_move_to, move_to = get_v1_v2_mock_calls(
         monkeypatch, legacy_instr, pip, 'move_to')
 
-    hw_aspirate_effect = pip._hw._api.aspirate
+    hw_aspirate_effect = pip._hw_manager.hardware._api.aspirate
 
     def run_aspirate(*args, **kwargs):
         return loop.run_until_complete(hw_aspirate_effect(*args, **kwargs))
 
     hw_aspirate = mock.Mock()
     hw_aspirate.side_effect = run_aspirate
-    monkeypatch.setattr(pip._hw._api, 'aspirate', hw_aspirate)
+    monkeypatch.setattr(pip._hw_manager.hardware._api, 'aspirate', hw_aspirate)
 
     legacy_call = {}
     new_call = {}
@@ -234,14 +234,14 @@ def test_dispense_locations(
     legacy_move_to, move_to = get_v1_v2_mock_calls(
         monkeypatch, legacy_instr, pip, 'move_to')
 
-    hw_dispense_effect = pip._hw._api.dispense
+    hw_dispense_effect = pip._hw_manager.hardware._api.dispense
 
     def run_dispense(*args, **kwargs):
         return loop.run_until_complete(hw_dispense_effect(*args, **kwargs))
 
     hw_dispense = mock.Mock()
     hw_dispense.side_effect = run_dispense
-    monkeypatch.setattr(pip._hw._api, 'dispense', hw_dispense)
+    monkeypatch.setattr(pip._hw_manager.hardware._api, 'dispense', hw_dispense)
 
     legacy_call = {}
     new_call = {}

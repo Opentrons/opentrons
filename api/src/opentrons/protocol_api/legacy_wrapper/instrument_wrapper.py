@@ -1,6 +1,6 @@
 from numbers import Number
 import logging
-from typing import Dict, List, Optional, Sequence, TYPE_CHECKING, Union
+from typing import Any, Dict, List, Optional, Sequence, TYPE_CHECKING, Union
 from opentrons import commands as cmds
 from opentrons.types import Point, Location
 from opentrons.config import pipette_config
@@ -42,7 +42,8 @@ def _unpack_motion_target(
         else:
             target_loc = motiontarget.bottom()
     else:
-        raise TypeError('A Well or tuple(well, point) is needed')
+        raise TypeError(
+            'A Well or tuple(well, point) is needed')
     return target_loc
 
 
@@ -75,14 +76,15 @@ class Pipette:
         self._instr_ctx = instrument_context
         self._ctx = self._instr_ctx._ctx
         self._mount = self._instr_ctx._mount
-        self._hw = self._instr_ctx._hw_manager.hardware
-        self._hw_pipette = self._hw._attached_instruments[self._mount]
+        self._hw_manager = self._instr_ctx._hw_manager
+        self._hw_pipette\
+            = self._hw_manager.hardware._attached_instruments[self._mount]
 
         self._log = self._instr_ctx._log
         self._default_speed = self._instr_ctx.default_speed
         self._max_plunger_speed: Optional[float] = None
 
-        self._trash_container = self._instr_ctx.trash_container
+        self._trash_container = LegacyLabware(self._instr_ctx.trash_container)
         self._tip_racks = self._instr_ctx.tip_racks\
             if self._instr_ctx.tip_racks else []
 
@@ -116,7 +118,7 @@ class Pipette:
 
     @property
     def _pipette_status(self):
-        return self._hw.attached_instruments[self._mount]
+        return self._hw_manager.hardware.attached_instruments[self._mount]
 
     @property
     def _working_volume(self) -> float:
@@ -203,7 +205,7 @@ class Pipette:
         Resets the state of this pipette, removing associated placeables,
         setting current volume to zero, and resetting tip tracking
         """
-        instr = self._hw._attached_instruments[self._mount]
+        instr = self._hw_manager.hardware._attached_instruments[self._mount]
         instr.set_current_volume(0)
         instr.current_tiprack_diamater = 0.0
         instr._has_tip = False
@@ -263,7 +265,7 @@ class Pipette:
         :returns Pipette: This instance
         '''
         self._ctx.location_cache = None
-        self._hw.retract(self._mount)
+        self._hw_manager.hardware.retract(self._mount)
         return self
 
     def move_to(self,
@@ -368,7 +370,7 @@ class Pipette:
                 self._instr_ctx.broker, cmds.aspirate, self.aspirate,
                 'before', None, None, self, volume,
                 display_location, rate)
-            self._hw.aspirate(self._mount, volume, rate)
+            self._hw_manager.hardware.aspirate(self._mount, volume, rate)
             cmds.do_publish(
                 self._instr_ctx.broker, cmds.aspirate, self.aspirate,
                 'after', self, None,  self, volume,
@@ -392,7 +394,7 @@ class Pipette:
         if self.current_volume == 0:
             if placeable:
                 self.move_to(placeable.top())
-            self._hw.prepare_for_aspirate(self._mount)
+            self._hw_manager.hardware.prepare_for_aspirate(self._mount)
 
         if location:
             if isinstance(location, LegacyWell):
@@ -477,7 +479,7 @@ class Pipette:
         if volume != 0:
             self._position_for_dispense(location)
 
-            self._hw.dispense(self._mount, volume, rate)
+            self._hw_manager.hardware.dispense(self._mount, volume, rate)
 
         cmds.do_publish(self._instr_ctx.broker, cmds.dispense, self.dispense,
                         'after', self, None, self, volume, display_location,
@@ -593,7 +595,7 @@ class Pipette:
             self.move_to(location)
         # In API v1, a pipette will blow out at any location as long as there
         # is a tip attached
-        self._hw.blow_out(self._mount)
+        self._hw_manager.hardware.blow_out(self._mount)
         return self
 
     @log_call(log)
@@ -763,7 +765,7 @@ class Pipette:
     @log_call(log)
     def pick_up_tip(
             self, location: MotionTarget = None,
-            presses: int = None, increment: float = 1.0)\
+            presses: int = None, increment: float = None)\
             -> 'Pipette':
         """
         Pick up a tip for the Pipette to handle liquids with
@@ -817,7 +819,7 @@ class Pipette:
             legacy_labware = self._lw_mappings[tiprack]
             tip = legacy_labware[new_tip._display_name.split(' of')[0]]
             new_loc = tip.top()
-            display_loc = new_tip
+            display_loc = tip
 
         self.current_tip(display_loc)
 
@@ -825,20 +827,26 @@ class Pipette:
                         self.pick_up_tip, 'before', None, None, self,
                         location=new_loc)
         self.move_to(new_loc)
-        self._hw.set_current_tiprack_diameter(
+        self._hw_manager.hardware.set_current_tiprack_diameter(
             self._mount, new_loc.labware.diameter)
-        self._hw.pick_up_tip(
+        self._hw_manager.hardware.pick_up_tip(
             self._mount,
             self._pipette_config.tip_length,
             presses, increment)
         cmds.do_publish(self._instr_ctx.broker, cmds.pick_up_tip,
                         self.pick_up_tip, 'after', self, None, self,
-                        location=display_loc)
-        self._hw.set_working_volume(self._mount, new_loc.labware.max_volume)
+                        location=new_loc)
+        working_volume = new_loc.labware.max_volume or \
+            self.max_volume
+        self._hw_manager.hardware.set_working_volume(
+            self._mount, working_volume)
         self._instr_ctx._last_tip_picked_up_from = \
             self.current_tip()  # type: ignore
 
         return self
+
+    def _tip_length_for(self, tiprack: Any) -> float:
+        return self._pipette_config.tip_length
 
     def _flatten_well_list(self, well_list: Union[List, WellSeries]):
         if isinstance(well_list[0], (List, WellSeries)):
@@ -891,11 +899,18 @@ class Pipette:
                            (0, self._pipette_config.model_offset[1], 0))
             else:
                 new_loc = lw.top()
-            checked_location = _absolute_motion_target(new_loc)
+            checked_location = _unpack_motion_target(new_loc)
         else:
-            checked_location = location  # type: ignore
-        self._instr_ctx.drop_tip(
-            location=checked_location, home_after=home_after)
+            checked_location = _unpack_motion_target(
+                self.trash_container.wells()[0].top())
+        self.move_to(checked_location)
+        cmds.do_publish(
+            self._ctx.broker, cmds.drop_tip, self.drop_tip,
+            'before', None, None, self, location=checked_location.labware)
+        self._hw_manager.hardware.drop_tip(self._mount, home_after=home_after)
+        cmds.do_publish(
+            self._ctx.broker, cmds.drop_tip, self.drop_tip,
+            'after', self, None, self, location=checked_location.labware)
         self.current_tip(None)
         return self
 

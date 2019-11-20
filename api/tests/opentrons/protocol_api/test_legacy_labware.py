@@ -197,22 +197,24 @@ def test_load_func(labware, container_create):
 @pytest.mark.api2_only
 def test_well_accessor(minimal_labware):
     # Access well by __getitem__ from LegacyLabware
-    assert minimal_labware[0] == minimal_labware._wells_by_index[0]
-    assert minimal_labware['A1'] == minimal_labware._wells_by_index[0]
+    assert minimal_labware[0] == minimal_labware._wells_by_index()[0]
+    assert minimal_labware['A1'] == minimal_labware._wells_by_index()[0]
 
     # Access individual wells within a labware using wells method
-    assert minimal_labware.wells()[0] == minimal_labware._wells_by_index[0]
-    assert minimal_labware.wells()['A1'] == minimal_labware._wells_by_index[0]
-    assert minimal_labware.wells(0) == minimal_labware._wells_by_index[0]
-    assert minimal_labware.wells('A2') == minimal_labware._wells_by_name['A2']
+    assert minimal_labware.wells()[0] == minimal_labware._wells_by_index()[0]
+    assert minimal_labware.wells()['A1']\
+        == minimal_labware._wells_by_index()[0]
+    assert minimal_labware.wells(0) == minimal_labware._wells_by_index()[0]
+    assert minimal_labware.wells('A2')\
+        == minimal_labware._wells_by_name()['A2']
 
-    assert minimal_labware.well(1) == minimal_labware._wells_by_index[1]
-    assert minimal_labware.well('A2') == minimal_labware._wells_by_name['A2']
+    assert minimal_labware.well(1) == minimal_labware._wells_by_index()[1]
+    assert minimal_labware.well('A2') == minimal_labware._wells_by_name()['A2']
 
-    well_1 = minimal_labware._wells_by_index[0]
-    well_2 = minimal_labware._wells_by_index[1]
-    well_3 = minimal_labware._wells_by_name['A2']
-    well_4 = minimal_labware._wells_by_name['B2']
+    well_1 = minimal_labware._wells_by_index()[0]
+    well_2 = minimal_labware._wells_by_index()[1]
+    well_3 = minimal_labware._wells_by_name()['A2']
+    well_4 = minimal_labware._wells_by_name()['B2']
 
     # Generate lists using `wells()` method
     assert minimal_labware.wells(0, 'A2') == [well_1, well_3]
@@ -231,11 +233,11 @@ def test_well_accessor(minimal_labware):
 @pytest.mark.api2_only
 def test_row_accessor(minimal_labware):
     row_1 = [
-        minimal_labware._wells_by_index[0],
-        minimal_labware._wells_by_index[2]]
+        minimal_labware._wells_by_index()[0],
+        minimal_labware._wells_by_index()[2]]
     row_2 = [
-        minimal_labware._wells_by_index[1],
-        minimal_labware._wells_by_index[3]]
+        minimal_labware._wells_by_index()[1],
+        minimal_labware._wells_by_index()[3]]
 
     assert minimal_labware.rows[0] == row_1
     assert minimal_labware.rows['B'] == row_2
@@ -248,17 +250,16 @@ def test_row_accessor(minimal_labware):
 @pytest.mark.api2_only
 def test_column_accessor(minimal_labware):
     col_1 = [
-        minimal_labware._wells_by_name['A1'],
-        minimal_labware._wells_by_name['B1']]
+        minimal_labware._wells_by_name()['A1'],
+        minimal_labware._wells_by_name()['B1']]
     col_2 = [
-        minimal_labware._wells_by_name['A2'],
-        minimal_labware._wells_by_name['B2']]
+        minimal_labware._wells_by_name()['A2'],
+        minimal_labware._wells_by_name()['B2']]
 
     assert minimal_labware.columns[0] == col_1
     assert minimal_labware.cols[0] == col_1
     assert minimal_labware.columns['2'] == col_2
     assert minimal_labware.cols['2'] == col_2
-
     assert minimal_labware.columns(0) == col_1
     assert minimal_labware.columns('1') == col_1
     assert minimal_labware.columns('1', 1) == [col_1, col_2]
