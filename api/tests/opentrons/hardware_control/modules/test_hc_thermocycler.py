@@ -44,7 +44,10 @@ async def test_sim_state():
 async def test_sim_update():
     therm = await modules.build('', 'thermocycler', True, lambda x: None)
 
-    await therm.set_temperature(10, None, 4.0)
+    await therm.set_temperature(temperature=10,
+                                hold_time_seconds=None,
+                                hold_time_minutes=4.0,
+                                volume=50)
     assert therm.temperature == 10
     assert therm.target == 10
     assert therm.status == 'holding at target'
