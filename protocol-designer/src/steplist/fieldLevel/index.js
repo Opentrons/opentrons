@@ -140,7 +140,6 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   magnetAction: { getErrors: composeErrors(requiredField) },
   engageHeight: {
     getErrors: composeErrors(
-      requiredField,
       minFieldValue(MIN_ENGAGE_HEIGHT),
       maxFieldValue(MAX_ENGAGE_HEIGHT)
     ),
