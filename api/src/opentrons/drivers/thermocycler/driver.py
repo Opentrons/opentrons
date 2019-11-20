@@ -286,9 +286,12 @@ class Thermocycler:
         if ramp_rate:
             ramp_cmd = f"{GCODES['SET_RAMP_RATE']} S{ramp_rate}"
             await self._write_and_wait(ramp_cmd)
+
+        log.info(f'\n\nVOLUME : {volume}\n')
         temp_cmd, temp = _build_temp_code(temp=temp,
                                           hold_time=hold_time,
                                           volume=volume)
+        log.info(f'\n\ntemp_command: {temp_cmd}\n')
         await self._write_and_wait(temp_cmd)
         retries = 0
         while (self._target_temp != temp) or (self._hold_time != hold_time):

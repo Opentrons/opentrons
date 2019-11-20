@@ -2322,17 +2322,14 @@ class ThermocyclerContext(ModuleContext):
             specified, the Thermocycler will proceed to the next command
             after ``temperature`` is reached.
         """
-        if self.labware and self.labware.volume_by_well:
-            max_vol = max(self.labware.volume_by_well.values())
-            block_volume = max_vol if max_vol > 0 else None
-        else:
-            block_volume = None
+
+        MODULE_LOG.info(f'\n\n\nctx: temp: {temperature} , vol: {self._get_block_max_volume()}')
         return self._module.set_temperature(
                 temperature=temperature,
                 hold_time_seconds=hold_time_seconds,
                 hold_time_minutes=hold_time_minutes,
                 ramp_rate=ramp_rate,
-                volume=block_volume)
+                volume=self._get_block_max_volume())
 
     @cmds.publish.both(command=cmds.thermocycler_set_lid_temperature)
     @requires_version(2, 0)
@@ -2385,7 +2382,9 @@ class ThermocyclerContext(ModuleContext):
                         "either hold_time_minutes or hold_time_seconds must be"
                         "defined for each step in cycle")
         return self._module.cycle_temperatures(
-            steps=steps, repetitions=repetitions)
+                steps=steps,
+                repetitions=repetitions,
+                volume=self._get_block_max_volume())
 
     @cmds.publish.both(command=cmds.thermocycler_deactivate_lid)
     @requires_version(2, 0)
@@ -2481,3 +2480,9 @@ class ThermocyclerContext(ModuleContext):
     def current_step_index(self):
         """ Index of the current step within the current cycle"""
         return self._module.current_step_index
+
+    def _get_block_max_volume(self) -> Optional[float]:
+        if self.labware and self.labware.volume_by_well:
+            max_vol = max(self.labware.volume_by_well.values())
+            return max_vol if max_vol > 0 else None
+        return None
