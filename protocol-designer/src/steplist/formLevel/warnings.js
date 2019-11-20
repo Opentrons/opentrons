@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import { getWellTotalVolume } from '@opentrons/shared-data'
+import { MIN_ENGAGE_HEIGHT, MAX_ENGAGE_HEIGHT } from '../../constants'
 import KnowledgeBaseLink from '../../components/KnowledgeBaseLink'
 import type { FormError } from './errors'
 /*******************
@@ -102,9 +103,9 @@ export const engageHeightRangeExceeded = (
   fields: HydratedFormData
 ): ?FormWarning => {
   const { magnetAction, engageHeight } = fields
-  if (magnetAction === 'engage' && engageHeight < -4.0) {
+  if (magnetAction === 'engage' && engageHeight < MIN_ENGAGE_HEIGHT) {
     return FORM_WARNINGS.ENGAGE_HEIGHT_MIN_EXCEEDED
-  } else if (magnetAction === 'engage' && engageHeight > 16) {
+  } else if (magnetAction === 'engage' && engageHeight > MAX_ENGAGE_HEIGHT) {
     return FORM_WARNINGS.ENGAGE_HEIGHT_MAX_EXCEEDED
   }
   return null

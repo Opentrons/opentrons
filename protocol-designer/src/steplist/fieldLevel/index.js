@@ -17,6 +17,7 @@ import {
   type ValueMasker,
   type ValueCaster,
 } from './processing'
+import { MIN_ENGAGE_HEIGHT, MAX_ENGAGE_HEIGHT } from '../../constants'
 import type { StepFieldName } from '../../form-types'
 import type { LabwareEntity, PipetteEntity } from '../../step-forms'
 import type { InvariantContext } from '../../step-generation'
@@ -140,8 +141,8 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   engageHeight: {
     getErrors: composeErrors(
       requiredField,
-      minFieldValue(-4.0),
-      maxFieldValue(16)
+      minFieldValue(MIN_ENGAGE_HEIGHT),
+      maxFieldValue(MAX_ENGAGE_HEIGHT)
     ),
     maskValue: composeMaskers(maskToFloat),
     castValue: Number,

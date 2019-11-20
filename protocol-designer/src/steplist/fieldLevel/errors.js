@@ -38,18 +38,20 @@ export const minimumWellCount = (minimum: number): ErrorChecker => (
   isArray(wells) && wells.length < minimum
     ? `${minimum} ${FIELD_ERRORS.UNDER_WELL_MINIMUM}`
     : null
+
 export const minFieldValue = (minimum: number): ErrorChecker => (
   value: mixed
 ): ?string =>
-  value && Number(value) < minimum
-    ? `${FIELD_ERRORS.UNDER_RANGE_MINIMUM} ${minimum}`
-    : null
+  Number(value) > minimum
+    ? null
+    : `${FIELD_ERRORS.UNDER_RANGE_MINIMUM} ${minimum}`
+
 export const maxFieldValue = (maximum: number): ErrorChecker => (
   value: mixed
 ): ?string =>
-  value && Number(value) > maximum
-    ? `${FIELD_ERRORS.OVER_RANGE_MAXIMUM} ${maximum}`
-    : null
+  Number(value) < maximum
+    ? null
+    : `${FIELD_ERRORS.OVER_RANGE_MAXIMUM} ${maximum}`
 
 /*******************
  **     Helpers    **
