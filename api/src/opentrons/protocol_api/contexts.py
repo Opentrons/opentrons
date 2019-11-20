@@ -2236,10 +2236,10 @@ class ThermocyclerContext(ModuleContext):
         to_lw, to_well = geometry.split_loc_labware(to_loc)
         from_lw, from_well = geometry.split_loc_labware(from_loc)
         if (self.labware is to_lw or self.labware is from_lw) and \
-                self.lid_position == 'closed':
+                self.lid_position != 'open':
             raise RuntimeError(
                 "Cannot move to labware loaded in Thermocycler"
-                " when lid is closed")
+                " when lid is not fully open.")
 
     @cmds.publish.both(command=cmds.thermocycler_open)
     @requires_version(2, 0)
