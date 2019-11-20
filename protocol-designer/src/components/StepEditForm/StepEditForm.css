@@ -209,6 +209,13 @@
   justify-content: space-between;
 }
 
+.magnet_section_wrapper {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 0.5rem;
+  min-height: 4rem;
+}
+
 .magnet_form_group {
-  margin-top: 1rem;
+  margin: 1rem 4.25rem 2rem 0;
 }

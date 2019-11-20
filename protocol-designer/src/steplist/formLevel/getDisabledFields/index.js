@@ -11,7 +11,9 @@ function _getDisabledFields(rawForm: FormData): Set<string> {
     case 'mix':
       return getDisabledFieldsMixForm(rawForm)
     case 'pause':
-      return new Set() // nothing to disable
+      return new Set() // nothing to disabled
+    case 'magnet':
+      return new Set()
     default: {
       console.warn(
         `disabled fields for step type ${rawForm.stepType} not yet implemented!`

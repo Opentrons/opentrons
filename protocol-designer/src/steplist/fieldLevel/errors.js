@@ -42,14 +42,14 @@ export const minimumWellCount = (minimum: number): ErrorChecker => (
 export const minFieldValue = (minimum: number): ErrorChecker => (
   value: mixed
 ): ?string =>
-  Number(value) > minimum
+  Number(value) >= minimum
     ? null
     : `${FIELD_ERRORS.UNDER_RANGE_MINIMUM} ${minimum}`
 
 export const maxFieldValue = (maximum: number): ErrorChecker => (
   value: mixed
 ): ?string =>
-  Number(value) < maximum
+  Number(value) <= maximum
     ? null
     : `${FIELD_ERRORS.OVER_RANGE_MAXIMUM} ${maximum}`
 
