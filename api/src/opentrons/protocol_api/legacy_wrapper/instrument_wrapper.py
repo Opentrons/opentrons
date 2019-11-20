@@ -823,7 +823,6 @@ class Pipette:
 
         self.current_tip(display_loc)
 
-        self._log.info(f"publishing {type(new_loc[0])}")
         cmds.do_publish(self._instr_ctx.broker, cmds.pick_up_tip,
                         self.pick_up_tip, 'before', None, None, self,
                         location=new_loc)
@@ -905,7 +904,6 @@ class Pipette:
             checked_location = _unpack_motion_target(
                 self.trash_container.wells()[0].top())
         self.move_to(checked_location)
-        self._log.info(f"publishing {type(checked_location[0])}")
         cmds.do_publish(
             self._ctx.broker, cmds.drop_tip, self.drop_tip,
             'before', None, None, self, location=checked_location.labware)

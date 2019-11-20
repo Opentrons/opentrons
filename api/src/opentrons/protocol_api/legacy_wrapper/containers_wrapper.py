@@ -13,7 +13,6 @@ from ..labware import (
     ModuleGeometry,
     LabwareDefinition,
     DeckItem)
-from .util import log_call
 from .types import LegacyLocation
 from typing import (
     Dict, List, Any, Union, Optional, Sequence, TYPE_CHECKING, Deque)
@@ -975,7 +974,6 @@ class Containers:
 
         old_labware.add_item(new_labware)
 
-    @log_call(log)
     def load(
             self,
             container_name: str,
@@ -1050,7 +1048,6 @@ class Containers:
 
         return labware_object
 
-    @log_call(log)
     def create(
             self,
             name,
@@ -1107,6 +1104,5 @@ class Containers:
         self.labware_mappings[lw] = legacy
         return legacy
 
-    @log_call(log)
     def list(self, *args, **kwargs):
         return get_all_labware_definitions()
