@@ -1,5 +1,6 @@
 // @flow
 import Ajv from 'ajv'
+import sortBy from 'lodash/sortBy'
 import labwareSchema from '@opentrons/shared-data/labware/schemas/2.json'
 
 import {
@@ -31,6 +32,7 @@ const sameIdentity = (a: LabwareIdentity, b: LabwareIdentity) =>
 const validateLabwareDefinition = (data: any): LabwareDefinition2 | null =>
   validateDefinition(data) ? data : null
 
+// validate a colection of unchecked labware files
 export function validateLabwareFiles(
   files: Array<UncheckedLabwareFile>
 ): Array<CheckedLabwareFile> {
@@ -72,16 +74,37 @@ export function validateLabwareFiles(
       const { type, ...props } = v
 
       // check for duplicates
-      const unique = validated.every(
-        other =>
-          other === v ||
-          !other.identity ||
-          !sameIdentity(v.identity, other.identity)
+      const duplicates = validated.filter(
+        other => other.identity && sameIdentity(v.identity, other.identity)
       )
 
-      return unique ? v : { type: DUPLICATE_LABWARE_FILE, ...props }
+      // if there are duplicates and this labware isn't the oldest one
+      // mark it as a duplicate
+      if (duplicates.length > 1 && sortBy(duplicates, 'created')[0] !== v) {
+        return { type: DUPLICATE_LABWARE_FILE, ...props }
+      }
     }
 
     return v
   })
+}
+
+// validate a new unchecked file against a collection of already checked files
+export function validateNewLabwareFile(
+  existing: Array<CheckedLabwareFile>,
+  newFile: UncheckedLabwareFile
+): CheckedLabwareFile {
+  const [checkedNewFile] = validateLabwareFiles([newFile])
+
+  if (
+    checkedNewFile.type === VALID_LABWARE_FILE &&
+    existing.some(
+      e => e.identity && sameIdentity(checkedNewFile.identity, e.identity)
+    )
+  ) {
+    const { type, ...props } = checkedNewFile
+    return { type: DUPLICATE_LABWARE_FILE, ...props }
+  }
+
+  return checkedNewFile
 }

@@ -8,6 +8,7 @@ import type { CustomLabwareState } from './types'
 export const INITIAL_STATE: CustomLabwareState = {
   filenames: [],
   filesByName: {},
+  addFileFailure: null,
 }
 
 export function customLabwareReducer(
@@ -26,6 +27,15 @@ export function customLabwareReducer(
       )
 
       return { ...state, filenames, filesByName }
+    }
+
+    case ActionTypes.ADD_CUSTOM_LABWARE:
+    case ActionTypes.CLEAR_ADD_CUSTOM_LABWARE_FAILURE: {
+      return { ...state, addFileFailure: null }
+    }
+
+    case ActionTypes.ADD_CUSTOM_LABWARE_FAILURE: {
+      return { ...state, addFileFailure: action.payload.labware }
     }
   }
 

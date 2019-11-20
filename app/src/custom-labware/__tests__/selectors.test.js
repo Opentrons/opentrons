@@ -18,6 +18,7 @@ describe('custom labware selectors', () => {
       selector: selectors.getCustomLabware,
       state: {
         labware: {
+          addFileFailure: null,
           filenames: ['a.json', 'b.json'],
           filesByName: {
             'a.json': {
@@ -43,6 +44,7 @@ describe('custom labware selectors', () => {
       selector: selectors.getValidCustomLabware,
       state: {
         labware: {
+          addFileFailure: null,
           filenames: ['a.json', 'b.json', 'c.json', 'd.json', 'e.json'],
           filesByName: {
             'a.json': {

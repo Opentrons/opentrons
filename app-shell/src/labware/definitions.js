@@ -46,3 +46,29 @@ export function parseLabwareFiles(
 
   return Promise.all(tasks)
 }
+
+// get a filename, adding an incrementor to avoid collisions
+const getFileName = (
+  dir: string,
+  base: string,
+  ext: string,
+  count = 0
+): Promise<string> => {
+  const basename = `${base}${count || ''}${ext}`
+  const name = path.join(dir, basename)
+
+  return fs
+    .pathExists(name)
+    .then((exists: boolean) =>
+      exists ? getFileName(dir, base, ext, count + 1) : name
+    )
+}
+
+export function addLabwareFile(file: string, dir: string): Promise<void> {
+  const extname = path.extname(file)
+  const basename = path.basename(file, extname)
+
+  return getFileName(dir, basename, extname).then(destName =>
+    fs.readJson(file).then(data => fs.outputJson(destName, data))
+  )
+}

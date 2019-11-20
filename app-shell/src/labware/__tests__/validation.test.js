@@ -1,5 +1,5 @@
 // @flow
-import { validateLabwareFiles } from '../validation'
+import { validateLabwareFiles, validateNewLabwareFile } from '../validation'
 
 import validLabwareA from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import validLabwareB from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
@@ -79,16 +79,16 @@ describe('validateLabwareFiles', () => {
 
   test('handles non-unique labware files', () => {
     const files = [
-      { filename: 'a.json', data: validLabwareA, created: Date.now() },
-      { filename: 'b.json', data: validLabwareB, created: Date.now() },
-      { filename: 'c.json', data: validLabwareA, created: Date.now() },
+      { filename: 'a.json', data: validLabwareA, created: 3 },
+      { filename: 'b.json', data: validLabwareB, created: 2 },
+      { filename: 'c.json', data: validLabwareA, created: 1 },
     ]
 
     expect(validateLabwareFiles(files)).toEqual([
       {
         type: 'DUPLICATE_LABWARE_FILE',
         filename: 'a.json',
-        created: expect.any(Number),
+        created: 3,
         metadata: validLabwareA.metadata,
         identity: {
           name: 'fixture_96_plate',
@@ -99,7 +99,7 @@ describe('validateLabwareFiles', () => {
       {
         type: 'VALID_LABWARE_FILE',
         filename: 'b.json',
-        created: expect.any(Number),
+        created: 2,
         metadata: validLabwareB.metadata,
         identity: {
           name: 'fixture_12_trough',
@@ -107,10 +107,11 @@ describe('validateLabwareFiles', () => {
           namespace: 'fixture',
         },
       },
+      // oldest duplicate wins and is valid
       {
-        type: 'DUPLICATE_LABWARE_FILE',
+        type: 'VALID_LABWARE_FILE',
         filename: 'c.json',
-        created: expect.any(Number),
+        created: 1,
         metadata: validLabwareA.metadata,
         identity: {
           name: 'fixture_96_plate',
@@ -140,5 +141,61 @@ describe('validateLabwareFiles', () => {
         },
       },
     ])
+  })
+})
+
+describe('validateNewLabwareFile', () => {
+  test('validates a new file', () => {
+    const existing = []
+    const newFile = {
+      filename: 'a.json',
+      data: validLabwareA,
+      created: 42,
+    }
+
+    expect(validateNewLabwareFile(existing, newFile)).toEqual({
+      type: 'VALID_LABWARE_FILE',
+      filename: 'a.json',
+      created: 42,
+      metadata: validLabwareA.metadata,
+      identity: {
+        name: 'fixture_96_plate',
+        version: 1,
+        namespace: 'fixture',
+      },
+    })
+  })
+
+  test('returns a duplicate if new file conflicts with existing', () => {
+    const existing = [
+      {
+        type: 'VALID_LABWARE_FILE',
+        filename: 'a.json',
+        created: 42,
+        metadata: validLabwareA.metadata,
+        identity: {
+          name: 'fixture_96_plate',
+          version: 1,
+          namespace: 'fixture',
+        },
+      },
+    ]
+    const newFile = {
+      filename: 'a.json',
+      data: validLabwareA,
+      created: 21,
+    }
+
+    expect(validateNewLabwareFile(existing, newFile)).toEqual({
+      type: 'DUPLICATE_LABWARE_FILE',
+      filename: 'a.json',
+      created: 21,
+      metadata: validLabwareA.metadata,
+      identity: {
+        name: 'fixture_96_plate',
+        version: 1,
+        namespace: 'fixture',
+      },
+    })
   })
 })
