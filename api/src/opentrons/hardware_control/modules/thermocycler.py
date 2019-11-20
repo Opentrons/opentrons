@@ -79,6 +79,7 @@ class SimulatingDriver:
         self._hold_time = hold_time
         self._ramp_rate = ramp_rate
         self._active = True
+        MODULE_LOG.info(f'\n\nSIM DRIVER: vol: {volume}\n')
 
     async def set_lid_temperature(self, temp: Optional[float]):
         """ Set the lid temperature in deg Celsius """
@@ -205,6 +206,7 @@ class Thermocycler(mod_abc.AbstractModule):
         minutes = hold_time_minutes if hold_time_minutes is not None else 0
         total_seconds = seconds + (minutes * 60)
         hold_time = total_seconds if total_seconds > 0 else 0
+        MODULE_LOG.info(f'\n\nHC: vol: {volume}\n')
         await self._driver.set_temperature(temp=temperature,
                                            hold_time=hold_time,
                                            ramp_rate=ramp_rate,
@@ -214,26 +216,30 @@ class Thermocycler(mod_abc.AbstractModule):
         else:
             self._current_task = self._loop.create_task(self.wait_for_temp())
         await self._current_task
+        MODULE_LOG.info(f'\n\nTC: after task {temperature}{volume}\n')
 
     async def _execute_cycles(self,
                               steps: List[types.ThermocyclerStep],
-                              repetitions: int):
+                              repetitions: int,
+                              volume: float = None):
         for rep in range(repetitions):
             self._current_cycle_index = rep + 1  # science starts at 1
             for step_idx, step in enumerate(steps):
                 await self._running_flag.wait()
                 self._current_step_index = step_idx + 1  # science starts at 1
-                await self.set_temperature(**step)
+                await self.set_temperature(**step, volume=volume)
                 await self.wait_for_hold()
 
     async def cycle_temperatures(self,
                                  steps: List[types.ThermocyclerStep],
-                                 repetitions: int):
+                                 repetitions: int,
+                                 volume: float = None):
         self._running_flag.set()
         self._total_cycle_count = repetitions
         self._total_step_count = len(steps)
         cycle_task = self._loop.create_task(self._execute_cycles(steps,
-                                                                 repetitions))
+                                                                 repetitions,
+                                                                 volume))
         self._current_task = cycle_task
         await cycle_task
 
