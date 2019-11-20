@@ -179,64 +179,50 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
       stepArgs => stepArgs
     )
 
-    // const commandCreators = continuousStepArgs.reduce(
-    //   (acc: Array<StepGeneration.CommandCreator>, stepArgs, stepIndex) => {
-    //     let reducedCommandCreator = null
-
-    //     const compoundCommandCreator: ?StepGeneration.CompoundCommandCreator = compoundCommandCreatorFromStepArgs(
-    //       stepArgs
-    //     )
-    //     reducedCommandCreator =
-    //       compoundCommandCreator &&
-    //       StepGeneration.reduceCommandCreators(
-    //         compoundCommandCreator(invariantContext, initialRobotState)
-    //       )
-
-    //     if (!reducedCommandCreator) {
-    //       console.warn(
-    //         `commandCreatorFnName "${stepArgs.commandCreatorFnName}" not yet implemented for robotStateTimeline`
-    //       )
-    //       return acc
-    //     }
-
-    //     // Drop tips eagerly, per pipette
-    //     // NOTE: this assumes all step forms that use a pipette have both
-    //     // 'pipette' and 'changeTip' fields (and they're not named something else).
-    //     const pipetteId = stepArgs.pipette
-    //     if (pipetteId) {
-    //       const nextStepArgsForPipette = continuousStepArgs
-    //         .slice(stepIndex + 1)
-    //         .find(stepArgs => stepArgs.pipette === pipetteId)
-
-    //       const willReuseTip =
-    //         nextStepArgsForPipette &&
-    //         nextStepArgsForPipette.changeTip === 'never'
-    //       if (!willReuseTip) {
-    //         return [
-    //           ...acc,
-    //           StepGeneration.reduceCommandCreators([
-    //             reducedCommandCreator,
-    //             StepGeneration.dropTip(pipetteId),
-    //           ]),
-    //         ]
-    //       }
-    //     }
-
-    //     return [...acc, reducedCommandCreator]
-    //   },
-    //   []
-    // )
-
-    // TODO IMMEDIATELY add back in the auto-tip functionality commented out above
+    // TODO IMMEDIATELY in `edge`, add coverage for the existing "eager drop tip" behavior, and rebase it into this branch
 
     const curriedCommandCreators = continuousStepArgs.reduce(
       (
         acc: Array<StepGeneration.CurriedCommandCreator>,
         args: StepGeneration.CommandCreatorArgs,
-        idx
+        stepIndex
       ): Array<StepGeneration.CurriedCommandCreator> => {
-        const c = commandCreatorFromStepArgs(args)
-        return c === null ? acc : [...acc, c]
+        const curriedCommandCreator = commandCreatorFromStepArgs(args)
+
+        if (curriedCommandCreator === null) {
+          // unsupported command creator in args.commandCreatorFnName
+          return acc
+        }
+
+        // Drop tips eagerly, per pipette
+        //
+        // - If we don't have a 'changeTip: never' step for this pipette in the future,
+        // we know the current tip(s) aren't going to be reused, so we can drop them
+        // immediately after the current step is done.
+        //
+        // NOTE: this implementation assumes all step forms that use a pipette have both
+        // 'pipette' and 'changeTip' fields (and they're not named something else).
+        const pipetteId =
+          args.commandCreatorFnName !== 'delay' ? args.pipette : false
+        if (pipetteId) {
+          const nextStepArgsForPipette = continuousStepArgs
+            .slice(stepIndex + 1)
+            .find(stepArgs => stepArgs.pipette === pipetteId)
+
+          const willReuseTip =
+            nextStepArgsForPipette &&
+            nextStepArgsForPipette.changeTip === 'never'
+          if (!willReuseTip) {
+            return [
+              ...acc,
+              curriedCommandCreator,
+              StepGeneration.curryCommandCreator(StepGeneration.dropTip, {
+                pipette: pipetteId,
+              }),
+            ]
+          }
+        }
+        return [...acc, curriedCommandCreator]
       },
       []
     )
