@@ -1,4 +1,5 @@
 // @flow
+import * as Fixtures from '../__fixtures__'
 import { INITIAL_STATE, customLabwareReducer } from '../reducer'
 
 import type { Action } from '../../types'
@@ -6,140 +7,109 @@ import type { CustomLabwareState } from '../types'
 
 type ReducerSpec = {|
   name: string,
-  state: CustomLabwareState,
+  state: $Shape<CustomLabwareState>,
   action: Action,
-  expected: CustomLabwareState,
+  expected: $Shape<CustomLabwareState>,
 |}
 
 describe('customLabwareReducer', () => {
   const SPECS: Array<ReducerSpec> = [
     {
-      name: 'handles CUSTOM_LABWARE with new files',
+      name: 'handles CUSTOM_LABWARE_LIST with new files',
       state: INITIAL_STATE,
       action: {
-        type: 'labware:CUSTOM_LABWARE',
-        payload: [
-          { type: 'BAD_JSON_LABWARE_FILE', filename: 'a.json', created: 3 },
-          { type: 'INVALID_LABWARE_FILE', filename: 'b.json', created: 2 },
-        ],
+        type: 'labware:CUSTOM_LABWARE_LIST',
+        payload: [Fixtures.mockInvalidLabware, Fixtures.mockValidLabware],
       },
       expected: {
-        addFileFailure: null,
-        filenames: ['a.json', 'b.json'],
+        ...INITIAL_STATE,
+        filenames: [
+          Fixtures.mockInvalidLabware.filename,
+          Fixtures.mockValidLabware.filename,
+        ],
         filesByName: {
-          'a.json': {
-            type: 'BAD_JSON_LABWARE_FILE',
-            filename: 'a.json',
-            created: 3,
-          },
-          'b.json': {
-            type: 'INVALID_LABWARE_FILE',
-            filename: 'b.json',
-            created: 2,
-          },
+          [Fixtures.mockInvalidLabware.filename]: Fixtures.mockInvalidLabware,
+          [Fixtures.mockValidLabware.filename]: Fixtures.mockValidLabware,
         },
+        listFailureMessage: null,
       },
     },
     {
-      name: 'handles CUSTOM_LABWARE with removed files',
+      name: 'handles CUSTOM_LABWARE_LIST with removed files',
       state: {
-        addFileFailure: null,
-        filenames: ['a.json', 'b.json'],
+        filenames: [
+          Fixtures.mockInvalidLabware.filename,
+          Fixtures.mockValidLabware.filename,
+        ],
         filesByName: {
-          'a.json': {
-            type: 'BAD_JSON_LABWARE_FILE',
-            filename: 'a.json',
-            created: 3,
-          },
-          'b.json': {
-            type: 'INVALID_LABWARE_FILE',
-            filename: 'b.json',
-            created: 2,
-          },
+          [Fixtures.mockInvalidLabware.filename]: Fixtures.mockInvalidLabware,
+          [Fixtures.mockValidLabware.filename]: Fixtures.mockValidLabware,
         },
+        listFailureMessage: 'AH',
       },
       action: {
-        type: 'labware:CUSTOM_LABWARE',
-        payload: [
-          { type: 'INVALID_LABWARE_FILE', filename: 'b.json', created: 2 },
-        ],
+        type: 'labware:CUSTOM_LABWARE_LIST',
+        payload: [Fixtures.mockInvalidLabware],
       },
       expected: {
-        addFileFailure: null,
-        filenames: ['b.json'],
+        filenames: [Fixtures.mockInvalidLabware.filename],
         filesByName: {
-          'b.json': {
-            type: 'INVALID_LABWARE_FILE',
-            filename: 'b.json',
-            created: 2,
-          },
+          [Fixtures.mockInvalidLabware.filename]: Fixtures.mockInvalidLabware,
         },
+        listFailureMessage: null,
       },
+    },
+    {
+      name: 'handles CUSTOM_LABWARE_LIST_FAILURE',
+      state: INITIAL_STATE,
+      action: {
+        type: 'labware:CUSTOM_LABWARE_LIST_FAILURE',
+        payload: { message: 'AH' },
+      },
+      expected: { ...INITIAL_STATE, listFailureMessage: 'AH' },
     },
     {
       name: 'handles ADD_CUSTOM_LABWARE',
       state: {
-        addFileFailure: {
-          type: 'INVALID_LABWARE_FILE',
-          filename: 'b.json',
-          created: 2,
-        },
-        filenames: [],
-        filesByName: {},
+        addFailureFile: Fixtures.mockInvalidLabware,
+        addFailureMessage: 'AH',
       },
       action: {
         type: 'labware:ADD_CUSTOM_LABWARE',
+        payload: { overwrite: null },
         meta: { shell: true },
       },
       expected: {
-        addFileFailure: null,
-        filenames: [],
-        filesByName: {},
+        addFailureFile: null,
+        addFailureMessage: null,
       },
     },
     {
       name: 'handles ADD_CUSTOM_LABWARE_FAILURE',
-      state: {
-        addFileFailure: null,
-        filenames: [],
-        filesByName: {},
-      },
+      state: INITIAL_STATE,
       action: {
         type: 'labware:ADD_CUSTOM_LABWARE_FAILURE',
         payload: {
-          labware: {
-            type: 'INVALID_LABWARE_FILE',
-            filename: 'b.json',
-            created: 2,
-          },
+          labware: Fixtures.mockInvalidLabware,
+          message: 'AH',
         },
       },
       expected: {
-        addFileFailure: {
-          type: 'INVALID_LABWARE_FILE',
-          filename: 'b.json',
-          created: 2,
-        },
-        filenames: [],
-        filesByName: {},
+        ...INITIAL_STATE,
+        addFailureFile: Fixtures.mockInvalidLabware,
+        addFailureMessage: 'AH',
       },
     },
     {
       name: 'handles CLEAR_ADD_CUSTOM_LABWARE_FAILURE',
       state: {
-        addFileFailure: {
-          type: 'INVALID_LABWARE_FILE',
-          filename: 'b.json',
-          created: 2,
-        },
-        filenames: [],
-        filesByName: {},
+        addFailureFile: Fixtures.mockInvalidLabware,
+        addFailureMessage: 'AH',
       },
       action: { type: 'labware:CLEAR_ADD_CUSTOM_LABWARE_FAILURE' },
       expected: {
-        addFileFailure: null,
-        filenames: [],
-        filesByName: {},
+        addFailureFile: null,
+        addFailureMessage: null,
       },
     },
   ]

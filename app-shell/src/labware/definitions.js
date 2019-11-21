@@ -1,6 +1,7 @@
 // @flow
 import path from 'path'
 import fs from 'fs-extra'
+import { shell } from 'electron'
 
 import type { Dirent } from '../types'
 import type { UncheckedLabwareFile } from '@opentrons/app/src/custom-labware/types'
@@ -71,4 +72,10 @@ export function addLabwareFile(file: string, dir: string): Promise<void> {
   return getFileName(dir, basename, extname).then(destName =>
     fs.readJson(file).then(data => fs.outputJson(destName, data))
   )
+}
+
+export function removeLabwareFile(file: string): Promise<void> {
+  const result = shell.moveItemToTrash(file)
+
+  return result ? Promise.resolve() : fs.unlink(file)
 }

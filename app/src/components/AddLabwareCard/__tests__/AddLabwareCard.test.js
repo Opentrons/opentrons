@@ -6,16 +6,25 @@ import { mount } from 'enzyme'
 import * as Cfg from '../../../config'
 
 import * as CustomLabware from '../../../custom-labware'
+import * as CustomLabwareFixtures from '../../../custom-labware/__fixtures__'
 import { AddLabwareCard } from '..'
 import { ManagePath } from '../ManagePath'
 import { AddLabware } from '../AddLabware'
+import { PortaledAddLabwareFailureModal } from '../AddLabwareFailureModal'
 
 import type { State } from '../../../types'
 import type { Config } from '../../../config/types'
+import type { FailedLabwareFile } from '../../../custom-labware/types'
 
 jest.mock('../../../config')
+jest.mock('../../../custom-labware/selectors')
 
 const mockGetConfig: JestMockFn<[State], $Shape<Config>> = Cfg.getConfig
+const mockGetAddLabwareFailure: JestMockFn<
+  [State],
+  {| file: FailedLabwareFile | null, errorMessage: string | null |}
+> = CustomLabware.getAddLabwareFailure
+
 const mockLabwarePath = '/path/to/labware'
 const mockConfig = { labware: { directory: mockLabwarePath } }
 
@@ -25,6 +34,7 @@ describe('AddLabwareCard', () => {
 
   beforeEach(() => {
     mockGetConfig.mockReturnValue(mockConfig)
+    mockGetAddLabwareFailure.mockReturnValue({ file: null, errorMessage: null })
 
     mockStore = {
       subscribe: () => {},
@@ -70,5 +80,42 @@ describe('AddLabwareCard', () => {
     expect(mockStore.dispatch).toHaveBeenCalledTimes(0)
     control.invoke('onAddLabware')()
     expect(mockStore.dispatch).toHaveBeenCalledWith(expectedAction)
+  })
+
+  test('renders an AddLabwareFailureModal if add labware fails', () => {
+    mockGetAddLabwareFailure.mockReturnValue({
+      file: CustomLabwareFixtures.mockInvalidLabware,
+      errorMessage: 'AH',
+    })
+
+    const wrapper = render()
+    const modal = wrapper.find(PortaledAddLabwareFailureModal)
+
+    expect(modal.props()).toEqual({
+      file: CustomLabwareFixtures.mockInvalidLabware,
+      errorMessage: 'AH',
+      directory: mockLabwarePath,
+      onCancel: expect.any(Function),
+      onOverwrite: expect.any(Function),
+    })
+  })
+
+  test('AddLabwareFailureModal onCancel and onOverwrite hooked to dispatch', () => {
+    const file = CustomLabwareFixtures.mockDuplicateLabware
+
+    mockGetAddLabwareFailure.mockReturnValue({ file, errorMessage: null })
+
+    const wrapper = render()
+    const modal = wrapper.find(PortaledAddLabwareFailureModal)
+
+    modal.invoke('onCancel')()
+    expect(mockStore.dispatch).toHaveBeenCalledWith(
+      CustomLabware.clearAddCustomLabwareFailure()
+    )
+
+    modal.invoke('onOverwrite')(file)
+    expect(mockStore.dispatch).toHaveBeenCalledWith(
+      CustomLabware.addCustomLabware(file)
+    )
   })
 })

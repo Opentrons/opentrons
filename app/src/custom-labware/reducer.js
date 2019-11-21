@@ -1,6 +1,7 @@
 // @flow
 // custom labware reducer
-import * as ActionTypes from './actions'
+import keyBy from 'lodash/keyBy'
+import * as Actions from './actions'
 
 import type { Action } from '../types'
 import type { CustomLabwareState } from './types'
@@ -8,7 +9,9 @@ import type { CustomLabwareState } from './types'
 export const INITIAL_STATE: CustomLabwareState = {
   filenames: [],
   filesByName: {},
-  addFileFailure: null,
+  addFailureFile: null,
+  addFailureMessage: null,
+  listFailureMessage: null,
 }
 
 export function customLabwareReducer(
@@ -16,26 +19,30 @@ export function customLabwareReducer(
   action: Action
 ): CustomLabwareState {
   switch (action.type) {
-    case ActionTypes.CUSTOM_LABWARE: {
-      const { filenames, filesByName } = action.payload.reduce(
-        (res, file) => {
-          res.filenames.push(file.filename)
-          res.filesByName[file.filename] = file
-          return res
-        },
-        { filenames: [], filesByName: {} }
-      )
-
-      return { ...state, filenames, filesByName }
+    case Actions.CUSTOM_LABWARE_LIST: {
+      return {
+        ...state,
+        listFailureMessage: null,
+        filenames: action.payload.map(f => f.filename),
+        filesByName: keyBy(action.payload, 'filename'),
+      }
     }
 
-    case ActionTypes.ADD_CUSTOM_LABWARE:
-    case ActionTypes.CLEAR_ADD_CUSTOM_LABWARE_FAILURE: {
-      return { ...state, addFileFailure: null }
+    case Actions.CUSTOM_LABWARE_LIST_FAILURE: {
+      return { ...state, listFailureMessage: action.payload.message }
     }
 
-    case ActionTypes.ADD_CUSTOM_LABWARE_FAILURE: {
-      return { ...state, addFileFailure: action.payload.labware }
+    case Actions.ADD_CUSTOM_LABWARE:
+    case Actions.CLEAR_ADD_CUSTOM_LABWARE_FAILURE: {
+      return { ...state, addFailureFile: null, addFailureMessage: null }
+    }
+
+    case Actions.ADD_CUSTOM_LABWARE_FAILURE: {
+      return {
+        ...state,
+        addFailureFile: action.payload.labware,
+        addFailureMessage: action.payload.message,
+      }
     }
   }
 

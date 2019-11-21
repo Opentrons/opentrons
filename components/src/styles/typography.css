@@ -15,6 +15,7 @@
   --fw-semibold: 600;
   --fw-regular: 400;
   --fw-light: 300;
+  --ff-code: Consolas, monaco, monospace;
   --lh-solid: 1;
   --lh-title: 1.25;
   --lh-copy: 1.5;
@@ -96,6 +97,13 @@
     font-size: var(--fs-caption);
     font-weight: var(--fw-semibold);
     color: var(--c-med-gray);
+  };
+
+  --font-code: {
+    font-family: var(--ff-code);
+    font-size: var(--fs-body-1);
+    font-weight: var(--fw-regular);
+    color: var(--c-font-dark);
   };
 
   --truncate: {

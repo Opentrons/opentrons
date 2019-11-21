@@ -5,29 +5,9 @@ import validLabwareA from '@opentrons/shared-data/labware/fixtures/2/fixture_96_
 import validLabwareB from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
 
 describe('validateLabwareFiles', () => {
-  test('handles unparseable labware files', () => {
+  test('handles unparseable and invalid labware files', () => {
     const files = [
       { filename: 'a.json', data: null, created: Date.now() },
-      { filename: 'b.json', data: null, created: Date.now() },
-    ]
-
-    expect(validateLabwareFiles(files)).toEqual([
-      {
-        type: 'BAD_JSON_LABWARE_FILE',
-        filename: 'a.json',
-        created: expect.any(Number),
-      },
-      {
-        type: 'BAD_JSON_LABWARE_FILE',
-        filename: 'b.json',
-        created: expect.any(Number),
-      },
-    ])
-  })
-
-  test('handles invalid labware files', () => {
-    const files = [
-      { filename: 'a.json', data: { foo: 'bar' }, created: Date.now() },
       { filename: 'b.json', data: { baz: 'qux' }, created: Date.now() },
     ]
 

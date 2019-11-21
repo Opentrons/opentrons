@@ -1,23 +1,26 @@
 // @flow
 
 import fse from 'fs-extra'
-import Electron from 'electron'
 import * as Cfg from '../../config'
+import * as Dialogs from '../../dialogs'
 import * as Defs from '../definitions'
 import * as Val from '../validation'
 import { registerLabware } from '..'
 
-import validLabwareA from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import * as CustomLabware from '@opentrons/app/src/custom-labware'
+import * as CustomLabwareFixtures from '@opentrons/app/src/custom-labware/__fixtures__'
 
 import type { Config } from '@opentrons/app/src/config/types'
 import type {
   UncheckedLabwareFile,
   CheckedLabwareFile,
+  DuplicateLabwareFile,
 } from '@opentrons/app/src/custom-labware/types'
 
 jest.mock('fs-extra')
 jest.mock('electron')
 jest.mock('../../config')
+jest.mock('../../dialogs')
 jest.mock('../definitions')
 jest.mock('../validation')
 
@@ -28,10 +31,15 @@ const getFullConfig: JestMockFn<[], $Shape<Config>> = Cfg.getFullConfig
 const handleConfigChange: JestMockFn<[string, (any, any) => mixed], mixed> =
   Cfg.handleConfigChange
 
-const showOpenDialog: JestMockFn<
+const showOpenDirectoryDialog: JestMockFn<
   Array<any>,
-  {| canceled: boolean, filePaths: Array<string> |}
-> = Electron.dialog.showOpenDialog
+  Array<string>
+> = (Dialogs.showOpenDirectoryDialog: any)
+
+const showOpenFileDialog: JestMockFn<
+  Array<any>,
+  Array<string>
+> = (Dialogs.showOpenFileDialog: any)
 
 const readLabwareDirectory: JestMockFn<
   [string],
@@ -48,6 +56,11 @@ const addLabwareFile: JestMockFn<
   void
 > = (Defs.addLabwareFile: any)
 
+const removeLabwareFile: JestMockFn<
+  [string],
+  void
+> = (Defs.removeLabwareFile: any)
+
 const validateLabwareFiles: JestMockFn<
   [Array<UncheckedLabwareFile>],
   Array<CheckedLabwareFile>
@@ -57,6 +70,9 @@ const validateNewLabwareFile: JestMockFn<
   [Array<CheckedLabwareFile>, UncheckedLabwareFile],
   CheckedLabwareFile
 > = Val.validateNewLabwareFile
+
+// wait a few ticks to let the mock Promises clear
+const flush = () => new Promise(resolve => setTimeout(resolve, 0))
 
 describe('labware module dispatches', () => {
   const labwareDir = '/path/to/somewhere'
@@ -68,9 +84,13 @@ describe('labware module dispatches', () => {
     getFullConfig.mockReturnValue({ labware: { directory: labwareDir } })
     ensureDir.mockResolvedValue()
     addLabwareFile.mockResolvedValue()
+    removeLabwareFile.mockResolvedValue()
     readLabwareDirectory.mockResolvedValue([])
     parseLabwareFiles.mockResolvedValue([])
     validateLabwareFiles.mockReturnValue([])
+
+    showOpenDirectoryDialog.mockResolvedValue([])
+    showOpenFileDialog.mockResolvedValue([])
 
     dispatch = jest.fn()
     handleAction = registerLabware(dispatch, mockMainWindow)
@@ -81,22 +101,16 @@ describe('labware module dispatches', () => {
   })
 
   test('ensures labware directory exists on FETCH_CUSTOM_LABWARE', () => {
-    handleAction({
-      type: 'labware:FETCH_CUSTOM_LABWARE',
-      meta: { shell: true },
-    })
+    handleAction(CustomLabware.fetchCustomLabware())
     expect(ensureDir).toHaveBeenCalledWith(labwareDir)
   })
 
   test('reads labware directory on FETCH_CUSTOM_LABWARE', () => {
-    handleAction({
-      type: 'labware:FETCH_CUSTOM_LABWARE',
-      meta: { shell: true },
-    })
+    handleAction(CustomLabware.fetchCustomLabware())
 
-    return Promise.resolve()
-      .then(() => ensureDir.mock.results[0].value)
-      .then(() => expect(readLabwareDirectory).toHaveBeenCalledWith(labwareDir))
+    return flush().then(() =>
+      expect(readLabwareDirectory).toHaveBeenCalledWith(labwareDir)
+    )
   })
 
   test('reads and parses definition files', () => {
@@ -111,105 +125,67 @@ describe('labware module dispatches', () => {
     readLabwareDirectory.mockResolvedValueOnce(mockDirectoryListing)
     parseLabwareFiles.mockResolvedValueOnce(mockParsedFiles)
 
-    handleAction({
-      type: 'labware:FETCH_CUSTOM_LABWARE',
-      meta: { shell: true },
-    })
+    handleAction(CustomLabware.fetchCustomLabware())
 
-    return Promise.resolve()
-      .then(() => readLabwareDirectory.mock.results[0].value)
-      .then(() => parseLabwareFiles.mock.results[0].value)
-      .then(() => {
-        expect(parseLabwareFiles).toHaveBeenCalledWith(mockDirectoryListing)
-        expect(validateLabwareFiles).toHaveBeenCalledWith(mockParsedFiles)
-      })
+    return flush().then(() => {
+      expect(parseLabwareFiles).toHaveBeenCalledWith(mockDirectoryListing)
+      expect(validateLabwareFiles).toHaveBeenCalledWith(mockParsedFiles)
+    })
   })
 
-  test('dispatches CUSTOM_LABWARE with labware files', () => {
+  test('dispatches CUSTOM_LABWARE_LIST with labware files', () => {
     const mockValidatedFiles = [
-      { type: 'BAD_JSON_LABWARE_FILE', filename: 'd.json', created: 3 },
-      { type: 'INVALID_LABWARE_FILE', filename: 'c.json', created: 2 },
-      {
-        type: 'DUPLICATE_LABWARE_FILE',
-        filename: 'b.json',
-        created: 1,
-        metadata: validLabwareA.metadata,
-        identity: {
-          name: 'fixture_96_plate',
-          version: 1,
-          namespace: 'fixture',
-        },
-      },
-      {
-        type: 'VALID_LABWARE_FILE',
-        filename: 'a.json',
-        created: 0,
-        metadata: validLabwareA.metadata,
-        identity: {
-          name: 'fixture_96_plate',
-          version: 1,
-          namespace: 'fixture',
-        },
-      },
+      CustomLabwareFixtures.mockInvalidLabware,
+      CustomLabwareFixtures.mockDuplicateLabware,
+      CustomLabwareFixtures.mockValidLabware,
     ]
 
     validateLabwareFiles.mockReturnValueOnce(mockValidatedFiles)
 
-    handleAction({
-      type: 'labware:FETCH_CUSTOM_LABWARE',
-      meta: { shell: true },
-    })
+    handleAction(CustomLabware.fetchCustomLabware())
 
-    return Promise.resolve()
-      .then(() => readLabwareDirectory.mock.results[0].value)
-      .then(() => parseLabwareFiles.mock.results[0].value)
-      .then(() => {
-        expect(dispatch).toHaveBeenCalledWith({
-          type: 'labware:CUSTOM_LABWARE',
-          payload: mockValidatedFiles,
-        })
-      })
+    return flush().then(() => {
+      expect(dispatch).toHaveBeenCalledWith(
+        CustomLabware.customLabwareList(mockValidatedFiles)
+      )
+    })
+  })
+
+  test('dispatches CUSTOM_LABWARE_LIST_FAILURE if read fails', () => {
+    readLabwareDirectory.mockRejectedValue((new Error('AH'): any))
+
+    handleAction(CustomLabware.fetchCustomLabware())
+
+    return flush().then(() => {
+      expect(dispatch).toHaveBeenCalledWith(
+        CustomLabware.customLabwareListFailure('AH')
+      )
+    })
   })
 
   test('opens file picker on CHANGE_CUSTOM_LABWARE_DIRECTORY', () => {
-    showOpenDialog.mockResolvedValue({ canceled: true, filePaths: [] })
+    handleAction(CustomLabware.changeCustomLabwareDirectory())
 
-    handleAction({
-      type: 'labware:CHANGE_CUSTOM_LABWARE_DIRECTORY',
-      meta: { shell: true },
-    })
-
-    return Promise.resolve()
-      .then(() => showOpenDialog.mock.results[0].value)
-      .then(() => {
-        expect(showOpenDialog).toHaveBeenCalledWith(mockMainWindow, {
-          defaultPath: labwareDir,
-          properties: ['openDirectory', 'createDirectory'],
-        })
-        expect(dispatch).not.toHaveBeenCalled()
+    return flush().then(() => {
+      expect(showOpenDirectoryDialog).toHaveBeenCalledWith(mockMainWindow, {
+        defaultPath: labwareDir,
       })
+      expect(dispatch).not.toHaveBeenCalled()
+    })
   })
 
   test('dispatches config:UPDATE on labware dir selection', () => {
-    showOpenDialog.mockResolvedValue({
-      canceled: false,
-      filePaths: ['/path/to/labware'],
-    })
+    showOpenDirectoryDialog.mockResolvedValue(['/path/to/labware'])
 
-    handleAction({
-      type: 'labware:CHANGE_CUSTOM_LABWARE_DIRECTORY',
-      meta: { shell: true },
-    })
+    handleAction(CustomLabware.changeCustomLabwareDirectory())
 
-    return Promise.resolve()
-      .then(() => showOpenDialog.mock.results[0].value)
-      .then(() => {
-        expect(dispatch).toHaveBeenCalledWith({
-          type: 'config:UPDATE',
-          payload: { path: 'labware.directory', value: '/path/to/labware' },
-          meta: { shell: true },
-        })
+    return flush().then(() => {
+      expect(dispatch).toHaveBeenCalledWith({
+        type: 'config:UPDATE',
+        payload: { path: 'labware.directory', value: '/path/to/labware' },
+        meta: { shell: true },
       })
+    })
   })
 
   test('reads labware directory on config change', () => {
@@ -221,35 +197,25 @@ describe('labware module dispatches', () => {
 
     changeHandler()
 
-    return Promise.resolve()
-      .then(() => ensureDir.mock.results[0].value)
-      .then(() => expect(readLabwareDirectory).toHaveBeenCalledWith(labwareDir))
+    return flush().then(() =>
+      expect(readLabwareDirectory).toHaveBeenCalledWith(labwareDir)
+    )
   })
 
   test('opens file picker on ADD_CUSTOM_LABWARE', () => {
-    showOpenDialog.mockResolvedValue({ canceled: true, filePaths: [] })
+    handleAction(CustomLabware.addCustomLabware())
 
-    handleAction({
-      type: 'labware:ADD_CUSTOM_LABWARE',
-      meta: { shell: true },
-    })
-
-    return Promise.resolve()
-      .then(() => showOpenDialog.mock.results[0].value)
-      .then(() => {
-        expect(showOpenDialog).toHaveBeenCalledWith(mockMainWindow, {
-          defaultPath: '__mock-app-path__',
-          properties: ['openFile'],
-          filters: [{ name: 'JSON Labware Definitions', extensions: ['json'] }],
-        })
-        expect(dispatch).not.toHaveBeenCalled()
+    return flush().then(() => {
+      expect(showOpenFileDialog).toHaveBeenCalledWith(mockMainWindow, {
+        defaultPath: '__mock-app-path__',
+        filters: [{ name: 'JSON Labware Definitions', extensions: ['json'] }],
       })
+      expect(dispatch).not.toHaveBeenCalled()
+    })
   })
 
   test('reads labware directory and new file and compares', () => {
-    const mockValidatedFiles = [
-      { type: 'INVALID_LABWARE_FILE', filename: 'c.json', created: 2 },
-    ]
+    const mockValidatedFiles = [CustomLabwareFixtures.mockInvalidLabware]
 
     const mockNewUncheckedFile = {
       filename: '/path/to/labware.json',
@@ -257,11 +223,7 @@ describe('labware module dispatches', () => {
       data: {},
     }
 
-    showOpenDialog.mockResolvedValue({
-      canceled: false,
-      filePaths: ['/path/to/labware.json'],
-    })
-
+    showOpenFileDialog.mockResolvedValue(['/path/to/labware.json'])
     // validation of existing definitions
     validateLabwareFiles.mockReturnValueOnce(mockValidatedFiles)
     // existing files mock return
@@ -271,65 +233,37 @@ describe('labware module dispatches', () => {
     // new file (not needed for this test except to prevent a type error)
     validateNewLabwareFile.mockReturnValueOnce(mockValidatedFiles[0])
 
-    handleAction({
-      type: 'labware:ADD_CUSTOM_LABWARE',
-      meta: { shell: true },
-    })
+    handleAction(CustomLabware.addCustomLabware())
 
-    return Promise.resolve()
-      .then(() => showOpenDialog.mock.results[0].value)
-      .then(() => readLabwareDirectory.mock.results[0].value)
-      .then(() => parseLabwareFiles.mock.results[0].value)
-      .then(() => parseLabwareFiles.mock.results[1].value)
-      .then(() => {
-        expect(validateNewLabwareFile).toHaveBeenCalledWith(
-          mockValidatedFiles,
-          mockNewUncheckedFile
-        )
-      })
+    return flush().then(() => {
+      expect(validateNewLabwareFile).toHaveBeenCalledWith(
+        mockValidatedFiles,
+        mockNewUncheckedFile
+      )
+    })
   })
 
   test('dispatches ADD_CUSTOM_LABWARE_FAILURE if checked file is invalid', () => {
-    const mockInvalidFile = {
-      type: 'INVALID_LABWARE_FILE',
-      filename: 'c.json',
-      created: 2,
-    }
+    const mockInvalidFile = CustomLabwareFixtures.mockInvalidLabware
+    const expectedAction = CustomLabware.addCustomLabwareFailure(
+      mockInvalidFile
+    )
 
-    const expectedAction = {
-      type: 'labware:ADD_CUSTOM_LABWARE_FAILURE',
-      payload: { labware: mockInvalidFile },
-    }
-
-    showOpenDialog.mockResolvedValue({ canceled: false, filePaths: ['c.json'] })
+    showOpenFileDialog.mockResolvedValue(['c.json'])
     validateNewLabwareFile.mockReturnValueOnce(mockInvalidFile)
 
-    handleAction({ type: 'labware:ADD_CUSTOM_LABWARE', meta: { shell: true } })
+    handleAction(CustomLabware.addCustomLabware())
 
-    return Promise.resolve()
-      .then(() => showOpenDialog.mock.results[0].value)
-      .then(() => readLabwareDirectory.mock.results[0].value)
-      .then(() => parseLabwareFiles.mock.results[0].value)
-      .then(() => parseLabwareFiles.mock.results[1].value)
-      .then(() => {
-        expect(dispatch).toHaveBeenCalledWith(expectedAction)
-      })
+    return flush().then(() => {
+      expect(dispatch).toHaveBeenCalledWith(expectedAction)
+    })
   })
 
   test('adds file and triggers a re-scan if valid', () => {
-    const mockValidFile = {
-      type: 'VALID_LABWARE_FILE',
-      filename: '/path/to/a.json',
-      created: 0,
-      metadata: validLabwareA.metadata,
-      identity: {
-        name: 'fixture_96_plate',
-        version: 1,
-        namespace: 'fixture',
-      },
-    }
+    const mockValidFile = CustomLabwareFixtures.mockValidLabware
+    const expectedAction = CustomLabware.customLabwareList([mockValidFile])
 
-    showOpenDialog.mockResolvedValue({ canceled: false, filePaths: ['a.json'] })
+    showOpenFileDialog.mockResolvedValue([mockValidFile.filename])
     validateNewLabwareFile.mockReturnValueOnce(mockValidFile)
 
     // initial read
@@ -337,27 +271,75 @@ describe('labware module dispatches', () => {
     // read after add
     validateLabwareFiles.mockReturnValueOnce([mockValidFile])
 
-    const expectedAction = {
-      type: 'labware:CUSTOM_LABWARE',
-      payload: [mockValidFile],
-    }
+    handleAction(CustomLabware.addCustomLabware())
 
-    handleAction({ type: 'labware:ADD_CUSTOM_LABWARE', meta: { shell: true } })
+    return flush().then(() => {
+      expect(addLabwareFile).toHaveBeenCalledWith(
+        mockValidFile.filename,
+        labwareDir
+      )
+      expect(dispatch).toHaveBeenCalledWith(expectedAction)
+    })
+  })
 
-    return Promise.resolve()
-      .then(() => showOpenDialog.mock.results[0].value)
-      .then(() => readLabwareDirectory.mock.results[0].value)
-      .then(() => parseLabwareFiles.mock.results[0].value)
-      .then(() => parseLabwareFiles.mock.results[1].value)
-      .then(() => addLabwareFile.mock.results[0].value)
-      .then(() => readLabwareDirectory.mock.results[1].value)
-      .then(() => parseLabwareFiles.mock.results[1].value)
-      .then(() => {
-        expect(addLabwareFile).toHaveBeenCalledWith(
-          '/path/to/a.json',
-          labwareDir
-        )
-        expect(dispatch).toHaveBeenCalledWith(expectedAction)
-      })
+  test('dispatches ADD_CUSTOM_LABWARE_FAILURE if something rejects', () => {
+    const mockValidFile = CustomLabwareFixtures.mockValidLabware
+    const expectedAction = CustomLabware.addCustomLabwareFailure(null, 'AH')
+
+    showOpenFileDialog.mockResolvedValue(['a.json'])
+    validateNewLabwareFile.mockReturnValueOnce(mockValidFile)
+    validateLabwareFiles.mockReturnValueOnce([])
+    addLabwareFile.mockRejectedValue((new Error('AH'): any))
+
+    handleAction(CustomLabware.addCustomLabware())
+
+    return flush().then(() => {
+      expect(dispatch).toHaveBeenCalledWith(expectedAction)
+    })
+  })
+
+  test('skips file picker on ADD_CUSTOM_LABWARE with overwrite', () => {
+    const duplicate = CustomLabwareFixtures.mockDuplicateLabware
+    const mockExisting = [
+      ({ ...duplicate, filename: '/duplicate1.json' }: DuplicateLabwareFile),
+      ({ ...duplicate, filename: '/duplicate2.json' }: DuplicateLabwareFile),
+    ]
+    const mockAfterDeletes = [CustomLabwareFixtures.mockValidLabware]
+    const expectedAction = CustomLabware.customLabwareList(mockAfterDeletes)
+
+    // validation of existing definitions
+    validateLabwareFiles.mockReturnValueOnce(mockExisting)
+    // validation after deletes
+    validateLabwareFiles.mockReturnValueOnce(mockAfterDeletes)
+
+    handleAction(CustomLabware.addCustomLabware(duplicate))
+
+    return flush().then(() => {
+      expect(removeLabwareFile).toHaveBeenCalledWith('/duplicate1.json')
+      expect(removeLabwareFile).toHaveBeenCalledWith('/duplicate2.json')
+      expect(addLabwareFile).toHaveBeenCalledWith(
+        duplicate.filename,
+        labwareDir
+      )
+      expect(dispatch).toHaveBeenCalledWith(expectedAction)
+    })
+  })
+
+  test('sends ADD_CUSTOM_LABWARE_FAILURE if a something rejects', () => {
+    const duplicate = CustomLabwareFixtures.mockDuplicateLabware
+    const mockExisting = [
+      ({ ...duplicate, filename: '/duplicate1.json' }: DuplicateLabwareFile),
+      ({ ...duplicate, filename: '/duplicate2.json' }: DuplicateLabwareFile),
+    ]
+    const expectedAction = CustomLabware.addCustomLabwareFailure(null, 'AH')
+
+    validateLabwareFiles.mockReturnValueOnce(mockExisting)
+    removeLabwareFile.mockRejectedValue((new Error('AH'): any))
+
+    handleAction(CustomLabware.addCustomLabware(duplicate))
+
+    return flush().then(() => {
+      expect(dispatch).toHaveBeenCalledWith(expectedAction)
+    })
   })
 })

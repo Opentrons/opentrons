@@ -3,10 +3,11 @@
 import { createSelector } from 'reselect'
 
 import type { State } from '../types'
-import type { CheckedLabwareFile, ValidLabwareFile } from './types'
-
-export const BAD_JSON_LABWARE_FILE: 'BAD_JSON_LABWARE_FILE' =
-  'BAD_JSON_LABWARE_FILE'
+import type {
+  CheckedLabwareFile,
+  ValidLabwareFile,
+  FailedLabwareFile,
+} from './types'
 
 export const INVALID_LABWARE_FILE: 'INVALID_LABWARE_FILE' =
   'INVALID_LABWARE_FILE'
@@ -29,4 +30,13 @@ export const getValidCustomLabware: State => Array<ValidLabwareFile> = createSel
   getCustomLabware,
   // $FlowFixMe: flow unable to do type refinements via filter
   labware => labware.filter(f => f.type === VALID_LABWARE_FILE)
+)
+
+export const getAddLabwareFailure: State => {|
+  file: FailedLabwareFile | null,
+  errorMessage: string | null,
+|} = createSelector(
+  state => state.labware.addFailureFile,
+  state => state.labware.addFailureMessage,
+  (file, errorMessage) => ({ file, errorMessage })
 )
