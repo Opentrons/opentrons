@@ -438,19 +438,19 @@ def test_functional(smoothie):
 
 
 @pytest.mark.api1_only
-def test_set_pick_up_current(model):
+def test_set_pick_up_current(model, monkeypatch):
     import types
     driver = model.robot._driver
 
     set_current = driver._save_current
     current_log = []
 
-    def set_current_mock(self, target, axes_active=True):
+    def set_current_mock(target, axes_active=True):
         nonlocal current_log
         current_log.append(target)
         set_current(target, axes_active)
 
-    driver._save_current = types.MethodType(set_current_mock, driver)
+    monkeypatch.setattr(driver, '_save_current', set_current_mock)
     driver.update_homed_flags({ax: True for ax in 'XYZABC'})
 
     rack = model.robot.add_container('tiprack-200ul', '10')
@@ -474,11 +474,9 @@ def test_set_pick_up_current(model):
     ]
     assert current_log == expected
 
-    driver._save_current = set_current
 
-
-@pytest.mark.api1_only
 @pytest.mark.xfail
+@pytest.mark.api1_only
 def test_drop_tip_current(model):
     # TODO: All of these API 1 tests either need to be removed or moved to
     # a different test file. The ones using the model fixture rely on
@@ -486,7 +484,7 @@ def test_drop_tip_current(model):
     # be testing methods in the smoothie directly.
 
     import types
-    driver = model.robot._driver
+    driver = model.driver
 
     old_save_current = driver._save_current
     current_log = []
@@ -788,7 +786,6 @@ def test_pause_resume(model):
     assert isclose(coords, expected_coords).all()
 
 
-@pytest.mark.api1_only
 def test_speed_change(robot, instruments, monkeypatch):
     ulmm = {
         "aspirate": [[100, 0, 0.5]],
@@ -826,7 +823,6 @@ def test_speed_change(robot, instruments, monkeypatch):
     fuzzy_assert(result=command_log, expected=expected)
 
 
-@pytest.mark.api1_only
 def test_max_speed_change(robot, smoothie, monkeypatch):
     smoothie.simulating = False
     robot._driver = smoothie
@@ -869,7 +865,6 @@ def test_pause_in_protocol(model):
     assert model.robot._driver.run_flag.is_set()
 
 
-@pytest.mark.api1_only
 def test_send_command_with_retry(robot, smoothie, monkeypatch):
     smoothie.simulating = False
     robot._driver = smoothie
@@ -897,7 +892,6 @@ def test_send_command_with_retry(robot, smoothie, monkeypatch):
         robot._driver._send_command('test')
 
 
-@pytest.mark.api1_only
 def test_unstick_axes(robot, smoothie):
     import types
 
@@ -1006,7 +1000,6 @@ def test_unstick_axes(robot, smoothie):
     assert current_log == expected
 
 
-@pytest.mark.api1_only
 def test_alarm_unhandled(smoothie, robot, monkeypatch):
     smoothie.simulating = False
     robot._driver = smoothie

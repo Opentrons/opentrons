@@ -10,7 +10,6 @@ from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
 from opentrons.config import pipette_config
 
 
-@pytest.mark.api1_only
 async def test_get_pipettes_uncommissioned(
         async_server, loop, async_client, monkeypatch):
 
@@ -31,64 +30,26 @@ async def test_get_pipettes_uncommissioned(
         }
     }
 
-    if async_server['api_version'] == 1:
-        def mock_parse_fail(gcode, mount):
-            pass
-
-        def fake_update_config(axis, data):
-            pass
-
-        def fake_update_steps_per_mm(data):
-            pass
-
-        monkeypatch.setattr(
-            async_server['com.opentrons.hardware']._driver,
-            '_read_from_pipette', mock_parse_fail)
-        monkeypatch.setattr(
-            async_server['com.opentrons.hardware']._driver,
-            'update_pipette_config', fake_update_config)
-        monkeypatch.setattr(
-            async_server['com.opentrons.hardware']._driver,
-            'update_steps_per_mm', fake_update_steps_per_mm)
-        hw = async_server['com.opentrons.hardware']
-        hw._driver.simulating = False
-
-    else:
-        hw = async_server['com.opentrons.hardware']._backend
-        hw._attached_instruments[types.Mount.LEFT] = {
-            'model': None, 'id': None}
+    hw = async_server['com.opentrons.hardware']._backend
+    hw._attached_instruments[types.Mount.LEFT] = {
+        'model': None, 'id': None}
 
     resp = await async_client.get('/pipettes?refresh=true')
-    if async_server['api_version'] == 1:
-        hw._driver.simulating = True
     text = await resp.text()
     assert resp.status == 200
     assert json.loads(text) == expected
 
 
-@pytest.mark.api1_only
 async def test_get_pipettes(async_server, async_client, monkeypatch):
     test_model = 'p300_multi_v1'
     test_name = 'p300_multi'
     test_id = '123abc'
 
     hw = async_server['com.opentrons.hardware']
-    if async_server['api_version'] == 1:
-        def dummy_read_model(mount):
-            return test_model
-
-        def dummy_read_id(mount):
-            return test_id
-
-        monkeypatch.setattr(
-            hw._driver, 'read_pipette_model', dummy_read_model)
-        monkeypatch.setattr(
-            hw._driver, 'read_pipette_id', dummy_read_id)
-    else:
-        hw._backend._attached_instruments = {
-            types.Mount.RIGHT: {'model': test_model, 'id': test_id},
-            types.Mount.LEFT: {'model': test_model, 'id': test_id}
-        }
+    hw._backend._attached_instruments = {
+        types.Mount.RIGHT: {'model': test_model, 'id': test_id},
+        types.Mount.LEFT: {'model': test_model, 'id': test_id}
+    }
 
     model = pipette_config.load(test_model)
     expected = {
@@ -116,29 +77,13 @@ async def test_get_pipettes(async_server, async_client, monkeypatch):
     assert json.loads(text) == expected
 
 
-@pytest.mark.api2_only
-async def test_get_modules_v2(
+async def test_get_modules(
         async_server, loop, async_client, monkeypatch):
     hw = async_server['com.opentrons.hardware']
     magdeck = await hw._backend.build_module('/dev/ot_module_magdeck1',
                                              'magdeck',
                                              lambda x: None)
     monkeypatch.setattr(hw, 'attached_modules', [magdeck])
-    await check_modules_response(async_client)
-
-
-@pytest.mark.api1_only
-async def test_get_modules_v1(
-        virtual_smoothie_env, loop, async_client, monkeypatch):
-
-    def stub_discover():
-        return [('tty1_magdeck', 'magdeck')]
-
-    monkeypatch.setattr(legacy_modules, "discover", stub_discover)
-    await check_modules_response(async_client)
-
-
-async def check_modules_response(async_client):
     keys = sorted(['name', 'port', 'serial', 'model', 'fwVersion',
                    'displayName', 'status', 'data'])
     resp = await async_client.get('/modules')
@@ -161,8 +106,7 @@ def dummy_attached_leg_modules():
     }
 
 
-@pytest.mark.api2_only
-async def test_execute_module_command_v2(
+async def test_execute_module_command(
         virtual_smoothie_env,
         loop,
         async_server,
@@ -186,53 +130,18 @@ async def test_execute_module_command_v2(
     assert body['message'] == 'Success'
 
 
-@pytest.mark.api1_only
-async def test_execute_module_command_v1(
-        dummy_attached_leg_modules,
-        virtual_smoothie_env,
-        loop,
-        async_server,
-        async_client,
-        monkeypatch):
-    hw = async_server['com.opentrons.hardware']
-    monkeypatch.setattr(hw, '_attached_modules', dummy_attached_leg_modules)
-
-    resp = await async_client.post('/modules/mdYYYYMMDD123',
-                                   json={'command_type': 'disengage'})
-    body = await resp.json()
-    assert resp.status == 200
-    assert 'message' in body
-    assert body['message'] == 'Success'
-
-
-@pytest.mark.api1_only
 async def test_get_cached_pipettes(async_server, async_client, monkeypatch):
     test_model = 'p300_multi_v1'
     test_name = 'p300_multi'
     test_id = '123abc'
 
     hw = async_server['com.opentrons.hardware']
-    if async_server['api_version'] == 1:
-        def dummy_read_model(mount):
-            return test_model
+    hw._backend._attached_instruments = {
+        types.Mount.RIGHT: {'model': test_model, 'id': test_id},
+        types.Mount.LEFT: {'model': test_model, 'id': test_id}
+    }
 
-        def dummy_read_id(mount):
-            return test_id
-
-        monkeypatch.setattr(
-            hw._driver, 'read_pipette_model', dummy_read_model)
-        monkeypatch.setattr(
-            hw._driver, 'read_pipette_id', dummy_read_id)
-    else:
-        hw._backend._attached_instruments = {
-            types.Mount.RIGHT: {'model': test_model, 'id': test_id},
-            types.Mount.LEFT: {'model': test_model, 'id': test_id}
-        }
-
-    if async_server['api_version'] == 1:
-        hw.reset()
-    else:
-        await hw.reset()
+    await hw.reset()
 
     model = pipette_config.load(test_model)
     expected = {
@@ -262,22 +171,10 @@ async def test_get_cached_pipettes(async_server, async_client, monkeypatch):
     model1 = 'p10_single_v1.3'
     config1 = pipette_config.load(model1)
     id1 = 'fgh876'
-    if async_server['api_version'] == 1:
-        def dummy_read_model(mount):
-            return model1
-
-        def dummy_read_id(mount):
-            return id1
-
-        monkeypatch.setattr(
-            hw._driver, 'read_pipette_model', dummy_read_model)
-        monkeypatch.setattr(
-            hw._driver, 'read_pipette_id', dummy_read_id)
-    else:
-        hw._backend._attached_instruments = {
-            types.Mount.RIGHT: {'model': model1, 'id': id1},
-            types.Mount.LEFT: {'model': model1, 'id': id1}
-        }
+    hw._backend._attached_instruments = {
+        types.Mount.RIGHT: {'model': model1, 'id': id1},
+        types.Mount.LEFT: {'model': model1, 'id': id1}
+    }
 
     resp1 = await async_client.get('/pipettes')
     text1 = await resp1.text()
@@ -309,7 +206,6 @@ async def test_get_cached_pipettes(async_server, async_client, monkeypatch):
     assert json.loads(text2) == expected2
 
 
-@pytest.mark.api1_only
 async def test_disengage_axes(async_client, monkeypatch):
     def mock_send(self, command, timeout=None):
         pass
@@ -350,7 +246,6 @@ async def test_disengage_axes(async_client, monkeypatch):
     assert json.loads(result2) == alltrue
 
 
-@pytest.mark.api1_only
 async def test_robot_info(async_client):
     res = await async_client.get('/robot/positions')
     assert res.status == 200
@@ -364,7 +259,6 @@ async def test_robot_info(async_client):
     assert len(body['positions']['attach_tip']['point']) == 3
 
 
-@pytest.mark.api1_only
 async def test_home_pipette(async_client):
     test_data = {
         'target': 'pipette',
@@ -377,7 +271,6 @@ async def test_home_pipette(async_client):
     assert res2.status == 200
 
 
-@pytest.mark.api1_only
 async def test_instrument_reuse(
         async_server, async_client, monkeypatch, instruments):
     hw = async_server['com.opentrons.hardware']
@@ -400,18 +293,10 @@ async def test_instrument_reuse(
     # If we do have a pipette connected, if we home we should still have it
     # connected afterwards
     test_model = 'p300_multi_v1'
-    if async_server['api_version'] == 1:
-
-        def dummy_read_model(mount):
-            return test_model
-
-        monkeypatch.setattr(hw._driver, 'read_pipette_model', dummy_read_model)
-        instruments.P300_Multi('left')
-    else:
-        hw._backend._attached_instruments = {
-            types.Mount.RIGHT: {'model': test_model, 'id': 'dummy-id'},
-            types.Mount.LEFT: {'model': test_model, 'id': 'dummy-id'}
-        }
+    hw._backend._attached_instruments = {
+        types.Mount.RIGHT: {'model': test_model, 'id': 'dummy-id'},
+        types.Mount.LEFT: {'model': test_model, 'id': 'dummy-id'}
+    }
 
     res = await async_client.get('/pipettes',
                                  params=[('refresh', 'true')])
@@ -427,7 +312,6 @@ async def test_instrument_reuse(
     assert data['left']['model'] == test_model
 
 
-@pytest.mark.api1_only
 async def test_home_robot(async_client):
     test_data = {
         'target': 'robot'}
@@ -437,7 +321,6 @@ async def test_home_robot(async_client):
     assert res.status == 200
 
 
-@pytest.mark.api1_only
 async def test_home_pipette_bad_request(async_client):
     test_data = {}
     res = await async_client.post('/robot/home', json=test_data)
@@ -467,7 +350,6 @@ async def test_home_pipette_bad_request(async_client):
     assert res4.status == 400
 
 
-@pytest.mark.api1_only
 async def test_move_bad_request(async_client):
     data0 = {
         'target': 'other'
@@ -500,7 +382,6 @@ async def test_move_bad_request(async_client):
     assert res.status == 400
 
 
-@pytest.mark.api1_only
 async def test_move_mount(async_client):
     resp = await async_client.post('/robot/home',
                                    json={'target': 'robot'})
@@ -514,7 +395,6 @@ async def test_move_mount(async_client):
     assert res.status == 200
 
 
-@pytest.mark.api1_only
 async def test_move_pipette(async_client):
     resp = await async_client.post('/robot/home',
                                    json={'target': 'robot'})
@@ -529,18 +409,12 @@ async def test_move_pipette(async_client):
     assert res.status == 200
 
 
-@pytest.mark.api1_only
 async def test_move_and_home_existing_pipette(
         async_server, async_client, instruments):
     hw = async_server['com.opentrons.hardware']
-    if async_server['api_version'] == 1:
-        hw.reset()
-    else:
-        await hw.reset()
+    await hw.reset()
     resp = await async_client.post('/robot/home', json={'target': 'robot'})
     assert resp.status == 200
-    if async_server['api_version'] == 1:
-        instruments.P300_Single(mount='right')
     move_data = {
         'target': 'pipette',
         'point': [100, 200, 50],
@@ -558,7 +432,6 @@ async def test_move_and_home_existing_pipette(
     assert res1.status == 200
 
 
-@pytest.mark.api2_only
 async def test_rail_lights(async_client):
     resp = await async_client.get('/robot/lights')
     assert resp.status == 200

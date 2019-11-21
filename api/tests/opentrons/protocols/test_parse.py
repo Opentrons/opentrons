@@ -256,8 +256,7 @@ def test_parse_json_details(get_json_protocol_fixture,
     parsed.schema_version == int(protocol_details[0])
 
 
-@pytest.mark.api2_only
-def test_parse_bundle_details(get_bundle_fixture, ensure_api2):
+def test_parse_bundle_details(get_bundle_fixture):
     fixture = get_bundle_fixture('simple_bundle')
     filename = fixture['filename']
 
@@ -275,7 +274,7 @@ def test_parse_bundle_details(get_bundle_fixture, ensure_api2):
 @pytest.mark.parametrize('protocol_file',
                          ['testosaur.py'])
 def test_extra_contents(
-        get_labware_fixture, ensure_api2, protocol_file, protocol):
+        get_labware_fixture, protocol_file, protocol):
     fixture_96_plate = get_labware_fixture('fixture_96_plate')
     bundled_labware = {
         'fixture/fixture_96_plate/1': fixture_96_plate

@@ -3,7 +3,7 @@ from unittest import mock
 
 import pytest
 
-import opentrons.protocol_api.labware as labware
+import opentrons.protocol_api.labware as new_labware
 
 from opentrons.legacy_api.containers import (
     load as containers_load,
@@ -24,7 +24,6 @@ from tests.opentrons import generate_plate
 # TODO: Modify calls that expect Deck and Slot to be Placeables
 
 
-@pytest.mark.api1_only
 def test_load_same_slot_force(robot):
     container_name = '96-flat'
     slot = '1'
@@ -52,7 +51,6 @@ def test_load_same_slot_force(robot):
     assert len(robot.get_containers()) == 4
 
 
-@pytest.mark.api1_only
 def test_load_legacy_slot_names(robot):
     slots_old = [
         'A1', 'B1', 'C1',
@@ -84,8 +82,7 @@ def test_load_legacy_slot_names(robot):
     warnings.filterwarnings('default')
 
 
-@pytest.mark.api1_only
-def test_new_slot_names(robot):
+def test_new_slot_names():
     trough = 'usascientific_12_reservoir_22ml'
     plate = 'corning_96_wellplate_360ul_flat'
     tuberack = 'opentrons_6_tuberack_falcon_50ml_conical'
@@ -98,8 +95,7 @@ def test_new_slot_names(robot):
     assert isinstance(cont, Container)
 
 
-@pytest.mark.api1_only
-def test_load_new_trough(robot):
+def test_load_new_trough():
     trough = 'usascientific_12_reservoir_22ml'
     cont = new_load(trough)
     assert cont.size() == (0, 0, 0)
@@ -107,60 +103,52 @@ def test_load_new_trough(robot):
         == (13.94, 42.9 + 31.4475, 2.29)
 
 
-@pytest.mark.api1_only
 def test_new_container_versioning(
-        singletons, get_labware_fixture, monkeypatch):
+        get_labware_fixture, monkeypatch, labware):
     fixt = get_labware_fixture('fixture_12_trough_v2')
     get_def_mock = mock.Mock()
     get_def_mock.return_value = fixt
     monkeypatch.setattr(
-        labware, 'get_labware_definition', get_def_mock)
-    loaded = singletons['labware'].load('fixture_12_trough_v2', 2, version=2)
+        new_labware, 'get_labware_definition', get_def_mock)
+    loaded = labware.load('fixture_12_trough_v2', 2, version=2)
     assert loaded.get_name() == fixt['parameters']['loadName']
 
 
-@pytest.mark.api1_only
 def test_load_fixed_trash(robot):
     assert robot.fixed_trash[0]._coordinates == (
         82.84, 80, 82)
 
 
-@pytest.mark.api1_only
-def test_containers_list(robot):
+def test_containers_list():
     res = containers_list()
     assert res
 
 
-@pytest.mark.api1_only
-def test_bad_unpack_containers(robot):
+def test_bad_unpack_containers():
     with pytest.raises(ValueError):
         unpack_location(1)
 
 
-@pytest.mark.api1_only
-def test_iterate_without_parent(robot):
+def test_iterate_without_parent():
     c = generate_plate(4, 2, (5, 5), (0, 0), 5)
     with pytest.raises(Exception):
         next(c)
 
 
-@pytest.mark.api1_only
-def test_back_container_getitem(robot):
+def test_back_container_getitem():
     c = generate_plate(4, 2, (5, 5), (0, 0), 5)
     with pytest.raises(TypeError):
         c.__getitem__((1, 1))
 
 
-@pytest.mark.api1_only
-def test_iterator(robot):
+def test_iterator():
     c = generate_plate(4, 2, (5, 5), (0, 0), 5)
     res = [well.coordinates() for well in c]
     expected = [(0, 0, 0), (5, 0, 0), (0, 5, 0), (5, 5, 0)]
     assert res == expected
 
 
-@pytest.mark.api1_only
-def test_next(robot):
+def test_next():
     c = generate_plate(4, 2, (5, 5), (0, 0), 5)
     well = c['A1']
     expected = c.get_child_by_name('B1')
@@ -168,16 +156,14 @@ def test_next(robot):
     assert next(well) == expected
 
 
-@pytest.mark.api1_only
-def test_int_index(robot):
+def test_int_index():
     c = generate_plate(4, 2, (5, 5), (0, 0), 5)
 
     assert c[3] == c.get_child_by_name('B2')
     assert c[1] == c.get_child_by_name('B1')
 
 
-@pytest.mark.api1_only
-def test_named_well(robot):
+def test_named_well():
     deck = Deck()
     slot = Slot()
     c = Container()
@@ -191,8 +177,7 @@ def test_named_well(robot):
     assert deck['A1'][0]['Red'] == red
 
 
-@pytest.mark.api1_only
-def test_generate_plate(robot):
+def test_generate_plate():
     c = generate_plate(
         wells=96,
         cols=8,
@@ -205,8 +190,7 @@ def test_generate_plate(robot):
     assert c['B2'].coordinates() == (15, 30, 0)
 
 
-@pytest.mark.api1_only
-def test_coordinates(robot):
+def test_coordinates():
     deck = Deck()
     slot = Slot()
     plate = generate_plate(
@@ -222,8 +206,7 @@ def test_coordinates(robot):
     assert plate['A1'].coordinates(deck) == (105, 215, 0)
 
 
-@pytest.mark.api1_only
-def test_get_name(robot):
+def test_get_name():
     deck = Deck()
     slot = Slot()
     c = Container()
@@ -237,8 +220,7 @@ def test_get_name(robot):
     assert red.get_name() == 'Red'
 
 
-@pytest.mark.api1_only
-def test_well_from_center(robot):
+def test_well_from_center():
     deck = Deck()
     slot = Slot()
     plate = generate_plate(

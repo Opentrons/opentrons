@@ -1,20 +1,6 @@
 import pytest
 from opentrons.protocol_api import execute, ProtocolContext
 from opentrons.protocols.parse import parse
-from opentrons.protocols.types import APIVersion
-
-v1_protocol_testcases = [
-    ("""from opentrons import labware, instruments, robot"""),
-    ("""
-metadata = {
-    "apiLevel": '1.0'
-}
-import opentrons
-opentrons.robot
-    """),
-    ("""
-metadata = {"apiLevel": '1'}
-""")]
 
 
 def test_api2_runfunc():
@@ -47,20 +33,13 @@ def test_api2_runfunc():
 
 
 @pytest.mark.parametrize('protocol_file', ['testosaur_v2.py'])
-def test_execute_ok(protocol, protocol_file, ensure_api2, loop):
+def test_execute_ok(protocol, protocol_file, loop):
     proto = parse(protocol.text, protocol.filename)
     ctx = ProtocolContext(loop)
     execute.run_protocol(proto, context=ctx)
 
 
-@pytest.mark.parametrize('protocol', v1_protocol_testcases)
-def test_execute_v1_imports(protocol, ensure_api2):
-    proto = parse(protocol)
-    ctx = ProtocolContext(api_version=APIVersion(1, 0))
-    execute.run_protocol(proto, ctx)
-
-
-def test_bad_protocol(ensure_api2, loop):
+def test_bad_protocol(loop):
     ctx = ProtocolContext(loop)
     no_run = parse('''
 metadata={"apiLevel": "2.0"}
@@ -89,7 +68,7 @@ def run(a, b):
         assert "must be called with more than one argument" in str(e.value)
 
 
-def test_proto_with_exception(ensure_api2, loop):
+def test_proto_with_exception(loop):
     ctx = ProtocolContext(loop)
     exc_in_root = '''metadata={"apiLevel": "2.0"}
 

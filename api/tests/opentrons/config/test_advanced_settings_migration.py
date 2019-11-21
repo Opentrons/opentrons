@@ -159,5 +159,4 @@ def test_ensures_config():
              'disableHomeOnBoot': None,
              'useOldAspirationFunctions': None,
              'disableLogAggregation': True,
-             'useLegacyInternals': None,
          }

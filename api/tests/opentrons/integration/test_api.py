@@ -1,33 +1,11 @@
 import pytest
 
-from tests.opentrons.conftest import state, log_by_axis
+from tests.opentrons.conftest import state
 
 from numpy import isclose, subtract
 from opentrons.trackers import pose_tracker
 
 
-@pytest.mark.api1_only
-@pytest.fixture
-def smoke(robot):
-    robot.connect()
-    robot.reset()
-    robot.home()
-    robot._driver.log.clear()
-    from tests.opentrons.data import smoke  # NOQA
-
-
-@pytest.mark.api1_only
-def test_smoke(virtual_smoothie_env, smoke, robot):
-    by_axis = log_by_axis(robot._driver.log, 'XYA')
-    coords = [
-        (x, y, z)
-        for x, y, z
-        in zip(by_axis['X'], by_axis['Y'], by_axis['A'])
-    ]
-    assert coords
-
-
-@pytest.mark.api1_only
 @pytest.mark.parametrize('protocol_file', ['multi-single.py'])
 async def test_multi_single(
         main_router, protocol, protocol_file, robot):
@@ -43,7 +21,6 @@ async def test_multi_single(
         session.containers[2])
 
 
-@pytest.mark.api1_only
 @pytest.mark.parametrize('protocol_file', ['multi-single.py'])
 async def test_load_jog_save_run(
         main_router, protocol, protocol_file, monkeypatch, robot):

@@ -143,8 +143,8 @@ class TempDeck:
     def temperature(self) -> int:
         return self._temperature.get('current')
 
-    @property
-    def status(self) -> str:
+    def _get_status(self) -> str:
+        # Separate function for testability
         current = self._temperature.get('current')
         target = self._temperature.get('target')
         delta = 0.7
@@ -158,6 +158,10 @@ class TempDeck:
                 return 'heating'
         else:
             return 'idle'
+
+    @property
+    def status(self) -> str:
+        return self._get_status()
 
     def get_device_info(self) -> Mapping[str, str]:
         '''

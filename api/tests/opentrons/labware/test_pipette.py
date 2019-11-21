@@ -388,10 +388,8 @@ def test_trough_move_to(robot, instruments):
 
 
 @pytest.mark.api1_only
-def test_delay_calls(monkeypatch, instruments):
-    from opentrons import robot
+def test_delay_calls(monkeypatch, instruments, robot):
     from opentrons.legacy_api.instruments import pipette
-    robot.reset()
     p300 = instruments.P300_Single(mount='right')
 
     cmd = []
@@ -423,10 +421,8 @@ def test_delay_calls(monkeypatch, instruments):
 
 
 @pytest.mark.xfail
-def test_drop_tip_in_trash(virtual_smoothie_env, monkeypatch, instruments):
-    from opentrons import robot, labware
+def test_drop_tip_in_trash(monkeypatch, instruments, robot, labware):
     from opentrons.legacy_api.instruments.pipette import Pipette
-    robot.reset()
     robot.home()
     tiprack = labware.load('tiprack-200ul', '1')
     p300 = instruments.P300_Multi(mount='left', tip_racks=[tiprack])

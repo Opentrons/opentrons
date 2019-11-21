@@ -84,7 +84,7 @@ class CalibrationManager:
         log.info('Probing tip with {}'.format(instrument.name))
         self._set_state('probing')
 
-        if ff.use_protocol_api_v2():
+        if instrument._context:
             mount = Mount[instrument._instrument.mount.upper()]
             assert instrument.tip_racks,\
                 'No known tipracks for {}'.format(instrument)
@@ -102,7 +102,7 @@ class CalibrationManager:
 
         log.info('Measured probe top center: {0}'.format(measured_center))
 
-        if ff.use_protocol_api_v2():
+        if instrument._context:
             self._hardware.update_instrument_offset(
                 Mount[instrument._instrument.mount.upper()],
                 from_tip_probe=measured_center)

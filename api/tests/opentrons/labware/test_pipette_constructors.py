@@ -1,6 +1,5 @@
 # TODO: Modify all calls to get a Well to use the `wells` method
 import pytest
-from opentrons.config import pipette_config
 from opentrons.legacy_api.instruments import Pipette
 
 factories = [
@@ -28,9 +27,9 @@ back_compat_pips = [
 
 
 # TODO: This should work on apiv2 back-compat also
-@pytest.mark.api1_only
 @pytest.mark.parametrize('factory', factories)
-def test_pipette_contructors(factory, monkeypatch, singletons):
+def test_pipette_contructors(factory, monkeypatch,
+                             singletons):
     robot = singletons['robot']
     instruments = singletons['instruments']
     model_name, expected_name, make_pipette = factory
@@ -77,27 +76,3 @@ def test_pipette_contructors(factory, monkeypatch, singletons):
     assert blow_out_flow_rate == 25
     assert pipette.min_volume == 7
     assert pipette.max_volume == 8
-
-
-# TODO: This should work on apiv2 back-compat also
-@pytest.mark.api1_only
-@pytest.mark.parametrize('back_compat', back_compat_pips)
-def test_backwards_compatibility(back_compat, monkeypatch, singletons):
-    expected_name, old_name, old_constructor = back_compat
-    robot = singletons['robot']
-    instruments = singletons['instruments']
-
-    fake_pip = {'left': {'model': None, 'id': None, 'name': None},
-                'right': {
-                    'model': expected_name.split('_gen2')[0] + '_v2.0',
-                    'id': 'FakePip',
-                    'name': expected_name}}
-    monkeypatch.setattr(robot, 'model_by_mount', fake_pip)
-
-    old_config = pipette_config.name_config()[old_name]
-    pipette = getattr(instruments, old_constructor)(mount='right')
-
-    assert pipette.name.startswith(expected_name) is True
-    assert pipette.mount == 'right'
-    assert pipette.min_volume == old_config['minVolume']
-    assert pipette.max_volume == old_config['maxVolume']

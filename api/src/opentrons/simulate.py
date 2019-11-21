@@ -22,8 +22,7 @@ from opentrons.config import feature_flags as ff
 from opentrons import protocol_api
 from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import (
-    JsonProtocol, PythonProtocol, BundleContents, APIVersion)
-from opentrons.protocol_api.legacy_wrapper import api
+    PythonProtocol, BundleContents, APIVersion)
 from opentrons.protocol_api import execute, MAX_SUPPORTED_VERSION
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
@@ -191,9 +190,8 @@ def simulate(protocol_file: TextIO,
              custom_labware_paths: List[str] = None,
              custom_data_paths: List[str] = None,
              propagate_logs: bool = False,
-             log_level: str = 'warning',
-             force_v1: bool = False) -> Tuple[List[Mapping[str, Any]],
-                                              Optional[BundleContents]]:
+             log_level: str = 'warning') -> Tuple[List[Mapping[str, Any]],
+                                                  Optional[BundleContents]]:
     """
     Simulate the protocol itself.
 
@@ -250,11 +248,6 @@ def simulate(protocol_file: TextIO,
     :param log_level: The level of logs to capture in the runlog. Default:
                       ``'warning'``
     :type log_level: 'debug', 'info', 'warning', or 'error'
-    :param bool force_v1: If ``True``, use API V1 internals. This prevents
-                          simulation of V2 protocols, but allows the use of
-                          undocumented, private, or internal API V1
-                          interactions. This parameter may be specified on
-                          the command line as ``-i v1``.
     :returns: A tuple of a run log for user output, and possibly the required
               data to write to a bundle to bundle this protocol. The bundle is
               only emitted if the API v2 feature flag is set and this is an
@@ -278,28 +271,13 @@ def simulate(protocol_file: TextIO,
                            extra_data=extra_data)
     bundle_contents:  Optional[BundleContents] = None
 
-    if force_v1:
+    if getattr(protocol, 'api_level', APIVersion(2, 0)) < APIVersion(2, 0):
         def _simulate_v1():
-            import opentrons.legacy_api
-            import opentrons.legacy_api.api
-            if not hasattr(opentrons, 'robot'):
-                setattr(opentrons, 'instruments',
-                        opentrons.legacy_api.api.instruments)
-                setattr(opentrons, 'containers',
-                        opentrons.legacy_api.api.containers)
-                setattr(opentrons, 'labware',
-                        opentrons.legacy_api.api.containers)
-                setattr(opentrons, 'robot',
-                        opentrons.legacy_api.api.robot)
-                setattr(opentrons, 'modules',
-                        opentrons.legacy_api.api.modules)
             opentrons.robot.disconnect()
+            opentrons.robot.reset()
             scraper = CommandScraper(stack_logger, log_level,
                                      opentrons.robot.broker)
-            if isinstance(protocol, JsonProtocol):
-                opentrons.legacy_api.protocols.execute_protocol(protocol)
-            else:
-                exec(protocol.contents, {})
+            exec(protocol.contents, {})
             return scraper
 
         scraper = _simulate_v1()
@@ -427,17 +405,6 @@ def get_arguments(
         help='What to output during simulations',
         choices=['runlog', 'nothing'],
         default='runlog')
-    parser.add_argument(
-        '-i', '--internals',
-        choices=['v1', 'v2'],
-        default='v2',
-        help='Specify the internals to use when executing the protocol. v2 '
-        'means execute protocols that request API V2 using V2, and protocols '
-        'that request API V1 using the V1 back-compat shim. If you have a '
-        'protocol that uses undocumented, private, or internal capabilities '
-        'that are not present in the backcompat layer, you can specify v1 to '
-        'use the old internals.'
-    )
     return parser
 
 
@@ -473,7 +440,6 @@ def main() -> int:
 
     args = parser.parse_args()
     # Try to migrate api v1 containers if needed
-    api.maybe_migrate_containers()
 
     runlog, maybe_bundle = simulate(
         args.protocol,
@@ -481,8 +447,7 @@ def main() -> int:
         getattr(args, 'custom_labware_path', []),
         getattr(args, 'custom_data_path', [])
         + getattr(args, 'custom_data_file', []),
-        log_level=args.log_level,
-        force_v1=(args.internals == 'v1'))
+        log_level=args.log_level)
 
     if maybe_bundle:
         bundle_name = getattr(args, 'bundle', None)
