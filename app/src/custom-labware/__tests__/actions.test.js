@@ -1,5 +1,7 @@
 // @flow
 import * as actions from '../actions'
+import * as Fixtures from '../__fixtures__'
+
 import type { CustomLabwareAction } from '../types'
 
 type ActionSpec = {|
@@ -58,6 +60,16 @@ describe('custom labware actions', () => {
       expected: {
         type: 'labware:ADD_CUSTOM_LABWARE',
         payload: { overwrite: null },
+        meta: { shell: true },
+      },
+    },
+    {
+      name: 'addCustomLabware with overwrite',
+      creator: actions.addCustomLabware,
+      args: [Fixtures.mockDuplicateLabware],
+      expected: {
+        type: 'labware:ADD_CUSTOM_LABWARE',
+        payload: { overwrite: Fixtures.mockDuplicateLabware },
         meta: { shell: true },
       },
     },
