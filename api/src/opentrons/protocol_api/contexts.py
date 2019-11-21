@@ -428,7 +428,7 @@ class ProtocolContext(CommandPublisher):
             'thermocycler': ThermocyclerContext}[resolved_name]
         for mod in self._hw_manager.hardware.attached_modules:
             if mod.name() == resolved_name:
-                hc_mod_instance = mod
+                hc_mod_instance = adapters.SynchronousAdapter(mod)
                 break
 
         if isinstance(hw, Simulator) and hc_mod_instance is None:
