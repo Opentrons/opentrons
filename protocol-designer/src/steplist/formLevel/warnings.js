@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import { getWellTotalVolume } from '@opentrons/shared-data'
+import { MIN_ENGAGE_HEIGHT, MAX_ENGAGE_HEIGHT } from '../../constants'
 import KnowledgeBaseLink from '../../components/KnowledgeBaseLink'
 import type { FormError } from './errors'
 /*******************
@@ -11,6 +12,8 @@ export type FormWarningType =
   | 'BELOW_PIPETTE_MINIMUM_VOLUME'
   | 'OVER_MAX_WELL_VOLUME'
   | 'BELOW_MIN_DISPOSAL_VOLUME'
+  | 'ENGAGE_HEIGHT_MIN_EXCEEDED'
+  | 'ENGAGE_HEIGHT_MAX_EXCEEDED'
 
 export type FormWarning = {
   ...$Exact<FormError>,
@@ -39,6 +42,16 @@ const FORM_WARNINGS: { [FormWarningType]: FormWarning } = {
       </React.Fragment>
     ),
     dependentFields: ['disposalVolume_volume', 'pipette'],
+  },
+  ENGAGE_HEIGHT_MIN_EXCEEDED: {
+    type: 'ENGAGE_HEIGHT_MIN_EXCEEDED',
+    title: 'Specified distance is below module minimum',
+    dependentFields: ['magnetAction', 'engageHeight'],
+  },
+  ENGAGE_HEIGHT_MAX_EXCEEDED: {
+    type: 'ENGAGE_HEIGHT_MAX_EXCEEDED',
+    title: 'Specified distance is above module maximum',
+    dependentFields: ['magnetAction', 'engageHeight'],
   },
 }
 export type WarningChecker = mixed => ?FormWarning
@@ -84,6 +97,18 @@ export const minDisposalVolume = (fields: HydratedFormData): ?FormWarning => {
   if (isUnselected) return FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME
   const isBelowMin = disposalVolume_volume < pipette.spec.minVolume
   return isBelowMin ? FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME : null
+}
+
+export const engageHeightRangeExceeded = (
+  fields: HydratedFormData
+): ?FormWarning => {
+  const { magnetAction, engageHeight } = fields
+  if (magnetAction === 'engage' && engageHeight < MIN_ENGAGE_HEIGHT) {
+    return FORM_WARNINGS.ENGAGE_HEIGHT_MIN_EXCEEDED
+  } else if (magnetAction === 'engage' && engageHeight > MAX_ENGAGE_HEIGHT) {
+    return FORM_WARNINGS.ENGAGE_HEIGHT_MAX_EXCEEDED
+  }
+  return null
 }
 
 /*******************

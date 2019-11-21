@@ -1,6 +1,7 @@
 // @flow
 import dependentFieldsUpdateMoveLiquid from './dependentFieldsUpdateMoveLiquid'
 import dependentFieldsUpdateMix from './dependentFieldsUpdateMix'
+import dependentFieldsUpdateMagnet from './dependentFieldsUpdateMagnet'
 import type { FormData } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
 import type {
@@ -34,6 +35,10 @@ function handleFormChange(
       pipetteEntities,
       labwareEntities
     )
+    return { ...patch, ...dependentFieldsPatch }
+  }
+  if (rawForm.stepType === 'magnet') {
+    const dependentFieldsPatch = dependentFieldsUpdateMagnet(patch, rawForm)
     return { ...patch, ...dependentFieldsPatch }
   }
 

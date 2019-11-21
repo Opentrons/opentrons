@@ -14,6 +14,8 @@ export type FormErrorKey =
   | 'WELL_RATIO_MOVE_LIQUID'
   | 'PAUSE_TYPE_REQUIRED'
   | 'TIME_PARAM_REQUIRED'
+  | 'MAGNET_ACTION_TYPE_REQUIRED'
+  | 'ENGAGE_HEIGHT_REQUIRED'
 
 export type FormError = {
   title: string,
@@ -50,6 +52,14 @@ const FORM_ERRORS: { [FormErrorKey]: FormError } = {
   WELL_RATIO_MOVE_LIQUID: {
     title: 'Well selection must be 1 to many, many to 1, or N to N',
     dependentFields: ['aspirate_wells', 'dispense_wells'],
+  },
+  MAGNET_ACTION_TYPE_REQUIRED: {
+    title: 'Action type must be either engage or disengage',
+    dependentFields: ['magnetAction'],
+  },
+  ENGAGE_HEIGHT_REQUIRED: {
+    title: 'Engage height is required',
+    dependentFields: ['magnetAction', 'engageHeight'],
   },
 }
 export type FormErrorChecker = mixed => ?FormError
@@ -116,6 +126,19 @@ export const wellRatioMoveLiquid = (fields: HydratedFormData): ?FormError => {
   return getWellRatio(aspirate_wells, dispense_wells)
     ? null
     : FORM_ERRORS.WELL_RATIO_MOVE_LIQUID
+}
+
+export const magnetActionRequired = (fields: HydratedFormData): ?FormError => {
+  const { magnetAction } = fields
+  if (!magnetAction) return FORM_ERRORS.MAGNET_ACTION_TYPE_REQUIRED
+  return null
+}
+
+export const engageHeightRequired = (fields: HydratedFormData): ?FormError => {
+  const { magnetAction, engageHeight } = fields
+  return magnetAction === 'engage' && !engageHeight
+    ? FORM_ERRORS.ENGAGE_HEIGHT_REQUIRED
+    : null
 }
 
 /*******************

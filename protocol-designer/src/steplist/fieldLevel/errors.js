@@ -7,12 +7,19 @@ import isArray from 'lodash/isArray'
 
 // TODO: reconcile difference between returning error string and key
 
-export type FieldError = 'REQUIRED' | 'UNDER_WELL_MINIMUM' | 'NON_ZERO'
+export type FieldError =
+  | 'REQUIRED'
+  | 'UNDER_WELL_MINIMUM'
+  | 'NON_ZERO'
+  | 'UNDER_RANGE_MINIMUM'
+  | 'OVER_RANGE_MAXIMUM'
 
 const FIELD_ERRORS: { [FieldError]: string } = {
   REQUIRED: 'This field is required',
   UNDER_WELL_MINIMUM: 'or more wells are required',
   NON_ZERO: 'Must be greater than zero',
+  UNDER_RANGE_MINIMUM: 'Must be greater than',
+  OVER_RANGE_MAXIMUM: 'Must be less than',
 }
 
 // TODO: test these
@@ -31,6 +38,20 @@ export const minimumWellCount = (minimum: number): ErrorChecker => (
   isArray(wells) && wells.length < minimum
     ? `${minimum} ${FIELD_ERRORS.UNDER_WELL_MINIMUM}`
     : null
+
+export const minFieldValue = (minimum: number): ErrorChecker => (
+  value: mixed
+): ?string =>
+  Number(value) >= minimum
+    ? null
+    : `${FIELD_ERRORS.UNDER_RANGE_MINIMUM} ${minimum}`
+
+export const maxFieldValue = (maximum: number): ErrorChecker => (
+  value: mixed
+): ?string =>
+  Number(value) <= maximum
+    ? null
+    : `${FIELD_ERRORS.OVER_RANGE_MAXIMUM} ${maximum}`
 
 /*******************
  **     Helpers    **

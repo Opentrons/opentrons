@@ -78,6 +78,11 @@ export default function getDefaultsForStepType(
         pipetteLocationUpdate: {},
         moduleLocationUpdate: {},
       }
+    case 'magnet':
+      return {
+        magnetAction: null,
+        engageHeight: null,
+      }
     default:
       return {}
   }

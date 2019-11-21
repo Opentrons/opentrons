@@ -6,6 +6,8 @@ import {
   incompatibleLabware,
   pauseForTimeOrUntilTold,
   wellRatioMoveLiquid,
+  magnetActionRequired,
+  engageHeightRequired,
   type FormError,
 } from './errors'
 import {
@@ -13,6 +15,7 @@ import {
   belowPipetteMinimumVolume,
   maxDispenseWellVolume,
   minDisposalVolume,
+  engageHeightRangeExceeded,
   type FormWarning,
   type FormWarningType,
 } from './warnings'
@@ -46,6 +49,10 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
       maxDispenseWellVolume,
       minDisposalVolume
     ),
+  },
+  magnet: {
+    getErrors: composeErrors(magnetActionRequired, engageHeightRequired),
+    getWarnings: composeWarnings(engageHeightRangeExceeded),
   },
 }
 

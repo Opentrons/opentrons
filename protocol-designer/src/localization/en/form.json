@@ -96,6 +96,7 @@
       "pipette": { "label": "pipette" },
       "preWetTip": { "label": "pre-wet tip" },
       "touchTip": { "label": "touch tip" },
+      "magnetActionLabware": { "label": "labware" },
       "magnetAction": {
         "label": "Magnet action",
         "options": {
@@ -104,7 +105,8 @@
         }
       },
       "engageHeight": {
-        "label": "Distance from labware bottom"
+        "label": "Distance from labware bottom",
+        "caption": "Recommended: 4mm"
       }
     }
   }

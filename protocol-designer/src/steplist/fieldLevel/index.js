@@ -4,6 +4,8 @@ import {
   minimumWellCount,
   nonZero,
   composeErrors,
+  minFieldValue,
+  maxFieldValue,
 } from './errors'
 import {
   maskToNumber,
@@ -15,6 +17,7 @@ import {
   type ValueMasker,
   type ValueCaster,
 } from './processing'
+import { MIN_ENGAGE_HEIGHT, MAX_ENGAGE_HEIGHT } from '../../constants'
 import type { StepFieldName } from '../../form-types'
 import type { LabwareEntity, PipetteEntity } from '../../step-forms'
 import type { InvariantContext } from '../../step-generation'
@@ -133,6 +136,15 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   wells: {
     getErrors: composeErrors(requiredField, minimumWellCount(1)),
     maskValue: defaultTo([]),
+  },
+  magnetAction: { getErrors: composeErrors(requiredField) },
+  engageHeight: {
+    getErrors: composeErrors(
+      minFieldValue(MIN_ENGAGE_HEIGHT),
+      maxFieldValue(MAX_ENGAGE_HEIGHT)
+    ),
+    maskValue: composeMaskers(maskToFloat),
+    castValue: Number,
   },
 }
 

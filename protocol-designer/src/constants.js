@@ -73,3 +73,6 @@ export const DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP = 0
 
 export const DEFAULT_WELL_ORDER_FIRST_OPTION: 't2b' = 't2b'
 export const DEFAULT_WELL_ORDER_SECOND_OPTION: 'l2r' = 'l2r'
+
+export const MIN_ENGAGE_HEIGHT = -4
+export const MAX_ENGAGE_HEIGHT = 16
