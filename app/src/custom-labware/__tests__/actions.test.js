@@ -51,6 +51,27 @@ describe('custom labware actions', () => {
         meta: { shell: true },
       },
     },
+    {
+      name: 'addCustomLabwareFailure',
+      creator: actions.addCustomLabwareFailure,
+      args: [{ type: 'INVALID_LABWARE_FILE', filename: 'a.json', created: 0 }],
+      expected: {
+        type: 'labware:ADD_CUSTOM_LABWARE_FAILURE',
+        payload: {
+          labware: {
+            type: 'INVALID_LABWARE_FILE',
+            filename: 'a.json',
+            created: 0,
+          },
+        },
+      },
+    },
+    {
+      name: 'clearAddCustomLabwareFailure',
+      creator: actions.clearAddCustomLabwareFailure,
+      args: [],
+      expected: { type: 'labware:CLEAR_ADD_CUSTOM_LABWARE_FAILURE' },
+    },
   ]
 
   SPECS.forEach(spec => {

@@ -24,6 +24,7 @@ describe('customLabwareReducer', () => {
         ],
       },
       expected: {
+        addFileFailure: null,
         filenames: ['a.json', 'b.json'],
         filesByName: {
           'a.json': {
@@ -42,6 +43,7 @@ describe('customLabwareReducer', () => {
     {
       name: 'handles CUSTOM_LABWARE with removed files',
       state: {
+        addFileFailure: null,
         filenames: ['a.json', 'b.json'],
         filesByName: {
           'a.json': {
@@ -63,6 +65,7 @@ describe('customLabwareReducer', () => {
         ],
       },
       expected: {
+        addFileFailure: null,
         filenames: ['b.json'],
         filesByName: {
           'b.json': {
@@ -71,6 +74,72 @@ describe('customLabwareReducer', () => {
             created: 2,
           },
         },
+      },
+    },
+    {
+      name: 'handles ADD_CUSTOM_LABWARE',
+      state: {
+        addFileFailure: {
+          type: 'INVALID_LABWARE_FILE',
+          filename: 'b.json',
+          created: 2,
+        },
+        filenames: [],
+        filesByName: {},
+      },
+      action: {
+        type: 'labware:ADD_CUSTOM_LABWARE',
+        meta: { shell: true },
+      },
+      expected: {
+        addFileFailure: null,
+        filenames: [],
+        filesByName: {},
+      },
+    },
+    {
+      name: 'handles ADD_CUSTOM_LABWARE_FAILURE',
+      state: {
+        addFileFailure: null,
+        filenames: [],
+        filesByName: {},
+      },
+      action: {
+        type: 'labware:ADD_CUSTOM_LABWARE_FAILURE',
+        payload: {
+          labware: {
+            type: 'INVALID_LABWARE_FILE',
+            filename: 'b.json',
+            created: 2,
+          },
+        },
+      },
+      expected: {
+        addFileFailure: {
+          type: 'INVALID_LABWARE_FILE',
+          filename: 'b.json',
+          created: 2,
+        },
+        filenames: [],
+        filesByName: {},
+      },
+    },
+    {
+      name: 'handles CLEAR_ADD_CUSTOM_LABWARE_FAILURE',
+      state: {
+        addFileFailure: {
+          type: 'INVALID_LABWARE_FILE',
+          filename: 'b.json',
+          created: 2,
+        },
+        filenames: [],
+        filesByName: {},
+      },
+      action: { type: 'labware:CLEAR_ADD_CUSTOM_LABWARE_FAILURE' },
+      expected: {
+        addFileFailure: null,
+        filenames: [],
+        filesByName: {},
       },
     },
   ]

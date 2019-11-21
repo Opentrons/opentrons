@@ -56,9 +56,16 @@ export type CheckedLabwareFile =
   | OpentronsLabwareFile
   | ValidLabwareFile
 
+export type FailedLabwareFile =
+  | BadJsonLabwareFile
+  | InvalidLabwareFile
+  | DuplicateLabwareFile
+  | OpentronsLabwareFile
+
 export type CustomLabwareState = $ReadOnly<{|
   filenames: Array<string>,
   filesByName: $Shape<{| [filename: string]: CheckedLabwareFile |}>,
+  addFileFailure: FailedLabwareFile | null,
 |}>
 
 export type CustomLabwareAction =
@@ -69,3 +76,8 @@ export type CustomLabwareAction =
       meta: {| shell: true |},
     |}
   | {| type: 'labware:ADD_CUSTOM_LABWARE', meta: {| shell: true |} |}
+  | {|
+      type: 'labware:ADD_CUSTOM_LABWARE_FAILURE',
+      payload: {| labware: FailedLabwareFile |},
+    |}
+  | {| type: 'labware:CLEAR_ADD_CUSTOM_LABWARE_FAILURE' |}
