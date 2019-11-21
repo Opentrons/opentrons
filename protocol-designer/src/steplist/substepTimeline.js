@@ -1,5 +1,4 @@
 // @flow
-import assert from 'assert'
 import last from 'lodash/last'
 import pick from 'lodash/pick'
 import { getWellsForTips } from '../step-generation/utils'
@@ -36,53 +35,33 @@ type SubstepTimelineAcc = {
 }
 
 const substepTimelineSingle = (
-  commandCreators: Array<CurriedCommandCreator>,
+  commandCreator: CurriedCommandCreator,
   invariantContext: InvariantContext,
   initialRobotState: RobotState
 ): Array<SubstepTimelineFrame> => {
-  const timeline = commandCreators.reduce(
-    (
-      acc: SubstepTimelineAcc,
-      commandCreator: CurriedCommandCreator,
-      index: number
-    ) => {
-      // error short-circuit
-      if (acc.errors) return acc
+  const nextFrame = commandCreator(invariantContext, initialRobotState)
+  if (nextFrame.errors) return []
+  console.log({ nextFrame })
 
-      const nextFrame = commandCreator(invariantContext, acc.prevRobotState)
+  const timeline = nextFrame.commands.reduce(
+    (acc: SubstepTimelineAcc, command: Command, index: number) => {
+      console.log('inside substepTimelineSingle reduce', { acc, index })
 
-      if (nextFrame.errors) {
-        return { ...acc, errors: nextFrame.errors }
-      }
-
-      // NOTE: only aspirate and dispense commands will appear alone in atomic commands
-      // from compound command creators (e.g. transfer, distribute, etc.)
-      const firstCommand = nextFrame.commands[0]
       const nextRobotState = getNextRobotStateAndWarningsMulti(
-        nextFrame.commands,
+        [command],
         invariantContext,
         acc.prevRobotState
       ).robotState
 
-      if (
-        firstCommand.command === 'aspirate' ||
-        firstCommand.command === 'dispense'
-      ) {
-        assert(
-          nextFrame.commands.length === 1,
-          `substepTimeline expected nextFrame to have only single commands for ${firstCommand.command}`
-        )
-
-        const commandGroup = firstCommand
-        const { well, volume, labware } = commandGroup.params
+      if (command.command === 'aspirate' || command.command === 'dispense') {
+        const { well, volume, labware } = command.params
         const wellInfo = {
           labware,
           wells: [well],
           preIngreds: acc.prevRobotState.liquidState.labware[labware][well],
           postIngreds: nextRobotState.liquidState.labware[labware][well],
         }
-        const ingredKey =
-          commandGroup.command === 'aspirate' ? 'source' : 'dest'
+        const ingredKey = command.command === 'aspirate' ? 'source' : 'dest'
         return {
           ...acc,
           timeline: [
@@ -117,43 +96,23 @@ const substepTimelineSingle = (
 
 // timeline for multi-channel substep context
 const substepTimelineMulti = (
-  commandCreators: Array<CurriedCommandCreator>,
+  commandCreator: CurriedCommandCreator,
   invariantContext: InvariantContext,
   initialRobotState: RobotState,
   channels: Channels
 ): Array<SubstepTimelineFrame> => {
-  const timeline = commandCreators.reduce(
-    (
-      acc: SubstepTimelineAcc,
-      commandCreator: CurriedCommandCreator,
-      index: number
-    ) => {
-      // error short-circuit
-      if (acc.errors) return acc
-
-      const nextFrame = commandCreator(invariantContext, acc.prevRobotState)
-
-      if (nextFrame.errors) {
-        return { ...acc, errors: nextFrame.errors }
-      }
-
+  const nextFrame = commandCreator(invariantContext, initialRobotState)
+  if (nextFrame.errors) return []
+  const timeline = nextFrame.commands.reduce(
+    (acc: SubstepTimelineAcc, command: Command, index: number) => {
       const nextRobotState = getNextRobotStateAndWarningsMulti(
         nextFrame.commands,
         invariantContext,
         acc.prevRobotState
       ).robotState
 
-      const firstCommand = nextFrame.commands[0]
-      if (
-        firstCommand.command === 'aspirate' ||
-        firstCommand.command === 'dispense'
-      ) {
-        assert(
-          nextFrame.commands.length === 1,
-          `substepTimeline expected nextFrame to have only single commands for ${firstCommand.command}`
-        )
-
-        const { well, volume, labware } = firstCommand.params
+      if (command.command === 'aspirate' || command.command === 'dispense') {
+        const { well, volume, labware } = command.params
         const labwareDef = invariantContext.labwareEntities
           ? invariantContext.labwareEntities[labware].def
           : null
@@ -175,8 +134,7 @@ const substepTimelineMulti = (
             : {},
         }
 
-        const ingredKey =
-          firstCommand.command === 'aspirate' ? 'source' : 'dest'
+        const ingredKey = command.command === 'aspirate' ? 'source' : 'dest'
         return {
           ...acc,
           timeline: [
@@ -209,20 +167,20 @@ const substepTimelineMulti = (
 }
 
 const substepTimeline = (
-  commandCreators: Array<CurriedCommandCreator>,
+  commandCreator: CurriedCommandCreator,
   invariantContext: InvariantContext,
   initialRobotState: RobotState,
   channels: Channels
 ) => {
   if (channels === 1) {
     return substepTimelineSingle(
-      commandCreators,
+      commandCreator,
       invariantContext,
       initialRobotState
     )
   } else {
     return substepTimelineMulti(
-      commandCreators,
+      commandCreator,
       invariantContext,
       initialRobotState,
       channels

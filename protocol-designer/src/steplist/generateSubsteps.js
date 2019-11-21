@@ -71,7 +71,7 @@ function transferLikeSubsteps(args: {|
   // if false, show aspirate vol instead
   const showDispenseVol = stepArgs.commandCreatorFnName === 'distribute'
 
-  let substepCommandCreators
+  let substepCommandCreator
 
   // Call appropriate command creator with the validateForm fields.
   // Disable any mix args so those aspirate/dispenses don't show up in substeps
@@ -83,7 +83,7 @@ function transferLikeSubsteps(args: {|
       preWetTip: false,
     }
 
-    substepCommandCreators = curryCommandCreator(transfer, commandCallArgs)
+    substepCommandCreator = curryCommandCreator(transfer, commandCallArgs)
   } else if (stepArgs.commandCreatorFnName === 'distribute') {
     const commandCallArgs = {
       ...stepArgs,
@@ -91,7 +91,7 @@ function transferLikeSubsteps(args: {|
       preWetTip: false,
     }
 
-    substepCommandCreators = curryCommandCreator(distribute, commandCallArgs)
+    substepCommandCreator = curryCommandCreator(distribute, commandCallArgs)
   } else if (stepArgs.commandCreatorFnName === 'consolidate') {
     const commandCallArgs = {
       ...stepArgs,
@@ -100,9 +100,9 @@ function transferLikeSubsteps(args: {|
       preWetTip: false,
     }
 
-    substepCommandCreators = curryCommandCreator(consolidate, commandCallArgs)
+    substepCommandCreator = curryCommandCreator(consolidate, commandCallArgs)
   } else if (stepArgs.commandCreatorFnName === 'mix') {
-    substepCommandCreators = curryCommandCreator(mix, stepArgs)
+    substepCommandCreator = curryCommandCreator(mix, stepArgs)
   } else {
     // TODO Ian 2018-05-21 Use assert here. Should be unreachable
     console.warn(
@@ -114,7 +114,7 @@ function transferLikeSubsteps(args: {|
   // Multichannel substeps
   if (pipetteSpec.channels > 1) {
     const substepRows: Array<SubstepTimelineFrame> = substepTimeline(
-      [substepCommandCreators], // TODO IMMEDIATELY remove substepTimeline's array feature?
+      substepCommandCreator,
       invariantContext,
       robotState,
       pipetteSpec.channels
@@ -196,6 +196,11 @@ function transferLikeSubsteps(args: {|
           return { activeTips, source, dest, volume: currentMultiRow.volume }
         })
     )
+    console.log('transferLikeSubsteps, multi', {
+      stepId,
+      substepRows,
+      mergedMultiRows,
+    })
 
     return {
       multichannel: true,
@@ -206,7 +211,7 @@ function transferLikeSubsteps(args: {|
   } else {
     // single channel
     const substepRows = substepTimeline(
-      [substepCommandCreators],
+      substepCommandCreator,
       invariantContext,
       robotState,
       1
@@ -251,6 +256,12 @@ function transferLikeSubsteps(args: {|
         }
       }
     )
+
+    console.log('transferLikeSubsteps, single', {
+      stepId,
+      substepRows,
+      mergedRows,
+    })
 
     return {
       multichannel: false,
