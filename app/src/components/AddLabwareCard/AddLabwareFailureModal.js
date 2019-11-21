@@ -38,6 +38,8 @@ const THIS_LABWARE_DEFINITION_CONFLICTS =
   'This labware definition conflicts with an Opentrons standard definition. If you are trying to create a new labware based on an Opentrons definition, please contact support.'
 const A_LABWARE_DEFINITION_ALREADY_EXISTS =
   'A labware definition with the same API name, version, and namespace already exists in your labware source folder. Would you like to overwrite it?'
+const CLICKING_OVERWRITE_LABWARE_WILL_DELETE_FILES =
+  'Clicking "Overwrite Labware" will delete any existing files that conflict with the new file'
 
 const DISPLAY_NAME = 'Name: '
 const API_NAME = 'API name: '
@@ -124,6 +126,7 @@ export function AddLabwareFailureModal(props: AddLabwareFailureModalProps) {
       <>
         <p>{A_LABWARE_DEFINITION_ALREADY_EXISTS}</p>
         {renderDetails(file)}
+        <p>{CLICKING_OVERWRITE_LABWARE_WILL_DELETE_FILES}</p>
       </>
     )
   }
