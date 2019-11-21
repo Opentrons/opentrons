@@ -365,6 +365,7 @@ class Pipette:
         display_location = location if location else self.previous_placeable
 
         if volume != 0:
+            print(f'Aspirate location: {location}')
             self._position_for_aspirate(location)
             cmds.do_publish(
                 self._instr_ctx.broker, cmds.aspirate, self.aspirate,
@@ -379,6 +380,7 @@ class Pipette:
         return self
 
     def _position_for_aspirate(self, location: MotionTarget = None):
+        print(f'pos for aspirate: {location}')
         placeable: Optional[Union[LegacyLabware, LegacyWell]] = None
         if location:
             if isinstance(location, (List, WellSeries)):
@@ -389,10 +391,12 @@ class Pipette:
             # go to top of source if not already there
             if placeable != self.previous_placeable:
                 self.move_to(placeable.top())
-        else:
-            placeable = self.previous_placeable
+            else:
+                placeable = self.previous_placeable
+        print(f'pos for aspirate placeable: {placeable}')
         if self.current_volume == 0:
             if placeable:
+                print('move to top')
                 self.move_to(placeable.top())
             self._hw_manager.hardware.prepare_for_aspirate(self._mount)
 
@@ -551,10 +555,12 @@ class Pipette:
 
         cmds.do_publish(self._instr_ctx.broker, cmds.mix, self.mix, 'before',
                         None, None, self, repetitions, volume, location, rate)
-
+        count = 1
+        print(count)
         self.aspirate(volume=volume, location=location, rate=rate)
         for i in range(repetitions - 1):
             self.dispense(volume, rate=rate)
+            print(count + i + 1)
             self.aspirate(volume, rate=rate)
         self.dispense(volume, rate=rate)
 
