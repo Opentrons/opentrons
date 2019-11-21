@@ -249,8 +249,13 @@ class LegacyWell(Well):
             parent_legacy: 'LegacyLabware',
             labware_height: float = None,
             well_name: str = None):
-        self._well = super().__init__(
-            well_props, parent, display_name, has_tip, api_version)
+        self._well = super().__init__(well_props,
+                                      parent,
+                                      display_name,
+                                      has_tip,
+                                      starting_volume=0,
+                                      well_id=well_name,
+                                      api_level=api_version)
         self._well_name = well_name
         self._parent_height = labware_height
         self._parent_legacy = parent_legacy
@@ -1031,7 +1036,7 @@ class Containers:
         # Manually add LegacyDeckItem to deck if not a module
         parent = self._ctx.deck.position_for(slot)
         labware_object = load_from_definition(
-            defn, parent, label, self._ctx.api_version)
+            defn, parent, label, {}, self._ctx.api_version)
         item = self._ctx._deck_layout.get(slot)
         if share and not item:
             raise ValueError(f'There is no other labware in slot {slot}',
