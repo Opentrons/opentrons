@@ -17,8 +17,8 @@ describe('custom labware actions', () => {
       expected: { type: 'labware:FETCH_CUSTOM_LABWARE', meta: { shell: true } },
     },
     {
-      name: 'customLabware',
-      creator: actions.customLabware,
+      name: 'customLabwareList',
+      creator: actions.customLabwareList,
       args: [
         [
           { type: 'INVALID_LABWARE_FILE', filename: 'a.json', created: 0 },
@@ -26,11 +26,20 @@ describe('custom labware actions', () => {
         ],
       ],
       expected: {
-        type: 'labware:CUSTOM_LABWARE',
+        type: 'labware:CUSTOM_LABWARE_LIST',
         payload: [
           { type: 'INVALID_LABWARE_FILE', filename: 'a.json', created: 0 },
           { type: 'INVALID_LABWARE_FILE', filename: 'b.json', created: 1 },
         ],
+      },
+    },
+    {
+      name: 'customLabwareListFailure',
+      creator: actions.customLabwareListFailure,
+      args: ['AH!'],
+      expected: {
+        type: 'labware:CUSTOM_LABWARE_LIST_FAILURE',
+        payload: { message: 'AH!' },
       },
     },
     {
@@ -43,27 +52,38 @@ describe('custom labware actions', () => {
       },
     },
     {
-      name: 'addCustomLabware',
+      name: 'addCustomLabware without overwrite',
       creator: actions.addCustomLabware,
       args: [],
       expected: {
         type: 'labware:ADD_CUSTOM_LABWARE',
+        payload: { overwrite: null },
         meta: { shell: true },
       },
     },
     {
-      name: 'addCustomLabwareFailure',
+      name: 'addCustomLabwareFailure with failed labware',
       creator: actions.addCustomLabwareFailure,
       args: [{ type: 'INVALID_LABWARE_FILE', filename: 'a.json', created: 0 }],
       expected: {
         type: 'labware:ADD_CUSTOM_LABWARE_FAILURE',
         payload: {
+          message: null,
           labware: {
             type: 'INVALID_LABWARE_FILE',
             filename: 'a.json',
             created: 0,
           },
         },
+      },
+    },
+    {
+      name: 'addCustomLabwareFailure with error message',
+      creator: actions.addCustomLabwareFailure,
+      args: [null, 'AH'],
+      expected: {
+        type: 'labware:ADD_CUSTOM_LABWARE_FAILURE',
+        payload: { labware: null, message: 'AH' },
       },
     },
     {

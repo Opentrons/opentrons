@@ -16,4 +16,8 @@ module.exports = {
     // https://electronjs.org/docs/api/dialog#dialogshowopendialogbrowserwindow-options
     showOpenDialog: jest.fn(),
   },
+
+  shell: {
+    moveItemToTrash: jest.fn(),
+  },
 }

@@ -1,8 +1,10 @@
 // @flow
 
+import * as Fixtures from '../__fixtures__'
 import * as selectors from '../selectors'
 
 import type { State } from '../../types'
+import type { ValidLabwareFile } from '../types'
 
 type SelectorSpec = {|
   name: string,
@@ -18,105 +20,62 @@ describe('custom labware selectors', () => {
       selector: selectors.getCustomLabware,
       state: {
         labware: {
-          addFileFailure: null,
-          filenames: ['a.json', 'b.json'],
+          addFailureFile: null,
+          addFailureMessage: null,
+          listFailureMessage: null,
+          filenames: [
+            Fixtures.mockValidLabware.filename,
+            Fixtures.mockInvalidLabware.filename,
+          ],
           filesByName: {
-            'a.json': {
-              type: 'BAD_JSON_LABWARE_FILE',
-              filename: 'a.json',
-              created: 3,
-            },
-            'b.json': {
-              type: 'INVALID_LABWARE_FILE',
-              filename: 'b.json',
-              created: 2,
-            },
+            [Fixtures.mockValidLabware.filename]: Fixtures.mockValidLabware,
+            [Fixtures.mockInvalidLabware.filename]: Fixtures.mockInvalidLabware,
           },
         },
       },
-      expected: [
-        { type: 'BAD_JSON_LABWARE_FILE', filename: 'a.json', created: 3 },
-        { type: 'INVALID_LABWARE_FILE', filename: 'b.json', created: 2 },
-      ],
+      expected: [Fixtures.mockValidLabware, Fixtures.mockInvalidLabware],
     },
     {
       name: 'getValidCustomLabware',
       selector: selectors.getValidCustomLabware,
       state: {
         labware: {
-          addFileFailure: null,
-          filenames: ['a.json', 'b.json', 'c.json', 'd.json', 'e.json'],
+          addFailureFile: null,
+          addFailureMessage: null,
+          listFailureMessage: null,
+          filenames: [
+            Fixtures.mockValidLabware.filename,
+            Fixtures.mockInvalidLabware.filename,
+            'foo.json',
+          ],
           filesByName: {
-            'a.json': {
-              type: 'VALID_LABWARE_FILE',
-              filename: 'a.json',
-              created: 1,
-              identity: { name: 'a', namespace: 'custom', version: 1 },
-              metadata: {
-                displayName: 'A',
-                displayCategory: 'wellPlate',
-                displayVolumeUnits: 'mL',
-              },
-            },
-            'b.json': {
-              type: 'BAD_JSON_LABWARE_FILE',
-              filename: 'b.json',
-              created: 2,
-            },
-            'c.json': {
-              type: 'INVALID_LABWARE_FILE',
-              filename: 'c.json',
-              created: 3,
-            },
-            'd.json': {
-              type: 'DUPLICATE_LABWARE_FILE',
-              filename: 'd.json',
-              created: 4,
-              identity: { name: 'd', namespace: 'custom', version: 1 },
-              metadata: {
-                displayName: 'D',
-                displayCategory: 'wellPlate',
-                displayVolumeUnits: 'mL',
-              },
-            },
-            'e.json': {
-              type: 'VALID_LABWARE_FILE',
-              filename: 'e.json',
-              created: 5,
-              identity: { name: 'e', namespace: 'custom', version: 1 },
-              metadata: {
-                displayName: 'E',
-                displayCategory: 'reservoir',
-                displayVolumeUnits: 'mL',
-              },
-            },
+            [Fixtures.mockValidLabware.filename]: Fixtures.mockValidLabware,
+            [Fixtures.mockInvalidLabware.filename]: Fixtures.mockInvalidLabware,
+            'foo.json': ({
+              ...Fixtures.mockValidLabware,
+              filename: 'foo.json',
+            }: ValidLabwareFile),
           },
         },
       },
       expected: [
-        {
-          type: 'VALID_LABWARE_FILE',
-          filename: 'a.json',
-          created: 1,
-          identity: { name: 'a', namespace: 'custom', version: 1 },
-          metadata: {
-            displayName: 'A',
-            displayCategory: 'wellPlate',
-            displayVolumeUnits: 'mL',
-          },
-        },
-        {
-          type: 'VALID_LABWARE_FILE',
-          filename: 'e.json',
-          created: 5,
-          identity: { name: 'e', namespace: 'custom', version: 1 },
-          metadata: {
-            displayName: 'E',
-            displayCategory: 'reservoir',
-            displayVolumeUnits: 'mL',
-          },
-        },
+        Fixtures.mockValidLabware,
+        { ...Fixtures.mockValidLabware, filename: 'foo.json' },
       ],
+    },
+    {
+      name: 'getAddLabwareFailure',
+      selector: selectors.getAddLabwareFailure,
+      state: {
+        labware: {
+          addFailureFile: Fixtures.mockInvalidLabware,
+          addFailureMessage: 'AH',
+          listFailureMessage: null,
+          filenames: [],
+          filesByName: {},
+        },
+      },
+      expected: { file: Fixtures.mockInvalidLabware, errorMessage: 'AH' },
     },
   ]
 

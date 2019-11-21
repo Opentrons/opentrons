@@ -6,25 +6,25 @@ import type { CustomLabwareState } from '../types'
 
 type ReducerSpec = {|
   name: string,
-  state: CustomLabwareState,
+  state: $Shape<CustomLabwareState>,
   action: Action,
-  expected: CustomLabwareState,
+  expected: $Shape<CustomLabwareState>,
 |}
 
 describe('customLabwareReducer', () => {
   const SPECS: Array<ReducerSpec> = [
     {
-      name: 'handles CUSTOM_LABWARE with new files',
+      name: 'handles CUSTOM_LABWARE_LIST with new files',
       state: INITIAL_STATE,
       action: {
-        type: 'labware:CUSTOM_LABWARE',
+        type: 'labware:CUSTOM_LABWARE_LIST',
         payload: [
           { type: 'BAD_JSON_LABWARE_FILE', filename: 'a.json', created: 3 },
           { type: 'INVALID_LABWARE_FILE', filename: 'b.json', created: 2 },
         ],
       },
       expected: {
-        addFileFailure: null,
+        ...INITIAL_STATE,
         filenames: ['a.json', 'b.json'],
         filesByName: {
           'a.json': {
@@ -38,12 +38,12 @@ describe('customLabwareReducer', () => {
             created: 2,
           },
         },
+        listFailureMessage: null,
       },
     },
     {
-      name: 'handles CUSTOM_LABWARE with removed files',
+      name: 'handles CUSTOM_LABWARE_LIST with removed files',
       state: {
-        addFileFailure: null,
         filenames: ['a.json', 'b.json'],
         filesByName: {
           'a.json': {
@@ -57,15 +57,15 @@ describe('customLabwareReducer', () => {
             created: 2,
           },
         },
+        listFailureMessage: 'AH',
       },
       action: {
-        type: 'labware:CUSTOM_LABWARE',
+        type: 'labware:CUSTOM_LABWARE_LIST',
         payload: [
           { type: 'INVALID_LABWARE_FILE', filename: 'b.json', created: 2 },
         ],
       },
       expected: {
-        addFileFailure: null,
         filenames: ['b.json'],
         filesByName: {
           'b.json': {
@@ -74,36 +74,41 @@ describe('customLabwareReducer', () => {
             created: 2,
           },
         },
+        listFailureMessage: null,
       },
+    },
+    {
+      name: 'handles CUSTOM_LABWARE_LIST_FAILURE',
+      state: INITIAL_STATE,
+      action: {
+        type: 'labware:CUSTOM_LABWARE_LIST_FAILURE',
+        payload: { message: 'AH' },
+      },
+      expected: { ...INITIAL_STATE, listFailureMessage: 'AH' },
     },
     {
       name: 'handles ADD_CUSTOM_LABWARE',
       state: {
-        addFileFailure: {
+        addFailureFile: {
           type: 'INVALID_LABWARE_FILE',
           filename: 'b.json',
           created: 2,
         },
-        filenames: [],
-        filesByName: {},
+        addFailureMessage: 'AH',
       },
       action: {
         type: 'labware:ADD_CUSTOM_LABWARE',
+        payload: { overwrite: null },
         meta: { shell: true },
       },
       expected: {
-        addFileFailure: null,
-        filenames: [],
-        filesByName: {},
+        addFailureFile: null,
+        addFailureMessage: null,
       },
     },
     {
       name: 'handles ADD_CUSTOM_LABWARE_FAILURE',
-      state: {
-        addFileFailure: null,
-        filenames: [],
-        filesByName: {},
-      },
+      state: INITIAL_STATE,
       action: {
         type: 'labware:ADD_CUSTOM_LABWARE_FAILURE',
         payload: {
@@ -112,34 +117,33 @@ describe('customLabwareReducer', () => {
             filename: 'b.json',
             created: 2,
           },
+          message: 'AH',
         },
       },
       expected: {
-        addFileFailure: {
+        ...INITIAL_STATE,
+        addFailureFile: {
           type: 'INVALID_LABWARE_FILE',
           filename: 'b.json',
           created: 2,
         },
-        filenames: [],
-        filesByName: {},
+        addFailureMessage: 'AH',
       },
     },
     {
       name: 'handles CLEAR_ADD_CUSTOM_LABWARE_FAILURE',
       state: {
-        addFileFailure: {
+        addFailureFile: {
           type: 'INVALID_LABWARE_FILE',
           filename: 'b.json',
           created: 2,
         },
-        filenames: [],
-        filesByName: {},
+        addFailureMessage: 'AH',
       },
       action: { type: 'labware:CLEAR_ADD_CUSTOM_LABWARE_FAILURE' },
       expected: {
-        addFileFailure: null,
-        filenames: [],
-        filesByName: {},
+        addFailureFile: null,
+        addFailureMessage: null,
       },
     },
   ]

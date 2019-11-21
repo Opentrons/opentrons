@@ -4,11 +4,16 @@
 import path from 'path'
 import fs from 'fs-extra'
 import tempy from 'tempy'
+import Electron from 'electron'
+
 import {
   readLabwareDirectory,
   parseLabwareFiles,
   addLabwareFile,
+  removeLabwareFile,
 } from '../definitions'
+
+jest.mock('electron')
 
 describe('labware directory utilities', () => {
   const tempDirs: Array<string> = []
@@ -159,32 +164,58 @@ describe('labware directory utilities', () => {
           ])
         })
     })
+
+    test('increments filename to avoid collisions', () => {
+      const sourceDir = makeEmptyDir()
+      const destDir = makeEmptyDir()
+      const sourceName = path.join(sourceDir, 'source.json')
+      const collision1 = path.join(destDir, 'source.json')
+      const collision2 = path.join(destDir, 'source1.json')
+      const expectedName = path.join(destDir, 'source2.json')
+
+      const setup = Promise.all([
+        fs.writeJson(sourceName, { name: 'a' }),
+        fs.writeJson(collision1, { name: 'b' }),
+        fs.writeJson(collision2, { name: 'c' }),
+      ])
+
+      return setup
+        .then(() => addLabwareFile(sourceName, destDir))
+        .then(() => readLabwareDirectory(destDir))
+        .then(parseLabwareFiles)
+        .then(files => {
+          expect(files).toContainEqual({
+            filename: expectedName,
+            data: { name: 'a' },
+            created: expect.any(Number),
+          })
+        })
+    })
   })
 
-  test('increments filename to avoid collisions', () => {
-    const sourceDir = makeEmptyDir()
-    const destDir = makeEmptyDir()
-    const sourceName = path.join(sourceDir, 'source.json')
-    const collision1 = path.join(destDir, 'source.json')
-    const collision2 = path.join(destDir, 'source1.json')
-    const expectedName = path.join(destDir, 'source2.json')
+  describe('remove labware file', () => {
+    test('calls Electron.shell.moveItemToTrash', () => {
+      const dir = makeEmptyDir()
+      const filename = path.join(dir, 'foo.json')
 
-    const setup = Promise.all([
-      fs.writeJson(sourceName, { name: 'a' }),
-      fs.writeJson(collision1, { name: 'b' }),
-      fs.writeJson(collision2, { name: 'c' }),
-    ])
+      Electron.shell.moveItemToTrash.mockReturnValue(true)
 
-    return setup
-      .then(() => addLabwareFile(sourceName, destDir))
-      .then(() => readLabwareDirectory(destDir))
-      .then(parseLabwareFiles)
-      .then(files => {
-        expect(files).toContainEqual({
-          filename: expectedName,
-          data: { name: 'a' },
-          created: expect.any(Number),
-        })
+      return removeLabwareFile(filename).then(() => {
+        expect(Electron.shell.moveItemToTrash).toHaveBeenCalledWith(filename)
       })
+    })
+
+    test('deletes the file if Electron fails to trash it', () => {
+      const dir = makeEmptyDir()
+      const filename = path.join(dir, 'foo.json')
+      const setup = fs.writeJson(filename, { name: 'a' })
+
+      Electron.shell.moveItemToTrash.mockReturnValue(false)
+
+      return setup
+        .then(() => removeLabwareFile(filename))
+        .then(() => readLabwareDirectory(dir))
+        .then(files => expect(files).toEqual([]))
+    })
   })
 })
