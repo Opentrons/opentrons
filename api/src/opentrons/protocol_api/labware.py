@@ -432,7 +432,7 @@ class Labware(DeckItem):
         to be applied.
         """
         if volume_by_well is None:
-            volume_by_well = {}
+            volume_by_well = self.volume_by_well or {}
         return [
             Well(
                 well_props=self._well_definition[well],
