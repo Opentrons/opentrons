@@ -1,17 +1,25 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
+import cx from 'classnames'
 import without from 'lodash/without'
 import i18n from '../localization'
 import { HoverTooltip, PrimaryButton } from '@opentrons/components'
 import { actions as steplistActions } from '../steplist'
 import { selectors as featureFlagSelectors } from '../feature-flags'
+import {
+  selectors as stepFormSelectors,
+  getIsModuleOnDeck,
+} from '../step-forms'
 import { stepIconsByType, type StepType } from '../form-types'
 import type { BaseState, ThunkDispatch } from '../types'
 import styles from './listButtons.css'
 
 type SP = {|
   modulesEnabled: ?boolean,
+  isStepTypeEnabled: {
+    [moduleType: StepType]: boolean,
+  },
 |}
 
 type DP = {|
@@ -47,12 +55,10 @@ class StepCreationButton extends React.Component<Props, State> {
       'thermocycler',
     ]
     const moduleSteps = ['magnet', 'temperature', 'thermocycler']
-    // TODO (ka 11-15-2019): Move module specific steps into thier own group to
-    // conditionally render below and add the disabled logic for steps related
-    // to modules not present on deck
     const filteredSteps = this.props.modulesEnabled
       ? supportedSteps
       : without(supportedSteps, ...moduleSteps)
+    const { isStepTypeEnabled } = this.props
 
     return (
       <div
@@ -65,27 +71,37 @@ class StepCreationButton extends React.Component<Props, State> {
 
         <div className={styles.buttons_popover}>
           {this.state.expanded &&
-            filteredSteps.map(stepType => (
-              <HoverTooltip
-                key={stepType}
-                placement="right"
-                modifiers={{ preventOverflow: { enabled: false } }}
-                positionFixed
-                tooltipComponent={i18n.t(
-                  `tooltip.step_description.${stepType}`
-                )}
-              >
-                {hoverTooltipHandlers => (
-                  <PrimaryButton
-                    hoverTooltipHandlers={hoverTooltipHandlers}
-                    onClick={this.props.makeAddStep(stepType)}
-                    iconName={stepIconsByType[stepType]}
-                  >
-                    {i18n.t(`application.stepType.${stepType}`, stepType)}
-                  </PrimaryButton>
-                )}
-              </HoverTooltip>
-            ))}
+            filteredSteps.map(stepType => {
+              const disabled = !isStepTypeEnabled[stepType]
+              const tooltipMessage = disabled
+                ? i18n.t(`tooltip.disabled_module_step`)
+                : i18n.t(`tooltip.step_description.${stepType}`)
+              const onClick = !disabled
+                ? this.props.makeAddStep(stepType)
+                : () => null
+              return (
+                <HoverTooltip
+                  key={stepType}
+                  placement="right"
+                  modifiers={{ preventOverflow: { enabled: false } }}
+                  positionFixed
+                  tooltipComponent={tooltipMessage}
+                >
+                  {hoverTooltipHandlers => (
+                    <PrimaryButton
+                      hoverTooltipHandlers={hoverTooltipHandlers}
+                      onClick={onClick}
+                      iconName={stepIconsByType[stepType]}
+                      className={cx({
+                        [styles.step_button_disabled]: disabled,
+                      })}
+                    >
+                      {i18n.t(`application.stepType.${stepType}`, stepType)}
+                    </PrimaryButton>
+                  )}
+                </HoverTooltip>
+              )
+            })}
         </div>
       </div>
     )
@@ -93,8 +109,19 @@ class StepCreationButton extends React.Component<Props, State> {
 }
 
 const mapSTP = (state: BaseState): SP => {
+  const modules = stepFormSelectors.getInitialDeckSetup(state).modules
   return {
     modulesEnabled: featureFlagSelectors.getEnableModules(state),
+    isStepTypeEnabled: {
+      moveLiquid: true,
+      mix: true,
+      pause: true,
+      magnet: getIsModuleOnDeck(modules, 'magdeck'),
+      temperature:
+        getIsModuleOnDeck(modules, 'tempdeck') ||
+        getIsModuleOnDeck(modules, 'thermocycler'),
+      thermocycler: getIsModuleOnDeck(modules, 'thermocycler'),
+    },
   }
 }
 
