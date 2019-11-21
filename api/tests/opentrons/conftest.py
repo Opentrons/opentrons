@@ -228,15 +228,18 @@ async def async_server(request, virtual_smoothie_env, loop):
         pytest.skip('requires api2 only')
     with request.param(loop) as hw:
         if request.param == using_api1:
-            app = init(hw, loop=loop)
-            app['api_version'] = 1
+            with using_api2(loop) as v2_hw:
+                app = init(v2_hw, loop=loop)
+                app['api_version'] = 1
+                yield app
+                await app.shutdown()
         elif request.param == using_api2:
             app = init(hw, loop=loop)
             app['api_version'] = 2
+            yield app
+            await app.shutdown()
         else:
             pytest.skip('Incorrect api version used')
-        yield app
-        await app.shutdown()
 
 
 @pytest.fixture

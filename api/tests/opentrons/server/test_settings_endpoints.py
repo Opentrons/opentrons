@@ -91,49 +91,6 @@ async def test_set(virtual_smoothie_env, loop, async_client):
     assert test_setting.get('value')
 
 
-async def test_restart_required_persistence(
-        virtual_smoothie_env, loop, async_client,
-        restore_restart_required):
-    current = await async_client.get('/settings')
-    current_body = await current.json()
-    assert not current_body['links']
-
-    # Changing the state sets restart required
-    cur_apiv2_state = [s['value'] for s in current_body['settings']
-                       if s['id'] == 'useLegacyInternals'][0]
-    new_apiv2_state = not bool(cur_apiv2_state)
-    resp = await async_client.post('/settings',
-                                   json={'id': 'useLegacyInternals',
-                                         'value': new_apiv2_state})
-    assert resp.status == 200
-    body = await resp.json()
-    assert body['links']['restart'] == '/server/restart'
-
-    # Setting the state to the same value again doesn't clear it
-    new = await async_client.get('/settings')
-    new_body = await new.json()
-    assert new_body['links']['restart'] == '/server/restart'
-
-    resp = await async_client.post('/settings',
-                                   json={'id': 'useLegacyInternals',
-                                         'value': new_apiv2_state})
-    assert resp.status == 200
-    body = await resp.json()
-    assert body['links']['restart'] == '/server/restart'
-
-    # Neither does changing the state back
-    new = await async_client.get('/settings')
-    new_body = await new.json()
-    assert new_body['links']['restart'] == '/server/restart'
-
-    resp = await async_client.post('/settings',
-                                   json={'id': 'useLegacyInternals',
-                                         'value': cur_apiv2_state})
-    assert resp.status == 200
-    body = await resp.json()
-    assert body['links']['restart'] == '/server/restart'
-
-
 async def test_available_resets(async_client):
     resp = await async_client.get('/settings/reset/options')
     body = await resp.json()

@@ -13,25 +13,14 @@ elif not config.feature_flags.use_protocol_api_v2():
     database_migration.check_version_and_perform_minimal_migrations()
 
 
-if not config.feature_flags.use_protocol_api_v2():
-    from .legacy_api.api import (robot,   # noqa(E402)
-                                 reset,
-                                 instruments,
-                                 containers,
-                                 labware,
-                                 modules)
-    names_list = [
-        'containers', 'instruments', 'robot', 'reset', 'modules', 'labware']
-else:
-    from .protocol_api.legacy_wrapper import api
-    from .protocol_api import ProtocolContext
-    globs = api.build_globals(ProtocolContext())
-    robot = globs['robot']
-    containers = globs['labware']
-    instruments = globs['instruments']
-    labware = globs['labware']
-    modules = globs['modules']
-    names_list = ['containers', 'instruments', 'robot', 'modules', 'labware']
+from .legacy_api.api import (robot,   # noqa(E402)
+                             reset,
+                             instruments,
+                             containers,
+                             labware,
+                             modules)
+names_list = [
+    'containers', 'instruments', 'robot', 'reset', 'modules', 'labware']
 
 try:
     with open(os.path.join(HERE, 'package.json')) as pkg:

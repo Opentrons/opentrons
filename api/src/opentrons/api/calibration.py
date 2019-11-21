@@ -129,7 +129,7 @@ class CalibrationManager:
         log.info('Picking up tip from {} in {} with {}'.format(
             container.name, container.slot, instrument.name))
         self._set_state('moving')
-        if ff.use_protocol_api_v2():
+        if instrument._context:
             with instrument._context.temp_connect(self._hardware):
                 loc = _well0(container._container)
                 instrument._context.location_cache =\
@@ -156,7 +156,7 @@ class CalibrationManager:
         log.info('Dropping tip from {} in {} with {}'.format(
             container.name, container.slot, instrument.name))
         self._set_state('moving')
-        if ff.use_protocol_api_v2():
+        if instrument._context:
             with instrument._context.temp_connect(self._hardware):
                 instrument._context.location_cache = None
                 inst.drop_tip(_well0(container._container))
@@ -170,7 +170,7 @@ class CalibrationManager:
         inst = instrument._instrument
         log.info('Returning tip from {}'.format(instrument.name))
         self._set_state('moving')
-        if ff.use_protocol_api_v2():
+        if instrument._context:
             with instrument._context.temp_connect(self._hardware):
                 instrument._context.location_cache = None
                 inst.return_tip()
@@ -184,7 +184,7 @@ class CalibrationManager:
         inst = instrument._instrument
         log.info('Moving {}'.format(instrument.name))
         self._set_state('moving')
-        if ff.use_protocol_api_v2():
+        if instrument._context:
             current = self._hardware.gantry_position(
                 Mount[inst.mount.upper()],
                 critical_point=CriticalPoint.NOZZLE)
@@ -219,7 +219,7 @@ class CalibrationManager:
             instrument.name, container.name, container.slot))
         self._set_state('moving')
 
-        if ff.use_protocol_api_v2():
+        if instrument._context:
             with instrument._context.temp_connect(self._hardware):
                 instrument._context.location_cache = None
                 inst.move_to(target)
@@ -235,7 +235,7 @@ class CalibrationManager:
         log.info('Jogging {} by {} in {}'.format(
             instrument.name, distance, axis))
         self._set_state('moving')
-        if ff.use_protocol_api_v2():
+        if instrument._context:
             self._hardware.move_rel(
                 Mount[inst.mount.upper()], Point(**{axis: distance}))
         else:
@@ -252,7 +252,7 @@ class CalibrationManager:
         inst = instrument._instrument
         log.info('Homing {}'.format(instrument.name))
         self._set_state('moving')
-        if ff.use_protocol_api_v2():
+        if instrument._context:
             with instrument._context.temp_connect(self._hardware):
                 instrument._context.location_cache = None
                 inst.home()
@@ -264,7 +264,7 @@ class CalibrationManager:
     def update_container_offset(self, container, instrument):
         inst = instrument._instrument
         log.info('Updating {} in {}'.format(container.name, container.slot))
-        if ff.use_protocol_api_v2():
+        if instrument._context:
             if 'centerMultichannelOnWells' in container._container.quirks:
                 cp = CriticalPoint.XY_CENTER
             else:

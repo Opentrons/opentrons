@@ -77,16 +77,6 @@ settings = [
                     ' default aspirate behavior (ul to mm conversion) to '
                     ' function as it did prior to version 3.7.0. '
                     ' NOTE: this does not impact GEN2 pipettes'
-    ),
-    Setting(
-        _id='useLegacyInternals',
-        title='Downgrade to Version 1 Server',
-        description='Turning on this feature flag will allow you to run APIv1 '
-        'protocols on the original Version 1 Server and Protocol API. This '
-        'downgrade option should only be used if your APIv1 protocols do not '
-        'function as expected on the Version 2 Server. If you notice this '
-        'happening, please contact us at support@opentrons.com.',
-        restart_required=True
     )
 ]
 
@@ -231,22 +221,7 @@ def _migrate2to3(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
-def _migrate3to4(previous: SettingsMap) -> SettingsMap:
-    """
-    Migration to version 4 of the feature flags file. Removes
-    the enableApi1BackCompat and useProtocolApi2 config elements
-    and adds a useLegacyInternals config element, which has the
-    opposite sense to useProtocolApi2.
-    """
-    # We keep the useProtocolApi2 and enableApi1BackCompat keys
-    # present because older versions of the software couldn't handle
-    # missing keys, for instance after a downgrade
-    newmap = {k: v for k, v in previous.items()}
-    newmap['useLegacyInternals'] = None
-    return newmap
-
-
-_MIGRATIONS = [_migrate0to1, _migrate1to2, _migrate2to3, _migrate3to4]
+_MIGRATIONS = [_migrate0to1, _migrate1to2, _migrate2to3]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
 for how the migration functions are applied. Each migration function should

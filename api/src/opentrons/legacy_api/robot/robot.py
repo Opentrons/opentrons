@@ -1173,7 +1173,7 @@ class Robot(CommandPublisher):
             self._attached_modules.pop(mod)
         for mod in new:
             module_class = modules.SUPPORTED_MODULES[discovered[mod][1]]
-            port = discovered[mod][1]
+            port = discovered[mod][0]
             self._attached_modules[mod]\
                 = module_class(port=port, broker=self.broker)
 
