@@ -432,14 +432,16 @@ class Labware(DeckItem):
         to be applied.
         """
         if volume_by_well is None:
-            volume_by_well = self.volume_by_well or {}
+            vol_by_well = self.volume_by_well
+        else:
+            vol_by_well = volume_by_well
         return [
             Well(
                 well_props=self._well_definition[well],
                 parent=Location(self._calibrated_offset, self),
                 display_name="{} of {}".format(well, self._display_name),
                 has_tip=self._is_tiprack,
-                starting_volume=volume_by_well.get(well) or 0,
+                starting_volume=vol_by_well.get(well) or 0,
                 well_id=well,
                 api_level=self._api_version)
             for well in self._ordering]
