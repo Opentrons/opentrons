@@ -1,17 +1,17 @@
 // @flow
 import React, { Fragment, type Node } from 'react'
-import startCase from 'lodash/startCase'
-import map from 'lodash/map'
 import styles from './URLDeck.css'
 
 import {
-  ContainerNameOverlay,
   RobotWorkSpace,
   Labware,
+  LabwareNameOverlay,
+  LabwareRender,
   Module,
+  RobotCoordsForeignDiv,
 } from '@opentrons/components'
+import { getLatestLabwareDef } from './getLabware'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
-import type { LabwareComponentProps } from '@opentrons/components'
 import type { ModuleType, DeckSlotId } from '@opentrons/shared-data'
 
 // URI-encoded JSON expected as URL param "data" (eg `?data=...`)
@@ -28,6 +28,16 @@ type UrlData = {
 }
 
 const DECK_DEF = getDeckDefinitions()['ot2_standard']
+
+const DECK_LAYER_BLACKLIST = [
+  'calibrationMarkings',
+  'fixedBase',
+  'doorStops',
+  'metalFrame',
+  'removalHandle',
+  'removableDeckOutline',
+  'screwHoles',
+]
 
 function getDataFromUrl(): ?UrlData {
   try {
@@ -53,42 +63,6 @@ export default class URLDeck extends React.Component<{}> {
     this.urlData = getDataFromUrl()
   }
 
-  getLabwareComponent = (args: LabwareComponentProps) => {
-    const { slot } = args
-    const { urlData } = this
-    if (!urlData) return null
-
-    const labwareData = urlData.labware && urlData.labware[slot]
-    const moduleData = urlData.modules && urlData.modules[slot]
-    let labware = null
-    let module = null
-
-    if (labwareData) {
-      const { name, labwareType } = labwareData
-      const displayLabwareType = startCase(labwareType)
-      labware = (
-        <>
-          <Labware labwareType={labwareType} />
-          <ContainerNameOverlay
-            title={name || displayLabwareType}
-            subtitle={name ? displayLabwareType : null}
-          />
-        </>
-      )
-    }
-
-    if (moduleData) {
-      module = <Module mode="default" name="tempdeck" />
-    }
-
-    return (
-      <>
-        {module}
-        {labware}
-      </>
-    )
-  }
-
   render() {
     const labwareBySlot = this.urlData?.labware
     const modulesBySlot = this.urlData?.modules
@@ -96,43 +70,66 @@ export default class URLDeck extends React.Component<{}> {
     return (
       <RobotWorkSpace
         deckDef={DECK_DEF}
-        viewBox={`-25 -25 ${488} ${390}`} // TODO: put these in variables
+        deckLayerBlacklist={DECK_LAYER_BLACKLIST}
+        viewBox={`-35 -35 ${488} ${390}`} // TODO: put these in variables
         className={styles.url_deck}
-        LabwareComponent={this.getLabwareComponent}
       >
         {({ deckSlotsById }): Array<Node> =>
           Object.keys(deckSlotsById).map((slotId): Node => {
             const slot = deckSlotsById[slotId]
             if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
-            const moduleInSlot = modulesBySlot && modulesBySlot[slotId]
-            const allLabwareInSlot = labwareBySlot && labwareBySlot[slotId]
+            const module = modulesBySlot && modulesBySlot[slotId]
+            const labware = labwareBySlot && labwareBySlot[slotId]
+            const labwareDef =
+              labware && getLatestLabwareDef(labware.labwareType)
+            const labwareDisplayType: string | null =
+              (labwareDef
+                ? labwareDef.metadata.displayName
+                : labware?.labwareType) || null
 
             return (
               <Fragment key={slotId}>
-                {moduleInSlot && (
+                {module && (
                   <g
                     transform={`translate(${slot.position[0]}, ${
                       slot.position[1]
                     })`}
                   >
-                    <Module name={moduleInSlot} mode={'default'} />
+                    <Module name={module} mode={'default'} />
                   </g>
                 )}
-                {allLabwareInSlot &&
-                  map(allLabwareInSlot, labware => (
-                    <Labware
-                      key={labware._id}
-                      x={
-                        slot.position[0] +
-                        (labware.position ? labware.position[0] : 0)
-                      }
-                      y={
-                        slot.position[1] +
-                        (labware.position ? labware.position[1] : 0)
-                      }
-                      labware={labware}
+                {labware && (
+                  <g
+                    transform={`translate(${slot.position[0]}, ${
+                      slot.position[1]
+                    })`}
+                  >
+                    {labwareDef ? (
+                      <LabwareRender definition={labwareDef} />
+                    ) : (
+                      <Labware
+                        key={`${labware.labwareType}:${slotId}`}
+                        x={0}
+                        y={0}
+                        labware={labware}
+                      />
+                    )}
+                  </g>
+                )}
+                {labware && (
+                  <RobotCoordsForeignDiv
+                    x={slot.position[0]}
+                    y={slot.position[1]}
+                    width={slot.boundingBox.xDimension}
+                    height={slot.boundingBox.yDimension}
+                  >
+                    <LabwareNameOverlay
+                      className={styles.labware_name_overlay}
+                      title={labware.name || labwareDisplayType || ''}
+                      subtitle={labware.name ? labwareDisplayType : null}
                     />
-                  ))}
+                  </RobotCoordsForeignDiv>
+                )}
               </Fragment>
             )
           })
