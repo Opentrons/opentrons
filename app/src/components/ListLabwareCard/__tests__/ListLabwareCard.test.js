@@ -4,8 +4,8 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 
 import { ListLabwareCard } from '..'
-import ListCard from '../ListCard'
-import LabwareItem from '../LabwareItem'
+import { LabwareList } from '../LabwareList'
+import * as LabwareFixtures from '../../../custom-labware/__fixtures__'
 import * as LabwareSelectors from '../../../custom-labware/selectors'
 import * as LabwareActions from '../../../custom-labware/actions'
 
@@ -13,10 +13,13 @@ import type { State } from '../../../types'
 
 jest.mock('../../../custom-labware/selectors')
 
-const getValidCustomLabware: JestMockFn<
+const mockGetCustomLabware: JestMockFn<
   [State],
-  $Call<typeof LabwareSelectors.getValidCustomLabware, State>
-> = LabwareSelectors.getValidCustomLabware
+  $Call<typeof LabwareSelectors.getCustomLabware, State>
+> = LabwareSelectors.getCustomLabware
+
+const mockGetListLabwareErrorMessage: JestMockFn<[State], string | null> =
+  LabwareSelectors.getListLabwareErrorMessage
 
 describe('ListLabwareCard', () => {
   let mockStore
@@ -24,7 +27,8 @@ describe('ListLabwareCard', () => {
 
   beforeEach(() => {
     jest.useFakeTimers()
-    getValidCustomLabware.mockReturnValue([])
+    mockGetCustomLabware.mockReturnValue([])
+    mockGetListLabwareErrorMessage.mockReturnValue(null)
 
     mockStore = {
       getState: () => ({}),
@@ -47,66 +51,26 @@ describe('ListLabwareCard', () => {
     jest.useRealTimers()
   })
 
-  test('renders a ListCard', () => {
+  test('renders a LabwareList', () => {
     const tree = render()
-    expect(tree.find(ListCard)).toHaveLength(1)
+    expect(tree.find(LabwareList)).toHaveLength(1)
   })
 
-  test('renders a LabwareItem for each valid labware', () => {
-    getValidCustomLabware.mockReturnValue([
-      {
-        type: 'VALID_LABWARE_FILE',
-        filename: 'a.json',
-        created: 1,
-        identity: { name: 'a', namespace: 'custom', version: 1 },
-        metadata: {
-          displayName: 'A',
-          displayCategory: 'wellPlate',
-          displayVolumeUnits: 'mL',
-        },
-      },
-      {
-        type: 'VALID_LABWARE_FILE',
-        filename: 'e.json',
-        created: 5,
-        identity: { name: 'e', namespace: 'custom', version: 1 },
-        metadata: {
-          displayName: 'E',
-          displayCategory: 'reservoir',
-          displayVolumeUnits: 'mL',
-        },
-      },
+  test('passes labware list and list error to LabwareList', () => {
+    mockGetCustomLabware.mockReturnValue([
+      LabwareFixtures.mockValidLabware,
+      LabwareFixtures.mockInvalidLabware,
     ])
+
+    mockGetListLabwareErrorMessage.mockReturnValue('AH!!!')
 
     const tree = render()
-    expect(tree.find(LabwareItem)).toHaveLength(2)
-  })
-
-  test('maps VALID_LABWARE_FILE to LabwareItem props', () => {
-    getValidCustomLabware.mockReturnValue([
-      {
-        type: 'VALID_LABWARE_FILE',
-        filename: 'a.json',
-        created: 1,
-        identity: { name: 'a', namespace: 'custom', version: 2 },
-        metadata: {
-          displayName: 'A',
-          displayCategory: 'wellPlate',
-          displayVolumeUnits: 'mL',
-        },
-      },
-    ])
-
-    const item = render()
-      .find(LabwareItem)
-      .first()
-
-    expect(item.props()).toEqual({
-      name: 'a',
-      version: 2,
-      displayName: 'A',
-      displayCategory: 'wellPlate',
-      dateAdded: 1,
+    expect(tree.find(LabwareList).props()).toEqual({
+      labware: [
+        LabwareFixtures.mockValidLabware,
+        LabwareFixtures.mockInvalidLabware,
+      ],
+      errorMessage: 'AH!!!',
     })
   })
 

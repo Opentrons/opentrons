@@ -1,0 +1,142 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LabwareList component renders 1`] = `
+<div
+  className="labware_list_wrapper"
+>
+  <div
+    className="message_wrapper"
+  >
+    <p
+      className="italic"
+    >
+      No labware definitions found
+      <br />
+      Please add custom labware via the Labware Management options above
+    </p>
+  </div>
+</div>
+`;
+
+exports[`LabwareList component renders 2`] = `
+<div
+  className="labware_list_wrapper"
+>
+  <div
+    className="message_wrapper"
+  >
+    <Warning>
+      <p>
+        Unable to read Custom Labware source folder.
+        <br />
+        Please ensure you are able to access the folder selected in Labware Management above.
+      </p>
+      <p
+        className="error_message"
+      >
+        AH!!!
+      </p>
+    </Warning>
+  </div>
+</div>
+`;
+
+exports[`LabwareList component renders 3`] = `
+<div
+  className="labware_list_wrapper"
+>
+  <div
+    className="list_column_titles"
+  >
+    <p
+      className="item_category_column"
+    >
+      Category
+    </p>
+    <p
+      className="item_name_column"
+    >
+      Labware
+    </p>
+    <p
+      className="item_date_column"
+    >
+      Date Added
+    </p>
+  </div>
+  <ul
+    className="unstyled_list"
+  >
+    <LabwareItem
+      file={
+        Object {
+          "created": 1,
+          "filename": "a.json",
+          "identity": Object {
+            "name": "a",
+            "namespace": "custom",
+            "version": 1,
+          },
+          "metadata": Object {
+            "displayCategory": "wellPlate",
+            "displayName": "A",
+            "displayVolumeUnits": "mL",
+          },
+          "type": "VALID_LABWARE_FILE",
+        }
+      }
+      key="a.json"
+    />
+    <LabwareItem
+      file={
+        Object {
+          "created": 2,
+          "filename": "b.json",
+          "type": "INVALID_LABWARE_FILE",
+        }
+      }
+      key="b.json"
+    />
+    <LabwareItem
+      file={
+        Object {
+          "created": 3,
+          "filename": "c.json",
+          "identity": Object {
+            "name": "c",
+            "namespace": "opentrons",
+            "version": 1,
+          },
+          "metadata": Object {
+            "displayCategory": "wellPlate",
+            "displayName": "C",
+            "displayVolumeUnits": "mL",
+          },
+          "type": "OPENTRONS_LABWARE_FILE",
+        }
+      }
+      key="c.json"
+    />
+    <LabwareItem
+      file={
+        Object {
+          "created": 4,
+          "filename": "d.json",
+          "identity": Object {
+            "name": "d",
+            "namespace": "custom",
+            "version": 1,
+          },
+          "metadata": Object {
+            "displayCategory": "wellPlate",
+            "displayName": "D",
+            "displayVolumeUnits": "mL",
+          },
+          "type": "DUPLICATE_LABWARE_FILE",
+        }
+      }
+      key="d.json"
+    />
+  </ul>
+</div>
+`;

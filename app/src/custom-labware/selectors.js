@@ -1,6 +1,7 @@
 // @flow
 // custom labware selectors
 import { createSelector } from 'reselect'
+import sortBy from 'lodash/sortBy'
 
 import type { State } from '../types'
 import type {
@@ -23,7 +24,11 @@ export const VALID_LABWARE_FILE: 'VALID_LABWARE_FILE' = 'VALID_LABWARE_FILE'
 export const getCustomLabware: State => Array<CheckedLabwareFile> = createSelector(
   state => state.labware.filenames,
   state => state.labware.filesByName,
-  (filenames, filesByName) => filenames.map(name => filesByName[name])
+  (filenames, filesByName) =>
+    sortBy(filenames.map(name => filesByName[name]), [
+      'metadata.displayCategory',
+      'metadata.displayName',
+    ])
 )
 
 export const getValidCustomLabware: State => Array<ValidLabwareFile> = createSelector(
@@ -40,3 +45,6 @@ export const getAddLabwareFailure: State => {|
   state => state.labware.addFailureMessage,
   (file, errorMessage) => ({ file, errorMessage })
 )
+
+export const getListLabwareErrorMessage = (state: State) =>
+  state.labware.listFailureMessage
