@@ -1,6 +1,6 @@
 // @flow
-import * as actions from '../actions'
 import * as Fixtures from '../__fixtures__'
+import * as actions from '../actions'
 
 import type { CustomLabwareAction } from '../types'
 

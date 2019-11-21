@@ -26,11 +26,6 @@ export type UncheckedLabwareFile = {|
   data: { [string]: mixed } | null,
 |}
 
-export type BadJsonLabwareFile = {|
-  type: 'BAD_JSON_LABWARE_FILE',
-  ...LabwareFileProps,
-|}
-
 export type InvalidLabwareFile = {|
   type: 'INVALID_LABWARE_FILE',
   ...LabwareFileProps,
@@ -52,14 +47,12 @@ export type ValidLabwareFile = {|
 |}
 
 export type CheckedLabwareFile =
-  | BadJsonLabwareFile
   | InvalidLabwareFile
   | DuplicateLabwareFile
   | OpentronsLabwareFile
   | ValidLabwareFile
 
 export type FailedLabwareFile =
-  | BadJsonLabwareFile
   | InvalidLabwareFile
   | DuplicateLabwareFile
   | OpentronsLabwareFile
