@@ -242,8 +242,11 @@ class Pipette:
         return self.current_tip_home_well
 
     @log_call(log)
-    def start_at_tip(self, _tip: LegacyWell = None):
+    def start_at_tip(self, _tip: Union[LegacyWell, WellSeries, List] = None):
         """ Change the first tip that will be picked up """
+        if isinstance(_tip, (List, WellSeries)):
+            _tip = _tip[0]
+        self._instr_ctx.reset_tipracks()
         self._instr_ctx.starting_tip = _tip
 
     @log_call(log)
@@ -805,6 +808,7 @@ class Pipette:
             p300.return_tip()
         """
         display_loc: Union[LegacyLocation, LegacyWell, Well]
+        tip: Union[LegacyLabware, LegacyWell, Well]
         if location:
             display_loc = location
             if isinstance(location, (List, WellSeries)):
@@ -814,7 +818,7 @@ class Pipette:
             new_loc = _unpack_motion_target(location, 'top')
             # always allow pick up tip if location is passed
             tip = new_loc.labware
-            tip.has_tip = True
+            tip.has_tip = True  # type: ignore
         else:
             tiprack, new_tip = self._instr_ctx._next_available_tip()
             legacy_labware = self._lw_mappings[tiprack]
