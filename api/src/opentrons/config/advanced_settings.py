@@ -107,7 +107,7 @@ settings_by_old_id = {s.old_id: s for s in settings}
 def get_adv_setting(setting: str) -> Optional[bool]:
     setting = _clean_id(setting)
     s = get_all_adv_settings()
-    return s[setting]['value']  # type: ignore
+    return s.get(setting, {}).get('value')  # type: ignore
 
 
 def get_all_adv_settings() -> Dict[str, Dict[str, Union[str, bool, None]]]:
@@ -169,6 +169,7 @@ def _read_settings_file(settings_file: 'Path') -> SettingsData:
     # Read settings from persistent file
     data = _read_json_file(settings_file)
     settings, version = _migrate(data)
+    settings = _ensure(settings)
 
     if (data.get('_version') != version):
         _write_settings_file(settings, version, settings_file)
@@ -237,9 +238,10 @@ def _migrate3to4(previous: SettingsMap) -> SettingsMap:
     and adds a useLegacyInternals config element, which has the
     opposite sense to useProtocolApi2.
     """
-    newmap = {k: v for k, v in previous.items()
-              if k not in [
-                      'enableApi1BackCompat', 'useProtocolApi2']}
+    # We keep the useProtocolApi2 and enableApi1BackCompat keys
+    # present because older versions of the software couldn't handle
+    # missing keys, for instance after a downgrade
+    newmap = {k: v for k, v in previous.items()}
     newmap['useLegacyInternals'] = None
     return newmap
 
@@ -272,6 +274,18 @@ def _migrate(data: Mapping[str, Any]) -> SettingsData:
         next = m(next)
 
     return next, target_version
+
+
+def _ensure(data: Mapping[str, Any]) -> SettingsMap:
+    """
+    Even after migration, we may have an invalid file. For instance,
+    we may have _downgraded_. Make sure all required keys are present.
+    """
+    newdata = {k: v for k, v in data.items()}
+    for s in settings:
+        if s.id not in newdata:
+            newdata[s.id] = None
+    return newdata
 
 
 def get_setting_with_env_overload(setting_name):

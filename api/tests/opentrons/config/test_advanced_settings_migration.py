@@ -1,4 +1,4 @@
-from opentrons.config.advanced_settings import _migrate
+from opentrons.config.advanced_settings import _migrate, _ensure
 
 
 good_file_version = 4
@@ -9,7 +9,8 @@ good_file_settings = {
     'disableHomeOnBoot': None,
     'useOldAspirationFunctions': None,
     'disableLogAggregation': None,
-    'useLegacyInternals': None
+    'useLegacyInternals': None,
+    'enableApi1BackCompat': None,
 }
 
 
@@ -38,7 +39,8 @@ def test_migrates_versionless_new_config():
       'disableHomeOnBoot': True,
       'useOldAspirationFunctions': True,
       'disableLogAggregation': None,
-      'useLegacyInternals': None
+      'useLegacyInternals': None,
+      'enableApi1BackCompat': None,
     }
 
 
@@ -58,7 +60,8 @@ def test_migrates_versionless_old_config():
       'disableHomeOnBoot': None,
       'useOldAspirationFunctions': None,
       'disableLogAggregation': None,
-      'useLegacyInternals': None
+      'useLegacyInternals': None,
+      'enableApi1BackCompat': None,
     }
 
 
@@ -91,6 +94,8 @@ def test_migrates_v1_config():
         'useOldAspirationFunctions': True,
         'disableLogAggregation': None,
         'useLegacyInternals': None,
+        'useProtocolApi2': False,
+        'enableApi1BackCompat': None,
     }
 
 
@@ -115,6 +120,8 @@ def test_migrates_v2_config():
         'useOldAspirationFunctions': True,
         'disableLogAggregation': False,
         'useLegacyInternals': None,
+        'useProtocolApi2': False,
+        'enableApi1BackCompat': None,
     }
 
 
@@ -139,4 +146,23 @@ def test_migrates_v3_config():
         'useOldAspirationFunctions': True,
         'disableLogAggregation': False,
         'useLegacyInternals': None,
+        'enableApi1BackCompat': False,
+        'useProtocolApi2': True,
     }
+
+
+def test_ensures_config():
+    assert _ensure(
+        {'_version': 3,
+         'shortFixedTrash': False,
+         'disableLogAggregation': True})\
+         == {
+             '_version': 3,
+             'shortFixedTrash': False,
+             'calibrateToBottom': None,
+             'deckCalibrationDots': None,
+             'disableHomeOnBoot': None,
+             'useOldAspirationFunctions': None,
+             'disableLogAggregation': True,
+             'useLegacyInternals': None,
+         }
