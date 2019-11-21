@@ -95,10 +95,7 @@ def test_migrates_v1_config():
         'disableLogAggregation': None,
         'useLegacyInternals': None,
         'useProtocolApi2': False,
-        << << << < HEAD
         'enableApi1BackCompat': None,
-        == == == =
-        >>>>>> > fix(api): prevent crashes after downgrade from adv settings changes
     }
 
 
