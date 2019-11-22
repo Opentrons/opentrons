@@ -70,10 +70,29 @@ async def test_set_temperature(monkeypatch):
     monkeypatch.setattr(
         hw_tc._driver, 'set_temperature', set_temp_driver_mock)
 
+    # Test volume param
     await hw_tc.set_temperature(30, hold_time_seconds=20,
                                 hold_time_minutes=1, volume=35)
-    # Test volume param
     set_temp_driver_mock.assert_called_once_with(temp=30,
                                                  hold_time=80,
                                                  volume=35,
                                                  ramp_rate=None)
+    set_temp_driver_mock.reset_mock()
+
+    # Test just seconds hold
+
+    await hw_tc.set_temperature(20, hold_time_seconds=30)
+    set_temp_driver_mock.assert_called_once_with(temp=20,
+                                                 hold_time=30,
+                                                 volume=None,
+                                                 ramp_rate=None)
+    set_temp_driver_mock.reset_mock()
+
+    # Test just minutes hold
+
+    await hw_tc.set_temperature(40, hold_time_minutes=5.5)
+    set_temp_driver_mock.assert_called_once_with(temp=40,
+                                                 hold_time=330,
+                                                 volume=None,
+                                                 ramp_rate=None)
+    set_temp_driver_mock.reset_mock()
