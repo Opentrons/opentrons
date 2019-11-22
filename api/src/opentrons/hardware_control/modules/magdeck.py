@@ -1,4 +1,5 @@
 import asyncio
+from threading import Lock
 from typing import Union
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from . import update, mod_abc
@@ -43,6 +44,10 @@ class SimulatingDriver:
     def plate_height(self):
         return self._height
 
+    @property
+    def mag_position(self):
+        return self._height
+
 
 class MagDeck(mod_abc.AbstractModule):
     """
@@ -84,7 +89,6 @@ class MagDeck(mod_abc.AbstractModule):
                  port: str,
                  simulating: bool,
                  loop: asyncio.AbstractEventLoop = None) -> None:
-        self._engaged = False
         self._port = port
         self._driver = self._build_driver(simulating)
 
@@ -94,6 +98,7 @@ class MagDeck(mod_abc.AbstractModule):
             self._loop = loop
 
         self._device_info = None
+        self._lock = Lock()
 
     def calibrate(self):
         """
@@ -101,7 +106,11 @@ class MagDeck(mod_abc.AbstractModule):
         """
         self._driver.probe_plate()
         # return if successful or not?
-        self._engaged = False
+
+    @property
+    def current_height(self):
+        with self._lock:
+            return self._driver.mag_position
 
     def engage(self, height):
         """
@@ -111,14 +120,13 @@ class MagDeck(mod_abc.AbstractModule):
             raise ValueError('Invalid engage height. Should be 0 to {}'.format(
                 MAX_ENGAGE_HEIGHT))
         self._driver.move(height)
-        self._engaged = True
 
     def deactivate(self):
         """
         Home the magnet
         """
         self._driver.home()
-        self._engaged = False
+        self.engage(0.0)
 
     @property
     def device_info(self):
@@ -130,14 +138,25 @@ class MagDeck(mod_abc.AbstractModule):
 
     @property
     def status(self):
-        return 'engaged' if self._engaged else 'disengaged'
+        if self.current_height > 0:
+            return 'engaged'
+        else:
+            return 'disengaged'
+
+    @property
+    def engaged(self):
+        if self.current_height > 0:
+            return True
+        else:
+            return False
 
     @property
     def live_data(self):
         return {
             'status': self.status,
             'data': {
-                'engaged': self._engaged
+                'engaged': self.engaged,
+                'height': self.current_height
             }
         }
 

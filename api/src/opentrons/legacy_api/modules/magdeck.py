@@ -1,3 +1,4 @@
+import threading
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from opentrons import commands
 
@@ -21,9 +22,9 @@ class MagDeck(commands.CommandPublisher):
         super().__init__(broker)
         self.labware = lw
         self._port = port
-        self._engaged = False
         self._driver = None
         self._device_info = None
+        self._lock = threading.Lock()
 
     @commands.publish.both(command=commands.magdeck_calibrate)
     def calibrate(self):
@@ -33,7 +34,6 @@ class MagDeck(commands.CommandPublisher):
         if self._driver and self._driver.is_connected():
             self._driver.probe_plate()
             # return if successful or not?
-            self._engaged = False
 
     @commands.publish.both(command=commands.magdeck_engage)
     def engage(self, **kwargs):
@@ -67,7 +67,6 @@ class MagDeck(commands.CommandPublisher):
                 MAX_ENGAGE_HEIGHT))
         if self._driver and self._driver.is_connected():
             self._driver.move(height)
-            self._engaged = True
 
     @commands.publish.both(command=commands.magdeck_disengage)
     def disengage(self):
@@ -76,7 +75,18 @@ class MagDeck(commands.CommandPublisher):
         '''
         if self._driver and self._driver.is_connected():
             self._driver.home()
-            self._engaged = False
+
+    @property
+    def current_height(self):
+        with self._lock:
+            return self._driver.mag_position
+
+    @property
+    def engaged(self):
+        if self.current_height > 0:
+            return True
+        else:
+            return False
 
     @classmethod
     def name(cls):
@@ -104,7 +114,8 @@ class MagDeck(commands.CommandPublisher):
         return {
             'status': self.status,
             'data': {
-                'engaged': self._engaged
+                'engaged': self.engaged,
+                'height': self.current_height
             }
         }
 
@@ -123,7 +134,10 @@ class MagDeck(commands.CommandPublisher):
 
     @property
     def status(self):
-        return 'engaged' if self._engaged else 'disengaged'
+        if self.current_height > 0:
+            return 'engaged'
+        else:
+            return 'disengaged'
 
     # Internal Methods
 
