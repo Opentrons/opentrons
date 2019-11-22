@@ -2283,7 +2283,9 @@ class ThermocyclerContext(ModuleContext):
                           If ``ramp_rate`` is not specified, it will default
                           to the maximum ramp rate as defined in the device
                           configuration.
-
+        :param block_max_volume: The maximum volume of any individual well
+                                 of the loaded labware. If not supplied,
+                                 the thermocycler will default to 25µL/well.
         .. note:
 
             If ``hold_time_minutes`` and ``hold_time_seconds`` are not
@@ -2317,7 +2319,8 @@ class ThermocyclerContext(ModuleContext):
     @requires_version(2, 0)
     def execute_profile(self,
                         steps: List[modules.types.ThermocyclerStep],
-                        repetitions: int):
+                        repetitions: int,
+                        block_max_volume: float = None):
         """ Execute a Thermocycler Profile defined as a cycle of
         :py:attr:`steps` to repeat for a given number of :py:attr:`repetitions`
 
@@ -2327,6 +2330,9 @@ class ThermocyclerContext(ModuleContext):
                       method with keys 'temperature', 'hold_time_seconds',
                       and 'hold_time_minutes'.
         :param repetitions: The number of times to repeat the cycled steps.
+        :param block_max_volume: The maximum volume of any individual well
+                                 of the loaded labware. If not supplied,
+                                 the thermocycler will default to 25µL/well.
 
         .. note:
 
@@ -2347,8 +2353,9 @@ class ThermocyclerContext(ModuleContext):
                 raise ValueError(
                         "either hold_time_minutes or hold_time_seconds must be"
                         "defined for each step in cycle")
-        return self._module.cycle_temperatures(
-            steps=steps, repetitions=repetitions)
+        return self._module.cycle_temperatures(steps=steps,
+                                               repetitions=repetitions
+                                               volume=block_max_volume)
 
     @cmds.publish.both(command=cmds.thermocycler_deactivate_lid)
     @requires_version(2, 0)
