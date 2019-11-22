@@ -1,7 +1,7 @@
 from opentrons.config.advanced_settings import _migrate, _ensure
 
 
-good_file_version = 4
+good_file_version = 3
 good_file_settings = {
     'shortFixedTrash': None,
     'calibrateToBottom': None,
@@ -9,7 +9,6 @@ good_file_settings = {
     'disableHomeOnBoot': None,
     'useOldAspirationFunctions': None,
     'disableLogAggregation': None,
-    'useLegacyInternals': None,
     'enableApi1BackCompat': None,
 }
 
@@ -39,7 +38,6 @@ def test_migrates_versionless_new_config():
       'disableHomeOnBoot': True,
       'useOldAspirationFunctions': True,
       'disableLogAggregation': None,
-      'useLegacyInternals': None,
       'enableApi1BackCompat': None,
     }
 
@@ -60,8 +58,7 @@ def test_migrates_versionless_old_config():
       'disableHomeOnBoot': None,
       'useOldAspirationFunctions': None,
       'disableLogAggregation': None,
-      'useLegacyInternals': None,
-      'enableApi1BackCompat': None,
+      'enableApi1BackCompat': None
     }
 
 
@@ -93,7 +90,6 @@ def test_migrates_v1_config():
         'disableHomeOnBoot': True,
         'useOldAspirationFunctions': True,
         'disableLogAggregation': None,
-        'useLegacyInternals': None,
         'useProtocolApi2': False,
         'enableApi1BackCompat': None,
     }
@@ -107,6 +103,7 @@ def test_migrates_v2_config():
         'deckCalibrationDots': False,
         'disableHomeOnBoot': True,
         'useProtocolApi2': False,
+        'enableApi1BackCompat': False,
         'useOldAspirationFunctions': True,
         'disableLogAggregation': False,
     })
@@ -119,7 +116,6 @@ def test_migrates_v2_config():
         'disableHomeOnBoot': True,
         'useOldAspirationFunctions': True,
         'disableLogAggregation': False,
-        'useLegacyInternals': None,
         'useProtocolApi2': False,
         'enableApi1BackCompat': None,
     }
@@ -145,9 +141,8 @@ def test_migrates_v3_config():
         'disableHomeOnBoot': True,
         'useOldAspirationFunctions': True,
         'disableLogAggregation': False,
-        'useLegacyInternals': None,
-        'enableApi1BackCompat': False,
         'useProtocolApi2': True,
+        'enableApi1BackCompat': False,
     }
 
 
@@ -164,5 +159,4 @@ def test_ensures_config():
              'disableHomeOnBoot': None,
              'useOldAspirationFunctions': None,
              'disableLogAggregation': True,
-             'useLegacyInternals': None,
          }

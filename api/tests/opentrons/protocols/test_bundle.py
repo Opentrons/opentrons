@@ -6,8 +6,7 @@ import pytest
 from opentrons.protocols import bundle
 
 
-@pytest.mark.api2_only
-def test_parse_bundle_no_root_files(get_bundle_fixture, ensure_api2):
+def test_parse_bundle_no_root_files(get_bundle_fixture):
     fixture = get_bundle_fixture('no_root_files_bundle')
     with pytest.raises(RuntimeError,
                        match='No files found in ZIP file\'s root directory'):
@@ -17,8 +16,7 @@ def test_parse_bundle_no_root_files(get_bundle_fixture, ensure_api2):
         bundle.extract_bundle(zf)
 
 
-@pytest.mark.api2_only
-def test_parse_bundle_no_entrypoint_protocol(get_bundle_fixture, ensure_api2):
+def test_parse_bundle_no_entrypoint_protocol(get_bundle_fixture):
     fixture = get_bundle_fixture('no_entrypoint_protocol_bundle')
     with pytest.raises(RuntimeError,
                        match='Bundled protocol should have a'):
@@ -28,8 +26,7 @@ def test_parse_bundle_no_entrypoint_protocol(get_bundle_fixture, ensure_api2):
         bundle.extract_bundle(zf)
 
 
-@pytest.mark.api2_only
-def test_parse_bundle_conflicting_labware(get_bundle_fixture, ensure_api2):
+def test_parse_bundle_conflicting_labware(get_bundle_fixture):
     fixture = get_bundle_fixture('conflicting_labware_bundle')
     with pytest.raises(RuntimeError,
                        match='Conflicting labware in bundle'):
@@ -39,8 +36,7 @@ def test_parse_bundle_conflicting_labware(get_bundle_fixture, ensure_api2):
         bundle.extract_bundle(zf)
 
 
-@pytest.mark.api2_only
-def test_write_bundle(ensure_api2, get_bundle_fixture):
+def test_write_bundle(get_bundle_fixture):
     fixture = get_bundle_fixture('simple_bundle')
     buf = io.BytesIO(fixture['binary_zipfile'])
     buf.seek(0)

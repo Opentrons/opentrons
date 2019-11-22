@@ -36,25 +36,17 @@ async def attached_pipettes(async_client, request):
     left_id = marker_with_default('attach_left_id', 'abc123')
     right_id = marker_with_default('attach_right_id', 'abcd123')
     hw = async_client.app['com.opentrons.hardware']
-    if async_client.app['api_version'] == 1:
-        hw.model_by_mount = {
-            'left': {'model': left_mod, 'id': left_id, 'name': left_name},
-            'right': {'model': right_mod, 'id': right_id, 'name': right_name}
-        }
-        hw.get_attached_pipettes()
-        return hw.model_by_mount
-    else:
-        hw._backend._attached_instruments = {
-            types.Mount.RIGHT: {
-                'model': right_mod, 'id': right_id, 'name': right_name
-            },
-            types.Mount.LEFT: {
-                'model': left_mod, 'id': left_id, 'name': left_name
+    hw._backend._attached_instruments = {
+        types.Mount.RIGHT: {
+            'model': right_mod, 'id': right_id, 'name': right_name
+        },
+        types.Mount.LEFT: {
+            'model': left_mod, 'id': left_id, 'name': left_name
             }
-        }
-        await hw.cache_instruments()
-        return {k.name.lower(): v
-                for k, v in hw._backend._attached_instruments.items()}
+    }
+    await hw.cache_instruments()
+    return {k.name.lower(): v
+            for k, v in hw._backend._attached_instruments.items()}
 
 
 def validate_response_body(body):
@@ -91,79 +83,25 @@ async def test_set(virtual_smoothie_env, loop, async_client):
     assert test_setting.get('value')
 
 
-async def test_restart_required_persistence(
-        virtual_smoothie_env, loop, async_client,
-        restore_restart_required):
-    current = await async_client.get('/settings')
-    current_body = await current.json()
-    assert not current_body['links']
-
-    # Changing the state sets restart required
-    cur_apiv2_state = [s['value'] for s in current_body['settings']
-                       if s['id'] == 'useLegacyInternals'][0]
-    new_apiv2_state = not bool(cur_apiv2_state)
-    resp = await async_client.post('/settings',
-                                   json={'id': 'useLegacyInternals',
-                                         'value': new_apiv2_state})
-    assert resp.status == 200
-    body = await resp.json()
-    assert body['links']['restart'] == '/server/restart'
-
-    # Setting the state to the same value again doesn't clear it
-    new = await async_client.get('/settings')
-    new_body = await new.json()
-    assert new_body['links']['restart'] == '/server/restart'
-
-    resp = await async_client.post('/settings',
-                                   json={'id': 'useLegacyInternals',
-                                         'value': new_apiv2_state})
-    assert resp.status == 200
-    body = await resp.json()
-    assert body['links']['restart'] == '/server/restart'
-
-    # Neither does changing the state back
-    new = await async_client.get('/settings')
-    new_body = await new.json()
-    assert new_body['links']['restart'] == '/server/restart'
-
-    resp = await async_client.post('/settings',
-                                   json={'id': 'useLegacyInternals',
-                                         'value': cur_apiv2_state})
-    assert resp.status == 200
-    body = await resp.json()
-    assert body['links']['restart'] == '/server/restart'
-
-
 async def test_available_resets(async_client):
     resp = await async_client.get('/settings/reset/options')
     body = await resp.json()
     options_list = body.get('options')
     assert resp.status == 200
-    if async_client.app['api_version'] == 1:
-        options = [{'id': 'tipProbe',
-                    'name': 'Tip Length',
-                    'description': 'Clear tip probe data'},
-                   {'id': 'labwareCalibration',
-                    'name': 'Labware Calibration',
-                    'description': 'Clear labware calibration'},
-                   {'id': 'bootScripts',
-                    'name': 'Boot Scripts',
-                    'description': 'Clear custom boot scripts'}]
-    else:
-        options = [
-            {'id': 'customLabware',
-             'name': 'Custom Labware',
-             'description': 'Clear custom labware definitions'},
-            {'id': 'tipProbe',
-             'name': 'Instrument Offset',
-             'description':
-             'Clear instrument offset calibration and tip probe data'},
-            {'id': 'labwareCalibration',
-             'name': 'Labware Calibration',
-             'description': 'Clear labware calibration'},
-            {'id': 'bootScripts',
-             'name': 'Boot Scripts',
-             'description': 'Clear custom boot scripts'}]
+    options = [
+        {'id': 'customLabware',
+         'name': 'Custom Labware',
+         'description': 'Clear custom labware definitions'},
+        {'id': 'tipProbe',
+         'name': 'Instrument Offset',
+         'description':
+         'Clear instrument offset calibration and tip probe data'},
+        {'id': 'labwareCalibration',
+         'name': 'Labware Calibration',
+         'description': 'Clear labware calibration'},
+        {'id': 'bootScripts',
+         'name': 'Boot Scripts',
+         'description': 'Clear custom boot scripts'}]
     assert sorted(options_list, key=lambda el: el['id'])\
         == sorted(options, key=lambda el: el['id'])
 
@@ -348,20 +286,14 @@ async def test_set_log_level(async_client):
     assert resp.status == 400
     body = await resp.json()
     assert 'message'in body
-    if async_client.app['api_version'] == 1:
-        conf = hardware.config
-    else:
-        conf = await hardware.config
+    conf = await hardware.config
     assert conf.log_level != 'ERROR'
     resp = await async_client.post('/settings/log_level/local',
                                    json={'log_level': 'error'})
     assert resp.status == 200
     body = await resp.json()
     assert 'message' in body
-    if async_client.app['api_version'] == 1:
-        conf = hardware.config
-    else:
-        conf = await hardware.config
+    conf = await hardware.config
     assert conf.log_level == 'ERROR'
 
 
@@ -370,8 +302,5 @@ async def test_get_robot_settings(async_client):
     body = await resp.json()
     assert resp.status == 200
     hardware = async_client.app['com.opentrons.hardware']
-    if async_client.app['api_version'] == 1:
-        conf = hardware.config
-    else:
-        conf = await hardware.config
+    conf = await hardware.config
     assert json.dumps(conf._asdict()) == json.dumps(body)

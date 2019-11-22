@@ -6,7 +6,6 @@ try:
 except OSError:
     aionotify = None  # type: ignore
 import asyncio
-import contextlib
 import os
 import io
 import json
@@ -21,10 +20,9 @@ import zipfile
 
 import pytest
 
-try:
-    from opentrons import robot as rb
-except ImportError:
-    pass
+from opentrons.legacy_api.containers import load
+from opentrons.legacy_api.instruments.pipette import Pipette
+from opentrons.api.routers import MainRouter
 from opentrons.api import models
 from opentrons.data_storage import database_migration
 from opentrons.server import rpc
@@ -35,6 +33,10 @@ from opentrons import hardware_control as hc
 from opentrons.hardware_control import adapters, API
 from opentrons.protocol_api import ProtocolContext
 from opentrons.types import Mount
+from opentrons import (robot as rb,
+                       instruments as ins,
+                       containers as cns,
+                       modules as mods)
 
 
 Session = namedtuple(
@@ -44,6 +46,37 @@ Session = namedtuple(
 Protocol = namedtuple(
     'Protocol',
     ['text', 'filename', 'filelike'])
+
+
+@pytest.fixture
+def singletons(virtual_smoothie_env):
+    rb.reset()
+    yield {'robot': rb,
+           'instruments': ins,
+           'labware': cns,
+           'modules': mods}
+    rb.disconnect()
+    rb.reset()
+
+
+@pytest.fixture
+def robot(singletons):
+    yield singletons['robot']
+
+
+@pytest.fixture
+def instruments(singletons):
+    yield singletons['instruments']
+
+
+@pytest.fixture
+def labware(singletons):
+    yield singletons['labware']
+
+
+@pytest.fixture
+def modules(singletons):
+    yield singletons['modules']
 
 
 @pytest.fixture(autouse=True)
@@ -150,93 +183,13 @@ def old_aspiration(monkeypatch):
 # -----end feature flag fixtures-----------
 
 
-@contextlib.contextmanager
-def using_api2(loop):
-    flag = os.environ.get('OT_API_FF_useLegacyInternals')
-    if flag is not None and flag.lower() in ('1', 'true'):
-        pytest.skip('Do not run api v1 tests here')
-    hw_manager = adapters.SingletonAdapter(loop)
-    old_config = config.robot_configs.load()
-    try:
-        yield hw_manager
-    finally:
-        asyncio.ensure_future(hw_manager.reset())
-        hw_manager.set_config(old_config)
-
-
 @pytest.mark.skipif(aionotify is None,
                     reason="requires inotify (linux only)")
-@contextlib.contextmanager
-def using_sync_api2(loop):
-    flag = os.environ.get('OT_API_FF_useLegacyInternals')
-    if flag is not None and flag.lower() in ('1', 'true'):
-        pytest.skip('Do not run api v1 tests here')
-    hardware = adapters.SynchronousAdapter.build(
-        API.build_hardware_controller)
-    try:
-        yield hardware
-    finally:
-        hardware.reset()
-        hardware.set_config(config.robot_configs.load())
-
-
 @pytest.fixture
-def ensure_api2(request, loop):
-    with using_api2(loop):
-        yield
-
-
-@pytest.fixture
-def ensure_api1(request, loop):
-    with using_api1(loop):
-        yield
-
-
-@pytest.mark.apiv1
-@contextlib.contextmanager
-def using_api1(loop):
-    flag = os.environ.get('OT_API_FF_useLegacyInternals')
-    if flag is None or flag.lower() not in ('1', 'true'):
-        pytest.skip('Do not run API v2 tests here')
-    try:
-        yield rb
-    finally:
-        rb.reset()
-        rb.config = config.robot_configs.load()
-
-
-def _should_skip_api1(request):
-    return request.node.get_closest_marker('api1_only')\
-        and request.param != using_api1
-
-
-def _should_skip_api2(request):
-    return request.node.get_closest_marker('api2_only')\
-        and request.param != using_api2
-
-
-@pytest.mark.skipif(aionotify is None,
-                    reason="requires inotify (linux only)")
-@pytest.fixture(
-    params=[
-        pytest.param(using_api1, marks=pytest.mark.apiv1),
-        pytest.param(using_api2, marks=pytest.mark.apiv2)])
-async def async_server(request, virtual_smoothie_env, loop):
-    if _should_skip_api1(request):
-        pytest.skip('requires api1 only')
-    elif _should_skip_api2(request):
-        pytest.skip('requires api2 only')
-    with request.param(loop) as hw:
-        if request.param == using_api1:
-            app = init(hw, loop=loop)
-            app['api_version'] = 1
-        elif request.param == using_api2:
-            app = init(hw, loop=loop)
-            app['api_version'] = 2
-        else:
-            pytest.skip('Incorrect api version used')
-        yield app
-        await app.shutdown()
+async def async_server(hardware, virtual_smoothie_env, loop):
+    app = init(hardware, loop=loop)
+    yield app
+    await app.shutdown()
 
 
 @pytest.fixture
@@ -258,77 +211,13 @@ async def dc_session(request, async_server, monkeypatch, loop):
     Mock session manager for deck calibation
     """
     hw = async_server['com.opentrons.hardware']
-    if async_server['api_version'] == 2:
-        await hw.cache_instruments({
-            types.Mount.LEFT: None,
-            types.Mount.RIGHT: 'p300_multi_v1'})
+    await hw.cache_instruments({
+        types.Mount.LEFT: None,
+        types.Mount.RIGHT: 'p300_multi_v1'})
     ses = endpoints.SessionManager(hw)
     endpoints.session = ses
     monkeypatch.setattr(endpoints, 'session', ses)
     yield ses
-
-
-@pytest.mark.apiv1
-def apiv1_singletons_factory(virtual_smoothie_env):
-    from opentrons.legacy_api import api
-    api.robot.connect()
-    api.robot.reset()
-    return {'robot': api.robot,
-            'instruments': api.instruments,
-            'labware': api.labware,
-            'modules': api.modules}
-
-
-@pytest.fixture
-def apiv1_singletons(config_tempdir, virtual_smoothie_env):
-    return apiv1_singletons_factory(virtual_smoothie_env)
-
-
-@pytest.mark.apiv2
-def apiv2_singletons_factory(virtual_smoothie_env):
-    from opentrons.protocol_api.legacy_wrapper import api
-    ctx = ProtocolContext()
-    return {**api.build_globals(ctx)}
-
-
-@pytest.fixture
-def apiv2_singletons():
-    return apiv2_singletons_factory()
-
-
-@pytest.fixture(
-    params=[
-        pytest.param(apiv1_singletons_factory, marks=pytest.mark.apiv1),
-        pytest.param(apiv2_singletons_factory, marks=pytest.mark.apiv2)])
-def singletons(config_tempdir, request, virtual_smoothie_env):
-    markers = list(request.node.iter_markers())
-    if 'apiv1_only' in markers and 'apiv2' in markers:
-        pytest.skip('apiv2 but apiv1 only')
-    if 'apiv2_only' in markers and 'apiv1' in markers:
-        pytest.skip('apiv1 but apiv2 only')
-    return request.param(virtual_smoothie_env)
-
-
-@pytest.fixture(scope='function')
-def robot(singletons):
-    return singletons['robot']
-
-
-@pytest.fixture(scope='function')
-def instruments(singletons):
-    return singletons['instruments']
-
-
-@pytest.mark.apiv1
-@pytest.fixture(scope='function')
-def labware(singletons):
-    return singletons['labware']
-
-
-@pytest.mark.apiv1
-@pytest.fixture(scope='function')
-def modules(singletons):
-    return singletons['modules']
 
 
 @pytest.fixture(params=["dinosaur.py"])
@@ -435,37 +324,32 @@ def virtual_smoothie_env(monkeypatch):
 
 @pytest.mark.skipif(aionotify is None,
                     reason="requires inotify (linux only)")
-@pytest.fixture(
-    params=[
-        pytest.param(using_api1, marks=pytest.mark.apiv1),
-        pytest.param(using_api2, marks=pytest.mark.apiv2)])
+@pytest.fixture
 def hardware(request, loop, virtual_smoothie_env):
-    if _should_skip_api1(request):
-        pytest.skip('requires api1 only')
-    elif _should_skip_api2(request):
-        pytest.skip('requires api2 only')
-    with request.param(loop) as hw:
-        yield hw
+    hw_manager = adapters.SingletonAdapter(loop)
+    old_config = config.robot_configs.load()
+    try:
+        yield hw_manager
+    finally:
+        asyncio.ensure_future(hw_manager.reset())
+        hw_manager.set_config(old_config)
 
 
 @pytest.mark.skipif(aionotify is None,
                     reason="requires inotify (linux only)")
-@pytest.fixture(
-    params=[
-        pytest.param(using_api1, marks=pytest.mark.apiv1),
-        pytest.param(using_sync_api2, marks=pytest.mark.apiv2)])
+@pytest.fixture
 def sync_hardware(request, loop, virtual_smoothie_env):
-    if _should_skip_api1(request):
-        pytest.skip('requires api1 only')
-    elif _should_skip_api2(request):
-        pytest.skip('requires api2 only')
-    with request.param(loop) as hw:
-        yield hw
+    hardware = adapters.SynchronousAdapter.build(
+        API.build_hardware_controller)
+    try:
+        yield hardware
+    finally:
+        hardware.reset()
+        hardware.set_config(config.robot_configs.load())
 
 
 @pytest.fixture
 def main_router(loop, virtual_smoothie_env, hardware):
-    from opentrons.api.routers import MainRouter
     router = MainRouter(hardware, loop)
     router.wait_until = partial(
         wait_until,
@@ -489,41 +373,63 @@ async def wait_until(matcher, notifications, timeout=1, loop=None):
             return result
 
 
-@pytest.fixture
-def model(robot, hardware, loop, request):
+def build_v1_model(r, lw_name):
+    plate = load(r, lw_name or '96-flat', '1')
+    tiprack = load(r, 'opentrons-tiprack-300ul', '2')
+    pipette = Pipette(r,
+                      ul_per_mm=18.5, max_volume=300, mount='right',
+                      tip_racks=[tiprack])
+    instrument = models.Instrument(pipette)
+    container = models.Container(plate)
+    return namedtuple('model', 'robot instrument container')(
+        robot=r,
+        instrument=instrument,
+        container=container,
+    )
+
+
+def build_v2_model(h, lw_name, loop):
+    ctx = ProtocolContext(loop=loop, hardware=h)
+
+    loop.run_until_complete(h.cache_instruments(
+        {Mount.RIGHT: 'p300_single'}))
+    tiprack = ctx.load_labware(
+        'opentrons_96_tiprack_300ul', '2')
+    pip = ctx.load_instrument('p300_single', 'right',
+                              tip_racks=[tiprack])
+    instrument = models.Instrument(pip, context=ctx)
+    plate = ctx.load_labware(
+        lw_name or 'corning_96_wellplate_360ul_flat', 1)
+    container = models.Container(plate, context=ctx)
+    return namedtuple('model', 'robot instrument container')(
+        robot=h,
+        instrument=instrument,
+        container=container,
+    )
+
+
+@pytest.fixture(params=[build_v1_model, build_v2_model])
+def model(request, robot, hardware, loop):
     # Use with pytest.mark.parametrize(’labware’, [some-labware-name])
     # to have a different labware loaded as .container. If not passed,
     # defaults to the version-appropriate way to do 96 flat
+    if request.node.get_closest_marker('api1_only')\
+       and request.param != build_v1_model:
+        pytest.skip('only works with a robot')
+    if request.node.get_closest_marker('api2_only')\
+       and request.param != build_v2_model:
+        pytest.skip('only works with hardware controller')
     try:
         lw_name = request.getfixturevalue('labware_name')
     except Exception:
         lw_name = None
 
-    if isinstance(hardware, hc.HardwareAPILike):
-        ctx = ProtocolContext(loop=loop, hardware=hardware)
-        pip = ctx.load_instrument('p300_single', 'right')
-        loop.run_until_complete(hardware.cache_instruments(
-            {Mount.RIGHT: 'p300_single'}))
-        instrument = models.Instrument(pip, context=ctx)
-        plate = ctx.load_labware(
-            lw_name or 'corning_96_wellplate_360ul_flat', 1)
-        rob = hardware
-        container = models.Container(plate, context=ctx)
-    else:
-        from opentrons.legacy_api.containers import load
-        from opentrons.legacy_api.instruments.pipette import Pipette
-        pipette = Pipette(robot,
-                          ul_per_mm=18.5, max_volume=300, mount='right')
-        plate = load(robot, lw_name or '96-flat', '1')
-        rob = robot
-        instrument = models.Instrument(pipette)
-        container = models.Container(plate)
+    builder = request.param
 
-    return namedtuple('model', 'robot instrument container')(
-            robot=rob,
-            instrument=instrument,
-            container=container
-        )
+    if builder == build_v1_model:
+        return builder(robot, lw_name)
+    else:
+        return builder(hardware, lw_name, loop)
 
 
 @pytest.fixture
@@ -554,7 +460,11 @@ def smoothie(monkeypatch):
     driver = SmoothieDriver(robot_configs.load())
     driver.connect()
     yield driver
-    driver.disconnect()
+    try:
+        driver.disconnect()
+    except AttributeError:
+        # if the test disconnected
+        pass
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
 
 

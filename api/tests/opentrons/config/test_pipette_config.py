@@ -104,7 +104,7 @@ def test_ul_per_mm_continuous(pipette_model):
     assert isclose(round(aspirate_mm), round(dispense_mm))
 
 
-def test_override_load():
+def test_override_load(config_tempdir):
     cdir = CONFIG['pipette_config_overrides_dir']
 
     existing_overrides = {
@@ -133,7 +133,7 @@ def test_override_load():
     assert unspecced == new_pconf
 
 
-def test_override_save():
+def test_override_save(config_tempdir):
     cdir = CONFIG['pipette_config_overrides_dir']
 
     overrides = {

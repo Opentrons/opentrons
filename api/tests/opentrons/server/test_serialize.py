@@ -36,7 +36,6 @@ def type_id(instance):
     return id(type(instance))
 
 
-@pytest.mark.api1_only
 def test_robot(singletons):
     robot = singletons['robot']
     containers = singletons['labware']

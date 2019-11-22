@@ -1915,13 +1915,11 @@ class Pipette(CommandPublisher):
     def _max_deck_height(self):
         mount_max_height = self.instrument_mover.axis_maximum(
             self.robot.poses, 'z')
-        log.info(f'Mount Max Height {mount_max_height}')
         _, _, pipette_max_height = pose_tracker.change_base(
             self.robot.poses,
             src=self,
             dst=self.mount,
             point=(0, 0, mount_max_height))
-        log.info(f'Coordinate transform {pipette_max_height}')
         return pipette_max_height
 
     @property

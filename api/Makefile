@@ -91,15 +91,10 @@ $(wheel_pattern): setup.py $(ot_sources)
 
 wheel: $(wheel_file)
 
-.PHONY: test, test-apiv1, test-apiv2
-test: local-install test-apiv2 test-apiv1
+.PHONY: test
+test: local-install
 	$(python)	-m twine check $(wheel_file)
-
-test-apiv2: local-install
-	OT_API_FF_useLegacyInternals=0 $(pytest) $(tests) $(test_opts) -m "not apiv1 and not api1_only"
-
-test-apiv1: local-install
-	OT_API_FF_useLegacyInternals=1 $(pytest) $(tests) $(test_opts) -m "not apiv2 and not api2_only"
+	$(pytest) $(tests) $(test_opts)
 
 .PHONY: lint
 lint: $(ot_py_sources)

@@ -9,6 +9,7 @@ except OSError:
 from opentrons.config import (CONFIG,
                               robot_configs,
                               advanced_settings as advs)
+from opentrons.types import Mount
 from opentrons.deck_calibration import dc_main
 from opentrons.deck_calibration.dc_main import get_calibration_points
 from opentrons.deck_calibration.endpoints import expected_points
@@ -31,41 +32,43 @@ def model2():
 
 
 @pytest.fixture
-def hardware(monkeypatch, async_server, model1, model2):
-    hardware = async_server['com.opentrons.hardware']
+def hw_with_pipettes(monkeypatch, sync_hardware, model1, model2):
     if model1:
-        monkeypatch.setattr(hardware, 'model_by_mount', {
-            'left': {
-                'model': model1[0],
-                'id': 'fakeid',
-                'name': model1[1],
-                'home_current': 0.1},
-            'right': {
-                'model': model1[0],
-                'id': 'fakeid2',
-                'name': model1[1],
-                'home_current': 0.1}})
+        def fake_gai(expected):
+            return {
+                Mount.LEFT: {
+                    'model': model1[0],
+                    'id': 'fakeid'},
+                Mount.RIGHT: {
+                    'model': model1[0],
+                    'id': 'fakeid2'}}
+        monkeypatch.setattr(
+            sync_hardware._api._backend,
+            'get_attached_instruments',
+            fake_gai)
     elif model2:
-        monkeypatch.setattr(hardware, 'model_by_mount', {
-            'left': {'model': model2[0], 'id': 'fakeid', 'name': model2[1]},
-            'right': {'model': model2[0], 'id': 'fakeid2', 'name': model2[1]}})
 
-    def fake_cached():
-        return hardware.model_by_mount
+        def fake_gai(expected):
+            return {
+                Mount.LEFT: {'model': model2[0], 'id': 'fakeid'},
+                Mount.RIGHT: {'model': model2[0], 'id': 'fakeid2'}}
 
-    monkeypatch.setattr(hardware, 'cache_instrument_models', fake_cached)
-    yield hardware
+        monkeypatch.setattr(
+            sync_hardware._api._backend,
+            'get_attached_instruments',
+            fake_gai)
+
+    yield sync_hardware
 
 
-@pytest.mark.api1_only
-def test_clear_config(mock_config, async_server):
+async def test_clear_config(mock_config, sync_hardware):
     # Clear should happen automatically after the following import, resetting
     # the robot config to the default value from robot_configs
     from opentrons.deck_calibration import dc_main
-    hardware = async_server['com.opentrons.hardware']
-    dc_main.clear_configuration_and_reload(hardware)
+    dc_main.clear_configuration_and_reload(sync_hardware)
 
-    assert hardware.config == robot_configs.build_config({}, {})
+    config = sync_hardware.config
+    assert config == robot_configs.build_config({}, {})
 
 
 @pytest.mark.skipif(aionotify is None,
@@ -100,7 +103,7 @@ def test_save_and_clear_config(mock_config, sync_hardware, loop):
     hardware.config.gantry_calibration[0][3] = 0
 
 
-async def test_new_deck_points():
+def test_new_deck_points():
     # Checks that the correct deck calibration points are being used
     # if feature_flag is set (or not)
 
@@ -131,14 +134,12 @@ async def test_new_deck_points():
 
 @pytest.mark.skipif(
     sys.platform.startswith("win"), reason="Incompatible with Windows")
-@pytest.mark.api1_only
-def test_move_output(mock_config, loop, monkeypatch, hardware):
+def test_move_output(mock_config, loop, monkeypatch, hw_with_pipettes):
     # Check that the robot moves to the correct locations
-    # TODO: Make tests for both APIs
     tool = dc_main.CLITool(
-        get_calibration_points(), hardware, loop=loop)
+        get_calibration_points(), hw_with_pipettes, loop=loop)
 
-    assert tool.hardware is hardware
+    assert tool.hardware is hw_with_pipettes
     # Move to all three calibration points
     expected_pts = tool._expected_points
     for pt in range(3):
@@ -150,17 +151,15 @@ def test_move_output(mock_config, loop, monkeypatch, hardware):
 
 @pytest.mark.skipif(
     sys.platform.startswith("win"), reason="Incompatible with Windows")
-@pytest.mark.api1_only
 @pytest.mark.model2
-def test_tip_probe(mock_config, loop, monkeypatch, hardware):
+def test_tip_probe(mock_config, loop, monkeypatch, hw_with_pipettes):
     # Test that tip probe returns successfully
 
-    # TODO (maybe): Figure out how to prevent the pytest loop fixture
-    # from getting closed by the CLI tool on exit for API V2
+    hw_with_pipettes.home()
     tool = dc_main.CLITool(
-        get_calibration_points(), hardware, loop=loop)
+        get_calibration_points(), hw_with_pipettes, loop=loop)
 
-    assert tool.hardware is hardware
+    assert tool.hardware is hw_with_pipettes
     point_after = (10, 10, 10)
     output = tool.probe(point_after)
     assert output == 'Tip probe'
@@ -168,20 +167,19 @@ def test_tip_probe(mock_config, loop, monkeypatch, hardware):
 
 @pytest.mark.skipif(
     sys.platform.startswith("win"), reason="Incompatible with Windows")
-@pytest.mark.api1_only
 @pytest.mark.model1
-def test_mount_offset(mock_config, hardware, loop, monkeypatch):
+def test_mount_offset(mock_config, hw_with_pipettes, loop, monkeypatch):
     # Check that mount offset gives the expected output when position is
     # slightly changed
 
     def fake_position(something):
-        return [11.13, 8, 51.7]
-
+        return [-22.87, 8, 0]
     monkeypatch.setattr(
-        hardware, 'config', mock_config)
+        hw_with_pipettes._api, '_config', mock_config)
 
+    hw_with_pipettes.home()
     tool = dc_main.CLITool(
-        get_calibration_points(), hardware, loop=loop)
+        get_calibration_points(), hw_with_pipettes, loop=loop)
 
     monkeypatch.setattr(
         dc_main.CLITool, '_position', fake_position)
@@ -189,22 +187,18 @@ def test_mount_offset(mock_config, hardware, loop, monkeypatch):
     tool.save_mount_offset()
     assert expected_offset == tool.hardware.config.mount_offset
 
-    hardware.reset()
-
 
 @pytest.mark.skipif(
     sys.platform.startswith("win"), reason="Incompatible with Windows")
-@pytest.mark.api1_only
 @pytest.mark.model1
 def test_gantry_matrix_output(
-        mock_config, hardware, loop, monkeypatch):
+        mock_config, hw_with_pipettes, loop, monkeypatch):
     # Check that the robot moves to the correct locations
-    # TODO: Make tests for both APIs
 
-    monkeypatch.setattr(hardware, 'config', mock_config)
-
+    monkeypatch.setattr(hw_with_pipettes, 'config', mock_config)
+    hw_with_pipettes.home()
     tool = dc_main.CLITool(
-        get_calibration_points(), hardware, loop=loop)
+        get_calibration_points(), hw_with_pipettes, loop=loop)
 
     expected = [
         [1.00, 0.00, 0.00, 0.00],
@@ -224,28 +218,21 @@ def test_gantry_matrix_output(
     tool.save_transform()
     assert np.allclose(expected, tool.current_transform)
 
-    hardware.reset()
-
 
 @pytest.mark.skipif(
     sys.platform.startswith("win"), reason="Incompatible with Windows")
-@pytest.mark.api1_only
 @pytest.mark.model2
 def test_try_pickup_tip(
-        mock_config, hardware, monkeypatch, loop):
+        mock_config, hw_with_pipettes, monkeypatch, loop):
     # Check that the robot moves to the correct locations
-    # TODO: Make tests for both APIs
-    def fake_read_model(mount):
-        return model2()
-    monkeypatch.setattr(
-        hardware._driver, 'read_pipette_model', fake_read_model)
 
+    hw_with_pipettes.home()
     monkeypatch.setattr(
-        hardware, 'config', mock_config)
+        hw_with_pipettes._api, '_config', mock_config)
 
     tool = dc_main.CLITool(
         get_calibration_points(),
-        hardware,
+        hw_with_pipettes,
         loop=loop)
     output = tool.try_pickup_tip()
     assert output == 'Picked up tip!'

@@ -3,10 +3,8 @@ from opentrons.commands import stringify_location
 
 
 @pytest.fixture
-def containers():
-    from opentrons import robot
-    from opentrons import containers
-    robot.reset()
+def containers(singletons):
+    containers = singletons['labware']
     return {
         '1': containers.load('96-flat', '1'),
         '11': containers.load('96-flat', '11')

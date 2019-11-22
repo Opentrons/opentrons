@@ -236,4 +236,5 @@ class Controller:
         self.resume()
 
     def __del__(self):
-        self._module_watcher.close()
+        if hasattr(self, '_module_watcher'):
+            self._module_watcher.close()

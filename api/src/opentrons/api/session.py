@@ -6,11 +6,11 @@ import logging
 from time import time
 from typing import List
 from uuid import uuid4
+from opentrons import robot
 from opentrons.broker import Broker
 from opentrons.commands import tree, types as command_types
 from opentrons.commands.commands import is_new_loc, listify
-from opentrons.config import feature_flags as ff
-from opentrons.protocols.types import JsonProtocol, PythonProtocol, APIVersion
+from opentrons.protocols.types import PythonProtocol, APIVersion
 from opentrons.protocols.parse import parse
 from opentrons.types import Location, Point
 from opentrons.protocol_api import (ProtocolContext,
@@ -24,10 +24,8 @@ from .models import Container, Instrument, Module
 
 from opentrons.legacy_api.containers.placeable import (
     Module as ModulePlaceable, Placeable)
-if not ff.use_protocol_api_v2():
-    from opentrons.legacy_api.containers import get_container, location_to_list
 
-    from opentrons.legacy_api.protocols import execute_protocol
+from opentrons.legacy_api.containers import get_container, location_to_list
 
 log = logging.getLogger(__name__)
 
@@ -123,9 +121,19 @@ class Session(object):
         self._loop = loop
         self.name = name
         self._protocol = protocol
+        self.api_level = getattr(self._protocol, 'api_level', APIVersion(2, 0))
+        self._use_v2 = self.api_level >= APIVersion(2, 0)
+        log.info(
+            f'Protocol API Version: {self.api_level}; '
+            f'Protocol kind: {type(self._protocol)}')
+
+        # self.metadata is exposed via rpc
+        self.metadata = getattr(self._protocol, 'metadata', {})
+
         self._hardware = hardware
         self._simulating_ctx = ProtocolContext.build_using(
             self._protocol, loop=self._loop, broker=self._broker)
+
         self.state = None
         self.commands = []
         self.command_log = {}
@@ -139,14 +147,20 @@ class Session(object):
         self.instruments = None
         self.containers = None
         self.modules = None
-        self.metadata = {}
-        self.api_level = None
         self.protocol_text = protocol.text
 
         self.startTime = None
         self._motion_lock = motion_lock
 
+    def _hw_iface(self):
+        if self._use_v2:
+            return self._hardware
+        else:
+            return robot
+
     def prepare(self):
+        if not self._use_v2:
+            robot.discover_modules()
         self.refresh()
 
     def get_instruments(self):
@@ -159,7 +173,7 @@ class Session(object):
                     self._interactions
                     if _instrument == instrument
                 ],
-                context=self._simulating_ctx)
+                context=self._use_v2 and self._simulating_ctx)
             for instrument in self._instruments
         ]
 
@@ -173,13 +187,14 @@ class Session(object):
                     self._interactions
                     if _container == container
                 ],
-                context=self._simulating_ctx)
+                context=self._use_v2 and self._simulating_ctx)
             for container in self._containers
         ]
 
     def get_modules(self):
         return [
-            Module(module=module, context=self._simulating_ctx)
+            Module(module=module,
+                   context=self._use_v2 and self._simulating_ctx)
             for module in self._modules
         ]
 
@@ -219,13 +234,12 @@ class Session(object):
                         'id': len(res)})
             else:
                 stack.pop()
-
         unsubscribe = self._broker.subscribe(command_types.COMMAND, on_command)
 
         try:
             # ensure actual pipettes are cached before driver is disconnected
-            if ff.use_protocol_api_v2():
-                self._hardware.cache_instruments()
+            self._hardware.cache_instruments()
+            if self._use_v2:
                 instrs = {}
                 for mount, pip in self._hardware.attached_instruments.items():
                     if pip:
@@ -245,19 +259,16 @@ class Session(object):
                 run_protocol(self._protocol,
                              context=self._simulating_ctx)
             else:
-                self._hardware.broker = self._broker
-                self._hardware.cache_instrument_models()
-                self._hardware.disconnect()
-                if isinstance(self._protocol, JsonProtocol):
-                    execute_protocol(self._protocol)
-                else:
-                    exec(self._protocol.contents, {})
+                robot.broker = self._broker
+                robot.cache_instrument_models()
+                robot.disconnect()
+                exec(self._protocol.contents, {})
         finally:
             # physically attached pipettes are re-cached during robot.connect()
             # which is important, because during a simulation, the robot could
             # think that it holds a pipette model that it actually does not
-            if not ff.use_protocol_api_v2():
-                self._hardware.connect()
+            if not self._use_v2:
+                robot.connect()
             unsubscribe()
 
             instruments, containers, modules, interactions = _accumulate(
@@ -272,25 +283,13 @@ class Session(object):
             # we have to clear the tips if they are left on after simulation
             # to ensure that the instruments are in the expected state at the
             # beginning of the labware calibration flow
-            if not ff.use_protocol_api_v2():
-                self._hardware.clear_tips()
+            if not self._use_v2:
+                robot.clear_tips()
 
         return res
 
     def refresh(self):
         self._reset()
-        # self.metadata is exposed via jrpc
-        if isinstance(self._protocol, PythonProtocol):
-            self.api_level = self._protocol.api_level
-            self.metadata = self._protocol.metadata
-            log.info(f"Protocol API version: {self._protocol.api_level}")
-        else:
-            if ff.use_protocol_api_v2():
-                self.api_level = APIVersion(2, 0)
-            else:
-                self.api_level = APIVersion(1, 0)
-            self.metadata = {}
-            log.info(f"JSON protocol")
 
         try:
             self._broker.set_logger(self._sim_logger)
@@ -310,29 +309,29 @@ class Session(object):
         return self
 
     def stop(self):
-        self._hardware.halt()
-        self._hardware.stop()
+        self._hw_iface().halt()
+        self._hw_iface().stop()
         self.set_state('stopped')
         return self
 
     def pause(self):
-        if ff.use_protocol_api_v2():
+        if self._use_v2:
             self._hardware.pause()
         # robot.pause in the legacy API will publish commands to the broker
         # use the broker-less execute_pause instead
         else:
-            self._hardware.execute_pause()
+            robot.execute_pause()
 
         self.set_state('paused')
         return self
 
     def resume(self):
-        if ff.use_protocol_api_v2():
+        if self._use_v2:
             self._hardware.resume()
         # robot.resume in the legacy API will publish commands to the broker
         # use the broker-less execute_resume instead
         else:
-            self._hardware.execute_resume()
+            robot.execute_resume()
 
         self.set_state('running')
         return self
@@ -358,7 +357,7 @@ class Session(object):
         try:
             self.resume()
             self._pre_run_hooks()
-            if ff.use_protocol_api_v2():
+            if self._use_v2:
                 self._hardware.cache_instruments()
                 ctx = ProtocolContext.build_using(
                     self._protocol,
@@ -368,13 +367,12 @@ class Session(object):
                 ctx.home()
                 run_protocol(self._protocol, context=ctx)
             else:
-                self._hardware.broker = self._broker
-                if isinstance(self._protocol, JsonProtocol):
-                    execute_protocol(self._protocol)
-                else:
-                    exec(self._protocol.contents, {})
+                robot.broker = self._broker
+                assert isinstance(self._protocol, PythonProtocol),\
+                    'Internal error: v1 should only be used for python'
+                exec(self._protocol.contents, {})
             self.set_state('finished')
-            self._hardware.home()
+            self._hw_iface().home()
         except Exception as e:
             log.exception("Exception during run:")
             self.error_append(e)
@@ -394,13 +392,13 @@ class Session(object):
         return self
 
     def identify(self):
-        self._hardware.identify()
+        self._hw_iface().identify()
 
     def turn_on_rail_lights(self):
-        self._hardware.set_lights(rails=True)
+        self._hw_iface().set_lights(rails=True)
 
     def turn_off_rail_lights(self):
-        self._hardware.set_lights(rails=False)
+        self._hw_ifce().set_lights(rails=False)
 
     def set_state(self, state):
         log.debug("State set to {}".format(state))
@@ -425,7 +423,7 @@ class Session(object):
         )
 
     def _reset(self):
-        self._hardware.reset()
+        self._hw_iface().reset()
         self.clear_logs()
 
     def _snapshot(self):
@@ -455,7 +453,7 @@ class Session(object):
         self._broker.publish(Session.TOPIC, snap)
 
     def _pre_run_hooks(self):
-        self._hardware.home_z()
+        self._hw_iface().home_z()
 
 
 def _accumulate(iterable):

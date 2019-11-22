@@ -13,13 +13,14 @@ import sys
 import threading
 from typing import Any, Callable, Dict, Optional, TextIO, Union
 
+import opentrons
 from opentrons import protocol_api, __version__
 from opentrons.protocol_api.legacy_wrapper import api
 from opentrons.protocol_api import (execute as execute_apiv2,
                                     MAX_SUPPORTED_VERSION)
 from opentrons import commands
 from opentrons.protocols.parse import parse, version_from_string
-from opentrons.protocols.types import JsonProtocol, APIVersion
+from opentrons.protocols.types import APIVersion, PythonProtocol
 from opentrons.hardware_control import API
 
 _HWCONTROL: Optional[API] = None
@@ -121,25 +122,13 @@ def get_arguments(
         help='The protocol file to execute. If you pass \'-\', you can pipe '
         'the protocol via stdin; this could be useful if you want to use this '
         'utility as part of an automated workflow.')
-    parser.add_argument(
-        '-i', '--internals',
-        choices=['v1', 'v2'],
-        default='v2',
-        help='Specify the internals to use when executing the protocol. v2 '
-        'means execute protocols that request API V2 using V2, and protocols '
-        'that request API V1 using the V1 back-compat shim. If you have a '
-        'protocol that uses undocumented, private, or internal capabilities '
-        'that are not present in the backcompat layer, you can specify v1 to '
-        'use the old internals.'
-    )
     return parser
 
 
 def execute(protocol_file: TextIO,
             propagate_logs: bool = False,
             log_level: str = 'warning',
-            emit_runlog: Callable[[Dict[str, Any]], None] = None,
-            force_v1: bool = False):
+            emit_runlog: Callable[[Dict[str, Any]], None] = None):
     """
     Run the protocol itself.
 
@@ -177,11 +166,6 @@ def execute(protocol_file: TextIO,
                         estimation. If specified, the callback should take a
                         single argument (the name doesn't matter) which will
                         be a dictionary (see below). Default: ``None``
-    :param bool force_v1: If ``True``, use API V1 internals. This prevents
-                          simulation of V2 protocols, but allows the use of
-                          undocumented, private, or internal API V1
-                          interactions. This parameter may be specified on
-                          the command line as ``-i v1``.
 
     The format of the runlog entries is as follows:
 
@@ -206,21 +190,7 @@ def execute(protocol_file: TextIO,
     stack_logger.setLevel(getattr(logging, log_level.upper(), logging.WARNING))
     contents = protocol_file.read()
     protocol = parse(contents, protocol_file.name)
-    if force_v1:
-        import opentrons.legacy_api.api
-        import opentrons.api
-        from opentrons.legacy_api import protocols
-        if not hasattr(opentrons, 'robot'):
-            setattr(opentrons, 'instruments',
-                    opentrons.legacy_api.api.instruments)
-            setattr(opentrons, 'containers',
-                    opentrons.legacy_api.api.containers)
-            setattr(opentrons, 'labware',
-                    opentrons.legacy_api.api.containers)
-            setattr(opentrons, 'robot',
-                    opentrons.legacy_api.api.robot)
-            setattr(opentrons, 'modules',
-                    opentrons.legacy_api.api.modules)
+    if getattr(protocol, 'api_level', APIVersion(2, 0)) < APIVersion(2, 0):
         opentrons.robot.connect()
         opentrons.robot.cache_instrument_models()
         opentrons.robot.discover_modules()
@@ -228,10 +198,9 @@ def execute(protocol_file: TextIO,
         if emit_runlog:
             opentrons.robot.broker.subscribe(
                 commands.command_types.COMMAND, emit_runlog)
-        if isinstance(protocol, JsonProtocol):
-            protocols.execute_protocol(protocol)
-        else:
-            exec(protocol.contents, {})
+        assert isinstance(protocol, PythonProtocol),\
+            'Internal error: Only Python protocols may be executed in v1'
+        exec(protocol.contents, {})
     else:
         context = get_protocol_api(
             getattr(protocol, 'api_level', MAX_SUPPORTED_VERSION),
@@ -296,8 +265,7 @@ def main() -> int:
         log_level = 'warning'
     # Try to migrate containers from database to v2 format
     api.maybe_migrate_containers()
-    execute(args.protocol, log_level=log_level, emit_runlog=printer,
-            force_v1=(args.internals == 'v1'))
+    execute(args.protocol, log_level=log_level, emit_runlog=printer)
     return 0
 
 

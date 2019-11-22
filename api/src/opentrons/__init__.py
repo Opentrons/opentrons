@@ -5,33 +5,18 @@ HERE = os.path.abspath(os.path.dirname(__file__))
 from opentrons import config  # noqa(E402)
 from opentrons.data_storage import database_migration  # noqa(E402)
 
-if os.environ.get('OT_UPDATE_SERVER') != 'true'\
-   and not config.feature_flags.use_protocol_api_v2():
+if os.environ.get('OT_UPDATE_SERVER') != 'true':
     database_migration.check_version_and_perform_full_migration()
-elif not config.feature_flags.use_protocol_api_v2():
-    # Need to minimally build the database for CI
-    database_migration.check_version_and_perform_minimal_migrations()
 
 
-if not config.feature_flags.use_protocol_api_v2():
-    from .legacy_api.api import (robot,   # noqa(E402)
-                                 reset,
-                                 instruments,
-                                 containers,
-                                 labware,
-                                 modules)
-    names_list = [
-        'containers', 'instruments', 'robot', 'reset', 'modules', 'labware']
-else:
-    from .protocol_api.legacy_wrapper import api
-    from .protocol_api import ProtocolContext
-    globs = api.build_globals(ProtocolContext())
-    robot = globs['robot']
-    containers = globs['labware']
-    instruments = globs['instruments']
-    labware = globs['labware']
-    modules = globs['modules']
-    names_list = ['containers', 'instruments', 'robot', 'modules', 'labware']
+from .legacy_api.api import (robot,   # noqa(E402)
+                             reset,
+                             instruments,
+                             containers,
+                             labware,
+                             modules)
+names_list = [
+    'containers', 'instruments', 'robot', 'reset', 'modules', 'labware']
 
 try:
     with open(os.path.join(HERE, 'package.json')) as pkg:
