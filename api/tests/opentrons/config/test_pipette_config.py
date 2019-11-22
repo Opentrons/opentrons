@@ -149,7 +149,7 @@ def test_override_save(config_tempdir):
 
     old_pconf = pipette_config.load('p300_multi_v1.4', new_id)
 
-    assert old_pconf.quirks == []
+    assert old_pconf.quirks == ['dropTipShake']
 
     pipette_config.save_overrides(new_id, overrides, model)
 
