@@ -460,7 +460,11 @@ def smoothie(monkeypatch):
     driver = SmoothieDriver(robot_configs.load())
     driver.connect()
     yield driver
-    driver.disconnect()
+    try:
+        driver.disconnect()
+    except AttributeError:
+        # if the test disconnected
+        pass
     monkeypatch.setenv('ENABLE_VIRTUAL_SMOOTHIE', 'false')
 
 

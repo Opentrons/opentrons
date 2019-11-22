@@ -1,7 +1,12 @@
+from copy import deepcopy
 from threading import Thread
 from unittest.mock import Mock
 import pytest
+from time import sleep
 
+from numpy import isclose
+
+from opentrons.trackers import pose_tracker
 from tests.opentrons.conftest import fuzzy_assert
 from opentrons.config.robot_configs import DEFAULT_GANTRY_STEPS_PER_MM
 from opentrons.drivers import serial_communication
@@ -12,15 +17,13 @@ def position(x, y, z, a, b, c):
     return {axis: value for axis, value in zip('XYZABC', [x, y, z, a, b, c])}
 
 
-def test_update_position(smoothie):
-    import types
+def test_update_position(smoothie, monkeypatch):
     driver = smoothie
-    _old_send_command = driver._send_command
 
     def _new_send_message(self, command, timeout=None):
         return 'ok MCS: X:0.0000 Y:0.0000 Z:0.0000 A:0.0000 B:0.0000 C:0.0000'
 
-    driver._send_command = types.MethodType(_new_send_message, driver)
+    monkeypatch.setattr(driver, '_send_command', _new_send_message)
 
     driver.update_position()
     expected = {
@@ -35,7 +38,7 @@ def test_update_position(smoothie):
 
     count = 0
 
-    def _new_send_message(self, command, timeout=None):
+    def _new_send_message2(self, command, timeout=None):
         nonlocal count
         # first attempt to read, we get bad data
         msg = 'ok MCS: X:0.0000 Y:MISTAKE Z:0.0000 A:0.0000 B:0.0000 C:0.0000'
@@ -45,7 +48,7 @@ def test_update_position(smoothie):
         count += 1
         return msg
 
-    driver._send_command = types.MethodType(_new_send_message, driver)
+    monkeypatch.setattr(driver, '_send_command', _new_send_message2)
 
     driver.update_position()
     expected = {
@@ -58,12 +61,8 @@ def test_update_position(smoothie):
     }
     assert driver.position == expected
 
-    driver._send_command = types.MethodType(_old_send_command, driver)
-
 
 def test_remove_serial_echo(smoothie, monkeypatch):
-    from opentrons.drivers import serial_communication
-    from opentrons.drivers.smoothie_drivers import driver_3_0
     smoothie.simulating = False
 
     def return_echo_response(command, ack, connection, timeout, tag=None):
@@ -102,10 +101,9 @@ def test_remove_serial_echo(smoothie, monkeypatch):
 
 
 def test_parse_position_response(smoothie):
-    from opentrons.drivers.smoothie_drivers import driver_3_0 as drv
     good_data = 'ok M114.2 X:10 Y:20: Z:30 A:40 B:50 C:60'
     bad_data = 'ok M114.2 X:10 Y:20: Z:30A:40 B:50 C:60'
-    res = drv._parse_position_response(good_data)
+    res = driver_3_0._parse_position_response(good_data)
     expected = {
         'X': 10,
         'Y': 20,
@@ -115,13 +113,11 @@ def test_parse_position_response(smoothie):
         'C': 60,
     }
     assert res == expected
-    with pytest.raises(drv.ParseError):
-        drv._parse_position_response(bad_data)
+    with pytest.raises(driver_3_0.ParseError):
+        driver_3_0._parse_position_response(bad_data)
 
 
 def test_dwell_and_activate_axes(smoothie, monkeypatch):
-    from opentrons.drivers import serial_communication
-    from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
     smoothie._setup()
     smoothie.simulating = False
@@ -165,8 +161,6 @@ def test_dwell_and_activate_axes(smoothie, monkeypatch):
 
 
 def test_disable_motor(smoothie, monkeypatch):
-    from opentrons.drivers import serial_communication
-    from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
     smoothie.simulating = False
 
@@ -197,8 +191,6 @@ def test_disable_motor(smoothie, monkeypatch):
 
 
 def test_plunger_commands(smoothie, monkeypatch):
-    from opentrons.drivers import serial_communication
-    from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
     smoothie._setup()
     smoothie.home()
@@ -293,8 +285,6 @@ def test_plunger_commands(smoothie, monkeypatch):
 
 
 def test_set_active_current(smoothie, monkeypatch):
-    from opentrons.drivers import serial_communication
-    from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
     smoothie._setup()
     smoothie.home()
@@ -361,8 +351,6 @@ def test_pipette_configs(smoothie, monkeypatch):
 
 
 def test_set_acceleration(smoothie, monkeypatch):
-    from opentrons.drivers import serial_communication
-    from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
     smoothie._setup()
     smoothie.home()
@@ -405,7 +393,6 @@ def test_active_dwelling_current_push_pop(smoothie):
     assert smoothie._active_current_settings != \
         smoothie._dwelling_current_settings
 
-    from copy import deepcopy
     old_active_currents = deepcopy(smoothie._active_current_settings)
     old_dwelling_currents = deepcopy(smoothie._dwelling_current_settings)
 
@@ -439,7 +426,6 @@ def test_functional(smoothie):
 
 @pytest.mark.api1_only
 def test_set_pick_up_current(model, monkeypatch):
-    import types
     driver = model.robot._driver
 
     set_current = driver._save_current
@@ -477,25 +463,23 @@ def test_set_pick_up_current(model, monkeypatch):
 
 @pytest.mark.xfail
 @pytest.mark.api1_only
-def test_drop_tip_current(model):
+def test_drop_tip_current(model, monkeypatch):
     # TODO: All of these API 1 tests either need to be removed or moved to
     # a different test file. The ones using the model fixture rely on
     # some ugly things created in RPC. Ideally, all of these tests should
     # be testing methods in the smoothie directly.
-
-    import types
     driver = model.driver
 
     old_save_current = driver._save_current
     current_log = []
 
-    def mock_save_current(self, settings, axes_active=True):
+    def mock_save_current(settings, axes_active=True):
         nonlocal current_log
         if 'C' in settings:
             current_log.append(settings)
         old_save_current(settings, axes_active)
 
-    driver._save_current = types.MethodType(mock_save_current, driver)
+    monkeypatch.setattr(driver, '_save_current', mock_save_current)
 
     rack = model.robot.add_container('tiprack-200ul', '10')
     pipette = model.instrument._instrument
@@ -519,43 +503,36 @@ def test_drop_tip_current(model):
     ]
     assert current_log == expected
 
-    driver._save_current = old_save_current
-
 
 def test_parse_pipette_data():
-    from opentrons.drivers.smoothie_drivers.driver_3_0 import \
-        _parse_instrument_data, _byte_array_to_hex_string
     msg = 'TestsRule!!'
     mount = 'L'
-    good_data = mount + ': ' + _byte_array_to_hex_string(msg.encode())
-    parsed = _parse_instrument_data(good_data).get(mount)
+    good_data = mount + ': ' \
+        + driver_3_0._byte_array_to_hex_string(msg.encode())
+    parsed = driver_3_0._parse_instrument_data(good_data).get(mount)
     assert parsed.decode() == msg
 
 
-def test_read_and_write_pipettes(smoothie):
-    import types
-    from opentrons.drivers.smoothie_drivers.driver_3_0 import GCODES
-
+def test_read_and_write_pipettes(smoothie, monkeypatch):
     driver = smoothie
-    _old_send_command = driver._send_command
 
     written_id = ''
     written_model = ''
     mount = 'L'
 
     def _new_send_message(
-            self, command, timeout=None, suppress_error_msg=True):
+            command, timeout=None, suppress_error_msg=True):
         nonlocal written_id, written_model, mount
-        if GCODES['READ_INSTRUMENT_ID'] in command:
+        if driver_3_0.GCODES['READ_INSTRUMENT_ID'] in command:
             return mount + ': ' + written_id
-        elif GCODES['READ_INSTRUMENT_MODEL'] in command:
+        elif driver_3_0.GCODES['READ_INSTRUMENT_MODEL'] in command:
             return mount + ': ' + written_model
-        if GCODES['WRITE_INSTRUMENT_ID'] in command:
+        if driver_3_0.GCODES['WRITE_INSTRUMENT_ID'] in command:
             written_id = command[command.index(mount) + 1:]
-        elif GCODES['WRITE_INSTRUMENT_MODEL'] in command:
+        elif driver_3_0.GCODES['WRITE_INSTRUMENT_MODEL'] in command:
             written_model = command[command.index(mount) + 1:]
 
-    driver._send_command = types.MethodType(_new_send_message, driver)
+    monkeypatch.setattr(driver, '_send_command', _new_send_message)
 
     test_id = 'TestsRock!!'
     test_model = 'TestPipette'
@@ -571,43 +548,33 @@ def test_read_and_write_pipettes(smoothie):
     driver.simulating = True
     assert read_model == test_model + '_v1'
 
-    driver._send_command = types.MethodType(_old_send_command, driver)
 
-
-def test_read_pipette_v13(smoothie):
-    import types
-    from opentrons.drivers.smoothie_drivers.driver_3_0 import \
-        _byte_array_to_hex_string
-
+def test_read_pipette_v13(smoothie, monkeypatch):
     driver = smoothie
-    _old_send_command = driver._send_command
     driver.simulating = False
 
     def _new_send_message(
-            self, command, timeout=None, suppress_error_msg=True):
-        return 'L:' + _byte_array_to_hex_string(b'p300_single_v13')
+            command, timeout=None, suppress_error_msg=True):
+        return 'L:' + driver_3_0._byte_array_to_hex_string(b'p300_single_v13')
 
-    driver._send_command = types.MethodType(_new_send_message, driver)
+    monkeypatch.setattr(driver, '_send_command', _new_send_message)
 
     res = driver.read_pipette_model('left')
     assert res == 'p300_single_v1.3'
 
-    driver._send_command = types.MethodType(_old_send_command, driver)
 
-
-def test_fast_home(smoothie):
-    import types
+def test_fast_home(smoothie, monkeypatch):
     driver = smoothie
 
     move = driver.move
     coords = []
 
-    def move_mock(self, target):
+    def move_mock(target):
         nonlocal coords
         coords.append(target)
         move(target)
 
-    driver.move = types.MethodType(move_mock, driver)
+    monkeypatch.setattr(driver, 'move', move_mock)
 
     assert coords == []
     driver.fast_home(axis='X', safety_margin=12)
@@ -615,21 +582,20 @@ def test_fast_home(smoothie):
     assert driver.position['X'] == driver.homed_position['X']
 
 
-def test_homing_flags(smoothie):
-    import types
+def test_homing_flags(smoothie, monkeypatch):
     driver = smoothie
 
-    def is_connected_mock(self):
+    def is_connected_mock():
         return True
 
-    driver.is_connected = types.MethodType(is_connected_mock, driver)
+    monkeypatch.setattr(driver, 'is_connected', is_connected_mock)
     driver.simulating = False
 
-    def send_mock(self, target):
+    def send_mock(target):
         smoothie_homing_res = 'X:0 Y:1 Z:0 A:1 B:0 C:1\r\n'
         return smoothie_homing_res
 
-    driver._send_command = types.MethodType(send_mock, driver)
+    monkeypatch.setattr(driver, '_send_command', send_mock)
 
     expected = {
         'X': False,
@@ -641,22 +607,20 @@ def test_homing_flags(smoothie):
     }
     driver.update_homed_flags()
     flags = driver.homed_flags
-    driver.is_connected = types.MethodType(lambda s: False, driver)
     assert flags == expected
 
 
-def test_switch_state(smoothie):
-    import types
+def test_switch_state(smoothie, monkeypatch):
     driver = smoothie
 
-    def send_mock(self, target):
+    def send_mock(target):
         smoothie_switch_res = 'X_max:0 Y_max:0 Z_max:0 A_max:0 B_max:0 C_max:0'
         smoothie_switch_res += ' _pins '
         smoothie_switch_res += '(XL)2.01:0 (YL)2.01:0 (ZL)2.01:0 '
         smoothie_switch_res += '(AL)2.01:0 (BL)2.01:0 (CL)2.01:0 Probe: 0\r\n'
         return smoothie_switch_res
 
-    driver._send_command = types.MethodType(send_mock, driver)
+    monkeypatch.setattr(driver, '_send_command', send_mock)
 
     expected = {
         'X': False,
@@ -669,14 +633,14 @@ def test_switch_state(smoothie):
     }
     assert driver.switch_state == expected
 
-    def send_mock(self, target):
+    def send_mock(target):
         smoothie_switch_res = 'X_max:0 Y_max:0 Z_max:0 A_max:1 B_max:0 C_max:0'
         smoothie_switch_res += ' _pins '
         smoothie_switch_res += '(XL)2.01:0 (YL)2.01:0 (ZL)2.01:0 '
         smoothie_switch_res += '(AL)2.01:0 (BL)2.01:0 (CL)2.01:0 Probe: 1\r\n'
         return smoothie_switch_res
 
-    driver._send_command = types.MethodType(send_mock, driver)
+    monkeypatch.setattr(driver, '_send_command', send_mock)
 
     expected = {
         'X': False,
@@ -698,9 +662,6 @@ def test_clear_limit_switch(smoothie, monkeypatch):
     encoded in this test. If requirements change around physical behavior, then
     this test will need to be revised.
     """
-    from opentrons.drivers.smoothie_drivers.driver_3_0 import (
-        serial_communication, GCODES, SmoothieError)
-
     driver = smoothie
     driver.home('xyza')
     cmd_list = []
@@ -708,9 +669,9 @@ def test_clear_limit_switch(smoothie, monkeypatch):
     def write_mock(command, ack, serial_connection, timeout, tag=None):
         nonlocal cmd_list
         cmd_list.append(command)
-        if GCODES['MOVE'] in command:
+        if driver_3_0.GCODES['MOVE'] in command:
             return "ALARM: Hard limit +C"
-        elif GCODES['CURRENT_POSITION'] in command:
+        elif driver_3_0.GCODES['CURRENT_POSITION'] in command:
             return 'ok M114.2 X:10 Y:20: Z:30 A:40 B:50 C:60'
         else:
             return "ok"
@@ -719,7 +680,7 @@ def test_clear_limit_switch(smoothie, monkeypatch):
 
     driver.simulating = False
     # This will cause a limit-switch error and not back off
-    with pytest.raises(SmoothieError):
+    with pytest.raises(driver_3_0.SmoothieError):
         driver.move({'C': 100})
 
     assert [c.strip() for c in cmd_list] == [
@@ -750,9 +711,6 @@ def test_pause_resume(model):
     True, but when testing whether `pause` actually pauses and `resume`
     resumes, `simulating` must be False.
     """
-    from numpy import isclose
-    from opentrons.trackers import pose_tracker
-    from time import sleep
 
     pipette = model.instrument._instrument
     robot = model.robot
@@ -794,8 +752,6 @@ def test_speed_change(robot, instruments, monkeypatch):
     pipette = instruments.Pipette(mount='right', ul_per_mm=ulmm)
     robot._driver.simulating = False
 
-    from opentrons.drivers import serial_communication
-    from opentrons.drivers.smoothie_drivers import driver_3_0
     command_log = []
 
     def write_with_log(command, ack, connection, timeout, tag=None):
