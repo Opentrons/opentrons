@@ -410,14 +410,15 @@ describe('discovery selectors', () => {
       expected: null,
     },
     {
-      name: 'getRobotProtocolApiVersion returns first health.protocol_api_version',
+      name:
+        'getRobotProtocolApiVersion returns first health.protocol_api_version',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
       state: {
-        serverHealth: {  },
+        serverHealth: {},
         health: { protocol_api_version: [2, 0] },
       },
       selector: discovery.getRobotProtocolApiVersion,
-      expected: 2,
+      expected: [2, 0],
     },
     {
       name: 'getRobotProtocolApiVersion returns null if no healths',

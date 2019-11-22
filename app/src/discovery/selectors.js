@@ -151,7 +151,5 @@ export const getRobotFirmwareVersion = (robot: AnyRobot): ?string =>
   (robot.health && robot.health.fw_version) ||
   (robot.serverHealth && robot.serverHealth.smoothieVersion)
 
-export const getRobotProtocolApiVersion = (robot: AnyRobot): ?number =>
-  robot.health &&
-  robot.health.protocol_api_version &&
-  robot.health.protocol_api_version[0]
+export const getRobotProtocolApiVersion = (robot: AnyRobot): Array<number> =>
+  robot.health && robot.health.protocol_api_version

@@ -39,7 +39,7 @@ function InformationCard(props: Props) {
   const lastUpdated = props.lastUpdated
     ? moment(props.lastUpdated).format(DATE_FORMAT)
     : '-'
-
+  const formattedApiLevel = apiLevel ? `${apiLevel[0]}.${apiLevel[1]}` : null
   return (
     <React.Fragment>
       <InfoSection title={INFO_TITLE}>
@@ -63,7 +63,7 @@ function InformationCard(props: Props) {
           <SectionContentHalf>
             <LabeledValue
               label="Protocol API Version"
-              value={apiLevel || '-'}
+              value={formattedApiLevel || '-'}
             />
           </SectionContentHalf>
         </CardRow>
@@ -84,6 +84,6 @@ function mapStateToProps(state: State): $Exact<Props> {
     lastUpdated: getProtocolLastUpdated(state),
     method: getProtocolMethod(state),
     description: getProtocolDescription(state),
-    apiLevel: robotSelectors.getApiLevel(state)[0],
+    apiLevel: robotSelectors.getApiLevel(state),
   }
 }

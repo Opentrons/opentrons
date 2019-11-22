@@ -64,6 +64,9 @@ export default function InformationCard(props: Props) {
   const version = getRobotApiVersion(robot)
   const firmwareVersion = getRobotFirmwareVersion(robot)
   const protocolApiVersion = getRobotProtocolApiVersion(robot)
+  const formattedProtocolApiVersion = protocolApiVersion
+    ? `${protocolApiVersion[0]}.${protocolApiVersion[1]}`
+    : null
 
   const updateFilesUnavailable = updateType === null
   const updateServerUnavailable = !serverOk
@@ -122,7 +125,7 @@ export default function InformationCard(props: Props) {
         <CardContentThird overrideLast>
           <LabeledValue
             label={MAX_API_VERSION_LABEL}
-            value={protocolApiVersion || 'Unknown'}
+            value={formattedProtocolApiVersion || 'Unknown'}
           />
         </CardContentThird>
       </div>
