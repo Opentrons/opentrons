@@ -15,7 +15,6 @@ from typing import Any, Callable, Dict, Optional, TextIO, Union
 
 import opentrons
 from opentrons import protocol_api, __version__
-from opentrons.protocol_api.legacy_wrapper import api
 from opentrons.protocol_api import (execute as execute_apiv2,
                                     MAX_SUPPORTED_VERSION)
 from opentrons import commands
@@ -264,7 +263,6 @@ def main() -> int:
     else:
         log_level = 'warning'
     # Try to migrate containers from database to v2 format
-    api.maybe_migrate_containers()
     execute(args.protocol, log_level=log_level, emit_runlog=printer)
     return 0
 

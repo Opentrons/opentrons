@@ -7,7 +7,6 @@ from opentrons.config import feature_flags as ff
 from opentrons.broker import Broker
 from opentrons.types import Point, Mount, Location
 from opentrons.protocol_api import labware
-from opentrons.protocol_api.legacy_wrapper import containers_wrapper
 from opentrons.hardware_control import CriticalPoint
 
 from .models import Container
@@ -21,7 +20,7 @@ VALID_STATES = {'probing', 'moving', 'ready'}
 # just one well, Placeable.wells() returns the Well rather than [Well].
 # Passing the well as an argument, though, will always return the well.
 def _well0(cont):
-    if isinstance(cont, (labware.Labware, containers_wrapper.LegacyLabware)):
+    if isinstance(cont, labware.Labware):
         return cont.wells()[0]
     else:
         return cont.wells(0)

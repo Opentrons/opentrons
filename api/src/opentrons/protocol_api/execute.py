@@ -4,10 +4,8 @@ import traceback
 import sys
 from typing import Any, Callable
 
-import opentrons
 from .contexts import ProtocolContext
 from . import execute_v3
-from .legacy_wrapper import api
 
 from opentrons.protocols.types import PythonProtocol, Protocol, APIVersion
 
@@ -116,27 +114,6 @@ def _run_python(
         raise ExceptionInProtocolError(e, tb, str(e), frame.lineno)
 
 
-def _run_python_legacy(proto: PythonProtocol, context: ProtocolContext):
-    new_globs = globals()
-    context._api_version = APIVersion(2, 0)
-    namespace_mapping = api.build_globals(context)
-    for key, value in namespace_mapping.items():
-        setattr(opentrons, key, value)
-    try:
-        exec(proto.contents, new_globs)
-    except Exception as e:
-        exc_type, exc_value, tb = sys.exc_info()
-        try:
-            frame = _find_protocol_error(tb, proto.filename)
-        except KeyError:
-            # No pretty names, just raise it
-            raise e
-        raise ExceptionInProtocolError(e, tb, str(e), frame.lineno)
-    finally:
-        for key in namespace_mapping.keys():
-            delattr(opentrons, key)
-
-
 def run_protocol(protocol: Protocol,
                  context: ProtocolContext):
     """ Run a protocol.
@@ -147,8 +124,6 @@ def run_protocol(protocol: Protocol,
     if isinstance(protocol, PythonProtocol):
         if protocol.api_level >= APIVersion(2, 0):
             _run_python(protocol, context)
-        elif protocol.api_level == APIVersion(1, 0):
-            _run_python_legacy(protocol, context)
         else:
             raise RuntimeError(
                 f'Unsupported python API version: {protocol.api_level}'
