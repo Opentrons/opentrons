@@ -57,8 +57,6 @@ export type FailedLabwareFile =
   | DuplicateLabwareFile
   | OpentronsLabwareFile
 
-export type CheckedLabwareFileType = $PropertyType<CheckedLabwareFile, 'type'>
-
 // state types
 
 export type CustomLabwareState = $ReadOnly<{|
