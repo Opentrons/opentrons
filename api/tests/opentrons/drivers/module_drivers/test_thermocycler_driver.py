@@ -9,8 +9,6 @@
 # expected ACK, then it'll eventually time out and return an error
 
 import types
-import time
-import asyncio
 from opentrons.drivers.thermocycler import Thermocycler
 
 
@@ -19,7 +17,6 @@ async def test_set_block_temperature():
 
     tc = Thermocycler(lambda x: None)
     command_log = []
-    return_string = 'T:none C:90'
 
     tc._target_temp = 25
     tc._current_temp = 25

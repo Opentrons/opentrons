@@ -72,9 +72,9 @@ class SimulatingDriver:
 
     async def set_temperature(self,
                               temp: float,
-                              hold_time: float,
-                              ramp_rate: float,
-                              volume: float) -> None:
+                              hold_time: float = None,
+                              ramp_rate: float = None,
+                              volume: float = None) -> None:
         self._target_temp = temp
         self._hold_time = hold_time
         self._ramp_rate = ramp_rate
@@ -224,7 +224,14 @@ class Thermocycler(mod_abc.AbstractModule):
             for step_idx, step in enumerate(steps):
                 await self._running_flag.wait()
                 self._current_step_index = step_idx + 1  # science starts at 1
-                await self.set_temperature(**step, volume=volume)
+                await self.set_temperature(temperature=step.get('temperature'),
+                                           hold_time_minutes=step.get(
+                                               'hold_time_minutes', None),
+                                           hold_time_seconds=step.get(
+                                               'hold_time_seconds', None),
+                                           ramp_rate=step.get(
+                                               'ramp_rate', None),
+                                           volume=volume)
                 await self.wait_for_hold()
 
     async def cycle_temperatures(self,
