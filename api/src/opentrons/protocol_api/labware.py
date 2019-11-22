@@ -42,9 +42,6 @@ CUSTOM_NAMESPACE = 'custom_beta'
 STANDARD_DEFS_PATH = Path(sys.modules['opentrons'].__file__).parent /\
     'shared_data' / 'labware' / 'definitions' / '2'
 
-# TODO BC 2019-11-19 pull pipette offsets/positions from some pipette definitions data
-OFFSET_8_CHANNEL = 9 # offset in mm between tips
-MULTICHANNEL_TIP_SPAN = OFFSET_8_CHANNEL * (8 - 1) # length in mm from first to last tip of multichannel
 
 
 LabwareDefinition = Dict[str, Any]
@@ -359,12 +356,6 @@ class Labware(DeckItem):
         # Applied properties
         self._update_calibrated_offset(self._calibrated_offset)
         self._wells = self._build_wells(volume_by_well)
-        self._multi_well_sets: Sequence[Sequence[Well]] = []
-        for well in self.wells():
-            well_set = self._get_multi_well_set(well)
-            if well_set:
-                self._multi_well_sets.append(well_set)
-
         self._pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
         self._definition = definition
         self._highest_z = self._dimensions['zDimension']
@@ -836,14 +827,18 @@ class Labware(DeckItem):
         for well in drop_targets:
             well.has_tip = True
 
-    def _get_multi_well_set(self, back_well: Well):
+    def _get_multi_well_set(self,
+                            back_well: Well,
+                            channel_count: int,
+                            tip_offset_mm: float):
         back_x = back_well.top().point.x
         back_y= back_well.top().point.y
-        tip_positions = [{'x': back_x, 'y': back_y - (tip_no * OFFSET_8_CHANNEL)}
+        tip_positions = [{'x': back_x, 'y': back_y - (tip_no * tip_offset_mm)}
                          for tip_no in list(range(8))]
 
         if 'centerMultichannelOnWells' in self.quirks:
-            tip_positions = [{**pos, 'y': pos['y'] + (MULTICHANNEL_TIP_SPAN / 2)}
+            tip_span = tip_offset_mm * (channel_count - 1)
+            tip_positions = [{**pos, 'y': pos['y'] + (tip_span / 2)}
                              for pos in tip_positions]
         wells_accessed = []
         for position in tip_positions:
@@ -869,10 +864,16 @@ class Labware(DeckItem):
                 return []
         return wells_accessed
 
-    @property  # type: ignore
     @requires_version(2, 0)
-    def multi_well_sets(self):
-        return self._multi_well_sets
+    def get_multi_well_sets(self, channel_count: int, tip_offset: float):
+        multi_well_sets: Sequence[Sequence[Well]] = []
+        for well in self.wells():
+            well_set = self._get_multi_well_set(back_well=well,
+                                                channel_count=channel_count,
+                                                tip_offset=tip_offset)
+            if well_set:
+                multi_well_sets.append(well_set)
+        return multi_well_sets
 
     @requires_version(2, 0)
     def reset(self):
