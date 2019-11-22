@@ -841,9 +841,9 @@ class InstrumentContext(CommandPublisher):
         cmds.do_publish(self.broker, cmds.aspirate, self.aspirate,
                         'before', None, None, self, volume, dest, rate)
         self._hw_manager.hardware.aspirate(self._mount, volume, rate)
-        if isinstance(location, Well):
+        if isinstance(dest.labware, Well):
             update_well_volumes(instrument_type=self.type,
-                                target_well=location,
+                                target_well=dest.labware,
                                 delta=-1 * volume)
         cmds.do_publish(self.broker, cmds.aspirate, self.aspirate,
                         'after', self, None, self, volume, dest, rate)
@@ -927,9 +927,9 @@ class InstrumentContext(CommandPublisher):
         cmds.do_publish(self.broker, cmds.dispense, self.dispense,
                         'before', None, None, self, volume, loc, rate)
         self._hw_manager.hardware.dispense(self._mount, volume, rate)
-        if isinstance(location, Well):
+        if isinstance(loc.labware, Well):
             update_well_volumes(instrument_type=self.type,
-                                target_well=location,
+                                target_well=loc.labware,
                                 delta=volume)
         cmds.do_publish(self.broker, cmds.dispense, self.dispense,
                         'after', self, None, self, volume, loc, rate)
@@ -1040,9 +1040,9 @@ class InstrumentContext(CommandPublisher):
                 "dispense) must previously have been called so the robot "
                 "knows where it is.")
         self._hw_manager.hardware.blow_out(self._mount)
-        if isinstance(location, Well):
+        if isinstance(location.labware, Well):
             update_well_volumes(instrument_type=self.type,
-                                target_well=location,
+                                target_well=location.labware,
                                 delta=self.current_volume)
         return self
 

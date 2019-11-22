@@ -11,8 +11,6 @@ mod_log = logging.getLogger(__name__)
 
 # TODO BC 2019-11-19 pull pipette offsets/positions from some pipette definitions data
 OFFSET_8_CHANNEL = 9  # offset in mm between tips
-# length in mm from first to last tip of multichannel
-TIP_SPAN_8_CHANNEL = OFFSET_8_CHANNEL * (8 - 1)
 
 
 class Pipette:
