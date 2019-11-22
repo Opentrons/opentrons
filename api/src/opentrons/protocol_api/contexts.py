@@ -16,8 +16,8 @@ from .labware import (Well, Labware, get_labware_definition, load_module,
                       LabwareDefinition, load_from_definition, load)
 from opentrons.protocols.types import APIVersion, Protocol
 from .util import (FlowRates, PlungerSpeeds, Clearances, AxisMaxSpeeds,
-                   HardwareManager, clamp_value, requires_version,
-                   update_well_volumes)
+                   HardwareManager, clamp_value, requires_version)
+
 from . import geometry
 from . import transfers
 from .definitions import MAX_SUPPORTED_VERSION
@@ -287,7 +287,6 @@ class ProtocolContext(CommandPublisher):
             labware_def: LabwareDefinition,
             location: types.DeckLocation,
             label: str = None,
-            volume_by_well: Dict[str, float] = None,
     ) -> Labware:
         """ Specify the presence of a piece of labware on the OT2 deck.
 
@@ -300,10 +299,7 @@ class ProtocolContext(CommandPublisher):
         :type location: int or str
         """
         parent = self.deck.position_for(location)
-        labware_obj = load_from_definition(labware_def,
-                                           parent,
-                                           label,
-                                           volume_by_well=volume_by_well)
+        labware_obj = load_from_definition(labware_def, parent, label)
         self._deck_layout[location] = labware_obj
         return labware_obj
 
@@ -315,7 +311,6 @@ class ProtocolContext(CommandPublisher):
             label: str = None,
             namespace: str = None,
             version: int = None,
-            volume_by_well: Dict[str, float] = None,
     ) -> Labware:
         """ Load a labware onto the deck given its name.
 
@@ -344,7 +339,7 @@ class ProtocolContext(CommandPublisher):
             bundled_defs=self._bundled_labware,
             extra_defs=self._extra_labware)
         return self.load_labware_from_definition(
-            labware_def, location, label, volume_by_well)
+            labware_def, location, label)
 
     @requires_version(2, 0)
     def load_labware_by_name(
@@ -841,10 +836,6 @@ class InstrumentContext(CommandPublisher):
         cmds.do_publish(self.broker, cmds.aspirate, self.aspirate,
                         'before', None, None, self, volume, dest, rate)
         self._hw_manager.hardware.aspirate(self._mount, volume, rate)
-        if isinstance(location, Well):
-            update_well_volumes(instrument_type=self.type,
-                                target_well=location,
-                                delta=-1 * volume)
         cmds.do_publish(self.broker, cmds.aspirate, self.aspirate,
                         'after', self, None, self, volume, dest, rate)
         return self
@@ -923,14 +914,9 @@ class InstrumentContext(CommandPublisher):
                 " method that moves to a location (such as move_to or "
                 "aspirate) must previously have been called so the robot "
                 "knows where it is.")
-
         cmds.do_publish(self.broker, cmds.dispense, self.dispense,
                         'before', None, None, self, volume, loc, rate)
         self._hw_manager.hardware.dispense(self._mount, volume, rate)
-        if isinstance(location, Well):
-            update_well_volumes(instrument_type=self.type,
-                                target_well=location,
-                                delta=volume)
         cmds.do_publish(self.broker, cmds.dispense, self.dispense,
                         'after', self, None, self, volume, loc, rate)
         return self
@@ -1040,10 +1026,6 @@ class InstrumentContext(CommandPublisher):
                 "dispense) must previously have been called so the robot "
                 "knows where it is.")
         self._hw_manager.hardware.blow_out(self._mount)
-        if isinstance(location, Well):
-            update_well_volumes(instrument_type=self.type,
-                                target_well=location,
-                                delta=self.current_volume)
         return self
 
     @cmds.publish.both(command=cmds.touch_tip)
@@ -1993,7 +1975,7 @@ class ModuleContext(CommandPublisher):
         return mod_labware
 
     @requires_version(2, 0)
-    def load_labware(self, name: str, volume_by_well: Dict[str, float] = None) -> Labware:
+    def load_labware(self, name: str) -> Labware:
         """ Specify the presence of a piece of labware on the module.
 
         :param name: The name of the labware object.
@@ -2001,15 +1983,12 @@ class ModuleContext(CommandPublisher):
         """
         lw = load(
             name, self._geometry.location,
-            bundled_defs=self._ctx._bundled_labware,
-            volume_by_well=volume_by_well)
+            bundled_defs=self._ctx._bundled_labware)
         return self.load_labware_object(lw)
 
     @requires_version(2, 0)
     def load_labware_from_definition(
-            self, definition: Dict[str, Any],
-            volume_by_well: Dict[str, float] = None,
-            ) -> Labware:
+            self, definition: Dict[str, Any]) -> Labware:
         """
         Specify the presence of a labware on the module, using an
         inline definition.
@@ -2310,13 +2289,11 @@ class ThermocyclerContext(ModuleContext):
             specified, the Thermocycler will proceed to the next command
             after ``temperature`` is reached.
         """
-
         return self._module.set_temperature(
                 temperature=temperature,
                 hold_time_seconds=hold_time_seconds,
                 hold_time_minutes=hold_time_minutes,
-                ramp_rate=ramp_rate,
-                volume=self._get_block_max_volume())
+                ramp_rate=ramp_rate)
 
     @cmds.publish.both(command=cmds.thermocycler_set_lid_temperature)
     @requires_version(2, 0)
@@ -2369,9 +2346,7 @@ class ThermocyclerContext(ModuleContext):
                         "either hold_time_minutes or hold_time_seconds must be"
                         "defined for each step in cycle")
         return self._module.cycle_temperatures(
-                steps=steps,
-                repetitions=repetitions,
-                volume=self._get_block_max_volume())
+            steps=steps, repetitions=repetitions)
 
     @cmds.publish.both(command=cmds.thermocycler_deactivate_lid)
     @requires_version(2, 0)
@@ -2467,9 +2442,3 @@ class ThermocyclerContext(ModuleContext):
     def current_step_index(self):
         """ Index of the current step within the current cycle"""
         return self._module.current_step_index
-
-    def _get_block_max_volume(self) -> Optional[float]:
-        if self.labware and self.labware.volume_by_well:
-            max_vol = max(self.labware.volume_by_well.values())
-            return max_vol if max_vol > 0 else None
-        return None
