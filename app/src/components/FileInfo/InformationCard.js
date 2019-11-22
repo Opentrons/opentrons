@@ -23,7 +23,7 @@ type Props = {
   lastUpdated: ?number,
   method: ?string,
   description: ?string,
-  apiLevel: ?number,
+  apiLevel: ?[number, number],
 }
 
 const INFO_TITLE = 'Information'
