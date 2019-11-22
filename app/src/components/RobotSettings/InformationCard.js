@@ -65,8 +65,6 @@ export default function InformationCard(props: Props) {
   const firmwareVersion = getRobotFirmwareVersion(robot)
   const protocolApiVersion = getRobotProtocolApiVersion(robot)
 
-  console.log(robot.health)
-
   const updateFilesUnavailable = updateType === null
   const updateServerUnavailable = !serverOk
   const otherRobotUpdating = Boolean(buildrootRobot && buildrootRobot !== robot)
