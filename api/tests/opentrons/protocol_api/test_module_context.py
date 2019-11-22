@@ -180,8 +180,7 @@ def test_thermocycler_temp(loop, monkeypatch):
     assert mod.hold_time == 0
     assert mod.ramp_rate is None
 
-    set_temp_hw_mock = mock.Mock(
-        side_effect=mod._module._api.set_temperature)
+    set_temp_hw_mock = mock.Mock()
     monkeypatch.setattr(
         mod._module._api, 'set_temperature', set_temp_hw_mock)
 

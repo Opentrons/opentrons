@@ -1,4 +1,5 @@
 import asyncio
+from unittest import mock
 from opentrons.hardware_control import modules
 
 
@@ -56,3 +57,23 @@ async def test_sim_update():
     assert therm.temperature is None
     assert therm.target is None
     assert therm.status == 'idle'
+
+
+async def test_set_temperature(monkeypatch):
+    hw_tc = await modules.build('', 'thermocycler', True, lambda x: None)
+
+    def async_return(result):
+        f = asyncio.Future()
+        f.set_result(result)
+        return f
+    set_temp_driver_mock = mock.Mock(return_value=async_return(''))
+    monkeypatch.setattr(
+        hw_tc._driver, 'set_temperature', set_temp_driver_mock)
+
+    await hw_tc.set_temperature(30, hold_time_seconds=20,
+                                hold_time_minutes=1, volume=35)
+    # Test volume param
+    set_temp_driver_mock.assert_called_once_with(temp=30,
+                                                 hold_time=80,
+                                                 volume=35,
+                                                 ramp_rate=None)
