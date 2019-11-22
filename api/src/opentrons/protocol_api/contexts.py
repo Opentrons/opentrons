@@ -2263,7 +2263,8 @@ class ThermocyclerContext(ModuleContext):
                               temperature: float,
                               hold_time_seconds: float = None,
                               hold_time_minutes: float = None,
-                              ramp_rate: float = None):
+                              ramp_rate: float = None,
+                              block_max_volume: float = None):
         """ Set the target temperature for the well block, in °C.
 
         Valid operational range yet to be determined.
@@ -2293,7 +2294,8 @@ class ThermocyclerContext(ModuleContext):
                 temperature=temperature,
                 hold_time_seconds=hold_time_seconds,
                 hold_time_minutes=hold_time_minutes,
-                ramp_rate=ramp_rate)
+                ramp_rate=ramp_rate,
+                volume=block_max_volume)
 
     @cmds.publish.both(command=cmds.thermocycler_set_lid_temperature)
     @requires_version(2, 0)

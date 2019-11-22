@@ -16,7 +16,6 @@ import pkgutil
 import shutil
 import sys
 import abc
-from math import sqrt
 from pathlib import Path
 from collections import defaultdict
 from enum import Enum, auto
@@ -41,7 +40,6 @@ OPENTRONS_NAMESPACE = 'opentrons'
 CUSTOM_NAMESPACE = 'custom_beta'
 STANDARD_DEFS_PATH = Path(sys.modules['opentrons'].__file__).parent /\
     'shared_data' / 'labware' / 'definitions' / '2'
-
 
 
 LabwareDefinition = Dict[str, Any]
@@ -86,8 +84,6 @@ class Well:
                  parent: Location,
                  display_name: str,
                  has_tip: bool,
-                 starting_volume: float,
-                 well_id: str,
                  api_level: APIVersion) -> None:
         """
         Create a well, and track the Point corresponding to the top-center of
@@ -110,21 +106,19 @@ class Well:
             = Point(well_props['x'],
                     well_props['y'],
                     well_props['z'] + well_props['depth']) + parent.point
-        self._well_id = well_id
 
         if not parent.labware:
             raise ValueError("Wells must have a parent")
         self._parent = parent.labware
         self._has_tip = has_tip
-        self._volume = starting_volume if starting_volume else 0
         self._shape = well_shapes.get(well_props['shape'])
         if self._shape is WellShape.RECTANGULAR:
-            self._x_dimension = well_props['xDimension']
-            self._y_dimension = well_props['yDimension']
+            self._length = well_props['xDimension']
+            self._width = well_props['yDimension']
             self._diameter = None
         elif self._shape is WellShape.CIRCULAR:
-            self._x_dimension = None
-            self._y_dimension = None
+            self._length = None
+            self._width = None
             self._diameter = well_props['diameter']
         else:
             raise ValueError(
@@ -145,11 +139,6 @@ class Well:
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def well_id(self) -> str:
-        return self._well_id
-
-    @property  # type: ignore
-    @requires_version(2, 0)
     def has_tip(self) -> bool:
         return self._has_tip
 
@@ -165,14 +154,6 @@ class Well:
     @property
     def display_name(self):
         return self._display_name
-
-    @property
-    def volume(self):
-        return self._volume
-
-    @volume.setter
-    def volume(self, value: float):
-        self._volume = value
 
     @requires_version(2, 0)
     def top(self, z: float = 0.0) -> Location:
@@ -244,8 +225,8 @@ class Well:
         """
         center = self._center()
         if self._shape is WellShape.RECTANGULAR:
-            x_size = self._x_dimension
-            y_size = self._y_dimension
+            x_size = self._length
+            y_size = self._width
         else:
             x_size = self._diameter
             y_size = self._diameter
@@ -302,7 +283,6 @@ class Labware(DeckItem):
     def __init__(
             self, definition: dict,
             parent: Location, label: str = None,
-            volume_by_well: Dict[str, float] = None,
             api_level: APIVersion = None) -> None:
         """
         :param definition: A dict representing all required data for a labware,
@@ -354,8 +334,8 @@ class Labware(DeckItem):
             = Point(offset['x'], offset['y'], offset['z']) + parent.point
         self._parent = parent.labware
         # Applied properties
-        self._update_calibrated_offset(self._calibrated_offset)
-        self._wells = self._build_wells(volume_by_well)
+        self.set_calibration(self._calibrated_offset)
+
         self._pattern = re.compile(r'^([A-Z]+)([1-9][0-9]*)$', re.X)
         self._definition = definition
         self._highest_z = self._dimensions['zDimension']
@@ -416,25 +396,19 @@ class Labware(DeckItem):
         else:
             return self._parameters['magneticModuleEngageHeight']
 
-    def _build_wells(self, volume_by_well: Dict[str, float] = None) -> Sequence[Well]:
+    def _build_wells(self) -> Sequence[Well]:
         """
         This function is used to create one instance of wells to be used by all
         accessor functions. It is only called again if a new offset needs
         to be applied.
         """
-        if volume_by_well is None:
-            vol_by_well = self.volume_by_well
-        else:
-            vol_by_well = volume_by_well
         return [
             Well(
-                well_props=self._well_definition[well],
-                parent=Location(self._calibrated_offset, self),
-                display_name="{} of {}".format(well, self._display_name),
-                has_tip=self._is_tiprack,
-                starting_volume=vol_by_well.get(well) or 0,
-                well_id=well,
-                api_level=self._api_version)
+                self._well_definition[well],
+                Location(self._calibrated_offset, self),
+                "{} of {}".format(well, self._display_name),
+                self._is_tiprack,
+                self._api_version)
             for well in self._ordering]
 
     def _create_indexed_dictionary(self, group=0):
@@ -451,16 +425,13 @@ class Labware(DeckItem):
             dict_list[self._pattern.match(index).group(group)].append(well_obj)
         return dict_list
 
-    def _update_calibrated_offset(self, delta: Point):
-        self._calibrated_offset = Point(x=self._offset.x + delta.x,
-                                        y=self._offset.y + delta.y,
-                                        z=self._offset.z + delta.z)
-
     def set_calibration(self, delta: Point):
         """
         Called by save calibration in order to update the offset on the object.
         """
-        self._update_calibrated_offset(delta)
+        self._calibrated_offset = Point(x=self._offset.x + delta.x,
+                                        y=self._offset.y + delta.y,
+                                        z=self._offset.z + delta.z)
         self._wells = self._build_wells()
 
     @property  # type: ignore
@@ -631,11 +602,6 @@ class Labware(DeckItem):
             'columns_by_index is deprecated and will be deleted in version '
             '3.12.0. please use columns_by_name')
         return self.columns_by_name()
-
-    @property
-    def volume_by_well(self) -> Dict[str, float]:
-        """ as is_tiprack but not subject to version checking for speed """
-        return {well.well_id: well.volume for well in self.wells()}
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -827,53 +793,6 @@ class Labware(DeckItem):
         for well in drop_targets:
             well.has_tip = True
 
-    def _get_multi_well_set(self,
-                            back_well: Well,
-                            channel_count: int,
-                            tip_offset_mm: float):
-        back_x = back_well.top().point.x
-        back_y= back_well.top().point.y
-        tip_positions = [{'x': back_x, 'y': back_y - (tip_no * tip_offset_mm)}
-                         for tip_no in list(range(8))]
-
-        if 'centerMultichannelOnWells' in self.quirks:
-            tip_span = tip_offset_mm * (channel_count - 1)
-            tip_positions = [{**pos, 'y': pos['y'] + (tip_span / 2)}
-                             for pos in tip_positions]
-        wells_accessed = []
-        for position in tip_positions:
-            found = False
-            for well in self.wells():
-                x_diff = position['x'] - well.top().point.x
-                y_diff = position['y'] - well.top().point.y
-                if well._diameter is not None and \
-                        sqrt(x_diff**2 + y_diff**2) <= well.diameter / 2:
-                    # circular well where tip lies within well radius
-                    found = True
-                    break
-                elif well._diameter is None and \
-                        abs(x_diff) <= well._x_dimension and \
-                        abs(y_diff) <= well._y_dimension:
-                    # rectangular well where tip lies within well dimensions
-                    found = True
-                    break
-                    wells_accessed.append(well)
-            if found:
-                wells_accessed.append(well)
-            else:
-                return []
-        return wells_accessed
-
-    def get_multi_well_sets(self, channel_count: int, tip_offset: float):
-        multi_well_sets: Sequence[Sequence[Well]] = []
-        for well in self.wells():
-            well_set = self._get_multi_well_set(back_well=well,
-                                                channel_count=channel_count,
-                                                tip_offset=tip_offset)
-            if well_set:
-                multi_well_sets.append(well_set)
-        return multi_well_sets
-
     @requires_version(2, 0)
     def reset(self):
         """Reset all tips in a tiprack
@@ -881,8 +800,6 @@ class Labware(DeckItem):
         if self._is_tiprack:
             for well in self.wells():
                 well.has_tip = True
-
-
 
 
 class ModuleGeometry(DeckItem):
@@ -1542,7 +1459,6 @@ def load_from_definition(
         definition: Dict[str, Any],
         parent: Location,
         label: str = None,
-        volume_by_well: Dict[str, float] = None,
         api_level: APIVersion = None) -> Labware:
     """
     Return a labware object constructed from a provided labware definition dict
@@ -1558,15 +1474,12 @@ def load_from_definition(
                    (often the front-left corner of a slot on the deck).
     :param str label: An optional label that will override the labware's
                       display name from its definition
-    :param volume_by_well: If specified, a mapping of well names to well
-        starting volume. If no map is passed, all wells initialize to 0µL.
     :param APIVersion api_level: the API version to set for the loaded labware
                                  instance. The :py:class:`.Labware` will
                                  conform to this level. If not specified,
                                  defaults to :py:attr:`.MAX_SUPPORTED_VERSION`.
     """
-    labware = Labware(definition, parent, label,
-                      volume_by_well=volume_by_well, api_level=api_level)
+    labware = Labware(definition, parent, label, api_level)
     load_calibration(labware)
     return labware
 
@@ -1579,7 +1492,6 @@ def load(
     version: int = 1,
     bundled_defs: Dict[str, LabwareDefinition] = None,
     extra_defs: Dict[str, LabwareDefinition] = None,
-    volume_by_well: Dict[str, float] = None,
     api_level: APIVersion = None
 ) -> Labware:
     """
@@ -1604,8 +1516,6 @@ def load(
     :param extra_defs: If specified, a mapping of labware names to labware
         definitions. If no bundle is passed, these definitions will also be
         searched.
-    :param volume_by_well: If specified, a mapping of well names to well
-        starting volume. If no map is passed, all wells initialize to 0µL.
     :param APIVersion api_level: the API version to set for the loaded labware
                                  instance. The :py:class:`.Labware` will
                                  conform to this level. If not specified,
@@ -1615,4 +1525,4 @@ def load(
         load_name, namespace, version,
         bundled_defs=bundled_defs,
         extra_defs=extra_defs)
-    return load_from_definition(definition, parent, label, volume_by_well, api_level)
+    return load_from_definition(definition, parent, label, api_level)
