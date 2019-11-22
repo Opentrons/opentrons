@@ -2354,7 +2354,7 @@ class ThermocyclerContext(ModuleContext):
                         "either hold_time_minutes or hold_time_seconds must be"
                         "defined for each step in cycle")
         return self._module.cycle_temperatures(steps=steps,
-                                               repetitions=repetitions
+                                               repetitions=repetitions,
                                                volume=block_max_volume)
 
     @cmds.publish.both(command=cmds.thermocycler_deactivate_lid)

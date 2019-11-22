@@ -290,6 +290,8 @@ class Thermocycler:
         temp_cmd, temp = _build_temp_code(temp=temp,
                                           hold_time=hold_time,
                                           volume=volume)
+        print(f'\n\ndriver {volume}\n\n')
+
         await self._write_and_wait(temp_cmd)
         retries = 0
         while (self._target_temp != temp) or (self._hold_time != hold_time):
