@@ -31,5 +31,31 @@ async def test_set_block_temperature():
 
     tc._write_and_wait = types.MethodType(_mock_write_and_wait, tc)
 
-    await tc.set_temperature(25, volume=80)
-    assert command_log.pop() == 'M104 S25 V80'
+    # basic set block temp
+    await tc.set_temperature(21)
+    assert command_log.pop(0) == 'M104 S21'
+
+    # upper clamp set block temp
+    await tc.set_temperature(130)
+    assert command_log.pop(0) == 'M104 S99'
+
+    # lower clamp set block temp
+    await tc.set_temperature(-30)
+    assert command_log.pop(0) == 'M104 S0'
+
+    # hold set block temp
+    await tc.set_temperature(21, hold_time=1)
+    assert command_log.pop(0) == 'M104 S21 H1'
+
+    # volume set block temp
+    await tc.set_temperature(21, volume=75)
+    assert command_log.pop(0) == 'M104 S21 V75'
+
+    # hold and volume set block temp
+    await tc.set_temperature(21, hold_time=1, volume=75)
+    assert command_log.pop(0) == 'M104 S21 H1 V75'
+
+    # ramp rate set block temp
+    await tc.set_temperature(21, ramp_rate=3)
+    assert command_log.pop(0) == 'M566 S3'
+    assert command_log.pop(0) == 'M104 S21'

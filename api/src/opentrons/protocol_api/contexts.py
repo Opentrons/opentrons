@@ -2292,6 +2292,7 @@ class ThermocyclerContext(ModuleContext):
             specified, the Thermocycler will proceed to the next command
             after ``temperature`` is reached.
         """
+
         return self._module.set_temperature(
                 temperature=temperature,
                 hold_time_seconds=hold_time_seconds,

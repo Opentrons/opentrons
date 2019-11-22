@@ -34,16 +34,18 @@ GCODES = {
 LID_TARGET_DEFAULT = 105    # Degree celsius
 LID_TARGET_MIN = 37
 LID_TARGET_MAX = 110
+BLOCK_TARGET_MIN = 0
+BLOCK_TARGET_MAX = 99
 TEMP_UPDATE_RETRIES = 15
 
 
 def _build_temp_code(temp: float,
                      hold_time: Optional[float],
                      volume: Optional[float]):
-    if temp < 0:
-        temp = 0
-    if temp > 99:
-        temp = 99
+    if temp < BLOCK_TARGET_MIN:
+        temp = BLOCK_TARGET_MIN
+    if temp > BLOCK_TARGET_MAX:
+        temp = BLOCK_TARGET_MAX
     cmd = f"{GCODES['SET_PLATE_TEMP']} S{temp}"
     if hold_time:
         cmd += f' H{hold_time}'
@@ -290,8 +292,6 @@ class Thermocycler:
         temp_cmd, temp = _build_temp_code(temp=temp,
                                           hold_time=hold_time,
                                           volume=volume)
-        print(f'\n\ndriver {volume}\n\n')
-
         await self._write_and_wait(temp_cmd)
         retries = 0
         while (self._target_temp != temp) or (self._hold_time != hold_time):
