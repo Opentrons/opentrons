@@ -843,8 +843,8 @@ class InstrumentContext(CommandPublisher):
         self._hw_manager.hardware.aspirate(self._mount, volume, rate)
         if isinstance(location, Well):
             update_well_volumes(instrument_type=self.type,
-                                     target_well=location,
-                                     delta=-1 * volume)
+                                target_well=location,
+                                delta=-1 * volume)
         cmds.do_publish(self.broker, cmds.aspirate, self.aspirate,
                         'after', self, None, self, volume, dest, rate)
         return self
@@ -929,8 +929,8 @@ class InstrumentContext(CommandPublisher):
         self._hw_manager.hardware.dispense(self._mount, volume, rate)
         if isinstance(location, Well):
             update_well_volumes(instrument_type=self.type,
-                                     target_well=location,
-                                     delta=volume)
+                                target_well=location,
+                                delta=volume)
         cmds.do_publish(self.broker, cmds.dispense, self.dispense,
                         'after', self, None, self, volume, loc, rate)
         return self
@@ -1042,8 +1042,8 @@ class InstrumentContext(CommandPublisher):
         self._hw_manager.hardware.blow_out(self._mount)
         if isinstance(location, Well):
             update_well_volumes(instrument_type=self.type,
-                                     target_well=location,
-                                     delta=self.current_volume)
+                                target_well=location,
+                                delta=self.current_volume)
         return self
 
     @cmds.publish.both(command=cmds.touch_tip)
