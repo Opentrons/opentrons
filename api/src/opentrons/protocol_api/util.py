@@ -1,12 +1,11 @@
 """ Utility functions and classes for the protocol api """
-from collections import UserDict, namedtuple
+from collections import UserDict
 import functools
 import logging
 from typing import Any, Callable, Optional, TYPE_CHECKING, Union
 
 from opentrons.protocols.types import APIVersion
 from opentrons.hardware_control import types, adapters, API, HardwareAPILike
-from opentrons.hardware_control.pipette import OFFSET_8_CHANNEL
 
 if TYPE_CHECKING:
     from .contexts import InstrumentContext
@@ -32,7 +31,6 @@ def _assert_gzero(val: Any, message: str) -> float:
 
 class FlowRates:
     """ Utility class for rich setters/getters for flow rates """
-
     def __init__(self,
                  instr: 'InstrumentContext') -> None:
         self._instr = instr
@@ -73,7 +71,6 @@ class FlowRates:
 
 class PlungerSpeeds:
     """ Utility class for rich setters/getters for speeds """
-
     def __init__(self,
                  instr: 'InstrumentContext') -> None:
         self._instr = instr
@@ -290,18 +287,3 @@ class ModifiedList(list):
             if name == item.replace("-", "_").lower():
                 return True
         return False
-
-
-def update_well_volumes(instrument_type: str,
-                        target_well,
-                        delta: float):
-    if instrument_type == 'multi':
-        well_sets = target_well.parent.get_multi_well_sets(
-            channel_count=8,
-            tip_offset=OFFSET_8_CHANNEL)
-        for well_set in well_sets:
-            if well_set[0] == target_well:
-                for well in well_set:
-                    well.volume = well.volume + delta
-    else:
-        target_well.volume = target_well.volume + delta
