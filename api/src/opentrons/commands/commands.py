@@ -11,8 +11,6 @@ from opentrons.legacy_api.containers import (Well as OldWell,
                                              Slot as OldSlot,
                                              location_to_list)
 from opentrons.protocol_api.labware import Well, Labware, ModuleGeometry
-from opentrons.protocol_api.legacy_wrapper.containers_wrapper import (
-    LegacyWell, LegacyLabware)
 from opentrons.types import Location
 from opentrons.drivers import utils
 
@@ -61,8 +59,7 @@ def _stringify_new_loc(loc: Union[Location, Well]) -> str:
 
 
 def _stringify_legacy_loc(loc: Union[OldWell, OldContainer,
-                                     OldSlot, LegacyLabware, LegacyWell,
-                                     None]) -> str:
+                                     OldSlot, None]) -> str:
     def get_slot(location):
         trace = location.get_trace()
         for item in trace:
@@ -76,8 +73,6 @@ def _stringify_legacy_loc(loc: Union[OldWell, OldContainer,
         OldSlot: 'slot',
         OldContainer: 'container',
         OldWell: 'well',
-        LegacyLabware: 'container',
-        LegacyWell: 'well'
     }
 
     # Coordinates only
