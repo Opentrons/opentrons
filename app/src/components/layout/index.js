@@ -4,6 +4,7 @@ import CardRow from './CardRow'
 import CardColumn from './CardColumn'
 import CardContentFull from './CardContentFull'
 import CardContentHalf from './CardContentHalf'
+import CardContentThird from './CardContentThird'
 import CardContentQuarter from './CardContentQuarter'
 import CardContentFlex from './CardContentFlex'
 import SectionContentFull from './SectionContentFull'
@@ -15,6 +16,7 @@ export {
   CardColumn,
   CardContentFull,
   CardContentHalf,
+  CardContentThird,
   CardContentQuarter,
   CardContentFlex,
   SectionContentFull,

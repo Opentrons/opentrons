@@ -4,7 +4,11 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { getRobotApiVersion, getRobotFirmwareVersion } from '../../discovery'
+import {
+  getRobotApiVersion,
+  getRobotFirmwareVersion,
+  getRobotProtocolApiVersion,
+} from '../../discovery'
 
 import {
   getBuildrootRobot,
@@ -20,7 +24,7 @@ import {
   useInterval,
 } from '@opentrons/components'
 
-import { CardContentQuarter } from '../layout'
+import { CardContentThird } from '../layout'
 
 import type { Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
@@ -34,6 +38,7 @@ const TITLE = 'Information'
 const NAME_LABEL = 'Robot name'
 const SERVER_VERSION_LABEL = 'Server version'
 const FIRMWARE_VERSION_LABEL = 'Firmware version'
+const MAX_API_VERSION_LABEL = 'Max API Version'
 
 const UPDATE_SERVER_UNAVAILABLE =
   "Unable to update because your robot's update server is not responding"
@@ -56,9 +61,11 @@ export default function InformationCard(props: Props) {
 
   const { displayName, serverOk } = robot
   const buildrootRobot = useSelector(getBuildrootRobot)
-
   const version = getRobotApiVersion(robot)
   const firmwareVersion = getRobotFirmwareVersion(robot)
+  const protocolApiVersion = getRobotProtocolApiVersion(robot)
+
+  console.log(robot.health)
 
   const updateFilesUnavailable = updateType === null
   const updateServerUnavailable = !serverOk
@@ -81,36 +88,46 @@ export default function InformationCard(props: Props) {
 
   return (
     <Card title={TITLE}>
-      <CardContentQuarter>
-        <LabeledValue label={NAME_LABEL} value={displayName} />
-      </CardContentQuarter>
-      <CardContentQuarter>
-        <LabeledValue
-          label={SERVER_VERSION_LABEL}
-          value={version || 'Unknown'}
-        />
-      </CardContentQuarter>
-      <CardContentQuarter>
-        <LabeledValue
-          label={FIRMWARE_VERSION_LABEL}
-          value={firmwareVersion || 'Unknown'}
-        />
-      </CardContentQuarter>
-      <CardContentQuarter>
-        <HoverTooltip tooltipComponent={updateButtonTooltip}>
-          {hoverTooltipHandlers => (
-            <div {...hoverTooltipHandlers}>
-              <OutlineButton
-                Component={Link}
-                to={updateUrl}
-                disabled={updateDisabled}
-              >
-                {updateButtonText}
-              </OutlineButton>
-            </div>
-          )}
-        </HoverTooltip>
-      </CardContentQuarter>
+      <div>
+        <CardContentThird>
+          <LabeledValue label={NAME_LABEL} value={displayName} />
+        </CardContentThird>
+        <CardContentThird>
+          <LabeledValue
+            label={SERVER_VERSION_LABEL}
+            value={version || 'Unknown'}
+          />
+        </CardContentThird>
+        <CardContentThird>
+          <HoverTooltip tooltipComponent={updateButtonTooltip}>
+            {hoverTooltipHandlers => (
+              <div {...hoverTooltipHandlers}>
+                <OutlineButton
+                  Component={Link}
+                  to={updateUrl}
+                  disabled={updateDisabled}
+                >
+                  {updateButtonText}
+                </OutlineButton>
+              </div>
+            )}
+          </HoverTooltip>
+        </CardContentThird>
+      </div>
+      <div>
+        <CardContentThird>
+          <LabeledValue
+            label={FIRMWARE_VERSION_LABEL}
+            value={firmwareVersion || 'Unknown'}
+          />
+        </CardContentThird>
+        <CardContentThird overrideLast>
+          <LabeledValue
+            label={MAX_API_VERSION_LABEL}
+            value={protocolApiVersion || 'Unknown'}
+          />
+        </CardContentThird>
+      </div>
     </Card>
   )
 }

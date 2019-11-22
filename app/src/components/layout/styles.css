@@ -57,6 +57,23 @@
   }
 }
 
+.card_content_third {
+  display: inline-block;
+  font-size: 0;
+  vertical-align: top;
+  width: calc(1 / 3 * 100%);
+  padding: 1rem 0 1rem 1rem;
+
+  &:last-child {
+    text-align: right;
+    padding: 1rem;
+  }
+
+  &.override_last {
+    text-align: left;
+  }
+}
+
 .card_content_flex {
   display: flex;
   justify-content: space-between;

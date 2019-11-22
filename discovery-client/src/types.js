@@ -7,6 +7,7 @@ export type HealthResponse = {
   fw_version: string,
   system_version?: string,
   logs?: Array<string>,
+  protocol_api_version?: Array<number>,
 }
 
 export type Capability =
