@@ -16,7 +16,8 @@ from .labware import (Well, Labware, get_labware_definition, load_module,
                       LabwareDefinition, load_from_definition, load)
 from opentrons.protocols.types import APIVersion, Protocol
 from .util import (FlowRates, PlungerSpeeds, Clearances, AxisMaxSpeeds,
-                   HardwareManager, clamp_value, requires_version)
+                   HardwareManager, clamp_value, requires_version,
+                   update_well_volumes)
 from . import geometry
 from . import transfers
 from .definitions import MAX_SUPPORTED_VERSION
@@ -841,13 +842,9 @@ class InstrumentContext(CommandPublisher):
                         'before', None, None, self, volume, dest, rate)
         self._hw_manager.hardware.aspirate(self._mount, volume, rate)
         if isinstance(location, Well):
-            if self.type == 'multi':
-                for well_set in location.parent.multi_well_sets:
-                    if well_set[0] == location:
-                        for well in well_set:
-                            well.volume = well.volume - volume
-            else:
-                location.volume = location.volume - volume
+            update_well_volumes(instrument_type=self.type,
+                                     target_well=location,
+                                     delta=-1 * volume)
         cmds.do_publish(self.broker, cmds.aspirate, self.aspirate,
                         'after', self, None, self, volume, dest, rate)
         return self
@@ -931,14 +928,9 @@ class InstrumentContext(CommandPublisher):
                         'before', None, None, self, volume, loc, rate)
         self._hw_manager.hardware.dispense(self._mount, volume, rate)
         if isinstance(location, Well):
-            if self.type == 'multi':
-                for well_set in location.parent.multi_well_sets:
-                    if well_set[0] == location:
-                        for well in well_set:
-                            well.volume = well.volume + volume
-                        break
-            else:
-                location.volume = location.volume + volume
+            update_well_volumes(instrument_type=self.type,
+                                     target_well=location,
+                                     delta=volume)
         cmds.do_publish(self.broker, cmds.dispense, self.dispense,
                         'after', self, None, self, volume, loc, rate)
         return self
@@ -1049,13 +1041,9 @@ class InstrumentContext(CommandPublisher):
                 "knows where it is.")
         self._hw_manager.hardware.blow_out(self._mount)
         if isinstance(location, Well):
-            if self.type == 'multi':
-                for well_set in location.parent.multi_well_sets:
-                    if well_set[0] == location:
-                        for well in well_set:
-                            well.volume = well.volume + self.current_volume
-            else:
-                location.volume = location.volume + self.current_volume
+            update_well_volumes(instrument_type=self.type,
+                                     target_well=location,
+                                     delta=self.current_volume)
         return self
 
     @cmds.publish.both(command=cmds.touch_tip)

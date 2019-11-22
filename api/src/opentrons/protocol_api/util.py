@@ -6,6 +6,7 @@ from typing import Any, Callable, Optional, TYPE_CHECKING, Union
 
 from opentrons.protocols.types import APIVersion
 from opentrons.hardware_control import types, adapters, API, HardwareAPILike
+from opentrons.hardware_control.pipette import OFFSET_8_CHANNEL
 
 if TYPE_CHECKING:
     from .contexts import InstrumentContext
@@ -289,3 +290,18 @@ class ModifiedList(list):
             if name == item.replace("-", "_").lower():
                 return True
         return False
+
+
+def update_well_volumes(instrument_type: str,
+                        target_well,
+                        delta: float):
+    if instrument_type == 'multi':
+        well_sets = target_well.parent.get_multi_well_sets(
+            channel_count=8,
+            tip_offset=OFFSET_8_CHANNEL)
+        for well_set in well_sets:
+            if well_set[0] == target_well:
+                for well in well_set:
+                    well.volume = well.volume + delta
+    else:
+        target_well.volume = target_well.volume + delta
