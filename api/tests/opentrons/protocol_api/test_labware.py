@@ -4,6 +4,7 @@ import pkgutil
 import pytest
 
 from opentrons.protocol_api import labware, MAX_SUPPORTED_VERSION
+from opentrons.protocol_api.util import get_multi_well_set
 from opentrons.types import Point, Location
 
 test_data = {
@@ -472,6 +473,8 @@ def test_initialize_volume():
 
 
 def test_multi_well_set():
+    channel_count = 8
+
     # well sets for 96 well plate
     def_96 = labware.get_labware_definition('corning_96_wellplate_360ul_flat')
     lw_96 = labware.Labware(def_96, Location(Point(0, 0, 0), 'Test Slot'))
@@ -487,8 +490,14 @@ def test_multi_well_set():
                     ['A10', 'B10', 'C10', 'D10', 'E10', 'F10', 'G10', 'H10'],
                     ['A11', 'B11', 'C11', 'D11', 'E11', 'F11', 'G11', 'H11'],
                     ['A12', 'B12', 'C12', 'D12', 'E12', 'F12', 'G12', 'H12']]
-    id_sets_96 = [[w.well_id for w in ws] for ws in lw_96.multi_well_sets]
-    assert id_sets_96 == well_sets_96
+    for well_set in well_sets_96:
+        found_set = get_multi_well_set(
+            back_well=lw_96.wells_by_name()[well_set[0]],
+            channel_count=channel_count,
+            wells=lw_96.wells(),
+            labware_quirks=lw_96.quirks)
+        found_ids = [w.well_id for w in found_set]
+        assert found_ids == well_set
 
     # well sets for 12 column trough
     def_tr = labware.get_labware_definition(
@@ -508,8 +517,14 @@ def test_multi_well_set():
                     ['A11', 'A11', 'A11', 'A11', 'A11', 'A11', 'A11', 'A11'],
                     ['A12', 'A12', 'A12', 'A12', 'A12', 'A12', 'A12', 'A12']]
 
-    id_sets_tr = [[w.well_id for w in ws] for ws in lw_tr.multi_well_sets]
-    assert id_sets_tr == well_sets_tr
+    for well_set in well_sets_tr:
+        found_set = get_multi_well_set(
+            back_well=lw_tr.wells_by_name()[well_set[0]],
+            channel_count=channel_count,
+            wells=lw_tr.wells(),
+            labware_quirks=lw_tr.quirks)
+        found_ids = [w.well_id for w in found_set]
+        assert found_ids == well_set
 
     # well sets for 384 well plate
     def_384 = labware.get_labware_definition(
@@ -564,5 +579,11 @@ def test_multi_well_set():
                      ['A24', 'C24', 'E24', 'G24', 'I24', 'K24', 'M24', 'O24'],
                      ['B24', 'D24', 'F24', 'H24', 'J24', 'L24', 'N24', 'P24']]
 
-    id_sets = [[w.well_id for w in ws] for ws in lw_384.multi_well_sets]
-    assert id_sets == well_sets_384
+    for well_set in well_sets_384:
+        found_set = get_multi_well_set(
+            back_well=lw_384.wells_by_name()[well_set[0]],
+            channel_count=channel_count,
+            wells=lw_384.wells(),
+            labware_quirks=lw_384.quirks)
+        found_ids = [w.well_id for w in found_set]
+        assert found_ids == well_set

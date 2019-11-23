@@ -2,6 +2,7 @@
 from collections import UserDict, namedtuple
 import functools
 import logging
+from math import sqrt
 from typing import Any, Callable, Optional, TYPE_CHECKING, Union, Sequence
 
 from opentrons.protocols.types import APIVersion

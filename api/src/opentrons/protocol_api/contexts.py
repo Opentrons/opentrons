@@ -1041,8 +1041,8 @@ class InstrumentContext(CommandPublisher):
                 "dispense) must previously have been called so the robot "
                 "knows where it is.")
         self._hw_manager.hardware.blow_out(self._mount)
-        if isinstance(location.labware, Well):
-            update_well_volumes(target_well=location.labware,
+        if isinstance(location, Well):
+            update_well_volumes(target_well=location,
                                 volume_delta=self.current_volume,
                                 channel_count=self.channels)
         return self
