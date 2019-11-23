@@ -2,13 +2,14 @@
 from collections import UserDict, namedtuple
 import functools
 import logging
-from typing import Any, Callable, Optional, TYPE_CHECKING, Union
+from typing import Any, Callable, Optional, TYPE_CHECKING, Union, Sequence
 
 from opentrons.protocols.types import APIVersion
 from opentrons.hardware_control import types, adapters, API, HardwareAPILike
-from opentrons.hardware_control.pipette import OFFSET_8_CHANNEL
+from opentrons.hardware_control.pipette import MULTI_TIP_Y_OFFSET
 
 if TYPE_CHECKING:
+    from .labware import Well
     from .contexts import InstrumentContext
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -292,16 +293,57 @@ class ModifiedList(list):
         return False
 
 
-def update_well_volumes(instrument_type: str,
-                        target_well,
-                        delta: float):
-    if instrument_type == 'multi':
-        well_sets = target_well.parent.get_multi_well_sets(
-            channel_count=8,
-            tip_offset=OFFSET_8_CHANNEL)
-        for well_set in well_sets:
-            if well_set[0] == target_well:
-                for well in well_set:
-                    well.volume = well.volume + delta
+def get_multi_well_set(back_well: 'Well',
+                       channel_count: int,
+                       wells: Sequence['Well'],
+                       labware_quirks: Sequence[str]):
+    back_x = back_well.top().point.x
+    back_y = back_well.top().point.y
+    tip_positions = [{'x': back_x, 'y': back_y - (tip_no * MULTI_TIP_Y_OFFSET)}
+                     for tip_no in range(channel_count)]
+
+    if 'centerMultichannelOnWells' in labware_quirks:
+        tip_span = MULTI_TIP_Y_OFFSET * (channel_count - 1)
+        tip_positions = [{**pos, 'y': pos['y'] + (tip_span / 2)}
+                         for pos in tip_positions]
+    wells_accessed = []
+    for position in tip_positions:
+        found_well_at_tip = False
+        for well in wells:
+            x_diff = position['x'] - well.top().point.x
+            y_diff = position['y'] - well.top().point.y
+            if well._diameter is not None and \
+                    sqrt(x_diff**2 + y_diff**2) <= well.diameter / 2:
+                    # circular well where tip lies within well radius
+                found_well_at_tip = True
+                break
+            elif well._diameter is None and \
+                    abs(x_diff) <= (well._x_dimension / 2) and \
+                    abs(y_diff) <= (well._y_dimension / 2):
+                # rectangular well where tip lies within well dimensions
+                found_well_at_tip = True
+                break
+        if found_well_at_tip:
+            wells_accessed.append(well)
+        else:
+            return []
+    return wells_accessed
+
+
+def update_well_volumes(target_well: 'Well',
+                        volume_delta: float,
+                        channel_count: str):
+    if channel_count > 1:
+        parent = target_well.parent
+        well_set = get_multi_well_set(back_well=target_well,
+                                      channel_count=channel_count,
+                                      wells=parent.wells(),
+                                      labware_quirks=parent.quirks())
+        if well_set == []:
+            MODULE_LOG.warning(
+                'cannot update volume of wells effected'
+                ' by incompatible multichannel pipette')
+        for well in well_set:
+            well.volume = well.volume + volume_delta
     else:
-        target_well.volume = target_well.volume + delta
+        target_well.volume = target_well.volume + volume_delta

@@ -827,10 +827,10 @@ class Labware(DeckItem):
         for well in drop_targets:
             well.has_tip = True
 
-    def _get_multi_well_set(self,
-                            back_well: Well,
-                            channel_count: int,
-                            tip_offset_mm: float):
+    def get_multi_well_set(self,
+                           back_well: Well,
+                           channel_count: int,
+                           tip_offset_mm: float):
         back_x = back_well.top().point.x
         back_y= back_well.top().point.y
         tip_positions = [{'x': back_x, 'y': back_y - (tip_no * tip_offset_mm)}
@@ -842,37 +842,27 @@ class Labware(DeckItem):
                              for pos in tip_positions]
         wells_accessed = []
         for position in tip_positions:
-            found = False
+            found_well_at_tip = False
             for well in self.wells():
                 x_diff = position['x'] - well.top().point.x
                 y_diff = position['y'] - well.top().point.y
                 if well._diameter is not None and \
                         sqrt(x_diff**2 + y_diff**2) <= well.diameter / 2:
                     # circular well where tip lies within well radius
-                    found = True
+                    found_well_at_tip = True
                     break
                 elif well._diameter is None and \
-                        abs(x_diff) <= well._x_dimension and \
-                        abs(y_diff) <= well._y_dimension:
+                        abs(x_diff) <= (well._x_dimension / 2) and \
+                        abs(y_diff) <= (well._y_dimension / 2):
                     # rectangular well where tip lies within well dimensions
-                    found = True
+                    found_well_at_tip = True
                     break
-                    wells_accessed.append(well)
-            if found:
+            if found_well_at_tip:
                 wells_accessed.append(well)
             else:
                 return []
         return wells_accessed
 
-    def get_multi_well_sets(self, channel_count: int, tip_offset: float):
-        multi_well_sets: Sequence[Sequence[Well]] = []
-        for well in self.wells():
-            well_set = self._get_multi_well_set(back_well=well,
-                                                channel_count=channel_count,
-                                                tip_offset=tip_offset)
-            if well_set:
-                multi_well_sets.append(well_set)
-        return multi_well_sets
 
     @requires_version(2, 0)
     def reset(self):

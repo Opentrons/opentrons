@@ -842,9 +842,9 @@ class InstrumentContext(CommandPublisher):
                         'before', None, None, self, volume, dest, rate)
         self._hw_manager.hardware.aspirate(self._mount, volume, rate)
         if isinstance(dest.labware, Well):
-            update_well_volumes(instrument_type=self.type,
-                                target_well=dest.labware,
-                                delta=-1 * volume)
+            update_well_volumes(target_well=dest.labware,
+                                volume_delta=-1 * volume,
+                                channel_count=self.channels)
         cmds.do_publish(self.broker, cmds.aspirate, self.aspirate,
                         'after', self, None, self, volume, dest, rate)
         return self
@@ -928,9 +928,10 @@ class InstrumentContext(CommandPublisher):
                         'before', None, None, self, volume, loc, rate)
         self._hw_manager.hardware.dispense(self._mount, volume, rate)
         if isinstance(loc.labware, Well):
-            update_well_volumes(instrument_type=self.type,
-                                target_well=loc.labware,
-                                delta=volume)
+            update_well_volumes(target_well=loc.labware,
+                                volume_delta=volume,
+                                channel_count=self.channels)
+
         cmds.do_publish(self.broker, cmds.dispense, self.dispense,
                         'after', self, None, self, volume, loc, rate)
         return self
@@ -1041,9 +1042,9 @@ class InstrumentContext(CommandPublisher):
                 "knows where it is.")
         self._hw_manager.hardware.blow_out(self._mount)
         if isinstance(location.labware, Well):
-            update_well_volumes(instrument_type=self.type,
-                                target_well=location.labware,
-                                delta=self.current_volume)
+            update_well_volumes(target_well=location.labware,
+                                volume_delta=self.current_volume,
+                                channel_count=self.channels)
         return self
 
     @cmds.publish.both(command=cmds.touch_tip)

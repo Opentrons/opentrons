@@ -10,7 +10,7 @@ from .types import CriticalPoint
 mod_log = logging.getLogger(__name__)
 
 # TODO BC 2019-11-19 pull pipette offsets/positions from some pipette definitions data
-OFFSET_8_CHANNEL = 9  # offset in mm between tips
+MULTI_TIP_Y_OFFSET = 9  # offset in mm between tips
 
 
 class Pipette:
