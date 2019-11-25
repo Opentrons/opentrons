@@ -41,7 +41,7 @@ TEMP_DECK_BAUDRATE = 115200
 TEMP_DECK_COMMAND_TERMINATOR = '\r\n\r\n'
 TEMP_DECK_ACK = 'ok\r\nok\r\n'
 
-temp_locks: Dict[str, object] = {}
+temp_locks: Dict[str, Lock] = {}
 
 
 class TempDeckError(Exception):
@@ -59,6 +59,7 @@ class TempDeck:
         self._temperature = {'current': 25, 'target': None}
         self._update_thread = None
         self._lock = None
+        self._port = None
 
     def connect(self, port=None) -> Optional[str]:
         if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
@@ -67,11 +68,9 @@ class TempDeck:
             self.disconnect(port)
             self._connect_to_port(port)
             self._wait_for_ack()  # verify the device is there
-            lock_for_port = temp_locks.get(port)
-            if not lock_for_port:
-                temp_locks[port] = Lock()
-                lock_for_port = temp_locks.get(port)
-            self._lock = lock_for_port
+            self._port = port
+            self._check_lock(self._port)
+
         except (SerialException, SerialNoResponse) as e:
             return str(e)
         return ''
@@ -89,6 +88,13 @@ class TempDeck:
         if not self._connection:
             return False
         return self._connection.is_open
+
+    def _check_lock(self, port):
+        lock_for_port = temp_locks.get(port)
+        if not lock_for_port:
+            temp_locks[port] = Lock()
+            lock_for_port = temp_locks.get(port)
+        self._lock = lock_for_port
 
     @property
     def port(self) -> Optional[str]:
@@ -108,6 +114,7 @@ class TempDeck:
         self.run_flag.wait()
         celsius = round(float(celsius),
                         utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
+        self._check_lock(self._port)
         with self._lock:
             try:
                 self._send_command(
@@ -124,6 +131,7 @@ class TempDeck:
         self.run_flag.wait()
         celsius = round(float(celsius),
                         utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
+        self._check_lock(self._port)
         with self._lock:
             try:
                 self._send_command(
@@ -193,6 +201,7 @@ class TempDeck:
         Example input from Temp-Deck's serial response:
             "serial:aa11bb22 model:aa11bb22 version:aa11bb22"
         '''
+        self._check_lock(self._port)
         with self._lock:
             try:
                 return self._recursive_get_info(DEFAULT_COMMAND_RETRIES)
@@ -206,6 +215,7 @@ class TempDeck:
         self.run_flag.set()
 
     def enter_programming_mode(self) -> str:
+        self._check_lock(self._port)
         with self._lock:
             try:
                 self._send_command(GCODES['PROGRAMMING_MODE'])
