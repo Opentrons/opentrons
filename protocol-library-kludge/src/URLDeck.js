@@ -4,13 +4,13 @@ import styles from './URLDeck.css'
 
 import {
   RobotWorkSpace,
-  Labware,
+  Labware as LegacyLabwareRender,
   LabwareNameOverlay,
   LabwareRender,
   Module,
   RobotCoordsForeignDiv,
 } from '@opentrons/components'
-import { getLatestLabwareDef } from './getLabware'
+import { getLatestLabwareDef, getLegacyLabwareDef } from './getLabware'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import type { ModuleType, DeckSlotId } from '@opentrons/shared-data'
 
@@ -80,12 +80,28 @@ export default class URLDeck extends React.Component<{}> {
             if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
             const module = modulesBySlot && modulesBySlot[slotId]
             const labware = labwareBySlot && labwareBySlot[slotId]
-            const labwareDef =
+            const labwareDefV2 =
               labware && getLatestLabwareDef(labware.labwareType)
-            const labwareDisplayType: string | null =
-              (labwareDef
-                ? labwareDef.metadata.displayName
-                : labware?.labwareType) || null
+            const labwareDefV1 =
+              labwareDefV2 || !labware
+                ? null
+                : getLegacyLabwareDef(labware.labwareType)
+            let labwareDisplayType: string | null = null
+            if (labwareDefV2) {
+              labwareDisplayType = labwareDefV2.metadata.displayName
+            } else if (labwareDefV1) {
+              labwareDisplayType =
+                labwareDefV1.metadata.displayName || labwareDefV1.metadata.name
+            } else {
+              labwareDisplayType = labware?.labwareType || null
+            }
+            console.log({
+              slot,
+              labware,
+              labwareDefV1,
+              labwareDefV2,
+              labwareDisplayType,
+            })
 
             return (
               <Fragment key={slotId}>
@@ -104,14 +120,13 @@ export default class URLDeck extends React.Component<{}> {
                       slot.position[1]
                     })`}
                   >
-                    {labwareDef ? (
-                      <LabwareRender definition={labwareDef} />
+                    {labwareDefV2 ? (
+                      <LabwareRender definition={labwareDefV2} />
                     ) : (
-                      <Labware
-                        key={`${labware.labwareType}:${slotId}`}
+                      <LegacyLabwareRender
                         x={0}
                         y={0}
-                        labware={labware}
+                        definition={labwareDefV1}
                       />
                     )}
                   </g>
