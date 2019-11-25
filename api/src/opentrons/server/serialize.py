@@ -34,7 +34,8 @@ def _get_object_tree(max_depth, path, refs, depth, obj):  # noqa C901
     if isinstance(obj, (list, tuple)):
         return [object_tree(o) for o in obj]
 
-    def iterate(kv): return {str(k): object_tree(v) for k, v in kv.items()}
+    def iterate(kv):
+        return {str(k): object_tree(v) for k, v in kv.items()}
 
     if isinstance(obj, dict):
         return object_container(iterate(obj))
@@ -51,7 +52,8 @@ def _get_object_tree(max_depth, path, refs, depth, obj):  # noqa C901
 
         # Filter out private attributes
         attributes = {
-            k: v for k, v in obj.__dict__.items() if not k.startswith('_')}
+            k: v for k, v in obj.__dict__.items()
+            if not k.startswith('_')}
         return object_container({**iterate(attributes), **tail})
     else:
         return object_container({})

@@ -4,7 +4,7 @@ from copy import copy
 from functools import reduce, wraps
 import logging
 from time import time
-from typing import List
+from typing import List, Dict, Any
 from uuid import uuid4
 from opentrons import robot
 from opentrons.broker import Broker
@@ -61,7 +61,40 @@ class SessionManager(object):
                       adapters.SynchronousAdapter):
             self._hardware.join()
 
-    def create(self, name, contents, is_binary=False):
+    def create(
+            self,
+            name: str,
+            contents: str,
+            is_binary: bool = False) -> 'Session':
+        """ Create a protocol session from either
+
+        - a json protocol
+        - a python protocol file
+        - a zipped protocol bundle (deprecated, for back compat)
+
+        No new code should be written that calls this function with
+        ``is_binary=True`` and a base64'd zip in ``contents``; instead,
+        use :py:meth:`.create_from_bundle`.
+
+        :param str name: The name of the protocol
+        :param str contents: The contents of the protocol; this should be
+                             either the contents of the file if it can be
+                             parsed directly or a base64d version of the
+                             contents if it is a zip. If it is base64,
+                             ``is_binary`` must be true. Do not write new
+                             code that uses this.
+        :param bool is_binary: ``True`` if ``contents`` is a base64'd zip.
+                               Do not write new code that uses this.
+        :returns Session: The created session.
+        :raises Exception: If another session is simulating at the time
+
+        .. note::
+
+            This function is mostly (only) intended to be called via rpc.
+        """
+        if is_binary:
+            log.warning("session.create: called with bundle")
+
         if self._session_lock:
             raise Exception(
                 'Cannot create session while simulation in progress')
@@ -78,11 +111,88 @@ class SessionManager(object):
                 hardware=self._hardware,
                 loop=self._loop,
                 broker=self._broker,
-                motion_lock=self._motion_lock)
+                motion_lock=self._motion_lock,
+                extra_labware=[])
+            return self.session
         finally:
             self._session_lock = False
 
-        return self.session
+    def create_from_bundle(self, name: str, contents: str) -> 'Session':
+        """ Create a protocol session from a base64'd zip file.
+
+        :param str name: The name of the protocol
+        :param str contents: The contents of the zip file, base64
+                             encoded
+        :returns Session: The created session
+        :raises Exception: If another session is simulating at the time
+
+        .. note::
+
+            This function is mostly (only) intended to be called via rpc.
+        """
+        if self._session_lock:
+            raise Exception(
+                'Cannot create session while simulation in progress')
+
+        self._session_lock = True
+        try:
+            _contents = base64.b64decode(contents)
+            session_short_id = hex(uuid4().fields[0])
+            session_logger = self._command_logger.getChild(session_short_id)
+            self._broker.set_logger(session_logger)
+            self.session = Session.build_and_prep(
+                name=name,
+                contents=_contents,
+                hardware=self._hardware,
+                loop=self._loop,
+                broker=self._broker,
+                motion_lock=self._motion_lock,
+                extra_labware=[])
+            return self.session
+        finally:
+            self._session_lock = False
+
+    def create_with_extra_labware(
+            self,
+            name: str,
+            contents: str,
+            extra_labware: List[Dict[str, Any]]) -> 'Session':
+        """
+        Create a protocol session from a python protocol string with a list
+        of extra custom labware to make available.
+
+        :param str name: The name of the protocol
+        :param str contents: The contents of the protocol file
+        :param extra_labware: A list of labware definitions to make available
+                              to protocol executions. This should be a list
+                              of directly serialized definitions.
+        :returns Session: The created session
+        :raises Exception: If another session is simulating at the time
+
+        .. note::
+
+            This function is mostly (only) intended to be called via rpc.
+        """
+        if self._session_lock:
+            raise Exception(
+                "Cannot create session while simulation in progress")
+
+        self._session_lock = True
+        try:
+            session_short_id = hex(uuid4().fields[0])
+            session_logger = self._command_logger.getChild(session_short_id)
+            self._broker.set_logger(session_logger)
+            self.session = Session.build_and_prep(
+                name=name,
+                contents=contents,
+                hardware=self._hardware,
+                loop=self._loop,
+                broker=self._broker,
+                motion_lock=self._motion_lock,
+                extra_labware=extra_labware)
+            return self.session
+        finally:
+            self._session_lock = False
 
     def clear(self):
         if self._session_lock:
@@ -103,9 +213,11 @@ class Session(object):
 
     @classmethod
     def build_and_prep(
-        cls, name, contents, hardware, loop, broker, motion_lock
+        cls, name, contents, hardware, loop, broker, motion_lock, extra_labware
     ):
-        protocol = parse(contents, filename=name)
+        protocol = parse(contents, filename=name,
+                         extra_labware={labware.uri_from_definition(defn): defn
+                                        for defn in extra_labware})
         sess = cls(name, protocol, hardware, loop, broker, motion_lock)
         sess.prepare()
         return sess
@@ -252,7 +364,13 @@ class Session(object):
                 self._simulating_ctx = ProtocolContext(
                     loop=self._loop,
                     hardware=sim,
-                    broker=self._broker)
+                    broker=self._broker,
+                    bundled_labware=getattr(
+                        self._protocol, 'bundled_labware', None),
+                    bundled_data=getattr(
+                        self._protocol, 'bundled_data', None),
+                    extra_labware=getattr(
+                        self._protocol, 'extra_labware', {}))
                 run_protocol(self._protocol,
                              context=self._simulating_ctx)
             else:
@@ -359,7 +477,12 @@ class Session(object):
                 ctx = ProtocolContext.build_using(
                     self._protocol,
                     loop=self._loop,
-                    broker=self._broker)
+                    broker=self._broker,
+                    bundled_labware=getattr(
+                        self._protocol, 'bundled_labware', None),
+                    bundled_data=getattr(
+                        self._protocol, 'bundled_data', None),
+                    extra_labware=getattr(self._protocol, 'extra_labware', {}))
                 ctx.connect(self._hardware)
                 ctx.home()
                 run_protocol(self._protocol, context=ctx)
