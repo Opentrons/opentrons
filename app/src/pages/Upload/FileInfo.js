@@ -1,19 +1,31 @@
 // @flow
 import * as React from 'react'
 
-import { SpinnerModal } from '@opentrons/components'
+import { Splash, SpinnerModal, AlertItem } from '@opentrons/components'
 import Page from '../../components/Page'
 import FileInfo from '../../components/FileInfo'
 
 import type { Robot } from '../../discovery/types'
 
+// TODO(mc, 2019-11-25): i18n
+const UPLOAD_AND_SIMULATE_PROTOCOL = 'Upload and Simulate Protocol'
+
+const SIMULATION_IN_PROGRESS = 'Simulation in Progress'
+
+const ROBOT_DOESNT_SUPPORT_CUSTOM_LABWARE =
+  "Robot doesn't support custom labware"
+
+const YOU_HAVE_CUSTOM_LABWARE_BUT_THIS_ROBOT_NEEDS_UPDATE =
+  'You have custom labware definitions saved to your app, but this robot needs to be updated before you can use these definitions with Python protocols'
+
 type Props = {|
   robot: Robot,
-  filename: string,
+  filename: ?string,
   uploadInProgress: boolean,
   uploadError: ?{ message: string },
   sessionLoaded: boolean,
   sessionHasSteps: boolean,
+  showCustomLabwareWarning: boolean,
 |}
 
 export default function FileInfoPage(props: Props) {
@@ -24,22 +36,33 @@ export default function FileInfoPage(props: Props) {
     uploadError,
     sessionLoaded,
     sessionHasSteps,
+    showCustomLabwareWarning,
   } = props
 
+  const titleBarProps = filename
+    ? { title: filename, subtitle: 'overview' }
+    : { title: UPLOAD_AND_SIMULATE_PROTOCOL }
+
+  const sessionLoadedSuccessfully = sessionLoaded && !uploadError
+
   return (
-    <Page
-      titleBarProps={{
-        title: filename,
-        subtitle: 'overview',
-      }}
-    >
-      <FileInfo
-        robot={robot}
-        sessionLoaded={sessionLoaded}
-        sessionHasSteps={sessionHasSteps}
-        uploadError={uploadError}
-      />
-      {uploadInProgress && <SpinnerModal message="Upload in Progress" />}
+    <Page titleBarProps={titleBarProps}>
+      {showCustomLabwareWarning && !sessionLoadedSuccessfully && (
+        <AlertItem type="warning" title={ROBOT_DOESNT_SUPPORT_CUSTOM_LABWARE}>
+          {YOU_HAVE_CUSTOM_LABWARE_BUT_THIS_ROBOT_NEEDS_UPDATE}
+        </AlertItem>
+      )}
+      {filename ? (
+        <FileInfo
+          robot={robot}
+          sessionLoaded={sessionLoaded}
+          sessionHasSteps={sessionHasSteps}
+          uploadError={uploadError}
+        />
+      ) : (
+        <Splash />
+      )}
+      {uploadInProgress && <SpinnerModal message={SIMULATION_IN_PROGRESS} />}
     </Page>
   )
 }

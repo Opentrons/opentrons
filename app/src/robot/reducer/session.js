@@ -112,7 +112,10 @@ export default function sessionReducer(
       return handleSessionUpdate(state, action)
 
     case 'protocol:UPLOAD':
-      return handleSessionInProgress(INITIAL_STATE)
+      return handleSessionInProgress({
+        ...INITIAL_STATE,
+        capabilities: state.capabilities,
+      })
 
     case 'robot:REFRESH_SESSION':
       return handleSessionInProgress(state)
