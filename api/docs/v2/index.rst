@@ -1,12 +1,12 @@
-=========================
-OT-2 Python API Version 2
-=========================
+==================================
+OT-2 Python Protocol API Version 2
+==================================
 
-The Opentrons API is a simple Python framework designed to make writing automated biology lab protocols easy.
+The OT-2 Python Protocol API is a simple Python framework designed to make writing automated biology lab protocols easy.
 
 We’ve designed it in a way we hope is accessible to anyone with basic Python and wetlab skills. As a bench scientist, you should be able to code your automated protocols in a way that reads like a lab notebook.
 
-Version 2 of the OT-2 API is a new way to write Python protocols. It is more reliable, simpler, and better able to be supported. It is where support for new modules like the Thermocycler will be added, and where improvements and bugfixes will be focused. For a guide on transitioning your protocols from API V1 to API V2, see `this article on migration <http://support.opentrons.com/en/articles/3425727-switching-your-protocols-from-api-version-1-to-version-2>`_. For a more in-depth discussion of why API V2 was developed and what is different about it, see `this article on why we wrote API V2 <http://support.opentrons.com/en/articles/3418212-opentrons-protocol-api-version-2>`_.
+Version 2 of the API is a new way to write Python protocols. It is more reliable, simpler, and better able to be supported. Unlike version 1, it has support for new modules like the Thermocycler. While version 1 will still recieve bug fixes, new features and improvements will land in version 2. For a guide on transitioning your protocols from version 1 to version 2 of the API, see `this article on migration <http://support.opentrons.com/en/articles/3425727-switching-your-protocols-from-api-version-1-to-version-2>`_. For a more in-depth discussion of why version 2 of the API was developed and what is different about it compared to version 1, see `this article on why we wrote API V2 <http://support.opentrons.com/en/articles/3418212-opentrons-protocol-api-version-2>`_.
 
 **********************
 
@@ -15,13 +15,7 @@ Getting Started
 
 New to Python? Check out our :ref:`writing` page first before continuing. To get a sense of the typical structure of our scripts, take a look at our :ref:`new-examples` page.
 
-Our API requires Python version 3.6.4 or later. Once this is set up on your computer, you can simply use `pip` to install the Opentrons package.
-
-.. code-block:: shell
-
-    pip install opentrons
-
-To simulate protocols on your laptop, check out :ref:`simulate-block`. When you're ready to run your script on a robot, download our latest `desktop app <https://www.opentrons.com/ot-app>`_
+To simulate protocols on your laptop, check out :ref:`simulate-block`. When you're ready to run your script on a robot, download our latest `desktop app <https://www.opentrons.com/ot-app>`_.
 
 
 Troubleshooting
@@ -32,28 +26,32 @@ If you encounter problems using our products please take a look at our `support 
 
 *****************
 
+.. _overview-section-v2:
+
 Overview
 --------
 
 How it Looks
 ++++++++++++
 
-The design goal of the Opentrons API is to make code readable and easy to understand. For example, below is a short set of instructions to transfer from well ``'A1'`` to well ``'B1'`` that even a computer could understand:
+The design goal of this API is to make code readable and easy to understand. For example, below is a short set of instructions to transfer from well ``'A1'`` to well ``'B1'`` that even a computer could understand:
 
-.. code-block:: none
+.. pull-quote::
 
-    This protocol is by me; it’s called Opentrons Protocol Tutorial and is used for demonstrating the Opentrons API. It uses Protocol API Version 2.0.
+    This protocol is by me; it’s called Opentrons Protocol Tutorial and is used for demonstrating the OT-2 Python Protocol API. It uses version 2.0 of this API.
 
     Begin the protocol
 
     Add a 96 well plate, and place it in slot '2' of the robot deck
+
     Add a 300 µL tip rack, and place it in slot '1' of the robot deck
 
     Add a single-channel 300 µL pipette to the left mount, and tell it to use that tip rack
 
     Transfer 100 µL from the plate's 'A1' well to its 'B2' well
 
-If we were to rewrite this with the Opentrons API, it would look like the following:
+
+If we were to rewrite this with the Python Protocol API, it would look like the following:
 
 .. code-block:: python
 
@@ -89,7 +87,7 @@ If we were to rewrite this with the Opentrons API, it would look like the follow
 How it's Organized
 ++++++++++++++++++
 
-When writing protocols using the Opentrons API, there are generally five sections:
+When writing protocols using the Python Protocol API, there are generally five sections:
 
 1) Metadata and Version Selection
 2) Run function
@@ -100,20 +98,17 @@ When writing protocols using the Opentrons API, there are generally five section
 Metadata and Version Selection
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Metadata is a dictionary of data that is read by the server and returned to client applications (such as the Opentrons Run App). Most metadata is not needed to run a protocol, but if present can help the client application display additional data about the protocol currently being executed. These optional (but recommended) fields are (``"protocolName"``, ``"author"``, and ``"description"``).
+Metadata is a dictionary of data that is read by the server and returned to client applications (such as the Opentrons App). Most metadata is not needed to run a protocol, but if present can help the Opentrons App display additional data about the protocol currently being executed. These optional (but recommended) fields are (``"protocolName"``, ``"author"``, and ``"description"``).
 
-The required element of the metadata is ``"apiLevel"``. This must contain a string specifying the major and minor version of the Python Protocol API that your protocol is designed for. For instance, a protocol written for the launch version of Protocol API v2 should have in its metadata ``"apiLevel": "2.0"``.
+The required element of the metadata is ``"apiLevel"``. This must contain a string specifying the major and minor version of the Python Protocol API that your protocol is designed for. For instance, a protocol written for version 2.0 of the Python Protocol API (only launch version of the Protocol API should have in its metadata ``"apiLevel": "2.0"``.
 
-.. note::
 
-    In the API V2 beta, the only available version is 2.0. It is not yet required to specify versions. However, when we fully release API V2, the version will be required.
-
-For more information on Protocol API versioning, see :ref:`v2-versioning`.
+For more information on Python Protocol API versioning, see :ref:`v2-versioning`.
 
 The Run Function and the Protocol Context
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Opentrons API version 2 protocols are structured around a function called ``run(protocol)``, defined in code like this:
+Protocols are structured around a function called ``run(protocol)``, defined in code like this:
 
 .. code-block:: python
 
@@ -149,7 +144,21 @@ The name of a labware is a string that is different for each kind of labware. Yo
 
 The slot is the labelled location on the deck in which you've placed the labware. The available slots are numbered from 1-11.
 
-Our example protocol above loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 2 (``plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)``) and an `Opentrons 300ul Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slot 1 (``tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', 1)``). These can be referenced later in the protocol as ``plate`` and ``tiprack`` respectively. Check out `the python docs <https://docs.python.org/3/index.html>`_ for further clarification on using variables effectively in your code.
+Our example protocol above loads
+
+* a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 2:
+
+.. code-block:: python
+
+   plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
+
+* an `Opentrons 300µL Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slot 1:
+
+.. code-block:: python
+
+   tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
+
+These labware can be referenced later in the protocol as ``plate`` and ``tiprack`` respectively. Check out `the Python docs <https://docs.python.org/3/index.html>`_ for further clarification on using variables effectively in your code.
 
 You can find more information about handling labware in the :ref:`new-labware` section.
 
@@ -163,7 +172,7 @@ The ``model`` of the pipette is the kind of pipette that should be attached; the
 
 See :ref:`new-pipette` for more information on creating and working with pipettes.
 
-Our example protocol above loads a P300 Single-channel pipette (``'p300_single'``) in the left mount (``'left'``), and uses the Opentrons 300ul tiprack we loaded previously as a source of tips (``tip_racks=[tiprack]``).
+Our example protocol above loads a P300 Single-channel pipette (``'p300_single'``) in the left mount (``'left'``), and uses the Opentrons 300 µL tiprack we loaded previously as a source of tips (``tip_racks=[tiprack]``).
 
 
 Commands
@@ -172,8 +181,8 @@ Commands
 Once the instruments and labware required for the protocol are defined, the next step is to define the commands that make up the protocol. The most common commands are ``aspirate()``, ``dispense()``, ``pick_up_tip()``, and ``drop_tip()``. These and many others are described in the :ref:`v2-atomic-commands` and :ref:`v2-complex-commands` sections, which go into more detail about the commands and how they work. These commands typically specify which wells of which labware to interact with, using the labware you defined earlier, and are methods of the instruments you created in the pipette section. For instance, in our example protocol, you use the pipette you defined to:
 
 1) Pick up a tip (implicitly from the tiprack you specified in slot 1 and assigned to the pipette): ``pipette.pick_up_tip()``
-2) Aspirate 100ul from well A1 of the 96 well plate you specified in slot 2: ``pipette.aspirate(100, plate['A1'])``
-3) Dispense 100ul into well A2 of the 96 well plate you specified in slot 2: ``pipette.dispense(100, plate['A2'])``
+2) Aspirate 100 µL from well A1 of the 96 well plate you specified in slot 2: ``pipette.aspirate(100, plate['A1'])``
+3) Dispense 100 µL into well A2 of the 96 well plate you specified in slot 2: ``pipette.dispense(100, plate['A2'])``
 4) Drop the tip (implicitly into the trash at the back right of the robot's deck): ``pipette.drop_tip()``
 
 
@@ -182,7 +191,7 @@ Once the instruments and labware required for the protocol are defined, the next
 Feature Requests
 ----------------
 
-Have an interesting idea or improvement for our software? Create a ticket on github by following these `guidelines.`__
+Have an interesting idea or improvement for our software? Create a ticket on GitHub by following these `guidelines.`__
 
 __ https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#opening-issues
 

@@ -6,12 +6,14 @@ Hardware Modules
 
 Modules are peripherals that attach to the OT-2 to extend its capabilities.
 
-Modules currently supported are the Temperature, Magnetic and Thermocycler Module.
+We currently support the Temperature, Magnetic and Thermocycler Modules.
 
 Loading your Module onto a deck
 ===============================
-Just like labware, you will also need to load in your module in order to use it
-within a protocol. To do this, you call the following *inside* the run function:
+
+Like labware and pipettes, you must inform the Protocol API of the modules you will use in your protocol. The Protocol API then creates software objects called :py:class:`.ModuleContext` that represent the attached modules.
+
+Modules are loaded using the function :py:meth:`.ProtocolContext.load_module`:
 
 .. code-block:: python
 
@@ -23,10 +25,11 @@ within a protocol. To do this, you call the following *inside* the run function:
          module = protocol.load_module('Module Name', slot)
 
 
-You can reference your module in a few different ways. The valid names can be found below. They are not case-sensitive.
+
+Module names can be specified in a few different ways. The valid names can be found below. They are not case-sensitive.
 
 +--------------------------+-----------------------------------------------+
-|        Module Type       |               Nickname(s)                     |
+|        Module Type       |               Valid Names                     |
 +==========================+===============================================+
 | ``Temperature Module``   | ``'Temperature Module'``, ``'tempdeck'``      |
 +--------------------------+-----------------------------------------------+
@@ -37,10 +40,10 @@ You can reference your module in a few different ways. The valid names can be fo
 
 .. versionadded:: 2.0
 
-Loading Labware onto your Module
+Loading Labware Onto Your Module
 ================================
-If you want to interact with labware on top of your Module, you must load labware
-onto the module. You can do this via:
+
+Like specifying labware that will be present on the deck of the OT-2, you must specify labware that will be present on the module you have just loaded. You do this using :py:meth:`.ModuleContext.load_labware`. For instance, to load a Temperature Module and specify an `aluminum block for 2 mL tubes<https://labware.opentrons.com/opentrons_24_aluminumblock_generic_2ml_screwcap?category=aluminumBlock>`_, you would do:
 
 .. code-block:: python
 
@@ -49,16 +52,17 @@ onto the module. You can do this via:
     metadata = {'apiLevel': '2.0'}
 
     def run(protocol: protocol_api.ProtocolContext):
-         module = protocol.load_module('Module Name', slot)
-         my_labware = module.load_labware('labware_definition_name')
+         module = protocol.load_module('Temperature Module', slot)
+         my_labware = module.load_labware('opentrons_24_aluminumblock_generic_2ml_screwcap')
 
-Where ``module`` is the variable name you saved your module to. You do not need to specify the slot.
+You do not need to specify a slot, because the labware is loaded into the module.
 
 .. versionadded:: 2.0
 
-Checking the status of your Module
+Checking The Status Of Your Module
 ==================================
-All modules have the ability to check what state they are currently in. To do this run the following:
+
+All modules have the ability to check what state they are currently in:
 
 .. code-block:: python
 
@@ -70,9 +74,11 @@ All modules have the ability to check what state they are currently in. To do th
          module = protocol.load_module('Module Name', slot)
          status = module.status
 
-For the temperature module this will return a string stating whether it's ``'heating'``, ``'cooling'``, ``'holding at target'`` or ``'idle'``.
-For the magnetic module this will return a string stating whether it's ``'engaged'`` or ``'disengaged'``.
-For the Thermocycler Module this will return ``'holding at target'`` or ``'idle'``. There are more detailed status checks which can be found in at :ref:`thermocycler-section`
+The Temperature Module's ``status`` is a string that is one of  ``'heating'``, ``'cooling'``, ``'holding at target'`` or ``'idle'``.
+
+The Magnetic Module's ``status`` is a string that is one of  ``'engaged'`` or ``'disengaged'``.
+
+The Thermocycler Module ``status`` is a string that is one of ``'holding at target'`` or ``'idle'``. There are more detailed status checks which can be found in :ref:`thermocycler-section`
 
 .. versionadded:: 2.0
 
@@ -80,10 +86,12 @@ For the Thermocycler Module this will return ``'holding at target'`` or ``'idle'
 Temperature Module
 ******************
 
-Our temperature module acts as both a cooling and heating device. The range
-of temperatures this module can reach goes from 4 to 95 degrees celsius with a resolution of 1 degree celcius.
+The Temperature Module acts as both a cooling and heating device. It can control the temperature
+of its deck between 4 °C and 95 °C with a resolution of 1 °C.
 
-The temperature module has the following methods that can be accessed during a protocol. For the purposes of this
+Temperature Modules are represented in code by :py:class:`.TemperatureModuleContext` objects.
+
+The Temperature Module has the following methods that can be accessed during a protocol. For the purposes of this
 section, assume we have the following already:
 
 .. code-block:: python
@@ -101,7 +109,8 @@ section, assume we have the following already:
 
 Set Temperature
 ^^^^^^^^^^^^^^^
-To set the temperature module to 4 degrees celsius do the following:
+
+To set the Temperature Module to 4 °C do the following:
 
 .. code-block:: python
 
@@ -109,11 +118,16 @@ To set the temperature module to 4 degrees celsius do the following:
 
 This function will pause your protocol until your target temperature is reached.
 
+.. note::
+
+     This is unlike version 1 of the Python API, in which you would have to use the separate function ``wait_for_temperature`` to block protocol execution until the Temperature Module was ready.
+
 .. versionadded:: 2.0
 
 Read the Current Temperature
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-You can read the current real-time temperature of the module by the following:
+
+You can read the current real-time temperature of the Temperature Module using the :py:attr:`.TemperatureModuleContext.temperature` property:
 
 .. code-block:: python
 
@@ -123,7 +137,8 @@ You can read the current real-time temperature of the module by the following:
 
 Read the Target Temperature
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-We can read the target temperature of the module by the following:
+
+You can read the current target temperature of the Temperature Module using the :py:attr:`.TemperatureModuleContext.target` property:
 
 .. code-block:: python
 
@@ -133,9 +148,8 @@ We can read the target temperature of the module by the following:
 
 Deactivate
 ^^^^^^^^^^
-This function will stop heating or cooling and will turn off the fan on the module.
-You would still be able to call ``set_temperature()`` function to initiate a heating
-or cooling phase again.
+
+This function will stop heating or cooling and will turn off the fan on the Temperature Module.
 
 .. code-block:: python
 
@@ -143,10 +157,12 @@ or cooling phase again.
 
 .. note::
 
-    You can also deactivate your temperature module through our Run App by
-    clicking on the ``Pipettes & Modules`` tab. Your temperature module will automatically
-    deactivate if another protocol is uploaded to the app. Your temperature module will
-    not deactivate automatically upon protocol end, cancel or re-setting a protocol.
+    You can also deactivate your temperature module through the Opentrons App by
+    clicking on the ``Pipettes & Modules`` tab. Your Temperature Module will automatically
+    deactivate if another protocol is uploaded to the app. Your Temperature Module will
+    *not* deactivate automatically when the protocol ends, is cancelled, or is reset.
+
+After deactivating your Temperature module, you can later call :py:meth:`.TemperatureModuleContext.set_temperature` to heat or cool phase again.
 
 .. versionadded:: 2.0
 
@@ -154,16 +170,11 @@ or cooling phase again.
 Magnetic Module
 ***************
 
-The magnetic module has two actions:
+The Magnetic Module controls a set of permanent magnets which can move vertically. When the magnets are raised or engaged, they induce a magnetic field in the labware on the module. When they are lowered or disengaged, they do not.
 
-- ``engage``: The magnetic stage rises to a default height unless an *offset* or a custom *height* is specified
-- ``disengage``: The magnetic stage moves down to its home position
+The Magnetic Module is represented by a :py:class:`.MagneticModuleContext` object.
 
-You can also specify a custom engage height for the magnets so you can use a different labware with the magdeck.
-In the future, we will have adapters to support tuberacks as well as deep well plates.
-
-The magnetic module has the following methods that can be accessed during a protocol. For the purposes of this
-section, assume we have the following already:
+For the purposes of this section, assume we have the following already:
 
 .. code-block:: python
 
@@ -178,22 +189,20 @@ section, assume we have the following already:
 
 .. versionadded:: 2.0
 
+
 Engage
 ^^^^^^
 
-The destination of the magnets can be specified in several different
-ways, based on internally stored default heights for labware:
+The :py:meth:`.MagneticModuleContext.engage` function raises the magnets to induce a magnetic field in the labware on top of the Magnetic Module. The height of the magnets can be specified in several different ways, based on internally stored default heights for labware:
 
-   - If neither ``height`` nor ``offset`` is specified **and** the labware is support on the magnetic module,
-     the magnets will raise to a reasonable default height based on the specified
-     labware.
+   - If neither ``height`` nor ``offset`` is specified **and** the labware is supported on the Magnetic Module,
+     the magnets will raise to a reasonable default height based on the specified labware.
 
      .. code-block:: python
 
          mag_mod.engage()
 
-   - If ``height`` is specified, it should be a distance in mm from the
-     home position of the magnets.
+   - If ``height`` is specified, it should be a distance in mm from the home position of the magnets.
 
      .. code-block:: python
 
@@ -210,12 +219,12 @@ ways, based on internally stored default heights for labware:
 
 Disengage
 ^^^^^^^^^
+
 .. code-block:: python
 
    mag_mod.disengage()
 
-The magnetic modules will disengage on power cycle of the device. It will not auto-disengage otherwise
-unless you specify in your protocol.
+The Magnetic Module will disengage when the device is turned on. It will not auto-disengage otherwise unless you call :py:meth:`.MagneticModuleContext.disengage` in your protocol.
 
 .. versionadded:: 2.0
 
@@ -225,13 +234,14 @@ unless you specify in your protocol.
 Thermocycler Module
 *******************
 
-The Thermocycler Module is still under active development. The commands are subject to change. A valid operational range has not been determined yet.
 
-The Thermocycler Module allows users to perform complete experiments that require temperature sensitive reactions
-such as PCR, restriction enzyme etc. Below is a description of a few ways you can control this module.
+The Thermocycler Module allows users to perform complete experiments that require temperature sensitive reactions such as PCR.
 
-There are two heating mechanisms in the Thermocycler module which the user has access to. One is the bottom plate (`block`) in which samples are located,
-the other is the lid heating pad.
+There are two heating mechanisms in the Thermocycler Module. One is the block in which samples are located; the other is the lid heating pad.
+
+The block can control its temperature between 4 °C and 99 °C to the nearest 1 °C.
+
+The lid can control its temperature between 37°C to 110°C.
 
 For the purposes of this section, assume we have the following already:
 
@@ -249,18 +259,19 @@ For the purposes of this section, assume we have the following already:
 
     When loading the Thermocycler Module, it is not necessary to specify a slot.
     This is because the Thermocycler Module has a default position that covers Slots 7, 8, 10, and 11.
-    This is the only valid location for the Thermocycler Module on the OT2 deck.
+    This is the only valid location for the Thermocycler Module on the OT-2 deck.
 
 .. versionadded:: 2.0
 
-Run App Control
-^^^^^^^^^^^^^^^
+Opentrons App Control
+^^^^^^^^^^^^^^^^^^^^^
+
 Certain functionality of the Thermocycler Module can be controlled in the Opentrons App.
 
 Setting a Target Temperature
 ++++++++++++++++++++++++++++
-Before the run of the protocol, when you navigate to the `Run` tab of the Opentrons App, you will
-see a Thermocycler Module card on the left-hand side like the image below.
+
+Before running your protocol, when you navigate to the `Run` tab of the Opentrons App, you will see a Thermocycler Module card on the left-hand side like the image below.
 
 .. image:: ../img/modules/set_target.png
 
@@ -270,6 +281,7 @@ We recommend using this if you want to pre-heat or pre-cool samples located on y
 
 Deactivating the Module
 +++++++++++++++++++++++
+
 Sometimes you may wish to deactivate the Thermocycler Module, such as removing samples from the module or shutting the
 module off after use. Before or after a protocol run, you can press `deactivate` to ensure that your Thermocycler Module is off before
 opening the lid.
@@ -278,15 +290,12 @@ opening the lid.
 
 .. note::
 
-    The thermocycler will hold at whatever temperature it was last told to hold at (whether through the
-    Opentrons App or through the protocol), regardless of the status of an ongoing (or not) run.
-    This allows you to cancel a run and be sure that your samples will be held at the temperature specified previously,
-    until you decide to deactivate the module from the Opentrons App as described above.
+    The Thermocycler Module will hold its temperature, regardless of whether a protocol is running or not. This allows you to cancel a run and be sure that your samples will be held at the temperature specified previously, until you decide to deactivate the module from the Opentrons App as described above.
 
 Lid Motor Control
 ^^^^^^^^^^^^^^^^^
-The Thermocycler Module supports temperature control with the lid open and closed. When the lid of the Thermocycler Module is open, the pipettes can access the contained 96-well labware.
-You can control the lid with the methods below.
+
+The Thermocycler Module can control its temperature control with the lid open or closed. When the lid of the Thermocycler Module is open, the pipettes can access the contained labware. You can control the lid with the methods below.
 
 Open Lid
 ++++++++
@@ -309,14 +318,15 @@ Close Lid
 
 Lid Temperature Control
 ^^^^^^^^^^^^^^^^^^^^^^^
-As mentioned before, users have access to controlling when a lid temperature is set. It is recommended that you set
-the lid temperature before executing a Thermocycler Module profile, described later. The range of the Thermocycler Module lid is
-37°C to 110°C.
+
+You can control when a lid temperature is set. It is recommended that you set
+the lid temperature before executing a Thermocycler Module profile (see :ref:`thermocycler-profiles`. The range of the Thermocycler Module lid is
+37 °C to 110 °C.
 
 Set Lid Temperature
 +++++++++++++++++++
-:py:meth:`.ThermocyclerContext.set_lid_temperature` takes in one parameter which is the temperature you wish the lid to be set to. The protocol will only proceed
-once the lid temperature has been reached.
+
+:py:meth:`.ThermocyclerContext.set_lid_temperature` takes one parameter: the ``temperature`` you wish the lid to be set to. The protocol will only proceed once the lid temperature has been reached.
 
 .. code-block:: python
 
@@ -326,14 +336,15 @@ once the lid temperature has been reached.
 
 Block Temperature Control
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-To set the aluminum block temperature inside the Thermocycler Module, you can use the method :py:meth:`.ThermocyclerContext.set_block_temperature`. It takes in four parameters
-``temperature``, ``hold_time_seconds``, ``hold_time_minutes`` and ``ramp_rate`` respectively. Only temperature is required, both the hold time parameters and ramp rate are not required.
+
+To set the block temperature inside the Thermocycler Module, you can use the method :py:meth:`.ThermocyclerContext.set_block_temperature`. It takes five parameters:
+``temperature``, ``hold_time_seconds``, ``hold_time_minutes``, ``ramp_rate`` and ``block_max_volume``. Only ``temperature`` is required; the two ``hold_time`` parameters, ``ramp_rate``, and ``block_max_volume`` are optional.
 
 
 Temperature
 +++++++++++
 
-If you only specify a temperature in celsius, the Thermocycler Module will hold this temperature indefinitely until powered off.
+If you only specify a ``temperature`` in °C, the Thermocycler Module will hold this temperature indefinitely until powered off.
 
 .. code-block:: python
 
@@ -344,9 +355,11 @@ If you only specify a temperature in celsius, the Thermocycler Module will hold 
 Hold Time
 +++++++++
 
-If you set a temperature and a hold time, the Thermocycler Module will hold the temperature for the specified amount of time. Time can be passed in as minutes or seconds.
-In the example below, the Thermocycler Module will hold the the specified temperature for 45 minutes and 15 seconds. If you do not specify a hold time the protocol will
-proceed once the temperature specified is reached.
+If you set a ``temperature`` and a ``hold_time``, the Thermocycler Module will hold the temperature for the specified amount of time. Time can be passed in as minutes or seconds.
+
+In the example below, the Thermocycler Module will hold the the specified temperature for 45 minutes and 15 seconds.
+
+If you do not specify a hold time the protocol will proceed once the temperature specified is reached.
 
 .. code-block:: python
 
@@ -357,7 +370,7 @@ proceed once the temperature specified is reached.
 Ramp Rate
 +++++++++
 
-Lastly, you can modify the ramp rate in degC/sec for a given temperature.
+Lastly, you can modify the ``ramp_rate`` in °C/sec for a given ``temperature``.
 
 .. code-block:: python
 
@@ -367,35 +380,60 @@ Lastly, you can modify the ramp rate in degC/sec for a given temperature.
 
   Do not change this parameter unless you know what you're doing.
 
+
+Block Max Volume
+++++++++++++++++
+
+The Thermocycler Module's block temperature controller varies its behavior based on the amount of liquid in the wells of its labware. Specifying an accurate volume is important to achieve the fastest temperature change times. The ``block_max_volume`` parameter is specified in µL and is the volume of the most-full well in the labware. If not specified, it defaults to 25 µL.
+
 .. versionadded:: 2.0
+
+.. _thermocycler-profiles:
 
 Thermocycler Module Profiles
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Unlike the temperature module, the Thermocycler Module can rapidly cycle through temperatures to accomplish heat-sensitive reactions. To set up a Thermocycler Module
-profile, like you might on the UI of other Thermocycler Modules, use :py:meth:`.ThermocyclerContext.execute_profile`. A profile requires one or more
-steps, each of which must contain a temperature and a hold time. As with the :py:meth:`.ThermocyclerContext.set_block_temperature` method, you have the option of specifying your hold time in seconds or
-minutes with ``hold_time_seconds`` and ``hold_time_minutes``. **Note** This is *only* for controlling the temperature of the `block` in the Thermocycler Module.
+
+The Thermocycler Module can rapidly cycle through temperatures to execute heat-sensitive reactions. These cycles are defined as profiles.
+
+
+Thermocycler Module profiles are defined for the Protocol API as lists of dicts. Each dict should have a ``temperature`` key, which specifies the temperature of a profile step, and either or both of ``hold_time_seconds`` or ``hold_time_minutes``, which specify the duration of the step. For instance, this profile commands the Thermocycler Module to drive its temperature to 10 °C for 30 seconds, and then 60 °C for 45 seconds:
+
 
 .. code-block:: python
 
         profile = [
           {temperature: 10, hold_time_seconds: 30},
+          {temperature: 60, hold_time_seconds: 45}]
+
+Once you have written your profile, you command the Thermocycler Module to execute it using :py:meth:`.ThermocyclerContext.execute_profile`. This function executes your profile steps multiple times depending on the ``repetitions`` parameter. It also takes a ``block_max_volume`` parameter, which is the same as that of the ``set_block_temperature`` function.
+
+For instance, you can execute the profile defined above 100 times for a 30 µL-per-well volume like this:
+
+.. code-block:: python
+
+        profile = [
           {temperature: 10, hold_time_seconds: 30},
-          {temperature: 10, hold_time_seconds: 30}]
+          {temperature: 60, hold_time_seconds: 30}]
 
-        tc_mod.execute_profile(steps=profile, repetitions=30)
+        tc_mod.execute_profile(steps=profile, repetitions=100, block_max_volume=30)
 
+
+.. note::
+
+    Temperature profiles only control the temperature of the `block` in the Thermocycler Module. You should set a lid temperature before executing the profile using :py:meth:`.ThermocyclerContext.set_lid_temperature`.
 
 .. versionadded:: 2.0
 
 Thermocycler Module Status
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Throughout your protocol, you may want particular information on the current status of your Thermocycler Module. Below are
 a few methods that allow you to do that.
 
 Lid Position
 ++++++++++++
-Returns the current status of the lid position. It can be one of the strings ``'open'``, ``'closed'`` or ``'in_between'``.
+
+The current status of the lid position. It can be one of the strings ``'open'``, ``'closed'`` or ``'in_between'``.
 
 .. code-block:: python
 
@@ -405,7 +443,8 @@ Returns the current status of the lid position. It can be one of the strings ``'
 
 Heated Lid Temperature Status
 +++++++++++++++++++++++++++++
-Returns the current status of the heated lid temperature. It can be one of the strings ``'holding at target'``, ``'heating'``, ``'idle'``,  or ``'error'``.
+
+The current status of the heated lid temperature controller. It can be one of the strings ``'holding at target'``, ``'heating'``, ``'idle'``,  or ``'error'``.
 
 .. code-block:: python
 
@@ -415,7 +454,8 @@ Returns the current status of the heated lid temperature. It can be one of the s
 
 Block Temperature Status
 ++++++++++++++++++++++++
-Returns the current status of the well block temperature controller. It can be one of the strings ``'holding at target'``, ``'cooling'``, ``'heating'``, ``'idle'``, or ``'error'``.
+
+The current status of the well block temperature controller. It can be one of the strings ``'holding at target'``, ``'cooling'``, ``'heating'``, ``'idle'``, or ``'error'``.
 
 .. code-block:: python
 
@@ -425,12 +465,13 @@ Returns the current status of the well block temperature controller. It can be o
 
 Thermocycler Module Deactivate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 At some points in your protocol, you may want to deactivate certain aspects of your Thermocycler Module. This can be done with three methods,
-:py:meth:`.ThermocyclerContext.deactivate`, :py:meth:`.ThermocyclerContext.deactivate_lid`, :py:meth:`.ThermocyclerContext.deactivate_block`
-that will be able to turn off certain functionalities of the Thermocycler Module.
+:py:meth:`.ThermocyclerContext.deactivate`, :py:meth:`.ThermocyclerContext.deactivate_lid`, :py:meth:`.ThermocyclerContext.deactivate_block`.
 
 Deactivate
 ++++++++++
+
 This deactivates both the well block and the heated lid of the Thermocycler Module.
 
 .. code-block:: python
@@ -439,6 +480,7 @@ This deactivates both the well block and the heated lid of the Thermocycler Modu
 
 Deactivate Lid
 ++++++++++++++
+
 This deactivates only the heated lid of the Thermocycler Module.
 
 .. code-block:: python
@@ -449,6 +491,7 @@ This deactivates only the heated lid of the Thermocycler Module.
 
 Deactivate Block
 ++++++++++++++++
+
 This deactivates only the well block of the Thermocycler Module.
 
 .. code-block:: python

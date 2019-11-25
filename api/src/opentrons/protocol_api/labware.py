@@ -255,9 +255,9 @@ class Well:
 
 class Labware(DeckItem):
     """
-    This class represents a labware, such as a PCR plate, a tube rack, trough,
-    tip rack, etc. It defines the physical geometry of the labware, and
-    provides methods for accessing wells within the labware.
+    This class represents a labware, such as a PCR plate, a tube rack,
+    reservoir, tip rack, etc. It defines the physical geometry of the labware,
+    and provides methods for accessing wells within the labware.
 
     It is commonly created by calling :py:meth:`ProtocolContext.load_labware`.
 

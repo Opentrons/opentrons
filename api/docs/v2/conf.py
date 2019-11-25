@@ -64,7 +64,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'OT-2 <br />APIv2<span class="beta beta_large">BETA</span> '
+project = 'OT-2 API V2'
 copyright = '2010, Opentrons'
 author = _package_json['author']['name']
 
@@ -152,7 +152,7 @@ html_theme_options = {
     'github_repo': 'opentrons',
     'github_button': True,
     # 'analytics_id': 'UA-83820700-1',
-    'description': 'Simple Biology Lab Protocol Coding',
+    'description': 'Python Protocol API',
     'link': '#006FFF',
     'link_hover': '#05C1B3',
     'sidebar_list': '#05C1B3',
