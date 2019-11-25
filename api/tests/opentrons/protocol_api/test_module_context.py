@@ -1,6 +1,6 @@
 import json
 import pkgutil
-
+from unittest import mock
 import opentrons.protocol_api as papi
 from opentrons.types import Point
 
@@ -146,7 +146,7 @@ def test_thermocycler_lid(loop):
     assert mod._geometry.highest_z == 98.0
 
 
-def test_thermocycler_temp(loop):
+def test_thermocycler_temp(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx._hw_manager.hardware._backend._attached_modules = [
         ('mod0', 'thermocycler')]
@@ -180,8 +180,20 @@ def test_thermocycler_temp(loop):
     assert mod.hold_time == 0
     assert mod.ramp_rate is None
 
+    set_temp_hw_mock = mock.Mock()
+    monkeypatch.setattr(
+        mod._module._api, 'set_temperature', set_temp_hw_mock)
 
-def test_thermocycler_profile(loop):
+    # Test volume param
+    mod.set_block_temperature(80.5, block_max_volume=45)
+    set_temp_hw_mock.assert_called_once_with(temperature=80.5,
+                                             hold_time_seconds=None,
+                                             hold_time_minutes=None,
+                                             ramp_rate=None,
+                                             volume=45)
+
+
+def test_thermocycler_profile(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx._hw_manager.hardware._backend._attached_modules = [
         ('mod0', 'thermocycler')]
@@ -223,20 +235,36 @@ def test_thermocycler_profile(loop):
     assert mod.lid_target_temperature == 80
     assert mod.lid_temperature == 80
 
+    set_temp_hw_mock = mock.Mock(
+        side_effect=mod._module._api.set_temperature)
+    monkeypatch.setattr(
+        mod._module._api, 'set_temperature', set_temp_hw_mock)
 
-# NOTE: this test should be rewritten when "semi" config is built
-# def test_semithermocycler_labware_accessor(loop):
-#     # Check that you can only access 9 columns of the 96 well plate loaded
-#     ctx = papi.ProtocolContext(loop)
-#     ctx._hw_manager.hardware._backend._attached_modules = [
-#         ('mod0', 'thermocycler')]
-#     mod = ctx.load_module('semithermocycler', 1)
-#     # open before loading labware
-#     mod.open()
-#     mod.load_labware('biorad_96_wellplate_200ul_pcr')
-
-#     assert len(mod.labware.columns()) == 9
-#     assert mod.labware.wells().__repr__()[1:3] == 'A4'
+    # Test volume param
+    mod.execute_profile(steps=[{'temperature': 30, 'hold_time_seconds': 20},
+                               {'temperature': 70, 'hold_time_seconds': 72}],
+                        repetitions=2,
+                        block_max_volume=35)
+    set_temp_hw_mock.assert_has_calls([mock.call(temperature=30,
+                                                 hold_time_seconds=20,
+                                                 hold_time_minutes=None,
+                                                 ramp_rate=None,
+                                                 volume=35),
+                                       mock.call(temperature=70,
+                                                 hold_time_seconds=72,
+                                                 hold_time_minutes=None,
+                                                 ramp_rate=None,
+                                                 volume=35),
+                                       mock.call(temperature=30,
+                                                 hold_time_seconds=20,
+                                                 hold_time_minutes=None,
+                                                 ramp_rate=None,
+                                                 volume=35),
+                                       mock.call(temperature=70,
+                                                 hold_time_seconds=72,
+                                                 hold_time_minutes=None,
+                                                 ramp_rate=None,
+                                                 volume=35)])
 
 
 def test_module_load_labware(loop):

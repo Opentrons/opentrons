@@ -72,8 +72,9 @@ class SimulatingDriver:
 
     async def set_temperature(self,
                               temp: float,
-                              hold_time: float,
-                              ramp_rate: float) -> None:
+                              hold_time: float = None,
+                              ramp_rate: float = None,
+                              volume: float = None) -> None:
         self._target_temp = temp
         self._hold_time = hold_time
         self._ramp_rate = ramp_rate
@@ -198,13 +199,16 @@ class Thermocycler(mod_abc.AbstractModule):
     async def set_temperature(self, temperature,
                               hold_time_seconds: float = None,
                               hold_time_minutes: float = None,
-                              ramp_rate=None):
+                              ramp_rate: float = None,
+                              volume: float = None):
         seconds = hold_time_seconds if hold_time_seconds is not None else 0
         minutes = hold_time_minutes if hold_time_minutes is not None else 0
         total_seconds = seconds + (minutes * 60)
         hold_time = total_seconds if total_seconds > 0 else 0
-        await self._driver.set_temperature(
-            temp=temperature, hold_time=hold_time, ramp_rate=ramp_rate)
+        await self._driver.set_temperature(temp=temperature,
+                                           hold_time=hold_time,
+                                           ramp_rate=ramp_rate,
+                                           volume=volume)
         if hold_time:
             self._current_task = self._loop.create_task(self.wait_for_hold())
         else:
@@ -213,23 +217,33 @@ class Thermocycler(mod_abc.AbstractModule):
 
     async def _execute_cycles(self,
                               steps: List[types.ThermocyclerStep],
-                              repetitions: int):
+                              repetitions: int,
+                              volume: float = None):
         for rep in range(repetitions):
             self._current_cycle_index = rep + 1  # science starts at 1
             for step_idx, step in enumerate(steps):
                 await self._running_flag.wait()
                 self._current_step_index = step_idx + 1  # science starts at 1
-                await self.set_temperature(**step)
+                await self.set_temperature(temperature=step.get('temperature'),
+                                           hold_time_minutes=step.get(
+                                               'hold_time_minutes', None),
+                                           hold_time_seconds=step.get(
+                                               'hold_time_seconds', None),
+                                           ramp_rate=step.get(
+                                               'ramp_rate', None),
+                                           volume=volume)
                 await self.wait_for_hold()
 
     async def cycle_temperatures(self,
                                  steps: List[types.ThermocyclerStep],
-                                 repetitions: int):
+                                 repetitions: int,
+                                 volume: float = None):
         self._running_flag.set()
         self._total_cycle_count = repetitions
         self._total_step_count = len(steps)
         cycle_task = self._loop.create_task(self._execute_cycles(steps,
-                                                                 repetitions))
+                                                                 repetitions,
+                                                                 volume))
         self._current_task = cycle_task
         await cycle_task
 

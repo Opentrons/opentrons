@@ -237,4 +237,6 @@ class Controller:
 
     def __del__(self):
         if hasattr(self, '_module_watcher'):
-            self._module_watcher.close()
+            loop = asyncio.get_event_loop()
+            if loop.is_running() and self._module_watcher:
+                self._module_watcher.close()
