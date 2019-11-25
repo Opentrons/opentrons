@@ -146,14 +146,16 @@ class TempDeck:
             updated_temperature = default or self._temperature.copy()
             self._temperature.update(updated_temperature)
         else:
-            try:
-                self._update_thread = Thread(
-                    target=self._recursive_update_temperature,
-                    args=[DEFAULT_COMMAND_RETRIES],
-                    name='Tempdeck recursive update temperature')
-                self._update_thread.start()
-            except (TempDeckError, SerialException, SerialNoResponse) as e:
-                return str(e)
+            self._check_lock(self._port)
+            with self._lock:
+                try:
+                    self._update_thread = Thread(
+                        target=self._recursive_update_temperature,
+                        args=[DEFAULT_COMMAND_RETRIES],
+                        name='Tempdeck recursive update temperature')
+                    self._update_thread.start()
+                except (TempDeckError, SerialException, SerialNoResponse) as e:
+                    return str(e)
         return ''
 
     @property
@@ -244,7 +246,9 @@ class TempDeck:
         This methods writes a sequence of newline characters, which will
         guarantee temp-deck responds with 'ok\r\nok\r\n' within 1 seconds
         '''
-        self._send_command('\r\n', timeout=DEFAULT_TEMP_DECK_TIMEOUT)
+        self._check_lock(self._port)
+        with self._lock:
+            self._send_command('\r\n', timeout=DEFAULT_TEMP_DECK_TIMEOUT)
 
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(
@@ -288,6 +292,8 @@ class TempDeck:
                 cmd, timeout, retries, tag=tag)
 
     def _recursive_update_temperature(self, retries):
+        # self._check_lock(self._port)
+        # with self._lock:
         try:
             res = self._send_command(
                 GCODES['GET_TEMP'],

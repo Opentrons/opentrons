@@ -202,7 +202,6 @@ class MagDeck:
             mag_locks[port] = Lock()
             lock_for_port = mag_locks.get(port)
         self._lock = lock_for_port
-        self._lock = lock_for_port
 
     @property
     def port(self) -> str:
@@ -272,7 +271,7 @@ class MagDeck:
                     '{0} Z{1}'.format(GCODES['MOVE'], position_mm))
             except (MagDeckError, SerialException, SerialNoResponse) as e:
                 return str(e)
-            return ''
+        return ''
 
     def get_device_info(self) -> dict:
         '''
@@ -312,7 +311,7 @@ class MagDeck:
                 self._send_command(GCODES['PROGRAMMING_MODE'])
             except (MagDeckError, SerialException, SerialNoResponse) as e:
                 return str(e)
-            return ''
+        return ''
 
     def _recursive_write_and_return(self, cmd, timeout, retries):
         try:
@@ -338,15 +337,17 @@ class MagDeck:
         This methods writes a sequence of newline characters, which will
         guarantee mag-deck responds with 'ok\r\nok\r\n' within 1 seconds
         '''
-        self._send_command('\r\n', timeout=DEFAULT_MAG_DECK_TIMEOUT)
+        self._check_lock(self._port)
+        with self._lock:
+            self._send_command('\r\n', timeout=DEFAULT_MAG_DECK_TIMEOUT)
 
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(self, command, timeout=DEFAULT_MAG_DECK_TIMEOUT):
         command_line = command + ' ' + MAG_DECK_COMMAND_TERMINATOR
-        self._check_lock(self._port)
-        with self._lock:
-            ret_code = self._recursive_write_and_return(
-                command_line, timeout, DEFAULT_COMMAND_RETRIES)
+        # self._check_lock(self._port)
+        # with self._lock:
+        ret_code = self._recursive_write_and_return(
+            command_line, timeout, DEFAULT_COMMAND_RETRIES)
 
         # Smoothieware returns error state if a switch was hit while moving
         if (ERROR_KEYWORD in ret_code.lower()) or \
@@ -400,14 +401,12 @@ class MagDeck:
             return ''
 
     def _recursive_get_info(self, retries) -> dict:
-        self._check_lock(self._port)
-        with self._lock:
-            try:
-                device_info = self._send_command(GCODES['DEVICE_INFO'])
-                return _parse_device_information(device_info)
-            except ParseError as e:
-                retries -= 1
-                if retries <= 0:
-                    raise MagDeckError(e)
-                sleep(DEFAULT_STABILIZE_DELAY)
-                return self._recursive_get_info(retries)
+        try:
+            device_info = self._send_command(GCODES['DEVICE_INFO'])
+            return _parse_device_information(device_info)
+        except ParseError as e:
+            retries -= 1
+            if retries <= 0:
+                raise MagDeckError(e)
+            sleep(DEFAULT_STABILIZE_DELAY)
+            return self._recursive_get_info(retries)
