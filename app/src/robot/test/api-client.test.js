@@ -16,9 +16,11 @@ import MockSession from './__mocks__/session'
 import MockCalibrationMangager from './__mocks__/calibration-manager'
 
 import { getLabwareDefBySlot } from '../../protocol/selectors'
+import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
 
 jest.mock('../../rpc/client')
 jest.mock('../../protocol/selectors')
+jest.mock('../../custom-labware/selectors')
 
 describe('api client', () => {
   let dispatch
@@ -48,7 +50,11 @@ describe('api client', () => {
     calibrationManager = MockCalibrationMangager()
 
     // mock rpc client
-    sessionManager = { session }
+    sessionManager = {
+      session,
+      create: jest.fn(),
+      create_from_bundle: jest.fn(),
+    }
     rpcClient = {
       // TODO(mc, 2017-09-22): these jest promise mocks are causing promise
       // rejection warnings. These warnings are Jest's fault for nextTick stuff
@@ -66,6 +72,7 @@ describe('api client', () => {
     mockResolvedValue(RpcClient, rpcClient)
 
     getLabwareDefBySlot.mockReturnValue({})
+    getCustomLabwareDefinitions.mockReturnValue([])
 
     const _receive = client(dispatch)
 
@@ -126,7 +133,7 @@ describe('api client', () => {
 
   describe('connect and disconnect', () => {
     test('connect RpcClient on CONNECT message', () => {
-      const expectedResponse = actions.connectResponse(null, true)
+      const expectedResponse = actions.connectResponse(null, expect.any(Array))
 
       expect(RpcClient).toHaveBeenCalledTimes(0)
 
@@ -147,8 +154,11 @@ describe('api client', () => {
       )
     })
 
-    test('send CONNECT_RESPONSE w pollHealth: false if RPC.monitoring', () => {
-      const expectedResponse = actions.connectResponse(null, false)
+    test('send CONNECT_RESPONSE w/ capabilities from remote.session_manager', () => {
+      const expectedResponse = actions.connectResponse(null, [
+        'create',
+        'create_from_bundle',
+      ])
 
       rpcClient.monitoring = true
 

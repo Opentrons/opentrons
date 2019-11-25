@@ -70,6 +70,10 @@ export const getConnectionStatus: OutputSelector<
   }
 )
 
+export function getSessionCapabilities(state: State): Array<string> {
+  return session(state).capabilities
+}
+
 export function getSessionLoadInProgress(state: State): boolean {
   return sessionRequest(state).inProgress
 }

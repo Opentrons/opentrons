@@ -51,6 +51,7 @@ export type SessionState = {
   startTime: ?number,
   runTime: number,
   apiLevel: [number, number],
+  capabilities: Array<string>,
 }
 
 // TODO(mc, 2018-01-11): replace actionType constants with Flow types
@@ -73,6 +74,7 @@ const INITIAL_STATE: SessionState = {
   errors: [],
   protocolCommands: [],
   protocolCommandsById: {},
+  capabilities: [],
 
   // deck setup from protocol
   pipettesByMount: {},
@@ -95,6 +97,14 @@ export default function sessionReducer(
   action: Action
 ): SessionState {
   switch (action.type) {
+    case 'robot:CONNECT_RESPONSE': {
+      if (action.payload.error) return state
+      return {
+        ...state,
+        capabilities: action.payload.sessionCapabilities,
+      }
+    }
+
     case 'robot:DISCONNECT_RESPONSE':
       return INITIAL_STATE
 

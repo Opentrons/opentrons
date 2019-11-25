@@ -19,6 +19,7 @@ describe('robot reducer - session', () => {
       errors: [],
       protocolCommands: [],
       protocolCommandsById: {},
+      capabilities: [],
 
       // deck setup from protocol
       pipettesByMount: {},
@@ -35,6 +36,28 @@ describe('robot reducer - session', () => {
       runTime: 0,
       apiLevel: [1, 0],
     })
+  })
+
+  test('handles CONNECT_RESPONSE success', () => {
+    const expected = { capabilities: ['create'] }
+    const state = { session: { capabilities: [] } }
+    const action = {
+      type: 'robot:CONNECT_RESPONSE',
+      payload: { sessionCapabilities: ['create'] },
+    }
+
+    expect(reducer(state, action).session).toEqual(expected)
+  })
+
+  test('handles CONNECT_RESPONSE failure', () => {
+    const expected = { capabilities: ['create'] }
+    const state = { session: { capabilities: ['create'] } }
+    const action = {
+      type: 'robot:CONNECT_RESPONSE',
+      payload: { error: new Error('AH'), sessionCapabilities: [] },
+    }
+
+    expect(reducer(state, action).session).toEqual(expected)
   })
 
   test('handles DISCONNECT_RESPONSE success', () => {

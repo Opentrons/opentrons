@@ -6,6 +6,7 @@ import find from 'lodash/find'
 import kebabCase from 'lodash/kebabCase'
 import mapKeys from 'lodash/mapKeys'
 import pick from 'lodash/pick'
+import functionsIn from 'lodash/functionsIn'
 
 import RpcClient from '../../rpc/client'
 import { actions, actionTypes } from '../actions'
@@ -128,8 +129,9 @@ export default function client(dispatch) {
           }
         }
 
-        // only poll health if RPC is not monitoring itself with ping/pong
-        dispatch(actions.connectResponse(null, !rpcClient.monitoring))
+        dispatch(
+          actions.connectResponse(null, functionsIn(remote.session_manager))
+        )
       })
       .catch(e => dispatch(actions.connectResponse(e)))
   }
