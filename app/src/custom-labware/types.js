@@ -1,14 +1,8 @@
 // @flow
 
-import type { LabwareMetadata } from '@opentrons/shared-data'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 // common types
-
-export type LabwareIdentity = {|
-  name: string,
-  namespace: string,
-  version: number,
-|}
 
 type LabwareFileProps = {|
   filename: string,
@@ -17,8 +11,7 @@ type LabwareFileProps = {|
 
 type ValidatedLabwareProps = {|
   ...LabwareFileProps,
-  identity: LabwareIdentity,
-  metadata: LabwareMetadata,
+  definition: LabwareDefinition2,
 |}
 
 export type UncheckedLabwareFile = {|

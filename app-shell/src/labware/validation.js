@@ -36,26 +36,15 @@ export function validateLabwareFiles(
     const { filename, data, created } = file
 
     // check file against the schema
-    const validatedData = data && validateLabwareDefinition(data)
+    const definition = data && validateLabwareDefinition(data)
 
-    if (validatedData === null) {
+    if (definition === null) {
       return { filename, created, type: INVALID_LABWARE_FILE }
     }
 
-    const identity = {
-      name: validatedData.parameters.loadName,
-      version: validatedData.version,
-      namespace: validatedData.namespace,
-    }
+    const props = { filename, created, definition }
 
-    const props = {
-      filename,
-      identity,
-      created,
-      metadata: validatedData.metadata,
-    }
-
-    return validatedData.namespace !== 'opentrons'
+    return definition.namespace !== 'opentrons'
       ? ({ ...props, type: VALID_LABWARE_FILE }: ValidLabwareFile)
       : ({ ...props, type: OPENTRONS_LABWARE_FILE }: OpentronsLabwareFile)
   })

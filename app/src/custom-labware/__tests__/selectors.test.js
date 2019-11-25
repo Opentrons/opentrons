@@ -36,6 +36,49 @@ describe('custom labware selectors', () => {
       expected: [Fixtures.mockValidLabware, Fixtures.mockInvalidLabware],
     },
     {
+      name: 'getCustomLabware sorts by displayCategory then displayName',
+      selector: selectors.getCustomLabware,
+      state: {
+        labware: {
+          addFailureFile: null,
+          addFailureMessage: null,
+          listFailureMessage: null,
+          filenames: ['4.json', '2.json', '1.json', '3.json'],
+          filesByName: {
+            '4.json': ({}: any),
+            '2.json': ({
+              definition: {
+                metadata: { displayCategory: 'A', displayName: 'B' },
+              },
+            }: any),
+            '1.json': ({
+              definition: {
+                metadata: { displayCategory: 'A', displayName: 'A' },
+              },
+            }: any),
+            '3.json': ({
+              definition: {
+                metadata: { displayCategory: 'B', displayName: 'A' },
+              },
+            }: any),
+          },
+        },
+      },
+      expected: [
+        ({
+          definition: { metadata: { displayCategory: 'A', displayName: 'A' } },
+        }: any),
+        ({
+          definition: { metadata: { displayCategory: 'A', displayName: 'B' } },
+        }: any),
+        ({
+          definition: { metadata: { displayCategory: 'B', displayName: 'A' } },
+        }: any),
+        ({}: any),
+      ],
+    },
+
+    {
       name: 'getValidCustomLabware',
       selector: selectors.getValidCustomLabware,
       state: {
@@ -76,6 +119,20 @@ describe('custom labware selectors', () => {
         },
       },
       expected: { file: Fixtures.mockInvalidLabware, errorMessage: 'AH' },
+    },
+    {
+      name: 'getListLabwareErrorMessage',
+      selector: selectors.getListLabwareErrorMessage,
+      state: {
+        labware: {
+          addFailureFile: null,
+          addFailureMessage: null,
+          listFailureMessage: 'AH',
+          filenames: [],
+          filesByName: {},
+        },
+      },
+      expected: 'AH',
     },
   ]
 

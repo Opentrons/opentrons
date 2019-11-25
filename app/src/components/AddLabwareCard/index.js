@@ -18,7 +18,7 @@ import { PortaledAddLabwareFailureModal } from './AddLabwareFailureModal'
 import type { Dispatch } from '../../types'
 
 // TODO(mc, 2019-10-17): i18n
-const ADD_LABWARE_CARD_TITLE = 'Labware Management'
+const LABWARE_MANAGEMENT = 'Labware Management'
 
 export function AddLabwareCard() {
   const dispatch = useDispatch<Dispatch>()
@@ -30,7 +30,7 @@ export function AddLabwareCard() {
   const showAddFailure = addFailure.file || addFailure.errorMessage !== null
 
   return (
-    <Card title={ADD_LABWARE_CARD_TITLE}>
+    <Card title={LABWARE_MANAGEMENT}>
       <ManagePath path={labwarePath} onChangePath={handleChangePath} />
       <AddLabware onAddLabware={handleAddLabware} />
       {showAddFailure && (

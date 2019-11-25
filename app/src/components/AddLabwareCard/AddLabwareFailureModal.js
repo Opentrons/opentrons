@@ -62,11 +62,13 @@ const renderDetails = file => (
     <ul className={styles.details_list}>
       <li className={styles.list_item}>
         <span className={styles.list_item_title}>{DISPLAY_NAME}</span>
-        <span>{file.metadata.displayName}</span>
+        <span>{file.definition.metadata.displayName}</span>
       </li>
       <li className={styles.list_item}>
         <span className={styles.list_item_title}>{API_NAME}</span>
-        <span className={styles.code}>{file.identity.name}</span>
+        <span className={styles.code}>
+          {file.definition.parameters.loadName}
+        </span>
       </li>
       <li className={styles.list_item}>
         <span className={styles.list_item_title}>{FILENAME}</span>

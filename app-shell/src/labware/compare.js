@@ -7,10 +7,10 @@ export function sameIdentity(
   b: CheckedLabwareFile
 ): boolean {
   return (
-    a.identity != null &&
-    b.identity != null &&
-    a.identity.name === b.identity.name &&
-    a.identity.version === b.identity.version &&
-    a.identity.namespace === b.identity.namespace
+    a.definition != null &&
+    b.definition != null &&
+    a.definition.parameters.loadName === b.definition.parameters.loadName &&
+    a.definition.version === b.definition.version &&
+    a.definition.namespace === b.definition.namespace
   )
 }

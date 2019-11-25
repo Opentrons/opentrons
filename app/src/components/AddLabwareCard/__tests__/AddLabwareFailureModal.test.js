@@ -98,8 +98,8 @@ describe('AddLabwareFailureModal', () => {
       expect(wrapper.html()).toMatch(
         /conflicts with an Opentrons standard definition/
       )
-      expect(html).toContain(file.metadata.displayName)
-      expect(html).toContain(file.identity.name)
+      expect(html).toContain(file.definition.metadata.displayName)
+      expect(html).toContain(file.definition.parameters.loadName)
       expect(html).toContain(file.filename)
     })
 
@@ -112,8 +112,8 @@ describe('AddLabwareFailureModal', () => {
         'Overwrite duplicate labware?'
       )
       expect(html).toMatch(/already exists/)
-      expect(html).toContain(file.metadata.displayName)
-      expect(html).toContain(file.identity.name)
+      expect(html).toContain(file.definition.metadata.displayName)
+      expect(html).toContain(file.definition.parameters.loadName)
       expect(html).toContain(file.filename)
     })
 

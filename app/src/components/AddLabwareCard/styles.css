@@ -6,11 +6,12 @@
 }
 
 .code {
-  @apply --font-code;
+  @apply --font-code-dark;
 }
 
 .details_list {
   list-style: none;
+  margin-bottom: 1rem;
 }
 
 .list_item {
