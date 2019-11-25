@@ -247,15 +247,23 @@ def test_thermocycler_profile(loop, monkeypatch):
                         block_max_volume=35)
     set_temp_hw_mock.assert_has_calls([mock.call(temperature=30,
                                                  hold_time_seconds=20,
+                                                 hold_time_minutes=None,
+                                                 ramp_rate=None,
                                                  volume=35),
                                        mock.call(temperature=70,
                                                  hold_time_seconds=72,
+                                                 hold_time_minutes=None,
+                                                 ramp_rate=None,
                                                  volume=35),
                                        mock.call(temperature=30,
                                                  hold_time_seconds=20,
+                                                 hold_time_minutes=None,
+                                                 ramp_rate=None,
                                                  volume=35),
                                        mock.call(temperature=70,
                                                  hold_time_seconds=72,
+                                                 hold_time_minutes=None,
+                                                 ramp_rate=None,
                                                  volume=35)])
 
 
