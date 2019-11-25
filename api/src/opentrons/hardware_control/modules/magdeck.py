@@ -1,5 +1,4 @@
 import asyncio
-from threading import Lock
 from typing import Union
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from . import update, mod_abc
@@ -34,7 +33,7 @@ class SimulatingDriver:
     def connect(self, port):
         pass
 
-    def disconnect(self):
+    def disconnect(self, port=None):
         pass
 
     def enter_programming_mode(self):
@@ -98,7 +97,6 @@ class MagDeck(mod_abc.AbstractModule):
             self._loop = loop
 
         self._device_info = None
-        self._lock = Lock()
 
     def calibrate(self):
         """
@@ -109,8 +107,7 @@ class MagDeck(mod_abc.AbstractModule):
 
     @property
     def current_height(self):
-        with self._lock:
-            return self._driver.mag_position
+        return self._driver.mag_position
 
     def engage(self, height):
         """
@@ -193,7 +190,7 @@ class MagDeck(mod_abc.AbstractModule):
         Disconnect from the serial port
         """
         if self._driver:
-            self._driver.disconnect()
+            self._driver.disconnect(port=self._port)
 
     def __del__(self):
         self._disconnect()

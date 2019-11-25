@@ -1,4 +1,4 @@
-from threading import Thread, Event, Lock
+from threading import Thread, Event
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 from opentrons import commands
 
@@ -25,7 +25,6 @@ class TempDeck(commands.CommandPublisher):
         self._driver = None
         self._device_info = None
         self._poll_stop_event = None
-        self._lock = Lock()
 
     @commands.publish.both(command=commands.tempdeck_set_temp)
     def set_temperature(self, celsius):
@@ -136,8 +135,7 @@ class TempDeck(commands.CommandPublisher):
             self._driver.connect(self._port)
             self._device_info = self._driver.get_device_info()
             self._poll_stop_event = Event()
-            with self._lock:
-                Thread(target=self._poll_temperature).start()
+            Thread(target=self._poll_temperature).start()
         else:
             # Sanity check Should never happen, because connect should never
             # be called without a port on Module
@@ -154,4 +152,4 @@ class TempDeck(commands.CommandPublisher):
         if self._driver:
             if self.status != 'idle':
                 self.deactivate()
-            self._driver.disconnect()
+            self._driver.disconnect(port=self._port)

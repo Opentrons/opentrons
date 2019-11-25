@@ -1,4 +1,3 @@
-import threading
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from opentrons import commands
 
@@ -24,7 +23,7 @@ class MagDeck(commands.CommandPublisher):
         self._port = port
         self._driver = None
         self._device_info = None
-        self._lock = threading.Lock()
+        self._lock = None
 
     @commands.publish.both(command=commands.magdeck_calibrate)
     def calibrate(self):
@@ -78,8 +77,7 @@ class MagDeck(commands.CommandPublisher):
 
     @property
     def current_height(self):
-        with self._lock:
-            return self._driver.mag_position
+        return self._driver.mag_position
 
     @property
     def engaged(self):
@@ -161,4 +159,4 @@ class MagDeck(commands.CommandPublisher):
         Disconnect from the serial port
         '''
         if self._driver:
-            self._driver.disconnect()
+            self._driver.disconnect(port=self._port)

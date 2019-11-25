@@ -128,7 +128,6 @@ class TempDeck(mod_abc.AbstractModule):
         self._port = port
         self._device_info = None
         self._poller = None
-        self._lock = asyncio.Lock(loop=self._loop)
 
     async def set_temperature(self, celsius):
         """
@@ -207,14 +206,12 @@ class TempDeck(mod_abc.AbstractModule):
             self._poller.join()
         self._driver.connect(self._port)
         self._device_info = self._driver.get_device_info()
-        async with self._lock:
-            self._poller = Poller(self._driver)
-            self._poller.start()
+        self._poller = Poller(self._driver)
+        self._poller.start()
 
     def __del__(self):
         if hasattr(self, '_poller') and self._poller:
             self._poller.join()
-            # self._lock.release()
 
     async def prep_for_update(self) -> str:
         if self._poller:

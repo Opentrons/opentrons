@@ -7,19 +7,27 @@
 # strips those ACK characters from the response, the return the response
 # If you send a commmand to the serial comm module and it never sees the
 # expected ACK, then it'll eventually time out and return an error
-
+import pytest
 import time
 import asyncio
+from threading import Lock
 from opentrons.drivers import serial_communication
 from opentrons.drivers.temp_deck import TempDeck
 
 
-def test_get_temp_deck_temperature(monkeypatch):
+@pytest.fixture
+def temp_deck():
+    temp_deck = TempDeck()
+    temp_deck.simulating = False
+    temp_deck._lock = Lock()
+    yield temp_deck
+    temp_deck._lock = None
+
+
+def test_get_temp_deck_temperature(monkeypatch, temp_deck):
     # Get the curent and target temperatures
     # If no target temp has been previously set,
     # then the response will set 'T' to 'none'
-    temp_deck = TempDeck()
-    temp_deck.simulating = False
     command_log = []
     return_string = 'T:none C:90'
 
@@ -45,11 +53,9 @@ def test_get_temp_deck_temperature(monkeypatch):
     assert temp_deck.target == 99
 
 
-def test_fail_get_temp_deck_temperature(monkeypatch):
+def test_fail_get_temp_deck_temperature(monkeypatch, temp_deck):
     # Get the curent and target temperatures
     # If get fails, temp_deck temperature is not updated
-    temp_deck = TempDeck()
-    temp_deck.simulating = False
 
     done = False
 
@@ -81,10 +87,8 @@ def test_fail_get_temp_deck_temperature(monkeypatch):
     assert temp_deck._temperature == {'current': 90, 'target': None}
 
 
-async def test_set_temp_deck_temperature(monkeypatch):
+async def test_set_temp_deck_temperature(monkeypatch, temp_deck):
     # Set target temperature
-    temp_deck = TempDeck()
-    temp_deck.simulating = False
     command_log = []
 
     def _mock_send_command(command, timeout=None, tag=None):
@@ -110,7 +114,7 @@ async def test_set_temp_deck_temperature(monkeypatch):
     assert command_log[-1] == 'M104 S-9.0'
 
 
-async def test_fail_set_temp_deck_temperature(monkeypatch):
+async def test_fail_set_temp_deck_temperature(monkeypatch, temp_deck):
 
     error_msg = 'ERROR: some error here'
 
@@ -121,10 +125,6 @@ async def test_fail_set_temp_deck_temperature(monkeypatch):
 
     monkeypatch.setattr(serial_communication, 'write_and_return',
                         _raise_error)
-
-    from opentrons.drivers.temp_deck import TempDeck
-    temp_deck = TempDeck()
-    temp_deck.simulating = False
 
     try:
         res = await asyncio.wait_for(temp_deck.set_temperature(-9),
@@ -151,10 +151,8 @@ async def test_fail_set_temp_deck_temperature(monkeypatch):
     assert res == error_msg
 
 
-def test_turn_off_temp_deck(monkeypatch):
+def test_turn_off_temp_deck(monkeypatch, temp_deck):
 
-    temp_deck = TempDeck()
-    temp_deck.simulating = False
     command_log = []
 
     def _mock_send_command(command, timeout=None, tag=None):
@@ -168,10 +166,8 @@ def test_turn_off_temp_deck(monkeypatch):
     assert command_log == ['M18']
 
 
-def test_get_device_info(monkeypatch):
+def test_get_device_info(monkeypatch, temp_deck):
 
-    temp_deck = TempDeck()
-    temp_deck.simulating = False
     command_log = []
 
     model = 'temp-v1'
@@ -195,9 +191,8 @@ def test_get_device_info(monkeypatch):
     }
 
 
-def test_fail_get_device_info(monkeypatch):
-    temp_deck = TempDeck()
-    temp_deck.simulating = False
+def test_fail_get_device_info(monkeypatch, temp_deck):
+
     command_log = []
 
     model = 'temp-v1'
@@ -217,9 +212,8 @@ def test_fail_get_device_info(monkeypatch):
     assert 'error' in res
 
 
-def test_dfu_command(monkeypatch):
-    temp_deck = TempDeck()
-    temp_deck.simulating = False
+def test_dfu_command(monkeypatch, temp_deck):
+
     command_log = []
 
     def _mock_send_command(command, timeout=None, tag=None):
