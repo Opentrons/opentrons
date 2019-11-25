@@ -34,6 +34,8 @@ export type ShellUpdateAction =
   | {| type: 'shell:SET_UPDATE_SEEN' |}
 
 // command sent to app-shell via meta.shell === true
+// TODO(mc, 2019-11-25): refactor this action to be shell:INITIALIZE
+// it is used for more than just initial update checking
 export function checkShellUpdate(): ShellUpdateAction {
   return { type: 'shell:CHECK_UPDATE', meta: { shell: true } }
 }

@@ -86,7 +86,8 @@ export function registerLabware(dispatch: Dispatch, mainWindow: {}) {
 
   return function handleActionForLabware(action: Action) {
     switch (action.type) {
-      case CustomLabware.FETCH_CUSTOM_LABWARE: {
+      case CustomLabware.FETCH_CUSTOM_LABWARE:
+      case 'shell:CHECK_UPDATE': {
         fetchAndValidateCustomLabware(dispatch)
         break
       }
