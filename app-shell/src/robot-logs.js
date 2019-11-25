@@ -13,10 +13,14 @@ export function registerRobotLogs(dispatch, mainWindow) {
       log.debug('Downloading robot logs', { logUrls })
 
       logUrls
-        .reduce(
-          (result, url) => result.then(() => download(mainWindow, url)),
-          Promise.resolve()
-        )
+        .reduce((result, url, index) => {
+          return result.then(() => {
+            return download(mainWindow, url, {
+              saveAs: true,
+              openFolderWhenDone: index === logUrls.length - 1,
+            })
+          })
+        }, Promise.resolve())
         .catch(error => log.error('Error downloading robot logs', { error }))
         .then(() => dispatch({ type: 'shell:DOWNLOAD_LOGS_DONE' }))
     }

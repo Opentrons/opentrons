@@ -18,6 +18,7 @@ export type FeatureFlags = $Shape<{|
 
 export type Config = {
   devtools: boolean,
+  reinstallDevtools: boolean,
 
   // app update config
   update: {
