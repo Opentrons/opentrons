@@ -182,6 +182,9 @@ table.docutils.field-list {
     background-color: white;
 }
 
+/* Makes pull-quote directives like code directives without monospace */
 .pull-quote {
-    background-color: #EEE
+    background-color: #EEE;
+    margin-left: 0;
+    padding-left: 30px;
 }
