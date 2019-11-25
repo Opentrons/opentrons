@@ -3,14 +3,17 @@ import { setIn } from '@thi.ng/paths'
 import { NAME, selectors, constants } from '../'
 
 import { getLabwareDefBySlot } from '../../protocol/selectors'
+import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
 
 jest.mock('../../protocol/selectors')
+jest.mock('../../custom-labware/selectors')
 
 const makeState = state => ({ [NAME]: state })
 
 const {
   getConnectedRobotName,
   getConnectionStatus,
+  getSessionCapabilities,
   getSessionLoadInProgress,
   getUploadError,
   getSessionIsLoaded,
@@ -38,7 +41,9 @@ const {
 describe('robot selectors', () => {
   beforeEach(() => {
     getLabwareDefBySlot.mockReturnValue({})
+    getCustomLabwareDefinitions.mockReturnValue([])
   })
+
   afterEach(() => {
     jest.resetAllMocks()
   })
@@ -87,6 +92,16 @@ describe('robot selectors', () => {
       })
       expect(getConnectionStatus(state)).toBe(constants.DISCONNECTING)
     })
+  })
+
+  test('getSessionCapabilities', () => {
+    const state = makeState({
+      session: { capabilities: ['create', 'create_from_bundle'] },
+    })
+    expect(getSessionCapabilities(state)).toEqual([
+      'create',
+      'create_from_bundle',
+    ])
   })
 
   test('getSessionLoadInProgress', () => {

@@ -43,6 +43,10 @@ export function parseProtocolData(
   return null
 }
 
+export function fileIsPython(file: ProtocolFile): boolean {
+  return file.type === 'python' || file.type == null
+}
+
 export function fileIsJson(file: ProtocolFile): boolean {
   return file.type === 'json'
 }

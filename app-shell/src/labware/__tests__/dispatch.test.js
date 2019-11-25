@@ -113,6 +113,15 @@ describe('labware module dispatches', () => {
     )
   })
 
+  // TODO(mc, 2019-11-25): refactor this action to be shell:INITIALIZE
+  test('reads labware directory on shell:CHECK_UPDATE', () => {
+    handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
+
+    return flush().then(() =>
+      expect(readLabwareDirectory).toHaveBeenCalledWith(labwareDir)
+    )
+  })
+
   test('reads and parses definition files', () => {
     const mockDirectoryListing = ['a.json', 'b.json', 'c.json', 'd.json']
     const mockParsedFiles = [

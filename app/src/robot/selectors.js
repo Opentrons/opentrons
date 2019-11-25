@@ -8,6 +8,7 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { getLatestLabwareDef } from '../getLabware'
 import { PIPETTE_MOUNTS, DECK_SLOTS } from './constants'
 import { getLabwareDefBySlot } from '../protocol/selectors'
+import { getCustomLabwareDefinitions } from '../custom-labware/selectors'
 
 import type { OutputSelector } from 'reselect'
 import type { State } from '../types'
@@ -68,6 +69,10 @@ export const getConnectionStatus: OutputSelector<
     return 'disconnected'
   }
 )
+
+export function getSessionCapabilities(state: State): Array<string> {
+  return session(state).capabilities
+}
 
 export function getSessionLoadInProgress(state: State): boolean {
   return sessionRequest(state).inProgress
@@ -229,13 +234,7 @@ export const getPipettes: OutputSelector<
   getPipettesByMount,
   (state: State) => calibration(state).probedByMount,
   (state: State) => calibration(state).tipOnByMount,
-  (state: State) => getCalibrationRequest(state),
-  (
-    pipettesByMount,
-    probedByMount,
-    tipOnByMount,
-    calibrationRequest
-  ): Array<Pipette> => {
+  (pipettesByMount, probedByMount, tipOnByMount): Array<Pipette> => {
     return PIPETTE_MOUNTS.filter(mount => pipettesByMount[mount] != null).map(
       mount => {
         const pipette = pipettesByMount[mount]
@@ -322,13 +321,15 @@ export const getLabware: OutputSelector<
   getModulesBySlot,
   getCalibrationRequest,
   getLabwareDefBySlot,
+  getCustomLabwareDefinitions,
   (
     instByMount,
     lwBySlot,
     confirmedBySlot,
     modulesBySlot,
     calibrationRequest,
-    labwareDefsBySlot
+    labwareDefsBySlot,
+    customLabwareDefs
   ): Labware[] => {
     return Object.keys(lwBySlot)
       .filter(isSlot)
@@ -338,7 +339,13 @@ export const getLabware: OutputSelector<
 
         let definition = null
         if (!isLegacy) {
-          definition = labwareDefsBySlot[slot] || getLatestLabwareDef(type)
+          // TODO(mc, 2019-11-25): this logic does not adequately address
+          // labware that shares a loadName but uses a different namespace
+          definition =
+            labwareDefsBySlot[slot] ||
+            getLatestLabwareDef(type) ||
+            customLabwareDefs.find(d => d.parameters.loadName === type) ||
+            null
         }
 
         // labware is confirmed if:

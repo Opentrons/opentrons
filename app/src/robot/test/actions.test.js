@@ -15,14 +15,14 @@ describe('robot actions', () => {
   test('CONNECT_RESPONSE action', () => {
     const success = {
       type: 'robot:CONNECT_RESPONSE',
-      payload: {},
+      payload: { error: null, sessionCapabilities: ['create'] },
     }
     const failure = {
       type: 'robot:CONNECT_RESPONSE',
-      payload: { error: new Error('AH') },
+      payload: { error: new Error('AH'), sessionCapabilities: [] },
     }
 
-    expect(actions.connectResponse()).toEqual(success)
+    expect(actions.connectResponse(null, ['create'])).toEqual(success)
     expect(actions.connectResponse(new Error('AH'))).toEqual(failure)
   })
 

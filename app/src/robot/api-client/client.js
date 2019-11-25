@@ -6,6 +6,7 @@ import find from 'lodash/find'
 import kebabCase from 'lodash/kebabCase'
 import mapKeys from 'lodash/mapKeys'
 import pick from 'lodash/pick'
+import functionsIn from 'lodash/functionsIn'
 
 import RpcClient from '../../rpc/client'
 import { actions, actionTypes } from '../actions'
@@ -15,13 +16,17 @@ import * as selectors from '../selectors'
 // bypass the robot entry point here to avoid shell module
 import { RESTART as ROBOT_RESTART_ACTION } from '../../robot-admin'
 import { getConnectableRobots } from '../../discovery/selectors'
-
-import { fileIsBinary } from '../../protocol/protocol-data'
+import { getProtocolFile } from '../../protocol/selectors'
+import { fileIsBundle, fileIsPython } from '../../protocol/protocol-data'
+import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
 
 const RUN_TIME_TICK_INTERVAL_MS = 1000
 const NO_INTERVAL = -1
 const RE_VOLUME = /.*?(\d+).*?/
 const RE_TIPRACK = /tiprack/i
+
+const THIS_ROBOT_DOES_NOT_SUPPORT_BUNDLES =
+  'This robot does not support ZIP protocol bundles. Please update its software to the latest version and upload this protocol again'
 
 export default function client(dispatch) {
   let freshUpload = false
@@ -124,8 +129,9 @@ export default function client(dispatch) {
           }
         }
 
-        // only poll health if RPC is not monitoring itself with ping/pong
-        dispatch(actions.connectResponse(null, !rpcClient.monitoring))
+        dispatch(
+          actions.connectResponse(null, functionsIn(remote.session_manager))
+        )
       })
       .catch(e => dispatch(actions.connectResponse(e)))
   }
@@ -149,25 +155,47 @@ export default function client(dispatch) {
   }
 
   function uploadProtocol(state, action) {
-    const { name } = state.protocol.file
+    const { session_manager } = remote
+    const file = getProtocolFile(state)
     const { contents } = action.payload
+    const isBundle = fileIsBundle(file)
+    const isPython = fileIsPython(file)
+    const customLabware = getCustomLabwareDefinitions(state)
 
     freshUpload = true
-    remote.session_manager
-      .create(name, contents, fileIsBinary(state.protocol.file))
-      .catch(error => {
-        // back compat: for robot versions before 3.13, Session.create fn takes only 3 args (self, name, contents)
-        // not 4 (self, name, contents, is_binary)
-        if (
-          error.name === 'RemoteError' &&
-          error.methodName === 'create' &&
-          /takes 3 positional arguments/.test(error.message)
-        ) {
-          return remote.session_manager.create(name, contents)
-        }
+    let createTask
 
-        throw error
-      })
+    if (isBundle && 'create_from_bundle' in session_manager) {
+      createTask = session_manager.create_from_bundle(file.name, contents)
+    } else if (isBundle) {
+      createTask = session_manager
+        .create(file.name, contents, true)
+        .catch(error => {
+          if (
+            error.methodName === 'create' &&
+            /takes 3 positional arguments/.test(error.message)
+          ) {
+            throw new Error(THIS_ROBOT_DOES_NOT_SUPPORT_BUNDLES)
+          }
+
+          throw error
+        })
+    } else if (
+      isPython &&
+      customLabware.length > 0 &&
+      'create_with_extra_labware' in session_manager
+    ) {
+      createTask = session_manager.create_with_extra_labware(
+        file.name,
+        contents,
+        // map JS objects to RPC objects (where "value" is under the key `v`)
+        customLabware.map(lw => ({ v: lw }))
+      )
+    } else {
+      createTask = session_manager.create(file.name, contents)
+    }
+
+    createTask
       .then(apiSession => {
         remote.session_manager.session = apiSession
         // state change will trigger a session notification, which will

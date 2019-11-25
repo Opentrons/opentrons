@@ -54,11 +54,15 @@ function startUp() {
   const actionHandlers = [
     registerConfig(dispatch),
     registerDiscovery(dispatch),
-    registerLabware(dispatch, mainWindow),
     registerRobotLogs(dispatch, mainWindow),
     registerUpdate(dispatch),
     registerBuildrootUpdate(dispatch),
   ]
+
+  // TODO(mc, 2019-11-25): remove this feature flag and move handler into `actionHandlers`
+  if (config.devInternal?.customLabware) {
+    actionHandlers.push(registerLabware(dispatch, mainWindow))
+  }
 
   ipcMain.on('dispatch', (_, action) => {
     log.debug('Received action via IPC from renderer', { action })

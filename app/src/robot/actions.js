@@ -24,7 +24,7 @@ export type ConnectResponseAction = {|
   type: 'robot:CONNECT_RESPONSE',
   payload: {|
     error: ?{ message: string },
-    pollHealth: ?boolean,
+    sessionCapabilities: Array<string>,
   |},
 |}
 
@@ -229,10 +229,13 @@ export const actions = {
     }
   },
 
-  connectResponse(error: ?Error, pollHealth: ?boolean): ConnectResponseAction {
+  connectResponse(
+    error: Error,
+    sessionCapabilities: Array<string> = []
+  ): ConnectResponseAction {
     return {
       type: 'robot:CONNECT_RESPONSE',
-      payload: { error, pollHealth },
+      payload: { error, sessionCapabilities },
     }
   },
 
