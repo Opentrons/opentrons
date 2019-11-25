@@ -71,17 +71,39 @@ exports[`LabwareList component renders 3`] = `
       file={
         Object {
           "created": 1,
-          "filename": "a.json",
-          "identity": Object {
-            "name": "a",
+          "definition": Object {
+            "brand": Object {
+              "brand": "Opentrons",
+            },
+            "cornerOffsetFromSlot": Object {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+            },
+            "dimensions": Object {
+              "xDimension": 0,
+              "yDimension": 0,
+              "zDimension": 0,
+            },
+            "groups": Array [],
+            "metadata": Object {
+              "displayCategory": "wellPlate",
+              "displayName": "A",
+              "displayVolumeUnits": "mL",
+            },
             "namespace": "custom",
+            "ordering": Array [],
+            "parameters": Object {
+              "format": "mock",
+              "isMagneticModuleCompatible": false,
+              "isTiprack": false,
+              "loadName": "a",
+            },
+            "schemaVersion": 2,
             "version": 1,
+            "wells": Object {},
           },
-          "metadata": Object {
-            "displayCategory": "wellPlate",
-            "displayName": "A",
-            "displayVolumeUnits": "mL",
-          },
+          "filename": "a.json",
           "type": "VALID_LABWARE_FILE",
         }
       }
@@ -101,17 +123,39 @@ exports[`LabwareList component renders 3`] = `
       file={
         Object {
           "created": 3,
-          "filename": "c.json",
-          "identity": Object {
-            "name": "c",
+          "definition": Object {
+            "brand": Object {
+              "brand": "Opentrons",
+            },
+            "cornerOffsetFromSlot": Object {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+            },
+            "dimensions": Object {
+              "xDimension": 0,
+              "yDimension": 0,
+              "zDimension": 0,
+            },
+            "groups": Array [],
+            "metadata": Object {
+              "displayCategory": "wellPlate",
+              "displayName": "C",
+              "displayVolumeUnits": "mL",
+            },
             "namespace": "opentrons",
+            "ordering": Array [],
+            "parameters": Object {
+              "format": "mock",
+              "isMagneticModuleCompatible": false,
+              "isTiprack": false,
+              "loadName": "c",
+            },
+            "schemaVersion": 2,
             "version": 1,
+            "wells": Object {},
           },
-          "metadata": Object {
-            "displayCategory": "wellPlate",
-            "displayName": "C",
-            "displayVolumeUnits": "mL",
-          },
+          "filename": "c.json",
           "type": "OPENTRONS_LABWARE_FILE",
         }
       }
@@ -121,17 +165,39 @@ exports[`LabwareList component renders 3`] = `
       file={
         Object {
           "created": 4,
-          "filename": "d.json",
-          "identity": Object {
-            "name": "d",
+          "definition": Object {
+            "brand": Object {
+              "brand": "Opentrons",
+            },
+            "cornerOffsetFromSlot": Object {
+              "x": 0,
+              "y": 0,
+              "z": 0,
+            },
+            "dimensions": Object {
+              "xDimension": 0,
+              "yDimension": 0,
+              "zDimension": 0,
+            },
+            "groups": Array [],
+            "metadata": Object {
+              "displayCategory": "wellPlate",
+              "displayName": "D",
+              "displayVolumeUnits": "mL",
+            },
             "namespace": "custom",
+            "ordering": Array [],
+            "parameters": Object {
+              "format": "mock",
+              "isMagneticModuleCompatible": false,
+              "isTiprack": false,
+              "loadName": "d",
+            },
+            "schemaVersion": 2,
             "version": 1,
+            "wells": Object {},
           },
-          "metadata": Object {
-            "displayCategory": "wellPlate",
-            "displayName": "D",
-            "displayVolumeUnits": "mL",
-          },
+          "filename": "d.json",
           "type": "DUPLICATE_LABWARE_FILE",
         }
       }

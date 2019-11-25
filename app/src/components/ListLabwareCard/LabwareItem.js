@@ -36,11 +36,11 @@ export type LabwareItemProps = {|
 
 export function LabwareItem(props: LabwareItemProps) {
   const { file } = props
-  const { type, filename, created } = file
-  const apiName = file.identity ? file.identity.name : NA
-  const displayName = file.metadata ? file.metadata.displayName : NA
-  const displayCategory = file.metadata
-    ? startCase(file.metadata.displayCategory)
+  const { type, filename, created, definition = null } = file
+  const apiName = definition?.parameters.loadName || NA
+  const displayName = definition?.metadata.displayName || NA
+  const displayCategory = definition
+    ? startCase(definition.metadata.displayCategory)
     : NA
 
   let warning = null

@@ -25,15 +25,17 @@ describe('LabwareItem', () => {
     filename: 'some_file.json',
     // Oct 21, 2019, 20:00:00 UTC
     created: 1571688000000,
-    identity: {
-      name: 'foo_bar',
-      namespace: 'custom',
-      version: 1,
-    },
-    metadata: {
-      displayName: 'Foo Bar',
-      displayCategory: 'wellPlate',
-      displayVolumeUnits: 'mL',
+    definition: {
+      ...CustomLabwareFixtures.mockDefinition,
+      parameters: {
+        ...CustomLabwareFixtures.mockDefinition.parameters,
+        loadName: 'foo_bar',
+      },
+      metadata: {
+        ...CustomLabwareFixtures.mockDefinition.metadata,
+        displayName: 'Foo Bar',
+        displayCategory: 'wellPlate',
+      },
     },
   }
 

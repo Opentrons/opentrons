@@ -47,21 +47,33 @@ describe('custom labware selectors', () => {
           filesByName: {
             '4.json': ({}: any),
             '2.json': ({
-              metadata: { displayCategory: 'A', displayName: 'B' },
+              definition: {
+                metadata: { displayCategory: 'A', displayName: 'B' },
+              },
             }: any),
             '1.json': ({
-              metadata: { displayCategory: 'A', displayName: 'A' },
+              definition: {
+                metadata: { displayCategory: 'A', displayName: 'A' },
+              },
             }: any),
             '3.json': ({
-              metadata: { displayCategory: 'B', displayName: 'A' },
+              definition: {
+                metadata: { displayCategory: 'B', displayName: 'A' },
+              },
             }: any),
           },
         },
       },
       expected: [
-        ({ metadata: { displayCategory: 'A', displayName: 'A' } }: any),
-        ({ metadata: { displayCategory: 'A', displayName: 'B' } }: any),
-        ({ metadata: { displayCategory: 'B', displayName: 'A' } }: any),
+        ({
+          definition: { metadata: { displayCategory: 'A', displayName: 'A' } },
+        }: any),
+        ({
+          definition: { metadata: { displayCategory: 'A', displayName: 'B' } },
+        }: any),
+        ({
+          definition: { metadata: { displayCategory: 'B', displayName: 'A' } },
+        }: any),
         ({}: any),
       ],
     },

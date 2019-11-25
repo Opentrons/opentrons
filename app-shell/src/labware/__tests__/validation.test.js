@@ -36,23 +36,13 @@ describe('validateLabwareFiles', () => {
         type: 'VALID_LABWARE_FILE',
         filename: 'a.json',
         created: expect.any(Number),
-        metadata: validLabwareA.metadata,
-        identity: {
-          name: 'fixture_96_plate',
-          version: 1,
-          namespace: 'fixture',
-        },
+        definition: validLabwareA,
       },
       {
         type: 'VALID_LABWARE_FILE',
         filename: 'b.json',
         created: expect.any(Number),
-        metadata: validLabwareB.metadata,
-        identity: {
-          name: 'fixture_12_trough',
-          version: 1,
-          namespace: 'fixture',
-        },
+        definition: validLabwareB,
       },
     ])
   })
@@ -69,35 +59,20 @@ describe('validateLabwareFiles', () => {
         type: 'DUPLICATE_LABWARE_FILE',
         filename: 'a.json',
         created: 3,
-        metadata: validLabwareA.metadata,
-        identity: {
-          name: 'fixture_96_plate',
-          version: 1,
-          namespace: 'fixture',
-        },
+        definition: validLabwareA,
       },
       {
         type: 'VALID_LABWARE_FILE',
         filename: 'b.json',
         created: 2,
-        metadata: validLabwareB.metadata,
-        identity: {
-          name: 'fixture_12_trough',
-          version: 1,
-          namespace: 'fixture',
-        },
+        definition: validLabwareB,
       },
       // oldest duplicate wins and is valid
       {
         type: 'VALID_LABWARE_FILE',
         filename: 'c.json',
         created: 1,
-        metadata: validLabwareA.metadata,
-        identity: {
-          name: 'fixture_96_plate',
-          version: 1,
-          namespace: 'fixture',
-        },
+        definition: validLabwareA,
       },
     ])
   })
@@ -113,12 +88,7 @@ describe('validateLabwareFiles', () => {
         type: 'OPENTRONS_LABWARE_FILE',
         filename: 'a.json',
         created: expect.any(Number),
-        metadata: validLabwareA.metadata,
-        identity: {
-          name: 'fixture_96_plate',
-          version: 1,
-          namespace: 'opentrons',
-        },
+        definition: opentronsDef,
       },
     ])
   })
@@ -137,12 +107,7 @@ describe('validateNewLabwareFile', () => {
       type: 'VALID_LABWARE_FILE',
       filename: 'a.json',
       created: 42,
-      metadata: validLabwareA.metadata,
-      identity: {
-        name: 'fixture_96_plate',
-        version: 1,
-        namespace: 'fixture',
-      },
+      definition: validLabwareA,
     })
   })
 
@@ -152,12 +117,7 @@ describe('validateNewLabwareFile', () => {
         type: 'VALID_LABWARE_FILE',
         filename: 'a.json',
         created: 42,
-        metadata: validLabwareA.metadata,
-        identity: {
-          name: 'fixture_96_plate',
-          version: 1,
-          namespace: 'fixture',
-        },
+        definition: validLabwareA,
       },
     ]
     const newFile = {
@@ -170,12 +130,7 @@ describe('validateNewLabwareFile', () => {
       type: 'DUPLICATE_LABWARE_FILE',
       filename: 'a.json',
       created: 21,
-      metadata: validLabwareA.metadata,
-      identity: {
-        name: 'fixture_96_plate',
-        version: 1,
-        namespace: 'fixture',
-      },
+      definition: validLabwareA,
     })
   })
 })

@@ -3,6 +3,7 @@
 import { createSelector } from 'reselect'
 import sortBy from 'lodash/sortBy'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { State } from '../types'
 import type {
   CheckedLabwareFile,
@@ -26,8 +27,8 @@ export const getCustomLabware: State => Array<CheckedLabwareFile> = createSelect
   state => state.labware.filesByName,
   (filenames, filesByName) =>
     sortBy(filenames.map(name => filesByName[name]), [
-      'metadata.displayCategory',
-      'metadata.displayName',
+      'definition.metadata.displayCategory',
+      'definition.metadata.displayName',
     ])
 )
 
@@ -48,3 +49,8 @@ export const getAddLabwareFailure: State => {|
 
 export const getListLabwareErrorMessage = (state: State) =>
   state.labware.listFailureMessage
+
+export const getCustomLabwareDefinitions: State => Array<LabwareDefinition2> = createSelector(
+  getValidCustomLabware,
+  labware => labware.map(lw => lw.definition)
+)
