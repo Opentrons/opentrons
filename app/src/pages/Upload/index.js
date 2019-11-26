@@ -7,9 +7,8 @@ import { withRouter, Route, Switch, Redirect } from 'react-router-dom'
 import { selectors as robotSelectors } from '../../robot'
 import { getProtocolFilename } from '../../protocol'
 import { getConnectedRobot } from '../../discovery'
+import { getCustomLabware } from '../../custom-labware'
 
-import { Splash } from '@opentrons/components'
-import Page from '../../components/Page'
 import FileInfo from './FileInfo'
 
 import type { ContextRouter } from 'react-router-dom'
@@ -25,6 +24,7 @@ type SP = {|
   uploadError: ?{ message: string },
   sessionLoaded: boolean,
   sessionHasSteps: boolean,
+  showCustomLabwareWarning: boolean,
 |}
 
 type Props = {| ...OP, ...SP, dispatch: Dispatch |}
@@ -41,6 +41,11 @@ function mapStateToProps(state: State): SP {
     uploadError: robotSelectors.getUploadError(state),
     sessionLoaded: robotSelectors.getSessionIsLoaded(state),
     sessionHasSteps: robotSelectors.getCommands(state).length > 0,
+    showCustomLabwareWarning:
+      getCustomLabware(state).length > 0 &&
+      !robotSelectors
+        .getSessionCapabilities(state)
+        .includes('create_with_extra_labware'),
   }
 }
 
@@ -52,19 +57,13 @@ function UploadPage(props: Props) {
     uploadError,
     sessionLoaded,
     sessionHasSteps,
+    showCustomLabwareWarning,
     match: { path },
   } = props
 
   const fileInfoPath = `${path}/file-info`
 
   if (!robot) return <Redirect to="/robots" />
-  if (!filename) {
-    return (
-      <Page>
-        <Splash />
-      </Page>
-    )
-  }
 
   return (
     <Switch>
@@ -79,6 +78,7 @@ function UploadPage(props: Props) {
             uploadError={uploadError}
             sessionLoaded={sessionLoaded}
             sessionHasSteps={sessionHasSteps}
+            showCustomLabwareWarning={showCustomLabwareWarning}
           />
         )}
       />

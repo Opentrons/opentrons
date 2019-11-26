@@ -72,6 +72,7 @@ describe('robot reducer - session', () => {
     const initialState = reducer(undefined, {}).session
     const state = {
       session: {
+        capabilities: ['create'],
         sessionRequest: { inProgress: false, error: new Error('AH') },
         startTime: 40,
         runTime: 42,
@@ -84,6 +85,7 @@ describe('robot reducer - session', () => {
 
     expect(reducer(state, action).session).toEqual({
       ...initialState,
+      capabilities: ['create'],
       sessionRequest: { inProgress: true, error: null },
     })
   })
