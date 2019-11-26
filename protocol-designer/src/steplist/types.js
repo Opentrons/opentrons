@@ -16,9 +16,20 @@ export type TerminalItemId =
   | typeof END_TERMINAL_ITEM_ID
 
 export type WellIngredientNames = { [ingredId: string]: string }
-export type WellIngredientVolumeData = {
-  [ingredId: string]: { volume: number },
-}
+
+// TODO: IL 2019-11-26 untangle single vs multi-channel data types for substeps.
+// We tried to unify them with Maybes and Unions, but really they should be
+// treated as 2 distinct paths
+export type WellIngredientVolumeData =
+  | {
+      // single-channel format
+      [ingredId: string]: {| volume: number |},
+    }
+  | {
+      // multi-channel 'by well' format
+      [well: string]: { [ingredId: string]: {| volume: number |} },
+    }
+
 export type TipLocation = { labware: string, well: string }
 
 export type SubstepIdentifier = {|
@@ -47,11 +58,11 @@ export type SubstepTimelineFrame = {
   channelId?: number,
 }
 
-export type SubstepWellData = {
+export type SubstepWellData = {|
   well: string,
   preIngreds: WellIngredientVolumeData,
   postIngreds: WellIngredientVolumeData,
-}
+|}
 
 export type StepItemSourceDestRow = {
   activeTips: ?TipLocation,

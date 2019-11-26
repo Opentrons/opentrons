@@ -11,7 +11,7 @@ import {
   DEFAULT_PIPETTE,
 } from './fixtures'
 import dropAllTips from '../commandCreators/atomic/dropAllTips'
-import { getNextRobotStateAndWarningsMulti } from '../getNextRobotStateAndWarnings'
+import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
 const p300SingleId = DEFAULT_PIPETTE
 const p300MultiId = 'p300MultiId'
 
@@ -29,7 +29,7 @@ function expectNoTipsRemaining(
   invariantContext: InvariantContext,
   res: CommandsAndWarnings
 ) {
-  const nextRobotState = getNextRobotStateAndWarningsMulti(
+  const nextRobotState = getNextRobotStateAndWarnings(
     res.commands,
     invariantContext,
     initialRobotState

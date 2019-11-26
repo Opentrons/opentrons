@@ -13,7 +13,7 @@ import type {
   RobotStateAndWarnings,
 } from '../types'
 
-export function getNextRobotStateAndWarnings(
+export function getNextRobotStateAndWarningsSingleCommand(
   command: Command,
   invariantContext: InvariantContext,
   prevRobotState: RobotState
@@ -54,14 +54,15 @@ export function getNextRobotStateAndWarnings(
   }
 }
 
-export function getNextRobotStateAndWarningsMulti(
+// Get next state after multiple commands
+export function getNextRobotStateAndWarnings(
   commands: Array<Command>,
   invariantContext: InvariantContext,
   initialRobotState: RobotState
 ): RobotStateAndWarnings {
   return commands.reduce(
     (acc, command) => {
-      const next = getNextRobotStateAndWarnings(
+      const next = getNextRobotStateAndWarningsSingleCommand(
         command,
         invariantContext,
         acc.robotState

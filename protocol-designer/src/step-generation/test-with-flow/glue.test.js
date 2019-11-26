@@ -1,7 +1,7 @@
 // @flow
 import {
+  getNextRobotStateAndWarningsSingleCommand,
   getNextRobotStateAndWarnings,
-  getNextRobotStateAndWarningsMulti,
 } from '../getNextRobotStateAndWarnings'
 import {
   curryCommandCreator,
@@ -84,7 +84,7 @@ const divideCreator: any = (
   }
 }
 
-function mockNextRobotStateAndWarnings(
+function mockNextRobotStateAndWarningsSingleCommand(
   command: CountCommand,
   invariantContext: any,
   prevState: CountState
@@ -114,14 +114,18 @@ function mockNextRobotStateAndWarnings(
   return { robotState: { count }, warnings }
 }
 
-function mockNextRobotStateAndWarningsMulti(
+function mockNextRobotStateAndWarnings(
   commands: Array<CountCommand>,
   invariantContext: any,
   prevState: CountState
 ): CountStateAndWarnings {
   const nextState = commands.reduce(
     (acc, command) =>
-      mockNextRobotStateAndWarnings(command, invariantContext, acc.robotState),
+      mockNextRobotStateAndWarningsSingleCommand(
+        command,
+        invariantContext,
+        acc.robotState
+      ),
     { robotState: prevState, warnings: [] }
   )
   const warnings = [] // NOTE: not making a fake implementation of any nextRobotState warnings!
@@ -129,11 +133,11 @@ function mockNextRobotStateAndWarningsMulti(
 }
 
 // $FlowFixMe: mock methods
-getNextRobotStateAndWarnings.mockImplementation(mockNextRobotStateAndWarnings)
-// $FlowFixMe: mock methods
-getNextRobotStateAndWarningsMulti.mockImplementation(
-  mockNextRobotStateAndWarningsMulti
+getNextRobotStateAndWarningsSingleCommand.mockImplementation(
+  mockNextRobotStateAndWarningsSingleCommand
 )
+// $FlowFixMe: mock methods
+getNextRobotStateAndWarnings.mockImplementation(mockNextRobotStateAndWarnings)
 
 beforeEach(() => {
   invariantContext = {

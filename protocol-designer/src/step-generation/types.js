@@ -174,7 +174,9 @@ export type CommandCreatorArgs =
  */
 type TipId = string
 
-export type LocationLiquidState = { [ingredGroup: string]: { volume: number } }
+export type LocationLiquidState = {
+  [ingredGroup: string]: {| volume: number |},
+}
 
 export type SingleLabwareLiquidState = { [well: string]: LocationLiquidState }
 

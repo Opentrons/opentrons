@@ -2,7 +2,7 @@
 import last from 'lodash/last'
 import pick from 'lodash/pick'
 import { getWellsForTips } from '../step-generation/utils'
-import { getNextRobotStateAndWarningsMulti } from '../step-generation/getNextRobotStateAndWarnings'
+import { getNextRobotStateAndWarnings } from '../step-generation/getNextRobotStateAndWarnings'
 
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type { Channels } from '@opentrons/components'
@@ -14,7 +14,7 @@ import type {
 } from '../step-generation/types'
 import type { SubstepTimelineFrame, TipLocation } from './types'
 
-function _getNewActiveTips(commands: Array<Command>): ?TipLocation {
+export function _getNewActiveTips(commands: Array<Command>): ?TipLocation {
   const lastNewTipCommand: ?Command = last(
     commands.filter(c => c.command === 'pickUpTip')
   )
@@ -34,20 +34,17 @@ type SubstepTimelineAcc = {
   prevRobotState: RobotState,
 }
 
-const substepTimelineSingle = (
+export const substepTimelineSingleChannel = (
   commandCreator: CurriedCommandCreator,
   invariantContext: InvariantContext,
   initialRobotState: RobotState
 ): Array<SubstepTimelineFrame> => {
   const nextFrame = commandCreator(invariantContext, initialRobotState)
   if (nextFrame.errors) return []
-  console.log({ nextFrame })
 
   const timeline = nextFrame.commands.reduce(
     (acc: SubstepTimelineAcc, command: Command, index: number) => {
-      console.log('inside substepTimelineSingle reduce', { acc, index })
-
-      const nextRobotState = getNextRobotStateAndWarningsMulti(
+      const nextRobotState = getNextRobotStateAndWarnings(
         [command],
         invariantContext,
         acc.prevRobotState
@@ -95,7 +92,7 @@ const substepTimelineSingle = (
 }
 
 // timeline for multi-channel substep context
-const substepTimelineMulti = (
+export const substepTimelineMultiChannel = (
   commandCreator: CurriedCommandCreator,
   invariantContext: InvariantContext,
   initialRobotState: RobotState,
@@ -105,7 +102,7 @@ const substepTimelineMulti = (
   if (nextFrame.errors) return []
   const timeline = nextFrame.commands.reduce(
     (acc: SubstepTimelineAcc, command: Command, index: number) => {
-      const nextRobotState = getNextRobotStateAndWarningsMulti(
+      const nextRobotState = getNextRobotStateAndWarnings(
         nextFrame.commands,
         invariantContext,
         acc.prevRobotState
@@ -173,13 +170,13 @@ const substepTimeline = (
   channels: Channels
 ) => {
   if (channels === 1) {
-    return substepTimelineSingle(
+    return substepTimelineSingleChannel(
       commandCreator,
       invariantContext,
       initialRobotState
     )
   } else {
-    return substepTimelineMulti(
+    return substepTimelineMultiChannel(
       commandCreator,
       invariantContext,
       initialRobotState,

@@ -84,10 +84,16 @@ export const PillTooltipContents = (props: PillTooltipContentsProps) => {
 
 function SubstepRow(props: SubstepRowProps) {
   const compactedSourcePreIngreds = props.source
-    ? omitBy(props.source.preIngreds, ingred => ingred.volume <= 0)
+    ? omitBy(
+        props.source.preIngreds,
+        ingred => typeof ingred.volume === 'number' && ingred.volume <= 0
+      )
     : {}
   const compactedDestPreIngreds = props.dest
-    ? omitBy(props.dest.preIngreds, ingred => ingred.volume <= 0)
+    ? omitBy(
+        props.dest.preIngreds,
+        ingred => typeof ingred.volume === 'number' && ingred.volume <= 0
+      )
     : {}
   const selectSubstep = props.selectSubstep || noop
   return (

@@ -1,6 +1,6 @@
 // @flow
 import last from 'lodash/last'
-import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
+import { getNextRobotStateAndWarningsSingleCommand } from '../getNextRobotStateAndWarnings'
 import type {
   InvariantContext,
   RobotState,
@@ -40,7 +40,7 @@ export const commandCreatorsTimeline = (
       const commands = commandCreatorResult.commands
       const nextRobotStateAndWarnings = commands.reduce(
         (acc: RobotStateAndWarnings, command) =>
-          getNextRobotStateAndWarnings(
+          getNextRobotStateAndWarningsSingleCommand(
             command,
             invariantContext,
             acc.robotState

@@ -6,19 +6,7 @@ import mapValues from 'lodash/mapValues'
 import isEmpty from 'lodash/isEmpty'
 
 import substepTimeline from './substepTimeline'
-import {
-  utils as steplistUtils,
-  type NamedIngred,
-  type StepArgsAndErrors,
-} from '../steplist'
-
-import type {
-  SubstepItemData,
-  SourceDestSubstepItem,
-  SubstepTimelineFrame,
-  StepItemSourceDestRow,
-} from './types'
-
+import * as steplistUtils from './utils'
 import {
   consolidate,
   distribute,
@@ -28,8 +16,11 @@ import {
 } from '../step-generation'
 
 import type { StepIdType } from '../form-types'
-import type { InvariantContext, RobotState } from '../step-generation'
-
+import type {
+  CurriedCommandCreator,
+  InvariantContext,
+  RobotState,
+} from '../step-generation'
 import type {
   ConsolidateArgs,
   DistributeArgs,
@@ -37,8 +28,192 @@ import type {
   PauseArgs,
   TransferArgs,
 } from '../step-generation/types'
+import type {
+  NamedIngred,
+  StepArgsAndErrors,
+  StepItemSourceDestRow,
+  SourceDestSubstepItem,
+  SubstepItemData,
+  SubstepTimelineFrame,
+} from './types'
 
 export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
+
+// TODO IMMEDIATELY this is already a type, right???
+type TransferLikeArgs =
+  | ConsolidateArgs
+  | DistributeArgs
+  | TransferArgs
+  | MixArgs
+
+function getCommandCreatorForSubsteps(
+  stepArgs: TransferLikeArgs
+): CurriedCommandCreator | null {
+  // Call appropriate command creator with the validateForm fields.
+  // Disable any mix args so those aspirate/dispenses don't show up in substeps
+  if (stepArgs.commandCreatorFnName === 'transfer') {
+    const commandCallArgs = {
+      ...stepArgs,
+      mixBeforeAspirate: null,
+      mixInDestination: null,
+      preWetTip: false,
+    }
+
+    return curryCommandCreator(transfer, commandCallArgs)
+  } else if (stepArgs.commandCreatorFnName === 'distribute') {
+    const commandCallArgs = {
+      ...stepArgs,
+      mixBeforeAspirate: null,
+      preWetTip: false,
+    }
+
+    return curryCommandCreator(distribute, commandCallArgs)
+  } else if (stepArgs.commandCreatorFnName === 'consolidate') {
+    const commandCallArgs = {
+      ...stepArgs,
+      mixFirstAspirate: null,
+      mixInDestination: null,
+      preWetTip: false,
+    }
+
+    return curryCommandCreator(consolidate, commandCallArgs)
+  } else if (stepArgs.commandCreatorFnName === 'mix') {
+    return curryCommandCreator(mix, stepArgs)
+  } else {
+    console.warn(
+      `getStepArgsForSubsteps got unsupported stepType "${stepArgs.commandCreatorFnName}"`
+    )
+    return null
+  }
+}
+
+export const mergeSubstepRowsSingleChannel = (args: {|
+  substepRows: Array<SubstepTimelineFrame>,
+  showDispenseVol: boolean,
+|}): Array<StepItemSourceDestRow> => {
+  const { substepRows, showDispenseVol } = args
+  return steplistUtils.mergeWhen(
+    substepRows,
+    (currentRow, nextRow) =>
+      // NOTE: if aspirate then dispense rows are adjacent, collapse them into one row
+      currentRow.source && nextRow.dest,
+    (currentRow, nextRow) => ({
+      ...currentRow,
+      source: {
+        well: currentRow.source && currentRow.source.wells[0],
+        preIngreds: currentRow.source && currentRow.source.preIngreds,
+        postIngreds: currentRow.source && currentRow.source.postIngreds,
+      },
+      ...nextRow,
+      dest: {
+        well: nextRow.dest && nextRow.dest.wells[0],
+        preIngreds: nextRow.dest && nextRow.dest.preIngreds,
+        postIngreds: nextRow.dest && nextRow.dest.postIngreds,
+      },
+      volume: showDispenseVol ? nextRow.volume : currentRow.volume,
+    }),
+    currentRow => {
+      const source = currentRow.source && {
+        well: currentRow.source.wells[0],
+        preIngreds: currentRow.source.preIngreds,
+        postIngreds: currentRow.source.postIngreds,
+      }
+      const dest = currentRow.dest && {
+        well: currentRow.dest.wells[0],
+        preIngreds: currentRow.dest.preIngreds,
+        postIngreds: currentRow.dest.postIngreds,
+      }
+      return {
+        activeTips: currentRow.activeTips,
+        source,
+        dest,
+        volume: currentRow.volume,
+      }
+    }
+  )
+}
+
+export const mergeSubstepRowsMultiChannel = (args: {|
+  substepRows: Array<SubstepTimelineFrame>,
+  channels: number,
+  isMixStep: boolean,
+  showDispenseVol: boolean,
+|}): Array<Array<StepItemSourceDestRow>> => {
+  const { substepRows, channels, isMixStep, showDispenseVol } = args
+  return steplistUtils.mergeWhen(
+    substepRows,
+    (
+      currentMultiRow: SubstepTimelineFrame,
+      nextMultiRow: SubstepTimelineFrame
+    ) => {
+      // aspirate then dispense multirows adjacent
+      // (inferring from first channel row in each multirow)
+      return (
+        currentMultiRow &&
+        currentMultiRow.source &&
+        nextMultiRow &&
+        nextMultiRow.dest
+      )
+    },
+    // Merge each channel row together when predicate true
+    (currentMultiRow, nextMultiRow) => {
+      return range(channels).map(channelIndex => {
+        const sourceChannelWell =
+          currentMultiRow.source && currentMultiRow.source.wells[channelIndex]
+        const destChannelWell =
+          nextMultiRow.dest && nextMultiRow.dest.wells[channelIndex]
+        const source = currentMultiRow.source &&
+          sourceChannelWell && {
+            well: sourceChannelWell,
+            preIngreds: currentMultiRow.source.preIngreds[sourceChannelWell],
+            postIngreds: currentMultiRow.source.postIngreds[sourceChannelWell],
+          }
+        const dest = nextMultiRow.dest &&
+          destChannelWell && {
+            well: destChannelWell,
+            preIngreds: nextMultiRow.dest.preIngreds[destChannelWell],
+            postIngreds: nextMultiRow.dest.postIngreds[destChannelWell],
+          }
+        const activeTips = currentMultiRow.activeTips
+        return {
+          activeTips,
+          source,
+          dest: isMixStep ? source : dest, // NOTE: since source and dest are same for mix, we're showing source on both sides. Otherwise dest would show the intermediate volume state
+          volume: showDispenseVol
+            ? nextMultiRow.volume
+            : currentMultiRow.volume,
+        }
+      })
+    },
+    currentMultiRow =>
+      range(channels).map(channelIndex => {
+        const source = currentMultiRow.source && {
+          well: currentMultiRow.source.wells[channelIndex],
+          preIngreds:
+            currentMultiRow.source.preIngreds[
+              currentMultiRow.source.wells[channelIndex]
+            ],
+          postIngreds:
+            currentMultiRow.source.postIngreds[
+              currentMultiRow.source.wells[channelIndex]
+            ],
+        }
+        const dest = currentMultiRow.dest && {
+          well: currentMultiRow.dest.wells[channelIndex],
+          preIngreds:
+            currentMultiRow.dest.preIngreds[
+              currentMultiRow.dest.wells[channelIndex]
+            ],
+          postIngreds:
+            currentMultiRow.dest.postIngreds[
+              currentMultiRow.dest.wells[channelIndex]
+            ],
+        }
+        const activeTips = currentMultiRow.activeTips
+        return { activeTips, source, dest, volume: currentMultiRow.volume }
+      })
+  )
+}
 
 function transferLikeSubsteps(args: {|
   stepArgs: ConsolidateArgs | DistributeArgs | TransferArgs | MixArgs,
@@ -71,43 +246,11 @@ function transferLikeSubsteps(args: {|
   // if false, show aspirate vol instead
   const showDispenseVol = stepArgs.commandCreatorFnName === 'distribute'
 
-  let substepCommandCreator
-
   // Call appropriate command creator with the validateForm fields.
   // Disable any mix args so those aspirate/dispenses don't show up in substeps
-  if (stepArgs.commandCreatorFnName === 'transfer') {
-    const commandCallArgs = {
-      ...stepArgs,
-      mixBeforeAspirate: null,
-      mixInDestination: null,
-      preWetTip: false,
-    }
-
-    substepCommandCreator = curryCommandCreator(transfer, commandCallArgs)
-  } else if (stepArgs.commandCreatorFnName === 'distribute') {
-    const commandCallArgs = {
-      ...stepArgs,
-      mixBeforeAspirate: null,
-      preWetTip: false,
-    }
-
-    substepCommandCreator = curryCommandCreator(distribute, commandCallArgs)
-  } else if (stepArgs.commandCreatorFnName === 'consolidate') {
-    const commandCallArgs = {
-      ...stepArgs,
-      mixFirstAspirate: null,
-      mixInDestination: null,
-      preWetTip: false,
-    }
-
-    substepCommandCreator = curryCommandCreator(consolidate, commandCallArgs)
-  } else if (stepArgs.commandCreatorFnName === 'mix') {
-    substepCommandCreator = curryCommandCreator(mix, stepArgs)
-  } else {
-    // TODO Ian 2018-05-21 Use assert here. Should be unreachable
-    console.warn(
-      `transferLikeSubsteps got unsupported stepType "${stepArgs.commandCreatorFnName}"`
-    )
+  const substepCommandCreator = getCommandCreatorForSubsteps(stepArgs)
+  if (!substepCommandCreator) {
+    assert(false, `transferLikeSubsteps could not make a command creator`)
     return null
   }
 
@@ -122,84 +265,11 @@ function transferLikeSubsteps(args: {|
 
     const mergedMultiRows: Array<
       Array<StepItemSourceDestRow>
-    > = steplistUtils.mergeWhen(
+    > = mergeSubstepRowsMultiChannel({
       substepRows,
-      (
-        currentMultiRow: SubstepTimelineFrame,
-        nextMultiRow: SubstepTimelineFrame
-      ) => {
-        // aspirate then dispense multirows adjacent
-        // (inferring from first channel row in each multirow)
-        return (
-          currentMultiRow &&
-          currentMultiRow.source &&
-          nextMultiRow &&
-          nextMultiRow.dest
-        )
-      },
-      // Merge each channel row together when predicate true
-      (currentMultiRow, nextMultiRow) => {
-        return range(pipetteSpec.channels).map(channelIndex => {
-          const sourceChannelWell =
-            currentMultiRow.source && currentMultiRow.source.wells[channelIndex]
-          const destChannelWell =
-            nextMultiRow.dest && nextMultiRow.dest.wells[channelIndex]
-          const source = currentMultiRow.source &&
-            sourceChannelWell && {
-              well: sourceChannelWell,
-              preIngreds: currentMultiRow.source.preIngreds[sourceChannelWell],
-              postIngreds:
-                currentMultiRow.source.postIngreds[sourceChannelWell],
-            }
-          const dest = nextMultiRow.dest &&
-            destChannelWell && {
-              well: destChannelWell,
-              preIngreds: nextMultiRow.dest.preIngreds[destChannelWell],
-              postIngreds: nextMultiRow.dest.postIngreds[destChannelWell],
-            }
-          const activeTips = currentMultiRow.activeTips
-          return {
-            activeTips,
-            source,
-            dest: stepArgs.commandCreatorFnName === 'mix' ? source : dest, // NOTE: since source and dest are same for mix, we're showing source on both sides. Otherwise dest would show the intermediate volume state
-            volume: showDispenseVol
-              ? nextMultiRow.volume
-              : currentMultiRow.volume,
-          }
-        })
-      },
-      currentMultiRow =>
-        range(pipetteSpec.channels).map(channelIndex => {
-          const source = currentMultiRow.source && {
-            well: currentMultiRow.source.wells[channelIndex],
-            preIngreds:
-              currentMultiRow.source.preIngreds[
-                currentMultiRow.source.wells[channelIndex]
-              ],
-            postIngreds:
-              currentMultiRow.source.postIngreds[
-                currentMultiRow.source.wells[channelIndex]
-              ],
-          }
-          const dest = currentMultiRow.dest && {
-            well: currentMultiRow.dest.wells[channelIndex],
-            preIngreds:
-              currentMultiRow.dest.preIngreds[
-                currentMultiRow.dest.wells[channelIndex]
-              ],
-            postIngreds:
-              currentMultiRow.dest.postIngreds[
-                currentMultiRow.dest.wells[channelIndex]
-              ],
-          }
-          const activeTips = currentMultiRow.activeTips
-          return { activeTips, source, dest, volume: currentMultiRow.volume }
-        })
-    )
-    console.log('transferLikeSubsteps, multi', {
-      stepId,
-      substepRows,
-      mergedMultiRows,
+      isMixStep: stepArgs.commandCreatorFnName === 'mix',
+      channels: pipetteSpec.channels,
+      showDispenseVol,
     })
 
     return {
@@ -217,51 +287,9 @@ function transferLikeSubsteps(args: {|
       1
     )
 
-    const mergedRows: Array<StepItemSourceDestRow> = steplistUtils.mergeWhen(
-      substepRows,
-      (currentRow, nextRow) =>
-        // NOTE: if aspirate then dispense rows are adjacent, collapse them into one row
-        currentRow.source && nextRow.dest,
-      (currentRow, nextRow) => ({
-        ...currentRow,
-        source: {
-          well: currentRow.source && currentRow.source.wells[0],
-          preIngreds: currentRow.source && currentRow.source.preIngreds,
-          postIngreds: currentRow.source && currentRow.source.postIngreds,
-        },
-        ...nextRow,
-        dest: {
-          well: nextRow.dest && nextRow.dest.wells[0],
-          preIngreds: nextRow.dest && nextRow.dest.preIngreds,
-          postIngreds: nextRow.dest && nextRow.dest.postIngreds,
-        },
-        volume: showDispenseVol ? nextRow.volume : currentRow.volume,
-      }),
-      currentRow => {
-        const source = currentRow.source && {
-          well: currentRow.source.wells[0],
-          preIngreds: currentRow.source.preIngreds,
-          postIngreds: currentRow.source.postIngreds,
-        }
-        const dest = currentRow.dest && {
-          well: currentRow.dest.wells[0],
-          preIngreds: currentRow.dest.preIngreds,
-          postIngreds: currentRow.dest.postIngreds,
-        }
-        return {
-          activeTips: currentRow.activeTips,
-          source,
-          dest,
-          volume: currentRow.volume,
-        }
-      }
+    const mergedRows: Array<StepItemSourceDestRow> = mergeSubstepRowsSingleChannel(
+      { substepRows, showDispenseVol }
     )
-
-    console.log('transferLikeSubsteps, single', {
-      stepId,
-      substepRows,
-      mergedRows,
-    })
 
     return {
       multichannel: false,

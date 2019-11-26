@@ -1,6 +1,6 @@
 // @flow
 import cloneDeep from 'lodash/cloneDeep'
-import { getNextRobotStateAndWarningsMulti } from '../getNextRobotStateAndWarnings'
+import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type {
   InvariantContext,
@@ -40,7 +40,7 @@ export const reduceCommandCreators = (
       }
 
       const allCommands = [...prev.commands, ...next.commands]
-      const updates = getNextRobotStateAndWarningsMulti(
+      const updates = getNextRobotStateAndWarnings(
         allCommands,
         invariantContext,
         initialRobotState
