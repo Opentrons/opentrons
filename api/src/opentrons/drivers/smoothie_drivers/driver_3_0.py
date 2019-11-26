@@ -6,7 +6,7 @@ from time import sleep
 from threading import Event, RLock
 from typing import Any, Dict, Optional
 
-from numpy import isclose  # type: ignore
+from math import isclose
 from serial.serialutil import SerialException  # type: ignore
 
 from opentrons.drivers import serial_communication
@@ -1268,7 +1268,8 @@ class SmoothieDriver_3_0_0:
             return not (
                 (axis in DISABLE_AXES) or
                 (coords is None) or
-                isclose(coords, self.position[axis])
+                isclose(coords, self.position[axis],
+                        rel_tol=1e-05, abs_tol=1e-08)
             )
 
         def create_coords_list(coords_dict):
@@ -1285,7 +1286,9 @@ class SmoothieDriver_3_0_0:
             if axis in 'BC' and self.position[axis] < value
         })
 
-        target_coords = create_coords_list(target)
+        target_coords = create_coords_list(
+            {axis: round(coords, GCODE_ROUNDING_PRECISION)
+             for axis, coords in target.items()})
         backlash_coords = create_coords_list(backlash_target)
 
         if target_coords:

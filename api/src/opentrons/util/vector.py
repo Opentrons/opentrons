@@ -62,11 +62,6 @@ class VectorValue(tuple):
 value_type = VectorValue
 
 
-# To keep Python 3.4 compatibility
-def isclose(a, b, rel_tol):
-    return abs(a - b) < rel_tol
-
-
 class VectorEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, Vector):
@@ -143,7 +138,7 @@ class Vector(object):
     def __eq__(self, other):
         if isinstance(other, Vector):
             return all(
-                [isclose(a, b, rel_tol=1e-5)
+                [math.isclose(a, b, rel_tol=1e-05, abs_tol=1e-08)
                  for a, b in zip(self, other)]
             )
         elif isinstance(other, dict):
