@@ -1,5 +1,7 @@
 // @flow
 
+import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import type { Pipette as ProtocolPipette } from '../robot/types'
 import type { RobotApiRequestMeta } from '../robot-api/types'
 
 // common types
@@ -17,6 +19,26 @@ export type AttachedPipettesByMount = $ReadOnly<{|
   left: null | AttachedPipette,
   right: null | AttachedPipette,
 |}>
+
+export type PipetteCompatibility = 'match' | 'inexact_match' | 'incompatible'
+
+export type ProtocolPipetteInfo = {|
+  actual: null | {|
+    ...AttachedPipette,
+    displayName: string,
+    modelSpecs: ?PipetteModelSpecs,
+  |},
+  protocol: null | {|
+    ...$Shape<$Exact<ProtocolPipette>>,
+    displayName: string,
+  |},
+  compatibility: PipetteCompatibility,
+|}
+
+export type ProtocolPipetteInfoByMount = {|
+  left: ProtocolPipetteInfo,
+  right: ProtocolPipetteInfo,
+|}
 
 // action types
 

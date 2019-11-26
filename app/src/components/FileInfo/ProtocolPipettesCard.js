@@ -1,29 +1,26 @@
 // @flow
 // setup pipettes component
 import * as React from 'react'
-import { useDispatch } from 'react-redux'
-import every from 'lodash/every'
-import some from 'lodash/some'
+import { useDispatch, useSelector } from 'react-redux'
 
 import { Icon } from '@opentrons/components'
-import { constants as robotConstants } from '../../robot'
-import { fetchPipettes } from '../../pipettes'
+import {
+  PIPETTE_MOUNTS,
+  fetchPipettes,
+  getProtocolPipettesInfo,
+  getProtocolPipettesMatch,
+  getSomeProtocolPipettesInexact,
+} from '../../pipettes'
 import InstrumentItem from './InstrumentItem'
 import { SectionContentHalf } from '../layout'
 import InfoSection from './InfoSection'
 import MissingItemWarning from './MissingItemWarning'
-import useInstrumentMountInfo, {
-  MATCH,
-  INEXACT_MATCH,
-} from './useInstrumentMountInfo'
 
 import styles from './styles.css'
 
-import type { Dispatch } from '../../types'
+import type { State, Dispatch } from '../../types'
 
 type Props = {| robotName: string |}
-
-const { PIPETTE_MOUNTS } = robotConstants
 
 const inexactPipetteSupportArticle =
   'https://support.opentrons.com/en/articles/3450143-gen2-pipette-compatibility'
@@ -32,22 +29,21 @@ const TITLE = 'Required Pipettes'
 function ProtocolPipettes(props: Props) {
   const { robotName } = props
   const dispatch = useDispatch<Dispatch>()
-  const infoByMount = useInstrumentMountInfo(robotName)
+  const infoByMount = useSelector((state: State) =>
+    getProtocolPipettesInfo(state, robotName)
+  )
+  const allPipettesMatch = useSelector((state: State) =>
+    getProtocolPipettesMatch(state, robotName)
+  )
+  const someInexactMatches = useSelector((state: State) =>
+    getSomeProtocolPipettesInexact(state, robotName)
+  )
 
   React.useEffect(() => {
     dispatch(fetchPipettes(robotName))
   }, [dispatch, robotName])
 
   const changePipetteUrl = `/robots/${robotName}/instruments`
-
-  const allPipettesMatch = every(infoByMount, ({ compatibility }) =>
-    [MATCH, INEXACT_MATCH].includes(compatibility)
-  )
-
-  const someInexactMatches = some(
-    infoByMount,
-    ({ compatibility }) => compatibility === INEXACT_MATCH
-  )
 
   const pipetteItemProps = PIPETTE_MOUNTS.map(mount => {
     const info = infoByMount[mount]

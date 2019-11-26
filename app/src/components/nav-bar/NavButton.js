@@ -1,115 +1,50 @@
 // @flow
 // nav button container
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import some from 'lodash/some'
-
-import { selectors as robotSelectors } from '../../robot'
-
-import {
-  getAvailableShellUpdate,
-  getBuildrootUpdateAvailable,
-} from '../../shell'
-import { getConnectedRobot } from '../../discovery'
 import { NavButton as GenericNavButton } from '@opentrons/components'
 
 import type { ContextRouter } from 'react-router-dom'
-import useInstrumentMountInfo from '../FileInfo/useInstrumentMountInfo'
+import type { NavLocation } from '../../nav/types'
+
 import styles from './styles.css'
 
-type Props = {| ...ContextRouter, name: string |}
+export type NavButtonProps = {|
+  ...ContextRouter,
+  ...NavLocation,
+  isBottom: boolean,
+|}
 
-function NavButton(props: Props) {
-  const { name } = props
-  const isProtocolLoaded = useSelector(robotSelectors.getSessionIsLoaded)
-  const isProtocolRunnable = useSelector(robotSelectors.getCommands).length > 0
-  const isProtocolRunning = useSelector(robotSelectors.getIsRunning)
-  const isProtocolDone = useSelector(robotSelectors.getIsDone)
-  const connectedRobot = useSelector(getConnectedRobot)
-  const buildrootUpdateAvailable = useSelector(
-    state =>
-      connectedRobot != null &&
-      getBuildrootUpdateAvailable(state, connectedRobot)
-  )
-  const robotNotification = buildrootUpdateAvailable === 'upgrade'
-  const moreNotification = useSelector(getAvailableShellUpdate) != null
-  const pipetteInfo = useInstrumentMountInfo(
-    connectedRobot != null ? connectedRobot.name : ''
-  )
+export function NavButtonWithoutRouter(props: NavButtonProps) {
+  const {
+    path,
+    title,
+    iconName,
+    disabledReason,
+    notificationReason,
+    isBottom,
+  } = props
 
-  const incompatiblePipettes = some(
-    pipetteInfo,
-    p => p.compatibility === 'incompatible'
-  )
-  const incompatPipetteTooltip = (
-    <div className={styles.nav_button_tooltip}>
-      Attached pipettes do not match pipettes specified in loaded protocol
-    </div>
-  )
-  switch (name) {
-    case 'connect':
-      return (
-        <GenericNavButton
-          iconName="ot-connect"
-          title="robot"
-          url="/robots"
-          notification={robotNotification}
-        />
-      )
-    case 'upload':
-      return (
-        <GenericNavButton
-          disabled={connectedRobot == null || isProtocolRunning}
-          iconName="ot-file"
-          title="protocol"
-          url="/upload"
-        />
-      )
-    case 'setup':
-      return (
-        <GenericNavButton
-          disabled={
-            !isProtocolLoaded ||
-            !isProtocolRunnable ||
-            isProtocolRunning ||
-            isProtocolDone ||
-            incompatiblePipettes
-          }
-          tooltipComponent={
-            incompatiblePipettes ? incompatPipetteTooltip : null
-          }
-          iconName="ot-calibrate"
-          title="calibrate"
-          url="/calibrate"
-        />
-      )
-    case 'run':
-      return (
-        <GenericNavButton
-          disabled={
-            !isProtocolLoaded || !isProtocolRunnable || incompatiblePipettes
-          }
-          tooltipComponent={
-            incompatiblePipettes ? incompatPipetteTooltip : null
-          }
-          iconName="ot-run"
-          title="run"
-          url="/run"
-        />
-      )
-  }
+  // TODO(mc, 2019-11-26): bottom aligned nav button does not work with current
+  // tooltip wrapper implementation
+  const tooltip =
+    !isBottom && (disabledReason || notificationReason) ? (
+      <div className={styles.nav_button_tooltip}>
+        {disabledReason || notificationReason}
+      </div>
+    ) : null
 
-  // case 'more':
   return (
     <GenericNavButton
-      iconName="dots-horizontal"
-      isBottom={true}
-      title="more"
-      url="/menu"
-      notification={moreNotification}
+      iconName={iconName}
+      title={title}
+      url={path}
+      notification={notificationReason != null}
+      disabled={disabledReason != null}
+      tooltipComponent={tooltip}
+      isBottom={isBottom}
     />
   )
 }
 
-export default withRouter(NavButton)
+export const NavButton = withRouter(NavButtonWithoutRouter)

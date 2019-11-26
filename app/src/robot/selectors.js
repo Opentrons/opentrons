@@ -226,11 +226,7 @@ export function getPipettesByMount(state: State) {
   return session(state).pipettesByMount
 }
 
-export const getPipettes: OutputSelector<
-  State,
-  void,
-  Array<Pipette>
-> = createSelector(
+export const getPipettes: State => Array<Pipette> = createSelector(
   getPipettesByMount,
   (state: State) => calibration(state).probedByMount,
   (state: State) => calibration(state).tipOnByMount,
