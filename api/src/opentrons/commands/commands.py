@@ -120,7 +120,7 @@ def home(mount):
 def aspirate(instrument, volume, location, rate):
     location_text = stringify_location(location)
     text = 'Aspirating {volume} uL from {location} at {rate} speed'.format(
-        volume=volume, location=location_text, rate=rate
+        volume=float(volume), location=location_text, rate=rate
     )
     return make_command(
         name=command_types.ASPIRATE,
@@ -136,8 +136,8 @@ def aspirate(instrument, volume, location, rate):
 
 def dispense(instrument, volume, location, rate):
     location_text = stringify_location(location)
-    text = 'Dispensing {volume} uL into {location}'.format(
-        volume=volume, location=location_text)
+    text = 'Dispensing {volume} uL into {location} at {rate} speed'.format(
+        volume=float(volume), location=location_text, rate=rate)
 
     return make_command(
         name=command_types.DISPENSE,
@@ -153,7 +153,7 @@ def dispense(instrument, volume, location, rate):
 
 def consolidate(instrument, volume, source, dest):
     text = 'Consolidating {volume} from {source} to {dest}'.format(
-        volume=volume,
+        volume=transform_volumes(volume),
         source=stringify_location(source),
         dest=stringify_location(dest)
     )
@@ -179,7 +179,7 @@ def consolidate(instrument, volume, source, dest):
 
 def distribute(instrument, volume, source, dest):
     text = 'Distributing {volume} from {source} to {dest}'.format(
-        volume=volume,
+        volume=transform_volumes(volume),
         source=stringify_location(source),
         dest=stringify_location(dest)
     )
@@ -205,7 +205,7 @@ def distribute(instrument, volume, source, dest):
 
 def transfer(instrument, volume, source, dest):
     text = 'Transferring {volume} from {source} to {dest}'.format(
-        volume=volume,
+        volume=transform_volumes(volume),
         source=stringify_location(source),
         dest=stringify_location(dest)
     )
@@ -239,9 +239,16 @@ def comment(msg):
     )
 
 
+def transform_volumes(volumes):
+    if not isinstance(volumes, list):
+        return float(volumes)
+    else:
+        return [float(vol) for vol in volumes]
+
+
 def mix(instrument, repetitions, volume, location):
-    text = 'Mixing {repetitions} times with a volume of {volume}ul'.format(
-        repetitions=repetitions, volume=volume
+    text = 'Mixing {repetitions} times with a volume of {volume} ul'.format(
+        repetitions=repetitions, volume=float(volume)
     )
     return make_command(
         name=command_types.MIX,
@@ -305,7 +312,7 @@ def return_tip():
 
 def pick_up_tip(instrument, location):
     location_text = stringify_location(location)
-    text = 'Picking up tip {location}'.format(location=location_text)
+    text = 'Picking up tip from {location}'.format(location=location_text)
     return make_command(
         name=command_types.PICK_UP_TIP,
         payload={
@@ -318,7 +325,7 @@ def pick_up_tip(instrument, location):
 
 def drop_tip(instrument, location):
     location_text = stringify_location(location)
-    text = 'Dropping tip {location}'.format(location=location_text)
+    text = 'Dropping tip into {location}'.format(location=location_text)
     return make_command(
         name=command_types.DROP_TIP,
         payload={
@@ -330,7 +337,7 @@ def drop_tip(instrument, location):
 
 
 def magdeck_engage():
-    text = "Engaging magnetic deck module"
+    text = "Engaging Magnetic Module"
     return make_command(
         name=command_types.MAGDECK_ENGAGE,
         payload={'text': text}
@@ -338,7 +345,7 @@ def magdeck_engage():
 
 
 def magdeck_disengage():
-    text = "Disengaging magnetic deck module"
+    text = "Disengaging Magnetic Module"
     return make_command(
         name=command_types.MAGDECK_DISENGAGE,
         payload={'text': text}
@@ -346,7 +353,7 @@ def magdeck_disengage():
 
 
 def magdeck_calibrate():
-    text = "Calibrating magnetic deck module"
+    text = "Calibrating Magnetic Module"
     return make_command(
         name=command_types.MAGDECK_CALIBRATE,
         payload={'text': text}
@@ -354,7 +361,7 @@ def magdeck_calibrate():
 
 
 def tempdeck_set_temp(celsius):
-    text = "Setting temperature deck module temperature " \
+    text = "Setting Temperature Module temperature " \
            "to {temp} °C (rounded off to nearest integer)".format(
             temp=round(float(celsius),
                        utils.TEMPDECK_GCODE_ROUNDING_PRECISION))
@@ -368,7 +375,7 @@ def tempdeck_set_temp(celsius):
 
 
 def tempdeck_deactivate():
-    text = "Deactivating temperature deck module"
+    text = "Deactivating Temperature Module"
     return make_command(
         name=command_types.TEMPDECK_DEACTIVATE,
         payload={'text': text}
@@ -386,7 +393,8 @@ def thermocycler_open():
 def thermocycler_set_block_temp(temperature,
                                 hold_time_seconds,
                                 hold_time_minutes):
-    text = f'Setting Thermocycler well block temperature to {temperature} °C '
+    temp = round(float(temperature), utils.TC_GCODE_ROUNDING_PRECISION)
+    text = f'Setting Thermocycler well block temperature to {temp} °C'
     total_seconds = None
     # TODO: BC 2019-09-05 this time resolving logic is partially duplicated
     # in the thermocycler api class definition, with this command logger
@@ -442,7 +450,8 @@ def thermocycler_wait_for_temp():
 
 
 def thermocycler_set_lid_temperature(temperature):
-    text = f'Setting Thermocycler lid temperature to {temperature} °C '
+    temp = round(float(temperature), utils.TC_GCODE_ROUNDING_PRECISION)
+    text = f'Setting Thermocycler lid temperature to {temp} °C'
     return make_command(
         name=command_types.THERMOCYCLER_SET_LID_TEMP,
         payload={'text': text}
@@ -490,7 +499,7 @@ def thermocycler_close():
 
 
 def delay(seconds, minutes, msg=None):
-    text = f"Delaying for {minutes}m {seconds}s"
+    text = f"Delaying for {minutes} minutes and {seconds} seconds"
     if msg:
         text = f"{text}. {msg}"
     return make_command(
