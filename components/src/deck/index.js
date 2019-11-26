@@ -14,7 +14,6 @@ import RobotWorkSpace from './RobotWorkSpace'
 import RobotCoordsForeignDiv from './RobotCoordsForeignDiv'
 import RobotCoordsText from './RobotCoordsText'
 
-import { ContainerNameOverlay } from './ContainerNameOverlay'
 import { EmptyDeckSlot } from './EmptyDeckSlot'
 import { SlotOverlay } from './SlotOverlay'
 
@@ -24,7 +23,6 @@ export * from './labwareInternals/types'
 export * from './types'
 export {
   Deck,
-  ContainerNameOverlay,
   EmptyDeckSlot,
   Labware,
   LabwareWrapper,
