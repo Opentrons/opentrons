@@ -20,12 +20,6 @@
 //   )
 // })
 
-describe('getCommandCreatorForSubsteps', () => {
-  test('consolidate', () => {})
-  test('distribute', () => {})
-  test('transfer', () => {})
-})
-
 describe('substep timeline', () => {
   describe('substepTimelineSingleChannel', () => {
     test('returns empty array if initial timeline frame has errors', () => {})

@@ -39,7 +39,6 @@ import type {
 
 export type GetIngreds = (labware: string, well: string) => Array<NamedIngred>
 
-// TODO IMMEDIATELY this is already a type, right???
 type TransferLikeArgs =
   | ConsolidateArgs
   | DistributeArgs
