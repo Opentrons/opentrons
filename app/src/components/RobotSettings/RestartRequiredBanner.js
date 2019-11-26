@@ -7,10 +7,9 @@ import { restartRobot } from '../../robot-admin'
 import styles from './styles.css'
 
 import type { Dispatch } from '../../types'
-import type { RobotHost } from '../../robot-api/types'
 
 export type RestartRequiredBannerProps = {|
-  robot: RobotHost,
+  robotName: string,
 |}
 
 // TODO(mc, 2019-10-24): i18n
@@ -20,12 +19,12 @@ const MESSAGE =
 const RESTART_NOW = 'Restart Now'
 
 function RestartRequiredBanner(props: RestartRequiredBannerProps) {
-  const { robot } = props
+  const { robotName } = props
   const [dismissed, setDismissed] = React.useState(false)
   const dispatch = useDispatch<Dispatch>()
-  const restart = React.useCallback(() => dispatch(restartRobot(robot)), [
+  const restart = React.useCallback(() => dispatch(restartRobot(robotName)), [
     dispatch,
-    robot,
+    robotName,
   ])
 
   if (dismissed) return null

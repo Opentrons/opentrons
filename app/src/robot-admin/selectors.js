@@ -2,7 +2,7 @@
 import { RESTART_PENDING_STATUS, RESTARTING_STATUS } from './constants'
 
 import type { State } from '../types'
-import type { RobotAdminStatus } from './types'
+import type { RobotAdminStatus, ResetConfigOption } from './types'
 
 const robotState = (state: State, name: string) => state.robotAdmin[name]
 
@@ -16,4 +16,11 @@ export function getRobotAdminStatus(
 export function getRobotRestarting(state: State, robotName: string): boolean {
   const status = getRobotAdminStatus(state, robotName)
   return status === RESTART_PENDING_STATUS || status === RESTARTING_STATUS
+}
+
+export function getResetConfigOptions(
+  state: State,
+  robotName: string
+): Array<ResetConfigOption> {
+  return robotState(state, robotName)?.resetConfigOptions || []
 }

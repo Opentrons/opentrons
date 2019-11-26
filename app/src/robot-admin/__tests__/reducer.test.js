@@ -2,17 +2,15 @@
 
 import { robotAdminReducer } from '../reducer'
 
-import type { Action, ActionLike } from '../../types'
+import type { Action } from '../../types'
 import type { RobotAdminState } from '../types'
 
 type ReducerSpec = {|
   name: string,
-  action: Action | ActionLike,
+  action: Action,
   state: RobotAdminState,
   expected: RobotAdminState,
 |}
-
-const mockRobot = { name: 'robotName', ip: '127.0.0.1', port: 31950 }
 
 describe('robotAdminReducer', () => {
   const SPECS: Array<ReducerSpec> = [
@@ -21,24 +19,17 @@ describe('robotAdminReducer', () => {
       action: {
         type: 'robotAdmin:RESTART',
         meta: { robot: true },
-        payload: { host: mockRobot, method: 'POST', path: '/server/restart' },
+        payload: { robotName: 'robotName' },
       },
       state: {},
       expected: { robotName: { status: 'restart-pending' } },
     },
     {
-      name: 'handles failed robotApi:RESPONSE for POST /server/restart',
+      name: 'handles failed robotAdmin:RESTART_FAILURE',
       action: {
-        type: 'robotApi:ERROR__POST__/server/restart',
+        type: 'robotAdmin:RESTART_FAILURE',
+        payload: { robotName: 'robotName', error: { message: 'AH' } },
         meta: {},
-        payload: {
-          host: mockRobot,
-          method: 'POST',
-          path: '/server/restart',
-          body: { message: 'AH!' },
-          status: 500,
-          ok: false,
-        },
       },
       state: {},
       expected: { robotName: { status: 'restart-failed' } },
@@ -104,6 +95,33 @@ describe('robotAdminReducer', () => {
         a: { status: 'restarting' },
       },
       expected: { a: { status: 'restarting' } },
+    },
+    {
+      name: 'handles robotAdmin:FETCH_RESET_CONFIG_OPTIONS_SUCCESS',
+      action: {
+        type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS_SUCCESS',
+        payload: {
+          robotName: 'robotName',
+          options: [
+            { id: 'foo', name: 'Foo', description: 'foobar' },
+            { id: 'baz', name: 'Baz', description: 'bazqux' },
+          ],
+        },
+        meta: {},
+      },
+      state: {
+        robotName: {
+          resetConfigOptions: [],
+        },
+      },
+      expected: {
+        robotName: {
+          resetConfigOptions: [
+            { id: 'foo', name: 'Foo', description: 'foobar' },
+            { id: 'baz', name: 'Baz', description: 'bazqux' },
+          ],
+        },
+      },
     },
   ]
 

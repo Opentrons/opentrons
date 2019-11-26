@@ -159,7 +159,7 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   } else {
     actions = [
       dcCommand(robot, { command: 'save transform' }),
-      restartRobot(robot),
+      restartRobot(robot.name),
       push(ownProps.parentUrl),
     ]
   }

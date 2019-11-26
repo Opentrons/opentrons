@@ -61,6 +61,32 @@ describe('robot admin selectors', () => {
       args: ['robotName'],
       expected: true,
     },
+    {
+      name: 'getResetConfigOptions returns [] by default',
+      selector: Selectors.getResetConfigOptions,
+      state: { robotAdmin: {} },
+      args: ['robotName'],
+      expected: [],
+    },
+    {
+      name: 'getResetConfigOptions returns options',
+      selector: Selectors.getResetConfigOptions,
+      state: {
+        robotAdmin: {
+          robotName: {
+            resetConfigOptions: [
+              { id: 'foo', name: 'Foo', description: 'foobar' },
+              { id: 'baz', name: 'Baz', description: 'bazqux' },
+            ],
+          },
+        },
+      },
+      args: ['robotName'],
+      expected: [
+        { id: 'foo', name: 'Foo', description: 'foobar' },
+        { id: 'baz', name: 'Baz', description: 'bazqux' },
+      ],
+    },
   ]
 
   SPECS.forEach(spec => {

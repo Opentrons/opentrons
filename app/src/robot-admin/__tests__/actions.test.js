@@ -14,15 +14,104 @@ describe('robot admin actions', () => {
     {
       name: 'robotAdmin:RESTART',
       creator: Actions.restartRobot,
-      args: [{ name: 'robotName', ip: 'localhost', port: 31950 }],
+      args: ['robotName'],
       expected: {
         type: 'robotAdmin:RESTART',
+        payload: { robotName: 'robotName' },
         meta: { robot: true },
+      },
+    },
+    {
+      name: 'robotAdmin:RESTART_SUCCESS',
+      creator: Actions.restartRobotSuccess,
+      args: ['robotName', { requestId: 'foo' }],
+      expected: {
+        type: 'robotAdmin:RESTART_SUCCESS',
+        payload: { robotName: 'robotName' },
+        meta: { requestId: 'foo' },
+      },
+    },
+    {
+      name: 'robotAdmin:RESTART_FAILURE',
+      creator: Actions.restartRobotFailure,
+      args: ['robotName', { message: 'AH' }, { requestId: 'foo' }],
+      expected: {
+        type: 'robotAdmin:RESTART_FAILURE',
+        payload: { robotName: 'robotName', error: { message: 'AH' } },
+        meta: { requestId: 'foo' },
+      },
+    },
+    {
+      name: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS',
+      creator: Actions.fetchResetConfigOptions,
+      args: ['robotName'],
+      expected: {
+        type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS',
+        payload: { robotName: 'robotName' },
+        meta: {},
+      },
+    },
+    {
+      name: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS_SUCCESS',
+      creator: Actions.fetchResetConfigOptionsSuccess,
+      args: [
+        'robotName',
+        [
+          { id: 'foo', name: 'Foo', description: 'foobar' },
+          { id: 'bar', name: 'Bar', description: 'bazqux' },
+        ],
+        { requestId: 'foo' },
+      ],
+      expected: {
+        type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS_SUCCESS',
         payload: {
-          host: { name: 'robotName', ip: 'localhost', port: 31950 },
-          method: 'POST',
-          path: '/server/restart',
+          robotName: 'robotName',
+          options: [
+            { id: 'foo', name: 'Foo', description: 'foobar' },
+            { id: 'bar', name: 'Bar', description: 'bazqux' },
+          ],
         },
+        meta: { requestId: 'foo' },
+      },
+    },
+    {
+      name: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS_FAILURE',
+      creator: Actions.fetchResetConfigOptionsFailure,
+      args: ['robotName', { message: 'AH' }, { requestId: 'foo' }],
+      expected: {
+        type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS_FAILURE',
+        payload: { robotName: 'robotName', error: { message: 'AH' } },
+        meta: { requestId: 'foo' },
+      },
+    },
+    {
+      name: 'robotAdmin:RESET_CONFIG',
+      creator: Actions.resetConfig,
+      args: ['robotName', { foo: true, bar: false }],
+      expected: {
+        type: 'robotAdmin:RESET_CONFIG',
+        payload: { robotName: 'robotName', resets: { foo: true, bar: false } },
+        meta: {},
+      },
+    },
+    {
+      name: 'robotAdmin:RESET_CONFIG_SUCCESS',
+      creator: Actions.resetConfigSuccess,
+      args: ['robotName', { requestId: 'foo' }],
+      expected: {
+        type: 'robotAdmin:RESET_CONFIG_SUCCESS',
+        payload: { robotName: 'robotName' },
+        meta: { requestId: 'foo' },
+      },
+    },
+    {
+      name: 'robotAdmin:RESET_CONFIG_FAILURE',
+      creator: Actions.resetConfigFailure,
+      args: ['robotName', { message: 'AH' }, { requestId: 'foo' }],
+      expected: {
+        type: 'robotAdmin:RESET_CONFIG_FAILURE',
+        payload: { robotName: 'robotName', error: { message: 'AH' } },
+        meta: { requestId: 'foo' },
       },
     },
   ]
