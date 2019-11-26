@@ -10,6 +10,7 @@ import {
   getProtocolMethod,
   getProtocolDescription,
 } from '../../protocol'
+
 import { LabeledValue } from '@opentrons/components'
 import InfoSection from './InfoSection'
 import { SectionContentHalf, CardRow } from '../layout'
@@ -28,7 +29,7 @@ const INFO_TITLE = 'Information'
 const DESCRIPTION_TITLE = 'Description'
 const DATE_FORMAT = 'DD MMM Y, hh:mmA'
 
-export default connect<Props, {||}, _, _, _, _>(mapStateToProps)(
+export default connect<Props, {||}, _, {||}, _, _>(mapStateToProps)(
   InformationCard
 )
 
@@ -49,12 +50,14 @@ function InformationCard(props: Props) {
             <LabeledValue label="Organization/Author" value={author || '-'} />
           </SectionContentHalf>
         </CardRow>
-        <SectionContentHalf>
-          <LabeledValue label="Last Updated" value={lastUpdated} />
-        </SectionContentHalf>
-        <SectionContentHalf>
-          <LabeledValue label="Creation Method" value={method || '-'} />
-        </SectionContentHalf>
+        <CardRow>
+          <SectionContentHalf>
+            <LabeledValue label="Last Updated" value={lastUpdated} />
+          </SectionContentHalf>
+          <SectionContentHalf>
+            <LabeledValue label="Creation Method" value={method || '-'} />
+          </SectionContentHalf>
+        </CardRow>
       </InfoSection>
       {description && (
         <InfoSection title={DESCRIPTION_TITLE}>

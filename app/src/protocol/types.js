@@ -18,8 +18,25 @@ export type ProtocolFile = {
   lastModified: ?number,
 }
 
-export type ProtocolState = {
-  file: ?ProtocolFile,
-  contents: ?string,
-  data: ?ProtocolData,
-}
+// action types
+
+export type OpenProtocolAction = {|
+  type: 'protocol:OPEN',
+  payload: {| file: ProtocolFile |},
+|}
+
+export type UploadProtocolAction = {|
+  type: 'protocol:UPLOAD',
+  payload: {| contents: string, data: ProtocolData | null |},
+  meta: {| robot: true |},
+|}
+
+export type ProtocolAction = OpenProtocolAction | UploadProtocolAction
+
+// state types
+
+export type ProtocolState = $ReadOnly<{|
+  file: ProtocolFile | null,
+  contents: string | null,
+  data: ProtocolData | null,
+|}>

@@ -396,7 +396,7 @@ describe('discovery selectors', () => {
     },
     {
       name:
-        'getRobotFirmwareVersion returns serverHealth.smoothieVersion if no halth',
+        'getRobotFirmwareVersion returns serverHealth.smoothieVersion if no health',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
       state: { serverHealth: { smoothieVersion: '4.5.6' }, health: null },
       selector: discovery.getRobotFirmwareVersion,
@@ -407,6 +407,24 @@ describe('discovery selectors', () => {
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
       state: { serverHealth: null, health: null },
       selector: discovery.getRobotFirmwareVersion,
+      expected: null,
+    },
+    {
+      name:
+        'getRobotProtocolApiVersion returns first health.protocol_api_version',
+      // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
+      state: {
+        serverHealth: {},
+        health: { protocol_api_version: [2, 0] },
+      },
+      selector: discovery.getRobotProtocolApiVersion,
+      expected: '2.0',
+    },
+    {
+      name: 'getRobotProtocolApiVersion returns null if no healths',
+      // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
+      state: { serverHealth: null, health: null },
+      selector: discovery.getRobotProtocolApiVersion,
       expected: null,
     },
   ]

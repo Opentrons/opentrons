@@ -3,7 +3,7 @@
 import { _NAME as NAME } from './constants'
 
 import type { Error } from '../types'
-import type { ProtocolData } from '../protocol'
+import type { ProtocolData } from '../protocol/types'
 import type { Mount, Slot, Axis, Direction, SessionUpdate } from './types'
 
 // TODO(mc, 2017-11-22): rename this function to actionType

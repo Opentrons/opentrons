@@ -150,3 +150,8 @@ export const getRobotApiVersion = (robot: AnyRobot): ?string =>
 export const getRobotFirmwareVersion = (robot: AnyRobot): ?string =>
   (robot.health && robot.health.fw_version) ||
   (robot.serverHealth && robot.serverHealth.smoothieVersion)
+
+export const getRobotProtocolApiVersion = (robot: AnyRobot): string | null => {
+  const maxApiVersion = robot.health?.protocol_api_version
+  return maxApiVersion ? maxApiVersion.join('.') : null
+}

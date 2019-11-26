@@ -17,22 +17,19 @@ type StringGetter = (?ProtocolData) => ?string
 type NumberGetter = (?ProtocolData) => ?number
 type StringSelector = OutputSelector<State, void, ?string>
 type NumberSelector = OutputSelector<State, void, ?number>
-type ProtocolTypeSelector = OutputSelector<State, void, ProtocolType | null>
-type ProtocolInfoSelector = OutputSelector<
-  State,
-  void,
-  {
-    protocolName: ?string,
-    lastModified: ?number,
-    appName: ?string,
-    appVersion: ?string,
-  }
->
-type CreatorAppSelector = OutputSelector<
-  State,
-  void,
-  { name: ?string, version: ?string }
->
+type ProtocolTypeSelector = State => ProtocolType | null
+
+type ProtocolInfoSelector = State => {|
+  protocolName: string | null,
+  lastModified: number | null,
+  appName: string | null,
+  appVersion: string | null,
+|}
+
+type CreatorAppSelector = State => {|
+  name: string | null,
+  version: string | null,
+|}
 
 const log = createLogger(__filename)
 
@@ -103,18 +100,22 @@ export const getLabwareDefBySlot: State => {
   }
 )
 
-export const getProtocolDisplayData: $Shape<ProtocolInfoSelector> = createSelector(
+export const getProtocolDisplayData: ProtocolInfoSelector = createSelector(
   getProtocolData,
   getProtocolFilename,
   (data, name) => {
-    if (!data)
+    const basename = name ? stripDirAndExtension(name) : null
+
+    if (!data) {
       return {
-        protocolName: name && stripDirAndExtension(name),
+        protocolName: basename,
         lastModified: null,
         appName: null,
         appVersion: null,
       }
-    const version = (data && getProtocolSchemaVersion(data)) || 1
+    }
+
+    const version = getProtocolSchemaVersion(data) || 1
     const getName = getter(PROTOCOL_GETTER_PATHS_BY_SCHEMA[version]['name'])
     const getLastModified = getter(
       PROTOCOL_GETTER_PATHS_BY_SCHEMA[version]['lastModified']
@@ -125,10 +126,11 @@ export const getProtocolDisplayData: $Shape<ProtocolInfoSelector> = createSelect
     const getAppVersion = getter(
       PROTOCOL_GETTER_PATHS_BY_SCHEMA[version]['appVersion']
     )
-    const protocolName = getName(data) || (name && stripDirAndExtension(name))
+    const protocolName = getName(data) || basename
     const lastModified = getLastModified(data) || getCreated(data)
     const appName = getAppName(data)
     const appVersion = getAppVersion(data)
+
     return {
       protocolName: protocolName,
       lastModified: lastModified,
@@ -179,7 +181,7 @@ export const getProtocolCreatorApp: CreatorAppSelector = createSelector(
   }
 )
 
-const METHOD_OT_API = 'Opentrons API'
+const METHOD_OT_API = 'Python Protocol API'
 const METHOD_UNKNOWN = 'Unknown Application'
 
 export const getProtocolMethod: StringSelector = createSelector(
@@ -187,15 +189,19 @@ export const getProtocolMethod: StringSelector = createSelector(
   getProtocolContents,
   getProtocolData,
   getProtocolCreatorApp,
-  (file, contents, data, app) => {
+  // TODO(mc, 2019-11-26): did not import due to circular dependency
+  // protocol API level should probably be part of protocol state
+  state => state.robot.session.apiLevel,
+  (file, contents, data, app, apiLevel) => {
     const isJson = file && fileIsJson(file)
-    const appVersion = app && app.version
-    const readableName = app && startCase(app.name)
+    const jsonAppName = app.name
+      ? startCase(app.name.replace(/^opentrons\//, ''))
+      : METHOD_UNKNOWN
+    const jsonAppVersion = app.version ? ` v${app.version}` : ''
+    const readableJsonName = isJson ? `${jsonAppName}${jsonAppVersion}` : null
 
     if (!file || !contents) return null
-    if (isJson === true && !readableName) return METHOD_UNKNOWN
-    if (!isJson) return METHOD_OT_API
-    if (readableName && appVersion) return `${readableName} ${appVersion}`
-    return readableName
+    if (readableJsonName) return readableJsonName
+    return `${METHOD_OT_API} v${apiLevel.join('.')}`
   }
 )

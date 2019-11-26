@@ -4,7 +4,11 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 
-import { getRobotApiVersion, getRobotFirmwareVersion } from '../../discovery'
+import {
+  getRobotApiVersion,
+  getRobotFirmwareVersion,
+  getRobotProtocolApiVersion,
+} from '../../discovery'
 
 import {
   getBuildrootRobot,
@@ -20,7 +24,7 @@ import {
   useInterval,
 } from '@opentrons/components'
 
-import { CardContentQuarter } from '../layout'
+import { CardRow, CardContentThird } from '../layout'
 
 import type { Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
@@ -34,6 +38,7 @@ const TITLE = 'Information'
 const NAME_LABEL = 'Robot name'
 const SERVER_VERSION_LABEL = 'Server version'
 const FIRMWARE_VERSION_LABEL = 'Firmware version'
+const MAX_PROTOCOL_API_VERSION_LABEL = 'Max Protocol API Version'
 
 const UPDATE_SERVER_UNAVAILABLE =
   "Unable to update because your robot's update server is not responding"
@@ -41,6 +46,8 @@ const OTHER_ROBOT_UPDATING =
   'Unable to update because your app is currently updating a different robot'
 const NO_UPDATE_FILES =
   'No robot update files found for this version of the app; please check again later'
+
+const DEFAULT_MAX_API_VERSION = '1.0'
 
 const UPDATE_RECHECK_DELAY_MS = 60000
 
@@ -56,9 +63,9 @@ export default function InformationCard(props: Props) {
 
   const { displayName, serverOk } = robot
   const buildrootRobot = useSelector(getBuildrootRobot)
-
   const version = getRobotApiVersion(robot)
   const firmwareVersion = getRobotFirmwareVersion(robot)
+  const maxApiVersion = getRobotProtocolApiVersion(robot)
 
   const updateFilesUnavailable = updateType === null
   const updateServerUnavailable = !serverOk
@@ -81,22 +88,28 @@ export default function InformationCard(props: Props) {
 
   return (
     <Card title={TITLE}>
-      <CardContentQuarter>
-        <LabeledValue label={NAME_LABEL} value={displayName} />
-      </CardContentQuarter>
-      <CardContentQuarter>
-        <LabeledValue
-          label={SERVER_VERSION_LABEL}
-          value={version || 'Unknown'}
-        />
-      </CardContentQuarter>
-      <CardContentQuarter>
+      <CardContentThird>
+        <CardRow>
+          <LabeledValue label={NAME_LABEL} value={displayName} />
+        </CardRow>
         <LabeledValue
           label={FIRMWARE_VERSION_LABEL}
           value={firmwareVersion || 'Unknown'}
         />
-      </CardContentQuarter>
-      <CardContentQuarter>
+      </CardContentThird>
+      <CardContentThird>
+        <CardRow>
+          <LabeledValue
+            label={SERVER_VERSION_LABEL}
+            value={version || 'Unknown'}
+          />
+        </CardRow>
+        <LabeledValue
+          label={MAX_PROTOCOL_API_VERSION_LABEL}
+          value={maxApiVersion || DEFAULT_MAX_API_VERSION}
+        />
+      </CardContentThird>
+      <CardContentThird>
         <HoverTooltip tooltipComponent={updateButtonTooltip}>
           {hoverTooltipHandlers => (
             <div {...hoverTooltipHandlers}>
@@ -110,7 +123,7 @@ export default function InformationCard(props: Props) {
             </div>
           )}
         </HoverTooltip>
-      </CardContentQuarter>
+      </CardContentThird>
     </Card>
   )
 }
