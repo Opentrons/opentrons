@@ -450,8 +450,8 @@ def thermocycler_wait_for_temp():
 
 
 def thermocycler_set_lid_temperature(temperature):
-    temperature = round(float(temperature), utils.TC_GCODE_ROUNDING_PRECISION)
-    text = f'Setting Thermocycler lid temperature to {temperature} °C '
+    temp = round(float(temperature), utils.TC_GCODE_ROUNDING_PRECISION)
+    text = f'Setting Thermocycler lid temperature to {temp} °C'
     return make_command(
         name=command_types.THERMOCYCLER_SET_LID_TEMP,
         payload={'text': text}
