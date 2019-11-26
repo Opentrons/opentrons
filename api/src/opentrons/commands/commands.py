@@ -312,7 +312,7 @@ def return_tip():
 
 def pick_up_tip(instrument, location):
     location_text = stringify_location(location)
-    text = 'Picking up tip {location}'.format(location=location_text)
+    text = 'Picking up tip from {location}'.format(location=location_text)
     return make_command(
         name=command_types.PICK_UP_TIP,
         payload={
@@ -325,7 +325,7 @@ def pick_up_tip(instrument, location):
 
 def drop_tip(instrument, location):
     location_text = stringify_location(location)
-    text = 'Dropping tip {location}'.format(location=location_text)
+    text = 'Dropping tip into {location}'.format(location=location_text)
     return make_command(
         name=command_types.DROP_TIP,
         payload={
@@ -394,7 +394,7 @@ def thermocycler_set_block_temp(temperature,
                                 hold_time_seconds,
                                 hold_time_minutes):
     temp = round(float(temperature), utils.TC_GCODE_ROUNDING_PRECISION)
-    text = f'Setting Thermocycler well block temperature to {temp} °C '
+    text = f'Setting Thermocycler well block temperature to {temp} °C'
     total_seconds = None
     # TODO: BC 2019-09-05 this time resolving logic is partially duplicated
     # in the thermocycler api class definition, with this command logger
@@ -499,7 +499,7 @@ def thermocycler_close():
 
 
 def delay(seconds, minutes, msg=None):
-    text = f"Delaying for {minutes}m {seconds}s"
+    text = f"Delaying for {minutes} minutes and {seconds} seconds"
     if msg:
         text = f"{text}. {msg}"
     return make_command(
