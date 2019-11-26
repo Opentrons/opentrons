@@ -3,7 +3,7 @@ import logging
 import asyncio
 from threading import Event, Thread, Lock
 from time import sleep
-from typing import Optional, Mapping, Dict
+from typing import Optional, Mapping, Dict, Tuple
 from serial.serialutil import SerialException  # type: ignore
 
 from opentrons.drivers import serial_communication, utils
@@ -41,7 +41,7 @@ TEMP_DECK_BAUDRATE = 115200
 TEMP_DECK_COMMAND_TERMINATOR = '\r\n\r\n'
 TEMP_DECK_ACK = 'ok\r\nok\r\n'
 
-temp_locks: Dict[str, Lock] = {}
+temp_locks: Dict[str, Tuple[Lock, 'TempDeck']] = {}
 
 
 class TempDeckError(Exception):
@@ -58,8 +58,8 @@ class TempDeck:
 
         self._temperature = {'current': 25, 'target': None}
         self._update_thread = None
-        self._lock = None
         self._port = None
+        self._lock = None
 
     def connect(self, port=None) -> Optional[str]:
         if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
@@ -67,18 +67,22 @@ class TempDeck:
         try:
             self.disconnect(port)
             self._connect_to_port(port)
+            if temp_locks.get(port):
+                self._lock = temp_locks[port][0]
+            else:
+                self._lock = Lock()
+                temp_locks[port] = (self._lock, self)
             self._wait_for_ack()  # verify the device is there
             self._port = port
-            self._check_lock(self._port)
 
         except (SerialException, SerialNoResponse) as e:
             return str(e)
         return ''
 
     def disconnect(self, port=None):
-        if port and self.is_connected():
+        if self._port and self.is_connected():
             self._connection.close()
-            del temp_locks[port]
+            del temp_locks[self._port]
         elif self.is_connected():
             self._connection.close()
 
@@ -88,13 +92,6 @@ class TempDeck:
         if not self._connection:
             return False
         return self._connection.is_open
-
-    def _check_lock(self, port):
-        lock_for_port = temp_locks.get(port)
-        if not lock_for_port:
-            temp_locks[port] = Lock()
-            lock_for_port = temp_locks.get(port)
-        self._lock = lock_for_port
 
     @property
     def port(self) -> Optional[str]:
@@ -114,16 +111,14 @@ class TempDeck:
         self.run_flag.wait()
         celsius = round(float(celsius),
                         utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
-        self._check_lock(self._port)
-        with self._lock:
-            try:
-                self._send_command(
-                    '{0} S{1}'.format(GCODES['SET_TEMP'], celsius))
-            except (TempDeckError, SerialException, SerialNoResponse) as e:
-                return str(e)
-            self._temperature.update({'target': celsius})
-            while self.status != 'holding at target':
-                await asyncio.sleep(0.1)
+        try:
+            self._send_command(
+                '{0} S{1}'.format(GCODES['SET_TEMP'], celsius))
+        except (TempDeckError, SerialException, SerialNoResponse) as e:
+            return str(e)
+        self._temperature.update({'target': celsius})
+        while self.status != 'holding at target':
+            await asyncio.sleep(0.1)
         return ''
 
     # NOTE: only present to support apiV1 non-blocking by default behavior
@@ -131,14 +126,12 @@ class TempDeck:
         self.run_flag.wait()
         celsius = round(float(celsius),
                         utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
-        self._check_lock(self._port)
-        with self._lock:
-            try:
-                self._send_command(
-                    '{0} S{1}'.format(GCODES['SET_TEMP'], celsius))
-            except (TempDeckError, SerialException, SerialNoResponse) as e:
-                return str(e)
-            self._temperature.update({'target': celsius})
+        try:
+            self._send_command(
+                '{0} S{1}'.format(GCODES['SET_TEMP'], celsius))
+        except (TempDeckError, SerialException, SerialNoResponse) as e:
+            return str(e)
+        self._temperature.update({'target': celsius})
         return ''
 
     def update_temperature(self, default=None) -> str:
@@ -146,16 +139,15 @@ class TempDeck:
             updated_temperature = default or self._temperature.copy()
             self._temperature.update(updated_temperature)
         else:
-            self._check_lock(self._port)
-            with self._lock:
-                try:
-                    self._update_thread = Thread(
-                        target=self._recursive_update_temperature,
-                        args=[DEFAULT_COMMAND_RETRIES],
-                        name='Tempdeck recursive update temperature')
-                    self._update_thread.start()
-                except (TempDeckError, SerialException, SerialNoResponse) as e:
-                    return str(e)
+            # comment
+            try:
+                self._update_thread = Thread(
+                    target=self._recursive_update_temperature,
+                    args=[DEFAULT_COMMAND_RETRIES],
+                    name='Tempdeck recursive update temperature')
+                self._update_thread.start()
+            except (TempDeckError, SerialException, SerialNoResponse) as e:
+                return str(e)
         return ''
 
     @property
@@ -203,12 +195,10 @@ class TempDeck:
         Example input from Temp-Deck's serial response:
             "serial:aa11bb22 model:aa11bb22 version:aa11bb22"
         '''
-        self._check_lock(self._port)
-        with self._lock:
-            try:
-                return self._recursive_get_info(DEFAULT_COMMAND_RETRIES)
-            except (TempDeckError, SerialException, SerialNoResponse) as e:
-                return {'error': str(e)}
+        try:
+            return self._recursive_get_info(DEFAULT_COMMAND_RETRIES)
+        except (TempDeckError, SerialException, SerialNoResponse) as e:
+            return {'error': str(e)}
 
     def pause(self):
         self.run_flag.clear()
@@ -217,12 +207,10 @@ class TempDeck:
         self.run_flag.set()
 
     def enter_programming_mode(self) -> str:
-        self._check_lock(self._port)
-        with self._lock:
-            try:
-                self._send_command(GCODES['PROGRAMMING_MODE'])
-            except (TempDeckError, SerialException, SerialNoResponse) as e:
-                return str(e)
+        try:
+            self._send_command(GCODES['PROGRAMMING_MODE'])
+        except (TempDeckError, SerialException, SerialNoResponse) as e:
+            return str(e)
         return ''
 
     def _connect_to_port(self, port=None):
@@ -246,9 +234,7 @@ class TempDeck:
         This methods writes a sequence of newline characters, which will
         guarantee temp-deck responds with 'ok\r\nok\r\n' within 1 seconds
         '''
-        self._check_lock(self._port)
-        with self._lock:
-            self._send_command('\r\n', timeout=DEFAULT_TEMP_DECK_TIMEOUT)
+        self._send_command('\r\n', timeout=DEFAULT_TEMP_DECK_TIMEOUT)
 
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(
@@ -256,19 +242,18 @@ class TempDeck:
         """
 
         """
+        with self._lock:
+            command_line = command + ' ' + TEMP_DECK_COMMAND_TERMINATOR
+            ret_code = self._recursive_write_and_return(
+                command_line, timeout, DEFAULT_COMMAND_RETRIES)
 
-        command_line = command + ' ' + TEMP_DECK_COMMAND_TERMINATOR
-        ret_code = self._recursive_write_and_return(
-            command_line, timeout, DEFAULT_COMMAND_RETRIES)
+            # Smoothieware returns error state if a switch was hit while moving
+            if (ERROR_KEYWORD in ret_code.lower()) or \
+                    (ALARM_KEYWORD in ret_code.lower()):
+                log.error(f'Received error message from Temp-Deck: {ret_code}')
+                raise TempDeckError(ret_code)
 
-        # Smoothieware returns error state if a switch was hit while moving
-        if (ERROR_KEYWORD in ret_code.lower()) or \
-                (ALARM_KEYWORD in ret_code.lower()):
-            log.error(
-                'Received error message from Temp-Deck: {}'.format(ret_code))
-            raise TempDeckError(ret_code)
-
-        return ret_code.strip()
+            return ret_code.strip()
 
     def _recursive_write_and_return(self, cmd, timeout, retries, tag=None):
         if not tag:
@@ -292,8 +277,6 @@ class TempDeck:
                 cmd, timeout, retries, tag=tag)
 
     def _recursive_update_temperature(self, retries):
-        # self._check_lock(self._port)
-        # with self._lock:
         try:
             res = self._send_command(
                 GCODES['GET_TEMP'],

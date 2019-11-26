@@ -1,4 +1,5 @@
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
+from opentrons.drivers.mag_deck.driver import mag_locks
 from opentrons import commands
 
 LABWARE_ENGAGE_HEIGHT = {
@@ -23,7 +24,6 @@ class MagDeck(commands.CommandPublisher):
         self._port = port
         self._driver = None
         self._device_info = None
-        self._lock = None
 
     @commands.publish.both(command=commands.magdeck_calibrate)
     def calibrate(self):
@@ -144,8 +144,12 @@ class MagDeck(commands.CommandPublisher):
         Connect to the serial port
         '''
         if self._port:
-            self._driver = MagDeckDriver()
-            self._driver.connect(self._port)
+            if mag_locks.get(self._port):
+                self._driver = mag_locks[self._port][1]
+            else:
+                self._driver = MagDeckDriver()
+            if not self._driver.is_connected():
+                self._driver.connect(self._port)
             self._device_info = self._driver.get_device_info()
         else:
             # Sanity check: Should never happen, because connect should

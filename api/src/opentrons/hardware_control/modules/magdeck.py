@@ -1,6 +1,7 @@
 import asyncio
 from typing import Union
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
+from opentrons.drivers.mag_deck.driver import mag_locks
 from . import update, mod_abc
 
 LABWARE_ENGAGE_HEIGHT = {'biorad-hardshell-96-PCR': 18}    # mm
@@ -89,7 +90,10 @@ class MagDeck(mod_abc.AbstractModule):
                  simulating: bool,
                  loop: asyncio.AbstractEventLoop = None) -> None:
         self._port = port
-        self._driver = self._build_driver(simulating)
+        if mag_locks.get(port):
+            self._driver = mag_locks[port][1]
+        else:
+            self._driver = self._build_driver(simulating)  # type: ignore
 
         if None is loop:
             self._loop = asyncio.get_event_loop()
@@ -182,7 +186,8 @@ class MagDeck(mod_abc.AbstractModule):
         """
         Connect to the serial port
         """
-        self._driver.connect(self._port)
+        if not self._driver.is_connected():
+            self._driver.connect(self._port)
         self._device_info = self._driver.get_device_info()
 
     def _disconnect(self):

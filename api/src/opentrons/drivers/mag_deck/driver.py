@@ -2,7 +2,7 @@ from os import environ
 import logging
 from threading import Event, Lock
 from time import sleep
-from typing import Optional, Dict
+from typing import Optional, Dict, Tuple
 from serial.serialutil import SerialException  # type: ignore
 
 from opentrons.drivers import serial_communication
@@ -46,7 +46,7 @@ MAG_DECK_ACK = 'ok\r\nok\r\n'
 # to/from Temp-Deck
 GCODE_ROUNDING_PRECISION = 3
 
-mag_locks: Dict[str, Lock] = {}
+mag_locks: Dict[str, Tuple[Lock, 'MagDeck']] = {}
 
 
 class MagDeckError(Exception):
@@ -158,8 +158,8 @@ class MagDeck:
 
         self._plate_height = None
         self._mag_position = None
-        self._lock = None
         self._port = None
+        self._lock = None
 
     def connect(self, port=None) -> str:
         '''
@@ -173,9 +173,14 @@ class MagDeck:
         try:
             self.disconnect(port)
             self._connect_to_port(port)
+            if mag_locks.get(port):
+                self._lock = mag_locks[port][0]
+            else:
+                self._lock = Lock()
+                mag_locks[port] = (self._lock, self)
             self._wait_for_ack()    # verify the device is there
             self._port = port
-            self._check_lock(self._port)
+
 
         except (SerialException, SerialNoResponse) as e:
             return str(e)
@@ -196,13 +201,6 @@ class MagDeck:
             return False
         return self._connection.is_open
 
-    def _check_lock(self, port):
-        lock_for_port = mag_locks.get(port)
-        if not lock_for_port:
-            mag_locks[port] = Lock()
-            lock_for_port = mag_locks.get(port)
-        self._lock = lock_for_port
-
     @property
     def port(self) -> str:
         if not self._connection:
@@ -214,13 +212,11 @@ class MagDeck:
         Homes the magnet
         '''
         self.run_flag.wait()
-        self._check_lock(self._port)
-        with self._lock:
-            try:
-                self._send_command(GCODES['HOME'])
-            except (MagDeckError, SerialException, SerialNoResponse) as e:
-                return str(e)
-            return ''
+        try:
+            self._send_command(GCODES['HOME'])
+        except (MagDeckError, SerialException, SerialNoResponse) as e:
+            return str(e)
+        return ''
 
     def probe_plate(self) -> str:
         '''
@@ -229,13 +225,11 @@ class MagDeck:
         To be used for calibrating MagDeck
         '''
         self.run_flag.wait()
-        self._check_lock(self._port)
-        with self._lock:
-            try:
-                self._send_command(GCODES['PROBE_PLATE'])
-            except (MagDeckError, SerialException, SerialNoResponse) as e:
-                return str(e)
-            return ''
+        try:
+            self._send_command(GCODES['PROBE_PLATE'])
+        except (MagDeckError, SerialException, SerialNoResponse) as e:
+            return str(e)
+        return ''
 
     @property
     def plate_height(self) -> float:
@@ -262,15 +256,13 @@ class MagDeck:
         is outside of the deck's linear range
         '''
         self.run_flag.wait()
-        self._check_lock(self._port)
-        with self._lock:
-            try:
-                position_mm = round(
-                    float(position_mm), GCODE_ROUNDING_PRECISION)
-                self._send_command(
-                    '{0} Z{1}'.format(GCODES['MOVE'], position_mm))
-            except (MagDeckError, SerialException, SerialNoResponse) as e:
-                return str(e)
+        try:
+            position_mm = round(
+                float(position_mm), GCODE_ROUNDING_PRECISION)
+            self._send_command(
+                '{0} Z{1}'.format(GCODES['MOVE'], position_mm))
+        except (MagDeckError, SerialException, SerialNoResponse) as e:
+            return str(e)
         return ''
 
     def get_device_info(self) -> dict:
@@ -290,12 +282,10 @@ class MagDeck:
         Example input from Temp-Deck's serial response:
             "serial:aa11bb22 model:aa11bb22 version:aa11bb22"
         '''
-        self._check_lock(self._port)
-        with self._lock:
-            try:
-                return self._recursive_get_info(DEFAULT_COMMAND_RETRIES)
-            except (MagDeckError, SerialException, SerialNoResponse) as e:
-                return {'error': str(e)}
+        try:
+            return self._recursive_get_info(DEFAULT_COMMAND_RETRIES)
+        except (MagDeckError, SerialException, SerialNoResponse) as e:
+            return {'error': str(e)}
 
     def enter_programming_mode(self) -> str:
         '''
@@ -305,12 +295,10 @@ class MagDeck:
         The connection can be restored by performing a .disconnect()
         followed by a .connect() to the same symlink node
         '''
-        self._check_lock(self._port)
-        with self._lock:
-            try:
-                self._send_command(GCODES['PROGRAMMING_MODE'])
-            except (MagDeckError, SerialException, SerialNoResponse) as e:
-                return str(e)
+        try:
+            self._send_command(GCODES['PROGRAMMING_MODE'])
+        except (MagDeckError, SerialException, SerialNoResponse) as e:
+            return str(e)
         return ''
 
     def _recursive_write_and_return(self, cmd, timeout, retries):
@@ -337,26 +325,22 @@ class MagDeck:
         This methods writes a sequence of newline characters, which will
         guarantee mag-deck responds with 'ok\r\nok\r\n' within 1 seconds
         '''
-        self._check_lock(self._port)
-        with self._lock:
-            self._send_command('\r\n', timeout=DEFAULT_MAG_DECK_TIMEOUT)
+        self._send_command('\r\n', timeout=DEFAULT_MAG_DECK_TIMEOUT)
 
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(self, command, timeout=DEFAULT_MAG_DECK_TIMEOUT):
         command_line = command + ' ' + MAG_DECK_COMMAND_TERMINATOR
-        # self._check_lock(self._port)
-        # with self._lock:
-        ret_code = self._recursive_write_and_return(
-            command_line, timeout, DEFAULT_COMMAND_RETRIES)
+        with self._lock:
+            ret_code = self._recursive_write_and_return(
+                command_line, timeout, DEFAULT_COMMAND_RETRIES)
 
-        # Smoothieware returns error state if a switch was hit while moving
-        if (ERROR_KEYWORD in ret_code.lower()) or \
-                (ALARM_KEYWORD in ret_code.lower()):
-            log.error(
-                'Received error message from Mag-Deck: {}'.format(ret_code))
-            raise MagDeckError(ret_code)
+            # Smoothieware returns error state if a switch was hit while moving
+            if (ERROR_KEYWORD in ret_code.lower()) or \
+                    (ALARM_KEYWORD in ret_code.lower()):
+                log.error(f'Received error message from Mag-Deck: {ret_code}')
+                raise MagDeckError(ret_code)
 
-        return ret_code.strip()
+            return ret_code.strip()
 
     def _connect_to_port(self, port=None):
         try:
@@ -379,26 +363,22 @@ class MagDeck:
             raise SerialException('No port specified')
 
     def _update_plate_height(self) -> str:
-        self._check_lock(self._port)
-        with self._lock:
-            try:
-                res = self._send_command(GCODES['GET_PLATE_HEIGHT'])
-                distance = _parse_distance_response(res)
-            except (MagDeckError, SerialException, SerialNoResponse) as e:
-                return str(e)
-            self._plate_height = distance
-            return ''
+        try:
+            res = self._send_command(GCODES['GET_PLATE_HEIGHT'])
+            distance = _parse_distance_response(res)
+        except (MagDeckError, SerialException, SerialNoResponse) as e:
+            return str(e)
+        self._plate_height = distance
+        return ''
 
     def _update_mag_position(self) -> str:
-        self._check_lock(self._port)
-        with self._lock:
-            try:
-                res = self._send_command(GCODES['GET_CURRENT_POSITION'])
-                distance = _parse_distance_response(res)
-            except (MagDeckError, SerialException, SerialNoResponse) as e:
-                return str(e)
-            self._mag_position = distance
-            return ''
+        try:
+            res = self._send_command(GCODES['GET_CURRENT_POSITION'])
+            distance = _parse_distance_response(res)
+        except (MagDeckError, SerialException, SerialNoResponse) as e:
+            return str(e)
+        self._mag_position = distance
+        return ''
 
     def _recursive_get_info(self, retries) -> dict:
         try:
