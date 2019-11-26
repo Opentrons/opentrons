@@ -33,7 +33,7 @@ import { configReducer } from './config'
 import { discoveryReducer } from './discovery/reducer'
 
 // protocol state
-import { protocolReducer } from './protocol'
+import { protocolReducer } from './protocol/reducer'
 
 // custom labware state
 import { customLabwareReducer } from './custom-labware/reducer'

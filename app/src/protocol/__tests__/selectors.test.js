@@ -172,13 +172,17 @@ const SPECS = [
   {
     name: 'getProtocolMethod if nothing loaded',
     selector: protocol.getProtocolMethod,
-    state: { protocol: { file: null, contents: null, data: null } },
+    state: {
+      robot: { session: { apiLevel: [1, 0] } },
+      protocol: { file: null, contents: null, data: null },
+    },
     expected: null,
   },
   {
     name: 'getProtocolMethod if file not yet read',
     selector: protocol.getProtocolMethod,
     state: {
+      robot: { session: { apiLevel: [1, 0] } },
       protocol: { file: { name: 'proto.py' }, contents: null, data: null },
     },
     expected: null,
@@ -187,18 +191,20 @@ const SPECS = [
     name: 'getProtocolMethod if non-JSON file has been read',
     selector: protocol.getProtocolMethod,
     state: {
+      robot: { session: { apiLevel: [1, 0] } },
       protocol: {
         file: { name: 'proto.py' },
         contents: 'fizzbuzz',
         data: null,
       },
     },
-    expected: 'Opentrons API',
+    expected: 'Python Protocol API v1.0',
   },
   {
     name: 'getProtocolMethod if JSON file read but no data',
     selector: protocol.getProtocolMethod,
     state: {
+      robot: { session: { apiLevel: [1, 0] } },
       protocol: {
         file: { name: 'proto.json', type: 'json' },
         contents: 'fizzbuzz',
@@ -211,6 +217,7 @@ const SPECS = [
     name: 'getProtocolMethod if JSON file read but no name in data',
     selector: protocol.getProtocolMethod,
     state: {
+      robot: { session: { apiLevel: [1, 0] } },
       protocol: {
         file: { name: 'proto.json', type: 'json' },
         contents: 'fizzbuzz',
@@ -223,6 +230,7 @@ const SPECS = [
     name: 'getProtocolMethod if JSON file read with name in data',
     selector: protocol.getProtocolMethod,
     state: {
+      robot: { session: { apiLevel: [1, 0] } },
       protocol: {
         file: { name: 'proto.json', type: 'json' },
         contents: 'fizzbuzz',
@@ -234,12 +242,13 @@ const SPECS = [
         },
       },
     },
-    expected: 'Opentrons Protocol Designer',
+    expected: 'Protocol Designer',
   },
   {
     name: 'getProtocolMethod if JSON file read with name and version in data',
     selector: protocol.getProtocolMethod,
     state: {
+      robot: { session: { apiLevel: [1, 0] } },
       protocol: {
         file: { name: 'proto.json', type: 'json' },
         contents: 'fizzbuzz',
@@ -247,12 +256,12 @@ const SPECS = [
           metadata: {},
           'designer-application': {
             'application-name': 'opentrons/protocol-designer',
-            'application-version': 'v1.2.3',
+            'application-version': '1.2.3',
           },
         },
       },
     },
-    expected: 'Opentrons Protocol Designer v1.2.3',
+    expected: 'Protocol Designer v1.2.3',
   },
 ]
 

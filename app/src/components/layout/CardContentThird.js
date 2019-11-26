@@ -3,18 +3,14 @@ import * as React from 'react'
 import cx from 'classnames'
 import styles from './styles.css'
 
-type Props = {
+export type CardContentThirdProps = {|
   children: React.Node,
   className?: string,
-  overrideLast?: boolean,
-}
-export default function CardContentThird(props: Props) {
+|}
+
+export function CardContentThird(props: CardContentThirdProps) {
   return (
-    <div
-      className={cx(styles.card_content_third, props.className, {
-        [styles.override_last]: props.overrideLast,
-      })}
-    >
+    <div className={cx(styles.card_content_third, props.className)}>
       {props.children}
     </div>
   )

@@ -68,10 +68,6 @@
     text-align: right;
     padding: 1rem;
   }
-
-  &.override_last {
-    text-align: left;
-  }
 }
 
 .card_content_flex {

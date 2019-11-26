@@ -10,7 +10,7 @@ import {
   getProtocolMethod,
   getProtocolDescription,
 } from '../../protocol'
-import { selectors as robotSelectors } from '../../robot'
+
 import { LabeledValue } from '@opentrons/components'
 import InfoSection from './InfoSection'
 import { SectionContentHalf, CardRow } from '../layout'
@@ -23,23 +23,22 @@ type Props = {
   lastUpdated: ?number,
   method: ?string,
   description: ?string,
-  apiLevel: ?[number, number],
 }
 
 const INFO_TITLE = 'Information'
 const DESCRIPTION_TITLE = 'Description'
 const DATE_FORMAT = 'DD MMM Y, hh:mmA'
 
-export default connect<Props, {||}, _, _, _, _>(mapStateToProps)(
+export default connect<Props, {||}, _, {||}, _, _>(mapStateToProps)(
   InformationCard
 )
 
 function InformationCard(props: Props) {
-  const { name, author, method, description, apiLevel } = props
+  const { name, author, method, description } = props
   const lastUpdated = props.lastUpdated
     ? moment(props.lastUpdated).format(DATE_FORMAT)
     : '-'
-  const formattedApiLevel = apiLevel ? `${apiLevel[0]}.${apiLevel[1]}` : null
+
   return (
     <React.Fragment>
       <InfoSection title={INFO_TITLE}>
@@ -59,14 +58,6 @@ function InformationCard(props: Props) {
             <LabeledValue label="Creation Method" value={method || '-'} />
           </SectionContentHalf>
         </CardRow>
-        <CardRow>
-          <SectionContentHalf>
-            <LabeledValue
-              label="Protocol API Version"
-              value={formattedApiLevel || '-'}
-            />
-          </SectionContentHalf>
-        </CardRow>
       </InfoSection>
       {description && (
         <InfoSection title={DESCRIPTION_TITLE}>
@@ -84,6 +75,5 @@ function mapStateToProps(state: State): $Exact<Props> {
     lastUpdated: getProtocolLastUpdated(state),
     method: getProtocolMethod(state),
     description: getProtocolDescription(state),
-    apiLevel: robotSelectors.getApiLevel(state),
   }
 }

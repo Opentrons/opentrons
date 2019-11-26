@@ -418,7 +418,7 @@ describe('discovery selectors', () => {
         health: { protocol_api_version: [2, 0] },
       },
       selector: discovery.getRobotProtocolApiVersion,
-      expected: [2, 0],
+      expected: '2.0',
     },
     {
       name: 'getRobotProtocolApiVersion returns null if no healths',

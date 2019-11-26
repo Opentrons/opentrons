@@ -1,6 +1,6 @@
 // protocol state reducer tests
 
-import { protocolReducer } from '..'
+import { protocolReducer } from '../reducer'
 
 describe('protocolReducer', () => {
   test('initial state', () => {

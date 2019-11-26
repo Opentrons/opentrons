@@ -24,7 +24,7 @@ import {
   useInterval,
 } from '@opentrons/components'
 
-import { CardContentThird } from '../layout'
+import { CardRow, CardContentThird } from '../layout'
 
 import type { Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
@@ -38,7 +38,7 @@ const TITLE = 'Information'
 const NAME_LABEL = 'Robot name'
 const SERVER_VERSION_LABEL = 'Server version'
 const FIRMWARE_VERSION_LABEL = 'Firmware version'
-const MAX_API_VERSION_LABEL = 'Max API Version'
+const MAX_PROTOCOL_API_VERSION_LABEL = 'Max Protocol API Version'
 
 const UPDATE_SERVER_UNAVAILABLE =
   "Unable to update because your robot's update server is not responding"
@@ -46,6 +46,8 @@ const OTHER_ROBOT_UPDATING =
   'Unable to update because your app is currently updating a different robot'
 const NO_UPDATE_FILES =
   'No robot update files found for this version of the app; please check again later'
+
+const DEFAULT_MAX_API_VERSION = '1.0'
 
 const UPDATE_RECHECK_DELAY_MS = 60000
 
@@ -63,10 +65,7 @@ export default function InformationCard(props: Props) {
   const buildrootRobot = useSelector(getBuildrootRobot)
   const version = getRobotApiVersion(robot)
   const firmwareVersion = getRobotFirmwareVersion(robot)
-  const protocolApiVersion = getRobotProtocolApiVersion(robot)
-  const formattedProtocolApiVersion = protocolApiVersion
-    ? `${protocolApiVersion[0]}.${protocolApiVersion[1]}`
-    : null
+  const maxApiVersion = getRobotProtocolApiVersion(robot)
 
   const updateFilesUnavailable = updateType === null
   const updateServerUnavailable = !serverOk
@@ -89,46 +88,42 @@ export default function InformationCard(props: Props) {
 
   return (
     <Card title={TITLE}>
-      <div>
-        <CardContentThird>
+      <CardContentThird>
+        <CardRow>
           <LabeledValue label={NAME_LABEL} value={displayName} />
-        </CardContentThird>
-        <CardContentThird>
+        </CardRow>
+        <LabeledValue
+          label={FIRMWARE_VERSION_LABEL}
+          value={firmwareVersion || 'Unknown'}
+        />
+      </CardContentThird>
+      <CardContentThird>
+        <CardRow>
           <LabeledValue
             label={SERVER_VERSION_LABEL}
             value={version || 'Unknown'}
           />
-        </CardContentThird>
-        <CardContentThird>
-          <HoverTooltip tooltipComponent={updateButtonTooltip}>
-            {hoverTooltipHandlers => (
-              <div {...hoverTooltipHandlers}>
-                <OutlineButton
-                  Component={Link}
-                  to={updateUrl}
-                  disabled={updateDisabled}
-                >
-                  {updateButtonText}
-                </OutlineButton>
-              </div>
-            )}
-          </HoverTooltip>
-        </CardContentThird>
-      </div>
-      <div>
-        <CardContentThird>
-          <LabeledValue
-            label={FIRMWARE_VERSION_LABEL}
-            value={firmwareVersion || 'Unknown'}
-          />
-        </CardContentThird>
-        <CardContentThird overrideLast>
-          <LabeledValue
-            label={MAX_API_VERSION_LABEL}
-            value={formattedProtocolApiVersion || 'Unknown'}
-          />
-        </CardContentThird>
-      </div>
+        </CardRow>
+        <LabeledValue
+          label={MAX_PROTOCOL_API_VERSION_LABEL}
+          value={maxApiVersion || DEFAULT_MAX_API_VERSION}
+        />
+      </CardContentThird>
+      <CardContentThird>
+        <HoverTooltip tooltipComponent={updateButtonTooltip}>
+          {hoverTooltipHandlers => (
+            <div {...hoverTooltipHandlers}>
+              <OutlineButton
+                Component={Link}
+                to={updateUrl}
+                disabled={updateDisabled}
+              >
+                {updateButtonText}
+              </OutlineButton>
+            </div>
+          )}
+        </HoverTooltip>
+      </CardContentThird>
     </Card>
   )
 }

@@ -20,7 +20,7 @@ import type { RobotState, Action as RobotAction } from './robot'
 import type { ShellState, ShellAction } from './shell/types'
 import type { Config, ConfigAction } from './config/types'
 import type { DiscoveryState, DiscoveryAction } from './discovery/types'
-import type { ProtocolState, ProtocolAction } from './protocol'
+import type { ProtocolState, ProtocolAction } from './protocol/types'
 import type {
   CustomLabwareState,
   CustomLabwareAction,
