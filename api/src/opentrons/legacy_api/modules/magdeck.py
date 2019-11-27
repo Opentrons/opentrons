@@ -1,4 +1,5 @@
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
+from opentrons.drivers.mag_deck.driver import mag_locks
 from opentrons import commands
 
 LABWARE_ENGAGE_HEIGHT = {
@@ -21,7 +22,6 @@ class MagDeck(commands.CommandPublisher):
         super().__init__(broker)
         self.labware = lw
         self._port = port
-        self._engaged = False
         self._driver = None
         self._device_info = None
 
@@ -33,7 +33,6 @@ class MagDeck(commands.CommandPublisher):
         if self._driver and self._driver.is_connected():
             self._driver.probe_plate()
             # return if successful or not?
-            self._engaged = False
 
     @commands.publish.both(command=commands.magdeck_engage)
     def engage(self, **kwargs):
@@ -67,7 +66,6 @@ class MagDeck(commands.CommandPublisher):
                 MAX_ENGAGE_HEIGHT))
         if self._driver and self._driver.is_connected():
             self._driver.move(height)
-            self._engaged = True
 
     @commands.publish.both(command=commands.magdeck_disengage)
     def disengage(self):
@@ -76,7 +74,17 @@ class MagDeck(commands.CommandPublisher):
         '''
         if self._driver and self._driver.is_connected():
             self._driver.home()
-            self._engaged = False
+
+    @property
+    def current_height(self):
+        return self._driver.mag_position
+
+    @property
+    def engaged(self):
+        if self.current_height > 0:
+            return True
+        else:
+            return False
 
     @classmethod
     def name(cls):
@@ -104,7 +112,8 @@ class MagDeck(commands.CommandPublisher):
         return {
             'status': self.status,
             'data': {
-                'engaged': self._engaged
+                'engaged': self.engaged,
+                'height': self.current_height
             }
         }
 
@@ -123,7 +132,10 @@ class MagDeck(commands.CommandPublisher):
 
     @property
     def status(self):
-        return 'engaged' if self._engaged else 'disengaged'
+        if self.current_height > 0:
+            return 'engaged'
+        else:
+            return 'disengaged'
 
     # Internal Methods
 
@@ -132,8 +144,12 @@ class MagDeck(commands.CommandPublisher):
         Connect to the serial port
         '''
         if self._port:
-            self._driver = MagDeckDriver()
-            self._driver.connect(self._port)
+            if mag_locks.get(self._port):
+                self._driver = mag_locks[self._port][1]
+            else:
+                self._driver = MagDeckDriver()
+            if not self._driver.is_connected():
+                self._driver.connect(self._port)
             self._device_info = self._driver.get_device_info()
         else:
             # Sanity check: Should never happen, because connect should
@@ -147,4 +163,4 @@ class MagDeck(commands.CommandPublisher):
         Disconnect from the serial port
         '''
         if self._driver:
-            self._driver.disconnect()
+            self._driver.disconnect(port=self._port)

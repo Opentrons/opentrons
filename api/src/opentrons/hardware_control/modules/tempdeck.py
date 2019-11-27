@@ -2,6 +2,7 @@ import asyncio
 from threading import Thread, Event
 from typing import Union, Optional
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
+from opentrons.drivers.temp_deck.driver import temp_locks
 from . import update, mod_abc
 
 TEMP_POLL_INTERVAL_SECS = 1
@@ -34,6 +35,9 @@ class SimulatingDriver:
 
     def connect(self, port):
         self._port = port
+
+    def is_connected(self):
+        return True
 
     def disconnect(self):
         pass
@@ -117,8 +121,10 @@ class TempDeck(mod_abc.AbstractModule):
                  port,
                  simulating,
                  loop: asyncio.AbstractEventLoop = None) -> None:
-
-        self._driver = self._build_driver(simulating)
+        if temp_locks.get(port):
+            self._driver = temp_locks[port][1]
+        else:
+            self._driver = self._build_driver(simulating)  # type: ignore
         if None is loop:
             self._loop = asyncio.get_event_loop()
         else:
@@ -204,7 +210,8 @@ class TempDeck(mod_abc.AbstractModule):
         """
         if self._poller:
             self._poller.join()
-        self._driver.connect(self._port)
+        if not self._driver.is_connected():
+            self._driver.connect(self._port)
         self._device_info = self._driver.get_device_info()
         self._poller = Poller(self._driver)
         self._poller.start()

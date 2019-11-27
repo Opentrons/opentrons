@@ -1,9 +1,9 @@
 from os import environ
 import logging
 import asyncio
-from threading import Event, Thread
+from threading import Event, Thread, Lock
 from time import sleep
-from typing import Optional, Mapping
+from typing import Optional, Mapping, Dict, Tuple
 from serial.serialutil import SerialException  # type: ignore
 
 from opentrons.drivers import serial_communication, utils
@@ -41,6 +41,8 @@ TEMP_DECK_BAUDRATE = 115200
 TEMP_DECK_COMMAND_TERMINATOR = '\r\n\r\n'
 TEMP_DECK_ACK = 'ok\r\nok\r\n'
 
+temp_locks: Dict[str, Tuple[Lock, 'TempDeck']] = {}
+
 
 class TempDeckError(Exception):
     pass
@@ -56,21 +58,34 @@ class TempDeck:
 
         self._temperature = {'current': 25, 'target': None}
         self._update_thread = None
+        self._port = None
+        self._lock = None
 
     def connect(self, port=None) -> Optional[str]:
         if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
             return None
         try:
-            self.disconnect()
+            self.disconnect(port)
             self._connect_to_port(port)
+            if temp_locks.get(port):
+                self._lock = temp_locks[port][0]
+            else:
+                self._lock = Lock()
+                temp_locks[port] = (self._lock, self)
             self._wait_for_ack()  # verify the device is there
+            self._port = port
+
         except (SerialException, SerialNoResponse) as e:
             return str(e)
         return ''
 
-    def disconnect(self):
-        if self.is_connected():
+    def disconnect(self, port=None):
+        if self._port and self.is_connected():
             self._connection.close()
+            del temp_locks[self._port]
+        elif self.is_connected():
+            self._connection.close()
+
         self._connection = None
 
     def is_connected(self) -> bool:
@@ -86,7 +101,6 @@ class TempDeck:
 
     def deactivate(self) -> str:
         self.run_flag.wait()
-
         try:
             self._send_command(GCODES['DISENGAGE'])
         except (TempDeckError, SerialException, SerialNoResponse) as e:
@@ -125,6 +139,7 @@ class TempDeck:
             updated_temperature = default or self._temperature.copy()
             self._temperature.update(updated_temperature)
         else:
+            # comment
             try:
                 self._update_thread = Thread(
                     target=self._recursive_update_temperature,
@@ -227,19 +242,18 @@ class TempDeck:
         """
 
         """
+        with self._lock:
+            command_line = command + ' ' + TEMP_DECK_COMMAND_TERMINATOR
+            ret_code = self._recursive_write_and_return(
+                command_line, timeout, DEFAULT_COMMAND_RETRIES)
 
-        command_line = command + ' ' + TEMP_DECK_COMMAND_TERMINATOR
-        ret_code = self._recursive_write_and_return(
-            command_line, timeout, DEFAULT_COMMAND_RETRIES)
+            # Smoothieware returns error state if a switch was hit while moving
+            if (ERROR_KEYWORD in ret_code.lower()) or \
+                    (ALARM_KEYWORD in ret_code.lower()):
+                log.error(f'Received error message from Temp-Deck: {ret_code}')
+                raise TempDeckError(ret_code)
 
-        # Smoothieware returns error state if a switch was hit while moving
-        if (ERROR_KEYWORD in ret_code.lower()) or \
-                (ALARM_KEYWORD in ret_code.lower()):
-            log.error(
-                'Received error message from Temp-Deck: {}'.format(ret_code))
-            raise TempDeckError(ret_code)
-
-        return ret_code.strip()
+            return ret_code.strip()
 
     def _recursive_write_and_return(self, cmd, timeout, retries, tag=None):
         if not tag:

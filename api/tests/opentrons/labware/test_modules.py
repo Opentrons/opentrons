@@ -4,6 +4,7 @@
 
 import pytest
 import asyncio
+from threading import Lock
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 from opentrons.drivers import serial_communication
@@ -87,6 +88,7 @@ def test_run_tempdeck_connected(
     def mock_connect(self, port):
         nonlocal connected
         connected = True
+        self._lock = Lock()
 
     def mock_write(command, ack, serial_connection):
         return 'ok\n\rok\n\r'

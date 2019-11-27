@@ -1,8 +1,8 @@
 from os import environ
 import logging
-from threading import Event
+from threading import Event, Lock
 from time import sleep
-from typing import Optional
+from typing import Optional, Dict, Tuple
 from serial.serialutil import SerialException  # type: ignore
 
 from opentrons.drivers import serial_communication
@@ -45,6 +45,8 @@ MAG_DECK_ACK = 'ok\r\nok\r\n'
 # Number of digits after the decimal point for temperatures being sent
 # to/from Temp-Deck
 GCODE_ROUNDING_PRECISION = 3
+
+mag_locks: Dict[str, Tuple[Lock, 'MagDeck']] = {}
 
 
 class MagDeckError(Exception):
@@ -156,6 +158,8 @@ class MagDeck:
 
         self._plate_height = None
         self._mag_position = None
+        self._port = None
+        self._lock = None
 
     def connect(self, port=None) -> str:
         '''
@@ -167,15 +171,25 @@ class MagDeck:
         if environ.get('ENABLE_VIRTUAL_SMOOTHIE', '').lower() == 'true':
             return ''
         try:
-            self.disconnect()
+            self.disconnect(port)
             self._connect_to_port(port)
+            if mag_locks.get(port):
+                self._lock = mag_locks[port][0]
+            else:
+                self._lock = Lock()
+                mag_locks[port] = (self._lock, self)
             self._wait_for_ack()    # verify the device is there
+            self._port = port
+
         except (SerialException, SerialNoResponse) as e:
             return str(e)
         return ''
 
-    def disconnect(self):
-        if self.is_connected():
+    def disconnect(self, port=None):
+        if port and self.is_connected():
+            self._connection.close()
+            del mag_locks[port]
+        elif self.is_connected():
             self._connection.close()
         self._connection = None
 
@@ -197,7 +211,6 @@ class MagDeck:
         Homes the magnet
         '''
         self.run_flag.wait()
-
         try:
             self._send_command(GCODES['HOME'])
         except (MagDeckError, SerialException, SerialNoResponse) as e:
@@ -211,7 +224,6 @@ class MagDeck:
         To be used for calibrating MagDeck
         '''
         self.run_flag.wait()
-
         try:
             self._send_command(GCODES['PROBE_PLATE'])
         except (MagDeckError, SerialException, SerialNoResponse) as e:
@@ -243,10 +255,11 @@ class MagDeck:
         is outside of the deck's linear range
         '''
         self.run_flag.wait()
-
         try:
-            position_mm = round(float(position_mm), GCODE_ROUNDING_PRECISION)
-            self._send_command('{0} Z{1}'.format(GCODES['MOVE'], position_mm))
+            position_mm = round(
+                float(position_mm), GCODE_ROUNDING_PRECISION)
+            self._send_command(
+                '{0} Z{1}'.format(GCODES['MOVE'], position_mm))
         except (MagDeckError, SerialException, SerialNoResponse) as e:
             return str(e)
         return ''
@@ -316,17 +329,17 @@ class MagDeck:
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(self, command, timeout=DEFAULT_MAG_DECK_TIMEOUT):
         command_line = command + ' ' + MAG_DECK_COMMAND_TERMINATOR
-        ret_code = self._recursive_write_and_return(
-            command_line, timeout, DEFAULT_COMMAND_RETRIES)
+        with self._lock:
+            ret_code = self._recursive_write_and_return(
+                command_line, timeout, DEFAULT_COMMAND_RETRIES)
 
-        # Smoothieware returns error state if a switch was hit while moving
-        if (ERROR_KEYWORD in ret_code.lower()) or \
-                (ALARM_KEYWORD in ret_code.lower()):
-            log.error(
-                'Received error message from Mag-Deck: {}'.format(ret_code))
-            raise MagDeckError(ret_code)
+            # Smoothieware returns error state if a switch was hit while moving
+            if (ERROR_KEYWORD in ret_code.lower()) or \
+                    (ALARM_KEYWORD in ret_code.lower()):
+                log.error(f'Received error message from Mag-Deck: {ret_code}')
+                raise MagDeckError(ret_code)
 
-        return ret_code.strip()
+            return ret_code.strip()
 
     def _connect_to_port(self, port=None):
         try:

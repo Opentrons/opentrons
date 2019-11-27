@@ -1,5 +1,6 @@
 from threading import Thread, Event
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
+from opentrons.drivers.temp_deck.driver import temp_locks
 from opentrons import commands
 
 
@@ -131,10 +132,13 @@ class TempDeck(commands.CommandPublisher):
         TempDecks
         """
         if self._port:
-            self._driver = TempDeckDriver()
-            self._driver.connect(self._port)
+            if temp_locks.get(self._port):
+                self._driver = temp_locks[self._port][1]
+            else:
+                self._driver = TempDeckDriver()
+            if not self._driver.is_connected():
+                self._driver.connect(self._port)
             self._device_info = self._driver.get_device_info()
-
             self._poll_stop_event = Event()
             Thread(target=self._poll_temperature).start()
         else:
@@ -153,4 +157,4 @@ class TempDeck(commands.CommandPublisher):
         if self._driver:
             if self.status != 'idle':
                 self.deactivate()
-            self._driver.disconnect()
+            self._driver.disconnect(port=self._port)
