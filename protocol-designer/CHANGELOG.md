@@ -3,7 +3,48 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [3.14.1](https://github.com/Opentrons/opentrons/compare/v3.13.2...v3.14.1) (2019-11-11)
+# [3.15.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.14.1...v3.15.0-alpha.0) (2019-11-27)
+
+
+### Bug Fixes
+
+* **protocol-designer:** fix bug in manualIntervention step ([#4350](https://github.com/Opentrons/opentrons/issues/4350)) ([2648052](https://github.com/Opentrons/opentrons/commit/2648052)), closes [#4334](https://github.com/Opentrons/opentrons/issues/4334)
+* **protocol-designer:** fix labware incompat drag warning ([#4428](https://github.com/Opentrons/opentrons/issues/4428)) ([467c2e4](https://github.com/Opentrons/opentrons/commit/467c2e4))
+
+
+### Features
+
+* **protocol-designer:** add compatibility info to LabwarePreview ([#4393](https://github.com/Opentrons/opentrons/issues/4393)) ([df9f41d](https://github.com/Opentrons/opentrons/commit/df9f41d)), closes [#4135](https://github.com/Opentrons/opentrons/issues/4135)
+* **protocol-designer:** Add edit modules modal ([#4320](https://github.com/Opentrons/opentrons/issues/4320)) ([bb71ae8](https://github.com/Opentrons/opentrons/commit/bb71ae8))
+* **protocol-designer:** Add magnet step form field validation ([#4469](https://github.com/Opentrons/opentrons/issues/4469)) ([07d7905](https://github.com/Opentrons/opentrons/commit/07d7905)), closes [#4300](https://github.com/Opentrons/opentrons/issues/4300)
+* **protocol-designer:** Add magnet step UI ([#4455](https://github.com/Opentrons/opentrons/issues/4455)) ([963288b](https://github.com/Opentrons/opentrons/commit/963288b))
+* **protocol-designer:** Add module placement warning and validation ([#4425](https://github.com/Opentrons/opentrons/issues/4425)) ([9034128](https://github.com/Opentrons/opentrons/commit/9034128)), closes [#4137](https://github.com/Opentrons/opentrons/issues/4137)
+* **protocol-designer:** add module slot visualization ([#4355](https://github.com/Opentrons/opentrons/issues/4355)) ([187fae0](https://github.com/Opentrons/opentrons/commit/187fae0)), closes [#4310](https://github.com/Opentrons/opentrons/issues/4310)
+* **protocol-designer:** add warning when using expt features ([#4447](https://github.com/Opentrons/opentrons/issues/4447)) ([15fcbd7](https://github.com/Opentrons/opentrons/commit/15fcbd7)), closes [#4129](https://github.com/Opentrons/opentrons/issues/4129)
+* **protocol-designer:** blocking hint on adding custom labware to modal ([#4383](https://github.com/Opentrons/opentrons/issues/4383)) ([f04d67e](https://github.com/Opentrons/opentrons/commit/f04d67e)), closes [#4329](https://github.com/Opentrons/opentrons/issues/4329)
+* **protocol-designer:** Disable module step creation when module missing ([#4468](https://github.com/Opentrons/opentrons/issues/4468)) ([f2e1a9e](https://github.com/Opentrons/opentrons/commit/f2e1a9e)), closes [#4456](https://github.com/Opentrons/opentrons/issues/4456)
+* **protocol-designer:** Enable adding and editing modules in file page ([#4385](https://github.com/Opentrons/opentrons/issues/4385)) ([6d975fd](https://github.com/Opentrons/opentrons/commit/6d975fd)), closes [#4317](https://github.com/Opentrons/opentrons/issues/4317)
+* **protocol-designer:** Enable slot selection for modules when FF enabled ([#4347](https://github.com/Opentrons/opentrons/issues/4347)) ([31fa641](https://github.com/Opentrons/opentrons/commit/31fa641)), closes [#4133](https://github.com/Opentrons/opentrons/issues/4133)
+* **protocol-designer:** enforce labware<>module compat ([#4427](https://github.com/Opentrons/opentrons/issues/4427)) ([4d42156](https://github.com/Opentrons/opentrons/commit/4d42156)), closes [#4136](https://github.com/Opentrons/opentrons/issues/4136)
+* **protocol-designer:** expose GEN2 pipettes in pipette select ([#4351](https://github.com/Opentrons/opentrons/issues/4351)) ([6195a2d](https://github.com/Opentrons/opentrons/commit/6195a2d)), closes [#4295](https://github.com/Opentrons/opentrons/issues/4295)
+* **protocol-designer:** fix labware duplication bug ([#4429](https://github.com/Opentrons/opentrons/issues/4429)) ([a0b321a](https://github.com/Opentrons/opentrons/commit/a0b321a)), closes [#4407](https://github.com/Opentrons/opentrons/issues/4407)
+* **protocol-designer:** hook up module creation in NewFileModal ([#4319](https://github.com/Opentrons/opentrons/issues/4319)) ([c2dba36](https://github.com/Opentrons/opentrons/commit/c2dba36))
+* **protocol-designer:** ignore labware<>module collision error in rogue mode ([#4437](https://github.com/Opentrons/opentrons/issues/4437)) ([99526ae](https://github.com/Opentrons/opentrons/commit/99526ae)), closes [#4130](https://github.com/Opentrons/opentrons/issues/4130)
+* **protocol-designer:** labware<>module incompat DnD behavior ([#4409](https://github.com/Opentrons/opentrons/issues/4409)) ([e7f0334](https://github.com/Opentrons/opentrons/commit/e7f0334)), closes [#4136](https://github.com/Opentrons/opentrons/issues/4136)
+* **protocol-designer:** move deck setup guidance to hint modal ([#4463](https://github.com/Opentrons/opentrons/issues/4463)) ([ae4e7be](https://github.com/Opentrons/opentrons/commit/ae4e7be)), closes [#4328](https://github.com/Opentrons/opentrons/issues/4328)
+* **protocol-designer:** Render crash warning for modules with Gen1 multi pipettes ([#4410](https://github.com/Opentrons/opentrons/issues/4410)) ([9981193](https://github.com/Opentrons/opentrons/commit/9981193)), closes [#4373](https://github.com/Opentrons/opentrons/issues/4373)
+* **protocol-designer:** render modules on deck ([#4309](https://github.com/Opentrons/opentrons/issues/4309)) ([20514f0](https://github.com/Opentrons/opentrons/commit/20514f0))
+* **protocol-designer:** save/load protocols with modules in prepro PD ([#4419](https://github.com/Opentrons/opentrons/issues/4419)) ([2b98da2](https://github.com/Opentrons/opentrons/commit/2b98da2))
+* **protocol-designer:** show module<>pipette collision error ([#4436](https://github.com/Opentrons/opentrons/issues/4436)) ([21cbca1](https://github.com/Opentrons/opentrons/commit/21cbca1)), closes [#4130](https://github.com/Opentrons/opentrons/issues/4130)
+* **protocol-designer:** show special-case warning for north/south ([#4361](https://github.com/Opentrons/opentrons/issues/4361)) ([86912e8](https://github.com/Opentrons/opentrons/commit/86912e8)), closes [#4332](https://github.com/Opentrons/opentrons/issues/4332)
+* **protocol-designer:** updates to LabwareSelectionModal ([#4325](https://github.com/Opentrons/opentrons/issues/4325)) ([04d8fea](https://github.com/Opentrons/opentrons/commit/04d8fea)), closes [#4323](https://github.com/Opentrons/opentrons/issues/4323)
+* **protocol-designer:** Wire up modules card with actual data ([#4354](https://github.com/Opentrons/opentrons/issues/4354)) ([33c5952](https://github.com/Opentrons/opentrons/commit/33c5952))
+
+
+
+
+
+## [3.14.1](https://github.com/Opentrons/opentrons/compare/v3.14.0...v3.14.1) (2019-11-11)
 
 **Note:** Version bump only for package protocol-designer
 

@@ -3,7 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [3.14.1](https://github.com/Opentrons/opentrons/compare/v3.13.2...v3.14.1) (2019-11-11)
+# [3.15.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.14.1...v3.15.0-alpha.0) (2019-11-27)
+
+
+### Features
+
+* **protocol-designer:** Add magnet step UI ([#4455](https://github.com/Opentrons/opentrons/issues/4455)) ([963288b](https://github.com/Opentrons/opentrons/commit/963288b))
+* **protocol-designer:** blocking hint on adding custom labware to modal ([#4383](https://github.com/Opentrons/opentrons/issues/4383)) ([f04d67e](https://github.com/Opentrons/opentrons/commit/f04d67e)), closes [#4329](https://github.com/Opentrons/opentrons/issues/4329)
+* **protocol-designer:** expose GEN2 pipettes in pipette select ([#4351](https://github.com/Opentrons/opentrons/issues/4351)) ([6195a2d](https://github.com/Opentrons/opentrons/commit/6195a2d)), closes [#4295](https://github.com/Opentrons/opentrons/issues/4295)
+* **protocol-designer:** move deck setup guidance to hint modal ([#4463](https://github.com/Opentrons/opentrons/issues/4463)) ([ae4e7be](https://github.com/Opentrons/opentrons/commit/ae4e7be)), closes [#4328](https://github.com/Opentrons/opentrons/issues/4328)
+* **protocol-designer:** show special-case warning for north/south ([#4361](https://github.com/Opentrons/opentrons/issues/4361)) ([86912e8](https://github.com/Opentrons/opentrons/commit/86912e8)), closes [#4332](https://github.com/Opentrons/opentrons/issues/4332)
+* **protocol-designer:** updates to LabwareSelectionModal ([#4325](https://github.com/Opentrons/opentrons/issues/4325)) ([04d8fea](https://github.com/Opentrons/opentrons/commit/04d8fea)), closes [#4323](https://github.com/Opentrons/opentrons/issues/4323)
+* **protocol-library-kludge:** support v2 labware ([#4507](https://github.com/Opentrons/opentrons/issues/4507)) ([8117289](https://github.com/Opentrons/opentrons/commit/8117289)), closes [#4505](https://github.com/Opentrons/opentrons/issues/4505)
+
+
+
+
+
+## [3.14.1](https://github.com/Opentrons/opentrons/compare/v3.14.0...v3.14.1) (2019-11-11)
 
 **Note:** Version bump only for package @opentrons/components
 

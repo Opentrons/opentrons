@@ -3,7 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [3.14.1](https://github.com/Opentrons/opentrons/compare/v3.13.2...v3.14.1) (2019-11-11)
+# [3.15.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.14.1...v3.15.0-alpha.0) (2019-11-27)
+
+
+### Bug Fixes
+
+* **api,shared-data:** fix gen2 multi positioning ([#4412](https://github.com/Opentrons/opentrons/issues/4412)) ([54be7f9](https://github.com/Opentrons/opentrons/commit/54be7f9))
+
+
+### Features
+
+* **api,shared-data:** support p20/300/1k single v2.1 ([#4392](https://github.com/Opentrons/opentrons/issues/4392)) ([e743d2b](https://github.com/Opentrons/opentrons/commit/e743d2b)), closes [#4389](https://github.com/Opentrons/opentrons/issues/4389)
+* **protocol-designer:** render modules on deck ([#4309](https://github.com/Opentrons/opentrons/issues/4309)) ([20514f0](https://github.com/Opentrons/opentrons/commit/20514f0))
+* **protocol-designer:** save/load protocols with modules in prepro PD ([#4419](https://github.com/Opentrons/opentrons/issues/4419)) ([2b98da2](https://github.com/Opentrons/opentrons/commit/2b98da2))
+
+
+
+
+
+## [3.14.1](https://github.com/Opentrons/opentrons/compare/v3.14.0...v3.14.1) (2019-11-11)
 
 **Note:** Version bump only for package @opentrons/shared-data
 
