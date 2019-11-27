@@ -68,10 +68,8 @@ class TempDeck:
             self.disconnect(port)
             self._connect_to_port(port)
             if temp_locks.get(port):
-                print("in here")
                 self._lock = temp_locks[port][0]
             else:
-                print("setting up lock")
                 self._lock = Lock()
                 temp_locks[port] = (self._lock, self)
             self._wait_for_ack()  # verify the device is there
