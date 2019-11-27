@@ -181,7 +181,6 @@ class MagDeck:
             self._wait_for_ack()    # verify the device is there
             self._port = port
 
-
         except (SerialException, SerialNoResponse) as e:
             return str(e)
         return ''

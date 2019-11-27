@@ -48,6 +48,9 @@ class SimulatingDriver:
     def mag_position(self):
         return self._height
 
+    def is_connected(self):
+        return True
+
 
 class MagDeck(mod_abc.AbstractModule):
     """

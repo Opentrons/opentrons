@@ -136,7 +136,7 @@ class TempDeck(commands.CommandPublisher):
                 self._driver = temp_locks[self._port][1]
             else:
                 self._driver = TempDeckDriver()
-            if self._driver.is_connected():
+            if not self._driver.is_connected():
                 self._driver.connect(self._port)
             self._device_info = self._driver.get_device_info()
             self._poll_stop_event = Event()

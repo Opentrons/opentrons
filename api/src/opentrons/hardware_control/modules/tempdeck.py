@@ -36,6 +36,9 @@ class SimulatingDriver:
     def connect(self, port):
         self._port = port
 
+    def is_connected(self):
+        return True
+
     def disconnect(self):
         pass
 
