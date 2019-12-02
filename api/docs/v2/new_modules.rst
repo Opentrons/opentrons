@@ -239,9 +239,9 @@ The Thermocycler Module allows users to perform complete experiments that requir
 
 There are two heating mechanisms in the Thermocycler Module. One is the block in which samples are located; the other is the lid heating pad.
 
-The block can control its temperature between 4°C and 99°C to the nearest 1°C.
+The block can control its temperature between 4 °C and 99 °C to the nearest 1 °C.
 
-The lid can control its temperature between 37°C to 110°C.
+The lid can control its temperature between 37 °C to 110 °C.
 
 For the purposes of this section, assume we have the following already:
 
@@ -260,6 +260,7 @@ For the purposes of this section, assume we have the following already:
     When loading the Thermocycler Module, it is not necessary to specify a slot.
     This is because the Thermocycler Module has a default position that covers Slots 7, 8, 10, and 11.
     This is the only valid location for the Thermocycler Module on the OT-2 deck.
+
 .. versionadded:: 2.0
 
 Opentrons App Control
@@ -282,7 +283,7 @@ Deactivating the Module
 +++++++++++++++++++++++
 
 Sometimes you may wish to deactivate the Thermocycler Module, in order to remove samples from the module or shut the
-module off after use. Before or after a protocol run, you can press `deactivate` to ensure that your Thermocycler Module is off before
+module off after use. Before or after a protocol run, you can click the `deactivate` button to ensure that your Thermocycler Module is off before
 opening the lid. You may also deactivate your Thermocycler Module from your protocol by calling one of the methods outlined in :ref:`thermocycler-deactivation`.
 
 .. image:: ../img/modules/deactivate_tc.png
@@ -294,7 +295,7 @@ opening the lid. You may also deactivate your Thermocycler Module from your prot
 Lid Motor Control
 ^^^^^^^^^^^^^^^^^
 
-The Thermocycler Module can control its temperature with the lid open or closed. When the lid of the Thermocycler Module is open, the pipettes can access the contained labware. You can control the lid position with the methods below.
+The Thermocycler Module can control its temperature with the lid open or closed. When the lid of the Thermocycler Module is open, the pipettes can access the loaded labware. You can control the lid position with the methods below.
 
 Open Lid
 ++++++++
