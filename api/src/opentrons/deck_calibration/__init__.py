@@ -69,36 +69,13 @@ def position(axis, hardware, cp=None):
 
     The critical point takes into account the model offset of a given pipette.
     """
-
-    if not ff.use_protocol_api_v2():
-        p = hardware._driver.position
-        return (p['X'], p['Y'], p[axis])
-    else:
-        p = hardware.gantry_position(axis, critical_point=cp, refresh=True)
-        return (p.x, p.y, p.z)
+    p = hardware.gantry_position(axis, critical_point=cp, refresh=True)
+    return (p.x, p.y, p.z)
 
 
 def jog(axis, direction, step, hardware, mount, cp=None):
-    if not ff.use_protocol_api_v2():
-        if axis == 'z':
-            if mount == 'left':
-                axis = 'Z'
-            elif mount == 'right':
-                axis = 'A'
-
-        hardware._driver.move(
-            {axis.upper():
-                hardware._driver.position[axis.upper()] + direction * step})
-        return position(axis.upper(), hardware)
-    else:
-        if axis == mount:
-            axis = 'z'
-        pt = types.Point(**{axis.lower(): direction*step})
-        hardware.move_rel(mount, pt)
-        return position(mount, hardware, cp)
-
-
-def apply_mount_offset(point, hardware):
-    px, py, pz = point
-    mx, my, mz = hardware.config.mount_offset
-    return (px - mx, py - my, pz - mz)
+    if axis == mount:
+        axis = 'z'
+    pt = types.Point(**{axis.lower(): direction*step})
+    hardware.move_rel(mount, pt)
+    return position(mount, hardware, cp)
