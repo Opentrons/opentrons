@@ -357,9 +357,9 @@ Hold Time
 
 If you set a ``temperature`` and a ``hold_time``, the Thermocycler Module will hold the temperature for the specified amount of time. Time can be passed in as minutes or seconds.
 
-With a hold time, it is important to also include the `block_max_volume` parameter. This is to ensure that the sample reaches the target temperature before the hold time counts down.
+With a hold time, it is important to also include the ``block_max_volume`` parameter. This is to ensure that the sample reaches the target temperature before the hold time counts down.
 
-In the example below, the Thermocycler Module will hold the 50µl samples at the specified temperature for 45 minutes and 15 seconds.
+In the example below, the Thermocycler Module will hold the 50 µl samples at the specified temperature for 45 minutes and 15 seconds.
 
 If you do not specify a hold time the protocol will proceed once the temperature specified is reached.
 
