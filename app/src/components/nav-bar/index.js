@@ -1,16 +1,23 @@
+// @flow
 // nav bar component
-import React from 'react'
+import * as React from 'react'
+import { useSelector } from 'react-redux'
 
 import { VerticalNavBar } from '@opentrons/components'
-import NavButton from './NavButton'
+import { NavButton } from './NavButton'
+import { getNavbarLocations } from '../../nav'
 
-import { PANELS } from '../../interface'
+export default function NavBar() {
+  const locations = useSelector(getNavbarLocations)
 
-export default function NavBar(props) {
   return (
     <VerticalNavBar>
-      {PANELS.map(panel => (
-        <NavButton key={panel.name} {...panel} />
+      {locations.map((location, i) => (
+        <NavButton
+          key={location.id}
+          {...location}
+          isBottom={i >= locations.length - 1}
+        />
       ))}
     </VerticalNavBar>
   )

@@ -27,7 +27,7 @@ type NavButtonProps = {
   notification?: boolean,
   /** selected styling (can also use react-router & `activeClassName`) */
   selected?: boolean,
-  /** contents of the tooltip targetting this button */
+  /** contents of the tooltip targeting this button */
   tooltipComponent?: React.Node,
 }
 
