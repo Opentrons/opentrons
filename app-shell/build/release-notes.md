@@ -6,13 +6,13 @@ For more details about this release, please see the full [technical change log][
 
 ## Custom Labware Support in the Opentrons App
 
-You can now upload custom labware definitions generated with the [Labware Creator][https://labware.opentrons.com/create] tool by navigating to the
+You can now upload custom labware definitions generated with the [Labware Creator](https://labware.opentrons.com/create) tool by navigating to the
 `More` tab.
 
 ## Other Changes
 - If a protocol does not have any executable steps, the Opentrons App will raise an error.
 - Make Opentrons App logs more accessible via the `Help` drop-down.
-
+- The Opentrons App will now detect the protocol API version supported by the robot and selected in the protocol. A modal will appear if there is a mismatch.
 
 ## Bug Fixes
 - Fixed more issues with app and robot version sync.
