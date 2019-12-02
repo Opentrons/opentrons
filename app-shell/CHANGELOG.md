@@ -3,7 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [3.14.1](https://github.com/Opentrons/opentrons/compare/v3.13.2...v3.14.1) (2019-11-11)
+# [3.15.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.14.1...v3.15.0-alpha.0) (2019-11-27)
+
+
+### Bug Fixes
+
+* **app:** Call correct create method depending on protocol ([#4509](https://github.com/Opentrons/opentrons/issues/4509)) ([a3ec421](https://github.com/Opentrons/opentrons/commit/a3ec421)), closes [#4202](https://github.com/Opentrons/opentrons/issues/4202)
+* **app-shell:** improve context menu and log handling ([#4472](https://github.com/Opentrons/opentrons/issues/4472)) ([de15135](https://github.com/Opentrons/opentrons/commit/de15135)), closes [#4293](https://github.com/Opentrons/opentrons/issues/4293)
+
+
+
+
+
+## [3.14.1](https://github.com/Opentrons/opentrons/compare/v3.14.0...v3.14.1) (2019-11-11)
 
 **Note:** Version bump only for package @opentrons/app-shell
 
