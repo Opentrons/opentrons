@@ -6,7 +6,7 @@ For more details about this release, please see the full [technical change log][
 
 ## Python Protocol API V2 Release
 
-We're happy to announce the full release version 2 of our Python protocol API! To read more, please go to our [documentation](https://docs.opentrons.com/v2/index.html).
+We're happy to announce the full release of version 2 of our Python protocol API! To read more, please go to our [documentation](https://docs.opentrons.com/v2/index.html).
 
 ## Thermocycler Release
 
