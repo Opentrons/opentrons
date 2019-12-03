@@ -1,28 +1,23 @@
 // @flow
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-
-import { getFeatureFlags } from '../../config/selectors'
 import { SidePanel, ListItem, Icon } from '@opentrons/components'
 
 import styles from './styles.css'
 
+// TODO(mc, 2019-12-03): i18n
+const MENU = 'Menu'
+const ITEMS = [
+  { label: 'App', url: '/menu/app' },
+  { label: 'Custom Labware', url: '/menu/custom-labware' },
+  { label: 'Resources', url: '/menu/resources' },
+]
+
 export default function MenuPanel() {
-  const featureFlags = useSelector(getFeatureFlags)
-
-  const items = [
-    { label: 'App', url: '/menu/app' },
-    featureFlags.customLabware
-      ? { label: 'Custom Labware', url: '/menu/custom-labware' }
-      : null,
-    { label: 'Resources', url: '/menu/resources' },
-  ].filter(Boolean)
-
   return (
-    <SidePanel title="Menu">
+    <SidePanel title={MENU}>
       <div className={styles.menu_panel}>
         <ol className={styles.menu_list}>
-          {items.map(item => (
+          {ITEMS.map(item => (
             <ListItem
               key={item.url}
               url={item.url}
@@ -30,7 +25,7 @@ export default function MenuPanel() {
               activeClassName={styles.active}
             >
               <span>{item.label}</span>
-              <Icon name={'chevron-right'} className={styles.menu_icon} />
+              <Icon name="chevron-right" className={styles.menu_icon} />
             </ListItem>
           ))}
         </ol>
