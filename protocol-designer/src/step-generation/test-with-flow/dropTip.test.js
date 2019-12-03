@@ -9,8 +9,6 @@ import {
 } from './fixtures'
 import dropTip from '../commandCreators/atomic/dropTip'
 
-jest.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
-
 describe('dropTip', () => {
   let invariantContext
 
