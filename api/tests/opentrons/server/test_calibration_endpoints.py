@@ -152,10 +152,8 @@ async def test_save_calibration_file(dc_session, monkeypatch):
     await endpoints.save_transform({})
 
     in_memory = hardware.config.gantry_calibration
-    assert len(persisted_data) == 2
+    assert len(persisted_data) == 1  # back up now happens at beginning of sess
     assert persisted_data[0][0].gantry_calibration == in_memory
-    assert persisted_data[1][0].gantry_calibration == in_memory
-    assert persisted_data[1][-1] is not None
 
     expected = [[1.0, 0.0, 0.0, 0.0],
                 [0.0, 1.0, 0.0, 0.3],

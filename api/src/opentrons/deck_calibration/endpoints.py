@@ -92,8 +92,10 @@ class SessionManager:
             self.adapter = hardware_control.adapters.SynchronousAdapter(
                 hardware)
 
+        robot_configs.backup_configuration(self.adapter.config)
         # Start from fresh identity matrix every calibration session
-        self.adapter.update_config(gantry_calibration=self.current_transform)
+        self.adapter.update_config(gantry_calibration=list(
+                map(lambda i: list(i), self.current_transform)))
 
 
 # -------------- Route Fns -----------------------------------------------
@@ -180,8 +182,10 @@ def set_current_mount(session):
 
     if right_channel == 1:
         pipette = right_pipette
+        session.cp = CriticalPoint.NOZZLE
     elif left_channel == 1:
         pipette = left_pipette
+        session.cp = CriticalPoint.NOZZLE
     elif right_pipette:
         pipette = right_pipette
         session.cp = CriticalPoint.FRONT_NOZZLE
@@ -240,8 +244,8 @@ async def attach_tip(data):
             pipette._add_tip(tip_length)
         else:
             session.adapter.add_tip(session.current_mount, tip_length)
-            if session.cp:
-                session.cp = CriticalPoint.FRONT_NOZZLE
+            if session.cp == CriticalPoint.NOZZLE:
+                session.cp = CriticalPoint.TIP
         session.tip_length = tip_length
 
         message = "Tip length set: {}".format(tip_length)
@@ -271,7 +275,7 @@ async def detach_tip(data):
         pipette._remove_tip(session.tip_length)
     else:
         session.adapter.remove_tip(session.current_mount)
-        if session.cp:
+        if session.cp == CriticalPoint.TIP:
             session.cp = CriticalPoint.NOZZLE
     session.tip_length = None
 
@@ -390,7 +394,7 @@ async def move(data):
                     Point(x=point[0], y=point[1], z=point[2]),
                     critical_point=session.cp)
             else:
-                if session.cp:
+                if session.cp == CriticalPoint.TIP:
                     session.cp = CriticalPoint.NOZZLE
                 session.adapter.move_to(
                     session.current_mount,
@@ -517,12 +521,11 @@ async def save_transform(data):
         # [const_zero, const_zero, const_one_, delta_z___],
         # [const_zero, const_zero, const_zero, const_one_]]
         session.current_transform = add_z(flat_matrix, session.z_value)
-
         session.adapter.update_config(gantry_calibration=list(
                 map(lambda i: list(i), session.current_transform)))
 
         robot_configs.save_deck_calibration(session.adapter.config)
-        robot_configs.backup_configuration(session.adapter.config)
+
         message = "Config file saved and backed up"
         status = 200
     return web.json_response({'message': message}, status=status)
