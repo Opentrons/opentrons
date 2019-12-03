@@ -94,19 +94,6 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
       initialDeckSetup.modules,
       (m: ModuleOnDeck): ModuleTemporalProperties => {
         return omit(m, ['id', 'type', 'model'])
-        // const slot = m.slot
-        // if (m.type === 'magdeck') {
-        //   return { slot, moduleState: MAGNETIC_MODULE_INITIAL_STATE }
-        // }
-        // if (m.type === 'tempdeck') {
-        //   return { slot, moduleState: TEMPERATURE_MODULE_INITIAL_STATE }
-        // }
-        // if (m.type === 'thermocycler') {
-        //   return { slot, moduleState: THERMOCYCLER_MODULE_INITIAL_STATE }
-        // }
-        // throw new Error(
-        //   `getInitialRobotState got nonsense module type ${m.type}`
-        // )
       }
     )
 
