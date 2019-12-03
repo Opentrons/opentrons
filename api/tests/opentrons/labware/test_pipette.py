@@ -283,7 +283,7 @@ def test_pipette_max_deck_height(robot, instruments):
 
 @pytest.mark.api1_only
 def test_retract(robot, instruments):
-    # robot.reset()
+    robot.reset()
     plate = containers_load(robot, '96-flat', '1')
     p300 = instruments.P300_Single(mount='left')
     from opentrons.drivers.smoothie_drivers.driver_3_0 import HOMED_POSITION

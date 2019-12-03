@@ -47,9 +47,9 @@ def test_configurable_mount_offsets(robot, instruments):
         robot.home()
         left_pos = pose_tracker.absolute(robot.poses, left)
         right_pos = pose_tracker.absolute(robot.poses, right)
-        assert left_pos[0] == right_pos[0] + x
-        assert left_pos[1] == right_pos[1] + y
-        assert left_pos[2] == right_pos[2] + z
+        assert left_pos[0] == (right_pos[0] + x)
+        assert left_pos[1] == (right_pos[1] + y)
+        assert left_pos[2] == (right_pos[2] + z)
 
     robot.config = robot.config._replace(
         instrument_offset={
