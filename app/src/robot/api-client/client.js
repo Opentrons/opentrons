@@ -23,7 +23,7 @@ import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
 const RUN_TIME_TICK_INTERVAL_MS = 1000
 const NO_INTERVAL = -1
 const RE_VOLUME = /.*?(\d+).*?/
-const RE_TIPRACK = /tiprack/i
+const RE_TIPRACK = /tip ?rack/i
 
 const THIS_ROBOT_DOES_NOT_SUPPORT_BUNDLES =
   'This robot does not support ZIP protocol bundles. Please update its software to the latest version and upload this protocol again'
@@ -573,7 +573,11 @@ export default function client(dispatch) {
         position,
         is_legacy: isLegacy,
       } = apiContainer
-      const isTiprack = RE_TIPRACK.test(type)
+      const isTiprack =
+        apiContainer.is_tiprack != null
+          ? apiContainer.is_tiprack
+          : RE_TIPRACK.test(type)
+
       const labware = { _id, name, slot, position, type, isTiprack, isLegacy }
 
       if (isTiprack && apiContainer.instruments.length > 0) {

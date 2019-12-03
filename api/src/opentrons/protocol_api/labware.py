@@ -378,6 +378,12 @@ class Labware(DeckItem):
 
     @property  # type: ignore
     @requires_version(2, 0)
+    def load_name(self) -> str:
+        """ The API load name of the labware definition """
+        return self._parameters['loadName']
+
+    @property  # type: ignore
+    @requires_version(2, 0)
     def parameters(self) -> Dict[str, Any]:
         """Internal properties of a labware including type and quirks"""
         return self._parameters
