@@ -48,15 +48,14 @@ export type SourceDestData = {
   postIngreds: WellIngredientVolumeData,
 }
 
-// TODO IMMEDIATELY: remove this, it's duplicated in ui/steps/types.js
-export type SubstepTimelineFrame = {
+export type SubstepTimelineFrame = {|
   substepIndex?: number,
   activeTips: ?TipLocation,
   source?: SourceDestData,
   dest?: SourceDestData,
   volume?: ?number,
   channelId?: number,
-}
+|}
 
 export type SubstepWellData = {|
   well: string,

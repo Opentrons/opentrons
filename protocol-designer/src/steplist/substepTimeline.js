@@ -14,6 +14,7 @@ import type {
 } from '../step-generation/types'
 import type { SubstepTimelineFrame, TipLocation } from './types'
 
+/** Return last picked up tip in the specified commands, if any */
 export function _getNewActiveTips(commands: Array<Command>): ?TipLocation {
   const lastNewTipCommand: ?Command = last(
     commands.filter(c => c.command === 'pickUpTip')
@@ -30,7 +31,6 @@ export function _getNewActiveTips(commands: Array<Command>): ?TipLocation {
 type SubstepTimelineAcc = {
   timeline: Array<SubstepTimelineFrame>,
   errors: ?Array<CommandCreatorError>,
-  prevActiveTips: ?TipLocation,
   prevRobotState: RobotState,
 }
 
@@ -66,7 +66,7 @@ export const substepTimelineSingleChannel = (
             {
               volume,
               [ingredKey]: wellInfo,
-              activeTips: acc.prevActiveTips,
+              activeTips: _getNewActiveTips(nextFrame.commands.slice(0, index)),
             },
           ],
           prevRobotState: nextRobotState,
@@ -74,8 +74,6 @@ export const substepTimelineSingleChannel = (
       } else {
         return {
           ...acc,
-          prevActiveTips:
-            _getNewActiveTips(nextFrame.commands) || acc.prevActiveTips,
           prevRobotState: nextRobotState,
         }
       }
@@ -83,7 +81,6 @@ export const substepTimelineSingleChannel = (
     {
       timeline: [],
       errors: null,
-      prevActiveTips: null,
       prevRobotState: initialRobotState,
     }
   )
@@ -139,7 +136,7 @@ export const substepTimelineMultiChannel = (
             {
               volume,
               [ingredKey]: wellInfo,
-              activeTips: acc.prevActiveTips,
+              activeTips: _getNewActiveTips(nextFrame.commands.slice(0, index)),
             },
           ],
           prevRobotState: nextRobotState,
@@ -147,7 +144,6 @@ export const substepTimelineMultiChannel = (
       } else {
         return {
           ...acc,
-          prevActiveTips: _getNewActiveTips(nextFrame.commands),
           prevRobotState: nextRobotState,
         }
       }
@@ -155,7 +151,6 @@ export const substepTimelineMultiChannel = (
     {
       timeline: [],
       errors: null,
-      prevActiveTips: null,
       prevRobotState: initialRobotState,
     }
   )
