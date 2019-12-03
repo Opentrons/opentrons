@@ -32,12 +32,15 @@ class Container:
             self.is_legacy = container.properties.get(
                 'labware_hash') is None
         else:
+            # will be labware's load name or label
             self.name = container.name
-            self.type = container.name
+            # type must be load_name so client can load correct definition
+            self.type = container.load_name
             slot, position = _get_parent_slot_and_position(container)
             self.slot = slot
             self.position = position
             self.is_legacy = False
+            self.is_tiprack = container.is_tiprack
         self.instruments = [
             Instrument(instrument)
             for instrument in instruments]
