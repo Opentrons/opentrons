@@ -17,6 +17,8 @@ export const getLabwareDefURI = (def: LabwareDefinition2): string =>
   `${def.namespace}/${def.parameters.loadName}/${def.version}`
 
 // Load names of "retired" labware
+// TODO(mc, 2019-12-3): how should this correspond to LABWAREV2_DO_NOT_LIST?
+// see shared-data/js/getLabware.js
 const RETIRED_LABWARE = [
   'geb_96_tiprack_10ul',
   'geb_96_tiprack_1000ul',
@@ -27,6 +29,8 @@ const RETIRED_LABWARE = [
   'opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip',
   'opentrons_96_aluminumblock_biorad_wellplate_200ul',
   'tipone_96_tiprack_200ul',
+  'eppendorf_96_tiprack_1000ul_eptips',
+  'eppendorf_96_tiprack_10ul_eptips',
 ]
 
 export const getLabwareDisplayName = (labwareDef: LabwareDefinition2) => {

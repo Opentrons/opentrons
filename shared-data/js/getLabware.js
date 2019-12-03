@@ -17,6 +17,8 @@ assert(
 
 // labware definitions only used for back-compat with legacy v1 defs.
 // do not list in any "available labware" UI.
+// TODO(mc, 2019-12-3): how should this correspond to RETIRED_LABWARE?
+// see shared-data/js/helpers/index.js
 export const LABWAREV2_DO_NOT_LIST = [
   'opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip',
   'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap_acrylic',
