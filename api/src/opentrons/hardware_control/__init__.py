@@ -992,10 +992,10 @@ class API(HardwareAPILike):
 
         if not this_pipette.has_tip:
             raise NoTipAttachedError(
-                f'Aspirate commands not allowed if there is not tip attached '
-                f'to the pipette. Please make sure that a tip is attached on '
-                f'the {mount.name.lower()} pipette before using '
-                f'liquid-handling commands')
+                f'Aspirate is not allowed if there is no tip attached to the '
+                f'pipette. Please make sure that a tip is attached on the'
+                f'{mount.name.lower()} pipette before using liquid-handling '
+                f'commands')
 
         if this_pipette.current_volume == 0\
            and not this_pipette.ready_to_aspirate:
@@ -1052,9 +1052,9 @@ class API(HardwareAPILike):
 
         if not this_pipette.has_tip:
             raise NoTipAttachedError(
-                f'Dispense commands not allowed if there is not tip attached '
-                f'to the pipette. Please make sure that a tip is attached on '
-                f'the {mount.name} pipette before using liquid-handling '
+                f'Dispense is not allowed if there is no tip attached to the '
+                f'pipette. Please make sure that a tip is attached on the '
+                f'{mount.name.lower()} pipette before using liquid-handling '
                 f'commands')
 
         if volume is None:
