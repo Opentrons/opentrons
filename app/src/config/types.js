@@ -7,10 +7,7 @@ export type UpdateChannel = 'latest' | 'beta' | 'alpha'
 
 export type DiscoveryCandidates = string | Array<string>
 
-export type DevInternalFlag =
-  | 'allPipetteConfig'
-  | 'customLabware'
-  | 'enableMultiGEN2'
+export type DevInternalFlag = 'allPipetteConfig' | 'enableMultiGEN2'
 
 export type FeatureFlags = $Shape<{|
   [DevInternalFlag]: boolean | void,

@@ -13,7 +13,6 @@ export * from './selectors'
 
 export const DEV_INTERNAL_FLAGS: Array<DevInternalFlag> = [
   'allPipetteConfig',
-  'customLabware',
   'enableMultiGEN2',
 ]
 
