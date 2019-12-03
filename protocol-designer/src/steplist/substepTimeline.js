@@ -2,7 +2,7 @@
 import last from 'lodash/last'
 import pick from 'lodash/pick'
 import { getWellsForTips } from '../step-generation/utils'
-import { getNextRobotStateAndWarnings } from '../step-generation/getNextRobotStateAndWarnings'
+import { getNextRobotStateAndWarningsSingleCommand } from '../step-generation/getNextRobotStateAndWarnings'
 
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type { Channels } from '@opentrons/components'
@@ -44,8 +44,8 @@ export const substepTimelineSingleChannel = (
 
   const timeline = nextFrame.commands.reduce(
     (acc: SubstepTimelineAcc, command: Command, index: number) => {
-      const nextRobotState = getNextRobotStateAndWarnings(
-        [command],
+      const nextRobotState = getNextRobotStateAndWarningsSingleCommand(
+        command,
         invariantContext,
         acc.prevRobotState
       ).robotState
@@ -102,8 +102,8 @@ export const substepTimelineMultiChannel = (
   if (nextFrame.errors) return []
   const timeline = nextFrame.commands.reduce(
     (acc: SubstepTimelineAcc, command: Command, index: number) => {
-      const nextRobotState = getNextRobotStateAndWarnings(
-        nextFrame.commands,
+      const nextRobotState = getNextRobotStateAndWarningsSingleCommand(
+        command,
         invariantContext,
         acc.prevRobotState
       ).robotState

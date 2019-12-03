@@ -215,10 +215,17 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
           if (!willReuseTip) {
             return [
               ...acc,
-              curriedCommandCreator,
-              StepGeneration.curryCommandCreator(StepGeneration.dropTip, {
-                pipette: pipetteId,
-              }),
+              (_invariantContext, _prevRobotState) =>
+                StepGeneration.reduceCommandCreators(
+                  [
+                    curriedCommandCreator,
+                    StepGeneration.curryCommandCreator(StepGeneration.dropTip, {
+                      pipette: pipetteId,
+                    }),
+                  ],
+                  _invariantContext,
+                  _prevRobotState
+                ),
             ]
           }
         }
