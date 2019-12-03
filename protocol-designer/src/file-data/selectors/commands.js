@@ -166,8 +166,6 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
       stepArgs => stepArgs
     )
 
-    // TODO IMMEDIATELY in `edge`, add coverage for the existing "eager drop tip" behavior, and rebase it into this branch
-
     const curriedCommandCreators = continuousStepArgs.reduce(
       (
         acc: Array<StepGeneration.CurriedCommandCreator>,

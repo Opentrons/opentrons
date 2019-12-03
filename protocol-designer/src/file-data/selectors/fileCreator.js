@@ -17,9 +17,9 @@ import {
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
+  MODULE_TYPE_TO_FILE_MODULE_TYPE,
 } from '../../constants'
 
-import type { ModuleType } from '@opentrons/shared-data'
 import type {
   FilePipette,
   FileLabware,
@@ -43,13 +43,6 @@ const applicationVersion: string = process.env.OT_PD_VERSION || ''
 // it just helps us humans quickly identify what build a user was using
 // when we look at saved protocols (without requiring us to trace thru git logs)
 const _internalAppBuildDate = process.env.OT_PD_BUILD_DATE
-
-// TODO IMMEDIATELY should live next to `FILE_MODULE_TYPE_TO_MODULE_TYPE`
-const MODULE_TYPE_TO_FILE_MODULE_TYPE: { [ModuleType]: string } = {
-  tempdeck: 'temperature module',
-  magdeck: 'magnetic module',
-  thermocycler: 'thermocycler',
-}
 
 export const createFile: BaseState => PDProtocolFile = createSelector(
   getFileMetadata,

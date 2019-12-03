@@ -35,7 +35,7 @@ export function forPickUpTip(
     const allWells = tiprackDef.ordering.find(col => col[0] === well)
     if (!allWells) {
       // TODO Ian 2018-04-30 return {errors}, don't throw
-      throw new Error('Invalid primary well for tip pickup: ' + well) // TODO IMMEDIATELY: test
+      throw new Error('Invalid primary well for tip pickup: ' + well)
     }
     allWells.forEach(function(well) {
       robotState.tipState.tipracks[labware][well] = false
