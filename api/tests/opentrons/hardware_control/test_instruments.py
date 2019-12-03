@@ -229,14 +229,18 @@ async def test_prep_aspirate(dummy_instruments, loop):
         attached_instruments=dummy_instruments, loop=loop)
     await hw_api.home()
     await hw_api.cache_instruments()
+
+    mount = types.Mount.LEFT
+    await hw_api.pick_up_tip(mount, 20.0)
+
     # If we're empty and haven't prepared, we should get an error
     with pytest.raises(RuntimeError):
-        await hw_api.aspirate(types.Mount.LEFT, 1, 1.0)
+        await hw_api.aspirate(mount, 1, 1.0)
     # If we're empty and have prepared, we should be fine
-    await hw_api.prepare_for_aspirate(types.Mount.LEFT)
-    await hw_api.aspirate(types.Mount.LEFT, 1)
+    await hw_api.prepare_for_aspirate(mount)
+    await hw_api.aspirate(mount, 1)
     # If we're not empty, we should be fine
-    await hw_api.aspirate(types.Mount.LEFT, 1)
+    await hw_api.aspirate(mount, 1)
 
 
 async def test_aspirate_new(dummy_instruments, loop):
@@ -244,12 +248,16 @@ async def test_aspirate_new(dummy_instruments, loop):
         attached_instruments=dummy_instruments, loop=loop)
     await hw_api.home()
     await hw_api.cache_instruments()
+
+    mount = types.Mount.LEFT
+    await hw_api.pick_up_tip(mount, 20.0)
+
     aspirate_ul = 3.0
     aspirate_rate = 2
-    await hw_api.prepare_for_aspirate(types.Mount.LEFT)
-    await hw_api.aspirate(types.Mount.LEFT, aspirate_ul, aspirate_rate)
+    await hw_api.prepare_for_aspirate(mount)
+    await hw_api.aspirate(mount, aspirate_ul, aspirate_rate)
     new_plunger_pos = 6.05285
-    pos = await hw_api.current_position(types.Mount.LEFT)
+    pos = await hw_api.current_position(mount)
     assert pos[Axis.B] == new_plunger_pos
 
 
@@ -258,12 +266,16 @@ async def test_aspirate_old(dummy_instruments, loop, old_aspiration):
         attached_instruments=dummy_instruments, loop=loop)
     await hw_api.home()
     await hw_api.cache_instruments()
+
+    mount = types.Mount.LEFT
+    await hw_api.pick_up_tip(mount, 20.0)
+
     aspirate_ul = 3.0
     aspirate_rate = 2
-    await hw_api.prepare_for_aspirate(types.Mount.LEFT)
-    await hw_api.aspirate(types.Mount.LEFT, aspirate_ul, aspirate_rate)
+    await hw_api.prepare_for_aspirate(mount)
+    await hw_api.aspirate(mount, aspirate_ul, aspirate_rate)
     new_plunger_pos = 5.660769
-    pos = await hw_api.current_position(types.Mount.LEFT)
+    pos = await hw_api.current_position(mount)
     assert pos[Axis.B] == new_plunger_pos
 
 
@@ -273,20 +285,24 @@ async def test_dispense(dummy_instruments, loop):
     await hw_api.home()
 
     await hw_api.cache_instruments()
+
+    mount = types.Mount.LEFT
+    await hw_api.pick_up_tip(mount, 20.0)
+
     aspirate_ul = 10.0
     aspirate_rate = 2
-    await hw_api.prepare_for_aspirate(types.Mount.LEFT)
-    await hw_api.aspirate(types.Mount.LEFT, aspirate_ul, aspirate_rate)
+    await hw_api.prepare_for_aspirate(mount)
+    await hw_api.aspirate(mount, aspirate_ul, aspirate_rate)
 
     dispense_1 = 3.0
-    await hw_api.dispense(types.Mount.LEFT, dispense_1)
+    await hw_api.dispense(mount, dispense_1)
     plunger_pos_1 = 10.810573
-    assert (await hw_api.current_position(types.Mount.LEFT))[Axis.B]\
+    assert (await hw_api.current_position(mount))[Axis.B]\
         == plunger_pos_1
 
-    await hw_api.dispense(types.Mount.LEFT, rate=2)
+    await hw_api.dispense(mount, rate=2)
     plunger_pos_2 = 2
-    assert (await hw_api.current_position(types.Mount.LEFT))[Axis.B]\
+    assert (await hw_api.current_position(mount))[Axis.B]\
         == plunger_pos_2
 
 
@@ -332,6 +348,9 @@ async def test_aspirate_flow_rate(dummy_instruments, loop, monkeypatch):
     mount = types.Mount.LEFT
     await hw_api.home()
     await hw_api.cache_instruments()
+
+    await hw_api.pick_up_tip(mount, 20.0)
+
     mock_move_plunger = mock.Mock()
 
     def instant_future(mount, distance, speed):
@@ -401,6 +420,9 @@ async def test_dispense_flow_rate(dummy_instruments, loop, monkeypatch):
     mount = types.Mount.LEFT
     await hw_api.home()
     await hw_api.cache_instruments()
+
+    await hw_api.pick_up_tip(mount, 20.0)
+
     await hw_api.prepare_for_aspirate(types.Mount.LEFT)
     await hw_api.aspirate(mount, 10)
     mock_move_plunger = mock.Mock()
@@ -466,6 +488,8 @@ async def test_blowout_flow_rate(dummy_instruments, loop, monkeypatch):
     mount = types.Mount.LEFT
     await hw_api.home()
     await hw_api.cache_instruments()
+
+    await hw_api.pick_up_tip(mount, 20.0)
 
     mock_move_plunger = mock.Mock()
 
