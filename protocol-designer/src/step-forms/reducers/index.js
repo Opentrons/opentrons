@@ -645,9 +645,8 @@ export const moduleInvariantProperties = handleActions<ModuleEntities, *>(
       action: LoadFileAction
     ): ModuleEntities => {
       const { file } = action.payload
-      // NOTE: fallback for JSONv3
       return mapValues(
-        file.modules || {}, // TODO: Ian 2019-11-11 remive this fallback to empty object once JSONv4 is migrated & released
+        file.modules || {}, // TODO: Ian 2019-11-11 this fallback to empty object is for JSONv3 protocols. Once JSONv4 is released, this should be handled in migration in PD
         (fileModule: FileModule, id: string) => ({
           id,
           type: FILE_MODULE_TYPE_TO_MODULE_TYPE[fileModule.moduleType],
