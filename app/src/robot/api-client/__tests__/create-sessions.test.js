@@ -4,14 +4,12 @@ import client from '../client'
 import RpcClient from '../../../rpc/client'
 import { actions as RobotActions } from '../../actions'
 import * as ProtocolSelectors from '../../../protocol/selectors'
-import * as ConfigSelectors from '../../../config/selectors'
 import * as DiscoverySelectors from '../../../discovery/selectors'
 import * as LabwareSelectors from '../../../custom-labware/selectors'
 import MockSession from '../../test/__mocks__/session'
 
 jest.mock('../../../rpc/client')
 jest.mock('../../../protocol/selectors')
-jest.mock('../../../config/selectors')
 jest.mock('../../../discovery/selectors')
 jest.mock('../../../custom-labware/selectors')
 
@@ -34,10 +32,6 @@ describe('RPC API client - session creation', () => {
       // added in API v3.15
       create_with_extra_labware: jest.fn(),
     }
-
-    ConfigSelectors.getFeatureFlags.mockReturnValue({
-      enableBundleUpload: false,
-    })
 
     mockRpcClient = Object.assign(new EventEmitter(), {
       close: jest.fn(),
@@ -90,9 +84,6 @@ describe('RPC API client - session creation', () => {
     const mockSession = MockSession()
 
     ProtocolSelectors.getProtocolFile.mockReturnValue(mockProtocolFile)
-    ConfigSelectors.getFeatureFlags.mockReturnValue({
-      enableBundleUpload: true,
-    })
     mockSessionManager.create_from_bundle.mockResolvedValue(mockSession)
 
     return sendToClient({
@@ -114,9 +105,6 @@ describe('RPC API client - session creation', () => {
     delete mockSessionManager.create_from_bundle
 
     ProtocolSelectors.getProtocolFile.mockReturnValue(mockProtocolFile)
-    ConfigSelectors.getFeatureFlags.mockReturnValue({
-      enableBundleUpload: true,
-    })
     mockSessionManager.create.mockResolvedValue(mockSession)
 
     return sendToClient({
@@ -163,9 +151,6 @@ describe('RPC API client - session creation', () => {
     delete mockSessionManager.create_with_extra_labware
 
     ProtocolSelectors.getProtocolFile.mockReturnValue(mockProtocolFile)
-    ConfigSelectors.getFeatureFlags.mockReturnValue({
-      enableBundleUpload: true,
-    })
     LabwareSelectors.getCustomLabwareDefinitions.mockReturnValue([
       { mockLabware: 1 },
       { mockLabware: 2 },
@@ -238,9 +223,6 @@ describe('RPC API client - session creation', () => {
     delete mockSessionManager.create_from_bundle
 
     ProtocolSelectors.getProtocolFile.mockReturnValue(mockProtocolFile)
-    ConfigSelectors.getFeatureFlags.mockReturnValue({
-      enableBundleUpload: true,
-    })
     mockSessionManager.create.mockRejectedValue(mockError)
 
     return sendToClient({

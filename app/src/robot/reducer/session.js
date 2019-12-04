@@ -14,6 +14,7 @@ import type {
   SessionStatus,
 } from '../types'
 
+import type { InvalidProtocolFileAction } from '../../protocol/types'
 import type { SessionUpdateAction } from '../actions'
 
 type Request = {
@@ -122,8 +123,9 @@ export default function sessionReducer(
 
     case 'robot:SESSION_RESPONSE':
     case 'robot:SESSION_ERROR':
-    case 'protocol:INVALID_FILE':
       return handleSessionResponse(state, action)
+    case 'protocol:INVALID_FILE':
+      return handleInvalidFile(state, action)
 
     case RUN:
       return handleRun(state, action)
@@ -220,6 +222,19 @@ function handleSessionResponse(state: SessionState, action: any): SessionState {
     ...state,
     sessionRequest: { inProgress: false, error: null },
     ...session,
+  }
+}
+
+function handleInvalidFile(
+  state: SessionState,
+  action: InvalidProtocolFileAction
+): SessionState {
+  return {
+    ...state,
+    sessionRequest: {
+      inProgress: false,
+      error: { message: action.payload.message },
+    },
   }
 }
 

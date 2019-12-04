@@ -61,7 +61,10 @@ export function openProtocol(file: File): ThunkAction {
     if (fileIsBundle(protocolFile) && !bundlesEnabled) {
       const invalidFileAction: InvalidProtocolFileAction = {
         type: 'protocol:INVALID_FILE',
-        payload: { file: protocolFile, error: BUNDLE_UPLOAD_DISABLED },
+        payload: {
+          file: protocolFile,
+          message: BUNDLE_UPLOAD_DISABLED,
+        },
       }
       return dispatch(invalidFileAction)
     }

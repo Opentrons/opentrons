@@ -33,7 +33,7 @@ export type UploadProtocolAction = {|
 
 export type InvalidProtocolFileAction = {|
   type: 'protocol:INVALID_FILE',
-  payload: {| file: ProtocolFile, error: string |},
+  payload: {| file: ProtocolFile, message: string |},
 |}
 
 export type ProtocolAction =

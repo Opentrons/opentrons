@@ -118,7 +118,7 @@ describe('protocol actions', () => {
           type: 'protocol:INVALID_FILE',
           payload: {
             file: bundleFile,
-            error: expect.stringMatching(
+            message: expect.stringMatching(
               /ZIP uploads are not currently supported/i
             ),
           },
