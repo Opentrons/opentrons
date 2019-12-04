@@ -14,6 +14,7 @@ export * from './selectors'
 export const DEV_INTERNAL_FLAGS: Array<DevInternalFlag> = [
   'allPipetteConfig',
   'enableMultiGEN2',
+  'enableBundleUpload',
 ]
 
 // trigger a config value update to the app-shell via shell middleware

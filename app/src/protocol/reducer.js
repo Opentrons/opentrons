@@ -11,6 +11,9 @@ export function protocolReducer(
   action: Action
 ): ProtocolState {
   switch (action.type) {
+    case 'protocol:INVALID_FILE':
+      return { ...INITIAL_STATE, file: action.payload.file }
+
     case 'protocol:OPEN':
       return { ...INITIAL_STATE, ...action.payload }
 

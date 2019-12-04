@@ -1,11 +1,13 @@
 // protocol actions tests
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
-
+import * as ConfigSelectors from '../../config/selectors'
 import { openProtocol } from '..'
 
 const middlewares = [thunk]
 const mockStore = configureMockStore(middlewares)
+
+jest.mock('../../config/selectors')
 
 describe('protocol actions', () => {
   let store
@@ -18,6 +20,9 @@ describe('protocol actions', () => {
 
     store = mockStore({})
     global.FileReader = jest.fn(() => mockReader)
+    ConfigSelectors.getFeatureFlags.mockReturnValue({
+      enableBundleUpload: false,
+    })
   })
 
   afterEach(() => {
@@ -94,10 +99,29 @@ describe('protocol actions', () => {
 
     describe('bundle upload', () => {
       test('dispatches a protocol:OPEN', () => {
+        ConfigSelectors.getFeatureFlags.mockReturnValue({
+          enableBundleUpload: true,
+        })
         const result = store.dispatch(openProtocol(bundleFile))
         const expected = {
           type: 'protocol:OPEN',
           payload: { file: bundleFile },
+        }
+
+        expect(result).toEqual(expected)
+        expect(store.getActions()).toEqual([expected])
+      })
+
+      test('dispatches a protocol:INVALID_FILE without bundles enabled', () => {
+        const result = store.dispatch(openProtocol(bundleFile))
+        const expected = {
+          type: 'protocol:INVALID_FILE',
+          payload: {
+            file: bundleFile,
+            message: expect.stringMatching(
+              /ZIP uploads are not currently supported/i
+            ),
+          },
         }
 
         expect(result).toEqual(expected)
