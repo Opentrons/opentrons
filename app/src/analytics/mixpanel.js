@@ -37,7 +37,10 @@ export function trackEvent(event: AnalyticsEvent, config: AnalyticsConfig) {
   const { optedIn } = config
 
   log.debug('Trackable event', { event, optedIn })
-  if (MIXPANEL_ID && optedIn) mixpanel.track(event.name, event.properties)
+  if (MIXPANEL_ID && optedIn) {
+    if (event.superProperties) mixpanel.register(event.superProperties)
+    if (event.name) mixpanel.track(event.name, event.properties)
+  }
 }
 
 export function setMixpanelTracking(config: AnalyticsConfig) {

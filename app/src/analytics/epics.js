@@ -13,7 +13,7 @@ import {
 } from 'rxjs/operators'
 
 import { setMixpanelTracking, trackEvent } from './mixpanel'
-import makeEvent from './make-event'
+import { makeEvent } from './make-event'
 
 import type { State, Action, Epic } from '../types'
 import type { TrackEventArgs, AnalyticsConfig } from './types'

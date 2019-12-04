@@ -2,7 +2,7 @@
 import { TestScheduler } from 'rxjs/testing'
 
 import { trackEvent, setMixpanelTracking } from '../mixpanel'
-import makeEvent from '../make-event'
+import { makeEvent } from '../make-event'
 import * as epics from '../epics'
 
 jest.mock('../make-event')
