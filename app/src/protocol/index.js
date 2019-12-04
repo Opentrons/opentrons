@@ -1,15 +1,24 @@
 // @flow
 // protocol state and loading actions
+import { getFeatureFlags } from '../config/selectors'
 import {
   fileToProtocolFile,
   parseProtocolData,
   fileIsBinary,
+  fileIsBundle,
 } from './protocol-data'
 
 import type { ThunkAction } from '../types'
-import type { OpenProtocolAction, UploadProtocolAction } from './types'
+import type {
+  OpenProtocolAction,
+  UploadProtocolAction,
+  InvalidProtocolFileAction,
+} from './types'
 
 export * from './selectors'
+
+const BUNDLE_UPLOAD_DISABLED =
+  'ZIP uploads are not currently supported. Please unzip the ZIP archive and upload the uncompressed files.'
 
 const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
   let binary = ''
@@ -22,13 +31,15 @@ const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
 }
 
 export function openProtocol(file: File): ThunkAction {
-  return dispatch => {
+  return (dispatch, getState) => {
     const reader = new FileReader()
     const protocolFile = fileToProtocolFile(file)
     const openAction: OpenProtocolAction = {
       type: 'protocol:OPEN',
       payload: { file: protocolFile },
     }
+    const bundlesEnabled =
+      getFeatureFlags(getState())?.enableBundleUpload === true
 
     reader.onload = () => {
       // when we use readAsText below, reader.result will be a string,
@@ -45,6 +56,14 @@ export function openProtocol(file: File): ThunkAction {
       }
 
       dispatch(uploadAction)
+    }
+
+    if (fileIsBundle(protocolFile) && !bundlesEnabled) {
+      const invalidFileAction: InvalidProtocolFileAction = {
+        type: 'protocol:INVALID_FILE',
+        payload: { file: protocolFile, error: BUNDLE_UPLOAD_DISABLED },
+      }
+      return dispatch(invalidFileAction)
     }
 
     if (fileIsBinary(protocolFile)) {

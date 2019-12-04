@@ -31,7 +31,15 @@ export type UploadProtocolAction = {|
   meta: {| robot: true |},
 |}
 
-export type ProtocolAction = OpenProtocolAction | UploadProtocolAction
+export type InvalidProtocolFileAction = {|
+  type: 'protocol:INVALID_FILE',
+  payload: {| file: ProtocolFile, error: string |},
+|}
+
+export type ProtocolAction =
+  | OpenProtocolAction
+  | UploadProtocolAction
+  | InvalidProtocolFileAction
 
 // state types
 

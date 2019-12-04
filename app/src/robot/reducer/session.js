@@ -122,6 +122,7 @@ export default function sessionReducer(
 
     case 'robot:SESSION_RESPONSE':
     case 'robot:SESSION_ERROR':
+    case 'protocol:INVALID_FILE':
       return handleSessionResponse(state, action)
 
     case RUN:

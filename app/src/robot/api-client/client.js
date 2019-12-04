@@ -15,7 +15,6 @@ import * as selectors from '../selectors'
 
 // bypass the robot entry point here to avoid shell module
 import { RESTART as ROBOT_RESTART_ACTION } from '../../robot-admin'
-import { getFeatureFlags } from '../../config/selectors'
 import { getConnectableRobots } from '../../discovery/selectors'
 import { getProtocolFile } from '../../protocol/selectors'
 import { fileIsBundle, fileIsPython } from '../../protocol/protocol-data'
@@ -28,8 +27,6 @@ const RE_TIPRACK = /tip ?rack/i
 
 const THIS_ROBOT_DOES_NOT_SUPPORT_BUNDLES =
   'This robot does not support ZIP protocol bundles. Please update its software to the latest version and upload this protocol again'
-const ZIP_UPLOAD_DISABLED =
-  'ZIP uploads are not currently supported. Please unzip the ZIP archive and upload the uncompressed files.'
 
 export default function client(dispatch) {
   let freshUpload = false
@@ -162,20 +159,13 @@ export default function client(dispatch) {
     const file = getProtocolFile(state)
     const { contents } = action.payload
     const isBundle = fileIsBundle(file)
-    const bundlesEnabled = getFeatureFlags(state)?.enableBundleUpload === true
     const isPython = fileIsPython(file)
     const customLabware = getCustomLabwareDefinitions(state)
 
     freshUpload = true
     let createTask
 
-    if (isBundle && !bundlesEnabled) {
-      const error = new Error(ZIP_UPLOAD_DISABLED)
-      dispatch(actions.sessionResponse(error, null, freshUpload))
-      freshUpload = false
-      // bail out
-      return
-    } else if (isBundle && 'create_from_bundle' in session_manager) {
+    if (isBundle && 'create_from_bundle' in session_manager) {
       createTask = session_manager.create_from_bundle(file.name, contents)
     } else if (isBundle) {
       createTask = session_manager
