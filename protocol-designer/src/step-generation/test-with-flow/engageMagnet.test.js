@@ -22,7 +22,7 @@ describe('engageMagnet', () => {
   })
   test('creates engage magnet command', () => {
     const module = moduleId
-    const engageHeight = 42
+    const engageHeight = 2
     const result = engageMagnet(
       { module, engageHeight },
       invariantContext,

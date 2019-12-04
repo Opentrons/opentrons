@@ -39,7 +39,6 @@ import type {
 } from '../../labware-ingred/actions'
 import type { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
 import type { FormData, StepIdType } from '../../form-types'
-// import type { ModuleType } from '@opentrons/shared-data'
 import type {
   FileLabware,
   FilePipette,
