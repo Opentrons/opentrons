@@ -326,3 +326,64 @@ async def test_session_bundle(main_router, get_bundle_fixture,
         name='bundle.zip',
         contents=b64d)
     assert session1._protocol == session2._protocol
+
+
+async def test_session_unused_hardware(main_router,
+                                       virtual_smoothie_env,
+                                       get_json_protocol_fixture):
+    # both python v2 and json should have their instruments and modules appear
+    # in the session properties even if they are not used
+    proto = '''
+metadata = {"apiLevel": "2.0"}
+def run(ctx):
+    rack1 = ctx.load_labware('opentrons_96_tiprack_300ul', '1')
+    rack2 = ctx.load_labware('opentrons_96_tiprack_300ul', '2')
+    left = ctx.load_instrument('p300_single', 'left', tip_racks=[rack1])
+    right = ctx.load_instrument('p10_multi', 'right', tip_racks=[rack2])
+    mod = ctx.load_module('magdeck', '4')
+    mod2 = ctx.load_module('tempdeck', '5')
+    plate = mod2.load_labware('corning_96_wellplate_360ul_flat')
+    mod2.set_temperature(60)
+    left.pick_up_tip()
+    left.aspirate(50, plate['A1'])
+    left.dispense(50, plate['A2'])
+    left.drop_tip()
+    '''
+    session = main_router.session_manager.create('dummy-pipette',
+                                                 proto)
+    assert 'p300_single_v1' in [pip.name for pip in session.instruments]
+    assert 'p10_multi_v1' in [pip.name for pip in session.instruments]
+    assert 'magdeck' in [mod.name for mod in session.modules]
+    assert 'tempdeck' in [mod.name for mod in session.modules]
+
+    v1proto = '''
+from opentrons import instruments, modules, labware
+
+racks = [labware.load('opentrons_96_tiprack_300ul', slot)
+         for slot in (1, 2)]
+magdeck = modules.load('magdeck', '4')
+tempdeck = modules.load('tempdeck', '5')
+plate = labware.load('corning_96_wellplate_360ul_flat', '5', share=True)
+left = instruments.P300_Single('left', tip_racks=[racks[0]])
+right = instruments.P10_Multi('right', tip_racks=[racks[1]])
+
+tempdeck.set_temperature(60)
+left.pick_up_tip()
+left.aspirate(plate.wells(0))
+left.dispense(plate.wells(1))
+left.drop_tip()
+'''
+
+    # json protocols don't support modules so we only have to check pipettes
+    jsonp = get_json_protocol_fixture('3', 'unusedPipette', decode=False)
+    session2 = main_router.session_manager.create('dummy-pipette-json',
+                                                  jsonp)
+    assert 'p50_single_v1' in [pip.name for pip in session2.instruments]
+    assert 'p10_single_v1' in [pip.name for pip in session2.instruments]
+
+    # do not change behavior for v1: instruments must have interactions
+    # to appear
+    session3 = main_router.session_manager.create('dummy-pipette_v1',
+                                                  v1proto)
+    assert ['p300_single_v1'] == [pip.name for pip in session3.instruments]
+    assert ['tempdeck'] == [mod.name for mod in session3.modules]
