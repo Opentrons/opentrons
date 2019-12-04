@@ -125,7 +125,13 @@ export default function sessionReducer(
     case 'robot:SESSION_ERROR':
       return handleSessionResponse(state, action)
     case 'protocol:INVALID_FILE':
-      return handleInvalidFile(state, action)
+      return handleInvalidFile(
+        {
+          ...INITIAL_STATE,
+          capabilities: state.capabilities,
+        },
+        action
+      )
 
     case RUN:
       return handleRun(state, action)
