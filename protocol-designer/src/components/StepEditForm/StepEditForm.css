@@ -219,3 +219,11 @@
 .magnet_form_group {
   margin: 1rem 4.25rem 2rem 0;
 }
+
+.temperature_section_wrapper {
+  margin-bottom: 2rem;
+}
+
+.temperature_form_group {
+  margin: 1rem 0;
+}
