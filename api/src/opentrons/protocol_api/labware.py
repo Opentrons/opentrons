@@ -1212,9 +1212,15 @@ def _get_standard_labware_definition(
             except (FileNotFoundError):
                 pass
         raise FileNotFoundError(
-            f'Labware "{load_name}" not found with version {checked_version}. '
-            f'If you are using a namespace besides {OPENTRONS_NAMESPACE} or '
-            f'{CUSTOM_NAMESPACE}, please specify it')
+            f'Unable to find a labware definition for "{load_name}",'
+            f'version {checked_version}, in the {OPENTRONS_NAMESPACE}'
+            'namespace. Please confirm your protocol includes the correct'
+            'labware spelling and (optionally) the correct version number'
+            'and namespace.'
+            ''
+            'If you are referencing a custom labware in your protocol, you'
+            'must add it to your Custom Labware Definitions Folder from the'
+            'Opentrons App before uploading your protocol.')
 
     namespace = namespace.lower()
     def_path = _get_path_to_labware(load_name, namespace, checked_version)
