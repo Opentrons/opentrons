@@ -14,7 +14,8 @@
     "times": "x",
     "seconds": "s",
     "minutes": "m",
-    "hours": "h"
+    "hours": "h",
+    "degrees": "°C"
   },
   "version": "Protocol Designer Version",
   "beta": "beta",
