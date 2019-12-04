@@ -11,6 +11,7 @@ import {
   getAddLabwareFailure,
 } from '../../custom-labware'
 
+import { CardCopy } from '../layout'
 import { ManagePath } from './ManagePath'
 import { AddLabware } from './AddLabware'
 import { PortaledAddLabwareFailureModal } from './AddLabwareFailureModal'
@@ -19,6 +20,8 @@ import type { Dispatch } from '../../types'
 
 // TODO(mc, 2019-10-17): i18n
 const LABWARE_MANAGEMENT = 'Labware Management'
+const MANAGE_CUSTOM_LABWARE_DEFINITIONS =
+  'Manage custom labware definitions for use in your Python Protocol API Version 2 protocols.'
 
 export function AddLabwareCard() {
   const dispatch = useDispatch<Dispatch>()
@@ -31,6 +34,7 @@ export function AddLabwareCard() {
 
   return (
     <Card title={LABWARE_MANAGEMENT}>
+      <CardCopy>{MANAGE_CUSTOM_LABWARE_DEFINITIONS}</CardCopy>
       <ManagePath path={labwarePath} onChangePath={handleChangePath} />
       <AddLabware onAddLabware={handleAddLabware} />
       {showAddFailure && (
