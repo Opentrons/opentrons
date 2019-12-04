@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.15.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.15.0-alpha.0...v3.15.0-alpha.1) (2019-12-04)
+
+
+### Bug Fixes
+
+* **api:** ensure load name is attached to RPC "containers" ([#4530](https://github.com/Opentrons/opentrons/issues/4530)) ([4580aa4](https://github.com/Opentrons/opentrons/commit/4580aa4))
+* **api:** Fix critical points and gantry config backup in http deck cal ([#4527](https://github.com/Opentrons/opentrons/issues/4527)) ([cfefab4](https://github.com/Opentrons/opentrons/commit/cfefab4))
+* **api:** present loaded but unused pipettes and modules to rpc ([#4538](https://github.com/Opentrons/opentrons/issues/4538)) ([fe27ef7](https://github.com/Opentrons/opentrons/commit/fe27ef7))
+* **api:** prevent liquid handling without a tip ([#4528](https://github.com/Opentrons/opentrons/issues/4528)) ([e1724ab](https://github.com/Opentrons/opentrons/commit/e1724ab)), closes [#4219](https://github.com/Opentrons/opentrons/issues/4219)
+
+
+
+
+
 # [3.15.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.14.1...v3.15.0-alpha.0) (2019-11-27)
 
 

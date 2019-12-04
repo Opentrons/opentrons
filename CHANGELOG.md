@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.15.0-alpha.1](https://github.com/opentrons/opentrons/compare/v3.15.0-alpha.0...v3.15.0-alpha.1) (2019-12-04)
+
+
+### Bug Fixes
+
+* **api:** ensure load name is attached to RPC "containers" ([#4530](https://github.com/opentrons/opentrons/issues/4530)) ([4580aa4](https://github.com/opentrons/opentrons/commit/4580aa4))
+* **api:** Fix critical points and gantry config backup in http deck cal ([#4527](https://github.com/opentrons/opentrons/issues/4527)) ([cfefab4](https://github.com/opentrons/opentrons/commit/cfefab4))
+* **api:** present loaded but unused pipettes and modules to rpc ([#4538](https://github.com/opentrons/opentrons/issues/4538)) ([fe27ef7](https://github.com/opentrons/opentrons/commit/fe27ef7))
+* **api:** prevent liquid handling without a tip ([#4528](https://github.com/opentrons/opentrons/issues/4528)) ([e1724ab](https://github.com/opentrons/opentrons/commit/e1724ab)), closes [#4219](https://github.com/opentrons/opentrons/issues/4219)
+* **app:** consolidate nav state to disable calibrate link on file info page ([#4514](https://github.com/opentrons/opentrons/issues/4514)) ([842f15c](https://github.com/opentrons/opentrons/commit/842f15c))
+* **shared-data:** increase GEN2 pipette plunger & drop tip current ([#4523](https://github.com/opentrons/opentrons/issues/4523)) ([e6909b9](https://github.com/opentrons/opentrons/commit/e6909b9))
+
+
+### Features
+
+* **app:** enable custom labware management in the app ([#4525](https://github.com/opentrons/opentrons/issues/4525)) ([e1c9958](https://github.com/opentrons/opentrons/commit/e1c9958))
+
+
+
+
+
 # [3.15.0-alpha.0](https://github.com/opentrons/opentrons/compare/v3.14.1...v3.15.0-alpha.0) (2019-11-27)
 
 

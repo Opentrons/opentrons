@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.15.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.15.0-alpha.0...v3.15.0-alpha.1) (2019-12-04)
+
+
+### Bug Fixes
+
+* **api:** ensure load name is attached to RPC "containers" ([#4530](https://github.com/Opentrons/opentrons/issues/4530)) ([4580aa4](https://github.com/Opentrons/opentrons/commit/4580aa4))
+* **app:** consolidate nav state to disable calibrate link on file info page ([#4514](https://github.com/Opentrons/opentrons/issues/4514)) ([842f15c](https://github.com/Opentrons/opentrons/commit/842f15c))
+
+
+### Features
+
+* **app:** enable custom labware management in the app ([#4525](https://github.com/Opentrons/opentrons/issues/4525)) ([e1c9958](https://github.com/Opentrons/opentrons/commit/e1c9958))
+
+
+
+
+
 # [3.15.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.14.1...v3.15.0-alpha.0) (2019-11-27)
 
 
