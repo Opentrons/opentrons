@@ -84,7 +84,7 @@ export default function client(dispatch) {
       // disconnect RPC prior to robot restart
       case ROBOT_RESTART_ACTION: {
         const connectedName = selectors.getConnectedRobotName(state)
-        const { name: restartingName } = action.payload.host
+        const { robotName: restartingName } = action.payload
         if (connectedName === restartingName) disconnect()
         break
       }
