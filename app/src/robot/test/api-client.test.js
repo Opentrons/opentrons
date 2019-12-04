@@ -11,6 +11,7 @@ import { delay } from '../../util'
 import client from '../api-client/client'
 import RpcClient from '../../rpc/client'
 import { NAME, actions, constants } from '../'
+import * as AdminActions from '../../robot-admin/actions'
 
 import MockSession from './__mocks__/session'
 import MockCalibrationMangager from './__mocks__/calibration-manager'
@@ -181,6 +182,19 @@ describe('api client', () => {
 
       return sendConnect()
         .then(() => sendDisconnect())
+        .then(() => expect(rpcClient.close).toHaveBeenCalled())
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    test('disconnects RPC client on robotAdmin:RESTART message', () => {
+      const state = {
+        ...STATE,
+        robot: { ...STATE.robot, connection: { connectedTo: ROBOT_NAME } },
+      }
+      const expected = actions.disconnectResponse()
+
+      return sendConnect()
+        .then(() => sendToClient(state, AdminActions.restartRobot(ROBOT_NAME)))
         .then(() => expect(rpcClient.close).toHaveBeenCalled())
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
