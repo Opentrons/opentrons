@@ -1,6 +1,10 @@
 // @flow
 import { createSelector } from 'reselect'
-import { getWellNamePerMultiTip } from '@opentrons/shared-data'
+import {
+  getWellNamePerMultiTip,
+  SINGLE_CHANNEL_N,
+  MULTI_CHANNEL_N,
+} from '@opentrons/shared-data'
 import { getWellSetForMultichannel } from '../utils'
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 
@@ -26,7 +30,7 @@ function _wellsForPipette(
   wells: Array<string>
 ): Array<string> {
   // `wells` is all the wells that pipette's channel 1 interacts with.
-  if (pipetteEntity.spec.channels === 8) {
+  if (pipetteEntity.spec.channels === MULTI_CHANNEL_N) {
     return wells.reduce((acc, well) => {
       const setOfWellsForMulti = getWellNamePerMultiTip(labwareEntity.def, well)
 
@@ -96,9 +100,9 @@ function _getSelectedWellsForStep(
       const pipetteSpec =
         invariantContext.pipetteEntities[pipetteId]?.spec || {}
 
-      if (pipetteSpec.channels === 1) {
+      if (pipetteSpec.channels === SINGLE_CHANNEL_N) {
         wells.push(commandWellName)
-      } else if (pipetteSpec.channels === 8) {
+      } else if (pipetteSpec.channels === MULTI_CHANNEL_N) {
         const wellSet =
           getWellSetForMultichannel(
             invariantContext.labwareEntities[labwareId].def,

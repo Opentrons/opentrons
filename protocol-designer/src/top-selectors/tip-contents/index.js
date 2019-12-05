@@ -3,6 +3,7 @@ import { createSelector } from 'reselect'
 import noop from 'lodash/noop'
 import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
+import { SINGLE_CHANNEL_N, MULTI_CHANNEL_N } from '@opentrons/shared-data'
 import { getWellSetForMultichannel } from '../../utils'
 import * as StepGeneration from '../../step-generation'
 import { allSubsteps as getAllSubsteps } from '../substeps'
@@ -45,9 +46,9 @@ function getTipHighlighted(
       const pipetteSpec =
         invariantContext.pipetteEntities[pipetteId]?.spec || {}
 
-      if (pipetteSpec.channels === 1) {
+      if (pipetteSpec.channels === SINGLE_CHANNEL_N) {
         return commandWellName === wellName
-      } else if (pipetteSpec.channels === 8) {
+      } else if (pipetteSpec.channels === MULTI_CHANNEL_N) {
         const wellSet = getWellSetForMultichannel(labwareDef, commandWellName)
         return Boolean(wellSet && wellSet.includes(wellName))
       } else {

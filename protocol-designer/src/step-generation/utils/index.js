@@ -9,6 +9,7 @@ import {
   getLabwareDefURI,
   getWellsDepth,
   getWellNamePerMultiTip,
+  SINGLE_CHANNEL_N,
 } from '@opentrons/shared-data'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -155,11 +156,13 @@ export function getWellsForTips(
 |} {
   // Array of wells corresponding to the tip at each position.
   const wellsForTips =
-    channels === 1 ? [well] : getWellNamePerMultiTip(labwareDef, well)
+    channels === SINGLE_CHANNEL_N
+      ? [well]
+      : getWellNamePerMultiTip(labwareDef, well)
 
   if (!wellsForTips) {
     console.warn(
-      channels === 1
+      channels === SINGLE_CHANNEL_N
         ? `Invalid well: ${well}`
         : `For labware def (URI ${getLabwareDefURI(
             labwareDef

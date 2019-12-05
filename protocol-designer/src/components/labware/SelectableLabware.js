@@ -2,6 +2,7 @@
 import * as React from 'react'
 import reduce from 'lodash/reduce'
 
+import { MULTI_CHANNEL_N } from '@opentrons/shared-data'
 import {
   arrayToWellGroup,
   getCollidingWells,
@@ -41,9 +42,9 @@ class SelectableLabware extends React.Component<Props> {
   _wellsFromSelected = (selectedWells: WellGroup): WellGroup => {
     const labwareDef = this.props.labwareProps.definition
     // Returns PRIMARY WELLS from the selection.
-    if (this.props.pipetteChannels === 8) {
+    if (this.props.pipetteChannels === MULTI_CHANNEL_N) {
       // for the wells that have been highlighted,
-      // get all 8-well well sets and merge them
+      // get all MULTI_CHANNEL_N-well well sets and merge them
       const primaryWells: WellGroup = reduce(
         selectedWells,
         (acc: WellGroup, _, wellName: string): WellGroup => {
@@ -63,7 +64,7 @@ class SelectableLabware extends React.Component<Props> {
   handleSelectionMove = (e: MouseEvent, rect: GenericRect) => {
     const labwareDef = this.props.labwareProps.definition
     if (!e.shiftKey) {
-      if (this.props.pipetteChannels === 8) {
+      if (this.props.pipetteChannels === MULTI_CHANNEL_N) {
         const selectedWells = this._getWellsFromRect(rect)
         const allWellsForMulti: WellGroup = reduce(
           selectedWells,
@@ -94,7 +95,7 @@ class SelectableLabware extends React.Component<Props> {
   }
 
   handleMouseEnterWell = (args: WellMouseEvent) => {
-    if (this.props.pipetteChannels === 8) {
+    if (this.props.pipetteChannels === MULTI_CHANNEL_N) {
       const labwareDef = this.props.labwareProps.definition
       const wellSet = getWellSetForMultichannel(labwareDef, args.wellName)
       const nextHighlightedWells = arrayToWellGroup(wellSet || [])
@@ -120,7 +121,7 @@ class SelectableLabware extends React.Component<Props> {
 
     // For rendering, show all wells not just primary wells
     const allSelectedWells =
-      pipetteChannels === 8
+      pipetteChannels === MULTI_CHANNEL_N
         ? reduce(
             selectedPrimaryWells,
             (acc, _, wellName): WellGroup => {

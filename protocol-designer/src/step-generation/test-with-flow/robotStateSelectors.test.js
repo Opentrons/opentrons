@@ -1,5 +1,5 @@
 // @flow
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import { getLabwareDefURI, SINGLE_CHANNEL_N } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 
 import {
@@ -52,7 +52,8 @@ describe('_getNextTip', () => {
     channel: 1 | 8,
     tiprackTipState: { [well: string]: boolean }
   ) => {
-    const pipetteId = channel === 1 ? DEFAULT_PIPETTE : 'p300MultiId'
+    const pipetteId =
+      channel === SINGLE_CHANNEL_N ? DEFAULT_PIPETTE : 'p300MultiId'
     const tiprackId = 'testTiprack'
     let _invariantContext = makeContext()
     _invariantContext.labwareEntities[tiprackId] = {

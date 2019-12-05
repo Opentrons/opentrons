@@ -4,7 +4,11 @@ import assert from 'assert'
 import { orderWells } from '../steplist/utils/orderWells.js'
 import min from 'lodash/min'
 import sortBy from 'lodash/sortBy'
-import { getTiprackVolume } from '@opentrons/shared-data'
+import {
+  getTiprackVolume,
+  SINGLE_CHANNEL_N,
+  MULTI_CHANNEL_N,
+} from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from './'
 
 export function sortLabwareBySlot(
@@ -31,13 +35,12 @@ export function _getNextTip(args: {|
 
   const orderedWells = orderWells(tiprackDef.ordering, 't2b', 'l2r')
 
-  if (pipetteChannels === 1) {
+  if (pipetteChannels === SINGLE_CHANNEL_N) {
     const well = orderedWells.find(hasTip)
     return well || null
   }
 
-  if (pipetteChannels === 8) {
-    // Otherwise, pipetteChannels === 8.
+  if (pipetteChannels === MULTI_CHANNEL_N) {
     // return first well in the column (for 96-well format, the 'A' row)
     const tiprackColumns = tiprackDef.ordering
     const fullColumn = tiprackColumns.find(col => col.every(hasTip))

@@ -1,6 +1,7 @@
 // @flow
 import last from 'lodash/last'
 import pick from 'lodash/pick'
+import { SINGLE_CHANNEL_N } from '@opentrons/shared-data'
 import { getWellsForTips } from '../step-generation/utils'
 import { getNextRobotStateAndWarningsSingleCommand } from '../step-generation/getNextRobotStateAndWarnings'
 
@@ -164,7 +165,7 @@ const substepTimeline = (
   initialRobotState: RobotState,
   channels: Channels
 ) => {
-  if (channels === 1) {
+  if (channels === SINGLE_CHANNEL_N) {
     return substepTimelineSingleChannel(
       commandCreator,
       invariantContext,

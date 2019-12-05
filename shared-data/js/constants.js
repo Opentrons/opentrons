@@ -12,3 +12,7 @@ export const SLOT_RENDER_HEIGHT = SLOT_WIDTH_MM // along Y axis in SVG coords
 export const FIXED_TRASH_RENDER_HEIGHT = 165.86 // along Y axis in SVG coords
 
 export const OPENTRONS_LABWARE_NAMESPACE = 'opentrons'
+
+// number of channels of single-channel vs multi-channel pipettes
+export const SINGLE_CHANNEL_N = 1
+export const MULTI_CHANNEL_N = 8

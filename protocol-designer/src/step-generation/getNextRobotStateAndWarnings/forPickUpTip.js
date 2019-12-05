@@ -1,7 +1,11 @@
 // @flow
 import assert from 'assert'
 import cloneDeep from 'lodash/cloneDeep'
-import { getIsTiprack } from '@opentrons/shared-data'
+import {
+  getIsTiprack,
+  SINGLE_CHANNEL_N,
+  MULTI_CHANNEL_N,
+} from '@opentrons/shared-data'
 import type { PipetteAccessParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type {
   InvariantContext,
@@ -29,9 +33,9 @@ export function forPickUpTip(
   robotState.tipState.pipettes[pipette] = true
 
   // remove tips from tiprack
-  if (pipetteSpec.channels === 1) {
+  if (pipetteSpec.channels === SINGLE_CHANNEL_N) {
     robotState.tipState.tipracks[labware][well] = false
-  } else if (pipetteSpec.channels === 8) {
+  } else if (pipetteSpec.channels === MULTI_CHANNEL_N) {
     const allWells = tiprackDef.ordering.find(col => col[0] === well)
     if (!allWells) {
       // TODO Ian 2018-04-30 return {errors}, don't throw

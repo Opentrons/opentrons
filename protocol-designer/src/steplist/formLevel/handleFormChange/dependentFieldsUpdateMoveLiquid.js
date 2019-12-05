@@ -3,7 +3,11 @@ import assert from 'assert'
 import clamp from 'lodash/clamp'
 import pick from 'lodash/pick'
 import round from 'lodash/round'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import {
+  getPipetteNameSpecs,
+  SINGLE_CHANNEL_N,
+  MULTI_CHANNEL_N,
+} from '@opentrons/shared-data'
 import makeConditionalPatchUpdater from './makeConditionalPatchUpdater'
 import {
   chainPatchUpdaters,
@@ -316,8 +320,10 @@ const updatePatchOnPipetteChannelChange = (
       : null
 
   const appliedPatch = { ...rawForm, ...patch }
-  const singleToMulti = prevChannels === 1 && nextChannels === 8
-  const multiToSingle = prevChannels === 8 && nextChannels === 1
+  const singleToMulti =
+    prevChannels === SINGLE_CHANNEL_N && nextChannels === MULTI_CHANNEL_N
+  const multiToSingle =
+    prevChannels === MULTI_CHANNEL_N && nextChannels === SINGLE_CHANNEL_N
 
   if (patch.pipette === null || singleToMulti) {
     // reset all well selection
