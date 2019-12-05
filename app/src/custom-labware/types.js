@@ -62,6 +62,13 @@ export type CustomLabwareState = $ReadOnly<{|
 
 // action types
 
+export type CustomLabwareListActionSource =
+  | 'poll'
+  | 'initial'
+  | 'addLabware'
+  | 'overwriteLabware'
+  | 'changeDirectory'
+
 export type FetchCustomLabwareAction = {|
   type: 'labware:FETCH_CUSTOM_LABWARE',
   meta: {| shell: true |},
@@ -70,11 +77,13 @@ export type FetchCustomLabwareAction = {|
 export type CustomLabwareListAction = {|
   type: 'labware:CUSTOM_LABWARE_LIST',
   payload: Array<CheckedLabwareFile>,
+  meta: {| source: CustomLabwareListActionSource |},
 |}
 
 export type CustomLabwareListFailureAction = {|
   type: 'labware:CUSTOM_LABWARE_LIST_FAILURE',
   payload: {| message: string |},
+  meta: {| source: CustomLabwareListActionSource |},
 |}
 
 export type ChangeCustomLabwareDirectoryAction = {|

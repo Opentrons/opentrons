@@ -32,9 +32,12 @@ export type BuildrootAnalyticsData = {|
   error: string | null,
 |}
 
-export type AnalyticsEvent = {|
-  name: string,
-  properties: {},
-|}
+export type AnalyticsEvent =
+  | {|
+      name: string,
+      properties: {},
+      superProperties?: {},
+    |}
+  | {| superProperties: {} |}
 
 export type TrackEventArgs = [AnalyticsEvent, AnalyticsConfig]

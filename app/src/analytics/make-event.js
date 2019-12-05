@@ -3,6 +3,7 @@
 import createLogger from '../logger'
 import { selectors as robotSelectors } from '../robot'
 import { getConnectedRobot } from '../discovery'
+import * as CustomLabware from '../custom-labware'
 import * as brActions from '../shell/buildroot/actions'
 import {
   getProtocolAnalyticsData,
@@ -15,7 +16,7 @@ import type { AnalyticsEvent } from './types'
 
 const log = createLogger(__filename)
 
-export default function makeEvent(
+export function makeEvent(
   action: Action,
   state: State
 ): Promise<AnalyticsEvent | null> {
@@ -178,6 +179,77 @@ export default function makeEvent(
       return Promise.resolve({
         name: 'robotUpdateComplete',
         properties: { ...data },
+      })
+    }
+
+    case CustomLabware.CUSTOM_LABWARE_LIST: {
+      const { payload: labware, meta } = action
+      const { source } = meta
+      const customLabwareCount = labware.filter(
+        lw => lw.type === CustomLabware.VALID_LABWARE_FILE
+      ).length
+      const superProperties = { customLabwareCount }
+
+      if (
+        source === CustomLabware.ADD_LABWARE ||
+        source === CustomLabware.OVERWRITE_LABWARE
+      ) {
+        return Promise.resolve({
+          name: 'addCustomLabware',
+          properties: {
+            success: true,
+            overwrite: source === CustomLabware.OVERWRITE_LABWARE,
+            error: '',
+          },
+          superProperties,
+        })
+      }
+
+      if (source === CustomLabware.CHANGE_DIRECTORY) {
+        return Promise.resolve({
+          name: 'changeLabwareSourceDirectory',
+          properties: { success: true, error: '' },
+          superProperties,
+        })
+      }
+
+      return Promise.resolve({ superProperties })
+    }
+
+    case CustomLabware.CUSTOM_LABWARE_LIST_FAILURE: {
+      const { message: error } = action.payload
+      const { source } = action.meta
+
+      if (source === CustomLabware.CHANGE_DIRECTORY) {
+        return Promise.resolve({
+          name: 'changeLabwareSourceDirectory',
+          properties: { success: false, error },
+        })
+      }
+
+      if (source === CustomLabware.INITIAL) {
+        return Promise.resolve({
+          name: 'customLabwareListError',
+          properties: { error },
+        })
+      }
+
+      break
+    }
+
+    case CustomLabware.ADD_CUSTOM_LABWARE_FAILURE: {
+      const { labware, message } = action.payload
+      let error = ''
+
+      if (labware !== null) {
+        error = labware.type
+      } else if (message !== null) {
+        error = message
+      }
+
+      return Promise.resolve({
+        name: 'addCustomLabware',
+        properties: { success: false, overwrite: false, error },
       })
     }
   }

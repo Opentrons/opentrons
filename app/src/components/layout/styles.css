@@ -11,6 +11,13 @@
   padding-bottom: 0;
 }
 
+.card_copy {
+  @apply --font-body-1-dark;
+
+  line-height: var(--lh-copy);
+  margin: 0.5rem 1rem 0;
+}
+
 .row {
   width: 100%;
   margin-bottom: var(--card_spacing);

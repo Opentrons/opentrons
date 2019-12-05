@@ -1,6 +1,7 @@
 // @flow
 // TODO(mc, 2019-11-26): flex box these and also no default exports
 export { default as CardContainer } from './CardContainer'
+export * from './CardCopy'
 export { default as CardRow } from './CardRow'
 export { default as CardColumn } from './CardColumn'
 export { default as CardContentFull } from './CardContentFull'

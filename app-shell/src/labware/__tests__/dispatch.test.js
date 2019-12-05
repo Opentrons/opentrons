@@ -206,9 +206,26 @@ describe('labware module dispatches', () => {
 
     changeHandler()
 
-    return flush().then(() =>
+    return flush().then(() => {
       expect(readLabwareDirectory).toHaveBeenCalledWith(labwareDir)
-    )
+      expect(dispatch).toHaveBeenCalledWith(
+        CustomLabware.customLabwareList([], 'changeDirectory')
+      )
+    })
+  })
+
+  test('dispatches labware directory list error on config change', () => {
+    const changeHandler = handleConfigChange.mock.calls[0][1]
+
+    readLabwareDirectory.mockRejectedValue((new Error('AH'): any))
+    changeHandler()
+
+    return flush().then(() => {
+      expect(readLabwareDirectory).toHaveBeenCalledWith(labwareDir)
+      expect(dispatch).toHaveBeenCalledWith(
+        CustomLabware.customLabwareListFailure('AH', 'changeDirectory')
+      )
+    })
   })
 
   test('opens file picker on ADD_CUSTOM_LABWARE', () => {
@@ -270,7 +287,10 @@ describe('labware module dispatches', () => {
 
   test('adds file and triggers a re-scan if valid', () => {
     const mockValidFile = CustomLabwareFixtures.mockValidLabware
-    const expectedAction = CustomLabware.customLabwareList([mockValidFile])
+    const expectedAction = CustomLabware.customLabwareList(
+      [mockValidFile],
+      'addLabware'
+    )
 
     showOpenFileDialog.mockResolvedValue([mockValidFile.filename])
     validateNewLabwareFile.mockReturnValueOnce(mockValidFile)
@@ -314,7 +334,10 @@ describe('labware module dispatches', () => {
       ({ ...duplicate, filename: '/duplicate2.json' }: DuplicateLabwareFile),
     ]
     const mockAfterDeletes = [CustomLabwareFixtures.mockValidLabware]
-    const expectedAction = CustomLabware.customLabwareList(mockAfterDeletes)
+    const expectedAction = CustomLabware.customLabwareList(
+      mockAfterDeletes,
+      'overwriteLabware'
+    )
 
     // validation of existing definitions
     validateLabwareFiles.mockReturnValueOnce(mockExisting)
