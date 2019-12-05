@@ -3,43 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.15.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.15.0-alpha.0...v3.15.0-alpha.1) (2019-12-04)
-
-
-### Bug Fixes
-
-* **api:** ensure load name is attached to RPC "containers" ([#4530](https://github.com/Opentrons/opentrons/issues/4530)) ([4580aa4](https://github.com/Opentrons/opentrons/commit/4580aa4))
-* **app:** consolidate nav state to disable calibrate link on file info page ([#4514](https://github.com/Opentrons/opentrons/issues/4514)) ([842f15c](https://github.com/Opentrons/opentrons/commit/842f15c))
+# [3.15.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.15.0-alpha.1...v3.15.0-alpha.2) (2019-12-05)
 
 
 ### Features
 
+* **app:** add simple aggregate event tracking for custom labware ([#4544](https://github.com/Opentrons/opentrons/issues/4544)) ([b4fd536](https://github.com/Opentrons/opentrons/commit/b4fd536)), closes [#4537](https://github.com/Opentrons/opentrons/issues/4537)
+* **app:** put bundle upload + exec under ff ([#4541](https://github.com/Opentrons/opentrons/issues/4541)) ([9023d95](https://github.com/Opentrons/opentrons/commit/9023d95))
 * **app:** enable custom labware management in the app ([#4525](https://github.com/Opentrons/opentrons/issues/4525)) ([e1c9958](https://github.com/Opentrons/opentrons/commit/e1c9958))
-
-
-
-
-
-# [3.15.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.14.1...v3.15.0-alpha.0) (2019-11-27)
-
-
-### Bug Fixes
-
-* **app:** Call correct create method depending on protocol ([#4509](https://github.com/Opentrons/opentrons/issues/4509)) ([a3ec421](https://github.com/Opentrons/opentrons/commit/a3ec421)), closes [#4202](https://github.com/Opentrons/opentrons/issues/4202)
-* **app:** display robot ip not robot ip subnet base ([#4411](https://github.com/Opentrons/opentrons/issues/4411)) ([57cdfee](https://github.com/Opentrons/opentrons/commit/57cdfee)), closes [#4372](https://github.com/Opentrons/opentrons/issues/4372)
-* **app:** prevent user from proceeding if uploaded protocol has no steps ([#4381](https://github.com/Opentrons/opentrons/issues/4381)) ([a8344e9](https://github.com/Opentrons/opentrons/commit/a8344e9)), closes [#3121](https://github.com/Opentrons/opentrons/issues/3121)
-* **app-shell:** improve context menu and log handling ([#4472](https://github.com/Opentrons/opentrons/issues/4472)) ([de15135](https://github.com/Opentrons/opentrons/commit/de15135)), closes [#4293](https://github.com/Opentrons/opentrons/issues/4293)
-* **app,api:** display session error messages in SessionAlert ([#4378](https://github.com/Opentrons/opentrons/issues/4378)) ([19d3e00](https://github.com/Opentrons/opentrons/commit/19d3e00)), closes [#4367](https://github.com/Opentrons/opentrons/issues/4367)
-
-
-### Features
-
 * **app:** Display robot and protocol api versions ([#4502](https://github.com/Opentrons/opentrons/issues/4502)) ([00f333e](https://github.com/Opentrons/opentrons/commit/00f333e)), closes [#4362](https://github.com/Opentrons/opentrons/issues/4362)
 * **app:** parse subnest out of CIDR-notation IP address ([#4372](https://github.com/Opentrons/opentrons/issues/4372)) ([ac74c12](https://github.com/Opentrons/opentrons/commit/ac74c12)), closes [#4075](https://github.com/Opentrons/opentrons/issues/4075)
 * **app,api:** allow rich version specification for python protocols ([#4358](https://github.com/Opentrons/opentrons/issues/4358)) ([b0adef5](https://github.com/Opentrons/opentrons/commit/b0adef5)), closes [#4338](https://github.com/Opentrons/opentrons/issues/4338)
 * **protocol-designer:** show special-case warning for north/south ([#4361](https://github.com/Opentrons/opentrons/issues/4361)) ([86912e8](https://github.com/Opentrons/opentrons/commit/86912e8)), closes [#4332](https://github.com/Opentrons/opentrons/issues/4332)
 
 
+### Bug Fixes
+
+* **api:** ensure load name is attached to RPC "containers" ([#4530](https://github.com/Opentrons/opentrons/issues/4530)) ([4580aa4](https://github.com/Opentrons/opentrons/commit/4580aa4))
+* **app:** consolidate nav state to disable calibrate link on file info page ([#4514](https://github.com/Opentrons/opentrons/issues/4514)) ([842f15c](https://github.com/Opentrons/opentrons/commit/842f15c))
+* **app:** Call correct create method depending on protocol ([#4509](https://github.com/Opentrons/opentrons/issues/4509)) ([a3ec421](https://github.com/Opentrons/opentrons/commit/a3ec421)), closes [#4202](https://github.com/Opentrons/opentrons/issues/4202)
+* **app:** display robot ip not robot ip subnet base ([#4411](https://github.com/Opentrons/opentrons/issues/4411)) ([57cdfee](https://github.com/Opentrons/opentrons/commit/57cdfee)), closes [#4372](https://github.com/Opentrons/opentrons/issues/4372)
+* **app:** prevent user from proceeding if uploaded protocol has no steps ([#4381](https://github.com/Opentrons/opentrons/issues/4381)) ([a8344e9](https://github.com/Opentrons/opentrons/commit/a8344e9)), closes [#3121](https://github.com/Opentrons/opentrons/issues/3121)
+* **app-shell:** improve context menu and log handling ([#4472](https://github.com/Opentrons/opentrons/issues/4472)) ([de15135](https://github.com/Opentrons/opentrons/commit/de15135)), closes [#4293](https://github.com/Opentrons/opentrons/issues/4293)
+* **app,api:** display session error messages in SessionAlert ([#4378](https://github.com/Opentrons/opentrons/issues/4378)) ([19d3e00](https://github.com/Opentrons/opentrons/commit/19d3e00)), closes [#4367](https://github.com/Opentrons/opentrons/issues/4367)
 
 
 
