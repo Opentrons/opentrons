@@ -6,8 +6,9 @@ For more details about this release, please see the full [technical change log][
 
 ## Custom Labware Support in the Opentrons App
 
-You can now upload custom labware definitions generated with the [Labware Creator](https://labware.opentrons.com/create) tool by navigating to the
-"More" tab. To get started using custom labware, please read [this support article](https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions).
+You can now upload custom labware definitions generated with the [Labware Creator](https://labware.opentrons.com/create) tool by navigating to the "More" tab.
+
+Uploaded labware will be available for use in Python Protocol API Version 2 protocols. To use, run on any connected robot running Robot OS 3.15 or above. Learn more about using custom labware in your version 2 Python Protocol API protocols [here][https://support.opentrons.com/en/articles/3136506-using-labware-in-your-protocols]
 
 ## Other Changes
 - If a protocol does not have any executable steps, the Opentrons App will raise an error.

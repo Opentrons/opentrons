@@ -6,9 +6,13 @@ For more details about this release, please see the full [technical change log][
 
 ## Python Protocol API V2 Release
 
-We're happy to announce the full release of version 2 of our Python protocol API! To read more, please go to our [documentation](https://docs.opentrons.com/v2/index.html).
+We're happy to announce the full release of our Python Protocol API Version 2! We’ve designed the Version 2 Python Protocol API to be easier to learn and use.
 
-## Thermocycler Release
+Robots updated to 3.15 will support both Python Protocol API Version 1 and Version 2 protocols. Please note that this update will NOT affect your existing protocols.
+
+To read more about the Version 2 update, please go to our [documentation](https://docs.opentrons.com/v2/index.html).
+
+## Thermocycler Module Software Release
 
 We're also happy to announce that software support for our new [Thermocycler Module](https://shop.opentrons.com/products/thermocycler-module?_pos=2&_sid=d5579276c&_ss=r) is complete!
 
@@ -28,6 +32,7 @@ We're also happy to announce that software support for our new [Thermocycler Mod
 
 - While the underlying definition is correct, there is a known API bug that is causing the robot to think a "50 mL" tube in a "15 / 50 mL" tube rack is the same height as the "15 mL" tube
 - When attaching or detaching a pipette from the left mount, the robot homes twice in the X direction
+- If the robot is about to initiate a pause and a cancel is issued from the Opentrons App, the cancel may fail. See issue [#4545](https://github.com/Opentrons/opentrons/issues/4545)
 
 
 [419]: https://github.com/Opentrons/opentrons/issues/419
