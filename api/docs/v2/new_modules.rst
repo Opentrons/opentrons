@@ -40,6 +40,12 @@ Module names can be specified in a few different ways. The valid names can be fo
 
 .. versionadded:: 2.0
 
+.. note::
+
+    When you load a module in a protocol, you inform the OT-2 that you want the specified module to be present. Even if you do not use the module anywhere else in your protocol, the Opentrons App and the OT-2 will not let your protocol proceed until all modules loaded with ``load_module`` are attached to the OT-2.
+
+
+
 Loading Labware Onto Your Module
 ================================
 
