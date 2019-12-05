@@ -26,14 +26,24 @@ A third optional argument can be used to give the labware a nickname to be displ
                                   slot='2',
                                   label='any-name-you-want')
 
-Labware is loaded into a protocol using :py:meth:`.ProtocolContext.load_labware`, which returns a
+Labware is loaded into a protocol using :py:meth:`.ProtocolContext.load_labware`, which returns
 :py:class:`opentrons.protocol_api.labware.Labware` object.
 
+***************
+Finding Labware
+***************
 
-.. tip::
+Default Labware
+^^^^^^^^^^^^^^^
 
-    Copy and paste labware API names directly from the `Opentrons Labware Library <https://labware.opentrons.com>`_ to ensure your ``protocol.load_labware`` statements get the correct definitions.
+The OT-2 has a set of labware well-supported by Opentrons defined internally. This set of labware is always available to protocols. This labware can be found on the `Opentrons Labware Library <https://labware.opentrons.com>`_. You can copy the load names that should be passed to ``protocol.load_labware`` statements to get the correct definitions.
 
+Custom Labware
+^^^^^^^^^^^^^^
+
+If you have a piece of labware that is not in the Labware Library, you can create your own definition using the `Opentrons Labware Creator <https://labware.opentrons.com/create/>`_. Before using the Labware Creator, you should read the introduction article `here <https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions>`_.
+
+Once you have created your labware and saved it as a ``.json`` file, you can add it to the Opentrons App by clicking "More" and then "Labware". Once you have added your labware to the Opentrons App, it will be available to all Python Protocol API version 2 protocols uploaded to your robot through that Opentrons App. If other people will be using this custom labware definition, they must also add it to their Opentrons App. You can find a support article about this custom labware process `here <https://support.opentrons.com/en/articles/3136506-using-labware-in-your-protocols>`_.
 
 
 .. _new-well-access:
