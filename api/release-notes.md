@@ -6,11 +6,11 @@ For more details about this release, please see the full [technical change log][
 
 ## Python Protocol API V2 Release
 
-We're happy to announce the full release of our Python Protocol API Version 2! We’ve designed the Version 2 Python Protocol API to be easier to learn and use.
+We're happy to announce the full release of our Python Protocol API Version 2! We’ve designed version 2 of the Python Protocol API to be easier to learn and use.
 
-Robots updated to 3.15 will support both Python Protocol API Version 1 and Version 2 protocols. Please note that this update will NOT affect your existing protocols.
+Robots updated to 3.15 will support both Python Protocol API version 1 and version 2 protocols. Please note that this update will NOT affect your existing protocols.
 
-To read more about the Version 2 update, please go to our [documentation](https://docs.opentrons.com/v2/index.html).
+To read more about the version 2 update, please go to our [documentation](https://docs.opentrons.com/v2/index.html).
 
 ## Thermocycler Module Software Release
 
