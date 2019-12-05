@@ -3,23 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.15.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.15.0-alpha.0...v3.15.0-alpha.1) (2019-12-04)
-
+# [3.15.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.15.0-alpha.1...v3.15.0-alpha.2) (2019-12-05)
 
 ### Bug Fixes
 
 * **api:** present loaded but unused pipettes and modules to rpc ([#4538](https://github.com/Opentrons/opentrons/issues/4538)) ([fe27ef7](https://github.com/Opentrons/opentrons/commit/fe27ef7))
 * **shared-data:** increase GEN2 pipette plunger & drop tip current ([#4523](https://github.com/Opentrons/opentrons/issues/4523)) ([e6909b9](https://github.com/Opentrons/opentrons/commit/e6909b9))
-
-
-
-
-
-# [3.15.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.14.1...v3.15.0-alpha.0) (2019-11-27)
-
-
-### Bug Fixes
-
 * **api,shared-data:** fix gen2 multi positioning ([#4412](https://github.com/Opentrons/opentrons/issues/4412)) ([54be7f9](https://github.com/Opentrons/opentrons/commit/54be7f9))
 
 

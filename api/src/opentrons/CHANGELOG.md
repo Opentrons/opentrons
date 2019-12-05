@@ -3,38 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.15.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.15.0-alpha.0...v3.15.0-alpha.1) (2019-12-04)
-
-
-### Bug Fixes
-
-* **api:** ensure load name is attached to RPC "containers" ([#4530](https://github.com/Opentrons/opentrons/issues/4530)) ([4580aa4](https://github.com/Opentrons/opentrons/commit/4580aa4))
-* **api:** Fix critical points and gantry config backup in http deck cal ([#4527](https://github.com/Opentrons/opentrons/issues/4527)) ([cfefab4](https://github.com/Opentrons/opentrons/commit/cfefab4))
-* **api:** present loaded but unused pipettes and modules to rpc ([#4538](https://github.com/Opentrons/opentrons/issues/4538)) ([fe27ef7](https://github.com/Opentrons/opentrons/commit/fe27ef7))
-* **api:** prevent liquid handling without a tip ([#4528](https://github.com/Opentrons/opentrons/issues/4528)) ([e1724ab](https://github.com/Opentrons/opentrons/commit/e1724ab)), closes [#4219](https://github.com/Opentrons/opentrons/issues/4219)
-
-
-
-
-
-# [3.15.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.14.1...v3.15.0-alpha.0) (2019-11-27)
-
-
-### Bug Fixes
-
-* **api:** clear running module tasks on cancel ([#4464](https://github.com/Opentrons/opentrons/issues/4464)) ([5135da9](https://github.com/Opentrons/opentrons/commit/5135da9))
-* **api:** connect context to real thermocycler during calibration ([#4454](https://github.com/Opentrons/opentrons/issues/4454)) ([1d40fd6](https://github.com/Opentrons/opentrons/commit/1d40fd6))
-* **api:** fix bad adv settings crash ([#4489](https://github.com/Opentrons/opentrons/issues/4489)) ([34fb8e7](https://github.com/Opentrons/opentrons/commit/34fb8e7))
-* **api:** fix calibration issues in backcompat ([#4480](https://github.com/Opentrons/opentrons/issues/4480)) ([7153be3](https://github.com/Opentrons/opentrons/commit/7153be3))
-* **api:** flag move to tc with in-between lid as unsafe ([#4488](https://github.com/Opentrons/opentrons/issues/4488)) ([1741088](https://github.com/Opentrons/opentrons/commit/1741088))
-* **api:** Suppress error log during check for pipettes ([#4374](https://github.com/Opentrons/opentrons/issues/4374)) ([b68caac](https://github.com/Opentrons/opentrons/commit/b68caac)), closes [#4096](https://github.com/Opentrons/opentrons/issues/4096)
-* **api:** tools: fix `write_pipette_memory` on host ([#4434](https://github.com/Opentrons/opentrons/issues/4434)) ([f3eef16](https://github.com/Opentrons/opentrons/commit/f3eef16))
-* **api:** wrap modules hc instance in async adapter on load ([#4492](https://github.com/Opentrons/opentrons/issues/4492)) ([99d3a47](https://github.com/Opentrons/opentrons/commit/99d3a47))
-* **api,shared-data:** fix gen2 multi positioning ([#4412](https://github.com/Opentrons/opentrons/issues/4412)) ([54be7f9](https://github.com/Opentrons/opentrons/commit/54be7f9))
-* **APIV2:** Make tipracks always calibrate from top ([#4418](https://github.com/Opentrons/opentrons/issues/4418)) ([bf2cf8c](https://github.com/Opentrons/opentrons/commit/bf2cf8c))
-* **app:** add handling for legacy(location,well,labware) in rpc ([#4478](https://github.com/Opentrons/opentrons/issues/4478)) ([4528c7a](https://github.com/Opentrons/opentrons/commit/4528c7a))
-* **app,api:** display session error messages in SessionAlert ([#4378](https://github.com/Opentrons/opentrons/issues/4378)) ([19d3e00](https://github.com/Opentrons/opentrons/commit/19d3e00)), closes [#4367](https://github.com/Opentrons/opentrons/issues/4367)
-
+# [3.15.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.15.0-alpha.1...v3.15.0-alpha.2) (2019-12-05)
 
 ### Features
 
@@ -55,6 +24,29 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **api:** warn tc-lid/gantry collision in simulation ([#4394](https://github.com/Opentrons/opentrons/issues/4394)) ([b22a3b3](https://github.com/Opentrons/opentrons/commit/b22a3b3)), closes [#4044](https://github.com/Opentrons/opentrons/issues/4044)
 * **api,shared-data:** support p20/300/1k single v2.1 ([#4392](https://github.com/Opentrons/opentrons/issues/4392)) ([e743d2b](https://github.com/Opentrons/opentrons/commit/e743d2b)), closes [#4389](https://github.com/Opentrons/opentrons/issues/4389)
 * **app,api:** allow rich version specification for python protocols ([#4358](https://github.com/Opentrons/opentrons/issues/4358)) ([b0adef5](https://github.com/Opentrons/opentrons/commit/b0adef5)), closes [#4338](https://github.com/Opentrons/opentrons/issues/4338)
+
+
+
+### Bug Fixes
+
+* **api:** ensure load name is attached to RPC "containers" ([#4530](https://github.com/Opentrons/opentrons/issues/4530)) ([4580aa4](https://github.com/Opentrons/opentrons/commit/4580aa4))
+* **api:** Fix critical points and gantry config backup in http deck cal ([#4527](https://github.com/Opentrons/opentrons/issues/4527)) ([cfefab4](https://github.com/Opentrons/opentrons/commit/cfefab4))
+* **api:** present loaded but unused pipettes and modules to rpc ([#4538](https://github.com/Opentrons/opentrons/issues/4538)) ([fe27ef7](https://github.com/Opentrons/opentrons/commit/fe27ef7))
+* **api:** prevent liquid handling without a tip ([#4528](https://github.com/Opentrons/opentrons/issues/4528)) ([e1724ab](https://github.com/Opentrons/opentrons/commit/e1724ab)), closes [#4219](https://github.com/Opentrons/opentrons/issues/4219)
+* **api:** clear running module tasks on cancel ([#4464](https://github.com/Opentrons/opentrons/issues/4464)) ([5135da9](https://github.com/Opentrons/opentrons/commit/5135da9))
+* **api:** connect context to real thermocycler during calibration ([#4454](https://github.com/Opentrons/opentrons/issues/4454)) ([1d40fd6](https://github.com/Opentrons/opentrons/commit/1d40fd6))
+* **api:** fix bad adv settings crash ([#4489](https://github.com/Opentrons/opentrons/issues/4489)) ([34fb8e7](https://github.com/Opentrons/opentrons/commit/34fb8e7))
+* **api:** fix calibration issues in backcompat ([#4480](https://github.com/Opentrons/opentrons/issues/4480)) ([7153be3](https://github.com/Opentrons/opentrons/commit/7153be3))
+* **api:** flag move to tc with in-between lid as unsafe ([#4488](https://github.com/Opentrons/opentrons/issues/4488)) ([1741088](https://github.com/Opentrons/opentrons/commit/1741088))
+* **api:** Suppress error log during check for pipettes ([#4374](https://github.com/Opentrons/opentrons/issues/4374)) ([b68caac](https://github.com/Opentrons/opentrons/commit/b68caac)), closes [#4096](https://github.com/Opentrons/opentrons/issues/4096)
+* **api:** tools: fix `write_pipette_memory` on host ([#4434](https://github.com/Opentrons/opentrons/issues/4434)) ([f3eef16](https://github.com/Opentrons/opentrons/commit/f3eef16))
+* **api:** wrap modules hc instance in async adapter on load ([#4492](https://github.com/Opentrons/opentrons/issues/4492)) ([99d3a47](https://github.com/Opentrons/opentrons/commit/99d3a47))
+* **api,shared-data:** fix gen2 multi positioning ([#4412](https://github.com/Opentrons/opentrons/issues/4412)) ([54be7f9](https://github.com/Opentrons/opentrons/commit/54be7f9))
+* **APIV2:** Make tipracks always calibrate from top ([#4418](https://github.com/Opentrons/opentrons/issues/4418)) ([bf2cf8c](https://github.com/Opentrons/opentrons/commit/bf2cf8c))
+* **app:** add handling for legacy(location,well,labware) in rpc ([#4478](https://github.com/Opentrons/opentrons/issues/4478)) ([4528c7a](https://github.com/Opentrons/opentrons/commit/4528c7a))
+* **app,api:** display session error messages in SessionAlert ([#4378](https://github.com/Opentrons/opentrons/issues/4378)) ([19d3e00](https://github.com/Opentrons/opentrons/commit/19d3e00)), closes [#4367](https://github.com/Opentrons/opentrons/issues/4367)
+
+
 
 
 ### Performance Improvements
