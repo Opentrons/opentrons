@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.15.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.15.0-alpha.1...v3.15.0-alpha.2) (2019-12-05)
+# [3.15.0](https://github.com/Opentrons/opentrons/compare/v3.14.1...v3.15.0) (2019-12-05)
 
 
 ### Features
