@@ -390,8 +390,13 @@ class Session(object):
                 [_get_labware(command) for command in commands])
 
             self._containers.extend(_dedupe(containers))
-            self._instruments.extend(_dedupe(instruments))
-            self._modules.extend(_dedupe(modules))
+            self._instruments.extend(_dedupe(
+                instruments
+                + list(self._simulating_ctx.loaded_instruments.values())))
+            self._modules.extend(_dedupe(
+                modules
+                + [m._geometry
+                   for m in self._simulating_ctx.loaded_modules.values()]))
             self._interactions.extend(_dedupe(interactions))
 
             # Labware calibration happens after simulation and before run, so

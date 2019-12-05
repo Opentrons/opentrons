@@ -20,6 +20,7 @@ describe('customLabwareReducer', () => {
       action: {
         type: 'labware:CUSTOM_LABWARE_LIST',
         payload: [Fixtures.mockInvalidLabware, Fixtures.mockValidLabware],
+        meta: { source: 'poll' },
       },
       expected: {
         ...INITIAL_STATE,
@@ -50,6 +51,7 @@ describe('customLabwareReducer', () => {
       action: {
         type: 'labware:CUSTOM_LABWARE_LIST',
         payload: [Fixtures.mockInvalidLabware],
+        meta: { source: 'poll' },
       },
       expected: {
         filenames: [Fixtures.mockInvalidLabware.filename],
@@ -65,6 +67,7 @@ describe('customLabwareReducer', () => {
       action: {
         type: 'labware:CUSTOM_LABWARE_LIST_FAILURE',
         payload: { message: 'AH' },
+        meta: { source: 'poll' },
       },
       expected: { ...INITIAL_STATE, listFailureMessage: 'AH' },
     },

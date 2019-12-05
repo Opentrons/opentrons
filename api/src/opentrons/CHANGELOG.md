@@ -3,7 +3,62 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [3.14.1](https://github.com/Opentrons/opentrons/compare/v3.13.2...v3.14.1) (2019-11-11)
+# [3.15.0](https://github.com/Opentrons/opentrons/compare/v3.14.1...v3.15.0) (2019-12-05)
+
+
+### Features
+
+* **api:** add extra labware in session ([#4490](https://github.com/Opentrons/opentrons/issues/4490)) ([27666db](https://github.com/Opentrons/opentrons/commit/27666db))
+* **api:** add http endpoint for robot settings dump ([#4344](https://github.com/Opentrons/opentrons/issues/4344)) ([bb91107](https://github.com/Opentrons/opentrons/commit/bb91107))
+* **api:** Add locks on direct data access for mag and temp module ([#4501](https://github.com/Opentrons/opentrons/issues/4501)) ([17a27c7](https://github.com/Opentrons/opentrons/commit/17a27c7))
+* **api:** add the maximum supported protocol api version ([#4363](https://github.com/Opentrons/opentrons/issues/4363)) ([086723d](https://github.com/Opentrons/opentrons/commit/086723d))
+* **api:** add volume parameter to thermocycler temperature commands ([#4500](https://github.com/Opentrons/opentrons/issues/4500)) ([ad3d77f](https://github.com/Opentrons/opentrons/commit/ad3d77f)), closes [#4264](https://github.com/Opentrons/opentrons/issues/4264)
+* **api:** apiv2: backcompat: implement LegacyWell position methods ([#4448](https://github.com/Opentrons/opentrons/issues/4448)) ([222cf37](https://github.com/Opentrons/opentrons/commit/222cf37))
+* **api:** apiv2: implement instruments backcompat ([#4458](https://github.com/Opentrons/opentrons/issues/4458)) ([ffb2942](https://github.com/Opentrons/opentrons/commit/ffb2942)), closes [#3540](https://github.com/Opentrons/opentrons/issues/3540)
+* **api:** apiv2: Limit protocols to max supported version ([#4365](https://github.com/Opentrons/opentrons/issues/4365)) ([8decf1a](https://github.com/Opentrons/opentrons/commit/8decf1a)), closes [#4342](https://github.com/Opentrons/opentrons/issues/4342)
+* **api:** apiv2: v1-backcompat: implement module backcompat ([#4438](https://github.com/Opentrons/opentrons/issues/4438)) ([2a42591](https://github.com/Opentrons/opentrons/commit/2a42591)), closes [#3655](https://github.com/Opentrons/opentrons/issues/3655)
+* **api:** check papi version on method call ([#4399](https://github.com/Opentrons/opentrons/issues/4399)) ([493029c](https://github.com/Opentrons/opentrons/commit/493029c)), closes [#4343](https://github.com/Opentrons/opentrons/issues/4343)
+* **api:** enable v2 internals by default ([#4474](https://github.com/Opentrons/opentrons/issues/4474)) ([e25bb55](https://github.com/Opentrons/opentrons/commit/e25bb55))
+* **api:** Migrate DB Labware into V2 Format ([#4256](https://github.com/Opentrons/opentrons/issues/4256)) ([d0c3f4a](https://github.com/Opentrons/opentrons/commit/d0c3f4a))
+* **api:** register module instances on os events ([#4441](https://github.com/Opentrons/opentrons/issues/4441)) ([89afd64](https://github.com/Opentrons/opentrons/commit/89afd64)), closes [#3580](https://github.com/Opentrons/opentrons/issues/3580)
+* **api:** surface protocol apiv1 backcompat in apiv2 ([#4473](https://github.com/Opentrons/opentrons/issues/4473)) ([831e963](https://github.com/Opentrons/opentrons/commit/831e963))
+* **api:** warn tc-lid/gantry collision in simulation ([#4394](https://github.com/Opentrons/opentrons/issues/4394)) ([b22a3b3](https://github.com/Opentrons/opentrons/commit/b22a3b3)), closes [#4044](https://github.com/Opentrons/opentrons/issues/4044)
+* **api,shared-data:** support p20/300/1k single v2.1 ([#4392](https://github.com/Opentrons/opentrons/issues/4392)) ([e743d2b](https://github.com/Opentrons/opentrons/commit/e743d2b)), closes [#4389](https://github.com/Opentrons/opentrons/issues/4389)
+* **app,api:** allow rich version specification for python protocols ([#4358](https://github.com/Opentrons/opentrons/issues/4358)) ([b0adef5](https://github.com/Opentrons/opentrons/commit/b0adef5)), closes [#4338](https://github.com/Opentrons/opentrons/issues/4338)
+
+
+
+### Bug Fixes
+
+* **api:** ensure load name is attached to RPC "containers" ([#4530](https://github.com/Opentrons/opentrons/issues/4530)) ([4580aa4](https://github.com/Opentrons/opentrons/commit/4580aa4))
+* **api:** Fix critical points and gantry config backup in http deck cal ([#4527](https://github.com/Opentrons/opentrons/issues/4527)) ([cfefab4](https://github.com/Opentrons/opentrons/commit/cfefab4))
+* **api:** present loaded but unused pipettes and modules to rpc ([#4538](https://github.com/Opentrons/opentrons/issues/4538)) ([fe27ef7](https://github.com/Opentrons/opentrons/commit/fe27ef7))
+* **api:** prevent liquid handling without a tip ([#4528](https://github.com/Opentrons/opentrons/issues/4528)) ([e1724ab](https://github.com/Opentrons/opentrons/commit/e1724ab)), closes [#4219](https://github.com/Opentrons/opentrons/issues/4219)
+* **api:** clear running module tasks on cancel ([#4464](https://github.com/Opentrons/opentrons/issues/4464)) ([5135da9](https://github.com/Opentrons/opentrons/commit/5135da9))
+* **api:** connect context to real thermocycler during calibration ([#4454](https://github.com/Opentrons/opentrons/issues/4454)) ([1d40fd6](https://github.com/Opentrons/opentrons/commit/1d40fd6))
+* **api:** fix bad adv settings crash ([#4489](https://github.com/Opentrons/opentrons/issues/4489)) ([34fb8e7](https://github.com/Opentrons/opentrons/commit/34fb8e7))
+* **api:** fix calibration issues in backcompat ([#4480](https://github.com/Opentrons/opentrons/issues/4480)) ([7153be3](https://github.com/Opentrons/opentrons/commit/7153be3))
+* **api:** flag move to tc with in-between lid as unsafe ([#4488](https://github.com/Opentrons/opentrons/issues/4488)) ([1741088](https://github.com/Opentrons/opentrons/commit/1741088))
+* **api:** Suppress error log during check for pipettes ([#4374](https://github.com/Opentrons/opentrons/issues/4374)) ([b68caac](https://github.com/Opentrons/opentrons/commit/b68caac)), closes [#4096](https://github.com/Opentrons/opentrons/issues/4096)
+* **api:** tools: fix `write_pipette_memory` on host ([#4434](https://github.com/Opentrons/opentrons/issues/4434)) ([f3eef16](https://github.com/Opentrons/opentrons/commit/f3eef16))
+* **api:** wrap modules hc instance in async adapter on load ([#4492](https://github.com/Opentrons/opentrons/issues/4492)) ([99d3a47](https://github.com/Opentrons/opentrons/commit/99d3a47))
+* **api,shared-data:** fix gen2 multi positioning ([#4412](https://github.com/Opentrons/opentrons/issues/4412)) ([54be7f9](https://github.com/Opentrons/opentrons/commit/54be7f9))
+* **APIV2:** Make tipracks always calibrate from top ([#4418](https://github.com/Opentrons/opentrons/issues/4418)) ([bf2cf8c](https://github.com/Opentrons/opentrons/commit/bf2cf8c))
+* **app:** add handling for legacy(location,well,labware) in rpc ([#4478](https://github.com/Opentrons/opentrons/issues/4478)) ([4528c7a](https://github.com/Opentrons/opentrons/commit/4528c7a))
+* **app,api:** display session error messages in SessionAlert ([#4378](https://github.com/Opentrons/opentrons/issues/4378)) ([19d3e00](https://github.com/Opentrons/opentrons/commit/19d3e00)), closes [#4367](https://github.com/Opentrons/opentrons/issues/4367)
+
+
+
+
+### Performance Improvements
+
+* **api:** use math.isclose in hotpaths ([#4510](https://github.com/Opentrons/opentrons/issues/4510)) ([fb6aef8](https://github.com/Opentrons/opentrons/commit/fb6aef8)), closes [#4482](https://github.com/Opentrons/opentrons/issues/4482) [#4482](https://github.com/Opentrons/opentrons/issues/4482)
+
+
+
+
+
+## [3.14.1](https://github.com/Opentrons/opentrons/compare/v3.14.0...v3.14.1) (2019-11-11)
 
 **Note:** Version bump only for package @opentrons/api-server
 

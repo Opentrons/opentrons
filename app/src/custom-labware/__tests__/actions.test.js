@@ -19,7 +19,7 @@ describe('custom labware actions', () => {
       expected: { type: 'labware:FETCH_CUSTOM_LABWARE', meta: { shell: true } },
     },
     {
-      name: 'customLabwareList',
+      name: 'customLabwareList from poll',
       creator: actions.customLabwareList,
       args: [
         [
@@ -33,15 +33,42 @@ describe('custom labware actions', () => {
           { type: 'INVALID_LABWARE_FILE', filename: 'a.json', created: 0 },
           { type: 'INVALID_LABWARE_FILE', filename: 'b.json', created: 1 },
         ],
+        meta: { source: 'poll' },
       },
     },
     {
-      name: 'customLabwareListFailure',
+      name: 'customLabwareList from source',
+      creator: actions.customLabwareList,
+      args: [
+        [{ type: 'INVALID_LABWARE_FILE', filename: 'a.json', created: 0 }],
+        'changeDirectory',
+      ],
+      expected: {
+        type: 'labware:CUSTOM_LABWARE_LIST',
+        payload: [
+          { type: 'INVALID_LABWARE_FILE', filename: 'a.json', created: 0 },
+        ],
+        meta: { source: 'changeDirectory' },
+      },
+    },
+    {
+      name: 'customLabwareListFailure from poll',
       creator: actions.customLabwareListFailure,
       args: ['AH!'],
       expected: {
         type: 'labware:CUSTOM_LABWARE_LIST_FAILURE',
         payload: { message: 'AH!' },
+        meta: { source: 'poll' },
+      },
+    },
+    {
+      name: 'customLabwareListFailure from source',
+      creator: actions.customLabwareListFailure,
+      args: ['AH!', 'changeDirectory'],
+      expected: {
+        type: 'labware:CUSTOM_LABWARE_LIST_FAILURE',
+        payload: { message: 'AH!' },
+        meta: { source: 'changeDirectory' },
       },
     },
     {

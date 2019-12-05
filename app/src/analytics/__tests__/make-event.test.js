@@ -1,5 +1,5 @@
 // events map tests
-import makeEvent from '../make-event'
+import { makeEvent } from '../make-event'
 import {
   actions as robotActions,
   selectors as robotSelectors,

@@ -12,6 +12,7 @@ import * as ConfigActions from '@opentrons/app/src/config'
 import type {
   UncheckedLabwareFile,
   DuplicateLabwareFile,
+  CustomLabwareListActionSource as ListSource,
 } from '@opentrons/app/src/custom-labware/types'
 import type { Action, Dispatch } from '../types'
 
@@ -25,14 +26,17 @@ const fetchCustomLabware = (): Promise<Array<UncheckedLabwareFile>> => {
     .then(Definitions.parseLabwareFiles)
 }
 
-const fetchAndValidateCustomLabware = (dispatch: Dispatch): Promise<void> => {
+const fetchAndValidateCustomLabware = (
+  dispatch: Dispatch,
+  source: ListSource
+): Promise<void> => {
   return fetchCustomLabware()
     .then(files => {
       const payload = validateLabwareFiles(files)
-      dispatch(CustomLabware.customLabwareList(payload))
+      dispatch(CustomLabware.customLabwareList(payload, source))
     })
     .catch((error: Error) => {
-      dispatch(CustomLabware.customLabwareListFailure(error.message))
+      dispatch(CustomLabware.customLabwareListFailure(error.message, source))
     })
 }
 
@@ -54,7 +58,9 @@ const overwriteLabware = (
       const dir = getFullConfig().labware.directory
       return Definitions.addLabwareFile(next.filename, dir)
     })
-    .then(() => fetchAndValidateCustomLabware(dispatch))
+    .then(() =>
+      fetchAndValidateCustomLabware(dispatch, CustomLabware.OVERWRITE_LABWARE)
+    )
 }
 
 const copyLabware = (
@@ -74,21 +80,25 @@ const copyLabware = (
     }
 
     return Definitions.addLabwareFile(next.filename, dir).then(() =>
-      fetchAndValidateCustomLabware(dispatch)
+      fetchAndValidateCustomLabware(dispatch, CustomLabware.ADD_LABWARE)
     )
   })
 }
 
 export function registerLabware(dispatch: Dispatch, mainWindow: {}) {
   handleConfigChange('labware.directory', () => {
-    fetchAndValidateCustomLabware(dispatch)
+    fetchAndValidateCustomLabware(dispatch, CustomLabware.CHANGE_DIRECTORY)
   })
 
   return function handleActionForLabware(action: Action) {
     switch (action.type) {
       case CustomLabware.FETCH_CUSTOM_LABWARE:
       case 'shell:CHECK_UPDATE': {
-        fetchAndValidateCustomLabware(dispatch)
+        const source =
+          action.type === CustomLabware.FETCH_CUSTOM_LABWARE
+            ? CustomLabware.POLL
+            : CustomLabware.INITIAL
+        fetchAndValidateCustomLabware(dispatch, source)
         break
       }
 

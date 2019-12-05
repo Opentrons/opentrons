@@ -48,6 +48,10 @@ def _sleep(seconds):
     time.sleep(seconds)
 
 
+class NoTipAttachedError(RuntimeError):
+    pass
+
+
 class PipetteTip:
     def __init__(self, length):
         self.length = length
@@ -432,7 +436,11 @@ class Pipette(CommandPublisher):
         >>> p300.aspirate(plate[2]) # doctest: +SKIP
         """
         if not self.tip_attached:
-            log.warning("Cannot aspirate without a tip attached.")
+            raise NoTipAttachedError(
+                f'Aspirate commands not allowed if there is not tip attached '
+                f'to the pipette. Please make sure that a tip is attached on '
+                f'the {self.mount} pipette before using liquid-handling '
+                f'commands')
 
         # Note: volume positional argument may not be passed. if it isn't then
         # assume the first positional argument is the location
@@ -532,7 +540,11 @@ class Pipette(CommandPublisher):
         >>> p300.dispense(plate[2]) # doctest: +SKIP
         """
         if not self.tip_attached:
-            log.warning("Cannot dispense without a tip attached.")
+            raise NoTipAttachedError(
+                f'Dispense commands not allowed if there is not tip attached '
+                f'to the pipette. Please make sure that a tip is attached on '
+                f'the {self.mount} pipette before using liquid-handling '
+                f'commands')
 
         # Note: volume positional argument may not be passed. if it isn't then
         # assume the first positional argument is the location

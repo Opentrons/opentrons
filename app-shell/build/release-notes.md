@@ -1,19 +1,22 @@
-# Opentrons App Changes from 3.13.2 to 3.14.1
+# Opentrons App Changes from 3.14.1 to 3.15.0
 
 For more details about this release, please see the full [technical change log][changelog]
 
 **Note for macOS users**: The Opentrons App is no longer compatible with macOS 10.9 Mavericks. If you are using 10.9, please upgrade to a later version of macOS (available for free from Apple) to continue to receive Opentrons updates.
 
-## Changes
+## Custom Labware Support in the Opentrons App
 
-- Our new generation of pipettes, labeled GEN2 Pipettes, now appear in the change pipettes dialog box. These pipettes will be coming soon.
-- You can control your Temperature Module and Thermocycler from the Pipettes and Modules page outside of a protocol
-- Changing certain advanced settings will prompt you to restart your robot
+You can now upload custom labware definitions generated with the [Labware Creator](https://labware.opentrons.com/create) tool by navigating to the "More" tab.
 
+Uploaded labware will be available for use in Python Protocol API Version 2 protocols. To use, run on any connected robot running Robot OS 3.15 or above. Learn more about using custom labware in your version 2 Python Protocol API protocols [here](https://support.opentrons.com/en/articles/3136506-using-labware-in-your-protocols).
+
+## Other Changes
+- If a protocol does not have any executable steps, the Opentrons App will raise an error.
+- Make Opentrons App logs more accessible via the "Help" drop-down.
+- The Opentrons App will now detect the protocol API version supported by the robot and selected in the protocol. A modal will appear if there is a mismatch.
 
 ## Bug Fixes
-
-- The Opentrons App will now disable the Run Start Button if your protocol is missing required modules or pipetttes.
+- Fixed more issues with app and robot version sync.
 
 [electron-6]: https://electronjs.org/releases/stable?version=6
 
@@ -21,7 +24,6 @@ For more details about this release, please see the full [technical change log][
 
 - The app's run log sometimes displays the wrong current run step ([#2047][2047])
 - The app should prevent you from starting a pipette swap while a protocol is executing, but it does not ([#2020][2020])
-- The app should warn you if you try to simulate a protocol without any valid steps, but it does not ([#3121][3121])
 - When disconnecting and reconnecting to a running OT-2 that doesn't know what time it is, the app's displayed run time will be subtly wrong ([#3872][3872])
 
 

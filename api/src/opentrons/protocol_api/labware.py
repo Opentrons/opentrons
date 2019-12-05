@@ -378,6 +378,12 @@ class Labware(DeckItem):
 
     @property  # type: ignore
     @requires_version(2, 0)
+    def load_name(self) -> str:
+        """ The API load name of the labware definition """
+        return self._parameters['loadName']
+
+    @property  # type: ignore
+    @requires_version(2, 0)
     def parameters(self) -> Dict[str, Any]:
         """Internal properties of a labware including type and quirks"""
         return self._parameters
@@ -1197,6 +1203,18 @@ def _get_standard_labware_definition(
         checked_version = 1
     else:
         checked_version = version
+    error_msg_string = """Unable to find a labware
+        definition for "{0}",
+        version {1}, in the {2} namespace.
+        Please confirm your protocol includes the correct
+        labware spelling and (optionally) the correct version
+        number and namespace.
+
+        If you are referencing a custom labware in your
+        protocol, you must add it to your Custom Labware
+        Definitions Folder from the Opentrons App before
+        uploading your protocol.
+        """
 
     if namespace is None:
         for fallback_namespace in [OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE]:
@@ -1205,10 +1223,9 @@ def _get_standard_labware_definition(
                     load_name, fallback_namespace, checked_version)
             except (FileNotFoundError):
                 pass
-        raise FileNotFoundError(
-            f'Labware "{load_name}" not found with version {checked_version}. '
-            f'If you are using a namespace besides {OPENTRONS_NAMESPACE} or '
-            f'{CUSTOM_NAMESPACE}, please specify it')
+
+        raise FileNotFoundError(error_msg_string.format(
+                load_name, checked_version, OPENTRONS_NAMESPACE))
 
     namespace = namespace.lower()
     def_path = _get_path_to_labware(load_name, namespace, checked_version)

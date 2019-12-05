@@ -6,7 +6,7 @@ from unittest import mock
 
 import opentrons.protocol_api as papi
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
-from opentrons.hardware_control import API
+from opentrons.hardware_control import API, NoTipAttachedError
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 from opentrons.config.pipette_config import config_models, name_for_model
@@ -401,6 +401,27 @@ def test_dispense(loop, get_labware_def, monkeypatch):
     move_called_with = None
     instr.dispense(2.0)
     assert move_called_with is None
+
+
+def test_prevent_liquid_handling_without_tip(loop):
+    ctx = papi.ProtocolContext(loop)
+    ctx.home()
+
+    tr = ctx.load_labware('opentrons_96_tiprack_300ul', '1')
+    plate = ctx.load_labware('corning_384_wellplate_112ul_flat', '2')
+    pipR = ctx.load_instrument('p300_single', Mount.RIGHT,
+                               tip_racks=[tr])
+
+    with pytest.raises(NoTipAttachedError):
+        pipR.aspirate(100, plate.wells()[0])
+
+    pipR.pick_up_tip()
+
+    pipR.aspirate(100, plate.wells()[0])
+    pipR.drop_tip()
+
+    with pytest.raises(NoTipAttachedError):
+        pipR.dispense(100, plate.wells()[1])
 
 
 def test_starting_tip_and_reset_tipracks(loop, get_labware_def, monkeypatch):

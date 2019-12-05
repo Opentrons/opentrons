@@ -25,6 +25,14 @@ export const ADD_CUSTOM_LABWARE_FAILURE: 'labware:ADD_CUSTOM_LABWARE_FAILURE' =
 export const CLEAR_ADD_CUSTOM_LABWARE_FAILURE: 'labware:CLEAR_ADD_CUSTOM_LABWARE_FAILURE' =
   'labware:CLEAR_ADD_CUSTOM_LABWARE_FAILURE'
 
+// action meta literals
+
+export const POLL: 'poll' = 'poll'
+export const INITIAL: 'initial' = 'initial'
+export const ADD_LABWARE: 'addLabware' = 'addLabware'
+export const OVERWRITE_LABWARE: 'overwriteLabware' = 'overwriteLabware'
+export const CHANGE_DIRECTORY: 'changeDirectory' = 'changeDirectory'
+
 // action creators
 
 export const fetchCustomLabware = (): Types.FetchCustomLabwareAction => ({
@@ -33,14 +41,21 @@ export const fetchCustomLabware = (): Types.FetchCustomLabwareAction => ({
 })
 
 export const customLabwareList = (
-  payload: Array<Types.CheckedLabwareFile>
-): Types.CustomLabwareListAction => ({ type: CUSTOM_LABWARE_LIST, payload })
+  payload: Array<Types.CheckedLabwareFile>,
+  source: Types.CustomLabwareListActionSource = POLL
+): Types.CustomLabwareListAction => ({
+  type: CUSTOM_LABWARE_LIST,
+  payload,
+  meta: { source },
+})
 
 export const customLabwareListFailure = (
-  message: string
+  message: string,
+  source: Types.CustomLabwareListActionSource = POLL
 ): Types.CustomLabwareListFailureAction => ({
   type: CUSTOM_LABWARE_LIST_FAILURE,
   payload: { message },
+  meta: { source },
 })
 
 export const changeCustomLabwareDirectory = (): Types.ChangeCustomLabwareDirectoryAction => ({
