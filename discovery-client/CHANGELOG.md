@@ -3,7 +3,9 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.15.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.15.0-alpha.1...v3.15.0-alpha.2) (2019-12-05)
+# [3.15.0](https://github.com/Opentrons/opentrons/compare/v3.14.1...v3.15.0) (2019-12-05)
+
+
 
 * **app:** Display robot and protocol api versions ([#4502](https://github.com/Opentrons/opentrons/issues/4502)) ([00f333e](https://github.com/Opentrons/opentrons/commit/00f333e)), closes [#4362](https://github.com/Opentrons/opentrons/issues/4362)
 
