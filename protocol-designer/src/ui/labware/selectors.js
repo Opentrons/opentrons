@@ -9,6 +9,7 @@ import { selectors as labwareIngredSelectors } from '../../labware-ingred/select
 import type { Options } from '@opentrons/components'
 import type { Selector } from '../../types'
 import type { LabwareEntity } from '../../step-forms'
+import { getLabwareHasQuirk } from '../../../../shared-data/js/helpers'
 
 export const getLabwareNicknamesById: Selector<{
   [labwareId: string]: string,
@@ -52,18 +53,16 @@ export const getDisposalLabwareOptions: Selector<Options> = createSelector(
   (labwareEntities, names) =>
     reduce(
       labwareEntities,
-      (acc: Options, labware: LabwareEntity, labwareId): Options => {
-        // TODO: Ian 2019-09-17 if we create a way to distinguish "intended for disposal"
-        // labware, use that here as a filter.
-        // Until then, allow all labware to be used for disposal
-        return [
-          ...acc,
-          {
-            name: names[labwareId],
-            value: labwareId,
-          },
-        ]
-      },
+      (acc: Options, labware: LabwareEntity, labwareId): Options =>
+        getLabwareHasQuirk(labware.def, 'fixedTrash')
+          ? [
+              ...acc,
+              {
+                name: names[labwareId],
+                value: labwareId,
+              },
+            ]
+          : acc,
       []
     )
 )
