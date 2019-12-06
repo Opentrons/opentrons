@@ -866,7 +866,7 @@ def test_unstick_axes(robot, smoothie):
 
     current_log = []
 
-    def send_command_mock(self, command, timeout=None):
+    def send_command_mock(self, command, timeout=12000.0, ack_timeout=5.0):
         nonlocal current_log
         current_log.append(command)
         if 'M119' in command:
@@ -903,7 +903,7 @@ def test_unstick_axes(robot, smoothie):
 
     assert current_log == expected
 
-    def send_command_mock(self, command, timeout=None):
+    def send_command_mock(self, command, timeout=12000.0, ack_timeout=5.0):
         nonlocal current_log
         current_log.append(command)
         if 'M119' in command:
@@ -930,7 +930,7 @@ def test_unstick_axes(robot, smoothie):
     ]
     assert current_log == expected
 
-    def send_command_mock(self, command, timeout=None):
+    def send_command_mock(self, command, timeout=12000.0, ack_timeout=5.0):
         nonlocal current_log
         current_log.append(command)
         if 'M119' in command:

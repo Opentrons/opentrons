@@ -106,7 +106,7 @@ SMOOTHIE_ACK = 'ok\r\nok\r\n'
 
 class SmoothieError(Exception):
     def __init__(self, ret_code: str = None, command: str = None) -> None:
-        self.ret_code = ret_code
+        self.ret_code = ret_code or ''
         self.command = command
         super().__init__()
 
