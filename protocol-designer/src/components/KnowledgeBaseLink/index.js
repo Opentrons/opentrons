@@ -9,7 +9,7 @@ export const links = {
   protocolSteps: `${KNOWLEDGEBASE_ROOT_URL}/en/collections/1606688-building-a-protocol#steps`,
   customLabware: `https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions`,
   recommendedLabware:
-    'https://docs.google.com/document/d/1CrK-3uAQYDylb9h7EfJBv2Ri4FIF-XW92Uf0Zd4dWr4/edit?usp=sharing', // TODO - update before launch with intercom article
+    'https://support.opentrons.com/en/articles/3540964-what-labware-can-i-use-with-my-modules',
   pipetteGen1MultiModuleCollision:
     'https://docs.google.com/document/d/1kE8qwlx6jVoPmWe0AwNmHVbnDNa4RHnoLCcDTt0SA1s/edit?usp=sharing', // TODO - update before launch with intercom article
 }
