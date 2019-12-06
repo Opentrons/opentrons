@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.15.1-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.15.1-alpha.0...v3.15.1-alpha.1) (2019-12-06)
+
+**Note:** Version bump only for package labware-designer
+
+
+
+
+
 ## [3.15.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.15.0...v3.15.1-alpha.0) (2019-12-06)
 
 **Note:** Version bump only for package labware-designer
