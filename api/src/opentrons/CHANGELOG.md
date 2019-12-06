@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.15.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.15.0...v3.15.1-alpha.0) (2019-12-06)
+
+
+### Bug Fixes
+
+* **api:** Allow Location types for multichannels in transfer ([#4555](https://github.com/Opentrons/opentrons/issues/4555)) ([6449401](https://github.com/Opentrons/opentrons/commit/6449401))
+* **api:** always do equivalent v1 factory resets ([#4556](https://github.com/Opentrons/opentrons/issues/4556)) ([87abf31](https://github.com/Opentrons/opentrons/commit/87abf31))
+
+
+
+
+
 # [3.15.0](https://github.com/Opentrons/opentrons/compare/v3.14.1...v3.15.0) (2019-12-05)
 
 
