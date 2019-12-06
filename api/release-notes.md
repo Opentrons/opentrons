@@ -1,4 +1,4 @@
-# Robot OS Changes from 3.14.1 to 3.15.0
+# Robot OS Changes from 3.14.1 to 3.15.1
 
 For more details about this release, please see the full [technical change log][changelog]
 
@@ -27,6 +27,8 @@ We're also happy to announce that software support for our new [Thermocycler Mod
 - When a protocol with modules is canceled, ensure the protocol is able to reset. Previously, a cancel with a module temperature hold or set would cause the server to hang and require a robot power-cycle to recover.
 - The robot will now always calibrate to the top of tipracks in Protocol API Version 2 even if the calibrate to bottom advanced setting is set ([#4417](https://github.com/Opentrons/opentrons/issues/4417)). Thanks to Theo Sanderson (GitHub: @theosanderson) for the issue documentation and contribution of the fix!
 - Use a more efficient way to check whether a motor is moving in a given command, resulting in about a 10% speedup in protocol simulation for Protocol API Version 1 protocols and a 5% speedup for Protocol API Version 2 protocols (#4482). Thanks to Robert Atkinson (GitHub: @rgatkinson) for discovering the issue and suggesting a fix!
+- Fix an issue where you could not specify location within wells for transfers using a multichannel pipette in Protocol API v2
+- Fix an issue where resetting labware calibration would not reset the calibration for old-style labware like `96-flat`
 
 ## Known Issues (Python Protocol API version 1)
 
