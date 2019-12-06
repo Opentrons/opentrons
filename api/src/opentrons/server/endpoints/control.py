@@ -465,28 +465,16 @@ async def home(request):
     data = json.loads(req)
     target = data.get('target')
     if target == 'robot':
-        if ff.use_protocol_api_v2():
-            await hw.home()
-        else:
-            hw.home()
+        await hw.home()
         status = 200
         message = "Homing robot."
     elif target == 'pipette':
         mount = data.get('mount')
         if mount in ['left', 'right']:
-            if ff.use_protocol_api_v2():
-                await hw.home([Axis.by_mount(Mount[mount.upper()])])
-                await hw.home_plunger(Mount[mount.upper()])
-                status = 200
-                message = 'Pipette on {} homed successfuly'.format(mount)
-            else:
-                pipette, should_remove = _fetch_or_create_pipette(hw,
-                                                                  mount)
-                pipette.home()
-                if should_remove:
-                    hw.remove_instrument(mount)
-                status = 200
-                message = "Pipette on {} homed successfully.".format(mount)
+            await hw.home([Axis.by_mount(Mount[mount.upper()])])
+            await hw.home_plunger(Mount[mount.upper()])
+            status = 200
+            message = 'Pipette on {} homed successfuly'.format(mount)
         else:
             status = 400
             message = "Expected 'left' or 'right' as values for mount" \
