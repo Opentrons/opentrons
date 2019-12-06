@@ -11,11 +11,14 @@ def _instr_labware(loop):
     lw1 = ctx.load_labware('biorad_96_wellplate_200ul_pcr', 1)
     lw2 = ctx.load_labware('corning_96_wellplate_360ul_flat', 2)
     tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 3)
+    tiprack2 = ctx.load_labware('opentrons_96_tiprack_300ul', 4)
     instr = ctx.load_instrument('p300_single', Mount.RIGHT,
                                 tip_racks=[tiprack])
+    instr_multi = ctx.load_instrument(
+        'p300_multi', Mount.LEFT, tip_racks=[tiprack2])
 
     return {'ctx': ctx, 'instr': instr, 'lw1': lw1, 'lw2': lw2,
-            'tiprack': tiprack}
+            'tiprack': tiprack, 'instr_multi': instr_multi}
 
 
 def test_default_transfers(_instr_labware):
@@ -231,8 +234,10 @@ def test_location_wells(_instr_labware):
     lw1 = _instr_labware['lw1']
     lw2 = _instr_labware['lw2']
     aspirate_loc = lw1.wells()[0].top()
+    # Test single-channel transfer with locations
     list_of_locs = [
         well.bottom(5) for col in lw2.columns()[0:11] for well in col]
+
     xfer_plan = tx.TransferPlan(
         30,
         aspirate_loc,
@@ -247,6 +252,26 @@ def test_location_wells(_instr_labware):
         elif step['method'] == 'dispense':
             assert step['args'][1].point\
                     == list_of_locs[idx_dest].point
+            idx_dest += 1
+
+    multi_locs = [
+        col[0].bottom(5) for col in lw2.columns()[0:11]]
+    # Test multi-channel transfer with locations
+    xfer_plan = tx.TransferPlan(
+        30,
+        aspirate_loc,
+        multi_locs,
+        _instr_labware['instr_multi'],
+        max_volume=_instr_labware['instr_multi'].hw_pipette['working_volume'],
+        mode='transfer')
+
+    idx_dest = 0
+    for step in xfer_plan:
+        if step['method'] == 'aspirate':
+            assert step['args'][1].point == aspirate_loc.point
+        elif step['method'] == 'dispense':
+            assert step['args'][1].point\
+                    == multi_locs[idx_dest].point
             idx_dest += 1
 
 

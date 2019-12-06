@@ -777,13 +777,15 @@ class TransferPlan:
     def _multichannel_transfer(self, s, d):
         # TODO: add a check for container being multi-channel compatible?
         # Helper function for multi-channel use-case
-        assert isinstance(s, Well) or \
+        assert isinstance(s, Well) or isinstance(s, types.Location) or \
                (isinstance(s, List) and isinstance(s[0], Well)) or \
-               (isinstance(s, List) and isinstance(s[0], List)),\
+               (isinstance(s, List) and isinstance(s[0], List)) or \
+               (isinstance(s, List) and isinstance(s[0], types.Location)), \
                'Source should be a Well or List[Well] but is {}'.format(s)
-        assert isinstance(d, Well) or \
+        assert isinstance(d, Well) or isinstance(d, types.Location) or \
             (isinstance(d, List) and isinstance(d[0], Well)) or \
-            (isinstance(d, List) and isinstance(d[0], List)), \
+            (isinstance(d, List) and isinstance(d[0], List)) or \
+            (isinstance(d, List) and isinstance(d[0], types.Location)), \
             'Target should be a Well or List[Well] but is {}'.format(d)
 
         # TODO: Account for cases where a src/dest list has a non-first-row
@@ -813,5 +815,9 @@ class TransferPlan:
 
         return new_src, new_dst
 
-    def _is_first_row(self, well: Well):
-        return well in well.parent.rows()[0]
+    def _is_first_row(self, well: Union[Well, types.Location]):
+        if isinstance(well, types.Location):
+            test_well: Well = well.labware  # type: ignore
+        else:
+            test_well = well
+        return test_well in test_well.parent.rows()[0]
