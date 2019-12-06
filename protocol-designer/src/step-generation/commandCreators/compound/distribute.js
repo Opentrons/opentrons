@@ -4,19 +4,19 @@ import flatMap from 'lodash/flatMap'
 import { getWellsDepth } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import type {
-  DistributeArgs,
-  RobotState,
-  InvariantContext,
-  CommandCreator,
-  CompoundCommandCreator,
-} from '../../types'
 import { aspirate, dispense, blowout, replaceTip, touchTip } from '../atomic'
 import { mixUtil } from './mix'
+import { curryCommandCreator, reduceCommandCreators } from '../../utils'
+import type {
+  DistributeArgs,
+  CommandCreator,
+  CurriedCommandCreator,
+} from '../../types'
 
-const distribute = (args: DistributeArgs): CompoundCommandCreator => (
-  invariantContext: InvariantContext,
-  prevRobotState: RobotState
+const distribute: CommandCreator<DistributeArgs> = (
+  args,
+  invariantContext,
+  prevRobotState
 ) => {
   /**
     Distribute will aspirate from a single source well into multiple destination wells.
@@ -43,16 +43,14 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (
     !invariantContext.pipetteEntities[args.pipette]
   ) {
     // bail out before doing anything else
-    return [
-      _robotState => ({
-        errors: [
-          errorCreators.pipetteDoesNotExist({
-            actionName,
-            pipette: args.pipette,
-          }),
-        ],
-      }),
-    ]
+    return {
+      errors: [
+        errorCreators.pipetteDoesNotExist({
+          actionName,
+          pipette: args.pipette,
+        }),
+      ],
+    }
   }
 
   // TODO: BC 2019-07-08 these argument names are a bit misleading, instead of being values bound
@@ -80,18 +78,16 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (
 
   if (maxWellsPerChunk === 0) {
     // distribute vol exceeds pipette vol
-    return [
-      _robotState => ({
-        errors: [
-          errorCreators.pipetteVolumeExceeded({
-            actionName,
-            volume: args.volume,
-            maxVolume,
-            disposalVolume,
-          }),
-        ],
-      }),
-    ]
+    return {
+      errors: [
+        errorCreators.pipetteVolumeExceeded({
+          actionName,
+          volume: args.volume,
+          maxVolume,
+          disposalVolume,
+        }),
+      ],
+    }
   }
 
   const commandCreators = flatMap(
@@ -99,13 +95,13 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (
     (
       destWellChunk: Array<string>,
       chunkIndex: number
-    ): Array<CommandCreator> => {
+    ): Array<CurriedCommandCreator> => {
       const dispenseCommands = flatMap(
         destWellChunk,
-        (destWell: string, wellIndex: number): Array<CommandCreator> => {
+        (destWell: string, wellIndex: number): Array<CurriedCommandCreator> => {
           const touchTipAfterDispenseCommand = args.touchTipAfterDispense
             ? [
-                touchTip({
+                curryCommandCreator(touchTip, {
                   pipette,
                   labware: args.destLabware,
                   well: destWell,
@@ -116,7 +112,7 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (
             : []
 
           return [
-            dispense({
+            curryCommandCreator(dispense, {
               pipette,
               volume: args.volume,
               labware: args.destLabware,
@@ -130,20 +126,22 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (
       )
 
       // NOTE: identical to consolidate
-      let tipCommands: Array<CommandCreator> = []
+      let tipCommands: Array<CurriedCommandCreator> = []
 
       if (
         args.changeTip === 'always' ||
         (args.changeTip === 'once' && chunkIndex === 0)
       ) {
-        tipCommands = [replaceTip(args.pipette)]
+        tipCommands = [
+          curryCommandCreator(replaceTip, { pipette: args.pipette }),
+        ]
       }
 
       // TODO: BC 2018-11-29 instead of disposalLabware and disposalWell use blowoutLocation
       let blowoutCommands = []
       if (args.disposalVolume && args.disposalLabware && args.disposalWell) {
         blowoutCommands = [
-          blowout({
+          curryCommandCreator(blowout, {
             pipette: args.pipette,
             labware: args.disposalLabware,
             well: args.disposalWell,
@@ -161,7 +159,7 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (
 
       const touchTipAfterAspirateCommand = args.touchTipAfterAspirate
         ? [
-            touchTip({
+            curryCommandCreator(touchTip, {
               pipette: args.pipette,
               labware: args.sourceLabware,
               well: args.sourceWell,
@@ -187,7 +185,7 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (
       return [
         ...tipCommands,
         ...mixBeforeAspirateCommands,
-        aspirate({
+        curryCommandCreator(aspirate, {
           pipette,
           volume: args.volume * destWellChunk.length + disposalVolume,
           labware: args.sourceLabware,
@@ -203,7 +201,11 @@ const distribute = (args: DistributeArgs): CompoundCommandCreator => (
     }
   )
 
-  return commandCreators
+  return reduceCommandCreators(
+    commandCreators,
+    invariantContext,
+    prevRobotState
+  )
 }
 
 export default distribute

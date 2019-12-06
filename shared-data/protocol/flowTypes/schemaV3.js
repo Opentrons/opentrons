@@ -18,13 +18,17 @@ export type FileLabware = {|
 
 type FlowRateParams = {| flowRate: number |}
 
-type PipetteAccessParams = {| pipette: string, labware: string, well: string |}
+export type PipetteAccessParams = {|
+  pipette: string,
+  labware: string,
+  well: string,
+|}
 
 type VolumeParams = {| volume: number |}
 
 type OffsetParams = {| offsetFromBottomMm: number |}
 
-type _AspDispAirgapParams = {|
+export type _AspDispAirgapParams = {|
   ...FlowRateParams,
   ...PipetteAccessParams,
   ...VolumeParams,

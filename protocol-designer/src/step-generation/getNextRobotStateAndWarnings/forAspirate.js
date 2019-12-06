@@ -11,10 +11,7 @@ import {
   totalVolume,
 } from '../utils'
 import * as warningCreators from '../warningCreators'
-import type {
-  AspirateParams,
-  DispenseParams,
-} from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+import type { AspirateParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type {
   InvariantContext,
   RobotState,
@@ -30,12 +27,12 @@ type PipetteLiquidStateAcc = {
   warnings: Array<CommandCreatorWarning>,
 }
 
-export default function getNextRobotStateAndWarningsForAspDisp(
-  args: AspirateParams | DispenseParams,
+export function forAspirate(
+  params: AspirateParams,
   invariantContext: InvariantContext,
   prevRobotState: RobotState
 ): RobotStateAndWarnings {
-  const { pipette: pipetteId, volume, labware: labwareId } = args
+  const { pipette: pipetteId, volume, labware: labwareId } = params
 
   const { liquidState: prevLiquidState } = prevRobotState
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
@@ -44,7 +41,7 @@ export default function getNextRobotStateAndWarningsForAspDisp(
   const { allWellsShared, wellsForTips } = getWellsForTips(
     pipetteSpec.channels,
     labwareDef,
-    args.well
+    params.well
   )
 
   // helper to avoid writing this twice

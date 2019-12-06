@@ -1,13 +1,16 @@
 // @flow
 import flatMap from 'lodash/flatMap'
-import { repeatArray, blowoutUtil } from '../../utils'
+import {
+  repeatArray,
+  blowoutUtil,
+  curryCommandCreator,
+  reduceCommandCreators,
+} from '../../utils'
 import * as errorCreators from '../../errorCreators'
 import type {
   MixArgs,
-  InvariantContext,
-  RobotState,
   CommandCreator,
-  CompoundCommandCreator,
+  CurriedCommandCreator,
 } from '../../types'
 import { aspirate, dispense, replaceTip, touchTip } from '../atomic'
 
@@ -22,7 +25,7 @@ export function mixUtil(args: {
   dispenseOffsetFromBottomMm: number,
   aspirateFlowRateUlSec: number,
   dispenseFlowRateUlSec: number,
-}): Array<CommandCreator> {
+}): Array<CurriedCommandCreator> {
   const {
     pipette,
     labware,
@@ -36,7 +39,7 @@ export function mixUtil(args: {
   } = args
   return repeatArray(
     [
-      aspirate({
+      curryCommandCreator(aspirate, {
         pipette,
         volume,
         labware,
@@ -44,7 +47,7 @@ export function mixUtil(args: {
         offsetFromBottomMm: aspirateOffsetFromBottomMm,
         flowRate: aspirateFlowRateUlSec,
       }),
-      dispense({
+      curryCommandCreator(dispense, {
         pipette,
         volume,
         labware,
@@ -57,9 +60,10 @@ export function mixUtil(args: {
   )
 }
 
-const mix = (data: MixArgs): CompoundCommandCreator => (
-  invariantContext: InvariantContext,
-  prevRobotState: RobotState
+const mix: CommandCreator<MixArgs> = (
+  data,
+  invariantContext,
+  prevRobotState
 ) => {
   /**
     Mix will aspirate and dispense a uniform volume some amount of times from a set of wells
@@ -94,34 +98,30 @@ const mix = (data: MixArgs): CompoundCommandCreator => (
     !invariantContext.pipetteEntities[pipette]
   ) {
     // bail out before doing anything else
-    return [
-      _robotState => ({
-        errors: [errorCreators.pipetteDoesNotExist({ actionName, pipette })],
-      }),
-    ]
+    return {
+      errors: [errorCreators.pipetteDoesNotExist({ actionName, pipette })],
+    }
   }
 
   if (!prevRobotState.labware[labware]) {
-    return [
-      _robotState => ({
-        errors: [errorCreators.labwareDoesNotExist({ actionName, labware })],
-      }),
-    ]
+    return {
+      errors: [errorCreators.labwareDoesNotExist({ actionName, labware })],
+    }
   }
 
   // Command generation
   const commandCreators = flatMap(
     wells,
-    (well: string, wellIndex: number): Array<CommandCreator> => {
-      let tipCommands: Array<CommandCreator> = []
+    (well: string, wellIndex: number): Array<CurriedCommandCreator> => {
+      let tipCommands: Array<CurriedCommandCreator> = []
 
       if (changeTip === 'always' || (changeTip === 'once' && wellIndex === 0)) {
-        tipCommands = [replaceTip(pipette)]
+        tipCommands = [curryCommandCreator(replaceTip, { pipette })]
       }
 
       const touchTipCommands = data.touchTip
         ? [
-            touchTip({
+            curryCommandCreator(touchTip, {
               pipette,
               labware,
               well,
@@ -163,7 +163,11 @@ const mix = (data: MixArgs): CompoundCommandCreator => (
     }
   )
 
-  return commandCreators
+  return reduceCommandCreators(
+    commandCreators,
+    invariantContext,
+    prevRobotState
+  )
 }
 
 export default mix

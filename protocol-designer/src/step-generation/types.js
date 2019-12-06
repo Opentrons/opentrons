@@ -1,5 +1,5 @@
 // @flow
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type {
   LabwareTemporalProperties,
   ModuleTemporalProperties,
@@ -150,17 +150,17 @@ export type MixArgs = {
   dispenseFlowRateUlSec: number,
 }
 
-export type PauseArgs = {
+export type PauseArgs = {|
   ...$Exact<CommonArgs>,
   commandCreatorFnName: 'delay',
   message?: string,
   wait: number | true,
-  meta: ?{
+  meta: ?{|
     hours?: number,
     minutes?: number,
     seconds?: number,
-  },
-}
+  |},
+|}
 
 export type CommandCreatorArgs =
   | ConsolidateArgs
@@ -174,7 +174,9 @@ export type CommandCreatorArgs =
  */
 type TipId = string
 
-export type LocationLiquidState = { [ingredGroup: string]: { volume: number } }
+export type LocationLiquidState = {
+  [ingredGroup: string]: {| volume: number |},
+}
 
 export type SingleLabwareLiquidState = { [well: string]: LocationLiquidState }
 
@@ -264,14 +266,22 @@ export type CommandCreatorErrorResponse = {
   warnings?: Array<CommandCreatorWarning>,
 }
 
-export type CommandCreator = (
+export type CommandsAndWarnings = {|
+  commands: Array<Command>,
+  warnings?: Array<CommandCreatorWarning>,
+|}
+export type CommandCreatorResult =
+  | CommandsAndWarnings
+  | CommandCreatorErrorResponse
+export type CommandCreator<Args> = (
+  args: Args,
   invariantContext: InvariantContext,
   prevRobotState: RobotState
-) => CommandsAndRobotState | CommandCreatorErrorResponse
-export type CompoundCommandCreator = (
+) => CommandCreatorResult
+export type CurriedCommandCreator = (
   invariantContext: InvariantContext,
   prevRobotState: RobotState
-) => Array<CommandCreator>
+) => CommandCreatorResult
 
 export type Timeline = {|
   timeline: Array<CommandsAndRobotState>, // TODO: Ian 2018-06-14 avoid timeline.timeline shape, better names

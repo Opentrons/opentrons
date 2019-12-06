@@ -18,8 +18,7 @@ import {
   dropTipHelper,
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
 } from './fixtures'
-import { reduceCommandCreators } from '../utils'
-import _distribute from '../commandCreators/compound/distribute'
+import distribute from '../commandCreators/compound/distribute'
 import type { DistributeArgs } from '../types'
 
 const aspirateHelper = makeAspirateHelper()
@@ -27,16 +26,6 @@ const dispenseHelper = makeDispenseHelper()
 const touchTipHelper = makeTouchTipHelper()
 // TODO: Ian 2019-06-14 more elegant way to test the blowout offset calculation
 const BLOWOUT_OFFSET_ANY: any = expect.any(Number)
-
-// collapse this compound command creator into the signature of an atomic command creator
-const distribute = (args: DistributeArgs) => (
-  invariantContext,
-  initialRobotState
-) =>
-  reduceCommandCreators(_distribute(args)(invariantContext, initialRobotState))(
-    invariantContext,
-    initialRobotState
-  )
 
 let mixinArgs
 let invariantContext
@@ -89,7 +78,8 @@ describe('distribute: minimal example', () => {
       changeTip: 'never',
       volume: 60,
     }
-    const result = distribute(distributeArgs)(
+    const result = distribute(
+      distributeArgs,
       invariantContext,
       robotStateWithTip
     )
@@ -113,7 +103,8 @@ describe('tip handling for multiple distribute chunks', () => {
       volume: 90,
     }
 
-    const result = distribute(distributeArgs)(
+    const result = distribute(
+      distributeArgs,
       invariantContext,
       robotStateWithTip
     )
@@ -144,7 +135,8 @@ describe('tip handling for multiple distribute chunks', () => {
       volume: 90,
     }
 
-    const result = distribute(distributeArgs)(
+    const result = distribute(
+      distributeArgs,
       invariantContext,
       robotStateWithTip
     )
@@ -177,7 +169,8 @@ describe('tip handling for multiple distribute chunks', () => {
       changeTip: 'never',
       volume: 90,
     }
-    const result = distribute(distributeArgs)(
+    const result = distribute(
+      distributeArgs,
       invariantContext,
       robotStateWithTip
     )
@@ -204,7 +197,8 @@ describe('tip handling for multiple distribute chunks', () => {
       volume: 150,
     }
 
-    const result = distribute(distributeArgs)(
+    const result = distribute(
+      distributeArgs,
       invariantContext,
       robotInitialStateNoTipsRemain
     )
@@ -232,7 +226,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       disposalLabware: SOURCE_LABWARE,
       disposalWell: 'A1',
     }
-    const result = distribute(distributeArgs)(
+    const result = distribute(
+      distributeArgs,
       invariantContext,
       robotStateWithTip
     )
@@ -282,7 +277,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       volume: 150,
       preWetTip: true,
     }
-    const result = distribute(distributeArgs)(
+    const result = distribute(
+      distributeArgs,
       invariantContext,
       robotStateWithTip
     )
@@ -318,7 +314,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       volume: 90,
       touchTipAfterAspirate: true,
     }
-    const result = distribute(distributeArgs)(
+    const result = distribute(
+      distributeArgs,
       invariantContext,
       robotStateWithTip
     )
@@ -348,7 +345,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       volume: 90,
       touchTipAfterDispense: true,
     }
-    const result = distribute(distributeArgs)(
+    const result = distribute(
+      distributeArgs,
       invariantContext,
       robotStateWithTip
     )
@@ -392,7 +390,8 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
       disposalWell,
     }
 
-    const result = distribute(distributeArgs)(
+    const result = distribute(
+      distributeArgs,
       invariantContext,
       robotStateWithTip
     )
@@ -440,7 +439,8 @@ describe('invalid input + state errors', () => {
       pipette: 'no-such-pipette-id-here',
     }
 
-    const result = distribute(distributeArgs)(
+    const result = distribute(
+      distributeArgs,
       invariantContext,
       robotStateWithTip
     )
@@ -466,7 +466,8 @@ describe('distribute volume exceeds pipette max volume', () => {
       disposalLabware: null,
       disposalWell: null,
     }
-    const result = distribute(distributeArgs)(
+    const result = distribute(
+      distributeArgs,
       invariantContext,
       robotStateWithTip
     )
@@ -488,7 +489,8 @@ describe('distribute volume exceeds pipette max volume', () => {
       disposalLabware: FIXED_TRASH_ID,
       disposalWell: 'A1',
     }
-    const result = distribute(distributeArgs)(
+    const result = distribute(
+      distributeArgs,
       invariantContext,
       robotStateWithTip
     )

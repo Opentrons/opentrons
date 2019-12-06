@@ -12,7 +12,7 @@ import { selectors as stepsSelectors } from '../../ui/steps'
 import { selectors as fileDataSelectors } from '../../file-data'
 import type { WellGroup } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
+import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type { OutputSelector } from 'reselect'
 import type { BaseState, Selector } from '../../types'
 

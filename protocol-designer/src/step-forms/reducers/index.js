@@ -16,7 +16,8 @@ import {
   INITIAL_DECK_SETUP_STEP_ID,
   FIXED_TRASH_ID,
   SPAN7_8_10_11_SLOT,
-} from '../../constants.js'
+  FILE_MODULE_TYPE_TO_MODULE_TYPE,
+} from '../../constants'
 import { getPDMetadata } from '../../file-types'
 import {
   getDefaultsForStepType,
@@ -38,7 +39,6 @@ import type {
 } from '../../labware-ingred/actions'
 import type { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
 import type { FormData, StepIdType } from '../../form-types'
-import type { ModuleType } from '@opentrons/shared-data'
 import type {
   FileLabware,
   FilePipette,
@@ -645,14 +645,8 @@ export const moduleInvariantProperties = handleActions<ModuleEntities, *>(
       action: LoadFileAction
     ): ModuleEntities => {
       const { file } = action.payload
-      // NOTE: fallback for JSONv3
-      const FILE_MODULE_TYPE_TO_MODULE_TYPE: { [string]: ModuleType } = {
-        'temperature module': 'tempdeck',
-        'magnetic module': 'magdeck',
-        thermocycler: 'thermocycler',
-      }
       return mapValues(
-        file.modules || {}, // TODO: Ian 2019-11-11 remive this fallback to empty object once JSONv4 is migrated & released
+        file.modules || {}, // TODO: Ian 2019-11-11 this fallback to empty object is for JSONv3 protocols. Once JSONv4 is released, this should be handled in migration in PD
         (fileModule: FileModule, id: string) => ({
           id,
           type: FILE_MODULE_TYPE_TO_MODULE_TYPE[fileModule.moduleType],

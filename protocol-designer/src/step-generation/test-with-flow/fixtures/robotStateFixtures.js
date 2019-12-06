@@ -15,6 +15,7 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 
 import {
   DEFAULT_PIPETTE,
+  MULTI_PIPETTE,
   SOURCE_LABWARE,
   DEST_LABWARE,
   TROUGH_LABWARE,
@@ -114,9 +115,9 @@ export function makeContext(): InvariantContext {
       tiprackLabwareDef: fixture_tiprack_300_ul,
       spec: fixtureP300Single,
     },
-    p300MultiId: {
+    [MULTI_PIPETTE]: {
       name: 'p300_multi',
-      id: 'p300MultiId',
+      id: MULTI_PIPETTE,
       tiprackDefURI: getLabwareDefURI(fixture_tiprack_300_ul),
       tiprackLabwareDef: fixture_tiprack_300_ul,
       spec: fixtureP300Multi,
@@ -155,8 +156,8 @@ export const makeState = (args: {|
 // ===== "STANDARDS" for uniformity across tests =====
 export const makeStateArgsStandard = () => ({
   pipetteLocations: {
-    p300SingleId: { mount: 'left' },
-    p300MultiId: { mount: 'right' },
+    [DEFAULT_PIPETTE]: { mount: 'left' },
+    [MULTI_PIPETTE]: { mount: 'right' },
   },
   labwareLocations: {
     tiprack1Id: { slot: '1' },
@@ -186,7 +187,7 @@ export const getRobotStateWithTipStandard = (
     invariantContext,
     tiprackSetting: { tiprack1Id: true, tiprack2Id: true },
   })
-  robotStateWithTip.tipState.pipettes.p300SingleId = true
+  robotStateWithTip.tipState.pipettes[DEFAULT_PIPETTE] = true
   return robotStateWithTip
 }
 
@@ -198,7 +199,7 @@ export const getRobotStatePickedUpTipStandard = (
     invariantContext,
     tiprackSetting: { tiprack1Id: true },
   })
-  robotStatePickedUpOneTip.tipState.pipettes.p300SingleId = true
+  robotStatePickedUpOneTip.tipState.pipettes[DEFAULT_PIPETTE] = true
   robotStatePickedUpOneTip.tipState.tipracks.tiprack1Id.A1 = false
   return robotStatePickedUpOneTip
 }

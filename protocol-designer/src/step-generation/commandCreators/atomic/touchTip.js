@@ -1,17 +1,12 @@
 // @flow
-// import cloneDeep from 'lodash/cloneDeep'
 import { noTipOnPipette, pipetteDoesNotExist } from '../../errorCreators'
-import type {
-  InvariantContext,
-  RobotState,
-  CommandCreator,
-  CommandCreatorError,
-} from '../../types'
+import type { CommandCreator, CommandCreatorError } from '../../types'
 import type { TouchTipParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 
-const touchTip = (args: TouchTipParams): CommandCreator => (
-  invariantContext: InvariantContext,
-  prevRobotState: RobotState
+const touchTip: CommandCreator<TouchTipParams> = (
+  args,
+  invariantContext,
+  prevRobotState
 ) => {
   /** touchTip with given args. Requires tip. */
   const actionName = 'touchTip'
@@ -47,7 +42,6 @@ const touchTip = (args: TouchTipParams): CommandCreator => (
 
   return {
     commands,
-    robotState: prevRobotState,
   }
 }
 

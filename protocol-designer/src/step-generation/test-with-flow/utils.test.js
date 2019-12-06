@@ -11,8 +11,6 @@ import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fix
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 
 import {
-  reduceCommandCreators,
-  commandCreatorsTimeline,
   splitLiquid,
   mergeLiquid,
   AIR,
@@ -20,197 +18,6 @@ import {
   makeInitialRobotState,
 } from '../utils'
 import { FIXED_TRASH_ID } from './fixtures'
-import type { InvariantContext } from '../types'
-
-let invariantContext
-
-// NOTE: using 'any' types all over here so I don't have to write a longer test with real RobotState
-type CountState = { count: number }
-const addCreator: any = (num: number) => (
-  invariantContext: InvariantContext,
-  prevState: CountState
-) => ({
-  commands: [`command: add ${num}`],
-  robotState: { count: prevState.count + num },
-})
-
-const addCreatorWithWarning: any = (num: number) => (
-  invariantContext: InvariantContext,
-  prevState: CountState
-) => {
-  // adds a warning for no meaningful reason
-  const result = addCreator(num)(invariantContext, prevState)
-  return {
-    ...result,
-    warnings: [
-      {
-        type: 'ADD_WARNING',
-        message: `adding ${num} with warning example`,
-      },
-    ],
-  }
-}
-
-const multiplyCreator: any = (num: number) => (
-  invariantContext: InvariantContext,
-  prevState: CountState
-) => ({
-  commands: [`command: multiply by ${num}`],
-  robotState: { count: prevState.count * num },
-})
-
-const divideCreator: any = (num: number) => (
-  invariantContext: InvariantContext,
-  prevState: CountState
-) => {
-  if (num === 0) {
-    return {
-      errors: [
-        {
-          message: 'Cannot divide by zero',
-          type: 'DIVIDE_BY_ZERO',
-        },
-      ],
-    }
-  }
-
-  return {
-    commands: [`command: divide by ${num}`],
-    robotState: { count: prevState.count / num },
-  }
-}
-
-beforeEach(() => {
-  invariantContext = {
-    labwareEntities: {},
-    moduleEntities: {},
-    pipetteEntities: {},
-  }
-})
-
-describe('reduceCommandCreators', () => {
-  test('basic command creators', () => {
-    const initialState: any = { count: 0 }
-    const result: any = reduceCommandCreators([
-      addCreator(1),
-      multiplyCreator(2),
-    ])(invariantContext, initialState)
-
-    expect(result.robotState).toEqual({ count: 2 })
-
-    expect(result.commands).toEqual([
-      'command: add 1',
-      'command: multiply by 2',
-    ])
-  })
-
-  test('error in a command short-circuits the command creation pipeline', () => {
-    const initialState: any = { count: 5 }
-    const result = reduceCommandCreators([
-      addCreator(4),
-      divideCreator(0),
-      multiplyCreator(3),
-    ])(invariantContext, initialState)
-
-    expect(result).toEqual({
-      robotState: { count: 9 }, // last valid state before division error
-      commands: ['command: add 4'], // last valid set of commands before division error
-      errors: [
-        {
-          message: 'Cannot divide by zero',
-          type: 'DIVIDE_BY_ZERO',
-        },
-      ],
-      errorStep: 1, // divide step passed the error
-      warnings: [],
-    })
-  })
-
-  test('warnings accumulate in a flat array across the command chain', () => {
-    const initialState: any = { count: 5 }
-    const result = reduceCommandCreators([
-      addCreatorWithWarning(3),
-      multiplyCreator(2),
-      addCreatorWithWarning(1),
-    ])(invariantContext, initialState)
-
-    expect(result).toEqual({
-      robotState: { count: 17 },
-      commands: ['command: add 3', 'command: multiply by 2', 'command: add 1'],
-      warnings: [
-        { type: 'ADD_WARNING', message: 'adding 3 with warning example' },
-        { type: 'ADD_WARNING', message: 'adding 1 with warning example' },
-      ],
-    })
-  })
-})
-
-describe('commandCreatorsTimeline', () => {
-  test('any errors short-circuit the timeline chain', () => {
-    const initialState: any = { count: 5 }
-    const result = commandCreatorsTimeline([
-      addCreatorWithWarning(4),
-      divideCreator(0),
-      multiplyCreator(3),
-    ])(invariantContext, initialState)
-
-    expect(result).toEqual({
-      // error-creating "divide by zero" commands's index in the command creators array
-      errors: [
-        {
-          message: 'Cannot divide by zero',
-          type: 'DIVIDE_BY_ZERO',
-        },
-      ],
-
-      timeline: [
-        // add 4 step
-        {
-          robotState: { count: 5 + 4 },
-          commands: ['command: add 4'],
-          warnings: [
-            { type: 'ADD_WARNING', message: 'adding 4 with warning example' },
-          ],
-        },
-        // no more steps in the timeline, stopped by error
-      ],
-    })
-  })
-
-  test('warnings are indexed in an indexed command chain', () => {
-    const initialState: any = { count: 5 }
-    const result = commandCreatorsTimeline([
-      addCreatorWithWarning(3),
-      multiplyCreator(2),
-      addCreatorWithWarning(1),
-    ])(invariantContext, initialState)
-
-    expect(result.timeline).toEqual([
-      // add 3 w/ warning
-      {
-        robotState: { count: 8 },
-        commands: ['command: add 3'],
-        warnings: [
-          { type: 'ADD_WARNING', message: 'adding 3 with warning example' },
-        ],
-      },
-      // multiply by 2
-      {
-        robotState: { count: 16 },
-        commands: ['command: multiply by 2'],
-        // no warnings -> no `warnings` key
-      },
-      // add 1 w/ warning
-      {
-        robotState: { count: 17 },
-        commands: ['command: add 1'],
-        warnings: [
-          { type: 'ADD_WARNING', message: 'adding 1 with warning example' },
-        ],
-      },
-    ])
-  })
-})
 
 describe('splitLiquid', () => {
   const singleIngred = {
@@ -465,7 +272,7 @@ describe('makeInitialRobotState', () => {
         trashId: { slot: '12' },
       },
       moduleLocations: {
-        someTempModuleId: { slot: '3' },
+        someTempModuleId: { slot: '3', moduleState: { type: 'tempdeck' } },
       },
       pipetteLocations: {
         p10SingleId: { mount: 'left' },

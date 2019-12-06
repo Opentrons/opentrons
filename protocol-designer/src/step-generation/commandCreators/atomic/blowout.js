@@ -1,18 +1,12 @@
 // @flow
 import * as errorCreators from '../../errorCreators'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
-import type {
-  InvariantContext,
-  RobotState,
-  CommandCreator,
-  CommandCreatorError,
-} from '../../types'
+import type { CommandCreatorError, CommandCreator } from '../../types'
 
-import updateLiquidState from '../../dispenseUpdateLiquidState'
-
-const blowout = (args: BlowoutParams): CommandCreator => (
-  invariantContext: InvariantContext,
-  prevRobotState: RobotState
+const blowout: CommandCreator<BlowoutParams> = (
+  args,
+  invariantContext,
+  prevRobotState
 ) => {
   /** Blowout with given args. Requires tip. */
   const { pipette, labware, well, offsetFromBottomMm, flowRate } = args
@@ -58,19 +52,6 @@ const blowout = (args: BlowoutParams): CommandCreator => (
 
   return {
     commands,
-    robotState: {
-      ...prevRobotState,
-      liquidState: updateLiquidState(
-        {
-          invariantContext,
-          pipetteId: pipette,
-          labwareId: labware,
-          useFullVolume: true,
-          well,
-        },
-        prevRobotState.liquidState
-      ),
-    },
   }
 }
 

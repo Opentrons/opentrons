@@ -1,19 +1,14 @@
 // @flow
 import * as errorCreators from '../../errorCreators'
-import updateLiquidState from '../../dispenseUpdateLiquidState'
 import { modulePipetteCollision } from '../../utils'
 import type { DispenseParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
-import type {
-  InvariantContext,
-  RobotState,
-  CommandCreator,
-  CommandCreatorError,
-} from '../../types'
+import type { CommandCreator, CommandCreatorError } from '../../types'
 
 /** Dispense with given args. Requires tip. */
-const dispense = (args: DispenseParams): CommandCreator => (
-  invariantContext: InvariantContext,
-  prevRobotState: RobotState
+const dispense: CommandCreator<DispenseParams> = (
+  args,
+  invariantContext,
+  prevRobotState
 ) => {
   const { pipette, volume, labware, well, offsetFromBottomMm, flowRate } = args
 
@@ -61,19 +56,6 @@ const dispense = (args: DispenseParams): CommandCreator => (
 
   return {
     commands,
-    robotState: {
-      ...prevRobotState,
-      liquidState: updateLiquidState(
-        {
-          invariantContext,
-          pipetteId: pipette,
-          labwareId: labware,
-          volume,
-          well,
-        },
-        prevRobotState.liquidState
-      ),
-    },
   }
 }
 

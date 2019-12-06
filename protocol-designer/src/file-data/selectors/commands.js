@@ -2,6 +2,7 @@
 import { createSelector } from 'reselect'
 import last from 'lodash/last'
 import mapValues from 'lodash/mapValues'
+import omit from 'lodash/omit'
 import takeWhile from 'lodash/takeWhile'
 import uniqBy from 'lodash/uniqBy'
 import { getAllWellsForLabware } from '../../constants'
@@ -13,10 +14,10 @@ import type { BaseState, Selector } from '../../types'
 import type { StepIdType } from '../../form-types'
 import type {
   LabwareOnDeck,
-  ModuleOnDeck,
-  PipetteOnDeck,
   LabwareTemporalProperties,
+  ModuleOnDeck,
   ModuleTemporalProperties,
+  PipetteOnDeck,
   PipetteTemporalProperties,
 } from '../../step-forms'
 
@@ -91,9 +92,9 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
       [moduleId: string]: ModuleTemporalProperties,
     } = mapValues(
       initialDeckSetup.modules,
-      (m: ModuleOnDeck): ModuleTemporalProperties => ({
-        slot: m.slot,
-      })
+      (m: ModuleOnDeck): ModuleTemporalProperties => {
+        return omit(m, ['id', 'type', 'model'])
+      }
     )
 
     const robotState = StepGeneration.makeInitialRobotState({
@@ -107,34 +108,27 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
   }
 )
 
-function compoundCommandCreatorFromStepArgs(
-  stepArgs: StepGeneration.CommandCreatorArgs
-): ?StepGeneration.CompoundCommandCreator {
-  switch (stepArgs.commandCreatorFnName) {
-    case 'consolidate':
-      return StepGeneration.consolidate(stepArgs)
+const commandCreatorFromStepArgs = (
+  args: StepGeneration.CommandCreatorArgs
+): StepGeneration.CurriedCommandCreator | null => {
+  switch (args.commandCreatorFnName) {
+    case 'consolidate': {
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.consolidate,
+        args
+      )
+    }
     case 'delay': {
-      // TODO(Ian 2019-01-29): homogenize compound vs non-compound command
-      // creator type, maybe flow will get un-confused here
-      // TODO(mc, 2019-04-09): these typedefs should probably be exact objects
-      // (like redux actions) to have this switch block behave
-      return prevRobotState => [
-        // TODO: Ian 2019-04-18 this is a HACK the make delay work here, until compound vs non-compound cc types are merged
-        (invariantContext, prevRobotState) =>
-          // $FlowFixMe: TODOs above ^^^
-          StepGeneration.delay(stepArgs)(invariantContext, prevRobotState),
-      ]
+      return StepGeneration.curryCommandCreator(StepGeneration.delay, args)
     }
     case 'distribute':
-      return StepGeneration.distribute(stepArgs)
+      return StepGeneration.curryCommandCreator(StepGeneration.distribute, args)
     case 'transfer':
-      return StepGeneration.transfer(stepArgs)
+      return StepGeneration.curryCommandCreator(StepGeneration.transfer, args)
     case 'mix':
-      return StepGeneration.mix(stepArgs)
+      return StepGeneration.curryCommandCreator(StepGeneration.mix, args)
   }
-  console.warn(
-    `unhandled commandCreatorFnName: ${stepArgs.commandCreatorFnName}`
-  )
+  console.warn(`unhandled commandCreatorFnName: ${args.commandCreatorFnName}`)
   return null
 }
 
@@ -172,30 +166,29 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
       stepArgs => stepArgs
     )
 
-    const commandCreators = continuousStepArgs.reduce(
-      (acc: Array<StepGeneration.CommandCreator>, stepArgs, stepIndex) => {
-        let reducedCommandCreator = null
+    const curriedCommandCreators = continuousStepArgs.reduce(
+      (
+        acc: Array<StepGeneration.CurriedCommandCreator>,
+        args: StepGeneration.CommandCreatorArgs,
+        stepIndex
+      ): Array<StepGeneration.CurriedCommandCreator> => {
+        const curriedCommandCreator = commandCreatorFromStepArgs(args)
 
-        const compoundCommandCreator: ?StepGeneration.CompoundCommandCreator = compoundCommandCreatorFromStepArgs(
-          stepArgs
-        )
-        reducedCommandCreator =
-          compoundCommandCreator &&
-          StepGeneration.reduceCommandCreators(
-            compoundCommandCreator(invariantContext, initialRobotState)
-          )
-
-        if (!reducedCommandCreator) {
-          console.warn(
-            `commandCreatorFnName "${stepArgs.commandCreatorFnName}" not yet implemented for robotStateTimeline`
-          )
+        if (curriedCommandCreator === null) {
+          // unsupported command creator in args.commandCreatorFnName
           return acc
         }
 
         // Drop tips eagerly, per pipette
-        // NOTE: this assumes all step forms that use a pipette have both
+        //
+        // - If we don't have a 'changeTip: never' step for this pipette in the future,
+        // we know the current tip(s) aren't going to be reused, so we can drop them
+        // immediately after the current step is done.
+        //
+        // NOTE: this implementation assumes all step forms that use a pipette have both
         // 'pipette' and 'changeTip' fields (and they're not named something else).
-        const pipetteId = stepArgs.pipette
+        const pipetteId =
+          args.commandCreatorFnName !== 'delay' ? args.pipette : false
         if (pipetteId) {
           const nextStepArgsForPipette = continuousStepArgs
             .slice(stepIndex + 1)
@@ -207,20 +200,27 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
           if (!willReuseTip) {
             return [
               ...acc,
-              StepGeneration.reduceCommandCreators([
-                reducedCommandCreator,
-                StepGeneration.dropTip(pipetteId),
-              ]),
+              (_invariantContext, _prevRobotState) =>
+                StepGeneration.reduceCommandCreators(
+                  [
+                    curriedCommandCreator,
+                    StepGeneration.curryCommandCreator(StepGeneration.dropTip, {
+                      pipette: pipetteId,
+                    }),
+                  ],
+                  _invariantContext,
+                  _prevRobotState
+                ),
             ]
           }
         }
-
-        return [...acc, reducedCommandCreator]
+        return [...acc, curriedCommandCreator]
       },
       []
     )
 
-    const timeline = StepGeneration.commandCreatorsTimeline(commandCreators)(
+    const timeline = StepGeneration.commandCreatorsTimeline(
+      curriedCommandCreators,
       invariantContext,
       initialRobotState
     )

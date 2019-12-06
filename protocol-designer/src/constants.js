@@ -4,6 +4,7 @@ import * as componentLib from '@opentrons/components'
 import type {
   LabwareDefinition2,
   DeckSlot as DeckDefSlot,
+  ModuleType,
 } from '@opentrons/shared-data'
 import type { DeckSlot, WellVolumes } from './types'
 // TODO Ian 2018-11-27: import these from components lib, not from this constants file
@@ -76,3 +77,16 @@ export const DEFAULT_WELL_ORDER_SECOND_OPTION: 'l2r' = 'l2r'
 
 export const MIN_ENGAGE_HEIGHT = -4
 export const MAX_ENGAGE_HEIGHT = 16
+
+// TODO: IL 2019-12-03 migrate the ModuleType '___deck' strings to '___ module' forms.
+// We don't call modules 'deck' anymore, but the old code is entrenched
+export const FILE_MODULE_TYPE_TO_MODULE_TYPE: { [string]: ModuleType } = {
+  'temperature module': 'tempdeck',
+  'magnetic module': 'magdeck',
+  thermocycler: 'thermocycler',
+}
+export const MODULE_TYPE_TO_FILE_MODULE_TYPE: { [ModuleType]: string } = {
+  tempdeck: 'temperature module',
+  magdeck: 'magnetic module',
+  thermocycler: 'thermocycler',
+}

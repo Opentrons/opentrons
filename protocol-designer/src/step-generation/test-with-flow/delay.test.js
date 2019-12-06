@@ -6,25 +6,36 @@ const getRobotInitialState = (): any => {
   // This particular state shouldn't matter for delay
   return {}
 }
-
 // neither should InvariantContext
 const invariantContext: any = {}
+
+let mixInArgs
+
+beforeEach(() => {
+  mixInArgs = {
+    commandCreatorFnName: 'delay',
+    meta: null,
+    name: 'Delay Test',
+    description: 'test blah blah',
+  }
+})
 
 describe('delay indefinitely', () => {
   test('...', () => {
     const robotInitialState = getRobotInitialState()
     const message = 'delay indefinitely message'
 
-    const result = delay({
-      message,
-      wait: true,
-    })(invariantContext, robotInitialState)
+    const result = delay(
+      {
+        ...mixInArgs,
+        message,
+        wait: true,
+      },
+      invariantContext,
+      robotInitialState
+    )
 
     const res = getSuccessResult(result)
-
-    expect(res.robotState).toEqual(getRobotInitialState())
-    expect(res.robotState).toBe(robotInitialState) // same object
-
     expect(res.commands).toEqual([
       {
         command: 'delay',
@@ -42,16 +53,17 @@ describe('delay for a given time', () => {
     const robotInitialState = getRobotInitialState()
     const message = 'delay 95.5 secs message'
 
-    const result = delay({
-      message,
-      wait: 95.5,
-    })(invariantContext, robotInitialState)
+    const result = delay(
+      {
+        ...mixInArgs,
+        message,
+        wait: 95.5,
+      },
+      invariantContext,
+      robotInitialState
+    )
 
     const res = getSuccessResult(result)
-
-    expect(res.robotState).toEqual(getRobotInitialState())
-    expect(res.robotState).toBe(robotInitialState) // same object
-
     expect(res.commands).toEqual([
       {
         command: 'delay',

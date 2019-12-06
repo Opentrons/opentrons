@@ -3,20 +3,23 @@ import assert from 'assert'
 import zip from 'lodash/zip'
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import type {
-  TransferArgs,
-  InvariantContext,
-  RobotState,
-  CommandCreator,
-  CompoundCommandCreator,
-} from '../../types'
-import { blowoutUtil } from '../../utils'
+import {
+  blowoutUtil,
+  curryCommandCreator,
+  reduceCommandCreators,
+} from '../../utils'
 import { aspirate, dispense, replaceTip, touchTip } from '../atomic'
 import { mixUtil } from './mix'
+import type {
+  TransferArgs,
+  CurriedCommandCreator,
+  CommandCreator,
+} from '../../types'
 
-const transfer = (args: TransferArgs): CompoundCommandCreator => (
-  invariantContext: InvariantContext,
-  prevRobotState: RobotState
+const transfer: CommandCreator<TransferArgs> = (
+  args,
+  invariantContext,
+  prevRobotState
 ) => {
   /**
     Transfer will iterate through a set of 1 or more source and destination wells.
@@ -51,16 +54,14 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
     !invariantContext.pipetteEntities[args.pipette]
   ) {
     // bail out before doing anything else
-    return [
-      _robotState => ({
-        errors: [
-          errorCreators.pipetteDoesNotExist({
-            actionName,
-            pipette: args.pipette,
-          }),
-        ],
-      }),
-    ]
+    return {
+      errors: [
+        errorCreators.pipetteDoesNotExist({
+          actionName,
+          pipette: args.pipette,
+        }),
+      ],
+    }
   }
   const pipetteSpec = invariantContext.pipetteEntities[args.pipette].spec
 
@@ -107,18 +108,18 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
   let prevDestWell = null
   const commandCreators = sourceDestPairs.reduce(
     (
-      outerAcc: Array<CommandCreator>,
+      outerAcc: Array<CurriedCommandCreator>,
       wellPair: [string, string],
       pairIdx: number
-    ): Array<CommandCreator> => {
+    ): Array<CurriedCommandCreator> => {
       const [sourceWell, destWell] = wellPair
 
       const commands = subTransferVolumes.reduce(
         (
-          innerAcc: Array<CommandCreator>,
+          innerAcc: Array<CurriedCommandCreator>,
           subTransferVol: number,
           chunkIdx: number
-        ): Array<CommandCreator> => {
+        ): Array<CurriedCommandCreator> => {
           const isInitialSubtransfer = pairIdx === 0 && chunkIdx === 0
           let changeTipNow = false // 'never' by default
 
@@ -132,8 +133,8 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
             changeTipNow = isInitialSubtransfer || destWell !== prevDestWell
           }
 
-          const tipCommands: Array<CommandCreator> = changeTipNow
-            ? [replaceTip(args.pipette)]
+          const tipCommands: Array<CurriedCommandCreator> = changeTipNow
+            ? [curryCommandCreator(replaceTip, { pipette: args.pipette })]
             : []
 
           const preWetTipCommands =
@@ -167,7 +168,7 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
 
           const touchTipAfterAspirateCommands = args.touchTipAfterAspirate
             ? [
-                touchTip({
+                curryCommandCreator(touchTip, {
                   pipette: args.pipette,
                   labware: args.sourceLabware,
                   well: sourceWell,
@@ -179,7 +180,7 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
 
           const touchTipAfterDispenseCommands = args.touchTipAfterDispense
             ? [
-                touchTip({
+                curryCommandCreator(touchTip, {
                   pipette: args.pipette,
                   labware: args.destLabware,
                   well: destWell,
@@ -219,7 +220,7 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
             ...tipCommands,
             ...preWetTipCommands,
             ...mixBeforeAspirateCommands,
-            aspirate({
+            curryCommandCreator(aspirate, {
               pipette: args.pipette,
               volume: subTransferVol,
               labware: args.sourceLabware,
@@ -228,7 +229,7 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
               offsetFromBottomMm: aspirateOffsetFromBottomMm,
             }),
             ...touchTipAfterAspirateCommands,
-            dispense({
+            curryCommandCreator(dispense, {
               pipette: args.pipette,
               volume: subTransferVol,
               labware: args.destLabware,
@@ -254,7 +255,11 @@ const transfer = (args: TransferArgs): CompoundCommandCreator => (
     },
     []
   )
-  return commandCreators
+  return reduceCommandCreators(
+    commandCreators,
+    invariantContext,
+    prevRobotState
+  )
 }
 
 export default transfer
