@@ -29,6 +29,7 @@ We're also happy to announce that software support for our new [Thermocycler Mod
 - Use a more efficient way to check whether a motor is moving in a given command, resulting in about a 10% speedup in protocol simulation for Protocol API Version 1 protocols and a 5% speedup for Protocol API Version 2 protocols (#4482). Thanks to Robert Atkinson (GitHub: @rgatkinson) for discovering the issue and suggesting a fix!
 - Fix an issue where you could not specify location within wells for transfers using a multichannel pipette in Protocol API v2
 - Fix an issue where resetting labware calibration would not reset the calibration for old-style labware like `96-flat`
+- Fix an issue where accessing Magnetic Module status in a Protocol API version 1 protocol would fail simulation
 
 ## Known Issues (Python Protocol API version 1)
 
