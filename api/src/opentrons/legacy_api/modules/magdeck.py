@@ -24,6 +24,7 @@ class MagDeck(commands.CommandPublisher):
         self._port = port
         self._driver = None
         self._device_info = None
+        self._height_shadow = 0
 
     @commands.publish.both(command=commands.magdeck_calibrate)
     def calibrate(self):
@@ -66,6 +67,7 @@ class MagDeck(commands.CommandPublisher):
                 MAX_ENGAGE_HEIGHT))
         if self._driver and self._driver.is_connected():
             self._driver.move(height)
+        self._height_shadow = height
 
     @commands.publish.both(command=commands.magdeck_disengage)
     def disengage(self):
@@ -74,10 +76,14 @@ class MagDeck(commands.CommandPublisher):
         '''
         if self._driver and self._driver.is_connected():
             self._driver.home()
+        self._height_shadow = 0
 
     @property
     def current_height(self):
-        return self._driver.mag_position
+        if self._driver and self._driver.is_connected():
+            return self._driver.mag_position
+        else:
+            return self._height_shadow
 
     @property
     def engaged(self):
