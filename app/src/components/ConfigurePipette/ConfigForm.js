@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import { Link } from 'react-router-dom'
 import { Formik, Form } from 'formik'
 
 import startCase from 'lodash/startCase'
@@ -19,11 +18,11 @@ import ConfigFormGroup, {
 } from './ConfigFormGroup'
 
 import type {
-  PipetteSettings,
   PipetteSettingsField,
   PipetteSettingsFieldsMap,
-  PipetteSettingsUpdate,
-} from '../../robot-api/types'
+  PipetteSettingsFieldsUpdate,
+} from '../../pipettes/types'
+
 import type { FormValues } from './ConfigFormGroup'
 
 export type DisplayFieldProps = {|
@@ -39,10 +38,9 @@ export type DisplayQuirkFieldProps = {|
 |}
 
 type Props = {|
-  parentUrl: string,
-  pipetteId: string,
-  pipetteConfig: PipetteSettings,
-  updateConfig: (id: string, body: PipetteSettingsUpdate) => mixed,
+  settings: PipetteSettingsFieldsMap,
+  updateSettings: (fields: PipetteSettingsFieldsUpdate) => mixed,
+  closeModal: () => mixed,
   __showHiddenFields: boolean,
 |}
 
@@ -69,7 +67,7 @@ export default class ConfigForm extends React.Component<Props> {
   }
 
   getKnownQuirks = (): Array<DisplayQuirkFieldProps> => {
-    const quirks = this.props.pipetteConfig.fields[QUIRK_KEY]
+    const quirks = this.props.settings[QUIRK_KEY]
     if (!quirks) return []
     const quirkKeys = Object.keys(quirks)
     return quirkKeys.map(name => {
@@ -84,8 +82,8 @@ export default class ConfigForm extends React.Component<Props> {
   }
 
   getVisibleFields = (): PipetteSettingsFieldsMap => {
-    if (this.props.__showHiddenFields) return this.props.pipetteConfig.fields
-    return pick(this.props.pipetteConfig.fields, [
+    if (this.props.__showHiddenFields) return this.props.settings
+    return pick(this.props.settings, [
       ...PLUNGER_KEYS,
       ...POWER_KEYS,
       ...TIP_KEYS,
@@ -94,7 +92,7 @@ export default class ConfigForm extends React.Component<Props> {
 
   getUnknownKeys = (): Array<string> => {
     return keys<string>(
-      omit(this.props.pipetteConfig.fields, [
+      omit(this.props.settings, [
         ...PLUNGER_KEYS,
         ...POWER_KEYS,
         ...TIP_KEYS,
@@ -104,13 +102,13 @@ export default class ConfigForm extends React.Component<Props> {
   }
 
   handleSubmit = (values: FormValues) => {
-    const params = mapValues(values, v => {
-      if (v === true || v === false) {
-        return { value: v }
-      }
-      return v === '' ? null : { value: Number(v) }
+    const params = mapValues(values, (v: ?(string | boolean)) => {
+      if (v === true || v === false) return v
+      if (v === '' || v == null) return null
+      return Number(v)
     })
-    this.props.updateConfig(this.props.pipetteId, { fields: { ...params } })
+    console.log(values, params)
+    this.props.updateSettings(params)
   }
 
   getFieldValue(
@@ -166,7 +164,7 @@ export default class ConfigForm extends React.Component<Props> {
       if (f.value === true || f.value === false) return f.value
       return f.value !== f.default ? f.value.toString() : ''
     })
-    const initialQuirkValues = this.props.pipetteConfig.fields[QUIRK_KEY]
+    const initialQuirkValues = this.props.settings[QUIRK_KEY]
     const initialValues = Object.assign(
       {},
       initialFieldValues,
@@ -177,7 +175,7 @@ export default class ConfigForm extends React.Component<Props> {
   }
 
   render() {
-    const { parentUrl } = this.props
+    const { closeModal } = this.props
     const fields = this.getVisibleFields()
     const UNKNOWN_KEYS = this.getUnknownKeys()
     const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
@@ -243,7 +241,7 @@ export default class ConfigForm extends React.Component<Props> {
                     children: 'reset all',
                     onClick: handleReset,
                   },
-                  { children: 'cancel', Component: Link, to: parentUrl },
+                  { children: 'cancel', onClick: closeModal },
                   { children: 'save', type: 'submit', disabled: disableSubmit },
                 ]}
               />

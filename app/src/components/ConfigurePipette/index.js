@@ -1,15 +1,19 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
-import { push } from 'connected-react-router'
+import { useSelector } from 'react-redux'
+import last from 'lodash/last'
 
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import {
-  getPipetteSettingsState,
-  setPipetteSettings,
-  getSetPipetteSettingsRequestState,
+  SUCCESS,
+  FAILURE,
+  useDispatchApiRequest,
+  getRequestById,
 } from '../../robot-api'
-import { getAttachedPipettes } from '../../pipettes'
+import {
+  getAttachedPipettes,
+  getAttachedPipetteSettings,
+  updatePipetteSettings,
+} from '../../pipettes'
 import { getConfig } from '../../config'
 
 import { ScrollableAlertModal } from '../modals'
@@ -17,127 +21,74 @@ import ConfigMessage from './ConfigMessage'
 import ConfigForm from './ConfigForm'
 import ConfigErrorBanner from './ConfigErrorBanner'
 
-import type { State, Dispatch } from '../../types'
-import type { Mount } from '../../robot/types'
-import type { Robot } from '../../discovery/types'
+import type { State } from '../../types'
 
-import type {
-  RobotApiRequestState,
-  PipetteSettings,
-  PipetteSettingsUpdate,
-} from '../../robot-api/types'
+import type { Mount, PipetteSettingsFieldsUpdate } from '../../pipettes/types'
 
-type OP = {|
-  robot: Robot,
+// TODO(mc, 2019-12-09): i18n
+const PIPETTE_SETTINGS = 'Pipette Settings'
+const AN_ERROR_OCCURRED_WHILE_UPDATING =
+  "An error occurred while updating your pipette's settings. Please try again."
+
+type Props = {|
+  robotName: string,
   mount: Mount,
-  parentUrl: string,
-|}
-
-type SP = {|
-  pipetteId: ?string,
-  pipetteDisplayName: string,
-  pipetteConfig: ?PipetteSettings,
-  configRequest: RobotApiRequestState | null,
-  __showHiddenFields: boolean,
-|}
-
-type DP = {|
-  updateConfig: (id: string, PipetteSettingsUpdate) => mixed,
   closeModal: () => mixed,
 |}
 
-type Props = {| ...OP, ...SP, ...DP |}
+export function ConfigurePipette(props: Props) {
+  const { robotName, mount, closeModal } = props
+  const [dispatchRequest, requestIds] = useDispatchApiRequest()
 
-export default connect<Props, OP, SP, DP, State, Dispatch>(
-  mapStateToProps,
-  mapDispatchToProps
-)(ConfigurePipette)
+  const pipette = useSelector(
+    (state: State) => getAttachedPipettes(state, robotName)[mount]
+  )
+  const settings = useSelector(
+    (state: State) => getAttachedPipetteSettings(state, robotName)[mount]
+  )
 
-function ConfigurePipette(props: Props) {
-  const {
-    parentUrl,
-    pipetteId,
-    pipetteDisplayName,
-    pipetteConfig,
-    updateConfig,
-    closeModal,
-    configRequest,
-  } = props
-  const [error, setError] = React.useState<string | null>(null)
-  const prevRequestState = React.useRef<RobotApiRequestState | null>(null)
-
-  // when an in-progress request completes, check if the response was ok
-  // if ok, close the modal, else save the error message for display
-  React.useEffect(() => {
-    const prevResponse = prevRequestState.current?.response
-    const nextResponse = configRequest?.response
-
-    if (prevRequestState.current && !prevResponse && nextResponse) {
-      if (nextResponse.ok) {
-        closeModal()
-      } else {
-        setError(nextResponse.body.message || 'An unknown error occurred')
-      }
+  const updateSettings = (fields: PipetteSettingsFieldsUpdate) => {
+    if (pipette) {
+      dispatchRequest(updatePipetteSettings(robotName, pipette.id, fields))
     }
+  }
 
-    prevRequestState.current = configRequest
-  }, [configRequest, closeModal])
+  const updateRequest = useSelector((state: State) =>
+    getRequestById(state, last(requestIds))
+  )
 
-  const TITLE = `Pipette Settings: ${pipetteDisplayName}`
+  const updateError: string | null =
+    updateRequest && updateRequest.status === FAILURE
+      ? updateRequest.response.body?.message || AN_ERROR_OCCURRED_WHILE_UPDATING
+      : null
+
+  // TODO(mc, 2019-12-09): remove this feature flag
+  const __showHiddenFields = useSelector((state: State) =>
+    Boolean(getConfig(state).devInternal?.allPipetteConfig)
+  )
+
+  // when an in-progress request completes, close modal if response was ok
+  React.useEffect(() => {
+    if (updateRequest?.status === SUCCESS) {
+      closeModal()
+    }
+  }, [updateRequest, closeModal])
 
   return (
-    <ScrollableAlertModal heading={TITLE} alertOverlay>
-      {error && <ConfigErrorBanner message={error} />}
+    <ScrollableAlertModal
+      heading={`${PIPETTE_SETTINGS}: ${pipette?.modelSpecs.displayName || ''}`}
+      alertOverlay
+    >
+      {updateError && <ConfigErrorBanner message={updateError} />}
       <ConfigMessage />
-      {pipetteId && pipetteConfig && (
+      {settings && (
         <ConfigForm
-          pipetteId={pipetteId}
-          pipetteConfig={pipetteConfig}
-          parentUrl={parentUrl}
-          updateConfig={updateConfig}
-          __showHiddenFields={props.__showHiddenFields}
+          settings={settings}
+          updateSettings={updateSettings}
+          closeModal={closeModal}
+          __showHiddenFields={__showHiddenFields}
         />
       )}
     </ScrollableAlertModal>
   )
-}
-
-function mapStateToProps(state: State, ownProps: OP): SP {
-  const { robot, mount } = ownProps
-  const pipette = getAttachedPipettes(state, robot.name)[mount]
-  const pipetteId = pipette?.id
-  const pipetteConfig = pipetteId
-    ? getPipetteSettingsState(state, robot.name, pipetteId)
-    : null
-
-  const configRequest = pipetteId
-    ? getSetPipetteSettingsRequestState(state, robot.name, pipetteId)
-    : null
-
-  // TODO (ka 2019-2-12): This logic is used to get display name in slightly
-  // different ways in several different files.
-  const pipetteSpec = getPipetteModelSpecs(pipette?.model || '')
-  const pipetteDisplayName = pipetteSpec?.displayName || ''
-
-  const __showHiddenFields = Boolean(
-    getConfig(state).devInternal?.allPipetteConfig
-  )
-
-  return {
-    __showHiddenFields,
-    pipetteId,
-    pipetteDisplayName,
-    pipetteConfig,
-    configRequest,
-  }
-}
-
-function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
-  const { robot, parentUrl } = ownProps
-
-  return {
-    updateConfig: (id, params) =>
-      dispatch(setPipetteSettings(robot, id, params)),
-    closeModal: () => dispatch(push(parentUrl)),
-  }
 }

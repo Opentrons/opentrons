@@ -16,7 +16,7 @@ export function FormColumn(props: FormColProps) {
   return <div className={styles.form_column}>{props.children}</div>
 }
 
-export type FormValues = { [string]: ?string }
+export type FormValues = { [string]: ?(string | boolean) }
 
 type FormGroupProps = {
   groupLabel: string,

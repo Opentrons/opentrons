@@ -4,7 +4,7 @@ import { Switch, Route } from 'react-router-dom'
 
 import InstrumentSettings from '../../components/InstrumentSettings'
 import ChangePipette from '../../components/ChangePipette'
-import ConfigurePipette from '../../components/ConfigurePipette'
+import { ConfigurePipette } from '../../components/ConfigurePipette'
 import Page from '../../components/Page'
 
 import type { Match } from 'react-router-dom'
@@ -38,11 +38,11 @@ export default function InstrumentSettingsPage(props: Props) {
         />
         <Route
           path={`${path}/pipettes/config/:mount${RE_MOUNT}`}
-          render={props => (
+          render={routeProps => (
             <ConfigurePipette
-              mount={(props.match.params.mount: any)}
-              robot={robot}
-              parentUrl={url}
+              mount={(routeProps.match.params.mount: any)}
+              robotName={robot.name}
+              closeModal={routeProps.history.goBack}
             />
           )}
         />
