@@ -63,6 +63,8 @@ DISABLE_AXES = ''
 MOVEMENT_ERROR_MARGIN = 1/160  # Largest movement in mm for any step
 SEC_PER_MIN = 60
 
+DEFAULT_ACK_TIMEOUT = 5
+DEFAULT_EXECUTE_TIMEOUT = 12000
 DEFAULT_SMOOTHIE_TIMEOUT = 1
 DEFAULT_MOVEMENT_TIMEOUT = 30
 SMOOTHIE_BOOT_TIMEOUT = 3
@@ -104,7 +106,7 @@ SMOOTHIE_ACK = 'ok\r\nok\r\n'
 
 class SmoothieError(Exception):
     def __init__(self, ret_code: str = None, command: str = None) -> None:
-        self.ret_code = ret_code
+        self.ret_code = ret_code or ''
         self.command = command
         super().__init__()
 
@@ -918,9 +920,10 @@ class SmoothieDriver_3_0_0:
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(
             self,
-            command,
-            timeout=DEFAULT_SMOOTHIE_TIMEOUT,
-            suppress_error_msg=False):
+            command: str,
+            timeout: float = DEFAULT_EXECUTE_TIMEOUT,
+            suppress_error_msg: bool = False,
+            ack_timeout: float = DEFAULT_ACK_TIMEOUT):
         """
         Submit a GCODE command to the robot, followed by M400 to block until
         done. This method also ensures that any command on the B or C axis
@@ -942,16 +945,27 @@ class SmoothieDriver_3_0_0:
         function should specify `supress_error_msg=True`.
 
         :param command: the GCODE to submit to the robot
-        :param timeout: the time to wait before returning (indefinite wait if
-            this is set to none
+        :param timeout: the time to wait for the smoothie to execute the
+            command (after an m400). this should be long enough to allow the
+            command to execute. If this is None, the timeout will be infinite.
+            This is almost certainly not what you want.
         :param suppress_error_msg: flag for indicating that smoothie errors
             should not be logged
+        :param ack_timeout: The time to wait for the smoothie to ack a
+            command. For commands that queue (like move) or are short (like
+            pipette interrogation) this should be a small number, and is the
+            default. For commands the smoothie only acks after execution,
+            like home, it should be long enough to allow the command to
+            complete in the worst case. If this is None, the timeout will
+            be infinite. This is almost certainly not what you want.
         """
         if self.simulating:
             return
         try:
             with self._serial_lock:
-                return self._send_command_unsynchronized(command, timeout)
+                return self._send_command_unsynchronized(command,
+                                                         ack_timeout,
+                                                         timeout)
         except SmoothieError as se:
             # XXX: This is a reentrancy error because another command could
             # swoop in here. We're already resetting though and errors (should
@@ -970,16 +984,17 @@ class SmoothieDriver_3_0_0:
             raise SmoothieError(se.ret_code, command)
 
     def _send_command_unsynchronized(self,
-                                     command,
-                                     timeout=DEFAULT_SMOOTHIE_TIMEOUT):
+                                     command: str,
+                                     ack_timeout: float,
+                                     execute_timeout: float):
         cmd_ret = self._write_with_retries(
             command + SMOOTHIE_COMMAND_TERMINATOR,
-            5.0, DEFAULT_COMMAND_RETRIES)
+            ack_timeout, DEFAULT_COMMAND_RETRIES)
         cmd_ret = self._remove_unwanted_characters(command, cmd_ret)
         self._handle_return(cmd_ret)
         wait_ret = serial_communication.write_and_return(
             GCODES['WAIT'] + SMOOTHIE_COMMAND_TERMINATOR,
-            SMOOTHIE_ACK, self._connection, timeout=12000,
+            SMOOTHIE_ACK, self._connection, timeout=execute_timeout,
             tag='smoothie')
         wait_ret = self._remove_unwanted_characters(
             GCODES['WAIT'], wait_ret)
@@ -1073,7 +1088,7 @@ class SmoothieDriver_3_0_0:
 
         command = '{0} {1}'.format(
             self._generate_current_command(), relative_retract_command)
-        self._send_command(command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
+        self._send_command(command)
         self.dwell_axes('Y')
 
         # now it is safe to home the X axis
@@ -1085,7 +1100,11 @@ class SmoothieDriver_3_0_0:
                 self._generate_current_command(),
                 GCODES['HOME'] + 'X'
             )
-            self._send_command(command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
+            # home commands are acked after execution rather than queueing, so
+            # we want a long ack timeout and a short execution timeout
+            home_timeout = (HOMED_POSITION['X'] / XY_HOMING_SPEED) * 2
+            self._send_command(command, ack_timeout=home_timeout,
+                               timeout=5)
             self.update_homed_flags(flags={'X': True})
         finally:
             self.pop_axis_max_speed()
@@ -1104,7 +1123,10 @@ class SmoothieDriver_3_0_0:
             self._generate_current_command(),
             GCODES['HOME'] + 'Y'
         )
-        self._send_command(command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
+        fast_home_timeout = (HOMED_POSITION['Y'] / XY_HOMING_SPEED) * 2
+        # home commands are executed before ack, set a long ack timeout
+        self._send_command(command, ack_timeout=fast_home_timeout,
+                           timeout=5)
 
         # slow the maximum allowed speed on Y axis
         self.set_axis_max_speed({'Y': Y_RETRACT_SPEED})
@@ -1117,13 +1139,15 @@ class SmoothieDriver_3_0_0:
             GCODES['ABSOLUTE_COORDS']   # set back to abs coordinate system
         )
         try:
+            self._send_command(relative_retract_command)
+            # home commands are executed before ack, use a long ack timeout
+            slow_timeout = (Y_RETRACT_DISTANCE / Y_RETRACT_SPEED) * 2
             self._send_command(
-                relative_retract_command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
-            self._send_command(
-                GCODES['HOME'] + 'Y', timeout=DEFAULT_MOVEMENT_TIMEOUT)
+                GCODES['HOME'] + 'Y', ack_timeout=slow_timeout,
+                timeout=5)
             self.update_homed_flags(flags={'Y': True})
             self._send_command(
-                relative_retract_command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
+                relative_retract_command)
         finally:
             self.pop_axis_max_speed()  # bring max speeds back to normal
             self.dwell_axes('Y')
@@ -1379,8 +1403,11 @@ class SmoothieDriver_3_0_0:
                 command += ' ' + GCODES['HOME'] + ''.join(sorted(axes))
                 try:
                     log.debug("home: {}".format(command))
+                    # home commands are executed before ack, use a long ack
+                    # timeout and short execute timeout
                     self._send_command(
-                        command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
+                        command, ack_timeout=DEFAULT_EXECUTE_TIMEOUT,
+                        timeout=DEFAULT_ACK_TIMEOUT)
                     self.update_homed_flags(flags={ax: True for ax in axes})
                 finally:
                     # always dwell an axis after it has been homed

@@ -69,6 +69,7 @@ def _write_to_device_and_return(cmd, ack, device_connection, tag=None):
     response = device_connection.read_until(encoded_ack)
     log.debug(f'{tag}: Read <- {response}')
     if encoded_ack not in response:
+        log.warning(f'{tag}: timed out after {device_connection.timeout}')
         raise SerialNoResponse(
             'No response from serial port after {} second(s)'.format(
                 device_connection.timeout))
