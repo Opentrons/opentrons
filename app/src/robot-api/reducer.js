@@ -86,9 +86,7 @@ export function robotApiReducer(
 
     if (meta.response.ok === false) {
       const error =
-        action.payload && typeof action.payload.message === 'string'
-          ? action.payload
-          : {}
+        action.payload && action.payload.error ? action.payload.error : {}
 
       return {
         ...state,

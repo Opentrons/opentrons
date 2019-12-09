@@ -59,7 +59,7 @@ export function ConfigurePipette(props: Props) {
 
   const updateError: string | null =
     updateRequest && updateRequest.status === FAILURE
-      ? updateRequest.response.body?.message || AN_ERROR_OCCURRED_WHILE_UPDATING
+      ? updateRequest.error.message || AN_ERROR_OCCURRED_WHILE_UPDATING
       : null
 
   // TODO(mc, 2019-12-09): remove this feature flag
