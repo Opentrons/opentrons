@@ -14,19 +14,48 @@ import * as Types from './types'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { State } from '../types'
 
-const getPipettesState = (state: State) => state.pipettes
-
-export const getAttachedPipettes = (
+export const getAttachedPipettes: (
   state: State,
   robotName: string
-): Types.AttachedPipettesByMount => {
-  return (
-    getPipettesState(state)[robotName]?.attachedByMount || {
-      left: null,
-      right: null,
-    }
-  )
-}
+) => Types.AttachedPipettesByMount = createSelector(
+  (state, robotName) => state.pipettes[robotName]?.attachedByMount,
+  attachedByMount => {
+    return Constants.PIPETTE_MOUNTS.reduce<Types.AttachedPipettesByMount>(
+      (result, mount) => {
+        const attached = attachedByMount?.[mount] || null
+        const modelSpecs =
+          attached && attached.model
+            ? getPipetteModelSpecs(attached.model)
+            : null
+
+        return attached && attached.model && modelSpecs
+          ? { ...result, [mount]: { ...attached, modelSpecs } }
+          : result
+      },
+      { left: null, right: null }
+    )
+  }
+)
+
+export const getAttachedPipetteSettings: (
+  state: State,
+  robotName: string
+) => Types.PipetteSettingsByMount = createSelector(
+  getAttachedPipettes,
+  (state, robotName) => state.pipettes[robotName]?.settingsById,
+  (attachedByMount, settingsById) => {
+    return Constants.PIPETTE_MOUNTS.reduce<Types.PipetteSettingsByMount>(
+      (result, mount) => {
+        const attached = attachedByMount[mount]
+        const settings = attached ? settingsById?.[attached.id] : null
+        const fields = settings?.fields || null
+
+        return fields ? { ...result, [mount]: fields } : result
+      },
+      { left: null, right: null }
+    )
+  }
+)
 
 const EMPTY_INFO = {
   actual: null,
@@ -61,9 +90,7 @@ export const getProtocolPipettesInfo: (
         const actualPipette = attachedByMount[mount]
         const requestedAs = protocolPipette?.requestedAs
 
-        const actualModelSpecs = getPipetteModelSpecs(
-          actualPipette?.model || ''
-        )
+        const actualModelSpecs = actualPipette?.modelSpecs
         const requestedDisplayName = requestedAs
           ? getPipetteNameSpecs(requestedAs)?.displayName
           : protocolPipette?.modelSpecs?.displayName

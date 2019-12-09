@@ -37,12 +37,16 @@ const SPECS: Array<ReducerSpec> = [
     name: 'handles an action with meta.requestId and failure response',
     state: { abc: { status: 'pending' }, def: { status: 'pending' } },
     action: {
-      type: 'someScope:FETCH_THING_SUCCESS',
-      payload: { thing: 42 },
+      type: 'someScope:FETCH_THING_FAILURE',
+      payload: { message: 'AH' },
       meta: { requestId: 'abc', response: { ok: false } },
     },
     expected: {
-      abc: { status: 'failure', response: ({ ok: false }: any) },
+      abc: {
+        status: 'failure',
+        response: ({ ok: false }: any),
+        error: { message: 'AH' },
+      },
       def: { status: 'pending' },
     },
   },

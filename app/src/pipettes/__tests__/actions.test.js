@@ -1,6 +1,7 @@
 // @flow
 
 import * as Actions from '../actions'
+import * as Fixtures from '../__fixtures__'
 
 import type { PipettesAction } from '../types'
 
@@ -36,12 +37,16 @@ describe('robot settings actions', () => {
     {
       name: 'pipettes:FETCH_PIPETTES_SUCCESS',
       creator: Actions.fetchPipettesSuccess,
-      args: ['robot-name', { left: null, right: null }, { requestId: 'abc' }],
+      args: [
+        'robot-name',
+        Fixtures.mockFetchPipettesSuccess.body,
+        { requestId: 'abc' },
+      ],
       expected: {
         type: 'pipettes:FETCH_PIPETTES_SUCCESS',
         payload: {
           robotName: 'robot-name',
-          pipettes: { left: null, right: null },
+          pipettes: Fixtures.mockFetchPipettesSuccess.body,
         },
         meta: { requestId: 'abc' },
       },
@@ -54,6 +59,98 @@ describe('robot settings actions', () => {
         type: 'pipettes:FETCH_PIPETTES_FAILURE',
         payload: {
           robotName: 'robot-name',
+          error: { message: 'AH' },
+        },
+        meta: { requestId: 'abc' },
+      },
+    },
+    {
+      name: 'pipettes:FETCH_PIPETTE_SETTINGS',
+      creator: Actions.fetchPipetteSettings,
+      args: ['robot-name'],
+      expected: {
+        type: 'pipettes:FETCH_PIPETTE_SETTINGS',
+        payload: { robotName: 'robot-name' },
+        meta: {},
+      },
+    },
+    {
+      name: 'pipettes:FETCH_PIPETTE_SETTINGS_SUCCESS',
+      creator: Actions.fetchPipetteSettingsSuccess,
+      args: [
+        'robot-name',
+        { pipetteId: Fixtures.mockPipetteSettings },
+        { requestId: 'abc' },
+      ],
+      expected: {
+        type: 'pipettes:FETCH_PIPETTE_SETTINGS_SUCCESS',
+        payload: {
+          robotName: 'robot-name',
+          settings: { pipetteId: Fixtures.mockPipetteSettings },
+        },
+        meta: { requestId: 'abc' },
+      },
+    },
+    {
+      name: 'pipettes:FETCH_PIPETTE_SETTINGS_FAILURE',
+      creator: Actions.fetchPipetteSettingsFailure,
+      args: ['robot-name', { message: 'AH' }, { requestId: 'abc' }],
+      expected: {
+        type: 'pipettes:FETCH_PIPETTE_SETTINGS_FAILURE',
+        payload: {
+          robotName: 'robot-name',
+          error: { message: 'AH' },
+        },
+        meta: { requestId: 'abc' },
+      },
+    },
+    {
+      name: 'pipettes:UPDATE_PIPETTE_SETTINGS',
+      creator: Actions.updatePipetteSettings,
+      args: ['robot-name', 'pipette-id', { fieldA: 42, fieldB: null }],
+      expected: {
+        type: 'pipettes:UPDATE_PIPETTE_SETTINGS',
+        payload: {
+          robotName: 'robot-name',
+          pipetteId: 'pipette-id',
+          fields: { fieldA: 42, fieldB: null },
+        },
+        meta: {},
+      },
+    },
+    {
+      name: 'pipettes:UPDATE_PIPETTE_SETTINGS_SUCCESS',
+      creator: Actions.updatePipetteSettingsSuccess,
+      args: [
+        'robot-name',
+        'pipette-id',
+        Fixtures.mockUpdatePipetteSettingsSuccess.body.fields,
+        { requestId: 'abc' },
+      ],
+      expected: {
+        type: 'pipettes:UPDATE_PIPETTE_SETTINGS_SUCCESS',
+        payload: {
+          robotName: 'robot-name',
+          pipetteId: 'pipette-id',
+          fields: Fixtures.mockUpdatePipetteSettingsSuccess.body.fields,
+        },
+        meta: { requestId: 'abc' },
+      },
+    },
+    {
+      name: 'pipettes:UPDATE_PIPETTE_SETTINGS_FAILURE',
+      creator: Actions.updatePipetteSettingsFailure,
+      args: [
+        'robot-name',
+        'pipette-id',
+        { message: 'AH' },
+        { requestId: 'abc' },
+      ],
+      expected: {
+        type: 'pipettes:UPDATE_PIPETTE_SETTINGS_FAILURE',
+        payload: {
+          robotName: 'robot-name',
+          pipetteId: 'pipette-id',
           error: { message: 'AH' },
         },
         meta: { requestId: 'abc' },

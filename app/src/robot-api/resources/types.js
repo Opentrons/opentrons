@@ -1,6 +1,8 @@
 /* eslint-disable no-use-before-define */
 // @flow
-// resource model types
+// DEPRECATED
+// do not add to this file
+// do not import from this file if you can avoid it
 
 // modules
 // TODO(mc, 2019-04-25): normalize?
@@ -60,6 +62,7 @@ export type ThermocyclerModule = {|
   displayName: 'Thermocycler Module',
   data: ThermocyclerData,
 |}
+
 export type ModuleCommand =
   | 'set_temperature'
   | 'set_block_temperature'
@@ -69,38 +72,4 @@ export type ModuleCommand =
 export type ModuleCommandRequest = {|
   command_type: ModuleCommand,
   args?: Array<number>,
-|}
-
-// settings
-export type SettingsState = {|
-  pipettesById: {| [id: string]: PipetteSettings |},
-|}
-
-export type PipetteSettings = {|
-  info: {| name: ?string, model: ?string |},
-  fields: PipetteSettingsFieldsMap,
-|}
-
-export type PipetteSettingsFieldsMap = {|
-  [fieldId: string]: PipetteSettingsField,
-  quirks?: PipetteQuirksField,
-|}
-
-export type PipetteSettingsField = {|
-  value: ?number,
-  default: number,
-  min?: number,
-  max?: number,
-  units?: string,
-  type?: string,
-|}
-
-export type PipetteQuirksField = {
-  [quirkId: string]: boolean,
-}
-
-export type PipetteSettingsUpdate = {|
-  fields: {|
-    [id: string]: null | {| value: number |},
-  |},
 |}

@@ -1,5 +1,7 @@
 // @flow
 
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
+import * as Fixtures from '../__fixtures__'
 import * as Selectors from '../selectors'
 import type { State } from '../../types'
 
@@ -26,16 +28,10 @@ const SPECS: Array<SelectorSpec> = [
       pipettes: {
         robotName: {
           attachedByMount: {
-            left: null,
-            right: {
-              id: 'abc',
-              name: 'foo',
-              model: 'bar',
-              tip_length: 42,
-              mount_axis: 'a',
-              plunger_axis: 'b',
-            },
+            left: Fixtures.mockUnattachedPipette,
+            right: Fixtures.mockAttachedPipette,
           },
+          settingsById: null,
         },
       },
     },
@@ -43,14 +39,29 @@ const SPECS: Array<SelectorSpec> = [
     expected: {
       left: null,
       right: {
-        id: 'abc',
-        name: 'foo',
-        model: 'bar',
-        tip_length: 42,
-        mount_axis: 'a',
-        plunger_axis: 'b',
+        ...Fixtures.mockAttachedPipette,
+        modelSpecs: getPipetteModelSpecs(Fixtures.mockAttachedPipette.model),
       },
     },
+  },
+  {
+    name: 'getAttachedPipetteSettings returns pipette settings by mount',
+    selector: Selectors.getAttachedPipetteSettings,
+    state: {
+      pipettes: {
+        robotName: {
+          attachedByMount: {
+            left: Fixtures.mockUnattachedPipette,
+            right: Fixtures.mockAttachedPipette,
+          },
+          settingsById: {
+            [Fixtures.mockAttachedPipette.id]: Fixtures.mockPipetteSettings,
+          },
+        },
+      },
+    },
+    args: ['robotName'],
+    expected: { left: null, right: Fixtures.mockPipetteSettings.fields },
   },
 ]
 

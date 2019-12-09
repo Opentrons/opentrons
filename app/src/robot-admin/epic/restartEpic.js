@@ -23,19 +23,19 @@ const mapActionToRequest: ActionToRequestMapper<Types.RestartRobotAction> = (
   action,
   state
 ) => {
-  const { robot: _, ...meta } = action.meta
   const path =
     getRobotRestartPath(state, action.payload.robotName) ||
     Constants.RESTART_PATH
 
-  return [{ method: POST, path }, meta]
+  return { method: POST, path }
 }
 
-const mapResponseToAction: ResponseToActionMapper<Types.RestartRobotDoneAction> = (
-  response,
-  prevMeta
-) => {
+const mapResponseToAction: ResponseToActionMapper<
+  Types.RestartRobotAction,
+  Types.RestartRobotDoneAction
+> = (response, originalAction) => {
   const { host, body, ...responseMeta } = response
+  const { robot: _, ...prevMeta } = originalAction.meta
   const meta = { ...prevMeta, response: responseMeta }
 
   return response.ok

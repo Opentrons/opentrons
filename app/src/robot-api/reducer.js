@@ -85,9 +85,18 @@ export function robotApiReducer(
     }
 
     if (meta.response.ok === false) {
+      const error =
+        action.payload && typeof action.payload.message === 'string'
+          ? action.payload
+          : {}
+
       return {
         ...state,
-        [meta.requestId]: { status: FAILURE, response: meta.response },
+        [meta.requestId]: {
+          status: FAILURE,
+          response: meta.response,
+          error,
+        },
       }
     }
   }

@@ -1,50 +1,8 @@
 // @flow
 // hooks for components that depend on API state
-import { useReducer, useRef, useEffect, useCallback } from 'react'
+import { useReducer, useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import uniqueId from 'lodash/uniqueId'
-import { usePrevious } from '@opentrons/components'
-
-import type { RobotApiResponse, RobotApiRequestState } from './types'
-
-export type Handlers = $Shape<{|
-  onFinish: (response: RobotApiResponse) => mixed,
-|}>
-
-/**
- * DEPRECATED - do not use
- */
-export function useTriggerRobotApiAction(
-  trigger: () => mixed,
-  requestState: RobotApiRequestState | null,
-  handlers: Handlers = {}
-): () => void {
-  const hasFiredRef = useRef(false)
-  const prevRequest = usePrevious(requestState)
-  const { onFinish } = handlers
-
-  useEffect(() => {
-    const hasFired = hasFiredRef.current
-
-    // hasFired ensures we actually triggered a request (as opposed to a
-    // request to the same path triggering on a loop)
-    if (hasFired) {
-      const prevResponse = prevRequest?.response
-      const nextResponse = requestState?.response
-
-      // if prevResponse is null and nextResponse exists, fetch has finished
-      if (!prevResponse && nextResponse) {
-        hasFiredRef.current = false
-        if (typeof onFinish === 'function') onFinish(nextResponse)
-      }
-    }
-  }, [prevRequest, requestState, onFinish])
-
-  return () => {
-    hasFiredRef.current = true
-    trigger()
-  }
-}
 
 /**
  * React hook to attach a unique request ID to and dispatch an API action

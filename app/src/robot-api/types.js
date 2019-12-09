@@ -1,5 +1,5 @@
 // @flow
-import type { ModulesState, SettingsState } from './resources/types'
+import type { ModulesState } from './resources/types'
 
 // TODO(mc, 2019-11-12): deprecated, remove when able
 export * from './resources/types'
@@ -67,12 +67,6 @@ export type DeprecatedRobotApiAction =
       payload: RobotApiRequest,
       meta: {| id: string |},
     |}
-  | {| type: 'robotApi:FETCH_PIPETTE_SETTINGS', payload: RobotApiRequest |}
-  | {|
-      type: 'robotApi:SET_PIPETTE_SETTINGS',
-      payload: RobotApiRequest,
-      meta: {| id: string |},
-    |}
 
 export type RobotApiActionType = $PropertyType<DeprecatedRobotApiAction, 'type'>
 
@@ -114,7 +108,6 @@ export type RobotInstanceNetworkingState = {
 // TODO(mc, 2019-11-12): deprecated, remove when able
 export type RobotInstanceResourcesState = {|
   modules: ModulesState,
-  settings: SettingsState,
 |}
 
 // TODO(mc, 2019-11-12): deprecated, remove when able
@@ -126,7 +119,11 @@ export type RobotInstanceApiState = {|
 export type RequestState =
   | $ReadOnly<{| status: 'pending' |}>
   | $ReadOnly<{| status: 'success', response: RobotApiResponse |}>
-  | $ReadOnly<{| status: 'failure', response: RobotApiResponse |}>
+  | $ReadOnly<{|
+      status: 'failure',
+      response: RobotApiResponse,
+      error: { message?: string },
+    |}>
 
 // overall API state
 

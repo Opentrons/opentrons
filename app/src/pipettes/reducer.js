@@ -8,7 +8,8 @@ import type { PipettesState, PerRobotPipettesState } from './types'
 const INITIAL_STATE: PipettesState = {}
 
 const INITIAL_PIPETTES_STATE: PerRobotPipettesState = {
-  attachedByMount: { left: null, right: null },
+  attachedByMount: null,
+  settingsById: null,
 }
 
 export function pipettesReducer(
@@ -23,6 +24,35 @@ export function pipettesReducer(
       return {
         ...state,
         [robotName]: { ...robotState, attachedByMount: pipettes },
+      }
+    }
+
+    case Constants.FETCH_PIPETTE_SETTINGS_SUCCESS: {
+      const { robotName, settings } = action.payload
+      const robotState = state[robotName] || INITIAL_PIPETTES_STATE
+
+      return {
+        ...state,
+        [robotName]: { ...robotState, settingsById: settings },
+      }
+    }
+
+    case Constants.UPDATE_PIPETTE_SETTINGS_SUCCESS: {
+      const { robotName, pipetteId, fields } = action.payload
+      const robotState = state[robotName] || INITIAL_PIPETTES_STATE
+      const settingsById = robotState.settingsById
+      const pipetteSettings = settingsById?.[pipetteId]
+      if (!settingsById || !pipetteSettings) return state
+
+      return {
+        ...state,
+        [robotName]: {
+          ...robotState,
+          settingsById: {
+            ...settingsById,
+            [pipetteId]: { ...pipetteSettings, fields },
+          },
+        },
       }
     }
   }
