@@ -21,9 +21,16 @@ log = logging.getLogger(__name__)
 
 _common_settings_reset_options = [
     {
+        'id': 'tipProbe',
+        'name': 'Instrument Offset',
+        'description':
+        'Clear instrument offset calibration, tip probe data, and tip length calibration'  # noqa(E501)
+    },
+    {
         'id': 'labwareCalibration',
         'name': 'Labware Calibration',
-        'description': 'Clear labware calibration'
+        'description':
+        'Clear labware calibration and Protocol API v1 custom labware (created with labware.create())'  # noqa(E501)
     },
     {
         'id': 'bootScripts',
@@ -31,19 +38,6 @@ _common_settings_reset_options = [
         'description': 'Clear custom boot scripts'
     },
 ]
-
-_apiv2_settings_reset_options = [
-    {
-        'id': 'customLabware',
-        'name': 'Custom Labware',
-        'description': 'Clear custom labware definitions'
-    },
-    {
-        'id': 'tipProbe',
-        'name': 'Instrument Offset',
-        'description': 'Clear instrument offset calibration and tip probe data'
-    },
-] + _common_settings_reset_options
 
 
 _SETTINGS_RESTART_REQUIRED = False
@@ -55,7 +49,7 @@ _SETTINGS_RESTART_REQUIRED = False
 
 
 def reset_options() -> List[Dict[str, str]]:
-    return _apiv2_settings_reset_options
+    return _common_settings_reset_options
 
 
 async def get_advanced_settings(request: web.Request) -> web.Response:
