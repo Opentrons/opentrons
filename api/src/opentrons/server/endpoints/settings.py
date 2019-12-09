@@ -45,14 +45,6 @@ _apiv2_settings_reset_options = [
     },
 ] + _common_settings_reset_options
 
-_apiv1_settings_reset_options = [
-    {
-        'id': 'tipProbe',
-        'name': 'Tip Length',
-        'description': 'Clear tip probe data'
-    },
-] + _common_settings_reset_options
-
 
 _SETTINGS_RESTART_REQUIRED = False
 # This is a bit of global state that indicates whether a setting has changed
@@ -63,10 +55,7 @@ _SETTINGS_RESTART_REQUIRED = False
 
 
 def reset_options() -> List[Dict[str, str]]:
-    if ff.use_protocol_api_v2():
-        return _apiv2_settings_reset_options
-    else:
-        return _apiv1_settings_reset_options
+    return _apiv2_settings_reset_options
 
 
 async def get_advanced_settings(request: web.Request) -> web.Response:
@@ -191,16 +180,14 @@ async def reset(request: web.Request) -> web.Response:  # noqa(C901)
     log.info("Reset requested for {}".format(', '.join(data.keys())))
     if data.get('tipProbe'):
         config = rc.load()
-        if ff.use_protocol_api_v2():
-            config = config._replace(
-                instrument_offset=rc.build_fallback_instrument_offset({}))
-        else:
-            config.tip_length.clear()
+        config = config._replace(
+            instrument_offset=rc.build_fallback_instrument_offset({}))
+        config.tip_length.clear()
         rc.save_robot_settings(config)
+
     if data.get('labwareCalibration'):
         labware.clear_calibrations()
-        if not ff.use_protocol_api_v2():
-            db.reset()
+        db.reset()
 
     if data.get('customLabware'):
         labware.delete_all_custom_labware()
