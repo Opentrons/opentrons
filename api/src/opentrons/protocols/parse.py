@@ -5,6 +5,7 @@ opentrons.protocols.parse: functions and state for parsing protocols
 import ast
 import itertools
 import json
+import logging
 import pkgutil
 import re
 from io import BytesIO
@@ -16,6 +17,8 @@ import jsonschema  # type: ignore
 from opentrons.config import feature_flags as ff
 from .types import Protocol, PythonProtocol, JsonProtocol, Metadata, APIVersion
 from .bundle import extract_bundle
+
+MODULE_LOG = logging.getLogger(__name__)
 
 # match e.g. "2.0" but not "hi", "2", "2.0.1"
 API_VERSION_RE = re.compile(r'^(\d+)\.(\d+)$')
@@ -64,6 +67,7 @@ def _parse_python(
 
     parsed = ast.parse(protocol_contents,
                        filename=ast_filename)
+
     metadata = extract_metadata(parsed)
     protocol = compile(parsed, filename=ast_filename, mode='exec')
     version = get_version(metadata, parsed)
@@ -301,7 +305,8 @@ def validate_json(protocol_json: Dict[Any, Any]) -> int:
             f'JSON protocol version {version_num} is '
             'deprecated. Please upload your protocol into Protocol '
             'Designer and save it to migrate the protocol to a later '
-            'version.')
+            'version. This error might mean a labware '
+            'definition was specified instead of a protocol.')
     protocol_schema = _get_schema_for_protocol(version_num)
     # instruct schema how to resolve all $ref's used in protocol schemas
     schema_body = pkgutil.get_data(  # type: ignore
@@ -316,5 +321,12 @@ def validate_json(protocol_json: Dict[Any, Any]) -> int:
             "opentronsLabwareSchemaV2": labware_schema_v2
         })
     # do the validation
-    jsonschema.validate(protocol_json, protocol_schema, resolver=resolver)
+    try:
+        jsonschema.validate(protocol_json, protocol_schema, resolver=resolver)
+    except jsonschema.ValidationError:
+        MODULE_LOG.exception("Bad protocol uploaded (does not match schema)")
+        raise RuntimeError(
+            'Could not parse protocol: does not match schema. This error '
+            'might also mean a labware definition was specified instead of '
+            'a protocol.')
     return version_num

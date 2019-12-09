@@ -1,7 +1,6 @@
 import ast
 import json
 
-import jsonschema
 import pytest
 
 from opentrons.protocols.parse import (extract_metadata,
@@ -184,7 +183,7 @@ def test_validate_json(get_json_protocol_fixture):
     # valid data that has no schema should fail
     with pytest.raises(RuntimeError, match='deprecated'):
         validate_json({'protocol-schema': '1.0.0'})
-    with pytest.raises(jsonschema.ValidationError):
+    with pytest.raises(RuntimeError):
         validate_json({'schemaVersion': '3'})
     v3 = get_json_protocol_fixture('3', 'testAllAtomicSingleV3')
     assert validate_json(v3) == 3

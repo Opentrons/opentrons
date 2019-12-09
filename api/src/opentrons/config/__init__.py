@@ -73,6 +73,13 @@ if IS_ROBOT:
             ARCHITECTURE = SystemArchitecture.BUILDROOT
         except Exception:
             log.exception("Could not find version file in /etc/VERSION.json")
+    JUPYTER_NOTEBOOK_ROOT_DIR: Optional[Path]\
+        = Path('/var/lib/jupyter/notebooks/')
+    JUPYTER_NOTEBOOK_LABWARE_DIR: Optional[Path]\
+        = JUPYTER_NOTEBOOK_ROOT_DIR/'labware'  # type: ignore
+else:
+    JUPYTER_NOTEBOOK_ROOT_DIR = None
+    JUPYTER_NOTEBOOK_LABWARE_DIR = None
 
 
 def name() -> str:

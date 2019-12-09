@@ -18,7 +18,7 @@ from typing import (Any, Dict, List, Mapping, TextIO, Tuple, BinaryIO,
 import opentrons
 import opentrons.commands
 import opentrons.broker
-from opentrons.config import feature_flags as ff
+from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
 from opentrons import protocol_api
 from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import (
@@ -107,7 +107,9 @@ class CommandScraper:
 def get_protocol_api(
         version: Union[str, APIVersion],
         bundled_labware: Dict[str, Dict[str, Any]] = None,
-        bundled_data: Dict[str, bytes] = None) -> protocol_api.ProtocolContext:
+        bundled_data: Dict[str, bytes] = None,
+        extra_labware: Dict[str, Dict[str, Any]] = None)\
+        -> protocol_api.ProtocolContext:
     """
     Build and return a :py:class:`ProtocolContext`connected to
     Virtual Smoothie.
@@ -121,6 +123,10 @@ def get_protocol_api(
         >>> protocol = get_protocol_api()
         >>> instr = protocol.load_instrument('p300_single', 'right')
         >>> instr.home()
+
+    If ``extra_labware`` is not specified, any labware definitions saved in
+    the ``labware`` directory of the Jupyter notebook directory will be
+    available.
 
     :param version: The API version to use. This must be lower than
                     :py:attr:`opentrons.protocol_api.MAX_SUPPORTED_VERSION`.
@@ -136,7 +142,13 @@ def get_protocol_api(
     :param bundled_data: If specified, a mapping from filenames to contents
                          for data to be available in the protocol from
                          :py:attr:`.ProtocolContext.bundled_data`.
-
+    :param extra_labware: If specified, a mapping from labware names to
+                          labware definitions for labware to consider in the
+                          protocol in addition to those stored on the robot.
+                          If this is an empty dict, and this function is called
+                          on a robot, it will look in the 'labware'
+                          subdirectory of the Jupyter data directory for
+                          custom labware.
     :returns opentrons.protocol_api.ProtocolContext: The protocol context.
     """
     if isinstance(version, str):
@@ -145,14 +157,19 @@ def get_protocol_api(
         raise TypeError('version must be either a string or an APIVersion')
     else:
         checked_version = version
+    if extra_labware is None and IS_ROBOT:
+        extra_labware = labware_from_paths(
+            [str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
     return _build_protocol_context(
-        checked_version, bundled_labware, bundled_data)
+        checked_version, bundled_labware, bundled_data, extra_labware)
 
 
 def _build_protocol_context(
         version: APIVersion = None,
         bundled_labware: Dict[str, Dict[str, Any]] = None,
-        bundled_data: Dict[str, bytes] = None) -> protocol_api.ProtocolContext:
+        bundled_data: Dict[str, bytes] = None,
+        extra_labware: Dict[str, Dict[str, Any]] = None,)\
+        -> protocol_api.ProtocolContext:
     """ Internal version of :py:meth:`get_protocol_api` that allows deferring
     version specification for use with
     :py:meth:`.protocol_api.execute.run_protocol`
@@ -160,7 +177,8 @@ def _build_protocol_context(
     context = protocol_api.contexts.ProtocolContext(
         bundled_labware=bundled_labware,
         bundled_data=bundled_data,
-        api_version=version)
+        api_version=version,
+        extra_labware=extra_labware)
     context.home()
     return context
 
@@ -250,8 +268,9 @@ def simulate(protocol_file: TextIO,
     :type log_level: 'debug', 'info', 'warning', or 'error'
     :returns: A tuple of a run log for user output, and possibly the required
               data to write to a bundle to bundle this protocol. The bundle is
-              only emitted if the API v2 feature flag is set and this is an
-              unbundled python protocol. In other cases it is None.
+              only emitted if bundling is allowed (see
+              :py:meth:`allow_bundling`)  and this is an unbundled Protocol API
+              v2 python protocol. In other cases it is None.
     """
     stack_logger = logging.getLogger('opentrons')
     stack_logger.propagate = propagate_logs
@@ -261,6 +280,7 @@ def simulate(protocol_file: TextIO,
         extra_labware = labware_from_paths(custom_labware_paths)
     else:
         extra_labware = {}
+
     if custom_data_paths:
         extra_data = datafiles_from_paths(custom_data_paths)
     else:
@@ -282,15 +302,20 @@ def simulate(protocol_file: TextIO,
 
         scraper = _simulate_v1()
     else:
+        # we want a None literal rather than empty dict so get_protocol_api
+        # will look for custom labware if this is a robot
+        gpa_extras = getattr(protocol, 'extra_labware', None) or None
         context = get_protocol_api(
             getattr(protocol, 'api_level', MAX_SUPPORTED_VERSION),
             bundled_labware=getattr(protocol, 'bundled_labware', None),
-            bundled_data=getattr(protocol, 'bundled_data', None))
+            bundled_data=getattr(protocol, 'bundled_data', None),
+            extra_labware=gpa_extras)
         scraper = CommandScraper(stack_logger, log_level, context.broker)
         execute.run_protocol(protocol, context)
         if isinstance(protocol, PythonProtocol)\
            and protocol.api_level >= APIVersion(2, 0)\
-           and protocol.bundled_labware is None:
+           and protocol.bundled_labware is None\
+           and allow_bundle():
             bundle_contents = bundle_from_sim(
                 protocol, context)
 
@@ -321,15 +346,59 @@ def format_runlog(runlog: List[Mapping[str, Any]]) -> str:
 def _get_bundle_args(
         parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     parser.add_argument(
+        '-b', '--bundle', nargs='?', const='PROTOCOL.ot2.zip', default=None,
+        action='store', type=str,
+        help='Bundle the specified protocol file, any labware used in it, and '
+             'any files in the data directories specified with -D into a '
+             'bundle. This bundle can be executed on a robot and carries with '
+             'it all the custom labware and data required to run. Without a '
+             'value specified in this argument, the bundle will be called '
+             '(protocol name without the .py).ot2.zip, but you can specify '
+             'a different output name. \n'
+             'These bundles are a beta feature, and their behavior may change')
+    return parser
+
+
+def allow_bundle() -> bool:
+    """
+    Check if bundling is allowed with a special not-exposed-to-the-app flag.
+
+    Returns ``True`` if the environment variable
+    ``OT_API_FF_allowBundleCreation`` is ``"1"``
+    """
+    return os.getenv('OT_API_FF_allowBundleCreation') == '1'
+
+
+def get_arguments(
+        parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
+    """ Get the argument parser for this module
+
+    Useful if you want to use this module as a component of another CLI program
+    and want to add its arguments.
+
+    :param parser: A parser to add arguments to. If not specified, one will be
+                   created.
+    :returns argparse.ArgumentParser: The parser with arguments added.
+    """
+    parser.add_argument(
+        '-l', '--log-level',
+        choices=['debug', 'info', 'warning', 'error', 'none'],
+        default='warning',
+        help='Specify the level filter for logs to show on the command line. '
+        'Log levels below warning can be chatty. If "none", do not show logs')
+
+    parser.add_argument(
         '-L', '--custom-labware-path',
         action='append', default=[os.getcwd()],
         help='Specify directories to search for custom labware definitions. '
              'You can specify this argument multiple times. Once you specify '
              'a directory in this way, labware definitions in that directory '
              'will become available in ProtocolContext.load_labware(). '
-             'Bundle execution will still only allow labware defined in '
-             'the bundle. Only directories specified directly by '
-             'this argument are searched, not their children.')
+             'Only directories specified directly by '
+             'this argument are searched, not their children. JSON files that '
+             'do not define labware will be ignored with a message. '
+             'By default, the current directory (the one from which you are '
+             'invoking this program) will be searched for labware.')
     parser.add_argument(
         '-D', '--custom-data-path',
         action='append', nargs='?', const='.', default=[],
@@ -355,39 +424,7 @@ def _get_bundle_args(
              'is passed). Can be specified multiple times with different '
              'files. It is usually a better idea to use this than -D because '
              'there is less possibility of accidentally including something.')
-    parser.add_argument(
-        '-b', '--bundle', nargs='?', const='PROTOCOL.ot2.zip', default=None,
-        action='store', type=str,
-        help='Bundle the specified protocol file, any labware used in it, and '
-             'any files in the data directories specified with -D into a '
-             'bundle. This bundle can be executed on a robot and carries with '
-             'it all the custom labware and data required to run. Without a '
-             'value specified in this argument, the bundle will be called '
-             '(protocol name without the .py).ot2.zip, but you can specify '
-             'a different output name. \n'
-             'These bundles are a beta feature, and their behavior may change')
-    return parser
-
-
-def get_arguments(
-        parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
-    """ Get the argument parser for this module
-
-    Useful if you want to use this module as a component of another CLI program
-    and want to add its arguments.
-
-    :param parser: A parser to add arguments to. If not specified, one will be
-                   created.
-    :returns argparse.ArgumentParser: The parser with arguments added.
-    """
-    parser.add_argument(
-        '-l', '--log-level',
-        choices=['debug', 'info', 'warning', 'error', 'none'],
-        default='warning',
-        help='Specify the level filter for logs to show on the command line. '
-        'Log levels below warning can be chatty. If "none", do not show logs')
-
-    if ff.use_protocol_api_v2():
+    if allow_bundle():
         parser = _get_bundle_args(parser)
 
     parser.add_argument(
