@@ -2,14 +2,17 @@
 import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
-import { getIsTiprack, getLabwareDisplayName } from '@opentrons/shared-data'
+import {
+  getIsTiprack,
+  getLabwareDisplayName,
+  getLabwareHasQuirk,
+} from '@opentrons/shared-data'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 
 import type { Options } from '@opentrons/components'
 import type { Selector } from '../../types'
 import type { LabwareEntity } from '../../step-forms'
-import { getLabwareHasQuirk } from '../../../../shared-data/js/helpers'
 
 export const getLabwareNicknamesById: Selector<{
   [labwareId: string]: string,

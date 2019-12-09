@@ -1,9 +1,8 @@
 import { getDisposalLabwareOptions } from '../selectors'
-import fixture_tiprack_1000_ul from '../../../../../shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
-import fixture_tiprack_10_ul from '../../../../../shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import fixture_trash from '../../../../../shared-data/labware/fixtures/2/fixture_trash.json'
+import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
+import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
+import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
 
-jest.mock('../../../labware-defs/utils')
 describe('labware selectors', () => {
   let names
   let tipracks
@@ -29,12 +28,13 @@ describe('labware selectors', () => {
 
     names = {
       trashId: 'Trash',
+      trashId2: 'Trash',
       fixture_tiprack_1000_ul: 'Opentrons Tip Rack 1000 µL',
       fixture_tiprack_10_ul: 'Opentrons Tip Rack 10 µL',
     }
   })
   describe('getDisposalLabwareOptions', () => {
-    test('returns an empty list when no labware is provided', () => {
+    test('returns an empty list when labware is NOT provided', () => {
       expect(getDisposalLabwareOptions.resultFunc([], names)).toEqual([])
     })
     test('returns empty list when trash is NOT present', () => {
@@ -45,7 +45,7 @@ describe('labware selectors', () => {
         getDisposalLabwareOptions.resultFunc(labwareEntities, names)
       ).toEqual([])
     })
-    test('filters out labware that is not trash', () => {
+    test('filters out labware that is NOT trash when one trash bin present', () => {
       const labwareEntities = {
         ...tipracks,
         ...trash,
@@ -54,6 +54,25 @@ describe('labware selectors', () => {
       expect(
         getDisposalLabwareOptions.resultFunc(labwareEntities, names)
       ).toEqual([{ name: 'Trash', value: 'trashId' }])
+    })
+    test('filters out labware that is NOT trash when multiple trash bins present', () => {
+      const trash2 = {
+        trashId2: {
+          def: { ...fixture_trash },
+        },
+      }
+      const labwareEntities = {
+        ...tipracks,
+        ...trash,
+        ...trash2,
+      }
+
+      expect(
+        getDisposalLabwareOptions.resultFunc(labwareEntities, names)
+      ).toEqual([
+        { name: 'Trash', value: 'trashId' },
+        { name: 'Trash', value: 'trashId2' },
+      ])
     })
   })
 })
