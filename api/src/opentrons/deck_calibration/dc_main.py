@@ -16,16 +16,14 @@ import opentrons
 from opentrons import types
 from opentrons.hardware_control import adapters
 from opentrons.hardware_control.types import CriticalPoint
-from opentrons.config import (robot_configs, feature_flags,
-                              SystemArchitecture, ARCHITECTURE)
-from opentrons.util.calibration_functions import probe_instrument
+from opentrons.config import robot_configs, SystemArchitecture, ARCHITECTURE
 from opentrons.util.linal import (solve, add_z, apply_transform,
                                   identity_deck_transform)
 from opentrons.util import logging_config
 
 from . import (
     left, right, SAFE_HEIGHT, cli_dots_set,
-    position, jog, apply_mount_offset)
+    position, jog)
 
 # TODO: add tests for methods, split out current point behavior per comment
 # TODO:   below, and total result on robot against prior version of this app
@@ -87,10 +85,8 @@ class CLITool:
         self._filler = urwid.Filler(self._pile, 'top')
         self.hardware = hardware
         self._pipettes = {}
-        if not feature_flags.use_protocol_api_v2():
-            self._current_mount = right
-        else:
-            self._current_mount = types.Mount.RIGHT
+
+        self._current_mount = types.Mount.RIGHT
 
         self.update_pipette_models()
         self.current_transform = identity_deck_transform()
@@ -99,18 +95,13 @@ class CLITool:
         if not pickup_tip:
             self._tip_length =\
                 self._pipettes[self._current_mount]._fallback_tip_length
-            if feature_flags.use_protocol_api_v2():
+            self.hardware.add_tip(
+                types.Mount.RIGHT,
+                self._tip_length)
+            if self._pipettes[types.Mount.LEFT]:
                 self.hardware.add_tip(
-                    types.Mount.RIGHT,
-                    self._tip_length)
-                if self._pipettes[types.Mount.LEFT]:
-                    self.hardware.add_tip(
-                        types.Mount.LEFT,
-                        self._pipettes[types.Mount.LEFT]._fallback_tip_length)
-            else:
-                for pip in self._pipettes.values():
-                    if pip:
-                        pip._add_tip(pip._tip_length)
+                    types.Mount.LEFT,
+                    self._pipettes[types.Mount.LEFT]._fallback_tip_length)
 
         self.current_position = (0, 0, 0)
         self._steps = [0.1, 0.25, 0.5, 1, 5, 10, 20, 40, 80]
@@ -118,8 +109,6 @@ class CLITool:
         self._current_point = 1
         self.model_offset = self._pipettes[self._current_mount].model_offset
         deck_height = 0
-        if not feature_flags.use_protocol_api_v2():
-            deck_height = self._tip_length
 
         self.actual_points = {
             1: (0, 0),
@@ -296,15 +285,7 @@ class CLITool:
         to the axis of a pipette currently used. Always returns deck
         coordinates
         """
-        if not feature_flags.use_protocol_api_v2():
-            px, py, pz = self._driver_to_deck_coords(
-                position(self._current_mount, self.hardware))
-            mox, moy, moz = self.model_offset
-            res = (px + mox, py + moy, pz + moz)
-        else:
-            res = position(
-                self._current_mount, self.hardware, CriticalPoint.TIP)
-        return res
+        return position(self._current_mount, self.hardware, CriticalPoint.TIP)
 
     def _jog(self, axis, direction, step):
         """
@@ -339,26 +320,14 @@ class CLITool:
         self._tip_length = pipette._fallback_tip_length
         # Check that pipette does not have tip attached, if it does remove it.
         self._clear_tips(pipette)
-        if not feature_flags.use_protocol_api_v2():
-            self._expected_points = self.set_deck_height_expected_points(
-                self._tip_length)
-            self._test_points = self.set_deck_height_test_points(
-                self._tip_length)
-            top = self._position()
-            self._helper_pickup(pipette, top)
-            pipette._add_tip(pipette._tip_length)
-        else:
-            self.hardware.pick_up_tip(
-                self._current_mount,
-                tip_length=self._tip_length)
+        self.hardware.pick_up_tip(
+            self._current_mount,
+            tip_length=self._tip_length)
         return "Picked up tip!"
 
     def _clear_tips(self, pipette):
         if pipette.has_tip:
-            if not feature_flags.use_protocol_api_v2():
-                pipette._remove_tip(self._tip_length)
-            else:
-                self.hardware.remove_tip(self._current_mount)
+            self.hardware.remove_tip(self._current_mount)
 
     def home(self) -> str:
         """
@@ -369,10 +338,7 @@ class CLITool:
         return 'Homed'
 
     def select_home(self, axes) -> str:
-        if feature_flags.use_protocol_api_v2():
-            self.hardware._backend._smoothie_driver.home(axes)
-        else:
-            self.hardware._driver.home(axes)
+        self.hardware._backend._smoothie_driver.home(axes)
         return f'Homed {axes}'
 
     def save_point(self) -> str:
@@ -399,16 +365,8 @@ class CLITool:
     def save_mount_offset(self) -> str:
         cx, cy, cz = self._position()
         log.debug("save_mount_offset cxyz: {}".format((cx, cy, cz)))
-        targ = self._expected_points[1]
-        if not feature_flags.use_protocol_api_v2():
-            moz_points = (targ[0], targ[1], self._tip_length)
-            ex, ey, ez = apply_mount_offset(
-                moz_points, self.hardware)
-            log.debug("save_mount_offset exyz: {}".format((ex, ey, ez)))
-            dx, dy, dz = (cx - ex, cy - ey, cz - ez)
-        else:
-            ex, ey, ez = targ
-            dx, dy, dz = (cx - ex, cy - ey, cz - ez)
+        ex, ey, ez = self._expected_points[1]
+        dx, dy, dz = (cx - ex, cy - ey, cz - ez)
         log.debug("save_mount_offset dxyz: {}".format((dx, dy, dz)))
 
         mx, my, mz = self.hardware.config.mount_offset
@@ -454,11 +412,7 @@ class CLITool:
 
     def save_z_value(self) -> str:
         actual_z = self._position()[-1]
-        if not feature_flags.use_protocol_api_v2():
-            expected_z = self.current_transform[2][3] + self._tip_length
-            new_z = self.current_transform[2][3] + actual_z - expected_z
-        else:
-            new_z = self.current_transform[2][3] + actual_z
+        new_z = self.current_transform[2][3] + actual_z
         log.debug("Saving z value: {}".format(new_z))
         self.current_transform[2][3] = new_z
         return 'saved Z-Offset: {}'.format(new_z)
@@ -469,15 +423,10 @@ class CLITool:
         return (lx - mx, ly - my, lz - mz)
 
     def switch_mounts(self):
-        if not feature_flags.use_protocol_api_v2():
-            self.select_home(self._current_mount)
-            r_pipette = right
-            l_pipette = left
-        else:
-            r_pipette = types.Mount.RIGHT
-            l_pipette = types.Mount.LEFT
-            axes = right if self._current_mount == r_pipette else left
-            self.select_home(axes)
+        r_pipette = types.Mount.RIGHT
+        l_pipette = types.Mount.LEFT
+        axes = right if self._current_mount == r_pipette else left
+        self.select_home(axes)
 
         if self._current_mount == r_pipette:
             self._current_mount = l_pipette
@@ -489,11 +438,7 @@ class CLITool:
                 self._pipettes[self._current_mount]._fallback_tip_length
             self.model_offset =\
                 self._pipettes[self._current_mount].model_offset
-            if not feature_flags.use_protocol_api_v2():
-                self._expected_points = self.set_deck_height_expected_points(
-                    self._tip_length)
-                self._test_points = self.set_deck_height_test_points(
-                    self._tip_length)
+
             return f"Switched mount to {self._current_mount}"
         else:
             return ("Switched mount, but please add pipette\n"
@@ -502,14 +447,9 @@ class CLITool:
     def validate_mount_offset(self):
         # move the RIGHT pipette to expected point, then immediately after
         # move the LEFT pipette to that same point
-        if not feature_flags.use_protocol_api_v2():
-            r_pipette = right
-            l_pipette = left
-            targ = apply_mount_offset(self._expected_points[1], self.hardware)
-        else:
-            r_pipette = types.Mount.RIGHT
-            l_pipette = types.Mount.LEFT
-            targ = self._expected_points[1]
+        r_pipette = types.Mount.RIGHT
+        l_pipette = types.Mount.LEFT
+        targ = self._expected_points[1]
         self.validate(self._expected_points[1], 1, r_pipette)
         next_pip = self._pipettes[l_pipette]
         self.switch_mounts()
@@ -534,42 +474,25 @@ class CLITool:
         :return:
         """
         self._current_point = point_num
-        if not feature_flags.use_protocol_api_v2():
-            _, _, cz = self._position()
-            if cz < SAFE_HEIGHT:
-                self.move_to_safe_height()
-            tx, ty, tz = self._deck_to_driver_coords(point)
-            _, _, moz = self.model_offset
-            self.hardware._driver.move({'X': tx, 'Y': ty})
-            self.hardware._driver.move({self._current_mount: tz-moz})
-        else:
-            self._current_mount = pipette_mount
-            self.move_to_safe_height()
-            pt1 = types.Point(x=point[0], y=point[1], z=SAFE_HEIGHT)
-            pt2 = types.Point(*point)
-            self.hardware.move_to(self._current_mount, pt1)
-            self.hardware.move_to(self._current_mount, pt2)
+        self._current_mount = pipette_mount
+
+        self.move_to_safe_height()
+        pt1 = types.Point(x=point[0], y=point[1], z=SAFE_HEIGHT)
+        pt2 = types.Point(*point)
+        self.hardware.move_to(self._current_mount, pt1)
+        self.hardware.move_to(self._current_mount, pt2)
         return 'moved to point {}'.format(point)
 
     def move_to_safe_height(self):
         cx, cy, _ = self._position()
-        if not feature_flags.use_protocol_api_v2():
-            _, _, sz = self._deck_to_driver_coords((cx, cy, SAFE_HEIGHT))
-            self.hardware._driver.move({self._current_mount: sz})
-        else:
-            pt = types.Point(x=cx, y=cy, z=SAFE_HEIGHT)
-            self.hardware.move_to(self._current_mount, pt)
+        pt = types.Point(x=cx, y=cy, z=SAFE_HEIGHT)
+        self.hardware.move_to(self._current_mount, pt)
 
     def update_pipette_models(self):
-        if feature_flags.use_protocol_api_v2():
-            self.hardware.cache_instruments()
-            cached = self.hardware.get_attached_instruments()
-            pip_func = None
-        else:
-            from opentrons import instruments
-            self.hardware.cache_instrument_models()
-            cached = self.hardware.get_attached_pipettes()
-            pip_func = instruments.pipette_by_name
+        self.hardware.cache_instruments()
+        cached = self.hardware.get_attached_instruments()
+        pip_func = None
+
         for mount, attached in cached.items():
             if mount == 'left':
                 mount_key = left
@@ -588,8 +511,8 @@ class CLITool:
                 self._pipettes[mount_key] = None
 
     def exit(self):
-        if feature_flags.use_protocol_api_v2():
-            self.hardware.remove_tip(self._current_mount)
+        self.hardware.remove_tip(self._current_mount)
+        self.hardware.set_lights(rails=False)
         raise urwid.ExitMainLoop
 
     # Private methods for URWID
@@ -625,19 +548,13 @@ class CLITool:
     def probe(self, move_after) -> str:
         hw = self.hardware
         mount = self._current_mount
-        if not feature_flags.use_protocol_api_v2():
-            log.info(f"Current tiplength {self._tip_length}")
-            probe_center = tuple(probe_instrument(
-                self._pipettes[mount],
-                hw,
-                tip_length=self._tip_length))
-        else:
-            probe_center = hw.locate_tip_probe_center(mount)
-            _, _, cz = position(mount, hw, CriticalPoint.TIP)
-            # work around to prevent pipette tip crashing into tip box
-            # when moving from tip box -> other point on the deck
-            pt = types.Point(x=move_after[0], y=move_after[1], z=cz)
-            hw.move_to(mount, pt)
+
+        probe_center = hw.locate_tip_probe_center(mount)
+        _, _, cz = position(mount, hw, CriticalPoint.TIP)
+        # work around to prevent pipette tip crashing into tip box
+        # when moving from tip box -> other point on the deck
+        pt = types.Point(x=move_after[0], y=move_after[1], z=cz)
+        hw.move_to(mount, pt)
         log.debug("Setting probe center to {}".format(probe_center))
         hw.update_config(
             tip_probe=hw.config.tip_probe._replace(center=probe_center))
@@ -658,8 +575,6 @@ def clear_configuration_and_reload(hardware):
     robot_configs.clear()
     new_config = robot_configs.load()
     hardware.set_config(new_config)
-    if not feature_flags.use_protocol_api_v2():
-        hardware.reset()
 
 
 def backup_configuration(hardware, tag):
@@ -728,16 +643,10 @@ def main(loop=None):
         default='info')
     args = parser.parse_args()
 
-    if not feature_flags.use_protocol_api_v2():
-        hardware = opentrons.robot
-        hardware.connect()
-        hardware.turn_on_rail_lights()
-        atexit.register(hardware.turn_off_rail_lights)
-    else:
-        api = opentrons.hardware_control.API
-        hardware = adapters.SynchronousAdapter.build(
-            api.build_hardware_controller)
-        hardware.set_lights(rails=True)
+    api = opentrons.hardware_control.API
+    hardware = adapters.SynchronousAdapter.build(
+        api.build_hardware_controller)
+    hardware.set_lights(rails=True)
     # Register hook to reboot the robot after exiting this tool (regardless of
     # whether this process exits normally or not)
     atexit.register(notify_and_restart)
@@ -752,8 +661,7 @@ def main(loop=None):
     cli.home()
     # lights help the script user to see the points on the deck
     cli.ui_loop.run()
-    if feature_flags.use_protocol_api_v2():
-        hardware.set_lights(rails=False)
+
     try:
         print('Robot config: \n', cli.hardware.config)
     except Exception:
