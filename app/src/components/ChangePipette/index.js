@@ -3,11 +3,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { push, goBack } from 'connected-react-router'
 import { Switch, Route, withRouter } from 'react-router-dom'
-import {
-  getPipetteNameSpecs,
-  getPipetteModelSpecs,
-  type PipetteDisplayCategory,
-} from '@opentrons/shared-data'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
 import { getAttachedPipettes } from '../../pipettes'
 import {
@@ -22,6 +18,7 @@ import type { ContextRouter } from 'react-router-dom'
 import type {
   PipetteNameSpecs,
   PipetteModelSpecs,
+  PipetteDisplayCategory,
 } from '@opentrons/shared-data'
 import type { State, Dispatch } from '../../types'
 import type { Mount } from '../../robot/types'
@@ -117,7 +114,7 @@ function makeMapStateToProps(): (State, OP) => SP {
   return (state, ownProps) => {
     const { mount, wantedPipette, robot } = ownProps
     const pipettes = getAttachedPipettes(state, robot.name)
-    const actualPipette = getPipetteModelSpecs(pipettes[mount]?.model || '')
+    const actualPipette = pipettes[mount]?.modelSpecs
     const direction = actualPipette ? 'detach' : 'attach'
 
     const success =
