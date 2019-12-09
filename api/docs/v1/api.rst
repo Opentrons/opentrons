@@ -37,5 +37,5 @@ Simulation
 ----------
 
 .. automodule:: opentrons.simulate
-   :exclude-members: CommandScraper, AccumulatingHandler, main
+   :exclude-members: CommandScraper, AccumulatingHandler, get_protocol_api, bundle_from_sim, main
    :members:
