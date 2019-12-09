@@ -1181,14 +1181,6 @@ class InstrumentContext(CommandPublisher):
         bot = loc.bottom()
         bot = bot._replace(point=bot.point._replace(z=bot.point.z + 10))
         self.drop_tip(bot, home_after=home_after)
-        try:
-            loc.parent.return_tips(loc, self.channels)
-        except AssertionError:
-            # The failure mode here is "can't return the tip", and might
-            # happen because another pipette took a tip from the tiprack
-            # since this pipette did. In this case just don't return the
-            # tip to the tip tracker
-            self._log.exception('Could not return tip to tip tracker')
 
         return self
 
