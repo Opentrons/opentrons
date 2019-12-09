@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import logging
 import asyncio
 import re
@@ -9,7 +10,7 @@ from opentrons.hardware_control import adapters
 from opentrons.server.main import build_arg_parser
 from argparse import ArgumentParser
 from opentrons import __version__
-from opentrons.config import feature_flags as ff, name, robot_configs
+from opentrons.config import feature_flags as ff, name, robot_configs, IS_ROBOT
 from opentrons.system import udev
 from opentrons.util import logging_config
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
@@ -24,14 +25,29 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 
+SMOOTHIE_HEX_RE = re.compile('smoothie-(.*).hex')
+ROBOT_FIRMWARE_DIR = Path('/usr/lib/firmware')
+
 
 def _find_smoothie_file():
-    resources = os.listdir(os.path.join(HERE, 'resources'))
+
+    resources = []
+
+    # Search for smoothie files in /usr/lib/firmware first then fall back to
+    # value packed in wheel
+    if IS_ROBOT:
+        resources.extend([ROBOT_FIRMWARE_DIR / item
+                          for item in os.listdir(ROBOT_FIRMWARE_DIR)])
+
+    resources_path = Path(HERE) / 'resources'
+    resources.extend([resources_path / item
+                      for item in os.listdir(resources_path)])
+
     for fi in resources:
-        matches = re.search('smoothie-(.*).hex', fi)
+        matches = SMOOTHIE_HEX_RE.search(str(fi))
         if matches:
             branch_plus_ref = matches.group(1)
-            return os.path.join(HERE, 'resources', fi), branch_plus_ref
+            return fi, branch_plus_ref
     raise OSError("Could not find smoothie firmware file in {}"
                   .format(os.path.join(HERE, 'resources')))
 
