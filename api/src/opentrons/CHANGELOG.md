@@ -3,22 +3,11 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [3.15.1-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.15.1-alpha.0...v3.15.1-alpha.1) (2019-12-06)
-
+## [3.15.1](https://github.com/Opentrons/opentrons/compare/v3.15.0...v3.15.1) (2019-12-09)
 
 ### Bug Fixes
 
 * **api:** shadow the magdeck height in v1 ([#4561](https://github.com/Opentrons/opentrons/issues/4561)) ([d7b4351](https://github.com/Opentrons/opentrons/commit/d7b4351))
-
-
-
-
-
-## [3.15.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.15.0...v3.15.1-alpha.0) (2019-12-06)
-
-
-### Bug Fixes
-
 * **api:** Allow Location types for multichannels in transfer ([#4555](https://github.com/Opentrons/opentrons/issues/4555)) ([6449401](https://github.com/Opentrons/opentrons/commit/6449401))
 * **api:** always do equivalent v1 factory resets ([#4556](https://github.com/Opentrons/opentrons/issues/4556)) ([87abf31](https://github.com/Opentrons/opentrons/commit/87abf31))
 
