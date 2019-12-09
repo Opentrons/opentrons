@@ -102,3 +102,6 @@ calibrations/
 *.DS_Store
 .ipynb_checkpoints
 *.ipynb
+
+# local IDE configs
+*/.vscode
