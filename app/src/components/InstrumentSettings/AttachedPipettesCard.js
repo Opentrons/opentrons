@@ -13,7 +13,7 @@ import {
   getAttachedPipetteSettings,
 } from '../../pipettes'
 
-import InstrumentInfo from './InstrumentInfo'
+import { PipetteInfo } from './PipetteInfo'
 import { CardContentFlex } from '../layout'
 import { Card, useInterval } from '@opentrons/components'
 
@@ -60,16 +60,15 @@ export function AttachedPipettesCard(props: Props) {
   return (
     <Card title={PIPETTES}>
       <CardContentFlex>
-        <InstrumentInfo
+        <PipetteInfo
           mount={LEFT}
           pipette={pipettes.left}
           changeUrl={makeChangeUrl(robot.name, LEFT)}
           settingsUrl={settings.left ? makeSettingsUrl(robot.name, LEFT) : null}
           onChangeClick={clearMove}
         />
-        <InstrumentInfo
-          mount="right"
-          robotName={robot.name}
+        <PipetteInfo
+          mount={RIGHT}
           pipette={pipettes.right}
           changeUrl={makeChangeUrl(robot.name, RIGHT)}
           settingsUrl={

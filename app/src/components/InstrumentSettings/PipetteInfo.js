@@ -12,20 +12,20 @@ import styles from './styles.css'
 
 import type { Mount, AttachedPipette } from '../../pipettes/types'
 
-type Props = {
+export type PipetteInfoProps = {|
   mount: Mount,
   pipette: AttachedPipette | null,
   changeUrl: string,
   settingsUrl: string | null,
   onChangeClick: () => mixed,
-}
+|}
 
 const LABEL_BY_MOUNT = {
   left: 'Left pipette',
   right: 'Right pipette',
 }
 
-export default function PipetteInfo(props: Props) {
+export function PipetteInfo(props: PipetteInfoProps) {
   const { mount, pipette, changeUrl, settingsUrl, onChangeClick } = props
   const label = LABEL_BY_MOUNT[mount]
   const displayName = pipette ? pipette.modelSpecs.displayName : null
