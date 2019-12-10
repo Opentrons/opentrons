@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 _common_settings_reset_options = [
     {
         'id': 'tipProbe',
-        'name': 'Instrument Offset',
+        'name': 'Pipette Calibration',
         'description':
         'Clear pipette offset and tip length calibration'
     },
