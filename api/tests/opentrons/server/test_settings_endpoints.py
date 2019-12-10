@@ -88,22 +88,8 @@ async def test_available_resets(async_client):
     body = await resp.json()
     options_list = body.get('options')
     assert resp.status == 200
-    options = [
-        {'id': 'customLabware',
-         'name': 'Custom Labware',
-         'description': 'Clear custom labware definitions'},
-        {'id': 'tipProbe',
-         'name': 'Instrument Offset',
-         'description':
-         'Clear instrument offset calibration and tip probe data'},
-        {'id': 'labwareCalibration',
-         'name': 'Labware Calibration',
-         'description': 'Clear labware calibration'},
-        {'id': 'bootScripts',
-         'name': 'Boot Scripts',
-         'description': 'Clear custom boot scripts'}]
-    assert sorted(options_list, key=lambda el: el['id'])\
-        == sorted(options, key=lambda el: el['id'])
+    assert sorted(['tipProbe', 'labwareCalibration', 'bootScripts'])\
+        == sorted([item['id'] for item in options_list])
 
 
 @pytest.mark.api1_only
