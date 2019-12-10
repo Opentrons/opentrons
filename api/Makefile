@@ -169,6 +169,7 @@ push: wheel
 	scp -i $(br_ssh_key) $(ssh_opts) $(wheel_file) root@$(host):/data/
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host) \
 "function cleanup () { rm -f /data/opentrons*.whl && mount -o remount,ro / && systemctl start opentrons-api-server; } ;\
+systemctl restart jupyter-notebook &&\
 systemctl stop opentrons-api-server &&\
 mount -o remount,rw / &&\
 cd /usr/lib/python3.7/site-packages &&\
