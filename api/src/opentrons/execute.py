@@ -9,18 +9,21 @@ protocol from the command line.
 import argparse
 import asyncio
 import logging
+import os
 import sys
 import threading
-from typing import Any, Callable, Dict, Optional, TextIO, Union
+from typing import Any, Callable, Dict, List, Optional, TextIO, Union
 
 import opentrons
 from opentrons import protocol_api, __version__
+from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
 from opentrons.protocol_api import (execute as execute_apiv2,
                                     MAX_SUPPORTED_VERSION)
 from opentrons import commands
 from opentrons.protocols.parse import parse, version_from_string
 from opentrons.protocols.types import APIVersion, PythonProtocol
 from opentrons.hardware_control import API
+from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
 _HWCONTROL: Optional[API] = None
 #: The background global cache that all protocol contexts created by
@@ -30,7 +33,8 @@ _HWCONTROL: Optional[API] = None
 def get_protocol_api(
         version: Union[str, APIVersion],
         bundled_labware: Dict[str, Dict[str, Any]] = None,
-        bundled_data: Dict[str, bytes] = None
+        bundled_data: Dict[str, bytes] = None,
+        extra_labware: Dict[str, Any] = None,
 ) -> protocol_api.ProtocolContext:
     """
     Build and return a :py:class:`ProtocolContext` connected to the robot.
@@ -45,7 +49,12 @@ def get_protocol_api(
         >>> instr = protocol.load_instrument('p300_single', 'right')
         >>> instr.home()
 
+    If ``extra_labware`` is not specified, any labware definitions saved in
+    the ``labware`` directory of the Jupyter notebook directory will be
+    available.
+
     When this function is called, modules and instruments will be recached.
+
     :param version: The API version to use. This must be lower than
                     :py:attr:`opentrons.protocol_api.MAX_SUPPORTED_VERSION`.
                     It may be specified either as a string (``'2.0'``) or
@@ -60,7 +69,13 @@ def get_protocol_api(
     :param bundled_data: If specified, a mapping from filenames to contents
                          for data to be available in the protocol from
                          :py:attr:`.ProtocolContext.bundled_data`.
-
+    :param extra_labware: If specified, a mapping from labware names to
+                          labware definitions for labware to consider in the
+                          protocol in addition to those stored on the robot.
+                          If this is an empty dict, and this function is called
+                          on a robot, it will look in the 'labware'
+                          subdirectory of the Jupyter data directory for
+                          custom labware.
     :returns opentrons.protocol_api.ProtocolContext: The protocol context.
     """
     if not _HWCONTROL:
@@ -89,9 +104,17 @@ def get_protocol_api(
         raise TypeError('version must be either a string or an APIVersion')
     else:
         checked_version = version
+
+    if extra_labware is None\
+       and IS_ROBOT\
+       and JUPYTER_NOTEBOOK_LABWARE_DIR.is_dir():  # type: ignore
+        extra_labware = labware_from_paths(
+            [str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
+
     context = protocol_api.ProtocolContext(hardware=_HWCONTROL,
                                            bundled_labware=bundled_labware,
                                            bundled_data=bundled_data,
+                                           extra_labware=extra_labware,
                                            api_version=checked_version)
     context._hw_manager.hardware.cache_instruments()
     return context
@@ -116,6 +139,43 @@ def get_arguments(
         'this option and should be configured in the config file. If '
         '\'none\', do not show logs')
     parser.add_argument(
+        '-L', '--custom-labware-path',
+        action='append', default=[os.getcwd()],
+        help='Specify directories to search for custom labware definitions. '
+             'You can specify this argument multiple times. Once you specify '
+             'a directory in this way, labware definitions in that directory '
+             'will become available in ProtocolContext.load_labware(). '
+             'Only directories specified directly by '
+             'this argument are searched, not their children. JSON files that '
+             'do not define labware will be ignored with a message. '
+             'By default, the current directory (the one in which you are '
+             'invoking this program) will be searched for labware.')
+    parser.add_argument(
+        '-D', '--custom-data-path',
+        action='append', nargs='?', const='.', default=[],
+        help='Specify directories to search for custom data files. '
+             'You can specify this argument multiple times. Once you specify '
+             'a directory in this way, files located in the specified '
+             'directory will be available in ProtocolContext.bundled_data. '
+             'Note that bundle execution will still only allow data files in '
+             'the bundle. If you specify this without a path, it will '
+             'add the current path implicitly. If you do not specify this '
+             'argument at all, no data files will be added. Any file in the '
+             'specified paths will be loaded into memory and included in the '
+             'bundle if --bundle is passed, so be careful that any directory '
+             'you specify has only the files you want. It is usually a '
+             'better idea to use -d so no files are accidentally included. '
+             'Also note that data files are made available as their name, not '
+             'their full path, so name them uniquely.')
+    parser.add_argument(
+        '-d', '--custom-data-file',
+        action='append', default=[],
+        help='Specify data files to be made available in '
+             'ProtocolContext.bundled_data (and possibly bundled if --bundle '
+             'is passed). Can be specified multiple times with different '
+             'files. It is usually a better idea to use this than -D because '
+             'there is less possibility of accidentally including something.')
+    parser.add_argument(
         'protocol', metavar='PROTOCOL',
         type=argparse.FileType('rb'),
         help='The protocol file to execute. If you pass \'-\', you can pipe '
@@ -125,9 +185,12 @@ def get_arguments(
 
 
 def execute(protocol_file: TextIO,
+            protocol_name: str,
             propagate_logs: bool = False,
             log_level: str = 'warning',
-            emit_runlog: Callable[[Dict[str, Any]], None] = None):
+            emit_runlog: Callable[[Dict[str, Any]], None] = None,
+            custom_labware_paths: List[str] = None,
+            custom_data_paths: List[str] = None):
     """
     Run the protocol itself.
 
@@ -148,6 +211,9 @@ def execute(protocol_file: TextIO,
     :py:meth:`.Robot.cache_instrument_models`.
 
     :param file-like protocol_file: The protocol file to execute
+    :param str protocol_name: The name of the protocol file. This is required
+                              internally, but it may not be a thing we can get
+                              from the protocol_file argument.
     :param propagate_logs: Whether this function should allow logs from the
                            Opentrons stack to propagate up to the root handler.
                            This can be useful if you're integrating this
@@ -165,7 +231,18 @@ def execute(protocol_file: TextIO,
                         estimation. If specified, the callback should take a
                         single argument (the name doesn't matter) which will
                         be a dictionary (see below). Default: ``None``
-
+    :param custom_labware_paths: A list of directories to search for custom
+                                 labware, or None. Ignored if the apiv2 feature
+                                 flag is not set. Loads valid labware from
+                                 these paths and makes them available to the
+                                 protocol context.
+    :param custom_data_paths: A list of directories or files to load custom
+                              data files from. Ignored if the apiv2 feature
+                              flag if not set. Entries may be either files or
+                              directories. Specified files and the
+                              non-recursive contents of specified directories
+                              are presented by the protocol context in
+                              :py:attr:`.ProtocolContext.bundled_data`.
     The format of the runlog entries is as follows:
 
     .. code-block:: python
@@ -188,7 +265,17 @@ def execute(protocol_file: TextIO,
     stack_logger.propagate = propagate_logs
     stack_logger.setLevel(getattr(logging, log_level.upper(), logging.WARNING))
     contents = protocol_file.read()
-    protocol = parse(contents, protocol_file.name)
+    if custom_labware_paths:
+        extra_labware = labware_from_paths(custom_labware_paths)
+    else:
+        extra_labware = {}
+    if custom_data_paths:
+        extra_data = datafiles_from_paths(custom_data_paths)
+    else:
+        extra_data = {}
+    protocol = parse(contents, protocol_name,
+                     extra_labware=extra_labware,
+                     extra_data=extra_data)
     if getattr(protocol, 'api_level', APIVersion(2, 0)) < APIVersion(2, 0):
         opentrons.robot.connect()
         opentrons.robot.cache_instrument_models()
@@ -201,10 +288,14 @@ def execute(protocol_file: TextIO,
             'Internal error: Only Python protocols may be executed in v1'
         exec(protocol.contents, {})
     else:
+        bundled_data = getattr(protocol, 'bundled_data', {})
+        bundled_data.update(extra_data)
+        gpa_extras = getattr(protocol, 'extra_labware', None) or None
         context = get_protocol_api(
             getattr(protocol, 'api_level', MAX_SUPPORTED_VERSION),
             bundled_labware=getattr(protocol, 'bundled_labware', None),
-            bundled_data=getattr(protocol, 'bundled_data', None))
+            bundled_data=bundled_data,
+            extra_labware=gpa_extras)
         if emit_runlog:
             context.broker.subscribe(
                 commands.command_types.COMMAND, emit_runlog)
@@ -263,7 +354,8 @@ def main() -> int:
     else:
         log_level = 'warning'
     # Try to migrate containers from database to v2 format
-    execute(args.protocol, log_level=log_level, emit_runlog=printer)
+    execute(args.protocol, args.protocol.name,
+            log_level=log_level, emit_runlog=printer)
     return 0
 
 

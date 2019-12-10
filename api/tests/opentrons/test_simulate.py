@@ -1,14 +1,21 @@
 # coding=utf-8
 import io
+import os
+from pathlib import Path
 
 import pytest
 
 from opentrons import simulate, protocols
+from opentrons.protocol_api.execute import ExceptionInProtocolError
+
+HERE = Path(__file__).parent
 
 
 @pytest.mark.parametrize('protocol_file', ['testosaur_v2.py'])
 def test_simulate_function_apiv2(protocol,
-                                 protocol_file):
+                                 protocol_file,
+                                 monkeypatch):
+    monkeypatch.setenv('OT_API_FF_allowBundleCreation', '1')
     runlog, bundle = simulate.simulate(
         protocol.filelike, 'testosaur_v2.py')
     assert isinstance(bundle, protocols.types.BundleContents)
@@ -61,25 +68,6 @@ def test_simulate_function_bundle_apiv2(get_bundle_fixture):
 
 
 @pytest.mark.parametrize('protocol_file', ['testosaur.py'])
-def test_simulate_function_apiv1(protocol, protocol_file):
-    runlog, bundle = simulate.simulate(protocol.filelike, 'testosaur.py')
-    assert bundle is None
-    assert runlog[0]['payload']['text'].startswith('Picking up tip')
-    assert 'A1' in runlog[0]['payload']['text']
-    assert runlog[1]['payload']['text'].startswith('Aspirating 10.0 uL')
-    assert 'A1' in runlog[1]['payload']['text']
-    assert runlog[2]['payload']['text'].startswith('Dispensing 10.0 uL')
-    assert 'H12' in runlog[2]['payload']['text']
-    assert runlog[3]['payload']['text'].startswith('Aspirating 10.0 uL')
-    assert 'A1' in runlog[3]['payload']['text']
-    assert runlog[4]['payload']['text'].startswith('Dispensing 10.0 uL')
-    assert 'H12' in runlog[4]['payload']['text']
-    assert runlog[5]['payload']['text'].startswith('Dropping tip')
-    assert 'A1' in runlog[5]['payload']['text']
-    assert len(runlog) == 6
-
-
-@pytest.mark.parametrize('protocol_file', ['testosaur.py'])
 def test_simulate_function_v1(protocol, protocol_file):
     runlog, bundle = simulate.simulate(protocol.filelike, 'testosaur.py')
     assert bundle is None
@@ -91,3 +79,42 @@ def test_simulate_function_v1(protocol, protocol_file):
         'Dispensing 10.0 uL into well H12 in "11" at 1.0 speed',
         'Dropping tip into well A1 in "12"'
     ]
+
+
+@pytest.mark.parametrize('protocol_file', ['python_v2_custom_lw.py'])
+def test_simulate_extra_labware(protocol, protocol_file, monkeypatch):
+    fixturedir = HERE / '..' / '..' / '..' /\
+        'shared-data' / 'labware' / 'fixtures' / '2'
+    # make sure we can load labware explicitly
+    # make sure we don't have an exception from not finding the labware
+    runlog, _ = simulate.simulate(protocol.filelike, 'custom_labware.py',
+                                  custom_labware_paths=[str(fixturedir)])
+    assert len(runlog) == 4
+
+    protocol.filelike.seek(0)
+    # make sure we don't get autoload behavior when not on a robot
+    with pytest.raises(ExceptionInProtocolError,
+                       match='.*FileNotFoundError.*'):
+        simulate.simulate(protocol.filelike, 'custom_labware.py')
+    no_lw = simulate.get_protocol_api('2.0')
+    assert not no_lw._extra_labware
+    protocol.filelike.seek(0)
+    monkeypatch.setattr(simulate, 'IS_ROBOT', True)
+    monkeypatch.setattr(simulate, 'JUPYTER_NOTEBOOK_LABWARE_DIR',
+                        fixturedir)
+    # make sure we don't have an exception from not finding the labware
+    runlog, _ = simulate.simulate(protocol.filelike, 'custom_labware.py')
+    assert len(runlog) == 4
+
+    # make sure the extra labware loaded by default is right
+    ctx = simulate.get_protocol_api('2.0')
+    assert len(ctx._extra_labware.keys()) == len(os.listdir(fixturedir))
+
+    assert ctx.load_labware('fixture_12_trough', 1, namespace='fixture')
+
+    # if there is no labware dir, make sure everything still works
+    monkeypatch.setattr(simulate, 'JUPYTER_NOTEBOOK_LABWARE_DIR',
+                        HERE / 'nosuchdirectory')
+    ctx = simulate.get_protocol_api('2.0')
+    with pytest.raises(FileNotFoundError):
+        ctx.load_labware("fixture_12_trough", 1, namespace='fixture')

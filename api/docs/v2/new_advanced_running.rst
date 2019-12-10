@@ -50,6 +50,11 @@ If you have a protocol that you have already written you can run it directly in 
    run(protocol)  # your protocol will now run
 
 
+Custom Labware
+++++++++++++++
+
+If you have custom labware definitions you want to use with Jupyter, make a new directory called "labware" in Jupyter and put the definitions there. These definitions will be available when you call ``load_labware``.
+
 
 Command Line
 ------------
