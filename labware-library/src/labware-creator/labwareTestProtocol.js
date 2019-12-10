@@ -29,8 +29,8 @@ const labwareTestProtocol = ({
 from opentrons import protocol_api, types
 
 CALIBRATION_CROSS_COORDS = types.Location(
-  point=types.Point(x=380.87, y=9.0, z=0.0),
-  labware=None
+    point=types.Point(x=380.87, y=9.0, z=0.0),
+    labware=None
 )
 CALIBRATION_CROSS_SLOT = '3'
 TEST_LABWARE_SLOT = CALIBRATION_CROSS_SLOT
@@ -47,89 +47,85 @@ TIPRACK_LOADNAME = '${tiprackLoadName}'
 LABWARE_DEF_JSON = """${JSON.stringify(definition)}"""
 LABWARE_DEF = json.loads(LABWARE_DEF_JSON)
 LABWARE_LABEL = LABWARE_DEF.get('metadata', {}).get(
-  'displayName', 'test labware')
+    'displayName', 'test labware')
 
 metadata = {'apiLevel': '2.0'}
 
 
 def uniq(l):
-  res = []
-  for i in l:
-    if i not in res:
-      res.append(i)
-  return res
+    res = []
+    for i in l:
+        if i not in res:
+            res.append(i)
+    return res
 
 def run(protocol: protocol_api.ProtocolContext):
-  tiprack = protocol.load_labware(TIPRACK_LOADNAME, TIPRACK_SLOT)
-  pipette = protocol.load_instrument(
-    PIPETTE_NAME, PIPETTE_MOUNT, tip_racks=[tiprack])
+    tiprack = protocol.load_labware(TIPRACK_LOADNAME, TIPRACK_SLOT)
+    pipette = protocol.load_instrument(
+        PIPETTE_NAME, PIPETTE_MOUNT, tip_racks=[tiprack])
 
-  test_labware = protocol.load_labware_from_definition(
-    LABWARE_DEF,
-    TEST_LABWARE_SLOT,
-    LABWARE_LABEL,
-  )
+    test_labware = protocol.load_labware_from_definition(
+        LABWARE_DEF,
+        TEST_LABWARE_SLOT,
+        LABWARE_LABEL,
+    )
 
-  num_cols = len(LABWARE_DEF.get('ordering', [[]]))
-  num_rows = len(LABWARE_DEF.get('ordering', [[]])[0])
-  well_locs = uniq([
-    'A1',
-    '{}{}'.format(chr(ord('A') + num_rows - 1), str(num_cols))])
+    num_cols = len(LABWARE_DEF.get('ordering', [[]]))
+    num_rows = len(LABWARE_DEF.get('ordering', [[]])[0])
+    well_locs = uniq([
+        'A1',
+        '{}{}'.format(chr(ord('A') + num_rows - 1), str(num_cols))])
 
-  pipette.pick_up_tip()
-  
+    pipette.pick_up_tip()
 
-  def set_speeds(rate):
-    # hash is empty on initialization, double check
-    # fallback logic
-    protocol.max_speeds.update({
-      'X': (600 * rate),
-      'Y': (400 * rate),
-      'Z': (125 * rate),
-      'A': (125 * rate),
-    })
+    def set_speeds(rate):
+        protocol.max_speeds.update({
+            'X': (600 * rate),
+            'Y': (400 * rate),
+            'Z': (125 * rate),
+            'A': (125 * rate),
+        })
 
-    speed_max = max(protocol.max_speeds.values())
+        speed_max = max(protocol.max_speeds.values())
 
-    for instr in protocol.loaded_instruments.values():
-      instr.default_speed = speed_max
-
-  set_speeds(RATE)
-  pipette.move_to(CALIBRATION_CROSS_COORDS)
-  protocol.pause(
-    f"Confirm {PIPETTE_MOUNT} pipette is at slot {CALIBRATION_CROSS_SLOT} calibration cross")
-
-  pipette.home()
-  protocol.pause(f"Place your labware in Slot {TEST_LABWARE_SLOT}")
-
-  for well_loc in well_locs:
-    well = test_labware.well(well_loc)
-    all_4_edges = [
-      [well._from_center_cartesian(x=-1, y=0, z=1), 'left'],
-      [well._from_center_cartesian(x=1, y=0, z=1), 'right'],
-      [well._from_center_cartesian(x=0, y=-1, z=1), 'front'],
-      [well._from_center_cartesian(x=0, y=1, z=1), 'back']
-    ]
+        for instr in protocol.loaded_instruments.values():
+            instr.default_speed = speed_max
 
     set_speeds(RATE)
-    pipette.move_to(well.top())
-    protocol.pause("Moved to the top of the well")
+    pipette.move_to(CALIBRATION_CROSS_COORDS)
+    protocol.pause(
+        f"Confirm {PIPETTE_MOUNT} pipette is at slot {CALIBRATION_CROSS_SLOT} calibration cross")
 
-    for edge_pos, edge_name in all_4_edges:
-      set_speeds(SLOWER_RATE)
-      edge_location = types.Location(point=edge_pos, labware=None)
-      pipette.move_to(edge_location)
-      protocol.pause(f'Moved to {edge_name} edge')
+    pipette.home()
+    protocol.pause(f"Place your labware in Slot {TEST_LABWARE_SLOT}")
 
-    set_speeds(RATE)
-    pipette.move_to(well.bottom())
-    protocol.pause("Moved to the bottom of the well")
+    for well_loc in well_locs:
+        well = test_labware.well(well_loc)
+        all_4_edges = [
+            [well._from_center_cartesian(x=-1, y=0, z=1), 'left'],
+            [well._from_center_cartesian(x=1, y=0, z=1), 'right'],
+            [well._from_center_cartesian(x=0, y=-1, z=1), 'front'],
+            [well._from_center_cartesian(x=0, y=1, z=1), 'back']
+        ]
 
-    # need to interact with labware for it to show on deck map
-    pipette.blow_out(well)
+        set_speeds(RATE)
+        pipette.move_to(well.top())
+        protocol.pause("Moved to the top of the well")
 
-  set_speeds(1.0)
-  pipette.return_tip()
+        for edge_pos, edge_name in all_4_edges:
+            set_speeds(SLOWER_RATE)
+            edge_location = types.Location(point=edge_pos, labware=None)
+            pipette.move_to(edge_location)
+            protocol.pause(f'Moved to {edge_name} edge')
+
+        set_speeds(RATE)
+        pipette.move_to(well.bottom())
+        protocol.pause("Moved to the bottom of the well")
+
+        pipette.blow_out(well)
+
+    set_speeds(1.0)
+    pipette.return_tip()
 `
 }
 
