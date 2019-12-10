@@ -105,7 +105,9 @@ def get_protocol_api(
     else:
         checked_version = version
 
-    if extra_labware is None and IS_ROBOT:
+    if extra_labware is None\
+       and IS_ROBOT\
+       and JUPYTER_NOTEBOOK_LABWARE_DIR.is_dir():  # type: ignore
         extra_labware = labware_from_paths(
             [str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
 

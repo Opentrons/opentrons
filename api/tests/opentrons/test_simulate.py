@@ -130,3 +130,10 @@ def test_simulate_extra_labware(protocol, protocol_file, monkeypatch):
     assert len(ctx._extra_labware.keys()) == len(os.listdir(fixturedir))
 
     assert ctx.load_labware('fixture_12_trough', 1, namespace='fixture')
+
+    # if there is no labware dir, make sure everything still works
+    monkeypatch.setattr(simulate, 'JUPYTER_NOTEBOOK_LABWARE_DIR',
+                        HERE / 'nosuchdirectory')
+    ctx = simulate.get_protocol_api('2.0')
+    with pytest.raises(FileNotFoundError):
+        ctx.load_labware("fixture_12_trough", 1, namespace='fixture')
