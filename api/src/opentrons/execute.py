@@ -185,6 +185,7 @@ def get_arguments(
 
 
 def execute(protocol_file: TextIO,
+            protocol_name: str,
             propagate_logs: bool = False,
             log_level: str = 'warning',
             emit_runlog: Callable[[Dict[str, Any]], None] = None,
@@ -210,6 +211,9 @@ def execute(protocol_file: TextIO,
     :py:meth:`.Robot.cache_instrument_models`.
 
     :param file-like protocol_file: The protocol file to execute
+    :param str protocol_name: The name of the protocol file. This is required
+                              internally, but it may not be a thing we can get
+                              from the protocol_file argument.
     :param propagate_logs: Whether this function should allow logs from the
                            Opentrons stack to propagate up to the root handler.
                            This can be useful if you're integrating this
@@ -269,7 +273,7 @@ def execute(protocol_file: TextIO,
         extra_data = datafiles_from_paths(custom_data_paths)
     else:
         extra_data = {}
-    protocol = parse(contents, protocol_file.name,
+    protocol = parse(contents, protocol_name,
                      extra_labware=extra_labware,
                      extra_data=extra_data)
     if getattr(protocol, 'api_level', APIVersion(2, 0)) < APIVersion(2, 0):
@@ -350,7 +354,8 @@ def main() -> int:
     else:
         log_level = 'warning'
     # Try to migrate containers from database to v2 format
-    execute(args.protocol, log_level=log_level, emit_runlog=printer)
+    execute(args.protocol, args.protocol.name,
+            log_level=log_level, emit_runlog=printer)
     return 0
 
 

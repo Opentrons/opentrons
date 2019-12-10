@@ -68,25 +68,6 @@ def test_simulate_function_bundle_apiv2(get_bundle_fixture):
 
 
 @pytest.mark.parametrize('protocol_file', ['testosaur.py'])
-def test_simulate_function_apiv1(protocol, protocol_file):
-    runlog, bundle = simulate.simulate(protocol.filelike, 'testosaur.py')
-    assert bundle is None
-    assert runlog[0]['payload']['text'].startswith('Picking up tip')
-    assert 'A1' in runlog[0]['payload']['text']
-    assert runlog[1]['payload']['text'].startswith('Aspirating 10.0 uL')
-    assert 'A1' in runlog[1]['payload']['text']
-    assert runlog[2]['payload']['text'].startswith('Dispensing 10.0 uL')
-    assert 'H12' in runlog[2]['payload']['text']
-    assert runlog[3]['payload']['text'].startswith('Aspirating 10.0 uL')
-    assert 'A1' in runlog[3]['payload']['text']
-    assert runlog[4]['payload']['text'].startswith('Dispensing 10.0 uL')
-    assert 'H12' in runlog[4]['payload']['text']
-    assert runlog[5]['payload']['text'].startswith('Dropping tip')
-    assert 'A1' in runlog[5]['payload']['text']
-    assert len(runlog) == 6
-
-
-@pytest.mark.parametrize('protocol_file', ['testosaur.py'])
 def test_simulate_function_v1(protocol, protocol_file):
     runlog, bundle = simulate.simulate(protocol.filelike, 'testosaur.py')
     assert bundle is None
