@@ -841,9 +841,8 @@ class Pipette(CommandPublisher):
         do_publish(self.broker, commands.touch_tip, self.touch_tip, 'before',
                    None, None, self, location, radius, v_offset, speed)
 
-        # move to location if we're not already there
-        if location != self.previous_placeable:
-            self.move_to(location)
+        # move to location
+        self.move_to(location.top(v_offset))
 
         v_offset = (0, 0, v_offset)
 

@@ -919,9 +919,10 @@ def test_touch_tip(local_test_pipette):
     p200.touch_tip(plate[1], radius=0.5)
 
     expected = [
-        mock.call(plate[0],
-                  instrument=p200,
-                  strategy='arc'),
+        mock.call(
+            (plate[0], (3.20, 3.20, 9.50)),
+            instrument=p200,
+            strategy='arc'),
 
         mock.call(
             (plate[0], (6.40, 3.20, 9.50)),
@@ -940,6 +941,10 @@ def test_touch_tip(local_test_pipette):
             instrument=p200,
             strategy='direct'),
         mock.call(
+            (plate[0], (3.20, 3.20, 7.50)),
+            instrument=p200,
+            strategy='direct'),
+        mock.call(
             (plate[0], (6.40, 3.20, 7.50)),
             instrument=p200,
             strategy='direct'),
@@ -955,9 +960,10 @@ def test_touch_tip(local_test_pipette):
             (plate[0], (3.20, 0.00, 7.50)),
             instrument=p200,
             strategy='direct'),
-        mock.call(plate[1],
-                  instrument=p200,
-                  strategy='arc'),
+        mock.call(
+            (plate[1], (3.20, 3.20, 9.50)),
+            instrument=p200,
+            strategy='arc'),
         mock.call(
             (plate[1], (4.80, 3.20, 9.50)),
             instrument=p200,
