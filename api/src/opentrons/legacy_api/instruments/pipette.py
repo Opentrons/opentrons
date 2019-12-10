@@ -783,10 +783,8 @@ class Pipette(CommandPublisher):
 
         Parameters
         ----------
-        location : :any:`Placeable` or tuple(:any:`Placeable`, :any:`Vector`)
+        location : :any:`Placeable`
             The :any:`Placeable` (:any:`Well`) to perform the touch_tip.
-            Can also be a tuple with first item :any:`Placeable`,
-            second item relative :any:`Vector`
 
         radius : float
             Radius is a floating point describing the percentage of a well's
