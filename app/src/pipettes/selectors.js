@@ -16,9 +16,10 @@ import type { State } from '../types'
 
 export const getAttachedPipettes: (
   state: State,
-  robotName: string
+  robotName: string | null
 ) => Types.AttachedPipettesByMount = createSelector(
-  (state, robotName) => state.pipettes[robotName]?.attachedByMount,
+  (state, robotName) =>
+    robotName ? state.pipettes[robotName]?.attachedByMount : null,
   attachedByMount => {
     return Constants.PIPETTE_MOUNTS.reduce<Types.AttachedPipettesByMount>(
       (result, mount) => {
@@ -39,10 +40,11 @@ export const getAttachedPipettes: (
 
 export const getAttachedPipetteSettings: (
   state: State,
-  robotName: string
+  robotName: string | null
 ) => Types.PipetteSettingsByMount = createSelector(
   getAttachedPipettes,
-  (state, robotName) => state.pipettes[robotName]?.settingsById,
+  (state, robotName) =>
+    robotName ? state.pipettes[robotName]?.settingsById : null,
   (attachedByMount, settingsById) => {
     return Constants.PIPETTE_MOUNTS.reduce<Types.PipetteSettingsByMount>(
       (result, mount) => {
@@ -71,12 +73,13 @@ const pipettesAreInexactMatch = (
   return backCompatNames && backCompatNames.includes(protocolInstrName)
 }
 
+// TODO(mc, 2019-12-10): possibly use getConnectedRobot selector rather than robotName
 export const getProtocolPipettesInfo: (
   state: State,
-  robotName: string
+  robotName: string | null
 ) => Types.ProtocolPipetteInfoByMount = createSelector<
   State,
-  string,
+  string | null,
   Types.ProtocolPipetteInfoByMount,
   _,
   _

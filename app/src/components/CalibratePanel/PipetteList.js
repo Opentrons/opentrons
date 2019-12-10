@@ -1,48 +1,39 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
-import {
-  constants as robotConstants,
-  selectors as robotSelectors,
-  type Pipette,
-} from '../../robot'
-
+import { selectors as robotSelectors } from '../../robot'
+import { PIPETTE_MOUNTS } from '../../pipettes'
+import { getCalibratePipettesLocations } from '../../nav'
 import { TitledList } from '@opentrons/components'
 import PipetteListItem from './PipetteListItem'
 
-type Props = {
-  pipettes: Array<Pipette>,
-  isRunning: boolean,
-}
+// TODO(mc, 2019-12-10): i18n
+const PIPETTE_CALIBRATION = 'Pipette Calibration'
 
-const TITLE = 'Pipette Calibration'
+export default withRouter(PipetteList)
 
-export default withRouter<{||}, _>(
-  connect<Props, _, _, _, _, _>(mapStateToProps)(PipetteList)
-)
-
-function PipetteList(props: Props) {
-  const { pipettes, isRunning } = props
+function PipetteList() {
+  const pipettes = useSelector(robotSelectors.getPipettes)
+  const urlsByMount = useSelector(getCalibratePipettesLocations)
 
   return (
-    <TitledList title={TITLE}>
-      {robotConstants.PIPETTE_MOUNTS.map(mount => (
-        <PipetteListItem
-          key={mount}
-          mount={mount}
-          isRunning={isRunning}
-          pipette={pipettes.find(i => i.mount === mount)}
-        />
-      ))}
+    <TitledList title={PIPETTE_CALIBRATION}>
+      {PIPETTE_MOUNTS.map(mount => {
+        const pipette = pipettes.find(i => i.mount === mount) || null
+        const { path, disabledReason = null } = urlsByMount[mount]
+
+        return (
+          <PipetteListItem
+            key={mount}
+            mount={mount}
+            pipette={pipette}
+            calibrateUrl={path}
+            disabledReason={disabledReason}
+          />
+        )
+      })}
     </TitledList>
   )
-}
-
-function mapStateToProps(state): $Exact<Props> {
-  return {
-    pipettes: robotSelectors.getPipettes(state),
-    isRunning: robotSelectors.getIsRunning(state),
-  }
 }

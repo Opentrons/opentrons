@@ -83,10 +83,9 @@ export type StatePipette = {
   // Python Pipette's `name` field by the pipette factory functions.
   // TLDR: this `name` needs to be renamed in a future PR to `model`
   name: string,
-  // volume of the instrument
-  // TODO(mc, 2018-01-17): this is used to drive tip probe setup
-  // instructions which is incorrect and needs to be rethought
-  volume: number,
+  // tipracks the pipette uses during the protocol
+  // array of RPC object IDs corresponding to `_id` field in StateLabware
+  tipRacks: Array<number>,
   // string specified in protocol to load pipette
   requestedAs?: ?string,
 }
