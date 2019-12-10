@@ -85,7 +85,7 @@ class SimulatingDriver:
         self._lid_heating_active = True
         self._lid_target = temp
 
-    async def stop_lid_heating(self):
+    async def deactivate_lid(self):
         self._lid_heating_active = False
         self._lid_target = None
 
@@ -254,8 +254,8 @@ class Thermocycler(mod_abc.AbstractModule):
         self._current_task = wait_for_lid_task
         await wait_for_lid_task
 
-    async def stop_lid_heating(self):
-        return await self._driver.stop_lid_heating()
+    async def deactivate_lid(self):
+        return await self._driver.deactivate_lid()
 
     async def wait_for_lid_temp(self):
         """
