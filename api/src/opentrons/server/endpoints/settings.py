@@ -24,7 +24,7 @@ _common_settings_reset_options = [
         'id': 'tipProbe',
         'name': 'Instrument Offset',
         'description':
-        'Clear instrument offset calibration, tip probe data, and tip length calibration'  # noqa(E501)
+        'Clear pipette offset and tip length calibration'
     },
     {
         'id': 'labwareCalibration',
