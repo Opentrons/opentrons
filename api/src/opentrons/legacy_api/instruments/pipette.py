@@ -783,10 +783,8 @@ class Pipette(CommandPublisher):
 
         Parameters
         ----------
-        location : :any:`Placeable` or tuple(:any:`Placeable`, :any:`Vector`)
+        location : :any:`Placeable`
             The :any:`Placeable` (:any:`Well`) to perform the touch_tip.
-            Can also be a tuple with first item :any:`Placeable`,
-            second item relative :any:`Vector`
 
         radius : float
             Radius is a floating point describing the percentage of a well's
@@ -841,9 +839,8 @@ class Pipette(CommandPublisher):
         do_publish(self.broker, commands.touch_tip, self.touch_tip, 'before',
                    None, None, self, location, radius, v_offset, speed)
 
-        # move to location if we're not already there
-        if location != self.previous_placeable:
-            self.move_to(location)
+        # move to location
+        self.move_to(location.top(v_offset))
 
         v_offset = (0, 0, v_offset)
 
