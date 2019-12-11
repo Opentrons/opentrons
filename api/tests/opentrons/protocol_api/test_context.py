@@ -653,6 +653,10 @@ def test_transfer_options(loop, monkeypatch):
         dispense=tf.DispenseOpts()
     )
     assert transfer_options == expected_xfer_options2
+    with pytest.raises(ValueError, match='air_gap.*'):
+        instr.transfer(300, lw1['A1'], lw2['A1'], air_gap=300)
+    with pytest.raises(ValueError, match='air_gap.*'):
+        instr.transfer(300, lw1['A1'], lw2['A1'], air_gap=10000)
 
 
 def test_flow_rate(loop, monkeypatch):

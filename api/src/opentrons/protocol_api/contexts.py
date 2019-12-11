@@ -1572,9 +1572,15 @@ class InstrumentContext(CommandPublisher):
         if disposal is None:
             disposal = default_args.disposal_volume
 
+        air_gap = kwargs.get('air_gap', default_args.air_gap)
+        if air_gap < 0 or air_gap >= max_volume:
+            raise ValueError(
+                "air_gap must be between 0uL and the pipette's expected "
+                f"working volume, {max_volume}uL")
+
         transfer_args = transfers.Transfer(
             new_tip=new_tip or default_args.new_tip,
-            air_gap=kwargs.get('air_gap') or default_args.air_gap,
+            air_gap=air_gap,
             carryover=kwargs.get('carryover') or default_args.carryover,
             gradient_function=(kwargs.get('gradient_function') or
                                default_args.gradient_function),
