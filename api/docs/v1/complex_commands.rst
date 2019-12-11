@@ -460,6 +460,34 @@ will have the steps...
     ...
     Dropping tip well A1 in "12"
 
+
+Use One Tip
+------------------------
+
+The default behavior of complex commands is to use one tip:
+
+.. code-block:: python
+
+    pipette.transfer(
+        100,
+        plate.wells('A1', 'A2', 'A3'),
+        plate.wells('B1', 'B2', 'B3'),
+        new_tip='once')    # use one tip (default behavior)
+
+will have the steps...
+
+.. code-block:: python
+
+    Transferring 100 from wells A1...A3 in "1" to wells B1...B3 in "1"
+    Picking up tip well A1 in "2"
+    Aspirating 100.0 uL from well A1 in "1" at 1 speed
+    Dispensing 100.0 uL into well B1 in "1"
+    Aspirating 100.0 uL from well A2 in "1" at 1 speed
+    Dispensing 100.0 uL into well B2 in "1"
+    Aspirating 100.0 uL from well A3 in "1" at 1 speed
+    Dispensing 100.0 uL into well B3 in "1"
+    Dropping tip well A1 in "12"
+
 Trash or Return Tip
 ------------------------
 
