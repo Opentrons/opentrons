@@ -23,6 +23,10 @@
     "custom_labware_with_modules": {
       "title": "Cannot verify compatibility of custom labware",
       "body": "The Protocol Designer cannot confirm whether or not custom labware is compatible with any module. Proceed if you are confident your custom labware will fit."
+    },
+    "module_without_labware": {
+      "title": "Your module has no labware",
+      "body": "Oops! It looks like your module is missing labware! Final copy TBD."
     }
   },
   "timeline": {
