@@ -344,6 +344,7 @@ class Session(object):
             else:
                 stack.pop()
         unsubscribe = self._broker.subscribe(command_types.COMMAND, on_command)
+        old_robot_connect = robot.connect
 
         try:
             # ensure actual pipettes are cached before driver is disconnected
@@ -377,13 +378,23 @@ class Session(object):
                 robot.broker = self._broker
                 robot.cache_instrument_models()
                 robot.disconnect()
+
+                def robot_connect_error(port=None, options=None):
+                    raise RuntimeError(
+                        'Protocols executed through the Opentrons App may not '
+                        'use robot.connect(). Allowing this call would cause '
+                        'the robot to execute commands during simulation, and '
+                        'then raise an error on execution.')
+                robot.connect = robot_connect_error
                 exec(self._protocol.contents, {})
         finally:
             # physically attached pipettes are re-cached during robot.connect()
             # which is important, because during a simulation, the robot could
             # think that it holds a pipette model that it actually does not
             if not self._use_v2:
+                robot.connect = old_robot_connect
                 robot.connect()
+
             unsubscribe()
 
             instruments, containers, modules, interactions = _accumulate(
