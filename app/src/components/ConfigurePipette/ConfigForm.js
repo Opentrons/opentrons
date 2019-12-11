@@ -107,7 +107,7 @@ export default class ConfigForm extends React.Component<Props> {
       if (v === '' || v == null) return null
       return Number(v)
     })
-    console.log(values, params)
+
     this.props.updateSettings(params)
   }
 
