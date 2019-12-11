@@ -517,6 +517,16 @@ def test_transfer(local_test_pipette, robot):
     fuzzy_assert(robot.commands(),
                  expected=expected)
     robot.clear_commands()
+    with pytest.raises(ValueError, match='air_gap.*'):
+        p200.transfer(300,
+                      plate[0],
+                      plate[1],
+                      air_gap=300)
+    with pytest.raises(ValueError, match='air_gap.*'):
+        p200.transfer(300,
+                      plate[0],
+                      plate[1],
+                      air_gap=10000)
 
 
 @pytest.mark.api1_only

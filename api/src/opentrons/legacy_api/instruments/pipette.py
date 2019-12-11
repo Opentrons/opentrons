@@ -1464,6 +1464,16 @@ class Pipette(CommandPublisher):
         }
         tip_option = kwargs.get('new_tip', 'once')
         tips = tip_options.get(tip_option)
+
+        # if air gap exceeds these bounds it breaks preconditions the transfer
+        # logic
+        if 'air_gap' in kwargs:
+            expected = self._expected_working_volume()
+            if kwargs['air_gap'] < 0 or kwargs['air_gap'] >= expected:
+                raise ValueError(
+                    "air_gap must be between 0uL and the pipette's expected "
+                    f"working volume, {expected}uL")
+
         if tips is None:
             raise ValueError('Unknown "new_tip" option: {}'.format(tip_option))
 
@@ -1630,6 +1640,23 @@ class Pipette(CommandPublisher):
 
         return s, d
 
+    def _expected_working_volume(self) -> float:
+        """ Find the working volume we expect to have for this pipette.
+
+        If we have a tip, we use that working volume; otherwise, if we have
+        tipracks set up, we use those; otherwise we just use the max.
+
+        This is useful when checking parameters for things like transfers,
+        where we might be picking up tips later in the process but want to
+        plan out volumes ahead of time.
+        """
+        if not self.tip_attached and self.tip_racks and \
+           self.tip_racks[0][0].max_volume():
+            return min(
+                self.tip_racks[0][0].max_volume(), self._working_volume)
+        else:
+            return self._working_volume
+
     def _create_transfer_plan(self, v, s, t, **kwargs):
         # SPECIAL CASE: if using multi-channel pipette,
         # and the source or target is a WellSeries
@@ -1656,12 +1683,7 @@ class Pipette(CommandPublisher):
                 'dispense': {'location': t[i], 'volume': v[i]}
             })
 
-        if not self.tip_attached and self.tip_racks and \
-                self.tip_racks[0][0].max_volume():
-            max_vol = min(
-                self.tip_racks[0][0].max_volume(), self._working_volume)
-        else:
-            max_vol = self._working_volume
+        max_vol = self._expected_working_volume()
         max_vol -= kwargs.get('air_gap', 0)  # air
 
         if kwargs.get('divide', True):
