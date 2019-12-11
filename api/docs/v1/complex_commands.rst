@@ -627,3 +627,105 @@ will have the steps...
     Dispensing 20 uL into well A2 in "1"
     Dispensing 100.0 uL into well A2 in "1"
     Dropping tip well A1 in "12"
+
+
+Multi-Channels and Complex Liquid Handling
+==========================================
+
+We will be using the code-block below to perform our examples.
+
+.. code-block:: python
+
+    from opentrons import robot, labware, instruments
+
+    plate = labware.load('96-flat', '1')
+
+    tiprack = labware.load('opentrons-tiprack-300ul', '2')
+
+    multi_pipette = instruments.P300_Multi(
+        mount='left',
+        tip_racks=[tiprack])
+
+If you want to move across a plate using a multi-channel you can do the
+following:
+
+.. code-block:: python
+
+    multi_pipette.transfer(50, plate.columns('1'), plate.columns('2', to='12'))
+
+will have the steps
+
+.. code-block:: python
+
+        Transferring 50 from well A1 in "3" to wells A2...H12 in "3"
+        Picking up tip wells A1...H1 in "4"
+        Aspirating 50.0 uL from wells A1...H1 in "3" at 1 speed
+        Dispensing 50.0 uL into wells A2...H2 in "3"
+        Aspirating 50.0 uL from wells A1...H1 in "3" at 1 speed
+        Dispensing 50.0 uL into wells A3...H3 in "3"
+        Aspirating 50.0 uL from wells A1...H1 in "3" at 1 speed
+        Dispensing 50.0 uL into wells A4...H4 in "3"
+        Aspirating 50.0 uL from wells A1...H1 in "3" at 1 speed
+        Dispensing 50.0 uL into wells A5...H5 in "3"
+        Aspirating 50.0 uL from wells A1...H1 in "3" at 1 speed
+        Dispensing 50.0 uL into wells A6...H6 in "3"
+        Aspirating 50.0 uL from wells A1...H1 in "3" at 1 speed
+        Dispensing 50.0 uL into wells A7...H7 in "3"
+        Aspirating 50.0 uL from wells A1...H1 in "3" at 1 speed
+        Dispensing 50.0 uL into wells A8...H8 in "3"
+        Aspirating 50.0 uL from wells A1...H1 in "3" at 1 speed
+        Dispensing 50.0 uL into wells A9...H9 in "3"
+        Aspirating 50.0 uL from wells A1...H1 in "3" at 1 speed
+        Dispensing 50.0 uL into wells A10...H10 in "3"
+        Aspirating 50.0 uL from wells A1...H1 in "3" at 1 speed
+        Dispensing 50.0 uL into wells A11...H11 in "3"
+        Aspirating 50.0 uL from wells A1...H1 in "3" at 1 speed
+        Dispensing 50.0 uL into wells A12...H12 in "3"
+        Dropping tip well A1 in "12"
+
+or
+
+.. code-block:: python
+
+    multi_pipette.transfer(50, plate.wells('A1'), plate.columns('2', to='12'))
+
+will have the steps
+
+.. code-block:: python
+
+    Transferring 50 from well A1 in "3" to wells A2...H12 in "3"
+    Picking up tip wells A1...H1 in "4"
+    Aspirating 50.0 uL from well A1 in "3" at 1 speed
+    Dispensing 50.0 uL into wells A2...H2 in "3"
+    Aspirating 50.0 uL from well A1 in "3" at 1 speed
+    Dispensing 50.0 uL into wells A3...H3 in "3"
+    Aspirating 50.0 uL from well A1 in "3" at 1 speed
+    Dispensing 50.0 uL into wells A4...H4 in "3"
+    Aspirating 50.0 uL from well A1 in "3" at 1 speed
+    Dispensing 50.0 uL into wells A5...H5 in "3"
+    Aspirating 50.0 uL from well A1 in "3" at 1 speed
+    Dispensing 50.0 uL into wells A6...H6 in "3"
+    Aspirating 50.0 uL from well A1 in "3" at 1 speed
+    Dispensing 50.0 uL into wells A7...H7 in "3"
+    Aspirating 50.0 uL from well A1 in "3" at 1 speed
+    Dispensing 50.0 uL into wells A8...H8 in "3"
+    Aspirating 50.0 uL from well A1 in "3" at 1 speed
+    Dispensing 50.0 uL into wells A9...H9 in "3"
+    Aspirating 50.0 uL from well A1 in "3" at 1 speed
+    Dispensing 50.0 uL into wells A10...H10 in "3"
+    Aspirating 50.0 uL from well A1 in "3" at 1 speed
+    Dispensing 50.0 uL into wells A11...H11 in "3"
+    Aspirating 50.0 uL from well A1 in "3" at 1 speed
+    Dispensing 50.0 uL into wells A12...H12 in "3"
+    Dropping tip well A1 in "12"
+
+
+If you were to input something such as:
+
+
+.. code-block:: python
+
+    multi_pipette.transfer(50, plate.wells('A1'), plate.wells())
+
+The multi-channel would visit **every** well in the plate and dispense liquid
+outside of the plate boundaries so be careful!
