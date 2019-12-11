@@ -517,7 +517,7 @@ The default behavior of complex commands is to use one tip:
         100,
         [plate.wells_by_name()[well_name] for well_name in ['A1', 'A2', 'A3']],
         [plate.wells_by_name()[well_name] for well_name in ['B1', 'B2', 'B3']],
-        new_tip='single')    # use one tip
+        new_tip='once')    # use one tip
 
 will have the steps...
 
