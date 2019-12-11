@@ -382,8 +382,8 @@ class Session(object):
                 def robot_connect_error(port=None, options=None):
                     raise RuntimeError(
                         'Protocols executed through the Opentrons App may not '
-                        'robot.connect(). Allowing this call would cause the '
-                        'robot to execute commands during simulation, and '
+                        'use robot.connect(). Allowing this call would cause '
+                        'the robot to execute commands during simulation, and '
                         'then raise an error on execution.')
                 robot.connect = robot_connect_error
                 exec(self._protocol.contents, {})

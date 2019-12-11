@@ -387,3 +387,14 @@ left.drop_tip()
                                                   v1proto)
     assert ['p300_single_v1'] == [pip.name for pip in session3.instruments]
     assert ['tempdeck'] == [mod.name for mod in session3.modules]
+
+
+async def test_session_robot_connect_not_allowed(main_router,
+                                                 virtual_smoothie_env):
+    proto = """
+from opentrons import robot
+robot.connect()
+"""
+
+    with pytest.raises(RuntimeError, match='.*robot.connect.*'):
+        main_router.session_manager.create('calls-connect', proto)
