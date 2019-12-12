@@ -1,7 +1,7 @@
 import copy
 import logging
 from threading import Event
-from typing import Dict, Optional, List, Tuple, TYPE_CHECKING
+from typing import Dict, Optional, List, Tuple, TYPE_CHECKING, Callable
 from contextlib import contextmanager
 from opentrons import types
 from opentrons.config.pipette_config import (config_models,
@@ -209,12 +209,14 @@ class Simulator:
             self,
             port: str,
             model: str,
+            run_flag: asyncio.Event,
             interrupt_callback: modules.InterruptCallback
             ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
             which=model,
             simulating=True,
+            run_flag=run_flag,
             interrupt_callback=interrupt_callback)
 
     @property

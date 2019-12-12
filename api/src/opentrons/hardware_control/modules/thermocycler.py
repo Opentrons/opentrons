@@ -119,6 +119,7 @@ class Thermocycler(mod_abc.AbstractModule):
     @classmethod
     async def build(cls,
                     port: str,
+                    run_flag: asyncio.Event,
                     interrupt_callback: types.InterruptCallback = None,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None):
@@ -126,6 +127,7 @@ class Thermocycler(mod_abc.AbstractModule):
         """
 
         mod = cls(port=port,
+                  run_flag=run_flag,
                   interrupt_callback=interrupt_callback,
                   simulating=simulating,
                   loop=loop)
@@ -156,6 +158,7 @@ class Thermocycler(mod_abc.AbstractModule):
 
     def __init__(self,
                  port: str,
+                 run_flag: asyncio.Event,
                  interrupt_callback: types.InterruptCallback = None,
                  simulating: bool = False,
                  loop: asyncio.AbstractEventLoop = None) -> None:
@@ -163,7 +166,7 @@ class Thermocycler(mod_abc.AbstractModule):
         self._interrupt_cb = interrupt_callback
         self._driver = self._build_driver(simulating, interrupt_callback)
 
-        self._running_flag = asyncio.Event(loop=self._loop)
+        self._running_flag = run_flag
         self._current_task: Optional[asyncio.Task] = None
 
         self._total_cycle_count: Optional[int] = None
