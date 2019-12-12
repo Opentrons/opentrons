@@ -90,6 +90,7 @@ class API(HardwareAPILike):
         self._config = config or robot_configs.load()
         self._backend = backend
         self._loop = loop
+        self._run_flag = asyncio.Event(loop=self._loop)
         self._callbacks: set = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: Dict[Axis, float] = {}
@@ -431,7 +432,8 @@ class API(HardwareAPILike):
         :py:meth:`resume`.
         """
         self._backend.pause()
-        self._call_on_attached_modules("pause")
+        self._loop.call_soon_threadsafe(self._run_flag.clear)
+        # self._call_on_attached_modules("pause")
 
     def pause_with_message(self, message):
         self._log.warning('Pause with message: {}'.format(message))
@@ -445,6 +447,7 @@ class API(HardwareAPILike):
         Resume motion after a call to :py:meth:`pause`.
         """
         self._backend.resume()
+        self._loop.call_soon_threadsafe(self._run_flag.set)
         self._call_on_attached_modules("resume")
 
     @_log_call
@@ -1424,9 +1427,18 @@ class API(HardwareAPILike):
         # build new mods
         for port, name in new_mods_at_ports:
             new_instance = await self._backend.build_module(
+<<<<<<< HEAD
                     port,
                     name,
                     self.pause_with_message)
+=======
+                    port=port,
+                    model=name,
+                    run_flag=self._run_flag
+                    interrupt_callback=self.pause_with_message)
+            self._log.info(f"{port}")
+            self._log.info(f"{name}")
+>>>>>>> include tree of run flag
             self._attached_modules.append(new_instance)
             self._log.info(f"Module {name} discovered and attached"
                            f" at port {port}, new_instance: {new_instance}")

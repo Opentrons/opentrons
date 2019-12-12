@@ -22,6 +22,7 @@ class AbstractModule(abc.ABC):
     @abc.abstractmethod
     async def build(cls,
                     port: str,
+                    run_flag: asyncio.Event,
                     interrupt_callback: InterruptCallback,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None) \
