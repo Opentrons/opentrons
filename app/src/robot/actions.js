@@ -230,7 +230,7 @@ export const actions = {
   },
 
   connectResponse(
-    error: Error,
+    error: Error | null,
     sessionCapabilities: Array<string> = []
   ): ConnectResponseAction {
     return {

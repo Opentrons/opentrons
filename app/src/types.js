@@ -12,6 +12,7 @@ import type {
 } from './robot-api/types'
 import type { RobotAdminState, RobotAdminAction } from './robot-admin/types'
 import type { PipettesState, PipettesAction } from './pipettes/types'
+import type { ModulesState, ModulesAction } from './modules/types'
 import type {
   State as SuperDeprecatedRobotApiState,
   HttpApiAction as SuperDeprecatedRobotApiAction,
@@ -39,6 +40,7 @@ export type State = $ReadOnly<{|
   robotAdmin: RobotAdminState,
   robotSettings: RobotSettingsState,
   pipettes: PipettesState,
+  modules: ModulesState,
   config: Config,
   discovery: DiscoveryState,
   labware: CustomLabwareState,
@@ -54,6 +56,7 @@ export type Action =
   | RobotAdminAction
   | RobotSettingsAction
   | PipettesAction
+  | ModulesAction
   | ShellAction
   | ConfigAction
   | RouterAction

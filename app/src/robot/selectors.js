@@ -47,8 +47,8 @@ export function getConnectRequest(state: State) {
   return connection(state).connectRequest
 }
 
-export function getConnectedRobotName(state: State): ?string {
-  return connection(state).connectedTo
+export function getConnectedRobotName(state: State): string | null {
+  return connection(state).connectedTo || null
 }
 
 export const getConnectionStatus: OutputSelector<
@@ -290,11 +290,7 @@ export function getModulesBySlot(state: State): { [Slot]: SessionModule } {
   return session(state).modulesBySlot
 }
 
-export const getModules: OutputSelector<
-  State,
-  void,
-  Array<SessionModule>
-> = createSelector(
+export const getModules: State => Array<SessionModule> = createSelector(
   getModulesBySlot,
   // TODO (ka 2019-3-26): can't import getConfig due to circular dependency
   state => state.config,
