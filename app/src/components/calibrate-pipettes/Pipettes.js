@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom'
 import cx from 'classnames'
 
 import { constants as robotConstants } from '../../robot'
-import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { InstrumentGroup, AlertItem } from '@opentrons/components'
 import styles from './styles.css'
 
@@ -37,9 +36,7 @@ export default function Pipettes(props: Props) {
     const pipette = pipettes.find(p => p.mount === mount)
     const tiprack = tipracksByMount[mount]
     const pipetteConfig = pipette?.modelSpecs
-    const actualPipetteConfig = getPipetteModelSpecs(
-      actualPipettes?.[mount]?.model || ''
-    )
+    const actualPipetteConfig = actualPipettes?.[mount]?.modelSpecs
 
     const isDisabled = !pipette || mount !== currentMount
     const details = !pipetteConfig

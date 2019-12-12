@@ -14,21 +14,18 @@ import type {
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 
-const mapActionToRequest: ActionToRequestMapper<Types.ResetConfigAction> = action => [
-  {
-    method: POST,
-    path: Constants.RESET_CONFIG_PATH,
-    body: action.payload.resets,
-  },
-  action.meta,
-]
+const mapActionToRequest: ActionToRequestMapper<Types.ResetConfigAction> = action => ({
+  method: POST,
+  path: Constants.RESET_CONFIG_PATH,
+  body: action.payload.resets,
+})
 
-const mapResponseToAction: ResponseToActionMapper<Types.ResetConfigDoneAction> = (
-  response,
-  prevMeta
-) => {
+const mapResponseToAction: ResponseToActionMapper<
+  Types.ResetConfigAction,
+  Types.ResetConfigDoneAction
+> = (response, originalAction) => {
   const { host, body, ...responseMeta } = response
-  const meta = { ...prevMeta, response: responseMeta }
+  const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
     ? Actions.resetConfigSuccess(host.name, meta)

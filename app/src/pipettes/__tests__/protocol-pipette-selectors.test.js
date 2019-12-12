@@ -3,6 +3,7 @@ import noop from 'lodash/noop'
 
 import * as SharedData from '@opentrons/shared-data'
 import * as Selectors from '../selectors'
+import * as Fixtures from '../__fixtures__'
 import * as RobotSelectors from '../../robot/selectors'
 import type { State } from '../../types'
 
@@ -79,7 +80,8 @@ const SPECS: Array<SelectorSpec> = [
     state: {
       pipettes: {
         robotName: {
-          attachedByMount: { left: null, right: null },
+          attachedByMount: null,
+          settingsById: null,
         },
       },
     },
@@ -98,6 +100,7 @@ const SPECS: Array<SelectorSpec> = [
             left: mockLeftPipette,
             right: mockRightPipette,
           },
+          settingsById: null,
         },
       },
     },
@@ -132,6 +135,7 @@ const SPECS: Array<SelectorSpec> = [
             left: mockLeftPipette,
             right: mockRightPipette,
           },
+          settingsById: null,
         },
       },
     },
@@ -173,7 +177,13 @@ const SPECS: Array<SelectorSpec> = [
     selector: Selectors.getProtocolPipettesInfo,
     state: {
       pipettes: {
-        robotName: { attachedByMount: { left: mockLeftPipette, right: null } },
+        robotName: {
+          attachedByMount: {
+            left: mockLeftPipette,
+            right: Fixtures.mockUnattachedPipette,
+          },
+          settingsById: null,
+        },
       },
     },
     before: () => {
@@ -203,7 +213,13 @@ const SPECS: Array<SelectorSpec> = [
     selector: Selectors.getProtocolPipettesInfo,
     state: {
       pipettes: {
-        robotName: { attachedByMount: { left: mockLeftPipette, right: null } },
+        robotName: {
+          attachedByMount: {
+            left: mockLeftPipette,
+            right: Fixtures.mockUnattachedPipette,
+          },
+          settingsById: null,
+        },
       },
     },
     before: () => {
