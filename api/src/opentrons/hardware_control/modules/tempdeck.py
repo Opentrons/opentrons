@@ -1,6 +1,6 @@
 import asyncio
 from threading import Thread, Event
-from typing import Union, Optional
+from typing import Union, Optional, Callable
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 from opentrons.drivers.temp_deck.driver import temp_locks
 from . import update, mod_abc, types
@@ -86,6 +86,7 @@ class TempDeck(mod_abc.AbstractModule):
     @classmethod
     async def build(cls,
                     port: str,
+                    run_flag: asyncio.Event,
                     interrupt_callback: types.InterruptCallback = None,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None):
@@ -94,6 +95,7 @@ class TempDeck(mod_abc.AbstractModule):
         # TempDeck does not currently use interrupts, so the callback is not
         # passed on
         mod = cls(port=port,
+                  run_flag=run_flag,
                   simulating=simulating,
                   loop=loop)
         await mod._connect()
@@ -121,6 +123,7 @@ class TempDeck(mod_abc.AbstractModule):
 
     def __init__(self,
                  port: str,
+                 run_flag: asyncio.Event,
                  simulating: bool,
                  loop: asyncio.AbstractEventLoop = None) -> None:
         super().__init__(port, simulating, loop)
@@ -128,6 +131,8 @@ class TempDeck(mod_abc.AbstractModule):
             self._driver = temp_locks[port][1]
         else:
             self._driver = self._build_driver(simulating)  # type: ignore
+
+        self._run_flag = run_flag
 
         self._current_task: Optional[asyncio.Task] = None
         self._poller = None
