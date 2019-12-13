@@ -1,8 +1,8 @@
 import asyncio
 from contextlib import contextmanager, ExitStack
 import logging
-from typing import Any, Dict, List, Optional,
-                   Tuple, TYPE_CHECKING, Callable
+from typing import Any, Dict, List, Optional, \
+    Tuple, TYPE_CHECKING, Callable
 try:
     import aionotify  # type: ignore
 except OSError:
@@ -168,14 +168,14 @@ class Controller:
             self,
             port: str,
             model: str,
-            run_flag: asyncio.Event,
+            gate_keeper: asyncio.Event,
             interrupt_callback: modules.InterruptCallback
             ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
             which=model,
             simulating=False,
-            run_flag=run_flag,
+            gate_keeper=gate_keeper,
             interrupt_callback=interrupt_callback)
 
     async def connect(self, port: str = None):

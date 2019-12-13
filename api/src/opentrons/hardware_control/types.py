@@ -1,5 +1,6 @@
 import enum
 import logging
+import asyncio
 from typing import Tuple
 from opentrons import types as top_types
 
@@ -101,3 +102,23 @@ class MustHomeError(RuntimeError):
 
 class NoTipAttachedError(RuntimeError):
     pass
+
+class GateKeeper():
+    def __init__(self, loop: asyncio.AbstractEventLoop, is_simulating: bool):
+        self._run_flag = asyncio.Event(loop=self._loop)
+        self._is_simulating = is_simulating
+
+    async def wait_for_open_gate(self):
+        if self._is_simulating:
+            return True
+        else:
+            return await self._run_flag.wait()
+
+    def close_gate():
+        self._run_flag.clear()
+
+    def open_gate():
+        self._run_flag.set()
+
+    def is_gate_open():
+        self._run_flag.is_set()
