@@ -72,7 +72,7 @@ describe('fetchModulesEpic', () => {
     })
   })
 
-  test('maps successful response to FETCH_PIPETTES_SUCCESS', () => {
+  test('maps successful response to FETCH_MODULES_SUCCESS', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
         cold('r', { r: Fixtures.mockFetchModulesSuccess })
