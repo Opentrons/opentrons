@@ -4,6 +4,8 @@
 Complex Liquid Handling
 #######################
 
+
+
 The examples below will use the following set-up:
 
 .. code-block:: python
@@ -18,7 +20,7 @@ The examples below will use the following set-up:
         mount='left',
         tip_racks=[tiprack])
 
-You could simulate the protocol using our protocol simulator, which can be installed by following the instructions [here](https://github.com/Opentrons/opentrons/tree/edge/api#simulating-protocols).
+You could simulate the protocol using our protocol simulator, which can be installed by following the instructions `here. <https://github.com/Opentrons/opentrons/tree/edge/api#simulating-protocols>`_
 
 **********************
 
@@ -629,7 +631,8 @@ will have the steps...
     Dispensing 100.0 uL into well A2 in "1"
     Dropping tip well A1 in "12"
 
-.. _multi-channel-lh
+
+.. _multi-channel-lh:
 
 Multi-Channel Pipettes and Complex Liquid Handling
 ==================================================
