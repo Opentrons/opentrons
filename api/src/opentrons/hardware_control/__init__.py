@@ -10,6 +10,10 @@ This module is not for use outside the opentrons api module. Higher-level
 functions are available elsewhere.
 """
 
+from .types import Axis, HardwareAPILike, CriticalPoint, GateKeeper
+from opentrons.drivers.types import MoveSplit
+from .types import Axis, HardwareAPILike, CriticalPoint
+from .util import use_or_initialize_loop
 import asyncio
 from collections import OrderedDict
 import contextlib
@@ -24,9 +28,9 @@ from opentrons.config import robot_configs, pipette_config
 from .pipette import Pipette
 from .controller import Controller
 from . import modules
-from .util import use_or_initialize_loop
-from .types import Axis, HardwareAPILike, CriticalPoint
-from opentrons.drivers.types import MoveSplit
+<< << << < HEAD
+== == == =
+>>>>>> > move to gatekeeper?
 
 
 mod_log = logging.getLogger(__name__)
@@ -91,6 +95,7 @@ class API(HardwareAPILike):
         self._backend = backend
         self._loop = loop
         self._run_flag = asyncio.Event(loop=self._loop)
+        self._gate_keeper = GateKeeper(self._loop, self.is_simulator_sync)
         self._callbacks: set = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: Dict[Axis, float] = {}
@@ -128,7 +133,13 @@ class API(HardwareAPILike):
         checked_loop = use_or_initialize_loop(loop)
         backend = Controller(config)
         await backend.connect(port)
+
+
+<< << << < HEAD
         api_instance = cls(backend, loop=checked_loop, config=config)
+== == == =
+        api_instance = cls(backend, config=config, loop=checked_loop)
+>>>>>> > move to gatekeeper?
 
         checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
@@ -387,6 +398,10 @@ class API(HardwareAPILike):
     def attached_modules(self):
         return self._attached_modules
 
+    @property
+    def gate_keeper(self):
+        return self._gate_keeper
+
     @_log_call
     async def update_firmware(
             self,
@@ -432,8 +447,7 @@ class API(HardwareAPILike):
         :py:meth:`resume`.
         """
         self._backend.pause()
-        self._loop.call_soon_threadsafe(self._run_flag.clear)
-        # self._call_on_attached_modules("pause")
+        self._loop.call_soon_threadsafe(self.gate_keeper.close_gate)
 
     def pause_with_message(self, message):
         self._log.warning('Pause with message: {}'.format(message))
@@ -447,8 +461,7 @@ class API(HardwareAPILike):
         Resume motion after a call to :py:meth:`pause`.
         """
         self._backend.resume()
-        self._loop.call_soon_threadsafe(self._run_flag.set)
-        self._call_on_attached_modules("resume")
+        self._loop.call_soon_threadsafe(self.gate_keeper.open_gate)
 
     @_log_call
     def halt(self):
@@ -476,7 +489,7 @@ class API(HardwareAPILike):
         """
         self._backend.halt()
         self._log.info("Recovering from halt")
-        self._call_on_attached_modules("cancel")
+        self._loop.call_soon_threadsafe(self.gate_keeper.close_gate)
         await self.reset()
         await self.home()
 
@@ -1427,18 +1440,12 @@ class API(HardwareAPILike):
         # build new mods
         for port, name in new_mods_at_ports:
             new_instance = await self._backend.build_module(
-<<<<<<< HEAD
-                    port,
-                    name,
-                    self.pause_with_message)
-=======
                     port=port,
                     model=name,
-                    run_flag=self._run_flag
+                    gate_keeper=self.gate_keeper,
                     interrupt_callback=self.pause_with_message)
             self._log.info(f"{port}")
             self._log.info(f"{name}")
->>>>>>> include tree of run flag
             self._attached_modules.append(new_instance)
             self._log.info(f"Module {name} discovered and attached"
                            f" at port {port}, new_instance: {new_instance}")

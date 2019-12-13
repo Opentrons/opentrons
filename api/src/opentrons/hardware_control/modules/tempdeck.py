@@ -86,7 +86,7 @@ class TempDeck(mod_abc.AbstractModule):
     @classmethod
     async def build(cls,
                     port: str,
-                    run_flag: asyncio.Event,
+                    gate_keeper: asyncio.Event,
                     interrupt_callback: Callable,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None):
@@ -95,7 +95,7 @@ class TempDeck(mod_abc.AbstractModule):
         # TempDeck does not currently use interrupts, so the callback is not
         # passed on
         mod = cls(port=port,
-                  run_flag=run_flag,
+                  gate_keeper=gate_keeper,
                   simulating=simulating,
                   loop=loop)
         await mod._connect()
@@ -123,7 +123,7 @@ class TempDeck(mod_abc.AbstractModule):
 
     def __init__(self,
                  port: str,
-                 run_flag: asyncio.Event,
+                 gate_keeper: asyncio.Event,
                  simulating: bool,
                  loop: asyncio.AbstractEventLoop = None) -> None:
         super().__init__(port, simulating, loop)
@@ -132,7 +132,7 @@ class TempDeck(mod_abc.AbstractModule):
         else:
             self._driver = self._build_driver(simulating)  # type: ignore
 
-        self._run_flag = run_flag
+        self._gate_keeper = gate_keeper
 
         self._current_task: Optional[asyncio.Task] = None
         self._poller = None

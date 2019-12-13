@@ -119,7 +119,7 @@ class Thermocycler(mod_abc.AbstractModule):
     @classmethod
     async def build(cls,
                     port: str,
-                    run_flag: asyncio.Event,
+                    gate_keeper: asyncio.Event,
                     interrupt_callback: mod_abc.InterruptCallback,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None):
@@ -127,7 +127,7 @@ class Thermocycler(mod_abc.AbstractModule):
         """
 
         mod = cls(port=port,
-                  run_flag=run_flag,
+                  gate_keeper=gate_keeper,
                   interrupt_callback=interrupt_callback,
                   simulating=simulating,
                   loop=loop)
@@ -158,7 +158,7 @@ class Thermocycler(mod_abc.AbstractModule):
 
     def __init__(self,
                  port: str,
-                 run_flag: asyncio.Event,
+                 gate_keeper: asyncio.Event = None,
                  interrupt_callback: mod_abc.InterruptCallback = None,
                  simulating: bool = False,
                  loop: asyncio.AbstractEventLoop = None) -> None:
@@ -166,7 +166,7 @@ class Thermocycler(mod_abc.AbstractModule):
         self._interrupt_cb = interrupt_callback
         self._driver = self._build_driver(simulating, interrupt_callback)
 
-        self._running_flag = run_flag
+        self._gate_keeper = gate_keeper
         self._current_task: Optional[asyncio.Task] = None
 
         self._total_cycle_count: Optional[int] = None
@@ -175,16 +175,16 @@ class Thermocycler(mod_abc.AbstractModule):
         self._current_step_index: Optional[int] = None
 
     def pause(self):
-        self._loop.call_soon_threadsafe(self._running_flag.clear)
+        self._loop.call_soon_threadsafe(self._gate_keeper.close_gate)
 
     def resume(self):
-        self._loop.call_soon_threadsafe(self._running_flag.set)
+        self._loop.call_soon_threadsafe(self._gate_keeper.open_gate)
 
     def cancel(self):
         if self._current_task:
             self._current_task.cancel()
             self._current_task = None
-            self._loop.call_soon_threadsafe(self._running_flag.clear)
+            self._loop.call_soon_threadsafe(self._gate_keeper.close_gate)
 
     def _clear_cycle_counters(self):
         self._total_cycle_count = None
@@ -208,10 +208,14 @@ class Thermocycler(mod_abc.AbstractModule):
 
     async def open(self) -> str:
         """ Open the lid if it is closed"""
+        MODULE_LOG.info(f'\n is open {self._gate_keeper.is_gate_open()}\n')
+        await self._gate_keeper.wait_for_open_gate()
         return await self._driver.open()
 
     async def close(self) -> str:
         """ Close the lid if it is open"""
+        MODULE_LOG.info(f'\n is open {self._gate_keeper.is_gate_open()}\n')
+        await self._gate_keeper.wait_for_open_gate()
         return await self._driver.close()
 
     async def set_temperature(self, temperature,
@@ -240,7 +244,7 @@ class Thermocycler(mod_abc.AbstractModule):
         for rep in range(repetitions):
             self._current_cycle_index = rep + 1  # science starts at 1
             for step_idx, step in enumerate(steps):
-                await self._running_flag.wait()
+                await self._gate_keeper.wait_for_open_gate()
                 self._current_step_index = step_idx + 1  # science starts at 1
                 await self.set_temperature(temperature=step.get('temperature'),
                                            hold_time_minutes=step.get(
@@ -256,7 +260,6 @@ class Thermocycler(mod_abc.AbstractModule):
                                  steps: List[types.ThermocyclerStep],
                                  repetitions: int,
                                  volume: float = None):
-        self._running_flag.set()
         self._total_cycle_count = repetitions
         self._total_step_count = len(steps)
         cycle_task = self._loop.create_task(self._execute_cycles(steps,
