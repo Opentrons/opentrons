@@ -45,11 +45,16 @@ Module names can be specified in a few different ways. The valid names can be fo
     When you load a module in a protocol, you inform the OT-2 that you want the specified module to be present. Even if you do not use the module anywhere else in your protocol, the Opentrons App and the OT-2 will not let your protocol proceed until all modules loaded with ``load_module`` are attached to the OT-2.
 
 
+Module and Labware Compatibility
+================================
+
+Before adding labware to your module, you should check if the desired labware is compatible with your module. For more information about each module’s compatible labware, check out this `support article <https://support.opentrons.com/en/articles/3540964-what-labware-can-i-use-with-my-modules>`_.
+
 
 Loading Labware Onto Your Module
 ================================
 
-Like specifying labware that will be present on the deck of the OT-2, you must specify labware that will be present on the module you have just loaded. You do this using :py:meth:`.ModuleContext.load_labware`. For instance, to load a Temperature Module and specify an `aluminum block for 2 mL tubes<https://labware.opentrons.com/opentrons_24_aluminumblock_generic_2ml_screwcap?category=aluminumBlock>`_, you would do:
+Like specifying labware that will be present on the deck of the OT-2, you must specify labware that will be present on the module you have just loaded. You do this using :py:meth:`.ModuleContext.load_labware`. For instance, to load a Temperature Module and specify an `aluminum block for 2 mL tubes <https://labware.opentrons.com/opentrons_24_aluminumblock_generic_2ml_screwcap?category=aluminumBlock>`_, you would do:
 
 .. code-block:: python
 
