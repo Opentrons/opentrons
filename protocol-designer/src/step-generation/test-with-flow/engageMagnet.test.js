@@ -3,6 +3,8 @@ import { makeContext, getInitialRobotStateStandard } from './fixtures'
 import { engageMagnet } from '../commandCreators/atomic/engageMagnet'
 
 const moduleId = 'magneticModuleId'
+const commandCreatorFnName = 'engageMagnet'
+
 describe('engageMagnet', () => {
   let invariantContext
   let robotState
@@ -24,7 +26,7 @@ describe('engageMagnet', () => {
     const module = moduleId
     const engageHeight = 2
     const result = engageMagnet(
-      { module, engageHeight },
+      { commandCreatorFnName, module, engageHeight },
       invariantContext,
       robotState
     )

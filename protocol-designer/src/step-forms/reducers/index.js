@@ -251,17 +251,29 @@ export const savedStepForms = (
               ...prevInitialDeckSetupStep.labwareLocationUpdate,
               [labwareOccupyingDestination]: moduleId,
             }
-      return {
-        ...savedStepForms,
-        [INITIAL_DECK_SETUP_STEP_ID]: {
-          ...prevInitialDeckSetupStep,
-          labwareLocationUpdate,
-          moduleLocationUpdate: {
-            ...prevInitialDeckSetupStep.moduleLocationUpdate,
-            [action.payload.id]: action.payload.slot,
-          },
-        },
-      }
+
+      return mapValues(savedStepForms, (savedForm: FormData, formId) => {
+        if (formId === INITIAL_DECK_SETUP_STEP_ID) {
+          return {
+            ...prevInitialDeckSetupStep,
+            labwareLocationUpdate,
+            moduleLocationUpdate: {
+              ...prevInitialDeckSetupStep.moduleLocationUpdate,
+              [action.payload.id]: action.payload.slot,
+            },
+          }
+        }
+
+        // NOTE: since users can only have 1 magnetic module at a time,
+        // and since the Magnet step form doesn't allow users to select a dropdown,
+        // we auto-select a newly-added magnetic module for all of them
+        // to handle the case where users delete and re-add a magnetic module
+        if (savedForm.stepType === 'magnet') {
+          return { ...savedForm, moduleId }
+        }
+
+        return savedForm
+      })
     }
     case 'MOVE_DECK_ITEM': {
       const { sourceSlot, destSlot } = action.payload
@@ -389,6 +401,8 @@ export const savedStepForms = (
                 labwareSlot === moduleId ? labwareFallbackSlot : labwareSlot
             ),
           }
+        } else if (form.stepType === 'magnet' && form.moduleId === moduleId) {
+          return { ...form, moduleId: null }
         } else {
           // TODO: Ian 2019-10-24 remove modules from forms that may reference them
           // via handleFormChange

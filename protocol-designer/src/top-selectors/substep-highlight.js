@@ -43,7 +43,11 @@ function _getSelectedWellsForStep(
   frame: StepGeneration.CommandsAndRobotState,
   invariantContext: StepGeneration.InvariantContext
 ): Array<string> {
-  if (stepArgs.commandCreatorFnName === 'delay') {
+  if (
+    stepArgs.commandCreatorFnName === 'delay' ||
+    stepArgs.commandCreatorFnName === 'engageMagnet' ||
+    stepArgs.commandCreatorFnName === 'disengageMagnet'
+  ) {
     return []
   }
 

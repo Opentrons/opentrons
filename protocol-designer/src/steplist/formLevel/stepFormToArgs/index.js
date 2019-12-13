@@ -3,6 +3,7 @@ import mapValues from 'lodash/mapValues'
 import { castField } from '../../../steplist/fieldLevel'
 import mixFormToArgs from './mixFormToArgs'
 import pauseFormToArgs from './pauseFormToArgs'
+import { magnetFormToArgs } from './magnetFormToArgs'
 import moveLiquidFormToArgs from './moveLiquidFormToArgs'
 import type { FormData } from '../../../form-types'
 import type { CommandCreatorArgs } from '../../../step-generation'
@@ -27,6 +28,8 @@ const stepFormToArgs = (hydratedForm: FormData): StepArgs => {
       return pauseFormToArgs(castForm)
     case 'mix':
       return mixFormToArgs(castForm)
+    case 'magnet':
+      return magnetFormToArgs(castForm)
     default:
       console.warn(`stepFormToArgs not implemented for ${castForm.stepType}`)
       return null

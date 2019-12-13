@@ -6,8 +6,8 @@ import mapValues from 'lodash/mapValues'
 // PD won't start, b/c of circular dependency when fileData/selectors/fileCreator
 // imports getDismissedWarnings selector from 'dismiss/
 import { timelineWarningsPerStep } from '../file-data/selectors/commands'
-import { selectors as stepFormSelectors } from '../step-forms'
-import { selectors as stepsSelectors } from '../ui/steps'
+import * as stepFormSelectors from '../step-forms/selectors'
+import stepsSelectors from '../ui/steps/selectors'
 import type { FormWarning } from '../steplist'
 import type { CommandCreatorWarning } from '../step-generation'
 import type { BaseState, Selector } from '../types'

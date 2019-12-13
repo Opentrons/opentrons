@@ -3,6 +3,8 @@ import { makeContext, getInitialRobotStateStandard } from './fixtures'
 import { disengageMagnet } from '../commandCreators/atomic/disengageMagnet'
 
 const moduleId = 'magneticModuleId'
+const commandCreatorFnName = 'disengageMagnet'
+
 describe('engageMagnet', () => {
   let invariantContext
   let robotState
@@ -22,7 +24,11 @@ describe('engageMagnet', () => {
   })
   test('creates engage magnet command', () => {
     const module = moduleId
-    const result = disengageMagnet({ module }, invariantContext, robotState)
+    const result = disengageMagnet(
+      { commandCreatorFnName, module },
+      invariantContext,
+      robotState
+    )
     expect(result).toEqual({
       commands: [
         {

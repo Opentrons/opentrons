@@ -141,6 +141,7 @@ const getWellSelectionLabwareKey: Selector<?string> = createSelector(
   (state: StepsState) => state.wellSelectionLabwareKey
 )
 
+// TODO: Ian 2019-12-13 don't use default exports here
 export default {
   rootSelector,
 
