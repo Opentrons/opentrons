@@ -274,35 +274,6 @@ For the purposes of this section, assume we have the following already:
 
 .. versionadded:: 2.0
 
-Opentrons App Control
-^^^^^^^^^^^^^^^^^^^^^
-
-Certain functionality of the Thermocycler Module can be controlled in the Opentrons App.
-
-Setting a Target Temperature
-++++++++++++++++++++++++++++
-
-Before running your protocol, when you navigate to the `Run` tab of the Opentrons App, you will see a Thermocycler Module card on the left-hand side like the image below.
-
-.. image:: ../img/modules/set_target.png
-
-If you wish to set a target temperature for the Thermocycler Module `block` before a protocol run, you may do so.
-When you run your actual protocol, the steps will not proceed until the target temperature that was set is reached.
-We recommend using this if you want to pre-heat or pre-cool samples located on your Thermocycler Module.
-
-Deactivating the Module
-+++++++++++++++++++++++
-
-Sometimes you may wish to deactivate the Thermocycler Module, in order to remove samples from the module or shut the
-module off after use. Before or after a protocol run, you can click the `deactivate` button to ensure that your Thermocycler Module is off before
-opening the lid. You may also deactivate your Thermocycler Module from your protocol by calling one of the methods outlined in :ref:`thermocycler-deactivation`.
-
-.. image:: ../img/modules/deactivate_tc.png
-
-.. note::
-
-    The Thermocycler Module will hold its temperature, regardless of whether a protocol is running or not. This allows you to cancel a run and be sure that your samples will be held at the temperature specified previously, until you decide to deactivate the module from the Opentrons App as described above.
-
 Lid Motor Control
 ^^^^^^^^^^^^^^^^^
 
