@@ -104,6 +104,9 @@ class Placeable(object):
         # by name and by reference
         self.children_by_name = OrderedDict()
         self.children_by_reference = OrderedDict()
+        # A special stash for original names because the children won't
+        # have them
+        self.child_original_names_by_reference = OrderedDict()
         self._coordinates = Vector(0, 0, 0)
 
         self.parent = parent
@@ -201,6 +204,15 @@ class Placeable(object):
 
         return self.parent.children_by_reference[self]
 
+    def get_original_name(self):
+        """ Returns the placeable's "original name" (i.e. not any
+        user-specified overrides
+        """
+        if self.parent is None:
+            return None
+
+        return self.parent.child_original_names_by_reference[self]
+
     def get_type(self):
         """
         Returns the Placeable's type or class name
@@ -246,7 +258,7 @@ class Placeable(object):
         coordinates = [i._coordinates for i in self.get_trace(reference)]
         return functools.reduce(lambda a, b: a + b, coordinates)
 
-    def add(self, child, name=None, coordinates=None):
+    def add(self, child, name=None, coordinates=None, original_name=None):
         """
         Adds child to the :Placeable:, storing it's :name: and :coordinates:
 
@@ -255,6 +267,9 @@ class Placeable(object):
         """
         if not name:
             name = str(child)
+
+        if not original_name:
+            original_name = name
 
         if name in self.children_by_name:
             raise RuntimeWarning(
@@ -266,6 +281,7 @@ class Placeable(object):
         child.parent = self
         self.children_by_name[name] = child
         self.children_by_reference[child] = name
+        self.child_original_names_by_reference[child] = original_name
 
     def get_deck(self):
         """
