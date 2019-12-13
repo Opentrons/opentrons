@@ -1712,7 +1712,7 @@ class Pipette(CommandPublisher):
                     dispense['volume'], dispense['location'], **kwargs)
                 if step is plan[-1] or plan[i + 1].get('aspirate'):
                     if touch_tip or touch_tip is 0:  # noqa(pyflakes)
-                        self.touch_tip(touch_tip)
+                        self.touch_tip(v_offset=touch_tip)
                     self._blowout_during_transfer(
                         dispense['location'], **kwargs)
                     tips = self._drop_tip_during_transfer(
@@ -1721,7 +1721,7 @@ class Pipette(CommandPublisher):
                     if air_gap:
                         self.air_gap(air_gap)
                     if touch_tip or touch_tip is 0:  # noqa(pyflakes)
-                        self.touch_tip(touch_tip)
+                        self.touch_tip(v_offset=touch_tip)
 
     def _add_tip_during_transfer(self, tips, **kwargs):
         """
