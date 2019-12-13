@@ -23,6 +23,9 @@ import { robotSettingsReducer } from './robot-settings/reducer'
 // pipettes state
 import { pipettesReducer } from './pipettes/reducer'
 
+// modules state
+import { modulesReducer } from './modules/reducer'
+
 // app shell state
 import { shellReducer } from './shell'
 
@@ -51,6 +54,7 @@ const rootReducer: Reducer<State, Action> = combineReducers<_, Action>({
   robotAdmin: robotAdminReducer,
   robotSettings: robotSettingsReducer,
   pipettes: pipettesReducer,
+  modules: modulesReducer,
   config: configReducer,
   discovery: discoveryReducer,
   labware: customLabwareReducer,

@@ -12,7 +12,7 @@ type ActionSpec = {|
   expected: PipettesAction,
 |}
 
-describe('robot settings actions', () => {
+describe('robot pipettes actions', () => {
   const SPECS: Array<ActionSpec> = [
     {
       name: 'pipettes:FETCH_PIPETTES without refresh',
