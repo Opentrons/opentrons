@@ -49,7 +49,7 @@ Module names can be specified in a few different ways. The valid names can be fo
 Loading Labware Onto Your Module
 ================================
 
-Like specifying labware that will be present on the deck of the OT-2, you must specify labware that will be present on the module you have just loaded. You do this using :py:meth:`.ModuleContext.load_labware`. For instance, to load a Temperature Module and specify an `aluminum block for 2 mL tubes<https://labware.opentrons.com/opentrons_24_aluminumblock_generic_2ml_screwcap?category=aluminumBlock>`_, you would do:
+Like specifying labware that will be present on the deck of the OT-2, you must specify labware that will be present on the module you have just loaded. You do this using :py:meth:`.ModuleContext.load_labware`. For instance, to load a Temperature Module and specify an `aluminum block for 2 mL tubes <https://labware.opentrons.com/opentrons_24_aluminumblock_generic_2ml_screwcap?category=aluminumBlock>`_, you would do:
 
 .. code-block:: python
 

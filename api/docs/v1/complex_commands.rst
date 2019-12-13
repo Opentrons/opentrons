@@ -26,6 +26,7 @@ Transfer
 ========
 
 Most of time, a protocol is really just looping over some wells, aspirating, and then dispensing. Even though they are simple in nature, these loops take up a lot of space. The ``pipette.transfer()`` command takes care of those common loops. It will combine aspirates and dispenses automatically, making your protocol easier to read and edit.
+For transferring with a multi-channel, please refer to the :ref:`multi-channel-lh` section.
 
 Basic
 -----
@@ -628,9 +629,15 @@ will have the steps...
     Dispensing 100.0 uL into well A2 in "1"
     Dropping tip well A1 in "12"
 
+.. _multi-channel-lh
 
-Multi-Channels and Complex Liquid Handling
-==========================================
+Multi-Channel Pipettes and Complex Liquid Handling
+==================================================
+
+When the robot is determining positioning for a multi-channel pipette, it uses
+the back-nozzle (`A1` channel) to move to the plate. While considering which
+wells you should input into your complex function, always keep in mind that
+you should determine the multi-channel position via the back-nozzle position.
 
 We will be using the code-block below to perform our examples.
 
@@ -638,7 +645,9 @@ We will be using the code-block below to perform our examples.
 
     from opentrons import robot, labware, instruments
 
-    plate = labware.load('96-flat', '1')
+    plate_96 = labware.load('96-flat', '1')
+    plate_384 = labware.load('384-plate', '3')
+    trough = labware.load('trough-12row', '4')
 
     tiprack = labware.load('opentrons-tiprack-300ul', '2')
 
@@ -646,12 +655,15 @@ We will be using the code-block below to perform our examples.
         mount='left',
         tip_racks=[tiprack])
 
-If you want to move across a plate using a multi-channel you can do the
+Transfer in a 96 Well Plate
+---------------------------
+
+If you want to move across a 96 well plate using a multi-channel you can do the
 following:
 
 .. code-block:: python
 
-    multi_pipette.transfer(50, plate.columns('1'), plate.columns('2', to='12'))
+    multi_pipette.transfer(50, plate_96.columns('1'), plate_96.columns('2', to='12'))
 
 will have the steps
 
@@ -687,7 +699,7 @@ or
 
 .. code-block:: python
 
-    multi_pipette.transfer(50, plate.wells('A1'), plate.columns('2', to='12'))
+    multi_pipette.transfer(50, plate_96.wells('A1'), plate_96.columns('2', to='12'))
 
 will have the steps
 
@@ -719,13 +731,45 @@ will have the steps
     Dispensing 50.0 uL into wells A12...H12 in "3"
     Dropping tip well A1 in "12"
 
+.. note::
 
-If you were to input something such as:
-
+The following scenarios may _not_ work as you expect them to.
 
 .. code-block:: python
 
-    multi_pipette.transfer(50, plate.wells('A1'), plate.wells())
+    multi_pipette.transfer(50, plate_96.wells('A1'), plate_96.wells())
 
 The multi-channel would visit **every** well in the plate and dispense liquid
 outside of the plate boundaries so be careful!
+
+.. code-block:: python
+
+    multi_pipette.transfer(50, plate_96.wells('A1'), plate_96.rows('A'))
+
+In this scenario, the multi-channel would only visit the first column of the plate.
+
+
+Transfer in a 384 Well Plate
+----------------------------
+
+In a 384 Well plate, there are 2 sets of 'columns' that the multi-channel can
+dispense into ['A1', 'C1'...'A2', 'C2'...] and ['B1', 'D1'...'B2', 'D2'].
+
+If you want to transfer to a 384 well plate in order, you can do:
+
+.. code-block:: python
+
+    alternating_wells = []
+    for row in plate_384.rows():
+        alternating_wells.append(row.wells('A'))
+        alternating_wells.append(row.wells('B'))
+    multi_pipette.transfer(50, trough.wells('A1'), alternating_wells)
+
+
+or you can choose to dispense by row first, moving first through row A
+and then through row B of the 384 well plate.
+
+.. code-block:: python
+
+    list_of_wells = [for well in plate_384.rows('A')] + [for well in plate_384.rows('B')]
+    multi_pipette.transfer(50, trough.wells('A1'), list_of_wells)
