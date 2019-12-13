@@ -22,6 +22,13 @@ export default function Resources() {
           url={'https://protocols.opentrons.com/'}
         />
       </CardRow>
+      <CardRow>
+        <ResourceCard
+          title="Python Protocol API Documentation"
+          description="Browse documentation for the OT-2 Python Protocol API"
+          url={'https://docs.opentrons.com/'}
+        />
+      </CardRow>
     </CardContainer>
   )
 }
