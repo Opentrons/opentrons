@@ -297,6 +297,10 @@ class ProtocolContext(CommandPublisher):
         :param location: The slot into which to load the labware such as
                          1 or '1'
         :type location: int or str
+        :param str label: An optional special name to give the labware. If
+                          specified, this is the name the labware will appear
+                          as in the run log and the calibration view in the
+                          Opentrons app.
         """
         parent = self.deck.position_for(location)
         labware_obj = load_from_definition(labware_def, parent, label)
@@ -310,7 +314,7 @@ class ProtocolContext(CommandPublisher):
             location: types.DeckLocation,
             label: str = None,
             namespace: str = None,
-            version: int = None,
+            version: int = 1,
     ) -> Labware:
         """ Load a labware onto the deck given its name.
 
@@ -1957,29 +1961,49 @@ class ModuleContext(CommandPublisher):
         return mod_labware
 
     @requires_version(2, 0)
-    def load_labware(self, name: str) -> Labware:
+    def load_labware(
+            self,
+            name: str,
+            label: str = None,
+            namespace: str = None,
+            version: int = 1,
+            ) -> Labware:
         """ Specify the presence of a piece of labware on the module.
 
         :param name: The name of the labware object.
+        :param str label: An optional special name to give the labware. If
+                          specified, this is the name the labware will appear
+                          as in the run log and the calibration view in the
+                          Opentrons app.
+        :param str namespace: The namespace the labware definition belongs to.
+            If unspecified, will search 'opentrons' then 'custom_beta'
+        :param int version: The version of the labware definition. If
+            unspecified, will use version 1.
         :returns: The initialized and loaded labware object.
         """
         lw = load(
-            name, self._geometry.location,
+            name, self._geometry.location, label, namespace, version,
             bundled_defs=self._ctx._bundled_labware)
         return self.load_labware_object(lw)
 
     @requires_version(2, 0)
     def load_labware_from_definition(
-            self, definition: Dict[str, Any]) -> Labware:
+            self,
+            definition: Dict[str, Any],
+            label: str = None) -> Labware:
         """
         Specify the presence of a labware on the module, using an
         inline definition.
 
         :param definition: The labware definition.
+        :param str label: An optional special name to give the labware. If
+                          specified, this is the name the labware will appear
+                          as in the run log and the calibration view in the
+                          Opentrons app.
         :returns: The initialized and loaded labware object.
         """
         lw = load_from_definition(
-            definition, self._geometry.location)
+            definition, self._geometry.location, label)
         return self.load_labware_object(lw)
 
     @requires_version(2, 0)
