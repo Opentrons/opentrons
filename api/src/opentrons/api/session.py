@@ -376,6 +376,8 @@ class Session(object):
                              context=self._simulating_ctx)
             else:
                 robot.broker = self._broker
+                # we don't rely on being connected anymore so make sure we are
+                robot.connect()
                 robot.cache_instrument_models()
                 robot.disconnect()
 
@@ -506,6 +508,10 @@ class Session(object):
                 robot.broker = self._broker
                 assert isinstance(self._protocol, PythonProtocol),\
                     'Internal error: v1 should only be used for python'
+                if not robot.is_connected():
+                    robot.connect()
+                robot.cache_instrument_models()
+                robot.discover_modules()
                 exec(self._protocol.contents, {})
 
             # If the last command in a protocol was a pause, the protocol
