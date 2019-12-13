@@ -23,8 +23,8 @@ export type MagneticData = {|
 |}
 
 export type ThermocyclerData = {|
-  // TODO(mc, 2019-12-12): in_between not yet implemented server side due to
-  // firmware limitations in current hardware revision
+  // TODO(mc, 2019-12-12): in_between comes from the thermocycler firmware and
+  // will be rare in normal operation due to limitations in current revision
   lid: 'open' | 'closed' | 'in_between',
   lidTarget: number | null,
   lidTemp: number | null,
