@@ -12,12 +12,12 @@ type BaseModule = {|
   port: string,
 |}
 
-export type TempDeckData = {|
+export type TemperatureData = {|
   currentTemp: number,
   targetTemp: number | null,
 |}
 
-export type MagDeckData = {|
+export type MagneticData = {|
   engaged: boolean,
   height: number,
 |}
@@ -56,14 +56,14 @@ export type MagneticStatus = 'engaged' | 'disengaged'
 export type TemperatureModule = {|
   ...BaseModule,
   name: 'tempdeck',
-  data: TempDeckData,
+  data: TemperatureData,
   status: TemperatureStatus,
 |}
 
 export type MagneticModule = {|
   ...BaseModule,
   name: 'magdeck',
-  data: MagDeckData,
+  data: MagneticData,
   status: MagneticStatus,
 |}
 

@@ -33,6 +33,12 @@ const mockGetRobotByName: JestMockFn<[any, string], mixed> =
 describe('fetchModulesEpic', () => {
   let testScheduler
 
+  const meta = { requestId: '1234' }
+  const action: Types.FetchModulesAction = {
+    ...Actions.fetchModules(mockRobot.name),
+    meta,
+  }
+
   beforeEach(() => {
     mockGetRobotByName.mockReturnValue(mockRobot)
 
@@ -45,74 +51,63 @@ describe('fetchModulesEpic', () => {
     jest.resetAllMocks()
   })
 
-  describe('handles FETCH_MODULES', () => {
-    const meta = { requestId: '1234' }
-    const action: Types.FetchModulesAction = {
-      ...Actions.fetchModules(mockRobot.name),
-      meta,
-    }
+  test('calls GET /modules', () => {
+    testScheduler.run(({ hot, cold, expectObservable, flush }) => {
+      mockFetchRobotApi.mockReturnValue(
+        cold('r', { r: Fixtures.mockFetchModulesSuccess })
+      )
 
-    test('calls GET /modules', () => {
-      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-        mockFetchRobotApi.mockReturnValue(
-          cold('r', { r: Fixtures.mockFetchModulesSuccess })
-        )
+      const action$ = hot('--a', { a: action })
+      const state$ = hot('a-a', { a: mockState })
+      const output$ = modulesEpic(action$, state$)
 
-        const action$ = hot('--a', { a: action })
-        const state$ = hot('a-a', { a: mockState })
-        const output$ = modulesEpic(action$, state$)
+      expectObservable(output$)
+      flush()
 
-        expectObservable(output$)
-        flush()
-
-        expect(mockGetRobotByName).toHaveBeenCalledWith(
-          mockState,
-          mockRobot.name
-        )
-        expect(mockFetchRobotApi).toHaveBeenCalledWith(mockRobot, {
-          method: 'GET',
-          path: '/modules',
-        })
+      expect(mockGetRobotByName).toHaveBeenCalledWith(mockState, mockRobot.name)
+      expect(mockFetchRobotApi).toHaveBeenCalledWith(mockRobot, {
+        method: 'GET',
+        path: '/modules',
       })
     })
+  })
 
-    test('maps successful response to FETCH_PIPETTES_SUCCESS', () => {
-      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-        mockFetchRobotApi.mockReturnValue(
-          cold('r', { r: Fixtures.mockFetchModulesSuccess })
-        )
+  test('maps successful response to FETCH_PIPETTES_SUCCESS', () => {
+    testScheduler.run(({ hot, cold, expectObservable, flush }) => {
+      mockFetchRobotApi.mockReturnValue(
+        cold('r', { r: Fixtures.mockFetchModulesSuccess })
+      )
 
-        const action$ = hot('--a', { a: action })
-        const state$ = hot('a-a', { a: {} })
-        const output$ = modulesEpic(action$, state$)
+      const action$ = hot('--a', { a: action })
+      const state$ = hot('a-a', { a: {} })
+      const output$ = modulesEpic(action$, state$)
 
-        expectObservable(output$).toBe('--a', {
-          a: Actions.fetchModulesSuccess(
-            mockRobot.name,
-            Fixtures.mockFetchModulesSuccess.body.modules,
-            { ...meta, response: Fixtures.mockFetchModulesSuccessMeta }
-          ),
-        })
+      expectObservable(output$).toBe('--a', {
+        a: Actions.fetchModulesSuccess(
+          mockRobot.name,
+          Fixtures.mockFetchModulesSuccess.body.modules,
+          { ...meta, response: Fixtures.mockFetchModulesSuccessMeta }
+        ),
       })
     })
+  })
 
-    test('maps failed response to FETCH_PIPETTES_FAILURE', () => {
-      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-        mockFetchRobotApi.mockReturnValue(
-          cold('r', { r: Fixtures.mockFetchModulesFailure })
-        )
+  test('maps failed response to FETCH_PIPETTES_FAILURE', () => {
+    testScheduler.run(({ hot, cold, expectObservable, flush }) => {
+      mockFetchRobotApi.mockReturnValue(
+        cold('r', { r: Fixtures.mockFetchModulesFailure })
+      )
 
-        const action$ = hot('--a', { a: action })
-        const state$ = hot('a-a', { a: {} })
-        const output$ = modulesEpic(action$, state$)
+      const action$ = hot('--a', { a: action })
+      const state$ = hot('a-a', { a: {} })
+      const output$ = modulesEpic(action$, state$)
 
-        expectObservable(output$).toBe('--a', {
-          a: Actions.fetchModulesFailure(
-            mockRobot.name,
-            { message: 'AH' },
-            { ...meta, response: Fixtures.mockFetchModulesFailureMeta }
-          ),
-        })
+      expectObservable(output$).toBe('--a', {
+        a: Actions.fetchModulesFailure(
+          mockRobot.name,
+          { message: 'AH' },
+          { ...meta, response: Fixtures.mockFetchModulesFailureMeta }
+        ),
       })
     })
   })

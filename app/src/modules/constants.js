@@ -4,7 +4,7 @@
 
 export const THERMOCYCLER: 'thermocycler' = 'thermocycler'
 
-export const PREPARABLE_MODULES = ['thermocycler']
+export const PREPARABLE_MODULES = [THERMOCYCLER]
 
 // http paths
 
