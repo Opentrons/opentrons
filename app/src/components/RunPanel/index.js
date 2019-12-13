@@ -6,12 +6,12 @@ import {
   actions as robotActions,
   selectors as robotSelectors,
 } from '../../robot'
-import { getMissingModules } from '../../robot-api'
+import { getMissingModules } from '../../modules'
 
 import { SidePanel, SidePanelGroup } from '@opentrons/components'
 import RunTimer from './RunTimer'
 import RunControls from './RunControls'
-import ModuleLiveStatusCards from '../ModuleLiveStatusCards'
+import { ModuleLiveStatusCards } from '../ModuleLiveStatusCards'
 
 import type { State, Dispatch } from '../../types'
 

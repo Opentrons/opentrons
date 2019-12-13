@@ -4,11 +4,12 @@ import styles from './styles.css'
 
 type TemperatureDataProps = {|
   title: string,
-  current: number,
-  target: ?number,
+  current: number | null,
+  target: number | null,
   className: string,
 |}
-const TemperatureData = ({
+
+export const TemperatureData = ({
   title,
   current,
   target,
@@ -30,5 +31,3 @@ const TemperatureData = ({
     </div>
   </div>
 )
-
-export default TemperatureData

@@ -12,7 +12,7 @@ import type { State } from '../types'
 export type ActionToRequestMapper<A> = (
   A,
   State
-) => Types.HostlessRobotApiRequest
+) => Types.RobotApiRequestOptions
 
 export type ResponseToActionMapper<A, B> = (
   Types.RobotApiResponse,

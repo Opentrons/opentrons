@@ -12,7 +12,7 @@ import { pipettesEpic } from '../../epic'
 import type { Observable } from 'rxjs'
 import type {
   RobotHost,
-  HostlessRobotApiRequest,
+  RobotApiRequestOptions,
   RobotApiResponse,
 } from '../../../robot-api/types'
 
@@ -23,7 +23,7 @@ const mockState = { state: true }
 const { mockRobot } = Fixtures
 
 const mockFetchRobotApi: JestMockFn<
-  [RobotHost, HostlessRobotApiRequest],
+  [RobotHost, RobotApiRequestOptions],
   Observable<RobotApiResponse>
 > = RobotApiHttp.fetchRobotApi
 

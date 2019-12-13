@@ -39,7 +39,7 @@ export const sendModuleCommand = (
   robotName: string,
   moduleId: string,
   command: Types.ModuleCommand,
-  args: Array<mixed>
+  args: Array<mixed> = []
 ): Types.SendModuleCommandAction => ({
   type: Constants.SEND_MODULE_COMMAND,
   payload: { robotName, moduleId, command, args },

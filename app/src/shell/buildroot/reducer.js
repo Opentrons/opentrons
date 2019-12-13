@@ -6,7 +6,7 @@ import {
   passRobotApiRequestAction,
   passRobotApiResponseAction,
   passRobotApiErrorAction,
-} from '../../robot-api/utils'
+} from '../../robot-api/deprecated'
 import * as actions from './actions'
 
 export const INITIAL_STATE: BuildrootState = {

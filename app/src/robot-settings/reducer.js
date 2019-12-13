@@ -1,5 +1,5 @@
 // @flow
-import { passRobotApiResponseAction } from '../robot-api/utils'
+import { passRobotApiResponseAction } from '../robot-api/deprecated'
 import { CLEAR_RESTART_PATH, SETTINGS_PATH } from './constants'
 
 import type { Action, ActionLike } from '../types'

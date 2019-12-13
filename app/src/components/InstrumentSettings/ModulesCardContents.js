@@ -1,25 +1,24 @@
 // @flow
 import * as React from 'react'
 
-import ModuleItem, { NoModulesMessage } from '../ModuleItem'
+import { ModuleItem, NoModulesMessage } from '../ModuleItem'
 
-import type { Robot } from '../../discovery/types'
-import type { Module } from '../../robot-api/types'
+import type { AttachedModule } from '../../modules/types'
 
-type Props = {
-  robot: Robot,
-  modules: Array<Module>,
-}
+type Props = {|
+  modules: Array<AttachedModule>,
+  canControl: boolean,
+|}
 
-export default function ModulesCardContents(props: Props) {
-  const { modules, robot } = props
+export function ModulesCardContents(props: Props) {
+  const { modules, canControl } = props
   if (modules.length === 0) return <NoModulesMessage />
 
   return (
-    <React.Fragment>
+    <>
       {modules.map((mod, index) => (
-        <ModuleItem module={mod} key={index} robot={robot} />
+        <ModuleItem key={index} module={mod} canControl={canControl} />
       ))}
-    </React.Fragment>
+    </>
   )
 }

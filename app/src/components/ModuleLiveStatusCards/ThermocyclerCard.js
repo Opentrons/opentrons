@@ -5,16 +5,12 @@ import cx from 'classnames'
 import { LabeledValue } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import StatusCard from './StatusCard'
-import StatusItem from './StatusItem'
+import { TemperatureControl, TemperatureData } from '../ModuleControls'
+import { StatusCard } from './StatusCard'
+import { StatusItem } from './StatusItem'
 import styles from './styles.css'
-import TemperatureControl from '../ModuleControls/TemperatureControl'
-import TemperatureData from '../ModuleControls/TemperatureData'
 
-import type {
-  ThermocyclerModule,
-  ModuleCommandRequest,
-} from '../../robot-api/types'
+import type { ThermocyclerModule, ModuleCommand } from '../../modules/types'
 
 const TimeRemaining = ({
   holdTime,
@@ -79,13 +75,17 @@ const CycleInfo = ({
 
 type Props = {|
   module: ThermocyclerModule,
-  sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
+  sendModuleCommand: (
+    moduleId: string,
+    command: ModuleCommand,
+    args?: Array<mixed>
+  ) => mixed,
   isProtocolActive: boolean,
   isCardExpanded: boolean,
   toggleCard: boolean => mixed,
 |}
 
-const ThermocyclerCard = ({
+export const ThermocyclerCard = ({
   module,
   sendModuleCommand,
   isProtocolActive,
@@ -155,5 +155,3 @@ const ThermocyclerCard = ({
     </StatusCard>
   )
 }
-
-export default ThermocyclerCard

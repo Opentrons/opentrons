@@ -2,7 +2,7 @@
 import { of } from 'rxjs'
 import { map, filter, switchMap, mergeMap } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
-import { makeRobotApiRequest } from '../robot-api/utils'
+import { makeRobotApiRequest } from '../robot-api/deprecated'
 import { getRobotAdminStatus, RESTARTING_STATUS } from '../robot-admin'
 import { clearRestartPath } from './actions'
 import { getAllRestartRequiredRobots } from './selectors'

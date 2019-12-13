@@ -12,7 +12,7 @@ import { robotAdminEpic } from '../epic'
 import type { Observable } from 'rxjs'
 import type {
   RobotHost,
-  HostlessRobotApiRequest,
+  RobotApiRequestOptions,
   RobotApiResponse,
 } from '../../robot-api/types'
 
@@ -21,7 +21,7 @@ jest.mock('../../discovery/selectors')
 jest.mock('../../robot-settings/selectors')
 
 const mockFetchRobotApi: JestMockFn<
-  [RobotHost, HostlessRobotApiRequest],
+  [RobotHost, RobotApiRequestOptions],
   Observable<RobotApiResponse>
 > = RobotApiHttp.fetchRobotApi
 

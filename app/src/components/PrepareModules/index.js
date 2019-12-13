@@ -4,29 +4,25 @@ import { useDispatch } from 'react-redux'
 import some from 'lodash/some'
 import { PrimaryButton, AlertModal, Icon } from '@opentrons/components'
 
-import { sendModuleCommand } from '../../robot-api'
+import { sendModuleCommand } from '../../modules'
 import DeckMap from '../DeckMap'
 import styles from './styles.css'
 import { Portal } from '../portal'
 
 import type { Dispatch } from '../../types'
-import type { Module, RobotHost } from '../../robot-api/types'
+import type { AttachedModule } from '../../modules/types'
 
-type Props = {| robot: RobotHost, modules: Array<Module> |}
+type Props = {| robotName: string, modules: Array<AttachedModule> |}
 
-function PrepareModules(props: Props) {
-  const { modules, robot } = props
+export function PrepareModules(props: Props) {
+  const { modules, robotName } = props
   const dispatch = useDispatch<Dispatch>()
 
   const handleOpenLidClick = () => {
     modules
       .filter(mod => mod.name === 'thermocycler')
-      .forEach(
-        mod =>
-          robot &&
-          dispatch(
-            sendModuleCommand(robot, mod.serial, { command_type: 'open' })
-          )
+      .forEach(mod =>
+        dispatch(sendModuleCommand(robotName, mod.serial, 'open'))
       )
   }
 
@@ -70,5 +66,3 @@ function PrepareModules(props: Props) {
     </div>
   )
 }
-
-export default PrepareModules
