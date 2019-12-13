@@ -1,5 +1,6 @@
 import copy
 import logging
+import asyncio
 from threading import Event
 from typing import Dict, Optional, List, Tuple, TYPE_CHECKING, Callable
 from contextlib import contextmanager
@@ -209,14 +210,14 @@ class Simulator:
             self,
             port: str,
             model: str,
-            run_flag: asyncio.Event,
+            gate_keeper: asyncio.Event,
             interrupt_callback: modules.InterruptCallback
             ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
             which=model,
             simulating=True,
-            run_flag=run_flag,
+            gate_keeper=gate_keeper,
             interrupt_callback=interrupt_callback)
 
     @property

@@ -19,6 +19,7 @@ class AbstractModule(abc.ABC):
     async def build(cls,
                     port: str,
                     run_flag: asyncio.Event,
+                    gate_keeper: asyncio.Event = None,
                     interrupt_callback: InterruptCallback = None,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None) \
