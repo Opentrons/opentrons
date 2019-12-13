@@ -28,7 +28,7 @@ export const addStep = (payload: { stepType: StepType }) => (
   const magnetModuleHasLabware = uiModuleSelectors.getMagnetModuleHasLabware(
     state
   )
-  // console.log(uiModuleSelectors.getMagnetModuleHasLabware(state))
+
   // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
   const stepNeedsLiquid = ['mix', 'moveLiquid'].includes(payload.stepType)
   const stepMagnetNeedsLabware = ['magnet'].includes(payload.stepType)

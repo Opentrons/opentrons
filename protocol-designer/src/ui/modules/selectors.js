@@ -39,7 +39,7 @@ export const getThermocyclerLabwareOptions: Selector<Options> = createSelector(
 )
 
 /** Returns boolean if magnetic module has labware */
-export const getMagnetModuleHasLabware: Selector<?boolean> = createSelector(
+export const getMagnetModuleHasLabware: Selector<boolean> = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   initialDeckSetup => {
     return getModuleHasLabware(initialDeckSetup, 'magdeck')

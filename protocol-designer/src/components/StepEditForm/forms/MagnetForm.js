@@ -16,6 +16,10 @@ function MagnetForm(props: MagnetFormProps): React.Element<'div'> {
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getMagneticLabwareOptions
   )
+  const moduleOption: ?string = moduleLabwareOptions[0]
+    ? moduleLabwareOptions[0].name
+    : 'No magnetic module'
+
   return (
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
@@ -29,9 +33,7 @@ function MagnetForm(props: MagnetFormProps): React.Element<'div'> {
           label={i18n.t('form.step_edit_form.field.moduleActionLabware.label')}
           className={styles.magnet_form_group}
         >
-          <p className={styles.module_labware_text}>
-            {moduleLabwareOptions[0].name}
-          </p>
+          <p className={styles.module_labware_text}>{moduleOption}</p>
         </FormGroup>
         <FormGroup
           label={i18n.t('form.step_edit_form.field.magnetAction.label')}

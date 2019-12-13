@@ -63,5 +63,5 @@ export function getModuleHasLabware(
 ): boolean {
   const module = getModuleOnDeckByType(initialDeckSetup, type)
   const labware = module && getLabwareOnModule(initialDeckSetup, module.id)
-  return !!module && !!labware
+  return Boolean(module) && Boolean(labware)
 }
