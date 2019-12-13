@@ -7,11 +7,15 @@ import classnames from 'classnames'
 import styles from './lists.css'
 import { type IconName, Icon } from '../icons'
 
-type ListItemProps = {
+type ListItemProps = {|
   /** click handler */
   onClick?: (event: SyntheticEvent<>) => mixed,
+  /** mouse enter handler */
+  onMouseEnter?: (event: SyntheticMouseEvent<>) => mixed,
+  /** mouse leave handler */
+  onMouseLeave?: (event: SyntheticMouseEvent<>) => mixed,
   /** if URL is specified, ListItem is wrapped in a React Router NavLink */
-  url?: string,
+  url?: string | null,
   /** if URL is specified NavLink can receive an active class name */
   activeClassName?: string,
   /** if URL is specified NavLink can receive an exact property for matching routes */
@@ -23,13 +27,15 @@ type ListItemProps = {
   /** name constant of the icon to display */
   iconName?: IconName,
   children: React.Node,
-}
+|}
 
 /**
  * A styled `<li>` with an optional icon, and an optional url for a React Router `NavLink`
  *
  */
-export default function ListItem(props: ListItemProps) {
+export default React.forwardRef<ListItemProps, _>(ListItem)
+
+function ListItem(props: ListItemProps, ref) {
   const { url, isDisabled, iconName, activeClassName, exact } = props
   const onClick = props.onClick && !isDisabled ? props.onClick : undefined
 
@@ -42,9 +48,13 @@ export default function ListItem(props: ListItemProps) {
     <Icon className={styles.item_icon} name={iconName} />
   )
 
-  if (url) {
+  if (url != null) {
     return (
-      <li>
+      <li
+        onMouseEnter={props.onMouseEnter}
+        onMouseLeave={props.onMouseLeave}
+        ref={ref}
+      >
         <NavLink
           to={url}
           onClick={onClick}
@@ -61,7 +71,13 @@ export default function ListItem(props: ListItemProps) {
   }
 
   return (
-    <li onClick={onClick} className={className}>
+    <li
+      ref={ref}
+      onClick={onClick}
+      onMouseEnter={props.onMouseEnter}
+      onMouseLeave={props.onMouseLeave}
+      className={className}
+    >
       {itemIcon}
       {props.children}
     </li>

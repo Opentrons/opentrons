@@ -22,7 +22,6 @@ import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
 
 const RUN_TIME_TICK_INTERVAL_MS = 1000
 const NO_INTERVAL = -1
-const RE_VOLUME = /.*?(\d+).*?/
 const RE_TIPRACK = /tip ?rack/i
 
 const THIS_ROBOT_DOES_NOT_SUPPORT_BUNDLES =
@@ -549,17 +548,21 @@ export default function client(dispatch) {
     }
 
     function addApiInstrumentToPipettes(apiInstrument) {
-      const { _id, mount, name, channels, requested_as } = apiInstrument
-      // TODO(mc, 2018-01-17): pull this somehow from tiprack the instrument
-      //  interacts with
-      const volume = Number(name.match(RE_VOLUME)[1])
+      const {
+        _id,
+        mount,
+        name,
+        channels,
+        requested_as,
+        tip_racks,
+      } = apiInstrument
 
       update.pipettesByMount[mount] = {
         _id,
         mount,
         name,
         channels,
-        volume,
+        tipRacks: tip_racks.map(t => t._id),
         requestedAs: requested_as,
       }
     }

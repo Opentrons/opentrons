@@ -1,11 +1,10 @@
 // @flow
 // setup pipettes component
 import * as React from 'react'
-import { connect } from 'react-redux'
-import { Redirect } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
 
 import { selectors as robotSelectors } from '../../robot'
-import { fetchPipettes, getAttachedPipettes } from '../../pipettes'
+import { PIPETTE_MOUNTS, fetchPipettes } from '../../pipettes'
 import { getConnectedRobot } from '../../discovery'
 
 import Page from '../../components/Page'
@@ -14,101 +13,43 @@ import { PipetteTabs, Pipettes } from '../../components/calibrate-pipettes'
 import SessionHeader from '../../components/SessionHeader'
 
 import type { ContextRouter } from 'react-router-dom'
-import type { State, Dispatch } from '../../types'
-import type { Pipette, TiprackByMountMap } from '../../robot/types'
-import type { AttachedPipettesByMount } from '../../pipettes/types'
-import type { Robot } from '../../discovery/types'
+import type { Dispatch } from '../../types'
+import type { Mount } from '../../pipettes/types'
 
-type OP = ContextRouter
+type Props = ContextRouter
 
-type SP = {|
-  pipettes: Array<Pipette>,
-  tipracksByMount: TiprackByMountMap,
-  currentPipette: ?Pipette,
-  actualPipettes: ?AttachedPipettesByMount,
-  _robot: ?Robot,
-|}
+export default function CalibratePipettesPage(props: Props) {
+  const { mount } = props.match.params
+  const dispatch = useDispatch<Dispatch>()
+  const robot = useSelector(getConnectedRobot)
+  const robotName = robot?.name || null
+  const tipracksByMount = useSelector(robotSelectors.getTipracksByMount)
+  const pipettes = useSelector(robotSelectors.getPipettes)
 
-type DP = {| dispatch: Dispatch |}
-
-type Props = {|
-  ...OP,
-  ...SP,
-  fetchPipettes: () => mixed,
-  changePipetteUrl: string,
-|}
-
-export default connect<Props, OP, SP, {||}, State, Dispatch>(
-  mapStateToProps,
-  null,
-  mergeProps
-)(CalibratePipettesPage)
-
-function CalibratePipettesPage(props: Props) {
-  const {
-    pipettes,
-    tipracksByMount,
-    actualPipettes,
-    currentPipette,
-    fetchPipettes,
-    match: { url, params },
-    changePipetteUrl,
-  } = props
+  const changePipetteUrl =
+    robotName !== null ? `/robots/${robotName}/instruments` : '/robots'
 
   React.useEffect(() => {
-    fetchPipettes()
-  }, [fetchPipettes])
+    robotName && dispatch(fetchPipettes(robotName))
+  }, [dispatch, robotName])
 
-  // redirect back to mountless route if mount doesn't exist
-  if (params.mount && !currentPipette) {
-    return <Redirect to={url.replace(`/${params.mount}`, '')} />
-  }
+  const currentMount: Mount | null =
+    PIPETTE_MOUNTS.find(m => m === mount) || null
+
+  const currentPipette = pipettes.find(p => p.mount === currentMount) || null
 
   return (
     <Page titleBarProps={{ title: <SessionHeader /> }}>
-      <PipetteTabs {...{ pipettes, currentPipette }} />
+      <PipetteTabs currentMount={currentMount} />
       <Pipettes
         {...{
+          currentMount,
           pipettes,
           tipracksByMount,
-          currentPipette,
-          actualPipettes,
           changePipetteUrl,
         }}
       />
       {!!currentPipette && <TipProbe {...currentPipette} />}
     </Page>
   )
-}
-
-function mapStateToProps(state: State, ownProps: OP): SP {
-  const { mount } = ownProps.match.params
-  const _robot = getConnectedRobot(state)
-  const pipettes = robotSelectors.getPipettes(state)
-  const tipracksByMount = robotSelectors.getTipracksByMount(state)
-  const currentPipette = pipettes.find(p => p.mount === mount)
-  const actualPipettes = _robot && getAttachedPipettes(state, _robot.name)
-
-  return {
-    _robot,
-    pipettes,
-    tipracksByMount,
-    actualPipettes,
-    currentPipette,
-  }
-}
-
-function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
-  const { dispatch } = dispatchProps
-  const { _robot } = stateProps
-  const changePipetteUrl = _robot
-    ? `/robots/${_robot.name}/instruments`
-    : '/robots'
-
-  return {
-    ...ownProps,
-    ...stateProps,
-    changePipetteUrl,
-    fetchPipettes: () => _robot && dispatch(fetchPipettes(_robot.name)),
-  }
 }

@@ -436,14 +436,16 @@ describe('api client', () => {
               mount: 'left',
               name: 'p200',
               channels: 1,
-              volume: 200,
+              tipRacks: [4, 5],
+              requestedAs: 'bar',
             },
             right: {
               _id: 1,
               mount: 'right',
               name: 'p50',
               channels: 8,
-              volume: 50,
+              tipRacks: [3, 4],
+              requestedAs: 'foo',
             },
           },
         }),
@@ -451,8 +453,22 @@ describe('api client', () => {
       )
 
       session.instruments = [
-        { _id: 1, mount: 'right', name: 'p50', channels: 8 },
-        { _id: 2, mount: 'left', name: 'p200', channels: 1 },
+        {
+          _id: 1,
+          mount: 'right',
+          name: 'p50',
+          channels: 8,
+          tip_racks: [{ _id: 3 }, { _id: 4 }],
+          requested_as: 'foo',
+        },
+        {
+          _id: 2,
+          mount: 'left',
+          name: 'p200',
+          channels: 1,
+          tip_racks: [{ _id: 4 }, { _id: 5 }],
+          requested_as: 'bar',
+        },
       ]
 
       return sendConnect().then(() =>

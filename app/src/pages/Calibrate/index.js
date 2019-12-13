@@ -14,7 +14,7 @@ import CalibrateLabware from './Labware'
 type OP = {| match: Match |}
 
 type SP = {|
-  nextPipette: Pipette,
+  nextPipette: Pipette | null,
   labware: Array<Labware>,
   nextLabware: Labware,
   isTipsProbed: boolean,

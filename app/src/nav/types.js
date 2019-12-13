@@ -10,3 +10,8 @@ export type NavLocation = {|
   disabledReason?: string | null,
   notificationReason?: string | null,
 |}
+
+export type SubnavLocation = {|
+  path: string,
+  disabledReason?: string | null,
+|}
