@@ -17,7 +17,7 @@ export function useTimeout(callback: () => mixed, delay: number | null): void {
     savedCallback.current = callback
   }, [callback])
 
-  // set up the interval
+  // set up the timeout
   useEffect(() => {
     const currentCallback = () =>
       savedCallback.current && savedCallback.current()
