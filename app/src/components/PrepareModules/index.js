@@ -1,8 +1,12 @@
 // @flow
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
-import some from 'lodash/some'
-import { PrimaryButton, AlertModal, Icon } from '@opentrons/components'
+import {
+  useTimeout,
+  PrimaryButton,
+  AlertModal,
+  Icon,
+} from '@opentrons/components'
 
 import { sendModuleCommand } from '../../modules'
 import DeckMap from '../DeckMap'
@@ -20,6 +24,16 @@ export function PrepareModules(props: Props) {
   const dispatch = useDispatch<Dispatch>()
   const [isHandling, setIsHandling] = React.useState(false)
 
+  // NOTE: this is the smarter implementation of isHandling that
+  // relies on the TC reporting its 'in_between' status while the lid m
+  // motor is moving, which currently doesn't happen because of a FW limitation
+  // const isHandling = some(
+  //   modules,
+  //   mod => mod.name === 'thermocycler' && mod.data?.lid === 'in_between'
+  // )
+
+  useTimeout(() => setIsHandling(false), isHandling ? LID_OPEN_DELAY_MS : null)
+
   const handleOpenLidClick = () => {
     modules
       .filter(mod => mod.name === 'thermocycler')
@@ -27,7 +41,6 @@ export function PrepareModules(props: Props) {
         dispatch(sendModuleCommand(robotName, mod.serial, 'open'))
       )
     setIsHandling(true)
-    setTimeout(() => setIsHandling(false), LID_OPEN_DELAY_MS)
   }
 
   return (
