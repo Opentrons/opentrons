@@ -57,6 +57,10 @@ function InfoBoxButton(props: Props) {
           // $FlowFixMe(BC, 2019-08-20): tagForRobotApi typing
           dispatch(robotActions.returnTip(mountToUse))
         }}
+        moveGantryToSafety={() => {
+          // $FlowFixMe(BC, 2019-12-16): tagForRobotApi typing
+          dispatch(robotActions.dropTipAndHome('left', '2'))
+        }}
       />
     )
   }

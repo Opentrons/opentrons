@@ -14,10 +14,11 @@ import styles from './styles.css'
 
 type Props = {|
   returnTip: () => mixed,
+  moveGantryToSafety: () => mixed,
 |}
 
 function InfoBoxButton(props: Props) {
-  const { returnTip } = props
+  const { returnTip, moveGantryToSafety } = props
   const dispatch = useDispatch<Dispatch>()
   const sessionModules = useSelector(robotSelectors.getModules)
   const [mustPrepForRun, setMustPrepForRun] = useState(false)
@@ -32,6 +33,7 @@ function InfoBoxButton(props: Props) {
   const handleClick = () => {
     // $FlowFixMe: robotActions.returnTip is not typed
     returnTip()
+    moveGantryToSafety()
     if (mustPrepForRun) {
       setRunPrepModalOpen(true)
     } else {
