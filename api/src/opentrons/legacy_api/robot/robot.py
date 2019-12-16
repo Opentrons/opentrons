@@ -855,7 +855,7 @@ class Robot(CommandPublisher):
             self, container, name, slot, label=None, share=False):
         location = self._get_placement_location(slot)
         if self._is_available_slot(location, share, slot, name):
-            location.add(container, label or name)
+            location.add(container, label or name, original_name=name)
         self.add_container_to_pose_tracker(location, container)
         self.max_deck_height.cache_clear()
         return container

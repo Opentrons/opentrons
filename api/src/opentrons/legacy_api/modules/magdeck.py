@@ -54,7 +54,7 @@ class MagDeck(commands.CommandPublisher):
                     magdeck_engage_height()
             except KeyError:
                 height = LABWARE_ENGAGE_HEIGHT.get(
-                    self.labware.get_children_list()[1].get_name())
+                    self.labware.get_children_list()[1].get_original_name())
             if not height:
                 raise ValueError(
                     'No engage height definition found for {}. Provide a'
