@@ -5,15 +5,16 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 import { LabeledValue } from '@opentrons/components'
 import styles from './styles.css'
 
-import type { Module } from '../../robot-api/types'
+import type { AttachedModule } from '../../modules/types'
 
-type Props = {
-  module: Module,
-}
+type Props = {|
+  module: AttachedModule,
+|}
 
-export default function ModuleInfo(props: Props) {
+export function ModuleInfo(props: Props) {
   const { name, serial, status, fwVersion } = props.module
   const displayName = getModuleDisplayName(name)
+
   return (
     <div className={styles.module_info}>
       <div className={styles.grid_50}>

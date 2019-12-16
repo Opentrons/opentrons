@@ -1,16 +1,16 @@
 // @flow
 import { TestScheduler } from 'rxjs/testing'
 
-import * as ApiUtils from '../../robot-api/utils'
+import * as ApiUtils from '../../robot-api/deprecated'
 import * as RobotAdminSelectors from '../../robot-admin/selectors'
 import * as Actions from '../actions'
 import * as Selectors from '../selectors'
 import { robotSettingsEpic } from '../epic'
 
 import type { State } from '../../types'
-import type { RobotApiRequest, RequestMeta } from '../../robot-api/types'
+import type { RobotApiRequest, RequestMeta } from '../../robot-api/deprecated'
 
-jest.mock('../../robot-api/utils')
+jest.mock('../../robot-api/deprecated')
 jest.mock('../../robot-admin/selectors')
 jest.mock('../selectors')
 

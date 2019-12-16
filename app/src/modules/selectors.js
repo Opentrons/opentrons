@@ -19,7 +19,7 @@ export const getAttachedModules: (
   modulesById => sortBy(modulesById, 'serial')
 )
 
-const getAttachedModulesForConnectedRobot = (
+export const getAttachedModulesForConnectedRobot = (
   state: State
 ): Array<Types.AttachedModule> => {
   const robotName = RobotSelectors.getConnectedRobotName(state)

@@ -1,6 +1,6 @@
 // @flow
 
-import type { RobotApiRequest } from '../robot-api/types'
+import type { RobotApiRequest } from '../robot-api/deprecated'
 
 export type RobotSettingsField = {|
   id: string,

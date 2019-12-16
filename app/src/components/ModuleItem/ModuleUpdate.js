@@ -5,11 +5,11 @@ import { OutlineButton } from '@opentrons/components'
 
 import styles from './styles.css'
 
-type Props = {
+type Props = {|
   availableUpdate?: ?string,
-}
+|}
 
-export default function ModuleUpdate(props: Props) {
+export function ModuleUpdate(props: Props) {
   const { availableUpdate } = props
   const buttonText = availableUpdate ? 'update' : 'updated'
   return (

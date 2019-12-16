@@ -3,12 +3,13 @@ import * as React from 'react'
 
 import styles from './styles.css'
 
-type Props = {
+type Props = {|
   name: string,
-}
+|}
 
-export default function ModuleImage(props: Props) {
+export function ModuleImage(props: Props) {
   const imgSrc = getModuleImg(props.name)
+
   return (
     <div className={styles.module_image_wrapper}>
       <img src={imgSrc} className={styles.module_image} />

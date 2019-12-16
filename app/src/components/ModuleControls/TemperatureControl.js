@@ -8,31 +8,44 @@ import {
   HoverTooltip,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
+import { THERMOCYCLER } from '../../modules'
 import { Portal } from '../portal'
 import styles from './styles.css'
 
 import type {
   ThermocyclerModule,
-  TempDeckModule,
-  ModuleCommandRequest,
-} from '../../robot-api/types'
+  TemperatureModule,
+  ModuleCommand,
+} from '../../modules/types'
 
 const CONNECT_FOR_CONTROL = 'Connect to robot to control modules'
 type Props = {|
-  module: ThermocyclerModule | TempDeckModule,
-  sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
+  module: ThermocyclerModule | TemperatureModule,
+  sendModuleCommand: (
+    moduleId: string,
+    command: ModuleCommand,
+    args?: Array<mixed>
+  ) => mixed,
   disabled?: boolean,
 |}
-const TemperatureControl = ({ module, sendModuleCommand, disabled }: Props) => {
+
+export const TemperatureControl = ({
+  module,
+  sendModuleCommand,
+  disabled,
+}: Props) => {
   const [primaryTempValue, setPrimaryTempValue] = useState(null)
   const [secondaryTempValue, setSecondaryTempValue] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isSecondaryTempEnabled, enableSecondaryTemp] = useState(false)
 
-  const hasTarget = module.status !== 'idle' || Boolean(module.data.lidTarget)
+  const hasTarget =
+    module.status !== 'idle' ||
+    (module.name === THERMOCYCLER && module.data.lidTarget != null)
+
   const handleClick = () => {
     if (hasTarget) {
-      sendModuleCommand(module.serial, { command_type: 'deactivate' })
+      sendModuleCommand(module.serial, 'deactivate')
     } else {
       setIsModalOpen(true)
     }
@@ -40,16 +53,14 @@ const TemperatureControl = ({ module, sendModuleCommand, disabled }: Props) => {
 
   const handleSubmitTemp = () => {
     if (primaryTempValue != null) {
-      sendModuleCommand(module.serial, {
-        command_type: 'set_temperature',
-        args: [Number(primaryTempValue)],
-      })
+      sendModuleCommand(module.serial, 'set_temperature', [
+        Number(primaryTempValue),
+      ])
     }
     if (secondaryTempValue != null) {
-      sendModuleCommand(module.serial, {
-        command_type: 'set_lid_temperature',
-        args: [Number(secondaryTempValue)],
-      })
+      sendModuleCommand(module.serial, 'set_lid_temperature', [
+        Number(secondaryTempValue),
+      ])
     }
     setIsModalOpen(false)
     setPrimaryTempValue(null)
@@ -130,5 +141,3 @@ const TemperatureControl = ({ module, sendModuleCommand, disabled }: Props) => {
     </>
   )
 }
-
-export default TemperatureControl

@@ -14,3 +14,7 @@ export default function createLogger(filename) {
     }
   )
 }
+
+export const useLogger = filename => {
+  return createLogger(filename)
+}

@@ -2,23 +2,21 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 
-import { getConnectedRobot } from '../../discovery'
-import { getModulesState } from '../../robot-api'
+import {
+  useSendModuleCommand,
+  getAttachedModulesForConnectedRobot,
+  THERMOCYCLER,
+  TEMPDECK,
+  MAGDECK,
+} from '../../modules'
+
 import { selectors as robotSelectors } from '../../robot'
+import { TempDeckCard } from './TempDeckCard'
+import { MagDeckCard } from './MagDeckCard'
+import { ThermocyclerCard } from './ThermocyclerCard'
 
-import useSendModuleCommand from '../ModuleControls/useSendModuleCommand'
-import TempDeckCard from './TempDeckCard'
-import MagDeckCard from './MagDeckCard'
-import ThermocyclerCard from './ThermocyclerCard'
-
-import type { Robot } from '../../discovery/types'
-import type { Module } from '../../robot-api/types'
-
-const ModuleLiveStatusCards = () => {
-  const robot: ?Robot = useSelector(getConnectedRobot)
-  const modules: Array<Module> = useSelector(state =>
-    robot ? getModulesState(state, robot.name) : []
-  )
+export const ModuleLiveStatusCards = () => {
+  const modules = useSelector(getAttachedModulesForConnectedRobot)
   const sendModuleCommand = useSendModuleCommand()
   const isProtocolActive: boolean = useSelector(robotSelectors.getIsActive)
   const [expandedCard, setExpandedCard] = React.useState(
@@ -42,7 +40,7 @@ const ModuleLiveStatusCards = () => {
     <>
       {modules.map((module, index) => {
         switch (module.name) {
-          case 'tempdeck':
+          case TEMPDECK:
             return (
               <TempDeckCard
                 key={module.serial}
@@ -53,7 +51,7 @@ const ModuleLiveStatusCards = () => {
                 isProtocolActive={isProtocolActive}
               />
             )
-          case 'thermocycler':
+          case THERMOCYCLER:
             return (
               <ThermocyclerCard
                 key={module.serial}
@@ -64,7 +62,7 @@ const ModuleLiveStatusCards = () => {
                 isProtocolActive={isProtocolActive}
               />
             )
-          case 'magdeck':
+          case MAGDECK:
             return (
               <MagDeckCard
                 key={module.serial}
@@ -80,5 +78,3 @@ const ModuleLiveStatusCards = () => {
     </>
   )
 }
-
-export default ModuleLiveStatusCards

@@ -18,7 +18,7 @@ import {
   type SessionModule,
 } from '../../robot'
 
-import { getMissingModules } from '../../robot-api'
+import { getMissingModules } from '../../modules'
 
 import LabwareItem from './LabwareItem'
 

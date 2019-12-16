@@ -3,12 +3,10 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { Route, Redirect, withRouter } from 'react-router-dom'
-import { push } from 'connected-react-router'
 
 import { selectors as robotSelectors } from '../../robot'
-import { getConnectedRobot } from '../../discovery'
 import { getRobotSettings } from '../../robot-settings'
-import { getUnpreparedModules } from '../../robot-api/resources/modules'
+import { getUnpreparedModules } from '../../modules'
 
 import Page from '../../components/Page'
 import CalibrateLabware from '../../components/CalibrateLabware'
@@ -16,13 +14,12 @@ import SessionHeader from '../../components/SessionHeader'
 import ReviewDeck from '../../components/ReviewDeck'
 import ConfirmModal from '../../components/CalibrateLabware/ConfirmModal'
 import ConnectModules from '../../components/ConnectModules'
-import PrepareModules from '../../components/PrepareModules'
+import { PrepareModules } from '../../components/PrepareModules'
 
 import type { ContextRouter } from 'react-router-dom'
 import type { State, Dispatch } from '../../types'
 import type { Labware } from '../../robot/types'
-import type { Robot } from '../../discovery/types'
-import type { Module } from '../../robot-api/types'
+import type { AttachedModule } from '../../modules/types'
 
 type OP = ContextRouter
 
@@ -30,46 +27,42 @@ type SP = {|
   deckPopulated: boolean,
   labware: ?Labware,
   calibrateToBottom: boolean,
-  robot: ?Robot,
+  robotName: string | null,
   hasModulesLeftToReview: ?boolean,
-  unpreparedModules: Array<Module>,
+  unpreparedModules: Array<AttachedModule>,
 |}
 
-type DP = {| onBackClick: () => mixed |}
-
-type Props = {| ...OP, ...SP, ...DP |}
+type Props = {| ...OP, ...SP, dispatch: Dispatch |}
 
 export default withRouter<_, _>(
-  connect<Props, OP, SP, _, _, _>(
-    mapStateToProps,
-    mapDispatchToProps
-  )(SetupDeckPage)
+  connect<Props, OP, SP, _, _, _>(mapStateToProps)(SetupDeckPage)
 )
 
 function SetupDeckPage(props: Props) {
   const {
-    robot,
+    robotName,
     calibrateToBottom,
     labware,
     unpreparedModules,
     deckPopulated,
     hasModulesLeftToReview,
-    onBackClick,
     match: {
       url,
       params: { slot },
     },
   } = props
 
-  if (!robot) {
+  if (robotName === null) {
     return <Redirect to="/" />
   }
 
   const renderPage = () => {
     if (hasModulesLeftToReview) {
-      return <ConnectModules robot={robot} />
+      return <ConnectModules robotName={robotName} />
     } else if (unpreparedModules.length > 0) {
-      return <PrepareModules robot={robot} modules={unpreparedModules} />
+      return (
+        <PrepareModules robotName={robotName} modules={unpreparedModules} />
+      )
     } else if (!deckPopulated && !hasModulesLeftToReview) {
       return <ReviewDeck slot={slot} />
     } else {
@@ -77,11 +70,11 @@ function SetupDeckPage(props: Props) {
     }
   }
   return (
-    <React.Fragment>
+    <>
       <Page titleBarProps={{ title: <SessionHeader /> }}>{renderPage()}</Page>
       <Route
         path={`${url}/confirm`}
-        render={() => {
+        render={routeProps => {
           if (!labware || labware.calibration === 'confirmed') {
             return <Redirect to={url} />
           }
@@ -89,13 +82,13 @@ function SetupDeckPage(props: Props) {
           return (
             <ConfirmModal
               labware={labware}
-              onBackClick={onBackClick}
+              onBackClick={() => routeProps.history.push(url)}
               calibrateToBottom={calibrateToBottom}
             />
           )
         }}
       />
-    </React.Fragment>
+    </>
   )
 }
 
@@ -106,8 +99,8 @@ function mapStateToProps(state: State, ownProps: OP): SP {
   const modules = robotSelectors.getModules(state)
   const hasModulesLeftToReview =
     modules.length > 0 && !robotSelectors.getModulesReviewed(state)
-  const robot = getConnectedRobot(state)
-  const settings = robot && getRobotSettings(state, robot.name)
+  const robotName = robotSelectors.getConnectedRobotName(state)
+  const settings = getRobotSettings(state, robotName)
 
   // TODO(mc, 2018-07-23): make diagram component a container
   const calToBottomFlag =
@@ -116,20 +109,10 @@ function mapStateToProps(state: State, ownProps: OP): SP {
 
   return {
     calibrateToBottom,
-    robot,
+    robotName,
     labware: currentLabware,
     deckPopulated: !!robotSelectors.getDeckPopulated(state),
     hasModulesLeftToReview,
     unpreparedModules: getUnpreparedModules(state),
-  }
-}
-
-function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
-  const {
-    match: { url },
-  } = ownProps
-
-  return {
-    onBackClick: () => dispatch(push(url)),
   }
 }

@@ -1,24 +1,23 @@
 // @flow
 import * as React from 'react'
 
-import ModuleImage from './ModuleImage'
-import ModuleInfo from './ModuleInfo'
-import ModuleUpdate from './ModuleUpdate'
-import NoModulesMessage from './NoModulesMessage'
-import ModuleControls from '../ModuleControls'
+import { ModuleImage } from './ModuleImage'
+import { ModuleInfo } from './ModuleInfo'
+import { ModuleUpdate } from './ModuleUpdate'
+import { ModuleControls } from '../ModuleControls'
 import styles from './styles.css'
 
-import type { Module } from '../../robot-api/types'
-import type { Robot } from '../../discovery/types'
+import type { AttachedModule } from '../../modules/types'
 
-type Props = {
-  robot: Robot,
-  module: Module,
+type Props = {|
+  module: AttachedModule,
+  canControl: boolean,
   availableUpdate?: ?string,
-}
+|}
 
-export default function ModuleItem(props: Props) {
-  const { module, robot } = props
+export function ModuleItem(props: Props) {
+  const { module, canControl } = props
+
   return (
     <div className={styles.module_item}>
       <div className={styles.module_content}>
@@ -27,10 +26,10 @@ export default function ModuleItem(props: Props) {
         <ModuleUpdate availableUpdate={props.availableUpdate} />
       </div>
       {(module.name === 'thermocycler' || module.name === 'tempdeck') && (
-        <ModuleControls robot={robot} module={module} />
+        <ModuleControls module={module} canControl={canControl} />
       )}
     </div>
   )
 }
 
-export { NoModulesMessage }
+export { NoModulesMessage } from './NoModulesMessage'
