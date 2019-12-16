@@ -1,0 +1,7 @@
+{
+  "detectiveOptions": {
+    "es6": {
+      "skipTypeImports": true
+    }
+  }
+}
