@@ -3,7 +3,7 @@ import * as React from 'react'
 import { mount } from 'enzyme'
 import { useInterval } from '..'
 
-describe('usePrevious hook', () => {
+describe('useInterval hook', () => {
   const callback = jest.fn()
 
   beforeEach(() => {

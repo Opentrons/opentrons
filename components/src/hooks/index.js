@@ -3,3 +3,4 @@
 
 export * from './usePrevious'
 export * from './useInterval'
+export * from './useTimeout'
