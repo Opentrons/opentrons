@@ -5,7 +5,10 @@ import { OutlineButton, PrimaryButton } from '@opentrons/components'
 import cx from 'classnames'
 
 import { actions as steplistActions } from '../../steplist'
-import { selectors as stepFormSelectors } from '../../step-forms'
+import {
+  actions as stepFormActions,
+  selectors as stepFormSelectors,
+} from '../../step-forms'
 import type { BaseState, ThunkDispatch } from '../../types'
 import styles from './StepEditForm.css'
 
@@ -62,7 +65,7 @@ const STP = (state: BaseState): SP => ({
 
 const DTP = (dispatch: ThunkDispatch<*>): DP => ({
   onCancel: () => dispatch(steplistActions.cancelStepForm()),
-  onSave: () => dispatch(steplistActions.saveStepForm()),
+  onSave: () => dispatch(stepFormActions.saveStepForm()),
 })
 
 export default connect<Props, OP, SP, DP, _, _>(

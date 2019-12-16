@@ -1,10 +1,6 @@
 // @flow
-import type { Dispatch } from 'redux'
-
-import { selectors as stepFormSelectors } from '../../step-forms'
 import type { StepType, StepIdType, FormData } from '../../form-types'
 import type { ChangeFormPayload } from './types'
-import type { GetState } from '../../types'
 
 export type ChangeSavedStepFormAction = {
   type: 'CHANGE_SAVED_STEP_FORM',
@@ -42,25 +38,6 @@ export const deleteStep = (stepId: StepIdType) => ({
   type: 'DELETE_STEP',
   payload: stepId,
 })
-
-export type SaveStepFormAction = {
-  type: 'SAVE_STEP_FORM',
-  payload: { id: StepIdType },
-}
-
-export const saveStepForm = () => (
-  dispatch: Dispatch<*>,
-  getState: GetState
-) => {
-  const state = getState()
-
-  if (stepFormSelectors.getCurrentFormCanBeSaved(state)) {
-    dispatch({
-      type: 'SAVE_STEP_FORM',
-      payload: stepFormSelectors.getUnsavedForm(state),
-    })
-  }
-}
 
 export type CancelStepFormAction = { type: 'CANCEL_STEP_FORM', payload: null }
 export const cancelStepForm = () => ({

@@ -1,7 +1,6 @@
 // @flow
 import assert from 'assert'
 import { handleActions } from 'redux-actions'
-import type { ActionType } from 'redux-actions'
 import mapValues from 'lodash/mapValues'
 import cloneDeep from 'lodash/cloneDeep'
 import merge from 'lodash/merge'
@@ -30,6 +29,7 @@ import {
 } from '../selectors'
 import { getIdsInRange, getDeckItemIdInSlot } from '../utils'
 
+import type { ActionType } from 'redux-actions'
 import type { LoadFileAction } from '../../load-file'
 import type {
   CreateContainerAction,
@@ -51,7 +51,6 @@ import type {
   DeleteStepAction,
   PopulateFormAction,
   ReorderStepsAction,
-  SaveStepFormAction,
 } from '../../steplist/actions'
 import type {
   DuplicateStepAction,
@@ -71,6 +70,7 @@ import type {
   CreateModuleAction,
   EditModuleAction,
   DeleteModuleAction,
+  SaveStepFormAction,
 } from '../actions'
 
 type FormState = FormData | null
