@@ -1,5 +1,5 @@
 // @flow
-import { AIR, createTipLiquidState } from '../utils'
+import { AIR, createTipLiquidState } from '../utils/misc'
 import {
   makeContext,
   getInitialRobotStateStandard,
