@@ -80,6 +80,7 @@
     "jest": "^24.8.0",
     "lerna": "^3.16.4",
     "lost": "^8.3.1",
+    "madge": "^3.6.0",
     "mime": "^2.4.4",
     "mini-css-extract-plugin": "^0.8.0",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
