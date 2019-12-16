@@ -2,7 +2,6 @@ import json
 import pkgutil
 from unittest import mock
 import opentrons.protocol_api as papi
-from opentrons.protocols.types import APIVersion
 from opentrons.types import Point
 
 import pytest

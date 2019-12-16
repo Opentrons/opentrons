@@ -1990,9 +1990,9 @@ class ModuleContext(CommandPublisher):
                 f'You have specified API {self._ctx.api_version}, but you '
                 'are trying to utilize new load_labware parameters in 2.1')
         lw = load(name, self._geometry.location,
-                    label, namespace, version,
-                    bundled_defs=self._ctx._bundled_labware,
-                    extra_defs=self._ctx._extra_labware)
+                  label, namespace, version,
+                  bundled_defs=self._ctx._bundled_labware,
+                  extra_defs=self._ctx._extra_labware)
         return self.load_labware_object(lw)
 
     @requires_version(2, 0)
