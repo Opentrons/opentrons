@@ -247,7 +247,7 @@ class ProtocolContext(CommandPublisher):
                 if isinstance(mod_ctx, ThermocyclerContext):
                     tc_context = mod_ctx
                     hw_tc = next(hw_mod for hw_mod in
-                                 hardware.attached_modules.values()
+                                 hardware.attached_modules
                                  if hw_mod.name() == 'thermocycler')
                     if hw_tc:
                         old_tc = mod_ctx._module
