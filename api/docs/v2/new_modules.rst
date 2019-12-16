@@ -252,7 +252,7 @@ There are two heating mechanisms in the Thermocycler. One is the block in which 
 
 The block can control its temperature between 4 °C and 99 °C to the nearest 1 °C.
 
-The lid can control its temperature between 37 °C to 110 °C.
+The lid can control its temperature between 37 °C to 110 °C. Please see our `support article <https://support.opentrons.com/en/articles/3469797-thermocycler-module>`_ on controlling the Thermocycler in the Opentrons App.
 
 For the purposes of this section, assume we have the following already:
 
