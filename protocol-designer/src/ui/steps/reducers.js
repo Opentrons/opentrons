@@ -1,29 +1,29 @@
 // @flow
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import type { ActionType, Reducer } from 'redux-actions'
 import omit from 'lodash/omit'
-
 import { getPDMetadata } from '../../file-types'
-
-import type { Action } from '../../types'
-import type { LoadFileAction } from '../../load-file'
-import type { StepIdType } from '../../form-types'
 import {
   START_TERMINAL_ITEM_ID,
   type SubstepIdentifier,
   type TerminalItemId,
 } from '../../steplist/types'
-import type { AddStepAction, DeleteStepAction } from '../../steplist/actions'
-
 import {
   hoverOnSubstep,
   hoverOnStep,
   hoverOnTerminalItem,
   toggleStepCollapsed,
-  type SelectStepAction,
-  type SelectTerminalItemAction,
-} from './actions'
+} from './actions/actions'
+
+import type { ActionType, Reducer } from 'redux-actions'
+import type { Action } from '../../types'
+import type { LoadFileAction } from '../../load-file'
+import type { StepIdType } from '../../form-types'
+import type { AddStepAction, DeleteStepAction } from '../../steplist/actions'
+import type {
+  SelectStepAction,
+  SelectTerminalItemAction,
+} from './actions/types'
 
 export type CollapsedStepsState = { [StepIdType]: boolean }
 

@@ -14,7 +14,7 @@ import LabwareUploadMessageModal from './modals/LabwareUploadMessageModal'
 import GateModal from './modals/GateModal'
 import { PortalRoot as MainPageModalPortalRoot } from '../components/portals/MainPageModalPortal'
 import { PortalRoot as TopPortalRoot } from './portals/TopPortal'
-import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../ui/steps/actions'
+import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../ui/steps'
 import styles from './ProtocolEditor.css'
 
 const showGateModal =

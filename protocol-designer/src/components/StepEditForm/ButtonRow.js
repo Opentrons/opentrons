@@ -5,7 +5,7 @@ import { OutlineButton, PrimaryButton } from '@opentrons/components'
 import cx from 'classnames'
 
 import { actions as steplistActions } from '../../steplist'
-import { selectors as stepsSelectors } from '../../ui/steps'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import type { BaseState, ThunkDispatch } from '../../types'
 import styles from './StepEditForm.css'
 
@@ -57,7 +57,7 @@ const ButtonRow = (props: Props) => {
 }
 
 const STP = (state: BaseState): SP => ({
-  canSave: stepsSelectors.getCurrentFormCanBeSaved(state),
+  canSave: stepFormSelectors.getCurrentFormCanBeSaved(state),
 })
 
 const DTP = (dispatch: ThunkDispatch<*>): DP => ({

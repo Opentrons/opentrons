@@ -1,7 +1,6 @@
 // @flow
 import { createSelector } from 'reselect'
 import last from 'lodash/last'
-import isEmpty from 'lodash/isEmpty'
 
 import * as stepFormSelectors from '../../step-forms/selectors' // TODO Ian 2018-12-20: fix circular dependency so this direct import isn't required
 import type { StepIdType } from '../../form-types'
@@ -137,14 +136,6 @@ const getSelectedStep: Selector<StepItemData | null> = createSelector(
   }
 )
 
-// TODO: BC: 2018-10-26 remove this when we decide to not block save
-export const getCurrentFormCanBeSaved: Selector<boolean> = createSelector(
-  stepFormSelectors.getUnsavedFormErrors,
-  formErrors => {
-    return Boolean(formErrors && isEmpty(formErrors))
-  }
-)
-
 const getWellSelectionLabwareKey: Selector<?string> = createSelector(
   rootSelector,
   (state: StepsState) => state.wellSelectionLabwareKey
@@ -163,7 +154,6 @@ export default {
   getActiveItem,
   getHoveredSubstep,
   getWellSelectionLabwareKey,
-  getCurrentFormCanBeSaved,
 
   // NOTE: this is exposed only for substeps/selectors.js
   getCollapsedSteps,

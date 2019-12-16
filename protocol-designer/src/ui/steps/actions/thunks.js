@@ -1,18 +1,12 @@
 // @flow
-import { uuid } from '../../utils'
-import { selectors as labwareIngredsSelectors } from '../../labware-ingred/selectors'
-import {
-  selectors as stepsSelectors,
-  actions as stepsActions,
-} from '../../ui/steps'
-import { actions as tutorialActions } from '../../tutorial'
-import type { StepType, StepIdType } from '../../form-types'
-import type { GetState, ThunkDispatch } from '../../types'
-
-export type SelectStepAction = {
-  type: 'SELECT_STEP',
-  payload: StepIdType,
-}
+import { uuid } from '../../../utils'
+import { selectors as labwareIngredsSelectors } from '../../../labware-ingred/selectors'
+import stepsSelectors from '../selectors'
+import { selectStep } from './actions'
+import { actions as tutorialActions } from '../../../tutorial'
+import type { DuplicateStepAction, ReorderSelectedStepAction } from './types'
+import type { StepType, StepIdType } from '../../../form-types'
+import type { GetState, ThunkDispatch } from '../../../types'
 
 // addStep thunk adds an incremental integer ID for Step reducers.
 export const addStep = (payload: { stepType: StepType }) => (
@@ -35,15 +29,7 @@ export const addStep = (payload: { stepType: StepType }) => (
   if (stepNeedsLiquid && !deckHasLiquid) {
     dispatch(tutorialActions.addHint('add_liquids_and_labware'))
   }
-  dispatch(stepsActions.selectStep(stepId, stepType))
-}
-
-export type ReorderSelectedStepAction = {
-  type: 'REORDER_SELECTED_STEP',
-  payload: {
-    delta: number,
-    stepId: StepIdType,
-  },
+  dispatch(selectStep(stepId, stepType))
 }
 
 export const reorderSelectedStep = (delta: number) => (
@@ -61,14 +47,6 @@ export const reorderSelectedStep = (delta: number) => (
       },
     })
   }
-}
-
-export type DuplicateStepAction = {
-  type: 'DUPLICATE_STEP',
-  payload: {
-    stepId: StepIdType,
-    duplicateStepId: StepIdType,
-  },
 }
 
 export const duplicateStep = (stepId: StepIdType) => (

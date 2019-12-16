@@ -2,7 +2,6 @@
 import type { Dispatch } from 'redux'
 
 import { selectors as stepFormSelectors } from '../../step-forms'
-import { selectors as stepsSelectors } from '../../ui/steps'
 import type { StepType, StepIdType, FormData } from '../../form-types'
 import type { ChangeFormPayload } from './types'
 import type { GetState } from '../../types'
@@ -48,13 +47,14 @@ export type SaveStepFormAction = {
   type: 'SAVE_STEP_FORM',
   payload: { id: StepIdType },
 }
+
 export const saveStepForm = () => (
   dispatch: Dispatch<*>,
   getState: GetState
 ) => {
   const state = getState()
 
-  if (stepsSelectors.getCurrentFormCanBeSaved(state)) {
+  if (stepFormSelectors.getCurrentFormCanBeSaved(state)) {
     dispatch({
       type: 'SAVE_STEP_FORM',
       payload: stepFormSelectors.getUnsavedForm(state),

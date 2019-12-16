@@ -49,12 +49,14 @@ import type {
   ChangeFormInputAction,
   ChangeSavedStepFormAction,
   DeleteStepAction,
-  DuplicateStepAction,
   PopulateFormAction,
-  ReorderSelectedStepAction,
   ReorderStepsAction,
   SaveStepFormAction,
 } from '../../steplist/actions'
+import type {
+  DuplicateStepAction,
+  ReorderSelectedStepAction,
+} from '../../ui/steps'
 import type { StepItemData } from '../../steplist/types'
 import type {
   NormalizedPipetteById,

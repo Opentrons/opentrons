@@ -3,6 +3,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import type { ThunkDispatch } from '../../types'
 import i18n from '../../localization'
+import { actions as stepsActions } from '../../ui/steps'
 import { actions as steplistActions } from '../../steplist'
 import { Portal } from '../portals/TopPortal'
 import type { StepIdType } from '../../form-types'
@@ -146,7 +147,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
   deleteStep: (stepId: StepIdType) =>
     dispatch(steplistActions.deleteStep(stepId)),
   duplicateStep: (stepId: StepIdType) =>
-    dispatch(steplistActions.duplicateStep(stepId)),
+    dispatch(stepsActions.duplicateStep(stepId)),
 })
 
 export default connect<Props, OP, {||}, DP, _, _>(
