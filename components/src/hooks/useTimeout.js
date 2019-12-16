@@ -2,8 +2,7 @@
 import { useEffect, useRef } from 'react'
 
 /**
- * React hook to call a function on an interval; copied from:
- * https://overreacted.io/making-setinterval-declarative-with-react-hooks/
+ * React hook to call a function after a delay; adapted from: useInterval
  *
  * @template T (type of the input value)
  * @param {() => mixed} callback (function to call after timeout)
