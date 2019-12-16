@@ -12,11 +12,13 @@ import { Portal } from '../portal'
 import type { Dispatch } from '../../types'
 import type { AttachedModule } from '../../modules/types'
 
+const LID_OPEN_DELAY_MS = 30 * 1000
 type Props = {| robotName: string, modules: Array<AttachedModule> |}
 
 export function PrepareModules(props: Props) {
   const { modules, robotName } = props
   const dispatch = useDispatch<Dispatch>()
+  const [isHandling, setIsHandling] = React.useState(false)
 
   const handleOpenLidClick = () => {
     modules
@@ -24,12 +26,10 @@ export function PrepareModules(props: Props) {
       .forEach(mod =>
         dispatch(sendModuleCommand(robotName, mod.serial, 'open'))
       )
+    setIsHandling(true)
+    setTimeout(() => setIsHandling(false), LID_OPEN_DELAY_MS)
   }
 
-  const isHandling = some(
-    modules,
-    mod => mod.name === 'thermocycler' && mod.data?.lid === 'in_between'
-  )
   return (
     <div className={styles.page_content_dark}>
       <div className={styles.deck_map_wrapper}>
@@ -47,7 +47,7 @@ export function PrepareModules(props: Props) {
           <PrimaryButton
             className={styles.open_lid_button}
             onClick={handleOpenLidClick}
-            // disabled={isHandling}  TODO: uncomment when optical latches report 'closed'
+            disabled={isHandling}
           >
             {isHandling ? (
               <>
