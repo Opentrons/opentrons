@@ -14,7 +14,7 @@ The examples below will use the following set-up:
 
     plate = labware.load('96-flat', '1')
 
-    tiprack = labware.load('opentrons-tiprack-300ul', '2')
+    tiprack = labware.load('opentrons_96_tiprack_300ul', '2')
 
     pipette = instruments.P300_Single(
         mount='left',
@@ -652,7 +652,7 @@ We will be using the code-block below to perform our examples.
     plate_384 = labware.load('384-plate', '3')
     trough = labware.load('trough-12row', '4')
 
-    tiprack = labware.load('opentrons-tiprack-300ul', '2')
+    tiprack = labware.load('opentrons_96_tiprack_300ul', '2')
 
     multi_pipette = instruments.P300_Multi(
         mount='left',

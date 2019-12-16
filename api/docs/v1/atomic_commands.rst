@@ -22,7 +22,7 @@ This section demonstrates the options available for controlling tips
     '''
     from opentrons import labware, instruments, robot
 
-    tiprack = labware.load('tiprack-200ul', '2')
+    tiprack = labware.load('opentrons_96_tiprack_300ul', '2')
 
     pipette = instruments.P300_Single(mount='left')
 
@@ -81,8 +81,8 @@ If no location is specified, the pipette will move to the next available tip by 
     from opentrons import labware, instruments, robot
 
     trash = labware.load('trash-box', '1')
-    tip_rack_1 = containers.load('tiprack-200ul', '2')
-    tip_rack_2 = containers.load('tiprack-200ul', '3')
+    tip_rack_1 = containers.load('opentrons_96_tiprack_300ul', '2')
+    tip_rack_2 = containers.load('opentrons_96_tiprack_300ul', '3')
 
 Attach Tip Rack to Pipette
 --------------------------
@@ -297,7 +297,7 @@ Some liquids need an extra amount of air in the pipette's tip to prevent it from
     '''
     Examples in this section expect the following
     '''
-    tiprack = labware.load('tiprack-200ul', '1')
+    tiprack = labware.load('opentrons_96_tiprack_300ul', '1')
     plate = labware.load('96-flat', '2')
 
     pipette = instruments.P300_Single(mount='right', tip_racks=[tiprack])
@@ -316,7 +316,7 @@ using our `set_flow_rate` function. This can be called at any time during the pr
     '''
     Examples in this section expect the following
     '''
-    tiprack = labware.load('tiprack-200ul', '1')
+    tiprack = labware.load('opentrons_96_tiprack_300ul', '1')
     plate = labware.load('96-flat', '2')
 
     pipette = instruments.P300_Single(mount='right', tip_racks=[tiprack])

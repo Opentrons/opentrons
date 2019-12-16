@@ -13,8 +13,8 @@ All examples on this page assume the following labware and pipette:
   plate = labware.load('96-flat', '1')
   trough = labware.load('trough-12row', '2')
 
-  tiprack_1 = labware.load('tiprack-200ul', '3')
-  tiprack_2 = labware.load('tiprack-200ul', '4')
+  tiprack_1 = labware.load('opentrons_96_tiprack_300ul', '3')
+  tiprack_2 = labware.load('opentrons_96_tiprack_300ul', '4')
 
   p300 = instruments.P300_Single(
       mount='left',

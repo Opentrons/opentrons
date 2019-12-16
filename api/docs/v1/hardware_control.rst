@@ -23,7 +23,7 @@ The robot module can be thought of as the parent for all aspects of the Opentron
     from opentrons import robot, labware, instruments
 
     plate = labware.load('96-flat', 'B1', 'my-plate')
-    tiprack = labware.load('tiprack-200ul', 'A1', 'my-rack')
+    tiprack = labware.load('opentrons_96_tiprack_300ul', 'A1', 'my-rack')
 
     pipette = instruments.P300_Single(mount='left', tip_racks=[tiprack])
 
@@ -153,7 +153,7 @@ will print out...
 
 .. code-block:: python
 
-    my-rack tiprack-200ul
+    my-rack opentrons_96_tiprack_300ul
     my-plate 96-flat
 
 
