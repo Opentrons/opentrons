@@ -314,7 +314,7 @@ class ProtocolContext(CommandPublisher):
             location: types.DeckLocation,
             label: str = None,
             namespace: str = None,
-            version: int = 1,
+            version: int = None,
     ) -> Labware:
         """ Load a labware onto the deck given its name.
 
@@ -1975,15 +1975,24 @@ class ModuleContext(CommandPublisher):
                           specified, this is the name the labware will appear
                           as in the run log and the calibration view in the
                           Opentrons app.
+        .. versionadded:: 2.1
         :param str namespace: The namespace the labware definition belongs to.
             If unspecified, will search 'opentrons' then 'custom_beta'
+        .. versionadded:: 2.1
         :param int version: The version of the labware definition. If
             unspecified, will use version 1.
+        .. versionadded:: 2.1
         :returns: The initialized and loaded labware object.
         """
-        lw = load(
-            name, self._geometry.location, label, namespace, version,
-            bundled_defs=self._ctx._bundled_labware)
+        if self._ctx.api_version < APIVersion(2, 1) and\
+                (label or namespace or version):
+            MODULE_LOG.warning(
+                f'You have specified API {self._ctx.api_version}, but you '
+                'are trying to utilize new load_labware parameters in 2.1')
+        lw = load(name, self._geometry.location,
+                    label, namespace, version,
+                    bundled_defs=self._ctx._bundled_labware,
+                    extra_defs=self._ctx._extra_labware)
         return self.load_labware_object(lw)
 
     @requires_version(2, 0)
@@ -2006,12 +2015,16 @@ class ModuleContext(CommandPublisher):
             definition, self._geometry.location, label)
         return self.load_labware_object(lw)
 
-    @requires_version(2, 0)
-    def load_labware_by_name(self, name: str) -> Labware:
+    @requires_version(2, 1)
+    def load_labware_by_name(self,
+                             name: str,
+                             label: str = None,
+                             namespace: str = None,
+                             version: int = 1,) -> Labware:
         MODULE_LOG.warning(
             'load_labware_by_name is deprecated and will be removed in '
             'version 3.12.0. please use load_labware')
-        return self.load_labware(name)
+        return self.load_labware(name, label, namespace, version)
 
     @property  # type: ignore
     @requires_version(2, 0)
