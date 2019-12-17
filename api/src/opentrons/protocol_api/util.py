@@ -259,7 +259,7 @@ def requires_version(
             # this newline and initial space has to be there for sphinx to
             # parse this correctly and not add it into for instance a
             # previous code-block
-            docstr += f'\n\n    .. versionadded:: {added_version}\n\n'
+            docstr += f'\n\n        .. versionadded:: {added_version}\n\n'
             decorated_obj.__doc__ = docstr
 
         @functools.wraps(decorated_obj)
