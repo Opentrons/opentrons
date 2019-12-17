@@ -3,8 +3,8 @@ import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
-import { rehydrate, type RehydratePersistedAction } from '../persist'
 import { userFacingFlags, DEPRECATED_FLAGS, type Flags } from './types'
+import type { RehydratePersistedAction } from '../persist'
 import type { SetFeatureFlagAction } from './actions'
 import type { Action } from '../types'
 
@@ -37,9 +37,7 @@ const flags = handleActions<Flags, any>(
       action: RehydratePersistedAction
     ): Flags => ({
       ...state,
-      // TODO(mc, 2019-10-15): reading from localStorage is not appropriate
-      // inside a reducer; move this logic elsewhere
-      ...omit(rehydrate('featureFlags.flags', initialFlags), DEPRECATED_FLAGS),
+      ...omit(action.payload?.['featureFlags.flags'], DEPRECATED_FLAGS),
     }),
   },
   initialFlags
