@@ -166,7 +166,8 @@
         "type": "array",
         "items": {
           "type": "string"
-        }
+        },
+        "minItems": 1
       }
     },
     "cornerOffsetFromSlot": {
@@ -201,6 +202,7 @@
       "type": "object",
       "description": "Unordered object of well objects with position and dimensional information",
       "additionalProperties": false,
+      "minProperties": 1,
       "patternProperties": {
         "[A-Z]+[0-9]+": {
           "type": "object",
@@ -268,7 +270,8 @@
             "description": "An array of wells that contain the same metadata",
             "items": {
               "type": "string"
-            }
+            },
+            "minItems": 1
           },
           "metadata": {
             "type": "object",
