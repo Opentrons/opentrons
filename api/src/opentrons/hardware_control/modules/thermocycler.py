@@ -95,7 +95,7 @@ class SimulatingDriver:
         self._hold_time = None
         self._active = None
 
-    async def deactivate(self):
+    async def deactivate_all(self):
         self._target_temp = None
         self._ramp_rate = None
         self._hold_time = None
@@ -266,9 +266,9 @@ class Thermocycler(mod_abc.AbstractModule):
         self._current_task = cycle_task
         await cycle_task
 
-    async def set_lid_temperature(self, temp: float):
+    async def set_lid_temperature(self, temperature: float):
         """ Set the lid temperature in deg Celsius """
-        await self._driver.set_lid_temperature(temp=temp)
+        await self._driver.set_lid_temperature(temp=temperature)
         wait_for_lid_task = self._loop.create_task(self.wait_for_lid_temp())
         self._current_task = wait_for_lid_task
         await wait_for_lid_task

@@ -2393,8 +2393,7 @@ class ThermocyclerContext(ModuleContext):
     @requires_version(2, 0)
     def deactivate(self):
         """ Turn off the well block temperature controller, and heated lid """
-        self.deactivate_lid()
-        self.deactivate_block()
+        self._module.deactivate()
 
     @property  # type: ignore
     @requires_version(2, 0)
