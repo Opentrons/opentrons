@@ -89,6 +89,12 @@ class SimulatingDriver:
         self._lid_heating_active = False
         self._lid_target = None
 
+    async def deactivate_block(self):
+        self._target_temp = None
+        self._ramp_rate = None
+        self._hold_time = None
+        self._active = None
+
     async def deactivate(self):
         self._target_temp = None
         self._ramp_rate = None
@@ -181,12 +187,25 @@ class Thermocycler(mod_abc.AbstractModule):
             self._current_task = None
             self._loop.call_soon_threadsafe(self._running_flag.clear)
 
-    async def deactivate(self):
+    def _clear_cycle_counters(self):
         self._total_cycle_count = None
         self._current_cycle_index = None
         self._total_step_count = None
         self._current_step_index = None
-        await self._driver.deactivate()
+
+    async def deactivate_lid(self):
+        """ Deactivate the lid heating pad"""
+        return await self._driver.deactivate_lid()
+
+    async def deactivate_block(self):
+        """ Deactivate the block peltiers"""
+        self._clear_cycle_counters()
+        return await self._driver.deactivate_block()
+
+    async def deactivate(self):
+        """ Deactivate the block peltiers and lid heating pad"""
+        self._clear_cycle_counters()
+        return await self._driver.deactivate_all()
 
     async def open(self) -> str:
         """ Open the lid if it is closed"""

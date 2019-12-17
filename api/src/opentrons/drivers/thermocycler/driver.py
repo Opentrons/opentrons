@@ -263,12 +263,11 @@ class Thermocycler:
         self._poller = None
         return self
 
-    async def deactivate(self):
+    async def deactivate_all(self):
         await self._write_and_wait(GCODES['DEACTIVATE_ALL'])
 
     async def deactivate_lid(self) -> None:
-        lid_temp_cmd = '{}'.format(GCODES['DEACTIVATE_LID'])
-        await self._write_and_wait(lid_temp_cmd)
+        await self._write_and_wait(GCODES['DEACTIVATE_LID'])
 
     async def deactivate_block(self):
         await self._write_and_wait(GCODES['DEACTIVATE_BLOCK'])

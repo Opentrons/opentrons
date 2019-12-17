@@ -2386,13 +2386,13 @@ class ThermocyclerContext(ModuleContext):
     @cmds.publish.both(command=cmds.thermocycler_deactivate_block)
     @requires_version(2, 0)
     def deactivate_block(self):
-        """ Turn off the well block """
+        """ Turn off the well block temperature controller"""
         self._module.deactivate_block()
 
     @cmds.publish.both(command=cmds.thermocycler_deactivate)
     @requires_version(2, 0)
     def deactivate(self):
-        """ Turn off the well block, and heated lid """
+        """ Turn off the well block temperature controller, and heated lid """
         self.deactivate_lid()
         self.deactivate_block()
 
