@@ -1,7 +1,12 @@
 // @flow
 import * as React from 'react'
 import { getWellTotalVolume } from '@opentrons/shared-data'
-import { MIN_ENGAGE_HEIGHT, MAX_ENGAGE_HEIGHT } from '../../constants'
+import {
+  MIN_ENGAGE_HEIGHT,
+  MAX_ENGAGE_HEIGHT,
+  MIN_TEMP_MODULE_TEMP,
+  MAX_TEMP_MODULE_TEMP,
+} from '../../constants'
 import KnowledgeBaseLink from '../../components/KnowledgeBaseLink'
 import type { FormError } from './errors'
 /*******************
@@ -14,6 +19,8 @@ export type FormWarningType =
   | 'BELOW_MIN_DISPOSAL_VOLUME'
   | 'ENGAGE_HEIGHT_MIN_EXCEEDED'
   | 'ENGAGE_HEIGHT_MAX_EXCEEDED'
+  | 'TEMPERATURE_MIN_EXCEEDED'
+  | 'TEMPERATURE_MAX_EXCEEDED'
 
 export type FormWarning = {
   ...$Exact<FormError>,
@@ -52,6 +59,16 @@ const FORM_WARNINGS: { [FormWarningType]: FormWarning } = {
     type: 'ENGAGE_HEIGHT_MAX_EXCEEDED',
     title: 'Specified distance is above module maximum',
     dependentFields: ['magnetAction', 'engageHeight'],
+  },
+  TEMPERATURE_MIN_EXCEEDED: {
+    type: 'TEMPERATURE_MIN_EXCEEDED',
+    title: 'Specified temperature is below module minimum',
+    dependentFields: ['setTemperature', 'targetTemperature'],
+  },
+  TEMPERATURE_MAX_EXCEEDED: {
+    type: 'TEMPERATURE_MAX_EXCEEDED',
+    title: 'Specified temperature is above module maximum',
+    dependentFields: ['setTemperature', 'targetTemperature'],
   },
 }
 export type WarningChecker = mixed => ?FormWarning
@@ -107,6 +124,21 @@ export const engageHeightRangeExceeded = (
     return FORM_WARNINGS.ENGAGE_HEIGHT_MIN_EXCEEDED
   } else if (magnetAction === 'engage' && engageHeight > MAX_ENGAGE_HEIGHT) {
     return FORM_WARNINGS.ENGAGE_HEIGHT_MAX_EXCEEDED
+  }
+  return null
+}
+
+export const temperatureRangeExceeded = (
+  fields: HydratedFormData
+): ?FormWarning => {
+  const { setTemperature, targetTemperature } = fields
+  if (setTemperature === 'true' && targetTemperature < MIN_TEMP_MODULE_TEMP) {
+    return FORM_WARNINGS.TEMPERATURE_MIN_EXCEEDED
+  } else if (
+    setTemperature === 'true' &&
+    targetTemperature > MAX_TEMP_MODULE_TEMP
+  ) {
+    return FORM_WARNINGS.TEMPERATURE_MAX_EXCEEDED
   }
   return null
 }

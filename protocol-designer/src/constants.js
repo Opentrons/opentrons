@@ -78,6 +78,9 @@ export const DEFAULT_WELL_ORDER_SECOND_OPTION: 'l2r' = 'l2r'
 export const MIN_ENGAGE_HEIGHT = -4
 export const MAX_ENGAGE_HEIGHT = 16
 
+export const MIN_TEMP_MODULE_TEMP = 0
+export const MAX_TEMP_MODULE_TEMP = 95
+
 // TODO: IL 2019-12-03 migrate the ModuleType '___deck' strings to '___ module' forms.
 // We don't call modules 'deck' anymore, but the old code is entrenched
 export const FILE_MODULE_TYPE_TO_MODULE_TYPE: { [string]: ModuleType } = {
