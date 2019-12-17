@@ -1,4 +1,4 @@
-# Opentrons App Changes from 3.14.1 to 3.15.0
+# Opentrons App Changes from 3.14.1 to 3.15.2
 
 For more details about this release, please see the full [technical change log][changelog]
 
@@ -17,6 +17,8 @@ Uploaded labware will be available for use in Python Protocol API Version 2 prot
 
 ## Bug Fixes
 - Fixed more issues with app and robot version sync.
+- Disable tip probe for unused pipettes (#4584).
+- Inform the user that the Thermocycler Module is opening its lid during labware calibration (#4616).
 
 [electron-6]: https://electronjs.org/releases/stable?version=6
 
