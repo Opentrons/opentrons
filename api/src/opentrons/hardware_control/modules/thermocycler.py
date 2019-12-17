@@ -273,9 +273,6 @@ class Thermocycler(mod_abc.AbstractModule):
         self._current_task = wait_for_lid_task
         await wait_for_lid_task
 
-    async def deactivate_lid(self):
-        return await self._driver.deactivate_lid()
-
     async def wait_for_lid_temp(self):
         """
         This method only exits if lid target temperature has been reached.
