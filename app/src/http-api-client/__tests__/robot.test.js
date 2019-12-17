@@ -6,14 +6,11 @@ import client from '../client'
 import {
   moveRobotTo,
   home,
-  fetchRobotLights,
-  setRobotLights,
   clearHomeResponse,
   clearMoveResponse,
   superDeprecatedRobotApiReducer as reducer,
   makeGetRobotMove,
   makeGetRobotHome,
-  makeGetRobotLights,
 } from '..'
 
 jest.mock('../client')
@@ -181,100 +178,6 @@ describe('robot/*', () => {
     })
   })
 
-  describe('fetchRobotLights action creator', () => {
-    const path = 'robot/lights'
-    const request = null
-    const response = { on: true }
-
-    test('calls GET /robot/lights', () => {
-      client.__setMockResponse(response)
-
-      return store
-        .dispatch(fetchRobotLights(robot))
-        .then(() =>
-          expect(client).toHaveBeenCalledWith(robot, 'GET', 'robot/lights')
-        )
-    })
-
-    test('dispatches api:REQUEST and api:SUCCESS', () => {
-      const expectedActions = [
-        { type: 'api:REQUEST', payload: { robot, request, path } },
-        { type: 'api:SUCCESS', payload: { robot, response, path } },
-      ]
-
-      client.__setMockResponse(response)
-
-      return store
-        .dispatch(fetchRobotLights(robot))
-        .then(() => expect(store.getActions()).toEqual(expectedActions))
-    })
-
-    test('dispatches api:REQUEST and api:FAILURE', () => {
-      const error = { name: 'ResponseError', status: '400' }
-      const expectedActions = [
-        { type: 'api:REQUEST', payload: { robot, request, path } },
-        { type: 'api:FAILURE', payload: { robot, error, path } },
-      ]
-
-      client.__setMockError(error)
-
-      return store
-        .dispatch(fetchRobotLights(robot))
-        .then(() => expect(store.getActions()).toEqual(expectedActions))
-    })
-  })
-
-  describe('setRobotLights action creator', () => {
-    const path = 'robot/lights'
-    const response = { on: false }
-
-    test('calls POST /robot/home to home robot', () => {
-      const expectedBody = { on: false }
-
-      client.__setMockResponse(response)
-
-      return store
-        .dispatch(setRobotLights(robot, false))
-        .then(() =>
-          expect(client).toHaveBeenCalledWith(
-            robot,
-            'POST',
-            'robot/lights',
-            expectedBody
-          )
-        )
-    })
-
-    test('dispatches api:REQUEST and api:SUCCESS', () => {
-      const request = { on: true }
-      const expectedActions = [
-        { type: 'api:REQUEST', payload: { robot, request, path } },
-        { type: 'api:SUCCESS', payload: { robot, response, path } },
-      ]
-
-      client.__setMockResponse(response)
-
-      return store
-        .dispatch(setRobotLights(robot, true))
-        .then(() => expect(store.getActions()).toEqual(expectedActions))
-    })
-
-    test('dispatches api:REQUEST and api:FAILURE', () => {
-      const request = { on: false }
-      const error = { name: 'ResponseError', status: '400' }
-      const expectedActions = [
-        { type: 'api:REQUEST', payload: { robot, request, path } },
-        { type: 'api:FAILURE', payload: { robot, error, path } },
-      ]
-
-      client.__setMockError(error)
-
-      return store
-        .dispatch(setRobotLights(robot, false))
-        .then(() => expect(store.getActions()).toEqual(expectedActions))
-    })
-  })
-
   const REDUCER_REQUEST_RESPONSE_TESTS = [
     {
       path: 'robot/move',
@@ -285,11 +188,6 @@ describe('robot/*', () => {
       path: 'robot/home',
       request: { target: 'pipette', mount: 'left' },
       response: { message: 'we did it!' },
-    },
-    {
-      path: 'robot/lights',
-      request: null,
-      response: { on: true },
     },
   ]
 
@@ -434,15 +332,6 @@ describe('robot/*', () => {
         state.superDeprecatedRobotApi.robot[NAME]['robot/home']
       )
       expect(getHome(state, { name: 'foo' })).toEqual({ inProgress: false })
-    })
-
-    test('makeGetRobotLights', () => {
-      const getLights = makeGetRobotLights()
-
-      expect(getLights(state, robot)).toEqual(
-        state.superDeprecatedRobotApi.robot[NAME]['robot/lights']
-      )
-      expect(getLights(state, { name: 'foo' })).toEqual({ inProgress: false })
     })
   })
 })

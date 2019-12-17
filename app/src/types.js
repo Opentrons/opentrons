@@ -7,6 +7,10 @@ import type { Observable } from 'rxjs'
 
 import type { RobotApiState } from './robot-api/types'
 import type { RobotAdminState, RobotAdminAction } from './robot-admin/types'
+import type {
+  RobotControlsState,
+  RobotControlsAction,
+} from './robot-controls/types'
 import type { PipettesState, PipettesAction } from './pipettes/types'
 import type { ModulesState, ModulesAction } from './modules/types'
 import type {
@@ -33,6 +37,7 @@ export type State = $ReadOnly<{|
   superDeprecatedRobotApi: SuperDeprecatedRobotApiState,
   robotApi: RobotApiState,
   robotAdmin: RobotAdminState,
+  robotControls: RobotControlsState,
   robotSettings: RobotSettingsState,
   pipettes: PipettesState,
   modules: ModulesState,
@@ -48,6 +53,7 @@ export type Action =
   | RobotAction
   | SuperDeprecatedRobotApiAction
   | RobotAdminAction
+  | RobotControlsAction
   | RobotSettingsAction
   | PipettesAction
   | ModulesAction
