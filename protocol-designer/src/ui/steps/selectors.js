@@ -2,7 +2,7 @@
 import { createSelector } from 'reselect'
 import last from 'lodash/last'
 
-import * as stepFormSelectors from '../../step-forms/selectors' // TODO Ian 2018-12-20: fix circular dependency so this direct import isn't required
+import { selectors as stepFormSelectors } from '../../step-forms'
 import type { StepIdType } from '../../form-types'
 import type { BaseState, Selector } from '../../types'
 import {

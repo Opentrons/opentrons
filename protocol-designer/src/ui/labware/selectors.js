@@ -7,7 +7,7 @@ import {
   getLabwareDisplayName,
   getLabwareHasQuirk,
 } from '@opentrons/shared-data'
-import * as stepFormSelectors from '../../step-forms/selectors'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 
 import type { Options } from '@opentrons/components'

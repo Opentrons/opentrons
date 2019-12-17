@@ -7,6 +7,7 @@ import type { BaseState, ThunkDispatch } from '../types'
 
 import type { SubstepIdentifier } from '../steplist/types'
 import * as substepSelectors from '../top-selectors/substeps'
+import * as timelineWarningSelectors from '../top-selectors/timelineWarnings'
 import { selectors as dismissSelectors } from '../dismiss'
 import {
   selectors as stepFormSelectors,
@@ -65,7 +66,7 @@ const makeMapStateToProps: () => (BaseState, OP) => SP = () => {
       argsAndErrors.errors !== undefined
 
     const hasWarnings =
-      dismissSelectors.getHasTimelineWarningsPerStep(state)[stepId] ||
+      timelineWarningSelectors.getHasTimelineWarningsPerStep(state)[stepId] ||
       dismissSelectors.getHasFormLevelWarningsPerStep(state)[stepId]
 
     const collapsed = stepsSelectors.getCollapsedSteps(state)[stepId]

@@ -2,7 +2,7 @@
 import forEach from 'lodash/forEach'
 import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../constants'
 import { selectors as stepFormSelectors } from '../../../step-forms'
-import * as uiModulesSelectors from '../../modules/selectors'
+import { selectors as uiModulesSelectors } from '../../modules'
 
 import {
   getNextDefaultPipetteId,

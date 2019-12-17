@@ -5,10 +5,8 @@ import { connect } from 'react-redux'
 import i18n from '../../localization'
 import ErrorContents from './ErrorContents'
 import WarningContents from './WarningContents'
-import {
-  actions as dismissActions,
-  selectors as dismissSelectors,
-} from '../../dismiss'
+import { actions as dismissActions } from '../../dismiss'
+import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
 import { selectors as stepsSelectors } from '../../ui/steps'
 import { selectors as fileDataSelectors } from '../../file-data'
 import type { BaseState } from '../../types'
@@ -36,7 +34,7 @@ function mapStateToProps(state: BaseState): SP {
     title: i18n.t(`alert.timeline.error.${error.type}.title`),
     description: <ErrorContents level="timeline" errorType={error.type} />,
   }))
-  const warnings = dismissSelectors
+  const warnings = timelineWarningSelectors
     .getTimelineWarningsForSelectedStep(state)
     .map(warning => ({
       title: i18n.t(`alert.timeline.warning.${warning.type}.title`),

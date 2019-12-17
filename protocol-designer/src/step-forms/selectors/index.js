@@ -27,9 +27,11 @@ import {
 } from '../../steplist/formLevel'
 import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
 import { denormalizePipetteEntities } from '../utils'
-import * as labwareDefSelectors from '../../labware-defs/selectors'
+import {
+  selectors as labwareDefSelectors,
+  type LabwareDefByDefURI,
+} from '../../labware-defs'
 
-import type { LabwareDefByDefURI } from '../../labware-defs'
 import type { FormWarning } from '../../steplist/formLevel'
 import type { BaseState, Selector, DeckSlot } from '../../types'
 import type { FormData, StepIdType, StepType } from '../../form-types'
