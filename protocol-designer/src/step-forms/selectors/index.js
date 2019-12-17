@@ -432,6 +432,14 @@ export const getUnsavedFormErrors: Selector<?StepFormAndFieldErrors> = createSel
   }
 )
 
+// TODO: BC: 2018-10-26 remove this when we decide to not block save
+export const getCurrentFormCanBeSaved: Selector<boolean> = createSelector(
+  getUnsavedFormErrors,
+  formErrors => {
+    return Boolean(formErrors && isEmpty(formErrors))
+  }
+)
+
 // TODO: Brian&Ian 2019-04-02 this is TEMPORARY, should be removed once legacySteps reducer is removed
 const getLegacyStepWithId = (
   state: BaseState,

@@ -1,19 +1,26 @@
 // @flow
 import forEach from 'lodash/forEach'
-
-import type { StepIdType, StepType } from '../../form-types'
-import type { GetState, ThunkAction, ThunkDispatch } from '../../types'
-import { selectors as stepFormSelectors } from '../../step-forms'
+import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../constants'
+import { selectors as stepFormSelectors } from '../../../step-forms'
 import {
   getNextDefaultPipetteId,
   handleFormChange,
-} from '../../steplist/formLevel'
-import type { TerminalItemId, SubstepIdentifier } from '../../steplist/types'
+} from '../../../steplist/formLevel'
+import type { StepIdType, StepType } from '../../../form-types'
+import type { GetState, ThunkAction, ThunkDispatch } from '../../../types'
+import type { TerminalItemId, SubstepIdentifier } from '../../../steplist/types'
+import type {
+  ExpandAddStepButtonAction,
+  ToggleStepCollapsedAction,
+  HoverOnStepAction,
+  HoverOnSubstepAction,
+  SelectTerminalItemAction,
+  HoverOnTerminalItemAction,
+  SetWellSelectionLabwareKeyAction,
+  ClearWellSelectionLabwareKeyAction,
+  SelectStepAction,
+} from './types'
 
-type ExpandAddStepButtonAction = {
-  type: 'EXPAND_ADD_STEP_BUTTON',
-  payload: boolean,
-}
 export const expandAddStepButton = (
   payload: boolean
 ): ExpandAddStepButtonAction => ({
@@ -21,10 +28,6 @@ export const expandAddStepButton = (
   payload,
 })
 
-type ToggleStepCollapsedAction = {
-  type: 'TOGGLE_STEP_COLLAPSED',
-  payload: StepIdType,
-}
 export const toggleStepCollapsed = (
   stepId: StepIdType
 ): ToggleStepCollapsedAction => ({
@@ -32,10 +35,6 @@ export const toggleStepCollapsed = (
   payload: stepId,
 })
 
-type HoverOnSubstepAction = {
-  type: 'HOVER_ON_SUBSTEP',
-  payload: SubstepIdentifier,
-}
 export const hoverOnSubstep = (
   payload: SubstepIdentifier
 ): HoverOnSubstepAction => ({
@@ -43,10 +42,6 @@ export const hoverOnSubstep = (
   payload: payload,
 })
 
-export type SelectTerminalItemAction = {
-  type: 'SELECT_TERMINAL_ITEM',
-  payload: TerminalItemId,
-}
 export const selectTerminalItem = (
   terminalId: TerminalItemId
 ): SelectTerminalItemAction => ({
@@ -54,17 +49,11 @@ export const selectTerminalItem = (
   payload: terminalId,
 })
 
-// TODO: Ian 2018-07-31 types aren't being inferred by ActionType in hoveredItem reducer...
-type HoverOnStepAction = { type: 'HOVER_ON_STEP', payload: ?StepIdType }
 export const hoverOnStep = (stepId: ?StepIdType): HoverOnStepAction => ({
   type: 'HOVER_ON_STEP',
   payload: stepId,
 })
 
-type HoverOnTerminalItemAction = {
-  type: 'HOVER_ON_TERMINAL_ITEM',
-  payload: ?TerminalItemId,
-}
 export const hoverOnTerminalItem = (
   terminalId: ?TerminalItemId
 ): HoverOnTerminalItemAction => ({
@@ -72,10 +61,6 @@ export const hoverOnTerminalItem = (
   payload: terminalId,
 })
 
-type SetWellSelectionLabwareKeyAction = {
-  type: 'SET_WELL_SELECTION_LABWARE_KEY',
-  payload: ?string,
-}
 export const setWellSelectionLabwareKey = (
   labwareName: ?string
 ): SetWellSelectionLabwareKeyAction => ({
@@ -83,18 +68,11 @@ export const setWellSelectionLabwareKey = (
   payload: labwareName,
 })
 
-type ClearWellSelectionLabwareKeyAction = {
-  type: 'CLEAR_WELL_SELECTION_LABWARE_KEY',
-  payload: null,
-}
 export const clearWellSelectionLabwareKey = (): ClearWellSelectionLabwareKeyAction => ({
   type: 'CLEAR_WELL_SELECTION_LABWARE_KEY',
   payload: null,
 })
 
-export const MAIN_CONTENT_FORCED_SCROLL_CLASSNAME = 'main_content_forced_scroll'
-
-export type SelectStepAction = { type: 'SELECT_STEP', payload: StepIdType }
 // NOTE: 'newStepType' arg is only used when generating a new step
 export const selectStep = (
   stepId: StepIdType,

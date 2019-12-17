@@ -9,7 +9,7 @@ import {
   splitLiquid,
   getWellsForTips,
   totalVolume,
-} from '../utils'
+} from '../utils/misc'
 import * as warningCreators from '../warningCreators'
 import type { AspirateParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type {

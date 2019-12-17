@@ -5,6 +5,7 @@ import type { BaseState, ThunkDispatch } from '../types'
 import type { StepIdType } from '../form-types'
 
 import { actions as steplistActions } from '../steplist'
+import { actions as stepsActions } from '../ui/steps'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { StepList } from '../components/steplist'
 
@@ -23,7 +24,7 @@ function mapStateToProps(state: BaseState): SP {
 function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   return {
     reorderSelectedStep: (delta: number) => {
-      dispatch(steplistActions.reorderSelectedStep(delta))
+      dispatch(stepsActions.reorderSelectedStep(delta))
     },
     reorderSteps: (stepIds: Array<StepIdType>) => {
       dispatch(steplistActions.reorderSteps(stepIds))

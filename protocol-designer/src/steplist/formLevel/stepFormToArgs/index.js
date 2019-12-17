@@ -1,6 +1,6 @@
 // @flow
 import mapValues from 'lodash/mapValues'
-import { castField } from '../../../steplist'
+import { castField } from '../../../steplist/fieldLevel'
 import mixFormToArgs from './mixFormToArgs'
 import pauseFormToArgs from './pauseFormToArgs'
 import moveLiquidFormToArgs from './moveLiquidFormToArgs'

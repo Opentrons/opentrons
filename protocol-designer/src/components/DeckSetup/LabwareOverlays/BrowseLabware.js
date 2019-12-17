@@ -8,7 +8,7 @@ import i18n from '../../../localization'
 import type { ThunkDispatch } from '../../../types'
 import type { LabwareOnDeck } from '../../../step-forms'
 import { drillDownOnLabware } from '../../../labware-ingred/actions'
-import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../../../ui/steps/actions'
+import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../../../ui/steps'
 import styles from './LabwareOverlays.css'
 
 type OP = {|

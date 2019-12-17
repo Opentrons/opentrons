@@ -5,7 +5,7 @@ import cx from 'classnames'
 import without from 'lodash/without'
 import i18n from '../localization'
 import { HoverTooltip, PrimaryButton } from '@opentrons/components'
-import { actions as steplistActions } from '../steplist'
+import { actions as stepsActions } from '../ui/steps'
 import { selectors as featureFlagSelectors } from '../feature-flags'
 import {
   selectors as stepFormSelectors,
@@ -127,7 +127,7 @@ const mapSTP = (state: BaseState): SP => {
 
 const mapDTP = (dispatch: ThunkDispatch<*>): DP => ({
   makeAddStep: (stepType: StepType) => (e: SyntheticEvent<>) =>
-    dispatch(steplistActions.addStep({ stepType })),
+    dispatch(stepsActions.addStep({ stepType })),
 })
 
 export default connect<Props, {||}, SP, DP, _, _>(

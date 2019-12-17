@@ -16,7 +16,7 @@ import {
   AIR,
   repeatArray,
   makeInitialRobotState,
-} from '../utils'
+} from '../utils/misc'
 import { FIXED_TRASH_ID } from './fixtures'
 
 describe('splitLiquid', () => {
