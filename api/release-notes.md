@@ -44,7 +44,6 @@ We're also happy to announce that software support for our new [Thermocycler Mod
 ## Known Issues (Python Protocol API version 1)
 
 - While the underlying definition is correct, there is a known API bug that is causing the robot to think a "50 mL" tube in a "15 / 50 mL" tube rack is the same height as the "15 mL" tube
-- When attaching or detaching a pipette from the left mount, the robot homes twice in the X direction
 - If the robot is about to initiate a pause and a cancel is issued from the Opentrons App, the cancel may fail. See issue [#4545](https://github.com/Opentrons/opentrons/issues/4545)
 
 
