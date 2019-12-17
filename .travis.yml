@@ -92,6 +92,7 @@ jobs:
       script:
         - make test-js
         - make lint-js
+        - make circular-dependencies-js
         - make lint-css
         - make format
         - make -C components

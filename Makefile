@@ -110,7 +110,7 @@ test-js:
 
 # lints and typechecks
 .PHONY: lint
-lint: lint-py lint-js lint-json lint-css check-js
+lint: lint-py lint-js lint-json lint-css check-js circular-dependencies-js
 
 .PHONY: format
 format:
@@ -138,6 +138,12 @@ lint-css:
 .PHONY: check-js
 check-js:
 	flow $(if $(CI),check,status)
+
+# TODO: Ian 2019-12-17 gradually add app, components, and shared-data
+.PHONY: circular-dependencies-js
+circular-dependencies-js:
+	madge --circular protocol-designer/src/index.js
+	madge --circular labware-library/src/index.js
 
 # upload coverage reports
 .PHONY: coverage
