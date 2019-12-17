@@ -488,9 +488,9 @@ class Session(object):
         self.set_state('running')
 
         try:
-            self.resume()
-            self._pre_run_hooks()
             if self._use_v2:
+                self.resume()
+                self._pre_run_hooks()
                 self._hardware.cache_instruments()
                 ctx = ProtocolContext.build_using(
                     self._protocol,
@@ -510,6 +510,8 @@ class Session(object):
                     'Internal error: v1 should only be used for python'
                 if not robot.is_connected():
                     robot.connect()
+                self.resume()
+                self._pre_run_hooks()
                 robot.cache_instrument_models()
                 robot.discover_modules()
                 exec(self._protocol.contents, {})
