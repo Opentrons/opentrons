@@ -214,7 +214,6 @@ export type HydratedMixFormDataLegacy = {
   blowout_location: ?string, // labwareId or 'SOURCE_WELL' or 'DEST_WELL'
 }
 
-// TODO IMMEDIATELY
 export type HydratedMagnetFormData = {|
   ...AnnotationFields,
   id: string,
