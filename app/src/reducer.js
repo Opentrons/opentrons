@@ -17,6 +17,9 @@ import { robotApiReducer } from './robot-api/reducer'
 // robot administration state
 import { robotAdminReducer } from './robot-admin/reducer'
 
+// robot controls state
+import { robotControlsReducer } from './robot-controls/reducer'
+
 // robot settings state
 import { robotSettingsReducer } from './robot-settings/reducer'
 
@@ -51,6 +54,7 @@ const rootReducer: Reducer<State, Action> = combineReducers<_, Action>({
   superDeprecatedRobotApi: superDeprecatedRobotApiReducer,
   robotApi: robotApiReducer,
   robotAdmin: robotAdminReducer,
+  robotControls: robotControlsReducer,
   robotSettings: robotSettingsReducer,
   pipettes: pipettesReducer,
   modules: modulesReducer,

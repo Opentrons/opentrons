@@ -58,19 +58,11 @@ type RobotHomeResponse = {
   message: string,
 }
 
-type RobotLightsRequest = ?{
-  on: boolean,
-}
+type RobotPath = 'robot/move' | 'robot/home'
 
-type RobotLightsResponse = {
-  on: boolean,
-}
+type RobotRequest = RobotMoveRequest | RobotHomeRequest
 
-type RobotPath = 'robot/move' | 'robot/home' | 'robot/lights'
-
-type RobotRequest = RobotMoveRequest | RobotHomeRequest | RobotLightsRequest
-
-type RobotResponse = RobotMoveResponse | RobotHomeResponse | RobotLightsResponse
+type RobotResponse = RobotMoveResponse | RobotHomeResponse
 
 export type RobotAction =
   | ApiRequestAction<RobotPath, RobotRequest>
@@ -82,12 +74,9 @@ export type RobotMove = ApiCall<RobotMoveRequest, RobotMoveResponse>
 
 export type RobotHome = ApiCall<RobotHomeRequest, RobotHomeResponse>
 
-export type RobotLights = ApiCall<RobotLightsRequest, RobotLightsResponse>
-
 type RobotByNameState = {
   'robot/move'?: RobotMove,
   'robot/home'?: RobotHome,
-  'robot/lights'?: RobotLights,
 }
 
 type RobotState = {
@@ -98,13 +87,12 @@ type RobotState = {
 const POSITIONS = 'robot/positions'
 const MOVE: 'robot/move' = 'robot/move'
 const HOME: 'robot/home' = 'robot/home'
-const LIGHTS: 'robot/lights' = 'robot/lights'
 
 // TODO(mc, 2018-07-03): flow helper until we have one reducer, since
 // p === 'constant' checks but p === CONSTANT does not, even if
 // CONSTANT is defined as `const CONSTANT: 'constant' = 'constant'`
 function getRobotPath(p: string): ?RobotPath {
-  if (p === 'robot/move' || p === 'robot/home' || p === 'robot/lights') {
+  if (p === 'robot/move' || p === 'robot/home') {
     return p
   }
 
@@ -165,23 +153,6 @@ export function home(robot: RobotService, mount?: Mount): ThunkPromiseAction {
   }
 }
 
-export function fetchRobotLights(robot: RobotService): ThunkPromiseAction {
-  return dispatch => {
-    // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
-    dispatch(apiRequest(robot, LIGHTS, null))
-
-    return (
-      client(robot, 'GET', LIGHTS)
-        .then(
-          (resp: RobotLightsResponse) => apiSuccess(robot, LIGHTS, resp),
-          (err: ApiRequestError) => apiFailure(robot, LIGHTS, err)
-        )
-        // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
-        .then(dispatch)
-    )
-  }
-}
-
 export function clearHomeResponse(
   robot: BaseRobot
 ): ClearApiResponseAction<RobotPath> {
@@ -192,28 +163,6 @@ export function clearMoveResponse(
   robot: BaseRobot
 ): ClearApiResponseAction<RobotPath> {
   return clearApiResponse(robot, MOVE)
-}
-
-export function setRobotLights(
-  robot: RobotService,
-  on: boolean
-): ThunkPromiseAction {
-  const request: RobotLightsRequest = { on }
-
-  return dispatch => {
-    // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
-    dispatch(apiRequest(robot, LIGHTS, request))
-
-    return (
-      client(robot, 'POST', LIGHTS, request)
-        .then(
-          (resp: RobotLightsResponse) => apiSuccess(robot, LIGHTS, resp),
-          (err: ApiRequestError) => apiFailure(robot, LIGHTS, err)
-        )
-        // $FlowFixMe: (mc, 2019-04-17): http-api-client types need to be redone
-        .then(dispatch)
-    )
-  }
 }
 
 // TODO(mc, 2018-07-03): remove in favor of single HTTP API reducer
@@ -320,19 +269,6 @@ export const makeGetRobotHome = () => {
   const selector: OutputSelector<State, BaseRobot, RobotHome> = createSelector(
     selectRobotState,
     state => state[HOME] || { inProgress: false }
-  )
-
-  return selector
-}
-
-export const makeGetRobotLights = () => {
-  const selector: OutputSelector<
-    State,
-    BaseRobot,
-    RobotLights
-  > = createSelector(
-    selectRobotState,
-    state => state[LIGHTS] || { inProgress: false }
   )
 
   return selector
