@@ -1,5 +1,10 @@
 // @flow
-import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+import type {
+  Command,
+  EngageMagnetParams,
+  DisengageMagnetParams,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
+
 import type {
   LabwareTemporalProperties,
   ModuleTemporalProperties,
@@ -162,12 +167,26 @@ export type PauseArgs = {|
   |},
 |}
 
+export type EngageMagnetArgs = {|
+  ...EngageMagnetParams,
+  module: string | null,
+  commandCreatorFnName: 'engageMagnet',
+|}
+
+export type DisengageMagnetArgs = {|
+  ...DisengageMagnetParams,
+  module: string | null,
+  commandCreatorFnName: 'disengageMagnet',
+|}
+
 export type CommandCreatorArgs =
   | ConsolidateArgs
   | DistributeArgs
   | MixArgs
   | PauseArgs
   | TransferArgs
+  | EngageMagnetArgs
+  | DisengageMagnetArgs
 
 /** tips are numbered 0-7. 0 is the furthest to the back of the robot.
  * For an 8-channel, on a 96-flat, Tip 0 is in row A, Tip 7 is in row H.
@@ -235,6 +254,7 @@ export type ErrorType =
   | 'INSUFFICIENT_TIPS'
   | 'LABWARE_DOES_NOT_EXIST'
   | 'MISMATCHED_SOURCE_DEST_WELLS'
+  | 'MISSING_MODULE'
   | 'MODULE_PIPETTE_COLLISION_DANGER'
   | 'NO_TIP_ON_PIPETTE'
   | 'PIPETTE_DOES_NOT_EXIST'

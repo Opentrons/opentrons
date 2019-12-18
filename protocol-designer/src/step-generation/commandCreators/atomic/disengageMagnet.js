@@ -1,16 +1,24 @@
 // @flow
 import assert from 'assert'
-import type { DisengageMagnetParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type { InvariantContext, RobotState } from '../../types'
+import * as errorCreators from '../../errorCreators'
+import type {
+  InvariantContext,
+  RobotState,
+  DisengageMagnetArgs,
+} from '../../types'
 
 /** Disengage magnet of specified magnetic module. */
 export const disengageMagnet = (
-  args: DisengageMagnetParams,
+  args: DisengageMagnetArgs,
   invariantContext: InvariantContext,
   prevRobotState: RobotState
 ) => {
   const { module } = args
   const command = 'magneticModule/disengageMagnet'
+
+  if (module === null) {
+    return { errors: [errorCreators.missingModuleError()] }
+  }
 
   assert(
     invariantContext.moduleEntities[module]?.type === 'magdeck',

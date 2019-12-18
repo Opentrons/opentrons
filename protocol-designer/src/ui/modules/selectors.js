@@ -1,9 +1,13 @@
 // @flow
 import { createSelector } from 'reselect'
 
-import * as stepFormSelectors from '../../step-forms/selectors'
+import { selectors as stepFormSelectors } from '../../step-forms'
+import {
+  getModuleLabwareOptions,
+  getModuleOnDeckByType,
+  getModuleHasLabware,
+} from './utils'
 import { getLabwareNicknamesById } from '../labware/selectors'
-import { getModuleLabwareOptions, getModuleHasLabware } from './utils'
 import type { Options } from '@opentrons/components'
 import type { Selector } from '../../types'
 
@@ -36,6 +40,15 @@ export const getThermocyclerLabwareOptions: Selector<Options> = createSelector(
       'thermocycler'
     )
   }
+)
+
+/** Get single magnetic module (assumes no multiples) */
+export const getSingleMagneticModuleId: Selector<
+  string | null
+> = createSelector(
+  stepFormSelectors.getInitialDeckSetup,
+  initialDeckSetup =>
+    getModuleOnDeckByType(initialDeckSetup, 'magdeck')?.id || null
 )
 
 /** Returns boolean if magnetic module has labware */

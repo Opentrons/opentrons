@@ -214,6 +214,15 @@ export type HydratedMixFormDataLegacy = {
   blowout_location: ?string, // labwareId or 'SOURCE_WELL' or 'DEST_WELL'
 }
 
+export type HydratedMagnetFormData = {|
+  ...AnnotationFields,
+  id: string,
+  stepType: 'magnet',
+  moduleId: string | null,
+  magnetAction: 'engage' | 'disengage',
+  engageHeight: number | null,
+|}
+
 // TODO: Ian 2019-01-17 Moving away from this and towards nesting all form fields
 // inside `fields` key, but deprecating transfer/consolidate/distribute is a pre-req
 export type HydratedMoveLiquidFormDataLegacy = {

@@ -346,6 +346,14 @@ export function generateSubsteps(
     })
   }
 
+  if (
+    stepArgs.commandCreatorFnName === 'disengageMagnet' ||
+    stepArgs.commandCreatorFnName === 'engageMagnet'
+  ) {
+    // no substeps for these
+    return null
+  }
+
   console.warn(
     "allSubsteps doesn't support commandCreatorFnName: ",
     stepArgs.commandCreatorFnName,

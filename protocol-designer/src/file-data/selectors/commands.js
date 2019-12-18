@@ -127,6 +127,16 @@ const commandCreatorFromStepArgs = (
       return StepGeneration.curryCommandCreator(StepGeneration.transfer, args)
     case 'mix':
       return StepGeneration.curryCommandCreator(StepGeneration.mix, args)
+    case 'engageMagnet':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.engageMagnet,
+        args
+      )
+    case 'disengageMagnet':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.disengageMagnet,
+        args
+      )
   }
   console.warn(`unhandled commandCreatorFnName: ${args.commandCreatorFnName}`)
   return null
@@ -188,7 +198,11 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
         // NOTE: this implementation assumes all step forms that use a pipette have both
         // 'pipette' and 'changeTip' fields (and they're not named something else).
         const pipetteId =
-          args.commandCreatorFnName !== 'delay' ? args.pipette : false
+          args.commandCreatorFnName !== 'delay' &&
+          args.commandCreatorFnName !== 'engageMagnet' &&
+          args.commandCreatorFnName !== 'disengageMagnet'
+            ? args.pipette
+            : false
         if (pipetteId) {
           const nextStepArgsForPipette = continuousStepArgs
             .slice(stepIndex + 1)

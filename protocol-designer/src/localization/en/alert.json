@@ -42,6 +42,10 @@
       "MODULE_PIPETTE_COLLISION_DANGER": {
         "title": "Pipette cannot access labware",
         "body": "Gen 1 8-Channel pipettes cannot access labware or tip racks in slot 4 or 6 because they are adjacent to modules. Read more "
+      },
+      "MISSING_MODULE": {
+        "title": "Missing module for step",
+        "body": "A step requires a module that does not exist"
       }
     },
     "warning": {

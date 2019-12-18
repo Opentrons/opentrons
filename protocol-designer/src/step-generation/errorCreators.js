@@ -51,6 +51,13 @@ export function labwareDoesNotExist(args: {|
   }
 }
 
+export function missingModuleError(): CommandCreatorError {
+  return {
+    message: 'This step requires a module, but none is selected',
+    type: 'MISSING_MODULE',
+  }
+}
+
 export function tipVolumeExceeded(args: {|
   actionName: string,
   volume: string | number,

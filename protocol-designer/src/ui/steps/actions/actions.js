@@ -2,6 +2,8 @@
 import forEach from 'lodash/forEach'
 import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../constants'
 import { selectors as stepFormSelectors } from '../../../step-forms'
+import { selectors as uiModulesSelectors } from '../../modules'
+
 import {
   getNextDefaultPipetteId,
   handleFormChange,
@@ -113,6 +115,12 @@ export const selectStep = (
       ...formData,
       ...updatedFields,
     }
+  }
+
+  // auto-select magnetic module if it exists (assumes no more than 1 magnetic module)
+  if (newStepType === 'magnet') {
+    const moduleId = uiModulesSelectors.getSingleMagneticModuleId(state)
+    formData = { ...formData, moduleId }
   }
 
   dispatch({
