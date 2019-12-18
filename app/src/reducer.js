@@ -17,7 +17,7 @@ import { robotApiReducer } from './robot-api/reducer'
 // robot administration state
 import { robotAdminReducer } from './robot-admin/reducer'
 
-// robot administration state
+// robot controls state
 import { robotControlsReducer } from './robot-controls/reducer'
 
 // robot settings state

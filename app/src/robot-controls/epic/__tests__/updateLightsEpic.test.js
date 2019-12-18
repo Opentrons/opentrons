@@ -50,7 +50,7 @@ describe('updateLightsEpic', () => {
     meta,
   }
 
-  test('calls GET /robot/lights', () => {
+  test('calls POST /robot/lights', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
         cold('r', { r: Fixtures.mockUpdateLightsSuccess })
@@ -72,7 +72,7 @@ describe('updateLightsEpic', () => {
     })
   })
 
-  test('maps successful response to FETCH_LIGHTS_SUCCESS', () => {
+  test('maps successful response to UPDATE_LIGHTS_SUCCESS', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
         cold('r', { r: Fixtures.mockUpdateLightsSuccess })
@@ -92,7 +92,7 @@ describe('updateLightsEpic', () => {
     })
   })
 
-  test('maps failed response to FETCH_LIGHTS_FAILURE', () => {
+  test('maps failed response to UPDATE_LIGHTS_FAILURE', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
         cold('r', { r: Fixtures.mockUpdateLightsFailure })
