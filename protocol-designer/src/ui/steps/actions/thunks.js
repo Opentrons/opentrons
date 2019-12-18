@@ -4,7 +4,10 @@ import { selectors as labwareIngredsSelectors } from '../../../labware-ingred/se
 import stepsSelectors from '../selectors'
 import { selectStep } from './actions'
 import { actions as tutorialActions } from '../../../tutorial'
-import type { DuplicateStepAction, ReorderSelectedStepAction } from './types'
+
+import * as uiModuleSelectors from '../../../ui/modules/selectors'
+import type { DuplicateStepAction } from './types'
+
 import type { StepType, StepIdType } from '../../../form-types'
 import type { GetState, ThunkDispatch } from '../../../types'
 
@@ -24,12 +27,28 @@ export const addStep = (payload: { stepType: StepType }) => (
     },
   })
   const deckHasLiquid = labwareIngredsSelectors.getDeckHasLiquid(state)
+  const magnetModuleHasLabware = uiModuleSelectors.getMagnetModuleHasLabware(
+    state
+  )
+
   // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
   const stepNeedsLiquid = ['mix', 'moveLiquid'].includes(payload.stepType)
+  const stepMagnetNeedsLabware = ['magnet'].includes(payload.stepType)
   if (stepNeedsLiquid && !deckHasLiquid) {
     dispatch(tutorialActions.addHint('add_liquids_and_labware'))
   }
+  if (stepMagnetNeedsLabware && !magnetModuleHasLabware) {
+    dispatch(tutorialActions.addHint('module_without_labware'))
+  }
   dispatch(selectStep(stepId, stepType))
+}
+
+export type ReorderSelectedStepAction = {
+  type: 'REORDER_SELECTED_STEP',
+  payload: {
+    delta: number,
+    stepId: StepIdType,
+  },
 }
 
 export const reorderSelectedStep = (delta: number) => (

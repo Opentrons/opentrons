@@ -8,6 +8,7 @@ import type {
   LabwareEntities,
   PipetteEntities,
 } from '../../../step-forms/types'
+import dependentFieldsUpdateTemperature from './dependentFieldsUpdateTemperature'
 
 function handleFormChange(
   patch: FormPatch,
@@ -39,6 +40,13 @@ function handleFormChange(
   }
   if (rawForm.stepType === 'magnet') {
     const dependentFieldsPatch = dependentFieldsUpdateMagnet(patch, rawForm)
+    return { ...patch, ...dependentFieldsPatch }
+  }
+  if (rawForm.stepType === 'temperature') {
+    const dependentFieldsPatch = dependentFieldsUpdateTemperature(
+      patch,
+      rawForm
+    )
     return { ...patch, ...dependentFieldsPatch }
   }
 

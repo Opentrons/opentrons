@@ -3,6 +3,45 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.15.2](https://github.com/opentrons/opentrons/compare/v3.15.1...v3.15.2) (2019-12-17)
+
+
+### Bug Fixes
+
+* **api:** fix cancelling during the pre-protocol home ([#4627](https://github.com/opentrons/opentrons/issues/4627)) ([94852cf](https://github.com/opentrons/opentrons/commit/94852cf))
+* **api:** allow labeling and versioning for module labware ([#4605](https://github.com/opentrons/opentrons/issues/4605)) ([d4d66a3](https://github.com/opentrons/opentrons/commit/d4d66a3))
+* **api:** allow labels on old magdeck containers in v1 ([#4608](https://github.com/opentrons/opentrons/issues/4608)) ([37ab7b8](https://github.com/opentrons/opentrons/commit/37ab7b8)), closes [#2310](https://github.com/opentrons/opentrons/issues/2310)
+* **api:** apiv1: move instrument in Z-axis prior to touch tip in XY ([#4585](https://github.com/opentrons/opentrons/issues/4585)) ([c946d5b](https://github.com/opentrons/opentrons/commit/c946d5b))
+* **api:** do not allow robot.connect() in rpc protocols ([#4589](https://github.com/opentrons/opentrons/issues/4589)) ([929baea](https://github.com/opentrons/opentrons/commit/929baea)), closes [#4252](https://github.com/opentrons/opentrons/issues/4252)
+* **api:** fix homing timeouts ([#4554](https://github.com/opentrons/opentrons/issues/4554)) ([31ab73b](https://github.com/opentrons/opentrons/commit/31ab73b))
+* **api:** fix temp connect to attached modules during lw calibration ([#4614](https://github.com/opentrons/opentrons/issues/4614)) ([e2848f8](https://github.com/opentrons/opentrons/commit/e2848f8)), closes [#4613](https://github.com/opentrons/opentrons/issues/4613)
+* **api:** limit air_gap in transfer to <max volume ([#4588](https://github.com/opentrons/opentrons/issues/4588)) ([d7a3b70](https://github.com/opentrons/opentrons/commit/d7a3b70)), closes [#364](https://github.com/opentrons/opentrons/issues/364)
+* **api:** make sure the robot is connected before querying instrs ([#4611](https://github.com/opentrons/opentrons/issues/4611)) ([286f1ce](https://github.com/opentrons/opentrons/commit/286f1ce)), closes [#4590](https://github.com/opentrons/opentrons/issues/4590)
+* **api:** remove unnecessary tip return ([#4566](https://github.com/opentrons/opentrons/issues/4566)) ([94df11e](https://github.com/opentrons/opentrons/commit/94df11e))
+* **api:** special case pause at end of protocol ([#4603](https://github.com/opentrons/opentrons/issues/4603)) ([0080d7b](https://github.com/opentrons/opentrons/commit/0080d7b)), closes [#3238](https://github.com/opentrons/opentrons/issues/3238)
+* **api:** specify v_offset in v1 transfer touch_tip ([#4602](https://github.com/opentrons/opentrons/issues/4602)) ([5605c37](https://github.com/opentrons/opentrons/commit/5605c37)), closes [#3703](https://github.com/opentrons/opentrons/issues/3703)
+* **api:** update settings reset copy to avoid confusion ([#4572](https://github.com/opentrons/opentrons/issues/4572)) ([0cf9132](https://github.com/opentrons/opentrons/commit/0cf9132)), closes [#4568](https://github.com/opentrons/opentrons/issues/4568)
+* **app:** disable tip probe for unused pipettes ([#4584](https://github.com/opentrons/opentrons/issues/4584)) ([9388391](https://github.com/opentrons/opentrons/commit/9388391)), closes [#4570](https://github.com/opentrons/opentrons/issues/4570)
+* **app:** naïve loading state for tc open lid during lw cal ([#4616](https://github.com/opentrons/opentrons/issues/4616)) ([c4a4cdf](https://github.com/opentrons/opentrons/commit/c4a4cdf))
+* **labware:** "retire" eppendorf tiprack definitions ([#4526](https://github.com/opentrons/opentrons/issues/4526)) ([ddc2800](https://github.com/opentrons/opentrons/commit/ddc2800)), closes [#4518](https://github.com/opentrons/opentrons/issues/4518)
+* **protocol-designer:** filters out non trash labware for blowout options ([#4559](https://github.com/opentrons/opentrons/issues/4559)) ([aaf189d](https://github.com/opentrons/opentrons/commit/aaf189d)), closes [#4348](https://github.com/opentrons/opentrons/issues/4348) [#4348](https://github.com/opentrons/opentrons/issues/4348)
+* **shared-data:** require well(s) in labware schema ([#4621](https://github.com/opentrons/opentrons/issues/4621)) ([4dcbff5](https://github.com/opentrons/opentrons/commit/4dcbff5)), closes [#4506](https://github.com/opentrons/opentrons/issues/4506)
+
+
+### Features
+
+* **api:** Handle extra labware in script entrypoints ([#4574](https://github.com/opentrons/opentrons/issues/4574)) ([8926340](https://github.com/opentrons/opentrons/commit/8926340))
+* **api:** Restart jupyter with an api push ([#4581](https://github.com/opentrons/opentrons/issues/4581)) ([aa3cea3](https://github.com/opentrons/opentrons/commit/aa3cea3))
+* **app:** add link to docs in resources card ([#4606](https://github.com/opentrons/opentrons/issues/4606)) ([21ec9ff](https://github.com/opentrons/opentrons/commit/21ec9ff))
+* **labware-library:** change test protocol to api v2 ([#4571](https://github.com/opentrons/opentrons/issues/4571)) ([bd631d4](https://github.com/opentrons/opentrons/commit/bd631d4))
+* **protocol-designer:** Add set temperature form ([#4533](https://github.com/opentrons/opentrons/issues/4533)) ([255e910](https://github.com/opentrons/opentrons/commit/255e910)), closes [#4307](https://github.com/opentrons/opentrons/issues/4307)
+* **protocol-designer:** reorganize step-generation ([#4531](https://github.com/opentrons/opentrons/issues/4531)) ([125f06f](https://github.com/opentrons/opentrons/commit/125f06f)), closes [#4301](https://github.com/opentrons/opentrons/issues/4301)
+* **protocol-designer:** update recommended labware article link ([#4552](https://github.com/opentrons/opentrons/issues/4552)) ([08a2d26](https://github.com/opentrons/opentrons/commit/08a2d26)), closes [#4324](https://github.com/opentrons/opentrons/issues/4324)
+
+
+
+
+
 ## [3.15.1](https://github.com/opentrons/opentrons/compare/v3.15.0...v3.15.1) (2019-12-09)
 
 ### Bug Fixes

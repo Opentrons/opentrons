@@ -3,9 +3,9 @@ import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import pickBy from 'lodash/pickBy'
 import uniq from 'lodash/uniq'
-import { rehydrate } from '../persist'
 
 import type { Action } from '../types'
+import type { RehydratePersistedAction } from '../persist'
 import type { HintKey } from './index'
 import type { AddHintAction, RemoveHintAction } from './actions'
 import type { NavigateToPageAction } from '../navigation/actions'
@@ -34,9 +34,14 @@ type DismissedHintReducerState = { [HintKey]: { rememberDismissal: boolean } }
 const dismissedHintsInitialState = {}
 const dismissedHints = handleActions(
   {
-    // only rehydrate "rememberDismissal" hints
-    REHYDRATE_PERSISTED: () =>
-      rehydrate('tutorial.dismissedHints', dismissedHintsInitialState),
+    // NOTE: only "rememberDismissal" hints should have been persisted
+    REHYDRATE_PERSISTED: (
+      state: DismissedHintReducerState,
+      action: RehydratePersistedAction
+    ) => {
+      const persistedState = action.payload?.['tutorial.dismissedHints']
+      return persistedState !== undefined ? persistedState : state
+    },
     REMOVE_HINT: (
       state: DismissedHintReducerState,
       action: RemoveHintAction

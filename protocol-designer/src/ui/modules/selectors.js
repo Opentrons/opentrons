@@ -1,16 +1,20 @@
 // @flow
 import { createSelector } from 'reselect'
 
-import * as uiLabwareSelectors from '../labware/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import { getModuleLabwareOptions, getModuleOnDeckByType } from './utils'
+import {
+  getModuleLabwareOptions,
+  getModuleOnDeckByType,
+  getModuleHasLabware,
+} from './utils'
+import { getLabwareNicknamesById } from '../labware/selectors'
 import type { Options } from '@opentrons/components'
 import type { Selector } from '../../types'
 
 /** Returns dropdown option for labware placed on magnetic module */
 export const getMagneticLabwareOptions: Selector<Options> = createSelector(
   stepFormSelectors.getInitialDeckSetup,
-  uiLabwareSelectors.getLabwareNicknamesById,
+  getLabwareNicknamesById,
   (initialDeckSetup, nicknamesById) => {
     return getModuleLabwareOptions(initialDeckSetup, nicknamesById, 'magdeck')
   }
@@ -19,7 +23,7 @@ export const getMagneticLabwareOptions: Selector<Options> = createSelector(
 /** Returns dropdown option for labware placed on temperature module */
 export const getTemperatureLabwareOptions: Selector<Options> = createSelector(
   stepFormSelectors.getInitialDeckSetup,
-  uiLabwareSelectors.getLabwareNicknamesById,
+  getLabwareNicknamesById,
   (initialDeckSetup, nicknamesById) => {
     return getModuleLabwareOptions(initialDeckSetup, nicknamesById, 'tempdeck')
   }
@@ -28,7 +32,7 @@ export const getTemperatureLabwareOptions: Selector<Options> = createSelector(
 /** Returns dropdown option for labware placed on thermocycler module */
 export const getThermocyclerLabwareOptions: Selector<Options> = createSelector(
   stepFormSelectors.getInitialDeckSetup,
-  uiLabwareSelectors.getLabwareNicknamesById,
+  getLabwareNicknamesById,
   (initialDeckSetup, nicknamesById) => {
     return getModuleLabwareOptions(
       initialDeckSetup,
@@ -45,4 +49,12 @@ export const getSingleMagneticModuleId: Selector<
   stepFormSelectors.getInitialDeckSetup,
   initialDeckSetup =>
     getModuleOnDeckByType(initialDeckSetup, 'magdeck')?.id || null
+)
+
+/** Returns boolean if magnetic module has labware */
+export const getMagnetModuleHasLabware: Selector<boolean> = createSelector(
+  stepFormSelectors.getInitialDeckSetup,
+  initialDeckSetup => {
+    return getModuleHasLabware(initialDeckSetup, 'magdeck')
+  }
 )

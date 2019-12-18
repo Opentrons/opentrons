@@ -1,4 +1,6 @@
 // @flow
+// DEPRECATED - do not add to nor import from this module if you can help it
+// TODO(mc, 2019-12-17): remove when able
 // robot HTTP API client module
 import { combineReducers } from 'redux'
 import apiReducer from './reducer'
@@ -33,7 +35,7 @@ export type {
   DeckCalPoint,
 } from './calibration'
 
-export type { RobotMove, RobotHome, RobotLights } from './robot'
+export type { RobotMove, RobotHome } from './robot'
 
 export type State = $Call<typeof superDeprecatedRobotApiReducer, void, Action>
 
@@ -62,9 +64,6 @@ export {
   clearHomeResponse,
   moveRobotTo,
   clearMoveResponse,
-  fetchRobotLights,
-  setRobotLights,
   makeGetRobotMove,
   makeGetRobotHome,
-  makeGetRobotLights,
 } from './robot'

@@ -1,4 +1,4 @@
-# Robot OS Changes from 3.14.1 to 3.15.1
+# Robot OS Changes from 3.14.1 to 3.15.2
 
 For more details about this release, please see the full [technical change log][changelog]
 
@@ -30,11 +30,20 @@ We're also happy to announce that software support for our new [Thermocycler Mod
 - Fix an issue where you could not specify location within wells for transfers using a multichannel pipette in Protocol API v2
 - Fix an issue where resetting labware calibration would not reset the calibration for old-style labware like `96-flat`
 - Fix an issue where accessing Magnetic Module status in a Protocol API version 1 protocol would fail simulation
+- Fix X axis double-homing issue (#4554).
+- Fix Thermocycler Module calibration issues (#4614).
+- Allow labels for labware on modules in Python Protocol API v1 (#4608).
+- Allow labeling and versioning for labware on modules in Python Protocol API v2 (#4605).
+- Allow for a pause at the end of protocols (#4603).
+- Fix touch tip in 15x50ml tuberack (#4585).
+- Disallow connecting to the robot in Python Protocol API v1 during upload to the Run App (#4589).
+- Limit air gap in Python Protocol API v1 to max volume of the pipette (#4588).
+- Use correct pipette settings which sometimes caused drop tip to mis-behave (#4611).
+
 
 ## Known Issues (Python Protocol API version 1)
 
 - While the underlying definition is correct, there is a known API bug that is causing the robot to think a "50 mL" tube in a "15 / 50 mL" tube rack is the same height as the "15 mL" tube
-- When attaching or detaching a pipette from the left mount, the robot homes twice in the X direction
 - If the robot is about to initiate a pause and a cancel is issued from the Opentrons App, the cancel may fail. See issue [#4545](https://github.com/Opentrons/opentrons/issues/4545)
 
 

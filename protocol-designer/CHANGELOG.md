@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.15.2](https://github.com/opentrons/opentrons/compare/v3.15.1...v3.15.2) (2019-12-17)
+
+### Bug Fixes
+
+* **protocol-designer:** filters out non trash labware for blowout options ([#4559](https://github.com/Opentrons/opentrons/issues/4559)) ([aaf189d](https://github.com/Opentrons/opentrons/commit/aaf189d)), closes [#4348](https://github.com/Opentrons/opentrons/issues/4348) [#4348](https://github.com/Opentrons/opentrons/issues/4348)
+
+
+### Features
+
+* **protocol-designer:** Add set temperature form ([#4533](https://github.com/Opentrons/opentrons/issues/4533)) ([255e910](https://github.com/Opentrons/opentrons/commit/255e910)), closes [#4307](https://github.com/Opentrons/opentrons/issues/4307)
+* **protocol-designer:** reorganize step-generation ([#4531](https://github.com/Opentrons/opentrons/issues/4531)) ([125f06f](https://github.com/Opentrons/opentrons/commit/125f06f)), closes [#4301](https://github.com/Opentrons/opentrons/issues/4301)
+* **protocol-designer:** update recommended labware article link ([#4552](https://github.com/Opentrons/opentrons/issues/4552)) ([08a2d26](https://github.com/Opentrons/opentrons/commit/08a2d26)), closes [#4324](https://github.com/Opentrons/opentrons/issues/4324)
+
+
+
+
+
 ## [3.15.1](https://github.com/Opentrons/opentrons/compare/v3.15.0...v3.15.1) (2019-12-09)
 
 **Note:** Version bump only for package protocol-designer

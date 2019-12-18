@@ -83,6 +83,11 @@ export default function getDefaultsForStepType(
         magnetAction: null,
         engageHeight: null,
       }
+    case 'temperature':
+      return {
+        setTemperature: null,
+        targetTemperature: null,
+      }
     default:
       return {}
   }

@@ -16,6 +16,7 @@ export type FormErrorKey =
   | 'TIME_PARAM_REQUIRED'
   | 'MAGNET_ACTION_TYPE_REQUIRED'
   | 'ENGAGE_HEIGHT_REQUIRED'
+  | 'TARGET_TEMPERATURE_REQUIRED'
 
 export type FormError = {
   title: string,
@@ -60,6 +61,10 @@ const FORM_ERRORS: { [FormErrorKey]: FormError } = {
   ENGAGE_HEIGHT_REQUIRED: {
     title: 'Engage height is required',
     dependentFields: ['magnetAction', 'engageHeight'],
+  },
+  TARGET_TEMPERATURE_REQUIRED: {
+    title: 'Temperature is required',
+    dependentFields: ['setTemperature', 'targetTemperature'],
   },
 }
 export type FormErrorChecker = mixed => ?FormError
@@ -138,6 +143,15 @@ export const engageHeightRequired = (fields: HydratedFormData): ?FormError => {
   const { magnetAction, engageHeight } = fields
   return magnetAction === 'engage' && !engageHeight
     ? FORM_ERRORS.ENGAGE_HEIGHT_REQUIRED
+    : null
+}
+
+export const targetTemperatureRequired = (
+  fields: HydratedFormData
+): ?FormError => {
+  const { setTemperature, targetTemperature } = fields
+  return setTemperature === 'true' && !targetTemperature
+    ? FORM_ERRORS.TARGET_TEMPERATURE_REQUIRED
     : null
 }
 

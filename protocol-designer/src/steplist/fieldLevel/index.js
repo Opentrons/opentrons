@@ -17,7 +17,12 @@ import {
   type ValueMasker,
   type ValueCaster,
 } from './processing'
-import { MIN_ENGAGE_HEIGHT, MAX_ENGAGE_HEIGHT } from '../../constants'
+import {
+  MIN_ENGAGE_HEIGHT,
+  MAX_ENGAGE_HEIGHT,
+  MIN_TEMP_MODULE_TEMP,
+  MAX_TEMP_MODULE_TEMP,
+} from '../../constants'
 import type { StepFieldName } from '../../form-types'
 import type { LabwareEntity, PipetteEntity } from '../../step-forms'
 import type { InvariantContext } from '../../step-generation'
@@ -144,6 +149,16 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
       maxFieldValue(MAX_ENGAGE_HEIGHT)
     ),
     maskValue: composeMaskers(maskToFloat),
+    castValue: Number,
+  },
+  setTemperature: { getErrors: composeErrors(requiredField) },
+  targetTemperature: {
+    getErrors: composeErrors(
+      minFieldValue(MIN_TEMP_MODULE_TEMP),
+      maxFieldValue(MAX_TEMP_MODULE_TEMP)
+    ),
+    // TODO (sa 2019-12-11): investigate maskToNumber not allowing 0
+    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
     castValue: Number,
   },
 }

@@ -9,6 +9,7 @@ import {
   magnetActionRequired,
   engageHeightRequired,
   type FormError,
+  targetTemperatureRequired,
 } from './errors'
 import {
   composeWarnings,
@@ -16,6 +17,7 @@ import {
   maxDispenseWellVolume,
   minDisposalVolume,
   engageHeightRangeExceeded,
+  temperatureRangeExceeded,
   type FormWarning,
   type FormWarningType,
 } from './warnings'
@@ -53,6 +55,10 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
   magnet: {
     getErrors: composeErrors(magnetActionRequired, engageHeightRequired),
     getWarnings: composeWarnings(engageHeightRangeExceeded),
+  },
+  temperature: {
+    getErrors: composeErrors(targetTemperatureRequired),
+    getWarnings: composeWarnings(temperatureRangeExceeded),
   },
 }
 

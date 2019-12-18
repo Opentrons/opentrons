@@ -67,7 +67,7 @@ If we were to rewrite this with the Opentrons API, it would look like the follow
 
     # labware
     plate = labware.load('96-flat', '2')
-    tiprack = labware.load('opentrons-tiprack-300ul', '1')
+    tiprack = labware.load('opentrons_96_tiprack_300ul', '1')
 
     # pipettes
     pipette = instruments.P300_Single(mount='left', tip_racks=[tiprack])
@@ -125,7 +125,7 @@ From the example above, the "labware" section looked like:
 .. code-block:: python
 
     plate = labware.load('96-flat', '2')
-    tiprack = labware.load('tiprack-200ul', '1')
+    tiprack = labware.load('opentrons_96_tiprack_300ul', '1')
 
 .. _index-pipettes:
 
