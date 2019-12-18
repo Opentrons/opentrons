@@ -8,17 +8,17 @@ import type { Error } from '../../types'
 
 import styles from './styles.css'
 
-type Props = {
+type Props = {|
   heading?: ?string,
   description: string,
   close?: () => mixed,
   closeUrl?: string,
   error: Error,
-}
+|}
 
 const DEFAULT_HEADING = 'Unexpected Error'
 
-export default function ErrorModal(props: Props) {
+export function ErrorModal(props: Props) {
   const { description, error } = props
   const heading = props.heading || DEFAULT_HEADING
   let closeButtonProps = { children: 'close', onClick: props.close }

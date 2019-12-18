@@ -9,13 +9,13 @@ import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
 
-type Props = {
+type Props = {|
   buttons: Array<?ButtonProps>,
   className?: string,
   description?: React.Node,
-}
+|}
 
-export default function BottomButtonBar(props: Props) {
+export function BottomButtonBar(props: Props) {
   const buttons = props.buttons.filter(Boolean)
   const className = cx(styles.bottom_button_bar, props.className)
 
