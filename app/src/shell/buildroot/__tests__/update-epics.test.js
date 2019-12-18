@@ -4,7 +4,7 @@ import {
   makeRobotApiRequest,
   passRobotApiResponseAction,
   passRobotApiErrorAction,
-} from '../../../robot-api/utils'
+} from '../../../robot-api/deprecated'
 
 import * as epics from '../update-epics'
 import * as actions from '../actions'
@@ -12,7 +12,7 @@ import * as selectors from '../selectors'
 import { INITIAL_STATE } from '../reducer'
 
 jest.mock('../selectors')
-jest.mock('../../../robot-api/utils')
+jest.mock('../../../robot-api/deprecated')
 
 const robot = { name: 'robot', host: '10.10.0.0', port: 31950 }
 

@@ -1,28 +1,21 @@
 // @flow
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-import TemperatureControl from './TemperatureControl'
+import { TemperatureControl } from './TemperatureControl'
 
-import useSendModuleCommand from './useSendModuleCommand'
-import { getConnectedRobot } from '../../discovery'
-import TemperatureData from './TemperatureData'
+import { THERMOCYCLER, useSendModuleCommand } from '../../modules'
+import { TemperatureData } from './TemperatureData'
 import styles from './styles.css'
 
-import type { TempDeckModule, ThermocyclerModule } from '../../robot-api/types'
-import type { Robot } from '../../discovery/types'
+import type { TemperatureModule, ThermocyclerModule } from '../../modules/types'
 
 type Props = {|
-  robot: Robot,
-  module: TempDeckModule | ThermocyclerModule,
+  module: TemperatureModule | ThermocyclerModule,
+  canControl: boolean,
 |}
 
-function ModuleControls(props: Props) {
-  const { module, robot } = props
-  const { currentTemp, targetTemp, lidTemp, lidTarget } = module.data
+export function ModuleControls(props: Props) {
+  const { module: mod, canControl } = props
   const sendModuleCommand = useSendModuleCommand()
-  const connectedRobot: ?Robot = useSelector(getConnectedRobot)
-
-  const canControl = connectedRobot && robot.name === connectedRobot.name
 
   return (
     <div className={styles.module_data}>
@@ -30,22 +23,24 @@ function ModuleControls(props: Props) {
       <div className={styles.temp_data_wrapper}>
         <TemperatureData
           className={styles.temp_data_item}
-          current={currentTemp}
-          target={targetTemp}
-          title={lidTemp ? 'Base Temperature:' : 'Temperature:'}
+          current={mod.data.currentTemp}
+          target={mod.data.targetTemp}
+          title={
+            mod.name === THERMOCYCLER ? 'Base Temperature:' : 'Temperature:'
+          }
         />
-        {lidTemp && (
+        {mod.name === THERMOCYCLER && (
           <TemperatureData
             className={styles.temp_data_item}
-            current={lidTemp}
-            target={lidTarget}
+            current={mod.data.lidTemp}
+            target={mod.data.lidTarget}
             title="Lid Temperature:"
           />
         )}
       </div>
       <div className={styles.control_wrapper}>
         <TemperatureControl
-          module={module}
+          module={mod}
           disabled={!canControl}
           sendModuleCommand={sendModuleCommand}
         />
@@ -54,4 +49,4 @@ function ModuleControls(props: Props) {
   )
 }
 
-export default ModuleControls
+export { TemperatureControl, TemperatureData }

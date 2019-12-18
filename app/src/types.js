@@ -5,11 +5,7 @@ import type { Store as ReduxStore, Dispatch as ReduxDispatch } from 'redux'
 import type { RouterState, RouterAction } from 'connected-react-router'
 import type { Observable } from 'rxjs'
 
-import type {
-  RobotApiState,
-  DeprecatedRobotApiAction,
-  DeprecatedRobotApiState,
-} from './robot-api/types'
+import type { RobotApiState } from './robot-api/types'
 import type { RobotAdminState, RobotAdminAction } from './robot-admin/types'
 import type { PipettesState, PipettesAction } from './pipettes/types'
 import type { ModulesState, ModulesAction } from './modules/types'
@@ -35,7 +31,6 @@ import type {
 export type State = $ReadOnly<{|
   robot: RobotState,
   superDeprecatedRobotApi: SuperDeprecatedRobotApiState,
-  deprecatedRobotApi: DeprecatedRobotApiState,
   robotApi: RobotApiState,
   robotAdmin: RobotAdminState,
   robotSettings: RobotSettingsState,
@@ -52,7 +47,6 @@ export type State = $ReadOnly<{|
 export type Action =
   | RobotAction
   | SuperDeprecatedRobotApiAction
-  | DeprecatedRobotApiAction
   | RobotAdminAction
   | RobotSettingsAction
   | PipettesAction

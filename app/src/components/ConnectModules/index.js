@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 
-import { getMissingModules, fetchModules } from '../../robot-api'
+import { getMissingModules, fetchModules } from '../../modules'
 import {
   selectors as robotSelectors,
   actions as robotActions,
@@ -13,9 +13,8 @@ import Prompt from './Prompt'
 import styles from './styles.css'
 
 import type { State, Dispatch } from '../../types'
-import type { RobotService } from '../../robot/types'
 
-type OP = {| robot: RobotService |}
+type OP = {| robotName: string |}
 
 type SP = {| modulesRequired: boolean, modulesMissing: boolean |}
 
@@ -54,6 +53,6 @@ function mapStateToProps(state: State, ownProps: OP): SP {
 function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   return {
     setReviewed: () => dispatch(robotActions.setModulesReviewed(true)),
-    fetchModules: () => dispatch(fetchModules(ownProps.robot)),
+    fetchModules: () => dispatch(fetchModules(ownProps.robotName)),
   }
 }

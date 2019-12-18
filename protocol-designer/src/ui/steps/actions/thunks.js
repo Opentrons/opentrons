@@ -4,8 +4,10 @@ import { selectors as labwareIngredsSelectors } from '../../../labware-ingred/se
 import stepsSelectors from '../selectors'
 import { selectStep } from './actions'
 import { actions as tutorialActions } from '../../../tutorial'
+
 import * as uiModuleSelectors from '../../../ui/modules/selectors'
 import type { DuplicateStepAction } from './types'
+
 import type { StepType, StepIdType } from '../../../form-types'
 import type { GetState, ThunkDispatch } from '../../../types'
 

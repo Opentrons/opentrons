@@ -3,7 +3,7 @@
 import * as React from 'react'
 
 import { AttachedPipettesCard } from './AttachedPipettesCard'
-import AttachedModulesCard from './AttachedModulesCard'
+import { AttachedModulesCard } from './AttachedModulesCard'
 import { CardContainer, CardRow } from '../layout'
 
 import type { Robot } from '../../discovery/types'
@@ -17,7 +17,7 @@ export default function InstrumentSettings(props: Props) {
         <AttachedPipettesCard robot={props.robot} />
       </CardRow>
       <CardRow>
-        <AttachedModulesCard robot={props.robot} />
+        <AttachedModulesCard robotName={props.robot.name} />
       </CardRow>
     </CardContainer>
   )

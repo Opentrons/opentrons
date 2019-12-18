@@ -4,36 +4,38 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { Card, useInterval } from '@opentrons/components'
-import { fetchModules, getModulesState } from '../../robot-api'
-import ModulesCardContents from './ModulesCardContents'
+import { fetchModules, getAttachedModules } from '../../modules'
+import { getConnectedRobotName } from '../../robot/selectors'
+import { ModulesCardContents } from './ModulesCardContents'
 
 import type { State, Dispatch } from '../../types'
-import type { Robot } from '../../discovery/types'
 
-type Props = {| robot: Robot |}
+type Props = {| robotName: string |}
 
 const TITLE = 'Modules'
 const POLL_MODULE_INTERVAL_MS = 5000
 
-export default function AttachedModulesCard(props: Props) {
-  const { robot } = props
+export function AttachedModulesCard(props: Props) {
+  const { robotName } = props
   const dispatch = useDispatch<Dispatch>()
-
+  const connectedRobotName = useSelector(getConnectedRobotName)
   const modules = useSelector((state: State) =>
-    getModulesState(state, robot.name)
+    getAttachedModules(state, robotName)
   )
+  const canControl = connectedRobotName === robotName
 
-  // this component may be mounted if the robot is not currently connected, so
-  // GET /modules ourselves instead of relying on the poll while connected epic
+  // if robot is connected, the modules epic will poll /modules automatically,
+  // but we need to poll ourselves if we're viewing this robot without
+  // connecting to its RPC server
   useInterval(
-    () => dispatch(fetchModules(robot)),
-    POLL_MODULE_INTERVAL_MS,
+    () => dispatch(fetchModules(robotName)),
+    connectedRobotName === null ? POLL_MODULE_INTERVAL_MS : null,
     true
   )
 
   return (
     <Card title={TITLE}>
-      <ModulesCardContents robot={robot} modules={modules} />
+      <ModulesCardContents modules={modules} canControl={canControl} />
     </Card>
   )
 }

@@ -14,7 +14,7 @@ type Props = {|
   toggleCard: boolean => mixed,
 |}
 
-export default function StatusCard(props: Props) {
+export function StatusCard(props: Props) {
   return (
     <CollapsibleItem
       className={styles.status_card}

@@ -289,7 +289,32 @@ def test_module_load_labware(loop):
     mod2 = ctx.load_module('tempdeck', 2)
     lw2 = mod2.load_labware(labware_name)
     assert lw2._offset == lw_offset + mod2._geometry.location.point
-    assert lw2.name == labware_name
+
+
+def test_module_load_labware_with_label(loop):
+    ctx = papi.ProtocolContext(loop)
+    labware_name = 'corning_96_wellplate_360ul_flat'
+    ctx._hw_manager.hardware._backend._attached_modules = [
+        ('mod0', 'tempdeck')]
+    mod = ctx.load_module('Temperature Module', 1)
+    lw = mod.load_labware(labware_name, label='my cool labware')
+    assert lw.name == 'my cool labware'
+
+
+def test_module_load_invalid_labware(loop):
+    ctx = papi.ProtocolContext(loop)
+    labware_name = 'corning_96_wellplate_360ul_flat'
+    ctx._hw_manager.hardware._backend._attached_modules = [
+        ('mod0', 'tempdeck')]
+    mod = ctx.load_module('Temperature Module', 1)
+    # wrong version number
+    with pytest.raises(FileNotFoundError):
+        mod.load_labware(labware_name, namespace='opentrons', version=100)
+    # wrong namespace
+    with pytest.raises(FileNotFoundError):
+        mod.load_labware(labware_name, namespace='fake namespace', version=1)
+    # valid info
+    assert mod.load_labware(labware_name, namespace='opentrons', version=1)
 
 
 def test_deprecated_module_load_labware(loop):

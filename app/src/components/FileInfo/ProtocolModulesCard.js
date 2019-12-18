@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { selectors as robotSelectors } from '../../robot'
-import { getModulesState } from '../../robot-api'
+import { getAttachedModules } from '../../modules'
 
 import InfoSection from './InfoSection'
 import { SectionContentHalf } from '../layout'
@@ -15,13 +15,13 @@ import MissingItemWarning from './MissingItemWarning'
 import type { State, Dispatch } from '../../types'
 import type { SessionModule } from '../../robot/types'
 import type { Robot } from '../../discovery/types'
-import type { Module } from '../../robot-api/types'
+import type { AttachedModule } from '../../modules/types'
 
 type OP = {| robot: Robot |}
 
 type SP = {|
   modules: Array<SessionModule>,
-  actualModules: Array<Module>,
+  actualModules: Array<AttachedModule>,
   attachModulesUrl: string,
 |}
 
@@ -70,7 +70,7 @@ function ProtocolModulesCard(props: Props) {
 
 function mapStateToProps(state: State, ownProps: OP): SP {
   const { robot } = ownProps
-  const actualModules = getModulesState(state, robot.name)
+  const actualModules = getAttachedModules(state, robot.name)
 
   return {
     actualModules,

@@ -1,39 +1,48 @@
 // @flow
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
-import some from 'lodash/some'
-import { PrimaryButton, AlertModal, Icon } from '@opentrons/components'
+import {
+  useTimeout,
+  PrimaryButton,
+  AlertModal,
+  Icon,
+} from '@opentrons/components'
 
-import { sendModuleCommand } from '../../robot-api'
+import { sendModuleCommand } from '../../modules'
 import DeckMap from '../DeckMap'
 import styles from './styles.css'
 import { Portal } from '../portal'
 
 import type { Dispatch } from '../../types'
-import type { Module, RobotHost } from '../../robot-api/types'
+import type { AttachedModule } from '../../modules/types'
 
-type Props = {| robot: RobotHost, modules: Array<Module> |}
+const LID_OPEN_DELAY_MS = 30 * 1000
+type Props = {| robotName: string, modules: Array<AttachedModule> |}
 
-function PrepareModules(props: Props) {
-  const { modules, robot } = props
+export function PrepareModules(props: Props) {
+  const { modules, robotName } = props
   const dispatch = useDispatch<Dispatch>()
+  const [isHandling, setIsHandling] = React.useState(false)
+
+  // NOTE: this is the smarter implementation of isHandling that
+  // relies on the TC reporting its 'in_between' status while the lid m
+  // motor is moving, which currently doesn't happen because of a FW limitation
+  // const isHandling = some(
+  //   modules,
+  //   mod => mod.name === 'thermocycler' && mod.data?.lid === 'in_between'
+  // )
+
+  useTimeout(() => setIsHandling(false), isHandling ? LID_OPEN_DELAY_MS : null)
 
   const handleOpenLidClick = () => {
     modules
       .filter(mod => mod.name === 'thermocycler')
-      .forEach(
-        mod =>
-          robot &&
-          dispatch(
-            sendModuleCommand(robot, mod.serial, { command_type: 'open' })
-          )
+      .forEach(mod =>
+        dispatch(sendModuleCommand(robotName, mod.serial, 'open'))
       )
+    setIsHandling(true)
   }
 
-  const isHandling = some(
-    modules,
-    mod => mod.name === 'thermocycler' && mod.data?.lid === 'in_between'
-  )
   return (
     <div className={styles.page_content_dark}>
       <div className={styles.deck_map_wrapper}>
@@ -51,7 +60,7 @@ function PrepareModules(props: Props) {
           <PrimaryButton
             className={styles.open_lid_button}
             onClick={handleOpenLidClick}
-            // disabled={isHandling}  TODO: uncomment when optical latches report 'closed'
+            disabled={isHandling}
           >
             {isHandling ? (
               <>
@@ -70,5 +79,3 @@ function PrepareModules(props: Props) {
     </div>
   )
 }
-
-export default PrepareModules

@@ -3,25 +3,26 @@ import * as React from 'react'
 import { LabeledValue } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import StatusCard from './StatusCard'
-import StatusItem from './StatusItem'
-import TemperatureControl from '../ModuleControls/TemperatureControl'
+import { StatusCard } from './StatusCard'
+import { StatusItem } from './StatusItem'
+import { TemperatureControl } from '../ModuleControls'
 import styles from './styles.css'
 
-import type {
-  TempDeckModule,
-  ModuleCommandRequest,
-} from '../../robot-api/types'
+import type { TemperatureModule, ModuleCommand } from '../../modules/types'
 
 type Props = {|
-  module: TempDeckModule,
-  sendModuleCommand: (serial: string, request: ModuleCommandRequest) => mixed,
+  module: TemperatureModule,
+  sendModuleCommand: (
+    moduleId: string,
+    command: ModuleCommand,
+    args?: Array<mixed>
+  ) => mixed,
   isProtocolActive: boolean,
   isCardExpanded: boolean,
   toggleCard: boolean => mixed,
 |}
 
-const TempDeckCard = ({
+export const TempDeckCard = ({
   module,
   sendModuleCommand,
   isProtocolActive,
@@ -56,5 +57,3 @@ const TempDeckCard = ({
     </div>
   </StatusCard>
 )
-
-export default TempDeckCard

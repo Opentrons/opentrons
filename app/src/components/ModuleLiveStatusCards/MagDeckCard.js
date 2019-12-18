@@ -2,19 +2,19 @@
 import * as React from 'react'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-import StatusCard from './StatusCard'
-import StatusItem from './StatusItem'
+import { StatusCard } from './StatusCard'
+import { StatusItem } from './StatusItem'
 import styles from './styles.css'
 
-import type { MagDeckModule } from '../../robot-api/types'
+import type { MagneticModule } from '../../modules/types'
 
 type Props = {|
-  module: MagDeckModule,
+  module: MagneticModule,
   isCardExpanded: boolean,
   toggleCard: boolean => mixed,
 |}
 
-const MagDeckCard = ({ module, isCardExpanded, toggleCard }: Props) => (
+export const MagDeckCard = ({ module, isCardExpanded, toggleCard }: Props) => (
   <StatusCard
     title={getModuleDisplayName(module.name)}
     isCardExpanded={isCardExpanded}
@@ -25,5 +25,3 @@ const MagDeckCard = ({ module, isCardExpanded, toggleCard }: Props) => (
     </div>
   </StatusCard>
 )
-
-export default MagDeckCard
