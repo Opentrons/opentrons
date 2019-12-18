@@ -139,7 +139,7 @@ lint-css:
 check-js:
 	flow $(if $(CI),check,status)
 
-# TODO: Ian 2019-12-17 gradually components and shared-data
+# TODO: Ian 2019-12-17 gradually add components and shared-data
 .PHONY: circular-dependencies-js
 circular-dependencies-js:
 	madge --circular protocol-designer/src/index.js
