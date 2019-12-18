@@ -1,9 +1,7 @@
 // webpack base config
 'use strict'
 
-const path = require('path')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
-const CircularDependencyPlugin = require('circular-dependency-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
@@ -44,11 +42,6 @@ module.exports = {
     }),
     ENABLE_ANALYZER &&
       new BundleAnalyzerPlugin({ analyzerMode: 'server', openAnalyzer: true }),
-    ENABLE_ANALYZER &&
-      new CircularDependencyPlugin({
-        exclude: /node_modules/,
-        cwd: path.join(__dirname, '../..'),
-      }),
   ].filter(Boolean),
 
   optimization: {
