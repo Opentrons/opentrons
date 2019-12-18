@@ -3,30 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [3.15.2-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.15.2-alpha.1...v3.15.2-alpha.2) (2019-12-17)
+## [3.15.2](https://github.com/opentrons/opentrons/compare/v3.15.1...v3.15.2) (2019-12-17)
 
 
 ### Bug Fixes
 
 * **api:** fix cancelling during the pre-protocol home ([#4627](https://github.com/Opentrons/opentrons/issues/4627)) ([94852cf](https://github.com/Opentrons/opentrons/commit/94852cf))
-
-
-
-
-
-## [3.15.2-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.15.2-alpha.0...v3.15.2-alpha.1) (2019-12-17)
-
-**Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-## [3.15.2-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.15.1...v3.15.2-alpha.0) (2019-12-17)
-
-
-### Bug Fixes
-
 * **api:** allow labeling and versioning for module labware ([#4605](https://github.com/Opentrons/opentrons/issues/4605)) ([d4d66a3](https://github.com/Opentrons/opentrons/commit/d4d66a3))
 * **api:** allow labels on old magdeck containers in v1 ([#4608](https://github.com/Opentrons/opentrons/issues/4608)) ([37ab7b8](https://github.com/Opentrons/opentrons/commit/37ab7b8)), closes [#2310](https://github.com/Opentrons/opentrons/issues/2310)
 * **api:** apiv1: move instrument in Z-axis prior to touch tip in XY ([#4585](https://github.com/Opentrons/opentrons/issues/4585)) ([c946d5b](https://github.com/Opentrons/opentrons/commit/c946d5b))
