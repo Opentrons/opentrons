@@ -1103,7 +1103,7 @@ class Pipette(CommandPublisher):
         ..
         >>> from opentrons import instruments, labware, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
-        >>> tiprack = labware.load('tiprack-200ul', 'C2') # doctest: +SKIP
+        >>> tiprack = labware.load('opentrons_96_tiprack_300ul', 'C2') # doctest: +SKIP  # noqa E501
         >>> trash = labware.load('point', 'A3') # doctest: +SKIP
         >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
         >>> p300.pick_up_tip(tiprack[0]) # doctest: +SKIP
