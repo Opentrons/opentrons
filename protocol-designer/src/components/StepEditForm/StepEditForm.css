@@ -227,3 +227,8 @@
 .temperature_form_group {
   margin: 1rem 0;
 }
+
+.module_labware_text {
+  font-size: var(--fs-body-1);
+  margin-top: 0.5rem;
+}

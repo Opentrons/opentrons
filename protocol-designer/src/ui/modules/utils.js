@@ -35,14 +35,33 @@ export function getModuleLabwareOptions(
   const module = getModuleOnDeckByType(initialDeckSetup, type)
   const labware = module && getLabwareOnModule(initialDeckSetup, module.id)
   const prefix = i18n.t(`form.step_edit_form.field.moduleLabwarePrefix.${type}`)
-  const options =
-    module && labware
-      ? [
-          {
-            name: `${prefix} ${nicknamesById[labware.id]}`,
-            value: module.id,
-          },
-        ]
-      : []
+  let options = []
+  if (module) {
+    if (labware) {
+      options = [
+        {
+          name: `${prefix} ${nicknamesById[labware.id]}`,
+          value: module.id,
+        },
+      ]
+    } else {
+      options = [
+        {
+          name: `${prefix} No labware on module`,
+          value: module.id,
+        },
+      ]
+    }
+  }
+
   return options
+}
+
+export function getModuleHasLabware(
+  initialDeckSetup: InitialDeckSetup,
+  type: ModuleType
+): boolean {
+  const module = getModuleOnDeckByType(initialDeckSetup, type)
+  const labware = module && getLabwareOnModule(initialDeckSetup, module.id)
+  return Boolean(module) && Boolean(labware)
 }

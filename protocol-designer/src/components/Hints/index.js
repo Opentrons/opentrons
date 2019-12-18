@@ -83,6 +83,12 @@ class Hints extends React.Component<Props, State> {
             <p>{i18n.t(`alert.hint.${hintKey}.body3`)}</p>
           </>
         )
+      case 'module_without_labware':
+        return (
+          <>
+            <p>{i18n.t(`alert.hint.${hintKey}.body`)}</p>
+          </>
+        )
       default:
         return null
     }

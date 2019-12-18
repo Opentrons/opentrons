@@ -96,7 +96,7 @@
       "pipette": { "label": "pipette" },
       "preWetTip": { "label": "pre-wet tip" },
       "touchTip": { "label": "touch tip" },
-      "moduleActionLabware": { "label": "labware" },
+      "moduleActionLabware": { "label": "module" },
       "moduleLabwarePrefix": {
         "magdeck": "MAG",
         "tempdeck": "TEMP",

@@ -1,5 +1,7 @@
 // @flow
 import * as React from 'react'
+import { useSelector } from 'react-redux'
+import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import { FormGroup } from '@opentrons/components'
 import i18n from '../../../localization'
 
@@ -11,6 +13,12 @@ import type { FocusHandlers } from '../types'
 type MagnetFormProps = { focusHandlers: FocusHandlers }
 function MagnetForm(props: MagnetFormProps): React.Element<'div'> {
   const { focusHandlers } = props
+  const moduleLabwareOptions = useSelector(
+    uiModuleSelectors.getMagneticLabwareOptions
+  )
+  const moduleOption: ?string = moduleLabwareOptions[0]
+    ? moduleLabwareOptions[0].name
+    : 'No magnetic module'
 
   return (
     <div className={styles.form_wrapper}>
@@ -21,6 +29,12 @@ function MagnetForm(props: MagnetFormProps): React.Element<'div'> {
       </div>
 
       <div className={styles.magnet_section_wrapper}>
+        <FormGroup
+          label={i18n.t('form.step_edit_form.field.moduleActionLabware.label')}
+          className={styles.magnet_form_group}
+        >
+          <p className={styles.module_labware_text}>{moduleOption}</p>
+        </FormGroup>
         <FormGroup
           label={i18n.t('form.step_edit_form.field.magnetAction.label')}
           className={styles.magnet_form_group}
