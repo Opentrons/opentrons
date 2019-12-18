@@ -1,15 +1,15 @@
 // @flow
-// AlertModal for updating to newest app version
+// AlertModal with vertical scrolling
 import * as React from 'react'
 import omit from 'lodash/omit'
 
 import { AlertModal } from '@opentrons/components'
-import { BottomButtonBar } from './'
+import { BottomButtonBar } from './BottomButtonBar'
 import styles from './styles.css'
 
 type Props = React.ElementProps<typeof AlertModal>
 
-export default function ScrollableAlertModal(props: Props) {
+export function ScrollableAlertModal(props: Props) {
   return (
     <AlertModal
       {...omit(props, 'buttons', 'children')}

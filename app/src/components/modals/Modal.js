@@ -8,16 +8,16 @@ import SessionHeader from '../SessionHeader'
 
 import styles from './styles.css'
 
-type Props = {
+type Props = {|
   children: React.Node,
-}
+|}
 
 const titleBarProps = {
   title: <SessionHeader />,
   className: styles.title_bar,
 }
 
-export default function Modal(props: Props) {
+export function Modal(props: Props) {
   return (
     <div className={styles.modal}>
       <Overlay />

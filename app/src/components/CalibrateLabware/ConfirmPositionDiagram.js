@@ -8,15 +8,15 @@ import InstructionStep from '../InstructionStep'
 import { getInstructionsByType, getDiagramSrc } from './instructions-data'
 import styles from '../InstructionStep/styles.css'
 
-export type LabwareCalibrationProps = {
+export type LabwareCalibrationProps = {|
   labware: Labware,
   calibrator: Pipette,
   calibrateToBottom: boolean,
   buttonText: string,
   useCenteredTroughs: boolean,
-}
+|}
 
-export default function ConfirmPositionDiagram(props: LabwareCalibrationProps) {
+export function ConfirmPositionDiagram(props: LabwareCalibrationProps) {
   const instructions = getInstructionsByType(props)
   const diagrams = getDiagramSrc(props)
 
