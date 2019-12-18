@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.15.2](https://github.com/opentrons/opentrons/compare/v3.15.1...v3.15.2) (2019-12-17)
+
+### Bug Fixes
+
+* **app:** disable tip probe for unused pipettes ([#4584](https://github.com/Opentrons/opentrons/issues/4584)) ([9388391](https://github.com/Opentrons/opentrons/commit/9388391)), closes [#4570](https://github.com/Opentrons/opentrons/issues/4570)
+* **app:** naïve loading state for tc open lid during lw cal ([#4616](https://github.com/Opentrons/opentrons/issues/4616)) ([c4a4cdf](https://github.com/Opentrons/opentrons/commit/c4a4cdf))
+
+
+
+
+
 ## [3.15.1](https://github.com/Opentrons/opentrons/compare/v3.15.0...v3.15.1) (2019-12-09)
 
 **Note:** Version bump only for package @opentrons/components

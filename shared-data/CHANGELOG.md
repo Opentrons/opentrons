@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.15.2](https://github.com/opentrons/opentrons/compare/v3.15.1...v3.15.2) (2019-12-17)
+
+
+### Bug Fixes
+
+* **labware:** "retire" eppendorf tiprack definitions ([#4526](https://github.com/Opentrons/opentrons/issues/4526)) ([ddc2800](https://github.com/Opentrons/opentrons/commit/ddc2800)), closes [#4518](https://github.com/Opentrons/opentrons/issues/4518)
+* **shared-data:** require well(s) in labware schema ([#4621](https://github.com/Opentrons/opentrons/issues/4621)) ([4dcbff5](https://github.com/Opentrons/opentrons/commit/4dcbff5)), closes [#4506](https://github.com/Opentrons/opentrons/issues/4506)
+
+
+### Features
+
+* **protocol-designer:** reorganize step-generation ([#4531](https://github.com/Opentrons/opentrons/issues/4531)) ([125f06f](https://github.com/Opentrons/opentrons/commit/125f06f)), closes [#4301](https://github.com/Opentrons/opentrons/issues/4301)
+
+
+
+
+
 ## [3.15.1](https://github.com/Opentrons/opentrons/compare/v3.15.1...v3.15.1) (2019-12-09)
 
 **Note:** Version bump only for package @opentrons/shared-data
