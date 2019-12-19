@@ -1,6 +1,7 @@
 import inspect
 import json
 import logging
+import pkgutil
 from aiohttp import web
 from opentrons import __version__, config, protocol_api, protocols
 
@@ -31,3 +32,9 @@ async def health(request: web.Request) -> web.Response:
     return web.json_response(
         headers={'Access-Control-Allow-Origin': '*'},
         body=json.dumps(res))
+
+
+async def get_openapi_spec(request: web.Request) -> web.Response:
+    spec = json.loads(pkgutil.get_data(
+        'opentrons', 'server/openapi.json'))
+    return web.json_response(spec, status=200)

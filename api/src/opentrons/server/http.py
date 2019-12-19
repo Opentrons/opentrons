@@ -12,7 +12,8 @@ class HTTPServer(object):
     def __init__(self, app, log_file_path):
         self.app = app
         self.log_file_path = log_file_path
-
+        self.app.router.add_get(
+            '/openapi', endp.get_openapi_spec)
         self.app.router.add_get(
             '/health', endp.health)
         self.app.router.add_get(
