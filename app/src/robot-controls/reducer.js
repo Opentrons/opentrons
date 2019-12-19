@@ -9,6 +9,21 @@ const INITIAL_STATE: RobotControlsState = {}
 
 const INITIAL_CONTROLS_STATE: PerRobotControlsState = {
   lightsOn: null,
+  movementStatus: null,
+  movementError: null,
+}
+
+const updateRobotState = (
+  state: RobotControlsState,
+  robotName: string,
+  update: $Shape<PerRobotControlsState>
+): RobotControlsState => {
+  const robotState = state[robotName] || INITIAL_CONTROLS_STATE
+
+  return {
+    ...state,
+    [robotName]: { ...robotState, ...update },
+  }
 }
 
 export function robotControlsReducer(
@@ -19,12 +34,32 @@ export function robotControlsReducer(
     case Constants.FETCH_LIGHTS_SUCCESS:
     case Constants.UPDATE_LIGHTS_SUCCESS: {
       const { robotName, lightsOn } = action.payload
-      const robotState = state[robotName] || INITIAL_CONTROLS_STATE
+      return updateRobotState(state, robotName, { lightsOn })
+    }
 
-      return {
-        ...state,
-        [robotName]: { ...robotState, lightsOn },
-      }
+    case Constants.HOME: {
+      const { robotName } = action.payload
+      return updateRobotState(state, robotName, {
+        movementStatus: Constants.HOMING,
+        movementError: null,
+      })
+    }
+
+    case Constants.HOME_SUCCESS:
+    case Constants.CLEAR_MOVEMENT_STATUS: {
+      const { robotName } = action.payload
+      return updateRobotState(state, robotName, {
+        movementStatus: null,
+        movementError: null,
+      })
+    }
+
+    case Constants.HOME_FAILURE: {
+      const { robotName, error } = action.payload
+      return updateRobotState(state, robotName, {
+        movementStatus: Constants.HOME_ERROR,
+        movementError: error.message,
+      })
     }
   }
 
