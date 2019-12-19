@@ -30,14 +30,21 @@ export const addStep = (payload: { stepType: StepType }) => (
   const magnetModuleHasLabware = uiModuleSelectors.getMagnetModuleHasLabware(
     state
   )
+  const temperatureModuleHasLabware = uiModuleSelectors.getTemperatureModuleHasLabware(
+    state
+  )
 
   // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
   const stepNeedsLiquid = ['mix', 'moveLiquid'].includes(payload.stepType)
   const stepMagnetNeedsLabware = ['magnet'].includes(payload.stepType)
+  const stepTemperatureNeedsLabware = ['temperature'].includes(payload.stepType)
   if (stepNeedsLiquid && !deckHasLiquid) {
     dispatch(tutorialActions.addHint('add_liquids_and_labware'))
   }
-  if (stepMagnetNeedsLabware && !magnetModuleHasLabware) {
+  if (
+    (stepMagnetNeedsLabware && !magnetModuleHasLabware) ||
+    (stepTemperatureNeedsLabware && !temperatureModuleHasLabware)
+  ) {
     dispatch(tutorialActions.addHint('module_without_labware'))
   }
   dispatch(selectStep(stepId, stepType))

@@ -58,3 +58,11 @@ export const getMagnetModuleHasLabware: Selector<boolean> = createSelector(
     return getModuleHasLabware(initialDeckSetup, 'magdeck')
   }
 )
+
+/** Returns boolean if temperature module has labware */
+export const getTemperatureModuleHasLabware: Selector<boolean> = createSelector(
+  stepFormSelectors.getInitialDeckSetup,
+  initialDeckSetup => {
+    return getModuleHasLabware(initialDeckSetup, 'tempdeck')
+  }
+)
