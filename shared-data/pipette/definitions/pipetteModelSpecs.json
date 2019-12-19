@@ -1134,6 +1134,7 @@
         "opentrons/opentrons_96_tiprack_10ul/1": 8.25,
         "opentrons/opentrons_96_filtertiprack_10ul/1": 8.25,
         "opentrons/opentrons_96_tiprack_20ul/1": 8.25,
+        "opentrons/opentrons_96_filtertiprack_20ul/1": 8.25,
         "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 8.4,
         "opentrons/geb_96_tiprack_10ul/1": 8.3
       },
@@ -1472,6 +1473,7 @@
         "opentrons/opentrons_96_tiprack_10ul/1": 8.25,
         "opentrons/opentrons_96_filtertiprack_10ul/1": 8.25,
         "opentrons/opentrons_96_tiprack_20ul/1": 8.25,
+        "opentrons/opentrons_96_filtertiprack_20ul/1": 8.25,
         "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 8.4,
         "opentrons/geb_96_tiprack_10ul/1": 8.3
       },
