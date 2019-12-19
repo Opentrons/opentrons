@@ -59,7 +59,7 @@
         }
       },
       "tip_position": { "label": "tip position" },
-      "volume": { "label": "volume" },
+      "volume": { "label": "volume per well" },
       "well_order": {
         "label": "Well order",
         "option": {

@@ -1,15 +1,18 @@
 // @flow
 import * as React from 'react'
-import cx from 'classnames'
 import { FormGroup, HoverTooltip } from '@opentrons/components'
 import i18n from '../../../localization'
 import { getTooltipForField } from '../utils'
 import TextField from './Text'
 import type { StepType } from '../../../form-types'
 import type { FocusHandlers } from '../types'
-import styles from '../StepEditForm.css'
 
-type Props = { stepType: StepType, focusHandlers: FocusHandlers, label: string }
+type Props = {|
+  stepType: StepType,
+  focusHandlers: FocusHandlers,
+  label: string,
+  className: string,
+|}
 const Volume = (props: Props) => (
   <HoverTooltip
     tooltipComponent={getTooltipForField(props.stepType, 'volume', false)}
@@ -18,7 +21,7 @@ const Volume = (props: Props) => (
     {hoverTooltipHandlers => (
       <FormGroup
         label={props.label}
-        className={cx(styles.volume_field, styles.small_field)}
+        className={props.className}
         hoverTooltipHandlers={hoverTooltipHandlers}
       >
         <TextField
