@@ -37,15 +37,18 @@ export function robotControlsReducer(
       return updateRobotState(state, robotName, { lightsOn })
     }
 
-    case Constants.HOME: {
+    case Constants.HOME:
+    case Constants.MOVE: {
       const { robotName } = action.payload
       return updateRobotState(state, robotName, {
-        movementStatus: Constants.HOMING,
+        movementStatus:
+          action.type === Constants.HOME ? Constants.HOMING : Constants.MOVING,
         movementError: null,
       })
     }
 
     case Constants.HOME_SUCCESS:
+    case Constants.MOVE_SUCCESS:
     case Constants.CLEAR_MOVEMENT_STATUS: {
       const { robotName } = action.payload
       return updateRobotState(state, robotName, {
@@ -54,10 +57,14 @@ export function robotControlsReducer(
       })
     }
 
-    case Constants.HOME_FAILURE: {
+    case Constants.HOME_FAILURE:
+    case Constants.MOVE_FAILURE: {
       const { robotName, error } = action.payload
       return updateRobotState(state, robotName, {
-        movementStatus: Constants.HOME_ERROR,
+        movementStatus:
+          action.type === Constants.HOME_FAILURE
+            ? Constants.HOME_ERROR
+            : Constants.MOVE_ERROR,
         movementError: error.message,
       })
     }

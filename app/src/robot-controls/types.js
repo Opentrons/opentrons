@@ -5,7 +5,22 @@ import type { Mount } from '../pipettes/types'
 
 // common types
 
-export type MovementStatus = 'homing' | 'home-error' | 'moving' | 'move-error'
+export type MovementStatus = 'homing' | 'homeError' | 'moving' | 'moveError'
+
+export type MovePosition = 'changePipette' | 'attachTip'
+
+// http responses
+
+export type PositionsResponse = {|
+  positions: {|
+    change_pipette: {|
+      target: 'mount',
+      left: [number, number, number],
+      right: [number, number, number],
+    |},
+    attach_tip: {| target: 'pipette', point: [number, number, number] |},
+  |},
+|}
 
 // action types
 
@@ -81,6 +96,33 @@ export type HomeFailureAction = {|
 
 export type HomeDoneAction = HomeSuccessAction | HomeFailureAction
 
+// move
+
+export type MoveAction = {|
+  type: 'robotControls:MOVE',
+  payload: {|
+    robotName: string,
+    mount: Mount,
+    position: MovePosition,
+    disengageMotors: boolean,
+  |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type MoveSuccessAction = {|
+  type: 'robotControls:MOVE_SUCCESS',
+  payload: {| robotName: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type MoveFailureAction = {|
+  type: 'robotControls:MOVE_FAILURE',
+  payload: {| robotName: string, error: {| message: string |} |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type MoveDoneAction = MoveSuccessAction | MoveFailureAction
+
 // clear homing and movement status and error
 
 export type ClearMovementStatusAction = {|
@@ -100,6 +142,9 @@ export type RobotControlsAction =
   | HomeAction
   | HomeSuccessAction
   | HomeFailureAction
+  | MoveAction
+  | MoveSuccessAction
+  | MoveFailureAction
   | ClearMovementStatusAction
 
 // state types

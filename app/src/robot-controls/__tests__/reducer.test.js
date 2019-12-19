@@ -67,7 +67,44 @@ const SPECS: Array<ReducerSpec> = [
     },
     state: { robotName: { movementStatus: 'homing' } },
     expected: {
-      robotName: { movementStatus: 'home-error', movementError: 'AH' },
+      robotName: { movementStatus: 'homeError', movementError: 'AH' },
+    },
+  },
+  {
+    name: 'handles robotControls:MOVE',
+    action: {
+      type: 'robotControls:MOVE',
+      payload: {
+        robotName: 'robotName',
+        position: 'attachTip',
+        mount: 'left',
+        disengageMotors: false,
+      },
+      meta: {},
+    },
+    state: { robotName: { movementStatus: null } },
+    expected: { robotName: { movementStatus: 'moving', movementError: null } },
+  },
+  {
+    name: 'handles robotControls:MOVE_SUCCESS',
+    action: {
+      type: 'robotControls:MOVE_SUCCESS',
+      payload: { robotName: 'robotName' },
+      meta: {},
+    },
+    state: { robotName: { movementStatus: 'moving' } },
+    expected: { robotName: { movementStatus: null, movementError: null } },
+  },
+  {
+    name: 'handles robotControls:MOVE_FAILURE',
+    action: {
+      type: 'robotControls:MOVE_FAILURE',
+      payload: { robotName: 'robotName', error: { message: 'AH' } },
+      meta: {},
+    },
+    state: { robotName: { movementStatus: 'moving' } },
+    expected: {
+      robotName: { movementStatus: 'moveError', movementError: 'AH' },
     },
   },
   {
@@ -76,7 +113,7 @@ const SPECS: Array<ReducerSpec> = [
       type: 'robotControls:CLEAR_MOVEMENT_STATUS',
       payload: { robotName: 'robotName' },
     },
-    state: { robotName: { movementStatus: 'home-error', movementError: 'AH' } },
+    state: { robotName: { movementStatus: 'homeError', movementError: 'AH' } },
     expected: {
       robotName: { movementStatus: null, movementError: null },
     },
