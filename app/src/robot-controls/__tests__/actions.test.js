@@ -84,6 +84,55 @@ const SPECS: Array<ActionSpec> = [
       meta: { requestId: 'abc' },
     },
   },
+  {
+    name: 'robotControls:HOME robot',
+    creator: Actions.home,
+    args: ['robot-name', 'robot'],
+    expected: {
+      type: 'robotControls:HOME',
+      payload: { robotName: 'robot-name', target: 'robot' },
+      meta: {},
+    },
+  },
+  {
+    name: 'robotControls:HOME pipette',
+    creator: Actions.home,
+    args: ['robot-name', 'pipette', 'left'],
+    expected: {
+      type: 'robotControls:HOME',
+      payload: { robotName: 'robot-name', target: 'pipette', mount: 'left' },
+      meta: {},
+    },
+  },
+  {
+    name: 'robotControls:HOME_SUCCESS',
+    creator: Actions.homeSuccess,
+    args: ['robot-name', { requestId: 'abc' }],
+    expected: {
+      type: 'robotControls:HOME_SUCCESS',
+      payload: { robotName: 'robot-name' },
+      meta: { requestId: 'abc' },
+    },
+  },
+  {
+    name: 'robotControls:HOME_FAILURE',
+    creator: Actions.homeFailure,
+    args: ['robot-name', { message: 'AH' }, { requestId: 'abc' }],
+    expected: {
+      type: 'robotControls:HOME_FAILURE',
+      payload: { robotName: 'robot-name', error: { message: 'AH' } },
+      meta: { requestId: 'abc' },
+    },
+  },
+  {
+    name: 'robotControls:CLEAR_MOVEMENT_STATUS',
+    creator: Actions.clearMovementStatus,
+    args: ['robot-name'],
+    expected: {
+      type: 'robotControls:CLEAR_MOVEMENT_STATUS',
+      payload: { robotName: 'robot-name' },
+    },
+  },
 ]
 
 describe('robot controls actions', () => {

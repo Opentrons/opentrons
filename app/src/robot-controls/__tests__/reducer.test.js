@@ -2,13 +2,13 @@
 import { robotControlsReducer } from '../reducer'
 
 import type { Action } from '../../types'
-import type { RobotControlsState } from '../types'
+import type { PerRobotControlsState } from '../types'
 
 type ReducerSpec = {|
   name: string,
-  state: RobotControlsState,
+  state: $Shape<{ [robotName: string]: $Shape<PerRobotControlsState> }>,
   action: Action,
-  expected: RobotControlsState,
+  expected: $Shape<{ [robotName: string]: $Shape<PerRobotControlsState> }>,
 |}
 
 const SPECS: Array<ReducerSpec> = [
@@ -37,6 +37,49 @@ const SPECS: Array<ReducerSpec> = [
     },
     state: { robotName: { lightsOn: true } },
     expected: { robotName: { lightsOn: false } },
+  },
+  {
+    name: 'handles robotControls:HOME',
+    action: {
+      type: 'robotControls:HOME',
+      payload: { robotName: 'robotName', target: 'robot' },
+      meta: {},
+    },
+    state: { robotName: { movementStatus: null } },
+    expected: { robotName: { movementStatus: 'homing', movementError: null } },
+  },
+  {
+    name: 'handles robotControls:HOME_SUCCESS',
+    action: {
+      type: 'robotControls:HOME_SUCCESS',
+      payload: { robotName: 'robotName' },
+      meta: {},
+    },
+    state: { robotName: { movementStatus: 'homing' } },
+    expected: { robotName: { movementStatus: null, movementError: null } },
+  },
+  {
+    name: 'handles robotControls:HOME_FAILURE',
+    action: {
+      type: 'robotControls:HOME_FAILURE',
+      payload: { robotName: 'robotName', error: { message: 'AH' } },
+      meta: {},
+    },
+    state: { robotName: { movementStatus: 'homing' } },
+    expected: {
+      robotName: { movementStatus: 'home-error', movementError: 'AH' },
+    },
+  },
+  {
+    name: 'handles robotControls:CLEAR_MOVEMENT_STATUS',
+    action: {
+      type: 'robotControls:CLEAR_MOVEMENT_STATUS',
+      payload: { robotName: 'robotName' },
+    },
+    state: { robotName: { movementStatus: 'home-error', movementError: 'AH' } },
+    expected: {
+      robotName: { movementStatus: null, movementError: null },
+    },
   },
 ]
 
