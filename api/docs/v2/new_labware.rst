@@ -38,6 +38,9 @@ Default Labware
 
 The OT-2 has a set of labware well-supported by Opentrons defined internally. This set of labware is always available to protocols. This labware can be found on the `Opentrons Labware Library <https://labware.opentrons.com>`_. You can copy the load names that should be passed to ``protocol.load_labware`` statements to get the correct definitions.
 
+
+.. _v2-custom-labware:
+
 Custom Labware
 ^^^^^^^^^^^^^^
 

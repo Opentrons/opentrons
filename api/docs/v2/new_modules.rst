@@ -60,15 +60,29 @@ Like specifying labware that will be present on the deck of the OT-2, you must s
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.0'}
+    metadata = {'apiLevel': '2.1'}
 
     def run(protocol: protocol_api.ProtocolContext):
          module = protocol.load_module('Temperature Module', slot)
-         my_labware = module.load_labware('opentrons_24_aluminumblock_generic_2ml_screwcap')
+         my_labware = module.load_labware('opentrons_24_aluminumblock_generic_2ml_screwcap',
+                                          label='Temperature-Controlled Tubes')
 
 You do not need to specify a slot, because the labware is loaded into the module.
 
 .. versionadded:: 2.0
+
+
+Loading Custom Labware Into Your Module
+---------------------------------------
+
+Any custom labware added to your Opentrons App (see :ref:`v2-custom-labware`) is accessible when loading labware onto a module.
+
+.. versionadded:: 2.1
+
+.. note::
+
+    In API version 2.0, :py:meth:`.ModuleContext.load_labware` only took a ``load_name`` argument. In API version 2.1 (introduced in Robot Software version 3.15.2) you can now specify a label, version, and namespace (though most of the time you won't have to).
+
 
 Checking The Status Of Your Module
 ==================================
