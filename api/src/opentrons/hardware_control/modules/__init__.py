@@ -10,6 +10,7 @@ from .mod_abc import AbstractModule
 # Must import tempdeck and magdeck (and other modules going forward) so they
 # actually create the subclasses
 from . import update, tempdeck, magdeck, thermocycler, types  # noqa(W0611)
+from ..types import PauseManager
 
 log = logging.getLogger(__name__)
 
@@ -38,10 +39,10 @@ async def build(
         port: str,
         which: str,
         simulating: bool,
-        gate_keeper: asyncio.Event,
+        pause_manager: PauseManager,
         interrupt_callback: Callable) -> AbstractModule:
     return await MODULE_TYPES[which].build(
-        port, gate_keeper=gate_keeper, interrupt_callback=interrupt_callback, simulating=simulating)
+        port, pause_manager=pause_manager, interrupt_callback=interrupt_callback, simulating=simulating)
 
 
 def get_module_at_port(port: str) -> Optional[ModuleAtPort]:

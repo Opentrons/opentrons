@@ -10,6 +10,7 @@ from opentrons.config.pipette_config import (config_models,
                                              configs)
 from opentrons.drivers.smoothie_drivers import SimulatingDriver
 from . import modules
+from .types import PauseManager
 if TYPE_CHECKING:
     from .dev_types import RegisterModules  # noqa (F501)
 
@@ -209,13 +210,13 @@ class Simulator:
     async def build_module(self,
                            port: str,
                            model: str,
-                           gate_keeper: asyncio.Event,
+                           pause_manager: PauseManager,
                            interrupt_callback: Callable) -> modules.AbstractModule:
         return await modules.build(
             port=port,
             which=model,
             simulating=True,
-            gate_keeper=gate_keeper,
+            pause_manager=pause_manager,
             interrupt_callback=interrupt_callback)
 
     @property

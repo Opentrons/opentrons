@@ -14,6 +14,7 @@ import opentrons.config
 from opentrons.types import Mount
 
 from . import modules
+from .types import PauseManager
 
 if TYPE_CHECKING:
     from .dev_types import RegisterModules  # noqa (F501)
@@ -167,13 +168,13 @@ class Controller:
     async def build_module(self,
                            port: str,
                            model: str,
-                           gate_keeper: asyncio.Event,
+                           pause_manager: PauseManager,
                            interrupt_callback: Callable) -> modules.AbstractModule:
         return await modules.build(
             port=port,
             which=model,
             simulating=False,
-            gate_keeper=gate_keeper,
+            pause_manager=pause_manager,
             interrupt_callback=interrupt_callback)
 
     async def connect(self, port: str = None):
