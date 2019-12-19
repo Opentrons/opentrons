@@ -6,7 +6,7 @@ import re
 import opentrons
 from opentrons import HERE
 from opentrons import server
-from opentrons.hardware_control import adapters
+from opentrons.hardware_control import adapters, thread_manager
 from opentrons.server.main import build_arg_parser
 from argparse import ArgumentParser
 from opentrons import __version__
@@ -93,10 +93,10 @@ async def _do_fw_update(new_fw_path, new_fw_ver):
         os.environ['ENABLE_VIRTUAL_SMOOTHIE'] = 'true'
 
 
-def initialize_robot(loop, hardware):
+async def initialize_robot(loop, hardware):
     packed_smoothie_fw_file, packed_smoothie_fw_ver = _find_smoothie_file()
     try:
-        hardware.connect()
+        await hardware.connect()
     except Exception as e:
         # The most common reason for this exception (aside from hardware
         # failures such as a disconnected smoothie) is that the smoothie
@@ -107,16 +107,15 @@ def initialize_robot(loop, hardware):
         fw_version = None
     else:
         if ff.use_protocol_api_v2():
-            fw_version = loop.run_until_complete(hardware.fw_version)
+            fw_version = await hardware.fw_version
         else:
             fw_version = hardware.fw_version
     log.info("Smoothie FW version: {}".format(fw_version))
     if fw_version != packed_smoothie_fw_ver:
         log.info("Executing smoothie update: current vers {}, packed vers {}"
                  .format(fw_version, packed_smoothie_fw_ver))
-        loop.run_until_complete(
-            _do_fw_update(packed_smoothie_fw_file, packed_smoothie_fw_ver))
-        hardware.connect()
+        await _do_fw_update(packed_smoothie_fw_file, packed_smoothie_fw_ver)
+        await hardware.connect()
     else:
         log.info("FW version OK: {}".format(packed_smoothie_fw_ver))
     log.info(f"Name: {name()}")
@@ -131,13 +130,15 @@ def run(hardware, **kwargs):  # noqa(C901)
     the use of different length args
     """
     loop = asyncio.get_event_loop()
+    logging_config.log_init('INFO')
 
-    if ff.use_protocol_api_v2():
-        robot_conf = loop.run_until_complete(hardware.get_config())
-    else:
-        robot_conf = hardware.config
+    log.info("before reading config {}, {}".format(hardware, loop))
+    # if ff.use_protocol_api_v2():
+    #     robot_conf = loop.run_until_complete(hardware.get_config())
+    # else:
+    #     robot_conf = hardware.config
 
-    logging_config.log_init(robot_conf.log_level)
+    # logging_config.log_init(robot_conf.log_level)
 
     log.info("API server version:  {}".format(__version__))
     if not os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
@@ -159,6 +160,7 @@ def run(hardware, **kwargs):  # noqa(C901)
         else:
             log.warning(
                 "Hardware server requested but apiv1 selected, not starting")
+    log.info(f"\nmain run hw {hardware}\n")
     server.run(
         hardware,
         kwargs.get('hostname'),
@@ -195,7 +197,7 @@ def main():
     args = arg_parser.parse_args()
 
     if ff.use_protocol_api_v2():
-        checked_hardware = adapters.SingletonAdapter(asyncio.get_event_loop())
+        checked_hardware = adapters.SingletonAdapter.build_in_managed_thread()
     else:
         checked_hardware = opentrons.robot
     run(checked_hardware, **vars(args))
