@@ -1,8 +1,12 @@
 import enum
 import logging
 import asyncio
+import functools
+import logging
 from typing import Tuple
 from opentrons import types as top_types
+
+MODULE_LOG = logging.getLogger(__name__)
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -103,22 +107,35 @@ class MustHomeError(RuntimeError):
 class NoTipAttachedError(RuntimeError):
     pass
 
-class GateKeeper():
+def pausable(func):
+    @functools.wraps(func)
+    async def pausable_wrapped_obj(*args, **kwargs):
+        self = args[0]
+        try:
+            await self.pause_manager.hold_while_paused()
+        except AttributeError as e:
+            MODULE_LOG.exception(f'Pausable cannot decorate function without'
+                                 f'reference to pause_manager: {e}')
+        return func(*args, **kwargs)
+    return pausable_wrapped_obj
+
+
+class PauseManager():
     def __init__(self, loop: asyncio.AbstractEventLoop, is_simulating: bool):
-        self._run_flag = asyncio.Event(loop=self._loop)
+        self._run_flag = asyncio.Event(loop=loop)
         self._is_simulating = is_simulating
 
-    async def wait_for_open_gate(self):
+    async def hold_while_paused(self):
         if self._is_simulating:
             return True
         else:
             return await self._run_flag.wait()
 
-    def close_gate():
+    def pause():
         self._run_flag.clear()
 
-    def open_gate():
+    def resume():
         self._run_flag.set()
 
-    def is_gate_open():
+    def is_paused():
         self._run_flag.is_set()

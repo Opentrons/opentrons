@@ -4,6 +4,7 @@ from typing import Union, Optional, Callable
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 from opentrons.drivers.temp_deck.driver import temp_locks
 from . import update, mod_abc, types
+from ..types import PauseManager
 
 TEMP_POLL_INTERVAL_SECS = 1
 
@@ -86,7 +87,7 @@ class TempDeck(mod_abc.AbstractModule):
     @classmethod
     async def build(cls,
                     port: str,
-                    gate_keeper: asyncio.Event,
+                    pause_manager: PauseManager,
                     interrupt_callback: types.InterruptCallback = None,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None):
@@ -95,7 +96,7 @@ class TempDeck(mod_abc.AbstractModule):
         # TempDeck does not currently use interrupts, so the callback is not
         # passed on
         mod = cls(port=port,
-                  gate_keeper=gate_keeper,
+                  pause_manager=pause_manager,
                   simulating=simulating,
                   loop=loop)
         await mod._connect()
@@ -123,7 +124,7 @@ class TempDeck(mod_abc.AbstractModule):
 
     def __init__(self,
                  port: str,
-                 gate_keeper: asyncio.Event,
+                 pause_manager: PauseManager,
                  simulating: bool,
                  loop: asyncio.AbstractEventLoop = None) -> None:
         super().__init__(port, simulating, loop)
@@ -132,7 +133,7 @@ class TempDeck(mod_abc.AbstractModule):
         else:
             self._driver = self._build_driver(simulating)  # type: ignore
 
-        self._gate_keeper = gate_keeper
+        self._pause_manager = pause_manager
 
         self._current_task: Optional[asyncio.Task] = None
         self._poller = None
@@ -153,6 +154,10 @@ class TempDeck(mod_abc.AbstractModule):
     def deactivate(self):
         """ Stop heating/cooling and turn off the fan """
         self._driver.deactivate()
+
+    @property
+    def pause_manager(self):
+        return self._pause_manager
 
     @property
     def device_info(self):

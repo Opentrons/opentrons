@@ -1,12 +1,15 @@
 import opentrons.server as server
+import logging
 from argparse import ArgumentParser
+
+log = logging.getLogger(__name__)
 
 
 def build_arg_parser():
     arg_parser = ArgumentParser(
-            description="Opentrons application server",
-            prog="opentrons.server.main",
-            add_help=False
+        description="Opentrons application server",
+        prog="opentrons.server.main",
+        add_help=False
     )
     arg_parser.add_argument(
         "-H", "--hostname",
@@ -49,8 +52,10 @@ def main():
     # in opentrons.main
     if args.patch_old_init is not None:
         import opentrons.main
+        log.info(f'\nSERVER old init HW CALLED\n')
         opentrons.main.run(**vars(args))
     else:
+        log.info(f'\nSERVER MAIN main HW CALLED\n')
         server.run(args.hostname, args.port, args.path)
         arg_parser.exit(message="Stopped\n")
 
