@@ -85,6 +85,7 @@ export default function getDefaultsForStepType(
       }
     case 'temperature':
       return {
+        moduleId: null,
         setTemperature: null,
         targetTemperature: null,
       }

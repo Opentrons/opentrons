@@ -36,7 +36,7 @@ function TemperatureForm(props: TemperatureFormProps): React.Element<'div'> {
         >
           <StepFormDropdown
             {...focusHandlers}
-            name="temperatureActionLabware"
+            name="moduleId"
             options={moduleLabwareOptions}
           />
         </FormGroup>
