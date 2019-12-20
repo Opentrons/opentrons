@@ -130,7 +130,7 @@ def run(hardware, **kwargs):  # noqa(C901)
     the use of different length args
     """
     loop = asyncio.get_event_loop()
-    logging_config.log_init('INFO')
+    # logging_config.log_init('INFO')
 
     log.info("before reading config {}, {}".format(hardware, loop))
     # if ff.use_protocol_api_v2():
@@ -182,6 +182,7 @@ def main():
     This function does not return until the server is brought down.
     """
 
+    logging_config.log_init('INFO')
     arg_parser = ArgumentParser(
         description="Opentrons robot software",
         parents=[build_arg_parser()])
