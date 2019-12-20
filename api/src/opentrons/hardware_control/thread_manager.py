@@ -23,7 +23,7 @@ class HardwareThreadManager(HardwareAPILike):
     >>> await api_single_thread.home()
     """
 
-    def __init__(self, builder) -> None:
+    def __init__(self, builder, *args, **kwargs) -> None:
         """ Build the HardwareThreadManager.
 
         :param builder: The API function to use
@@ -31,7 +31,7 @@ class HardwareThreadManager(HardwareAPILike):
         self._loop = None
         self._api = None
         self._thread = threading.Thread(target=self._build_api_and_start_loop,
-                                        name='Hardware control thread', args=(builder,))
+                                        name='Hardware control thread', args=(builder, *args), kwargs=kwargs)
         self._thread.start()
 
     def _build_api_and_start_loop(self, builder):
