@@ -3,6 +3,7 @@
 import threading
 import logging
 import asyncio
+import functools
 from . import API
 from .types import Axis, HardwareAPILike
 
@@ -28,18 +29,29 @@ class HardwareThreadManager(HardwareAPILike):
 
         :param builder: The API function to use
         """
+
         self._loop = None
         self._api = None
-        self._thread = threading.Thread(target=self._build_api_and_start_loop,
-                                        name='Hardware control thread', args=(builder, *args), kwargs=kwargs)
-        self._thread.start()
+        is_running = threading.Event()
+        self._is_running = is_running
+        target = object.__getattribute__(self, '_build_api_and_start_loop')
+        thread = threading.Thread(target=target, name='Hardware thread',
+                                  args=(builder, *args), kwargs=kwargs)
+        self._thread = thread
+        thread.start()
+        is_running.wait()
 
     def _build_api_and_start_loop(self, builder):
-        self._loop = asyncio.new_event_loop()
-        self._api = builder(self._loop)
-        MODULE_LOG.info(f'BUILT AND STARTED LOOP = ')
-        self._loop.run_forever()
-        self._loop.close()
+        loop = asyncio.new_event_loop()
+        self._loop = loop
+        MODULE_LOG.info(f'MADE LOOP: {loop} ')
+        api = builder(loop)
+        MODULE_LOG.info(f'BUILT AND STARTED LOOP = {api}')
+        self._api = api
+        is_running = object.__getattribute__(self, '_is_running')
+        is_running.set()
+        loop.run_forever()
+        loop.close()
 
     def __repr__(self):
         return '<HardwareThreadManager>'
@@ -53,20 +65,29 @@ class HardwareThreadManager(HardwareAPILike):
 
     @staticmethod
     async def call_coroutine_threadsafe(loop, coro, *args, **kwargs):
-        fut = loop.call_coroutine_threadsafe(coro(*args, **kwargs))
+        MODULE_LOG.info(
+            f'CCTS: loop: {loop}, coro: {coro}, args: {args}, kwargs: {kwargs}')
+        fut = asyncio.run_coroutine_threadsafe(coro(*args, **kwargs), loop)
         wrapped = asyncio.wrap_future(fut)
-        return await fut.result()
+        return await wrapped.result()
 
-    def __getattr__(self, attr_name):
-        # loop = self._loop
-        if asyncio.iscoroutinefunction(attr_name):
+    def __getattribute__(self, attr_name):
+        # Almost every attribute retrieved from us will be for people actually
+        # looking for an attribute of the hardware API, so check there first.
+        api = object.__getattribute__(self, '_api')
+        loop = object.__getattribute__(self, '_loop')
+        MODULE_LOG.info(
+            f'__GETATTRIBUTE__= looking for: {attr_name}, api: {api}, loop: {loop}')
+        try:
+            attr = getattr(api, attr_name)
+        except AttributeError:
+            # Maybe this actually was for us? Let’s find it
+            return object.__getattribute__(self, attr_name)
+
+        if asyncio.iscoroutinefunction(attr):
             # Return coroutine result of async function
             # executed in managed thread to calling thread
             return functools.partial(self.call_coroutine_threadsafe,
-                                     object.__getattribute__(self, '_loop'),
-                                     attr_name)
-        # elif attr_name == '_loop':
-        #     return loop
-
-        api = object.__getattribute__(self, '_api')
-        return getattr(api, attr_name)
+                                     loop,
+                                     attr)
+        return attr

@@ -164,7 +164,8 @@ class API(HardwareAPILike):
                             attached_modules,
                             config, checked_loop,
                             strict_attached_instruments)
-        api_instance = cls(backend, loop=checked_loop, config=config)
+        api_instance = cls(backend, config=config, loop=checked_loop)
+        mod_log.info(f'\nloop: {loop}, checked_loop: {checked_loop}, backend: {backend}, api_instance: {api_instance}\n')
         checked_loop.create_task(backend.watch_modules(
             register_modules=api_instance.register_modules))
         return api_instance

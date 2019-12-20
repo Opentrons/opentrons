@@ -133,10 +133,13 @@ class SingletonAdapter(HardwareAPILike):
 
     @classmethod
     def build_in_managed_thread(cls) -> 'SingletonAdapter':
+        MODULE_LOG.info('Singleton ADAPTER: builder in thread')
         return thread_manager.HardwareThreadManager(cls)
 
     def __init__(self, loop: asyncio.AbstractEventLoop = None) -> None:
+        MODULE_LOG.info('Singleton ADAPTER: init ')
         self._api = API.build_hardware_simulator(loop=loop)
+        MODULE_LOG.info(f'Singleton ADAPTER: init after api: {self._api}')
 
     def __getattr__(self, attr_name):
         return getattr(self._api, attr_name)
@@ -149,12 +152,16 @@ class SingletonAdapter(HardwareAPILike):
                      with the device name `FT232R`; or port name compatible
                      with `serial.Serial<https://pythonhosted.org/pyserial/pyserial_api.html#serial.Serial.__init__>`_.  # noqa(E501)
         """
+        MODULE_LOG.info('Connect CALLEd')
         old_api = object.__getattribute__(self, '_api')
+        MODULE_LOG.info(f'old_api: {old_api}')
         config = await old_api.config
+        MODULE_LOG.info(f'config: {config}')
         new_api = await API.build_hardware_controller(
             loop=old_api._loop,
             port=port,
             config=copy.copy(config))
+        MODULE_LOG.info(f'newapi: {new_api}')
         await new_api.cache_instruments()
         setattr(self, '_api', new_api)
 
