@@ -1,5 +1,5 @@
 // @flow
-import { getNextDefaultTemperatureModuleId } from '../'
+import { getNextDefaultTemperatureModuleId } from '..'
 
 describe('getNextDefaultTemperatureModuleId', () => {
   describe('no previous forms', () => {
