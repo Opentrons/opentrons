@@ -57,6 +57,7 @@ class MoveLiquidForm extends React.Component<Props, State> {
             label={i18n.t('form.step_edit_form.field.volume.label')}
             focusHandlers={focusHandlers}
             stepType={stepType}
+            className={styles.large_field}
           />
         </div>
 

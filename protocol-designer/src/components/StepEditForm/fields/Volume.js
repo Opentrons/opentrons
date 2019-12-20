@@ -12,6 +12,7 @@ type Props = {|
   stepType: StepType,
   focusHandlers: FocusHandlers,
   label: string,
+  className: string,
 |}
 const Volume = (props: Props) => (
   <HoverTooltip
@@ -21,7 +22,7 @@ const Volume = (props: Props) => (
     {hoverTooltipHandlers => (
       <FormGroup
         label={props.label}
-        className={styles.large_field}
+        className={props.className}
         hoverTooltipHandlers={hoverTooltipHandlers}
       >
         <TextField
