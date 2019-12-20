@@ -206,7 +206,7 @@ def bundle_from_sim(
 
 
 def simulate(protocol_file: TextIO,
-             file_name: str,
+             file_name: str = None,
              custom_labware_paths: List[str] = None,
              custom_data_paths: List[str] = None,
              propagate_logs: bool = False,

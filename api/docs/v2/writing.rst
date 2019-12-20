@@ -51,7 +51,7 @@ __ https://code.visualstudio.com/
 
     For example, ``my_protocol.py``
 
-   
+
 ***************************
 Simulating Python Protocols
 ***************************
@@ -116,16 +116,16 @@ The simulation script can also be invoked through python:
 
     python -m opentrons.simulate /path/to/protocol
 
-In Python
-^^^^^^^^^
+In the Python Shell
+^^^^^^^^^^^^^^^^^^^
 
 The Opentrons Python package also provides an entrypoint to use the Opentrons simulation package from other Python contexts such as an interactive prompt or Jupyter. To simulate a protocol in Python, open a file containing a protocol and pass it to :py:meth:`opentrons.simulate.simulate`:
 
 .. code-block:: python
 
-   import opentrons.simulate
+   from opentrons.simulate import simulate, format_runlog
    protocol_file = open('/path/to/protocol.py')
-   runlog = opentrons.simulate.simulate(protocol_file)
+   runlog = simulate(protocol_file)
    print(format_runlog(runlog))
 
 The :py:meth:`opentrons.simulate.simulate` method does the work of simulating the protocol and returns the run log, which is a list of structured dictionaries. :py:meth:`opentrons.simulate.format_runlog` turns that list of dictionaries into a human readable string, which is then printed out. For more information on the protocol simulator, see :ref:`simulate-block`.
@@ -146,7 +146,7 @@ The ``protocol`` object, which is an instance of :py:class:`.ProtocolContext`, i
 
 If you have a full protocol, wrapped inside a ``run`` function, defined in a Jupyter cell you can also use :py:meth:`opentrons.simulate.simulate` as described above to simulate the protocol.
 
-These instructions also work on the OT-2's Jupyter notebook.
+These instructions also work on the OT-2's Jupyter notebook. This can also be used in the Python interactive shell.
 
 
 Configuration and Local Storage
