@@ -6,12 +6,12 @@ import { getTooltipForField } from '../utils'
 import TextField from './Text'
 import type { StepType } from '../../../form-types'
 import type { FocusHandlers } from '../types'
+import styles from '../StepEditForm.css'
 
 type Props = {|
   stepType: StepType,
   focusHandlers: FocusHandlers,
   label: string,
-  className: string,
 |}
 const Volume = (props: Props) => (
   <HoverTooltip
@@ -21,10 +21,11 @@ const Volume = (props: Props) => (
     {hoverTooltipHandlers => (
       <FormGroup
         label={props.label}
-        className={props.className}
+        className={styles.large_field}
         hoverTooltipHandlers={hoverTooltipHandlers}
       >
         <TextField
+          className={styles.small_field}
           name="volume"
           units={i18n.t('application.units.microliter')}
           {...props.focusHandlers}
