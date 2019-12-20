@@ -22,6 +22,13 @@ function TemperatureForm(props: TemperatureFormProps): React.Element<'div'> {
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions
   )
+  const temperatureModuleId = useSelector(
+    uiModuleSelectors.getSingleTemperatureModuleId
+  )
+  const thermocyclerModuleId = useSelector(
+    uiModuleSelectors.getSingleThermocyclerModuleId
+  )
+
   return (
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
@@ -40,46 +47,58 @@ function TemperatureForm(props: TemperatureFormProps): React.Element<'div'> {
             options={moduleLabwareOptions}
           />
         </FormGroup>
-
-        <div className={styles.checkbox_row}>
-          <RadioGroupField
-            name="setTemperature"
-            options={[
-              {
-                name: i18n.t(
-                  'form.step_edit_form.field.setTemperature.options.true'
-                ),
-                value: 'true',
-              },
-            ]}
-            {...focusHandlers}
-          />
-          <ConditionalOnField
-            name={'setTemperature'}
-            condition={val => val === 'true'}
-          >
-            <TextField
-              name="targetTemperature"
-              className={styles.small_field}
-              units={i18n.t('application.units.degrees')}
+        {/* TODO (ka 2019-12-20): Only render form for temperature modules at the moment */}
+        <ConditionalOnField
+          name={'moduleId'}
+          condition={val => val === temperatureModuleId}
+        >
+          <div className={styles.checkbox_row}>
+            <RadioGroupField
+              name="setTemperature"
+              options={[
+                {
+                  name: i18n.t(
+                    'form.step_edit_form.field.setTemperature.options.true'
+                  ),
+                  value: 'true',
+                },
+              ]}
               {...focusHandlers}
             />
-          </ConditionalOnField>
-        </div>
-        <div className={styles.checkbox_row}>
-          <RadioGroupField
-            name="setTemperature"
-            options={[
-              {
-                name: i18n.t(
-                  'form.step_edit_form.field.setTemperature.options.false'
-                ),
-                value: 'false',
-              },
-            ]}
-            {...focusHandlers}
-          />
-        </div>
+            <ConditionalOnField
+              name={'setTemperature'}
+              condition={val => val === 'true'}
+            >
+              <TextField
+                name="targetTemperature"
+                className={styles.small_field}
+                units={i18n.t('application.units.degrees')}
+                {...focusHandlers}
+              />
+            </ConditionalOnField>
+          </div>
+          <div className={styles.checkbox_row}>
+            <RadioGroupField
+              name="setTemperature"
+              options={[
+                {
+                  name: i18n.t(
+                    'form.step_edit_form.field.setTemperature.options.false'
+                  ),
+                  value: 'false',
+                },
+              ]}
+              {...focusHandlers}
+            />
+          </div>
+        </ConditionalOnField>
+        {/* TODO (ka 2019-12-20): Implement thermocycler set temp form */}
+        <ConditionalOnField
+          name={'moduleId'}
+          condition={value => value === thermocyclerModuleId}
+        >
+          TODO: Thermocycler set temperature form not implemented
+        </ConditionalOnField>
       </div>
     </div>
   )

@@ -25,7 +25,17 @@ export const getTemperatureLabwareOptions: Selector<Options> = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   getLabwareNicknamesById,
   (initialDeckSetup, nicknamesById) => {
-    return getModuleLabwareOptions(initialDeckSetup, nicknamesById, 'tempdeck')
+    const temperatureModuleOptions = getModuleLabwareOptions(
+      initialDeckSetup,
+      nicknamesById,
+      'tempdeck'
+    )
+    const thermocyclerModuleOptions = getModuleLabwareOptions(
+      initialDeckSetup,
+      nicknamesById,
+      'thermocycler'
+    )
+    return temperatureModuleOptions.concat(thermocyclerModuleOptions)
   }
 )
 
@@ -51,6 +61,24 @@ export const getSingleMagneticModuleId: Selector<
     getModuleOnDeckByType(initialDeckSetup, 'magdeck')?.id || null
 )
 
+/** Get single temperature module (assumes no multiples) */
+export const getSingleTemperatureModuleId: Selector<
+  string | null
+> = createSelector(
+  stepFormSelectors.getInitialDeckSetup,
+  initialDeckSetup =>
+    getModuleOnDeckByType(initialDeckSetup, 'tempdeck')?.id || null
+)
+
+/** Get single temperature module (assumes no multiples) */
+export const getSingleThermocyclerModuleId: Selector<
+  string | null
+> = createSelector(
+  stepFormSelectors.getInitialDeckSetup,
+  initialDeckSetup =>
+    getModuleOnDeckByType(initialDeckSetup, 'thermocycler')?.id || null
+)
+
 /** Returns boolean if magnetic module has labware */
 export const getMagnetModuleHasLabware: Selector<boolean> = createSelector(
   stepFormSelectors.getInitialDeckSetup,
@@ -64,5 +92,13 @@ export const getTemperatureModuleHasLabware: Selector<boolean> = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   initialDeckSetup => {
     return getModuleHasLabware(initialDeckSetup, 'tempdeck')
+  }
+)
+
+/** Returns boolean if thermocycler module has labware */
+export const getThermocyclerModuleHasLabware: Selector<boolean> = createSelector(
+  stepFormSelectors.getInitialDeckSetup,
+  initialDeckSetup => {
+    return getModuleHasLabware(initialDeckSetup, 'thermocycler')
   }
 )
