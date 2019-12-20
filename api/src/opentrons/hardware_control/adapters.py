@@ -29,7 +29,7 @@ class SynchronousAdapter(HardwareAPILike):
     """
 
     @classmethod
-    def build(cls, builder, *args, build_loop=None, **kwargs):
+    def build(cls, builder, *args, **kwargs):
         """ Build a hardware control API and initialize the adapter in one call
 
         :param builder: the builder method to use (e.g.
@@ -37,20 +37,25 @@ class SynchronousAdapter(HardwareAPILike):
         :param args: Args to forward to the builder method
         :param kwargs: Kwargs to forward to the builder method
         """
+
         loop = asyncio.new_event_loop()
-        kwargs['loop'] = loop
         args = [arg for arg in args
                 if not isinstance(arg, asyncio.AbstractEventLoop)]
         if asyncio.iscoroutinefunction(builder):
-            checked_loop = build_loop or asyncio.get_event_loop()
-            api = checked_loop.run_until_complete(builder(*args, **kwargs))
+            api = loop.run_until_complete(
+                thread_manager.HardwareThreadManager(builder, *args, **kwargs)
+            )
+            MODULE_LOG.info(
+                f'\nSYNC ADAPTER build async api: {api}\n')
         else:
-            api = builder(*args, **kwargs)
-        return cls(api, loop)
+            api = thread_manager.HardwareThreadManager(builder, *args,
+                                                       **kwargs)
+            MODULE_LOG.info(
+                f'\nSYNC ADAPTER build api: {api}\n')
+        return cls(api)
 
     def __init__(self,
-                 api: API,
-                 loop: asyncio.AbstractEventLoop = None) -> None:
+                 api: API) -> None:
         """ Build the SynchronousAdapter.
 
         :param api: The API instance to wrap
@@ -62,8 +67,8 @@ class SynchronousAdapter(HardwareAPILike):
                      for the worker thread.
         """
         MODULE_LOG.info(
-            f'\nSYNC ADAPTER init loop: {loop} api._loop: {api._loop}\n')
-        self._loop = loop or api._loop
+            f'\nSYNC ADAPTER init loop: api._loop: {api._loop}\n')
+        self._loop = api._loop
         self._api = api
 
     def __repr__(self):
@@ -187,7 +192,7 @@ class SingletonAdapter(HardwareAPILike):
                 'plunger_axis': Axis.of_plunger(mount)
             }
             if data.get('model'):
-                instrs[mount.name.lower()]['tip_length'] \
+                instrs[mount.name.lower()]['tip_length']\
                     = data.get('tip_length', None)
 
         return instrs
