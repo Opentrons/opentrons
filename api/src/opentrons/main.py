@@ -106,7 +106,9 @@ async def initialize_robot(loop, hardware):
         log.exception("Error while connecting to motor driver: {}".format(e))
         fw_version = None
     else:
+        log.info("CHECKED FW VERSION{}".format(fw_version))
         if ff.use_protocol_api_v2():
+            log.info("CHECKED FW VERSION IN V2: {}".format(fw_version))
             fw_version = await hardware.fw_version
         else:
             fw_version = hardware.fw_version

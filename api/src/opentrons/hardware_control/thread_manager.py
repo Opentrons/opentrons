@@ -4,6 +4,7 @@ import threading
 import logging
 import asyncio
 import functools
+from time import sleep
 from . import API
 from .types import Axis, HardwareAPILike
 
@@ -69,7 +70,7 @@ class HardwareThreadManager(HardwareAPILike):
             f'CCTS: loop: {loop}, coro: {coro}, args: {args}, kwargs: {kwargs}')
         fut = asyncio.run_coroutine_threadsafe(coro(*args, **kwargs), loop)
         wrapped = asyncio.wrap_future(fut)
-        return await wrapped.result()
+        return await wrapped.result(timeout=10)
 
     def __getattribute__(self, attr_name):
         # Almost every attribute retrieved from us will be for people actually
