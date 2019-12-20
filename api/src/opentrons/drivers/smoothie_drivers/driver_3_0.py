@@ -331,8 +331,9 @@ class SmoothieDriver_3_0_0:
         self._combined_speed = float(DEFAULT_AXES_SPEED)
         self._saved_axes_speed = float(self._combined_speed)
         self._steps_per_mm = {}
-        self._acceleration = config.acceleration.copy()
-        self._saved_acceleration = config.acceleration.copy()
+        self._default_acceleration = config.acceleration.copy()
+        self._acceleration = self._default_acceleration.copy()
+        self._saved_acceleration = self._default_acceleration.copy()
 
         # position after homing
         self._homed_position = HOMED_POSITION.copy()
@@ -711,6 +712,8 @@ class SmoothieDriver_3_0_0:
             Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
             and floating point number for mm-per-second-squared (mm/sec^2)
         '''
+        if not settings:
+            settings = self._default_acceleration
         self._acceleration.update(settings)
         values = ['{}{}'.format(axis.upper(), value)
                   for axis, value in sorted(settings.items())]

@@ -121,6 +121,12 @@ def run_protocol(protocol: Protocol,
     :param protocol: The :py:class:`.protocols.types.Protocol` to execute
     :param context: The context to use.
     """
+
+    # Before running any protocol, ensure that the robot is properly set up
+    # Currently, the only thing ensured is that Smoothie acceleration is set to
+    # default
+    context.set_acceleration()
+
     if isinstance(protocol, PythonProtocol):
         if protocol.api_level >= APIVersion(2, 0):
             _run_python(protocol, context)

@@ -126,6 +126,9 @@ class Controller:
     def set_pipette_speed(self, val: float):
         self._smoothie_driver.set_speed(val)
 
+    def set_acceleration(self, settings):
+        self._smoothie_driver.set_acceleration(settings)
+
     async def watch_modules(self, loop: asyncio.AbstractEventLoop,
                             register_modules: 'RegisterModules'):
         can_watch = aionotify is not None

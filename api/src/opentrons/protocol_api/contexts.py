@@ -281,6 +281,10 @@ class ProtocolContext(CommandPublisher):
     def is_simulating(self) -> bool:
         return self._hw_manager.hardware.get_is_simulator()
 
+    @requires_version(2, 1)
+    def set_acceleration(self, settings=None):
+        self._hw_manager.hardware.set_acceleration(settings)
+
     @requires_version(2, 0)
     def load_labware_from_definition(
             self,

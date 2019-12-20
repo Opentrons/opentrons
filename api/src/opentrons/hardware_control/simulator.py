@@ -243,6 +243,10 @@ class Simulator:
         if rails is not None:
             self._lights['rails'] = rails
 
+    def set_acceleration(self, settings):
+        if settings:
+            assert type(settings) == dict
+
     def get_lights(self) -> Dict[str, bool]:
         return self._lights
 

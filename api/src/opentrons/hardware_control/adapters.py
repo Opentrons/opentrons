@@ -98,7 +98,7 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
 
     def __getattribute__(self, attr_name):
         """ Retrieve attributes from our API and wrap coroutines """
-        # Almost every attribute retrieved from us will be fore people actually
+        # Almost every attribute retrieved from us will be for people actually
         # looking for an attribute of the hardware API, so check there first.
         if attr_name == 'discover_modules':
             return object.__getattribute__(self, attr_name)

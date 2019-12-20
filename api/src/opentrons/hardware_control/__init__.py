@@ -925,6 +925,9 @@ class API(HardwareAPILike):
         """
         self._config = self._config._replace(**kwargs)
 
+    async def set_acceleration(self, settings):
+        self._backend.set_acceleration(settings)
+
     async def update_deck_calibration(self, new_transform):
         pass
 
