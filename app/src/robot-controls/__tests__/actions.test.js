@@ -125,6 +125,41 @@ const SPECS: Array<ActionSpec> = [
     },
   },
   {
+    name: 'robotControls:MOVE',
+    creator: Actions.move,
+    args: ['robot-name', 'changePipette', 'left', true],
+    expected: {
+      type: 'robotControls:MOVE',
+      payload: {
+        robotName: 'robot-name',
+        position: 'changePipette',
+        mount: 'left',
+        disengageMotors: true,
+      },
+      meta: {},
+    },
+  },
+  {
+    name: 'robotControls:MOVE_SUCCESS',
+    creator: Actions.moveSuccess,
+    args: ['robot-name', { requestId: 'abc' }],
+    expected: {
+      type: 'robotControls:MOVE_SUCCESS',
+      payload: { robotName: 'robot-name' },
+      meta: { requestId: 'abc' },
+    },
+  },
+  {
+    name: 'robotControls:MOVE_FAILURE',
+    creator: Actions.moveFailure,
+    args: ['robot-name', { message: 'AH' }, { requestId: 'abc' }],
+    expected: {
+      type: 'robotControls:MOVE_FAILURE',
+      payload: { robotName: 'robot-name', error: { message: 'AH' } },
+      meta: { requestId: 'abc' },
+    },
+  },
+  {
     name: 'robotControls:CLEAR_MOVEMENT_STATUS',
     creator: Actions.clearMovementStatus,
     args: ['robot-name'],
