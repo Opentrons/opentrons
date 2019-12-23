@@ -13,41 +13,40 @@ import styles from './styles.css'
 
 type Diagram = 'screws' | 'tab'
 
-type DiagramProps = {
+type DiagramProps = {|
   direction: Direction,
   mount: Mount,
   channels: PipetteChannels,
   diagram: Diagram,
-  displayCategory: ?PipetteDisplayCategory,
-}
+  displayCategory: PipetteDisplayCategory | null,
+|}
 
-type Props = DiagramProps & {
+type Props = {|
+  ...DiagramProps,
   step: 'one' | 'two',
   children: React.Node,
-}
+|}
 
-export function getDiagramsSrc(props: DiagramProps) {
+export function getDiagramsSrc(props: DiagramProps): string {
   const { channels, displayCategory, direction, mount, diagram } = props
   const channelsKey = channels === 8 ? 'multi' : 'single'
 
-  switch (displayCategory) {
-    case 'GEN2':
-      return require(`./images/${direction}-${mount}-${channelsKey}-GEN2-${diagram}@3x.png`)
-    case 'GEN1':
-    default:
-      return require(`./images/${direction}-${mount}-${channelsKey}-${diagram}@3x.png`)
-  }
+  return displayCategory === 'GEN2'
+    ? require(`./images/${direction}-${mount}-${channelsKey}-GEN2-${diagram}@3x.png`)
+    : require(`./images/${direction}-${mount}-${channelsKey}-${diagram}@3x.png`)
 }
 
-export default function InstructionStep(props: Props) {
+export function InstructionStep(props: Props) {
+  const { step, children, ...diagramProps } = props
+
   return (
     <fieldset className={styles.step}>
-      <legend className={styles.step_legend}>Step {props.step}</legend>
-      <div>{props.children}</div>
+      <legend className={styles.step_legend}>Step {step}</legend>
+      <div>{children}</div>
       {props.diagram === 'screws' && (
         <img src={screwdriverSrc} className={styles.screwdriver} />
       )}
-      <img src={getDiagramsSrc(props)} className={styles.diagram} />
+      <img src={getDiagramsSrc(diagramProps)} className={styles.diagram} />
     </fieldset>
   )
 }

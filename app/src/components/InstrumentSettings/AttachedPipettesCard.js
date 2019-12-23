@@ -3,7 +3,6 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
-import { clearMoveResponse } from '../../http-api-client'
 import {
   LEFT,
   RIGHT,
@@ -18,10 +17,12 @@ import { CardContentFlex } from '../layout'
 import { Card, useInterval } from '@opentrons/components'
 
 import type { State, Dispatch } from '../../types'
-import type { Robot } from '../../discovery/types'
+import type { Mount } from '../../pipettes/types'
 
 type Props = {|
-  robot: Robot,
+  robotName: string,
+  makeChangeUrl: (mount: Mount) => string,
+  makeConfigureUrl: (mount: Mount) => string,
 |}
 
 // TODO(mc, 2019-12-09): i18n
@@ -29,29 +30,21 @@ const PIPETTES = 'Pipettes'
 
 const FETCH_PIPETTES_INTERVAL_MS = 5000
 
-// TODO(mc, 2019-12-09): either move to `src/nav` or don't use routes
-const makeChangeUrl = (robotName: string, mount: string) =>
-  `/robots/${robotName}/instruments/pipettes/change/${mount}`
-
-const makeSettingsUrl = (robotName: string, mount: string) =>
-  `/robots/${robotName}/instruments/pipettes/config/${mount}`
-
 export function AttachedPipettesCard(props: Props) {
-  const { robot } = props
+  const { robotName, makeChangeUrl, makeConfigureUrl } = props
   const dispatch = useDispatch<Dispatch>()
-  const clearMove = () => dispatch(clearMoveResponse(robot))
 
   const pipettes = useSelector((state: State) =>
-    getAttachedPipettes(state, robot.name)
+    getAttachedPipettes(state, robotName)
   )
   const settings = useSelector((state: State) =>
-    getAttachedPipetteSettings(state, robot.name)
+    getAttachedPipetteSettings(state, robotName)
   )
 
   useInterval(
     () => {
-      dispatch(fetchPipettes(robot.name))
-      dispatch(fetchPipetteSettings(robot.name))
+      dispatch(fetchPipettes(robotName))
+      dispatch(fetchPipetteSettings(robotName))
     },
     FETCH_PIPETTES_INTERVAL_MS,
     true
@@ -63,18 +56,14 @@ export function AttachedPipettesCard(props: Props) {
         <PipetteInfo
           mount={LEFT}
           pipette={pipettes.left}
-          changeUrl={makeChangeUrl(robot.name, LEFT)}
-          settingsUrl={settings.left ? makeSettingsUrl(robot.name, LEFT) : null}
-          onChangeClick={clearMove}
+          changeUrl={makeChangeUrl(LEFT)}
+          settingsUrl={settings.left ? makeConfigureUrl(LEFT) : null}
         />
         <PipetteInfo
           mount={RIGHT}
           pipette={pipettes.right}
-          changeUrl={makeChangeUrl(robot.name, RIGHT)}
-          settingsUrl={
-            settings.right ? makeSettingsUrl(robot.name, RIGHT) : null
-          }
-          onChangeClick={clearMove}
+          changeUrl={makeChangeUrl(RIGHT)}
+          settingsUrl={settings.right ? makeConfigureUrl(RIGHT) : null}
         />
       </CardContentFlex>
     </Card>

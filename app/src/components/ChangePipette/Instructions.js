@@ -1,37 +1,61 @@
 // @flow
 import * as React from 'react'
-import { Link } from 'react-router-dom'
 import capitalize from 'lodash/capitalize'
 
 import { ModalPage } from '@opentrons/components'
 import PipetteSelection from './PipetteSelection'
-import InstructionStep from './InstructionStep'
+import { InstructionStep } from './InstructionStep'
 import { CheckPipettesButton } from './CheckPipettesButton'
 import styles from './styles.css'
 
-import type { ChangePipetteProps } from './types'
+import type {
+  PipetteNameSpecs,
+  PipetteModelSpecs,
+  PipetteDisplayCategory,
+} from '@opentrons/shared-data'
+import type { Mount } from '../../pipettes/types'
+import type { Direction } from './types'
 
 const ATTACH_CONFIRM = 'have robot check connection'
 const DETACH_CONFIRM = 'confirm pipette is detached'
+const EXIT = 'exit'
 
-export default function Instructions(props: ChangePipetteProps) {
+type Props = {|
+  title: string,
+  subtitle: string,
+  robotName: string,
+  mount: Mount,
+  wantedPipette: PipetteNameSpecs | null,
+  actualPipette: PipetteModelSpecs | null,
+  displayName: string,
+  displayCategory: PipetteDisplayCategory | null,
+  direction: Direction,
+  setWantedName: (name: string | null) => mixed,
+  confirm: () => mixed,
+  exit: () => mixed,
+|}
+
+export function Instructions(props: Props) {
   const {
-    robot,
+    title,
+    subtitle,
+    robotName,
     wantedPipette,
     actualPipette,
     setWantedName,
     direction,
     displayName,
-    goToConfirmUrl,
+    confirm,
+    exit,
   } = props
 
   const heading = `${capitalize(direction)} ${displayName} Pipette`
   const titleBar = {
-    title: props.title,
-    subtitle: props.subtitle,
+    title: title,
+    subtitle: subtitle,
     back: wantedPipette
       ? { onClick: () => setWantedName(null) }
-      : { Component: Link, to: props.exitUrl, children: 'exit' },
+      : { onClick: exit, children: EXIT },
   }
 
   return (
@@ -41,7 +65,9 @@ export default function Instructions(props: ChangePipetteProps) {
       contentsClassName={styles.modal_contents}
     >
       {!actualPipette && !wantedPipette && (
-        <PipetteSelection onPipetteChange={props.onPipetteSelect} />
+        <PipetteSelection
+          onPipetteChange={specs => setWantedName(specs ? specs.name : null)}
+        />
       )}
 
       {(actualPipette || wantedPipette) && (
@@ -49,8 +75,8 @@ export default function Instructions(props: ChangePipetteProps) {
           <Steps {...props} />
           <CheckPipettesButton
             className={styles.check_pipette_button}
-            robotName={robot.name}
-            onDone={goToConfirmUrl}
+            robotName={robotName}
+            onDone={confirm}
           >
             {actualPipette ? DETACH_CONFIRM : ATTACH_CONFIRM}
           </CheckPipettesButton>
@@ -60,12 +86,18 @@ export default function Instructions(props: ChangePipetteProps) {
   )
 }
 
-function Steps(props: ChangePipetteProps) {
-  const { direction, displayCategory } = props
+function Steps(props: Props) {
+  const {
+    direction,
+    mount,
+    displayCategory,
+    actualPipette,
+    wantedPipette,
+  } = props
 
-  const channels = props.actualPipette
-    ? props.actualPipette.channels
-    : props.wantedPipette?.channels || 1
+  const channels = actualPipette
+    ? actualPipette.channels
+    : wantedPipette?.channels || 1
 
   let stepOne
   let stepTwo
@@ -97,18 +129,14 @@ function Steps(props: ChangePipetteProps) {
       <InstructionStep
         step="one"
         diagram="screws"
-        channels={channels}
-        displayCategory={displayCategory}
-        {...props}
+        {...{ direction, mount, channels, displayCategory }}
       >
         {stepOne}
       </InstructionStep>
       <InstructionStep
         step="two"
         diagram="tab"
-        channels={channels}
-        displayCategory={displayCategory}
-        {...props}
+        {...{ direction, mount, channels, displayCategory }}
       >
         {stepTwo}
       </InstructionStep>

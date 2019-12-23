@@ -17,7 +17,6 @@ export type PipetteInfoProps = {|
   pipette: AttachedPipette | null,
   changeUrl: string,
   settingsUrl: string | null,
-  onChangeClick: () => mixed,
 |}
 
 const LABEL_BY_MOUNT = {
@@ -26,7 +25,7 @@ const LABEL_BY_MOUNT = {
 }
 
 export function PipetteInfo(props: PipetteInfoProps) {
-  const { mount, pipette, changeUrl, settingsUrl, onChangeClick } = props
+  const { mount, pipette, changeUrl, settingsUrl } = props
   const label = LABEL_BY_MOUNT[mount]
   const displayName = pipette ? pipette.modelSpecs.displayName : null
   const channels = pipette ? pipette.modelSpecs.channels : null
@@ -45,7 +44,7 @@ export function PipetteInfo(props: PipetteInfoProps) {
       />
 
       <div className={styles.button_group}>
-        <OutlineButton Component={Link} to={changeUrl} onClick={onChangeClick}>
+        <OutlineButton Component={Link} to={changeUrl}>
           {direction}
         </OutlineButton>
         {settingsUrl !== null && (

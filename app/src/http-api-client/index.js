@@ -5,15 +5,11 @@
 import { combineReducers } from 'redux'
 import apiReducer from './reducer'
 import { calibrationReducer, type CalibrationAction } from './calibration'
-import type { MotorsAction } from './motors'
-import { robotReducer, type RobotAction } from './robot'
 import type { NetworkingAction } from './networking'
 import type { Action } from '../types'
 
 export const superDeprecatedRobotApiReducer = combineReducers<_, Action>({
   calibration: calibrationReducer,
-  robot: robotReducer,
-  // TODO(mc, 2018-07-09): api subreducer will become the sole reducer
   api: apiReducer,
 })
 
@@ -35,17 +31,9 @@ export type {
   DeckCalPoint,
 } from './calibration'
 
-export type { RobotMove, RobotHome } from './robot'
-
 export type State = $Call<typeof superDeprecatedRobotApiReducer, void, Action>
 
-export type HttpApiAction =
-  | CalibrationAction
-  | MotorsAction
-  | NetworkingAction
-  | RobotAction
-
-export { getRobotApiState } from './reducer'
+export type HttpApiAction = CalibrationAction | NetworkingAction
 
 export {
   startDeckCalibration,
@@ -55,15 +43,4 @@ export {
   makeGetDeckCalibrationCommandState,
 } from './calibration'
 
-export * from './motors'
-
 export * from './networking'
-
-export {
-  home,
-  clearHomeResponse,
-  moveRobotTo,
-  clearMoveResponse,
-  makeGetRobotMove,
-  makeGetRobotHome,
-} from './robot'

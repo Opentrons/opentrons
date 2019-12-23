@@ -1,201 +1,165 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
-import { push, goBack } from 'connected-react-router'
-import { Switch, Route, withRouter } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import last from 'lodash/last'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 
+import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
 import { getAttachedPipettes } from '../../pipettes'
 import {
   home,
-  moveRobotTo,
-  disengagePipetteMotors,
-  makeGetRobotMove,
-  makeGetRobotHome,
-} from '../../http-api-client'
-
-import type { ContextRouter } from 'react-router-dom'
-import type {
-  PipetteNameSpecs,
-  PipetteModelSpecs,
-  PipetteDisplayCategory,
-} from '@opentrons/shared-data'
-import type { State, Dispatch } from '../../types'
-import type { Mount } from '../../robot/types'
-import type { Robot } from '../../discovery/types'
-import type { Direction, ChangePipetteProps } from './types'
-import type { RobotHome, RobotMove } from '../../http-api-client'
+  move,
+  getMovementStatus,
+  HOMING,
+  MOVING,
+  PIPETTE,
+  CHANGE_PIPETTE,
+} from '../../robot-controls'
 
 import ClearDeckAlertModal from '../ClearDeckAlertModal'
-import ExitAlertModal from './ExitAlertModal'
-import type { PipetteSelectionProps } from './PipetteSelection'
-import Instructions from './Instructions'
-import ConfirmPipette from './ConfirmPipette'
-import RequestInProgressModal from './RequestInProgressModal'
+import { ExitAlertModal } from './ExitAlertModal'
+import { Instructions } from './Instructions'
+import { ConfirmPipette } from './ConfirmPipette'
+import { RequestInProgressModal } from './RequestInProgressModal'
+
+import { ATTACH, DETACH, CLEAR_DECK, INSTRUCTIONS, CONFIRM } from './constants'
+
+import type { State, Dispatch } from '../../types'
+import type { Mount } from '../../robot/types'
+import type { WizardStep } from './types'
 
 type Props = {|
-  ...ContextRouter,
-  robot: Robot,
-  parentUrl: string,
-|}
-
-type OP = {|
-  title: string,
-  subtitle: string,
+  robotName: string,
   mount: Mount,
-  robot: Robot,
-  wantedPipette: ?PipetteNameSpecs,
-  setWantedName: (name: string | null) => mixed,
-  baseUrl: string,
-  confirmUrl: string,
-  exitUrl: string,
-  parentUrl: string,
+  closeModal: () => mixed,
 |}
 
-type SP = {|
-  moveRequest: RobotMove,
-  homeRequest: RobotHome,
-  actualPipette: ?PipetteModelSpecs,
-  displayName: string,
-  displayCategory: ?PipetteDisplayCategory,
-  direction: Direction,
-  success: boolean,
-  attachedWrong: boolean,
-|}
+// TODO(mc, 2019-12-18): i18n
+const PIPETTE_SETUP = 'Pipette Setup'
+const MOVE_PIPETTE_TO_FRONT = 'Move pipette to front'
+const CANCEL = 'Cancel'
+const MOUNT = 'mount'
 
-type DP = {|
-  exit: () => mixed,
-  back: () => mixed,
-  onPipetteSelect: $PropertyType<PipetteSelectionProps, 'onPipetteChange'>,
-  moveToFront: () => mixed,
-  goToConfirmUrl: () => mixed,
-|}
-
-const TITLE = 'Pipette Setup'
-// used to guarantee mount param in route is left or right
-const RE_MOUNT = '(left|right)'
-
-const ConnectedChangePipetteRouter = withRouter<_, _>(
-  connect<ChangePipetteProps, OP, SP, DP, State, Dispatch>(
-    makeMapStateToProps,
-    mapDispatchToProps
-  )(ChangePipetteRouter)
-)
-
-function ChangePipetteRouter(props: ChangePipetteProps) {
-  const { baseUrl, confirmUrl, exitUrl, moveRequest, homeRequest } = props
-  const clearDeckProps = {
-    cancelText: 'cancel',
-    continueText: 'move pipette to front',
-    parentUrl: props.parentUrl,
-    onContinueClick: props.moveToFront,
-  }
-  if (!moveRequest.inProgress && !moveRequest.response) {
-    return <ClearDeckAlertModal {...clearDeckProps} />
-  }
-
-  if (moveRequest.inProgress || homeRequest.inProgress) {
-    return <RequestInProgressModal {...props} />
-  }
-
-  return (
-    <Switch>
-      <Route exact path={baseUrl} render={() => <Instructions {...props} />} />
-      <Route path={exitUrl} render={() => <ExitAlertModal {...props} />} />
-      <Route path={confirmUrl} render={() => <ConfirmPipette {...props} />} />
-    </Switch>
-  )
-}
-
-function makeMapStateToProps(): (State, OP) => SP {
-  const getRobotMove = makeGetRobotMove()
-  const getRobotHome = makeGetRobotHome()
-
-  return (state, ownProps) => {
-    const { mount, wantedPipette, robot } = ownProps
-    const pipettes = getAttachedPipettes(state, robot.name)
-    const actualPipette = pipettes[mount]?.modelSpecs
-    const direction = actualPipette ? 'detach' : 'attach'
-
-    const success =
-      actualPipette?.name === wantedPipette?.name ||
-      (!actualPipette && !wantedPipette)
-
-    const attachedWrong = !!(!success && wantedPipette && actualPipette)
-
-    const displayName =
-      actualPipette?.displayName || wantedPipette?.displayName || ''
-
-    const displayCategory =
-      actualPipette?.displayCategory || wantedPipette?.displayCategory
-
-    return {
-      actualPipette,
-      direction,
-      success,
-      attachedWrong,
-      displayName,
-      displayCategory,
-      moveRequest: getRobotMove(state, robot),
-      homeRequest: getRobotHome(state, robot),
-    }
-  }
-}
-
-function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
-  const { confirmUrl, parentUrl, robot, mount } = ownProps
-  const disengage = () => dispatch(disengagePipetteMotors(robot))
-
-  return {
-    exit: () =>
-      dispatch(home(robot, mount)).then(() => dispatch(push(parentUrl))),
-    back: () => dispatch(goBack()),
-    onPipetteSelect: spec => spec && ownProps.setWantedName(spec.name),
-    moveToFront: () =>
-      dispatch(
-        moveRobotTo(robot, {
-          mount,
-          position: 'change_pipette',
-        })
-      ).then(disengage),
-    goToConfirmUrl: () => dispatch(push(confirmUrl)),
-  }
-}
-
-export default function ChangePipette(props: Props) {
+export function ChangePipette(props: Props) {
+  const { robotName, mount, closeModal } = props
+  const dispatch = useDispatch<Dispatch>()
+  const [dispatchApiRequest, requestIds] = useDispatchApiRequest()
+  const [wizardStep, setWizardStep] = React.useState<WizardStep>(CLEAR_DECK)
   const [wantedName, setWantedName] = React.useState<string | null>(null)
-  const {
-    robot,
-    parentUrl,
-    match: { path },
-  } = props
+  const [confirmExit, setConfirmExit] = React.useState(false)
+  const wantedPipette = wantedName ? getPipetteNameSpecs(wantedName) : null
+  const actualPipette = useSelector((state: State) => {
+    return getAttachedPipettes(state, robotName)[mount]?.modelSpecs || null
+  })
 
-  return (
-    <Route
-      path={`${path}/:mount${RE_MOUNT}`}
-      render={propsWithMount => {
-        const { params, url: baseUrl } = propsWithMount.match
-        const mount: Mount = (params.mount: any)
+  const movementStatus = useSelector((state: State) => {
+    return getMovementStatus(state, robotName)
+  })
 
-        const wantedPipette = wantedName
-          ? getPipetteNameSpecs(wantedName)
-          : null
+  const homeRequest = useSelector((state: State) => {
+    return getRequestById(state, last(requestIds))
+  })?.status
 
-        return (
-          <ConnectedChangePipetteRouter
-            robot={robot}
-            title={TITLE}
-            subtitle={`${mount} mount`}
-            mount={mount}
-            wantedPipette={wantedPipette}
-            setWantedName={setWantedName}
-            parentUrl={parentUrl}
-            baseUrl={baseUrl}
-            confirmUrl={`${baseUrl}/confirm`}
-            exitUrl={`${baseUrl}/exit`}
-          />
-        )
-      }}
-    />
+  React.useEffect(() => {
+    if (homeRequest && homeRequest !== PENDING) {
+      closeModal()
+    }
+  }, [homeRequest, closeModal])
+
+  const homeAndExit = React.useCallback(
+    () => dispatchApiRequest(home(robotName, PIPETTE, mount)),
+    [dispatchApiRequest, robotName, mount]
   )
+
+  const baseProps = {
+    title: PIPETTE_SETUP,
+    subtitle: `${mount} ${MOUNT}`,
+    mount,
+  }
+
+  if (
+    movementStatus !== null &&
+    (movementStatus === HOMING || movementStatus === MOVING)
+  ) {
+    return (
+      <RequestInProgressModal {...baseProps} movementStatus={movementStatus} />
+    )
+  }
+
+  if (wizardStep === CLEAR_DECK) {
+    return (
+      <ClearDeckAlertModal
+        cancelText={CANCEL}
+        continueText={MOVE_PIPETTE_TO_FRONT}
+        onCancelClick={closeModal}
+        onContinueClick={() => {
+          dispatch(move(robotName, CHANGE_PIPETTE, mount, true))
+          setWizardStep(INSTRUCTIONS)
+        }}
+      />
+    )
+  }
+
+  const basePropsWithPipettes = {
+    ...baseProps,
+    robotName,
+    wantedPipette,
+    actualPipette,
+    displayName: actualPipette?.displayName || wantedPipette?.displayName || '',
+    displayCategory:
+      actualPipette?.displayCategory || wantedPipette?.displayCategory || null,
+  }
+
+  if (wizardStep === INSTRUCTIONS) {
+    const direction = actualPipette ? DETACH : ATTACH
+
+    return (
+      <>
+        {confirmExit && (
+          <ExitAlertModal
+            back={() => setConfirmExit(false)}
+            exit={homeAndExit}
+          />
+        )}
+        <Instructions
+          {...{
+            ...basePropsWithPipettes,
+            direction,
+            setWantedName,
+            confirm: () => setWizardStep(CONFIRM),
+            exit: () => setConfirmExit(true),
+          }}
+        />
+      </>
+    )
+  }
+
+  if (wizardStep === CONFIRM) {
+    const success =
+      // success if we were trying to detach and nothings attached
+      (!actualPipette && !wantedPipette) ||
+      // or if the names of wanted and attached match
+      actualPipette?.name === wantedPipette?.name
+
+    const attachedWrong = Boolean(!success && wantedPipette && actualPipette)
+
+    return (
+      <ConfirmPipette
+        {...{
+          ...basePropsWithPipettes,
+          success,
+          attachedWrong,
+          tryAgain: () => {
+            setWantedName(null)
+            setWizardStep(INSTRUCTIONS)
+          },
+          back: () => setWizardStep(INSTRUCTIONS),
+          exit: homeAndExit,
+        }}
+      />
+    )
+  }
+
+  // this will never be reached
+  return null
 }

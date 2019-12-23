@@ -116,8 +116,7 @@ describe('ControlsCard', () => {
     )
   })
 
-  // TODO(mc, 2019-12-17): enable test when POST /robot/home is epic-based
-  test.skip('calls home on button click', () => {
+  test('calls home on button click', () => {
     const wrapper = mount(
       <Provider store={mockStore}>
         <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
@@ -126,7 +125,9 @@ describe('ControlsCard', () => {
 
     getHomeButton(wrapper).invoke('onClick')()
 
-    // expect(mockStore.dispatch).toHaveBeenCalledWith(RobotControls.home(mockRobot.name))
+    expect(mockStore.dispatch).toHaveBeenCalledWith(
+      RobotControls.home(mockRobot.name, RobotControls.ROBOT)
+    )
   })
 
   test('DC, home, and restart buttons enabled if connected and not running', () => {

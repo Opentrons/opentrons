@@ -3,10 +3,6 @@ import functions from 'lodash/functions'
 import omit from 'lodash/omit'
 import { push } from 'connected-react-router'
 
-import {
-  mockResolvedValue,
-  mockRejectedValue,
-} from '../../../__util__/mock-promise'
 import { delay } from '../../util'
 import client from '../api-client/client'
 import RpcClient from '../../rpc/client'
@@ -70,7 +66,7 @@ describe('api client', () => {
     }
 
     dispatch = jest.fn()
-    mockResolvedValue(RpcClient, rpcClient)
+    RpcClient.mockResolvedValue(rpcClient)
 
     getLabwareDefBySlot.mockReturnValue({})
     getCustomLabwareDefinitions.mockReturnValue([])
@@ -148,7 +144,7 @@ describe('api client', () => {
       const error = new Error('AHH get_root')
       const expectedResponse = actions.connectResponse(error)
 
-      mockRejectedValue(RpcClient, error)
+      RpcClient.mockRejectedValue(error)
 
       return sendConnect().then(() =>
         expect(dispatch).toHaveBeenCalledWith(expectedResponse)
@@ -223,7 +219,7 @@ describe('api client', () => {
     test('calls session.run and dispatches RUN_RESPONSE success', () => {
       const expected = actions.runResponse()
 
-      mockResolvedValue(session.run)
+      session.run.mockResolvedValue()
 
       return sendConnect()
         .then(() => sendToClient({}, actions.run()))
@@ -236,7 +232,7 @@ describe('api client', () => {
     test('calls session.run and dispatches RUN_RESPONSE failure', () => {
       const expected = actions.runResponse(new Error('AH'))
 
-      mockRejectedValue(session.run, new Error('AH'))
+      session.run.mockRejectedValue(new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient({}, actions.run()))
@@ -246,7 +242,7 @@ describe('api client', () => {
     test('calls session.pause and dispatches PAUSE_RESPONSE success', () => {
       const expected = actions.pauseResponse()
 
-      mockResolvedValue(session.pause)
+      session.pause.mockResolvedValue()
 
       return sendConnect()
         .then(() => sendToClient({}, actions.pause()))
@@ -259,7 +255,7 @@ describe('api client', () => {
     test('calls session.stop and dispatches PAUSE_RESPONSE failure', () => {
       const expected = actions.pauseResponse(new Error('AH'))
 
-      mockRejectedValue(session.pause, new Error('AH'))
+      session.pause.mockRejectedValue(new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient({}, actions.pause()))
@@ -269,7 +265,7 @@ describe('api client', () => {
     test('calls session.resume and dispatches RESUME_RESPONSE success', () => {
       const expected = actions.resumeResponse()
 
-      mockResolvedValue(session.resume)
+      session.resume.mockResolvedValue()
 
       return sendConnect()
         .then(() => sendToClient({}, actions.resume()))
@@ -282,7 +278,7 @@ describe('api client', () => {
     test('calls session.resume and dispatches RESUME_RESPONSE failure', () => {
       const expected = actions.resumeResponse(new Error('AH'))
 
-      mockRejectedValue(session.resume, new Error('AH'))
+      session.resume.mockRejectedValue(new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient({}, actions.resume()))
@@ -292,8 +288,8 @@ describe('api client', () => {
     test('calls session.resume + stop and dispatches CANCEL_RESPONSE', () => {
       const expected = actions.cancelResponse()
 
-      mockResolvedValue(session.resume)
-      mockResolvedValue(session.stop)
+      session.resume.mockResolvedValue()
+      session.stop.mockResolvedValue()
 
       return sendConnect()
         .then(() => sendToClient({}, actions.cancel()))
@@ -307,8 +303,8 @@ describe('api client', () => {
     test('calls session.stop and dispatches CANCEL_RESPONSE failure', () => {
       const expected = actions.cancelResponse(new Error('AH'))
 
-      mockResolvedValue(session.resume)
-      mockRejectedValue(session.stop, new Error('AH'))
+      session.resume.mockResolvedValue()
+      session.stop.mockRejectedValue(new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient({}, actions.cancel()))
@@ -316,7 +312,7 @@ describe('api client', () => {
     })
 
     test('calls session.refresh with REFRESH_SESSION', () => {
-      mockResolvedValue(session.refresh)
+      session.refresh.mockResolvedValue()
 
       return sendConnect()
         .then(() => sendToClient({}, actions.refreshSession()))
@@ -324,7 +320,7 @@ describe('api client', () => {
     })
 
     test('start a timer when the run starts', () => {
-      mockResolvedValue(session.run)
+      session.run.mockResolvedValue()
 
       return sendConnect()
         .then(() => sendToClient({}, actions.run()))
@@ -644,7 +640,7 @@ describe('api client', () => {
       const action = actions.moveToFront('left')
       const expectedResponse = actions.moveToFrontResponse()
 
-      mockResolvedValue(calibrationManager.move_to_front)
+      calibrationManager.move_to_front.mockResolvedValue()
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -660,7 +656,7 @@ describe('api client', () => {
       const action = actions.moveToFront('left')
       const expectedResponse = actions.moveToFrontResponse(new Error('AH'))
 
-      mockRejectedValue(calibrationManager.move_to_front, new Error('AH'))
+      calibrationManager.move_to_front.mockRejectedValue(new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -671,7 +667,7 @@ describe('api client', () => {
       const action = actions.probeTip('right')
       const expectedResponse = actions.probeTipResponse()
 
-      mockResolvedValue(calibrationManager.tip_probe)
+      calibrationManager.tip_probe.mockResolvedValue()
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -687,7 +683,7 @@ describe('api client', () => {
       const action = actions.probeTip('right')
       const expectedResponse = actions.probeTipResponse(new Error('AH'))
 
-      mockRejectedValue(calibrationManager.tip_probe, new Error('AH'))
+      calibrationManager.tip_probe.mockRejectedValue(new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -698,7 +694,7 @@ describe('api client', () => {
       const action = actions.moveTo('left', '5')
       const expectedResponse = actions.moveToResponse()
 
-      mockResolvedValue(calibrationManager.move_to)
+      calibrationManager.move_to.mockResolvedValue()
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -715,7 +711,7 @@ describe('api client', () => {
       const action = actions.moveTo('left', '5')
       const expectedResponse = actions.moveToResponse(new Error('AH'))
 
-      mockRejectedValue(calibrationManager.move_to, new Error('AH'))
+      calibrationManager.move_to.mockRejectedValue(new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -726,9 +722,9 @@ describe('api client', () => {
       const action = actions.pickupAndHome('left', '5')
       const expectedResponse = actions.pickupAndHomeResponse()
 
-      mockResolvedValue(calibrationManager.update_container_offset)
-      mockResolvedValue(calibrationManager.pick_up_tip)
-      mockResolvedValue(calibrationManager.home)
+      calibrationManager.update_container_offset.mockResolvedValue()
+      calibrationManager.pick_up_tip.mockResolvedValue()
+      calibrationManager.home.mockResolvedValue()
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -745,8 +741,7 @@ describe('api client', () => {
       const action = actions.pickupAndHome('left', '5')
       const expectedResponse = actions.pickupAndHomeResponse(new Error('AH'))
 
-      mockRejectedValue(
-        calibrationManager.update_container_offset,
+      calibrationManager.update_container_offset.mockRejectedValue(
         new Error('AH')
       )
 
@@ -759,8 +754,8 @@ describe('api client', () => {
       const action = actions.pickupAndHome('left', '5')
       const expectedResponse = actions.pickupAndHomeResponse(new Error('AH'))
 
-      mockResolvedValue(calibrationManager.update_container_offset)
-      mockRejectedValue(calibrationManager.pick_up_tip, new Error('AH'))
+      calibrationManager.update_container_offset.mockResolvedValue()
+      calibrationManager.pick_up_tip.mockRejectedValue(new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -771,9 +766,9 @@ describe('api client', () => {
       const action = actions.dropTipAndHome('right', '9')
       const expectedResponse = actions.dropTipAndHomeResponse()
 
-      mockResolvedValue(calibrationManager.drop_tip)
-      mockResolvedValue(calibrationManager.home)
-      mockResolvedValue(calibrationManager.move_to)
+      calibrationManager.drop_tip.mockResolvedValue()
+      calibrationManager.home.mockResolvedValue()
+      calibrationManager.move_to.mockResolvedValue()
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -797,7 +792,7 @@ describe('api client', () => {
       const action = actions.dropTipAndHome('right', '9')
       const expectedResponse = actions.dropTipAndHomeResponse(new Error('AH'))
 
-      mockRejectedValue(calibrationManager.drop_tip, new Error('AH'))
+      calibrationManager.drop_tip.mockRejectedValue(new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -808,8 +803,8 @@ describe('api client', () => {
       const action = actions.dropTipAndHome('right', '9')
       const expectedResponse = actions.dropTipAndHomeResponse(new Error('AH'))
 
-      mockResolvedValue(calibrationManager.drop_tip)
-      mockRejectedValue(calibrationManager.home, new Error('AH'))
+      calibrationManager.drop_tip.mockResolvedValue()
+      calibrationManager.home.mockRejectedValue(new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -820,9 +815,9 @@ describe('api client', () => {
       const action = actions.dropTipAndHome('right', '9')
       const expectedResponse = actions.dropTipAndHomeResponse(new Error('AH'))
 
-      mockResolvedValue(calibrationManager.drop_tip)
-      mockResolvedValue(calibrationManager.home)
-      mockRejectedValue(calibrationManager.move_to, new Error('AH'))
+      calibrationManager.drop_tip.mockResolvedValue()
+      calibrationManager.home.mockResolvedValue()
+      calibrationManager.move_to.mockRejectedValue(new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -833,7 +828,7 @@ describe('api client', () => {
       const action = actions.confirmTiprack('left', '9')
       const expectedResponse = actions.confirmTiprackResponse()
 
-      mockResolvedValue(calibrationManager.drop_tip)
+      calibrationManager.drop_tip.mockResolvedValue()
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -852,7 +847,7 @@ describe('api client', () => {
       const action = actions.confirmTiprack('left', '9')
       const expectedResponse = actions.confirmTiprackResponse(null, true)
 
-      mockResolvedValue(calibrationManager.drop_tip)
+      calibrationManager.drop_tip.mockResolvedValue()
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -866,7 +861,7 @@ describe('api client', () => {
       const action = actions.confirmTiprack('left', '9')
       const expectedResponse = actions.confirmTiprackResponse(new Error('AH'))
 
-      mockRejectedValue(calibrationManager.drop_tip, new Error('AH'))
+      calibrationManager.drop_tip.mockRejectedValue(new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -877,7 +872,7 @@ describe('api client', () => {
       const action = actions.jog('left', 'y', -1, 10)
       const expectedResponse = actions.jogResponse()
 
-      mockResolvedValue(calibrationManager.jog)
+      calibrationManager.jog.mockResolvedValue()
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -895,7 +890,7 @@ describe('api client', () => {
       const action = actions.jog('left', 'x', 1, 10)
       const expectedResponse = actions.jogResponse(new Error('AH'))
 
-      mockRejectedValue(calibrationManager.jog, new Error('AH'))
+      calibrationManager.jog.mockRejectedValue(new Error('AH'))
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -906,7 +901,7 @@ describe('api client', () => {
       const action = actions.updateOffset('left', 1)
       const expectedResponse = actions.updateOffsetResponse(null, false)
 
-      mockResolvedValue(calibrationManager.update_container_offset)
+      calibrationManager.update_container_offset.mockResolvedValue()
 
       return sendConnect()
         .then(() => sendToClient(state, action))
@@ -922,8 +917,7 @@ describe('api client', () => {
       const action = actions.updateOffset('left', 9)
       const expectedResponse = actions.updateOffsetResponse(new Error('AH'))
 
-      mockRejectedValue(
-        calibrationManager.update_container_offset,
+      calibrationManager.update_container_offset.mockRejectedValue(
         new Error('AH')
       )
 

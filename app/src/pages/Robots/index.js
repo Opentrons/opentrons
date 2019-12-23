@@ -17,7 +17,7 @@ import { getShellUpdateState, getBuildrootRobot } from '../../shell'
 import { Splash } from '@opentrons/components'
 import Page from '../../components/Page'
 import RobotSettings from './RobotSettings'
-import InstrumentSettings from './InstrumentSettings'
+import { InstrumentSettings } from './InstrumentSettings'
 
 import type { ContextRouter } from 'react-router-dom'
 
@@ -63,8 +63,13 @@ export function Robots(props: Props) {
       {robot.status === CONNECTABLE && (
         <Route
           path={`${path}/instruments`}
-          render={props => (
-            <InstrumentSettings robot={robot} match={props.match} />
+          render={routeProps => (
+            <InstrumentSettings
+              robotName={robot.name}
+              robotDisplayName={robot.displayName}
+              url={routeProps.match.url}
+              path={routeProps.match.path}
+            />
           )}
         />
       )}

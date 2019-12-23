@@ -1,31 +1,33 @@
 // @flow
 import * as React from 'react'
 
-import type { ChangePipetteProps } from './types'
+import { HOMING, MOVING } from '../../robot-controls'
+import { RIGHT } from '../../pipettes'
 import { SpinnerModalPage } from '@opentrons/components'
-// TODO (ka 2018-4-10): move this component to util/ or at least up a level for reuse for tip probe
-export default function RequestInProgressModal(props: ChangePipetteProps) {
-  let message =
-    props.mount === 'right'
-      ? 'Right pipette carriage moving'
-      : 'Left pipette carriage moving'
+import type { MovementStatus } from '../../robot-controls/types'
+import type { Mount } from '../../pipettes/types'
 
-  if (props.moveRequest.inProgress) {
+type Props = {|
+  title: string,
+  subtitle: string,
+  mount: Mount,
+  movementStatus: MovementStatus,
+|}
+
+export function RequestInProgressModal(props: Props) {
+  const { title, subtitle, mount, movementStatus } = props
+  let message = `${mount === RIGHT ? 'Right' : 'Left'} pipette carriage moving`
+
+  if (movementStatus === MOVING) {
     message +=
       props.mount === 'right' ? ' to front and left.' : ' to front and right.'
-  } else if (props.homeRequest.inProgress) {
+  } else if (movementStatus === HOMING) {
     message += ' up.'
   }
 
   return (
     <SpinnerModalPage
-      titleBar={{
-        title: props.title,
-        subtitle: props.subtitle,
-        back: {
-          disabled: true,
-        },
-      }}
+      titleBar={{ title, subtitle, back: { disabled: true } }}
       message={message}
     />
   )

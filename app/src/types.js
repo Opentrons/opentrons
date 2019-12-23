@@ -19,7 +19,7 @@ import type {
 } from './http-api-client'
 import type { RobotState, Action as RobotAction } from './robot'
 import type { ShellState, ShellAction } from './shell/types'
-import type { Config, ConfigAction } from './config/types'
+import type { Config as ConfigState, ConfigAction } from './config/types'
 import type { DiscoveryState, DiscoveryAction } from './discovery/types'
 import type { ProtocolState, ProtocolAction } from './protocol/types'
 import type {
@@ -41,7 +41,7 @@ export type State = $ReadOnly<{|
   robotSettings: RobotSettingsState,
   pipettes: PipettesState,
   modules: ModulesState,
-  config: Config,
+  config: ConfigState,
   discovery: DiscoveryState,
   labware: CustomLabwareState,
   protocol: ProtocolState,
@@ -67,8 +67,6 @@ export type Action =
 export type ActionLike = {| type: string, payload: any, meta: any |}
 
 export type GetState = () => State
-
-export type ActionType = $PropertyType<Action, 'type'>
 
 export type ThunkAction = (Dispatch, GetState) => ?Action
 

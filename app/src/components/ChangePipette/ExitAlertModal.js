@@ -4,29 +4,32 @@ import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../portal'
 
-type Props = {
+type Props = {|
   back: () => mixed,
   exit: () => mixed,
-}
+|}
 
-const HEADING = 'Are you sure you want to go back?'
-const CANCEL_TEXT = 'cancel'
-const EXIT_TEXT = 'exit'
+// TODO(mc, 2019-12-18): i18n
+const ARE_YOU_SURE_YOU_WANT_TO_GO_BACK = 'Are you sure you want to go back?'
+const EXITING_WILL_END_PIPETTE_SETUP =
+  'Exiting will end pipette setup and home your robot.'
+const CANCEL = 'cancel'
+const EXIT = 'exit'
 
-export default function ExitAlertModal(props: Props) {
+export function ExitAlertModal(props: Props) {
   const { back, exit } = props
 
   return (
     <Portal>
       <AlertModal
-        heading={HEADING}
+        heading={ARE_YOU_SURE_YOU_WANT_TO_GO_BACK}
         buttons={[
-          { children: CANCEL_TEXT, onClick: back },
-          { children: EXIT_TEXT, onClick: exit },
+          { children: CANCEL, onClick: back },
+          { children: EXIT, onClick: exit },
         ]}
         alertOverlay
       >
-        <p>Doing so will exit pipette setup and home your robot.</p>
+        <p>{EXITING_WILL_END_PIPETTE_SETUP}</p>
       </AlertModal>
     </Portal>
   )
