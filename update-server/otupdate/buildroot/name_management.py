@@ -192,11 +192,10 @@ def _rewrite_machine_info(current_machine_info_contents: str, new_pretty_hostnam
     Return current_machine_info_contents - the full contents of /etc/machine-info - with the
     PRETTY_HOSTNAME=... line rewritten to refer to new_pretty_hostname.
     """
-    new_contents = ''
-    for line in current_machine_info_contents.split('\n'):
-        if not line.startswith('PRETTY_HOSTNAME'):
-            new_contents += f'{line}\n'
-    new_contents += f'PRETTY_HOSTNAME={new_pretty_hostname}\n'
+    current_lines = current_machine_info_contents.splitlines()
+    preserved_lines = [l for l in current_lines if not l.startswith('PRETTY_HOSTNAME')]
+    new_lines = preserved_lines + [f'PRETTY_HOSTNAME={new_pretty_hostname}']
+    new_contents = '\n'.join(new_lines) + '\n'
     return new_contents
 
 
