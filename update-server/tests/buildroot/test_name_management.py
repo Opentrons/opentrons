@@ -41,3 +41,10 @@ async def test_name_endpoint(test_cli, monkeypatch):
     health = await test_cli.get('/server/update/health')
     health_body = await health.json()
     assert health_body['name'] == to_set + to_set
+
+
+def test_new_machine_info_contents_idempotent():
+    initial_contents = "PRETTY_HOSTNAME=foo\nSOME_OTHER_VARIABLE=some_other_variable\n"
+    first_rewrite = name_management._new_machine_info_contents(initial_contents, "bar")
+    second_rewrite = name_management._new_machine_info_contents(first_rewrite, "bar")
+    assert second_rewrite == first_rewrite
