@@ -182,12 +182,12 @@ def _update_pretty_hostname(new_val: str):
     except OSError:
         LOG.exception("Couldn't read /etc/machine-info")
         contents = ''
-    new_contents = _new_machine_info_contents(contents, new_val)
+    new_contents = _rewrite_machine_info(contents, new_val)
     with open('/etc/machine-info', 'w') as emi:
         emi.write(new_contents)
 
 
-def _new_machine_info_contents(current_machine_info_contents: str, new_pretty_hostname: str) -> str:
+def _rewrite_machine_info(current_machine_info_contents: str, new_pretty_hostname: str) -> str:
     """
     Return current_machine_info_contents - the full contents of /etc/machine-info - with the
     PRETTY_HOSTNAME=... line rewritten to refer to new_pretty_hostname.
