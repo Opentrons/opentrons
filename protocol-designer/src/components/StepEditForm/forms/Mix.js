@@ -48,6 +48,7 @@ class MixForm extends React.Component<Props, State> {
             label={i18n.t('form.step_edit_form.mixVolumeLabel')}
             focusHandlers={focusHandlers}
             stepType="mix"
+            className={styles.small_field}
           />
           <FormGroup
             className={styles.small_field}
