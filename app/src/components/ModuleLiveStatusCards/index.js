@@ -5,11 +5,12 @@ import { useSelector } from 'react-redux'
 import {
   useSendModuleCommand,
   getAttachedModulesForConnectedRobot,
+} from '../../modules'
+import {
   THERMOCYCLER,
   TEMPDECK,
   MAGDECK,
-} from '../../modules'
-
+} from '@opentrons/shared-data/js/constants'
 import { selectors as robotSelectors } from '../../robot'
 import { TempDeckCard } from './TempDeckCard'
 import { MagDeckCard } from './MagDeckCard'

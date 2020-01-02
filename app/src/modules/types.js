@@ -1,4 +1,9 @@
 // @flow
+import {
+  MAGDECK,
+  TEMPDECK,
+  THERMOCYCLER,
+} from '@opentrons/shared-data/js/constants'
 
 import type { RobotApiRequestMeta } from '../robot-api/types'
 
@@ -55,21 +60,21 @@ export type MagneticStatus = 'engaged' | 'disengaged'
 
 export type TemperatureModule = {|
   ...BaseModule,
-  name: 'tempdeck',
+  name: typeof TEMPDECK,
   data: TemperatureData,
   status: TemperatureStatus,
 |}
 
 export type MagneticModule = {|
   ...BaseModule,
-  name: 'magdeck',
+  name: typeof MAGDECK,
   data: MagneticData,
   status: MagneticStatus,
 |}
 
 export type ThermocyclerModule = {|
   ...BaseModule,
-  name: 'thermocycler',
+  name: typeof THERMOCYCLER,
   data: ThermocyclerData,
   status: ThermocyclerStatus,
 |}

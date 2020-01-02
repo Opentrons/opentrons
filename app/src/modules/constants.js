@@ -1,15 +1,5 @@
 // @flow
 
-// common constants
-
-export const THERMOCYCLER: 'thermocycler' = 'thermocycler'
-
-export const TEMPDECK: 'tempdeck' = 'tempdeck'
-
-export const MAGDECK: 'magdeck' = 'magdeck'
-
-export const PREPARABLE_MODULES = [THERMOCYCLER]
-
 // http paths
 
 export const MODULES_PATH: '/modules' = '/modules'

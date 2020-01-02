@@ -4,11 +4,14 @@ import sortBy from 'lodash/sortBy'
 import countBy from 'lodash/countBy'
 
 import { selectors as RobotSelectors } from '../robot'
-import * as Constants from './constants'
 import * as Types from './types'
 
 import type { State } from '../types'
 import type { SessionModule } from '../robot/types'
+import {
+  PREPARABLE_MODULES,
+  THERMOCYCLER,
+} from '@opentrons/shared-data/js/constants'
 
 export const getAttachedModules: (
   state: State,
@@ -27,7 +30,7 @@ export const getAttachedModulesForConnectedRobot = (
 }
 
 const isModulePrepared = (module: Types.AttachedModule): boolean => {
-  if (module.name === 'thermocycler') return module.data.lid === 'open'
+  if (module.name === THERMOCYCLER) return module.data.lid === 'open'
   return false
 }
 
@@ -38,7 +41,7 @@ export const getUnpreparedModules: (
   RobotSelectors.getModules,
   (attachedModules, protocolModules) => {
     const preparableSessionModules = protocolModules
-      .filter(m => Constants.PREPARABLE_MODULES.includes(m.name))
+      .filter(m => PREPARABLE_MODULES.includes(m.name))
       .map(m => m.name)
 
     // return actual modules that are both

@@ -8,7 +8,6 @@ import {
   HoverTooltip,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
-import { THERMOCYCLER } from '../../modules'
 import { Portal } from '../portal'
 import styles from './styles.css'
 
@@ -17,6 +16,7 @@ import type {
   TemperatureModule,
   ModuleCommand,
 } from '../../modules/types'
+import { THERMOCYCLER } from '@opentrons/shared-data/js/constants'
 
 const CONNECT_FOR_CONTROL = 'Connect to robot to control modules'
 type Props = {|
@@ -66,7 +66,7 @@ export const TemperatureControl = ({
     setPrimaryTempValue(null)
     setSecondaryTempValue(null)
   }
-  const isThermocycler = module.name === 'thermocycler'
+  const isThermocycler = module.name === THERMOCYCLER
   const displayName = getModuleDisplayName(module.name)
   const alertHeading = `Set ${displayName} Temp`
   const alertBody = `Pre heat or cool ${displayName}.`
