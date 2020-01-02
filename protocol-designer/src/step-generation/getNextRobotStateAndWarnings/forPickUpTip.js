@@ -23,14 +23,15 @@ export function forPickUpTip(
     `forPickUpTip expected ${labware} to be a tiprack`
   )
 
-  const robotState = cloneDeep(prevRobotState)
+  // PERF: Only clone needed part of robot state
+  const tipState = cloneDeep(prevRobotState.tipState)
 
   // pipette now has tip(s)
-  robotState.tipState.pipettes[pipette] = true
+  tipState.pipettes[pipette] = true
 
   // remove tips from tiprack
   if (pipetteSpec.channels === 1) {
-    robotState.tipState.tipracks[labware][well] = false
+    tipState.tipracks[labware][well] = false
   } else if (pipetteSpec.channels === 8) {
     const allWells = tiprackDef.ordering.find(col => col[0] === well)
     if (!allWells) {
@@ -38,12 +39,12 @@ export function forPickUpTip(
       throw new Error('Invalid primary well for tip pickup: ' + well)
     }
     allWells.forEach(function(well) {
-      robotState.tipState.tipracks[labware][well] = false
+      tipState.tipracks[labware][well] = false
     })
   }
 
   return {
     warnings: [],
-    robotState,
+    robotState: { ...prevRobotState, tipState },
   }
 }
