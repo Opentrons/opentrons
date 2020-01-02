@@ -13,7 +13,7 @@ VENV_NAME = 'env'
 # This regex should match a PEP427 compliant wheel filename and extract its
 # version into separate groups. Groups 1, 2, 3, and 4 should be the major,
 # minor, patch, and tag respectively. The tag capture group is optional
-WHEEL_VERSION_RE = re.compile('^[\w]+-([\d]+).([\d]+).([\d]+)([\w.]+)?-.*\.whl') # noqa
+WHEEL_VERSION_RE = re.compile(r'^[\w]+-([\d]+).([\d]+).([\d]+)([\w.]+)?-.*\.whl') # noqa
 FIRST_PROVISIONED_VERSION = (3, 3, 0)
 
 
