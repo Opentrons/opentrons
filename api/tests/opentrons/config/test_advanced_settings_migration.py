@@ -10,6 +10,7 @@ good_file_settings = {
     'useOldAspirationFunctions': None,
     'disableLogAggregation': None,
     'enableApi1BackCompat': None,
+    'useProtocolApi2': None
 }
 
 
@@ -26,7 +27,6 @@ def test_migrates_versionless_new_config():
       'calibrateToBottom': True,
       'deckCalibrationDots': False,
       'disableHomeOnBoot': True,
-      'useProtocolApi2': False,
       'useOldAspirationFunctions': True,
     })
 
@@ -39,6 +39,7 @@ def test_migrates_versionless_new_config():
       'useOldAspirationFunctions': True,
       'disableLogAggregation': None,
       'enableApi1BackCompat': None,
+      'useProtocolApi2': None
     }
 
 
@@ -58,7 +59,8 @@ def test_migrates_versionless_old_config():
       'disableHomeOnBoot': None,
       'useOldAspirationFunctions': None,
       'disableLogAggregation': None,
-      'enableApi1BackCompat': None
+      'enableApi1BackCompat': None,
+      'useProtocolApi2': None,
     }
 
 
@@ -79,7 +81,7 @@ def test_migrates_v1_config():
       'calibrateToBottom': True,
       'deckCalibrationDots': False,
       'disableHomeOnBoot': True,
-      'useProtocolApi2': False,
+      'useProtocolApi2': None,
       'useOldAspirationFunctions': True,
     })
     assert version == good_file_version
@@ -90,7 +92,7 @@ def test_migrates_v1_config():
         'disableHomeOnBoot': True,
         'useOldAspirationFunctions': True,
         'disableLogAggregation': None,
-        'useProtocolApi2': False,
+        'useProtocolApi2': None,
         'enableApi1BackCompat': None,
     }
 
@@ -102,7 +104,7 @@ def test_migrates_v2_config():
         'calibrateToBottom': True,
         'deckCalibrationDots': False,
         'disableHomeOnBoot': True,
-        'useProtocolApi2': False,
+        'useProtocolApi2': None,
         'enableApi1BackCompat': False,
         'useOldAspirationFunctions': True,
         'disableLogAggregation': False,
@@ -116,7 +118,7 @@ def test_migrates_v2_config():
         'disableHomeOnBoot': True,
         'useOldAspirationFunctions': True,
         'disableLogAggregation': False,
-        'useProtocolApi2': False,
+        'useProtocolApi2': None,
         'enableApi1BackCompat': None,
     }
 
@@ -128,7 +130,7 @@ def test_migrates_v3_config():
         'calibrateToBottom': True,
         'deckCalibrationDots': False,
         'disableHomeOnBoot': True,
-        'useProtocolApi2': True,
+        'useProtocolApi2': None,
         'useOldAspirationFunctions': True,
         'disableLogAggregation': False,
         'enableApi1BackCompat': False
@@ -141,7 +143,7 @@ def test_migrates_v3_config():
         'disableHomeOnBoot': True,
         'useOldAspirationFunctions': True,
         'disableLogAggregation': False,
-        'useProtocolApi2': True,
+        'useProtocolApi2': None,
         'enableApi1BackCompat': False,
     }
 
@@ -159,4 +161,5 @@ def test_ensures_config():
              'disableHomeOnBoot': None,
              'useOldAspirationFunctions': None,
              'disableLogAggregation': True,
+             'useProtocolApi2': None
          }
