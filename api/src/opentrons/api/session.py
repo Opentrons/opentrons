@@ -57,10 +57,10 @@ class SessionManager(object):
         self._broker.set_logger(self._command_logger)
         self._motion_lock = lock
 
-    def __del__(self):
-        if isinstance(getattr(self, '_hardware', None),
-                      adapters.SynchronousAdapter):
-            self._hardware.join()
+    # def __del__(self):
+        # if isinstance(getattr(self, '_hardware', None),
+        #               adapters.SynchronousAdapter):
+        #     self._hardware.join()
 
     def create(
             self,
@@ -495,7 +495,7 @@ class Session(object):
                     loop=self._loop,
                     broker=self._broker,
                     extra_labware=getattr(self._protocol, 'extra_labware', {}))
-                ctx.connect(self._hardware)
+                # ctx.connect(self._hardware)
                 ctx.home()
                 run_protocol(self._protocol, context=ctx)
             else:

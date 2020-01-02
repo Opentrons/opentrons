@@ -67,7 +67,7 @@ class SynchronousAdapter(HardwareAPILike):
                      for the worker thread.
         """
         MODULE_LOG.info(
-            f'\nSYNC ADAPTER init loop: api._loop: {api._loop}\n')
+            f'\nSYNC ADAPTER init loop: api._loop: {api._loop}, api: {api}\n')
         self._loop = api._loop
         self._api = api
 
@@ -164,7 +164,10 @@ class SingletonAdapter(HardwareAPILike):
             config=copy.copy(config))
         MODULE_LOG.info(f'newapi: {new_api}')
         await new_api.cache_instruments()
+        MODULE_LOG.info(f'after Cache instr: {new_api}')
         setattr(self, '_api', new_api)
+        MODULE_LOG.info(
+            f'after setattr _api: {object.__getattribute__(self, "_api")}')
 
     async def disconnect(self):
         """ Disconnect from connected hardware. """
