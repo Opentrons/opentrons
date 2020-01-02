@@ -76,12 +76,11 @@ settings = [
     ),
     Setting(
         _id='useOldAspirationFunctions',
-        title='Use older pipette calibrations',
-        description='Use the older pipette calibrations for P10S, P10M, P50S,'
-                    ' P50M, and P300S pipettes. Note this will cause the '
-                    ' default aspirate behavior (ul to mm conversion) to '
-                    ' function as it did prior to version 3.7.0. '
-                    ' NOTE: this does not impact GEN2 pipettes'
+        title='Use older aspirate behavior',
+        description='Aspirate with the less accurate volumetric calibrations'
+                    ' that were used before version 3.7.0. Use this if you'
+                    ' need consistency with pre-3.7.0 results. This only'
+                    ' affects GEN1 P10S, P10M, P50S, P50M, and P300S pipettes.'
     )
 ]
 
