@@ -13,10 +13,10 @@ class MainRouter:
         self._broker = Broker()
         self._notifications = Notifications(topics, self._broker, loop=loop)
 
-        log.info(f'\n\nMAIN ROUTER INIT HW {hardware}\n')
+        log.info(f'\n\nMAIN ROUTER INIT HW: {hardware}\n')
         if hardware:
             hardware = adapters.SynchronousAdapter(hardware)
-        log.info(f'\n\nMAIN ROUTER INIT HW  wrapped{hardware}\n')
+        log.info(f'\n\nMAIN ROUTER INIT HW wrapped:  {hardware}\n')
         self.session_manager = SessionManager(
             hardware=hardware,
             loop=loop,
