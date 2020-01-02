@@ -128,12 +128,15 @@ class API(HardwareAPILike):
                      :py:meth:`asyncio.get_event_loop`.
         """
         checked_loop = use_or_initialize_loop(loop)
+        mod_log.info(f'\nBHWC before loop: {loop}, checked_loop: {checked_loop}\n')
         backend = Controller(config)
+        mod_log.info(f'BHWC backend : {backend}')
         await backend.connect(port)
 
 
         api_instance = cls(backend, config=config, loop=checked_loop)
 
+        mod_log.info(f'\nBHWC loop: {loop}, checked_loop: {checked_loop}, backend: {backend}, api_instance: {api_instance}\n')
         checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
                 register_modules=api_instance.register_modules,
@@ -154,16 +157,19 @@ class API(HardwareAPILike):
         Multiple simulating hardware controllers may be active at one time.
         """
 
+        mod_log.info(f'\nBHS before all\n')
         if None is attached_instruments:
             attached_instruments = {}
 
         if None is attached_modules:
             attached_modules = []
+        mod_log.info(f'\nBHS before loop: {loop}\n')
         checked_loop = use_or_initialize_loop(loop)
         backend = Simulator(attached_instruments,
                             attached_modules,
                             config, checked_loop,
                             strict_attached_instruments)
+        mod_log.info(f'\nBHS backend: {backend}\n')
         api_instance = cls(backend, config=config, loop=checked_loop)
         mod_log.info(f'\nloop: {loop}, checked_loop: {checked_loop}, backend: {backend}, api_instance: {api_instance}\n')
         checked_loop.create_task(backend.watch_modules(

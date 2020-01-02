@@ -35,6 +35,7 @@ class HardwareThreadManager(HardwareAPILike):
         self._api = None
         is_running = threading.Event()
         self._is_running = is_running
+        MODULE_LOG.info(f'THREAD MANAGER init with builder: {builder} ')
         target = object.__getattribute__(self, '_build_api_and_start_loop')
         thread = threading.Thread(target=target, name='Hardware thread',
                                   args=(builder, *args), kwargs=kwargs)
@@ -42,11 +43,11 @@ class HardwareThreadManager(HardwareAPILike):
         thread.start()
         is_running.wait()
 
-    def _build_api_and_start_loop(self, builder):
+    def _build_api_and_start_loop(self, builder, *args, **kwargs):
         loop = asyncio.new_event_loop()
         self._loop = loop
-        MODULE_LOG.info(f'MADE LOOP: {loop} ')
-        api = builder(loop)
+        MODULE_LOG.info(f'MADE LOOP: {loop}, with builder: {builder} ')
+        api = builder(*args, loop=loop, **kwargs)
         MODULE_LOG.info(f'BUILT AND STARTED LOOP = {api}')
         self._api = api
         is_running = object.__getattribute__(self, '_is_running')
@@ -57,12 +58,15 @@ class HardwareThreadManager(HardwareAPILike):
     def __repr__(self):
         return '<HardwareThreadManager>'
 
-    def __del__(self):
+    def clean_up(self):
         try:
             self._thread.join()
         except Exception as e:
             log.exception(f'Exception while cleaning up'
                           f'Hardware Thread Manager: {e}')
+
+    def __del__(self):
+        self.clean_up()
 
     @staticmethod
     async def call_coroutine_threadsafe(loop, coro, *args, **kwargs):
@@ -70,15 +74,13 @@ class HardwareThreadManager(HardwareAPILike):
             f'CCTS: loop: {loop}, coro: {coro}, args: {args}, kwargs: {kwargs}')
         fut = asyncio.run_coroutine_threadsafe(coro(*args, **kwargs), loop)
         wrapped = asyncio.wrap_future(fut)
-        return await wrapped.result(timeout=10)
+        return await wrapped
 
     def __getattribute__(self, attr_name):
         # Almost every attribute retrieved from us will be for people actually
         # looking for an attribute of the hardware API, so check there first.
         api = object.__getattribute__(self, '_api')
         loop = object.__getattribute__(self, '_loop')
-        MODULE_LOG.info(
-            f'__GETATTRIBUTE__= looking for: {attr_name}, api: {api}, loop: {loop}')
         try:
             attr = getattr(api, attr_name)
         except AttributeError:
