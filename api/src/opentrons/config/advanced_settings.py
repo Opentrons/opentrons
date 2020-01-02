@@ -79,7 +79,7 @@ settings = [
         title='Use older aspirate behavior',
         description='Aspirate with the less accurate volumetric calibrations'
                     ' that were used before version 3.7.0. Use this if you'
-                    ' need consistency with pre-3.7.0 results. This only'
+                    ' need consistency with pre-v3.7.0 results. This only'
                     ' affects GEN1 P10S, P10M, P50S, P50M, and P300S pipettes.'
     )
 ]
