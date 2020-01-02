@@ -798,8 +798,7 @@ class TransferPlan:
             s = [s]
         new_src = []
         for well in s:
-            if self._is_first_row(well):
-                # For now, just use wells that are in first row
+            if self._is_valid_row(well):
                 new_src.append(well)
 
         if isinstance(d, List) and isinstance(d[0], List):
@@ -809,15 +808,22 @@ class TransferPlan:
             d = [d]
         new_dst = []
         for well in d:
-            if self._is_first_row(well):
-                # For now, just use wells that are in first row
+            if self._is_valid_row(well):
                 new_dst.append(well)
-
         return new_src, new_dst
 
-    def _is_first_row(self, well: Union[Well, types.Location]):
+    def _is_valid_row(self, well: Union[Well, types.Location]):
         if isinstance(well, types.Location):
             test_well: Well = well.labware  # type: ignore
         else:
             test_well = well
-        return test_well in test_well.parent.rows()[0]
+
+        # Allow the first 2 rows to be accessible to 384-well plates;
+        # otherwise, only the first row is accessible
+        if test_well.parent.parameters['format'] == '384Standard':
+            valid_wells = [
+                well for row in test_well.parent.rows()[:2]
+                for well in row]
+            return test_well in valid_wells
+        else:
+            return test_well in test_well.parent.rows()[0]

@@ -896,3 +896,38 @@ def test_oversized_transfer(_instr_labware):
              'args': [200, lw1.wells_by_index()['C1'], 1.0], 'kwargs': {}},
             {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
     assert xfer_plan_list == exp1
+
+
+def test_multichannel_transfer_locs(loop):
+    ctx = papi.ProtocolContext(loop)
+    lw1 = ctx.load_labware('biorad_96_wellplate_200ul_pcr', 1)
+    lw2 = ctx.load_labware('corning_384_wellplate_112ul_flat', 2)
+    tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 3)
+    instr_multi = ctx.load_instrument(
+        'p300_multi', Mount.LEFT, tip_racks=[tiprack])
+
+    # targets within row limit
+    xfer_plan = tx.TransferPlan(
+            100, lw1.rows()[0][1], lw2.rows()[1][1],
+            instr_multi,
+            max_volume=instr_multi.hw_pipette['working_volume'])
+    xfer_plan_list = []
+    for step in xfer_plan:
+        xfer_plan_list.append(step)
+    exp1 = [{'method': 'pick_up_tip', 'args': [], 'kwargs': {}},
+            {'method': 'aspirate',
+             'args': [100, lw1.wells_by_name()['A2'], 1.0], 'kwargs': {}},
+            {'method': 'dispense',
+            'args': [100, lw2.wells_by_index()['B2'], 1.0], 'kwargs': {}},
+            {'method': 'drop_tip', 'args': [], 'kwargs': {}}]
+    assert xfer_plan_list == exp1
+
+    # targets outside of row limit will be skipped
+    xfer_plan = tx.TransferPlan(
+        100, lw1.rows()[0][1], [lw2.rows()[1][1], lw2.rows()[2][1]],
+        instr_multi,
+        max_volume=instr_multi.hw_pipette['working_volume'])
+    xfer_plan_list = []
+    for step in xfer_plan:
+        xfer_plan_list.append(step)
+    assert xfer_plan_list == exp1

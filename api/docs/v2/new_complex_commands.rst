@@ -22,12 +22,14 @@ The examples in this section will use the following set up:
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
         tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', 2)
+        tiprack_multi = protocol.load_labware('opentrons_96_tiprack_300ul', 3)
         pipette = protocol.load_instrument('p300_single', mount='left', tip_racks=[tiprack])
+        pipette_multi = protocol.load_instrument('p300_multi', mount='right', tip_racks=[tiprack_multi])
 
         # The code used in the rest of the examples goes here
 
 
-This loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 1 and a `Opentrons 300 µL Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slot 2, and uses a P300 Single pipette.
+This loads a `Corning 96 Well Plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_ in slot 1 and a `Opentrons 300 µL Tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_ in slot 2 and 3, and uses a P300 Single pipette and a P300 Multi pipette.
 
 You can follow along and simulate the protocol using our protocol simulator, which can be installed by following the instructions at :ref:`writing`.
 
@@ -122,11 +124,21 @@ Below you will find a few scenarios using the :py:meth:`.InstrumentContext.trans
 Basic
 -----
 
-This example below transfers 100 µL from well ``'A1'`` to well ``'B1'``, automatically picking up a new tip and then disposing of it when finished.
+This example below transfers 100 µL from well ``'A1'`` to well ``'B1'`` using the P300 Single pipette, automatically picking up a new tip and then disposing of it when finished.
 
 .. code-block:: python
 
     pipette.transfer(100, plate.wells_by_name()['A1'], plate.wells_by_name()['B1'])
+
+When you are using a multi-channel pipette, you can transfer the entire column (8 wells) in the plate to another using:
+
+.. code-block:: python
+
+    pipette.transfer(100, plate.wells_by_name()['A1'], plate.wells_by_name()['A2'])
+
+.. note::
+
+    There is a limited number of rows your multi-channel pipettes can access in a plate during transfer, distribute and consoldiate. Multi pipettes can only access the wells in the first row (wells A1 - A12) of a 96-well plate, and the first two rows (wells A1 - B24) for a 384-well plate. Wells specified outside of the limit will be ignored.
 
 Transfer commands will automatically create entire series of :py:meth:`.InstrumentContext.aspirate`, :py:meth:`.InstrumentContext.dispense`, and other :py:meth:`.InstrumentContext` commands.
 
