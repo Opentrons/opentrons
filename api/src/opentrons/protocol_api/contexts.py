@@ -1358,18 +1358,6 @@ class InstrumentContext(CommandPublisher):
         self._hw_manager.hardware.drop_tip(self._mount, home_after=home_after)
         cmds.do_publish(self.broker, cmds.drop_tip, self.drop_tip,
                         'after', self, None, self, location=target)
-        if isinstance(target.labware, Well)\
-           and target.labware.parent.is_tiprack:
-            # If this is a tiprack we can try and add the tip back to the
-            # tracker
-            try:
-                target.labware.parent.return_tips(
-                    target.labware, self.channels)
-            except AssertionError:
-                # Similarly to :py:meth:`return_tips`, the failure case here
-                # just means the tip can't be reused, so don't actually stop
-                # the protocol
-                self._log.exception(f'Could not return tip to {target}')
         self._last_tip_picked_up_from = None
         return self
 

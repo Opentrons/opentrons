@@ -200,9 +200,10 @@ def test_pick_up_and_drop_tip(loop, get_labware_def):
     new_offset = model_offset - Point(0, 0,
                                       tip_length-overlap)
     assert pipette.critical_point() == new_offset
+    assert pipette.has_tip
 
     instr.drop_tip(target_location)
-    assert tiprack.wells()[0].has_tip
+    assert not pipette.has_tip
     assert pipette.critical_point() == model_offset
 
 
@@ -227,7 +228,6 @@ def test_return_tip(loop, get_labware_def):
 
     instr.return_tip()
     assert not pipette.has_tip
-    assert tiprack.wells()[0].has_tip
 
 
 def test_use_filter_tips(loop, get_labware_def):
@@ -285,7 +285,7 @@ def test_pick_up_tip_no_location(loop, get_labware_def,
 
     # TODO: remove argument and verify once trash container is added
     instr.drop_tip(tiprack1.wells()[0].top())
-    assert tiprack1.wells()[0].has_tip
+    assert not pipette.has_tip
     assert pipette.critical_point() == model_offset
 
     for well in tiprack1.wells():
