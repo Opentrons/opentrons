@@ -1,5 +1,4 @@
 // @flow
-import cloneDeep from 'lodash/cloneDeep'
 import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type {
@@ -57,7 +56,7 @@ export const reduceCommandCreators = (
       }
     },
     {
-      robotState: cloneDeep(initialRobotState),
+      robotState: initialRobotState,
       commands: [],
       errors: [],
       warnings: [],
