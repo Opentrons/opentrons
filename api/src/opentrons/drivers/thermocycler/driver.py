@@ -23,12 +23,13 @@ GCODES = {
     'GET_LID_STATUS': 'M119',
     'SET_LID_TEMP': 'M140',
     'GET_LID_TEMP': 'M141',
-    'DEACTIVATE_LID_HEATING': 'M108',
     'EDIT_PID_PARAMS': 'M301',
     'SET_PLATE_TEMP': 'M104',
     'GET_PLATE_TEMP': 'M105',
     'SET_RAMP_RATE': 'M566',
-    'DEACTIVATE': 'M18',
+    'DEACTIVATE_ALL': 'M18',
+    'DEACTIVATE_LID': 'M108',
+    'DEACTIVATE_BLOCK': 'M14',
     'DEVICE_INFO': 'M115'
 }
 LID_TARGET_DEFAULT = 105    # Degree celsius
@@ -262,8 +263,14 @@ class Thermocycler:
         self._poller = None
         return self
 
-    async def deactivate(self):
-        await self._write_and_wait(GCODES['DEACTIVATE'])
+    async def deactivate_all(self):
+        await self._write_and_wait(GCODES['DEACTIVATE_ALL'])
+
+    async def deactivate_lid(self) -> None:
+        await self._write_and_wait(GCODES['DEACTIVATE_LID'])
+
+    async def deactivate_block(self):
+        await self._write_and_wait(GCODES['DEACTIVATE_BLOCK'])
 
     def is_connected(self) -> bool:
         if not self._poller:
@@ -313,10 +320,6 @@ class Thermocycler:
 
         lid_temp_cmd = '{} S{}'.format(GCODES['SET_LID_TEMP'],
                                        self._lid_target)
-        await self._write_and_wait(lid_temp_cmd)
-
-    async def stop_lid_heating(self) -> None:
-        lid_temp_cmd = '{}'.format(GCODES['DEACTIVATE_LID_HEATING'])
         await self._write_and_wait(lid_temp_cmd)
 
     def _lid_status_update_callback(self, lid_response):

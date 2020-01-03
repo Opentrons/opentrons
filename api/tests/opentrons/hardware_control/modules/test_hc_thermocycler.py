@@ -53,10 +53,33 @@ async def test_sim_update():
     assert therm.target == 10
     assert therm.status == 'holding at target'
     await asyncio.wait_for(therm.wait_for_temp(), timeout=0.2)
+    await therm.deactivate_block()
+    assert therm.temperature is None
+    assert therm.target is None
+    assert therm.status == 'idle'
+
+    await therm.set_lid_temperature(temperature=80)
+    assert therm.lid_temp == 80
+    assert therm.lid_target == 80
+    await asyncio.wait_for(therm.wait_for_lid_temp(), timeout=0.2)
+    await therm.deactivate_lid()
+    assert therm.lid_temp is None
+    assert therm.lid_target is None
+
+    await therm.set_temperature(temperature=10, volume=60, hold_time_seconds=2)
+    await therm.set_lid_temperature(temperature=70)
+    await asyncio.wait_for(therm.wait_for_temp(), timeout=0.2)
+    await asyncio.wait_for(therm.wait_for_lid_temp(), timeout=0.2)
+    assert therm.temperature == 10
+    assert therm.target == 10
+    assert therm.lid_temp == 70
+    assert therm.lid_target == 70
     await therm.deactivate()
     assert therm.temperature is None
     assert therm.target is None
     assert therm.status == 'idle'
+    assert therm.lid_temp is None
+    assert therm.lid_target is None
 
 
 async def test_set_temperature(monkeypatch):
