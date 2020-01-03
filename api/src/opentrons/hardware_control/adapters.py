@@ -66,7 +66,7 @@ class SynchronousAdapter(HardwareAPILike):
                      for the worker thread.
         """
         MODULE_LOG.info(
-            f'\nSYNC ADAPTER init loop: api._loop: {api._loop}, api: {api}\n')
+            f'\nSYNC ADAPTER init loop: api._loop: {api._loop}\n')
         self._loop = api._loop
         self._api = api
 
@@ -92,8 +92,10 @@ class SynchronousAdapter(HardwareAPILike):
         # Almost every attribute retrieved from us will be for people actually
         # looking for an attribute of the hardware API, so check there first.
         api = object.__getattribute__(self, '_api')
+        MODULE_LOG.info(f'SA __GETATTRIBUTE__= looking for: {attr}')
         try:
             attr = getattr(api, attr_name)
+            MODULE_LOG.info(f'SA __GETATTRIBUTE__= found inside: {attr}')
         except AttributeError:
             # Maybe this actually was for us? Let’s find it
             return object.__getattribute__(self, attr_name)
