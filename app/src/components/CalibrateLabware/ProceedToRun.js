@@ -6,7 +6,6 @@ import { push } from 'connected-react-router'
 import { PrimaryButton, AlertModal } from '@opentrons/components'
 import some from 'lodash/some'
 
-import { home } from '../../http-api-client'
 import { selectors as robotSelectors } from '../../robot'
 import type { Dispatch } from '../../types'
 import pcrSealSrc from '../../img/place_pcr_seal.png'
@@ -22,7 +21,6 @@ function InfoBoxButton(props: Props) {
   const { returnTip } = props
   const dispatch = useDispatch<Dispatch>()
   const sessionModules = useSelector(robotSelectors.getModules)
-  const robot = useSelector(robotSelectors.getConnectedRobotName)
   const [mustPrepForRun, setMustPrepForRun] = useState(false)
   const [runPrepModalOpen, setRunPrepModalOpen] = useState(false)
 
@@ -36,7 +34,6 @@ function InfoBoxButton(props: Props) {
     // $FlowFixMe: robotActions.returnTip is not typed
     returnTip()
     if (mustPrepForRun) {
-      dispatch(home(robot))
       setRunPrepModalOpen(true)
     } else {
       dispatch(push(`/run`))

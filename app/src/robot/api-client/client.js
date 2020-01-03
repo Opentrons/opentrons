@@ -311,6 +311,7 @@ export default function client(dispatch) {
 
     remote.calibration_manager
       .return_tip(pipette)
+      .then(() => remote.calibration_manager.home(pipette))
       .then(() => dispatch(actions.returnTipResponse()))
       .catch(error => dispatch(actions.returnTipResponse(error)))
   }
