@@ -441,14 +441,16 @@ class ProtocolContext(CommandPublisher):
                 'thermocycler': modules.thermocycler.Thermocycler
             }[resolved_name]
             hc_mod_instance = adapters.SynchronousAdapter(mod_type(
-                port='', simulating=True, loop=self._loop))
+                port='',
+                pause_manager=self._hw_manager.hardware.pause_manager,
+                simulating=True,
+                loop=self._loop))
         if hc_mod_instance:
             mod_ctx = mod_class(self,
                                 hc_mod_instance,
                                 geometry,
                                 self.api_version,
-                                self._loop,
-                                pause_manager=self._hw_manager.hardware.pause_manager)
+                                self._loop)
         else:
             raise RuntimeError(
                 f'Could not find specified module: {resolved_name}')

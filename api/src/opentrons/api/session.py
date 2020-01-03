@@ -495,7 +495,7 @@ class Session(object):
                     loop=self._loop,
                     broker=self._broker,
                     extra_labware=getattr(self._protocol, 'extra_labware', {}))
-                # ctx.connect(self._hardware)
+                ctx.connect(self._hardware)
                 ctx.home()
                 run_protocol(self._protocol, context=ctx)
             else:
