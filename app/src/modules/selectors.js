@@ -8,10 +8,7 @@ import * as Types from './types'
 
 import type { State } from '../types'
 import type { SessionModule } from '../robot/types'
-import {
-  PREPARABLE_MODULES,
-  THERMOCYCLER,
-} from '@opentrons/shared-data/js/constants'
+import { PREPARABLE_MODULES, THERMOCYCLER } from './constants'
 
 export const getAttachedModules: (
   state: State,

@@ -9,9 +9,9 @@ import {
 } from '@opentrons/shared-data'
 import { ListItem, HoverTooltip } from '@opentrons/components'
 import styles from './styles.css'
-import { THERMOCYCLER } from '@opentrons/shared-data/js/constants'
 
 import type { Labware } from '../../robot'
+import { THERMOCYCLER } from '../../modules/constants'
 
 type LabwareListItemProps = {|
   ...$Exact<Labware>,

@@ -1,5 +1,5 @@
 // @flow
-import { MAGDECK, TEMPDECK, THERMOCYCLER } from './constants'
+import typeof { MAGDECK, TEMPDECK, THERMOCYCLER } from './constants'
 // TODO Ian 2019-06-04 split this out into eg ../labware/flowTypes/labwareV1.js
 export type WellDefinition = {
   diameter?: number, // NOTE: presence of diameter indicates a circular well
@@ -145,7 +145,7 @@ export type LabwareDefinition2 = {|
   groups: Array<LabwareWellGroup>,
 |}
 
-export type ModuleType = typeof MAGDECK | typeof TEMPDECK | typeof THERMOCYCLER
+export type ModuleType = MAGDECK | TEMPDECK | THERMOCYCLER
 
 export type DeckOffset = {|
   x: number,

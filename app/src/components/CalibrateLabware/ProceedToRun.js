@@ -11,7 +11,7 @@ import type { Dispatch } from '../../types'
 import pcrSealSrc from '../../img/place_pcr_seal.png'
 import { Portal } from '../portal'
 import styles from './styles.css'
-import { THERMOCYCLER } from '@opentrons/shared-data/js/constants'
+import { THERMOCYCLER } from '../../modules/constants'
 
 type Props = {|
   returnTip: () => mixed,

@@ -1,10 +1,9 @@
 // @flow
+import { THERMOCYCLER } from '@opentrons/shared-data'
 
 // http paths
 
 export const MODULES_PATH: '/modules' = '/modules'
-
-// action type strings
 
 // fetch modules
 
@@ -26,3 +25,7 @@ export const SEND_MODULE_COMMAND_SUCCESS: 'modules:SEND_MODULE_COMMAND_SUCCESS' 
 
 export const SEND_MODULE_COMMAND_FAILURE: 'modules:SEND_MODULE_COMMAND_FAILURE' =
   'modules:SEND_MODULE_COMMAND_FAILURE'
+
+export const PREPARABLE_MODULES = [THERMOCYCLER]
+
+export { MAGDECK, TEMPDECK, THERMOCYCLER } from '@opentrons/shared-data'

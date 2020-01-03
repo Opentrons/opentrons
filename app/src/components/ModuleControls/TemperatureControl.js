@@ -7,7 +7,6 @@ import {
   CheckboxField,
   HoverTooltip,
 } from '@opentrons/components'
-import { getModuleDisplayName } from '@opentrons/shared-data'
 import { Portal } from '../portal'
 import styles from './styles.css'
 
@@ -16,7 +15,8 @@ import type {
   TemperatureModule,
   ModuleCommand,
 } from '../../modules/types'
-import { THERMOCYCLER } from '@opentrons/shared-data/js/constants'
+import { THERMOCYCLER } from '../../modules/constants'
+import { getModuleDisplayName } from '@opentrons/shared-data'
 
 const CONNECT_FOR_CONTROL = 'Connect to robot to control modules'
 type Props = {|

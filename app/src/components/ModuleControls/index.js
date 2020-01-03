@@ -7,7 +7,7 @@ import { TemperatureData } from './TemperatureData'
 import styles from './styles.css'
 
 import type { TemperatureModule, ThermocyclerModule } from '../../modules/types'
-import { THERMOCYCLER } from '@opentrons/shared-data/js/constants'
+import { THERMOCYCLER } from '../../modules/constants'
 
 type Props = {|
   module: TemperatureModule | ThermocyclerModule,

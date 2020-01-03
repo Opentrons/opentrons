@@ -6,11 +6,7 @@ import {
   useSendModuleCommand,
   getAttachedModulesForConnectedRobot,
 } from '../../modules'
-import {
-  THERMOCYCLER,
-  TEMPDECK,
-  MAGDECK,
-} from '@opentrons/shared-data/js/constants'
+import { THERMOCYCLER, TEMPDECK, MAGDECK } from '../../modules/constants'
 import { selectors as robotSelectors } from '../../robot'
 import { TempDeckCard } from './TempDeckCard'
 import { MagDeckCard } from './MagDeckCard'

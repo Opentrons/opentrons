@@ -11,7 +11,7 @@ import {
   selectors as robotSelectors,
 } from '../../robot'
 import secureTCLatchSrc from '../../img/secure_tc_latch.png'
-import { THERMOCYCLER } from '@opentrons/shared-data/js/constants'
+import { THERMOCYCLER } from '../../modules/constants'
 
 import { Portal } from '../portal'
 import DeckMap from '../DeckMap'

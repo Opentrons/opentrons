@@ -6,8 +6,8 @@ import { ModuleInfo } from './ModuleInfo'
 import { ModuleUpdate } from './ModuleUpdate'
 import { ModuleControls } from '../ModuleControls'
 import styles from './styles.css'
-import { THERMOCYCLER, TEMPDECK } from '@opentrons/shared-data/js/constants'
 import type { AttachedModule } from '../../modules/types'
+import { TEMPDECK, THERMOCYCLER } from '../../modules/constants'
 
 type Props = {|
   module: AttachedModule,
