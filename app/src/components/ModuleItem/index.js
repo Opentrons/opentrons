@@ -7,7 +7,7 @@ import { ModuleUpdate } from './ModuleUpdate'
 import { ModuleControls } from '../ModuleControls'
 import styles from './styles.css'
 import type { AttachedModule } from '../../modules/types'
-import { TEMPDECK, THERMOCYCLER } from '../../modules/constants'
+import { TEMPDECK, THERMOCYCLER } from '../../modules'
 
 type Props = {|
   module: AttachedModule,

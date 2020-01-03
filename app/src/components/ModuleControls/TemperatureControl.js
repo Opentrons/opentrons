@@ -15,7 +15,7 @@ import type {
   TemperatureModule,
   ModuleCommand,
 } from '../../modules/types'
-import { THERMOCYCLER } from '../../modules/constants'
+import { THERMOCYCLER } from '../../modules'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 const CONNECT_FOR_CONTROL = 'Connect to robot to control modules'

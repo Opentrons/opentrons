@@ -8,11 +8,10 @@ import {
   Icon,
 } from '@opentrons/components'
 
-import { sendModuleCommand } from '../../modules'
+import { THERMOCYCLER, sendModuleCommand } from '../../modules'
 import DeckMap from '../DeckMap'
 import styles from './styles.css'
 import { Portal } from '../portal'
-import { THERMOCYCLER } from '../../modules/constants'
 import type { Dispatch } from '../../types'
 import type { AttachedModule } from '../../modules/types'
 

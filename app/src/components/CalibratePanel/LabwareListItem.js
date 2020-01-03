@@ -11,7 +11,7 @@ import { ListItem, HoverTooltip } from '@opentrons/components'
 import styles from './styles.css'
 
 import type { Labware } from '../../robot'
-import { THERMOCYCLER } from '../../modules/constants'
+import { THERMOCYCLER } from '../../modules'
 
 type LabwareListItemProps = {|
   ...$Exact<Labware>,
