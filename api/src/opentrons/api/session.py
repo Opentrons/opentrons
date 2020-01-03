@@ -502,7 +502,7 @@ class Session(object):
                     bundled_data=getattr(
                         self._protocol, 'bundled_data', None),
                     extra_labware=getattr(self._protocol, 'extra_labware', {}))
-                # ctx.connect(self._hardware)
+                ctx.connect(self._hardware)
                 ctx.home()
                 run_protocol(self._protocol, context=ctx)
             else:
