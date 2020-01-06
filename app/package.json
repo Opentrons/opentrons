@@ -48,6 +48,7 @@
     "remark-react": "^4.0.3",
     "reselect": "^4.0.0",
     "rxjs": "^6.5.1",
-    "semver": "^5.5.0"
+    "semver": "^5.5.0",
+    "typeface-open-sans": "^0.0.75"
   }
 }
