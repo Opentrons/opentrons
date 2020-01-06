@@ -1,7 +1,7 @@
 // @flow
 
 import * as Actions from '../actions'
-
+import * as Fixtures from '../__fixtures__'
 import type { RobotSettingsAction } from '../types'
 
 type ActionSpec = {|
@@ -11,40 +11,97 @@ type ActionSpec = {|
   expected: RobotSettingsAction,
 |}
 
-const mockRobot = { name: 'robotName', ip: 'localhost', port: 31950 }
-
 describe('robot settings actions', () => {
   const SPECS: Array<ActionSpec> = [
     {
       name: 'robotSettings:FETCH_SETTINGS',
       creator: Actions.fetchSettings,
-      args: [mockRobot],
+      args: ['robot-name'],
       expected: {
         type: 'robotSettings:FETCH_SETTINGS',
-        payload: { host: mockRobot, method: 'GET', path: '/settings' },
+        payload: { robotName: 'robot-name' },
+        meta: {},
+      },
+    },
+    {
+      name: 'robotSettings:FETCH_SETTINGS_SUCCESS',
+      creator: Actions.fetchSettingsSuccess,
+      args: [
+        'robot-name',
+        Fixtures.mockRobotSettings,
+        null,
+        { requestId: 'abc' },
+      ],
+      expected: {
+        type: 'robotSettings:FETCH_SETTINGS_SUCCESS',
+        payload: {
+          robotName: 'robot-name',
+          settings: Fixtures.mockRobotSettings,
+          restartPath: null,
+        },
+        meta: { requestId: 'abc' },
+      },
+    },
+    {
+      name: 'robotSettings:FETCH_SETTINGS_FAILURE',
+      creator: Actions.fetchSettingsFailure,
+      args: ['robot-name', { message: 'AH' }, { requestId: 'abc' }],
+      expected: {
+        type: 'robotSettings:FETCH_SETTINGS_FAILURE',
+        payload: { robotName: 'robot-name', error: { message: 'AH' } },
+        meta: { requestId: 'abc' },
       },
     },
     {
       name: 'robotSettings:UPDATE_SETTING',
       creator: Actions.updateSetting,
-      args: [mockRobot, 'foo', true],
+      args: ['robot-name', 'foo', true],
       expected: {
         type: 'robotSettings:UPDATE_SETTING',
         payload: {
-          host: mockRobot,
-          method: 'POST',
-          path: '/settings',
-          body: { id: 'foo', value: true },
+          robotName: 'robot-name',
+          settingId: 'foo',
+          value: true,
         },
+        meta: {},
+      },
+    },
+    {
+      name: 'robotSettings:UPDATE_SETTING_SUCCESS',
+      creator: Actions.updateSettingSuccess,
+      args: [
+        'robot-name',
+        Fixtures.mockRobotSettings,
+        null,
+        { requestId: 'abc' },
+      ],
+      expected: {
+        type: 'robotSettings:UPDATE_SETTING_SUCCESS',
+        payload: {
+          robotName: 'robot-name',
+          settings: Fixtures.mockRobotSettings,
+          restartPath: null,
+        },
+        meta: { requestId: 'abc' },
+      },
+    },
+    {
+      name: 'robotSettings:UPDATE_SETTING_FAILURE',
+      creator: Actions.updateSettingFailure,
+      args: ['robot-name', { message: 'AH' }, { requestId: 'abc' }],
+      expected: {
+        type: 'robotSettings:UPDATE_SETTING_FAILURE',
+        payload: { robotName: 'robot-name', error: { message: 'AH' } },
+        meta: { requestId: 'abc' },
       },
     },
     {
       name: 'clearRestartPath',
       creator: Actions.clearRestartPath,
-      args: [mockRobot.name],
+      args: ['robot-name'],
       expected: {
         type: 'robotSettings:CLEAR_RESTART_PATH',
-        payload: { robotName: mockRobot.name },
+        payload: { robotName: 'robot-name' },
       },
     },
   ]

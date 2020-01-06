@@ -12,7 +12,7 @@ import { buildrootReducer, buildrootUpdateEpic } from './buildroot'
 import { robotLogsReducer } from './robot-logs/reducer'
 
 import type { Reducer } from 'redux'
-import type { LooseEpic, Action, ActionLike } from '../types'
+import type { StrictEpic, Action } from '../types'
 import type { ShellState } from './types'
 
 const { ipcRenderer, CURRENT_VERSION, CURRENT_RELEASE_NOTES } = remote
@@ -34,23 +34,23 @@ export const shellReducer: Reducer<ShellState, Action> = combineReducers<
   robotLogs: robotLogsReducer,
 })
 
-export const sendActionToShellEpic: LooseEpic = action$ =>
+export const sendActionToShellEpic: StrictEpic<> = action$ =>
   action$.pipe(
-    filter<ActionLike>((action: ActionLike) => action.meta?.shell === true),
-    tap<ActionLike>((shellAction: ActionLike) =>
+    filter<Action>(a => a.meta != null && a.meta.shell != null && a.meta.shell),
+    tap<Action>((shellAction: Action) =>
       ipcRenderer.send('dispatch', shellAction)
     ),
     ignoreElements()
   )
 
-export const receiveActionFromShellEpic = () =>
+export const receiveActionFromShellEpic: StrictEpic<> = () =>
   // IPC event listener: (IpcRendererEvent, ...args) => void
   // our action is the only argument, so pluck it out from index 1
-  fromEvent<ActionLike>(
+  fromEvent<Action>(
     ipcRenderer,
     'dispatch',
-    (_: mixed, incoming: ActionLike) => incoming
-  ).pipe<ActionLike>(
+    (_: mixed, incoming: Action) => incoming
+  ).pipe<Action>(
     tap(incoming => {
       log.debug('Received action from main via IPC', {
         actionType: incoming.type,

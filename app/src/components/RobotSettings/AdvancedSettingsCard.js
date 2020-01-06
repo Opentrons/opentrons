@@ -65,11 +65,11 @@ export default function AdvancedSettingsCard(props: Props) {
     s => s.id === ROBOT_LOGS_OPTOUT_ID && s.value === null
   )
   const setLogOptout = (value: boolean) =>
-    dispatch(updateSetting(robot, ROBOT_LOGS_OPTOUT_ID, value))
+    dispatch(updateSetting(name, ROBOT_LOGS_OPTOUT_ID, value))
 
   React.useEffect(() => {
-    dispatch(fetchSettings(robot))
-  }, [dispatch, robot])
+    dispatch(fetchSettings(name))
+  }, [dispatch, name])
 
   return (
     <Card title={TITLE} disabled={disabled}>
@@ -103,12 +103,12 @@ export default function AdvancedSettingsCard(props: Props) {
           key={id}
           label={title}
           toggledOn={value === true}
-          onClick={() => dispatch(updateSetting(robot, id, !value))}
+          onClick={() => dispatch(updateSetting(name, id, !value))}
         >
           <p>{description}</p>
         </LabeledToggle>
       ))}
-      <UploadRobotUpdate robotName={robot.name} />
+      <UploadRobotUpdate robotName={name} />
       {showLogOptoutModal && (
         <Portal>
           <AlertModal

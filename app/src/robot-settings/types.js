@@ -1,6 +1,6 @@
 // @flow
 
-import type { RobotApiRequest } from '../robot-api/deprecated'
+import type { RobotApiRequestMeta } from '../robot-api/types'
 
 export type RobotSettingsField = {|
   id: string,
@@ -31,15 +31,76 @@ export type RobotSettingsFieldUpdate = {|
   value: $PropertyType<RobotSettingsField, 'value'>,
 |}
 
+// action types
+
+// fetch settings
+
+export type FetchSettingsAction = {|
+  type: 'robotSettings:FETCH_SETTINGS',
+  payload: {| robotName: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchSettingsSuccessAction = {|
+  type: 'robotSettings:FETCH_SETTINGS_SUCCESS',
+  payload: {|
+    robotName: string,
+    settings: RobotSettings,
+    restartPath: string | null,
+  |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchSettingsFailureAction = {|
+  type: 'robotSettings:FETCH_SETTINGS_FAILURE',
+  payload: {| robotName: string, error: {| message: string |} |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchSettingsDoneAction =
+  | FetchSettingsSuccessAction
+  | FetchSettingsFailureAction
+
+// update setting
+
+export type UpdateSettingAction = {|
+  type: 'robotSettings:UPDATE_SETTING',
+  payload: {| robotName: string, settingId: string, value: boolean | null |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type UpdateSettingSuccessAction = {|
+  type: 'robotSettings:UPDATE_SETTING_SUCCESS',
+  payload: {|
+    robotName: string,
+    settings: RobotSettings,
+    restartPath: string | null,
+  |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type UpdateSettingFailureAction = {|
+  type: 'robotSettings:UPDATE_SETTING_FAILURE',
+  payload: {| robotName: string, error: {| message: string |} |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type UpdateSettingDoneAction =
+  | UpdateSettingSuccessAction
+  | UpdateSettingFailureAction
+
+// clear restart path
+
 export type ClearRestartPathAction = {|
   type: 'robotSettings:CLEAR_RESTART_PATH',
   payload: { robotName: string },
 |}
 
-export type RobotSettingsApiAction =
-  | {| type: 'robotSettings:FETCH_SETTINGS', payload: RobotApiRequest |}
-  | {| type: 'robotSettings:UPDATE_SETTING', payload: RobotApiRequest |}
-
 export type RobotSettingsAction =
   | ClearRestartPathAction
-  | RobotSettingsApiAction
+  | FetchSettingsAction
+  | FetchSettingsSuccessAction
+  | FetchSettingsFailureAction
+  | UpdateSettingAction
+  | UpdateSettingSuccessAction
+  | UpdateSettingFailureAction
