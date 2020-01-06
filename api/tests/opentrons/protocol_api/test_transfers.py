@@ -6,7 +6,6 @@ from opentrons.protocol_api import transfers as tx
 from opentrons.protocols.types import APIVersion
 
 
-
 @pytest.fixture
 def _instr_labware(loop):
     ctx = papi.ProtocolContext(loop)
@@ -933,7 +932,7 @@ def test_multichannel_transfer_old_version(loop):
     tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 3)
     instr_multi = ctx.load_instrument(
         'p300_multi', Mount.LEFT, tip_racks=[tiprack])
-    
+
     xfer_plan = tx.TransferPlan(
             100, lw1.rows()[0][0], [lw2.rows()[0][1], lw2.rows()[1][1]],
             instr_multi,
