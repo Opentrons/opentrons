@@ -14,6 +14,8 @@ import type {
   CalibrationSuccessAction,
   CalibrationFailureAction,
   SetModulesReviewedAction,
+  ReturnTipResponseAction,
+  ReturnTipAction,
 } from '../actions'
 
 // calibration request types
@@ -30,6 +32,7 @@ type CalibrationRequestType =
   | 'CONFIRM_TIPRACK'
   | 'UPDATE_OFFSET'
   | 'SET_MODULES_REVIEWED'
+  | 'RETURN_TIP'
 
 type CalibrationRequest = $ReadOnly<{|
   type: CalibrationRequestType,
@@ -151,6 +154,12 @@ export default function calibrationReducer(
 
     case 'robot:SET_MODULES_REVIEWED':
       return handleSetModulesReviewed(state, action)
+
+    case 'robot:RETURN_TIP':
+      return handleReturnTip(state, action)
+
+    case 'robot:RETURN_TIP_RESPONSE':
+      return handleReturnTipResponse(state, action)
 
     // TODO(mc, 20187-01-26): caution - not covered by flow yet
     case SET_DECK_POPULATED:
@@ -664,5 +673,46 @@ function handleConfirmLabware(
   return {
     ...state,
     confirmedBySlot: { ...state.confirmedBySlot, [slot]: true },
+  }
+}
+
+function handleReturnTip(
+  state: CalibrationState,
+  action: ReturnTipAction
+): CalibrationState {
+  const {
+    payload: { mount },
+  } = action
+  return {
+    ...state,
+    calibrationRequest: {
+      type: 'RETURN_TIP',
+      inProgress: true,
+      error: null,
+      mount,
+    },
+  }
+}
+
+function handleReturnTipResponse(
+  state: CalibrationState,
+  action: ReturnTipResponseAction
+): CalibrationState {
+  const {
+    calibrationRequest: { mount, slot },
+  } = state
+  if (!mount) return state
+
+  return {
+    ...state,
+    calibrationRequest: {
+      ...state.calibrationRequest,
+      inProgress: false,
+      error: null,
+    },
+    tipOnByMount: {
+      ...state.tipOnByMount,
+      [mount]: false,
+    },
   }
 }

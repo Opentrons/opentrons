@@ -133,10 +133,10 @@ class CalibrationManager:
                 loc = _well0(container._container)
                 instrument._context.location_cache =\
                     Location(self._hardware.gantry_position(
-                                Mount[inst.mount.upper()],
-                                critical_point=CriticalPoint.NOZZLE,
-                                refresh=True),
-                             loc)
+                        Mount[inst.mount.upper()],
+                        critical_point=CriticalPoint.NOZZLE,
+                        refresh=True),
+                        loc)
                 loc_leg = _well0(container._container)
                 inst.pick_up_tip(loc_leg)
         else:
@@ -260,6 +260,13 @@ class CalibrationManager:
         self._set_state('ready')
 
     @_require_lock
+    def home_all(self):
+        log.info('Homing via Calibration Manager')
+        self._set_state('moving')
+        self._hardware.home()
+        self._set_state('ready')
+
+    @_require_lock
     def update_container_offset(self, container, instrument):
         inst = instrument._instrument
         log.info('Updating {} in {}'.format(container.name, container.slot))
@@ -274,7 +281,7 @@ class CalibrationManager:
             # relative to the old calibration
             container._container.set_calibration(Point(0, 0, 0))
             if ff.calibrate_to_bottom() and not (
-                                            container._container.is_tiprack):
+                    container._container.is_tiprack):
                 orig = _well0(container._container)._bottom().point
             else:
                 orig = _well0(container._container)._top().point

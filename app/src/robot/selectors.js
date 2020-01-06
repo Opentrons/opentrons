@@ -462,6 +462,12 @@ export function getOffsetUpdateInProgress(state: State): boolean {
   return request.type === 'UPDATE_OFFSET' && request.inProgress
 }
 
+export function getReturnTipInProgress(state: State): boolean {
+  const request = getCalibrationRequest(state)
+
+  return request.type === 'RETURN_TIP' && request.inProgress
+}
+
 // return a tiprack used by the pipette on each mount for calibration processes
 export const getTipracksByMount: (
   state: State
