@@ -122,6 +122,10 @@ If you try to :py:meth:`.InstrumentContext.pick_up_tip()` again when all the tip
     # this will raise an exception if run after the previous code block
     pipette.pick_up_tip()
 
+.. note:
+
+    In API Version 2.0 and 2.1, the returned tip would be picked up by a subsequent ``pick_up_tip()`` call. The above example in versions 2.0 and 2.1 would not iterate through the list of tip racks as described. This bug has been fixed since API version 2.2, so that the next unused tip will be picked up after a tip is returned.
+
 To change the location of the first tip used by the pipette, you can use :py:attr:`.InstrumentContext.starting_tip`:
 
 .. code-block:: python
