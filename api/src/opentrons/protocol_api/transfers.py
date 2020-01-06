@@ -4,6 +4,7 @@ from typing import (Any, Dict, List, Optional, Union, NamedTuple,
                     TYPE_CHECKING)
 from .labware import Well
 from opentrons import types
+from opentrons.protocols.types import APIVersion
 
 if TYPE_CHECKING:
     from .contexts import InstrumentContext  #noqa (F501)
@@ -360,6 +361,7 @@ class TransferPlan:
                  dests,
                  instr: 'InstrumentContext',
                  max_volume: float,
+                 api_version: APIVersion,
                  mode: Optional[str] = None,
                  options: Optional[TransferOptions] = None
                  ) -> None:
@@ -370,6 +372,7 @@ class TransferPlan:
         :py:meth:`.InstrumentContext.transfer`.
         """
         self._instr = instr
+        self._api_version = api_version
         # Convert sources & dests into proper format
         # CASES:
         # i. if using multi-channel pipette,
@@ -818,12 +821,15 @@ class TransferPlan:
         else:
             test_well = well
 
-        # Allow the first 2 rows to be accessible to 384-well plates;
-        # otherwise, only the first row is accessible
-        if test_well.parent.parameters['format'] == '384Standard':
-            valid_wells = [
-                well for row in test_well.parent.rows()[:2]
-                for well in row]
-            return test_well in valid_wells
-        else:
+        if self._api_version < APIVersion(2, 2):
             return test_well in test_well.parent.rows()[0]
+        else:
+            # Allow the first 2 rows to be accessible to 384-well plates;
+            # otherwise, only the first row is accessible
+            if test_well.parent.parameters['format'] == '384Standard':
+                valid_wells = [
+                    well for row in test_well.parent.rows()[:2]
+                    for well in row]
+                return test_well in valid_wells
+            else:
+                return test_well in test_well.parent.rows()[0]

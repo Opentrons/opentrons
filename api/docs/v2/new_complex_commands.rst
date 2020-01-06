@@ -136,6 +136,8 @@ When you are using a multi-channel pipette, you can transfer the entire column (
 
     pipette.transfer(100, plate.wells_by_name()['A1'], plate.wells_by_name()['A2'])
 
+.. versionadded:: 2.2
+
 .. note::
 
     There is a limited number of rows your multi-channel pipettes can access in a plate during transfer, distribute and consoldiate. Multi pipettes can only access the wells in the first row (wells A1 - A12) of a 96-well plate, and the first two rows (wells A1 - B24) for a 384-well plate. Wells specified outside of the limit will be ignored.
