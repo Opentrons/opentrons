@@ -6,6 +6,7 @@ import { selectors as uiModulesSelectors } from '../../modules'
 
 import {
   getNextDefaultPipetteId,
+  getNextDefaultMagnetAction,
   handleFormChange,
 } from '../../../steplist/formLevel'
 import type { StepIdType, StepType } from '../../../form-types'
@@ -120,7 +121,11 @@ export const selectStep = (
   // auto-select magnetic module if it exists (assumes no more than 1 magnetic module)
   if (newStepType === 'magnet') {
     const moduleId = uiModulesSelectors.getSingleMagneticModuleId(state)
-    formData = { ...formData, moduleId }
+    const magnetAction = getNextDefaultMagnetAction(
+      stepFormSelectors.getSavedStepForms(state),
+      stepFormSelectors.getOrderedStepIds(state)
+    )
+    formData = { ...formData, moduleId, magnetAction }
   }
 
   dispatch({
