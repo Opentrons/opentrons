@@ -47,10 +47,18 @@ function TemperatureForm(props: TemperatureFormProps): React.Element<'div'> {
             options={moduleLabwareOptions}
           />
         </FormGroup>
-        {/* TODO (ka 2019-12-20): Only render form for temperature modules at the moment */}
+        {/* TODO (ka 2020-1-6):
+          moduleID dropdown will autoselect when creating a new step,
+          but this will not be the case when returning to a never saved form.
+          Rather than defaulting to one or the other when null,
+          display a message (copy, design, etc TBD) that you need to select a module to continue
+        */}
+        <ConditionalOnField name={'moduleId'} condition={val => val === null}>
+          <p>Please select a module for this temperature step.</p>
+        </ConditionalOnField>
         <ConditionalOnField
           name={'moduleId'}
-          condition={val => val === temperatureModuleId}
+          condition={val => val === temperatureModuleId && val != null}
         >
           <div className={styles.checkbox_row}>
             <RadioGroupField
@@ -95,7 +103,7 @@ function TemperatureForm(props: TemperatureFormProps): React.Element<'div'> {
         {/* TODO (ka 2019-12-20): Implement thermocycler set temp form */}
         <ConditionalOnField
           name={'moduleId'}
-          condition={value => value === thermocyclerModuleId}
+          condition={value => value === thermocyclerModuleId && value != null}
         >
           TODO: Thermocycler set temperature form not implemented
         </ConditionalOnField>
