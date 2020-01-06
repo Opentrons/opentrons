@@ -11,6 +11,7 @@ import { ListItem, HoverTooltip } from '@opentrons/components'
 import styles from './styles.css'
 
 import type { Labware } from '../../robot'
+import { THERMOCYCLER } from '../../modules'
 
 type LabwareListItemProps = {|
   ...$Exact<Labware>,
@@ -37,7 +38,7 @@ export default function LabwareListItem(props: LabwareListItemProps) {
   const iconName = confirmed ? 'check-circle' : 'checkbox-blank-circle-outline'
   const displayName = definition ? getLabwareDisplayName(definition) : type
   let displaySlot = `Slot ${slot}`
-  if (moduleName === 'thermocycler') {
+  if (moduleName === THERMOCYCLER) {
     displaySlot = 'Slots 7, 8, 10, & 11'
   }
   const moduleDisplayName = moduleName && getModuleDisplayName(moduleName)

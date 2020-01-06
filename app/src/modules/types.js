@@ -1,6 +1,7 @@
 // @flow
 
 import type { RobotApiRequestMeta } from '../robot-api/types'
+import typeof { MAGDECK, TEMPDECK, THERMOCYCLER } from './constants'
 
 // common types
 
@@ -55,21 +56,21 @@ export type MagneticStatus = 'engaged' | 'disengaged'
 
 export type TemperatureModule = {|
   ...BaseModule,
-  name: 'tempdeck',
+  name: TEMPDECK,
   data: TemperatureData,
   status: TemperatureStatus,
 |}
 
 export type MagneticModule = {|
   ...BaseModule,
-  name: 'magdeck',
+  name: MAGDECK,
   data: MagneticData,
   status: MagneticStatus,
 |}
 
 export type ThermocyclerModule = {|
   ...BaseModule,
-  name: 'thermocycler',
+  name: THERMOCYCLER,
   data: ThermocyclerData,
   status: ThermocyclerStatus,
 |}

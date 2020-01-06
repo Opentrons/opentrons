@@ -12,3 +12,9 @@ export const SLOT_RENDER_HEIGHT = SLOT_WIDTH_MM // along Y axis in SVG coords
 export const FIXED_TRASH_RENDER_HEIGHT = 165.86 // along Y axis in SVG coords
 
 export const OPENTRONS_LABWARE_NAMESPACE = 'opentrons'
+
+export const THERMOCYCLER: 'thermocycler' = 'thermocycler'
+
+export const TEMPDECK: 'tempdeck' = 'tempdeck'
+
+export const MAGDECK: 'magdeck' = 'magdeck'

@@ -1,20 +1,15 @@
 // @flow
+import { THERMOCYCLER } from '@opentrons/shared-data'
 
 // common constants
 
-export const THERMOCYCLER: 'thermocycler' = 'thermocycler'
-
-export const TEMPDECK: 'tempdeck' = 'tempdeck'
-
-export const MAGDECK: 'magdeck' = 'magdeck'
-
 export const PREPARABLE_MODULES = [THERMOCYCLER]
+
+export { MAGDECK, TEMPDECK, THERMOCYCLER } from '@opentrons/shared-data'
 
 // http paths
 
 export const MODULES_PATH: '/modules' = '/modules'
-
-// action type strings
 
 // fetch modules
 

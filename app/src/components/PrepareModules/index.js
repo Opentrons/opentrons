@@ -8,11 +8,10 @@ import {
   Icon,
 } from '@opentrons/components'
 
-import { sendModuleCommand } from '../../modules'
+import { THERMOCYCLER, sendModuleCommand } from '../../modules'
 import DeckMap from '../DeckMap'
 import styles from './styles.css'
 import { Portal } from '../portal'
-
 import type { Dispatch } from '../../types'
 import type { AttachedModule } from '../../modules/types'
 
@@ -36,7 +35,7 @@ export function PrepareModules(props: Props) {
 
   const handleOpenLidClick = () => {
     modules
-      .filter(mod => mod.name === 'thermocycler')
+      .filter(mod => mod.name === THERMOCYCLER)
       .forEach(mod =>
         dispatch(sendModuleCommand(robotName, mod.serial, 'open'))
       )

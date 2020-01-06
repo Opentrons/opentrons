@@ -6,8 +6,8 @@ import { ModuleInfo } from './ModuleInfo'
 import { ModuleUpdate } from './ModuleUpdate'
 import { ModuleControls } from '../ModuleControls'
 import styles from './styles.css'
-
 import type { AttachedModule } from '../../modules/types'
+import { TEMPDECK, THERMOCYCLER } from '../../modules'
 
 type Props = {|
   module: AttachedModule,
@@ -25,7 +25,7 @@ export function ModuleItem(props: Props) {
         <ModuleInfo module={module} />
         <ModuleUpdate availableUpdate={props.availableUpdate} />
       </div>
-      {(module.name === 'thermocycler' || module.name === 'tempdeck') && (
+      {(module.name === THERMOCYCLER || module.name === TEMPDECK) && (
         <ModuleControls module={module} canControl={canControl} />
       )}
     </div>
