@@ -6,6 +6,7 @@ import last from 'lodash/last'
 import {
   SUCCESS,
   FAILURE,
+  PENDING,
   useDispatchApiRequest,
   getRequestById,
 } from '../../robot-api'
@@ -17,9 +18,9 @@ import {
 import { getConfig } from '../../config'
 
 import { ScrollableAlertModal } from '../modals'
-import ConfigMessage from './ConfigMessage'
-import ConfigForm from './ConfigForm'
-import ConfigErrorBanner from './ConfigErrorBanner'
+import { ConfigMessage } from './ConfigMessage'
+import { ConfigForm } from './ConfigForm'
+import { ConfigErrorBanner } from './ConfigErrorBanner'
 
 import type { State } from '../../types'
 
@@ -84,6 +85,7 @@ export function ConfigurePipette(props: Props) {
       {settings && (
         <ConfigForm
           settings={settings}
+          updateInProgress={updateRequest?.status === PENDING}
           updateSettings={updateSettings}
           closeModal={closeModal}
           __showHiddenFields={__showHiddenFields}

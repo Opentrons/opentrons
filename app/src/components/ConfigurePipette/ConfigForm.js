@@ -11,6 +11,7 @@ import omit from 'lodash/omit'
 import set from 'lodash/set'
 import isEmpty from 'lodash/isEmpty'
 
+import { Icon } from '@opentrons/components'
 import FormButtonBar from './FormButtonBar'
 import ConfigFormGroup, {
   FormColumn,
@@ -39,6 +40,7 @@ export type DisplayQuirkFieldProps = {|
 
 type Props = {|
   settings: PipetteSettingsFieldsMap,
+  updateInProgress: boolean,
   updateSettings: (fields: PipetteSettingsFieldsUpdate) => mixed,
   closeModal: () => mixed,
   __showHiddenFields: boolean,
@@ -49,7 +51,7 @@ const POWER_KEYS = ['plungerCurrent', 'pickUpCurrent', 'dropTipCurrent']
 const TIP_KEYS = ['dropTipSpeed', 'pickUpDistance']
 const QUIRK_KEY = 'quirks'
 
-export default class ConfigForm extends React.Component<Props> {
+export class ConfigForm extends React.Component<Props> {
   getFieldsByKey(
     keys: Array<string>,
     fields: PipetteSettingsFieldsMap
@@ -175,7 +177,7 @@ export default class ConfigForm extends React.Component<Props> {
   }
 
   render() {
-    const { closeModal } = this.props
+    const { updateInProgress, closeModal } = this.props
     const fields = this.getVisibleFields()
     const UNKNOWN_KEYS = this.getUnknownKeys()
     const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
@@ -240,9 +242,22 @@ export default class ConfigForm extends React.Component<Props> {
                   {
                     children: 'reset all',
                     onClick: handleReset,
+                    disabled: updateInProgress,
                   },
-                  { children: 'cancel', onClick: closeModal },
-                  { children: 'save', type: 'submit', disabled: disableSubmit },
+                  {
+                    children: 'cancel',
+                    onClick: closeModal,
+                    disabled: updateInProgress,
+                  },
+                  {
+                    type: 'submit',
+                    disabled: disableSubmit || updateInProgress,
+                    children: updateInProgress ? (
+                      <Icon name="ot-spinner" height="1em" spin />
+                    ) : (
+                      'save'
+                    ),
+                  },
                 ]}
               />
             </Form>
