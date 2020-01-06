@@ -207,6 +207,36 @@ def test_pick_up_and_drop_tip(loop, get_labware_def):
     assert pipette.critical_point() == model_offset
 
 
+def test_return_tip_old_version(loop, get_labware_def):
+    # API version 2.2, a returned tip would be picked up by the
+    # next pick up tip call
+    ctx = papi.ProtocolContext(loop, api_version=APIVersion(2, 1))
+    ctx.home()
+    tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 1)
+    mount = Mount.LEFT
+
+    instr = ctx.load_instrument('p300_single', mount, tip_racks=[tiprack])
+
+    with pytest.raises(TypeError):
+        instr.return_tip()
+
+    pipette: Pipette\
+        = ctx._hw_manager.hardware._attached_instruments[mount]
+
+    target_location = tiprack['A1'].top()
+    instr.pick_up_tip(target_location)
+    assert not tiprack.wells()[0].has_tip
+    assert pipette.has_tip
+
+    instr.return_tip()
+    assert not pipette.has_tip
+    assert tiprack.wells()[0].has_tip
+
+    instr.pick_up_tip()
+    assert pipette.has_tip
+    assert not tiprack.wells()[0].has_tip
+
+
 def test_return_tip(loop, get_labware_def):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
@@ -228,6 +258,11 @@ def test_return_tip(loop, get_labware_def):
 
     instr.return_tip()
     assert not pipette.has_tip
+    assert not tiprack.wells()[0].has_tip
+
+    instr.pick_up_tip()
+    assert pipette.has_tip
+    assert not tiprack.wells()[1].has_tip
 
 
 def test_use_filter_tips(loop, get_labware_def):
