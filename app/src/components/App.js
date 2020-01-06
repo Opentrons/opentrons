@@ -1,6 +1,11 @@
 import React from 'react'
 import { Switch, Route, Redirect } from 'react-router-dom'
 
+// TODO(mc, 2020-01-06): move typeface import to global CSS once postcss
+// can be modified to behave properly with it
+import 'typeface-open-sans'
+import './App.global.css'
+
 import NavBar from './nav-bar'
 
 import { PageWrapper } from '../components/Page'
@@ -11,8 +16,6 @@ import Upload from '../pages/Upload'
 import Calibrate from '../pages/Calibrate'
 import Run from '../pages/Run'
 import { PortalRoot as ModalPortalRoot } from './portal'
-
-import './App.global.css'
 import styles from './App.css'
 
 export default function App() {
