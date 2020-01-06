@@ -28,12 +28,25 @@ const labwareTestProtocol = ({
   return `import json
 from opentrons import protocol_api, types
 
-CALIBRATION_CROSS_COORDS = types.Location(
-    point=types.Point(x=380.87, y=9.0, z=0.0),
-    labware=None
-)
-CALIBRATION_CROSS_SLOT = '3'
-TEST_LABWARE_SLOT = CALIBRATION_CROSS_SLOT
+CALIBRATION_CROSS_COORDS = {
+    '1': {
+        'x': 12.13,
+        'y': 9.0,
+        'z': 0.0
+    },
+    '3': {
+        'x': 380.87,
+        'y': 9.0,
+        'z': 0.0
+    },
+    '7': {
+        'x': 12.13,
+        'y': 258.0,
+        'z': 0.0
+    }
+}
+CALIBRATION_CROSS_SLOTS = ['1', '3', '7']
+TEST_LABWARE_SLOT = '3'
 
 RATE = 0.25  # % of default speeds
 SLOWER_RATE = 0.1
@@ -92,9 +105,14 @@ def run(protocol: protocol_api.ProtocolContext):
             instr.default_speed = speed_max
 
     set_speeds(RATE)
-    pipette.move_to(CALIBRATION_CROSS_COORDS)
-    protocol.pause(
-        f"Confirm {PIPETTE_MOUNT} pipette is at slot {CALIBRATION_CROSS_SLOT} calibration cross")
+
+    for slot in CALIBRATION_CROSS_SLOTS:
+        coordinate = CALIBRATION_CROSS_COORDS[slot]
+        location = types.Location(point=types.Point(**coordinate),
+                                  labware=None)
+        pipette.move_to(location)
+        protocol.pause(
+            f"Confirm {PIPETTE_MOUNT} pipette is at slot {slot} calibration cross")
 
     pipette.home()
     protocol.pause(f"Place your labware in Slot {TEST_LABWARE_SLOT}")

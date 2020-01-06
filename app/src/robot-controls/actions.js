@@ -95,6 +95,36 @@ export const homeFailure = (
   meta,
 })
 
+export const move = (
+  robotName: string,
+  position: Types.MovePosition,
+  mount: Mount,
+  disengageMotors: boolean = false
+): Types.MoveAction => ({
+  type: Constants.MOVE,
+  payload: { robotName, mount, position, disengageMotors },
+  meta: {},
+})
+
+export const moveSuccess = (
+  robotName: string,
+  meta: RobotApiRequestMeta
+): Types.MoveSuccessAction => ({
+  type: Constants.MOVE_SUCCESS,
+  payload: { robotName },
+  meta,
+})
+
+export const moveFailure = (
+  robotName: string,
+  error: {| message: string |},
+  meta: RobotApiRequestMeta
+): Types.MoveFailureAction => ({
+  type: Constants.MOVE_FAILURE,
+  payload: { robotName, error },
+  meta,
+})
+
 export const clearMovementStatus = (
   robotName: string
 ): Types.ClearMovementStatusAction => ({

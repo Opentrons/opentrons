@@ -3,13 +3,12 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 
 import {
-  useSendModuleCommand,
-  getAttachedModulesForConnectedRobot,
   THERMOCYCLER,
   TEMPDECK,
   MAGDECK,
+  useSendModuleCommand,
+  getAttachedModulesForConnectedRobot,
 } from '../../modules'
-
 import { selectors as robotSelectors } from '../../robot'
 import { TempDeckCard } from './TempDeckCard'
 import { MagDeckCard } from './MagDeckCard'

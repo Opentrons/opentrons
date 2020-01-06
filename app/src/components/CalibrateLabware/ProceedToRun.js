@@ -11,6 +11,7 @@ import type { Dispatch } from '../../types'
 import pcrSealSrc from '../../img/place_pcr_seal.png'
 import { Portal } from '../portal'
 import styles from './styles.css'
+import { THERMOCYCLER } from '../../modules'
 
 type Props = {|
   returnTip: () => mixed,
@@ -24,7 +25,7 @@ function InfoBoxButton(props: Props) {
   const [runPrepModalOpen, setRunPrepModalOpen] = useState(false)
 
   useEffect(() => {
-    if (some(sessionModules, mod => mod.name === 'thermocycler')) {
+    if (some(sessionModules, mod => mod.name === THERMOCYCLER)) {
       setMustPrepForRun(true)
     }
   }, [sessionModules])

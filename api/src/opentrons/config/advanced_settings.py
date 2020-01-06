@@ -64,6 +64,11 @@ settings = [
                     ' robots that do not have crosses etched on the deck'
     ),
     Setting(
+        _id='useProtocolApi2',
+        title='Use Protocol API version 2',
+        description='Deprecated feature flag'
+    ),
+    Setting(
         _id='disableHomeOnBoot',
         old_id='disable-home-on-boot',
         title='Disable home on boot',
@@ -71,12 +76,11 @@ settings = [
     ),
     Setting(
         _id='useOldAspirationFunctions',
-        title='Use older pipette calibrations',
-        description='Use the older pipette calibrations for P10S, P10M, P50S,'
-                    ' P50M, and P300S pipettes. Note this will cause the '
-                    ' default aspirate behavior (ul to mm conversion) to '
-                    ' function as it did prior to version 3.7.0. '
-                    ' NOTE: this does not impact GEN2 pipettes'
+        title='Use older aspirate behavior',
+        description='Aspirate with the less accurate volumetric calibrations'
+                    ' that were used before version 3.7.0. Use this if you'
+                    ' need consistency with pre-v3.7.0 results. This only'
+                    ' affects GEN1 P10S, P10M, P50S, P50M, and P300S pipettes.'
     )
 ]
 
@@ -218,6 +222,7 @@ def _migrate2to3(previous: SettingsMap) -> SettingsMap:
     """
     newmap = {k: v for k, v in previous.items()}
     newmap['enableApi1BackCompat'] = None
+    newmap['useProtocolApi2'] = None
     return newmap
 
 

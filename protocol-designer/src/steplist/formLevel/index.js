@@ -29,6 +29,7 @@ export { default as getDefaultsForStepType } from './getDefaultsForStepType'
 export { default as getDisabledFields } from './getDisabledFields'
 export { default as getNextDefaultPipetteId } from './getNextDefaultPipetteId'
 export { getNextDefaultTemperatureModuleId } from './getNextDefaultModuleId'
+export { getNextDefaultMagnetAction } from './getNextDefaultMagnetAction'
 export { default as stepFormToArgs } from './stepFormToArgs'
 
 type FormHelpers = {
