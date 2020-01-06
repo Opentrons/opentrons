@@ -305,4 +305,3 @@ class CalibrationManager:
         self._hardware._use_safest_height = (self.state in
                                              ['probing', 'moving'])
         self._broker.publish(CalibrationManager.TOPIC, self._snapshot())
-
