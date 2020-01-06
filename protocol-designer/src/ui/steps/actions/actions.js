@@ -6,6 +6,7 @@ import { selectors as uiModulesSelectors } from '../../modules'
 
 import {
   getNextDefaultPipetteId,
+  getNextDefaultTemperatureModuleId,
   getNextDefaultMagnetAction,
   handleFormChange,
 } from '../../../steplist/formLevel'
@@ -126,6 +127,15 @@ export const selectStep = (
       stepFormSelectors.getOrderedStepIds(state)
     )
     formData = { ...formData, moduleId, magnetAction }
+  }
+
+  if (newStepType === 'temperature') {
+    const moduleId = getNextDefaultTemperatureModuleId(
+      stepFormSelectors.getSavedStepForms(state),
+      stepFormSelectors.getOrderedStepIds(state),
+      stepFormSelectors.getInitialDeckSetup(state).modules
+    )
+    formData = { ...formData, moduleId }
   }
 
   dispatch({
