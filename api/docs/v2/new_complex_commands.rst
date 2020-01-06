@@ -136,11 +136,13 @@ When you are using a multi-channel pipette, you can transfer the entire column (
 
     pipette.transfer(100, plate.wells_by_name()['A1'], plate.wells_by_name()['A2'])
 
-.. versionadded:: 2.2
+.. note::
+        
+        In API Versions 2.0 and 2.1, multichannel pipettes could only access the first row of a 384 well plate, and access to the second row would be ignored. If you need to transfer from all wells of a 384-well plate, please make sure to use API Version 2.2
 
 .. note::
 
-    There is a limited number of rows your multi-channel pipettes can access in a plate during transfer, distribute and consoldiate. Multi pipettes can only access the wells in the first row (wells A1 - A12) of a 96-well plate, and the first two rows (wells A1 - B24) for a 384-well plate. Wells specified outside of the limit will be ignored.
+        Multichannel pipettes can only access a limited number of rows in a plate during `transfer`, `distribute` and `consolidate`: the first row (wells A1 - A12) of a 96-well plate, and (since API Version 2.2) the first two rows (wells A1 - B24) for a 384-well plate. Wells specified outside of the limit will be ignored. 
 
 Transfer commands will automatically create entire series of :py:meth:`.InstrumentContext.aspirate`, :py:meth:`.InstrumentContext.dispense`, and other :py:meth:`.InstrumentContext` commands.
 
