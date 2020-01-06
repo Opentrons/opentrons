@@ -1001,7 +1001,7 @@ def test_multichannel_transfer_locs(loop):
     # no valid source or targets, raise error
     with pytest.raises(RuntimeError):
         assert tx.TransferPlan(
-            100, lw1.rows()[0][1], lw2.rows()[1][1],
+            100, lw1.rows()[0][1], lw2.rows()[2][1],
             instr_multi,
             max_volume=instr_multi.hw_pipette['working_volume'],
             api_version=ctx.api_version)
