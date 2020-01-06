@@ -8,6 +8,7 @@ import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefini
 import { Icon } from '../icons'
 import RobotCoordsForeignDiv from './RobotCoordsForeignDiv'
 import styles from './Module.css'
+import { MAGDECK, TEMPDECK, THERMOCYCLER } from '../constants'
 
 export type Props = {
   /** name of module, eg 'magdeck', 'tempdeck', or 'thermocycler' */
@@ -28,21 +29,21 @@ export default function Module(props: Props) {
   } = deckDef?.locations?.orderedSlots[0]?.boundingBox
 
   switch (props.name) {
-    case 'magdeck': {
+    case MAGDECK: {
       width = 137
       height = 91
       x = -7
       y = 4
       break
     }
-    case 'tempdeck': {
+    case TEMPDECK: {
       width = 196
       height = 91
       x = -66
       y = 4
       break
     }
-    case 'thermocycler': {
+    case THERMOCYCLER: {
       // TODO: BC 2019-07-24 these are taken from snapshots of the cad file, they should
       // be included in the module spec schema and added to the data
       width = 172

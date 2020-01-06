@@ -1,4 +1,7 @@
 // @flow
+// common constants
+
+export { MAGDECK, TEMPDECK, THERMOCYCLER } from '@opentrons/shared-data'
 
 // ========= STYLE ================
 
