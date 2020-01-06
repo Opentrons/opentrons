@@ -47,15 +47,15 @@ export const addStep = (payload: { stepType: StepType }) => (
   const stepNeedsLiquid = ['mix', 'moveLiquid'].includes(payload.stepType)
   const stepMagnetNeedsLabware = ['magnet'].includes(payload.stepType)
   const stepTemperatureNeedsLabware = ['temperature'].includes(payload.stepType)
-  if (stepNeedsLiquid && !deckHasLiquid) {
-    dispatch(tutorialActions.addHint('add_liquids_and_labware'))
-  }
-  if (
+  const stepModuleMissingLabware =
     (stepMagnetNeedsLabware && !magnetModuleHasLabware) ||
     (stepTemperatureNeedsLabware &&
       ((temperatureModuleOnDeck && !temperatureModuleHasLabware) ||
         (thermocyclerModuleOnDeck && !thermocyclerModuleHasLabware)))
-  ) {
+  if (stepNeedsLiquid && !deckHasLiquid) {
+    dispatch(tutorialActions.addHint('add_liquids_and_labware'))
+  }
+  if (stepModuleMissingLabware) {
     dispatch(tutorialActions.addHint('module_without_labware'))
   }
   dispatch(selectStep(stepId, stepType))
