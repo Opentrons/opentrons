@@ -136,7 +136,7 @@ export function ChangePipette(props: Props) {
 
   if (wizardStep === CONFIRM) {
     const success =
-      // success if we were trying to detach and nothings attached
+      // success if we were trying to detach and nothing's attached
       (!actualPipette && !wantedPipette) ||
       // or if the names of wanted and attached match
       actualPipette?.name === wantedPipette?.name

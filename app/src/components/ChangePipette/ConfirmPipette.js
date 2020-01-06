@@ -33,8 +33,6 @@ type Props = {|
   exit: () => mixed,
 |}
 
-// note: direction prop is not valid inside this component
-// display messages based on presence of wantedPipette and actualPipette
 export function ConfirmPipette(props: Props) {
   const { title, subtitle, success, attachedWrong, actualPipette, back } = props
 
