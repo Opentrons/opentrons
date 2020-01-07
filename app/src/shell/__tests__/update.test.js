@@ -1,33 +1,32 @@
 // shell/update tests
 
-import * as update from '../update'
-
-const reducer = update.updateReducer
+import * as ShellUpdate from '../update'
+import { shellUpdateReducer } from '../reducer'
 
 describe('shell/update', () => {
   describe('action creators', () => {
     const SPECS = [
       {
         name: 'shell:CHECK_UPDATE',
-        creator: update.checkShellUpdate,
+        creator: ShellUpdate.checkShellUpdate,
         args: [],
         expected: { type: 'shell:CHECK_UPDATE', meta: { shell: true } },
       },
       {
         name: 'shell:DOWNLOAD_UPDATE',
-        creator: update.downloadShellUpdate,
+        creator: ShellUpdate.downloadShellUpdate,
         args: [],
         expected: { type: 'shell:DOWNLOAD_UPDATE', meta: { shell: true } },
       },
       {
         name: 'shell:APPLY_UPDATE',
-        creator: update.applyShellUpdate,
+        creator: ShellUpdate.applyShellUpdate,
         args: [],
         expected: { type: 'shell:APPLY_UPDATE', meta: { shell: true } },
       },
       {
         name: 'shell:SET_UPDATE_SEEN',
-        creator: update.setShellUpdateSeen,
+        creator: ShellUpdate.setShellUpdateSeen,
         args: [],
         expected: { type: 'shell:SET_UPDATE_SEEN' },
       },
@@ -111,7 +110,9 @@ describe('shell/update', () => {
 
     SPECS.forEach(spec => {
       const { name, action, initialState, expected } = spec
-      test(name, () => expect(reducer(initialState, action)).toEqual(expected))
+      test(name, () =>
+        expect(shellUpdateReducer(initialState, action)).toEqual(expected)
+      )
     })
   })
 
@@ -119,7 +120,7 @@ describe('shell/update', () => {
     const SPECS = [
       {
         name: 'getAvailableShellUpdate with nothing available',
-        selector: update.getAvailableShellUpdate,
+        selector: ShellUpdate.getAvailableShellUpdate,
         state: {
           shell: { update: { available: false, info: { version: '1.0.0' } } },
         },
@@ -127,7 +128,7 @@ describe('shell/update', () => {
       },
       {
         name: 'getAvailableShellUpdate with update available',
-        selector: update.getAvailableShellUpdate,
+        selector: ShellUpdate.getAvailableShellUpdate,
         state: {
           shell: { update: { available: true, info: { version: '1.0.0' } } },
         },

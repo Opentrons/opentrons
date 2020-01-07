@@ -17,8 +17,8 @@ import { initializeAnalytics } from './analytics'
 import { initializeSupport, supportMiddleware } from './support'
 import { startDiscovery } from './discovery'
 
-import rootReducer, { history } from './reducer'
-import rootEpic from './epic'
+import { rootReducer, history } from './reducer'
+import { rootEpic } from './epic'
 
 // components
 import App from './components/App'

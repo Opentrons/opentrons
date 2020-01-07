@@ -22,7 +22,7 @@ import {
   getBuildrootRobot,
   getBuildrootSession,
   getRobotSystemType,
-} from '../shell'
+} from '../buildroot'
 
 import { getRobotSettings } from '../robot-settings'
 import { getAttachedPipettes } from '../pipettes'

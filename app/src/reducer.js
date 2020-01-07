@@ -23,6 +23,9 @@ import { robotControlsReducer } from './robot-controls/reducer'
 // robot settings state
 import { robotSettingsReducer } from './robot-settings/reducer'
 
+// robot buildroot update state
+import { buildrootReducer } from './buildroot/reducer'
+
 // pipettes state
 import { pipettesReducer } from './pipettes/reducer'
 
@@ -30,7 +33,7 @@ import { pipettesReducer } from './pipettes/reducer'
 import { modulesReducer } from './modules/reducer'
 
 // app shell state
-import { shellReducer } from './shell'
+import { shellReducer } from './shell/reducer'
 
 // config state
 import { configReducer } from './config'
@@ -49,13 +52,14 @@ import type { State, Action } from './types'
 
 export const history = createHistory()
 
-const rootReducer: Reducer<State, Action> = combineReducers<_, Action>({
+export const rootReducer: Reducer<State, Action> = combineReducers<_, Action>({
   robot: robotReducer,
   superDeprecatedRobotApi: superDeprecatedRobotApiReducer,
   robotApi: robotApiReducer,
   robotAdmin: robotAdminReducer,
   robotControls: robotControlsReducer,
   robotSettings: robotSettingsReducer,
+  buildroot: buildrootReducer,
   pipettes: pipettesReducer,
   modules: modulesReducer,
   config: configReducer,
@@ -65,5 +69,3 @@ const rootReducer: Reducer<State, Action> = combineReducers<_, Action>({
   shell: shellReducer,
   router: connectRouter<_, Action>(history),
 })
-
-export default rootReducer

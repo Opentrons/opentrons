@@ -7,7 +7,7 @@ import { autoUpdater as updater } from 'electron-updater'
 import createLogger from './log'
 import { getConfig } from './config'
 
-import type { UpdateInfo } from '@opentrons/app/src/shell'
+import type { UpdateInfo } from '@opentrons/app/src/shell/types'
 import type { Action, Dispatch, PlainError } from './types'
 
 updater.logger = createLogger('update')

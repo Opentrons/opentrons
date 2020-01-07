@@ -5,7 +5,10 @@ import { usePrevious } from '@opentrons/components'
 import { ProgressSpinner, ProgressBar } from './progress'
 import styles from './styles.css'
 
-import type { BuildrootUpdateSession, RobotSystemType } from '../../../shell'
+import type {
+  BuildrootUpdateSession,
+  RobotSystemType,
+} from '../../../buildroot/types'
 
 type Props = {|
   robotSystemType: RobotSystemType | null,

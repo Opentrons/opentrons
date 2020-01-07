@@ -13,7 +13,7 @@ import {
   clearBuildrootSession,
   getRobotSystemType,
   getBuildrootUpdateAvailable,
-} from '../../../shell'
+} from '../../../buildroot'
 
 import type { Dispatch } from '../../../types'
 import type { ViewableRobot } from '../../../discovery/types'

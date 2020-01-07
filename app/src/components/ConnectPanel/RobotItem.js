@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { withRouter, type ContextRouter } from 'react-router-dom'
 
 import { actions as robotActions } from '../../robot'
-import { getBuildrootUpdateAvailable } from '../../shell'
+import { getBuildrootUpdateAvailable } from '../../buildroot'
 import { RobotListItem } from './RobotListItem.js'
 
 import type { State, Dispatch } from '../../types'

@@ -16,7 +16,7 @@ import type { ReleaseSetUrls, ReleaseSetFilepaths } from './types'
 import type {
   BuildrootUpdateInfo,
   BuildrootAction,
-} from '@opentrons/app/src/shell'
+} from '@opentrons/app/src/buildroot/types'
 
 const log = createLogger('buildroot/index')
 

@@ -2,13 +2,10 @@
 import semver from 'semver'
 import { createSelector } from 'reselect'
 
-import {
-  getViewableRobots,
-  getRobotApiVersion,
-} from '../../discovery/selectors'
+import { getViewableRobots, getRobotApiVersion } from '../discovery/selectors'
 
-import type { State } from '../../types'
-import type { ViewableRobot } from '../../discovery/types'
+import type { State } from '../types'
+import type { ViewableRobot } from '../discovery/types'
 import type {
   BuildrootUpdateInfo,
   BuildrootUpdateSession,
@@ -17,25 +14,25 @@ import type {
 } from './types'
 
 export function getBuildrootUpdateVersion(state: State): string | null {
-  return state.shell.buildroot.version || null
+  return state.buildroot.version || null
 }
 
 export function getBuildrootUpdateInfo(
   state: State
 ): BuildrootUpdateInfo | null {
-  return state.shell.buildroot.info || null
+  return state.buildroot.info || null
 }
 
 export function getBuildrootTargetVersion(state: State): string | null {
   return (
-    state.shell.buildroot.session?.userFileInfo?.version ||
-    state.shell.buildroot.version ||
+    state.buildroot.session?.userFileInfo?.version ||
+    state.buildroot.version ||
     null
   )
 }
 
 export function getBuildrootUpdateSeen(state: State): boolean {
-  return state.shell.buildroot.seen || false
+  return state.buildroot.seen || false
 }
 
 export function getBuildrootUpdateInProgress(
@@ -51,21 +48,21 @@ export function getBuildrootUpdateInProgress(
 }
 
 export function getBuildrootDownloadProgress(state: State): number | null {
-  return state.shell.buildroot.downloadProgress
+  return state.buildroot.downloadProgress
 }
 
 export function getBuildrootDownloadError(state: State): string | null {
-  return state.shell.buildroot.downloadError
+  return state.buildroot.downloadError
 }
 
 export function getBuildrootSession(
   state: State
 ): BuildrootUpdateSession | null {
-  return state.shell.buildroot.session
+  return state.buildroot.session
 }
 
 export function getBuildrootRobotName(state: State): string | null {
-  return state.shell.buildroot.session?.robotName || null
+  return state.buildroot.session?.robotName || null
 }
 
 export const getBuildrootRobot: State => ViewableRobot | null = createSelector(

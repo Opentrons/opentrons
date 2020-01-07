@@ -4,7 +4,7 @@ import createLogger from '../logger'
 import { selectors as robotSelectors } from '../robot'
 import { getConnectedRobot } from '../discovery'
 import * as CustomLabware from '../custom-labware'
-import * as brActions from '../shell/buildroot/actions'
+import * as brActions from '../buildroot/actions'
 import {
   getProtocolAnalyticsData,
   getRobotAnalyticsData,

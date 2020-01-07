@@ -4,6 +4,7 @@ import noop from 'lodash/noop'
 import * as DiscoverySelectors from '../../discovery/selectors'
 import * as PipetteSelectors from '../../pipettes/selectors'
 import * as RobotSelectors from '../../robot/selectors'
+import * as BuildrootSelectors from '../../buildroot/selectors'
 import * as ShellSelectors from '../../shell'
 import * as Selectors from '../selectors'
 
@@ -20,6 +21,7 @@ type SelectorSpec = {|
 
 jest.mock('../../discovery/selectors')
 jest.mock('../../pipettes/selectors')
+jest.mock('../../buildroot/selectors')
 jest.mock('../../shell')
 jest.mock('../../robot/selectors')
 
@@ -40,8 +42,12 @@ const mockGetAvailableShellUpdate: JestMockFn<
 
 const mockGetBuildrootUpdateAvailable: JestMockFn<
   [State, ViewableRobot],
-  $Call<typeof ShellSelectors.getBuildrootUpdateAvailable, State, ViewableRobot>
-> = ShellSelectors.getBuildrootUpdateAvailable
+  $Call<
+    typeof BuildrootSelectors.getBuildrootUpdateAvailable,
+    State,
+    ViewableRobot
+  >
+> = BuildrootSelectors.getBuildrootUpdateAvailable
 
 const mockGetIsRunning: JestMockFn<
   [State],

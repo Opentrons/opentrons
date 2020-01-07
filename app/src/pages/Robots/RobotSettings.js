@@ -14,7 +14,7 @@ import {
   getBuildrootRobot,
   getBuildrootUpdateInProgress,
   getBuildrootUpdateAvailable,
-} from '../../shell'
+} from '../../buildroot'
 
 import { getRobotRestarting } from '../../robot-admin'
 import {
@@ -41,7 +41,7 @@ import ResetRobotModal from '../../components/RobotSettings/ResetRobotModal'
 import type { ContextRouter } from 'react-router-dom'
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
-import type { ShellUpdateState } from '../../shell'
+import type { ShellUpdateState } from '../../shell/types'
 
 type OP = {|
   ...ContextRouter,

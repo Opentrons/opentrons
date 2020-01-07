@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import styles from './styles.css'
-import type { BuildrootUpdateType } from '../../../shell'
+import type { BuildrootUpdateType } from '../../../buildroot/types'
 
 type Props = {|
   updateType: BuildrootUpdateType,

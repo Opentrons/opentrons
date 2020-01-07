@@ -1,5 +1,5 @@
 // @flow
-import type { RobotHost } from '../../robot-api/types'
+import type { RobotHost } from '../robot-api/types'
 import type { BuildrootAction, UpdateSessionStep } from './types'
 
 export const BR_UPDATE_VERSION: 'buildroot:UPDATE_VERSION' =
