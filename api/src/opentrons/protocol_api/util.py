@@ -205,7 +205,7 @@ class HardwareManager:
         return self._current
 
     def set_hw(self, hardware):
-        if (self._is_orig or self._built_own_adapter):
+        if self._current and (self._is_orig or self._built_own_adapter):
             self._current.join()
         if isinstance(hardware, adapters.SynchronousAdapter):
             self._current = hardware
