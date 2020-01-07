@@ -1,13 +1,14 @@
 // @flow
 
 import { robotSettingsReducer } from '../reducer'
+import * as Fixtures from '../__fixtures__'
 
-import type { Action, ActionLike } from '../../types'
+import type { Action } from '../../types'
 import type { RobotSettingsState } from '../types'
 
 type ReducerSpec = {|
   name: string,
-  action: Action | ActionLike,
+  action: Action,
   state: RobotSettingsState,
   expected: RobotSettingsState,
 |}
@@ -15,83 +16,57 @@ type ReducerSpec = {|
 describe('robotSettingsReducer', () => {
   const SPECS: Array<ReducerSpec> = [
     {
-      name: 'handles initial robotApi:RESPONSE for GET /settings',
+      name: 'handles FETCH_SETTINGS_SUCCESS without restart required',
       action: {
-        type: 'robotApi:RESPONSE__GET__/settings',
+        type: 'robotSettings:FETCH_SETTINGS_SUCCESS',
         meta: {},
         payload: {
-          host: { name: 'robotName' },
-          method: 'GET',
-          path: '/settings',
-          body: {
-            settings: [
-              { id: 'foo', title: 'Foo', description: 'foobar', value: true },
-              { id: 'bar', title: 'Bar', description: 'bazqux', value: false },
-            ],
-          },
+          robotName: 'robotName',
+          settings: Fixtures.mockRobotSettings,
+          restartPath: null,
         },
       },
       state: {},
       expected: {
         robotName: {
-          settings: [
-            { id: 'foo', title: 'Foo', description: 'foobar', value: true },
-            { id: 'bar', title: 'Bar', description: 'bazqux', value: false },
-          ],
+          settings: Fixtures.mockRobotSettings,
           restartPath: null,
         },
       },
     },
     {
-      name: 'handles robotApi:RESPONSE for GET /settings with restart required',
+      name: 'handles FETCH_SETTINGS_SUCCESS with restart required',
       action: {
-        type: 'robotApi:RESPONSE__GET__/settings',
+        type: 'robotSettings:FETCH_SETTINGS_SUCCESS',
         meta: {},
         payload: {
-          host: { name: 'robotName' },
-          method: 'GET',
-          path: '/settings',
-          body: {
-            settings: [
-              { id: 'foo', title: 'Foo', description: 'foobar', value: true },
-            ],
-            links: { restart: '/server/restart' },
-          },
+          robotName: 'robotName',
+          settings: Fixtures.mockRobotSettings.slice(0, 1),
+          restartPath: '/server/restart',
         },
       },
       state: {
         robotName: {
-          settings: [
-            { id: 'foo', title: 'Foo', description: 'foobar', value: true },
-            { id: 'bar', title: 'Bar', description: 'bazqux', value: false },
-          ],
+          settings: Fixtures.mockRobotSettings,
           restartPath: null,
         },
       },
       expected: {
         robotName: {
-          settings: [
-            { id: 'foo', title: 'Foo', description: 'foobar', value: true },
-          ],
+          settings: Fixtures.mockRobotSettings.slice(0, 1),
           restartPath: '/server/restart',
         },
       },
     },
     {
-      name: 'handles robotApi:RESPONSE for POST /settings',
+      name: 'handles UPDATE_SETTING_SUCCESS',
       action: {
-        type: 'robotApi:RESPONSE__POST__/settings',
+        type: 'robotSettings:UPDATE_SETTING_SUCCESS',
         meta: {},
         payload: {
-          host: { name: 'robotName' },
-          method: 'POST',
-          path: '/settings',
-          body: {
-            settings: [
-              { id: 'foo', title: 'Foo', description: 'foobar', value: true },
-              { id: 'bar', title: 'Bar', description: 'bazqux', value: false },
-            ],
-          },
+          robotName: 'robotName',
+          settings: Fixtures.mockRobotSettings,
+          restartPath: '/server/restart',
         },
       },
       state: {
@@ -102,63 +77,7 @@ describe('robotSettingsReducer', () => {
       },
       expected: {
         robotName: {
-          settings: [
-            { id: 'foo', title: 'Foo', description: 'foobar', value: true },
-            { id: 'bar', title: 'Bar', description: 'bazqux', value: false },
-          ],
-          restartPath: null,
-        },
-      },
-    },
-    {
-      name:
-        'handles robotApi:RESPONSE for POST /settings where restart is required',
-      action: {
-        type: 'robotApi:RESPONSE__POST__/settings',
-        meta: { settingId: 'baz' },
-        payload: {
-          host: { name: 'robotName' },
-          method: 'POST',
-          path: '/settings',
-          body: {
-            settings: [
-              {
-                id: 'baz',
-                title: 'Baz',
-                description: 'bazqux',
-                value: true,
-                restart_required: true,
-              },
-            ],
-            links: { restart: '/server/restart' },
-          },
-        },
-      },
-      state: {
-        robotName: {
-          settings: [
-            {
-              id: 'baz',
-              title: 'Baz',
-              description: 'bazqux',
-              value: false,
-              restart_required: true,
-            },
-          ],
-          restartPath: null,
-        },
-      },
-      expected: {
-        robotName: {
-          settings: [
-            {
-              id: 'baz',
-              title: 'Baz',
-              description: 'bazqux',
-              value: true,
-              restart_required: true,
-            },
-          ],
+          settings: Fixtures.mockRobotSettings,
           restartPath: '/server/restart',
         },
       },

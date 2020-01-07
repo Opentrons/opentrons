@@ -64,11 +64,7 @@ export type Action =
   | ProtocolAction
   | CustomLabwareAction
 
-export type ActionLike = {| type: string, payload: any, meta: any |}
-
 export type GetState = () => State
-
-export type ActionType = $PropertyType<Action, 'type'>
 
 export type ThunkAction = (Dispatch, GetState) => ?Action
 
@@ -91,6 +87,7 @@ type ThunkDispatch = (thunk: ThunkAction) => ?Action
 
 type ThunkPromiseDispatch = (thunk: ThunkPromiseAction) => Promise<?Action>
 
+// DEPRECATED(mc, 2020-01-06): prefer StrictEpic
 // regular, medium strict epic type
 export type Epic = (
   action$: Observable<Action>,
@@ -98,14 +95,15 @@ export type Epic = (
 ) => Observable<mixed>
 
 // for when you need more strict epic typing
-export type StrictEpic<R: Action> = (
+export type StrictEpic<R: Action = Action> = (
   action$: Observable<Action>,
   state$: Observable<State>
 ) => Observable<R>
 
+// DEPRECATED(mc, 2020-01-06): this was a bad idea
 // for when the strict typing of Action is too much
 export type LooseEpic = (
-  action$: Observable<ActionLike>,
+  action$: Observable<{| type: string, payload: any, meta: any |}>,
   state$: Observable<State>
 ) => Observable<mixed>
 

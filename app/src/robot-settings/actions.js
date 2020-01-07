@@ -1,38 +1,72 @@
 // @flow
-import { GET, POST } from '../robot-api/constants'
+import * as Constants from './constants'
+import * as Types from './types'
 
-import {
-  FETCH_SETTINGS,
-  UPDATE_SETTING,
-  CLEAR_RESTART_PATH,
-  SETTINGS_PATH,
-} from './constants'
+import type { RobotApiRequestMeta } from '../robot-api/types'
 
-import type { RobotHost } from '../robot-api/types'
-import type { RobotSettingsApiAction, ClearRestartPathAction } from './types'
+export const fetchSettings = (
+  robotName: string
+): Types.FetchSettingsAction => ({
+  type: Constants.FETCH_SETTINGS,
+  payload: { robotName },
+  meta: {},
+})
 
-export const fetchSettings = (host: RobotHost): RobotSettingsApiAction => ({
-  type: FETCH_SETTINGS,
-  payload: { host, method: GET, path: SETTINGS_PATH },
+export const fetchSettingsSuccess = (
+  robotName: string,
+  settings: Types.RobotSettings,
+  restartPath: string | null,
+  meta: RobotApiRequestMeta
+): Types.FetchSettingsSuccessAction => ({
+  type: Constants.FETCH_SETTINGS_SUCCESS,
+  payload: { robotName, settings, restartPath },
+  meta,
+})
+
+export const fetchSettingsFailure = (
+  robotName: string,
+  error: {| message: string |},
+  meta: RobotApiRequestMeta
+): Types.FetchSettingsFailureAction => ({
+  type: Constants.FETCH_SETTINGS_FAILURE,
+  payload: { robotName, error },
+  meta,
 })
 
 export const updateSetting = (
-  host: RobotHost,
+  robotName: string,
   settingId: string,
   value: boolean | null
-): RobotSettingsApiAction => ({
-  type: UPDATE_SETTING,
-  payload: {
-    host,
-    method: POST,
-    path: SETTINGS_PATH,
-    body: { id: settingId, value },
-  },
+): Types.UpdateSettingAction => ({
+  type: Constants.UPDATE_SETTING,
+  payload: { robotName, settingId, value },
+  meta: {},
+})
+
+export const updateSettingSuccess = (
+  robotName: string,
+  settings: Types.RobotSettings,
+  restartPath: string | null,
+  meta: RobotApiRequestMeta
+): Types.UpdateSettingSuccessAction => ({
+  type: Constants.UPDATE_SETTING_SUCCESS,
+  payload: { robotName, settings, restartPath },
+  meta,
+})
+
+export const updateSettingFailure = (
+  robotName: string,
+  error: {| message: string |},
+  meta: RobotApiRequestMeta
+): Types.UpdateSettingFailureAction => ({
+  type: Constants.UPDATE_SETTING_FAILURE,
+  payload: { robotName, error },
+  meta,
 })
 
 export const clearRestartPath = (
   robotName: string
-): ClearRestartPathAction => ({
-  type: CLEAR_RESTART_PATH,
+): Types.ClearRestartPathAction => ({
+  type: Constants.CLEAR_RESTART_PATH,
   payload: { robotName },
 })

@@ -9,12 +9,11 @@ import { switchMap, catchError } from 'rxjs/operators'
 import { robotApiUrl } from './http'
 
 import type { Observable } from 'rxjs'
-import type { Action, ActionLike } from '../types'
 import type { Method, RobotHost, RobotApiResponse } from './types'
 
-export type RequestMeta = $Shape<{| [string]: mixed |}>
+type RequestMeta = $Shape<{| [string]: mixed |}>
 
-export type RobotApiRequest = {|
+type RobotApiRequest = {|
   host: RobotHost,
   method: Method,
   path: string,
@@ -24,7 +23,7 @@ export type RobotApiRequest = {|
 
 // internal, request lifecycle types
 // only for use inside observables
-export type RobotApiRequestAction = {|
+type RobotApiRequestAction = {|
   type: string,
   payload: RobotApiRequest,
   meta: RequestMeta,
@@ -34,12 +33,6 @@ export type RobotApiResponseAction = {|
   type: string,
   payload: RobotApiResponse,
   meta: RequestMeta,
-|}
-
-export type RobotApiActionLike = {|
-  type: string,
-  payload: RobotApiRequest | RobotApiResponse,
-  meta?: RequestMeta,
 |}
 
 const ROBOT_API_ACTION_PREFIX = 'robotApi'
@@ -65,7 +58,7 @@ const robotApiResponse = (
   meta,
 })
 
-export const robotApiError = (
+const robotApiError = (
   payload: RobotApiResponse,
   meta: RequestMeta
 ): RobotApiResponseAction => ({
@@ -74,23 +67,18 @@ export const robotApiError = (
   meta,
 })
 
-export const passRobotApiAction = (
-  action: Action | ActionLike
-): RobotApiActionLike | null =>
-  action.type.startsWith(ROBOT_API_ACTION_PREFIX) ? (action: any) : null
-
 export const passRobotApiRequestAction = (
-  action: Action | ActionLike
+  action: any
 ): RobotApiRequestAction | null =>
   action.type.startsWith(ROBOT_API_REQUEST_PREFIX) ? (action: any) : null
 
 export const passRobotApiResponseAction = (
-  action: Action | ActionLike
+  action: any
 ): RobotApiResponseAction | null =>
   action.type.startsWith(ROBOT_API_RESPONSE_PREFIX) ? (action: any) : null
 
 export const passRobotApiErrorAction = (
-  action: Action | ActionLike
+  action: any
 ): RobotApiResponseAction | null =>
   action.type.startsWith(ROBOT_API_ERROR_PREFIX) ? (action: any) : null
 
