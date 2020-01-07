@@ -320,6 +320,7 @@ def simulate(protocol_file: TextIO,
            and allow_bundle():
             bundle_contents = bundle_from_sim(
                 protocol, context)
+        context.cleanup()
 
     return scraper.commands, bundle_contents
 
