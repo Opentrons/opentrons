@@ -2,13 +2,18 @@
 import React, { useMemo } from 'react'
 import cx from 'classnames'
 
-import { getModuleDisplayName, type ModuleType } from '@opentrons/shared-data'
+import {
+  getModuleDisplayName,
+  type ModuleType,
+  MAGDECK,
+  TEMPDECK,
+  THERMOCYCLER,
+} from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import { Icon } from '../icons'
 import RobotCoordsForeignDiv from './RobotCoordsForeignDiv'
 import styles from './Module.css'
-import { MAGDECK, TEMPDECK, THERMOCYCLER } from '../constants'
 
 export type Props = {
   /** name of module, eg 'magdeck', 'tempdeck', or 'thermocycler' */
