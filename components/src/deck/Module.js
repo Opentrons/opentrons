@@ -2,7 +2,13 @@
 import React, { useMemo } from 'react'
 import cx from 'classnames'
 
-import { getModuleDisplayName, type ModuleType } from '@opentrons/shared-data'
+import {
+  getModuleDisplayName,
+  type ModuleType,
+  MAGDECK,
+  TEMPDECK,
+  THERMOCYCLER,
+} from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import { Icon } from '../icons'
@@ -28,21 +34,21 @@ export default function Module(props: Props) {
   } = deckDef?.locations?.orderedSlots[0]?.boundingBox
 
   switch (props.name) {
-    case 'magdeck': {
+    case MAGDECK: {
       width = 137
       height = 91
       x = -7
       y = 4
       break
     }
-    case 'tempdeck': {
+    case TEMPDECK: {
       width = 196
       height = 91
       x = -66
       y = 4
       break
     }
-    case 'thermocycler': {
+    case THERMOCYCLER: {
       // TODO: BC 2019-07-24 these are taken from snapshots of the cad file, they should
       // be included in the module spec schema and added to the data
       width = 172
