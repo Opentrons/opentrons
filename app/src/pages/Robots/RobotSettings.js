@@ -16,8 +16,13 @@ import {
   getBuildrootUpdateAvailable,
 } from '../../shell'
 
-import { makeGetRobotHome, clearHomeResponse } from '../../http-api-client'
 import { getRobotRestarting } from '../../robot-admin'
+import {
+  getMovementStatus,
+  getMovementError,
+  clearMovementStatus,
+  HOMING,
+} from '../../robot-controls'
 import { getRobotRestartRequired } from '../../robot-settings'
 
 import { SpinnerModalPage } from '@opentrons/components'
@@ -34,7 +39,7 @@ import RestartRequiredBanner from '../../components/RobotSettings/RestartRequire
 import ResetRobotModal from '../../components/RobotSettings/ResetRobotModal'
 
 import type { ContextRouter } from 'react-router-dom'
-import type { State, Dispatch, Error } from '../../types'
+import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
 import type { ShellUpdateState } from '../../shell'
 
@@ -47,27 +52,24 @@ type OP = {|
 type SP = {|
   showUpdateModal: boolean,
   showConnectAlert: boolean,
-  homeInProgress: ?boolean,
-  homeError: ?Error,
+  homeInProgress: boolean,
+  homeError: string | null,
   updateInProgress: boolean,
   restartRequired: boolean,
   restarting: boolean,
 |}
 
-type DP = {| dispatch: Dispatch |}
-
-type Props = {|
-  ...OP,
-  ...SP,
-  closeHomeAlert?: () => mixed,
+type DP = {|
+  closeHomeAlert: () => mixed,
   closeConnectAlert: () => mixed,
 |}
 
+type Props = {| ...OP, ...DP, ...SP |}
+
 export default withRouter<_, _>(
-  connect<Props, OP, SP, {||}, State, Dispatch>(
-    makeMapStateToProps,
-    null,
-    mergeProps
+  connect<Props, OP, SP, DP, State, Dispatch>(
+    mapStateToProps,
+    mapDispatchToProps
   )(RobotSettingsPage)
 )
 
@@ -90,6 +92,7 @@ function RobotSettingsPage(props: Props) {
     match: { path, url },
   } = props
 
+  const { name: robotName } = robot
   const titleBarProps = { title: robot.displayName }
   const updateUrl = `${url}/${UPDATE_FRAGMENT}`
   const calibrateDeckUrl = `${url}/${CALIBRATE_DECK_FRAGMENT}`
@@ -104,14 +107,12 @@ function RobotSettingsPage(props: Props) {
         {!restarting && !updateInProgress && (
           <>
             {robot.status === REACHABLE && (
-              <ReachableRobotBanner key={robot.name} {...robot} />
+              <ReachableRobotBanner key={robotName} {...robot} />
             )}
             {robot.status === CONNECTABLE && (
               <ConnectBanner {...robot} key={Number(robot.connected)} />
             )}
-            {restartRequired && (
-              <RestartRequiredBanner robotName={robot.name} />
-            )}
+            {restartRequired && <RestartRequiredBanner robotName={robotName} />}
           </>
         )}
 
@@ -137,14 +138,14 @@ function RobotSettingsPage(props: Props) {
 
         <Route
           path={`${path}/${CALIBRATE_DECK_FRAGMENT}`}
-          render={props => <CalibrateDeck robot={robot} parentUrl={url} />}
+          render={() => <CalibrateDeck robot={robot} parentUrl={url} />}
         />
 
         <Route
           path={`${path}/${RESET_FRAGMENT}`}
           render={routeProps => (
             <ResetRobotModal
-              robotName={robot.name}
+              robotName={robotName}
               closeModal={() => routeProps.history.push(url)}
             />
           )}
@@ -174,10 +175,10 @@ function RobotSettingsPage(props: Props) {
                   />
                 )}
 
-                {!!homeError && (
+                {homeError !== null && (
                   <ErrorModal
                     heading="Robot unable to home"
-                    error={homeError}
+                    error={{ name: 'HomeError', message: homeError }}
                     description="Robot was unable to home, please try again."
                     close={closeHomeAlert}
                   />
@@ -195,51 +196,38 @@ function RobotSettingsPage(props: Props) {
   )
 }
 
-function makeMapStateToProps(): (state: State, ownProps: OP) => SP {
-  const getHomeRequest = makeGetRobotHome()
+function mapStateToProps(state: State, ownProps: OP): SP {
+  const { robot } = ownProps
+  const connectRequest = robotSelectors.getConnectRequest(state)
+  const movementStatus = getMovementStatus(state, robot.name)
+  const movementError = getMovementError(state, robot.name)
+  const buildrootUpdateSeen = getBuildrootUpdateSeen(state)
+  const buildrootUpdateType = getBuildrootUpdateAvailable(state, robot)
+  const updateInProgress = getBuildrootUpdateInProgress(state, robot)
+  const currentBrRobot = getBuildrootRobot(state)
 
-  return (state, ownProps) => {
-    const { robot } = ownProps
-    const connectRequest = robotSelectors.getConnectRequest(state)
-    const homeRequest = getHomeRequest(state, robot)
-    const buildrootUpdateSeen = getBuildrootUpdateSeen(state)
-    const buildrootUpdateType = getBuildrootUpdateAvailable(state, robot)
-    const updateInProgress = getBuildrootUpdateInProgress(state, robot)
-    const currentBrRobot = getBuildrootRobot(state)
+  const showUpdateModal =
+    updateInProgress ||
+    (!buildrootUpdateSeen &&
+      buildrootUpdateType === 'upgrade' &&
+      currentBrRobot === null)
 
-    const showUpdateModal =
-      updateInProgress ||
-      (!buildrootUpdateSeen &&
-        buildrootUpdateType === 'upgrade' &&
-        currentBrRobot === null)
-
-    return {
-      updateInProgress,
-      restarting: getRobotRestarting(state, robot.name),
-      restartRequired: getRobotRestartRequired(state, robot.name),
-      showUpdateModal: !!showUpdateModal,
-      homeInProgress: homeRequest && homeRequest.inProgress,
-      homeError: homeRequest && homeRequest.error,
-      showConnectAlert: !connectRequest.inProgress && !!connectRequest.error,
-    }
+  return {
+    updateInProgress,
+    restarting: getRobotRestarting(state, robot.name),
+    restartRequired: getRobotRestartRequired(state, robot.name),
+    showUpdateModal: !!showUpdateModal,
+    homeInProgress: movementStatus === HOMING,
+    homeError: movementError,
+    showConnectAlert: !connectRequest.inProgress && !!connectRequest.error,
   }
 }
 
-function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
+function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   const { robot } = ownProps
-  const { dispatch } = dispatchProps
-  const props = {
-    ...stateProps,
-    ...ownProps,
+
+  return {
     closeConnectAlert: () => dispatch(robotActions.clearConnectResponse()),
+    closeHomeAlert: () => dispatch(clearMovementStatus(robot.name)),
   }
-
-  if (robot) {
-    return {
-      ...props,
-      closeHomeAlert: () => dispatch(clearHomeResponse(robot)),
-    }
-  }
-
-  return props
 }

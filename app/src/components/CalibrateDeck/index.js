@@ -11,8 +11,8 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { chainActions } from '../../util'
 import createLogger from '../../logger'
 
+import { home, ROBOT } from '../../robot-controls'
 import {
-  home,
   startDeckCalibration,
   deckCalibrationCommand,
   clearDeckCalibration,
@@ -185,7 +185,7 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
         chainActions(
           deckCalibrationCommand(robot, { command: 'release' }),
           push(parentUrl),
-          home(robot)
+          home(robot.name, ROBOT)
         )
       ),
     // exit from error modal

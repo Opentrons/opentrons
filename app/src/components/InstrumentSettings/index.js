@@ -6,18 +6,28 @@ import { AttachedPipettesCard } from './AttachedPipettesCard'
 import { AttachedModulesCard } from './AttachedModulesCard'
 import { CardContainer, CardRow } from '../layout'
 
-import type { Robot } from '../../discovery/types'
+import type { Mount } from '../../pipettes/types'
 
-type Props = {| robot: Robot |}
+type Props = {|
+  robotName: string,
+  makeChangePipetteUrl: (mount: Mount) => string,
+  makeConfigurePipetteUrl: (mount: Mount) => string,
+|}
 
-export default function InstrumentSettings(props: Props) {
+export function InstrumentSettings(props: Props) {
+  const { robotName, makeChangePipetteUrl, makeConfigurePipetteUrl } = props
+
   return (
     <CardContainer>
       <CardRow>
-        <AttachedPipettesCard robot={props.robot} />
+        <AttachedPipettesCard
+          robotName={robotName}
+          makeChangeUrl={makeChangePipetteUrl}
+          makeConfigureUrl={makeConfigurePipetteUrl}
+        />
       </CardRow>
       <CardRow>
-        <AttachedModulesCard robotName={props.robot.name} />
+        <AttachedModulesCard robotName={robotName} />
       </CardRow>
     </CardContainer>
   )

@@ -4,8 +4,14 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { push } from 'connected-react-router'
 
-import { home, startDeckCalibration } from '../../http-api-client'
-import { fetchLights, updateLights, getLightsOn } from '../../robot-controls'
+import { startDeckCalibration } from '../../http-api-client'
+import {
+  home,
+  fetchLights,
+  updateLights,
+  getLightsOn,
+  ROBOT,
+} from '../../robot-controls'
 import { restartRobot } from '../../robot-admin'
 import { selectors as robotSelectors } from '../../robot'
 import { CONNECTABLE } from '../../discovery'
@@ -59,7 +65,7 @@ export function ControlsCard(props: Props) {
       <LabeledButton
         label="Home all axes"
         buttonProps={{
-          onClick: () => dispatch(home(robot)),
+          onClick: () => dispatch(home(robotName, ROBOT)),
           disabled: notConnectable || !canControl,
           children: 'Home',
         }}
