@@ -188,46 +188,58 @@ class HardwareManager:
     def __init__(self, hardware):
         if None is hardware:
             self._is_orig = True
+            self._built_own_adapter = True
             self._current = adapters.SynchronousAdapter.build(
                 API.build_hardware_simulator)
         elif isinstance(hardware, adapters.SynchronousAdapter):
             self._is_orig = False
             self._current = hardware
+            self._built_own_adapter = False
         else:
             self._is_orig = False
             self._current = adapters.SynchronousAdapter(hardware)
+            self._built_own_adapter = True
 
     @property
     def hardware(self):
         return self._current
 
     def set_hw(self, hardware):
-        if self._is_orig:
-            self._is_orig = False
+        if self._current and (self._is_orig or self._built_own_adapter):
             self._current.join()
         if isinstance(hardware, adapters.SynchronousAdapter):
             self._current = hardware
+            self._built_own_adapter = False
         elif isinstance(hardware, HardwareAPILike):
             self._current = adapters.SynchronousAdapter(hardware)
+            self._built_own_adapter = True
         else:
             raise TypeError(
                 "hardware should be API or synch adapter but is {}"
                 .format(hardware))
+        self._is_orig = False
         return self._current
 
     def reset_hw(self):
-        if self._is_orig:
+        if self._is_orig or self._built_own_adapter:
             self._current.join()
         self._current = adapters.SynchronousAdapter.build(
             API.build_hardware_simulator)
         self._is_orig = True
+        self._built_own_adapter = True
         return self._current
 
     def __del__(self):
         orig = getattr(self, '_is_orig', False)
         cur = getattr(self, '_current', None)
-        if orig and cur:
+        built_own = getattr(self, '_built_own_adapter')
+        if cur and (orig or built_own):
             cur.join()
+
+    def cleanup(self):
+        """ Call to cleanup attached hardware (if it was created locally) """
+        if self._current and (self._is_orig or self._built_own_adapter):
+            self._current.join()
 
 
 def clamp_value(

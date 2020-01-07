@@ -301,6 +301,7 @@ def execute(protocol_file: TextIO,
                 commands.command_types.COMMAND, emit_runlog)
         context.home()
         execute_apiv2.run_protocol(protocol, context)
+        context.cleanup()
 
 
 def make_runlog_cb():
