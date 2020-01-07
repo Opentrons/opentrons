@@ -699,7 +699,7 @@ function handleReturnTipResponse(
   action: ReturnTipResponseAction
 ): CalibrationState {
   const {
-    calibrationRequest: { mount, slot },
+    calibrationRequest: { mount },
   } = state
   if (!mount) return state
 

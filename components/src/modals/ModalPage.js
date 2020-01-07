@@ -9,7 +9,7 @@ import styles from './modals.css'
 
 type Props = {|
   /** Props for title bar at top of modal page */
-  titleBar: TitleBarProps,
+  titleBar?: TitleBarProps,
   contentsClassName?: string,
   heading?: React.Node,
   children?: React.Node,
