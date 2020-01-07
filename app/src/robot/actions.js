@@ -221,6 +221,7 @@ export type Action =
   | LabwareCalibrationAction
   | CalibrationResponseAction
   | CalibrationFailureAction
+  | ReturnTipAction
   | ReturnTipResponseAction
   | SetJogDistanceAction
   | SessionResponseAction
