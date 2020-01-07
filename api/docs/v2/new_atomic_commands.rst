@@ -76,6 +76,36 @@ To retun the tip to the original location, you can call :py:meth:`.InstrumentCon
     pipette.pick_up_tip(tiprack['A3'])
     pipette.return_tip()
 
+.. note:
+
+    In API Version 2.0 and 2.1, the returned tips are added back into the tip-tracker and thus treated as `unused`. If you make a subsequent call to `pick_up_tip` then the software will treat returned tips as valid locations.
+    In API Version 2.2, returned tips are no longer added back into the tip tracker. This means that returned tips are no longer valid locations and the pipette will not attempt to pick up tips from these locations. 
+
+In API version 2.2 or above:
+
+.. code-block:: python
+
+    tip_rack = protocol.load_labware(
+            'opentrons_96_tiprack_300ul', 1)
+    pipette = protocol.load_instrument(
+        'p300_single_gen2', mount='left', tip_racks=[tip_rack])
+
+    pipette.pick_up_tip() # picks up tip_rack:A1
+    pipette.return_tip()
+    pipette.pick_up_tip() # picks up tip_rack:B1
+
+In API version 2.0 and 2.1:
+
+.. code-block:: python
+
+    tip_rack = protocol.load_labware(
+            'opentrons_96_tiprack_300ul', 1)
+    pipette = protocol.load_instrument(
+        'p300_single_gen2', mount='left', tip_racks=[tip_rack])
+
+    pipette.pick_up_tip() # picks up tip_rack:A1
+    pipette.return_tip()
+    pipette.pick_up_tip() # picks up tip_rack:A1
 
 Iterating Through Tips
 ----------------------
@@ -121,10 +151,6 @@ If you try to :py:meth:`.InstrumentContext.pick_up_tip()` again when all the tip
 
     # this will raise an exception if run after the previous code block
     pipette.pick_up_tip()
-
-.. note:
-
-    In API Version 2.0 and 2.1, the returned tip would be picked up by a subsequent ``pick_up_tip()`` call. The above example in versions 2.0 and 2.1 would not iterate through the list of tip racks as described. This bug has been fixed since API version 2.2, so that the next unused tip will be picked up after a tip is returned.
 
 To change the location of the first tip used by the pipette, you can use :py:attr:`.InstrumentContext.starting_tip`:
 
