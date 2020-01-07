@@ -35,6 +35,6 @@ async def health(request: web.Request) -> web.Response:
 
 
 async def get_openapi_spec(request: web.Request) -> web.Response:
-    spec = json.loads(pkgutil.get_data(
+    spec = json.loads(pkgutil.get_data(  # type: ignore
         'opentrons', 'server/openapi.json'))
     return web.json_response(spec, status=200)
