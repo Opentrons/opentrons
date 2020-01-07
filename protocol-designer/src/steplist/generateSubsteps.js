@@ -224,11 +224,9 @@ function transferLikeSubsteps(args: {|
 
   // Add tips to pipettes, since this is just a "simulation"
   // TODO: Ian 2018-07-31 develop more elegant way to bypass tip handling for simulation/test
-  const robotState = cloneDeep(args.robotState)
-  robotState.tipState.pipettes = mapValues(
-    robotState.tipState.pipettes,
-    () => true
-  )
+  const tipState = cloneDeep(args.robotState.tipState)
+  tipState.pipettes = mapValues(tipState.pipettes, () => true)
+  const initialRobotState = { ...args.robotState, tipState }
   const { pipette: pipetteId } = stepArgs
 
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId]?.spec
@@ -258,7 +256,7 @@ function transferLikeSubsteps(args: {|
     const substepRows: Array<SubstepTimelineFrame> = substepTimeline(
       substepCommandCreator,
       invariantContext,
-      robotState,
+      initialRobotState,
       pipetteSpec.channels
     )
 
@@ -282,7 +280,7 @@ function transferLikeSubsteps(args: {|
     const substepRows = substepTimeline(
       substepCommandCreator,
       invariantContext,
-      robotState,
+      initialRobotState,
       1
     )
 
