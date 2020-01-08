@@ -200,10 +200,41 @@ def test_pick_up_and_drop_tip(loop, get_labware_def):
     new_offset = model_offset - Point(0, 0,
                                       tip_length-overlap)
     assert pipette.critical_point() == new_offset
+    assert pipette.has_tip
 
     instr.drop_tip(target_location)
-    assert tiprack.wells()[0].has_tip
+    assert not pipette.has_tip
     assert pipette.critical_point() == model_offset
+
+
+def test_return_tip_old_version(loop, get_labware_def):
+    # API version 2.2, a returned tip would be picked up by the
+    # next pick up tip call
+    ctx = papi.ProtocolContext(loop, api_version=APIVersion(2, 1))
+    ctx.home()
+    tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 1)
+    mount = Mount.LEFT
+
+    instr = ctx.load_instrument('p300_single', mount, tip_racks=[tiprack])
+
+    with pytest.raises(TypeError):
+        instr.return_tip()
+
+    pipette: Pipette\
+        = ctx._hw_manager.hardware._attached_instruments[mount]
+
+    target_location = tiprack['A1'].top()
+    instr.pick_up_tip(target_location)
+    assert not tiprack.wells()[0].has_tip
+    assert pipette.has_tip
+
+    instr.return_tip()
+    assert not pipette.has_tip
+    assert tiprack.wells()[0].has_tip
+
+    instr.pick_up_tip()
+    assert pipette.has_tip
+    assert not tiprack.wells()[0].has_tip
 
 
 def test_return_tip(loop, get_labware_def):
@@ -227,7 +258,11 @@ def test_return_tip(loop, get_labware_def):
 
     instr.return_tip()
     assert not pipette.has_tip
-    assert tiprack.wells()[0].has_tip
+    assert not tiprack.wells()[0].has_tip
+
+    instr.pick_up_tip()
+    assert pipette.has_tip
+    assert not tiprack.wells()[1].has_tip
 
 
 def test_use_filter_tips(loop, get_labware_def):
@@ -285,7 +320,7 @@ def test_pick_up_tip_no_location(loop, get_labware_def,
 
     # TODO: remove argument and verify once trash container is added
     instr.drop_tip(tiprack1.wells()[0].top())
-    assert tiprack1.wells()[0].has_tip
+    assert not pipette.has_tip
     assert pipette.critical_point() == model_offset
 
     for well in tiprack1.wells():

@@ -1364,8 +1364,9 @@ class InstrumentContext(CommandPublisher):
         self._hw_manager.hardware.drop_tip(self._mount, home_after=home_after)
         cmds.do_publish(self.broker, cmds.drop_tip, self.drop_tip,
                         'after', self, None, self, location=target)
-        if isinstance(target.labware, Well)\
-           and target.labware.parent.is_tiprack:
+        if self.api_version < APIVersion(2, 2) \
+                and isinstance(target.labware, Well) \
+                and target.labware.parent.is_tiprack:
             # If this is a tiprack we can try and add the tip back to the
             # tracker
             try:
