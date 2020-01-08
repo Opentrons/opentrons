@@ -27,7 +27,12 @@ async def health(request: web.Request) -> web.Response:
         'fw_version': fw_version,
         'logs': static_paths,
         'system_version': config.OT_SYSTEM_VERSION,
-        'protocol_api_version': list(max_supported)
+        'protocol_api_version': list(max_supported),
+        'links': {
+            'apiLog': '/logs/api.log',
+            'serialLog': '/logs/serial.log',
+            'apiSpec': '/openapi.json'
+        }
     }
     return web.json_response(
         headers={'Access-Control-Allow-Origin': '*'},

@@ -14,7 +14,12 @@ async def test_health(virtual_smoothie_env, loop, async_client):
         'protocol_api_version':
         list(protocol_api.MAX_SUPPORTED_VERSION)
         if ff.use_protocol_api_v2() else
-        [1, 0]
+        [1, 0],
+        "links": {
+            "apiLog": "/logs/api.log",
+            "serialLog": "/logs/serial.log",
+            "apiSpec": "/openapi.json"
+        }
     })
     resp = await async_client.get('/health')
     text = await resp.text()
