@@ -705,4 +705,60 @@ describe('robot reducer - calibration', () => {
       calibrationRequest: { type: '', inProgress: false, error: null },
     })
   })
+
+  test('handles RETURN_TIP action', () => {
+    const state = {
+      calibration: {
+        calibrationRequest: {
+          type: '',
+          inProgress: false,
+          error: new Error(),
+        },
+      },
+    }
+    const action = {
+      type: actionTypes.RETURN_TIP,
+      payload: { mount: 'left' },
+    }
+
+    expect(reducer(state, action).calibration).toEqual({
+      calibrationRequest: {
+        type: 'RETURN_TIP',
+        inProgress: true,
+        error: null,
+        mount: 'left',
+      },
+    })
+  })
+
+  test('handles RETURN_TIP_RESPONSE action', () => {
+    const state = {
+      calibration: {
+        calibrationRequest: {
+          type: 'RETURN_TIP',
+          inProgress: true,
+          error: null,
+          mount: 'left',
+        },
+        tipOnByMount: {
+          left: true,
+        },
+      },
+    }
+    const action = {
+      type: actionTypes.RETURN_TIP_RESPONSE,
+    }
+
+    expect(reducer(state, action).calibration).toEqual({
+      calibrationRequest: {
+        type: 'RETURN_TIP',
+        inProgress: false,
+        error: null,
+        mount: 'left',
+      },
+      tipOnByMount: {
+        left: false,
+      },
+    })
+  })
 })

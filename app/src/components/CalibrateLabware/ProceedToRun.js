@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { push } from 'connected-react-router'
 import cx from 'classnames'
-import { PrimaryButton, AlertModal, ModalPage } from '@opentrons/components'
+import { PrimaryButton, AlertModal, SpinnerModal } from '@opentrons/components'
 import some from 'lodash/some'
 
 import { selectors as robotSelectors } from '../../robot'
@@ -14,6 +14,8 @@ import { Portal } from '../portal'
 import InProgressContents from './InProgressContents'
 import styles from './styles.css'
 import { THERMOCYCLER } from '../../modules'
+
+const is_homing_message = 'Returning tip and homing robot'
 
 type Props = {|
   returnTip: () => mixed,
@@ -50,17 +52,9 @@ function ProceedToRun(props: Props) {
       </PrimaryButton>
       {runPrepModalOpen && (
         <Portal>
-          {inProgress && (
-            <ModalPage
-              contentsClassName={cx({
-                [styles.modal_contents]: inProgress,
-                [styles.in_progress_contents]: inProgress,
-              })}
-            >
-              <InProgressContents />
-            </ModalPage>
-          )}
-          {!inProgress && (
+          {inProgress ? (
+            <SpinnerModal message={is_homing_message} />
+          ) : (
             <AlertModal
               alertOverlay
               iconName={null}
