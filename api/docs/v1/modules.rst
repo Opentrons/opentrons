@@ -237,7 +237,7 @@ should move the tops of the magnets to level with base of the labware.
 .. note::
     `engage()` and `engage(offset=y)` can only be used for labware that have default heights defined in the api. If your
     labware doesn't yet have a default height definition and your protocol uses either of those methods then you will get
-    an error. Simply use the height parameter to provide a custom height for you labware in such a case.
+    an error. Simply use the ``height`` or ``height_from_base`` parameter to provide a custom height for you labware in such a case.
 
 Disengage
 =========
