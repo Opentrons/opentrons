@@ -1,6 +1,7 @@
 import json
 import pkgutil
 from unittest import mock
+from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
 import opentrons.protocol_api as papi
 from opentrons.types import Point
 
@@ -372,3 +373,5 @@ def test_magdeck_labware_props(loop):
         mod.engage(offset=1)
     mod.engage(height=2)
     assert mod._module._driver.plate_height == 2
+    mod.engage(height_from_base=2)
+    assert mod._module._driver.plate_height == 2 + OFFSET_TO_LABWARE_BOTTOM
