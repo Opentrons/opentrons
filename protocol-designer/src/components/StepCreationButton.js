@@ -3,8 +3,8 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import cx from 'classnames'
 import without from 'lodash/without'
-import i18n from '../localization'
 import { HoverTooltip, PrimaryButton } from '@opentrons/components'
+import i18n from '../localization'
 import { actions as stepsActions } from '../ui/steps'
 import { selectors as featureFlagSelectors } from '../feature-flags'
 import {
@@ -13,6 +13,7 @@ import {
 } from '../step-forms'
 import { stepIconsByType, type StepType } from '../form-types'
 import type { BaseState, ThunkDispatch } from '../types'
+import { MAGDECK, TEMPDECK, THERMOCYCLER } from '../constants'
 import styles from './listButtons.css'
 
 type SP = {|
@@ -116,11 +117,11 @@ const mapSTP = (state: BaseState): SP => {
       moveLiquid: true,
       mix: true,
       pause: true,
-      magnet: getIsModuleOnDeck(modules, 'magdeck'),
+      magnet: getIsModuleOnDeck(modules, MAGDECK),
       temperature:
-        getIsModuleOnDeck(modules, 'tempdeck') ||
-        getIsModuleOnDeck(modules, 'thermocycler'),
-      thermocycler: getIsModuleOnDeck(modules, 'thermocycler'),
+        getIsModuleOnDeck(modules, TEMPDECK) ||
+        getIsModuleOnDeck(modules, THERMOCYCLER),
+      thermocycler: getIsModuleOnDeck(modules, THERMOCYCLER),
     },
   }
 }

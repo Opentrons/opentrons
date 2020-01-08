@@ -1,5 +1,6 @@
 // @flow
 import assert from 'assert'
+import { MAGDECK } from '../../../constants'
 import * as errorCreators from '../../errorCreators'
 import type {
   InvariantContext,
@@ -21,7 +22,7 @@ export const disengageMagnet = (
   }
 
   assert(
-    invariantContext.moduleEntities[module]?.type === 'magdeck',
+    invariantContext.moduleEntities[module]?.type === MAGDECK,
     `expected module ${module} to be magdeck, got ${invariantContext.moduleEntities[module]?.type}`
   )
 

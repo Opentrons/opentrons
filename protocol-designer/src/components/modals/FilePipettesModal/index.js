@@ -13,7 +13,7 @@ import {
   type Mount,
 } from '@opentrons/components'
 import i18n from '../../../localization'
-import { SPAN7_8_10_11_SLOT, THERMO_TYPE } from '../../../constants'
+import { SPAN7_8_10_11_SLOT, THERMOCYCLER } from '../../../constants'
 import StepChangesConfirmModal from '../EditPipettesModal/StepChangesConfirmModal'
 import ModuleFields from './ModuleFields'
 import PipetteFields from './PipetteFields'
@@ -213,7 +213,7 @@ export default class FilePipettesModal extends React.Component<Props, State> {
 
     const visibleModules = this.props.thermocyclerEnabled
       ? this.state.modulesByType
-      : omit(this.state.modulesByType, THERMO_TYPE)
+      : omit(this.state.modulesByType, THERMOCYCLER)
 
     return (
       <React.Fragment>
