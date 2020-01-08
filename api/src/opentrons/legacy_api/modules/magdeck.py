@@ -50,6 +50,8 @@ class MagDeck(commands.CommandPublisher):
         '''
         if 'height' in kwargs:
             height = kwargs.get('height')
+        elif 'height_from_base' in kwargs:
+            height = kwargs.get('height_from_base') + OFFSET_TO_LABWARE_BOTTOM
         else:
             try:
                 height = self.labware.get_children_list()[1].\
@@ -64,9 +66,7 @@ class MagDeck(commands.CommandPublisher):
                         self.labware.get_children_list()[1].get_name()))
             if 'offset' in kwargs:
                 height += kwargs.get('offset')
-            elif 'height_from_base' in kwargs:
-                height = kwargs.get('height_from_base') + \
-                    OFFSET_TO_LABWARE_BOTTOM
+
         if height > MAX_ENGAGE_HEIGHT or height < 0:
             raise ValueError('Invalid engage height. Should be 0 to {}'.format(
                 MAX_ENGAGE_HEIGHT))
