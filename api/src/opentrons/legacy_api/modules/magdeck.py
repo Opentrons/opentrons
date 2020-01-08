@@ -64,7 +64,7 @@ class MagDeck(commands.CommandPublisher):
                         self.labware.get_children_list()[1].get_name()))
             if 'offset' in kwargs:
                 height += kwargs.get('offset')
-            if 'height_from_base' in kwargs:
+            elif 'height_from_base' in kwargs:
                 height = kwargs.get('height_from_base') + \
                     OFFSET_TO_LABWARE_BOTTOM
         if height > MAX_ENGAGE_HEIGHT or height < 0:
