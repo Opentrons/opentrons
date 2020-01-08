@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { push } from 'connected-react-router'
-import cx from 'classnames'
 import { PrimaryButton, AlertModal, SpinnerModal } from '@opentrons/components'
 import some from 'lodash/some'
 
@@ -11,7 +10,6 @@ import { selectors as robotSelectors } from '../../robot'
 import type { Dispatch } from '../../types'
 import pcrSealSrc from '../../img/place_pcr_seal.png'
 import { Portal } from '../portal'
-import InProgressContents from './InProgressContents'
 import styles from './styles.css'
 import { THERMOCYCLER } from '../../modules'
 
