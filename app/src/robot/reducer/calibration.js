@@ -84,6 +84,7 @@ export default function calibrationReducer(
       return INITIAL_STATE
 
     // reset calibration state on robot home
+    case 'robotControls:HOME':
     case 'robot:CLEAR_CALIBRATION_REQUEST':
       return {
         ...state,
