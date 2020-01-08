@@ -2168,7 +2168,10 @@ class MagneticModuleContext(ModuleContext):
 
     @cmds.publish.both(command=cmds.magdeck_engage)
     @requires_version(2, 0)
-    def engage(self, height: float = None, offset: float = None):
+    def engage(self,
+               height: float = None,
+               offset: float = None,
+               labware_base_offset: float = None):
         """ Raise the Magnetic Module's magnets.
 
         The destination of the magnets can be specified in several different
@@ -2191,6 +2194,7 @@ class MagneticModuleContext(ModuleContext):
         :param height: The height to raise the magnets to, in mm from home.
         :param offset: An offset relative to the default height for the labware
                        in mm
+        :param :
         """
         if height:
             dist = height
@@ -2198,6 +2202,8 @@ class MagneticModuleContext(ModuleContext):
             dist = self.labware.magdeck_engage_height
             if offset:
                 dist += offset
+            if labware_base_offset:
+                dist = labware_base_offset + modules.magdeck.PLACEHOLDER_HEIGHT
         else:
             raise ValueError(
                 "Currently loaded labware {} does not have a known engage "

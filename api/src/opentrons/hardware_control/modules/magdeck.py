@@ -6,6 +6,7 @@ from . import update, mod_abc
 
 LABWARE_ENGAGE_HEIGHT = {'biorad-hardshell-96-PCR': 18}    # mm
 MAX_ENGAGE_HEIGHT = 45  # mm from home position
+PLACEHOLDER_HEIGHT = 5
 
 
 class MissingDevicePortError(Exception):

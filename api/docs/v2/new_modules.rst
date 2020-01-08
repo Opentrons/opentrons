@@ -233,6 +233,14 @@ The :py:meth:`.MagneticModuleContext.engage` function raises the magnets to indu
 
         mag_mod.engage(height=18.5)
 
+   - You can also specify the height for the magnet to be raised from the base of the labware:
+
+    .. code-block:: python
+
+       mag_mod.engage(labware_base_offset=13.5)
+
+    .. versionadded:: 2.2
+
 .. note::
 
     Only certain labwares have defined engage heights for the Magnetic
