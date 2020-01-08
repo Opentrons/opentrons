@@ -5,6 +5,7 @@ from opentrons import commands
 LABWARE_ENGAGE_HEIGHT = {
     'biorad-hardshell-96-PCR': 18}  # mm
 MAX_ENGAGE_HEIGHT = 45  # mm from home position
+OFFSET_TO_LABWARE_BOTTOM = 5  # mm from home position
 
 
 class MissingDevicePortError(Exception):
@@ -45,6 +46,7 @@ class MagDeck(commands.CommandPublisher):
             [engage(offset=2)]
         or  a 'height' value specified as mm from magdeck home position
             [engage(height=20)]
+        or a 'height_from_base' specified as mm from the bottom of the labware
         '''
         if 'height' in kwargs:
             height = kwargs.get('height')
@@ -62,6 +64,9 @@ class MagDeck(commands.CommandPublisher):
                         self.labware.get_children_list()[1].get_name()))
             if 'offset' in kwargs:
                 height += kwargs.get('offset')
+            if 'height_from_base' in kwargs:
+                height = kwargs.get('height_from_base') + \
+                    OFFSET_TO_LABWARE_BOTTOM
         if height > MAX_ENGAGE_HEIGHT or height < 0:
             raise ValueError('Invalid engage height. Should be 0 to {}'.format(
                 MAX_ENGAGE_HEIGHT))

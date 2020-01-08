@@ -220,10 +220,24 @@ You can also use a custom height parameter with engage():
 The height should be specified in mm from the magdeck home position (i.e. the position of magnets when power-cycled or
 disengaged)
 
-** Note **
-`engage()` and `engage(offset=y)` can only be used for labware that have default heights defined in the api. If your
-labware doesn't yet have a default height definition and your protocol uses either of those methods then you will get
-an error. Simply use the height parameter to provide a custom height for you labware in such a case.
+You can also move the position of the magnets relative to the base of the labware that is loaded on the module:
+
+.. code-block:: python
+
+    module.engage(height_from_base=7)
+
+The ``height_from_base`` should be specifed in mm from the bottom of the labware. A ``module.engage(height_from_base=0)``
+should move the top of the magnets to level with base of the labware.
+
+.. note::
+
+    There is a +/- 1 mmm variance across magnetic module units, using ``height_from_base=0`` might not be able to get the magnets to completely flush with base of the labware. Please test before carrying out your experiment to ensure the magnets are at the desired height.
+
+
+.. note::
+    `engage()` and `engage(offset=y)` can only be used for labware that have default heights defined in the api. If your
+    labware doesn't yet have a default height definition and your protocol uses either of those methods then you will get
+    an error. Simply use the height parameter to provide a custom height for you labware in such a case.
 
 Disengage
 =========

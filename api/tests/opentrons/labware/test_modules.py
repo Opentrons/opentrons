@@ -108,7 +108,7 @@ def test_run_tempdeck_connected(
 
 
 @pytest.mark.api1_only
-def test_load_correct_engage_height(robot, modules, labware):
+def test_load_correct_engage_height(robot, modules, labware, monkeypatch):
     robot.reset()
     md = modules.load('magdeck', '1')
     test_container = labware.load('biorad_96_wellplate_200ul_pcr',
@@ -116,6 +116,25 @@ def test_load_correct_engage_height(robot, modules, labware):
     assert test_container.magdeck_engage_height() == 18
     assert md.labware.get_children_list()[1].magdeck_engage_height() == \
         test_container.magdeck_engage_height()
+
+
+@pytest.mark.api1_only
+def test_use_correct_engage_height(robot, modules, labware):
+    robot.reset()
+    md = modules.load('magdeck', '1')
+    test_container = labware.load('biorad_96_wellplate_200ul_pcr',
+                                  '1', share=True)
+    md.engage()
+    assert md._height_shadow == test_container.magdeck_engage_height()
+
+    md.engage(height=test_container.magdeck_engage_height())
+    assert md._height_shadow == test_container.magdeck_engage_height()
+
+    md.engage(offset=-test_container.magdeck_engage_height())
+    assert md._height_shadow == 0
+
+    md.engage(height_from_base=10)
+    assert md._height_shadow == 15
 
 
 @pytest.fixture
