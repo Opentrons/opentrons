@@ -13,7 +13,7 @@ import { Portal } from '../portal'
 import styles from './styles.css'
 import { THERMOCYCLER } from '../../modules'
 
-const is_homing_message = 'Returning tip and homing robot'
+const IS_HOMING_MESSAGE = 'Returning tip and homing robot'
 
 type Props = {|
   returnTip: () => mixed,
@@ -51,7 +51,7 @@ function ProceedToRun(props: Props) {
       {runPrepModalOpen && (
         <Portal>
           {inProgress ? (
-            <SpinnerModal message={is_homing_message} />
+            <SpinnerModal message={IS_HOMING_MESSAGE} />
           ) : (
             <AlertModal
               alertOverlay
