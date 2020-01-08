@@ -227,11 +227,11 @@ You can also move the position of the magnets relative to the base of the labwar
     module.engage(height_from_base=7)
 
 The ``height_from_base`` should be specifed in mm from the bottom of the labware. A ``module.engage(height_from_base=0)``
-should move the top of the magnets to level with base of the labware.
+should move the tops of the magnets to level with base of the labware.
 
 .. note::
 
-    There is a +/- 1 mmm variance across magnetic module units, using ``height_from_base=0`` might not be able to get the magnets to completely flush with base of the labware. Please test before carrying out your experiment to ensure the magnets are at the desired height.
+    There is a +/- 1 mmm variance across magnetic module units, using ``height_from_base=0`` might not be able to get the magnets to completely flush with base of the labware. Please test before carrying out your experiment to ensure the desired engage height for your labware.
 
 
 .. note::
