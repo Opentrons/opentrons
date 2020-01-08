@@ -4,6 +4,7 @@
 import mapValues from 'lodash/mapValues'
 
 import type { Action, Error } from '../../types'
+import { HOME } from '../../robot-controls'
 import type { Mount, Slot } from '../types'
 import { actionTypes } from '../actions'
 import type {
@@ -84,7 +85,7 @@ export default function calibrationReducer(
       return INITIAL_STATE
 
     // reset calibration state on robot home
-    case 'robotControls:HOME':
+    case HOME:
     case 'robot:CLEAR_CALIBRATION_REQUEST':
       return {
         ...state,

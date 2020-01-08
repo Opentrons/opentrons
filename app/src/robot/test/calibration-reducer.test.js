@@ -1,4 +1,5 @@
 // calibration reducer tests
+import { HOME } from '../../robot-controls'
 import { robotReducer as reducer, actionTypes } from '../'
 
 const EXPECTED_INITIAL_STATE = {
@@ -679,6 +680,29 @@ describe('robot reducer - calibration', () => {
 
     expect(reducer(state, action).calibration).toEqual({
       confirmedBySlot: { 5: true },
+    })
+  })
+
+  test('handles CLEAR_CALIBRATION_REQUEST and robot home actions', () => {
+    const state = {
+      calibration: {
+        calibrationRequest: {
+          type: 'JOG',
+          inProgress: true,
+          error: null,
+          mount: 'right',
+        },
+      },
+    }
+
+    const clearAction = { type: 'robot:CLEAR_CALIBRATION_REQUEST' }
+    expect(reducer(state, clearAction).calibration).toEqual({
+      calibrationRequest: { type: '', inProgress: false, error: null },
+    })
+
+    const homeAction = { type: HOME }
+    expect(reducer(state, homeAction).calibration).toEqual({
+      calibrationRequest: { type: '', inProgress: false, error: null },
     })
   })
 })
