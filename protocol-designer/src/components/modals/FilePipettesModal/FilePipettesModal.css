@@ -90,6 +90,10 @@
   flex-direction: row;
 }
 
+.hide_thermo {
+  justify-content: flex-start;
+}
+
 .module_form_group {
   width: 30%;
 

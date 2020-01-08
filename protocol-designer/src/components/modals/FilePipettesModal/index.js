@@ -1,6 +1,7 @@
 // @flow
 import assert from 'assert'
 import reduce from 'lodash/reduce'
+import omit from 'lodash/omit'
 import * as React from 'react'
 import cx from 'classnames'
 import { getCrashablePipetteSelected } from '../../../step-forms'
@@ -12,7 +13,7 @@ import {
   type Mount,
 } from '@opentrons/components'
 import i18n from '../../../localization'
-import { SPAN7_8_10_11_SLOT } from '../../../constants'
+import { SPAN7_8_10_11_SLOT, THERMO_TYPE } from '../../../constants'
 import StepChangesConfirmModal from '../EditPipettesModal/StepChangesConfirmModal'
 import ModuleFields from './ModuleFields'
 import PipetteFields from './PipetteFields'
@@ -58,6 +59,7 @@ type Props = {|
     modules: Array<ModuleCreationArgs>,
   |}) => mixed,
   modulesEnabled: ?boolean,
+  thermocyclerEnabled: ?boolean,
 |}
 
 const initialState: State = {
@@ -209,6 +211,10 @@ export default class FilePipettesModal extends React.Component<Props, State> {
       getCrashablePipetteSelected(this.state.pipettesByMount) &&
       this.getCrashableModuleSelected(this.state.modulesByType)
 
+    const visibleModules = this.props.thermocyclerEnabled
+      ? this.state.modulesByType
+      : omit(this.state.modulesByType, THERMO_TYPE)
+
     return (
       <React.Fragment>
         <Modal
@@ -262,7 +268,8 @@ export default class FilePipettesModal extends React.Component<Props, State> {
                       {i18n.t('modal.new_protocol.title.PROTOCOL_MODULES')}
                     </h2>
                     <ModuleFields
-                      values={this.state.modulesByType}
+                      values={visibleModules}
+                      thermocyclerEnabled={this.props.thermocyclerEnabled}
                       onFieldChange={this.handleModuleOnDeckChange}
                     />
                   </div>

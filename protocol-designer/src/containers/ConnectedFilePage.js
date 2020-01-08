@@ -20,6 +20,7 @@ type SP = {|
   formValues: $PropertyType<Props, 'formValues'>,
   _initialDeckSetup: InitialDeckSetup,
   modulesEnabled: ?boolean,
+  thermocyclerEnabled: ?boolean,
   modules: $PropertyType<Props, 'modules'>,
 |}
 
@@ -30,6 +31,7 @@ const mapStateToProps = (state: BaseState): SP => {
     modules: stepFormSelectors.getModulesForEditModulesCard(state),
     _initialDeckSetup: stepFormSelectors.getInitialDeckSetup(state),
     modulesEnabled: featureFlagSelectors.getEnableModules(state),
+    thermocyclerEnabled: featureFlagSelectors.getEnableThermocycler(state),
   }
 }
 

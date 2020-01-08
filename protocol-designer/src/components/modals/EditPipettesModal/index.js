@@ -29,6 +29,7 @@ type SP = {|
   _prevPipettes: { [pipetteId: string]: PipetteOnDeck },
   _orderedStepIds: Array<StepIdType>,
   modulesEnabled: ?boolean,
+  thermocyclerEnabled: ?boolean,
 |}
 
 type OP = {|
@@ -43,6 +44,7 @@ const mapSTP = (state: BaseState): SP => {
     _prevPipettes: stepFormSelectors.getInitialDeckSetup(state).pipettes, // TODO: Ian 2019-01-02 when multi-step editing is supported, don't use initial deck state. Instead, show the pipettes available for the selected step range
     _orderedStepIds: stepFormSelectors.getOrderedStepIds(state),
     modulesEnabled: featureFlagSelectors.getEnableModules(state),
+    thermocyclerEnabled: featureFlagSelectors.getEnableThermocycler(state),
   }
 }
 
