@@ -27,8 +27,6 @@
       "interfaceStatus": {
         "type": "object",
         "description": "Status for this interface",
-        "additionalProperties": false,
-        "required": [],
         "properties": {
           "ipAddress": {
             "description": "The interface IP address with CIDR subnet appended (e.g. 10.0.0.1/24)",
@@ -132,105 +130,102 @@
         }
       },
       "moduleLiveData": {
-        "description": "Module-specific live data",
-        "properties": {
-          "oneOf": [
-            {
-              "type": "object",
-              "description": "Temperature Module live data",
-              "additionalProperties": true,
-              "required": ["currentTemp", "targetTemp"],
-              "properties": {
-                "currentTemp": {
-                  "type": "number",
-                  "description": "The current temperature of the module"
-                },
-                "targetTemp": {
-                  "type": "number",
-                  "description": "The target temperature of the module if any",
-                  "nullable": true
-                }
-              }
-            },
-            {
-              "type": "object",
-              "description": "Magnetic Module live data",
-              "additionalProperties": true,
-              "required": ["engaged", "height"],
-              "properties": {
-                "engaged": {
-                  "description": "Whether the magnets are raised or lowered",
-                  "type": "boolean"
-                },
-                "height": {
-                  "description": "The height of the top of the magnets relative to their home position, in mm",
-                  "type": "number"
-                }
-              }
-            },
-            {
-              "type": "object",
-              "description": "Thermocycler live data",
-              "additionalProperties": true,
-              "required": ["lid", "lidTarget", "lidTemp", "currentTemp", "targetTemp", "holdTime", "rampRate", "currentCycleIndex", "totalCycleCount", "currentStepIndex", "totalStepCount"],
-              "properties": {
-                "lid": {
-                  "description": "The current state of the lid",
-                  "type": "string",
-                  "enum": ["in_between", "open", "closed", "unknown"]
-                },
-                "lidTarget": {
-                  "description": "The target temperature of the lid temperature controller",
-                  "type": "number",
-                  "nullable": true
-                },
-                "lidTemp": {
-                  "description": "The current temperature of the lid",
-                  "type": "number"
-                },
-                "currentTemp": {
-                  "description": "The current temperature of the thermocycler block",
-                  "type": "number"
-                },
-                "targetTemp": {
-                  "description": "The target temperature of the thermocycler block",
-                  "type": "number",
-                  "nullable": true
-                },
-                "holdTime": {
-                  "description": "The time left in the current hold step, if any (in seconds)",
-                  "type": "number",
-                  "nullable": true
-                },
-                "rampRate": {
-                  "description": "The current ramp rate (in degC/s) for the thermocycler block",
-                  "type": "number",
-                  "nullable": true
-                },
-                "currentCycleIndex": {
-                  "description": "The index of the current cycle within the current programmed sequence",
-                  "type": "integer",
-                  "nullable": true
-                },
-                "totalCycleCount": {
-                  "description": "The total number of cycles within the current sequence",
-                  "type": "integer",
-                  "nullable": true
-                },
-                "currentStepIndex": {
-                  "description": "The index of the current step within the current programmed cycle",
-                  "type": "integer",
-                  "nullable": true
-                },
-                "totalStepCount": {
-                  "description": "The total number of steps within the current cycle",
-                  "type": "integer",
-                  "nullable": true
-                }
+        "oneOf": [
+          {
+            "type": "object",
+            "description": "Temperature Module live data",
+            "additionalProperties": true,
+            "required": ["currentTemp", "targetTemp"],
+            "properties": {
+              "currentTemp": {
+                "type": "number",
+                "description": "The current temperature of the module"
+              },
+              "targetTemp": {
+                "type": "number",
+                "description": "The target temperature of the module if any",
+                "nullable": true
               }
             }
-          ]
-        }
+          },
+          {
+            "type": "object",
+            "description": "Magnetic Module live data",
+            "additionalProperties": true,
+            "required": ["engaged", "height"],
+            "properties": {
+              "engaged": {
+                "description": "Whether the magnets are raised or lowered",
+                "type": "boolean"
+              },
+              "height": {
+                "description": "The height of the top of the magnets relative to their home position, in mm",
+                "type": "number"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "Thermocycler live data",
+            "additionalProperties": true,
+            "required": ["lid", "lidTarget", "lidTemp", "currentTemp", "targetTemp", "holdTime", "rampRate", "currentCycleIndex", "totalCycleCount", "currentStepIndex", "totalStepCount"],
+            "properties": {
+              "lid": {
+                "description": "The current state of the lid",
+                "type": "string",
+                "enum": ["in_between", "open", "closed", "unknown"]
+              },
+              "lidTarget": {
+                "description": "The target temperature of the lid temperature controller",
+                "type": "number",
+                "nullable": true
+              },
+              "lidTemp": {
+                "description": "The current temperature of the lid",
+                "type": "number"
+              },
+              "currentTemp": {
+                "description": "The current temperature of the thermocycler block",
+                "type": "number"
+              },
+              "targetTemp": {
+                "description": "The target temperature of the thermocycler block",
+                "type": "number",
+                "nullable": true
+              },
+              "holdTime": {
+                "description": "The time left in the current hold step, if any (in seconds)",
+                "type": "number",
+                "nullable": true
+              },
+              "rampRate": {
+                "description": "The current ramp rate (in degC/s) for the thermocycler block",
+                "type": "number",
+                "nullable": true
+              },
+              "currentCycleIndex": {
+                "description": "The index of the current cycle within the current programmed sequence",
+                "type": "integer",
+                "nullable": true
+              },
+              "totalCycleCount": {
+                "description": "The total number of cycles within the current sequence",
+                "type": "integer",
+                "nullable": true
+              },
+              "currentStepIndex": {
+                "description": "The index of the current step within the current programmed cycle",
+                "type": "integer",
+                "nullable": true
+              },
+              "totalStepCount": {
+                "description": "The total number of steps within the current cycle",
+                "type": "integer",
+                "nullable": true
+              }
+            }
+          }
+        ]
       },
       "attachedPipette": {
         "description": "Pipette (if any) attached to the mount",
@@ -495,7 +490,7 @@
           "fields": {
             "description": "The fields of the pipette settings",
             "type": "object",
-            "patternProperties": {
+            "x-patternProperties": {
               "*": {
                 "description": "A pipette config element identified by the property's name",
                 "type": "object",
@@ -532,7 +527,7 @@
                 "summary": "Pipette config elements that are binary in nature",
                 "description": "Quirks are behavioral changes associated with pipettes. For instance, some models of pipette might need to run their drop tip behavior twice. Specific pipettes have specific valid quirks which can then be enabled or disabled; quirks that are not originally defined as compatible with a specific kind of pipette cannot be added to an incompatible pipette. Because quirks are only defined as compatible for a pipette if they should be on, the default value for all quirks is true.",
                 "type": "object",
-                "pattern": {
+                "x-patternProperties": {
                   "*": {
                     "type": "boolean",
                     "description": "Whether the quirk is enabled or not"
@@ -547,20 +542,16 @@
     "responses": {
       "serverDown": {
         "description": "Error from the reverse proxy indicating the API server is not up",
-        "summary": "If this endpoint is polled before the API server is started in boot (or after it has crashed), you will still be able to connect to the OT-2's reverse proxy but will get a bad gateway error.",
         "content": {
           "text/html": {
-            "description": "A default nginx error page",
             "example": "<html><head><title>502 Bad Gateway</title></head><body><center><h1>502 Bad Gateway</h1></center><hr><center>nginx/1.15.7</center></body></html>"
           }
         }
       },
       "advancedSettings": {
         "description": "A dump of advanced settings and suitable links for next action",
-        "summary": "Returned from anything involving advanced settings, this response has a dump of the settings and values as well as a set of links that indicate next actions to take",
         "content": {
           "application/json": {
-            "description": "The response",
             "schema": {
               "type": "object",
               "required": ["links", "settings"],
@@ -583,7 +574,7 @@
       }
     }
   },
-  "servers": {},
+  "servers": [],
   "tags": [
     {"name": "networking",
      "description": "Controls or queries the OT-2's network connectivity"},
@@ -598,7 +589,7 @@
     {"name": "settings",
      "description": "Operations for viewing or editing robot configuration"}
   ],
-  "security": {},
+  "security": [],
   "externalDocs": {
     "description": "More documentation for the OT-2 is here",
     "url": "https://docs.opentrons.com"
@@ -609,9 +600,10 @@
         "description": "Get an OpenAPI spec (this document)",
         "responses": {
           "200": {
+            "description": "The OpenAPI spec",
             "content": {
               "application/json": {
-                "description": "The OpenAPI spec"
+                "schema": {}
               }
             }
           },
@@ -627,13 +619,6 @@
         "responses": {
           "200": {
             "description": "A set of information about the name and versions.",
-            "headers": {
-              "Access-Control-Allow-Origin": {
-                "allowReserved": true,
-                "schema": "string",
-                "example": "*"
-              }
-            },
             "content": {
               "application/json": {
                 "schema": {
@@ -687,7 +672,7 @@
                   "links": {
                     "apiLog": "/logs/api.log",
                     "serialLog": "/logs/serial.log",
-                    "apiSpec": "/openapi.json"
+                    "apiSpec": "/openapi"
                   }
                 }
               }
@@ -953,6 +938,7 @@
         "description": "Get a list of key files known to the system",
         "responses": {
           "200": {
+            "description": "The list of key files",
             "content": {
               "application/json": {
                 "schema": {
@@ -1190,6 +1176,7 @@
         ],
         "responses": {
           "200": {
+            "description": "A notification that the identification procedure has begun",
             "content": {
               "application/json": {
                 "schema": {"$ref": "#/components/schemas/v1ErrorMessage"},
@@ -1208,6 +1195,7 @@
         "description": "Describe the modules attached to the OT-2",
         "responses": {
           "200": {
+            "description": "A list of all attached modules and the status of each one",
             "content": {
               "application/json": {
                 "schema": {
@@ -1250,10 +1238,7 @@
                             "description": "A human-readable module-specific status",
                             "type": "string"
                           },
-                          "data": {
-                            "description": "Live data from this particular module",
-                            "schema": { "$ref": "#/components/schemas/moduleLiveData" }
-                          }
+                          "data": { "$ref": "#/components/schemas/moduleLiveData" }
                         }
                       }
                     }
@@ -1465,9 +1450,10 @@
         "operationId": "executeModuleCommand",
         "tags": ["control", "modules"],
         "requestBody": {
+          "description": "The serialized module call",
+          "required": true,
           "content": {
             "application/json": {
-              "description": "The serialized module call",
               "schema": {
                 "type": "object",
                 "required": ["command_type"],
@@ -1497,9 +1483,9 @@
         },
         "responses": {
           "200": {
+            "description": "The result of a successful call",
             "content": {
               "application/json": {
-                "description": "Call succeeded",
                 "schema": {
                   "type": "object",
                   "required": ["message", "returnValue"],
@@ -1527,9 +1513,9 @@
             }
           },
           "400": {
+            "description": "Invalid command",
             "content": {
               "application/json": {
-                "description": "Invalid command type",
                 "schema": {
                   "$ref": "#/components/schemas/v1ErrorMessage"
                 },
@@ -1546,9 +1532,9 @@
             }
           },
           "404": {
+            "description": "Invalid module serial specified",
             "content": {
               "application/json": {
-                "description": "Invalid module serial specified",
                 "schema": {
                   "$ref": "#/components/schemas/v1ErrorMessage"
                 }
@@ -1572,6 +1558,7 @@
         "description": "Capture an image from the OT-2's onboard camera and return it",
         "responses": {
           "200": {
+            "description": "The image",
             "content": {
               "image/jpeg": {
                 "schema": {"type": "string", "format": "binary"}
@@ -1579,9 +1566,9 @@
             }
           },
           "500": {
+            "description": "Something went wrong when taking the picture",
             "content": {
               "application/json": {
-                "description": "Something went wrong when taking the picture",
                 "schema": {"$ref": "#/components/schemas/v1ErrorMessage"},
                 "example": {"message": "picture not saved"}
               }
@@ -1607,6 +1594,7 @@
         "summary": "This endpoint lists properties of the pipettes currently attached to the robot like name, model, and mount. It queries a cached value unless the refresh query parameter is set to true, in which case it will actively scan for pipettes. This requires disabling the pipette motors (which is done automatically) and therefore should only be done through user intent",
         "responses": {
           "200": {
+            "description": "Data about the attached pipettes",
             "content": {
               "application/json": {
                 "schema": {
@@ -1649,6 +1637,7 @@
         "tags": ["control"],
         "responses": {
           "200": {
+            "description":" Which motors are engaged",
             "content": {
               "application/json": {
                 "schema": {
@@ -1658,23 +1647,27 @@
                   "properties": {
                     "x": {"type": "object",
                           "additionalProperties": false,
-                          "required": "enabled",
+                          "required": ["enabled"],
                           "properties": {"enabled": {"type": "boolean"}}},
                     "y": {"type": "object",
                           "additionalProperties": false,
-                          "required": "enabled",
+                          "required": ["enabled"],
+                          "properties": {"enabled": {"type": "boolean"}}},
+                    "z": {"type": "object",
+                          "additionalProperties": false,
+                          "required": ["enabled"],
                           "properties": {"enabled": {"type": "boolean"}}},
                     "a": {"type": "object",
                           "additionalProperties": false,
-                          "required": "enabled",
+                          "required": ["enabled"],
                           "properties": {"enabled": {"type": "boolean"}}},
                     "b": {"type": "object",
                           "additionalProperties": false,
-                          "required": "enabled",
+                          "required": ["enabled"],
                           "properties": {"enabled": {"type": "boolean"}}},
                     "c": {"type": "object",
                           "additionalProperties": false,
-                          "required": "enabled",
+                          "required": ["enabled"],
                           "properties": {"enabled": {"type": "boolean"}}}
                   }
                 },
@@ -1700,9 +1693,9 @@
         "tags": ["control"],
         "requestBody": {
           "required": true,
+          "description": "A list of motor axes to disengage",
           "content": {
             "application/json": {
-              "description": "A list of motor axes to disengage",
               "schema": {
                 "type": "array",
                 "items": {
@@ -1744,6 +1737,7 @@
         "tags": ["control"],
         "responses": {
           "200": {
+            "description": "The positions and their names",
             "content": {
               "application/json": {
                 "schema": {
@@ -1810,10 +1804,10 @@
         "description": "Move the robot's gantry to a position (usually to a position retrieved from GET /robot/positions)",
         "tags": ["control"],
         "requestBody": {
+          "description": "Specify the place to move to (as a point) and the thing to move (combining motion target, mount, and model if necessary)",
           "required": true,
           "content": {
             "application/json": {
-              "description": "Specify the place to move to (as a point) and the thing to move (combining motion target, mount, and model if necessary)",
               "schema": {
                 "type": "object",
                 "required": ["target", "point", "mount"],
@@ -1888,10 +1882,10 @@
         "tags": ["control"],
         "description": "Home the robot",
         "requestBody": {
+          "description": "Parameters for the home",
           "required": true,
           "content": {
             "application/json": {
-              "description": "Parameters for the home",
               "schema": {
                 "type": "object",
                 "required": ["target"],
@@ -1996,6 +1990,7 @@
         },
         "responses": {
           "200": {
+            "description": "The new state of the lights",
             "content": {
               "application/json": {
                 "schema": {"$ref": "#/components/schemas/lightState"},
@@ -2036,14 +2031,13 @@
               "dispatch": {
                 "description": "Dispatch deck calibration commands once you have a session",
                 "operationId": "deckCalibrationDispatch",
-                "requestBody": {
-                  "token": "$response.body#/token"
-                }
+                "requestBody": "$response.body#/token"
               }
             },
             "content": {
               "application/json": {
                 "schema": {
+                  "type": "object",
                   "required": ["token", "pipette"],
                   "properties": {
                     "token": {
@@ -2091,9 +2085,7 @@
               "forceBegin": {
                 "description": "Re-request a session and force refresh",
                 "operationId": "deckCalibrationStart",
-                "requestBody": {
-                  "force": true
-                }
+                "requestBody": "{\"force\": true }"
               }
             },
             "content": {
@@ -2113,6 +2105,7 @@
         "tags": ["deckCalibration"],
         "description": "Execute a deck calibration action",
         "requestBody": {
+          "required": true,
           "description": "The operation to execute and any required parameters",
           "content": {
             "application/json": {
@@ -2516,11 +2509,12 @@
     },
     "/settings/robot": {
       "get": {
-        "description": "Get the current robot config. This is currently not schema controlled and changes frequently",
+        "description": "Get the current robot config.",
         "tags": ["settings"],
         "operationId": "getRobotSettings",
         "responses": {
           "200": {
+            "description":" The robot settings, which are currently not schema controlled and may change without warning",
             "content": {
               "application/json": {
                 "schema": {
@@ -2540,12 +2534,12 @@
         "operationId": "getAllPipetteSettings",
         "responses": {
           "200": {
+            "description": "Settings for each pipette, keyed by the pipette ID",
             "content": {
               "application/json": {
-                "description": "Settings for each pipette, keyed by the pipette ID",
                 "schema": {
                   "type": "object",
-                  "pattern": {
+                  "x-patternProperties": {
                     "*": { "$ref": "#/components/schemas/pipetteSettings" }
                   }
                 },
@@ -2607,9 +2601,9 @@
         "operationId": "getSpecificPipetteSettings",
         "responses": {
           "200": {
+            "description": "The settings for this pipette",
             "content": {
               "application/json": {
-                "description": "The pipette settings",
                 "schema": {"$ref": "#/components/schemas/pipetteSettings"},
                 "example": {
                   "info": {

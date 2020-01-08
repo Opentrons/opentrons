@@ -21,6 +21,7 @@ coverage = "==4.4.2"
 mypy = "==0.740"
 colorama = "*"
 typing-extensions = "*"
+openapi-spec-validator = "*"
 
 [packages]
 numpy = "==1.15.1"

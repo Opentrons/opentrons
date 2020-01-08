@@ -31,7 +31,7 @@ async def health(request: web.Request) -> web.Response:
         'links': {
             'apiLog': '/logs/api.log',
             'serialLog': '/logs/serial.log',
-            'apiSpec': '/openapi.json'
+            'apiSpec': '/openapi'
         }
     }
     return web.json_response(
