@@ -1,5 +1,4 @@
 [ignore]
-.*/dist/.*
 .*/test/.*
 .*/coverage/.*
 .*/docs/.*

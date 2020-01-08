@@ -1,4 +1,5 @@
 // @flow
+import { produce } from 'immer'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
@@ -26,7 +27,7 @@ import type {
 } from './actions/types'
 
 export type CollapsedStepsState = { [StepIdType]: boolean }
-
+console.log({ produce }) // TODO IMMEDIATELY
 const collapsedSteps: Reducer<CollapsedStepsState, *> = handleActions(
   {
     ADD_STEP: (state: CollapsedStepsState, action: AddStepAction) => ({
