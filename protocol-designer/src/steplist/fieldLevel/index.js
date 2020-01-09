@@ -11,7 +11,6 @@ import {
   maskToNumber,
   maskToFloat,
   onlyPositiveNumbers,
-  onlyIntegers,
   defaultTo,
   composeMaskers,
   type ValueMasker,
@@ -59,12 +58,7 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     hydrate: getLabwareEntity,
   },
   aspirate_mix_times: {
-    maskValue: composeMaskers(
-      maskToNumber,
-      onlyPositiveNumbers,
-      onlyIntegers,
-      defaultTo(1)
-    ),
+    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers, defaultTo(1)),
     castValue: Number,
   },
   aspirate_mix_volume: {
@@ -83,12 +77,7 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     hydrate: getLabwareEntity,
   },
   dispense_mix_times: {
-    maskValue: composeMaskers(
-      maskToNumber,
-      onlyPositiveNumbers,
-      onlyIntegers,
-      defaultTo(1)
-    ),
+    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers, defaultTo(1)),
     castValue: Number,
   },
   dispense_mix_volume: {
@@ -111,13 +100,13 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     hydrate: getLabwareEntity,
   },
   pauseHour: {
-    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers, onlyIntegers),
+    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers),
   },
   pauseMinute: {
-    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers, onlyIntegers),
+    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers),
   },
   pauseSecond: {
-    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers, onlyIntegers),
+    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers),
   },
   pipette: {
     getErrors: composeErrors(requiredField),
@@ -125,12 +114,7 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   },
   times: {
     getErrors: composeErrors(requiredField),
-    maskValue: composeMaskers(
-      maskToNumber,
-      onlyPositiveNumbers,
-      onlyIntegers,
-      defaultTo(0)
-    ),
+    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers, defaultTo(0)),
     castValue: Number,
   },
   volume: {

@@ -8,22 +8,20 @@ export type ValueCaster = (value: mixed) => mixed
 
 // Mask to number now allows for 0 and negative numbers, for decimals use maskToFloat
 export const maskToNumber = (rawValue: mixed): mixed => {
-  if (!rawValue) return Number(rawValue)
   const rawNumericValue =
     typeof rawValue === 'string'
-      ? rawValue.replace(/[^-0-9]/, '')
+      ? rawValue.replace(/[^-0-9]/g, '')
       : String(rawValue)
   return rawNumericValue
 }
 
-// rawValue.replace(/[\D]+/g, '')
 const DEFAULT_DECIMAL_PLACES = 1
 
 export const maskToFloat = (rawValue: mixed): ?mixed => {
   if (!rawValue) return Number(rawValue)
   const rawNumericValue =
     typeof rawValue === 'string'
-      ? rawValue.replace(/[^-/.0-9]/, '')
+      ? rawValue.replace(/[^-/.0-9]/g, '')
       : String(rawValue)
   const trimRegex = new RegExp(
     `(\\d*[.]{1}\\d{${DEFAULT_DECIMAL_PLACES}})(\\d*)`
