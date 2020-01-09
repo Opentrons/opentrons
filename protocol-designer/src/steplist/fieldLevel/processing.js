@@ -37,7 +37,6 @@ export const maskToFloat = (rawValue: mixed): ?mixed => {
 
 export const onlyPositiveNumbers = (value: mixed) =>
   value !== null && !Number.isNaN(value) && Number(value) >= 0 ? value : null
-// removed onlyIntegers in favor of maskToInteger
 export const defaultTo = (defaultValue: mixed) => (value: mixed) =>
   value === null || Number.isNaN(value) ? defaultValue : value
 
