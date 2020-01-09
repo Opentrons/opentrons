@@ -12,20 +12,20 @@ import {
 } from 'rxjs/operators'
 
 // imported directly to avoid circular dependencies between discovery and shell
-import { getAllRobots, getRobotApiVersion } from '../../discovery/selectors'
+import { getAllRobots, getRobotApiVersion } from '../discovery/selectors'
 import {
   startDiscovery,
   finishDiscovery,
   removeRobot,
-} from '../../discovery/actions'
+} from '../discovery/actions'
 
 import {
   makeRobotApiRequest,
   passRobotApiResponseAction,
   passRobotApiErrorAction,
-} from '../../robot-api/deprecated'
+} from '../robot-api/deprecated'
 
-import { actions as robotActions } from '../../robot'
+import { actions as robotActions } from '../robot'
 
 import {
   getBuildrootTargetVersion,
@@ -45,9 +45,9 @@ import {
   unexpectedBuildrootError,
 } from './actions'
 
-import type { State, Epic, LooseEpic } from '../../types'
-import type { ViewableRobot } from '../../discovery/types'
-import type { RobotApiResponseAction } from '../../robot-api/deprecated'
+import type { State, Epic, LooseEpic } from '../types'
+import type { ViewableRobot } from '../discovery/types'
+import type { RobotApiResponseAction } from '../robot-api/deprecated'
 
 import type {
   BuildrootAction,
@@ -371,7 +371,7 @@ export const disconnectRpcOnStartEpic: Epic = action$ =>
     switchMap<_, _, mixed>(() => of(robotActions.disconnect()))
   )
 
-export const buildrootUpdateEpic = combineEpics(
+export const buildrootEpic = combineEpics(
   startUpdateEpic,
   cancelSessionOnConflictEpic,
   triggerUpdateAfterPremigrationEpic,

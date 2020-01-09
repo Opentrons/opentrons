@@ -1,9 +1,10 @@
 // tests for the shell module
+import { EMPTY } from 'rxjs'
 import { TestScheduler } from 'rxjs/testing'
 import { take } from 'rxjs/operators'
 
 import mockRemote from '../remote'
-import { sendActionToShellEpic, receiveActionFromShellEpic } from '..'
+import { shellEpic } from '../epic'
 
 const { ipcRenderer: mockIpc } = mockRemote
 
@@ -25,7 +26,7 @@ describe('shell epics', () => {
 
     testScheduler.run(({ hot, expectObservable }) => {
       const action$ = hot('-a', { a: shellAction })
-      const output$ = sendActionToShellEpic(action$)
+      const output$ = shellEpic(action$)
 
       expectObservable(output$).toBe('--')
     })
@@ -39,7 +40,7 @@ describe('shell epics', () => {
   // test. `toPromise` based expectation should be sufficient
   test('catches actions from main', () => {
     const shellAction = { type: 'bar' }
-    const result = receiveActionFromShellEpic()
+    const result = shellEpic(EMPTY)
       .pipe(take(1))
       .toPromise()
 

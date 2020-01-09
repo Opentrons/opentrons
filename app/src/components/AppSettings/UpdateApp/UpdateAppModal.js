@@ -6,7 +6,7 @@ import { ScrollableAlertModal } from '../../modals'
 import UpdateAppMessage from './UpdateAppMessage'
 import ReleaseNotes from '../../ReleaseNotes'
 
-import type { ShellUpdateState } from '../../../shell'
+import type { ShellUpdateState } from '../../../shell/types'
 import type { ButtonProps } from '@opentrons/components'
 
 type Props = {

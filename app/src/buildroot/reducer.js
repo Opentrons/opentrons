@@ -1,12 +1,12 @@
 // @flow
-import type { Action } from '../../types'
+import type { Action } from '../types'
 import type { BuildrootState, BuildrootUpdateSession } from './types'
 
 import {
   passRobotApiRequestAction,
   passRobotApiResponseAction,
   passRobotApiErrorAction,
-} from '../../robot-api/deprecated'
+} from '../robot-api/deprecated'
 import * as actions from './actions'
 
 export const INITIAL_STATE: BuildrootState = {

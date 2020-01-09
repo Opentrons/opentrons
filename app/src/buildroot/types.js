@@ -1,5 +1,5 @@
 // @flow
-import type { RobotHost } from '../../robot-api/types'
+import type { RobotHost } from '../robot-api/types'
 
 export type BuildrootUpdateType = 'upgrade' | 'downgrade' | 'reinstall'
 

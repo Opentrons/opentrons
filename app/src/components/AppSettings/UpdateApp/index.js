@@ -5,7 +5,7 @@ import { SpinnerModal } from '@opentrons/components'
 import UpdateAppModal from './UpdateAppModal'
 import RestartAppModal from './RestartAppModal'
 
-import type { ShellUpdateState } from '../../../shell'
+import type { ShellUpdateState } from '../../../shell/types'
 
 type Props = {
   update: ShellUpdateState,

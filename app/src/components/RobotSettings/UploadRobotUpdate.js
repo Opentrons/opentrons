@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useDispatch } from 'react-redux'
 
 import { LabeledButton } from '@opentrons/components'
-import { startBuildrootUpdate } from '../../shell'
+import { startBuildrootUpdate } from '../../buildroot'
 import styles from './styles.css'
 
 import type { Dispatch } from '../../types'

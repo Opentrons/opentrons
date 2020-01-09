@@ -5,7 +5,7 @@ import { AlertModal } from '@opentrons/components'
 import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
-import type { BuildrootUpdateType } from '../../../shell'
+import type { BuildrootUpdateType } from '../../../buildroot/types'
 
 type Props = {|
   notNowButton: ButtonProps,

@@ -2,11 +2,11 @@ import * as selectors from '../selectors'
 import {
   getViewableRobots,
   getRobotApiVersion,
-} from '../../../discovery/selectors'
+} from '../../discovery/selectors'
 
-jest.mock('../../../discovery/selectors')
+jest.mock('../../discovery/selectors')
 
-describe('app/shell/buildroot selectors', () => {
+describe('buildroot selectors', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
@@ -16,11 +16,9 @@ describe('app/shell/buildroot selectors', () => {
       name: 'getBuildrootUpdateInfo',
       selector: selectors.getBuildrootUpdateInfo,
       state: {
-        shell: {
-          buildroot: {
-            info: {
-              releaseNotes: 'some release notes',
-            },
+        buildroot: {
+          info: {
+            releaseNotes: 'some release notes',
           },
         },
       },
@@ -31,18 +29,16 @@ describe('app/shell/buildroot selectors', () => {
     {
       name: 'getBuildrootTargetVersion with auto-downloaded file',
       selector: selectors.getBuildrootTargetVersion,
-      state: { shell: { buildroot: { version: '1.0.0' } } },
+      state: { buildroot: { version: '1.0.0' } },
       expected: '1.0.0',
     },
     {
       name: 'getBuildrootTargetVersion with user file',
       selector: selectors.getBuildrootTargetVersion,
       state: {
-        shell: {
-          buildroot: {
-            version: '1.0.0',
-            session: { userFileInfo: { version: '1.0.1' } },
-          },
+        buildroot: {
+          version: '1.0.0',
+          session: { userFileInfo: { version: '1.0.1' } },
         },
       },
       expected: '1.0.1',
@@ -51,10 +47,8 @@ describe('app/shell/buildroot selectors', () => {
       name: 'getBuildrootDownloadError',
       selector: selectors.getBuildrootDownloadError,
       state: {
-        shell: {
-          buildroot: {
-            downloadError: 'error with download',
-          },
+        buildroot: {
+          downloadError: 'error with download',
         },
       },
       expected: 'error with download',
@@ -63,10 +57,8 @@ describe('app/shell/buildroot selectors', () => {
       name: 'getBuildrootDownloadProgress',
       selector: selectors.getBuildrootDownloadProgress,
       state: {
-        shell: {
-          buildroot: {
-            downloadProgress: 10,
-          },
+        buildroot: {
+          downloadProgress: 10,
         },
       },
       expected: 10,
@@ -75,10 +67,8 @@ describe('app/shell/buildroot selectors', () => {
       name: 'getBuildrootUpdateSeen',
       selector: selectors.getBuildrootUpdateSeen,
       state: {
-        shell: {
-          buildroot: {
-            seen: false,
-          },
+        buildroot: {
+          seen: false,
         },
       },
       expected: false,
@@ -87,10 +77,8 @@ describe('app/shell/buildroot selectors', () => {
       name: 'getBuildrootUpdateAvailable with lesser version',
       selector: selectors.getBuildrootUpdateAvailable,
       state: {
-        shell: {
-          buildroot: {
-            version: '1.0.0',
-          },
+        buildroot: {
+          version: '1.0.0',
         },
       },
       args: [{ name: 'robot-name' }],
@@ -103,10 +91,8 @@ describe('app/shell/buildroot selectors', () => {
       name: 'getBuildrootUpdateAvailable with greater version',
       selector: selectors.getBuildrootUpdateAvailable,
       state: {
-        shell: {
-          buildroot: {
-            version: '1.0.0',
-          },
+        buildroot: {
+          version: '1.0.0',
         },
       },
       args: [{ name: 'robot-name' }],
@@ -119,10 +105,8 @@ describe('app/shell/buildroot selectors', () => {
       name: 'getBuildrootUpdateAvailable with same version',
       selector: selectors.getBuildrootUpdateAvailable,
       state: {
-        shell: {
-          buildroot: {
-            version: '1.0.0',
-          },
+        buildroot: {
+          version: '1.0.0',
         },
       },
       args: [{ name: 'robot-name' }],
@@ -135,10 +119,8 @@ describe('app/shell/buildroot selectors', () => {
       name: 'getBuildrootUpdateAvailable with no update available',
       selector: selectors.getBuildrootUpdateAvailable,
       state: {
-        shell: {
-          buildroot: {
-            version: null,
-          },
+        buildroot: {
+          version: null,
         },
       },
       args: [{ name: 'robot-name' }],
@@ -151,10 +133,8 @@ describe('app/shell/buildroot selectors', () => {
       name: 'getBuildrootUpdateSession',
       selector: selectors.getBuildrootSession,
       state: {
-        shell: {
-          buildroot: {
-            session: { robotName: 'robot-name', token: null, pathPrefix: null },
-          },
+        buildroot: {
+          session: { robotName: 'robot-name', token: null, pathPrefix: null },
         },
       },
       expected: { robotName: 'robot-name', token: null, pathPrefix: null },
@@ -163,10 +143,8 @@ describe('app/shell/buildroot selectors', () => {
       name: 'getBuildrootRobotName',
       selector: selectors.getBuildrootRobotName,
       state: {
-        shell: {
-          buildroot: {
-            session: { robotName: 'robot-name', token: null, pathPrefix: null },
-          },
+        buildroot: {
+          session: { robotName: 'robot-name', token: null, pathPrefix: null },
         },
       },
       expected: 'robot-name',
@@ -175,10 +153,8 @@ describe('app/shell/buildroot selectors', () => {
       name: 'getBuildrootRobot',
       selector: selectors.getBuildrootRobot,
       state: {
-        shell: {
-          buildroot: {
-            session: { robotName: 'robot-name' },
-          },
+        buildroot: {
+          session: { robotName: 'robot-name' },
         },
       },
       expected: { name: 'robot-name', host: '10.10.0.0', port: 31950 },
@@ -193,10 +169,8 @@ describe('app/shell/buildroot selectors', () => {
       name: 'getBuildrootRobot after migration with opentrons-robot-name',
       selector: selectors.getBuildrootRobot,
       state: {
-        shell: {
-          buildroot: {
-            session: { robotName: 'opentrons-robot-name' },
-          },
+        buildroot: {
+          session: { robotName: 'opentrons-robot-name' },
         },
       },
       expected: {

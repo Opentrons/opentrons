@@ -13,7 +13,7 @@ import SkipAppUpdateMessage from './SkipAppUpdateMessage'
 import SyncRobotMessage from './SyncRobotMessage'
 import styles from './styles.css'
 
-import type { BuildrootUpdateType } from '../../../shell'
+import type { BuildrootUpdateType } from '../../../buildroot/types'
 import type { ViewableRobot } from '../../../discovery/types'
 
 type Props = {|

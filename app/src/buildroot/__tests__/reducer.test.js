@@ -11,7 +11,7 @@ const BASE_SESSION = {
   error: null,
 }
 
-describe('app/shell/buildroot reducer', () => {
+describe('buildroot reducer', () => {
   const SPECS = [
     {
       name: 'handles buildroot:UPDATE_INFO',

@@ -12,7 +12,8 @@ import {
   getViewableRobots,
 } from '../../discovery'
 
-import { getShellUpdateState, getBuildrootRobot } from '../../shell'
+import { getBuildrootRobot } from '../../buildroot'
+import { getShellUpdateState } from '../../shell'
 
 import { Splash } from '@opentrons/components'
 import Page from '../../components/Page'

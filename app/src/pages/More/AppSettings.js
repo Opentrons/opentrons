@@ -20,7 +20,7 @@ import UpdateApp from '../../components/AppSettings/UpdateApp'
 import { ErrorModal } from '../../components/modals'
 
 import type { State, Dispatch } from '../../types'
-import type { ShellUpdateState } from '../../shell'
+import type { ShellUpdateState } from '../../shell/types'
 
 type OP = ContextRouter
 

@@ -10,11 +10,9 @@ import {
   getRobotProtocolApiVersion,
 } from '../../discovery'
 
-import {
-  getBuildrootRobot,
-  checkShellUpdate,
-  getBuildrootUpdateAvailable,
-} from '../../shell'
+import { getBuildrootRobot, getBuildrootUpdateAvailable } from '../../buildroot'
+
+import { checkShellUpdate } from '../../shell'
 
 import {
   Card,

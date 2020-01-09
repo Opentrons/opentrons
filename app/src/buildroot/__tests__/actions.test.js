@@ -1,6 +1,6 @@
 import * as actions from '../actions'
 
-describe('app/shell/buildroot action creators', () => {
+describe('buildroot action creators', () => {
   const SPECS = [
     {
       name: 'buildroot:SET_UPDATE_SEEN',

@@ -11,6 +11,7 @@ import type {
   RobotControlsState,
   RobotControlsAction,
 } from './robot-controls/types'
+import type { BuildrootState, BuildrootAction } from './buildroot/types'
 import type { PipettesState, PipettesAction } from './pipettes/types'
 import type { ModulesState, ModulesAction } from './modules/types'
 import type {
@@ -39,6 +40,7 @@ export type State = $ReadOnly<{|
   robotAdmin: RobotAdminState,
   robotControls: RobotControlsState,
   robotSettings: RobotSettingsState,
+  buildroot: BuildrootState,
   pipettes: PipettesState,
   modules: ModulesState,
   config: ConfigState,
@@ -55,6 +57,7 @@ export type Action =
   | RobotAdminAction
   | RobotControlsAction
   | RobotSettingsAction
+  | BuildrootAction
   | PipettesAction
   | ModulesAction
   | ShellAction
