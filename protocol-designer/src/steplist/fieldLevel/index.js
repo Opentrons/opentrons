@@ -8,7 +8,7 @@ import {
   maxFieldValue,
 } from './errors'
 import {
-  maskToNumber,
+  maskToInteger,
   maskToFloat,
   onlyPositiveNumbers,
   defaultTo,
@@ -58,7 +58,7 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     hydrate: getLabwareEntity,
   },
   aspirate_mix_times: {
-    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers, defaultTo(1)),
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),
     castValue: Number,
   },
   aspirate_mix_volume: {
@@ -77,7 +77,7 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     hydrate: getLabwareEntity,
   },
   dispense_mix_times: {
-    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers, defaultTo(1)),
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(1)),
     castValue: Number,
   },
   dispense_mix_volume: {
@@ -100,13 +100,13 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     hydrate: getLabwareEntity,
   },
   pauseHour: {
-    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers),
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
   },
   pauseMinute: {
-    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers),
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
   },
   pauseSecond: {
-    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers),
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
   },
   pipette: {
     getErrors: composeErrors(requiredField),
@@ -114,7 +114,7 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   },
   times: {
     getErrors: composeErrors(requiredField),
-    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers, defaultTo(0)),
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers, defaultTo(0)),
     castValue: Number,
   },
   volume: {
@@ -141,7 +141,7 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
       minFieldValue(MIN_TEMP_MODULE_TEMP),
       maxFieldValue(MAX_TEMP_MODULE_TEMP)
     ),
-    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers),
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
 }
