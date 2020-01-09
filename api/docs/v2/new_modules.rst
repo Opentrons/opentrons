@@ -225,44 +225,46 @@ Engage
 
 The :py:meth:`.MagneticModuleContext.engage` function raises the magnets to induce a magnetic field in the labware on top of the Magnetic Module. The height of the magnets can be specified in several different ways, based on internally stored default heights for labware:
 
-   - If neither ``height``, ``offset`` nor ``height_from_base`` is specified **and** the labware is supported on the Magnetic Module,
-     the magnets will raise to a reasonable default height based on the specified labware.
+- If neither ``height_from_base``, ``height`` nor ``offset`` is specified **and** the labware is supported on the Magnetic Module, the magnets will raise to a reasonable default height based on the specified labware.
 
-     .. code-block:: python
+  .. code-block:: python
 
-         mag_mod.engage()
+      mag_mod.engage()
 
-    .. versionadded:: 2.0
+  .. versionadded:: 2.0
 
-   - If ``height`` is specified, it should be a distance in mm from the home position of the magnets.
+- The recommended way to specify the magnets' position is to utilize the ``height_from_base`` parameter, which allows you to raise the height of the magnets relative to the base of the labware.
 
-     .. code-block:: python
+  .. code-block:: python
 
-        mag_mod.engage(height=18.5)
+      mag_mod.engage(height_from_base=13.5)
 
-    .. versionadded:: 2.0
+  A ``mag_mod.engage(height_from_base=0)`` call should move the tops of the magnets to level with base of the labware.
 
-   - You can also specify the height for the magnet to be raised relative to the base of the labware.
-
-    .. code-block:: python
-
-       mag_mod.engage(height_from_base=13.5)
-
-    A ``mag_mod.engage(height_from_base=0)`` call should move the tops of the magnets to level with base of the labware.
-
-    .. versionadded:: 2.2
+  .. versionadded:: 2.2
 
 .. note::
     There is a +/- 1 mmm variance across magnetic module units, using ``height_from_base=0`` might not be able to get the magnets to completely flush with base of the labware. Please test before carrying out your experiment to ensure the desired engage height for your labware.
 
+- You can also specify ``height``, which should be a distance in mm from the home position of the magnets.
+
+  .. code-block:: python
+
+      mag_mod.engage(height=18.5)
+
+  .. versionadded:: 2.0
+
+- An ``offset`` can be applied to move the magnets relatively from the default engage height of the labware, **if** the labware is supported on the Magnetic Module.
+
+  .. code-block:: python
+
+      mag_mod.engage(offset=-2)
+
+  .. versionadded:: 2.0
 
 .. note::
 
-    Only certain labwares have defined engage heights for the Magnetic
-    Module. If a labware that does not have a defined engage height is
-    loaded on the Magnetic Module (or if no labware is loaded), then
-    ``height``, or ``height_from_labware`` (since version 2.2), must be specified.
-
+    Only certain labwares have defined engage heights for the Magnetic Module. If a labware that does not have a defined engage height is loaded on the Magnetic Module (or if no labware is loaded), then ``height_from_labware`` (since version 2.2) or ``height``, must be specified.
 
 .. versionadded:: 2.0
 
