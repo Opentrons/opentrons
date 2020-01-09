@@ -30,6 +30,7 @@ type SP = {|
   hideModal: $PropertyType<Props, 'hideModal'>,
   _hasUnsavedChanges: ?boolean,
   modulesEnabled: ?boolean,
+  thermocyclerEnabled: ?boolean,
 |}
 
 type DP = {|
@@ -48,6 +49,7 @@ function mapStateToProps(state: BaseState): SP {
     hideModal: !selectors.getNewProtocolModal(state),
     _hasUnsavedChanges: loadFileSelectors.getHasUnsavedChanges(state),
     modulesEnabled: featureFlagSelectors.getEnableModules(state),
+    thermocyclerEnabled: featureFlagSelectors.getEnableThermocycler(state),
   }
 }
 
@@ -108,6 +110,7 @@ function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
   return {
     ...ownProps,
     modulesEnabled: stateProps.modulesEnabled,
+    thermocyclerEnabled: stateProps.thermocyclerEnabled,
     showModulesFields: true,
     hideModal: stateProps.hideModal,
     onCancel: dispatchProps.onCancel,

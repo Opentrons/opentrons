@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import cx from 'classnames'
 import i18n from '../../../localization'
 import { CheckboxField, DropdownField, FormGroup } from '@opentrons/components'
 import { ModuleDiagram } from '../../modules'
@@ -11,18 +12,23 @@ import type { FormModulesByType } from '../../../step-forms'
 
 type Props = {|
   values: FormModulesByType,
+  thermocyclerEnabled: ?boolean,
   onFieldChange: (type: ModuleType, value: boolean) => mixed,
 |}
 
 export default function ModuleFields(props: Props) {
-  const { onFieldChange, values } = props
+  const { onFieldChange, values, thermocyclerEnabled } = props
   const modules = Object.keys(values)
   const handleOnDeckChange = (type: ModuleType) => (
     e: SyntheticInputEvent<HTMLInputElement>
   ) => onFieldChange(type, e.currentTarget.checked || false)
 
+  const className = cx(styles.modules_row, {
+    [styles.hide_thermo]: !thermocyclerEnabled,
+  })
+
   return (
-    <div className={styles.modules_row}>
+    <div className={className}>
       {modules.map((moduleType, i) => {
         const label = i18n.t(`modules.module_display_names.${moduleType}`)
         return (

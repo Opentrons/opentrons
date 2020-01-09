@@ -16,6 +16,7 @@ const initialFlags: Flags = {
   OT_PD_ENABLE_MODULES: false,
   OT_PD_DISABLE_MODULE_RESTRICTIONS: false,
   OT_PD_ENABLE_MULTI_GEN2_PIPETTES: false,
+  OT_PD_ENABLE_THERMOCYCLER: false,
 }
 
 const flags = handleActions<Flags, any>(
