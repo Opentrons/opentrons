@@ -311,6 +311,14 @@ export default function client(dispatch) {
 
     remote.calibration_manager
       .return_tip(pipette)
+      .then(() => {
+        // check for home_all method, introduced to CM on 2020-01-06
+        // NOTE: home_all needs pipette passed to it because of calibration
+        // manager limitations
+        if ('home_all' in remote.calibration_manager) {
+          return remote.calibration_manager.home_all(pipette)
+        }
+      })
       .then(() => dispatch(actions.returnTipResponse()))
       .catch(error => dispatch(actions.returnTipResponse(error)))
   }

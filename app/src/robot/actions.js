@@ -28,6 +28,16 @@ export type ConnectResponseAction = {|
   |},
 |}
 
+export type ReturnTipAction = {|
+  type: 'robot:RETURN_TIP',
+  payload: {|
+    mount: Mount,
+  |},
+  meta: {|
+    robotCommand: true,
+  |},
+|}
+
 export type ReturnTipResponseAction = {|
   type: 'robot:RETURN_TIP_RESPONSE',
   payload: {|
@@ -211,6 +221,7 @@ export type Action =
   | LabwareCalibrationAction
   | CalibrationResponseAction
   | CalibrationFailureAction
+  | ReturnTipAction
   | ReturnTipResponseAction
   | SetJogDistanceAction
   | SessionResponseAction
