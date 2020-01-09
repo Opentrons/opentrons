@@ -3,6 +3,7 @@ import semver from 'semver'
 import { createSelector } from 'reselect'
 
 import { getViewableRobots, getRobotApiVersion } from '../discovery/selectors'
+import * as Constants from './constants'
 
 import type { State } from '../types'
 import type { ViewableRobot } from '../discovery/types'
@@ -43,7 +44,9 @@ export function getBuildrootUpdateInProgress(
   const brRobot = getBuildrootRobot(state)
 
   return (
-    robot === brRobot && session?.step !== 'finished' && session?.error === null
+    robot === brRobot &&
+    session?.step !== Constants.FINISHED &&
+    session?.error === null
   )
 }
 
@@ -97,11 +100,11 @@ export function getBuildrootUpdateAvailable(
 
   if (validUpdate) {
     if (!validCurrent || semver.gt(validUpdate, validCurrent)) {
-      type = 'upgrade'
+      type = Constants.UPGRADE
     } else if (semver.lt(validUpdate, validCurrent)) {
-      type = 'downgrade'
+      type = Constants.DOWNGRADE
     } else if (semver.eq(validUpdate, validCurrent)) {
-      type = 'reinstall'
+      type = Constants.REINSTALL
     }
   }
 
@@ -117,10 +120,10 @@ export function getRobotSystemType(
     const { capabilities } = serverHealth
 
     if (!capabilities || capabilities.balenaUpdate) {
-      return 'balena'
+      return Constants.BALENA
     }
 
-    return 'buildroot'
+    return Constants.BUILDROOT
   }
 
   return null

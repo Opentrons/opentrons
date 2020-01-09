@@ -90,24 +90,13 @@ type ThunkDispatch = (thunk: ThunkAction) => ?Action
 
 type ThunkPromiseDispatch = (thunk: ThunkPromiseAction) => Promise<?Action>
 
-// DEPRECATED(mc, 2020-01-06): prefer StrictEpic
-// regular, medium strict epic type
-export type Epic = (
-  action$: Observable<Action>,
-  state$: Observable<State>
-) => Observable<mixed>
-
-// for when you need more strict epic typing
+// DEPRECATED(mc, 2020-01-09): prefer plain Epic
+// TODO(mc, 2020-01-09): remove StrictEpic and refactor code that relies on it
 export type StrictEpic<R: Action = Action> = (
   action$: Observable<Action>,
   state$: Observable<State>
 ) => Observable<R>
 
-// DEPRECATED(mc, 2020-01-06): this was a bad idea
-// for when the strict typing of Action is too much
-export type LooseEpic = (
-  action$: Observable<{| type: string, payload: any, meta: any |}>,
-  state$: Observable<State>
-) => Observable<mixed>
+export type Epic = StrictEpic<>
 
 export type Error = { name: string, message: string }
