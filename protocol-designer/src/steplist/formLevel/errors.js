@@ -16,6 +16,7 @@ export type FormErrorKey =
   | 'TIME_PARAM_REQUIRED'
   | 'MAGNET_ACTION_TYPE_REQUIRED'
   | 'ENGAGE_HEIGHT_REQUIRED'
+  | 'MODULE_ID_REQUIRED'
   | 'TARGET_TEMPERATURE_REQUIRED'
 
 export type FormError = {
@@ -61,6 +62,11 @@ const FORM_ERRORS: { [FormErrorKey]: FormError } = {
   ENGAGE_HEIGHT_REQUIRED: {
     title: 'Engage height is required',
     dependentFields: ['magnetAction', 'engageHeight'],
+  },
+  MODULE_ID_REQUIRED: {
+    title:
+      'Module is required. Ensure the appropriate module is present on the deck and selected for this step',
+    dependentFields: ['moduleId'],
   },
   TARGET_TEMPERATURE_REQUIRED: {
     title: 'Temperature is required',
@@ -144,6 +150,12 @@ export const engageHeightRequired = (fields: HydratedFormData): ?FormError => {
   return magnetAction === 'engage' && !engageHeight
     ? FORM_ERRORS.ENGAGE_HEIGHT_REQUIRED
     : null
+}
+
+export const moduleIdRequired = (fields: HydratedFormData): ?FormError => {
+  const { moduleId } = fields
+  if (!moduleId) return FORM_ERRORS.MODULE_ID_REQUIRED
+  return null
 }
 
 export const targetTemperatureRequired = (
