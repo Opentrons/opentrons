@@ -6,19 +6,19 @@ export type ValueCaster = (value: mixed) => mixed
  **  Value Casters   **
  **********************/
 
-// TODO: account for floats and negative numbers
+// Mask to number now allows for 0 and negative numbers, for decimals use maskToFloat
 export const maskToNumber = (rawValue: mixed): mixed => {
-  if (!rawValue) return null
-  let castValue = Number(rawValue)
-  if (Number.isNaN(castValue)) {
-    const cleanValue = String(rawValue).replace(/[\D]+/g, '')
-    return cleanValue
-  } else {
-    return castValue
-  }
+  if (!rawValue) return Number(rawValue)
+  const rawNumericValue =
+    typeof rawValue === 'string'
+      ? rawValue.replace(/[^-0-9]/, '')
+      : String(rawValue)
+  return rawNumericValue
 }
 
+// rawValue.replace(/[\D]+/g, '')
 const DEFAULT_DECIMAL_PLACES = 1
+
 export const maskToFloat = (rawValue: mixed): ?mixed => {
   if (!rawValue) return Number(rawValue)
   const rawNumericValue =

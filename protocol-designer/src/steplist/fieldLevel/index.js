@@ -157,8 +157,7 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
       minFieldValue(MIN_TEMP_MODULE_TEMP),
       maxFieldValue(MAX_TEMP_MODULE_TEMP)
     ),
-    // TODO (sa 2019-12-11): investigate maskToNumber not allowing 0
-    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    maskValue: composeMaskers(maskToNumber, onlyPositiveNumbers),
     castValue: Number,
   },
 }
