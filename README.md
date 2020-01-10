@@ -39,6 +39,7 @@ This example tells the Opentrons OT2 to pipette 30µL of liquid from a trough to
 
 Easily upload a protocol, calibrate positions, and run your experiment from your computer.
 
+- [Download Here](https://opentrons.com/ot-app)
 - [Documentation](https://support.opentrons.com/)
 - [Source code](./app)
 
@@ -48,6 +49,7 @@ Easily upload a protocol, calibrate positions, and run your experiment from your
 
 Easily create a protocol to run on your robot with this grapical tool.
 
+- [Access Here](https://designer.opentrons.com/)
 - [Documentation](https://intercom.help/opentrons-protocol-designer/en/)
 - [Source code](./protocol-designer)
 
