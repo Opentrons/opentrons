@@ -97,7 +97,7 @@ The OT-2 pipettes can do some things that a human cannot do with a pipette, like
         for well in reservoir.wells():
             p300.aspirate(35, well)
             p300.air_gap(10)
-            p300.dispense(plate['A1'])
+            p300.dispense(45, plate['A1'])
 
         p300.return_tip()
 
@@ -131,11 +131,11 @@ This example first spreads a diluent to all wells of a plate. It then dilutes 8 
             row = plate.rows()[i]
 
             # transfer 30uL of source to first well in column
-            p300.transfer(30, source, column[0])
+            p300.transfer(30, source, row[0], mix_after=(3, 25))
 
             # dilute the sample down the column
             p300.transfer(
-                30, row.wells()[1:11], row.wells()[2:],
+                30, row[:11], row[1:],
                 mix_after=(3, 25))
 
 ******************************
