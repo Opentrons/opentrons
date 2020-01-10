@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
 import i18n from '../../localization'
-import { timelineFrameAfterActiveItem } from '../../top-selectors/timelineFrames'
+import { timelineFrameBeforeActiveItem } from '../../top-selectors/timelineFrames'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { STD_SLOT_X_DIM, STD_SLOT_Y_DIM } from '../../constants'
 import { getModuleVizDims } from './getModuleVizDims'
@@ -40,15 +40,13 @@ const ModuleStatus = ({
 }
 
 const ModuleTag = (props: Props) => {
-  const timelineFrame = useSelector(timelineFrameAfterActiveItem)
+  const timelineFrame = useSelector(timelineFrameBeforeActiveItem)
   const moduleEntity = useSelector(stepFormSelectors.getModuleEntities)[
     props.id
   ]
   const moduleState: ?* =
     timelineFrame.robotState.modules[props.id]?.moduleState
   const moduleType: ?* = moduleEntity?.type
-
-  console.log({ moduleState, moduleType })
 
   if (moduleType == null || moduleState == null) {
     // this should never happen, but better to have an empty tag than to whitescreen
