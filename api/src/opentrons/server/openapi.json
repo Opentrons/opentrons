@@ -365,19 +365,15 @@
         ]
       },
       "deckCalibrationDispatchDetachTip": {
-        "description": "command: \"detach tip\" dispatch args",
         "$ref": "#/components/schemas/deckCalibrationDispatch"
       },
       "deckCalibrationDispatchSaveZ": {
-        "description": "command: \"save z\" dispatch args",
         "$ref": "#/components/schemas/deckCalibrationDispatch"
       },
       "deckCalibrationDispatchSaveTransform": {
-        "description": "command: \"save transform\" dispatch args",
         "$ref": "#/components/schemas/deckCalibrationDispatch"
       },
       "deckCalibrationDispatchRelease": {
-        "description": "command: \"release\" dispatch args",
         "$ref": "#/components/schemas/deckCalibrationDispatch"
       },
       "deckCalibrationDispatch": {
@@ -597,6 +593,7 @@
   "paths": {
     "/openapi": {
       "get": {
+        "operationId": "getOpenAPISpec",
         "description": "Get an OpenAPI spec (this document)",
         "responses": {
           "200": {
@@ -1700,7 +1697,7 @@
                 "type": "array",
                 "items": {
                   "type": "string",
-                  "enum": ["x", "y", "z", "a", "b", "z"]
+                  "enum": ["x", "y", "z", "a", "b", "c"]
                 }
               },
               "example": ["x", "y", "b"]
