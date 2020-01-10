@@ -4,10 +4,12 @@
 [![AppVeyor][appveyor-badge]][appveyor]
 [![Codecov][codecov-badge]][codecov]
 
-- [Overview](#overview)
-- [Opentrons API](#opentrons-api)
-- [Opentrons App](#opentrons-app)
-- [Contributing/Building](#contributing)
+- [Opentrons Platform](#opentrons-platform)
+  - [Overview](#overview)
+  - [Opentrons API](#opentrons-api)
+  - [Opentrons App](#opentrons-app)
+  - [Opentrons Protocol Designer](#opentrons-protocol-designer)
+  - [Contributing](#contributing)
 
 ## Overview
 
@@ -41,6 +43,13 @@ Easily upload a protocol, calibrate positions, and run your experiment from your
 - [Source code](./app)
 
 ![ot-app](https://s3.amazonaws.com/opentrons-images/standalone/ot-2-app.png)
+
+## Opentrons Protocol Designer
+
+Easily create a protocol to run on your robot with this grapical tool.
+
+- [Documentation](https://intercom.help/opentrons-protocol-designer/en/)
+- [Source code](./protocol-designer)
 
 ## Contributing
 
