@@ -218,10 +218,7 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
         const { substepIndex } = hoveredSubstepIdentifier
         const substepsForStep = allSubsteps[hoveredSubstepIdentifier.stepId]
 
-        if (
-          substepsForStep &&
-          substepsForStep.commandCreatorFnName !== 'delay'
-        ) {
+        if (substepsForStep && substepsForStep.substepType === 'sourceDest') {
           if (substepsForStep.multichannel) {
             const hoveredSubstepData =
               substepsForStep.multiRows[substepIndex][0] // just use first multi row

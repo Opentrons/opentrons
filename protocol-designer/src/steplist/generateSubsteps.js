@@ -25,7 +25,6 @@ import type {
   ConsolidateArgs,
   DistributeArgs,
   MixArgs,
-  PauseArgs,
   TransferArgs,
 } from '../step-generation/types'
 import type {
@@ -270,6 +269,7 @@ function transferLikeSubsteps(args: {|
     })
 
     return {
+      substepType: 'sourceDest',
       multichannel: true,
       commandCreatorFnName: stepArgs.commandCreatorFnName,
       parentStepId: stepId,
@@ -289,6 +289,7 @@ function transferLikeSubsteps(args: {|
     )
 
     return {
+      substepType: 'sourceDest',
       multichannel: false,
       commandCreatorFnName: stepArgs.commandCreatorFnName,
       parentStepId: stepId,
@@ -325,9 +326,10 @@ export function generateSubsteps(
   const { stepArgs } = stepArgsAndErrors
 
   if (stepArgs.commandCreatorFnName === 'delay') {
-    // just returns formData
-    const formData: PauseArgs = stepArgs
-    return formData
+    return {
+      substepType: 'pause',
+      pauseStepArgs: stepArgs,
+    }
   }
 
   if (
@@ -348,8 +350,11 @@ export function generateSubsteps(
     stepArgs.commandCreatorFnName === 'disengageMagnet' ||
     stepArgs.commandCreatorFnName === 'engageMagnet'
   ) {
-    // no substeps for these
-    return null
+    return {
+      substepType: 'magnet',
+      engage: stepArgs.commandCreatorFnName === 'engageMagnet',
+      moduleId: stepArgs.module,
+    }
   }
 
   console.warn(

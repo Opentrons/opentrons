@@ -110,8 +110,19 @@ function getStepItemContents(stepItemProps: StepItemProps) {
   }
 
   // pause substep component uses the delay args directly
-  if (substeps && substeps.commandCreatorFnName === 'delay') {
-    return <PauseStepItems pauseArgs={substeps} />
+  if (substeps && substeps.substepType === 'pause') {
+    return <PauseStepItems pauseArgs={substeps.pauseStepArgs} />
+  }
+
+  if (substeps && substeps.substepType === 'magnet') {
+    // TODO IMMEDIATELY
+    console.log({ substeps })
+    return (
+      <div>
+        <div>Engage: {substeps.engage ? 'ENGAGE' : 'DISENGAGE'}</div>
+        <div>Module: {substeps.moduleId}</div>
+      </div>
+    )
   }
 
   const result = []

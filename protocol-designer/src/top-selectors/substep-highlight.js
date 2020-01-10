@@ -176,7 +176,7 @@ function _getSelectedWellsForSubstep(
     wells.push(...getWells('dest'))
   }
 
-  if (substeps && substeps.commandCreatorFnName !== 'delay') {
+  if (substeps && substeps.substepType === 'sourceDest') {
     let tipWellSet = []
     if (substeps.multichannel) {
       const { activeTips } = substeps.multiRows[substepIndex][0] // just use first multi row
