@@ -8,7 +8,8 @@ python_version = "3.6"
 
 [dev-packages]
 pylama = "*"
-pytest = "*"
+pytest = "==5.3.1"
+atomicwrites = {version="*", sys_platform="== 'windows'"}
 pytest-cov = "*"
 pytest-aiohttp = "*"
 dill = "==0.2.7.1"
