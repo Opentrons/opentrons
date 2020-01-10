@@ -24,6 +24,8 @@ export const allSubsteps: Selector<AllSubsteps> = createSelector(
     robotStateTimeline,
     _initialRobotState
   ) => {
+    // Add initial robot state frame, offsetting the timeline.
+    // This is because substeps show the robot state just BEFORE their step has occurred
     const timeline = [
       { robotState: _initialRobotState },
       ...robotStateTimeline.timeline,
