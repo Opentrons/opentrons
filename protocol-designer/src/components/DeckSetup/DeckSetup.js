@@ -128,6 +128,8 @@ const getSwapBlocked = (args: {
   return labwareSourceToDestBlocked || labwareDestToSourceBlocked
 }
 
+// TODO IL 2020-01-12: to support dynamic labware/module movement during a protocol,
+// don't use initialDeckSetup here. Use some version of timelineFrameForActiveItem
 const DeckSetupContents = (props: ContentsProps) => {
   const {
     initialDeckSetup,
@@ -212,7 +214,7 @@ const DeckSetupContents = (props: ContentsProps) => {
               x={moduleX}
               y={moduleY}
               orientation={orientation}
-              module={module}
+              id={module.id}
             />
           </React.Fragment>
         )
