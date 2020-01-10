@@ -4,12 +4,10 @@
 [![AppVeyor][appveyor-badge]][appveyor]
 [![Codecov][codecov-badge]][codecov]
 
-- [Opentrons Platform](#opentrons-platform)
-  - [Overview](#overview)
-  - [Opentrons API](#opentrons-api)
-  - [Opentrons App](#opentrons-app)
-  - [Opentrons Protocol Designer](#opentrons-protocol-designer)
-  - [Contributing](#contributing)
+- [Overview](#overview)
+- [Opentrons API](#opentrons-api)
+- [Opentrons App](#opentrons-app)
+- [Contributing](#contributing)
 
 ## Overview
 
