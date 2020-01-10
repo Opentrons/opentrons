@@ -6,7 +6,7 @@ import { RobotCoordsForeignDiv } from '@opentrons/components'
 import i18n from '../../localization'
 import { timelineFrameBeforeActiveItem } from '../../top-selectors/timelineFrames'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import { STD_SLOT_X_DIM, STD_SLOT_Y_DIM } from '../../constants'
+import { MAGDECK, STD_SLOT_X_DIM, STD_SLOT_Y_DIM } from '../../constants'
 import { getModuleVizDims } from './getModuleVizDims'
 import styles from './ModuleTag.css'
 import type { ModuleOrientation } from '../../types'
@@ -29,14 +29,21 @@ const ModuleStatus = ({
   moduleState: $PropertyType<ModuleTemporalProperties, 'moduleState'>,
 |}) => {
   switch (moduleState.type) {
-    case 'magdeck':
-      return moduleState.engaged ? 'ENGAGED' : 'DISENGAGED'
+    case MAGDECK:
+      return (
+        <div className={styles.module_status_line}>
+          {i18n.t(
+            `modules.status.${moduleState.engaged ? 'engaged' : 'disengaged'}`
+          )}
+        </div>
+      )
+
     default:
       console.warn(
         `ModuleStatus doesn't support module type ${moduleState.type}`
       )
+      return null
   }
-  return null
 }
 
 const ModuleTag = (props: Props) => {
