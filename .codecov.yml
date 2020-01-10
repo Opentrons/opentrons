@@ -1,7 +1,6 @@
 fixes:
   - 'api/src/opentrons/::opentrons/'
 ignore:
-  - 'architecture-and-planning'
   - 'audio'
   - 'compute'
   - '**/node_modules'
