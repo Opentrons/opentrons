@@ -24,10 +24,11 @@ The Opentrons API is a simple framework designed to make writing automated biolo
 We've designed it in a way we hope is accessible to anyone with basic computer and wetlab skills. As a bench scientist, you should be able to code your automated protocols in a way that reads like a lab notebook.
 
 ```python
-pipette.aspirate(tube_1).dispense(tube_2)
+pipette.aspirate(location=trough['A1'], volume=30)
+pipette.dispense(location=well_plate['A1'], volume=30)
 ```
 
-That is how you tell the Opentrons robot to pipette its max volume from one tube to another. Learn more here:
+This example tells the Opentrons OT2 to pipette 30µL of liquid from a trough to well plate. Learn more here:
 
 - [Documentation](http://docs.opentrons.com)
 - [Source code](./api)
