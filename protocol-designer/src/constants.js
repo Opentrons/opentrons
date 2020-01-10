@@ -1,6 +1,7 @@
 // @flow
 import mapValues from 'lodash/mapValues'
 import * as componentLib from '@opentrons/components'
+import { MAGDECK, TEMPDECK, THERMOCYCLER } from '@opentrons/shared-data'
 import type {
   LabwareDefinition2,
   DeckSlot as DeckDefSlot,
@@ -53,7 +54,7 @@ export const PSEUDO_DECK_SLOTS: { [DeckSlot]: DeckDefSlot } = {
       yDimension: STD_SLOT_Y_DIM * 2 + STD_SLOT_DIVIDER_WIDTH,
       zDimension: 0,
     },
-    compatibleModules: ['thermocycler'],
+    compatibleModules: [THERMOCYCLER],
   },
 }
 
@@ -81,19 +82,20 @@ export const MAX_ENGAGE_HEIGHT = 16
 export const MIN_TEMP_MODULE_TEMP = 0
 export const MAX_TEMP_MODULE_TEMP = 95
 
-export const MAGNET_TYPE = 'magdeck'
-export const TEMPERATURE_TYPE = 'tempdeck'
-export const THERMO_TYPE = 'thermocycler'
+export { MAGDECK, TEMPDECK, THERMOCYCLER } from '@opentrons/shared-data'
+
+const TEMPMOD: 'temperature module' = 'temperature module'
+const MAGMOD: 'magnetic module' = 'magnetic module'
 
 // TODO: IL 2019-12-03 migrate the ModuleType '___deck' strings to '___ module' forms.
 // We don't call modules 'deck' anymore, but the old code is entrenched
 export const FILE_MODULE_TYPE_TO_MODULE_TYPE: { [string]: ModuleType } = {
-  'temperature module': 'tempdeck',
-  'magnetic module': 'magdeck',
-  thermocycler: 'thermocycler',
+  [TEMPMOD]: TEMPDECK,
+  [MAGMOD]: MAGDECK,
+  [THERMOCYCLER]: THERMOCYCLER,
 }
 export const MODULE_TYPE_TO_FILE_MODULE_TYPE: { [ModuleType]: string } = {
-  tempdeck: 'temperature module',
-  magdeck: 'magnetic module',
-  thermocycler: 'thermocycler',
+  [TEMPDECK]: TEMPMOD,
+  [MAGDECK]: MAGMOD,
+  [THERMOCYCLER]: THERMOCYCLER,
 }

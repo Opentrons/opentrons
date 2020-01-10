@@ -6,7 +6,7 @@ import styles from './styles.css'
 
 import type { ModuleType } from '@opentrons/shared-data'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
-import { THERMO_TYPE } from '../../constants'
+import { THERMOCYCLER } from '../../constants'
 import type { ModulesForEditModulesCard } from '../../step-forms'
 type Props = {
   modules: ModulesForEditModulesCard,
@@ -19,7 +19,7 @@ export default function EditModulesCard(props: Props) {
 
   const visibleModules = thermocyclerEnabled
     ? SUPPORTED_MODULE_TYPES
-    : SUPPORTED_MODULE_TYPES.filter(m => m !== THERMO_TYPE)
+    : SUPPORTED_MODULE_TYPES.filter(m => m !== THERMOCYCLER)
 
   return (
     <Card title="Modules">

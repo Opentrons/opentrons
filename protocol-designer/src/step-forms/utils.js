@@ -2,16 +2,15 @@
 import assert from 'assert'
 import reduce from 'lodash/reduce'
 import values from 'lodash/values'
-import {
-  getPipetteNameSpecs,
-  type DeckSlotId,
-  type ModuleType,
-} from '@opentrons/shared-data'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
   SPAN7_8_10_11_SLOT,
   TC_SPAN_SLOTS,
   GEN_ONE_MULTI_PIPETTES,
+  THERMOCYCLER,
 } from '../constants'
+import type { DeckSlotId, ModuleType } from '@opentrons/shared-data'
+import type { DeckSlot } from '../types'
 import type { LabwareDefByDefURI } from '../labware-defs'
 import type {
   NormalizedPipette,
@@ -24,7 +23,6 @@ import type {
   FormPipette,
   LabwareOnDeck as LabwareOnDeckType,
 } from './types'
-import type { DeckSlot } from '../types'
 
 export function getIdsInRange<T: string | number>(
   orderedIds: Array<T>,
@@ -96,7 +94,7 @@ export const getSlotsBlockedBySpanning = (
   if (
     values(initialDeckSetup.modules).some(
       (module: ModuleOnDeck) =>
-        module.type === 'thermocycler' && module.slot === SPAN7_8_10_11_SLOT
+        module.type === THERMOCYCLER && module.slot === SPAN7_8_10_11_SLOT
     )
   ) {
     return ['7', '8', '10', '11']

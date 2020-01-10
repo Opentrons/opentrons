@@ -1,12 +1,17 @@
 // @flow
-import { SPAN7_8_10_11_SLOT } from '../constants'
+import {
+  SPAN7_8_10_11_SLOT,
+  MAGDECK,
+  TEMPDECK,
+  THERMOCYCLER,
+} from '../constants'
 import type { ModuleType } from '@opentrons/shared-data'
 import type { DropdownOption } from '@opentrons/components'
 
 export const SUPPORTED_MODULE_TYPES: Array<ModuleType> = [
-  'magdeck',
-  'tempdeck',
-  'thermocycler',
+  MAGDECK,
+  TEMPDECK,
+  THERMOCYCLER,
 ]
 
 type SupportedSlotMap = {
@@ -33,7 +38,7 @@ export function getAllModuleSlotsByType(
   moduleType: ModuleType
 ): Array<DropdownOption> {
   const supportedSlotOption = SUPPORTED_MODULE_SLOTS[moduleType]
-  if (moduleType === 'thermocycler') {
+  if (moduleType === THERMOCYCLER) {
     return supportedSlotOption
   }
   const allOtherSlots = ALL_MODULE_SLOTS.filter(

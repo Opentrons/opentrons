@@ -1,11 +1,5 @@
 // @flow
 import type { ElementProps } from 'react'
-import type {
-  DropdownOption,
-  Mount,
-  InstrumentInfoProps,
-} from '@opentrons/components'
-import { typeof InstrumentGroup as InstrumentGroupProps } from '@opentrons/components'
 import assert from 'assert'
 import forEach from 'lodash/forEach'
 import isEmpty from 'lodash/isEmpty'
@@ -18,7 +12,12 @@ import {
   getLabwareDefURI,
 } from '@opentrons/shared-data'
 import i18n from '../../localization'
-import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
+import {
+  INITIAL_DECK_SETUP_STEP_ID,
+  MAGDECK,
+  TEMPDECK,
+  THERMOCYCLER,
+} from '../../constants'
 import {
   generateNewForm,
   getFormWarnings,
@@ -32,6 +31,12 @@ import {
   type LabwareDefByDefURI,
 } from '../../labware-defs'
 
+import { typeof InstrumentGroup as InstrumentGroupProps } from '@opentrons/components'
+import type {
+  DropdownOption,
+  Mount,
+  InstrumentInfoProps,
+} from '@opentrons/components'
 import type { FormWarning } from '../../steplist/formLevel'
 import type { BaseState, Selector, DeckSlot } from '../../types'
 import type { FormData, StepIdType, StepType } from '../../form-types'
@@ -149,14 +154,14 @@ export const getLabwareLocationsForStep = (
 }
 
 const MAGNETIC_MODULE_INITIAL_STATE: MagneticModuleState = {
-  type: 'magdeck',
+  type: MAGDECK,
   engaged: false,
 }
 const TEMPERATURE_MODULE_INITIAL_STATE: TemperatureModuleState = {
-  type: 'tempdeck',
+  type: TEMPDECK,
 }
 const THERMOCYCLER_MODULE_INITIAL_STATE: ThermocyclerModuleState = {
-  type: 'thermocycler',
+  type: THERMOCYCLER,
 }
 export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
   getInitialDeckSetupStepForm,
@@ -185,19 +190,19 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
         moduleLocations,
         (slot: DeckSlot, moduleId: string): ModuleOnDeck => {
           const module = moduleEntities[moduleId]
-          if (module.type === 'magdeck') {
+          if (module.type === MAGDECK) {
             return {
               id: module.id,
               model: module.model,
-              type: 'magdeck',
+              type: MAGDECK,
               slot,
               moduleState: MAGNETIC_MODULE_INITIAL_STATE,
             }
-          } else if (module.type === 'tempdeck') {
+          } else if (module.type === TEMPDECK) {
             return {
               id: module.id,
               model: module.model,
-              type: 'tempdeck',
+              type: TEMPDECK,
               slot,
               moduleState: TEMPERATURE_MODULE_INITIAL_STATE,
             }
@@ -205,7 +210,7 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
             return {
               id: module.id,
               model: module.model,
-              type: 'thermocycler',
+              type: THERMOCYCLER,
               slot,
               moduleState: THERMOCYCLER_MODULE_INITIAL_STATE,
             }

@@ -2,6 +2,14 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { useSelector, useDispatch } from 'react-redux'
+import { getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  Modal,
+  OutlineButton,
+  FormGroup,
+  DropdownField,
+  HoverTooltip,
+} from '@opentrons/components'
 import {
   selectors as stepFormSelectors,
   actions as stepFormActions,
@@ -15,20 +23,12 @@ import {
   SUPPORTED_MODULE_SLOTS,
   getAllModuleSlotsByType,
 } from '../../../modules'
+import { MAGDECK, TEMPDECK, THERMOCYCLER } from '../../../constants'
 import i18n from '../../../localization'
-import { getModuleDisplayName } from '@opentrons/shared-data'
-import {
-  Modal,
-  OutlineButton,
-  FormGroup,
-  DropdownField,
-  HoverTooltip,
-} from '@opentrons/components'
 import { PDAlert } from '../../alerts/PDAlert'
 import { CrashInfoBox } from '../../modules'
-import styles from './EditModules.css'
 import modalStyles from '../modal.css'
-
+import styles from './EditModules.css'
 import type { ModuleType } from '@opentrons/shared-data'
 
 type EditModulesProps = {
@@ -57,7 +57,7 @@ export default function EditModulesModal(props: EditModulesProps) {
 
   const showCrashInfoBox =
     getCrashablePipetteSelected(pipettesByMount) &&
-    (moduleType === 'magdeck' || moduleType === 'tempdeck')
+    (moduleType === MAGDECK || moduleType === TEMPDECK)
 
   const slotsBlockedBySpanning = getSlotsBlockedBySpanning(_initialDeckSetup)
   const previousModuleSlot = module && module.slot
@@ -67,7 +67,7 @@ export default function EditModulesModal(props: EditModulesProps) {
     (getSlotIsEmpty(_initialDeckSetup, selectedSlot) ||
       previousModuleSlot === selectedSlot)
 
-  const showSlotOption = moduleType !== 'thermocycler'
+  const showSlotOption = moduleType !== THERMOCYCLER
 
   const enableSlotSelection = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions

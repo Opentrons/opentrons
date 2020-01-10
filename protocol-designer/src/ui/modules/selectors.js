@@ -1,13 +1,13 @@
 // @flow
 import { createSelector } from 'reselect'
-
+import { MAGDECK, TEMPDECK, THERMOCYCLER } from '../../constants'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import { getLabwareNicknamesById } from '../labware/selectors'
 import {
   getModuleLabwareOptions,
   getModuleOnDeckByType,
   getModuleHasLabware,
 } from './utils'
-import { getLabwareNicknamesById } from '../labware/selectors'
 import type { Options } from '@opentrons/components'
 import type { Selector } from '../../types'
 
@@ -16,7 +16,7 @@ export const getMagneticLabwareOptions: Selector<Options> = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   getLabwareNicknamesById,
   (initialDeckSetup, nicknamesById) => {
-    return getModuleLabwareOptions(initialDeckSetup, nicknamesById, 'magdeck')
+    return getModuleLabwareOptions(initialDeckSetup, nicknamesById, MAGDECK)
   }
 )
 
@@ -28,12 +28,12 @@ export const getTemperatureLabwareOptions: Selector<Options> = createSelector(
     const temperatureModuleOptions = getModuleLabwareOptions(
       initialDeckSetup,
       nicknamesById,
-      'tempdeck'
+      TEMPDECK
     )
     const thermocyclerModuleOptions = getModuleLabwareOptions(
       initialDeckSetup,
       nicknamesById,
-      'thermocycler'
+      THERMOCYCLER
     )
     return temperatureModuleOptions.concat(thermocyclerModuleOptions)
   }
@@ -47,7 +47,7 @@ export const getThermocyclerLabwareOptions: Selector<Options> = createSelector(
     return getModuleLabwareOptions(
       initialDeckSetup,
       nicknamesById,
-      'thermocycler'
+      THERMOCYCLER
     )
   }
 )
@@ -58,7 +58,7 @@ export const getSingleMagneticModuleId: Selector<
 > = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   initialDeckSetup =>
-    getModuleOnDeckByType(initialDeckSetup, 'magdeck')?.id || null
+    getModuleOnDeckByType(initialDeckSetup, MAGDECK)?.id || null
 )
 
 /** Get single temperature module (assumes no multiples) */
@@ -67,7 +67,7 @@ export const getSingleTemperatureModuleId: Selector<
 > = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   initialDeckSetup =>
-    getModuleOnDeckByType(initialDeckSetup, 'tempdeck')?.id || null
+    getModuleOnDeckByType(initialDeckSetup, TEMPDECK)?.id || null
 )
 
 /** Get single temperature module (assumes no multiples) */
@@ -76,14 +76,14 @@ export const getSingleThermocyclerModuleId: Selector<
 > = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   initialDeckSetup =>
-    getModuleOnDeckByType(initialDeckSetup, 'thermocycler')?.id || null
+    getModuleOnDeckByType(initialDeckSetup, THERMOCYCLER)?.id || null
 )
 
 /** Returns boolean if magnetic module has labware */
 export const getMagnetModuleHasLabware: Selector<boolean> = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   initialDeckSetup => {
-    return getModuleHasLabware(initialDeckSetup, 'magdeck')
+    return getModuleHasLabware(initialDeckSetup, MAGDECK)
   }
 )
 
@@ -91,7 +91,7 @@ export const getMagnetModuleHasLabware: Selector<boolean> = createSelector(
 export const getTemperatureModuleHasLabware: Selector<boolean> = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   initialDeckSetup => {
-    return getModuleHasLabware(initialDeckSetup, 'tempdeck')
+    return getModuleHasLabware(initialDeckSetup, TEMPDECK)
   }
 )
 
@@ -99,6 +99,6 @@ export const getTemperatureModuleHasLabware: Selector<boolean> = createSelector(
 export const getThermocyclerModuleHasLabware: Selector<boolean> = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   initialDeckSetup => {
-    return getModuleHasLabware(initialDeckSetup, 'thermocycler')
+    return getModuleHasLabware(initialDeckSetup, THERMOCYCLER)
   }
 )

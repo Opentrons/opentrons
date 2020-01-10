@@ -1,10 +1,10 @@
 // @flow
 import findKey from 'lodash/findKey'
 import last from 'lodash/last'
+import { TEMPDECK, THERMOCYCLER } from '../../../constants'
+
 import type { ModuleOnDeck } from '../../../step-forms'
 import type { StepIdType, FormData } from '../../../form-types'
-
-import { TEMPERATURE_TYPE, THERMO_TYPE } from '../../../constants'
 
 export function getNextDefaultTemperatureModuleId(
   savedForms: { [StepIdType]: FormData },
@@ -21,8 +21,8 @@ export function getNextDefaultTemperatureModuleId(
   // should we simplify this to only return temperature modules?
   const nextDefaultModule: string | null =
     (lastModuleStep && lastModuleStep.moduleId) ||
-    findKey(equippedModulesById, m => m.type === TEMPERATURE_TYPE) ||
-    findKey(equippedModulesById, m => m.type === THERMO_TYPE)
+    findKey(equippedModulesById, m => m.type === TEMPDECK) ||
+    findKey(equippedModulesById, m => m.type === THERMOCYCLER)
 
   if (!nextDefaultModule) {
     console.error('Could not get next default module. Something went wrong.')
