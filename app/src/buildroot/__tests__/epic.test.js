@@ -1,20 +1,19 @@
 import { TestScheduler } from 'rxjs/testing'
 
-import {
-  makeRobotApiRequest,
-  passRobotApiResponseAction,
-  passRobotApiErrorAction,
-} from '../../robot-api/deprecated'
-
+import { mockRobot as robot } from '../../robot-api/__fixtures__'
+import { startDiscovery } from '../../discovery'
+import * as RobotApiHttp from '../../robot-api/http'
+import * as Fixtures from '../__fixtures__'
 import * as epics from '../epic'
 import * as actions from '../actions'
 import * as selectors from '../selectors'
+
 import { INITIAL_STATE } from '../reducer'
 
 jest.mock('../selectors')
-jest.mock('../../robot-api/deprecated')
+jest.mock('../../robot-api/http')
 
-const robot = { name: 'robot', host: '10.10.0.0', port: 31950 }
+const mockFetchRobotApi = RobotApiHttp.fetchRobotApi
 
 const balenaRobot = { ...robot, serverHealth: {} }
 
@@ -54,57 +53,37 @@ describe('buildroot update epics', () => {
   })
 
   describe('startUpdateEpic', () => {
-    test('with BR robot sends request to token URL', () => {
+    test('with BR robot sends CREATE_SESSION', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
-        const action = actions.startBuildrootUpdate(robot.name)
-
         selectors.getBuildrootRobot.mockReturnValueOnce(brRobot)
-        makeRobotApiRequest.mockImplementationOnce((req, meta) =>
-          cold('-a', { a: { req, meta } })
-        )
 
-        const action$ = hot('-a', { a: action })
+        const action$ = hot('-a', {
+          a: actions.startBuildrootUpdate(robot.name),
+        })
         const state$ = hot('a-', { a: state })
         const output$ = epics.startUpdateEpic(action$, state$)
 
-        expectObservable(output$).toBe('--a', {
-          a: {
-            req: {
-              method: 'POST',
-              host: brRobot,
-              path: '/server/update/begin',
-            },
-            meta: { buildrootPrefix: '/server/update', buildrootToken: true },
-          },
+        expectObservable(output$).toBe('-a', {
+          a: actions.createSession(brRobot, '/server/update/begin'),
         })
       })
     })
 
-    test('with BR-ready robot sends request to token URL', () => {
+    test('with BR-ready robot sends CREATE_SESSION', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
-        const action = actions.startBuildrootUpdate(robot.name)
-
         selectors.getBuildrootRobot.mockReturnValueOnce(brReadyRobot)
-        makeRobotApiRequest.mockImplementationOnce((req, meta) =>
-          cold('-a', { a: { req, meta } })
-        )
 
-        const action$ = hot('-a', { a: action })
+        const action$ = hot('-a', {
+          a: actions.startBuildrootUpdate(robot.name),
+        })
         const state$ = hot('a-', { a: state })
         const output$ = epics.startUpdateEpic(action$, state$)
 
-        expectObservable(output$).toBe('--a', {
-          a: {
-            req: {
-              method: 'POST',
-              host: brReadyRobot,
-              path: '/server/update/migrate/begin',
-            },
-            meta: {
-              buildrootPrefix: '/server/update/migrate',
-              buildrootToken: true,
-            },
-          },
+        expectObservable(output$).toBe('-a', {
+          a: actions.createSession(
+            brReadyRobot,
+            '/server/update/migrate/begin'
+          ),
         })
       })
     })
@@ -163,57 +142,104 @@ describe('buildroot update epics', () => {
     })
   })
 
-  describe('token conflict epics', () => {
-    test('cancelSessionOnConflictEpic sends cancel on token conflict', () => {
-      testScheduler.run(({ hot, cold, expectObservable }) => {
-        const action = {
-          type: 'robotApi:ERROR__POST__/server/update/begin',
-          payload: { host: brRobot, ok: false, status: 409 },
-          meta: { buildrootPrefix: '/server/update', buildrootToken: true },
-        }
+  describe('createSessionEpic', () => {
+    test('sends request to token URL from payload and issues CREATE_SESSION_SUCCESS', () => {
+      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
+        const action = actions.createSession(robot, '/server/update/begin')
 
-        passRobotApiErrorAction.mockImplementationOnce(a => a)
-        makeRobotApiRequest.mockImplementationOnce((req, meta) =>
-          cold('-a', { a: { req, meta } })
+        mockFetchRobotApi.mockReturnValue(
+          cold('r', { r: Fixtures.mockUpdateBeginSuccess })
         )
 
         const action$ = hot('-a', { a: action })
-        const output$ = epics.cancelSessionOnConflictEpic(action$)
+        const state$ = hot('a-', { a: state })
+        const output$ = epics.createSessionEpic(action$, state$)
 
-        expectObservable(output$).toBe('--a', {
-          a: {
-            req: {
-              method: 'POST',
-              host: brRobot,
-              path: '/server/update/cancel',
-            },
-            meta: { buildrootRetry: true },
-          },
+        expectObservable(output$).toBe('-s', {
+          s: actions.createSessionSuccess(
+            robot,
+            Fixtures.mockUpdateBeginSuccess.body.token,
+            '/server/update'
+          ),
+        })
+
+        flush()
+        expect(mockFetchRobotApi).toHaveBeenCalledWith(robot, {
+          method: 'POST',
+          path: '/server/update/begin',
         })
       })
     })
 
-    test('triggerUpdateAfterCancelEpic sends START_UPDATE after cancel success', () => {
-      testScheduler.run(({ hot, expectObservable }) => {
-        const action = {
-          type: 'robotApi:RESPONSE__POST__/server/update/cancel',
-          payload: { host: brRobot, ok: true },
-          meta: { buildrootRetry: true },
-        }
+    test('sends request to cancel URL if 409 and reissues CREATE_SESSION', () => {
+      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
+        const action = actions.createSession(robot, '/server/update/begin')
 
-        passRobotApiResponseAction.mockImplementationOnce(a => a)
+        mockFetchRobotApi
+          .mockReturnValueOnce(
+            cold('r', { r: Fixtures.mockUpdateBeginConflict })
+          )
+          .mockReturnValueOnce(
+            cold('r', { r: Fixtures.mockUpdateCancelSuccess })
+          )
 
         const action$ = hot('-a', { a: action })
-        const output$ = epics.triggerUpdateAfterCancelEpic(action$)
+        const state$ = hot('a-', { a: state })
+        const output$ = epics.createSessionEpic(action$, state$)
 
-        expectObservable(output$).toBe('-a', {
-          a: actions.startBuildrootUpdate(brRobot.name),
+        expectObservable(output$).toBe('-a', { a: action })
+        flush()
+        expect(mockFetchRobotApi).toHaveBeenCalledWith(robot, {
+          method: 'POST',
+          path: '/server/update/cancel',
+        })
+      })
+    })
+
+    test('issues error if begin request fails without 409', () => {
+      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
+        const action = actions.createSession(robot, '/server/update/begin')
+
+        mockFetchRobotApi.mockReturnValueOnce(
+          cold('r', { r: Fixtures.mockUpdateBeginFailure })
+        )
+
+        const action$ = hot('-a', { a: action })
+        const state$ = hot('a-', { a: state })
+        const output$ = epics.createSessionEpic(action$, state$)
+
+        expectObservable(output$).toBe('-e', {
+          e: actions.unexpectedBuildrootError('Unable to start update session'),
+        })
+      })
+    })
+
+    test('issues error if cancel request fails', () => {
+      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
+        const action = actions.createSession(robot, '/server/update/begin')
+
+        mockFetchRobotApi
+          .mockReturnValueOnce(
+            cold('r', { r: Fixtures.mockUpdateBeginConflict })
+          )
+          .mockReturnValueOnce(
+            cold('r', { r: Fixtures.mockUpdateCancelFailure })
+          )
+
+        const action$ = hot('-a', { a: action })
+        const state$ = hot('a-', { a: state })
+        const output$ = epics.createSessionEpic(action$, state$)
+
+        expectObservable(output$).toBe('-e', {
+          e: actions.unexpectedBuildrootError(
+            'Unable to cancel in-progress update session'
+          ),
         })
       })
     })
   })
 
-  test('triggerUpdateAfterPremigrationEpic', () => {
+  test('retryAfterPremigrationEpic', () => {
     testScheduler.run(({ hot, expectObservable }) => {
       selectors.getBuildrootRobot.mockReturnValueOnce(brReadyRobot)
       selectors.getBuildrootRobotName.mockReturnValueOnce(brReadyRobot.name)
@@ -223,7 +249,7 @@ describe('buildroot update epics', () => {
       })
 
       const state$ = hot('-a', { a: state })
-      const output$ = epics.triggerUpdateAfterPremigrationEpic(null, state$)
+      const output$ = epics.retryAfterPremigrationEpic(null, state$)
 
       expectObservable(output$).toBe('-a', {
         a: actions.startBuildrootUpdate(brReadyRobot.name),
@@ -233,38 +259,43 @@ describe('buildroot update epics', () => {
 
   test('statusPollEpic', () => {
     testScheduler.run(
-      ({ hot, cold, expectObservable, expectSubscriptions }) => {
+      ({ hot, cold, expectObservable, expectSubscriptions, flush }) => {
         const action = {
-          type: 'robotApi:RESPONSE__POST__/server/update/begin',
-          payload: { host: brRobot, ok: true, body: { token: 'a-token' } },
-          meta: { buildrootPrefix: '/server/update', buildrootToken: true },
+          type: 'buildroot:CREATE_SESSION_SUCCESS',
+          payload: {
+            host: brRobot,
+            token: 'foobar',
+            pathPrefix: '/server/update',
+          },
         }
 
         selectors.getBuildrootSession
           .mockReturnValue({ stage: 'ready-for-restart' })
           .mockReturnValueOnce({ stage: null })
 
-        passRobotApiResponseAction.mockImplementationOnce(a => a)
-        makeRobotApiRequest.mockImplementation((req, meta) =>
-          cold('a', { a: { req, meta } })
+        mockFetchRobotApi.mockReturnValue(
+          cold('r', { r: Fixtures.mockStatusSuccess })
         )
 
         const action$ = hot('-a', { a: action })
         const state$ = hot('-x 4s y 2s y #', { x: state, y: state })
         const output$ = epics.statusPollEpic(action$, state$)
-        const expectedPoll = {
-          req: {
-            method: 'GET',
-            host: brRobot,
-            path: '/server/update/a-token/status',
-          },
-          meta: { buildrootStatus: true },
-        }
+        const { stage, message, progress } = Fixtures.mockStatusSuccess.body
+        const expectedAction = actions.buildrootStatus(
+          stage,
+          message,
+          Math.round(progress * 100)
+        )
 
         expectSubscriptions(state$.subscriptions).toBe('-^ 4s !')
         expectObservable(output$).toBe('- 2s a 1999ms a', {
-          a: expectedPoll,
+          a: expectedAction,
         })
+        flush()
+
+        const request = { method: 'GET', path: '/server/update/foobar/status' }
+        expect(mockFetchRobotApi).toHaveBeenNthCalledWith(1, brRobot, request)
+        expect(mockFetchRobotApi).toHaveBeenNthCalledWith(2, brRobot, request)
       }
     )
   })
@@ -295,78 +326,123 @@ describe('buildroot update epics', () => {
     })
   })
 
-  test('commitUpdateEpic', () => {
-    testScheduler.run(({ hot, cold, expectObservable }) => {
-      const session = {
-        pathPrefix: '/server/update',
-        token: 'tok',
-        stage: 'done',
-        step: 'processFile',
-      }
+  describe('commitUpdateEpic', () => {
+    const session = {
+      pathPrefix: '/server/update',
+      token: 'foobar',
+      stage: 'done',
+      step: 'processFile',
+    }
 
-      selectors.getBuildrootRobot.mockReturnValue(brRobot)
-      selectors.getBuildrootSession.mockReturnValue(session)
-      makeRobotApiRequest.mockImplementation((req, meta) =>
-        cold('--a', { a: { req, meta } })
-      )
+    test('commit request success', () => {
+      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
+        selectors.getBuildrootRobot.mockReturnValue(brRobot)
+        selectors.getBuildrootSession.mockReturnValue(session)
 
-      const action$ = null
-      const state$ = hot('-a', { a: state })
-      const output$ = epics.commitUpdateEpic(action$, state$)
+        mockFetchRobotApi.mockReturnValue(
+          cold('-r', { r: Fixtures.mockCommitSuccess })
+        )
 
-      expectObservable(output$).toBe('---a', {
-        a: {
-          req: {
-            method: 'POST',
-            host: brRobot,
-            path: '/server/update/tok/commit',
-          },
-          meta: { buildrootCommit: true },
-        },
+        const action$ = hot('--')
+        const state$ = hot('-a', { a: state })
+        const output$ = epics.commitUpdateEpic(action$, state$)
+
+        expectObservable(output$).toBe('-a', {
+          a: actions.setBuildrootSessionStep('commitUpdate'),
+        })
+
+        flush()
+        expect(mockFetchRobotApi).toHaveBeenCalledWith(brRobot, {
+          method: 'POST',
+          path: '/server/update/foobar/commit',
+        })
+      })
+    })
+
+    test('commit request failure', () => {
+      testScheduler.run(({ hot, cold, expectObservable }) => {
+        selectors.getBuildrootRobot.mockReturnValue(brRobot)
+        selectors.getBuildrootSession.mockReturnValue(session)
+
+        mockFetchRobotApi.mockReturnValue(
+          cold('-r', { r: Fixtures.mockCommitFailure })
+        )
+
+        const action$ = hot('--')
+        const state$ = hot('-a', { a: state })
+        const output$ = epics.commitUpdateEpic(action$, state$)
+
+        expectObservable(output$).toBe('-ab', {
+          a: actions.setBuildrootSessionStep('commitUpdate'),
+          b: actions.unexpectedBuildrootError('Unable to commit update: AH'),
+        })
       })
     })
   })
 
-  test('restartAfterCommitEpic', () => {
-    testScheduler.run(({ hot, cold, expectObservable }) => {
-      const session = {
-        pathPrefix: '/server/update',
-        token: 'a-token',
-        stage: 'ready-for-restart',
-        step: 'commitUpdate',
-      }
+  describe('restartAfterCommitEpic', () => {
+    const session = {
+      pathPrefix: '/server/update',
+      token: 'foobar',
+      stage: 'ready-for-restart',
+      step: 'commitUpdate',
+    }
 
-      selectors.getBuildrootRobot.mockReturnValue(brRobot)
-      selectors.getBuildrootSession.mockReturnValue(session)
-      makeRobotApiRequest.mockImplementation((req, meta) =>
-        cold('--a', { a: { req, meta } })
-      )
+    test('restart request success', () => {
+      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
+        selectors.getBuildrootRobot.mockReturnValue(brRobot)
+        selectors.getBuildrootSession.mockReturnValue(session)
 
-      const action$ = null
-      const state$ = hot('-a', { a: state })
-      const output$ = epics.restartAfterCommitEpic(action$, state$)
+        mockFetchRobotApi.mockReturnValue(
+          cold('-r', { r: Fixtures.mockRestartSuccess })
+        )
 
-      expectObservable(output$).toBe('---a', {
-        a: {
-          req: {
-            method: 'POST',
-            host: brRobot,
-            path: '/server/restart',
-          },
-          meta: { buildrootRestart: true },
-        },
+        const action$ = hot('--')
+        const state$ = hot('-a', { a: state })
+        const output$ = epics.restartAfterCommitEpic(action$, state$)
+
+        expectObservable(output$).toBe('-ab', {
+          a: actions.setBuildrootSessionStep('restart'),
+          b: startDiscovery(1200000),
+        })
+
+        flush()
+        expect(mockFetchRobotApi).toHaveBeenCalledWith(brRobot, {
+          method: 'POST',
+          path: '/server/restart',
+        })
+      })
+    })
+
+    test('restart request failure', () => {
+      testScheduler.run(({ hot, cold, expectObservable }) => {
+        selectors.getBuildrootRobot.mockReturnValue(brRobot)
+        selectors.getBuildrootSession.mockReturnValue(session)
+
+        mockFetchRobotApi.mockReturnValue(
+          cold('-r', { r: Fixtures.mockRestartFailure })
+        )
+
+        const action$ = hot('--')
+        const state$ = hot('-a', { a: state })
+        const output$ = epics.restartAfterCommitEpic(action$, state$)
+
+        expectObservable(output$).toBe('-ab', {
+          a: actions.setBuildrootSessionStep('restart'),
+          b: actions.unexpectedBuildrootError('Unable to restart robot: AH'),
+        })
       })
     })
   })
 
   describe('user file upload epics', () => {
-    test('triggerUpdateAfterUserFileInfo', () => {
+    test('retryAfterUserFileInfoEpic', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
         selectors.getBuildrootRobotName.mockReturnValue(balenaRobot.name)
 
         const action$ = hot('-a', { a: { type: 'buildroot:USER_FILE_INFO' } })
         const state$ = hot('a-', { a: state })
-        const output$ = epics.triggerUpdateAfterUserFileInfo(action$, state$)
+        const output$ = epics.retryAfterUserFileInfoEpic(action$, state$)
 
         expectObservable(output$).toBe('-a', {
           a: actions.startBuildrootUpdate(balenaRobot.name),

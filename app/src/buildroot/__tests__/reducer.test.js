@@ -1,7 +1,8 @@
+import { mockRobot } from '../../robot-api/__fixtures__'
 import { INITIAL_STATE, buildrootReducer } from '../reducer'
 
 const BASE_SESSION = {
-  robotName: 'robot-name',
+  robotName: mockRobot.name,
   userFileInfo: null,
   step: null,
   token: null,
@@ -35,11 +36,14 @@ describe('buildroot reducer', () => {
           releaseNotes: 'release notes',
         },
       },
-      initialState: { ...INITIAL_STATE, session: { robotName: 'robot-name' } },
+      initialState: {
+        ...INITIAL_STATE,
+        session: { robotName: mockRobot.name },
+      },
       expected: {
         ...INITIAL_STATE,
         session: {
-          robotName: 'robot-name',
+          robotName: mockRobot.name,
           userFileInfo: {
             systemFile: '/path/to/system.zip',
             version: '1.0.0',
@@ -70,7 +74,7 @@ describe('buildroot reducer', () => {
       name: 'handles buildroot:START_UPDATE',
       action: {
         type: 'buildroot:START_UPDATE',
-        payload: { robotName: 'robot-name' },
+        payload: { robotName: mockRobot.name },
       },
       initialState: { ...INITIAL_STATE, session: null },
       expected: { ...INITIAL_STATE, session: BASE_SESSION },
@@ -79,13 +83,13 @@ describe('buildroot reducer', () => {
       name: 'buildroot:START_UPDATE preserves user file info',
       action: {
         type: 'buildroot:START_UPDATE',
-        payload: { robotName: 'robot-name' },
+        payload: { robotName: mockRobot.name },
       },
       initialState: {
         ...INITIAL_STATE,
         session: {
           ...BASE_SESSION,
-          robotName: 'robot-name',
+          robotName: mockRobot.name,
           userFileInfo: { systemFile: 'system.zip' },
         },
       },
@@ -93,7 +97,7 @@ describe('buildroot reducer', () => {
         ...INITIAL_STATE,
         session: {
           ...BASE_SESSION,
-          robotName: 'robot-name',
+          robotName: mockRobot.name,
           userFileInfo: { systemFile: 'system.zip' },
         },
       },
@@ -102,7 +106,7 @@ describe('buildroot reducer', () => {
       name: 'handles buildroot:START_PREMIGRATION',
       action: {
         type: 'buildroot:START_PREMIGRATION',
-        payload: { name: 'robot-name', ip: '10.10.0.0', port: 31950 },
+        payload: { name: mockRobot.name, ip: '10.10.0.0', port: 31950 },
       },
       initialState: { ...INITIAL_STATE, session: BASE_SESSION },
       expected: {
@@ -123,52 +127,66 @@ describe('buildroot reducer', () => {
       },
     },
     {
-      name: 'handles robotApi:REQUEST__POST__/session/update/begin',
+      name: 'handles buildroot:CREATE_SESSION',
       action: {
-        type: 'robotApi:REQUEST__POST__/session/update/begin',
-        payload: { host: { name: 'robot-name' }, body: { token: 'foobar' } },
-        meta: { buildrootPrefix: '/session/update', buildrootToken: true },
+        type: 'buildroot:CREATE_SESSION',
+        payload: { host: mockRobot, sessionPath: '/session/update/begin' },
       },
       initialState: { ...INITIAL_STATE, session: BASE_SESSION },
       expected: {
+        ...INITIAL_STATE,
+        session: { ...BASE_SESSION, step: 'getToken' },
+      },
+    },
+    {
+      name: 'handles buildroot:CREATE_SESSION_SUCCESS',
+      action: {
+        type: 'buildroot:CREATE_SESSION_SUCCESS',
+        payload: {
+          host: mockRobot,
+          pathPrefix: '/session/update',
+          token: 'foobar',
+        },
+      },
+      initialState: {
         ...INITIAL_STATE,
         session: {
           ...BASE_SESSION,
           step: 'getToken',
         },
       },
-    },
-    {
-      name: 'handles robotApi:RESPONSE__POST__/session/update/begin',
-      action: {
-        type: 'robotApi:RESPONSE__POST__/session/update/begin',
-        payload: { host: { name: 'robot-name' }, body: { token: 'foobar' } },
-        meta: { buildrootPrefix: '/session/update', buildrootToken: true },
-      },
-      initialState: { ...INITIAL_STATE, session: BASE_SESSION },
       expected: {
         ...INITIAL_STATE,
         session: {
           ...BASE_SESSION,
-          token: 'foobar',
+          step: 'getToken',
           pathPrefix: '/session/update',
+          token: 'foobar',
         },
       },
     },
     {
-      name: 'handles robotApi:RESPONSE__POST__/session/update/:token/status',
+      name: 'handles buildroot:STATUS',
       action: {
-        type: 'robotApi:RESPONSE__POST__/session/update/a-token/status',
-        payload: {
-          host: { name: 'robot-name' },
-          body: { stage: 'awaiting-file', progress: 0.1 },
-        },
-        meta: { buildrootStatus: true },
+        type: 'buildroot:STATUS',
+        payload: { stage: 'writing', progress: 10, message: 'Writing file' },
       },
       initialState: { ...INITIAL_STATE, session: BASE_SESSION },
       expected: {
         ...INITIAL_STATE,
-        session: { ...BASE_SESSION, stage: 'awaiting-file', progress: 10 },
+        session: { ...BASE_SESSION, stage: 'writing', progress: 10 },
+      },
+    },
+    {
+      name: 'handles buildroot:STATUS with error',
+      action: {
+        type: 'buildroot:STATUS',
+        payload: { stage: 'error', error: 'error-type', message: 'AH!' },
+      },
+      initialState: { ...INITIAL_STATE, session: BASE_SESSION },
+      expected: {
+        ...INITIAL_STATE,
+        session: { ...BASE_SESSION, stage: 'error', error: 'AH!' },
       },
     },
     {
@@ -176,7 +194,7 @@ describe('buildroot reducer', () => {
       action: {
         type: 'buildroot:UPLOAD_FILE',
         payload: {
-          host: { name: 'robot-name' },
+          host: { name: mockRobot.name },
           path: '/server/update/a-token/file',
         },
         meta: { shell: true },
@@ -206,44 +224,6 @@ describe('buildroot reducer', () => {
           ...BASE_SESSION,
           step: 'processFile',
         },
-      },
-    },
-    {
-      name: 'handles robotApi:REQUEST__POST__/session/update/:token/commit',
-      action: {
-        type: 'robotApi:REQUEST__POST__/session/update/a-token/status',
-        payload: { host: { name: 'robot-name' } },
-        meta: { buildrootCommit: true },
-      },
-      initialState: {
-        ...INITIAL_STATE,
-        session: {
-          ...BASE_SESSION,
-          step: 'processFile',
-        },
-      },
-      expected: {
-        ...INITIAL_STATE,
-        session: {
-          ...BASE_SESSION,
-          step: 'commitUpdate',
-        },
-      },
-    },
-    {
-      name: 'handles robotApi:REQUEST__POST__/server/restart',
-      action: {
-        type: 'robotApi:REQUEST__POST__/server/restart',
-        payload: { host: { name: 'robot-name' } },
-        meta: { buildrootRestart: true },
-      },
-      initialState: {
-        ...INITIAL_STATE,
-        session: { ...BASE_SESSION, step: 'commitUpdate' },
-      },
-      expected: {
-        ...INITIAL_STATE,
-        session: { ...BASE_SESSION, step: 'restart' },
       },
     },
     {

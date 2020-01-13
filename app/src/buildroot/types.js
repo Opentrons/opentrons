@@ -63,6 +63,25 @@ export type StartBuildrootUpdateAction = {|
   payload: {| robotName: string, systemFile: string | null |},
 |}
 
+export type CreateSessionAction = {|
+  type: 'buildroot:CREATE_SESSION',
+  payload: {| host: RobotHost, sessionPath: string |},
+|}
+
+export type CreateSessionSuccessAction = {|
+  type: 'buildroot:CREATE_SESSION_SUCCESS',
+  payload: {| host: RobotHost, token: string, pathPrefix: string |},
+|}
+
+export type BuildrootStatusAction = {|
+  type: 'buildroot:STATUS',
+  payload: {|
+    stage: UpdateSessionStage,
+    message: string,
+    progress: number | null,
+  |},
+|}
+
 export type UnexpectedBuildrootError = {|
   type: 'buildroot:UNEXPECTED_ERROR',
   payload: {| message: string |},
@@ -70,6 +89,9 @@ export type UnexpectedBuildrootError = {|
 
 export type BuildrootAction =
   | StartBuildrootUpdateAction
+  | CreateSessionAction
+  | CreateSessionSuccessAction
+  | BuildrootStatusAction
   | UnexpectedBuildrootError
   | {| type: 'buildroot:DOWNLOAD_PROGRESS', payload: number |}
   | {| type: 'buildroot:DOWNLOAD_ERROR', payload: string |}
