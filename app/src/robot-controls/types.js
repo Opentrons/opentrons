@@ -44,10 +44,6 @@ export type FetchLightsFailureAction = {|
   meta: RobotApiRequestMeta,
 |}
 
-export type FetchLightsDoneAction =
-  | FetchLightsSuccessAction
-  | FetchLightsFailureAction
-
 // update lights
 
 export type UpdateLightsAction = {|
@@ -67,10 +63,6 @@ export type UpdateLightsFailureAction = {|
   payload: {| robotName: string, error: {| message: string |} |},
   meta: RobotApiRequestMeta,
 |}
-
-export type UpdateLightsDoneAction =
-  | UpdateLightsSuccessAction
-  | UpdateLightsFailureAction
 
 // home
 
@@ -93,8 +85,6 @@ export type HomeFailureAction = {|
   payload: {| robotName: string, error: {| message: string |} |},
   meta: RobotApiRequestMeta,
 |}
-
-export type HomeDoneAction = HomeSuccessAction | HomeFailureAction
 
 // move
 
@@ -120,8 +110,6 @@ export type MoveFailureAction = {|
   payload: {| robotName: string, error: {| message: string |} |},
   meta: RobotApiRequestMeta,
 |}
-
-export type MoveDoneAction = MoveSuccessAction | MoveFailureAction
 
 // clear homing and movement status and error
 

@@ -3,7 +3,6 @@ import functions from 'lodash/functions'
 import omit from 'lodash/omit'
 import { push } from 'connected-react-router'
 
-import { delay } from '../../util'
 import client from '../api-client/client'
 import RpcClient from '../../rpc/client'
 import { NAME, actions, constants } from '../'
@@ -18,6 +17,8 @@ import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
 jest.mock('../../rpc/client')
 jest.mock('../../protocol/selectors')
 jest.mock('../../custom-labware/selectors')
+
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 describe('api client', () => {
   let dispatch

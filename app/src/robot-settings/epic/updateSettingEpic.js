@@ -7,14 +7,14 @@ import { mapToRobotApiRequest } from '../../robot-api/operators'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
-import type { StrictEpic } from '../../types'
+import type { Epic } from '../../types'
 
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 
-import type { UpdateSettingAction, UpdateSettingDoneAction } from '../types'
+import type { UpdateSettingAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<UpdateSettingAction> = action => ({
   method: POST,
@@ -22,10 +22,10 @@ const mapActionToRequest: ActionToRequestMapper<UpdateSettingAction> = action =>
   body: { id: action.payload.settingId, value: action.payload.value },
 })
 
-const mapResponseToAction: ResponseToActionMapper<
-  UpdateSettingAction,
-  UpdateSettingDoneAction
-> = (response, originalAction) => {
+const mapResponseToAction: ResponseToActionMapper<UpdateSettingAction> = (
+  response,
+  originalAction
+) => {
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
 
@@ -39,10 +39,7 @@ const mapResponseToAction: ResponseToActionMapper<
     : Actions.updateSettingFailure(host.name, body, meta)
 }
 
-export const updateSettingEpic: StrictEpic<UpdateSettingDoneAction> = (
-  action$,
-  state$
-) => {
+export const updateSettingEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType(Constants.UPDATE_SETTING),
     mapToRobotApiRequest(

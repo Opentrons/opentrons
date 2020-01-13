@@ -8,17 +8,14 @@ import { mapToRobotApiRequest } from '../../robot-api/operators'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
-import type { StrictEpic } from '../../types'
+import type { Epic } from '../../types'
 
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 
-import type {
-  UpdatePipetteSettingsAction,
-  UpdatePipetteSettingsDoneAction,
-} from '../types'
+import type { UpdatePipetteSettingsAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<UpdatePipetteSettingsAction> = action => ({
   method: PATCH,
@@ -30,10 +27,10 @@ const mapActionToRequest: ActionToRequestMapper<UpdatePipetteSettingsAction> = a
   },
 })
 
-const mapResponseToAction: ResponseToActionMapper<
-  UpdatePipetteSettingsAction,
-  UpdatePipetteSettingsDoneAction
-> = (response, originalAction) => {
+const mapResponseToAction: ResponseToActionMapper<UpdatePipetteSettingsAction> = (
+  response,
+  originalAction
+) => {
   const { host, body, ...responseMeta } = response
   const { pipetteId } = originalAction.payload
   const meta = { ...originalAction.meta, response: responseMeta }
@@ -48,10 +45,7 @@ const mapResponseToAction: ResponseToActionMapper<
     : Actions.updatePipetteSettingsFailure(host.name, pipetteId, body, meta)
 }
 
-export const updatePipetteSettingsEpic: StrictEpic<UpdatePipetteSettingsDoneAction> = (
-  action$,
-  state$
-) => {
+export const updatePipetteSettingsEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType(Constants.UPDATE_PIPETTE_SETTINGS),
     mapToRobotApiRequest(

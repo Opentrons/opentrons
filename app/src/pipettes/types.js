@@ -175,18 +175,6 @@ export type UpdatePipetteSettingsFailureAction = {|
 
 // pipette actions unions
 
-export type FetchPipettesDoneAction =
-  | FetchPipettesSuccessAction
-  | FetchPipettesFailureAction
-
-export type FetchPipetteSettingsDoneAction =
-  | FetchPipetteSettingsSuccessAction
-  | FetchPipetteSettingsFailureAction
-
-export type UpdatePipetteSettingsDoneAction =
-  | UpdatePipetteSettingsSuccessAction
-  | UpdatePipetteSettingsFailureAction
-
 export type PipettesAction =
   | FetchPipettesAction
   | FetchPipettesSuccessAction
