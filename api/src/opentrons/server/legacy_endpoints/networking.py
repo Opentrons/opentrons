@@ -33,7 +33,7 @@ class ConfigureArgsError(Exception):
         super().__init__()
 
 
-@http_version(0, 0)
+@http_version(1, 0)
 async def list_networks(request: web.Request) -> web.Response:
     """
     Get request will return a list of discovered ssids:
@@ -219,7 +219,7 @@ def _check_configure_args(configure_args: Dict[str, Any]) -> Dict[str, Any]:
     return configure_args
 
 
-@http_version(0, 0)
+@http_version(1, 0)
 async def configure(request: web.Request) -> web.Response:
     """
     Post request should include a json body specifying config information
@@ -278,7 +278,7 @@ async def configure(request: web.Request) -> web.Response:
         return web.json_response({'message': message}, status=401)
 
 
-@http_version(0, 0)
+@http_version(1, 0)
 async def status(request: web.Request) -> web.Response:
     """
     Get request will return the status of the machine's connection to the
@@ -351,7 +351,7 @@ async def status(request: web.Request) -> web.Response:
     return web.json_response(connectivity, status=status)
 
 
-@http_version(0, 0)
+@http_version(1, 0)
 async def add_key(request: web.Request) -> web.Response:
     """ Add a key file (for later use in EAP config) to the system.
 
@@ -421,7 +421,7 @@ async def add_key(request: web.Request) -> web.Response:
         status=201)
 
 
-@http_version(0, 0)
+@http_version(1, 0)
 async def list_keys(request: web.Request) -> web.Response:
     """ List the key files installed in the system.
 
@@ -458,7 +458,7 @@ async def list_keys(request: web.Request) -> web.Response:
     return web.json_response({'keys': keys}, status=200)
 
 
-@http_version(0, 0)
+@http_version(1, 0)
 async def remove_key(request: web.Request) -> web.Response:
     """ Remove a key.
 
@@ -485,7 +485,7 @@ async def remove_key(request: web.Request) -> web.Response:
         status=200)
 
 
-@http_version(0, 0)
+@http_version(1, 0)
 async def eap_options(request: web.Request) -> web.Response:
     """ Get request returns the available configuration options for WPA-EAP.
 

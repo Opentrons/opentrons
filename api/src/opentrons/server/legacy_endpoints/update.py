@@ -13,7 +13,7 @@ UPDATE_TIMEOUT = 15
 
 # TODO: (BC, 2019-10-24): once APIv1 server ff toggle is gone,
 #  this should be removed
-@http_version(0, 0)
+@http_version(1, 0)
 async def cannot_update_firmware(request: web.Request) -> web.Response:
     """
      This handler refuses a module firmware update request
@@ -26,7 +26,7 @@ async def cannot_update_firmware(request: web.Request) -> web.Response:
     return web.json_response(res, status=status)
 
 
-@http_version(0, 0)
+@http_version(1, 0)
 async def update_module_firmware(request: web.Request) -> web.Response:
     """
      This handler accepts a POST request with Content-Type: multipart/form-data

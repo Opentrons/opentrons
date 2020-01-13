@@ -11,7 +11,6 @@ import traceback
 from typing import TYPE_CHECKING
 from aiohttp import web
 
-from multidict import MultiDict
 from .util import HTTPVersionMismatchError, SUPPORTED_VERSIONS, ERROR_CODES
 from opentrons.config import CONFIG
 from .rpc import RPCServer

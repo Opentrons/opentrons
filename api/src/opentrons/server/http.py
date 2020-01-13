@@ -5,12 +5,8 @@ from opentrons import config
 from .legacy_endpoints import (networking, control, settings, update)
 from opentrons.deck_calibration import endpoints as dc_endp
 
-<<<<<<< HEAD
-=======
-from .legacy_endpoints import serverlib_fallback as endpoints
 from . import endpoints as v1_endp
 
->>>>>>> Main HTTP API Versioning
 log = logging.getLogger(__name__)
 
 
@@ -53,7 +49,7 @@ class HTTPServerLegacy:
             '/camera/picture', control.take_picture)
 
         if config.ARCHITECTURE == config.SystemArchitecture.BUILDROOT:
-            from .endpoints import logs
+            from .legacy_endpoints import logs
             self.app.router.add_get('/logs/{syslog_identifier}',
                                     logs.get_logs_by_id)
         else:
@@ -110,4 +106,5 @@ class HTTPServer:
         self.app = app
         self.log_file_path = log_file_path
 
-        self.app.router.add_get('/robot/health', v1_endp.health)
+        self.app.router.add_get('/health/{version}', v1_endp.health)
+        self.app.router.add_get('/openapi/{version}', v1_endp.get_openapi_spec)

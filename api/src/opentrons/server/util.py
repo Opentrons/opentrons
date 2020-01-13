@@ -3,13 +3,14 @@ from aiohttp import helpers, web
 
 from opentrons.protocols.types import APIVersion
 
-SUPPORTED_VERSIONS = [APIVersion(0, 0), APIVersion(1, 0)]
-DEFAULT_VERSION = APIVersion(0, 0)
+SUPPORTED_VERSIONS = [APIVersion(1, 0), APIVersion(2, 0)]
+DEFAULT_VERSION = APIVersion(1, 0)
 
 ERROR_CODES = {
     'unsupportedVersion': 1,
     'HTTPNotFound': 2
 }
+
 
 class HTTPVersionMismatchError(Exception):
     def __init__(self, message, versions):
@@ -25,7 +26,7 @@ def determine_requested_version(request):
         # Use aiohttp helper to parse MIME type header into 4 element tuple
         # see for further info: https://aiohttp.readthedocs.io/en/v0.18.2/api.html#aiohttp.helpers.parse_mimetype  # noqa(E501)
         params = helpers.parse_mimetype(accept_header).parameters
-        version = params.get('version', '0.0')
+        version = params.get('version', '1.0')
         major, minor = version.split('.')
         return APIVersion(int(major), int(minor))
     else:

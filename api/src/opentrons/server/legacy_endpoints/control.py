@@ -35,7 +35,7 @@ def hw_from_req(req):
     return req.app['com.opentrons.hardware']
 
 
-@http_version(0, 0)
+@http_version(1, 0)
 async def get_attached_pipettes(request: web.Request) -> web.Response:
     """
     Query robot for model strings on 'left' and 'right' mounts, and return a
@@ -96,7 +96,7 @@ async def get_attached_pipettes(request: web.Request) -> web.Response:
     return web.json_response(response, status=200)
 
 
-@http_version(0, 0)
+@http_version(1, 0)
 async def get_attached_modules(request: web.Request) -> web.Response:
     """
     On success (including an empty "modules" list if no modules are detected):
@@ -166,7 +166,7 @@ async def get_attached_modules(request: web.Request) -> web.Response:
                              status=200)
 
 
-@http_version(0, 0)
+@http_version(1, 0)
 async def get_module_data(request: web.Request) -> web.Response:
     """
     Query a module (by its serial number) for its live data
@@ -191,7 +191,7 @@ async def get_module_data(request: web.Request) -> web.Response:
         return web.json_response({"message": "Module not found"}, status=404)
 
 
-@http_version(0, 0)
+@http_version(1, 0)
 async def execute_module_command(request: web.Request) -> web.Response:
     """
     Execute a command on a given module by its serial number
@@ -236,7 +236,7 @@ async def execute_module_command(request: web.Request) -> web.Response:
             status=400)
 
 
-@http_version(0, 0)
+@http_version(1, 0)
 async def get_engaged_axes(request: web.Request) -> web.Response:
     """
     Query driver for engaged state by axis. Response keys will be axes XYZABC
@@ -257,7 +257,7 @@ async def get_engaged_axes(request: web.Request) -> web.Response:
          for k, v in engaged.items()})
 
 
-@http_version(0, 0)
+@http_version(1, 0)
 async def disengage_axes(request: web.Request) -> web.Response:
     """
     Disengage axes (turn off power) primarily in order to reduce heat
@@ -280,7 +280,7 @@ async def disengage_axes(request: web.Request) -> web.Response:
     return web.json_response({"message": message}, status=status)
 
 
-@http_version(0, 0)
+@http_version(1, 0)
 async def position_info(request: web.Request) -> web.Response:
     """
     Positions determined experimentally by issuing move commands. Change
@@ -343,7 +343,7 @@ def _validate_move_data(data):
 
 
 @_motion_lock
-@http_version(0, 0)
+@http_version(1, 0)
 async def move(request: web.Request) -> web.Response:
     """
     Moves the robot to the specified position as provided by the `control.info`
@@ -455,7 +455,7 @@ def _move_mount(robot, mount, point):
 
 
 @_motion_lock
-@http_version(0, 0)
+@http_version(1, 0)
 async def home(request: web.Request) -> web.Response:
     """
     This initializes a call to pipette.home() which, as a side effect will:
@@ -497,7 +497,7 @@ async def home(request: web.Request) -> web.Response:
     return web.json_response({"message": message}, status=status)
 
 
-@http_version(0, 0)
+@http_version(1, 0)
 async def identify(request: web.Request) -> web.Response:
     hw = hw_from_req(request)
     blink_time = int(request.query.get('seconds', '10'))
@@ -508,7 +508,7 @@ async def identify(request: web.Request) -> web.Response:
     return web.json_response({"message": "identifying"})
 
 
-@http_version(0, 0)
+@http_version(1, 0)
 async def get_rail_lights(request: web.Request) -> web.Response:
     hw = hw_from_req(request)
     if ff.use_protocol_api_v2():
@@ -518,7 +518,7 @@ async def get_rail_lights(request: web.Request) -> web.Response:
     return web.json_response({'on': on['rails']})
 
 
-@http_version(0, 0)
+@http_version(1, 0)
 async def set_rail_lights(request: web.Request) -> web.Response:
     hw = hw_from_req(request)
     data = await request.json()
@@ -535,7 +535,7 @@ async def set_rail_lights(request: web.Request) -> web.Response:
     return web.json_response({'on': on})
 
 
-@http_version(0, 0)
+@http_version(1, 0)
 async def take_picture(request: web.Request) -> web.FileResponse:
     filename = os.path.join(
         request.app['com.opentrons.response_file_tempdir'], 'picture.jpg')
