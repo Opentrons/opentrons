@@ -1,4 +1,5 @@
 // @flow
+import { TEMPERATURE_DEACTIVATED } from '../../../../constants'
 import { getNextDefaultTemperatureModuleId } from '..'
 
 describe('getNextDefaultTemperatureModuleId', () => {
@@ -12,14 +13,18 @@ describe('getNextDefaultTemperatureModuleId', () => {
             type: 'tempdeck',
             model: 'GEN1',
             slot: '3',
-            moduleState: { type: 'tempdeck' },
+            moduleState: {
+              type: 'tempdeck',
+              status: TEMPERATURE_DEACTIVATED,
+              targetTemperature: null,
+            },
           },
           tcId: {
             id: 'tcId',
             type: 'thermocycler',
             model: 'GEN1',
             slot: '_span781011',
-            moduleState: { type: 'tempdeck' },
+            moduleState: { type: 'thermocycler' },
           },
         },
         expected: 'tempId',
@@ -32,7 +37,9 @@ describe('getNextDefaultTemperatureModuleId', () => {
             type: 'thermocycler',
             model: 'GEN1',
             slot: '_span781011',
-            moduleState: { type: 'tempdeck' },
+            moduleState: {
+              type: 'thermocycler',
+            },
           },
         },
         expected: 'tcId',

@@ -335,6 +335,8 @@ Object {
   "modules": Object {
     "someTempModuleId": Object {
       "moduleState": Object {
+        "status": "TEMPERATURE_DEACTIVATED",
+        "targetTemperature": null,
         "type": "tempdeck",
       },
       "slot": "3",
