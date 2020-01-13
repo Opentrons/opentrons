@@ -131,7 +131,9 @@ export const pauseForTimeOrUntilTold = (
   }
 }
 
-export const wellRatioMoveLiquid = (fields: HydratedFormData): ?FormError => {
+export const wellRatioMoveLiquid = (
+  fields: HydratedFormData
+): FormError | null => {
   const { aspirate_wells, dispense_wells } = fields
   if (!aspirate_wells || !dispense_wells) return null
   return getWellRatio(aspirate_wells, dispense_wells)
@@ -139,20 +141,26 @@ export const wellRatioMoveLiquid = (fields: HydratedFormData): ?FormError => {
     : FORM_ERRORS.WELL_RATIO_MOVE_LIQUID
 }
 
-export const magnetActionRequired = (fields: HydratedFormData): ?FormError => {
+export const magnetActionRequired = (
+  fields: HydratedFormData
+): FormError | null => {
   const { magnetAction } = fields
   if (!magnetAction) return FORM_ERRORS.MAGNET_ACTION_TYPE_REQUIRED
   return null
 }
 
-export const engageHeightRequired = (fields: HydratedFormData): ?FormError => {
+export const engageHeightRequired = (
+  fields: HydratedFormData
+): FormError | null => {
   const { magnetAction, engageHeight } = fields
   return magnetAction === 'engage' && !engageHeight
     ? FORM_ERRORS.ENGAGE_HEIGHT_REQUIRED
     : null
 }
 
-export const moduleIdRequired = (fields: HydratedFormData): ?FormError => {
+export const moduleIdRequired = (
+  fields: HydratedFormData
+): FormError | null => {
   const { moduleId } = fields
   if (!moduleId) return FORM_ERRORS.MODULE_ID_REQUIRED
   return null
@@ -160,7 +168,7 @@ export const moduleIdRequired = (fields: HydratedFormData): ?FormError => {
 
 export const targetTemperatureRequired = (
   fields: HydratedFormData
-): ?FormError => {
+): FormError | null => {
   const { setTemperature, targetTemperature } = fields
   return setTemperature === 'true' && !targetTemperature
     ? FORM_ERRORS.TARGET_TEMPERATURE_REQUIRED
