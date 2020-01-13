@@ -232,3 +232,7 @@
   font-size: var(--fs-body-1);
   margin-top: 0.5rem;
 }
+
+.select_module_message {
+  font-size: var(--fs-body-1);
+}

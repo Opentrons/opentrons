@@ -54,7 +54,10 @@ function TemperatureForm(props: TemperatureFormProps): React.Element<'div'> {
           display a message (copy, design, etc TBD) that you need to select a module to continue
         */}
         <ConditionalOnField name={'moduleId'} condition={val => val === null}>
-          <p>Please select a module for this temperature step.</p>
+          <p className={styles.select_module_message}>
+            Please ensure a compatible module is present on the deck and
+            selected to create a temperature step.
+          </p>
         </ConditionalOnField>
         <ConditionalOnField
           name={'moduleId'}

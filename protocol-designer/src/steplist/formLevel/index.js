@@ -9,6 +9,7 @@ import {
   magnetActionRequired,
   engageHeightRequired,
   type FormError,
+  moduleIdRequired,
   targetTemperatureRequired,
 } from './errors'
 import {
@@ -59,6 +60,7 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
     getWarnings: composeWarnings(engageHeightRangeExceeded),
   },
   temperature: {
+    moduleId: composeErrors(moduleIdRequired),
     getErrors: composeErrors(targetTemperatureRequired),
     getWarnings: composeWarnings(temperatureRangeExceeded),
   },
