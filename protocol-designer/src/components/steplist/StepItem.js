@@ -120,6 +120,7 @@ function getStepItemContents(stepItemProps: StepItemProps) {
       <MagnetStepItems
         engage={substeps.engage}
         labwareDisplayName={substeps.labwareDisplayName}
+        labwareNickname={substeps.labwareNickname}
         message={substeps.message}
       />
     )

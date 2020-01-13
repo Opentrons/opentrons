@@ -106,6 +106,7 @@ export type MagnetSubstepItem = {|
   substepType: 'magnet',
   engage: boolean,
   labwareDisplayName: ?string,
+  labwareNickname: ?string,
   message?: string,
 |}
 

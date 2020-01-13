@@ -1,11 +1,9 @@
 // @flow
 import { createSelector } from 'reselect'
-
 import { selectors as stepFormSelectors } from '../step-forms'
 import { selectors as fileDataSelectors } from '../file-data'
-
+import { selectors as uiModulesSelectors } from '../ui/modules'
 import { generateSubsteps } from '../steplist/generateSubsteps' // TODO Ian 2018-04-11 move generateSubsteps closer to this substeps.js file?
-
 import type { Selector } from '../types'
 import type { StepIdType } from '../form-types'
 import type { SubstepItemData } from '../steplist/types'
@@ -17,12 +15,14 @@ export const allSubsteps: Selector<AllSubsteps> = createSelector(
   stepFormSelectors.getOrderedStepIds,
   fileDataSelectors.getRobotStateTimeline,
   fileDataSelectors.getInitialRobotState,
+  uiModulesSelectors.getLabwareNamesByModuleId,
   (
     allStepArgsAndErrors,
     invariantContext,
     orderedStepIds,
     robotStateTimeline,
-    _initialRobotState
+    _initialRobotState,
+    labwareNamesByModuleId
   ) => {
     // Add initial robot state frame, offsetting the timeline.
     // This is because substeps show the robot state just BEFORE their step has occurred
@@ -38,7 +38,8 @@ export const allSubsteps: Selector<AllSubsteps> = createSelector(
         allStepArgsAndErrors[stepId],
         invariantContext,
         robotState,
-        stepId
+        stepId,
+        labwareNamesByModuleId
       )
 
       return {

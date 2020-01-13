@@ -303,7 +303,10 @@ export function generateSubsteps(
   stepArgsAndErrors: ?StepArgsAndErrors,
   invariantContext: InvariantContext,
   robotState: ?RobotState,
-  stepId: string
+  stepId: string,
+  labwareNamesByModuleId: {
+    [moduleId: string]: ?{ nickname: ?string, displayName: string },
+  }
 ): ?SubstepItemData {
   if (!robotState) {
     console.info(
@@ -350,10 +353,13 @@ export function generateSubsteps(
     stepArgs.commandCreatorFnName === 'disengageMagnet' ||
     stepArgs.commandCreatorFnName === 'engageMagnet'
   ) {
+    const moduleId = stepArgs.module
+    const labwareNames = moduleId ? labwareNamesByModuleId[moduleId] : null
     return {
       substepType: 'magnet',
       engage: stepArgs.commandCreatorFnName === 'engageMagnet',
-      labwareDisplayName: 'foo spam test spam blah spam spam',
+      labwareDisplayName: labwareNames?.displayName,
+      labwareNickname: labwareNames?.nickname,
       message: stepArgs.message,
     }
   }
