@@ -1,6 +1,7 @@
 import inspect
 import json
 import logging
+import pkgutil
 from aiohttp import web
 from opentrons import __version__, config, protocol_api, protocols
 
@@ -26,8 +27,19 @@ async def health(request: web.Request) -> web.Response:
         'fw_version': fw_version,
         'logs': static_paths,
         'system_version': config.OT_SYSTEM_VERSION,
-        'protocol_api_version': list(max_supported)
+        'protocol_api_version': list(max_supported),
+        'links': {
+            'apiLog': '/logs/api.log',
+            'serialLog': '/logs/serial.log',
+            'apiSpec': '/openapi'
+        }
     }
     return web.json_response(
         headers={'Access-Control-Allow-Origin': '*'},
         body=json.dumps(res))
+
+
+async def get_openapi_spec(request: web.Request) -> web.Response:
+    spec = json.loads(pkgutil.get_data(  # type: ignore
+        'opentrons', 'server/openapi.json'))
+    return web.json_response(spec, status=200)
