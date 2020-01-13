@@ -2,6 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { HoverTooltip } from '@opentrons/components'
+import i18n from '../../localization'
 import { PDListItem } from '../lists'
 import { Portal } from './TooltipPortal'
 import LabwareTooltipContents from './LabwareTooltipContents'
@@ -17,11 +18,10 @@ type Props = {|
 export const MagnetStepItems = (props: Props) => (
   <>
     {props.message && <PDListItem>{props.message}</PDListItem>}
-    {/* TODO IMMEDIATELY i18n here */}
     <li className={styles.aspirate_dispense}>
-      <span>MAGNETIC MODULE</span>
+      <span>{i18n.t('modules.module_long_names.magdeck')}</span>
       <span className={styles.spacer} />
-      <span>ACTION</span>
+      <span>{i18n.t('modules.actions.action')}</span>
     </li>
     <PDListItem
       className={cx(styles.step_subitem_column_header, styles.emphasized_cell)}
@@ -46,7 +46,7 @@ export const MagnetStepItems = (props: Props) => (
       </HoverTooltip>
       <span className={styles.step_subitem_spacer} />
       <span className={styles.labware_display_name}>
-        {props.engage ? 'Engage' : 'Disengage'}
+        {i18n.t(`modules.actions.${props.engage ? 'engage' : 'disengage'}`)}
       </span>
     </PDListItem>
   </>

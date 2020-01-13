@@ -14,6 +14,7 @@
 }
 
 .emphasized_cell {
+  text-transform: capitalize;
   font-weight: var(--fw-semibold);
 }
 
@@ -24,6 +25,7 @@
 
   & > * {
     text-align: left;
+    min-height: 1rem;
   }
 }
 
@@ -39,6 +41,7 @@
   margin: 0.5rem 0.5rem 0 0.5rem;
   text-align: left;
   font-size: var(--fs-caption);
+  text-transform: uppercase;
 
   & .spacer {
     flex: 1;

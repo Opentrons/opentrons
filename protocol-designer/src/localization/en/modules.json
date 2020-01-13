@@ -12,5 +12,10 @@
   "status": {
     "engaged": "engaged",
     "disengaged": "disengaged"
+  },
+  "actions": {
+    "action": "action",
+    "engage": "engage",
+    "disengage": "disengage"
   }
 }
