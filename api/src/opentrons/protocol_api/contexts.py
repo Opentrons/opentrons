@@ -2177,9 +2177,9 @@ class MagneticModuleContext(ModuleContext):
         The destination of the magnets can be specified in several different
         ways, based on internally stored default heights for labware:
 
-           - If neither ``height``, ``height_from_base`` nor ``offset`` is specified,
-             the magnets will raise to a reasonable default height based on the
-             specified labware.
+           - If neither ``height``, ``height_from_base`` nor ``offset`` is
+             specified, the magnets will raise to a reasonable default height
+             based on the specified labware.
            - The recommended way to adjust the height of the magnets is to
              specify ``height_from_base``, which should be a distance in mm
              relative to the base of the labware that is on the magnetic module
