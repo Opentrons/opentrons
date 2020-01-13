@@ -1,15 +1,35 @@
 // @flow
 import { createSelector } from 'reselect'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
+import mapValues from 'lodash/mapValues'
 import { MAGDECK, TEMPDECK, THERMOCYCLER } from '../../constants'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { getLabwareNicknamesById } from '../labware/selectors'
 import {
   getModuleLabwareOptions,
+  getLabwareOnModule,
   getModuleOnDeckByType,
   getModuleHasLabware,
 } from './utils'
 import type { Options } from '@opentrons/components'
 import type { Selector } from '../../types'
+
+export const getLabwareNamesByModuleId: Selector<{
+  [moduleId: string]: ?{ nickname: ?string, displayName: string },
+}> = createSelector(
+  stepFormSelectors.getInitialDeckSetup,
+  getLabwareNicknamesById,
+  (initialDeckSetup, nicknamesById) =>
+    mapValues(initialDeckSetup.modules, (module, moduleId) => {
+      const labware = getLabwareOnModule(initialDeckSetup, moduleId)
+      return labware
+        ? {
+            nickname: nicknamesById[labware.id],
+            displayName: getLabwareDisplayName(labware.def),
+          }
+        : null
+    })
+)
 
 /** Returns dropdown option for labware placed on magnetic module */
 export const getMagneticLabwareOptions: Selector<Options> = createSelector(

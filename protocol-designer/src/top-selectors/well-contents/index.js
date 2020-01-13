@@ -7,16 +7,14 @@ import min from 'lodash/min'
 import pick from 'lodash/pick'
 import reduce from 'lodash/reduce'
 import omitBy from 'lodash/omitBy'
-import assert from 'assert'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import * as StepGeneration from '../../step-generation'
 import { selectors as fileDataSelectors } from '../../file-data'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import { selectors as stepsSelectors } from '../../ui/steps'
+import { timelineFrameBeforeActiveItem } from '../timelineFrames'
 import wellSelectionSelectors from '../../well-selection/selectors'
-import { START_TERMINAL_ITEM_ID } from '../../steplist'
 import { getAllWellsForLabware, getMaxVolumes } from '../../constants'
 
 import type { Selector } from '../../types'
@@ -79,6 +77,9 @@ export const getAllWellContentsForSteps: Selector<
   fileDataSelectors.getRobotStateTimeline,
   stepFormSelectors.getLabwareEntities,
   (initialRobotState, robotStateTimeline, labwareEntities) => {
+    // Add initial robot state frame, offsetting the timeline.
+    // This is because liquids state for a step shows the
+    // robot state just BEFORE the given step has occurred
     const timeline = [
       { robotState: initialRobotState },
       ...robotStateTimeline.timeline,
@@ -121,43 +122,10 @@ export const getLastValidWellContents: Selector<WellContentsByLabware> = createS
 )
 
 export const getAllWellContentsForActiveItem: Selector<WellContentsByLabware> = createSelector(
-  stepsSelectors.getActiveItem,
-  fileDataSelectors.getInitialRobotState,
-  fileDataSelectors.getRobotStateTimeline,
-  fileDataSelectors.lastValidRobotState,
   stepFormSelectors.getLabwareEntities,
-  stepFormSelectors.getOrderedStepIds,
-  (
-    activeItem,
-    initialRobotState,
-    robotStateTimeline,
-    lastValidRobotState,
-    labwareEntities,
-    orderedStepIds
-  ) => {
-    const timeline = [
-      { robotState: initialRobotState },
-      ...robotStateTimeline.timeline,
-      { robotState: lastValidRobotState },
-    ]
-    const lastValidRobotStateIdx = timeline.length - 1
-    let timelineIdx = lastValidRobotStateIdx // default to last valid robot state
-
-    if (activeItem.isStep) {
-      timelineIdx = Math.min(
-        orderedStepIds.findIndex(id => id === activeItem.id),
-        lastValidRobotStateIdx
-      )
-    } else if (activeItem.id === START_TERMINAL_ITEM_ID) {
-      timelineIdx = 0
-    }
-
-    assert(
-      timelineIdx !== -1,
-      `getAllWellContentsForActiveItem got unhandled terminal id: "${activeItem.id}"`
-    )
-
-    const liquidState = timeline[timelineIdx].robotState.liquidState.labware
+  timelineFrameBeforeActiveItem,
+  (labwareEntities, timelineFrame) => {
+    const liquidState = timelineFrame.robotState.liquidState.labware
     const wellContentsByLabwareId = mapValues(
       liquidState,
       (

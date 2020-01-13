@@ -171,12 +171,14 @@ export type EngageMagnetArgs = {|
   ...EngageMagnetParams,
   module: string | null,
   commandCreatorFnName: 'engageMagnet',
+  message?: string,
 |}
 
 export type DisengageMagnetArgs = {|
   ...DisengageMagnetParams,
   module: string | null,
   commandCreatorFnName: 'disengageMagnet',
+  message?: string,
 |}
 
 export type CommandCreatorArgs =

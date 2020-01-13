@@ -7,6 +7,7 @@ import styles from './StepItem.css'
 import AspirateDispenseHeader from './AspirateDispenseHeader'
 import MixHeader from './MixHeader'
 import PauseStepItems from './PauseStepItems'
+import { MagnetStepItems } from './MagnetStepItems'
 import StepDescription from '../StepDescription'
 import { stepIconsByType } from '../../form-types'
 import type { FormData, StepIdType, StepType } from '../../form-types'
@@ -110,8 +111,19 @@ function getStepItemContents(stepItemProps: StepItemProps) {
   }
 
   // pause substep component uses the delay args directly
-  if (substeps && substeps.commandCreatorFnName === 'delay') {
-    return <PauseStepItems pauseArgs={substeps} />
+  if (substeps && substeps.substepType === 'pause') {
+    return <PauseStepItems pauseArgs={substeps.pauseStepArgs} />
+  }
+
+  if (substeps && substeps.substepType === 'magnet') {
+    return (
+      <MagnetStepItems
+        engage={substeps.engage}
+        labwareDisplayName={substeps.labwareDisplayName}
+        labwareNickname={substeps.labwareNickname}
+        message={substeps.message}
+      />
+    )
   }
 
   const result = []

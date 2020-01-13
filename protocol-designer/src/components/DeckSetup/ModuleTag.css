@@ -16,3 +16,7 @@
 .module_info_type {
   text-transform: uppercase;
 }
+
+.module_status_line {
+  text-transform: capitalize;
+}

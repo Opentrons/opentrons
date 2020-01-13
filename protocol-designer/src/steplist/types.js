@@ -1,5 +1,5 @@
 // @flow
-import type { PauseArgs, CommandCreatorArgs } from '../step-generation'
+import type { CommandCreatorArgs, PauseArgs } from '../step-generation'
 import type {
   FormData,
   StepIdType,
@@ -81,6 +81,7 @@ type SourceDestCommandCreatorName =
   | 'mix'
 
 export type SourceDestSubstepItemSingleChannel = {|
+  substepType: 'sourceDest',
   multichannel: false,
   commandCreatorFnName: SourceDestCommandCreatorName,
   parentStepId: StepIdType,
@@ -88,6 +89,7 @@ export type SourceDestSubstepItemSingleChannel = {|
 |}
 
 export type SourceDestSubstepItemMultiChannel = {|
+  substepType: 'sourceDest',
   multichannel: true,
   commandCreatorFnName: SourceDestCommandCreatorName,
   parentStepId: StepIdType,
@@ -100,7 +102,23 @@ export type SourceDestSubstepItem =
   | SourceDestSubstepItemSingleChannel
   | SourceDestSubstepItemMultiChannel
 
-export type SubstepItemData = SourceDestSubstepItem | PauseArgs // Pause substep uses same data as processed form
+export type MagnetSubstepItem = {|
+  substepType: 'magnet',
+  engage: boolean,
+  labwareDisplayName: ?string,
+  labwareNickname: ?string,
+  message?: string,
+|}
+
+export type PauseSubstepItem = {|
+  substepType: 'pause',
+  pauseStepArgs: PauseArgs,
+|} // Pause substeps use same data as processed form
+
+export type SubstepItemData =
+  | SourceDestSubstepItem
+  | PauseSubstepItem
+  | MagnetSubstepItem
 
 export type StepItemData = {
   id: StepIdType,
