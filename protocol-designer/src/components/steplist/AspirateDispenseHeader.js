@@ -55,7 +55,7 @@ function AspirateDispenseHeader(props: AspirateDispenseHeaderProps) {
           )}
         </HoverTooltip>
         {/* This is always a "transfer icon" (arrow pointing right) for any step: */}
-        <Icon name="ot-transfer" />
+        <Icon className={styles.step_subitem_spacer} name="ot-transfer" />
         <HoverTooltip
           portal={Portal}
           tooltipComponent={

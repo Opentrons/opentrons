@@ -353,7 +353,8 @@ export function generateSubsteps(
     return {
       substepType: 'magnet',
       engage: stepArgs.commandCreatorFnName === 'engageMagnet',
-      moduleId: stepArgs.module,
+      labwareDisplayName: 'foo spam test spam blah spam spam',
+      message: stepArgs.message,
     }
   }
 

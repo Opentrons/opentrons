@@ -105,7 +105,8 @@ export type SourceDestSubstepItem =
 export type MagnetSubstepItem = {|
   substepType: 'magnet',
   engage: boolean,
-  moduleId: ?string,
+  labwareDisplayName: ?string,
+  message?: string,
 |}
 
 export type PauseSubstepItem = {|

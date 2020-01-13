@@ -7,6 +7,7 @@ import styles from './StepItem.css'
 import AspirateDispenseHeader from './AspirateDispenseHeader'
 import MixHeader from './MixHeader'
 import PauseStepItems from './PauseStepItems'
+import { MagnetStepItems } from './MagnetStepItems'
 import StepDescription from '../StepDescription'
 import { stepIconsByType } from '../../form-types'
 import type { FormData, StepIdType, StepType } from '../../form-types'
@@ -115,13 +116,12 @@ function getStepItemContents(stepItemProps: StepItemProps) {
   }
 
   if (substeps && substeps.substepType === 'magnet') {
-    // TODO IMMEDIATELY
-    console.log({ substeps })
     return (
-      <div>
-        <div>Engage: {substeps.engage ? 'ENGAGE' : 'DISENGAGE'}</div>
-        <div>Module: {substeps.moduleId}</div>
-      </div>
+      <MagnetStepItems
+        engage={substeps.engage}
+        labwareDisplayName={substeps.labwareDisplayName}
+        message={substeps.message}
+      />
     )
   }
 
