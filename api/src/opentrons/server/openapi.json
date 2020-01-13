@@ -235,11 +235,13 @@
         "properties": {
           "model": {
             "description": "The model of the attached pipette. These are snake case as in the Protocol API. This includes the full version string",
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "name": {
             "description": "The name of the attached pipette - the model without the version string",
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
           "tip_length": {
             "description": "The default tip length for this pipette, if attached",
@@ -583,7 +585,9 @@
     {"name": "deckCalibration",
      "description": "Operations for executing deck calibration"},
     {"name": "settings",
-     "description": "Operations for viewing or editing robot configuration"}
+     "description": "Operations for viewing or editing robot configuration"},
+    {"name": "metadata",
+     "description": "Operations involving robot or server metadata"}
   ],
   "security": [],
   "externalDocs": {
@@ -593,6 +597,7 @@
   "paths": {
     "/openapi": {
       "get": {
+        "tags": ["metadata"],
         "operationId": "getOpenAPISpec",
         "description": "Get an OpenAPI spec (this document)",
         "responses": {
@@ -610,6 +615,7 @@
     },
     "/health": {
       "get": {
+        "tags": ["metadata"],
         "operationId": "getHealth",
         "description": "Retrieve some useful information about supported API versions, names, and so on",
         "summary": "The /health endpoint is a good one to check to see if you're communicating with an OT-2 with a properly booted API server. If it returns OK, all is well. It also can be used to pull information like the robot software version and name.",
@@ -632,12 +638,10 @@
                                     "type": "string"},
                     "fw_version": {"description": "The version of the firmware flashed to the OT-2's motor controller board. Doesn't follow a pattern, suitable only for display or exact matching.",
                                    "type": "string"},
-                    "logs": {"description": "A list of relative URIs at which to find log files.",
-                             "$ref": "#/components/schemas/logPaths"},
+                    "logs": {"$ref": "#/components/schemas/logPaths" },
                     "system_version": {"description": "The SemVer dotted-int version of the robot OS",
                                        "type": "string"},
-                    "protocol_api_version": {"description": "The highest protocol API version supported by this OT-2",
-                                             "$ref": "#/components/schemas/protocolApiVersion"},
+                    "protocol_api_version": { "$ref": "#/components/schemas/protocolApiVersion" },
                     "links": {
                       "type": "object",
                       "description": "A set of useful links",
@@ -1747,7 +1751,7 @@
                       "required": ["change_pipette", "attach_tip"],
                       "additionalProperties": false,
                       "properties": {
-                        "change_pipettes": {
+                        "change_pipette": {
                           "type": "object",
                           "required": ["target", "left", "right"],
                           "additionalProperties": false,
@@ -2186,6 +2190,22 @@
           }
         },
         "responses": {
+          "200": {
+            "description": "Operation succeeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["message"],
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
           "418": {
             "description": "No session ongoing",
             "links": {
@@ -2364,7 +2384,7 @@
     "/settings/log_level/upstream": {
       "post": {
         "tags": ["settings"],
-        "operationId": "setLocalLogLevel",
+        "operationId": "setUpstreamLogLevel",
         "description": "Set the minimum level of logs sent upstream to Opentrons. Only available on a real robot",
         "requestBody": {
           "content": {
