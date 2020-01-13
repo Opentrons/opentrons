@@ -262,7 +262,7 @@ def session(loop, aiohttp_client, request, main_router):
     If not set root will be defaulted to None
     """
     from aiohttp import web
-    from opentrons.server import version_middleware, error_middleware
+    from opentrons.server import version_middleware
     root = None
     try:
         root = request.getfixturevalue('root')
@@ -273,7 +273,7 @@ def session(loop, aiohttp_client, request, main_router):
     except Exception:
         pass
 
-    app = web.Application(middlewares=[version_middleware, error_middleware])
+    app = web.Application(middlewares=[version_middleware])
     server = rpc.RPCServer(app, root)
     client = loop.run_until_complete(aiohttp_client(server.app))
     socket = loop.run_until_complete(client.ws_connect('/'))

@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING
 from aiohttp import web
 
 from multidict import MultiDict
-from .util import HTTPVersionMismatchError
+from .util import HTTPVersionMismatchError, SUPPORTED_VERSIONS, ERROR_CODES
 from opentrons.config import CONFIG
 from .rpc import RPCServer
 from .http import HTTPServerLegacy, HTTPServer
@@ -24,25 +24,42 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-# @web.middleware
-async def error_middleware(request, handler):
-    try:
-        print(request.headers)
-        response = await handler(request)
-    except web.HTTPNotFound:
-        log.exception("Exception handler for request {}".format(request))
+def error_handling(error, request):
+    minVersion = SUPPORTED_VERSIONS[0]
+    maxVersion = SUPPORTED_VERSIONS[-1]
+    if isinstance(error, HTTPVersionMismatchError):
+        msg = error.message
         data = {
-            'message': 'File was not found at {}'.format(request)
+            "type": "error",
+            "errorId": ERROR_CODES["unsupportedVersion"],
+            "errorType": "unsupportedVersion",
+            "message": msg,
+            "supportedHttpApiVersions": {
+                "minimum": minVersion, "maximum": maxVersion},
+            "links": {}
+        }
+        # Client is trying to use a version higher than supported
+        response = web.json_response(data, status=406)
+    elif isinstance(error, web.HTTPNotFound):
+        log.exception("Exception handler for request {}".format(request))
+        msg = "Request was not found at {}".format(request)
+        data = {
+            "type": "error",
+            "errorId": ERROR_CODES["HTTPNotFound"],
+            "errorType": "HTTPNotFound",
+            "message": msg,
+            "supportedHttpApiVersions": {
+                "minimum": minVersion, "maximum": maxVersion},
+            "links": {}
         }
         response = web.json_response(data, status=404)
-    except Exception as e:
+    else:
         log.exception("Exception in handler for request {}".format(request))
         data = {
-            'message': 'An unexpected error occured - {}'.format(e),
-            'traceback': traceback.format_exc()
+            "message": 'An unexpected error occured - {}'.format(error),
+            "traceback": traceback.format_exc()
         }
         response = web.json_response(data, status=500)
-
     return response
 
 
@@ -55,44 +72,9 @@ async def version_middleware(request, handler):
     """
     try:
         response = await handler(request)
-    except HTTPVersionMismatchError as e:
-        header_version = e.dErrorArguments['header_version']
-        expected_version = e.dErrorArguments['expected_version']
-        if header_version > expected_version:
-            data = {
-                "type": "error",
-                "errorId": 1,
-                "errorType": "unsupportedVersion",
-                "message": msg,
-                "supportedHttpApiVersions": {
-                    "minimum": minVersion, "maximum": maxVersion},
-                "links": {}
-            }
-            msg = """Requested Version {h} is not supported for the route
-                provide. Max Version is {e}.
-                """.format(h=header_version, e=expected_version)
-            # Client is trying to use a version higher than supported
-            response = web.json_response(data, status=405)
-        else:
-            updated_headers_dict = MultiDict(**request.headers)
-            accept_header = updated_headers.get('Accept', '')
-            new_header = accept_header.replace(f'={header_version}', f'={expected_version}')
-            updated_headers_dict.update(Accept=new_header)
-            updated_request = request.clone(
-                method=request.method,
-                rel_url=request.rel_url,
-                headers=updated_headers_dict,
-                scheme=request.scheme,
-                host=request.host,
-                remote=request.remote)
-            # TODO look up older equivalent of a request
-            response = await error_middleware(updated_request, handler)
+    except Exception as e:
+        response = error_handling(e, request)
     return response
-
-
-async def add_header(request, response):
-    version = '1.0'
-    response.headers['X-Opentrons-Media-Type'] = f'opentrons.api.{version}'
 
 
 class ThreadedAsyncLock:
@@ -175,7 +157,6 @@ def init(hardware: 'HardwareAPILike' = None,
             except Exception:
                 log.exception(f"failed to remove app temp path {temppath}")
 
-    app.on_response_prepare.append(add_header)
     app.on_shutdown.append(dispose_response_file_tempdir)
     app.on_shutdown.freeze()
     return app

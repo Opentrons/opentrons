@@ -11,40 +11,29 @@ async def test_client_version_request(virtual_smoothie_env, async_client):
     # 1. version higher 2. version lower
     old_header = {'accept': 'application/com.opentrons.http+json;version=0.0'}
     new_header = {'accept': 'application/com.opentrons.http+json;version=1.0'}
+
+    old_return_header = 'opentrons.api.0.0'
+    new_return_header = 'opentrons.api.1.0'
     resp = await async_client.get('/health', headers=old_header)
     assert resp.status == 200
+    assert resp.headers['X-Opentrons-Media-Type'] == old_return_header
 
     resp2 = await async_client.get('/robot/health', headers=new_header)
     assert resp2.status == 200
+    assert resp2.headers['X-Opentrons-Media-Type'] == new_return_header
 
     resp3 = await async_client.get('/health', headers=new_header)
-    assert resp3.status == 405
+    assert resp3.status == 406
+    assert 'X-Opentrons-Media-Type' not in resp3.headers.keys()
 
     resp4 = await async_client.get('/robot/health', headers=old_header)
-    assert resp4.status == 200
+    assert resp4.status == 404
+    assert 'X-Opentrons-Media-Type' not in resp4.headers.keys()
 
 
 async def test_client_no_version(async_client):
     resp1 = await async_client.get('/health')
     assert resp1.status == 200
+
     resp2 = await async_client.get('/robot/health')
-    assert resp2.status == 405
-
-
-async def test_middleware_execution_order(async_server, async_client, monkeypatch):
-    mocked_version_middleware = mock.Mock()
-    mocked_error_middleware = mock.Mock()
-
-    monkeypatch.setattr(
-        opentrons.server, 'version_middleware', mocked_version_middleware)
-    monkeypatch.setattr(
-        opentrons.server, 'error_middleware', mocked_error_middleware)
-
-    expected = [mocked_version_middleware]
-    await async_client.get('/health')
-    mock.mock_calls = expected
-
-    new_header = {'accept': 'application/com.opentrons.http+json;version=1.0'}
-    expected2 = [mocked_version_middleware, mocked_error_middleware]
-    await async_client.get('/health', headers=new_header)
-    mock.mock_calls = expected2
+    assert resp2.status == 404
