@@ -3,7 +3,7 @@ import * as React from 'react'
 import { FormGroup, HoverTooltip } from '@opentrons/components'
 import i18n from '../../../localization'
 import { getTooltipForField } from '../utils'
-import TextField from './Text'
+import { TextField } from './Text'
 import type { StepType } from '../../../form-types'
 import type { FocusHandlers } from '../types'
 import styles from '../StepEditForm.css'
@@ -14,7 +14,7 @@ type Props = {|
   label: string,
   className: string,
 |}
-const Volume = (props: Props) => (
+export const VolumeField = (props: Props) => (
   <HoverTooltip
     tooltipComponent={getTooltipForField(props.stepType, 'volume', false)}
     placement="top-start"
@@ -35,5 +35,3 @@ const Volume = (props: Props) => (
     )}
   </HoverTooltip>
 )
-
-export default Volume

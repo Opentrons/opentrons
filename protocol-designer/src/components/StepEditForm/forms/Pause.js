@@ -4,13 +4,13 @@ import { FormGroup } from '@opentrons/components'
 import i18n from '../../../localization'
 
 import { ConditionalOnField, TextField, RadioGroupField } from '../fields'
-import StepField from '../fields/FieldConnector'
+import { FieldConnector } from '../fields/FieldConnector'
 import styles from '../StepEditForm.css'
 
 import type { FocusHandlers } from '../types'
 
 type PauseFormProps = { focusHandlers: FocusHandlers }
-function PauseForm(props: PauseFormProps): React.Element<'div'> {
+export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
   const { focusHandlers } = props
 
   // time fields blur together
@@ -90,7 +90,7 @@ function PauseForm(props: PauseFormProps): React.Element<'div'> {
         <div className={styles.section_column}>
           <div className={styles.form_row}>
             {/* TODO: Ian 2019-03-25 consider making this a component eg `TextAreaField.js` if used anywhere else */}
-            <StepField
+            <FieldConnector
               dirtyFields={focusHandlers.dirtyFields}
               focusedField={focusHandlers.focusedField}
               name="pauseMessage"
@@ -115,5 +115,3 @@ function PauseForm(props: PauseFormProps): React.Element<'div'> {
     </div>
   )
 }
-
-export default PauseForm

@@ -2,7 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { FormGroup } from '@opentrons/components'
-import AspDispSection from './AspDispSection'
+import { AspDispSection } from './AspDispSection'
 
 import i18n from '../../../localization'
 
@@ -26,7 +26,7 @@ import styles from '../StepEditForm.css'
 type Props = { focusHandlers: FocusHandlers }
 type State = { collapsed?: boolean }
 
-class MixForm extends React.Component<Props, State> {
+export class MixForm extends React.Component<Props, State> {
   state = { collapsed: true }
 
   toggleCollapsed = () => {
@@ -164,5 +164,3 @@ class MixForm extends React.Component<Props, State> {
     )
   }
 }
-
-export default MixForm

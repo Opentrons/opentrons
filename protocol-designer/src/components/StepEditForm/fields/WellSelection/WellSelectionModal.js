@@ -51,7 +51,7 @@ type DP = {| saveWellSelection: WellGroup => mixed |}
 type Props = {| ...OP, ...SP, ...DP |}
 type State = { selectedWells: WellGroup, highlightedWells: WellGroup }
 
-class WellSelectionModal extends React.Component<Props, State> {
+class WellSelectionModalComponent extends React.Component<Props, State> {
   state = { selectedWells: {}, highlightedWells: {} }
   constructor(props: Props) {
     super(props)
@@ -183,7 +183,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>, ownProps: OP): DP {
   }
 }
 
-export default connect<Props, OP, SP, DP, _, _>(
+export const WellSelectionModal = connect<Props, OP, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
-)(WellSelectionModal)
+)(WellSelectionModalComponent)

@@ -5,7 +5,7 @@ import cx from 'classnames'
 
 import type { StepFieldName } from '../../../steplist/fieldLevel'
 import styles from '../StepEditForm.css'
-import StepField from './FieldConnector'
+import { FieldConnector } from './FieldConnector'
 
 type CheckboxRowProps = {
   label?: string,
@@ -15,8 +15,8 @@ type CheckboxRowProps = {
   disabled?: boolean,
   tooltipComponent?: React.Node,
 }
-export const CheckboxRow = (props: CheckboxRowProps) => (
-  <StepField
+export const CheckboxRowField = (props: CheckboxRowProps) => (
+  <FieldConnector
     name={props.name}
     tooltipComponent={props.tooltipComponent}
     render={({ value, updateValue, hoverTooltipHandlers, disabled }) => (
@@ -34,5 +34,3 @@ export const CheckboxRow = (props: CheckboxRowProps) => (
     )}
   />
 )
-
-export default CheckboxRow

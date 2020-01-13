@@ -3,7 +3,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { FormGroup, InputField } from '@opentrons/components'
 import i18n from '../../../../localization'
-import WellSelectionModal from './WellSelectionModal'
+import { WellSelectionModal } from './WellSelectionModal'
 import { Portal } from '../../../portals/MainPageModalPortal'
 import {
   actions as stepsActions,
@@ -40,7 +40,7 @@ type OP = {|
 
 type Props = {| ...OP, ...SP, ...DP |}
 
-class WellSelectionInput extends React.Component<Props> {
+class WellSelectionInputComponent extends React.Component<Props> {
   handleOpen = () => {
     const { labwareId, pipetteId, name } = this.props
     this.props.onFieldFocus(name)
@@ -105,7 +105,7 @@ const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
   onClose: () => dispatch(stepsActions.clearWellSelectionLabwareKey()),
 })
 
-export default connect<Props, OP, SP, DP, _, _>(
+export const WellSelectionInput = connect<Props, OP, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
-)(WellSelectionInput)
+)(WellSelectionInputComponent)

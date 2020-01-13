@@ -5,7 +5,7 @@ import cx from 'classnames'
 import type { StepFieldName } from '../../../steplist/fieldLevel'
 import type { FocusHandlers } from '../types'
 import styles from '../StepEditForm.css'
-import StepField from './FieldConnector'
+import { FieldConnector } from './FieldConnector'
 
 export type StepFormDropdownProps = {
   ...$Exact<FocusHandlers>,
@@ -14,7 +14,7 @@ export type StepFormDropdownProps = {
   className?: string,
 }
 
-export default function StepFormDropdown(props: StepFormDropdownProps) {
+export const StepFormDropdown = (props: StepFormDropdownProps) => {
   const {
     options,
     name,
@@ -26,7 +26,7 @@ export default function StepFormDropdown(props: StepFormDropdownProps) {
   } = props
   return (
     // TODO: BC abstract e.currentTarget.value inside onChange with fn like onChangeValue of type (value: mixed) => {}
-    <StepField
+    <FieldConnector
       name={name}
       focusedField={focusedField}
       dirtyFields={dirtyFields}

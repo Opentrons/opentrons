@@ -17,7 +17,9 @@ import type { FocusHandlers } from '../types'
 
 type TemperatureFormProps = { focusHandlers: FocusHandlers }
 
-function TemperatureForm(props: TemperatureFormProps): React.Element<'div'> {
+export const TemperatureForm = (
+  props: TemperatureFormProps
+): React.Element<'div'> => {
   const { focusHandlers } = props
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions
@@ -111,5 +113,3 @@ function TemperatureForm(props: TemperatureFormProps): React.Element<'div'> {
     </div>
   )
 }
-
-export default TemperatureForm

@@ -37,7 +37,7 @@ type State = {
   pristine: boolean,
 }
 
-export default class FlowRateInput extends React.Component<Props, State> {
+export class FlowRateInput extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = this.getStateFromProps(props)

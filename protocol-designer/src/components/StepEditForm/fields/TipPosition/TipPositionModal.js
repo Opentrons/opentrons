@@ -17,7 +17,7 @@ import i18n from '../../../../localization'
 import { Portal } from '../../../portals/MainPageModalPortal'
 import modalStyles from '../../../modals/modal.css'
 import { actions } from '../../../../steplist'
-import TipPositionZAxisViz from './TipPositionZAxisViz'
+import { TipPositionZAxisViz } from './TipPositionZAxisViz'
 
 import styles from './TipPositionInput.css'
 import * as utils from './utils'
@@ -48,7 +48,7 @@ type State = { value: ?number }
 const roundValue = (value: number | string): number =>
   round(Number(value), DECIMALS_ALLOWED)
 
-class TipPositionModal extends React.Component<Props, State> {
+class TipPositionModalComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     const initialValue =
@@ -257,7 +257,7 @@ const mapDTP = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => {
   }
 }
 
-export default connect<Props, OP, {||}, DP, _, _>(
+export const TipPositionModal = connect<Props, OP, {||}, DP, _, _>(
   null,
   mapDTP
-)(TipPositionModal)
+)(TipPositionModalComponent)

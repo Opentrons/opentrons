@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { FormGroup, HoverTooltip, SelectField } from '@opentrons/components'
 import i18n from '../../../../localization'
-import StepField from '../FieldConnector'
+import { FieldConnector } from '../FieldConnector'
 import styles from '../../StepEditForm.css'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { ChangeTipOptions } from '../../../../step-generation/types'
@@ -14,7 +14,7 @@ type Props = {
   disabledOptions: ?Set<ChangeTipOptions>,
 }
 
-const ChangeTipField = (props: Props) => {
+export const ChangeTip = (props: Props) => {
   const { name, disabledOptions } = props
 
   const options = props.options.map(value => {
@@ -47,7 +47,7 @@ const ChangeTipField = (props: Props) => {
     }
   })
   return (
-    <StepField
+    <FieldConnector
       name={name}
       render={({ value, updateValue, hoverTooltipHandlers }) => (
         <FormGroup
@@ -66,5 +66,3 @@ const ChangeTipField = (props: Props) => {
     />
   )
 }
-
-export default ChangeTipField

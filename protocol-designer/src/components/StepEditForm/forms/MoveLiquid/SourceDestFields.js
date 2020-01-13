@@ -27,7 +27,7 @@ const makeAddFieldNamePrefix = (prefix: string) => (
   fieldName: string
 ): StepFieldName => `${prefix}_${fieldName}`
 
-function SourceDestFields(props: Props) {
+export const SourceDestFields = (props: Props) => {
   const { className, focusHandlers, prefix } = props
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
 
@@ -127,5 +127,3 @@ function SourceDestFields(props: Props) {
     </div>
   )
 }
-
-export default SourceDestFields

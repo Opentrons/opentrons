@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import WellSelectionInput from './WellSelectionInput'
+import { WellSelectionInput } from './WellSelectionInput'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { getFieldErrors } from '../../../../steplist/fieldLevel'
 import { getDisabledFields } from '../../../../steplist/formLevel'
@@ -81,7 +81,7 @@ function mergeProps(
   }
 }
 
-export default connect<Props, OP, SP, {||}, _, _>(
+export const WellSelectionField = connect<Props, OP, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps

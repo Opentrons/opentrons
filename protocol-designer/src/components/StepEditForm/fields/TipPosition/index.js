@@ -8,7 +8,7 @@ import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { getDisabledFields } from '../../../../steplist/formLevel'
 import stepFormStyles from '../../StepEditForm.css'
 import styles from './TipPositionInput.css'
-import TipPositionModal from './TipPositionModal'
+import { TipPositionModal } from './TipPositionModal'
 import { getIsTouchTipField } from '../../../../form-types'
 import { getDefaultMmFromBottom } from './utils'
 import type { BaseState } from '../../../../types'
@@ -132,4 +132,6 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-export default connect<Props, OP, SP, _, _, _>(mapSTP)(TipPositionInput)
+export const TipPositionField = connect<Props, OP, SP, _, _, _>(mapSTP)(
+  TipPositionInput
+)

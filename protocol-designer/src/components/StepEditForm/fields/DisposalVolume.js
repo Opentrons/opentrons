@@ -15,8 +15,8 @@ import { selectors as stepFormSelectors } from '../../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { getBlowoutLocationOptionsForForm } from '../utils'
 
-import FieldConnector from './FieldConnector'
-import TextField from './Text'
+import { FieldConnector } from './FieldConnector'
+import { TextField } from './Text'
 
 import type { BaseState } from '../../../types'
 import type { FocusHandlers } from '../types'
@@ -31,7 +31,7 @@ type SP = {|
 
 type Props = { ...OP, ...SP }
 
-const DisposalVolumeField = (props: Props) => (
+const DisposalVolumeFieldComponent = (props: Props) => (
   <FormGroup label={i18n.t('form.step_edit_form.multiDispenseOptionsLabel')}>
     <FieldConnector
       name="disposalVolume_checkbox"
@@ -122,4 +122,6 @@ const mapSTP = (state: BaseState): SP => {
   }
 }
 
-export default connect<Props, OP, SP, _, _, _>(mapSTP)(DisposalVolumeField)
+export const DisposalVolumeField = connect<Props, OP, SP, _, _, _>(mapSTP)(
+  DisposalVolumeFieldComponent
+)

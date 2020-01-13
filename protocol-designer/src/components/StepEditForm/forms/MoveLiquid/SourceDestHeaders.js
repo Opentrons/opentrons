@@ -3,7 +3,7 @@ import * as React from 'react'
 import { FormGroup } from '@opentrons/components'
 import i18n from '../../../../localization'
 import { LabwareField, WellSelectionField } from '../../fields'
-import AspDispSection from '../AspDispSection'
+import { AspDispSection } from '../AspDispSection'
 
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { FocusHandlers } from '../../types'
@@ -22,7 +22,7 @@ const makeAddFieldNamePrefix = (prefix: string) => (
   fieldName: string
 ): StepFieldName => `${prefix}_${fieldName}`
 
-function SourceDestHeaders(props: Props) {
+export const SourceDestHeaders = (props: Props) => {
   const { className, collapsed, toggleCollapsed, focusHandlers, prefix } = props
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
   const labwareLabel = i18n.t(`form.step_edit_form.labwareLabel.${prefix}`)
@@ -46,5 +46,3 @@ function SourceDestHeaders(props: Props) {
     </AspDispSection>
   )
 }
-
-export default SourceDestHeaders

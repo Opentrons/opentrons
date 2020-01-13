@@ -9,7 +9,7 @@ import type { BaseState } from '../../../types'
 import type { StepType } from '../../../form-types'
 import styles from '../StepEditForm.css'
 import type { FocusHandlers } from '../types'
-import StepField from './FieldConnector'
+import { FieldConnector } from './FieldConnector'
 
 type OP = {|
   ...$Exact<FocusHandlers>,
@@ -25,9 +25,9 @@ const PipetteFieldSTP = (state: BaseState, ownProps: OP): SP => ({
   pipetteOptions: stepFormSelectors.getEquippedPipetteOptions(state),
 })
 
-const PipetteField = connect<Props, OP, SP, _, _, _>(PipetteFieldSTP)(
+export const PipetteField = connect<Props, OP, SP, _, _, _>(PipetteFieldSTP)(
   (props: Props) => (
-    <StepField
+    <FieldConnector
       name={props.name}
       focusedField={props.focusedField}
       dirtyFields={props.dirtyFields}
@@ -55,5 +55,3 @@ const PipetteField = connect<Props, OP, SP, _, _, _>(PipetteFieldSTP)(
     />
   )
 )
-
-export default PipetteField

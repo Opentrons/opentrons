@@ -18,7 +18,7 @@ import { selectors as stepFormSelectors } from '../../../../step-forms'
 import type { BaseState, ThunkDispatch } from '../../../../types'
 import type { WellOrderOption } from '../../../../form-types'
 
-import WellOrderViz from './WellOrderViz'
+import { WellOrderViz } from './WellOrderViz'
 import styles from './WellOrderInput.css'
 import stepEditStyles from '../../StepEditForm.css'
 
@@ -56,7 +56,7 @@ type State = {
   secondValue: ?WellOrderOption,
 }
 
-class WellOrderModal extends React.Component<Props, State> {
+class WellOrderModalComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -223,7 +223,7 @@ const mapDTP = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   },
 })
 
-export default connect<Props, OP, SP, DP, _, _>(
+export const WellOrderModal = connect<Props, OP, SP, DP, _, _>(
   mapSTP,
   mapDTP
-)(WellOrderModal)
+)(WellOrderModalComponent)

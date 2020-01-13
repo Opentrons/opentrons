@@ -6,7 +6,7 @@ import cx from 'classnames'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { getBlowoutLocationOptionsForForm } from '../utils'
-import FieldConnector from './FieldConnector'
+import { FieldConnector } from './FieldConnector'
 import styles from '../StepEditForm.css'
 import type { StepFieldName } from '../../../steplist/fieldLevel'
 import type { BaseState } from '../../../types'
@@ -43,7 +43,7 @@ type BlowoutLocationDropdownProps = {
   ...BlowoutLocationDropdownSP,
 }
 
-export const BlowoutLocationDropdown = connect<
+export const BlowoutLocationField = connect<
   BlowoutLocationDropdownProps,
   BlowoutLocationDropdownOP,
   BlowoutLocationDropdownSP,
@@ -85,5 +85,3 @@ export const BlowoutLocationDropdown = connect<
     />
   )
 })
-
-export default BlowoutLocationDropdown

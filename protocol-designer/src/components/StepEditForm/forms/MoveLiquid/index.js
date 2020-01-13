@@ -15,8 +15,8 @@ import {
 } from '../../fields'
 import styles from '../../StepEditForm.css'
 import type { FocusHandlers } from '../../types'
-import SourceDestFields from './SourceDestFields'
-import SourceDestHeaders from './SourceDestHeaders'
+import { SourceDestFields } from './SourceDestFields'
+import { SourceDestHeaders } from './SourceDestHeaders'
 
 type Props = {
   focusHandlers: FocusHandlers,
@@ -31,7 +31,7 @@ type State = {
 // TODO: BC 2019-01-25 instead of passing path from here, put it in connect fields where needed
 // or question if it even needs path
 
-class MoveLiquidForm extends React.Component<Props, State> {
+export class MoveLiquidForm extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = { collapsed: true }
@@ -124,5 +124,3 @@ class MoveLiquidForm extends React.Component<Props, State> {
     )
   }
 }
-
-export default MoveLiquidForm

@@ -14,7 +14,7 @@ type Props = {
   wellDepthMm: number,
 }
 
-const TipPositionZAxisViz = (props: Props) => {
+export const TipPositionZAxisViz = (props: Props) => {
   const fractionOfWellHeight = props.mmFromBottom / props.wellDepthMm
   const pixelsFromBottom =
     Number(fractionOfWellHeight) * WELL_HEIGHT_PIXELS - WELL_HEIGHT_PIXELS
@@ -39,4 +39,3 @@ const TipPositionZAxisViz = (props: Props) => {
     </div>
   )
 }
-export default TipPositionZAxisViz

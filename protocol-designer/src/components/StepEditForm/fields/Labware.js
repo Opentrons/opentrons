@@ -2,7 +2,7 @@
 import { connect } from 'react-redux'
 
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
-import StepFormDropdown from './StepFormDropdown'
+import { StepFormDropdown } from './StepFormDropdown'
 import type { Options } from '@opentrons/components'
 import type { StepFieldName } from '../../../steplist/fieldLevel'
 import type { BaseState } from '../../../types'
@@ -21,6 +21,6 @@ const mapSTP = (state: BaseState): SP => ({
   options: uiLabwareSelectors.getLabwareOptions(state),
 })
 
-export default connect<StepFormDropdownProps, OP, SP, _, _, _>(mapSTP)(
-  StepFormDropdown
-)
+export const LabwareField = connect<StepFormDropdownProps, OP, SP, _, _, _>(
+  mapSTP
+)(StepFormDropdown)

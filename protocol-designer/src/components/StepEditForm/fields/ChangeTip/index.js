@@ -1,6 +1,6 @@
 // @flow
 import { connect } from 'react-redux'
-import ChangeTip from './ChangeTip'
+import { ChangeTip } from './ChangeTip'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { getWellRatio } from '../../../../steplist/utils'
 import type { ElementProps } from 'react'
@@ -61,4 +61,4 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-export default connect<Props, OP, SP, _, _, _>(mapSTP)(ChangeTip)
+export const ChangeTipField = connect<Props, OP, SP, _, _, _>(mapSTP)(ChangeTip)

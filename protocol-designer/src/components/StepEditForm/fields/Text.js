@@ -3,13 +3,13 @@ import * as React from 'react'
 import { InputField } from '@opentrons/components'
 import type { StepFieldName } from '../../../steplist/fieldLevel'
 import type { FocusHandlers } from '../types'
-import StepField from './FieldConnector'
+import { FieldConnector } from './FieldConnector'
 
 type TextFieldProps = {
   className?: string,
   name: StepFieldName,
 } & FocusHandlers
-const TextField = (
+export const TextField = (
   props: TextFieldProps & React.ElementProps<typeof InputField>
 ) => {
   const {
@@ -21,7 +21,7 @@ const TextField = (
     ...inputProps
   } = props
   return (
-    <StepField
+    <FieldConnector
       name={name}
       focusedField={focusedField}
       dirtyFields={dirtyFields}
@@ -44,5 +44,3 @@ const TextField = (
     />
   )
 }
-
-export default TextField

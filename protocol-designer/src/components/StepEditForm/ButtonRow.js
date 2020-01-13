@@ -26,7 +26,7 @@ type DP = {|
 
 type Props = { ...OP, ...SP, ...DP }
 
-const ButtonRow = (props: Props) => {
+const ButtonRowComponent = (props: Props) => {
   const { canSave, onDelete, onSave, onCancel, onClickMoreOptions } = props
   return (
     <div
@@ -68,7 +68,7 @@ const DTP = (dispatch: ThunkDispatch<*>): DP => ({
   onSave: () => dispatch(stepFormActions.saveStepForm()),
 })
 
-export default connect<Props, OP, SP, DP, _, _>(
+export const ButtonRow = connect<Props, OP, SP, DP, _, _>(
   STP,
   DTP
-)(ButtonRow)
+)(ButtonRowComponent)

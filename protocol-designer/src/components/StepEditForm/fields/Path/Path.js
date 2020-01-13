@@ -3,7 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import { FormGroup, HoverTooltip } from '@opentrons/components'
 import i18n from '../../../../localization'
-import StepField from '../FieldConnector'
+import { FieldConnector } from '../FieldConnector'
 import styles from '../../StepEditForm.css'
 import type { FocusHandlers } from '../../types'
 import type { PathOption } from '../../../../form-types'
@@ -93,10 +93,10 @@ const getSubtitle = (
   const reasonForDisabled = disabledPathMap && disabledPathMap[path]
   return reasonForDisabled || ''
 }
-const PathField = (props: PathFieldProps) => {
+export const Path = (props: PathFieldProps) => {
   return (
     <FormGroup label="Path">
-      <StepField
+      <FieldConnector
         name="path"
         render={({ value, updateValue }) => (
           <ul className={styles.path_options}>
@@ -121,5 +121,3 @@ const PathField = (props: PathFieldProps) => {
     </FormGroup>
   )
 }
-
-export default PathField

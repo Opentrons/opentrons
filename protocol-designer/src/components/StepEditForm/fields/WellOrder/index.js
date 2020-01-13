@@ -6,7 +6,7 @@ import cx from 'classnames'
 import i18n from '../../../../localization'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import ZIG_ZAG_IMAGE from '../../../../images/zig_zag_icon.svg'
-import WellOrderModal from './WellOrderModal'
+import { WellOrderModal } from './WellOrderModal'
 
 import type { BaseState } from '../../../../types'
 
@@ -81,4 +81,6 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   return { iconClassNames }
 }
 
-export default connect<Props, OP, SP, _, _, _>(mapSTP)(WellOrderInput)
+export const WellOrderField = connect<Props, OP, SP, _, _, _>(mapSTP)(
+  WellOrderInput
+)

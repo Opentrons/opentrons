@@ -11,7 +11,7 @@ import styles from '../StepEditForm.css'
 import type { FocusHandlers } from '../types'
 
 type MagnetFormProps = { focusHandlers: FocusHandlers }
-function MagnetForm(props: MagnetFormProps): React.Element<'div'> {
+export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
   const { focusHandlers } = props
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getMagneticLabwareOptions
@@ -84,5 +84,3 @@ function MagnetForm(props: MagnetFormProps): React.Element<'div'> {
     </div>
   )
 }
-
-export default MagnetForm

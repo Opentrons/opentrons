@@ -1,6 +1,6 @@
 // @flow
 import { connect } from 'react-redux'
-import Path from './Path'
+import { Path } from './Path'
 import i18n from '../../../../localization'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { getWellRatio } from '../../../../steplist/utils'
@@ -98,4 +98,4 @@ function mapSTP(state: BaseState): SP {
   }
 }
 
-export default connect<Props, OP, SP, _, _, _>(mapSTP)(Path)
+export const PathField = connect<Props, OP, SP, _, _, _>(mapSTP)(Path)

@@ -72,7 +72,7 @@ const mergeProps = (
   }
 }
 
-export default connect<Props, OP, SP, {||}, _, _>(
+export const FormAlerts = connect<Props, OP, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps

@@ -15,7 +15,7 @@ type Props = {
   secondValue: ?WellOrderOption,
 }
 
-const WellOrderViz = (props: Props) => (
+export const WellOrderViz = (props: Props) => (
   <div className={styles.viz_wrapper}>
     <img src={WELLS_IMAGE} className={styles.wells_image} />
     <img
@@ -28,5 +28,3 @@ const WellOrderViz = (props: Props) => (
     />
   </div>
 )
-
-export default WellOrderViz

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import FlowRateInput from './FlowRateInput'
+import { FlowRateInput } from './FlowRateInput'
 import { connect } from 'react-redux'
 import { actions as steplistActions } from '../../../../steplist'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
@@ -84,7 +84,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>, ownProps: OP): DP {
   }
 }
 
-export default connect<Props, OP, SP, DP, _, _>(
+export const FlowRateField = connect<Props, OP, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(FlowRateInputWithKey)
