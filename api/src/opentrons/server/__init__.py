@@ -11,9 +11,11 @@ import traceback
 from typing import TYPE_CHECKING
 from aiohttp import web
 
+from multidict import MultiDict
+from .util import HTTPVersionMismatchError
 from opentrons.config import CONFIG
 from .rpc import RPCServer
-from .http import HTTPServer
+from .http import HTTPServerLegacy, HTTPServer
 from opentrons.api.routers import MainRouter
 
 if TYPE_CHECKING:
@@ -22,9 +24,10 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-@web.middleware
+# @web.middleware
 async def error_middleware(request, handler):
     try:
+        print(request.headers)
         response = await handler(request)
     except web.HTTPNotFound:
         log.exception("Exception handler for request {}".format(request))
@@ -41,6 +44,55 @@ async def error_middleware(request, handler):
         response = web.json_response(data, status=500)
 
     return response
+
+
+@web.middleware
+async def version_middleware(request, handler):
+    """
+    Helper middleware to route any requests to the default HTTP API (v0)
+    webserver paths. If the route still does not exist in v0, then the
+    error middleware will be called.
+    """
+    try:
+        response = await handler(request)
+    except HTTPVersionMismatchError as e:
+        header_version = e.dErrorArguments['header_version']
+        expected_version = e.dErrorArguments['expected_version']
+        if header_version > expected_version:
+            data = {
+                "type": "error",
+                "errorId": 1,
+                "errorType": "unsupportedVersion",
+                "message": msg,
+                "supportedHttpApiVersions": {
+                    "minimum": minVersion, "maximum": maxVersion},
+                "links": {}
+            }
+            msg = """Requested Version {h} is not supported for the route
+                provide. Max Version is {e}.
+                """.format(h=header_version, e=expected_version)
+            # Client is trying to use a version higher than supported
+            response = web.json_response(data, status=405)
+        else:
+            updated_headers_dict = MultiDict(**request.headers)
+            accept_header = updated_headers.get('Accept', '')
+            new_header = accept_header.replace(f'={header_version}', f'={expected_version}')
+            updated_headers_dict.update(Accept=new_header)
+            updated_request = request.clone(
+                method=request.method,
+                rel_url=request.rel_url,
+                headers=updated_headers_dict,
+                scheme=request.scheme,
+                host=request.host,
+                remote=request.remote)
+            # TODO look up older equivalent of a request
+            response = await error_middleware(updated_request, handler)
+    return response
+
+
+async def add_header(request, response):
+    version = '1.0'
+    response.headers['X-Opentrons-Media-Type'] = f'opentrons.api.{version}'
 
 
 class ThreadedAsyncLock:
@@ -84,6 +136,15 @@ class ThreadedAsyncLock:
         self._thread_lock.release()
 
 
+class CombinedHTTPRoutes:
+    def __init__(self, app, log_file_path):
+        self.app = app
+        self.log_file_path = log_file_path
+
+        HTTPServerLegacy(app, log_file_path)
+        HTTPServer(app, log_file_path)
+
+
 # Support for running using aiohttp CLI.
 # See: https://docs.aiohttp.org/en/stable/web.html#command-line-interface-cli
 def init(hardware: 'HardwareAPILike' = None,
@@ -97,14 +158,14 @@ def init(hardware: 'HardwareAPILike' = None,
                      If not specified, the server will use
                      :py:attr:`opentrons.hardware`
     """
-    app = web.Application(middlewares=[error_middleware])
+    app = web.Application(middlewares=[version_middleware])
     app['com.opentrons.hardware'] = hardware
     app['com.opentrons.motion_lock'] = ThreadedAsyncLock()
     app['com.opentrons.rpc'] = RPCServer(
         app, MainRouter(
             hardware, lock=app['com.opentrons.motion_lock'], loop=loop))
     app['com.opentrons.response_file_tempdir'] = tempfile.mkdtemp()
-    app['com.opentrons.http'] = HTTPServer(app, CONFIG['log_dir'])
+    app['com.opentrons.http'] = CombinedHTTPRoutes(app, CONFIG['log_dir'])
 
     async def dispose_response_file_tempdir(app):
         temppath = app.get('com.opentrons.response_file_tempdir')
@@ -114,6 +175,7 @@ def init(hardware: 'HardwareAPILike' = None,
             except Exception:
                 log.exception(f"failed to remove app temp path {temppath}")
 
+    app.on_response_prepare.append(add_header)
     app.on_shutdown.append(dispose_response_file_tempdir)
     app.on_shutdown.freeze()
     return app

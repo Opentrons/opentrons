@@ -2,6 +2,8 @@ import logging
 import asyncio
 import tempfile
 from aiohttp import web
+
+from ..util import http_version
 from opentrons.hardware_control import modules
 
 
@@ -11,7 +13,8 @@ UPDATE_TIMEOUT = 15
 
 # TODO: (BC, 2019-10-24): once APIv1 server ff toggle is gone,
 #  this should be removed
-async def cannot_update_firmware(request):
+@http_version(0, 0)
+async def cannot_update_firmware(request: web.Request) -> web.Response:
     """
      This handler refuses a module firmware update request
      in the case that the API server isn't equipped to handle it.
@@ -23,7 +26,8 @@ async def cannot_update_firmware(request):
     return web.json_response(res, status=status)
 
 
-async def update_module_firmware(request):
+@http_version(0, 0)
+async def update_module_firmware(request: web.Request) -> web.Response:
     """
      This handler accepts a POST request with Content-Type: multipart/form-data
      and a file field in the body named "module_firmware". The file should

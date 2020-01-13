@@ -3,6 +3,7 @@ import functools
 import os
 import json
 import logging
+from typing import Optional
 from aiohttp import web
 from threading import Thread
 
@@ -10,6 +11,7 @@ try:
     from opentrons import instruments
 except ImportError:
     pass
+from ..util import http_version
 from opentrons.config import pipette_config
 from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as ff
@@ -33,7 +35,8 @@ def hw_from_req(req):
     return req.app['com.opentrons.hardware']
 
 
-async def get_attached_pipettes(request):
+@http_version(0, 0)
+async def get_attached_pipettes(request: web.Request) -> web.Response:
     """
     Query robot for model strings on 'left' and 'right' mounts, and return a
     dict with the results keyed by mount. By default, this endpoint provides
@@ -93,7 +96,8 @@ async def get_attached_pipettes(request):
     return web.json_response(response, status=200)
 
 
-async def get_attached_modules(request):
+@http_version(0, 0)
+async def get_attached_modules(request: web.Request) -> web.Response:
     """
     On success (including an empty "modules" list if no modules are detected):
     # status: 200
@@ -162,7 +166,8 @@ async def get_attached_modules(request):
                              status=200)
 
 
-async def get_module_data(request):
+@http_version(0, 0)
+async def get_module_data(request: web.Request) -> web.Response:
     """
     Query a module (by its serial number) for its live data
     """
@@ -186,7 +191,8 @@ async def get_module_data(request):
         return web.json_response({"message": "Module not found"}, status=404)
 
 
-async def execute_module_command(request):
+@http_version(0, 0)
+async def execute_module_command(request: web.Request) -> web.Response:
     """
     Execute a command on a given module by its serial number
     """
@@ -230,7 +236,8 @@ async def execute_module_command(request):
             status=400)
 
 
-async def get_engaged_axes(request):
+@http_version(0, 0)
+async def get_engaged_axes(request: web.Request) -> web.Response:
     """
     Query driver for engaged state by axis. Response keys will be axes XYZABC
     and keys will be True for engaged and False for disengaged. Axes must be
@@ -250,7 +257,8 @@ async def get_engaged_axes(request):
          for k, v in engaged.items()})
 
 
-async def disengage_axes(request):
+@http_version(0, 0)
+async def disengage_axes(request: web.Request) -> web.Response:
     """
     Disengage axes (turn off power) primarily in order to reduce heat
     consumption.
@@ -272,7 +280,8 @@ async def disengage_axes(request):
     return web.json_response({"message": message}, status=status)
 
 
-async def position_info(request):
+@http_version(0, 0)
+async def position_info(request: web.Request) -> web.Response:
     """
     Positions determined experimentally by issuing move commands. Change
     pipette position offsets the mount to the left or right such that a user
@@ -334,7 +343,8 @@ def _validate_move_data(data):
 
 
 @_motion_lock
-async def move(request):
+@http_version(0, 0)
+async def move(request: web.Request) -> web.Response:
     """
     Moves the robot to the specified position as provided by the `control.info`
     endpoint response
@@ -359,7 +369,7 @@ async def move(request):
         if ff.use_protocol_api_v2():
             await hw.cache_instruments()
             if target == 'mount':
-                critical_point = CriticalPoint.MOUNT
+                critical_point: Optional[CriticalPoint] = CriticalPoint.MOUNT
             else:
                 critical_point = None
             mount = Mount[mount.upper()]
@@ -445,7 +455,8 @@ def _move_mount(robot, mount, point):
 
 
 @_motion_lock
-async def home(request):
+@http_version(0, 0)
+async def home(request: web.Request) -> web.Response:
     """
     This initializes a call to pipette.home() which, as a side effect will:
         1. Check the pipette is actually connected (will throw an error if you
@@ -486,7 +497,8 @@ async def home(request):
     return web.json_response({"message": message}, status=status)
 
 
-async def identify(request):
+@http_version(0, 0)
+async def identify(request: web.Request) -> web.Response:
     hw = hw_from_req(request)
     blink_time = int(request.query.get('seconds', '10'))
     if ff.use_protocol_api_v2():
@@ -496,7 +508,8 @@ async def identify(request):
     return web.json_response({"message": "identifying"})
 
 
-async def get_rail_lights(request):
+@http_version(0, 0)
+async def get_rail_lights(request: web.Request) -> web.Response:
     hw = hw_from_req(request)
     if ff.use_protocol_api_v2():
         on = await hw.get_lights()
@@ -505,7 +518,8 @@ async def get_rail_lights(request):
     return web.json_response({'on': on['rails']})
 
 
-async def set_rail_lights(request):
+@http_version(0, 0)
+async def set_rail_lights(request: web.Request) -> web.Response:
     hw = hw_from_req(request)
     data = await request.json()
     on = data.get('on')
@@ -521,7 +535,8 @@ async def set_rail_lights(request):
     return web.json_response({'on': on})
 
 
-async def take_picture(request):
+@http_version(0, 0)
+async def take_picture(request: web.Request) -> web.FileResponse:
     filename = os.path.join(
         request.app['com.opentrons.response_file_tempdir'], 'picture.jpg')
     if os.path.exists(filename):
@@ -536,10 +551,9 @@ async def take_picture(request):
         stdout=asyncio.subprocess.PIPE,
         loop=request.loop)
 
-    res = await proc.stdout.read()
+    res = await proc.stdout.read()  # type: ignore
     res = res.decode().strip()
     await proc.wait()
-
     # TODO (andy - 2018-04-23) find better way of ensuring picture was taken
     # TODO              and properly saved by ffmpeg
     if 'video:' in res and 'audio:' in res and 'subtitle:' in res:

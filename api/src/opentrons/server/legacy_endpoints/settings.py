@@ -4,6 +4,8 @@ import os
 import shutil
 from typing import Dict, List, Tuple, Union
 from aiohttp import web
+
+from ..util import http_version
 from opentrons.config import (advanced_settings as advs,
                               robot_configs as rc,
                               feature_flags as ff,
@@ -52,6 +54,7 @@ def reset_options() -> List[Dict[str, str]]:
     return _common_settings_reset_options
 
 
+@http_version(0, 0)
 async def get_advanced_settings(request: web.Request) -> web.Response:
     """
     Handles a GET request and returns a json body with the key "settings" and a
@@ -89,6 +92,7 @@ def _get_adv_settings_response() -> Dict[
             if _should_show(setting)]}
 
 
+@http_version(0, 0)
 async def set_advanced_setting(request: web.Request) -> web.Response:
     """ Set a specific advanced setting.
 
@@ -156,6 +160,7 @@ def _check_reset(reset_req: Dict[str, str]) -> Tuple[bool, str]:
     return (True, '')
 
 
+@http_version(0, 0)
 async def reset(request: web.Request) -> web.Response:  # noqa(C901)
     """ Execute a reset of the requested parts of the user configuration.
 
@@ -195,12 +200,14 @@ async def reset(request: web.Request) -> web.Response:  # noqa(C901)
     return web.json_response({}, status=200)
 
 
+@http_version(0, 0)
 async def available_resets(request: web.Request) -> web.Response:
     """ Indicate what parts of the user configuration are available for reset.
     """
     return web.json_response({'options': reset_options()}, status=200)
 
 
+@http_version(0, 0)
 async def pipette_settings(request: web.Request) -> web.Response:
     res = {}
     for id in pc.known_pipettes():
@@ -215,6 +222,7 @@ async def pipette_settings(request: web.Request) -> web.Response:
     return web.json_response(res, status=200)
 
 
+@http_version(0, 0)
 async def pipette_settings_id(request: web.Request) -> web.Response:
     pipette_id = request.match_info['id']
     if pipette_id not in pc.known_pipettes():
@@ -232,6 +240,7 @@ async def pipette_settings_id(request: web.Request) -> web.Response:
     return web.json_response(res, status=200)
 
 
+@http_version(0, 0)
 async def modify_pipette_settings(request: web.Request) -> web.Response:
     """
     Expects a dictionary with mutable configs
@@ -268,6 +277,7 @@ async def modify_pipette_settings(request: web.Request) -> web.Response:
     return web.json_response(updated_configs, status=200)
 
 
+@http_version(0, 0)
 async def set_log_level(request: web.Request) -> web.Response:
     """
     Set the log level of the API logs (serial logs are unaffected)
@@ -309,6 +319,7 @@ async def set_log_level(request: web.Request) -> web.Response:
         data={'message': f'log_level set to {log_level}'})
 
 
+@http_version(0, 0)
 async def get_robot_settings(request: web.Request) -> web.Response:
     """
     Handles a GET request and returns a body that is the JSON

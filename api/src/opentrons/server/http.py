@@ -1,13 +1,20 @@
 import logging
-from . import endpoints as endp
+from . import legacy_endpoints as endp
 from opentrons import config
-from .endpoints import (networking, control, settings, update)
+
+from .legacy_endpoints import (networking, control, settings, update)
 from opentrons.deck_calibration import endpoints as dc_endp
 
+<<<<<<< HEAD
+=======
+from .legacy_endpoints import serverlib_fallback as endpoints
+from . import endpoints as v1_endp
+
+>>>>>>> Main HTTP API Versioning
 log = logging.getLogger(__name__)
 
 
-class HTTPServer(object):
+class HTTPServerLegacy:
     def __init__(self, app, log_file_path):
         self.app = app
         self.log_file_path = log_file_path
@@ -96,3 +103,11 @@ class HTTPServer(object):
         )
         self.app.router.add_get(
             '/settings/robot', settings.get_robot_settings)
+
+
+class HTTPServer:
+    def __init__(self, app, log_file_path):
+        self.app = app
+        self.log_file_path = log_file_path
+
+        self.app.router.add_get('/robot/health', v1_endp.health)
