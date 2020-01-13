@@ -2168,32 +2168,43 @@ class MagneticModuleContext(ModuleContext):
 
     @cmds.publish.both(command=cmds.magdeck_engage)
     @requires_version(2, 0)
-    def engage(self, height: float = None, offset: float = None):
+    def engage(self,
+               height: float = None,
+               offset: float = None,
+               height_from_base: float = None):
         """ Raise the Magnetic Module's magnets.
 
         The destination of the magnets can be specified in several different
         ways, based on internally stored default heights for labware:
 
-           - If neither `height` nor `offset` is specified, the magnets will
-             raise to a reasonable default height based on the specified
-             labware.
-           - If `height` is specified, it should be a distance in mm from the
+           - If neither ``height``, ``height_from_base`` nor ``offset`` is
+             specified, the magnets will raise to a reasonable default height
+             based on the specified labware.
+           - The recommended way to adjust the height of the magnets is to
+             specify ``height_from_base``, which should be a distance in mm
+             relative to the base of the labware that is on the magnetic module
+           - If ``height`` is specified, it should be a distance in mm from the
              home position of the magnets.
-           - If `offset` is specified, it should be an offset in mm from the
+           - If ``offset`` is specified, it should be an offset in mm from the
              default position. A positive number moves the magnets higher and
              a negative number moves the magnets lower.
 
         Only certain labwares have defined engage heights for the Magnetic
         Module. If a labware that does not have a defined engage height is
         loaded on the Magnetic Module (or if no labware is loaded), then
-        `height` must be specified.
+        ``height`` or ``height_from_labware`` must be specified.
 
+        :param height_from_base: The height to raise the magnets to, in mm from
+                                 the base of the labware
+        .. versionadded:: 2.1
         :param height: The height to raise the magnets to, in mm from home.
         :param offset: An offset relative to the default height for the labware
                        in mm
         """
         if height:
             dist = height
+        elif height_from_base and self._ctx._api_version >= APIVersion(2, 2):
+            dist = height_from_base + modules.magdeck.OFFSET_TO_LABWARE_BOTTOM
         elif self.labware and self.labware.magdeck_engage_height is not None:
             dist = self.labware.magdeck_engage_height
             if offset:

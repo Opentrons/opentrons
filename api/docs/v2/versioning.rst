@@ -42,7 +42,7 @@ The version you specify determines the features and behaviors available to your 
 
 .. code-block:: python
 
-    
+
    from opentrons import protocol_api
 
    metadata = {
@@ -94,4 +94,6 @@ This table lists the correspondence between Protocol API versions and robot soft
 |     2.0     |          3.14.0             |
 +-------------+-----------------------------+
 |     2.1     |          3.15.2             |
++-------------+-----------------------------+
+|     2.2     |          3.16.0             |
 +-------------+-----------------------------+

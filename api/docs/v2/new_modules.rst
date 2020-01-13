@@ -4,9 +4,14 @@
 Hardware Modules
 ################
 
+
 Modules are peripherals that attach to the OT-2 to extend its capabilities.
 
 We currently support the Temperature, Magnetic and Thermocycler Modules.
+
+************
+Module Setup
+************
 
 Loading your Module onto a deck
 ===============================
@@ -133,7 +138,7 @@ section, assume we have the following already:
 .. versionadded:: 2.0
 
 Set Temperature
-^^^^^^^^^^^^^^^
+===============
 
 To set the Temperature Module to 4 °C do the following:
 
@@ -150,7 +155,7 @@ This function will pause your protocol until your target temperature is reached.
 .. versionadded:: 2.0
 
 Read the Current Temperature
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 You can read the current real-time temperature of the Temperature Module using the :py:attr:`.TemperatureModuleContext.temperature` property:
 
@@ -161,7 +166,7 @@ You can read the current real-time temperature of the Temperature Module using t
 .. versionadded:: 2.0
 
 Read the Target Temperature
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+===========================
 
 You can read the current target temperature of the Temperature Module using the :py:attr:`.TemperatureModuleContext.target` property:
 
@@ -172,7 +177,7 @@ You can read the current target temperature of the Temperature Module using the 
 .. versionadded:: 2.0
 
 Deactivate
-^^^^^^^^^^
+==========
 
 This function will stop heating or cooling and will turn off the fan on the Temperature Module.
 
@@ -216,34 +221,55 @@ For the purposes of this section, assume we have the following already:
 
 
 Engage
-^^^^^^
+======
 
 The :py:meth:`.MagneticModuleContext.engage` function raises the magnets to induce a magnetic field in the labware on top of the Magnetic Module. The height of the magnets can be specified in several different ways, based on internally stored default heights for labware:
 
-   - If neither ``height`` nor ``offset`` is specified **and** the labware is supported on the Magnetic Module,
-     the magnets will raise to a reasonable default height based on the specified labware.
+- If neither ``height_from_base``, ``height`` nor ``offset`` is specified **and** the labware is supported on the Magnetic Module, the magnets will raise to a reasonable default height based on the specified labware.
 
-     .. code-block:: python
+  .. code-block:: python
 
-         mag_mod.engage()
+      mag_mod.engage()
 
-   - If ``height`` is specified, it should be a distance in mm from the home position of the magnets.
+  .. versionadded:: 2.0
 
-     .. code-block:: python
+- The recommended way to specify the magnets' position is to utilize the ``height_from_base`` parameter, which allows you to raise the height of the magnets relative to the base of the labware.
 
-        mag_mod.engage(height=18.5)
+  .. code-block:: python
+
+      mag_mod.engage(height_from_base=13.5)
+
+  A ``mag_mod.engage(height_from_base=0)`` call should move the tops of the magnets to level with base of the labware.
+
+  .. versionadded:: 2.2
+
+.. note::
+    There is a +/- 1 mmm variance across magnetic module units, using ``height_from_base=0`` might not be able to get the magnets to completely flush with base of the labware. Please test before carrying out your experiment to ensure the desired engage height for your labware.
+
+- You can also specify ``height``, which should be a distance in mm from the home position of the magnets.
+
+  .. code-block:: python
+
+      mag_mod.engage(height=18.5)
+
+  .. versionadded:: 2.0
+
+- An ``offset`` can be applied to move the magnets relatively from the default engage height of the labware, **if** the labware is supported on the Magnetic Module.
+
+  .. code-block:: python
+
+      mag_mod.engage(offset=-2)
+
+  .. versionadded:: 2.0
 
 .. note::
 
-    Only certain labwares have defined engage heights for the Magnetic
-    Module. If a labware that does not have a defined engage height is
-    loaded on the Magnetic Module (or if no labware is loaded), then
-    ``height`` must be specified.
+    Only certain labwares have defined engage heights for the Magnetic Module. If a labware that does not have a defined engage height is loaded on the Magnetic Module (or if no labware is loaded), then ``height_from_labware`` (since version 2.2) or ``height``, must be specified.
 
 .. versionadded:: 2.0
 
 Disengage
-^^^^^^^^^
+=========
 
 .. code-block:: python
 
@@ -289,12 +315,12 @@ For the purposes of this section, assume we have the following already:
 .. versionadded:: 2.0
 
 Lid Motor Control
-^^^^^^^^^^^^^^^^^
+=================
 
 The Thermocycler can control its temperature with the lid open or closed. When the lid of the Thermocycler is open, the pipettes can access the loaded labware. You can control the lid position with the methods below.
 
 Open Lid
-++++++++
+--------
 
 .. code-block:: python
 
@@ -304,7 +330,7 @@ Open Lid
 .. versionadded:: 2.0
 
 Close Lid
-+++++++++
+---------
 
 .. code-block:: python
 
@@ -313,14 +339,14 @@ Close Lid
 .. versionadded:: 2.0
 
 Lid Temperature Control
-^^^^^^^^^^^^^^^^^^^^^^^
+=======================
 
 You can control when a lid temperature is set. It is recommended that you set
 the lid temperature before executing a Thermocycler profile (see :ref:`thermocycler-profiles`). The range of the Thermocycler lid is
 37 °C to 110 °C.
 
 Set Lid Temperature
-+++++++++++++++++++
+-------------------
 
 :py:meth:`.ThermocyclerContext.set_lid_temperature` takes one parameter: the ``temperature`` you wish the lid to be set to. The protocol will only proceed once the lid temperature has been reached.
 
@@ -331,14 +357,14 @@ Set Lid Temperature
 .. versionadded:: 2.0
 
 Block Temperature Control
-^^^^^^^^^^^^^^^^^^^^^^^^^
+=========================
 
 To set the block temperature inside the Thermocycler, you can use the method :py:meth:`.ThermocyclerContext.set_block_temperature`. It takes five parameters:
 ``temperature``, ``hold_time_seconds``, ``hold_time_minutes``, ``ramp_rate`` and ``block_max_volume``. Only ``temperature`` is required; the two ``hold_time`` parameters, ``ramp_rate``, and ``block_max_volume`` are optional.
 
 
 Temperature
-+++++++++++
+-----------
 
 If you only specify a ``temperature`` in °C, the Thermocycler will hold this temperature indefinitely until powered off.
 
@@ -349,7 +375,7 @@ If you only specify a ``temperature`` in °C, the Thermocycler will hold this te
 .. versionadded:: 2.0
 
 Hold Time
-+++++++++
+---------
 
 If you set a ``temperature`` and a ``hold_time``, the Thermocycler will hold the temperature for the specified amount of time. Time can be passed in as minutes or seconds.
 
@@ -366,7 +392,7 @@ If you do not specify a hold time the protocol will proceed once the temperature
 .. versionadded:: 2.0
 
 Block Max Volume
-++++++++++++++++
+----------------
 
 The Thermocycler's block temperature controller varies its behavior based on the amount of liquid in the wells of its labware. Specifying an accurate volume allows the Thermocycler to precisely track the temperature of the samples. The ``block_max_volume`` parameter is specified in µL and is the volume of the most-full well in the labware that is loaded on the Thermocycler's block. If not specified, it defaults to 25 µL.
 
@@ -378,7 +404,7 @@ The Thermocycler's block temperature controller varies its behavior based on the
 .. versionadded:: 2.0
 
 Ramp Rate
-+++++++++
+---------
 
 Lastly, you can modify the ``ramp_rate`` in °C/sec for a given ``temperature``.
 
@@ -395,7 +421,7 @@ Lastly, you can modify the ``ramp_rate`` in °C/sec for a given ``temperature``.
 .. _thermocycler-profiles:
 
 Thermocycler Profiles
-^^^^^^^^^^^^^^^^^^^^^
+=====================
 
 The Thermocycler can rapidly cycle through temperatures to execute heat-sensitive reactions. These cycles are defined as profiles.
 
@@ -429,13 +455,13 @@ For instance, you can execute the profile defined above 100 times for a 30 µL-p
 .. versionadded:: 2.0
 
 Thermocycler Status
-^^^^^^^^^^^^^^^^^^^
+===================
 
 Throughout your protocol, you may want particular information on the current status of your Thermocycler. Below are
 a few methods that allow you to do that.
 
 Lid Position
-++++++++++++
+------------
 
 The current status of the lid position. It can be one of the strings ``'open'``, ``'closed'`` or ``'in_between'``.
 
@@ -446,7 +472,7 @@ The current status of the lid position. It can be one of the strings ``'open'``,
 .. versionadded:: 2.0
 
 Heated Lid Temperature Status
-+++++++++++++++++++++++++++++
+-----------------------------
 
 The current status of the heated lid temperature controller. It can be one of the strings ``'holding at target'``, ``'heating'``, ``'idle'``,  or ``'error'``.
 
@@ -457,7 +483,7 @@ The current status of the heated lid temperature controller. It can be one of th
 .. versionadded:: 2.0
 
 Block Temperature Status
-++++++++++++++++++++++++
+------------------------
 
 The current status of the well block temperature controller. It can be one of the strings ``'holding at target'``, ``'cooling'``, ``'heating'``, ``'idle'``, or ``'error'``.
 
@@ -470,13 +496,13 @@ The current status of the well block temperature controller. It can be one of th
 .. _thermocycler-deactivation:
 
 Thermocycler Deactivate
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+=======================
 
 At some points in your protocol, you may want to deactivate specific temperature controllers of your Thermocycler. This can be done with three methods,
 :py:meth:`.ThermocyclerContext.deactivate`, :py:meth:`.ThermocyclerContext.deactivate_lid`, :py:meth:`.ThermocyclerContext.deactivate_block`.
 
 Deactivate
-++++++++++
+----------
 
 This deactivates both the well block and the heated lid of the Thermocycler.
 
@@ -485,7 +511,7 @@ This deactivates both the well block and the heated lid of the Thermocycler.
   tc_mod.deactivate()
 
 Deactivate Lid
-++++++++++++++
+--------------
 
 This deactivates only the heated lid of the Thermocycler.
 
@@ -496,7 +522,7 @@ This deactivates only the heated lid of the Thermocycler.
 .. versionadded:: 2.0
 
 Deactivate Block
-++++++++++++++++
+----------------
 
 This deactivates only the well block of the Thermocycler.
 
