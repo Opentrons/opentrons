@@ -11,6 +11,7 @@ from typing import List, Tuple
 
 from aiohttp import web
 
+from .util import update_http_version
 
 LOG = logging.getLogger(__name__)
 
@@ -92,6 +93,7 @@ def key_present(hashval: str) -> bool:
 
 
 @require_linklocal
+@update_http_version(1, 0)
 async def list_keys(request: web.Request) -> web.Response:
     """ List keys in the authorized_keys file.
 
@@ -107,6 +109,7 @@ async def list_keys(request: web.Request) -> web.Response:
 
 
 @require_linklocal
+@update_http_version(1, 0)
 async def add(request: web.Request) -> web.Response:
     """ Add a public key to the authorized_keys file.
 
@@ -154,6 +157,7 @@ async def add(request: web.Request) -> web.Response:
 
 
 @require_linklocal
+@update_http_version(1, 0)
 async def clear(request: web.Request) -> web.Response:
     """ Clear all public keys from authorized_keys
 
@@ -174,6 +178,7 @@ async def clear(request: web.Request) -> web.Response:
 
 
 @require_linklocal
+@update_http_version(1, 0)
 async def remove(request: web.Request) -> web.Response:
     """ Remove a public key from authorized_keys
 

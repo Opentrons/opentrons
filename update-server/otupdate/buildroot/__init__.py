@@ -8,7 +8,7 @@ from aiohttp import web
 from . import constants, name_management
 
 from . import config, control, update, ssh_key_management
-
+from .util import HTTPVersionMismatchError, ERROR_CODES, SUPPORTED_VERSIONS
 
 BR_BUILTIN_VERSION_FILE = '/etc/VERSION.json'
 #: Location of the builtin system version
@@ -18,8 +18,36 @@ LOG = logging.getLogger(__name__)
 
 @web.middleware
 async def log_error_middleware(request, handler):
+    minVersion = SUPPORTED_VERSIONS[0]
+    maxVersion = SUPPORTED_VERSIONS[-1]
     try:
         resp = await handler(request)
+    except HTTPVersionMismatchError as error:
+        msg = error.message
+        data = {
+            "type": "error",
+            "errorId": ERROR_CODES["unsupportedVersion"],
+            "errorType": "unsupportedVersion",
+            "message": msg,
+            "supportedHttpApiVersions": {
+                "minimum": minVersion, "maximum": maxVersion},
+            "links": {}
+        }
+        # Client is trying to use a version higher than supported
+        resp = web.json_response(data, status=406)
+    except web.HTTPNotFound:
+        LOG.exception("Exception handler for request {}".format(request))
+        msg = "Request was not found at {}".format(request)
+        data = {
+            "type": "error",
+            "errorId": ERROR_CODES["HTTPNotFound"],
+            "errorType": "HTTPNotFound",
+            "message": msg,
+            "supportedHttpApiVersions": {
+                "minimum": minVersion, "maximum": maxVersion},
+            "links": {}
+        }
+        resp = web.json_response(data, status=404)
     except Exception:
         LOG.exception(f"Exception serving {request.method} {request.path}")
         raise
