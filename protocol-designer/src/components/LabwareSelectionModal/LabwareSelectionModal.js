@@ -300,21 +300,26 @@ const LabwareSelectionModal = (props: Props) => {
               inert={!populatedCategories[category]}
             >
               {labwareByCategory[category] &&
-                labwareByCategory[category].map((labwareDef, index) => (
-                  <LabwareItem
-                    key={index}
-                    icon={
-                      getLabwareRecommended(labwareDef)
-                        ? 'check-decagram'
-                        : null
-                    }
-                    disabled={getLabwareDisabled(labwareDef)}
-                    labwareDef={labwareDef}
-                    selectLabware={selectLabware}
-                    onMouseEnter={() => setPreviewedLabware(labwareDef)}
-                    onMouseLeave={() => setPreviewedLabware()}
-                  />
-                ))}
+                labwareByCategory[category].map((labwareDef, index) => {
+                  const isDisabled = getLabwareDisabled(labwareDef)
+                  if (!isDisabled) {
+                    return (
+                      <LabwareItem
+                        key={index}
+                        icon={
+                          getLabwareRecommended(labwareDef)
+                            ? 'check-decagram'
+                            : null
+                        }
+                        disabled={isDisabled}
+                        labwareDef={labwareDef}
+                        selectLabware={selectLabware}
+                        onMouseEnter={() => setPreviewedLabware(labwareDef)}
+                        onMouseLeave={() => setPreviewedLabware()}
+                      />
+                    )
+                  }
+                })}
             </PDTitledList>
           ))}
         </ul>
