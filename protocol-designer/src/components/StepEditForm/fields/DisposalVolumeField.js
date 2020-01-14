@@ -16,7 +16,7 @@ import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { getBlowoutLocationOptionsForForm } from '../utils'
 
 import { FieldConnector } from './FieldConnector'
-import { TextField } from './Text'
+import { TextField } from './TextField'
 
 import type { BaseState } from '../../../types'
 import type { FocusHandlers } from '../types'

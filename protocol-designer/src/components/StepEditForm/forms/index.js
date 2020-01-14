@@ -1,7 +1,7 @@
 // @flow
 
-export { MoveLiquidForm } from './MoveLiquid'
-export { MixForm } from './Mix'
-export { PauseForm } from './Pause'
+export { MoveLiquidForm } from './MoveLiquidForm'
+export { MixForm } from './MixForm'
+export { PauseForm } from './PauseForm'
 export { MagnetForm } from './MagnetForm'
 export { TemperatureForm } from './TemperatureForm'

@@ -2,12 +2,12 @@
 import { connect } from 'react-redux'
 
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
-import { StepFormDropdown } from './StepFormDropdown'
+import { StepFormDropdown } from './StepFormDropdownField'
 import type { Options } from '@opentrons/components'
 import type { StepFieldName } from '../../../steplist/fieldLevel'
 import type { BaseState } from '../../../types'
 import type { FocusHandlers } from '../types'
-import type { StepFormDropdownProps } from './StepFormDropdown'
+import type { StepFormDropdownProps } from './StepFormDropdownField'
 
 type OP = {|
   ...$Exact<FocusHandlers>,
