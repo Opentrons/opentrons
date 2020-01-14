@@ -33,12 +33,12 @@ export type DP = {|
   back: () => mixed,
 |}
 
-export type CalibrateDeckProps = { ...OP, ...SP, ...DP }
+export type CalibrateDeckProps = {| ...OP, ...SP, ...DP |}
 
-export type CalibrateDeckStartedProps = {
-  ...$Exact<CalibrateDeckProps>,
+export type CalibrateDeckStartedProps = {|
+  ...CalibrateDeckProps,
   exitUrl: string,
   mount: Mount,
   pipette: PipetteModelSpecs,
   calibrationStep: CalibrationStep,
-}
+|}

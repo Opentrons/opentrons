@@ -8,7 +8,7 @@ import ClearDeckAlertModal from '../ClearDeckAlertModal'
 import type { Dispatch } from '../../types'
 import type { CalibrateDeckProps } from './types'
 
-type OP = $Exact<CalibrateDeckProps>
+type OP = CalibrateDeckProps
 
 type DP = {|
   onContinue: () => mixed,

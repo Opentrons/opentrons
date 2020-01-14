@@ -294,7 +294,7 @@ export const getPipettesForInstrumentGroup: Selector<PipettesForInstrumentGroup>
           [pipetteOnDeck.mount]: pipetteForInstrumentGroup,
         }
       },
-      {}
+      { left: undefined, right: undefined }
     )
 )
 

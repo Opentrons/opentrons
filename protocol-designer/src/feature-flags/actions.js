@@ -3,7 +3,7 @@ import type { Flags } from './types'
 
 export type SetFeatureFlagAction = {|
   type: 'SET_FEATURE_FLAGS',
-  payload: Flags,
+  payload: $Shape<Flags>,
 |}
 
 export const setFeatureFlags = (payload: Flags): SetFeatureFlagAction => ({

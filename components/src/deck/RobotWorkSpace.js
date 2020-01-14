@@ -27,7 +27,6 @@ function RobotWorkSpace(props: Props) {
   // in Firefox the same fn returns a deprecated SVGMatrix.
   // Until Firefox fixes this and conforms to SVG2 draft,
   // it will suffer from inverted y behavior (ignores css transform)
-  // $FlowFixMe(bc, 2019-05-31): flow type svg ref
   const getRobotCoordsFromDOMCoords: GetRobotCoordsFromDOMCoords = (x, y) => {
     if (!wrapperRef.current) return { x: 0, y: 0 }
     const cursorPoint = wrapperRef.current.createSVGPoint()

@@ -81,6 +81,7 @@ export function buildrootReducer(
 
     case Constants.BR_STATUS: {
       const { stage, progress, message } = action.payload
+      const currentError = state.session?.error || null
 
       return {
         ...state,
@@ -88,7 +89,7 @@ export function buildrootReducer(
           ...state.session,
           stage,
           progress: typeof progress === 'number' ? progress : null,
-          error: stage === Constants.ERROR ? message : state.session?.error,
+          error: stage === Constants.ERROR ? message : currentError,
         },
       }
     }

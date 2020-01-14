@@ -5,11 +5,11 @@ import InstrumentInfo, { type InstrumentInfoProps } from './InstrumentInfo'
 
 import styles from './instrument.css'
 
-type Props = {
+type Props = {|
   showMountLabel?: ?boolean,
   left?: InstrumentInfoProps,
   right?: InstrumentInfoProps,
-}
+|}
 
 const EMPTY_INSTRUMENT_PROPS = {
   description: 'None',

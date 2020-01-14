@@ -6,7 +6,7 @@ import styles from './forms.css'
 
 // TODO: Ian 2018-09-14 remove 'label' prop when IngredientPropertiesForm gets updated
 
-type Props = {
+type Props = {|
   /** field is disabled if value is true */
   disabled?: boolean,
   /** change handler */
@@ -47,7 +47,7 @@ type Props = {
   tabIndex?: number,
   /** automatically focus field on render */
   autoFocus?: boolean,
-}
+|}
 
 export default function InputField(props: Props) {
   const error = props.error != null

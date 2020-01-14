@@ -29,7 +29,7 @@ type SP = {|
   maxDisposalVolume: ?number,
 |}
 
-type Props = { ...OP, ...SP }
+type Props = {| ...OP, ...SP, dispatch: mixed |}
 
 const DisposalVolumeFieldComponent = (props: Props) => (
   <FormGroup label={i18n.t('form.step_edit_form.multiDispenseOptionsLabel')}>

@@ -24,11 +24,7 @@ export default function UnreachableRobotItem(props: UnreachableRobot) {
             disabled
             hoverTooltipHandlers={hoverTooltipHandlers}
           >
-            <Icon
-              name={'alert-circle'}
-              className={styles.robot_item_icon}
-              disabled
-            />
+            <Icon name={'alert-circle'} className={styles.robot_item_icon} />
             <p className={styles.link_text}>{displayName}</p>
           </RobotLink>
         )}

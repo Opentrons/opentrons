@@ -31,13 +31,13 @@ type PasswordFieldProps = {
   toggleShowPassword: (name: string) => mixed,
 }
 
-type SelectOptionFieldProps = {
+type SelectOptionFieldProps = {|
   ...BaseFieldProps,
   options: Array<SelectOption>,
   placeholder?: string,
-  onValueChange?: (name: string, value: ?string) => mixed,
+  onValueChange: (name: string, value: ?string) => mixed,
   onLoseFocus?: (name: string) => mixed,
-}
+|}
 
 const SHOW_PASSWORD_LABEL = 'Show password'
 const FIELD_ID_PREFIX = '__ConnectForm__'

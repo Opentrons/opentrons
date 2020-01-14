@@ -5,10 +5,12 @@ import type { StepFieldName } from '../../../steplist/fieldLevel'
 import type { FocusHandlers } from '../types'
 import { FieldConnector } from './FieldConnector'
 
-type RadioGroupFieldProps = {
+type RadioGroupFieldProps = {|
+  ...FocusHandlers,
   name: StepFieldName,
   options: $PropertyType<React.ElementProps<typeof RadioGroup>, 'options'>,
-} & FocusHandlers
+|}
+
 export const RadioGroupField = (props: RadioGroupFieldProps) => {
   const {
     name,

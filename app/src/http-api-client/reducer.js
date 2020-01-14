@@ -1,5 +1,6 @@
 // @flow
 // generic api reducer
+// DEPRECATED(mc, 2020-01-13)
 import isEmpty from 'lodash/isEmpty'
 import reduce from 'lodash/reduce'
 import { normalizeRobots } from '../discovery/reducer'
@@ -7,10 +8,9 @@ import { normalizeRobots } from '../discovery/reducer'
 import type { Service } from '@opentrons/discovery-client'
 import type { State, Action } from '../types'
 import type { BaseRobot } from '../robot'
-import type { NetworkingState } from './networking'
 
 export type RobotApiState = $Shape<{|
-  ...NetworkingState,
+  [path: string]: any,
 |}>
 
 type ApiState = { [name: string]: ?RobotApiState }
@@ -117,7 +117,7 @@ export function getRobotApiState(
   return state.superDeprecatedRobotApi.api[props.name] || {}
 }
 
-function getUpdateInfo(state: ApiState, action: *): * {
+function getUpdateInfo(state: ApiState, action: any): any {
   const {
     path,
     robot: { name },

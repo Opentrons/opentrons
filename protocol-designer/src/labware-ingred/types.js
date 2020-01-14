@@ -40,15 +40,16 @@ export type OrderedLiquids = Array<{
 }>
 
 // TODO: Ian 2018-10-15 audit & rename these confusing types
-export type LiquidGroup = {
+export type LiquidGroup = {|
   name: ?string,
   description: ?string,
   serialize: boolean,
-}
+|}
 
-export type IngredInputs = LiquidGroup & {
-  volume: ?number,
-}
+export type IngredInputs = {|
+  ...LiquidGroup,
+  volume?: ?number,
+|}
 
 export type IngredGroupAccessor = $Keys<IngredInputs>
 

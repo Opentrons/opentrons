@@ -40,7 +40,6 @@ export default class SelectKey extends React.Component<Props> {
       event.target.value = ''
       // $FlowFixMe: see TODO and HACK in app/src/http-api-client/networking.js
       this.props.addKey(file).then(success => {
-        // $FlowFixMe: ditto
         this.props.onValueChange(this.props.name, success.payload.response.id)
       })
     }

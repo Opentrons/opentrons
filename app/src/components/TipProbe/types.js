@@ -1,7 +1,7 @@
 // @flow
 import type { Pipette } from '../../robot'
 
-export type TipProbeProps = $Exact<Pipette>
+export type TipProbeProps = Pipette
 
 export type TipProbeState =
   | 'unprobed'

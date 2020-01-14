@@ -84,11 +84,11 @@ export default class FilePipettesModal extends React.Component<Props, State> {
       ...initialState,
       pipettesByMount: {
         ...initialState.pipettesByMount,
-        ...(props.initialPipetteValues || {}),
+        ...props.initialPipetteValues,
       },
       modulesByType: {
         ...initialState.modulesByType,
-        ...(props.initialModuleValues || {}),
+        ...props.initialModuleValues,
       },
     }
   }

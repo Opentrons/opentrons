@@ -168,7 +168,7 @@ const LabwareSelectionModal = (props: Props) => {
     >(
       defs,
       (acc, def: $Values<typeof defs>) => {
-        const category = def.metadata.displayCategory
+        const category: string = def.metadata.displayCategory
         // filter out non-permitted tipracks
         if (
           category === 'tipRack' &&
