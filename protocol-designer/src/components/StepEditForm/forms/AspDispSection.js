@@ -12,7 +12,7 @@ type Props = {
   children?: React.Node,
 }
 
-function AspDispSection(props: Props) {
+export const AspDispSection = (props: Props) => {
   const { children, className, collapsed, toggleCollapsed, prefix } = props
 
   return (
@@ -42,5 +42,3 @@ function AspDispSection(props: Props) {
     </div>
   )
 }
-
-export default AspDispSection

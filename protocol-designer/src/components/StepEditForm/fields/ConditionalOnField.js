@@ -18,7 +18,7 @@ type SP = {|
 
 type Props = { ...OP, ...SP }
 
-function ConditionalOnField(props: Props) {
+function ConditionalOnFieldComponent(props: Props) {
   return props.condition(props.value) ? props.children : null
 }
 
@@ -29,4 +29,6 @@ function STP(state: BaseState, ownProps: OP): SP {
   }
 }
 
-export default connect<Props, OP, SP, _, _, _>(STP)(ConditionalOnField)
+export const ConditionalOnField = connect<Props, OP, SP, _, _, _>(STP)(
+  ConditionalOnFieldComponent
+)
