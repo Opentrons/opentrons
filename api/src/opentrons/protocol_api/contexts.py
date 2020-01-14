@@ -1605,7 +1605,8 @@ class InstrumentContext(CommandPublisher):
         transfer_options = transfers.TransferOptions(transfer=transfer_args,
                                                      mix=mix_opts)
         plan = transfers.TransferPlan(volume, source, dest, self, max_volume,
-                                      kwargs['mode'], transfer_options)
+                                      self.api_version, kwargs['mode'],
+                                      transfer_options)
         self._execute_transfer(plan)
         return self
 

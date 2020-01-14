@@ -4,6 +4,7 @@ from typing import (Any, Dict, List, Optional, Union, NamedTuple,
                     TYPE_CHECKING)
 from .labware import Well
 from opentrons import types
+from opentrons.protocols.types import APIVersion
 
 if TYPE_CHECKING:
     from .contexts import InstrumentContext  #noqa (F501)
@@ -360,6 +361,7 @@ class TransferPlan:
                  dests,
                  instr: 'InstrumentContext',
                  max_volume: float,
+                 api_version: APIVersion,
                  mode: Optional[str] = None,
                  options: Optional[TransferOptions] = None
                  ) -> None:
@@ -370,6 +372,7 @@ class TransferPlan:
         :py:meth:`.InstrumentContext.transfer`.
         """
         self._instr = instr
+        self._api_version = api_version
         # Convert sources & dests into proper format
         # CASES:
         # i. if using multi-channel pipette,
@@ -774,6 +777,11 @@ class TransferPlan:
 
         return [_map_volume(i) for i in range(total)]
 
+    def _check_valid_well_list(self, well_list, id, old_well_list):
+        if self._api_version >= APIVersion(2, 2) and len(well_list) < 1:
+            raise RuntimeError(
+                f"Invalid {id} for multichannel transfer: {old_well_list}")
+
     def _multichannel_transfer(self, s, d):
         # TODO: add a check for container being multi-channel compatible?
         # Helper function for multi-channel use-case
@@ -798,9 +806,9 @@ class TransferPlan:
             s = [s]
         new_src = []
         for well in s:
-            if self._is_first_row(well):
-                # For now, just use wells that are in first row
+            if self._is_valid_row(well):
                 new_src.append(well)
+        self._check_valid_well_list(new_src, 'source', s)
 
         if isinstance(d, List) and isinstance(d[0], List):
             # s is a List[List]]; flatten to 1D list
@@ -809,15 +817,26 @@ class TransferPlan:
             d = [d]
         new_dst = []
         for well in d:
-            if self._is_first_row(well):
-                # For now, just use wells that are in first row
+            if self._is_valid_row(well):
                 new_dst.append(well)
-
+        self._check_valid_well_list(new_dst, 'target', d)
         return new_src, new_dst
 
-    def _is_first_row(self, well: Union[Well, types.Location]):
+    def _is_valid_row(self, well: Union[Well, types.Location]):
         if isinstance(well, types.Location):
             test_well: Well = well.labware  # type: ignore
         else:
             test_well = well
-        return test_well in test_well.parent.rows()[0]
+
+        if self._api_version < APIVersion(2, 2):
+            return test_well in test_well.parent.rows()[0]
+        else:
+            # Allow the first 2 rows to be accessible to 384-well plates;
+            # otherwise, only the first row is accessible
+            if test_well.parent.parameters['format'] == '384Standard':
+                valid_wells = [
+                    well for row in test_well.parent.rows()[:2]
+                    for well in row]
+                return test_well in valid_wells
+            else:
+                return test_well in test_well.parent.rows()[0]
