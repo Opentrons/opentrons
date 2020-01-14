@@ -11,13 +11,14 @@ type MagnetArgs = EngageMagnetArgs | DisengageMagnetArgs
 export const magnetFormToArgs = (
   hydratedFormData: HydratedMagnetFormData
 ): MagnetArgs => {
-  const { magnetAction, moduleId, engageHeight } = hydratedFormData
+  const { magnetAction, moduleId } = hydratedFormData
+  const engageHeight = parseFloat(hydratedFormData.engageHeight)
 
   assert(
-    magnetAction === 'engage' ? engageHeight != null : true,
-    'magnetFormToArgs expected (hydrated) engageHeight to be non-null if magnetAction is "engage"'
+    magnetAction === 'engage' ? !Number.isNaN(engageHeight) : true,
+    'magnetFormToArgs expected (hydrated) engageHeight to be non-NaN if magnetAction is "engage"'
   )
-  if (magnetAction === 'engage' && engageHeight != null) {
+  if (magnetAction === 'engage' && !Number.isNaN(engageHeight)) {
     return {
       commandCreatorFnName: 'engageMagnet',
       module: moduleId,

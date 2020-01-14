@@ -181,6 +181,19 @@ export type DisengageMagnetArgs = {|
   message?: string,
 |}
 
+export type SetTemperatureArgs = {|
+  module: string | null,
+  commandCreatorFnName: 'setTemperature',
+  targetTemperature: number,
+  message?: string,
+|}
+
+export type DeactivateTemperatureArgs = {|
+  module: string | null,
+  commandCreatorFnName: 'deactivateTemperature',
+  message?: string,
+|}
+
 export type CommandCreatorArgs =
   | ConsolidateArgs
   | DistributeArgs
@@ -189,6 +202,8 @@ export type CommandCreatorArgs =
   | TransferArgs
   | EngageMagnetArgs
   | DisengageMagnetArgs
+  | SetTemperatureArgs
+  | DeactivateTemperatureArgs
 
 /** tips are numbered 0-7. 0 is the furthest to the back of the robot.
  * For an 8-channel, on a 96-flat, Tip 0 is in row A, Tip 7 is in row H.

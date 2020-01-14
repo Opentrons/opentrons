@@ -4,6 +4,7 @@ export {
   blowout,
   consolidate,
   distribute,
+  deactivateTemperature,
   delay,
   disengageMagnet,
   dispense,
@@ -12,6 +13,7 @@ export {
   engageMagnet,
   mix,
   replaceTip,
+  setTemperature,
   touchTip,
   transfer,
 } from './commandCreators'

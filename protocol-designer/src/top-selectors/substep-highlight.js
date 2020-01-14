@@ -46,7 +46,9 @@ function _getSelectedWellsForStep(
   if (
     stepArgs.commandCreatorFnName === 'delay' ||
     stepArgs.commandCreatorFnName === 'engageMagnet' ||
-    stepArgs.commandCreatorFnName === 'disengageMagnet'
+    stepArgs.commandCreatorFnName === 'disengageMagnet' ||
+    stepArgs.commandCreatorFnName === 'setTemperature' ||
+    stepArgs.commandCreatorFnName === 'deactivateTemperature'
   ) {
     return []
   }

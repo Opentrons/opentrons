@@ -137,6 +137,16 @@ const commandCreatorFromStepArgs = (
         StepGeneration.disengageMagnet,
         args
       )
+    case 'setTemperature':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.setTemperature,
+        args
+      )
+    case 'deactivateTemperature':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.deactivateTemperature,
+        args
+      )
   }
   console.warn(`unhandled commandCreatorFnName: ${args.commandCreatorFnName}`)
   return null
@@ -200,7 +210,9 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
         const pipetteId =
           args.commandCreatorFnName !== 'delay' &&
           args.commandCreatorFnName !== 'engageMagnet' &&
-          args.commandCreatorFnName !== 'disengageMagnet'
+          args.commandCreatorFnName !== 'disengageMagnet' &&
+          args.commandCreatorFnName !== 'setTemperature' &&
+          args.commandCreatorFnName !== 'deactivateTemperature'
             ? args.pipette
             : false
         if (pipetteId) {

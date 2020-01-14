@@ -61,10 +61,15 @@ export type Command =
       params: DisengageMagnetParams,
     |}
   | {|
-      command: 'temperatureModule/setTargetTemp',
+      command: 'temperatureModule/setTargetTemperature',
       params: SetTargetTempParams,
     |}
   | {| command: 'temperatureModule/deactivate', params: DeactivateTempParams |}
+  | {|
+      command: 'thermocycler/setTargetTemperature',
+      params: SetTargetTempParams,
+    |}
+  | {| command: 'thermocycler/deactivate', params: DeactivateTempParams |}
 
 // NOTE: must be kept in sync with '../schemas/4.json'
 export type ProtocolFile<DesignerApplicationData> = {|

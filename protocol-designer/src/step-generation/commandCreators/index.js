@@ -4,6 +4,7 @@ export { transfer, mix, consolidate, distribute } from './compound'
 export {
   aspirate,
   blowout,
+  deactivateTemperature,
   delay,
   disengageMagnet,
   dispense,
@@ -11,5 +12,6 @@ export {
   dropTip,
   engageMagnet,
   replaceTip,
+  setTemperature,
   touchTip,
 } from './atomic'
