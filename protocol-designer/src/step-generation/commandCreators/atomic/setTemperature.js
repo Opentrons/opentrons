@@ -1,5 +1,4 @@
 // @flow
-import assert from 'assert'
 import { TEMPDECK, THERMOCYCLER } from '../../../constants'
 import * as errorCreators from '../../errorCreators'
 import type { CommandCreator, SetTemperatureArgs } from '../../types'
@@ -37,8 +36,7 @@ export const setTemperature: CommandCreator<SetTemperatureArgs> = (
       ],
     }
   } else {
-    assert(
-      false,
+    console.error(
       `setTemperature expected module ${module} to be ${TEMPDECK} or ${THERMOCYCLER}, got ${moduleType}`
     )
     // NOTE: "missing module" isn't exactly the right error here, but better than a whitescreen!
