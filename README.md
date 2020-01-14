@@ -28,7 +28,7 @@ pipette.aspirate(location=trough['A1'], volume=30)
 pipette.dispense(location=well_plate['A1'], volume=30)
 ```
 
-This example tells the Opentrons OT2 to pipette 30µL of liquid from a trough to well plate. Learn more here:
+This example tells the Opentrons OT-2 to pipette 30 µL of liquid from a trough to well plate. Learn more here:
 
 - [Documentation](http://docs.opentrons.com)
 - [Source code](./api)
