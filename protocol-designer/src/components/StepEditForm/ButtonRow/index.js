@@ -35,7 +35,7 @@ const mapStateToProps = (state: BaseState): StateProps => ({
   canSave: canSaveForm(state),
 })
 
-const mapDispatchToProps = {
+const mapDispatchToProps: DispatchProps = {
   onCancel: cancelStepForm,
   onSave: saveStepForm,
 }
