@@ -98,6 +98,12 @@ export const selectStep = (
     stepFormSelectors.getInitialDeckSetup(state).pipettes
   )
 
+  const moduleId = getNextDefaultTemperatureModuleId(
+    stepFormSelectors.getSavedStepForms(state),
+    stepFormSelectors.getOrderedStepIds(state),
+    stepFormSelectors.getInitialDeckSetup(state).modules
+  )
+
   // For a pristine step, if there is a `pipette` field in the form
   // (added by upstream `getDefaultsForStepType` fn),
   // then set `pipette` field of new steps to the next default pipette id.
@@ -119,6 +125,17 @@ export const selectStep = (
     }
   }
 
+  // For a pristine step, if there is a `moduleId` field in the form
+  // (added by upstream `getDefaultsForStepType` fn),
+  // then set `moduleID` field of new steps to the next default module id.
+  const formHasModuleIdField = formData && 'moduleId' in formData
+  if (newStepType && formHasModuleIdField) {
+    formData = {
+      ...formData,
+      moduleId,
+    }
+  }
+
   // auto-select magnetic module if it exists (assumes no more than 1 magnetic module)
   if (newStepType === 'magnet') {
     const moduleId = uiModulesSelectors.getSingleMagneticModuleId(state)
@@ -127,15 +144,6 @@ export const selectStep = (
       stepFormSelectors.getOrderedStepIds(state)
     )
     formData = { ...formData, moduleId, magnetAction }
-  }
-
-  if (newStepType === 'temperature') {
-    const moduleId = getNextDefaultTemperatureModuleId(
-      stepFormSelectors.getSavedStepForms(state),
-      stepFormSelectors.getOrderedStepIds(state),
-      stepFormSelectors.getInitialDeckSetup(state).modules
-    )
-    formData = { ...formData, moduleId }
   }
 
   dispatch({

@@ -1,9 +1,17 @@
 // @flow
 import * as React from 'react'
+import { useSelector } from 'react-redux'
+import { selectors as uiModuleSelectors } from '../../../ui/modules'
+import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { FormGroup } from '@opentrons/components'
 import i18n from '../../../localization'
 
-import { ConditionalOnField, TextField, RadioGroupField } from '../fields'
+import {
+  ConditionalOnField,
+  TextField,
+  RadioGroupField,
+  StepFormDropdown,
+} from '../fields'
 import { FieldConnector } from '../fields/FieldConnector'
 import styles from '../StepEditForm.css'
 
@@ -12,6 +20,11 @@ import type { FocusHandlers } from '../types'
 type PauseFormProps = { focusHandlers: FocusHandlers }
 export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
   const { focusHandlers } = props
+
+  const modulesEnabled = useSelector(featureFlagSelectors.getEnableModules)
+  const moduleLabwareOptions = useSelector(
+    uiModuleSelectors.getTemperatureLabwareOptions
+  )
 
   // time fields blur together
   const blurAllTimeUnitFields = () => {
@@ -36,9 +49,9 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
               options={[
                 {
                   name: i18n.t(
-                    'form.step_edit_form.field.pauseForAmountOfTime.options.false'
+                    'form.step_edit_form.field.pauseForAmountOfTime.options.untilResume'
                   ),
-                  value: 'false',
+                  value: 'untilResume',
                 },
               ]}
               {...focusHandlers}
@@ -50,9 +63,9 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
               options={[
                 {
                   name: i18n.t(
-                    'form.step_edit_form.field.pauseForAmountOfTime.options.true'
+                    'form.step_edit_form.field.pauseForAmountOfTime.options.untilTime'
                   ),
-                  value: 'true',
+                  value: 'untilTime',
                 },
               ]}
               {...focusHandlers}
@@ -60,7 +73,7 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
           </div>
           <ConditionalOnField
             name={'pauseForAmountOfTime'}
-            condition={val => val === 'true'}
+            condition={val => val === 'untilTime'}
           >
             <div className={styles.form_row}>
               <TextField
@@ -86,6 +99,54 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
               />
             </div>
           </ConditionalOnField>
+          {modulesEnabled && (
+            <>
+              <div className={styles.checkbox_row}>
+                <RadioGroupField
+                  name="pauseForAmountOfTime"
+                  options={[
+                    {
+                      name: i18n.t(
+                        'form.step_edit_form.field.pauseForAmountOfTime.options.untilTemperature'
+                      ),
+                      value: 'untilTemperature',
+                    },
+                  ]}
+                  {...focusHandlers}
+                />
+              </div>
+              <ConditionalOnField
+                name={'pauseForAmountOfTime'}
+                condition={val => val === 'untilTemperature'}
+              >
+                <div className={styles.form_row}>
+                  <FormGroup
+                    label={i18n.t(
+                      'form.step_edit_form.field.moduleActionLabware.label'
+                    )}
+                  >
+                    <StepFormDropdown
+                      {...focusHandlers}
+                      name="moduleId"
+                      options={moduleLabwareOptions}
+                    />
+                  </FormGroup>
+                  <FormGroup
+                    label={i18n.t(
+                      'form.step_edit_form.field.pauseTemperature.label'
+                    )}
+                  >
+                    <TextField
+                      name="pauseTemperature"
+                      className={styles.small_field}
+                      units={i18n.t('application.units.degrees')}
+                      {...focusHandlers}
+                    />
+                  </FormGroup>
+                </div>
+              </ConditionalOnField>
+            </>
+          )}
         </div>
         <div className={styles.section_column}>
           <div className={styles.form_row}>

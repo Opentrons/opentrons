@@ -8,6 +8,14 @@ const pauseFormToArgs = (formData: FormData): PauseArgs => {
   const minutes = parseFloat(formData['pauseMinute']) || 0
   const seconds = parseFloat(formData['pauseSecond']) || 0
   const totalSeconds = hours * 3600 + minutes * 60 + seconds
+  const temperature = parseFloat(formData['pauseTemperature'])
+
+  let wait = true
+  if (formData['pauseForAmountOfTime'] === 'untilTemperature') {
+    wait = temperature // TODO: differentiate between seconds and temperature in step generation
+  } else if (formData['pauseForAmountOfTime'] === 'untilTime') {
+    wait = totalSeconds
+  }
 
   const message = formData['pauseMessage'] || ''
 
@@ -15,7 +23,7 @@ const pauseFormToArgs = (formData: FormData): PauseArgs => {
     commandCreatorFnName: 'delay',
     name: `Pause ${formData.id}`, // TODO real name for steps
     description: 'description would be here 2018-03-01', // TODO get from form
-    wait: formData['pauseForAmountOfTime'] === 'false' ? true : totalSeconds,
+    wait,
     message,
     meta: {
       hours,

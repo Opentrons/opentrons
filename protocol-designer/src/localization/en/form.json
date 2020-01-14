@@ -74,10 +74,12 @@
       "mix": { "label": "mix" },
       "pauseForAmountOfTime": {
         "options": {
-          "false": "Pause until told to resume",
-          "true": "Delay for an amount of time"
+          "untilResume": "Pause until told to resume",
+          "untilTime": "Delay for an amount of time",
+          "untilTemperature": "Pause until temperature reached"
         }
       },
+      "pauseTemperature": { "label": "Temp" },
       "pauseMessage": { "label": "message to display" },
       "path": {
         "title": {

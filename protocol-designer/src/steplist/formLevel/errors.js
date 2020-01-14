@@ -14,6 +14,7 @@ export type FormErrorKey =
   | 'WELL_RATIO_MOVE_LIQUID'
   | 'PAUSE_TYPE_REQUIRED'
   | 'TIME_PARAM_REQUIRED'
+  | 'PAUSE_TEMP_PARAM_REQUIRED'
   | 'MAGNET_ACTION_TYPE_REQUIRED'
   | 'ENGAGE_HEIGHT_REQUIRED'
   | 'MODULE_ID_REQUIRED'
@@ -39,7 +40,8 @@ const FORM_ERRORS: { [FormErrorKey]: FormError } = {
     dependentFields: ['labware', 'pipette'],
   },
   PAUSE_TYPE_REQUIRED: {
-    title: 'Must either pause for amount of time, or until told to resume',
+    title:
+      'Must either pause for amount of time, until told to resume, or until temperature reached',
     dependentFields: ['pauseForAmountOfTime'],
   },
   TIME_PARAM_REQUIRED: {
@@ -50,6 +52,10 @@ const FORM_ERRORS: { [FormErrorKey]: FormError } = {
       'pauseMinute',
       'pauseSecond',
     ],
+  },
+  PAUSE_TEMP_PARAM_REQUIRED: {
+    title: 'Temperature is required',
+    dependentFields: ['pauseForAmountOfTime', 'pauseTemperature'],
   },
   WELL_RATIO_MOVE_LIQUID: {
     title: 'Well selection must be 1 to many, many to 1, or N to N',
@@ -114,19 +120,37 @@ export const incompatibleAspirateLabware = (
 export const pauseForTimeOrUntilTold = (
   fields: HydratedFormData
 ): ?FormError => {
-  const { pauseForAmountOfTime, pauseHour, pauseMinute, pauseSecond } = fields
-  if (pauseForAmountOfTime === 'true') {
+  const {
+    pauseForAmountOfTime,
+    pauseHour,
+    pauseMinute,
+    pauseSecond,
+    moduleId,
+    pauseTemperature,
+  } = fields
+  if (pauseForAmountOfTime === 'untilTime') {
     // user selected pause for amount of time
     const hours = parseFloat(pauseHour) || 0
     const minutes = parseFloat(pauseMinute) || 0
     const seconds = parseFloat(pauseSecond) || 0
     const totalSeconds = hours * 3600 + minutes * 60 + seconds
     return totalSeconds <= 0 ? FORM_ERRORS.TIME_PARAM_REQUIRED : null
-  } else if (pauseForAmountOfTime === 'false') {
+  } else if (pauseForAmountOfTime === 'untilTemperature') {
+    // user selected pause until temperature reached
+    if (!moduleId) {
+      // missing module field (reached by deleting a module from deck)
+      return FORM_ERRORS.MODULE_ID_REQUIRED
+    }
+    if (!pauseTemperature) {
+      // missing temperature field
+      return FORM_ERRORS.PAUSE_TEMP_PARAM_REQUIRED
+    }
+    return null
+  } else if (pauseForAmountOfTime === 'untilResume') {
     // user selected pause until resume
     return null
   } else {
-    // user selected neither pause until resume nor pause for amount of time
+    // user did not select a pause type
     return FORM_ERRORS.PAUSE_TYPE_REQUIRED
   }
 }

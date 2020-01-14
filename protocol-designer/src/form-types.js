@@ -116,11 +116,12 @@ export type PauseForm = {|
   stepType: 'pause',
   id: StepIdType,
 
-  pauseForAmountOfTime?: 'true' | 'false',
+  pauseForAmountOfTime?: 'untilTime' | 'untilTemperature' | 'untilResume',
   pauseHour?: string,
   pauseMinute?: string,
   pauseSecond?: string,
   pauseMessage?: string,
+  pauseTemperature?: string,
 |}
 
 // TODO: separate field values from from metadata
