@@ -1,12 +1,5 @@
 // @flow
-import {
-  SPAN7_8_10_11_SLOT,
-  TEMPDECK,
-  THERMOCYCLER,
-  TEMPERATURE_DEACTIVATED,
-} from '../../constants'
-import { makeStateArgsStandard, makeContext, makeState } from './fixtures'
-
+import { getStateAndContextTempMagModules } from './fixtures'
 import { setTemperature } from '../commandCreators/atomic/setTemperature'
 
 const temperatureModuleId = 'temperatureModuleId'
@@ -17,39 +10,12 @@ let invariantContext
 let robotState
 
 beforeEach(() => {
-  invariantContext = makeContext()
-  invariantContext.moduleEntities = {
-    [temperatureModuleId]: {
-      id: temperatureModuleId,
-      type: TEMPDECK,
-      model: 'foo',
-    },
-    [thermocyclerId]: { id: thermocyclerId, type: THERMOCYCLER, model: 'foo' },
-  }
-
-  robotState = makeState({
-    ...makeStateArgsStandard(),
-    invariantContext,
-    tiprackSetting: { tiprack1Id: true }, // TODO IMMEDIATELY: why this?
+  const stateAndContext = getStateAndContextTempMagModules({
+    temperatureModuleId,
+    thermocyclerId,
   })
-  // TODO IMMEDIATELY: make this a fixture for module-related tests
-  robotState.modules = {
-    [temperatureModuleId]: {
-      slot: '3',
-      moduleState: {
-        type: TEMPDECK,
-        status: TEMPERATURE_DEACTIVATED,
-        targetTemperature: null,
-      },
-    },
-    [thermocyclerId]: {
-      slot: SPAN7_8_10_11_SLOT,
-      moduleState: {
-        type: THERMOCYCLER,
-        // TODO IL 2020-01-14 create this state when thermocycler state is implemented
-      },
-    },
-  }
+  invariantContext = stateAndContext.invariantContext
+  robotState = stateAndContext.robotState
 })
 
 describe('setTemperature', () => {

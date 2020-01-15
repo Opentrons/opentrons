@@ -14,6 +14,12 @@ import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fix
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 
 import {
+  SPAN7_8_10_11_SLOT,
+  TEMPDECK,
+  THERMOCYCLER,
+  TEMPERATURE_DEACTIVATED,
+} from '../../../constants'
+import {
   DEFAULT_PIPETTE,
   MULTI_PIPETTE,
   SOURCE_LABWARE,
@@ -224,4 +230,47 @@ export const getRobotInitialStateNoTipsRemain = (
     tiprackSetting: { tiprack1Id: false, tiprack2Id: false },
   })
   return robotInitialStateNoTipsRemain
+}
+
+export const getStateAndContextTempMagModules = ({
+  temperatureModuleId,
+  thermocyclerId,
+}: {
+  temperatureModuleId: string,
+  thermocyclerId: string,
+}) => {
+  const invariantContext = makeContext()
+  invariantContext.moduleEntities = {
+    [temperatureModuleId]: {
+      id: temperatureModuleId,
+      type: TEMPDECK,
+      model: 'foo',
+    },
+    [thermocyclerId]: { id: thermocyclerId, type: THERMOCYCLER, model: 'foo' },
+  }
+
+  const robotState = makeState({
+    ...makeStateArgsStandard(),
+    invariantContext,
+    tiprackSetting: { tiprack1Id: true },
+  })
+
+  robotState.modules = {
+    [temperatureModuleId]: {
+      slot: '3',
+      moduleState: {
+        type: TEMPDECK,
+        status: TEMPERATURE_DEACTIVATED,
+        targetTemperature: null,
+      },
+    },
+    [thermocyclerId]: {
+      slot: SPAN7_8_10_11_SLOT,
+      moduleState: {
+        type: THERMOCYCLER,
+        // TODO IL 2020-01-14 create this state when thermocycler state is implemented
+      },
+    },
+  }
+  return { invariantContext, robotState }
 }
