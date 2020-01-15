@@ -3,7 +3,7 @@ import { getStateAndContextTempMagModules } from './fixtures'
 import { deactivateTemperature } from '../commandCreators/atomic/deactivateTemperature'
 
 const temperatureModuleId = 'temperatureModuleId'
-const thermocyclerId = 'thermocycylerId'
+const thermocyclerId = 'thermocyclerId'
 const commandCreatorFnName = 'deactivateTemperature'
 
 let invariantContext
