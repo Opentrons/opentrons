@@ -268,11 +268,11 @@ def test_plunger_commands(smoothie, monkeypatch):
 
     smoothie.move({
         'X': 10.987654321,
-        'Y': 1.12345678,
-        'Z': 2,
-        'A': 3,
-        'B': 4,
-        'C': 5})
+        'Y': 2.12345678,
+        'Z': 2.5,
+        'A': 3.5,
+        'B': 4.25,
+        'C': 5.55})
     expected = [
         # Set active axes high
         ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 G0.+[BC].+'],
