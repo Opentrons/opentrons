@@ -48,7 +48,6 @@ function mergeProps(
 
   return {
     ...passThruProps,
-    ...dispatchProps,
     goToNextPage: () => dispatch(navActions.navigateToPage('liquids')),
     saveFileMetadata: (nextFormValues: FileMetadataFields) =>
       dispatch(actions.saveFileMetadata(nextFormValues)),

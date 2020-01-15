@@ -14,7 +14,7 @@ import type { Labware } from '../../robot'
 import { THERMOCYCLER } from '../../modules'
 
 type LabwareListItemProps = {|
-  ...$Exact<Labware>,
+  ...Labware,
   moduleName?: ModuleType,
   isDisabled: boolean,
   onClick: () => mixed,

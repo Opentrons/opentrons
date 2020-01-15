@@ -51,7 +51,10 @@ export const inferFsKeyWithSuffix = (
   return null
 }
 
-export const fullstoryEvent = (name: string, parameters: Object) => {
+export const fullstoryEvent = (
+  name: string,
+  parameters: $Shape<{| [string]: mixed |}> = {}
+) => {
   // NOTE: make sure user has opted in before calling this fn
   const fs = _getFullstory()
   if (fs && fs.event) {
@@ -60,7 +63,8 @@ export const fullstoryEvent = (name: string, parameters: Object) => {
     const _parameters = Object.keys(parameters).reduce((acc, key) => {
       const value = parameters[key]
       const suffix = inferFsKeyWithSuffix(key, value)
-      return { ...acc, [suffix === null ? key : `${key}_${suffix}`]: value }
+      const name: string = suffix === null ? key : `${key}_${suffix}`
+      return { ...acc, [name]: value }
     }, {})
     fs.event(name, _parameters)
   }
@@ -104,12 +108,10 @@ export const initializeFullstory = () => {
     }
     g.q = []
     o = n.createElement(t)
-    // $FlowFixMe
     o.async = 1
     o.crossOrigin = 'anonymous'
     o.src = 'https://' + global._fs_host + '/s/fs.js'
     y = n.getElementsByTagName(t)[0]
-    // $FlowFixMe
     y.parentNode.insertBefore(o, y)
     g.identify = function(i, v, s) {
       g(l, { uid: i }, s)

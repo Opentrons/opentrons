@@ -6,8 +6,6 @@ import { selectors } from '../selectors'
 import type { DeckSlot, GetState } from '../../types'
 import type { IngredInputs } from '../types'
 
-type IngredInputsExact = $Exact<IngredInputs>
-
 // ===== Labware selector actions =====
 
 export const openAddLabwareModal = createAction<
@@ -185,15 +183,15 @@ export type EditLiquidGroupAction = {|
   type: 'EDIT_LIQUID_GROUP',
   payload: {|
     liquidGroupId: string,
-    ...IngredInputsExact,
+    ...IngredInputs,
   |},
 |}
 
 // NOTE: with no ID, a new one is assigned
-export const editLiquidGroup = (args: {
+export const editLiquidGroup = (args: {|
   liquidGroupId: ?string,
-  ...IngredInputsExact,
-}) => (dispatch: Dispatch<EditLiquidGroupAction>, getState: GetState) => {
+  ...IngredInputs,
+|}) => (dispatch: Dispatch<EditLiquidGroupAction>, getState: GetState) => {
   const { liquidGroupId, ...payloadArgs } = args // NOTE: separate liquidGroupId for flow to understand unpacking :/
   dispatch({
     type: 'EDIT_LIQUID_GROUP',

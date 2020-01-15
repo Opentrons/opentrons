@@ -34,7 +34,6 @@ function ProceedToRun(props: Props) {
   }, [sessionModules])
 
   const handleClick = () => {
-    // $FlowFixMe: robotActions.returnTip is not typed
     returnTip()
     if (mustPrepForRun) {
       setRunPrepModalOpen(true)

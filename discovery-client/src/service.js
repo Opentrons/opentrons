@@ -62,7 +62,6 @@ export function updateService(
     const prevVal = result[key]
     const nextVal = defaultTo(next[key], prevVal)
     // use isEqual to deep compare response objects
-    // $FlowFixMe: flow can't type [key]: nextVal but we know this is correct
     return isEqual(nextVal, prevVal) ? result : { ...result, [key]: nextVal }
   }, service)
 }

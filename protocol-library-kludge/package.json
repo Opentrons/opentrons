@@ -26,9 +26,5 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-hot-loader": "^3.0.0-beta.7"
-  },
-  "devDependencies": {
-    "flow-bin": "^0.110.1",
-    "flow-typed": "^2.6.2"
   }
 }

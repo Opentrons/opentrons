@@ -51,12 +51,10 @@ export const initializeFullstory = () => {
     }
     g.q = []
     o = n.createElement(t)
-    // $FlowFixMe
     o.async = 1
     o.crossOrigin = 'anonymous'
     o.src = 'https://' + global._fs_host + '/s/fs.js'
     y = n.getElementsByTagName(t)[0]
-    // $FlowFixMe
     y.parentNode.insertBefore(o, y)
     g.identify = function(i, v, s) {
       g(l, { uid: i }, s)

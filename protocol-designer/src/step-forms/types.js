@@ -8,11 +8,11 @@ import type {
 import type { DeckSlot } from '../types'
 import typeof { MAGDECK, TEMPDECK, THERMOCYCLER } from '../constants'
 
-export type FormPipette = { pipetteName: ?string, tiprackDefURI: ?string }
-export type FormPipettesByMount = {
+export type FormPipette = {| pipetteName: ?string, tiprackDefURI: ?string |}
+export type FormPipettesByMount = {|
   left: FormPipette,
   right: FormPipette,
-}
+|}
 
 // "entities" have only properties that are time-invariant
 // when they are de-normalized, the definitions they reference are baked in
@@ -40,9 +40,11 @@ export type PipetteEntities = {
 // =========== MODULES ========
 // Note: 'model' is like 'GEN1'/'GEN2' etc
 export type FormModule = {| onDeck: boolean, model: string, slot: DeckSlot |}
-export type FormModulesByType = {
-  [type: ModuleType]: FormModule,
-}
+export type FormModulesByType = {|
+  tempdeck: FormModule,
+  magdeck: FormModule,
+  thermocycler: FormModule,
+|}
 
 export type ModuleEntity = {| id: string, type: ModuleType, model: string |}
 export type ModuleEntities = { [moduleId: string]: ModuleEntity }

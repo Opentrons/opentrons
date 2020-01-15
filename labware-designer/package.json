@@ -20,9 +20,5 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@opentrons/shared-data": "3.15.2"
-  },
-  "devDependencies": {
-    "flow-bin": "^0.110.1",
-    "flow-typed": "^2.6.2"
   }
 }

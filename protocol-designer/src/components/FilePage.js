@@ -21,7 +21,7 @@ import formStyles from '../components/forms/forms.css'
 import type { FileMetadataFields } from '../file-data'
 import type { ModulesForEditModulesCard } from '../step-forms'
 import type { ModuleType } from '@opentrons/shared-data'
-export type Props = {
+export type Props = {|
   formValues: FileMetadataFields,
   instruments: React.ElementProps<typeof InstrumentGroup>,
   goToNextPage: () => mixed,
@@ -30,16 +30,16 @@ export type Props = {
   modulesEnabled: ?boolean,
   thermocyclerEnabled: ?boolean,
   modules: ModulesForEditModulesCard,
-}
+|}
 
-type State = {
+type State = {|
   isEditPipetteModalOpen: boolean,
   isEditModulesModalOpen: boolean,
-  currentModule: {
+  currentModule: {|
     moduleType: ?ModuleType,
     moduleId: ?string,
-  },
-}
+  |},
+|}
 
 const DATE_ONLY_FORMAT = 'MMM DD, YYYY'
 const DATETIME_FORMAT = 'MMM DD, YYYY | h:mm A'

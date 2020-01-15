@@ -6,11 +6,12 @@ import { Icon } from '@opentrons/components'
 import styles from './styles.css'
 import type { IconName } from '@opentrons/components'
 
-export type ClickableIconProps = {
-  ...$Exact<React.ElementProps<'button'>>,
+export type ClickableIconProps = {|
   name: IconName,
   className?: string,
-}
+  title?: string,
+  onClick?: (SyntheticMouseEvent<>) => mixed,
+|}
 
 export function ClickableIcon(props: ClickableIconProps) {
   const { name, className, ...buttonProps } = props

@@ -1,19 +1,14 @@
 // @flow
 import * as React from 'react'
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { CalibrateDeckStartedProps, CalibrationStep } from './types'
 import { PrimaryButton } from '@opentrons/components'
 
 import styles from './styles.css'
 
-type Props = CalibrateDeckStartedProps & {
+type Props = {|
+  ...CalibrateDeckStartedProps,
   proceed: () => mixed,
-}
-
-type DiagramProps = {
-  calibrationStep: CalibrationStep,
-  pipette: PipetteModelSpecs,
-}
+|}
 
 type Channels = 'single' | 'multi'
 
@@ -72,7 +67,7 @@ export default function AttachTipModal(props: Props) {
   )
 }
 
-function getDiagramSrc(props: DiagramProps): string {
+function getDiagramSrc(props: Props): string {
   const { calibrationStep, pipette } = props
   const channelsKey = pipette.channels === 8 ? 'multi' : 'single'
 

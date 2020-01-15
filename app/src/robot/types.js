@@ -70,7 +70,7 @@ export type Command = {
 }
 
 // instrument as stored in redux state
-export type StatePipette = {
+export type StatePipette = {|
   // resource ID
   _id: number,
   // robot mount instrument is installed on
@@ -88,14 +88,14 @@ export type StatePipette = {
   tipRacks: Array<number>,
   // string specified in protocol to load pipette
   requestedAs?: ?string,
-}
+|}
 
-export type Pipette = {
-  ...$Exact<StatePipette>,
+export type Pipette = {|
+  ...StatePipette,
   probed: boolean,
   tipOn: boolean,
   modelSpecs: PipetteModelSpecs | null,
-}
+|}
 
 // labware as stored in redux state
 export type StateLabware = {|
@@ -117,24 +117,24 @@ export type StateLabware = {|
   calibratorMount: ?Mount,
 |}
 
-export type Labware = {
+export type Labware = {|
   ...StateLabware,
   calibration: LabwareCalibrationStatus,
   confirmed: boolean,
   isMoving: boolean,
   definition: LabwareDefinition2 | null,
-}
+|}
 
 export type LabwareType = 'tiprack' | 'labware'
 
-export type SessionModule = {
+export type SessionModule = {|
   // resource ID
   _id: number,
   // slot module is installed in
   slot: Slot,
   // name identifier of the module
   name: ModuleType,
-}
+|}
 
 export type SessionStatus =
   | ''
@@ -145,14 +145,14 @@ export type SessionStatus =
   | 'finished'
   | 'stopped'
 
-export type SessionUpdate = {
+export type SessionUpdate = {|
   state: SessionStatus,
   startTime: ?number,
-  lastCommand: ?{
+  lastCommand: ?{|
     id: number,
     handledAt: number,
-  },
-}
+  |},
+|}
 
 export type TiprackByMountMap = {|
   left: Labware | null,

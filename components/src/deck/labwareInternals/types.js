@@ -8,4 +8,4 @@ export type WellMouseEvent = {|
 export type WellFill = { [wellName: string]: string }
 
 // Use this like a Set!
-export type WellGroup = { [wellName: string]: null }
+export type WellGroup = $Shape<{| [wellName: string]: null |}>

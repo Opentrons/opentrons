@@ -24,12 +24,12 @@ type SP = {|
 
 type DP = {| dispatch: Dispatch |}
 
-type Props = {
+type Props = {|
   labware: Array<Labware>,
   modulesBySlot: { [Slot]: SessionModule },
   disabled: boolean,
   setLabware: (labware: Labware) => mixed,
-}
+|}
 
 export default withRouter<{||}, _>(
   connect<Props, _, SP, {||}, State, Dispatch>(
@@ -54,7 +54,6 @@ function LabwareList(props: Props) {
             modulesBySlot[lw.slot].name
           }
           isDisabled={disabled}
-          confirmed={lw.confirmed}
           onClick={() => setLabware(lw)}
         />
       ))}

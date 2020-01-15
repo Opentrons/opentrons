@@ -47,8 +47,8 @@ export function makeEvent(
       return getProtocolAnalyticsData(state).then(data => ({
         name: 'protocolUploadRequest',
         properties: {
-          ...data,
           ...getRobotAnalyticsData(state),
+          ...data,
         },
       }))
     }
@@ -63,8 +63,8 @@ export function makeEvent(
       return getProtocolAnalyticsData(state).then(data => ({
         name: 'protocolUploadResponse',
         properties: {
-          ...data,
           ...getRobotAnalyticsData(state),
+          ...data,
           success: actionType === 'robot:SESSION_RESPONSE',
           error: (actionPayload.error && actionPayload.error.message) || '',
         },
@@ -76,8 +76,8 @@ export function makeEvent(
       return getProtocolAnalyticsData(state).then(data => ({
         name: 'runStart',
         properties: {
-          ...data,
           ...getRobotAnalyticsData(state),
+          ...data,
         },
       }))
     }
@@ -94,8 +94,8 @@ export function makeEvent(
       return getProtocolAnalyticsData(state).then(data => ({
         name: 'runFinish',
         properties: {
-          ...data,
           ...getRobotAnalyticsData(state),
+          ...data,
           runTime,
           success,
           error,

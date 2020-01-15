@@ -5,9 +5,10 @@ import { PrimaryButton } from '@opentrons/components'
 import JogControls from '../JogControls'
 import Instructions from './Instructions'
 
-type Props = CalibrateDeckStartedProps & {
+type Props = {|
+  ...CalibrateDeckStartedProps,
   proceed: () => mixed,
-}
+|}
 
 export default function ConfirmPosition(props: Props) {
   return (

@@ -16,10 +16,6 @@
     "url": "https://github.com/Opentrons/opentrons/issues"
   },
   "homepage": "https://github.com/Opentrons/opentrons",
-  "devDependencies": {
-    "flow-bin": "^0.110.1",
-    "flow-typed": "^2.6.2"
-  },
   "dependencies": {
     "@opentrons/components": "3.15.2",
     "@opentrons/shared-data": "3.15.2",

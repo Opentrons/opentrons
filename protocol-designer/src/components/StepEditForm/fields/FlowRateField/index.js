@@ -8,10 +8,12 @@ import { getDisabledFields } from '../../../../steplist/formLevel'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
 import type { BaseState, ThunkDispatch } from '../../../../types'
 
-type Props = {
+type Props = {|
   ...$Exact<React.ElementProps<typeof FlowRateInput>>,
+  name: StepFieldName,
+  pipetteFieldName: StepFieldName,
   innerKey: string,
-}
+|}
 
 type OP = {|
   name: StepFieldName,
@@ -25,7 +27,7 @@ type DP = {|
   updateValue: $PropertyType<Props, 'updateValue'>,
 |}
 
-type SP = $Rest<$Exact<Props>, {| ...OP, ...DP |}>
+type SP = $Rest<Props, {| ...OP, ...DP |}>
 
 // Add a key to force re-constructing component when values change
 function FlowRateInputWithKey(props: Props) {

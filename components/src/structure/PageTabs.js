@@ -7,16 +7,16 @@ import { Link } from 'react-router-dom'
 
 import styles from './structure.css'
 
-type TabProps = {
+type TabProps = {|
   title: string,
   href: string,
   isActive: boolean,
   isDisabled: boolean,
-}
+|}
 
-export type PageTabProps = {
+export type PageTabProps = {|
   pages: Array<TabProps>,
-}
+|}
 
 export default function PageTabs(props: PageTabProps) {
   return (

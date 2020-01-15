@@ -5,7 +5,7 @@ import classnames from 'classnames'
 import ICON_DATA_BY_NAME, { type IconName } from './icon-data'
 import styles from './icons.css'
 
-export type IconProps = {
+export type IconProps = {|
   /** name constant of the icon to display */
   name: IconName,
   /** classes to apply */
@@ -24,7 +24,7 @@ export type IconProps = {
   style?: { [string]: string },
   /** optional children */
   children?: React.Node,
-}
+|}
 
 /**
  * Inline SVG icon component

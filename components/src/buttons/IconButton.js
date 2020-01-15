@@ -8,20 +8,26 @@ import FlatButton from './FlatButton'
 
 import styles from './buttons.css'
 
-type Props = ButtonProps & IconProps
+type Props = {|
+  ...$Exact<ButtonProps>,
+  name: $PropertyType<IconProps, 'name'>,
+  spin?: $PropertyType<IconProps, 'spin'>,
+|}
 
 /**
  * FlatButton variant for a button that is a single icon. Takes props of
  * both Button _and_ Icon. Use `name` to specify icon name.
  */
 export default function IconButton(props: Props) {
+  const { name, spin, ...buttonProps } = props
+  const iconProps = { name, spin }
   const className = cx(styles.button_icon, props.className, {
     [styles.inverted]: props.inverted,
   })
 
   return (
-    <FlatButton {...props} className={className} iconName={undefined}>
-      <Icon {...props} className={styles.button_only_icon} />
+    <FlatButton {...buttonProps} className={className} iconName={undefined}>
+      <Icon {...iconProps} className={styles.button_only_icon} />
     </FlatButton>
   )
 }

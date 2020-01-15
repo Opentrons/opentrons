@@ -24,7 +24,9 @@ const _getLabwareDef = (
   )
 }
 
-const _makeCustomLabwareDefsObj = (customDefs: LabwareDefByDefURI) => {
+const _makeCustomLabwareDefsObj = (
+  customDefs: LabwareDefByDefURI
+): LabwareDefByDefURI => {
   const allCustomIds = Object.keys(customDefs)
   const customDefsById = allCustomIds.reduce(
     (acc, id) => ({

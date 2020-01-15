@@ -33,7 +33,7 @@ const RadioField = (props: Props) => (
                 //
                 // NOTE: onBlur doesn't work on Firefox on Mac for radio fields,
                 // so we can't do `e.currentTarget.blur()`. See https://bugzilla.mozilla.org/show_bug.cgi?id=756028
-                form.setTouched({ [props.name]: true })
+                form.setTouched({ [(props.name: string)]: true })
               }, 0)
 
               reportFieldEdit({ value: field.value, name: field.name })

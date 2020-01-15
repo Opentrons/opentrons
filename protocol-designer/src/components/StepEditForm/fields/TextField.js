@@ -5,13 +5,16 @@ import type { StepFieldName } from '../../../steplist/fieldLevel'
 import type { FocusHandlers } from '../types'
 import { FieldConnector } from './FieldConnector'
 
-type TextFieldProps = {
+type TextFieldProps = {|
+  ...FocusHandlers,
   className?: string,
   name: StepFieldName,
-} & FocusHandlers
-export const TextField = (
-  props: TextFieldProps & React.ElementProps<typeof InputField>
-) => {
+|}
+
+export const TextField = (props: {|
+  ...TextFieldProps,
+  ...React.ElementProps<typeof InputField>,
+|}) => {
   const {
     name,
     focusedField,
@@ -20,6 +23,7 @@ export const TextField = (
     onFieldBlur,
     ...inputProps
   } = props
+
   return (
     <FieldConnector
       name={name}

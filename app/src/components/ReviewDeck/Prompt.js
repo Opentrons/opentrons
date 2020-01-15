@@ -9,13 +9,14 @@ import { selectors as robotSelectors, type Labware } from '../../robot'
 import styles from './styles.css'
 
 type Props = {|
-  ...$Exact<Labware>,
+  ...Labware,
   onClick: () => void,
 |}
 
 export default function Prompt(props: Props) {
-  const { name, definition, slot, onClick } = props
-  const labwareType = robotSelectors.labwareType(props)
+  const { onClick, ...labware } = props
+  const { name, definition, slot } = labware
+  const labwareType = robotSelectors.labwareType(labware)
   const labwareTitle = definition ? getLabwareDisplayName(definition) : name
 
   return (

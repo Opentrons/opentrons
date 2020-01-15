@@ -2,7 +2,7 @@
 
 export type AnalyticsEvent = {|
   name: string,
-  properties?: Object,
+  properties?: $Shape<{| [string]: mixed |}>,
 |}
 
 // this state is persisted in browser storage (via cookie).

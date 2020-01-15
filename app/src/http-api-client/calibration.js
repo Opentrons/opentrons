@@ -1,5 +1,6 @@
 // @flow
 // http api client module for /calibration/**
+// DEPRECATED(mc, 2020-01-13)
 import { createSelector } from 'reselect'
 
 import type { OutputSelector } from 'reselect'
@@ -68,8 +69,7 @@ export type DeckCalStartState = ApiCall<DeckStartRequest, DeckStartResponse>
 export type DeckCalCommandState = ApiCall<DeckCalRequest, DeckCalResponse>
 
 type RobotCalState = {
-  'calibration/deck/start'?: DeckCalStartState,
-  'calibration/deck'?: DeckCalCommandState,
+  [string]: any,
 }
 
 type CalState = {
@@ -82,7 +82,7 @@ const DECK_START: 'calibration/deck/start' = 'calibration/deck/start'
 // TODO(mc, 2018-07-05): flow helper until we have one reducer, since
 // p === 'constant' checks but p === CONSTANT does not, even if
 // CONSTANT is defined as `const CONSTANT: 'constant' = 'constant'`
-function getCalPath(p: string): ?CalPath {
+function getCalPath(p: string): string | null {
   if (p === 'calibration/deck/start' || p === 'calibration/deck') return p
 
   return null
@@ -158,7 +158,7 @@ export function calibrationReducer(state: ?CalState, action: Action): CalState {
       }
 
       if (path === DECK_START) {
-        stateByName[DECK] = {
+        stateByName[(DECK: string)] = {
           request: null,
           response: null,
           error: null,

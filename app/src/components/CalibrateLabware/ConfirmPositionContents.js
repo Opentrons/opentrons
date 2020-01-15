@@ -23,7 +23,7 @@ type DP = {|
   jog: Jog,
 |}
 
-type Props = { ...OP, ...DP }
+type Props = {| ...OP, ...DP |}
 
 export default connect<Props, OP, _, _, _, _>(
   null,
@@ -32,6 +32,7 @@ export default connect<Props, OP, _, _, _, _>(
 
 function ConfirmPositionContents(props: Props) {
   const {
+    jog,
     onConfirmClick,
     labware,
     calibrator,
@@ -49,7 +50,7 @@ function ConfirmPositionContents(props: Props) {
         {...{ labware, calibrator, calibrateToBottom, useCenteredTroughs }}
         buttonText={confirmButtonText}
       />
-      <JogControls {...props} />
+      <JogControls jog={jog} />
       <PrimaryButton title="confirm" onClick={onConfirmClick}>
         {confirmButtonText}
       </PrimaryButton>
