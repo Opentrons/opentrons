@@ -19,6 +19,7 @@
 .form_row {
   min-height: 2.25rem;
   display: flex;
+  align-items: flex-start;
 }
 
 .wrap_group {

@@ -71,6 +71,8 @@ export default function getDefaultsForStepType(
         pauseMinute: null,
         pauseSecond: null,
         pauseMessage: '',
+        moduleId: null,
+        pauseTemperature: null,
       }
     case 'manualIntervention':
       return {
