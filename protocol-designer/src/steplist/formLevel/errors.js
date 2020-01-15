@@ -2,6 +2,11 @@
 import * as React from 'react'
 import { getWellRatio } from '../utils'
 import { canPipetteUseLabware } from '../../utils'
+import {
+  PAUSE_UNTIL_RESUME,
+  PAUSE_UNTIL_TIME,
+  PAUSE_UNTIL_TEMP,
+} from '../../constants'
 import type { StepFieldName } from '../../form-types'
 
 /*******************
@@ -128,14 +133,14 @@ export const pauseForTimeOrUntilTold = (
     moduleId,
     pauseTemperature,
   } = fields
-  if (pauseForAmountOfTime === 'untilTime') {
+  if (pauseForAmountOfTime === PAUSE_UNTIL_TIME) {
     // user selected pause for amount of time
     const hours = parseFloat(pauseHour) || 0
     const minutes = parseFloat(pauseMinute) || 0
     const seconds = parseFloat(pauseSecond) || 0
     const totalSeconds = hours * 3600 + minutes * 60 + seconds
     return totalSeconds <= 0 ? FORM_ERRORS.TIME_PARAM_REQUIRED : null
-  } else if (pauseForAmountOfTime === 'untilTemperature') {
+  } else if (pauseForAmountOfTime === PAUSE_UNTIL_TEMP) {
     // user selected pause until temperature reached
     if (!moduleId) {
       // missing module field (reached by deleting a module from deck)
@@ -146,7 +151,7 @@ export const pauseForTimeOrUntilTold = (
       return FORM_ERRORS.PAUSE_TEMP_PARAM_REQUIRED
     }
     return null
-  } else if (pauseForAmountOfTime === 'untilResume') {
+  } else if (pauseForAmountOfTime === PAUSE_UNTIL_RESUME) {
     // user selected pause until resume
     return null
   } else {

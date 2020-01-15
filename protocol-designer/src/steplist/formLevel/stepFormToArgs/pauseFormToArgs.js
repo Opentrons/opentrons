@@ -1,4 +1,5 @@
 // @flow
+import { PAUSE_UNTIL_TIME, PAUSE_UNTIL_TEMP } from '../../../constants'
 
 import type { FormData } from '../../../form-types'
 import type { PauseArgs } from '../../../step-generation'
@@ -11,9 +12,9 @@ const pauseFormToArgs = (formData: FormData): PauseArgs => {
   const temperature = parseFloat(formData['pauseTemperature'])
 
   let wait = true
-  if (formData['pauseForAmountOfTime'] === 'untilTemperature') {
+  if (formData['pauseForAmountOfTime'] === PAUSE_UNTIL_TEMP) {
     wait = temperature // TODO: differentiate between seconds and temperature in step generation
-  } else if (formData['pauseForAmountOfTime'] === 'untilTime') {
+  } else if (formData['pauseForAmountOfTime'] === PAUSE_UNTIL_TIME) {
     wait = totalSeconds
   }
 

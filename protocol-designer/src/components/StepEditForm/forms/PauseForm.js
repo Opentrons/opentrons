@@ -5,6 +5,11 @@ import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { FormGroup } from '@opentrons/components'
 import i18n from '../../../localization'
+import {
+  PAUSE_UNTIL_RESUME,
+  PAUSE_UNTIL_TIME,
+  PAUSE_UNTIL_TEMP,
+} from '../../../constants'
 
 import {
   ConditionalOnField,
@@ -51,7 +56,7 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
                   name: i18n.t(
                     'form.step_edit_form.field.pauseForAmountOfTime.options.untilResume'
                   ),
-                  value: 'untilResume',
+                  value: PAUSE_UNTIL_RESUME,
                 },
               ]}
               {...focusHandlers}
@@ -65,7 +70,7 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
                   name: i18n.t(
                     'form.step_edit_form.field.pauseForAmountOfTime.options.untilTime'
                   ),
-                  value: 'untilTime',
+                  value: PAUSE_UNTIL_TIME,
                 },
               ]}
               {...focusHandlers}
@@ -73,7 +78,7 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
           </div>
           <ConditionalOnField
             name={'pauseForAmountOfTime'}
-            condition={val => val === 'untilTime'}
+            condition={val => val === PAUSE_UNTIL_TIME}
           >
             <div className={styles.form_row}>
               <TextField
@@ -109,7 +114,7 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
                       name: i18n.t(
                         'form.step_edit_form.field.pauseForAmountOfTime.options.untilTemperature'
                       ),
-                      value: 'untilTemperature',
+                      value: PAUSE_UNTIL_TEMP,
                     },
                   ]}
                   {...focusHandlers}
@@ -117,7 +122,7 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
               </div>
               <ConditionalOnField
                 name={'pauseForAmountOfTime'}
-                condition={val => val === 'untilTemperature'}
+                condition={val => val === PAUSE_UNTIL_TEMP}
               >
                 <div className={styles.form_row}>
                   <FormGroup
