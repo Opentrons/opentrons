@@ -26,6 +26,7 @@ def check_sequences_close(first, second):
                           (c.startswith('p1000')
                            or c.startswith('p300_multi')
                            or c.endswith('1.5')
+                           or c.endswith('1.6')
                            or 'v2' in c)])
 def test_versioned_aspiration(pipette_model, monkeypatch):
 
