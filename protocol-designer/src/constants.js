@@ -100,6 +100,6 @@ export const MODULE_TYPE_TO_FILE_MODULE_TYPE: { [ModuleType]: string } = {
   [THERMOCYCLER]: THERMOCYCLER,
 }
 
-export const PAUSE_UNTIL_RESUME = 'untilResume'
-export const PAUSE_UNTIL_TIME = 'untilTime'
-export const PAUSE_UNTIL_TEMP = 'untilTemperature'
+export const PAUSE_UNTIL_RESUME: 'untilResume' = 'untilResume'
+export const PAUSE_UNTIL_TIME: 'untilTime' = 'untilTime'
+export const PAUSE_UNTIL_TEMP: 'untilTemperature' = 'untilTemperature'

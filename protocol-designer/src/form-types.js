@@ -1,4 +1,9 @@
 // @flow
+import {
+  PAUSE_UNTIL_RESUME,
+  PAUSE_UNTIL_TIME,
+  PAUSE_UNTIL_TEMP,
+} from './constants'
 import type { IconName } from '@opentrons/components'
 import type { LabwareEntity, PipetteEntity } from './step-forms'
 import type { ChangeTipOptions } from './step-generation'
@@ -116,7 +121,11 @@ export type PauseForm = {|
   stepType: 'pause',
   id: StepIdType,
 
-  pauseForAmountOfTime?: 'untilTime' | 'untilTemperature' | 'untilResume',
+  pauseForAmountOfTime?:
+    | typeof PAUSE_UNTIL_RESUME
+    | typeof PAUSE_UNTIL_TIME
+    | typeof PAUSE_UNTIL_TEMP,
+
   pauseHour?: string,
   pauseMinute?: string,
   pauseSecond?: string,

@@ -129,7 +129,10 @@ export const selectStep = (
   // (added by upstream `getDefaultsForStepType` fn),
   // then set `moduleID` field of new steps to the next default module id.
   const formHasModuleIdField = formData && 'moduleId' in formData
-  if (newStepType && formHasModuleIdField) {
+  if (
+    (newStepType === 'pause' || newStepType === 'temperature') &&
+    formHasModuleIdField
+  ) {
     formData = {
       ...formData,
       moduleId,
