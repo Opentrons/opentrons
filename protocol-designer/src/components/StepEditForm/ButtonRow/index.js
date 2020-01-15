@@ -7,7 +7,7 @@ import { OutlineButton, PrimaryButton } from '@opentrons/components'
 import { actions as steplistActions } from '../../../steplist'
 import { actions as stepFormActions } from '../../../step-forms'
 
-import { canSaveForm } from './selector'
+import { getCurrentFormCanBeSaved } from './selector'
 
 import type { BaseState } from '../../../types'
 
@@ -32,7 +32,7 @@ type DispatchProps = {|
 type Props = {| ...OwnProps, ...StateProps, ...DispatchProps |}
 
 const mapStateToProps = (state: BaseState): StateProps => ({
-  canSave: canSaveForm(state),
+  canSave: getCurrentFormCanBeSaved(state),
 })
 
 const mapDispatchToProps: DispatchProps = {
