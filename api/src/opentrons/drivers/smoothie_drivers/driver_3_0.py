@@ -1338,10 +1338,9 @@ class SmoothieDriver_3_0_0:
                 if home_flagged_axes:
                     self.home_flagged_axes(''.join(list(target.keys())))
                 log.debug("move: {}".format(command))
-                # TODO (andy) a movement's timeout should be calculated by
-                # how long the movement is expected to take. A default timeout
-                # of 30 seconds prevents any movements that take longer
-                self._send_command(command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
+                # TODO (hmg) a movement's timeout should be calculated by
+                # how long the movement is expected to take.
+                self._send_command(command, timeout=DEFAULT_EXECUTE_TIMEOUT)
             finally:
                 # dwell pipette motors because they get hot
                 plunger_axis_moved = ''.join(set('BC') & set(target.keys()))
