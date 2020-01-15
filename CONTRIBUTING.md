@@ -55,7 +55,7 @@ After your Pull Request is merged (or otherwise closed), you’ll want to make s
 
 ### Deciding What to Work On
 
-If you're looking for something to work on, especially for a first contribution, check out [our list of easy issues][easyfix]. Be sure to drop a comment in the thread before starting work to make sure nobody else has picked it up. Also, to understand a bit more of the plans developed by the Opentrons software engineering team, see the [documentation on software architecture and plans](https://github.com/Opentrons/opentrons/tree/edge/architecture-and-planning).
+If you're looking for something to work on, especially for a first contribution, check out [our list of easy issues][easyfix]. Be sure to drop a comment in the thread before starting work to make sure nobody else has picked it up.
 
 ## Commit Guidelines
 

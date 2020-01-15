@@ -7,7 +7,7 @@
 - [Overview](#overview)
 - [Opentrons API](#opentrons-api)
 - [Opentrons App](#opentrons-app)
-- [Contributing/Building](#contributing)
+- [Contributing](#contributing)
 
 ## Overview
 
@@ -24,10 +24,11 @@ The Opentrons API is a simple framework designed to make writing automated biolo
 We've designed it in a way we hope is accessible to anyone with basic computer and wetlab skills. As a bench scientist, you should be able to code your automated protocols in a way that reads like a lab notebook.
 
 ```python
-pipette.aspirate(tube_1).dispense(tube_2)
+pipette.aspirate(location=trough['A1'], volume=30)
+pipette.dispense(location=well_plate['A1'], volume=30)
 ```
 
-That is how you tell the Opentrons robot to pipette its max volume from one tube to another. Learn more here:
+This example tells the Opentrons OT-2 to pipette 30 µL of liquid from a trough to well plate. Learn more here:
 
 - [Documentation](http://docs.opentrons.com)
 - [Source code](./api)
@@ -36,10 +37,19 @@ That is how you tell the Opentrons robot to pipette its max volume from one tube
 
 Easily upload a protocol, calibrate positions, and run your experiment from your computer.
 
+- [Download Here](https://opentrons.com/ot-app)
 - [Documentation](https://support.opentrons.com/)
 - [Source code](./app)
 
 ![ot-app](https://s3.amazonaws.com/opentrons-images/standalone/ot-2-app.png)
+
+## Opentrons Protocol Designer
+
+Easily create a protocol to run on your robot with this grapical tool.
+
+- [Access Here](https://designer.opentrons.com/)
+- [Documentation](https://intercom.help/opentrons-protocol-designer/)
+- [Source code](./protocol-designer)
 
 ## Contributing
 
