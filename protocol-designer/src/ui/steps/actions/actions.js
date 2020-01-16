@@ -8,6 +8,7 @@ import {
   getNextDefaultPipetteId,
   getNextDefaultTemperatureModuleId,
   getNextDefaultMagnetAction,
+  getNextDefaultEngageHeight,
   handleFormChange,
 } from '../../../steplist/formLevel'
 import type { StepIdType, StepType } from '../../../form-types'
@@ -145,7 +146,15 @@ export const selectStep = (
       stepFormSelectors.getSavedStepForms(state),
       stepFormSelectors.getOrderedStepIds(state)
     )
-    formData = { ...formData, moduleId, magnetAction }
+
+    // TODO (ka 2020-1-16): Investigate autopopulating engageHeight
+    // conditional field with shared-data default
+    const engageHeight = getNextDefaultEngageHeight(
+      stepFormSelectors.getSavedStepForms(state),
+      stepFormSelectors.getOrderedStepIds(state)
+    )
+
+    formData = { ...formData, moduleId, magnetAction, engageHeight }
   }
 
   dispatch({
