@@ -397,10 +397,16 @@ class Thermocycler(mod_abc.AbstractModule):
     async def _connect(self):
         await self._driver.connect(self._port)
         self._device_info = await self._driver.get_device_info()
+        self._available_version =
 
     @property
     def port(self):
         return self._port
+
+    @property
+    def has_available_update(self) -> bool:
+        device_version_raw = self.device_info.get('version', None)
+        available_version_raw = self._
 
     async def prep_for_update(self):
         new_port = await update.enter_bootloader(self._driver,

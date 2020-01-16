@@ -200,9 +200,10 @@ async def _discover_ports():
     raise Exception("No ot_modules found in /dev. Try again")
 
 
-def get_available_version():
+def get_available_version(module_type: str) -> str:
     resources = []
 
+    MODULE_FW_RE = re.compile(f'{module_type}-v(.*).hex')
     # Search for module fw files in /usr/lib/firmware
     if IS_ROBOT:
         resources.extend([ROBOT_FIRMWARE_DIR / item
