@@ -18,3 +18,5 @@ export const THERMOCYCLER: 'thermocycler' = 'thermocycler'
 export const TEMPDECK: 'tempdeck' = 'tempdeck'
 
 export const MAGDECK: 'magdeck' = 'magdeck'
+
+export const ENGAGE_HEIGHT_OFFSET = -4
