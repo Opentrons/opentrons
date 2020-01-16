@@ -20,6 +20,13 @@ export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
     ? moduleLabwareOptions[0].name
     : 'No magnetic module'
 
+  const defaultEngageHeight = useSelector(
+    uiModuleSelectors.getMagnetLabwareEngageHeight
+  )
+  const engageHeightCaption = defaultEngageHeight
+    ? `Recommended: ${defaultEngageHeight}`
+    : null
+
   return (
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
@@ -76,6 +83,7 @@ export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
               name="engageHeight"
               className={styles.small_field}
               units={i18n.t('application.units.millimeter')}
+              caption={engageHeightCaption}
               {...focusHandlers}
             />
           </FormGroup>

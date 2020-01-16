@@ -98,12 +98,6 @@ export const selectStep = (
     stepFormSelectors.getInitialDeckSetup(state).pipettes
   )
 
-  const moduleId = getNextDefaultTemperatureModuleId(
-    stepFormSelectors.getSavedStepForms(state),
-    stepFormSelectors.getOrderedStepIds(state),
-    stepFormSelectors.getInitialDeckSetup(state).modules
-  )
-
   // For a pristine step, if there is a `pipette` field in the form
   // (added by upstream `getDefaultsForStepType` fn),
   // then set `pipette` field of new steps to the next default pipette id.
@@ -133,6 +127,11 @@ export const selectStep = (
     (newStepType === 'pause' || newStepType === 'temperature') &&
     formHasModuleIdField
   ) {
+    const moduleId = getNextDefaultTemperatureModuleId(
+      stepFormSelectors.getSavedStepForms(state),
+      stepFormSelectors.getOrderedStepIds(state),
+      stepFormSelectors.getInitialDeckSetup(state).modules
+    )
     formData = {
       ...formData,
       moduleId,
