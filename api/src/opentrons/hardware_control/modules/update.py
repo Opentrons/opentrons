@@ -4,6 +4,8 @@ import os
 import sys
 from glob import glob
 from typing import Any, Dict, Optional, Tuple
+from opentrons.config import IS_ROBOT
+from opentrons.main import ROBOT_FIRMWARE_DIR
 
 from .mod_abc import UploadFunction
 
@@ -196,3 +198,24 @@ async def _discover_ports():
             return module_ports
         await asyncio.sleep(2)
     raise Exception("No ot_modules found in /dev. Try again")
+
+
+def get_available_version():
+    resources = []
+
+    # Search for module fw files in /usr/lib/firmware
+    if IS_ROBOT:
+        resources.extend([ROBOT_FIRMWARE_DIR / item
+                          for item in os.listdir(ROBOT_FIRMWARE_DIR)])
+
+    resources_path = Path(HERE) / 'resources'
+    resources.extend([resources_path / item
+                      for item in os.listdir(resources_path)])
+
+    for fi in resources:
+        matches = SMOOTHIE_HEX_RE.search(str(fi))
+        if matches:
+            branch_plus_ref = matches.group(1)
+            return fi, branch_plus_ref
+    raise OSError("Could not find smoothie firmware file in {}"
+                  .format(os.path.join(HERE, 'resources')))

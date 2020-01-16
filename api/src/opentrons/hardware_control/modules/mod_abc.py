@@ -41,6 +41,12 @@ class AbstractModule(abc.ABC):
 
     @property
     @abc.abstractmethod
+    def has_available_update(self) -> bool:
+        """ Return whether a newer firmware file is available """
+        pass
+
+    @property
+    @abc.abstractmethod
     def live_data(self) -> Dict[str, str]:
         """ Return a dict of the module's dynamic information """
         pass
