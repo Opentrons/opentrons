@@ -15,7 +15,7 @@ type Props = {
 }
 
 const TITLE = 'Information'
-const VERSION_LABEL = 'Software Version'
+const VERSION_LABEL = 'Opentrons App Version'
 
 const UPDATE_AVAILABLE = 'view available update'
 const UPDATE_NOT_AVAILABLE = 'up to date'

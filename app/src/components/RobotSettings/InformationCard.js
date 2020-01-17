@@ -35,7 +35,7 @@ type Props = {|
 const TITLE = 'Information'
 const NAME_LABEL = 'Robot name'
 const SERVER_VERSION_LABEL = 'Server version'
-const FIRMWARE_VERSION_LABEL = 'Firmware version'
+const FIRMWARE_VERSION_LABEL = 'Motor controller firmware version'
 const MAX_PROTOCOL_API_VERSION_LABEL = 'Max Protocol API Version'
 
 const UPDATE_SERVER_UNAVAILABLE =
