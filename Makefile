@@ -114,7 +114,13 @@ lint: lint-py lint-js lint-json lint-css check-js circular-dependencies-js
 
 .PHONY: format
 format:
-	prettier --ignore-path .eslintignore $(if $(CI),--check,--write) ".*.@(js|yml)" "**/*.@(js|json|md|yml)"
+ifeq ($(watch),true)
+	onchange ".*.@(js|yml)" "**/*.@(js|json|md|yml)" -- \
+	prettier --ignore-path .eslintignore --write {{changed}}
+else
+	prettier --ignore-path .eslintignore $(if $(CI),--check,--write) \
+	".*.@(js|yml)" "**/*.@(js|json|md|yml)"
+endif
 
 .PHONY: lint-py
 lint-py:
