@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "coordinates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "z": { "type": "number" }
+      }
+    },
+    "affineTransform": {
+      "description": "A 3x3 row-major matrix describing an affine transform to apply to the labwareOffset and calibrationPoint coordinates of the module (in certain circumstances, e.g. per slot)",
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 3,
+        "items": {
+          "type": "number"
+        }
+      }
+    }
+  },
+  "description": "Module specifications",
+  "type": "object",
+  "$comment": "Example key: 'magdeck'",
+  "required": ["$otSharedSchema"],
+  "properties": {
+    "$otSharedSchema": {
+      "type": "string",
+      "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension. For instance, #/module/schemas/2 is a reference to this schema."
+    }
+  },
+  "patternProperties": {
+    "^[^$].*": {
+      "type": "object",
+      "required": [
+        "labwareOffset",
+        "dimensions",
+        "calibrationPoint",
+        "displayName",
+        "loadName",
+        "quirks",
+        "slotTransforms",
+        "compatibleLoadNames"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "labwareOffset": { "$ref": "#/definitions/coordinates" },
+        "dimensions": {
+          "type": "object",
+          "required": ["bareOverallHeight", "overLabwareHeight"],
+          "properties": {
+            "bareOverallHeight": { "type": "number" },
+            "overLabwareHeight": { "type": "number" },
+            "lidHeight": { "type": "number" }
+          }
+        },
+        "calibrationPoint": { "$ref": "#/definitions/coordinates" },
+        "displayName": { "type": "string" },
+        "loadName": { "type": "string" },
+        "quirks": {
+          "type": "array",
+          "description": "List of quirks for a given module",
+          "items": {
+            "type": "string"
+          }
+        },
+        "slotTransforms": {
+          "type": "object",
+          "description": "Per-deckmap sets of per-slot transforms, properties should be ids of decks such as \"ot2_standard\". Transforms for a deck not explicitly listed are the identity.",
+          "patternProperties": {
+            ".*": {
+              "type": "object",
+              "patternProperties:": {
+                "^([1-9]|10|11)$": {
+                  "type": "object",
+                  "description": "Holds 2-D affine transforms that should be applied to top level keys plus the special property $image for applying to images images. If any top level key has no corresponding entry, it is an identity transform. If the transform applies to an entity specifying a 3D position, it should be applied only to the x and y.",
+                  "patternProperties": {
+                    ".*": {
+                      "type": "object",
+                      "description": "The keys identify transforms that apply to different sections of the module definition. Most will be top level keys of the module def (for instance, \"labwareOffset\") but there may also be additional meta keys for values that are not in the def",
+                      "patternProperties": {
+                        ".*": { "$ref": "#/definitions/affineTransform" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "compatibleLoadNames": {
+          "description": "Array of compatible load names. If this module is specified in a protocol and is not present, other modules with compatible load names are allowed to be substituted.",
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}
