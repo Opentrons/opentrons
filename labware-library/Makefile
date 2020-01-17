@@ -29,3 +29,8 @@ dev:
 .PHONY: serve
 serve: all
 	node ../scripts/serve-static dist
+
+# end to end tests
+.PHONY: test-e2e
+test-e2e:
+	yarn run cypress run
