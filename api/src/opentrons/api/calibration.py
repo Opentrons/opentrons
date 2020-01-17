@@ -7,6 +7,7 @@ from opentrons.config import feature_flags as ff
 from opentrons.broker import Broker
 from opentrons.types import Point, Mount, Location
 from opentrons.protocol_api import labware
+from opentrons.protocols.types import APIVersion
 from opentrons.hardware_control import CriticalPoint
 
 from .models import Container
@@ -157,7 +158,8 @@ class CalibrationManager:
         self._set_state('moving')
         if instrument._context:
             with instrument._context.temp_connect(self._hardware):
-                instrument._context.location_cache = None
+                if instrument._context.api_version < APIVersion(2, 2):
+                    instrument._context.location_cache = None
                 inst.drop_tip(_well0(container._container))
         else:
             inst.drop_tip(_well0(container._container))

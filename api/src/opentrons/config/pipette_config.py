@@ -197,7 +197,7 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
         display_name=ensure_value(cfg, 'displayName', MUTABLE_CONFIGS),
         name=cfg.get('name'),
         back_compat_names=cfg.get('backCompatNames', []),
-        return_tip_height=cfg.get('returnTipHeight'),
+        return_tip_height=cfg.get('returnTipHeight', 0.5),
         blow_out_flow_rate=ensure_value(
             cfg, 'defaultBlowOutFlowRate', MUTABLE_CONFIGS),
         max_travel=smoothie_configs['travelDistance'],
