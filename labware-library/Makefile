@@ -1,9 +1,9 @@
 # opentrons labware-library makefile
 
-SHELL := /bin/bash
-
 # add node_modules/.bin to PATH
 PATH := $(shell cd .. && yarn bin):$(PATH)
+# ensure PATH is honored when shell invoked (this gets round an issue on macOS)
+SHELL := env PATH=$(PATH) /bin/bash
 
 .PHONY: all
 all: clean dist

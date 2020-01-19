@@ -1,11 +1,12 @@
 # opentrons api makefile
 
-SHELL := /bin/bash
-
 # add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
 # and also make an explicit version for shx for use in the shell function,
 # where PATH won’t be propagated
 PATH := $(shell cd .. && yarn bin):$(PATH)
+# ensure PATH is honored when shell invoked (this gets round an issue on macOS)
+SHELL := env PATH=$(PATH) /bin/bash
+
 SHX := npx shx
 
 # make push wheel file (= rather than := to expand at every use)

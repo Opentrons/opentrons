@@ -1,10 +1,10 @@
 # opentrons platform makefile
 # https://github.com/Opentrons/opentrons
 
-SHELL := /bin/bash
-
 # add node_modules/.bin to PATH
 PATH := $(shell yarn bin):$(PATH)
+# ensure PATH is honored when shell invoked (this gets round an issue on macOS)
+SHELL := env PATH=$(PATH) /bin/bash
 
 API_DIR := api
 DISCOVERY_CLIENT_DIR := discovery-client
