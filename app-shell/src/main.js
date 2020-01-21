@@ -2,9 +2,9 @@
 import { app, ipcMain } from 'electron'
 import contextMenu from 'electron-context-menu'
 
-import createUi from './ui'
-import initializeMenu from './menu'
-import createLogger from './log'
+import { createUi } from './ui'
+import { initializeMenu } from './menu'
+import { createLogger } from './log'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
 import { registerDiscovery } from './discovery'
 import { registerLabware } from './labware'

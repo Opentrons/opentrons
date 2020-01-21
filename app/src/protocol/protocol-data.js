@@ -1,6 +1,6 @@
 // @flow
 // functions for parsing protocol files
-import createLogger from '../logger'
+import { createLogger } from '../logger'
 
 import type { ProtocolFile, ProtocolData, ProtocolType } from './types'
 

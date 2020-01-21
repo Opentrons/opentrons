@@ -3,7 +3,7 @@ import { combineEpics } from 'redux-observable'
 import { fromEvent } from 'rxjs'
 import { filter, tap, ignoreElements } from 'rxjs/operators'
 
-import createLogger from '../logger'
+import { createLogger } from '../logger'
 import remote from './remote'
 
 import type { StrictEpic, Action } from '../types'

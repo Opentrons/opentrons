@@ -41,6 +41,6 @@ const helpMenu = {
 
 const template = [firstMenu, editMenu, viewMenu, windowMenu, helpMenu]
 
-export default function initializeMenu() {
+export const initializeMenu = () => {
   Menu.setApplicationMenu(Menu.buildFromTemplate(template))
 }

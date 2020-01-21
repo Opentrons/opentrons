@@ -1,6 +1,6 @@
 // @flow
 // analytics module
-import createLogger from '../logger'
+import { createLogger } from '../logger'
 import { updateConfig } from '../config'
 import { initializeMixpanel } from './mixpanel'
 

@@ -10,7 +10,7 @@ import DiscoveryClient, {
 } from '@opentrons/discovery-client'
 
 import { getConfig, getOverrides, handleConfigChange } from './config'
-import createLogger from './log'
+import { createLogger } from './log'
 
 import type { Service } from '@opentrons/discovery-client'
 

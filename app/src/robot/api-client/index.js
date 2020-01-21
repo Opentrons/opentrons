@@ -1,7 +1,7 @@
 // robot api client redux middleware
 // wraps the api client worker to handle API side effects in a different thread
 
-import createLogger from '../../logger'
+import { createLogger } from '../../logger'
 import Worker from './worker'
 
 const log = createLogger(__filename)

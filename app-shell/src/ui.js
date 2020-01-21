@@ -2,7 +2,7 @@
 import { app, shell, BrowserWindow } from 'electron'
 import path from 'path'
 import { getConfig } from './config'
-import createLogger from './log'
+import { createLogger } from './log'
 
 const config = getConfig('ui')
 const log = createLogger('ui')
@@ -30,7 +30,7 @@ const WINDOW_OPTS = {
   ),
 }
 
-export default function createUi() {
+export const createUi = () => {
   log.debug('Creating main window', { options: WINDOW_OPTS })
 
   const mainWindow = new BrowserWindow(WINDOW_OPTS).once(

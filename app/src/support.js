@@ -3,7 +3,7 @@
 import { version } from './../package.json'
 import { FF_PREFIX, getRobotAnalyticsData } from './analytics'
 import { getConnectedRobot } from './discovery'
-import createLogger from './logger'
+import { createLogger } from './logger'
 
 import type { Action, ThunkAction, Middleware } from './types'
 import type { BaseRobot } from './robot/types'

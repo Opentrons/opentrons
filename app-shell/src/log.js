@@ -26,7 +26,7 @@ let config
 let transports
 let log
 
-export default function initializeLogger(filename) {
+export const initializeLogger = filename => {
   if (!config) config = getConfig('log')
   if (!transports) initializeTransports()
 

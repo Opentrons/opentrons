@@ -33,7 +33,7 @@ const VERBOSE: 'verbose' = 'verbose'
 const DEBUG: 'debug' = 'debug'
 const SILLY: 'silly' = 'silly'
 
-export default function createLogger(filename: string): Logger {
+export const createLogger = (filename: string): Logger => {
   const label = `app/${filename}`
 
   return {

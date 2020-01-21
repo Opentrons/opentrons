@@ -9,7 +9,7 @@ import thunk from 'redux-thunk'
 import { ConnectedRouter, routerMiddleware } from 'connected-react-router'
 import { createEpicMiddleware } from 'redux-observable'
 
-import createLogger from './logger'
+import { createLogger } from './logger'
 import { checkShellUpdate } from './shell'
 
 import { apiClientMiddleware as robotApiMiddleware } from './robot'

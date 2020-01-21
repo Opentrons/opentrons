@@ -27,7 +27,7 @@ import {
 import { getRobotSettings } from '../robot-settings'
 import { getAttachedPipettes } from '../pipettes'
 
-import hash from './hash'
+import { hash } from './hash'
 
 import type { OutputSelector } from 'reselect'
 import type { State } from '../types'
