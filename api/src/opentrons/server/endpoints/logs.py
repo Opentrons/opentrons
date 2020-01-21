@@ -5,7 +5,6 @@ from typing import Any, Dict, Mapping
 
 from aiohttp import web
 
-from ..util import http_version
 from opentrons.system import log_control
 
 LOG = logging.getLogger(__name__)
@@ -55,7 +54,6 @@ async def _get_log_response(syslog_selector: str, record_count: int,
     return web.Response(text=output.decode('utf-8'))
 
 
-@http_version(1, 0)
 async def get_logs_by_id(request: web.Request) -> web.Response:
     """ Get logs from the robot.
 
@@ -89,7 +87,6 @@ async def get_logs_by_id(request: web.Request) -> web.Response:
         ident, opts['records'], opts['format'])
 
 
-@http_version(1, 0)
 async def set_syslog_level(request: web.Request) -> web.Response:
     """
     Set the minimum level for which logs will be sent upstream via syslog-ng

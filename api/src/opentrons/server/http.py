@@ -1,21 +1,20 @@
 import logging
-from . import legacy_endpoints as endp
+from . import endpoints as endp
 from opentrons import config
 
-from .legacy_endpoints import (networking, control, settings, update)
+from .endpoints import (networking, control, settings, update)
 from opentrons.deck_calibration import endpoints as dc_endp
-
-from . import endpoints as v1_endp
 
 log = logging.getLogger(__name__)
 
 
-class HTTPServerLegacy:
-    def __init__(self, app, log_file_path):
+class HTTPServer:
+    def __init__(self, app, log_file_path, max_version):
         self.app = app
+        self.app['com.opentrons.max_version'] = max_version
         self.log_file_path = log_file_path
         self.app.router.add_get(
-            '/openapi', endp.get_openapi_spec)
+            '/openapi/{version}', endp.get_openapi_spec)
         self.app.router.add_get(
             '/health', endp.health)
         self.app.router.add_get(
@@ -49,7 +48,7 @@ class HTTPServerLegacy:
             '/camera/picture', control.take_picture)
 
         if config.ARCHITECTURE == config.SystemArchitecture.BUILDROOT:
-            from .legacy_endpoints import logs
+            from .endpoints import logs
             self.app.router.add_get('/logs/{syslog_identifier}',
                                     logs.get_logs_by_id)
         else:
@@ -99,12 +98,3 @@ class HTTPServerLegacy:
         )
         self.app.router.add_get(
             '/settings/robot', settings.get_robot_settings)
-
-
-class HTTPServer:
-    def __init__(self, app, log_file_path):
-        self.app = app
-        self.log_file_path = log_file_path
-
-        self.app.router.add_get('/health/{version}', v1_endp.health)
-        self.app.router.add_get('/openapi/{version}', v1_endp.get_openapi_spec)

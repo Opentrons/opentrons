@@ -1,3 +1,38 @@
+from unittest import mock
+import pytest
+from aiohttp import web
+
+
+async def fake_handler(request):
+    version = request.get('requested_version')
+    stuff = {'version': version}
+    return web.json_response(data=stuff, status=200)
+
+@pytest.fixture
+async def fake_server():
+    from opentrons.server import version_middleware
+    app = web.Application(middlewares=[version_middleware])
+    app.router.add_get('/fake_request', fake_handler)
+    yield app
+    await app.shutdown()
+
+
+async def test_version_middleware(aiohttp_client, fake_server, loop):
+    cli = await loop.create_task(aiohttp_client(fake_server))
+    old_header = {'accept': 'application/vnd.opentrons.http+json;version=1'}
+    new_header = {'accept': 'application/vnd.opentrons.http+json;version=2'}
+    # Test request has new key added
+    resp = await cli.get('/fake_request', headers=old_header)
+    text = await resp.json()
+    assert text['version'] == '1'
+    resp2 = await cli.get('/fake_request', headers=new_header)
+    text = await resp2.json()
+    assert text['version'] == '2'
+    # Test determined accept version correct
+
+    # Test response adds in correct version specified
+
+
 
 async def test_client_version_request(virtual_smoothie_env, async_client):
     # Test a match and success

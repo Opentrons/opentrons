@@ -18,7 +18,6 @@ class HTTPVersionMismatchError(Exception):
         self.dErrorArguments = versions
         self.message = message
 
-
 def determine_requested_version(request):
     headers = getattr(request, 'headers', {})
     accept_header = headers.get('accept', '')
@@ -26,12 +25,11 @@ def determine_requested_version(request):
         # Use aiohttp helper to parse MIME type header into 4 element tuple
         # see for further info: https://aiohttp.readthedocs.io/en/v0.18.2/api.html#aiohttp.helpers.parse_mimetype  # noqa(E501)
         params = helpers.parse_mimetype(accept_header).parameters
-        version = params.get('version', '1.0')
-        major, minor = version.split('.')
-        return APIVersion(int(major), int(minor))
+        version = params.get('version', '1')
+        # major, minor = version.split('.')
+        return version
     else:
-        return DEFAULT_VERSION
-
+        return 1
 
 def http_version(major: int, minor: int):
     expected_version = APIVersion(major, minor)

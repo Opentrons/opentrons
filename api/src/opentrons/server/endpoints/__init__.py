@@ -4,19 +4,17 @@ import logging
 import pkgutil
 from aiohttp import web
 
-from ..util import http_version, SUPPORTED_VERSIONS
+from ..util import http_version
 from opentrons import __version__, config, protocol_api, protocols
 
 log = logging.getLogger(__name__)
 
 
-@http_version(2, 0)
 async def health(request: web.Request) -> web.Response:
     static_paths = ['/logs/serial.log', '/logs/api.log']
     # This conditional handles the case where we have just changed the
     # use protocol api v2 feature flag, so it does not match the type
     # of hardware we're actually using.
-
     fw_version = request.app['com.opentrons.hardware'].fw_version
     if inspect.iscoroutine(fw_version):
         fw_version = await fw_version
@@ -37,20 +35,17 @@ async def health(request: web.Request) -> web.Response:
             'serialLog': '/logs/serial.log',
             'apiSpec': '/openapi/{version}'
         },
-        'supportedHttpApiVersions': {
-            'minimum': SUPPORTED_VERSIONS[0],
-            'maximum': SUPPORTED_VERSIONS[-1]}
-    }
+        'maxSupportedHttpApiVersions': SUPPORTED_VERSIONS[-1]
+        }
     return web.json_response(
         headers={'Access-Control-Allow-Origin': '*'},
         body=json.dumps(res))
 
 
-@http_version(2, 0)
 async def get_openapi_spec(request: web.Request) -> web.Response:
-    version = request.get('version', '1')
+    version = request.get('requested_version')
     spec = json.loads(pkgutil.get_data(  # type: ignore
-        'opentrons', f'server/openapi/{version}.json'))
+        'opentrons', 'server/openapi/1.json'))
     if spec:
         return web.json_response(spec, status=200)
     else:

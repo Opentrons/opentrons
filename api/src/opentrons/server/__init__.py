@@ -11,7 +11,9 @@ import traceback
 from typing import TYPE_CHECKING
 from aiohttp import web
 
-from .util import HTTPVersionMismatchError, SUPPORTED_VERSIONS, ERROR_CODES
+from .util import (
+    HTTPVersionMismatchError, SUPPORTED_VERSIONS,
+    ERROR_CODES, determine_requested_version)
 from opentrons.config import CONFIG
 from .rpc import RPCServer
 from .http import HTTPServerLegacy, HTTPServer
@@ -70,7 +72,12 @@ async def version_middleware(request, handler):
     error middleware will be called.
     """
     try:
+        header_version = determine_requested_version(request)
+        version_to_use = min(header_version, max_accepted_version)
+        request['requested_version'] = header_version
         response = await handler(request)
+        response.headers['X-Opentrons-Media-Type'] =\
+            f'opentrons.api.{header_version}'
     except Exception as e:
         response = error_handling(e, request)
     return response
@@ -117,15 +124,6 @@ class ThreadedAsyncLock:
         self._thread_lock.release()
 
 
-class CombinedHTTPRoutes:
-    def __init__(self, app, log_file_path):
-        self.app = app
-        self.log_file_path = log_file_path
-
-        HTTPServerLegacy(app, log_file_path)
-        HTTPServer(app, log_file_path)
-
-
 # Support for running using aiohttp CLI.
 # See: https://docs.aiohttp.org/en/stable/web.html#command-line-interface-cli
 def init(hardware: 'HardwareAPILike' = None,
@@ -146,7 +144,7 @@ def init(hardware: 'HardwareAPILike' = None,
         app, MainRouter(
             hardware, lock=app['com.opentrons.motion_lock'], loop=loop))
     app['com.opentrons.response_file_tempdir'] = tempfile.mkdtemp()
-    app['com.opentrons.http'] = CombinedHTTPRoutes(app, CONFIG['log_dir'])
+    app['com.opentrons.http'] = HTTPServer(app, CONFIG['log_dir'])
 
     async def dispose_response_file_tempdir(app):
         temppath = app.get('com.opentrons.response_file_tempdir')
