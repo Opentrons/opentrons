@@ -127,19 +127,19 @@ lint-py:
 	$(MAKE) -C $(API_DIR) lint
 	$(MAKE) -C $(UPDATE_SERVER_DIR) lint
 
+# TODO(mc, 2020-01-22): turn on warning logs in CI once this issue is resolved:
+# https://github.com/Opentrons/opentrons/issues/4830
 .PHONY: lint-js
 lint-js:
-	eslint '.*.js' '**/*.js'
+	eslint $(and $(CI),--quiet) ".*.js" "**/*.js"
 
 .PHONY: lint-json
 lint-json:
 	eslint --max-warnings 0 --ext .json .
 
-# stylelint seems to close stdout before make can, causing spurious failures
-# with `write error: stdout`; pipe to tee which will hopefully paper over it
 .PHONY: lint-css
 lint-css:
-	stylelint '**/*.css'
+	stylelint "**/*.css"
 
 .PHONY: check-js
 check-js:
