@@ -1289,6 +1289,16 @@ class InstrumentContext(CommandPublisher):
 
         return self
 
+    def _determine_drop_target(self, location: Well):
+        if self.api_version < APIVersion(2, 2):
+            bot = location.bottom()
+            return bot._replace(point=bot.point._replace(z=bot.point.z + 10))
+        else:
+            tr = location.parent
+            assert tr.is_tiprack
+            z_height = self.return_height * self._tip_length_for(tr)
+            return location.top(-z_height + 10)
+
     @requires_version(2, 0)
     def drop_tip(  # noqa(C901)
             self,
@@ -1347,9 +1357,7 @@ class InstrumentContext(CommandPublisher):
             if 'fixedTrash' in quirks_from_any_parent(location):
                 target = location.top()
             else:
-                bot = location.bottom()
-                target = bot._replace(
-                    point=bot.point._replace(z=bot.point.z + 10))
+                target = self._determine_drop_target(location)
         elif not location:
             target = self.trash_container.wells()[0].top()
         else:
@@ -1883,6 +1891,12 @@ class InstrumentContext(CommandPublisher):
         return self.hw_pipette['channels']
 
     @property  # type: ignore
+    @requires_version(2, 2)
+    def return_height(self) -> int:
+        """ The height to return a tip to its tiprack. """
+        return self.hw_pipette.get('returnTipHeight', 0.5)
+
+    @property  # type: ignore
     @requires_version(2, 0)
     def well_bottom_clearance(self) -> 'Clearances':
         """ The distance above the bottom of a well to aspirate or dispense.
@@ -1992,10 +2006,10 @@ class ModuleContext(CommandPublisher):
         .. versionadded:: 2.1
         :returns: The initialized and loaded labware object.
         """
-        if self._ctx.api_version < APIVersion(2, 1) and\
+        if self.api_version < APIVersion(2, 1) and\
                 (label or namespace or version):
             MODULE_LOG.warning(
-                f'You have specified API {self._ctx.api_version}, but you '
+                f'You have specified API {self.api_version}, but you '
                 'are trying to utilize new load_labware parameters in 2.1')
         lw = load(name, self._geometry.location,
                   label, namespace, version,
