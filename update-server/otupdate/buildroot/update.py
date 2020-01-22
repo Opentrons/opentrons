@@ -15,7 +15,6 @@ from typing import Optional
 
 from aiohttp import web, BodyPartReader
 
-from .util import update_http_version
 from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
 from . import config, file_actions
 from .update_session import UpdateSession, Stages
@@ -44,7 +43,6 @@ def require_session(handler):
     return decorated
 
 
-@update_http_version(1, 0)
 async def begin(request: web.Request) -> web.Response:
     """ Begin a session
     """
@@ -64,7 +62,6 @@ async def begin(request: web.Request) -> web.Response:
         status=201)
 
 
-@update_http_version(1, 0)
 async def cancel(request: web.Request) -> web.Response:
     request.app.pop(SESSION_VARNAME, None)
     return web.json_response(
@@ -73,14 +70,12 @@ async def cancel(request: web.Request) -> web.Response:
 
 
 @require_session
-@update_http_version(1, 0)
 async def status(request: web.Request, session: UpdateSession) -> web.Response:
     return web.json_response(
         data=session.state,
         status=200)
 
 
-@update_http_version(1, 0)
 async def _save_file(part: BodyPartReader, path: str):
     with open(os.path.join(path, part.name), 'wb') as write:
         while not part.at_eof():
@@ -142,7 +137,6 @@ def _begin_validation(
 
 
 @require_session
-@update_http_version(1, 0)
 async def file_upload(
         request: web.Request, session: UpdateSession) -> web.Response:
     """ Serves /update/:session/file
@@ -175,7 +169,6 @@ async def file_upload(
 
 
 @require_session
-@update_http_version(1, 0)
 async def commit(
         request: web.Request, session: UpdateSession) -> web.Response:
     """ Serves /update/:session/commit """

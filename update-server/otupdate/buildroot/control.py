@@ -11,7 +11,6 @@ from typing import Callable, Coroutine, Mapping
 from aiohttp import web
 
 from .constants import (RESTART_LOCK_NAME, DEVICE_NAME_VARNAME)
-from .util import update_http_version
 
 LOG = logging.getLogger(__name__)
 
@@ -20,7 +19,6 @@ def _do_restart():
     subprocess.check_call(['reboot'])
 
 
-@update_http_version(1, 0)
 async def restart(request: web.Request) -> web.Response:
     """ Restart the robot.
 
@@ -38,7 +36,6 @@ def build_health_endpoint(
                     Coroutine[None, None, web.Response]]:
     """ Build a coroutine to serve /health that captures version info
     """
-    @update_http_version(1, 0)
     async def health(request: web.Request) -> web.Response:
         return web.json_response(
             {

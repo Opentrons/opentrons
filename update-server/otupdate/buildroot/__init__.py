@@ -8,7 +8,8 @@ from aiohttp import web
 from . import constants, name_management
 
 from . import config, control, update, ssh_key_management
-from .util import HTTPVersionMismatchError, ERROR_CODES, SUPPORTED_VERSIONS
+from .util import (ERROR_CODES, MAX_VERSION,
+                   SUPPORTED_VERSIONS, determine_requested_version)
 
 BR_BUILTIN_VERSION_FILE = '/etc/VERSION.json'
 #: Location of the builtin system version
@@ -16,26 +17,8 @@ BR_BUILTIN_VERSION_FILE = '/etc/VERSION.json'
 LOG = logging.getLogger(__name__)
 
 
-@web.middleware
-async def log_error_middleware(request, handler):
-    minVersion = SUPPORTED_VERSIONS[0]
-    maxVersion = SUPPORTED_VERSIONS[-1]
-    try:
-        resp = await handler(request)
-    except HTTPVersionMismatchError as error:
-        msg = error.message
-        data = {
-            "type": "error",
-            "errorId": ERROR_CODES["unsupportedVersion"],
-            "errorType": "unsupportedVersion",
-            "message": msg,
-            "supportedHttpApiVersions": {
-                "minimum": minVersion, "maximum": maxVersion},
-            "links": {}
-        }
-        # Client is trying to use a version higher than supported
-        resp = web.json_response(data, status=406)
-    except web.HTTPNotFound:
+async def error_handling(error, request):
+    if isinstance(error, web.HTTPNotFound):
         LOG.exception("Exception handler for request {}".format(request))
         msg = "Request was not found at {}".format(request)
         data = {
@@ -43,15 +26,33 @@ async def log_error_middleware(request, handler):
             "errorId": ERROR_CODES["HTTPNotFound"],
             "errorType": "HTTPNotFound",
             "message": msg,
-            "supportedHttpApiVersions": {
-                "minimum": minVersion, "maximum": maxVersion},
+            "supportedHttpApiVersions": SUPPORTED_VERSIONS,
             "links": {}
         }
         resp = web.json_response(data, status=404)
-    except Exception:
+    else:
         LOG.exception(f"Exception serving {request.method} {request.path}")
         raise
     return resp
+
+
+@web.middleware
+async def version_middleware(request, handler):
+    """
+    Helper middleware to route any requests to the default HTTP API (v0)
+    webserver paths. If the route still does not exist in v0, then the
+    error middleware will be called.
+    """
+    try:
+        header_version = determine_requested_version(request)
+        version_to_use = min(header_version, MAX_VERSION)
+        request['requested_version'] = version_to_use
+        response = await handler(request)
+        response.headers['X-Opentrons-Media-Type'] =\
+            f'opentrons.api.{version_to_use}'
+    except Exception as e:
+        response = error_handling(e, request)
+    return response
 
 
 def get_version(version_file: str) -> Mapping[str, str]:
@@ -94,7 +95,7 @@ def get_app(system_version_file: str = None,
     if not loop:
         loop = asyncio.get_event_loop()
 
-    app = web.Application(middlewares=[log_error_middleware])
+    app = web.Application(middlewares=[version_middleware])
     app[config.CONFIG_VARNAME] = config_obj
     app[constants.RESTART_LOCK_NAME] = asyncio.Lock()
     app[constants.DEVICE_NAME_VARNAME] = name

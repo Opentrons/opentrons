@@ -25,7 +25,6 @@ import urllib.parse
 from aiohttp import web
 
 from .constants import DEVICE_NAME_VARNAME
-from .util import update_http_version
 
 LOG = logging.getLogger(__name__)
 
@@ -125,7 +124,6 @@ def _get_hostname() -> str:
     return open('/etc/machine-id').read().strip()[:6]
 
 
-@update_http_version(1, 0)
 async def setup_hostname() -> str:
     """
     Intended to be run when the server starts. Sets the machine hostname.
@@ -213,7 +211,6 @@ def get_name(default: str = 'no name set'):
     return default
 
 
-@update_http_version(1, 0)
 async def set_name(name: str = None) -> str:
     """
     Change the name by writing /etc/machine-info and then calling setup_name
@@ -239,7 +236,6 @@ async def set_name(name: str = None) -> str:
     return checked_name
 
 
-@update_http_version(1, 0)
 async def set_name_endpoint(request: web.Request) -> web.Response:
     """ Set the name of the robot.
 
@@ -269,7 +265,6 @@ async def set_name_endpoint(request: web.Request) -> web.Response:
                              status=200)
 
 
-@update_http_version(1, 0)
 async def get_name_endpoint(request: web.Request) -> web.Response:
     """ Get the name of the robot.
 
