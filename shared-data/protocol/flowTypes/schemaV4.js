@@ -26,6 +26,10 @@ export type DisengageMagnetParams = {|
   module: string,
 |}
 
+export type SetTargetTempParams = {| module: string, temperature: number |}
+
+export type DeactivateTempParams = {| module: string |}
+
 export type Command =
   | {|
       command: 'aspirate' | 'dispense' | 'airGap',
@@ -56,6 +60,16 @@ export type Command =
       command: 'magneticModule/disengageMagnet',
       params: DisengageMagnetParams,
     |}
+  | {|
+      command: 'temperatureModule/setTargetTemperature',
+      params: SetTargetTempParams,
+    |}
+  | {| command: 'temperatureModule/deactivate', params: DeactivateTempParams |}
+  | {|
+      command: 'thermocycler/setTargetTemperature',
+      params: SetTargetTempParams,
+    |}
+  | {| command: 'thermocycler/deactivate', params: DeactivateTempParams |}
 
 // NOTE: must be kept in sync with '../schemas/4.json'
 export type ProtocolFile<DesignerApplicationData> = {|

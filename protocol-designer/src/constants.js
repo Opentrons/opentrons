@@ -87,6 +87,14 @@ export { MAGDECK, TEMPDECK, THERMOCYCLER } from '@opentrons/shared-data'
 const TEMPMOD: 'temperature module' = 'temperature module'
 const MAGMOD: 'magnetic module' = 'magnetic module'
 
+// Temperature statuses
+export const TEMPERATURE_DEACTIVATED: 'TEMPERATURE_DEACTIVATED' =
+  'TEMPERATURE_DEACTIVATED'
+export const TEMPERATURE_AT_TARGET: 'TEMPERATURE_AT_TARGET' =
+  'TEMPERATURE_AT_TARGET'
+export const TEMPERATURE_APPROACHING_TARGET: 'TEMPERATURE_APPROACHING_TARGET' =
+  'TEMPERATURE_APPROACHING_TARGET'
+
 // TODO: IL 2019-12-03 migrate the ModuleType '___deck' strings to '___ module' forms.
 // We don't call modules 'deck' anymore, but the old code is entrenched
 export const FILE_MODULE_TYPE_TO_MODULE_TYPE: { [string]: ModuleType } = {

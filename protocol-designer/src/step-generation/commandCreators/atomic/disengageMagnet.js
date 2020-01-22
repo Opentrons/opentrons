@@ -2,17 +2,13 @@
 import assert from 'assert'
 import { MAGDECK } from '../../../constants'
 import * as errorCreators from '../../errorCreators'
-import type {
-  InvariantContext,
-  RobotState,
-  DisengageMagnetArgs,
-} from '../../types'
+import type { CommandCreator, DisengageMagnetArgs } from '../../types'
 
 /** Disengage magnet of specified magnetic module. */
-export const disengageMagnet = (
-  args: DisengageMagnetArgs,
-  invariantContext: InvariantContext,
-  prevRobotState: RobotState
+export const disengageMagnet: CommandCreator<DisengageMagnetArgs> = (
+  args,
+  invariantContext,
+  prevRobotState
 ) => {
   const { module } = args
   const command = 'magneticModule/disengageMagnet'

@@ -43,16 +43,14 @@ function _getSelectedWellsForStep(
   frame: StepGeneration.CommandsAndRobotState,
   invariantContext: StepGeneration.InvariantContext
 ): Array<string> {
-  if (
-    stepArgs.commandCreatorFnName === 'delay' ||
-    stepArgs.commandCreatorFnName === 'engageMagnet' ||
-    stepArgs.commandCreatorFnName === 'disengageMagnet'
-  ) {
+  if (StepGeneration.getHasNoWellsFromCCArgs(stepArgs)) {
     return []
   }
 
-  const pipetteId = stepArgs.pipette
-  const pipetteEntity = invariantContext.pipetteEntities[pipetteId]
+  const pipetteId = StepGeneration.getPipetteIdFromCCArgs(stepArgs)
+  const pipetteEntity = pipetteId
+    ? invariantContext.pipetteEntities[pipetteId]
+    : null
   const labwareEntity = invariantContext.labwareEntities[labwareId]
 
   if (!pipetteEntity || !labwareEntity) {

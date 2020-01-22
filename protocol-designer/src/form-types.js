@@ -228,9 +228,19 @@ export type HydratedMagnetFormData = {|
   ...AnnotationFields,
   id: string,
   stepType: 'magnet',
+  stepDetails: string | null,
   moduleId: string | null,
   magnetAction: 'engage' | 'disengage',
-  engageHeight: number | null,
+  engageHeight: string | null,
+|}
+
+export type HydratedTemperatureFormData = {|
+  id: string,
+  stepType: 'temperature',
+  stepDetails: string | null,
+  moduleId: string | null,
+  setTemperature: 'true' | 'false',
+  targetTemperature: string | null,
 |}
 
 // TODO: Ian 2019-01-17 Moving away from this and towards nesting all form fields

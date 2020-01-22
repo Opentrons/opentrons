@@ -55,6 +55,13 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'delay':
       // these commands don't have any effects on the state
       break
+    case 'temperatureModule/setTargetTemperature':
+    case 'temperatureModule/deactivate':
+    case 'thermocycler/setTargetTemperature':
+    case 'thermocycler/deactivate':
+      console.warn(`NOT IMPLEMENTED: ${command.command}`)
+      break
+
     default:
       assert(
         false,

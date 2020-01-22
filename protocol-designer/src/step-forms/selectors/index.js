@@ -17,6 +17,7 @@ import {
   MAGDECK,
   TEMPDECK,
   THERMOCYCLER,
+  TEMPERATURE_DEACTIVATED,
 } from '../../constants'
 import {
   generateNewForm,
@@ -159,6 +160,8 @@ const MAGNETIC_MODULE_INITIAL_STATE: MagneticModuleState = {
 }
 const TEMPERATURE_MODULE_INITIAL_STATE: TemperatureModuleState = {
   type: TEMPDECK,
+  status: TEMPERATURE_DEACTIVATED,
+  targetTemperature: null,
 }
 const THERMOCYCLER_MODULE_INITIAL_STATE: ThermocyclerModuleState = {
   type: THERMOCYCLER,

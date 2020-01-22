@@ -6,7 +6,14 @@ import type {
   ModuleType,
 } from '@opentrons/shared-data'
 import type { DeckSlot } from '../types'
-import typeof { MAGDECK, TEMPDECK, THERMOCYCLER } from '../constants'
+import typeof {
+  MAGDECK,
+  TEMPDECK,
+  THERMOCYCLER,
+  TEMPERATURE_DEACTIVATED,
+  TEMPERATURE_AT_TARGET,
+  TEMPERATURE_APPROACHING_TARGET,
+} from '../constants'
 
 export type FormPipette = {| pipetteName: ?string, tiprackDefURI: ?string |}
 export type FormPipettesByMount = {|
@@ -51,8 +58,18 @@ export type ModuleEntities = { [moduleId: string]: ModuleEntity }
 
 // NOTE: semi-redundant 'type' key in FooModuleState types is required for Flow to disambiguate 'moduleState'
 export type MagneticModuleState = {| type: MAGDECK, engaged: boolean |}
-export type TemperatureModuleState = {| type: TEMPDECK |} // TODO IL 2019-11-18 create this state
+
+export type TemperatureStatus =
+  | TEMPERATURE_DEACTIVATED
+  | TEMPERATURE_AT_TARGET
+  | TEMPERATURE_APPROACHING_TARGET
+export type TemperatureModuleState = {|
+  type: TEMPDECK,
+  status: TemperatureStatus,
+  targetTemperature: number | null,
+|}
 export type ThermocyclerModuleState = {| type: THERMOCYCLER |} // TODO IL 2019-11-18 create this state
+
 export type ModuleTemporalProperties = {|
   slot: DeckSlot,
   moduleState:
