@@ -147,13 +147,18 @@ export const selectStep = (
       stepFormSelectors.getOrderedStepIds(state)
     )
 
-    // TODO (ka 2020-1-16): Investigate autopopulating engageHeight
-    // conditional field with shared-data default
-    const engageHeight = getNextDefaultEngageHeight(
+    const defaultEngageHeight = uiModulesSelectors.getMagnetLabwareEngageHeight(
+      state
+    )
+
+    const prevEngageHeight = getNextDefaultEngageHeight(
       stepFormSelectors.getSavedStepForms(state),
       stepFormSelectors.getOrderedStepIds(state)
     )
 
+    // if no previously saved engageHeight, autopopulate with recommended value
+    // recommended value is null when no labware found on module
+    const engageHeight = prevEngageHeight || defaultEngageHeight
     formData = { ...formData, moduleId, magnetAction, engageHeight }
   }
 
