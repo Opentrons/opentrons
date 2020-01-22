@@ -72,7 +72,7 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [ModuleType]: Array<string> } = {
     'opentrons_24_aluminumblock_nest_2ml_snapcap',
     'opentrons_24_aluminumblock_nest_0.5ml_screwcap',
   ],
-  magdeck: ['biorad_96_wellplate_200ul_pcr'],
+  magdeck: ['nest_96_wellplate_100ul_pcr_full_skirt'],
   thermocycler: ['nest_96_wellplate_100ul_pcr_full_skirt'],
 }
 
@@ -290,33 +290,43 @@ const LabwareSelectionModal = (props: Props) => {
               ))}
             </PDTitledList>
           ) : null}
-          {orderedCategories.map(category => (
-            <PDTitledList
-              key={category}
-              title={startCase(category)}
-              collapsed={selectedCategory !== category}
-              onCollapseToggle={makeToggleCategory(category)}
-              onClick={makeToggleCategory(category)}
-              inert={!populatedCategories[category]}
-            >
-              {labwareByCategory[category] &&
-                labwareByCategory[category].map((labwareDef, index) => (
-                  <LabwareItem
-                    key={index}
-                    icon={
-                      getLabwareRecommended(labwareDef)
-                        ? 'check-decagram'
-                        : null
-                    }
-                    disabled={getLabwareDisabled(labwareDef)}
-                    labwareDef={labwareDef}
-                    selectLabware={selectLabware}
-                    onMouseEnter={() => setPreviewedLabware(labwareDef)}
-                    onMouseLeave={() => setPreviewedLabware()}
-                  />
-                ))}
-            </PDTitledList>
-          ))}
+          {orderedCategories.map(category => {
+            const isPopulated = populatedCategories[category]
+            if (isPopulated) {
+              return (
+                <PDTitledList
+                  key={category}
+                  title={startCase(category)}
+                  collapsed={selectedCategory !== category}
+                  onCollapseToggle={makeToggleCategory(category)}
+                  onClick={makeToggleCategory(category)}
+                  inert={!isPopulated}
+                >
+                  {labwareByCategory[category] &&
+                    labwareByCategory[category].map((labwareDef, index) => {
+                      const isDisabled = getLabwareDisabled(labwareDef)
+                      if (!isDisabled) {
+                        return (
+                          <LabwareItem
+                            key={index}
+                            icon={
+                              getLabwareRecommended(labwareDef)
+                                ? 'check-decagram'
+                                : null
+                            }
+                            disabled={isDisabled}
+                            labwareDef={labwareDef}
+                            selectLabware={selectLabware}
+                            onMouseEnter={() => setPreviewedLabware(labwareDef)}
+                            onMouseLeave={() => setPreviewedLabware()}
+                          />
+                        )
+                      }
+                    })}
+                </PDTitledList>
+              )
+            }
+          })}
         </ul>
 
         <OutlineButton Component="label" className={styles.upload_button}>

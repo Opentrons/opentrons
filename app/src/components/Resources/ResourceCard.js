@@ -11,7 +11,7 @@ type Props = {
   url: string,
 }
 
-export default function ResourceCard(props: Props) {
+export function ResourceCard(props: Props) {
   return (
     <Card title={props.title}>
       <div className={styles.card_content}>

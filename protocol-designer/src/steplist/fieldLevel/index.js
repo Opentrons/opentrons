@@ -135,7 +135,6 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     maskValue: composeMaskers(maskToFloat),
     castValue: Number,
   },
-  moduleId: { getErrors: composeErrors(requiredField) },
   setTemperature: { getErrors: composeErrors(requiredField) },
   targetTemperature: {
     getErrors: composeErrors(

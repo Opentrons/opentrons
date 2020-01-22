@@ -85,6 +85,7 @@
     "madge": "^3.6.0",
     "mime": "^2.4.4",
     "mini-css-extract-plugin": "^0.8.0",
+    "onchange": "^6.1.0",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "portfinder": "^1.0.13",
     "postcss": "^7.0.18",

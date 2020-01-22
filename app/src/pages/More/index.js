@@ -5,11 +5,11 @@ import { Switch, Route, Redirect } from 'react-router-dom'
 
 import AppSettings from './AppSettings'
 import CustomLabware from './CustomLabware'
-import Resources from './Resources'
+import { ResourcesPage } from './Resources'
 
 import type { ContextRouter } from 'react-router-dom'
 
-export default function More(props: ContextRouter) {
+export function More(props: ContextRouter) {
   const { path } = props.match
   const appPath = `${path}/app`
 
@@ -18,7 +18,7 @@ export default function More(props: ContextRouter) {
       <Redirect exact from={path} to={appPath} />
       <Route path={appPath} component={AppSettings} />
       <Route path={`${path}/custom-labware`} component={CustomLabware} />
-      <Route path={`${path}/resources`} component={Resources} />
+      <Route path={`${path}/resources`} component={ResourcesPage} />
     </Switch>
   )
 }
