@@ -1,11 +1,10 @@
-/* eslint-disable no-undef */
-describe('Desktop Navigation', function() {
+describe('Desktop Navigation', () => {
   beforeEach(() => {
     cy.visit('/')
     cy.viewport('macbook-15')
   })
 
-  it('contains the subdomain nav bar', function() {
+  it('contains the subdomain nav bar', () => {
     cy.get("div[class*='_subdomain_nav_wrapper_']")
       .contains('Python API')
       .should('have.prop', 'href')
@@ -23,7 +22,7 @@ describe('Desktop Navigation', function() {
       .and('equal', 'https://designer.opentrons.com/')
   })
 
-  it('contains the main nav bar', function() {
+  it('contains the main nav bar', () => {
     cy.get("div[class*='_main_nav_wrapper_']")
       .find('a')
       .should('have.prop', 'href')
@@ -35,7 +34,7 @@ describe('Desktop Navigation', function() {
     cy.get("div[class*='_main_nav_wrapper_']").contains('Support & Sales')
   })
 
-  it('displays correct about links', function() {
+  it('displays correct about links', () => {
     cy.get("div[class*='_main_nav_wrapper_']")
       .contains('About')
       .parent()

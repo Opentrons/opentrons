@@ -33,4 +33,6 @@ serve: all
 # end to end tests
 .PHONY: test-e2e
 test-e2e:
-	yarn run cypress run
+	concurrently --no-color --kill-others --names "server,tests" \
+		"$(MAKE) dev" \
+		"cypress run --browser chrome"

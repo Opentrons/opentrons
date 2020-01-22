@@ -2,8 +2,7 @@
 // an element is in view before clicking or checking with
 // { force: true }
 
-/* eslint-disable no-undef */
-context('Reservoirs', function() {
+context('Reservoirs', () => {
   before(() => {
     cy.visit('/create')
     cy.viewport('macbook-15')
@@ -17,17 +16,17 @@ context('Reservoirs', function() {
       cy.contains('start creating labware').click({ force: true })
     })
 
-    it('contains a button to the testing guide', function() {
+    it('contains a button to the testing guide', () => {
       cy.contains('view test guide')
         .should('have.prop', 'href')
         .and('to.have.string', 'labwareDefinition_testGuide')
     })
 
-    it('does not have a preview image', function() {
+    it('does not have a preview image', () => {
       cy.contains('Add missing info to see labware preview').should('exist')
     })
 
-    it('tests regularity', function() {
+    it('tests regularity', () => {
       cy.get("input[name='homogeneousWells'][value='false']").check({
         force: true,
       })
@@ -42,7 +41,7 @@ context('Reservoirs', function() {
       ).should('not.exist')
     })
 
-    it('tests footprint', function() {
+    it('tests footprint', () => {
       cy.get("input[name='footprintXDimension']")
         .type('150')
         .blur()
@@ -71,7 +70,7 @@ context('Reservoirs', function() {
       ).should('not.exist')
     })
 
-    it('tests height', function() {
+    it('tests height', () => {
       cy.get("input[name='labwareZDimension']")
         .type('150')
         .blur()
@@ -93,8 +92,8 @@ context('Reservoirs', function() {
       ).should('not.exist')
     })
 
-    describe('Grid tests', function() {
-      it('tests number of rows', function() {
+    describe('Grid tests', () => {
+      it('tests number of rows', () => {
         cy.get("input[name='gridRows']")
           .focus()
           .blur()
@@ -105,7 +104,7 @@ context('Reservoirs', function() {
         cy.contains('Number of rows must be a number').should('not.exist')
       })
 
-      it('tests are all of your rows evenly spaced', function() {
+      it('tests are all of your rows evenly spaced', () => {
         cy.get("input[name='regularRowSpacing'][value='false']").check({
           force: true,
         })
@@ -117,7 +116,7 @@ context('Reservoirs', function() {
         })
       })
 
-      it('tests number of columns', function() {
+      it('tests number of columns', () => {
         cy.get("input[name='gridColumns']")
           .focus()
           .blur()
@@ -128,7 +127,7 @@ context('Reservoirs', function() {
         cy.contains('Number of columns must be a number').should('not.exist')
       })
 
-      it('tests are all of your columns evenly spaced', function() {
+      it('tests are all of your columns evenly spaced', () => {
         cy.get("input[name='regularColumnSpacing'][value='false']").check({
           force: true,
         })
@@ -144,7 +143,7 @@ context('Reservoirs', function() {
       })
     })
 
-    it('tests volume', function() {
+    it('tests volume', () => {
       cy.get("input[name='wellVolume']")
         .focus()
         .blur()
@@ -155,8 +154,8 @@ context('Reservoirs', function() {
       cy.contains('Max volume per well must be a number').should('not.exist')
     })
 
-    describe('Well shape tests', function() {
-      it('tests circular wells', function() {
+    describe('Well shape tests', () => {
+      it('tests circular wells', () => {
         cy.get("input[name='wellShape'][value='circular']").check({
           force: true,
         })
@@ -173,7 +172,7 @@ context('Reservoirs', function() {
         cy.contains('Diameter must be a number').should('not.exist')
       })
 
-      it('tests rectangular wells', function() {
+      it('tests rectangular wells', () => {
         cy.get("input[name='wellShape'][value='rectangular']").check({
           force: true,
         })
@@ -198,7 +197,7 @@ context('Reservoirs', function() {
         cy.contains('Well Y must be a number').should('not.exist')
       })
 
-      it('tests well bottom shape and depth', function() {
+      it('tests well bottom shape and depth', () => {
         cy.get("input[name='wellBottomShape'][value='flat']").check({
           force: true,
         })
@@ -227,7 +226,7 @@ context('Reservoirs', function() {
         cy.contains('Depth must be a number').should('not.exist')
       })
 
-      it('tests well spacing', function() {
+      it('tests well spacing', () => {
         cy.get("input[name='gridSpacingX']")
           .focus()
           .blur()
@@ -246,7 +245,7 @@ context('Reservoirs', function() {
         cy.contains('Y Spacing (Ys) must be a number').should('not.exist')
       })
 
-      it('tests grid offset', function() {
+      it('tests grid offset', () => {
         cy.get("input[name='gridOffsetX']")
           .focus()
           .blur()
@@ -265,13 +264,13 @@ context('Reservoirs', function() {
         cy.contains('Y Offset (Yo) must be a number').should('not.exist')
       })
 
-      it('does has a preview image', function() {
+      it('does has a preview image', () => {
         cy.contains('Add missing info to see labware preview').should(
           'not.exist'
         )
       })
 
-      it('tests the file export', function() {
+      it('tests the file export', () => {
         // Try with missing fields
         cy.get('button[class*="_export_button_"]').click({ force: true })
         cy.contains(

@@ -1,11 +1,10 @@
-/* eslint-disable no-undef */
-describe('The Desktop Home Page', function() {
+describe('The Desktop Home Page', () => {
   beforeEach(() => {
     cy.visit('/')
     cy.viewport('macbook-15')
   })
 
-  it('successfully loads', function() {
+  it('successfully loads', () => {
     cy.title().should('equal', 'Labware Library')
   })
 

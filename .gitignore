@@ -87,6 +87,8 @@ api/tests/opentrons/data/labware-def/
 api/opentrons/config/*.json
 sample_protocol.py
 api/opentrons/server/endpoints/ignore.json
+labware-library/cypress/screenshots/
+labware-library/cypress/videos/
 
 # Local Calibration Data
 calibrations/
