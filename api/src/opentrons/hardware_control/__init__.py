@@ -1249,6 +1249,8 @@ class API(HardwareAPILike):
                         plunger_ax.name.upper(), safety_margin)
                     self._current_position = self._deck_from_smoothie(
                         smoothie_pos)
+                self._backend.set_active_current(
+                    plunger_ax, instr.config.plunger_current)
                 await self._move_plunger(mount, bottom)
 
         if 'doubleDropTip' in instr.config.quirks:
