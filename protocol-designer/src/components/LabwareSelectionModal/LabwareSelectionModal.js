@@ -72,7 +72,7 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [ModuleType]: Array<string> } = {
     'opentrons_24_aluminumblock_nest_2ml_snapcap',
     'opentrons_24_aluminumblock_nest_0.5ml_screwcap',
   ],
-  magdeck: ['biorad_96_wellplate_200ul_pcr'],
+  magdeck: ['nest_96_wellplate_100ul_pcr_full_skirt'],
   thermocycler: ['nest_96_wellplate_100ul_pcr_full_skirt'],
 }
 
