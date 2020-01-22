@@ -1,6 +1,6 @@
 {
   "warning": {
-    "gen1multichannel": "No 8-Channel GEN1 access"
+    "gen1multichannel": "No GEN1 8-Channel access"
   },
   "blocked_slot": {
     "MODULE_INCOMPATIBLE_SINGLE_LABWARE": "Labware incompatible with this module",
