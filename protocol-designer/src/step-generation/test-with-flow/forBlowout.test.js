@@ -56,33 +56,4 @@ describe('Blowout command', () => {
       })
     })
   })
-
-  describe('test params', () => {
-    test('blowout updates with max volume of pipette', () => {
-      robotStateWithTip.liquidState.pipettes.p300SingleId['0'] = {
-        ingred1: { volume: 150 },
-      }
-
-      const result = forBlowout(params, invariantContext, robotStateWithTip)
-
-      expect(result).toMatchObject({
-        robotState: {
-          liquidState: {
-            pipettes: {
-              p300SingleId: {
-                '0': {
-                  ingred1: { volume: 0 },
-                },
-              },
-            },
-            labware: {
-              sourcePlateId: {
-                A1: { ingred1: { volume: 150 } },
-              },
-            },
-          },
-        },
-      })
-    })
-  })
 })

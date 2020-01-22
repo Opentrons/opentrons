@@ -18,9 +18,9 @@ type MutableStateUpdater<P> = (
   robotStateAndWarnings: RobotStateAndWarnings
 ) => void
 
-export function makeImmutableStateUpdater<C>(
-  commandFn: MutableStateUpdater<C>
-): ImmutableStateUpdater<C> {
+export function makeImmutableStateUpdater<P>(
+  commandFn: MutableStateUpdater<P>
+): ImmutableStateUpdater<P> {
   return (params, invariantContext, robotState) => {
     const robotStateAndWarnings = {
       warnings: [],

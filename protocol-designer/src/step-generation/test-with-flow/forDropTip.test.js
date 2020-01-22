@@ -83,13 +83,10 @@ describe('dropTip', () => {
         }),
       })
     })
-
-    // TODO: IL 2019-11-20
-    test.skip('no tip on pipette', () => {})
   })
 
   describe('liquid tracking', () => {
-    test('dropTip calls dispenseUpdateLiquidState with useFullVolume: true', () => {
+    test('dropTip uses full volume when transfering tip to trash', () => {
       const prevRobotState = makeRobotState({
         singleHasTips: true,
         multiHasTips: true,
