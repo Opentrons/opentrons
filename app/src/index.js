@@ -21,7 +21,7 @@ import { rootReducer, history } from './reducer'
 import { rootEpic } from './epic'
 
 // components
-import App from './components/App'
+import { App } from './components/App'
 
 const log = createLogger(__filename)
 

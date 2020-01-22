@@ -11,14 +11,14 @@ import NavBar from './nav-bar'
 import { PageWrapper } from '../components/Page'
 import SidePanel from '../pages/SidePanel'
 import Robots from '../pages/Robots'
-import More from '../pages/More'
+import { More } from '../pages/More'
 import Upload from '../pages/Upload'
 import Calibrate from '../pages/Calibrate'
 import Run from '../pages/Run'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import styles from './App.css'
 
-export default function App() {
+export function App() {
   return (
     <div className={styles.wrapper} onDragOver={stopEvent} onDrop={stopEvent}>
       <NavBar />

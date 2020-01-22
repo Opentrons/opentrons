@@ -8,16 +8,18 @@
 
 .card_content {
   padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .link_label {
   @apply --font-body-1-dark;
 
   max-width: var(--mw-labeled-button);
-  display: inline-block;
-  line-height: 2.25rem;
 }
 
 .link_button {
-  float: right;
+  flex-shrink: 0;
+  margin-left: var(--resources_card_spacing);
 }
