@@ -5,7 +5,6 @@ module.exports = {
 
   extends: [
     'standard',
-    'plugin:cypress/recommended',
     'plugin:react/recommended',
     'plugin:flowtype/recommended',
     'plugin:prettier/recommended',
@@ -14,14 +13,7 @@ module.exports = {
     'prettier/standard',
   ],
 
-  plugins: [
-    // 'eslint-plugin-cypress',
-    'flowtype',
-    'react',
-    'react-hooks',
-    'json',
-    'prettier',
-  ],
+  plugins: ['flowtype', 'react', 'react-hooks', 'json', 'prettier'],
 
   rules: {
     camelcase: 'off',
@@ -43,7 +35,6 @@ module.exports = {
   env: {
     node: true,
     browser: true,
-    // 'cypress/globals': true,
   },
 
   settings: {
@@ -65,6 +56,10 @@ module.exports = {
       env: {
         jest: true,
       },
+    },
+    {
+      files: ['**/cypress/**'],
+      extends: ['plugin:cypress/recommended'],
     },
   ],
 }
