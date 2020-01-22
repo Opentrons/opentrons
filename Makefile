@@ -148,9 +148,9 @@ check-js:
 # TODO: Ian 2019-12-17 gradually add components and shared-data
 .PHONY: circular-dependencies-js
 circular-dependencies-js:
-	madge --circular protocol-designer/src/index.js
-	madge --circular labware-library/src/index.js
-	madge --circular app/src/index.js
+	madge $(and $(CI),--no-spinner --no-color) --circular protocol-designer/src/index.js
+	madge $(and $(CI),--no-spinner --no-color) --circular labware-library/src/index.js
+	madge $(and $(CI),--no-spinner --no-color) --circular app/src/index.js
 
 # upload coverage reports
 .PHONY: coverage
